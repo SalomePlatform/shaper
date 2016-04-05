@@ -12,16 +12,19 @@
 #include "ModelAPI_Feature.h"
 
 #include <TDataStd_ReferenceList.hxx>
+#include <TDataStd_ExtStringList.hxx>
 
 /**\class Model_AttributeRefList
  * \ingroup DataModel
- * \brief Attribute that contains list of references to features (located in the same document).
- * For the current moment it does not support references to objects in other documents.
+ * \brief Attribute that contains list of references to features, may be located in different documents.
  */
 
 class Model_AttributeRefList : public ModelAPI_AttributeRefList
 {
   Handle_TDataStd_ReferenceList myRef;  ///< references to the features labels
+  /// pairs of doc ID and entries if reference is to external object, appends some in this list if
+  /// something in myRef is empty
+  Handle_TDataStd_ExtStringList myExtDocRef;
  public:
   /// Appends the feature to the end of a list
   MODEL_EXPORT virtual void append(ObjectPtr theObject);
@@ -48,15 +51,19 @@ class Model_AttributeRefList : public ModelAPI_AttributeRefList
   MODEL_EXPORT virtual ObjectPtr object(const int theIndex, const bool theWithEmpty = true) const;
 
   /// Substitutes the feature by another one. Does nothing if such object is not found.
+  /// Does not support the external documents objects yet.
   MODEL_EXPORT virtual void substitute(const ObjectPtr& theCurrent, const ObjectPtr& theNew);
 
   /// Substitutes the object by another one and back. So, features will become exchanged in the list
+  /// Does not support the external documents objects yet.
   MODEL_EXPORT virtual void exchange(const ObjectPtr& theObject1, const ObjectPtr& theObject2);
 
   /// Removes the last element in the list.
+  /// Does not support the external documents objects yet.
   MODEL_EXPORT virtual void removeLast();
 
   /// Removes the elements from the list.
+  /// Does not support the external documents objects yet.
   /// \param theIndices a list of indices of elements to be removed
   MODEL_EXPORT virtual void remove(const std::set<int>& theIndices);
 
@@ -65,6 +72,10 @@ class Model_AttributeRefList : public ModelAPI_AttributeRefList
  protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeRefList(TDF_Label& theLabel);
+  /// Returns the object by iterators (theExtIter is iterated if necessary)
+  ObjectPtr iteratedObject(TDF_ListIteratorOfLabelList& theLIter,
+    TDataStd_ListIteratorOfListOfExtendedString& theExtIter,
+    std::shared_ptr<Model_Document> theDoc) const;
 
   friend class Model_Data;
 };

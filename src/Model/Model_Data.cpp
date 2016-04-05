@@ -116,7 +116,7 @@ void Model_Data::setName(const std::string& theName)
 AttributePtr Model_Data::addAttribute(const std::string& theID, const std::string theAttrType)
 {
   AttributePtr aResult;
-  TDF_Label anAttrLab = myLab.FindChild(myAttrs.size() + 1);
+  TDF_Label anAttrLab = myLab.FindChild(int(myAttrs.size()) + 1);
   ModelAPI_Attribute* anAttr = 0;
   if (theAttrType == ModelAPI_AttributeDocRef::typeId()) {
     anAttr = new Model_AttributeDocRef(anAttrLab);

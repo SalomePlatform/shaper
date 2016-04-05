@@ -33,7 +33,7 @@
 using namespace std;
 
 Model_Update MY_UPDATER_INSTANCE;  /// the only one instance initialized on load of the library
-#define DEB_UPDATE
+//#define DEB_UPDATE
 
 Model_Update::Model_Update()
 {
@@ -66,7 +66,9 @@ void Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
   }
   if (myModified.find(theFeature) != myModified.end()) {
     if (theReason.get()) {
+#ifdef DEB_UPDATE
       std::cout<<"*** Add already modified "<<theFeature->name()<<std::endl;
+#endif
       myModified[theFeature].insert(theReason);
     }
     return; // already is marked as modified, so, nothing to do, it will be processed
@@ -684,4 +686,3 @@ void Model_Update::updateStability(void* theSender)
     }
   }
 }
-

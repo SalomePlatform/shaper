@@ -150,5 +150,5 @@ double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, st
 
 bool ParametersPlugin_Parameter::isPreviewNeeded() const
 {
-  return false;
+  return true;
 }

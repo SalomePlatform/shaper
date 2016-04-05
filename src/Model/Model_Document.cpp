@@ -975,6 +975,7 @@ void Model_Document::setCurrentFeature(
   bool aPassed = false; // flag that the current object is already passed in cycle
   FeaturePtr anIter = myObjs->lastFeature();
   bool aWasChanged = false;
+  bool isCurrentParameter = theCurrent.get() && theCurrent->getKind() == "Parameter";
   for(; anIter.get(); anIter = myObjs->nextFeature(anIter, true)) {
     // check this before passed become enabled: the current feature is enabled!
     if (anIter == theCurrent) aPassed = true;
@@ -988,9 +989,12 @@ void Model_Document::setCurrentFeature(
     }
 
     if (anIter->getKind() == "Parameter") {// parameters are always out of the history of features, but not parameters
-      if (theCurrent.get() && theCurrent->getKind() != "Parameter")
+      if (!isCurrentParameter)
         aDisabledFlag = false;
+    } else if (isCurrentParameter) { // if paramater is active, all other features become enabled (issue 1307)
+      aDisabledFlag = false;
     }
+
     if (anIter->setDisabled(aDisabledFlag)) {
       // state of feature is changed => so feature become updated
       static Events_ID anUpdateEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);

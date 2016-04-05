@@ -200,7 +200,7 @@ reflistA.setAttr(aCircleCenter)
 reflistB.setObject(aSketchArc.lastResult())
 aConstraint.execute()
 aSession.finishOperation()
-#checkPointOnArc(aCircleCenter, aSketchArc)
+checkPointOnArc(aCircleCenter, aSketchArc)
 #=========================================================================
 # Check center of circle is still in origin
 #=========================================================================
