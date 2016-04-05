@@ -570,10 +570,11 @@ bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
 
       FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
       FeaturePtr anOpFeature = aFOperation->feature();
-      TopoDS_Shape aShape = aSelectedPrs.shape();
+      GeomShapePtr aShape = aSelectedPrs.shape();
       // click on the digit of dimension constrain comes here with an empty shape, so we need the check
-      if (aFeature == anOpFeature && !aShape.IsNull()) {
-        AttributePtr anAttribute = PartSet_Tools::findAttributeBy2dPoint(anObject, aShape,
+      if (aFeature == anOpFeature && aShape.get() && !aShape->isNull()) {
+        const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+        AttributePtr anAttribute = PartSet_Tools::findAttributeBy2dPoint(anObject, aTDShape,
                                                                          mySketchMgr->activeSketch());
         if (anAttribute.get()) {
           QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();

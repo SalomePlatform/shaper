@@ -550,8 +550,9 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, 
     aContext->UnhilightSelected(false);
     aContext->ClearSelected(false);
     foreach (ModuleBase_ViewerPrs aPrs, theValues) {
-      const TopoDS_Shape& aShape = aPrs.shape();
-      if (!aShape.IsNull()) {
+      const GeomShapePtr& aGeomShape = aPrs.shape();
+      if (aGeomShape.get() && !aGeomShape->isNull()) {
+        const TopoDS_Shape& aShape = aGeomShape->impl<TopoDS_Shape>();
         aContext->AddOrRemoveSelected(aShape, false);
       } else {
         ObjectPtr anObject = aPrs.object();

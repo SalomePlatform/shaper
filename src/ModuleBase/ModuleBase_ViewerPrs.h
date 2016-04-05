@@ -10,11 +10,11 @@
 #include "ModuleBase.h"
 
 #include <memory>
-#include <TopoDS_Shape.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <AIS_InteractiveObject.hxx>
 
 #include <ModelAPI_Result.h>
+#include <GeomAPI_Shape.h>
 
 /**\class ModuleBase_ViewerPrs
  * \ingroup GUI
@@ -30,7 +30,7 @@ class ModuleBase_ViewerPrs
   /// \param theResult an object
   /// \param theShape a viewer shape
   /// \param theOwner a selection owner
-  MODULEBASE_EXPORT ModuleBase_ViewerPrs(ObjectPtr theResult, const TopoDS_Shape& theShape,
+  MODULEBASE_EXPORT ModuleBase_ViewerPrs(ObjectPtr theResult, const GeomShapePtr& theShape,
                        Handle_SelectMgr_EntityOwner theOwner);
 
   /// Destructor
@@ -66,14 +66,14 @@ class ModuleBase_ViewerPrs
 
   /// Sets the shape
   /// \param theShape a shape instance
-  MODULEBASE_EXPORT void setShape(const TopoDS_Shape& theShape)
+  MODULEBASE_EXPORT void setShape(const GeomShapePtr& theShape)
   {
     myShape = theShape;
   }
 
   /// Returns the shape
   /// \return a shape instance
-  MODULEBASE_EXPORT const TopoDS_Shape& shape() const
+  MODULEBASE_EXPORT const GeomShapePtr& shape() const
   {
     return myShape;
   }
@@ -95,7 +95,7 @@ class ModuleBase_ViewerPrs
   /// \return boolean value
   MODULEBASE_EXPORT bool isEmpty() const
   {
-    return myShape.IsNull() &&
+    return (!myShape.get() || myShape->isNull()) &&
            myOwner.IsNull() && !myResult.get();
   }
 
@@ -106,7 +106,7 @@ class ModuleBase_ViewerPrs
  private:
   ObjectPtr myResult;  /// the feature
   Handle(SelectMgr_EntityOwner) myOwner;  /// the selection owner
-  TopoDS_Shape myShape;  /// the shape
+  GeomShapePtr myShape;  /// the shape
   Handle(AIS_InteractiveObject) myInteractive;  /// interactive object
 };
 

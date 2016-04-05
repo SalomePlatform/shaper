@@ -155,11 +155,12 @@ bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
     return isDone;
 
   ModuleBase_ViewerPrs aValue = theValues.takeFirst();
-  TopoDS_Shape aShape = aValue.shape();
-  if (!aShape.IsNull()) {
+  GeomShapePtr aShape = aValue.shape();
+  if (aShape.get() && !aShape->isNull()) {
     Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
     double aX, aY;
-    if (getPoint2d(aView, aShape, aX, aY)) {
+    const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+    if (getPoint2d(aView, aTDShape, aX, aY)) {
       isDone = setPoint(aX, aY);
       PartSet_Tools::setConstraints(mySketch, feature(), attributeID(), aX, aY);
     }

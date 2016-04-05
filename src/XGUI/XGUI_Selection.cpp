@@ -110,7 +110,7 @@ void XGUI_Selection::getSelectedInBrowser(QList<ModuleBase_ViewerPrs>& thePresen
   for (; anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
     if (anObject.get() != NULL && !aPresentationObjects.contains(anObject)) {
-      thePresentations.append(ModuleBase_ViewerPrs(anObject, TopoDS_Shape(), NULL));
+      thePresentations.append(ModuleBase_ViewerPrs(anObject, GeomShapePtr(), NULL));
     }
   }
 }
@@ -135,8 +135,11 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
     if (aShape.IsNull())
       aShape = findAxisShape(anIO);
 #endif
-    if (!aShape.IsNull())
-      thePrs.setShape(aShape);
+    if (!aShape.IsNull()) {
+      std::shared_ptr<GeomAPI_Shape> aGeomShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+      aGeomShape->setImpl(new TopoDS_Shape(aShape));
+      thePrs.setShape(aGeomShape);
+    }
   } else {
 #ifdef DEBUG_DELIVERY
     // Fill by trihedron shapes
@@ -150,8 +153,11 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
       BRep_Builder aBuilder;      
       TopoDS_Edge aEdge;
       aBuilder.MakeEdge(aEdge, aTLine, Precision::Confusion());
-      if (!aEdge.IsNull())
-        thePrs.setShape(aEdge);
+      if (!aEdge.IsNull()) {
+        std::shared_ptr<GeomAPI_Shape> aGeomShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+        aGeomShape->setImpl(new TopoDS_Shape(aEdge));
+        thePrs.setShape(aGeomShape);
+      }
     } else {
       Handle(AIS_Point) aPoint = Handle(AIS_Point)::DownCast(anIO);
       if (!aPoint.IsNull()) {
@@ -160,8 +166,11 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
         BRep_Builder aBuilder;
         TopoDS_Vertex aVertex;
         aBuilder.MakeVertex(aVertex, aPnt->Pnt(), Precision::Confusion());
-        if (!aVertex.IsNull())
-          thePrs.setShape(aVertex);
+        if (!aVertex.IsNull()) {
+          std::shared_ptr<GeomAPI_Shape> aGeomShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+          aGeomShape->setImpl(new TopoDS_Shape(aVertex));
+          thePrs.setShape(aGeomShape);
+        }
       }
     }
 #endif
@@ -178,13 +187,10 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
     if (aResult.get()) {
       ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(aResult);
       if (aCompSolid.get()) {
-        GeomShapePtr aShapePtr = aCompSolid->shape();
-        if (aShapePtr.get()) {
-          TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
-          if (aShape.IsEqual(thePrs.shape())) {
-            thePrs.setObject(aCompSolid);
-            return;
-          }
+        GeomShapePtr aShape = aCompSolid->shape();
+        if (aShape.get() && aShape->isEqual(thePrs.shape())) {
+          thePrs.setObject(aCompSolid);
+          return;
         }
       }
     }
@@ -216,8 +222,11 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted() const
     aPrs.setObject(aResult);
     if (aContext->HasOpenedContext()) {
       TopoDS_Shape aShape = aContext->DetectedShape();
-      if (!aShape.IsNull())
-        aPrs.setShape(aShape);
+      if (!aShape.IsNull()) {
+        std::shared_ptr<GeomAPI_Shape> aGeomShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+        aGeomShape->setImpl(new TopoDS_Shape(aShape));
+        aPrs.setShape(aGeomShape);
+      }
     }
     aPresentations.push_back(aPrs);
   }

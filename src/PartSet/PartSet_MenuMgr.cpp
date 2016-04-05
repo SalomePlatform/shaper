@@ -120,14 +120,13 @@ bool PartSet_MenuMgr::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*
   bool hasFeature = false;
 
   QList<ModuleBase_ViewerPrs> aPrsList = aSelection->getSelected(ModuleBase_ISelection::Viewer);
-  TopoDS_Shape aShape;
   ResultPtr aResult;
   FeaturePtr aFeature;
   foreach(ModuleBase_ViewerPrs aPrs, aPrsList) {
     aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs.object());
     if (aResult.get() != NULL) {
-      aShape = aPrs.shape();
-      if (aShape.IsEqual(aResult->shape()->impl<TopoDS_Shape>()))
+      const GeomShapePtr& aShape = aPrs.shape();
+      if (aShape.get() && aShape->isEqual(aResult->shape()))
         hasFeature = true;
       else
         hasAttribute = true;
@@ -138,12 +137,13 @@ bool PartSet_MenuMgr::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*
   }
 
   if (aPrsList.size() == 1) {
-    TopoDS_Shape aShape = aPrsList.first().shape();
-    if ((!aShape.IsNull()) && aShape.ShapeType() == TopAbs_VERTEX) {
+    const GeomShapePtr& aShape = aPrsList.first().shape();
+    if (aShape.get() && !aShape->isNull() && aShape->shapeType() == GeomAPI_Shape::VERTEX) {
       // Find 2d coordinates
       FeaturePtr aSketchFea = myModule->sketchMgr()->activeSketch();
       if (aSketchFea->getKind() == SketchPlugin_Sketch::ID()) {
-        gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
+        const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+        gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aTDShape));
         std::shared_ptr<GeomAPI_Pnt> aPnt3d(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
         std::shared_ptr<GeomAPI_Pnt2d> aSelPnt = PartSet_Tools::convertTo2D(aSketchFea, aPnt3d);
 

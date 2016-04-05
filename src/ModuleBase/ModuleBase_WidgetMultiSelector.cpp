@@ -628,14 +628,8 @@ void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<in
         continue;
       AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
       ResultPtr anObject = anAttr->context();
-      if (anObject.get()) {
-        TopoDS_Shape aShape;
-        std::shared_ptr<GeomAPI_Shape> aShapePtr = anAttr->value();
-        if (aShapePtr.get()) {
-          aShape = aShapePtr->impl<TopoDS_Shape>();
-        }
-        theValues.append(ModuleBase_ViewerPrs(anObject, aShape, NULL));
-      }
+      if (anObject.get())
+        theValues.append(ModuleBase_ViewerPrs(anObject, anAttr->value(), NULL));
     }
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
@@ -646,7 +640,7 @@ void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<in
         continue;
       ObjectPtr anObject = aRefListAttr->object(i);
       if (anObject.get()) {
-        theValues.append(ModuleBase_ViewerPrs(anObject, TopoDS_Shape(), NULL));
+        theValues.append(ModuleBase_ViewerPrs(anObject, GeomShapePtr(), NULL));
       }
     }
   }
@@ -663,10 +657,7 @@ void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<in
       AttributePtr anAttribute = aRefAttrListAttr->attribute(i);
       if (anAttribute.get()) {
         GeomShapePtr aGeomShape = myWorkshop->module()->findShape(anAttribute);
-        if (aGeomShape.get()) {
-          aShape = aGeomShape->impl<TopoDS_Shape>();
-        }
-        theValues.append(ModuleBase_ViewerPrs(anObject, aShape, NULL));
+        theValues.append(ModuleBase_ViewerPrs(anObject, aGeomShape, NULL));
       }
     }
   }

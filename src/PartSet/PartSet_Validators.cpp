@@ -44,9 +44,9 @@ int shapesNbPoints(const ModuleBase_ISelection* theSelection)
 
   int aCount = 0;
   foreach (ModuleBase_ViewerPrs aPrs, aList) {
-    const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull()) {
-      if (aShape.ShapeType() == TopAbs_VERTEX)
+    const GeomShapePtr& aShape = aPrs.shape();
+    if (aShape.get() && !aShape->isNull()) {
+      if (aShape->shapeType() == GeomAPI_Shape::VERTEX)
         aCount++;
     }
   }
@@ -58,10 +58,11 @@ int shapesNbLines(const ModuleBase_ISelection* theSelection)
   QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
   int aCount = 0;
   foreach(ModuleBase_ViewerPrs aPrs, aList) {
-    const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull()) {
-      if (aShape.ShapeType() == TopAbs_EDGE) {
-        TopoDS_Edge aEdge = TopoDS::Edge(aShape);
+    const GeomShapePtr& aShape = aPrs.shape();
+    if (aShape.get() && !aShape->isNull()) {
+      if (aShape->shapeType() == GeomAPI_Shape::EDGE) {
+        const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+        TopoDS_Edge aEdge = TopoDS::Edge(aTDShape);
         Standard_Real aStart, aEnd;
         Handle(Geom_Curve) aCurve = BRep_Tool::Curve(aEdge, aStart, aEnd);
         GeomAdaptor_Curve aAdaptor(aCurve);
@@ -159,10 +160,11 @@ bool PartSet_RadiusSelection::isValid(const ModuleBase_ISelection* theSelection,
     ModuleBase_ViewerPrs aPrs;
     int aCount = 0;
     foreach (ModuleBase_ViewerPrs aPrs, aList) {
-      const TopoDS_Shape& aShape = aPrs.shape();
-      if (!aShape.IsNull()) {
-        if (aShape.ShapeType() == TopAbs_EDGE) {
-          TopoDS_Edge aEdge = TopoDS::Edge(aShape);
+      const GeomShapePtr& aShape = aPrs.shape();
+      if (aShape.get() && !aShape->isNull()) {
+        if (aShape->shapeType() == GeomAPI_Shape::EDGE) {
+          const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+          TopoDS_Edge aEdge = TopoDS::Edge(aTDShape);
           Standard_Real aStart, aEnd;
           Handle(Geom_Curve) aCurve = BRep_Tool::Curve(aEdge, aStart, aEnd);
           GeomAdaptor_Curve aAdaptor(aCurve);
@@ -228,31 +230,20 @@ bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection
       return false;
 
     ModuleBase_ViewerPrs aPrs = aList.first();
-    const TopoDS_Shape& aShape = aPrs.shape();
-    if (aShape.IsNull())
+    const GeomShapePtr& aShape = aPrs.shape();
+    if (!aShape.get() || aShape->isNull() || aShape->shapeType() != GeomAPI_Shape::EDGE)
       return false;
-
-    if (aShape.ShapeType() != TopAbs_EDGE)
-      return false;
-
-    std::shared_ptr<GeomAPI_Shape> aShapePtr(new GeomAPI_Shape);
-    aShapePtr->setImpl(new TopoDS_Shape(aShape));
-    GeomAPI_Edge aEdge1(aShapePtr);
+    GeomAPI_Edge aEdge1(aShape);
 
     if (aEdge1.isLine() || aEdge1.isArc()) {
       if (aList.size() == 2) {
         // Check second selection
         aPrs = aList.last();
-        const TopoDS_Shape& aShape2 = aPrs.shape();
-        if (aShape2.IsNull())
+        const GeomShapePtr& aShape2 = aPrs.shape();
+        if (!aShape2.get() || aShape2->isNull() || aShape2->shapeType() != GeomAPI_Shape::EDGE)
           return false;
+        GeomAPI_Edge aEdge2(aShape2);
 
-        if (aShape2.ShapeType() != TopAbs_EDGE)
-          return false;
-
-        std::shared_ptr<GeomAPI_Shape> aShapePtr2(new GeomAPI_Shape);
-        aShapePtr2->setImpl(new TopoDS_Shape(aShape2));
-        GeomAPI_Edge aEdge2(aShapePtr2);
         if (aEdge1.isLine() && aEdge2.isArc())
           return true;
         else if (aEdge1.isArc() && aEdge2.isLine())
@@ -286,9 +277,8 @@ bool PartSet_EqualSelection::isValid(const ModuleBase_ISelection* theSelection, 
     int aCount = 0;
     int aType = 0;
     foreach (ModuleBase_ViewerPrs aPrs, aList) {
-      std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
-      aShape->setImpl(new TopoDS_Shape(aPrs.shape()));
-      if (aShape->isEdge()) {
+      GeomShapePtr aShape = aPrs.shape();
+      if (aShape.get() && aShape->isEdge()) {
         aCount++;
         GeomAPI_Edge aEdge(aShape);
         if (aEdge.isLine()) {

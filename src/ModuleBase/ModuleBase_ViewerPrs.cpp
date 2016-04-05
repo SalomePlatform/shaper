@@ -14,7 +14,7 @@ ModuleBase_ViewerPrs::ModuleBase_ViewerPrs()
 }
 
 ModuleBase_ViewerPrs::ModuleBase_ViewerPrs(ObjectPtr theResult, 
-                                           const TopoDS_Shape& theShape, 
+                                           const GeomShapePtr& theShape, 
                                            Handle_SelectMgr_EntityOwner theOwner) 
 : myResult(theResult),
   myShape(theShape),
@@ -29,7 +29,8 @@ ModuleBase_ViewerPrs::~ModuleBase_ViewerPrs()
 bool ModuleBase_ViewerPrs::operator==(const ModuleBase_ViewerPrs& thePrs)
 {
   bool isEqualResult = (myResult.get() == thePrs.object().get());
-  bool isEqualShape = myShape.IsEqual(thePrs.shape()) == Standard_True;
+  bool isEqualShape = (!myShape.get() && !thePrs.shape().get()) ||
+                       (myShape.get() && myShape->isEqual(thePrs.shape()));
   bool isEqualIO = (myInteractive == thePrs.interactive()) == Standard_True;
 
   bool isEqualOwner = (myOwner.Access() == thePrs.owner().Access());

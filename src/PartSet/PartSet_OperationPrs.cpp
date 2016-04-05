@@ -95,7 +95,7 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
       // appendShapeIfVisible() on the step of filling myFeatureShapes list
       // the reason is to avoid empty AIS object visualized in the viewer
       //if (!aGeomShape.get()) continue;
-      TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>();
+      TopoDS_Shape aShape = aGeomShape.get() ? aGeomShape->impl<TopoDS_Shape>() : TopoDS_Shape();
       // change deviation coefficient to provide more precise circle
       ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
 
@@ -339,14 +339,8 @@ void PartSet_OperationPrs::getHighlightedShapes(ModuleBase_IWorkshop* theWorksho
     ModuleBase_ViewerPrs aPrs = *anIIt;
     ObjectPtr anObject = aPrs.object();
 
-    GeomShapePtr aGeomShape;
-
-    TopoDS_Shape aShape = aPrs.shape();
-    if (!aShape.IsNull()) {
-      aGeomShape = GeomShapePtr(new GeomAPI_Shape());
-      aGeomShape->setImpl(new TopoDS_Shape(aShape));
-    }
-    else {
+    GeomShapePtr aGeomShape = aPrs.shape();
+    if (!aGeomShape.get() || aGeomShape->isNull()) {
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
       if (aResult.get()) {
         aGeomShape = aResult->shape();

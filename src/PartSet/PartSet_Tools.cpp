@@ -657,10 +657,11 @@ bool PartSet_Tools::hasVertexShape(const ModuleBase_ViewerPrs& thePrs, FeaturePt
 {
   bool aHasVertex = false;
 
-  const TopoDS_Shape& aShape = thePrs.shape();
-  if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX)
+  const GeomShapePtr& aShape = thePrs.shape();
+  if (aShape.get() && !aShape->isNull() && aShape->shapeType() == GeomAPI_Shape::VERTEX)
   {
-    const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
+    const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+    const TopoDS_Vertex& aVertex = TopoDS::Vertex(aTDShape);
     if (!aVertex.IsNull())
     {
       gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);

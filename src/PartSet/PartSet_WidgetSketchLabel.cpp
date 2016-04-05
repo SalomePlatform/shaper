@@ -211,7 +211,7 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   // 1. hide main planes if they have been displayed
   erasePreviewPlanes();
   // 2. if the planes were displayed, change the view projection
-  TopoDS_Shape aShape = thePrs.shape();
+  const GeomShapePtr& aShape = thePrs.shape();
   std::shared_ptr<GeomAPI_Shape> aGShape;
   std::shared_ptr<GeomAPI_Shape> aBaseShape;
 
@@ -220,9 +220,8 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
                             (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
 
   // selection happens in OCC viewer
-  if (!aShape.IsNull()) {
-    aGShape =  std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-    aGShape->setImpl(new TopoDS_Shape(aShape));
+  if (aShape.get() && !aShape->isNull()) {
+    aGShape = aShape;
 
     if (aSelAttr && aSelAttr->context()) {
       aBaseShape = aSelAttr->context()->shape();
@@ -320,7 +319,7 @@ bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrs& t
 {
   bool isOwnerSet = false;
 
-  const TopoDS_Shape& aShape = thePrs.shape();
+  const GeomShapePtr& aShape = thePrs.shape();
   std::shared_ptr<GeomAPI_Dir> aDir;
 
   if (thePrs.object() && (feature() != thePrs.object())) {
@@ -332,11 +331,11 @@ bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrs& t
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
       if (aRes) {
         GeomShapePtr aShapePtr(new GeomAPI_Shape());
-        if (aShape.IsNull()) {  // selection happens in the OCC viewer
+        if (!aShape.get() || aShape->isNull()) {  // selection happens in the OCC viewer
           aShapePtr = ModelAPI_Tools::shape(aRes);
         }
         else { // selection happens in OB browser
-          aShapePtr->setImpl(new TopoDS_Shape(aShape));
+          aShapePtr = aShape;
         }
         if (aShapePtr.get() != NULL) {
           aSelAttr->setValue(aRes, aShapePtr);
@@ -345,8 +344,9 @@ bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrs& t
       }
     }
   }
-  else if (!aShape.IsNull()) {
-    aDir = setSketchPlane(aShape);
+  else if (aShape.get() && !aShape->isNull()) {
+    const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+    aDir = setSketchPlane(aTDShape);
     isOwnerSet = aDir.get();
   }
   return isOwnerSet;

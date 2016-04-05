@@ -27,7 +27,7 @@ void ModuleBase_ISelection::appendSelected(const QList<ModuleBase_ViewerPrs> the
   for (; anIt != aLast; anIt++) {
     ObjectPtr anObject = (*anIt).object();
     if (anObject.get() != NULL && !anExistedObjects.contains(anObject)) {
-      theValuesTo.append(ModuleBase_ViewerPrs(anObject, TopoDS_Shape(), NULL));
+      theValuesTo.append(ModuleBase_ViewerPrs(anObject, GeomShapePtr(), NULL));
     }
   }
 
@@ -53,13 +53,12 @@ GeomShapePtr ModuleBase_ISelection::getShape(const ModuleBase_ViewerPrs& thePrs)
 {
   GeomShapePtr aShape;
 
-  const TopoDS_Shape& aTDSShape = thePrs.shape();
+  const GeomShapePtr& aPrsShape = thePrs.shape();
   // if only result is selected, an empty shape is set to the model
-  if (aTDSShape.IsNull()) {
+  if (!aPrsShape.get() || aPrsShape->isNull()) {
   }
   else {
-    aShape = GeomShapePtr(new GeomAPI_Shape());
-    aShape->setImpl(new TopoDS_Shape(aTDSShape));
+    aShape = aPrsShape;
     // If the result object is built on the same shape, the result shape here is empty one
     ResultPtr aResult = getResult(thePrs);
     if (aResult.get() && aShape->isEqual(aResult->shape()))
@@ -76,7 +75,7 @@ QList<ModuleBase_ViewerPrs> ModuleBase_ISelection::getViewerPrs(const QObjectPtr
   for (; anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
     if (anObject.get() != NULL) {
-      aSelectedPrs.append(ModuleBase_ViewerPrs(anObject, TopoDS_Shape(), NULL));
+      aSelectedPrs.append(ModuleBase_ViewerPrs(anObject, GeomShapePtr(), NULL));
     }
   }
   return aSelectedPrs;

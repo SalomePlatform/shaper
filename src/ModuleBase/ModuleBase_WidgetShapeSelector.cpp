@@ -148,12 +148,8 @@ QList<ModuleBase_ViewerPrs> ModuleBase_WidgetShapeSelector::getAttributeSelectio
     AttributePtr anAttribute = myFeature->attribute(attributeID());
 
     ObjectPtr anObject = ModuleBase_Tools::getObject(anAttribute);
-    TopoDS_Shape aShape;
     std::shared_ptr<GeomAPI_Shape> aShapePtr = getShape();
-    if (aShapePtr.get()) {
-      aShape = aShapePtr->impl<TopoDS_Shape>();
-    }
-    ModuleBase_ViewerPrs aPrs(anObject, aShape, NULL);
+    ModuleBase_ViewerPrs aPrs(anObject, aShapePtr, NULL);
     aSelected.append(aPrs);
   }
   return aSelected;
