@@ -87,6 +87,20 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
 
   // Getting base shape.
   const TopoDS_Shape& aBaseShape = theBaseShape->impl<TopoDS_Shape>();
+  TopAbs_ShapeEnum aShapeTypeToExp;
+  switch(aBaseShape.ShapeType()) {
+    case TopAbs_VERTEX:
+      aShapeTypeToExp = TopAbs_VERTEX;
+      break;
+    case TopAbs_EDGE:
+    case TopAbs_WIRE:
+      aShapeTypeToExp = TopAbs_EDGE;
+      break;
+    case TopAbs_FACE:
+    case TopAbs_SHELL:
+      aShapeTypeToExp = TopAbs_FACE;
+      break;
+  }
 
   // Getting direction.
   gp_Vec aDirVec;
@@ -141,20 +155,6 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     aResult = aPrismBuilder->Shape();
 
     // Setting naming.
-    TopAbs_ShapeEnum aShapeTypeToExp;
-    switch(aMovedBase.ShapeType()) {
-      case TopAbs_VERTEX:
-        aShapeTypeToExp = TopAbs_VERTEX;
-        break;
-      case TopAbs_EDGE:
-      case TopAbs_WIRE:
-        aShapeTypeToExp = TopAbs_EDGE;
-        break;
-      case TopAbs_FACE:
-      case TopAbs_SHELL:
-        aShapeTypeToExp = TopAbs_FACE;
-        break;
-    }
     for(TopExp_Explorer anExp(aMovedBase, aShapeTypeToExp); anExp.More(); anExp.Next()) {
       const TopoDS_Shape& aFace = anExp.Current();
       GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
