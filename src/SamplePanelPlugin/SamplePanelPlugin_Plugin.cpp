@@ -12,6 +12,7 @@
 
 #include <ModuleBase_WidgetCreatorFactory.h>
 #include <SamplePanelPlugin_WidgetCreator.h>
+#include <SamplePanelPlugin_ModelWidgetCreator.h>
 
 // the only created instance of this plugin
 static SamplePanelPlugin_Plugin* MY_SAMPLE_PANEL_PLUGIN_INSTANCE = new SamplePanelPlugin_Plugin();
@@ -23,6 +24,8 @@ SamplePanelPlugin_Plugin::SamplePanelPlugin_Plugin()
   WidgetCreatorFactoryPtr aWidgetCreatorFactory = ModuleBase_WidgetCreatorFactory::get();
   aWidgetCreatorFactory->registerCreator(
           std::shared_ptr<SamplePanelPlugin_WidgetCreator>(new SamplePanelPlugin_WidgetCreator()));
+  aWidgetCreatorFactory->registerCreator(
+   std::shared_ptr<SamplePanelPlugin_ModelWidgetCreator>(new SamplePanelPlugin_ModelWidgetCreator()));
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

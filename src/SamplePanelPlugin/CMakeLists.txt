@@ -6,6 +6,8 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
     SamplePanelPlugin.h
     SamplePanelPlugin_Feature.h
+    SamplePanelPlugin_ModelWidget.h
+    SamplePanelPlugin_ModelWidgetCreator.h
     SamplePanelPlugin_Panel.h
     SamplePanelPlugin_Plugin.h
     SamplePanelPlugin_WidgetCreator.h
@@ -13,6 +15,8 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_SOURCES
     SamplePanelPlugin_Feature.cpp
+    SamplePanelPlugin_ModelWidget.cpp
+    SamplePanelPlugin_ModelWidgetCreator.cpp
     SamplePanelPlugin_Panel.cpp
     SamplePanelPlugin_Plugin.cpp
     SamplePanelPlugin_WidgetCreator.cpp

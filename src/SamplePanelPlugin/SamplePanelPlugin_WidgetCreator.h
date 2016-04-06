@@ -45,6 +45,4 @@ private:
   std::set<std::string> myPanelTypes; /// types of panels
 };
 
-typedef std::shared_ptr<SamplePanelPlugin_WidgetCreator> SamplePanelWidgetCreatorPtr;
-
 #endif
