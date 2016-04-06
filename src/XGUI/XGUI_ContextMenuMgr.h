@@ -12,6 +12,7 @@ class XGUI_Workshop;
 class QAction;
 class QContextMenuEvent;
 class QMenu;
+class QActionGroup;
 
 /**
  * \ingroup GUI
@@ -113,7 +114,9 @@ signals:
   QMap<std::string, QActionsList> myObjBrowserMenus;
   QMap<std::string, QActionsList> myViewerMenu;
 
-   QAction* mySeparator;
+  QActionGroup* mySelectActions;
+
+  QAction* mySeparator;
 };
 
 #endif

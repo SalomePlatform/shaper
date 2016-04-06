@@ -1245,3 +1245,13 @@ void XGUI_Displayer::displayTrihedron(bool theToDisplay) const
 
   updateViewer();
 }
+
+QIntList XGUI_Displayer::activeSelectionModes() const 
+{ 
+  QIntList aModes;
+  foreach (int aMode, myActiveSelectionModes) {
+    // aMode < 9 is a Shape Enum values
+    aModes << ((aMode < 9)? AIS_Shape::SelectionType(aMode) : aMode);
+  }
+  return aModes; 
+}

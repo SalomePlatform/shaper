@@ -119,7 +119,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
       mySalomeConnector(theConnector),
       myPropertyPanel(0),
       myObjectBrowser(0),
-      myDisplayer(0)
+      myDisplayer(0),
+      myViewerSelMode(TopAbs_FACE)
 {
 #ifndef HAVE_SALOME
   myMainWindow = new AppElements_MainWindow();
@@ -187,6 +188,9 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
                                    Config_Prop::Color, ModelAPI_ResultConstruction::DEFAULT_COLOR());
   Config_PropManager::registerProp("Visualization", "result_part_color", "Part color",
                                    Config_Prop::Color, ModelAPI_ResultPart::DEFAULT_COLOR());
+  
+  myViewerSelMode = 
+    ModuleBase_Preferences::resourceMgr()->integerValue("Viewer", "selection", TopAbs_FACE);
 }
 
 //******************************************************
@@ -238,12 +242,10 @@ void XGUI_Workshop::activateModule()
 
   updateCommandStatus();
 
+  // TODO: get default selection mode
+
   // activate visualized objects in the viewer
-  XGUI_Displayer* aDisplayer = displayer();
-  QObjectPtrList aDisplayed = aDisplayer->displayedObjects();
-  QIntList aModes;
-  module()->activeSelectionModes(aModes);
-  aDisplayer->activateObjects(aModes, aDisplayed);
+  activateObjectsSelection(displayer()->displayedObjects());
   myOperationMgr->activate();
 }
 
@@ -565,9 +567,7 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
       }
     }
   }
-  QIntList aModes;
-  module()->activeSelectionModes(aModes);
-  myDisplayer->activateObjects(aModes, anObjects);
+  activateObjectsSelection(anObjects);
 }
 
 
@@ -1160,8 +1160,34 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
         aObj->setDisplayed(false);
     }
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  } else if (theId == "SELECT_VERTEX_CMD") {
+    setViewerSelectionMode(TopAbs_VERTEX);
+  } else if (theId == "SELECT_EDGE_CMD") {
+    setViewerSelectionMode(TopAbs_EDGE);
+  } else if (theId == "SELECT_FACE_CMD") {
+    setViewerSelectionMode(TopAbs_FACE);
+  } else if (theId == "SELECT_RESULT_CMD") {
+    setViewerSelectionMode(-1);
   }
 }
+
+//**************************************************************
+void XGUI_Workshop::setViewerSelectionMode(int theMode)
+{
+  myViewerSelMode = theMode;
+  activateObjectsSelection(myDisplayer->displayedObjects());
+}
+
+//**************************************************************
+void XGUI_Workshop::activateObjectsSelection(const QObjectPtrList& theList)
+{
+  QIntList aModes;
+  module()->activeSelectionModes(aModes);
+  if (aModes.isEmpty() && (myViewerSelMode != -1))
+    aModes.append(myViewerSelMode);
+  myDisplayer->activateObjects(aModes, theList);
+}
+
 
 //**************************************************************
 void XGUI_Workshop::deleteObjects()

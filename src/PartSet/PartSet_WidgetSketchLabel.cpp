@@ -424,6 +424,10 @@ void PartSet_WidgetSketchLabel::activateCustom()
 
   myStackWidget->setCurrentIndex(0);
   bool aBodyIsVisualized = myPreviewPlanes->hasVisualizedBodies(myWorkshop);
+
+  // Clear previous selection mode It is necessary for correct activation of preview planes
+  aDisp->activateObjects(QIntList(), aDisplayed, false);
+
   if (!aBodyIsVisualized) {
     // We have to select a plane before any operation
     myPreviewPlanes->showPreviewPlanes(myWorkshop);

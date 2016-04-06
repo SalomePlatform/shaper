@@ -96,6 +96,22 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
   QList<ModuleBase_ViewerPrs> aSelectedPrs =
              myWorkshop->selector()->selection()->getSelected(ModuleBase_ISelection::Browser);
 
+  QList<ModuleBase_ViewerPrs> aTmpList = aSelectedPrs;
+  ObjectPtr aObject;
+  FeaturePtr aFeature;
+  foreach(ModuleBase_ViewerPrs aPrs, aTmpList) {
+    aObject = aPrs.object();
+    if (aObject.get()) {
+      aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+      if (aFeature.get()) {
+        const std::list<std::shared_ptr<ModelAPI_Result>> aResList = aFeature->results();
+        std::list<ResultPtr>::const_iterator aIt;
+        for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
+          aSelectedPrs.append(ModuleBase_ViewerPrs((*aIt), TopoDS_Shape(), NULL));
+        }
+      }
+    }
+  }
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   aDisplayer->setSelected(aSelectedPrs);
   emit selectionChanged();
@@ -111,6 +127,18 @@ void XGUI_SelectionMgr::onViewerSelection()
     foreach(ModuleBase_ViewerPrs aPrs, aPresentations) {
       if (aPrs.object().get())
         aFeatures.append(aPrs.object());
+    }
+  }
+  // Add features by selected results
+  QObjectPtrList aTmpList = aFeatures;
+  ResultPtr aResult;
+  FeaturePtr aFeature;
+  foreach(ObjectPtr aObj, aTmpList) {
+    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    if (aResult.get()) {
+      aFeature = ModelAPI_Feature::feature(aResult);
+      if (aFeature.get() && (!aFeatures.contains(aFeature)))
+        aFeatures.append(aFeature);
     }
   }
   bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);

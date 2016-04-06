@@ -9,6 +9,8 @@
 
 #include <Config_PropManager.h>
 
+#include <TopAbs_ShapeEnum.hxx>
+
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_PreferenceMgr.h>
 #include <Qtx.h>
@@ -287,6 +289,26 @@ void ModuleBase_PreferencesDlg::createViewerPage(int thePageId)
   myPreferences->setItemProperty("texture_stretch_enabled", true, bgId);
   myPreferences->setItemProperty("custom_enabled", false, bgId);
   myPreferences->setItemProperty("image_formats", aImgFiles, bgId);
+
+  // Create other parameters group in viewer tab
+  int otherGroup = myPreferences->addItem(tr("Other parameters"), viewTab);
+  int selId = myPreferences->addItem(tr("Default selection type"), otherGroup, 
+                                     SUIT_PreferenceMgr::Selector,
+                                     ModuleBase_Preferences::VIEWER_SECTION, "selection");
+  QStringList aSelectionList;
+  aSelectionList.append( tr("Vertices") );
+  aSelectionList.append( tr("Edges") );
+  aSelectionList.append( tr("Faces") );
+  aSelectionList.append( tr("Results") );
+
+  QList<QVariant> anIndexesList;
+  anIndexesList.append(TopAbs_VERTEX);
+  anIndexesList.append(TopAbs_EDGE);
+  anIndexesList.append(TopAbs_FACE);
+  anIndexesList.append(-1);
+
+  myPreferences->setItemProperty( "strings", aSelectionList, selId );
+  myPreferences->setItemProperty( "indexes", anIndexesList, selId );
 }
 
 void ModuleBase_PreferencesDlg::createMenuPage(int thePageId)

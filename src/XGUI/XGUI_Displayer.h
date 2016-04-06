@@ -243,6 +243,11 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Returns true if the trihedron should be activated in current selection modes
   bool isTrihedronActive() const { return myIsTrihedronActive; }
 
+  /// Returns list of currently active selection modes
+  /// Selection modes will be returned according to TopAbs_ShapeEnum
+  QIntList activeSelectionModes() const;
+
+
   /// Converts shape type (TopAbs_ShapeEnum) to selection mode
   /// \param theShapeType a shape type from TopAbs_ShapeEnum
   static int getSelectionMode(int theShapeType);

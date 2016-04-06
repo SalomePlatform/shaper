@@ -11,6 +11,7 @@
   <section name="Viewer" >
     <!-- Viewer preferences -->
     <parameter name="background" value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />
+    <parameter name="selection" value="4" />
   </section>
   <section name="Menu" >
     <!-- Menu bar preferences -->

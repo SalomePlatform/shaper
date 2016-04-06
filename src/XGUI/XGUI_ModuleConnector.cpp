@@ -85,9 +85,7 @@ void XGUI_ModuleConnector::deactivateSubShapesSelection()
 void XGUI_ModuleConnector::activateModuleSelectionModes()
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();
-  QIntList aModes;
-  module()->activeSelectionModes(aModes);
-  aDisp->activateObjects(aModes, activeObjects(aDisp->displayedObjects()));
+  myWorkshop->activateObjectsSelection(activeObjects(aDisp->displayedObjects()));
 }
 
 AISObjectPtr XGUI_ModuleConnector::findPresentation(const ObjectPtr& theObject) const

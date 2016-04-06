@@ -33,6 +33,7 @@
 #include <ModuleBase_OperationAction.h>
 
 #include <QAction>
+#include <QActionGroup>
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QMdiArea>
@@ -98,6 +99,30 @@ void XGUI_ContextMenuMgr::createActions()
   mySeparator = new QAction(this);
   mySeparator->setSeparator(true);
 
+  mySelectActions = new QActionGroup(this);
+  mySelectActions->setExclusive(true);
+
+  aAction = new QAction(QIcon(":pictures/vertex.png"), tr("Vertices"), this);
+  aAction->setCheckable(true);
+  addAction("SELECT_VERTEX_CMD", aAction);
+  mySelectActions->addAction(aAction);
+
+  aAction = new QAction(QIcon(":pictures/edge.png"), tr("Edges"), this);
+  aAction->setCheckable(true);
+  addAction("SELECT_EDGE_CMD", aAction);
+  mySelectActions->addAction(aAction);
+
+  aAction = new QAction(QIcon(":pictures/face.png"), tr("Faces"), this);
+  aAction->setCheckable(true);
+  addAction("SELECT_FACE_CMD", aAction);
+  mySelectActions->addAction(aAction);
+
+  aAction = new QAction(QIcon(":pictures/result.png"), tr("Result"), this);
+  aAction->setCheckable(true);
+  addAction("SELECT_RESULT_CMD", aAction);
+  mySelectActions->addAction(aAction);
+
+  aAction->setChecked(true);
 
   buildObjBrowserMenu();
   buildViewerMenu();
@@ -282,6 +307,7 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
     aAction->setEnabled(false);
 
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   QList<ModuleBase_ViewerPrs> aPrsList = aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
   if (aPrsList.size() > 0) {
     bool isVisible = false;
@@ -300,7 +326,6 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
     }
     if (isVisible) {
       if (canBeShaded) {
-        XGUI_Displayer* aDisplayer = myWorkshop->displayer();
         XGUI_Displayer::DisplayMode aMode = aDisplayer->displayMode(aObject);
         if (aMode != XGUI_Displayer::NoMode) {
           action("WIREFRAME_CMD")->setEnabled(aMode == XGUI_Displayer::Shading);
@@ -322,6 +347,30 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
 
   action("DELETE_CMD")->setEnabled(true);
 
+  // Update selection menu
+  QIntList aModes = aDisplayer->activeSelectionModes();
+  if (aModes.count() <= 1) {
+    action("SELECT_VERTEX_CMD")->setEnabled(true);
+    action("SELECT_EDGE_CMD")->setEnabled(true);
+    action("SELECT_FACE_CMD")->setEnabled(true);
+    action("SELECT_RESULT_CMD")->setEnabled(true);
+    if (aModes.count() == 1) {
+      switch (aModes.first()) {
+      case TopAbs_VERTEX: 
+        action("SELECT_VERTEX_CMD")->setChecked(true);
+        break;
+      case TopAbs_EDGE: 
+        action("SELECT_EDGE_CMD")->setChecked(true);
+        break;
+      case TopAbs_FACE:
+        action("SELECT_FACE_CMD")->setChecked(true);
+        break;
+      default:
+        action("SELECT_RESULT_CMD")->setChecked(true);
+      }
+    } else 
+      action("SELECT_RESULT_CMD")->setChecked(true);
+  }
   ModuleBase_IModule* aModule = myWorkshop->module();
   if (aModule)
     aModule->updateViewerMenu(myActions);
@@ -464,6 +513,20 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
   QList<ModuleBase_ViewerPrs> aPrsList = aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
   int aSelected = aPrsList.size();
   QActionsList aActions;
+
+  // Create selection menu
+  XGUI_OperationMgr* aOpMgr = myWorkshop->operationMgr();
+  QIntList aModes;
+  myWorkshop->module()->activeSelectionModes(aModes);
+  if ((!aOpMgr->hasOperation()) && aModes.isEmpty()) {
+    QMenu* aSelMenu = new QMenu(tr("Selection mode"), theMenu);
+    aSelMenu->addAction(action("SELECT_VERTEX_CMD"));
+    aSelMenu->addAction(action("SELECT_EDGE_CMD"));
+    aSelMenu->addAction(action("SELECT_FACE_CMD"));
+    aSelMenu->addAction(action("SELECT_RESULT_CMD"));
+    theMenu->addMenu(aSelMenu);
+    theMenu->addSeparator();
+  }
   if (aSelected == 1) {
     ObjectPtr aObject = aPrsList.first().object();
     if (aObject.get() != NULL) {

@@ -205,6 +205,13 @@ Q_OBJECT
   /// \param theMode a mode to set (see \ref XGUI_Displayer)
   void setDisplayMode(const QObjectPtrList& theList, int theMode);
 
+  /// Set selection mode in viewer. If theMode=-1 then activate default mode
+  /// \param theMode the selection mode (according to TopAbs_ShapeEnum)
+  void setViewerSelectionMode(int theMode);
+
+  /// Activates current selection mode for the given list of objects
+  void activateObjectsSelection(const QObjectPtrList& theList);
+
   /// Returns current module
   ModuleBase_IModule* module() const
   {
@@ -351,6 +358,10 @@ signals:
 
   /// Activates/deactivates the trihedron in the viewer AIS context
   void onTrihedronVisibilityChanged(bool theState);
+
+  /// Returns defailt selection mode in 3d viewer
+  int viewerSelectionMode() const { return myViewerSelMode; }
+
 
  protected:
   /// Sets the granted operations for the parameter operation. Firstly, it finds the nested features
@@ -503,6 +514,8 @@ private:
   XGUI_WorkshopListener* myEventsListener;
 
   QString myCurrentDir;
+
+  int myViewerSelMode;
 };
 
 #endif
