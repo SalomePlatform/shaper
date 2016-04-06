@@ -35,4 +35,8 @@
     <!-- Module resources -->
     <parameter name="SHAPER" value="${SHAPER_ROOT_DIR}/share/salome/resources/shaper"/>
   </section>
+  <section name="Viewer" >
+    <!-- Viewer preferences -->
+    <parameter name="selection" value="4" />
+  </section>
 </document>

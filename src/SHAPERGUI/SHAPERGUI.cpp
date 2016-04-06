@@ -608,6 +608,28 @@ void SHAPERGUI::createPreferences()
     return;
   SHAPERGUI_PrefMgr aMgr(pref, aModName);
   ModuleBase_Preferences::createEditContent(&aMgr, catId);
+
+  int viewTab = pref->addItem(tr("Viewer"), catId);
+  // Create other parameters group in viewer tab
+  int otherGroup = pref->addItem(tr("Other parameters"), viewTab);
+  int selId = pref->addItem(tr("Default selection type"), otherGroup, 
+                                     SUIT_PreferenceMgr::Selector,
+                                     ModuleBase_Preferences::VIEWER_SECTION, "selection");
+  QStringList aSelectionList;
+  aSelectionList.append( tr("Vertices") );
+  aSelectionList.append( tr("Edges") );
+  aSelectionList.append( tr("Faces") );
+  aSelectionList.append( tr("Results") );
+
+  QList<QVariant> anIndexesList;
+  anIndexesList.append(TopAbs_VERTEX);
+  anIndexesList.append(TopAbs_EDGE);
+  anIndexesList.append(TopAbs_FACE);
+  anIndexesList.append(-1);
+
+  pref->setItemProperty( "strings", aSelectionList, selId );
+  pref->setItemProperty( "indexes", anIndexesList, selId );
+  
   pref->retrieve();
 }
 
