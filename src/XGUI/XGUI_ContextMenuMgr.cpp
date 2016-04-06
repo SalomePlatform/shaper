@@ -31,6 +31,7 @@
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_OperationAction.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <QAction>
 #include <QActionGroup>

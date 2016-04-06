@@ -12,7 +12,6 @@
 
 #include <ModuleBase.h>
 #include <ModuleBase_Operation.h>
-#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_CompositeFeature.h>
@@ -27,6 +26,7 @@ class ModuleBase_ModelWidget;
 class ModuleBase_ISelection;
 class ModuleBase_IViewer;
 class ModuleBase_IWorkshop;
+class ModuleBase_ViewerPrs;
 
 class QKeyEvent;
 

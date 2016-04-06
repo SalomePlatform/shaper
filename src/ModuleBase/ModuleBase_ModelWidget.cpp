@@ -5,6 +5,7 @@
 // Author:      Natalia ERMOLAEVA
 
 #include "ModuleBase_ModelWidget.h"
+#include "ModuleBase_ViewerPrs.h"
 #include "ModuleBase_Tools.h"
 
 #include <ModelAPI_Data.h>

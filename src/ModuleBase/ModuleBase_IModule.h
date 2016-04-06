@@ -29,6 +29,9 @@ class Config_WidgetAPI;
 class ModuleBase_ModelWidget;
 class ModuleBase_Operation;
 class ModuleBase_IWorkshop;
+class ModelAPI_Result;
+
+class Handle_AIS_InteractiveObject;
 
 /**
  * \ingroup GUI
@@ -202,7 +205,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
                                    const bool theUpdateViewer) {}
 
   /// Modifies the given presentation in the custom way.
-  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+  virtual bool customisePresentation(std::shared_ptr<ModelAPI_Result> theResult, AISObjectPtr thePrs,
                                      GeomCustomPrsPtr theCustomPrs) { return false; };
 
   /// Update the object presentable properties such as color, lines width and other
@@ -231,7 +234,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Create specific for the module presentation
   /// \param theResult an object for presentation
   /// \return created presentation or NULL(default value)
-  virtual Handle(AIS_InteractiveObject) createPresentation(const ResultPtr& theResult);
+  virtual Handle_AIS_InteractiveObject createPresentation(
+                           const std::shared_ptr<ModelAPI_Result>& theResult);
 
   //! Returns data object by AIS
   virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const = 0;

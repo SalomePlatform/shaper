@@ -9,7 +9,6 @@
 
 #include "XGUI.h"
 
-#include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_ISelection.h>
 
@@ -22,6 +21,7 @@
 
 class XGUI_Workshop;
 class Handle_SelectMgr_EntityOwner;
+class ModuleBase_ViewerPrs;
 
 /**
 * \ingroup GUI

@@ -9,7 +9,6 @@
 
 #include "PartSet.h"
 
-#include <ModuleBase_ViewerPrs.h>
 #include <gp_Pnt.hxx>
 
 #include <QPoint>
@@ -29,11 +28,13 @@ class Handle_V3d_View;
 class ModuleBase_ViewerPrs;
 class ModuleBase_IWorkshop;
 class GeomDataAPI_Point2D;
+class GeomAPI_Shape;
 class GeomAPI_Pln;
 class GeomAPI_Pnt2d;
 class GeomAPI_Pnt;
 class GeomAPI_Edge;
 class GeomAPI_Vertex;
+class ModelAPI_Result;
 
 /*!
  * \class PartSet_Tools
@@ -159,7 +160,8 @@ public:
   /// \param theObject a selected result object
   /// \param theSketch a sketch feature
   /// \return result of found feature or NULL
-  static ResultPtr findFixedObjectByExternal(const TopoDS_Shape& theShape, 
+  static std::shared_ptr<ModelAPI_Result> findFixedObjectByExternal(
+                                             const TopoDS_Shape& theShape,
                                              const ObjectPtr& theObject, 
                                              CompositeFeaturePtr theSketch);
 
@@ -170,7 +172,8 @@ public:
   /// \param theSketch a sketch feature
   /// \param theTemporary the created external object is temporary, execute is not performed for it
   /// \return result of created feature
-  static ResultPtr createFixedObjectByExternal(const TopoDS_Shape& theShape, 
+  static std::shared_ptr<ModelAPI_Result> createFixedObjectByExternal(
+                                               const TopoDS_Shape& theShape, 
                                                const ObjectPtr& theObject, 
                                                CompositeFeaturePtr theSketch,
                                                const bool theTemporary = false);
@@ -186,13 +189,15 @@ public:
   /// \param theSketch - the sketch feature
   /// \param theEdge - the edge
   /// \return result object with external edge if it is found
-  static ResultPtr findExternalEdge(CompositeFeaturePtr theSketch, std::shared_ptr<GeomAPI_Edge> theEdge);
+  static std::shared_ptr<ModelAPI_Result> findExternalEdge(CompositeFeaturePtr theSketch,
+                                                           std::shared_ptr<GeomAPI_Edge> theEdge);
 
   /// Returns Result object if the given sketch contains external vertex equal to the given
   /// \param theSketch - the sketch feature
   /// \param theVert - the vertex
   /// \return result object with external vertex if it is found
-  static ResultPtr findExternalVertex(CompositeFeaturePtr theSketch, std::shared_ptr<GeomAPI_Vertex> theVert);
+  static std::shared_ptr<ModelAPI_Result> findExternalVertex(CompositeFeaturePtr theSketch,
+                                                        std::shared_ptr<GeomAPI_Vertex> theVert);
 
   /// Returns whether the selected presentation has a shape with the vertex type
   /// \param thePrs a selected presentation
@@ -219,7 +224,7 @@ public:
   * \param theWorkshop a reference to workshop
   * \return a geometry shape
   */
-  static GeomShapePtr findShapeBy2DPoint(const AttributePtr& theAttribute,
+  static std::shared_ptr<GeomAPI_Shape> findShapeBy2DPoint(const AttributePtr& theAttribute,
                                          ModuleBase_IWorkshop* theWorkshop);
 
   /**

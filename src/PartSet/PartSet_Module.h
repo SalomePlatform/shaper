@@ -35,6 +35,7 @@ class PartSet_MenuMgr;
 class PartSet_CustomPrs;
 class PartSet_SketcherMgr;
 class PartSet_SketcherReetntrantMgr;
+class ModelAPI_Result;
 
 class QAction;
 
@@ -228,7 +229,8 @@ public:
                                    const bool theUpdateViewer);
 
   /// Modifies the given presentation in the custom way.
-  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+  virtual bool customisePresentation(std::shared_ptr<ModelAPI_Result> theResult,
+                                     AISObjectPtr thePrs,
                                      std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs);
 
   /// Update the object presentable properties such as color, lines width and other
@@ -252,7 +254,8 @@ public:
   /// Create specific for the module presentation
   /// \param theResult an object for presentation
   /// \return created presentation or NULL(default value)
-  virtual Handle(AIS_InteractiveObject) createPresentation(const ResultPtr& theResult);
+  virtual Handle(AIS_InteractiveObject) createPresentation(
+                              const std::shared_ptr<ModelAPI_Result>& theResult);
 
   //! Returns data object by AIS
   virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;

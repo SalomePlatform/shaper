@@ -13,6 +13,7 @@
 #include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_Filter.h>
 #include <ModuleBase_IModule.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <Config_WidgetAPI.h>
 #include <Events_Loop.h>

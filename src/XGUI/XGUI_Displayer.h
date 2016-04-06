@@ -18,7 +18,6 @@
 #include <ModelAPI_Result.h>
 
 #include <ModuleBase_Definitions.h>
-#include <ModuleBase_ViewerPrs.h>
 
 #include <GeomAPI_ICustomPrs.h>
 
@@ -29,6 +28,7 @@
 #include <QObject>
 #include <QColor>
 
+class ModuleBase_ViewerPrs;
 class ModelAPI_Feature;
 class XGUI_Workshop;
 

@@ -11,11 +11,11 @@
 #include "PartSet.h"
 
 #include <ModuleBase_WidgetMultiSelector.h>
-#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_CompositeFeature.h>
 
 class PartSet_ExternalObjectsMgr;
+class ModuleBase_ViewerPrs;
 
 /**
 * \ingroup Modules

@@ -10,7 +10,6 @@
 #include "ModuleBase.h"
 #include "ModuleBase_WidgetSelector.h"
 #include "ModuleBase_ViewerFilters.h"
-#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Attribute.h>
@@ -26,6 +25,7 @@ class QLabel;
 class QLineEdit;
 class QToolButton;
 class ModuleBase_IWorkshop;
+class ModuleBase_ViewerPrs;
 class ModelAPI_Validator;
 
 /**

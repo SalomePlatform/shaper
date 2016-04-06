@@ -10,7 +10,6 @@
 #include "ModuleBase.h"
 #include "ModuleBase_Definitions.h"
 #include <ModuleBase_FilterValidated.h>
-#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_Object.h>
 #include <GeomAPI_AISObject.h>
@@ -23,6 +22,7 @@ class ModuleBase_IViewer;
 class ModuleBase_IPropertyPanel;
 class ModuleBase_Operation;
 class ModuleBase_FilterFactory;
+class ModuleBase_ViewerPrs;
 
 /**
  * \ingroup GUI

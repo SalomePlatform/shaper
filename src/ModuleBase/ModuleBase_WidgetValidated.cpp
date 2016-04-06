@@ -5,6 +5,7 @@
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_WidgetSelectorStore.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>

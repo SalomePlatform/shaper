@@ -14,6 +14,7 @@
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_ResultPrs.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_ResultConstruction.h>
 

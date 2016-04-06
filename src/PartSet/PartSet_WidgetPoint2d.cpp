@@ -17,6 +17,7 @@
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IViewWindow.h>
 #include <ModuleBase_ISelection.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>

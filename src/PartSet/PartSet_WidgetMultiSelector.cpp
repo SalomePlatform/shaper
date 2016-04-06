@@ -16,6 +16,7 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ISelection.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <Config_WidgetAPI.h>
 

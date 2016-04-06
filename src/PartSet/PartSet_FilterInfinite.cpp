@@ -8,6 +8,8 @@
 
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ISelection.h>
+#include <ModuleBase_ViewerPrs.h>
+
 #include <ModelAPI_ResultConstruction.h>
 
 #include <AIS_InteractiveObject.hxx>

@@ -17,6 +17,7 @@
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_WidgetShapeSelector.h>
 #include <ModuleBase_OperationFeature.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeSelection.h>

@@ -9,7 +9,6 @@
 
 #include "ModuleBase.h"
 #include "ModuleBase_WidgetValidated.h"
-#include <ModuleBase_ViewerPrs.h>
 #include "ModuleBase_Definitions.h"
 
 #include <ModelAPI_Object.h>
@@ -19,6 +18,8 @@
 class Config_WidgetAPI;
 class QWidget;
 class ModuleBase_IWorkshop;
+class ModuleBase_ViewerPrs;
+class ModelAPI_Result;
 
 /**
 * \ingroup GUI
@@ -94,7 +95,8 @@ protected:
   /// in the construction.
   /// \param theShape a shape
   /// \param theResult a selected result
-  bool acceptSubShape(const GeomShapePtr& theShape, const ResultPtr& theResult) const;
+  bool acceptSubShape(const GeomShapePtr& theShape,
+                      const std::shared_ptr<ModelAPI_Result>& theResult) const;
 
   /// Return an object and geom shape by the viewer presentation
   /// \param thePrs a selection

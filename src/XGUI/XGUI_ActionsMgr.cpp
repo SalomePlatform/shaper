@@ -1,9 +1,5 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
-/*
- * XGUI_ActionsMgr.cpp
- */
-
 #ifndef HAVE_SALOME
 #include <AppElements_Command.h>
 #endif

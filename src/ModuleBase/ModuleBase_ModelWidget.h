@@ -8,7 +8,6 @@
 #define MODULEBASE_MODELWIDGET_H
 
 #include <ModuleBase.h>
-#include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_OperationFeature.h>
 #include <ModelAPI_Feature.h>
 
@@ -18,6 +17,7 @@
 
 class Config_WidgetAPI;
 class ModuleBase_IWorkshop;
+class ModuleBase_ViewerPrs;
 class QKeyEvent;
 
 /**\class ModuleBase_ModelWidget

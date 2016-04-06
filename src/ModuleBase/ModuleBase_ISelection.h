@@ -9,7 +9,6 @@
 
 #include "ModuleBase.h"
 #include "ModuleBase_Definitions.h"
-#include "ModuleBase_ViewerPrs.h"
 
 #include <ModelAPI_Result.h>
 #include <GeomAPI_Shape.h>
@@ -21,6 +20,7 @@
 
 #include <QList>
 
+class ModuleBase_ViewerPrs;
 class Handle_SelectMgr_EntityOwner;
 
 /**

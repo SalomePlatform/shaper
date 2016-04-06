@@ -37,6 +37,8 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_OperationFeature.h>
+#include <ModuleBase_ViewerPrs.h>
+
 #include <Config_WidgetAPI.h>
 
 #include <Events_Loop.h>

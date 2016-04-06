@@ -13,6 +13,8 @@
 #include <ModelAPI_Validator.h>
 
 #include <ModuleBase_Definitions.h>
+#include <ModuleBase_ViewerPrs.h>
+
 #include <Config_WidgetAPI.h>
 
 #include <PartSet_ExternalObjectsMgr.h>

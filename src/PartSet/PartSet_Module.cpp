@@ -41,6 +41,7 @@
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_OperationDescription.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>

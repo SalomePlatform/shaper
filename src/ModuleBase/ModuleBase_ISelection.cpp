@@ -2,6 +2,8 @@
 
 #include "ModuleBase_ISelection.h"
 
+#include "ModuleBase_ViewerPrs.h"
+
 #include <StdSelect_BRepOwner.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS.hxx>

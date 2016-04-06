@@ -16,6 +16,7 @@
 #include "ModuleBase_IModule.h"
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_ModelWidget.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Attribute.h>

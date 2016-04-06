@@ -25,6 +25,7 @@
 #include <ModuleBase_ResultPrs.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IModule.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_IPresentable.h>

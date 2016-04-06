@@ -15,6 +15,7 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_IModule.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
