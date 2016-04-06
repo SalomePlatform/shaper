@@ -339,7 +339,7 @@ void XGUI_OperationMgr::setCurrentFeature(const FeaturePtr& theFeature)
   DocumentPtr aDoc = aMgr->activeDocument();
   bool aIsOp = aMgr->isOperation();
   if (!aIsOp)
-    aMgr->startOperation();
+    aMgr->startOperation(QString("Set current feature: %1").arg(theFeature->getKind().c_str()).toStdString());
   aDoc->setCurrentFeature(theFeature, false);
   if (!aIsOp)
     aMgr->finishOperation();

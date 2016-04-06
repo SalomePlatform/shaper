@@ -155,7 +155,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     GeomValidators_ShapeType aShapeTypeValidator;
     if(!aShapeTypeValidator.isValid(anAttr, theArguments, theError)) {
       theError = "Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, \
-                  whole sketch(if it has at least one face), and whole objects with shape types: ";
+whole sketch(if it has at least one face), and whole objects with shape types: ";
       std::list<std::string>::const_iterator anIt = theArguments.cbegin();
       theError += *anIt;
       for(++anIt; anIt != theArguments.cend(); ++anIt) {

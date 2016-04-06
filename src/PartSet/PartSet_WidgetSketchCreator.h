@@ -70,19 +70,10 @@ public:
   /// \return a boolean value
   virtual bool isValidSelection(const ModuleBase_ViewerPrs& theValue);
 
-  /// Check if the current and the parent operations are a composite. If the parent operation contains
-  /// attribute selection list, the method returns false if it is invalid in this attibute validator
-  /// \param theWorkshop a current workshop
-  /// \return boolean value
-  static bool canCommitCurrentSketch(ModuleBase_IWorkshop* theWorkshop);
-
-  /// Sets the sub-object to list of base.
-  static void setSketchObjectToList(const CompositeFeaturePtr& theFeature,
-                                    const AttributePtr& theAttribute);
-
 protected:
   /// If there is no operation in current session, start operation for modify parameters
-  void openTransaction();
+  /// \return true if the operation was not opened
+  void openExtrusionTransaction();
 
   /// Checks whether the selection presentation contains preview planes
   /// \param theValue a selection information
@@ -134,6 +125,14 @@ private:
   /// \param theValues a selection list
   /// \return true if the sketch is started
   bool startSketchOperation(const QList<ModuleBase_ViewerPrs>& theValues);
+
+  /// Sets the sub-object to list of base.
+  static void setSketchObjectToList(const CompositeFeaturePtr& theFeature,
+                                    const AttributePtr& theAttribute);
+
+  /// Calls validator for attribute list and warn if it is not valid
+  /// \return true if validation succeed
+  bool validateSelectionList() const;
 
 private:
   std::string myAttributeListID;
