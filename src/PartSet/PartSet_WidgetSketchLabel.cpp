@@ -132,7 +132,7 @@ PartSet_WidgetSketchLabel::~PartSet_WidgetSketchLabel()
 {
 }
 
-bool PartSet_WidgetSketchLabel::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+bool PartSet_WidgetSketchLabel::setSelection(QList<ModuleBase_ViewerPrsPtr>& theValues,
                                              const bool theToValidate)
 {
   // do not use the given selection if the plane of the sketch has been already set.
@@ -141,7 +141,7 @@ bool PartSet_WidgetSketchLabel::setSelection(QList<ModuleBase_ViewerPrs>& theVal
   if (plane().get())
     return true;
 
-  ModuleBase_ViewerPrs aPrs = theValues.first();
+  ModuleBase_ViewerPrsPtr aPrs = theValues.first();
   bool aDone = setSelectionInternal(theValues, theToValidate);
   if (aDone)
     updateByPlaneSelected(aPrs);
@@ -157,11 +157,11 @@ QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
 
 void PartSet_WidgetSketchLabel::onSelectionChanged()
 {
-  QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
+  QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
 
   if (aSelected.empty())
     return;
-  ModuleBase_ViewerPrs aPrs = aSelected.first();
+  ModuleBase_ViewerPrsPtr aPrs = aSelected.first();
   bool aDone = setSelectionInternal(aSelected, false);
   if (aDone) {
     updateByPlaneSelected(aPrs);
@@ -209,19 +209,19 @@ void PartSet_WidgetSketchLabel::blockAttribute(const AttributePtr& theAttribute,
   }
 }
 
-bool PartSet_WidgetSketchLabel::setSelectionInternal(const QList<ModuleBase_ViewerPrs>& theValues,
+bool PartSet_WidgetSketchLabel::setSelectionInternal(const QList<ModuleBase_ViewerPrsPtr>& theValues,
                                                      const bool theToValidate)
 {
   bool aDone = false;
-  ModuleBase_ViewerPrs aValue;
   if (theValues.empty()) {
     // In order to make reselection possible, set empty object and shape should be done
-    setSelectionCustom(ModuleBase_ViewerPrs());
+    setSelectionCustom(std::shared_ptr<ModuleBase_ViewerPrs>(
+                              new ModuleBase_ViewerPrs(ObjectPtr(), GeomShapePtr(), NULL)));
     aDone = false;
   }
   else {
     // it removes the processed value from the parameters list
-    aValue = theValues.first();//.takeFirst();
+    ModuleBase_ViewerPrsPtr aValue = theValues.first();//.takeFirst();
     if (!theToValidate || isValidInFilters(aValue))
       aDone = setSelectionCustom(aValue);
   }
@@ -229,12 +229,12 @@ bool PartSet_WidgetSketchLabel::setSelectionInternal(const QList<ModuleBase_View
   return aDone;
 }
 
-void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs& thePrs)
+void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   // 1. hide main planes if they have been displayed
   myPreviewPlanes->erasePreviewPlanes(myWorkshop);
   // 2. if the planes were displayed, change the view projection
-  const GeomShapePtr& aShape = thePrs.shape();
+  const GeomShapePtr& aShape = thePrs->shape();
   std::shared_ptr<GeomAPI_Shape> aGShape;
   std::shared_ptr<GeomAPI_Shape> aBaseShape;
 
@@ -340,16 +340,16 @@ void PartSet_WidgetSketchLabel::restoreAttributeValue(const AttributePtr& theAtt
   }
 }
 
-bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
+bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   return fillSketchPlaneBySelection(feature(), thePrs);
 }
 
-bool PartSet_WidgetSketchLabel::canFillSketch(const ModuleBase_ViewerPrs& thePrs)
+bool PartSet_WidgetSketchLabel::canFillSketch(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   bool aCanFillSketch = true;
   // avoid any selection on sketch object
-  ObjectPtr anObject = thePrs.object();
+  ObjectPtr anObject = thePrs->object();
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
   if (aResult.get()) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(aResult);
@@ -360,7 +360,7 @@ bool PartSet_WidgetSketchLabel::canFillSketch(const ModuleBase_ViewerPrs& thePrs
   if (aCanFillSketch) {
     std::shared_ptr<GeomAPI_Face> aGeomFace;
 
-    GeomShapePtr aGeomShape = thePrs.shape();
+    GeomShapePtr aGeomShape = thePrs->shape();
     if ((!aGeomShape.get() || aGeomShape->isNull()) && aResult.get()) {
       aGeomShape = aResult->shape();
     }
@@ -376,20 +376,20 @@ bool PartSet_WidgetSketchLabel::canFillSketch(const ModuleBase_ViewerPrs& thePrs
 }
 
 bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const FeaturePtr& theFeature,
-                                                           const ModuleBase_ViewerPrs& thePrs)
+                                                           const ModuleBase_ViewerPrsPtr& thePrs)
 {
   bool isOwnerSet = false;
 
-  const GeomShapePtr& aShape = thePrs.shape();
+  const GeomShapePtr& aShape = thePrs->shape();
   std::shared_ptr<GeomAPI_Dir> aDir;
 
-  if (thePrs.object() && (theFeature != thePrs.object())) {
+  if (thePrs->object() && (theFeature != thePrs->object())) {
     DataPtr aData = theFeature->data();
     AttributeSelectionPtr aSelAttr = 
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
       (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
     if (aSelAttr) {
-      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
+      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs->object());
       if (aRes) {
         GeomShapePtr aShapePtr(new GeomAPI_Shape());
         if (!aShape.get() || aShape->isNull()) {  // selection happens in the OCC viewer

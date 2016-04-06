@@ -412,11 +412,11 @@ FeaturePtr ModuleBase_OperationFeature::previousCurrentFeature()
 void ModuleBase_OperationFeature::initSelection(ModuleBase_ISelection* theSelection,
                                          ModuleBase_IViewer* theViewer)
 {
-  QList<ModuleBase_ViewerPrs> aPreSelected;
+  QList<ModuleBase_ViewerPrsPtr> aPreSelected;
   // Check that the selected result are not results of operation feature
   FeaturePtr aFeature = feature();
   if (aFeature) {
-    QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected(ModuleBase_ISelection::AllControls);
+    QList<ModuleBase_ViewerPrsPtr> aSelected = theSelection->getSelected(ModuleBase_ISelection::AllControls);
 
     std::list<ResultPtr> aResults = aFeature->results();
     QObjectPtrList aResList;
@@ -424,8 +424,8 @@ void ModuleBase_OperationFeature::initSelection(ModuleBase_ISelection* theSelect
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
       aResList.append(*aIt);
 
-    foreach (ModuleBase_ViewerPrs aPrs, aSelected) {
-      if ((!aResList.contains(aPrs.object())) && (aPrs.object() != aFeature))
+    foreach (ModuleBase_ViewerPrsPtr aPrs, aSelected) {
+      if ((!aResList.contains(aPrs->object())) && (aPrs->object() != aFeature))
         aPreSelected.append(aPrs);
     }
   } else
@@ -434,7 +434,7 @@ void ModuleBase_OperationFeature::initSelection(ModuleBase_ISelection* theSelect
   setPreselection(aPreSelected);
 }
 
-void ModuleBase_OperationFeature::setPreselection(const QList<ModuleBase_ViewerPrs>& theValues)
+void ModuleBase_OperationFeature::setPreselection(const QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
   clearPreselection();
   myPreSelection = theValues;

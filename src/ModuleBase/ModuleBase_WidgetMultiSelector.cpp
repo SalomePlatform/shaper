@@ -215,19 +215,19 @@ bool ModuleBase_WidgetMultiSelector::restoreValueCustom()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>& theValues,
                                                   const bool theToValidate)
 {
-  QList<ModuleBase_ViewerPrs> aSkippedValues;
+  QList<ModuleBase_ViewerPrsPtr> aSkippedValues;
 
   /// remove unused objects from the model attribute.
   /// It should be performed before new attributes append.
   removeUnusedAttributeObjects(theValues);
 
-  QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
   bool isDone = false;
   for (; anIt != aLast; anIt++) {
-    ModuleBase_ViewerPrs aValue = *anIt;
+    ModuleBase_ViewerPrsPtr aValue = *anIt;
     bool aProcessed = false;
     if (!theToValidate || isValidInFilters(aValue)) {
       aProcessed = setSelectionCustom(aValue);
@@ -253,7 +253,7 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrs>& t
 }
 
 //********************************************************************
-void ModuleBase_WidgetMultiSelector::getHighlighted(QList<ModuleBase_ViewerPrs>& theValues)
+void ModuleBase_WidgetMultiSelector::getHighlighted(QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
   std::set<int> anAttributeIds;
   getSelectedAttributeIndices(anAttributeIds);
@@ -262,7 +262,7 @@ void ModuleBase_WidgetMultiSelector::getHighlighted(QList<ModuleBase_ViewerPrs>&
 }
 
 //********************************************************************
-bool ModuleBase_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
+bool ModuleBase_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   bool aValid = ModuleBase_WidgetSelector::isValidSelectionCustom(thePrs);
   if (aValid) {
@@ -340,7 +340,7 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
   activateSelectionAndFilters(true);
-  QList<ModuleBase_ViewerPrs> anEmptyList;
+  QList<ModuleBase_ViewerPrsPtr> anEmptyList;
   // This method will call Selection changed event which will call onSelectionChanged
   // To clear mySelection, myListControl and storeValue()
   // So, we don't need to call it
@@ -400,9 +400,9 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum 
   }
 }
 
-QList<ModuleBase_ViewerPrs> ModuleBase_WidgetMultiSelector::getAttributeSelection() const
+QList<ModuleBase_ViewerPrsPtr> ModuleBase_WidgetMultiSelector::getAttributeSelection() const
 {
-  QList<ModuleBase_ViewerPrs> aSelected;
+  QList<ModuleBase_ViewerPrsPtr> aSelected;
   convertIndicesToViewerSelection(std::set<int>(), aSelected);
   return aSelected;
 }
@@ -523,7 +523,7 @@ void ModuleBase_WidgetMultiSelector::getSelectedAttributeIndices(std::set<int>& 
 }
 
 void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<int> theAttributeIds,
-                                                      QList<ModuleBase_ViewerPrs>& theValues) const
+                                                      QList<ModuleBase_ViewerPrsPtr>& theValues) const
 {
   if(myFeature.get() == NULL)
     return;
@@ -540,7 +540,8 @@ void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<in
       AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
       ResultPtr anObject = anAttr->context();
       if (anObject.get())
-        theValues.append(ModuleBase_ViewerPrs(anObject, anAttr->value(), NULL));
+        theValues.append(std::shared_ptr<ModuleBase_ViewerPrs>(
+               new ModuleBase_ViewerPrs(anObject, anAttr->value(), NULL)));
     }
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
@@ -551,7 +552,8 @@ void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<in
         continue;
       ObjectPtr anObject = aRefListAttr->object(i);
       if (anObject.get()) {
-        theValues.append(ModuleBase_ViewerPrs(anObject, GeomShapePtr(), NULL));
+        theValues.append(std::shared_ptr<ModuleBase_ViewerPrs>(
+               new ModuleBase_ViewerPrs(anObject, GeomShapePtr(), NULL)));
       }
     }
   }
@@ -568,14 +570,15 @@ void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<in
       AttributePtr anAttribute = aRefAttrListAttr->attribute(i);
       if (anAttribute.get()) {
         GeomShapePtr aGeomShape = ModuleBase_Tools::getShape(anAttribute, myWorkshop);
-        theValues.append(ModuleBase_ViewerPrs(anObject, aGeomShape, NULL));
+        theValues.append(std::shared_ptr<ModuleBase_ViewerPrs>(
+               new ModuleBase_ViewerPrs(anObject, aGeomShape, NULL)));
       }
     }
   }
 }
 
 void ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
-                                                 (QList<ModuleBase_ViewerPrs>& theValues)
+                                                 (QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
   std::map<ObjectPtr, std::set<GeomShapePtr> > aGeomSelection = convertSelection(theValues);
   DataPtr aData = myFeature->data();
@@ -608,11 +611,11 @@ void ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
   }
   else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
     std::set<AttributePtr> anAttributes;
-    QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
+    QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
     ObjectPtr anObject;
     GeomShapePtr aShape;
     for (; anIt != aLast; anIt++) {
-      ModuleBase_ViewerPrs aPrs = *anIt;
+      ModuleBase_ViewerPrsPtr aPrs = *anIt;
       getGeomSelection(aPrs, anObject, aShape);
       AttributePtr anAttr = myWorkshop->module()->findAttribute(anObject, aShape);
       if (anAttr.get() && anAttributes.find(anAttr) == anAttributes.end())
@@ -637,17 +640,17 @@ void ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
 }
 
 std::map<ObjectPtr, std::set<GeomShapePtr> > ModuleBase_WidgetMultiSelector::convertSelection
-                                                     (QList<ModuleBase_ViewerPrs>& theValues)
+                                                     (QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
   // convert prs list to objects map
   std::map<ObjectPtr, std::set<GeomShapePtr> > aGeomSelection;
   std::set<GeomShapePtr> aShapes;
-  QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
   ObjectPtr anObject;
   GeomShapePtr aShape;
   GeomShapePtr anEmptyShape(new GeomAPI_Shape());
   for (; anIt != aLast; anIt++) {
-    ModuleBase_ViewerPrs aPrs = *anIt;
+    ModuleBase_ViewerPrsPtr aPrs = *anIt;
     getGeomSelection(aPrs, anObject, aShape);
     aShapes.clear();
     if (aGeomSelection.find(anObject) != aGeomSelection.end()) // found

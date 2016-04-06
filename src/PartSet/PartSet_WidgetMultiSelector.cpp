@@ -43,7 +43,7 @@ PartSet_WidgetMultiSelector::~PartSet_WidgetMultiSelector()
 }
 
 //********************************************************************
-bool PartSet_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
+bool PartSet_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   bool aValid = ModuleBase_WidgetMultiSelector::isValidSelectionCustom(thePrs);
   if (aValid) {
@@ -62,7 +62,7 @@ void PartSet_WidgetMultiSelector::restoreAttributeValue(const AttributePtr& theA
   myExternalObjectMgr->removeExternal(sketch(), myFeature, myWorkshop, true);
 }
 
-void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
+void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr& thePrs,
                                                    ObjectPtr& theObject,
                                                    GeomShapePtr& theShape)
 {

@@ -36,23 +36,23 @@ class ModuleBase_ISelection
 
   /// Returns a list of viewer selected presentations
   /// \return list of presentations
-  virtual QList<ModuleBase_ViewerPrs> getSelected(const SelectionPlace& thePlace = Browser) const = 0;
+  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getSelected(const SelectionPlace& thePlace = Browser) const = 0;
 
   /// The values are appended to the first parameter list if the first list does not contain an item
   /// with the same object
   /// \param theValues a list of new values
   /// \param theValuesTo a list, that will be changed
-  static void appendSelected(const QList<ModuleBase_ViewerPrs> theValues,
-                             QList<ModuleBase_ViewerPrs>& theValuesTo);
+  static void appendSelected(const QList<std::shared_ptr<ModuleBase_ViewerPrs>> theValues,
+                             QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValuesTo);
 
   /// Returns a list of viewer highlited presentations
   /// \return list of presentations
-  virtual QList<ModuleBase_ViewerPrs> getHighlighted() const = 0;
+  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getHighlighted() const = 0;
 
   /// Fills the viewer presentation parameters by the parameters from the owner
   /// \param thePrs a container for selection
   /// \param theOwner a selection owner
-  virtual void fillPresentation(ModuleBase_ViewerPrs& thePrs,
+  virtual void fillPresentation(std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
                                 const Handle_SelectMgr_EntityOwner& theOwner) const = 0;
 
   /**
@@ -89,35 +89,35 @@ class ModuleBase_ISelection
   //! If the shape is equal to the shape of selected object, it returns an empty shape
   //! \param thePrs a selected object
   //! \return a shape
-  MODULEBASE_EXPORT ResultPtr getResult(const ModuleBase_ViewerPrs& thePrs);
+  MODULEBASE_EXPORT ResultPtr getResult(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   //! Return the shape from the viewer presentation.
   //! If the shape is equal to the shape of selected object, it returns an empty shape
   //! \param thePrs a selected object
   //! \return a shape
-  MODULEBASE_EXPORT GeomShapePtr getShape(const ModuleBase_ViewerPrs& thePrs);
+  MODULEBASE_EXPORT GeomShapePtr getShape(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   //! Return the IO from the viewer presentation.
   //! \param thePrs a selected object
   //! \return an interactive object
-  virtual MODULEBASE_EXPORT Handle(AIS_InteractiveObject) getIO(const ModuleBase_ViewerPrs& thePrs) = 0;
+  virtual MODULEBASE_EXPORT Handle(AIS_InteractiveObject) getIO(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs) = 0;
 
   //! Wraps the object list into the viewer prs list
   //! \param theObjects a list of objects
   //! \return a list of prs, where only object is not empty
-  static MODULEBASE_EXPORT QList<ModuleBase_ViewerPrs> getViewerPrs(
+  static MODULEBASE_EXPORT QList<std::shared_ptr<ModuleBase_ViewerPrs>> getViewerPrs(
                                                        const QObjectPtrList& theObjects);
 
   /// Removes selection items where owners have equal vertices. The first
   /// owner with the qual vertex stays in the list.
   static MODULEBASE_EXPORT void filterSelectionOnEqualPoints
-                                              (QList<ModuleBase_ViewerPrs>& theSelected);
+                                              (QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theSelected);
 private:
   /// Returns true if the presentations have an owner with a vertex and these vertices are equal.
   /// \param thePrs1 the first viewer selected presentation
   /// \param thePrs2 the second viewer selected presentation
-  static bool isEqualVertices(const ModuleBase_ViewerPrs thePrs1,
-                              const ModuleBase_ViewerPrs thePrs2);
+  static bool isEqualVertices(const std::shared_ptr<ModuleBase_ViewerPrs> thePrs1,
+                              const std::shared_ptr<ModuleBase_ViewerPrs> thePrs2);
 };
 
 #endif

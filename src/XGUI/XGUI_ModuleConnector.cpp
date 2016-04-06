@@ -101,7 +101,7 @@ ObjectPtr XGUI_ModuleConnector::findPresentedObject(const AISObjectPtr& theAIS) 
   return anObject;
 }
 
-void XGUI_ModuleConnector::setSelected(const QList<ModuleBase_ViewerPrs>& theValues)
+void XGUI_ModuleConnector::setSelected(const QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   if (theValues.isEmpty()) {

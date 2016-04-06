@@ -308,14 +308,14 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
 
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  QList<ModuleBase_ViewerPrs> aPrsList = aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
+  QList<ModuleBase_ViewerPrsPtr> aPrsList = aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
   if (aPrsList.size() > 0) {
     bool isVisible = false;
     bool isShading = false;
     bool canBeShaded = false;
     ObjectPtr aObject;
-    foreach(ModuleBase_ViewerPrs aPrs, aPrsList) {
-      aObject = aPrs.object();
+    foreach(ModuleBase_ViewerPrsPtr aPrs, aPrsList) {
+      aObject = aPrs->object();
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
       if (aRes && aRes->isDisplayed()) {
         isVisible = true;
@@ -510,7 +510,7 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
       theMenu->addSeparator();
   }
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
-  QList<ModuleBase_ViewerPrs> aPrsList = aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
+  QList<ModuleBase_ViewerPrsPtr> aPrsList = aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
   int aSelected = aPrsList.size();
   QActionsList aActions;
 
@@ -528,7 +528,7 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
     theMenu->addSeparator();
   }
   if (aSelected == 1) {
-    ObjectPtr aObject = aPrsList.first().object();
+    ObjectPtr aObject = aPrsList.first()->object();
     if (aObject.get() != NULL) {
       std::string aName = aObject->groupName();
       if (myViewerMenu.contains(aName))

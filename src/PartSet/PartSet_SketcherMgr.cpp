@@ -89,15 +89,15 @@
 //#define DEBUG_CURSOR
 
 /// Returns list of unique objects by sum of objects from List1 and List2
-/*QList<ModuleBase_ViewerPrs> getSumList(const QList<ModuleBase_ViewerPrs>& theList1,
-                                       const QList<ModuleBase_ViewerPrs>& theList2)
+/*QList<ModuleBase_ViewerPrsPtr> getSumList(const QList<ModuleBase_ViewerPrsPtr>& theList1,
+                                       const QList<ModuleBase_ViewerPrsPtr>& theList2)
 {
-  QList<ModuleBase_ViewerPrs> aRes;
-  foreach (ModuleBase_ViewerPrs aPrs, theList1) {
+  QList<ModuleBase_ViewerPrsPtr> aRes;
+  foreach (ModuleBase_ViewerPrsPtr aPrs, theList1) {
     if (!aRes.contains(aPrs))
       aRes.append(aPrs);
   }
-  foreach (ModuleBase_ViewerPrs aPrs, theList2) {
+  foreach (ModuleBase_ViewerPrsPtr aPrs, theList2) {
     if (!aRes.contains(aPrs))
       aRes.append(aPrs);
   }
@@ -109,18 +109,18 @@
 // \param theSketch a sketch to project a vertex shape of a presentation to the plane
 // and find the corresponded attribute
 // \param theFeatureList  an output list of features
-void fillFeatureList(const QList<ModuleBase_ViewerPrs>& theList,
+void fillFeatureList(const QList<ModuleBase_ViewerPrsPtr>& theList,
                      const FeaturePtr theSketch,
                      QList<FeaturePtr>& theFeatureList)
 {
-  QList<ModuleBase_ViewerPrs> aRes;
+  QList<ModuleBase_ViewerPrsPtr> aRes;
 
-  QList<ModuleBase_ViewerPrs>::const_iterator anIt = theList.begin(),
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theList.begin(),
                                               aLast = theList.end();
   for (; anIt != aLast; anIt++)
   {
-    ModuleBase_ViewerPrs aPrs = *anIt;
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aPrs.object());
+    ModuleBase_ViewerPrsPtr aPrs = *anIt;
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aPrs->object());
     if (aFeature.get()  && !theFeatureList.contains(aFeature))
       theFeatureList.append(aFeature);
   }
@@ -1621,7 +1621,7 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_ISelection* aSelect = aWorkshop->selection();
-  QList<ModuleBase_ViewerPrs> aHighlighted = aSelect->getHighlighted();
+  QList<ModuleBase_ViewerPrsPtr> aHighlighted = aSelect->getHighlighted();
 
   QList<FeaturePtr> aFeatureList;
   if (theHighlightedOnly) {
@@ -1630,7 +1630,7 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
   else {
     fillFeatureList(aHighlighted, myCurrentSketch, aFeatureList);
 
-    QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected(ModuleBase_ISelection::AllControls);
+    QList<ModuleBase_ViewerPrsPtr> aSelected = aSelect->getSelected(ModuleBase_ISelection::AllControls);
     fillFeatureList(aSelected, myCurrentSketch, aFeatureList);
   }
 

@@ -79,7 +79,7 @@ Q_OBJECT
 
   //! Select features clearing previous selection. 
   //! If the list is empty then selection will be cleared
-  virtual void setSelected(const QList<ModuleBase_ViewerPrs>& theValues);
+  virtual void setSelected(const QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
    /// Update of commands status
   virtual void updateCommandStatus();

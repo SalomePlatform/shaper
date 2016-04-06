@@ -32,7 +32,7 @@ ModuleBase_WidgetSelector::~ModuleBase_WidgetSelector()
 }
 
 //********************************************************************
-void ModuleBase_WidgetSelector::getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
+void ModuleBase_WidgetSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr& thePrs,
                                                       ObjectPtr& theObject,
                                                       GeomShapePtr& theShape)
 {
@@ -44,7 +44,7 @@ void ModuleBase_WidgetSelector::getGeomSelection(const ModuleBase_ViewerPrs& the
 //********************************************************************
 void ModuleBase_WidgetSelector::onSelectionChanged()
 {
-  QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
+  QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
   bool isDone = setSelection(aSelected, true/*false*/);
   updateOnSelectionChanged(isDone);
 }
@@ -69,9 +69,9 @@ void ModuleBase_WidgetSelector::updateOnSelectionChanged(const bool theDone)
 }
 
 //********************************************************************
-QList<ModuleBase_ViewerPrs> ModuleBase_WidgetSelector::getAttributeSelection() const
+QList<ModuleBase_ViewerPrsPtr> ModuleBase_WidgetSelector::getAttributeSelection() const
 {
-  return QList<ModuleBase_ViewerPrs>();
+  return QList<ModuleBase_ViewerPrsPtr>();
 }
 
 //********************************************************************
@@ -153,7 +153,7 @@ void ModuleBase_WidgetSelector::activateCustom()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
+bool ModuleBase_WidgetSelector::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
   ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
@@ -169,7 +169,7 @@ bool ModuleBase_WidgetSelector::isValidSelectionCustom(const ModuleBase_ViewerPr
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::setSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
+bool ModuleBase_WidgetSelector::setSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   ObjectPtr anObject;
   GeomShapePtr aShape;

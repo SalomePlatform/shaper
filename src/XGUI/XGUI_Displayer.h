@@ -92,7 +92,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// empty, select it, otherwise select the result.
   /// \param theValues a list of presentation to be selected
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  void setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, bool theUpdateViewer = true);
+  void setSelected(const  QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues, bool theUpdateViewer = true);
 
   /// Unselect all objects
   void clearSelected();

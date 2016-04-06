@@ -27,7 +27,7 @@ Standard_Boolean PartSet_FilterInfinite::IsOk(const Handle(SelectMgr_EntityOwner
 {
   Standard_Boolean aValid = Standard_True;
 
-  ModuleBase_ViewerPrs aPrs;
+  ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
   myWorkshop->selection()->fillPresentation(aPrs, theOwner);
   ResultPtr aResult = myWorkshop->selection()->getResult(aPrs);
   // to filter infinite construction results

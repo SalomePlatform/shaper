@@ -49,11 +49,11 @@ Q_OBJECT
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view
   /// \return a boolean value
-  virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
+  virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   /// Fills the attribute with the value of the selected owner
   /// \param thePrs a selected owner
-  virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
+  virtual bool setSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   /// The methiod called when widget is deactivated
   virtual void deactivate();
@@ -75,7 +75,7 @@ protected:
   /// \return a list of viewer presentations, which contains an attribute result and
   /// a shape. If the attribute do not uses the shape, it is empty
   // NDS: has body is temporary
-  virtual QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
+  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getAttributeSelection() const;
 
   /// Retunrs a list of possible shape types
   /// \return a list of shapes
@@ -100,7 +100,7 @@ protected:
   /// \param thePrs a selection
   /// \param theObject an output object
   /// \param theShape a shape of the selection
-  virtual void getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
+  virtual void getGeomSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
                                 ObjectPtr& theObject,
                                 GeomShapePtr& theShape);
 

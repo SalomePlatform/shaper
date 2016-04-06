@@ -107,16 +107,17 @@ bool ModuleBase_WidgetShapeSelector::storeValueCustom() const
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+bool ModuleBase_WidgetShapeSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>& theValues,
                                                   const bool theToValidate)
 {
   if (theValues.empty()) {
     // In order to make reselection possible, set empty object and shape should be done
-    setSelectionCustom(ModuleBase_ViewerPrs());
+    setSelectionCustom(std::shared_ptr<ModuleBase_ViewerPrs>(new ModuleBase_ViewerPrs(
+                                                  ObjectPtr(), GeomShapePtr(), NULL)));
     return false;
   }
   // it removes the processed value from the parameters list
-  ModuleBase_ViewerPrs aValue = theValues.takeFirst();
+  ModuleBase_ViewerPrsPtr aValue = theValues.takeFirst();
   bool isDone = false;
 
   if (!theToValidate || isValidInFilters(aValue)) {
@@ -131,16 +132,16 @@ bool ModuleBase_WidgetShapeSelector::setSelection(QList<ModuleBase_ViewerPrs>& t
 }
 
 //********************************************************************
-QList<ModuleBase_ViewerPrs> ModuleBase_WidgetShapeSelector::getAttributeSelection() const
+QList<ModuleBase_ViewerPrsPtr> ModuleBase_WidgetShapeSelector::getAttributeSelection() const
 {
-  QList<ModuleBase_ViewerPrs> aSelected;
+  QList<ModuleBase_ViewerPrsPtr> aSelected;
   if(myFeature) {
     DataPtr aData = myFeature->data();
     AttributePtr anAttribute = myFeature->attribute(attributeID());
 
     ObjectPtr anObject = ModuleBase_Tools::getObject(anAttribute);
     std::shared_ptr<GeomAPI_Shape> aShapePtr = getShape();
-    ModuleBase_ViewerPrs aPrs(anObject, aShapePtr, NULL);
+    ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs(anObject, aShapePtr, NULL));
     aSelected.append(aPrs);
   }
   return aSelected;

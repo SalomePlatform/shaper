@@ -51,7 +51,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   /// restored.The valid/invalid value is cashed.
   /// \param theValue a selected presentation in the view
   /// \return a boolean value
-  virtual bool isValidSelection(const ModuleBase_ViewerPrs& theValue);
+  virtual bool isValidSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
 
   //! Returns data object by AIS
   ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
@@ -63,14 +63,14 @@ protected:
   /// Checks whether all active viewer filters validate the presentation
   /// \param thePrs a selected presentation in the view
   /// \return a boolean value
-  bool isValidInFilters(const ModuleBase_ViewerPrs& thePrs);
+  bool isValidInFilters(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   /// Checks all attribute validators returns valid. It tries on the given selection
   /// to current attribute by setting the value inside and calling validators. After this,
   /// the previous attribute value is restored.The valid/invalid value is cashed.
   /// \param theValue a selected presentation in the view
   /// \return a boolean value
-  bool isValidSelectionForAttribute(const ModuleBase_ViewerPrs& theValue,
+  bool isValidSelectionForAttribute(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue,
                                     const AttributePtr& theAttribute);
 
   /// Retunrs attribute, which should be validated. In default implementation,
@@ -94,16 +94,16 @@ protected:
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view
   /// \return a boolean value
-  virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
+  virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   /// Fills the attribute with the value of the selected owner
   /// \param thePrs a selected owner
-  virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs) = 0;
+  virtual bool setSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs) = 0;
 
   /// Returns a list of selected presentations in the viewer and object browser
   /// The presentations from the object browser are filtered by the AIS context filters
   /// \return a list of presentations
-  QList<ModuleBase_ViewerPrs> getFilteredSelected();
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> getFilteredSelected();
 
   /// It obtains selection filters from the workshop and activates them in the active viewer
   /// \param toActivate a flag about activation or deactivation the filters
@@ -134,22 +134,22 @@ protected:
   /// Gets the validity state of the presentation in an internal map. Returns true if the valid state of value is stored
   /// \param theValue a viewer presentation
   /// \param theValid a valid state
-  bool getValidState(const ModuleBase_ViewerPrs& theValue, bool& theValid);
+  bool getValidState(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue, bool& theValid);
 
   /// Store the validity state of the presentation in an internal map
   /// \param theValue a viewer presentation
   /// \param theValid a valid state
-  void storeValidState(const ModuleBase_ViewerPrs& theValue, const bool theValid);
+  void storeValidState(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue, const bool theValid);
 
 private:
   /// Applies AIS context filters to the parameter list. The not approved presentations are
   /// removed from the parameters.
   /// \param theValues a list of presentations.
-  void filterPresentations(QList<ModuleBase_ViewerPrs>& theValues);
+  void filterPresentations(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
   /// Remove subshapes of compsolids if whole compsolid is present.
   /// \param theValues a list of presentations.
-  void filterCompSolids(QList<ModuleBase_ViewerPrs>& theValues);
+  void filterCompSolids(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
 protected:
   /// Reference to workshop
@@ -159,8 +159,8 @@ protected:
 
 private:
   ObjectPtr myPresentedObject; /// back up of the filtered object
-  QList<ModuleBase_ViewerPrs> myValidPrs; /// cash of valid selection presentations
-  QList<ModuleBase_ViewerPrs> myInvalidPrs; /// cash of invalid selection presentations
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> myValidPrs; /// cash of valid selection presentations
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> myInvalidPrs; /// cash of invalid selection presentations
 
   /// store to backup parameters of the model
   ModuleBase_WidgetSelectorStore* myAttributeStore;

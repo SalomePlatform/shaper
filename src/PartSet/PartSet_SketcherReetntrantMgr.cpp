@@ -152,8 +152,9 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* /*
         if (isLineFeature) {
           PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(anActiveWidget);
           if (aPoint2DWdg) { // line, start point should be equal last point of the last feature line
-            QList<ModuleBase_ViewerPrs> aSelection;
-            aSelection.append(ModuleBase_ViewerPrs(aLastFeature, GeomShapePtr(), NULL));
+            QList<ModuleBase_ViewerPrsPtr> aSelection;
+            aSelection.append(std::shared_ptr<ModuleBase_ViewerPrs>(
+               new ModuleBase_ViewerPrs(aLastFeature, GeomShapePtr(), NULL)));
             aWidgetIsFilled = aPoint2DWdg->setSelection(aSelection, true);
           }
         }

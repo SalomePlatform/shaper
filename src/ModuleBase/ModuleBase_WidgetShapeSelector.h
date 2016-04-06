@@ -74,7 +74,7 @@ Q_OBJECT
   /// It is redefined to check the value validity and if it is, fill the attribute with by value
   /// \param theValues the wrapped selection values
   /// \param theToValidate a flag on validation of the values
-  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+  virtual bool setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
                             const bool theToValidate);
 
   /// Returns list of widget controls
@@ -105,7 +105,7 @@ Q_OBJECT
   /// Return the attribute values wrapped in a list of viewer presentations
   /// \return a list of viewer presentations, which contains an attribute result and
   /// a shape. If the attribute do not uses the shape, it is empty
-  virtual QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
+  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getAttributeSelection() const;
 
   //----------- Class members -------------
   protected:

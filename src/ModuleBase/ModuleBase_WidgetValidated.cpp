@@ -69,14 +69,14 @@ void ModuleBase_WidgetValidated::restoreAttributeValue(const AttributePtr& theAt
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrs& thePrs)
+bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   bool aValid = true;
-  Handle(SelectMgr_EntityOwner) anOwner = thePrs.owner();
+  Handle(SelectMgr_EntityOwner) anOwner = thePrs->owner();
 
   // if an owner is null, the selection happens in the Object browser.
   // creates a selection owner on the base of object shape and the object AIS object
-  if (anOwner.IsNull() && thePrs.owner().IsNull() && thePrs.object().get()) {
+  if (anOwner.IsNull() && thePrs->owner().IsNull() && thePrs->object().get()) {
     ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
     if (aResult.get() && aResult->shape().get()) {
       // some results have no shape, e.g. the parameter one. So, they should not be validated
@@ -111,7 +111,7 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrs& th
   }
 
   // removes created owner
-  if (!anOwner.IsNull() && anOwner != thePrs.owner()) {
+  if (!anOwner.IsNull() && anOwner != thePrs->owner()) {
     anOwner.Nullify();
     myPresentedObject = ObjectPtr();
   }
@@ -125,7 +125,7 @@ AttributePtr ModuleBase_WidgetValidated::attribute() const
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& theValue)
+bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrsPtr& theValue)
 {
   bool aValid = false;
   if (getValidState(theValue, aValid)) {
@@ -140,7 +140,7 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrs& th
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::isValidSelectionForAttribute(const ModuleBase_ViewerPrs& theValue,
+bool ModuleBase_WidgetValidated::isValidSelectionForAttribute(const ModuleBase_ViewerPrsPtr& theValue,
                                                               const AttributePtr& theAttribute)
 {
   bool aValid = false;
@@ -176,7 +176,7 @@ bool ModuleBase_WidgetValidated::isValidSelectionForAttribute(const ModuleBase_V
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
+bool ModuleBase_WidgetValidated::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   return true;
 }
@@ -241,7 +241,7 @@ void ModuleBase_WidgetValidated::blockAttribute(const AttributePtr& theAttribute
 }
 
 //********************************************************************
-void ModuleBase_WidgetValidated::storeValidState(const ModuleBase_ViewerPrs& theValue, const bool theValid)
+void ModuleBase_WidgetValidated::storeValidState(const ModuleBase_ViewerPrsPtr& theValue, const bool theValid)
 {
   bool aValidPrs = myInvalidPrs.contains(theValue);
   bool anInvalidPrs = myInvalidPrs.contains(theValue);
@@ -267,7 +267,7 @@ void ModuleBase_WidgetValidated::storeValidState(const ModuleBase_ViewerPrs& the
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::getValidState(const ModuleBase_ViewerPrs& theValue, bool& theValid)
+bool ModuleBase_WidgetValidated::getValidState(const ModuleBase_ViewerPrsPtr& theValue, bool& theValid)
 {
   bool aValidPrs = myValidPrs.contains(theValue);
   bool anInvalidPrs = myInvalidPrs.contains(theValue);
@@ -281,12 +281,12 @@ bool ModuleBase_WidgetValidated::getValidState(const ModuleBase_ViewerPrs& theVa
 }
 
 //********************************************************************
-QList<ModuleBase_ViewerPrs> ModuleBase_WidgetValidated::getFilteredSelected()
+QList<ModuleBase_ViewerPrsPtr> ModuleBase_WidgetValidated::getFilteredSelected()
 {
-  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected(
+  QList<ModuleBase_ViewerPrsPtr> aSelected = myWorkshop->selection()->getSelected(
                                                        ModuleBase_ISelection::Viewer);
 
-  QList<ModuleBase_ViewerPrs> anOBSelected = myWorkshop->selection()->getSelected(
+  QList<ModuleBase_ViewerPrsPtr> anOBSelected = myWorkshop->selection()->getSelected(
                                                        ModuleBase_ISelection::Browser);
   // filter the OB presentations
   filterPresentations(anOBSelected);
@@ -299,11 +299,11 @@ QList<ModuleBase_ViewerPrs> ModuleBase_WidgetValidated::getFilteredSelected()
 }
 
 //********************************************************************
-void ModuleBase_WidgetValidated::filterPresentations(QList<ModuleBase_ViewerPrs>& theValues)
+void ModuleBase_WidgetValidated::filterPresentations(QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
-  QList<ModuleBase_ViewerPrs> aValidatedValues;
+  QList<ModuleBase_ViewerPrsPtr> aValidatedValues;
 
-  QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
   bool isDone = false;
   for (; anIt != aLast; anIt++) {
     if (isValidInFilters(*anIt))
@@ -316,16 +316,16 @@ void ModuleBase_WidgetValidated::filterPresentations(QList<ModuleBase_ViewerPrs>
 }
 
 //********************************************************************
-void ModuleBase_WidgetValidated::filterCompSolids(QList<ModuleBase_ViewerPrs>& theValues)
+void ModuleBase_WidgetValidated::filterCompSolids(QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
   std::set<ResultCompSolidPtr> aCompSolids;
-  QList<ModuleBase_ViewerPrs> aValidatedValues;
+  QList<ModuleBase_ViewerPrsPtr> aValidatedValues;
 
   // Collect compsolids.
-  QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
   for (; anIt != aLast; anIt++) {
-    const ModuleBase_ViewerPrs& aViewerPrs = *anIt;
-    ObjectPtr anObject = aViewerPrs.object();
+    const ModuleBase_ViewerPrsPtr& aViewerPrs = *anIt;
+    ObjectPtr anObject = aViewerPrs->object();
     ResultCompSolidPtr aResultCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anObject);
     if(aResultCompSolid.get()) {
       aCompSolids.insert(aResultCompSolid);
@@ -335,8 +335,8 @@ void ModuleBase_WidgetValidated::filterCompSolids(QList<ModuleBase_ViewerPrs>& t
   // Filter sub-solids of compsolids.
   anIt = theValues.begin();
   for (; anIt != aLast; anIt++) {
-    const ModuleBase_ViewerPrs& aViewerPrs = *anIt;
-    ObjectPtr anObject = aViewerPrs.object();
+    const ModuleBase_ViewerPrsPtr& aViewerPrs = *anIt;
+    ObjectPtr anObject = aViewerPrs->object();
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
     ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aResult);
     if(aResCompSolidPtr.get() && (aCompSolids.find(aResCompSolidPtr) != aCompSolids.end())) {

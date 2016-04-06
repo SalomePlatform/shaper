@@ -104,7 +104,7 @@ Q_OBJECT
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped selection values
   /// \param theToValidate the boolean value whether the value should be checked by filters
-  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+  virtual bool setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
                             const bool theToValidate)
   {
     return false;
@@ -112,7 +112,7 @@ Q_OBJECT
 
   /// Returns values which should be highlighted when the whidget is active
   /// \param theValues a list of presentations
-  virtual void getHighlighted(QList<ModuleBase_ViewerPrs>& theValues) {};
+  virtual void getHighlighted(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues) {};
 
   /// Restore value from attribute data to the widget's control. Emits signals before and after store
   /// \return True in success

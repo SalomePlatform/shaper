@@ -100,7 +100,7 @@ Q_OBJECT
 
   /// Fill internal map by preselection
   /// \param theValues a list of preselection
-  void setPreselection(const QList<ModuleBase_ViewerPrs>& theValues);
+  void setPreselection(const QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
   /// \brief Set property pane to the operation
   /// \param theProp a property panel instance
@@ -177,7 +177,7 @@ Q_OBJECT
   bool myIsEditing;
 
   /// List of pre-selected object 
-  QList<ModuleBase_ViewerPrs> myPreSelection;
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> myPreSelection;
 
   /// If the operation works with feature which is sub-feature of another one
   /// then this variable has to be initialised by parent feature 

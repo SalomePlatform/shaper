@@ -147,15 +147,15 @@ PartSet_WidgetPoint2D::~PartSet_WidgetPoint2D()
 {
 }
 
-bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrsPtr>& theValues,
                                          const bool theToValidate)
 {
   bool isDone = false;
   if (theValues.empty())
     return isDone;
 
-  ModuleBase_ViewerPrs aValue = theValues.takeFirst();
-  GeomShapePtr aShape = aValue.shape();
+  ModuleBase_ViewerPrsPtr aValue = theValues.takeFirst();
+  GeomShapePtr aShape = aValue->shape();
   if (aShape.get() && !aShape->isNull()) {
     Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
     double aX, aY;
@@ -167,7 +167,7 @@ bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
   }
   else if (canBeActivatedByMove()) {
     if (feature()->getKind() == SketchPlugin_Line::ID()) {
-      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aValue.object());
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aValue->object());
       // Initialize new line with first point equal to end of previous
       if (aFeature.get()) {
         std::shared_ptr<ModelAPI_Data> aData = aFeature->data();

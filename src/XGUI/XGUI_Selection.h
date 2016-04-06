@@ -36,17 +36,17 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
 
   /// Returns a list of viewer selected presentations
   /// \return list of presentations
-  virtual QList<ModuleBase_ViewerPrs> getSelected(const SelectionPlace& thePlace = Browser) const;
+  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getSelected(const SelectionPlace& thePlace = Browser) const;
 
   /// Fills the viewer presentation parameters by the parameters from the owner
   /// \param thePrs a container for selection
   /// \param theOwner a selection owner
-  virtual void fillPresentation(ModuleBase_ViewerPrs& thePrs,
+  virtual void fillPresentation(std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
                                 const Handle_SelectMgr_EntityOwner& theOwner) const;
 
   /// Returns a list of viewer highlited presentations
   /// \return list of presentations
-  virtual QList<ModuleBase_ViewerPrs> getHighlighted() const;
+  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getHighlighted() const;
 
   /**
    * Returns list of currently selected objects in object browser
@@ -93,18 +93,18 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   //! Return the IO from the viewer presentation.
   //! \param thePrs a selected object
   //! \return an interactive object
-  virtual Handle(AIS_InteractiveObject) getIO(const ModuleBase_ViewerPrs& thePrs);
+  virtual Handle(AIS_InteractiveObject) getIO(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
 protected:
   /// Fills the list of presentations by objects selected in the viewer.
   /// \param thePresentations an output list of presentation
-  void getSelectedInViewer(QList<ModuleBase_ViewerPrs>& thePresentations) const;
+  void getSelectedInViewer(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& thePresentations) const;
   /// Fills the list of presentations by objects selected in the object browser.
   /// ViewerPrs contains only object parameter not empty.
   /// If the given list of presentations already has a viewer presentation with the same object
   /// as selected in the browser, a new item is not appended to the list of presentations.
   /// \param thePresentations an output list of presentation
-  void getSelectedInBrowser(QList<ModuleBase_ViewerPrs>& thePresentations) const;
+  void getSelectedInBrowser(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& thePresentations) const;
 
   /// Generates a vertex or edge by the give IO if it is an AIS created on trihedron
   /// \param theIO a selected object

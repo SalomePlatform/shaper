@@ -565,14 +565,14 @@ bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
   if (mySketchMgr->activeSketch().get() && aFOperation && aPropertyPanel) {
     ModuleBase_ISelection* aSelection = workshop()->selection();
     // click on a point in sketch leads here with the point is highlighted, not yet selected
-    QList<ModuleBase_ViewerPrs> aPreselection = aSelection->getHighlighted();
+    QList<ModuleBase_ViewerPrsPtr> aPreselection = aSelection->getHighlighted();
     if (aPreselection.size() == 1) {
-      ModuleBase_ViewerPrs aSelectedPrs = aPreselection[0];
-      ObjectPtr anObject = aSelectedPrs.object();
+      ModuleBase_ViewerPrsPtr aSelectedPrs = aPreselection[0];
+      ObjectPtr anObject = aSelectedPrs->object();
 
       FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
       FeaturePtr anOpFeature = aFOperation->feature();
-      GeomShapePtr aShape = aSelectedPrs.shape();
+      GeomShapePtr aShape = aSelectedPrs->shape();
       // click on the digit of dimension constrain comes here with an empty shape, so we need the check
       if (aFeature == anOpFeature && aShape.get() && !aShape->isNull()) {
         const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
@@ -612,10 +612,10 @@ void PartSet_Module::onSelectionChanged()
   if (isSketcherOp) {
     // Editing of constraints can be done on selection
     ModuleBase_ISelection* aSelect = myWorkshop->selection();
-    QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected();
+    QList<ModuleBase_ViewerPrsPtr> aSelected = aSelect->getSelected();
     if (aSelected.size() == 1) {
-      ModuleBase_ViewerPrs aPrs = aSelected.first();
-      ObjectPtr aObject = aPrs.object();
+      ModuleBase_ViewerPrsPtr aPrs = aSelected.first();
+      ObjectPtr aObject = aPrs->object();
       FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
       if (aFeature) {
         std::string aId = aFeature->getKind();

@@ -179,8 +179,8 @@ public:
   /// \param theSelected a list of presentations
   /// \param thePrs a presentation to be found
   /// \return - result of check, true if the list contains the prs
-  static bool isContainPresentation(const QList<ModuleBase_ViewerPrs>& theSelected,
-                                    const ModuleBase_ViewerPrs& thePrs);
+  static bool isContainPresentation(const QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theSelected,
+                                    const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   /// Returns Result object if the given skietch contains external edge equal to the given
   /// \param theSketch - the sketch feature
@@ -200,7 +200,7 @@ public:
   /// \param theView a 3D view
   /// \param theX the output horizontal coordinate of the point
   /// \param theY the output vertical coordinate of the point
-  static bool hasVertexShape(const ModuleBase_ViewerPrs& thePrs, FeaturePtr theSketch,
+  static bool hasVertexShape(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs, FeaturePtr theSketch,
                              Handle_V3d_View theView, double& theX, double& theY);
 
 

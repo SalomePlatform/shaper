@@ -70,17 +70,17 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped selection values
   /// \param theToValidate a validation of the values flag
-  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+  virtual bool setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
                             const bool theToValidate);
 
   /// Returns values which should be highlighted when the whidget is active
   /// \param theValues a list of presentations
-  virtual void getHighlighted(QList<ModuleBase_ViewerPrs>& theValues);
+  virtual void getHighlighted(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view
   /// \return a boolean value
-  virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
+  virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   /// Returns true if the event is processed. The default implementation is empty, returns false.
   virtual bool processDelete();
@@ -125,7 +125,7 @@ protected:
   /// Return the attribute values wrapped in a list of viewer presentations
   /// \return a list of viewer presentations, which contains an attribute result and
   /// a shape. If the attribute do not uses the shape, it is empty
-  virtual QList<ModuleBase_ViewerPrs> getAttributeSelection() const;
+  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getAttributeSelection() const;
 
   /// Fills the list control by the attribute values
   void updateSelectionList();
@@ -144,17 +144,17 @@ protected:
   /// \param theAttributeIds indices in attribute list to be returned
   /// \param theValues the result presentations, filled with object and shape of an attribute item
   void convertIndicesToViewerSelection(std::set<int> theAttributeIds,
-                                       QList<ModuleBase_ViewerPrs>& theValues) const;
+                                       QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues) const;
 
   /// Iterates throgh the model attribute list and remove elements which do not present in the list
   /// \param theValues the wrapped selection values
-  virtual void removeUnusedAttributeObjects(QList<ModuleBase_ViewerPrs>& theValues);
+  virtual void removeUnusedAttributeObjects(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
   /// Converts viewer presentation selection list to objects and shapes map
   /// \param theValues the wrapped selection values
   /// \return selection list
   std::map<ObjectPtr, std::set<GeomShapePtr> > convertSelection
-                                          (QList<ModuleBase_ViewerPrs>& theValues);
+                                          (QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
   /// Returns true if the object and shape present in the container
   /// \param theObject a model object, a set of shapes is searched by it

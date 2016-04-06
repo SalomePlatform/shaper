@@ -125,7 +125,7 @@ void PartSet_WidgetSketchCreator::openExtrusionTransaction()
 }
 
 //********************************************************************
-bool PartSet_WidgetSketchCreator::isValidSelection(const ModuleBase_ViewerPrs& theValue)
+bool PartSet_WidgetSketchCreator::isValidSelection(const ModuleBase_ViewerPrsPtr& theValue)
 {
   bool aValid = false;
   if (myIsCustomAttribute) {
@@ -155,7 +155,7 @@ bool PartSet_WidgetSketchCreator::isValidSelection(const ModuleBase_ViewerPrs& t
 }
 
 //********************************************************************
-bool PartSet_WidgetSketchCreator::isValidSelectionCustom(const ModuleBase_ViewerPrs& theValue)
+bool PartSet_WidgetSketchCreator::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& theValue)
 {
   return PartSet_WidgetSketchLabel::canFillSketch(theValue);
 }
@@ -254,16 +254,16 @@ bool PartSet_WidgetSketchCreator::hasSubObjects() const
   return aHasSubObjects;
 }
 
-bool PartSet_WidgetSketchCreator::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+bool PartSet_WidgetSketchCreator::setSelection(QList<ModuleBase_ViewerPrsPtr>& theValues,
                                                const bool theToValidate)
 {
   bool aDone = false;
   if (!startSketchOperation(theValues)) {
     myIsCustomAttribute = true;
-    QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
+    QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
     bool aProcessed = false;
     for (; anIt != aLast; anIt++) {
-      ModuleBase_ViewerPrs aValue = *anIt;
+      ModuleBase_ViewerPrsPtr aValue = *anIt;
       if (!theToValidate || isValidInFilters(aValue))
         aProcessed = setSelectionCustom(aValue) || aProcessed;
     }
@@ -284,7 +284,7 @@ bool PartSet_WidgetSketchCreator::setSelection(QList<ModuleBase_ViewerPrs>& theV
 //********************************************************************
 void PartSet_WidgetSketchCreator::onSelectionChanged()
 {
-  QList<ModuleBase_ViewerPrs> aSelected = getFilteredSelected();
+  QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
   bool isDone = setSelection(aSelected, true/*false*/);
 }
 
@@ -293,14 +293,14 @@ void PartSet_WidgetSketchCreator::updateOnSelectionChanged(const bool theDone)
 {
 }
 
-bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_ViewerPrs>& theValues)
+bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
   bool aSketchStarted = false;
 
   if (theValues.size() != 1)
     return aSketchStarted;
 
-  ModuleBase_ViewerPrs aValue = theValues.front();
+  ModuleBase_ViewerPrsPtr aValue = theValues.front();
   if (!PartSet_WidgetSketchLabel::canFillSketch(aValue))
     return aSketchStarted;
 
@@ -318,7 +318,7 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_Vi
   // start edit operation for the sketch
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                             (myModule->createOperation("Sketch"));
-  QList<ModuleBase_ViewerPrs> aValues;
+  QList<ModuleBase_ViewerPrsPtr> aValues;
   aValues.push_back(aValue);
   aFOperation->setPreselection(aValues);
 

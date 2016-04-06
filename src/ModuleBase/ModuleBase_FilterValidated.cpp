@@ -28,7 +28,7 @@ Standard_Boolean ModuleBase_FilterValidated::IsOk(const Handle(SelectMgr_EntityO
       aCurrentWidget = myWorkshop->module()->activeWidget();
     ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
                                                                            (aCurrentWidget);
-    ModuleBase_ViewerPrs aPrs;
+    ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
     myWorkshop->selection()->fillPresentation(aPrs, theOwner);
 
     aValid = !aWidgetValidated || aWidgetValidated->isValidSelection(aPrs);

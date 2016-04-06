@@ -592,11 +592,11 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
   return ResultPtr();
 }
 
-bool PartSet_Tools::isContainPresentation(const QList<ModuleBase_ViewerPrs>& theSelected,
-                                          const ModuleBase_ViewerPrs& thePrs)
+bool PartSet_Tools::isContainPresentation(const QList<ModuleBase_ViewerPrsPtr>& theSelected,
+                                          const ModuleBase_ViewerPrsPtr& thePrs)
 {
-  foreach (ModuleBase_ViewerPrs aPrs, theSelected) {
-    if (aPrs.object() == thePrs.object())
+  foreach (ModuleBase_ViewerPrsPtr aPrs, theSelected) {
+    if (aPrs->object() == thePrs->object())
       return true;
   }
   return false;
@@ -658,12 +658,12 @@ ResultPtr PartSet_Tools::findExternalVertex(CompositeFeaturePtr theSketch, std::
 }
 
 
-bool PartSet_Tools::hasVertexShape(const ModuleBase_ViewerPrs& thePrs, FeaturePtr theSketch,
+bool PartSet_Tools::hasVertexShape(const ModuleBase_ViewerPrsPtr& thePrs, FeaturePtr theSketch,
                                    Handle_V3d_View theView, double& theX, double& theY)
 {
   bool aHasVertex = false;
 
-  const GeomShapePtr& aShape = thePrs.shape();
+  const GeomShapePtr& aShape = thePrs->shape();
   if (aShape.get() && !aShape->isNull() && aShape->shapeType() == GeomAPI_Shape::VERTEX)
   {
     const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();

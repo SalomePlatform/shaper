@@ -321,7 +321,7 @@ void PartSet_OperationPrs::getHighlightedShapes(ModuleBase_IWorkshop* theWorksho
 {
   theObjectShapes.clear();
 
-  QList<ModuleBase_ViewerPrs> aValues;
+  QList<ModuleBase_ViewerPrsPtr> aValues;
   ModuleBase_IPropertyPanel* aPanel = theWorkshop->propertyPanel();
   if (aPanel) {
     ModuleBase_ModelWidget* aWidget = aPanel->activeWidget();
@@ -331,13 +331,13 @@ void PartSet_OperationPrs::getHighlightedShapes(ModuleBase_IWorkshop* theWorksho
   }
 
   QList<GeomShapePtr> aShapes;
-  QList<ModuleBase_ViewerPrs>::const_iterator anIIt = aValues.begin(),
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIIt = aValues.begin(),
                                               aILast = aValues.end();
   for (; anIIt != aILast; anIIt++) {
-    ModuleBase_ViewerPrs aPrs = *anIIt;
-    ObjectPtr anObject = aPrs.object();
+    ModuleBase_ViewerPrsPtr aPrs = *anIIt;
+    ObjectPtr anObject = aPrs->object();
 
-    GeomShapePtr aGeomShape = aPrs.shape();
+    GeomShapePtr aGeomShape = aPrs->shape();
     if (!aGeomShape.get() || aGeomShape->isNull()) {
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
       if (aResult.get()) {

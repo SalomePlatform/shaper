@@ -541,7 +541,7 @@ bool XGUI_Displayer::isActive(ObjectPtr theObject) const
   aContext->ActivatedModes(anAIS, aModes);
   return aModes.Extent() > 0;
 }
-void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, bool theUpdateViewer)
+void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValues, bool theUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
@@ -549,13 +549,13 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, 
   if (aContext->HasOpenedContext()) {
     aContext->UnhilightSelected(false);
     aContext->ClearSelected(false);
-    foreach (ModuleBase_ViewerPrs aPrs, theValues) {
-      const GeomShapePtr& aGeomShape = aPrs.shape();
+    foreach (ModuleBase_ViewerPrsPtr aPrs, theValues) {
+      const GeomShapePtr& aGeomShape = aPrs->shape();
       if (aGeomShape.get() && !aGeomShape->isNull()) {
         const TopoDS_Shape& aShape = aGeomShape->impl<TopoDS_Shape>();
         aContext->AddOrRemoveSelected(aShape, false);
       } else {
-        ObjectPtr anObject = aPrs.object();
+        ObjectPtr anObject = aPrs->object();
         ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
         if (aResult.get() && isVisible(aResult)) {
           AISObjectPtr anObj = myResult2AISObjectMap[aResult];
@@ -574,8 +574,8 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrs>& theValues, 
   } else {
     aContext->UnhilightCurrents(false);
     aContext->ClearCurrents(false);
-    foreach (ModuleBase_ViewerPrs aPrs, theValues) {
-      ObjectPtr anObject = aPrs.object();
+    foreach (ModuleBase_ViewerPrsPtr aPrs, theValues) {
+      ObjectPtr anObject = aPrs->object();
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
       if (aResult.get() && isVisible(aResult)) {
         AISObjectPtr anObj = myResult2AISObjectMap[aResult];

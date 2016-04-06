@@ -49,13 +49,13 @@ protected:
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view
   /// \return a boolean value
-  virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
+  virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   /// Return an object and geom shape by the viewer presentation
   /// \param thePrs a selection
   /// \param theObject an output object
   /// \param theShape a shape of the selection
-  virtual void getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
+  virtual void getGeomSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
                                 ObjectPtr& theObject,
                                 GeomShapePtr& theShape);
 

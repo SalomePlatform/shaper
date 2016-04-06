@@ -55,7 +55,7 @@ public:
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped selection values
   /// \param theToValidate a validation of the values flag
-  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+  virtual bool setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
                             const bool theToValidate);
 
   /// Editing mode depends on mode of current operation. This value is defined by it.
@@ -67,7 +67,7 @@ public:
   /// restored.The valid/invalid value is cashed.
   /// \param theValue a selected presentation in the view
   /// \return a boolean value
-  virtual bool isValidSelection(const ModuleBase_ViewerPrs& theValue);
+  virtual bool isValidSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
 
 protected:
   /// If there is no operation in current session, start operation for modify parameters
@@ -77,7 +77,7 @@ protected:
   /// Checks whether the selection presentation contains preview planes
   /// \param theValue a selection information
   /// \return a boolean value
-  virtual bool isValidSelectionCustom(const ModuleBase_ViewerPrs& theValue);
+  virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
 
   /// Saves the internal parameters to the given feature
   /// \return True in success
@@ -127,7 +127,7 @@ private:
   /// Append new Sketch, set the selected plane for the sketch and start Edit operation.
   /// \param theValues a selection list
   /// \return true if the sketch is started
-  bool startSketchOperation(const QList<ModuleBase_ViewerPrs>& theValues);
+  bool startSketchOperation(const QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
   /// Sets the sub-object to list of base.
   static void setSketchObjectToList(const CompositeFeaturePtr& theFeature,

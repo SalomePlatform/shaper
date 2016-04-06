@@ -37,9 +37,9 @@ XGUI_Selection::XGUI_Selection(XGUI_Workshop* theWorkshop)
 {
 }
 
-QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(const SelectionPlace& thePlace) const
+QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getSelected(const SelectionPlace& thePlace) const
 {
-  QList<ModuleBase_ViewerPrs> aPresentations;
+  QList<ModuleBase_ViewerPrsPtr> aPresentations;
 
   switch (thePlace) {
     case Browser:
@@ -56,17 +56,17 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(const SelectionPlace& th
   return aPresentations;
 }
 
-Handle(AIS_InteractiveObject) XGUI_Selection::getIO(const ModuleBase_ViewerPrs& thePrs)
+Handle(AIS_InteractiveObject) XGUI_Selection::getIO(const ModuleBase_ViewerPrsPtr& thePrs)
 {
-  Handle(AIS_InteractiveObject) anIO = thePrs.interactive();
+  Handle(AIS_InteractiveObject) anIO = thePrs->interactive();
   if (anIO.IsNull()) {
-    Handle(SelectMgr_EntityOwner) anOwner = thePrs.owner();
+    Handle(SelectMgr_EntityOwner) anOwner = thePrs->owner();
     if (!anOwner.IsNull())
       anIO = Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
 
-    if (anIO.IsNull() && thePrs.object()) {
+    if (anIO.IsNull() && thePrs->object()) {
       XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-      AISObjectPtr anAISObject = aDisplayer->getAISObject(thePrs.object());
+      AISObjectPtr anAISObject = aDisplayer->getAISObject(thePrs->object());
       if (anAISObject.get())
         anIO = anAISObject->impl<Handle(AIS_InteractiveObject)>();
     }
@@ -74,13 +74,13 @@ Handle(AIS_InteractiveObject) XGUI_Selection::getIO(const ModuleBase_ViewerPrs& 
   return anIO;
 }
 
-void XGUI_Selection::getSelectedInViewer(QList<ModuleBase_ViewerPrs>& thePresentations) const
+void XGUI_Selection::getSelectedInViewer(QList<ModuleBase_ViewerPrsPtr>& thePresentations) const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull() && aContext->HasOpenedContext()) {
     QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
     for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
-      ModuleBase_ViewerPrs aPrs;
+      ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
       Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
 
       if (aSelectedIds.contains((long)anOwner.Access()))
@@ -95,14 +95,14 @@ void XGUI_Selection::getSelectedInViewer(QList<ModuleBase_ViewerPrs>& thePresent
   }
 }
 
-void XGUI_Selection::getSelectedInBrowser(QList<ModuleBase_ViewerPrs>& thePresentations) const
+void XGUI_Selection::getSelectedInBrowser(QList<ModuleBase_ViewerPrsPtr>& thePresentations) const
 {
   // collect the objects  of the parameter presentation to avoid a repeted objects in the result
   QObjectPtrList aPresentationObjects;
-  QList<ModuleBase_ViewerPrs>::const_iterator aPrsIt = thePresentations.begin(),
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator aPrsIt = thePresentations.begin(),
                                               aPrsLast = thePresentations.end();
   for (; aPrsIt != aPrsLast; aPrsIt++) {
-    aPresentationObjects.push_back((*aPrsIt).object());
+    aPresentationObjects.push_back((*aPrsIt)->object());
   }
 
   QObjectPtrList anObjects = selectedObjects();
@@ -110,19 +110,20 @@ void XGUI_Selection::getSelectedInBrowser(QList<ModuleBase_ViewerPrs>& thePresen
   for (; anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
     if (anObject.get() != NULL && !aPresentationObjects.contains(anObject)) {
-      thePresentations.append(ModuleBase_ViewerPrs(anObject, GeomShapePtr(), NULL));
+      thePresentations.append(std::shared_ptr<ModuleBase_ViewerPrs>(
+               new ModuleBase_ViewerPrs(anObject, GeomShapePtr(), NULL)));
     }
   }
 }
 
-void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
+void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
                                       const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
-  thePrs.setOwner(theOwner);
+  thePrs->setOwner(theOwner);
 
   Handle(AIS_InteractiveObject) anIO = 
                            Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
-  thePrs.setInteractive(anIO);
+  thePrs->setInteractive(anIO);
 
   // we should not check the appearance of this feature because there can be some selected shapes
   // for one feature
@@ -138,7 +139,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
     if (!aShape.IsNull()) {
       std::shared_ptr<GeomAPI_Shape> aGeomShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
       aGeomShape->setImpl(new TopoDS_Shape(aShape));
-      thePrs.setShape(aGeomShape);
+      thePrs->setShape(aGeomShape);
     }
   } else {
 #ifdef DEBUG_DELIVERY
@@ -156,7 +157,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
       if (!aEdge.IsNull()) {
         std::shared_ptr<GeomAPI_Shape> aGeomShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
         aGeomShape->setImpl(new TopoDS_Shape(aEdge));
-        thePrs.setShape(aGeomShape);
+        thePrs->setShape(aGeomShape);
       }
     } else {
       Handle(AIS_Point) aPoint = Handle(AIS_Point)::DownCast(anIO);
@@ -169,7 +170,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
         if (!aVertex.IsNull()) {
           std::shared_ptr<GeomAPI_Shape> aGeomShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
           aGeomShape->setImpl(new TopoDS_Shape(aVertex));
-          thePrs.setShape(aGeomShape);
+          thePrs->setShape(aGeomShape);
         }
       }
     }
@@ -188,19 +189,19 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrs& thePrs,
       ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(aResult);
       if (aCompSolid.get()) {
         GeomShapePtr aShape = aCompSolid->shape();
-        if (aShape.get() && aShape->isEqual(thePrs.shape())) {
-          thePrs.setObject(aCompSolid);
+        if (aShape.get() && aShape->isEqual(thePrs->shape())) {
+          thePrs->setObject(aCompSolid);
           return;
         }
       }
     }
   }
-  thePrs.setObject(aFeature);
+  thePrs->setObject(aFeature);
 }
 
-QList<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted() const
+QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getHighlighted() const
 {
-  QList<ModuleBase_ViewerPrs> aPresentations;
+  QList<ModuleBase_ViewerPrsPtr> aPresentations;
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (aContext.IsNull())
     return aPresentations;
@@ -208,24 +209,24 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted() const
   QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
-    ModuleBase_ViewerPrs aPrs;
+    ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
     Handle(AIS_InteractiveObject) anIO = aContext->DetectedInteractive();
     if (aSelectedIds.contains((long)anIO.Access()))
       continue;
     
     aSelectedIds.append((long)anIO.Access());
-    aPrs.setInteractive(anIO);
+    aPrs->setInteractive(anIO);
 
     ObjectPtr aResult = aDisplayer->getObject(anIO);
     // we should not check the appearance of this feature because there can be some selected shapes
     // for one feature
-    aPrs.setObject(aResult);
+    aPrs->setObject(aResult);
     if (aContext->HasOpenedContext()) {
       TopoDS_Shape aShape = aContext->DetectedShape();
       if (!aShape.IsNull()) {
         std::shared_ptr<GeomAPI_Shape> aGeomShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
         aGeomShape->setImpl(new TopoDS_Shape(aShape));
-        aPrs.setShape(aGeomShape);
+        aPrs->setShape(aGeomShape);
       }
     }
     aPresentations.push_back(aPrs);

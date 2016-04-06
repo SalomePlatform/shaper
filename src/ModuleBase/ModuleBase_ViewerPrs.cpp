@@ -8,11 +8,6 @@
 
 #include <ModuleBase_ResultPrs.h>
 
-ModuleBase_ViewerPrs::ModuleBase_ViewerPrs()
-{
-
-}
-
 ModuleBase_ViewerPrs::ModuleBase_ViewerPrs(ObjectPtr theResult, 
                                            const GeomShapePtr& theShape, 
                                            Handle_SelectMgr_EntityOwner theOwner) 
@@ -43,7 +38,8 @@ bool ModuleBase_ViewerPrs::operator==(const ModuleBase_ViewerPrs& thePrs)
     Handle(StdSelect_BRepOwner) anOwner1 = Handle(StdSelect_BRepOwner)::DownCast(myOwner);
     Handle(StdSelect_BRepOwner) anOwner2 = Handle(StdSelect_BRepOwner)::DownCast(thePrs.owner());
     if (!anOwner1.IsNull() && !anOwner2.IsNull())
-      isEqualOwner = anOwner1->Shape() == anOwner2->Shape();
+      isEqualOwner = (anOwner1->Shape().IsNull() && anOwner2->Shape().IsNull()) ||
+                      anOwner1->Shape().IsEqual(anOwner2->Shape());
   }
 
   if (isEqualResult && isEqualShape &&
@@ -56,7 +52,8 @@ bool ModuleBase_ViewerPrs::operator==(const ModuleBase_ViewerPrs& thePrs)
     Handle(ModuleBase_BRepOwner) aCSolidOwner2 = Handle(ModuleBase_BRepOwner)::DownCast(thePrs.owner());
     isEqualIO = !aCSolidOwner1.IsNull() && !aCSolidOwner2.IsNull();
     if (!aCSolidOwner1.IsNull() && !aCSolidOwner1.IsNull())
-      isEqualOwner = aCSolidOwner1->Shape() == aCSolidOwner1->Shape();
+      isEqualOwner = (aCSolidOwner1->Shape().IsNull() && aCSolidOwner2->Shape().IsNull()) ||
+                      aCSolidOwner1->Shape().IsEqual(aCSolidOwner2->Shape());
   }
 
   return isEqualResult && isEqualShape && isEqualOwner && isEqualIO;

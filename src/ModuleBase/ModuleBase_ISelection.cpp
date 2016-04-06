@@ -9,39 +9,40 @@
 #include <GeomAPI_Pnt.h>
 
 //********************************************************************
-void ModuleBase_ISelection::appendSelected(const QList<ModuleBase_ViewerPrs> theValues,
-                                           QList<ModuleBase_ViewerPrs>& theValuesTo)
+void ModuleBase_ISelection::appendSelected(const QList<ModuleBase_ViewerPrsPtr> theValues,
+                                           QList<ModuleBase_ViewerPrsPtr>& theValuesTo)
 {
   // collect the objects from the viewer
   QObjectPtrList anExistedObjects;
-  QList<ModuleBase_ViewerPrs>::const_iterator aPrsIt = theValuesTo.begin(),
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator aPrsIt = theValuesTo.begin(),
                                               aPrsLast = theValuesTo.end();
   for (; aPrsIt != aPrsLast; aPrsIt++) {
-    if ((*aPrsIt).owner() && (*aPrsIt).object())
-      anExistedObjects.push_back((*aPrsIt).object());
+    if ((*aPrsIt)->owner() && (*aPrsIt)->object())
+      anExistedObjects.push_back((*aPrsIt)->object());
   }
 
 
-  QList<ModuleBase_ViewerPrs>::const_iterator anIt = theValues.begin(),
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theValues.begin(),
                                               aLast = theValues.end();
   for (; anIt != aLast; anIt++) {
-    ObjectPtr anObject = (*anIt).object();
+    ObjectPtr anObject = (*anIt)->object();
     if (anObject.get() != NULL && !anExistedObjects.contains(anObject)) {
-      theValuesTo.append(ModuleBase_ViewerPrs(anObject, GeomShapePtr(), NULL));
+      theValuesTo.append(std::shared_ptr<ModuleBase_ViewerPrs>(
+               new ModuleBase_ViewerPrs(anObject, GeomShapePtr(), NULL)));
     }
   }
 
 }
 
 //********************************************************************
-ResultPtr ModuleBase_ISelection::getResult(const ModuleBase_ViewerPrs& thePrs)
+ResultPtr ModuleBase_ISelection::getResult(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   ResultPtr aResult;
 
-  if (thePrs.object().get())
-    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
-  else if (!thePrs.owner().IsNull()) {
-    ObjectPtr anObject = getSelectableObject(thePrs.owner());
+  if (thePrs->object().get())
+    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs->object());
+  else if (!thePrs->owner().IsNull()) {
+    ObjectPtr anObject = getSelectableObject(thePrs->owner());
     aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
   }
 
@@ -49,11 +50,11 @@ ResultPtr ModuleBase_ISelection::getResult(const ModuleBase_ViewerPrs& thePrs)
 }
 
 //********************************************************************
-GeomShapePtr ModuleBase_ISelection::getShape(const ModuleBase_ViewerPrs& thePrs)
+GeomShapePtr ModuleBase_ISelection::getShape(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   GeomShapePtr aShape;
 
-  const GeomShapePtr& aPrsShape = thePrs.shape();
+  const GeomShapePtr& aPrsShape = thePrs->shape();
   // if only result is selected, an empty shape is set to the model
   if (!aPrsShape.get() || aPrsShape->isNull()) {
   }
@@ -68,14 +69,15 @@ GeomShapePtr ModuleBase_ISelection::getShape(const ModuleBase_ViewerPrs& thePrs)
 }
 
 //********************************************************************
-QList<ModuleBase_ViewerPrs> ModuleBase_ISelection::getViewerPrs(const QObjectPtrList& theObjects)
+QList<ModuleBase_ViewerPrsPtr> ModuleBase_ISelection::getViewerPrs(const QObjectPtrList& theObjects)
 {
-  QList<ModuleBase_ViewerPrs> aSelectedPrs;
+  QList<ModuleBase_ViewerPrsPtr> aSelectedPrs;
   QObjectPtrList::const_iterator anIt = theObjects.begin(), aLast = theObjects.end();
   for (; anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
     if (anObject.get() != NULL) {
-      aSelectedPrs.append(ModuleBase_ViewerPrs(anObject, GeomShapePtr(), NULL));
+      aSelectedPrs.append(std::shared_ptr<ModuleBase_ViewerPrs>(
+               new ModuleBase_ViewerPrs(anObject, GeomShapePtr(), NULL)));
     }
   }
   return aSelectedPrs;
@@ -83,12 +85,12 @@ QList<ModuleBase_ViewerPrs> ModuleBase_ISelection::getViewerPrs(const QObjectPtr
 
 //********************************************************************
 void ModuleBase_ISelection::filterSelectionOnEqualPoints
-                                              (QList<ModuleBase_ViewerPrs>& theSelected)
+                                              (QList<ModuleBase_ViewerPrsPtr>& theSelected)
 {
-  QList<ModuleBase_ViewerPrs> aCandidatesToRemove;
-  QList<ModuleBase_ViewerPrs>::const_iterator anIt = theSelected.begin(),
+  QList<ModuleBase_ViewerPrsPtr> aCandidatesToRemove;
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theSelected.begin(),
                                               aLast = theSelected.end();
-  QList<ModuleBase_ViewerPrs>::const_iterator aSubIt;
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator aSubIt;
   for (; anIt != aLast; anIt++) {
     aSubIt = anIt;
     aSubIt++;
@@ -99,19 +101,19 @@ void ModuleBase_ISelection::filterSelectionOnEqualPoints
       }
     }
   }
-  QList<ModuleBase_ViewerPrs>::const_iterator aRemIt = aCandidatesToRemove.begin(),
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator aRemIt = aCandidatesToRemove.begin(),
                                               aRemLast = aCandidatesToRemove.end();
   for (; aRemIt != aRemLast; aRemIt++) {
     theSelected.removeAll(*aRemIt);
   }
 }
 
-bool ModuleBase_ISelection::isEqualVertices(const ModuleBase_ViewerPrs thePrs1,
-                                            const ModuleBase_ViewerPrs thePrs2)
+bool ModuleBase_ISelection::isEqualVertices(const ModuleBase_ViewerPrsPtr thePrs1,
+                                            const ModuleBase_ViewerPrsPtr thePrs2)
 {
   bool isEqual = false;
-  Handle(StdSelect_BRepOwner) anOwner1 = Handle(StdSelect_BRepOwner)::DownCast(thePrs1.owner());
-  Handle(StdSelect_BRepOwner) anOwner2 = Handle(StdSelect_BRepOwner)::DownCast(thePrs2.owner());
+  Handle(StdSelect_BRepOwner) anOwner1 = Handle(StdSelect_BRepOwner)::DownCast(thePrs1->owner());
+  Handle(StdSelect_BRepOwner) anOwner2 = Handle(StdSelect_BRepOwner)::DownCast(thePrs2->owner());
 
   if (!anOwner1.IsNull() && anOwner1->HasShape() &&
       !anOwner2.IsNull() && anOwner2->HasShape()) {

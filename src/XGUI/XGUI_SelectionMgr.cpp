@@ -93,21 +93,22 @@ void XGUI_SelectionMgr::updateSelectedOwners(bool isUpdateViewer)
 //**************************************************************
 void XGUI_SelectionMgr::onObjectBrowserSelection()
 {
-  QList<ModuleBase_ViewerPrs> aSelectedPrs =
+  QList<ModuleBase_ViewerPrsPtr> aSelectedPrs =
              myWorkshop->selector()->selection()->getSelected(ModuleBase_ISelection::Browser);
 
-  QList<ModuleBase_ViewerPrs> aTmpList = aSelectedPrs;
+  QList<ModuleBase_ViewerPrsPtr> aTmpList = aSelectedPrs;
   ObjectPtr aObject;
   FeaturePtr aFeature;
-  foreach(ModuleBase_ViewerPrs aPrs, aTmpList) {
-    aObject = aPrs.object();
+  foreach(ModuleBase_ViewerPrsPtr aPrs, aTmpList) {
+    aObject = aPrs->object();
     if (aObject.get()) {
       aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
       if (aFeature.get()) {
         const std::list<std::shared_ptr<ModelAPI_Result>> aResList = aFeature->results();
         std::list<ResultPtr>::const_iterator aIt;
         for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
-          aSelectedPrs.append(ModuleBase_ViewerPrs((*aIt), GeomShapePtr(), NULL));
+          aSelectedPrs.append(std::shared_ptr<ModuleBase_ViewerPrs>(
+               new ModuleBase_ViewerPrs((*aIt), GeomShapePtr(), NULL)));
         }
       }
     }
@@ -127,8 +128,8 @@ void XGUI_SelectionMgr::onViewerSelection()
   FeaturePtr aFeature;
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull()) {
-    QList<ModuleBase_ViewerPrs> aPresentations = selection()->getSelected(ModuleBase_ISelection::Viewer);
-    foreach(ModuleBase_ViewerPrs aPrs, aPresentations) {
+    QList<ModuleBase_ViewerPrsPtr> aPresentations = selection()->getSelected(ModuleBase_ISelection::Viewer);
+    foreach(ModuleBase_ViewerPrsPtr aPrs, aPresentations) {
       if (aPrs.object().get()) {
         aFeatures.append(aPrs.object());
         if (aPrs.shape().get()) {
@@ -152,7 +153,7 @@ void XGUI_SelectionMgr::onViewerSelection()
 //**************************************************************
 void XGUI_SelectionMgr::updateSelectionBy(const ModuleBase_ISelection::SelectionPlace& thePlace)
 {
-  QList<ModuleBase_ViewerPrs> aSelectedPrs =
+  QList<ModuleBase_ViewerPrsPtr> aSelectedPrs =
                myWorkshop->selector()->selection()->getSelected(thePlace);
   if (thePlace == ModuleBase_ISelection::Browser) {
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
@@ -168,7 +169,7 @@ void XGUI_SelectionMgr::clearSelection()
   myWorkshop->objectBrowser()->setObjectsSelected(aFeatures);
   myWorkshop->objectBrowser()->blockSignals(aBlocked);
   
-  QList<ModuleBase_ViewerPrs> aSelectedPrs =
+  QList<ModuleBase_ViewerPrsPtr> aSelectedPrs =
              myWorkshop->selector()->selection()->getSelected(ModuleBase_ISelection::Browser);
 
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();

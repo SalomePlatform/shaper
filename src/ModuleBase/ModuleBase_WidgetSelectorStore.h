@@ -19,26 +19,26 @@ class ModuleBase_IWorkshop;
 * \ingroup GUI
   Provides for an attribute backup of values. It is possible to store/ restore the attribute values.
 */
-class MODULEBASE_EXPORT ModuleBase_WidgetSelectorStore
+class ModuleBase_WidgetSelectorStore
 {
  public:
 
   /// Constructor
-  ModuleBase_WidgetSelectorStore();
+  MODULEBASE_EXPORT ModuleBase_WidgetSelectorStore();
   /// Destructor
-  virtual ~ModuleBase_WidgetSelectorStore() {}
+  MODULEBASE_EXPORT virtual ~ModuleBase_WidgetSelectorStore() {}
 
   /// Creates a backup of the current values of the attribute
   /// \param theAttribute a model attribute which parameters are to be stored
   /// \param theWorkshop a current workshop
-  void storeAttributeValue(const AttributePtr& theAttribute,
-                           ModuleBase_IWorkshop* theWorkshop);
+  MODULEBASE_EXPORT void storeAttributeValue(const AttributePtr& theAttribute,
+                                             ModuleBase_IWorkshop* theWorkshop);
 
   /// Creates a backup of the current values of the attribute
   /// \param theAttribute a model attribute which parameters are to be restored
   /// \param theWorkshop a current workshop
-  void restoreAttributeValue(const AttributePtr& theAttribute,
-                             ModuleBase_IWorkshop* theWorkshop);
+  MODULEBASE_EXPORT void restoreAttributeValue(const AttributePtr& theAttribute,
+                                               ModuleBase_IWorkshop* theWorkshop);
 
 private:
   /// backup parameters of the model attribute. The class processes three types of attribute:

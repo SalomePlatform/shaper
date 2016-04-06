@@ -55,7 +55,7 @@ bool PartSet_WidgetShapeSelector::activateSelectionAndFilters(bool toActivate)
 }
 
 //********************************************************************
-bool PartSet_WidgetShapeSelector::isValidSelectionCustom(const ModuleBase_ViewerPrs& thePrs)
+bool PartSet_WidgetShapeSelector::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   bool aValid = ModuleBase_WidgetShapeSelector::isValidSelectionCustom(thePrs);
   if (aValid) {
@@ -65,7 +65,7 @@ bool PartSet_WidgetShapeSelector::isValidSelectionCustom(const ModuleBase_Viewer
   return aValid;
 }
 
-void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrs& thePrs,
+void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr& thePrs,
                                                    ObjectPtr& theObject,
                                                    GeomShapePtr& theShape)
 {

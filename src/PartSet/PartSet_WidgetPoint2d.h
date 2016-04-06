@@ -51,7 +51,7 @@ Q_OBJECT
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped widget values
   /// \param theToValidate a validation flag
-  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+  virtual bool setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
                             const bool theToValidate);
 
   /// Select the internal content if it can be selected. It is empty in the default realization

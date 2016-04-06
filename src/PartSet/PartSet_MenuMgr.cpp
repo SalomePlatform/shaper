@@ -119,25 +119,25 @@ bool PartSet_MenuMgr::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*
   bool hasAttribute = false;
   bool hasFeature = false;
 
-  QList<ModuleBase_ViewerPrs> aPrsList = aSelection->getSelected(ModuleBase_ISelection::Viewer);
+  QList<ModuleBase_ViewerPrsPtr> aPrsList = aSelection->getSelected(ModuleBase_ISelection::Viewer);
   ResultPtr aResult;
   FeaturePtr aFeature;
-  foreach(ModuleBase_ViewerPrs aPrs, aPrsList) {
-    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs.object());
+  foreach(ModuleBase_ViewerPrsPtr aPrs, aPrsList) {
+    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
     if (aResult.get() != NULL) {
-      const GeomShapePtr& aShape = aPrs.shape();
+      const GeomShapePtr& aShape = aPrs->shape();
       if (aShape.get() && aShape->isEqual(aResult->shape()))
         hasFeature = true;
       else
         hasAttribute = true;
     } else {
-      aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aPrs.object());
+      aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aPrs->object());
       hasFeature = (aFeature.get() != NULL);
     }
   }
 
   if (aPrsList.size() == 1) {
-    const GeomShapePtr& aShape = aPrsList.first().shape();
+    const GeomShapePtr& aShape = aPrsList.first()->shape();
     if (aShape.get() && !aShape->isNull() && aShape->shapeType() == GeomAPI_Shape::VERTEX) {
       // Find 2d coordinates
       FeaturePtr aSketchFea = myModule->sketchMgr()->activeSketch();
@@ -148,7 +148,7 @@ bool PartSet_MenuMgr::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*
         std::shared_ptr<GeomAPI_Pnt2d> aSelPnt = PartSet_Tools::convertTo2D(aSketchFea, aPnt3d);
 
         // Find coincident in these coordinates
-        ObjectPtr aObj = aPrsList.first().object();
+        ObjectPtr aObj = aPrsList.first()->object();
         FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
         FeaturePtr aCoincident = PartSet_Tools::findFirstCoincidence(aFeature, aSelPnt);
         // If we have coincidence then add Detach menu

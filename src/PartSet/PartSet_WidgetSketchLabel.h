@@ -55,7 +55,7 @@ public:
   /// It is redefined to do nothing if the plane of the sketch has been already set.
   /// \param theValues the wrapped selection values
   /// \param theToValidate a validation flag
-  virtual bool setSelection(QList<ModuleBase_ViewerPrs>& theValues,
+  virtual bool setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
                             const bool theToValidate);
 
   /// Returns list of widget controls
@@ -73,10 +73,10 @@ public:
   virtual void setHighlighted(bool) { /*do nothing*/ };
   virtual void enableFocusProcessing();
 
-  static bool canFillSketch(const ModuleBase_ViewerPrs& thePrs);
+  static bool canFillSketch(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   static bool fillSketchPlaneBySelection(const FeaturePtr& theFeature,
-                                         const ModuleBase_ViewerPrs& thePrs);
+                                         const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
 signals:
   /// Signal on plane selection
@@ -104,7 +104,7 @@ protected:
 
   /// Fills the attribute with the value of the selected owner
   /// \param thePrs a selected owner
-  virtual bool setSelectionCustom(const ModuleBase_ViewerPrs& thePrs);
+  virtual bool setSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   /// Saves the internal parameters to the given feature
   /// \return True in success
@@ -139,12 +139,12 @@ protected:
   /// It is redefined to do nothing if the plane of the sketch has been already set.
   /// \param theValues the wrapped selection values
   /// \param theToValidate a validation flag
-  bool setSelectionInternal(const QList<ModuleBase_ViewerPrs>& theValues,
+  bool setSelectionInternal(const QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
                             const bool theToValidate);
 
   /// Erase preview planes, disconnect widget, change the view projection
   /// \param thePrs a selected presentation
-  void updateByPlaneSelected(const ModuleBase_ViewerPrs& thePrs);
+  void updateByPlaneSelected(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
  protected:
   /// Activate or deactivate selection

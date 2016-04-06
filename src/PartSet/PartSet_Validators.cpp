@@ -39,12 +39,12 @@
 
 int shapesNbPoints(const ModuleBase_ISelection* theSelection)
 {
-  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
+  QList<ModuleBase_ViewerPrsPtr> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
   ModuleBase_ISelection::filterSelectionOnEqualPoints(aList);
 
   int aCount = 0;
-  foreach (ModuleBase_ViewerPrs aPrs, aList) {
-    const GeomShapePtr& aShape = aPrs.shape();
+  foreach (ModuleBase_ViewerPrsPtr aPrs, aList) {
+    const GeomShapePtr& aShape = aPrs->shape();
     if (aShape.get() && !aShape->isNull()) {
       if (aShape->shapeType() == GeomAPI_Shape::VERTEX)
         aCount++;
@@ -55,10 +55,10 @@ int shapesNbPoints(const ModuleBase_ISelection* theSelection)
 
 int shapesNbLines(const ModuleBase_ISelection* theSelection)
 {
-  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
+  QList<ModuleBase_ViewerPrsPtr> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
   int aCount = 0;
-  foreach(ModuleBase_ViewerPrs aPrs, aList) {
-    const GeomShapePtr& aShape = aPrs.shape();
+  foreach(ModuleBase_ViewerPrsPtr aPrs, aList) {
+    const GeomShapePtr& aShape = aPrs->shape();
     if (aShape.get() && !aShape->isNull()) {
       if (aShape->shapeType() == GeomAPI_Shape::EDGE) {
         const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
@@ -156,11 +156,10 @@ bool PartSet_RadiusSelection::isValid(const ModuleBase_ISelection* theSelection,
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
-    ModuleBase_ViewerPrs aPrs;
+    QList<ModuleBase_ViewerPrsPtr> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
     int aCount = 0;
-    foreach (ModuleBase_ViewerPrs aPrs, aList) {
-      const GeomShapePtr& aShape = aPrs.shape();
+    foreach (ModuleBase_ViewerPrsPtr aPrs, aList) {
+      const GeomShapePtr& aShape = aPrs->shape();
       if (aShape.get() && !aShape->isNull()) {
         if (aShape->shapeType() == GeomAPI_Shape::EDGE) {
           const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
@@ -182,7 +181,7 @@ bool PartSet_RigidSelection::isValid(const ModuleBase_ISelection* theSelection, 
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
+    QList<ModuleBase_ViewerPrsPtr> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
     return (aList.count() == 1);
   }
 }
@@ -225,12 +224,12 @@ bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
+    QList<ModuleBase_ViewerPrsPtr> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
     if ((aList.size() == 0) || (aList.size() > 2))
       return false;
 
-    ModuleBase_ViewerPrs aPrs = aList.first();
-    const GeomShapePtr& aShape = aPrs.shape();
+    ModuleBase_ViewerPrsPtr aPrs = aList.first();
+    const GeomShapePtr& aShape = aPrs->shape();
     if (!aShape.get() || aShape->isNull() || aShape->shapeType() != GeomAPI_Shape::EDGE)
       return false;
     GeomAPI_Edge aEdge1(aShape);
@@ -239,7 +238,7 @@ bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection
       if (aList.size() == 2) {
         // Check second selection
         aPrs = aList.last();
-        const GeomShapePtr& aShape2 = aPrs.shape();
+        const GeomShapePtr& aShape2 = aPrs->shape();
         if (!aShape2.get() || aShape2->isNull() || aShape2->shapeType() != GeomAPI_Shape::EDGE)
           return false;
         GeomAPI_Edge aEdge2(aShape2);
@@ -272,12 +271,11 @@ bool PartSet_EqualSelection::isValid(const ModuleBase_ISelection* theSelection, 
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
-    ModuleBase_ViewerPrs aPrs;
+    QList<ModuleBase_ViewerPrsPtr> aList = theSelection->getSelected(ModuleBase_ISelection::Viewer);
     int aCount = 0;
     int aType = 0;
-    foreach (ModuleBase_ViewerPrs aPrs, aList) {
-      GeomShapePtr aShape = aPrs.shape();
+    foreach (ModuleBase_ViewerPrsPtr aPrs, aList) {
+      GeomShapePtr aShape = aPrs->shape();
       if (aShape.get() && aShape->isEdge()) {
         aCount++;
         GeomAPI_Edge aEdge(aShape);

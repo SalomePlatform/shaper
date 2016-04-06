@@ -24,14 +24,12 @@ class ModuleBase_ViewerPrs
 {
  public:
   /// Constructor
-  MODULEBASE_EXPORT ModuleBase_ViewerPrs();
-
-  /// Constructor
   /// \param theResult an object
   /// \param theShape a viewer shape
   /// \param theOwner a selection owner
-  MODULEBASE_EXPORT ModuleBase_ViewerPrs(ObjectPtr theResult, const GeomShapePtr& theShape,
-                       Handle_SelectMgr_EntityOwner theOwner);
+  MODULEBASE_EXPORT ModuleBase_ViewerPrs(ObjectPtr theResult = ObjectPtr(),
+                                         const GeomShapePtr& theShape = GeomShapePtr(),
+                                         Handle_SelectMgr_EntityOwner theOwner = NULL);
 
   /// Destructor
   MODULEBASE_EXPORT virtual ~ModuleBase_ViewerPrs();
@@ -109,5 +107,7 @@ class ModuleBase_ViewerPrs
   GeomShapePtr myShape;  /// the shape
   Handle(AIS_InteractiveObject) myInteractive;  /// interactive object
 };
+
+typedef std::shared_ptr<ModuleBase_ViewerPrs> ModuleBase_ViewerPrsPtr;
 
 #endif
