@@ -25,6 +25,7 @@ class ModelAPI_ResultPart;
 class ModelAPI_ResultGroup;
 class ModelAPI_ResultParameter;
 class ModelAPI_Data;
+class GeomAPI_Shape;
 
 /**\class ModelAPI_Document
  * \ingroup DataModel
@@ -156,6 +157,11 @@ public:
 
   /// Returns true if document is opened and valid
   virtual bool isOpened() = 0;
+
+  /// Returns the feature that produced the given face of the given result.
+  virtual std::shared_ptr<ModelAPI_Feature> producedByFeature(
+    std::shared_ptr<ModelAPI_Result> theResult,
+    const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
 
 
 protected:

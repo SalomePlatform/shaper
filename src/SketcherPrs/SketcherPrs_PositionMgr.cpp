@@ -38,7 +38,7 @@ int SketcherPrs_PositionMgr::getPositionIndex(ObjectPtr theLine,
       return aPosMap[thePrs];
     } else {
       // Add a new [Presentation - Index] pair
-      int aInd = aPosMap.size();
+      int aInd = int(aPosMap.size());
       aPosMap[thePrs] = aInd;
       return aInd;
     }

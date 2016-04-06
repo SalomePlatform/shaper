@@ -15,6 +15,7 @@
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultBody.h>
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
@@ -38,6 +39,9 @@
 #include <TDF_AttributeDeltaList.hxx>
 #include <TDF_ListIteratorOfAttributeDeltaList.hxx>
 #include <TDF_ListIteratorOfLabelList.hxx>
+#include <TopoDS_Shape.hxx>
+#include <TNaming_SameShapeIterator.hxx>
+
 
 #include <climits>
 #ifndef WIN32
@@ -1265,4 +1269,33 @@ FeaturePtr Model_Document::lastFeature()
   if (myObjs)
     return myObjs->lastFeature();
   return FeaturePtr();
+}
+
+std::shared_ptr<ModelAPI_Feature> Model_Document::producedByFeature(
+    std::shared_ptr<ModelAPI_Result> theResult,
+    const std::shared_ptr<GeomAPI_Shape>& theShape)
+{
+  ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theResult);
+  if (!aBody.get()) {
+    return feature(theResult); // for not-body just returns the feature that produced this result
+  }
+  // otherwise get the shape and search the very initial label for it
+  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
+  if (aShape.IsNull())
+    return FeaturePtr();
+
+  
+  FeaturePtr aResult;
+  for(TNaming_SameShapeIterator anIter(aShape, myDoc->Main()); anIter.More(); anIter.Next()) {
+    TDF_Label aNSLab = anIter.Label();
+    while(aNSLab.Depth() > 4)
+      aNSLab = aNSLab.Father();
+    FeaturePtr aFeature = myObjs->feature(aNSLab);
+    if (aFeature.get()) {
+      if (!aResult.get() || myObjs->isLater(aResult, aFeature)) {
+        aResult = aFeature;
+      }
+    }
+  }
+  return aResult;
 }

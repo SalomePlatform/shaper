@@ -116,7 +116,7 @@ bool GeomAPI_Shape::isPlanar() const
       Handle(Geom_RectangularTrimmedSurface) aTrimSurface = Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurface);
       aType = aTrimSurface->BasisSurface()->DynamicType();
     }
-    return (aType == STANDARD_TYPE(Geom_Plane));
+    return (aType == STANDARD_TYPE(Geom_Plane)) == Standard_True;
   } else {
     return false;
   }

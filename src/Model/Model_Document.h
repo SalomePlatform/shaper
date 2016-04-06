@@ -209,6 +209,11 @@ class Model_Document : public ModelAPI_Document
   /// \returns null if there is no features
   FeaturePtr lastFeature();
 
+  /// Returns the feature that produced the given face of the given result.
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> producedByFeature(
+    std::shared_ptr<ModelAPI_Result> theResult,
+    const std::shared_ptr<GeomAPI_Shape>& theShape);
+
  protected:
   //! Returns (creates if needed) the general label
   TDF_Label generalLabel() const;
