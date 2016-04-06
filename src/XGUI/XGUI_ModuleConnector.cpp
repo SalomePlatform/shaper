@@ -14,6 +14,7 @@
 #include "XGUI_PropertyPanel.h"
 
 #include <ModuleBase_IModule.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <AIS_Shape.hxx>
 

@@ -24,6 +24,7 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationAction.h>
 #include <ModuleBase_OperationFeature.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Workshop.h>

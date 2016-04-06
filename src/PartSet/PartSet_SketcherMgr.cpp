@@ -36,6 +36,7 @@
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_WidgetEditor.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <GeomDataAPI_Point2D.h>
 

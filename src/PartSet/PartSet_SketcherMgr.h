@@ -35,6 +35,8 @@ class ModuleBase_Operation;
 class XGUI_OperationMgr;
 class XGUI_Workshop;
 
+class Handle_AIS_InteractiveObject;
+
 class QMouseEvent;
 
 /**
@@ -241,7 +243,7 @@ public:
   /// Create specific for the module presentation
   /// \param theResult an object for presentation
   /// \return created presentation or NULL(default value)
-  virtual Handle(AIS_InteractiveObject) createPresentation(const ResultPtr& theResult);
+  virtual Handle_AIS_InteractiveObject createPresentation(const ResultPtr& theResult);
 
   /// Connects or disconnects to the value changed signal of the property panel widgets
   /// \param theWidget a property contol widget

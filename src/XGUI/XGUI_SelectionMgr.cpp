@@ -20,6 +20,8 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Object.h>
 
+#include <ModuleBase_ViewerPrs.h>
+
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
 XGUI_SelectionMgr::XGUI_SelectionMgr(XGUI_Workshop* theParent)
