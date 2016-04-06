@@ -60,6 +60,8 @@ Model_Update::Model_Update()
 }
 
 void Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
+  if (!theFeature->data()->isValid())
+    return; // delete an extrusion created on the sketch
   if (!theFeature->isPreviewNeeded() && !myIsFinish) {
     myProcessOnFinish.insert(theFeature);
 #ifdef DEB_UPDATE
