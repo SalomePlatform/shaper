@@ -21,12 +21,18 @@
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_FindPlane.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
+#include <Geom_Curve.hxx>
+#include <Geom2d_Curve.hxx>
+#include <BRepLib_CheckCurveOnSurface.hxx>
 #include <BRepPrimAPI_MakePrism.hxx>
 #include <Geom_Plane.hxx>
 #include <gp_Pln.hxx>
 #include <IntAna_IntConicQuad.hxx>
 #include <IntAna_Quadric.hxx>
+#include <IntTools_Context.hxx>
 #include <TopExp_Explorer.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Edge.hxx>
 #include <TopoDS_Shell.hxx>
 #include <TopoDS_Solid.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
@@ -158,10 +164,10 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
 
     // Setting naming.
     for(TopExp_Explorer anExp(aMovedBase, aShapeTypeToExp); anExp.More(); anExp.Next()) {
-      const TopoDS_Shape& aFace = anExp.Current();
+      const TopoDS_Shape& aShape = anExp.Current();
       GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
-      aFromShape->setImpl(new TopoDS_Shape(aPrismBuilder->FirstShape(aFace)));
-      aToShape->setImpl(new TopoDS_Shape(aPrismBuilder->LastShape(aFace)));
+      aFromShape->setImpl(new TopoDS_Shape(aPrismBuilder->FirstShape(aShape)));
+      aToShape->setImpl(new TopoDS_Shape(aPrismBuilder->LastShape(aShape)));
       this->addFromShape(aFromShape);
       this->addToShape(aToShape);
     }
@@ -170,15 +176,13 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     GeomShapePtr aBoundingToShape   = theToShape   ? theToShape   : aBasePlane;
 
     // Moving prism bounding faces according to "from" and "to" sizes.
-    std::shared_ptr<GeomAPI_Face> aFromFace(new GeomAPI_Face(aBoundingFromShape));
-    std::shared_ptr<GeomAPI_Pln>  aFromPln = aFromFace->getPlane();
-    std::shared_ptr<GeomAPI_Pnt>  aFromLoc = aFromPln->location();
-    std::shared_ptr<GeomAPI_Dir>  aFromDir = aFromPln->direction();
+    std::shared_ptr<GeomAPI_Pln> aFromPln = GeomAPI_Face(aBoundingFromShape).getPlane();
+    std::shared_ptr<GeomAPI_Pnt> aFromLoc = aFromPln->location();
+    std::shared_ptr<GeomAPI_Dir> aFromDir = aFromPln->direction();
 
-    std::shared_ptr<GeomAPI_Face> aToFace(new GeomAPI_Face(aBoundingToShape));
-    std::shared_ptr<GeomAPI_Pln>  aToPln = aToFace->getPlane();
-    std::shared_ptr<GeomAPI_Pnt>  aToLoc = aToPln->location();
-    std::shared_ptr<GeomAPI_Dir>  aToDir = aToPln->direction();
+    std::shared_ptr<GeomAPI_Pln> aToPln = GeomAPI_Face(aBoundingToShape).getPlane();
+    std::shared_ptr<GeomAPI_Pnt> aToLoc = aToPln->location();
+    std::shared_ptr<GeomAPI_Dir> aToDir = aToPln->direction();
 
     bool aSign = aFromLoc->xyz()->dot(aBaseDir->xyz()) > aToLoc->xyz()->dot(aBaseDir->xyz());
 
@@ -292,6 +296,8 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     TopoDS_Solid aToSolid, aFromSolid;
     const TopoDS_Shape& aToShape   = aBoundingToShape->impl<TopoDS_Shape>();
     const TopoDS_Shape& aFromShape = aBoundingFromShape->impl<TopoDS_Shape>();
+    TopoDS_Face aToFace   = TopoDS::Face(aToShape);
+    TopoDS_Face aFromFace = TopoDS::Face(aFromShape);
     BRep_Builder aBoundingBuilder;
     aBoundingBuilder.MakeShell(aToShell);
     aBoundingBuilder.Add(aToShell, aToShape);
@@ -309,15 +315,17 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
       return;
     }
     this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aToCutBuilder)));
-    const TopTools_ListOfShape& aToShapes = aToCutBuilder->Modified(aToShape);
-    for(TopTools_ListIteratorOfListOfShape anIt(aToShapes); anIt.More(); anIt.Next()) {
-      GeomShapePtr aShape(new GeomAPI_Shape());
-      aShape->setImpl(new TopoDS_Shape(anIt.Value()));
-      this->addToShape(aShape);
-    }
     aResult = aToCutBuilder->Shape();
     if(aResult.ShapeType() == TopAbs_COMPOUND) {
       aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
+    }
+    if(aShapeTypeToExp == TopAbs_FACE) {
+      const TopTools_ListOfShape& aToShapes = aToCutBuilder->Modified(aToShape);
+      for(TopTools_ListIteratorOfListOfShape anIt(aToShapes); anIt.More(); anIt.Next()) {
+        GeomShapePtr aGeomSh(new GeomAPI_Shape());
+        aGeomSh->setImpl(new TopoDS_Shape(anIt.Value()));
+        this->addToShape(aGeomSh);
+      }
     }
 
     // Cutting with from plane.
@@ -327,21 +335,60 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
       return;
     }
     this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aFromCutBuilder)));
-    const TopTools_ListOfShape& aFromShapes = aFromCutBuilder->Modified(aFromShape);
-    for(TopTools_ListIteratorOfListOfShape anIt(aFromShapes); anIt.More(); anIt.Next()) {
-      GeomShapePtr aShape(new GeomAPI_Shape());
-      aShape->setImpl(new TopoDS_Shape(anIt.Value()));
-      this->addFromShape(aShape);
-    }
     aResult = aFromCutBuilder->Shape();
-
-    TopoDS_Iterator anIt(aResult);
-    if(!anIt.More()) {
+    TopoDS_Iterator aCheckIt(aResult);
+    if(!aCheckIt.More()) {
       return;
     }
     if(aResult.ShapeType() == TopAbs_COMPOUND) {
       aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
     }
+    if(aShapeTypeToExp == TopAbs_FACE) {
+      const TopTools_ListOfShape& aFromShapes = aFromCutBuilder->Modified(aFromShape);
+      for(TopTools_ListIteratorOfListOfShape anIt(aFromShapes); anIt.More(); anIt.Next()) {
+        GeomShapePtr aGeomSh(new GeomAPI_Shape());
+        aGeomSh->setImpl(new TopoDS_Shape(anIt.Value()));
+        this->addFromShape(aGeomSh);
+      }
+    }
+
+    // Naming for extrusion from vertex, edge.
+    for(TopExp_Explorer anExp(aResult, aShapeTypeToExp); anExp.More(); anExp.Next()) {
+      const TopoDS_Shape& aShape = anExp.Current();
+      if(aShapeTypeToExp == TopAbs_VERTEX) {
+        gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
+        IntTools_Context anIntTools;
+        if(anIntTools.IsValidPointForFace(aPnt, aToFace, Precision::Confusion()) == Standard_True) {
+          GeomShapePtr aGeomSh(new GeomAPI_Shape());
+          aGeomSh->setImpl(new TopoDS_Shape(aShape));
+          this->addToShape(aGeomSh);
+        }
+        if(anIntTools.IsValidPointForFace(aPnt, aFromFace, Precision::Confusion()) == Standard_True) {
+          GeomShapePtr aGeomSh(new GeomAPI_Shape());
+          aGeomSh->setImpl(new TopoDS_Shape(aShape));
+          this->addFromShape(aGeomSh);
+        }
+      } else if(aShapeTypeToExp == TopAbs_EDGE) {
+        TopoDS_Edge anEdge = TopoDS::Edge(aShape);
+        BRepLib_CheckCurveOnSurface anEdgeCheck(anEdge, aToFace);
+        anEdgeCheck.Perform();
+        if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
+          GeomShapePtr aGeomSh(new GeomAPI_Shape());
+          aGeomSh->setImpl(new TopoDS_Shape(aShape));
+          this->addToShape(aGeomSh);
+        }
+        anEdgeCheck.Init(anEdge, aFromFace);
+        anEdgeCheck.Perform();
+        if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
+          GeomShapePtr aGeomSh(new GeomAPI_Shape());
+          aGeomSh->setImpl(new TopoDS_Shape(aShape));
+          this->addFromShape(aGeomSh);
+        }
+      } else {
+        break;
+      }
+    }
+
     if(aResult.ShapeType() == TopAbs_COMPOUND) {
       GeomShapePtr aCompound(new GeomAPI_Shape);
       aCompound->setImpl(new TopoDS_Shape(aResult));
@@ -368,8 +415,8 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
   if(aResult.IsNull()) {
     return;
   }
-  GeomShapePtr aShape(new GeomAPI_Shape());
-  aShape->setImpl(new TopoDS_Shape(aResult));
-  this->setShape(aShape);
+  GeomShapePtr aGeomSh(new GeomAPI_Shape());
+  aGeomSh->setImpl(new TopoDS_Shape(aResult));
+  this->setShape(aGeomSh);
   this->setDone(true);
 }
