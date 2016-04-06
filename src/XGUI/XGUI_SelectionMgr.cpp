@@ -130,12 +130,12 @@ void XGUI_SelectionMgr::onViewerSelection()
   if (!aContext.IsNull()) {
     QList<ModuleBase_ViewerPrsPtr> aPresentations = selection()->getSelected(ModuleBase_ISelection::Viewer);
     foreach(ModuleBase_ViewerPrsPtr aPrs, aPresentations) {
-      if (aPrs.object().get()) {
-        aFeatures.append(aPrs.object());
-        if (aPrs.shape().get()) {
-          aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs.object());
+      if (aPrs->object().get()) {
+        aFeatures.append(aPrs->object());
+        if (aPrs->shape().get()) {
+          aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
           if (aResult.get()) {
-            aFeature = anActiveDocument->producedByFeature(aResult, aPrs.shape());
+            aFeature = anActiveDocument->producedByFeature(aResult, aPrs->shape());
             if (aFeature.get() && (!aFeatures.contains(aFeature)))
               aFeatures.append(aFeature);
           }
