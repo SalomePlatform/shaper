@@ -12,3 +12,9 @@ FeaturesPlugin_ExtrusionFuse::FeaturesPlugin_ExtrusionFuse()
   myFeature = this;
   myOperationType = BOOL_FUSE;
 }
+
+//=================================================================================================
+void FeaturesPlugin_ExtrusionFuse::execute()
+{
+  executeCompositeBoolean();
+}

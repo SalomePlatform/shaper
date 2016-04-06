@@ -12,3 +12,9 @@ FeaturesPlugin_ExtrusionCut::FeaturesPlugin_ExtrusionCut()
   myFeature = this;
   myOperationType = BOOL_CUT;
 }
+
+//=================================================================================================
+void FeaturesPlugin_ExtrusionCut::execute()
+{
+  executeCompositeBoolean();
+}

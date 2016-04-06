@@ -12,3 +12,9 @@ FeaturesPlugin_RevolutionFuse::FeaturesPlugin_RevolutionFuse()
   myFeature = this;
   myOperationType = BOOL_FUSE;
 }
+
+//=================================================================================================
+void FeaturesPlugin_RevolutionFuse::execute()
+{
+  executeCompositeBoolean();
+}

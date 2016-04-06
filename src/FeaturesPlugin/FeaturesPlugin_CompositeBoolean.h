@@ -34,7 +34,7 @@ public:
   }
 
   /// Creates a new part document if needed.
-  FEATURESPLUGIN_EXPORT virtual void execute();
+  FEATURESPLUGIN_EXPORT virtual void executeCompositeBoolean();
 
 protected:
   FeaturesPlugin_CompositeBoolean(){};

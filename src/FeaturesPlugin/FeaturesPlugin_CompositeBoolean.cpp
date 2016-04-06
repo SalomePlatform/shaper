@@ -25,7 +25,7 @@ void FeaturesPlugin_CompositeBoolean::initBooleanAttributes()
 }
 
 //=================================================================================================
-void FeaturesPlugin_CompositeBoolean::execute()
+void FeaturesPlugin_CompositeBoolean::executeCompositeBoolean()
 {
   // Make generation.
   ListOfShape aGenBaseShapes;
@@ -76,7 +76,11 @@ void FeaturesPlugin_CompositeBoolean::execute()
 
     int aModTag = aTag;
     storeModificationHistory(aResultBody, *aBoolObjIt, aTools, *aBoolMSIt, aModTag);
+
+    myFeature->setResult(aResultBody, aResultIndex++);
   }
+
+  myFeature->removeResults(aResultIndex);
 }
 
 //=================================================================================================
@@ -179,8 +183,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
           return false;
         }
 
-        GeomAlgoAPI_MakeShapeList aMakeShapeList;
-        aMakeShapeList.appendAlgo(aBoolAlgo);
+        std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
+        aMakeShapeList->appendAlgo(aBoolAlgo);
 
         // Add result to not used solids from compsolid.
         aShapesToAdd.push_back(aBoolAlgo->shape());
@@ -190,11 +194,11 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
           return false;
         }
 
-        aMakeShapeList.appendAlgo(aFillerAlgo);
+        aMakeShapeList->appendAlgo(aFillerAlgo);
 
         if(GeomAlgoAPI_ShapeTools::volume(aFillerAlgo->shape()) > 1.e-7) {
           theObjects.push_back(aCompSolid);
-          theMakeShapes.push_back(aBoolAlgo);
+          theMakeShapes.push_back(aMakeShapeList);
         }
       }
       break;
@@ -207,7 +211,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
 
       // Filter edges and faces in tools.
       ListOfShape aTools;
-      for(ListOfShape::const_iterator anIt = aTools.cbegin(); anIt != aTools.cend(); ++anIt) {
+      for(ListOfShape::const_iterator anIt = theTools.cbegin(); anIt != theTools.cend(); ++anIt) {
         if((*anIt)->shapeType() == GeomAPI_Shape::EDGE ||
            (*anIt)->shapeType() == GeomAPI_Shape::FACE) {
           anEdgesAndFaces.push_back(*anIt);
@@ -255,7 +259,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
       aCutTools.insert(aCutTools.end(), aCompSolids.begin(), aCompSolids.end());
       aCutTools.insert(aCutTools.end(), aTools.begin(), aTools.end());
 
-      GeomAlgoAPI_MakeShapeList aMakeShapeList;
+      std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
       if(!anEdgesAndFaces.empty() && !aCutTools.empty()) {
         std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(new GeomAlgoAPI_Boolean(anEdgesAndFaces,
                                                                               aCutTools,
@@ -263,7 +267,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         if(aCutAlgo->isDone() && !aCutAlgo->shape()->isNull() && aCutAlgo->isValid()) {
           anEdgesAndFaces.clear();
           anEdgesAndFaces.push_back(aCutAlgo->shape());
-          aMakeShapeList.appendAlgo(aCutAlgo);
+          aMakeShapeList->appendAlgo(aCutAlgo);
         }
       }
 
@@ -275,7 +279,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         if(aCutAlgo->isDone() && GeomAlgoAPI_ShapeTools::volume(aCutAlgo->shape()) > 1.e-7) {
           aSolidsToFuse.clear();
           aSolidsToFuse.push_back(aCutAlgo->shape());
-          aMakeShapeList.appendAlgo(aCutAlgo);
+          aMakeShapeList->appendAlgo(aCutAlgo);
         }
       }
 
@@ -300,7 +304,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         }
 
         aFusedShape = aFuseAlgo->shape();
-        aMakeShapeList.appendAlgo(aFuseAlgo);
+        aMakeShapeList->appendAlgo(aFuseAlgo);
       }
 
       // Combine result with not used solids from compsolid and edges and faces (if we have any).
@@ -316,8 +320,10 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
           return false;
         }
 
-        aMakeShapeList.appendAlgo(aFillerAlgo);
+        aMakeShapeList->appendAlgo(aFillerAlgo);
       }
+
+      theMakeShapes.push_back(aMakeShapeList);
       break;
     }
   }

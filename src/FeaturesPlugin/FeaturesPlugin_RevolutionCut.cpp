@@ -12,3 +12,9 @@ FeaturesPlugin_RevolutionCut::FeaturesPlugin_RevolutionCut()
   myFeature = this;
   myOperationType = BOOL_CUT;
 }
+
+//=================================================================================================
+void FeaturesPlugin_RevolutionCut::execute()
+{
+  executeCompositeBoolean();
+}

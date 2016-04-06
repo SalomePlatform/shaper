@@ -32,6 +32,9 @@ public:
     static std::string MY_KIND = FeaturesPlugin_ExtrusionCut::ID();
     return MY_KIND;
   }
+
+  /// Creates a new part document if needed.
+  FEATURESPLUGIN_EXPORT virtual void execute();
 };
 
 #endif
