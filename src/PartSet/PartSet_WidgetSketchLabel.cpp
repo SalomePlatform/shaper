@@ -426,7 +426,9 @@ void PartSet_WidgetSketchLabel::activateCustom()
   bool aBodyIsVisualized = myPreviewPlanes->hasVisualizedBodies(myWorkshop);
 
   // Clear previous selection mode It is necessary for correct activation of preview planes
-  aDisp->activateObjects(QIntList(), aDisplayed, false);
+  XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
+  XGUI_Displayer* aDisp = aWorkshop->displayer();
+  aDisp->activateObjects(QIntList(), aDisp->displayedObjects(), false);
 
   if (!aBodyIsVisualized) {
     // We have to select a plane before any operation

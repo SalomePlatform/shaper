@@ -107,7 +107,7 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
         const std::list<std::shared_ptr<ModelAPI_Result>> aResList = aFeature->results();
         std::list<ResultPtr>::const_iterator aIt;
         for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
-          aSelectedPrs.append(ModuleBase_ViewerPrs((*aIt), TopoDS_Shape(), NULL));
+          aSelectedPrs.append(ModuleBase_ViewerPrs((*aIt), GeomShapePtr(), NULL));
         }
       }
     }
