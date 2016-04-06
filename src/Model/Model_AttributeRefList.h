@@ -10,6 +10,7 @@
 #include "Model.h"
 #include "ModelAPI_AttributeRefList.h"
 #include "ModelAPI_Feature.h"
+#include "Model_Document.h"
 
 #include <TDataStd_ReferenceList.hxx>
 #include <TDataStd_ExtStringList.hxx>

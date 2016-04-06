@@ -62,6 +62,15 @@ Model_Update::Model_Update()
 void Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
   if (!theFeature->isPreviewNeeded() && !myIsFinish) {
     myProcessOnFinish.insert(theFeature);
+#ifdef DEB_UPDATE
+      std::cout<<"*** Add process on finish "<<theFeature->name()<<std::endl;
+#endif
+    updateArguments(theFeature);
+    if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated) {
+      theFeature->data()->execState(ModelAPI_StateDone);
+      static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+      aFactory->validate(theFeature); // need to be validated to update the "Apply" state if not previewed
+    }
     return;
   }
   if (myModified.find(theFeature) != myModified.end()) {
@@ -154,7 +163,8 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     const std::set<ObjectPtr>& anObjs = aMsg->objects();
     std::set<ObjectPtr>::const_iterator anObjIter = anObjs.cbegin();
     for(; anObjIter != anObjs.cend(); anObjIter++) {
-      ModelAPI_EventCreator::get()->sendUpdated(*anObjIter, kUpdatedEvent);
+      if (std::dynamic_pointer_cast<Model_Document>((*anObjIter)->document())->executeFeatures())
+        ModelAPI_EventCreator::get()->sendUpdated(*anObjIter, kUpdatedEvent);
     }
     return;
   }
@@ -167,6 +177,9 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     for(; anObjIter != anObjs.cend(); anObjIter++) {
       if (!(*anObjIter)->data()->isValid())
         continue;
+#ifdef DEB_UPDATE
+      std::cout<<">>> in event updated "<<(*anObjIter)->data()->name()<<std::endl;
+#endif
       if ((*anObjIter)->groupName() == ModelAPI_ResultParameter::group()) {
         myIsParamUpdated = true;
       }
@@ -175,7 +188,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
         !std::dynamic_pointer_cast<Model_Document>((*anObjIter)->document())->executeFeatures();
       FeaturePtr anUpdated = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
       if (anUpdated.get()) {
-        if (!anUpdateOnlyNotPersistent || anUpdated->isPersistentResult()) {
+        if (!anUpdateOnlyNotPersistent || !anUpdated->isPersistentResult()) {
           addModified(anUpdated, FeaturePtr());
           aSomeModified = true;
         }
@@ -186,7 +199,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
           if (!(*aRefIter)->owner()->data()->isValid())
             continue;
           FeaturePtr anUpdated = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIter)->owner());
-          if (anUpdated.get() && (!anUpdateOnlyNotPersistent || anUpdated->isPersistentResult())) {
+          if (anUpdated.get() && (!anUpdateOnlyNotPersistent || !anUpdated->isPersistentResult())) {
             addModified(anUpdated, FeaturePtr());
             aSomeModified = true;
           }
@@ -200,17 +213,18 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   } else if (theMessage->eventID() == kOpFinishEvent || theMessage->eventID() == kOpAbortEvent ||
       theMessage->eventID() == kOpStartEvent) {
 
+    if (theMessage->eventID() == kOpFinishEvent) {
+      myIsFinish = true;
+      // add features that wait for finish as modified
+      std::set<std::shared_ptr<ModelAPI_Feature> >::iterator aFeature = myProcessOnFinish.begin();
+      for(; aFeature != myProcessOnFinish.end(); aFeature++)
+        if ((*aFeature)->data()->isValid()) // there may be already removed wait for features
+          addModified(*aFeature, FeaturePtr());
+      myIsFinish = false;
+    }
+    myProcessOnFinish.clear(); // processed features must be only on finish, so clear anyway (to avoid reimport on load)
+
     if (!(theMessage->eventID() == kOpStartEvent)) {
-      if (theMessage->eventID() == kOpFinishEvent) {
-        myIsFinish = true;
-        // add features that wait for finish as modified
-        std::set<std::shared_ptr<ModelAPI_Feature> >::iterator aFeature = myProcessOnFinish.begin();
-        for(; aFeature != myProcessOnFinish.end(); aFeature++)
-          if ((*aFeature)->data()->isValid()) // there may be already removed wait for features
-            addModified(*aFeature, FeaturePtr());
-        myIsFinish = false;
-      }
-      myProcessOnFinish.clear();
       processFeatures();
     }
     // remove all macros before clearing all created
@@ -599,6 +613,8 @@ bool Model_Update::isReason(std::shared_ptr<ModelAPI_Feature>& theFeature,
 {
   std::map<std::shared_ptr<ModelAPI_Feature>, std::set<std::shared_ptr<ModelAPI_Feature> > >
     ::iterator aReasonsIt = myModified.find(theFeature);
+  if (aReasonsIt == myModified.end())
+    return false; // this case only for not-previewed items update state, nothing is changed in args for it
   if (aReasonsIt->second.find(theFeature) != aReasonsIt->second.end())
     return true; // any is reason if it contains itself
   FeaturePtr aReasFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(theReason);
