@@ -19,7 +19,6 @@ SET(PROJECT_HEADERS
 	PartSet_WidgetPoint2d.h
 	PartSet_WidgetEditor.h
 	PartSet_WidgetMultiSelector.h
-	PartSet_WidgetMultiSelectorComposite.h
 	PartSet_WidgetPoint2dDistance.h
 	PartSet_WidgetPoint2DFlyout.h
 	PartSet_WidgetShapeSelector.h
@@ -47,7 +46,6 @@ SET(PROJECT_SOURCES
 	PartSet_Validators.cpp
 	PartSet_WidgetEditor.cpp
 	PartSet_WidgetMultiSelector.cpp
-	PartSet_WidgetMultiSelectorComposite.cpp
 	PartSet_WidgetPoint2d.cpp
 	PartSet_WidgetPoint2dDistance.cpp
 	PartSet_WidgetPoint2DFlyout.cpp

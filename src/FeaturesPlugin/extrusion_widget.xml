@@ -10,12 +10,12 @@
                    shape_types="faces objects">
     <validator id="FeaturesPlugin_ValidatorCompositeLauncher" parameters="base,Sketch"/>
   </sketch_launcher>
-  <composite_multi_selector id="base"
+  <multi_selector id="base"
                             label="Base objects:"
                             tooltip="Select a base objects"
                             type_choice="faces objects">
     <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell"/>
-  </composite_multi_selector>
+  </multi_selector>
   <shape_selector id="direction_object"
                   icon=":icons/axis.png"
                   label="Direction"

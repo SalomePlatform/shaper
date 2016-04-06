@@ -98,6 +98,10 @@ Q_OBJECT
   virtual void initSelection(ModuleBase_ISelection* theSelection,
                              ModuleBase_IViewer* theViewer);
 
+  /// Fill internal map by preselection
+  /// \param theValues a list of preselection
+  void setPreselection(const QList<ModuleBase_ViewerPrs>& theValues);
+
   /// \brief Set property pane to the operation
   /// \param theProp a property panel instance
   virtual void setPropertyPanel(ModuleBase_IPropertyPanel* theProp);

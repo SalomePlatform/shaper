@@ -48,7 +48,7 @@
 #include <QMessageBox>
 #include <QMainWindow>
 
-//#define DEBUG_UNDO_INVALID_SKETCH
+#define DEBUG_UNDO_INVALID_SKETCH
 
 PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent, 
                                                          PartSet_Module* theModule,
@@ -71,19 +71,6 @@ PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
   myLabel->setWordWrap(true);
   aLayout->addWidget(myLabel);
   aLayout->addStretch(1);
-  /*if (!aLabelIcon.isEmpty())
-    myLabel->setPixmap(QPixmap(aLabelIcon));
-
-
-  QString aToolTip = QString::fromStdString(theData->widgetTooltip());
-  myTextLine = new QLineEdit(this);
-  myTextLine->setReadOnly(true);
-  myTextLine->setToolTip(aToolTip);
-  myTextLine->installEventFilter(this);
-
-  myLabel->setToolTip(aToolTip);
-
-  aLayout->addRow(myLabel, myTextLine);*/
 
   std::string aTypes = theData->getProperty("shape_types");
   myShapeTypes = QString(aTypes.c_str()).split(' ', QString::SkipEmptyParts);
@@ -93,6 +80,9 @@ PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
 
 PartSet_WidgetSketchCreator::~PartSet_WidgetSketchCreator()
 {
+  // we need to deactivate here in order to hide preview planes if the selection mode is
+  // active
+  deactivate();
 }
 
 QList<QWidget*> PartSet_WidgetSketchCreator::getControls() const
@@ -104,12 +94,6 @@ QList<QWidget*> PartSet_WidgetSketchCreator::getControls() const
 
 bool PartSet_WidgetSketchCreator::restoreValueCustom()
 {
-  /*CompositeFeaturePtr aCompFeature = 
-    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
-  if (aCompFeature->numberOfSubs() > 0) {
-    FeaturePtr aSubFeature = aCompFeature->subFeature(0);
-    myTextLine->setText(QString::fromStdString(aSubFeature->data()->name()));
-  }*/
   return true;
 }
 
@@ -178,8 +162,6 @@ bool PartSet_WidgetSketchCreator::isValidSelectionCustom(const ModuleBase_Viewer
 
 void PartSet_WidgetSketchCreator::activateSelectionControl()
 {
-  setVisibleSelectionControl(true);
-
   // we need to call activate here as the widget has no focus accepted controls
   // if these controls are added here, activate will happens automatically after focusIn()
   XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myModule->workshop());
@@ -201,8 +183,11 @@ void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelec
     else { // hide current control
       if (aWidget == this)
         aWidget->setVisible(false);
-      else
+      else {
         aWidget->setVisible(true);
+        if (aWidget->attributeID() == myAttributeListID)
+          setEnabledModelWidget(aWidget, !hasSubObjects());
+      }
     }
   }
 
@@ -232,8 +217,22 @@ QIntList PartSet_WidgetSketchCreator::getShapeTypes() const
 void PartSet_WidgetSketchCreator::setEditingMode(bool isEditing)
 {
   ModuleBase_ModelWidget::setEditingMode(isEditing);
-  if (isEditing)
+  if (isEditing) {
     setVisibleSelectionControl(false);
+
+    ModuleBase_ModelWidget* anAttributeListWidget = 0;
+    XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myModule->workshop());
+    XGUI_PropertyPanel* aPanel = aWorkshop->propertyPanel();
+    const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
+    foreach(ModuleBase_ModelWidget* aWidget, aWidgets) {
+      if (aWidget->attributeID() == myAttributeListID) {
+        anAttributeListWidget = aWidget;
+        break;
+      }
+    }
+    if (anAttributeListWidget)
+      setEnabledModelWidget(anAttributeListWidget, !hasSubObjects());
+  }
 }
 
 bool PartSet_WidgetSketchCreator::isSelectionMode() const
@@ -242,6 +241,17 @@ bool PartSet_WidgetSketchCreator::isSelectionMode() const
   bool aHasValueInList = anAttrList.get() && anAttrList->size() > 0;
 
   return !aHasValueInList;
+}
+
+bool PartSet_WidgetSketchCreator::hasSubObjects() const
+{
+  bool aHasSubObjects = false;
+
+  bool aCanSetFocus = true;
+  CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+  if (aComposite.get())
+    aHasSubObjects = aComposite->numberOfSubs() > 0;
+  return aHasSubObjects;
 }
 
 bool PartSet_WidgetSketchCreator::setSelection(QList<ModuleBase_ViewerPrs>& theValues,
@@ -305,23 +315,13 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_Vi
   CompositeFeaturePtr aCompFeature = 
     std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
 
-  /// add sketch feature without current feature change.
-  /// it is important to do not change the current feature in order to
-  /// after sketch edition, the extrusion cut feature becomes current
-  SessionPtr aMgr = ModelAPI_Session::get();
-  DocumentPtr aDoc = aMgr->activeDocument();
-  FeaturePtr aPreviousCurrentFeature = aDoc->currentFeature(false);
-  FeaturePtr aSketch = aCompFeature->addFeature("Sketch");
-
-  PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(aSketch, aValue);
-
-  aDoc->setCurrentFeature(aPreviousCurrentFeature, false);
-
   // start edit operation for the sketch
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                             (myModule->createOperation("Sketch"));
-  if (aFOperation)
-    aFOperation->setFeature(aSketch);
+  QList<ModuleBase_ViewerPrs> aValues;
+  aValues.push_back(aValue);
+  aFOperation->setPreselection(aValues);
+
   myModule->sendOperation(aFOperation);
 
   return aSketchStarted;
@@ -330,16 +330,16 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_Vi
 bool PartSet_WidgetSketchCreator::focusTo()
 {
   // this method is called only in creation mode. In Edition mode this widget is hidden
-  CompositeFeaturePtr aCompFeature = 
-      std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
-  if (isSelectionMode() && aCompFeature->numberOfSubs() == 0) {
+  if (isSelectionMode() && !hasSubObjects()) {
+    setVisibleSelectionControl(true);
     activateSelectionControl();
     openExtrusionTransaction();
     return true;
   }
   else
     connect(myModule, SIGNAL(resumed(ModuleBase_Operation*)), SLOT(onResumed(ModuleBase_Operation*)));
-  return false;
+
+  return true;
 }
 
 void PartSet_WidgetSketchCreator::deactivate()
@@ -401,7 +401,11 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
   }
   openExtrusionTransaction();
 
-  if (aCompFeature->numberOfSubs() > 0) {
+  if (aCompFeature->numberOfSubs() == 0) {
+    // call activateWidget() of the parent to connect to the viewer seleciton
+    activateSelectionControl();
+  }
+  else {
     // check if the created sketch is valid. If it is invalid, it will be deleted with warning else
     /// the attribute selection list will be filled by result of this sketch.
     setVisibleSelectionControl(false);
@@ -493,5 +497,14 @@ void PartSet_WidgetSketchCreator::setSketchObjectToList(const CompositeFeaturePt
 
   if(aBaseObjectsSelectionList->size() == 0) {
     aBaseObjectsSelectionList->append(aSketchRes, GeomShapePtr());
+  }
+}
+
+void PartSet_WidgetSketchCreator::setEnabledModelWidget(ModuleBase_ModelWidget* theModelWidget,
+                                                        const bool theEnabled)
+{
+  QList<QWidget*> aMyControls = theModelWidget->getControls();
+  foreach(QWidget*  eachControl, aMyControls) {
+    eachControl->setEnabled(theEnabled);
   }
 }

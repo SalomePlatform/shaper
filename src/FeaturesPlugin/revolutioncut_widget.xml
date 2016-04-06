@@ -11,13 +11,13 @@
       shape_types="face objects">
       <validator id="FeaturesPlugin_ValidatorCompositeLauncher" parameters="base,Sketch"/>
     </sketch_launcher>
-    <composite_multi_selector id="base"
+    <multi_selector id="base"
       label="Select a sketch face"
       icon=":icons/sketch.png"
       tooltip="Select a sketch face"
       type_choice="Faces Objects">
       <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="face,shell"/>
-    </composite_multi_selector>
+    </multi_selector>
     <shape_selector id="axis_object"
                     icon=":icons/axis.png"
                     label="Axis"

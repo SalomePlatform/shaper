@@ -10,7 +10,6 @@
 #include "PartSet_WidgetPoint2DFlyout.h"
 #include "PartSet_WidgetShapeSelector.h"
 #include "PartSet_WidgetMultiSelector.h"
-#include "PartSet_WidgetMultiSelectorComposite.h"
 #include "PartSet_WidgetEditor.h"
 #include "PartSet_WidgetFileSelector.h"
 #include "PartSet_WidgetSketchCreator.h"
@@ -679,10 +678,6 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     PartSet_WidgetMultiSelector* aShapeSelectorWgt =
                           new PartSet_WidgetMultiSelector(theParent, aWorkshop, theWidgetApi);
     aShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
-    aWgt = aShapeSelectorWgt;
-  } else if (theType == "composite_multi_selector") {
-    PartSet_WidgetMultiSelectorComposite* aShapeSelectorWgt =
-                 new PartSet_WidgetMultiSelectorComposite(theParent, aWorkshop, theWidgetApi);
     aWgt = aShapeSelectorWgt;
   }
   else if (theType == WDG_DOUBLEVALUE_EDITOR) {

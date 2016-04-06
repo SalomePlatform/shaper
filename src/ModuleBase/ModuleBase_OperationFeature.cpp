@@ -412,8 +412,6 @@ FeaturePtr ModuleBase_OperationFeature::previousCurrentFeature()
 void ModuleBase_OperationFeature::initSelection(ModuleBase_ISelection* theSelection,
                                          ModuleBase_IViewer* theViewer)
 {
-  clearPreselection();
-
   QList<ModuleBase_ViewerPrs> aPreSelected;
   // Check that the selected result are not results of operation feature
   FeaturePtr aFeature = feature();
@@ -433,7 +431,13 @@ void ModuleBase_OperationFeature::initSelection(ModuleBase_ISelection* theSelect
   } else
     aPreSelected = theSelection->getSelected(ModuleBase_ISelection::AllControls);
 
-  myPreSelection = aPreSelected;
+  setPreselection(aPreSelected);
+}
+
+void ModuleBase_OperationFeature::setPreselection(const QList<ModuleBase_ViewerPrs>& theValues)
+{
+  clearPreselection();
+  myPreSelection = theValues;
 }
 
 void ModuleBase_OperationFeature::clearPreselection()

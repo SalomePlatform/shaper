@@ -12,7 +12,6 @@
 #include <ModuleBase_WidgetSelector.h>
 
 class QLabel;
-class QLineEdit;
 class PartSet_Module;
 class ModelAPI_Tools;
 class ModuleBase_Operation;
@@ -117,6 +116,10 @@ private:
   /// \return boolean value
   bool isSelectionMode() const;
 
+  /// Returns true if the current composite feature contains at least one sub-object
+  /// \return boolean value
+  bool hasSubObjects() const;
+
 private slots:
   void onResumed(ModuleBase_Operation* theOp);
 
@@ -134,6 +137,12 @@ private:
   /// \return true if validation succeed
   bool validateSelectionList() const;
 
+  /// Change enable state of controls in the model widget by the attribute identifier
+  /// \param theModelWidget a model widget
+  /// \param theEnabled a state if the controls should be enabled/disabled
+  void setEnabledModelWidget(ModuleBase_ModelWidget* theModelWidget,
+                             const bool theEnabled);
+
 private:
   std::string myAttributeListID;
 
@@ -145,9 +154,6 @@ private:
 
   /// Label of the widget
   QLabel* myLabel;
-
-  /// Input control of the widget
-  QLineEdit* myTextLine;
 
   /// List of accepting shapes types
   QStringList myShapeTypes;
