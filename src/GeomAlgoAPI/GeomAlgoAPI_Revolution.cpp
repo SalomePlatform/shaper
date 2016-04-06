@@ -15,6 +15,7 @@
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
+#include <BRepBuilderAPI_FindPlane.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
 #include <BRepCheck_Analyzer.hxx>
@@ -78,27 +79,38 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     return;
   }
 
-  // Geting base plane.
+  // Getting base shape.
   const TopoDS_Shape& aBaseShape = theBaseShape->impl<TopoDS_Shape>();
-  TopoDS_Face aBaseFace;
-  if(theBaseShape->shapeType() == GeomAPI_Shape::FACE) {
-    aBaseFace = TopoDS::Face(theBaseShape->impl<TopoDS_Shape>());
-  } else if(theBaseShape->shapeType() == GeomAPI_Shape::SHELL) {
-    GeomAPI_ShapeExplorer anExp(theBaseShape, GeomAPI_Shape::FACE);
-    if(anExp.more()) {
-      GeomShapePtr aFaceOnShell = anExp.current();
-      aBaseFace = TopoDS::Face(aFaceOnShell->impl<TopoDS_Shape>());
-    }
+  TopAbs_ShapeEnum aShapeTypeToExp;
+  switch(aBaseShape.ShapeType()) {
+    case TopAbs_VERTEX:
+      aShapeTypeToExp = TopAbs_VERTEX;
+      break;
+    case TopAbs_EDGE:
+    case TopAbs_WIRE:
+      aShapeTypeToExp = TopAbs_EDGE;
+      break;
+    case TopAbs_FACE:
+    case TopAbs_SHELL:
+      aShapeTypeToExp = TopAbs_FACE;
+      break;
+    default:
+      return;
   }
-  if(aBaseFace.IsNull()) {
-    return;
+
+  // Getting base plane.
+  Handle(Geom_Plane) aBasePlane;
+  BRepBuilderAPI_FindPlane aFindPlane(aBaseShape);
+  if(aShapeTypeToExp == TopAbs_FACE && aFindPlane.Found() == Standard_True) {
+    aBasePlane = aFindPlane.Plane();
   }
-  GeomLib_IsPlanarSurface isBasePlanar(BRep_Tool::Surface(aBaseFace));
-  gp_Pln aBasePln = isBasePlanar.Plan();
-  Geom_Plane aBasePlane(aBasePln);
+
+  // Getting axis.
   gp_Ax1 anAxis = theAxis->impl<gp_Ax1>();
-  if(aBasePlane.Axis().Angle(anAxis) < Precision::Confusion()) {
-    return;
+  if(aShapeTypeToExp == TopAbs_FACE) {
+    if(aBasePlane->Axis().Angle(anAxis) < Precision::Confusion()) {
+      return;
+    }
   }
 
   gp_Pnt aBaseCentre = GeomAlgoAPI_ShapeTools::centreOfMass(theBaseShape)->impl<gp_Pnt>();
@@ -135,11 +147,11 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     aResult = aRevolBuilder->Shape();
 
     // Setting naming.
-    for(TopExp_Explorer anExp(aRotatedBase, TopAbs_FACE); anExp.More(); anExp.Next()) {
-      const TopoDS_Shape& aFace = anExp.Current();
+    for(TopExp_Explorer anExp(aRotatedBase, aShapeTypeToExp); anExp.More(); anExp.Next()) {
+      const TopoDS_Shape& aShape = anExp.Current();
       GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
-      aFromShape->setImpl(new TopoDS_Shape(aRevolBuilder->FirstShape(aFace)));
-      aToShape->setImpl(new TopoDS_Shape(aRevolBuilder->LastShape(aFace)));
+      aFromShape->setImpl(new TopoDS_Shape(aRevolBuilder->FirstShape(aShape)));
+      aToShape->setImpl(new TopoDS_Shape(aRevolBuilder->LastShape(aShape)));
       this->addFromShape(aFromShape);
       this->addToShape(aToShape);
     }
@@ -180,8 +192,8 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     // Rotating bounding planes to the specified angle.
     gp_Trsf aFromTrsf;
     gp_Trsf aToTrsf;
-    double aFromRotAngle = ((aFromPln.Axis().Direction() * aBasePln.Axis().Direction()) > 0) ? -theFromAngle : theFromAngle;
-    double aToRotAngle = ((aToPln.Axis().Direction() * aBasePln.Axis().Direction()) > 0) ? -theToAngle : theToAngle;
+    double aFromRotAngle = ((aFromPln.Axis().Direction() * aBasePlane->Axis().Direction()) > 0) ? -theFromAngle : theFromAngle;
+    double aToRotAngle = ((aToPln.Axis().Direction() * aBasePlane->Axis().Direction()) > 0) ? -theToAngle : theToAngle;
     aFromTrsf.SetRotation(anAxis,aFromRotAngle / 180.0 * M_PI);
     aToTrsf.SetRotation(anAxis, aToRotAngle / 180.0 * M_PI);
     BRepBuilderAPI_Transform aFromTransform(aFromSolid, aFromTrsf, true);
@@ -295,10 +307,10 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
 
     // Rotating bounding plane to the specified angle.
     double aBoundingRotAngle = isFromFaceSet ? theFromAngle : theToAngle;
-    if(aBoundingPln.Axis().IsParallel(aBasePln.Axis(), Precision::Confusion())) {
+    if(aBoundingPln.Axis().IsParallel(aBasePlane->Axis(), Precision::Confusion())) {
       if(isFromFaceSet) aBoundingRotAngle = -aBoundingRotAngle;
     } else {
-      double aSign = (aBoundingPln.Axis().Direction() ^ aBasePln.Axis().Direction()) *
+      double aSign = (aBoundingPln.Axis().Direction() ^ aBasePlane->Axis().Direction()) *
                      anAxis.Direction();
       if((aSign <= 0 && !isFromFaceSet) || (aSign > 0 && isFromFaceSet)) {
         aBoundingRotAngle = -aBoundingRotAngle;
@@ -334,7 +346,7 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
         aModifiedBaseShape.Orientation(TopAbs_REVERSED);
       } else {
         gp_Trsf aMirrorTrsf;
-        aMirrorTrsf.SetMirror(aBasePlane.Position().Ax2());
+        aMirrorTrsf.SetMirror(aBasePlane->Position().Ax2());
         BRepBuilderAPI_Transform aMirrorTransform(aModifiedBaseShape, aMirrorTrsf, true);
         aModifiedBaseShape = aMirrorTransform.Shape();
       }

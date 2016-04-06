@@ -23,7 +23,7 @@
                     label="Direction"
                     tooltip="Select an edge for direction"
                     shape_types="edge"
-                    default="">
+                    default="&lt;base normal&gt;">
       <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
     </shape_selector>
     <toolbox id="CreationMethod">
