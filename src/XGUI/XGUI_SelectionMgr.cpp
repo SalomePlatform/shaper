@@ -120,25 +120,26 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
 //**************************************************************
 void XGUI_SelectionMgr::onViewerSelection()
 {
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr anActiveDocument = aMgr->activeDocument();
   QObjectPtrList aFeatures;
+  ResultPtr aResult;
+  FeaturePtr aFeature;
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull()) {
     QList<ModuleBase_ViewerPrs> aPresentations = selection()->getSelected(ModuleBase_ISelection::Viewer);
     foreach(ModuleBase_ViewerPrs aPrs, aPresentations) {
-      if (aPrs.object().get())
+      if (aPrs.object().get()) {
         aFeatures.append(aPrs.object());
-    }
-  }
-  // Add features by selected results
-  QObjectPtrList aTmpList = aFeatures;
-  ResultPtr aResult;
-  FeaturePtr aFeature;
-  foreach(ObjectPtr aObj, aTmpList) {
-    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-    if (aResult.get()) {
-      aFeature = ModelAPI_Feature::feature(aResult);
-      if (aFeature.get() && (!aFeatures.contains(aFeature)))
-        aFeatures.append(aFeature);
+        if (aPrs.shape().get()) {
+          aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs.object());
+          if (aResult.get()) {
+            aFeature = anActiveDocument->producedByFeature(aResult, aPrs.shape());
+            if (aFeature.get() && (!aFeatures.contains(aFeature)))
+              aFeatures.append(aFeature);
+          }
+        }
+      }
     }
   }
   bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
