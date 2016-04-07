@@ -397,7 +397,8 @@ std::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(CompositeFeaturePtr theS
         aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
     std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
         aData->attribute(SketchPlugin_Sketch::NORM_ID()));
-    if (aNormal && anOrigin) {
+    if (aNormal.get() && aNormal->isInitialized() &&
+        anOrigin.get() && anOrigin->isInitialized()) {
       double adX = aNormal->x();
       double adY = aNormal->y();
       double adZ = aNormal->z();

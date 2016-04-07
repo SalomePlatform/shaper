@@ -891,18 +891,13 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   myModule->workshop()->viewer()->addSelectionFilter(myPlaneFilter);
   bool aHasPlane = false;
   std::shared_ptr<GeomAPI_Pln> aPln;
-  if (aFOperation->isEditOperation()) {
-    // If it is editing of sketch then it means that plane is already defined
-    aPln = PartSet_Tools::sketchPlane(myCurrentSketch);
-    if (aPln.get())
-      aHasPlane = true;
-  }
+  aPln = PartSet_Tools::sketchPlane(myCurrentSketch);
   myPlaneFilter->setPlane(aPln);
 
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  // all sketch objects should be activated in the sketch selection modes by edit operation start
-  // in case of creation operation, there is an active widget, which activates own selection mode
-  if (aFOperation->isEditOperation() && aHasPlane)
+  // all displayed objects should be activated in current selection modes according to switched
+  // plane filter
+  if (aPln.get())
     aConnector->activateModuleSelectionModes();
 }
 
