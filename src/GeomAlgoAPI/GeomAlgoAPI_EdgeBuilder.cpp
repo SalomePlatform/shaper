@@ -130,8 +130,15 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
     std::shared_ptr<GeomAPI_Pnt> theCenter, std::shared_ptr<GeomAPI_Pnt> theStartPoint,
     std::shared_ptr<GeomAPI_Pnt> theEndPoint, std::shared_ptr<GeomAPI_Dir> theNormal)
 {
+  std::shared_ptr<GeomAPI_Edge> aRes;
+
   const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
   const gp_Dir& aDir = theNormal->impl<gp_Dir>();
+
+  /// OCCT creates an edge on a circle with empty radius, but visualization
+  /// is not able to process it
+  if (theCenter->isEqual(theStartPoint))
+    return aRes;
 
   double aRadius = theCenter->distance(theStartPoint);
   gp_Circ aCircle(gp_Ax2(aCenter, aDir), aRadius);
@@ -145,12 +152,11 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
   else
     anEdgeBuilder = BRepBuilderAPI_MakeEdge(aCircle, aStart, anEnd);
 
-  std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
   anEdgeBuilder.Build();
 
-  if (anEdgeBuilder.IsDone())
+  if (anEdgeBuilder.IsDone()) {
+    aRes = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge);
     aRes->setImpl(new TopoDS_Shape(anEdgeBuilder.Edge()));
-  else
-    aRes = std::shared_ptr<GeomAPI_Edge>();
+  }
   return aRes;
 }
