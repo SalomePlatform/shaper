@@ -139,11 +139,16 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
       }
     }
   } else {
-    Handle(Geom_Plane) aPlane = aFindPlane.Plane();
-    aLoc = aPlane->Axis().Location();
-    aDirVec = aPlane->Axis().Direction();
+    if(!theDirection.get()) {
+      Handle(Geom_Plane) aPlane = aFindPlane.Plane();
+      aLoc = aPlane->Axis().Location();
+      aDirVec = aPlane->Axis().Direction();
 
-    aBaseDir.reset(new GeomAPI_Dir(aDirVec.X(), aDirVec.Y(), aDirVec.Z()));
+      aBaseDir.reset(new GeomAPI_Dir(aDirVec.X(), aDirVec.Y(), aDirVec.Z()));
+    } else {
+      aBaseDir = theDirection;
+      aDirVec = theDirection->impl<gp_Dir>();
+    }
   }
   aBaseLoc.reset(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
   aBasePlane = GeomAlgoAPI_FaceBuilder::planarFace(aBaseLoc, aBaseDir);
