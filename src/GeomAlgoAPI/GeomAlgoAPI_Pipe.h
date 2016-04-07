@@ -64,11 +64,6 @@ private:
   void build(const ListOfShape& theBaseShapes,
              const ListOfShape& theLocations,
              const GeomShapePtr thePathShape);
-
-private:
-  //bool myIsPipeShellUsed;
-  GeomShapePtr myBaseShape;
-  GeomShapePtr myPathShape;
 };
 
 #endif

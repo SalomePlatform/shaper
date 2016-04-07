@@ -32,9 +32,6 @@ static bool buildPipe(BRepOffsetAPI_MakePipeShell* thePipeBuilder);
 //=================================================================================================
 GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const GeomShapePtr theBaseShape,
                                    const GeomShapePtr thePathShape)
-: /*myIsPipeShellUsed(false),*/
-  myBaseShape(theBaseShape),
-  myPathShape(thePathShape)
 {
   build(theBaseShape, thePathShape);
 }
@@ -43,7 +40,6 @@ GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const GeomShapePtr theBaseShape,
 GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const GeomShapePtr theBaseShape,
                                    const GeomShapePtr thePathShape,
                                    const GeomShapePtr theBiNormal)
-//: myIsPipeShellUsed(true)
 {
   build(theBaseShape, thePathShape, theBiNormal);
 }
@@ -52,7 +48,6 @@ GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const GeomShapePtr theBaseShape,
 GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const ListOfShape& theBaseShapes,
                                    const ListOfShape& theLocations,
                                    const GeomShapePtr thePathShape)
-//: myIsPipeShellUsed(true)
 {
   build(theBaseShapes, theLocations, thePathShape);
 }
