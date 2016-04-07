@@ -41,7 +41,9 @@
 #include <TDF_ListIteratorOfLabelList.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TNaming_SameShapeIterator.hxx>
-
+#include <TNaming_Iterator.hxx>
+#include <TNaming_NamedShape.hxx>
+#include <TopExp_Explorer.hxx>
 
 #include <climits>
 #ifndef WIN32
@@ -1284,17 +1286,92 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::producedByFeature(
   if (aShape.IsNull())
     return FeaturePtr();
 
-  
-  FeaturePtr aResult;
-  for(TNaming_SameShapeIterator anIter(aShape, myDoc->Main()); anIter.More(); anIter.Next()) {
-    TDF_Label aNSLab = anIter.Label();
-    while(aNSLab.Depth() > 4)
-      aNSLab = aNSLab.Father();
-    FeaturePtr aFeature = myObjs->feature(aNSLab);
-    if (aFeature.get()) {
-      if (!aResult.get() || myObjs->isLater(aResult, aFeature)) {
-        aResult = aFeature;
+  std::shared_ptr<Model_Data> aBodyData = std::dynamic_pointer_cast<Model_Data>(theResult->data());
+  if (!aBodyData.get() || !aBodyData->isValid())
+    return FeaturePtr();
+
+  TopoDS_Shape anOldShape; // old shape in the pair oldshape->theShape in the named shape
+  TopoDS_Shape aShapeContainer; // old shape of the shape that contains aShape as sub-element
+  Handle(TNaming_NamedShape) aCandidatInThis, aCandidatContainer;
+  TDF_Label aBodyLab = aBodyData->label();
+  // use childs and this label (the lowest priority)
+  bool aUseThis = false;
+  TDF_ChildIDIterator aNSIter(aBodyLab, TNaming_NamedShape::GetID(), Standard_True);
+  while(anOldShape.IsNull() && (aNSIter.More() || aUseThis)) {
+    Handle(TNaming_NamedShape) aNS;
+    if (aUseThis) {
+      if (!aBodyLab.FindAttribute(TNaming_NamedShape::GetID(), aNS))
+        break;
+    } else {
+      aNS = Handle(TNaming_NamedShape)::DownCast(aNSIter.Value());
+    }
+    for(TNaming_Iterator aShapesIter(aNS); aShapesIter.More(); aShapesIter.Next()) {
+      if (aShapesIter.Evolution() == TNaming_SELECTED || aShapesIter.Evolution() == TNaming_DELETE)
+        continue; // don't use the selection evolution
+      if (aShapesIter.NewShape().IsSame(aShape)) { // found the original shape
+        aCandidatInThis = aNS;
+        if (aCandidatInThis->Evolution() == TNaming_MODIFY)
+          anOldShape = aShapesIter.OldShape();
+        if (!anOldShape.IsNull()) // otherwise may me searching for another item of this shape with longer history
+          break;
       }
+      // check that the shape contains aShape as sub-shape to fill container
+      if (aShapesIter.NewShape().ShapeType() < aShape.ShapeType() && aCandidatContainer.IsNull()) {
+        TopExp_Explorer anExp(aShapesIter.NewShape(), aShape.ShapeType());
+        for(; anExp.More(); anExp.Next()) {
+          if (aShape.IsSame(anExp.Current())) {
+            aCandidatContainer = aNS;
+            aShapeContainer = aShapesIter.NewShape();
+          }
+        }
+      }
+    }
+    // iterate to the next label or to the body label in the end
+    if (!aUseThis)
+      aNSIter.Next();
+    if (!aNSIter.More()) {
+      if (aUseThis)
+        break;
+      aUseThis = true;
+    }
+  }
+  if (aCandidatInThis.IsNull()) {
+    if (aCandidatContainer.IsNull())
+      return FeaturePtr();
+    // with the lower priority use the higher level shape that contains aShape
+    aCandidatInThis = aCandidatContainer;
+    anOldShape = aShapeContainer;
+  }
+
+  while(!anOldShape.IsNull()) { // searching for the very initial shape that produces this one
+    aShape = anOldShape;
+    anOldShape.Nullify();
+    for(TNaming_SameShapeIterator anIter(aShape, myDoc->Main()); anIter.More(); anIter.Next()) {
+      TDF_Label aNSLab = anIter.Label();
+      Handle(TNaming_NamedShape) aNS;
+      if (aNSLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        for(TNaming_Iterator aShapesIter(aNS); aShapesIter.More(); aShapesIter.Next()) {
+          if (aShapesIter.Evolution() == TNaming_SELECTED || aShapesIter.Evolution() == TNaming_DELETE)
+            continue; // don't use the selection evolution
+          if (aShapesIter.NewShape().IsSame(aShape)) { // found the original shape
+            aCandidatInThis = aNS;
+            if (aCandidatInThis->Evolution() == TNaming_MODIFY)
+              anOldShape = aShapesIter.OldShape();
+            if (!anOldShape.IsNull()) // otherwise may me searching for another item of this shape with longer history
+              break;
+          }
+        }
+      }
+    }
+  }
+  FeaturePtr aResult;
+  TDF_Label aResultLab = aCandidatInThis->Label();
+  while(aResultLab.Depth() > 3)
+    aResultLab = aResultLab.Father();
+  FeaturePtr aFeature = myObjs->feature(aResultLab);
+  if (aFeature.get()) {
+    if (!aResult.get() || myObjs->isLater(aResult, aFeature)) {
+      aResult = aFeature;
     }
   }
   return aResult;
