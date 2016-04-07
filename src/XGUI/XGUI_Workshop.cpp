@@ -1168,6 +1168,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     setViewerSelectionMode(TopAbs_FACE);
   } else if (theId == "SELECT_RESULT_CMD") {
     setViewerSelectionMode(-1);
+  } else if (theId == "SHOW_RESULTS_CMD") {
+    highlightResults(aObjects);
   }
 }
 
@@ -1990,4 +1992,27 @@ void XGUI_Workshop::synchronizeGroupInViewer(const DocumentPtr& theDoc,
   }
   if (theUpdateViewer)
     myDisplayer->updateViewer();
+}
+
+void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
+{
+  FeaturePtr aFeature;
+  QObjectPtrList aSelList = theObjects;
+  std::list<ResultPtr> aResList;
+  foreach(ObjectPtr aObj, theObjects) {
+    aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+    if (aFeature.get()) {
+      aResList = aFeature->results();
+      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
+      for(aIt = aResList.cbegin(); aIt != aResList.cend(); aIt++) {
+        aSelList.append(*aIt);
+      }
+    }
+  }
+  if (aSelList.count() > theObjects.count()) {
+    // if something was found
+    bool aBlocked = objectBrowser()->blockSignals(true);
+    objectBrowser()->setObjectsSelected(aSelList);
+    objectBrowser()->blockSignals(aBlocked);
+  }
 }

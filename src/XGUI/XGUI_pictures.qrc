@@ -57,5 +57,6 @@
      <file>pictures/shell.png</file>
      <file>pictures/wire.png</file>
      <file>pictures/result.png</file>
+     <file>pictures/find_result.png</file>
  </qresource>
  </RCC>

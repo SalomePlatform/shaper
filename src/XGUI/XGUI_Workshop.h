@@ -274,6 +274,13 @@ Q_OBJECT
   /// \param isToConnect a boolean value whether connect or disconnect
   void connectToPropertyPanel(const bool isToConnect);
 
+  /// Returns defailt selection mode in 3d viewer
+  int viewerSelectionMode() const { return myViewerSelMode; }
+
+  /// Highlights result objects in Object Browser according to
+  /// features found in the given list
+  void highlightResults(const QObjectPtrList& theObjects);
+
   /// A constant string used for "Move to end" command definition
   /// It is used for specific processing of Undo/Redo for this command.
   static QString MOVE_TO_END_COMMAND;
@@ -358,9 +365,6 @@ signals:
 
   /// Activates/deactivates the trihedron in the viewer AIS context
   void onTrihedronVisibilityChanged(bool theState);
-
-  /// Returns defailt selection mode in 3d viewer
-  int viewerSelectionMode() const { return myViewerSelMode; }
 
 
  protected:

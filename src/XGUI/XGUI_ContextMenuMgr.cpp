@@ -125,6 +125,9 @@ void XGUI_ContextMenuMgr::createActions()
 
   aAction->setChecked(true);
 
+  aAction = new QAction(QIcon(":pictures/find_result.png"), tr("Select results"), this);
+  addAction("SHOW_RESULTS_CMD", aAction);
+
   buildObjBrowserMenu();
   buildViewerMenu();
 }
@@ -274,6 +277,8 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     }
     if (!hasSubFeature && allActive && (hasFeature|| hasParameter))
       action("CLEAN_HISTORY_CMD")->setEnabled(true);
+
+    action("SHOW_RESULTS_CMD")->setEnabled(hasFeature);
   }
 
   // Show/Hide command has to be disabled for objects from non active document
@@ -430,6 +435,8 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("CLEAN_HISTORY_CMD"));
   aList.append(mySeparator);
   aList.append(action("RENAME_CMD"));
+  aList.append(mySeparator);
+  aList.append(action("SHOW_RESULTS_CMD"));
   myObjBrowserMenus[ModelAPI_Feature::group()] = aList;
 
   aList.clear();
