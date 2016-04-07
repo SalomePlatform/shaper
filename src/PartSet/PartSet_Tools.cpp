@@ -521,6 +521,15 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
         (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
 
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+      // selection shape has no result owner => the trihedron axis
+      // TODO: make reference to the real axes when they are implemented in the initialization plugin
+      if (!aRes.get()) {
+        ObjectPtr aPointObj = ModelAPI_Session::get()->moduleDocument()->objectByName(
+          ModelAPI_ResultConstruction::group(), "Origin");
+        if (aPointObj.get()) { // if initialization plugin performed well
+          aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPointObj);
+        }     
+      }
       if (!aRes.get()) {
         aRes = aMyFeature->firstResult();
       }
@@ -551,6 +560,15 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
         (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
 
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+      // if there is no object, it means that this is the origin point: search it in the module document
+      if (!aRes.get()) {
+        ObjectPtr aPointObj = ModelAPI_Session::get()->moduleDocument()->objectByName(
+          ModelAPI_ResultConstruction::group(), "Origin");
+        if (aPointObj.get()) { // if initialization plugin performed well
+          aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPointObj);
+        }     
+      }
+      // reference to itself with name "Origin" (but this may cause the infinitive cycling)
       if (!aRes.get()) {
         // If the point is selected not from Result object
         std::shared_ptr<GeomAPI_Shape> aShape = 
