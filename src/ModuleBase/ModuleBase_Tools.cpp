@@ -304,12 +304,13 @@ TopAbs_ShapeEnum shapeType(const QString& theType)
   return TopAbs_SHAPE;
 }
 
-void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature, bool& hasParameter, bool& hasSubFeature)
+void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature,
+                  bool& hasParameter, bool& hasCompositeOwner)
 {
   hasResult = false;
   hasFeature = false;
   hasParameter = false;
-  hasSubFeature = false;
+  hasCompositeOwner = false;
   foreach(ObjectPtr aObj, theObjects) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
@@ -319,8 +320,8 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
     hasFeature |= (aFeature.get() != NULL);
     hasParameter |= (aConstruction.get() != NULL);
     if (hasFeature) 
-      hasSubFeature |= (ModelAPI_Tools::compositeOwner(aFeature) != NULL);
-    if (hasFeature && hasResult  && hasParameter && hasSubFeature)
+      hasCompositeOwner |= (ModelAPI_Tools::compositeOwner(aFeature) != NULL);
+    if (hasFeature && hasResult  && hasParameter && hasCompositeOwner)
       break;
   }
 }

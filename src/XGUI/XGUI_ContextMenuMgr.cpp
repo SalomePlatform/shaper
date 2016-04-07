@@ -209,9 +209,9 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     bool hasResult = false;
     bool hasFeature = false;
     bool hasParameter = false;
-    bool hasSubFeature = false;
-    ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter, hasSubFeature);
-
+    bool hasCompositeOwner = false;
+    ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter,
+                                   hasCompositeOwner);
     //Process Feature
     if (aSelected == 1) {
       ObjectPtr aObject = aObjects.first();
@@ -246,13 +246,12 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         else if (hasFeature && myWorkshop->canMoveFeature())
           action("MOVE_CMD")->setEnabled(true);
 
-        else if (hasFeature || hasParameter)
-          action("CLEAN_HISTORY_CMD")->setEnabled(!hasSubFeature);
-
         if( aMgr->activeDocument() == aObject->document() )
         {
           action("RENAME_CMD")->setEnabled(true);
-          action("DELETE_CMD")->setEnabled(!hasSubFeature);
+          action("DELETE_CMD")->setEnabled(!hasCompositeOwner);
+          action("CLEAN_HISTORY_CMD")->setEnabled(!hasCompositeOwner &&
+                                                  (hasFeature || hasParameter));
         }
       }
     } else {
@@ -271,11 +270,11 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         allActive = false;
         break;
       }
-    if (!hasSubFeature && allActive ) {
+    if (!hasCompositeOwner && allActive ) {
       if (hasFeature || hasParameter)
         action("DELETE_CMD")->setEnabled(true);
     }
-    if (!hasSubFeature && allActive && (hasFeature|| hasParameter))
+    if (!hasCompositeOwner && allActive && (hasFeature|| hasParameter))
       action("CLEAN_HISTORY_CMD")->setEnabled(true);
 
     action("SHOW_RESULTS_CMD")->setEnabled(hasFeature);

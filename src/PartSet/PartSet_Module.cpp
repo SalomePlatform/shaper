@@ -1063,9 +1063,9 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
     bool hasResult = false;
     bool hasFeature = false;
     bool hasParameter = false;
-    bool hasSubFeature = false;
-    ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter, hasSubFeature);
-
+    bool hasCompositeOwner = false;
+    ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter,
+                                   hasCompositeOwner);
     ObjectPtr aObject = aObjects.first();
     if (aObject) {
       ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);

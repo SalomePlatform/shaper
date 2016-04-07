@@ -1211,8 +1211,8 @@ void XGUI_Workshop::deleteObjects()
   bool hasResult = false;
   bool hasFeature = false;
   bool hasParameter = false;
-  bool hasSubFeature = false;
-  ModuleBase_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter, hasSubFeature);
+  bool hasCompositeOwner = false;
+  ModuleBase_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter, hasCompositeOwner);
   if (!(hasFeature || hasParameter))
     return;
 
