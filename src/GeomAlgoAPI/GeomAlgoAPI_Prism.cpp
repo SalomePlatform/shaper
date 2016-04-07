@@ -38,8 +38,6 @@
 #include <TopoDS_Solid.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
-#include <limits>
-
 //=================================================================================================
 GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
                                      const double       theToSize,
@@ -121,7 +119,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
   BRepBuilderAPI_FindPlane aFindPlane(aBaseShape);
   if(aBaseShape.ShapeType() == TopAbs_VERTEX || aBaseShape.ShapeType() == TopAbs_EDGE ||
      aFindPlane.Found() != Standard_True) {
-    // Direction and both bounding planes should be set or empty.
+    // Direction should be set.
     if(!theDirection.get()) {
       return;
     }
@@ -129,7 +127,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     aBaseDir = theDirection;
     aDirVec = theDirection->impl<gp_Dir>();
     gp_XYZ aDirXYZ = aDirVec.XYZ();
-    Standard_Real aMinParam = std::numeric_limits<double>::max();
+    Standard_Real aMinParam = Precision::Infinite();
 
     for(TopExp_Explorer anExp(aBaseShape, TopAbs_VERTEX); anExp.More(); anExp.Next()) {
       const TopoDS_Shape& aVertex = anExp.Current();

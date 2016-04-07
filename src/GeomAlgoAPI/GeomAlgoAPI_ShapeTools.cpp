@@ -61,8 +61,16 @@ std::shared_ptr<GeomAPI_Pnt> GeomAlgoAPI_ShapeTools::centreOfMass(const std::sha
   if(aShape.IsNull()) {
     return std::shared_ptr<GeomAPI_Pnt>();
   }
-  BRepGProp::SurfaceProperties(aShape, aGProps);
-  gp_Pnt aCentre = aGProps.CentreOfMass();
+  gp_Pnt aCentre;
+  if(aShape.ShapeType() == TopAbs_VERTEX) {
+    aCentre = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
+  } else if(aShape.ShapeType() == TopAbs_EDGE || aShape.ShapeType() == TopAbs_WIRE) {
+    BRepGProp::LinearProperties(aShape, aGProps);
+    aCentre = aGProps.CentreOfMass();
+  } else {
+    BRepGProp::SurfaceProperties(aShape, aGProps);
+    aCentre = aGProps.CentreOfMass();
+  }
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aCentre.X(), aCentre.Y(), aCentre.Z()));
 }
 

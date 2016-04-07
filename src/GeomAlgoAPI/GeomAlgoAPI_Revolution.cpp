@@ -19,14 +19,20 @@
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
 #include <BRepCheck_Analyzer.hxx>
+#include <Geom_Curve.hxx>
+#include <Geom2d_Curve.hxx>
+#include <BRepLib_CheckCurveOnSurface.hxx>
 #include <BRepPrimAPI_MakeRevol.hxx>
 #include <BRepGProp.hxx>
+#include <GC_MakePlane.hxx>
 #include <Geom_Plane.hxx>
 #include <GeomLib_IsPlanarSurface.hxx>
 #include <gp_Pln.hxx>
 #include <GProp_GProps.hxx>
+#include <IntTools_Context.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
+#include <TopoDS_Edge.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
 /// \brief Constructs infinite face from thePlane, and with axis located on the same side
@@ -38,6 +44,10 @@ static TopoDS_Face makeFaceFromPlane(gp_Pln& thePlane, const gp_Pnt& thePoint);
 
 /// \return solid created from face or shell.
 static TopoDS_Solid makeSolidFromShape(const TopoDS_Shape& theShape);
+
+/// \brief return centre of mass for theShape.
+/// \param[in] theShape shape.
+static gp_Pnt centreOfMass(const TopoDS_Shape& theShape);
 
 /// \brief Selects solid from theShape with closest center of mass to thePoint
 /// \param[in] theShape compound with solids.
@@ -98,15 +108,44 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
       return;
   }
 
+  // Getting axis.
+  gp_Ax1 anAxis = theAxis->impl<gp_Ax1>();
+
   // Getting base plane.
   Handle(Geom_Plane) aBasePlane;
   BRepBuilderAPI_FindPlane aFindPlane(aBaseShape);
   if(aShapeTypeToExp == TopAbs_FACE && aFindPlane.Found() == Standard_True) {
     aBasePlane = aFindPlane.Plane();
+  } else {
+    gp_Pnt aPnt1 = anAxis.Location();
+    gp_Pnt aPnt2 = aPnt1;
+    aPnt2.Translate(anAxis.Direction());
+    gp_Pnt aPnt3;
+
+    for(TopExp_Explorer anExp(aBaseShape, TopAbs_VERTEX); anExp.More(); anExp.Next()) {
+      aPnt3 = BRep_Tool::Pnt(TopoDS::Vertex(anExp.Current()));
+
+      GC_MakePlane aMkPlane(aPnt1, aPnt2, aPnt3);
+      if(aMkPlane.IsDone() != Standard_True) {
+        continue;
+      }
+
+      aBasePlane = aMkPlane.Value();
+      break;
+    }
+
+    if(aBasePlane.IsNull()) {
+      aPnt3 = centreOfMass(aBaseShape);
+
+      GC_MakePlane aMkPlane(aPnt1, aPnt2, aPnt3);
+      if(aMkPlane.IsDone() != Standard_True) {
+        return;
+      }
+
+      aBasePlane = aMkPlane.Value();
+    }
   }
 
-  // Getting axis.
-  gp_Ax1 anAxis = theAxis->impl<gp_Ax1>();
   if(aShapeTypeToExp == TopAbs_FACE) {
     if(aBasePlane->Axis().Angle(anAxis) < Precision::Confusion()) {
       return;
@@ -211,6 +250,9 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     }
     this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aFromCutBuilder)));
     aResult = aFromCutBuilder->Shape();
+    if(aResult.ShapeType() == TopAbs_COMPOUND) {
+      aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
+    }
 
     // Cutting revolution with to plane.
     BRepAlgoAPI_Cut* aToCutBuilder = new BRepAlgoAPI_Cut(aResult, aToSolid);
@@ -220,9 +262,8 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     }
     this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aToCutBuilder)));
     aResult = aToCutBuilder->Shape();
-
-    TopExp_Explorer anExp(aResult, TopAbs_SOLID);
-    if(!anExp.More()) {
+    TopoDS_Iterator aCheckIt(aResult);
+    if(!aCheckIt.More()) {
       return;
     }
     if(aResult.ShapeType() == TopAbs_COMPOUND) {
@@ -253,20 +294,51 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     aResult = findClosest(aResult, aBaseCentre);
 
     // Setting naming.
-    for(TopExp_Explorer anExp(aResult, TopAbs_FACE); anExp.More (); anExp.Next ()) {
-      const TopoDS_Shape& aFaceOnResult = anExp.Current();
-      Handle(Geom_Surface) aFaceSurface = BRep_Tool::Surface(TopoDS::Face(aFaceOnResult));
-      Handle(Geom_Surface) aFromSurface = BRep_Tool::Surface(TopoDS::Face(aRotatedFromFace));
-      Handle(Geom_Surface) aToSurface = BRep_Tool::Surface(TopoDS::Face(aRotatedToFace));
-      if(aFaceSurface == aFromSurface) {
-        GeomShapePtr aFSHape(new GeomAPI_Shape);
-        aFSHape->setImpl(new TopoDS_Shape(aFaceOnResult));
-        this->addFromShape(aFSHape);
-      }
-      if(aFaceSurface == aToSurface) {
-        GeomShapePtr aTSHape(new GeomAPI_Shape);
-        aTSHape->setImpl(new TopoDS_Shape(aFaceOnResult));
-        this->addToShape(aTSHape);
+    for(TopExp_Explorer anExp(aResult, aShapeTypeToExp); anExp.More (); anExp.Next ()) {
+      const TopoDS_Shape& aShape = anExp.Current();
+      if(aShapeTypeToExp == TopAbs_VERTEX) {
+        gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
+        IntTools_Context anIntTools;
+        if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(aRotatedToFace), Precision::Confusion()) == Standard_True) {
+          GeomShapePtr aGeomSh(new GeomAPI_Shape());
+          aGeomSh->setImpl(new TopoDS_Shape(aShape));
+          this->addToShape(aGeomSh);
+        }
+        if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(aRotatedFromFace), Precision::Confusion()) == Standard_True) {
+          GeomShapePtr aGeomSh(new GeomAPI_Shape());
+          aGeomSh->setImpl(new TopoDS_Shape(aShape));
+          this->addFromShape(aGeomSh);
+        }
+      } else if(aShapeTypeToExp == TopAbs_EDGE) {
+        TopoDS_Edge anEdge = TopoDS::Edge(aShape);
+        BRepLib_CheckCurveOnSurface anEdgeCheck(anEdge, TopoDS::Face(aRotatedToFace));
+        anEdgeCheck.Perform();
+        if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
+          GeomShapePtr aGeomSh(new GeomAPI_Shape());
+          aGeomSh->setImpl(new TopoDS_Shape(aShape));
+          this->addToShape(aGeomSh);
+        }
+        anEdgeCheck.Init(anEdge, TopoDS::Face(aRotatedFromFace));
+        anEdgeCheck.Perform();
+        if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
+          GeomShapePtr aGeomSh(new GeomAPI_Shape());
+          aGeomSh->setImpl(new TopoDS_Shape(aShape));
+          this->addFromShape(aGeomSh);
+        }
+      } else {
+        Handle(Geom_Surface) aFaceSurface = BRep_Tool::Surface(TopoDS::Face(aShape));
+        Handle(Geom_Surface) aFromSurface = BRep_Tool::Surface(TopoDS::Face(aRotatedFromFace));
+        Handle(Geom_Surface) aToSurface = BRep_Tool::Surface(TopoDS::Face(aRotatedToFace));
+        if(aFaceSurface == aFromSurface) {
+          GeomShapePtr aFSHape(new GeomAPI_Shape);
+          aFSHape->setImpl(new TopoDS_Shape(aShape));
+          this->addFromShape(aFSHape);
+        }
+        if(aFaceSurface == aToSurface) {
+          GeomShapePtr aTSHape(new GeomAPI_Shape);
+          aTSHape->setImpl(new TopoDS_Shape(aShape));
+          this->addToShape(aTSHape);
+        }
       }
     }
   } else { //Case 3: When only one bounding plane was set.
@@ -470,6 +542,23 @@ TopoDS_Solid makeSolidFromShape(const TopoDS_Shape& theShape)
 }
 
 //=================================================================================================
+gp_Pnt centreOfMass(const TopoDS_Shape& theShape)
+{
+  TopAbs_ShapeEnum aShType = theShape.ShapeType();
+  GProp_GProps aGProps;
+
+  if(aShType == TopAbs_EDGE || aShType == TopAbs_WIRE) {
+    BRepGProp::LinearProperties(theShape, aGProps);
+  } else if(aShType == TopAbs_FACE || aShType == TopAbs_SHELL) {
+    BRepGProp::SurfaceProperties(theShape, aGProps);
+  } else if(aShType == TopAbs_SOLID || aShType == TopAbs_COMPSOLID) {
+    BRepGProp::VolumeProperties(theShape, aGProps);
+  }
+
+  return aGProps.CentreOfMass();
+}
+
+//=================================================================================================
 TopoDS_Shape findClosest(const TopoDS_Shape& theShape, const gp_Pnt& thePoint)
 {
   TopoDS_Shape aResult = theShape;
@@ -477,13 +566,10 @@ TopoDS_Shape findClosest(const TopoDS_Shape& theShape, const gp_Pnt& thePoint)
   if(theShape.ShapeType() == TopAbs_COMPOUND) {
     double aMinDistance = Precision::Infinite();
     double aCurDistance;
-    GProp_GProps aGProps;
     gp_Pnt aCentr;
-
     for (TopoDS_Iterator anItr(theShape); anItr.More(); anItr.Next()) {
       TopoDS_Shape aValue = anItr.Value();
-      BRepGProp::VolumeProperties(aValue, aGProps);
-      aCentr = aGProps.CentreOfMass();
+      aCentr = centreOfMass(aValue);
       aCurDistance = aCentr.Distance(thePoint);
 
       if(aCurDistance < aMinDistance) {
