@@ -168,15 +168,13 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
 
   // Angle value is in degrees
   AttributeDoublePtr aVal = aData->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
-  SetCustomValue(aVal->value() * PI / 180.0);
+  SetCustomValue(aVal->value());
 
   myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
   myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
 
-  AttributeDoublePtr aValue = myConstraint->data()->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
-  SketcherPrs_Tools::setDisplaySpecialSymbol(this, aValue->usedParameters().size() > 0);
-
-  myStyleListener->updateDimensions(this, aValue);
+  SketcherPrs_Tools::setDisplaySpecialSymbol(this, aVal->usedParameters().size() > 0);
+  myStyleListener->updateDimensions(this, aVal);
 
   AIS_AngleDimension::Compute(thePresentationManager, thePresentation, theMode);
 }

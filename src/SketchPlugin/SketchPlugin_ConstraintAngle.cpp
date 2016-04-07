@@ -212,7 +212,7 @@ double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle)
       anAngle = aPositiveNormal ? theAngle : 360 - theAngle;
     break;
     case SketcherPrs_Tools::ANGLE_COMPLEMENTARY:
-      anAngle = 180 - theAngle;
+      anAngle = fabs(180 - theAngle);
     break;
     case SketcherPrs_Tools::ANGLE_BACKWARD:
       anAngle = aPositiveNormal ? 360 - theAngle : theAngle;

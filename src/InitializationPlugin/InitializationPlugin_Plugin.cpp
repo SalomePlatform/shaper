@@ -48,7 +48,7 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
 
     aFeatures.push_back(createPoint(aDoc));
     aFeatures.push_back(createPlane(aDoc, 1., 0., 0.));
-    aFeatures.push_back(createPlane(aDoc, 0., 1., 0.));
+    aFeatures.push_back(createPlane(aDoc, 0., -1., 0.));
     aFeatures.push_back(createPlane(aDoc, 0., 0., 1.));
     // for PartSet it is done outside of the transaction, so explicitly flush this creation
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
