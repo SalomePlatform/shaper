@@ -28,7 +28,7 @@ ModuleBase_WidgetValidated::ModuleBase_WidgetValidated(QWidget* theParent,
                                                        ModuleBase_IWorkshop* theWorkshop,
                                                        const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData),
-  myWorkshop(theWorkshop)
+  myWorkshop(theWorkshop), myIsInValidate(false)
 {
   myAttributeStore = new ModuleBase_WidgetSelectorStore();
 }
