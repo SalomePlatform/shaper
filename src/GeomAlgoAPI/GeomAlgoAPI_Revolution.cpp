@@ -9,6 +9,7 @@
 #include <GeomAPI_Face.h>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAlgoAPI_DFLoader.h>
+#include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
@@ -412,7 +413,26 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     }
 
     // Try to cut with base face. If it can not be done then keep result of cut with bounding plane.
-    TopoDS_Shape aModifiedBaseShape = aBaseShape;
+    TopoDS_Shape aModifiedBaseShape;
+    if(aShapeTypeToExp != TopAbs_FACE) {
+      ListOfShape aList;
+      GeomShapePtr aSh(new GeomAPI_Shape());
+      aSh->setImpl(new TopoDS_Shape(aBaseShape));
+      std::shared_ptr<GeomAPI_Pnt> theCenter(new GeomAPI_Pnt(aBasePlane->Location().X(),
+                                                             aBasePlane->Location().Y(),
+                                                             aBasePlane->Location().Z()));
+      std::shared_ptr<GeomAPI_Dir> theNormal(new GeomAPI_Dir(aBasePlane->Axis().Direction().X(),
+                                                             aBasePlane->Axis().Direction().Y(),
+                                                             aBasePlane->Axis().Direction().Z()));
+      GeomShapePtr aPln = GeomAlgoAPI_FaceBuilder::planarFace(theCenter, theNormal);
+
+      aList.push_back(aSh);
+      std::list<std::shared_ptr<GeomAPI_Pnt> > aBoundingPoints = GeomAlgoAPI_ShapeTools::getBoundingBox(aList);
+
+      aSh = GeomAlgoAPI_ShapeTools::fitPlaneToBox(aPln, aBoundingPoints);
+    } else {
+      aModifiedBaseShape = aBaseShape;
+    }
     if(isFromFaceSet) {
       if(aModifiedBaseShape.ShapeType() == TopAbs_FACE) {
         aModifiedBaseShape.Orientation(TopAbs_REVERSED);
