@@ -222,20 +222,12 @@ bool FeaturesPlugin_ValidatorCanBeEmpty::isValid(const std::shared_ptr<ModelAPI_
                                                  const std::list<std::string>& theArguments,
                                                  std::string& theError) const
 {
-  if(theArguments.size() != 5 && theArguments.size() != 6) {
-    theError = "Validator should be used with 6 parameters for extrusion and with 5 for revolution.";
+  if(theArguments.size() != 2) {
+    theError = "Validator should be used with 2 parameters for extrusion.";
     return false;
   }
 
   std::list<std::string>::const_iterator anArgsIt = theArguments.begin(), aLast = theArguments.end();
-
-  std::string aSelectedMethod;
-  if(theFeature->string(*anArgsIt)) {
-    aSelectedMethod = theFeature->string(*anArgsIt)->value();
-  }
-  ++anArgsIt;
-  std::string aCreationMethod = *anArgsIt;
-  ++anArgsIt;
 
   AttributePtr aCheckAttribute = theFeature->attribute(*anArgsIt);
   ++anArgsIt;
@@ -244,33 +236,26 @@ bool FeaturesPlugin_ValidatorCanBeEmpty::isValid(const std::shared_ptr<ModelAPI_
     return true;
   }
 
-  if(aSelectedMethod == aCreationMethod) {
-    ++anArgsIt;
-    ++anArgsIt;
+  AttributeSelectionPtr aSelAttr = theFeature->selection(*anArgsIt);
+  if(!aSelAttr.get()) {
+    theError = "Could not get selection attribute \"" + *anArgsIt + "\".";
+    return false;
   }
 
-  for(; anArgsIt != theArguments.cend(); ++anArgsIt) {
-    AttributeSelectionPtr aSelAttr = theFeature->selection(*anArgsIt);
-    if(!aSelAttr.get()) {
-      theError = "Could not get selection attribute \"" + *anArgsIt + "\".";
-      return false;
-    }
-
-    GeomShapePtr aShape = aSelAttr->value();
-    if(!aShape.get()) {
-      ResultPtr aContext = aSelAttr->context();
-      if(!aContext.get()) {
-        theError = "Selection attribute \"" + *anArgsIt + "\" can not be empty.";
-        return false;
-      }
-
-      aShape = aContext->shape();
-    }
-
-    if(!aShape.get()) {
+  GeomShapePtr aShape = aSelAttr->value();
+  if(!aShape.get()) {
+    ResultPtr aContext = aSelAttr->context();
+    if(!aContext.get()) {
       theError = "Selection attribute \"" + *anArgsIt + "\" can not be empty.";
       return false;
     }
+
+    aShape = aContext->shape();
+  }
+
+  if(!aShape.get()) {
+    theError = "Selection attribute \"" + *anArgsIt + "\" can not be empty.";
+    return false;
   }
 
   return true;

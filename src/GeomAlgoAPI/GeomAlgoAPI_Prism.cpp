@@ -111,6 +111,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
   }
 
   // Getting direction.
+  gp_Pnt aLoc;
   gp_Vec aDirVec;
   std::shared_ptr<GeomAPI_Pnt> aBaseLoc;
   std::shared_ptr<GeomAPI_Dir> aBaseDir;
@@ -120,21 +121,33 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
   if(aBaseShape.ShapeType() == TopAbs_VERTEX || aBaseShape.ShapeType() == TopAbs_EDGE ||
      aFindPlane.Found() != Standard_True) {
     // Direction and both bounding planes should be set or empty.
-    if(!theDirection.get() || (isBoundingShapesSet && (!theToShape.get() || !theFromShape.get()))) {
+    if(!theDirection.get()) {
       return;
     }
 
     aBaseDir = theDirection;
     aDirVec = theDirection->impl<gp_Dir>();
+    gp_XYZ aDirXYZ = aDirVec.XYZ();
+    Standard_Real aMinParam = std::numeric_limits<double>::max();
+
+    for(TopExp_Explorer anExp(aBaseShape, TopAbs_VERTEX); anExp.More(); anExp.Next()) {
+      const TopoDS_Shape& aVertex = anExp.Current();
+      gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aVertex));
+      double aParam = aDirXYZ.Dot(aPnt.XYZ());
+      if(aParam < aMinParam) {
+        aMinParam = aParam;
+        aLoc = aPnt;
+      }
+    }
   } else {
     Handle(Geom_Plane) aPlane = aFindPlane.Plane();
-    gp_Pnt aLoc = aPlane->Axis().Location();
+    aLoc = aPlane->Axis().Location();
     aDirVec = aPlane->Axis().Direction();
 
-    aBaseLoc.reset(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
     aBaseDir.reset(new GeomAPI_Dir(aDirVec.X(), aDirVec.Y(), aDirVec.Z()));
-    aBasePlane = GeomAlgoAPI_FaceBuilder::planarFace(aBaseLoc, aBaseDir);
   }
+  aBaseLoc.reset(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
+  aBasePlane = GeomAlgoAPI_FaceBuilder::planarFace(aBaseLoc, aBaseDir);
 
   TopoDS_Shape aResult;
   if(!isBoundingShapesSet) {

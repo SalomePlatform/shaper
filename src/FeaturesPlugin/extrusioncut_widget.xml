@@ -92,5 +92,5 @@
     <validator id="GeomValidators_ShapeType" parameters="solid"/>
   </multi_selector>
   <validator id="GeomValidators_ZeroOffset" parameters="CreationMethod,BySizes,sketch_selection,to_size,from_size,to_object,to_offset,from_object,from_offset"/>
-  <validator id="FeaturesPlugin_ValidatorCanBeEmpty" parameters="CreationMethod,BySizes,base,to_object,from_object,direction_object"/>
+  <validator id="FeaturesPlugin_ValidatorCanBeEmpty" parameters="base,direction_object"/>
 </source>
