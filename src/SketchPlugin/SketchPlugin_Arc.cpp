@@ -241,25 +241,25 @@ AISObjectPtr SketchPlugin_Arc::getAISObject(AISObjectPtr thePrevious)
             if (aTypeAttr && aTypeAttr->isInitialized() &&
                 aTypeAttr->value() == ARC_TYPE_THREE_POINTS() && aEndAttr->isInitialized())
               aEndPoint = aSketch->to3D(aEndAttr->x(), aEndAttr->y());
+
+            std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
+            // make a visible point
+            std::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
+            aShapes.push_back(aCenterPointShape);
+
             std::shared_ptr<GeomAPI_Shape> aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircleArc(
                                                             aCenter, aStartPoint, aEndPoint, aNormal);
-            if (aCircleShape) {
-              std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
-              // make a visible point
-              std::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
-              aShapes.push_back(aCenterPointShape);
-
+            if (aCircleShape)
               aShapes.push_back(aCircleShape);
-              if (!aShapes.empty())
-              {
-                std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
-                AISObjectPtr anAIS = thePrevious;
-                if (!anAIS)
-                  anAIS = AISObjectPtr(new GeomAPI_AISObject);
-                anAIS->createShape(aCompound);
-                anAIS->setWidth(3);
-                return anAIS;
-              }
+
+            if (!aShapes.empty()) {
+              std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+              AISObjectPtr anAIS = thePrevious;
+              if (!anAIS)
+                anAIS = AISObjectPtr(new GeomAPI_AISObject);
+              anAIS->createShape(aCompound);
+              anAIS->setWidth(3);
+              return anAIS;
             }
           }
         }
