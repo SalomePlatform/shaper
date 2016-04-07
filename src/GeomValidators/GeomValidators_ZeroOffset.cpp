@@ -46,7 +46,9 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
       int aSketchFacesNum = aConstruction->facesNum();
       for(int aFaceIndex = 0; aFaceIndex < aSketchFacesNum; aFaceIndex++) {
         std::shared_ptr<GeomAPI_Shape> aFace = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
-        aFacesList.push_back(aFace);
+        if(aFace->isFace() && aFace->isPlanar()) {
+          aFacesList.push_back(aFace);
+        }
       }
     }
   } else if(theFeature->selectionList(*anIt)) {
@@ -55,7 +57,9 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
       AttributeSelectionPtr aFaceSel = aFacesSelectionList->value(anIndex);
       std::shared_ptr<GeomAPI_Shape> aFaceShape = aFaceSel->value();
       if(aFaceShape.get() && !aFaceShape->isNull()) { // Getting face.
-        aFacesList.push_back(aFaceShape);
+        if(aFaceShape->isFace() && aFaceShape->isPlanar()) {
+          aFacesList.push_back(aFaceShape);
+        }
       } else { // This may be the whole sketch result selected, check and get faces.
         ResultPtr aContext = aFaceSel->context();
         std::shared_ptr<GeomAPI_Shape> aContextShape = aContext->shape();
@@ -69,7 +73,9 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
         int aFacesNum = aConstruction->facesNum();
         for(int aFaceIndex = 0; aFaceIndex < aFacesNum || aFacesNum == -1; aFaceIndex++) {
           aFaceShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
-          aFacesList.push_back(aFaceShape);
+          if(aFaceShape->isFace() && aFaceShape->isPlanar()) {
+            aFacesList.push_back(aFaceShape);
+          }
         }
       }
     }

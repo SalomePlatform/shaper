@@ -21,6 +21,7 @@
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_FindPlane.hxx>
 #include <BRepBuilderAPI_Transform.hxx>
+#include <BRepTools.hxx>
 #include <Geom_Curve.hxx>
 #include <Geom2d_Curve.hxx>
 #include <BRepLib_CheckCurveOnSurface.hxx>
@@ -37,7 +38,7 @@
 #include <TopoDS_Solid.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
-#include <BRepTools.hxx>
+#include <limits>
 
 //=================================================================================================
 GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
