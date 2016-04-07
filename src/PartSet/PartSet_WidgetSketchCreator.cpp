@@ -303,7 +303,13 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_Vi
     return aSketchStarted;
 
   ModuleBase_ViewerPrsPtr aValue = theValues.front();
-  if (!PartSet_WidgetSketchLabel::canFillSketch(aValue))
+  if (!aValue.get() || !PartSet_WidgetSketchLabel::canFillSketch(aValue))
+    return aSketchStarted;
+
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aValue->object());
+  /// sketch should not started by object(face) selected as global. If Local face is selected,
+  /// sketch is started
+  if (aResult.get() && aValue->shape().get() && aResult->shape()->isEqual(aValue->shape()))
     return aSketchStarted;
 
   aSketchStarted = true;
