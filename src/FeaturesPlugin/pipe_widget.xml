@@ -6,7 +6,7 @@
                   tooltip="Select a base objects"
                   type_choice="faces objects"
                   use_choice="false">
-    <validator id="FeaturesPlugin_ValidatorBaseForGeneration"/>
+    <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell"/>
   </multi_selector>
   <shape_selector id="path_object"
                   label="Path object:"
