@@ -18,6 +18,7 @@
 #include <ModuleBase_IViewWindow.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_WidgetValidator.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -116,6 +117,22 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
   ModuleBase_Tools::zeroMargins(aLayout);
   aLayout->addWidget(myGroupBox);
   setLayout(aLayout);
+
+  myWidgetValidator = new ModuleBase_WidgetValidator(this, myWorkshop);
+}
+
+bool PartSet_WidgetPoint2D::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& theValue)
+{
+  bool aValid = true;
+  /*if (getValidState(theValue, aValid)) {
+    return aValid;
+  }
+  aValid = isValidSelectionCustom(theValue);
+  if (aValid)
+    aValid = isValidSelectionForAttribute(theValue, attribute());
+
+  storeValidState(theValue, aValid);
+  */return aValid;
 }
 
 bool PartSet_WidgetPoint2D::resetCustom()

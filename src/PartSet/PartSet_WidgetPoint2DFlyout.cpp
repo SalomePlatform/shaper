@@ -6,6 +6,8 @@
 
 #include "PartSet_WidgetPoint2DFlyout.h"
 
+#include "ModuleBase_WidgetValidator.h"
+
 #include <XGUI_Workshop.h>
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Displayer.h>
@@ -21,6 +23,13 @@ PartSet_WidgetPoint2DFlyout::PartSet_WidgetPoint2DFlyout(QWidget* theParent,
                                                          const Config_WidgetAPI* theData)
  : PartSet_WidgetPoint2D(theParent, theWorkshop, theData)
 {
+  myWidgetValidator = new ModuleBase_WidgetValidator(this, myWorkshop);
+}
+
+bool PartSet_WidgetPoint2DFlyout::isValidSelectionCustom(
+                                      const std::shared_ptr<ModuleBase_ViewerPrs>& theValue)
+{
+  return false;
 }
 
 bool PartSet_WidgetPoint2DFlyout::useSelectedShapes() const

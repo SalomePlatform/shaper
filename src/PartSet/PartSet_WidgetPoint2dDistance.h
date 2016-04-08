@@ -47,6 +47,11 @@ Q_OBJECT
 
   virtual ~PartSet_WidgetPoint2dDistance();
 
+  /// Checks if the selection presentation is valid in widget 
+  /// \param theValue a selected presentation in the view
+  /// \return a boolean value
+  virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
+
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 

@@ -12,6 +12,7 @@
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_WidgetValidated.h>
+#include <ModuleBase_WidgetValidator.h>
 #include <ModuleBase_ViewerPrs.h>
 
 IMPLEMENT_STANDARD_HANDLE(ModuleBase_FilterValidated, SelectMgr_Filter);
@@ -30,8 +31,12 @@ Standard_Boolean ModuleBase_FilterValidated::IsOk(const Handle(SelectMgr_EntityO
                                                                            (aCurrentWidget);
     ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
     myWorkshop->selection()->fillPresentation(aPrs, theOwner);
-
-    aValid = !aWidgetValidated || aWidgetValidated->isValidSelection(aPrs);
+    if (aWidgetValidated)
+      aValid = !aWidgetValidated || aWidgetValidated->isValidSelection(aPrs);
+    else if (aCurrentWidget->widgetValidator()) {
+      ModuleBase_WidgetValidator* aWidgetValidator = aCurrentWidget->widgetValidator();
+      aValid = aWidgetValidator->isValidSelection(aPrs);
+    }
   }
 
 #ifdef DEBUG_FILTERS

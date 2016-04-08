@@ -7,6 +7,7 @@
 #include "ModuleBase_ModelWidget.h"
 #include "ModuleBase_ViewerPrs.h"
 #include "ModuleBase_Tools.h"
+#include "ModuleBase_WidgetValidator.h"
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Attribute.h>
@@ -30,7 +31,8 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
     : QWidget(theParent),
       myIsEditing(false),
       myState(Stored),
-      myIsValueStateBlocked(false)
+      myIsValueStateBlocked(false),
+      myWidgetValidator(0)
 {
   myIsInternal = theData->getBooleanAttribute(ATTR_INTERNAL, false);
 
@@ -168,6 +170,10 @@ void ModuleBase_ModelWidget::activate()
     if (anAttribute.get() != NULL && !anAttribute->isInitialized())
       initializeValueByActivate();
   }
+
+  if (myWidgetValidator)
+    myWidgetValidator->activateFilters(true);
+
   activateCustom();
 }
 
@@ -177,6 +183,9 @@ void ModuleBase_ModelWidget::deactivate()
   if (myState == ModifiedInPP || myState == ModifiedInViewer)
     storeValue();
   myState = Stored;
+
+  if (myWidgetValidator)
+    myWidgetValidator->activateFilters(false);
 }
 
 void ModuleBase_ModelWidget::initializeValueByActivate()

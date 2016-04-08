@@ -16,6 +16,7 @@
 #include <ModuleBase_IViewWindow.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_WidgetValidator.h>
 
 #include <GeomAPI_Pnt2d.h>
 #include <Config_WidgetAPI.h>
@@ -33,10 +34,17 @@ PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
   myValueIsCashed(false), myIsFeatureVisibleInCash(true), myValueInCash(0)
 {
   myFirstPntName = theData->getProperty("first_point");
+  myWidgetValidator = new ModuleBase_WidgetValidator(this, myWorkshop);
 }
 
 PartSet_WidgetPoint2dDistance::~PartSet_WidgetPoint2dDistance()
 {
+}
+
+bool PartSet_WidgetPoint2dDistance::isValidSelectionCustom(
+                                      const std::shared_ptr<ModuleBase_ViewerPrs>& theValue)
+{
+  return false;
 }
 
 bool PartSet_WidgetPoint2dDistance::resetCustom()

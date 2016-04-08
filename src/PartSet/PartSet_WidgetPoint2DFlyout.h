@@ -30,6 +30,11 @@ public:
   /// Destructor
   virtual ~PartSet_WidgetPoint2DFlyout() {};
 
+  /// Checks if the selection presentation is valid in widget 
+  /// \param theValue a selected presentation in the view
+  /// \return a boolean value
+  virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
+
   /// Activates the editor control only in case if the mouse over the OCC window, otherwise
   /// set focus to the usual double value control
   /// \return the state whether the widget can accept the focus

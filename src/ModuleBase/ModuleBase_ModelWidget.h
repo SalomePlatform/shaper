@@ -18,6 +18,7 @@
 class Config_WidgetAPI;
 class ModuleBase_IWorkshop;
 class ModuleBase_ViewerPrs;
+class ModuleBase_WidgetValidator;
 class QKeyEvent;
 
 /**\class ModuleBase_ModelWidget
@@ -113,6 +114,14 @@ Q_OBJECT
   /// Returns values which should be highlighted when the whidget is active
   /// \param theValues a list of presentations
   virtual void getHighlighted(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues) {};
+
+  /// Checks if the selection presentation is valid in widget 
+  /// \param theValue a selected presentation in the view
+  /// \return a boolean value
+  virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue) { return true; }
+
+  /// Returns widget validator, by default it is NULL. To be created in a child if necessary
+  ModuleBase_WidgetValidator* widgetValidator() { return myWidgetValidator; }
 
   /// Restore value from attribute data to the widget's control. Emits signals before and after store
   /// \return True in success
@@ -280,6 +289,7 @@ protected slots:
   void onWidgetValuesModified();
 
  protected:
+   ModuleBase_WidgetValidator* myWidgetValidator; /// own validator, by default it is zero
 
   /// The attribute name of the model feature
   std::string myAttributeID;

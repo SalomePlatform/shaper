@@ -47,6 +47,11 @@ Q_OBJECT
   /// Destructor
   virtual ~PartSet_WidgetPoint2D();
 
+  /// Checks if the selection presentation is valid in widget 
+  /// \param theValue a selected presentation in the view
+  /// \return a boolean value
+  virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
+
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped widget values
