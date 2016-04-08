@@ -24,7 +24,7 @@ def testImport(theType, theFile, theVolume, theDelta):
     aPartFeature = aSession.moduleDocument().addFeature("Part")
     aSession.finishOperation()
     aPart = aSession.activeDocument()
-    
+
     aSession.startOperation("Import file")
     aFeatureKind = "Import"
     anImportFeature = aPart.addFeature(aFeatureKind)
@@ -35,7 +35,7 @@ def testImport(theType, theFile, theVolume, theDelta):
     file.setValue(theFile)
     anImportFeature.execute()
     aSession.finishOperation()
-    
+
     # Check results
     assert anImportFeature.error() == '', "{0}: The error after execution: {1}".format(theType, anImportFeature.error())
     assert len(anImportFeature.results()) == 1, "{0}: Wrong number of results: expected = 1, real = {1}".format(theType, len(anImportFeature.results()))
@@ -43,7 +43,7 @@ def testImport(theType, theFile, theVolume, theDelta):
     assert aResultBody, "{0}: The result is not a body".format(theType)
     aShape = aResultBody.shape()
     assert aShape, "{0}: The body does not have a shape".format(theType)
-    
+
     # Check shape volume
     aRefVolume = theVolume
     aResVolume = GeomAlgoAPI_ShapeTools.volume(aShape)
@@ -53,18 +53,18 @@ if __name__ == '__main__':
 #=========================================================================
 # Create a shape imported from BREP
 #=========================================================================
-    testImport("BREP", "Data/solid.brep", 259982.29715, 10 ** -5)
-    testImport("BRP", "Data/solid.brp", 259982.29715, 10 ** -5)
+    testImport("BREP", "Data/solid.brep", 259982.297176, 10 ** -5)
+    testImport("BRP", "Data/solid.brp", 259982.297176, 10 ** -5)
 #=========================================================================
 # Create a shape imported from STEP
 #=========================================================================
-    testImport("STP", "Data/screw.stp", 3.78827059338e-06, 10 ** -17)
-    testImport("STEP", "Data/screw.step", 3.78827059338e-06, 10 ** -17)
+    testImport("STP", "Data/screw.stp", 3.78827401738e-06, 10 ** -17)
+    testImport("STEP", "Data/screw.step", 3.78827401738e-06, 10 ** -17)
 #=========================================================================
 # Create a shape imported from IGES
 #=========================================================================
-    testImport("IGES", "Data/bearing.iges", 6.86980756235e-14, 10 ** -25)
-    testImport("IGS", "Data/bearing.igs", 6.86980756235e-14, 10 ** -25)
+    testImport("IGES", "Data/bearing.iges", 6.86970803067e-14, 10 ** -25)
+    testImport("IGS", "Data/bearing.igs", 6.86970803067e-14, 10 ** -25)
 #=========================================================================
 # End of test
 #=========================================================================
