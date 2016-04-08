@@ -43,9 +43,9 @@ mybox = model.addExtrusion(mypart, mybase.selectFace(), 50)
 
 # Creating a cylinder on a face of the box
 
-thisface = "Extrusion_1_1/LateralFace_2"
-thisxmin = "Extrusion_1_1/LateralFace_3&Extrusion_1_1/LateralFace_2"
-thiszmax = "Extrusion_1_1/LateralFace_2&Extrusion_1_1/ToFace_1_1"
+thisface = "Extrusion_1_1/Generated_Face_2"
+thisxmin = "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_2"
+thiszmax = "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/To_Face_1_1"
 
 mystand = model.addSketch(mypart, thisface)
 circle = mystand.addCircle(0, 25, 5)

@@ -1,7 +1,7 @@
 """
       TestExtrusion.py
       Unit test of FeaturesPlugin_Extrusion class
-      
+
       class FeaturesPlugin_Extrusion : public ModelAPI_Feature
         static const std::string MY_EXTRUSION_ID("Extrusion");
         static const std::string LIST_ID("base");
@@ -228,9 +228,9 @@ anExtrusionFt.selectionList("base").append(
 anExtrusionFt.string("CreationMethod").setValue("ByPlanesAndOffsets")
 anExtrusionFt.real("to_size").setValue(0) #TODO: remove
 anExtrusionFt.real("from_size").setValue(0) #TODO: remove
-anExtrusionFt.selection("to_object").selectSubShape("face", "Extrusion_3_1/LateralFace_2")
+anExtrusionFt.selection("to_object").selectSubShape("face", "Extrusion_3_1/Generated_Face_2")
 anExtrusionFt.real("to_offset").setValue(0)
-anExtrusionFt.selection("from_object").selectSubShape("face", "Extrusion_3_1/LateralFace_1")
+anExtrusionFt.selection("from_object").selectSubShape("face", "Extrusion_3_1/Generated_Face_1")
 anExtrusionFt.real("from_offset").setValue(0)
 anExtrusionFt.execute()
 aSession.finishOperation()

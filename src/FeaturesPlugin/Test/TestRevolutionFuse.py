@@ -1,7 +1,7 @@
 """
       TestRevolutionFuse.py
       Unit test of FeaturesPlugin_RevolutionFuse class
-      
+
       class FeaturesPlugin_RevolutionFuse : public FeaturesPlugin_RevolutionBoolean
 		static const std::string MY_REVOLUTION_ID("RevolutionFuse");
         static const std::string MY_SKETCH_OBJECT_ID("sketch");
@@ -142,22 +142,25 @@ dirx = geomDataAPI_Dir(aCircleSketchFeature.attribute("DirX"))
 dirx.setValue(1, 0, 0)
 norm = geomDataAPI_Dir(aCircleSketchFeature.attribute("Norm"))
 norm.setValue(0, 0, 1)
-aCircleSketchFeature.selection("External").selectSubShape("face", "Extrusion_1/TopFace_1")
+aCircleSketchFeature.selection("External").selectSubShape("face", "Extrusion_1/To_Face_1")
+aSession.startOperation()
 aSketchCircle = aCircleSketchFeature.addFeature("SketchCircle")
 anCircleCentr = geomDataAPI_Point2D(aSketchCircle.attribute("CircleCenter"))
 aCircleRadius = aSketchCircle.real("CircleRadius")
 anCircleCentr.setValue(0, 0)
 aCircleRadius.setValue(10)
 aSession.finishOperation()
+aSession.finishOperation()
 aSession.startOperation()
+aCircleSketchFeature.execute() # execute for sketch should be called here, because it is not set as current feature, so it is disabled.
+anRevolutionFuseFt.selectionList("base").append(aCircleSketchFeature.firstResult(), None)
 anRevolutionFuseFt.selection("axis_object").setValue(aLineSketchResult, aLineEdge)
 anRevolutionFuseFt.string("CreationMethod").setValue("ByAngles")
 anRevolutionFuseFt.real("to_angle").setValue(50)
 anRevolutionFuseFt.real("from_angle").setValue(50)
 anRevolutionFuseFt.real("to_offset").setValue(0) #TODO: remove
 anRevolutionFuseFt.real("from_offset").setValue(0) #TODO: remove
-anRevolutionFuseFt.selectionList("boolean_objects").append(anExtrusionResult, anExtrusionResult.shape())
-anRevolutionFuseFt.execute()
+anRevolutionFuseFt.selectionList("main_objects").append(anExtrusionResult, anExtrusionResult.shape())
 aSession.finishOperation()
 aSession.finishOperation()
 

@@ -1,29 +1,3 @@
-"""
-      TestExtrusionCut.py
-      Unit test of FeaturesPlugin_ExtrusionCut class
-      
-      class FeaturesPlugin_ExtrusionCut : public FeaturesPlugin_ExtrusionBoolean
-		static const std::string MY_EXTRUSION_ID("ExtrusionCut");
-        static const std::string MY_SKETCH_OBJECT_ID("sketch");
-        static const std::string METHOD_ATTR("CreationMethod");
-        static const std::string MY_TO_SIZE_ID("to_size");
-        static const std::string MY_FROM_SIZE_ID("from_size");
-        static const std::string MY_TO_OBJECT_ID("to_object");
-        static const std::string MY_TO_OFFSET_ID("to_offset");
-        static const std::string MY_FROM_OBJECT_ID("from_object");
-        static const std::string MY_FROM_OFFSET_ID("from_offset");
-        static const std::string MY_BOOLEAN_OBJECTS_ID("boolean_objects");
-
-        data()->addAttribute(SKETCH_OBJECT_ID(), ModelAPI_AttributeReference::typeId());
-        data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
-        data()->addAttribute(TO_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
-        data()->addAttribute(FROM_SIZE_ID(), ModelAPI_AttributeDouble::typeId());
-        data()->addAttribute(TO_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
-        data()->addAttribute(TO_OFFSET_ID(), ModelAPI_AttributeDouble::typeId());
-        data()->addAttribute(FROM_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
-        data()->addAttribute(FROM_OFFSET_ID(), ModelAPI_AttributeSelection::typeId());
-        data()->addAttribute(BOOLEAN_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
-"""
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -114,21 +88,24 @@ dirx = geomDataAPI_Dir(aCircleSketchFeature.attribute("DirX"))
 dirx.setValue(1, 0, 0)
 norm = geomDataAPI_Dir(aCircleSketchFeature.attribute("Norm"))
 norm.setValue(0, 0, 1)
-aCircleSketchFeature.selection("External").selectSubShape("face", "Extrusion_1/TopFace_1")
+aCircleSketchFeature.selection("External").selectSubShape("face", "Extrusion_1/To_Face_1")
+aSession.startOperation()
 aSketchCircle = aCircleSketchFeature.addFeature("SketchCircle")
 anCircleCentr = geomDataAPI_Point2D(aSketchCircle.attribute("CircleCenter"))
 aCircleRadius = aSketchCircle.real("CircleRadius")
 anCircleCentr.setValue(0, 0)
 aCircleRadius.setValue(10)
 aSession.finishOperation()
+aSession.finishOperation()
 aSession.startOperation()
+aCircleSketchFeature.execute() # execute for sketch should be called here, because it is not set as current feature, so it is disabled.
+anExtrusionCutFt.selectionList("base").append(aCircleSketchFeature.firstResult(), None)
 anExtrusionCutFt.string("CreationMethod").setValue("BySizes")
 anExtrusionCutFt.real("to_size").setValue(10)
 anExtrusionCutFt.real("from_size").setValue(10)
 anExtrusionCutFt.real("to_offset").setValue(0) #TODO: remove
 anExtrusionCutFt.real("from_offset").setValue(0) #TODO: remove
-anExtrusionCutFt.selectionList("boolean_objects").append(anExtrusionResult, anExtrusionResult.shape())
-anExtrusionCutFt.execute()
+anExtrusionCutFt.selectionList("main_objects").append(anExtrusionResult, anExtrusionResult.shape())
 aSession.finishOperation()
 aSession.finishOperation()
 

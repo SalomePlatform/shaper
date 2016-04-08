@@ -125,7 +125,7 @@ anAxisFeature = aPart.addFeature("Axis")
 anAxisFeatureData = anAxisFeature.data()
 assert(anAxisFeatureData is not None)
 anAxisFeatureData.string("CreationMethod").setValue("AxisByCylindricalFaceCase")
-anAxisFeatureData.selection("CylindricalFace").selectSubShape("face", "Extrusion_1_1/LateralFace_1")
+anAxisFeatureData.selection("CylindricalFace").selectSubShape("face", "Extrusion_1_1/Generated_Face_1")
 anAxisFeature.execute()
 aSession.finishOperation()
 

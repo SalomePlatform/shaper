@@ -1,7 +1,7 @@
 """
       Test1064.py
       Unit test for testing the Part sub-shapes naming, described in the issue 1064
-      
+
 """
 #=========================================================================
 # Initialization of the test
@@ -73,7 +73,7 @@ aSession.setActiveDocument(aPartSet)
 aPlane = aPartSet.addFeature("Plane")
 aPlane.string("CreationMethod").setValue("PlaneByFaceAndDistance")
 aPlane.real("distance").setValue(0)
-aPlane.selection("planeFace").selectSubShape("face", "Part_1/Extrusion_1_1/LateralFace_3")
+aPlane.selection("planeFace").selectSubShape("face", "Part_1/Extrusion_1_1/Generated_Face_3")
 aSession.finishOperation()
 
 #=========================================================================
