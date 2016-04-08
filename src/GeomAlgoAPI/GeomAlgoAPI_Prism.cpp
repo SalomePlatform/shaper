@@ -110,25 +110,30 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
   }
 
   // Getting direction.
-  gp_Pnt aLoc;
   gp_Vec aDirVec;
   std::shared_ptr<GeomAPI_Pnt> aBaseLoc;
   std::shared_ptr<GeomAPI_Dir> aBaseDir;
   GeomShapePtr aBasePlane;
   const bool isBoundingShapesSet = theFromShape.get() || theToShape.get();
   BRepBuilderAPI_FindPlane aFindPlane(aBaseShape);
-  if(aBaseShape.ShapeType() == TopAbs_VERTEX || aBaseShape.ShapeType() == TopAbs_EDGE ||
-     aFindPlane.Found() != Standard_True) {
-    // Direction should be set.
-    if(!theDirection.get()) {
-      return;
-    }
-
+  if(theDirection.get()) {
     aBaseDir = theDirection;
     aDirVec = theDirection->impl<gp_Dir>();
+  } else if(aBaseShape.ShapeType() != TopAbs_VERTEX &&
+            aBaseShape.ShapeType() != TopAbs_EDGE &&
+            aFindPlane.Found() == Standard_True){
+    Handle(Geom_Plane) aPlane = aFindPlane.Plane();
+    gp_Pnt aLoc = aPlane->Axis().Location();
+    aDirVec = aPlane->Axis().Direction();
+    aBaseLoc.reset(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
+    aBaseDir.reset(new GeomAPI_Dir(aDirVec.X(), aDirVec.Y(), aDirVec.Z()));
+  } else {
+    return;
+  }
+  if(!aBaseLoc.get()) {
+    gp_Pnt aLoc;
     gp_XYZ aDirXYZ = aDirVec.XYZ();
     Standard_Real aMinParam = Precision::Infinite();
-
     for(TopExp_Explorer anExp(aBaseShape, TopAbs_VERTEX); anExp.More(); anExp.Next()) {
       const TopoDS_Shape& aVertex = anExp.Current();
       gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aVertex));
@@ -138,19 +143,8 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
         aLoc = aPnt;
       }
     }
-  } else {
-    if(!theDirection.get()) {
-      Handle(Geom_Plane) aPlane = aFindPlane.Plane();
-      aLoc = aPlane->Axis().Location();
-      aDirVec = aPlane->Axis().Direction();
-
-      aBaseDir.reset(new GeomAPI_Dir(aDirVec.X(), aDirVec.Y(), aDirVec.Z()));
-    } else {
-      aBaseDir = theDirection;
-      aDirVec = theDirection->impl<gp_Dir>();
-    }
+    aBaseLoc.reset(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
   }
-  aBaseLoc.reset(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
   aBasePlane = GeomAlgoAPI_FaceBuilder::planarFace(aBaseLoc, aBaseDir);
 
   TopoDS_Shape aResult;
@@ -372,16 +366,15 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     // Naming for extrusion from vertex, edge.
     for(TopExp_Explorer anExp(aResult, aShapeTypeToExp); anExp.More(); anExp.Next()) {
       const TopoDS_Shape& aShape = anExp.Current();
+      GeomShapePtr aGeomSh(new GeomAPI_Shape());
       if(aShapeTypeToExp == TopAbs_VERTEX) {
         gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
         IntTools_Context anIntTools;
         if(anIntTools.IsValidPointForFace(aPnt, aToFace, Precision::Confusion()) == Standard_True) {
-          GeomShapePtr aGeomSh(new GeomAPI_Shape());
           aGeomSh->setImpl(new TopoDS_Shape(aShape));
           this->addToShape(aGeomSh);
         }
         if(anIntTools.IsValidPointForFace(aPnt, aFromFace, Precision::Confusion()) == Standard_True) {
-          GeomShapePtr aGeomSh(new GeomAPI_Shape());
           aGeomSh->setImpl(new TopoDS_Shape(aShape));
           this->addFromShape(aGeomSh);
         }
@@ -390,14 +383,12 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
         BRepLib_CheckCurveOnSurface anEdgeCheck(anEdge, aToFace);
         anEdgeCheck.Perform();
         if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
-          GeomShapePtr aGeomSh(new GeomAPI_Shape());
           aGeomSh->setImpl(new TopoDS_Shape(aShape));
           this->addToShape(aGeomSh);
         }
         anEdgeCheck.Init(anEdge, aFromFace);
         anEdgeCheck.Perform();
         if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
-          GeomShapePtr aGeomSh(new GeomAPI_Shape());
           aGeomSh->setImpl(new TopoDS_Shape(aShape));
           this->addFromShape(aGeomSh);
         }
