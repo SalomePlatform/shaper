@@ -309,9 +309,11 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_Vi
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aValue->object());
   /// sketch should not started by object(face) selected as global. If Local face is selected,
   /// sketch is started
-  if (aResult.get() && aValue->shape().get() && aResult->shape()->isEqual(aValue->shape()))
-    return aSketchStarted;
-
+  if (aResult.get() && aValue->shape().get() && aResult->shape()->isEqual(aValue->shape())) {
+    ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aResult);
+    if (!aConstruction.get() || !aConstruction->isInfinite())
+      return aSketchStarted;
+  }
   aSketchStarted = true;
 
   // manually deactivation because the widget was not activated as has no focus acceptin controls
