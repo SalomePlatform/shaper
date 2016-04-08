@@ -199,23 +199,19 @@ double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle)
 {
   double anAngle = theAngle;
 
-  std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
-  std::shared_ptr<GeomAPI_Dir> aNormal = aPlane->normal();
-  bool aPositiveNormal = !(aNormal->x() < 0 || aNormal->y() < 0 || aNormal->z() < 0);
-
   std::shared_ptr<ModelAPI_Data> aData = data();
   std::shared_ptr<ModelAPI_AttributeInteger> aTypeAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeInteger>(aData->attribute(SketchPlugin_ConstraintAngle::TYPE_ID()));
   SketcherPrs_Tools::AngleType anAngleType = (SketcherPrs_Tools::AngleType)(aTypeAttr->value());
   switch (anAngleType) {
     case SketcherPrs_Tools::ANGLE_DIRECT:
-      anAngle = aPositiveNormal ? theAngle : 360 - theAngle;
+      anAngle = theAngle;
     break;
     case SketcherPrs_Tools::ANGLE_COMPLEMENTARY:
-      anAngle = fabs(180 - theAngle);
+      anAngle = fabs(180.0 - theAngle);
     break;
     case SketcherPrs_Tools::ANGLE_BACKWARD:
-      anAngle = aPositiveNormal ? 360 - theAngle : theAngle;
+      anAngle = 360.0 - theAngle;
     break;
     default:
       break;

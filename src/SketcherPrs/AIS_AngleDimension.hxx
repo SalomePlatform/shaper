@@ -207,10 +207,10 @@ public:
 
   Standard_EXPORT virtual const gp_Pnt GetTextPosition () const;
 
-  //! Sets state if the create arc should be built depending on the input geometry orientation
-  //! or to be always oriented in [0,0,1]. The last case propose angles more than 180 degree.
-  //! @param theSecondAttach [in] the second attachment point.
-  void SetGeometryOrientedAngle(const Standard_Boolean& theState, const Standard_Boolean& theUseReverse);
+  //! Sets state if the angle arc should be built reversing to the presentation plane.
+  //! Default state is not reversed
+  //! @param theUseReverse [in] the boolean state.
+  void SetAngleReversed(const Standard_Boolean& theUseReverse);
 
   //! Sets visible state of angle arrows. Default value is true for both
   //! @param theFirstArrowVisible [in] the visibility of the first arrow.
@@ -346,7 +346,6 @@ protected:
                                                   const gp_Pnt& theSecondPoint) const;
 
 private:
-  Standard_Boolean myGeometryOrientedAngle;
   Standard_Boolean myUseReverse;
 
   Standard_Boolean myFirstArrowVisible;

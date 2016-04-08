@@ -277,8 +277,8 @@ void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Face& theFirstFace,
 //=======================================================================
 void AIS_AngleDimension::Init()
 {
-  SetGeometryOrientedAngle (Standard_False, Standard_False);
-  SetArrowVisible(Standard_True, Standard_True);
+  SetAngleReversed (Standard_False);
+  SetArrowVisible (Standard_True, Standard_True);
   SetSpecialSymbol (THE_DEGREE_SYMBOL);
   SetDisplaySpecialSymbol (AIS_DSS_After);
   SetFlyout (15.0);
@@ -339,23 +339,11 @@ void AIS_AngleDimension::DrawArc (const Handle(Prs3d_Presentation)& thePresentat
   }
 
   gp_Pln aPlane = aConstructPlane.Value();
-  if (myGeometryOrientedAngle) {
-    gp_Dir aCPlaneDir = GetPlane().Axis().Direction();
-    bool aCPlaneDirToReverse = !(aCPlaneDir.X() < 0 || aCPlaneDir.Y() < 0 || aCPlaneDir.Z() < 0);
-    // have similar direction for all cases
-    if (!aCPlaneDirToReverse && myUseReverse) {
-      gp_Ax1 anAxis = aPlane.Axis();
-      gp_Dir aDir = anAxis.Direction();
-      aDir.Reverse();
-      aPlane.SetAxis(gp_Ax1(anAxis.Location(), aDir));
-    }
-
-    if (aCPlaneDirToReverse && !myUseReverse) {
-      gp_Ax1 anAxis = aPlane.Axis();
-      gp_Dir aDir = anAxis.Direction();
-      aDir.Reverse();
-      aPlane.SetAxis(gp_Ax1(anAxis.Location(), aDir));
-    }
+  if (myUseReverse) {
+    gp_Ax1 anAxis = aPlane.Axis();
+    gp_Dir aDir = anAxis.Direction();
+    aDir.Reverse();
+    aPlane.SetAxis(gp_Ax1(anAxis.Location(), aDir));
   }
   
   // construct circle forming the arc
@@ -382,9 +370,14 @@ void AIS_AngleDimension::DrawArc (const Handle(Prs3d_Presentation)& thePresentat
   // compute number of discretization elements in old-fanshioned way
   gp_Vec aCenterToFirstVec  (theCenter, theFirstAttach);
   gp_Vec aCenterToSecondVec (theCenter, theSecondAttach);
-  const Standard_Real anAngle = aCenterToFirstVec.Angle (aCenterToSecondVec);
-  const Standard_Integer aNbPoints = myGeometryOrientedAngle ? 40 :
-                                     Max (4, Standard_Integer (50.0 * anAngle / M_PI));
+
+  gp_Ax1 anAxis = aPlane.Axis();
+  gp_Dir aDir = anAxis.Direction();
+  gp_Vec aRefVec(aDir);
+  Standard_Real anAngle = aCenterToFirstVec.AngleWithRef (aCenterToSecondVec, aRefVec);
+  if (anAngle < 0)
+    anAngle = 2.0 * M_PI + anAngle;
+  const Standard_Integer aNbPoints = Max (4, Standard_Integer (50.0 * anAngle / M_PI));
 
   GCPnts_UniformAbscissa aMakePnts (anArcAdaptor, aNbPoints);
   if (!aMakePnts.IsDone())
@@ -1253,13 +1246,11 @@ void AIS_AngleDimension::SetTextPosition (const gp_Pnt& theTextPos)
 }
 
 //=======================================================================
-//function : SetGeometryOrientedAngle
+//function : SetAngleReversed
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::SetGeometryOrientedAngle(const Standard_Boolean& theState,
-                                                  const Standard_Boolean& theUseReverse)
+void AIS_AngleDimension::SetAngleReversed(const Standard_Boolean& theUseReverse)
 {
-  myGeometryOrientedAngle = theState;
   myUseReverse = theUseReverse;
 }
 

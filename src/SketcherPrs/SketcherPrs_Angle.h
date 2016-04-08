@@ -51,6 +51,17 @@ protected:
   Standard_EXPORT virtual void ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
     const Standard_Integer aMode);
 
+  /// Checks is the angle plane has inverted direction of normal to the plane of current sketcher
+  /// Returns true if crossed product is negative.
+  /// \return bolean value
+  bool isAnglePlaneReversedToSketchPlane();
+
+  /// Calculates a distance between center of the angle presentation and the value of flyout point
+  /// attribute. It should be used after setting measured geometry for the angle presentation as
+  /// it uses calculated center/first/second point coordinates
+  /// \return real value
+  double calculateDistanceToFlyoutPoint();
+
 private:
   /// Constraint feature
   ModelAPI_Feature* myConstraint;
