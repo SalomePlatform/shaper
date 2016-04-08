@@ -10,6 +10,7 @@
 
 #include <ModuleBase.h>
 
+#include <QList>
 #include <memory>
 
 class ModuleBase_ModelWidget;
@@ -48,10 +49,26 @@ private:
   /// \return boolean value
   bool isFilterActivated() const;
 
+  //! Clear all validated cash in the widget
+  void clearValidatedCash();
+
+  /// Gets the validity state of the presentation in an internal map. Returns true if the valid state of value is stored
+  /// \param theValue a viewer presentation
+  /// \param theValid a valid state
+  bool getValidState(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue, bool& theValid);
+
+  /// Store the validity state of the presentation in an internal map
+  /// \param theValue a viewer presentation
+  /// \param theValid a valid state
+  void storeValidState(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue, const bool theValid);
+
 protected:
   /// Reference to workshop
   ModuleBase_ModelWidget* myModelWidget; ///< the current widget to be validated
   ModuleBase_IWorkshop* myWorkshop; ///< the active workshop
+
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> myValidPrs; /// cash of valid selection presentations
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> myInvalidPrs; /// cash of invalid selection presentations
 };
 
 #endif /* ModuleBase_WidgetValidator_H_ */

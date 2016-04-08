@@ -219,8 +219,13 @@ AISObjectPtr SketchPlugin_Arc::getAISObject(AISObjectPtr thePrevious)
       // compute a circle point in 3D view
       std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
           GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
+
+      std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
       if (aCenterAttr->isInitialized()) {
         std::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
+        // make a visible point
+        std::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
+        aShapes.push_back(aCenterPointShape);
 
         std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<
             GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Arc::START_ID()));
@@ -242,27 +247,21 @@ AISObjectPtr SketchPlugin_Arc::getAISObject(AISObjectPtr thePrevious)
                 aTypeAttr->value() == ARC_TYPE_THREE_POINTS() && aEndAttr->isInitialized())
               aEndPoint = aSketch->to3D(aEndAttr->x(), aEndAttr->y());
 
-            std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
-            // make a visible point
-            std::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
-            aShapes.push_back(aCenterPointShape);
-
             std::shared_ptr<GeomAPI_Shape> aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircleArc(
                                                             aCenter, aStartPoint, aEndPoint, aNormal);
             if (aCircleShape)
               aShapes.push_back(aCircleShape);
-
-            if (!aShapes.empty()) {
-              std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
-              AISObjectPtr anAIS = thePrevious;
-              if (!anAIS)
-                anAIS = AISObjectPtr(new GeomAPI_AISObject);
-              anAIS->createShape(aCompound);
-              anAIS->setWidth(3);
-              return anAIS;
-            }
           }
         }
+      }
+      if (!aShapes.empty()) {
+        std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+        AISObjectPtr anAIS = thePrevious;
+        if (!anAIS)
+          anAIS = AISObjectPtr(new GeomAPI_AISObject);
+        anAIS->createShape(aCompound);
+        anAIS->setWidth(3);
+        return anAIS;
       }
     }
   }

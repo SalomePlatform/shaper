@@ -48,7 +48,7 @@ ObjectPtr ModuleBase_WidgetValidated::findPresentedObject(const AISObjectPtr& th
 void ModuleBase_WidgetValidated::clearValidatedCash()
 {
 #ifdef DEBUG_VALID_STATE
-  qDebug("clearValidatedState");
+  qDebug("clearValidatedCash");
 #endif
   myValidPrs.clear();
   myInvalidPrs.clear();

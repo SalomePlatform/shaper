@@ -182,6 +182,14 @@ protected:
    static bool isOrphanPoint(const FeaturePtr& theFeature, const CompositeFeaturePtr& theSketch,
                              double theX, double theY);
 
+   /// Explode the given shape by vertices and found closed to the point vertes
+   /// \param theShape a shape to be exploded
+   /// \param thePoint a point
+   /// \return boolean value
+   static bool shapeContainsPoint(const std::shared_ptr<GeomAPI_Shape>& theShape,
+                                  const std::shared_ptr<GeomAPI_Pnt2d>& thePoint,
+                                  const CompositeFeaturePtr& theSketch);
+
 protected:
   ModuleBase_IWorkshop* myWorkshop; ///< workshop
 

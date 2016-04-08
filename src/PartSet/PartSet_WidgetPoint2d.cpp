@@ -7,6 +7,7 @@
 #include "PartSet_WidgetPoint2d.h"
 #include <PartSet_Tools.h>
 #include <PartSet_Module.h>
+#include <PartSet_SketcherReetntrantMgr.h>
 
 #include <XGUI_Tools.h>
 #include <XGUI_Workshop.h>
@@ -32,6 +33,9 @@
 #include <ModelAPI_Object.h>
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAPI_Pnt2d.h>
+
+#include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_Vertex.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
@@ -124,15 +128,51 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
 bool PartSet_WidgetPoint2D::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& theValue)
 {
   bool aValid = true;
-  /*if (getValidState(theValue, aValid)) {
-    return aValid;
-  }
-  aValid = isValidSelectionCustom(theValue);
-  if (aValid)
-    aValid = isValidSelectionForAttribute(theValue, attribute());
 
-  storeValidState(theValue, aValid);
-  */return aValid;
+  PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+  if (aModule->sketchReentranceMgr()->isInternalEditActive()) 
+    return true; /// when internal edit is started a new feature is created. I has not results, AIS
+
+  // workaround for feature, where there is no results
+  //if (myFeature->getKind() == "SketchRectangle")
+  //  return true;
+
+  /// the selection is not possible if the current feature has no presentation for the current
+  /// attribute not in AIS not in results. If so, no object in current feature where make
+  /// coincidence, so selection is not necessary
+  std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
+  std::shared_ptr<GeomDataAPI_Point2D> aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aData->attribute(attributeID()));
+  std::shared_ptr<GeomAPI_Pnt2d> aPoint = aPointAttr->pnt();
+
+  bool aFoundPoint = false;
+  GeomShapePtr anAISShape;
+  GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(myFeature);
+  if (aPrs.get()) {
+    AISObjectPtr anAIS;
+    anAIS = aPrs->getAISObject(anAIS);
+    if (anAIS.get()) {
+      anAISShape = anAIS->getShape();
+    }
+  }
+  const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = myFeature->results();
+  if (!anAISShape.get() && aResults.empty())
+    return true;
+
+  /// analysis of AIS
+  if (anAISShape.get())
+    aFoundPoint = shapeContainsPoint(anAISShape, aPoint, mySketch);
+
+  /// analysis of results
+  std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.cbegin();
+  for (; aRIter != aResults.cend() && !aFoundPoint; aRIter++) {
+    ResultPtr aResult = *aRIter;
+    if (aResult.get() && aResult->shape().get()) {
+      GeomShapePtr aShape = aResult->shape();
+      aFoundPoint = shapeContainsPoint(aShape, aPoint, mySketch);
+    }
+  }
+  return aFoundPoint;
 }
 
 bool PartSet_WidgetPoint2D::resetCustom()
@@ -450,14 +490,22 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
 
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
   Handle(V3d_View) aView = theWnd->v3dView();
-  // TODO: This fragment doesn't work because bug in OCC Viewer. It can be used after fixing.
-  NCollection_List<TopoDS_Shape> aShapes;
-  std::list<ObjectPtr> aObjects;
-  aSelection->selectedShapes(aShapes, aObjects);
+
+  QList<ModuleBase_ViewerPrsPtr> aList = aSelection->getSelected(ModuleBase_ISelection::Viewer);
+  ModuleBase_ViewerPrsPtr aFirstValue = aList.size() > 0 ? aList.first() : ModuleBase_ViewerPrsPtr();
+  //NCollection_List<TopoDS_Shape> aShapes;
+  //std::list<ObjectPtr> aObjects;
+  //aSelection->selectedShapes(aShapes, aObjects);
   // if we have selection and use it
-  if (aShapes.Extent() > 0 && useSelectedShapes()) {
-    TopoDS_Shape aShape = aShapes.First();
-    ObjectPtr aObject = aObjects.front();
+  //if (/*aShapes.Extent() > 0 && useSelectedShapes() &&*/ isValidSelectionCustom() {
+  if (aFirstValue.get() && isValidSelectionCustom(aFirstValue)) {
+    //TopoDS_Shape aShape = aShapes.First();
+    //ObjectPtr aObject = aObjects.front();
+
+    GeomShapePtr aGeomShape = aFirstValue->shape();
+    TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>(); /// to find axis shape
+    ObjectPtr aObject = aFirstValue->object(); /// to find owner
+
     FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aObject);
     bool anExternal = false;
     std::shared_ptr<SketchPlugin_Feature> aSPFeature;
@@ -713,4 +761,21 @@ bool PartSet_WidgetPoint2D::isOrphanPoint(const FeaturePtr& theFeature,
     }
   }
   return anOrphanPoint;
+}
+
+bool PartSet_WidgetPoint2D::shapeContainsPoint(const GeomShapePtr& theShape,
+                                               const std::shared_ptr<GeomAPI_Pnt2d>& thePoint,
+                                               const CompositeFeaturePtr& theSketch)
+{
+  std::shared_ptr<GeomAPI_Pnt> aPoint = PartSet_Tools::point3D(thePoint, theSketch);
+
+  bool aContainPoint = false;
+  GeomAPI_ShapeExplorer anExp(theShape, GeomAPI_Shape::VERTEX);
+  for(; anExp.more() && !aContainPoint; anExp.next()) {
+    std::shared_ptr<GeomAPI_Shape> aVertexInCompSolid = anExp.current();
+    std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aVertexInCompSolid));
+    if (aVertex.get())
+      aContainPoint = aPoint->isEqual(aVertex->point());
+  }
+  return aContainPoint;
 }
