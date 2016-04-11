@@ -126,8 +126,4 @@ void Model_AttributeReference::setObject(const std::shared_ptr<ModelAPI_Object>&
 }
 
 Model_AttributeReference::~Model_AttributeReference()
-{
-  std::shared_ptr<Model_Document> aDoc =
-    std::dynamic_pointer_cast<Model_Document>(owner()->document());
-  TDF_Label aLab = myRef->Get();
-}
+{}

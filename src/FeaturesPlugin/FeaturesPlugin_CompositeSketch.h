@@ -52,9 +52,6 @@ public:
   /// structures of the owner (the remove from the document will be done outside just after).
   FEATURESPLUGIN_EXPORT virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
 
-  /// Removes also all sub-sketch.
-  FEATURESPLUGIN_EXPORT virtual void erase();
-
 protected:
   enum InitFlags {
     InitSketchLauncher   = 1 << 0,

@@ -105,19 +105,6 @@ void FeaturesPlugin_CompositeSketch::removeFeature(std::shared_ptr<ModelAPI_Feat
 }
 
 //=================================================================================================
-void FeaturesPlugin_CompositeSketch::erase()
-{
-  if(data().get() && data()->isValid()) { // on abort of sketch of this composite it may be invalid
-    FeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_Feature>(reference(SKETCH_ID())->value());
-    if(aSketch.get() && aSketch->data()->isValid()) {
-      document()->removeFeature(aSketch);
-    }
-  }
-
-  ModelAPI_CompositeFeature::erase();
-}
-
-//=================================================================================================
 void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesList,
                                                    const bool theIsMakeShells)
 {

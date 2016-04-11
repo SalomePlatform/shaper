@@ -140,9 +140,17 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
     isPlanesCoincident = true;
   } else if(aFromShape.get() && aToShape.get()) {
     std::shared_ptr<GeomAPI_Face> aFromFace(new GeomAPI_Face(aFromShape));
+    if (aFromFace->isNull()) {
+      theError = "From face selection is invalid.";
+      return false;
+    }
     std::shared_ptr<GeomAPI_Pln>  aFromPln = aFromFace->getPlane();
 
     std::shared_ptr<GeomAPI_Face> aToFace(new GeomAPI_Face(aToShape));
+    if (aToFace->isNull()) {
+      theError = "To face selection is invalid.";
+      return false;
+    }
     std::shared_ptr<GeomAPI_Pln>  aToPln = aToFace->getPlane();
 
     if(aFromPln.get()) {
@@ -152,8 +160,16 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
     std::shared_ptr<GeomAPI_Face> aFace;
     if(aFromShape.get()) {
       aFace.reset(new GeomAPI_Face(aFromShape));
+      if (aFace->isNull()) {
+        theError = "From face selection is invalid.";
+        return false;
+      }
     } else {
       aFace.reset(new GeomAPI_Face(aToShape));
+      if (aFace->isNull()) {
+        theError = "To face selection is invalid.";
+        return false;
+      }
     }
     std::shared_ptr<GeomAPI_Pln> aPln = aFace->getPlane();
     if(aPln.get()) {

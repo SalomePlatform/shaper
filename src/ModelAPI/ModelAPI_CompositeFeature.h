@@ -43,6 +43,9 @@ public:
   /// Exchanges IDs of two given features: needed for more correct naming in some cases (issue 769)
   MODELAPI_EXPORT virtual void exchangeIDs(std::shared_ptr<ModelAPI_Feature> theFeature1,
     std::shared_ptr<ModelAPI_Feature> theFeature2);
+
+  /// in addition removes all subs
+  MODELAPI_EXPORT virtual void erase();
 };
 
 //! Pointer on the composite feature object

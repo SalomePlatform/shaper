@@ -54,7 +54,7 @@ void Model_Objects::setOwner(DocumentPtr theDoc)
   myDoc = theDoc;
   // update all fields and recreate features and result objects if needed
   TDF_LabelList aNoUpdated;
-  synchronizeFeatures(aNoUpdated, true, true);
+  synchronizeFeatures(aNoUpdated, true, true, true);
   myHistory.clear();
 }
 
@@ -240,7 +240,7 @@ void Model_Objects::removeFeature(FeaturePtr theFeature)
     for(; aRefIter != aRefs.end(); aRefIter++) {
       std::shared_ptr<ModelAPI_CompositeFeature> aComposite = 
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aRefIter);
-      if (aComposite.get() && aComposite->data()->isValid()) {
+      if (aComposite.get()) {
         aComposite->removeFeature(theFeature);
       }
     }
@@ -606,7 +606,8 @@ std::shared_ptr<ModelAPI_Feature> Model_Objects::featureById(const int theId)
 }
 
 void Model_Objects::synchronizeFeatures(
-  const TDF_LabelList& theUpdated, const bool theUpdateReferences, const bool theFlush)
+  const TDF_LabelList& theUpdated, const bool theUpdateReferences, 
+  const bool theOpen, const bool theFlush)
 {
   Model_Document* anOwner = std::dynamic_pointer_cast<Model_Document>(myDoc).get();
   if (!anOwner) // this may happen on creation of document: nothing there, so nothing to synchronize
@@ -728,7 +729,8 @@ void Model_Objects::synchronizeFeatures(
     myHistory.clear();
   }
 
-  anOwner->executeFeatures() = false;
+  if (theOpen)
+    anOwner->executeFeatures() = false;
   aLoop->activateFlushes(isActive);
 
   if (theFlush) {
@@ -740,7 +742,8 @@ void Model_Objects::synchronizeFeatures(
     aLoop->flush(aRedispEvent);
     aLoop->flush(aToHideEvent);
   }
-  anOwner->executeFeatures() = true;
+  if (theOpen)
+    anOwner->executeFeatures() = true;
 }
 
 /// synchronises back references for the given object basing on the collected data

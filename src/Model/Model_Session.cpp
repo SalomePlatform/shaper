@@ -263,7 +263,7 @@ void Model_Session::setActiveDocument(
         bool aWasChecked = myCheckTransactions;
         setCheckTransactions(false);
         TDF_LabelList anEmptyUpdated;
-        aDoc->objects()->synchronizeFeatures(anEmptyUpdated, true, true);
+        aDoc->objects()->synchronizeFeatures(anEmptyUpdated, true, true, true);
         if (aWasChecked)
             setCheckTransactions(true);
       }
@@ -326,7 +326,7 @@ std::shared_ptr<ModelAPI_Document> Model_Session::copy(
   TDF_CopyTool::Copy(aDS, aRT);
 
   TDF_LabelList anEmptyUpdated;
-  aNew->objects()->synchronizeFeatures(anEmptyUpdated, true, true);
+  aNew->objects()->synchronizeFeatures(anEmptyUpdated, true, true, true);
   return aNew;
 }
 

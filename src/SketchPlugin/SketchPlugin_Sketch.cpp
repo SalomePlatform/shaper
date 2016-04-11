@@ -206,22 +206,6 @@ bool SketchPlugin_Sketch::isSub(ObjectPtr theObject) const
 }
 
 
-void SketchPlugin_Sketch::erase()
-{
-  std::shared_ptr<ModelAPI_AttributeRefList> aRefList = std::dynamic_pointer_cast<
-      ModelAPI_AttributeRefList>(data()->attribute(SketchPlugin_Sketch::FEATURES_ID()));
-  std::list<ObjectPtr> aFeatures = aRefList->list();
-  std::list<ObjectPtr>::const_iterator anIt = aFeatures.begin();
-  for (; anIt != aFeatures.end(); anIt++) {
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
-    if (aFeature) {
-      // subs are referenced from sketch, but must be removed for sure, so not checkings
-      document()->removeFeature(aFeature);
-    }
-  }
-  ModelAPI_CompositeFeature::erase();
-}
-
 void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
   if (theID == SketchPlugin_SketchEntity::EXTERNAL_ID()) {
     std::shared_ptr<GeomAPI_Shape> aSelection = 

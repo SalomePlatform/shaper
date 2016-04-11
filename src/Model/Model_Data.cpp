@@ -302,8 +302,24 @@ void Model_Data::blockSendAttributeUpdated(const bool theBlock)
 
 void Model_Data::erase()
 {
-  if (!myLab.IsNull())
+  if (!myLab.IsNull()) {
+    // remove in order to clear back references in other objects
+    std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
+    referencesToObjects(aRefs);
+    std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator anAttrIter = aRefs.begin();
+    for(; anAttrIter != aRefs.end(); anAttrIter++) {
+      std::list<ObjectPtr>::iterator aReferenced = anAttrIter->second.begin();
+      for(; aReferenced != anAttrIter->second.end(); aReferenced++) {
+        if (aReferenced->get() && (*aReferenced)->data()->isValid()) {
+          std::shared_ptr<Model_Data> aData = 
+            std::dynamic_pointer_cast<Model_Data>((*aReferenced)->data());
+          aData->removeBackReference(myAttrs[anAttrIter->first]);
+        }
+      }
+    }
+    myAttrs.clear();
     myLab.ForgetAllAttributes();
+  }
 }
 
 // indexes in the state array

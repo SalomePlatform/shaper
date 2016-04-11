@@ -59,9 +59,16 @@ Model_Update::Model_Update()
   myIsProcessed = false;
 }
 
-void Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
+bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
+
   if (!theFeature->data()->isValid())
-    return; // delete an extrusion created on the sketch
+    return false; // delete an extrusion created on the sketch
+
+  if (theFeature->isPersistentResult()) {
+    if (!std::dynamic_pointer_cast<Model_Document>((theFeature)->document())->executeFeatures())
+      return false;
+  }
+
   if (!theFeature->isPreviewNeeded() && !myIsFinish) {
     myProcessOnFinish.insert(theFeature);
 #ifdef DEB_UPDATE
@@ -73,7 +80,7 @@ void Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
       static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
       aFactory->validate(theFeature); // need to be validated to update the "Apply" state if not previewed
     }
-    return;
+    return true;
   }
   if (myModified.find(theFeature) != myModified.end()) {
     if (theReason.get()) {
@@ -82,7 +89,7 @@ void Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
 #endif
       myModified[theFeature].insert(theReason);
     }
-    return; // already is marked as modified, so, nothing to do, it will be processed
+    return true;
   }
   // do not add the disabled, but possibly the sub-elements are not disabled
   bool aIsDisabled = theFeature->isDisabled();
@@ -103,7 +110,7 @@ void Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
     if (theFeature->data()->execState() == ModelAPI_StateDone)
       theFeature->data()->execState(ModelAPI_StateMustBeUpdated);
     else 
-      return; // do not need iteration deeply if it is already marked as modified or so
+      return true; // do not need iteration deeply if it is already marked as modified or so
 #ifdef DEB_UPDATE
     std::cout<<"*** Set modified state "<<theFeature->name()<<std::endl;
 #endif
@@ -139,7 +146,7 @@ void Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
     if (aPart.get())
       addModified(aPart, theFeature);
   }
-  return;
+  return true;
 }
 
 void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessage)
@@ -186,14 +193,10 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
         myIsParamUpdated = true;
       }
       // on undo/redo, abort do not update persisten features
-      bool anUpdateOnlyNotPersistent = 
-        !std::dynamic_pointer_cast<Model_Document>((*anObjIter)->document())->executeFeatures();
       FeaturePtr anUpdated = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
       if (anUpdated.get()) {
-        if (!anUpdateOnlyNotPersistent || !anUpdated->isPersistentResult()) {
-          addModified(anUpdated, FeaturePtr());
+        if (addModified(anUpdated, FeaturePtr()))
           aSomeModified = true;
-        }
       } else { // process the updated result as update of features that refers to this result
         const std::set<std::shared_ptr<ModelAPI_Attribute> >& aRefs = (*anObjIter)->data()->refsToMe();
         std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aRefIter = aRefs.cbegin();
@@ -201,9 +204,9 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
           if (!(*aRefIter)->owner()->data()->isValid())
             continue;
           FeaturePtr anUpdated = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIter)->owner());
-          if (anUpdated.get() && (!anUpdateOnlyNotPersistent || !anUpdated->isPersistentResult())) {
-            addModified(anUpdated, FeaturePtr());
-            aSomeModified = true;
+          if (anUpdated.get()) {
+            if (addModified(anUpdated, FeaturePtr()))
+              aSomeModified = true;
           }
         }
       }
@@ -292,6 +295,11 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     if (myModified.find(theFeature) != myModified.end())
       myModified.erase(theFeature);
     return false;
+  }
+
+  if (theFeature->isPersistentResult()) {
+    if (!std::dynamic_pointer_cast<Model_Document>((theFeature)->document())->executeFeatures())
+      return false;
   }
 
   // check this feature is not yet checked or processed
@@ -399,42 +407,26 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
   // this checking must be after the composite feature sub-elements processing:
   // composite feature status may depend on it's subelements
   if (theFeature->data()->execState() == ModelAPI_StateInvalidArgument) {
+  #ifdef DEB_UPDATE
+    std::cout<<"Invalid args "<<theFeature->name()<<std::endl;
+  #endif
     theFeature->eraseResults();
     redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
     return true; // so, feature is modified (results are erased)
   }
 
-  // On abort, undo or redo execute is not needed: results in document are updated automatically
-  // But redisplay is needed: results are updated, must be also updated in the viewer.
-  if (!std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures()) {
-    if (!theFeature->isPersistentResult()) { // not persistent must be re-executed on abort, etc.
-      ModelAPI_ExecState aState = theFeature->data()->execState();
-      if (aFactory->validate(theFeature)) {
-        executeFeature(theFeature);
-      } else {
-        theFeature->eraseResults();
-        redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
-      }
-    } else {
-      redisplayWithResults(theFeature, ModelAPI_StateNothing);
-      if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated) { // it is done (in the tree)
-        theFeature->data()->execState(ModelAPI_StateDone);
-      }
+  // execute feature if it must be updated
+  ModelAPI_ExecState aState = theFeature->data()->execState();
+  if (aFactory->validate(theFeature)) {
+    if (!isPostponedMain) {
+      executeFeature(theFeature);
     }
   } else {
-    // execute feature if it must be updated
-    ModelAPI_ExecState aState = theFeature->data()->execState();
-    if (aFactory->validate(theFeature)) {
-      if (!isPostponedMain) {
-        executeFeature(theFeature);
-      }
-    } else {
-      #ifdef DEB_UPDATE
-        std::cout<<"Feature is not valid, erase results "<<theFeature->name()<<std::endl;
-      #endif
-      theFeature->eraseResults();
-      redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
-    }
+    #ifdef DEB_UPDATE
+      std::cout<<"Feature is not valid, erase results "<<theFeature->name()<<std::endl;
+    #endif
+    theFeature->eraseResults();
+    redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
   }
   return true;
 }
@@ -660,6 +652,7 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
 
 void Model_Update::updateStability(void* theSender)
 {
+  static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
   if (theSender) {
     bool added = false; // object may be was crated
     ModelAPI_Object* aSender = static_cast<ModelAPI_Object*>(theSender);
@@ -676,6 +669,8 @@ void Model_Update::updateStability(void* theSender)
           aSender->data()->referencesToObjects(aRefs);
           std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRefIt = aRefs.begin();
           for(; aRefIt != aRefs.end(); aRefIt++) {
+            if (!aFactory->isConcealed(aFeatureSender->getKind(), aRefIt->first))
+              continue; // take into account only concealed references (do not remove the sketch constraint and the edge on constraint edit)
             std::list<ObjectPtr>& aRefFeaturesList = aRefIt->second;
             std::list<ObjectPtr>::iterator aReferenced = aRefFeaturesList.begin();
             for(; aReferenced != aRefFeaturesList.end(); aReferenced++) {

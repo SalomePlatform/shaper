@@ -52,7 +52,8 @@ protected:
   /// Appends the new modified feature to the myModified, clears myProcessed if needed
   /// Returns true if some feature really was marked as modified
   /// theReason is the object that causes modification of this feature
-  void addModified(
+  /// returns true if something reallsy was added to the modified and must be processed
+  bool addModified(
     std::shared_ptr<ModelAPI_Feature> theFeature, std::shared_ptr<ModelAPI_Feature> theReason);
 
   /// Recoursively checks and updates features if needed (calls the execute method)

@@ -40,7 +40,6 @@ void GeomAPI_PlanarEdges::addEdge(std::shared_ptr<GeomAPI_Shape> theEdge)
 std::list<std::shared_ptr<GeomAPI_Shape> > GeomAPI_PlanarEdges::getEdges()
 {
   TopoDS_Shape& aShape = const_cast<TopoDS_Shape&>(impl<TopoDS_Shape>());
-  //BRepTools_WireExplorer aWireExp(TopoDS::Wire(aShape));
   TopExp_Explorer aWireExp(aShape, TopAbs_EDGE);
   std::list<std::shared_ptr<GeomAPI_Shape> > aResult;
   for (; aWireExp.More(); aWireExp.Next()) {
@@ -101,4 +100,24 @@ void GeomAPI_PlanarEdges::setPlane(const std::shared_ptr<GeomAPI_Pnt>& theOrigin
                                    const std::shared_ptr<GeomAPI_Dir>& theNorm)
 {
   myPlane = std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(theOrigin, theDirX, theNorm));
+}
+
+bool GeomAPI_PlanarEdges::isEqual(const std::shared_ptr<GeomAPI_Shape> theShape) const
+{
+  if (!theShape.get())
+    return false;
+  TopoDS_Shape& aMyShape = const_cast<TopoDS_Shape&>(impl<TopoDS_Shape>());
+  TopoDS_Shape aTheShape = theShape->impl<TopoDS_Shape>();
+  TopExp_Explorer aMyExp(aMyShape, TopAbs_EDGE);
+  TopExp_Explorer aTheExp(aTheShape, TopAbs_EDGE);
+  for (; aMyExp.More() && aTheExp.More(); aMyExp.Next(), aTheExp.Next()) {
+    // check that edge by edge all geometrically matches
+    std::shared_ptr<GeomAPI_Edge> aMyEdge(new GeomAPI_Edge);
+    aMyEdge->setImpl<TopoDS_Shape>(new TopoDS_Shape(aMyExp.Current()));
+    std::shared_ptr<GeomAPI_Edge> aTheEdge(new GeomAPI_Edge);
+    aTheEdge->setImpl<TopoDS_Shape>(new TopoDS_Shape(aTheExp.Current()));
+    if (!aMyEdge->isEqual(aTheEdge))
+      return false;
+  }
+  return !(aMyExp.More() || aTheExp.More());
 }

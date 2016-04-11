@@ -16,3 +16,16 @@ void ModelAPI_CompositeFeature::exchangeIDs(
 {
   // by default nothing is in the implementation
 }
+
+void ModelAPI_CompositeFeature::erase()
+{
+  // erase all sub-features
+  for(int a = numberOfSubs(); a > 0; a--) {
+    FeaturePtr aFeature = subFeature(a - 1);
+    if (aFeature.get()) {
+      // subs are referenced from sketch, but must be removed for sure, so not checkings
+      aFeature->document()->removeFeature(aFeature);
+    }
+  }
+  ModelAPI_Feature::erase();
+}
