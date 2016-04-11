@@ -493,18 +493,11 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
 
   QList<ModuleBase_ViewerPrsPtr> aList = aSelection->getSelected(ModuleBase_ISelection::Viewer);
   ModuleBase_ViewerPrsPtr aFirstValue = aList.size() > 0 ? aList.first() : ModuleBase_ViewerPrsPtr();
-  //NCollection_List<TopoDS_Shape> aShapes;
-  //std::list<ObjectPtr> aObjects;
-  //aSelection->selectedShapes(aShapes, aObjects);
   // if we have selection and use it
-  //if (/*aShapes.Extent() > 0 && useSelectedShapes() &&*/ isValidSelectionCustom() {
   if (aFirstValue.get() && isValidSelectionCustom(aFirstValue)) {
-    //TopoDS_Shape aShape = aShapes.First();
-    //ObjectPtr aObject = aObjects.front();
-
     GeomShapePtr aGeomShape = aFirstValue->shape();
-    TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>(); /// to find axis shape
-    ObjectPtr aObject = aFirstValue->object(); /// to find owner
+    TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>();
+    ObjectPtr aObject = aFirstValue->object();
 
     FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aObject);
     bool anExternal = false;

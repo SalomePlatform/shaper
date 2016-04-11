@@ -294,33 +294,6 @@ ObjectPtr XGUI_Selection::getSelectableObject(const Handle(SelectMgr_EntityOwner
 }
 
 //**************************************************************
-void XGUI_Selection::selectedShapes(NCollection_List<TopoDS_Shape>& theList, 
-                                    std::list<ObjectPtr>& theOwners) const
-{
-  theList.Clear();
-  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (aContext.IsNull())
-    return;
-
-  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
-    TopoDS_Shape aShape = aContext->SelectedShape();
-    if (aShape.IsNull()) {
-      aShape = findAxisShape(aContext->SelectedInteractive());
-    }
-    if (!aShape.IsNull()) {
-      theList.Append(aShape);
-      Handle(SelectMgr_EntityOwner) aEO = aContext->SelectedOwner();
-      if (!aEO.IsNull()) {
-        Handle(AIS_InteractiveObject) anObj = 
-          Handle(AIS_InteractiveObject)::DownCast(aEO->Selectable());
-        ObjectPtr anObject = myWorkshop->displayer()->getObject(anObj);
-        theOwners.push_back(anObject);
-      }
-    }
-  }
-}
-
-//**************************************************************
 void XGUI_Selection::selectedOwners(SelectMgr_IndexedMapOfOwner& theSelectedOwners) const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();

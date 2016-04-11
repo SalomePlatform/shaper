@@ -75,10 +75,6 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   /// \return a found object or NULL
   ObjectPtr getSelectableObject(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
-  //! Returns list of currently selected shapes
-  virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theShapes, 
-    std::list<ObjectPtr>& theOwners) const;
-
   //! Returns list of currently selected owners
   /// \return list of owners
   void selectedOwners(SelectMgr_IndexedMapOfOwner& theSelectedOwners) const;
