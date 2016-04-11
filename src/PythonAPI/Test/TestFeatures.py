@@ -30,8 +30,10 @@ class FeaturesTestCase(FeaturesFixture):
             "addPoint", "addAxis", "addPlane",
             "addImport", "exportToFile",
             "addAddition", "addSubtraction", "addIntersection",
-            "addExtrusion", "addExtrusionCut", "addExtrusionFuse", "addExtrusionSketch",
-            "addRevolution", "addRevolutionCut", "addRevolutionFuse", "addRevolutionSketch",
+            "addExtrusion",
+            # "addExtrusionCut", "addExtrusionFuse",
+            "addRevolution",
+            # "addRevolutionCut", "addRevolutionFuse",
             "addPlacement", "addRotation", "addTranslation",
             "addGroup",
             "addParameter",
@@ -53,11 +55,11 @@ class FeaturesTestCase(FeaturesFixture):
 
         model.features.boolean.Boolean(self.part.addFeature("Boolean"))
         model.features.extrusion.Extrusion(self.part.addFeature("Extrusion"))
-        model.features.extrusion_boolean.ExtrusionBoolean(self.part.addFeature("ExtrusionCut"))
-        model.features.extrusion_boolean.ExtrusionBoolean(self.part.addFeature("ExtrusionFuse"))
+        # model.features.extrusion_boolean.ExtrusionBoolean(self.part.addFeature("ExtrusionCut"))
+        # model.features.extrusion_boolean.ExtrusionBoolean(self.part.addFeature("ExtrusionFuse"))
         model.features.revolution.Revolution(self.part.addFeature("Revolution"))
-        model.features.revolution_boolean.RevolutionBoolean(self.part.addFeature("RevolutionCut"))
-        model.features.revolution_boolean.RevolutionBoolean(self.part.addFeature("RevolutionFuse"))
+        # model.features.revolution_boolean.RevolutionBoolean(self.part.addFeature("RevolutionCut"))
+        # model.features.revolution_boolean.RevolutionBoolean(self.part.addFeature("RevolutionFuse"))
         model.features.placement.Placement(self.part.addFeature("Placement"))
         model.features.rotation.Rotation(self.part.addFeature("Rotation"))
         model.features.translation.Translation(self.part.addFeature("Translation"))
