@@ -121,7 +121,26 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   switch (anAngleType) {
     case SketcherPrs_Tools::ANGLE_DIRECT: {
       SetArrowVisible(Standard_False/*first*/, Standard_True/*second*/);
+      /*
+      std::shared_ptr<GeomAPI_Edge> anEdge1 = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aShape1));
+      std::shared_ptr<GeomAPI_Edge> anEdge2 = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aShape2));
 
+      std::shared_ptr<GeomAPI_Lin> aLin1 = anEdge1->line();
+      std::shared_ptr<GeomAPI_Lin> aLin2 = anEdge2->line();
+
+      std::shared_ptr<GeomAPI_Pnt> aCenterPnt = aLin1->intersect(aLin2);
+      std::shared_ptr<GeomAPI_Dir> aDir1 = aLin1->direction();
+      std::shared_ptr<GeomAPI_Dir> aDir2 = aLin2->direction();
+
+      const gp_Pnt& aCenterPoint = aCenterPnt->impl<gp_Pnt>();
+
+      const gp_Dir& aDirection1 = aDir1->impl<gp_Dir>();
+      const gp_Dir& aDirection2 = aDir2->impl<gp_Dir>();
+
+      gp_Pnt aFirstPoint  = aCenterPoint.Translated (gp_Vec (aDirection1));
+      gp_Pnt aSecondPoint = aCenterPoint.Translated (gp_Vec (aDirection2));
+
+      SetMeasuredGeometry(aFirstPoint, aCenterPoint, aSecondPoint);*/
       SetMeasuredGeometry(aEdge1, aEdge2, Standard_False);
       bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
       SetAngleReversed(!isReversedPlanes);
