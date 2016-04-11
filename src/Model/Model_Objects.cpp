@@ -240,7 +240,7 @@ void Model_Objects::removeFeature(FeaturePtr theFeature)
     for(; aRefIter != aRefs.end(); aRefIter++) {
       std::shared_ptr<ModelAPI_CompositeFeature> aComposite = 
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aRefIter);
-      if (aComposite.get()) {
+      if (aComposite.get() && aComposite->data()->isValid()) {
         aComposite->removeFeature(theFeature);
       }
     }
