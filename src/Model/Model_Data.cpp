@@ -536,7 +536,13 @@ void Model_Data::referencesToObjects(
     } else if (aType == ModelAPI_AttributeRefAttr::typeId()) { // reference to attribute or object
       std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = std::dynamic_pointer_cast<
           ModelAPI_AttributeRefAttr>(anAttr->second);
-      aReferenced.push_back(aRef->isObject() ? aRef->object() : aRef->attr()->owner());
+      if (aRef->isObject()) {
+        aReferenced.push_back(aRef->object());
+      } else {
+        AttributePtr anAttr = aRef->attr();
+        if (anAttr.get())
+          aReferenced.push_back(anAttr->owner());
+      }
     } else if (aType == ModelAPI_AttributeRefList::typeId()) { // list of references
       aReferenced = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttr->second)->list();
     } else if (aType == ModelAPI_AttributeSelection::typeId()) { // selection attribute
