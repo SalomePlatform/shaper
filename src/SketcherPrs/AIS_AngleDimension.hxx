@@ -67,8 +67,11 @@ public:
   //! These two edges should be intersected by each other. Otherwise the geometry is not valid.
   //! @param theFirstEdge [in] the first edge.
   //! @param theSecondEdge [in] the second edge.
+  //! @param theUseLongestDistance [in] automatically fills first/second points of presentation by
+  //! the maximum distanced point of edges from the presentation center
   Standard_EXPORT AIS_AngleDimension (const TopoDS_Edge& theFirstEdge,
-                                      const TopoDS_Edge& theSecondEdge);
+                                      const TopoDS_Edge& theSecondEdge,
+                                      const Standard_Boolean& theUseLongestDistance = Standard_True);
 
   //! Constructs the angle display object defined by three points.
   //! @param theFirstPoint [in] the first point (point on first angle flyout).
@@ -149,8 +152,11 @@ public:
   //! These two edges should be intersected by each other. Otherwise the geometry is not valid.
   //! @param theFirstEdge [in] the first edge.
   //! @param theSecondEdge [in] the second edge.
+  //! @param theUseLongestDistance [in] automatically fills first/second points of presentation by
+  //! the maximum distanced point of edges from the presentation center
   Standard_EXPORT void SetMeasuredGeometry (const TopoDS_Edge& theFirstEdge,
-                                            const TopoDS_Edge& theSecondEdge);
+                                   const TopoDS_Edge& theSecondEdge,
+                                   const Standard_Boolean& theUseLongestDistance = Standard_True);
 
   //! Measures angle defined by three points.
   //! @param theFirstPoint [in] the first point (point on first angle flyout).
@@ -311,9 +317,12 @@ protected:
 protected:
 
   //! Init angular dimension to measure angle between two linear edges.
+  //! @param theUseLongestDistance [in] automatically fills first/second points of presentation by
+  //! the maximum distanced point of edges from the presentation center
   //! @return TRUE if the angular dimension can be constructured
   //!         for the passed edges.
-  Standard_EXPORT Standard_Boolean InitTwoEdgesAngle (gp_Pln& theComputedPlane);
+  Standard_EXPORT Standard_Boolean InitTwoEdgesAngle (gp_Pln& theComputedPlane,
+                                    const Standard_Boolean& theUseLongestDistance = Standard_True);
 
   //! Init angular dimension to measure angle between two planar faces.
   //! there is no user-defined poisitoning. So attach points are set

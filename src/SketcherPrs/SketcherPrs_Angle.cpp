@@ -122,7 +122,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
     case SketcherPrs_Tools::ANGLE_DIRECT: {
       SetArrowVisible(Standard_False/*first*/, Standard_True/*second*/);
 
-      SetMeasuredGeometry(aEdge1, aEdge2);
+      SetMeasuredGeometry(aEdge1, aEdge2, Standard_False);
       bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
       SetAngleReversed(!isReversedPlanes);
     }
@@ -131,7 +131,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
       SetArrowVisible(Standard_True/*first*/, Standard_False/*second*/);
       // to calculate center, first and end points
       SetAngleReversed(false);
-      SetMeasuredGeometry(aEdge1, aEdge2);
+      SetMeasuredGeometry(aEdge1, aEdge2, Standard_False);
       /// the first point will be moved, so it is necessary to find distance
       /// after applying initial parameters of geometry but before correcting them
       /// for the current type of angle(complementary)
@@ -150,7 +150,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
     case SketcherPrs_Tools::ANGLE_BACKWARD: {
       SetArrowVisible(Standard_False/*first*/, Standard_True/*second*/);
 
-      SetMeasuredGeometry(aEdge1, aEdge2);
+      SetMeasuredGeometry(aEdge1, aEdge2, Standard_False);
       bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
       SetAngleReversed(isReversedPlanes);
     }
