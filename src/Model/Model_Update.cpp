@@ -375,6 +375,11 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     return false;
   }
 
+  // evaluate parameter before the sub-elements update: it updates dependencies on evaluation (#1085)
+  if (theFeature->getKind() == "Parameter") {
+    theFeature->execute();
+  }
+
   // check all features this feature depended on (recursive call of updateFeature)
   std::set<std::shared_ptr<ModelAPI_Feature> >& aReasons = myModified[theFeature];
   if (aReasons.find(theFeature) == aReasons.end()) {
