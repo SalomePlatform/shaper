@@ -41,6 +41,8 @@ class Model_Update : public Events_Listener
   std::set<std::shared_ptr<ModelAPI_Feature> > myProcessOnFinish;
   /// to avoid infinitive cycling: feature -> count of the processing periods during this update
   std::map<std::shared_ptr<ModelAPI_Feature>, int > myProcessed;
+  /// if preview in hte property panel is blocked and any update is postponed until the end of operation
+  bool myIsPreviewBlocked;
 
  public:
   /// Is called only once, on startup of the application

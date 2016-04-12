@@ -691,8 +691,7 @@ void Model_Objects::synchronizeFeatures(
         // redisplay also removed feature (used for sketch and AISObject)
         ModelAPI_EventCreator::get()->sendUpdated(aFeature, aRedispEvent);
         updateHistory(aFeature);
-        // don't call this because it will ask the internal attributes
-        //aFeature->erase();
+        aFeature->erase();
 
         // unbind after the "erase" call: on abort sketch is removes sub-objects that corrupts aFIter
         myFeatures.UnBind(aFIter.Key());

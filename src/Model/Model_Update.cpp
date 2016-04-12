@@ -52,11 +52,16 @@ Model_Update::Model_Update()
   aLoop->registerListener(this, kOpStartEvent);
   static const Events_ID kStabilityEvent = aLoop->eventByName(EVENT_STABILITY_CHANGED);
   aLoop->registerListener(this, kStabilityEvent);
+  static const Events_ID kPreviewBlockedEvent = aLoop->eventByName(EVENT_PREVIEW_BLOCKED);
+  aLoop->registerListener(this, kPreviewBlockedEvent);
+  static const Events_ID kPreviewRequestedEvent = aLoop->eventByName(EVENT_PREVIEW_REQUESTED);
+  aLoop->registerListener(this, kPreviewRequestedEvent);
 
   //  Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
   myIsParamUpdated = false;
   myIsFinish = false;
   myIsProcessed = false;
+  myIsPreviewBlocked = false;
 }
 
 bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
@@ -158,11 +163,26 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
   static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
   static const Events_ID kStabilityEvent = aLoop->eventByName(EVENT_STABILITY_CHANGED);
+  static const Events_ID kPreviewBlockedEvent = aLoop->eventByName(EVENT_PREVIEW_BLOCKED);
+  static const Events_ID kPreviewRequestedEvent = aLoop->eventByName(EVENT_PREVIEW_REQUESTED);
+
 #ifdef DEB_UPDATE
   std::cout<<"****** Event "<<theMessage->eventID().eventText()<<std::endl;
 #endif
   if (theMessage->eventID() == kStabilityEvent) {
     updateStability(theMessage->sender());
+    return;
+  }
+  if (theMessage->eventID() == kPreviewBlockedEvent) {
+    myIsPreviewBlocked = true;
+    return;
+  }
+  if (theMessage->eventID() == kPreviewRequestedEvent) {
+    if (myIsPreviewBlocked) {
+      myIsPreviewBlocked = false;
+      processFeatures();
+      myIsPreviewBlocked = true;
+    }
     return;
   }
   // creation is added to "update" to avoid recomputation twice: on create and immediately after on update
@@ -217,6 +237,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     }
   } else if (theMessage->eventID() == kOpFinishEvent || theMessage->eventID() == kOpAbortEvent ||
       theMessage->eventID() == kOpStartEvent) {
+    myIsPreviewBlocked = false;
 
     if (theMessage->eventID() == kOpFinishEvent) {
       myIsFinish = true;
@@ -260,7 +281,8 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
 
 void Model_Update::processFeatures()
 {
-  if (!myIsProcessed) { // perform update of everything if it is not performed right now
+   // perform update of everything if it is not performed right now or any preview is blocked
+  if (!myIsProcessed && !myIsPreviewBlocked) {
     myIsProcessed = true;
     #ifdef DEB_UPDATE
       std::cout<<"****** Start processing"<<std::endl;
