@@ -4,7 +4,11 @@
 
 #include <ParametersPlugin_Plugin.h>
 #include <ParametersPlugin_Parameter.h>
+#include <ParametersPlugin_ParametersMgr.h>
 #include <ParametersPlugin_Validators.h>
+#include <ParametersPlugin_WidgetCreator.h>
+
+#include <ModuleBase_WidgetCreatorFactory.h>
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -17,6 +21,10 @@ static ParametersPlugin_Plugin* MY_PARAMETERSPLUGIN_INSTANCE = new ParametersPlu
 ParametersPlugin_Plugin::ParametersPlugin_Plugin()
 {
   // register this plugin
+  WidgetCreatorFactoryPtr aWidgetCreatorFactory = ModuleBase_WidgetCreatorFactory::get();
+  aWidgetCreatorFactory->registerCreator(
+   std::shared_ptr<ParametersPlugin_WidgetCreator>(new ParametersPlugin_WidgetCreator()));
+
   SessionPtr aSession = ModelAPI_Session::get();
   aSession->registerPlugin(this);
 
@@ -34,6 +42,9 @@ FeaturePtr ParametersPlugin_Plugin::createFeature(std::string theFeatureID)
   // TODO: register some features
   if (theFeatureID == ParametersPlugin_Parameter::ID()) {
     return FeaturePtr(new ParametersPlugin_Parameter);
+  }
+  if (theFeatureID == ParametersPlugin_ParametersMgr::ID()) {
+    return FeaturePtr(new ParametersPlugin_ParametersMgr);
   }
   return FeaturePtr();
 }

@@ -28,6 +28,7 @@ struct MODULEBASE_EXPORT ModuleBase_ActionInfo
   bool checked; //!< action's checked state
   bool enabled; //!< action's enabled state
   bool visible; //!< action's visibility state
+  bool modal;   //!< = true if the acton is a modal dialog box else property panel (==false by default)
   QIcon icon; //!< action's icon
   QString text; //!< action's text
   QString iconText; //!< action's descriptive icon text

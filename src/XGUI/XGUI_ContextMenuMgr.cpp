@@ -11,6 +11,7 @@
 #include "XGUI_DataModel.h"
 #include "XGUI_OperationMgr.h"
 #include "XGUI_Tools.h"
+#include "XGUI_ActionsMgr.h"
 
 #ifndef HAVE_SALOME
 #include <AppElements_MainWindow.h>
@@ -28,6 +29,8 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
 
+#include <Config_DataModelReader.h>
+
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_OperationAction.h>
@@ -39,6 +42,7 @@
 #include <QMenu>
 #include <QMdiArea>
 #include <QMainWindow>
+#include <QModelIndex>
 
 
 XGUI_ContextMenuMgr::XGUI_ContextMenuMgr(XGUI_Workshop* theParent)
@@ -510,9 +514,11 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
       aActions.append(action("DELETE_CMD"));
   }
   theMenu->addActions(aActions);
+  addFeatures(theMenu);
 
-  theMenu->addSeparator();
-  theMenu->addActions(myWorkshop->objectBrowser()->actions());
+  // It is commented out because Object Browser does not have actions
+  //theMenu->addSeparator();
+  //theMenu->addActions(myWorkshop->objectBrowser()->actions());
 }
 
 void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
@@ -610,4 +616,49 @@ void XGUI_ContextMenuMgr::onRename()
   // restore selection in case if dialog box was shown
   myWorkshop->objectBrowser()->setObjectsSelected(anObjects);
   myWorkshop->objectBrowser()->onEditItem();
+}
+
+void XGUI_ContextMenuMgr::addFeatures(QMenu* theMenu) const
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aActiveDoc = aMgr->activeDocument();
+
+  XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
+  XGUI_ActionsMgr* aActionMgr = myWorkshop->actionsMgr();
+  const Config_DataModelReader* aDataModelXML = myWorkshop->dataModelXMLReader();
+  QModelIndexList aSelectedIndexes = aSelMgr->selection()->selectedIndexes();
+
+  QString aName;
+  int aLen = 0;
+  bool aIsRoot = false;
+  foreach(QModelIndex aIdx, aSelectedIndexes) {
+    // Process only first column
+    if (aIdx.column() == 0) {
+      aIsRoot = !aIdx.parent().isValid();
+      // Exit if the selected index belongs to non active document
+      if (aIsRoot && (aActiveDoc != aMgr->moduleDocument()))
+        return;
+      if ((!aIsRoot) && (aIdx.internalPointer() != aActiveDoc.get()))
+        return;
+      
+      // Get name of the selected index
+      aName = aIdx.data().toString();
+      aLen = aName.indexOf('(');
+      if (aLen != -1) {
+        aName = aName.left(--aLen);
+      }
+      std::string aFeaturesStr = aIsRoot? 
+        aDataModelXML->rootFolderFeatures(aName.toStdString()) :
+        aDataModelXML->subFolderFeatures(aName.toStdString());
+        if (aFeaturesStr.length() > 0) {
+          QStringList aFeturesList = 
+            QString(aFeaturesStr.c_str()).split(",", QString::SkipEmptyParts);
+          foreach(QString aFea, aFeturesList) {
+            QAction* aAction = aActionMgr->action(aFea);
+            if (aAction)
+              theMenu->addAction(aAction);
+          }
+        }
+    }
+  }
 }

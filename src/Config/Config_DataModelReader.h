@@ -58,6 +58,9 @@ class Config_DataModelReader : public Config_XMLReader
   /// \param theId id of the folder
   CONFIG_EXPORT bool rootShowEmpty(int theId) const { return myRootFolderShowEmpty[theId]; }
 
+  /// Returns list of features attached to folder with name theFolderName in sub-document
+  /// \param theFolderName a name of the folder
+  CONFIG_EXPORT std::string rootFolderFeatures(const std::string& theFolderName) const;
 
 
   // SUB folders propertiues ********************
@@ -87,6 +90,11 @@ class Config_DataModelReader : public Config_XMLReader
   /// \param theType type of objects in folder
   CONFIG_EXPORT int subFolderId(std::string theType) const;
 
+  /// Returns list of features attached to folder with name theFolderName in sub-document
+  /// \param theFolderName a name of the folder
+  CONFIG_EXPORT std::string subFolderFeatures(const std::string& theFolderName) const;
+
+
   /// Returns true if the sub-document data tree has to be attached to Part Result node
   /// Otherwise it has to be connected to Part feature node
   CONFIG_EXPORT bool isAttachToResult() const { return myIsResultLink; }
@@ -102,6 +110,7 @@ private:
   std::vector<std::string> myRootFolderNames;
   std::vector<std::string> myRootFolderTypes;
   std::vector<std::string> myRootFolderIcons;
+  std::vector<std::string> myRootFeaturesList;
   std::vector<bool> myRootFolderShowEmpty;
 
   std::string myRootTypes;
@@ -110,6 +119,7 @@ private:
   std::vector<std::string> mySubFolderNames;
   std::vector<std::string> mySubFolderTypes;
   std::vector<std::string> mySubFolderIcons;
+  std::vector<std::string> mySubFeaturesList;
   std::vector<bool> mySubFolderShowEmpty;
 
   bool myIsResultLink;

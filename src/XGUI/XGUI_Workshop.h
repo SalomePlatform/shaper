@@ -47,7 +47,7 @@ class QDockWidget;
 class QMainWindow;
 
 class QAction;
-
+class Config_DataModelReader;
 
 /**\class XGUI_Workshop
  * \ingroup GUI
@@ -287,6 +287,10 @@ Q_OBJECT
   /// Highlights result objects in Object Browser according to
   /// features found in the given list
   void highlightResults(const QObjectPtrList& theObjects);
+
+  /// Returns Data Model XML reader which contains information about 
+  /// Data structure configuration
+  const Config_DataModelReader* dataModelXMLReader() const { return myDataModelXMLReader; }
 
   /// A constant string used for "Move to end" command definition
   /// It is used for specific processing of Undo/Redo for this command.
@@ -537,6 +541,8 @@ private:
   QString myCurrentDir;
 
   int myViewerSelMode;
+
+  Config_DataModelReader* myDataModelXMLReader;
 };
 
 #endif

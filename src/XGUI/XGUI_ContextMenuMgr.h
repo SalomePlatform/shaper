@@ -95,6 +95,8 @@ signals:
    */
   void addAction(const QString& theId, QAction* theAction);
 
+  void addFeatures(QMenu* theMenu) const;
+
   /// Updates menu for object browser
   void updateObjectBrowserMenu();
 

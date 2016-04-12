@@ -130,6 +130,11 @@ bool Config_FeatureMessage::isAutoPreview() const
   return myIsAutoPreview;
 }
 
+bool Config_FeatureMessage::isModal() const
+{
+  return myModal;
+}
+
 void Config_FeatureMessage::setUseInput(bool isUseInput)
 {
   myUseInput = isUseInput;
@@ -138,6 +143,11 @@ void Config_FeatureMessage::setUseInput(bool isUseInput)
 void Config_FeatureMessage::setInternal(bool isInternal)
 {
   myInternal = isInternal;
+}
+
+void Config_FeatureMessage::setModal(bool isModal)
+{
+  myModal = isModal;
 }
 
 const std::string& Config_FeatureMessage::nestedFeatures() const

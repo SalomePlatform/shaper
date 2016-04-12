@@ -63,6 +63,7 @@ const static char* FEATURE_WHEN_NESTED = "when_nested";
 const static char* FEATURE_WHEN_NESTED_ACCEPT = "accept";
 const static char* FEATURE_WHEN_NESTED_ABORT = "abort";
 const static char* FEATURE_DOC = WORKBENCH_DOC;
+const static char* FEATURE_MODAL = "modal";
 const static char* FEATURE_AUTO_PREVIEW = "auto_preview";
 // NODE_VALIDATOR properties, NODE_SELFILTER properties
 const static char* _PARAMETERS = "parameters";
@@ -117,5 +118,6 @@ const static char* SUB_DOCUMENT = "sub_document";
 const static char* NODE_ICON = "icon";
 const static char* SHOW_EMPTY = "show_empty";
 const static char* LINK_ITEM = "from_result";
+const static char* FOLDER_FEATURES = "folder_features";
 
 #endif /* CONFIG_KEYWORDS_H_ */

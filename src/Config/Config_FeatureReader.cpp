@@ -120,6 +120,7 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   outFeatureMessage->setPluginLibrary(myLibraryName);
   outFeatureMessage->setNestedFeatures(getProperty(theFeatureNode, FEATURE_NESTED));
   outFeatureMessage->setActionsWhenNested(getNormalizedProperty(theFeatureNode, FEATURE_WHEN_NESTED));
+  outFeatureMessage->setModal(getBooleanAttribute(theFeatureNode, FEATURE_MODAL, false));
 
   bool isInternal = getBooleanAttribute(theFeatureNode, ATTR_INTERNAL, false);
   outFeatureMessage->setInternal(isInternal);
@@ -127,6 +128,7 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
     //Internal feature has no visual representation.
     return;
   }
+  
   outFeatureMessage->setText(getProperty(theFeatureNode, FEATURE_TEXT));
   outFeatureMessage->setTooltip(getProperty(theFeatureNode, FEATURE_TOOLTIP));
   outFeatureMessage->setIcon(getProperty(theFeatureNode, FEATURE_ICON));

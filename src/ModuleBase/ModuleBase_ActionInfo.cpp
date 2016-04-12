@@ -65,6 +65,8 @@ void ModuleBase_ActionInfo::initFrom(std::shared_ptr<Config_FeatureMessage> theM
   }
   // If feature requires PropertyPannel for input, it should be checkable
   checkable = theMessage->isUseInput();
+  // If Feature requires modal Dialog box for input
+  modal = theMessage->isModal();
 }
 
 QAction* ModuleBase_ActionInfo::makeAction(QObject* theParent)

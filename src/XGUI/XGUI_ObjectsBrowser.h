@@ -15,6 +15,7 @@
 
 class ModuleBase_IDocumentDataModel;
 class XGUI_DataModel;
+class Config_DataModelReader;
 
 /**
 * \ingroup GUI
@@ -179,6 +180,8 @@ Q_OBJECT
 
   /// Resets the object browser into initial state
   void clearContent();
+
+  void setXMLReader(Config_DataModelReader* theReader);
 
 public slots:
   //! Called on Edit command request

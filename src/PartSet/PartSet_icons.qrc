@@ -10,5 +10,7 @@
      <file>icons/hand_point.png</file>
      <file>icons/move_to_end.png</file>
      <file>icons/sketch_shape.png</file>
+     <file>icons/expression.png</file>
+     <file>icons/paper_roll.png</file>
  </qresource>
  </RCC>

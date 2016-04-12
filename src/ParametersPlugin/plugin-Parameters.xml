@@ -3,13 +3,17 @@
 <plugin>
   <workbench id="Part">
     <group id="Parameters">
-      <feature id="Parameter" title="Parameter" tooltip="Create a parameter" icon=":pictures/expression.png">
-        <stringvalue id="variable" label="Name" icon=":pictures/expression.png" placeholder="Please input the parameter name">
+      <feature id="Parameter" title="Parameter" tooltip="Create a parameter" icon=":icons/expression.png">
+        <stringvalue id="variable" label="Name" icon=":icons/expression.png" placeholder="Please input the parameter name">
           <validator id="Parameters_VariableValidator"/>
         </stringvalue>
         <expr_editor id="expression" placeholder="Please input the expression">
           <validator id="Parameters_ExpressionValidator"/>
         </expr_editor>
+      </feature>
+      
+      <feature id="ParametersMgr" title="Parameters" tooltip="Manage parameters" icon=":icons/paper_roll.png" modal="true">
+        <parameters-manager/>
       </feature>
     </group>
   </workbench>

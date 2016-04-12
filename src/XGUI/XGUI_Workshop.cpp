@@ -77,6 +77,7 @@
 #include <Config_PointerMessage.h>
 #include <Config_PropManager.h>
 #include <Config_SelectionFilterMessage.h>
+#include <Config_DataModelReader.h>
 
 #include <SUIT_ResourceMgr.h>
 
@@ -134,6 +135,9 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   else 
     QLocale::setDefault( QLocale::system() );
 #endif
+
+  myDataModelXMLReader = new Config_DataModelReader();
+  myDataModelXMLReader->readAll();
 
   myDisplayer = new XGUI_Displayer(this);
 
@@ -200,6 +204,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 XGUI_Workshop::~XGUI_Workshop(void)
 {
   delete myDisplayer;
+  delete myDataModelXMLReader;
 }
 
 //******************************************************
@@ -1078,6 +1083,7 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   aObjDock->setStyleSheet(
       "::title { position: relative; padding-left: 5px; text-align: left center }");
   myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
+  myObjectBrowser->setXMLReader(myDataModelXMLReader);
   myModule->customizeObjectBrowser(myObjectBrowser);
   aObjDock->setWidget(myObjectBrowser);
 

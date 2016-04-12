@@ -32,6 +32,7 @@ class Config_FeatureMessage : public Events_Message
 
   bool myUseInput;  ///<Action is being checked until user commit the operation
   bool myInternal;  ///<Internal feature without GUI representation
+  bool myModal;     ///<True if the feature has to be represented by modal dialog box
   bool myIsAutoPreview; ///< Preview computation is performed automatically
 
   std::string myNestedFeatures; ///<Space separated list of child features
@@ -83,6 +84,8 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT bool isUseInput() const;
   /// If true - feature will not be added into the workbench
   CONFIG_EXPORT bool isInternal() const;
+  /// If true - the feature will be represented by modal dialog box GUI
+  CONFIG_EXPORT bool isModal() const;
 
   /// If true - preview of the feature is done by any modification of the feature attributes
   CONFIG_EXPORT bool isAutoPreview() const;
@@ -115,6 +118,8 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT void setInternal(bool isInternal);
   ///Set auto preview state; If true - preview of the feature is computed automatically
   CONFIG_EXPORT void setAutoPreview(bool isAutoPreview);
+  ///Set modality state; If true - the feature will be represented by modal dialog box GUI
+  CONFIG_EXPORT void setModal(bool isModal);
 };
 
 #endif // CONFIG_MESSAGE_H

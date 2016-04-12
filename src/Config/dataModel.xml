@@ -1,12 +1,14 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 <data_model>
     <root_document group_type="Features">
-        <folder name="Parameters" group_type="Parameters" icon=":pictures/params_folder.png"/>
+        <folder name="Parameters" group_type="Parameters" icon=":pictures/params_folder.png"
+                folder_features="ParametersMgr"/>
         <folder name="Constructions" group_type="Construction" icon=":pictures/constr_folder.png"/>
         <folder name="Parts" group_type="Parts" icon=":pictures/constr_folder.png"/>
     </root_document>
     <sub_document group_type="Features" from_result="false">
-        <folder name="Parameters" group_type="Parameters" icon=":pictures/params_folder.png"/>
+        <folder name="Parameters" group_type="Parameters" icon=":pictures/params_folder.png"
+                folder_features="ParametersMgr"/>
         <folder name="Constructions" group_type="Construction" icon=":pictures/constr_folder.png"/>
         <folder name="Groups" group_type="Groups" icon=":pictures/constr_folder.png" show_empty="false"/>
         <folder name="Bodies" group_type="Bodies" icon=":pictures/constr_folder.png"/>

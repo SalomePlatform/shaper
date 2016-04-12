@@ -12,10 +12,11 @@
 #include <ModuleBase_Definitions.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Document.h>
-#include <Config_DataModelReader.h>
 #include <Events_Listener.h>
 
 #include <QAbstractItemModel>
+
+class Config_DataModelReader;
 
 /**\class XGUI_DataModel
  * \ingroup GUI
@@ -34,6 +35,9 @@ public:
   /// Constructor
   /// \param theParent a parent object
   XGUI_DataModel(QObject* theParent);
+
+  /// Destructor
+  virtual ~XGUI_DataModel();
 
   /// Event Listener method
   /// \param theMessage an event message
@@ -116,6 +120,9 @@ public:
   /// Returns last history object index
   virtual QModelIndex lastHistoryIndex() const;
 
+  /// Initialises XML data model reader. It must be initialised before DataModel using.
+  void setXMLReader(Config_DataModelReader* theReader) { myXMLReader = theReader; }
+
 private:
   /// Find a root index which contains objects of the given document
   /// \param theDoc the document object
@@ -145,7 +152,7 @@ private:
   /// \param fromRoot - root document flag
   QStringList listOfShowNotEmptyFolders(bool fromRoot = true) const;
 
-  Config_DataModelReader myXMLReader;
+  Config_DataModelReader* myXMLReader;
 };
 
 #endif
