@@ -549,7 +549,7 @@ void SHAPERGUI::setFeatureInfo(const QString& theFeatureId,
   myFeaturesInfo.insert(theFeatureId, theMessage);
 }
 
-const std::shared_ptr<Config_FeatureMessage>& SHAPERGUI::featureInfo(const QString& theFeatureId)
+std::shared_ptr<Config_FeatureMessage> SHAPERGUI::featureInfo(const QString& theFeatureId)
 {
   return myFeaturesInfo.contains(theFeatureId) ? myFeaturesInfo[theFeatureId] : NULL;
 }

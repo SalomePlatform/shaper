@@ -109,7 +109,7 @@ class XGUI_EXPORT XGUI_SalomeConnector
   //! Returns XML information for the feature kind
   //! \param theFeatureId a feature kind
   //! \return theMessage a container of the feature XML properties
-  virtual const std::shared_ptr<Config_FeatureMessage>& featureInfo(const QString& theFeatureId) = 0;
+  virtual std::shared_ptr<Config_FeatureMessage> featureInfo(const QString& theFeatureId) = 0;
 
   //! Returns interface to Salome viewer
   virtual ModuleBase_IViewer* viewer() const = 0;
