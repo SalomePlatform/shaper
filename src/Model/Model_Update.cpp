@@ -302,6 +302,18 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
       return false;
   }
 
+  if (myProcessed.find(theFeature) == myProcessed.end()) {
+    myProcessed[theFeature] = 0;
+  } else {
+    int aCount = myProcessed[theFeature];
+    if (aCount > 100) { // too many repetition of processing (in VS it may crash on 330 with stack overflow)
+      Events_Error::send(
+        "Feature '" + theFeature->data()->name() + "' is updtated in infinitive loop");
+      return false;
+    }
+    myProcessed[theFeature] = aCount + 1;
+  }
+
   // check this feature is not yet checked or processed
   bool aIsModified = myModified.find(theFeature) != myModified.end();
   if (!aIsModified && myIsFinish) { // get info about the modification for features without preview

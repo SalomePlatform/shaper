@@ -39,7 +39,8 @@ class Model_Update : public Events_Listener
   bool myIsProcessed;
   /// set that contains features that must be executed only on finish of the operation
   std::set<std::shared_ptr<ModelAPI_Feature> > myProcessOnFinish;
-
+  /// to avoid infinitive cycling: feature -> count of the processing periods during this update
+  std::map<std::shared_ptr<ModelAPI_Feature>, int > myProcessed;
 
  public:
   /// Is called only once, on startup of the application
