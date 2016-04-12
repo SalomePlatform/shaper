@@ -284,6 +284,7 @@ void Model_Update::processFeatures()
     #ifdef DEB_UPDATE
       std::cout<<"****** End processing"<<std::endl;
     #endif
+    myProcessed.clear();
   }
 }
 
