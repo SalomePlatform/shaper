@@ -74,7 +74,8 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
       return false;
   }
 
-  if (!theFeature->isPreviewNeeded() && !myIsFinish) {
+  // update arguments for "apply button" state change
+  if ((!theFeature->isPreviewNeeded() && !myIsFinish) || myIsPreviewBlocked) {
     myProcessOnFinish.insert(theFeature);
 #ifdef DEB_UPDATE
       std::cout<<"*** Add process on finish "<<theFeature->name()<<std::endl;
@@ -85,7 +86,8 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
       static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
       aFactory->validate(theFeature); // need to be validated to update the "Apply" state if not previewed
     }
-    return true;
+    if (!myIsPreviewBlocked)
+      return true;
   }
   if (myModified.find(theFeature) != myModified.end()) {
     if (theReason.get()) {
