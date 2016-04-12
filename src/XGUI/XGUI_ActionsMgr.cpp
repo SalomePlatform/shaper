@@ -61,7 +61,11 @@ void XGUI_ActionsMgr::addCommand(QAction* theCmd)
   myActions.insert(aId, theCmd);
 #ifdef HAVE_SALOME
     XGUI_Workshop* aWorkshop = static_cast<XGUI_Workshop*>(parent());
-    myNestedActions[aId] = aWorkshop->salomeConnector()->nestedActions(aId);
+    const std::shared_ptr<Config_FeatureMessage>& anInfo =
+                         aWorkshop->salomeConnector()->featureInfo(aId);
+    if (anInfo.get())
+      myNestedActions[aId] = QString::fromStdString(anInfo->nestedFeatures())
+                                   .split(" ", QString::SkipEmptyParts);
 #else
   AppElements_Command* aXCmd = dynamic_cast<AppElements_Command*>(theCmd);
   myNestedActions[aId] = aXCmd->nestedCommands();
@@ -244,7 +248,7 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId, QOb
       }
       break;
       case Preview: {
-        aResult = new QAction("See the preview", theParent);
+        aResult = new QAction("See preview", theParent);
         aResult->setToolTip("Compute preview");
       }
       break;
@@ -363,7 +367,8 @@ void XGUI_ActionsMgr::updateByDocumentKind()
 #ifdef HAVE_SALOME
     QString aId = eachAction->data().toString();
     if (!aId.isEmpty()) {
-      aCmdDocKind = aWorkshop->salomeConnector()->documentKind(aId);
+      aCmdDocKind = QString::fromStdString(
+                 aWorkshop->salomeConnector()->featureInfo(aId)->documentKind());
     }
 #else
     AppElements_Command* aCmd = dynamic_cast<AppElements_Command*>(eachAction);

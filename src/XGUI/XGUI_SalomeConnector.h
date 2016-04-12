@@ -11,6 +11,7 @@
 #include <ModuleBase_ActionInfo.h>
 
 class QMainWindow;
+class Config_FeatureMessage;
 class ModuleBase_IViewer;
 
 /**
@@ -99,21 +100,16 @@ class XGUI_EXPORT XGUI_SalomeConnector
   //! Returns list of Ids of defined actions (just by NewGeom module)
   virtual QStringList commandIdList() const = 0;
 
-  //! Set nested actions dependent on command Id
-  //! \param theId - the command ID
-  //! \param theActions - the list of nested actions
-  virtual void setNestedActions(const QString& theId, const QStringList& theActions) = 0;
+  //! Stores XML information for the feature kind
+  //! \param theFeatureId a feature kind
+  //! \param theMessage a container of the feature XML properties
+  virtual void setFeatureInfo(const QString& theFeatureId,
+                              const std::shared_ptr<Config_FeatureMessage>& theMessage) = 0;
 
-  //! Returns list of nested actions according to the given command ID
-  virtual QStringList nestedActions(const QString& theId) const = 0;
-
-  //! Set the document kind of the action by the given command Id
-  //! \param theId - the command ID
-  //! \param theKind - the document kind
-  virtual void setDocumentKind(const QString& theId, const QString& theKind) = 0;
-
-  //! Returns the document kind of the action by the given command ID
-  virtual QString documentKind(const QString& theId) const = 0;
+  //! Returns XML information for the feature kind
+  //! \param theFeatureId a feature kind
+  //! \return theMessage a container of the feature XML properties
+  virtual std::shared_ptr<Config_FeatureMessage> featureInfo(const QString& theFeatureId) = 0;
 
   //! Returns interface to Salome viewer
   virtual ModuleBase_IViewer* viewer() const = 0;

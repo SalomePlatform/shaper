@@ -92,21 +92,16 @@ Q_OBJECT
 
   virtual QAction* command(const QString& theId) const;
 
-  //! Set nested actions dependent on command Id
-  //! \param theId - the command ID
-  //! \param theActions - the list of nested actions
-  virtual void setNestedActions(const QString& theId, const QStringList& theActions);
+    //! Stores XML information for the feature kind
+  //! \param theFeatureId a feature kind
+  //! \param theMessage a container of the feature XML properties
+  virtual void setFeatureInfo(const QString& theFeatureId,
+                              const std::shared_ptr<Config_FeatureMessage>& theMessage);
 
-  //! Returns list of nested actions according to the given command ID
-  virtual QStringList nestedActions(const QString& theId) const;
-
-  //! Set the document kind of the action by the given command Id
-  //! \param theId - the command ID
-  //! \param theKind - the document kind
-  virtual void setDocumentKind(const QString& theId, const QString& theKind);
-
-  //! Returns the document kind of the action by the given command ID
-  virtual QString documentKind(const QString& theId) const;
+  //! Returns XML information for the feature kind
+  //! \param theFeatureId a feature kind
+  //! \return theMessage a container of the feature XML properties
+  virtual std::shared_ptr<Config_FeatureMessage> featureInfo(const QString& theFeatureId);
 
   //! Returns interface to Salome viewer
   virtual ModuleBase_IViewer* viewer() const
@@ -197,11 +192,8 @@ Q_OBJECT
   /// Proxy viewer for connection to OCC Viewer in SALOME
   SHAPERGUI_SalomeViewer* myProxyViewer;
 
-  /// Map of nested actions [ActionID: list of nested actions Id]
-  QMap<QString, QStringList> myNestedActions;
-
-  /// Map of document types
-  QMap<QString, QString> myDocumentType;
+  /// Map of feature kind to a container of XML properties for the feature
+  QMap<QString, std::shared_ptr<Config_FeatureMessage> > myFeaturesInfo;
 
   /// Flag of opened document state
   bool myIsOpened;
