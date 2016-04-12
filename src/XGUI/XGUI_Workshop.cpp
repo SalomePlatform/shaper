@@ -489,7 +489,7 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
 #else
   AppElements_MainMenu* aMenuBar = mainWindow()->menuObject();
   AppElements_Command* aCommand = aMenuBar->feature(aFeatureKind.c_str());
-  bool anIsAutoPreview = aCommand && aCommand->isAutoPreview();
+  bool anIsAutoPreview = aCommand && aCommand->featureMessage()->isAutoPreview();
 #endif
   if (!anIsAutoPreview) {
     myPropertyPanel->findButton(PROP_PANEL_PREVIEW)->setVisible(true);

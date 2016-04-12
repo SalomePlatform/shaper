@@ -367,7 +367,7 @@ void XGUI_ActionsMgr::updateByDocumentKind()
     }
 #else
     AppElements_Command* aCmd = dynamic_cast<AppElements_Command*>(eachAction);
-    aCmdDocKind = aCmd->documentKind();
+    aCmdDocKind = QString::fromStdString(aCmd->featureMessage()->documentKind());
 #endif
     if(!aCmdDocKind.isEmpty() && aCmdDocKind != aDocKind) {
       eachAction->setEnabled(false);

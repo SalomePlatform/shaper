@@ -536,11 +536,7 @@ void XGUI_WorkshopListener::addFeature(const std::shared_ptr<Config_FeatureMessa
   if(aHotKey != aFeatureInfo.shortcut) {
     aFeatureInfo.shortcut = aHotKey;
   }
-  // Create feature...
-  AppElements_Command* aCommand = aGroup->addFeature(aFeatureInfo,
-                                                      aDocKind,
-                                                      aNestedFeatures,
-                                                      theMessage->isAutoPreview());
+  AppElements_Command* aCommand = aGroup->addFeature(theMessage);
   // Enrich created button with accept/abort buttons if necessary
   AppElements_Button* aButton = aCommand->button();
   if (aButton->isColumnButton()) {
