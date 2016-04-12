@@ -32,6 +32,8 @@ class Config_FeatureMessage : public Events_Message
 
   bool myUseInput;  ///<Action is being checked until user commit the operation
   bool myInternal;  ///<Internal feature without GUI representation
+  bool myIsAutoPreview; ///< Preview computation is performed automatically
+
   std::string myNestedFeatures; ///<Space separated list of child features
   std::string myActionsWhenNested; ///<Space separated list of actions
 
@@ -82,6 +84,9 @@ class Config_FeatureMessage : public Events_Message
   /// If true - feature will not be added into the workbench
   CONFIG_EXPORT bool isInternal() const;
 
+  /// If true - preview of the feature is done by any modification of the feature attributes
+  CONFIG_EXPORT bool isAutoPreview() const;
+
   ///Set feature's Id
   CONFIG_EXPORT void setId(const std::string& id);
   ///Set feature's Icon
@@ -108,6 +113,8 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT void setUseInput(bool isUseInput);
   ///Set internal state; If true - feature will not be added into the workbench
   CONFIG_EXPORT void setInternal(bool isInternal);
+  ///Set auto preview state; If true - preview of the feature is computed automatically
+  CONFIG_EXPORT void setAutoPreview(bool isAutoPreview);
 };
 
 #endif // CONFIG_MESSAGE_H

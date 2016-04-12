@@ -453,6 +453,10 @@ private:
   /// the operation can be committed and do it if it returns true.
   void onAcceptActionClicked();
 
+  /// Called by Preview button clicked in the property panel. Sends signal to model to
+  /// compute preview.
+  void onPreivewActionClicked();
+
  private:
    /// Init menu
   void initMenu();

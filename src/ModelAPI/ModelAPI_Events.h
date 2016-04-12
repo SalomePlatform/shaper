@@ -50,6 +50,9 @@ static const char * EVENT_FEATURE_STATE_RESPONSE = "FeatureStateResponse";
 static const char * EVENT_UPDATE_VIEWER_BLOCKED = "UpdateViewerBlocked";
 static const char * EVENT_UPDATE_VIEWER_UNBLOCKED = "UpdateViewerUnblocked";
 
+static const char * EVENT_PREVIEW_BLOCKED = "PreviewBlocked";
+static const char * EVENT_PREVIEW_REQUESTED = "PreviewRequested";
+
 /// Event ID that solver has conflicting constraints (comes with ModelAPI_SolverFailedMessage)
 static const char * EVENT_SOLVER_FAILED = "SolverFailed";
 /// Event ID that the problem in solver disappeared

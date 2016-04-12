@@ -62,6 +62,7 @@ const static char* FEATURE_WHEN_NESTED = "when_nested";
 const static char* FEATURE_WHEN_NESTED_ACCEPT = "accept";
 const static char* FEATURE_WHEN_NESTED_ABORT = "abort";
 const static char* FEATURE_DOC = WORKBENCH_DOC;
+const static char* FEATURE_AUTO_PREVIEW = "auto_preview";
 // NODE_VALIDATOR properties, NODE_SELFILTER properties
 const static char* _PARAMETERS = "parameters";
 

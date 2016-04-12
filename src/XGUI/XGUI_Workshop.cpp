@@ -408,6 +408,14 @@ void XGUI_Workshop::onAcceptActionClicked()
 }
 
 //******************************************************
+void XGUI_Workshop::onPreivewActionClicked()
+{
+  std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
+                new Events_Message(Events_Loop::eventByName(EVENT_PREVIEW_REQUESTED)));
+  Events_Loop::loop()->send(aMsg);
+}
+
+//******************************************************
 void XGUI_Workshop::deactivateActiveObject(const ObjectPtr& theObject, const bool theUpdateViewer)
 {
   if (!myModule->canActivateSelection(theObject)) {
@@ -456,9 +464,10 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
 
   // check compatibility of feature and widgets
   FeaturePtr aFeature = aFOperation->feature();
+  std::string aFeatureKind = aFeature->getKind();
   foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
     if (!aWidget->attributeID().empty() && !aFeature->attribute(aWidget->attributeID()).get()) {
-      std::string anErrorMsg = "The feature '" + aFeature->getKind() + "' has no attribute '"
+      std::string anErrorMsg = "The feature '" + aFeatureKind + "' has no attribute '"
           + aWidget->attributeID() + "' used by widget '"
           + aWidget->metaObject()->className() + "'.";
       Events_Error::send(anErrorMsg);
@@ -466,15 +475,30 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
       return;
     }
   }
-
   foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
     bool isStoreValue = !aFOperation->isEditOperation() &&
                         !aWidget->getDefaultValue().empty() &&
                         !aWidget->isComputedDefault();
-    aWidget->setFeature(aFOperation->feature(), isStoreValue);
+    aWidget->setFeature(aFeature, isStoreValue);
     aWidget->enableFocusProcessing();
   }
 
+  // update visible state of Preview button
+#ifdef HAVE_SALOME
+  bool anIsAutoPreview = true;//mySalomeConnector->featureInfo(aFeatureKind)->isAutoPreview();
+#else
+  AppElements_MainMenu* aMenuBar = mainWindow()->menuObject();
+  AppElements_Command* aCommand = aMenuBar->feature(aFeatureKind.c_str());
+  bool anIsAutoPreview = aCommand && aCommand->isAutoPreview();
+#endif
+  if (!anIsAutoPreview) {
+    myPropertyPanel->findButton(PROP_PANEL_PREVIEW)->setVisible(true);
+    // send signal about preview should not be computed automatically, click on preview
+    // button should initiate it
+    std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
+                  new Events_Message(Events_Loop::eventByName(EVENT_PREVIEW_BLOCKED)));
+    Events_Loop::loop()->send(aMsg);
+  }
   myPropertyPanel->setModelWidgets(aWidgets);
   aFOperation->setPropertyPanel(myPropertyPanel);
 
@@ -1057,9 +1081,12 @@ void XGUI_Workshop::createDockWidgets()
 
   QAction* aCancelAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Abort);
   connect(aCancelAct, SIGNAL(triggered()), myOperationMgr, SLOT(onAbortOperation()));
+
+  QAction* aPreviewAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Preview);
+  connect(aPreviewAct, SIGNAL(triggered()), this, SLOT(onPreivewActionClicked()));
+
   connect(myPropertyPanel, SIGNAL(keyReleased(QObject*, QKeyEvent*)),
           myOperationMgr,  SLOT(onKeyReleased(QObject*, QKeyEvent*)));
-
   connect(myPropertyPanel, SIGNAL(enterClicked(QObject*)),
           myOperationMgr,  SLOT(onProcessEnter(QObject*)));
 }

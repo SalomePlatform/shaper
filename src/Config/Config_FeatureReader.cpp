@@ -139,4 +139,6 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
     aDocKind = restoreAttribute(NODE_WORKBENCH, WORKBENCH_DOC);
   }
   outFeatureMessage->setDocumentKind(aDocKind);
+  bool isAutoPreview = getBooleanAttribute(theFeatureNode, FEATURE_AUTO_PREVIEW, true);
+  outFeatureMessage->setAutoPreview(isAutoPreview);
 }

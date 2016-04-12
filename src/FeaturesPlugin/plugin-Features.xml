@@ -3,7 +3,7 @@
 <plugin>
   <workbench id="Features" document="Part">
     <group id="Extrusion">
-      <feature id="Extrusion" title="Extrusion" tooltip="Create a solid by extrusion of a face" icon=":icons/extrusion.png">
+      <feature id="Extrusion" title="Extrusion" tooltip="Create a solid by extrusion of a face" icon=":icons/extrusion.png" auto_preview="false">
           <source path="extrusion_widget.xml"/>
       </feature>
       <!--<feature id="ExtrusionSketch" title="ExtrusionSketch" tooltip="Create a solids by extrusion of a sketch" icon=":icons/extrusionsketch.png">

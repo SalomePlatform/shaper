@@ -46,9 +46,9 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* th
     myPanelPage(NULL),
     myOperationMgr(theMgr)
 {
-  this->setWindowTitle(tr("Property Panel"));
-  QAction* aViewAct = this->toggleViewAction();
-  this->setObjectName(PROP_PANEL);
+  setWindowTitle(tr("Property Panel"));
+  QAction* aViewAct = toggleViewAction();
+  setObjectName(PROP_PANEL);
   setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
 
   QWidget* aContent = new QWidget(this);
@@ -56,7 +56,7 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* th
   const int kPanelColumn = 0;
   int aPanelRow = 0;
   aMainLayout->setContentsMargins(3, 3, 3, 3);
-  this->setWidget(aContent);
+  setWidget(aContent);
 
   QFrame* aFrm = new QFrame(aContent);
   aFrm->setFrameStyle(QFrame::Raised);
@@ -81,7 +81,21 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* th
 
   myPanelPage = new ModuleBase_PageWidget(aContent);
   myPanelPage->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
-  aMainLayout->addWidget(myPanelPage, aPanelRow, kPanelColumn);
+  aMainLayout->addWidget(myPanelPage, aPanelRow++, kPanelColumn);
+
+  // spit to make the preview button on the bottom of the panel
+  aMainLayout->setRowStretch(aPanelRow++, 1);
+
+  // preview button on the bottom of panel
+  aFrm = new QFrame(aContent);
+  aBtnLay = new QHBoxLayout(aFrm);
+  aBtnLay->addStretch(1);
+  ModuleBase_Tools::zeroMargins(aBtnLay);
+  aMainLayout->addWidget(aFrm, aPanelRow++, kPanelColumn);
+
+  QToolButton* aBtn = new QToolButton(aFrm);
+  aBtn->setObjectName(PROP_PANEL_PREVIEW);
+  aBtnLay->addWidget(aBtn);
 }
 
 XGUI_PropertyPanel::~XGUI_PropertyPanel()
@@ -111,6 +125,8 @@ void XGUI_PropertyPanel::cleanContent()
   myWidgets.clear();
   myPanelPage->clearPage();
   myActiveWidget = NULL;
+
+  findButton(PROP_PANEL_PREVIEW)->setVisible(false); /// by default it is hidden
   setWindowTitle(tr("Property Panel"));
 }
 
@@ -240,11 +256,11 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
   // it should be performed before activateWidget(NULL) because it emits some signals which
   // can be processed by moudule for example as to activate another widget with setting focus
   QWidget* aNewFocusWidget = 0;
-  QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
+  QToolButton* anOkBtn = findButton(PROP_PANEL_OK);
   if (anOkBtn->isEnabled())
     aNewFocusWidget = anOkBtn;
   else {
-    QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
+    QToolButton* aCancelBtn = findButton(PROP_PANEL_CANCEL);
     if (aCancelBtn->isEnabled())
       aNewFocusWidget = aCancelBtn;
   }
@@ -333,11 +349,11 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
       if (theIsNext) {
         if (aFocusWidgetIndex == aChildrenCount-1) {
           // after the last widget focus should be set to "Apply"
-          QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
+          QToolButton* anOkBtn = findButton(PROP_PANEL_OK);
           if (anOkBtn->isEnabled())
             aNewFocusWidget = anOkBtn;
           else {
-            QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
+            QToolButton* aCancelBtn = findButton(PROP_PANEL_CANCEL);
             if (aCancelBtn->isEnabled())
               aNewFocusWidget = aCancelBtn;
           }
@@ -353,7 +369,7 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
         }
         else {
           // before the "Apply" button, the last should accept focus for consistency with "Next"
-          QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
+          QToolButton* anOkBtn = findButton(PROP_PANEL_OK);
           if (aFocusWidget == anOkBtn) {
             aNewFocusWidget = aChildren[aChildrenCount - 1];
           }
@@ -424,19 +440,19 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
 
 void XGUI_PropertyPanel::setFocusOnOkButton()
 {
-  QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
+  QToolButton* anOkBtn = findButton(PROP_PANEL_OK);
   ModuleBase_Tools::setFocus(anOkBtn, "XGUI_PropertyPanel::setFocusOnOkButton()");
 }
 
 void XGUI_PropertyPanel::setCancelEnabled(bool theEnabled)
 {
-  QToolButton* anCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
+  QToolButton* anCancelBtn = findButton(PROP_PANEL_CANCEL);
   anCancelBtn->setEnabled(theEnabled);
 }
 
 bool XGUI_PropertyPanel::isCancelEnabled() const
 {
-  QToolButton* anCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
+  QToolButton* anCancelBtn = findButton(PROP_PANEL_CANCEL);
   return anCancelBtn->isEnabled();
 }
 
@@ -451,11 +467,12 @@ void XGUI_PropertyPanel::setEditingMode(bool isEditing)
 void XGUI_PropertyPanel::setupActions(XGUI_ActionsMgr* theMgr)
 {
   QStringList aButtonNames;
-  aButtonNames << PROP_PANEL_OK << PROP_PANEL_CANCEL << PROP_PANEL_HELP;
+  aButtonNames << PROP_PANEL_OK << PROP_PANEL_CANCEL << PROP_PANEL_HELP << PROP_PANEL_PREVIEW;
   QList<XGUI_ActionsMgr::OperationStateActionId> aActionIds;
-  aActionIds << XGUI_ActionsMgr::Accept << XGUI_ActionsMgr::Abort << XGUI_ActionsMgr::Help;
+  aActionIds << XGUI_ActionsMgr::Accept << XGUI_ActionsMgr::Abort << XGUI_ActionsMgr::Help
+             << XGUI_ActionsMgr::Preview;
   for (int i = 0; i < aButtonNames.size(); ++i) {
-    QToolButton* aBtn = findChild<QToolButton*>(aButtonNames.at(i));
+    QToolButton* aBtn = findButton(aButtonNames.at(i).toStdString().c_str());
     QAction* anAct = theMgr->operationStateAction(aActionIds.at(i));
     aBtn->setDefaultAction(anAct);
   }
@@ -486,4 +503,9 @@ void XGUI_PropertyPanel::closeEvent(QCloseEvent* theEvent)
       theEvent->ignore();
   } else
     ModuleBase_IPropertyPanel::closeEvent(theEvent);
+}
+
+QToolButton* XGUI_PropertyPanel::findButton(const char* theInternalName) const
+{
+  return findChild<QToolButton*>(theInternalName);
 }

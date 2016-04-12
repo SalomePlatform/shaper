@@ -539,7 +539,8 @@ void XGUI_WorkshopListener::addFeature(const std::shared_ptr<Config_FeatureMessa
   // Create feature...
   AppElements_Command* aCommand = aGroup->addFeature(aFeatureInfo,
                                                       aDocKind,
-                                                      aNestedFeatures);
+                                                      aNestedFeatures,
+                                                      theMessage->isAutoPreview());
   // Enrich created button with accept/abort buttons if necessary
   AppElements_Button* aButton = aCommand->button();
   if (aButton->isColumnButton()) {

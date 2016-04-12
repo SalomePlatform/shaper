@@ -125,6 +125,11 @@ bool Config_FeatureMessage::isInternal() const
   return myInternal;
 }
 
+bool Config_FeatureMessage::isAutoPreview() const
+{
+  return myIsAutoPreview;
+}
+
 void Config_FeatureMessage::setUseInput(bool isUseInput)
 {
   myUseInput = isUseInput;
@@ -153,4 +158,9 @@ void Config_FeatureMessage::setNestedFeatures(const std::string& theNestedFeatur
 void Config_FeatureMessage::setActionsWhenNested(const std::string& theActions)
 {
   myActionsWhenNested = theActions;
+}
+
+void Config_FeatureMessage::setAutoPreview(bool isAutoPreview)
+{
+  myIsAutoPreview = isAutoPreview;
 }

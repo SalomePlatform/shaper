@@ -45,7 +45,8 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
     Accept = 1,
     Help = 2,
     AbortAll = 3,
-    AcceptAll = 4
+    AcceptAll = 4,
+    Preview = 5
   };
 
   //! Add a command in the manager.

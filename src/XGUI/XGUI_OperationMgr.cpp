@@ -619,7 +619,7 @@ bool XGUI_OperationMgr::onProcessEnter(QObject* theObject)
   bool isAborted = false;
   if (!anActiveWgt) {
     QWidget* aFocusWidget = aPanel->focusWidget();
-    QToolButton* aCancelBtn = aPanel->findChild<QToolButton*>(PROP_PANEL_CANCEL);
+    QToolButton* aCancelBtn = dynamic_cast<XGUI_PropertyPanel*>(aPanel)->findButton(PROP_PANEL_CANCEL);
     if (aFocusWidget && aCancelBtn && aFocusWidget == aCancelBtn) {
       abortOperation(aOperation);
       isAccepted = true;

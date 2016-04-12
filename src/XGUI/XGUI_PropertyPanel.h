@@ -20,6 +20,7 @@
 class XGUI_ActionsMgr;
 class QKeyEvent;
 class QGridLayout;
+class QToolButton;
 class ModuleBase_PageBase;
 class ModuleBase_PageWidget;
 class XGUI_OperationMgr;
@@ -35,6 +36,9 @@ const static char* PROP_PANEL_CANCEL = "property_panel_cancel";
 
 /// Internal name of Help button
 const static char* PROP_PANEL_HELP = "property_panel_help";
+
+/// Internal name of Preview button
+const static char* PROP_PANEL_PREVIEW = "property_panel_preview";
 
 /**
 * \ingroup GUI
@@ -105,6 +109,11 @@ Q_OBJECT
   /// Returns operation manager
   XGUI_OperationMgr* operationMgr() const { return myOperationMgr; }
 
+  /// Find under the panel a child button with the parameter name
+  /// \param theInternalName a button object name
+  /// \return button instance or NULL
+  QToolButton* findButton(const char* theInternalName) const;
+
 public slots:
   /// \brief Update all widgets in property panel with values from the given feature
   /// \param theFeature a Feature to update values in widgets
@@ -156,10 +165,9 @@ protected:
    /// \param theEvent a close event
    void closeEvent(QCloseEvent* theEvent);
 
-  /// A header widget
-  QWidget* myHeaderWidget;
+private:
+  QWidget* myHeaderWidget;  ///< A header widget
 
- private:
   ModuleBase_PageWidget* myPanelPage;
   QList<ModuleBase_ModelWidget*> myWidgets;
 

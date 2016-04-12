@@ -243,6 +243,11 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId, QOb
         aResult->setToolTip("Help");
       }
       break;
+      case Preview: {
+        aResult = new QAction("See the preview", theParent);
+        aResult->setToolTip("Compute preview");
+      }
+      break;
       default:
         break;
     }

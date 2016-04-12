@@ -415,7 +415,7 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
             }
             // if there is no the next widget to be automatically activated, the Ok button in property
             // panel should accept the focus(example is parallel constraint on sketch lines)
-            QToolButton* anOkBtn = aPanel->findChild<QToolButton*>(PROP_PANEL_OK);
+            QToolButton* anOkBtn = dynamic_cast<XGUI_PropertyPanel*>(aPanel)->findButton(PROP_PANEL_OK);
             if (anOkBtn)
               anOkBtn->setFocus(Qt::TabFocusReason);
           }
