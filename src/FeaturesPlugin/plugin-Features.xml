@@ -3,7 +3,7 @@
 <plugin>
   <workbench id="Features" document="Part">
     <group id="Extrusion">
-      <feature id="Extrusion" title="Extrusion" tooltip="Create a solid by extrusion of a face" icon=":icons/extrusion.png" auto_preview="false">
+      <feature id="Extrusion" title="Extrusion" tooltip="Create a solid by extrusion of a face" icon=":icons/extrusion.png">
           <source path="extrusion_widget.xml"/>
       </feature>
       <!--<feature id="ExtrusionSketch" title="ExtrusionSketch" tooltip="Create a solids by extrusion of a sketch" icon=":icons/extrusionsketch.png">
@@ -36,10 +36,12 @@
       </feature>
     </group>
     <group id="Boolean">
-      <feature id="Boolean" title="Boolean" tooltip="Perform boolean operations with solids" icon=":icons/cut.png">
+      <feature id="Boolean" title="Boolean" tooltip="Perform boolean operations with solids" icon=":icons/cut.png"
+               auto_preview="false">
           <source path="boolean_widget.xml"/>
       </feature>
-      <feature id="Partition" title="Partition" tooltip="Perform partition operations with solids" icon=":icons/partition.png">
+      <feature id="Partition" title="Partition" tooltip="Perform partition operations with solids" icon=":icons/partition.png"
+               auto_preview="false">
           <source path="partition_widget.xml"/>
       </feature>
       <feature id="Intersection" title="Intersection" tooltip="Intersect objects with tools" icon=":icons/intersection.png">

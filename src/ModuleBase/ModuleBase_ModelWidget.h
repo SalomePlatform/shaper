@@ -127,6 +127,10 @@ Q_OBJECT
   /// \return True in success
   bool restoreValue();
 
+  /// Saves the internal parameters to the given feature. Emits signals before and after store
+  /// \return True in success
+  bool storeValue();
+
   /// Set focus to the first control of the current widget. The focus policy of the control is checked.
   /// If the widget has the NonFocus focus policy, it is skipped.
   /// \return the state whether the widget can accept the focus
@@ -263,10 +267,6 @@ protected:
   /// or store the control value to the feature
   virtual void initializeValueByActivate();
 
-  /// Saves the internal parameters to the given feature. Emits signals before and after store
-  /// \return True in success
-  bool storeValue();
-
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const = 0;
@@ -321,8 +321,6 @@ private:
   bool myUseReset;
   /// blocked flag of modification of the value state
   bool myIsValueStateBlocked;
-
-  friend class ModuleBase_OperationFeature; // to call storeValue() by commit if value state is ModifiedInPP
 };
 
 #endif

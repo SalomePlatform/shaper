@@ -455,7 +455,7 @@ private:
 
   /// Called by Preview button clicked in the property panel. Sends signal to model to
   /// compute preview.
-  void onPreivewActionClicked();
+  void onPreviewActionClicked();
 
  private:
    /// Init menu

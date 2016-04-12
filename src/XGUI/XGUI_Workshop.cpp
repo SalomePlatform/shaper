@@ -68,6 +68,7 @@
 #include <ModuleBase_OperationAction.h>
 #include <ModuleBase_PagedContainer.h>
 #include <ModuleBase_WidgetValidated.h>
+#include <ModuleBase_ModelWidget.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -408,8 +409,15 @@ void XGUI_Workshop::onAcceptActionClicked()
 }
 
 //******************************************************
-void XGUI_Workshop::onPreivewActionClicked()
+void XGUI_Workshop::onPreviewActionClicked()
 {
+  ModuleBase_IPropertyPanel* aPanel = propertyPanel();
+  if (aPanel) {
+    ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
+    if (anActiveWidget && anActiveWidget->getValueState() == ModuleBase_ModelWidget::ModifiedInPP) {
+      anActiveWidget->storeValue();
+    }
+  }
   std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
                 new Events_Message(Events_Loop::eventByName(EVENT_PREVIEW_REQUESTED)));
   Events_Loop::loop()->send(aMsg);
@@ -1088,7 +1096,7 @@ void XGUI_Workshop::createDockWidgets()
   connect(aCancelAct, SIGNAL(triggered()), myOperationMgr, SLOT(onAbortOperation()));
 
   QAction* aPreviewAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Preview);
-  connect(aPreviewAct, SIGNAL(triggered()), this, SLOT(onPreivewActionClicked()));
+  connect(aPreviewAct, SIGNAL(triggered()), this, SLOT(onPreviewActionClicked()));
 
   connect(myPropertyPanel, SIGNAL(keyReleased(QObject*, QKeyEvent*)),
           myOperationMgr,  SLOT(onKeyReleased(QObject*, QKeyEvent*)));

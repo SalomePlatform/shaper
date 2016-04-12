@@ -551,7 +551,10 @@ void SHAPERGUI::setFeatureInfo(const QString& theFeatureId,
 
 std::shared_ptr<Config_FeatureMessage> SHAPERGUI::featureInfo(const QString& theFeatureId)
 {
-  return myFeaturesInfo.contains(theFeatureId) ? myFeaturesInfo[theFeatureId] : NULL;
+  std::shared_ptr<Config_FeatureMessage> aMessage;
+  if (myFeaturesInfo.contains(theFeatureId))
+    aMessage =  myFeaturesInfo[theFeatureId];
+  return aMessage;
 }
 
 //******************************************************
