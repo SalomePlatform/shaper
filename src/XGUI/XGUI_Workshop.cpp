@@ -485,7 +485,7 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
 
   // update visible state of Preview button
 #ifdef HAVE_SALOME
-  bool anIsAutoPreview = true;//mySalomeConnector->featureInfo(aFeatureKind)->isAutoPreview();
+  bool anIsAutoPreview = mySalomeConnector->featureInfo(aFeatureKind.c_str())->isAutoPreview();
 #else
   AppElements_MainMenu* aMenuBar = mainWindow()->menuObject();
   AppElements_Command* aCommand = aMenuBar->feature(aFeatureKind.c_str());
@@ -612,8 +612,13 @@ void XGUI_Workshop::setGrantedFeatures(ModuleBase_Operation* theOperation)
     return;
 
   QStringList aGrantedIds;
-  if (isSalomeMode())
-    aGrantedIds = mySalomeConnector->nestedActions(theOperation->id());
+  if (isSalomeMode()) {
+    const std::shared_ptr<Config_FeatureMessage>& anInfo =
+                         mySalomeConnector->featureInfo(theOperation->id());
+    if (anInfo.get())
+      aGrantedIds = QString::fromStdString(anInfo->nestedFeatures())
+                                   .split(" ", QString::SkipEmptyParts);
+  }
   else
     aGrantedIds = myActionsMgr->nestedCommands(theOperation->id());
 

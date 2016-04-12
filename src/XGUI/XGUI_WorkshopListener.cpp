@@ -483,7 +483,6 @@ void XGUI_WorkshopListener::addFeature(const std::shared_ptr<Config_FeatureMessa
   QString aWchName = QString::fromStdString(theMessage->workbenchId());
   QStringList aNestedFeatures =
       QString::fromStdString(theMessage->nestedFeatures()).split(" ", QString::SkipEmptyParts);
-  QString aDocKind = QString::fromStdString(theMessage->documentKind());
   QList<QAction*> aNestedActList;
   bool isColumnButton = !aNestedFeatures.isEmpty();
   if (isColumnButton) {
@@ -512,8 +511,7 @@ void XGUI_WorkshopListener::addFeature(const std::shared_ptr<Config_FeatureMessa
     aFeatureInfo.toolTip = aFeatureInfo.text;
     aAction = aSalomeConnector->addFeature(aWchName, aFeatureInfo);
   }
-  aSalomeConnector->setNestedActions(aFeatureInfo.id, aNestedFeatures);
-  aSalomeConnector->setDocumentKind(aFeatureInfo.id, aDocKind);
+  aSalomeConnector->setFeatureInfo(aFeatureInfo.id, theMessage);
 
   aWorkshop->actionsMgr()->addCommand(aAction);
   aWorkshop->module()->actionCreated(aAction);

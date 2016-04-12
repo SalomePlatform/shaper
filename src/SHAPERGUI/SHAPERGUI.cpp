@@ -543,33 +543,15 @@ QAction* SHAPERGUI::command(const QString& theId) const
   return 0;
 }
 
-//******************************************************
-void SHAPERGUI::setNestedActions(const QString& theId, const QStringList& theActions)
+void SHAPERGUI::setFeatureInfo(const QString& theFeatureId,
+                               const std::shared_ptr<Config_FeatureMessage>& theMessage)
 {
-  myNestedActions[theId] = theActions;
+  myFeaturesInfo.insert(theFeatureId, theMessage);
 }
 
-//******************************************************
-QStringList SHAPERGUI::nestedActions(const QString& theId) const
+const std::shared_ptr<Config_FeatureMessage>& SHAPERGUI::featureInfo(const QString& theFeatureId)
 {
-  if (myNestedActions.contains(theId))
-    return myNestedActions[theId];
-  return QStringList();
-}
-
-//******************************************************
-void SHAPERGUI::setDocumentKind(const QString& theId, const QString& theKind)
-{
-  myDocumentType[theId] = theKind;
-}
-
-//******************************************************
-QString SHAPERGUI::documentKind(const QString& theId) const
-{
-  if (myDocumentType.contains(theId))
-    return myDocumentType[theId];
-  return QString();
-
+  return myFeaturesInfo.contains(theFeatureId) ? myFeaturesInfo[theFeatureId] : NULL;
 }
 
 //******************************************************
