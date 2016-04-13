@@ -11,6 +11,7 @@
 
 #include <string>
 #include <list>
+#include <memory>
 
 class Config_FeatureMessage;
 
