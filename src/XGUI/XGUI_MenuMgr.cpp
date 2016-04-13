@@ -20,6 +20,8 @@
 #include <AppElements_MainWindow.h>
 #include <AppElements_MenuGroupPanel.h>
 #include <AppElements_Button.h>
+#else
+#include <XGUI_SalomeConnector.h>
 #endif
 
 #include <ModuleBase_IModule.h>
