@@ -4,28 +4,31 @@
 // Created:     3 August 2015
 // Author:      Dmitry Bobylev
 
-#include <GeomAlgoAPI_ShapeTools.h>
+#include "GeomAlgoAPI_ShapeTools.h"
 
-#include <GeomAlgoAPI_CompoundBuilder.h>
+#include "GeomAlgoAPI_SketchBuilder.h"
 
-#include <gp_Pln.hxx>
+#include <GeomAPI_Dir.h>
+#include <GeomAPI_PlanarEdges.h>
+#include <GeomAPI_Pnt.h>
 
 #include <Bnd_Box.hxx>
 #include <BOPTools.hxx>
+#include <BRep_Builder.hxx>
+#include <BRepAlgo_FaceRestrictor.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepGProp.hxx>
-#include <BRepTools.hxx>
 #include <BRep_Tool.hxx>
 #include <Geom_Plane.hxx>
 #include <GeomLib_IsPlanarSurface.hxx>
 #include <GeomLib_Tool.hxx>
+#include <gp_Pln.hxx>
 #include <GProp_GProps.hxx>
 #include <IntAna_IntConicQuad.hxx>
 #include <IntAna_Quadric.hxx>
 #include <NCollection_Vector.hxx>
 #include <ShapeAnalysis.hxx>
-#include <TCollection_AsciiString.hxx>
 #include <TopoDS_Builder.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Shape.hxx>
@@ -34,6 +37,9 @@
 #include <TopoDS.hxx>
 #include <TopExp_Explorer.hxx>
 
+
+void mapWireFaces(const TopoDS_Shape& theShape,
+                  BOPCol_IndexedDataMapOfShapeListOfShape& theMapWireFaces);
 
 //=================================================================================================
 double GeomAlgoAPI_ShapeTools::volume(const std::shared_ptr<GeomAPI_Shape> theShape)
@@ -332,4 +338,36 @@ void GeomAlgoAPI_ShapeTools::findBounds(const std::shared_ptr<GeomAPI_Shape> the
   aGeomV2->setImpl(new TopoDS_Vertex(aV2));
   theV1 = aGeomV1;
   theV2 = aGeomV2;
+}
+
+//=================================================================================================
+void GeomAlgoAPI_ShapeTools::makeFacesWithHoles(const std::shared_ptr<GeomAPI_Pnt> theOrigin,
+                                                const std::shared_ptr<GeomAPI_Dir> theDirection,
+                                                const ListOfShape& theWires,
+                                                ListOfShape& theFaces)
+{
+  BRepBuilderAPI_MakeFace aMKFace(gp_Pln(theOrigin->impl<gp_Pnt>(),
+                                         theDirection->impl<gp_Dir>()));
+  TopoDS_Face aFace = aMKFace.Face();
+
+  BRepAlgo_FaceRestrictor aFRestrictor;
+  aFRestrictor.Init(aFace);
+  for(ListOfShape::const_iterator anIt = theWires.cbegin();
+      anIt != theWires.cend();
+      ++anIt) {
+    TopoDS_Wire aWire = TopoDS::Wire((*anIt)->impl<TopoDS_Shape>());
+    aFRestrictor.Add(aWire);
+  }
+
+  aFRestrictor.Perform();
+
+  if(!aFRestrictor.IsDone()) {
+    return;
+  }
+
+  for(; aFRestrictor.More(); aFRestrictor.Next()) {
+    GeomShapePtr aShape(new GeomAPI_Shape());
+    aShape->setImpl(new TopoDS_Shape(aFRestrictor.Current()));
+    theFaces.push_back(aShape);
+  }
 }

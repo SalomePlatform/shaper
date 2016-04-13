@@ -9,9 +9,12 @@
 
 #include "GeomAlgoAPI.h"
 
-#include <GeomAPI_Pnt.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Vertex.h>
+
+class GeomAPI_Dir;
+class GeomAPI_PlanarEdges;
+class GeomAPI_Pnt;
 
 /// \class GeomAlgoAPI_ShapeTools
 /// \ingroup DataAlgo
@@ -20,18 +23,18 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_ShapeTools
 {
 public:
   /// \return the total volume of the solids of the current shape or 0.0 if it can be computed.
-  static double volume(const std::shared_ptr<GeomAPI_Shape> theShape);
+  static double volume(const GeomShapePtr theShape);
 
   /// \return the centre of mass of the current face. The coordinates returned for the center of mass
   /// are expressed in the absolute Cartesian coordinate system. (This function works only for surfaces).
-  static std::shared_ptr<GeomAPI_Pnt> centreOfMass(const std::shared_ptr<GeomAPI_Shape> theShape);
+  static std::shared_ptr<GeomAPI_Pnt> centreOfMass(const GeomShapePtr theShape);
 
   /// \brief Combines faces with common edges to shells, or solids to compsolids.
   /// \param[in] theCompound compound of shapes.
   /// \param[in] theType type of combine.
   /// \param[out] theCombinedShapes resulting shapes.
   /// \param[out] theFreeShapes shapes that does not have common subshapes.
-  static void combineShapes(const std::shared_ptr<GeomAPI_Shape> theCompound,
+  static void combineShapes(const GeomShapePtr theCompound,
                             const GeomAPI_Shape::ShapeType theType,
                             ListOfShape& theCombinedShapes,
                             ListOfShape& theFreeShapes);
@@ -43,14 +46,14 @@ public:
   static std::list<std::shared_ptr<GeomAPI_Pnt> > getBoundingBox(const ListOfShape& theShapes, const double theEnlarge = 0.0);
 
   /// \return infinite plane received from theFace plane.
-  static std::shared_ptr<GeomAPI_Shape> faceToInfinitePlane(const std::shared_ptr<GeomAPI_Shape> theFace);
+  static GeomShapePtr faceToInfinitePlane(const GeomShapePtr theFace);
 
   /// \brief Enlarges or reduces plane to fit bounding box.
   /// \return plane that fits to bounding box.
   /// \param[in] thePlane base plane.
   /// \param[in] thePoints bounding box points (shoud be eight).
-  static std::shared_ptr<GeomAPI_Shape> fitPlaneToBox(const std::shared_ptr<GeomAPI_Shape> thePlane,
-                                                      const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints);
+  static GeomShapePtr fitPlaneToBox(const GeomShapePtr thePlane,
+                                    const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints);
 
   /// \brief Finds the start and end vertices of theShape. theShape can be of the following type:\n
   /// Vertex: theV1 and theV2 are the same and equal to theShape;\n
@@ -58,10 +61,17 @@ public:
   /// Wire : theV1 is start vertex of the first edge, theV2 is end vertex of the last edge. If wire
   /// contains no edges theV1 and theV2 are nullified.\n
   /// If none of the above theV1 and theV2 are nullified.
-  static void findBounds(const std::shared_ptr<GeomAPI_Shape> theShape,
+  static void findBounds(const GeomShapePtr theShape,
                          std::shared_ptr<GeomAPI_Vertex>& theV1,
                          std::shared_ptr<GeomAPI_Vertex>& theV2);
 
+  /// \Creates faces with holes from wires.
+  /// \param[in] theWires base wires.
+  /// \param[out] theFaces resulting faces.
+  static void makeFacesWithHoles(const std::shared_ptr<GeomAPI_Pnt> theOrigin,
+                                 const std::shared_ptr<GeomAPI_Dir> theDirection,
+                                 const ListOfShape& theWires,
+                                 ListOfShape& theFaces);
 };
 
 #endif

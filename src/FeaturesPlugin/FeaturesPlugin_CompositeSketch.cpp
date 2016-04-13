@@ -17,8 +17,12 @@
 #include <GeomAlgoAPI_Prism.h>
 #include <GeomAlgoAPI_Revolution.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_SketchBuilder.h>
+
+#include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_ShapeExplorer.h>
 
+#include <map>
 #include <sstream>
 
 //=================================================================================================
@@ -111,6 +115,7 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
   theBaseShapesList.clear();
 
   ListOfShape aBaseFacesList;
+  std::map<ResultConstructionPtr, ListOfShape> aSketchWiresMap;
   AttributeSelectionListPtr aBaseObjectsSelectionList = selectionList(BASE_OBJECTS_ID());
   if(!aBaseObjectsSelectionList.get()) {
     setError("Error: Could not get base objects selection list.");
@@ -123,7 +128,7 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
   for(int anIndex = 0; anIndex < aBaseObjectsSelectionList->size(); anIndex++) {
     AttributeSelectionPtr aBaseObjectSelection = aBaseObjectsSelectionList->value(anIndex);
     if(!aBaseObjectSelection.get()) {
-      setError("Error: One of the selected base objects is empty.");
+      setError("Error: Selected base object is empty.");
       return;
     }
     GeomShapePtr aBaseShape = aBaseObjectSelection->value();
@@ -134,14 +139,24 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
         setError("Error: Selected shapes has unsupported type.");
         return;
       }
-      aST == GeomAPI_Shape::FACE ? aBaseFacesList.push_back(aBaseShape) :
-                                   theBaseShapesList.push_back(aBaseShape);
+      if(aST == GeomAPI_Shape::WIRE) {
+        ResultConstructionPtr aConstruction =
+          std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseObjectSelection->context());
+        if(aConstruction.get() && !aBaseShape->isEqual(aConstruction->shape())) {
+          // It is a wire on the sketch, store it to make face later.
+          aSketchWiresMap[aConstruction].push_back(aBaseShape);
+          continue;
+        }
+      } else {
+        aST == GeomAPI_Shape::FACE ? aBaseFacesList.push_back(aBaseShape) :
+                                     theBaseShapesList.push_back(aBaseShape);
+      }
     } else {
       // This may be the whole sketch result selected, check and get faces.
       ResultConstructionPtr aConstruction =
         std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseObjectSelection->context());
       if(!aConstruction.get()) {
-        setError("Error: One of selected sketches does not have results.");
+        setError("Error: Selected sketches does not have results.");
         return;
       }
       int aFacesNum = aConstruction->facesNum();
@@ -162,13 +177,27 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
         for(int aFaceIndex = 0; aFaceIndex < aFacesNum; aFaceIndex++) {
           GeomShapePtr aBaseFace = aConstruction->face(aFaceIndex);
           if(!aBaseFace.get() || aBaseFace->isNull()) {
-            setError("Error: One of the faces on selected sketch is Null.");
+            setError("Error: One of the faces on selected sketch is null.");
             return;
           }
           aBaseFacesList.push_back(aBaseFace);
         }
       }
     }
+  }
+
+  // Make faces from sketch wires.
+  for(std::map<ResultConstructionPtr, ListOfShape>::const_iterator anIt = aSketchWiresMap.cbegin();
+      anIt != aSketchWiresMap.cend(); ++anIt) {
+    const std::shared_ptr<GeomAPI_PlanarEdges> aSketchPlanarEdges =
+      std::dynamic_pointer_cast<GeomAPI_PlanarEdges>((*anIt).first->shape());
+    const ListOfShape& aWiresList = (*anIt).second;
+    ListOfShape aFaces;
+    GeomAlgoAPI_ShapeTools::makeFacesWithHoles(aSketchPlanarEdges->origin(),
+                                               aSketchPlanarEdges->norm(),
+                                               aWiresList,
+                                               aFaces);
+    aBaseFacesList.insert(aBaseFacesList.end(), aFaces.begin(), aFaces.end());
   }
 
   // Searching faces with common edges.
