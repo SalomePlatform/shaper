@@ -8,6 +8,8 @@
 #include <XGUI_Workshop.h>
 #include <XGUI_ActionsMgr.h>
 #include <XGUI_OperationMgr.h>
+#include <XGUI_MenuWorkbench.h>
+#include <XGUI_MenuGroup.h>
 
 #include <Events_Loop.h>
 #include <Config_FeatureMessage.h>
@@ -57,6 +59,15 @@ void XGUI_MenuMgr::addFeature(const std::shared_ptr<Config_FeatureMessage>& theM
     qDebug() << "XGUI_WorkshopListener::addFeature: NULL message.";
 #endif
     return;
+  }
+  {
+    std::string aWchName = theMessage->workbenchId();
+    std::shared_ptr<XGUI_MenuWorkbench> aWorkbench = findWorkbench(aWchName);
+
+    std::string aGroupName = theMessage->groupId();
+    std::shared_ptr<XGUI_MenuGroup> aGroup = aWorkbench->findGroup(aGroupName);
+
+    aGroup->setFeatureInfo(theMessage);
   }
 
   ActionInfo aFeatureInfo;
@@ -125,4 +136,21 @@ void XGUI_MenuMgr::addFeature(const std::shared_ptr<Config_FeatureMessage>& theM
   myWorkshop->actionsMgr()->addCommand(aCommand);
   myWorkshop->module()->actionCreated(aCommand);
 #endif
+}
+
+std::shared_ptr<XGUI_MenuWorkbench> XGUI_MenuMgr::findWorkbench(std::string& theWorkbenchName)
+{
+  std::list< std::shared_ptr<XGUI_MenuWorkbench> >::const_iterator anIt = myWorkbenches.begin(),
+                                                                   aLast = myWorkbenches.end();
+  std::shared_ptr<XGUI_MenuWorkbench> aResultWorkbench;
+  for (; anIt != aLast && !aResultWorkbench; anIt++) {
+    std::shared_ptr<XGUI_MenuWorkbench> aWorkbench = *anIt;
+    if (aWorkbench->getName() == theWorkbenchName)
+      aResultWorkbench = aWorkbench;
+  }
+  if (!aResultWorkbench) {
+    aResultWorkbench = std::shared_ptr<XGUI_MenuWorkbench>(new XGUI_MenuWorkbench(theWorkbenchName));
+    myWorkbenches.push_back(aResultWorkbench);
+  }
+  return aResultWorkbench;
 }

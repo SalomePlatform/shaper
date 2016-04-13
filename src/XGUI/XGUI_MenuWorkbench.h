@@ -9,6 +9,12 @@
 
 #include "XGUI.h"
 
+#include <string>
+#include <list>
+#include <memory>
+
+class XGUI_MenuGroup;
+
 /**
 * \ingroup GUI
 * A class for management of menu actions (features). The actions should be arranged like they are
@@ -19,9 +25,26 @@ class XGUI_EXPORT XGUI_MenuWorkbench
 {
  public:
   /// Constructor
-  XGUI_MenuWorkbench();
+  XGUI_MenuWorkbench(const std::string& theName);
   /// Destructor
   virtual ~XGUI_MenuWorkbench() {}
+
+  /// Returns a name of the workbench
+  /// \return workbench name
+  std::string getName() const { return myName; }
+
+  /// Finds or creates a group for the given name
+  /// \param theGroupName a name defined in XML
+  /// \return an instance of group
+  std::shared_ptr<XGUI_MenuGroup> findGroup(const std::string& theGroupName);
+
+  /// Returns container of existing groups
+  /// \returns list
+  const std::list<std::shared_ptr<XGUI_MenuGroup> >& groups() const;
+
+private:
+  std::string myName; /// a name of the workbench
+  std::list<std::shared_ptr<XGUI_MenuGroup> > myGroups; /// container of existing groups
 };
 
 #endif /* XGUI_MENUWORKBENCH_H_ */

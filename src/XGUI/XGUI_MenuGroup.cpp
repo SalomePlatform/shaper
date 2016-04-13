@@ -6,6 +6,17 @@
 
 #include <XGUI_MenuGroup.h>
 
-XGUI_MenuGroup::XGUI_MenuGroup()
+XGUI_MenuGroup::XGUI_MenuGroup(const std::string& theName)
+: myName(theName)
 {
+}
+
+void XGUI_MenuGroup::setFeatureInfo(const std::shared_ptr<Config_FeatureMessage>& theMessage)
+{
+  myFeatureInfo.push_back(theMessage);
+}
+
+const std::list<std::shared_ptr<Config_FeatureMessage> >& XGUI_MenuGroup::featureInfo() const
+{
+  return myFeatureInfo;
 }
