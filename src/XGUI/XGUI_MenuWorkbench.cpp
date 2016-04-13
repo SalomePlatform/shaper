@@ -17,7 +17,7 @@ std::shared_ptr<XGUI_MenuGroup> XGUI_MenuWorkbench::findGroup(const std::string&
 {
   std::list< std::shared_ptr<XGUI_MenuGroup> >::const_iterator anIt = myGroups.begin(),
                                                               aLast = myGroups.end();
-  std::shared_ptr<XGUI_MenuGroup> aResultGroup = 0;
+  std::shared_ptr<XGUI_MenuGroup> aResultGroup;
   for (; anIt != aLast && !aResultGroup; anIt++) {
     std::shared_ptr<XGUI_MenuGroup> aGroup = *anIt;
     if (aGroup->getName() == theGroupName)
