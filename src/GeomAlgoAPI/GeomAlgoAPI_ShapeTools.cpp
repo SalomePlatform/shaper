@@ -30,6 +30,7 @@
 #include <NCollection_Vector.hxx>
 #include <ShapeAnalysis.hxx>
 #include <TopoDS_Builder.hxx>
+#include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Shell.hxx>
@@ -351,7 +352,7 @@ void GeomAlgoAPI_ShapeTools::makeFacesWithHoles(const std::shared_ptr<GeomAPI_Pn
   TopoDS_Face aFace = aMKFace.Face();
 
   BRepAlgo_FaceRestrictor aFRestrictor;
-  aFRestrictor.Init(aFace);
+  aFRestrictor.Init(aFace, Standard_False, Standard_True);
   for(ListOfShape::const_iterator anIt = theWires.cbegin();
       anIt != theWires.cend();
       ++anIt) {
