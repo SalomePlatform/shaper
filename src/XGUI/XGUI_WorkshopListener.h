@@ -47,9 +47,6 @@ protected:
   /// Procedure to process postponed events
   bool event(QEvent * theEvent);
 
-   /// Process event "Add a feature"
-  void addFeature(const std::shared_ptr<Config_FeatureMessage>&);
-
   /// Process feature update message
   void onFeatureUpdatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
 

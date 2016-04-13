@@ -4,6 +4,7 @@
 #include "XGUI_Workshop.h"
 
 #include "XGUI_ActionsMgr.h"
+#include "XGUI_MenuMgr.h"
 #include "XGUI_ColorDialog.h"
 #include "XGUI_ContextMenuMgr.h"
 #include "XGUI_Displayer.h"
@@ -141,6 +142,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 
   myOperationMgr = new XGUI_OperationMgr(this, 0);
   myActionsMgr = new XGUI_ActionsMgr(this);
+  myMenuMgr = new XGUI_MenuMgr(this);
   myErrorDlg = new XGUI_ErrorDialog(QApplication::desktop());
   myContextMenuMgr = new XGUI_ContextMenuMgr(this);
   connect(myContextMenuMgr, SIGNAL(actionTriggered(const QString&, bool)), this,

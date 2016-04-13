@@ -14,6 +14,9 @@ SET(PROJECT_HEADERS
 	XGUI_ErrorDialog.h
 	XGUI_ErrorMgr.h
 	XGUI_HistoryMenu.h
+	XGUI_MenuGroup.h
+	XGUI_MenuMgr.h
+	XGUI_MenuWorkbench.h
 	XGUI_ModuleConnector.h
 	XGUI_ObjectsBrowser.h
 	XGUI_OperationMgr.h
@@ -42,6 +45,9 @@ SET(PROJECT_SOURCES
 	XGUI_ErrorDialog.cpp
 	XGUI_ErrorMgr.cpp
 	XGUI_HistoryMenu.cpp
+	XGUI_MenuGroup.cpp
+	XGUI_MenuMgr.cpp
+	XGUI_MenuWorkbench.cpp
 	XGUI_ModuleConnector.cpp
 	XGUI_ObjectsBrowser.cpp
 	XGUI_OperationMgr.cpp

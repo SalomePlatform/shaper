@@ -1,0 +1,42 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+// File:        XGUI_MenuMgr.hxx
+// Created:     13 Apr 2016
+// Author:      Natalia ERMOLAEVA
+
+#ifndef XGUI_MENUMGR_H_
+#define XGUI_MENUMGR_H_
+
+#include "XGUI.h"
+
+#include <Events_Listener.h>
+
+class XGUI_Workshop;
+class Config_FeatureMessage;
+
+/**
+* \ingroup GUI
+* A class for management of menu actions (features). The actions should be arranged like they are
+* in XML file. It listens the read feature of XML and fills internal structure of menu workbenches
+* and groups of feature. After, it creates menues and tools in the module.
+*/
+class XGUI_EXPORT XGUI_MenuMgr : public Events_Listener
+{
+ public:
+  /// Constructor
+  /// \param the current workshop
+  XGUI_MenuMgr(XGUI_Workshop* theWorkshop);
+  virtual ~XGUI_MenuMgr() {}
+
+  //! Redefinition of Events_Listener method
+  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
+
+protected:
+  /// Process event "Add a feature"
+  void addFeature(const std::shared_ptr<Config_FeatureMessage>& theMessage);
+
+private:
+  XGUI_Workshop* myWorkshop; /// the current workshop
+};
+
+#endif /* XGUI_MENUMGR_H_ */

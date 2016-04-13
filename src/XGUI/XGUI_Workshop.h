@@ -27,6 +27,7 @@ class XGUI_ContextMenuMgr;
 class XGUI_Displayer;
 class XGUI_ErrorDialog;
 class XGUI_ErrorMgr;
+class XGUI_MenuMgr;
 class XGUI_ModuleConnector;
 class XGUI_ObjectsBrowser;
 class XGUI_OperationMgr;
@@ -110,6 +111,12 @@ Q_OBJECT
   XGUI_ActionsMgr* actionsMgr() const
   {
     return myActionsMgr;
+  }
+
+  //! ! Returns an actions manager
+  XGUI_MenuMgr* menuMgr() const
+  {
+    return myMenuMgr;
   }
 
   //! Returns property panel widget
@@ -514,6 +521,7 @@ private:
   XGUI_Displayer* myDisplayer;
   XGUI_OperationMgr* myOperationMgr;  ///< manager to manipulate through the operations
   XGUI_ActionsMgr* myActionsMgr;
+  XGUI_MenuMgr* myMenuMgr; ///< manager to build menu/tool bar using order defined in XML
   XGUI_SalomeConnector* mySalomeConnector;
   XGUI_ErrorDialog* myErrorDlg;
   XGUI_ViewerProxy* myViewerProxy;
