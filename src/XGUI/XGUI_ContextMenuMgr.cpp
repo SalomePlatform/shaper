@@ -347,10 +347,6 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
   }
   if (myWorkshop->displayer()->objectsCount() > 0)
     action("HIDEALL_CMD")->setEnabled(true);
-  if (myWorkshop->canChangeColor())
-    action("COLOR_CMD")->setEnabled(true);
-
-  action("DELETE_CMD")->setEnabled(true);
 
   // Update selection menu
   QIntList aModes = aDisplayer->activeSelectionModes();
@@ -376,9 +372,15 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
     } else 
       action("SELECT_RESULT_CMD")->setChecked(true);
   }
+
   ModuleBase_IModule* aModule = myWorkshop->module();
   if (aModule)
     aModule->updateViewerMenu(myActions);
+
+  if (myWorkshop->canChangeColor())
+    action("COLOR_CMD")->setEnabled(true);
+
+  action("DELETE_CMD")->setEnabled(true);
 }
 
 void XGUI_ContextMenuMgr::connectObjectBrowser()
@@ -400,27 +402,28 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aSeparator->setSeparator(true);
 
   QActionsList aList;
-  
+
   // Result construction menu
   aList.append(action("SHOW_CMD"));
   aList.append(action("HIDE_CMD"));
   aList.append(action("SHOW_ONLY_CMD"));
-  aList.append(action("COLOR_CMD"));
   aList.append(mySeparator);
   aList.append(action("RENAME_CMD"));
+  aList.append(action("COLOR_CMD"));
   myObjBrowserMenus[ModelAPI_ResultConstruction::group()] = aList;
+
   //-------------------------------------
   // Result body menu
   aList.clear();
   aList.append(action("WIREFRAME_CMD"));
   aList.append(action("SHADING_CMD"));
-  aList.append(action("COLOR_CMD"));
   aList.append(mySeparator);
   aList.append(action("SHOW_CMD"));
   aList.append(action("HIDE_CMD"));
   aList.append(action("SHOW_ONLY_CMD"));
   aList.append(mySeparator);
   aList.append(action("RENAME_CMD"));
+  aList.append(action("COLOR_CMD"));
   myObjBrowserMenus[ModelAPI_ResultBody::group()] = aList;
   // Group menu
   myObjBrowserMenus[ModelAPI_ResultGroup::group()] = aList;
@@ -429,20 +432,20 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   //-------------------------------------
   // Feature menu
   aList.clear();
-  aList.append(action("DELETE_CMD"));
-  aList.append(action("MOVE_CMD"));
-  aList.append(action("CLEAN_HISTORY_CMD"));
+  aList.append(action("SHOW_RESULTS_CMD"));
   aList.append(mySeparator);
   aList.append(action("RENAME_CMD"));
+  aList.append(action("MOVE_CMD"));
   aList.append(mySeparator);
-  aList.append(action("SHOW_RESULTS_CMD"));
+  aList.append(action("CLEAN_HISTORY_CMD"));
+  aList.append(action("DELETE_CMD"));
   myObjBrowserMenus[ModelAPI_Feature::group()] = aList;
 
   aList.clear();
-  aList.append(action("DELETE_CMD"));
-  aList.append(action("CLEAN_HISTORY_CMD"));
-  aList.append(mySeparator);
   aList.append(action("RENAME_CMD"));
+  aList.append(mySeparator);
+  aList.append(action("CLEAN_HISTORY_CMD"));
+  aList.append(action("DELETE_CMD"));
   myObjBrowserMenus[ModelAPI_ResultParameter::group()] = aList;
   //-------------------------------------
 }
@@ -453,6 +456,7 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   // Result construction menu
   aList.append(action("HIDE_CMD"));
   aList.append(action("SHOW_ONLY_CMD"));
+  aList.append(mySeparator);
   aList.append(action("COLOR_CMD"));
   myViewerMenu[ModelAPI_ResultConstruction::group()] = aList;
   // Result part menu
@@ -462,20 +466,26 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   aList.clear();
   aList.append(action("WIREFRAME_CMD"));
   aList.append(action("SHADING_CMD"));
-  aList.append(action("COLOR_CMD"));
   aList.append(mySeparator);
   aList.append(action("HIDE_CMD"));
   aList.append(action("SHOW_ONLY_CMD"));
+  aList.append(mySeparator);
+  aList.append(action("COLOR_CMD"));
   myViewerMenu[ModelAPI_ResultBody::group()] = aList;
   // Group menu
   myViewerMenu[ModelAPI_ResultGroup::group()] = aList;
   //-------------------------------------
-
 }
 
 
 void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
 {
+  ModuleBase_IModule* aModule = myWorkshop->module();
+  if (aModule) {
+    theMenu->addSeparator();
+    aModule->addObjectBrowserMenu(theMenu);
+  }
+
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
   QObjectPtrList aObjects = aSelMgr->selection()->selectedObjects();
   int aSelected = aObjects.size();
@@ -486,25 +496,20 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
     if (myObjBrowserMenus.contains(aName))
       aActions = myObjBrowserMenus[aName];
   } else if (aSelected > 1) {
-      aActions.append(action("SHADING_CMD"));
       aActions.append(action("WIREFRAME_CMD"));
+      aActions.append(action("SHADING_CMD"));
       aActions.append(mySeparator);
       aActions.append(action("SHOW_CMD"));
       aActions.append(action("HIDE_CMD"));
       aActions.append(action("SHOW_ONLY_CMD"));
       aActions.append(mySeparator);
-      aActions.append(action("DELETE_CMD"));
       //aActions.append(action("MOVE_CMD"));
-      aActions.append(action("CLEAN_HISTORY_CMD"));
       aActions.append(action("COLOR_CMD"));
+      aActions.append(action("CLEAN_HISTORY_CMD"));
+      aActions.append(action("DELETE_CMD"));
   }
   theMenu->addActions(aActions);
 
-  ModuleBase_IModule* aModule = myWorkshop->module();
-  if (aModule) {
-    theMenu->addSeparator();
-    aModule->addObjectBrowserMenu(theMenu);
-  }
   theMenu->addSeparator();
   theMenu->addActions(myWorkshop->objectBrowser()->actions());
 }
