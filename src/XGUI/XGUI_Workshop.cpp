@@ -1002,7 +1002,9 @@ bool XGUI_Workshop::createModule()
   //  myModule, SLOT(onBeforeObjectErase(ObjectPtr, AISObjectPtr)));
 
   myModule->createFeatures();
+#ifdef HAVE_SALOME
   salomeConnector()->createFeatureActions();
+#endif
   //myActionsMgr->update();
   return true;
 }
