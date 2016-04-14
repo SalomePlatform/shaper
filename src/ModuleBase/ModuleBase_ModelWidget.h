@@ -180,7 +180,9 @@ Q_OBJECT
   /// Set feature which is processing by active operation
   /// \param theFeature a feature object
   /// \param theToStoreValue a value about necessity to store the widget value to the feature
-  void setFeature(const FeaturePtr& theFeature, const bool theToStoreValue = false);
+  /// \param isUpdateFlushed a flag if update should be flushed on store value
+  void setFeature(const FeaturePtr& theFeature, const bool theToStoreValue = false,
+                  const bool isUpdateFlushed = true);
 
   /// Editing mode depends on mode of current operation. This value is defined by it.
   virtual void setEditingMode(bool isEditing) { myIsEditing = isEditing; }
@@ -320,6 +322,8 @@ private:
   bool myUseReset;
   /// blocked flag of modification of the value state
   bool myIsValueStateBlocked;
+  /// do not flush updated signal
+  bool myFlushUpdateBlocked;
 };
 
 #endif

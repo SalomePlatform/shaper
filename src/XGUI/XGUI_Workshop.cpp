@@ -485,13 +485,16 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
       return;
     }
   }
+  // for performance purpose, flush should be done after all controls are filled
+  bool isUpdateFlushed = false;
   foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
     bool isStoreValue = !aFOperation->isEditOperation() &&
                         !aWidget->getDefaultValue().empty() &&
                         !aWidget->isComputedDefault();
-    aWidget->setFeature(aFeature, isStoreValue);
+    aWidget->setFeature(aFeature, isStoreValue, isUpdateFlushed);
     aWidget->enableFocusProcessing();
   }
+  ModuleBase_Tools::flushUpdated(aFeature);
 
   // update visible state of Preview button
 #ifdef HAVE_SALOME

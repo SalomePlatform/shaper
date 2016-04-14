@@ -32,6 +32,7 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
       myIsEditing(false),
       myState(Stored),
       myIsValueStateBlocked(false),
+      myFlushUpdateBlocked(false),
       myWidgetValidator(0)
 {
   myIsInternal = theData->getBooleanAttribute(ATTR_INTERNAL, false);
@@ -138,11 +139,16 @@ void ModuleBase_ModelWidget::setHighlighted(bool isHighlighted)
   }
 }
 
-void ModuleBase_ModelWidget::setFeature(const FeaturePtr& theFeature, const bool theToStoreValue)
+void ModuleBase_ModelWidget::setFeature(const FeaturePtr& theFeature, const bool theToStoreValue,
+                                        const bool isUpdateFlushed)
 {
+  /// it is possible to give this flag as parameter in storeValue/storeCustomValue
+  /// after debug, it may be corrected
+  myFlushUpdateBlocked = !isUpdateFlushed;
   myFeature = theFeature;
   if (theToStoreValue)
     storeValue();
+  myFlushUpdateBlocked = false;
 }
 
 bool ModuleBase_ModelWidget::focusTo()
@@ -287,8 +293,10 @@ bool ModuleBase_ModelWidget::restoreValue()
 
 void ModuleBase_ModelWidget::updateObject(ObjectPtr theObject)
 {
-  ModuleBase_Tools::flushUpdated(theObject);
-  emit objectUpdated();
+  if (!myFlushUpdateBlocked) {
+    ModuleBase_Tools::flushUpdated(theObject);
+    emit objectUpdated();
+  }
 }
 
 void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
