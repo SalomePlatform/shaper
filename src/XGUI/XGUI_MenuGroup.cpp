@@ -16,7 +16,7 @@ void XGUI_MenuGroup::setFeatureInfo(const std::shared_ptr<Config_FeatureMessage>
   myFeatureInfo.push_back(theMessage);
 }
 
-const std::list<std::shared_ptr<Config_FeatureMessage> >& XGUI_MenuGroup::featureInfo() const
+const std::list<std::shared_ptr<Config_FeatureMessage> >& XGUI_MenuGroup::featuresInfo() const
 {
   return myFeatureInfo;
 }

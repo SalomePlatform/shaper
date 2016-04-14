@@ -60,16 +60,11 @@ void XGUI_MenuMgr::addFeature(const std::shared_ptr<Config_FeatureMessage>& theM
 #endif
     return;
   }
-  {
-    std::string aWchName = theMessage->workbenchId();
-    std::shared_ptr<XGUI_MenuWorkbench> aWorkbench = findWorkbench(aWchName);
-
-    std::string aGroupName = theMessage->groupId();
-    std::shared_ptr<XGUI_MenuGroup> aGroup = aWorkbench->findGroup(aGroupName);
-
-    aGroup->setFeatureInfo(theMessage);
-  }
-
+#ifdef HAVE_SALOME
+  std::shared_ptr<XGUI_MenuWorkbench> aWorkbench = findWorkbench(theMessage->workbenchId());
+  std::shared_ptr<XGUI_MenuGroup> aGroup = aWorkbench->findGroup(theMessage->groupId());
+  aGroup->setFeatureInfo(theMessage);
+#else
   ActionInfo aFeatureInfo;
   aFeatureInfo.initFrom(theMessage);
 
@@ -94,21 +89,6 @@ void XGUI_MenuMgr::addFeature(const std::shared_ptr<Config_FeatureMessage>& theM
     }
   }
 
-#ifdef HAVE_SALOME
-  XGUI_SalomeConnector* aSalomeConnector = myWorkshop->salomeConnector();
-  QAction* aAction;
-  if (isColumnButton) {
-    aAction = aSalomeConnector->addFeatureOfNested(aWchName, aFeatureInfo, aNestedActList);
-  } else {
-    //Issue #650: in the SALOME mode the tooltip should be same as text
-    aFeatureInfo.toolTip = aFeatureInfo.text;
-    aAction = aSalomeConnector->addFeature(aWchName, aFeatureInfo);
-  }
-  aSalomeConnector->setFeatureInfo(aFeatureInfo.id, theMessage);
-
-  myWorkshop->actionsMgr()->addCommand(aAction);
-  myWorkshop->module()->actionCreated(aAction);
-#else 
   //Find or create Workbench
   AppElements_MainMenu* aMenuBar = myWorkshop->mainWindow()->menuObject();
   AppElements_Workbench* aPage = aMenuBar->findWorkbench(aWchName);
@@ -138,7 +118,7 @@ void XGUI_MenuMgr::addFeature(const std::shared_ptr<Config_FeatureMessage>& theM
 #endif
 }
 
-std::shared_ptr<XGUI_MenuWorkbench> XGUI_MenuMgr::findWorkbench(std::string& theWorkbenchName)
+std::shared_ptr<XGUI_MenuWorkbench> XGUI_MenuMgr::findWorkbench(const std::string& theWorkbenchName)
 {
   std::list< std::shared_ptr<XGUI_MenuWorkbench> >::const_iterator anIt = myWorkbenches.begin(),
                                                                    aLast = myWorkbenches.end();
@@ -153,4 +133,79 @@ std::shared_ptr<XGUI_MenuWorkbench> XGUI_MenuMgr::findWorkbench(std::string& the
     myWorkbenches.push_back(aResultWorkbench);
   }
   return aResultWorkbench;
+}
+
+void XGUI_MenuMgr::createFeatureActions()
+{
+#ifdef HAVE_SALOME
+  std::list< std::shared_ptr<XGUI_MenuWorkbench> >::const_iterator anIt = myWorkbenches.begin(),
+                                                                   aLast = myWorkbenches.end();
+  XGUI_SalomeConnector* aSalomeConnector = myWorkshop->salomeConnector();
+  for (; anIt != aLast; anIt++) {
+    std::shared_ptr<XGUI_MenuWorkbench> aWorkbench = *anIt;
+    std::string aWchName = aWorkbench->getName();
+    const std::list<std::shared_ptr<XGUI_MenuGroup> >& aGroups = aWorkbench->groups();
+    std::list<std::shared_ptr<XGUI_MenuGroup> >::const_iterator aGIt = aGroups.begin(),
+                                                                aGLast = aGroups.end();
+    for (; aGIt != aGLast; aGIt++) {
+      const std::shared_ptr<XGUI_MenuGroup> aGroup = *aGIt;
+      std::string aGName = aGroup->getName();
+      const std::list<std::shared_ptr<Config_FeatureMessage> >& aFeaturesInfo = aGroup->featuresInfo();
+      std::list<std::shared_ptr<Config_FeatureMessage> >::const_iterator aFIt = aFeaturesInfo.begin(),
+                                                                               aFLast = aFeaturesInfo.end();
+      int aFSize = aFeaturesInfo.size();
+      for(int i = 0; aFIt != aFLast; aFIt++, i++) {
+        std::shared_ptr<Config_FeatureMessage> aMessage = *aFIt;
+        bool aUseSeparator = i == aFSize-1;
+        QAction* aAction = buildAction(aMessage, aWchName, aUseSeparator);
+
+        aSalomeConnector->setFeatureInfo(QString::fromStdString(aMessage->id()), aMessage);
+        myWorkshop->actionsMgr()->addCommand(aAction);
+        myWorkshop->module()->actionCreated(aAction);
+      }
+    }
+  }
+#endif
+}
+
+QAction* XGUI_MenuMgr::buildAction(const std::shared_ptr<Config_FeatureMessage>& theMessage,
+                                   const std::string& theWchName, const bool aUseSeparator) const
+{
+  QAction* anAction;
+
+#ifdef HAVE_SALOME
+  XGUI_SalomeConnector* aSalomeConnector = myWorkshop->salomeConnector();
+
+  ActionInfo aFeatureInfo;
+  aFeatureInfo.initFrom(theMessage);
+  QStringList aNestedFeatures =
+      QString::fromStdString(theMessage->nestedFeatures()).split(" ", QString::SkipEmptyParts);
+  QList<QAction*> aNestedActList;
+  if (!aNestedFeatures.isEmpty()) {
+    QString aNestedActions = QString::fromStdString(theMessage->actionsWhenNested());
+    XGUI_OperationMgr* anOperationMgr = myWorkshop->operationMgr();
+    XGUI_ActionsMgr* anActionsMgr = myWorkshop->actionsMgr();
+    if (aNestedActions.contains(FEATURE_WHEN_NESTED_ACCEPT)) {
+      QAction* anAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
+      QObject::connect(anAction, SIGNAL(triggered()), anOperationMgr, SLOT(commitAllOperations()));
+      aNestedActList << anAction;
+    }
+    if (aNestedActions.contains(FEATURE_WHEN_NESTED_ABORT)) {
+      QAction* anAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AbortAll, NULL);
+      QObject::connect(anAction, SIGNAL(triggered()), anOperationMgr, SLOT(abortAllOperations()));
+      aNestedActList << anAction;
+    }
+    anAction = aSalomeConnector->addFeatureOfNested(theWchName.c_str(), aFeatureInfo,
+                                                    aNestedActList, false, true);
+    QAction* aMenuAction = aSalomeConnector->addFeature(theWchName.c_str(), aFeatureInfo,
+                                                    aUseSeparator, true, false);
+    myWorkshop->module()->actionCreated(aMenuAction);
+  }
+  else {
+    //Issue #650: in the SALOME mode the tooltip should be same as text
+    aFeatureInfo.toolTip = aFeatureInfo.text;
+    anAction = aSalomeConnector->addFeature(theWchName.c_str(), aFeatureInfo, aUseSeparator);
+  }
+#endif
+  return anAction;
 }

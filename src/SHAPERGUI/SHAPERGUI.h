@@ -52,11 +52,13 @@ Q_OBJECT
   virtual QAction* addFeature(const QString& theWBName, const QString& theId,
                               const QString& theTitle, const QString& theTip, const QIcon& theIcon,
                               const QKeySequence& theKeys = QKeySequence(),
-                              bool isCheckable = false);
+                              bool isCheckable = false, const bool isAddSeparator = false,
+                              bool isMenuAction = true, bool isToolAction = true);
 
   //! Add feature (QAction) in the \a theWBName toolbar with given \a theInfo about action
   virtual QAction* addFeature(const QString& theWBName,
-                              const ActionInfo& theInfo);
+                              const ActionInfo& theInfo, const bool isAddSeparator,
+                              bool isMenuAction = true, bool isToolAction = true);
 
   /// Add a nested feature
   /// \param theWBName a workbench name
@@ -64,7 +66,8 @@ Q_OBJECT
   /// \param theNestedActions a list of nested actions
   virtual QAction* addFeatureOfNested(const QString& theWBName,
                                     const ActionInfo& theInfo,
-                                    const QList<QAction*>& theNestedActions);
+                                    const QList<QAction*>& theNestedActions,
+                                    bool isMenuAction = true, bool isToolAction = true);
 
   //! Returns true if the feature action is a nested action, in other words,
   //! it is created by addNestedFeature().
@@ -85,7 +88,10 @@ Q_OBJECT
   /// \param theAction an ation to add
   /// \param theToolBarTitle a name of tool bar
   virtual bool addActionInToolbar( QAction* theAction, const QString& theToolBarTitle );
-    
+
+  /// Creates menu/tool bar actions for loaded features stored in the menu manager
+  virtual void createFeatureActions();
+
   virtual QMainWindow* desktop() const;
 
   virtual QString commandId(const QAction* theCmd) const;

@@ -38,7 +38,7 @@ class XGUI_EXPORT XGUI_MenuGroup
 
   /// Returns container of existing features
   /// \returns list
-  const std::list<std::shared_ptr<Config_FeatureMessage> >& featureInfo() const;
+  const std::list<std::shared_ptr<Config_FeatureMessage> >& featuresInfo() const;
 
 private:
   std::string myName; /// a name of the workbench

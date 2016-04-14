@@ -327,8 +327,8 @@ protected slots:
   /// Called on selection changed event
   virtual void onSelectionChanged() {}
 
- protected:
-  /// Register validators for this module
+protected:
+ /// Register validators for this module
   virtual void registerValidators() {}
 
   /// Register selection filters for this module

@@ -19,6 +19,8 @@ class XGUI_MenuWorkbench;
 class XGUI_Workshop;
 class Config_FeatureMessage;
 
+class QAction;
+
 /**
 * \ingroup GUI
 * A class for management of menu actions (features). The actions should be arranged like they are
@@ -33,6 +35,8 @@ class XGUI_MenuMgr : public Events_Listener
   XGUI_EXPORT XGUI_MenuMgr(XGUI_Workshop* theWorkshop);
   XGUI_EXPORT virtual ~XGUI_MenuMgr() {}
 
+  XGUI_EXPORT void createFeatureActions();
+
   /// Redefinition of Events_Listener method
   XGUI_EXPORT virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
@@ -43,7 +47,15 @@ protected:
   /// Finds or creates a workbench for the given name
   /// \param theWorkbenchName a name defined in XML
   /// \return an instance of workbench
-  std::shared_ptr<XGUI_MenuWorkbench> findWorkbench(std::string& theWorkbenchName);
+  std::shared_ptr<XGUI_MenuWorkbench> findWorkbench(const std::string& theWorkbenchName);
+
+  /// Creates a new action by the message
+  /// \param theMessage an XML information of the feature
+  /// \param theWchName a workbench name, will be used as menu/tool bar name
+  /// \param aUseSeparator boolean value if a separator should be added after the action
+  /// \return an action
+  QAction* buildAction(const std::shared_ptr<Config_FeatureMessage>& theMessage,
+                       const std::string& theWchName, const bool aUseSeparator) const;
 
 private:
   XGUI_Workshop* myWorkshop; /// the current workshop
