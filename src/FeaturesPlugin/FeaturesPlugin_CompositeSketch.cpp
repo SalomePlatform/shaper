@@ -279,8 +279,12 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
       ListOfShape aV1History, aV2History;
       theMakeShape->generated(aV1, aV1History);
       theMakeShape->generated(aV2, aV2History);
-      theResultBody->generated(aV1, aV1History.front(), aGenName + "Edge_1", theTag++);
-      theResultBody->generated(aV2, aV2History.front(), aGenName + "Edge_2", theTag++);
+      if(!aV1History.empty()) {
+        theResultBody->generated(aV1, aV1History.front(), aGenName + "Edge_1", theTag++);
+      }
+      if(!aV2History.empty()) {
+        theResultBody->generated(aV2, aV2History.front(), aGenName + "Edge_2", theTag++);
+      }
     }
     case GeomAPI_Shape::FACE:
     case GeomAPI_Shape::SHELL: {
