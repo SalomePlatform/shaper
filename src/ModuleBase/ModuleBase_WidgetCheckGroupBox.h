@@ -62,7 +62,7 @@ protected:
   /// Methods to be redefined from ModuleBase_ModelWidget: start
   /// Saves the internal parameters to the given feature
   /// \return True in success
-  virtual bool storeValueCustom() const;
+  virtual bool storeValueCustom();
   /// Restore value from attribute data to the widget's control
   virtual bool restoreValueCustom();
   /// Methods to be redefined from ModuleBase_ModelWidget: end

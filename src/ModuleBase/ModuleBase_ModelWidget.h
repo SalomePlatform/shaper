@@ -196,15 +196,11 @@ Q_OBJECT
 
   /// Sends Update and Redisplay for the given object
   /// \param theObj is updating object
-  static void updateObject(ObjectPtr theObj);
+  void updateObject(ObjectPtr theObj);
 
   /// Sends Move event for the given object
   /// \param theObj is object for moving
   static void moveObject(ObjectPtr theObj);
-
-  /// Sends a message about block/unblock viewer updating
-  /// \param theValue a boolean value
-  static void blockUpdateViewer(const bool theValue);
 
 signals:
   /// The signal about widget values are to be changed
@@ -241,6 +237,9 @@ signals:
   /// The signal about value state modification
   void valueStateChanged(int theState);
 
+  /// The signal is emitted after flush of updates singal for the widget
+  void objectUpdated();
+
 protected:
   /// Sets default value of widget. Normally, widget should fetch this value
   /// from the xml. However, some widgets derived widgets could define it
@@ -269,7 +268,7 @@ protected:
 
   /// Saves the internal parameters to the given feature
   /// \return True in success
-  virtual bool storeValueCustom() const = 0;
+  virtual bool storeValueCustom() = 0;
 
   /// Restore value from attribute data to the widget's control
   virtual bool restoreValueCustom() = 0;

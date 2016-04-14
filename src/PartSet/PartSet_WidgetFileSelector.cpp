@@ -34,7 +34,7 @@ bool PartSet_WidgetFileSelector::restoreValueCustom()
   return ModuleBase_WidgetFileSelector::restoreValueCustom();
 }
 
-bool PartSet_WidgetFileSelector::storeValueCustom() const
+bool PartSet_WidgetFileSelector::storeValueCustom()
 {
   // A rare case when plugin was not loaded.
   if (!myFeature)

@@ -38,6 +38,11 @@ public:
   /// \return boolean value
   static bool hasVisualizedBodies(ModuleBase_IWorkshop* theWorkshop);
 
+  /// Returns true if there is at least one Sketch visualized in the viewer
+  /// \param theWorkshop the application workshop
+  /// \return boolean value
+  static bool hasVisualizedSketch(ModuleBase_IWorkshop* theWorkshop);
+
   /// Returns if the preview was displayed
   /// \param theWorkshop the application workshop
   /// \return boolean value

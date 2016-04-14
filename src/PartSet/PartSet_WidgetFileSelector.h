@@ -37,7 +37,7 @@ public:
 
 protected:
   /// Reimplemented from ModuleBase_WidgetFileSelector::storeValueCustom()
-  virtual bool storeValueCustom() const;
+  virtual bool storeValueCustom();
 
   /// Reimplemented from ModuleBase_WidgetFileSelector::restoreValue()
   virtual bool restoreValueCustom();

@@ -93,7 +93,7 @@ void ModuleBase_PagedContainer::activateCustom()
   focusTo();
 }
 
-bool ModuleBase_PagedContainer::storeValueCustom() const
+bool ModuleBase_PagedContainer::storeValueCustom()
 {
   // A rare case when plugin was not loaded.
   if(!myFeature)

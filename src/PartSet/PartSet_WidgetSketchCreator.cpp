@@ -99,7 +99,7 @@ bool PartSet_WidgetSketchCreator::restoreValueCustom()
   return true;
 }
 
-bool PartSet_WidgetSketchCreator::storeValueCustom() const
+bool PartSet_WidgetSketchCreator::storeValueCustom()
 {
   return true;
 }
@@ -195,7 +195,8 @@ void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelec
 
   if (theSelectionControl) {
     bool aBodyIsVisualized = myPreviewPlanes->hasVisualizedBodies(myWorkshop);
-    if (!aBodyIsVisualized) {
+    bool aSketchIsVisualized = myPreviewPlanes->hasVisualizedSketch(myWorkshop);
+    if (!aBodyIsVisualized && !aSketchIsVisualized) {
       // We have to select a plane before any operation
       myPreviewPlanes->showPreviewPlanes(myWorkshop);
     }

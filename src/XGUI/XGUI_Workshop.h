@@ -341,6 +341,9 @@ signals:
   /// differs in the new state of paged container
   void onValuesChanged();
 
+  /// Listens the corresponded signal of model widget and updates Apply button state by feature
+  void onWidgetObjectUpdated();
+
   /// Show property panel
   void showPropertyPanel();
 

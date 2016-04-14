@@ -17,6 +17,9 @@
 #include <ModuleBase_ModelWidget.h>
 #include <ModuleBase_OperationFeature.h>
 
+#include <ModuleBase_Tools.h>
+#include <QDebug>
+
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -32,6 +35,7 @@
 
 const QString INVALID_VALUE = "invalid_action";
 
+//#define DEBUG_ERROR_STATE
 
 XGUI_ErrorMgr::XGUI_ErrorMgr(QObject* theParent, ModuleBase_IWorkshop* theWorkshop)
   : ModuleBase_IErrorMgr(theParent),
@@ -78,6 +82,15 @@ void XGUI_ErrorMgr::updateActions(const FeaturePtr& theFeature)
     }
     updateActionState(anOkAction, anError);
     updateToolTip(anActiveWidget, aWidgetError);
+
+#ifdef DEBUG_ERROR_STATE
+    QString anInfo = ModuleBase_Tools::objectInfo(theFeature);
+
+    QString aResultInfo = QString("valid = %1, anError = %2, aWidgetError = %3")
+                          .arg(anError.isEmpty()).arg(anError).arg(aWidgetError);
+    qDebug(QString("XGUI_ErrorMgr::updateActions for %1, result: %2").arg(anInfo)
+                  .arg(aResultInfo).toStdString().c_str());
+#endif
   }
 }
 

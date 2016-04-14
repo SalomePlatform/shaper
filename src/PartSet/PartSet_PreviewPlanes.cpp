@@ -42,6 +42,25 @@ bool PartSet_PreviewPlanes::hasVisualizedBodies(ModuleBase_IWorkshop* theWorksho
   return aBodyIsVisualized;
 }
 
+bool PartSet_PreviewPlanes::hasVisualizedSketch(ModuleBase_IWorkshop* theWorkshop)
+{
+  bool aSketchIsVisualized = false;
+
+  XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(theWorkshop);
+  XGUI_Displayer* aDisp = aWorkshop->displayer();
+  QObjectPtrList aDisplayed = aDisp->displayedObjects();
+  foreach (ObjectPtr anObj, aDisplayed) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+    if (aResult.get() != NULL) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aResult);
+      aSketchIsVisualized = aFeature.get() && aFeature->getKind() == SketchPlugin_Sketch::ID();
+      if (aSketchIsVisualized)
+        break;
+    }
+  }
+  return aSketchIsVisualized;
+}
+
 void PartSet_PreviewPlanes::erasePreviewPlanes(ModuleBase_IWorkshop* theWorkshop)
 {
   if (myPreviewDisplayed) {

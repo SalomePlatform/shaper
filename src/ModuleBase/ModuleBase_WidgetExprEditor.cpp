@@ -248,7 +248,7 @@ void ModuleBase_WidgetExprEditor::initializeValueByActivate()
 {
 }
 
-bool ModuleBase_WidgetExprEditor::storeValueCustom() const
+bool ModuleBase_WidgetExprEditor::storeValueCustom()
 {
   // A rare case when plugin was not loaded. 
   if(!myFeature)

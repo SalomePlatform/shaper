@@ -81,7 +81,7 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* th
 
   myPanelPage = new ModuleBase_PageWidget(aContent);
   myPanelPage->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
-  aMainLayout->addWidget(myPanelPage, aPanelRow++, kPanelColumn);
+  aMainLayout->addWidget(myPanelPage, aPanelRow, kPanelColumn);
 
   // spit to make the preview button on the bottom of the panel
   aMainLayout->setRowStretch(aPanelRow++, 1);

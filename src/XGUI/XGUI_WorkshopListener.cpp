@@ -90,7 +90,6 @@ void XGUI_WorkshopListener::initializeEventListening()
   aLoop->registerListener(this, Events_LongOp::eventID());
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_PLUGIN_LOADED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SELFILTER_LOADED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_ERROR_CHANGED));
 
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED));
@@ -180,25 +179,6 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     // the viewer's update context is unblocked, the viewer's update works
     XGUI_Displayer* aDisplayer = workshop()->displayer();
     aDisplayer->enableUpdateViewer(true);
-  } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_OBJECT_ERROR_CHANGED)) {
-    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
-        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
-    std::set<ObjectPtr> anObjects = aUpdMsg->objects();
-
-    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                              (workshop()->operationMgr()->currentOperation());
-    bool aFeatureChanged = false;
-    if(aFOperation ) {
-      FeaturePtr aFeature = aFOperation->feature();
-      if (aFeature.get()) {
-        std::set<ObjectPtr>::const_iterator aIt;
-        for (aIt = anObjects.begin(); aIt != anObjects.end() && !aFeatureChanged; ++aIt) {
-          aFeatureChanged = ModelAPI_Feature::feature(*aIt) == aFeature;
-        }
-      }
-      if (aFeatureChanged)
-        workshop()->operationMgr()->onValidateOperation();
-    }
   } else {
     //Show error dialog if error message received.
     std::shared_ptr<Events_Error> anAppError = std::dynamic_pointer_cast<Events_Error>(theMessage);

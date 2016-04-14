@@ -105,7 +105,7 @@ protected:
 
   /// Saves the internal parameters to the given feature
   /// \return True in success
-  virtual bool storeValueCustom() const;
+  virtual bool storeValueCustom();
 
   virtual bool restoreValueCustom();
 

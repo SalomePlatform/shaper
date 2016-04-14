@@ -53,6 +53,7 @@
 
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_Tools.h>
 
 #include <V3d_View.hxx>
 #include <gp_Pln.hxx>
@@ -304,7 +305,7 @@ std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findFirstEqualPointInArgumen
 
   // may be feature is not updated yet, execute is not performed and references features
   // are not created. Case: rectangle macro feature
-  ModuleBase_ModelWidget::updateObject(theFeature);
+  ModuleBase_Tools::flushUpdated(theFeature);
 
   std::list<AttributePtr> anAttributes = theFeature->data()->attributes(
                                           ModelAPI_AttributeRefList::typeId());

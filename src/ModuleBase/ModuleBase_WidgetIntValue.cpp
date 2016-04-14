@@ -110,7 +110,7 @@ bool ModuleBase_WidgetIntValue::resetCustom()
   return aDone;
 }
 
-bool ModuleBase_WidgetIntValue::storeValueCustom() const
+bool ModuleBase_WidgetIntValue::storeValueCustom()
 {
   DataPtr aData = myFeature->data();
   AttributeIntegerPtr anAttribute = aData->integer(attributeID());

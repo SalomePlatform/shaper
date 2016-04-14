@@ -179,7 +179,7 @@ void ModuleBase_WidgetMultiSelector::deactivate()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetMultiSelector::storeValueCustom() const
+bool ModuleBase_WidgetMultiSelector::storeValueCustom()
 {
   // the value is stored on the selection changed signal processing 
   // A rare case when plugin was not loaded. 

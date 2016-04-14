@@ -48,7 +48,7 @@ QList<QWidget*> SamplePanelPlugin_ModelWidget::getControls() const
   return aControls;
 }
 
-bool SamplePanelPlugin_ModelWidget::storeValueCustom() const
+bool SamplePanelPlugin_ModelWidget::storeValueCustom()
 {
   AttributePtr anAttribute = myFeature->attribute(SamplePanelPlugin_Feature::VALUE_ID());
   AttributeIntegerPtr aValueAttribute =

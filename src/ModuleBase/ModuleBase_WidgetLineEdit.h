@@ -47,7 +47,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetLineEdit : public ModuleBase_ModelWidge
 protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
-  virtual bool storeValueCustom() const;
+  virtual bool storeValueCustom();
 
   /// Redefinition of virtual method
   virtual bool restoreValueCustom();

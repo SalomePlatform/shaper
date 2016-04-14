@@ -263,7 +263,7 @@ bool PartSet_WidgetPoint2D::setPoint(double theX, double theY)
   return true;
 }
 
-bool PartSet_WidgetPoint2D::storeValueCustom() const
+bool PartSet_WidgetPoint2D::storeValueCustom()
 {
   std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   if (!aData) // can be on abort of sketcher element

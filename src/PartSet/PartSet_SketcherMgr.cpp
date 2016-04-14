@@ -247,9 +247,6 @@ void PartSet_SketcherMgr::onLeaveViewPort()
 {
   myIsMouseOverViewProcessed = false;
   myIsMouseOverWindow = false;
-  // it is important to validate operation here only if sketch entity create operation is active
-  // because at this operation we reacts to the mouse leave/enter view port
-  //operationMgr()->onValidateOperation();
 
   #ifdef DEBUG_DO_NOT_BY_ENTER
   return;
@@ -270,6 +267,8 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   if (myIsPopupMenuActive)
     return;
 
+  // it is important to validate operation here only if sketch entity create operation is active
+  // because at this operation we reacts to the mouse leave/enter view port
   operationMgr()->onValidateOperation();
 
   // 2. if the mouse IS NOT over window, reset the active widget value and hide the presentation

@@ -285,13 +285,10 @@ bool ModuleBase_ModelWidget::restoreValue()
   return isDone;
 }
 
-void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj)
+void ModuleBase_ModelWidget::updateObject(ObjectPtr theObject)
 {
-  blockUpdateViewer(true);
-
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-
-  blockUpdateViewer(false);
+  ModuleBase_Tools::flushUpdated(theObject);
+  emit objectUpdated();
 }
 
 void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
@@ -359,24 +356,4 @@ void ModuleBase_ModelWidget::onWidgetValuesChanged()
 void ModuleBase_ModelWidget::onWidgetValuesModified()
 {
   setValueState(ModifiedInPP);
-}
-
-//**************************************************************
-void ModuleBase_ModelWidget::blockUpdateViewer(const bool theValue)
-{
-  // the viewer update should be blocked in order to avoid the temporary feature content
-  // when the solver processes the feature, the redisplay message can be flushed
-  // what caused the display in the viewer preliminary states of object
-  // e.g. fillet feature, angle value change
-  std::shared_ptr<Events_Message> aMsg;
-  if (theValue) {
-    aMsg = std::shared_ptr<Events_Message>(
-        new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
-  }
-  else {
-    // the viewer update should be unblocked
-    aMsg = std::shared_ptr<Events_Message>(
-        new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
-  }
-  Events_Loop::loop()->send(aMsg);
 }

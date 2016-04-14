@@ -56,7 +56,7 @@ Q_OBJECT
 protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
-  virtual bool storeValueCustom() const;
+  virtual bool storeValueCustom();
 
   //! Read value of corresponded attribute from data model to the input control
   // \return True in success

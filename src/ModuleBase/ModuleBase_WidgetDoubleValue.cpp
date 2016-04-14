@@ -126,7 +126,7 @@ bool ModuleBase_WidgetDoubleValue::resetCustom()
   return aDone;
 }
 
-bool ModuleBase_WidgetDoubleValue::storeValueCustom() const
+bool ModuleBase_WidgetDoubleValue::storeValueCustom()
 {
   DataPtr aData = myFeature->data();
   AttributeDoublePtr aReal = aData->real(attributeID());

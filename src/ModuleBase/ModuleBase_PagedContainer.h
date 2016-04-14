@@ -60,7 +60,7 @@ class MODULEBASE_EXPORT ModuleBase_PagedContainer : public ModuleBase_ModelWidge
   virtual void activateCustom();
 
   /// Redefinition of virtual function
-  virtual bool storeValueCustom() const;
+  virtual bool storeValueCustom();
 
   /// Redefinition of virtual function
   virtual bool restoreValueCustom();

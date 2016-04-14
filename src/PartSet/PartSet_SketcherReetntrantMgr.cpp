@@ -205,7 +205,7 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
       // in activate() the value of the point is initialized and it can be displayed
       // but the default value is [0, 0]. So, we block update viewer contentent until
       // onMouseRelease happens, which correct the point position
-      ModuleBase_ModelWidget::blockUpdateViewer(true);
+      ModuleBase_Tools::blockUpdateViewer(true);
 
       restartOperation();
       aProcessed = true;
@@ -219,7 +219,7 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
         aPoint2DWdg->onMouseRelease(theWnd, theEvent);
       }
       // unblock viewer update
-      ModuleBase_ModelWidget::blockUpdateViewer(false);
+      ModuleBase_Tools::blockUpdateViewer(false);
     }
   }
 
@@ -552,7 +552,7 @@ bool PartSet_SketcherReetntrantMgr::copyReetntrantAttributes(const FeaturePtr& t
     AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
     AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
     aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
-    ModuleBase_ModelWidget::updateObject(theNewFeature);
+    ModuleBase_Tools::flushUpdated(theNewFeature);
     aChanged = true;
   }
   return aChanged;

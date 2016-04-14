@@ -535,10 +535,12 @@ void XGUI_Workshop::connectToPropertyPanel(const bool isToConnect)
        if (isToConnect) {
         connect(aWidget, SIGNAL(valueStateChanged(int)), this, SLOT(onWidgetStateChanged(int)));
         connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChanged()));
-      }
+        connect(aWidget, SIGNAL(objectUpdated()), this, SLOT(onWidgetObjectUpdated()));
+       }
       else {
         disconnect(aWidget, SIGNAL(valueStateChanged(int)), this, SLOT(onWidgetStateChanged(int)));
         disconnect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChanged()));
+        disconnect(aWidget, SIGNAL(objectUpdated()), this, SLOT(onWidgetObjectUpdated()));
       }
     }
   }
@@ -927,6 +929,11 @@ void XGUI_Workshop::onValuesChanged()
     if (aWidgetValidated)
       aWidgetValidated->clearValidatedCash();
   }
+}
+
+void XGUI_Workshop::onWidgetObjectUpdated()
+{
+  operationMgr()->onValidateOperation();
 }
 
 ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)

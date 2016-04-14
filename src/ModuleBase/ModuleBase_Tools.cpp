@@ -19,6 +19,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttrList.h>
+#include <Events_Loop.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Result.h>
@@ -26,6 +27,7 @@
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Events.h>
 
 #include <TopoDS_Iterator.hxx>
 
@@ -511,6 +513,34 @@ GeomShapePtr getShape(const AttributePtr& theAttribute, ModuleBase_IWorkshop* th
     aShape = aSelectAttr->value();
   }
   return aShape;
+}
+
+void flushUpdated(ObjectPtr theObject)
+{
+  blockUpdateViewer(true);
+
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+
+  blockUpdateViewer(false);
+}
+
+void blockUpdateViewer(const bool theValue)
+{
+  // the viewer update should be blocked in order to avoid the temporary feature content
+  // when the solver processes the feature, the redisplay message can be flushed
+  // what caused the display in the viewer preliminary states of object
+  // e.g. fillet feature, angle value change
+  std::shared_ptr<Events_Message> aMsg;
+  if (theValue) {
+    aMsg = std::shared_ptr<Events_Message>(
+        new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
+  }
+  else {
+    // the viewer update should be unblocked
+    aMsg = std::shared_ptr<Events_Message>(
+        new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
+  }
+  Events_Loop::loop()->send(aMsg);
 }
 
 } // namespace ModuleBase_Tools

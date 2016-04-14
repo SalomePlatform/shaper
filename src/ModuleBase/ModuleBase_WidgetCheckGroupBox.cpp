@@ -103,7 +103,7 @@ QLayout* ModuleBase_WidgetCheckGroupBox::pageLayout()
   return myMainLayout;
 }
 
-bool ModuleBase_WidgetCheckGroupBox::storeValueCustom() const
+bool ModuleBase_WidgetCheckGroupBox::storeValueCustom()
 {
   DataPtr aData = myFeature->data();
   std::shared_ptr<ModelAPI_AttributeBoolean> aBool = aData->boolean(attributeID());

@@ -199,6 +199,14 @@ MODULEBASE_EXPORT void setObject(const AttributePtr& theAttribute, const ObjectP
 MODULEBASE_EXPORT std::shared_ptr<GeomAPI_Shape> getShape(const AttributePtr& theAttribute,
                                                           ModuleBase_IWorkshop* theWorkshop);
 
+/// Flush updated signal for the object. The viewer update is blocked in the process
+/// \param theObject parameter of the signal
+MODULEBASE_EXPORT void flushUpdated(ObjectPtr theObject);
+
+/// Sends a message about block/unblock viewer updating
+/// \param theValue a boolean value
+MODULEBASE_EXPORT void blockUpdateViewer(const bool theValue);
+
 }
 
 #endif

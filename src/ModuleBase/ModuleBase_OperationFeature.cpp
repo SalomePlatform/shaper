@@ -172,8 +172,10 @@ FeaturePtr ModuleBase_OperationFeature::createFeature(const bool theFlushMessage
      }*/
   }
 
-  if (theFlushMessage)
+  if (theFlushMessage) {
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  }
   return myFeature;
 }
 
@@ -381,7 +383,7 @@ ModuleBase_ModelWidget* ModuleBase_OperationFeature::activateByPreselection(
       // in order to redisplay object in the viewer, the update/redisplay signals should be flushed
       // it is better to perform it not in setSelection of each widget, but do it here,
       // after the preselection is processed
-      ModuleBase_ModelWidget::updateObject(myFeature);
+      ModuleBase_Tools::flushUpdated(myFeature);
     }
   }
   clearPreselection();
