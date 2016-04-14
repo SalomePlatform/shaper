@@ -186,6 +186,7 @@ bool PartSet_WidgetPoint2D::resetCustom()
       // if the restored value should be hidden, aDone = true to set
       // reset state for the widget in the parent
       aDone = restoreCurentValue();
+      emit objectUpdated();
     }
     else {
       bool isOk;

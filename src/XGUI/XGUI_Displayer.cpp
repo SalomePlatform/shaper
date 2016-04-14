@@ -440,7 +440,9 @@ bool XGUI_Displayer::isVisible(XGUI_Displayer* theDisplayer, const ObjectPtr& th
       }
     }
   }
-  else {
+  // it is possible that feature is presentable and has results, so we should check visibility
+  // of results if presentation is not shown (e.g. Sketch Circle/Arc features)
+  if (!aVisible) {
     // check if all results of the feature are visible
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     std::list<ResultPtr> aResults = aFeature->results();
