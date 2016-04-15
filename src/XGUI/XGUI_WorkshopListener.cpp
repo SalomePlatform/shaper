@@ -62,7 +62,7 @@
 //#define DEBUG_RESULT_COMPSOLID
 
 #ifdef DEBUG_FEATURE_REDISPLAY
-const std::string DebugFeatureKind = "Extrusion";
+const std::string DebugFeatureKind = "";//"Extrusion";
 #endif
 
 XGUI_WorkshopListener::XGUI_WorkshopListener(ModuleBase_IWorkshop* theWorkshop)
@@ -285,7 +285,7 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
       FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
       if (aFeature.get()) {
         std::string aKind = aFeature->getKind();
-        if (aKind == DebugFeatureKind) {
+        if (aKind == DebugFeatureKind || DebugFeatureKind.empty()) {
           qDebug(QString("visible=%1, hide=%2 : display= %2").arg(aDisplayer->isVisible(aObj))
                                             .arg(aHide).arg(anObjInfo).toStdString().c_str());
         }

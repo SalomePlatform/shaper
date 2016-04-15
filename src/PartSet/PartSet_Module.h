@@ -176,11 +176,13 @@ public:
   /// \param theMenu a popup menu to be shown in the object browser
   virtual void addObjectBrowserMenu(QMenu* theMenu) const;
 
-  /// Add menu atems for viewer into the given menu
-  /// \param theMenu a popup menu to be shown in the viewer
+  /// Add menu items for viewer into the actions map
   /// \param theStdActions a map of standard actions
+  /// \param theMenuActions map of action/menu for the desirable index in the viewer menu
   /// \return true if items are added and there is no necessity to provide standard menu
-  virtual bool addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const;
+  virtual bool addViewerMenu(const QMap<QString, QAction*>& theStdActions,
+                             QWidget* theParent,
+                             QMap<int, QAction*>& theMenuActions) const;
 
   /// Returns a list of modes, where the AIS objects should be activated
   /// \param theModes a list of modes

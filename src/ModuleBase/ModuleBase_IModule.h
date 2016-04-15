@@ -105,11 +105,13 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Realizes some functionality by an operation start
   virtual ModuleBase_Operation* currentOperation() const = 0;
 
-  /// Add menu items for viewer into the given menu
-  /// \param theMenu a popup menu to be shown in the viewer
+  /// Add menu items for viewer into the actions map
   /// \param theStdActions a map of standard actions
+  /// \param theMenuActions map of action/menu for the desirable index in the viewer menu
   /// \return true if items are added and there is no necessity to provide standard menu
-  virtual bool addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const
+  virtual bool addViewerMenu(const QMap<QString, QAction*>& theStdActions,
+                             QWidget* theParent,
+                             QMap<int, QAction*>& theMenuActions) const
   { return false; }
 
   /// Add menu items for object browser into the given menu

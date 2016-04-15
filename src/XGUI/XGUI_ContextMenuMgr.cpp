@@ -417,7 +417,8 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.clear();
   aList.append(action("WIREFRAME_CMD"));
   aList.append(action("SHADING_CMD"));
-  aList.append(mySeparator);
+  aList.append(mySeparator); // this separator is not shown as this action is added after show only
+  // qt list container contains only one instance of the same action
   aList.append(action("SHOW_CMD"));
   aList.append(action("HIDE_CMD"));
   aList.append(action("SHOW_ONLY_CMD"));
@@ -516,11 +517,6 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
 
 void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
 {
-  ModuleBase_IModule* aModule = myWorkshop->module();
-  if (aModule) {
-    if (aModule->addViewerMenu(theMenu, myActions))
-      theMenu->addSeparator();
-  }
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
   QList<ModuleBase_ViewerPrsPtr> aPrsList = aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
   int aSelected = aPrsList.size();
@@ -546,14 +542,34 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
       if (myViewerMenu.contains(aName))
         aActions = myViewerMenu[aName];
     }
-    aActions.append(action("COLOR_CMD"));
   } else if (aSelected > 1) {
     aActions.append(action("HIDE_CMD"));
-    aActions.append(action("COLOR_CMD"));
   }
   // hide all is shown always even if selection in the viewer is empty
   aActions.append(action("HIDEALL_CMD"));
+  aActions.append(action("COLOR_CMD"));
+
   theMenu->addActions(aActions);
+
+  QMap<int, QAction*> aMenuActions;
+  ModuleBase_IModule* aModule = myWorkshop->module();
+  if (aModule) {
+    if (aModule->addViewerMenu(myActions, theMenu, aMenuActions))
+      theMenu->addSeparator();
+  }
+
+  // insert the module menu items on specific positions in the popup menu: some actions should be
+  // in the begin of the list, Delete action should be the last by #1343 issue
+  QList<QAction*> anActions = theMenu->actions();
+  int anActionsSize = anActions.size();
+  QAction* aFirstAction = anActions[0];
+  QMap<int, QAction*>::const_iterator anIt = aMenuActions.begin(), aLast = aMenuActions.end();
+  for (; anIt != aLast; anIt++) {
+    if (anIt.key() > anActionsSize)
+      theMenu->addAction(anIt.value());
+    else
+      theMenu->insertAction(aFirstAction, *anIt);
+  }
 
 #ifndef HAVE_SALOME
   theMenu->addSeparator();

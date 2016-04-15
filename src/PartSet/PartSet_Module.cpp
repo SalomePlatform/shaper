@@ -487,9 +487,11 @@ bool PartSet_Module::canActivateSelection(const ObjectPtr& theObject) const
   return aCanActivate;
 }
 
-bool PartSet_Module::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const
+bool PartSet_Module::addViewerMenu(const QMap<QString, QAction*>& theStdActions,
+                                   QWidget* theParent,
+                                   QMap<int, QAction*>& theMenuActions) const
 {
-  return myMenuMgr->addViewerMenu(theMenu, theStdActions);
+  return myMenuMgr->addViewerMenu(theStdActions, theParent, theMenuActions);
 }
 
 void PartSet_Module::updateViewerMenu(const QMap<QString, QAction*>& theStdActions)

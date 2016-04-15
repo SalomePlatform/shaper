@@ -37,11 +37,14 @@ public:
   /// \param theId an action identifier, it should be uniqued in the bounds of the module
   QAction* action(const QString& theId) const;
 
-  /// Add menu atems for viewer into the given menu
-  /// \param theMenu a popup menu to be shown in the viewer
+  /// Add menu items for viewer into the actions map
   /// \param theStdActions a map of standard actions
+  /// \param theParent a parent widget for the 
+  /// \param theMenuActions map of action/menu for the desirable index in the viewer menu
   /// \return true if items are added and there is no necessity to provide standard menu
-  bool addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const;
+  bool addViewerMenu(const QMap<QString, QAction*>& theStdActions,
+                     QWidget* theParent,
+                     QMap<int, QAction*>& theMenuActions) const;
 
   /// Update state of pop-up menu items in viewer
   /// \param theStdActions - a map of standard actions

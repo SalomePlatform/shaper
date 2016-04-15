@@ -106,8 +106,12 @@ void PartSet_MenuMgr::onAction(bool isChecked)
   }
 }
 
-bool PartSet_MenuMgr::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*>& theStdActions) const
+bool PartSet_MenuMgr::addViewerMenu(const QMap<QString, QAction*>& theStdActions,
+                                    QWidget* theParent,
+                                    QMap<int, QAction*>& theMenuActions) const
 {
+  int anIndex = 0;
+
   ModuleBase_Operation* anOperation = myModule->workshop()->currentOperation();
   if (!PartSet_SketcherMgr::isSketchOperation(anOperation) &&
       !PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
@@ -121,23 +125,25 @@ bool PartSet_MenuMgr::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*
   bool hasFeature = false;
 
   QList<ModuleBase_ViewerPrsPtr> aPrsList = aSelection->getSelected(ModuleBase_ISelection::Viewer);
-  ResultPtr aResult;
-  FeaturePtr aFeature;
-  foreach(ModuleBase_ViewerPrsPtr aPrs, aPrsList) {
-    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
-    if (aResult.get() != NULL) {
-      const GeomShapePtr& aShape = aPrs->shape();
-      if (aShape.get() && aShape->isEqual(aResult->shape()))
-        hasFeature = true;
-      else
-        hasAttribute = true;
-    } else {
-      aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aPrs->object());
-      hasFeature = (aFeature.get() != NULL);
+  if (aPrsList.size() > 1) {
+    hasFeature = true;
+  } else if (aPrsList.size() == 1) {
+    ResultPtr aResult;
+    FeaturePtr aFeature;
+    foreach(ModuleBase_ViewerPrsPtr aPrs, aPrsList) {
+      aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
+      if (aResult.get() != NULL) {
+        const GeomShapePtr& aShape = aPrs->shape();
+        if (aShape.get() && aShape->isEqual(aResult->shape()))
+          hasFeature = true;
+        else
+          hasAttribute = true;
+      } else {
+        aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aPrs->object());
+        hasFeature = (aFeature.get() != NULL);
+      }
     }
-  }
 
-  if (aPrsList.size() == 1) {
     const GeomShapePtr& aShape = aPrsList.first()->shape();
     if (aShape.get() && !aShape->isNull() && aShape->shapeType() == GeomAPI_Shape::VERTEX) {
       // Find 2d coordinates
@@ -162,7 +168,8 @@ bool PartSet_MenuMgr::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*
                                           SketchPlugin_ConstraintCoincidence::ENTITY_B());
           if (myCoinsideLines.size() > 0) {
             aIsDetach = true;
-            QMenu* aSubMenu = theMenu->addMenu(tr("Detach"));
+            QMenu* aSubMenu = new QMenu(tr("Detach"), theParent);
+            theMenuActions[anIndex++] = aSubMenu->menuAction();
             QAction* aAction;
             int i = 0;
             foreach (FeaturePtr aCoins, myCoinsideLines) {
@@ -178,17 +185,20 @@ bool PartSet_MenuMgr::addViewerMenu(QMenu* theMenu, const QMap<QString, QAction*
       }
     }
   }
-  if ((!aIsDetach) && hasFeature) {
-    theMenu->addAction(theStdActions["DELETE_CMD"]);
+  if (!hasAttribute) {
+    bool isAuxiliary;
+    if (canSetAuxiliary(isAuxiliary)) {
+      QAction* anAction = action("AUXILIARY_CMD");
+      theMenuActions[anIndex++] = anAction;
+      anAction->setChecked(isAuxiliary);
+    }
   }
-  if (hasAttribute)
-    return true;
-  bool isAuxiliary;
-  if (canSetAuxiliary(isAuxiliary)) {
-    QAction* anAction = action("AUXILIARY_CMD");
-    theMenu->addAction(anAction);
-    anAction->setChecked(isAuxiliary);
+
+  if (!aIsDetach && hasFeature) {
+    // Delete item should be the last in the list of actions
+    theMenuActions[1000] = theStdActions["DELETE_CMD"];
   }
+
   return true;
 }
 
