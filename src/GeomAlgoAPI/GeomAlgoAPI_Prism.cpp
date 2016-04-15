@@ -27,6 +27,7 @@
 #include <BRepLib_CheckCurveOnSurface.hxx>
 #include <BRepPrimAPI_MakePrism.hxx>
 #include <Geom_Plane.hxx>
+#include <Geom_RectangularTrimmedSurface.hxx>
 #include <gp_Pln.hxx>
 #include <IntAna_IntConicQuad.hxx>
 #include <IntAna_Quadric.hxx>
@@ -119,16 +120,34 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
   if(theDirection.get()) {
     aBaseDir = theDirection;
     aDirVec = theDirection->impl<gp_Dir>();
-  } else if(aBaseShape.ShapeType() != TopAbs_VERTEX &&
-            aBaseShape.ShapeType() != TopAbs_EDGE &&
-            aFindPlane.Found() == Standard_True){
-    Handle(Geom_Plane) aPlane = aFindPlane.Plane();
+  } else {
+    if(aBaseShape.ShapeType() == TopAbs_VERTEX
+        || aBaseShape.ShapeType() == TopAbs_EDGE
+        || aFindPlane.Found() == Standard_False) {
+      return;
+    }
+
+    Handle(Geom_Plane) aPlane;
+    if(aBaseShape.ShapeType() == TopAbs_FACE || aBaseShape.ShapeType() == TopAbs_SHELL) {
+      TopExp_Explorer anExp(aBaseShape, TopAbs_FACE);
+      const TopoDS_Shape& aFace = anExp.Current();
+      Handle(Geom_Surface) aSurface = BRep_Tool::Surface(TopoDS::Face(aFace));
+      if(aSurface->DynamicType() == STANDARD_TYPE(Geom_RectangularTrimmedSurface)) {
+        Handle(Geom_RectangularTrimmedSurface) aTrimSurface =
+          Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurface);
+        aSurface = aTrimSurface->BasisSurface();
+      }
+      if(aSurface->DynamicType() != STANDARD_TYPE(Geom_Plane)) {
+        return;
+      }
+      aPlane = Handle(Geom_Plane)::DownCast(aSurface);
+    } else {
+      aPlane = aFindPlane.Plane();
+    }
     gp_Pnt aLoc = aPlane->Axis().Location();
     aDirVec = aPlane->Axis().Direction();
     aBaseLoc.reset(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
     aBaseDir.reset(new GeomAPI_Dir(aDirVec.X(), aDirVec.Y(), aDirVec.Z()));
-  } else {
-    return;
   }
   if(!aBaseLoc.get()) {
     gp_Pnt aLoc;
