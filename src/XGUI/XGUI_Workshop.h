@@ -504,9 +504,11 @@ private:
   //! \param theList an objects to be deleted
   //! \param theIgnoredFeatures a list of features to be ignored during delete
   //! \param theActionId an action command key to find context menu object types enabled for remove
+  //! \param theFlushRedisplay a boolean value if the redisplay signal should be flushed
   bool removeFeatures(const QObjectPtrList& theList,
                       const std::set<FeaturePtr>& theIgnoredFeatures,
-                      const QString& theActionId);
+                      const QString& theActionId,
+                      const bool theFlushRedisplay);
 
   //! Creates list of actions (commands) by given history list from session
   QList<ActionInfo> processHistoryList(const std::list<std::string>&) const;

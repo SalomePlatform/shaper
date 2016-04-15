@@ -68,6 +68,7 @@
 #include <XGUI_DataModel.h>
 #include <XGUI_ErrorMgr.h>
 #include <XGUI_CustomPrs.h>
+#include <XGUI_SelectionMgr.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
@@ -766,6 +767,11 @@ bool PartSet_Module::deleteObjects()
       return true; // the objects are processed but can not be deleted
 
     anOpMgr->startOperation(anOpAction);
+
+    // WORKAROUND, should be done to avoid viewer highlight update after deletetion of objects
+    // the problem is in AIS Dimensions recompute if a line and the dim are removed, line is the first
+    // it causes the AIS recompute, where the base line is null, the result is empty AIS in the viewer
+    XGUI_Tools::workshop(myWorkshop)->selector()->clearSelection();
 
     // 4. delete features
     // sketch feature should be skipped, only sub-features can be removed

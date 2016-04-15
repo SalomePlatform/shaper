@@ -90,6 +90,8 @@ class Model_Document : public ModelAPI_Document
                                           const bool isSendError = true);
 
   //! Removes the feature from the document (with result)
+  //! It is necessary to flush REDISPLAY signal manually after this method because
+  //! the method sends it, but for the performance purpose does not flush it
   //! \param theFeature a removed feature
   MODEL_EXPORT virtual void removeFeature(FeaturePtr theFeature);
 

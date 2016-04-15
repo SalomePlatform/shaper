@@ -253,7 +253,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     myProcessOnFinish.clear(); // processed features must be only on finish, so clear anyway (to avoid reimport on load)
 
     if (!(theMessage->eventID() == kOpStartEvent)) {
-      processFeatures();
+      processFeatures(false);
     }
     // remove all macros before clearing all created
     std::set<FeaturePtr>::iterator anUpdatedIter = myWaitForFinish.begin();
@@ -275,13 +275,18 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
         anUpdatedIter++;
       }
     }
+    // the redisplay signal should be flushed in order to erase the feature presentation in the viewer
+    // if should be done after removeFeature() of document,
+    // by this reason, upper processFeatures() do not perform this flush
+    Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+
     // in the end of transaction everything is updated, so clear the old objects
     myIsParamUpdated = false;
     myWaitForFinish.clear();
   }
 }
 
-void Model_Update::processFeatures()
+void Model_Update::processFeatures(const bool theFlushRedisplay)
 {
    // perform update of everything if it is not performed right now or any preview is blocked
   if (!myIsProcessed && !myIsPreviewBlocked) {
@@ -303,8 +308,10 @@ void Model_Update::processFeatures()
     aLoop->flush(kUpdatedEvent);
 
     // flush to update display
-    static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-    aLoop->flush(EVENT_DISP);
+    if (theFlushRedisplay) {
+      static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+      aLoop->flush(EVENT_DISP);
+    }
     #ifdef DEB_UPDATE
       std::cout<<"****** End processing"<<std::endl;
     #endif

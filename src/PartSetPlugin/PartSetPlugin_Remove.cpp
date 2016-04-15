@@ -6,6 +6,7 @@
 
 #include "PartSetPlugin_Remove.h"
 #include "PartSetPlugin_Part.h"
+
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
@@ -13,6 +14,9 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_Events.h>
+
+#include <Events_Loop.h>
 
 void PartSetPlugin_Remove::execute()
 {
@@ -27,8 +31,12 @@ void PartSetPlugin_Remove::execute()
       aPart->data()->document(ModelAPI_ResultPart::DOC_REF())->value()->close();
       std::set<std::shared_ptr<ModelAPI_Feature> > aRefFeatures;
       aRoot->refsToFeature(aFeature, aRefFeatures);
-      if (aRefFeatures.empty())
+      if (aRefFeatures.empty()) {
         aRoot->removeFeature(aFeature);
+        // the redisplay signal should be flushed in order to erase the feature presentation in the viewer
+        // after removeFeature from the document
+        Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+      }
     }
   }
 }

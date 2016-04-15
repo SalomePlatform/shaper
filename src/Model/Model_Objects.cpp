@@ -263,8 +263,6 @@ void Model_Objects::removeFeature(FeaturePtr theFeature)
     RemoveFromRefArray(featuresLabel(), aFeatureLabel);
     // event: feature is deleted
     ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
-    // the redisplay signal should be flushed in order to erase the feature presentation in the viewer
-    Events_Loop::loop()->flush(EVENT_DISP);
     updateHistory(ModelAPI_Feature::group());
   }
 }

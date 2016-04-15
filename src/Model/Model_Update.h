@@ -73,7 +73,8 @@ protected:
 
   /// On operation start/end/abort the "Just" fileds must be cleared and processed in the right way
   /// \param theFinish is true for start, close or abort transaction: all objects must be processed
-  void processFeatures();
+  //! \param theFlushRedisplay a boolean value if the redisplay signal should be flushed
+  void processFeatures(const bool theFlushRedisplay = true);
 
   /// Performs the feature execution
   /// \returns the status of execution

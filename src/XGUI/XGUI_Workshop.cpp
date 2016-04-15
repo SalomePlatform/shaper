@@ -1386,7 +1386,7 @@ void XGUI_Workshop::cleanHistory()
     mySelector->clearSelection();
 
     std::set<FeaturePtr> anIgnoredFeatures;
-    if (removeFeatures(anUnusedObjects, anIgnoredFeatures, anActionId)) {
+    if (removeFeatures(anUnusedObjects, anIgnoredFeatures, anActionId, true)) {
       operationMgr()->commitOperation();
     }
     else {
@@ -1565,6 +1565,7 @@ bool XGUI_Workshop::deleteFeaturesInternal(const QObjectPtrList& theList,
                                            const std::set<FeaturePtr>& theIgnoredFeatures,
                                            const bool doDeleteReferences)
 {
+  bool isDone = false;
   if (doDeleteReferences) {
     std::set<FeaturePtr> aFeaturesToDelete = aDirectRefFeatures;
     aFeaturesToDelete.insert(aIndirectRefFeatures.begin(), aIndirectRefFeatures.end());
@@ -1577,7 +1578,9 @@ bool XGUI_Workshop::deleteFeaturesInternal(const QObjectPtrList& theList,
       FeaturePtr aFeature = (*anIt);
       DocumentPtr aDoc = aFeature->document();
       if (theIgnoredFeatures.find(aFeature) == theIgnoredFeatures.end()) {
+        // flush REDISPLAY signal after remove feature
         aDoc->removeFeature(aFeature);
+        isDone = true;
 #ifdef DEBUG_DELETE
         anInfo.append(ModuleBase_Tools::objectInfo(aFeature).toStdString().c_str());
 #endif
@@ -1590,13 +1593,21 @@ bool XGUI_Workshop::deleteFeaturesInternal(const QObjectPtrList& theList,
   }
 
   QString anActionId = "DELETE_CMD";
-  return removeFeatures(theList, theIgnoredFeatures, anActionId);
+  isDone = removeFeatures(theList, theIgnoredFeatures, anActionId, false) || isDone;
+
+  if (isDone) {
+    // the redisplay signal should be flushed in order to erase the feature presentation in the viewer
+    // if should be done after removeFeature() of document
+    Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  }
+  return isDone;
 }
 
 //**************************************************************
 bool XGUI_Workshop::removeFeatures(const QObjectPtrList& theList,
                                    const std::set<FeaturePtr>& theIgnoredFeatures,
-                                   const QString& theActionId)
+                                   const QString& theActionId,
+                                   const bool theFlushRedisplay)
 {
   bool isDone = false;
 
@@ -1624,11 +1635,18 @@ bool XGUI_Workshop::removeFeatures(const QObjectPtrList& theList,
         anInfo.append(anInfoStr);
         qDebug(QString("remove feature :%1").arg(anInfoStr).toStdString().c_str());
 #endif
+        // flush REDISPLAY signal after remove feature
         aDoc->removeFeature(aFeature);
         isDone = true;
       }
     }
   }
+  if (isDone && theFlushRedisplay) {
+    // the redisplay signal should be flushed in order to erase the feature presentation in the viewer
+    // if should be done after removeFeature() of document
+    Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  }
+
 #ifdef DEBUG_DELETE
   qDebug(QString("remove features:%1").arg(anInfo.join("; ")).toStdString().c_str());
 #endif
