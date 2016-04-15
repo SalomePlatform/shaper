@@ -15,7 +15,7 @@
 #include <QList>
 
 class ModuleBase_ModelWidget;
-class QGridLayout;
+class QVBoxLayout;
 
 /*!
  * \ingroup GUI
@@ -41,7 +41,7 @@ class MODULEBASE_EXPORT ModuleBase_PageWidget : public QFrame, public ModuleBase
   virtual void addPageStretch();
 
  private:
-  QGridLayout* myMainLayout; ///< page's layout
+  QVBoxLayout* myMainLayout; ///< page's layout
 };
 
 #endif /* MODULEBASE_PAGEWIDGET_H_ */

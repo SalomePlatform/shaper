@@ -84,6 +84,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theCmdId the operation name
   virtual void launchOperation(const QString& theCmdId);
 
+  /// Executes feature as a modal dialog box
+  /// \param theCmdId the operation name
+  virtual void launchModal(const QString& theCmdId);
+
   /// Realizes some functionality by an operation start
   /// \param theOperation a started operation
   virtual void operationStarted(ModuleBase_Operation* theOperation) {}

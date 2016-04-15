@@ -84,6 +84,14 @@ Q_OBJECT
    /// Update of commands status
   virtual void updateCommandStatus();
 
+  /// Returns Information about feature defined in corresponded XML
+  /// \param theId - id of the feature
+  virtual std::shared_ptr<Config_FeatureMessage> featureInfo(const QString& theId) const;
+
+  /// Return application main window
+  virtual QMainWindow* desktop() const;
+
+
   //! Returns workshop
   XGUI_Workshop* workshop() const { return myWorkshop; }
 

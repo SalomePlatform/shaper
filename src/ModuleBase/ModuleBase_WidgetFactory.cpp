@@ -71,7 +71,7 @@ ModuleBase_WidgetFactory::~ModuleBase_WidgetFactory()
   delete myWidgetApi;
 }
 
-void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
+void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage, bool alignToTop)
 {
   std::string aWType = myWidgetApi->widgetType();
   if (aWType == NODE_FEATURE) {
@@ -132,7 +132,8 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
     }
   } while (myWidgetApi->toNextWidget());
 
-  thePage->alignToTop();
+  if (alignToTop)
+    thePage->alignToTop();
 }
 
 void ModuleBase_WidgetFactory::createPanel(ModuleBase_PageBase* thePage,

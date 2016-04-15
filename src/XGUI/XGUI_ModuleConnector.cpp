@@ -12,12 +12,16 @@
 #include "XGUI_OperationMgr.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_PropertyPanel.h"
+#include "XGUI_ActionsMgr.h"
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_ViewerPrs.h>
 
 #include <AIS_Shape.hxx>
 
+#ifndef HAVE_SALOME
+#include "AppElements_Command.h"
+#endif
 
 XGUI_ModuleConnector::XGUI_ModuleConnector(XGUI_Workshop* theWorkshop)
     : ModuleBase_IWorkshop(theWorkshop),
@@ -135,4 +139,23 @@ void XGUI_ModuleConnector::abortOperation(ModuleBase_Operation* theOperation)
 void XGUI_ModuleConnector::updateCommandStatus()
 {
   myWorkshop->updateCommandStatus();
+}
+
+QMainWindow* XGUI_ModuleConnector::desktop() const 
+{ 
+  return myWorkshop->desktop(); 
+}
+
+
+std::shared_ptr<Config_FeatureMessage> XGUI_ModuleConnector::featureInfo(const QString& theId) const
+{
+#ifdef HAVE_SALOME
+  return myWorkshop->salomeConnector()->featureInfo(theId);
+#else 
+  AppElements_Command* aAction = 
+    dynamic_cast<AppElements_Command*>(myWorkshop->actionsMgr()->action(theId));
+  if (aAction)
+    return aAction->featureMessage();
+  return std::shared_ptr<Config_FeatureMessage>();
+#endif
 }

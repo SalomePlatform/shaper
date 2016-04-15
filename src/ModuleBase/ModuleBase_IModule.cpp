@@ -9,6 +9,9 @@
 #include "ModuleBase_OperationDescription.h"
 #include "ModuleBase_OperationFeature.h"
 #include "ModuleBase_ModelWidget.h"
+#include "ModuleBase_WidgetFactory.h"
+#include "ModuleBase_PageWidget.h"
+#include "ModuleBase_Dialog.h"
 
 #include <Events_Loop.h>
 
@@ -22,6 +25,11 @@
 #include <Config_ModuleReader.h>
 
 #include <QAction>
+#include <QMainWindow>
+#include <QDialog>
+#include <QLayout>
+#include <QDialogButtonBox>
+#include <QPushButton>
 
 ModuleBase_IModule::ModuleBase_IModule(ModuleBase_IWorkshop* theParent)
   : QObject(theParent), myWorkshop(theParent) 
@@ -40,6 +48,26 @@ ModuleBase_IModule::ModuleBase_IModule(ModuleBase_IWorkshop* theParent)
   //connect(myWorkshop->viewer(), SIGNAL(mouseDoubleClick(QMouseEvent*)), this,
   //        SLOT(onMouseDoubleClick(QMouseEvent*)));
 }
+
+void ModuleBase_IModule::launchModal(const QString& theCmdId)
+{
+  if (!myWorkshop->canStartOperation(theCmdId))
+    return;
+
+  std::string aXmlCfg, aDescription;
+  getXMLRepresentation(theCmdId.toStdString(), aXmlCfg, aDescription);
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  aMgr->startOperation(theCmdId.toStdString());
+
+  ModuleBase_Dialog aDlg(myWorkshop, theCmdId, aXmlCfg);
+  if (aDlg.exec() == QDialog::Accepted)
+    aMgr->finishOperation();
+  else
+    aMgr->abortOperation();
+  myWorkshop->updateCommandStatus();
+}
+
 
 void ModuleBase_IModule::launchOperation(const QString& theCmdId)
 {
@@ -176,8 +204,14 @@ void ModuleBase_IModule::onFeatureTriggered()
     }
   }
   else {
-    launchOperation(aCmd->data().toString());
-    emit operationLaunched();
+    QString aCmdId = aCmd->data().toString();
+    std::shared_ptr<Config_FeatureMessage> aInfo = myWorkshop->featureInfo(aCmdId);
+    if (aInfo.get() && aInfo->isModal()) {
+      launchModal(aCmdId);
+    } else {
+      launchOperation(aCmdId);
+      emit operationLaunched();
+    }
   }
 }
 

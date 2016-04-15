@@ -39,7 +39,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
 
   /// Creates content widget for property panel
   /// \param thePage a parent page
-  void createWidget(ModuleBase_PageBase* thePage);
+  void createWidget(ModuleBase_PageBase* thePage, bool alignToTop = true);
 
   /// Creates property panel content for the feature
   /// \param thePage a parent page

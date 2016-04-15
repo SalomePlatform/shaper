@@ -8,8 +8,12 @@
 #define ParametersPlugin_WidgetParamsMgr_H_
 
 #include <ModuleBase_ModelWidget.h>
+#include <QModelIndex>
+#include <QAbstractItemDelegate>
 
 class QTreeWidget;
+class QTreeWidgetItem;
+class ParametersPlugin_ItemDelegate;
 
 /*!
  * \ingroup GUI
@@ -37,9 +41,22 @@ protected:
   /// Restore value from attribute data to the widget's control
   virtual bool restoreValueCustom();
 
+  /// The method called when widget is activated
+  virtual void activateCustom();
+
+private slots:
+  void onDoubleClick(const QModelIndex&);
+  void onCloseEditor(QWidget* theEditor, QAbstractItemDelegate::EndEditHint theHint);
+
 private:
 
   QTreeWidget* myTable;
+  QTreeWidgetItem* myFeatures;
+  QTreeWidgetItem* myParameters;
+  ParametersPlugin_ItemDelegate* myDelegate;
+  QModelIndex myEditingIndex;
+
+  QList<FeaturePtr> myFeatureList;
 };
 
 

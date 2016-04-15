@@ -13,6 +13,7 @@
 
 #include <ModelAPI_Object.h>
 #include <GeomAPI_AISObject.h>
+#include <Config_FeatureMessage.h>
 
 #include <QObject>
 
@@ -23,6 +24,7 @@ class ModuleBase_IPropertyPanel;
 class ModuleBase_Operation;
 class ModuleBase_FilterFactory;
 class ModuleBase_ViewerPrs;
+class QMainWindow;
 
 /**
  * \ingroup GUI
@@ -103,6 +105,11 @@ Q_OBJECT
 
    /// Update of commands status
   virtual void updateCommandStatus() = 0;
+
+  virtual std::shared_ptr<Config_FeatureMessage> featureInfo(const QString& theId) const = 0;
+
+  virtual QMainWindow* desktop() const = 0;
+
 
 signals:
   /// Signal selection changed.
