@@ -81,7 +81,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
       std::cout<<"*** Add process on finish "<<theFeature->name()<<std::endl;
 #endif
     updateArguments(theFeature);
-    if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated || myIsPreviewBlocked) {
+    if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated) {
       theFeature->data()->execState(ModelAPI_StateDone);
       static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
       aFactory->validate(theFeature); // need to be validated to update the "Apply" state if not previewed

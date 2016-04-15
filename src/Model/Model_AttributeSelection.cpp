@@ -475,7 +475,7 @@ bool Model_AttributeSelection::update()
       }
 
       if (aShapeType == TopAbs_FACE || aShapeType == TopAbs_WIRE) { // compound is for the whole sketch selection
-        // If this is a wire with plane defined thin it is a sketch-like object
+        // If this is a wire with plane defined then it is a sketch-like object
         if (!aConstructionContext->facesNum()) // no faces, update can not work correctly
           return setInvalidIfFalse(aSelLab, false);
         // if there is no edges indexes, any face can be used: take the first

@@ -34,8 +34,6 @@ static const char * EVENT_OBJECT_RENAMED = "ObjectRenamed";
 static const char * EVENT_OBJECT_MOVED = "ObjectsMoved";
 /// Event ID that visualization must be redisplayed (comes with ModelAPI_ObjectUpdatedMessage)
 static const char * EVENT_OBJECT_TO_REDISPLAY = "ObjectsToRedisplay";
-/// Event ID that error state or error message was updated for the object
-static const char * EVENT_OBJECT_ERROR_CHANGED = "ObjectsErrorChanged";
 /// Event ID that visualization must be redisplayed (comes with ModelAPI_ObjectUpdatedMessage)
 static const char * EVENT_OPERATION_LAUNCHED = "OperationLaunched";
 /// Event ID that plugin is loaded (comes with ModelAPI_ObjectUpdatedMessage)
