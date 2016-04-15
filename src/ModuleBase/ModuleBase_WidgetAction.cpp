@@ -13,6 +13,8 @@
 #include <QHBoxLayout>
 #include <QToolButton>
 
+#define DEFAULT_TOOL_TIP_WIDTH 300
+
 ModuleBase_WidgetAction::ModuleBase_WidgetAction(QWidget* theParent,
                                                  const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData)
@@ -24,8 +26,8 @@ ModuleBase_WidgetAction::ModuleBase_WidgetAction(QWidget* theParent,
   setAttributeID("");
 
   QString aText = QString::fromStdString(theData->widgetLabel());
-  QString aToolTip = ModuleBase_Tools::wrapToolTipByWords(
-                        QString::fromStdString(theData->widgetTooltip()), myButton);
+  QString aToolTip = ModuleBase_Tools::wrapTextByWords(
+              QString::fromStdString(theData->widgetTooltip()), myButton, DEFAULT_TOOL_TIP_WIDTH);
 
   myButton = new QToolButton(this);
   myButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);

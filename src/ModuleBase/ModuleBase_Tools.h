@@ -211,7 +211,7 @@ MODULEBASE_EXPORT void blockUpdateViewer(const bool theValue);
 /// \param theValue a boolean value
 /// \param theWidget a widget to know the font
 /// \param theMaxLineInPixels a maximum line width in pixels
-MODULEBASE_EXPORT QString wrapToolTipByWords(const QString& theValue, QWidget* theWidget,
+MODULEBASE_EXPORT QString wrapTextByWords(const QString& theValue, QWidget* theWidget,
                                              int theMaxLineInPixels = 150);
 }
 
