@@ -544,7 +544,7 @@ void blockUpdateViewer(const bool theValue)
   Events_Loop::loop()->send(aMsg);
 }
 
-QString ModuleBase_Tools::wrapTextByWords(const QString& theValue, QWidget* theWidget,
+QString wrapTextByWords(const QString& theValue, QWidget* theWidget,
                                           int theMaxLineInPixels)
 {
   static QFontMetrics tfm(theWidget ? theWidget->font() : QApplication::font());
