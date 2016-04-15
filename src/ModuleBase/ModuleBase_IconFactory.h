@@ -25,6 +25,13 @@ public:
   /// \param theObj an object
   virtual QIcon getIcon(ObjectPtr theObj);
 
+  /// Finds an icon for the given object. The icon is loaded: firstly from qrc file,
+  /// then by the icon path. If the path contains ":" , it will be treated as absolute path to
+  /// the icon, or relative path from the plugin library
+  /// \param theValue an icon information
+  /// \return a loaded or empty icon
+  static QIcon loadIcon(const QString& theValue);
+
 protected:
   ModuleBase_IconFactory();
 

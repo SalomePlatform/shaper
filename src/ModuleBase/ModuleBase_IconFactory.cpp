@@ -34,3 +34,14 @@ QIcon ModuleBase_IconFactory::getIcon(ObjectPtr theIcon)
 {
   return QIcon();
 }
+
+QIcon ModuleBase_IconFactory::loadIcon(const QString& theValue)
+{
+  QIcon anIcon(theValue);
+
+  if (anIcon.isNull()) {
+    
+  }
+
+  return anIcon;
+}

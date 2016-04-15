@@ -379,7 +379,8 @@
       </feature>
 
       <!--  SketchConstraintParallel  -->
-      <feature id="SketchConstraintParallel" title="Parallel" tooltip="Create constraint defining two parallel lines" icon=":icons/parallel.png">
+      <feature id="SketchConstraintParallel" title="Parallel" tooltip="Create constraint defining two parallel lines"
+               icon="parallel.png">
         <sketch_shape_selector id="ConstraintEntityA" 
             label="First line" tooltip="Select a line" shape_types="edge">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
