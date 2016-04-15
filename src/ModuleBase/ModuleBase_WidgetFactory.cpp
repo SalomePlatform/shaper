@@ -33,6 +33,7 @@
 #include <ModuleBase_PageWidget.h>
 #include <ModuleBase_WidgetExprEditor.h>
 #include <ModuleBase_WidgetCreatorFactory.h>
+#include <ModuleBase_WidgetAction.h>
 
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
@@ -312,6 +313,8 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
              theType == NODE_VALIDATOR) {
     // Do nothing for "box" and "case"
     result = NULL;
+  } else if (theType == WDG_ACTION) {
+    result = new ModuleBase_WidgetAction(theParent, myWidgetApi);
   } else {
     result = myWorkshop->module()->createWidgetByType(theType, theParent, myWidgetApi);
     if (!result)

@@ -38,6 +38,7 @@ const static char* WDG_DOUBLEVALUE_EDITOR = "doublevalue_editor";
 const static char* WDG_FILE_SELECTOR= "file_selector";
 const static char* WDG_EXPR_EDITOR = "expr_editor";
 const static char* WDG_PLACE_HOLDER = "placeholder";
+const static char* WDG_ACTION = "action";
 
 // Containers
 const static char* WDG_GROUP = "groupbox";

@@ -7,4 +7,5 @@
                   type_choice="edges objects">
     <validator id="FeaturesPlugin_ValidatorBaseForWire"/>
   </multi_selector>
+  <action id="Action_1" label="Action_1" tooltip="Tool tip information"/>
 </source>

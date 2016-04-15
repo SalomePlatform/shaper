@@ -218,6 +218,11 @@ bool ModelAPI_Feature::isStable()
   return myIsStable;
 }
 
+bool ModelAPI_Feature::customAction(const std::string& theActionId)
+{
+  return false;
+}
+
 bool ModelAPI_Feature::isPreviewNeeded() const
 {
   return true;

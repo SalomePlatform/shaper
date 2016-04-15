@@ -39,6 +39,7 @@ SET(PROJECT_HEADERS
   ModuleBase_Tools.h
   ModuleBase_ViewerFilters.h
   ModuleBase_ViewerPrs.h
+  ModuleBase_WidgetAction.h
   ModuleBase_WidgetBoolValue.h
   ModuleBase_WidgetCheckGroupBox.h
   ModuleBase_WidgetChoice.h
@@ -96,6 +97,7 @@ SET(PROJECT_SOURCES
   ModuleBase_Tools.cpp
   ModuleBase_ViewerFilters.cpp
   ModuleBase_ViewerPrs.cpp
+  ModuleBase_WidgetAction.cpp
   ModuleBase_WidgetBoolValue.cpp
   ModuleBase_WidgetCheckGroupBox.cpp
   ModuleBase_WidgetChoice.cpp
