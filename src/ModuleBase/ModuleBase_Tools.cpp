@@ -43,6 +43,7 @@
 #include <QDoubleSpinBox>
 #include <QGraphicsDropShadowEffect>
 #include <QColor>
+#include <QApplication>
 
 #include <sstream>
 #include <string>
@@ -158,17 +159,17 @@ QPixmap lighter(const QString& theIcon, const int theLighterValue)
     return QPixmap();
 
   QImage aResult(theIcon);
-  for ( int i = 0; i < anIcon.width(); i++ )
+  for (int i = 0; i < anIcon.width(); i++)
   {
-    for ( int j = 0; j < anIcon.height(); j++ )
+    for (int j = 0; j < anIcon.height(); j++)
     {
-      QRgb anRgb = anIcon.pixel( i, j );
+      QRgb anRgb = anIcon.pixel(i, j);
       QColor aPixelColor(qRed(anRgb), qGreen(anRgb), qBlue(anRgb),
-                         qAlpha( aResult.pixel( i, j ) ));
+                         qAlpha(aResult.pixel(i, j)));
 
       QColor aLighterColor = aPixelColor.lighter(theLighterValue);
-      aResult.setPixel(i, j, qRgba( aLighterColor.red(), aLighterColor.green(),
-                                    aLighterColor.blue(), aLighterColor.alpha() ) );
+      aResult.setPixel(i, j, qRgba(aLighterColor.red(), aLighterColor.green(),
+                                    aLighterColor.blue(), aLighterColor.alpha()));
     }
   }
   return QPixmap::fromImage(aResult);
@@ -541,6 +542,45 @@ void blockUpdateViewer(const bool theValue)
         new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
   }
   Events_Loop::loop()->send(aMsg);
+}
+
+QString ModuleBase_Tools::wrapTextByWords(const QString& theValue, QWidget* theWidget,
+                                          int theMaxLineInPixels)
+{
+  static QFontMetrics tfm(theWidget ? theWidget->font() : QApplication::font());
+  static qreal phi = 2.618;
+
+  QRect aBounds = tfm.boundingRect(theValue);
+  if(aBounds.width() <= theMaxLineInPixels)
+    return theValue;
+
+  qreal s = aBounds.width() * aBounds.height();
+  qreal aGoldWidth = sqrt(s*phi);
+
+  QStringList aWords = theValue.split(" ", QString::SkipEmptyParts);
+  QStringList aLines;
+  int n = aWords.count();
+  QString aLine;
+  for (int i = 0; i < n; i++) {
+    QString aLineExt = aLine + " " + aWords[i];
+    qreal anWidthNonExt = tfm.boundingRect(aLine).width();
+    qreal anWidthExt = tfm.boundingRect(aLineExt).width();
+    qreal aDeltaNonExt = fabs(anWidthNonExt-aGoldWidth);
+    qreal aDeltaExt    = fabs(anWidthExt-aGoldWidth);
+    if(aDeltaNonExt < aDeltaExt) {
+      // new line
+      aLines.append(aLine);
+      aLine = aWords[i];
+    }
+    else
+      aLine = aLineExt;
+  }
+
+  if(!aLine.isEmpty())
+    aLines.append(aLine);
+
+  QString aResult = aLines.join("\n");
+  return aResult;
 }
 
 } // namespace ModuleBase_Tools

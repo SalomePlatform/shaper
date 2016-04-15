@@ -207,6 +207,12 @@ MODULEBASE_EXPORT void flushUpdated(ObjectPtr theObject);
 /// \param theValue a boolean value
 MODULEBASE_EXPORT void blockUpdateViewer(const bool theValue);
 
+/// Generates a wrapped string to be less than value with '\n' separators
+/// \param theValue a boolean value
+/// \param theWidget a widget to know the font
+/// \param theMaxLineInPixels a maximum line width in pixels
+MODULEBASE_EXPORT QString wrapToolTipByWords(const QString& theValue, QWidget* theWidget,
+                                             int theMaxLineInPixels = 150);
 }
 
 #endif

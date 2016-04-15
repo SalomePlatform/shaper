@@ -24,7 +24,8 @@ ModuleBase_WidgetAction::ModuleBase_WidgetAction(QWidget* theParent,
   setAttributeID("");
 
   QString aText = QString::fromStdString(theData->widgetLabel());
-  QString aToolTip = QString::fromStdString(theData->widgetTooltip());
+  QString aToolTip = ModuleBase_Tools::wrapToolTipByWords(
+                        QString::fromStdString(theData->widgetTooltip()), myButton);
 
   myButton = new QToolButton(this);
   myButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
