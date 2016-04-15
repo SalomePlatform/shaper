@@ -220,6 +220,8 @@ std::string library(const std::string& theLibName)
   return aLibName;
 }
 
+bool BothAreSpaces(char lhs, char rhs) { return (lhs == rhs) && (lhs == ' '); }
+
 std::string getProperty(xmlNodePtr theNode, const char* thePropName)
 {
   std::string result = "";
@@ -227,6 +229,10 @@ std::string getProperty(xmlNodePtr theNode, const char* thePropName)
   if (!aPropChars || aPropChars[0] == 0)
     return result;
   result = std::string(aPropChars);
+
+  std::string::iterator new_end = std::unique(result.begin(), result.end(), BothAreSpaces);
+  result.erase(new_end, result.end()); 
+
   return result;
 }
 
