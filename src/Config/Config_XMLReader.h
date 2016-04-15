@@ -44,6 +44,11 @@ class Config_XMLReader
   CONFIG_EXPORT Config_XMLReader(const std::string& theXmlFile);
   CONFIG_EXPORT virtual ~Config_XMLReader();
   /*!
+   * Returns value of PLUGINS_CONFIG_FILE env variable, a path to the plugins.xml file
+   * \return string value
+   */
+  CONFIG_EXPORT static std::string pluginConfigFile();
+  /*!
    * Read all nodes in associated xml file,
    * recursively if processChildren(xmlNode) is true for the xmlNode.
    * For each read node the processNode will be called.

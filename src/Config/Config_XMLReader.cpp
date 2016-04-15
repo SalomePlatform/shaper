@@ -40,12 +40,9 @@ Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
    * the problem: application may be launched using python executable,
    * to use environment variable (at least for the current moment)
    */
-  if (prefix.empty()) {
-    char* anEnv = getenv("PLUGINS_CONFIG_FILE");
-    if (anEnv) {
-      prefix = std::string(anEnv);
-    }
-  }
+  if (prefix.empty())
+    prefix = pluginConfigFile();
+
 #ifdef WIN32
     prefix += "\\";
 #else
@@ -60,6 +57,16 @@ Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
 Config_XMLReader::~Config_XMLReader()
 {
   xmlFreeDoc(myXmlDoc);
+}
+
+std::string Config_XMLReader::pluginConfigFile()
+{
+  std::string aValue;
+  char* anEnv = getenv("PLUGINS_CONFIG_FILE");
+  if (anEnv) {
+    aValue = std::string(anEnv);
+  }
+  return aValue;
 }
 
 void Config_XMLReader::readAll()

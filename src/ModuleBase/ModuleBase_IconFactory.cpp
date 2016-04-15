@@ -4,8 +4,11 @@
 // Created:     28 Jul 2015
 // Author:      Vitaly SMETANNIKOV
 
-
 #include "ModuleBase_IconFactory.h"
+
+#include "Config_XMLReader.h"
+
+#include <QDir>
 
 ModuleBase_IconFactory* MYIconFactory = 0;
 
@@ -37,11 +40,14 @@ QIcon ModuleBase_IconFactory::getIcon(ObjectPtr theIcon)
 
 QIcon ModuleBase_IconFactory::loadIcon(const QString& theValue)
 {
-  QIcon anIcon(theValue);
+  QPixmap aPixmap(theValue);
 
-  if (anIcon.isNull()) {
-    
+  if (aPixmap.isNull()) {
+    std::string aPluginPath = Config_XMLReader::pluginConfigFile();
+    QString anIconPath = QString::fromStdString(aPluginPath) + QDir::separator() +
+                         theValue;
+    if (QFile::exists(anIconPath))
+      aPixmap = QPixmap(anIconPath);
   }
-
-  return anIcon;
+  return QIcon(aPixmap);
 }
