@@ -343,7 +343,21 @@ bool FeaturesPlugin_ValidatorBaseForWire::isValid(const AttributePtr& theAttribu
   ListOfShape aListOfShapes;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
+    if(!aSelection.get()) {
+      theError = "Could not get selection.";
+      return false;
+    }
+    ResultPtr aContext = aSelection->context();
+    if(!aContext.get()) {
+      theError = "Attribute have empty context.";
+      return false;
+    }
+    
     GeomShapePtr aShape = aSelection->value();
+    GeomShapePtr aContextShape = aContext->shape();
+    if(!aShape.get()) {
+      aShape = aContextShape;
+    }
     if(!aShape.get()) {
       theError = "Empty shape selected.";
       return false;
@@ -356,14 +370,13 @@ bool FeaturesPlugin_ValidatorBaseForWire::isValid(const AttributePtr& theAttribu
     }
 
     // Check that it is edge on sketch.
-    ResultPtr aContext = aSelection->context();
-    if(!aContext.get()) {
-      theError = "Attribute have empty context.";
-      return false;
-    }
-    GeomShapePtr aContextShape = aContext->shape();
     ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
     if(aConstruction.get()) {
+      if(aConstruction->isInfinite()) {
+        theError = "Inifinte objects not acceptable.";
+        return false;
+      }
+
       std::shared_ptr<GeomAPI_PlanarEdges> anEdges = std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aContextShape);
       if(!anEdges.get()) {
         // It is not an edge on the sketch.
