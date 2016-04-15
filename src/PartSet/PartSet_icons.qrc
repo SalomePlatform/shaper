@@ -101,5 +101,6 @@
      <file>icons/pipe_simple_32x32.png</file>
      <file>icons/pipe_binormal_32x32.png</file>
      <file>icons/pipe_locations_32x32.png</file>
+     <file>icons/feature_wire.png</file>
  </qresource>
  </RCC>

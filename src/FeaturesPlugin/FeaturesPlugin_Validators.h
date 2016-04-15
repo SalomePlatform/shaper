@@ -88,4 +88,20 @@ private:
                           std::string& theError) const;
 };
 
+/// \class FeaturesPlugin_ValidatorBaseForWire
+/// \ingroup Validators
+/// \brief A validator for selection base shapes for wire. Allows to select edges on sketch and
+/// wires objects that are connected to already selected shapes.
+class FeaturesPlugin_ValidatorBaseForWire: public ModelAPI_AttributeValidator
+{
+public:
+  //! Returns true if attribute is ok.
+  //! \param[in] theAttribute the checked attribute.
+  //! \param[in] theArguments arguments of the attribute.
+  //! \param[out] theError error message.
+   virtual bool isValid(const AttributePtr& theAttribute,
+                        const std::list<std::string>& theArguments,
+                        std::string& theError) const;
+};
+
 #endif

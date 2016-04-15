@@ -42,6 +42,7 @@
 %include "GeomAlgoAPI_PaveFiller.h"
 %include "GeomAlgoAPI_Intersection.h"
 %include "GeomAlgoAPI_Pipe.h"
+%include "GeomAlgoAPI_WireBuilder.h"
 
 %typemap(out) std::list< std::shared_ptr< GeomAPI_Shape > >::value_type & {
   $result = SWIG_NewPointerObj(SWIG_as_voidptr(new std::shared_ptr<GeomAPI_Shape>(*$1)), $descriptor(std::shared_ptr<GeomAPI_Shape> *), SWIG_POINTER_OWN | 0 );

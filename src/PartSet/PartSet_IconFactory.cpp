@@ -77,24 +77,20 @@ QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
   if (aResult.get()) {
     GeomShapePtr aShape = aResult->shape();
-    if (aShape.get()) {
-      if (aShape->isSolid()) 
-        return QIcon(":pictures/solid.png");
-      else if (aShape->isCompound()) 
-        return QIcon(":pictures/compound.png");
-      else if (aShape->isCompoundOfSolids()) 
-        return QIcon(":pictures/compoundofsolids.png");
-      else if (aShape->isCompSolid()) 
-        return QIcon(":pictures/compsolid.png");
-      else if (aShape->isEdge()) 
-        return QIcon(":pictures/edge.png");
-      else if (aShape->isFace()) 
-        return QIcon(":pictures/face.png");
-      else if (aShape->isVertex()) 
-        return QIcon(":pictures/vertex.png");
+    if(aShape.get()) {
+      switch(aShape->shapeType()) {
+        case GeomAPI_Shape::COMPOUND:  return QIcon(":pictures/compound.png");
+        case GeomAPI_Shape::COMPSOLID: return QIcon(":pictures/compsolid.png");
+        case GeomAPI_Shape::SOLID:     return QIcon(":pictures/solid.png");
+        case GeomAPI_Shape::SHELL:     return QIcon(":pictures/shell.png");
+        case GeomAPI_Shape::FACE:      return QIcon(":pictures/face.png");
+        case GeomAPI_Shape::WIRE:      return QIcon(":pictures/wire.png");
+        case GeomAPI_Shape::EDGE:      return QIcon(":pictures/edge.png");
+        case GeomAPI_Shape::VERTEX:    return QIcon(":pictures/vertex.png");
+      }
     }
   }
-  return anIcon;  
+  return anIcon;
 }
 
 void PartSet_IconFactory::processEvent(const std::shared_ptr<Events_Message>& theMessage)

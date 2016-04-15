@@ -18,6 +18,7 @@
 #include <FeaturesPlugin_Rotation.h>
 #include <FeaturesPlugin_ValidatorTransform.h>
 #include <FeaturesPlugin_Validators.h>
+#include <FeaturesPlugin_Wire.h>
 
 #include <ModelAPI_Session.h>
 
@@ -44,6 +45,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorPipeLocations);
   aFactory->registerValidator("FeaturesPlugin_ValidatorCanBeEmpty",
                               new FeaturesPlugin_ValidatorCanBeEmpty);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorBaseForWire",
+                              new FeaturesPlugin_ValidatorBaseForWire);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -79,6 +82,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_RevolutionCut);
   } else if (theFeatureID == FeaturesPlugin_RevolutionFuse::ID()) {
     return FeaturePtr(new FeaturesPlugin_RevolutionFuse);
+  } else if (theFeatureID == FeaturesPlugin_Wire::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Wire);
   }
   // feature of such kind is not found
   return FeaturePtr();

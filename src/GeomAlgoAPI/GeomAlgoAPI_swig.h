@@ -36,6 +36,7 @@
   #include "GeomAlgoAPI_PaveFiller.h"
   #include "GeomAlgoAPI_Intersection.h"
   #include "GeomAlgoAPI_Pipe.h"
+  #include "GeomAlgoAPI_WireBuilder.h"
 
   #include <memory>
   #include <string>
