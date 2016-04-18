@@ -2,11 +2,6 @@
 
 <plugin>
   <workbench id="Features" document="Part">
-    <group id="Shape">
-      <feature id="Wire" title="Wire" tooltip ="Create a wire from sketch edges and wires objects" icon="icons/Features/feature_wire.png">
-        <source path="wire_widget.xml"/>
-      </feature>
-    </group>
     <group id="Extrusion">
       <feature id="Extrusion" title="Extrusion" tooltip="Create a solid by extrusion of a face" icon="icons/Features/extrusion.png">
           <source path="extrusion_widget.xml"/>

@@ -1,0 +1,11 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<plugin>
+  <workbench id="Build" document="Part">
+    <group id="Shape">
+      <feature id="Wire" title="Wire" tooltip ="Create a wire from sketch edges and wires objects" icon="icons/Build/feature_wire.png">
+        <source path="wire_widget.xml"/>
+      </feature>
+    </group>
+   </workbench>
+</plugin>

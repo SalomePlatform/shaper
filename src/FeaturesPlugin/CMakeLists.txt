@@ -26,7 +26,6 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_RevolutionFuse.h
     FeaturesPlugin_ValidatorTransform.h
     FeaturesPlugin_Validators.h
-    FeaturesPlugin_Wire.h
 )
 
 SET(PROJECT_SOURCES
@@ -51,7 +50,6 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_RevolutionFuse.cpp
     FeaturesPlugin_ValidatorTransform.cpp
     FeaturesPlugin_Validators.cpp
-    FeaturesPlugin_Wire.cpp
 )
 
 SET(XML_RESOURCES
@@ -70,7 +68,6 @@ SET(XML_RESOURCES
   placement_widget.xml
   intersection_widget.xml
   pipe_widget.xml
-  wire_widget.xml
 )
 
 INCLUDE_DIRECTORIES(

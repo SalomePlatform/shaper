@@ -1,10 +1,10 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        FeaturesPlugin_Wire.cpp
+// File:        BuildPlugin_Wire.cpp
 // Created:     14 April 2016
 // Author:      Dmitry Bobylev
 
-#include "FeaturesPlugin_Wire.h"
+#include "BuildPlugin_Wire.h"
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_ResultBody.h>
@@ -22,18 +22,18 @@
 #include <algorithm>
 
 //=================================================================================================
-FeaturesPlugin_Wire::FeaturesPlugin_Wire()
+BuildPlugin_Wire::BuildPlugin_Wire()
 {
 }
 
 //=================================================================================================
-void FeaturesPlugin_Wire::initAttributes()
+void BuildPlugin_Wire::initAttributes()
 {
   data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
 }
 
 //=================================================================================================
-void FeaturesPlugin_Wire::execute()
+void BuildPlugin_Wire::execute()
 {
   // Get base objects list.
   AttributeSelectionListPtr aSelectionList = selectionList(BASE_OBJECTS_ID());
@@ -78,7 +78,7 @@ void FeaturesPlugin_Wire::execute()
 }
 
 //=================================================================================================
-bool FeaturesPlugin_Wire::customAction(const std::string& theActionId)
+bool BuildPlugin_Wire::customAction(const std::string& theActionId)
 {
   if(theActionId == "add_contour") {
     return addContour();
@@ -90,7 +90,7 @@ bool FeaturesPlugin_Wire::customAction(const std::string& theActionId)
 }
 
 //=================================================================================================
-bool FeaturesPlugin_Wire::addContour()
+bool BuildPlugin_Wire::addContour()
 {
   // Get base objects list.
   AttributeSelectionListPtr aSelectionList = selectionList(BASE_OBJECTS_ID());
