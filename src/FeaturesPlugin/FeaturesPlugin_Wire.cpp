@@ -145,8 +145,8 @@ bool FeaturesPlugin_Wire::addContour()
     ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSelection->context());
     std::shared_ptr<GeomAPI_PlanarEdges> aPlanarEdges = std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aConstruction->shape());
 
-    ListOfShape aClosedWires;
-    GeomAlgoAPI_ShapeTools::getClosedWires(aPlanarEdges->getEdges(), aClosedWires);
+    //ListOfShape aClosedWires;
+    //GeomAlgoAPI_ShapeTools::getClosedWires(aPlanarEdges->getEdges(), aClosedWires);
 
     //// Iterate on wires and add wire with this edge.
     //std::shared_ptr<GeomAPI_Shape> aFoundWire;
@@ -220,6 +220,8 @@ bool FeaturesPlugin_Wire::addContour()
     Events_Error::send("Error: No contours found for selected edges.");
     return false;
   }
+
+  
 
   return false;
 }
