@@ -46,6 +46,17 @@ public:
 
   /// Creates a new part document if needed.
   FEATURESPLUGIN_EXPORT virtual void execute();
+
+  /// Performs some functionality by action id.
+  /// \param[in] theAttributeId action key id.
+  /// \return false in case if action not perfomed.
+  FEATURESPLUGIN_EXPORT virtual bool customAction(const std::string& theActionId);
+
+private:
+  /// Action: Adds to the list of segments other segments of the sketcher connected to
+  /// the already selected ones to create a closed contour.
+  /// \return false in case if no countours have been added.
+  bool addContour();
 };
 
 #endif

@@ -7,5 +7,8 @@
                   type_choice="edges objects">
     <validator id="FeaturesPlugin_ValidatorBaseForWire"/>
   </multi_selector>
-  <action id="Action_1" label="Action_1" tooltip="Tool tip information"/>
+  <action id="add_contour"
+          label="Add contour"
+          tooltip="Adds to the list of segments other segments of the sketcher
+                   connected to the already selected ones to create a closed contour."/>
 </source>

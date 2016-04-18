@@ -352,7 +352,7 @@ bool FeaturesPlugin_ValidatorBaseForWire::isValid(const AttributePtr& theAttribu
       theError = "Attribute have empty context.";
       return false;
     }
-    
+
     GeomShapePtr aShape = aSelection->value();
     GeomShapePtr aContextShape = aContext->shape();
     if(!aShape.get()) {
