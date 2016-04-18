@@ -132,6 +132,7 @@ SET(ICON_RESOURCES
   icons/plane.png
   icons/plane_inverted.png
   icons/plane_inverted_32x32.png
+  icons/revol.png
   icons/revol_cut.png
   icons/revol_fuse.png
   icons/revolsketch.png
