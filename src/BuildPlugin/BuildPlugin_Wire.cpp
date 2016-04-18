@@ -100,6 +100,7 @@ bool BuildPlugin_Wire::addContour()
   }
 
   // Collect attributes to check.
+  ListOfShape anAddedEdges;
   std::list<AttributeSelectionPtr> anAttributesToCheck;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
@@ -130,12 +131,12 @@ bool BuildPlugin_Wire::addContour()
       continue;
     }
 
+    anAddedEdges.push_back(anEdgeInList);
     anAttributesToCheck.push_back(aSelection);
   }
 
   // Check if edges have contours.
-  ListOfShape anAddedEdges;
-  bool isAnyContourFound = false;
+  bool isAnyContourAdded = false;
   for(std::list<AttributeSelectionPtr>::const_iterator aListIt = anAttributesToCheck.cbegin();
       aListIt != anAttributesToCheck.cend();
       ++aListIt) {
@@ -147,10 +148,6 @@ bool BuildPlugin_Wire::addContour()
       if(anEdgeInList->isEqual(*anEdgesIt)) {
         break;
       }
-    }
-    if(anEdgesIt != anAddedEdges.cend()) {
-      // This edge is already in list.
-      continue;
     }
 
     ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSelection->context());
@@ -175,8 +172,6 @@ bool BuildPlugin_Wire::addContour()
 
     // If face with the same edge found. Add all other edges to list.
     if(aFoundFace.get()) {
-      isAnyContourFound = true;
-      anAddedEdges.push_back(anEdgeInList);
       for(GeomAPI_ShapeExplorer anExp(aFoundFace, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
         std::shared_ptr<GeomAPI_Edge> anEdgeOnFace(new GeomAPI_Edge(anExp.current()));
         anEdgesIt = anAddedEdges.cbegin();
@@ -186,6 +181,7 @@ bool BuildPlugin_Wire::addContour()
           }
         }
         if(anEdgesIt == anAddedEdges.cend()) {
+          isAnyContourAdded = true;
           anAddedEdges.push_back(anEdgeOnFace);
           aSelectionList->append(aConstruction, anEdgeOnFace);
         }
@@ -193,7 +189,7 @@ bool BuildPlugin_Wire::addContour()
     }
   }
 
-  if(!isAnyContourFound) {
+  if(!isAnyContourAdded) {
     Events_Error::send("Error: Contours already closed or no contours found for selected edges.");
     return false;
   }
