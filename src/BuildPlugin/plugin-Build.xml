@@ -3,6 +3,9 @@
 <plugin>
   <workbench id="Build" document="Part">
     <group id="Shape">
+      <feature id="Vertex" title="Vertex" tooltip ="Create a vertex from sketch vertex and vertex objects" icon="icons/Build/feature_vertex.png">
+        <source path="vertex_widget.xml"/>
+      </feature>
       <feature id="Wire" title="Wire" tooltip ="Create a wire from sketch edges and wires objects" icon="icons/Build/feature_wire.png">
         <source path="wire_widget.xml"/>
       </feature>

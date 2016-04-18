@@ -9,6 +9,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <BuildPlugin_Vertex.h>
 #include <BuildPlugin_Wire.h>
 #include <BuildPlugin_Validators.h>
 
@@ -21,6 +22,8 @@ BuildPlugin_Plugin::BuildPlugin_Plugin()
   // Register validators.
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  aFactory->registerValidator("BuildPlugin_ValidatorBaseForVertex",
+                              new BuildPlugin_ValidatorBaseForVertex());
   aFactory->registerValidator("BuildPlugin_ValidatorBaseForWire",
                               new BuildPlugin_ValidatorBaseForWire());
 
@@ -31,7 +34,9 @@ BuildPlugin_Plugin::BuildPlugin_Plugin()
 //=================================================================================================
 FeaturePtr BuildPlugin_Plugin::createFeature(std::string theFeatureID)
 {
-  if (theFeatureID == BuildPlugin_Wire::ID()) {
+  if(theFeatureID == BuildPlugin_Vertex::ID()) {
+    return FeaturePtr(new BuildPlugin_Vertex());
+  } else if(theFeatureID == BuildPlugin_Wire::ID()) {
     return FeaturePtr(new BuildPlugin_Wire());
   }
 

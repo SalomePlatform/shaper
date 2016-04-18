@@ -1,0 +1,10 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<source>
+  <multi_selector id="base_objects"
+                  label="Vertices:"
+                  tooltip="Select a vertices on sketch or vertex objects."
+                  type_choice="vertex objects">
+    <validator id="BuildPlugin_ValidatorBaseForVertex"/>
+  </multi_selector>
+</source>

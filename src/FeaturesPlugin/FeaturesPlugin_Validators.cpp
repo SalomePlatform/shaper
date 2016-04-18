@@ -148,6 +148,8 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
           return true;
         }
       }
+
+      return false;
     }
 
     if(!aShape->isEqual(aContextShape)) {

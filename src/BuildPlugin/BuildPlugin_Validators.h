@@ -10,6 +10,22 @@
 #include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_FeatureValidator.h>
 
+/// \class BuildPlugin_ValidatorBaseForVertex
+/// \ingroup Validators
+/// \brief A validator for selection base shapes for vertex. Allows to select vertices on sketch and
+/// vertex objects.
+class BuildPlugin_ValidatorBaseForVertex: public ModelAPI_AttributeValidator
+{
+public:
+  //! Returns true if attribute is ok.
+  //! \param[in] theAttribute the checked attribute.
+  //! \param[in] theArguments arguments of the attribute.
+  //! \param[out] theError error message.
+   virtual bool isValid(const AttributePtr& theAttribute,
+                        const std::list<std::string>& theArguments,
+                        std::string& theError) const;
+};
+
 /// \class BuildPlugin_ValidatorBaseForWire
 /// \ingroup Validators
 /// \brief A validator for selection base shapes for wire. Allows to select edges on sketch and

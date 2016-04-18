@@ -13,18 +13,21 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
 SET(PROJECT_HEADERS
     BuildPlugin.h
     BuildPlugin_Plugin.h
+    BuildPlugin_Vertex.h
     BuildPlugin_Wire.h
     BuildPlugin_Validators.h
 )
 
 SET(PROJECT_SOURCES
     BuildPlugin_Plugin.cpp
+    BuildPlugin_Vertex.cpp
     BuildPlugin_Wire.cpp
     BuildPlugin_Validators.cpp
 )
 
 SET(XML_RESOURCES
     plugin-Build.xml
+    vertex_widget.xml
     wire_widget.xml
 )
 
