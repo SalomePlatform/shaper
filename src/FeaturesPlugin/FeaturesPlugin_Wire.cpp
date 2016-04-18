@@ -100,7 +100,6 @@ bool FeaturesPlugin_Wire::addContour()
   }
 
   // Collect attributes to check.
-  ListOfShape anAddedEdges;
   std::list<AttributeSelectionPtr> anAttributesToCheck;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
@@ -131,54 +130,31 @@ bool FeaturesPlugin_Wire::addContour()
       continue;
     }
 
-    anAddedEdges.push_back(anEdgeInList);
     anAttributesToCheck.push_back(aSelection);
   }
 
   // Check if edges have contours.
+  ListOfShape anAddedEdges;
   bool isAnyContourFound = false;
   for(std::list<AttributeSelectionPtr>::const_iterator aListIt = anAttributesToCheck.cbegin();
       aListIt != anAttributesToCheck.cend();
       ++aListIt) {
     AttributeSelectionPtr aSelection = *aListIt;
     std::shared_ptr<GeomAPI_Edge> anEdgeInList(new GeomAPI_Edge(aSelection->value()));
+
+    ListOfShape::const_iterator anEdgesIt = anAddedEdges.cbegin();
+    for(; anEdgesIt != anAddedEdges.cend(); ++anEdgesIt) {
+      if(anEdgeInList->isEqual(*anEdgesIt)) {
+        break;
+      }
+    }
+    if(anEdgesIt != anAddedEdges.cend()) {
+      // This edge is already in list.
+      continue;
+    }
+
     ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSelection->context());
     std::shared_ptr<GeomAPI_PlanarEdges> aPlanarEdges = std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aConstruction->shape());
-
-    //ListOfShape aClosedWires;
-    //GeomAlgoAPI_ShapeTools::getClosedWires(aPlanarEdges->getEdges(), aClosedWires);
-
-    //// Iterate on wires and add wire with this edge.
-    //std::shared_ptr<GeomAPI_Shape> aFoundWire;
-    //for(ListOfShape::const_iterator aWireIt = aClosedWires.cbegin();
-    //    aWireIt != aClosedWires.cend();
-    //    ++aWireIt) {
-    //  GeomShapePtr aWire = *aWireIt;
-    //  for(GeomAPI_ShapeExplorer anExp(aWire, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
-    //    GeomShapePtr anEdgeOnWire = anExp.current();
-    //    if(anEdgeInList->isSame(anEdgeOnWire)) {
-    //      aFoundWire = aWire;
-    //      break;
-    //    }
-    //  }
-
-    //  if(aFoundWire.get()) {
-    //    break;
-    //  }
-    //}
-
-    //// If wire with the same edge found add all other edges to list.
-    //if(aFoundWire.get()) {
-    //  isAnyContourFound = true;
-    //  anAddedEdges.bind(anEdgeInList, anEdgeInList);
-    //  for(GeomAPI_ShapeExplorer anExp(aFoundWire, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
-    //    GeomShapePtr anEdgeOnFace = anExp.current();
-    //    if(!anAddedEdges.isBound(anEdgeOnFace)) {
-    //      anAddedEdges.bind(anEdgeOnFace, anEdgeOnFace);
-    //      aSelectionList->append(aConstruction, anEdgeOnFace);
-    //    }
-    //  }
-    //}
 
     // Iterate on faces and add face with this edge.
     std::shared_ptr<GeomAPI_Face> aFoundFace;
@@ -200,9 +176,10 @@ bool FeaturesPlugin_Wire::addContour()
     // If face with the same edge found. Add all other edges to list.
     if(aFoundFace.get()) {
       isAnyContourFound = true;
+      anAddedEdges.push_back(anEdgeInList);
       for(GeomAPI_ShapeExplorer anExp(aFoundFace, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
         std::shared_ptr<GeomAPI_Edge> anEdgeOnFace(new GeomAPI_Edge(anExp.current()));
-        ListOfShape::const_iterator anEdgesIt = anAddedEdges.cbegin();
+        anEdgesIt = anAddedEdges.cbegin();
         for(; anEdgesIt != anAddedEdges.cend(); ++anEdgesIt) {
           if(anEdgeOnFace->isEqual(*anEdgesIt)) {
             break;
@@ -217,11 +194,9 @@ bool FeaturesPlugin_Wire::addContour()
   }
 
   if(!isAnyContourFound) {
-    Events_Error::send("Error: No contours found for selected edges.");
+    Events_Error::send("Error: Contours already closed or no contours found for selected edges.");
     return false;
   }
 
-  
-
-  return false;
+  return true;
 }
