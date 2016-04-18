@@ -9,7 +9,10 @@
 
 #include "ModuleBase.h"
 #include <ModelAPI_Object.h>
+
+#include <QPixmap>
 #include <QIcon>
+#include <QImage>
 
 /**\class ModuleBase_IconFactory
  * \ingroup GUI
@@ -25,12 +28,24 @@ public:
   /// \param theObj an object
   virtual QIcon getIcon(ObjectPtr theObj);
 
-  /// Finds an icon for the given object. The icon is loaded: firstly from qrc file,
+  /// Finds an icon for the given value. The icon is loaded: firstly from qrc file,
   /// then by the icon path. If the path contains ":" , it will be treated as absolute path to
   /// the icon, or relative path from the plugin library
   /// \param theValue an icon information
   /// \return a loaded or empty icon
   static QIcon loadIcon(const QString& theValue);
+
+  /// Finds a pixmap for the given value. It is loaded: firstly from qrc file,
+  /// then by the absolute path. If the pixmap is not loaded, it is searched in relative plugin path
+  /// \param theValue a pixmap information
+  /// \return a loaded or empty pixmap
+  static QPixmap loadPixmap(const QString& theValue);
+
+  /// Finds an image for the given value. It is loaded: firstly from qrc file,
+  /// then by the absolute path. If the image is not loaded, it is searched in relative plugin path
+  /// \param theValue a image information
+  /// \return a loaded or empty pixmap
+  static QImage loadImage(const QString& theValue);
 
 protected:
   ModuleBase_IconFactory();

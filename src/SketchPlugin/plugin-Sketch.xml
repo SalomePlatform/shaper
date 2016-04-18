@@ -325,7 +325,7 @@
           label="Angle type"
           tooltip="Type of angle"
           string_list="Direct Complementary Additional"
-          icons_list="icons/Sketch/angle_direct.png icons/angle_complementary.png icons/angle_backward.png"
+          icons_list="icons/Sketch/angle_direct.png icons/Sketch/angle_complementary.png icons/Sketch/angle_backward.png"
           default="0"
           />
       </feature>

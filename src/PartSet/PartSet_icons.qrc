@@ -9,7 +9,6 @@
      <file>icons/exec_state_invalid_parameters.png</file>
      <file>icons/hand_point.png</file>
      <file>icons/move_to_end.png</file>
-     <file>icons/rectangle.png</file>
      <file>icons/sketch_shape.png</file>
  </qresource>
  </RCC>

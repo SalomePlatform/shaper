@@ -2,7 +2,7 @@
   <workbench id="Macros" document="Part">
     <group id="Samples">
 
-      <feature id="Box" title="Box" tooltip="Create a box parallel to xyz by extruding a rectangular" icon=":pictures/box_ico.png">
+      <feature id="Box" title="Box" tooltip="Create a box parallel to xyz by extruding a rectangular" icon="icons/Addons/box_ico.png">
         <doublevalue id="width"  label="Width: " min="0" step="1.0" default="50" tooltip="Box width">
           <validator id="GeomValidators_Positive"/>
         </doublevalue>

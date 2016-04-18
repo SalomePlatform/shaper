@@ -373,7 +373,7 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
         return QString(myXMLReader.rootFolderName(theIndexRow).c_str()) + 
           QString(" (%1)").arg(rowCount(theIndex));
       case Qt::DecorationRole:
-        return QIcon(myXMLReader.rootFolderIcon(theIndexRow).c_str());
+        return ModuleBase_IconFactory::loadIcon(myXMLReader.rootFolderIcon(theIndexRow).c_str());
       case Qt::ForegroundRole:
         {
           Qt::ItemFlags aFlags = theIndex.flags();
@@ -406,7 +406,7 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
           return QString(myXMLReader.subFolderName(aRow).c_str()) + 
             QString(" (%1)").arg(rowCount(theIndex));
         case Qt::DecorationRole:
-          return QIcon(myXMLReader.subFolderIcon(aRow).c_str());
+          return ModuleBase_IconFactory::loadIcon(myXMLReader.subFolderIcon(aRow).c_str());
       }
     } else {
       ModelAPI_Object* aObj = (ModelAPI_Object*)theIndex.internalPointer();

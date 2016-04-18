@@ -5,7 +5,8 @@
 // Author:      Vitaly Smetannikov
 
 #include "ModuleBase_WidgetChoice.h"
-#include <ModuleBase_Tools.h>
+#include "ModuleBase_Tools.h"
+#include "ModuleBase_IconFactory.h"
 
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Data.h>
@@ -62,7 +63,7 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
         aBtn->setCheckable(true);
         aBtn->setToolTip(aBtnTxt);
 
-        QPixmap aIcon(aIconList.at(aId));
+        QPixmap aIcon = ModuleBase_IconFactory::loadPixmap(aIconList.at(aId));
         aBtn->setIcon(aIcon);
         aBtn->setIconSize(aIcon.size());
         

@@ -40,14 +40,31 @@ QIcon ModuleBase_IconFactory::getIcon(ObjectPtr theIcon)
 
 QIcon ModuleBase_IconFactory::loadIcon(const QString& theValue)
 {
+  return QIcon(loadPixmap(theValue));
+}
+
+QPixmap ModuleBase_IconFactory::loadPixmap(const QString& theValue)
+{
   QPixmap aPixmap(theValue);
 
   if (aPixmap.isNull()) {
     std::string aPluginPath = Config_XMLReader::pluginConfigFile();
-    QString anIconPath = QString::fromStdString(aPluginPath) + QDir::separator() +
-                         theValue;
-    if (QFile::exists(anIconPath))
-      aPixmap = QPixmap(anIconPath);
+    QString aPath = QString::fromStdString(aPluginPath) + QDir::separator() + theValue;
+    if (QFile::exists(aPath))
+      aPixmap = QPixmap(aPath);
   }
-  return QIcon(aPixmap);
+  return aPixmap;
+}
+
+QImage ModuleBase_IconFactory::loadImage(const QString& theValue)
+{
+  QImage anImage(theValue);
+
+  if (anImage.isNull()) {
+    std::string aPluginPath = Config_XMLReader::pluginConfigFile();
+    QString aPath = QString::fromStdString(aPluginPath) + QDir::separator() + theValue;
+    if (QFile::exists(aPath))
+      anImage = QImage(aPath);
+  }
+  return anImage;
 }

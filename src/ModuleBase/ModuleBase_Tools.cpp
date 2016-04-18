@@ -11,6 +11,7 @@
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IModule.h>
+#include <ModuleBase_IconFactory.h>
 
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeRefAttr.h>
@@ -126,7 +127,7 @@ void setShadowEffect(QWidget* theWidget, const bool isSetEffect)
 
 QPixmap composite(const QString& theAdditionalIcon, const QString& theIcon)
 {
-  QImage anIcon(theIcon);
+  QImage anIcon = ModuleBase_IconFactory::loadImage(theIcon);
   QImage anAditional(theAdditionalIcon);
 
   if (anIcon.isNull())
@@ -154,11 +155,11 @@ QPixmap composite(const QString& theAdditionalIcon, const QString& theIcon)
 
 QPixmap lighter(const QString& theIcon, const int theLighterValue)
 {
-  QImage anIcon(theIcon);
+  QImage anIcon = ModuleBase_IconFactory::loadImage(theIcon);
   if (anIcon.isNull())
     return QPixmap();
 
-  QImage aResult(theIcon);
+  QImage aResult = ModuleBase_IconFactory::loadImage(theIcon);
   for (int i = 0; i < anIcon.width(); i++)
   {
     for (int j = 0; j < anIcon.height(); j++)

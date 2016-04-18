@@ -44,7 +44,7 @@ QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
     switch(aState) {
       case ModelAPI_StateDone:
       case ModelAPI_StateNothing: {
-        anIcon = QIcon(anIconString);
+        anIcon = loadIcon(anIconString);
       }
       break;
       case ModelAPI_StateMustBeUpdated: {

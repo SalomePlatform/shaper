@@ -7,7 +7,7 @@
         id="SketchRectangle"
         title="Rectangle"
         tooltip="Create rectangle"
-        icon=":icons/rectangle.png">
+        icon="icons/Addons/rectangle.png">
         <sketch-2dpoint_selector id="RectStartPoint" accept_expressions="0" title="Start point" tooltip="Start point coordinates"/>
         <sketch-2dpoint_selector id="RectEndPoint" accept_expressions="0" title="End point" tooltip="End point coordinates"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>

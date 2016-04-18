@@ -8,6 +8,7 @@
  */
 
 #include <ModuleBase_WidgetFactory.h>
+#include <ModuleBase_IconFactory.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
@@ -122,7 +123,7 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
               ModuleBase_PagedContainer* aContainer = qobject_cast<ModuleBase_PagedContainer*>(aWidget);
 
               QString anIconPath = qs( myWidgetApi->getProperty( CONTAINER_PAGE_ICON ) );
-              QPixmap anIcon( anIconPath );
+              QPixmap anIcon = ModuleBase_IconFactory::loadPixmap( anIconPath );
               aContainer->addPage( aPage, aPageName, aCaseId, anIcon );
             }
           } while (myWidgetApi->toNextWidget());
