@@ -9,23 +9,22 @@
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create sketch"
-        icon=":icons/sketch.png">
+        icon="icons/Sketch/sketch.png">
         <sketch-start-label id="External" title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch">
           <validator id="GeomValidators_Face" parameters="plane"/>
         </sketch-start-label>
         <error_label id="SolverError"/>
         <validator id="SketchPlugin_SolverErrorValidator"/>
-      <!--icon=":pictures/x_point.png"-->
       </feature>
 
       <!-- SketchPoint -->
-      <feature id="SketchPoint" title="Point" tooltip="Create point" icon=":icons/point.png">
+      <feature id="SketchPoint" title="Point" tooltip="Create point" icon="icons/Sketch/point.png">
         <sketch-2dpoint_selector id="PointCoordindates" accept_expressions="0" title="Point" tooltip="Point coordinates"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
       
       <!-- SketchLine -->
-      <feature id="SketchLine" title="Line" tooltip="Create line" icon=":icons/line.png">
+      <feature id="SketchLine" title="Line" tooltip="Create line" icon="icons/Sketch/line.png">
         <sketch-2dpoint_selector id="StartPoint" accept_expressions="0" title="Start point" tooltip="Start point coordinates" previous_feature_param="EndPoint"/>
         <sketch-2dpoint_selector id="EndPoint" accept_expressions="0" title="End point" tooltip="End point coordinates"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
@@ -37,15 +36,15 @@
         id="SketchCircle"
         title="Circle"
         tooltip="Create circle"
-        icon=":icons/circle.png">
+        icon="icons/Sketch/circle.png">
         <toolbox id="CircleType">
-          <box id="CenterRadius" title="Center and radius" icon=":icons/circle_pt_rad_32x32.png">
+          <box id="CenterRadius" title="Center and radius" icon="icons/Sketch/circle_pt_rad_32x32.png">
             <sketch-2dpoint_selector id="CircleCenter" accept_expressions="0" title="Center" tooltip="Center coordinates"/>
-            <point2ddistance id="CircleRadius" accept_expressions="0" first_point="CircleCenter" label="Radius:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Set radius">
+            <point2ddistance id="CircleRadius" accept_expressions="0" first_point="CircleCenter" label="Radius:" min="0" step="1.0" default="0" icon="icons/Sketch/radius.png" tooltip="Set radius">
               <validator id="GeomValidators_Positive"/>
             </point2ddistance>
           </box>
-          <box id="ThreePoints" title="Three points" icon=":icons/circle_3pt_32x32.png">
+          <box id="ThreePoints" title="Three points" icon="icons/Sketch/circle_3pt_32x32.png">
             <sketch-2dpoint_selector id="FirstPoint" accept_expressions="0" title="First point" tooltip="First point"/>
             <sketch-2dpoint_selector id="SecondPoint" accept_expressions="0" title="Second point" tooltip="Second point"/>
             <sketch-2dpoint_selector id="ThirdPoint" accept_expressions="0" title="Third point" tooltip="Third point"/>
@@ -59,36 +58,36 @@
         id="SketchArc"
         title="Arc"
         tooltip="Create arc"
-        icon=":icons/arc.png">
+        icon="icons/Sketch/arc.png">
         <toolbox id="ArcType">
-          <box id="CenterStartEnd" title="Center and two points" icon=":icons/arc_base_32x32.png">
+          <box id="CenterStartEnd" title="Center and two points" icon="icons/Sketch/arc_base_32x32.png">
             <sketch-2dpoint_selector id="ArcCenter" accept_expressions="0" title="Center" tooltip="Center of a circle"/>
             <sketch-2dpoint_selector id="ArcStartPoint" accept_expressions="0" title="Start point" tooltip="Start point"/>
             <sketch-2dpoint_selector id="ArcEndPoint" accept_expressions="0" title="End point" tooltip="End point"/>
             <validator id="GeomValidators_Different" parameters="ArcCenter,ArcStartPoint,ArcEndPoint"/>
           </box>
-          <box id="ThreePoints" title="Three points on arc" icon=":icons/arc_3pt_32x32.png">
+          <box id="ThreePoints" title="Three points on arc" icon="icons/Sketch/arc_3pt_32x32.png">
             <sketch-2dpoint_selector id="ArcStartPoint" accept_expressions="0" title="Start point" tooltip="Start point"/>
             <sketch-2dpoint_selector id="ArcEndPoint" accept_expressions="0" title="End point" tooltip="End point"/>
             <sketch-2dpoint_selector id="ArcPassedPoint" accept_expressions="0" title="Passed point" tooltip="Passed point"/>
             <validator id="GeomValidators_Different" parameters="ArcStartPoint,ArcEndPoint,ArcPassedPoint"/>
           </box>
-          <box id="Tangent" title="Tangent with edge" icon=":icons/arc_tang_32x32.png">
+          <box id="Tangent" title="Tangent with edge" icon="icons/Sketch/arc_tang_32x32.png">
             <sketch_shape_selector id="ArcTangentPoint" label="Start point" tooltip="Select point on line" shape_types="vertex">
               <validator id="SketchPlugin_ArcTangentPoint" parameters="" />
             </sketch_shape_selector>
             <sketch-2dpoint_selector id="ArcEndPoint" accept_expressions="0" title="End point" tooltip="End point"/>
           </box>
         </toolbox>
-        <doublevalue id="ArcRadius" accept_expressions="0" label="Radius:" default="computed" icon=":icons/radius.png" tooltip="Set radius" obligatory="0">
+        <doublevalue id="ArcRadius" accept_expressions="0" label="Radius:" default="computed" icon="icons/Sketch/radius.png" tooltip="Set radius" obligatory="0">
           <validator id="GeomValidators_Positive"/>
         </doublevalue>
-        <doublevalue id="ArcAngle" label="Angle:" icon=":icons/angle.png" tooltip="Set angle" default="90" use_reset="false" obligatory="0"/>
+        <doublevalue id="ArcAngle" label="Angle:" icon="icons/Sketch/angle.png" tooltip="Set angle" default="90" use_reset="false" obligatory="0"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
 
       <!--  SketchConstraintFillet  -->
-      <feature id="SketchConstraintFillet" title="Fillet" tooltip="Create constraint defining fillet between two objects" icon=":icons/fillet.png">
+      <feature id="SketchConstraintFillet" title="Fillet" tooltip="Create constraint defining fillet between two objects" icon="icons/Sketch/fillet.png">
         <!--<sketch_shape_selector id="ConstraintEntityA"
             label="Point" tooltip="Select point for fillet (should be shared by two entities only)" shape_types="vertex">
           <validator id="SketchPlugin_FilletVertexValidator"/>
@@ -113,7 +112,7 @@
         id="SketchIntersectionPoint"
         title="Intersection Point"
         tooltip="Create intersection point"
-        icon=":icons/intersection_point.png">
+        icon="icons/Sketch/intersection_point.png">
         <sketch_shape_selector
               id="ExternalLine"
               label="Edge"
@@ -132,7 +131,7 @@
       <!--  SketchConstraintMirror  -->
       <feature
         id="SketchConstraintMirror"
-        title="Mirror" icon=":icons/mirror.png"
+        title="Mirror" icon="icons/Sketch/mirror.png"
         tooltip="Create constraint, mirroring group of objects">
         <sketch_shape_selector id="ConstraintEntityA"
             label="Mirror line" tooltip="Select mirror line" shape_types="edge">
@@ -151,7 +150,7 @@
       <!--  SketchMultiTranslation  -->
       <feature
         id="SketchMultiTranslation"
-        title="Translation" icon=":icons/translate.png"
+        title="Translation" icon="icons/Sketch/translate.png"
         tooltip="Multiple translation">
         <sketch_multi_selector id="MultiTranslationList"
             label="Segments:"
@@ -162,7 +161,7 @@
           <validator id="SketchPlugin_CopyValidator" />
         </sketch_multi_selector>
         <toolbox id="ValueType">
-          <box id="SingleValue" title="Single value" icon=":icons/translate_32x32.png">
+          <box id="SingleValue" title="Single value" icon="icons/Sketch/translate_32x32.png">
             <groupbox title="Direction">
               <sketch_shape_selector
                     id="MultiTranslationStartPoint"
@@ -182,7 +181,7 @@
               </sketch_shape_selector>
             </groupbox>
           </box>
-          <box id="FullValue" title="Full value" icon=":icons/translate_full_32x32.png">
+          <box id="FullValue" title="Full value" icon="icons/Sketch/translate_full_32x32.png">
             <groupbox title="Direction">
               <sketch_shape_selector
                     id="MultiTranslationStartPoint"
@@ -214,7 +213,7 @@
       <!--  SketchMultiRotation  -->
       <feature
         id="SketchMultiRotation"
-        title="Rotation" icon=":icons/rotate.png"
+        title="Rotation" icon="icons/Sketch/rotate.png"
         tooltip="Multiple rotation">
         <sketch_multi_selector id="MultiRotationList"
             label="Segments:"
@@ -232,17 +231,17 @@
           <validator id="GeomValidators_ShapeType" parameters="vertex"/>
         </sketch_shape_selector>
         <toolbox id="AngleType">
-          <box id="SingleAngle" title="Single angle" icon=":icons/angle_up_32x32.png">
+          <box id="SingleAngle" title="Single angle" icon="icons/Sketch/angle_up_32x32.png">
             <doublevalue id="MultiRotationAngle"
                          label="Angle"
-                         icon=":icons/angle.png"
+                         icon="icons/Sketch/angle.png"
                          tooltip="Rotation angle"
                          default="90" use_reset="false"/>
           </box>
-          <box id="FullAngle" title="Full angle" icon=":icons/angle_up_full_32x32.png">
+          <box id="FullAngle" title="Full angle" icon="icons/Sketch/angle_up_full_32x32.png">
             <doublevalue id="MultiRotationAngle"
                          label="Angle"
-                         icon=":icons/angle.png"
+                         icon="icons/Sketch/angle.png"
                          tooltip="Rotation angle"
                          default="90" use_reset="false"/>
           </box>
@@ -262,7 +261,7 @@
         id="SketchConstraintDistance"
         title="Distance"
         tooltip="Set fixed distance from a point to an object"
-        icon=":icons/distance.png">
+        icon="icons/Sketch/distance.png">
         <label title="Select objects for distance definition. Following objects can be accepted: point, line or arc end point, center of circle or arc."/>
         <sketch_shape_selector
               id="ConstraintEntityA"
@@ -293,7 +292,7 @@
       </feature>
       
     <!--  SketchConstraintLength  -->      
-      <feature id="SketchConstraintLength" title="Length" tooltip="Set fixed length of a line segment" icon=":icons/length.png">
+      <feature id="SketchConstraintLength" title="Length" tooltip="Set fixed length of a line segment" icon="icons/Sketch/length.png">
         <label title="Select a line on which to calculate length" tooltip="Select a line on which to calculate length"/>
         <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select an line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
@@ -306,7 +305,7 @@
       </feature>
 
       <!--  SketchConstraintAngle  -->
-      <feature id="SketchConstraintAngle" title="Angle" tooltip="Set fixed angle between two line segments" icon=":icons/angle_constr.png">
+      <feature id="SketchConstraintAngle" title="Angle" tooltip="Set fixed angle between two line segments" icon="icons/Sketch/angle_constr.png">
         <sketch_shape_selector id="ConstraintEntityA" label="Line 1" tooltip="Select an line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
           <validator id="PartSet_DifferentObjects"/>
@@ -326,13 +325,13 @@
           label="Angle type"
           tooltip="Type of angle"
           string_list="Direct Complementary Additional"
-          icons_list=":icons/angle_direct.png :icons/angle_complementary.png :icons/angle_backward.png"
+          icons_list="icons/Sketch/angle_direct.png icons/angle_complementary.png icons/angle_backward.png"
           default="0"
           />
       </feature>
 
       <!--  SketchConstraintRadius  -->
-      <feature id="SketchConstraintRadius" title="Radius" tooltip="Set fixed radius of a circle or an arc" icon=":icons/radius_constr.png">
+      <feature id="SketchConstraintRadius" title="Radius" tooltip="Set fixed radius of a circle or an arc" icon="icons/Sketch/radius_constr.png">
         <label title="Select a circle or an arc on which to calculate radius" tooltip="Select a circle or an arc on which to calculate radius"/>
         <shape_selector id="ConstraintEntityA" label="Circle or Arc" tooltip="Select a circle or an arc"
             shape_types="edge">
@@ -350,7 +349,7 @@
     <group id="Geometrical constraints">
 
       <!--  SketchConstraintHorizontal  -->
-      <feature id="SketchConstraintHorizontal" title="Horizontal" tooltip="Create constraint defining horizontal line" icon=":icons/horisontal.png">
+      <feature id="SketchConstraintHorizontal" title="Horizontal" tooltip="Create constraint defining horizontal line" icon="icons/Sketch/horisontal.png">
         <sketch_shape_selector id="ConstraintEntityA"
             label="Line" tooltip="Select a line" shape_types="edge" use_external="false">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
@@ -359,7 +358,7 @@
       </feature>
 
       <!--  SketchConstraintVertical  -->
-      <feature id="SketchConstraintVertical" title="Vertical" tooltip="Create constraint defining vertical line" icon=":icons/vertical.png">
+      <feature id="SketchConstraintVertical" title="Vertical" tooltip="Create constraint defining vertical line" icon="icons/Sketch/vertical.png">
         <sketch_shape_selector id="ConstraintEntityA"
             label="Line" tooltip="Select a line" shape_types="edge" use_external="false">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
@@ -368,7 +367,7 @@
       </feature>
 
       <!--  SketchConstraintRigid  -->
-      <feature id="SketchConstraintRigid" title="Fixed" tooltip="Fix an object" icon=":icons/fixed.png">
+      <feature id="SketchConstraintRigid" title="Fixed" tooltip="Fix an object" icon="icons/Sketch/fixed.png">
         <sketch_shape_selector id="ConstraintEntityA" label="Object"
                         tooltip="Select point, line end point, line, center of circle or arc."
                         shape_types="edge vertex">
@@ -380,7 +379,7 @@
 
       <!--  SketchConstraintParallel  -->
       <feature id="SketchConstraintParallel" title="Parallel" tooltip="Create constraint defining two parallel lines"
-               icon="parallel.png">
+               icon="icons/Sketch/parallel.png">
         <sketch_shape_selector id="ConstraintEntityA" 
             label="First line" tooltip="Select a line" shape_types="edge">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
@@ -400,7 +399,7 @@
     <!--  SketchConstraintPerpendicular  -->
       <feature id="SketchConstraintPerpendicular" title="Perpendicular" 
         tooltip="Create constraint defining two perpendicular lines" 
-        icon=":icons/perpendicular.png">
+        icon="icons/Sketch/perpendicular.png">
         <sketch_shape_selector id="ConstraintEntityA" 
             label="First line" tooltip="Select an line" 
             shape_types="edge">
@@ -420,7 +419,7 @@
       </feature>
 
       <!--  SketchConstraintTangent  -->
-      <feature id="SketchConstraintTangent" title="Tangent" tooltip="Create constraint defining tangency of two objects with common coincident point" icon=":icons/tangent.png">
+      <feature id="SketchConstraintTangent" title="Tangent" tooltip="Create constraint defining tangency of two objects with common coincident point" icon="icons/Sketch/tangent.png">
         <sketch_shape_selector id="ConstraintEntityA"
             label="First object" tooltip="Select line or arc" shape_types="edge">
           <validator id="SketchPlugin_TangentAttr" parameters="ConstraintEntityB"/>
@@ -436,7 +435,7 @@
       </feature>
 
       <!--  SketchConstraintCoincidence  -->
-      <feature id="SketchConstraintCoincidence" title="Coincident" tooltip="Create constraint for the coincidence of two points or point on line or circle" icon=":icons/coincedence.png">
+      <feature id="SketchConstraintCoincidence" title="Coincident" tooltip="Create constraint for the coincidence of two points or point on line or circle" icon="icons/Sketch/coincedence.png">
         <sketch_shape_selector id="ConstraintEntityA" label="First object" tooltip="Select a first object" shape_types="vertex edge">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
@@ -450,7 +449,7 @@
       </feature>
 
       <!--  SketchConstraintMiddle  -->
-      <feature id="SketchConstraintMiddle" title="Middle point" tooltip="Create constraint for setting middle point on a line" icon=":icons/middlepoint.png">
+      <feature id="SketchConstraintMiddle" title="Middle point" tooltip="Create constraint for setting middle point on a line" icon="icons/Sketch/middlepoint.png">
         <sketch_shape_selector id="ConstraintEntityA" label="First object" tooltip="Select a first object" shape_types="vertex edge">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
@@ -467,7 +466,7 @@
       <!--  SketchConstraintEqual  -->
       <feature id="SketchConstraintEqual" title="Equal"
         tooltip="Create constraint defining equal lengths of two lines or line and arc or equal radii of two arcs or two circles or arc and circle"
-        icon=":icons/equal.png">
+        icon="icons/Sketch/equal.png">
         <sketch_shape_selector id="ConstraintEntityA" 
             label="First object" tooltip="Select line, circle or arc" shape_types="edge">
           <validator id="PartSet_DifferentObjects"/>
@@ -485,7 +484,7 @@
       
     <!--  SketchConstraintCollinear  -->
       <!--
-      <feature id="SketchConstraintCollinear" title="Collinear" tooltip="Create constraint defining collinearity of two lines" icon=":icons/collinear.png">
+      <feature id="SketchConstraintCollinear" title="Collinear" tooltip="Create constraint defining collinearity of two lines" icon="icons/Sketch/collinear.png">
         <sketch_shape_selector id="ConstraintEntityA" 
             label="First line" tooltip="Select a line" shape_types="edge">
           <validator id="GeomValidators_ShapeType" parameters="line"/>

@@ -3,47 +3,47 @@
 <plugin>
   <workbench id="Features" document="Part">
     <group id="Shape">
-      <feature id="Wire" title="Wire" tooltip ="Create a wire from sketch edges and wires objects" icon=":icons/feature_wire.png">
+      <feature id="Wire" title="Wire" tooltip ="Create a wire from sketch edges and wires objects" icon="icons/Features/feature_wire.png">
         <source path="wire_widget.xml"/>
       </feature>
     </group>
     <group id="Extrusion">
-      <feature id="Extrusion" title="Extrusion" tooltip="Create a solid by extrusion of a face" icon=":icons/extrusion.png">
+      <feature id="Extrusion" title="Extrusion" tooltip="Create a solid by extrusion of a face" icon="icons/Features/extrusion.png">
           <source path="extrusion_widget.xml"/>
       </feature>
-      <feature id="ExtrusionCut" title="ExtrusionCut" tooltip="" icon=":icons/extrusion_cut.png">
+      <feature id="ExtrusionCut" title="ExtrusionCut" tooltip="" icon="icons/Features/extrusion_cut.png">
         <source path="extrusioncut_widget.xml"/>
       </feature>
-      <feature id="ExtrusionFuse" title="ExtrusionFuse" tooltip="" icon=":icons/extrusion_fuse.png">
+      <feature id="ExtrusionFuse" title="ExtrusionFuse" tooltip="" icon="icons/Features/extrusion_fuse.png">
         <source path="extrusionfuse_widget.xml"/>
       </feature>
     </group>
     <group id="Revolution">
-      <feature id="Revolution" title="Revolution" tooltip="Create a solid by revolution of a face" icon=":icons/revol.png">
+      <feature id="Revolution" title="Revolution" tooltip="Create a solid by revolution of a face" icon="icons/Features/revol.png">
           <source path="revolution_widget.xml"/>
       </feature>
-      <feature id="RevolutionCut" title="RevolutionCut" tooltip="" icon=":icons/revol_cut.png">
+      <feature id="RevolutionCut" title="RevolutionCut" tooltip="" icon="icons/Features/revol_cut.png">
         <source path="revolutioncut_widget.xml"/>
       </feature>
-      <feature id="RevolutionFuse" title="RevolutionFuse" tooltip="" icon=":icons/revol_fuse.png">
+      <feature id="RevolutionFuse" title="RevolutionFuse" tooltip="" icon="icons/Features/revol_fuse.png">
         <source path="revolutionfuse_widget.xml"/>
       </feature>
     </group>
     <group id="Pipe">
-      <feature id="Pipe" title="Pipe" tooltip="Generates extrusion along a path" icon=":icons/pipe.png">
+      <feature id="Pipe" title="Pipe" tooltip="Generates extrusion along a path" icon="icons/Features/pipe.png">
         <source path="pipe_widget.xml"/>
       </feature>
     </group>
     <group id="Boolean">
-      <feature id="Boolean" title="Boolean" tooltip="Perform boolean operations with solids" icon=":icons/cut.png"
+      <feature id="Boolean" title="Boolean" tooltip="Perform boolean operations with solids" icon="icons/Features/cut.png"
                auto_preview="false">
           <source path="boolean_widget.xml"/>
       </feature>
-      <feature id="Partition" title="Partition" tooltip="Perform partition operations with solids" icon=":icons/partition.png"
+      <feature id="Partition" title="Partition" tooltip="Perform partition operations with solids" icon="icons/Features/partition.png"
                auto_preview="false">
           <source path="partition_widget.xml"/>
       </feature>
-      <feature id="Intersection" title="Intersection" tooltip="Intersect objects with tools" icon=":icons/intersection.png">
+      <feature id="Intersection" title="Intersection" tooltip="Intersect objects with tools" icon="icons/Features/intersection.png">
           <source path="intersection_widget.xml"/>
       </feature>
     </group>
@@ -51,20 +51,20 @@
       <feature id="Group"
         title="Group"
         tooltip="Create named collection of geometry entities"
-        icon=":icons/shape_group.png">
+        icon="icons/Features/shape_group.png">
         <source path="group_widget.xml"/>
       </feature>
     </group>
   </workbench>
   <workbench id="Part">
     <group id="Movement">
-      <feature id="Placement" title="Placement" tooltip="Place an objects relatively to another one" icon=":icons/placement.png">
+      <feature id="Placement" title="Placement" tooltip="Place an objects relatively to another one" icon="icons/Features/placement.png">
         <source path="placement_widget.xml"/>
       </feature>
-      <feature id="Translation" title="Translation" tooltip="Perform translation of an objects along the axis to specified distance" icon=":icons/movement.png">
+      <feature id="Translation" title="Translation" tooltip="Perform translation of an objects along the axis to specified distance" icon="icons/Features/movement.png">
         <source path="translation_widget.xml"/>
       </feature>
-      <feature id="Rotation" title="Rotation" tooltip="Perform rotation of an objects around the axis to specified angle" icon=":icons/rotation.png">
+      <feature id="Rotation" title="Rotation" tooltip="Perform rotation of an objects around the axis to specified angle" icon="icons/Features/rotation.png">
         <source path="rotation_widget.xml"/>
       </feature>
     </group>

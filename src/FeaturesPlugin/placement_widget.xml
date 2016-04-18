@@ -3,7 +3,7 @@
 <source>
   <multi_selector id="placement_objects_list"
     label="Select objects to move"
-    icon=":icons/cut_shape.png"
+    icon="icons/Features/cut_shape.png"
     tooltip="Select solid objects"
     type_choice=""
     concealment="true" >
@@ -11,13 +11,13 @@
   </multi_selector>
   <shape_selector id="placement_start_shape"
     label="Select an object" 
-    icon=":icons/placement_from.png"
+    icon="icons/Features/placement_from.png"
     tooltip="Select a start face, edge or vertex"
     shape_types="face edge vertex"
   />
   <shape_selector id="placement_end_shape"
     label="Select an object" 
-    icon=":icons/placement_to.png"
+    icon="icons/Features/placement_to.png"
     tooltip="Select an end face, edge or vertex"
     shape_types="face edge vertex">
     <validator id="PartSet_DifferentObjects"/>

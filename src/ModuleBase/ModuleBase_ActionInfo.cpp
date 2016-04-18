@@ -7,6 +7,7 @@
  */
 
 #include <ModuleBase_ActionInfo.h>
+#include <ModuleBase_IconFactory.h>
 
 ModuleBase_ActionInfo::ModuleBase_ActionInfo()
 {
@@ -54,7 +55,7 @@ void ModuleBase_ActionInfo::initFrom(std::shared_ptr<Config_FeatureMessage> theM
   id = QString::fromStdString(theMessage->id());
   iconFile = QString::fromStdString(theMessage->icon());
   if (!iconFile.isEmpty()) {
-    icon = QIcon(iconFile);
+    icon = ModuleBase_IconFactory::loadIcon(iconFile);
   }
   text = QString::fromStdString(theMessage->text());
   toolTip = QString::fromStdString(theMessage->tooltip());

@@ -7,21 +7,21 @@
         id="Point"
         title="Point"
         tooltip="Create point"
-        icon=":icons/point.png">
+        icon="icons/Construction/point.png">
         <source path="point_widget.xml" />
       </feature>
       <feature
         id="Axis"
         title="Axis"
         tooltip="Create axis"
-        icon=":icons/axis.png">
+        icon="icons/Construction/axis.png">
         <source path="axis_widget.xml" />
       </feature>
       <feature
         id="Plane"
         title="Plane"
         tooltip="Create plane"
-        icon=":icons/plane.png">
+        icon="icons/Construction/plane.png">
         <source path="plane_widget.xml" />
       </feature>
     </group>

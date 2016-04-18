@@ -3,7 +3,7 @@
 <source>
   <multi_selector id="main_objects"
     label="Main objects"
-    icon=":icons/cut_shape.png"
+    icon="icons/Features/cut_shape.png"
     tooltip="Select solid objects"
     type_choice="solid"
     use_choice="false"
@@ -11,7 +11,7 @@
     <validator id="FeaturesPlugin_ValidatorTransform"/>
   </multi_selector>
   <shape_selector id="axis_object"
-                  icon=":icons/axis.png"
+                  icon="icons/Features/axis.png"
                   label="Axis"
                   tooltip="Select an edge for axis"
                   shape_types="edge"
@@ -25,7 +25,7 @@
     max="360"
     step="1.0"
     default="0"
-    icon=":icons/angle.png"
+    icon="icons/Features/angle.png"
     tooltip="Angle">
   </doublevalue>
 </source>

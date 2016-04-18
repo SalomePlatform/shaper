@@ -8,12 +8,12 @@
                icon=":pictures/part_ico.png"/>
       <feature id="Duplicate" title="Duplicate part"
                tooltip="Duplicate active part"
-               icon=":icons/duplicate.png"
+               icon="icons/PartSet/duplicate.png"
                document="Part"/>
       <feature id="Remove"
                title="Remove part"
                tooltip="Remove active part"
-               icon=":icons/remove.png"
+               icon="icons/PartSet/remove.png"
                document="Part"/>
     </group>
   </workbench>

@@ -102,12 +102,49 @@ INCLUDE_DIRECTORIES(
 )
 
 SET(ICON_RESOURCES
+  icons/angle.png
+  icons/angle_backward.png
+  icons/angle_complementary.png
+  icons/angle_constr.png
+  icons/angle_direct.png
+  icons/angle_up_32x32.png
+  icons/angle_up_full_32x32.png
+  icons/arc.png
+  icons/arc_3pt_32x32.png
+  icons/arc_base_32x32.png
+  icons/arc_tang_32x32.png
+  icons/circle.png
+  icons/circle_3pt_32x32.png
+  icons/circle_pt_rad_32x32.png
+  icons/coincedence.png
+  icons/collinear.png
+  icons/distance.png
+  icons/equal.png
+  icons/fillet.png
+  icons/fixed.png
+  icons/horisontal.png
+  icons/intersection_point.png
+  icons/length.png
+  icons/line.png
+  icons/middlepoint.png
+  icons/mirror.png
   icons/parallel.png
+  icons/perpendicular.png
+  icons/point.png
+  icons/radius.png
+  icons/radius_constr.png
+  icons/rotate.png
+  icons/sketch.png
+  icons/tangent.png
+  icons/translate.png
+  icons/translate_32x32.png
+  icons/translate_full_32x32.png
+  icons/vertical.png
 )
 
 INSTALL(TARGETS SketchPlugin DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
 INSTALL(FILES ${XML_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
-INSTALL(FILES ${ICON_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
+INSTALL(FILES ${ICON_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Sketch)
 
 ADD_UNIT_TESTS(TestSketchPointLine.py
                TestSketchArcCircle.py

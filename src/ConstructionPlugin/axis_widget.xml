@@ -2,10 +2,10 @@
 
 <source>
   <toolbox id="CreationMethod">
-    <box id="AxisByPointsCase" title="By two points" icon=":icons/by_two_points_32x32.png">
+    <box id="AxisByPointsCase" title="By two points" icon="icons/Construction/by_two_points_32x32.png">
       <shape_selector id="FirstPoint"
         label="First point"
-        icon=":icons/point.png"
+        icon="icons/Construction/point.png"
         tooltip="Select a first point"
         shape_types="vertex">
         <validator id="GeomValidators_ConstructionComposite"/>
@@ -13,7 +13,7 @@
       </shape_selector>
       <shape_selector id="SecondPoint"
         label="Second point"
-        icon=":icons/point.png"
+        icon="icons/Construction/point.png"
         tooltip="Select a second point"
         shape_types="vertex">
         <validator id="GeomValidators_ConstructionComposite"/>
@@ -21,10 +21,10 @@
         <validator id="GeomValidators_DifferentShapes"/>
       </shape_selector>
     </box>
-    <box id="AxisByCylindricalFaceCase" title="As axis of cylindrical face" icon=":icons/cylindrical_face_32x32.png">
+    <box id="AxisByCylindricalFaceCase" title="As axis of cylindrical face" icon="icons/Construction/cylindrical_face_32x32.png">
       <shape_selector id="CylindricalFace"
         label="Main object" 
-        icon=":icons/circle.png" 
+        icon="icons/Construction/circle.png" 
         tooltip="Select a cylindrical object"
         shape_types="face solid shell">
         <validator id="GeomValidators_Face" parameters="cylinder"/>

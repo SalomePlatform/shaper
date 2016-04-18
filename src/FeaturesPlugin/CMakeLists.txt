@@ -89,12 +89,64 @@ SET(PROJECT_LIBRARIES
     GeomValidators
 )
 
+SET(ICON_RESOURCES
+  icons/angle.png
+  icons/angle_down.png
+  icons/angle_up.png
+  icons/angle_up_down.png
+  icons/angle_up_down_32x32.png
+  icons/axis.png
+  icons/bool_common.png
+  icons/bool_cut.png
+  icons/bool_fuse.png
+  icons/bool_smash.png
+  icons/common.png
+  icons/cut.png
+  icons/cut_shape.png
+  icons/cut_tool.png
+  icons/dimension_down.png
+  icons/dimension_down_32x32.png
+  icons/dimension_up.png
+  icons/dimension_up_32x32.png
+  icons/dimension_up_down.png
+  icons/dimension_up_down_32x32.png
+  icons/dimension_v.png
+  icons/dimension_v_32x32.png
+  icons/dimension_vert_32x32.png
+  icons/extrusion.png
+  icons/extrusion_cut.png
+  icons/extrusion_fuse.png
+  icons/extrusionsketch.png
+  icons/feature_wire.png
+  icons/fusion.png
+  icons/intersection.png
+  icons/movement.png
+  icons/partition.png
+  icons/pipe.png
+  icons/pipe_binormal_32x32.png
+  icons/pipe_locations_32x32.png
+  icons/pipe_simple_32x32.png
+  icons/placement.png
+  icons/placement_from.png
+  icons/placement_to.png
+  icons/plane.png
+  icons/plane_inverted.png
+  icons/plane_inverted_32x32.png
+  icons/revol_cut.png
+  icons/revol_fuse.png
+  icons/revolsketch.png
+  icons/rotation.png
+  icons/shape_group.png
+  icons/sketch.png
+)
+
 ADD_DEFINITIONS(-DFEATURESPLUGIN_EXPORTS)
 ADD_LIBRARY(FeaturesPlugin MODULE ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES})
 TARGET_LINK_LIBRARIES(FeaturesPlugin ${PROJECT_LIBRARIES})
 
 INSTALL(TARGETS FeaturesPlugin DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
 INSTALL(FILES ${XML_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
+INSTALL(FILES ${ICON_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Features)
 
 ADD_UNIT_TESTS(TestExtrusion.py
                TestExtrusionCut.py

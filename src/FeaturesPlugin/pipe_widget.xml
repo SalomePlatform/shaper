@@ -14,8 +14,8 @@
                   shape_types="edge wire">
   </shape_selector>
   <toolbox id="creation_method">
-    <box id="simple" title="Simple pipe by objects and path" icon=":icons/pipe_simple_32x32.png"/>
-    <box id="binormal" title="Pipe by objects, path and Bi-Normal" icon=":icons/pipe_binormal_32x32.png">
+    <box id="simple" title="Simple pipe by objects and path" icon="icons/Features/pipe_simple_32x32.png"/>
+    <box id="binormal" title="Pipe by objects, path and Bi-Normal" icon="icons/Features/pipe_binormal_32x32.png">
       <shape_selector id="binormal"
                       label="Bi-Normal:"
                       tooltip="Select an edge for Bi-Normal"
@@ -23,7 +23,7 @@
         <validator id="GeomValidators_ShapeType" parameters="line"/>
       </shape_selector>
     </box>
-    <box id="locations" title="Pipe by objects, path and locations" icon=":icons/pipe_locations_32x32.png">
+    <box id="locations" title="Pipe by objects, path and locations" icon="icons/Features/pipe_locations_32x32.png">
       <multi_selector id="locations_objects"
                       label="Locations:"
                       tooltip="Select one or more vertices to specify the locations"

@@ -3,7 +3,7 @@
 <source>
   <multi_selector id="main_objects"
     label="Main objects"
-    icon=":icons/cut_shape.png"
+    icon="icons/Features/cut_shape.png"
     tooltip="Select solid objects"
     type_choice="Solids"
     concealment="true">
@@ -12,7 +12,7 @@
   </multi_selector>
   <multi_selector id="tool_objects"
     label="Tool objects"
-    icon=":icons/cut_tool.png"
+    icon="icons/Features/cut_tool.png"
     tooltip="Select a tool face or solid"
     type_choice="Faces Solids"
     use_choice="false"

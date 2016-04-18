@@ -17,7 +17,7 @@
     <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell"/>
   </multi_selector>
   <shape_selector id="direction_object"
-                  icon=":icons/axis.png"
+                  icon="icons/Features/axis.png"
                   label="Direction"
                   tooltip="Select an edge for direction"
                   shape_types="edge"
@@ -27,13 +27,13 @@
   <toolbox id="CreationMethod">
     <box id="BySizes"
          title="By sizes"
-         icon=":icons/dimension_up_down_32x32.png">
+         icon="icons/Features/dimension_up_down_32x32.png">
       <groupbox>
         <doublevalue id="to_size"
                      label="Size"
                      step="1.0"
                      default="10"
-                     icon=":icons/dimension_up.png"
+                     icon="icons/Features/dimension_up.png"
                      tooltip="To size"/>
       </groupbox>
       <groupbox>
@@ -41,16 +41,16 @@
                      label="Size"
                      step="1.0"
                      default="0"
-                     icon=":icons/dimension_down.png"
+                     icon="icons/Features/dimension_down.png"
                      tooltip="From size"/>
       </groupbox>
     </box>
     <box id="ByPlanesAndOffsets"
          title="By bounding planes and offsets"
-         icon=":icons/plane_inverted_32x32.png">
+         icon="icons/Features/plane_inverted_32x32.png">
       <groupbox title="From">
         <shape_selector id="from_object"
-                        icon=":icons/plane.png"
+                        icon="icons/Features/plane.png"
                         label="Plane face"
                         tooltip="Bounding plane (select a planar face)"
                         shape_types="face"
@@ -61,12 +61,12 @@
                      label="Offset"
                      step="1.0"
                      default="0"
-                     icon=":icons/dimension_up_down.png"
+                     icon="icons/Features/dimension_up_down.png"
                      tooltip="Offset for &quot;from&quot; bounding plane"/>
       </groupbox>
       <groupbox title="To">
         <shape_selector id="to_object"
-                        icon=":icons/plane_inverted.png"
+                        icon="icons/Features/plane_inverted.png"
                         label="Plane face"
                         tooltip="Bounding plane (select a planar face)"
                         shape_types="face"
@@ -77,7 +77,7 @@
                      label="Offset"
                      step="1.0"
                      default="0"
-                     icon=":icons/dimension_up_down.png"
+                     icon="icons/Features/dimension_up_down.png"
                      tooltip="Offset for &quot;to&quot; bounding plane"/>
       </groupbox>
     </box>

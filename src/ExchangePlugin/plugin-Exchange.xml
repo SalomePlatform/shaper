@@ -3,12 +3,12 @@
 <plugin>
   <workbench id="Part">
     <group id="Exchange">
-      <feature id="Import" title="Import" tooltip="Import a file" icon=":icons/import.png" document="Part">
+      <feature id="Import" title="Import" tooltip="Import a file" icon="icons/Exchange/import.png" document="Part">
         <file_selector id="file_path" title="Import file" path="">
           <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,STEP|STP:STEP,IGES|IGS:IGES" />
         </file_selector>
       </feature>
-      <feature id="Export" title="Export" tooltip="Export to file" icon=":icons/export.png">
+      <feature id="Export" title="Export" tooltip="Export to file" icon="icons/Exchange/export.png">
         <export_file_selector id="file_path" type="save" title="Export file" path="">
           <validator id="ExchangePlugin_ExportFormat" parameters="BREP|BRP:BREP,STEP|STP:STEP,IGES|IGS:IGES-5.1,IGES|IGS:IGES-5.3" />
         </export_file_selector>
