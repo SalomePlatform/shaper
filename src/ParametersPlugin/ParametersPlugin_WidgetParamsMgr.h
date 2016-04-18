@@ -36,7 +36,7 @@ public:
 protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
-  virtual bool storeValueCustom() const;
+  virtual bool storeValueCustom();
 
   /// Restore value from attribute data to the widget's control
   virtual bool restoreValueCustom();
@@ -45,10 +45,36 @@ protected:
   virtual void activateCustom();
 
 private slots:
-  void onDoubleClick(const QModelIndex&);
+  /// Slot for reaction on double click in the table (start editing)
+  /// \param theIndex the clicked index
+  void onDoubleClick(const QModelIndex& theIndex);
+
+  /// Slot for reaction on end of cell editing
+  /// \param theEditor the editor widget
+  /// \param theHint end of edit type
   void onCloseEditor(QWidget* theEditor, QAbstractItemDelegate::EndEditHint theHint);
 
+  /// Slot for reaction on add parameter
+  void onAdd();
+
+  /// Slot for reaction on insert parameter
+  void onInsert();
+
+  /// Slot for reaction on remove parameter
+  void onRemove();
+
+  /// Slot for reaction on shift up
+  void onUp();
+
+  /// Slot for reaction on shift down
+  void onDown();
+
+  void sendWarning();
+
 private:
+  void updateFeaturesPart();
+
+  bool hasName(const QString& theName) const;
 
   QTreeWidget* myTable;
   QTreeWidgetItem* myFeatures;
@@ -56,7 +82,9 @@ private:
   ParametersPlugin_ItemDelegate* myDelegate;
   QModelIndex myEditingIndex;
 
-  QList<FeaturePtr> myFeatureList;
+  QList<FeaturePtr> myParametersList;
+
+  QString myMessage;
 };
 
 

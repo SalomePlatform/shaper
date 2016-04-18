@@ -50,6 +50,10 @@ public:
 
   /// Reimplemented from ModelAPI_Feature::isPreviewNeeded(). Returns false.
   PARAMETERSPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return false; }
+
+  /// Returns true if result is persistent (stored in document) and on undo-redo, save-open
+  /// it is not needed to recompute it.
+  PARAMETERSPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
 };
 
 

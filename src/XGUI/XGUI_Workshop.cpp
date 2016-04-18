@@ -153,8 +153,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
           SLOT(onContextMenuCommand(const QString&, bool)));
 
   myViewerProxy = new XGUI_ViewerProxy(this);
-  connect(myViewerProxy, SIGNAL(selectionChanged()),
-          myActionsMgr,  SLOT(updateOnViewSelection()));
+  //connect(myViewerProxy, SIGNAL(selectionChanged()),
+  //        myActionsMgr,  SLOT(updateOnViewSelection()));
 
   myModuleConnector = new XGUI_ModuleConnector(this);
 

@@ -11,6 +11,11 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_Events.h>
+#include <ModelAPI_Session.h>
+
+#include <Events_Loop.h>
 
 #include <QLayout>
 #include <QTreeWidget>
@@ -18,6 +23,8 @@
 #include <QToolButton>
 #include <QStyledItemDelegate>
 #include <QPainter>
+#include <QMessageBox>
+#include <QTimer>
 
 enum ColumnType {
   Col_Name,
@@ -25,6 +32,9 @@ enum ColumnType {
   Col_Result,
   Col_Comment
 };
+
+const char* NoName = "<NoName>";
+const char* NoValue = "<NoValue>";
 
 class ParametersPlugin_ItemDelegate : public QStyledItemDelegate
 {
@@ -65,10 +75,15 @@ void ParametersPlugin_ItemDelegate::paint(QPainter* painter,
 
   painter->setPen(Qt::darkGray);
   painter->drawRect(option.rect);
+  painter->setPen(aPen);
   
+  //QString aText = index.data().toString();
+  //if ((aText == NoName) || (aText == NoValue))
+  //  painter->setPen(Qt::red);
+
   QStyledItemDelegate::paint(painter, option, index);
 
-  painter->setPen(aPen);
+  //painter->setPen(aPen);
   painter->setBrush(aBrush);
 }
 
@@ -127,19 +142,27 @@ ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theP
   QHBoxLayout* aBtnLayout = new QHBoxLayout(this);
 
   QToolButton* aUpBtn = new QToolButton(this);
-  aUpBtn->setArrowType(Qt::DownArrow);
+  aUpBtn->setArrowType(Qt::UpArrow);
+  connect(aUpBtn, SIGNAL(clicked(bool)), SLOT(onUp()));
   aBtnLayout->addWidget(aUpBtn);
+
   QToolButton* aDownBtn = new QToolButton(this);
-  aDownBtn->setArrowType(Qt::UpArrow);
+  aDownBtn->setArrowType(Qt::DownArrow);
+  connect(aDownBtn, SIGNAL(clicked(bool)), SLOT(onDown()));
   aBtnLayout->addWidget(aDownBtn);
 
   aBtnLayout->addStretch();
 
   QPushButton* aAddBtn = new QPushButton(tr("Add"), this);
+  connect(aAddBtn, SIGNAL(clicked(bool)), SLOT(onAdd()));
   aBtnLayout->addWidget(aAddBtn);
+
   QPushButton* aInsertBtn = new QPushButton(tr("Insert"), this);
+  connect(aInsertBtn, SIGNAL(clicked(bool)), SLOT(onInsert()));
   aBtnLayout->addWidget(aInsertBtn);
+
   QPushButton* aRemoveBtn = new QPushButton(tr("Remove"), this);
+  connect(aRemoveBtn, SIGNAL(clicked(bool)), SLOT(onRemove()));
   aBtnLayout->addWidget(aRemoveBtn);
 
   aLayout->addLayout(aBtnLayout);
@@ -152,8 +175,23 @@ QList<QWidget*> ParametersPlugin_WidgetParamsMgr::getControls() const
   return aList;
 }
 
-bool ParametersPlugin_WidgetParamsMgr::storeValueCustom() const
+bool ParametersPlugin_WidgetParamsMgr::storeValueCustom()
 {
+  for(int i = 0; i < myParameters->childCount(); i++) {
+    QTreeWidgetItem* aItem = myParameters->child(i);
+    if ((aItem->text(Col_Name) == NoName) || (aItem->text(Col_Equation) == NoValue)) {
+      QMessageBox::warning(this, tr("Warning"), tr("Created parameter is not defined properly."));
+
+      // The index of myParameters item
+      QModelIndex aParent = myTable->model()->index(0, 0);
+      int aRow = myParameters->indexOfChild(aItem);
+      QModelIndex aIndex = myTable->model()->index(aRow, Col_Name, aParent);
+      myTable->selectionModel()->select(aIndex, 
+        QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+      myTable->scrollToItem(aItem);
+      return false;
+    }
+  }
   return true;
 }
 
@@ -175,6 +213,7 @@ void ParametersPlugin_WidgetParamsMgr::activateCustom()
     aObj = aDoc->object(ModelAPI_ResultParameter::group(), i);
     aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aObj);
     if (aParam.get()) {
+      // Set parameter feature
       aParamFeature = ModelAPI_Feature::feature(aParam);
 
       QStringList aValues;
@@ -184,30 +223,36 @@ void ParametersPlugin_WidgetParamsMgr::activateCustom()
       AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
       aValues << QString::number(aValueAttribute->value());
 
-      //AttributeRefListPtr aParams = aParamFeature->reflist(ParametersPlugin_Parameter::ARGUMENTS_ID());
-      //std::list<ObjectPtr> aList = aParams->list();
-      //std::string aName;
-      //std::list<ObjectPtr>::iterator aIt;
-      //for(aIt = aList.begin(); aIt != aList.end(); aIt++) {
-      //  aObj = (*aIt);
-      //  aName = aObj->data()->name();
-      //}
+      aValues << aParamFeature->string(ParametersPlugin_Parameter::COMMENT_ID())->value().c_str();
+
       aItem = new QTreeWidgetItem(aValues);
       aItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
       myParameters->addChild(aItem);
 
-      myFeatureList.append(aParamFeature);
+      myParametersList.append(aParamFeature);
 
+      // Set features where the parameter is used
       const std::set<std::shared_ptr<ModelAPI_Attribute>>& aRefs = aParam->data()->refsToMe();
       std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aIt;
       for(aIt = aRefs.cbegin(); aIt != aRefs.cend(); aIt++) {
-        FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>((*aIt)->owner());
+        std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+        FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
         if (aReferenced.get()) {
           QStringList aValNames;
           aValNames << aReferenced->data()->name().c_str();
 
-          //AttributeDoublePtr aValue = aReferenced->data()->real(SketchPlugin_Constraint::VALUE());
-          //aReferenced
+          AttributeDoublePtr aDouble = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aAttr);
+          if (aDouble.get()) {
+            aValNames << aDouble->text().c_str();
+            aValNames << QString::number(aDouble->value());
+          } else {
+            AttributeIntegerPtr aInt = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aAttr);
+            if (aInt.get()) {
+              aValNames << aInt->text().c_str();
+              aValNames << QString::number(aInt->value());
+            }
+          }
+
           aItem = new QTreeWidgetItem(aValNames);
           myFeatures->addChild(aItem);
         }
@@ -230,22 +275,153 @@ void ParametersPlugin_WidgetParamsMgr::onDoubleClick(const QModelIndex& theIndex
 void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor, 
                                                      QAbstractItemDelegate::EndEditHint theHint)
 {
-  if (myEditingIndex.column() == Col_Equation) {
-    QTreeWidgetItem* aItem = myParameters->child(myEditingIndex.row());
-    QString aText = aItem->text(myEditingIndex.column());
-    if (!aText.isEmpty()) {
-      FeaturePtr aFeature = myFeatureList.at(myEditingIndex.row());
+  FeaturePtr aFeature = myParametersList.at(myEditingIndex.row());
+  QTreeWidgetItem* aItem = myParameters->child(myEditingIndex.row());
+  int aColumn = myEditingIndex.column();
+  QString aText = aItem->text(aColumn);
+  bool isModified = false;
+
+  switch (aColumn) {
+  case Col_Name:
+    {
+      AttributeStringPtr aStringAttr = aFeature->string(ParametersPlugin_Parameter::VARIABLE_ID());
+      if (!aText.isEmpty()) {
+        if (hasName(aText)) {
+          myMessage = tr("Name %1 already exists.").arg(aText);
+          aItem->setText(Col_Name, aStringAttr->value().c_str());
+          QTimer::singleShot(50, this, SLOT(sendWarning()));
+          return;
+        }
+        aStringAttr->setValue(aText.toStdString());
+        isModified = true;
+      } else {
+        aItem->setText(Col_Name, aStringAttr->value().c_str());
+      }
+    }
+    break;
+  case Col_Equation:
+    {
       AttributeStringPtr aStringAttr = aFeature->string(ParametersPlugin_Parameter::EXPRESSION_ID());
+      if (!aText.isEmpty()) {
+        if (aText != aStringAttr->value().c_str()) {
+          aStringAttr->setValue(aText.toStdString());
+          isModified = true;
+        }
+      } else {
+        aItem->setText(Col_Equation, aStringAttr->value().c_str());
+      }
+    }
+    break;
+  case Col_Comment:
+    {
+      AttributeStringPtr aStringAttr = aFeature->string(ParametersPlugin_Parameter::COMMENT_ID());
       aStringAttr->setValue(aText.toStdString());
-      aFeature->execute();
-      ResultParameterPtr aResult = 
-        std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aFeature->firstResult());
-      if (aResult.get()) {
-        AttributeDoublePtr aValueAttribute = 
-          aResult->data()->real(ModelAPI_ResultParameter::VALUE());
-        aItem->setText(Col_Result, QString::number(aValueAttribute->value()));
+      isModified = true;
+    }
+    break;
+  }
+
+  if (!isModified)
+    return;
+  Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+
+  ResultParameterPtr aResult = 
+    std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aFeature->firstResult());
+  if (aResult.get()) {
+    AttributeDoublePtr aValueAttribute = 
+      aResult->data()->real(ModelAPI_ResultParameter::VALUE());
+    aItem->setText(Col_Result, QString::number(aValueAttribute->value()));
+  }
+  myEditingIndex = QModelIndex();
+  updateFeaturesPart();
+}
+
+void ParametersPlugin_WidgetParamsMgr::updateFeaturesPart()
+{
+  std::shared_ptr<ModelAPI_ResultParameter> aParam;
+  int i = 0;
+  foreach(FeaturePtr aFeature, myParametersList) {
+    aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aFeature->firstResult());
+    const std::set<std::shared_ptr<ModelAPI_Attribute>>& aRefs = aParam->data()->refsToMe();
+    std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aIt;
+    for(aIt = aRefs.cbegin(); aIt != aRefs.cend(); aIt++) {
+      std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+      FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+      if (aReferenced.get()) {
+        QStringList aValNames;
+        aValNames << aReferenced->data()->name().c_str();
+
+        AttributeDoublePtr aDouble = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aAttr);
+        if (aDouble.get()) {
+          aValNames << aDouble->text().c_str();
+          aValNames << QString::number(aDouble->value());
+        } else {
+          AttributeIntegerPtr aInt = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aAttr);
+          if (aInt.get()) {
+            aValNames << aInt->text().c_str();
+            aValNames << QString::number(aInt->value());
+          }
+        }
+
+        QTreeWidgetItem* aItem = myFeatures->child(i++);
+        for(int i = 0; i < aValNames.count(); i++)
+          aItem->setText(i, aValNames.at(i));
       }
     }
   }
-  myEditingIndex = QModelIndex();
+}
+
+void ParametersPlugin_WidgetParamsMgr::onAdd()
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
+
+  FeaturePtr aFeature = aDoc->addFeature(ParametersPlugin_Parameter::ID());
+  if (!aFeature.get())
+    return;
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+
+  QStringList aValues;
+  aValues << NoName;
+  aValues << NoValue;
+
+  QTreeWidgetItem* aItem = new QTreeWidgetItem(aValues);
+  aItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+  myParameters->addChild(aItem);
+  myParametersList.append(aFeature);
+      
+  myTable->scrollToItem(aItem);
+}
+
+void ParametersPlugin_WidgetParamsMgr::onInsert()
+{
+}
+
+void ParametersPlugin_WidgetParamsMgr::onRemove()
+{
+}
+
+void ParametersPlugin_WidgetParamsMgr::onUp()
+{
+}
+
+void ParametersPlugin_WidgetParamsMgr::onDown()
+{
+}
+
+
+bool ParametersPlugin_WidgetParamsMgr::hasName(const QString& theName) const
+{
+  foreach(FeaturePtr aFeature, myParametersList) {
+    if (aFeature->data()->name() == theName.toStdString())
+      return true;
+  }
+  return false;
+}
+
+void ParametersPlugin_WidgetParamsMgr::sendWarning()
+{
+  QMessageBox::warning(this, tr("Warning"), myMessage);
 }

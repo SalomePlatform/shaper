@@ -24,6 +24,8 @@ public:
   ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QString& theId, 
                     const std::string& theDescription);
 
+  virtual void accept();
+
 protected:
   virtual void showEvent(QShowEvent* theEvent);
 
@@ -36,6 +38,7 @@ private:
   ModuleBase_IWorkshop* myWorkshop;
   FeaturePtr myFeature;
   QList<ModuleBase_ModelWidget*> myWidgets;
+  ModuleBase_ModelWidget* myActiveWidget;
 };
 
 #endif

@@ -34,6 +34,7 @@ void ParametersPlugin_Parameter::initAttributes()
 {
   data()->addAttribute(VARIABLE_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(EXPRESSION_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(COMMENT_ID(), ModelAPI_AttributeString::typeId());
 
   data()->addAttribute(EXPRESSION_ERROR_ID(), ModelAPI_AttributeString::typeId());
   data()->string(EXPRESSION_ERROR_ID())->setIsArgument(false);

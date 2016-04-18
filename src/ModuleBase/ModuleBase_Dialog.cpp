@@ -8,6 +8,8 @@
 #include "ModuleBase_PageWidget.h"
 
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Events.h>
+#include <Events_Loop.h>
 
 #include <QMainWindow>
 #include <QLayout>
@@ -20,7 +22,8 @@ ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QStr
                                      QDialog(theParent->desktop()), 
                                      myId(theId), 
                                      myDescription(theDescription), 
-                                     myWorkshop(theParent)
+                                     myWorkshop(theParent),
+                                     myActiveWidget(0)
 {
   ModuleBase_WidgetFactory aFactory(myDescription, myWorkshop);
 
@@ -31,6 +34,8 @@ ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QStr
   myFeature = aDoc->addFeature(myId.toStdString());
   if (!myFeature.get())
     return;
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   aLayout->setContentsMargins(0, 0, 0, 0);
@@ -62,8 +67,6 @@ ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QStr
 
   connect(aBtnBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(aBtnBox, SIGNAL(rejected()), this, SLOT(reject()));
-
-  
 }
 
 void ModuleBase_Dialog::initializeWidget(ModuleBase_ModelWidget* theWidget)
@@ -74,6 +77,17 @@ void ModuleBase_Dialog::initializeWidget(ModuleBase_ModelWidget* theWidget)
 void ModuleBase_Dialog::showEvent(QShowEvent* theEvent)
 {
   QDialog::showEvent(theEvent);
-  if (myWidgets.length() > 0)
-    myWidgets.first()->activate();
+  if (myWidgets.length() > 0) {
+    myActiveWidget = myWidgets.first();
+    myActiveWidget->activate();
+  }
+}
+
+void ModuleBase_Dialog::accept()
+{
+  if (myActiveWidget) {
+    if (!myActiveWidget->storeValue())
+      return;
+  }
+  QDialog::accept();
 }

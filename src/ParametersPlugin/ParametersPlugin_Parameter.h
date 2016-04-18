@@ -55,6 +55,13 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
     return MY_ARGUMENTS_ID;
   }
 
+  /// return comment attribute Id
+  inline static const std::string& COMMENT_ID()
+  {
+    static const std::string MY_COMMENT_ID("comment");
+    return MY_COMMENT_ID;
+  }
+
   /// Returns the kind of a feature
   PARAMETERSPLUGIN_EXPORT virtual const std::string& getKind()
   {
