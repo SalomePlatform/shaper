@@ -10,6 +10,7 @@
         <expr_editor id="expression" placeholder="Please input the expression">
           <validator id="Parameters_ExpressionValidator"/>
         </expr_editor>
+        <stringvalue id="comment" label="Comment"/>
       </feature>
       
       <feature id="ParametersMgr" title="Parameters" tooltip="Manage parameters" icon=":icons/paper_roll.png" modal="true">

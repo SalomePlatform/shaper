@@ -54,6 +54,10 @@ public:
   /// Returns true if result is persistent (stored in document) and on undo-redo, save-open
   /// it is not needed to recompute it.
   PARAMETERSPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
+
+  /// Returns true if this feature must not be created: this is just an action
+  /// that is not stored in the features history and data model (like "delete part").
+  virtual bool isInHistory()  { return false; }
 };
 
 
