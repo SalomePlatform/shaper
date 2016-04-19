@@ -288,6 +288,10 @@ Q_OBJECT
   /// features found in the given list
   void highlightResults(const QObjectPtrList& theObjects);
 
+  /// Highlights feature objects in Object Browser according to
+  /// features found in the given list
+  void highlightFeature(const QObjectPtrList& theObjects);
+
   /// Returns Data Model XML reader which contains information about 
   /// Data structure configuration
   const Config_DataModelReader* dataModelXMLReader() const { return myDataModelXMLReader; }

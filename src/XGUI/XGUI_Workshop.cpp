@@ -1233,6 +1233,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     setViewerSelectionMode(-1);
   } else if (theId == "SHOW_RESULTS_CMD") {
     highlightResults(aObjects);
+  } else if (theId == "SHOW_FEATURE_CMD") {
+    highlightFeature(aObjects);
   }
 }
 
@@ -1988,6 +1990,28 @@ void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
       std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
       for(aIt = aResList.cbegin(); aIt != aResList.cend(); aIt++) {
         aSelList.append(*aIt);
+      }
+    }
+  }
+  if (aSelList.count() > theObjects.count()) {
+    // if something was found
+    bool aBlocked = objectBrowser()->blockSignals(true);
+    objectBrowser()->setObjectsSelected(aSelList);
+    objectBrowser()->blockSignals(aBlocked);
+  }
+}
+
+void XGUI_Workshop::highlightFeature(const QObjectPtrList& theObjects)
+{
+  ResultPtr aResult;
+  QObjectPtrList aSelList = theObjects;
+  FeaturePtr aFeature;
+  foreach(ObjectPtr aObj, theObjects) {
+    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    if (aResult.get()) {
+      aFeature = ModelAPI_Feature::feature(aResult);
+      if (aFeature.get()) {
+        aSelList.append(aFeature);
       }
     }
   }

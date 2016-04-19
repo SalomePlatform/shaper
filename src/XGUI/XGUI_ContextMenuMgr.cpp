@@ -132,6 +132,9 @@ void XGUI_ContextMenuMgr::createActions()
   aAction = new QAction(QIcon(":pictures/find_result.png"), tr("Select results"), this);
   addAction("SHOW_RESULTS_CMD", aAction);
 
+  aAction = new QAction(QIcon(":pictures/find_result.png"), tr("Select parent feature"), this);
+  addAction("SHOW_FEATURE_CMD", aAction);
+
   buildObjBrowserMenu();
   buildViewerMenu();
 }
@@ -282,6 +285,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
       action("CLEAN_HISTORY_CMD")->setEnabled(true);
 
     action("SHOW_RESULTS_CMD")->setEnabled(hasFeature);
+    action("SHOW_FEATURE_CMD")->setEnabled(hasResult);
   }
 
   // Show/Hide command has to be disabled for objects from non active document
@@ -414,6 +418,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(mySeparator);
   aList.append(action("RENAME_CMD"));
   aList.append(action("COLOR_CMD"));
+  aList.append(action("SHOW_FEATURE_CMD"));
   myObjBrowserMenus[ModelAPI_ResultConstruction::group()] = aList;
 
   //-------------------------------------
@@ -429,6 +434,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(mySeparator);
   aList.append(action("RENAME_CMD"));
   aList.append(action("COLOR_CMD"));
+  aList.append(action("SHOW_FEATURE_CMD"));
   myObjBrowserMenus[ModelAPI_ResultBody::group()] = aList;
   // Group menu
   myObjBrowserMenus[ModelAPI_ResultGroup::group()] = aList;
@@ -437,9 +443,8 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   //-------------------------------------
   // Feature menu
   aList.clear();
-  aList.append(action("SHOW_RESULTS_CMD"));
-  aList.append(mySeparator);
   aList.append(action("RENAME_CMD"));
+  aList.append(action("SHOW_RESULTS_CMD"));
   aList.append(action("MOVE_CMD"));
   aList.append(mySeparator);
   aList.append(action("CLEAN_HISTORY_CMD"));

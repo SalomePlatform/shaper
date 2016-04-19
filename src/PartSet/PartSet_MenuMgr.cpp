@@ -88,11 +88,6 @@ void PartSet_MenuMgr::createActions()
   aAction = new QAction(QIcon(":icons/edit.png"), tr("Edit..."), this);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onEdit(bool)));
   myActions["EDIT_CMD"] = aAction;
-
-  aAction = new QAction(QIcon(), tr("Select parent feature"), this);
-  aAction->setCheckable(false);
-  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onSelectParentFeature()));
-  myActions["SELECT_PARENT_CMD"] = aAction;
 }
 
 
@@ -501,23 +496,6 @@ void PartSet_MenuMgr::onEdit(bool)
   }
   if (aFeature.get() != NULL)
     myModule->editFeature(aFeature);
-}
-
-void PartSet_MenuMgr::onSelectParentFeature()
-{
-  QObjectPtrList aObjects = myModule->workshop()->selection()->selectedObjects();
-  if (aObjects.size() != 1)
-    return;
-
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>( aObjects.first() );
-  if( !aResult.get() )
-    return;
-
-  FeaturePtr aParentFeature = aResult->document()->feature( aResult );
-  QObjectPtrList aSelection;
-  aSelection.append( aParentFeature );
-  myModule->workshop()->selection()->setSelectedObjects( aSelection );
 }
 
 bool PartSet_MenuMgr::eventFilter(QObject* theObj, QEvent* theEvent)

@@ -83,8 +83,6 @@ private slots:
   /// A slot called on edit of feature
   void onEdit(bool);
 
-  void onSelectParentFeature();
-
 protected:
   bool eventFilter(QObject* theObj, QEvent* theEvent);
 
