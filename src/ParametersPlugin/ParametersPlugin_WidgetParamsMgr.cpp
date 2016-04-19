@@ -6,6 +6,7 @@
 
 #include "ParametersPlugin_WidgetParamsMgr.h"
 #include "ParametersPlugin_Parameter.h"
+#include "ParametersPlugin_Validators.h"
 
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_AttributeString.h>
@@ -14,6 +15,8 @@
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
+
+#include <ModuleBase_Tools.h>
 
 #include <Events_Loop.h>
 
@@ -117,9 +120,11 @@ ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theP
   myTable->setColumnWidth(Col_Comment, 200);
   myTable->setMinimumWidth(600);
   myTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  myTable->setSelectionMode(QAbstractItemView::SingleSelection);
+
   connect(myTable, SIGNAL(doubleClicked(const QModelIndex&)),
           SLOT(onDoubleClick(const QModelIndex&)));
-  //myTable->viewport()->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum));
+  connect(myTable, SIGNAL(itemSelectionChanged()), SLOT(onSelectionChanged()));
 
   myDelegate = new ParametersPlugin_ItemDelegate(myTable);
   connect(myDelegate, SIGNAL(closeEditor(QWidget*, QAbstractItemDelegate::EndEditHint)), 
@@ -141,31 +146,33 @@ ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theP
 
   QHBoxLayout* aBtnLayout = new QHBoxLayout(this);
 
-  QToolButton* aUpBtn = new QToolButton(this);
-  aUpBtn->setArrowType(Qt::UpArrow);
-  connect(aUpBtn, SIGNAL(clicked(bool)), SLOT(onUp()));
-  aBtnLayout->addWidget(aUpBtn);
+  myUpBtn = new QToolButton(this);
+  myUpBtn->setArrowType(Qt::UpArrow);
+  connect(myUpBtn, SIGNAL(clicked(bool)), SLOT(onUp()));
+  aBtnLayout->addWidget(myUpBtn);
 
-  QToolButton* aDownBtn = new QToolButton(this);
-  aDownBtn->setArrowType(Qt::DownArrow);
-  connect(aDownBtn, SIGNAL(clicked(bool)), SLOT(onDown()));
-  aBtnLayout->addWidget(aDownBtn);
+  myDownBtn = new QToolButton(this);
+  myDownBtn->setArrowType(Qt::DownArrow);
+  connect(myDownBtn, SIGNAL(clicked(bool)), SLOT(onDown()));
+  aBtnLayout->addWidget(myDownBtn);
 
   aBtnLayout->addStretch();
 
-  QPushButton* aAddBtn = new QPushButton(tr("Add"), this);
-  connect(aAddBtn, SIGNAL(clicked(bool)), SLOT(onAdd()));
-  aBtnLayout->addWidget(aAddBtn);
+  myAddBtn = new QPushButton(tr("Add"), this);
+  connect(myAddBtn, SIGNAL(clicked(bool)), SLOT(onAdd()));
+  aBtnLayout->addWidget(myAddBtn);
 
-  QPushButton* aInsertBtn = new QPushButton(tr("Insert"), this);
-  connect(aInsertBtn, SIGNAL(clicked(bool)), SLOT(onInsert()));
-  aBtnLayout->addWidget(aInsertBtn);
+  myInsertBtn = new QPushButton(tr("Insert"), this);
+  connect(myInsertBtn, SIGNAL(clicked(bool)), SLOT(onInsert()));
+  aBtnLayout->addWidget(myInsertBtn);
 
-  QPushButton* aRemoveBtn = new QPushButton(tr("Remove"), this);
-  connect(aRemoveBtn, SIGNAL(clicked(bool)), SLOT(onRemove()));
-  aBtnLayout->addWidget(aRemoveBtn);
+  myRemoveBtn = new QPushButton(tr("Remove"), this);
+  connect(myRemoveBtn, SIGNAL(clicked(bool)), SLOT(onRemove()));
+  aBtnLayout->addWidget(myRemoveBtn);
 
   aLayout->addLayout(aBtnLayout);
+
+  onSelectionChanged();
 }
 
 QList<QWidget*> ParametersPlugin_WidgetParamsMgr::getControls() const
@@ -175,22 +182,32 @@ QList<QWidget*> ParametersPlugin_WidgetParamsMgr::getControls() const
   return aList;
 }
 
+void ParametersPlugin_WidgetParamsMgr::selectItemScroll(QTreeWidgetItem* aItem)
+{
+  myTable->clearSelection();
+  QModelIndex aParent = myTable->model()->index(0, 0);
+  int aChildIdx = myParameters->indexOfChild(aItem);
+  QModelIndex aIndex = myTable->model()->index(aChildIdx, Col_Name, aParent);
+  myTable->selectionModel()->select(aIndex, 
+    QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+  myTable->scrollToItem(aItem);
+}
+
+
 bool ParametersPlugin_WidgetParamsMgr::storeValueCustom()
 {
-  for(int i = 0; i < myParameters->childCount(); i++) {
-    QTreeWidgetItem* aItem = myParameters->child(i);
-    if ((aItem->text(Col_Name) == NoName) || (aItem->text(Col_Equation) == NoValue)) {
-      QMessageBox::warning(this, tr("Warning"), tr("Created parameter is not defined properly."));
-
-      // The index of myParameters item
-      QModelIndex aParent = myTable->model()->index(0, 0);
-      int aRow = myParameters->indexOfChild(aItem);
-      QModelIndex aIndex = myTable->model()->index(aRow, Col_Name, aParent);
-      myTable->selectionModel()->select(aIndex, 
-        QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
-      myTable->scrollToItem(aItem);
+  ParametersPlugin_ExpressionValidator aValidator;
+  std::list<std::string> aArgs;
+  std::string aAttrId = ParametersPlugin_Parameter::VARIABLE_ID();
+  std::string aErr;
+  int aId = 0;
+  foreach(FeaturePtr aFeature, myParametersList) {
+    if (!aValidator.isValid(aFeature->attribute(aAttrId), aArgs, aErr)) {
+      QMessageBox::warning(this, tr("Warning"), aErr.c_str());
+      selectItemScroll(myParameters->child(aId));
       return false;
     }
+    aId++;
   }
   return true;
 }
@@ -372,43 +389,168 @@ void ParametersPlugin_WidgetParamsMgr::updateFeaturesPart()
   }
 }
 
-void ParametersPlugin_WidgetParamsMgr::onAdd()
+FeaturePtr ParametersPlugin_WidgetParamsMgr::createParameter() const
 {
   SessionPtr aMgr = ModelAPI_Session::get();
   std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
 
   FeaturePtr aFeature = aDoc->addFeature(ParametersPlugin_Parameter::ID());
-  if (!aFeature.get())
-    return;
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  if (aFeature.get()) {
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  }
+  return aFeature;
+}
 
+
+QTreeWidgetItem* ParametersPlugin_WidgetParamsMgr::createNewItem() const
+{
   QStringList aValues;
   aValues << NoName;
   aValues << NoValue;
 
   QTreeWidgetItem* aItem = new QTreeWidgetItem(aValues);
   aItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+  return aItem;
+}
+
+
+void ParametersPlugin_WidgetParamsMgr::onAdd()
+{
+  FeaturePtr aFeature = createParameter();
+  if (!aFeature.get())
+    return;
+
+  QTreeWidgetItem* aItem = createNewItem();
   myParameters->addChild(aItem);
   myParametersList.append(aFeature);
       
   myTable->scrollToItem(aItem);
 }
 
+QTreeWidgetItem* ParametersPlugin_WidgetParamsMgr::selectedItem() const
+{
+  QList<QTreeWidgetItem*> aItemsList = myTable->selectedItems();
+  if (aItemsList.count() == 0)
+    return 0;
+
+  QTreeWidgetItem* aCurrentItem = aItemsList.first();
+  if (aCurrentItem->parent() != myParameters)
+    return 0;
+
+  return aCurrentItem;
+}
+
+
 void ParametersPlugin_WidgetParamsMgr::onInsert()
 {
+  QTreeWidgetItem* aCurrentItem = selectedItem();
+  if (!aCurrentItem)
+    return;
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
+
+  FeaturePtr aNewFeature = createParameter();
+  if (!aNewFeature.get())
+    return;
+
+  QTreeWidgetItem* aItem = createNewItem();
+  int aCurrentPos = myParameters->indexOfChild(aCurrentItem);
+  if (aCurrentPos == 0) {
+    aDoc->moveFeature(aNewFeature, FeaturePtr());
+  } else {
+    FeaturePtr aCurFeature = myParametersList.at(aCurrentPos - 1);
+    aDoc->moveFeature(aNewFeature, aCurFeature);
+  }
+  myParametersList.insert(aCurrentPos, aNewFeature);
+  myParameters->insertChild(aCurrentPos, aItem);
 }
 
 void ParametersPlugin_WidgetParamsMgr::onRemove()
 {
+  QTreeWidgetItem* aCurrentItem = selectedItem();
+  if (!aCurrentItem)
+    return;
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
+
+  int aCurrentPos = myParameters->indexOfChild(aCurrentItem);
+  FeaturePtr aCurFeature = myParametersList.at(aCurrentPos);
+
+  QObjectPtrList anObjects;
+  anObjects.append(aCurFeature);
+
+  std::set<FeaturePtr> aDirectRefFeatures, aIndirectRefFeatures;
+  ModuleBase_Tools::findReferences(anObjects, aDirectRefFeatures, aIndirectRefFeatures);
+
+  bool doDeleteReferences = true;
+  if (ModuleBase_Tools::isDeleteFeatureWithReferences(anObjects, aDirectRefFeatures, 
+      aIndirectRefFeatures, this, doDeleteReferences)) {
+    myParametersList.removeOne(aCurFeature);
+    myParameters->removeChild(aCurrentItem);
+    aDoc->removeFeature(aCurFeature);
+  }
 }
 
 void ParametersPlugin_WidgetParamsMgr::onUp()
 {
+  QTreeWidgetItem* aCurrentItem = selectedItem();
+  if (!aCurrentItem)
+    return;
+
+  QString aName = aCurrentItem->text(0);
+
+  int aCurrentPos = myParameters->indexOfChild(aCurrentItem);
+  if (aCurrentPos == 0)
+    return;
+  FeaturePtr aCurFeature = myParametersList.at(aCurrentPos);
+
+  std::string aNm = aCurFeature->data()->name();
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
+
+  FeaturePtr aa = myParametersList.at(aCurrentPos - 1);
+  std::string aN = aa->data()->name();
+
+  if (aCurrentPos == 1)
+    aDoc->moveFeature(aCurFeature, FeaturePtr());
+  else
+    aDoc->moveFeature(aCurFeature, myParametersList.at(aCurrentPos - 2));
+
+  myParametersList.removeOne(aCurFeature);
+  myParametersList.insert(aCurrentPos - 1, aCurFeature);
+
+  myParameters->removeChild(aCurrentItem);
+  myParameters->insertChild(aCurrentPos - 1, aCurrentItem);
+
+  selectItemScroll(aCurrentItem);
 }
 
 void ParametersPlugin_WidgetParamsMgr::onDown()
 {
+  QTreeWidgetItem* aCurrentItem = selectedItem();
+  if (!aCurrentItem)
+    return;
+
+  int aCurrentPos = myParameters->indexOfChild(aCurrentItem);
+  if (aCurrentPos == (myParametersList.count() - 1))
+    return;
+  FeaturePtr aCurFeature = myParametersList.at(aCurrentPos);
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
+  aDoc->moveFeature(aCurFeature, myParametersList.at(aCurrentPos + 1));
+
+  myParametersList.removeOne(aCurFeature);
+  myParametersList.insert(aCurrentPos + 1, aCurFeature);
+
+  myParameters->removeChild(aCurrentItem);
+  myParameters->insertChild(aCurrentPos + 1, aCurrentItem);
+
+  selectItemScroll(aCurrentItem);
 }
 
 
@@ -424,4 +566,20 @@ bool ParametersPlugin_WidgetParamsMgr::hasName(const QString& theName) const
 void ParametersPlugin_WidgetParamsMgr::sendWarning()
 {
   QMessageBox::warning(this, tr("Warning"), myMessage);
+}
+
+void ParametersPlugin_WidgetParamsMgr::onSelectionChanged()
+{
+  QList<QTreeWidgetItem*> aItemsList = myTable->selectedItems();
+  bool isParameter = false;
+  foreach(QTreeWidgetItem* aItem, aItemsList) {
+    if (aItem->parent() == myParameters) {
+      isParameter = true;
+      break;
+    }
+  }
+  myInsertBtn->setEnabled(isParameter);
+  myRemoveBtn->setEnabled(isParameter);
+  myUpBtn->setEnabled(isParameter);
+  myDownBtn->setEnabled(isParameter);
 }

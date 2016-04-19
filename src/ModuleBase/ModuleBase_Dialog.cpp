@@ -72,6 +72,7 @@ ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QStr
 void ModuleBase_Dialog::initializeWidget(ModuleBase_ModelWidget* theWidget)
 {
   theWidget->setFeature(myFeature);
+  theWidget->restoreValue();
 }
 
 void ModuleBase_Dialog::showEvent(QShowEvent* theEvent)

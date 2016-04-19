@@ -14,6 +14,8 @@
 class QTreeWidget;
 class QTreeWidgetItem;
 class ParametersPlugin_ItemDelegate;
+class QPushButton;
+class QToolButton;
 
 /*!
  * \ingroup GUI
@@ -71,7 +73,14 @@ private slots:
 
   void sendWarning();
 
+  void onSelectionChanged();
+
 private:
+  FeaturePtr createParameter() const;
+  QTreeWidgetItem* createNewItem() const;
+  QTreeWidgetItem* selectedItem() const;
+  void selectItemScroll(QTreeWidgetItem* aItem);
+
   void updateFeaturesPart();
 
   bool hasName(const QString& theName) const;
@@ -85,6 +94,12 @@ private:
   QList<FeaturePtr> myParametersList;
 
   QString myMessage;
+
+  QPushButton* myAddBtn;
+  QPushButton* myInsertBtn;
+  QPushButton* myRemoveBtn;
+  QToolButton* myUpBtn;
+  QToolButton* myDownBtn;
 };
 
 

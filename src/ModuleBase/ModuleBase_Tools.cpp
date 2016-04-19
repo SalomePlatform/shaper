@@ -20,6 +20,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttrList.h>
+#include <ModelAPI_ResultPart.h>
 #include <Events_Loop.h>
 
 #include <ModelAPI_Data.h>
@@ -45,6 +46,7 @@
 #include <QGraphicsDropShadowEffect>
 #include <QColor>
 #include <QApplication>
+#include <QMessageBox>
 
 #include <sstream>
 #include <string>
@@ -582,6 +584,274 @@ QString wrapTextByWords(const QString& theValue, QWidget* theWidget,
 
   QString aResult = aLines.join("\n");
   return aResult;
+}
+
+void findReferences(const QObjectPtrList& theList,
+                    std::set<FeaturePtr>& aDirectRefFeatures,
+                    std::set<FeaturePtr>& aIndirectRefFeatures)
+{
+  foreach (ObjectPtr aDeletedObj, theList) {
+    std::set<FeaturePtr> alreadyProcessed;
+    refsToFeatureInAllDocuments(aDeletedObj, aDeletedObj, theList, aDirectRefFeatures,
+                                            aIndirectRefFeatures, alreadyProcessed);
+    std::set<FeaturePtr> aDifference;
+    std::set_difference(aIndirectRefFeatures.begin(), aIndirectRefFeatures.end(), 
+                        aDirectRefFeatures.begin(), aDirectRefFeatures.end(), 
+                        std::inserter(aDifference, aDifference.begin()));
+    aIndirectRefFeatures = aDifference;
+  }
+}
+
+//**************************************************************
+void refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const ObjectPtr& theObject,
+                                 const QObjectPtrList& theIgnoreList,
+                                 std::set<FeaturePtr>& theDirectRefFeatures, 
+                                 std::set<FeaturePtr>& theIndirectRefFeatures,
+                                 std::set<FeaturePtr>& theAlreadyProcessed)
+{
+  refsDirectToFeatureInAllDocuments(theSourceObject, theObject, theIgnoreList, theDirectRefFeatures, 
+                                    theAlreadyProcessed);
+
+  // Run recursion. It is possible recursive dependency, like the following: plane, extrusion uses plane,
+  // axis is built on extrusion. Delete of a plane should check the dependency from the axis also.
+  std::set<FeaturePtr>::const_iterator aFeatureIt = theDirectRefFeatures.begin();
+  for (; aFeatureIt != theDirectRefFeatures.end(); ++aFeatureIt) {
+    std::set<FeaturePtr> aRecursiveRefFeatures;
+    refsToFeatureInAllDocuments(theSourceObject, *aFeatureIt, theIgnoreList,
+      aRecursiveRefFeatures, aRecursiveRefFeatures, theAlreadyProcessed);
+    theIndirectRefFeatures.insert(aRecursiveRefFeatures.begin(), aRecursiveRefFeatures.end());
+  }
+
+}
+
+
+
+//**************************************************************
+void refsDirectToFeatureInAllDocuments(const ObjectPtr& theSourceObject, const ObjectPtr& theObject,
+                                       const QObjectPtrList& theIgnoreList,
+                                       std::set<FeaturePtr>& theDirectRefFeatures, 
+                                       std::set<FeaturePtr>& theAlreadyProcessed)
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (!aFeature.get())
+    return;
+  if (theAlreadyProcessed.find(aFeature) != theAlreadyProcessed.end())
+    return;
+  theAlreadyProcessed.insert(aFeature);
+
+  //convert ignore object list to containt sub-features if the composite feature is in the list
+  QObjectPtrList aFullIgnoreList;
+  QObjectPtrList::const_iterator anIIt = theIgnoreList.begin(), anILast = theIgnoreList.end();
+  for (; anIIt != anILast; anIIt++) {
+    aFullIgnoreList.append(*anIIt);
+    CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*anIIt);
+    // if the current feature is aborted, the composite is removed and has invalid data
+    if (aComposite.get() && aComposite->data()->isValid()) {
+      int aNbSubs = aComposite->numberOfSubs();
+      for (int aSub = 0; aSub < aNbSubs; aSub++) {
+        aFullIgnoreList.append(aComposite->subFeature(aSub));
+      }
+    }
+  }
+
+  // 1. find references in the current document
+  std::set<FeaturePtr> aRefFeatures;
+  refsToFeatureInFeatureDocument(theObject, aRefFeatures);
+  std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
+                                       aLast = aRefFeatures.end();
+  for (; anIt != aLast; anIt++) {
+    // composite feature should not be deleted when the sub feature is to be deleted
+    if (!isSubOfComposite(theSourceObject, *anIt) && !aFullIgnoreList.contains(*anIt))
+      theDirectRefFeatures.insert(*anIt);
+  }
+
+  // 2. find references in all documents if the document of the feature is
+  // "PartSet". Features of this document can be used in all other documents
+  DocumentPtr aFeatureDoc = aFeature->document();
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aModuleDoc = aMgr->moduleDocument();
+  if (aFeatureDoc == aModuleDoc) {
+    // the feature and results of the feature should be found in references
+    std::list<ObjectPtr> aObjects;
+    aObjects.push_back(aFeature);
+    typedef std::list<std::shared_ptr<ModelAPI_Result> > ResultsList;
+    const ResultsList& aResults = aFeature->results();
+    ResultsList::const_iterator aRIter = aResults.begin();
+    for (; aRIter != aResults.cend(); aRIter++) {
+      ResultPtr aRes = *aRIter;
+      if (aRes.get())
+        aObjects.push_back(aRes);
+    }
+    // get all opened documents; found features in the documents;
+    // get a list of objects where a feature refers;
+    // search in these objects the deleted objects.
+    SessionPtr aMgr = ModelAPI_Session::get();
+    std::list<DocumentPtr> anOpenedDocs = aMgr->allOpenedDocuments();
+    std::list<DocumentPtr>::const_iterator anIt = anOpenedDocs.begin(),
+                                            aLast = anOpenedDocs.end();
+    std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
+    for (; anIt != aLast; anIt++) {
+      DocumentPtr aDocument = *anIt;
+      if (aDocument == aFeatureDoc)
+        continue; // this document has been already processed in 1.1
+
+      int aFeaturesCount = aDocument->size(ModelAPI_Feature::group());
+      for (int aId = 0; aId < aFeaturesCount; aId++) {
+        ObjectPtr anObject = aDocument->object(ModelAPI_Feature::group(), aId);
+        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+        if (!aFeature.get())
+          continue;
+
+        aRefs.clear();
+        aFeature->data()->referencesToObjects(aRefs);
+        std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRef = aRefs.begin();
+        bool aHasReferenceToObject = false;
+        for(; aRef != aRefs.end() && !aHasReferenceToObject; aRef++) {
+          std::list<ObjectPtr>::iterator aRefObj = aRef->second.begin();
+          for(; aRefObj != aRef->second.end() && !aHasReferenceToObject; aRefObj++) {
+            std::list<ObjectPtr>::const_iterator aObjIt = aObjects.begin();
+            for(; aObjIt != aObjects.end() && !aHasReferenceToObject; aObjIt++) {
+              aHasReferenceToObject = *aObjIt == *aRefObj;
+            }
+          }
+        }
+        if (aHasReferenceToObject && !isSubOfComposite(theSourceObject, aFeature) &&
+            !theIgnoreList.contains(aFeature))
+          theDirectRefFeatures.insert(aFeature);
+      }
+    }
+  }
+}
+
+//**************************************************************
+void refsToFeatureInFeatureDocument(const ObjectPtr& theObject, std::set<FeaturePtr>& theRefFeatures)
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (aFeature.get()) {
+    DocumentPtr aFeatureDoc = aFeature->document();
+    // 1. find references in the current document
+    aFeatureDoc->refsToFeature(aFeature, theRefFeatures, false);
+  }
+}
+
+
+//**************************************************************
+bool isSubOfComposite(const ObjectPtr& theObject)
+{
+  bool isSub = false;
+  std::set<FeaturePtr> aRefFeatures;
+  refsToFeatureInFeatureDocument(theObject, aRefFeatures);
+  std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
+                                       aLast = aRefFeatures.end();
+  for (; anIt != aLast && !isSub; anIt++) {
+    isSub = isSubOfComposite(theObject, *anIt);
+  }
+  return isSub;
+}
+
+//**************************************************************
+bool isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature)
+{
+  bool isSub = false;
+  CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
+  if (aComposite.get()) {
+    isSub = aComposite->isSub(theObject);
+    // the recursive is possible, the parameters are sketch circle and extrusion cut. They are
+    // separated by composite sketch feature
+    if (!isSub) {
+      int aNbSubs = aComposite->numberOfSubs();
+      for (int aSub = 0; aSub < aNbSubs && !isSub; aSub++) {
+        isSub = isSubOfComposite(theObject, aComposite->subFeature(aSub));
+      }
+    }
+  }
+  return isSub;
+}
+
+
+//**************************************************************
+bool isDeleteFeatureWithReferences(const QObjectPtrList& theList,
+                                   const std::set<FeaturePtr>& aDirectRefFeatures,
+                                   const std::set<FeaturePtr>& aIndirectRefFeatures,
+                                   QWidget* theParent,
+                                   bool& doDeleteReferences)
+{
+  doDeleteReferences = true;
+
+  QString aDirectNames, aIndirectNames;
+  if (!aDirectRefFeatures.empty()) {
+    QStringList aDirectRefNames;
+    foreach (const FeaturePtr& aFeature, aDirectRefFeatures)
+      aDirectRefNames.append(aFeature->name().c_str());
+    aDirectNames = aDirectRefNames.join(", ");
+
+    QStringList aIndirectRefNames;
+    foreach (const FeaturePtr& aFeature, aIndirectRefFeatures)
+      aIndirectRefNames.append(aFeature->name().c_str());
+    aIndirectNames = aIndirectRefNames.join(", ");
+  }
+
+  bool aCanReplaceParameters = !aDirectRefFeatures.empty();
+  QStringList aPartFeatureNames;
+  foreach (ObjectPtr aObj, theList) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+    // invalid feature data means that the feature is already removed in model,
+    // we needn't process it. E.g. delete of feature from create operation. The operation abort
+    // will delete the operation
+    if (!aFeature->data()->isValid())
+      continue;
+    ResultPtr aFirstResult = aFeature->firstResult();
+    if (!aFirstResult.get())
+      continue;
+    std::string aResultGroupName = aFirstResult->groupName();
+    if (aResultGroupName == ModelAPI_ResultPart::group())
+      aPartFeatureNames.append(aFeature->name().c_str());
+
+    if (aCanReplaceParameters && aResultGroupName != ModelAPI_ResultParameter::group())
+      aCanReplaceParameters = false;
+  }
+  QString aPartNames = aPartFeatureNames.join(", ");
+
+  QMessageBox aMessageBox(theParent);
+  aMessageBox.setWindowTitle(QObject::tr("Delete features"));
+  aMessageBox.setIcon(QMessageBox::Warning);
+  aMessageBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+  aMessageBox.setDefaultButton(QMessageBox::No);
+
+  QString aText;
+  if (!aDirectNames.isEmpty() || !aIndirectNames.isEmpty()) {
+    if (aCanReplaceParameters) {
+      aText = QString(QObject::tr("Selected parameters are used in the following features: %1.\nThese features will be deleted.\nOr parameters could be replaced by their values.\n")
+                      .arg(aDirectNames));
+      if (!aIndirectNames.isEmpty())
+        aText += QString(QObject::tr("(Also these features will be deleted: %1)\n")).arg(aIndirectNames);
+      QPushButton *aReplaceButton = aMessageBox.addButton(QObject::tr("Replace"), QMessageBox::ActionRole);
+    } else {
+      aText = QString(QObject::tr("Selected features are used in the following features: %1.\nThese features will be deleted.\n")).arg(aDirectNames);
+      if (!aIndirectNames.isEmpty())
+        aText += QString(QObject::tr("(Also these features will be deleted: %1)\n")).arg(aIndirectNames);
+    }
+  }
+  if (!aPartNames.isEmpty())
+    aText += QString(QObject::tr("The following parts will be deleted: %1.\n")).arg(aPartNames);
+
+  if (!aText.isEmpty()) {
+    aText += "Would you like to continue?";
+    aMessageBox.setText(aText);
+    aMessageBox.exec();
+    QMessageBox::ButtonRole aButtonRole = aMessageBox.buttonRole(aMessageBox.clickedButton());
+
+    if (aButtonRole == QMessageBox::NoRole)
+      return false;
+
+    if (aButtonRole == QMessageBox::ActionRole) {
+      foreach (ObjectPtr aObj, theList)
+        ModelAPI_ReplaceParameterMessage::send(aObj, 0);
+      doDeleteReferences = false;
+    }
+  }
+  return true;
 }
 
 } // namespace ModuleBase_Tools

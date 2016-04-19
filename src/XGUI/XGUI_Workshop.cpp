@@ -1280,11 +1280,11 @@ void XGUI_Workshop::deleteObjects()
   // 3. delete objects
   std::set<FeaturePtr> anIgnoredFeatures;
   std::set<FeaturePtr> aDirectRefFeatures, aIndirectRefFeatures;
-  findReferences(anObjects, aDirectRefFeatures, aIndirectRefFeatures);
+  ModuleBase_Tools::findReferences(anObjects, aDirectRefFeatures, aIndirectRefFeatures);
 
   bool doDeleteReferences = true;
-  if (isDeleteFeatureWithReferences(anObjects, aDirectRefFeatures, aIndirectRefFeatures,
-                                    desktop(), doDeleteReferences)) {
+  if (ModuleBase_Tools::isDeleteFeatureWithReferences(anObjects, aDirectRefFeatures, 
+      aIndirectRefFeatures, desktop(), doDeleteReferences)) {
     // start operation
     QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text();
     aDescription += " " + aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
@@ -1335,7 +1335,7 @@ void XGUI_Workshop::cleanHistory()
     if (aFeature.get()) {
       std::set<FeaturePtr> alreadyProcessed;
       aDirectRefFeatures.clear();
-      XGUI_Tools::refsDirectToFeatureInAllDocuments(aFeature, aFeature, aFeatures,
+      ModuleBase_Tools::refsDirectToFeatureInAllDocuments(aFeature, aFeature, aFeatures,
                                                     aDirectRefFeatures, alreadyProcessed);
       if (aDirectRefFeatures.empty() && !anUnusedObjects.contains(aFeature))
         anUnusedObjects.append(aFeature);
@@ -1457,110 +1457,11 @@ void XGUI_Workshop::moveObjects()
 }
 
 //**************************************************************
-void XGUI_Workshop::findReferences(const QObjectPtrList& theList,
-                                   std::set<FeaturePtr>& aDirectRefFeatures,
-                                   std::set<FeaturePtr>& aIndirectRefFeatures)
-{
-  foreach (ObjectPtr aDeletedObj, theList) {
-    std::set<FeaturePtr> alreadyProcessed;
-    XGUI_Tools::refsToFeatureInAllDocuments(aDeletedObj, aDeletedObj, theList, aDirectRefFeatures,
-                                            aIndirectRefFeatures, alreadyProcessed);
-    std::set<FeaturePtr> aDifference;
-    std::set_difference(aIndirectRefFeatures.begin(), aIndirectRefFeatures.end(), 
-                        aDirectRefFeatures.begin(), aDirectRefFeatures.end(), 
-                        std::inserter(aDifference, aDifference.begin()));
-    aIndirectRefFeatures = aDifference;
-  }
-}
-
-bool XGUI_Workshop::isDeleteFeatureWithReferences(const QObjectPtrList& theList,
-                                   const std::set<FeaturePtr>& aDirectRefFeatures,
-                                   const std::set<FeaturePtr>& aIndirectRefFeatures,
-                                   QWidget* theParent,
-                                   bool& doDeleteReferences)
-{
-  doDeleteReferences = true;
-
-  QString aDirectNames, aIndirectNames;
-  if (!aDirectRefFeatures.empty()) {
-    QStringList aDirectRefNames;
-    foreach (const FeaturePtr& aFeature, aDirectRefFeatures)
-      aDirectRefNames.append(aFeature->name().c_str());
-    aDirectNames = aDirectRefNames.join(", ");
-
-    QStringList aIndirectRefNames;
-    foreach (const FeaturePtr& aFeature, aIndirectRefFeatures)
-      aIndirectRefNames.append(aFeature->name().c_str());
-    aIndirectNames = aIndirectRefNames.join(", ");
-  }
-
-  bool aCanReplaceParameters = !aDirectRefFeatures.empty();
-  QStringList aPartFeatureNames;
-  foreach (ObjectPtr aObj, theList) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-    // invalid feature data means that the feature is already removed in model,
-    // we needn't process it. E.g. delete of feature from create operation. The operation abort
-    // will delete the operation
-    if (!aFeature->data()->isValid())
-      continue;
-    ResultPtr aFirstResult = aFeature->firstResult();
-    if (!aFirstResult.get())
-      continue;
-    std::string aResultGroupName = aFirstResult->groupName();
-    if (aResultGroupName == ModelAPI_ResultPart::group())
-      aPartFeatureNames.append(aFeature->name().c_str());
-
-    if (aCanReplaceParameters && aResultGroupName != ModelAPI_ResultParameter::group())
-      aCanReplaceParameters = false;
-  }
-  QString aPartNames = aPartFeatureNames.join(", ");
-
-  QMessageBox aMessageBox(theParent);
-  aMessageBox.setWindowTitle(tr("Delete features"));
-  aMessageBox.setIcon(QMessageBox::Warning);
-  aMessageBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
-  aMessageBox.setDefaultButton(QMessageBox::No);
-
-  QString aText;
-  if (!aDirectNames.isEmpty() || !aIndirectNames.isEmpty()) {
-    if (aCanReplaceParameters) {
-      aText = QString(tr("Selected parameters are used in the following features: %1.\nThese features will be deleted.\nOr parameters could be replaced by their values.\n")
-                      .arg(aDirectNames));
-      if (!aIndirectNames.isEmpty())
-        aText += QString(tr("(Also these features will be deleted: %1)\n")).arg(aIndirectNames);
-      QPushButton *aReplaceButton = aMessageBox.addButton(tr("Replace"), QMessageBox::ActionRole);
-    } else {
-      aText = QString(tr("Selected features are used in the following features: %1.\nThese features will be deleted.\n")).arg(aDirectNames);
-      if (!aIndirectNames.isEmpty())
-        aText += QString(tr("(Also these features will be deleted: %1)\n")).arg(aIndirectNames);
-    }
-  }
-  if (!aPartNames.isEmpty())
-    aText += QString(tr("The following parts will be deleted: %1.\n")).arg(aPartNames);
-
-  if (!aText.isEmpty()) {
-    aText += "Would you like to continue?";
-    aMessageBox.setText(aText);
-    aMessageBox.exec();
-    QMessageBox::ButtonRole aButtonRole = aMessageBox.buttonRole(aMessageBox.clickedButton());
-
-    if (aButtonRole == QMessageBox::NoRole)
-      return false;
-
-    if (aButtonRole == QMessageBox::ActionRole) {
-      foreach (ObjectPtr aObj, theList)
-        ModelAPI_ReplaceParameterMessage::send(aObj, this);
-      doDeleteReferences = false;
-    }
-  }
-  return true;
-}
-
 bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theFeatures,
                                    const std::set<FeaturePtr>& theIgnoredFeatures)
 {
   std::set<FeaturePtr> aDirectRefFeatures, aIndirectRefFeatures;
-  findReferences(theFeatures, aDirectRefFeatures, aIndirectRefFeatures);
+  ModuleBase_Tools::findReferences(theFeatures, aDirectRefFeatures, aIndirectRefFeatures);
   return deleteFeaturesInternal(theFeatures, aDirectRefFeatures, aIndirectRefFeatures,
                                 theIgnoredFeatures);
 }
@@ -1758,7 +1659,7 @@ bool XGUI_Workshop::canMoveFeature()
       std::set<FeaturePtr> aPlacedFeatures(aFeaturesBetween.begin(), aFeaturesBetween.end());
       // 2. Get all reference features to the selected object in the document 
       std::set<FeaturePtr> aRefFeatures;
-      XGUI_Tools::refsToFeatureInFeatureDocument(aObject, aRefFeatures);
+      ModuleBase_Tools::refsToFeatureInFeatureDocument(aObject, aRefFeatures);
 
       if (aRefFeatures.empty())
         continue;

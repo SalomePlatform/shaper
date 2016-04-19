@@ -213,6 +213,84 @@ MODULEBASE_EXPORT void blockUpdateViewer(const bool theValue);
 /// \param theMaxLineInPixels a maximum line width in pixels
 MODULEBASE_EXPORT QString wrapTextByWords(const QString& theValue, QWidget* theWidget,
                                              int theMaxLineInPixels = 150);
+
+//! Find all referenced features. Return direct and indirect lists of referenced object
+//! \param theList an objects to be checked
+//! \param aDirectRefFeatures a list of direct reference features
+//! \param aIndirectRefFeatures a list of features which depend on the feature through others
+MODULEBASE_EXPORT void findReferences(const QObjectPtrList& theList,
+                                      std::set<FeaturePtr>& aDirectRefFeatures,
+                                      std::set<FeaturePtr>& aIndirectRefFeatures);
+/*!
+ Returns a container of references feature to the source object. The search happens in the object
+ document and in other Part documents if the object belongs to the PartSet. The search is recursive,
+ in other words it is applyed to set of the found objects until it is possible.
+ It do not returns the referenced features to the object if this references is a composite feature
+ which has the object as a sub object.
+ \param theSourceObject an object, which references are searched
+ \param theObject an intermediate recursive object, should be set in the source object
+ \param theIgnoreList an ignore list, the found referernces which coincide with the objects are ignored
+ \param theDirectRefFeatures direct references
+ \param theIndirectRefFeatures indirect references. These are features that refers to the direct features
+ \param theAlreadyProcessed set of processed elements, used for optimization (do not reanalyse processed)
+ \return a boolean value
+ */
+void MODULEBASE_EXPORT refsToFeatureInAllDocuments(const ObjectPtr& theSourceObject,
+                                                   const ObjectPtr& theObject,
+                                                   const QObjectPtrList& theIgnoreList,
+                                                   std::set<FeaturePtr>& theDirectRefFeatures,
+                                                   std::set<FeaturePtr>& theIndirectRefFeatures,
+                                                   std::set<FeaturePtr>& theAlreadyProcessed);
+
+/*!
+*/
+void MODULEBASE_EXPORT refsDirectToFeatureInAllDocuments(const ObjectPtr& theSourceObject, 
+                                                         const ObjectPtr& theObject,
+                                                         const QObjectPtrList& theIgnoreList,
+                                                         std::set<FeaturePtr>& theDirectRefFeatures, 
+                                                         std::set<FeaturePtr>& theAlreadyProcessed);
+
+/*!
+  Returns a container of referenced feature to the current object in the object document.
+  \param theObject an object, which will be casted to a feature type
+  \param theRefFeatures an output container
+ */
+void MODULEBASE_EXPORT refsToFeatureInFeatureDocument(const ObjectPtr& theObject,
+                                                      std::set<FeaturePtr>& theRefFeatures);
+
+
+/*!
+ Returns true if the object if a sub child of the feature. The feature is casted to the
+ composite one. If it is possible, the sub object check happens. The method is applyed
+ recursively to the feature subs.
+ \param theObject a candidate to be a sub object
+ \param theFeature a candidate to be a composite feature
+ \return a boolean value
+ */
+bool MODULEBASE_EXPORT isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature);
+
+
+/*!
+* Returns true if the result is a sub object of some composite object
+* \param theObject a result object
+* \returns boolean value
+*/
+bool MODULEBASE_EXPORT isSubOfComposite(const ObjectPtr& theObject);
+
+
+//! Shows a dialog box about references. Ask whether they should be also removed.
+//! \param theList an objects to be checked
+//! \param aDirectRefFeatures a list of direct reference features
+//! \param aIndirectRefFeatures a list of features which depend on the feature through others
+//! \param theParent a parent widget for the question message box
+//! \param doDeleteReferences if there are parameters between features, ask if they should be
+//! replaced to their meaning without corresponded features remove
+//! \return true if in message box answer is Yes
+bool MODULEBASE_EXPORT isDeleteFeatureWithReferences(const QObjectPtrList& theList,
+                                                     const std::set<FeaturePtr>& aDirectRefFeatures,
+                                                     const std::set<FeaturePtr>& aIndirectRefFeatures,
+                                                     QWidget* theParent,
+                                                     bool& doDeleteReferences);
 }
 
 #endif

@@ -387,28 +387,6 @@ signals:
   /// \param theOperation an operation
    void setGrantedFeatures(ModuleBase_Operation* theOperation);
 
-  //! Find all referenced features. Return direct and indirect lists of referenced object
-  //! \param theList an objects to be checked
-  //! \param aDirectRefFeatures a list of direct reference features
-  //! \param aIndirectRefFeatures a list of features which depend on the feature through others
-  void findReferences(const QObjectPtrList& theList,
-                      std::set<FeaturePtr>& aDirectRefFeatures,
-                      std::set<FeaturePtr>& aIndirectRefFeatures);
-
-  //! Shows a dialog box about references. Ask whether they should be also removed.
-  //! \param theList an objects to be checked
-  //! \param aDirectRefFeatures a list of direct reference features
-  //! \param aIndirectRefFeatures a list of features which depend on the feature through others
-  //! \param theParent a parent widget for the question message box
-  //! \param doDeleteReferences if there are parameters between features, ask if they should be
-  //! replaced to their meaning without corresponded features remove
-  //! \return true if in message box answer is Yes
-  bool isDeleteFeatureWithReferences(const QObjectPtrList& theList,
-                                     const std::set<FeaturePtr>& aDirectRefFeatures,
-                                     const std::set<FeaturePtr>& aIndirectRefFeatures,
-                                     QWidget* theParent,
-                                     bool& doDeleteReferences);
-
   //! \param theIgnoredFeatures a list of features to be ignored during delete
   //! \param theList an objects to be checked
   //! \param aDirectRefFeatures a list of direct reference features
