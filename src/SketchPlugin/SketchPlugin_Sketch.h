@@ -68,6 +68,13 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
     return MY_SOLVER_ERROR;
   }
 
+  /// Sketch solver error
+  inline static const std::string& SOLVER_DOF()
+  {
+    static const std::string MY_SOLVER_DOF("SolverDOF");
+    return MY_SOLVER_DOF;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {

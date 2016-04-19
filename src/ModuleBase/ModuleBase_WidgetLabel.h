@@ -31,15 +31,12 @@ Q_OBJECT
   /// It returns false because this is an info widget
   virtual bool canAcceptFocus() const { return false; };
 
-  virtual bool restoreValueCustom()
-  {
-    return true;
-  }
+  virtual bool restoreValueCustom();
 
   virtual QList<QWidget*> getControls() const;
 
   /// This control doesn't accept focus
-  virtual bool focusTo() { return false; }
+  virtual bool focusTo();
 
 protected:
   /// Saves the internal parameters to the given feature

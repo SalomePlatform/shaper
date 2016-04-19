@@ -497,6 +497,8 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
                         !aWidget->getDefaultValue().empty() &&
                         !aWidget->isComputedDefault();
     aWidget->setFeature(aFeature, isStoreValue, isUpdateFlushed);
+    if (!isStoreValue)
+      aWidget->restoreValue();
     aWidget->enableFocusProcessing();
   }
   ModuleBase_Tools::flushUpdated(aFeature);

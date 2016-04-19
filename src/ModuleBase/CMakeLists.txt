@@ -61,7 +61,6 @@ SET(PROJECT_HEADERS
   ModuleBase_WidgetValidated.h
   ModuleBase_WidgetValidator.h
   ModuleBase_IconFactory.h
-  ModuleBase_WidgetErrorLabel.h
   ModuleBase_Dialog.h
 )
 
@@ -120,7 +119,6 @@ SET(PROJECT_SOURCES
   ModuleBase_WidgetValidated.cpp
   ModuleBase_WidgetValidator.cpp
   ModuleBase_IconFactory.cpp
-  ModuleBase_WidgetErrorLabel.cpp
   ModuleBase_SelectionValidator.cpp
   ModuleBase_Dialog.cpp
 )

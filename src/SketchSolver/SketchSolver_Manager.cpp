@@ -48,6 +48,7 @@
 #include <list>
 #include <set>
 #include <memory>
+#include <cmath>
 
 static const Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
 
@@ -234,6 +235,7 @@ void SketchSolver_Manager::checkConflictingConstraints(const std::shared_ptr<Eve
             // reset error message on the sketch
             aGroup->getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(
                 SketchSolver_Error::CONSTRAINTS());
+            Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
             break;
           }
         }
@@ -566,12 +568,12 @@ void SketchSolver_Manager::degreesOfFreedom()
     if (aFound != myDoF.end() && aFound->second == aDoFIt->second)
       continue; // nothing is changed
     myDoF[aDoFIt->first] = aDoFIt->second;
-    // send a message
-    std::shared_ptr<ModelAPI_SolverFailedMessage> aMessage =
-        std::shared_ptr<ModelAPI_SolverFailedMessage>(
-        new ModelAPI_SolverFailedMessage(Events_Loop::eventByName(EVENT_SOLVER_REPAIRED)));
-    aMessage->dof(aDoFIt->second);
-    Events_Loop::loop()->send(aMessage);
+    // change attribute value
+    char aValue[10];
+    _itoa_s(aDoFIt->second, aValue, 10);
+    aDoFIt->first->data()->string(SketchPlugin_Sketch::SOLVER_DOF())->setValue(
+                                                             "DOF(degree of freedom) = "+ std::string(aValue));
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   }
 }
 
