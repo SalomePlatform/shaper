@@ -362,10 +362,6 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
 
   myDocModel = new XGUI_DataModel(this);
 
-  QItemSelectionModel* aSelMod = myTreeView->selectionModel();
-  connect(aSelMod, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-          this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
-
   connect(myTreeView, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
           SLOT(onContextMenuRequested(QContextMenuEvent*)));
 }
@@ -382,6 +378,10 @@ void XGUI_ObjectsBrowser::setXMLReader(Config_DataModelReader* theReader)
 
   // It has to be done after setting of model
   myActiveDocLbl->setTreeView(myTreeView);
+
+  QItemSelectionModel* aSelMod = myTreeView->selectionModel();
+  connect(aSelMod, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+          this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
 }
 
 //***************************************************
