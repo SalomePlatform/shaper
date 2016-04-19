@@ -48,7 +48,7 @@
 #include <list>
 #include <set>
 #include <memory>
-#include <cmath>
+#include <sstream>
 
 static const Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
 
@@ -569,10 +569,11 @@ void SketchSolver_Manager::degreesOfFreedom()
       continue; // nothing is changed
     myDoF[aDoFIt->first] = aDoFIt->second;
     // change attribute value
-    char aValue[10];
-    _itoa_s(aDoFIt->second, aValue, 10);
-    aDoFIt->first->data()->string(SketchPlugin_Sketch::SOLVER_DOF())->setValue(
-                                                             "DOF(degree of freedom) = "+ std::string(aValue));
+    std::ostringstream aStream;
+    std::string aValue = "DOF(degree of freedom) = ";
+    aStream << aDoFIt->second;
+    aDoFIt->first->data()->string(SketchPlugin_Sketch::SOLVER_DOF())->setValue(aValue);
+
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   }
 }
