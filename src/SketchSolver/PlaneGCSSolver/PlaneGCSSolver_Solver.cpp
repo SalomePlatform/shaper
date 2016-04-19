@@ -97,3 +97,7 @@ void PlaneGCSSolver_Solver::collectConflicting()
   myConfCollected = true;
 }
 
+int PlaneGCSSolver_Solver::dof() const
+{
+  return const_cast<PlaneGCSSolver_Solver*>(this)->myEquationSystem.dofsNumber();
+}

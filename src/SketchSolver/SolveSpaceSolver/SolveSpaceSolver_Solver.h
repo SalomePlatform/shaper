@@ -83,6 +83,9 @@ public:
   /// \brief Check the constraint is conflicted with others
   virtual bool isConflicting(const ConstraintID& theConstraint) const;
 
+  /// \brief Degrees of freedom
+  virtual int dof() const;
+
 private:
   /// \brief Check whether degenerated arcs exist
   bool hasDegeneratedArcs() const;

@@ -320,8 +320,14 @@ public:
   /// Returns list of conflicting constraints
   MODELAPI_EXPORT const std::set<ObjectPtr>& objects() const;
 
+  /// Sets degrees of freedom
+  void dof(const int theDOF) { myDOF = theDOF; }
+  /// Returns degrees of freedom
+  const int& dof() const { return myDOF; }
+
 private:
   std::set<ObjectPtr> myObjects;
+  int myDOF;
 };
 
 #endif

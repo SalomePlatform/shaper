@@ -15,9 +15,27 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Attribute.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeString.h>
 
 #include <SketchPlugin_Constraint.h>
+#include <SketchPlugin_ConstraintAngle.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintCollinear.h>
+#include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintEqual.h>
+#include <SketchPlugin_ConstraintHorizontal.h>
+#include <SketchPlugin_ConstraintLength.h>
+#include <SketchPlugin_ConstraintMiddle.h>
+#include <SketchPlugin_ConstraintMirror.h>
+#include <SketchPlugin_ConstraintParallel.h>
+#include <SketchPlugin_ConstraintPerpendicular.h>
+#include <SketchPlugin_ConstraintRadius.h>
+#include <SketchPlugin_ConstraintRigid.h>
+#include <SketchPlugin_ConstraintTangent.h>
+#include <SketchPlugin_ConstraintVertical.h>
+#include <SketchPlugin_MultiRotation.h>
+#include <SketchPlugin_MultiTranslation.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
@@ -26,6 +44,7 @@
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Feature.h>
 
+#include <assert.h>
 #include <list>
 #include <set>
 #include <memory>
@@ -184,6 +203,7 @@ void SketchSolver_Manager::processEvent(
         resolveConstraints(aGroupsToResolve);
     }
   }
+  degreesOfFreedom();
   myIsComputed = false;
 }
 
@@ -423,6 +443,136 @@ bool SketchSolver_Manager::resolveConstraints(const std::list<SketchSolver_Group
     if ((*aGroupIter)->resolveConstraints())
       needToUpdate = true;
   return needToUpdate;
+}
+
+// ============================================================================
+//  Function: degreesOfFreedom
+//  Purpose:  calculate DoFs for each sketch
+// ============================================================================
+void SketchSolver_Manager::degreesOfFreedom()
+{
+  static std::map<std::string, int> aDoFDelta; // indicates how many DoF adds or decreases a feature
+  static bool isNeedInit = true;
+  if (isNeedInit) {
+    aDoFDelta[SketchPlugin_Point::ID()] = 2;
+    aDoFDelta[SketchPlugin_Line::ID()] = 4;
+    aDoFDelta[SketchPlugin_Circle::ID()] = 3;
+    aDoFDelta[SketchPlugin_Arc::ID()] = 5;
+
+    aDoFDelta[SketchPlugin_ConstraintAngle::ID()] = -1;
+    aDoFDelta[SketchPlugin_ConstraintCollinear::ID()] = -1;
+    aDoFDelta[SketchPlugin_ConstraintDistance::ID()] = -1;
+    aDoFDelta[SketchPlugin_ConstraintEqual::ID()] = -1;
+    aDoFDelta[SketchPlugin_ConstraintHorizontal::ID()] = -1;
+    aDoFDelta[SketchPlugin_ConstraintLength::ID()] = -1;
+    aDoFDelta[SketchPlugin_ConstraintMiddle::ID()] = -1;
+    aDoFDelta[SketchPlugin_ConstraintParallel::ID()] = -1;
+    aDoFDelta[SketchPlugin_ConstraintPerpendicular::ID()] = -1;
+    aDoFDelta[SketchPlugin_ConstraintRadius::ID()] = -1;
+    aDoFDelta[SketchPlugin_ConstraintTangent::ID()] = -1;
+    aDoFDelta[SketchPlugin_ConstraintVertical::ID()] = -1;
+
+    isNeedInit = false;
+  }
+
+  std::map<CompositeFeaturePtr, int> aSketchDoF;
+
+  std::list<SketchSolver_Group*>::const_iterator aGroupIt = myGroups.begin();
+  for (; aGroupIt != myGroups.end(); ++aGroupIt) {
+    CompositeFeaturePtr aSketch = (*aGroupIt)->getWorkplane();
+
+    // check conflicting constraints in the group
+    if ((*aGroupIt)->isFailed())
+      aSketchDoF[aSketch] = -1;
+    // check the sketch is already processed
+    if (aSketchDoF.find(aSketch) != aSketchDoF.end() || aSketchDoF[aSketch] < 0)
+      continue;
+
+    int aDoF = 0;
+    int aNbSubs = aSketch->numberOfSubs();
+    for (int i = 0; i < aNbSubs; ++i) {
+      FeaturePtr aFeature = aSketch->subFeature(i);
+      // check DoF delta for invariant types
+      std::map<std::string, int>::const_iterator aFound = aDoFDelta.find(aFeature->getKind());
+      if (aFound != aDoFDelta.end()) {
+        aDoF += aFound->second;
+        continue;
+      }
+
+      // DoF delta in specific cases
+      if (aFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+        for (int j = 0; j < 2; ++j) {
+          AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+              aFeature->attribute(SketchPlugin_Constraint::ATTRIBUTE(j)));
+          if (!aRefAttr)
+            continue;
+          bool isPoint = !aRefAttr->isObject();
+          if (!isPoint) {
+            FeaturePtr anAttr = ModelAPI_Feature::feature(aRefAttr->object());
+            isPoint = anAttr && anAttr->getKind() == SketchPlugin_Point::ID();
+          }
+          if (isPoint)
+            aDoF -= 1;
+        }
+      }
+      else if (aFeature->getKind() == SketchPlugin_ConstraintRigid::ID()) {
+        AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+            aFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
+        assert(aRefAttr);
+        if (!aRefAttr->isObject())
+          aDoF -= 2; // attribute is a point
+        else {
+          FeaturePtr anAttr = ModelAPI_Feature::feature(aRefAttr->object());
+          assert(anAttr);
+          aDoF -= aDoFDelta[anAttr->getKind()];
+        }
+      }
+      else if (aFeature->getKind() == SketchPlugin_ConstraintMirror::ID() ||
+               aFeature->getKind() == SketchPlugin_MultiRotation::ID() ||
+               aFeature->getKind() == SketchPlugin_MultiTranslation::ID()) {
+        int aNbCopies = 1;
+        std::string anAttrName;
+        if (aFeature->getKind() == SketchPlugin_ConstraintMirror::ID())
+          anAttrName = SketchPlugin_Constraint::ENTITY_B();
+        else {
+          if (aFeature->getKind() == SketchPlugin_MultiRotation::ID())
+            aNbCopies = aFeature->integer(SketchPlugin_MultiRotation::NUMBER_OF_OBJECTS_ID())->value() - 1;
+          else if (aFeature->getKind() == SketchPlugin_MultiTranslation::ID())
+            aNbCopies = aFeature->integer(SketchPlugin_MultiTranslation::NUMBER_OF_OBJECTS_ID())->value() - 1;
+          anAttrName = SketchPlugin_Constraint::ENTITY_A();
+        }
+
+        AttributeRefListPtr aRefListOfShapes = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+            aFeature->attribute(anAttrName));
+        std::list<ObjectPtr> anObjList = aRefListOfShapes->list();
+        std::list<ObjectPtr>::const_iterator anObjIt = anObjList.begin();
+        for (; anObjIt != anObjList.end(); ++anObjIt) {
+          FeaturePtr aSub = ModelAPI_Feature::feature(*anObjIt);
+          aDoF -= aDoFDelta[aSub->getKind()] * aNbCopies;
+        }
+      }
+    }
+
+    aSketchDoF[aSketch] = aDoF;
+  }
+
+  // Check the degrees of freedom are changed
+  std::map<CompositeFeaturePtr, int>::const_iterator aDoFIt = aSketchDoF.begin();
+  std::map<CompositeFeaturePtr, int>::iterator aFound;
+  for (; aDoFIt != aSketchDoF.end(); ++aDoFIt) {
+    if (aDoFIt->second < 0)
+      continue; // conflicting constraints on the current sketch
+    aFound = myDoF.find(aDoFIt->first);
+    if (aFound != myDoF.end() && aFound->second == aDoFIt->second)
+      continue; // nothing is changed
+    myDoF[aDoFIt->first] = aDoFIt->second;
+    // send a message
+    std::shared_ptr<ModelAPI_SolverFailedMessage> aMessage =
+        std::shared_ptr<ModelAPI_SolverFailedMessage>(
+        new ModelAPI_SolverFailedMessage(Events_Loop::eventByName(EVENT_SOLVER_REPAIRED)));
+    aMessage->dof(aDoFIt->second);
+    Events_Loop::loop()->send(aMessage);
+  }
 }
 
 bool SketchSolver_Manager::stopSendUpdate() const

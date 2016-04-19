@@ -205,3 +205,8 @@ bool SolveSpaceSolver_Solver::isConflicting(const ConstraintID& theConstraint) c
       return true;
   return false;
 }
+
+int SolveSpaceSolver_Solver::dof() const
+{
+  return myEquationsSystem.dof;
+}
