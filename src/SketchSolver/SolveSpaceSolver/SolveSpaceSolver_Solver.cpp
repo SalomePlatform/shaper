@@ -97,7 +97,7 @@ SketchSolver_SolveStatus SolveSpaceSolver_Solver::solve()
   }
 
   Events_LongOp::start(this);
-  Slvs_Solve(&myEquationsSystem, myGroup);
+  Slvs_Solve(&myEquationsSystem, (Slvs_hGroup)myGroup);
   Events_LongOp::end(this);
 
   SketchSolver_SolveStatus aStatus;

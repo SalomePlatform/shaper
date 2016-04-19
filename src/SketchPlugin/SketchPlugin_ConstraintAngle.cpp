@@ -12,6 +12,7 @@
 
 #include <GeomDataAPI_Point2D.h>
 
+#include <GeomAPI_Angle2d.h>
 #include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Lin2d.h>
 #include <GeomAPI_Pnt2d.h>
@@ -43,6 +44,9 @@ void SketchPlugin_ConstraintAngle::initAttributes()
 
   data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(SketchPlugin_ConstraintAngle::TYPE_ID(), ModelAPI_AttributeInteger::typeId());
+
+  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID(), ModelAPI_AttributeBoolean::typeId());
 }
 
 void SketchPlugin_ConstraintAngle::colorConfigInfo(std::string& theSection, std::string& theName,
@@ -144,54 +148,37 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
 
 double SketchPlugin_ConstraintAngle::calculateAngle()
 {
-  double anAngle = 0.0;
-
   std::shared_ptr<ModelAPI_Data> aData = data();
   std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
   FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
   FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
 
-  // Intersection of lines
-  std::shared_ptr<GeomAPI_Pnt2d> anInter = intersect(aLineA, aLineB);
-  if (!anInter)
-    return anAngle;
-
-  // Start and end points of lines
-  std::shared_ptr<GeomDataAPI_Point2D> aPointA1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  std::shared_ptr<GeomDataAPI_Point2D> aStartA = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aLineA->attribute(SketchPlugin_Line::START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aPointA2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  std::shared_ptr<GeomDataAPI_Point2D> aEndA = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aLineA->attribute(SketchPlugin_Line::END_ID()));
-
-  std::shared_ptr<GeomDataAPI_Point2D> aPointB1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  std::shared_ptr<GeomDataAPI_Point2D> aStartB = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aLineB->attribute(SketchPlugin_Line::START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aPointB2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  std::shared_ptr<GeomDataAPI_Point2D> aEndB = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aLineB->attribute(SketchPlugin_Line::END_ID()));
 
-  std::shared_ptr<GeomAPI_Pnt2d> aStartA = aPointA1->pnt();
-  std::shared_ptr<GeomAPI_Pnt2d> aEndA   = aPointA2->pnt();
-  std::shared_ptr<GeomAPI_Pnt2d> aStartB = aPointB1->pnt();
-  std::shared_ptr<GeomAPI_Pnt2d> aEndB   = aPointB2->pnt();
-
-  double aDist[2][2] = {
-      { anInter->distance(aStartA), anInter->distance(aEndA) },
-      { anInter->distance(aStartB), anInter->distance(aEndB) }
-  };
-
-  // Directions of lines
-  if (aDist[0][0] > aDist[0][1])
-    aEndA = aStartA;
-  if (aDist[1][0] > aDist[1][1])
-    aEndB = aStartB;
-
-  std::shared_ptr<GeomAPI_Dir2d> aDirA(new GeomAPI_Dir2d(aEndA->xy()->decreased(anInter->xy())));
-  std::shared_ptr<GeomAPI_Dir2d> aDirB(new GeomAPI_Dir2d(aEndB->xy()->decreased(anInter->xy())));
-
-  double aDirAngle = aDirA->angle(aDirB);
-  if (aDirAngle < 0)
-    aDirAngle += 2.0 * PI;
-  anAngle = fabs(aDirAngle) * 180.0 / PI;
+  std::shared_ptr<GeomAPI_Angle2d> anAng;
+  if (!attribute(ANGLE_REVERSED_FIRST_LINE_ID())->isInitialized() ||
+      !attribute(ANGLE_REVERSED_SECOND_LINE_ID())->isInitialized())
+    anAng = std::shared_ptr<GeomAPI_Angle2d>(new GeomAPI_Angle2d(
+        aStartA->pnt(), aEndA->pnt(), aStartB->pnt(), aEndB->pnt()));
+  else {
+    std::shared_ptr<GeomAPI_Lin2d> aLine1(new GeomAPI_Lin2d(aStartA->pnt(), aEndA->pnt()));
+    bool isReversed1 = boolean(ANGLE_REVERSED_FIRST_LINE_ID())->value();
+    std::shared_ptr<GeomAPI_Lin2d> aLine2(new GeomAPI_Lin2d(aStartB->pnt(), aEndB->pnt()));
+    bool isReversed2 = boolean(ANGLE_REVERSED_SECOND_LINE_ID())->value();
+    anAng = std::shared_ptr<GeomAPI_Angle2d>(new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
+  }
+  double anAngle = anAng->angleDegree();
   /// an angle value should be corrected by the current angle type
   anAngle = getAngleForType(anAngle);
+  boolean(ANGLE_REVERSED_FIRST_LINE_ID())->setValue(anAng->isReversed(0));
+  boolean(ANGLE_REVERSED_SECOND_LINE_ID())->setValue(anAng->isReversed(1));
   return anAngle;
 }
 

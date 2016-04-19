@@ -422,7 +422,7 @@ void SolveSpaceSolver_Storage::replaceInConstraints(
             aConstr.entityC == aSlvsCIt->entityC && aConstr.entityD == aSlvsCIt->entityD) {
           Slvs_hConstraint anIDToRemove = aConstr.h;
           aConstr = *aSlvsCIt;
-          int aShift = aSlvsCIt - myConstraints.begin();
+          int aShift = (int)(aSlvsCIt - myConstraints.begin());
           removeConstraint(anIDToRemove);
           aSlvsCIt = myConstraints.begin() + aShift - 1;
           for (; aSlvsCIt != myConstraints.end(); ++aSlvsCIt)
@@ -810,13 +810,13 @@ Slvs_hConstraint SolveSpaceSolver_Storage::updateConstraint(const Slvs_Constrain
     if (anIt != myConstraints.end()) {
       // change the constraint to the lengths equality to avoid conflicts
       Slvs_Entity aLine = getEntity(aConstraint.entityA);
-      Slvs_Entity aNewLine1 = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, myGroupID,
+      Slvs_Entity aNewLine1 = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, (Slvs_hGroup)myGroupID,
           myWorkplaneID, aLine.point[0], aConstraint.ptA);
       aNewLine1.h = addEntity(aNewLine1);
-      Slvs_Entity aNewLine2 = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, myGroupID,
+      Slvs_Entity aNewLine2 = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, (Slvs_hGroup)myGroupID,
           myWorkplaneID, aLine.point[1], aConstraint.ptA);
       aNewLine2.h = addEntity(aNewLine2);
-      aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, myGroupID, SLVS_C_EQUAL_LENGTH_LINES,
+      aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, (Slvs_hGroup)myGroupID, SLVS_C_EQUAL_LENGTH_LINES,
           myWorkplaneID, 0.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aNewLine1.h, aNewLine2.h);
     }
   }
@@ -1240,7 +1240,7 @@ template<typename T>
 int Search(const uint32_t& theEntityID, const std::vector<T>& theEntities)
 {
   int aResIndex = theEntityID <= theEntities.size() ? theEntityID - 1 : 0;
-  int aVecSize = theEntities.size();
+  int aVecSize = (int)theEntities.size();
   if (theEntities.empty())
     return 1;
   while (aResIndex >= 0 && theEntities[aResIndex].h > theEntityID)

@@ -14,6 +14,7 @@
 
 #include <SketchSolver_Manager.h>
 
+#include <GeomAPI_Angle2d.h>
 #include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
@@ -28,6 +29,7 @@
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_IntersectionPoint.h>
+#include <SketchPlugin_ConstraintAngle.h>
 
 #include <math.h>
 
@@ -687,13 +689,31 @@ void adjustAngle(ConstraintWrapperPtr theConstraint)
     std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aPoints[0][0], aPoints[0][1])),
     std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aPoints[1][0], aPoints[1][1]))
   };
-  std::shared_ptr<GeomAPI_Pnt2d> anIntersection = aLine[0]->intersect(aLine[1]);
-  if (!anIntersection)
-    return;
+  bool isReversed[2] = {
+    aConstraint->baseConstraint()->boolean(
+        SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID())->value(),
+    aConstraint->baseConstraint()->boolean(
+        SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID())->value()
+  };
+  std::shared_ptr<GeomAPI_Angle2d> anAngle(new GeomAPI_Angle2d(aLine[0], isReversed[0], aLine[1], isReversed[1]));
+  std::shared_ptr<GeomAPI_Pnt2d> aCenter = anAngle->center();
+
+  std::shared_ptr<GeomAPI_Dir2d> aDir[2];
+
+  Slvs_Constraint& aSlvsConstraint = aConstraint->changeConstraint();
+  aSlvsConstraint.other = false;
+  for (int i = 0; i < 2; i++) {
+    aDir[i] = aLine[i]->direction();
+    if (isReversed[i]) {
+      aSlvsConstraint.other = !aSlvsConstraint.other;
+      aDir[i]->reverse();
+    }
+  }
+
   double aDist[2][2];
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 2; j++) {
-      aDist[i][j] = anIntersection->distance(aPoints[i][j]);
+      aDist[i][j] = aCenter->distance(aPoints[i][j]);
       if (fabs(aDist[i][j]) <= tolerance)
         aDist[i][j] = 0.0;
     }
@@ -705,27 +725,6 @@ void adjustAngle(ConstraintWrapperPtr theConstraint)
       aDist[i][0] *= -1.0;
     }
   }
-  std::shared_ptr<GeomAPI_Dir2d> aDir[2];
-  for (int i = 0; i < 2; i++) {
-    if (aDist[i][1] > fabs(aDist[i][0]))
-      aDir[i] = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(
-          aPoints[i][1]->xy()->decreased(anIntersection->xy())));
-    else {
-      aDir[i] = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(
-          aPoints[i][0]->xy()->decreased(anIntersection->xy())));
-      // main direction is opposite => change signs
-      if (aDist[i][0] < 0.0) {
-        aDist[i][0] *= -1.0;
-        aDist[i][1] *= -1.0;
-      }
-    }
-  }
-
-  Slvs_Constraint& aSlvsConstraint = aConstraint->changeConstraint();
-  aSlvsConstraint.other = false;
-  for (int i = 0; i < 2; i++)
-    if (aLine[i]->direction()->dot(aDir[i]) < 0.0)
-      aSlvsConstraint.other = !aSlvsConstraint.other;
 
   // Recalculate positions of lines to avoid conflicting constraints
   // while changing angle value several times
@@ -744,8 +743,8 @@ void adjustAngle(ConstraintWrapperPtr theConstraint)
   std::shared_ptr<GeomAPI_Pnt2d> aNewPoints[2];
   for (int i = 0; i < 2; i++) {
     aNewPoints[i] = std::shared_ptr<GeomAPI_Pnt2d>(
-        new GeomAPI_Pnt2d(anIntersection->x() + x * aDist[aLineToUpd][i],
-                          anIntersection->y() + y * aDist[aLineToUpd][i]));
+        new GeomAPI_Pnt2d(aCenter->x() + x * aDist[aLineToUpd][i],
+                          aCenter->y() + y * aDist[aLineToUpd][i]));
   }
 
   std::shared_ptr<GeomAPI_XY> aDelta;

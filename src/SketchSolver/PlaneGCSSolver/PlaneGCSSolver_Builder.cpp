@@ -1135,59 +1135,14 @@ void adjustAngle(ConstraintWrapperPtr theConstraint)
   std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aConstraint =
     std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(theConstraint);
 
-  std::shared_ptr<GeomAPI_Pnt2d> aPoints[2][2]; // start and end points of lines
-  const std::list<EntityWrapperPtr>& aConstrLines = aConstraint->entities();
-  std::list<EntityWrapperPtr>::const_iterator aCLIt = aConstrLines.begin();
-  for (int i = 0; aCLIt != aConstrLines.end(); ++i, ++aCLIt) {
-    const std::list<EntityWrapperPtr>& aLinePoints = (*aCLIt)->subEntities();
-    std::list<EntityWrapperPtr>::const_iterator aLPIt = aLinePoints.begin();
-    for (int j = 0; aLPIt != aLinePoints.end(); ++j, ++aLPIt)
-      aPoints[i][j] = aBuilder->point(*aLPIt);
-  }
-
-  std::shared_ptr<GeomAPI_Lin2d> aLine[2] = {
-    std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aPoints[0][0], aPoints[0][1])),
-    std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aPoints[1][0], aPoints[1][1]))
+  bool isReversed[2] = {
+    aConstraint->baseConstraint()->boolean(
+        SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID())->value(),
+    aConstraint->baseConstraint()->boolean(
+        SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID())->value()
   };
-  std::shared_ptr<GeomAPI_Pnt2d> anIntersection = aLine[0]->intersect(aLine[1]);
-  if (!anIntersection)
-    return;
-  double aDist[2][2];
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 2; j++) {
-      aDist[i][j] = anIntersection->distance(aPoints[i][j]);
-      if (fabs(aDist[i][j]) <= tolerance)
-        aDist[i][j] = 0.0;
-    }
-    if (aDist[i][0] > tolerance && aDist[i][1] > tolerance &&
-        aDist[i][0] + aDist[i][1] < aPoints[i][0]->distance(aPoints[i][1]) + 2.0 * tolerance) {
-      // the intersection point is an inner point of the line,
-      // we change the sign of distance till start point to calculate correct coordinates
-      // after rotation
-      aDist[i][0] *= -1.0;
-    }
-  }
-  std::shared_ptr<GeomAPI_Dir2d> aDir[2];
-  for (int i = 0; i < 2; i++) {
-    if (aDist[i][1] > fabs(aDist[i][0]))
-      aDir[i] = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(
-          aPoints[i][1]->xy()->decreased(anIntersection->xy())));
-    else {
-      aDir[i] = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(
-          aPoints[i][0]->xy()->decreased(anIntersection->xy())));
-      // main direction is opposite => change signs
-      if (aDist[i][0] < 0.0) {
-        aDist[i][0] *= -1.0;
-        aDist[i][1] *= -1.0;
-      }
-    }
-  }
 
-  bool isReversed = false;
-  for (int i = 0; i < 2; i++)
-    if (aLine[i]->direction()->dot(aDir[i]) < 0.0)
-      isReversed = !isReversed;
-  if (isReversed)
+  if (isReversed[0] != isReversed[1])
     aConstraint->setValue(aConstraint->value() - 180.0);
 }
 

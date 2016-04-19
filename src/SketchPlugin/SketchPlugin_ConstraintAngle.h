@@ -48,6 +48,19 @@ class SketchPlugin_ConstraintAngle : public SketchPlugin_ConstraintBase
     return MY_ANGLE_VALUE_ID;
   }
 
+  /// attribute name indicating the first line is reversed
+  inline static const std::string& ANGLE_REVERSED_FIRST_LINE_ID()
+  {
+    static const std::string MY_ANGLE_REVERSED_ID("AngleReversedLine1");
+    return MY_ANGLE_REVERSED_ID;
+  }
+  /// attribute name indicating the second line is reversed
+  inline static const std::string& ANGLE_REVERSED_SECOND_LINE_ID()
+  {
+    static const std::string MY_ANGLE_REVERSED_ID("AngleReversedLine2");
+    return MY_ANGLE_REVERSED_ID;
+  }
+
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
