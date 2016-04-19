@@ -202,11 +202,6 @@ void SketchPlugin_Arc::execute()
 
     // update radius and angle
     updateDependentAttributes();
-
-    AttributeRefAttrPtr aTangentPoint = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-        attribute(TANGENT_POINT_ID()));
-    if (!hasResult && aTangentPoint->attr())
-      tangencyArcConstraints();
   }
 }
 
