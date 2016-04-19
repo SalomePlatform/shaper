@@ -139,17 +139,15 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
         setError("Error: Selected shapes has unsupported type.");
         return;
       }
-      if(aST == GeomAPI_Shape::WIRE) {
-        ResultConstructionPtr aConstruction =
-          std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseObjectSelection->context());
-        if(aConstruction.get() && !aBaseShape->isEqual(aConstruction->shape())) {
-          // It is a wire on the sketch, store it to make face later.
-          aSketchWiresMap[aConstruction].push_back(aBaseShape);
-          continue;
-        }
+      ResultConstructionPtr aConstruction =
+        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseObjectSelection->context());
+      if(aConstruction.get() && !aBaseShape->isEqual(aConstruction->shape()) && aST == GeomAPI_Shape::WIRE) {
+        // It is a wire on the sketch, store it to make face later.
+        aSketchWiresMap[aConstruction].push_back(aBaseShape);
+        continue;
       } else {
-        aST == GeomAPI_Shape::FACE ? aBaseFacesList.push_back(aBaseShape) :
-                                     theBaseShapesList.push_back(aBaseShape);
+      aST == GeomAPI_Shape::FACE ? aBaseFacesList.push_back(aBaseShape) :
+                                   theBaseShapesList.push_back(aBaseShape);
       }
     } else {
       // This may be the whole sketch result selected, check and get faces.

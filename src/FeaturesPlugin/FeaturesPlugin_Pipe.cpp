@@ -15,9 +15,11 @@
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_Pipe.h>
-#include <GeomAPI_ShapeExplorer.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAPI_PlanarEdges.h>
+#include <GeomAPI_ShapeExplorer.h>
 
+#include <map>
 #include <sstream>
 
 //=================================================================================================
@@ -47,6 +49,7 @@ void FeaturesPlugin_Pipe::execute()
 
   // Getting base objects.
   ListOfShape aBaseShapesList, aBaseFacesList;
+  std::map<ResultConstructionPtr, ListOfShape> aSketchWiresMap;
   AttributeSelectionListPtr aBaseObjectsSelectionList = selectionList(BASE_OBJECTS_ID());
   if(!aBaseObjectsSelectionList.get()) {
     setError("Error: Could not get base objects selection list.");
@@ -64,8 +67,17 @@ void FeaturesPlugin_Pipe::execute()
     }
     std::shared_ptr<GeomAPI_Shape> aBaseShape = aBaseObjectSelection->value();
     if(aBaseShape.get() && !aBaseShape->isNull()) {
-      aBaseShape->shapeType() == GeomAPI_Shape::FACE ? aBaseFacesList.push_back(aBaseShape) :
-                                                       aBaseShapesList.push_back(aBaseShape);
+      GeomAPI_Shape::ShapeType aST = aBaseShape->shapeType();
+      ResultConstructionPtr aConstruction =
+        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseObjectSelection->context());
+      if(aConstruction.get() && !aBaseShape->isEqual(aConstruction->shape()) && aST == GeomAPI_Shape::WIRE) {
+        // It is a wire on the sketch, store it to make face later.
+        aSketchWiresMap[aConstruction].push_back(aBaseShape);
+        continue;
+      } else {
+      aST == GeomAPI_Shape::FACE ? aBaseFacesList.push_back(aBaseShape) :
+                                   aBaseShapesList.push_back(aBaseShape);
+      }
     } else {
       // This may be the whole sketch result selected, check and get faces.
       ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseObjectSelection->context());
@@ -92,6 +104,20 @@ void FeaturesPlugin_Pipe::execute()
         }
       }
     }
+  }
+
+  // Make faces from sketch wires.
+  for(std::map<ResultConstructionPtr, ListOfShape>::const_iterator anIt = aSketchWiresMap.cbegin();
+      anIt != aSketchWiresMap.cend(); ++anIt) {
+    const std::shared_ptr<GeomAPI_PlanarEdges> aSketchPlanarEdges =
+      std::dynamic_pointer_cast<GeomAPI_PlanarEdges>((*anIt).first->shape());
+    const ListOfShape& aWiresList = (*anIt).second;
+    ListOfShape aFaces;
+    GeomAlgoAPI_ShapeTools::makeFacesWithHoles(aSketchPlanarEdges->origin(),
+                                               aSketchPlanarEdges->norm(),
+                                               aWiresList,
+                                               aFaces);
+    aBaseFacesList.insert(aBaseFacesList.end(), aFaces.begin(), aFaces.end());
   }
 
   // Searching faces with common edges.
