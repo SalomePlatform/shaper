@@ -21,6 +21,8 @@
 
 #ifndef HAVE_SALOME
 #include "AppElements_Command.h"
+#else
+#include "XGUI_SalomeConnector.h"
 #endif
 
 XGUI_ModuleConnector::XGUI_ModuleConnector(XGUI_Workshop* theWorkshop)
