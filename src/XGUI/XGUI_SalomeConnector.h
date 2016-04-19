@@ -36,34 +36,25 @@ class XGUI_EXPORT XGUI_SalomeConnector
   //! \param isCheckable - is checkable or not
   //! \param theKeys - hot keys
   //! \param isAddSeparator boolean flag about adding separator after the action
-  //! \param isMenuAction boolean flag about adding the action to application menu bar
-  //! \param isToolAction boolean flag about adding the action to application tool bar
   //! returns created action
   virtual QAction* addFeature(const QString& theWBName, const QString& theId,
                               const QString& theTitle, const QString& theTip, const QIcon& theIcon,
-                              const QKeySequence& theKeys, bool isCheckable, const bool isAddSeparator,
-                              bool isMenuAction = true, bool isToolAction = true) = 0;
+                              const QKeySequence& theKeys, bool isCheckable, const bool isAddSeparator) = 0;
 
   //! Creates a feature (command) in SALOME desktop
   //! \param theWBName - name of toolbar (workbench)
   //! \param theInfo - information about action (icon, text, etc)
   //! \param isAddSeparator boolean flag about adding separator after the action
-  //! \param isMenuAction boolean flag about adding the action to application menu bar
-  //! \param isToolAction boolean flag about adding the action to application tool bar
   virtual QAction* addFeature(const QString& theWBName,
-                              const ActionInfo& theInfo, const bool isAddSeparator,
-                              bool isMenuAction = true, bool isToolAction = true) = 0;
+                              const ActionInfo& theInfo, const bool isAddSeparator) = 0;
 
   //! Creates a feature (command) in SALOME desktop
   //! \param theWBName - name of toolbar (workbench)
   //! \param theInfo - information about action (icon, text, etc)
   //! \param theNestedActions a list of nested actions
-  //! \param isMenuAction boolean flag about adding the action to application menu bar
-  //! \param isToolAction boolean flag about adding the action to application tool bar
   virtual QAction* addFeatureOfNested(const QString& theWBName,
                                       const ActionInfo& theInfo,
-                                      const QList<QAction*>& theNestedActions,
-                                      bool isMenuAction = true, bool isToolAction = true) = 0;
+                                      const QList<QAction*>& theNestedActions) = 0;
 
   //! Returns true if the feature action is a nested action, in other words,
   //! it is created by addFeatureOfNested().
@@ -102,17 +93,8 @@ class XGUI_EXPORT XGUI_SalomeConnector
   //! Returns desktop window of SALOME
   virtual QMainWindow* desktop() const = 0;
 
-  //! Returns command string Id by QAction instance
-  virtual QString commandId(const QAction* theCmd) const = 0;
-
-  //! Returns QAction instance by command string Id
-  virtual QAction* command(const QString& theId) const = 0;
-
   //! Returns list of defined actions (just by SHAPER module)
   virtual QList<QAction*> commandList() const = 0;
-
-  //! Returns list of Ids of defined actions (just by NewGeom module)
-  virtual QStringList commandIdList() const = 0;
 
   //! Stores XML information for the feature kind
   //! \param theFeatureId a feature kind

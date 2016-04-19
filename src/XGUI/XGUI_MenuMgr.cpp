@@ -196,10 +196,7 @@ QAction* XGUI_MenuMgr::buildAction(const std::shared_ptr<Config_FeatureMessage>&
       aNestedActList << anAction;
     }
     anAction = aSalomeConnector->addFeatureOfNested(theWchName.c_str(), aFeatureInfo,
-                                                    aNestedActList, false, true);
-    QAction* aMenuAction = aSalomeConnector->addFeature(theWchName.c_str(), aFeatureInfo,
-                                                    aUseSeparator, true, false);
-    myWorkshop->module()->actionCreated(aMenuAction);
+                                                    aNestedActList);
   }
   else {
     //Issue #650: in the SALOME mode the tooltip should be same as text

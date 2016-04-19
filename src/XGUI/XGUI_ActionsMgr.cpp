@@ -97,7 +97,7 @@ bool XGUI_ActionsMgr::isNested(const QString& theId) const
 
 void XGUI_ActionsMgr::updateCommandsStatus()
 {
-  setAllEnabled(true);
+  setAllEnabled();
   XGUI_Selection* aSelection = myWorkshop->selector()->selection();
   if (aSelection->getSelected(ModuleBase_ISelection::Viewer).size() > 0)
     updateOnViewSelection();
@@ -281,10 +281,13 @@ ActionInfo XGUI_ActionsMgr::actionInfoById(const QString& theId)
   return aResult;
 }
 
-void XGUI_ActionsMgr::setAllEnabled(bool isEnabled)
+void XGUI_ActionsMgr::setAllEnabled()
 {
   foreach(QString eachAction, myActions.keys()) {
-    setActionEnabled(eachAction, isEnabled);
+    if (myActions.contains(eachAction)) {
+      QAction* aAction = myActions[eachAction];
+      aAction->setEnabled(true);
+    }
   }
 }
 

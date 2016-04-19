@@ -100,8 +100,8 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
   //! Updates actions according to current selection in the viewer
   void updateOnViewSelection();
   
-  //! Sets all actions to isEnabled state.
-  void setAllEnabled(bool isEnabled);
+  //! Sets all actions to enabled state.
+  void setAllEnabled();
   
   //! Sets all nested actions to isEnabled state for the command with given ID.
   //! If ID is empty - all nested actions will be affected.

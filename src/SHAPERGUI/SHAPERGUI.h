@@ -52,13 +52,11 @@ Q_OBJECT
   virtual QAction* addFeature(const QString& theWBName, const QString& theId,
                               const QString& theTitle, const QString& theTip, const QIcon& theIcon,
                               const QKeySequence& theKeys = QKeySequence(),
-                              bool isCheckable = false, const bool isAddSeparator = false,
-                              bool isMenuAction = true, bool isToolAction = true);
+                              bool isCheckable = false, const bool isAddSeparator = false);
 
   //! Add feature (QAction) in the \a theWBName toolbar with given \a theInfo about action
   virtual QAction* addFeature(const QString& theWBName,
-                              const ActionInfo& theInfo, const bool isAddSeparator,
-                              bool isMenuAction = true, bool isToolAction = true);
+                              const ActionInfo& theInfo, const bool isAddSeparator);
 
   /// Add a nested feature
   /// \param theWBName a workbench name
@@ -66,8 +64,7 @@ Q_OBJECT
   /// \param theNestedActions a list of nested actions
   virtual QAction* addFeatureOfNested(const QString& theWBName,
                                     const ActionInfo& theInfo,
-                                    const QList<QAction*>& theNestedActions,
-                                    bool isMenuAction = true, bool isToolAction = true);
+                                    const QList<QAction*>& theNestedActions);
 
   //! Returns true if the feature action is a nested action, in other words,
   //! it is created by addNestedFeature().
@@ -94,11 +91,7 @@ Q_OBJECT
 
   virtual QMainWindow* desktop() const;
 
-  virtual QString commandId(const QAction* theCmd) const;
-
-  virtual QAction* command(const QString& theId) const;
-
-    //! Stores XML information for the feature kind
+  //! Stores XML information for the feature kind
   //! \param theFeatureId a feature kind
   //! \param theMessage a container of the feature XML properties
   virtual void setFeatureInfo(const QString& theFeatureId,
@@ -117,9 +110,6 @@ Q_OBJECT
 
   //! Returns list of defined actions (just by SHAPER module)
   virtual QList<QAction*> commandList() const;
-
-  //! Returns list of Ids of defined actions (just by SHAPER module)
-  virtual QStringList commandIdList() const;
 
   /// Redefinition of virtual function. 
   /// \param theClient name of pop-up client
@@ -188,6 +178,9 @@ Q_OBJECT
 
   /// List of registered actions
   QStringList myActionsList;
+
+  /// List of registered nested actions
+  QStringList myNestedActionsList;
 
   /// Reference to workshop
   XGUI_Workshop* myWorkshop;

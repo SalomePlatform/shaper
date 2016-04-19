@@ -375,8 +375,7 @@ CAM_DataModel* SHAPERGUI::createDataModel()
 }
 
 QAction* SHAPERGUI::addFeature(const QString& theWBName, const ActionInfo& theInfo,
-                               const bool isAddSeparator,
-                               bool isMenuAction, bool isToolAction)
+                               const bool isAddSeparator)
 {
   return addFeature(theWBName,
                     theInfo.id,
@@ -385,15 +384,14 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const ActionInfo& theIn
                     theInfo.icon,
                     theInfo.shortcut,
                     theInfo.checkable,
-                    isAddSeparator, isMenuAction, isToolAction);
+                    isAddSeparator);
 }
 
 //******************************************************
 QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theId,
                                const QString& theTitle, const QString& theTip,
                                const QIcon& theIcon, const QKeySequence& theKeys,
-                               bool isCheckable, const bool isAddSeparator,
-                               bool isMenuAction, bool isToolAction)
+                               bool isCheckable, const bool isAddSeparator)
 {
   static QString aLastTool = "";
   static int aNb = 0;
@@ -418,18 +416,16 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theId,
                                   isCheckable);
   aAction->setData(theId);
 
-  if (isMenuAction) {
-    int aWBMenu = createMenu(theWBName, -1, -1, 50/*10-Window, 1000 - Help*/);
-    int aItemId = createMenu(aId, aWBMenu);
-    if (isAddSeparator)
-      createMenu(separator(), aWBMenu);
-  }
-  if (isToolAction) {
-    int aWBTool = createTool(theWBName, theWBName);
-    int aToolId = createTool(aId, aWBTool);
-    if (isAddSeparator)
-      createTool(separator(), aWBTool);
-  }
+  int aWBMenu = createMenu(theWBName, -1, -1, 50/*10-Window, 1000 - Help*/);
+  int aItemId = createMenu(aId, aWBMenu);
+  if (isAddSeparator)
+    createMenu(separator(), aWBMenu);
+
+  int aWBTool = createTool(theWBName, theWBName);
+  int aToolId = createTool(aId, aWBTool);
+  if (isAddSeparator)
+    createTool(separator(), aWBTool);
+
   return aAction;
 }
 
@@ -440,10 +436,8 @@ bool SHAPERGUI::isFeatureOfNested(const QAction* theAction)
 
 QAction* SHAPERGUI::addFeatureOfNested(const QString& theWBName,
                                        const ActionInfo& theInfo,
-                                       const QList<QAction*>& theNestedActions,
-                                       bool isMenuAction, bool isToolAction)
+                                       const QList<QAction*>& theNestedActions)
 {
-  int aId = myActionsList.size();
   myActionsList.append(theInfo.id);
   SUIT_Desktop* aDesk = application()->desktop();
   SHAPERGUI_NestedButton* anAction = new SHAPERGUI_NestedButton(aDesk, theNestedActions);
@@ -458,14 +452,12 @@ QAction* SHAPERGUI::addFeatureOfNested(const QString& theWBName,
   anAction->setShortcut(theInfo.shortcut);
   anAction->setFont(theInfo.font);
 
-  if (isMenuAction) {
-    int aWBMenu = createMenu(theWBName, -1, -1, 50);
-    int aItemId = createMenu(anAction, aWBMenu);
-  }
-  if (isToolAction) {
-    int aWBTool = createTool(theWBName, theWBName);
-    int aToolId = createTool(anAction, aWBTool);
-  }
+  int aWBMenu = createMenu(theWBName, -1, -1, 50);
+  int aItemId = createMenu(anAction, aWBMenu);
+
+  int aWBTool = createTool(theWBName, theWBName);
+  int aToolId = createTool(anAction, aWBTool);
+
   return anAction;
 }
 
@@ -524,38 +516,14 @@ QList<QAction*> SHAPERGUI::commandList() const
     if (aCmd && myActionsList.contains(aCmd->data().toString()))
       aActions.append(aCmd);
   }
-  return aActions;
-}
 
-//******************************************************
-QStringList SHAPERGUI::commandIdList() const
-{
-  return myActionsList;
+  return aActions;
 }
 
 //******************************************************
 QMainWindow* SHAPERGUI::desktop() const
 {
   return application()->desktop();
-}
-
-//******************************************************
-QString SHAPERGUI::commandId(const QAction* theCmd) const
-{
-  int aId = actionId(theCmd);
-  if (aId < myActionsList.size())
-    return myActionsList[aId];
-  return QString();
-}
-
-//******************************************************
-QAction* SHAPERGUI::command(const QString& theId) const
-{
-  int aId = myActionsList.indexOf(theId);
-  if ((aId != -1) && (aId < myActionsList.size())) {
-    return action(aId);
-  }
-  return 0;
 }
 
 void SHAPERGUI::setFeatureInfo(const QString& theFeatureId,

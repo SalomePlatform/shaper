@@ -11,6 +11,7 @@
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QToolButton>
+#include <QToolBar>
 #include <QEvent>
 
 SHAPERGUI_NestedButton::SHAPERGUI_NestedButton(QObject* theParent,
@@ -43,6 +44,12 @@ void SHAPERGUI_NestedButton::showAdditionalButtons(bool isShow)
 
 QWidget * SHAPERGUI_NestedButton::createWidget(QWidget * theParent)
 {
+  // the action has widget only in tool bar, in menu bar, the default
+  // action presentation is shown
+  QToolBar* aToolBar = dynamic_cast<QToolBar*>(theParent);
+  if (!aToolBar)
+    return 0;
+
   myButtonFrame = new QFrame(theParent);
   QHBoxLayout* aBoxLay = new QHBoxLayout(myButtonFrame);
   aBoxLay->setContentsMargins(2, 0, 0, 0);
