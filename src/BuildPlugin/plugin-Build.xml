@@ -6,6 +6,9 @@
       <feature id="Vertex" title="Vertex" tooltip ="Create a vertex from sketch vertex and vertex objects" icon="icons/Build/feature_vertex.png">
         <source path="vertex_widget.xml"/>
       </feature>
+      <feature id="Edge" title="Edge" tooltip ="Create an edge from sketch edges and edge objects" icon="icons/Build/feature_edge.png">
+        <source path="edge_widget.xml"/>
+      </feature>
       <feature id="Wire" title="Wire" tooltip ="Create a wire from sketch edges and wires objects" icon="icons/Build/feature_wire.png">
         <source path="wire_widget.xml"/>
       </feature>

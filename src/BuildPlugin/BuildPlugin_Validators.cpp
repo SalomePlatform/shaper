@@ -76,16 +76,16 @@ bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute
       }
 
       std::shared_ptr<GeomAPI_PlanarEdges> anEdges = std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aContextShape);
-      if(anEdges.get() && !aShape->isEqual(aContextShape)) {
-        // It is local selection on sketch. Ok.
-        return true;
+      if(anEdges.get()) {
+        if(aShape->isEqual(aContextShape)) {
+          // It is whole sketch.
+          return false;
+        }
+      } else if(!aShape->isEqual(aContextShape)) {
+        // Local selection on body does not allowed.
+        theError = "Selected shape is in the local selection. Only global selection is allowed.";
+        return false;
       }
-    }
-
-    if(!aShape->isEqual(aContextShape)) {
-      // Local selection on body does not allowed.
-      theError = "Selected shape is in the local selection. Only global selection is allowed.";
-      return false;
     }
   }
 

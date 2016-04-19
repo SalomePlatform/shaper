@@ -10,6 +10,7 @@
 #include <ModelAPI_Validator.h>
 
 #include <BuildPlugin_Vertex.h>
+#include <BuildPlugin_Edge.h>
 #include <BuildPlugin_Wire.h>
 #include <BuildPlugin_Validators.h>
 
@@ -36,6 +37,8 @@ FeaturePtr BuildPlugin_Plugin::createFeature(std::string theFeatureID)
 {
   if(theFeatureID == BuildPlugin_Vertex::ID()) {
     return FeaturePtr(new BuildPlugin_Vertex());
+  } else if(theFeatureID == BuildPlugin_Edge::ID()) {
+    return FeaturePtr(new BuildPlugin_Edge());
   } else if(theFeatureID == BuildPlugin_Wire::ID()) {
     return FeaturePtr(new BuildPlugin_Wire());
   }
