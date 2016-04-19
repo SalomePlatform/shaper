@@ -22,8 +22,8 @@ BuildPlugin_Plugin::BuildPlugin_Plugin()
   // Register validators.
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  aFactory->registerValidator("BuildPlugin_ValidatorBaseForVertex",
-                              new BuildPlugin_ValidatorBaseForVertex());
+  aFactory->registerValidator("BuildPlugin_ValidatorBaseForBuild",
+                              new BuildPlugin_ValidatorBaseForBuild());
   aFactory->registerValidator("BuildPlugin_ValidatorBaseForWire",
                               new BuildPlugin_ValidatorBaseForWire());
 

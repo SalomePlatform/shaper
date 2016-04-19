@@ -10,11 +10,11 @@
 #include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_FeatureValidator.h>
 
-/// \class BuildPlugin_ValidatorBaseForVertex
+/// \class BuildPlugin_ValidatorBaseForBuild
 /// \ingroup Validators
-/// \brief A validator for selection base shapes for vertex. Allows to select vertices on sketch and
-/// vertex objects.
-class BuildPlugin_ValidatorBaseForVertex: public ModelAPI_AttributeValidator
+/// \brief A validator for selection base shapes for build features. Allows to select shapes on sketch and
+/// whole objects with allowed type.
+class BuildPlugin_ValidatorBaseForBuild: public ModelAPI_AttributeValidator
 {
 public:
   //! Returns true if attribute is ok.
