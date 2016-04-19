@@ -633,9 +633,7 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
       }
 
       data()->blockSendAttributeUpdated(false);
-
-      if (theID == TANGENT_POINT_ID())
-        tangencyArcConstraints();
+      tangencyArcConstraints();
     }
   }
 }
