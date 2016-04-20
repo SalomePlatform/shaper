@@ -5,10 +5,11 @@
                   label="Segments and wires:"
                   tooltip="Select an edges on sketch or wires objects."
                   type_choice="edges objects">
-    <validator id="BuildPlugin_ValidatorBaseForWire" parameters="edge,wire"/>
+    <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="edge,wire"/>
   </multi_selector>
   <action id="add_contour"
           label="Add contour"
           tooltip="Adds to the list of segments other segments of the sketcher
                    connected to the already selected ones to create a closed contour."/>
+  <validator id="BuildPlugin_ValidatorBaseForWire" parameters="base_objects"/>
 </source>

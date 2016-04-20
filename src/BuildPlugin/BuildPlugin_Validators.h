@@ -30,7 +30,26 @@ public:
 /// \ingroup Validators
 /// \brief A validator for selection base shapes for wire. Allows to select edges on sketch and
 /// wires objects that are connected to already selected shapes.
-class BuildPlugin_ValidatorBaseForWire: public ModelAPI_AttributeValidator
+class BuildPlugin_ValidatorBaseForWire: public ModelAPI_FeatureValidator
+{
+public:
+  //! Returns true if attributes is ok.
+  //! \param theFeature the checked feature.
+  //! \param theArguments arguments of the feature.
+  //! \param theError error message.
+  virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
+
+  /// \return true if the attribute in feature is not obligatory for the feature execution
+  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
+};
+
+/// \class BuildPlugin_ValidatorBaseForFace
+/// \ingroup Validators
+/// \brief A validator for selection base shapes for face. Allows to select sketch edges, edges and
+/// wires objects that lie in the same plane.
+class BuildPlugin_ValidatorBaseForFace: public ModelAPI_AttributeValidator
 {
 public:
   //! Returns true if attribute is ok.

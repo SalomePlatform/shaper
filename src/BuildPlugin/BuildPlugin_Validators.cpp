@@ -11,6 +11,7 @@
 
 #include <GeomAPI_PlanarEdges.h>
 
+#include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_WireBuilder.h>
 
 #include <GeomValidators_ShapeType.h>
@@ -24,7 +25,7 @@ bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute
 {
   // Get base objects list.
   if(theAttribute->attributeType() != ModelAPI_AttributeSelectionList::typeId()) {
-    Events_Error::send("Validator does not support attribute type \"" + theAttribute->attributeType()
+    Events_Error::send("Error: BuildPlugin_ValidatorBaseForBuild does not support attribute type \"" + theAttribute->attributeType()
       + "\"\n Only \"" + ModelAPI_AttributeSelectionList::typeId() + "\" supported.");
     return false;
   }
@@ -93,25 +94,33 @@ bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute
 }
 
 //=================================================================================================
-bool BuildPlugin_ValidatorBaseForWire::isValid(const AttributePtr& theAttribute,
+bool BuildPlugin_ValidatorBaseForWire::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                const std::list<std::string>& theArguments,
                                                std::string& theError) const
 {
-  // Get base objects list.
+  // Get attribute.
+  if(theArguments.size() != 1) {
+    Events_Error::send("Error: BuildPlugin_ValidatorBaseForWire should be used only with 1 parameter (ID of base objects list)");
+    return false;
+  }
+  AttributePtr anAttribute = theFeature->attribute(theArguments.front());
+
+  // Check base objects list.
   BuildPlugin_ValidatorBaseForBuild aValidatorBaseForBuild;
-  if(!aValidatorBaseForBuild.isValid(theAttribute, theArguments, theError)) {
+  std::list<std::string> anArguments;
+  anArguments.push_back("edge");
+  anArguments.push_back("wire");
+  if(!aValidatorBaseForBuild.isValid(anAttribute, anArguments, theError)) {
     return false;
   }
 
   // Collect base shapes.
   AttributeSelectionListPtr aSelectionList =
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
   ListOfShape aListOfShapes;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
-    ResultPtr aContext = aSelection->context();
     GeomShapePtr aShape = aSelection->value();
-    GeomShapePtr aContextShape = aContext->shape();
     if(!aShape.get()) {
       aShape = aSelection->context()->shape();
     }
@@ -126,4 +135,43 @@ bool BuildPlugin_ValidatorBaseForWire::isValid(const AttributePtr& theAttribute,
   }
 
   return true;
+}
+
+//=================================================================================================
+bool BuildPlugin_ValidatorBaseForWireisNotObligatory(std::string theFeature, std::string theAttribute)
+{
+  return false;
+}
+
+//=================================================================================================
+bool BuildPlugin_ValidatorBaseForFace::isValid(const AttributePtr& theAttribute,
+                                               const std::list<std::string>& theArguments,
+                                               std::string& theError) const
+{
+  // Get base objects list.
+  BuildPlugin_ValidatorBaseForBuild aValidatorBaseForBuild;
+  std::list<std::string> anArguments;
+  anArguments.push_back("edge");
+  anArguments.push_back("wire");
+  if(!aValidatorBaseForBuild.isValid(theAttribute, anArguments, theError)) {
+    return false;
+  }
+
+  // Collect base shapes.
+  AttributeSelectionListPtr aSelectionList =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  ListOfShape aListOfShapes;
+  for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
+    GeomShapePtr aShape = aSelection->value();
+    if(!aShape.get()) {
+      aShape = aSelection->context()->shape();
+    }
+    aListOfShapes.push_back(aShape);
+  }
+
+  // Check that they are planar.
+  GeomShapePtr aCompound = GeomAlgoAPI_CompoundBuilder::compound(aListOfShapes);
+
+  return aCompound->isPlanar();
 }
