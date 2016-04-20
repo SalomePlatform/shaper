@@ -181,11 +181,16 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
 
 std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
 {
+  GeomShapePtr aResult;
   if (myTmpContext.get() || myTmpSubShape.get()) {
+    ResultConstructionPtr aResulConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myTmpContext);
+    if(aResulConstruction.get()) {
+      // it is just reference to construction, nothing is in value
+      return aResult;
+    }
     return myTmpSubShape.get() ? myTmpSubShape : myTmpContext->shape();
   }
 
-  std::shared_ptr<GeomAPI_Shape> aResult;
   TDF_Label aSelLab = selectionLabel();
   if (aSelLab.IsAttribute(kINVALID_SELECTION))
     return aResult;
