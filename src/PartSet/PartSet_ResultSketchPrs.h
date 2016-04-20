@@ -61,9 +61,9 @@ private:
   /// \param theResultShape contains a shape of the result, it will be set as a Shape of AIS_Shape
   /// \param theAuxiliaryCompound a compound of auxiliary shapes
   /// \param theFaceList a list of face shapes
-  void PartSet_ResultSketchPrs::fillShapes(TopoDS_Shape& aResultShape,
-                                         TopoDS_Compound& theAuxiliaryCompound,
-                                         NCollection_List<TopoDS_Shape>& theFaceList);
+  void fillShapes(TopoDS_Shape& aResultShape,
+                  TopoDS_Compound& theAuxiliaryCompound,
+                  NCollection_List<TopoDS_Shape>& theFaceList);
 
   /// Reference to result object
   ResultPtr myResult;
