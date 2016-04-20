@@ -8,7 +8,7 @@
     tooltip="Type of boolean operation"
     string_list="Cut Fuse Common Smash"
     use_in_title="true"
-    icons_list="icons/Features/bool_cut.png :icons/bool_fuse.png :icons/bool_common.png :icons/bool_smash.png"
+    icons_list="icons/Features/bool_cut.png icons/Features/bool_fuse.png icons/Features/bool_common.png icons/Features/bool_smash.png"
     default="0"
   />
   <multi_selector id="main_objects"

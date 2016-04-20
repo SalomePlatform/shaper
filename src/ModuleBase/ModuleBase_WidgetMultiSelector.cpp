@@ -16,6 +16,7 @@
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_IconFactory.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
@@ -122,7 +123,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
     QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
     if (!aLabelIcon.isEmpty()) {
       QLabel* aSelectedLabel = new QLabel("", this);
-      aSelectedLabel->setPixmap(QPixmap(aLabelIcon));
+      aSelectedLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
       aMainLay->addWidget(aSelectedLabel, 1, 1);
     }
     aMainLay->setColumnStretch(2, 1);

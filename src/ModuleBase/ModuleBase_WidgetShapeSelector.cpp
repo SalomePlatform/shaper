@@ -14,6 +14,7 @@
 #include <ModuleBase_Filter.h>
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_IconFactory.h>
 
 #include <Config_WidgetAPI.h>
 #include <Events_Loop.h>
@@ -77,7 +78,7 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   myLabel = new QLabel(aLabelText, this);
   if (!aLabelIcon.isEmpty())
-    myLabel->setPixmap(QPixmap(aLabelIcon));
+    myLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
 
 
   QString aToolTip = QString::fromStdString(theData->widgetTooltip());

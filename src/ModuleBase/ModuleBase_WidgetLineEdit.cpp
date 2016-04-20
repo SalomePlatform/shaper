@@ -9,6 +9,7 @@
 
 #include <ModuleBase_WidgetLineEdit.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_IconFactory.h>
 
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Data.h>
@@ -84,7 +85,7 @@ ModuleBase_WidgetLineEdit::ModuleBase_WidgetLineEdit(QWidget* theParent,
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   QLabel* aLabel = new QLabel(aLabelText, this);
   if (!aLabelIcon.isEmpty())
-    aLabel->setPixmap(QPixmap(aLabelIcon));
+    aLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
 
   myLineEdit = new CustomLineEdit( this, QString::fromStdString( thePlaceHolder ) );
   // Here we do not use the Qt's standard method setPlaceHolderText() since it

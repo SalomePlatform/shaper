@@ -6,6 +6,7 @@
 
 #include <ModuleBase_WidgetAction.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_IconFactory.h>
 
 #include <Config_WidgetAPI.h>
 
@@ -35,7 +36,7 @@ ModuleBase_WidgetAction::ModuleBase_WidgetAction(QWidget* theParent,
 
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   if (!aLabelIcon.isEmpty())
-    myButton->setIcon(QPixmap(aLabelIcon));
+    myButton->setIcon(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
   else
     myButton->setText(aText);
   myButton->setToolTip(aToolTip);

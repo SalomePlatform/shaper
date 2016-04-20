@@ -14,6 +14,7 @@
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_WidgetDoubleValue.h>
+#include <ModuleBase_IconFactory.h>
 
 #include <QFormLayout>
 #include <QLabel>
@@ -44,7 +45,7 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   myLabel = new QLabel(aLabelText, this);
   if (!aLabelIcon.isEmpty())
-    myLabel->setPixmap(QPixmap(aLabelIcon));
+    myLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
 
   bool aAcceptVariables = theData->getBooleanAttribute(DOUBLE_WDG_ACCEPT_EXPRESSIONS, true);
 

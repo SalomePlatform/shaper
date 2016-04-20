@@ -84,7 +84,7 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
   } else {
     myLabel = new QLabel(aLabelText, this);
     if (!aLabelIcon.isEmpty())
-      myLabel->setPixmap(QPixmap(aLabelIcon));
+      myLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
     aLayout->addWidget(myLabel);
 
     std::string aToolstr = theData->widgetTooltip();

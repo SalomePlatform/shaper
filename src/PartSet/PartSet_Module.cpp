@@ -1305,7 +1305,8 @@ void PartSet_Module::onChoiceChanged(ModuleBase_ModelWidget* theWidget,
     if (!aOperation)
       return;
     ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-    aPanel->setWindowTitle(aChoiceTitle);
+    if (aPanel)
+      aPanel->setWindowTitle(aChoiceTitle);
   }
 }
 

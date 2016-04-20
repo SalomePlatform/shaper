@@ -8,6 +8,7 @@
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_ParamIntSpinBox.h>
+#include <ModuleBase_IconFactory.h>
 
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Data.h>
@@ -45,7 +46,7 @@ ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   myLabel = new QLabel(aLabelText, this);
   if (!aLabelIcon.isEmpty())
-    myLabel->setPixmap(QPixmap(aLabelIcon));
+    myLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
 
   mySpinBox = new ModuleBase_ParamIntSpinBox(this);
   QString anObjName = QString::fromStdString(attributeID());
