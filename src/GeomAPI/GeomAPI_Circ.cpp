@@ -92,3 +92,11 @@ const bool GeomAPI_Circ::parameter(const std::shared_ptr<GeomAPI_Pnt> thePoint,
   Handle(Geom_Circle) aCurve = new Geom_Circle(*MY_CIRC);
   return GeomLib_Tool::Parameter(aCurve, thePoint->impl<gp_Pnt>(), theTolerance, theParameter) == Standard_True;
 }
+
+//=================================================================================================
+std::shared_ptr<GeomAPI_Dir> GeomAPI_Circ::normal() const
+{
+  const gp_Ax1& anAxis = MY_CIRC->Axis();
+  const gp_Dir& aDir = anAxis.Direction();
+  return std::shared_ptr<GeomAPI_Dir>(new GeomAPI_Dir(aDir.X(), aDir.Y(), aDir.Z()));
+}

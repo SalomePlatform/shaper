@@ -5,7 +5,7 @@
     <group id="Geometry">
       <feature
         id="Sketch"
-        nested="SketchPoint SketchIntersectionPoint SketchLine SketchCircle SketchArc SketchRectangle SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror SketchConstraintAngle SketchMultiRotation SketchMultiTranslation SketchConstraintCollinear SketchConstraintMiddle"
+        nested="SketchPoint SketchIntersectionPoint SketchLine SketchCircle SketchArc SketchRectangle SketchProjection SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror SketchConstraintAngle SketchMultiRotation SketchMultiTranslation SketchConstraintCollinear SketchConstraintMiddle"
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create sketch"
@@ -107,7 +107,7 @@
       </feature>
     </group>
 
-    <!--<group id="Projection"> -->
+    <!--<group id="Projection">-->
       <!-- Intersection Point -->
       <!-- feature
         id="SketchIntersectionPoint"
@@ -126,6 +126,23 @@
         </sketch_shape_selector>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature -->
+
+      <!-- Projected feature -->
+      <!--<feature
+        id="SketchProjection"
+        title="Projection"
+        tooltip="Project feature onto sketch plane"
+        icon="icons/Sketch/projection.png">
+        <sketch_shape_selector
+              id="ExternalFeature"
+              label="Edge"
+              tooltip="Select external edge."
+              shape_types="edge"
+              use_sketch_plane="false">
+          <validator id="SketchPlugin_ProjectionValidator"/>
+        </sketch_shape_selector>
+        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+      </feature> -->
     <!--</group>-->
 
     <group id="Replication">

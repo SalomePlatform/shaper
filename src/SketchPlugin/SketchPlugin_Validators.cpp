@@ -32,6 +32,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultConstruction.h>
 
+#include <GeomAPI_Circ.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Vertex.h>
@@ -812,4 +813,62 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
   std::shared_ptr<GeomAPI_Pln> aPlane = aSketch->plane();
   std::shared_ptr<GeomAPI_Dir> aNormal = aPlane->direction();
   return fabs(aNormal->dot(aLineDir)) > tolerance * tolerance;
+}
+
+bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
+                                               const std::list<std::string>& theArguments,
+                                               std::string& theError) const
+{
+  if (theAttribute->attributeType() != ModelAPI_AttributeSelection::typeId()) {
+    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    return false;
+  }
+
+  AttributeSelectionPtr aFeatureAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  std::shared_ptr<GeomAPI_Edge> anEdge;
+  if(aFeatureAttr && aFeatureAttr->value() && aFeatureAttr->value()->isEdge()) {
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aFeatureAttr->value()));
+  } else if(aFeatureAttr->context() && aFeatureAttr->context()->shape() &&
+            aFeatureAttr->context()->shape()->isEdge()) {
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aFeatureAttr->context()->shape()));
+  }
+
+  if (!anEdge) {
+    theError = "The attribute " + theAttribute->id() + " should be an edge";
+    return false;
+  }
+
+  // find a sketch
+  std::shared_ptr<SketchPlugin_Sketch> aSketch;
+  std::set<AttributePtr> aRefs = theAttribute->owner()->data()->refsToMe();
+  std::set<AttributePtr>::const_iterator anIt = aRefs.begin();
+  for (; anIt != aRefs.end(); ++anIt) {
+    CompositeFeaturePtr aComp =
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>((*anIt)->owner());
+    if (aComp && aComp->getKind() == SketchPlugin_Sketch::ID()) {
+      aSketch = std::dynamic_pointer_cast<SketchPlugin_Sketch>(aComp);
+      break;
+    }
+  }
+  if (!aSketch) {
+    theError = "There is no sketch referring to the current feature";
+    return false;
+  }
+
+  std::shared_ptr<GeomAPI_Pln> aPlane = aSketch->plane();
+  std::shared_ptr<GeomAPI_Dir> aNormal = aPlane->direction();
+
+  if (anEdge->isLine()) {
+    std::shared_ptr<GeomAPI_Dir> aLineDir = anEdge->line()->direction();
+    double aDot = aNormal->dot(aLineDir);
+    return aDot > -1.0 + tolerance && aDot < 1.0 - tolerance;
+  }
+  else if (anEdge->isCircle() || anEdge->isArc()) {
+    std::shared_ptr<GeomAPI_Dir> aCircNormal = anEdge->circle()->normal();
+    double aDot = fabs(aNormal->dot(aCircNormal));
+    return fabs(aDot - 1.0) < tolerance * tolerance;
+  }
+
+  return false;
 }

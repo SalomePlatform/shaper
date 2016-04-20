@@ -7,6 +7,7 @@
 #include <SketchPlugin_IntersectionPoint.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Arc.h>
+#include <SketchPlugin_Projection.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCollinear.h>
@@ -81,6 +82,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_ArcTangentPointValidator);
   aFactory->registerValidator("SketchPlugin_IntersectionValidator",
                               new SketchPlugin_IntersectionValidator);
+  aFactory->registerValidator("SketchPlugin_ProjectionValidator",
+                              new SketchPlugin_ProjectionValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -126,6 +129,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new SketchPlugin_Circle);
   } else if (theFeatureID == SketchPlugin_Arc::ID()) {
     return FeaturePtr(new SketchPlugin_Arc);
+  } else if (theFeatureID == SketchPlugin_Projection::ID()) {
+    return FeaturePtr(new SketchPlugin_Projection);
   } else if (theFeatureID == SketchPlugin_ConstraintCoincidence::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintCoincidence);
   } else if (theFeatureID == SketchPlugin_ConstraintCollinear::ID()) {
@@ -203,6 +208,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Line::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Circle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Arc::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_Projection::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintCoincidence::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintCollinear::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintDistance::ID(), aHasSketchPlane);

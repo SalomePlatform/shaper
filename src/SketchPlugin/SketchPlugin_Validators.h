@@ -234,4 +234,20 @@ class SketchPlugin_IntersectionValidator : public ModelAPI_AttributeValidator
                        std::string& theError) const;
 };
 
+/**\class SketchPlugin_ProjectionValidator
+ * \ingroup Validators
+ * \brief Validator for the attribute to be projected onto the sketch plane.
+ */
+class SketchPlugin_ProjectionValidator : public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
+};
+
 #endif

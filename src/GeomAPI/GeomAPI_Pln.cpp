@@ -74,3 +74,15 @@ std::shared_ptr<GeomAPI_Pnt> GeomAPI_Pln::intersect(const std::shared_ptr<GeomAP
   double aParam = aNormal->dot(aLocation->decreased(aLineLoc)) / aDot;
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aLineLoc->added(aLineDir->multiplied(aParam))));
 }
+
+std::shared_ptr<GeomAPI_Pnt> GeomAPI_Pln::project(const std::shared_ptr<GeomAPI_Pnt>& thePoint) const
+{
+  std::shared_ptr<GeomAPI_XYZ> aNormal = direction()->xyz();
+  std::shared_ptr<GeomAPI_XYZ> aLocation = location()->xyz();
+
+  std::shared_ptr<GeomAPI_XYZ> aVec = thePoint->xyz()->decreased(aLocation);
+  double aDot = aNormal->dot(aVec);
+  std::shared_ptr<GeomAPI_XYZ> aProjection = 
+      aLocation->added(aVec->decreased(aNormal->multiplied(aDot)));
+  return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aProjection));
+}

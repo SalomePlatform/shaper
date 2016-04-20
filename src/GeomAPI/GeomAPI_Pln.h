@@ -54,7 +54,11 @@ class GeomAPI_Pln : public GeomAPI_Interface
 
   /// Returns intersection point or empty if no intersections
   GEOMAPI_EXPORT
-    std::shared_ptr<GeomAPI_Pnt> intersect(const std::shared_ptr<GeomAPI_Lin>& theLine) const;
+  std::shared_ptr<GeomAPI_Pnt> intersect(const std::shared_ptr<GeomAPI_Lin>& theLine) const;
+
+  /// Returns projection of the given point onto the plane
+  GEOMAPI_EXPORT
+  std::shared_ptr<GeomAPI_Pnt> project(const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
 };
 
 #endif

@@ -42,6 +42,9 @@ class GeomAPI_Circ : public GeomAPI_Interface
   /// Return radius of the circle
   GEOMAPI_EXPORT double radius() const;
 
+  /// Return orthogonal direction to the circle's plane
+  GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Dir> normal() const;
+
   /// Project point on circle
   GEOMAPI_EXPORT const std::shared_ptr<GeomAPI_Pnt> project(
       const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
