@@ -361,6 +361,8 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   aLabelWgt->setPalette(aPalet);
 
   myDocModel = new XGUI_DataModel(this);
+  connect(myDocModel, SIGNAL(modelAboutToBeReset()), SLOT(onBeforeReset()));
+  connect(myDocModel, SIGNAL(treeRebuilt()), SLOT(onAfterModelReset()));
 
   connect(myTreeView, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
           SLOT(onContextMenuRequested(QContextMenuEvent*)));
@@ -470,11 +472,7 @@ QModelIndexList XGUI_ObjectsBrowser::expandedItems(const QModelIndex& theParent)
 //***************************************************
 void XGUI_ObjectsBrowser::rebuildDataTree()
 {
-  QModelIndexList aIndexList = expandedItems();
   myDocModel->rebuildDataTree();
-  foreach(QModelIndex aIndex, aIndexList) {
-    myTreeView->setExpanded(aIndex, true);
-  }
   update();
 }
 
@@ -523,4 +521,16 @@ QObjectPtrList XGUI_ObjectsBrowser::selectedObjects(QModelIndexList* theIndexes)
     }
   }
   return aList;
+}
+
+void XGUI_ObjectsBrowser::onBeforeReset()
+{
+  myExpandedItems = expandedItems();
+}
+
+void XGUI_ObjectsBrowser::onAfterModelReset()
+{
+  foreach(QModelIndex aIndex, myExpandedItems) {
+    myTreeView->setExpanded(aIndex, true);
+  }
 }

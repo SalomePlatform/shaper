@@ -150,11 +150,8 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
               }
             }
           }
-        } 
-#ifdef _DEBUG
-        else
-          Events_Error::send("Problem with Data Model definition of sub-document");
-#endif
+        } else
+          rebuildDataTree();
       }
     }
     // Deleted object event ***********************
@@ -233,9 +230,14 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     std::string aObjType;
     for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
       ObjectPtr aObject = (*aIt);
-      QModelIndex aIndex = objectIndex(aObject);
-      if (aIndex.isValid())
-        emit dataChanged(aIndex, aIndex);
+      if (aObject->data()->isValid()) {
+        QModelIndex aIndex = objectIndex(aObject);
+        if (aIndex.isValid())
+          emit dataChanged(aIndex, aIndex);
+      } else {
+        rebuildDataTree();
+        break;
+      }
     }
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_ORDER_UPDATED)) {
     std::shared_ptr<ModelAPI_OrderUpdatedMessage> aUpdMsg =
@@ -272,10 +274,6 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       else 
         // We have got a new document
         rebuildDataTree();
-//#ifdef _DEBUG
-//      else
-//        Events_Error::send("Problem with Data Model definition of sub-document");
-//#endif
     }
   } 
 }
@@ -291,6 +289,7 @@ void XGUI_DataModel::rebuildDataTree()
 {
   beginResetModel();
   endResetModel();
+  emit treeRebuilt();
 }
 
 //******************************************************

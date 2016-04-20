@@ -66,11 +66,14 @@ QString unionOfObjectNames(const QObjectPtrList& theObjects, const QString& theS
 {
   QStringList aObjectNames;
   foreach (ObjectPtr aObj, theObjects) {
-    if (!aObj->data()->isValid())
-      continue;
-    aObjectNames << QString::fromStdString(aObj->data()->name());
+    if (aObj->data()->isValid())
+      aObjectNames << QString::fromStdString(aObj->data()->name());
   }
-  return aObjectNames.join(", ");
+  if (aObjectNames.count() == 0)
+    return QString();
+  if (aObjectNames.count() == 1)
+    return aObjectNames.first();
+  return aObjectNames.join(theSeparator);
 }
 
 //******************************************************************

@@ -123,6 +123,9 @@ public:
   /// Initialises XML data model reader. It must be initialised before DataModel using.
   void setXMLReader(Config_DataModelReader* theReader) { myXMLReader = theReader; }
 
+signals:
+  void treeRebuilt();
+
 private:
   /// Find a root index which contains objects of the given document
   /// \param theDoc the document object

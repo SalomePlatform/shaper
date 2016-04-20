@@ -1290,8 +1290,8 @@ void XGUI_Workshop::deleteObjects()
   if (ModuleBase_Tools::isDeleteFeatureWithReferences(anObjects, aDirectRefFeatures, 
       aIndirectRefFeatures, desktop(), doDeleteReferences)) {
     // start operation
-    QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text();
-    aDescription += " " + aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
+    QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text() + " %1";
+    aDescription = aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
     ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
     operationMgr()->startOperation(anOpAction);
 

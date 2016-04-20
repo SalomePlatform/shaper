@@ -209,6 +209,10 @@ signals:
   //! Called when selection in Data Tree is changed
   void onSelectionChanged(const QItemSelection& theSelected, const QItemSelection& theDeselected);
 
+  void onBeforeReset();
+
+  void onAfterModelReset();
+
  private:
   QModelIndexList expandedItems(const QModelIndex& theParent = QModelIndex()) const;
 
@@ -216,6 +220,9 @@ signals:
   XGUI_DataModel* myDocModel;
   XGUI_ActiveDocLbl* myActiveDocLbl;
   XGUI_DataTree* myTreeView;
+
+  /// A field to store expanded items before model reset
+  QModelIndexList myExpandedItems;
 };
 
 #endif
