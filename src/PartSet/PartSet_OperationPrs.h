@@ -22,6 +22,7 @@
 #include <Standard_DefineHandle.hxx>
 
 #include <Quantity_Color.hxx>
+#include <NCollection_List.hxx>
 
 #include <QMap>
 #include <QList>
@@ -129,7 +130,15 @@ private:
                                    GeomShapePtr theGeomShape,
                                    QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes);
 
+  /// Fills the list of shapes by map of model objects
+  /// \param theFeatureShape a container to find shapes
+  /// \param theShapesMap an out container
+  void fillShapeList(const QMap<ObjectPtr, QList<GeomShapePtr> >& theFeatureShapes,
+                     NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)>& theShapeToPrsMap);
+
 private:
+  NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)> myShapeToPrsMap; /// list of visualized shapes
+
   QMap<ObjectPtr, QList<GeomShapePtr> > myFeatureShapes; /// visualized shapes
 
   ModuleBase_IWorkshop* myWorkshop; /// current workshop

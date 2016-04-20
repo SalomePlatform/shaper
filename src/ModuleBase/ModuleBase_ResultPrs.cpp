@@ -7,11 +7,13 @@
 #include "ModuleBase_ResultPrs.h"
 #include "ModuleBase_Tools.h"
 
+#include <ModelAPI_Events.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <GeomAPI_PlanarEdges.h>
 
 #include <Events_Error.h>
+#include <Events_Loop.h>
 
 #include <BRep_Builder.hxx>
 #include <Prs3d_Drawer.hxx>
@@ -69,27 +71,24 @@ bool ModuleBase_ResultPrs::isValidShapeType(const TopAbs_ShapeEnum& theBaseType,
   return aValid;
 }
 
-
 void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
   std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(myResult);
-  if (!aShapePtr) {
-    Events_Error::throwException("An empty AIS presentation: ModuleBase_ResultPrs");
-    return;
+  if (aShapePtr.get()) {
+    myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
+    if (!myOriginalShape.IsNull())
+      Set(myOriginalShape);
   }
-
-  myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
-  if (!myOriginalShape.IsNull()) {
-    Set(myOriginalShape);
-
-    // change deviation coefficient to provide more precise circle
-    ModuleBase_Tools::setDefaultDeviationCoefficient(myOriginalShape, Attributes());
-    AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
-  }
-  else
+  else {
     Events_Error::throwException("An empty AIS presentation: ModuleBase_ResultPrs");
+    static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
+    ModelAPI_EventCreator::get()->sendUpdated(myResult, anEvent);
+  }
+  // change deviation coefficient to provide more precise circle
+  ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), Attributes());
+  AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
 }
 
 void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,

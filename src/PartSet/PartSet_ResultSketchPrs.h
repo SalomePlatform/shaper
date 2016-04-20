@@ -57,6 +57,14 @@ private:
   /// \param isAuxiliary a boolean value if the properties are for auxiliary objects
   void setAuxiliaryPresentationStyle(const bool isAuxiliary);
 
+  /// Fills the containers by the current result
+  /// \param theResultShape contains a shape of the result, it will be set as a Shape of AIS_Shape
+  /// \param theAuxiliaryCompound a compound of auxiliary shapes
+  /// \param theFaceList a list of face shapes
+  void PartSet_ResultSketchPrs::fillShapes(TopoDS_Shape& aResultShape,
+                                         TopoDS_Compound& theAuxiliaryCompound,
+                                         NCollection_List<TopoDS_Shape>& theFaceList);
+
   /// Reference to result object
   ResultPtr myResult;
 
@@ -67,7 +75,8 @@ private:
   TopoDS_Compound myAuxiliaryCompound;
 
   /// List of faces
-  std::list<std::shared_ptr<GeomAPI_Shape> > myFacesList;
+  //std::list<std::shared_ptr<GeomAPI_Shape> > myFacesList;
+  NCollection_List<TopoDS_Shape> mySketchFaceList;
 };
 
 

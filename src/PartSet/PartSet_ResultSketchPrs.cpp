@@ -8,11 +8,13 @@
 #include "PartSet_Tools.h"
 #include "ModuleBase_Tools.h"
 
+#include <ModelAPI_Events.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <GeomAPI_PlanarEdges.h>
 
 #include <Events_Error.h>
+#include <Events_Loop.h>
 
 #include <SketchPlugin_SketchEntity.h>
 
@@ -77,92 +79,39 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
 {
   thePresentation->Clear();
 
-  std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(myResult);
-  if (!aShapePtr) {
-    Events_Error::throwException("An empty AIS presentation: PartSet_ResultSketchPrs");
-    return;
+  TopoDS_Shape aResultShape;
+  TopoDS_Compound anAuxiliaryCompound;
+  NCollection_List<TopoDS_Shape> aFaceList;
+  fillShapes(aResultShape, anAuxiliaryCompound, mySketchFaceList);
+
+  bool isEmptyPresentation = aResultShape.IsNull() && anAuxiliaryCompound.IsNull();
+
+  if (!aResultShape.IsNull()) {
+    myOriginalShape = aResultShape;
+    if (!myOriginalShape.IsNull())
+      Set(myOriginalShape);
   }
+
+  if (!anAuxiliaryCompound.IsNull())
+    myAuxiliaryCompound = anAuxiliaryCompound;
 
   setAuxiliaryPresentationStyle(false);
 
-  myFacesList.clear();
-  ResultConstructionPtr aConstruction = 
-    std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myResult);
-  if (aConstruction.get()) {
-    int aFacesNum = aConstruction->facesNum();
-    for(int aFaceIndex = 0; aFaceIndex < aFacesNum; aFaceIndex++) {
-      myFacesList.push_back(aConstruction->face(aFaceIndex));
-    }
-  }
-  myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
-  if (!myOriginalShape.IsNull()) {
-    Set(myOriginalShape);
-
     // change deviation coefficient to provide more precise circle
-    ModuleBase_Tools::setDefaultDeviationCoefficient(myOriginalShape, Attributes());
-    AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
-  }
-  else
-    Events_Error::throwException("An empty AIS presentation: PartSet_ResultSketchPrs");
+  ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), Attributes());
+  AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
 
-  // visualize auxiliary shapes and sketch construction elements(point, center of a circle)
-  FeaturePtr aResultFeature = ModelAPI_Feature::feature(myResult);
-  CompositeFeaturePtr aSketchFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>
-                                                                          (aResultFeature);
-  std::list<ResultPtr> anAuxiliaryResults;
-  /// append auxiliary shapes
-  for (int i = 0; i < aSketchFeature->numberOfSubs(); i++) {
-    FeaturePtr aFeature = aSketchFeature->subFeature(i);
-    if (PartSet_Tools::isAuxiliarySketchEntity(aFeature)) {
-      std::list<ResultPtr> aResults = aFeature->results();
-      std::list<ResultPtr>::const_iterator aIt;
-      for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-        ResultPtr aResult = *aIt;
-        if (aResult.get() && aResult->shape().get())
-          anAuxiliaryResults.push_back(aResult);
-      }
-    }
-    else {
-    /// append not-edges shapes, e.g. center of a circle, an arc, a point feature
-      const std::list<std::shared_ptr<ModelAPI_Result> >& aRes = aFeature->results();
-      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter = aRes.cbegin();
-      for (; aResIter != aRes.cend(); aResIter++) {
-        std::shared_ptr<ModelAPI_ResultConstruction> aConstr = std::dynamic_pointer_cast<
-            ModelAPI_ResultConstruction>(*aResIter);
-        if (aConstr) {
-          std::shared_ptr<GeomAPI_Shape> aGeomShape = aConstr->shape();
-          if (aGeomShape.get()) {
-            const TopoDS_Shape& aShape = aGeomShape->impl<TopoDS_Shape>();
-            if (aShape.ShapeType() != TopAbs_EDGE)
-              anAuxiliaryResults.push_back(aConstr);
-          }
-        }
-      }
-    }
-  }
-
-  if (anAuxiliaryResults.size() > 0) {
+  if (!myAuxiliaryCompound.IsNull()) {
     setAuxiliaryPresentationStyle(true);
 
-    BRep_Builder aBuilder;
-    TopoDS_Compound aComp;
-    aBuilder.MakeCompound(aComp);
-    std::list<ResultPtr>::const_iterator anIt = anAuxiliaryResults.begin(),
-                                         aLast = anAuxiliaryResults.end();
-    for (; anIt != aLast; anIt++) {
-      ResultPtr aResult = *anIt;
-      if (aResult.get()) {
-        GeomShapePtr aGeomShape = aResult->shape();
-        if (aGeomShape.get()) {
-          const TopoDS_Shape& aShape = aGeomShape->impl<TopoDS_Shape>();
-          if (!aShape.IsNull())
-            aBuilder.Add(aComp, aShape);
-        }
-      }
-    }
-    myAuxiliaryCompound = aComp;
     Handle(Prs3d_Drawer) aDrawer = Attributes();
-    StdPrs_WFDeflectionShape::Add(thePresentation, aComp, aDrawer);
+    StdPrs_WFDeflectionShape::Add(thePresentation, myAuxiliaryCompound, aDrawer);
+  }
+
+  if (isEmptyPresentation) {
+    Events_Error::throwException("An empty AIS presentation: PartSet_ResultSketchPrs");
+    static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
+    ModelAPI_EventCreator::get()->sendUpdated(myResult, anEvent);
   }
 }
 
@@ -201,9 +150,9 @@ void PartSet_ResultSketchPrs::ComputeSelection(const Handle(SelectMgr_Selection)
     TopoDS_Compound aComp;
     aBuilder.MakeCompound(aComp);
     aBuilder.Add(aComp, myOriginalShape);
-    std::list<std::shared_ptr<GeomAPI_Shape>>::const_iterator aIt;
-    for (aIt = myFacesList.cbegin(); aIt != myFacesList.cend(); ++aIt) {
-      TopoDS_Shape aFace = (*aIt)->impl<TopoDS_Shape>();
+    
+    for(NCollection_List<TopoDS_Shape>::Iterator anIt(mySketchFaceList); anIt.More(); anIt.Next()) {
+      const TopoDS_Shape& aFace = anIt.Value();
       aBuilder.Add(aComp, aFace);
       // for sketch presentation in the face mode wires should be selectable also
       // accoring to #1343 Improvement of Extrusion and Revolution operations
@@ -289,5 +238,84 @@ void PartSet_ResultSketchPrs::setAuxiliaryPresentationStyle(const bool isAuxilia
   bool isChangedLineType = aType != aPrevLineType;
   if (isChangedLineType) {
     aLineAspect->SetTypeOfLine(aType);
+  }
+}
+
+void PartSet_ResultSketchPrs::fillShapes(TopoDS_Shape& theResultShape,
+                                         TopoDS_Compound& theAuxiliaryCompound,
+                                         NCollection_List<TopoDS_Shape>& theFaceList)
+{
+  //if (!aResultShape.IsNull() || !anAuxiliaryCompound.IsNull())
+  std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(myResult);
+  if (!aShapePtr)
+    return;
+
+  theFaceList.Clear();
+  ResultConstructionPtr aConstruction = 
+    std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myResult);
+  if (aConstruction.get()) {
+    int aFacesNum = aConstruction->facesNum();
+    for(int aFaceIndex = 0; aFaceIndex < aFacesNum; aFaceIndex++) {
+      std::shared_ptr<GeomAPI_Face> aFaceShape = aConstruction->face(aFaceIndex);
+      if (aFaceShape.get()) {
+        TopoDS_Shape aFace = (aFaceShape)->impl<TopoDS_Shape>();
+        theFaceList.Append(aFace);
+      }
+    }
+  }
+  theResultShape = aShapePtr->impl<TopoDS_Shape>();
+
+  /// find auxiliary shapes
+  FeaturePtr aResultFeature = ModelAPI_Feature::feature(myResult);
+  CompositeFeaturePtr aSketchFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>
+                                                                          (aResultFeature);
+  std::list<ResultPtr> anAuxiliaryResults;
+  for (int i = 0; i < aSketchFeature->numberOfSubs(); i++) {
+    FeaturePtr aFeature = aSketchFeature->subFeature(i);
+    if (PartSet_Tools::isAuxiliarySketchEntity(aFeature)) {
+      std::list<ResultPtr> aResults = aFeature->results();
+      std::list<ResultPtr>::const_iterator aIt;
+      for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+        ResultPtr aResult = *aIt;
+        if (aResult.get() && aResult->shape().get())
+          anAuxiliaryResults.push_back(aResult);
+      }
+    }
+    else {
+    /// append not-edges shapes, e.g. center of a circle, an arc, a point feature
+      const std::list<std::shared_ptr<ModelAPI_Result> >& aRes = aFeature->results();
+      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter = aRes.cbegin();
+      for (; aResIter != aRes.cend(); aResIter++) {
+        std::shared_ptr<ModelAPI_ResultConstruction> aConstr = std::dynamic_pointer_cast<
+            ModelAPI_ResultConstruction>(*aResIter);
+        if (aConstr) {
+          std::shared_ptr<GeomAPI_Shape> aGeomShape = aConstr->shape();
+          if (aGeomShape.get()) {
+            const TopoDS_Shape& aShape = aGeomShape->impl<TopoDS_Shape>();
+            if (aShape.ShapeType() != TopAbs_EDGE)
+              anAuxiliaryResults.push_back(aConstr);
+          }
+        }
+      }
+    }
+  }
+
+  if (anAuxiliaryResults.size() > 0) {
+    BRep_Builder aBuilder;
+    //TopoDS_Compound aComp;
+    aBuilder.MakeCompound(theAuxiliaryCompound);
+    std::list<ResultPtr>::const_iterator anIt = anAuxiliaryResults.begin(),
+                                         aLast = anAuxiliaryResults.end();
+    for (; anIt != aLast; anIt++) {
+      ResultPtr aResult = *anIt;
+      if (aResult.get()) {
+        GeomShapePtr aGeomShape = aResult->shape();
+        if (aGeomShape.get()) {
+          const TopoDS_Shape& aShape = aGeomShape->impl<TopoDS_Shape>();
+          if (!aShape.IsNull())
+            aBuilder.Add(theAuxiliaryCompound, aShape);
+        }
+      }
+    }
   }
 }

@@ -48,6 +48,9 @@ static const char * EVENT_FEATURE_STATE_RESPONSE = "FeatureStateResponse";
 static const char * EVENT_UPDATE_VIEWER_BLOCKED = "UpdateViewerBlocked";
 static const char * EVENT_UPDATE_VIEWER_UNBLOCKED = "UpdateViewerUnblocked";
 
+static const char * EVENT_EMPTY_AIS_PRESENTATION = "EmptyAISPresentation";
+static const char * EVENT_EMPTY_OPERATION_PRESENTATION = "EmptyOperationPresentation";
+
 static const char * EVENT_PREVIEW_BLOCKED = "PreviewBlocked";
 static const char * EVENT_PREVIEW_REQUESTED = "PreviewRequested";
 

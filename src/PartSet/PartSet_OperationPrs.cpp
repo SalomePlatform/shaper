@@ -18,6 +18,7 @@
 #include <ModuleBase_ModelWidget.h>
 #include <ModuleBase_ViewerPrs.h>
 
+#include <ModelAPI_Events.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeRefAttr.h>
@@ -30,6 +31,7 @@
 #include <ModelAPI_ResultCompSolid.h>
 
 #include <Events_Error.h>
+#include <Events_Loop.h>
 
 #include <GeomAPI_IPresentable.h>
 
@@ -77,49 +79,44 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   SetColor(myShapeColor);
   thePresentation->Clear();
 
+  NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)> aShapeToPrsMap;
+  fillShapeList(myFeatureShapes, aShapeToPrsMap);
+
+  if (!aShapeToPrsMap.IsEmpty()) {
+    myShapeToPrsMap.Clear();
+    myShapeToPrsMap.Assign(aShapeToPrsMap);
+  }
   XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(myWorkshop)->displayer();
   Handle(Prs3d_Drawer) aDrawer = Attributes();
-
   // create presentations on the base of the shapes
-  bool anEmptyAIS = true;
-  QMap<ObjectPtr, QList<GeomShapePtr> >::const_iterator anIt = myFeatureShapes.begin(),
-                                                        aLast = myFeatureShapes.end();
-  for (; anIt != aLast; anIt++) {
-    ObjectPtr anObject = anIt.key();
-    QList<GeomShapePtr> aShapes = anIt.value();
-    QList<GeomShapePtr>::const_iterator aShIt = aShapes.begin(), aShLast = aShapes.end();
-    for (; aShIt != aShLast; aShIt++) {
-      GeomShapePtr aGeomShape = *aShIt;
-      // the shape should not be checked here on empty value because it should be checked in
-      // appendShapeIfVisible() on the step of filling myFeatureShapes list
-      // the reason is to avoid empty AIS object visualized in the viewer
-      //if (!aGeomShape.get()) continue;
-      TopoDS_Shape aShape = aGeomShape.get() ? aGeomShape->impl<TopoDS_Shape>() : TopoDS_Shape();
-      // change deviation coefficient to provide more precise circle
-      ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
+  for(NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)>::Iterator anIter(myShapeToPrsMap);
+      anIter.More(); anIter.Next()) {
+    const TopoDS_Shape& aShape = anIter.Key();
+    // change deviation coefficient to provide more precise circle
+    ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
 
-      if (myUseAISWidth) {
-        AISObjectPtr anAISPtr = aDisplayer->getAISObject(anObject);
-        if (anAISPtr.get()) {
-          Handle(AIS_InteractiveObject) anIO = anAISPtr->impl<Handle(AIS_InteractiveObject)>();
-          if (!anIO.IsNull()) {
-            int aWidth = anIO->Width();
-            /// workaround for zero width. Else, there will be a crash
-            if (aWidth == 0) { // width returns of TSolid shape is zero
-              bool isDisplayed = !anIO->GetContext().IsNull();
-              aWidth = PartSet_Tools::getAISDefaultWidth();// default width value
-            }
-            setWidth(aDrawer, aWidth);
-          }
+    if (myUseAISWidth) {
+      Handle(AIS_InteractiveObject) anIO = anIter.Value();
+      if (!anIO.IsNull()) {
+        int aWidth = anIO->Width();
+        /// workaround for zero width. Else, there will be a crash
+        if (aWidth == 0) { // width returns of TSolid shape is zero
+          bool isDisplayed = !anIO->GetContext().IsNull();
+          aWidth = PartSet_Tools::getAISDefaultWidth();// default width value
         }
+        setWidth(aDrawer, aWidth);
       }
-      StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
-      if (anEmptyAIS)
-        anEmptyAIS = false;
     }
+    StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
   }
-  if (anEmptyAIS)
+
+  if (myShapeToPrsMap.IsEmpty()) {
     Events_Error::throwException("An empty AIS presentation: PartSet_OperationPrs");
+
+    //std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
+    //            new Events_Message(Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION)));
+    //Events_Loop::loop()->send(aMsg);
+  }
 }
 
 void PartSet_OperationPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
@@ -359,4 +356,38 @@ bool PartSet_OperationPrs::isSelectionAttribute(const AttributePtr& theAttribute
          anAttrType == ModelAPI_AttributeRefAttr::typeId() ||
          anAttrType == ModelAPI_AttributeSelection::typeId() ||
          anAttrType == ModelAPI_AttributeReference::typeId();
+}
+
+void PartSet_OperationPrs::fillShapeList(const QMap<ObjectPtr, QList<GeomShapePtr> >& theFeatureShapes,
+                            NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)>& theShapeToPrsMap)
+{
+  theShapeToPrsMap.Clear();
+
+  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(myWorkshop)->displayer();
+  Handle(Prs3d_Drawer) aDrawer = Attributes();
+
+  // create presentations on the base of the shapes
+  QMap<ObjectPtr, QList<GeomShapePtr> >::const_iterator anIt = myFeatureShapes.begin(),
+                                                        aLast = myFeatureShapes.end();
+  for (; anIt != aLast; anIt++) {
+    ObjectPtr anObject = anIt.key();
+    QList<GeomShapePtr> aShapes = anIt.value();
+    QList<GeomShapePtr>::const_iterator aShIt = aShapes.begin(), aShLast = aShapes.end();
+    for (; aShIt != aShLast; aShIt++) {
+      GeomShapePtr aGeomShape = *aShIt;
+      // the shape should not be checked here on empty value because it should be checked in
+      // appendShapeIfVisible() on the step of filling myFeatureShapes list
+      // the reason is to avoid empty AIS object visualized in the viewer
+      //if (!aGeomShape.get()) continue;
+      TopoDS_Shape aShape = aGeomShape.get() ? aGeomShape->impl<TopoDS_Shape>() : TopoDS_Shape();
+      // change deviation coefficient to provide more precise circle
+      Handle(AIS_InteractiveObject) anIO;
+      if (myUseAISWidth) {
+        AISObjectPtr anAISPtr = aDisplayer->getAISObject(anObject);
+        if (anAISPtr.get())
+          anIO = anAISPtr->impl<Handle(AIS_InteractiveObject)>();
+      }
+      theShapeToPrsMap.Bind(aShape, anIO);
+    }
+  }
 }

@@ -48,14 +48,18 @@ protected:
   bool event(QEvent * theEvent);
 
   /// Process feature update message
-  void onFeatureUpdatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
+  /// \param theMsg a message with a container of objects
+  void onFeatureUpdatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg);
 
   /// Process feature created message
-  void onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
+  /// \param theMsg a message with a container of objects
+  void onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg);
 
   /// Process feature redisplay message
-  void onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
+  /// \param theMsg a message with a container of objects
+  void onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg);
 
+  void onFeatureEmptyPresentationMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg);
   /// Displaus object and fit all viewer if the object is first (update viewer will not be called)
   /// Asks the module whether the object can be displayed
   /// \param theObj an object

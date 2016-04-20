@@ -93,6 +93,8 @@ void XGUI_WorkshopListener::initializeEventListening()
 
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION));
 }
 
 //******************************************************
@@ -128,6 +130,10 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     onFeatureRedisplayMsg(aUpdMsg);
+  } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION)) {
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    onFeatureEmptyPresentationMsg(aUpdMsg);
   }
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
@@ -341,6 +347,8 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
 
   bool isCustomized = customizeCurrentObject(anObjects, aRedisplayed);
   if (aRedisplayed || isCustomized) {
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION));
+
     //VSV FitAll updated viewer by it self
     if (aFirstVisualizedBody)
       myWorkshop->viewer()->fitAll();
@@ -348,6 +356,7 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
       aDisplayer->updateViewer();
   }
 }
+
 //******************************************************
 void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
@@ -411,6 +420,7 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
   //if (myObjectBrowser)
   //  myObjectBrowser->processEvent(theMsg);
   if (aDisplayed) {
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION));
     //VSV FitAll updated viewer by it self
     if (aFirstVisualizedBody)
       myWorkshop->viewer()->fitAll();
@@ -420,6 +430,34 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
   //if (aHasPart) { // TODO: Avoid activate last part on loading of document
   //  activateLastPart();
   //}
+}
+
+//******************************************************
+void XGUI_WorkshopListener::onFeatureEmptyPresentationMsg(
+                                      const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
+{
+  std::set<ObjectPtr> anObjects = theMsg->objects();
+  std::set<ObjectPtr>::const_iterator aIt;
+#ifdef DEBUG_FEATURE_CREATED
+  QStringList anInfo;
+  for (aIt = anObjects.begin(); aIt != anObjects.end(); ++aIt) {
+    anInfo.append(ModuleBase_Tools::objectInfo((*aIt)));
+  }
+  QString anInfoStr = anInfo.join(";\t");
+  qDebug(QString("onFeatureEmptyPresentationMsg: %1, %2").arg(anObjects.size()).arg(anInfoStr).toStdString().c_str());
+#endif
+
+  XGUI_Workshop* aWorkshop = workshop();
+  XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+
+  bool aRedisplayed = false;
+  for (aIt = anObjects.begin(); aIt != anObjects.end(); ++aIt) {
+    ObjectPtr anObject = *aIt;
+    aRedisplayed = aDisplayer->erase(anObject, false) || aRedisplayed;
+  }
+
+  if (aRedisplayed)
+    aDisplayer->updateViewer();
 }
 
 bool XGUI_WorkshopListener::event(QEvent * theEvent)
