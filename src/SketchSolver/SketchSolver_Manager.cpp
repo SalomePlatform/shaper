@@ -482,6 +482,10 @@ void SketchSolver_Manager::degreesOfFreedom()
   std::list<SketchSolver_Group*>::const_iterator aGroupIt = myGroups.begin();
   for (; aGroupIt != myGroups.end(); ++aGroupIt) {
     CompositeFeaturePtr aSketch = (*aGroupIt)->getWorkplane();
+    if (!aSketch->data()->isValid()) {
+      myDoF.erase(aSketch);
+      continue;
+    }
 
     // check conflicting constraints in the group
     if ((*aGroupIt)->isFailed())
