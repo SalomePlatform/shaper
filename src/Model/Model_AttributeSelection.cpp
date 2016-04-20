@@ -185,8 +185,8 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
   if (myTmpContext.get() || myTmpSubShape.get()) {
     ResultConstructionPtr aResulConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myTmpContext);
     if(aResulConstruction.get()) {
-      // it is just reference to construction, nothing is in value
-      return aResult;
+      // it is just reference to construction.
+      return myTmpSubShape;
     }
     return myTmpSubShape.get() ? myTmpSubShape : myTmpContext->shape();
   }
