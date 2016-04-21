@@ -59,8 +59,9 @@ bool SolveSpaceSolver_Storage::update(ConstraintWrapperPtr theConstraint)
     aSlvsConstr = aConstraint->constraint();
 
   // update value of constraint if exist
-  if (fabs(aSlvsConstr.valA - theConstraint->value()) > tolerance) {
-    aSlvsConstr.valA = theConstraint->value();
+  double aCoeff = aSlvsConstr.type == SLVS_C_DIAMETER ? 2.0 : 1.0;
+  if (fabs(aSlvsConstr.valA - theConstraint->value() * aCoeff) > tolerance) {
+    aSlvsConstr.valA = theConstraint->value() * aCoeff;
     isUpdated = true;
   }
 

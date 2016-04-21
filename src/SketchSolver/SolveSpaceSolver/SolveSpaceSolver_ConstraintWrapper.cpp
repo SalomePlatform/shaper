@@ -35,15 +35,6 @@ SketchSolver_ConstraintType SolveSpaceSolver_ConstraintWrapper::type() const
   return ConstraintType::fromSolveSpace(mySlvsConstraint.type);
 }
 
-void SolveSpaceSolver_ConstraintWrapper::setValue(const double& theValue)
-{
-  double aValue = theValue;
-  if (type() == CONSTRAINT_RADIUS)
-    aValue *= 2.0; // NOTE: SolveSpace uses constraint DIAMETER
-
-  SketchSolver_IConstraintWrapper::setValue(aValue);
-}
-
 bool SolveSpaceSolver_ConstraintWrapper::isUsed(FeaturePtr theFeature) const
 {
   std::list<EntityWrapperPtr>::const_iterator anIt = myConstrained.begin();

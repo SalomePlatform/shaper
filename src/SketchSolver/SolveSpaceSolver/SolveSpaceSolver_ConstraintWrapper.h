@@ -39,9 +39,6 @@ public:
   /// \brief Return type of current entity
   virtual SketchSolver_ConstraintType type() const;
 
-  /// \brief Assign numeric parameter of constraint
-  virtual void setValue(const double& theValue);
-
   /// \brief Verify the feature is used in the constraint
   virtual bool isUsed(FeaturePtr theFeature) const;
   /// \brief Verify the attribute is used in the constraint
