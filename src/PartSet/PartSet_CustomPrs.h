@@ -84,11 +84,12 @@ private:
   /// \param theFlag an object AIS presentation type
   void initPresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag);
 
-  /// Gets an AIS presentation by the flag
+  /// Gets an AIS presentation by the flag or create new if there is no a presentation by the flag
   /// \param theFlag an object AIS presentation type
-  /// \return the AIS prsentation
-  Handle(PartSet_OperationPrs) getPresentation(
-                            const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag);
+  /// \param theToCreate a flag if a new presentation should be created
+  /// \return wrap of AIS prsentation
+  AISObjectPtr getPresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                               const bool theToCreate);
 
   //! Returns workshop
   XGUI_Workshop* workshop() const;

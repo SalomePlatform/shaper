@@ -84,7 +84,10 @@ bool PartSet_CustomPrs::displayPresentation(
   bool isModified = false;
 
   // update the AIS objects content
-  Handle(PartSet_OperationPrs) anOperationPrs = getPresentation(theFlag);
+  AISObjectPtr aPresentation = getPresentation(theFlag, true);
+  Handle(AIS_InteractiveObject) anAISIO = aPresentation->impl<Handle(AIS_InteractiveObject)>();
+  Handle(PartSet_OperationPrs) anOperationPrs = Handle(PartSet_OperationPrs)::DownCast(anAISIO);
+
   // do nothing if the feature can not be displayed [is moved from presentation, to be checked]
   if (!myFeature.get())
     return isModified;
@@ -142,33 +145,40 @@ void PartSet_CustomPrs::erasePresentation(const ModuleBase_IModule::ModuleBase_C
                                           const bool theUpdateViewer)
 {
   XGUI_Workshop* aWorkshop = workshop();
-  aWorkshop->displayer()->eraseAIS(myPresentations[theFlag], theUpdateViewer);
+  if (myPresentations.contains(theFlag))
+    aWorkshop->displayer()->eraseAIS(myPresentations[theFlag], theUpdateViewer);
 }
 
 void PartSet_CustomPrs::clearPresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag)
 {
-  Handle(PartSet_OperationPrs) anOperationPrs = getPresentation(theFlag);
-  anOperationPrs->featureShapes().clear();
-  if (!anOperationPrs.IsNull())
-    anOperationPrs.Nullify();
-  myPresentations[theFlag] = AISObjectPtr();
+  AISObjectPtr aPresentation = getPresentation(theFlag, false);
+  if (aPresentation.get()) {
+    Handle(AIS_InteractiveObject) anAISIO = aPresentation->impl<Handle(AIS_InteractiveObject)>();
+    Handle(PartSet_OperationPrs) anOperationPrs = Handle(PartSet_OperationPrs)::DownCast(anAISIO);
+
+    anOperationPrs->featureShapes().clear();
+    if (!anOperationPrs.IsNull())
+      anOperationPrs.Nullify();
+    myPresentations.remove(theFlag);
+  }
 }
 
-Handle(PartSet_OperationPrs) PartSet_CustomPrs::getPresentation(
-                                         const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag)
+AISObjectPtr PartSet_CustomPrs::getPresentation(
+                                       const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                                       const bool theToCreate)
 {
   Handle(PartSet_OperationPrs) aPresentation;
 
-  if (myPresentations.contains(theFlag)) {
-    AISObjectPtr anOperationPrs = myPresentations[theFlag];
-    if (!anOperationPrs.get()) {
-      initPresentation(theFlag);
-      anOperationPrs = myPresentations[theFlag];
-    }
-    Handle(AIS_InteractiveObject) anAISIO = anOperationPrs->impl<Handle(AIS_InteractiveObject)>();
-    aPresentation = Handle(PartSet_OperationPrs)::DownCast(anAISIO);
+  AISObjectPtr anOperationPrs;
+  if (myPresentations.contains(theFlag))
+    anOperationPrs = myPresentations[theFlag];
+  
+  if (!anOperationPrs.get() && theToCreate) {
+    initPresentation(theFlag);
+    anOperationPrs = myPresentations[theFlag];
   }
-  return aPresentation;
+
+  return anOperationPrs;
 }
 
 bool PartSet_CustomPrs::redisplay(const ObjectPtr& theObject,
@@ -181,7 +191,7 @@ bool PartSet_CustomPrs::redisplay(const ObjectPtr& theObject,
   bool aRedisplayed = false;
   if (myIsActive[theFlag])
     aRedisplayed = displayPresentation(theFlag, theUpdateViewer);
-
+  
   return aRedisplayed;
 }
 
