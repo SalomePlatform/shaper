@@ -204,7 +204,7 @@ checkPointOnArc(aCircleCenter, aSketchArc)
 #=========================================================================
 # Check center of circle is still in origin
 #=========================================================================
-#assert (aCircleCenter.x() == 0. and aCircleCenter.y() == 0.)
+assert (aCircleCenter.x() == 0. and aCircleCenter.y() == 0.)
 #=========================================================================
 # End of test
 #=========================================================================
