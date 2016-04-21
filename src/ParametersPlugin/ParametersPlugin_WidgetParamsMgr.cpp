@@ -281,6 +281,43 @@ void ParametersPlugin_WidgetParamsMgr::activateCustom()
 }
 
 
+void ParametersPlugin_WidgetParamsMgr::rebuildFeatures()
+{
+  myFeatures->takeChildren(); // Clear list
+
+  ResultParameterPtr aParam;
+  QTreeWidgetItem* aItem;
+  foreach(FeaturePtr aParameter, myParametersList) {
+    aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParameter->firstResult());
+    const std::set<std::shared_ptr<ModelAPI_Attribute>>& aRefs = aParam->data()->refsToMe();
+    std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aIt;
+    for(aIt = aRefs.cbegin(); aIt != aRefs.cend(); aIt++) {
+      std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
+      FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+      if (aReferenced.get()) {
+        QStringList aValNames;
+        aValNames << aReferenced->data()->name().c_str();
+
+        AttributeDoublePtr aDouble = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aAttr);
+        if (aDouble.get()) {
+          aValNames << aDouble->text().c_str();
+          aValNames << QString::number(aDouble->value());
+        } else {
+          AttributeIntegerPtr aInt = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aAttr);
+          if (aInt.get()) {
+            aValNames << aInt->text().c_str();
+            aValNames << QString::number(aInt->value());
+          }
+        }
+
+        aItem = new QTreeWidgetItem(aValNames);
+        myFeatures->addChild(aItem);
+      }
+    }
+  }
+}
+
+
 void ParametersPlugin_WidgetParamsMgr::onDoubleClick(const QModelIndex& theIndex)
 {
   if (myDelegate->isEditable(theIndex)) {
@@ -490,7 +527,23 @@ void ParametersPlugin_WidgetParamsMgr::onRemove()
       aIndirectRefFeatures, this, doDeleteReferences)) {
     myParametersList.removeOne(aCurFeature);
     myParameters->removeChild(aCurrentItem);
+
+    std::set<FeaturePtr> aFeaturesToDelete;
+    if (doDeleteReferences) {
+      aFeaturesToDelete = aDirectRefFeatures;
+      aFeaturesToDelete.insert(aIndirectRefFeatures.begin(), aIndirectRefFeatures.end());
+    }
     aDoc->removeFeature(aCurFeature);
+    std::set<FeaturePtr>::const_iterator anIt = aFeaturesToDelete.begin(),
+                                         aLast = aFeaturesToDelete.end();
+    for (; anIt != aLast; anIt++) {
+      FeaturePtr aFeature = (*anIt);
+      DocumentPtr aDoc = aFeature->document();
+      aDoc->removeFeature(aFeature);
+    }
+
+    Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    rebuildFeatures();
   }
 }
 

@@ -71,19 +71,33 @@ private slots:
   /// Slot for reaction on shift down
   void onDown();
 
+  /// Slot to show message on closing of editor
   void sendWarning();
 
+  /// Slot for reaction on selection in the table
   void onSelectionChanged();
 
 private:
+  /// Creates a new parameter feature
   FeaturePtr createParameter() const;
+
+  /// Creates a new item
   QTreeWidgetItem* createNewItem() const;
+
+  /// Returns currently selected item
   QTreeWidgetItem* selectedItem() const;
+
+  /// Select the given Item and scroll the table to make it visible
   void selectItemScroll(QTreeWidgetItem* aItem);
 
+  /// Update values in features part
   void updateFeaturesPart();
 
+  /// Returns true if parameter with the given name already exists
   bool hasName(const QString& theName) const;
+
+  /// Clear and rebuild children of Features item
+  void rebuildFeatures();
 
   QTreeWidget* myTable;
   QTreeWidgetItem* myFeatures;
