@@ -363,7 +363,6 @@ bool SketchSolver_Group::resolveConstraints()
     } catch (...) {
 //      Events_Error::send(SketchSolver_Error::SOLVESPACE_CRASH(), this);
       getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::SOLVESPACE_CRASH());
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
       if (myPrevResult == STATUS_OK || myPrevResult == STATUS_UNKNOWN) {
         // the error message should be changed before sending the message
         sendMessage(EVENT_SOLVER_FAILED);
@@ -377,7 +376,6 @@ bool SketchSolver_Group::resolveConstraints()
       updateMultiConstraints(myConstraints);
       if (myPrevResult != STATUS_OK || myPrevResult == STATUS_UNKNOWN) {
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
-        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
         // the error message should be changed before sending the message
         sendMessage(EVENT_SOLVER_REPAIRED, myConflictingConstraints);
         myConflictingConstraints.clear();
@@ -388,7 +386,6 @@ bool SketchSolver_Group::resolveConstraints()
       if (!myConstraints.empty()) {
         // the error message should be changed before sending the message
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::CONSTRAINTS());
-        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
         if (myPrevResult != aResult || myPrevResult == STATUS_UNKNOWN) {
           // Obtain list of conflicting constraints
           std::set<ObjectPtr> aConflicting = myStorage->getConflictingConstraints(mySketchSolver);
