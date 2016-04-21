@@ -76,19 +76,21 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
                                    const Standard_Integer theMode)
 {
   std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(myResult);
-  if (aShapePtr.get()) {
+  bool aReadyToDisplay = aShapePtr.get();
+  if (aReadyToDisplay) {
     myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
     if (!myOriginalShape.IsNull())
       Set(myOriginalShape);
   }
-  else {
+  // change deviation coefficient to provide more precise circle
+  ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), Attributes());
+  AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
+
+  if (!aReadyToDisplay) {
     Events_Error::throwException("An empty AIS presentation: ModuleBase_ResultPrs");
     static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
     ModelAPI_EventCreator::get()->sendUpdated(myResult, anEvent);
   }
-  // change deviation coefficient to provide more precise circle
-  ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), Attributes());
-  AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
 }
 
 void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,

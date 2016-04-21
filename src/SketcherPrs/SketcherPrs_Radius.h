@@ -42,6 +42,18 @@ public:
   /// \return boolean result value
   static bool IsReadyToDisplay(ModelAPI_Feature* theConstraint,
                                const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+private:
+  /// Fills the constraint parameters by constraint and plane
+  /// \param theConstraint a constraint feature
+  /// \param thePlane a coordinate plane of current sketch
+  /// \param theCircle a circle build on the constraint values
+  /// \param thePoint an anchor point to show text value
+  /// \param theRadius a circle custom radius value to be visualized
+  /// \return boolean result value
+  static bool readyToDisplay(ModelAPI_Feature* theConstraint,
+                             const std::shared_ptr<GeomAPI_Ax3>& thePlane,
+                             gp_Circ& theCircle, gp_Pnt& theAnchorPoint,
+                             double& theRadius);
 protected:
   /// Redefinition of virtual function
   Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
@@ -64,7 +76,7 @@ private:
   /// container of values obtained from the constraint, which are necessary to fill the presentation
   double myRadius; ///< the radius custom value
   gp_Circ myCircle; ///< the radius circle
-  gp_Pnt myAncorPnt; ///< an ancor for the radius value visualization
+  gp_Pnt myAnchorPoint; ///< an ancor for the radius value visualization
 
   bool myHasParameters; ///< true if the atrribute value has used parameters
   std::string myValue; ///< dimension value

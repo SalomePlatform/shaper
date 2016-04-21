@@ -56,6 +56,11 @@ protected:
     const Standard_Integer aMode) ;
 
 private:
+  static bool readyToDisplay(ModelAPI_Feature* theConstraint,
+                      const std::shared_ptr<GeomAPI_Ax3>& thePlane,
+                      gp_Pnt& thePoint);
+
+private:
   ModelAPI_Feature* myConstraint;
   std::shared_ptr<GeomAPI_Ax3> mySketcherPlane;
   gp_Pnt myPoint;

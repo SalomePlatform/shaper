@@ -56,9 +56,9 @@ protected:
     const Standard_Integer aMode);
 
 private:
-  static bool getPoints(ModelAPI_Feature* theConstraint,
-                 const std::shared_ptr<GeomAPI_Ax3>& thePlane,
-                 gp_Pnt& thePnt1, gp_Pnt& thePnt2);
+  static bool readyToDisplay(ModelAPI_Feature* theConstraint,
+                             const std::shared_ptr<GeomAPI_Ax3>& thePlane,
+                             gp_Pnt& thePnt1, gp_Pnt& thePnt2);
 
   /// Constraint feature
   ModelAPI_Feature* myConstraint;

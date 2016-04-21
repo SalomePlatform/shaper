@@ -56,22 +56,21 @@ SketcherPrs_LengthDimension::~SketcherPrs_LengthDimension()
 bool SketcherPrs_LengthDimension::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 {
-  bool aReadyToDisplay = false;
-
   gp_Pnt aPnt1, aPnt2;
-  aReadyToDisplay = getPoints(theConstraint, thePlane, aPnt1, aPnt2);
-
-  return aReadyToDisplay;
+  return readyToDisplay(theConstraint, thePlane, aPnt1, aPnt2);
 }
 
 void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                           const Handle(Prs3d_Presentation)& thePresentation, 
                                           const Standard_Integer theMode)
 {
-  bool aReadyToDisplay = IsReadyToDisplay(myConstraint, mySketcherPlane);
+  gp_Pnt aPnt1, aPnt2;
+  bool aReadyToDisplay = readyToDisplay(myConstraint, mySketcherPlane, aPnt1, aPnt2);
   if (aReadyToDisplay) {
+    myFirstPoint = aPnt1;
+    mySecondPoint = aPnt2;
+
     myDistance = SketcherPrs_Tools::getFlyoutDistance(myConstraint);
-    getPoints(myConstraint, mySketcherPlane, myFirstPoint, mySecondPoint);
     myPlane = gp_Pln(mySketcherPlane->impl<gp_Ax3>());
 
     AttributeDoublePtr anAttributeValue = myConstraint->data()->real(SketchPlugin_Constraint::VALUE());
@@ -97,12 +96,11 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
   if (!aReadyToDisplay)
     SketcherPrs_Tools::sendEmptyPresentationError(myConstraint,
                               "An empty AIS presentation: SketcherPrs_LengthDimension");
-
 }
 
-bool SketcherPrs_LengthDimension::getPoints(ModelAPI_Feature* theConstraint,
-                                            const std::shared_ptr<GeomAPI_Ax3>& thePlane,
-                                            gp_Pnt& thePnt1, gp_Pnt& thePnt2)
+bool SketcherPrs_LengthDimension::readyToDisplay(ModelAPI_Feature* theConstraint,
+                                                 const std::shared_ptr<GeomAPI_Ax3>& thePlane,
+                                                 gp_Pnt& thePnt1, gp_Pnt& thePnt2)
 {
   DataPtr aData = theConstraint->data();
   if (theConstraint->getKind() == SketchPlugin_ConstraintLength::ID()) {

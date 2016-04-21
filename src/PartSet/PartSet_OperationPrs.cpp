@@ -82,10 +82,12 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)> aShapeToPrsMap;
   fillShapeList(myFeatureShapes, aShapeToPrsMap);
 
-  if (!aShapeToPrsMap.IsEmpty()) {
+  bool aReadyToDisplay = !myShapeToPrsMap.IsEmpty();
+  if (aReadyToDisplay) {
     myShapeToPrsMap.Clear();
     myShapeToPrsMap.Assign(aShapeToPrsMap);
   }
+
   XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(myWorkshop)->displayer();
   Handle(Prs3d_Drawer) aDrawer = Attributes();
   // create presentations on the base of the shapes
@@ -110,9 +112,8 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
     StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
   }
 
-  if (myShapeToPrsMap.IsEmpty()) {
+  if (!aReadyToDisplay) {
     Events_Error::throwException("An empty AIS presentation: PartSet_OperationPrs");
-
     //std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
     //            new Events_Message(Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION)));
     //Events_Loop::loop()->send(aMsg);

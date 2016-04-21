@@ -42,17 +42,26 @@ SketcherPrs_Coincident::SketcherPrs_Coincident(ModelAPI_Feature* theConstraint,
 }  
 
 bool SketcherPrs_Coincident::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
-                                              const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
+                                              const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+{
+  gp_Pnt aPoint;
+  return readyToDisplay(theConstraint, thePlane, aPoint);
+}
+
+bool SketcherPrs_Coincident::readyToDisplay(ModelAPI_Feature* theConstraint,
+                                            const std::shared_ptr<GeomAPI_Ax3>& thePlane,
+                                            gp_Pnt& thePoint)
 {
   bool aReadyToDisplay = false;
-
   // Get point of the presentation
   std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(theConstraint,
                                                               SketchPlugin_Constraint::ENTITY_A());
-  if (aPnt.get() == NULL)
+  if (aPnt.get() == NULL) {
     aPnt = SketcherPrs_Tools::getPoint(theConstraint, SketchPlugin_Constraint::ENTITY_B());
-  
-  aReadyToDisplay = aPnt.get() != NULL;
+    aReadyToDisplay = aPnt.get() != NULL;
+    if (aReadyToDisplay)
+      thePoint = aPnt->impl<gp_Pnt>();
+  }
   return aReadyToDisplay;
 }
 
@@ -61,15 +70,10 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
-  bool aReadyToDisplay = IsReadyToDisplay(myConstraint, mySketcherPlane);
-  if (aReadyToDisplay) {
-    std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(myConstraint, 
-                                                                      SketchPlugin_Constraint::ENTITY_A());
-    if (aPnt.get() == NULL)
-      aPnt = SketcherPrs_Tools::getPoint(myConstraint, SketchPlugin_Constraint::ENTITY_B());
-    std::shared_ptr<GeomAPI_Pnt> aPoint = mySketcherPlane->to3D(aPnt->x(), aPnt->y());
-    myPoint = aPoint->impl<gp_Pnt>();
-  }
+  gp_Pnt aPoint;
+  bool aReadyToDisplay = readyToDisplay(myConstraint, mySketcherPlane, aPoint);
+  if (aReadyToDisplay)
+    myPoint = aPoint;
 
   // Get point of the presentation
   static Handle(Graphic3d_AspectMarker3d) aPtA;

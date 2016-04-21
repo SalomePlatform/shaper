@@ -84,20 +84,20 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
   NCollection_List<TopoDS_Shape> aFaceList;
   fillShapes(aResultShape, anAuxiliaryCompound, mySketchFaceList);
 
-  bool isEmptyPresentation = aResultShape.IsNull() && anAuxiliaryCompound.IsNull();
+  bool aReadyToDisplay = !aResultShape.IsNull() || !anAuxiliaryCompound.IsNull();
 
-  if (!aResultShape.IsNull()) {
-    myOriginalShape = aResultShape;
-    if (!myOriginalShape.IsNull())
-      Set(myOriginalShape);
-  }
-
-  if (!anAuxiliaryCompound.IsNull())
+  if (aReadyToDisplay) {
+    if (!aResultShape.IsNull()) {
+      myOriginalShape = aResultShape;
+      if (!myOriginalShape.IsNull())
+        Set(myOriginalShape);
+    }
     myAuxiliaryCompound = anAuxiliaryCompound;
+  }
 
   setAuxiliaryPresentationStyle(false);
 
-    // change deviation coefficient to provide more precise circle
+  // change deviation coefficient to provide more precise circle
   ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), Attributes());
   AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
 
@@ -108,7 +108,7 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
     StdPrs_WFDeflectionShape::Add(thePresentation, myAuxiliaryCompound, aDrawer);
   }
 
-  if (isEmptyPresentation) {
+  if (!aReadyToDisplay) {
     Events_Error::throwException("An empty AIS presentation: PartSet_ResultSketchPrs");
     static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
     ModelAPI_EventCreator::get()->sendUpdated(myResult, anEvent);
