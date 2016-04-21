@@ -232,8 +232,12 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       ObjectPtr aObject = (*aIt);
       if (aObject->data()->isValid()) {
         QModelIndex aIndex = objectIndex(aObject);
-        if (aIndex.isValid())
+        if (aIndex.isValid()) {
           emit dataChanged(aIndex, aIndex);
+        } else {
+          rebuildDataTree();
+          break;
+        }
       } else {
         rebuildDataTree();
         break;
