@@ -56,7 +56,7 @@ bool SketcherPrs_Coincident::readyToDisplay(ModelAPI_Feature* theConstraint,
   // Get point of the presentation
   std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(theConstraint,
                                                               SketchPlugin_Constraint::ENTITY_A());
-  if (aPnt.get() == NULL) {
+  if (aPnt.get()) {
     aPnt = SketcherPrs_Tools::getPoint(theConstraint, SketchPlugin_Constraint::ENTITY_B());
     aReadyToDisplay = aPnt.get() != NULL;
     if (aReadyToDisplay)
