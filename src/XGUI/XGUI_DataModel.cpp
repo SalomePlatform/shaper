@@ -234,10 +234,10 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         QModelIndex aIndex = objectIndex(aObject);
         if (aIndex.isValid()) {
           emit dataChanged(aIndex, aIndex);
-        } else {
+        }/* else {
           rebuildDataTree();
           break;
-        }
+        }*/
       } else {
         rebuildDataTree();
         break;
