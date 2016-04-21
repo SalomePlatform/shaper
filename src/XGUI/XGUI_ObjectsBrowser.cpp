@@ -455,7 +455,7 @@ QModelIndexList XGUI_ObjectsBrowser::expandedItems(const QModelIndex& theParent)
 {
   QModelIndexList aIndexes;
   QModelIndex aIndex;
-  for (int i = 0; i < myDocModel->rowCount(); i++) {
+  for (int i = 0; i < myDocModel->rowCount(theParent); i++) {
     aIndex = myDocModel->index(i, 0, theParent);
     if (myDocModel->hasChildren(aIndex)) {
       if (myTreeView->isExpanded(aIndex)) {
