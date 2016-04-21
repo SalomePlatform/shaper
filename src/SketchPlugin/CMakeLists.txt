@@ -109,7 +109,7 @@ INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Sketc
 
 ADD_UNIT_TESTS(TestSketchPointLine.py
                TestSketchArcCircle.py
-               TestConstraintConcidence.py
+               TestConstraintCoincidence.py
                # TestConstraintCollinear.py
                TestConstraintLength.py
                TestConstraintDistance.py
