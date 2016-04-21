@@ -68,6 +68,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
   /// \param theAttributeId an outpup parameter with  attribute
   void getGreedAttribute(std::string& theAttributeId);
 
+  /// Returns widget API from XML
+  const Config_WidgetAPI* widgetAPI() const { return myWidgetApi; }
+
 protected:
   /// check if ModuleBase_Widget has expandable widgets in getControls
   bool hasExpandingControls(QWidget* theParent);

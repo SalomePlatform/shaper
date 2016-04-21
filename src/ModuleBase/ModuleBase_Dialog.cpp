@@ -11,6 +11,9 @@
 #include <ModelAPI_Events.h>
 #include <Events_Loop.h>
 
+#include <Config_WidgetAPI.h>
+#include <Config_Keywords.h>
+
 #include <QMainWindow>
 #include <QLayout>
 #include <QDialogButtonBox>
@@ -26,6 +29,9 @@ ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QStr
                                      myActiveWidget(0)
 {
   ModuleBase_WidgetFactory aFactory(myDescription, myWorkshop);
+  std::string aTitle = aFactory.widgetAPI()->getProperty(FEATURE_TEXT);
+
+  setWindowTitle(aTitle.c_str());
 
   SessionPtr aMgr = ModelAPI_Session::get();
   std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
