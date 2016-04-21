@@ -13,7 +13,9 @@
 #include <AIS_LengthDimension.hxx>
 #include <Standard_DefineHandle.hxx>
 
-#include <SketcherPrs_Tools.h>
+#include <gp_Pnt.hxx>
+#include <gp_Pln.hxx>
+#include <string>
 
 class SketcherPrs_DimensionStyleListener;
 
@@ -58,16 +60,26 @@ private:
                  const std::shared_ptr<GeomAPI_Ax3>& thePlane,
                  gp_Pnt& thePnt1, gp_Pnt& thePnt2);
 
+  /// Update variable aspect parameters (depending on viewer scale)
+  void updateArrows();
+
   /// Constraint feature
   ModelAPI_Feature* myConstraint;
 
   /// Plane of the current sketcher
-  std::shared_ptr<GeomAPI_Ax3> myPlane;
+  std::shared_ptr<GeomAPI_Ax3> mySketcherPlane;
 
-  Handle(Prs3d_DimensionAspect) myAspect;
+  //Handle(Prs3d_DimensionAspect) myAspect;
 
   /// Listener to update dimension visualization style
   SketcherPrs_DimensionStyleListener* myStyleListener;
+
+  double myDistance; ///< the flyout distance
+  gp_Pnt myFirstPoint; ///< the dimension first point for measured geometry
+  gp_Pnt mySecondPoint; ///< the dimension first point for measured geometry
+  gp_Pln myPlane; ///< the plane(plane of the sketch) for measured geometry
+  bool myHasParameters; ///< true if the atrribute value has used parameters
+  std::string myValue; ///< dimension value
 };
 
 #endif

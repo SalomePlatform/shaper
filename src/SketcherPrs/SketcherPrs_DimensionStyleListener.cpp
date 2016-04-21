@@ -39,15 +39,25 @@ void SketcherPrs_DimensionStyleListener::updateDimensions(AIS_Dimension* theDime
 {
   if (!theDimension || !theAttributeValue.get())
     return;
+  updateDimensions(theDimension, theAttributeValue->usedParameters().size() > 0,
+                   theAttributeValue->text());
+}
 
-  bool aHasParameters = theAttributeValue->usedParameters().size() > 0;
-  if (aHasParameters) {
+void SketcherPrs_DimensionStyleListener::updateDimensions(AIS_Dimension* theDimension,
+                                                          const bool theHasParameters,
+                                                          const std::string& theValue)
+{
+  if (!theDimension)
+    return;
+
+  if (theHasParameters) {
     bool isParameterValueStyle = myStyle == SketcherPrs_ParameterStyleMessage::ParameterValue;
     SketcherPrs_Tools::setDisplaySpecialSymbol(theDimension, isParameterValueStyle);
-    SketcherPrs_Tools::setDisplayParameter(theDimension, theAttributeValue->text(), !isParameterValueStyle);
+    SketcherPrs_Tools::setDisplayParameter(theDimension, theValue, !isParameterValueStyle);
   }
   else {
     SketcherPrs_Tools::setDisplaySpecialSymbol(theDimension, false);
-    SketcherPrs_Tools::setDisplayParameter(theDimension, theAttributeValue->text(), false);
+    SketcherPrs_Tools::setDisplayParameter(theDimension, theValue, false);
   }
 }
+

@@ -15,6 +15,8 @@
 
 #include <Standard.hxx>
 
+#include <string>
+
 /**
 * \ingroup GUI
 * A class for representation of linear dimension constraint.
@@ -38,6 +40,14 @@ public:
   /// Redefinition of virtual function
   Standard_EXPORT void updateDimensions(AIS_Dimension* theDimension,
                                         const AttributeDoublePtr& theAttributeValue);
+
+  /// Visualizes the dimension text or dimension value depending on the has parameters state
+  /// \param theDimension a modified dimension
+  /// \param theHasParameters if true, the text is shown, else digit
+  /// \param theValue a dimension value
+  Standard_EXPORT void updateDimensions(AIS_Dimension* theDimension,
+                                        const bool theHasParameters,
+                                        const std::string& theValue);
 
 private:
   /// Style how the parameter of dimension should be visualized
