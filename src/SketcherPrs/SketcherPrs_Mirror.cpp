@@ -57,7 +57,7 @@ bool SketcherPrs_Mirror::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_Mirror::updatePoints(double theStep) const
+bool SketcherPrs_Mirror::updateIfReadyToDisplay(double theStep) const
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;

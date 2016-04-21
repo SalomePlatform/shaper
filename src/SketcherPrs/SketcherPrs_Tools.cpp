@@ -42,23 +42,37 @@ namespace SketcherPrs_Tools {
 
 AttributePtr getAttribute(ModelAPI_Feature* theFeature, const std::string& theAttrName)
 {
-  std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = aData->refattr(theAttrName);
-  return !anAttr->isObject() ? anAttr->attr() : AttributePtr();
+  AttributePtr anAttribute;
+  if (theFeature) {
+    std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+    if (aData.get() && aData->isValid()) { /// essential check as it is called in openGl thread
+      std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = aData->refattr(theAttrName);
+      if (!anAttr->isObject())
+        anAttribute = anAttr->attr();
+    }
+  }
+  return anAttribute;
 }
 
 ObjectPtr getResult(ModelAPI_Feature* theFeature, const std::string& theAttrName)
 {
-  std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = aData->refattr(theAttrName);
-  return anAttr->object();
+  ObjectPtr anObject;
+  if (theFeature) {
+    std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+    if (aData.get() && aData->isValid()) { /// essential check as it is called in openGl thread
+      std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = aData->refattr(theAttrName);
+      if (anAttr.get())
+        anObject = anAttr->object();
+    }
+  }
+  return anObject;
 }
 
 
 std::shared_ptr<GeomAPI_Shape> getShape(ObjectPtr theObject)
 {
   ResultConstructionPtr aRes = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theObject);
-  if (aRes.get() != NULL) {
+  if (aRes.get() != NULL && aRes->data()->isValid()) {/// essential check as it is called in openGl thread
     return aRes->shape();
   }
   return std::shared_ptr<GeomAPI_Shape>();
@@ -70,7 +84,8 @@ std::shared_ptr<GeomAPI_Pnt2d> getPoint(ModelAPI_Feature* theFeature,
 {
   std::shared_ptr<GeomDataAPI_Point2D> aPointAttr;
 
-  if (!theFeature->data())
+  /// essential check as it is called in openGl thread
+  if (!theFeature || !theFeature->data().get() || !theFeature->data()->isValid())
     return std::shared_ptr<GeomAPI_Pnt2d>();
 
   FeaturePtr aFeature;
@@ -144,7 +159,7 @@ std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
 {
   std::shared_ptr<GeomDataAPI_Point2D> aPointAttr;
 
-  if (!theData)
+  if (!theData.get() || !theData->isValid()) /// essential check as it is called in openGl thread
     return aPointAttr;
 
   FeaturePtr aFeature;
@@ -184,7 +199,7 @@ FeaturePtr getFeatureLine(DataPtr theData,
                           const std::string& theAttribute)
 {
   FeaturePtr aLine;
-  if (!theData)
+  if (!theData.get() || !theData->isValid()) /// essential check as it is called in openGl thread)
     return aLine;
 
   std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
@@ -203,6 +218,9 @@ std::shared_ptr<GeomAPI_Pnt2d> getProjectionPoint(const FeaturePtr theLine,
                                                   const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {
   DataPtr aData = theLine->data();
+  if (!aData.get() || !aData->isValid())
+    return std::shared_ptr<GeomAPI_Pnt2d>();
+
   std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(SketchPlugin_Line::START_ID()));
   std::shared_ptr<GeomDataAPI_Point2D> aPoint2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(

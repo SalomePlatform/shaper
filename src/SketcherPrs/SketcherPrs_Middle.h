@@ -41,7 +41,7 @@ protected:
 
   /// Update myPntArray according to presentation positions
   /// \return true in case of success
-  virtual bool updatePoints(double theStep) const;
+  virtual bool updateIfReadyToDisplay(double theStep) const;
 
   /// Draw shape of the object. Find shape result if the object is feature
   void drawLine(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor,

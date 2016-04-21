@@ -44,7 +44,7 @@ bool SketcherPrs_Collinear::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_Collinear::updatePoints(double theStep) const
+bool SketcherPrs_Collinear::updateIfReadyToDisplay(double theStep) const
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;

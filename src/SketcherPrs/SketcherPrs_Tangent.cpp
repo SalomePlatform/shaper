@@ -47,7 +47,7 @@ bool SketcherPrs_Tangent::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_Tangent::updatePoints(double theStep) const
+bool SketcherPrs_Tangent::updateIfReadyToDisplay(double theStep) const
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;

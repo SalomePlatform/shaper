@@ -41,7 +41,7 @@ protected:
 
   /// Update myPntArray according to presentation positions
   /// \return true in case of success
-  virtual bool updatePoints(double theStep) const;
+  virtual bool updateIfReadyToDisplay(double theStep) const;
 };
 
 #endif

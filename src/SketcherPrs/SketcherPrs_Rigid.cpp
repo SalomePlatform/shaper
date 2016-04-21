@@ -68,7 +68,7 @@ bool SketcherPrs_Rigid::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_Rigid::updatePoints(double theStep) const 
+bool SketcherPrs_Rigid::updateIfReadyToDisplay(double theStep) const 
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;

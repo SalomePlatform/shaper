@@ -40,7 +40,7 @@ bool SketcherPrs_HVDirection::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_HVDirection::updatePoints(double theStep) const 
+bool SketcherPrs_HVDirection::updateIfReadyToDisplay(double theStep) const 
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;

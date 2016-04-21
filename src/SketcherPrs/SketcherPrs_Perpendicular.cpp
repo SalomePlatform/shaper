@@ -43,7 +43,7 @@ bool SketcherPrs_Perpendicular::IsReadyToDisplay(ModelAPI_Feature* theConstraint
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_Perpendicular::updatePoints(double theStep) const
+bool SketcherPrs_Perpendicular::updateIfReadyToDisplay(double theStep) const
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;

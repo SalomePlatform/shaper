@@ -362,10 +362,10 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
   }
 
   // Update points with default shift value
-  if (!updatePoints(20)) {
-    Events_Error::throwException("An empty AIS presentation: SketcherPrs_SymbolPrs");
-    return;
-  }
+  // it updates array of points if the presentation is ready to display, or the array of points
+  // contains the previous values
+  
+  bool aReadyToDisplay = updateIfReadyToDisplay(20);
 
   int aNbVertex = myPntArray->VertexNumber();
   if (myOwner.IsNull()) {
@@ -397,6 +397,10 @@ void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& 
   // Disable frustum culling for this object by marking it as mutable
   aGroup->Structure()->SetMutable(true);
   //aGroup->AddPrimitiveArray(myPntArray);
+
+  if (!aReadyToDisplay)
+    SketcherPrs_Tools::sendEmptyPresentationError(myConstraint,
+                          "An empty AIS presentation: SketcherPrs_LengthDimension");
 }
 
 
@@ -448,8 +452,8 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
   // ShaperModification:start
   double aScale = aView->Camera()->Scale();
   // Update points coordinate taking the viewer scale into account
-  if (!updatePoints(MyDist * aScale))
-    return;
+  updateIfReadyToDisplay(MyDist * aScale);
+
   // ShaperModification:end
 
   Handle(Graphic3d_Buffer) aAttribs = myPntArray->Attributes();

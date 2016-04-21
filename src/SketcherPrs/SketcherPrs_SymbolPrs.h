@@ -116,7 +116,7 @@ protected:
 
   /// Update myPntArray according to presentation positions
   /// \return true in case of success
-  virtual bool updatePoints(double theStep) const { return true; }
+  virtual bool updateIfReadyToDisplay(double theStep) const { return true; }
 
   /// Draw a shape into the given presentation scene
   /// \param theShape the shape to draw

@@ -69,7 +69,7 @@ bool SketcherPrs_Transformation::IsReadyToDisplay(ModelAPI_Feature* theConstrain
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_Transformation::updatePoints(double theStep) const 
+bool SketcherPrs_Transformation::updateIfReadyToDisplay(double theStep) const 
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
