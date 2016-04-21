@@ -15,6 +15,9 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_Events.h>
+
+#include <Events_Error.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAPI_Lin2d.h>
@@ -22,6 +25,8 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Vertex.hxx>
+
+#include <Prs3d_DimensionAspect.hxx>
 
 #include <BRep_Tool.hxx>
 #include <Precision.hxx>
@@ -319,4 +324,43 @@ void sendExpressionShownEvent(const bool& theState)
   Events_Loop::loop()->flush(anId);
 }
 
+Handle(Prs3d_DimensionAspect) createDimensionAspect()
+{
+  Handle(Prs3d_DimensionAspect) anAspect = new Prs3d_DimensionAspect();
+  anAspect->MakeArrows3d(false);
+  anAspect->MakeText3d(false);
+  anAspect->MakeTextShaded(false);
+  anAspect->MakeUnitsDisplayed(false);
+  anAspect->TextAspect()->SetHeight(SketcherPrs_Tools::getDefaultTextHeight());
+  anAspect->ArrowAspect()->SetLength(SketcherPrs_Tools::getArrowSize());
+
+  return anAspect;
+}
+
+void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect, double theDimValue, double theTextSize)
+{
+  double anArrowLength = theDimAspect->ArrowAspect()->Length();
+   // This is not realy correct way to get viewer scale.
+  double aViewerScale = (double) SketcherPrs_Tools::getDefaultArrowSize() / anArrowLength;
+
+  if(theTextSize > ((theDimValue - 3 * SketcherPrs_Tools::getArrowSize()) * aViewerScale)) {
+    theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Left);
+    theDimAspect->SetArrowOrientation(Prs3d_DAO_External);
+    theDimAspect->SetExtensionSize(theTextSize / aViewerScale - SketcherPrs_Tools::getArrowSize() / 2.0);
+  } else {
+    theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Center);
+    theDimAspect->SetArrowOrientation(Prs3d_DAO_Internal);
+  }
+  theDimAspect->SetArrowTailSize(theDimAspect->ArrowAspect()->Length());
+  // The value of vertical aligment is sometimes changed
+  theDimAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
+}
+
+void sendEmptyPresentationError(ModelAPI_Feature* theFeature, const std::string theError)
+{
+  Events_Error::throwException("An empty AIS presentation: SketcherPrs_LengthDimension");
+  static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
+  std::shared_ptr<ModelAPI_Object> aConstraintPtr(theFeature);
+  ModelAPI_EventCreator::get()->sendUpdated(aConstraintPtr, anEvent);
+}
 };

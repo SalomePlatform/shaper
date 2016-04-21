@@ -56,12 +56,18 @@ private:
   ModelAPI_Feature* myConstraint;
 
   /// Plane of the current sketcher
-  std::shared_ptr<GeomAPI_Ax3> myPlane;
-
-  Handle(Prs3d_DimensionAspect) myAspect;
+  std::shared_ptr<GeomAPI_Ax3> mySketcherPlane;
 
   /// Listener to update dimension visualization style
   SketcherPrs_DimensionStyleListener* myStyleListener;
+
+  /// container of values obtained from the constraint, which are necessary to fill the presentation
+  double myRadius; ///< the radius custom value
+  gp_Circ myCircle; ///< the radius circle
+  gp_Pnt myAncorPnt; ///< an ancor for the radius value visualization
+
+  bool myHasParameters; ///< true if the atrribute value has used parameters
+  std::string myValue; ///< dimension value
 };
 
 #endif

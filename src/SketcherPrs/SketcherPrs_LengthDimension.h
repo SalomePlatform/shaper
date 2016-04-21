@@ -60,9 +60,6 @@ private:
                  const std::shared_ptr<GeomAPI_Ax3>& thePlane,
                  gp_Pnt& thePnt1, gp_Pnt& thePnt2);
 
-  /// Update variable aspect parameters (depending on viewer scale)
-  void updateArrows();
-
   /// Constraint feature
   ModelAPI_Feature* myConstraint;
 
@@ -74,6 +71,7 @@ private:
   /// Listener to update dimension visualization style
   SketcherPrs_DimensionStyleListener* myStyleListener;
 
+  /// container of values obtained from the constraint, which are necessary to fill the presentation
   double myDistance; ///< the flyout distance
   gp_Pnt myFirstPoint; ///< the dimension first point for measured geometry
   gp_Pnt mySecondPoint; ///< the dimension first point for measured geometry

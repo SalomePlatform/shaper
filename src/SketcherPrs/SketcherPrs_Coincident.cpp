@@ -8,6 +8,8 @@
 #include "SketcherPrs_Tools.h"
 
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_Events.h>
+
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
@@ -34,7 +36,7 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Coincident, AIS_InteractiveObject);
 
 SketcherPrs_Coincident::SketcherPrs_Coincident(ModelAPI_Feature* theConstraint, 
                                                const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
- : AIS_InteractiveObject(), myConstraint(theConstraint), myPlane(thePlane)
+ : AIS_InteractiveObject(), myConstraint(theConstraint), mySketcherPlane(thePlane)
 {
   
 }  
@@ -59,19 +61,17 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
-  if (!IsReadyToDisplay(myConstraint, myPlane)) {
-    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Coincident");
-    return;
+  bool aReadyToDisplay = IsReadyToDisplay(myConstraint, mySketcherPlane);
+  if (aReadyToDisplay) {
+    std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(myConstraint, 
+                                                                      SketchPlugin_Constraint::ENTITY_A());
+    if (aPnt.get() == NULL)
+      aPnt = SketcherPrs_Tools::getPoint(myConstraint, SketchPlugin_Constraint::ENTITY_B());
+    std::shared_ptr<GeomAPI_Pnt> aPoint = mySketcherPlane->to3D(aPnt->x(), aPnt->y());
+    myPoint = aPoint->impl<gp_Pnt>();
   }
 
   // Get point of the presentation
-  std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(myConstraint, 
-                                                                    SketchPlugin_Constraint::ENTITY_A());
-  if (aPnt.get() == NULL)
-    aPnt = SketcherPrs_Tools::getPoint(myConstraint, SketchPlugin_Constraint::ENTITY_B());
-  std::shared_ptr<GeomAPI_Pnt> aPoint = myPlane->to3D(aPnt->x(), aPnt->y());
-  myPoint = aPoint->impl<gp_Pnt>();
-
   static Handle(Graphic3d_AspectMarker3d) aPtA;
   if (aPtA.IsNull()) {
     aPtA = new Graphic3d_AspectMarker3d ();
@@ -86,7 +86,7 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
   aGroup->SetPrimitivesAspect(aPtA);
   Handle(Graphic3d_ArrayOfPoints) aPntArray = new Graphic3d_ArrayOfPoints(1);
-  aPntArray->AddVertex (aPoint->x(), aPoint->y(), aPoint->z());
+  aPntArray->AddVertex (myPoint.X(), myPoint.Y(), myPoint.Z());
   aGroup->AddPrimitiveArray (aPntArray);
 
   // Make a black mid ring
@@ -101,6 +101,10 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
   aPtA->SetScale(5.);
   aGroup->SetPrimitivesAspect(aPtA);
   aGroup->AddPrimitiveArray (aPntArray);
+
+  if (!aReadyToDisplay)
+    SketcherPrs_Tools::sendEmptyPresentationError(myConstraint,
+                              "An empty AIS presentation: SketcherPrs_Coincident");
 }
 
 

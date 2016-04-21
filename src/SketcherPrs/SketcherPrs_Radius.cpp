@@ -30,18 +30,9 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Radius, AIS_RadiusDimension);
 
 SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint, 
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane)
-: AIS_RadiusDimension(MyDefCirc), myConstraint(theConstraint), myPlane(thePlane)
+: AIS_RadiusDimension(MyDefCirc), myConstraint(theConstraint), mySketcherPlane(thePlane)
 {
-  // Set default values of the presentation
-  myAspect = new Prs3d_DimensionAspect();
-  myAspect->MakeArrows3d(false);
-  myAspect->MakeText3d(false);
-  myAspect->MakeTextShaded(false);
-  myAspect->MakeUnitsDisplayed(false);
-  myAspect->TextAspect()->SetHeight(SketcherPrs_Tools::getDefaultTextHeight());
-  myAspect->ArrowAspect()->SetLength(SketcherPrs_Tools::getArrowSize());
-  
-  SetDimensionAspect(myAspect);
+  SetDimensionAspect(SketcherPrs_Tools::createDimensionAspect());
   SetSelToleranceForText2d(SketcherPrs_Tools::getDefaultTextHeight());
 
   myStyleListener = new SketcherPrs_DimensionStyleListener();
@@ -116,81 +107,69 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
                                  const Handle(Prs3d_Presentation)& thePresentation, 
                                  const Standard_Integer theMode)
 {
-  if (!IsReadyToDisplay(myConstraint, myPlane)) {
-    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Radius");
-    return;
-  }
+  bool aReadyToDisplay = IsReadyToDisplay(myConstraint, mySketcherPlane);
+  if (aReadyToDisplay) {
+    //myDistance = SketcherPrs_Tools::getFlyoutDistance(myConstraint);
 
-  DataPtr aData = myConstraint->data();
+    DataPtr aData = myConstraint->data();
 
-  // Flyout point
-  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
-    std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-    (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-
-  // Get circle
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
-    (aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
-
-  std::shared_ptr<ModelAPI_Feature> aCyrcFeature = ModelAPI_Feature::feature(anAttr->object());
-  double aRadius = 1;
-  std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr;
-  if (aCyrcFeature->getKind() == SketchPlugin_Circle::ID()) { // circle
-    aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aCyrcFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
-    AttributeDoublePtr aCircRadius = 
-      std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      aCyrcFeature->data()->attribute(SketchPlugin_Circle::RADIUS_ID()));
-    aRadius = aCircRadius->value();
-  } else { // arc
-    aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aCyrcFeature->data()->attribute(SketchPlugin_Arc::CENTER_ID()));
-    std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
+    // Flyout point
+    std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-      (aCyrcFeature->data()->attribute(SketchPlugin_Arc::START_ID()));
-    aRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
+      (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+
+    // Get circle
+    std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
+      (aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
+
+    std::shared_ptr<ModelAPI_Feature> aCyrcFeature = ModelAPI_Feature::feature(anAttr->object());
+    myRadius = 1;
+    std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr;
+    if (aCyrcFeature->getKind() == SketchPlugin_Circle::ID()) { // circle
+      aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aCyrcFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
+      AttributeDoublePtr aCircRadius = 
+        std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+        aCyrcFeature->data()->attribute(SketchPlugin_Circle::RADIUS_ID()));
+      myRadius = aCircRadius->value();
+    } else { // arc
+      aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aCyrcFeature->data()->attribute(SketchPlugin_Arc::CENTER_ID()));
+      std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+        (aCyrcFeature->data()->attribute(SketchPlugin_Arc::START_ID()));
+      myRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
+    }
+    std::shared_ptr<GeomAPI_Pnt> aCenter = mySketcherPlane->to3D(aCenterAttr->x(), aCenterAttr->y());
+    std::shared_ptr<GeomAPI_Dir> aNormal = mySketcherPlane->normal();
+
+    GeomAPI_Circ aCircle(aCenter, aNormal, myRadius);
+    std::shared_ptr<GeomAPI_Pnt> anAnchor = SketcherPrs_Tools::getAnchorPoint(myConstraint, mySketcherPlane);
+
+    myCircle = aCircle.impl<gp_Circ>();
+    myAncorPnt = anAnchor->impl<gp_Pnt>();
+
+    AttributeDoublePtr anAttributeValue = myConstraint->data()->real(SketchPlugin_Constraint::VALUE());
+    myHasParameters = anAttributeValue->usedParameters().size() > 0;
+    myValue = anAttributeValue->text();
   }
-  std::shared_ptr<GeomAPI_Pnt> aCenter = myPlane->to3D(aCenterAttr->x(), aCenterAttr->y());
-  std::shared_ptr<GeomAPI_Dir> aNormal = myPlane->normal();
 
-  GeomAPI_Circ aCircle(aCenter, aNormal, aRadius);
-    
-  std::shared_ptr<GeomAPI_Pnt> anAnchor = SketcherPrs_Tools::getAnchorPoint(myConstraint, myPlane);
-
-  gp_Circ aCirc = aCircle.impl<gp_Circ>();
-  gp_Pnt anAncorPnt = anAnchor->impl<gp_Pnt>();
-
-  SetMeasuredGeometry(aCirc, anAncorPnt);
-  SetCustomValue(aRadius);
+  SetMeasuredGeometry(myCircle, myAncorPnt);
+  SetCustomValue(myRadius);
 
   // Update variable aspect parameters (depending on viewer scale)
-  double anArrowLength = myAspect->ArrowAspect()->Length();
-   // This is not realy correct way to get viewer scale.
-  double aViewerScale = (double) SketcherPrs_Tools::getDefaultArrowSize() / anArrowLength;
-  double aDimensionValue = GetValue();
   double aTextSize = 0.0;
   GetValueString(aTextSize);
+  SketcherPrs_Tools::updateArrows(DimensionAspect(), GetValue(), aTextSize);
 
-  if(aTextSize > ((aDimensionValue - 2 * SketcherPrs_Tools::getArrowSize()) * aViewerScale)) {
-    myAspect->SetTextHorizontalPosition(Prs3d_DTHP_Left);
-    myAspect->SetArrowOrientation(Prs3d_DAO_External);
-    myAspect->SetExtensionSize(aTextSize / aViewerScale - SketcherPrs_Tools::getArrowSize() / 2.0);
-  } else {
-    myAspect->SetTextHorizontalPosition(Prs3d_DTHP_Center);
-    myAspect->SetArrowOrientation(Prs3d_DAO_Internal);
-  }
-  myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
-
-  // The value of vertical aligment is sometimes changed
-  myAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
-
-  AttributeDoublePtr aValue = myConstraint->data()->real(SketchPlugin_Constraint::VALUE());
-  SketcherPrs_Tools::setDisplaySpecialSymbol(this, aValue->usedParameters().size() > 0);
-
-  myStyleListener->updateDimensions(this, aValue);
-
+  myStyleListener->updateDimensions(this, myHasParameters, myValue);
+  
   AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);
+
+  if (!aReadyToDisplay)
+    SketcherPrs_Tools::sendEmptyPresentationError(myConstraint,
+                              "An empty AIS presentation: SketcherPrs_Radius");
 }
 
 void SketcherPrs_Radius::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,

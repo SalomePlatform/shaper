@@ -6,7 +6,6 @@
 
 #include "SketcherPrs_LengthDimension.h"
 #include "SketcherPrs_Tools.h"
-#include "SketcherPrs_Tools.h"
 #include "SketcherPrs_DimensionStyleListener.h"
 
 #include <SketchPlugin_Constraint.h>
@@ -17,7 +16,6 @@
 #include <SketchPlugin_Circle.h>
 
 #include <Events_Error.h>
-#include <Events_Loop.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAPI_Pnt.h>
@@ -26,7 +24,6 @@
 #include <GeomAPI_Lin2d.h>
 
 #include <ModelAPI_Data.h>
-#include <ModelAPI_Events.h>
 #include <ModelAPI_AttributeDouble.h>
 
 #include <AIS_DisplaySpecialSymbol.hxx>
@@ -45,17 +42,8 @@ SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theCo
   myConstraint(theConstraint),
   mySketcherPlane(thePlane)
 {
-  Handle(Prs3d_DimensionAspect) anAspect = new Prs3d_DimensionAspect();
-
-  anAspect->MakeArrows3d(false);
-  anAspect->MakeText3d(false);
-  anAspect->MakeTextShaded(false);
-  anAspect->MakeUnitsDisplayed(false);
-  anAspect->TextAspect()->SetHeight(SketcherPrs_Tools::getDefaultTextHeight());
-  anAspect->ArrowAspect()->SetLength(SketcherPrs_Tools::getArrowSize());
-
+  SetDimensionAspect(SketcherPrs_Tools::createDimensionAspect());
   SetSelToleranceForText2d(SketcherPrs_Tools::getTextHeight());
-  SetDimensionAspect(anAspect);
 
   myStyleListener = new SketcherPrs_DimensionStyleListener();
 }
@@ -77,10 +65,10 @@ bool SketcherPrs_LengthDimension::IsReadyToDisplay(ModelAPI_Feature* theConstrai
 }
 
 void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-                                 const Handle(Prs3d_Presentation)& thePresentation, 
-                                 const Standard_Integer theMode)
+                                          const Handle(Prs3d_Presentation)& thePresentation, 
+                                          const Standard_Integer theMode)
 {
-  bool aReadyToDisplay = SketcherPrs_LengthDimension::IsReadyToDisplay(myConstraint, mySketcherPlane);
+  bool aReadyToDisplay = IsReadyToDisplay(myConstraint, mySketcherPlane);
   if (aReadyToDisplay) {
     myDistance = SketcherPrs_Tools::getFlyoutDistance(myConstraint);
     getPoints(myConstraint, mySketcherPlane, myFirstPoint, mySecondPoint);
@@ -97,18 +85,19 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
   SetMeasuredGeometry(myFirstPoint, mySecondPoint, myPlane);
 
   // Update variable aspect parameters (depending on viewer scale)
-  updateArrows();
+  double aTextSize = 0.0;
+  GetValueString(aTextSize);
+  SketcherPrs_Tools::updateArrows(DimensionAspect(), GetValue(), aTextSize);
 
+  // Update text visualization: parameter value or parameter text
   myStyleListener->updateDimensions(this, myHasParameters, myValue);
 
   AIS_LengthDimension::Compute(thePresentationManager, thePresentation, theMode);
 
-  if (!aReadyToDisplay) {
-    Events_Error::throwException("An empty AIS presentation: SketcherPrs_LengthDimension");
-    static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
-    std::shared_ptr<ModelAPI_Object> aConstraintPtr(myConstraint);
-    ModelAPI_EventCreator::get()->sendUpdated(aConstraintPtr, anEvent);
-  }
+  if (!aReadyToDisplay)
+    SketcherPrs_Tools::sendEmptyPresentationError(myConstraint,
+                              "An empty AIS presentation: SketcherPrs_LengthDimension");
+
 }
 
 bool SketcherPrs_LengthDimension::getPoints(ModelAPI_Feature* theConstraint,
@@ -211,28 +200,4 @@ void SketcherPrs_LengthDimension::ComputeSelection(const Handle(SelectMgr_Select
   }
   SetSelToleranceForText2d(SketcherPrs_Tools::getTextHeight());
   AIS_LengthDimension::ComputeSelection(aSelection, aMode);
-}
-
-void SketcherPrs_LengthDimension::updateArrows()
-{
-  Handle(Prs3d_DimensionAspect) anAspect = DimensionAspect();
-
-  double anArrowLength = anAspect->ArrowAspect()->Length();
-   // This is not realy correct way to get viewer scale.
-  double aViewerScale = (double) SketcherPrs_Tools::getDefaultArrowSize() / anArrowLength;
-  double aDimensionValue = GetValue();
-  double aTextSize = 0.0;
-  GetValueString(aTextSize);
-
-  if(aTextSize > ((aDimensionValue - 3 * SketcherPrs_Tools::getArrowSize()) * aViewerScale)) {
-    anAspect->SetTextHorizontalPosition(Prs3d_DTHP_Left);
-    anAspect->SetArrowOrientation(Prs3d_DAO_External);
-    anAspect->SetExtensionSize(aTextSize / aViewerScale - SketcherPrs_Tools::getArrowSize() / 2.0);
-  } else {
-    anAspect->SetTextHorizontalPosition(Prs3d_DTHP_Center);
-    anAspect->SetArrowOrientation(Prs3d_DAO_Internal);
-  }
-  anAspect->SetArrowTailSize(anAspect->ArrowAspect()->Length());
-  // The value of vertical aligment is sometimes changed
-  anAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
 }

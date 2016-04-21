@@ -57,7 +57,7 @@ protected:
 
 private:
   ModelAPI_Feature* myConstraint;
-  std::shared_ptr<GeomAPI_Ax3> myPlane;
+  std::shared_ptr<GeomAPI_Ax3> mySketcherPlane;
   gp_Pnt myPoint;
 };
 
