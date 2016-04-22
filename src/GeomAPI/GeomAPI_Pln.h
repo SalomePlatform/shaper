@@ -44,6 +44,10 @@ class GeomAPI_Pln : public GeomAPI_Interface
   GEOMAPI_EXPORT 
   std::shared_ptr<GeomAPI_Dir> direction() const;
 
+  /// Returns a plane x direction
+  GEOMAPI_EXPORT 
+  std::shared_ptr<GeomAPI_Dir> xDirection() const;
+
   /// Returns the plane coefficients (Ax+By+Cz+D=0)
   GEOMAPI_EXPORT 
   void coefficients(double& theA, double& theB, double& theC, double& theD);

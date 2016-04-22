@@ -12,6 +12,9 @@
       <feature id="Wire" title="Wire" tooltip ="Create a wire from sketch edges and wires objects" icon="icons/Build/feature_wire.png">
         <source path="wire_widget.xml"/>
       </feature>
+      <feature id="Face" title="Face" tooltip ="Create a face from sketch edges and wires objects" icon="icons/Build/feature_face.png">
+        <source path="face_widget.xml"/>
+      </feature>
     </group>
    </workbench>
 </plugin>

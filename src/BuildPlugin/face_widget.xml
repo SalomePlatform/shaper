@@ -1,0 +1,11 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<source>
+  <multi_selector id="base_objects"
+                  label="Segments and wires:"
+                  tooltip="Select an edges on sketch or wires objects."
+                  type_choice="edges objects">
+    <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="edge,wire"/>
+  </multi_selector>
+  <validator id="BuildPlugin_ValidatorBaseForFace" parameters="base_objects"/>
+</source>

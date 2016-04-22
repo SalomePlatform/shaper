@@ -48,17 +48,20 @@ public:
 /// \class BuildPlugin_ValidatorBaseForFace
 /// \ingroup Validators
 /// \brief A validator for selection base shapes for face. Allows to select sketch edges, edges and
-/// wires objects that lie in the same plane.
-class BuildPlugin_ValidatorBaseForFace: public ModelAPI_AttributeValidator
+/// wires objects that lie in the same plane and don't have intersections.
+class BuildPlugin_ValidatorBaseForFace: public ModelAPI_FeatureValidator
 {
 public:
-  //! Returns true if attribute is ok.
-  //! \param[in] theAttribute the checked attribute.
-  //! \param[in] theArguments arguments of the attribute.
-  //! \param[out] theError error message.
-   virtual bool isValid(const AttributePtr& theAttribute,
-                        const std::list<std::string>& theArguments,
-                        std::string& theError) const;
+  //! Returns true if attributes is ok.
+  //! \param theFeature the checked feature.
+  //! \param theArguments arguments of the feature.
+  //! \param theError error message.
+  virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
+
+  /// \return true if the attribute in feature is not obligatory for the feature execution
+  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
 #endif

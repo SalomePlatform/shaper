@@ -10,8 +10,13 @@
 #include <ModelAPI_ResultConstruction.h>
 
 #include <GeomAPI_PlanarEdges.h>
+#include <GeomAPI_Pln.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_PaveFiller.h>
+#include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_SketchBuilder.h>
 #include <GeomAlgoAPI_WireBuilder.h>
 
 #include <GeomValidators_ShapeType.h>
@@ -100,23 +105,17 @@ bool BuildPlugin_ValidatorBaseForWire::isValid(const std::shared_ptr<ModelAPI_Fe
 {
   // Get attribute.
   if(theArguments.size() != 1) {
-    Events_Error::send("Error: BuildPlugin_ValidatorBaseForWire should be used only with 1 parameter (ID of base objects list)");
+    Events_Error::send("Error: BuildPlugin_ValidatorBaseForWire should be used only with 1 parameter (ID of base objects list).");
     return false;
   }
-  AttributePtr anAttribute = theFeature->attribute(theArguments.front());
+  AttributeSelectionListPtr aSelectionList = theFeature->selectionList(theArguments.front());
+  if(!aSelectionList.get()) {
+    theError = "Empty attribute \"" + theArguments.front() + "\".";
+    return false;
+  }
 
-  // Check base objects list.
-  BuildPlugin_ValidatorBaseForBuild aValidatorBaseForBuild;
-  std::list<std::string> anArguments;
-  anArguments.push_back("edge");
-  anArguments.push_back("wire");
-  if(!aValidatorBaseForBuild.isValid(anAttribute, anArguments, theError)) {
-    return false;
-  }
 
   // Collect base shapes.
-  AttributeSelectionListPtr aSelectionList =
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
   ListOfShape aListOfShapes;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
@@ -138,40 +137,80 @@ bool BuildPlugin_ValidatorBaseForWire::isValid(const std::shared_ptr<ModelAPI_Fe
 }
 
 //=================================================================================================
-bool BuildPlugin_ValidatorBaseForWireisNotObligatory(std::string theFeature, std::string theAttribute)
+bool BuildPlugin_ValidatorBaseForWire::isNotObligatory(std::string theFeature, std::string theAttribute)
 {
   return false;
 }
 
 //=================================================================================================
-bool BuildPlugin_ValidatorBaseForFace::isValid(const AttributePtr& theAttribute,
+bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                const std::list<std::string>& theArguments,
                                                std::string& theError) const
 {
-  // Get base objects list.
-  BuildPlugin_ValidatorBaseForBuild aValidatorBaseForBuild;
-  std::list<std::string> anArguments;
-  anArguments.push_back("edge");
-  anArguments.push_back("wire");
-  if(!aValidatorBaseForBuild.isValid(theAttribute, anArguments, theError)) {
+  // Get attribute.
+  if(theArguments.size() != 1) {
+    Events_Error::send("Error: BuildPlugin_ValidatorBaseForFace should be used only with 1 parameter (ID of base objects list).");
+    return false;
+  }
+  AttributeSelectionListPtr aSelectionList = theFeature->selectionList(theArguments.front());
+  if(!aSelectionList.get()) {
+    theError = "Empty attribute \"" + theArguments.front() + "\".";
     return false;
   }
 
   // Collect base shapes.
-  AttributeSelectionListPtr aSelectionList =
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
-  ListOfShape aListOfShapes;
+  ListOfShape anEdges;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
     GeomShapePtr aShape = aSelection->value();
     if(!aShape.get()) {
       aShape = aSelection->context()->shape();
     }
-    aListOfShapes.push_back(aShape);
+    for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
+      GeomShapePtr anEdge = anExp.current();
+      anEdges.push_back(anEdge);
+    }
+  }
+
+  // Check that edges does not have intersections.
+  if(anEdges.size() > 1) {
+    GeomAlgoAPI_PaveFiller aPaveFiller(anEdges, false);
+    if(!aPaveFiller.isDone()) {
+      theError = "Error while checking if edges intersects.";
+      return false;
+    }
+    GeomShapePtr aSectedEdges = aPaveFiller.shape();
+
+    int anEdgesNum = 0;
+    for(GeomAPI_ShapeExplorer anExp(aSectedEdges, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
+      anEdgesNum++;
+    }
+    if(anEdgesNum != anEdges.size()) {
+      theError = "Selected objects have intersections.";
+      return false;
+    }
   }
 
   // Check that they are planar.
-  GeomShapePtr aCompound = GeomAlgoAPI_CompoundBuilder::compound(aListOfShapes);
+  std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(anEdges);
+  if(!aPln.get()) {
+    theError = "Selected objects are not planar.";
+    return false;
+  }
 
-  return aCompound->isPlanar();
+  // Check that selected objects have closed contours.
+  ListOfShape aFaces;
+  GeomAlgoAPI_SketchBuilder::createFaces(aPln->location(), aPln->xDirection(), aPln->direction(), anEdges, aFaces);
+  if(aFaces.empty()) {
+    theError = "Selected objects does not have closed contours.";
+    return false;
+  }
+
+  return true;
+}
+
+//=================================================================================================
+bool BuildPlugin_ValidatorBaseForFace::isNotObligatory(std::string theFeature, std::string theAttribute)
+{
+  return false;
 }

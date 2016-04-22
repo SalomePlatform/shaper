@@ -43,6 +43,12 @@ std::shared_ptr<GeomAPI_Dir> GeomAPI_Pln::direction() const
   return std::shared_ptr<GeomAPI_Dir>(new GeomAPI_Dir(aDir.X(), aDir.Y(), aDir.Z()));
 }
 
+std::shared_ptr<GeomAPI_Dir> GeomAPI_Pln::xDirection() const
+{
+  const gp_Dir& aDir = impl<gp_Pln>().XAxis().Direction();
+  return std::shared_ptr<GeomAPI_Dir>(new GeomAPI_Dir(aDir.X(), aDir.Y(), aDir.Z()));
+}
+
 void GeomAPI_Pln::coefficients(double& theA, double& theB, double& theC, double& theD)
 {
   impl<gp_Pln>().Coefficients(theA, theB, theC, theD);

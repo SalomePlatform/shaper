@@ -17,6 +17,7 @@ SET(PROJECT_HEADERS
     BuildPlugin_Vertex.h
     BuildPlugin_Edge.h
     BuildPlugin_Wire.h
+    BuildPlugin_Face.h
     BuildPlugin_Validators.h
 )
 
@@ -25,6 +26,7 @@ SET(PROJECT_SOURCES
     BuildPlugin_Vertex.cpp
     BuildPlugin_Edge.cpp
     BuildPlugin_Wire.cpp
+    BuildPlugin_Face.cpp
     BuildPlugin_Validators.cpp
 )
 
@@ -33,6 +35,7 @@ SET(XML_RESOURCES
     vertex_widget.xml
     edge_widget.xml
     wire_widget.xml
+    face_widget.xml
 )
 
 SET(PROJECT_LIBRARIES

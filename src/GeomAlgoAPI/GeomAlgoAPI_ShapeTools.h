@@ -14,6 +14,7 @@
 
 class GeomAPI_Dir;
 class GeomAPI_PlanarEdges;
+class GeomAPI_Pln;
 class GeomAPI_Pnt;
 
 /// \class GeomAlgoAPI_ShapeTools
@@ -65,13 +66,18 @@ public:
                          std::shared_ptr<GeomAPI_Vertex>& theV1,
                          std::shared_ptr<GeomAPI_Vertex>& theV2);
 
-  /// \Creates faces with holes from wires.
+  /// \brief Creates faces with holes from wires.
   /// \param[in] theWires base wires.
   /// \param[out] theFaces resulting faces.
   static void makeFacesWithHoles(const std::shared_ptr<GeomAPI_Pnt> theOrigin,
                                  const std::shared_ptr<GeomAPI_Dir> theDirection,
                                  const ListOfShape& theWires,
                                  ListOfShape& theFaces);
+
+  /// \brief Return a plane for list of shapes if they are all planar.
+  /// \param[in] theShapes shapes to find plane.
+  /// \return plane where all shapes lie or empty ptr if they not planar.
+  static std::shared_ptr<GeomAPI_Pln> findPlane(const ListOfShape& theShapes);
 };
 
 #endif

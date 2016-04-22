@@ -67,7 +67,7 @@ void BuildPlugin_Wire::execute()
   // Create wire.
   GeomShapePtr aWire = GeomAlgoAPI_WireBuilder::wire(aListOfShapes);
   if(!aWire.get()) {
-    setError("Error: Result wire empty. Probably it has disconnected edges or non-manifold.");
+    setError("Error: Result wire is empty. Probably it has disconnected edges or non-manifold.");
     return;
   }
 

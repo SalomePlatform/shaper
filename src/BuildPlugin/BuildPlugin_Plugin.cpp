@@ -12,6 +12,7 @@
 #include <BuildPlugin_Vertex.h>
 #include <BuildPlugin_Edge.h>
 #include <BuildPlugin_Wire.h>
+#include <BuildPlugin_Face.h>
 #include <BuildPlugin_Validators.h>
 
 // the only created instance of this plugin
@@ -27,6 +28,8 @@ BuildPlugin_Plugin::BuildPlugin_Plugin()
                               new BuildPlugin_ValidatorBaseForBuild());
   aFactory->registerValidator("BuildPlugin_ValidatorBaseForWire",
                               new BuildPlugin_ValidatorBaseForWire());
+  aFactory->registerValidator("BuildPlugin_ValidatorBaseForFace",
+                              new BuildPlugin_ValidatorBaseForFace());
 
   // Register this plugin.
   ModelAPI_Session::get()->registerPlugin(this);
@@ -41,6 +44,8 @@ FeaturePtr BuildPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new BuildPlugin_Edge());
   } else if(theFeatureID == BuildPlugin_Wire::ID()) {
     return FeaturePtr(new BuildPlugin_Wire());
+  } else if(theFeatureID == BuildPlugin_Face::ID()) {
+    return FeaturePtr(new BuildPlugin_Face());
   }
 
   // Feature of such kind is not found.

@@ -11,8 +11,16 @@
 #include <BRepBuilderAPI_FindPlane.hxx>
 #include <BRepTools.hxx>
 #include <Bnd_Box.hxx>
+#include <Geom_Circle.hxx>
+#include <Geom_Conic.hxx>
+#include <Geom_Curve.hxx>
+#include <Geom_Ellipse.hxx>
+#include <Geom_Hyperbola.hxx>
+#include <Geom_Line.hxx>
+#include <Geom_Parabola.hxx>
 #include <Geom_Plane.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
+#include <Geom_TrimmedCurve.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS_Shape.hxx>
@@ -95,19 +103,28 @@ bool GeomAPI_Shape::isCompSolid() const
 
 bool GeomAPI_Shape::isPlanar() const
 {
-  const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+  TopoDS_Shape aShape = impl<TopoDS_Shape>();
 
   if(aShape.IsNull()) {
     return false;
   }
 
   TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
+  if(aShapeType == TopAbs_COMPOUND) {
+    TopoDS_Iterator anIt(aShape);
+    int aShNum = 0;
+    for(; anIt.More(); anIt.Next()) {
+      ++aShNum;
+    }
+    if(aShNum == 1) {
+      anIt.Initialize(aShape);
+      aShape = anIt.Value();
+    }
+  }
 
+  aShapeType = aShape.ShapeType();
   if(aShapeType == TopAbs_VERTEX) {
     return true;
-  } else if(aShapeType == TopAbs_EDGE || aShapeType ==  TopAbs_WIRE || aShapeType == TopAbs_SHELL) {
-    BRepBuilderAPI_FindPlane aFindPlane(aShape);
-    return aFindPlane.Found() == Standard_True;
   } else if(aShapeType == TopAbs_FACE) {
     const Handle(Geom_Surface)& aSurface = BRep_Tool::Surface(TopoDS::Face(aShape));
     Handle(Standard_Type) aType = aSurface->DynamicType();
@@ -118,8 +135,33 @@ bool GeomAPI_Shape::isPlanar() const
     }
     return (aType == STANDARD_TYPE(Geom_Plane)) == Standard_True;
   } else {
-    return false;
+    BRepBuilderAPI_FindPlane aFindPlane(aShape);
+    bool isFound = aFindPlane.Found() == Standard_True;
+
+    if(!isFound && aShapeType == TopAbs_EDGE) {
+      Standard_Real aFirst, aLast;
+      Handle(Geom_Curve) aCurve = BRep_Tool::Curve(TopoDS::Edge(aShape), aFirst, aLast);
+      Handle(Standard_Type) aType = aCurve->DynamicType();
+
+      if(aType == STANDARD_TYPE(Geom_TrimmedCurve)) {
+        Handle(Geom_TrimmedCurve) aTrimCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve);
+        aType = aTrimCurve->BasisCurve()->DynamicType();
+      }
+
+      if(aType == STANDARD_TYPE(Geom_Line)
+          || aType == STANDARD_TYPE(Geom_Conic)
+          || aType == STANDARD_TYPE(Geom_Circle)
+          || aType == STANDARD_TYPE(Geom_Ellipse)
+          || aType == STANDARD_TYPE(Geom_Hyperbola)
+          || aType == STANDARD_TYPE(Geom_Parabola)) {
+        isFound = true;
+      }
+    }
+
+    return isFound;
   }
+
+  return false;
 }
 
 GeomAPI_Shape::ShapeType GeomAPI_Shape::shapeType() const

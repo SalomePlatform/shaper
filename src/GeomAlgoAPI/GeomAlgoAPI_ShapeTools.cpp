@@ -10,6 +10,7 @@
 
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_PlanarEdges.h>
+#include <GeomAPI_Pln.h>
 #include <GeomAPI_Pnt.h>
 
 #include <Bnd_Box.hxx>
@@ -17,6 +18,7 @@
 #include <BRep_Builder.hxx>
 #include <BRepAlgo_FaceRestrictor.hxx>
 #include <BRepBndLib.hxx>
+#include <BRepBuilderAPI_FindPlane.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepGProp.hxx>
 #include <BRep_Tool.hxx>
@@ -37,10 +39,6 @@
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS.hxx>
 #include <TopExp_Explorer.hxx>
-
-
-void mapWireFaces(const TopoDS_Shape& theShape,
-                  BOPCol_IndexedDataMapOfShapeListOfShape& theMapWireFaces);
 
 //=================================================================================================
 double GeomAlgoAPI_ShapeTools::volume(const std::shared_ptr<GeomAPI_Shape> theShape)
@@ -371,4 +369,32 @@ void GeomAlgoAPI_ShapeTools::makeFacesWithHoles(const std::shared_ptr<GeomAPI_Pn
     aShape->setImpl(new TopoDS_Shape(aFRestrictor.Current()));
     theFaces.push_back(aShape);
   }
+}
+
+//=================================================================================================
+std::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_ShapeTools::findPlane(const ListOfShape& theShapes)
+{
+  TopoDS_Compound aCompound;
+  BRep_Builder aBuilder;
+  aBuilder.MakeCompound(aCompound);
+
+  for(ListOfShape::const_iterator anIt = theShapes.cbegin(); anIt != theShapes.cend(); ++anIt) {
+    aBuilder.Add(aCompound, (*anIt)->impl<TopoDS_Shape>());
+  }
+  BRepBuilderAPI_FindPlane aFindPlane(aCompound);
+
+  if(aFindPlane.Found() != Standard_True) {
+    return std::shared_ptr<GeomAPI_Pln>();
+  }
+
+  Handle(Geom_Plane) aPlane = aFindPlane.Plane();
+  gp_Pnt aLoc = aPlane->Location();
+  gp_Dir aDir = aPlane->Axis().Direction();
+
+  std::shared_ptr<GeomAPI_Pnt> aGeomPnt(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
+  std::shared_ptr<GeomAPI_Dir> aGeomDir(new GeomAPI_Dir(aDir.X(), aDir.Y(), aDir.Z()));
+
+  std::shared_ptr<GeomAPI_Pln> aPln(new GeomAPI_Pln(aGeomPnt, aGeomDir));
+
+  return aPln;
 }
