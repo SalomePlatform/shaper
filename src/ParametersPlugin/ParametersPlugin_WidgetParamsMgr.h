@@ -88,15 +88,20 @@ private:
   QTreeWidgetItem* selectedItem() const;
 
   /// Select the given Item and scroll the table to make it visible
-  void selectItemScroll(QTreeWidgetItem* aItem);
+  void selectItemScroll(QTreeWidgetItem* theItem);
 
   /// Update values in features part
+  void updateItem(QTreeWidgetItem* theItem, const QList<QStringList>& theFeaturesList);
+
   void updateFeaturesPart();
+
+  void updateParametersPart();
 
   /// Returns true if parameter with the given name already exists
   bool hasName(const QString& theName) const;
 
   QList<QStringList> featuresItems(const QList<FeaturePtr>& theFeatures) const;
+  QList<QStringList> parametersItems(const QList<FeaturePtr>& theFeatures) const;
 
   QTreeWidget* myTable;
   QTreeWidgetItem* myFeatures;

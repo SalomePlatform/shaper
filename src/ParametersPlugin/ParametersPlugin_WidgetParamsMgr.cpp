@@ -223,36 +223,29 @@ void ParametersPlugin_WidgetParamsMgr::activateCustom()
   DocumentPtr aDoc = aFeature->document();
   int aNbParam = aDoc->size(ModelAPI_ResultParameter::group());
   ObjectPtr aObj;
-  QTreeWidgetItem* aItem;
-  ResultParameterPtr aParam;
   FeaturePtr aParamFeature;
   for (int i = 0; i < aNbParam; i++) {
     aObj = aDoc->object(ModelAPI_ResultParameter::group(), i);
-    aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aObj);
-    if (aParam.get()) {
-      // Set parameter feature
-      aParamFeature = ModelAPI_Feature::feature(aParam);
-
-      QStringList aValues;
-      aValues << aParamFeature->string(ParametersPlugin_Parameter::VARIABLE_ID())->value().c_str();
-      aValues << aParamFeature->string(ParametersPlugin_Parameter::EXPRESSION_ID())->value().c_str();
-
-      AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
-      aValues << QString::number(aValueAttribute->value());
-
-      aValues << aParamFeature->string(ParametersPlugin_Parameter::COMMENT_ID())->value().c_str();
-
-      aItem = new QTreeWidgetItem(aValues);
-      aItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
-      myParameters->addChild(aItem);
-
+    aParamFeature = ModelAPI_Feature::feature(aObj);
+    if (aParamFeature.get() && (aParamFeature->getKind() == ParametersPlugin_Parameter::ID())) {
       myParametersList.append(aParamFeature);
     }
   }
+  updateParametersPart();
   updateFeaturesPart();
 
   myFeatures->setExpanded(true);
   myParameters->setExpanded(true);
+}
+
+void ParametersPlugin_WidgetParamsMgr::updateFeaturesPart()
+{
+  updateItem(myFeatures, featuresItems(myParametersList));
+}
+
+void ParametersPlugin_WidgetParamsMgr::updateParametersPart()
+{
+  updateItem(myParameters, parametersItems(myParametersList));
 }
 
 
@@ -294,6 +287,26 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
         }
       }
     }
+  }
+  return aItemsList;
+}
+
+
+QList<QStringList> ParametersPlugin_WidgetParamsMgr::
+  parametersItems(const QList<FeaturePtr>& theFeatures) const
+{
+  QList<QStringList> aItemsList;
+  foreach(FeaturePtr aParameter, theFeatures) {
+    ResultPtr aParam = aParameter->firstResult();
+    QStringList aValues;
+    aValues << aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->value().c_str();
+    aValues << aParameter->string(ParametersPlugin_Parameter::EXPRESSION_ID())->value().c_str();
+
+    AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
+    aValues << QString::number(aValueAttribute->value());
+
+    aValues << aParameter->string(ParametersPlugin_Parameter::COMMENT_ID())->value().c_str();
+    aItemsList.append(aValues);
   }
   return aItemsList;
 }
@@ -369,26 +382,29 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
     aItem->setText(Col_Result, QString::number(aValueAttribute->value()));
   }
   myEditingIndex = QModelIndex();
+
+  if (aColumn == Col_Equation)
+    updateParametersPart();
   updateFeaturesPart();
 }
 
-void ParametersPlugin_WidgetParamsMgr::updateFeaturesPart()
+void ParametersPlugin_WidgetParamsMgr::updateItem(QTreeWidgetItem* theItem, 
+                                                  const QList<QStringList>& theFeaturesList)
 {
-  QList<QStringList> aFeaturesList = featuresItems(myParametersList);
-  if (aFeaturesList.count() != myFeatures->childCount()) {
-    if (myFeatures->childCount()  < aFeaturesList.count()) {
-      while (myFeatures->childCount() != aFeaturesList.count()) 
-        myFeatures->addChild(new QTreeWidgetItem());
+  if (theFeaturesList.count() != theItem->childCount()) {
+    if (theItem->childCount()  < theFeaturesList.count()) {
+      while (theItem->childCount() != theFeaturesList.count()) 
+        theItem->addChild(createNewItem());
     } else {
-      while (myFeatures->childCount() != aFeaturesList.count()) 
-        myFeatures->removeChild(myFeatures->child(myFeatures->childCount() - 1));
+      while (theItem->childCount() != theFeaturesList.count()) 
+        theItem->removeChild(theItem->child(theItem->childCount() - 1));
     }
   }
   int i = 0;
-  foreach(QStringList aFeature, aFeaturesList) {
+  foreach(QStringList aFeature, theFeaturesList) {
     int aCol = 0;
     foreach(QString aText, aFeature) {
-      myFeatures->child(i)->setText(aCol, aText);
+      theItem->child(i)->setText(aCol, aText);
       aCol++;
     }
     i++;
