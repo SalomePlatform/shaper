@@ -269,21 +269,29 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
       std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
       FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
       if (aReferenced.get()) {
-        QStringList aValNames;
-        aValNames << aReferenced->data()->name().c_str();
-
-        AttributeDoublePtr aDouble = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aAttr);
-        if (aDouble.get()) {
-          aValNames << aDouble->text().c_str();
-          aValNames << QString::number(aDouble->value());
+        if (aReferenced->getKind() == ParametersPlugin_Parameter::ID()) {
+          // Find referenced feature Recursive
+          QList<FeaturePtr> aList;
+          aList.append(aReferenced);
+          QList<QStringList> aItems = featuresItems(aList);
+          aItemsList.append(aItems);
         } else {
-          AttributeIntegerPtr aInt = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aAttr);
-          if (aInt.get()) {
-            aValNames << aInt->text().c_str();
-            aValNames << QString::number(aInt->value());
+          QStringList aValNames;
+          aValNames << aReferenced->data()->name().c_str();
+
+          AttributeDoublePtr aDouble = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aAttr);
+          if (aDouble.get()) {
+            aValNames << aDouble->text().c_str();
+            aValNames << QString::number(aDouble->value());
+          } else {
+            AttributeIntegerPtr aInt = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aAttr);
+            if (aInt.get()) {
+              aValNames << aInt->text().c_str();
+              aValNames << QString::number(aInt->value());
+            }
           }
+          aItemsList.append(aValNames);
         }
-        aItemsList.append(aValNames);
       }
     }
   }
