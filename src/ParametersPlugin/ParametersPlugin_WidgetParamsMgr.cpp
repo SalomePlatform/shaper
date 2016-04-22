@@ -79,27 +79,10 @@ void ParametersPlugin_ItemDelegate::paint(QPainter* painter,
   painter->setPen(Qt::darkGray);
   painter->drawRect(option.rect);
   painter->setPen(aPen);
-  
-  //QString aText = index.data().toString();
-  //if ((aText == NoName) || (aText == NoValue))
-  //  painter->setPen(Qt::red);
 
   QStyledItemDelegate::paint(painter, option, index);
-
-  //painter->setPen(aPen);
   painter->setBrush(aBrush);
 }
-
-
-//QWidget* ParametersPlugin_ItemDelegate::createEditor(QWidget* parent, 
-//                                                    const QStyleOptionViewItem& option, 
-//                                                    const QModelIndex& index) const
-//{
-//  QWidget* aWgt = QStyledItemDelegate::createEditor(parent, option, index); 
-//  aWgt->setMinimumSize(option.rect.width() - option.decorationSize.width(), 
-//                       option.rect.height());
-//  return aWgt;
-//}
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -529,6 +512,7 @@ void ParametersPlugin_WidgetParamsMgr::onRemove()
       aDoc->removeFeature(aFeature);
     }
 
+    Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED));
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
     updateFeaturesPart();
   }
