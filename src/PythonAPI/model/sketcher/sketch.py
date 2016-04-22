@@ -364,16 +364,6 @@ class Sketch(Interface):
 
     #-------------------------------------------------------------
     #
-    # Edition of Dimensional Constraints
-    #
-    #-------------------------------------------------------------
-
-    def setText(self, constraint, text):
-        """Modify the value of the given dimensional constraint."""
-        constraint.data().real("ConstraintValue").setText(text)
-
-    #-------------------------------------------------------------
-    #
     # Macro functions combining geometry creation and constraints
     #
     #-------------------------------------------------------------
