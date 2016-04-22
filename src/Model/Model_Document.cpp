@@ -945,6 +945,7 @@ void Model_Document::setCurrentFeature(
     }
   }
 
+  /*
   if (theVisible) { // make features below which are not in history also enabled: sketch subs
     FeaturePtr aNext = 
       theCurrent.get() ? myObjs->nextFeature(theCurrent) : myObjs->firstFeature();
@@ -955,7 +956,7 @@ void Model_Document::setCurrentFeature(
         theCurrent = aNext;
       }
     }
-  }
+  }*/
   if (theCurrent.get()) {
     std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
     if (!aData.get() || !aData->isValid()) {
@@ -1036,6 +1037,12 @@ void Model_Document::setCurrentFeatureUp()
   FeaturePtr aCurrent = currentFeature(false);
   if (aCurrent.get()) { // if not, do nothing because null is the upper
     FeaturePtr aPrev = myObjs->nextFeature(aCurrent, true);
+    // make the higher level composite as current (sketch becomes disabled if line is enabled)
+    if (aPrev.get()) {
+      for(FeaturePtr aComp = ModelAPI_Tools::compositeOwner(aPrev); aComp.get();
+        aComp = ModelAPI_Tools::compositeOwner(aPrev))
+          aPrev = aComp;
+    }
     // do not flush: it is called only on remove, it will be flushed in the end of transaction
     setCurrentFeature(aPrev, false);
   }
