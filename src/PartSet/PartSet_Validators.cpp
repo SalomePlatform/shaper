@@ -216,7 +216,7 @@ bool PartSet_FilletSelection::isValid(const ModuleBase_ISelection* theSelection,
     return isEmptySelectionValid(theOperation);
   } else {
     int aCount = shapesNbPoints(theSelection);
-    return aCount == 1;
+    return aCount > 1;
   }
 }
 
