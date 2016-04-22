@@ -62,20 +62,31 @@ protected:
   /// \return real value
   double calculateDistanceToFlyoutPoint();
 
-  bool getPoints(gp_Pnt& theFirstPoint, gp_Pnt& theSecondPoint, gp_Pnt& theCenterPoint,
-                 double& theAngle) const;
+  static bool readyToDisplay(ModelAPI_Feature* theConstraint,
+                             const std::shared_ptr<GeomAPI_Ax3>& thePlane,
+                             gp_Pnt& theFirstPoint, gp_Pnt& theSecondPoint,
+                             gp_Pnt& theCenterPoint);
 
 private:
   /// Constraint feature
   ModelAPI_Feature* myConstraint;
 
   /// Plane of the current sketcher
-  std::shared_ptr<GeomAPI_Ax3> myPlane;
+  std::shared_ptr<GeomAPI_Ax3> mySketcherPlane;
 
   Handle(Prs3d_DimensionAspect) myAspect;
 
   /// Listener to update dimension visualization style
   SketcherPrs_DimensionStyleListener* myStyleListener;
+
+  /// container of values obtained from the constraint, which are necessary to fill the presentation
+  gp_Pnt myFirstPoint; ///< the dimension first point for measured geometry
+  gp_Pnt mySecondPoint; ///< the dimension second point for measured geometry
+  gp_Pnt myCenterPoint; ///< the dimension center point for measured geometry
+  gp_Pnt myFlyOutPoint;  ///< the dimension fly out point for measured geometry
+  double myAngle; ///< the angle value to be shown as custom value of presentation
+  bool myHasParameters; ///< true if the atrribute value has used parameters
+  std::string myValue; ///< the angle value depending on angle type
 };
 
 

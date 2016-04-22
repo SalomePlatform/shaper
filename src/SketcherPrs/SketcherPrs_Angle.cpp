@@ -34,7 +34,8 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Angle, AIS_AngleDimension);
 
 SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint, 
                                      const std::shared_ptr<GeomAPI_Ax3>& thePlane)
-: AIS_AngleDimension(gp_Pnt(0,0,0), gp_Pnt(1,0,0), gp_Pnt(0,1,0)), myConstraint(theConstraint), myPlane(thePlane)
+: AIS_AngleDimension(gp_Pnt(0,0,0), gp_Pnt(1,0,0), gp_Pnt(0,1,0)), myConstraint(theConstraint),
+  mySketcherPlane(thePlane)
 {
   myAspect = new Prs3d_DimensionAspect();
   myAspect->MakeArrows3d(false);
@@ -56,7 +57,16 @@ SketcherPrs_Angle::~SketcherPrs_Angle()
 }
 
 bool SketcherPrs_Angle::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
-                                         const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
+                                         const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+{
+  gp_Pnt aFirstPoint, aSecondPoint, aCenterPoint;
+  return readyToDisplay(theConstraint, thePlane, aFirstPoint, aSecondPoint, aCenterPoint);
+}
+
+bool SketcherPrs_Angle::readyToDisplay(ModelAPI_Feature* theConstraint,
+                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane,
+                                       gp_Pnt& theFirstPoint, gp_Pnt& theSecondPoint,
+                                       gp_Pnt& theCenterPoint)
 {
   bool aReadyToDisplay = false;
 
@@ -77,26 +87,11 @@ bool SketcherPrs_Angle::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   if (!anAttr2->isInitialized())
     return aReadyToDisplay;
 
-  // Get angle edges
-  ObjectPtr aObj1 = anAttr1->object();
-  ObjectPtr aObj2 = anAttr2->object();
-
-  std::shared_ptr<GeomAPI_Shape> aShape1 = SketcherPrs_Tools::getShape(aObj1);
-  std::shared_ptr<GeomAPI_Shape> aShape2 = SketcherPrs_Tools::getShape(aObj2);
-
-  aReadyToDisplay = aShape1.get() && aShape2.get();
-  return aReadyToDisplay;
-}
-
-bool SketcherPrs_Angle::getPoints(gp_Pnt& theFirstPoint, gp_Pnt& theSecondPoint,
-                                  gp_Pnt& theCenterPoint, double& theAngle) const
-{
-  bool aReadyToDisplay = false;
-
-  std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
-  std::shared_ptr<GeomAPI_Ax3> aPlane = myPlane;
   FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
   FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+
+  if (!aLineA.get() || !aLineB.get())
+    return aReadyToDisplay;
 
   std::shared_ptr<GeomDataAPI_Point2D> aStartA = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aLineA->attribute(SketchPlugin_Line::START_ID()));
@@ -119,61 +114,71 @@ bool SketcherPrs_Angle::getPoints(gp_Pnt& theFirstPoint, gp_Pnt& theSecondPoint,
     bool isReversed2 = aData->boolean(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID())->value();
     anAng = std::shared_ptr<GeomAPI_Angle2d>(new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
   }
-  theAngle = anAng->angleDegree();
 
   gp_Pnt2d aFirstPoint = anAng->firstPoint()->impl<gp_Pnt2d>();
-  std::shared_ptr<GeomAPI_Pnt> aPoint = myPlane->to3D(aFirstPoint.X(), aFirstPoint.Y());
+  std::shared_ptr<GeomAPI_Pnt> aPoint = thePlane->to3D(aFirstPoint.X(), aFirstPoint.Y());
   theFirstPoint = aPoint->impl<gp_Pnt>();
 
   gp_Pnt2d aCenterPoint = anAng->center()->impl<gp_Pnt2d>();
-  aPoint = myPlane->to3D(aCenterPoint.X(), aCenterPoint.Y());
+  aPoint = thePlane->to3D(aCenterPoint.X(), aCenterPoint.Y());
   theCenterPoint = aPoint->impl<gp_Pnt>();
 
   gp_Pnt2d aSecondPoint = anAng->secondPoint()->impl<gp_Pnt2d>();
-  aPoint = myPlane->to3D(aSecondPoint.X(), aSecondPoint.Y());
+  aPoint = thePlane->to3D(aSecondPoint.X(), aSecondPoint.Y());
   theSecondPoint = aPoint->impl<gp_Pnt>();
 
-  return aReadyToDisplay;
+  return true;
 }
+
 
 void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                 const Handle(Prs3d_Presentation)& thePresentation, 
                                 const Standard_Integer theMode)
 {
-  DataPtr aData = myConstraint->data();
+  gp_Pnt aFirstPoint, aSecondPoint, aCenterPoint;
+  bool aReadyToDisplay = readyToDisplay(myConstraint, mySketcherPlane, aFirstPoint, aSecondPoint, aCenterPoint);
+  if (aReadyToDisplay) {
+    myFirstPoint = aFirstPoint;
+    mySecondPoint = aSecondPoint;
+    myCenterPoint = aCenterPoint;
 
-  if (!IsReadyToDisplay(myConstraint, myPlane)) {
-    Events_Error::throwException("An empty AIS presentation: SketcherPrs_Angle");
-    return; // can not create a good presentation
+    DataPtr aData = myConstraint->data();
+    AttributeDoublePtr aVal = aData->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
+    myAngle = aVal->value();
+    myValue = aVal->text();
+
+    std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
+                                std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+                                (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+    std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = mySketcherPlane->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
+    myFlyOutPoint = aFlyoutPnt->impl<gp_Pnt>();
   }
 
+  DataPtr aData = myConstraint->data();
   std::shared_ptr<ModelAPI_AttributeInteger> aTypeAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeInteger>(aData->attribute(SketchPlugin_ConstraintAngle::TYPE_ID()));
   SketcherPrs_Tools::AngleType anAngleType = (SketcherPrs_Tools::AngleType)(aTypeAttr->value());
-
-  gp_Pnt aFirstPoint, aSecondPoint, aCenterPoint;
-  double aValue;
-  getPoints(aFirstPoint, aSecondPoint, aCenterPoint, aValue);
 
   double aDist = -1;
   switch (anAngleType) {
     case SketcherPrs_Tools::ANGLE_DIRECT: {
       SetArrowVisible(Standard_False/*first*/, Standard_True/*second*/);
-      SetMeasuredGeometry(aFirstPoint, aCenterPoint, aSecondPoint);
+      SetMeasuredGeometry(myFirstPoint, myCenterPoint, mySecondPoint);
       bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
       SetAngleReversed(!isReversedPlanes);
     }
     break;
     case SketcherPrs_Tools::ANGLE_COMPLEMENTARY: {
-      double anEdge1Length = aCenterPoint.Distance(aFirstPoint);
-      aFirstPoint = aCenterPoint.Translated (gp_Vec(aCenterPoint, aFirstPoint).Normalized() * (-anEdge1Length));
-      anEdge1Length = aCenterPoint.Distance(aFirstPoint);
-      SetMeasuredGeometry(aFirstPoint, aCenterPoint, aSecondPoint);
+      double anEdge1Length = aCenterPoint.Distance(myFirstPoint);
+      //aDist = calculateDistanceToFlyoutPoint();
+      gp_Pnt aFirstPoint = aCenterPoint.Translated(
+                          gp_Vec(myCenterPoint, myFirstPoint).Normalized() * (-anEdge1Length));
+      SetMeasuredGeometry(aFirstPoint, myCenterPoint, mySecondPoint);
     }
     break;
     case SketcherPrs_Tools::ANGLE_BACKWARD: {
       SetArrowVisible(Standard_False/*first*/, Standard_True/*second*/);
-      SetMeasuredGeometry(aFirstPoint, aCenterPoint, aSecondPoint);
+      SetMeasuredGeometry(myFirstPoint, myCenterPoint, mySecondPoint);
       bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
       SetAngleReversed(isReversedPlanes);
     }
@@ -186,16 +191,19 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   SetFlyout(aDist);
 
   // Angle value is in degrees
-  AttributeDoublePtr aVal = aData->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
-  SetCustomValue(aValue);
+  SetCustomValue(myAngle);
 
   myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
   myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
 
-  SketcherPrs_Tools::setDisplaySpecialSymbol(this, aVal->usedParameters().size() > 0);
-  myStyleListener->updateDimensions(this, aVal);
+  // Update text visualization: parameter value or parameter text
+  myStyleListener->updateDimensions(this, myHasParameters, myValue);
 
   AIS_AngleDimension::Compute(thePresentationManager, thePresentation, theMode);
+
+  if (!aReadyToDisplay)
+    SketcherPrs_Tools::sendEmptyPresentationError(myConstraint,
+                              "An empty AIS presentation: SketcherPrs_Angle");
 }
 
 void SketcherPrs_Angle::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
@@ -227,32 +235,21 @@ void SketcherPrs_Angle::ComputeSelection(const Handle(SelectMgr_Selection)& aSel
 bool SketcherPrs_Angle::isAnglePlaneReversedToSketchPlane()
 {
   bool aReversed = false;
-  if (!myPlane.get())
+  if (!mySketcherPlane.get())
     return aReversed;
 
   gp_Pln aPlane = GetPlane();
   gp_Dir aDir = aPlane.Axis().Direction();
-  double aDot = myPlane->normal()->dot(
+  double aDot = mySketcherPlane->normal()->dot(
                 std::shared_ptr<GeomAPI_Dir>(new GeomAPI_Dir(aDir.X(), aDir.Y(), aDir.Z())));
   return aDot < 0;
 }
 
 double SketcherPrs_Angle::calculateDistanceToFlyoutPoint()
 {
-  const gp_Pnt& aCenter = CenterPoint();
-  const gp_Pnt& aFirst = FirstPoint();
-  const gp_Pnt& aSecond = SecondPoint();
-
-  // Flyout point
-  DataPtr aData = myConstraint->data();
-  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
-                              std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-                              (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = myPlane->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
-
-  gp_Dir aBisector((aFirst.XYZ() + aSecond.XYZ()) * 0.5 - aCenter.XYZ());
-  gp_Pnt aFlyPnt(aFlyoutPnt->x(), aFlyoutPnt->y(), aFlyoutPnt->z());
-  gp_XYZ aFlyDir = aFlyPnt.XYZ() - aCenter.XYZ();
+  gp_Dir aBisector((myFirstPoint.XYZ() + mySecondPoint.XYZ()) * 0.5 - myCenterPoint.XYZ());
+  //gp_Pnt aFlyPnt(aFlyoutPnt->x(), aFlyoutPnt->y(), aFlyoutPnt->z());
+  gp_XYZ aFlyDir = myFlyOutPoint.XYZ() - myCenterPoint.XYZ();
   double aDistance = aFlyDir.Dot(aBisector.XYZ());
   // make a positive distance in order to AIS angle presentation is not reversed
   aDistance = fabs(aDistance);
