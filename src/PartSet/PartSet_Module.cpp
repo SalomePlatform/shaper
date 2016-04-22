@@ -966,8 +966,7 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
       if (aColor.empty())
         XGUI_CustomPrs::getDefaultColor(anObject, true, aColor);
       if (!aColor.empty()) {
-        thePrs->setColor(aColor[0], aColor[1], aColor[2]);
-        aCustomized = true;
+        aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
       }
     }
 

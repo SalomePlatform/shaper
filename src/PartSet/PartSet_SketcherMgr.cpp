@@ -1692,10 +1692,12 @@ void PartSet_SketcherMgr::updateBySketchParameters(
     }
     break;
     case PartSet_Tools::Expressions: {
-      /// call all sketch features redisplay, the expression state will be corrected in customize
-      /// of distance presentation
-      Events_ID anEventId = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-      PartSet_Tools::sendSubFeaturesEvent(myCurrentSketch, anEventId);
+      if (aPrevState != theState) {
+        /// call all sketch features redisplay, the expression state will be corrected in customize
+        /// of distance presentation
+        Events_ID anEventId = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+        PartSet_Tools::sendSubFeaturesEvent(myCurrentSketch, anEventId);
+      }
     }
     break;
   }
