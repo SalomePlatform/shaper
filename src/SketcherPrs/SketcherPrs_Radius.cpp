@@ -30,7 +30,12 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Radius, AIS_RadiusDimension);
 
 SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint, 
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane)
-: AIS_RadiusDimension(MyDefCirc), myConstraint(theConstraint), mySketcherPlane(thePlane)
+: AIS_RadiusDimension(MyDefCirc), myConstraint(theConstraint), mySketcherPlane(thePlane),
+  myCircle(MyDefCirc),
+  myAnchorPoint(gp_Pnt(0, 0, 2)),
+  myHasParameters(false),
+  myValue(""),
+  myRadius(1)
 {
   SetDimensionAspect(SketcherPrs_Tools::createDimensionAspect());
   SetSelToleranceForText2d(SketcherPrs_Tools::getDefaultTextHeight());

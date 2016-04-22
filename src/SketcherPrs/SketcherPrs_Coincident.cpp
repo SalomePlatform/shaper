@@ -36,10 +36,10 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Coincident, AIS_InteractiveObject);
 
 SketcherPrs_Coincident::SketcherPrs_Coincident(ModelAPI_Feature* theConstraint, 
                                                const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
- : AIS_InteractiveObject(), myConstraint(theConstraint), mySketcherPlane(thePlane)
+: AIS_InteractiveObject(), myConstraint(theConstraint), mySketcherPlane(thePlane),
+  myPoint(gp_Pnt(0.0, 0.0, 0.0))
 {
-  
-}  
+}
 
 bool SketcherPrs_Coincident::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
                                               const std::shared_ptr<GeomAPI_Ax3>& thePlane)

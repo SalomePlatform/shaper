@@ -74,12 +74,11 @@ private:
   SketcherPrs_DimensionStyleListener* myStyleListener;
 
   /// container of values obtained from the constraint, which are necessary to fill the presentation
-  double myRadius; ///< the radius custom value
   gp_Circ myCircle; ///< the radius circle
   gp_Pnt myAnchorPoint; ///< an ancor for the radius value visualization
-
   bool myHasParameters; ///< true if the atrribute value has used parameters
   std::string myValue; ///< dimension value
+  double myRadius; ///< the radius custom value
 };
 
 #endif

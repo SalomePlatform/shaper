@@ -25,9 +25,7 @@ SketcherPrs_Middle::SketcherPrs_Middle(ModelAPI_Feature* theConstraint,
                                      const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
  : SketcherPrs_SymbolPrs(theConstraint, thePlane)
 {
-  myPntArray = new Graphic3d_ArrayOfPoints(2);
-  myPntArray->AddVertex(0., 0., 0.);
-}  
+}
 
 bool SketcherPrs_Middle::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
                                          const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)

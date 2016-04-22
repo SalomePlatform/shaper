@@ -39,6 +39,10 @@
 
 #include <QList>
 
+#include <gp_Pnt.hxx>
+#include <TopoDS_Vertex.hxx>
+#include <BRepBuilderAPI_MakeVertex.hxx>
+
 //#define DEBUG_EMPTY_SHAPE
 
 // multi-rotation/translation operation
@@ -55,6 +59,12 @@ PartSet_OperationPrs::PartSet_OperationPrs(ModuleBase_IWorkshop* theWorkshop)
 : ViewerData_AISShape(TopoDS_Shape()), myWorkshop(theWorkshop), myUseAISWidth(false)
 {
   myShapeColor = Quantity_Color(1, 1, 1, Quantity_TOC_RGB);
+
+  // first presentation for having correct Compute until presentation with shapes are set
+  gp_Pnt aPnt(0.0, 0.0, 0.0);
+  BRepBuilderAPI_MakeVertex aMaker(aPnt);
+  TopoDS_Vertex aVertex = aMaker.Vertex();
+  myShapeToPrsMap.Bind(aVertex, NULL);
 }
 
 bool PartSet_OperationPrs::hasShapes()

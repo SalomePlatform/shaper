@@ -41,10 +41,7 @@ SketcherPrs_Rigid::SketcherPrs_Rigid(ModelAPI_Feature* theConstraint,
                                            const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
  : SketcherPrs_SymbolPrs(theConstraint, thePlane)
 {
-  // Set default points array
-  myPntArray = new Graphic3d_ArrayOfPoints(1);
-  myPntArray->AddVertex(0., 0., 0.);
-}  
+}
 
 bool SketcherPrs_Rigid::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane)

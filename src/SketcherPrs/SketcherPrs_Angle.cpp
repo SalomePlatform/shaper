@@ -35,7 +35,9 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Angle, AIS_AngleDimension);
 SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint, 
                                      const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 : AIS_AngleDimension(gp_Pnt(0,0,0), gp_Pnt(1,0,0), gp_Pnt(0,1,0)), myConstraint(theConstraint),
-  mySketcherPlane(thePlane)
+  mySketcherPlane(thePlane),
+  myFirstPoint(gp_Pnt(0,0,0)), myCenterPoint(gp_Pnt(1,0,0)), mySecondPoint(gp_Pnt(0,1,0)),
+  myAngle(90), myValue("90"), myFlyOutPoint(0, 0.5, 0)
 {
   myAspect = new Prs3d_DimensionAspect();
   myAspect->MakeArrows3d(false);

@@ -74,8 +74,8 @@ bool PartSet_ResultSketchPrs::isValidShapeType(const TopAbs_ShapeEnum& theBaseTy
 }
 
 void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-                                   const Handle(Prs3d_Presentation)& thePresentation, 
-                                   const Standard_Integer theMode)
+                                      const Handle(Prs3d_Presentation)& thePresentation, 
+                                      const Standard_Integer theMode)
 {
   thePresentation->Clear();
 

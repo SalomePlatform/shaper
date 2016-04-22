@@ -40,7 +40,13 @@ SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theCo
                                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 : AIS_LengthDimension(MyDefStart, MyDefEnd, MyDefPln),
   myConstraint(theConstraint),
-  mySketcherPlane(thePlane)
+  mySketcherPlane(thePlane),
+  myFirstPoint(MyDefStart),
+  mySecondPoint(MyDefEnd),
+  myPlane(MyDefPln),
+  myHasParameters(false),
+  myValue(""),
+  myDistance(1)
 {
   SetDimensionAspect(SketcherPrs_Tools::createDimensionAspect());
   SetSelToleranceForText2d(SketcherPrs_Tools::getTextHeight());

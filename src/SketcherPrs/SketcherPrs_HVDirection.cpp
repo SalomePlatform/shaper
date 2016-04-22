@@ -26,9 +26,7 @@ SketcherPrs_HVDirection::SketcherPrs_HVDirection(ModelAPI_Feature* theConstraint
                                            bool isHorisontal) 
  : SketcherPrs_SymbolPrs(theConstraint, thePlane), myIsHorisontal(isHorisontal)
 {
-  myPntArray = new Graphic3d_ArrayOfPoints(1);
-  myPntArray->AddVertex(0., 0., 0.);
-}  
+}
 
 bool SketcherPrs_HVDirection::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
                                                const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)

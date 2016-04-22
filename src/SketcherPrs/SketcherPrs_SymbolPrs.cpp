@@ -252,6 +252,8 @@ SketcherPrs_SymbolPrs::SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint,
  : AIS_InteractiveObject(), myConstraint(theConstraint), myPlane(thePlane), myIsConflicting(false)
 {
   SetAutoHilight(Standard_False);
+  myPntArray = new Graphic3d_ArrayOfPoints(1);
+  myPntArray->AddVertex(0., 0., 0.);
 }
 
 SketcherPrs_SymbolPrs::~SketcherPrs_SymbolPrs()

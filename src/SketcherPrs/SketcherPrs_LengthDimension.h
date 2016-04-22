@@ -72,12 +72,12 @@ private:
   SketcherPrs_DimensionStyleListener* myStyleListener;
 
   /// container of values obtained from the constraint, which are necessary to fill the presentation
-  double myDistance; ///< the flyout distance
   gp_Pnt myFirstPoint; ///< the dimension first point for measured geometry
   gp_Pnt mySecondPoint; ///< the dimension first point for measured geometry
   gp_Pln myPlane; ///< the plane(plane of the sketch) for measured geometry
   bool myHasParameters; ///< true if the atrribute value has used parameters
   std::string myValue; ///< dimension value
+  double myDistance; ///< the flyout distance
 };
 
 #endif
