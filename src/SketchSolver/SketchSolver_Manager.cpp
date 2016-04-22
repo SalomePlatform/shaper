@@ -579,7 +579,10 @@ void SketchSolver_Manager::degreesOfFreedom()
     myDoF[aDoFIt->first] = aDoFIt->second;
     // change attribute value
     std::ostringstream aStream;
-    aStream << "DOF(degree of freedom) = " << aDoFIt->second;
+    if (aDoFIt->second == 0)
+      aStream << "Sketch fully fixed (DOF = " << aDoFIt->second << ")";
+    else
+      aStream << "DOF (degree of freedom) = " << aDoFIt->second;
     aDoFIt->first->data()->string(SketchPlugin_Sketch::SOLVER_DOF())->setValue(aStream.str());
   }
 }
