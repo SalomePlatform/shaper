@@ -24,6 +24,10 @@ class Feature(ModelAPI.ModelAPI_Feature):
         """F.getRealInput(str) -- get real value of the attribute"""
         return self.data().real(inputid).value()
 
+    def getTextInput(self, inputid):
+        """F.getTextInput(str) -- get text value of the attribute"""
+        return self.data().real(inputid).text()
+
     def addResult(self, result):
         """F.addResult(ModelAPI_Result) -- add ModelAPI_Result shape as a result"""
         shape = result.shape()
