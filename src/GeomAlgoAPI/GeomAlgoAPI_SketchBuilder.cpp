@@ -126,7 +126,10 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
       for (; aSkIt != aSkippedEdges.end(); ++aSkIt)
         aBuilder.Add(aNewWire, *aSkIt);
 
-      aBuilder.Add(aNewFace, aNewWire);
+      // check the wire is empty
+      anExp.Init(aNewWire, TopAbs_EDGE);
+      if (anExp.More())
+        aBuilder.Add(aNewFace, aNewWire);
     }
 
     // store face
