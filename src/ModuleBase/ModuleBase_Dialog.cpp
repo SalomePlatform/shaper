@@ -36,7 +36,6 @@ ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QStr
   SessionPtr aMgr = ModelAPI_Session::get();
   std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
 
-  aMgr->startOperation(myId.toStdString());
   myFeature = aDoc->addFeature(myId.toStdString());
   if (!myFeature.get())
     return;
