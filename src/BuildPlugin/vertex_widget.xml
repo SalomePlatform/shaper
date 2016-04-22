@@ -3,7 +3,7 @@
 <source>
   <multi_selector id="base_objects"
                   label="Vertices:"
-                  tooltip="Select a vertices on sketch or vertex objects."
+                  tooltip="Select vertices on sketch or vertex objects."
                   type_choice="vertices objects">
     <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="vertex"/>
   </multi_selector>

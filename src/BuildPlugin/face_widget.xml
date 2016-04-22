@@ -3,7 +3,7 @@
 <source>
   <multi_selector id="base_objects"
                   label="Segments and wires:"
-                  tooltip="Select an edges on sketch or wires objects."
+                  tooltip="Select edges on sketch, edges or wires objects."
                   type_choice="edges objects">
     <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="edge,wire"/>
   </multi_selector>
