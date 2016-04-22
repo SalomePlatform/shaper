@@ -454,9 +454,11 @@ QAction* SHAPERGUI::addFeatureOfNested(const QString& theWBName,
 
   int aWBMenu = createMenu(theWBName, -1, -1, 50);
   int aItemId = createMenu(anAction, aWBMenu);
+  createMenu(separator(), aWBMenu); /// nested action is always separated of others
 
   int aWBTool = createTool(theWBName, theWBName);
   int aToolId = createTool(anAction, aWBTool);
+  createTool(separator(), aWBTool); /// nested action is always separated of others
 
   return anAction;
 }

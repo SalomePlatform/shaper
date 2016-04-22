@@ -1,6 +1,6 @@
 <source>
   <workbench id="Sketch">
-    <group id="Geometry">
+    <group id="Linear geometry">
 
       <!-- SketchRectangle (python feature) -->
       <feature

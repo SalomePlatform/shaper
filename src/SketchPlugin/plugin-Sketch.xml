@@ -2,7 +2,7 @@
 
 <plugin>
   <workbench id="Sketch">
-    <group id="Geometry">
+    <group id="Linear geometry">
       <feature
         id="Sketch"
         nested="SketchPoint SketchIntersectionPoint SketchLine SketchCircle SketchArc SketchRectangle SketchProjection SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintCoincidence SketchConstraintMirror SketchConstraintAngle SketchMultiRotation SketchMultiTranslation SketchConstraintCollinear SketchConstraintMiddle"
@@ -31,7 +31,8 @@
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
         <validator id="GeomValidators_Different" parameters="StartPoint,EndPoint"/>
       </feature>
-
+    </group>
+    <group id="Circular geometry">
       <!-- SketchCircle -->
       <feature 
         id="SketchCircle"
