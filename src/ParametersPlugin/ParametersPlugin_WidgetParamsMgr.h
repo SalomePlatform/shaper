@@ -96,8 +96,7 @@ private:
   /// Returns true if parameter with the given name already exists
   bool hasName(const QString& theName) const;
 
-  /// Clear and rebuild children of Features item
-  void rebuildFeatures();
+  QList<QStringList> featuresItems(const QList<FeaturePtr>& theFeatures) const;
 
   QTreeWidget* myTable;
   QTreeWidgetItem* myFeatures;

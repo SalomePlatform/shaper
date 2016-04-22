@@ -247,47 +247,21 @@ void ParametersPlugin_WidgetParamsMgr::activateCustom()
       myParameters->addChild(aItem);
 
       myParametersList.append(aParamFeature);
-
-      // Set features where the parameter is used
-      const std::set<std::shared_ptr<ModelAPI_Attribute>>& aRefs = aParam->data()->refsToMe();
-      std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aIt;
-      for(aIt = aRefs.cbegin(); aIt != aRefs.cend(); aIt++) {
-        std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
-        FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
-        if (aReferenced.get()) {
-          QStringList aValNames;
-          aValNames << aReferenced->data()->name().c_str();
-
-          AttributeDoublePtr aDouble = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aAttr);
-          if (aDouble.get()) {
-            aValNames << aDouble->text().c_str();
-            aValNames << QString::number(aDouble->value());
-          } else {
-            AttributeIntegerPtr aInt = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aAttr);
-            if (aInt.get()) {
-              aValNames << aInt->text().c_str();
-              aValNames << QString::number(aInt->value());
-            }
-          }
-
-          aItem = new QTreeWidgetItem(aValNames);
-          myFeatures->addChild(aItem);
-        }
-      }
     }
   }
+  updateFeaturesPart();
+
   myFeatures->setExpanded(true);
   myParameters->setExpanded(true);
 }
 
 
-void ParametersPlugin_WidgetParamsMgr::rebuildFeatures()
+QList<QStringList> ParametersPlugin_WidgetParamsMgr::
+  featuresItems(const QList<FeaturePtr>& theFeatures) const
 {
-  myFeatures->takeChildren(); // Clear list
-
+  QList<QStringList> aItemsList;
   ResultParameterPtr aParam;
-  QTreeWidgetItem* aItem;
-  foreach(FeaturePtr aParameter, myParametersList) {
+  foreach(FeaturePtr aParameter, theFeatures) {
     aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParameter->firstResult());
     const std::set<std::shared_ptr<ModelAPI_Attribute>>& aRefs = aParam->data()->refsToMe();
     std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aIt;
@@ -309,12 +283,11 @@ void ParametersPlugin_WidgetParamsMgr::rebuildFeatures()
             aValNames << QString::number(aInt->value());
           }
         }
-
-        aItem = new QTreeWidgetItem(aValNames);
-        myFeatures->addChild(aItem);
+        aItemsList.append(aValNames);
       }
     }
   }
+  return aItemsList;
 }
 
 
@@ -393,36 +366,24 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
 
 void ParametersPlugin_WidgetParamsMgr::updateFeaturesPart()
 {
-  std::shared_ptr<ModelAPI_ResultParameter> aParam;
-  int i = 0;
-  foreach(FeaturePtr aFeature, myParametersList) {
-    aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aFeature->firstResult());
-    const std::set<std::shared_ptr<ModelAPI_Attribute>>& aRefs = aParam->data()->refsToMe();
-    std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aIt;
-    for(aIt = aRefs.cbegin(); aIt != aRefs.cend(); aIt++) {
-      std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
-      FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
-      if (aReferenced.get()) {
-        QStringList aValNames;
-        aValNames << aReferenced->data()->name().c_str();
-
-        AttributeDoublePtr aDouble = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aAttr);
-        if (aDouble.get()) {
-          aValNames << aDouble->text().c_str();
-          aValNames << QString::number(aDouble->value());
-        } else {
-          AttributeIntegerPtr aInt = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aAttr);
-          if (aInt.get()) {
-            aValNames << aInt->text().c_str();
-            aValNames << QString::number(aInt->value());
-          }
-        }
-
-        QTreeWidgetItem* aItem = myFeatures->child(i++);
-        for(int i = 0; i < aValNames.count(); i++)
-          aItem->setText(i, aValNames.at(i));
-      }
+  QList<QStringList> aFeaturesList = featuresItems(myParametersList);
+  if (aFeaturesList.count() != myFeatures->childCount()) {
+    if (myFeatures->childCount()  < aFeaturesList.count()) {
+      while (myFeatures->childCount() != aFeaturesList.count()) 
+        myFeatures->addChild(new QTreeWidgetItem());
+    } else {
+      while (myFeatures->childCount() != aFeaturesList.count()) 
+        myFeatures->removeChild(myFeatures->child(myFeatures->childCount() - 1));
     }
+  }
+  int i = 0;
+  foreach(QStringList aFeature, aFeaturesList) {
+    int aCol = 0;
+    foreach(QString aText, aFeature) {
+      myFeatures->child(i)->setText(aCol, aText);
+      aCol++;
+    }
+    i++;
   }
 }
 
@@ -459,6 +420,8 @@ void ParametersPlugin_WidgetParamsMgr::onAdd()
     return;
 
   QTreeWidgetItem* aItem = createNewItem();
+  if (aFeature->name().length() > 0)
+    aItem->setText(Col_Name, aFeature->name().c_str());
   myParameters->addChild(aItem);
   myParametersList.append(aFeature);
       
@@ -543,7 +506,7 @@ void ParametersPlugin_WidgetParamsMgr::onRemove()
     }
 
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
-    rebuildFeatures();
+    updateFeaturesPart();
   }
 }
 
