@@ -1302,8 +1302,8 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::producedByFeature(
   Handle(TNaming_NamedShape) aCandidatInThis, aCandidatContainer;
   TDF_Label aBodyLab = aBodyData->label();
   // use childs and this label (the lowest priority)
-  bool aUseThis = false;
   TDF_ChildIDIterator aNSIter(aBodyLab, TNaming_NamedShape::GetID(), Standard_True);
+  bool aUseThis = !aNSIter.More();
   while(anOldShape.IsNull() && (aNSIter.More() || aUseThis)) {
     Handle(TNaming_NamedShape) aNS;
     if (aUseThis) {
