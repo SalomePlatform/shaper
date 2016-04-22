@@ -19,6 +19,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_ResultCompSolid.h>
 
 #include <ModuleBase_ViewerPrs.h>
 
@@ -107,10 +108,21 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
       aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
       if (aFeature.get()) {
         const std::list<std::shared_ptr<ModelAPI_Result>> aResList = aFeature->results();
+        ResultPtr aResult;
+        ResultCompSolidPtr aCompSolid;
         std::list<ResultPtr>::const_iterator aIt;
         for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
-          aSelectedPrs.append(std::shared_ptr<ModuleBase_ViewerPrs>(
-               new ModuleBase_ViewerPrs((*aIt), GeomShapePtr(), NULL)));
+          aResult = (*aIt);
+          aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+          if (aCompSolid.get()) {
+            for (int i = 0; i < aCompSolid->numberOfSubs(); i++) {
+              aSelectedPrs.append(std::shared_ptr<ModuleBase_ViewerPrs>(
+                   new ModuleBase_ViewerPrs(aCompSolid->subResult(i), GeomShapePtr(), NULL)));
+            }
+          } else {
+            aSelectedPrs.append(std::shared_ptr<ModuleBase_ViewerPrs>(
+                 new ModuleBase_ViewerPrs(aResult, GeomShapePtr(), NULL)));
+          }
         }
       }
     }
