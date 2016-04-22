@@ -523,6 +523,8 @@ void SketchSolver_Manager::degreesOfFreedom()
       else if (aFeature->getKind() == SketchPlugin_ConstraintRigid::ID()) {
         AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
             aFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
+        if (!aRefAttr->isInitialized())
+          continue;
         assert(aRefAttr);
         if (!aRefAttr->isObject())
           aDoF -= 2; // attribute is a point

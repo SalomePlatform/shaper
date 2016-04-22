@@ -62,6 +62,9 @@ protected:
   /// \return real value
   double calculateDistanceToFlyoutPoint();
 
+  bool getPoints(gp_Pnt& theFirstPoint, gp_Pnt& theSecondPoint, gp_Pnt& theCenterPoint,
+                 double& theAngle) const;
+
 private:
   /// Constraint feature
   ModelAPI_Feature* myConstraint;

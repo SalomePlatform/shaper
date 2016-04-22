@@ -10,10 +10,13 @@
 
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_Constraint.h>
+#include <SketchPlugin_Line.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomAPI_Angle2d.h>
+#include <GeomAPI_Lin2d.h>
 
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -85,6 +88,54 @@ bool SketcherPrs_Angle::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   return aReadyToDisplay;
 }
 
+bool SketcherPrs_Angle::getPoints(gp_Pnt& theFirstPoint, gp_Pnt& theSecondPoint,
+                                  gp_Pnt& theCenterPoint, double& theAngle) const
+{
+  bool aReadyToDisplay = false;
+
+  std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
+  std::shared_ptr<GeomAPI_Ax3> aPlane = myPlane;
+  FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
+  FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+
+  std::shared_ptr<GeomDataAPI_Point2D> aStartA = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aLineA->attribute(SketchPlugin_Line::START_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aEndA = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aLineA->attribute(SketchPlugin_Line::END_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aStartB = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aLineB->attribute(SketchPlugin_Line::START_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aEndB = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aLineB->attribute(SketchPlugin_Line::END_ID()));
+
+  std::shared_ptr<GeomAPI_Angle2d> anAng;
+  if (!aData->attribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID())->isInitialized() ||
+      !aData->attribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID())->isInitialized())
+    anAng = std::shared_ptr<GeomAPI_Angle2d>(new GeomAPI_Angle2d(
+        aStartA->pnt(), aEndA->pnt(), aStartB->pnt(), aEndB->pnt()));
+  else {
+    std::shared_ptr<GeomAPI_Lin2d> aLine1(new GeomAPI_Lin2d(aStartA->pnt(), aEndA->pnt()));
+    bool isReversed1 = aData->boolean(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID())->value();
+    std::shared_ptr<GeomAPI_Lin2d> aLine2(new GeomAPI_Lin2d(aStartB->pnt(), aEndB->pnt()));
+    bool isReversed2 = aData->boolean(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID())->value();
+    anAng = std::shared_ptr<GeomAPI_Angle2d>(new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
+  }
+  theAngle = anAng->angleDegree();
+
+  gp_Pnt2d aFirstPoint = anAng->firstPoint()->impl<gp_Pnt2d>();
+  std::shared_ptr<GeomAPI_Pnt> aPoint = myPlane->to3D(aFirstPoint.X(), aFirstPoint.Y());
+  theFirstPoint = aPoint->impl<gp_Pnt>();
+
+  gp_Pnt2d aCenterPoint = anAng->center()->impl<gp_Pnt2d>();
+  aPoint = myPlane->to3D(aCenterPoint.X(), aCenterPoint.Y());
+  theCenterPoint = aPoint->impl<gp_Pnt>();
+
+  gp_Pnt2d aSecondPoint = anAng->secondPoint()->impl<gp_Pnt2d>();
+  aPoint = myPlane->to3D(aSecondPoint.X(), aSecondPoint.Y());
+  theSecondPoint = aPoint->impl<gp_Pnt>();
+
+  return aReadyToDisplay;
+}
+
 void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                 const Handle(Prs3d_Presentation)& thePresentation, 
                                 const Standard_Integer theMode)
@@ -100,76 +151,29 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
       ModelAPI_AttributeInteger>(aData->attribute(SketchPlugin_ConstraintAngle::TYPE_ID()));
   SketcherPrs_Tools::AngleType anAngleType = (SketcherPrs_Tools::AngleType)(aTypeAttr->value());
 
-  AttributeRefAttrPtr anAttr1 = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
-  AttributeRefAttrPtr anAttr2 = aData->refattr(SketchPlugin_Constraint::ENTITY_B());
-
-  // Get angle edges
-  ObjectPtr aObj1 = anAttr1->object();
-  ObjectPtr aObj2 = anAttr2->object();
-
-  std::shared_ptr<GeomAPI_Shape> aShape1 = SketcherPrs_Tools::getShape(aObj1);
-  std::shared_ptr<GeomAPI_Shape> aShape2 = SketcherPrs_Tools::getShape(aObj2);
-
-  TopoDS_Shape aTEdge1 = aShape1->impl<TopoDS_Shape>();
-  TopoDS_Shape aTEdge2 = aShape2->impl<TopoDS_Shape>();
-
-  TopoDS_Edge aEdge1 = TopoDS::Edge(aTEdge1);
-  TopoDS_Edge aEdge2 = TopoDS::Edge(aTEdge2);
+  gp_Pnt aFirstPoint, aSecondPoint, aCenterPoint;
+  double aValue;
+  getPoints(aFirstPoint, aSecondPoint, aCenterPoint, aValue);
 
   double aDist = -1;
-
   switch (anAngleType) {
     case SketcherPrs_Tools::ANGLE_DIRECT: {
       SetArrowVisible(Standard_False/*first*/, Standard_True/*second*/);
-      /*
-      std::shared_ptr<GeomAPI_Edge> anEdge1 = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aShape1));
-      std::shared_ptr<GeomAPI_Edge> anEdge2 = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aShape2));
-
-      std::shared_ptr<GeomAPI_Lin> aLin1 = anEdge1->line();
-      std::shared_ptr<GeomAPI_Lin> aLin2 = anEdge2->line();
-
-      std::shared_ptr<GeomAPI_Pnt> aCenterPnt = aLin1->intersect(aLin2);
-      std::shared_ptr<GeomAPI_Dir> aDir1 = aLin1->direction();
-      std::shared_ptr<GeomAPI_Dir> aDir2 = aLin2->direction();
-
-      const gp_Pnt& aCenterPoint = aCenterPnt->impl<gp_Pnt>();
-
-      const gp_Dir& aDirection1 = aDir1->impl<gp_Dir>();
-      const gp_Dir& aDirection2 = aDir2->impl<gp_Dir>();
-
-      gp_Pnt aFirstPoint  = aCenterPoint.Translated (gp_Vec (aDirection1));
-      gp_Pnt aSecondPoint = aCenterPoint.Translated (gp_Vec (aDirection2));
-
-      SetMeasuredGeometry(aFirstPoint, aCenterPoint, aSecondPoint);*/
-      SetMeasuredGeometry(aEdge1, aEdge2, Standard_False);
+      SetMeasuredGeometry(aFirstPoint, aCenterPoint, aSecondPoint);
       bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
       SetAngleReversed(!isReversedPlanes);
     }
     break;
     case SketcherPrs_Tools::ANGLE_COMPLEMENTARY: {
-      SetArrowVisible(Standard_True/*first*/, Standard_False/*second*/);
-      // to calculate center, first and end points
-      SetAngleReversed(false);
-      SetMeasuredGeometry(aEdge1, aEdge2, Standard_False);
-      /// the first point will be moved, so it is necessary to find distance
-      /// after applying initial parameters of geometry but before correcting them
-      /// for the current type of angle(complementary)
-      aDist = calculateDistanceToFlyoutPoint();
-      /// invert the first edge according to the angle center
-      gp_Pnt aCenter = CenterPoint();
-      gp_Pnt aFirst = FirstPoint();
-      gp_Pnt aSecond = SecondPoint();
-      double anEdge1Length = aCenter.Distance(aFirst);
-      aFirst = aCenter.Translated (gp_Vec(aCenter, aFirst).Normalized() * (-anEdge1Length));
-      anEdge1Length = aCenter.Distance(aFirst);
-
-      SetMeasuredGeometry(aFirst, aCenter, aSecond);
+      double anEdge1Length = aCenterPoint.Distance(aFirstPoint);
+      aFirstPoint = aCenterPoint.Translated (gp_Vec(aCenterPoint, aFirstPoint).Normalized() * (-anEdge1Length));
+      anEdge1Length = aCenterPoint.Distance(aFirstPoint);
+      SetMeasuredGeometry(aFirstPoint, aCenterPoint, aSecondPoint);
     }
     break;
     case SketcherPrs_Tools::ANGLE_BACKWARD: {
       SetArrowVisible(Standard_False/*first*/, Standard_True/*second*/);
-
-      SetMeasuredGeometry(aEdge1, aEdge2, Standard_False);
+      SetMeasuredGeometry(aFirstPoint, aCenterPoint, aSecondPoint);
       bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
       SetAngleReversed(isReversedPlanes);
     }
@@ -183,7 +187,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
 
   // Angle value is in degrees
   AttributeDoublePtr aVal = aData->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
-  SetCustomValue(aVal->value());
+  SetCustomValue(aValue);
 
   myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
   myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
