@@ -194,8 +194,11 @@ double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle)
     case SketcherPrs_Tools::ANGLE_DIRECT:
       anAngle = theAngle;
     break;
-    case SketcherPrs_Tools::ANGLE_COMPLEMENTARY:
-      anAngle = fabs(180.0 - theAngle);
+    case SketcherPrs_Tools::ANGLE_COMPLEMENTARY: {
+      anAngle = 180.0 - theAngle;
+      if (anAngle < 0)
+        anAngle += 360;
+    }
     break;
     case SketcherPrs_Tools::ANGLE_BACKWARD:
       anAngle = 360.0 - theAngle;
