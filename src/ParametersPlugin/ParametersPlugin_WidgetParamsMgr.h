@@ -107,7 +107,6 @@ private:
   QTreeWidgetItem* myFeatures;
   QTreeWidgetItem* myParameters;
   ParametersPlugin_ItemDelegate* myDelegate;
-  QModelIndex myEditingIndex;
 
   QList<FeaturePtr> myParametersList;
 

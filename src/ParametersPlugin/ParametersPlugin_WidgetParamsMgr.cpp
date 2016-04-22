@@ -49,11 +49,16 @@ public:
     const QStyleOptionViewItem& option, 
     const QModelIndex& index ) const;
   
-  //virtual QWidget* createEditor(QWidget* parent, 
-  //                              const QStyleOptionViewItem& option, 
-  //                              const QModelIndex& index) const;
+  virtual QWidget* createEditor(QWidget* parent, 
+                                const QStyleOptionViewItem& option, 
+                                const QModelIndex& index) const;
 
   bool isEditable(const QModelIndex& theIndex) const;
+
+  QModelIndex editIndex() const { return myEditingIdx; }
+
+private:
+  mutable QModelIndex myEditingIdx;
 };
 
 bool ParametersPlugin_ItemDelegate::isEditable(const QModelIndex& theIndex) const
@@ -82,6 +87,14 @@ void ParametersPlugin_ItemDelegate::paint(QPainter* painter,
 
   QStyledItemDelegate::paint(painter, option, index);
   painter->setBrush(aBrush);
+}
+
+QWidget* ParametersPlugin_ItemDelegate::createEditor(QWidget* parent, 
+                                                     const QStyleOptionViewItem& option, 
+                                                     const QModelIndex& index) const
+{
+  myEditingIdx = index;
+  return QStyledItemDelegate::createEditor(parent, option, index);
 }
 
 
@@ -299,16 +312,15 @@ void ParametersPlugin_WidgetParamsMgr::onDoubleClick(const QModelIndex& theIndex
 {
   if (myDelegate->isEditable(theIndex)) {
     myTable->edit(theIndex);
-    myEditingIndex = theIndex;
   }
 }
 
 void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor, 
                                                      QAbstractItemDelegate::EndEditHint theHint)
 {
-  FeaturePtr aFeature = myParametersList.at(myEditingIndex.row());
-  QTreeWidgetItem* aItem = myParameters->child(myEditingIndex.row());
-  int aColumn = myEditingIndex.column();
+  FeaturePtr aFeature = myParametersList.at(myDelegate->editIndex().row());
+  QTreeWidgetItem* aItem = myParameters->child(myDelegate->editIndex().row());
+  int aColumn = myDelegate->editIndex().column();
   QString aText = aItem->text(aColumn);
   bool isModified = false;
 
@@ -355,7 +367,9 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
   if (!isModified)
     return;
   Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 
   ResultParameterPtr aResult = 
     std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aFeature->firstResult());
@@ -364,8 +378,6 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
       aResult->data()->real(ModelAPI_ResultParameter::VALUE());
     aItem->setText(Col_Result, QString::number(aValueAttribute->value()));
   }
-  myEditingIndex = QModelIndex();
-
   if (aColumn == Col_Equation)
     updateParametersPart();
   updateFeaturesPart();
@@ -387,7 +399,8 @@ void ParametersPlugin_WidgetParamsMgr::updateItem(QTreeWidgetItem* theItem,
   foreach(QStringList aFeature, theFeaturesList) {
     int aCol = 0;
     foreach(QString aText, aFeature) {
-      theItem->child(i)->setText(aCol, aText);
+      if (aText.length() > 0)
+        theItem->child(i)->setText(aCol, aText);
       aCol++;
     }
     i++;
