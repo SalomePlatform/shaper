@@ -12,7 +12,6 @@
 
 #include <Events_Error.h>
 
-#include <GeomAPI_DataMapOfShapeShape.h>
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_ShapeExplorer.h>
 
@@ -47,25 +46,21 @@ void BuildPlugin_Wire::execute()
   }
 
   // Collect base shapes.
-  ListOfShape aListOfShapes;
+  ListOfShape anEdges;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
     GeomShapePtr aShape = aSelection->value();
     if(!aShape.get()) {
-      setError("Error: Empty shape selected.");
-      return;
+      aShape = aSelection->context()->shape();
     }
-
-    if(aShape->shapeType() != GeomAPI_Shape::EDGE && aShape->shapeType() != GeomAPI_Shape::WIRE) {
-      setError("Error: Selected shape has wrong type. Only edges and wires acceptable.");
-      return;
+    for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
+      GeomShapePtr anEdge = anExp.current();
+      anEdges.push_back(anEdge);
     }
-
-    aListOfShapes.push_back(aShape);
   }
 
   // Create wire.
-  GeomShapePtr aWire = GeomAlgoAPI_WireBuilder::wire(aListOfShapes);
+  GeomShapePtr aWire = GeomAlgoAPI_WireBuilder::wire(anEdges);
   if(!aWire.get()) {
     setError("Error: Result wire is empty. Probably it has disconnected edges or non-manifold.");
     return;
@@ -74,6 +69,16 @@ void BuildPlugin_Wire::execute()
   // Store result.
   ResultBodyPtr aResultBody = document()->createBody(data());
   aResultBody->store(aWire);
+  for(GeomAPI_ShapeExplorer anExp(aWire, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
+    GeomShapePtr anEdgeInResult = anExp.current();
+    for(ListOfShape::const_iterator anIt = anEdges.cbegin(); anIt != anEdges.cend(); ++anIt) {
+      std::shared_ptr<GeomAPI_Edge> anEdgeInList(new GeomAPI_Edge(*anIt));
+      if(anEdgeInList->isEqual(anEdgeInResult)) {
+        aResultBody->modified(anEdgeInList, anEdgeInResult, "Edge");
+        break;
+      }
+    }
+  }
   setResult(aResultBody);
 }
 

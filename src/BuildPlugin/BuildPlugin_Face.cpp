@@ -8,21 +8,13 @@
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_ResultBody.h>
-#include <ModelAPI_ResultConstruction.h>
 
-#include <Events_Error.h>
-
-#include <GeomAPI_DataMapOfShapeShape.h>
-#include <GeomAPI_PlanarEdges.h>
+#include <GeomAPI_Edge.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_ShapeExplorer.h>
 
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
-#include <GeomAlgoAPI_WireBuilder.h>
-
-#include <algorithm>
-#include <sstream>
 
 //=================================================================================================
 BuildPlugin_Face::BuildPlugin_Face()
