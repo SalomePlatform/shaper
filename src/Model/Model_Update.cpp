@@ -126,9 +126,11 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
   const std::set<std::shared_ptr<ModelAPI_Attribute> >& aRefs = theFeature->data()->refsToMe();
   std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aRefIter = aRefs.cbegin();
   for(; aRefIter != aRefs.cend(); aRefIter++) {
-    FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIter)->owner());
-    if (aReferenced.get()) {
-      addModified(aReferenced, theFeature);
+    if ((*aRefIter)->isArgument()) {
+      FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIter)->owner());
+      if (aReferenced.get()) {
+        addModified(aReferenced, theFeature);
+      }
     }
   }
   // proccess also results
@@ -139,9 +141,11 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
     const std::set<std::shared_ptr<ModelAPI_Attribute> >& aRefs = (*aRes)->data()->refsToMe();
     std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aRefIter = aRefs.cbegin();
     for(; aRefIter != aRefs.cend(); aRefIter++) {
-      FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIter)->owner());
-      if (aReferenced.get()) {
-        addModified(aReferenced, theFeature);
+      if ((*aRefIter)->isArgument()) {
+        FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIter)->owner());
+        if (aReferenced.get()) {
+          addModified(aReferenced, theFeature);
+        }
       }
     }
   }
@@ -404,18 +408,20 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > >::iterator
       anAttrsIter = aDeps.begin();
     for(; anAttrsIter != aDeps.end(); anAttrsIter++) {
-      std::list<std::shared_ptr<ModelAPI_Object> >::iterator aDepIter = anAttrsIter->second.begin();
-      for(; aDepIter != anAttrsIter->second.end(); aDepIter++) {
-        FeaturePtr aDepFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(*aDepIter);
-        if (!aDepFeat.get()) { // so, it depends on the result and process the feature owner of it
-          ResultPtr aDepRes = std::dynamic_pointer_cast<ModelAPI_Result>(*aDepIter);
-          if (aDepRes.get()) {
-            aDepFeat = (*aDepIter)->document()->feature(aDepRes);
+      if (theFeature->attribute(anAttrsIter->first)->isArgument()) {
+        std::list<std::shared_ptr<ModelAPI_Object> >::iterator aDepIter = anAttrsIter->second.begin();
+        for(; aDepIter != anAttrsIter->second.end(); aDepIter++) {
+          FeaturePtr aDepFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(*aDepIter);
+          if (!aDepFeat.get()) { // so, it depends on the result and process the feature owner of it
+            ResultPtr aDepRes = std::dynamic_pointer_cast<ModelAPI_Result>(*aDepIter);
+            if (aDepRes.get()) {
+              aDepFeat = (*aDepIter)->document()->feature(aDepRes);
+            }
           }
-        }
-        if (aDepFeat.get()) {
-          if (processFeature(aDepFeat))
-            aIsModified = true;
+          if (aDepFeat.get()) {
+            if (processFeature(aDepFeat))
+              aIsModified = true;
+          }
         }
       }
     }
