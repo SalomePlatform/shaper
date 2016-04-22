@@ -53,7 +53,7 @@ void SketchPlugin_Projection::execute()
     return;
   FeaturePtr aProjection = ModelAPI_Feature::feature(aRefAttr->object());
 
-  if (!lastResult()) {
+  if (!lastResult().get()) {
     ResultConstructionPtr aConstr = document()->createConstruction(data());
     aConstr->setShape(std::shared_ptr<GeomAPI_Edge>());
     aConstr->setIsInHistory(false);
