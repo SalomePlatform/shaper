@@ -107,7 +107,7 @@
       </feature>
     </group>
 
-    <!--<group id="Projection">-->
+    <group id="Projection">
       <!-- Intersection Point -->
       <!-- feature
         id="SketchIntersectionPoint"
@@ -128,7 +128,7 @@
       </feature -->
 
       <!-- Projected feature -->
-      <!--<feature
+      <feature
         id="SketchProjection"
         title="Projection"
         tooltip="Project feature onto sketch plane"
@@ -142,8 +142,8 @@
           <validator id="SketchPlugin_ProjectionValidator"/>
         </sketch_shape_selector>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
-      </feature> -->
-    <!--</group>-->
+      </feature>
+    </group>
 
     <group id="Replication">
       <!--  SketchConstraintMirror  -->

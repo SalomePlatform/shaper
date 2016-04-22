@@ -53,56 +53,14 @@ void SketchPlugin_Projection::execute()
     return;
   FeaturePtr aProjection = ModelAPI_Feature::feature(aRefAttr->object());
 
-  bool hasResult = lastResult();
+  if (!lastResult()) {
+    ResultConstructionPtr aConstr = document()->createConstruction(data());
+    aConstr->setShape(std::shared_ptr<GeomAPI_Edge>());
+    aConstr->setIsInHistory(false);
+    setResult(aConstr);
 
-  std::shared_ptr<GeomAPI_Edge> anEdge;
-  if (aProjection->getKind() == SketchPlugin_Line::ID()) {
-    std::shared_ptr<GeomDataAPI_Point2D> aStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aProjection->attribute(SketchPlugin_Line::START_ID()));
-    std::shared_ptr<GeomDataAPI_Point2D> aEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aProjection->attribute(SketchPlugin_Line::END_ID()));
-
-    // edge to store result
-    std::shared_ptr<GeomAPI_Pnt> aFirst = sketch()->to3D(aStartPnt->x(), aStartPnt->y());
-    std::shared_ptr<GeomAPI_Pnt> aLast = sketch()->to3D(aEndPnt->x(), aEndPnt->y());
-    anEdge = GeomAlgoAPI_EdgeBuilder::line(aFirst, aLast);
-  }
-  else {
-    std::shared_ptr<GeomAPI_Pln> aSketchPlane = sketch()->plane();
-    std::shared_ptr<GeomAPI_Dir> aNormal = aSketchPlane->direction();
-
-    if (aProjection->getKind() == SketchPlugin_Circle::ID()) {
-      std::shared_ptr<GeomDataAPI_Point2D> aCenterPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-          aProjection->attribute(SketchPlugin_Circle::CENTER_ID()));
-
-      // edge to store result
-      std::shared_ptr<GeomAPI_Pnt> aCenter = sketch()->to3D(aCenterPnt->x(), aCenterPnt->y());
-      double aRadius = aProjection->real(SketchPlugin_Circle::RADIUS_ID())->value();
-      anEdge = GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, aRadius);
-    }
-    else if (aProjection->getKind() == SketchPlugin_Arc::ID()) {
-      std::shared_ptr<GeomDataAPI_Point2D> aCenterPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-          aProjection->attribute(SketchPlugin_Arc::CENTER_ID()));
-      std::shared_ptr<GeomDataAPI_Point2D> aStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-          aProjection->attribute(SketchPlugin_Arc::START_ID()));
-      std::shared_ptr<GeomDataAPI_Point2D> aEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-          aProjection->attribute(SketchPlugin_Arc::END_ID()));
-
-      // edge to store result
-      std::shared_ptr<GeomAPI_Pnt> aCenter = sketch()->to3D(aCenterPnt->x(), aCenterPnt->y());
-      std::shared_ptr<GeomAPI_Pnt> aFirst = sketch()->to3D(aStartPnt->x(), aStartPnt->y());
-      std::shared_ptr<GeomAPI_Pnt> aLast = sketch()->to3D(aEndPnt->x(), aEndPnt->y());
-      anEdge = GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aFirst, aLast, aNormal);
-    }
-  }
-
-  std::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
-  aConstr->setShape(anEdge);
-  aConstr->setIsInHistory(false);
-  setResult(aConstr);
-
-  if (!hasResult)
     aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
+  }
 }
 
 void SketchPlugin_Projection::move(double theDeltaX, double theDeltaY)
