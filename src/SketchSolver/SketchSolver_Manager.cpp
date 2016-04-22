@@ -110,6 +110,10 @@ void SketchSolver_Manager::processEvent(
   if (myIsComputed)
     return;
   myIsComputed = true;
+
+  // Shows that the message has at least one feature applicable for solver
+  bool hasProperFeature = false;
+
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)
       || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)
       || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
@@ -118,8 +122,6 @@ void SketchSolver_Manager::processEvent(
     std::set<ObjectPtr> aFeatures = anUpdateMsg->objects();
 
     bool isUpdateFlushed = stopSendUpdate();
-    // Shows the message has at least one feature applicable for solver
-    bool hasProperFeature = false;
 
     bool isMovedEvt = theMessage->eventID()
           == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED);
@@ -184,6 +186,7 @@ void SketchSolver_Manager::processEvent(
           delete *aGroupIter;
           std::list<SketchSolver_Group*>::iterator aRemoveIt = aGroupIter++;
           myGroups.erase(aRemoveIt);
+          hasProperFeature = true;
           continue;
         }
         if (!(*aGroupIter)->isConsistent()) {  // some constraints were removed, try to split the group
@@ -191,6 +194,7 @@ void SketchSolver_Manager::processEvent(
           //if (!(*aGroupIter)->getWorkplane()->string(
           //    SketchPlugin_Sketch::SOLVER_ERROR())->value().empty())
             aGroupsToResolve.push_back(*aGroupIter);
+          hasProperFeature = true;
         }
         aGroupIter++;
       }
@@ -204,7 +208,9 @@ void SketchSolver_Manager::processEvent(
         resolveConstraints(aGroupsToResolve);
     }
   }
-  degreesOfFreedom();
+
+  if (hasProperFeature)
+    degreesOfFreedom();
   myIsComputed = false;
 }
 
@@ -523,8 +529,6 @@ void SketchSolver_Manager::degreesOfFreedom()
       else if (aFeature->getKind() == SketchPlugin_ConstraintRigid::ID()) {
         AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
             aFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
-        if (!aRefAttr->isInitialized())
-          continue;
         assert(aRefAttr);
         if (!aRefAttr->isObject())
           aDoF -= 2; // attribute is a point
