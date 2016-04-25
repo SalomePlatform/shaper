@@ -1983,12 +1983,14 @@ void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
   FeaturePtr aFeature;
   QObjectPtrList aSelList = theObjects;
   std::list<ResultPtr> aResList;
+  bool aHasHidden = false;
   foreach(ObjectPtr aObj, theObjects) {
     aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
     if (aFeature.get()) {
       aResList = aFeature->results();
       std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
       for(aIt = aResList.cbegin(); aIt != aResList.cend(); aIt++) {
+        aHasHidden |= (*aIt)->isConcealed();
         aSelList.append(*aIt);
       }
     }
@@ -1999,6 +2001,9 @@ void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
     objectBrowser()->setObjectsSelected(aSelList);
     objectBrowser()->blockSignals(aBlocked);
   }
+  if (aHasHidden) 
+    QMessageBox::information(desktop(), tr("Find results"), 
+                             tr("Not all results can be highlighted"), QMessageBox::Ok);
 }
 
 void XGUI_Workshop::highlightFeature(const QObjectPtrList& theObjects)
