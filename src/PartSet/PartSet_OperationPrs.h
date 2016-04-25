@@ -32,6 +32,7 @@
 DEFINE_STANDARD_HANDLE(PartSet_OperationPrs, ViewerData_AISShape)
 
 class XGUI_Displayer;
+class Handle_AIS_InteractiveObject;
 
 /**
 * \ingroup GUI
@@ -70,9 +71,9 @@ protected:
                                                 const Standard_Integer aMode) ;
 
 protected:
-  /// Returns map of feature shapes to be able to fill it outside this class, e.g. in friend
-  /// \return a map of object to shape
-  QMap<ObjectPtr, QList<GeomShapePtr> >& featureShapes() { return myFeatureShapes; }
+  /// list of visualized shapes
+  /// \return a map of shapes
+  NCollection_DataMap<TopoDS_Shape, Handle_AIS_InteractiveObject>& shapesMap();
 
 private:
   /// Fills the map by the feature object and shapes, which should be visuaziled
@@ -133,13 +134,12 @@ private:
   /// Fills the list of shapes by map of model objects
   /// \param theFeatureShape a container to find shapes
   /// \param theShapesMap an out container
-  void fillShapeList(const QMap<ObjectPtr, QList<GeomShapePtr> >& theFeatureShapes,
-                     NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)>& theShapeToPrsMap);
+  static void fillShapeList(const QMap<ObjectPtr, QList<GeomShapePtr> >& theFeatureShapes,
+          ModuleBase_IWorkshop* theWorkshop,
+          NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)>& theShapeToPrsMap);
 
 private:
   NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)> myShapeToPrsMap; /// list of visualized shapes
-
-  QMap<ObjectPtr, QList<GeomShapePtr> > myFeatureShapes; /// visualized shapes
 
   ModuleBase_IWorkshop* myWorkshop; /// current workshop
   Quantity_Color myShapeColor; /// color of feature depended shapes

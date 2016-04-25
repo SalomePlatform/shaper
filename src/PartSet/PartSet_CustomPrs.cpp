@@ -97,19 +97,23 @@ bool PartSet_CustomPrs::displayPresentation(
   if (!myFeature.get())
     return isModified;
 
+  QMap<ObjectPtr, QList<GeomShapePtr> > aFeatureShapes;
   switch (theFlag) {
     case ModuleBase_IModule::CustomizeArguments:
-      PartSet_OperationPrs::getFeatureShapes(myFeature, myWorkshop, anOperationPrs->featureShapes());
+      PartSet_OperationPrs::getFeatureShapes(myFeature, myWorkshop, aFeatureShapes);
       break;
     case ModuleBase_IModule::CustomizeResults:
-      PartSet_OperationPrs::getResultShapes(myFeature, myWorkshop, anOperationPrs->featureShapes());
+      PartSet_OperationPrs::getResultShapes(myFeature, myWorkshop, aFeatureShapes);
       break;
     case ModuleBase_IModule::CustomizeHighlightedObjects:
-      PartSet_OperationPrs::getHighlightedShapes(myWorkshop, anOperationPrs->featureShapes());
+      PartSet_OperationPrs::getHighlightedShapes(myWorkshop, aFeatureShapes);
       break;
     default:
       return isModified;
   }
+  NCollection_DataMap<TopoDS_Shape, Handle_AIS_InteractiveObject>& aShapeMap =
+                                                                 anOperationPrs->shapesMap();
+  PartSet_OperationPrs::fillShapeList(aFeatureShapes, myWorkshop, aShapeMap);
 
   myPresentationIsEmpty = false;
   // redisplay AIS objects
@@ -170,7 +174,7 @@ void PartSet_CustomPrs::clearPresentation(const ModuleBase_IModule::ModuleBase_C
     Handle(AIS_InteractiveObject) anAISIO = aPresentation->impl<Handle(AIS_InteractiveObject)>();
     Handle(PartSet_OperationPrs) anOperationPrs = Handle(PartSet_OperationPrs)::DownCast(anAISIO);
 
-    anOperationPrs->featureShapes().clear();
+    anOperationPrs->shapesMap().Clear();
     if (!anOperationPrs.IsNull())
       anOperationPrs.Nullify();
     myPresentations.remove(theFlag);

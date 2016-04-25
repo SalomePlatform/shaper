@@ -69,7 +69,7 @@ PartSet_OperationPrs::PartSet_OperationPrs(ModuleBase_IWorkshop* theWorkshop)
 
 bool PartSet_OperationPrs::hasShapes()
 {
-  return !myFeatureShapes.empty();
+  return !myShapeToPrsMap.IsEmpty();
 }
 
 void PartSet_OperationPrs::setShapeColor(const Quantity_Color& theColor)
@@ -88,15 +88,7 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
 {
   SetColor(myShapeColor);
   thePresentation->Clear();
-
-  NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)> aShapeToPrsMap;
-  fillShapeList(myFeatureShapes, aShapeToPrsMap);
-
-  bool aReadyToDisplay = !aShapeToPrsMap.IsEmpty();
-  if (aReadyToDisplay) {
-    myShapeToPrsMap.Clear();
-    myShapeToPrsMap.Assign(aShapeToPrsMap);
-  }
+  bool aReadyToDisplay = !myShapeToPrsMap.IsEmpty();
 
   XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(myWorkshop)->displayer();
   Handle(Prs3d_Drawer) aDrawer = Attributes();
@@ -134,6 +126,11 @@ void PartSet_OperationPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
                                             const Standard_Integer aMode)
 {
   // the presentation is not used in the selection
+}
+
+NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)>& PartSet_OperationPrs::shapesMap()
+{
+  return myShapeToPrsMap;
 }
 
 bool isSubObject(const ObjectPtr& theObject, const FeaturePtr& theFeature)
@@ -370,16 +367,16 @@ bool PartSet_OperationPrs::isSelectionAttribute(const AttributePtr& theAttribute
 }
 
 void PartSet_OperationPrs::fillShapeList(const QMap<ObjectPtr, QList<GeomShapePtr> >& theFeatureShapes,
+                            ModuleBase_IWorkshop* theWorkshop,
                             NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)>& theShapeToPrsMap)
 {
   theShapeToPrsMap.Clear();
 
-  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(myWorkshop)->displayer();
-  Handle(Prs3d_Drawer) aDrawer = Attributes();
+  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(theWorkshop)->displayer();
 
   // create presentations on the base of the shapes
-  QMap<ObjectPtr, QList<GeomShapePtr> >::const_iterator anIt = myFeatureShapes.begin(),
-                                                        aLast = myFeatureShapes.end();
+  QMap<ObjectPtr, QList<GeomShapePtr> >::const_iterator anIt = theFeatureShapes.begin(),
+                                                        aLast = theFeatureShapes.end();
   for (; anIt != aLast; anIt++) {
     ObjectPtr anObject = anIt.key();
     QList<GeomShapePtr> aShapes = anIt.value();
@@ -387,17 +384,18 @@ void PartSet_OperationPrs::fillShapeList(const QMap<ObjectPtr, QList<GeomShapePt
     for (; aShIt != aShLast; aShIt++) {
       GeomShapePtr aGeomShape = *aShIt;
       // the shape should not be checked here on empty value because it should be checked in
-      // appendShapeIfVisible() on the step of filling myFeatureShapes list
+      // appendShapeIfVisible() on the step of filling theFeatureShapes list
       // the reason is to avoid empty AIS object visualized in the viewer
       //if (!aGeomShape.get()) continue;
       TopoDS_Shape aShape = aGeomShape.get() ? aGeomShape->impl<TopoDS_Shape>() : TopoDS_Shape();
+      if (aShape.IsNull())
+        continue;
+
       // change deviation coefficient to provide more precise circle
       Handle(AIS_InteractiveObject) anIO;
-      if (myUseAISWidth) {
-        AISObjectPtr anAISPtr = aDisplayer->getAISObject(anObject);
-        if (anAISPtr.get())
-          anIO = anAISPtr->impl<Handle(AIS_InteractiveObject)>();
-      }
+      AISObjectPtr anAISPtr = aDisplayer->getAISObject(anObject);
+      if (anAISPtr.get())
+        anIO = anAISPtr->impl<Handle(AIS_InteractiveObject)>();
       theShapeToPrsMap.Bind(aShape, anIO);
     }
   }
