@@ -176,6 +176,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
       gp_Pnt aFirstPoint = aCenterPoint.Translated(
                           gp_Vec(myCenterPoint, myFirstPoint).Normalized() * (-anEdge1Length));
       SetMeasuredGeometry(aFirstPoint, myCenterPoint, mySecondPoint);
+      SetAngleReversed(false);
     }
     break;
     case SketcherPrs_Tools::ANGLE_BACKWARD: {

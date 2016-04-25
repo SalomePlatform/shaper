@@ -66,12 +66,11 @@ namespace
 //purpose  : 
 //=======================================================================
 AIS_AngleDimension::AIS_AngleDimension (const TopoDS_Edge& theFirstEdge,
-                                        const TopoDS_Edge& theSecondEdge,
-                                        const Standard_Boolean& theUseLongestDistance)
+                                        const TopoDS_Edge& theSecondEdge)
 : AIS_Dimension (AIS_KOD_PLANEANGLE)
 {
   Init();
-  SetMeasuredGeometry (theFirstEdge, theSecondEdge, theUseLongestDistance);
+  SetMeasuredGeometry (theFirstEdge, theSecondEdge);
 }
 
 //=======================================================================
@@ -141,8 +140,7 @@ AIS_AngleDimension::AIS_AngleDimension (const TopoDS_Face& theFirstFace,
 //purpose  : 
 //=======================================================================
 void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Edge& theFirstEdge,
-                                              const TopoDS_Edge& theSecondEdge,
-                                              const Standard_Boolean& theUseLongestDistance)
+                                              const TopoDS_Edge& theSecondEdge)
 {
   gp_Pln aComputedPlane;
 
@@ -150,7 +148,7 @@ void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Edge& theFirstEdge,
   mySecondShape     = theSecondEdge;
   myThirdShape      = TopoDS_Shape();
   myGeometryType    = GeometryType_Edges;
-  myIsGeometryValid = InitTwoEdgesAngle (aComputedPlane, theUseLongestDistance);
+  myIsGeometryValid = InitTwoEdgesAngle (aComputedPlane);
 
   if (myIsGeometryValid && !myIsPlaneCustom)
   {
@@ -302,6 +300,12 @@ gp_Pnt AIS_AngleDimension::GetCenterOnArc (const gp_Pnt& theFirstAttach,
   }
   
   gp_Pln aPlane = aConstructPlane.Value();
+  if (myUseReverse) {
+    gp_Ax1 anAxis = aPlane.Axis();
+    gp_Dir aDir = anAxis.Direction();
+    aDir.Reverse();
+    aPlane.SetAxis(gp_Ax1(anAxis.Location(), aDir));
+  }
 
   Standard_Real aRadius = theFirstAttach.Distance (theCenter);
 
@@ -839,8 +843,7 @@ void AIS_AngleDimension::ComputeFlyoutSelection (const Handle(SelectMgr_Selectio
 //function : InitTwoEdgesAngle
 //purpose  : 
 //=======================================================================
-Standard_Boolean AIS_AngleDimension::InitTwoEdgesAngle (gp_Pln& theComputedPlane,
-                                                        const Standard_Boolean& theUseLongestDistance)
+Standard_Boolean AIS_AngleDimension::InitTwoEdgesAngle (gp_Pln& theComputedPlane)
 {
   TopoDS_Edge aFirstEdge  = TopoDS::Edge (myFirstShape);
   TopoDS_Edge aSecondEdge = TopoDS::Edge (mySecondShape);
@@ -921,22 +924,12 @@ Standard_Boolean AIS_AngleDimension::InitTwoEdgesAngle (gp_Pln& theComputedPlane
     // |
     // | <- dimension should be here
     // *----
-    if (theUseLongestDistance) {
-      myFirstPoint  = myCenterPoint.Distance (aFirstPoint1) > myCenterPoint.Distance (aLastPoint1)
+    myFirstPoint  = !myCenterPoint.IsEqual(aFirstPoint1, Precision::Confusion())
                     ? aFirstPoint1
                     : aLastPoint1;
-
-      mySecondPoint = myCenterPoint.Distance (aFirstPoint2) > myCenterPoint.Distance (aLastPoint2)
+    mySecondPoint = !myCenterPoint.IsEqual(aFirstPoint2, Precision::Confusion())
                     ? aFirstPoint2
                     : aLastPoint2;
-    } else {
-      myFirstPoint  = !myCenterPoint.IsEqual(aFirstPoint1, Precision::Confusion())
-                      ? aFirstPoint1
-                      : aLastPoint1;
-      mySecondPoint = !myCenterPoint.IsEqual(aFirstPoint2, Precision::Confusion())
-                      ? aFirstPoint2
-                      : aLastPoint2;
-    }
   }
 
   return IsValidPoints (myFirstPoint, myCenterPoint, mySecondPoint);
