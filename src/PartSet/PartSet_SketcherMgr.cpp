@@ -613,7 +613,8 @@ void PartSet_SketcherMgr::onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMo
       QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
       // Find corresponded widget to activate value editing
       foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
-        if (aWgt->attributeID() == "ConstraintValue") {
+        if (aWgt->attributeID() == SketchPlugin_Constraint::VALUE() ||
+            aWgt->attributeID() == SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()) {
           PartSet_WidgetEditor* anEditor = dynamic_cast<PartSet_WidgetEditor*>(aWgt);
           if (anEditor)
             anEditor->showPopupEditor();
