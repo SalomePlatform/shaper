@@ -210,9 +210,9 @@ void PartSet_ResultSketchPrs::setAuxiliaryPresentationStyle(const bool isAuxilia
     aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
   }
   else {
-    aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color",
-                                         SKETCH_AUXILIARY_COLOR);
-    aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH_AUXILIARY();
+    aColor = Config_PropManager::color("Visualization", "result_construction_color",
+                                        ModelAPI_ResultConstruction::DEFAULT_COLOR());
+    aWidth = PartSet_Tools::getAISDefaultWidth();// default width value
     aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY();
   }
 
