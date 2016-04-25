@@ -18,6 +18,8 @@
 #include <ModuleBase_Tools.h>
 
 #include <Config_PropManager.h>
+#include <Events_Loop.h>
+#include <ModelAPI_Events.h>
 
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_InteractiveObject.hxx>
@@ -26,8 +28,11 @@
 //#define DO_NOT_VISUALIZE_CUSTOM_PRESENTATION
 
 PartSet_CustomPrs::PartSet_CustomPrs(ModuleBase_IWorkshop* theWorkshop)
-  : myWorkshop(theWorkshop), myFeature(FeaturePtr())
+  : myWorkshop(theWorkshop), myFeature(FeaturePtr()), myPresentationIsEmpty(false)
 {
+  Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION));
+
   initPresentation(ModuleBase_IModule::CustomizeArguments);
   initPresentation(ModuleBase_IModule::CustomizeResults);
   initPresentation(ModuleBase_IModule::CustomizeHighlightedObjects);
@@ -106,7 +111,9 @@ bool PartSet_CustomPrs::displayPresentation(
       return isModified;
   }
 
+  myPresentationIsEmpty = false;
   // redisplay AIS objects
+  bool aRedisplayed = false;
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull() && !aContext->IsDisplayed(anOperationPrs)) {
     // when the feature can not be visualized in the module, the operation preview should not
@@ -118,8 +125,8 @@ bool PartSet_CustomPrs::displayPresentation(
 
       PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
       XGUI_Workshop* aWorkshop = workshop();
-      aWorkshop->displayer()->displayAIS(myPresentations[theFlag], false/*load object in selection*/,
-                                         theUpdateViewer);
+      aRedisplayed = aWorkshop->displayer()->displayAIS(myPresentations[theFlag],
+                                         false/*load object in selection*/, false);
       aContext->SetZLayer(anOperationPrs, aModule->getVisualLayerId());
       isModified = true;
     }
@@ -128,25 +135,32 @@ bool PartSet_CustomPrs::displayPresentation(
     // when the feature can not be visualized in the module, the operation preview should not
     // be visualized also
     if (!anOperationPrs->hasShapes() || !myWorkshop->module()->canDisplayObject(myFeature)) {
-      erasePresentation(theFlag, theUpdateViewer);
+      aRedisplayed = erasePresentation(theFlag, false);
       isModified = true;
     }
     else {
       anOperationPrs->Redisplay();
       isModified = true;
-      if (theUpdateViewer)
-        workshop()->displayer()->updateViewer();
+      aRedisplayed = true;
     }
   }
+  if (myPresentationIsEmpty) {
+    aRedisplayed = erasePresentation(theFlag, false);
+  }
+  if (aRedisplayed && theUpdateViewer)
+    workshop()->displayer()->updateViewer();
+
   return isModified;
 }
 
-void PartSet_CustomPrs::erasePresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+bool PartSet_CustomPrs::erasePresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
                                           const bool theUpdateViewer)
 {
+  bool isErased = false;
   XGUI_Workshop* aWorkshop = workshop();
   if (myPresentations.contains(theFlag))
-    aWorkshop->displayer()->eraseAIS(myPresentations[theFlag], theUpdateViewer);
+    isErased = aWorkshop->displayer()->eraseAIS(myPresentations[theFlag], theUpdateViewer);
+  return isErased;
 }
 
 void PartSet_CustomPrs::clearPresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag)
@@ -200,6 +214,12 @@ void PartSet_CustomPrs::clearPrs()
   clearPresentation(ModuleBase_IModule::CustomizeArguments);
   clearPresentation(ModuleBase_IModule::CustomizeResults);
   clearPresentation(ModuleBase_IModule::CustomizeHighlightedObjects);
+}
+
+void PartSet_CustomPrs::processEvent(const std::shared_ptr<Events_Message>& theMessage)
+{
+  if (theMessage->eventID() == Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION))
+    myPresentationIsEmpty = true; /// store state to analize it after display/erase is finished
 }
 
 void PartSet_CustomPrs::initPresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag)

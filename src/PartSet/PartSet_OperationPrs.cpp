@@ -124,9 +124,9 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
 
   if (!aReadyToDisplay) {
     Events_Error::throwException("An empty AIS presentation: PartSet_OperationPrs");
-    //std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
-    //            new Events_Message(Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION)));
-    //Events_Loop::loop()->send(aMsg);
+    std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
+                new Events_Message(Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION)));
+    Events_Loop::loop()->send(aMsg);
   }
 }
 

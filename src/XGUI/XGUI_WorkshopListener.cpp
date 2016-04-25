@@ -94,7 +94,6 @@ void XGUI_WorkshopListener::initializeEventListening()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION));
 }
 
 //******************************************************

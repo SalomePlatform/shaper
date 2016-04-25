@@ -16,6 +16,8 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Feature.h>
 
+#include <Events_Listener.h>
+
 #include <GeomAPI_ICustomPrs.h>
 #include <GeomAPI_AISObject.h>
 #include <GeomAPI_Shape.h>
@@ -27,7 +29,7 @@ class XGUI_Workshop;
  * This is the module custom presentation, which manage an AIS presentation, that can be filled
  * by a feature and visualized in the viewer additionally to usual workshop objects.
 */
-class PartSet_CustomPrs
+class PartSet_CustomPrs : public Events_Listener
 {
 public:
   /// Returns yellow color
@@ -79,6 +81,9 @@ public:
   /// it caused erroneus case because the presentation has linkage to the previous context.
   void clearPrs();
 
+  //! Redefinition of Events_Listener method to listen a moment that the presentation becomes empty
+  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
+
 private:
   /// Creates the AIS operation presentation
   /// \param theFlag an object AIS presentation type
@@ -104,7 +109,8 @@ private:
   /// Erases the internal presentation from the viewer of workshop
   /// \param theFlag an object AIS presentation type
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  void erasePresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+  /// \param returns whether the presentation is erased
+  bool erasePresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
                          const bool theUpdateViewer);
 
   /// Nullify the operation presentation. For example, it can be useful when the viewer/context
@@ -119,6 +125,7 @@ private:
   Quantity_Color getShapeColor(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag);
 
 private:
+  bool myPresentationIsEmpty; /// Boolean state about empty presentation
   FeaturePtr myFeature; /// Reference to a feature object
   ModuleBase_IWorkshop* myWorkshop; /// current workshop
   /// map of presentation type to AIS object
