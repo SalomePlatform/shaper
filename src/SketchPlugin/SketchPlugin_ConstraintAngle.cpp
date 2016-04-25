@@ -72,7 +72,7 @@ void SketchPlugin_ConstraintAngle::execute()
   if (!anAttrValue->isInitialized()) {
     double anAngle = calculateAngle();
     anAttrValue->setValue(anAngle);
-    updateAngleValue();
+    updateConstraintValueByAngleValue();
   }
   // the value should to be computed here, not in the getAISObject in order to change the model value
   // inside the object transaction. This is important for creating a constraint by preselection.
@@ -110,7 +110,7 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
     if (!aValueAttr->isInitialized()) { // only if it is not initialized, try to compute the current value
       double anAngle = calculateAngle();
       aValueAttr->setValue(anAngle);
-      updateAngleValue();
+      updateConstraintValueByAngleValue();
     }
   } else if (theID == SketchPlugin_Constraint::FLYOUT_VALUE_PNT() && !myFlyoutUpdate) {
     // Recalculate flyout point in local coordinates
@@ -139,10 +139,9 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
       ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
     double anAngle = calculateAngle();
     aValueAttr->setValue(anAngle);
-    updateAngleValue();
   }
   else if (theID == SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()) {
-    updateAngleValue();
+    updateConstraintValueByAngleValue();
   }
 }
 
@@ -182,7 +181,7 @@ double SketchPlugin_ConstraintAngle::calculateAngle()
   return anAngle;
 }
 
-double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle)
+double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle, bool isPreviousValueObtuse)
 {
   double anAngle = theAngle;
 
@@ -195,9 +194,13 @@ double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle)
       anAngle = theAngle;
     break;
     case SketcherPrs_Tools::ANGLE_COMPLEMENTARY: {
-      anAngle = 180.0 - theAngle;
-      if (anAngle < 0)
-        anAngle += 360;
+      if (theAngle > 180 || isPreviousValueObtuse)
+        anAngle = theAngle - 180.0;
+      else
+        anAngle = 180.0 - theAngle;
+      
+      if (anAngle < 0.0)
+        anAngle += 360.0;
     }
     break;
     case SketcherPrs_Tools::ANGLE_BACKWARD:
@@ -209,16 +212,16 @@ double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle)
   return anAngle;
 }
 
-void SketchPlugin_ConstraintAngle::updateAngleValue()
+void SketchPlugin_ConstraintAngle::updateConstraintValueByAngleValue()
 {
   std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
     ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
   double anAngle = aValueAttr->value();
 
   /// an angle value should be corrected by the current angle type
-  anAngle = getAngleForType(anAngle);
   aValueAttr = std::dynamic_pointer_cast<
                   ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
+  anAngle = getAngleForType(anAngle, aValueAttr->value() > 180.0);
   aValueAttr->setValue(anAngle);
 }
 
