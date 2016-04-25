@@ -57,7 +57,7 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
   /// Width of the auxiliary line
   inline static const double SKETCH_LINE_WIDTH_AUXILIARY()
   {
-    return 1;
+    return 2;
   }
 
   /// Width of the line

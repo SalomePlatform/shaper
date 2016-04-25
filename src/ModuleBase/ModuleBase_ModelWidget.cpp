@@ -87,7 +87,7 @@ QString ModuleBase_ModelWidget::getValueStateError() const
   return anError;
 }
 
-QString ModuleBase_ModelWidget::getError() const
+QString ModuleBase_ModelWidget::getError(const bool theValueStateChecked) const
 {
   QString anError;
 
@@ -110,7 +110,7 @@ QString ModuleBase_ModelWidget::getError() const
   }
 
   anError = QString::fromStdString(anErrorMsg);
-  if (anError.isEmpty())
+  if (anError.isEmpty() && theValueStateChecked)
     anError = getValueStateError();
 
   return anError;

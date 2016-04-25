@@ -128,7 +128,7 @@ void PartSet_WidgetPoint2dDistance::onMouseRelease(ModuleBase_IViewWindow* theWn
   setPoint(feature(), aPnt);
 
   // if the validator of the control returns false, focus should not be switched
-  if (getError().isEmpty())
+  if (getError(false).isEmpty())
     emit focusOutWidget(this);
 }
 
