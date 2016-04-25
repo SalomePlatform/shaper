@@ -331,7 +331,10 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
       if (!aText.isEmpty()) {
         if (hasName(aText)) {
           myMessage = tr("Name %1 already exists.").arg(aText);
-          aItem->setText(Col_Name, aStringAttr->value().c_str());
+          if (aStringAttr->value().length() > 0)
+            aItem->setText(Col_Name, aStringAttr->value().c_str());
+          else 
+            aItem->setText(Col_Name, NoName);
           QTimer::singleShot(50, this, SLOT(sendWarning()));
           return;
         }
@@ -593,9 +596,12 @@ void ParametersPlugin_WidgetParamsMgr::onDown()
 
 bool ParametersPlugin_WidgetParamsMgr::hasName(const QString& theName) const
 {
+  int aCurrent = myDelegate->editIndex().row();
+  int i = 0;
   foreach(FeaturePtr aFeature, myParametersList) {
-    if (aFeature->data()->name() == theName.toStdString())
+    if ((i != aCurrent) && (aFeature->data()->name() == theName.toStdString()))
       return true;
+    i++;
   }
   return false;
 }
