@@ -100,7 +100,7 @@ class BoxFeature(model.Feature):
         else:
             self.base.setText(self.width, width_text)
 
-        if length_text != "":
+        if length_text == "":
             self.base.setValue(self.length, length)
         else:
             self.base.setText(self.length, length_text)
