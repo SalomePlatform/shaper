@@ -353,7 +353,7 @@ static inline void calculateArcAngleRadius(
   theRadiusAttr->setValue(theCircle->radius());
 }
 
-static inline void calculatePassedPoint(
+static inline bool calculatePassedPoint(
     const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
     const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint,
     const std::shared_ptr<GeomAPI_Pnt2d>& theEndPoint,
@@ -362,7 +362,7 @@ static inline void calculatePassedPoint(
 {
   if (theCenter->distance(theStartPoint) < tolerance ||
       theCenter->distance(theEndPoint) < tolerance)
-    return;
+    return false;
 
   std::shared_ptr<GeomAPI_Dir2d> aStartDir(new GeomAPI_Dir2d(
       theStartPoint->xy()->decreased(theCenter->xy())));
@@ -381,6 +381,7 @@ static inline void calculatePassedPoint(
   double aRadius = theCenter->distance(theStartPoint);
   std::shared_ptr<GeomAPI_XY> aPassedPnt = theCenter->xy()->added( aMidDir->xy()->multiplied(aRadius) );
   thePassedPoint->setValue(aPassedPnt->x(), aPassedPnt->y());
+  return true;
 }
 
 void SketchPlugin_Arc::updateDependentAttributes()
@@ -403,9 +404,9 @@ void SketchPlugin_Arc::updateDependentAttributes()
 
   data()->blockSendAttributeUpdated(true);
 
-  calculatePassedPoint(aCenterAttr->pnt(), aStartAttr->pnt(), anEndAttr->pnt(),
+  bool isOk = calculatePassedPoint(aCenterAttr->pnt(), aStartAttr->pnt(), anEndAttr->pnt(),
                        isReversed(), aPassedPoint);
-  if (aRadiusAttr && anAngleAttr) {
+  if (isOk && aRadiusAttr && anAngleAttr) {
     std::shared_ptr<GeomAPI_Circ2d> aCircle(
         new GeomAPI_Circ2d(aStartAttr->pnt(), anEndAttr->pnt(), aPassedPoint->pnt()));
     if (aCircle->implPtr<void*>())

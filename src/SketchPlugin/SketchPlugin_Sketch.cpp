@@ -290,7 +290,9 @@ FeaturePtr SketchPlugin_Sketch::addUniqueNamedCopiedFeature(FeaturePtr theFeatur
   std::string aUniqueFeatureName = aNewFeature->data()->name();
   // all attribute values are copied\pasted to the new feature, name is not an exception
   theFeature->data()->copyTo(aNewFeature->data());
-  // as a name for the feature, the generated unique name is set
+  // external state should not be copied as a new object is an object of the current sketch
+  if (theFeature->selection(SketchPlugin_SketchEntity::EXTERNAL_ID()).get())
+    theFeature->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->setValue(NULL, NULL);
   aNewFeature->data()->setName(aUniqueFeatureName);
   // text expressions could block setValue of some attributes
   SketchPlugin_Tools::clearExpressions(aNewFeature);
