@@ -37,7 +37,8 @@
   #include "GeomAlgoAPI_Intersection.h"
   #include "GeomAlgoAPI_Pipe.h"
   #include "GeomAlgoAPI_WireBuilder.h"
-
+  #include "GeomAlgoAPI_Sewing.h"
+  
   #include <memory>
   #include <string>
   #include <list>

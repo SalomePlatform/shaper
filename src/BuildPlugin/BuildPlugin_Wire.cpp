@@ -148,13 +148,6 @@ bool BuildPlugin_Wire::addContour()
     AttributeSelectionPtr aSelection = *aListIt;
     std::shared_ptr<GeomAPI_Edge> anEdgeInList(new GeomAPI_Edge(aSelection->value()));
 
-    ListOfShape::const_iterator anEdgesIt = anAddedEdges.cbegin();
-    for(; anEdgesIt != anAddedEdges.cend(); ++anEdgesIt) {
-      if(anEdgeInList->isEqual(*anEdgesIt)) {
-        break;
-      }
-    }
-
     ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSelection->context());
     std::shared_ptr<GeomAPI_PlanarEdges> aPlanarEdges = std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aConstruction->shape());
 
@@ -179,7 +172,7 @@ bool BuildPlugin_Wire::addContour()
     if(aFoundFace.get()) {
       for(GeomAPI_ShapeExplorer anExp(aFoundFace, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
         std::shared_ptr<GeomAPI_Edge> anEdgeOnFace(new GeomAPI_Edge(anExp.current()));
-        anEdgesIt = anAddedEdges.cbegin();
+        ListOfShape::const_iterator anEdgesIt = anAddedEdges.cbegin();
         for(; anEdgesIt != anAddedEdges.cend(); ++anEdgesIt) {
           if(anEdgeOnFace->isEqual(*anEdgesIt)) {
             break;

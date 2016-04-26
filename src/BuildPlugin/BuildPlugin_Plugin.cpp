@@ -13,6 +13,7 @@
 #include <BuildPlugin_Edge.h>
 #include <BuildPlugin_Wire.h>
 #include <BuildPlugin_Face.h>
+#include <BuildPlugin_Shell.h>
 #include <BuildPlugin_Validators.h>
 
 // the only created instance of this plugin
@@ -46,6 +47,8 @@ FeaturePtr BuildPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new BuildPlugin_Wire());
   } else if(theFeatureID == BuildPlugin_Face::ID()) {
     return FeaturePtr(new BuildPlugin_Face());
+  } else if(theFeatureID == BuildPlugin_Shell::ID()) {
+    return FeaturePtr(new BuildPlugin_Shell());
   }
 
   // Feature of such kind is not found.

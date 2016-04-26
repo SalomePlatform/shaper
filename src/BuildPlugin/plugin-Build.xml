@@ -9,11 +9,14 @@
       <feature id="Edge" title="Edge" tooltip ="Create an edge from sketch edges and edge objects" icon="icons/Build/feature_edge.png">
         <source path="edge_widget.xml"/>
       </feature>
-      <feature id="Wire" title="Wire" tooltip ="Create a wire from sketch edges and wires objects" icon="icons/Build/feature_wire.png">
+      <feature id="Wire" title="Wire" tooltip ="Create a wire from sketch edges, edges and wires objects" icon="icons/Build/feature_wire.png">
         <source path="wire_widget.xml"/>
       </feature>
-      <feature id="Face" title="Face" tooltip ="Create a face from sketch edges and wires objects" icon="icons/Build/feature_face.png">
+      <feature id="Face" title="Face" tooltip ="Create a face from sketch edges, edges and wires objects" icon="icons/Build/feature_face.png">
         <source path="face_widget.xml"/>
+      </feature>
+      <feature id="Shell" title="Shell" tooltip ="Create a shell from faces or shells objects" icon="icons/Build/feature_shell.png">
+        <source path="shell_widget.xml"/>
       </feature>
     </group>
    </workbench>

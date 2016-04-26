@@ -78,6 +78,11 @@ public:
   GEOMAPI_EXPORT
   virtual std::string shapeTypeStr() const;
 
+  /// \return true if passed shape is a sub-shape of this shape.
+  /// \param theShape shape to search.
+  GEOMAPI_EXPORT virtual bool isSubShape(const std::shared_ptr<GeomAPI_Shape> theShape) const;
+
+
   /// Computes boundary dimensions of the shape
   /// Returns False if it is not possible
   GEOMAPI_EXPORT 

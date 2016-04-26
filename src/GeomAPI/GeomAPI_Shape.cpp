@@ -21,6 +21,7 @@
 #include <Geom_Plane.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
 #include <Geom_TrimmedCurve.hxx>
+#include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS_Shape.hxx>
@@ -248,6 +249,26 @@ std::string GeomAPI_Shape::shapeTypeStr() const
   }
 
   return aShapeTypeStr;
+}
+
+bool GeomAPI_Shape::isSubShape(const std::shared_ptr<GeomAPI_Shape> theShape) const
+{
+  if(!theShape.get()) {
+    return false;
+  }
+
+  const TopoDS_Shape& aShapeToSearch = theShape->impl<TopoDS_Shape>();
+  if(aShapeToSearch.IsNull()) {
+    return false;
+  }
+
+  for(TopExp_Explorer anExp(*MY_SHAPE, aShapeToSearch.ShapeType()); anExp.More(); anExp.Next()) {
+    if(aShapeToSearch.IsEqual(anExp.Current())) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 bool GeomAPI_Shape::computeSize(double& theXmin, double& theYmin, double& theZmin,

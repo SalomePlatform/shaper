@@ -1,0 +1,11 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<source>
+  <multi_selector id="base_objects"
+                  label="Faces and shells:"
+                  tooltip="Select faces or shells objects."
+                  type_choice="objects">
+    <validator id="GeomValidators_ShapeType" parameters="face,shell"/>
+  </multi_selector>
+  <!--<validator id="BuildPlugin_ValidatorBaseForShell" parameters="base_objects"/>-->
+</source>

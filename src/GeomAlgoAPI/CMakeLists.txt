@@ -37,6 +37,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Intersection.h
     GeomAlgoAPI_Pipe.h
     GeomAlgoAPI_WireBuilder.h
+    GeomAlgoAPI_Sewing.h
 )
 
 SET(PROJECT_SOURCES
@@ -70,6 +71,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Intersection.cpp
     GeomAlgoAPI_Pipe.cpp
     GeomAlgoAPI_WireBuilder.cpp
+    GeomAlgoAPI_Sewing.cpp
 )
 
 SET(PROJECT_LIBRARIES
