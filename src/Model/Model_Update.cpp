@@ -80,7 +80,12 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
 #ifdef DEB_UPDATE
       std::cout<<"*** Add process on finish "<<theFeature->name()<<std::endl;
 #endif
-    updateArguments(theFeature);
+    static std::set<FeaturePtr> aCurrentlyUpdated;
+    if (aCurrentlyUpdated.find(theFeature) == aCurrentlyUpdated.end()) {
+      aCurrentlyUpdated.insert(theFeature);
+      updateArguments(theFeature);
+      aCurrentlyUpdated.erase(theFeature);
+    }
     if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated) {
       theFeature->data()->execState(ModelAPI_StateDone);
       static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
