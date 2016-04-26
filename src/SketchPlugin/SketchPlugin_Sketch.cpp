@@ -292,7 +292,8 @@ FeaturePtr SketchPlugin_Sketch::addUniqueNamedCopiedFeature(FeaturePtr theFeatur
   theFeature->data()->copyTo(aNewFeature->data());
   // external state should not be copied as a new object is an object of the current sketch
   if (theFeature->selection(SketchPlugin_SketchEntity::EXTERNAL_ID()).get())
-    theFeature->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->setValue(NULL, NULL);
+    theFeature->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->setValue(ResultPtr(),
+                                                                              GeomShapePtr());
   aNewFeature->data()->setName(aUniqueFeatureName);
   // text expressions could block setValue of some attributes
   SketchPlugin_Tools::clearExpressions(aNewFeature);
