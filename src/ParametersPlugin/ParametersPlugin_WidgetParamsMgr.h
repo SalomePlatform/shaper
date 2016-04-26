@@ -103,6 +103,8 @@ private:
   QList<QStringList> featuresItems(const QList<FeaturePtr>& theFeatures) const;
   QList<QStringList> parametersItems(const QList<FeaturePtr>& theFeatures) const;
 
+  void updateParametersFeatures();
+
   QTreeWidget* myTable;
   QTreeWidgetItem* myFeatures;
   QTreeWidgetItem* myParameters;

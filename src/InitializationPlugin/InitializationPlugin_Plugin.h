@@ -35,7 +35,21 @@ class INITIALIZATIONPLUGIN_EXPORT InitializationPlugin_Plugin : public Events_Li
   FeaturePtr createPlane(DocumentPtr theDoc, double theX, double theY, double theZ);
   /// Creates the origin point in (0,0,0)
   /// \param theDoc - document to contain a "point" feature
-  FeaturePtr createPoint(DocumentPtr theDoc);
+  /// \param theName - name of the point
+  /// \param theX - X coordinate
+  /// \param theY - Y coordinate
+  /// \param theZ - Z coordinate
+  FeaturePtr createPoint(DocumentPtr theDoc, const std::string& theName, 
+                         double theX, double theY, double theZ);
+
+  /// Creates an axis which is started from origin point
+  /// \param theDoc - document to contain an "axis" feature
+  /// \param theOrigin - origin point feature
+  /// \param theX - X of direction point
+  /// \param theY - Y of direction point
+  /// \param theZ - Z of direction point
+  FeaturePtr createAxis(DocumentPtr theDoc, FeaturePtr theOrigin, 
+                        double theX, double theY, double theZ);
 };
 
 #endif

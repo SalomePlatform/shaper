@@ -12,6 +12,7 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <BRep_Tool.hxx>
+#include <BRep_Builder.hxx>
 #include <gp_Pnt.hxx>
 #include <Precision.hxx>
 
@@ -25,6 +26,14 @@ GeomAPI_Vertex::GeomAPI_Vertex(const std::shared_ptr<GeomAPI_Shape>& theShape)
   if (!theShape->isNull() && theShape->isVertex()) {
     setImpl(new TopoDS_Shape(theShape->impl<TopoDS_Shape>()));
   }
+}
+
+GeomAPI_Vertex::GeomAPI_Vertex(double theX, double theY, double theZ)
+{
+  TopoDS_Vertex aVertex;
+  BRep_Builder aBuilder;
+  aBuilder.MakeVertex(aVertex, gp_Pnt(theX, theY, theZ), Precision::Confusion());
+  setImpl(new TopoDS_Shape(aVertex));
 }
 
 std::shared_ptr<GeomAPI_Pnt> GeomAPI_Vertex::point()

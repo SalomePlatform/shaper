@@ -121,6 +121,7 @@ void ModuleBase_WidgetFileSelector::onPathSelectionBtn()
     if (myType == WFS_SAVE)
       aFileName = applyExtension(aFileName, mySelectedFilter);
     myPathField->setText(aFileName);
+    emit focusOutWidget(this);
   }
 }
 

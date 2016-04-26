@@ -6,6 +6,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Result.h>
 
@@ -46,7 +47,11 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
         new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)));
     Events_Loop::loop()->send(aMsg);
 
-    aFeatures.push_back(createPoint(aDoc));
+    FeaturePtr aOrigin = createPoint(aDoc, "Origin", 0., 0., 0.);
+    aFeatures.push_back(aOrigin);
+    aFeatures.push_back(createAxis(aDoc, aOrigin, 100., 0., 0.));
+    aFeatures.push_back(createAxis(aDoc, aOrigin, 0., 100., 0.));
+    aFeatures.push_back(createAxis(aDoc, aOrigin, 0., 0., 100.));
     aFeatures.push_back(createPlane(aDoc, 1., 0., 0.));
     aFeatures.push_back(createPlane(aDoc, 0., -1., 0.));
     aFeatures.push_back(createPlane(aDoc, 0., 0., 1.));
@@ -110,13 +115,14 @@ FeaturePtr InitializationPlugin_Plugin::createPlane(DocumentPtr theDoc, double t
   return aPlane;
 }
 
-FeaturePtr InitializationPlugin_Plugin::createPoint(DocumentPtr theDoc)
+FeaturePtr InitializationPlugin_Plugin::createPoint(DocumentPtr theDoc, const std::string& theName,
+                                                    double theX, double theY, double theZ)
 {
   std::shared_ptr<ModelAPI_Feature> aPoint = theDoc->addFeature("Point");
-  aPoint->real("x")->setValue(0.);
-  aPoint->real("y")->setValue(0.);
-  aPoint->real("z")->setValue(0.);
-  aPoint->data()->setName("Origin");
+  aPoint->real("x")->setValue(theX);
+  aPoint->real("y")->setValue(theY);
+  aPoint->real("z")->setValue(theZ);
+  aPoint->data()->setName(theName);
   aPoint->setInHistory(aPoint, false);  // don't show automatically created feature in the features history
 
   // the point should be executed in order to build the feature result immediatelly
@@ -126,4 +132,32 @@ FeaturePtr InitializationPlugin_Plugin::createPoint(DocumentPtr theDoc)
   aPoint->firstResult()->data()->execState(ModelAPI_StateDone);
 
   return aPoint;
+}
+
+FeaturePtr InitializationPlugin_Plugin::createAxis(DocumentPtr theDoc, FeaturePtr theOrigin,
+                                                   double theX, double theY, double theZ)
+{
+  std::shared_ptr<ModelAPI_Feature> aAxis = theDoc->addFeature("Axis");
+  aAxis->string("CreationMethod")->setValue("AxisByPointAndDirection");
+
+  ResultPtr aResult = theOrigin->firstResult();
+  aAxis->selection("FirstPoint")->setValue(aResult, aResult->shape());
+
+  aAxis->real("X_Direction")->setValue(theX);
+  aAxis->real("Y_Direction")->setValue(theY);
+  aAxis->real("Z_Direction")->setValue(theZ);
+
+  if (theX != 0) {
+    aAxis->data()->setName("OX");
+  } else if (theY != 0) {
+    aAxis->data()->setName("OY");
+  } else if (theZ != 0) {
+    aAxis->data()->setName("OZ");
+  }
+  aAxis->setInHistory(aAxis, false);  // don't show automatically created feature in the features history
+  aAxis->execute();
+  aAxis->data()->execState(ModelAPI_StateDone);
+  aAxis->firstResult()->data()->execState(ModelAPI_StateDone);
+
+  return aAxis;
 }

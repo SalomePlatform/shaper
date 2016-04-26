@@ -58,6 +58,27 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
     return CYLINDRICAL_FACE_ATTR;
   }
 
+  /// attribute name for X direction
+  inline static const std::string& X_DIRECTION()
+  {
+    static const std::string ATTR_X_DIRECTION("X_Direction");
+    return ATTR_X_DIRECTION;
+  }
+
+  /// attribute name for Y direction
+  inline static const std::string& Y_DIRECTION()
+  {
+    static const std::string ATTR_Y_DIRECTION("Y_Direction");
+    return ATTR_Y_DIRECTION;
+  }
+
+  /// attribute name for Y direction
+  inline static const std::string& Z_DIRECTION()
+  {
+    static const std::string ATTR_Z_DIRECTION("Z_Direction");
+    return ATTR_Z_DIRECTION;
+  }
+
   /// Returns a minimal length for axis
   inline static const double MINIMAL_LENGTH() { return 1.e-5; }
 
@@ -82,6 +103,8 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
   void createAxisByTwoPoints();
   /// Creates a new axis as copy of cylindrical face axis
   void createAxisByCylindricalFace();
+  /// Creates a new axis by point and direction
+  void createAxisByPointAndDirection();
 };
 
 
