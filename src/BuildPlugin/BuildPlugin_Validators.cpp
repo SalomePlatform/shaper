@@ -87,11 +87,15 @@ bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute
           // It is whole sketch.
           return false;
         }
-      } else if(!aShape->isEqual(aContextShape)) {
-        // Local selection on body does not allowed.
-        theError = "Selected shape is in the local selection. Only global selection is allowed.";
-        return false;
+
+        continue;
       }
+    }
+
+    if(!aShape->isEqual(aContextShape)) {
+      // Local selection on body does not allowed.
+      theError = "Selected shape is in the local selection. Only global selection is allowed.";
+      return false;
     }
   }
 
