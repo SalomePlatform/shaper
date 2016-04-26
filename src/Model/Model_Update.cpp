@@ -344,7 +344,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     int aCount = myProcessed[theFeature];
     if (aCount > 100) { // too many repetition of processing (in VS it may crash on 330 with stack overflow)
       Events_Error::send(
-        "Feature '" + theFeature->data()->name() + "' is updtated in infinitive loop");
+        "Feature '" + theFeature->data()->name() + "' is updated in infinitive loop");
       return false;
     }
     myProcessed[theFeature] = aCount + 1;
@@ -581,7 +581,8 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
     for(; anIter != anAttributes.end(); anIter++) {
       AttributePointPtr aPointAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point>(*anIter);
-      if (aPointAttribute.get()) {
+      if (aPointAttribute.get() && (!aPointAttribute->textX().empty() || 
+          !aPointAttribute->textY().empty() || !aPointAttribute->textZ().empty())) {
         if (myIsParamUpdated) {
           ModelAPI_AttributeEvalMessage::send(aPointAttribute, this);
         }
@@ -601,7 +602,8 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
       AttributePoint2DPtr aPoint2DAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIter);
       if (aPoint2DAttribute.get()) {
-        if (myIsParamUpdated) {
+        if (myIsParamUpdated && (!aPoint2DAttribute->textX().empty() || 
+            !aPoint2DAttribute->textY().empty())) {
           ModelAPI_AttributeEvalMessage::send(aPoint2DAttribute, this);
         }
         if ((!aPoint2DAttribute->textX().empty() && aPoint2DAttribute->expressionInvalid(0)) ||
