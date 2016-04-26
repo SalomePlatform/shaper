@@ -15,6 +15,8 @@
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Axis.hxx>
@@ -146,32 +148,49 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
 #ifdef DEBUG_DELIVERY
     // Fill by trihedron shapes
     Handle(AIS_Axis) aAxis = Handle(AIS_Axis)::DownCast(anIO);
+    DocumentPtr aDoc = ModelAPI_Session::get()->moduleDocument();
+    int aSize = aDoc->size(ModelAPI_ResultConstruction::group());
+    ObjectPtr aObj;
     if (!aAxis.IsNull()) {
       // an Axis from Trihedron
-      Handle(Geom_Line) aLine = aAxis->Component();
-      Handle(Prs3d_DatumAspect) DA = aAxis->Attributes()->DatumAspect();
-      Handle(Geom_TrimmedCurve) aTLine = new Geom_TrimmedCurve(aLine, 0, DA->FirstAxisLength());
-
-      BRep_Builder aBuilder;      
-      TopoDS_Edge aEdge;
-      aBuilder.MakeEdge(aEdge, aTLine, Precision::Confusion());
-      if (!aEdge.IsNull()) {
-        std::shared_ptr<GeomAPI_Shape> aGeomShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-        aGeomShape->setImpl(new TopoDS_Shape(aEdge));
-        thePrs->setShape(aGeomShape);
+      gp_Lin aLine = aAxis->Component()->Lin();
+      gp_Dir aDir = aLine.Direction();
+      std::string aAxName;
+      if (aDir.X() == 1.) 
+        aAxName = "OX";
+      else if (aDir.Y() == 1.)
+        aAxName = "OY";
+      else if (aDir.Z() == 1.)
+        aAxName = "OZ";
+      if (aAxName.length() > 0) {
+        ResultPtr aAx;
+        for (int i = 0; i < aSize; i++) {
+          aObj = aDoc->object(ModelAPI_ResultConstruction::group(), i);
+          if (aObj->data()->name() == aAxName) {
+            aAx = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aObj);
+            break;
+          }
+        }
+        if (aAx.get()) {
+          thePrs->setObject(aAx);
+          thePrs->setShape(aAx->shape());
+        }
       }
     } else {
       Handle(AIS_Point) aPoint = Handle(AIS_Point)::DownCast(anIO);
       if (!aPoint.IsNull()) {
-        // A point from trihedron
-        Handle(Geom_Point) aPnt = aPoint->Component();
-        BRep_Builder aBuilder;
-        TopoDS_Vertex aVertex;
-        aBuilder.MakeVertex(aVertex, aPnt->Pnt(), Precision::Confusion());
-        if (!aVertex.IsNull()) {
-          std::shared_ptr<GeomAPI_Shape> aGeomShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-          aGeomShape->setImpl(new TopoDS_Shape(aVertex));
-          thePrs->setShape(aGeomShape);
+        // An origin point from trihedron
+        ResultPtr aOrigin;
+        for (int i = 0; i < aSize; i++) {
+          aObj = aDoc->object(ModelAPI_ResultConstruction::group(), i);
+          if (aObj->data()->name() == "Origin") {
+            aOrigin = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aObj);
+            break;
+          }
+        }
+        if (aOrigin.get()) {
+          thePrs->setObject(aOrigin);
+          thePrs->setShape(aOrigin->shape());
         }
       }
     }

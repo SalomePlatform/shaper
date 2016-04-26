@@ -215,6 +215,17 @@ bool ParametersPlugin_WidgetParamsMgr::restoreValueCustom()
 
 void ParametersPlugin_WidgetParamsMgr::activateCustom()
 {
+  updateParametersFeatures();
+  updateParametersPart();
+  updateFeaturesPart();
+
+  myFeatures->setExpanded(true);
+  myParameters->setExpanded(true);
+}
+
+void ParametersPlugin_WidgetParamsMgr::updateParametersFeatures()
+{
+  myParametersList.clear();
   FeaturePtr aFeature = feature();
   DocumentPtr aDoc = aFeature->document();
   int aNbParam = aDoc->size(ModelAPI_ResultParameter::group());
@@ -227,11 +238,6 @@ void ParametersPlugin_WidgetParamsMgr::activateCustom()
       myParametersList.append(aParamFeature);
     }
   }
-  updateParametersPart();
-  updateFeaturesPart();
-
-  myFeatures->setExpanded(true);
-  myParameters->setExpanded(true);
 }
 
 void ParametersPlugin_WidgetParamsMgr::updateFeaturesPart()
@@ -530,7 +536,9 @@ void ParametersPlugin_WidgetParamsMgr::onRemove()
 
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED));
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    updateParametersFeatures();
     updateFeaturesPart();
+    updateParametersPart();
   }
 }
 
@@ -567,6 +575,13 @@ void ParametersPlugin_WidgetParamsMgr::onUp()
   myParameters->insertChild(aCurrentPos - 1, aCurrentItem);
 
   selectItemScroll(aCurrentItem);
+
+  //Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED));
+  //Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED));
+  //Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  //updateParametersFeatures();
+  //updateParametersPart();
+  //updateFeaturesPart();
 }
 
 void ParametersPlugin_WidgetParamsMgr::onDown()
@@ -591,6 +606,13 @@ void ParametersPlugin_WidgetParamsMgr::onDown()
   myParameters->insertChild(aCurrentPos + 1, aCurrentItem);
 
   selectItemScroll(aCurrentItem);
+
+  //Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED));
+  //Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED));
+  //Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  //updateParametersFeatures();
+  //updateParametersPart();
+  //updateFeaturesPart();
 }
 
 

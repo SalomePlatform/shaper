@@ -23,9 +23,13 @@ public:
   GEOMAPI_EXPORT 
    GeomAPI_Vertex();
 
-   /// Creation of edge by the edge-shape
+   /// Creation of vertex by the vertex-shape
   GEOMAPI_EXPORT 
    GeomAPI_Vertex(const std::shared_ptr<GeomAPI_Shape>& theShape);
+
+   /// Creation of vertex by 3d coordinates
+  GEOMAPI_EXPORT 
+   GeomAPI_Vertex(double theX, double theY, double theZ);
 
   /// Returns the first vertex coordinates of the edge 
   GEOMAPI_EXPORT 
