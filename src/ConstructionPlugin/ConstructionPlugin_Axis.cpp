@@ -90,7 +90,7 @@ void ConstructionPlugin_Axis::createAxisByPointAndDirection()
                                                                aZAttr->value()));
     if (aShape1->isVertex() && (!aShape1->isEqual(aVertex))) {
       std::shared_ptr<GeomAPI_Pnt> aStart = GeomAlgoAPI_PointBuilder::point(aShape1);
-      std::shared_ptr<GeomAPI_Pnt> anEnd = GeomAlgoAPI_PointBuilder::point(aVertex);
+      std::shared_ptr<GeomAPI_Pnt> anEnd = aVertex->point();
       if (aStart->distance(anEnd) > ConstructionPlugin_Axis::MINIMAL_LENGTH()) {
         std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
 
