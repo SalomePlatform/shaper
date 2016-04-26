@@ -56,13 +56,13 @@ bool SketcherPrs_Coincident::readyToDisplay(ModelAPI_Feature* theConstraint,
   // Get point of the presentation
   std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(theConstraint,
                                                               SketchPlugin_Constraint::ENTITY_A());
-  if (aPnt.get()) {
+  if (aPnt.get() == NULL)
     aPnt = SketcherPrs_Tools::getPoint(theConstraint, SketchPlugin_Constraint::ENTITY_B());
-    aReadyToDisplay = aPnt.get() != NULL;
-    if (aReadyToDisplay) {
-      std::shared_ptr<GeomAPI_Pnt> aPoint = thePlane->to3D(aPnt->x(), aPnt->y());
-      thePoint = aPoint->impl<gp_Pnt>();
-    }
+
+  aReadyToDisplay = aPnt.get() != NULL;
+  if (aReadyToDisplay) {
+    std::shared_ptr<GeomAPI_Pnt> aPoint = thePlane->to3D(aPnt->x(), aPnt->y());
+    thePoint = aPoint->impl<gp_Pnt>();
   }
   return aReadyToDisplay;
 }
