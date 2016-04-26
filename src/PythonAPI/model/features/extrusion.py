@@ -126,7 +126,7 @@ class Extrusion(Interface):
         self._fillAttribute(self._base, base)
         pass
 
-    def setSizes(self, to_size, from_size):
+    def setSizes(self, to_size, from_size, to_size_text="", from_size_text=""):
         """Modify the to_size, from_size attributes of the feature.
 
         See __init__.
@@ -136,23 +136,34 @@ class Extrusion(Interface):
         # values without changes that causes cyclic dependency
         #self.__clear()
         self._fillAttribute(self._CreationMethod, "BySizes")
-        self._fillAttribute(self._to_size, to_size)
-        self._fillAttribute(self._from_size, from_size)
+        if to_size_text == "":
+            self._fillAttribute(self._to_size, to_size)
+        else:
+            self._fillAttribute(self._to_size, to_size_text)
+
+        if from_size_text == "":
+            self._fillAttribute(self._from_size, from_size)
+        else:
+            self._fillAttribute(self._to_size, from_size_text)
         pass
 
-    def setSize(self, size):
+    def setSize(self, size, text=""):
         """Modify the size of the feature.
 
         If size is positive then initialize to_size with size.
         If size is negative then initialize from_size with -size.
         """
         to_size, from_size = 0, 0
+        to_size_text, from_size_text = "", ""
         if size >= 0:
             to_size = size
+            to_size_text = text
         else:
             from_size = -size
+            from_size_text = text
 
-        self.setSizes(to_size, from_size)
+        self.setSizes(to_size, from_size, to_size_text, from_size_text)
+
         pass
 
     def setPlanesAndOffsets(self, to_object, to_offset,

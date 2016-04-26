@@ -95,13 +95,17 @@ class BoxFeature(model.Feature):
         height_text = self.getTextInput(self.HEIGHT_ID())
 
         # Editing the box
-        self.base.setValue(self.width, width)
-        self.base.setText(self.width, width_text)
+        if width_text == "":
+            self.base.setValue(self.width, width)
+        else:
+            self.base.setText(self.width, width_text)
 
-        self.base.setValue(self.length, length)
-        self.base.setText(self.length, length_text)
+        if length_text != "":
+            self.base.setValue(self.length, length)
+        else:
+            self.base.setText(self.length, length_text)
 
-        self.box.setSize(height)
+        self.box.setSize(height, height_text)
 
         # Publishing the result: not needed for Macro feature
         # self.addResult( self.box.result() )
