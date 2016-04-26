@@ -499,6 +499,7 @@ void SketchSolver_Manager::degreesOfFreedom()
     if (aSketchDoF.find(aSketch) != aSketchDoF.end() || aSketchDoF[aSketch] < 0)
       continue;
 
+    std::set<AttributePtr> aCoincidentPoints;
     int aDoF = 0;
     int aNbSubs = aSketch->numberOfSubs();
     for (int i = 0; i < aNbSubs; ++i) {
@@ -512,19 +513,32 @@ void SketchSolver_Manager::degreesOfFreedom()
 
       // DoF delta in specific cases
       if (aFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+        AttributePtr aCoincPoint[2] = {AttributePtr(), AttributePtr()};
         for (int j = 0; j < 2; ++j) {
           AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
               aFeature->attribute(SketchPlugin_Constraint::ATTRIBUTE(j)));
           if (!aRefAttr)
             continue;
           bool isPoint = !aRefAttr->isObject();
-          if (!isPoint) {
+          if (isPoint)
+            aCoincPoint[j] = aRefAttr->attr();
+          else {
             FeaturePtr anAttr = ModelAPI_Feature::feature(aRefAttr->object());
             isPoint = anAttr && anAttr->getKind() == SketchPlugin_Point::ID();
+            if (isPoint)
+              aCoincPoint[j] = anAttr->attribute(SketchPlugin_Point::COORD_ID());
           }
-          if (isPoint)
-            aDoF -= 1;
         }
+        if (aCoincPoint[0] && aCoincPoint[1]) {
+          // point-point coincidence
+          if (aCoincidentPoints.find(aCoincPoint[0]) == aCoincidentPoints.end() ||
+              aCoincidentPoints.find(aCoincPoint[1]) == aCoincidentPoints.end())
+            aDoF -= 2;
+        } else 
+          aDoF -= 1;
+        for (int j = 0; j < 2; ++j)
+          if (aCoincPoint[j])
+            aCoincidentPoints.insert(aCoincPoint[j]);
       }
       else if (aFeature->getKind() == SketchPlugin_ConstraintRigid::ID()) {
         AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
