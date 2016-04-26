@@ -98,7 +98,8 @@ public:
   virtual std::shared_ptr<ModelAPI_Feature> currentFeature(const bool theVisible) = 0;
 
   //! Sets the current feature: all features below will be disabled, new features
-  //! will be appended after this one.
+  //! will be appended after this one. This method does not flushes the events appeared:
+  //! it will be done by the finishOperation, or direct flushes
   //! \param theCurrent the selected feature as current: blow it everythin become disabled
   //! \param theVisible use visible features only: flag is true for Object Browser functionality
   virtual void setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent,

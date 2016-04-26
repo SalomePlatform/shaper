@@ -976,8 +976,6 @@ void Model_Document::setCurrentFeature(
   }
   // make all features after this feature disabled in reversed order (to remove results without deps)
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  static Events_ID aCreateEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-  static Events_ID aDeleteEvent = aLoop->eventByName(EVENT_OBJECT_DELETED);
 
   bool aPassed = false; // flag that the current object is already passed in cycle
   FeaturePtr anIter = myObjs->lastFeature();

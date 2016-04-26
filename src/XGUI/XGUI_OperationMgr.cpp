@@ -444,9 +444,18 @@ void XGUI_OperationMgr::onBeforeOperationStarted()
             ModuleBase_Tools::objectInfo(ModelAPI_Session::get()->activeDocument()->currentFeature(false))).toStdString().c_str());
 #endif
 
-    if (aFOperation->isEditOperation()) // it should be performed by the feature edit only
+    if (aFOperation->isEditOperation()) {// it should be performed by the feature edit only
       // in create operation, the current feature is changed by addFeature()
       aDoc->setCurrentFeature(aFOperation->feature(), false);
+      // this is the only place where flushes must be called after setCurrentFeature for the current
+      // moment: after this the opertion is not finished, so, the ObjectBrowser state may be corrupted
+      // (issue #1457)
+      static Events_Loop* aLoop = Events_Loop::loop();
+      static Events_ID aCreateEvent = aLoop->eventByName(EVENT_OBJECT_CREATED);
+      aLoop->flush(aCreateEvent);
+      static Events_ID aDeleteEvent = aLoop->eventByName(EVENT_OBJECT_DELETED);
+      aLoop->flush(aDeleteEvent);
+    }
 
 #ifdef DEBUG_CURRENT_FEATURE
     qDebug("\tdocument->setCurrentFeature");
