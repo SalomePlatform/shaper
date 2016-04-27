@@ -485,27 +485,39 @@ void SketchSolver_Group::splitGroup(std::list<SketchSolver_Group*>& theCuts)
   }
 
   std::list<SketchSolver_Group*>::iterator aCutsIter;
-  aUnuseIt = anUnusedConstraints.begin();
-  for ( ; aUnuseIt != anUnusedConstraints.end(); ++aUnuseIt) {
-    // Remove unused constraints
+  // Remove unused constraints
+  for (aUnuseIt = anUnusedConstraints.begin(); aUnuseIt != anUnusedConstraints.end(); ++aUnuseIt)
     removeConstraint(*aUnuseIt);
-    // Try to append constraint to already existent group
-    for (aCutsIter = theCuts.begin(); aCutsIter != theCuts.end(); ++aCutsIter)
-      if ((*aCutsIter)->isInteract(*aUnuseIt)) {
-        (*aCutsIter)->changeConstraint(*aUnuseIt);
-        break;
-      }
-    if (aCutsIter == theCuts.end()) {
+
+  SketchSolver_Group* aBaseGroup;
+  for (aUnuseIt = anUnusedConstraints.begin(); aUnuseIt != anUnusedConstraints.end(); ++aUnuseIt) {
+    aBaseGroup = 0;
+    aCutsIter = theCuts.begin();
+    // Try to append constraint to the current group
+    if (isInteract(*aUnuseIt)) {
+      changeConstraint(*aUnuseIt);
+      aBaseGroup = this;
+    } else {
+      // Try to append constraint to already existent group
+      for (; aCutsIter != theCuts.end(); ++aCutsIter)
+        if ((*aCutsIter)->isInteract(*aUnuseIt)) {
+          (*aCutsIter)->changeConstraint(*aUnuseIt);
+          break;
+        }
+    }
+
+    if (aCutsIter == theCuts.end() && !aBaseGroup) {
       // Add new group
       SketchSolver_Group* aGroup = new SketchSolver_Group(mySketch);
       aGroup->changeConstraint(*aUnuseIt);
       theCuts.push_back(aGroup);
     } else {
+      if (!aBaseGroup)
+        aBaseGroup = *aCutsIter++;
       // Find other groups interacting with constraint
-      std::list<SketchSolver_Group*>::iterator aBaseGroupIt = aCutsIter;
-      for (++aCutsIter; aCutsIter != theCuts.end(); ++aCutsIter)
+      for (; aCutsIter != theCuts.end(); ++aCutsIter)
         if ((*aCutsIter)->isInteract(*aUnuseIt)) {
-          (*aBaseGroupIt)->mergeGroups(**aCutsIter);
+          aBaseGroup->mergeGroups(**aCutsIter);
           std::list<SketchSolver_Group*>::iterator aRemoveIt = aCutsIter--;
           theCuts.erase(aRemoveIt);
         }
