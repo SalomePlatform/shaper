@@ -50,8 +50,8 @@ void ModuleBase_WidgetValidated::clearValidatedCash()
 #ifdef DEBUG_VALID_STATE
   qDebug("clearValidatedCash");
 #endif
-  myValidPrs.clear();
-  myInvalidPrs.clear();
+  myValidPrs.Clear();
+  myInvalidPrs.Clear();
 }
 
 //********************************************************************
@@ -244,22 +244,47 @@ void ModuleBase_WidgetValidated::blockAttribute(const AttributePtr& theAttribute
 //********************************************************************
 void ModuleBase_WidgetValidated::storeValidState(const ModuleBase_ViewerPrsPtr& theValue, const bool theValid)
 {
-  bool aValidPrs = myInvalidPrs.contains(theValue);
-  bool anInvalidPrs = myInvalidPrs.contains(theValue);
-
   if (theValid) {
-    if (!aValidPrs)
+    GeomShapePtr aShape = theValue.get() ? theValue->shape() : GeomShapePtr();
+    const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+    bool aValidPrsContains = aShape.get() && myValidPrs.IsBound(aTDShape) &&
+                             theValue.get()->isEqual(myValidPrs.Find(aTDShape).get());
+    if (!aValidPrsContains) {
+#ifdef LIST_OF_VALID_PRS
+
       myValidPrs.append(theValue);
+#else
+      GeomShapePtr aShape = theValue->shape();
+      if (aShape.get()) {
+        const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+        myValidPrs.Bind(aTDShape, theValue);
+      }
+#endif
     // the commented code will be useful when the valid state of the presentation
     // will be changable between activate/deactivate. Currently it does not happen.
     //if (anInvalidPrs)
     //  myInvalidPrs.removeOne(theValue);
+    }
   }
   else { // !theValid
-    if (!anInvalidPrs)
+    GeomShapePtr aShape = theValue.get() ? theValue->shape() : GeomShapePtr();
+    const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+    bool anIValidPrsContains = aShape.get() && myInvalidPrs.IsBound(aTDShape) &&
+                               theValue.get()->isEqual(myInvalidPrs.Find(aTDShape).get());
+
+    if (!anIValidPrsContains) {
+#ifdef LIST_OF_VALID_PRS
       myInvalidPrs.append(theValue);
+#else
+      GeomShapePtr aShape = theValue->shape();
+      if (aShape.get()) {
+        const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+        myInvalidPrs.Bind(aTDShape, theValue);
+      }
+#endif
     //if (!aValidPrs)
     //  myValidPrs.removeOne(theValue);
+    }
   }
 #ifdef DEBUG_VALID_STATE
   qDebug(QString("storeValidState: myValidPrs.size() = %1, myInvalidPrs.size() = %2").arg(myValidPrs.count())
@@ -270,15 +295,47 @@ void ModuleBase_WidgetValidated::storeValidState(const ModuleBase_ViewerPrsPtr& 
 //********************************************************************
 bool ModuleBase_WidgetValidated::getValidState(const ModuleBase_ViewerPrsPtr& theValue, bool& theValid)
 {
-  bool aValidPrs = myValidPrs.contains(theValue);
-  bool anInvalidPrs = myInvalidPrs.contains(theValue);
+  if (!theValue.get())
+    return false;
 
-  if (aValidPrs)
+#ifdef LIST_OF_VALID_PRS
+  bool aValidPrsContains = myValidPrs.contains(theValue);
+  bool anInvalidPrsContains = myInvalidPrs.contains(theValue);
+#else
+  GeomShapePtr aShape = theValue.get() ? theValue->shape() : GeomShapePtr();
+  const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+  bool aValidPrsContains = aShape.get() && myValidPrs.IsBound(aTDShape) &&
+                           theValue.get()->isEqual(myValidPrs.Find(aTDShape).get());
+  /*if (aShape.get() && myValidPrs.IsBound(aTDShape)) {
+    ModuleBase_ViewerPrs* aPrs1 = theValue.get();
+    ModuleBase_ViewerPrs* aPrs2 = myValidPrs.Find(aTDShape).get();
+
+    bool isEqual2 = aPrs1->isEqual(aPrs2);
+
+    bool aValue = 9;
+  }*/
+
+  bool anInvalidPrsContains = aShape.get() && myInvalidPrs.IsBound(aTDShape) &&
+                              theValue.get()->isEqual(myInvalidPrs.Find(aTDShape).get());
+  /*
+  bool aValidPrsContains = false, anInvalidPrsContains = false;
+  GeomShapePtr aShape = theValue.get() ? theValue->shape() : GeomShapePtr();
+  if (aShape.get()) {
+    aValidPrsContains = myValidPrs.contains(aShape);
+    anInvalidPrsContains = myInvalidPrs.contains(aShape);
+
+    if (aValidPrsContains)
+      aValidPrsContains = theValue == myValidPrs[aShape];
+    else
+      anInvalidPrsContains = theValue == myInvalidPrs[aShape];*/
+#endif
+
+  if (aValidPrsContains)
     theValid = true;
-  else if (anInvalidPrs)
+  else if (anInvalidPrsContains)
     theValid = false;
 
-  return aValidPrs || anInvalidPrs;
+  return aValidPrsContains || anInvalidPrsContains;
 }
 
 //********************************************************************

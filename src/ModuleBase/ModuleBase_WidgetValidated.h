@@ -17,8 +17,11 @@
 #include <ModelAPI_Attribute.h>
 
 #include <SelectMgr_ListOfFilter.hxx>
+#include <NCollection_DataMap.hxx>
+#include <TopoDS_Shape.hxx>
 
 #include <QList>
+#include <QMap>
 
 class QWidget;
 class ModuleBase_IWorkshop;
@@ -27,6 +30,8 @@ class ModuleBase_WidgetSelectorStore;
 class ModelAPI_Validator;
 class Config_WidgetAPI;
 class Handle_SelectMgr_EntityOwner;
+
+//#define LIST_OF_VALID_PRS
 
 /**
 * \ingroup GUI
@@ -159,8 +164,14 @@ protected:
 
 private:
   ObjectPtr myPresentedObject; /// back up of the filtered object
+#ifdef LIST_OF_VALID_PRS
   QList<std::shared_ptr<ModuleBase_ViewerPrs>> myValidPrs; /// cash of valid selection presentations
   QList<std::shared_ptr<ModuleBase_ViewerPrs>> myInvalidPrs; /// cash of invalid selection presentations
+#else
+  // assume that one presentation selection presentation corresponds only one shape
+  NCollection_DataMap<TopoDS_Shape, std::shared_ptr<ModuleBase_ViewerPrs> > myValidPrs;
+  NCollection_DataMap<TopoDS_Shape, std::shared_ptr<ModuleBase_ViewerPrs> > myInvalidPrs;
+#endif
 
   /// store to backup parameters of the model
   ModuleBase_WidgetSelectorStore* myAttributeStore;

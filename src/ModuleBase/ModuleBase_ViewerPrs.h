@@ -97,6 +97,10 @@ class ModuleBase_ViewerPrs
            myOwner.IsNull() && !myResult.get();
   }
 
+    /// Returns true if all presentation fields are empty
+  /// \return boolean value
+  MODULEBASE_EXPORT bool isEqual(ModuleBase_ViewerPrs* thePrs) const;
+
   /// Returns True if the current object is equal to the given one
   /// \param thePrs an object to compare
   MODULEBASE_EXPORT bool operator==(const ModuleBase_ViewerPrs& thePrs);
