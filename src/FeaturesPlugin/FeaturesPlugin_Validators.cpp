@@ -253,7 +253,8 @@ bool FeaturesPlugin_ValidatorCanBeEmpty::isValid(const std::shared_ptr<ModelAPI_
   if(!aShape.get()) {
     ResultPtr aContext = aSelAttr->context();
     if(!aContext.get()) {
-      theError = "Selection attribute \"" + *anArgsIt + "\" can not be empty.";
+      theError = "Base objects list contains vertex or edge, so attribute \"" + *anArgsIt
+               + "\" can not be used with default value. Select direction for extrusion.";
       return false;
     }
 
@@ -261,7 +262,8 @@ bool FeaturesPlugin_ValidatorCanBeEmpty::isValid(const std::shared_ptr<ModelAPI_
   }
 
   if(!aShape.get()) {
-    theError = "Selection attribute \"" + *anArgsIt + "\" can not be empty.";
+    theError = "Base objects list contains vertex or edge, so attribute \"" + *anArgsIt
+              + "\" can not be used with default value. Select direction for extrusion.";
     return false;
   }
 
