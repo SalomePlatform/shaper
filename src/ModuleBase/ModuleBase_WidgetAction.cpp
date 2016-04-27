@@ -26,11 +26,11 @@ ModuleBase_WidgetAction::ModuleBase_WidgetAction(QWidget* theParent,
   myActionID = attributeID();
   setAttributeID("");
 
+  myButton = new QToolButton(this);
   QString aText = QString::fromStdString(theData->widgetLabel());
   QString aToolTip = ModuleBase_Tools::wrapTextByWords(
               QString::fromStdString(theData->widgetTooltip()), myButton, DEFAULT_TOOL_TIP_WIDTH);
 
-  myButton = new QToolButton(this);
   myButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   aControlLay->addWidget(myButton);
 
