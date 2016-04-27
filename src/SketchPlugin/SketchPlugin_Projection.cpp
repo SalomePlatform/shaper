@@ -10,6 +10,7 @@
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Sketch.h>
+#include <SketchPlugin_ConstraintRigid.h>
 
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeSelection.h>
@@ -55,7 +56,7 @@ void SketchPlugin_Projection::execute()
 
   if (!lastResult().get()) {
     ResultConstructionPtr aConstr = document()->createConstruction(data());
-    aConstr->setShape(std::shared_ptr<GeomAPI_Edge>());
+    aConstr->setShape(aProjection->lastResult()->shape());
     aConstr->setIsInHistory(false);
     setResult(aConstr);
 
@@ -74,6 +75,16 @@ void SketchPlugin_Projection::attributeChanged(const std::string& theID)
     myIsComputing = true;
     computeProjection(theID);
     myIsComputing = false;
+  }
+  else if (theID == AUXILIARY_ID())
+  {
+    AttributeRefAttrPtr aRefAttr = data()->refattr(PROJECTED_FEATURE_ID());
+    if (!aRefAttr || !aRefAttr->isInitialized())
+      return;
+    FeaturePtr aProjection = ModelAPI_Feature::feature(aRefAttr->object());
+    if (!aProjection)
+      return;
+    aProjection->boolean(AUXILIARY_ID())->setValue(boolean(AUXILIARY_ID())->value());
   }
 }
 
@@ -97,7 +108,8 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     aProjection = ModelAPI_Feature::feature(aRefAttr->object());
 
   // if the type of feature differs with already selected, remove it and create once again
-  if (aProjection) {
+  bool hasPrevProj = aProjection.get() != 0;
+  if (hasPrevProj) {
     if ((anEdge->isLine() && aProjection->getKind() != SketchPlugin_Line::ID()) ||
         (anEdge->isCircle() && aProjection->getKind() != SketchPlugin_Circle::ID()) ||
         (anEdge->isArc() && aProjection->getKind() != SketchPlugin_Arc::ID())) {
@@ -119,7 +131,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     if (aFirstInSketch->distance(aLastInSketch) < tolerance)
       return; // line is semi-orthogonal to the sketch plane
 
-    if (!aProjection)
+    if (!hasPrevProj)
       aProjection = sketch()->addFeature(SketchPlugin_Line::ID());
 
     // update attributes of projection
@@ -137,7 +149,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     std::shared_ptr<GeomAPI_Pnt> aCenter = aSketchPlane->project(aCircle->center());
     std::shared_ptr<GeomAPI_Pnt2d> aCenterInSketch = sketch()->to2D(aCenter);
 
-    if (!aProjection)
+    if (!hasPrevProj)
       aProjection = sketch()->addFeature(SketchPlugin_Circle::ID());
 
     // update attributes of projection
@@ -156,7 +168,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     std::shared_ptr<GeomAPI_Pnt> aCenter = aSketchPlane->project(aCircle->center());
     std::shared_ptr<GeomAPI_Pnt2d> aCenterInSketch = sketch()->to2D(aCenter);
 
-    if (!aProjection)
+    if (!hasPrevProj)
       aProjection = sketch()->addFeature(SketchPlugin_Arc::ID());
 
     // update attributes of projection
@@ -173,6 +185,12 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
 
   aProjection->execute();
   aRefAttr->setObject(aProjection);
+
+  if (!hasPrevProj) {
+    FeaturePtr aFixed = sketch()->addFeature(SketchPlugin_ConstraintRigid::ID());
+    aFixed->refattr(SketchPlugin_Constraint::ENTITY_A())->setObject(aProjection->lastResult());
+    aFixed->execute();
+  }
 
   if (theID == EXTERNAL_FEATURE_ID())
     selection(EXTERNAL_ID())->setValue(aExtFeature->context(), aExtFeature->context()->shape());

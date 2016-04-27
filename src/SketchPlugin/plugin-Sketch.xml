@@ -139,6 +139,7 @@
               label="Edge"
               tooltip="Select external edge."
               shape_types="edge"
+              use_external="false"
               use_sketch_plane="false">
           <validator id="SketchPlugin_ProjectionValidator"/>
         </sketch_shape_selector>
