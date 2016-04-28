@@ -21,13 +21,14 @@
 #include <Events_Loop.h>
 
 #include <QLayout>
-#include <QTreeWidget>
 #include <QPushButton>
 #include <QToolButton>
 #include <QStyledItemDelegate>
 #include <QPainter>
 #include <QMessageBox>
 #include <QTimer>
+#include <QEvent>
+#include <QKeyEvent>
 
 enum ColumnType {
   Col_Name,
@@ -97,6 +98,39 @@ QWidget* ParametersPlugin_ItemDelegate::createEditor(QWidget* parent,
   return QStyledItemDelegate::createEditor(parent, option, index);
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+void ParametersPlugin_TreeWidget::closeEditor(QWidget* theEditor, QAbstractItemDelegate::EndEditHint theHint)
+{
+  if (theHint == QAbstractItemDelegate::EditNextItem) {
+    QModelIndex aCurrent = currentIndex();
+    QModelIndex aParent = model()->index(0, 0);
+    int aNbRows = model()->rowCount(aParent);
+    QModelIndex aIdx;
+    switch (aCurrent.column()) {
+    case 0:
+      aIdx = model()->index(aCurrent.row(), 1, aParent);
+      break;
+    case 1:
+      if (aCurrent.row() < (aNbRows - 1))
+        aIdx = model()->index(aCurrent.row() + 1, 0, aParent);
+      else {
+        QTreeWidget::closeEditor(theEditor, QAbstractItemDelegate::NoHint);
+        return;
+      }
+      break;
+    case 3:
+      QTreeWidget::closeEditor(theEditor, theHint);
+      return;
+    }
+    if (aIdx.isValid()) {
+      QTreeWidget::closeEditor(theEditor, QAbstractItemDelegate::NoHint);
+      setCurrentIndex(aIdx);
+      edit(aIdx);
+      return;
+    }
+  }
+  QTreeWidget::closeEditor(theEditor, theHint);
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -105,7 +139,7 @@ ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theP
 {
   QVBoxLayout* aLayout = new QVBoxLayout(this);
 
-  myTable = new QTreeWidget(this);
+  myTable = new ParametersPlugin_TreeWidget(this);
   myTable->setColumnCount(4);
   QStringList aHeaders;
   aHeaders << tr("Name") << tr("Equation") << tr("Result") << tr("Comment");
@@ -317,6 +351,7 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
 void ParametersPlugin_WidgetParamsMgr::onDoubleClick(const QModelIndex& theIndex)
 {
   if (myDelegate->isEditable(theIndex)) {
+    myTable->setCurrentIndex(theIndex);
     myTable->edit(theIndex);
   }
 }
@@ -455,6 +490,8 @@ void ParametersPlugin_WidgetParamsMgr::onAdd()
   myParametersList.append(aFeature);
       
   myTable->scrollToItem(aItem);
+  myTable->setCurrentItem(aItem);
+  myTable->editItem(aItem);
 }
 
 QTreeWidgetItem* ParametersPlugin_WidgetParamsMgr::selectedItem() const
@@ -648,3 +685,4 @@ void ParametersPlugin_WidgetParamsMgr::onSelectionChanged()
   myUpBtn->setEnabled(isParameter);
   myDownBtn->setEnabled(isParameter);
 }
+

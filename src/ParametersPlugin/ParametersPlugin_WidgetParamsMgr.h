@@ -10,12 +10,25 @@
 #include <ModuleBase_ModelWidget.h>
 #include <QModelIndex>
 #include <QAbstractItemDelegate>
+#include <QTreeWidget>
 
-class QTreeWidget;
 class QTreeWidgetItem;
 class ParametersPlugin_ItemDelegate;
 class QPushButton;
 class QToolButton;
+
+
+class ParametersPlugin_TreeWidget: public QTreeWidget
+{
+ Q_OBJECT
+public:
+  ParametersPlugin_TreeWidget(QWidget* theParent = 0) : QTreeWidget(theParent) {}
+
+protected slots:
+  virtual void closeEditor(QWidget* theEditor, QAbstractItemDelegate::EndEditHint theHint);
+};
+
+
 
 /*!
  * \ingroup GUI
@@ -105,7 +118,7 @@ private:
 
   void updateParametersFeatures();
 
-  QTreeWidget* myTable;
+  ParametersPlugin_TreeWidget* myTable;
   QTreeWidgetItem* myFeatures;
   QTreeWidgetItem* myParameters;
   ParametersPlugin_ItemDelegate* myDelegate;
