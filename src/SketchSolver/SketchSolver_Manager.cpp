@@ -178,6 +178,7 @@ void SketchSolver_Manager::processEvent(
         break;
 
     if (aFGrIter != aFeatureGroups.end()) {
+      hasProperFeature = true;
       std::list<SketchSolver_Group*> aGroupsToResolve;
       std::list<SketchSolver_Group*>::iterator aGroupIter = myGroups.begin();
       std::list<SketchSolver_Group*> aSeparatedGroups;
@@ -186,7 +187,6 @@ void SketchSolver_Manager::processEvent(
           delete *aGroupIter;
           std::list<SketchSolver_Group*>::iterator aRemoveIt = aGroupIter++;
           myGroups.erase(aRemoveIt);
-          hasProperFeature = true;
           continue;
         }
         if (!(*aGroupIter)->isConsistent()) {  // some constraints were removed, try to split the group
@@ -194,7 +194,6 @@ void SketchSolver_Manager::processEvent(
           //if (!(*aGroupIter)->getWorkplane()->string(
           //    SketchPlugin_Sketch::SOLVER_ERROR())->value().empty())
             aGroupsToResolve.push_back(*aGroupIter);
-          hasProperFeature = true;
         }
         aGroupIter++;
       }
