@@ -220,6 +220,12 @@ bool ModuleBase_WidgetMultiSelector::restoreValueCustom()
 bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>& theValues,
                                                   const bool theToValidate)
 {
+  AttributeSelectionListPtr aSelectionListAttr;
+  if (attribute()->attributeType() == ModelAPI_AttributeSelectionList::typeId())
+    aSelectionListAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(attribute());
+  if (aSelectionListAttr.get())
+    aSelectionListAttr->cashValues(true);
+
   /// remove unused objects from the model attribute.
   /// It should be performed before new attributes append.
   removeUnusedAttributeObjects(theValues);
@@ -260,6 +266,9 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>
     // this emit is necessary to call store/restore method an restore type of selection
     //emit valuesChanged();
   //}
+
+  if (aSelectionListAttr.get())
+    aSelectionListAttr->cashValues(false);
 
   theValues.clear();
   if (!anInvalidValues.empty())
