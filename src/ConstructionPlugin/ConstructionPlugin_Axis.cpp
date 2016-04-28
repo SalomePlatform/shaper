@@ -12,6 +12,8 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Vertex.h>
@@ -44,6 +46,12 @@ void ConstructionPlugin_Axis::initAttributes()
                        ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(ConstructionPlugin_Axis::Z_DIRECTION(),
                        ModelAPI_AttributeDouble::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), 
+      ConstructionPlugin_Axis::X_DIRECTION());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), 
+      ConstructionPlugin_Axis::Y_DIRECTION());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), 
+      ConstructionPlugin_Axis::Z_DIRECTION());
 }
 
 void ConstructionPlugin_Axis::createAxisByTwoPoints()
