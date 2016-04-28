@@ -60,6 +60,7 @@ void SketchPlugin_Projection::execute()
     ResultConstructionPtr aConstr = document()->createConstruction(data());
     aConstr->setShape(aProjection->lastResult()->shape());
     aConstr->setIsInHistory(false);
+    aConstr->setDisplayed(false);
     setResult(aConstr);
 
     aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
@@ -113,6 +114,13 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
   }
 
   std::shared_ptr<GeomAPI_Pln> aSketchPlane = sketch()->plane();
+
+  ResultConstructionPtr aResult =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(lastResult());
+  if (aResult && aResult->shape()) {
+    aResult->setShape(std::shared_ptr<GeomAPI_Edge>());
+    aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
+  }
 
   if (anEdge->isLine()) {
     std::shared_ptr<GeomAPI_Pnt> aFirst = aSketchPlane->project(anEdge->firstPoint());
@@ -184,6 +192,13 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     aFixed->execute();
   }
 
-  if (theID == EXTERNAL_FEATURE_ID())
+  if (theID == EXTERNAL_FEATURE_ID()) {
     selection(EXTERNAL_ID())->setValue(aExtFeature->context(), aExtFeature->context()->shape());
+
+    if (aResult) {
+      aResult->setShape(aProjection->lastResult()->shape());
+      setResult(aResult);
+      aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
+    }
+  }
 }
