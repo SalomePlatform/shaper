@@ -295,6 +295,7 @@ Model_AttributeSelectionList::Model_AttributeSelectionList(TDF_Label& theLabel)
   } else { // recollect mySubs
     theLabel.FindAttribute(TDataStd_Comment::GetID(), mySelectionType);
   }
+  myIsCashed = false;
 }
 
 void Model_AttributeSelectionList::cashValues(const bool theEnabled)
