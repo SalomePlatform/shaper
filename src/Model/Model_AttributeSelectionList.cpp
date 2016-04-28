@@ -187,12 +187,12 @@ bool Model_AttributeSelectionList::isInList(const ResultPtr& theContext,
                                             const std::shared_ptr<GeomAPI_Shape>& theSubShape,
                                             const bool theTemporarily)
 {
-  if (myCash.size()) { // the cashing is active
-    std::map<ResultPtr, std::list<const std::shared_ptr<GeomAPI_Shape> > >::iterator aContext =
+  if (!myCash.empty()) { // the cashing is active
+    std::map<ResultPtr, std::list<std::shared_ptr<GeomAPI_Shape> > >::iterator aContext =
       myCash.find(theContext);
     if (aContext != myCash.end()) {
       // iterate shapes because "isEqual" method must be called for each shape
-      std::list<const std::shared_ptr<GeomAPI_Shape> >::iterator aShapes = aContext->second.begin();
+      std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aShapes = aContext->second.begin();
       for(; aShapes != aContext->second.end(); aShapes++) {
         if (!theSubShape.get()) {
           if (!aShapes->get())
