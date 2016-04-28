@@ -174,6 +174,10 @@ double SketchPlugin_ConstraintAngle::calculateAngle()
     anAng = std::shared_ptr<GeomAPI_Angle2d>(new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
   }
   double anAngle = anAng->angleDegree();
+  std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
+      ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_ConstraintAngle::VALUE()));
+  if (!aValueAttr->isInitialized())
+    aValueAttr->setValue(anAngle);
   /// an angle value should be corrected by the current angle type
   anAngle = getAngleForType(anAngle);
   boolean(ANGLE_REVERSED_FIRST_LINE_ID())->setValue(anAng->isReversed(0));
