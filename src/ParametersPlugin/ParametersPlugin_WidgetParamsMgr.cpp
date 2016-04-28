@@ -282,6 +282,8 @@ void ParametersPlugin_WidgetParamsMgr::updateFeaturesPart()
 void ParametersPlugin_WidgetParamsMgr::updateParametersPart()
 {
   updateItem(myParameters, parametersItems(myParametersList));
+  bool aIsValid = checkIsValid();
+  enableButtons(aIsValid);
 }
 
 
@@ -339,15 +341,15 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
     QStringList aValues;
 
     std::string aName = aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->value();
-    if (aName.empty())
+    if (aName.empty()) {
       aValues << NoName;
-    else
+    } else
       aValues << aName.c_str();
 
     std::string aExpr = aParameter->string(ParametersPlugin_Parameter::EXPRESSION_ID())->value();
-    if (aName.empty())
+    if (aName.empty()) {
       aValues << NoValue;
-    else
+    } else
       aValues << aExpr.c_str();
 
     std::string aErr = aParameter->data()->string(ParametersPlugin_Parameter::EXPRESSION_ERROR_ID())->value();
@@ -495,6 +497,8 @@ void ParametersPlugin_WidgetParamsMgr::onAdd()
   myTable->scrollToItem(aItem);
   myTable->setCurrentItem(aItem);
   myTable->editItem(aItem);
+
+  enableButtons(false);
 }
 
 QTreeWidgetItem* ParametersPlugin_WidgetParamsMgr::selectedItem() const
@@ -666,17 +670,52 @@ void ParametersPlugin_WidgetParamsMgr::sendWarning()
 
 void ParametersPlugin_WidgetParamsMgr::onSelectionChanged()
 {
-  QList<QTreeWidgetItem*> aItemsList = myTable->selectedItems();
-  bool isParameter = false;
-  foreach(QTreeWidgetItem* aItem, aItemsList) {
-    if (aItem->parent() == myParameters) {
-      isParameter = true;
+  bool isValid = checkIsValid();
+  if (isValid) {
+    QList<QTreeWidgetItem*> aItemsList = myTable->selectedItems();
+    bool isParameter = false;
+    foreach(QTreeWidgetItem* aItem, aItemsList) {
+      if (aItem->parent() == myParameters) {
+        isParameter = true;
+        break;
+      }
+    }
+    myInsertBtn->setEnabled(isParameter);
+    myRemoveBtn->setEnabled(isParameter);
+    myUpBtn->setEnabled(isParameter);
+    myDownBtn->setEnabled(isParameter);
+  } else {
+    myInsertBtn->setEnabled(false);
+    myRemoveBtn->setEnabled(false);
+    myUpBtn->setEnabled(false);
+    myDownBtn->setEnabled(false);
+  }
+}
+
+void ParametersPlugin_WidgetParamsMgr::enableButtons(bool theEnable)
+{
+  myAddBtn->setEnabled(theEnable);
+  if (theEnable) 
+    onSelectionChanged();
+  else {
+    myInsertBtn->setEnabled(theEnable);
+    myRemoveBtn->setEnabled(theEnable);
+    myUpBtn->setEnabled(theEnable);
+    myDownBtn->setEnabled(theEnable);
+  }
+}
+
+bool ParametersPlugin_WidgetParamsMgr::checkIsValid()
+{
+  QTreeWidgetItem* aItem;
+  bool aIsValid = true;
+  for(int i = 0; i < myParameters->childCount(); i++) {
+    aItem = myParameters->child(i);
+    if ((aItem->text(Col_Name) == NoName) || (aItem->text(Col_Equation) == NoValue)) {
+      aIsValid = false;
       break;
     }
   }
-  myInsertBtn->setEnabled(isParameter);
-  myRemoveBtn->setEnabled(isParameter);
-  myUpBtn->setEnabled(isParameter);
-  myDownBtn->setEnabled(isParameter);
+  return aIsValid;
 }
 

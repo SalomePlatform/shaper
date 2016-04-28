@@ -113,6 +113,11 @@ private:
   /// Returns true if parameter with the given name already exists
   bool hasName(const QString& theName) const;
 
+  /// Enable or disable buttons for parameters managemnt
+  void enableButtons(bool theEnable);
+
+  bool checkIsValid();
+
   QList<QStringList> featuresItems(const QList<FeaturePtr>& theFeatures) const;
   QList<QStringList> parametersItems(const QList<FeaturePtr>& theFeatures) const;
 
