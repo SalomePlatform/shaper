@@ -220,22 +220,27 @@ bool ModuleBase_WidgetMultiSelector::restoreValueCustom()
 bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>& theValues,
                                                   const bool theToValidate)
 {
-  QList<ModuleBase_ViewerPrsPtr> aSkippedValues;
-
   /// remove unused objects from the model attribute.
   /// It should be performed before new attributes append.
   removeUnusedAttributeObjects(theValues);
 
+  QList<ModuleBase_ViewerPrsPtr> anInvalidValues;
   QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
-  bool isDone = false;
   for (; anIt != aLast; anIt++) {
     ModuleBase_ViewerPrsPtr aValue = *anIt;
     bool aProcessed = false;
-    if (!theToValidate || isValidInFilters(aValue)) {
-      aProcessed = setSelectionCustom(aValue);
-    }
-    else
-      aSkippedValues.append(aValue);
+    if (theToValidate && !isValidInFilters(aValue))
+      anInvalidValues.append(aValue);
+  }
+  bool aHasInvalidValues = anInvalidValues.size() > 0;
+
+  bool isDone = false;
+  for (anIt = theValues.begin(); anIt != aLast; anIt++) {
+    ModuleBase_ViewerPrsPtr aValue = *anIt;
+    bool aProcessed = false;
+    if (aHasInvalidValues && anInvalidValues.contains(aValue))
+      continue;
+    aProcessed = setSelectionCustom(aValue);
     // if there is at least one set, the result is true
     isDone = isDone || aProcessed;
   }
@@ -248,8 +253,8 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>
   //}
 
   theValues.clear();
-  if (!aSkippedValues.empty())
-    theValues.append(aSkippedValues);
+  if (!anInvalidValues.empty())
+    theValues.append(anInvalidValues);
 
   return isDone;
 }
