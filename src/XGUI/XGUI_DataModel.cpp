@@ -599,6 +599,8 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
 static QModelIndex MYLastDeleted;
 QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
 {
+  if (!theIndex.isValid())
+    return QModelIndex();
   // To avoid additional request about index which was already deleted
   if (theIndex == MYLastDeleted)
     return QModelIndex();
