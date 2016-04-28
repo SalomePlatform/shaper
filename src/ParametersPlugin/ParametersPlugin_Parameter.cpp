@@ -123,7 +123,11 @@ double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, st
     std::ostringstream sstream;
     sstream << aValue;
     std::string aParamValue = sstream.str();
-    aContext.push_back(*it + "=" + aParamValue);
+    size_t aPos = aParamValue.find(".");
+    std::string aPnt = "";
+    if (aPos == std::string::npos)
+      aPnt = ".";
+    aContext.push_back(*it + "=" + aParamValue + aPnt);
   }
   // compare the list of parameters to store if changed
   AttributeRefListPtr aParams = reflist(ARGUMENTS_ID());

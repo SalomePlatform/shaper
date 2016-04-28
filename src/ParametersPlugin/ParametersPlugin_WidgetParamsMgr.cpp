@@ -292,6 +292,7 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
 {
   QList<QStringList> aItemsList;
   ResultParameterPtr aParam;
+  QList<FeaturePtr> aFeatures;
   foreach(FeaturePtr aParameter, theFeatures) {
     aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParameter->firstResult());
     const std::set<std::shared_ptr<ModelAPI_Attribute>>& aRefs = aParam->data()->refsToMe();
@@ -307,21 +308,24 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
           QList<QStringList> aItems = featuresItems(aList);
           aItemsList.append(aItems);
         } else {
-          QStringList aValNames;
-          aValNames << aReferenced->data()->name().c_str();
+          if (!aFeatures.contains(aReferenced)) {
+            QStringList aValNames;
+            aValNames << aReferenced->data()->name().c_str();
 
-          AttributeDoublePtr aDouble = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aAttr);
-          if (aDouble.get()) {
-            aValNames << aDouble->text().c_str();
-            aValNames << QString::number(aDouble->value());
-          } else {
-            AttributeIntegerPtr aInt = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aAttr);
-            if (aInt.get()) {
-              aValNames << aInt->text().c_str();
-              aValNames << QString::number(aInt->value());
+            AttributeDoublePtr aDouble = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aAttr);
+            if (aDouble.get()) {
+              aValNames << aDouble->text().c_str();
+              aValNames << QString::number(aDouble->value());
+            } else {
+              AttributeIntegerPtr aInt = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aAttr);
+              if (aInt.get()) {
+                aValNames << aInt->text().c_str();
+                aValNames << QString::number(aInt->value());
+              }
             }
+            aItemsList.append(aValNames);
+            aFeatures.append(aReferenced);
           }
-          aItemsList.append(aValNames);
         }
       }
     }
