@@ -85,7 +85,7 @@ void ModuleBase_WidgetSelectorStore::restoreAttributeValue(const AttributePtr& t
       aRefAttrListAttr->removeLast();
   }
   else {
-    ModuleBase_Tools::setObject(theAttribute, myObject, myShape, theWorkshop, true);
+    ModuleBase_Tools::setObject(theAttribute, myObject, myShape, theWorkshop, true, true);
     AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
     if (aRefAttr) {
       if (!myIsObject)

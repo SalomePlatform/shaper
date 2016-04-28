@@ -225,10 +225,18 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>
   removeUnusedAttributeObjects(theValues);
 
   QList<ModuleBase_ViewerPrsPtr> anInvalidValues;
+  QList<ModuleBase_ViewerPrsPtr> anAttributeValues;
   QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
   for (; anIt != aLast; anIt++) {
     ModuleBase_ViewerPrsPtr aValue = *anIt;
-    bool aProcessed = false;
+    // do not validate and append to attribute selection presentation if it exists in the attribute
+    ObjectPtr anObject;
+    GeomShapePtr aShape;
+    getGeomSelection(aValue, anObject, aShape);
+    if (ModuleBase_Tools::hasObject(attribute(), anObject, aShape, myWorkshop, myIsInValidate)) {
+      anAttributeValues.append(aValue);
+      continue;
+    }
     if (theToValidate && !isValidInFilters(aValue))
       anInvalidValues.append(aValue);
   }
@@ -238,9 +246,10 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>
   for (anIt = theValues.begin(); anIt != aLast; anIt++) {
     ModuleBase_ViewerPrsPtr aValue = *anIt;
     bool aProcessed = false;
-    if (aHasInvalidValues && anInvalidValues.contains(aValue))
+    if ((aHasInvalidValues && anInvalidValues.contains(aValue)) ||
+        anAttributeValues.contains(aValue))
       continue;
-    aProcessed = setSelectionCustom(aValue);
+    aProcessed = setSelectionCustom(aValue); /// it is not optimal as hasObject() is already checked
     // if there is at least one set, the result is true
     isDone = isDone || aProcessed;
   }
