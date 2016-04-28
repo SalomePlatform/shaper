@@ -125,7 +125,6 @@
           <validator id="GeomValidators_ShapeType" parameters="line"/>
           <validator id="SketchPlugin_IntersectionValidator"/>
         </sketch_shape_selector>
-        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature -->
 
       <!-- Projected feature -->
@@ -143,7 +142,6 @@
               use_sketch_plane="false">
           <validator id="SketchPlugin_ProjectionValidator"/>
         </sketch_shape_selector>
-        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
     </group>
 

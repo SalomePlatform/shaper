@@ -45,6 +45,8 @@ void SketchPlugin_Projection::initDerivedClassAttributes()
 
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), AUXILIARY_ID());
 }
 
 void SketchPlugin_Projection::execute()
@@ -75,16 +77,6 @@ void SketchPlugin_Projection::attributeChanged(const std::string& theID)
     myIsComputing = true;
     computeProjection(theID);
     myIsComputing = false;
-  }
-  else if (theID == AUXILIARY_ID())
-  {
-    AttributeRefAttrPtr aRefAttr = data()->refattr(PROJECTED_FEATURE_ID());
-    if (!aRefAttr || !aRefAttr->isInitialized())
-      return;
-    FeaturePtr aProjection = ModelAPI_Feature::feature(aRefAttr->object());
-    if (!aProjection)
-      return;
-    aProjection->boolean(AUXILIARY_ID())->setValue(boolean(AUXILIARY_ID())->value());
   }
 }
 
