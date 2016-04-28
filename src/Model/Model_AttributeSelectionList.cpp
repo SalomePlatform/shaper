@@ -14,11 +14,12 @@
 #include <TDF_ChildIterator.hxx>
 #include <TDF_RelocationTable.hxx>
 #include <TopAbs_ShapeEnum.hxx>
-
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Edge.hxx>
 #include <BRep_Tool.hxx>
+#include <TNaming_Builder.hxx>
+#include <TNaming_Iterator.hxx>
 
 using namespace std;
 
@@ -84,9 +85,6 @@ void Model_AttributeSelectionList::removeLast()
     owner()->data()->sendAttributeUpdated(this);
   }
 }
-
-#include <TNaming_Builder.hxx>
-#include <TNaming_Iterator.hxx>
 
 // copies named shapes: we need the implementation of this 
 static void CopyNS(const Handle(TNaming_NamedShape)& theFrom,
@@ -189,6 +187,25 @@ bool Model_AttributeSelectionList::isInList(const ResultPtr& theContext,
                                             const std::shared_ptr<GeomAPI_Shape>& theSubShape,
                                             const bool theTemporarily)
 {
+  if (myCash.size()) { // the cashing is active
+    std::map<ResultPtr, std::list<const std::shared_ptr<GeomAPI_Shape> > >::iterator aContext =
+      myCash.find(theContext);
+    if (aContext != myCash.end()) {
+      // iterate shapes because "isEqual" method must be called for each shape
+      std::list<const std::shared_ptr<GeomAPI_Shape> >::iterator aShapes = aContext->second.begin();
+      for(; aShapes != aContext->second.end(); aShapes++) {
+        if (!theSubShape.get()) {
+          if (!aShapes->get())
+            return true;
+        } else {
+          if (theSubShape->isEqual(*aShapes))
+            return true;
+        }
+      }
+    }
+    return false;
+  }
+  // no-cash method
   for(int anIndex = size() - 1; anIndex >= 0; anIndex--) {
     AttributeSelectionPtr anAttr = value(anIndex);
     if (anAttr.get()) {
@@ -273,5 +290,17 @@ Model_AttributeSelectionList::Model_AttributeSelectionList(TDF_Label& theLabel)
     mySelectionType = TDataStd_Comment::Set(theLabel, "");
   } else { // recollect mySubs
     theLabel.FindAttribute(TDataStd_Comment::GetID(), mySelectionType);
+  }
+}
+
+void Model_AttributeSelectionList::cashValues(const bool theEnabled) {
+  myCash.clear(); // empty list as indicator that cash is not used
+  if (theEnabled) {
+    for(int anIndex = size() - 1; anIndex >= 0; anIndex--) {
+      AttributeSelectionPtr anAttr = value(anIndex);
+      if (anAttr.get()) {
+        myCash[anAttr->context()].push_back(anAttr->value());
+      }
+    }
   }
 }

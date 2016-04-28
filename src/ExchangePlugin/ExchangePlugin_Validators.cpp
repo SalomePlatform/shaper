@@ -24,7 +24,7 @@ bool ExchangePlugin_FormatValidator::parseFormats(const std::list<std::string>& 
   bool result = true;
   for (; it != theArguments.end(); ++it) {
     std::string anArg = *it;
-    int aSepPos = anArg.find(":");
+    size_t aSepPos = anArg.find(":");
     if (aSepPos == std::string::npos) {
       result = false;
       continue;

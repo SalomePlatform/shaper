@@ -13,6 +13,7 @@
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
 #include <vector>
+#include <map>
 
 /**\class Model_AttributeSelectionList
  * \ingroup DataModel
@@ -23,8 +24,11 @@
 class Model_AttributeSelectionList : public ModelAPI_AttributeSelectionList
 {
   Handle(TDataStd_Integer) mySize;  ///< Contains size of this list
-  Handle(TDataStd_Comment) mySelectionType;  ///< Contains current type name (same as selection attribute)
+  /// Contains current type name (same as selection attribute)
+  Handle(TDataStd_Comment) mySelectionType;
   std::shared_ptr<Model_AttributeSelection> myTmpAttr; ///< temporary attribute (the last one)
+  /// the cashed shapes to optimize isInList method: from context to set of shapes in this context
+  std::map<ResultPtr, std::list<const std::shared_ptr<GeomAPI_Shape> > > myCash;
 public:
   /// Adds the new reference to the end of the list
   /// \param theContext object where the sub-shape was selected
@@ -73,6 +77,11 @@ public:
 
   /// Returns true if attribute was  initialized by some value
   MODEL_EXPORT virtual bool isInitialized();
+
+  /// Starts or stops cashing of the values in the attribute (the cash may become invalid
+  /// on modification of the attribute or sub-elements, so the cash must be enabled only
+  /// during non-modification operations with this attribute)
+  MODEL_EXPORT virtual void cashValues(const bool theEnabled);
 
 protected:
   /// Objects are created for features automatically

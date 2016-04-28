@@ -64,6 +64,11 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// Returns all attributes
   virtual void clear() = 0;
 
+  /// Starts or stops cashing of the values in the attribute (the cash may become invalid
+  /// on modification of the attribute or sub-elements, so the cash must be enabled only
+  /// during non-modification operations with this attribute)
+  virtual void cashValues(const bool theEnabled) = 0;
+
   /// Returns the type of this class of attributes
   static std::string typeId()
   {
