@@ -39,6 +39,7 @@ enum ColumnType {
 
 const char* NoName = "<NoName>";
 const char* NoValue = "<NoValue>";
+const char* NotValid = "<NotValid>";
 
 class ParametersPlugin_ItemDelegate : public QStyledItemDelegate
 {
@@ -262,13 +263,12 @@ void ParametersPlugin_WidgetParamsMgr::updateParametersFeatures()
   myParametersList.clear();
   FeaturePtr aFeature = feature();
   DocumentPtr aDoc = aFeature->document();
-  int aNbParam = aDoc->size(ModelAPI_ResultParameter::group());
   ObjectPtr aObj;
   FeaturePtr aParamFeature;
-  for (int i = 0; i < aNbParam; i++) {
-    aObj = aDoc->object(ModelAPI_ResultParameter::group(), i);
-    aParamFeature = ModelAPI_Feature::feature(aObj);
-    if (aParamFeature.get() && (aParamFeature->getKind() == ParametersPlugin_Parameter::ID())) {
+  int aNbFeatures = aDoc->numInternalFeatures();
+  for (int i = 0; i < aNbFeatures; i++) {
+    aParamFeature = aDoc->internalFeature(i);
+    if (aParamFeature->getKind() == ParametersPlugin_Parameter::ID()) {
       myParametersList.append(aParamFeature);
     }
   }
@@ -331,16 +331,32 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
 QList<QStringList> ParametersPlugin_WidgetParamsMgr::
   parametersItems(const QList<FeaturePtr>& theFeatures) const
 {
+  std::list<std::string> aArgs;
+  std::string aErr;
   QList<QStringList> aItemsList;
   foreach(FeaturePtr aParameter, theFeatures) {
     ResultPtr aParam = aParameter->firstResult();
     QStringList aValues;
-    aValues << aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->value().c_str();
-    aValues << aParameter->string(ParametersPlugin_Parameter::EXPRESSION_ID())->value().c_str();
 
-    AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
-    aValues << QString::number(aValueAttribute->value());
+    std::string aName = aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->value();
+    if (aName.empty())
+      aValues << NoName;
+    else
+      aValues << aName.c_str();
 
+    std::string aExpr = aParameter->string(ParametersPlugin_Parameter::EXPRESSION_ID())->value();
+    if (aName.empty())
+      aValues << NoValue;
+    else
+      aValues << aExpr.c_str();
+
+    std::string aErr = aParameter->data()->string(ParametersPlugin_Parameter::EXPRESSION_ERROR_ID())->value();
+    if (aErr.empty()) {
+      AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
+      aValues << QString::number(aValueAttribute->value());
+    } else {
+      aValues << aErr.c_str();
+    }
     aValues << aParameter->string(ParametersPlugin_Parameter::COMMENT_ID())->value().c_str();
     aItemsList.append(aValues);
   }
@@ -372,18 +388,12 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
       if (!aText.isEmpty()) {
         if (hasName(aText)) {
           myMessage = tr("Name %1 already exists.").arg(aText);
-          if (aStringAttr->value().length() > 0)
-            aItem->setText(Col_Name, aStringAttr->value().c_str());
-          else 
-            aItem->setText(Col_Name, NoName);
           QTimer::singleShot(50, this, SLOT(sendWarning()));
           return;
         }
         aStringAttr->setValue(aText.toStdString());
         isModified = true;
-      } else {
-        aItem->setText(Col_Name, aStringAttr->value().c_str());
-      }
+      } 
     }
     break;
   case Col_Equation:
@@ -392,10 +402,9 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
       if (!aText.isEmpty()) {
         if (aText != aStringAttr->value().c_str()) {
           aStringAttr->setValue(aText.toStdString());
+          aFeature->execute();
           isModified = true;
         }
-      } else {
-        aItem->setText(Col_Equation, aStringAttr->value().c_str());
       }
     }
     break;
@@ -415,13 +424,6 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 
-  ResultParameterPtr aResult = 
-    std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aFeature->firstResult());
-  if (aResult.get()) {
-    AttributeDoublePtr aValueAttribute = 
-      aResult->data()->real(ModelAPI_ResultParameter::VALUE());
-    aItem->setText(Col_Result, QString::number(aValueAttribute->value()));
-  }
   if (aColumn == Col_Equation)
     updateParametersPart();
   updateFeaturesPart();
@@ -443,8 +445,10 @@ void ParametersPlugin_WidgetParamsMgr::updateItem(QTreeWidgetItem* theItem,
   foreach(QStringList aFeature, theFeaturesList) {
     int aCol = 0;
     foreach(QString aText, aFeature) {
-      if (aText.length() > 0)
+      if (aText.length() > 0) {
         theItem->child(i)->setText(aCol, aText);
+        theItem->child(i)->setToolTip(aCol, aText);
+      }
       aCol++;
     }
     i++;
@@ -483,12 +487,11 @@ void ParametersPlugin_WidgetParamsMgr::onAdd()
   if (!aFeature.get())
     return;
 
-  QTreeWidgetItem* aItem = createNewItem();
-  if (aFeature->name().length() > 0)
-    aItem->setText(Col_Name, aFeature->name().c_str());
-  myParameters->addChild(aItem);
   myParametersList.append(aFeature);
-      
+  updateParametersPart();    
+
+  QTreeWidgetItem* aItem = myParameters->child(myParameters->childCount() - 1);
+
   myTable->scrollToItem(aItem);
   myTable->setCurrentItem(aItem);
   myTable->editItem(aItem);
@@ -521,7 +524,6 @@ void ParametersPlugin_WidgetParamsMgr::onInsert()
   if (!aNewFeature.get())
     return;
 
-  QTreeWidgetItem* aItem = createNewItem();
   int aCurrentPos = myParameters->indexOfChild(aCurrentItem);
   if (aCurrentPos == 0) {
     aDoc->moveFeature(aNewFeature, FeaturePtr());
@@ -529,8 +531,12 @@ void ParametersPlugin_WidgetParamsMgr::onInsert()
     FeaturePtr aCurFeature = myParametersList.at(aCurrentPos - 1);
     aDoc->moveFeature(aNewFeature, aCurFeature);
   }
-  myParametersList.insert(aCurrentPos, aNewFeature);
-  myParameters->insertChild(aCurrentPos, aItem);
+  updateParametersFeatures();
+  updateParametersPart();
+
+  myTable->scrollToItem(aCurrentItem);
+  myTable->setCurrentItem(aCurrentItem);
+  myTable->editItem(aCurrentItem);
 }
 
 void ParametersPlugin_WidgetParamsMgr::onRemove()
@@ -554,8 +560,6 @@ void ParametersPlugin_WidgetParamsMgr::onRemove()
   bool doDeleteReferences = true;
   if (ModuleBase_Tools::isDeleteFeatureWithReferences(anObjects, aDirectRefFeatures, 
       aIndirectRefFeatures, this, doDeleteReferences)) {
-    myParametersList.removeOne(aCurFeature);
-    myParameters->removeChild(aCurrentItem);
 
     std::set<FeaturePtr> aFeaturesToDelete;
     if (doDeleteReferences) {
@@ -585,40 +589,32 @@ void ParametersPlugin_WidgetParamsMgr::onUp()
   if (!aCurrentItem)
     return;
 
-  QString aName = aCurrentItem->text(0);
-
   int aCurrentPos = myParameters->indexOfChild(aCurrentItem);
   if (aCurrentPos == 0)
     return;
   FeaturePtr aCurFeature = myParametersList.at(aCurrentPos);
 
-  std::string aNm = aCurFeature->data()->name();
-
   SessionPtr aMgr = ModelAPI_Session::get();
   std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
-
-  FeaturePtr aa = myParametersList.at(aCurrentPos - 1);
-  std::string aN = aa->data()->name();
 
   if (aCurrentPos == 1)
     aDoc->moveFeature(aCurFeature, FeaturePtr());
   else
     aDoc->moveFeature(aCurFeature, myParametersList.at(aCurrentPos - 2));
 
-  myParametersList.removeOne(aCurFeature);
-  myParametersList.insert(aCurrentPos - 1, aCurFeature);
 
-  myParameters->removeChild(aCurrentItem);
-  myParameters->insertChild(aCurrentPos - 1, aCurrentItem);
+  Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED));
+  Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  updateParametersFeatures();
+  updateParametersPart();
+  updateFeaturesPart();
 
-  selectItemScroll(aCurrentItem);
-
-  //Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED));
-  //Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED));
-  //Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  //updateParametersFeatures();
-  //updateParametersPart();
-  //updateFeaturesPart();
+  if (aCurrentPos > 0) {
+    aCurrentItem = myParameters->child(aCurrentPos - 1);
+    myTable->setCurrentItem(aCurrentItem);
+    selectItemScroll(aCurrentItem);
+  }
 }
 
 void ParametersPlugin_WidgetParamsMgr::onDown()
@@ -636,20 +632,18 @@ void ParametersPlugin_WidgetParamsMgr::onDown()
   std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
   aDoc->moveFeature(aCurFeature, myParametersList.at(aCurrentPos + 1));
 
-  myParametersList.removeOne(aCurFeature);
-  myParametersList.insert(aCurrentPos + 1, aCurFeature);
+  Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED));
+  Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  updateParametersFeatures();
+  updateParametersPart();
+  updateFeaturesPart();
 
-  myParameters->removeChild(aCurrentItem);
-  myParameters->insertChild(aCurrentPos + 1, aCurrentItem);
-
-  selectItemScroll(aCurrentItem);
-
-  //Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED));
-  //Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED));
-  //Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  //updateParametersFeatures();
-  //updateParametersPart();
-  //updateFeaturesPart();
+  if (aCurrentPos < myParameters->childCount() - 1) {
+    aCurrentItem = myParameters->child(aCurrentPos + 1);
+    myTable->setCurrentItem(aCurrentItem);
+    selectItemScroll(aCurrentItem);
+  }
 }
 
 
