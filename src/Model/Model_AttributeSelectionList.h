@@ -29,6 +29,7 @@ class Model_AttributeSelectionList : public ModelAPI_AttributeSelectionList
   std::shared_ptr<Model_AttributeSelection> myTmpAttr; ///< temporary attribute (the last one)
   /// the cashed shapes to optimize isInList method: from context to set of shapes in this context
   std::map<ResultPtr, std::list<std::shared_ptr<GeomAPI_Shape> > > myCash;
+  bool myIsCashed; ///< true if cashing is performed
 public:
   /// Adds the new reference to the end of the list
   /// \param theContext object where the sub-shape was selected

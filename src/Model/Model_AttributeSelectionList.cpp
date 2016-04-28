@@ -35,6 +35,10 @@ void Model_AttributeSelectionList::append(
     }
   }
 
+  if (myIsCashed && !theTemporarily) {
+    myCash[theContext].push_back(theSubShape);
+  }
+
   int aNewTag = mySize->Get() + 1;
   TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);
 
@@ -187,7 +191,7 @@ bool Model_AttributeSelectionList::isInList(const ResultPtr& theContext,
                                             const std::shared_ptr<GeomAPI_Shape>& theSubShape,
                                             const bool theTemporarily)
 {
-  if (!myCash.empty()) { // the cashing is active
+  if (myIsCashed) { // the cashing is active
     std::map<ResultPtr, std::list<std::shared_ptr<GeomAPI_Shape> > >::iterator aContext =
       myCash.find(theContext);
     if (aContext != myCash.end()) {
@@ -293,7 +297,9 @@ Model_AttributeSelectionList::Model_AttributeSelectionList(TDF_Label& theLabel)
   }
 }
 
-void Model_AttributeSelectionList::cashValues(const bool theEnabled) {
+void Model_AttributeSelectionList::cashValues(const bool theEnabled)
+{
+  myIsCashed = theEnabled;
   myCash.clear(); // empty list as indicator that cash is not used
   if (theEnabled) {
     for(int anIndex = size() - 1; anIndex >= 0; anIndex--) {
