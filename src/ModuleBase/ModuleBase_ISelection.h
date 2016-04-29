@@ -12,6 +12,7 @@
 
 #include <ModelAPI_Result.h>
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_Vertex.h>
 
 #include <QModelIndexList>
 #include <AIS_ListOfInteractive.hxx>
@@ -106,11 +107,11 @@ class ModuleBase_ISelection
   static MODULEBASE_EXPORT void filterSelectionOnEqualPoints
                                               (QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theSelected);
 private:
-  /// Returns true if the presentations have an owner with a vertex and these vertices are equal.
-  /// \param thePrs1 the first viewer selected presentation
-  /// \param thePrs2 the second viewer selected presentation
-  static bool isEqualVertices(const std::shared_ptr<ModuleBase_ViewerPrs> thePrs1,
-                              const std::shared_ptr<ModuleBase_ViewerPrs> thePrs2);
+  /// Find vertex shape build by a Brep owner of the presentation if it exists
+  /// \param thePrs a viewer presentation
+  /// \return GeomAPI wrap of vertex
+  static std::shared_ptr<GeomAPI_Vertex> getPresentationVertex(
+                                               const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 };
 
 #endif

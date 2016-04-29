@@ -228,7 +228,7 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>
 
   /// remove unused objects from the model attribute.
   /// It should be performed before new attributes append.
-  removeUnusedAttributeObjects(theValues);
+  bool isDone = removeUnusedAttributeObjects(theValues);
 
   QList<ModuleBase_ViewerPrsPtr> anInvalidValues;
   QList<ModuleBase_ViewerPrsPtr> anAttributeValues;
@@ -248,7 +248,6 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>
   }
   bool aHasInvalidValues = anInvalidValues.size() > 0;
 
-  bool isDone = false;
   for (anIt = theValues.begin(); anIt != aLast; anIt++) {
     ModuleBase_ViewerPrsPtr aValue = *anIt;
     bool aProcessed = false;
@@ -273,6 +272,10 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>
   theValues.clear();
   if (!anInvalidValues.empty())
     theValues.append(anInvalidValues);
+
+  if (isDone) // may be the feature's result is not displayed, but attributes should be
+    myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeArguments,
+                                          true);/// hope that something is redisplayed by object updated
 
   return isDone;
 }
@@ -348,6 +351,10 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
 
     restoreValue();
     myWorkshop->setSelected(getAttributeSelection());
+
+    // may be the feature's result is not displayed, but attributes should be
+    myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeArguments,
+                                          true); /// hope that something is redisplayed by object updated
   }
   return aDone;
 }
@@ -602,9 +609,11 @@ void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<in
   }
 }
 
-void ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
+bool ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
                                                  (QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
+  bool isDone = false;
+
   std::map<ObjectPtr, std::set<GeomShapePtr> > aGeomSelection = convertSelection(theValues);
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = aData->attribute(attributeID());
@@ -620,6 +629,7 @@ void ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
       if (!aFound)
         anIndicesToBeRemoved.insert(i);
     }
+    isDone = anIndicesToBeRemoved.size() > 0;
     aSelectionListAttr->remove(anIndicesToBeRemoved);
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
@@ -632,6 +642,7 @@ void ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
           anIndicesToBeRemoved.insert(i);
       }
     }
+    isDone = anIndicesToBeRemoved.size() > 0;
     aRefListAttr->remove(anIndicesToBeRemoved);
   }
   else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
@@ -660,8 +671,11 @@ void ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
       if (!aFound)
         anIndicesToBeRemoved.insert(i);
     }
+    isDone = anIndicesToBeRemoved.size() > 0;
     aRefAttrListAttr->remove(anIndicesToBeRemoved);
   }
+
+  return isDone;
 }
 
 std::map<ObjectPtr, std::set<GeomShapePtr> > ModuleBase_WidgetMultiSelector::convertSelection

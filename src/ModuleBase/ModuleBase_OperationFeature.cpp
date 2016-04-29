@@ -339,8 +339,6 @@ ModuleBase_ModelWidget* ModuleBase_OperationFeature::activateByPreselection(
   ModuleBase_ModelWidget* aWidget = 0;
   if (myPreSelection.empty())
     return aWidget;
-  // equal vertices should not be used here
-  ModuleBase_ISelection::filterSelectionOnEqualPoints(myPreSelection);
 
   ModuleBase_IPropertyPanel* aPropertyPanel = propertyPanel();
   ModuleBase_ModelWidget* aFilledWgt = 0;
@@ -349,6 +347,9 @@ ModuleBase_ModelWidget* ModuleBase_OperationFeature::activateByPreselection(
     QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
     ModuleBase_ModelWidget* aWgt = 0;
     if (!aWidgets.empty()) {
+      // equal vertices should not be used here
+      ModuleBase_ISelection::filterSelectionOnEqualPoints(myPreSelection);
+
       if (!theGreedAttributeId.empty()) {
         // set preselection to greed widget
         for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {

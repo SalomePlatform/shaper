@@ -148,7 +148,8 @@ protected:
 
   /// Iterates throgh the model attribute list and remove elements which do not present in the list
   /// \param theValues the wrapped selection values
-  virtual void removeUnusedAttributeObjects(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
+  /// \return true if at least one object is removed
+  virtual bool removeUnusedAttributeObjects(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
   /// Converts viewer presentation selection list to objects and shapes map
   /// \param theValues the wrapped selection values

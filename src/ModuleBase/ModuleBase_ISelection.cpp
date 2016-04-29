@@ -93,14 +93,35 @@ void ModuleBase_ISelection::filterSelectionOnEqualPoints
   QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theSelected.begin(),
                                               aLast = theSelected.end();
   QList<ModuleBase_ViewerPrsPtr>::const_iterator aSubIt;
+
+  std::set<std::shared_ptr<GeomAPI_Vertex> > aVerticesMap;
   for (; anIt != aLast; anIt++) {
     aSubIt = anIt;
     aSubIt++;
-    for (; aSubIt != aLast; aSubIt++) {
-      if (isEqualVertices(*anIt, *aSubIt)) {
-        aCandidatesToRemove.append(*aSubIt);
-        break;
+    ModuleBase_ViewerPrsPtr aPrs = *anIt;
+    std::shared_ptr<GeomAPI_Vertex> aGeomPrsVertex = getPresentationVertex(aPrs);
+    if (aGeomPrsVertex.get()) {
+      const TopoDS_Vertex& aPrsVertex = aGeomPrsVertex->impl<TopoDS_Vertex>();
+      std::set<std::shared_ptr<GeomAPI_Vertex> >::const_iterator anIt = aVerticesMap.begin(),
+                                                                 aLast = aVerticesMap.end();
+      bool aFound = false;
+      for (; anIt != aLast && !aFound; anIt++) {
+        std::shared_ptr<GeomAPI_Vertex> aGeomVertex = *anIt;
+        const TopoDS_Vertex& aVertex = aGeomVertex->impl<TopoDS_Vertex>();
+        gp_Pnt aPoint1 = BRep_Tool::Pnt(aVertex);
+        gp_Pnt aPoint2 = BRep_Tool::Pnt(aPrsVertex);
+
+        std::shared_ptr<GeomAPI_Pnt> aPnt1 = std::shared_ptr<GeomAPI_Pnt>
+                        (new GeomAPI_Pnt(aPoint1.X(), aPoint1.Y(), aPoint1.Z()));
+        std::shared_ptr<GeomAPI_Pnt> aPnt2 = std::shared_ptr<GeomAPI_Pnt>
+                        (new GeomAPI_Pnt(aPoint2.X(), aPoint2.Y(), aPoint2.Z()));
+        aFound = aPnt1->isEqual(aPnt2);
       }
+      if (aFound) {
+        aCandidatesToRemove.append(*aSubIt);
+        continue;
+      }
+      aVerticesMap.insert(aGeomPrsVertex);
     }
   }
   QList<ModuleBase_ViewerPrsPtr>::const_iterator aRemIt = aCandidatesToRemove.begin(),
@@ -110,34 +131,23 @@ void ModuleBase_ISelection::filterSelectionOnEqualPoints
   }
 }
 
-bool ModuleBase_ISelection::isEqualVertices(const ModuleBase_ViewerPrsPtr thePrs1,
-                                            const ModuleBase_ViewerPrsPtr thePrs2)
+std::shared_ptr<GeomAPI_Vertex> ModuleBase_ISelection::getPresentationVertex(
+                                                         const ModuleBase_ViewerPrsPtr& thePrs)
 {
-  bool isEqual = false;
-  Handle(StdSelect_BRepOwner) anOwner1 = Handle(StdSelect_BRepOwner)::DownCast(thePrs1->owner());
-  Handle(StdSelect_BRepOwner) anOwner2 = Handle(StdSelect_BRepOwner)::DownCast(thePrs2->owner());
+  std::shared_ptr<GeomAPI_Vertex> aGeomVertex;
+  Handle(StdSelect_BRepOwner) anOwner = Handle(StdSelect_BRepOwner)::DownCast(thePrs->owner());
 
-  if (!anOwner1.IsNull() && anOwner1->HasShape() &&
-      !anOwner2.IsNull() && anOwner2->HasShape()) {
-    const TopoDS_Shape& aShape1 = anOwner1->Shape();
-    const TopoDS_Shape& aShape2 = anOwner2->Shape();
-    //TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
-    if (aShape1.ShapeType() == TopAbs_VERTEX &&
-        aShape2.ShapeType() == TopAbs_VERTEX) {
-      const TopoDS_Vertex& aVertex1 = TopoDS::Vertex(aShape1);
-      const TopoDS_Vertex& aVertex2 = TopoDS::Vertex(aShape2);
-      if (!aVertex1.IsNull() && !aVertex2.IsNull())  {
-        gp_Pnt aPoint1 = BRep_Tool::Pnt(aVertex1);
-        gp_Pnt aPoint2 = BRep_Tool::Pnt(aVertex2);
-
-        std::shared_ptr<GeomAPI_Pnt> aPnt1 = std::shared_ptr<GeomAPI_Pnt>
-                        (new GeomAPI_Pnt(aPoint1.X(), aPoint1.Y(), aPoint1.Z()));
-        std::shared_ptr<GeomAPI_Pnt> aPnt2 = std::shared_ptr<GeomAPI_Pnt>
-                        (new GeomAPI_Pnt(aPoint2.X(), aPoint2.Y(), aPoint2.Z()));
-        isEqual = aPnt1->isEqual(aPnt2);
+  if (!anOwner.IsNull() && anOwner->HasShape()) {
+    const TopoDS_Shape& aShape = anOwner->Shape();
+    if (aShape.ShapeType() == TopAbs_VERTEX) {
+      const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
+      if (!aVertex.IsNull())  {
+        gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
+        aGeomVertex = std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex(aPoint.X(), aPoint.Y(),
+                                                                         aPoint.Z()));
       }
     }
   }
-
-  return isEqual;
+  return aGeomVertex;
 }
+
