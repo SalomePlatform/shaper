@@ -36,6 +36,13 @@ GeomAPI_Shape::GeomAPI_Shape()
 {
 }
 
+std::shared_ptr<GeomAPI_Shape> GeomAPI_Shape::emptyCopied() const
+{
+  GeomShapePtr aShape(new GeomAPI_Shape());
+  aShape->setImpl(new TopoDS_Shape(MY_SHAPE->EmptyCopied()));
+  return aShape;
+}
+
 bool GeomAPI_Shape::isNull() const
 {
   return MY_SHAPE->IsNull() == Standard_True;
@@ -312,6 +319,31 @@ std::string GeomAPI_Shape::shapeTypeStr() const
   }
 
   return aShapeTypeStr;
+}
+
+GeomAPI_Shape::Orientation GeomAPI_Shape::orientation() const
+{
+  TopAbs_Orientation anOrientation = MY_SHAPE->Orientation();
+
+  switch(anOrientation) {
+    case TopAbs_FORWARD:  return FORWARD;
+    case TopAbs_REVERSED: return REVERSED;
+    case TopAbs_INTERNAL: return INTERNAL;
+    case TopAbs_EXTERNAL: return EXTERNAL;
+    default:              return FORWARD;
+  }
+}
+
+void GeomAPI_Shape::setOrientation(const GeomAPI_Shape::Orientation theOrientation)
+{
+  TopAbs_Orientation anOrientation = MY_SHAPE->Orientation();
+
+  switch(theOrientation) {
+    case FORWARD:  MY_SHAPE->Orientation(TopAbs_FORWARD);  break;
+    case REVERSED: MY_SHAPE->Orientation(TopAbs_REVERSED); break;
+    case INTERNAL: MY_SHAPE->Orientation(TopAbs_INTERNAL); break;
+    case EXTERNAL: MY_SHAPE->Orientation(TopAbs_EXTERNAL); break;
+  }
 }
 
 bool GeomAPI_Shape::isSubShape(const std::shared_ptr<GeomAPI_Shape> theShape) const

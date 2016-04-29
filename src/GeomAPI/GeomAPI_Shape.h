@@ -25,10 +25,22 @@ public:
     SHAPE
   };
 
+  /// Shape orientation
+  enum Orientation {
+    FORWARD,
+    REVERSED,
+    INTERNAL,
+    EXTERNAL
+  };
+
  public:
   /// Creation of empty (null) shape
   GEOMAPI_EXPORT 
   GeomAPI_Shape();
+
+  /// \return a new Shape with the same Orientation and Location and a new TShape with the same
+  ///         geometry and no sub-shapes.
+  GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Shape> emptyCopied() const;
 
   /// Returns true if the underlied shape is null
   GEOMAPI_EXPORT 
@@ -82,10 +94,15 @@ public:
   GEOMAPI_EXPORT
   virtual std::string shapeTypeStr() const;
 
+  /// \return the shape orientation.
+  GEOMAPI_EXPORT virtual Orientation orientation() const;
+
+  /// Sets the shape orientation.
+  GEOMAPI_EXPORT virtual void setOrientation(const Orientation theOrientation);
+
   /// \return true if passed shape is a sub-shape of this shape.
   /// \param theShape shape to search.
   GEOMAPI_EXPORT virtual bool isSubShape(const std::shared_ptr<GeomAPI_Shape> theShape) const;
-
 
   /// Computes boundary dimensions of the shape
   /// Returns False if it is not possible

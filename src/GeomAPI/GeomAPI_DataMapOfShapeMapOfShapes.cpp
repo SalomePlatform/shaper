@@ -22,6 +22,9 @@ bool GeomAPI_DataMapOfShapeMapOfShapes::bind(const std::shared_ptr<GeomAPI_Shape
                                              const ListOfShape& theItems)
 {
   const TopoDS_Shape& aKey = theKey->impl<TopoDS_Shape>();
+  if(MY_MAP->IsBound(aKey)) {
+    MY_MAP->ChangeFind(aKey).Clear();
+  }
   for(ListOfShape::const_iterator anIt = theItems.cbegin(); anIt != theItems.cend(); anIt++) {
     const TopoDS_Shape& anItem = (*anIt)->impl<TopoDS_Shape>();
     if(MY_MAP->IsBound(aKey)) {
@@ -83,6 +86,12 @@ bool GeomAPI_DataMapOfShapeMapOfShapes::unBind(const std::shared_ptr<GeomAPI_Sha
 {
   const TopoDS_Shape& aKey = theKey->impl<TopoDS_Shape>();
   return MY_MAP->UnBind(aKey) == Standard_True;
+}
+
+//=================================================================================================
+void GeomAPI_DataMapOfShapeMapOfShapes::clear()
+{
+  return MY_MAP->Clear();
 }
 
 //=================================================================================================

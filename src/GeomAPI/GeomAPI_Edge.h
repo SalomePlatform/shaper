@@ -22,7 +22,7 @@ class GeomAPI_Lin;
 class GeomAPI_Edge : public GeomAPI_Shape
 {
 public:
-   /// Creation of empty (null) shape
+   /// Makes an undefined Edge (no geometry).
   GEOMAPI_EXPORT 
    GeomAPI_Edge();
 

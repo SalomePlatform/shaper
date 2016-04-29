@@ -2,7 +2,7 @@
 
 <plugin>
   <workbench id="Build" document="Part">
-    <group id="Shape">
+    <group id="Generate">
       <feature id="Vertex" title="Vertex" tooltip ="Create a vertex from sketch vertex and vertex objects" icon="icons/Build/feature_vertex.png">
         <source path="vertex_widget.xml"/>
       </feature>
@@ -17,6 +17,11 @@
       </feature>
       <feature id="Shell" title="Shell" tooltip ="Create a shell from faces or shells objects" icon="icons/Build/feature_shell.png">
         <source path="shell_widget.xml"/>
+      </feature>
+    </group>
+    <group id="Modify">
+      <feature id="SubShapes" title="Sub-Shapes" tooltip ="Allows to add or to remove sub-shapes of the selected shape" icon="icons/Build/feature_subshapes.png">
+        <source path="subshapes_widget.xml"/>
       </feature>
     </group>
    </workbench>

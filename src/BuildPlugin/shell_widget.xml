@@ -4,7 +4,8 @@
   <multi_selector id="base_objects"
                   label="Faces and shells:"
                   tooltip="Select faces or shells objects."
-                  type_choice="objects">
+                  type_choice="objects"
+                  concealment="true">
     <validator id="GeomValidators_ShapeType" parameters="face,shell"/>
   </multi_selector>
 </source>

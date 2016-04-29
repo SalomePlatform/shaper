@@ -19,6 +19,7 @@
 #include <GeomAlgoAPI_SketchBuilder.h>
 #include <GeomAlgoAPI_WireBuilder.h>
 
+#include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_ShapeType.h>
 
 #include <Events_Error.h>
@@ -30,11 +31,13 @@ bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute
 {
   // Get base objects list.
   if(theAttribute->attributeType() != ModelAPI_AttributeSelectionList::typeId()) {
-    Events_Error::send("Error: BuildPlugin_ValidatorBaseForBuild does not support attribute type \"" + theAttribute->attributeType()
-      + "\"\n Only \"" + ModelAPI_AttributeSelectionList::typeId() + "\" supported.");
+    Events_Error::send("Error: BuildPlugin_ValidatorBaseForBuild does not support attribute type \""
+      + theAttribute->attributeType() + "\"\n Only \"" + ModelAPI_AttributeSelectionList::typeId()
+      + "\" supported.");
     return false;
   }
-  AttributeSelectionListPtr aSelectionList = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  AttributeSelectionListPtr aSelectionList =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
   if(!aSelectionList.get()) {
     theError = "Could not get selection list.";
     return false;
@@ -109,7 +112,8 @@ bool BuildPlugin_ValidatorBaseForWire::isValid(const std::shared_ptr<ModelAPI_Fe
 {
   // Get attribute.
   if(theArguments.size() != 1) {
-    Events_Error::send("Error: BuildPlugin_ValidatorBaseForWire should be used only with 1 parameter (ID of base objects list).");
+    Events_Error::send("Error: BuildPlugin_ValidatorBaseForWire should be used only with "
+      "1 parameter (ID of base objects list).");
     return false;
   }
   AttributeSelectionListPtr aSelectionList = theFeature->selectionList(theArguments.front());
@@ -153,7 +157,8 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
 {
   // Get attribute.
   if(theArguments.size() != 1) {
-    Events_Error::send("Error: BuildPlugin_ValidatorBaseForFace should be used only with 1 parameter (ID of base objects list).");
+    Events_Error::send("Error: BuildPlugin_ValidatorBaseForFace should be used only with "
+      "1 parameter (ID of base objects list).");
     return false;
   }
   AttributeSelectionListPtr aSelectionList = theFeature->selectionList(theArguments.front());
@@ -217,4 +222,91 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
 bool BuildPlugin_ValidatorBaseForFace::isNotObligatory(std::string theFeature, std::string theAttribute)
 {
   return false;
+}
+
+//=================================================================================================
+bool BuildPlugin_ValidatorSubShapesSelection::isValid(const AttributePtr& theAttribute,
+                                                      const std::list<std::string>& theArguments,
+                                                      std::string& theError) const
+{
+  if(theArguments.size() != 2) {
+    Events_Error::send("Error: BuildPlugin_ValidatorSubShapesSelection should be used only with "
+      "2 parameters (ID of base shape; Sketch feature id).");
+    return false;
+  }
+
+  // Get base objects list.
+  if(theAttribute->attributeType() != ModelAPI_AttributeSelectionList::typeId()) {
+    Events_Error::send("Error: BuildPlugin_ValidatorSubShapesSelection does not support attribute type \""
+      + theAttribute->attributeType() + "\"\n Only \"" + ModelAPI_AttributeSelectionList::typeId()
+      + "\" supported.");
+    return false;
+  }
+  AttributeSelectionListPtr aSelectionList =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if(!aSelectionList.get()) {
+    theError = "Could not get selection list.";
+    return false;
+  }
+
+  // Get base shape.
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+  AttributeSelectionPtr aShapeAttrSelection = aFeature->selection(theArguments.front());
+
+  if(!aShapeAttrSelection.get()) {
+    theError = "Base shape is empty.";
+    return false;
+  }
+
+  ResultPtr aBaseContext = aShapeAttrSelection->context();
+
+  GeomShapePtr aBaseShape  = aShapeAttrSelection->value();
+  if(!aBaseShape.get()) {
+    theError = "Base shape is empty.";
+    return false;
+  }
+
+  // If selected shape is wire allow to select only vertices. If face - allow vertices and edges.
+  std::set<GeomAPI_Shape::ShapeType> anAllowedTypes;
+  switch(aBaseShape->shapeType()) {
+    case GeomAPI_Shape::FACE: anAllowedTypes.insert(GeomAPI_Shape::EDGE);
+    case GeomAPI_Shape::WIRE: anAllowedTypes.insert(GeomAPI_Shape::VERTEX);
+    default: break;
+  }
+
+  // Check selected shapes.
+  GeomValidators_FeatureKind aFeatureKindValidator;
+  std::list<std::string> anArguments;
+  anArguments.push_back(theArguments.back());
+  for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr aSelectionAttrInList = aSelectionList->value(anIndex);
+    if(!aSelectionAttrInList.get()) {
+      theError = "Empty attribute in list.";
+      return false;
+    }
+    // If context not same check that it is a selection on Sketch.
+    if(aBaseContext != aSelectionAttrInList->context()) {
+      if(!aFeatureKindValidator.isValid(aSelectionAttrInList, anArguments, theError)) {
+        return false;
+      }
+    }
+
+    // Check shape type.
+    GeomShapePtr aShapeInList = aSelectionAttrInList->value();
+    if(!aShapeInList.get()) {
+      aShapeInList = aSelectionAttrInList->context()->shape();
+    }
+    if(anAllowedTypes.find(aShapeInList->shapeType()) == anAllowedTypes.cend()) {
+      theError = "Selected shape has unacceptable type.";
+      return false;
+    }
+
+    // Check that shape inside wire or face.
+    if(!GeomAlgoAPI_ShapeTools::isSubShapeInShape(aShapeInList, aBaseShape)) {
+      theError = "Selected shape is not inside base face.";
+      return false;
+    }
+  }
+
+  return true;
 }

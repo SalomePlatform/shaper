@@ -14,6 +14,7 @@
 #include <BuildPlugin_Wire.h>
 #include <BuildPlugin_Face.h>
 #include <BuildPlugin_Shell.h>
+#include <BuildPlugin_SubShapes.h>
 #include <BuildPlugin_Validators.h>
 
 // the only created instance of this plugin
@@ -31,6 +32,8 @@ BuildPlugin_Plugin::BuildPlugin_Plugin()
                               new BuildPlugin_ValidatorBaseForWire());
   aFactory->registerValidator("BuildPlugin_ValidatorBaseForFace",
                               new BuildPlugin_ValidatorBaseForFace());
+  aFactory->registerValidator("BuildPlugin_ValidatorSubShapesSelection",
+                              new BuildPlugin_ValidatorSubShapesSelection());
 
   // Register this plugin.
   ModelAPI_Session::get()->registerPlugin(this);
@@ -49,6 +52,8 @@ FeaturePtr BuildPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new BuildPlugin_Face());
   } else if(theFeatureID == BuildPlugin_Shell::ID()) {
     return FeaturePtr(new BuildPlugin_Shell());
+  } else if(theFeatureID == BuildPlugin_SubShapes::ID()) {
+    return FeaturePtr(new BuildPlugin_SubShapes());
   }
 
   // Feature of such kind is not found.

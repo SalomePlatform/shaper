@@ -64,4 +64,19 @@ public:
   virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
+/// \class BuildPlugin_ValidatorSubShapesSelection
+/// \ingroup Validators
+/// \brief A validator for selection sub-shapes for SubShape feature.
+class BuildPlugin_ValidatorSubShapesSelection: public ModelAPI_AttributeValidator
+{
+public:
+  //! Returns true if attribute is ok.
+  //! \param[in] theAttribute the checked attribute.
+  //! \param[in] theArguments arguments of the attribute.
+  //! \param[out] theError error message.
+   virtual bool isValid(const AttributePtr& theAttribute,
+                        const std::list<std::string>& theArguments,
+                        std::string& theError) const;
+};
+
 #endif

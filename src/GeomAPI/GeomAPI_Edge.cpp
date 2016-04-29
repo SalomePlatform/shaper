@@ -14,6 +14,7 @@
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS.hxx>
+#include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
 #include <Geom_Curve.hxx>
 #include <Geom_Line.hxx>
@@ -23,8 +24,13 @@
 #include <gp_Pln.hxx>
 
 GeomAPI_Edge::GeomAPI_Edge()
-  : GeomAPI_Shape()
 {
+  TopoDS_Edge* anEdge = new TopoDS_Edge;
+
+  BRep_Builder aBuilder;
+  aBuilder.MakeEdge(*anEdge);
+
+  setImpl(anEdge);
 }
 
 GeomAPI_Edge::GeomAPI_Edge(const std::shared_ptr<GeomAPI_Shape>& theShape)

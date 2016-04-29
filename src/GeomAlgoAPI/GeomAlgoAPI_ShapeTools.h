@@ -78,6 +78,13 @@ public:
   /// \param[in] theShapes shapes to find plane.
   /// \return plane where all shapes lie or empty ptr if they not planar.
   static std::shared_ptr<GeomAPI_Pln> findPlane(const ListOfShape& theShapes);
+
+  /// \brief Checks that vertex/edge is inside face or vertext inside wire.
+  /// \param[in] theSubShape shape that should be inside.
+  /// \param[in] theBaseShape base shape.
+  /// \return true if edge inside the face.
+  static bool isSubShapeInShape(const std::shared_ptr<GeomAPI_Shape> theSubShape,
+                                const std::shared_ptr<GeomAPI_Shape> theBaseShape);
 };
 
 #endif

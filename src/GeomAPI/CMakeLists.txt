@@ -21,6 +21,7 @@ SET(PROJECT_HEADERS
     GeomAPI_Pln.h
     GeomAPI_Shape.h
     GeomAPI_ShapeExplorer.h
+    GeomAPI_ShapeIterator.h
     GeomAPI_Edge.h
     GeomAPI_Face.h
     GeomAPI_PlanarEdges.h
@@ -37,6 +38,7 @@ SET(PROJECT_HEADERS
     GeomAPI_Trsf.h
     GeomAPI_Angle.h
     GeomAPI_Angle2d.h
+    GeomAPI_Wire.h
 )
 
 SET(PROJECT_SOURCES
@@ -54,6 +56,7 @@ SET(PROJECT_SOURCES
     GeomAPI_Pln.cpp
     GeomAPI_Shape.cpp
     GeomAPI_ShapeExplorer.cpp
+    GeomAPI_ShapeIterator.cpp
     GeomAPI_Edge.cpp
     GeomAPI_Face.cpp
     GeomAPI_PlanarEdges.cpp
@@ -70,6 +73,7 @@ SET(PROJECT_SOURCES
     GeomAPI_Trsf.cpp
     GeomAPI_Angle.cpp
     GeomAPI_Angle2d.cpp
+    GeomAPI_Wire.cpp
 )
 
 SET(PROJECT_LIBRARIES

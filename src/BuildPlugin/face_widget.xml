@@ -4,7 +4,8 @@
   <multi_selector id="base_objects"
                   label="Segments and wires:"
                   tooltip="Select edges on sketch, edges or wires objects."
-                  type_choice="edges objects">
+                  type_choice="edges objects"
+                  concealment="true">
     <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="edge,wire"/>
   </multi_selector>
   <validator id="BuildPlugin_ValidatorBaseForFace" parameters="base_objects"/>

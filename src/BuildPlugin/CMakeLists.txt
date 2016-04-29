@@ -19,6 +19,7 @@ SET(PROJECT_HEADERS
     BuildPlugin_Wire.h
     BuildPlugin_Face.h
     BuildPlugin_Shell.h
+    BuildPlugin_SubShapes.h
     BuildPlugin_Validators.h
 )
 
@@ -29,6 +30,7 @@ SET(PROJECT_SOURCES
     BuildPlugin_Wire.cpp
     BuildPlugin_Face.cpp
     BuildPlugin_Shell.cpp
+    BuildPlugin_SubShapes.cpp
     BuildPlugin_Validators.cpp
 )
 
@@ -39,6 +41,7 @@ SET(XML_RESOURCES
     wire_widget.xml
     face_widget.xml
     shell_widget.xml
+    subshapes_widget.xml
 )
 
 SET(PROJECT_LIBRARIES

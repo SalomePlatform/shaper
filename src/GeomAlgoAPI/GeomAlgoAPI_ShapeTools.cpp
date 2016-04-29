@@ -16,21 +16,30 @@
 #include <Bnd_Box.hxx>
 #include <BOPTools.hxx>
 #include <BRep_Builder.hxx>
+#include <BRepAdaptor_Curve.hxx>
 #include <BRepAlgo_FaceRestrictor.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_FindPlane.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
+#include <BRepExtrema_DistShapeShape.hxx>
 #include <BRepGProp.hxx>
+#include <BRepTopAdaptor_FClass2d.hxx>
+#include <Geom_Curve.hxx>
+#include <Geom2d_Curve.hxx>
+#include <BRepLib_CheckCurveOnSurface.hxx>
 #include <BRep_Tool.hxx>
 #include <Geom_Plane.hxx>
 #include <GeomLib_IsPlanarSurface.hxx>
 #include <GeomLib_Tool.hxx>
+#include <GeomProjLib.hxx>
 #include <gp_Pln.hxx>
 #include <GProp_GProps.hxx>
 #include <IntAna_IntConicQuad.hxx>
 #include <IntAna_Quadric.hxx>
 #include <NCollection_Vector.hxx>
 #include <ShapeAnalysis.hxx>
+#include <ShapeAnalysis_Surface.hxx>
 #include <TopoDS_Builder.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
@@ -397,4 +406,75 @@ std::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_ShapeTools::findPlane(const ListOfShape
   std::shared_ptr<GeomAPI_Pln> aPln(new GeomAPI_Pln(aGeomPnt, aGeomDir));
 
   return aPln;
+}
+
+//=================================================================================================
+bool GeomAlgoAPI_ShapeTools::isSubShapeInShape(const std::shared_ptr<GeomAPI_Shape> theSubShape,
+                                               const std::shared_ptr<GeomAPI_Shape> theBaseShape)
+{
+  if(!theSubShape.get() || !theBaseShape.get()) {
+    return false;
+  }
+
+  const TopoDS_Shape& aSubShape = theSubShape->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aBaseShape = theBaseShape->impl<TopoDS_Shape>();
+
+  if(aSubShape.ShapeType() == TopAbs_VERTEX) {
+    // If sub-shape is a vertex check distance to shape. If it is <= Precision::Confusion() then OK.
+    BRepExtrema_DistShapeShape aDist(aBaseShape, aSubShape);
+    aDist.Perform();
+    if(!aDist.IsDone() || aDist.Value() > Precision::Confusion()) {
+      return false;
+    }
+  } else if (aSubShape.ShapeType() == TopAbs_EDGE) {
+    if(aBaseShape.ShapeType() == TopAbs_FACE) {
+      // Check that edge is on face surface.
+      TopoDS_Face aFace = TopoDS::Face(aBaseShape);
+      TopoDS_Edge anEdge = TopoDS::Edge(aSubShape);
+      BRepLib_CheckCurveOnSurface aCheck(anEdge, aFace);
+      aCheck.Perform();
+      if(!aCheck.IsDone() || aCheck.MaxDistance() > Precision::Confusion()) {
+        return false;
+      }
+
+      // Check intersections.
+      TopoDS_Vertex aV1, aV2;
+      ShapeAnalysis::FindBounds(anEdge, aV1, aV2);
+      gp_Pnt aPnt1 = BRep_Tool::Pnt(aV1);
+      gp_Pnt aPnt2 = BRep_Tool::Pnt(aV2);
+      for(TopExp_Explorer anExp(aBaseShape, TopAbs_EDGE); anExp.More(); anExp.Next()) {
+        const TopoDS_Shape& anEdgeOnFace = anExp.Current();
+        BRepExtrema_DistShapeShape aDist(anEdgeOnFace, anEdge);
+        aDist.Perform();
+        if(aDist.IsDone() && aDist.Value() <= Precision::Confusion()) {
+          // Edge intersect face bound. Check that it is not on edge begin or end.
+          for(Standard_Integer anIndex = 1; anIndex <= aDist.NbSolution(); ++anIndex) {
+            gp_Pnt aPntOnSubShape = aDist.PointOnShape2(anIndex);
+            if(aPntOnSubShape.Distance(aPnt1) > Precision::Confusion()
+                && aPntOnSubShape.Distance(aPnt2) > Precision::Confusion()) {
+              return false;
+            }
+          }
+        }
+      }
+
+      // No intersections found. Edge is inside or outside face. Check it.
+      BRepAdaptor_Curve aCurveAdaptor(anEdge);
+      gp_Pnt aPointToCheck = aCurveAdaptor.Value((aCurveAdaptor.FirstParameter() + aCurveAdaptor.LastParameter()) / 2.0);
+      Handle(Geom_Surface) aSurface = BRep_Tool::Surface(aFace);
+      ShapeAnalysis_Surface aSAS(aSurface);
+      gp_Pnt2d aPointOnFace = aSAS.ValueOfUV(aPointToCheck, Precision::Confusion());
+      BRepTopAdaptor_FClass2d aFClass2d(aFace, Precision::Confusion());
+      if(aFClass2d.Perform(aPointOnFace) == TopAbs_OUT) {
+        return false;
+      }
+
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
+
+  return true;
 }

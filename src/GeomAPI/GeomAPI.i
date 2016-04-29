@@ -37,10 +37,12 @@
 %shared_ptr(GeomAPI_Pnt2d)
 %shared_ptr(GeomAPI_Shape)
 %shared_ptr(GeomAPI_ShapeExplorer)
+%shared_ptr(GeomAPI_ShapeIterator)
 %shared_ptr(GeomAPI_Vertex)
 %shared_ptr(GeomAPI_XY)
 %shared_ptr(GeomAPI_XYZ)
 %shared_ptr(GeomAPI_Trsf)
+%shared_ptr(GeomAPI_Wire)
 
 
 // all supported interfaces
@@ -68,7 +70,9 @@
 %include "GeomAPI_Pnt.h"
 %include "GeomAPI_Pnt2d.h"
 %include "GeomAPI_ShapeExplorer.h"
+%include "GeomAPI_ShapeIterator.h"
 %include "GeomAPI_Vertex.h"
 %include "GeomAPI_XY.h"
 %include "GeomAPI_XYZ.h"
 %include "GeomAPI_Trsf.h"
+%include "GeomAPI_Wire.h"

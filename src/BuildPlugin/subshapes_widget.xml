@@ -1,0 +1,18 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<source>
+  <shape_selector id="base_shape"
+                  label="Shape:"
+                  tooltip="Select a shape to modify."
+                  shape_types="objects"
+                  concealment="true">
+    <validator id="GeomValidators_ShapeType" parameters="wire,face"/>
+  </shape_selector>
+  <multi_selector id="sub_shapes"
+                  label="Sub-Shapes:"
+                  tooltip="Select shapes on sketch to add."
+                  type_choice="vertices edges"
+                  concealment="true">
+    <validator id="BuildPlugin_ValidatorSubShapesSelection" parameters="base_shape,Sketch"/>
+  </multi_selector>
+</source>

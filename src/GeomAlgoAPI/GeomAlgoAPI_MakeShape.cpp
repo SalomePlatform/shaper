@@ -91,7 +91,10 @@ void GeomAlgoAPI_MakeShape::modified(const std::shared_ptr<GeomAPI_Shape> theSha
   TopTools_ListOfShape aList;
   if(myBuilderType == OCCT_BRepBuilderAPI_MakeShape) {
     BRepBuilderAPI_MakeShape* aMakeShape = implPtr<BRepBuilderAPI_MakeShape>();
-    aList = aMakeShape->Modified(theShape->impl<TopoDS_Shape>());
+    try {
+      aList = aMakeShape->Modified(theShape->impl<TopoDS_Shape>());
+    } catch(Standard_NoSuchObject) {
+    }
   } else if(myBuilderType == OCCT_BOPAlgo_Builder) {
     BOPAlgo_Builder* aBOPBuilder = implPtr<BOPAlgo_Builder>();
     aList = aBOPBuilder->Modified(theShape->impl<TopoDS_Shape>());
