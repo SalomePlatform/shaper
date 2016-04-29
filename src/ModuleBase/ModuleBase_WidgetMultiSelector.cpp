@@ -156,6 +156,8 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
 
   myListControl->setContextMenuPolicy(Qt::ActionsContextMenu);
   connect(myListControl, SIGNAL(itemSelectionChanged()), SLOT(onListSelection()));
+
+  myIsNeutralPointClear = theData->getBooleanAttribute("clear_in_neutral_point", true);
 }
 
 ModuleBase_WidgetMultiSelector::~ModuleBase_WidgetMultiSelector()
@@ -377,6 +379,17 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
   // To clear mySelection, myListControl and storeValue()
   // So, we don't need to call it
   myWorkshop->setSelected(anEmptyList);
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::onSelectionChanged()
+{
+  if (!myIsNeutralPointClear) {
+    QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
+    if (aSelected.size() == 0)
+      return;
+  }
+  ModuleBase_WidgetSelector::onSelectionChanged();
 }
 
 void ModuleBase_WidgetMultiSelector::updateFocus()

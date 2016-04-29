@@ -89,6 +89,10 @@ public slots:
   /// Slot is called on selection type changed
   void onSelectionTypeChanged();
 
+  /// Slot which is called on selection event. Redefined to process XML state about
+  /// clear selection in neutral point
+  virtual void onSelectionChanged();
+
 protected slots:
   /// Slot for copy command in a list pop-up menu
   void onCopyItem();
@@ -182,6 +186,9 @@ protected:
 
   /// A flag to store use_choice parameter state
   bool myIsUseChoice;
+
+  /// A flag to clear selection by click in empty place in the viewer
+  bool myIsNeutralPointClear;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */
