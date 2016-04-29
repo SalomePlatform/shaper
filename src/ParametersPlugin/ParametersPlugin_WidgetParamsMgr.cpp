@@ -80,10 +80,11 @@ void ParametersPlugin_ItemDelegate::paint(QPainter* painter,
 {
   QBrush aBrush = painter->brush();
   QPen aPen = painter->pen();
-  if (!isEditable(index))
+//  if (!isEditable(index))
+  if (!index.parent().isValid())
     painter->setBrush(Qt::lightGray);
 
-  painter->setPen(Qt::darkGray);
+  painter->setPen(Qt::lightGray);
   painter->drawRect(option.rect);
   painter->setPen(aPen);
 
@@ -168,11 +169,13 @@ ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theP
   QStringList aNames;
   aNames<<tr("Parameters");
   myParameters = new QTreeWidgetItem(aNames);
+  myParameters->setFlags(Qt::ItemIsEnabled);
   myTable->addTopLevelItem(myParameters);
 
   aNames.clear();
   aNames<<tr("Features");
   myFeatures = new QTreeWidgetItem(aNames);
+  myFeatures->setFlags(Qt::ItemIsEnabled);
   myTable->addTopLevelItem(myFeatures);
 
   QHBoxLayout* aBtnLayout = new QHBoxLayout(this);
@@ -392,6 +395,9 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
     {
       AttributeStringPtr aStringAttr = aFeature->string(ParametersPlugin_Parameter::VARIABLE_ID());
       if (!aText.isEmpty()) {
+        while (aText.indexOf(" ") != -1) {
+          aText.replace(" ", "");
+        }
         if (hasName(aText)) {
           myMessage = tr("Name %1 already exists.").arg(aText);
           QTimer::singleShot(50, this, SLOT(sendWarning()));
@@ -441,7 +447,7 @@ void ParametersPlugin_WidgetParamsMgr::updateItem(QTreeWidgetItem* theItem,
   if (theFeaturesList.count() != theItem->childCount()) {
     if (theItem->childCount()  < theFeaturesList.count()) {
       while (theItem->childCount() != theFeaturesList.count()) 
-        theItem->addChild(createNewItem());
+        theItem->addChild(createNewItem(theItem));
     } else {
       while (theItem->childCount() != theFeaturesList.count()) 
         theItem->removeChild(theItem->child(theItem->childCount() - 1));
@@ -475,14 +481,17 @@ FeaturePtr ParametersPlugin_WidgetParamsMgr::createParameter() const
 }
 
 
-QTreeWidgetItem* ParametersPlugin_WidgetParamsMgr::createNewItem() const
+QTreeWidgetItem* ParametersPlugin_WidgetParamsMgr::createNewItem(QTreeWidgetItem* theParent) const
 {
   QStringList aValues;
   aValues << NoName;
   aValues << NoValue;
 
   QTreeWidgetItem* aItem = new QTreeWidgetItem(aValues);
-  aItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+  if (theParent == myParameters)
+    aItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+  else 
+    aItem->setFlags(Qt::NoItemFlags);
   return aItem;
 }
 

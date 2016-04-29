@@ -95,7 +95,7 @@ private:
   FeaturePtr createParameter() const;
 
   /// Creates a new item
-  QTreeWidgetItem* createNewItem() const;
+  QTreeWidgetItem* createNewItem(QTreeWidgetItem* theParent) const;
 
   /// Returns currently selected item
   QTreeWidgetItem* selectedItem() const;
