@@ -2003,7 +2003,7 @@ void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
   }
   if (aHasHidden) 
     QMessageBox::information(desktop(), tr("Find results"), 
-                             tr("Not all results can be highlighted"), QMessageBox::Ok);
+                             tr("Results not found"), QMessageBox::Ok);
 }
 
 void XGUI_Workshop::highlightFeature(const QObjectPtrList& theObjects)
