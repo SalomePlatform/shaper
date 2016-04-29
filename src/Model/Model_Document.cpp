@@ -1299,6 +1299,15 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::producedByFeature(
   if (aShape.IsNull())
     return FeaturePtr();
 
+  // for comsolids and compounds all the naming is located in the main object, so, try to use
+  // it first
+  ResultCompSolidPtr aMain = ModelAPI_Tools::compSolidOwner(theResult);
+  if (aMain.get()) {
+    FeaturePtr aMainRes = producedByFeature(aMain, theShape);
+    if (aMainRes)
+      return aMainRes;
+  }
+
   std::shared_ptr<Model_Data> aBodyData = std::dynamic_pointer_cast<Model_Data>(theResult->data());
   if (!aBodyData.get() || !aBodyData->isValid())
     return FeaturePtr();
