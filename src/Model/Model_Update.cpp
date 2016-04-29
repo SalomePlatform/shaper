@@ -626,14 +626,21 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
     ObjectPtr aContext = aSel->context();
     // update argument only if the referenced object is ready to use
-    if (aContext.get() && !aContext->isDisabled() && isReason(theFeature, aContext)) {
-      if (!aSel->update()) { // this must be done on execution since it may be long operation
-        bool isObligatory = !aFactory->isNotObligatory(
-          theFeature->getKind(), theFeature->data()->id(aSel)) &&
-          aFactory->isCase(theFeature, theFeature->data()->id(aSel));
-        if (isObligatory)
-          aState = ModelAPI_StateInvalidArgument;
+    if (aContext.get() && !aContext->isDisabled()) {
+      if (isReason(theFeature, aContext)) {
+        if (!aSel->update()) { // this must be done on execution since it may be long operation
+          bool isObligatory = !aFactory->isNotObligatory(
+            theFeature->getKind(), theFeature->data()->id(aSel)) &&
+            aFactory->isCase(theFeature, theFeature->data()->id(aSel));
+          if (isObligatory)
+            aState = ModelAPI_StateInvalidArgument;
+        }
       }
+    } else if (aContext.get()) {
+      // here it may be not obligatory, but if the reference is wrong, it should not be correct
+      bool isObligatory = aFactory->isCase(theFeature, theFeature->data()->id(aSel));
+      if (isObligatory)
+        aState = ModelAPI_StateInvalidArgument;
     }
   }
   // update the selection list attributes if any
@@ -647,14 +654,21 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
       if (aSelAttr) {
         ObjectPtr aContext = aSelAttr->context();
         // update argument only if the referenced object is ready to use
-        if (aContext.get() && !aContext->isDisabled() && isReason(theFeature, aContext)) {
-          if (!aSelAttr->update()) {
-            bool isObligatory = !aFactory->isNotObligatory(
-              theFeature->getKind(), theFeature->data()->id(aSel)) &&
-              aFactory->isCase(theFeature, theFeature->data()->id(aSel));
-            if (isObligatory)
-              aState = ModelAPI_StateInvalidArgument;
+        if (aContext.get() && !aContext->isDisabled()) {
+          if (isReason(theFeature, aContext)) {
+            if (!aSelAttr->update()) {
+              bool isObligatory = !aFactory->isNotObligatory(
+                theFeature->getKind(), theFeature->data()->id(aSel)) &&
+                aFactory->isCase(theFeature, theFeature->data()->id(aSel));
+              if (isObligatory)
+                aState = ModelAPI_StateInvalidArgument;
+            }
           }
+        } else if (aContext.get()) {
+          // here it may be not obligatory, but if the reference is wrong, it should not be correct
+          bool isObligatory = aFactory->isCase(theFeature, theFeature->data()->id(aSel));
+          if (isObligatory)
+            aState = ModelAPI_StateInvalidArgument;
         }
       }
     }
