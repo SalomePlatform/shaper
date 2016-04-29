@@ -14,7 +14,7 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#include <AIS_AngleDimension.hxx>
+#include <AIS_AngleDimension_.hxx>
 
 #include <AIS.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
@@ -50,8 +50,8 @@
 #include <Standard_ProgramError.hxx>
 #include <UnitsAPI.hxx>
 
-IMPLEMENT_STANDARD_HANDLE (AIS_AngleDimension, AIS_Dimension)
-IMPLEMENT_STANDARD_RTTIEXT (AIS_AngleDimension, AIS_Dimension)
+IMPLEMENT_STANDARD_HANDLE (AIS_AngleDimension_, AIS_Dimension)
+IMPLEMENT_STANDARD_RTTIEXT (AIS_AngleDimension_, AIS_Dimension)
 
 namespace
 {
@@ -65,7 +65,7 @@ namespace
 //function : Constructor
 //purpose  : 
 //=======================================================================
-AIS_AngleDimension::AIS_AngleDimension (const TopoDS_Edge& theFirstEdge,
+AIS_AngleDimension_::AIS_AngleDimension_ (const TopoDS_Edge& theFirstEdge,
                                         const TopoDS_Edge& theSecondEdge)
 : AIS_Dimension (AIS_KOD_PLANEANGLE)
 {
@@ -77,7 +77,7 @@ AIS_AngleDimension::AIS_AngleDimension (const TopoDS_Edge& theFirstEdge,
 //function : Constructor
 //purpose  : 
 //=======================================================================
-AIS_AngleDimension::AIS_AngleDimension (const gp_Pnt& theFirstPoint,
+AIS_AngleDimension_::AIS_AngleDimension_ (const gp_Pnt& theFirstPoint,
                                         const gp_Pnt& theSecondPoint,
                                         const gp_Pnt& theThirdPoint)
 : AIS_Dimension (AIS_KOD_PLANEANGLE)
@@ -90,7 +90,7 @@ AIS_AngleDimension::AIS_AngleDimension (const gp_Pnt& theFirstPoint,
 //function : Constructor
 //purpose  : 
 //=======================================================================
-AIS_AngleDimension::AIS_AngleDimension (const TopoDS_Vertex& theFirstVertex,
+AIS_AngleDimension_::AIS_AngleDimension_ (const TopoDS_Vertex& theFirstVertex,
                                         const TopoDS_Vertex& theSecondVertex,
                                         const TopoDS_Vertex& theThirdVertex)
 : AIS_Dimension (AIS_KOD_PLANEANGLE)
@@ -103,7 +103,7 @@ AIS_AngleDimension::AIS_AngleDimension (const TopoDS_Vertex& theFirstVertex,
 //function : Constructor
 //purpose  : 
 //=======================================================================
-AIS_AngleDimension::AIS_AngleDimension (const TopoDS_Face& theCone)
+AIS_AngleDimension_::AIS_AngleDimension_ (const TopoDS_Face& theCone)
 : AIS_Dimension (AIS_KOD_PLANEANGLE)
 {
   Init();
@@ -114,7 +114,7 @@ AIS_AngleDimension::AIS_AngleDimension (const TopoDS_Face& theCone)
 //function : Constructor
 //purpose  : 
 //=======================================================================
-AIS_AngleDimension::AIS_AngleDimension (const TopoDS_Face& theFirstFace,
+AIS_AngleDimension_::AIS_AngleDimension_ (const TopoDS_Face& theFirstFace,
                                         const TopoDS_Face& theSecondFace)
 : AIS_Dimension (AIS_KOD_PLANEANGLE)
 {
@@ -126,7 +126,7 @@ AIS_AngleDimension::AIS_AngleDimension (const TopoDS_Face& theFirstFace,
 //function : Constructor
 //purpose  : 
 //=======================================================================
-AIS_AngleDimension::AIS_AngleDimension (const TopoDS_Face& theFirstFace,
+AIS_AngleDimension_::AIS_AngleDimension_ (const TopoDS_Face& theFirstFace,
                                         const TopoDS_Face& theSecondFace,
                                         const gp_Pnt& thePoint)
 : AIS_Dimension (AIS_KOD_PLANEANGLE)
@@ -139,7 +139,7 @@ AIS_AngleDimension::AIS_AngleDimension (const TopoDS_Face& theFirstFace,
 //function : SetMeasuredGeometry
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Edge& theFirstEdge,
+void AIS_AngleDimension_::SetMeasuredGeometry (const TopoDS_Edge& theFirstEdge,
                                               const TopoDS_Edge& theSecondEdge)
 {
   gp_Pln aComputedPlane;
@@ -162,7 +162,7 @@ void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Edge& theFirstEdge,
 //function : SetMeasuredGeometry
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::SetMeasuredGeometry (const gp_Pnt& theFirstPoint,
+void AIS_AngleDimension_::SetMeasuredGeometry (const gp_Pnt& theFirstPoint,
                                               const gp_Pnt& theSecondPoint,
                                               const gp_Pnt& theThirdPoint)
 {
@@ -187,7 +187,7 @@ void AIS_AngleDimension::SetMeasuredGeometry (const gp_Pnt& theFirstPoint,
 //function : SetMeasuredGeometry
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Vertex& theFirstVertex,
+void AIS_AngleDimension_::SetMeasuredGeometry (const TopoDS_Vertex& theFirstVertex,
                                               const TopoDS_Vertex& theSecondVertex,
                                               const TopoDS_Vertex& theThirdVertex)
 {
@@ -212,7 +212,7 @@ void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Vertex& theFirstVerte
 //function : SetMeasuredGeometry
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Face& theCone)
+void AIS_AngleDimension_::SetMeasuredGeometry (const TopoDS_Face& theCone)
 {
   myFirstShape      = theCone;
   mySecondShape     = TopoDS_Shape();
@@ -232,7 +232,7 @@ void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Face& theCone)
 //function : SetMeasuredGeometry
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Face& theFirstFace,
+void AIS_AngleDimension_::SetMeasuredGeometry (const TopoDS_Face& theFirstFace,
                                               const TopoDS_Face& theSecondFace)
 {
   myFirstShape      = theFirstFace;
@@ -253,7 +253,7 @@ void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Face& theFirstFace,
 //function : SetMeasuredGeometry
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Face& theFirstFace,
+void AIS_AngleDimension_::SetMeasuredGeometry (const TopoDS_Face& theFirstFace,
                                               const TopoDS_Face& theSecondFace,
                                               const gp_Pnt& thePoint)
 {
@@ -275,7 +275,7 @@ void AIS_AngleDimension::SetMeasuredGeometry (const TopoDS_Face& theFirstFace,
 //function : Init
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::Init()
+void AIS_AngleDimension_::Init()
 {
   SetAngleReversed (Standard_False);
   SetArrowVisible (Standard_True, Standard_True);
@@ -288,7 +288,7 @@ void AIS_AngleDimension::Init()
 //function: GetCenterOnArc
 //purpose :
 //=======================================================================
-gp_Pnt AIS_AngleDimension::GetCenterOnArc (const gp_Pnt& theFirstAttach,
+gp_Pnt AIS_AngleDimension_::GetCenterOnArc (const gp_Pnt& theFirstAttach,
                                            const gp_Pnt& theSecondAttach,
                                            const gp_Pnt& theCenter) const
 {
@@ -330,7 +330,7 @@ gp_Pnt AIS_AngleDimension::GetCenterOnArc (const gp_Pnt& theFirstAttach,
 //function : DrawArc
 //purpose  : draws the arc between two attach points
 //=======================================================================
-void AIS_AngleDimension::DrawArc (const Handle(Prs3d_Presentation)& thePresentation,
+void AIS_AngleDimension_::DrawArc (const Handle(Prs3d_Presentation)& thePresentation,
                                   const gp_Pnt& theFirstAttach,
                                   const gp_Pnt& theSecondAttach,
                                   const gp_Pnt& theCenter,
@@ -424,7 +424,7 @@ void AIS_AngleDimension::DrawArc (const Handle(Prs3d_Presentation)& thePresentat
 //function: DrawArcWithText
 //purpose :
 //=======================================================================
-void AIS_AngleDimension::DrawArcWithText (const Handle(Prs3d_Presentation)& thePresentation,
+void AIS_AngleDimension_::DrawArcWithText (const Handle(Prs3d_Presentation)& thePresentation,
                                           const gp_Pnt& theFirstAttach,
                                           const gp_Pnt& theSecondAttach,
                                           const gp_Pnt& theCenter,
@@ -507,7 +507,7 @@ void AIS_AngleDimension::DrawArcWithText (const Handle(Prs3d_Presentation)& theP
 //function : CheckPlane
 //purpose  : 
 //=======================================================================
-Standard_Boolean AIS_AngleDimension::CheckPlane (const gp_Pln& thePlane)const
+Standard_Boolean AIS_AngleDimension_::CheckPlane (const gp_Pln& thePlane)const
 {
   if (!thePlane.Contains (myFirstPoint, Precision::Confusion()) &&
       !thePlane.Contains (mySecondPoint, Precision::Confusion()) &&
@@ -523,7 +523,7 @@ Standard_Boolean AIS_AngleDimension::CheckPlane (const gp_Pln& thePlane)const
 //function : ComputePlane
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::ComputePlane()
+void AIS_AngleDimension_::ComputePlane()
 {
   if (!myIsGeometryValid)
   {
@@ -543,7 +543,7 @@ void AIS_AngleDimension::ComputePlane()
 //function : GetModelUnits
 //purpose  :
 //=======================================================================
-const TCollection_AsciiString& AIS_AngleDimension::GetModelUnits() const
+const TCollection_AsciiString& AIS_AngleDimension_::GetModelUnits() const
 {
   return myDrawer->DimAngleModelUnits();
 }
@@ -552,7 +552,7 @@ const TCollection_AsciiString& AIS_AngleDimension::GetModelUnits() const
 //function : GetDisplayUnits
 //purpose  :
 //=======================================================================
-const TCollection_AsciiString& AIS_AngleDimension::GetDisplayUnits() const
+const TCollection_AsciiString& AIS_AngleDimension_::GetDisplayUnits() const
 {
   return myDrawer->DimAngleDisplayUnits();
 }
@@ -561,7 +561,7 @@ const TCollection_AsciiString& AIS_AngleDimension::GetDisplayUnits() const
 //function : SetModelUnits
 //purpose  :
 //=======================================================================
-void AIS_AngleDimension::SetModelUnits (const TCollection_AsciiString& theUnits)
+void AIS_AngleDimension_::SetModelUnits (const TCollection_AsciiString& theUnits)
 {
   myDrawer->SetDimAngleModelUnits (theUnits);
 }
@@ -570,7 +570,7 @@ void AIS_AngleDimension::SetModelUnits (const TCollection_AsciiString& theUnits)
 //function : SetDisplayUnits
 //purpose  :
 //=======================================================================
-void AIS_AngleDimension::SetDisplayUnits (const TCollection_AsciiString& theUnits)
+void AIS_AngleDimension_::SetDisplayUnits (const TCollection_AsciiString& theUnits)
 {
   myDrawer->SetDimAngleDisplayUnits (theUnits);
 }
@@ -579,7 +579,7 @@ void AIS_AngleDimension::SetDisplayUnits (const TCollection_AsciiString& theUnit
 //function : ComputeValue
 //purpose  : 
 //=======================================================================
-Standard_Real AIS_AngleDimension::ComputeValue() const
+Standard_Real AIS_AngleDimension_::ComputeValue() const
 {
   if (!IsValid())
   {
@@ -598,7 +598,7 @@ Standard_Real AIS_AngleDimension::ComputeValue() const
 //function : Compute
 //purpose  : Having three gp_Pnt points compute presentation
 //=======================================================================
-void AIS_AngleDimension::Compute (const Handle(PrsMgr_PresentationManager3d)& /*thePM*/,
+void AIS_AngleDimension_::Compute (const Handle(PrsMgr_PresentationManager3d)& /*thePM*/,
                                   const Handle(Prs3d_Presentation)& thePresentation,
                                   const Standard_Integer theMode)
 {
@@ -826,7 +826,7 @@ void AIS_AngleDimension::Compute (const Handle(PrsMgr_PresentationManager3d)& /*
 //function : ComputeFlyoutSelection
 //purpose  : computes selection for flyouts
 //=======================================================================
-void AIS_AngleDimension::ComputeFlyoutSelection (const Handle(SelectMgr_Selection)& theSelection,
+void AIS_AngleDimension_::ComputeFlyoutSelection (const Handle(SelectMgr_Selection)& theSelection,
                                                  const Handle(SelectMgr_EntityOwner)& theOwner)
 {
   gp_Pnt aFirstAttach  = myCenterPoint.Translated (gp_Vec (myCenterPoint, myFirstPoint).Normalized()  * GetFlyout());
@@ -843,7 +843,7 @@ void AIS_AngleDimension::ComputeFlyoutSelection (const Handle(SelectMgr_Selectio
 //function : InitTwoEdgesAngle
 //purpose  : 
 //=======================================================================
-Standard_Boolean AIS_AngleDimension::InitTwoEdgesAngle (gp_Pln& theComputedPlane)
+Standard_Boolean AIS_AngleDimension_::InitTwoEdgesAngle (gp_Pln& theComputedPlane)
 {
   TopoDS_Edge aFirstEdge  = TopoDS::Edge (myFirstShape);
   TopoDS_Edge aSecondEdge = TopoDS::Edge (mySecondShape);
@@ -939,7 +939,7 @@ Standard_Boolean AIS_AngleDimension::InitTwoEdgesAngle (gp_Pln& theComputedPlane
 //function : InitTwoFacesAngle
 //purpose  : initialization of angle dimension between two faces
 //=======================================================================
-Standard_Boolean AIS_AngleDimension::InitTwoFacesAngle()
+Standard_Boolean AIS_AngleDimension_::InitTwoFacesAngle()
 {
   TopoDS_Face aFirstFace = TopoDS::Face (myFirstShape);
   TopoDS_Face aSecondFace = TopoDS::Face (mySecondShape);
@@ -990,7 +990,7 @@ Standard_Boolean AIS_AngleDimension::InitTwoFacesAngle()
 //function : InitTwoFacesAngle
 //purpose  : initialization of angle dimension between two faces
 //=======================================================================
-Standard_Boolean AIS_AngleDimension::InitTwoFacesAngle (const gp_Pnt thePointOnFirstFace)
+Standard_Boolean AIS_AngleDimension_::InitTwoFacesAngle (const gp_Pnt thePointOnFirstFace)
 {
   TopoDS_Face aFirstFace = TopoDS::Face (myFirstShape);
   TopoDS_Face aSecondFace = TopoDS::Face (mySecondShape);
@@ -1044,7 +1044,7 @@ Standard_Boolean AIS_AngleDimension::InitTwoFacesAngle (const gp_Pnt thePointOnF
 //function : InitConeAngle
 //purpose  : initialization of the cone angle
 //=======================================================================
-Standard_Boolean AIS_AngleDimension::InitConeAngle()
+Standard_Boolean AIS_AngleDimension_::InitConeAngle()
 {
   if (myFirstShape.IsNull())
   {
@@ -1148,7 +1148,7 @@ Standard_Boolean AIS_AngleDimension::InitConeAngle()
 //function : IsValidPoints
 //purpose  : 
 //=======================================================================
-Standard_Boolean AIS_AngleDimension::IsValidPoints (const gp_Pnt& theFirstPoint,
+Standard_Boolean AIS_AngleDimension_::IsValidPoints (const gp_Pnt& theFirstPoint,
                                                     const gp_Pnt& theCenterPoint,
                                                     const gp_Pnt& theSecondPoint) const
 {
@@ -1162,7 +1162,7 @@ Standard_Boolean AIS_AngleDimension::IsValidPoints (const gp_Pnt& theFirstPoint,
 //function : GetTextPosition
 //purpose  : 
 //=======================================================================
-const gp_Pnt AIS_AngleDimension::GetTextPosition() const
+const gp_Pnt AIS_AngleDimension_::GetTextPosition() const
 {
   if (!IsValid())
   {
@@ -1233,7 +1233,7 @@ const gp_Pnt AIS_AngleDimension::GetTextPosition() const
 //function : SetTextPosition
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::SetTextPosition (const gp_Pnt& theTextPos)
+void AIS_AngleDimension_::SetTextPosition (const gp_Pnt& theTextPos)
 {
   if (!IsValid())
   {
@@ -1254,7 +1254,7 @@ void AIS_AngleDimension::SetTextPosition (const gp_Pnt& theTextPos)
 //function : SetAngleReversed
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::SetAngleReversed(const Standard_Boolean& theUseReverse)
+void AIS_AngleDimension_::SetAngleReversed(const Standard_Boolean& theUseReverse)
 {
   myUseReverse = theUseReverse;
 }
@@ -1263,7 +1263,7 @@ void AIS_AngleDimension::SetAngleReversed(const Standard_Boolean& theUseReverse)
 //function : SetArrowVisible
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::SetArrowVisible(const Standard_Boolean& theFirstArrowVisible,
+void AIS_AngleDimension_::SetArrowVisible(const Standard_Boolean& theFirstArrowVisible,
                                          const Standard_Boolean& theSecondArrowVisible)
 {
   myFirstArrowVisible = theFirstArrowVisible;
@@ -1274,7 +1274,7 @@ void AIS_AngleDimension::SetArrowVisible(const Standard_Boolean& theFirstArrowVi
 //function : AdjustParameters
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::AdjustParameters (const gp_Pnt& theTextPos,
+void AIS_AngleDimension_::AdjustParameters (const gp_Pnt& theTextPos,
                                            Standard_Real& theExtensionSize,
                                            Prs3d_DimensionTextHorizontalPosition& theAlignment,
                                            Standard_Real& theFlyout) const
@@ -1371,7 +1371,7 @@ void AIS_AngleDimension::AdjustParameters (const gp_Pnt& theTextPos,
 //function : FitTextAlignment
 //purpose  : 
 //=======================================================================
-void AIS_AngleDimension::FitTextAlignment (const Prs3d_DimensionTextHorizontalPosition& theHorizontalTextPos,
+void AIS_AngleDimension_::FitTextAlignment (const Prs3d_DimensionTextHorizontalPosition& theHorizontalTextPos,
                                            Standard_Integer& theLabelPosition,
                                            Standard_Boolean& theIsArrowsExternal) const
 {

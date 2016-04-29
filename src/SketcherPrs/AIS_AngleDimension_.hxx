@@ -34,7 +34,7 @@
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Vertex.hxx>
 
-DEFINE_STANDARD_HANDLE (AIS_AngleDimension, AIS_Dimension)
+DEFINE_STANDARD_HANDLE (AIS_AngleDimension_, AIS_Dimension)
 
 //! Angle dimension. Can be constructed:
 //! - on two intersected edges.
@@ -59,7 +59,7 @@ DEFINE_STANDARD_HANDLE (AIS_AngleDimension, AIS_Dimension)
 //! In case of the conical face the center point of the angle is the apex of the conical surface.
 //! The attachment points are points of the first and the last parameter of the basis circle of the cone.
 //!
-class AIS_AngleDimension : public AIS_Dimension
+class AIS_AngleDimension_ : public AIS_Dimension
 {
 public:
 
@@ -68,14 +68,14 @@ public:
   //! @param theFirstEdge [in] the first edge.
   //! @param theSecondEdge [in] the second edge.
   //! the maximum distanced point of edges from the presentation center
-  Standard_EXPORT AIS_AngleDimension (const TopoDS_Edge& theFirstEdge,
+  Standard_EXPORT AIS_AngleDimension_ (const TopoDS_Edge& theFirstEdge,
                                       const TopoDS_Edge& theSecondEdge);
 
   //! Constructs the angle display object defined by three points.
   //! @param theFirstPoint [in] the first point (point on first angle flyout).
   //! @param theSecondPoint [in] the center point of angle dimension.
   //! @param theThirdPoint [in] the second point (point on second angle flyout).
-  Standard_EXPORT AIS_AngleDimension (const gp_Pnt& theFirstPoint,
+  Standard_EXPORT AIS_AngleDimension_ (const gp_Pnt& theFirstPoint,
                                       const gp_Pnt& theSecondPoint,
                                       const gp_Pnt& theThirdPoint);
 
@@ -83,18 +83,18 @@ public:
   //! @param theFirstVertex [in] the first vertex (vertex for first angle flyout).
   //! @param theSecondVertex [in] the center vertex of angle dimension.
   //! @param theThirdPoint [in] the second vertex (vertex for second angle flyout).
-  Standard_EXPORT AIS_AngleDimension (const TopoDS_Vertex& theFirstVertex,
+  Standard_EXPORT AIS_AngleDimension_ (const TopoDS_Vertex& theFirstVertex,
                                       const TopoDS_Vertex& theSecondVertex,
                                       const TopoDS_Vertex& theThirdVertex);
 
   //! Constructs angle dimension for the cone face.
   //! @param theCone [in] the conical face.
-  Standard_EXPORT AIS_AngleDimension (const TopoDS_Face& theCone);
+  Standard_EXPORT AIS_AngleDimension_ (const TopoDS_Face& theCone);
 
   //! Constructs angle dimension between two planar faces.
   //! @param theFirstFace [in] the first face.
   //! @param theSecondFace [in] the second face.
-  Standard_EXPORT AIS_AngleDimension (const TopoDS_Face& theFirstFace,
+  Standard_EXPORT AIS_AngleDimension_ (const TopoDS_Face& theFirstFace,
                                       const TopoDS_Face& theSecondFace);
 
   //! Constructs angle dimension between two planar faces.
@@ -102,7 +102,7 @@ public:
   //! @param theSecondFace [in] the second face.
   //! @param thePoint [in] the point which the dimension plane should pass through.
   //! This point can lay on the one of the faces or not.
-  Standard_EXPORT AIS_AngleDimension (const TopoDS_Face& theFirstFace,
+  Standard_EXPORT AIS_AngleDimension_ (const TopoDS_Face& theFirstFace,
                                       const TopoDS_Face& theSecondFace,
                                       const gp_Pnt& thePoint);
 
@@ -222,7 +222,7 @@ public:
 
 public:
 
-  DEFINE_STANDARD_RTTI (AIS_AngleDimension)
+  DEFINE_STANDARD_RTTI (AIS_AngleDimension_)
 
 protected:
 

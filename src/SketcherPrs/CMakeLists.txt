@@ -27,7 +27,7 @@ SET(PROJECT_HEADERS
     SketcherPrs_Mirror.h
     SketcherPrs_Transformation.h
     SketcherPrs_Angle.h
-    AIS_AngleDimension.hxx
+    AIS_AngleDimension_.hxx
 )
 
 SET(PROJECT_SOURCES
@@ -51,7 +51,7 @@ SET(PROJECT_SOURCES
     SketcherPrs_Mirror.cpp
     SketcherPrs_Transformation.cpp
     SketcherPrs_Angle.cpp
-    AIS_AngleDimension.cxx
+    AIS_AngleDimension_.cxx
 )
 
 SET(PROJECT_LIBRARIES

@@ -11,18 +11,18 @@
 #include <GeomAPI_Ax3.h>
 #include <ModelAPI_Feature.h>
 
-#include <AIS_AngleDimension.hxx>
+#include <AIS_AngleDimension_.hxx>
 #include <Standard_DefineHandle.hxx>
 
 class SketcherPrs_DimensionStyleListener;
 
-DEFINE_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension)
+DEFINE_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension_)
 
 /**
 * \ingroup GUI
 * A class for representation of angle constraint
 */
-class SketcherPrs_Angle : public AIS_AngleDimension
+class SketcherPrs_Angle : public AIS_AngleDimension_
 {
 public:
   /// Constructor
