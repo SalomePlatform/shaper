@@ -928,13 +928,23 @@ bool SolveSpaceSolver_Storage::removeCoincidence(ConstraintWrapperPtr theConstra
           aConstrIt->first->attribute(SketchPlugin_Constraint::ENTITY_A()));
       AttributeRefAttrPtr aRefAttrB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
           aConstrIt->first->attribute(SketchPlugin_Constraint::ENTITY_B()));
-      if (!aRefAttrA || !aRefAttrB || aRefAttrA->isObject() || aRefAttrB->isObject())
-        continue;
+      AttributePtr anAttrA, anAttrB;
+      if (aConstrIt->first->data()->isValid()) {
+        if (!aRefAttrA || !aRefAttrB || aRefAttrA->isObject() || aRefAttrB->isObject())
+          continue;
+        anAttrA = aRefAttrA->attr();
+        anAttrB = aRefAttrB->attr();
+      } else {
+        // obtain attributes from the constraint wrapper
+        ConstraintWrapperPtr aWrapper = aConstrIt->second.front();
+        anAttrA = aWrapper->entities().front()->baseAttribute();
+        anAttrB = aWrapper->entities().back()->baseAttribute();
+      }
       std::map<AttributePtr, EntityWrapperPtr>::iterator
-          aFound = myAttributeMap.find(aRefAttrA->attr());
+          aFound = myAttributeMap.find(anAttrA);
       if (aFound != myAttributeMap.end())
         aNotCoinc.erase(aFound->second);
-      aFound = myAttributeMap.find(aRefAttrB->attr());
+      aFound = myAttributeMap.find(anAttrB);
       if (aFound != myAttributeMap.end())
         aNotCoinc.erase(aFound->second);
     }

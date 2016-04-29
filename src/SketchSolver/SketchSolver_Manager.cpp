@@ -547,8 +547,8 @@ void SketchSolver_Manager::degreesOfFreedom()
           aDoF -= 2; // attribute is a point
         else {
           FeaturePtr anAttr = ModelAPI_Feature::feature(aRefAttr->object());
-          assert(anAttr);
-          aDoF -= aDoFDelta[anAttr->getKind()];
+          if (anAttr)
+            aDoF -= aDoFDelta[anAttr->getKind()];
         }
       }
       else if (aFeature->getKind() == SketchPlugin_ConstraintMirror::ID() ||
