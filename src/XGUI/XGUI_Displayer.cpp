@@ -42,6 +42,7 @@
 #include <AIS_Axis.hxx>
 #include <AIS_Plane.hxx>
 #include <AIS_Point.hxx>
+#include <AIS_Selection.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 #include <SelectMgr_ListOfFilter.hxx>
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
@@ -72,6 +73,9 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse
 
 //#define DEBUG_COMPOSILID_DISPLAY
 // Workaround for bug #25637
+
+//#define DEBUG_OCCT_SHAPE_SELECTION
+
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
 {
   // Get from null point
@@ -552,11 +556,17 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValue
   if (aContext->HasOpenedContext()) {
     aContext->UnhilightSelected(false);
     aContext->ClearSelected(false);
+    NCollection_Map<TopoDS_Shape> aShapesToBeSelected;
+
     foreach (ModuleBase_ViewerPrsPtr aPrs, theValues) {
       const GeomShapePtr& aGeomShape = aPrs->shape();
       if (aGeomShape.get() && !aGeomShape->isNull()) {
         const TopoDS_Shape& aShape = aGeomShape->impl<TopoDS_Shape>();
+#ifdef DEBUG_OCCT_SHAPE_SELECTION
         aContext->AddOrRemoveSelected(aShape, false);
+#else
+        aShapesToBeSelected.Add(aShape);
+#endif
       } else {
         ObjectPtr anObject = aPrs->object();
         ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
@@ -574,6 +584,8 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValue
         }
       }
     }
+    if (!aShapesToBeSelected.IsEmpty())
+      XGUI_Displayer::AddOrRemoveSelectedShapes(aContext, aShapesToBeSelected);
   } else {
     aContext->UnhilightCurrents(false);
     aContext->ClearCurrents(false);
@@ -1257,4 +1269,31 @@ QIntList XGUI_Displayer::activeSelectionModes() const
     aModes << ((aMode < 9)? AIS_Shape::SelectionType(aMode) : aMode);
   }
   return aModes; 
+}
+
+void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) theContext,
+                                      const NCollection_Map<TopoDS_Shape>& theShapesToBeSelected)
+{
+  Handle(AIS_LocalContext) aLContext = theContext->LocalContext();
+  TCollection_AsciiString aSelectionName = aLContext->SelectionName();
+  aLContext->UnhilightPicked(Standard_False);
+
+  NCollection_Map<TopoDS_Shape> aShapesSelected;
+
+  NCollection_List<Handle(SelectBasics_EntityOwner)> anActiveOwners;
+  aLContext->MainSelector()->ActiveOwners(anActiveOwners);
+  NCollection_List<Handle(SelectBasics_EntityOwner)>::Iterator anOwnersIt (anActiveOwners);
+  Handle(SelectMgr_EntityOwner) anOwner;
+  for (; anOwnersIt.More(); anOwnersIt.Next()) {
+    anOwner = Handle(SelectMgr_EntityOwner)::DownCast (anOwnersIt.Value());
+    Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast(anOwner);
+    if (!BROwnr.IsNull() && BROwnr->HasShape() && theShapesToBeSelected.Contains(BROwnr->Shape())) {
+      if (aShapesSelected.Contains(BROwnr->Shape()))
+        continue;
+      AIS_Selection::Selection(aSelectionName.ToCString())->Select(anOwner);
+      anOwner->SetSelected (Standard_True);
+      aShapesSelected.Add(BROwnr->Shape());
+    }
+  }
+  aLContext->HilightPicked(Standard_False);
 }

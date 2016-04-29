@@ -322,6 +322,15 @@ private:
   /// \return a string representation
   std::string getResult2AISObjectMapInfo() const;
 
+  /// Sets the shapes selected in the context. It contains logic of the similar method
+  /// in OCCT but improved for performance. The modification is to iterates by a list
+  /// of owners in the context only once.
+  /// \param theContext a viewer context. It has opened local context
+  /// \param theShapesToBeSelected a map of shapes. Owner's shape is searched in the map and the owner
+  /// is selected if it is found there. Only first owner is processed(according to OCCT logic)
+  static void AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) theContext,
+                                        const NCollection_Map<TopoDS_Shape>& theShapesToBeSelected);
+
  protected:
    /// Reference to workshop
   XGUI_Workshop* myWorkshop;
