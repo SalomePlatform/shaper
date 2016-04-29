@@ -619,8 +619,12 @@ void ParametersPlugin_WidgetParamsMgr::onUp()
   else
     aDoc->moveFeature(aCurFeature, myParametersList.at(aCurrentPos - 2));
 
-
-  Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED));
+  // add the updated also the feature that goes down
+  Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED));
+  static Events_ID EVENT_UPD = Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED);
+  ModelAPI_EventCreator::get()->sendUpdated(myParametersList.at(aCurrentPos - 1), EVENT_UPD);
+  Events_Loop::loop()->flush(EVENT_UPD);
+  Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED));
   Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED));
   Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
   updateParametersFeatures();
@@ -648,8 +652,13 @@ void ParametersPlugin_WidgetParamsMgr::onDown()
   SessionPtr aMgr = ModelAPI_Session::get();
   std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
   aDoc->moveFeature(aCurFeature, myParametersList.at(aCurrentPos + 1));
+  // add the updated also the feature that goes up
+  static Events_ID EVENT_UPD = Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED);
+  ModelAPI_EventCreator::get()->sendUpdated(myParametersList.at(aCurrentPos + 1), EVENT_UPD);
 
+  Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED));
   Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED));
   Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED));
   Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
   updateParametersFeatures();

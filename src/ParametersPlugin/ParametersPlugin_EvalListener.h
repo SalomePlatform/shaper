@@ -13,6 +13,7 @@
 
 class ModelAPI_Attribute;
 class ModelAPI_Document;
+class ModelAPI_Feature;
 class ModelAPI_ResultParameter;
 class ParametersPlugin_Parameter;
 class ParametersPlugin_PyInterp;
@@ -33,8 +34,8 @@ class ParametersPlugin_EvalListener : public Events_Listener
 
  protected:
   /// Evaluates theExpression and returns its value.
-  double evaluate(const std::string& theExpression, std::string& theError, 
-                  const std::shared_ptr<ModelAPI_Document>& theDocument);
+   double evaluate(std::shared_ptr<ModelAPI_Feature> theParameter,
+                  const std::string& theExpression, std::string& theError);
 
   /// Processes Evaluation event.
   void processEvaluationEvent(const std::shared_ptr<Events_Message>& theMessage);

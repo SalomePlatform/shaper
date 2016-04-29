@@ -164,6 +164,9 @@ public:
     std::shared_ptr<ModelAPI_Result> theResult,
     const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
 
+  /// Returns true if theLater is in history of features creation later than theCurrent
+  virtual bool isLater(std::shared_ptr<ModelAPI_Feature> theLater, 
+                       std::shared_ptr<ModelAPI_Feature> theCurrent) const = 0;
 
 protected:
   //! Only for SWIG wrapping it is here

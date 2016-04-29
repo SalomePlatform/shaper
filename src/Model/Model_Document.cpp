@@ -832,11 +832,18 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
 
 void Model_Document::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
 {
-  if (theAfterThis == currentFeature(false))
-    setCurrentFeature(theMoved, true);
-  else if (theMoved == currentFeature(false))
+  bool aCurrentUp = theMoved == currentFeature(false);
+  if (aCurrentUp) {
     setCurrentFeatureUp();
+  }
+
   myObjs->moveFeature(theMoved, theAfterThis);
+  if (aCurrentUp) { // make the moved feature enabled or disabled due to the real status
+    setCurrentFeature(currentFeature(false), false);
+  } else if (theAfterThis == currentFeature(false)) {
+    // must be after move to make enabled all features which are before theMoved
+    setCurrentFeature(theMoved, true);
+  }
 }
 
 void Model_Document::updateHistory(const std::shared_ptr<ModelAPI_Object> theObject)
@@ -1382,4 +1389,9 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::producedByFeature(
     }
   }
   return aResult;
+}
+
+bool Model_Document::isLater(FeaturePtr theLater, FeaturePtr theCurrent) const
+{
+  return myObjs->isLater(theLater, theCurrent);
 }

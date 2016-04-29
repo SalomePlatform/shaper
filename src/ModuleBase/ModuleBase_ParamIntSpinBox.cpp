@@ -193,7 +193,7 @@ bool ModuleBase_ParamIntSpinBox::findVariable(const QString& theName,
                                               double& outValue) const
 {
   ResultParameterPtr aParam;
-  return ModelAPI_Tools::findVariable(theName.toStdString(), outValue, aParam);
+  return ModelAPI_Tools::findVariable(FeaturePtr(), theName.toStdString(), outValue, aParam);
 }
 
 /*!

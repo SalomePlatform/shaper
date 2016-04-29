@@ -88,32 +88,37 @@ ObjectPtr objectByName(const DocumentPtr& theDocument, const std::string& theGro
   return ObjectPtr();
 }
 
-bool findVariable(const DocumentPtr& theDocument, 
+bool findVariable(const DocumentPtr& theDocument, FeaturePtr theSearcher,
                   const std::string& theName, double& outValue, ResultParameterPtr& theParam)
 {
   ObjectPtr aParamObj = objectByName(theDocument, ModelAPI_ResultParameter::group(), theName);
   theParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParamObj);
   if (!theParam.get())
     return false;
+  // avoid usage of parameters created later than the initial parameter
+  if (theSearcher.get() && theDocument->isLater(theDocument->feature(theParam), theSearcher))
+    return false;
   AttributeDoublePtr aValueAttribute = theParam->data()->real(ModelAPI_ResultParameter::VALUE());
   outValue = aValueAttribute->value();
   return true;
 }
 
-bool findVariable(const std::string& theName, double& outValue, ResultParameterPtr& theParam,
-                  const DocumentPtr& theDocument /*= DocumentPtr()*/)
+bool findVariable(FeaturePtr theSearcher, const std::string& theName, double& outValue, ResultParameterPtr& theParam,
+                  const DocumentPtr& theDocument)
 {
   SessionPtr aSession = ModelAPI_Session::get();
   std::list<DocumentPtr> aDocList;
   DocumentPtr aDocument = theDocument.get() ? theDocument : aSession->activeDocument();
+  if (findVariable(aDocument, theSearcher, theName, outValue, theParam))
+    return true;
   DocumentPtr aRootDocument = aSession->moduleDocument();
-  aDocList.push_back(aDocument);
   if (aDocument != aRootDocument) {
-    aDocList.push_back(aRootDocument);
-  }
-  for(std::list<DocumentPtr>::const_iterator it = aDocList.begin(); it != aDocList.end(); ++it) {
-    if (findVariable(*it, theName, outValue, theParam))
-      return true;
+    ResultPtr aPartResult = findPartResult(aRootDocument, aDocument);
+    if (aPartResult.get()) {
+      FeaturePtr aPartFeature = aRootDocument->feature(aPartResult);
+      if (findVariable(aRootDocument, aPartFeature, theName, outValue, theParam))
+        return true;
+    }
   }
   return false;
 }

@@ -94,8 +94,8 @@ void ParametersPlugin_EvalListener::processEvent(
   }
 }
 
-double ParametersPlugin_EvalListener::evaluate(const std::string& theExpression, std::string& theError, 
-                                               const std::shared_ptr<ModelAPI_Document>& theDocument)
+double ParametersPlugin_EvalListener::evaluate(FeaturePtr theParameter,
+  const std::string& theExpression, std::string& theError)
 {
   std::list<std::string> anExprParams = myInterp->compile(theExpression);
   // find expression's params in the model
@@ -105,7 +105,8 @@ double ParametersPlugin_EvalListener::evaluate(const std::string& theExpression,
     double aValue;
     ResultParameterPtr aParamRes;
     // If variable does not exist python interpreter will generate an error. It is OK.
-    if (!ModelAPI_Tools::findVariable(*it, aValue, aParamRes, theDocument)) continue;
+    if (!ModelAPI_Tools::findVariable(theParameter, *it, aValue, aParamRes, theParameter->document()))
+      continue;
 
     aContext.push_back(*it + "=" + toStdString(aValue));
   }
@@ -121,11 +122,13 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
   std::shared_ptr<ModelAPI_AttributeEvalMessage> aMessage =
       std::dynamic_pointer_cast<ModelAPI_AttributeEvalMessage>(theMessage);
 
+  FeaturePtr aParamFeature = 
+    std::dynamic_pointer_cast<ModelAPI_Feature>(aMessage->attribute()->owner());
   if (aMessage->attribute()->attributeType() == ModelAPI_AttributeInteger::typeId()) {
     AttributeIntegerPtr anAttribute =
         std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aMessage->attribute());
     std::string anError;
-    int aValue = (int)evaluate(anAttribute->text(), anError, anAttribute->owner()->document());
+    int aValue = (int)evaluate(aParamFeature, anAttribute->text(), anError);
     bool isValid = anError.empty();
     if (isValid)
       anAttribute->setCalculatedValue(aValue);
@@ -137,7 +140,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
     AttributeDoublePtr anAttribute =
         std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aMessage->attribute());
     std::string anError;
-    double aValue = evaluate(anAttribute->text(), anError, anAttribute->owner()->document());
+    double aValue = evaluate(aParamFeature, anAttribute->text(), anError);
     bool isValid = anError.empty();
     if (isValid)
       anAttribute->setCalculatedValue(aValue);
@@ -160,7 +163,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
     };
     for (int i = 0; i < 3; ++i) {
       std::string anError;
-      double aValue = evaluate(aText[i], anError, anAttribute->owner()->document());
+      double aValue = evaluate(aParamFeature, aText[i], anError);
       bool isValid = anError.empty();
       if (isValid) aCalculatedValue[i] = aValue;
       anAttribute->setUsedParameters(i, isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
@@ -184,7 +187,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
     };
     for (int i = 0; i < 2; ++i) {
       std::string anError;
-      double aValue = evaluate(aText[i], anError, anAttribute->owner()->document());
+      double aValue = evaluate(aParamFeature, aText[i], anError);
       bool isValid = anError.empty();
       if (isValid) aCalculatedValue[i] = aValue;
       anAttribute->setUsedParameters(i, isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());

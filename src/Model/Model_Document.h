@@ -216,6 +216,9 @@ class Model_Document : public ModelAPI_Document
     std::shared_ptr<ModelAPI_Result> theResult,
     const std::shared_ptr<GeomAPI_Shape>& theShape);
 
+  /// Returns true if theLater is in history of features creation later than theCurrent
+  MODEL_EXPORT virtual bool isLater(FeaturePtr theLater, FeaturePtr theCurrent) const;
+
  protected:
   //! Returns (creates if needed) the general label
   TDF_Label generalLabel() const;

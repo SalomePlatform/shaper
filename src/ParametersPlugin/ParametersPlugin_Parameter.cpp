@@ -117,7 +117,8 @@ double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, st
 
     double aValue;
     ResultParameterPtr aParamRes;
-    if (!ModelAPI_Tools::findVariable(aVariableName, aValue, aParamRes, aDocument)) continue;
+    if (!ModelAPI_Tools::findVariable(std::dynamic_pointer_cast<ModelAPI_Feature>(data()->owner()),
+      aVariableName, aValue, aParamRes, aDocument)) continue;
     aParamsList.push_back(aParamRes);
 
     std::ostringstream sstream;
