@@ -459,6 +459,38 @@ bool XGUI_Displayer::isVisible(XGUI_Displayer* theDisplayer, const ObjectPtr& th
   return aVisible;
 }
 
+#ifdef DEBUG_ACTIVATE_OBJECTS
+QString getModeInfo(const int theMode)
+{
+  QString anInfo = "Undefined";
+  switch(theMode) {
+    case 0: anInfo = "SHAPE(0)"; break;
+    case 1: anInfo = "VERTEX(1)"; break;
+    case 2: anInfo = "EDGE(2)"; break;
+    case 3: anInfo = "WIRE(3)"; break;
+    case 4: anInfo = "FACE(4)"; break;
+    case 5: anInfo = "SHELL(5)"; break;
+    case 6: anInfo = "SOLID(6)"; break;
+    case 7: anInfo = "COMPSOLID(7)"; break;
+    case 8: anInfo = "COMPOUND(8)"; break;
+    case 100: anInfo = "Sel_Mode_First(100)"; break; //SketcherPrs_Tools
+    case 101: anInfo = "Sel_Constraint(101)"; break;
+    case 102: anInfo = "Sel_Dimension_All(102)"; break;
+    case 103: anInfo = "Sel_Dimension_Line(103)"; break;
+    case 104: anInfo = "Sel_Dimension_Text(104)"; break;
+    default: break;
+  }
+  return anInfo;
+}
+
+QString getModesInfo(const QIntList& theModes)
+{
+  QStringList aModesInfo;
+  for (int i = 0, aSize = theModes.size(); i < aSize; i++)
+    aModesInfo.append(getModeInfo(theModes[i]));
+  return QString("[%1] = %2").arg(aModesInfo.size()).arg(aModesInfo.join(", "));
+}
+#endif
 
 void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrList& theObjList,
                                      const bool theUpdateViewer)
@@ -477,9 +509,10 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   }
   QString anInfoStr = anInfo.join(", ");
 
-  qDebug(QString("activateObjects: aModes[%1] = %2, myActiveSelectionModes[%3] = %4, objects = %5").
-    arg(aModes.size()).arg(qIntListInfo(aModes)).
-    arg(myActiveSelectionModes.size()).arg(qIntListInfo(myActiveSelectionModes)).
+  qDebug(QString("activateObjects: new modes%1, active modes%2, objects[%3] = %4").
+    arg(getModesInfo(aModes)).
+    arg(getModesInfo(myActiveSelectionModes)).
+    arg(theObjList.size()).
     arg(anInfoStr).
     toStdString().c_str());
 #endif
