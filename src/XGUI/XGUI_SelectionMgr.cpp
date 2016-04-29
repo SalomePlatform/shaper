@@ -113,15 +113,15 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
         std::list<ResultPtr>::const_iterator aIt;
         for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
           aResult = (*aIt);
+          aSelectedPrs.append(std::shared_ptr<ModuleBase_ViewerPrs>(
+            new ModuleBase_ViewerPrs(aResult, GeomShapePtr(), NULL)));
           aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
           if (aCompSolid.get()) {
             for (int i = 0; i < aCompSolid->numberOfSubs(); i++) {
+              ResultBodyPtr aResult = aCompSolid->subResult(i);
               aSelectedPrs.append(std::shared_ptr<ModuleBase_ViewerPrs>(
-                   new ModuleBase_ViewerPrs(aCompSolid->subResult(i), GeomShapePtr(), NULL)));
+                new ModuleBase_ViewerPrs(aResult, aResult->shape(), NULL)));
             }
-          } else {
-            aSelectedPrs.append(std::shared_ptr<ModuleBase_ViewerPrs>(
-                 new ModuleBase_ViewerPrs(aResult, GeomShapePtr(), NULL)));
           }
         }
       }
