@@ -954,8 +954,7 @@ void Model_Document::setCurrentFeature(
     }
   }
 
-  /*
-  if (theVisible) { // make features below which are not in history also enabled: sketch subs
+  if (theVisible && !theCurrent.get()) { // needed to avoid disabling of PartSet initial constructions
     FeaturePtr aNext = 
       theCurrent.get() ? myObjs->nextFeature(theCurrent) : myObjs->firstFeature();
     for (; aNext.get(); aNext = myObjs->nextFeature(theCurrent)) {
@@ -965,7 +964,7 @@ void Model_Document::setCurrentFeature(
         theCurrent = aNext;
       }
     }
-  }*/
+  }
   if (theCurrent.get()) {
     std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
     if (!aData.get() || !aData->isValid()) {
