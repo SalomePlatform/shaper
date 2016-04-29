@@ -174,6 +174,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
         if (aAx.get()) {
           thePrs->setObject(aAx);
           thePrs->setShape(aAx->shape());
+          return;
         }
       }
     } else {
@@ -191,6 +192,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
         if (aOrigin.get()) {
           thePrs->setObject(aOrigin);
           thePrs->setShape(aOrigin->shape());
+          return;
         }
       }
     }
