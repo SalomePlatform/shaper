@@ -37,7 +37,11 @@ std::string toStdString(double theValue)
 {
   std::ostringstream sstream;
   sstream << theValue;
-  return sstream.str();
+  size_t aPos = sstream.str().find(".");
+  std::string aPnt = "";
+  if (aPos == std::string::npos)
+    aPnt = ".";
+  return sstream.str() + aPnt;
 }
 
 std::set<std::string> toSet(const std::list<std::string>& theContainer)
