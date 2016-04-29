@@ -96,8 +96,6 @@ void ModuleBase_ISelection::filterSelectionOnEqualPoints
 
   std::set<std::shared_ptr<GeomAPI_Vertex> > aVerticesMap;
   for (; anIt != aLast; anIt++) {
-    aSubIt = anIt;
-    aSubIt++;
     ModuleBase_ViewerPrsPtr aPrs = *anIt;
     std::shared_ptr<GeomAPI_Vertex> aGeomPrsVertex = getPresentationVertex(aPrs);
     if (aGeomPrsVertex.get()) {
@@ -118,7 +116,7 @@ void ModuleBase_ISelection::filterSelectionOnEqualPoints
         aFound = aPnt1->isEqual(aPnt2);
       }
       if (aFound) {
-        aCandidatesToRemove.append(*aSubIt);
+        aCandidatesToRemove.append(aPrs);
         continue;
       }
       aVerticesMap.insert(aGeomPrsVertex);
