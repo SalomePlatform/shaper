@@ -325,6 +325,11 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
   std::set<int> anAttributeIds;
   getSelectedAttributeIndices(anAttributeIds);
 
+  QModelIndexList aIndexes = myListControl->selectionModel()->selectedIndexes();
+  //foreach(QModelIndex aIndex, aIndexes) {
+  //  aIndex.row();
+  //}
+
   // refill attribute by the items which indices are not in the list of ids
   bool aDone = false;
   DataPtr aData = myFeature->data();
@@ -357,6 +362,9 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
     // may be the feature's result is not displayed, but attributes should be
     myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeArguments,
                                           true); /// hope that something is redisplayed by object updated
+  }
+  foreach(QModelIndex aIndex, aIndexes) {
+    myListControl->selectionModel()->select(aIndex, QItemSelectionModel::Select);
   }
   return aDone;
 }
