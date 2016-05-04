@@ -423,11 +423,18 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
 
     // Update value in attribute selection list
     XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myModule->workshop());
-    XGUI_PropertyPanel* aPanel = aWorkshop->propertyPanel();
-    const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
+    XGUI_PropertyPanel* aPropertyPanel = aWorkshop->propertyPanel();
+    const QList<ModuleBase_ModelWidget*>& aWidgets = aPropertyPanel->modelWidgets();
+    ModuleBase_ModelWidget* aListWidget = 0;
     foreach(ModuleBase_ModelWidget* aWidget, aWidgets) {
-      if (aWidget->attributeID() == myAttributeListID)
-        aWidget->restoreValue();
+      if (aWidget->attributeID() == myAttributeListID) {
+        aListWidget = aWidget;
+        break;
+      }
+    }
+    if (aListWidget) {
+      aListWidget->restoreValue();
+      aPropertyPanel->activateNextWidget(aListWidget);
     }
 
     // Hide sketcher result
