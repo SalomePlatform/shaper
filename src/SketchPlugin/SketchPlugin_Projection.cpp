@@ -31,6 +31,12 @@
 
 static const double tolerance = 1.e-7;
 
+static std::shared_ptr<GeomAPI_Edge> emptyEdge()
+{
+  static std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge);
+  return anEdge;
+}
+
 SketchPlugin_Projection::SketchPlugin_Projection()
     : SketchPlugin_SketchEntity(),
       myIsComputing(false)
@@ -58,7 +64,7 @@ void SketchPlugin_Projection::execute()
 
   if (!lastResult().get() && aProjection->lastResult().get()) {
     ResultConstructionPtr aConstr = document()->createConstruction(data());
-    aConstr->setShape(aProjection->lastResult()->shape());
+    aConstr->setShape(emptyEdge());
     aConstr->setIsInHistory(false);
     aConstr->setDisplayed(false);
     setResult(aConstr);
@@ -196,7 +202,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     selection(EXTERNAL_ID())->setValue(aExtFeature->context(), aExtFeature->context()->shape());
 
     if (aResult) {
-      aResult->setShape(aProjection->lastResult()->shape());
+      aResult->setShape(emptyEdge());
       setResult(aResult);
       aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
     }

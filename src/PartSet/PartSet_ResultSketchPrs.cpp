@@ -292,7 +292,7 @@ void PartSet_ResultSketchPrs::fillShapes(TopoDS_Shape& theResultShape,
           std::shared_ptr<GeomAPI_Shape> aGeomShape = aConstr->shape();
           if (aGeomShape.get()) {
             const TopoDS_Shape& aShape = aGeomShape->impl<TopoDS_Shape>();
-            if (aShape.ShapeType() != TopAbs_EDGE)
+            if (!aShape.IsNull() && aShape.ShapeType() != TopAbs_EDGE)
               anAuxiliaryResults.push_back(aConstr);
           }
         }
