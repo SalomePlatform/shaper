@@ -148,9 +148,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   mySelectionFilters.Append(new PartSet_GlobalFilter(myWorkshop));
   mySelectionFilters.Append(new PartSet_FilterInfinite(myWorkshop));
 
-  myHasConstraintShown[PartSet_Tools::Geometrical] = true;
-  myHasConstraintShown[PartSet_Tools::Dimensional] = true;
-  myHasConstraintShown[PartSet_Tools::Expressions] = false;
+  setDefaultConstraintShown();
 
   Config_PropManager::registerProp("Visualization", "operation_parameter_color",
                           "Reference shape wireframe color in operation", Config_Prop::Color,
@@ -394,6 +392,8 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
   if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->stopNestedSketch(theOperation);
   }
+  else if (PartSet_SketcherMgr::isSketchOperation(theOperation))
+    setDefaultConstraintShown();
 
   //VSV: Viewer is updated on feature update and redisplay
   if (isModified) {
@@ -405,7 +405,6 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
   QMap<PartSet_Tools::ConstraintVisibleState, bool>::const_iterator anIt = myHasConstraintShown.begin(),
                                                                     aLast = myHasConstraintShown.end();
   for (; anIt != aLast; anIt++) {
-    myHasConstraintShown[anIt.key()];
     mySketchMgr->updateBySketchParameters(anIt.key(), anIt.value());
   }
 }
@@ -1314,4 +1313,12 @@ XGUI_Workshop* PartSet_Module::getWorkshop() const
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   return aConnector->workshop();
+}
+
+//******************************************************
+void PartSet_Module::setDefaultConstraintShown()
+{
+  myHasConstraintShown[PartSet_Tools::Geometrical] = true;
+  myHasConstraintShown[PartSet_Tools::Dimensional] = true;
+  myHasConstraintShown[PartSet_Tools::Expressions] = false;
 }

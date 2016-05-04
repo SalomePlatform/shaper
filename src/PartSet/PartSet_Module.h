@@ -376,14 +376,15 @@ protected:
    void onActiveDocPopup(const QPoint&);
 
  private:
-
   //! Delete features
   virtual bool deleteObjects();
 
   /// Returns the workshop
   XGUI_Workshop* getWorkshop() const;
 
- private:
+  void setDefaultConstraintShown();
+
+private:
   SelectMgr_ListOfFilter mySelectionFilters;
 
   PartSet_SketcherMgr* mySketchMgr;
