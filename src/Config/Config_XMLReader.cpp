@@ -62,10 +62,20 @@ Config_XMLReader::~Config_XMLReader()
 std::string Config_XMLReader::pluginConfigFile()
 {
   std::string aValue;
-  char* anEnv = getenv("PLUGINS_CONFIG_FILE");
+  char* anEnv = getenv("SHAPER_ROOT_DIR");
   if (anEnv) {
     aValue = std::string(anEnv);
+  } else {
+    anEnv = getenv("OPENPARTS_ROOT_DIR");
+    if (anEnv)
+      aValue = std::string(anEnv);
   }
+#ifdef WIN32
+    aValue += "\\";
+#else
+    aValue += "/";
+#endif
+  aValue += "plugins";
   return aValue;
 }
 

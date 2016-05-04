@@ -273,16 +273,24 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
     return myIconsMap[iconName()];
   }
   // Load icon for the presentation
-  char* aEnv = getenv("SHAPERResources");
-  if (aEnv != NULL) {
-    TCollection_AsciiString aFile(aEnv);
-    aFile += FSEP;
-    aFile += iconName();
-    Handle(Image_AlienPixMap) aPixMap = new Image_AlienPixMap();
-    if (aPixMap->Load(aFile)) {
-      myIconsMap[iconName()] = aPixMap;
-      return aPixMap;
-    }
+  std::string aFile;
+  char* anEnv = getenv("SHAPER_ROOT_DIR");
+  if (anEnv) {
+    aFile = std::string(anEnv);
+  } else {
+    anEnv = getenv("OPENPARTS_ROOT_DIR");
+    if (anEnv)
+      aFile = std::string(anEnv);
+  }
+  aFile += FSEP;
+  aFile += "resources";
+
+  aFile += FSEP;
+  aFile += iconName();
+  Handle(Image_AlienPixMap) aPixMap = new Image_AlienPixMap();
+  if (aPixMap->Load(aFile.c_str())) {
+    myIconsMap[iconName()] = aPixMap;
+    return aPixMap;
   }
   // The icon for constraint is not found
   static const char aMsg[] = "Error! constraint images are not found";
