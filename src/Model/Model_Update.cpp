@@ -80,6 +80,8 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
 #ifdef DEB_UPDATE
       std::cout<<"*** Add process on finish "<<theFeature->name()<<std::endl;
 #endif
+    // keeps the currently updated features to avoid infinitive cycling here: where feature on
+    // "updateArguments" sends "updated" (in selection attribute) and goes here again
     static std::set<FeaturePtr> aCurrentlyUpdated;
     if (aCurrentlyUpdated.find(theFeature) == aCurrentlyUpdated.end()) {
       aCurrentlyUpdated.insert(theFeature);
