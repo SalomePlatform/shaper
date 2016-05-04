@@ -292,6 +292,7 @@ void ModuleBase_PreferencesDlg::createViewerPage(int thePageId)
 
   // Create other parameters group in viewer tab
   int otherGroup = myPreferences->addItem(tr("Default selection"), viewTab);
+  myPreferences->setItemProperty("columns", 3, otherGroup);
   myPreferences->addItem(tr("Faces"), otherGroup, 
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "face-selection");
@@ -301,20 +302,6 @@ void ModuleBase_PreferencesDlg::createViewerPage(int thePageId)
   myPreferences->addItem(tr("Vertices"), otherGroup, 
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "vertex-selection");
-  //QStringList aSelectionList;
-  //aSelectionList.append( tr("Vertices") );
-  //aSelectionList.append( tr("Edges") );
-  //aSelectionList.append( tr("Faces") );
-  //aSelectionList.append( tr("Results") );
-
-  //QList<QVariant> anIndexesList;
-  //anIndexesList.append(TopAbs_VERTEX);
-  //anIndexesList.append(TopAbs_EDGE);
-  //anIndexesList.append(TopAbs_FACE);
-  //anIndexesList.append(-1);
-
-  //myPreferences->setItemProperty( "strings", aSelectionList, selId );
-  //myPreferences->setItemProperty( "indexes", anIndexesList, selId );
 }
 
 void ModuleBase_PreferencesDlg::createMenuPage(int thePageId)

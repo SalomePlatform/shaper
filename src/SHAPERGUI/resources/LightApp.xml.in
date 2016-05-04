@@ -37,6 +37,8 @@
   </section>
   <section name="Viewer" >
     <!-- Viewer preferences -->
-    <parameter name="selection" value="4" />
+    <parameter name="face-selection" value="true" />
+    <parameter name="edge-selection" value="true" />
+    <parameter name="vertex-selection" value="true" />
   </section>
 </document>

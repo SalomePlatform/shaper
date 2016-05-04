@@ -581,24 +581,17 @@ void SHAPERGUI::createPreferences()
 
   int viewTab = pref->addItem(tr("Viewer"), catId);
   // Create other parameters group in viewer tab
-  int otherGroup = pref->addItem(tr("Other parameters"), viewTab);
-  int selId = pref->addItem(tr("Default selection type"), otherGroup, 
-                                     SUIT_PreferenceMgr::Selector,
-                                     ModuleBase_Preferences::VIEWER_SECTION, "selection");
-  QStringList aSelectionList;
-  aSelectionList.append( tr("Vertices") );
-  aSelectionList.append( tr("Edges") );
-  aSelectionList.append( tr("Faces") );
-  aSelectionList.append( tr("Results") );
-
-  QList<QVariant> anIndexesList;
-  anIndexesList.append(TopAbs_VERTEX);
-  anIndexesList.append(TopAbs_EDGE);
-  anIndexesList.append(TopAbs_FACE);
-  anIndexesList.append(-1);
-
-  pref->setItemProperty( "strings", aSelectionList, selId );
-  pref->setItemProperty( "indexes", anIndexesList, selId );
+  int otherGroup = pref->addItem(tr("Default selection"), viewTab);
+  pref->setItemProperty("columns", 3, otherGroup);
+  pref->addItem(tr("Faces"), otherGroup, 
+                         SUIT_PreferenceMgr::Bool,
+                         ModuleBase_Preferences::VIEWER_SECTION, "face-selection");
+  pref->addItem(tr("Edges"), otherGroup, 
+                         SUIT_PreferenceMgr::Bool,
+                         ModuleBase_Preferences::VIEWER_SECTION, "edge-selection");
+  pref->addItem(tr("Vertices"), otherGroup, 
+                         SUIT_PreferenceMgr::Bool,
+                         ModuleBase_Preferences::VIEWER_SECTION, "vertex-selection");
   
   pref->retrieve();
 }
