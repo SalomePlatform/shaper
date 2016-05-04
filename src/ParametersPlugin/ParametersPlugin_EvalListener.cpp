@@ -105,7 +105,10 @@ double ParametersPlugin_EvalListener::evaluate(FeaturePtr theParameter,
     double aValue;
     ResultParameterPtr aParamRes;
     // If variable does not exist python interpreter will generate an error. It is OK.
-    if (!ModelAPI_Tools::findVariable(theParameter, *it, aValue, aParamRes, theParameter->document()))
+    // But due to the issue 1479 it should not check the history position of parameters relatively
+    // to feature that contains expression
+    if (!ModelAPI_Tools::findVariable(/*theParameter*/ FeaturePtr(), 
+      *it, aValue, aParamRes, theParameter->document()))
       continue;
 
     aContext.push_back(*it + "=" + toStdString(aValue));

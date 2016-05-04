@@ -496,8 +496,7 @@ std::set<std::string> usedParameters(const AttributePoint2DPtr& theAttribute)
   return anUsedParameters;
 }
 
-std::list<ResultParameterPtr> findVariables(const std::set<std::string>& theParameters, 
-                                            const FeaturePtr& theParam)
+std::list<ResultParameterPtr> findVariables(const std::set<std::string>& theParameters)
 {
   std::list<ResultParameterPtr> aResult;
   std::set<std::string>::const_iterator aParamIt = theParameters.cbegin();
@@ -505,7 +504,8 @@ std::list<ResultParameterPtr> findVariables(const std::set<std::string>& thePara
     const std::string& aName = *aParamIt;
     double aValue;
     ResultParameterPtr aParam;
-    if (ModelAPI_Tools::findVariable(theParam, aName, aValue, aParam))
+    // theSearcher is not needed here: in expressions of features the parameters history is not needed
+    if (ModelAPI_Tools::findVariable(FeaturePtr(), aName, aValue, aParam))
       aResult.push_back(aParam);
   }
   return aResult;
@@ -565,25 +565,25 @@ void Model_Data::referencesToObjects(
       AttributeIntegerPtr anAttribute =
           std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(anAttr->second);
       std::set<std::string> anUsedParameters = anAttribute->usedParameters();
-      std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters, aMyFeature);
+      std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters);
       aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
     } else if (aType == ModelAPI_AttributeDouble::typeId()) { // double attribute
       AttributeDoublePtr anAttribute =
           std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anAttr->second);
       std::set<std::string> anUsedParameters = anAttribute->usedParameters();
-      std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters, aMyFeature);
+      std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters);
       aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
     } else if (aType == GeomDataAPI_Point::typeId()) { // point attribute
       AttributePointPtr anAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point>(anAttr->second);
       std::set<std::string> anUsedParameters = usedParameters(anAttribute);
-      std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters, aMyFeature);
+      std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters);
       aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
     } else if (aType == GeomDataAPI_Point2D::typeId()) { // point attribute
       AttributePoint2DPtr anAttribute =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->second);
       std::set<std::string> anUsedParameters = usedParameters(anAttribute);
-      std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters, aMyFeature);
+      std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters);
       aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
     } else
       continue; // nothing to do, not reference
