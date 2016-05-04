@@ -104,28 +104,32 @@ void XGUI_ContextMenuMgr::createActions()
   mySeparator = new QAction(this);
   mySeparator->setSeparator(true);
 
-  mySelectActions = new QActionGroup(this);
-  mySelectActions->setExclusive(true);
+  //mySelectActions = new QActionGroup(this);
+  //mySelectActions->setExclusive(true);
 
   aAction = new QAction(QIcon(":pictures/vertex.png"), tr("Vertices"), this);
   aAction->setCheckable(true);
   addAction("SELECT_VERTEX_CMD", aAction);
-  mySelectActions->addAction(aAction);
+  connect(aAction, SIGNAL(triggered(bool)), SLOT(onShapeSelection(bool)));
+  //mySelectActions->addAction(aAction);
 
   aAction = new QAction(QIcon(":pictures/edge.png"), tr("Edges"), this);
   aAction->setCheckable(true);
   addAction("SELECT_EDGE_CMD", aAction);
-  mySelectActions->addAction(aAction);
+  connect(aAction, SIGNAL(triggered(bool)), SLOT(onShapeSelection(bool)));
+  //mySelectActions->addAction(aAction);
 
   aAction = new QAction(QIcon(":pictures/face.png"), tr("Faces"), this);
   aAction->setCheckable(true);
   addAction("SELECT_FACE_CMD", aAction);
-  mySelectActions->addAction(aAction);
+  connect(aAction, SIGNAL(triggered(bool)), SLOT(onShapeSelection(bool)));
+  //mySelectActions->addAction(aAction);
 
   aAction = new QAction(QIcon(":pictures/result.png"), tr("Result"), this);
   aAction->setCheckable(true);
   addAction("SELECT_RESULT_CMD", aAction);
-  mySelectActions->addAction(aAction);
+  connect(aAction, SIGNAL(triggered(bool)), SLOT(onResultSelection(bool)));
+  //mySelectActions->addAction(aAction);
 
   aAction->setChecked(true);
 
@@ -358,13 +362,21 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
 
   // Update selection menu
   QIntList aModes = aDisplayer->activeSelectionModes();
-  if (aModes.count() <= 1) {
-    action("SELECT_VERTEX_CMD")->setEnabled(true);
-    action("SELECT_EDGE_CMD")->setEnabled(true);
-    action("SELECT_FACE_CMD")->setEnabled(true);
-    action("SELECT_RESULT_CMD")->setEnabled(true);
-    if (aModes.count() == 1) {
-      switch (aModes.first()) {
+  action("SELECT_VERTEX_CMD")->setEnabled(true);
+  action("SELECT_EDGE_CMD")->setEnabled(true);
+  action("SELECT_FACE_CMD")->setEnabled(true);
+  action("SELECT_RESULT_CMD")->setEnabled(true);
+
+  action("SELECT_RESULT_CMD")->setChecked(false);
+  action("SELECT_VERTEX_CMD")->setChecked(false);
+  action("SELECT_EDGE_CMD")->setChecked(false);
+  action("SELECT_FACE_CMD")->setChecked(false);
+  action("SELECT_RESULT_CMD")->setChecked(false);
+  if (aModes.count() == 0) {
+    action("SELECT_RESULT_CMD")->setChecked(true);
+  } else {
+    foreach(int aMode, aModes) {
+      switch (aMode) {
       case TopAbs_VERTEX: 
         action("SELECT_VERTEX_CMD")->setChecked(true);
         break;
@@ -377,9 +389,8 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
       default:
         action("SELECT_RESULT_CMD")->setChecked(true);
       }
-    } else 
-      action("SELECT_RESULT_CMD")->setChecked(true);
-  }
+    }
+  } 
 
   ModuleBase_IModule* aModule = myWorkshop->module();
   if (aModule)
@@ -542,6 +553,7 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
     aSelMenu->addAction(action("SELECT_VERTEX_CMD"));
     aSelMenu->addAction(action("SELECT_EDGE_CMD"));
     aSelMenu->addAction(action("SELECT_FACE_CMD"));
+    aSelMenu->addSeparator();
     aSelMenu->addAction(action("SELECT_RESULT_CMD"));
     theMenu->addMenu(aSelMenu);
     theMenu->addSeparator();
@@ -666,4 +678,24 @@ void XGUI_ContextMenuMgr::addFeatures(QMenu* theMenu) const
         }
     }
   }
+}
+
+#define UNCHECK_ACTION(NAME) \
+{ QAction* aAction = action(NAME); \
+bool isBlock = aAction->signalsBlocked(); \
+aAction->blockSignals(true); \
+aAction->setChecked(false); \
+  aAction->blockSignals(isBlock); }
+
+
+void XGUI_ContextMenuMgr::onResultSelection(bool theChecked)
+{
+  UNCHECK_ACTION("SELECT_VERTEX_CMD");
+  UNCHECK_ACTION("SELECT_EDGE_CMD");
+  UNCHECK_ACTION("SELECT_FACE_CMD");
+}
+
+void XGUI_ContextMenuMgr::onShapeSelection(bool theChecked)
+{
+  UNCHECK_ACTION("SHOW_RESULTS_CMD");
 }

@@ -122,8 +122,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
       mySalomeConnector(theConnector),
       myPropertyPanel(0),
       myObjectBrowser(0),
-      myDisplayer(0),
-      myViewerSelMode(TopAbs_FACE)
+      myDisplayer(0)
+      //myViewerSelMode(TopAbs_FACE)
 {
 #ifndef HAVE_SALOME
   myMainWindow = new AppElements_MainWindow();
@@ -135,6 +135,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   else 
     QLocale::setDefault( QLocale::system() );
 #endif
+
+  myViewerSelMode << TopAbs_FACE << TopAbs_EDGE << TopAbs_VERTEX;
 
   myDataModelXMLReader = new Config_DataModelReader();
   myDataModelXMLReader->readAll();
@@ -196,8 +198,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   Config_PropManager::registerProp("Visualization", "result_part_color", "Part color",
                                    Config_Prop::Color, ModelAPI_ResultPart::DEFAULT_COLOR());
   
-  myViewerSelMode = 
-    ModuleBase_Preferences::resourceMgr()->integerValue("Viewer", "selection", TopAbs_FACE);
+  //myViewerSelMode = 
+  //  ModuleBase_Preferences::resourceMgr()->integerValue("Viewer", "selection", TopAbs_FACE);
 }
 
 //******************************************************
@@ -1241,7 +1243,14 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
 //**************************************************************
 void XGUI_Workshop::setViewerSelectionMode(int theMode)
 {
-  myViewerSelMode = theMode;
+  if (theMode == -1)
+    myViewerSelMode.clear();
+  else {
+    if (myViewerSelMode.contains(theMode))
+      myViewerSelMode.removeAll(theMode);
+    else
+      myViewerSelMode.append(theMode);
+  }
   activateObjectsSelection(myDisplayer->displayedObjects());
 }
 
@@ -1250,7 +1259,7 @@ void XGUI_Workshop::activateObjectsSelection(const QObjectPtrList& theList)
 {
   QIntList aModes;
   module()->activeSelectionModes(aModes);
-  if (aModes.isEmpty() && (myViewerSelMode != -1))
+  if (aModes.isEmpty() && (myViewerSelMode.length() > 0))
     aModes.append(myViewerSelMode);
   myDisplayer->activateObjects(aModes, theList);
 }

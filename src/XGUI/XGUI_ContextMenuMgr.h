@@ -87,6 +87,12 @@ signals:
 
   void onRename();
 
+  /// Slot called on Result selection menu press
+  void onResultSelection(bool theChecked);
+
+  /// Slot called on any shape selection menu press
+  void onShapeSelection(bool theChecked);
+
  private:
   /** 
    * Add action
@@ -116,7 +122,7 @@ signals:
   QMap<std::string, QActionsList> myObjBrowserMenus;
   QMap<std::string, QActionsList> myViewerMenu;
 
-  QActionGroup* mySelectActions;
+  //QActionGroup* mySelectActions;
 
   QAction* mySeparator;
 };

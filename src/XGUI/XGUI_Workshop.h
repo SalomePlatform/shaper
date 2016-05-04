@@ -282,7 +282,7 @@ Q_OBJECT
   void connectToPropertyPanel(const bool isToConnect);
 
   /// Returns defailt selection mode in 3d viewer
-  int viewerSelectionMode() const { return myViewerSelMode; }
+  QIntList viewerSelectionModes() const { return myViewerSelMode; }
 
   /// Highlights result objects in Object Browser according to
   /// features found in the given list
@@ -522,7 +522,7 @@ private:
 
   QString myCurrentDir;
 
-  int myViewerSelMode;
+  QIntList myViewerSelMode;
 
   Config_DataModelReader* myDataModelXMLReader;
 };
