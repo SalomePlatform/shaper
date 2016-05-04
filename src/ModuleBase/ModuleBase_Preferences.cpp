@@ -291,24 +291,30 @@ void ModuleBase_PreferencesDlg::createViewerPage(int thePageId)
   myPreferences->setItemProperty("image_formats", aImgFiles, bgId);
 
   // Create other parameters group in viewer tab
-  int otherGroup = myPreferences->addItem(tr("Other parameters"), viewTab);
-  int selId = myPreferences->addItem(tr("Default selection type"), otherGroup, 
-                                     SUIT_PreferenceMgr::Selector,
-                                     ModuleBase_Preferences::VIEWER_SECTION, "selection");
-  QStringList aSelectionList;
-  aSelectionList.append( tr("Vertices") );
-  aSelectionList.append( tr("Edges") );
-  aSelectionList.append( tr("Faces") );
-  aSelectionList.append( tr("Results") );
+  int otherGroup = myPreferences->addItem(tr("Default selection"), viewTab);
+  myPreferences->addItem(tr("Faces"), otherGroup, 
+                         SUIT_PreferenceMgr::Bool,
+                         ModuleBase_Preferences::VIEWER_SECTION, "face-selection");
+  myPreferences->addItem(tr("Edges"), otherGroup, 
+                         SUIT_PreferenceMgr::Bool,
+                         ModuleBase_Preferences::VIEWER_SECTION, "edge-selection");
+  myPreferences->addItem(tr("Vertices"), otherGroup, 
+                         SUIT_PreferenceMgr::Bool,
+                         ModuleBase_Preferences::VIEWER_SECTION, "vertex-selection");
+  //QStringList aSelectionList;
+  //aSelectionList.append( tr("Vertices") );
+  //aSelectionList.append( tr("Edges") );
+  //aSelectionList.append( tr("Faces") );
+  //aSelectionList.append( tr("Results") );
 
-  QList<QVariant> anIndexesList;
-  anIndexesList.append(TopAbs_VERTEX);
-  anIndexesList.append(TopAbs_EDGE);
-  anIndexesList.append(TopAbs_FACE);
-  anIndexesList.append(-1);
+  //QList<QVariant> anIndexesList;
+  //anIndexesList.append(TopAbs_VERTEX);
+  //anIndexesList.append(TopAbs_EDGE);
+  //anIndexesList.append(TopAbs_FACE);
+  //anIndexesList.append(-1);
 
-  myPreferences->setItemProperty( "strings", aSelectionList, selId );
-  myPreferences->setItemProperty( "indexes", anIndexesList, selId );
+  //myPreferences->setItemProperty( "strings", aSelectionList, selId );
+  //myPreferences->setItemProperty( "indexes", anIndexesList, selId );
 }
 
 void ModuleBase_PreferencesDlg::createMenuPage(int thePageId)

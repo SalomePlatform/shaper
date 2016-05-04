@@ -136,8 +136,6 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
     QLocale::setDefault( QLocale::system() );
 #endif
 
-  myViewerSelMode << TopAbs_FACE << TopAbs_EDGE << TopAbs_VERTEX;
-
   myDataModelXMLReader = new Config_DataModelReader();
   myDataModelXMLReader->readAll();
 
@@ -198,8 +196,12 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   Config_PropManager::registerProp("Visualization", "result_part_color", "Part color",
                                    Config_Prop::Color, ModelAPI_ResultPart::DEFAULT_COLOR());
   
-  //myViewerSelMode = 
-  //  ModuleBase_Preferences::resourceMgr()->integerValue("Viewer", "selection", TopAbs_FACE);
+  if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "face-selection", true))
+    myViewerSelMode.append(TopAbs_FACE);
+  if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "edge-selection", true))
+    myViewerSelMode.append(TopAbs_EDGE);
+  if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "vertex-selection", true))
+    myViewerSelMode.append(TopAbs_VERTEX);
 }
 
 //******************************************************

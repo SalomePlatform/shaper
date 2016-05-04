@@ -11,7 +11,9 @@
   <section name="Viewer" >
     <!-- Viewer preferences -->
     <parameter name="background" value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />
-    <parameter name="selection" value="4" />
+    <parameter name="face-selection" value="true" />
+    <parameter name="edge-selection" value="true" />
+    <parameter name="vertex-selection" value="true" />
   </section>
   <section name="Menu" >
     <!-- Menu bar preferences -->
