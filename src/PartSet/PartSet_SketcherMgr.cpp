@@ -1030,8 +1030,12 @@ bool PartSet_SketcherMgr::operationActivatedByPreselection()
     bool aCanCommitOperation = true;
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                             (anOperation);
-    if (aFOperation && PartSet_SketcherMgr::isDistanceOperation(aFOperation))
-      aCanCommitOperation = setDistanceValueByPreselection(anOperation, myModule->workshop());
+    if (aFOperation && PartSet_SketcherMgr::isDistanceOperation(aFOperation)) {
+      bool aValueAccepted = setDistanceValueByPreselection(anOperation, myModule->workshop(),
+                                                           aCanCommitOperation);
+      if (!aValueAccepted)
+        return isOperationStopped;
+    }
 
     if (aCanCommitOperation)
       isOperationStopped = anOperation->commit();
@@ -1325,9 +1329,11 @@ void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& th
 }
 
 bool PartSet_SketcherMgr::setDistanceValueByPreselection(ModuleBase_Operation* theOperation,
-                                                         ModuleBase_IWorkshop* theWorkshop)
+                                                         ModuleBase_IWorkshop* theWorkshop,
+                                                         bool& theCanCommitOperation)
 {
   bool isValueAccepted = false;
+  theCanCommitOperation = false;
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                               (theOperation);
@@ -1389,6 +1395,7 @@ bool PartSet_SketcherMgr::setDistanceValueByPreselection(ModuleBase_Operation* t
             }
             anEditor->setCursorPosition(aX, anY);
             isValueAccepted = anEditor->showPopupEditor(false);
+            theCanCommitOperation = true;
           }
         }
       }

@@ -163,16 +163,19 @@ bool ModuleBase_WidgetValidated::isValidSelectionForAttribute(const ModuleBase_V
   restoreAttributeValue(theAttribute, aValid);
 
   blockAttribute(theAttribute, false, isFlushesActived, isAttributeSetInitializedBlocked);
+  /// NDS: The following rows are commented for issue #1452 (to be removed after debug)
+  /// This is not correct to perform it here because it might cause update selection and
+  /// the selection mechanizm will be circled: use the scenario of the bug with preselected point.
   // In particular case the results are deleted and called as redisplayed inside of this
   // highlight-selection, to they must be flushed as soon as possible.
   // Example: selection of group-vertices subshapes with shift pressend on body. Without
   //  these 4 lines below the application crashes because of left presentations on
   //  removed results still in the viewer.
-  static Events_ID aDeletedEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
+  /*static Events_ID aDeletedEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
   static Events_ID aRedispEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
   Events_Loop::loop()->flush(aDeletedEvent);
   Events_Loop::loop()->flush(aRedispEvent);
-
+  */
   return aValid;
 }
 

@@ -306,7 +306,8 @@ private:
   /// are filled by preseletion
   /// \return true if the value is accepted
   static bool setDistanceValueByPreselection(ModuleBase_Operation* theOperation,
-                                             ModuleBase_IWorkshop* theWorkshop);
+                                             ModuleBase_IWorkshop* theWorkshop,
+                                             bool& theCanCommitOperation);
 
   typedef QMap<FeaturePtr, std::pair<std::set<AttributePtr>, std::set<ResultPtr> > >
                                                                        FeatureToSelectionMap;
