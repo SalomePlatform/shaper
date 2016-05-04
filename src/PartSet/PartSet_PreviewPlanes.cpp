@@ -33,10 +33,15 @@ bool PartSet_PreviewPlanes::hasVisualizedBodies(ModuleBase_IWorkshop* theWorksho
   QObjectPtrList aDisplayed = aDisp->displayedObjects();
   foreach (ObjectPtr anObj, aDisplayed) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
-    if (aResult.get() != NULL) {
-      aBodyIsVisualized = aResult->groupName() == ModelAPI_ResultBody::group();
-      if (aBodyIsVisualized)
-        break;
+    // result constructions should not be taken as a body
+    if (aResult.get() != NULL && aResult->groupName() == ModelAPI_ResultBody::group()) {
+      GeomShapePtr aShape = aResult->shape();
+      if (aShape.get()) {
+        // vertices, edges should not be taken as a body
+        aBodyIsVisualized = aShape->shapeType() <= GeomAPI_Shape::FACE;
+        if (aBodyIsVisualized)
+          break;
+      }
     }
   }
   return aBodyIsVisualized;
