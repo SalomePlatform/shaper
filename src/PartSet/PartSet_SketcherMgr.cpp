@@ -696,7 +696,7 @@ void PartSet_SketcherMgr::launchEditing()
     FeaturePtr aFeature = myCurrentSelection.begin().key();
     std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
               std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    if (aSPFeature) {
+    if (aSPFeature && (!aSPFeature->isExternal())) {
       myModule->editFeature(aSPFeature);
     }
   }
