@@ -46,6 +46,9 @@ void ModuleBase_WidgetSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr& 
 void ModuleBase_WidgetSelector::onSelectionChanged()
 {
   QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
+  // equal vertices should not be used here
+  ModuleBase_ISelection::filterSelectionOnEqualPoints(aSelected);
+
   bool isDone = setSelection(aSelected, true/*false*/);
   updateOnSelectionChanged(isDone);
 }
