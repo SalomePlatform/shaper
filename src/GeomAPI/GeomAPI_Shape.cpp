@@ -25,6 +25,7 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS_Shape.hxx>
+#include <NCollection_List.hxx>
 
 #include <sstream>
 
@@ -88,6 +89,68 @@ bool GeomAPI_Shape::isCompoundOfSolids() const
     isAtLeastOne = true;
   }
   return isAtLeastOne;
+}
+
+// adds the nopt-compound elements recursively to the list
+static void addSimpleToList(const TopoDS_Shape& theShape, NCollection_List<TopoDS_Shape>& theList)
+{
+  if (!theShape.IsNull()) {
+    if (theShape.ShapeType() == TopAbs_COMPOUND) {
+      for(TopoDS_Iterator aSubs(theShape); aSubs.More(); aSubs.Next()) {
+        addSimpleToList(aSubs.Value(), theList);
+      }
+    } else {
+      theList.Append(theShape);
+    }
+  }
+}
+
+bool GeomAPI_Shape::isConnectedTopology() const
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+  if (aShape.IsNull() || aShape.ShapeType() != TopAbs_COMPOUND)
+    return false;
+  NCollection_List<TopoDS_Shape> aNotConnected; // list of simple elements that are not detected in connection to others
+  addSimpleToList(aShape, aNotConnected);
+  if (aNotConnected.IsEmpty()) // an empty compound
+    return false;
+
+  // collect here the group of connected subs, starting with one first element
+  NCollection_List<TopoDS_Shape> aNewConnected;
+  aNewConnected.Append(aNotConnected.First());
+  aNotConnected.RemoveFirst();
+  // iterate until some new element become connected
+  while(!aNewConnected.IsEmpty() && !aNotConnected.IsEmpty()) {
+    NCollection_List<TopoDS_Shape> aNew; // very new connected to new connected
+    NCollection_List<TopoDS_Shape>::Iterator aNotIter(aNotConnected);
+    while(aNotIter.More()) {
+      bool aConnected =  false;
+      NCollection_List<TopoDS_Shape>::Iterator aNewIter(aNewConnected);
+      for(; !aConnected && aNewIter.More(); aNewIter.Next()) {
+        // checking topological connecion of aNotIter and aNewIter (if shapes are connected, vertices are connected for sure)
+        TopExp_Explorer anExp1(aNotIter.Value(), TopAbs_VERTEX);
+        for(; !aConnected && anExp1.More(); anExp1.Next()) {
+          TopExp_Explorer anExp2(aNewIter.Value(), TopAbs_VERTEX);
+          for(; anExp2.More(); anExp2.Next()) {
+            if (anExp1.Current().IsSame(anExp2.Current())) {
+              aConnected = true;
+              break;
+            }
+          }
+        }
+      }
+      if (aConnected) {
+        aNew.Append(aNotIter.Value());
+        aNotConnected.Remove(aNotIter);
+      } else {
+        aNotIter.Next();
+      }
+    }
+    // remove all new connected and put to this list very new connected
+    aNewConnected.Clear();
+    aNewConnected.Append(aNew);
+  }
+  return aNotConnected.IsEmpty() == Standard_True;
 }
 
 bool GeomAPI_Shape::isSolid() const

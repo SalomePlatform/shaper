@@ -79,7 +79,8 @@ QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
     GeomShapePtr aShape = aResult->shape();
     if(aShape.get()) {
       switch(aShape->shapeType()) {
-        case GeomAPI_Shape::COMPOUND:  return QIcon(":pictures/compound.png");
+        case GeomAPI_Shape::COMPOUND:  return aShape->isConnectedTopology() ?
+                QIcon(":pictures/compoundofsolids.png") : QIcon(":pictures/compound.png");
         case GeomAPI_Shape::COMPSOLID: return QIcon(":pictures/compsolid.png");
         case GeomAPI_Shape::SOLID:     return QIcon(":pictures/solid.png");
         case GeomAPI_Shape::SHELL:     return QIcon(":pictures/shell.png");

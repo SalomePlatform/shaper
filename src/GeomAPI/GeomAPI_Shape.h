@@ -58,6 +58,10 @@ public:
   GEOMAPI_EXPORT 
   virtual bool isCompoundOfSolids() const;
 
+  /// Returns whether the shape is a compound where all elements are topologically connected
+  GEOMAPI_EXPORT 
+  virtual bool isConnectedTopology() const;
+
   /// Returns whether the shape is a solid
   GEOMAPI_EXPORT 
   virtual bool isSolid() const;
