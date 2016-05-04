@@ -731,7 +731,7 @@ bool SolveSpaceSolver_Storage::removeEntity(const Slvs_hEntity& theEntityID)
     myEntities.erase(myEntities.begin() + aPos);
     myEntityMaxID = myEntities.empty() ? SLVS_E_UNKNOWN : myEntities.back().h;
     if (anEntity.distance != SLVS_E_UNKNOWN)
-      aResult = aResult && removeParameter(anEntity.distance);
+      aResult = aResult && removeEntity(anEntity.distance);
     for (int i = 0; i < 4; i++)
       if (anEntity.param[i] != SLVS_E_UNKNOWN)
         aResult = removeParameter(anEntity.param[i]) && aResult;
