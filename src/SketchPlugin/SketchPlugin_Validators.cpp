@@ -534,6 +534,8 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
   for(std::list<std::pair<ObjectPtr, AttributePtr>>::const_iterator aPointsIt = aPointsList.cbegin(); aPointsIt != aPointsList.cend(); aPointsIt++) {
     ObjectPtr anObject = (*aPointsIt).first;
     AttributePtr aPointAttribute = (*aPointsIt).second;
+    if (!aPointAttribute.get())
+        return false;
     std::shared_ptr<GeomAPI_Pnt2d> aSelectedPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPointAttribute)->pnt();
 
     // If we alredy have some result then:
