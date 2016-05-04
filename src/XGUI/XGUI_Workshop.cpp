@@ -98,6 +98,8 @@
 
 #include <iterator>
 
+//#define DEBUG_CLEAN_HISTORY
+
 #ifdef _DEBUG
 #include <QDebug>
 #include <iostream>
@@ -1321,6 +1323,45 @@ void XGUI_Workshop::deleteObjects()
 }
 
 //**************************************************************
+void addRefsToFeature(const FeaturePtr& theFeature,
+                      const std::map<FeaturePtr, std::set<FeaturePtr> >& theMainList,
+                      std::set<FeaturePtr>& theReferences)
+{
+  //if (theReferences.find(theFeature) != theReferences.end())
+  //  return;
+  if (theMainList.find(theFeature) == theMainList.end())
+    return; // this feature is not in the selection list, so exists without references to it
+  std::set<FeaturePtr> aMainReferences = theMainList.at(theFeature);
+
+  std::set<FeaturePtr>::const_iterator anIt = aMainReferences.begin(),
+                                       aLast = aMainReferences.end();
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aRefFeature = *anIt;
+    if (theReferences.find(aRefFeature) == theReferences.end())
+      theReferences.insert(aRefFeature);
+    addRefsToFeature(aRefFeature, theMainList, theReferences);
+  }
+}
+
+void printMapInfo(const std::map<FeaturePtr, std::set<FeaturePtr> >& theMainList,
+                  const QString& thePrefix)
+{
+  std::map<FeaturePtr, std::set<FeaturePtr> >::const_iterator aMainIt = theMainList.begin(),
+                                                              aMainLast = theMainList.end();
+  QStringList aMapInfo;
+  for (; aMainIt != aMainLast; aMainIt++) {
+    QStringList anInfo;
+    FeaturePtr aMainListFeature = aMainIt->first;
+    std::set<FeaturePtr> aMainRefList = aMainIt->second;
+    foreach (FeaturePtr aRefFeature, aMainRefList) {
+      anInfo.append(aRefFeature->name().c_str());
+    }
+    aMapInfo.append(QString("%1: %2\n").arg(aMainListFeature->name().c_str()).arg(anInfo.join(",")));
+  }
+  qDebug(QString("%1: %2\n%3").arg(thePrefix).arg(aMapInfo.size()).arg(aMapInfo.join("\n")).toStdString().c_str());
+}
+
+//**************************************************************
 void XGUI_Workshop::cleanHistory()
 {
   if (!abortAllOperations())
@@ -1337,27 +1378,101 @@ void XGUI_Workshop::cleanHistory()
     aFeatures.append(aFeature);
   }
 
-  // 1. find all referenced features
-  QList<ObjectPtr> anUnusedObjects;
-  std::set<FeaturePtr> aDirectRefFeatures;
-  //foreach (ObjectPtr anObject, anObjects) {
-  foreach (ObjectPtr anObject, aFeatures) {
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
-    // for parameter result, use the corresponded reature to be removed
-    //if (!aFeature.get() && anObject->groupName() == ModelAPI_ResultParameter::group()) {
-    //  aFeature = ModelAPI_Feature::feature(anObject);
-    //}
-    if (aFeature.get()) {
-      std::set<FeaturePtr> alreadyProcessed;
-      aDirectRefFeatures.clear();
-      ModuleBase_Tools::refsDirectToFeatureInAllDocuments(aFeature, aFeature, aFeatures,
-                                                    aDirectRefFeatures, alreadyProcessed);
-      if (aDirectRefFeatures.empty() && !anUnusedObjects.contains(aFeature))
-        anUnusedObjects.append(aFeature);
+#ifdef DEBUG_CLEAN_HISTORY
+  QObjectPtrList::const_iterator aFIt;
+  QStringList anInfo;
+  for (aFIt = aFeatures.begin(); aFIt != aFeatures.end(); ++aFIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*aFIt);
+    anInfo.append(aFeature->name().c_str());
+  }
+  QString anInfoStr = anInfo.join(";\t");
+  qDebug(QString("cleanHistory for: [%1] - %2").arg(aFeatures.size()).arg(anInfoStr).toStdString().c_str());
+#endif
+
+  // For dependencies, find main_list:
+  // sk_1(ext_1, vertex_1)
+  // ext_1(bool_1, sk_3)
+  // vertex_1()
+  // sk_2(ext_2)
+  // ext_2(bool_2)
+  // sk_3()
+  // Information: bool_1 is not selected
+  // find all referenced features
+  std::map<FeaturePtr, std::set<FeaturePtr> > aMainList;
+  foreach(ObjectPtr anObject, aFeatures) {
+    FeaturePtr aSelFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+    /// composite ??? see refsDirectToFeatureInAllDocuments
+    /// other documents ???
+    if (aSelFeature.get()) {
+      DocumentPtr aSelFeatureDoc = aSelFeature->document();
+      std::set<FeaturePtr> aSelRefFeatures;
+      // 1. find references in the current document
+      aSelFeatureDoc->refsToFeature(aSelFeature, aSelRefFeatures, false/*do not emit signals*/);
+      //if (aMainList.find(aSelFeature) != aMainList.end())
+        aMainList[aSelFeature] = aSelRefFeatures;
     }
   }
+#ifdef DEBUG_CLEAN_HISTORY
+  printMapInfo(aMainList, "firstDependencies");
+#endif
+  // find all dependencies for each object:
+  // sk_1(ext_1, vertex_1) + (sk_3, bool_1)
+  // ext_1(bool_1, sk_3)
+  // vertex_1()
+  // sk_2(ext_2) + (bool_1)
+  // ext_2(bool_1)
+  // sk_3()
+  std::map<FeaturePtr, std::set<FeaturePtr> > anExtendedMainList;
+  std::map<FeaturePtr, std::set<FeaturePtr> >::const_iterator aMainIt = aMainList.begin(),
+                                                              aMainLast = aMainList.end();
+  for (; aMainIt != aMainLast; aMainIt++) {
+    FeaturePtr aMainListFeature = aMainIt->first;
+    //std::string aName = aMainListFeature->name();
+    std::set<FeaturePtr> aMainRefList = aMainIt->second;
+    std::set<FeaturePtr> anAddRefFeatures;
+    foreach (FeaturePtr aRefFeature, aMainRefList) {
+      addRefsToFeature(aRefFeature, aMainList, aMainRefList);
+    }
+    anExtendedMainList[aMainListFeature] = aMainRefList;
+  }
 
-  // 2. warn about the references remove, break the delete operation if the user chose it
+#ifdef DEBUG_CLEAN_HISTORY
+  printMapInfo(anExtendedMainList, "allDependencies");
+#endif
+  // find for each object whether all reference values are in the map as key, that means that there is
+  // no other reference in the model to this object, so it might be removed by cleaning history
+  // sk_1(ext_1, vertex_1) + (sk_3, bool_1) - cann't be deleted, dependency to bool_1
+  // ext_1(bool_1, sk_3)  - cann't be deleted, dependency to bool_1
+  // vertex_1()
+  // sk_2(ext_2) + (bool_1)  - cann't be deleted, dependency to bool_1
+  // ext_2(bool_1)  - cann't be deleted, dependency to bool_1
+  // sk_3()
+  // Information: bool_1 is not selected
+  QList<ObjectPtr> anUnusedObjects;
+  aMainIt = anExtendedMainList.begin(), aMainLast = anExtendedMainList.end();
+  for (; aMainIt != aMainLast; aMainIt++) {
+    FeaturePtr aMainListFeature = aMainIt->first;
+    std::set<FeaturePtr> aMainRefList = aMainIt->second;
+    std::set<FeaturePtr>::const_iterator aRefIt = aMainRefList.begin(), aRefLast = aMainRefList.end();
+    bool aFeatureOutOfTheList = false;
+    for (; aRefIt != aRefLast && !aFeatureOutOfTheList; aRefIt++) {
+      FeaturePtr aRefFeature = *aRefIt;
+      aFeatureOutOfTheList = anExtendedMainList.find(aRefFeature) == anExtendedMainList.end();
+    }
+    if (!aFeatureOutOfTheList)
+      anUnusedObjects.append(aMainListFeature);
+  }
+
+#ifdef DEBUG_CLEAN_HISTORY
+  anInfo.clear();
+  for (aFIt = anUnusedObjects.begin(); aFIt != anUnusedObjects.end(); ++aFIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*aFIt);
+    anInfo.append(aFeature->name().c_str());
+  }
+  qDebug(QString("unused objects: [%1] - %2").arg(anInfo.size()).arg(anInfo.join(";\t")).toStdString().c_str());
+#endif
+
+  // warn about the references remove, break the delete operation if the user chose it
   if (!anUnusedObjects.empty()) {
     QStringList aNames;
     foreach (const ObjectPtr& anObject, anUnusedObjects) {
@@ -1377,21 +1492,6 @@ void XGUI_Workshop::cleanHistory()
 
     QString aText = QString(tr("Unused features are the following: %1.\nThese features will be deleted.\nWould you like to continue?")
                    .arg(anUnusedNames));
-    /*QString aText;
-    if (anUnusedNames.isEmpty()) {
-      aMessageBox.setStandardButtons(QMessageBox::Ok);
-      aMessageBox.setDefaultButton(QMessageBox::Ok);
-
-      aText = QString(tr("All features are relevant, there is nothing to be deleted"));
-    }
-    else {
-      aMessageBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
-      aMessageBox.setDefaultButton(QMessageBox::No);
-
-      aText = QString(tr("Unused features are the following: %1.\nThese features will be deleted.\nWould you like to continue?")
-        .arg(anUnusedNames));
-    }*/
-
     aMessageBox.setText(aText);
     if (aMessageBox.exec() == QMessageBox::No)
       return;
