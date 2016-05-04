@@ -27,6 +27,12 @@
 #include <iostream>
 #endif
 
+#ifdef WIN32
+    static const char FSEP = '\\';
+#else
+    static const char FSEP = '/';
+#endif
+
 Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
     : myXmlDoc(NULL)
 {
@@ -43,12 +49,7 @@ Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
   if (prefix.empty())
     prefix = pluginConfigFile();
 
-#ifdef WIN32
-    prefix += "\\";
-#else
-    prefix += "/";
-#endif
-  myDocumentPath = prefix + theXmlFileName;
+  myDocumentPath = prefix + FSEP + theXmlFileName;
   std::ifstream aTestFile(myDocumentPath);
   if (!aTestFile) Events_Error::send("Unable to open " + myDocumentPath);
   aTestFile.close();
@@ -64,18 +65,14 @@ std::string Config_XMLReader::pluginConfigFile()
   std::string aValue;
   char* anEnv = getenv("SHAPER_ROOT_DIR");
   if (anEnv) {
-    aValue = std::string(anEnv);
+    aValue = std::string(anEnv) +
+      FSEP + "share" + FSEP + "salome" + FSEP + "resources" + FSEP + "shaper";
   } else {
     anEnv = getenv("OPENPARTS_ROOT_DIR");
-    if (anEnv)
-      aValue = std::string(anEnv);
+    if (anEnv) {
+      aValue = std::string(anEnv) + FSEP + "plugins";
+    }
   }
-#ifdef WIN32
-    aValue += "\\";
-#else
-    aValue += "/";
-#endif
-  aValue += "plugins";
   return aValue;
 }
 

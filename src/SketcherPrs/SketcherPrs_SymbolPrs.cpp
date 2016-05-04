@@ -276,14 +276,13 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
   std::string aFile;
   char* anEnv = getenv("SHAPER_ROOT_DIR");
   if (anEnv) {
-    aFile = std::string(anEnv);
+    aFile = std::string(anEnv) +
+      FSEP + "share" + FSEP + "salome" + FSEP + "resources" + FSEP + "shaper";
   } else {
     anEnv = getenv("OPENPARTS_ROOT_DIR");
     if (anEnv)
-      aFile = std::string(anEnv);
+      aFile = std::string(anEnv) + FSEP + "resources";
   }
-  aFile += FSEP;
-  aFile += "resources";
 
   aFile += FSEP;
   aFile += iconName();
