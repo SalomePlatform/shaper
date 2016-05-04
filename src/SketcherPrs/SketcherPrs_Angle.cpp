@@ -149,6 +149,8 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
     myAngle = aVal->value();
     myValue = aVal->text();
 
+    myHasParameters = aVal->usedParameters().size() > 0;
+
     std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
                                 std::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                 (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
