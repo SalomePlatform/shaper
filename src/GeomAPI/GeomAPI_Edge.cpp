@@ -138,6 +138,9 @@ bool GeomAPI_Edge::isEqual(const std::shared_ptr<GeomAPI_Shape> theEdge) const
   const TopoDS_Shape& aMyShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   const TopoDS_Shape& aInShape = theEdge->impl<TopoDS_Shape>();
 
+  if (aMyShape.IsNull() || aInShape.IsNull())
+    return false;
+
   if (aMyShape.ShapeType() != aInShape.ShapeType())
     return false;
 
