@@ -4,6 +4,7 @@
 
 import geom
 import model
+import ModelAPI
 
 # Initialisation
 model.begin()
@@ -199,6 +200,11 @@ b3 = body_3()
 boolean = model.addAddition(part, boolean.result() + b3.result())
 model.do()
 
+# START DEBUG PURPOSES
+# prepare a study without last operation to trap floating problem with degenerated line
+results = ModelAPI.StringList()
+ModelAPI.ModelAPI_Session.get().save("/misc/dn48/newgem/azv/testPlatine", results)
+# END DEBUG PURPOSES
 b4 = body_4()
 
 boolean = model.addAddition(part, boolean.result() + b4.result())

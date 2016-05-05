@@ -101,6 +101,7 @@
 %include "ModelAPI_ResultCompSolid.h"
 
 // std::list -> [] 
+%template(StringList) std::list<std::string>;
 %template(ObjectList) std::list<std::shared_ptr<ModelAPI_Object> >;
 %template(ResultList) std::list<std::shared_ptr<ModelAPI_Result> >;
 %template(DocumentList) std::list<std::shared_ptr<ModelAPI_Document> >;
