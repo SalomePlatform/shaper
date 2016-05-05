@@ -470,7 +470,7 @@ void PlaneGCSSolver_Storage::toggleEntity(
     }
 
     theTo.push_back(*anIt);
-    int aShift = anIt - theFrom.begin();
+    int aShift = int(anIt - theFrom.begin());
     theFrom.erase(anIt);
     anIt = theFrom.begin() + aShift;
   }
