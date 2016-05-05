@@ -442,6 +442,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
   if(aResult.IsNull()) {
     return;
   }
+  aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
   GeomShapePtr aGeomSh(new GeomAPI_Shape());
   aGeomSh->setImpl(new TopoDS_Shape(aResult));
   this->setShape(aGeomSh);

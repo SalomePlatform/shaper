@@ -549,6 +549,7 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
   if(aResult.IsNull()) {
     return;
   }
+  aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
   GeomShapePtr aShape(new GeomAPI_Shape());
   aShape->setImpl(new TopoDS_Shape(aResult));
   this->setShape(aShape);

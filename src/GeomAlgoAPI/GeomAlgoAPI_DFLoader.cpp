@@ -13,20 +13,23 @@
 //function : refineResult
 //purpose  :
 //=======================================================================
-const TopoDS_Shape GeomAlgoAPI_DFLoader::refineResult(const  TopoDS_Shape& theResult)
+const TopoDS_Shape GeomAlgoAPI_DFLoader::refineResult(const TopoDS_Shape& theResult)
 {
-  TopoDS_Shape aResult;
-  if (theResult.ShapeType() == TopAbs_COMPOUND) {
-    Standard_Integer nbSubResults = 0;
-    TopoDS_Iterator itr(theResult);
-    for (; itr.More(); itr.Next()) nbSubResults++;
-    if (nbSubResults == 1) {
-      itr.Initialize(theResult);
-      if (itr.More()) aResult = itr.Value();
-    } else {
-      /// MPV: store compound anyway: it may be Boolean operation that produces two solids from one
-      aResult = theResult;
+  TopoDS_Shape aResult = theResult;
+  const TopAbs_ShapeEnum aShType = theResult.ShapeType();
+  if(aShType == TopAbs_COMPOUND || aShType == TopAbs_SHELL || aShType == TopAbs_WIRE) {
+    Standard_Integer aSubResultsNb = 0;
+    TopoDS_Iterator anIt(theResult);
+    for(; anIt.More(); anIt.Next()) {
+      ++aSubResultsNb;
+    }
+    if(aSubResultsNb == 1) {
+      anIt.Initialize(theResult);
+      if(anIt.More()) {
+        aResult = anIt.Value();
+      }
     }
   }
+
   return aResult;
 }

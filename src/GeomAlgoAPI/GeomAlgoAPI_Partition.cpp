@@ -89,6 +89,11 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
     }
   }
 
+  // Setting result.
+  if(aResult.IsNull()) {
+    return;
+  }
+  aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
   std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
   aShape->setImpl(new TopoDS_Shape(aResult));
   this->setShape(aShape);

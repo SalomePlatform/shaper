@@ -6,6 +6,8 @@
 
 #include "GeomAlgoAPI_Pipe.h"
 
+#include "GeomAlgoAPI_DFLoader.h"
+
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
@@ -99,10 +101,11 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
   this->addToShape(aToShape);
 
   // Setting result.
-  TopoDS_Shape aResultShape = aPipeBuilder->Shape();
-  GeomShapePtr aResultGeomShape(new GeomAPI_Shape());
-  aResultGeomShape->setImpl(new TopoDS_Shape(aResultShape));
-  this->setShape(aResultGeomShape);
+  TopoDS_Shape aResult = aPipeBuilder->Shape();
+  aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
+  GeomShapePtr aGeomSh(new GeomAPI_Shape());
+  aGeomSh->setImpl(new TopoDS_Shape(aResult));
+  this->setShape(aGeomSh);
   this->setDone(true);
 }
 
@@ -160,9 +163,7 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
       return;
     }
   }
-  if(aPipeBuilder->Shape().IsNull()) {
-    return;
-  }
+  TopoDS_Shape aResult = aPipeBuilder->Shape();
 
   // Setting naming.
   GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
@@ -172,10 +173,13 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
   this->addToShape(aToShape);
 
   // Setting result.
-  TopoDS_Shape aResultShape = aPipeBuilder->Shape();
-  GeomShapePtr aResultGeomShape(new GeomAPI_Shape());
-  aResultGeomShape->setImpl(new TopoDS_Shape(aResultShape));
-  this->setShape(aResultGeomShape);
+  if(aResult.IsNull()) {
+    return;
+  }
+  aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
+  GeomShapePtr aGeomSh(new GeomAPI_Shape());
+  aGeomSh->setImpl(new TopoDS_Shape(aResult));
+  this->setShape(aGeomSh);
   this->setDone(true);
 }
 
@@ -251,9 +255,7 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
       return;
     }
   }
-  if(aPipeBuilder->Shape().IsNull()) {
-    return;
-  }
+  TopoDS_Shape aResult = aPipeBuilder->Shape();
 
   // Setting naming.
   GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
@@ -263,10 +265,13 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
   this->addToShape(aToShape);
 
   // Setting result.
-  TopoDS_Shape aResultShape = aPipeBuilder->Shape();
-  GeomShapePtr aResultGeomShape(new GeomAPI_Shape());
-  aResultGeomShape->setImpl(new TopoDS_Shape(aResultShape));
-  this->setShape(aResultGeomShape);
+  if(aResult.IsNull()) {
+    return;
+  }
+  aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
+  GeomShapePtr aGeomSh(new GeomAPI_Shape());
+  aGeomSh->setImpl(new TopoDS_Shape(aResult));
+  this->setShape(aGeomSh);
   this->setDone(true);
 }
 
