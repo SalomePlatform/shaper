@@ -206,8 +206,7 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createMirror(
   std::list<ConstraintWrapperPtr> aResult;
   std::list<EntityWrapperPtr> aConstrAttrList;
   if (theEntity1->type() == ENTITY_POINT) {
-    if (theEntity2->group() == theGroupID) // theEntity2 is not fixed
-      makeMirrorPoints(theEntity1, theEntity2, theMirrorLine);
+    makeMirrorPoints(theEntity1, theEntity2, theMirrorLine);
 
     aConstraint = Slvs_MakeConstraint(
         SLVS_E_UNKNOWN, (Slvs_hGroup)theGroupID, SLVS_C_SYMMETRIC_LINE, (Slvs_hEntity)theSketchID,
@@ -264,8 +263,7 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createMirror(
     std::list<ConstraintWrapperPtr> aMrrList;
     std::list<EntityWrapperPtr>::const_iterator anIt1 = theEntity1->subEntities().begin();
     std::list<EntityWrapperPtr>::const_iterator anIt2 = theEntity2->subEntities().begin();
-    if ((*anIt2)->group() == theGroupID) // mirrored point is not fixed
-      makeMirrorPoints(*anIt1, *anIt2, theMirrorLine);
+    makeMirrorPoints(*anIt1, *anIt2, theMirrorLine);
 
     // Workaround to avoid problems in SolveSpace.
     // The symmetry of two arcs will be done using symmetry of three points on these arcs:
