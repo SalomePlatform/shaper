@@ -28,81 +28,97 @@ public:
   /// Creates coincedent constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(coincidentConstraint)
 
   /// Creates collinear constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(collinearConstraint)
 
   /// Creates parallel constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(parallelConstraint)
 
   /// Creates coincedent perpendicular presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(perpendicularConstraint)
 
   /// Creates rigid constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(rigidConstraint)
 
   /// Creates horizontal constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(horisontalConstraint)
 
   /// Creates vertical constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(verticalConstraint)
 
   /// Creates equal constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(equalConstraint)
 
   /// Creates tangent constraiont presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(tangentConstraint)
 
   /// Creates radius dimension presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(radiusConstraint)
 
   /// Creates length dimension presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(lengthDimensionConstraint)
 
   /// Creates middle constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(middleConstraint)
 
   /// Creates mirror constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(mirrorConstraint)
 
   /// Creates translate constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(translateConstraint)
 
   /// Creates rotate constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(rotateConstraint)
 
   /// Creates angle constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(angleConstraint)
 };
 

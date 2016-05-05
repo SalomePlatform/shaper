@@ -29,9 +29,10 @@ class Handle_Prs3d_DimensionAspect;
 class SketcherPrs_ParameterStyleMessage : public Events_Message
 {
 public:
+  /// \enum ParameterStyle lists styles of parameter
   enum ParameterStyle {
-    ParameterValue, /// using symbol with the parameter value
-    ParameterText /// using parameter text
+    ParameterValue, ///< using symbol with the parameter value
+    ParameterText ///< using parameter text
   };
 
 public:

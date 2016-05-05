@@ -26,8 +26,6 @@ class SketcherPrs_DimensionStyleListener : public Events_Listener
 {
 public:
   /// Constructor
-  /// \param theConstraint a constraint feature
-  /// \param thePlane a coordinate plane of current sketch
   Standard_EXPORT SketcherPrs_DimensionStyleListener();
 
   /// Destructor
