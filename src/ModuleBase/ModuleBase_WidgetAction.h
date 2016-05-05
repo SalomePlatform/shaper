@@ -29,6 +29,9 @@ Q_OBJECT
 
   virtual ~ModuleBase_WidgetAction();
 
+  /// Do not accept focus, returns false
+  virtual bool focusTo();
+
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;

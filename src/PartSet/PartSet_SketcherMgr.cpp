@@ -1092,6 +1092,11 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
     if (aFeature.get() != NULL && aFeature == activeSketch()) {
       aCanDisplay = false;
     }
+    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+                            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+    /// some sketch entities should be never shown, e.g. projection feature
+    if (aSketchFeature.get())
+      aCanDisplay = aSketchFeature->canBeDisplayed();
   }
   else { // there are no an active sketch
     // 2. sketch sub-features should not be visualized if the sketch operation is not active
@@ -1107,43 +1112,45 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
 
   // 3. the method should not filter the objects, which are not related to the current operation.
   // The object is filtered just if it is a current operation feature or this feature result
-  bool isObjectFound = false;
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                               (getCurrentOperation());
-  if (aFOperation) {
-    FeaturePtr aFeature = aFOperation->feature();
-    if (aFeature.get()) {
-      std::list<ResultPtr> aResults = aFeature->results();
-      if (theObject == aFeature)
-        isObjectFound = true;
-      else {
-        std::list<ResultPtr>::const_iterator anIt = aResults.begin(), aLast = aResults.end();
-        for (; anIt != aLast && !isObjectFound; anIt++) {
-          isObjectFound = *anIt == theObject;
+  if (aCanDisplay) {
+    bool isObjectFound = false;
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                 (getCurrentOperation());
+    if (aFOperation) {
+      FeaturePtr aFeature = aFOperation->feature();
+      if (aFeature.get()) {
+        std::list<ResultPtr> aResults = aFeature->results();
+        if (theObject == aFeature)
+          isObjectFound = true;
+        else {
+          std::list<ResultPtr>::const_iterator anIt = aResults.begin(), aLast = aResults.end();
+          for (; anIt != aLast && !isObjectFound; anIt++) {
+            isObjectFound = *anIt == theObject;
+          }
         }
       }
     }
-  }
-  if (isObjectFound) {
-    // 4. For created nested feature operation do not display the created feature if
-    // the mouse curstor leaves the OCC window.
-    // The correction cases, which ignores this condition:
-    // a. the property panel values modification
-    // b. the popup menu activated
-    // c. widget editor control
-    #ifndef DEBUG_DO_NOT_BY_ENTER
-    if (aCanDisplay && isNestedCreateOperation(getCurrentOperation())) {
-      ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
-      ModuleBase_WidgetEditor* anEditorWdg = anActiveWidget ? dynamic_cast<ModuleBase_WidgetEditor*>(anActiveWidget) : 0;
-      // the active widget editor should not influence here. The presentation should be visible always
-      // when this widget is active.
-      if (!anEditorWdg && !myIsPopupMenuActive) {
-        // during a nested create operation, the feature is redisplayed only if the mouse over view
-        // of there was a value modified in the property panel after the mouse left the view
-        aCanDisplay = canDisplayCurrentCreatedFeature();
+    if (isObjectFound) {
+      // 4. For created nested feature operation do not display the created feature if
+      // the mouse curstor leaves the OCC window.
+      // The correction cases, which ignores this condition:
+      // a. the property panel values modification
+      // b. the popup menu activated
+      // c. widget editor control
+      #ifndef DEBUG_DO_NOT_BY_ENTER
+      if (isNestedCreateOperation(getCurrentOperation())) {
+        ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
+        ModuleBase_WidgetEditor* anEditorWdg = anActiveWidget ? dynamic_cast<ModuleBase_WidgetEditor*>(anActiveWidget) : 0;
+        // the active widget editor should not influence here. The presentation should be visible always
+        // when this widget is active.
+        if (!anEditorWdg && !myIsPopupMenuActive) {
+          // during a nested create operation, the feature is redisplayed only if the mouse over view
+          // of there was a value modified in the property panel after the mouse left the view
+          aCanDisplay = canDisplayCurrentCreatedFeature();
+        }
       }
+      #endif
     }
-    #endif
   }
 
   // checks the sketcher constraints visibility according to active sketch check box states

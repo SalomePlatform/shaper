@@ -45,6 +45,13 @@ class SketchPlugin_Feature : public ModelAPI_Feature
     return false;
   }
 
+  /// Returns true if the feature and the feature results can be displayed
+  /// \return true
+  SKETCHPLUGIN_EXPORT virtual bool canBeDisplayed() const
+  {
+    return true;
+  }
+
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved
   /// \param theDeltaY the delta for Y coordinate is moved

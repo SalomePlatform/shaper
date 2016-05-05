@@ -45,9 +45,12 @@ public:
   virtual bool isFixed()
   { return true; }
 
-  /// Returns true if object must be displayed in the viewer
-  virtual bool isDisplayed()
-  { return false; }
+  /// Returns true if the feature and the feature results can be displayed.
+  /// \return false
+  SKETCHPLUGIN_EXPORT virtual bool canBeDisplayed() const
+  {
+    return false;
+  }
 
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();

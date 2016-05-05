@@ -48,6 +48,11 @@ ModuleBase_WidgetAction::~ModuleBase_WidgetAction()
 {
 }
 
+bool ModuleBase_WidgetAction::focusTo()
+{
+  return false;
+}
+
 QList<QWidget*> ModuleBase_WidgetAction::getControls() const
 {
   QList<QWidget*> aList;
