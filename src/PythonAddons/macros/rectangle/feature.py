@@ -141,6 +141,15 @@ class SketchPlugin_Rectangle(model.Feature):
               self.updateLines()
             else:
               self.updateStartPoint()
+        if theID == self.AUXILIARY_ID():
+            anAuxiliary = self.data().boolean(self.AUXILIARY_ID()).value()
+            aLinesList = self.reflist(self.LINES_LIST_ID())
+            aNbLines = aLinesList.size()
+            # Update coordinates of rectangle lines
+            for i in range (0, aNbLines):
+                aLine = ModelAPI.objectToFeature(aLinesList.object(i))
+                aLine.data().boolean("Auxiliary").setValue(anAuxiliary)
+
 
     def updateLines(self):
         # Retrieving list of already created lines
