@@ -326,9 +326,6 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
   getSelectedAttributeIndices(anAttributeIds);
 
   QModelIndexList aIndexes = myListControl->selectionModel()->selectedIndexes();
-  //foreach(QModelIndex aIndex, aIndexes) {
-  //  aIndex.row();
-  //}
 
   // refill attribute by the items which indices are not in the list of ids
   bool aDone = false;
@@ -363,8 +360,18 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
     myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeArguments,
                                           true); /// hope that something is redisplayed by object updated
   }
-  foreach(QModelIndex aIndex, aIndexes) {
-    myListControl->selectionModel()->select(aIndex, QItemSelectionModel::Select);
+
+  // Restore selection
+  int aRows = myListControl->model()->rowCount();
+  if (aRows > 0) {
+    foreach(QModelIndex aIndex, aIndexes) {
+      if (aIndex.row() < aRows)
+        myListControl->selectionModel()->select(aIndex, QItemSelectionModel::Select);
+      else {
+        QModelIndex aIdx = myListControl->model()->index(aRows - 1, 0);
+        myListControl->selectionModel()->select(aIdx, QItemSelectionModel::Select);
+      }
+    }
   }
   return aDone;
 }
