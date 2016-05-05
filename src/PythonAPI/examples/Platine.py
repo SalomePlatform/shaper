@@ -203,7 +203,7 @@ model.do()
 # START DEBUG PURPOSES
 # prepare a study without last operation to trap floating problem with degenerated line
 results = ModelAPI.StringList()
-ModelAPI.ModelAPI_Session.get().save("/misc/dn48/newgem/azv/testPlatine", results)
+ModelAPI.ModelAPI_Session.get().save("Data", results)
 # END DEBUG PURPOSES
 b4 = body_4()
 
