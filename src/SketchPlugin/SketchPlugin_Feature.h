@@ -39,6 +39,12 @@ class SketchPlugin_Feature : public ModelAPI_Feature
     return false;
   }
 
+  /// Returns true if the feature is a copy of other feature
+  SKETCHPLUGIN_EXPORT virtual bool isCopy() const
+  {
+    return false;
+  }
+
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved
   /// \param theDeltaY the delta for Y coordinate is moved
