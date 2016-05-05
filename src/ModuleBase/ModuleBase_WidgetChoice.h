@@ -60,6 +60,9 @@ Q_OBJECT
   QString getPropertyPanelTitle(int theIndex);
 
 signals:
+  /// Segnal about selected item
+  /// \param theWidget selected widget
+  /// \param theIndex selected index
   void itemSelected(ModuleBase_ModelWidget* theWidget, int theIndex);
 
 protected:

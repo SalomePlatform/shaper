@@ -25,11 +25,19 @@ DEFINE_STANDARD_HANDLE(ModuleBase_BRepOwner, StdSelect_BRepOwner)
 class ModuleBase_BRepOwner: public StdSelect_BRepOwner
 {
 public:
+  /// Constructor
+  /// \param aShape an owner shape
+  /// \param aPriority drawig priority
+  /// \param ComesFromDecomposition decomposition flag
   ModuleBase_BRepOwner(const TopoDS_Shape& aShape, 
     const Standard_Integer aPriority = 0, 
     const Standard_Boolean ComesFromDecomposition = Standard_False)
     : StdSelect_BRepOwner(aShape, aPriority, ComesFromDecomposition) {}
 
+  /// Highlight the presentation with the given color
+  /// \param aPM a presentations manager
+  /// \param aCol a color
+  /// \param aMode a drawing mode
   virtual void HilightWithColor (const Handle(PrsMgr_PresentationManager3d)& aPM, 
     const Quantity_NameOfColor aCol, const Standard_Integer aMode = 0)
   {  Selectable()->HilightOwnerWithColor(aPM, aCol, this); }

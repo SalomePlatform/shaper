@@ -180,8 +180,10 @@ protected:
   /// Provides correspondance between Result object and its shape
   typedef QPair<ResultPtr, GeomShapePtr> GeomSelection;
 
-  /// An action for pop-up menu in a list control
+  /// A copy action for pop-up menu in a list control
   QAction* myCopyAction;
+
+  /// A delete action for pop-up menu in a list control
   QAction* myDeleteAction;
 
   /// A flag to store use_choice parameter state

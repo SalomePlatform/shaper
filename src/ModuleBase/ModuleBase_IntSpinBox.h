@@ -23,6 +23,8 @@ class MODULEBASE_EXPORT ModuleBase_IntSpinBox : public QSpinBox
 Q_OBJECT
 
 public:
+  /// Constructor
+  /// \param theParent a parent widget
   explicit ModuleBase_IntSpinBox(QWidget* theParent = 0);
   virtual ~ModuleBase_IntSpinBox() {};
 

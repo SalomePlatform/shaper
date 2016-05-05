@@ -47,7 +47,7 @@ public:
 
 
 protected:
-  XGUI_Workshop* myWorkshop; /// the current workshop
+  XGUI_Workshop* myWorkshop; ///< the current workshop
 };
 
 #endif

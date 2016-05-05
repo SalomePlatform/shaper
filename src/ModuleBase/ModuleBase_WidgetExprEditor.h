@@ -100,7 +100,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetExprEditor : public ModuleBase_ModelWid
   /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuration.
-  /// \param theParentId is Id of a parent of the current attribute
   /// \param thePlaceHolder a placeholder string
   ModuleBase_WidgetExprEditor( QWidget* theParent,
                                const Config_WidgetAPI* theData,

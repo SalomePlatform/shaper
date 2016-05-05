@@ -47,6 +47,9 @@ Q_OBJECT
   /// \return true if the editor value is accepted
   bool showPopupEditor(const bool theSendSignals = true);
 
+  /// Set current cursor position
+  /// \param theX the X coordinate
+  /// \param theY the Y coordinate
   void setCursorPosition(const int theX, const int theY);
 
 private:

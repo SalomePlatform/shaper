@@ -106,8 +106,11 @@ Q_OBJECT
    /// Update of commands status
   virtual void updateCommandStatus() = 0;
 
+  /// Returns feature info according to given feature ID
+  /// \param theId a feature Id
   virtual std::shared_ptr<Config_FeatureMessage> featureInfo(const QString& theId) const = 0;
 
+  /// Returns main window of the application
   virtual QMainWindow* desktop() const = 0;
 
 

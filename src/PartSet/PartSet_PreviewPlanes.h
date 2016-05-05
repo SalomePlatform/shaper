@@ -44,7 +44,6 @@ public:
   static bool hasVisualizedSketch(ModuleBase_IWorkshop* theWorkshop);
 
   /// Returns if the preview was displayed
-  /// \param theWorkshop the application workshop
   /// \return boolean value
   bool isPreviewDisplayed() const { return myPreviewDisplayed; }
 

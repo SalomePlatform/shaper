@@ -106,11 +106,11 @@ Q_OBJECT
   /// \param theProp a property panel instance
   virtual void setPropertyPanel(ModuleBase_IPropertyPanel* theProp);
 
-  /// \return Currently installed property panel
+  // \return Currently installed property panel
   //ModuleBase_IPropertyPanel* propertyPanel() const { return myPropertyPanel; }
 
   /// Activates widgets by preselection if it is accepted.
-  /// \param theGreeAttributeId a greed attribute id if there is in the current feature
+  /// \param theGreedAttributeId a greed attribute id if there is in the current feature
   /// \return last filled widget
   virtual ModuleBase_ModelWidget* activateByPreselection(const std::string& theGreedAttributeId);
 

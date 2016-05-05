@@ -60,10 +60,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Remove default selection filters of the module from the current viewer
   virtual void deactivateSelectionFilters() {};
 
-  // Stores the current selection
+  /// Stores the current selection
   virtual void storeSelection() {};
 
-  // Restores the current selection
+  /// Restores the current selection
   virtual void restoreSelection() {};
 
   /// Reads description of features from XML file 
@@ -111,6 +111,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Add menu items for viewer into the actions map
   /// \param theStdActions a map of standard actions
+  /// \param theParent a parent widget
   /// \param theMenuActions map of action/menu for the desirable index in the viewer menu
   /// \return true if items are added and there is no necessity to provide standard menu
   virtual bool addViewerMenu(const QMap<QString, QAction*>& theStdActions,
@@ -197,7 +198,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   virtual void activeSelectionModes(QIntList& theModes) {}
 
   /// Activate custom presentation for the object. Default realization is empty.
-  /// \param theObject an object instance
+  /// \param theFeature a feature instance
   /// \param theFlag a flag of level of customization, which means that only part of sub-elements
   /// \param theUpdateViewer the parameter whether the viewer should be update immediately
   virtual void activateCustomPrs(const FeaturePtr& theFeature,

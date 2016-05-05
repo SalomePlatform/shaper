@@ -33,9 +33,9 @@ public:
 
   virtual ~PartSet_OverconstraintListener() {};
 
-  /// Set erroneous color for the presentation of object if the object is in the conflicting list
-  /// \param theObject an object to be settled
-  /// \param theUpdateViewer a boolean state whether the current viewer should be updated
+  // Set erroneous color for the presentation of object if the object is in the conflicting list
+  // \param theObject an object to be settled
+  // \param theUpdateViewer a boolean state whether the current viewer should be updated
   //bool customizeObject(ObjectPtr theObject, const bool theUpdateViewer);
 
   /// Returns true if the object belongs to internal container of conflicting objects

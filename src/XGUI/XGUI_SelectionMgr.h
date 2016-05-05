@@ -55,7 +55,7 @@ Q_OBJECT
   void clearSelection();
 
   /// Updates selection, which are depend on the selection in the given place
-  /// \thePlace a widget where selection has happened.
+  /// \param thePlace a widget where selection has happened.
   void updateSelectionBy(const ModuleBase_ISelection::SelectionPlace& thePlace);
 
 signals:

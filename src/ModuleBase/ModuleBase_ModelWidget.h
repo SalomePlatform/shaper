@@ -43,7 +43,7 @@ Q_OBJECT
   /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuration. The attribute of the model widget is obtained from
-  /// \param theData a low-level API for reading xml definitions of widgets
+  /// a low-level API for reading xml definitions of widgets
   ModuleBase_ModelWidget(QWidget* theParent, const Config_WidgetAPI* theData);
   /// Destructor
   virtual ~ModuleBase_ModelWidget()
@@ -291,7 +291,8 @@ protected slots:
   void onWidgetValuesModified();
 
  protected:
-   ModuleBase_WidgetValidator* myWidgetValidator; /// own validator, by default it is zero
+    /// own validator, by default it is zero
+   ModuleBase_WidgetValidator* myWidgetValidator;
 
   /// The attribute name of the model feature
   std::string myAttributeID;

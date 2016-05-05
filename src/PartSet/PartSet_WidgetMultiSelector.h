@@ -54,6 +54,7 @@ protected:
   /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
   /// parameters of the current attribute
+  /// \param theAttribute an attribute
   /// \param theValid a boolean flag, if restore happens for valid parameters
   virtual void restoreAttributeValue(const AttributePtr& theAttribute, const bool theValid);
 

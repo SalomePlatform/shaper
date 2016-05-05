@@ -239,8 +239,8 @@ public:
   * Gets all references to the feature, take coincidence constraint features, get point 2d attributes
   * and compare the point value to be equal with the given. Returns the first feature, which has
   * equal points.
-  * \param theSearchInResults a flag whether the conicidence feature shoudl be searched in
-  * references of the feature results.
+  * \param theFeature the coincidence feature
+  * \param thePoint a 2d point
   * \return the coincidence feature or null
   */
   static FeaturePtr findFirstCoincidence(const FeaturePtr& theFeature,
@@ -250,6 +250,7 @@ public:
   * Returns list of features connected in a councedence feature point
   * \param theStartCoin the coincidence feature
   * \param theList a list which collects lines features
+  * \param theCoincidencies a list of coincidence features
   * \param theAttr the attribute name
   */
   static void findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList,

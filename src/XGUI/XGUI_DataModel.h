@@ -124,6 +124,7 @@ public:
   void setXMLReader(Config_DataModelReader* theReader) { myXMLReader = theReader; }
 
 signals:
+  /// Signal about tree had been rebuilt
   void treeRebuilt();
 
 private:

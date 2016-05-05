@@ -27,20 +27,25 @@ public:
    The value is initially set to 0.00.
 
    \param theParent a parent object
-   \param thePrecision a precision of values display
    */
   explicit ModuleBase_ParamIntSpinBox(QWidget* theParent = 0);
   virtual ~ModuleBase_ParamIntSpinBox();
 
   virtual void stepBy(int);
 
+  /// Convert Int value from text string
   virtual int valueFromText(const QString&) const;
-  virtual QString textFromValue(int value) const;
 
+  /// Convert text string from int value
+  virtual QString textFromValue(int) const;
+
+  /// Validate the value
   virtual QValidator::State validate(QString&, int&) const;
 
+  /// Set current int value
   virtual void setValue(int);
 
+  /// Set current text value
   virtual void setText(const QString&);
 
   /// Set a flag about accepted variable

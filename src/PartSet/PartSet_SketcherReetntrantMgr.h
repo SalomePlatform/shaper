@@ -42,7 +42,7 @@ enum RestartingMode {
 
 public:
   /// Constructor
-  /// \param theParent a parent object
+  /// \param theWorkshop a workshop instance
   PartSet_SketcherReetntrantMgr(ModuleBase_IWorkshop* theWorkshop);
   virtual ~PartSet_SketcherReetntrantMgr();
 

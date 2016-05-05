@@ -248,7 +248,7 @@ Q_OBJECT
 
   //! Delete features. Delete the referenced features. There can be a question with a list of
   //! referenced objects.
-  //! \param theList an objects to be deleted
+  //! \param theFeatures a list of objects to be deleted
   //! \param theIgnoredFeatures a list of features to be ignored during delete
   bool deleteFeatures(const QObjectPtrList& theFeatures,
                       const std::set<FeaturePtr>& theIgnoredFeatures = std::set<FeaturePtr>());

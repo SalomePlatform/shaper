@@ -257,7 +257,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param theDisplayer a displayer
   /// \param theObject an object
   /// \return a boolean value
-  static bool isVisible(XGUI_Displayer* theDislayer, const ObjectPtr& theObject);
+  static bool isVisible(XGUI_Displayer* theDisplayer, const ObjectPtr& theObject);
 
 signals:
   /// Signal on object display
@@ -353,7 +353,7 @@ private:
   /// Number of blocking of the viewer update. The viewer is updated only if it equals zero
   int myViewerBlockedRecursiveCount;
 
-  // Flag: use trihedgon for selection or not
+  /// Flag: use trihedgon for selection or not
   bool myIsTrihedronActive;
 
   /// A flag that update was requested but not done

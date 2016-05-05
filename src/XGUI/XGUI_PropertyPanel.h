@@ -137,6 +137,9 @@ public slots:
    /// \param theWidget a widget where focus in event happened
   void onFocusInWidget(ModuleBase_ModelWidget* theWidget);
 
+
+  /// Activate next widget
+  /// \param theWidget the current widget
   void onActivateNextWidget(ModuleBase_ModelWidget* theWidget);
 
 signals:

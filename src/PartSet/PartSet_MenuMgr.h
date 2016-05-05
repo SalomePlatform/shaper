@@ -84,7 +84,10 @@ private slots:
   void onEdit(bool);
 
 protected:
-  bool eventFilter(QObject* theObj, QEvent* theEvent);
+  /// Redefinition of virtual method
+  /// \param theObj an object
+  /// \param theEvent an event
+  virtual bool eventFilter(QObject* theObj, QEvent* theEvent);
 
 private:
   /// Returns true if the current operation is sketch entity create operation

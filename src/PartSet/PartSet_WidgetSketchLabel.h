@@ -73,8 +73,13 @@ public:
   virtual void setHighlighted(bool) { /*do nothing*/ };
   virtual void enableFocusProcessing();
 
+  /// Returns True if the selected presentation can be used for plane definition
+  /// \param thePrs a presentation
   static bool canFillSketch(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
+  /// Set sketch plane from selected object
+  /// \param theFeature a feature of sketch
+  /// \param thePrs a presentation
   static bool fillSketchPlaneBySelection(const FeaturePtr& theFeature,
                                          const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
@@ -124,8 +129,9 @@ protected:
   /// Block the model flush of update and intialization of attribute
   /// In additional to curstom realization it blocks initialization for all feature attributes
   /// as the current attribute is selection but its modification leads to other attributes change
+  /// \param theAttribute an attribute
   /// \param theToBlock flag whether the model is blocked or unblocked
-  /// \param isActive out value if model is blocked, in value if model is unblocked
+  /// \param isFlushesActived out value if model is blocked, in value if model is unblocked
   /// to be used to restore flush state when unblocked
   /// \param isAttributeSetInitializedBlocked out value if model is blocked
   /// in value if model is unblocked to be used to restore previous state when unblocked

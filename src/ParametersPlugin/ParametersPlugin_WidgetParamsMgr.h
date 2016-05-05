@@ -18,13 +18,22 @@ class QPushButton;
 class QToolButton;
 
 
+/*!
+ * \ingroup GUI
+ * Redefinition of QTreeWidget for processing of closeEditor event
+ */
 class ParametersPlugin_TreeWidget: public QTreeWidget
 {
  Q_OBJECT
 public:
+  /// Constructor
+  /// \param theParent a parent widget
   ParametersPlugin_TreeWidget(QWidget* theParent = 0) : QTreeWidget(theParent) {}
 
 protected slots:
+  /// Redefinition of virtual method
+  /// \param theEditor a editor widget
+  /// \param theHint end of editing hint
   virtual void closeEditor(QWidget* theEditor, QAbstractItemDelegate::EndEditHint theHint);
 };
 

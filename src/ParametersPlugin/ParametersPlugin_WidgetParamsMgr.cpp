@@ -41,22 +41,39 @@ const char* NoName = "<NoName>";
 const char* NoValue = "<NoValue>";
 const char* NotValid = "<NotValid>";
 
+/*!
+ * \ingroup GUI
+ * ItemDelegate object in order to redefine items behavior
+ */
 class ParametersPlugin_ItemDelegate : public QStyledItemDelegate
 {
 public:
+  /// Constructor
+  /// \param thaParent a parent
   ParametersPlugin_ItemDelegate(QObject* thaParent) : 
       QStyledItemDelegate(thaParent) {}
 
+  /// Redefinition of virtual method
+  /// \param painter a painter object
+  /// \param option the item options
+  /// \param index the current index
   virtual void paint(QPainter* painter, 
     const QStyleOptionViewItem& option, 
     const QModelIndex& index ) const;
   
+  /// Redefinition of virtual method
+  /// \param parent a parent widget
+  /// \param option the item options
+  /// \param index the current index
   virtual QWidget* createEditor(QWidget* parent, 
                                 const QStyleOptionViewItem& option, 
                                 const QModelIndex& index) const;
 
+  /// Returns True if the given index is editable item
+  /// \param theIndex an item index
   bool isEditable(const QModelIndex& theIndex) const;
 
+  /// Returns currently editing index
   QModelIndex editIndex() const { return myEditingIdx; }
 
 private:

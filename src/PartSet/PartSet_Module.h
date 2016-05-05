@@ -178,6 +178,7 @@ public:
 
   /// Add menu items for viewer into the actions map
   /// \param theStdActions a map of standard actions
+  /// \param theParent a parent widget
   /// \param theMenuActions map of action/menu for the desirable index in the viewer menu
   /// \return true if items are added and there is no necessity to provide standard menu
   virtual bool addViewerMenu(const QMap<QString, QAction*>& theStdActions,

@@ -32,7 +32,7 @@ class QWidget;
 class MODULEBASE_EXPORT ModuleBase_WidgetCreatorFactory
 {
  public:
-  // Returns an singular instance of the class if it exists or create it
+  /// Returns an singular instance of the class if it exists or create it
   static std::shared_ptr<ModuleBase_WidgetCreatorFactory> get();
 
   /// Destructor
@@ -63,6 +63,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetCreatorFactory
   /// Create page by its type
   /// \param theType a type
   /// \param theParent a parent widget
+  /// \param theWidgetApi the widget configuration. The attribute of the model widget is obtained from XML
   /// \return a created page or null
   ModuleBase_PageBase* createPageByType(const std::string& theType,
                                         QWidget* theParent,
@@ -71,6 +72,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetCreatorFactory
   /// Create widget by its type
   /// \param theType a type
   /// \param theParent a parent widget
+  /// \param theWidgetApi the widget configuration. The attribute of the model widget is obtained from XML
+  /// \param theWorkshop a workshop object instance
   /// \return a created widget or null
   ModuleBase_ModelWidget* createWidgetByType(const std::string& theType,
                                              QWidget* theParent,

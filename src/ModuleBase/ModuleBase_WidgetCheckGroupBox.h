@@ -29,6 +29,8 @@ public:
   ModuleBase_WidgetCheckGroupBox(QWidget* theParent, const Config_WidgetAPI* theData);
   virtual ~ModuleBase_WidgetCheckGroupBox();
 
+  /// Set the title of the group box
+  /// \param theTitle the text of the title
   void setTitle(const QString& theTitle);
 
   /// Methods to be redefined from ModuleBase_PageBase: start

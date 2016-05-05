@@ -90,6 +90,7 @@ Q_OBJECT
 
   /// Redefinition of virtual function
   /// \param theObject a sender of the event
+  /// \param theEvent the event
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
   /// Start the operation and append it to the stack of operations

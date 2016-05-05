@@ -181,6 +181,8 @@ Q_OBJECT
   /// Resets the object browser into initial state
   void clearContent();
 
+  /// Set XML reader object for data model
+  /// \param theReader the reader object
   void setXMLReader(Config_DataModelReader* theReader);
 
 public slots:

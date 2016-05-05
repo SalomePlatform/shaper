@@ -74,6 +74,7 @@ protected:
   /// to current attribute by setting the value inside and calling validators. After this,
   /// the previous attribute value is restored.The valid/invalid value is cashed.
   /// \param theValue a selected presentation in the view
+  /// \param theAttribute the attribute
   /// \return a boolean value
   bool isValidSelectionForAttribute(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue,
                                     const AttributePtr& theAttribute);
@@ -118,7 +119,7 @@ protected:
   /// Block the model flush of update and intialization of attribute
   /// \param theAttribute an attribute of blocking
   /// \param theToBlock flag whether the model is blocked or unblocked
-  /// \param isActive out value if model is blocked, in value if model is unblocked
+  /// \param isFlushesActived out value if model is blocked, in value if model is unblocked
   /// to be used to restore flush state when unblocked
   /// \param isAttributeSetInitializedBlocked out value if model is blocked
   /// in value if model is unblocked to be used to restore previous state when unblocked

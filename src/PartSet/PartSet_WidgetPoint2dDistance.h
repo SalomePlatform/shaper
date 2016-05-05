@@ -111,9 +111,9 @@ protected:
   /// Reference to sketch
   CompositeFeaturePtr mySketch;
 
-  bool myValueIsCashed; /// boolean state if the value is cashed during value state change
-  bool myIsFeatureVisibleInCash; /// boolean value if the feature was visible when cash if filled
-  double myValueInCash; /// the cashed X value during value state change
+  bool myValueIsCashed; ///< boolean state if the value is cashed during value state change
+  bool myIsFeatureVisibleInCash; ///< boolean value if the feature was visible when cash if filled
+  double myValueInCash; ///< the cashed X value during value state change
 };
 
 #endif

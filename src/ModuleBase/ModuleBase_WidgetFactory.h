@@ -39,6 +39,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
 
   /// Creates content widget for property panel
   /// \param thePage a parent page
+  /// \param alignToTop align to top flag (true by default)
   void createWidget(ModuleBase_PageBase* thePage, bool alignToTop = true);
 
   /// Creates property panel content for the feature
@@ -47,7 +48,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
   void createPanel(ModuleBase_PageBase* thePage, const FeaturePtr& theFeature);
 
   /// Creates one widget for property panel for the widget with given index
-  /// \param theParent a parent widget
+  /// \param thePage a parent widget
   /// \param theWidgetId a widget index
   void createWidget(ModuleBase_PageBase* thePage,
                     const std::string& theWidgetId);

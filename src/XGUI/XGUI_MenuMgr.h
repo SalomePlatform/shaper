@@ -31,13 +31,15 @@ class XGUI_MenuMgr : public Events_Listener
 {
  public:
   /// Constructor
-  /// \param the current workshop
+  /// \param theWorkshop the current workshop
   XGUI_EXPORT XGUI_MenuMgr(XGUI_Workshop* theWorkshop);
   XGUI_EXPORT virtual ~XGUI_MenuMgr() {}
 
+  /// Creates feature actions
   XGUI_EXPORT void createFeatureActions();
 
   /// Redefinition of Events_Listener method
+  /// \param theMessage a message
   XGUI_EXPORT virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
 protected:
@@ -58,8 +60,8 @@ protected:
                        const std::string& theWchName, const bool aUseSeparator) const;
 
 private:
-  XGUI_Workshop* myWorkshop; /// the current workshop
-  std::list< std::shared_ptr<XGUI_MenuWorkbench> > myWorkbenches; /// container of existing workbenchs
+  XGUI_Workshop* myWorkshop; ///< the current workshop
+  std::list< std::shared_ptr<XGUI_MenuWorkbench> > myWorkbenches; ///< container of existing workbenchs
 };
 
 #endif /* XGUI_MENUMGR_H_ */
