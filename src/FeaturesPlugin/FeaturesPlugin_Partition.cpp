@@ -127,7 +127,7 @@ void FeaturesPlugin_Partition::execute()
       return;
     }
 
-    if (GeomAlgoAPI_ShapeTools::volume(aPartitionAlgo->shape()) > 1.e-7) {
+    if (GeomAlgoAPI_ShapeTools::volume(aPartitionAlgo->shape()) > 1.e-27) {
       std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
       aMakeShapeList.appendAlgo(aPartitionAlgo);
       GeomAPI_DataMapOfShapeShape& aMapOfShapes = *aPartitionAlgo->mapOfSubShapes().get();
@@ -162,7 +162,7 @@ void FeaturesPlugin_Partition::execute()
         return;
       }
 
-      if (GeomAlgoAPI_ShapeTools::volume(aPartitionAlgo->shape()) > 1.e-7) {
+      if (GeomAlgoAPI_ShapeTools::volume(aPartitionAlgo->shape()) > 1.e-27) {
         std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
         GeomAlgoAPI_MakeShapeList aMakeShapeListCopy = aMakeShapeList;
         aMakeShapeListCopy.appendAlgo(aPartitionAlgo);

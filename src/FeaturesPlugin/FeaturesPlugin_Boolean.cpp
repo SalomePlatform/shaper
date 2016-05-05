@@ -160,7 +160,7 @@ void FeaturesPlugin_Boolean::execute()
           return;
         }
 
-        if(GeomAlgoAPI_ShapeTools::volume(aBoolAlgo.shape()) > 1.e-7) {
+        if(GeomAlgoAPI_ShapeTools::volume(aBoolAlgo.shape()) > 1.e-27) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
           loadNamingDS(aResultBody, anObject, aTools, aBoolAlgo.shape(), aBoolAlgo, *aBoolAlgo.mapOfSubShapes().get());
           setResult(aResultBody, aResultIndex);
@@ -228,7 +228,7 @@ void FeaturesPlugin_Boolean::execute()
         aMakeShapeList.appendAlgo(aFillerAlgo);
         aMapOfShapes.merge(aFillerAlgo->mapOfSubShapes());
 
-        if(GeomAlgoAPI_ShapeTools::volume(aFillerAlgo->shape()) > 1.e-7) {
+        if(GeomAlgoAPI_ShapeTools::volume(aFillerAlgo->shape()) > 1.e-27) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
           loadNamingDS(aResultBody, aCompSolid, aTools, aFillerAlgo->shape(), aMakeShapeList, aMapOfShapes);
           setResult(aResultBody, aResultIndex);
@@ -297,7 +297,7 @@ void FeaturesPlugin_Boolean::execute()
           aOneObjectList.push_back(*anIt);
           std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(new GeomAlgoAPI_Boolean(aOneObjectList, aShapesToAdd, GeomAlgoAPI_Boolean::BOOL_CUT));
 
-          if(GeomAlgoAPI_ShapeTools::volume(aCutAlgo->shape()) > 1.e-7) {
+          if(GeomAlgoAPI_ShapeTools::volume(aCutAlgo->shape()) > 1.e-27) {
             aSolidsToFuse.push_back(aCutAlgo->shape());
             aMakeShapeList.appendAlgo(aCutAlgo);
             aMapOfShapes.merge(aCutAlgo->mapOfSubShapes());
@@ -433,7 +433,7 @@ void FeaturesPlugin_Boolean::execute()
                                                                                       aShapesToAdd,
                                                                                       GeomAlgoAPI_Boolean::BOOL_CUT));
 
-        if(GeomAlgoAPI_ShapeTools::volume(anObjectsCutAlgo->shape()) > 1.e-7) {
+        if(GeomAlgoAPI_ShapeTools::volume(anObjectsCutAlgo->shape()) > 1.e-27) {
           aShapesToSmash.clear();
           aShapesToSmash.push_back(anObjectsCutAlgo->shape());
           aMakeShapeList.appendAlgo(anObjectsCutAlgo);
@@ -445,7 +445,7 @@ void FeaturesPlugin_Boolean::execute()
                                                                                    aShapesToAdd,
                                                                                    GeomAlgoAPI_Boolean::BOOL_CUT));
 
-        if(GeomAlgoAPI_ShapeTools::volume(aToolsCutAlgo->shape()) > 1.e-7) {
+        if(GeomAlgoAPI_ShapeTools::volume(aToolsCutAlgo->shape()) > 1.e-27) {
           aTools.clear();
           aTools.push_back(aToolsCutAlgo->shape());
           aMakeShapeList.appendAlgo(aToolsCutAlgo);
