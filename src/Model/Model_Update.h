@@ -72,7 +72,6 @@ protected:
     const ModelAPI_ExecState theState);
 
   /// On operation start/end/abort the "Just" fileds must be cleared and processed in the right way
-  /// \param theFinish is true for start, close or abort transaction: all objects must be processed
   //! \param theFlushRedisplay a boolean value if the redisplay signal should be flushed
   void processFeatures(const bool theFlushRedisplay = true);
 

@@ -171,7 +171,7 @@ void XGUI_MenuMgr::createFeatureActions()
 QAction* XGUI_MenuMgr::buildAction(const std::shared_ptr<Config_FeatureMessage>& theMessage,
                                    const std::string& theWchName, const bool aUseSeparator) const
 {
-  QAction* anAction;
+  QAction* anAction = 0;
 
 #ifdef HAVE_SALOME
   XGUI_SalomeConnector* aSalomeConnector = myWorkshop->salomeConnector();

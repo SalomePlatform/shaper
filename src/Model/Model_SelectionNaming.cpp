@@ -335,11 +335,11 @@ const TopoDS_Shape findFaceByName(
   return aFace;
 }
 
-int ParseName(const std::string& theSubShapeName,   std::list<std::string>& theList)
+size_t ParseName(const std::string& theSubShapeName,   std::list<std::string>& theList)
 {
   std::string aName = theSubShapeName;
   std::string aLastName;
-  int n1(0), n2(0); // n1 - start position, n2 - position of the delimiter
+  size_t n1(0), n2(0); // n1 - start position, n2 - position of the delimiter
   while ((n2 = aName.find('&', n1)) != std::string::npos) {
     const std::string aName1 = aName.substr(n1, n2 - n1); //name of face
     theList.push_back(aName1);	
@@ -495,7 +495,7 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
       }
       if(aSelection.IsNull()) {
         std::list<std::string> aListofNames;
-        int n = ParseName(theSubShapeName, aListofNames);
+        size_t n = ParseName(theSubShapeName, aListofNames);
         if(n > 1 && n < 5) {
           TopTools_ListOfShape aList;
           std::list<std::string>::iterator it =aListofNames.begin();
@@ -527,7 +527,7 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
       }
       if(aSelection.IsNull()) {
         std::list<std::string> aListofNames;
-        int n = ParseName(theSubShapeName, aListofNames);
+        size_t n = ParseName(theSubShapeName, aListofNames);
         if(n > 1 && n < 4) { // 2 || 3
           TopTools_ListOfShape aList;
           std::list<std::string>::iterator it = aListofNames.begin();

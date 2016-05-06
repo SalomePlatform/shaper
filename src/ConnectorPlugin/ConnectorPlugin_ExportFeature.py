@@ -27,6 +27,10 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
     ## The constructor.
     def __init__(self):
         ModelAPI.ModelAPI_Feature.__init__(self)
+        ## Shape that will be exported (the compound if there are several exported bodies)
+        self.shape = None
+        ## BRep representation of the exported shape (a stream that will be sent to GEOM and converted to GEOM object)
+        self.brep = None
 
     @staticmethod
     ## Export kind. Static.

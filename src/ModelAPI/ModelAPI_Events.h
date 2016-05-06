@@ -311,11 +311,13 @@ class ModelAPI_ReplaceParameterMessage : public Events_Message
   MODELAPI_EXPORT void setObject(ObjectPtr theObject);
 };
 
-
+/// Message that sends the sketch solver and sketcher GUI processes to show in the property panel
 class ModelAPI_SolverFailedMessage : public Events_Message
 {
 public:
+  /// Creates an message
   MODELAPI_EXPORT ModelAPI_SolverFailedMessage(const Events_ID theID, const void* theSender = 0);
+  /// Default destructor
   MODELAPI_EXPORT virtual ~ModelAPI_SolverFailedMessage();
 
   /// Sets list of conflicting constraints

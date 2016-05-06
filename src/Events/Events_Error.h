@@ -38,7 +38,7 @@ public:
   EVENTS_EXPORT static void send(const std::string& theDescription, const void* theSender = 0);
 
   /// Throws a C++ exception about using an empty AIS object
-  /// \theDescription an exception information
+  /// \param theDescription an exception information
   EVENTS_EXPORT static void throwException(const std::string& theDescription);
 
 protected:

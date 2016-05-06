@@ -142,8 +142,8 @@ class ModelAPI_Feature : public ModelAPI_Object
   /// Returns the feature is stable or not.
   MODELAPI_EXPORT virtual bool isStable();
 
-  /// Performs some functionality for the indes
-  /// \param theAttributeId an action key
+  /// Performs some custom feature specific functionality (normally called by some GUI button)
+  /// \param theActionId an action key
   /// \return a boolean value about it is performed
   MODELAPI_EXPORT virtual bool customAction(const std::string& theActionId);
 
