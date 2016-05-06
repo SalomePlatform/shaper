@@ -106,6 +106,9 @@ void SketchSolver_ConstraintMirror::process()
   }
 
   myStorage->addConstraint(myBaseConstraint, aMirConstrList);
+  // update mirrored features to be in the current group
+  for (aMIt = aMirrorList.begin(); aMIt != aMirrorList.end(); ++aMIt)
+    myStorage->update((*aMIt)->baseFeature(), myGroupID);
 }
 
 
