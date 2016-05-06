@@ -51,10 +51,10 @@ bool ModuleBase_ViewerPrs::isEqual(ModuleBase_ViewerPrs* thePrs) const
     // ComputeSelection of ModuleBase_ResultPrs. A new owner is created there for each subsolid
     // and set in the sub-solid AIS. ViewerPrs of these fictive owners are accepted as equal
     // as they use the same shape and result(of compsolid)
-    Handle(ModuleBase_BRepOwner) aCSolidOwner1 = Handle(ModuleBase_BRepOwner)::DownCast(myOwner);
-    Handle(ModuleBase_BRepOwner) aCSolidOwner2 = Handle(ModuleBase_BRepOwner)::DownCast(thePrs->owner());
+    Handle(StdSelect_BRepOwner) aCSolidOwner1 = Handle(StdSelect_BRepOwner)::DownCast(myOwner);
+    Handle(StdSelect_BRepOwner) aCSolidOwner2 = Handle(StdSelect_BRepOwner)::DownCast(thePrs->owner());
     isEqualIO = !aCSolidOwner1.IsNull() && !aCSolidOwner2.IsNull();
-    if (!aCSolidOwner1.IsNull() && !aCSolidOwner1.IsNull())
+    if (!aCSolidOwner1.IsNull() && !aCSolidOwner2.IsNull())
       isEqualOwner = (aCSolidOwner1->Shape().IsNull() && aCSolidOwner2->Shape().IsNull()) ||
                       aCSolidOwner1->Shape().IsEqual(aCSolidOwner2->Shape());
   }
@@ -92,8 +92,8 @@ bool ModuleBase_ViewerPrs::operator==(const ModuleBase_ViewerPrs& thePrs)
     // ComputeSelection of ModuleBase_ResultPrs. A new owner is created there for each subsolid
     // and set in the sub-solid AIS. ViewerPrs of these fictive owners are accepted as equal
     // as they use the same shape and result(of compsolid)
-    Handle(ModuleBase_BRepOwner) aCSolidOwner1 = Handle(ModuleBase_BRepOwner)::DownCast(myOwner);
-    Handle(ModuleBase_BRepOwner) aCSolidOwner2 = Handle(ModuleBase_BRepOwner)::DownCast(thePrs.owner());
+    Handle(StdSelect_BRepOwner) aCSolidOwner1 = Handle(StdSelect_BRepOwner)::DownCast(myOwner);
+    Handle(StdSelect_BRepOwner) aCSolidOwner2 = Handle(StdSelect_BRepOwner)::DownCast(thePrs.owner());
     isEqualIO = !aCSolidOwner1.IsNull() && !aCSolidOwner2.IsNull();
     if (!aCSolidOwner1.IsNull() && !aCSolidOwner1.IsNull())
       isEqualOwner = (aCSolidOwner1->Shape().IsNull() && aCSolidOwner2->Shape().IsNull()) ||
