@@ -52,6 +52,6 @@ export PATH=${CASROOT}:${PATH}
 ##
 
 #------ SHAPER ------
-export PATH=${SHAPER_ROOT_DIR}/lib/salome:${PATH}
+export PATH=${SHAPER_ROOT_DIR}/bin/salome:${PATH}
 export PYTHONPATH=${SHAPER_ROOT_DIR}/bin/salome:${PYTHONPATH}
-export LD_LIBRARY_PATH=${SHAPER_ROOT_DIR}/bin/salome:${SHAPER_ROOT_DIR}/lib/salome:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=${SHAPER_ROOT_DIR}/lib/salome:${LD_LIBRARY_PATH}

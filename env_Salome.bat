@@ -101,6 +101,6 @@ IF "%ARCH%" == "Win64" (
 
 @SET SHAPER_ROOT_DIR=%ROOT_DIR%\install
 @SET PATH=%SHAPER_ROOT_DIR%\lib\salome;%PATH%
-@SET PYTHONPATH=%SHAPER_ROOT_DIR%\lib\salome;%PYTHONPATH%
+@SET PYTHONPATH=%SHAPER_ROOT_DIR%\bin\salome;%PYTHONPATH%
 
 @SET LightAppConfig=%SHAPER_ROOT_DIR%\share\salome\resources\shaper;%GUI_ROOT_DIR%\share\salome\resources\gui
