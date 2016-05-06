@@ -364,7 +364,7 @@ void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect, double theDimValue
   if(theTextSize > ((theDimValue - 3 * SketcherPrs_Tools::getArrowSize()) * aViewerScale)) {
     theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Left);
     theDimAspect->SetArrowOrientation(Prs3d_DAO_External);
-    theDimAspect->SetExtensionSize(theTextSize / aViewerScale - SketcherPrs_Tools::getArrowSize() / 2.0);
+    theDimAspect->SetExtensionSize((theTextSize / aViewerScale + SketcherPrs_Tools::getArrowSize()) / 2.0);
   } else {
     theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Center);
     theDimAspect->SetArrowOrientation(Prs3d_DAO_Internal);
