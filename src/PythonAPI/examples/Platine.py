@@ -4,7 +4,12 @@
 
 import geom
 import model
+
+# START DEBUG PURPOSES
+# Should be removed
+import os
 import ModelAPI
+# END DEBUG PURPOSES
 
 # Initialisation
 model.begin()
@@ -202,8 +207,12 @@ model.do()
 
 # START DEBUG PURPOSES
 # prepare a study without last operation to trap floating problem with degenerated line
+aPathToStore = os.path.join(os.getcwd(), "Data")
+print aPathToStore
+if not os.path.exists(aPathToStore):
+    os.mkdir(aPathToStore)
 results = ModelAPI.StringList()
-ModelAPI.ModelAPI_Session.get().save("Data", results)
+ModelAPI.ModelAPI_Session.get().save(aPathToStore, results)
 # END DEBUG PURPOSES
 b4 = body_4()
 
