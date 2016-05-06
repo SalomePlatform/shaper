@@ -17,7 +17,9 @@
 #include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_ShapeType.h>
 
+#include <GeomAPI_DataMapOfShapeShape.h>
 #include <GeomAPI_PlanarEdges.h>
+#include <GeomAPI_ShapeExplorer.h>
 #include <GeomAlgoAPI_WireBuilder.h>
 
 //=================================================================================================
@@ -86,6 +88,56 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
       theError = "Attribute contains unacceptable shape.";
     }
     return false;
+  }
+
+  std::set<ResultConstructionPtr> aSelectedSketches;
+  std::set<ResultConstructionPtr> aSelectedSketchesFromObjects;
+  GeomAPI_DataMapOfShapeShape aSelectedWiresFromObjects;
+  std::string anAttributeType = theAttribute->attributeType();
+  if(anAttributeType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aListAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+    for(int anIndex = 0; anIndex < aListAttr->size(); ++anIndex) {
+      AttributeSelectionPtr aSelectionAttr = aListAttr->value(anIndex);
+      ResultConstructionPtr aContext = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSelectionAttr->context());
+      if(!aContext.get()) {
+        // It is not a result construction, continue.
+        continue;
+      }
+
+      GeomShapePtr aShape = aSelectionAttr->value();
+      GeomShapePtr aContextShape = aContext->shape();
+      if(!aShape.get()) {
+        // Whole sketch selected.
+        if(aSelectedSketchesFromObjects.find(aContext) != aSelectedSketchesFromObjects.cend()) {
+          theError = "Object from this sketch is already selected. Sketch is not allowed for selection.";
+          return false;
+        }
+
+        aSelectedSketches.insert(aContext);
+      } else {
+        // Object from sketch selected.
+        if(aSelectedSketches.find(aContext) != aSelectedSketches.cend()) {
+          theError = "Whole sketch with this object is already selected. Don't allow to select this object.";
+          return false;
+        }
+
+        for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::WIRE); anExp.more(); anExp.next()) {
+          GeomShapePtr aWire = anExp.current();
+          if(aWire->orientation() != GeomAPI_Shape::FORWARD) {
+            theError = "Wire with wrong orientation selected.";
+            return false;
+          }
+
+          if(aSelectedWiresFromObjects.isBound(aWire)) {
+            theError = "Objects with such wire already selected. Don't allow to select this object.";
+            return false;
+          }
+
+          aSelectedWiresFromObjects.bind(aWire, aWire);
+          aSelectedSketchesFromObjects.insert(aContext);
+        }
+      }
+    }
   }
 
   return true;
@@ -161,8 +213,8 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     // Check that object is a shape with allowed type.
     GeomValidators_ShapeType aShapeTypeValidator;
     if(!aShapeTypeValidator.isValid(anAttr, theArguments, theError)) {
-      theError = "Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, \
-whole sketch(if it has at least one face), and whole objects with shape types: ";
+      theError = "Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, "
+                 "whole sketch(if it has at least one face), and whole objects with shape types: ";
       std::list<std::string>::const_iterator anIt = theArguments.cbegin();
       theError += *anIt;
       for(++anIt; anIt != theArguments.cend(); ++anIt) {
