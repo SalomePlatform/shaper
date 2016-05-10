@@ -33,7 +33,7 @@
 using namespace std;
 
 Model_Update MY_UPDATER_INSTANCE;  /// the only one instance initialized on load of the library
-//#define DEB_UPDATE
+#define DEB_UPDATE
 
 Model_Update::Model_Update()
 {
@@ -400,13 +400,17 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     theFeature->execute();
   }
 
+  bool isReferencedInvalid = false;
   // check all features this feature depended on (recursive call of updateFeature)
   std::set<std::shared_ptr<ModelAPI_Feature> >& aReasons = myModified[theFeature];
   if (aReasons.find(theFeature) == aReasons.end()) {
     std::set<std::shared_ptr<ModelAPI_Feature> >::iterator aReasonIter = aReasons.begin();
     for(; aReasonIter != aReasons.end(); aReasonIter++) {
-      if (*aReasonIter != theFeature && processFeature(*aReasonIter)) {
-        aIsModified = true;
+      if (*aReasonIter != theFeature) {
+        if (processFeature(*aReasonIter))
+          aIsModified = true;
+        if ((*aReasonIter)->data()->execState() == ModelAPI_StateInvalidArgument)
+          isReferencedInvalid = true;
       }
     }
   } else { // check all features this feature depended on because here which one was modified is unknown
@@ -428,6 +432,8 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
           if (aDepFeat.get()) {
             if (processFeature(aDepFeat))
               aIsModified = true;
+            if (aDepFeat->data()->execState() == ModelAPI_StateInvalidArgument)
+              isReferencedInvalid = true;
           }
         }
       }
@@ -440,6 +446,8 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
         if (aSub.get()) {
           if (processFeature(aSub))
             aIsModified = true;
+          if (aSub->data()->execState() == ModelAPI_StateInvalidArgument)
+            isReferencedInvalid = true;
         }
       }
     }
@@ -468,7 +476,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
 
   // this checking must be after the composite feature sub-elements processing:
   // composite feature status may depend on it's subelements
-  if (theFeature->data()->execState() == ModelAPI_StateInvalidArgument) {
+  if (theFeature->data()->execState() == ModelAPI_StateInvalidArgument || isReferencedInvalid) {
   #ifdef DEB_UPDATE
     std::cout<<"Invalid args "<<theFeature->name()<<std::endl;
   #endif

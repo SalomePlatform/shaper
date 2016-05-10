@@ -1002,7 +1002,8 @@ void Model_Document::setCurrentFeature(
     }
 
     if (anIter->getKind() == "Parameter") {// parameters are always out of the history of features, but not parameters
-      if (!isCurrentParameter)
+      // due to the issue 1491 all parameters are kept enabled any time
+      //if (!isCurrentParameter)
         aDisabledFlag = false;
     } else if (isCurrentParameter) { // if paramater is active, all other features become enabled (issue 1307)
       aDisabledFlag = false;
