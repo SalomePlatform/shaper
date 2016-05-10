@@ -65,4 +65,6 @@ INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Build
 ADD_UNIT_TESTS(TestVertex.py
                TestEdge.py
                TestWire.py
-               TestFace.py)
+               TestFace.py
+               TestShell.py
+               TestSubShapes.py)
