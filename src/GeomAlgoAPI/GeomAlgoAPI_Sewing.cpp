@@ -38,22 +38,26 @@ void GeomAlgoAPI_Sewing::build(const ListOfShape& theShapes)
 
   TopoDS_Shape aResult = aSewingBuilder->SewedShape();
   BRep_Builder aBuilder;
-  TopoDS_Compound aResultCompound;
-  aBuilder.MakeCompound(aResultCompound);
-  for(TopoDS_Iterator anIt(aResult); anIt.More(); anIt.Next()) {
-    const TopoDS_Shape aSubShape = anIt.Value();
-    if(aSubShape.ShapeType() == TopAbs_SHELL) {
-      aBuilder.Add(aResultCompound, aSubShape);
-    } else if (aSubShape.ShapeType() == TopAbs_FACE) {
-      TopoDS_Shell aShell;
-      aBuilder.MakeShell(aShell);
-      aBuilder.Add(aShell, aSubShape);
-      aBuilder.Add(aResultCompound, aShell);
+  if(aResult.ShapeType() == TopAbs_COMPOUND) {
+    TopoDS_Compound aResultCompound;
+    aBuilder.MakeCompound(aResultCompound);
+    for(TopoDS_Iterator anIt(aResult); anIt.More(); anIt.Next()) {
+      const TopoDS_Shape aSubShape = anIt.Value();
+      if(aSubShape.ShapeType() == TopAbs_SHELL) {
+        aBuilder.Add(aResultCompound, aSubShape);
+      } else if (aSubShape.ShapeType() == TopAbs_FACE) {
+        TopoDS_Shell aShell;
+        aBuilder.MakeShell(aShell);
+        aBuilder.Add(aShell, aSubShape);
+        aBuilder.Add(aResultCompound, aShell);
+      }
     }
-  }
-  TopoDS_Iterator anIt(aResultCompound);
-  if(anIt.More()) {
     aResult = aResultCompound;
+  } else if(aResult.ShapeType() == TopAbs_FACE) {
+    TopoDS_Shell aShell;
+    aBuilder.MakeShell(aShell);
+    aBuilder.Add(aShell, aResult);
+    aResult = aShell;
   }
 
   std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());

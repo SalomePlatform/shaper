@@ -26,7 +26,6 @@ aNorm = geomDataAPI_Dir(aSketchFeature.attribute("Norm"))
 aNorm.setValue(0, 0, 1)
 
 # Create lines
-aNumOfLines = 10
 aSketchLineFeature = aSketchFeature.addFeature("SketchLine")
 aSketchLineStartPoint = geomDataAPI_Point2D(aSketchLineFeature.attribute("StartPoint"))
 aSketchLineEndPoint = geomDataAPI_Point2D(aSketchLineFeature.attribute("EndPoint"))
