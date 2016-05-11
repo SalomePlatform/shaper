@@ -12,7 +12,8 @@
                   label="Sub-Shapes:"
                   tooltip="Select shapes on sketch to add."
                   type_choice="vertices edges"
-                  concealment="true">
+                  concealment="true"
+                  clear_in_neutral_point="false">
     <validator id="BuildPlugin_ValidatorSubShapesSelection" parameters="base_shape,Sketch"/>
   </multi_selector>
 </source>
