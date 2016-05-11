@@ -33,7 +33,7 @@
 using namespace std;
 
 Model_Update MY_UPDATER_INSTANCE;  /// the only one instance initialized on load of the library
-#define DEB_UPDATE
+//#define DEB_UPDATE
 
 Model_Update::Model_Update()
 {
@@ -476,7 +476,8 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
 
   // this checking must be after the composite feature sub-elements processing:
   // composite feature status may depend on it's subelements
-  if (theFeature->data()->execState() == ModelAPI_StateInvalidArgument || isReferencedInvalid) {
+  if ((theFeature->data()->execState() == ModelAPI_StateInvalidArgument || isReferencedInvalid) && 
+    theFeature->getKind() != "Part") { // don't disable Part because it will make disabled all the features (performance and problems with the current feature)
   #ifdef DEB_UPDATE
     std::cout<<"Invalid args "<<theFeature->name()<<std::endl;
   #endif
