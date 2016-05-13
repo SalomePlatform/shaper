@@ -554,6 +554,13 @@ void SketchPlugin_ConstraintFillet::attributeChanged(const std::string& theID)
           }
           aNewSetOfCoincides.insert(*anIt);
         } else if(aFeatureKind == SketchPlugin_Arc::ID() ) {
+          AttributePtr anAttrCenter = (*anIt)->attribute(SketchPlugin_Arc::CENTER_ID());
+          std::shared_ptr<GeomDataAPI_Point2D> aPointCenter2D =
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrCenter);
+          if(aPointCenter2D.get() && aFilletPnt2d->isEqual(aPointCenter2D->pnt())) {
+            aPointsToSkeep.insert(anAttrCenter);
+            continue;
+          }
           AttributePtr anAttrStart = (*anIt)->attribute(SketchPlugin_Arc::START_ID());
           std::shared_ptr<GeomDataAPI_Point2D> aPointStart2D =
             std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrStart);
@@ -1032,6 +1039,8 @@ std::set<FeaturePtr> getCoincides(const FeaturePtr& theConstraintCoincidence)
 {
   std::set<FeaturePtr> aCoincides;
 
+  std::shared_ptr<GeomAPI_Pnt2d> aFilletPnt = SketchPlugin_Tools::getCoincidencePoint(theConstraintCoincidence);
+
   SketchPlugin_Tools::findCoincidences(theConstraintCoincidence,
                                        SketchPlugin_ConstraintCoincidence::ENTITY_A(),
                                        aCoincides);
@@ -1042,8 +1051,15 @@ std::set<FeaturePtr> getCoincides(const FeaturePtr& theConstraintCoincidence)
   // Remove points from set of coincides.
   std::set<FeaturePtr> aNewSetOfCoincides;
   for(std::set<FeaturePtr>::iterator anIt = aCoincides.begin(); anIt != aCoincides.end(); ++anIt) {
-    if((*anIt)->getKind() == SketchPlugin_Line::ID() ||
-        (*anIt)->getKind() == SketchPlugin_Arc::ID() ) {
+    if((*anIt)->getKind() == SketchPlugin_Line::ID()) {
+      aNewSetOfCoincides.insert(*anIt);
+    } else if((*anIt)->getKind() == SketchPlugin_Arc::ID()) {
+      AttributePtr anAttrCenter = (*anIt)->attribute(SketchPlugin_Arc::CENTER_ID());
+      std::shared_ptr<GeomDataAPI_Point2D> aPointCenter2D =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrCenter);
+      if(aPointCenter2D.get() && aFilletPnt->isEqual(aPointCenter2D->pnt())) {
+        continue;
+      }
       aNewSetOfCoincides.insert(*anIt);
     }
   }
