@@ -18,6 +18,24 @@ import math
 
 __updated__ = "2015-03-17"
 
+def distancePointLine(point, line):
+    """
+    subroutine to calculate distance between point and line
+    result of calculated distance is has 10**-5 precision
+    """
+    aStartPoint = geomDataAPI_Point2D(line.attribute("StartPoint"))
+    aEndPoint = geomDataAPI_Point2D(line.attribute("EndPoint"))
+    # orthogonal direction
+    aDirX = -(aEndPoint.y() - aStartPoint.y())
+    aDirY = (aEndPoint.x() - aStartPoint.x())
+    aLen = math.sqrt(aDirX**2 + aDirY**2)
+    aDirX = aDirX / aLen
+    aDirY = aDirY / aLen
+    aVecX = point.x() - aStartPoint.x()
+    aVecY = point.y() - aStartPoint.y()
+    return round(math.fabs(aVecX * aDirX + aVecY * aDirY), 5)
+
+
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
 #=========================================================================
@@ -253,6 +271,37 @@ anArc3VecY = anArc3StartPoint.y() - anArc3Center.y()
 aLen = aLen * math.sqrt(anArc3VecX**2 + anArc3VecY**2)
 aCross = anArc1VecX * anArc3VecY - anArc1VecY * anArc3VecX
 assert math.fabs(aCross) <= 2.e-6 * aLen, "Observed cross product: {0}".format(aCross)
+
+#=========================================================================
+# TEST 5. Creating of tangency between line and circle
+#=========================================================================
+aSession.startOperation()
+aLine = aSketchFeature.addFeature("SketchLine")
+aLineStart = geomDataAPI_Point2D(aLine.attribute("StartPoint"))
+aLineEnd = geomDataAPI_Point2D(aLine.attribute("EndPoint"))
+aLineStart.setValue(100., 100.)
+aLineEnd.setValue(200., 200.)
+aCircle = aSketchFeature.addFeature("SketchCircle")
+aCircleCenter = geomDataAPI_Point2D(aCircle.attribute("CircleCenter"))
+aCircleRadius = aCircle.real("CircleRadius")
+aCircleCenter.setValue(150., 100.)
+aCircleRadius.setValue(20.)
+aSession.finishOperation()
+
+aSession.startOperation()
+aTangency = aSketchFeature.addFeature("SketchConstraintTangent")
+aRefObjectA = aTangency.refattr("ConstraintEntityA")
+aRefObjectB = aTangency.refattr("ConstraintEntityB")
+anObjectA = modelAPI_ResultConstruction(aLine.lastResult())
+anObjectB = modelAPI_ResultConstruction(aCircle.lastResult())
+assert (anObjectA is not None)
+assert (anObjectB is not None)
+aRefObjectA.setObject(anObjectA)
+aRefObjectB.setObject(anObjectB)
+aTangency.execute()
+aSession.finishOperation()
+
+assert(math.fabs(distancePointLine(aCircleCenter, aLine) - aCircleRadius.value()) < 1.e-10)
 #=========================================================================
 # End of test
 #=========================================================================
