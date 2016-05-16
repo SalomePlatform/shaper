@@ -26,6 +26,16 @@ import math
 
 __updated__ = "2014-10-28"
 
+def distancePointPoint(pointA, pointB):
+    """
+    subroutine to calculate distance between two points
+    result of calculated distance is has 10**-5 precision
+    """
+    xdiff = math.pow((pointA.x() - pointB.x()), 2)
+    ydiff = math.pow((pointA.y() - pointB.y()), 2)
+    return round(math.sqrt(xdiff + ydiff), 5)
+
+
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
 #=========================================================================
@@ -72,6 +82,12 @@ aCircleRadius = aSketchCircle.real("CircleRadius")
 anCircleCentr.setValue(-25., -25)
 aCircleRadius.setValue(25.)
 aSession.finishOperation()
+# Change the radius of the arc
+aSession.startOperation()
+RADIUS = 40
+anArcRadius = aSketchArc.real("ArcRadius")
+anArcRadius.setValue(RADIUS)
+aSession.finishOperation()
 #=========================================================================
 # Make a constraint to keep the radius of the arc
 #=========================================================================
@@ -79,7 +95,7 @@ aSession.startOperation()
 aConstraint = aSketchFeature.addFeature("SketchConstraintRadius")
 aRadius = aConstraint.real("ConstraintValue")
 aRefObject = aConstraint.refattr("ConstraintEntityA")
-aResult = aSketchArc.firstResult()
+aResult = aSketchArc.lastResult()
 assert (aResult is not None)
 aRefObject.setObject(modelAPI_ResultConstruction(aResult))
 aConstraint.execute()
@@ -93,7 +109,7 @@ aSession.startOperation()
 aConstraint = aSketchFeature.addFeature("SketchConstraintRadius")
 aRadius = aConstraint.real("ConstraintValue")
 aRefObject = aConstraint.refattr("ConstraintEntityA")
-aResult = aSketchCircle.firstResult()
+aResult = aSketchCircle.lastResult()
 assert (aResult is not None)
 aRefObject.setObject(modelAPI_ResultConstruction(aResult))
 aConstraint.execute()
@@ -106,23 +122,18 @@ assert (aRefObject.isInitialized())
 # 2. Move one point of the arc
 # 3. Check that second point is moved also
 #=========================================================================
-assert (anArcCentr.x() == 10.)
-assert (anArcCentr.y() == 10.)
-assert (anArcStartPoint.x() == 0.)
-assert (anArcStartPoint.y() == 50.)
+assert (math.fabs(distancePointPoint(anArcCentr, anArcStartPoint) - RADIUS) < 1.e-10)
+assert (math.fabs(distancePointPoint(anArcCentr, anArcEndPoint) - RADIUS) < 1.e-10)
 anArcPrevEndPointX = anArcEndPoint.x()
 anArcPrevEndPointY = anArcEndPoint.y()
-assert (anArcPrevEndPointX == 50.)
-assert (anArcPrevEndPointY == 0.)
 # Move one point of the arc
 aSession.startOperation()
 anArcStartPoint.setValue(0, 60)
 aSession.finishOperation()
-assert (anArcCentr.x() == 10.)
-assert (anArcCentr.y() == 10.)
-# MPV: it just projects back to the circle the moved start point
-#assert (anArcEndPoint.x() != anArcPrevEndPointX)
-#assert (anArcEndPoint.y() != anArcPrevEndPointY)
+assert (anArcEndPoint.x() != anArcPrevEndPointX)
+assert (anArcEndPoint.y() != anArcPrevEndPointY)
+assert (math.fabs(distancePointPoint(anArcCentr, anArcStartPoint) - RADIUS) < 1.e-10)
+assert (math.fabs(distancePointPoint(anArcCentr, anArcEndPoint) - RADIUS) < 1.e-10)
 #=========================================================================
 # 4. Move the centr or the point of the arc
 # 5. Check radius is the same

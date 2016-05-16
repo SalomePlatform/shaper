@@ -122,11 +122,12 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestConstraintEqual.py
                TestConstraintTangent.py
                TestConstraintMirror.py
-               #TestConstraintAngle.py
+               TestConstraintAngle.py
                TestConstraintMiddlePoint.py
                TestMultiRotation.py
                TestMultiTranslation.py
                TestFillet.py
                TestRectangle.py
+               TestProjection.py
                TestHighload.py
                TestSnowflake.py)

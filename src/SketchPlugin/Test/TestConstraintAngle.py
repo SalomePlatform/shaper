@@ -46,6 +46,10 @@ def angle(theLine1, theLine2):
 
 __updated__ = "2015-09-18"
 
+ANGLE_DIRECT = 0
+ANGLE_COMPLEMENTARY = 1
+ANGLE_BACKWARD = 2
+
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
 #=========================================================================
@@ -83,15 +87,16 @@ aSession.finishOperation()
 ANGLE_DEGREE = 30.
 aSession.startOperation()
 aConstraint = aSketchFeature.addFeature("SketchConstraintAngle")
-anAngleVal = aConstraint.real("ConstraintValue")
+aConstraint.integer("AngleType").setValue(ANGLE_DIRECT)
+anAngleVal = aConstraint.real("AngleValue")
 refattrA = aConstraint.refattr("ConstraintEntityA")
 refattrB = aConstraint.refattr("ConstraintEntityB")
 assert (not anAngleVal.isInitialized())
 assert (not refattrA.isInitialized())
 assert (not refattrB.isInitialized())
-anAngleVal.setValue(ANGLE_DEGREE)
 refattrA.setObject(aSketchLineA.firstResult())
 refattrB.setObject(aSketchLineB.firstResult())
+anAngleVal.setValue(ANGLE_DEGREE)
 aConstraint.execute()
 aSession.finishOperation()
 assert (anAngleVal.isInitialized())
@@ -114,6 +119,17 @@ NEW_ANGLE_DEGREE = 60.
 aSession.startOperation()
 anAngleVal.setValue(NEW_ANGLE_DEGREE)
 aConstraint.execute()
+aSession.finishOperation()
+assert (angle(aSketchLineA, aSketchLineB) == NEW_ANGLE_DEGREE)
+#=========================================================================
+# Change angle type
+#=========================================================================
+aSession.startOperation()
+aConstraint.integer("AngleType").setValue(ANGLE_COMPLEMENTARY)
+aSession.finishOperation()
+assert (angle(aSketchLineA, aSketchLineB) == NEW_ANGLE_DEGREE)
+aSession.startOperation()
+aConstraint.integer("AngleType").setValue(ANGLE_BACKWARD)
 aSession.finishOperation()
 assert (angle(aSketchLineA, aSketchLineB) == NEW_ANGLE_DEGREE)
 #=========================================================================
