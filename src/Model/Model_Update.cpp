@@ -406,7 +406,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
   if (aReasons.find(theFeature) == aReasons.end()) {
     std::set<std::shared_ptr<ModelAPI_Feature> >::iterator aReasonIter = aReasons.begin();
     for(; aReasonIter != aReasons.end(); aReasonIter++) {
-      if (*aReasonIter != theFeature) {
+      if (*aReasonIter != theFeature && (*aReasonIter)->data()->isValid()) {
         if (processFeature(*aReasonIter))
           aIsModified = true;
         if ((*aReasonIter)->data()->execState() == ModelAPI_StateInvalidArgument)
@@ -429,7 +429,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
               aDepFeat = (*aDepIter)->document()->feature(aDepRes);
             }
           }
-          if (aDepFeat.get()) {
+          if (aDepFeat.get() && aDepFeat->data()->isValid()) {
             if (processFeature(aDepFeat))
               aIsModified = true;
             if (aDepFeat->data()->execState() == ModelAPI_StateInvalidArgument)
@@ -443,7 +443,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
       int aNum = aPart->numberOfSubs();
       for(int a = 0; a < aNum; a++) {
         FeaturePtr aSub = aPart->subFeature(a);
-        if (aSub.get()) {
+        if (aSub.get() && aSub->data()->isValid()) {
           if (processFeature(aSub))
             aIsModified = true;
           if (aSub->data()->execState() == ModelAPI_StateInvalidArgument)
