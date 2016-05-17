@@ -55,9 +55,9 @@ aSession.startOperation()
 aWireFeature = aPart.addFeature("Wire")
 aBaseObjectsList = aWireFeature.selectionList("base_objects")
 aShapeExplorer = GeomAPI_ShapeExplorer(aSketchShape, GeomAPI_Shape.EDGE)
-while aShapeExplorer.more():
+if aShapeExplorer.more():
     aBaseObjectsList.append(aSketchResult, aShapeExplorer.current())
-    aShapeExplorer.next()
+aWireFeature.customAction("add_contour")
 aSession.finishOperation()
 
 # Test results
