@@ -18,6 +18,7 @@
 
 #include <GeomAlgoAPI_Boolean.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
+#include <GeomAlgoAPI_Partition.h>
 #include <GeomAlgoAPI_PaveFiller.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAPI_ShapeExplorer.h>
@@ -129,7 +130,8 @@ void FeaturesPlugin_Boolean::execute()
 
   switch(aType) {
     case BOOL_CUT:
-    case BOOL_COMMON:{
+    case BOOL_COMMON:
+    case BOOL_FILL: {
       if((anObjects.empty() && aCompSolidsObjects.empty()) || aTools.empty()) {
         std::string aFeatureError = "Error: Not enough objects for boolean operation.";
         setError(aFeatureError);
@@ -141,7 +143,13 @@ void FeaturesPlugin_Boolean::execute()
         std::shared_ptr<GeomAPI_Shape> anObject = *anObjectsIt;
         ListOfShape aListWithObject;
         aListWithObject.push_back(anObject);
-        GeomAlgoAPI_Boolean aBoolAlgo(aListWithObject, aTools, (GeomAlgoAPI_Boolean::OperationType)aType);
+        GeomAlgoAPI_MakeShape aBoolAlgo; (aListWithObject, aTools, (GeomAlgoAPI_Boolean::OperationType)aType);
+
+        switch(aType) {
+          case BOOL_CUT:    aBoolAlgo = GeomAlgoAPI_Boolean(aListWithObject, aTools, GeomAlgoAPI_Boolean::BOOL_CUT); break;
+          case BOOL_COMMON: aBoolAlgo = GeomAlgoAPI_Boolean(aListWithObject, aTools, GeomAlgoAPI_Boolean::BOOL_COMMON); break;
+          case BOOL_FILL:   aBoolAlgo = GeomAlgoAPI_Partition(aListWithObject, aTools); break;
+        }
 
         // Checking that the algorithm worked properly.
         if(!aBoolAlgo.isDone()) {
@@ -189,9 +197,26 @@ void FeaturesPlugin_Boolean::execute()
           }
         }
 
-        std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(new GeomAlgoAPI_Boolean(aUsedInOperationSolids,
-                                                                               aTools,
-                                                                               (GeomAlgoAPI_Boolean::OperationType)aType));
+        std::shared_ptr<GeomAlgoAPI_MakeShape> aBoolAlgo;
+
+        switch(aType) {
+          case BOOL_CUT: {
+            aBoolAlgo.reset(new GeomAlgoAPI_Boolean(aUsedInOperationSolids,
+                                                    aTools,
+                                                    GeomAlgoAPI_Boolean::BOOL_CUT));
+            break;
+          }
+          case BOOL_COMMON: {
+            aBoolAlgo.reset(new GeomAlgoAPI_Boolean(aUsedInOperationSolids,
+                                                    aTools,
+                                                    GeomAlgoAPI_Boolean::BOOL_COMMON));
+            break;
+          }
+          case BOOL_FILL: {
+            aBoolAlgo.reset(new GeomAlgoAPI_Partition(aUsedInOperationSolids, aTools));
+            break;
+          }
+        }
 
         // Checking that the algorithm worked properly.
         if(!aBoolAlgo->isDone()) {

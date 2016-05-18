@@ -35,10 +35,10 @@ public:
   /// \param[in] theType type of combine.
   /// \param[out] theCombinedShapes resulting shapes.
   /// \param[out] theFreeShapes shapes that does not have common subshapes.
-  static void combineShapes(const std::shared_ptr<GeomAPI_Shape> theCompound,
-                            const GeomAPI_Shape::ShapeType theType,
-                            ListOfShape& theCombinedShapes,
-                            ListOfShape& theFreeShapes);
+  static std::shared_ptr<GeomAPI_Shape> combineShapes(const std::shared_ptr<GeomAPI_Shape> theCompound,
+                                                      const GeomAPI_Shape::ShapeType theType,
+                                                      ListOfShape& theCombinedShapes,
+                                                      ListOfShape& theFreeShapes);
 
   /// \brief Calculates bounding box for theShapes
   /// \return list of eight points.

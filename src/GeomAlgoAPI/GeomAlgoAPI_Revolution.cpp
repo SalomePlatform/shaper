@@ -271,24 +271,14 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
       aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
     }
     if(aResult.ShapeType() == TopAbs_COMPOUND) {
-      GeomShapePtr aCompound(new GeomAPI_Shape);
-      aCompound->setImpl(new TopoDS_Shape(aResult));
+      std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+      aGeomShape->setImpl(new TopoDS_Shape(aResult));
       ListOfShape aCompSolids, aFreeSolids;
-      GeomAlgoAPI_ShapeTools::combineShapes(aCompound, GeomAPI_Shape::COMPSOLID, aCompSolids, aFreeSolids);
-      if(aCompSolids.size() == 1 && aFreeSolids.size() == 0) {
-        aResult = aCompSolids.front()->impl<TopoDS_Shape>();
-      } else if (aCompSolids.size() > 1 || (aCompSolids.size() >= 1 && aFreeSolids.size() >= 1)) {
-        TopoDS_Compound aResultComp;
-        TopoDS_Builder aBuilder;
-        aBuilder.MakeCompound(aResultComp);
-        for(ListOfShape::const_iterator anIter = aCompSolids.cbegin(); anIter != aCompSolids.cend(); anIter++) {
-          aBuilder.Add(aResultComp, (*anIter)->impl<TopoDS_Shape>());
-        }
-        for(ListOfShape::const_iterator anIter = aFreeSolids.cbegin(); anIter != aFreeSolids.cend(); anIter++) {
-          aBuilder.Add(aResultComp, (*anIter)->impl<TopoDS_Shape>());
-        }
-        aResult = aResultComp;
-      }
+      aGeomShape = GeomAlgoAPI_ShapeTools::combineShapes(aGeomShape,
+                                                         GeomAPI_Shape::COMPSOLID,
+                                                         aCompSolids,
+                                                         aFreeSolids);
+      aResult = aGeomShape->impl<TopoDS_Shape>();
     }
 
     // If after cut we got more than one solids then take closest to the center of mass of the base face.
@@ -477,24 +467,14 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     }
 
     if(aResult.ShapeType() == TopAbs_COMPOUND) {
-      GeomShapePtr aCompound(new GeomAPI_Shape);
-      aCompound->setImpl(new TopoDS_Shape(aResult));
+      std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+      aGeomShape->setImpl(new TopoDS_Shape(aResult));
       ListOfShape aCompSolids, aFreeSolids;
-      GeomAlgoAPI_ShapeTools::combineShapes(aCompound, GeomAPI_Shape::COMPSOLID, aCompSolids, aFreeSolids);
-      if(aCompSolids.size() == 1 && aFreeSolids.size() == 0) {
-        aResult = aCompSolids.front()->impl<TopoDS_Shape>();
-      } else if (aCompSolids.size() > 1 || (aCompSolids.size() >= 1 && aFreeSolids.size() >= 1)) {
-        TopoDS_Compound aResultComp;
-        TopoDS_Builder aBuilder;
-        aBuilder.MakeCompound(aResultComp);
-        for(ListOfShape::const_iterator anIter = aCompSolids.cbegin(); anIter != aCompSolids.cend(); anIter++) {
-          aBuilder.Add(aResultComp, (*anIter)->impl<TopoDS_Shape>());
-        }
-        for(ListOfShape::const_iterator anIter = aFreeSolids.cbegin(); anIter != aFreeSolids.cend(); anIter++) {
-          aBuilder.Add(aResultComp, (*anIter)->impl<TopoDS_Shape>());
-        }
-        aResult = aResultComp;
-      }
+      aGeomShape = GeomAlgoAPI_ShapeTools::combineShapes(aGeomShape,
+                                                         GeomAPI_Shape::COMPSOLID,
+                                                         aCompSolids,
+                                                         aFreeSolids);
+      aResult = aGeomShape->impl<TopoDS_Shape>();
     }
 
     // If after cut we got more than one solids then take closest to the center of mass of the base face.

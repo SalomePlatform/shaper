@@ -24,6 +24,7 @@ public:
     BOOL_CUT,
     BOOL_FUSE,
     BOOL_COMMON,
+    BOOL_FILL,
     BOOL_SMASH
   };
 

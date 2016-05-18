@@ -90,17 +90,19 @@ std::shared_ptr<GeomAPI_Pnt> GeomAlgoAPI_ShapeTools::centreOfMass(const std::sha
 }
 
 //=================================================================================================
-void GeomAlgoAPI_ShapeTools::combineShapes(const std::shared_ptr<GeomAPI_Shape> theCompound,
-                                           const GeomAPI_Shape::ShapeType theType,
-                                           ListOfShape& theCombinedShapes,
-                                           ListOfShape& theFreeShapes)
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(const std::shared_ptr<GeomAPI_Shape> theCompound,
+                                                                     const GeomAPI_Shape::ShapeType theType,
+                                                                     ListOfShape& theCombinedShapes,
+                                                                     ListOfShape& theFreeShapes)
 {
+  GeomShapePtr aResult = theCompound;
+
   if(!theCompound.get()) {
-    return;
+    return aResult;
   }
 
   if(theType != GeomAPI_Shape::SHELL && theType != GeomAPI_Shape::COMPSOLID) {
-    return;
+    return aResult;
   }
 
   TopAbs_ShapeEnum aTS = TopAbs_EDGE;
@@ -125,7 +127,7 @@ void GeomAlgoAPI_ShapeTools::combineShapes(const std::shared_ptr<GeomAPI_Shape> 
   BOPCol_IndexedDataMapOfShapeListOfShape aMapSA;
   BOPTools::MapShapesAndAncestors(aShapesComp, aTS, aTA, aMapSA);
   if(aMapSA.IsEmpty()) {
-    return;
+    return aResult;
   }
 
   // Get all shapes with common subshapes and free shapes.
@@ -213,6 +215,23 @@ void GeomAlgoAPI_ShapeTools::combineShapes(const std::shared_ptr<GeomAPI_Shape> 
       theFreeShapes.push_back(aGeomShape);
     }
   }
+
+  if(theCombinedShapes.size() == 1 && theFreeShapes.size() == 0) {
+    aResult = theCombinedShapes.front();
+  } else if (theCombinedShapes.size() > 1 || (theCombinedShapes.size() >= 1 && theFreeShapes.size() >= 1)) {
+    TopoDS_Compound aResultComp;
+    TopoDS_Builder aBuilder;
+    aBuilder.MakeCompound(aResultComp);
+    for(ListOfShape::const_iterator anIter = theCombinedShapes.cbegin(); anIter != theCombinedShapes.cend(); anIter++) {
+      aBuilder.Add(aResultComp, (*anIter)->impl<TopoDS_Shape>());
+    }
+    for(ListOfShape::const_iterator anIter = theFreeShapes.cbegin(); anIter != theFreeShapes.cend(); anIter++) {
+      aBuilder.Add(aResultComp, (*anIter)->impl<TopoDS_Shape>());
+    }
+    aResult->setImpl(new TopoDS_Shape(aResultComp));
+  }
+
+  return aResult;
 }
 
 //=================================================================================================

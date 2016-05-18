@@ -7,10 +7,12 @@
 #include "FeaturesPlugin_Validators.h"
 
 #include <ModelAPI_Attribute.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
-#include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeReference.h>
+#include <ModelAPI_Feature.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <Events_Error.h>
 
@@ -22,7 +24,7 @@
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAlgoAPI_WireBuilder.h>
 
-//=================================================================================================
+//==================================================================================================
 bool FeaturesPlugin_ValidatorPipeLocations::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                     const std::list<std::string>& theArguments,
                                                     std::string& theError) const
@@ -66,13 +68,13 @@ bool FeaturesPlugin_ValidatorPipeLocations::isValid(const std::shared_ptr<ModelA
   return true;
 }
 
-//=================================================================================================
+//==================================================================================================
 bool FeaturesPlugin_ValidatorPipeLocations::isNotObligatory(std::string theFeature, std::string theAttribute)
 {
   return false;
 }
 
-//=================================================================================================
+//==================================================================================================
 bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theAttribute,
                                                         const std::list<std::string>& theArguments,
                                                         std::string& theError) const
@@ -143,7 +145,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
   return true;
 }
 
-//=================================================================================================
+//==================================================================================================
 bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const AttributePtr& theAttribute,
                                                                  const std::list<std::string>& theArguments,
                                                                  std::string& theError) const
@@ -231,7 +233,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
   return true;
 }
 
-//=================================================================================================
+//==================================================================================================
 bool FeaturesPlugin_ValidatorCompositeLauncher::isValid(const AttributePtr& theAttribute,
                                                         const std::list<std::string>& theArguments,
                                                         std::string& theError) const
@@ -276,7 +278,7 @@ bool FeaturesPlugin_ValidatorCompositeLauncher::isValid(const AttributePtr& theA
   return aValid;
 }
 
-//=================================================================================================
+//==================================================================================================
 bool FeaturesPlugin_ValidatorCanBeEmpty::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                  const std::list<std::string>& theArguments,
                                                  std::string& theError) const
@@ -322,13 +324,13 @@ bool FeaturesPlugin_ValidatorCanBeEmpty::isValid(const std::shared_ptr<ModelAPI_
   return true;
 }
 
-//=================================================================================================
+//==================================================================================================
 bool FeaturesPlugin_ValidatorCanBeEmpty::isNotObligatory(std::string theFeature, std::string theAttribute)
 {
   return false;
 }
 
-//=================================================================================================
+//==================================================================================================
 bool FeaturesPlugin_ValidatorCanBeEmpty::isShapesCanBeEmpty(const AttributePtr& theAttribute,
                                                             std::string& theError) const
 {
@@ -374,7 +376,7 @@ bool FeaturesPlugin_ValidatorCanBeEmpty::isShapesCanBeEmpty(const AttributePtr& 
   return true;
 }
 
-//=================================================================================================
+//==================================================================================================
 bool FeaturesPlugin_ValidatorBaseForWire::isValid(const AttributePtr& theAttribute,
                                                   const std::list<std::string>& theArguments,
                                                   std::string& theError) const
@@ -453,6 +455,68 @@ bool FeaturesPlugin_ValidatorBaseForWire::isValid(const AttributePtr& theAttribu
   if(!aWire.get()) {
     theError = "Result wire empty. Probably it has disconnected edges or non-manifold.";
     return false;
+  }
+
+  return true;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_BooleanSelection::isValid(const AttributePtr& theAttribute,
+                                              const std::list<std::string>& theArguments,
+                                              std::string& theError) const
+{
+  AttributeSelectionListPtr anAttrSelectionList = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if(!anAttrSelectionList.get()) {
+    theError = "Error: this validator can only work with selection list attributes in Boolean feature.";
+    return false;
+  }
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  int anOperationType = aFeature->integer("bool_type")->value();
+
+  for(int anIndex = 0; anIndex < anAttrSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr anAttrSelection = anAttrSelectionList->value(anIndex);
+    if(!anAttrSelection.get()) {
+      theError = "Error: empty attribute selection.";
+      return false;
+    }
+    ResultPtr aContext = anAttrSelection->context();
+    if(!aContext.get()) {
+      theError = "Error: empty selection context.";
+      return false;
+    }
+    ResultConstructionPtr aResultConstruction =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    if(aResultConstruction.get()) {
+      theError = "Error: Result construction not allowed for selection.";
+      return false;
+    }
+    std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
+    if(!aShape.get()) {
+      aShape = aContext->shape();
+    }
+    if(!aShape.get()) {
+      theError = "Error: empty shape.";
+      return false;
+    }
+    int aShapeType = aShape->shapeType();
+    if(anOperationType == 1) {
+      // Fuse operation. Allow to select edges, faces and solids.
+      if(aShapeType != GeomAPI_Shape::EDGE &&
+         aShapeType != GeomAPI_Shape::FACE &&
+         aShapeType != GeomAPI_Shape::SOLID &&
+         aShapeType != GeomAPI_Shape::COMPSOLID &&
+         aShapeType != GeomAPI_Shape::COMPOUND) {
+        theError = "Error: selected shape has the wrong type.";
+        return false;
+      }
+    } else {
+      if(aShapeType != GeomAPI_Shape::SOLID &&
+         aShapeType != GeomAPI_Shape::COMPSOLID &&
+         aShapeType != GeomAPI_Shape::COMPOUND) {
+        theError = "Error: selected shape has the wrong type.";
+        return false;
+      }
+    }
   }
 
   return true;

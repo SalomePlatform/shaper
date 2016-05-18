@@ -7,6 +7,7 @@
 #include "GeomAlgoAPI_Boolean.h"
 
 #include <GeomAlgoAPI_DFLoader.h>
+#include <GeomAlgoAPI_ShapeTools.h>
 
 #include <BOPAlgo_BOP.hxx>
 #include <TopTools_ListOfShape.hxx>
@@ -76,6 +77,16 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
 
   if(aResult.ShapeType() == TopAbs_COMPOUND) {
     aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
+  }
+  if(aResult.ShapeType() == TopAbs_COMPOUND) {
+    std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+    aGeomShape->setImpl(new TopoDS_Shape(aResult));
+    ListOfShape aCompSolids, aFreeSolids;
+    aGeomShape = GeomAlgoAPI_ShapeTools::combineShapes(aGeomShape,
+                                                       GeomAPI_Shape::COMPSOLID,
+                                                       aCompSolids,
+                                                       aFreeSolids);
+    aResult = aGeomShape->impl<TopoDS_Shape>();
   }
 
   std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());

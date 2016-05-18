@@ -66,9 +66,8 @@ public:
 
 /// \class FeaturesPlugin_ValidatorCanBeEmpty
 /// \ingroup Validators
-/// \brief A validator for extrusion direction attribute and bounding planes for extrusion and
-///        revolution. Allows them to be empty if base objects are planar and do not contain
-///        vertices and edges.
+/// \brief A validator for extrusion direction attribute. Allows it to be empty if base objects are
+///        planar and do not contain vertices and edges.
 class FeaturesPlugin_ValidatorCanBeEmpty: public ModelAPI_FeatureValidator
 {
 public:
@@ -102,6 +101,22 @@ public:
    virtual bool isValid(const AttributePtr& theAttribute,
                         const std::list<std::string>& theArguments,
                         std::string& theError) const;
+};
+
+/// \class FeaturesPlugin_BooleanSelection
+/// \ingroup Validators
+/// \brief Validates selection for boolean operation.
+class FeaturesPlugin_BooleanSelection: public ModelAPI_AttributeValidator
+{
+public:
+  /// \return True if the attribute is valid. It checks whether the selection
+  /// is acceptable for boolean operation.
+  /// \param[in] theAttribute an attribute to check.
+  /// \param[in] theArguments a filter parameters.
+  /// \param[out] theError error message.
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
 };
 
 #endif
