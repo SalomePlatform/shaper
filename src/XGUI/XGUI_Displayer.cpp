@@ -76,6 +76,8 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse
 
 //#define DEBUG_OCCT_SHAPE_SELECTION
 
+#define WORKAROUND_UNTIL_27523_IS_FIXED
+
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
 {
   // Get from null point
@@ -332,7 +334,17 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       if (aNeedToRestoreSelection)
         myWorkshop->module()->storeSelection();
 
+#ifdef WORKAROUND_UNTIL_27523_IS_FIXED
+      if (!myActiveSelectionModes.contains(0))
+        aContext->Activate(aAISIO, 0);
+#endif
+
       aContext->Redisplay(aAISIO, false);
+
+#ifdef WORKAROUND_UNTIL_27523_IS_FIXED
+      if (!myActiveSelectionModes.contains(0))
+        aContext->Deactivate(aAISIO, 0);
+#endif
 
       if (aNeedToRestoreSelection)
         myWorkshop->module()->restoreSelection();
