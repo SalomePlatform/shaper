@@ -284,6 +284,8 @@ void XGUI_OperationMgr::updateApplyOfOperations(ModuleBase_Operation* theOperati
         updateApplyOfOperations(anOperation);
     }
   }
+  // Apply button of the current operation should also be updated
+  onValidateOperation();
 }
 
 bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation)
