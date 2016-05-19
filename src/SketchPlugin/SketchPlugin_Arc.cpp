@@ -19,6 +19,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAPI_Ax2.h>
 #include <GeomAPI_Circ2d.h>
@@ -751,10 +752,12 @@ void SketchPlugin_Arc::tangencyArcConstraints()
     // Remove all obtained constraints which use current arc, because
     // there is no information which of them were used to build tangency arc.
     DocumentPtr aDoc = sketch()->document();
+    std::set<FeaturePtr> aFeaturesToBeRemoved;
     for (aCIt = aCoincidence.begin(); aCIt != aCoincidence.end(); ++aCIt)
-      aDoc->removeFeature(*aCIt);
+      aFeaturesToBeRemoved.insert(*aCIt);
     for (aTIt = aTangency.begin(); aTIt != aTangency.end(); ++aTIt)
-      aDoc->removeFeature(*aTIt);
+      aFeaturesToBeRemoved.insert(*aTIt);
+    ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved);
     // Send events to update the sub-features by the solver.
     if (isDeleteFlushed)
       Events_Loop::loop()->setFlushed(aDeleteEvent, true);

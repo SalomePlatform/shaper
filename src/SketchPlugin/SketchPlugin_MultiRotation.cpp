@@ -121,7 +121,6 @@ void SketchPlugin_MultiRotation::execute()
         FeaturePtr aFeature =  aDoc ? aDoc->feature(aRC) : FeaturePtr();
         if (aFeature)
           aFeaturesToBeRemoved.insert(aFeature);
-          //aDoc->removeFeature(aFeature);
       }
     } else {
       for (int i = 0; i <= aNbCopies && aTargetIter != aTargetList.end(); i++)
@@ -165,7 +164,6 @@ void SketchPlugin_MultiRotation::execute()
             FeaturePtr aFeature =  aDoc ? aDoc->feature(aRC) : FeaturePtr();
             if (aFeature)
               aFeaturesToBeRemoved.insert(aFeature);
-              //aDoc->removeFeature(aFeature);
           }
           ind++;
         }
@@ -350,7 +348,6 @@ void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
           FeaturePtr aFeature =  aDoc ? aDoc->feature(aRC) : FeaturePtr();
           if (aFeature)
             aFeaturesToBeRemoved.insert(aFeature);
-            //aDoc->removeFeature(aFeature);
         }
       }
       ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved);

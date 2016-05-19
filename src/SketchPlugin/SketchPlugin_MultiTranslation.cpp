@@ -19,6 +19,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Tools.h>
 
 #include <SketchPlugin_SketchEntity.h>
 #include <SketcherPrs_Factory.h>
@@ -104,6 +105,7 @@ void SketchPlugin_MultiTranslation::execute()
   std::list<ObjectPtr>::iterator anInitIter = anInitialList.begin();
   std::list<ObjectPtr>::iterator aTargetIter = aTargetList.begin();
   std::vector<bool>::iterator aUsedIter = isUsed.begin();
+  std::set<FeaturePtr> aFeaturesToBeRemoved;
   for (; aUsedIter != isUsed.end(); aUsedIter++) {
     if (!(*aUsedIter)) {
       aRefListOfShapes->remove(*anInitIter);
@@ -116,7 +118,7 @@ void SketchPlugin_MultiTranslation::execute()
         DocumentPtr aDoc = aRC ? aRC->document() : DocumentPtr();
         FeaturePtr aFeature =  aDoc ? aDoc->feature(aRC) : FeaturePtr();
         if (aFeature)
-          aDoc->removeFeature(aFeature);
+          aFeaturesToBeRemoved.insert(aFeature);
       }
     } else {
       for (int i = 0; i <= aNbCopies && aTargetIter != aTargetList.end(); i++)
@@ -125,6 +127,7 @@ void SketchPlugin_MultiTranslation::execute()
     if (anInitIter != anInitialList.end())
       anInitIter++;
   }
+  ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved);
   // change number of copies
   if (aCurrentNbCopies != 0 && aNbCopies != aCurrentNbCopies) {
     bool isAdd = aNbCopies > aCurrentNbCopies;

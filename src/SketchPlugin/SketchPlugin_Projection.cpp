@@ -18,6 +18,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAPI_Circ.h>
 #include <GeomAPI_Edge.h>
@@ -107,7 +108,10 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
         (anEdge->isCircle() && aProjection->getKind() != SketchPlugin_Circle::ID()) ||
         (anEdge->isArc() && aProjection->getKind() != SketchPlugin_Arc::ID())) {
       DocumentPtr aDoc = sketch()->document();
-      aDoc->removeFeature(aProjection);
+
+      std::set<FeaturePtr> aFeaturesToBeRemoved;
+      aFeaturesToBeRemoved.insert(aProjection);
+      ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved);
       aProjection = FeaturePtr();
       aRefAttr->setObject(aProjection);
     }

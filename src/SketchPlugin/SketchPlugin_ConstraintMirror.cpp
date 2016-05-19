@@ -13,6 +13,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Tools.h>
 
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Sketch.h>
@@ -70,6 +71,7 @@ void SketchPlugin_ConstraintMirror::execute()
   std::list<ObjectPtr>::iterator anInitIter = anInitialList.begin();
   std::list<ObjectPtr>::iterator aMirrorIter = aMirroredList.begin();
   std::vector<bool>::iterator aUsedIter = isUsed.begin();
+  std::set<FeaturePtr> aFeaturesToBeRemoved;
   for (; aUsedIter != isUsed.end(); aUsedIter++) {
     if (!(*aUsedIter)) {
       aRefListOfShapes->remove(*anInitIter);
@@ -81,7 +83,7 @@ void SketchPlugin_ConstraintMirror::execute()
         DocumentPtr aDoc = aRC ? aRC->document() : DocumentPtr();
         FeaturePtr aFeature =  aDoc ? aDoc->feature(aRC) : FeaturePtr();
         if (aFeature)
-          aDoc->removeFeature(aFeature);
+          aFeaturesToBeRemoved.insert(aFeature);
       }
     }
     if (anInitIter != anInitialList.end())
@@ -89,6 +91,7 @@ void SketchPlugin_ConstraintMirror::execute()
     if (aMirrorIter != aMirroredList.end())
       aMirrorIter++;
   }
+  ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved);
 
   static Events_ID aRedisplayEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
 
