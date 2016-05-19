@@ -15,6 +15,7 @@
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
 
 #include <ModuleBase_Tools.h>
 
@@ -588,26 +589,16 @@ void ParametersPlugin_WidgetParamsMgr::onRemove()
   QObjectPtrList anObjects;
   anObjects.append(aCurFeature);
 
-  std::set<FeaturePtr> aDirectRefFeatures, aIndirectRefFeatures;
-  ModuleBase_Tools::findReferences(anObjects, aDirectRefFeatures, aIndirectRefFeatures);
+  std::map<FeaturePtr, std::set<FeaturePtr> > aReferences;
+  std::set<FeaturePtr> aFeatures;
+  ModuleBase_Tools::convertToFeatures(anObjects, aFeatures);
+  ModelAPI_Tools::findAllReferences(aFeatures, aReferences);
 
-  bool doDeleteReferences = true;
-  if (ModuleBase_Tools::isDeleteFeatureWithReferences(anObjects, aDirectRefFeatures, 
-      aIndirectRefFeatures, this, doDeleteReferences)) {
-
-    std::set<FeaturePtr> aFeaturesToDelete;
-    if (doDeleteReferences) {
-      aFeaturesToDelete = aDirectRefFeatures;
-      aFeaturesToDelete.insert(aIndirectRefFeatures.begin(), aIndirectRefFeatures.end());
-    }
-    aDoc->removeFeature(aCurFeature);
-    std::set<FeaturePtr>::const_iterator anIt = aFeaturesToDelete.begin(),
-                                         aLast = aFeaturesToDelete.end();
-    for (; anIt != aLast; anIt++) {
-      FeaturePtr aFeature = (*anIt);
-      DocumentPtr aDoc = aFeature->document();
-      aDoc->removeFeature(aFeature);
-    }
+  std::set<FeaturePtr> aFeatureRefsToDelete;
+  if (ModuleBase_Tools::askToDelete(aFeatures, aReferences, this, aFeatureRefsToDelete)) {
+    if (!aFeatureRefsToDelete.empty())
+      aFeatures.insert(aFeatureRefsToDelete.begin(), aFeatureRefsToDelete.end());
+    ModelAPI_Tools::removeFeatures(aFeatures, false);
 
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED));
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));

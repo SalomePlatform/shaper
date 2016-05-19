@@ -249,9 +249,7 @@ Q_OBJECT
   //! Delete features. Delete the referenced features. There can be a question with a list of
   //! referenced objects.
   //! \param theFeatures a list of objects to be deleted
-  //! \param theIgnoredFeatures a list of features to be ignored during delete
-  bool deleteFeatures(const QObjectPtrList& theFeatures,
-                      const std::set<FeaturePtr>& theIgnoredFeatures = std::set<FeaturePtr>());
+  bool deleteFeatures(const QObjectPtrList& theFeatures);
 
   /// Deactivates the object, if it is active and the module returns that the activation
   /// of selection for the object is not possible currently(the current operation uses it)
@@ -391,17 +389,6 @@ signals:
   /// \param theOperation an operation
    void setGrantedFeatures(ModuleBase_Operation* theOperation);
 
-  //! \param theIgnoredFeatures a list of features to be ignored during delete
-  //! \param theList an objects to be checked
-  //! \param aDirectRefFeatures a list of direct reference features
-  //! \param aIndirectRefFeatures a list of features which depend on the feature through others
-  //! \param doDeleteReferences flag if referenced features should be removed also
-  bool deleteFeaturesInternal(const QObjectPtrList& theList,
-                              const std::set<FeaturePtr>& aDirectRefFeatures,
-                              const std::set<FeaturePtr>& aIndirectRefFeatures,
-                              const std::set<FeaturePtr>& theIgnoredFeatures,
-                              const bool doDeleteReferences = true);
-
 private:
   /// Display all results
   //void displayAllResults();
@@ -484,17 +471,6 @@ private:
   //! \param theSignal - void "updateUndoHistory" or "updateRedoHistory" SIGNAL;
   //! \param theSlot - onUndo(int) or onRedo(int) SLOT
   void addHistoryMenu(QObject* theObject, const char* theSignal, const char* theSlot);
-
-
-  /// Calls removeFeature of the document for each object in the list
-  //! \param theList an objects to be deleted
-  //! \param theIgnoredFeatures a list of features to be ignored during delete
-  //! \param theActionId an action command key to find context menu object types enabled for remove
-  //! \param theFlushRedisplay a boolean value if the redisplay signal should be flushed
-  bool removeFeatures(const QObjectPtrList& theList,
-                      const std::set<FeaturePtr>& theIgnoredFeatures,
-                      const QString& theActionId,
-                      const bool theFlushRedisplay);
 
   //! Creates list of actions (commands) by given history list from session
   QList<ActionInfo> processHistoryList(const std::list<std::string>&) const;

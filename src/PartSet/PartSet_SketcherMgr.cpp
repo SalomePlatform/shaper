@@ -1212,7 +1212,7 @@ bool PartSet_SketcherMgr::canDisplayConstraint(const FeaturePtr& theFeature,
   return aSwitchedOn;
 }
 
-void PartSet_SketcherMgr::processHiddenObject(const std::list<ObjectPtr>& theObjects)
+/*void PartSet_SketcherMgr::processHiddenObject(const std::list<ObjectPtr>& theObjects)
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                            (getCurrentOperation());
@@ -1288,7 +1288,7 @@ will be hidden: %1. Would you like to delete them?")
       }
     }
   }
-}
+}*/
 
 bool PartSet_SketcherMgr::canDisplayCurrentCreatedFeature() const
 {

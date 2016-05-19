@@ -190,7 +190,7 @@ public:
   /// Check the given objects either there are some results of the current sketch. If so,
   /// it suggests to delete them as there are no functionality to show back hidden sketch objects
   /// \param theObjects a list of hidden objects
-  virtual void processHiddenObject(const std::list<ObjectPtr>& theObjects);
+  //virtual void processHiddenObject(const std::list<ObjectPtr>& theObjects);
 
   /// Returns true if the mouse is over viewer or property panel value is changed
   /// \return boolean result

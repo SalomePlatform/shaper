@@ -164,7 +164,7 @@ public:
 
   /// Make some functionality after the objects are hidden in viewer
   /// \param theObjects a list of hidden objects
-  virtual void processHiddenObject(const std::list<ObjectPtr>& theObjects);
+  //virtual void processHiddenObject(const std::list<ObjectPtr>& theObjects);
 
   /// Returns true if selection for the object can be activate.
   /// For sketch operation allow the selection activation if the operation is edit, for other

@@ -18,6 +18,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Tools.h>
 
 #include <SketchPlugin_SketchEntity.h>
 
@@ -106,6 +107,7 @@ void SketchPlugin_MultiRotation::execute()
   std::list<ObjectPtr>::iterator anInitIter = anInitialList.begin();
   std::list<ObjectPtr>::iterator aTargetIter = aTargetList.begin();
   std::vector<bool>::iterator aUsedIter = isUsed.begin();
+  std::set<FeaturePtr> aFeaturesToBeRemoved;
   for (; aUsedIter != isUsed.end(); aUsedIter++) {
     if (!(*aUsedIter)) {
       aRefListOfShapes->remove(*anInitIter);
@@ -118,7 +120,8 @@ void SketchPlugin_MultiRotation::execute()
         DocumentPtr aDoc = aRC ? aRC->document() : DocumentPtr();
         FeaturePtr aFeature =  aDoc ? aDoc->feature(aRC) : FeaturePtr();
         if (aFeature)
-          aDoc->removeFeature(aFeature);
+          aFeaturesToBeRemoved.insert(aFeature);
+          //aDoc->removeFeature(aFeature);
       }
     } else {
       for (int i = 0; i <= aNbCopies && aTargetIter != aTargetList.end(); i++)
@@ -127,6 +130,7 @@ void SketchPlugin_MultiRotation::execute()
     if (anInitIter != anInitialList.end())
       anInitIter++;
   }
+  ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved);
   // change number of copies
   if (aCurrentNbCopies != 0 && aNbCopies != aCurrentNbCopies) {
     bool isAdd = aNbCopies > aCurrentNbCopies;
@@ -137,6 +141,7 @@ void SketchPlugin_MultiRotation::execute()
     aTargetList = aRefListOfRotated->list();
     aTargetIter = aTargetList.begin();
     ObjectPtr anObjToCopy = *aTargetIter;
+    std::set<FeaturePtr> aFeaturesToBeRemoved;
     while (aTargetIter != aTargetList.end()) {
       aRefListOfRotated->remove(*aTargetIter);
       aTargetIter++;
@@ -159,7 +164,8 @@ void SketchPlugin_MultiRotation::execute()
             DocumentPtr aDoc = aRC ? aRC->document() : DocumentPtr();
             FeaturePtr aFeature =  aDoc ? aDoc->feature(aRC) : FeaturePtr();
             if (aFeature)
-              aDoc->removeFeature(aFeature);
+              aFeaturesToBeRemoved.insert(aFeature);
+              //aDoc->removeFeature(aFeature);
           }
           ind++;
         }
@@ -168,6 +174,7 @@ void SketchPlugin_MultiRotation::execute()
           anObjToCopy = *aTargetIter;
       }
     }
+    ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved);
 
     for (aTargetIter = aTargetList.begin(); aTargetIter != aTargetList.end(); aTargetIter++)
       aRefListOfRotated->append(*aTargetIter);
@@ -331,6 +338,7 @@ void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
           data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
       std::list<ObjectPtr> aTargetList = aRefListOfRotated->list();
       std::list<ObjectPtr>::iterator aTargetIter = aTargetList.begin();
+      std::set<FeaturePtr> aFeaturesToBeRemoved;
       while (aTargetIter != aTargetList.end()) {
         aTargetIter++;
         for (int i = 0; i < aNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++) {
@@ -341,9 +349,12 @@ void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
           DocumentPtr aDoc = aRC ? aRC->document() : DocumentPtr();
           FeaturePtr aFeature =  aDoc ? aDoc->feature(aRC) : FeaturePtr();
           if (aFeature)
-            aDoc->removeFeature(aFeature);
+            aFeaturesToBeRemoved.insert(aFeature);
+            //aDoc->removeFeature(aFeature);
         }
       }
+      ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved);
+
       aRefListOfRotated->clear();
       std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
         data()->attribute(SketchPlugin_Constraint::ENTITY_A()))->clear();

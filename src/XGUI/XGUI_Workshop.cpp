@@ -98,8 +98,6 @@
 
 #include <iterator>
 
-//#define DEBUG_CLEAN_HISTORY
-
 #ifdef _DEBUG
 #include <QDebug>
 #include <iostream>
@@ -111,11 +109,11 @@
 #include <dlfcn.h>
 #endif
 
-
 QString XGUI_Workshop::MOVE_TO_END_COMMAND = QObject::tr("Move to the end");
 
 //#define DEBUG_DELETE
 //#define DEBUG_FEATURE_NAME
+//#define DEBUG_CLEAN_HISTORY
 
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
     : QObject(),
@@ -1268,12 +1266,11 @@ void XGUI_Workshop::activateObjectsSelection(const QObjectPtrList& theList)
   myDisplayer->activateObjects(aModes, theList);
 }
 
-
 //**************************************************************
 void XGUI_Workshop::deleteObjects()
 {
   ModuleBase_IModule* aModule = module();
-  // 1. allow the module to delete objects, do nothing if it has succeed
+  // allow the module to delete objects, do nothing if it has succeed
   if (aModule->deleteObjects()) {
     updateCommandStatus();
     return;
@@ -1294,32 +1291,34 @@ void XGUI_Workshop::deleteObjects()
   if (!(hasFeature || hasParameter))
     return;
 
-  // 3. delete objects
-  std::set<FeaturePtr> anIgnoredFeatures;
-  std::set<FeaturePtr> aDirectRefFeatures, aIndirectRefFeatures;
-  ModuleBase_Tools::findReferences(anObjects, aDirectRefFeatures, aIndirectRefFeatures);
+  // delete objects
+  std::map<FeaturePtr, std::set<FeaturePtr> > aReferences;
+  std::set<FeaturePtr> aFeatures;
+  ModuleBase_Tools::convertToFeatures(anObjects, aFeatures);
+  ModelAPI_Tools::findAllReferences(aFeatures, aReferences);
 
-  bool doDeleteReferences = true;
-  if (ModuleBase_Tools::isDeleteFeatureWithReferences(anObjects, aDirectRefFeatures, 
-      aIndirectRefFeatures, desktop(), doDeleteReferences)) {
-    // start operation
-    QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text() + " %1";
-    aDescription = aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
-    ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
-    operationMgr()->startOperation(anOpAction);
+  bool aDone = false;
+  QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text() + " %1";
+  aDescription = aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
+  ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
 
+  operationMgr()->startOperation(anOpAction);
+
+  std::set<FeaturePtr> aFeatureRefsToDelete;
+  if (ModuleBase_Tools::askToDelete(aFeatures, aReferences, desktop(), aFeatureRefsToDelete)) {
     // WORKAROUND, should be done before each object remove, if it presents in XGUI_DataModel tree
     // It is necessary to clear selection in order to avoid selection changed event during
     // deletion and negative consequences connected with processing of already deleted items
     mySelector->clearSelection();
 
-    // delete and commit/abort operation in model
-    if (deleteFeaturesInternal(anObjects, aDirectRefFeatures, aIndirectRefFeatures,
-                               anIgnoredFeatures, doDeleteReferences))
-      operationMgr()->commitOperation();
-    else
-      operationMgr()->abortOperation(operationMgr()->currentOperation());
+    if (!aFeatureRefsToDelete.empty())
+      aFeatures.insert(aFeatureRefsToDelete.begin(), aFeatureRefsToDelete.end());
+    aDone = ModelAPI_Tools::removeFeatures(aFeatures, false);
   }
+  if (aDone)
+    operationMgr()->commitOperation();
+  else
+    operationMgr()->abortOperation(operationMgr()->currentOperation());
 }
 
 //**************************************************************
@@ -1343,24 +1342,6 @@ void addRefsToFeature(const FeaturePtr& theFeature,
   }
 }
 
-void printMapInfo(const std::map<FeaturePtr, std::set<FeaturePtr> >& theMainList,
-                  const QString& thePrefix)
-{
-  std::map<FeaturePtr, std::set<FeaturePtr> >::const_iterator aMainIt = theMainList.begin(),
-                                                              aMainLast = theMainList.end();
-  QStringList aMapInfo;
-  for (; aMainIt != aMainLast; aMainIt++) {
-    QStringList anInfo;
-    FeaturePtr aMainListFeature = aMainIt->first;
-    std::set<FeaturePtr> aMainRefList = aMainIt->second;
-    foreach (FeaturePtr aRefFeature, aMainRefList) {
-      anInfo.append(aRefFeature->name().c_str());
-    }
-    aMapInfo.append(QString("%1: %2\n").arg(aMainListFeature->name().c_str()).arg(anInfo.join(",")));
-  }
-  qDebug(QString("%1: %2\n%3").arg(thePrefix).arg(aMapInfo.size()).arg(aMapInfo.join("\n")).toStdString().c_str());
-}
-
 //**************************************************************
 void XGUI_Workshop::cleanHistory()
 {
@@ -1368,19 +1349,12 @@ void XGUI_Workshop::cleanHistory()
     return;
 
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
-  QObjectPtrList aFeatures;
-  foreach (ObjectPtr anObject, anObjects) {
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
-    // for parameter result, use the corresponded reature to be removed
-    if (!aFeature.get() && anObject->groupName() == ModelAPI_ResultParameter::group()) {
-      aFeature = ModelAPI_Feature::feature(anObject);
-    }
-    aFeatures.append(aFeature);
-  }
+  std::set<FeaturePtr> aFeatures;
+  ModuleBase_Tools::convertToFeatures(anObjects, aFeatures);
 
 #ifdef DEBUG_CLEAN_HISTORY
-  QObjectPtrList::const_iterator aFIt;
   QStringList anInfo;
+  std::set<FeaturePtr>::const_iterator aFIt;
   for (aFIt = aFeatures.begin(); aFIt != aFeatures.end(); ++aFIt) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(*aFIt);
     anInfo.append(aFeature->name().c_str());
@@ -1389,56 +1363,8 @@ void XGUI_Workshop::cleanHistory()
   qDebug(QString("cleanHistory for: [%1] - %2").arg(aFeatures.size()).arg(anInfoStr).toStdString().c_str());
 #endif
 
-  // For dependencies, find main_list:
-  // sk_1(ext_1, vertex_1)
-  // ext_1(bool_1, sk_3)
-  // vertex_1()
-  // sk_2(ext_2)
-  // ext_2(bool_2)
-  // sk_3()
-  // Information: bool_1 is not selected
-  // find all referenced features
-  std::map<FeaturePtr, std::set<FeaturePtr> > aMainList;
-  foreach(ObjectPtr anObject, aFeatures) {
-    FeaturePtr aSelFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
-    /// composite ??? see refsDirectToFeatureInAllDocuments
-    /// other documents ???
-    if (aSelFeature.get()) {
-      DocumentPtr aSelFeatureDoc = aSelFeature->document();
-      std::set<FeaturePtr> aSelRefFeatures;
-      // 1. find references in the current document
-      aSelFeatureDoc->refsToFeature(aSelFeature, aSelRefFeatures, false/*do not emit signals*/);
-      //if (aMainList.find(aSelFeature) != aMainList.end())
-        aMainList[aSelFeature] = aSelRefFeatures;
-    }
-  }
-#ifdef DEBUG_CLEAN_HISTORY
-  printMapInfo(aMainList, "firstDependencies");
-#endif
-  // find all dependencies for each object:
-  // sk_1(ext_1, vertex_1) + (sk_3, bool_1)
-  // ext_1(bool_1, sk_3)
-  // vertex_1()
-  // sk_2(ext_2) + (bool_1)
-  // ext_2(bool_1)
-  // sk_3()
-  std::map<FeaturePtr, std::set<FeaturePtr> > anExtendedMainList;
-  std::map<FeaturePtr, std::set<FeaturePtr> >::const_iterator aMainIt = aMainList.begin(),
-                                                              aMainLast = aMainList.end();
-  for (; aMainIt != aMainLast; aMainIt++) {
-    FeaturePtr aMainListFeature = aMainIt->first;
-    //std::string aName = aMainListFeature->name();
-    std::set<FeaturePtr> aMainRefList = aMainIt->second;
-    std::set<FeaturePtr> anAddRefFeatures;
-    foreach (FeaturePtr aRefFeature, aMainRefList) {
-      addRefsToFeature(aRefFeature, aMainList, aMainRefList);
-    }
-    anExtendedMainList[aMainListFeature] = aMainRefList;
-  }
-
-#ifdef DEBUG_CLEAN_HISTORY
-  printMapInfo(anExtendedMainList, "allDependencies");
-#endif
+  std::map<FeaturePtr, std::set<FeaturePtr> > aReferences;
+  ModelAPI_Tools::findAllReferences(aFeatures, aReferences, true, false);
   // find for each object whether all reference values are in the map as key, that means that there is
   // no other reference in the model to this object, so it might be removed by cleaning history
   // sk_1(ext_1, vertex_1) + (sk_3, bool_1) - cann't be deleted, dependency to bool_1
@@ -1448,8 +1374,9 @@ void XGUI_Workshop::cleanHistory()
   // ext_2(bool_1)  - cann't be deleted, dependency to bool_1
   // sk_3()
   // Information: bool_1 is not selected
-  QList<ObjectPtr> anUnusedObjects;
-  aMainIt = anExtendedMainList.begin(), aMainLast = anExtendedMainList.end();
+  std::set<FeaturePtr> anUnusedObjects;
+  std::map<FeaturePtr, std::set<FeaturePtr> >::const_iterator aMainIt = aReferences.begin(),
+                                                              aMainLast = aReferences.end();
   for (; aMainIt != aMainLast; aMainIt++) {
     FeaturePtr aMainListFeature = aMainIt->first;
     std::set<FeaturePtr> aMainRefList = aMainIt->second;
@@ -1457,16 +1384,16 @@ void XGUI_Workshop::cleanHistory()
     bool aFeatureOutOfTheList = false;
     for (; aRefIt != aRefLast && !aFeatureOutOfTheList; aRefIt++) {
       FeaturePtr aRefFeature = *aRefIt;
-      aFeatureOutOfTheList = anExtendedMainList.find(aRefFeature) == anExtendedMainList.end();
+      aFeatureOutOfTheList = aReferences.find(aRefFeature) == aReferences.end();
     }
     if (!aFeatureOutOfTheList)
-      anUnusedObjects.append(aMainListFeature);
+      anUnusedObjects.insert(aMainListFeature);
   }
 
 #ifdef DEBUG_CLEAN_HISTORY
   anInfo.clear();
   for (aFIt = anUnusedObjects.begin(); aFIt != anUnusedObjects.end(); ++aFIt) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(*aFIt);
+    FeaturePtr aFeature = *aFIt;
     anInfo.append(aFeature->name().c_str());
   }
   qDebug(QString("unused objects: [%1] - %2").arg(anInfo.size()).arg(anInfo.join(";\t")).toStdString().c_str());
@@ -1475,10 +1402,10 @@ void XGUI_Workshop::cleanHistory()
   // warn about the references remove, break the delete operation if the user chose it
   if (!anUnusedObjects.empty()) {
     QStringList aNames;
-    foreach (const ObjectPtr& anObject, anUnusedObjects) {
-      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+    foreach (const FeaturePtr& aFeature, anUnusedObjects) {
       aNames.append(aFeature->name().c_str());
     }
+    aNames.sort();
     QString anUnusedNames = aNames.join(", ");
 
     QString anActionId = "CLEAN_HISTORY_CMD";
@@ -1507,7 +1434,7 @@ void XGUI_Workshop::cleanHistory()
     mySelector->clearSelection();
 
     std::set<FeaturePtr> anIgnoredFeatures;
-    if (removeFeatures(anUnusedObjects, anIgnoredFeatures, anActionId, true)) {
+    if (ModelAPI_Tools::removeFeatures(anUnusedObjects, true)) {
       operationMgr()->commitOperation();
     }
     else {
@@ -1572,107 +1499,13 @@ void XGUI_Workshop::moveObjects()
 }
 
 //**************************************************************
-bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theFeatures,
-                                   const std::set<FeaturePtr>& theIgnoredFeatures)
+bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theObjects)
 {
-  std::set<FeaturePtr> aDirectRefFeatures, aIndirectRefFeatures;
-  ModuleBase_Tools::findReferences(theFeatures, aDirectRefFeatures, aIndirectRefFeatures);
-  return deleteFeaturesInternal(theFeatures, aDirectRefFeatures, aIndirectRefFeatures,
-                                theIgnoredFeatures);
-}
+  std::map<FeaturePtr, std::set<FeaturePtr> > aReferences;
+  std::set<FeaturePtr> aFeatures;
+  ModuleBase_Tools::convertToFeatures(theObjects, aFeatures);
 
-bool XGUI_Workshop::deleteFeaturesInternal(const QObjectPtrList& theList,
-                                           const std::set<FeaturePtr>& aDirectRefFeatures,
-                                           const std::set<FeaturePtr>& aIndirectRefFeatures,
-                                           const std::set<FeaturePtr>& theIgnoredFeatures,
-                                           const bool doDeleteReferences)
-{
-  bool isDone = false;
-  if (doDeleteReferences) {
-    std::set<FeaturePtr> aFeaturesToDelete = aDirectRefFeatures;
-    aFeaturesToDelete.insert(aIndirectRefFeatures.begin(), aIndirectRefFeatures.end());
-    std::set<FeaturePtr>::const_iterator anIt = aFeaturesToDelete.begin(),
-                                         aLast = aFeaturesToDelete.end();
-#ifdef DEBUG_DELETE
-    QStringList anInfo;
-#endif
-    for (; anIt != aLast; anIt++) {
-      FeaturePtr aFeature = (*anIt);
-      DocumentPtr aDoc = aFeature->document();
-      if (theIgnoredFeatures.find(aFeature) == theIgnoredFeatures.end()) {
-        // flush REDISPLAY signal after remove feature
-        aDoc->removeFeature(aFeature);
-        isDone = true;
-#ifdef DEBUG_DELETE
-        anInfo.append(ModuleBase_Tools::objectInfo(aFeature).toStdString().c_str());
-#endif
-      }
-    }
-#ifdef DEBUG_DELETE
-    qDebug(QString("remove references:%1").arg(anInfo.join("; ")).toStdString().c_str());
-    anInfo.clear();
-#endif
-  }
-
-  QString anActionId = "DELETE_CMD";
-  isDone = removeFeatures(theList, theIgnoredFeatures, anActionId, false) || isDone;
-
-  if (isDone) {
-    // the redisplay signal should be flushed in order to erase the feature presentation in the viewer
-    // if should be done after removeFeature() of document
-    Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  }
-  return isDone;
-}
-
-//**************************************************************
-bool XGUI_Workshop::removeFeatures(const QObjectPtrList& theList,
-                                   const std::set<FeaturePtr>& theIgnoredFeatures,
-                                   const QString& theActionId,
-                                   const bool theFlushRedisplay)
-{
-  bool isDone = false;
-
-  QString anId = QString::fromStdString(theActionId.toStdString().c_str());
-  QStringList anObjectGroups = contextMenuMgr()->actionObjectGroups(anId);
-  // 4. remove the parameter features
-  foreach (ObjectPtr aObj, theList) {
-    // features and parameters can be removed here,
-    // the results are removed only by a corresponded feature remove
-    std::string aGroupName = aObj->groupName();
-    if (!anObjectGroups.contains(aGroupName.c_str()))
-      continue;
-
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-    if (aFeature) {
-      /*// TODO: to learn the workshop to delegate the Part object deletion to the PartSet module
-      // part features are removed in the PartSet module. This condition should be moved there
-      if (aFeature->getKind() == "Part")
-        continue;
-        */
-      DocumentPtr aDoc = aObj->document();
-      if (theIgnoredFeatures.find(aFeature) == theIgnoredFeatures.end()) {
-#ifdef DEBUG_DELETE
-        QString anInfoStr = ModuleBase_Tools::objectInfo(aFeature);
-        anInfo.append(anInfoStr);
-        qDebug(QString("remove feature :%1").arg(anInfoStr).toStdString().c_str());
-#endif
-        // flush REDISPLAY signal after remove feature
-        aDoc->removeFeature(aFeature);
-        isDone = true;
-      }
-    }
-  }
-  if (isDone && theFlushRedisplay) {
-    // the redisplay signal should be flushed in order to erase the feature presentation in the viewer
-    // if should be done after removeFeature() of document
-    Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  }
-
-#ifdef DEBUG_DELETE
-  qDebug(QString("remove features:%1").arg(anInfo.join("; ")).toStdString().c_str());
-#endif
-  return true;
+  return ModelAPI_Tools::removeFeaturesAndReferences(aFeatures);
 }
 
 bool hasResults(QObjectPtrList theObjects, const std::set<std::string>& theTypes)

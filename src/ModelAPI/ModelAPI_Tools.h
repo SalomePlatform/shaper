@@ -19,6 +19,8 @@
 #include <GeomAPI_Shape.h>
 
 #include <vector>
+#include <map>
+#include <set>
 
 namespace ModelAPI_Tools {
 /// Returns shape from the given Result object
@@ -98,6 +100,46 @@ MODELAPI_EXPORT bool hasSubResults(const ResultPtr& theResult);
 */
 MODELAPI_EXPORT void allResults(const FeaturePtr& theFeature, std::list<ResultPtr>& theResults);
 
+
+/*! Removes features from the document
+* \param theFeatures a list of features to be removed
+* \param theFlushRedisplay a boolean value if the redisplay signal should be flushed
+* \return true if at least one feature is removed
+*/
+MODELAPI_EXPORT bool removeFeaturesAndReferences(const std::set<FeaturePtr>& theFeatures,
+                                                 const bool theFlushRedisplay = false,
+                                                 const bool theUseComposite = false,
+                                                 const bool theUseRecursion = true);
+
+/*! Removes features from the document
+* \param theFeatures a list of features to be removed
+* \param theFlushRedisplay a boolean value if the redisplay signal should be flushed
+* \return true if at least one feature is removed
+*/
+MODELAPI_EXPORT bool removeFeatures(const std::set<FeaturePtr>& theFeatures,
+                                    const bool theFlushRedisplay);
+
+/*! Build a map of references for the given set of features
+* \param theFeatures a list of features
+* \param theReferences a map of all references to the features
+* \param theUseComposite state if the composite features of the reference should be in the map
+* \param theUseRecursion state if references for features out of the sources feature
+         list are put into the result container. E.g. if theFeatures contains "Sketch_2", map will
+         contain references to this feature also.
+*/
+MODELAPI_EXPORT void findAllReferences(const std::set<FeaturePtr>& theFeatures,
+                                       std::map<FeaturePtr, std::set<FeaturePtr> >& theReferences,
+                                       const bool theUseComposite = true,
+                                       const bool theUseRecursion = true);
+
+/*! In the map of references find all features referenced to the source feature
+* \param theFeatures a list of features to find references
+* \param theReferences a map of all references to the features
+* \param theFeaturesRefsTo an out list of referenced features
+*/
+MODELAPI_EXPORT void findRefsToFeatures(const std::set<FeaturePtr>& aFeatures,
+                                        const std::map<FeaturePtr, std::set<FeaturePtr> >& aReferences,
+                                        std::set<FeaturePtr>& aFeaturesRefsTo);
 }
 
 #endif

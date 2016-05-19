@@ -78,14 +78,8 @@ void PartSet_ExternalObjectsMgr::removeExternalObject(const ObjectPtr& theObject
     if (aFeature.get() != NULL) {
       QObjectPtrList anObjects;
       anObjects.append(aFeature);
-      // the external feature should be removed with all references, sketch feature should be ignored
-      std::set<FeaturePtr> anIgnoredFeatures;
-      // the current feature should be ignored, because it can use the external feature in the
-      // attributes and, therefore have a references to it. So, the delete functionality tries
-      // to delete this feature. Test case is creation of a constraint on external point,
-      // use in this control after an external point, the point of the sketch.
-      anIgnoredFeatures.insert(theFeature);
-      workshop(theWorkshop)->deleteFeatures(anObjects, anIgnoredFeatures);
+      // the external feature should be removed with all references, composite sketch feature will be ignored
+      workshop(theWorkshop)->deleteFeatures(anObjects);
     }
   }
 }

@@ -14,6 +14,52 @@
 #include <ModelAPI_AttributeDocRef.h>
 #include <list>
 #include <map>
+#include <iostream>
+
+#include <Events_Loop.h>
+#include <ModelAPI_Events.h>
+
+//#define DEBUG_REMOVE_FEATURES
+
+#ifdef DEBUG_REMOVE_FEATURES
+void printMapInfo(const std::map<FeaturePtr, std::set<FeaturePtr> >& theMainList,
+                  const std::string& thePrefix)
+{
+  std::map<FeaturePtr, std::set<FeaturePtr> >::const_iterator aMainIt = theMainList.begin(),
+                                                              aMainLast = theMainList.end();
+  std::string anInfo;
+  for (; aMainIt != aMainLast; aMainIt++) {
+    FeaturePtr aMainListFeature = aMainIt->first;
+    std::set<FeaturePtr> aMainRefList = aMainIt->second;
+    std::set<FeaturePtr>::const_iterator anIt = aMainRefList.begin(), aLast = aMainRefList.end();
+    std::string aRefsInfo;
+    for (; anIt != aLast; anIt++) {
+      aRefsInfo += (*anIt)->name().c_str();
+      if (anIt != aLast)
+        aRefsInfo += ", ";
+    }
+    if (!aRefsInfo.empty()) {
+      anInfo = anInfo + aMainListFeature->name().c_str() + ": " + aRefsInfo + "\n";
+    }
+  }
+  std::cout << thePrefix.c_str() << ": " << anInfo.c_str() << std::endl;
+}
+
+void printListInfo(const std::set<FeaturePtr>& theMainList,
+                  const std::string& thePrefix)
+{
+  std::set<FeaturePtr>::const_iterator aMainIt = theMainList.begin(),
+                                       aMainLast = theMainList.end();
+  std::string anInfo;
+  for (; aMainIt != aMainLast; aMainIt++) {
+    FeaturePtr aRefFeature = *aMainIt;
+    anInfo += aRefFeature->name().c_str();
+    if (aMainIt != aMainLast)
+      anInfo += ", ";
+  }
+  std::cout << thePrefix.c_str() << ": " << anInfo.c_str() << std::endl;
+}
+#endif
 
 namespace ModelAPI_Tools {
 
@@ -308,6 +354,196 @@ void allResults(const FeaturePtr& theFeature, std::list<ResultPtr>& theResults)
       for(int a = 0; a < aNumSub; a++) {
         theResults.push_back(aComp->subResult(a));
       }
+    }
+  }
+}
+
+bool removeFeaturesAndReferences(const std::set<FeaturePtr>& theFeatures,
+                                 const bool theFlushRedisplay,
+                                 const bool theUseComposite,
+                                 const bool theUseRecursion)
+{
+#ifdef DEBUG_REMOVE_FEATURES
+  printListInfo(theFeatures, "selection: ");
+#endif
+
+  std::map<FeaturePtr, std::set<FeaturePtr> > aReferences;
+  ModelAPI_Tools::findAllReferences(theFeatures, aReferences, theUseComposite, theUseRecursion);
+#ifdef DEBUG_REMOVE_FEATURES
+  printMapInfo(aReferences, "allDependencies: ");
+#endif
+
+  std::set<FeaturePtr> aFeaturesRefsTo;
+  ModelAPI_Tools::findRefsToFeatures(theFeatures, aReferences, aFeaturesRefsTo);
+#ifdef DEBUG_REMOVE_FEATURES
+  printListInfo(aFeaturesRefsTo, "references: ");
+#endif
+
+  std::set<FeaturePtr> aFeatures = theFeatures;
+  if (!aFeaturesRefsTo.empty())
+    aFeatures.insert(aFeaturesRefsTo.begin(), aFeaturesRefsTo.end());
+#ifdef DEBUG_REMOVE_FEATURES
+  printListInfo(aFeatures, "removeFeatures: ");
+#endif
+
+  return ModelAPI_Tools::removeFeatures(aFeatures, false);
+}
+
+bool removeFeatures(const std::set<FeaturePtr>& theFeatures,
+                    const bool theFlushRedisplay)
+{
+  bool isDone = false;
+  std::set<FeaturePtr>::const_iterator anIt = theFeatures.begin(),
+                                       aLast = theFeatures.end();
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aFeature = *anIt;
+    if (aFeature.get()) {
+      DocumentPtr aDoc = aFeature->document();
+      // flush REDISPLAY signal after remove feature
+      aDoc->removeFeature(aFeature);
+      isDone = true;
+    }
+  }
+  if (isDone && theFlushRedisplay) {
+    // the redisplay signal should be flushed in order to erase the feature presentation in the viewer
+    // if should be done after removeFeature() of document
+    Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  }
+  return true;
+}
+
+// Fills the references list by all references of the feature from the references map.
+// This is a recusive method to find references by next found feature in the map of references.
+// \param theFeature a feature to find references
+// \param theReferencesMap a map of references
+// \param theReferences an out container of references
+void addRefsToFeature(const FeaturePtr& theFeature,
+                      const std::map<FeaturePtr, std::set<FeaturePtr> >& theReferencesMap,
+                      std::set<FeaturePtr>& theReferences)
+{
+  if (theReferencesMap.find(theFeature) == theReferencesMap.end())
+    return; // this feature is not in the selection list, so exists without references to it
+  std::set<FeaturePtr> aMainReferences = theReferencesMap.at(theFeature);
+
+  std::set<FeaturePtr>::const_iterator anIt = aMainReferences.begin(),
+                                       aLast = aMainReferences.end();
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aRefFeature = *anIt;
+    if (theReferences.find(aRefFeature) == theReferences.end())
+      theReferences.insert(aRefFeature);
+    addRefsToFeature(aRefFeature, theReferencesMap, theReferences);
+  }
+}
+
+// For each feature from the feature list it searches references to the feature and append them
+// to the references map. This is a recusive method.
+// \param theFeature a feature to find references
+// \param theReferencesMap a map of references
+// \param theReferences an out container of references
+void findReferences(const std::set<FeaturePtr>& theFeatures,
+                    std::map<FeaturePtr, std::set<FeaturePtr> >& theReferences,
+                    const bool theUseComposite, const bool theUseRecursion)
+{
+  std::set<FeaturePtr>::const_iterator anIt = theFeatures.begin(),
+                                        aLast = theFeatures.end();
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aFeature = *anIt;
+    if (aFeature.get() && theReferences.find(aFeature) == theReferences.end()) {
+      DocumentPtr aSelFeatureDoc = aFeature->document();
+      std::set<FeaturePtr> aSelRefFeatures;
+      aSelFeatureDoc->refsToFeature(aFeature, aSelRefFeatures, false/*do not emit signals*/);
+      if (theUseComposite) { // do not filter selection
+        theReferences[aFeature] = aSelRefFeatures;
+      }
+      else { // filter references to skip composition features of the current feature
+        std::set<FeaturePtr> aFilteredFeatures;
+        std::set<FeaturePtr>::const_iterator anIt = aSelRefFeatures.begin(),
+                                             aLast = aSelRefFeatures.end();
+        for (; anIt != aLast; anIt++) {
+          FeaturePtr aCFeature = *anIt;
+          CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCFeature);
+          if (aComposite.get() && aComposite->isSub(aFeature))
+            continue; /// composite of the current feature should be skipped
+          aFilteredFeatures.insert(aCFeature);
+        }
+        theReferences[aFeature] = aFilteredFeatures;
+      }
+      if (theUseRecursion)
+        findReferences(aSelRefFeatures, theReferences, theUseComposite, theUseRecursion);
+    }
+  }
+}
+
+void findAllReferences(const std::set<FeaturePtr>& theFeatures,
+                       std::map<FeaturePtr, std::set<FeaturePtr> >& theReferences,
+                       const bool theUseComposite,
+                       const bool theUseRecursion)
+{
+  // For dependencies, find main_list:
+  // sk_1(ext_1, vertex_1)
+  // ext_1(bool_1, sk_3)
+  // vertex_1()
+  // sk_2(ext_2)
+  // ext_2(bool_2)
+  // sk_3()
+  // Information: bool_1 is not selected, ext_2(bool_2) exists
+  // find all referenced features
+  std::map<FeaturePtr, std::set<FeaturePtr> > aMainList;
+  findReferences(theFeatures, aMainList, theUseComposite, theUseRecursion);
+
+#ifdef DEBUG_REMOVE_FEATURES
+  printMapInfo(aMainList, "firstDependencies");
+#endif
+  // find all dependencies for each object:
+  // sk_1(ext_1, vertex_1) + (sk_3, bool_1)
+  // ext_1(bool_1, sk_3)
+  // vertex_1()
+  // sk_2(ext_2) + (bool_1)
+  // ext_2(bool_1)
+  // sk_3()
+  std::map<FeaturePtr, std::set<FeaturePtr> >::const_iterator aMainIt = aMainList.begin(),
+                                                              aMainLast = aMainList.end();
+  for (; aMainIt != aMainLast; aMainIt++) {
+    FeaturePtr aMainListFeature = aMainIt->first;
+    //std::string aName = aMainListFeature->name();
+    std::set<FeaturePtr> aMainRefList = aMainIt->second;
+    std::set<FeaturePtr> anAddRefFeatures;
+
+    std::set<FeaturePtr>::const_iterator anIt = aMainRefList.begin(),
+                                         aLast = aMainRefList.end();
+    for (; anIt != aLast; anIt++) {
+      FeaturePtr aFeature = *anIt;
+      addRefsToFeature(aFeature, aMainList, aMainRefList);
+    }
+    theReferences[aMainListFeature] = aMainRefList;
+  }
+
+#ifdef DEBUG_REMOVE_FEATURES
+  printMapInfo(theReferences, "allDependencies");
+#endif
+}
+
+void findRefsToFeatures(const std::set<FeaturePtr>& theFeatures,
+                        const std::map<FeaturePtr, std::set<FeaturePtr> >& theReferences,
+                        std::set<FeaturePtr>& theFeaturesRefsTo)
+{
+  std::set<FeaturePtr>::const_iterator anIt = theFeatures.begin(),
+                                       aLast = theFeatures.end();
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aFeature = *anIt;
+    if (theReferences.find(aFeature) == theReferences.end())
+      continue;
+    std::set<FeaturePtr> aRefList = theReferences.at(aFeature);
+    std::set<FeaturePtr>::const_iterator aRefIt = aRefList.begin(), aRefLast = aRefList.end();
+    for (; aRefIt != aRefLast; aRefIt++) {
+      FeaturePtr aRefFeature = *aRefIt;
+      CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aRefFeature);
+      if (aComposite.get() && aComposite->isSub(aFeature))
+        continue; /// composite of the current feature should not be removed
+
+      if (theFeatures.find(aRefFeature) == theFeatures.end() && // it is not selected
+          theFeaturesRefsTo.find(aRefFeature) == theFeaturesRefsTo.end()) // it is not added
+        theFeaturesRefsTo.insert(aRefFeature);
     }
   }
 }

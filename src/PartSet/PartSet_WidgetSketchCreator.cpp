@@ -404,7 +404,7 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
       anObjects.append(aSketchFeature);
 
       XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myModule->workshop());
-      aWorkshop->deleteFeatures(anObjects, std::set<FeaturePtr>());
+      aWorkshop->deleteFeatures(anObjects);
 
       aMgr->finishOperation();
 #endif
