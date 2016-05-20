@@ -238,10 +238,10 @@ bool FeaturesPlugin_CompositeSketch::isMakeShapeValid(const std::shared_ptr<Geom
 //=================================================================================================
 void FeaturesPlugin_CompositeSketch::storeResult(const GeomShapePtr theBaseShape,
                                                  const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
-                                                 const int theResultIndex)
+                                                 const int theIndex)
 {
   // Create result body.
-  ResultBodyPtr aResultBody = document()->createBody(data(), theResultIndex);
+  ResultBodyPtr aResultBody = document()->createBody(data(), theIndex);
 
   // Store generated shape.
   aResultBody->storeGenerated(theBaseShape, theMakeShape->shape());
@@ -250,7 +250,7 @@ void FeaturesPlugin_CompositeSketch::storeResult(const GeomShapePtr theBaseShape
   int aGenTag = 1;
   storeGenerationHistory(aResultBody, theBaseShape, theMakeShape, aGenTag);
 
-  setResult(aResultBody, theResultIndex);
+  setResult(aResultBody, theIndex);
 }
 
 //=================================================================================================

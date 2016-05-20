@@ -5,6 +5,6 @@
     tooltip="Select a set of objects"
     type_choice="Vertices Edges Faces Solids"
     use_choice="true">
-    <validator id="GeomValidators_BodyShapes" parameters="Sketch"/>
+    <validator id="GeomValidators_BodyShapes"/>
   </multi_selector>
 </source>

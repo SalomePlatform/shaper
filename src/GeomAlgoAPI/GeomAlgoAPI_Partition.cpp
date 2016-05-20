@@ -66,24 +66,15 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
   TopoDS_Shape aResult = anOperation->Shape();
 
   if(aResult.ShapeType() == TopAbs_COMPOUND) {
-    aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
-  }
-  if(aResult.ShapeType() == TopAbs_COMPOUND) {
     std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
     aGeomShape->setImpl(new TopoDS_Shape(aResult));
-    ListOfShape aCompSolids, aFreeSolids;
-    aGeomShape = GeomAlgoAPI_ShapeTools::combineShapes(aGeomShape,
-                                                       GeomAPI_Shape::COMPSOLID,
-                                                       aCompSolids,
-                                                       aFreeSolids);
-    aResult = aGeomShape->impl<TopoDS_Shape>();
+    aResult = GeomAlgoAPI_ShapeTools::groupSharedTopology(aGeomShape)->impl<TopoDS_Shape>();
   }
 
   // Setting result.
   if(aResult.IsNull()) {
     return;
   }
-  aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
   std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
   aShape->setImpl(new TopoDS_Shape(aResult));
   this->setShape(aShape);

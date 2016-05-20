@@ -302,7 +302,7 @@ bool BuildPlugin_ValidatorSubShapesSelection::isValid(const AttributePtr& theAtt
     }
 
     // Check that shape inside wire or face.
-    if(!GeomAlgoAPI_ShapeTools::isSubShapeInShape(aShapeInList, aBaseShape)) {
+    if(!GeomAlgoAPI_ShapeTools::isSubShapeInsideShape(aShapeInList, aBaseShape)) {
       theError = "Selected shape is not inside base face.";
       return false;
     }

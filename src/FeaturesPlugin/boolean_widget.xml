@@ -4,7 +4,7 @@
   <module_choice id="bool_type"
     widget_type="radiobuttons"
     buttons_dir="horizontal"
-    label="Operation type" 
+    label="Operation type"
     tooltip="Type of boolean operation"
     string_list="Cut Fuse Common Fill Smash"
     use_in_title="true"
@@ -19,7 +19,7 @@
     use_choice="false"
     concealment="true">
     <validator id="PartSet_DifferentObjects"/>
-    <validator id="FeaturesPlugin_BooleanSelection"/>
+    <validator id="FeaturesPlugin_ValidatorBooleanSelection"/>
   </multi_selector>
   <multi_selector id="tool_objects"
     label="Tool objects"
@@ -29,7 +29,7 @@
     use_choice="false"
     concealment="true" >
     <validator id="PartSet_DifferentObjects"/>
-    <validator id="FeaturesPlugin_BooleanSelection"/>
+    <validator id="FeaturesPlugin_ValidatorBooleanSelection"/>
   </multi_selector>
   <validator id="GeomValidators_BooleanArguments" parameters="main_objects,tool_objects,bool_type"/>
 </source>

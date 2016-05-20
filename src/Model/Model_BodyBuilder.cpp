@@ -370,13 +370,14 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
   GeomAPI_DataMapOfShapeShape& theSubShapes,
   const bool theIsStoreSeparate)
 {
+  int anIndex = 1;
   int aTag = theTag;
+  bool isBuilt = !theName.empty();
   std::string aName = theName;
   std::ostringstream aStream;
-  int anIndex = 1;
+  GeomShapePtr aResultShape = shape();
   TopoDS_Shape aShapeIn = theShapeIn->impl<TopoDS_Shape>();
   TopTools_MapOfShape aView;
-  bool isBuilt = theName.empty();
   TopExp_Explorer aShapeExplorer (aShapeIn, (TopAbs_ShapeEnum)theKindOfShape);
   for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
@@ -387,14 +388,14 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
     theMS->modified(aRShape, aList);
     std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aList.begin(), aLast = aList.end();
     for (; anIt != aLast; anIt++) {
-      TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>(); 	  
+      TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>();
       if (theSubShapes.isBound(*anIt)) {
         std::shared_ptr<GeomAPI_Shape> aMapShape(theSubShapes.find(*anIt));
         aNewShape.Orientation(aMapShape->impl<TopoDS_Shape>().Orientation());
       }
-      if (!aRoot.IsSame (aNewShape)) {
+      if(!aRoot.IsSame(aNewShape) && aResultShape->isSubShape(*anIt)) {
         builder(aTag)->Modify(aRoot,aNewShape);
-        if(!isBuilt) {
+        if(isBuilt) {
           if(theIsStoreSeparate) {
             aStream.str(std::string());
             aStream.clear();

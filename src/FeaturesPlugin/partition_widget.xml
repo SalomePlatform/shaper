@@ -1,28 +1,12 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <multi_selector id="main_objects"
-    label="Main objects"
-    icon="icons/Features/cut_shape.png"
-    tooltip="Select solid objects"
-    type_choice="Solids"
+  <multi_selector id="base_objects"
+    label="Base objects:"
+    tooltip="Select objects for partitioning."
+    type_choice="objects"
     concealment="true">
-    <validator id="PartSet_DifferentObjects"/>
-    <validator id="GeomValidators_ShapeType" parameters="solid"/>
+    <validator id="FeaturesPlugin_ValidatorPartitionSelection"/>
   </multi_selector>
-  <multi_selector id="tool_objects"
-    label="Tool objects"
-    icon="icons/Features/cut_tool.png"
-    tooltip="Select a tool face or solid"
-    type_choice="Faces Solids"
-    use_choice="false"
-    concealment="true">
-    <validator id="PartSet_DifferentObjects"/>
-    <validator id="GeomValidators_ShapeType" parameters="solid,plane,empty"/>
-  </multi_selector>
-  <boolvalue id="partition_combine"
-    label="Combine results"
-    default="true"
-    tooltip="If True combines all results to one. If False builds separate result for each object."/>
-  <validator id="GeomValidators_PartitionArguments" parameters="main_objects,tool_objects,partition_combine"/>
+  <!--<validator id="GeomValidators_PartitionArguments" parameters="main_objects,tool_objects,partition_combine"/>-->
 </source>

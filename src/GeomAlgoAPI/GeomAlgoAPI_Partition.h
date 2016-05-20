@@ -21,6 +21,8 @@ public:
   /// \brief Creates common partition operation.
   /// \param[in] theObjects the main shape.
   /// \param[in] theTools  second shape.
+  /// \param[in] theGroupConnectedTopology if true then result will be a compound of groups
+  ///            with connected topology(compsolids or compounds of shapes with shared topology).
   /// \return a solid as result of operation.
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> make(const ListOfShape& theObjects,
                                                                 const ListOfShape& theTools);

@@ -23,6 +23,8 @@
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
+#include <GeomAPI_ShapeIterator.h>
+
 #include <sstream>
 
 //=================================================================================================
@@ -33,185 +35,132 @@ FeaturesPlugin_Partition::FeaturesPlugin_Partition()
 //=================================================================================================
 void FeaturesPlugin_Partition::initAttributes()
 {
-  AttributeSelectionListPtr aSelection =
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
-    FeaturesPlugin_Partition::OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
-  aSelection->setSelectionType("SOLID");
-
-  aSelection =
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
-    FeaturesPlugin_Partition::TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
-  aSelection->setSelectionType("SOLID");
-
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TOOL_LIST_ID());
-
-  data()->addAttribute(COMBINE_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
 }
 
 //=================================================================================================
 void FeaturesPlugin_Partition::execute()
 {
-  ListOfShape anObjects, aTools, aToolsForNaming;
+  ListOfShape anObjects, aPlanes;
 
   // Getting objects.
-  AttributeSelectionListPtr anObjectsSelList = selectionList(FeaturesPlugin_Partition::OBJECT_LIST_ID());
-  for (int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr = anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if (!anObject.get()) {
-      return;
+  AttributeSelectionListPtr anObjectsSelList = selectionList(BASE_OBJECTS_ID());
+  for(int anIndex = 0; anIndex < anObjectsSelList->size(); ++anIndex) {
+    AttributeSelectionPtr anObjectAttr = anObjectsSelList->value(anIndex);
+    GeomShapePtr anObject = anObjectAttr->value();
+    if(!anObject.get()) {
+      // It could be a construction plane.
+      ResultPtr aContext = anObjectAttr->context();
+      aPlanes.push_back(anObjectAttr->context()->shape());
+    } else {
+      anObjects.push_back(anObject);
     }
-    anObjects.push_back(anObject);
   }
-
-  GeomAlgoAPI_MakeShapeList aMakeShapeList;
   std::list<std::shared_ptr<GeomAPI_Pnt> > aBoundingPoints = GeomAlgoAPI_ShapeTools::getBoundingBox(anObjects, 1.0);
 
-  // Getting tools.
-  AttributeSelectionListPtr aToolsSelList = selectionList(FeaturesPlugin_Partition::TOOL_LIST_ID());
-  for (int aToolsIndex = 0; aToolsIndex < aToolsSelList->size(); aToolsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> aToolAttr = aToolsSelList->value(aToolsIndex);
-    std::shared_ptr<GeomAPI_Shape> aTool = aToolAttr->value();
-    if(!aTool.get()) {
-      // it could be a construction plane
-      ResultPtr aContext = aToolAttr->context();
-      if(aContext.get()) {
-        aTool = GeomAlgoAPI_ShapeTools::fitPlaneToBox(aContext->shape(), aBoundingPoints);
-        std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMkShCustom(new GeomAlgoAPI_MakeShapeCustom);
-        aMkShCustom->addModified(aContext->shape(), aTool);
-        aMakeShapeList.appendAlgo(aMkShCustom);
-        aTools.push_back(aTool);
-        aToolsForNaming.push_back(aContext->shape());
-      }
-    } else {
-      aTools.push_back(aTool);
-      aToolsForNaming.push_back(aTool);
-    }
+  // Resize planes.
+  ListOfShape aTools;
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
+  for(ListOfShape::const_iterator anIt = aPlanes.cbegin(); anIt != aPlanes.cend(); ++anIt) {
+    GeomShapePtr aPlane = *anIt;
+    GeomShapePtr aTool = GeomAlgoAPI_ShapeTools::fitPlaneToBox(aPlane, aBoundingPoints);
+    std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMkShCustom(new GeomAlgoAPI_MakeShapeCustom);
+    aMkShCustom->addModified(aPlane, aTool);
+    aMakeShapeList->appendAlgo(aMkShCustom);
+    aTools.push_back(aTool);
   }
 
-  // Getting combine flag.
-  bool isCombine = boolean(COMBINE_ID())->value();
+  // Create single result.
+  std::shared_ptr<GeomAlgoAPI_Partition> aPartitionAlgo(new GeomAlgoAPI_Partition(anObjects, aTools));
 
-  if(anObjects.empty()/* || aTools.empty()*/) {
-    std::string aFeatureError = "Error: Not enough objects for partition operation.";
+  // Checking that the algorithm worked properly.
+  if (!aPartitionAlgo->isDone()) {
+    static const std::string aFeatureError = "Error: Partition algorithm failed.";
     setError(aFeatureError);
     return;
   }
+  if (aPartitionAlgo->shape()->isNull()) {
+    static const std::string aShapeError = "Error: Resulting shape is Null.";
+    setError(aShapeError);
+    return;
+  }
+  if (!aPartitionAlgo->isValid()) {
+    std::string aFeatureError = "Error: Resulting shape is not valid.";
+    setError(aFeatureError);
+    return;
+  }
+  aMakeShapeList->appendAlgo(aPartitionAlgo);
+  GeomShapePtr aResultShape = aPartitionAlgo->shape();
 
   int aResultIndex = 0;
-
-  if(isCombine) {
-    // Create single result.
-    //if(!aTools.empty()) {
-    //  // This is a workaround for naming. Passing compound of objects as argument instead each object separately.
-    //  std::shared_ptr<GeomAPI_Shape> aCompoud = GeomAlgoAPI_CompoundBuilder::compound(anObjects);
-    //  anObjects.clear();
-    //  anObjects.push_back(aCompoud);
-    //}
-    std::shared_ptr<GeomAlgoAPI_Partition> aPartitionAlgo(new GeomAlgoAPI_Partition(anObjects, aTools));
-
-    // Checking that the algorithm worked properly.
-    if (!aPartitionAlgo->isDone()) {
-      static const std::string aFeatureError = "Error: Partition algorithm failed.";
-      setError(aFeatureError);
-      return;
-    }
-    if (aPartitionAlgo->shape()->isNull()) {
-      static const std::string aShapeError = "Error: Resulting shape is Null.";
-      setError(aShapeError);
-      return;
-    }
-    if (!aPartitionAlgo->isValid()) {
-      std::string aFeatureError = "Error: Resulting shape is not valid.";
-      setError(aFeatureError);
-      return;
-    }
-
-    if (GeomAlgoAPI_ShapeTools::volume(aPartitionAlgo->shape()) > 1.e-27) {
-      std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-      aMakeShapeList.appendAlgo(aPartitionAlgo);
-      GeomAPI_DataMapOfShapeShape& aMapOfShapes = *aPartitionAlgo->mapOfSubShapes().get();
-      std::shared_ptr<GeomAPI_Shape> aBaseShape = anObjects.front();
-      anObjects.pop_front();
-      aToolsForNaming.insert(aToolsForNaming.end(), anObjects.begin(), anObjects.end());
-      loadNamingDS(aResultBody, aBaseShape, aToolsForNaming, aPartitionAlgo->shape(), aMakeShapeList, aMapOfShapes);
-      setResult(aResultBody, aResultIndex);
-      aResultIndex++;
+  anObjects.insert(anObjects.end(), aPlanes.begin(), aPlanes.end());
+  if(aResultShape->shapeType() == GeomAPI_Shape::COMPOUND) {
+    for(GeomAPI_ShapeIterator anIt(aResultShape); anIt.more(); anIt.next()) {
+      storeResult(anObjects, anIt.current(), aMakeShapeList, aResultIndex);
+      ++aResultIndex;
     }
   } else {
-    // Create result for each object.
-    for (ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end(); anObjectsIt++) {
-      std::shared_ptr<GeomAPI_Shape> anObject = *anObjectsIt;
-      ListOfShape aListWithObject; aListWithObject.push_back(anObject);
-      std::shared_ptr<GeomAlgoAPI_Partition> aPartitionAlgo(new GeomAlgoAPI_Partition(aListWithObject, aTools));
-
-      // Checking that the algorithm worked properly.
-      if (!aPartitionAlgo->isDone()) {
-        static const std::string aFeatureError = "Error: Partition algorithm failed.";
-        setError(aFeatureError);
-        return;
-      }
-      if (aPartitionAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Error: Resulting shape is Null.";
-        setError(aShapeError);
-        return;
-      }
-      if (!aPartitionAlgo->isValid()) {
-        std::string aFeatureError = "Error: Resulting shape is not valid.";
-        setError(aFeatureError);
-        return;
-      }
-
-      if (GeomAlgoAPI_ShapeTools::volume(aPartitionAlgo->shape()) > 1.e-27) {
-        std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-        GeomAlgoAPI_MakeShapeList aMakeShapeListCopy = aMakeShapeList;
-        aMakeShapeListCopy.appendAlgo(aPartitionAlgo);
-        GeomAPI_DataMapOfShapeShape aMapOfShapes = *aPartitionAlgo->mapOfSubShapes().get();
-        loadNamingDS(aResultBody, anObject, aToolsForNaming, aPartitionAlgo->shape(), aMakeShapeListCopy, aMapOfShapes);
-        setResult(aResultBody, aResultIndex);
-        aResultIndex++;
-      }
-    }
+    storeResult(anObjects, aResultShape, aMakeShapeList, aResultIndex);
+    ++aResultIndex;
   }
 
-  // remove the rest results if there were produced in the previous pass
+  // Remove the rest results if there were produced in the previous pass.
   removeResults(aResultIndex);
 }
 
 //=================================================================================================
-void FeaturesPlugin_Partition::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                            const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                            const ListOfShape& theTools,
-                                            const std::shared_ptr<GeomAPI_Shape> theResultShape,
-                                            GeomAlgoAPI_MakeShape& theMakeShape,
-                                            GeomAPI_DataMapOfShapeShape& theMapOfShapes)
+void FeaturesPlugin_Partition::storeResult(const ListOfShape& theObjects,
+                                           const GeomShapePtr theResultShape,
+                                           const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+                                           const int theIndex)
 {
-  //load result
-  if(theBaseShape->isEqual(theResultShape)) {
-    theResultBody->store(theResultShape);
-  } else {
-    const int aDeletedTag = 1;
-    const int aSubsolidsTag = 2; /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
-    const int aModifyTag = 100000;
-    int aModifyToolsTag = 200000;
-    std::ostringstream aStream;
-
-    theResultBody->storeModified(theBaseShape, theResultShape, aSubsolidsTag);
-
-    std::string aModName = "Modified";
-    theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE,
-                                               aModifyTag, aModName, theMapOfShapes, true);
-    theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE, aDeletedTag);
-
-    int anIndex = 1;
-    for(ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
-      aStream.str(std::string());
-      aStream.clear();
-      aStream << aModName << "_" << anIndex++;
-      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE,
-                                                 aModifyToolsTag, aStream.str(), theMapOfShapes, true);
-      theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
-      aModifyToolsTag += 10000;
+  // Find base.
+  GeomShapePtr aBaseShape;
+  for(ListOfShape::const_iterator anIt = theObjects.cbegin(); anIt != theObjects.cend(); ++anIt) {
+    GeomShapePtr anObjectShape = *anIt;
+    ListOfShape aModifiedShapes;
+    theMakeShape->modified(anObjectShape, aModifiedShapes);
+    for(ListOfShape::const_iterator aModIt = aModifiedShapes.cbegin(); aModIt != aModifiedShapes.cend(); ++aModIt) {
+      GeomShapePtr aModShape = *aModIt;
+      if(theResultShape->isSubShape(aModShape)) {
+        aBaseShape = anObjectShape;
+        break;
+      }
+    }
+    if(aBaseShape.get()) {
+      break;
     }
   }
+
+  // Create result body.
+  ResultBodyPtr aResultBody = document()->createBody(data(), theIndex);
+
+  // Store modified shape.
+  if(aBaseShape->isEqual(theResultShape)) {
+    aResultBody->store(theResultShape);
+    return;
+  }
+
+  const int aDelTag = 1;
+  const int aSubTag = 2; /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
+  int aModTag = aSubTag + 10000;
+  const std::string aModName = "Modified";
+
+  aResultBody->storeModified(aBaseShape, theResultShape, aSubTag);
+
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfSubShapes = theMakeShape->mapOfSubShapes();
+  int anIndex = 1;
+  for(ListOfShape::const_iterator anIt = theObjects.cbegin(); anIt != theObjects.cend(); ++anIt) {
+    std::ostringstream aStream;
+    aStream << aModName << "_" << anIndex++;
+    aResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::EDGE,
+                                             aModTag, aStream.str(), *aMapOfSubShapes.get(), true);
+    aResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::FACE,
+                                             aModTag, aStream.str(), *aMapOfSubShapes.get(), true);
+    aResultBody->loadDeletedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::EDGE, aDelTag);
+    aResultBody->loadDeletedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::FACE, aDelTag);
+    aModTag += 10000;
+  }
+
+  setResult(aResultBody, theIndex);
 }

@@ -44,8 +44,10 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorPipeLocations);
   aFactory->registerValidator("FeaturesPlugin_ValidatorCanBeEmpty",
                               new FeaturesPlugin_ValidatorCanBeEmpty);
-  aFactory->registerValidator("FeaturesPlugin_BooleanSelection",
-                              new FeaturesPlugin_BooleanSelection);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorBooleanSelection",
+                              new FeaturesPlugin_ValidatorBooleanSelection);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorPartitionSelection",
+                              new FeaturesPlugin_ValidatorPartitionSelection);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

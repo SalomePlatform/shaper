@@ -87,26 +87,26 @@ private:
                           std::string& theError) const;
 };
 
-/// \class FeaturesPlugin_ValidatorBaseForWire
-/// \ingroup Validators
-/// \brief A validator for selection base shapes for wire. Allows to select edges on sketch and
-/// wires objects that are connected to already selected shapes.
-class FeaturesPlugin_ValidatorBaseForWire: public ModelAPI_AttributeValidator
-{
-public:
-  //! Returns true if attribute is ok.
-  //! \param[in] theAttribute the checked attribute.
-  //! \param[in] theArguments arguments of the attribute.
-  //! \param[out] theError error message.
-   virtual bool isValid(const AttributePtr& theAttribute,
-                        const std::list<std::string>& theArguments,
-                        std::string& theError) const;
-};
-
-/// \class FeaturesPlugin_BooleanSelection
+/// \class FeaturesPlugin_ValidatorBooleanSelection
 /// \ingroup Validators
 /// \brief Validates selection for boolean operation.
-class FeaturesPlugin_BooleanSelection: public ModelAPI_AttributeValidator
+class FeaturesPlugin_ValidatorBooleanSelection: public ModelAPI_AttributeValidator
+{
+public:
+  /// \return True if the attribute is valid. It checks whether the selection
+  /// is acceptable for boolean operation.
+  /// \param[in] theAttribute an attribute to check.
+  /// \param[in] theArguments a filter parameters.
+  /// \param[out] theError error message.
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
+};
+
+/// \class FeaturesPlugin_ValidatorPartitionSelection
+/// \ingroup Validators
+/// \brief Validates selection for partition.
+class FeaturesPlugin_ValidatorPartitionSelection: public ModelAPI_AttributeValidator
 {
 public:
   /// \return True if the attribute is valid. It checks whether the selection

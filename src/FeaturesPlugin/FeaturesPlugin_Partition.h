@@ -14,39 +14,26 @@
 
 /// \class FeaturesPlugin_Partition
 /// \ingroup Plugins
-/// \brief Feature for applying of Partition operations on Solids. Partition makes conjunctional
+/// \brief Feature for applying of Partition operations on Shapes. Partition makes conjunctional
 /// faces of solids as shared. The result of partitions is a compsolid.
-/// Main objects are solids, tool objects are solids or faces
 class FeaturesPlugin_Partition : public ModelAPI_Feature
 {
 public:
-  /// Extrusion kind
+  /// Feature kind.
   inline static const std::string& ID()
   {
     static const std::string MY_ID("Partition");
     return MY_ID;
   }
-  /// attribute name of referenced object
-  inline static const std::string& OBJECT_LIST_ID()
+
+  /// Attribute name of base objects.
+  inline static const std::string& BASE_OBJECTS_ID()
   {
-    static const std::string MY_OBJECT_LIST_ID("main_objects");
-    return MY_OBJECT_LIST_ID;
-  }
-  /// attribute name of tool object
-  inline static const std::string& TOOL_LIST_ID()
-  {
-    static const std::string MY_TOOL_LIST_ID("tool_objects");
-    return MY_TOOL_LIST_ID;
+    static const std::string MY_BASE_OBJECTS_ID("base_objects");
+    return MY_BASE_OBJECTS_ID;
   }
 
-  /// attribute name of combine flag
-  inline static const std::string& COMBINE_ID()
-  {
-    static const std::string MY_COMBINE_ID("partition_combine");
-    return MY_COMBINE_ID;
-  }
-
-  /// Returns the kind of a feature
+  /// \return the kind of a feature.
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
   {
     static std::string MY_KIND = FeaturesPlugin_Partition::ID();
@@ -63,14 +50,11 @@ public:
   FeaturesPlugin_Partition();
 
 private:
-  /// Load Naming data structure of the feature to the document
-  void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                    const ListOfShape& theTools,
-                    const std::shared_ptr<GeomAPI_Shape> theResultShape,
-                    GeomAlgoAPI_MakeShape& theMakeShape,
-                    GeomAPI_DataMapOfShapeShape& theMapOfShapes);
-
+  /// Stores result of generation.
+  void storeResult(const ListOfShape& theObjects,
+                   const GeomShapePtr theResultShape,
+                   const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+                   const int theIndex = 0);
 };
 
 #endif
