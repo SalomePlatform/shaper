@@ -12,21 +12,22 @@ aFeature.real("x").setValue(1.)
 aFeature.real("y").setValue(-1.)
 aFeature.real("z").setValue(0.)
 aFeatureName = aFeature.name()
-assert(aFeatureName == "Point_1")
+# "2" is because Origin is the first point
+assert(aFeatureName == "Point_2")
 
 aFeature.execute()
 aSession.finishOperation()
 
-assert(aDoc.size("Construction") == 1)
+assert(aDoc.size("Construction") == 8)
 assert(aSession.canUndo())
 assert(not aSession.canRedo())
 
 aSession.undo()
-assert(aDoc.size("Construction") == 0)
+assert(aDoc.size("Construction") == 7)
 assert(not aSession.canUndo())
 assert(aSession.canRedo())
 
 aSession.redo()
-assert(aDoc.size("Construction") == 1)
+assert(aDoc.size("Construction") == 8)
 assert(aSession.canUndo())
 assert(not aSession.canRedo())

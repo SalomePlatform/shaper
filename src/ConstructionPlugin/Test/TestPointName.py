@@ -14,7 +14,8 @@ aFeatureName = aFeature.name()
 aFeature.execute()
 aSession.finishOperation()
 
-aFeature1 = aDoc.object("Construction", 0)
+# with index "0" is Origin and then - all default constructions
+aFeature1 = aDoc.object("Construction", 7)
 aFeature1Name = aFeature1.data().name()
 
 assert (aFeatureName == aFeature1Name)

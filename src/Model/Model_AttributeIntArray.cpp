@@ -34,7 +34,7 @@ void Model_AttributeIntArray::setSize(const int theSize)
 {
   if (myArray.IsNull() || !myArray->IsValid()) { // create array if it is not done yet
     if (theSize != 0) { // if size is zero, nothing to do (null array means there is no array)
-      myArray = TDataStd_IntegerArray::Set(myLab, 0, theSize);
+      myArray = TDataStd_IntegerArray::Set(myLab, 0, theSize - 1);
       owner()->data()->sendAttributeUpdated(this);
     }
   } else { // reset the old array

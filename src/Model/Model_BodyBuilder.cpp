@@ -8,7 +8,6 @@
 
 #include <Model_Data.h>
 #include <Model_Document.h>
-#include <ModelAPI_AttributeIntArray.h>
 #include <TNaming_Builder.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Iterator.hxx>

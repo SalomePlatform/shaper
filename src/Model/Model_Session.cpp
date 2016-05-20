@@ -189,6 +189,8 @@ std::shared_ptr<ModelAPI_Document> Model_Session::moduleDocument()
   Handle(Model_Application) anApp = Model_Application::getApplication();
   bool aFirstCall = !anApp->hasRoot();
   if (aFirstCall) {
+    // to be sure that plugins are loaded, even before the first "createFeature" call (in unit tests)
+    LoadPluginsInfo();
     // creation of the root document is always outside of the transaction, so, avoid checking it
     setCheckTransactions(false);
     anApp->createDocument(0); // 0 is a root ID

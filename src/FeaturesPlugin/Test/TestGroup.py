@@ -238,6 +238,7 @@ assert(aSelectionListAttr.size() == 1)
 assert(len(aGroupFeature.results()) > 0)
 aGroupResult = aGroupFeature.firstResult()
 assert(aGroupResult)
+assert(aGroupResult.shape())
 #=========================================================================
 # End of test
 #=========================================================================
