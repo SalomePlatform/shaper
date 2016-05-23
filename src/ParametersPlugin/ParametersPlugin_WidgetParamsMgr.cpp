@@ -297,7 +297,8 @@ void ParametersPlugin_WidgetParamsMgr::updateParametersFeatures()
 
 void ParametersPlugin_WidgetParamsMgr::updateFeaturesPart()
 {
-  updateItem(myFeatures, featuresItems(myParametersList));
+  QList<FeaturePtr> aFeatureList;
+  updateItem(myFeatures, featuresItems(myParametersList, aFeatureList));
 }
 
 void ParametersPlugin_WidgetParamsMgr::updateParametersPart()
@@ -309,11 +310,10 @@ void ParametersPlugin_WidgetParamsMgr::updateParametersPart()
 
 
 QList<QStringList> ParametersPlugin_WidgetParamsMgr::
-  featuresItems(const QList<FeaturePtr>& theFeatures) const
+  featuresItems(const QList<FeaturePtr>& theFeatures, QList<FeaturePtr>& theFeatureList) const
 {
   QList<QStringList> aItemsList;
   ResultParameterPtr aParam;
-  QList<FeaturePtr> aFeatures;
   foreach(FeaturePtr aParameter, theFeatures) {
     aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aParameter->firstResult());
     const std::set<std::shared_ptr<ModelAPI_Attribute>>& aRefs = aParam->data()->refsToMe();
@@ -326,10 +326,10 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
           // Find referenced feature Recursive
           QList<FeaturePtr> aList;
           aList.append(aReferenced);
-          QList<QStringList> aItems = featuresItems(aList);
+          QList<QStringList> aItems = featuresItems(aList, theFeatureList);
           aItemsList.append(aItems);
         } else {
-          if (!aFeatures.contains(aReferenced)) {
+          if (!theFeatureList.contains(aReferenced)) {
             QStringList aValNames;
             aValNames << aReferenced->data()->name().c_str();
 
@@ -345,7 +345,7 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
               }
             }
             aItemsList.append(aValNames);
-            aFeatures.append(aReferenced);
+            theFeatureList.append(aReferenced);
           }
         }
       }

@@ -127,7 +127,7 @@ private:
 
   bool checkIsValid();
 
-  QList<QStringList> featuresItems(const QList<FeaturePtr>& theFeatures) const;
+  QList<QStringList> featuresItems(const QList<FeaturePtr>& theFeatures, QList<FeaturePtr>& theFeatureList) const;
   QList<QStringList> parametersItems(const QList<FeaturePtr>& theFeatures) const;
 
   void updateParametersFeatures();
