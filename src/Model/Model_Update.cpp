@@ -311,10 +311,10 @@ void Model_Update::processFeatures(const bool theFlushRedisplay)
     }
     myIsProcessed = false;
 
-    // flush updates just before "myModification" increment: to distinguish
-    // updates by "execute" produced by this updater and other updates, coming outside,
-    // which are really important for "processEvent" of this updater
+    // to update the object browser if something is updated/created during executions
     static Events_Loop* aLoop = Events_Loop::loop();
+    static const Events_ID kCreatedEvent= aLoop->eventByName(EVENT_OBJECT_CREATED);
+    aLoop->flush(kCreatedEvent);
     static const Events_ID kUpdatedEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
     aLoop->flush(kUpdatedEvent);
 
