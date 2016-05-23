@@ -49,9 +49,8 @@
 #include <TopoDS.hxx>
 #include <TopExp_Explorer.hxx>
 
-namespace GeomAlgoAPI_ShapeTools {
 //==================================================================================================
-double volume(const std::shared_ptr<GeomAPI_Shape> theShape)
+double GeomAlgoAPI_ShapeTools::volume(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
   GProp_GProps aGProps;
   if(!theShape.get()) {
@@ -67,7 +66,7 @@ double volume(const std::shared_ptr<GeomAPI_Shape> theShape)
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Pnt> centreOfMass(const std::shared_ptr<GeomAPI_Shape> theShape)
+std::shared_ptr<GeomAPI_Pnt> GeomAlgoAPI_ShapeTools::centreOfMass(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
   GProp_GProps aGProps;
   if(!theShape) {
@@ -91,10 +90,10 @@ std::shared_ptr<GeomAPI_Pnt> centreOfMass(const std::shared_ptr<GeomAPI_Shape> t
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Shape> combineShapes(const std::shared_ptr<GeomAPI_Shape> theCompound,
-                                             const GeomAPI_Shape::ShapeType theType,
-                                             ListOfShape& theCombinedShapes,
-                                             ListOfShape& theFreeShapes)
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(const std::shared_ptr<GeomAPI_Shape> theCompound,
+                                                                     const GeomAPI_Shape::ShapeType theType,
+                                                                     ListOfShape& theCombinedShapes,
+                                                                     ListOfShape& theFreeShapes)
 {
   GeomShapePtr aResult = theCompound;
 
@@ -270,7 +269,7 @@ static TopoDS_Compound makeCompound(const NCollection_List<TopoDS_Shape> theShap
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Shape> groupSharedTopology(const std::shared_ptr<GeomAPI_Shape> theCompound)
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(const std::shared_ptr<GeomAPI_Shape> theCompound)
 {
   GeomShapePtr aResult = theCompound;
 
@@ -338,7 +337,7 @@ std::shared_ptr<GeomAPI_Shape> groupSharedTopology(const std::shared_ptr<GeomAPI
 }
 
 //==================================================================================================
-std::list<std::shared_ptr<GeomAPI_Pnt> > getBoundingBox(const ListOfShape& theShapes, const double theEnlarge)
+std::list<std::shared_ptr<GeomAPI_Pnt> > GeomAlgoAPI_ShapeTools::getBoundingBox(const ListOfShape& theShapes, const double theEnlarge)
 {
   // Bounding box of all objects.
   Bnd_Box aBndBox;
@@ -372,7 +371,7 @@ std::list<std::shared_ptr<GeomAPI_Pnt> > getBoundingBox(const ListOfShape& theSh
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Shape> faceToInfinitePlane(const std::shared_ptr<GeomAPI_Shape> theFace)
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::faceToInfinitePlane(const std::shared_ptr<GeomAPI_Shape> theFace)
 {
   if (!theFace.get())
     return std::shared_ptr<GeomAPI_Shape>();
@@ -394,8 +393,8 @@ std::shared_ptr<GeomAPI_Shape> faceToInfinitePlane(const std::shared_ptr<GeomAPI
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Shape> fitPlaneToBox(const std::shared_ptr<GeomAPI_Shape> thePlane,
-                                              const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints)
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::fitPlaneToBox(const std::shared_ptr<GeomAPI_Shape> thePlane,
+                                                                     const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints)
 {
   std::shared_ptr<GeomAPI_Shape> aResultShape;
 
@@ -447,9 +446,9 @@ std::shared_ptr<GeomAPI_Shape> fitPlaneToBox(const std::shared_ptr<GeomAPI_Shape
 }
 
 //==================================================================================================
-void findBounds(const std::shared_ptr<GeomAPI_Shape> theShape,
-                std::shared_ptr<GeomAPI_Vertex>& theV1,
-                std::shared_ptr<GeomAPI_Vertex>& theV2)
+void GeomAlgoAPI_ShapeTools::findBounds(const std::shared_ptr<GeomAPI_Shape> theShape,
+                                        std::shared_ptr<GeomAPI_Vertex>& theV1,
+                                        std::shared_ptr<GeomAPI_Vertex>& theV2)
 {
   if(!theShape.get()) {
     std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex);
@@ -471,10 +470,10 @@ void findBounds(const std::shared_ptr<GeomAPI_Shape> theShape,
 }
 
 //==================================================================================================
-void makeFacesWithHoles(const std::shared_ptr<GeomAPI_Pnt> theOrigin,
-                        const std::shared_ptr<GeomAPI_Dir> theDirection,
-                        const ListOfShape& theWires,
-                        ListOfShape& theFaces)
+void GeomAlgoAPI_ShapeTools::makeFacesWithHoles(const std::shared_ptr<GeomAPI_Pnt> theOrigin,
+                                                const std::shared_ptr<GeomAPI_Dir> theDirection,
+                                                const ListOfShape& theWires,
+                                                ListOfShape& theFaces)
 {
   BRepBuilderAPI_MakeFace aMKFace(gp_Pln(theOrigin->impl<gp_Pnt>(),
                                           theDirection->impl<gp_Dir>()));
@@ -503,7 +502,7 @@ void makeFacesWithHoles(const std::shared_ptr<GeomAPI_Pnt> theOrigin,
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Pln> findPlane(const ListOfShape& theShapes)
+std::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_ShapeTools::findPlane(const ListOfShape& theShapes)
 {
   TopoDS_Compound aCompound;
   BRep_Builder aBuilder;
@@ -531,8 +530,8 @@ std::shared_ptr<GeomAPI_Pln> findPlane(const ListOfShape& theShapes)
 }
 
 //==================================================================================================
-bool isSubShapeInsideShape(const std::shared_ptr<GeomAPI_Shape> theSubShape,
-                            const std::shared_ptr<GeomAPI_Shape> theBaseShape)
+bool GeomAlgoAPI_ShapeTools::isSubShapeInsideShape(const std::shared_ptr<GeomAPI_Shape> theSubShape,
+                                                   const std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {
   if(!theSubShape.get() || !theBaseShape.get()) {
     return false;
@@ -600,4 +599,3 @@ bool isSubShapeInsideShape(const std::shared_ptr<GeomAPI_Shape> theSubShape,
 
   return true;
 }
-} //namespace GeomAlgoAPI_ShapeTools

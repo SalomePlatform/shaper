@@ -444,16 +444,31 @@ bool FeaturesPlugin_ValidatorPartitionSelection::isValid(const AttributePtr& the
                                                          const std::list<std::string>& theArguments,
                                                          std::string& theError) const
 {
-  GeomValidators_BodyShapes aBodyValidator;
-  if(aBodyValidator.isValid(theAttribute, theArguments, theError)) {
-    return true;
+  std::string anAttributeType = theAttribute->attributeType();
+  if(anAttributeType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr =
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+
+    for(int anIndex = 0; anIndex < aSelectionListAttr->size(); ++anIndex) {
+      AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(anIndex);
+
+      GeomValidators_BodyShapes aBodyValidator;
+      if(aBodyValidator.isValid(aSelectAttr, theArguments, theError)) {
+        continue;
+      }
+
+      GeomValidators_FeatureKind aFeatureKindValidator;
+      if(aFeatureKindValidator.isValid(aSelectAttr, theArguments, theError)) {
+        continue;
+      }
+
+      theError = "Only body shapes and construction planes are allowed for selection.";
+      return false;
+    }
+  } else {
+    theError = "This validator supports only " + ModelAPI_AttributeSelectionList::typeId() + " attribute type.";
+    return false;
   }
 
-  GeomValidators_FeatureKind aFeatureKindValidator;
-  if(aFeatureKindValidator.isValid(theAttribute, theArguments, theError)) {
-    return true;
-  }
-
-  theError = "Only body shapes and construction planes are allowed for selection.";
-  return false;
+  return true;
 }

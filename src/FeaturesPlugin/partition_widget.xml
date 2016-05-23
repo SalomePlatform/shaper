@@ -6,7 +6,6 @@
     tooltip="Select objects for partitioning."
     type_choice="objects"
     concealment="true">
-    <validator id="FeaturesPlugin_ValidatorPartitionSelection"/>
+    <validator id="FeaturesPlugin_ValidatorPartitionSelection" parameters="Plane"/>
   </multi_selector>
-  <!--<validator id="GeomValidators_PartitionArguments" parameters="main_objects,tool_objects,partition_combine"/>-->
 </source>
