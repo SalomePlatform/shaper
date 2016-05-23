@@ -28,8 +28,8 @@ void BuildPlugin_SubShapes::initAttributes()
 {
   data()->addAttribute(BASE_SHAPE_ID(), ModelAPI_AttributeSelection::typeId());
 
-  data()->addAttribute(SUB_SHAPES_ID(), ModelAPI_AttributeSelectionList::typeId());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SUB_SHAPES_ID());
+  data()->addAttribute(SUBSHAPES_ID(), ModelAPI_AttributeSelectionList::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SUBSHAPES_ID());
 }
 
 void BuildPlugin_SubShapes::attributeChanged(const std::string& theID)
@@ -38,7 +38,7 @@ void BuildPlugin_SubShapes::attributeChanged(const std::string& theID)
 
   if(theID == BASE_SHAPE_ID()) {
     AttributeSelectionPtr aShapeAttrSelection = selection(BASE_SHAPE_ID());
-    AttributeSelectionListPtr aSubShapesAttrList = selectionList(SUB_SHAPES_ID());
+    AttributeSelectionListPtr aSubShapesAttrList = selectionList(SUBSHAPES_ID());
     if(!aShapeAttrSelection.get() || !aSubShapesAttrList.get()) {
       return;
     }
@@ -80,7 +80,7 @@ void BuildPlugin_SubShapes::execute()
 {
   // Get base shape and sub-shapes list.
   AttributeSelectionPtr aShapeAttrSelection = selection(BASE_SHAPE_ID());
-  AttributeSelectionListPtr aSubShapesAttrList = selectionList(SUB_SHAPES_ID());
+  AttributeSelectionListPtr aSubShapesAttrList = selectionList(SUBSHAPES_ID());
   if(!aShapeAttrSelection.get() || !aSubShapesAttrList.get()) {
     return;
   }

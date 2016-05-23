@@ -35,10 +35,10 @@ public:
   }
 
   /// Attribute name of sub-shapes.
-  inline static const std::string& SUB_SHAPES_ID()
+  inline static const std::string& SUBSHAPES_ID()
   {
-    static const std::string MY_SUB_SHAPES_ID("sub_shapes");
-    return MY_SUB_SHAPES_ID;
+    static const std::string MY_SUBSHAPES_ID("subshapes");
+    return MY_SUBSHAPES_ID;
   }
 
   /// \return the kind of a feature.

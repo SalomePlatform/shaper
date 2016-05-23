@@ -15,6 +15,7 @@
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_PaveFiller.h>
+#include <GeomAlgoAPI_ShapeBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
 #include <GeomAlgoAPI_WireBuilder.h>
@@ -229,9 +230,9 @@ bool BuildPlugin_ValidatorSubShapesSelection::isValid(const AttributePtr& theAtt
                                                       const std::list<std::string>& theArguments,
                                                       std::string& theError) const
 {
-  if(theArguments.size() != 2) {
+  if(theArguments.size() != 1) {
     Events_Error::send("Error: BuildPlugin_ValidatorSubShapesSelection should be used only with "
-      "2 parameters (ID of base shape; Sketch feature id).");
+      "1 parameter(Sketch feature id).");
     return false;
   }
 
@@ -250,8 +251,9 @@ bool BuildPlugin_ValidatorSubShapesSelection::isValid(const AttributePtr& theAtt
   }
 
   // Get base shape.
+  const std::string aBaseShapeId = "base_shape";
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
-  AttributeSelectionPtr aShapeAttrSelection = aFeature->selection(theArguments.front());
+  AttributeSelectionPtr aShapeAttrSelection = aFeature->selection(aBaseShapeId);
 
   if(!aShapeAttrSelection.get()) {
     theError = "Base shape is empty.";
@@ -266,6 +268,10 @@ bool BuildPlugin_ValidatorSubShapesSelection::isValid(const AttributePtr& theAtt
     return false;
   }
 
+  GeomAlgoAPI_ShapeBuilder aBuilder;
+  aBuilder.removeInternal(aBaseShape);
+  aBaseShape = aBuilder.shape();
+
   // If selected shape is wire allow to select only vertices. If face - allow vertices and edges.
   std::set<GeomAPI_Shape::ShapeType> anAllowedTypes;
   switch(aBaseShape->shapeType()) {
@@ -277,18 +283,22 @@ bool BuildPlugin_ValidatorSubShapesSelection::isValid(const AttributePtr& theAtt
   // Check selected shapes.
   GeomValidators_FeatureKind aFeatureKindValidator;
   std::list<std::string> anArguments;
-  anArguments.push_back(theArguments.back());
+  anArguments.push_back(theArguments.front());
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelectionAttrInList = aSelectionList->value(anIndex);
     if(!aSelectionAttrInList.get()) {
       theError = "Empty attribute in list.";
       return false;
     }
-    // If context not same check that it is a selection on Sketch.
-    if(aBaseContext != aSelectionAttrInList->context()) {
-      if(!aFeatureKindValidator.isValid(aSelectionAttrInList, anArguments, theError)) {
-        return false;
-      }
+
+    // If context of selection same skip.
+    if(aBaseContext == aSelectionAttrInList->context()) {
+      continue;
+    }
+
+    // Check that it is a selection on Sketch.
+    if(!aFeatureKindValidator.isValid(aSelectionAttrInList, anArguments, theError)) {
+      return false;
     }
 
     // Check shape type.
