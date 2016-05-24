@@ -38,6 +38,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QTimer>
+#include <QMainWindow>
 
 #include <memory>
 #include <string>
@@ -143,14 +144,14 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   //this->setLayout(aMainLay);
   connect(myTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onSelectionTypeChanged()));
 
-  myCopyAction = ModuleBase_Tools::createAction(QIcon(":pictures/copy.png"), tr("Copy"), this,
-                          this, SLOT(onCopyItem()));
+  myCopyAction = ModuleBase_Tools::createAction(QIcon(":pictures/copy.png"), tr("Copy"),
+                          myWorkshop->desktop(), this, SLOT(onCopyItem()));
   myCopyAction->setShortcut(QKeySequence::Copy);
   myCopyAction->setEnabled(false);
   myListControl->addAction(myCopyAction);
 
-  myDeleteAction = ModuleBase_Tools::createAction(QIcon(":pictures/delete.png"), tr("Delete"), this,
-                          this, SLOT(onDeleteItem()));
+  myDeleteAction = ModuleBase_Tools::createAction(QIcon(":pictures/delete.png"), tr("Delete"),
+                          myWorkshop->desktop(), this, SLOT(onDeleteItem()));
   myDeleteAction->setEnabled(false);
   myListControl->addAction(myDeleteAction);
 

@@ -79,7 +79,7 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
 
   //! Return property panel's action like ok, cancel, help.
   //! If there is no such action, it will be created.
-  QAction* operationStateAction(OperationStateActionId theId, QObject* theParent = 0);
+  QAction* operationStateAction(OperationStateActionId theId);
 
   /// Return an action by the given id, if it was registered in the manager
   QAction* action(const QString& theId);

@@ -45,7 +45,7 @@ XGUI_ErrorMgr::XGUI_ErrorMgr(QObject* theParent, ModuleBase_IWorkshop* theWorksh
 {
   ModuleBase_ModelWidget* anActiveWidget = activeWidget();
   XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
-  QAction* anAcceptAllAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
+  QAction* anAcceptAllAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll);
   myAcceptAllToolTip = anAcceptAllAction->toolTip();
 
   QAction* anOkAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
@@ -102,7 +102,7 @@ void XGUI_ErrorMgr::updateAcceptAllAction(const FeaturePtr& theFeature)
   }
   XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
   if (workshop()->isFeatureOfNested(theFeature)) {
-    QAction* anAcceptAllAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
+    QAction* anAcceptAllAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll);
     bool anEnabled = anError.isEmpty();
     anAcceptAllAction->setEnabled(anEnabled);
     anAcceptAllAction->setToolTip(!anEnabled ? anError : myAcceptAllToolTip);

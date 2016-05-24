@@ -39,6 +39,7 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_ResultParameter.h>
 
+#include <QMainWindow>
 #include <QAction>
 #include <QMenu>
 #include <QEvent>
@@ -73,20 +74,21 @@ void PartSet_MenuMgr::createActions()
 {
   QAction* aAction;
 
-  aAction = ModuleBase_Tools::createAction(QIcon(), tr("Auxiliary"), this);
+  QWidget* aParent = myModule->workshop()->desktop();
+  aAction = ModuleBase_Tools::createAction(QIcon(), tr("Auxiliary"), aParent);
   aAction->setCheckable(true);
   addAction("AUXILIARY_CMD", aAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":icons/activate.png"), tr("Activate"), this,
+  aAction = ModuleBase_Tools::createAction(QIcon(":icons/activate.png"), tr("Activate"), aParent,
                                            this, SLOT(onActivatePart(bool)));
   myActions["ACTIVATE_PART_CMD"] = aAction;
 
   // Activate PartSet
-  aAction = ModuleBase_Tools::createAction(QIcon(":icons/activate.png"), tr("Activate"), this,
+  aAction = ModuleBase_Tools::createAction(QIcon(":icons/activate.png"), tr("Activate"), aParent,
                         this, SLOT(onActivatePartSet(bool)));
   myActions["ACTIVATE_PARTSET_CMD"] = aAction;
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":icons/edit.png"), tr("Edit..."), this,
+  aAction = ModuleBase_Tools::createAction(QIcon(":icons/edit.png"), tr("Edit..."), aParent,
                          this, SLOT(onEdit(bool)));
   myActions["EDIT_CMD"] = aAction;
 }

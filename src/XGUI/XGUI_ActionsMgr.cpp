@@ -24,6 +24,7 @@
 
 
 #include <QAction>
+#include <QMainWindow>
 
 #ifdef _DEBUG
 #include <iostream>
@@ -218,26 +219,27 @@ void XGUI_ActionsMgr::processEvent(const std::shared_ptr<Events_Message>& theMes
   }
 }
 
-QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId, QObject* theParent)
+QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId)
 {
   QAction* aResult = NULL;
   if (myOperationActions.contains(theId)) {
     aResult = myOperationActions.value(theId);
-    if (theParent && aResult->parent() != theParent) {
-      aResult->setParent(theParent);
-    }
+    //if (theParent && aResult->parent() != theParent) {
+    //  aResult->setParent(theParent);
+    //}
   } else {
+    QWidget* aParent = myWorkshop->desktop();
     switch (theId) {
       case Accept:
       case AcceptAll: {
         aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_ok.png"),
-                            "" /*empty to show error*/, theParent);
+                            "Apply" /*empty to show error*/, aParent);
       }
       break;
       case Abort:
       case AbortAll: {
         aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_cancel.png"), "Cancel",
-                                                 theParent);
+                                                 aParent);
         if (theId == Abort) {
           aResult->setShortcut(QKeySequence(Qt::Key_Escape));
         }
@@ -245,11 +247,11 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId, QOb
       break;
       case Help: {
         aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_help.png"), "Help",
-                                                 theParent);
+                                                 aParent);
       }
       break;
       case Preview: {
-        aResult = ModuleBase_Tools::createAction(QIcon(), tr("See preview"), theParent, 0, 0, "Compute preview");
+        aResult = ModuleBase_Tools::createAction(QIcon(), tr("See preview"), aParent, 0, 0, "Compute preview");
         aResult->setStatusTip(aResult->toolTip());
       }
       break;

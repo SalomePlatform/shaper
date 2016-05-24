@@ -78,12 +78,12 @@ void XGUI_MenuMgr::addFeature(const std::shared_ptr<Config_FeatureMessage>& theM
     XGUI_OperationMgr* anOperationMgr = myWorkshop->operationMgr();
     XGUI_ActionsMgr* anActionsMgr = myWorkshop->actionsMgr();
     if (aNestedActions.contains(FEATURE_WHEN_NESTED_ACCEPT)) {
-      QAction* anAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
+      QAction* anAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll);
       QObject::connect(anAction, SIGNAL(triggered()), anOperationMgr, SLOT(commitAllOperations()));
       aNestedActList << anAction;
     }
     if (aNestedActions.contains(FEATURE_WHEN_NESTED_ABORT)) {
-      QAction* anAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AbortAll, NULL);
+      QAction* anAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AbortAll);
       QObject::connect(anAction, SIGNAL(triggered()), anOperationMgr, SLOT(abortAllOperations()));
       aNestedActList << anAction;
     }
@@ -186,12 +186,12 @@ QAction* XGUI_MenuMgr::buildAction(const std::shared_ptr<Config_FeatureMessage>&
     XGUI_OperationMgr* anOperationMgr = myWorkshop->operationMgr();
     XGUI_ActionsMgr* anActionsMgr = myWorkshop->actionsMgr();
     if (aNestedActions.contains(FEATURE_WHEN_NESTED_ACCEPT)) {
-      QAction* anAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll, NULL);
+      QAction* anAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll);
       QObject::connect(anAction, SIGNAL(triggered()), anOperationMgr, SLOT(commitAllOperations()));
       aNestedActList << anAction;
     }
     if (aNestedActions.contains(FEATURE_WHEN_NESTED_ABORT)) {
-      QAction* anAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AbortAll, NULL);
+      QAction* anAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AbortAll);
       QObject::connect(anAction, SIGNAL(triggered()), anOperationMgr, SLOT(abortAllOperations()));
       aNestedActList << anAction;
     }
