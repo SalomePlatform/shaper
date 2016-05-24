@@ -60,30 +60,45 @@ GeomAlgoAPI_ShapeBuilder::GeomAlgoAPI_ShapeBuilder()
 //==================================================================================================
 void GeomAlgoAPI_ShapeBuilder::removeInternal(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
-  GeomShapePtr aResultShape = theShape->emptyCopied();
+  GeomShapePtr aResultShape;
+
   GeomAPI_Shape::ShapeType aBaseShapeType = theShape->shapeType();
-  std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMakeShapeCustom(new GeomAlgoAPI_MakeShapeCustom());
-  for(GeomAPI_ShapeIterator anIter(theShape); anIter.more(); anIter.next()) {
-    GeomShapePtr aSubShape = anIter.current();
-    if(aBaseShapeType == GeomAPI_Shape::WIRE) {
+  if(aBaseShapeType == GeomAPI_Shape::WIRE) {
+    aResultShape = theShape->emptyCopied();
+    std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMakeShapeCustom(new GeomAlgoAPI_MakeShapeCustom());
+    for(GeomAPI_ShapeIterator anIter(theShape); anIter.more(); anIter.next()) {
+      GeomShapePtr aSubShape = anIter.current();
       GeomShapePtr aSubShapeCopy = aSubShape->emptyCopied();
-      aMakeShapeCustom->addModified(aSubShape, aSubShapeCopy);
       for(GeomAPI_ShapeIterator aSubIter(aSubShape); aSubIter.more(); aSubIter.next()) {
         GeomShapePtr aSubOfSubShape = aSubIter.current();
         if(aSubOfSubShape->orientation() != GeomAPI_Shape::INTERNAL) {
           GeomAlgoAPI_ShapeBuilder::add(aSubShapeCopy, aSubOfSubShape);
         }
       }
+      aMakeShapeCustom->addModified(aSubShape, aSubShapeCopy);
       GeomAlgoAPI_ShapeBuilder::add(aResultShape, aSubShapeCopy);
-    } else if(aBaseShapeType == GeomAPI_Shape::FACE) {
-      if(aSubShape->shapeType() == GeomAPI_Shape::WIRE
-          && aSubShape->orientation() != GeomAPI_Shape::INTERNAL) {
-        GeomAlgoAPI_ShapeBuilder::add(aResultShape, aSubShape);
+    }
+    this->appendAlgo(aMakeShapeCustom);
+  } else if(aBaseShapeType == GeomAPI_Shape::FACE) {
+    const TopoDS_Shape& aBaseShape = theShape->impl<TopoDS_Shape>();
+    BRepBuilderAPI_Copy* aCopyBuilder = new BRepBuilderAPI_Copy(aBaseShape);
+    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aCopyBuilder)));
+    if(!aCopyBuilder->IsDone()) {
+      return;
+    }
+    TopoDS_Shape aShape = aCopyBuilder->Shape();
+    TopoDS_Shape aShapeCopy = aShape.EmptyCopied();
+    BRep_Builder aBuilder;
+    for(TopoDS_Iterator anIt(aShape); anIt.More(); anIt.Next()) {
+      const TopoDS_Shape& aSubShape = anIt.Value();
+      if(aSubShape.ShapeType() == TopAbs_WIRE
+          && aSubShape.Orientation() != TopAbs_INTERNAL) {
+        aBuilder.Add(aShapeCopy, aSubShape);
       }
     }
+    aResultShape.reset(new GeomAPI_Shape());
+    aResultShape->setImpl(new TopoDS_Shape(aShapeCopy));
   }
-
-  this->appendAlgo(aMakeShapeCustom);
 
   setShape(aResultShape);
   setDone(true);
@@ -101,7 +116,7 @@ void GeomAlgoAPI_ShapeBuilder::add(const std::shared_ptr<GeomAPI_Shape> theShape
   TopAbs_ShapeEnum aBaseShapeType = aBaseShape.ShapeType();
 
   // Copy base shape.
-  BRepBuilderAPI_Copy* aCopyBuilder = new BRepBuilderAPI_Copy(aBaseShape, Standard_False);
+  BRepBuilderAPI_Copy* aCopyBuilder = new BRepBuilderAPI_Copy(aBaseShape);
   this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aCopyBuilder)));
   if(!aCopyBuilder->IsDone()) {
     return;
@@ -113,6 +128,8 @@ void GeomAlgoAPI_ShapeBuilder::add(const std::shared_ptr<GeomAPI_Shape> theShape
   std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMakeShapeCustom(new GeomAlgoAPI_MakeShapeCustom());
   for(ListOfShape::const_iterator anIt = theShapesToAdd.cbegin(); anIt != theShapesToAdd.cend(); ++anIt) {
     TopoDS_Shape aShapeToAdd = (*anIt)->impl<TopoDS_Shape>();
+    TopoDS_Shape aModShapeToAdd = aShapeToAdd;
+    aModShapeToAdd.Orientation(TopAbs_INTERNAL);
     for(TopExp_Explorer aResExp(aResultShape, TopAbs_VERTEX); aResExp.More(); aResExp.Next()) {
       const TopoDS_Vertex& aVertexInRes = TopoDS::Vertex(aResExp.Current());
       const gp_Pnt aPntInRes = BRep_Tool::Pnt(aVertexInRes);
@@ -124,17 +141,18 @@ void GeomAlgoAPI_ShapeBuilder::add(const std::shared_ptr<GeomAPI_Shape> theShape
           TopoDS_Shape aVertexInResMod = aVertexInRes;
           aVertexInResMod.Orientation(aVertexInAdd.Orientation());
           aReShape.Replace(aVertexInAdd, aVertexInResMod);
-          TopoDS_Shape aModShape = aReShape.Apply(aShapeToAdd);
-
-          GeomShapePtr aGeomBaseShape(new GeomAPI_Shape());
-          GeomShapePtr aGeomModShape(new GeomAPI_Shape());
-          aGeomBaseShape->setImpl(new TopoDS_Shape(aShapeToAdd));
-          aGeomModShape->setImpl(new TopoDS_Shape(aModShape));
-          aMakeShapeCustom->addModified(aGeomBaseShape, aGeomModShape);
-          aShapeToAdd = aModShape;
+          aModShapeToAdd = aReShape.Apply(aModShapeToAdd);
         }
       }
     }
+
+    GeomShapePtr aGeomBaseShape(new GeomAPI_Shape());
+    GeomShapePtr aGeomModShape(new GeomAPI_Shape());
+    aGeomBaseShape->setImpl(new TopoDS_Shape(aShapeToAdd));
+    aGeomModShape->setImpl(new TopoDS_Shape(aModShapeToAdd));
+    aMakeShapeCustom->addModified(aGeomBaseShape, aGeomModShape);
+    aShapeToAdd = aModShapeToAdd;
+
     TopAbs_ShapeEnum aShapeToAddType = aShapeToAdd.ShapeType();
     if(aBaseShapeType == TopAbs_WIRE) {
       if(aShapeToAddType == TopAbs_VERTEX) {

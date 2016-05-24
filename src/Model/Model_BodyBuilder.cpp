@@ -393,7 +393,9 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
         std::shared_ptr<GeomAPI_Shape> aMapShape(theSubShapes.find(*anIt));
         aNewShape.Orientation(aMapShape->impl<TopoDS_Shape>().Orientation());
       }
-      if(!aRoot.IsSame(aNewShape) && aResultShape->isSubShape(*anIt)) {
+      GeomShapePtr aGeomNewShape(new GeomAPI_Shape());
+      aGeomNewShape->setImpl(new TopoDS_Shape(aNewShape));
+      if(!aRoot.IsSame(aNewShape) && aResultShape->isSubShape(aGeomNewShape)) {
         builder(aTag)->Modify(aRoot,aNewShape);
         if(isBuilt) {
           if(theIsStoreSeparate) {
