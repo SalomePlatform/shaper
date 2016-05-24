@@ -231,7 +231,7 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId, QOb
       case Accept:
       case AcceptAll: {
         aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_ok.png"),
-                            "", /*empty to show error*/, theParent);
+                            "" /*empty to show error*/, theParent);
       }
       break;
       case Abort:
