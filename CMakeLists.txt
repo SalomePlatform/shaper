@@ -94,6 +94,9 @@ ADD_SUBDIRECTORY (src/InitializationPlugin)
 ADD_SUBDIRECTORY (src/ParametersPlugin)
 ADD_SUBDIRECTORY (src/PythonAddons)
 ADD_SUBDIRECTORY (src/PythonAPI)
+# High Level C++/Python API
+ADD_SUBDIRECTORY (src/ModelHighAPI)
+ADD_SUBDIRECTORY (src/ConstructionAPI)
 
 IF(${HAVE_SALOME})
     ADD_SUBDIRECTORY (src/SHAPERGUI)
