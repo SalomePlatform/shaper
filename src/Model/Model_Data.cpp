@@ -187,7 +187,7 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
   return aResult;
 }
 
-// macro for gthe generic returning of the attribute by the ID
+// macro for the generic returning of the attribute by the ID
 #define GET_ATTRIBUTE_BY_ID(ATTR_TYPE, METHOD_NAME) \
   std::shared_ptr<ATTR_TYPE> Model_Data::METHOD_NAME(const std::string& theID) { \
     std::shared_ptr<ATTR_TYPE> aRes; \
