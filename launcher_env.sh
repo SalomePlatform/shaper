@@ -1,9 +1,9 @@
 #!/bin/bash
 
 source env.sh
-source env_standalone.sh
+source env_salome.sh
 
-export PATH=${INSTALL_DIR}/bin:${PATH}
+export PATH=${SHAPER_ROOT_DIR}/bin:${PATH}
 
 cd ${BUILD_DIR}
 
