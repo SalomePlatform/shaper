@@ -76,6 +76,8 @@ private:
   QLabel* myErrorLabel; /// contains an error information
   QString myAcceptToolTip; /// cached tool tip value for enabled Accept action
   QString myAcceptAllToolTip; /// cached tool tip value for enabled AcceptAll action
+  QString myAcceptStatusTip; /// cached status tip value for enabled Accept action
+  QString myAcceptAllStatusTip; /// cached status tip value for enabled AcceptAll action
 };
 
 #endif // XGUI_ErrorMgr_H
