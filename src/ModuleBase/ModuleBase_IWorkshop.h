@@ -103,6 +103,10 @@ Q_OBJECT
   //! \param theValues a list of presentations
   virtual void setSelected(const QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues) = 0;
 
+  //! Shows the message in the status bar
+  //! \param theMessage a message
+  virtual void setStatusBarMessage(const QString& theMessage) = 0;
+
    /// Update of commands status
   virtual void updateCommandStatus() = 0;
 

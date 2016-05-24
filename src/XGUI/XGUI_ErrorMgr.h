@@ -52,11 +52,11 @@ protected slots:
   virtual void onWidgetChanged();
 
 private:
-  /// It disables the action if the error message is not empty
+  /// It disables the propety panel Accept action if the error message is not empty
   /// The message is set to the header tool tip.
   /// \param theAction an action to be changed
   /// \param theError an error state
-  void updateActionState(QAction* theAction, const QString& theError);
+  void updateAcceptActionState(const QString& theError);
 
   /// It updates the tool tip of the widget controls according to the widget error
   /// \param theWidget a widget

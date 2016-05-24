@@ -20,6 +20,7 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_SelectionValidator.h>
+#include <ModuleBase_Tools.h>
 
 
 #include <QAction>
@@ -229,27 +230,27 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId, QOb
     switch (theId) {
       case Accept:
       case AcceptAll: {
-        aResult = new QAction(QIcon(":pictures/button_ok.png"), "", theParent);
-        aResult->setToolTip("Apply");
+        aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_ok.png"),
+                            "", /*empty to show error*/, theParent);
       }
       break;
       case Abort:
       case AbortAll: {
-        aResult = new QAction(QIcon(":pictures/button_cancel.png"), "", theParent);
-        aResult->setToolTip("Cancel");
+        aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_cancel.png"), "Cancel",
+                                                 theParent);
         if (theId == Abort) {
           aResult->setShortcut(QKeySequence(Qt::Key_Escape));
         }
       }
       break;
       case Help: {
-        aResult = new QAction(QIcon(":pictures/button_help.png"), "", theParent);
-        aResult->setToolTip("Help");
+        aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_help.png"), "Help",
+                                                 theParent);
       }
       break;
       case Preview: {
-        aResult = new QAction("See preview", theParent);
-        aResult->setToolTip("Compute preview");
+        aResult = ModuleBase_Tools::createAction(QIcon(), tr("See preview"), theParent, 0, 0, "Compute preview");
+        aResult->setStatusTip(aResult->toolTip());
       }
       break;
       default:

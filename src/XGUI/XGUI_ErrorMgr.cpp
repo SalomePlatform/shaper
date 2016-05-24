@@ -54,7 +54,6 @@ XGUI_ErrorMgr::XGUI_ErrorMgr(QObject* theParent, ModuleBase_IWorkshop* theWorksh
 
 XGUI_ErrorMgr::~XGUI_ErrorMgr()
 {
-
 }
 
 void XGUI_ErrorMgr::updateActions(const FeaturePtr& theFeature)
@@ -64,8 +63,6 @@ void XGUI_ErrorMgr::updateActions(const FeaturePtr& theFeature)
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                       (workshop()->operationMgr()->currentOperation());
   if (aFOperation && aFOperation->feature() == theFeature) {
-    QAction* anOkAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
-    
     ModuleBase_ModelWidget* anActiveWidget = activeWidget();
     bool isApplyEnabledByActiveWidget = false;
     if (anActiveWidget)
@@ -80,8 +77,9 @@ void XGUI_ErrorMgr::updateActions(const FeaturePtr& theFeature)
       if (anError.isEmpty())
         anError = aWidgetError;
     }
-    updateActionState(anOkAction, anError);
+    updateAcceptActionState(anError);
     updateToolTip(anActiveWidget, aWidgetError);
+    myWorkshop->setStatusBarMessage(anError);
 
 #ifdef DEBUG_ERROR_STATE
     QString anInfo = ModuleBase_Tools::objectInfo(theFeature);
@@ -124,12 +122,15 @@ bool XGUI_ErrorMgr::isApplyEnabled() const
   return isEnabled;
 }
 
-void XGUI_ErrorMgr::updateActionState(QAction* theAction, const QString& theError)
+void XGUI_ErrorMgr::updateAcceptActionState(const QString& theError)
 {
+  XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
+  QAction* anAcceptAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
+
   bool anEnabled = theError.isEmpty();
 
-  theAction->setEnabled(anEnabled);
-  theAction->setToolTip(anEnabled ? myAcceptToolTip : theError);
+  anAcceptAction->setEnabled(anEnabled);
+  anAcceptAction->setToolTip(anEnabled ? myAcceptToolTip : theError);
   // some operations have no property panel, so it is important to check that it is not null
   if (myPropertyPanel) {
     // update controls error information

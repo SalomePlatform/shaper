@@ -19,6 +19,7 @@
 
 #include <Quantity_Color.hxx>
 
+#include <QIcon>
 #include <QPixmap>
 
 #include <map>
@@ -26,6 +27,7 @@
 class QWidget;
 class QLayout;
 class QDoubleSpinBox;
+class QAction;
 class ModuleBase_ParamIntSpinBox;
 class ModuleBase_ParamSpinBox;
 class ModuleBase_IWorkshop;
@@ -117,6 +119,20 @@ MODULEBASE_EXPORT void setSpinValue(ModuleBase_ParamIntSpinBox* theSpin, int the
 /// \param theSpin a SpinBox that accepts text
 /// \param theText a new value
 MODULEBASE_EXPORT void setSpinText(ModuleBase_ParamIntSpinBox* theSpin, const QString& theText);
+
+/// Creates an action filled with the parameters
+/// \param theIcon an action icon
+/// \param theText an icon text
+/// \param theParent an action object
+/// \param theReceiver an object to process action triggered signal
+/// \param theMember a slot to process the action triggered signal
+/// \param theToolTip an action tool tip information, if empty the text is used
+/// \param theStatusTip an action status tip information, if empty the text is used
+MODULEBASE_EXPORT QAction* createAction(const QIcon& theIcon, const QString& theText,
+                                        QObject* theParent, const QObject* theReceiver = 0,
+                                        const char* theMember = "",
+                                        const QString& theToolTip = QString(),
+                                        const QString& theStatusTip = QString());
 
 /// Converts the object to the feature or a result and generate information string
 /// \param theObj an object

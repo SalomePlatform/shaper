@@ -143,15 +143,15 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   //this->setLayout(aMainLay);
   connect(myTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onSelectionTypeChanged()));
 
-  myCopyAction = new QAction(QIcon(":pictures/copy.png"), tr("Copy"), this);
+  myCopyAction = ModuleBase_Tools::createAction(QIcon(":pictures/copy.png"), tr("Copy"), this,
+                          this, SLOT(onCopyItem()));
   myCopyAction->setShortcut(QKeySequence::Copy);
   myCopyAction->setEnabled(false);
-  connect(myCopyAction, SIGNAL(triggered(bool)), SLOT(onCopyItem()));
   myListControl->addAction(myCopyAction);
 
-  myDeleteAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
+  myDeleteAction = ModuleBase_Tools::createAction(QIcon(":pictures/delete.png"), tr("Delete"), this,
+                          this, SLOT(onDeleteItem()));
   myDeleteAction->setEnabled(false);
-  connect(myDeleteAction, SIGNAL(triggered(bool)), SLOT(onDeleteItem()));
   myListControl->addAction(myDeleteAction);
 
   myListControl->setContextMenuPolicy(Qt::ActionsContextMenu);

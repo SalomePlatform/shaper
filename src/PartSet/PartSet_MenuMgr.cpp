@@ -25,6 +25,7 @@
 #include <ModuleBase_OperationAction.h>
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_Tools.h>
 
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Workshop.h>
@@ -72,21 +73,21 @@ void PartSet_MenuMgr::createActions()
 {
   QAction* aAction;
 
-  aAction = new QAction(tr("Auxiliary"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(), tr("Auxiliary"), this);
   aAction->setCheckable(true);
   addAction("AUXILIARY_CMD", aAction);
 
-  aAction = new QAction(QIcon(":icons/activate.png"), tr("Activate"), this);
-  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onActivatePart(bool)));
+  aAction = ModuleBase_Tools::createAction(QIcon(":icons/activate.png"), tr("Activate"), this,
+                                           this, SLOT(onActivatePart(bool)));
   myActions["ACTIVATE_PART_CMD"] = aAction;
 
   // Activate PartSet
-  aAction = new QAction(QIcon(":icons/activate.png"), tr("Activate"), this);
-  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onActivatePartSet(bool)));
+  aAction = ModuleBase_Tools::createAction(QIcon(":icons/activate.png"), tr("Activate"), this,
+                        this, SLOT(onActivatePartSet(bool)));
   myActions["ACTIVATE_PARTSET_CMD"] = aAction;
 
-  aAction = new QAction(QIcon(":icons/edit.png"), tr("Edit..."), this);
-  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onEdit(bool)));
+  aAction = ModuleBase_Tools::createAction(QIcon(":icons/edit.png"), tr("Edit..."), this,
+                         this, SLOT(onEdit(bool)));
   myActions["EDIT_CMD"] = aAction;
 }
 

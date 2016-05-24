@@ -78,7 +78,7 @@ QAction* ModuleBase_ActionInfo::makeAction(QObject* theParent)
   aResult->setVisible(visible);
   aResult->setIconText(iconText);
   aResult->setToolTip(toolTip);
-  // aResult->setStatusTip(statusTip);
+  aResult->setStatusTip(toolTip);
   // aResult->setWhatsThis(whatsThis);
   aResult->setShortcut(shortcut);
   aResult->setFont(font);

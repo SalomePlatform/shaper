@@ -47,6 +47,7 @@
 #include <QColor>
 #include <QApplication>
 #include <QMessageBox>
+#include <QAction>
 
 #include <sstream>
 #include <string>
@@ -225,6 +226,21 @@ void setSpinValue(ModuleBase_ParamIntSpinBox* theSpin, int theValue)
   bool isBlocked = theSpin->blockSignals(true);
   theSpin->setValue(theValue);
   theSpin->blockSignals(isBlocked);
+}
+
+QAction* createAction(const QIcon& theIcon, const QString& theText,
+                      QObject* theParent, const QObject* theReceiver,
+                      const char* theMember, const QString& theToolTip,
+                      const QString& theStatusTip)
+{
+  QAction* anAction = new QAction(theIcon, theText, theParent);
+  anAction->setToolTip(theToolTip.isEmpty() ? theText : theToolTip);
+  anAction->setStatusTip(!theStatusTip.isEmpty() ? theStatusTip :
+                                                   (!theToolTip.isEmpty() ? theToolTip : theText));
+  if (theReceiver)
+    QObject::connect(anAction, SIGNAL(triggered(bool)), theReceiver, theMember);
+
+  return anAction;
 }
 
 QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)

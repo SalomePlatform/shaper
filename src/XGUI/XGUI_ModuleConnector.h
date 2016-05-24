@@ -81,6 +81,10 @@ Q_OBJECT
   //! If the list is empty then selection will be cleared
   virtual void setSelected(const QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
+  //! Shows the message in the status bar
+  //! \param theMessage a message
+  virtual void setStatusBarMessage(const QString& theMessage);
+
    /// Update of commands status
   virtual void updateCommandStatus();
 
