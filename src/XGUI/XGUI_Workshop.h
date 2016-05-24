@@ -261,6 +261,10 @@ Q_OBJECT
   /// \param theFeature a feature
   bool isFeatureOfNested(const FeaturePtr& theFeature);
 
+  //! Shows the message in the status bar
+  //! \param theMessage a message
+  void setStatusBarMessage(const QString& theMessage);
+
   /// Has to be called in order to display objects with visibility status = true
   void synchronizeViewer();
 

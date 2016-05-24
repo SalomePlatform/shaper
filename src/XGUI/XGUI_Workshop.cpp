@@ -1890,6 +1890,15 @@ QList<ActionInfo> XGUI_Workshop::processHistoryList(const std::list<std::string>
   return aResult;
 }
 
+void XGUI_Workshop::setStatusBarMessage(const QString& theMessage)
+{
+#ifdef HAVE_SALOME
+  return salomeConnector()->desktop();
+#else
+  myMainWindow->putInfo(theMessage, -1);
+#endif
+}
+
 void XGUI_Workshop::synchronizeViewer()
 {
   SessionPtr aMgr = ModelAPI_Session::get();

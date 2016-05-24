@@ -118,17 +118,9 @@ void XGUI_ModuleConnector::setSelected(const QList<ModuleBase_ViewerPrsPtr>& the
   }    
 }
 
-#include <QMainWindow>
-#include <QStatusBar>
 void XGUI_ModuleConnector::setStatusBarMessage(const QString& theMessage)
 {
-#ifdef HAVE_SALOME
-  //return myWorkshop->salomeConnector()->featureInfo(theId);
-#else
-  QMainWindow* aDesktop = desktop();
-  aDesktop->statusBar()->showMessage(theMessage);
-
-#endif
+  myWorkshop->setStatusBarMessage(theMessage);
 }
 
 bool XGUI_ModuleConnector::canStartOperation(QString theId)
