@@ -616,6 +616,11 @@ void SHAPERGUI::preferencesChanged(const QString& theSection, const QString& the
   myWorkshop->displayer()->redisplayObjects();
 }
 
+void SHAPERGUI::putInfo(const QString& theInfo, const int theMSecs)
+{
+  application()->putInfo(theInfo, theMSecs);
+}
+
 void SHAPERGUI::inspectSalomeModules()
 {
   QStringList aModuleNames;

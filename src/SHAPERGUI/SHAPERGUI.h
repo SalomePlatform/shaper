@@ -122,7 +122,13 @@ Q_OBJECT
 
   /// Redefinition of virtual function for preferences changed event. 
   virtual void preferencesChanged(const QString& theSection, const QString& theParam);
-  
+
+  //! Shows the given text in status bar as a permanent text
+  //! \theInfo a string value
+  //! \theMsecs interval of msec milliseconds when the message will be hidden, if -1, it stays.
+  //            If 0, default value is used, it is 3000
+  virtual void putInfo(const QString& theInfo, const int theMSecs = 0);
+
   /// \return Workshop class instance
   XGUI_Workshop* workshop() const { return myWorkshop; }
 

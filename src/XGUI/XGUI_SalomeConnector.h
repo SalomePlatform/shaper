@@ -112,6 +112,12 @@ class XGUI_EXPORT XGUI_SalomeConnector
 
   //! Create preferences
   virtual void createPreferences() = 0;
+
+  //! Shows the given text in status bar as a permanent text
+  //! \theInfo a string value
+  //! \theMsecs interval of msec milliseconds when the message will be hidden, if -1, it stays.
+  //            If 0, default value is used, it is 3000
+  virtual void putInfo(const QString& theInfo, const int theMSecs = 0) = 0;
 };
 
 #endif
