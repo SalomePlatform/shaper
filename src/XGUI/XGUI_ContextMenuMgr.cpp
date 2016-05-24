@@ -64,79 +64,82 @@ void XGUI_ContextMenuMgr::createActions()
   QMainWindow* aDesktop = myWorkshop->mainWindow();
 #endif
 
-  QAction* aAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
+  QAction* aAction = ModuleBase_Tools::createAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
   aDesktop->addAction(aAction);
 
   addAction("DELETE_CMD", aAction);
   aAction->setShortcutContext(Qt::ApplicationShortcut);
 
-  aAction = new QAction(QIcon(":pictures/rename_edit.png"), tr("Rename"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/rename_edit.png"), tr("Rename"), this,
+                        this, SLOT(onRename()));
   addAction("RENAME_CMD", aAction);
-  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRename()));
 
-  aAction = new QAction(QIcon(":pictures/move.png"), XGUI_Workshop::MOVE_TO_END_COMMAND, this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/move.png"),
+                                           XGUI_Workshop::MOVE_TO_END_COMMAND, this);
   addAction("MOVE_CMD", aAction);
 
-  aAction = new QAction(QIcon(":pictures/clean_history.png"), tr("Clean history"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/clean_history.png"), tr("Clean history"), this);
   addAction("CLEAN_HISTORY_CMD", aAction);
 
-  aAction = new QAction(QIcon(":pictures/color.png"), tr("Color..."), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/color.png"), tr("Color..."), this);
   addAction("COLOR_CMD", aAction);
 
-  aAction = new QAction(QIcon(":pictures/eye_pencil.png"), tr("Show"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil.png"), tr("Show"), this);
   addAction("SHOW_CMD", aAction);
 
-  aAction = new QAction(QIcon(":pictures/eye_pencil.png"), tr("Show only"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil.png"), tr("Show only"), this);
   addAction("SHOW_ONLY_CMD", aAction);
 
-  aAction = new QAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide"), this);
   addAction("HIDE_CMD", aAction);
 
-  aAction = new QAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide all"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide all"), this);
   addAction("HIDEALL_CMD", aAction);
 
-  aAction = new QAction(QIcon(":pictures/shading.png"), tr("Shading"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/shading.png"), tr("Shading"), this);
   addAction("SHADING_CMD", aAction);
 
-  aAction = new QAction(QIcon(":pictures/wireframe.png"), tr("Wireframe"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/wireframe.png"), tr("Wireframe"), this);
   addAction("WIREFRAME_CMD", aAction);
 
-  mySeparator = new QAction(this);
+  mySeparator = ModuleBase_Tools::createAction(QIcon(), "", this);
   mySeparator->setSeparator(true);
 
   //mySelectActions = new QActionGroup(this);
   //mySelectActions->setExclusive(true);
 
-  aAction = new QAction(QIcon(":pictures/vertex.png"), tr("Vertices"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/vertex.png"), tr("Vertices"), this,
+                                           this, SLOT(onShapeSelection(bool)));
   aAction->setCheckable(true);
   addAction("SELECT_VERTEX_CMD", aAction);
-  connect(aAction, SIGNAL(triggered(bool)), SLOT(onShapeSelection(bool)));
   //mySelectActions->addAction(aAction);
 
-  aAction = new QAction(QIcon(":pictures/edge.png"), tr("Edges"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/edge.png"), tr("Edges"), this,
+                                           this, SLOT(onShapeSelection(bool)));
   aAction->setCheckable(true);
   addAction("SELECT_EDGE_CMD", aAction);
-  connect(aAction, SIGNAL(triggered(bool)), SLOT(onShapeSelection(bool)));
   //mySelectActions->addAction(aAction);
 
-  aAction = new QAction(QIcon(":pictures/face.png"), tr("Faces"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/face.png"), tr("Faces"), this,
+                                           this, SLOT(onShapeSelection(bool)));
   aAction->setCheckable(true);
   addAction("SELECT_FACE_CMD", aAction);
-  connect(aAction, SIGNAL(triggered(bool)), SLOT(onShapeSelection(bool)));
   //mySelectActions->addAction(aAction);
 
-  aAction = new QAction(QIcon(":pictures/result.png"), tr("Result"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/result.png"), tr("Result"), this,
+                                           this, SLOT(onResultSelection(bool)));
   aAction->setCheckable(true);
   addAction("SELECT_RESULT_CMD", aAction);
-  connect(aAction, SIGNAL(triggered(bool)), SLOT(onResultSelection(bool)));
   //mySelectActions->addAction(aAction);
 
   aAction->setChecked(true);
 
-  aAction = new QAction(QIcon(":pictures/find_result.png"), tr("Select results"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/find_result.png"),
+                                           tr("Select results"), this);
   addAction("SHOW_RESULTS_CMD", aAction);
 
-  aAction = new QAction(QIcon(":pictures/find_result.png"), tr("Select parent feature"), this);
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/find_result.png"),
+                                           tr("Select parent feature"), this);
   addAction("SHOW_FEATURE_CMD", aAction);
 
   buildObjBrowserMenu();
@@ -417,7 +420,7 @@ void XGUI_ContextMenuMgr::connectViewer()
 
 void XGUI_ContextMenuMgr::buildObjBrowserMenu()
 {
-  QAction* aSeparator = new QAction(this);
+  QAction* aSeparator = ModuleBase_Tools::createAction(QIcon(), "", this);
   aSeparator->setSeparator(true);
 
   QActionsList aList;

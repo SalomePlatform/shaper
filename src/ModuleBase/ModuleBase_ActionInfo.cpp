@@ -69,24 +69,6 @@ void ModuleBase_ActionInfo::initFrom(std::shared_ptr<Config_FeatureMessage> theM
   modal = theMessage->isModal();
 }
 
-QAction* ModuleBase_ActionInfo::makeAction(QObject* theParent)
-{
-  QAction* aResult = new QAction(icon, text, theParent);
-  aResult->setCheckable(checkable);
-  aResult->setChecked(checked);
-  aResult->setEnabled(enabled);
-  aResult->setVisible(visible);
-  aResult->setIconText(iconText);
-  aResult->setToolTip(toolTip);
-  aResult->setStatusTip(toolTip);
-  // aResult->setWhatsThis(whatsThis);
-  aResult->setShortcut(shortcut);
-  aResult->setFont(font);
-  // By convenience, QAction for a feature keeps feature's id as data (QVariant);
-  aResult->setData(id);
-  return aResult;
-}
-
 void ModuleBase_ActionInfo::initDefault()
 {
   id = QString();

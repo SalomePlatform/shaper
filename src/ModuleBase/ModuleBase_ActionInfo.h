@@ -52,9 +52,6 @@ struct MODULEBASE_EXPORT ModuleBase_ActionInfo
   void initFrom(QAction* theAction);
   //! Fills itself with info from given \param theFeatureMessage
   void initFrom(std::shared_ptr<Config_FeatureMessage> theFeatureMessage);
-  //! Creates new QAction with given parent and data initialized from this structure
-  //! \param theParent - parent of created action
-  QAction* makeAction(QObject* theParent = 0);
 
  protected:
   //! Initializes structure with default values, like QAction()
