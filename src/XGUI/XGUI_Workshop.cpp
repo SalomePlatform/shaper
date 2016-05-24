@@ -1893,7 +1893,7 @@ QList<ActionInfo> XGUI_Workshop::processHistoryList(const std::list<std::string>
 void XGUI_Workshop::setStatusBarMessage(const QString& theMessage)
 {
 #ifdef HAVE_SALOME
-  return salomeConnector()->desktop();
+  //return salomeConnector()->desktop();
 #else
   myMainWindow->putInfo(theMessage, -1);
 #endif
