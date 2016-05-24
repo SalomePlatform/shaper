@@ -135,6 +135,10 @@ void SketchSolver_Manager::processEvent(
           hasProperFeature = true;
         }
       }
+      if (!hasProperFeature) // in this iteration it will compute nothing, so, no problem with recursion
+        // it is important that solver flushes signal updated after processing move signal as there is
+        // optimization that relies on this update, might be found by key "optimization"
+        myIsComputed = false;
     } else {
       std::list<FeaturePtr> aSketchFeatures = SketchSolver_Group::selectApplicableFeatures(aFeatures);
       std::list<FeaturePtr>::iterator aFeatIter = aSketchFeatures.begin();
