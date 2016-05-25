@@ -9,7 +9,6 @@
 
   #include <ModelAPI.h>
 
-  #include "ModelHighAPI.h"
   #include "ModelHighAPI_Double.h"
   #include "ModelHighAPI_Interface.h"
 

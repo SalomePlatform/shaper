@@ -7,9 +7,8 @@
 #ifndef SRC_CONSTRUCTIONAPI_CONSTRUCTIONAPI_SWIG_H_
 #define SRC_CONSTRUCTIONAPI_CONSTRUCTIONAPI_SWIG_H_
 
-  #include "ModelHighAPI_swig.h"
+  #include <ModelHighAPI_swig.h>
 
-  #include "ConstructionAPI.h"
   #include "ConstructionAPI_Point.h"
 
 #endif /* SRC_CONSTRUCTIONAPI_CONSTRUCTIONAPI_SWIG_H_ */
