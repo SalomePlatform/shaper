@@ -48,6 +48,9 @@ class FeaturesTestCase(FeaturesFixture):
             except AssertionError as e:
                 self.fail("%s does not check empty args" % name)
 
+    def test_addPoint(self):
+        model.addPoint(self.part, 10, "20", "x + 30")
+
     def test_initialize_without_attributes(self):
         import ConstructionAPI
         model.construction.axis.Axis(self.part.addFeature("Axis"))
