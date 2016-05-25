@@ -10,9 +10,10 @@
 // standard definitions
 %include "typemaps.i"
 %include "std_string.i"
+%include "std_shared_ptr.i"
 
-// all supported interfaces
-%include "ModelHighAPI_Double.h"
+// shared pointers
+%shared_ptr(ModelHighAPI_Interface)
 
 // typemaps
 %typemap(in) const ModelHighAPI_Double & (ModelHighAPI_Double temp) {
@@ -32,3 +33,7 @@
 %typecheck(SWIG_TYPECHECK_POINTER) ModelHighAPI_Double, const ModelHighAPI_Double & {
   $1 = (PyFloat_Check($input) || PyInt_Check($input) || PyLong_Check($input) || PyString_Check($input)) ? 1 : 0;
 }
+
+// all supported interfaces
+%include "ModelHighAPI_Double.h"
+%include "ModelHighAPI_Interface.h"
