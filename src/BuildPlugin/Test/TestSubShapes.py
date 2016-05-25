@@ -115,7 +115,7 @@ aSession.startOperation()
 aSubShapesFeature = aPart.addFeature("SubShapes")
 aBaseShapeSelection = aSubShapesFeature.selection("base_shape")
 aBaseShapeSelection.setValue(aFaceResult, None)
-aSubShapesList = aSubShapesFeature.selectionList("sub_shapes")
+aSubShapesList = aSubShapesFeature.selectionList("subshapes")
 for aPoint in aPoints:
     aSubShapesList.append(aSketchResult, aPoint)
 aShapeExplorer = GeomAPI_ShapeExplorer(aSketchShape, GeomAPI_Shape.EDGE)
