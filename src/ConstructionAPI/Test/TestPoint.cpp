@@ -10,6 +10,7 @@
 
 #include "MockModelAPI_AttributeDouble.h"
 #include "MockModelAPI_Data.h"
+#include "MockModelAPI_Document.h"
 #include "MockModelAPI_Feature.h"
 
 using ::testing::_;
@@ -17,6 +18,7 @@ using ::testing::Return;
 using ::testing::ReturnRefOfCopy;
 using ::testing::Test;
 
+// TODO(spo): should be common function
 void null_deleter(void *) {}
 
 class MockEvents_Listener : public Events_Listener {
@@ -31,8 +33,12 @@ public:
   MockModelAPI_AttributeDouble aMockAttributeDouble;
   MockModelAPI_Data aMockData;
   MockModelAPI_Feature aMockFeature;
+  MockModelAPI_Document aMockDocument;
 
   ConstructionAPI_Point_Constructor_Test() {
+    ON_CALL(aMockDocument, addFeature(_, _))
+      .WillByDefault(Return(std::shared_ptr<ModelAPI_Feature>(&aMockFeature, &null_deleter)));
+
     ON_CALL(aMockFeature, getKind())
       .WillByDefault(ReturnRefOfCopy(std::string("Point")));
 
@@ -49,7 +55,7 @@ public:
     Events_Loop::loop()->removeListener(&aErrorListener);
   }
 
-  void testUsingAttributes() {
+  void testInitializeFeature() {
     EXPECT_CALL(aMockFeature, getKind());
 
     EXPECT_CALL(aMockFeature, data())
@@ -60,6 +66,13 @@ public:
     EXPECT_CALL(aMockData, real("z"));
   }
 
+  void testSetAttributes() {
+    EXPECT_CALL(aMockAttributeDouble, setValue(10));
+    EXPECT_CALL(aMockAttributeDouble, setText("20"));
+    EXPECT_CALL(aMockAttributeDouble, setText("x + 30"));
+
+    EXPECT_CALL(aMockFeature, execute());
+  }
 };
 
 TEST_F(ConstructionAPI_Point_Constructor_Test, GetEmptyFeature_SendException) {
@@ -94,7 +107,7 @@ TEST_F(ConstructionAPI_Point_Constructor_Test, GetWrongFeature_SendException) {
 TEST_F(ConstructionAPI_Point_Constructor_Test, GetFeature) {
   FeaturePtr aFeature(&aMockFeature, &null_deleter);
 
-  testUsingAttributes();
+  testInitializeFeature();
 
   ConstructionAPI_Point aPoint(aFeature);
 }
@@ -102,13 +115,29 @@ TEST_F(ConstructionAPI_Point_Constructor_Test, GetFeature) {
 TEST_F(ConstructionAPI_Point_Constructor_Test, GetFeatureAndValues) {
   FeaturePtr aFeature(&aMockFeature, &null_deleter);
 
-  testUsingAttributes();
-
-  EXPECT_CALL(aMockAttributeDouble, setValue(10));
-  EXPECT_CALL(aMockAttributeDouble, setText("20"));
-  EXPECT_CALL(aMockAttributeDouble, setText("x + 30"));
-
-  EXPECT_CALL(aMockFeature, execute());
+  testInitializeFeature();
+  testSetAttributes();
 
   ConstructionAPI_Point aPoint(aFeature, 10, "20", std::string("x + 30"));
+}
+
+TEST_F(ConstructionAPI_Point_Constructor_Test, addPoint) {
+  DocumentPtr aDocument(&aMockDocument, &null_deleter);
+
+  EXPECT_CALL(aMockDocument, addFeature("Point", true));
+
+  testInitializeFeature();
+
+  PointPtr aPoint = addPoint(aDocument);
+}
+
+TEST_F(ConstructionAPI_Point_Constructor_Test, addPointWithValues) {
+  DocumentPtr aDocument(&aMockDocument, &null_deleter);
+
+  EXPECT_CALL(aMockDocument, addFeature("Point", true));
+
+  testInitializeFeature();
+  testSetAttributes();
+
+  PointPtr aPoint = addPoint(aDocument, 10, "20", std::string("x + 30"));
 }

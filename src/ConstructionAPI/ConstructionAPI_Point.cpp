@@ -8,6 +8,7 @@
 #include "ConstructionAPI_Point.h"
 //--------------------------------------------------------------------------------------
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 
 #include <ModelHighAPI_Double.h>
@@ -83,4 +84,25 @@ std::shared_ptr<ModelAPI_AttributeDouble> ConstructionAPI_Point::y() const
 std::shared_ptr<ModelAPI_AttributeDouble> ConstructionAPI_Point::z() const
 {
   return myZ;
+}
+
+//--------------------------------------------------------------------------------------
+// TODO(spo): make add* as static functions of the class
+PointPtr addPoint(
+    std::shared_ptr<ModelAPI_Document> thePart)
+{
+  // TODO(spo): check that thePart is not empty
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature("Point");
+  return PointPtr(new ConstructionAPI_Point(aFeature));
+}
+
+PointPtr addPoint(
+    std::shared_ptr<ModelAPI_Document> thePart,
+    const ModelHighAPI_Double& theX,
+    const ModelHighAPI_Double& theY,
+    const ModelHighAPI_Double& theZ)
+{
+  // TODO(spo): check that thePart is not empty
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature("Point");
+  return PointPtr(new ConstructionAPI_Point(aFeature, theX, theY, theZ));
 }

@@ -13,6 +13,7 @@
 #include <ModelHighAPI_Interface.h>
 //--------------------------------------------------------------------------------------
 class ModelAPI_AttributeDouble;
+class ModelAPI_Document;
 class ModelHighAPI_Double;
 //--------------------------------------------------------------------------------------
 /*
@@ -41,6 +42,15 @@ protected:
 
   bool initialize();
 };
+
+//! Pointer on point object
+typedef std::shared_ptr<ConstructionAPI_Point> PointPtr;
+
+PointPtr addPoint(std::shared_ptr<ModelAPI_Document> thePart);
+PointPtr addPoint(std::shared_ptr<ModelAPI_Document> thePart,
+                  const ModelHighAPI_Double & theX,
+                  const ModelHighAPI_Double & theY,
+                  const ModelHighAPI_Double & theZ);
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
