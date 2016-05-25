@@ -885,7 +885,12 @@ void XGUI_Displayer::activateAIS(const Handle(AIS_InteractiveObject)& theIO,
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull()) {
-    aContext->Activate(theIO, theMode, false);
+    if (myWorkshop->module()) {
+      int aMode = (theMode > 8)? theMode : AIS_Shape::SelectionType(theMode);
+      if (myWorkshop->module()->canActivateSelectionMode(theIO, aMode))
+        aContext->Activate(theIO, theMode, false);
+    } else
+      aContext->Activate(theIO, theMode, false);
 
 #ifdef DEBUG_ACTIVATE_AIS
     ObjectPtr anObject = getObject(theIO);
@@ -903,9 +908,9 @@ void XGUI_Displayer::deactivateAIS(const Handle(AIS_InteractiveObject)& theIO, c
   if (!aContext.IsNull()) {
     if (theMode == -1)
       aContext->Deactivate(theIO);
-    else
+    else 
       aContext->Deactivate(theIO, theMode);
-
+   
 #ifdef DEBUG_DEACTIVATE_AIS
     ObjectPtr anObject = getObject(theIO);
     anInfo.append(ModuleBase_Tools::objectInfo((*anIt)));
@@ -1154,7 +1159,8 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   bool isDeactivated = false;
   for (; itr.More(); itr.Next() ) {
     Standard_Integer aMode = itr.Value();
-    if (!theModes.contains(aMode)) {
+    int aShapeMode = (aMode > 8)? aMode : AIS_Shape::SelectionType(aMode);
+    if (!theModes.contains(aMode) || (myWorkshop->module()->needDeactivateSelectionMode(theIO, aShapeMode))) {
       deactivateAIS(theIO, aMode);
       isDeactivated = true;
     }

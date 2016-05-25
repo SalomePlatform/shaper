@@ -183,6 +183,16 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theObject a model object
   virtual bool canActivateSelection(const ObjectPtr& theObject) const;
 
+  /// Returns true if the given selection mode can be activated for the given presentgation
+  /// \param theIO an object presentation
+  /// \param theMode selection mode
+  virtual bool canActivateSelectionMode(const Handle(AIS_InteractiveObject)& theIO, int theMode) const { return true; }
+
+  /// Returns true if the given selection mode must be deactivated for the given presentgation in any case
+  /// \param theIO an object presentation
+  /// \param theMode selection mode
+  virtual bool needDeactivateSelectionMode(const Handle(AIS_InteractiveObject)& theIO, int theMode) const { return false; }
+
   /// Reacts to the delete action in module
   /// \returns true if the action is processed
   virtual bool deleteObjects() { return false; };

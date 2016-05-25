@@ -307,6 +307,16 @@ public:
   /// \return theAttribute
   virtual AttributePtr findAttribute(const ObjectPtr& theObject, const GeomShapePtr& theGeomShape);
 
+  /// Returns true if the given selection mode can be activated for the given presentgation
+  /// \param theIO an object presentation
+  /// \param theMode selection mode
+  virtual bool canActivateSelectionMode(const Handle(AIS_InteractiveObject)& theIO, int theMode) const;
+
+  /// Returns true if the given selection mode must be deactivated for the given presentgation in any case
+  /// \param theIO an object presentation
+  /// \param theMode selection mode
+  virtual bool needDeactivateSelectionMode(const Handle(AIS_InteractiveObject)& theIO, int theMode) const;
+
 public slots:
   /// Redefines the parent method in order to customize the next case:
   /// If the sketch nested operation is active and the presentation is not visualized in the viewer,

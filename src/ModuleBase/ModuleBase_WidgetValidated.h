@@ -64,6 +64,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   //! Clear all validated cash in the widget
   void clearValidatedCash();
 
+  /// Returns true if the workshop validator filter has been already activated
+  /// \return boolean value
+  bool isFilterActivated() const;
+
 protected:
   /// Checks whether all active viewer filters validate the presentation
   /// \param thePrs a selected presentation in the view
@@ -131,10 +135,6 @@ private:
   /// \param theAttribute an attribute to be validated
   /// \return true if all validators return that the attribute is valid
   bool isValidAttribute(const AttributePtr& theAttribute) const;
-
-  /// Returns true if the workshop validator filter has been already activated
-  /// \return boolean value
-  bool isFilterActivated() const;
 
 protected:
   /// Gets the validity state of the presentation in an internal map. Returns true if the valid state of value is stored
