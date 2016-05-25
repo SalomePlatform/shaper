@@ -89,14 +89,6 @@ std::shared_ptr<ModelAPI_AttributeDouble> ConstructionAPI_Point::z() const
 //--------------------------------------------------------------------------------------
 // TODO(spo): make add* as static functions of the class
 PointPtr addPoint(
-    std::shared_ptr<ModelAPI_Document> thePart)
-{
-  // TODO(spo): check that thePart is not empty
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature("Point");
-  return PointPtr(new ConstructionAPI_Point(aFeature));
-}
-
-PointPtr addPoint(
     std::shared_ptr<ModelAPI_Document> thePart,
     const ModelHighAPI_Double& theX,
     const ModelHighAPI_Double& theY,

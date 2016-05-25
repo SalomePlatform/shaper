@@ -46,7 +46,6 @@ protected:
 //! Pointer on point object
 typedef std::shared_ptr<ConstructionAPI_Point> PointPtr;
 
-PointPtr addPoint(std::shared_ptr<ModelAPI_Document> thePart);
 PointPtr addPoint(std::shared_ptr<ModelAPI_Document> thePart,
                   const ModelHighAPI_Double & theX,
                   const ModelHighAPI_Double & theY,
