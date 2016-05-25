@@ -21,7 +21,7 @@ public:
   GEOMAPI_EXPORT 
   GeomAPI_Ax1();
 
-  /** \brief Ñonstructor.
+  /** \brief Constructor.
    *  \param[in] theOrigin point of origin.
    *  \param[in] theDir direction of axis.
    */
