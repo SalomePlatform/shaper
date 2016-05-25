@@ -41,17 +41,12 @@ XGUI_ErrorMgr::XGUI_ErrorMgr(QObject* theParent, ModuleBase_IWorkshop* theWorksh
   : ModuleBase_IErrorMgr(theParent),
     myErrorDialog(0),
     myErrorLabel(0),
-    myWorkshop(theWorkshop)
+    myWorkshop(theWorkshop),
+    myAcceptAllToolTip(""),
+    myAcceptAllStatusTip(""),
+    myAcceptToolTip(""),
+    myAcceptStatusTip("")
 {
-  ModuleBase_ModelWidget* anActiveWidget = activeWidget();
-  XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
-  QAction* anAcceptAllAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll);
-  myAcceptAllToolTip = anAcceptAllAction->toolTip();
-  myAcceptAllStatusTip = anAcceptAllAction->statusTip();
-
-  QAction* anOkAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
-  myAcceptToolTip = anOkAction->toolTip();
-  myAcceptStatusTip = anOkAction->toolTip();
 }
 
 XGUI_ErrorMgr::~XGUI_ErrorMgr()
@@ -96,6 +91,9 @@ void XGUI_ErrorMgr::updateActions(const FeaturePtr& theFeature)
 
 void XGUI_ErrorMgr::updateAcceptAllAction(const FeaturePtr& theFeature)
 {
+  if (myAcceptAllToolTip.isEmpty() && myAcceptToolTip.isEmpty())
+    storeInitialActionValues();
+
   QString anError = myWorkshop->module()->getFeatureError(theFeature);
   if (anError.isEmpty()) {
     ModuleBase_ModelWidget* anActiveWidget = activeWidget();
@@ -125,13 +123,28 @@ bool XGUI_ErrorMgr::isApplyEnabled() const
   return isEnabled;
 }
 
+void XGUI_ErrorMgr::storeInitialActionValues()
+{
+  ModuleBase_ModelWidget* anActiveWidget = activeWidget();
+  XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
+  QAction* anAcceptAllAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll);
+  myAcceptAllToolTip = anAcceptAllAction->toolTip();
+  myAcceptAllStatusTip = anAcceptAllAction->statusTip();
+
+  QAction* anOkAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
+  myAcceptToolTip = anOkAction->toolTip();
+  myAcceptStatusTip = anOkAction->toolTip();
+}
+
 void XGUI_ErrorMgr::updateAcceptActionState(const QString& theError)
 {
   XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
   QAction* anAcceptAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
 
-  bool anEnabled = theError.isEmpty();
+  if (myAcceptAllToolTip.isEmpty() && myAcceptToolTip.isEmpty())
+    storeInitialActionValues();
 
+  bool anEnabled = theError.isEmpty();
   anAcceptAction->setEnabled(anEnabled);
   anAcceptAction->setToolTip(anEnabled ? myAcceptToolTip : theError);
   anAcceptAction->setStatusTip(anEnabled ? myAcceptStatusTip : theError);
