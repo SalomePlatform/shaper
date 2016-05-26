@@ -159,8 +159,21 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     std::shared_ptr<ModelAPI_ObjectDeletedMessage> aUpdMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
     DocumentPtr aDoc = aUpdMsg->document();
-    std::set<std::string> aGroups = aUpdMsg->groups();
-    std::set<std::string>::const_iterator aIt;
+    std::set<std::string> aMsgGroups = aUpdMsg->groups();
+
+    /// Sort groups because RootType deletion has to be done after others
+    std::string aType = (aDoc == aRootDoc)? aRootType : aSubType;
+    std::list<std::string> aGroups;
+    std::set<std::string>::const_iterator aSetIt;
+    for (aSetIt = aMsgGroups.begin(); aSetIt != aMsgGroups.end(); ++aSetIt) {
+      std::string aGroup = (*aSetIt);
+      if (aGroup == aType)
+        aGroups.push_back(aGroup);
+      else
+        aGroups.push_front(aGroup);
+    }
+
+    std::list<std::string>::const_iterator aIt;
     for (aIt = aGroups.begin(); aIt != aGroups.end(); ++aIt) {
       std::string aGroup = (*aIt);
       if (aDoc == aRootDoc) {  // If root objects
