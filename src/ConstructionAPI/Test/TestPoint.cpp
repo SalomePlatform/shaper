@@ -8,10 +8,12 @@
 #include <ModelHighAPI_Double.h>
 #include <ConstructionAPI_Point.h>
 
-#include "MockModelAPI_AttributeDouble.h"
-#include "MockModelAPI_Data.h"
-#include "MockModelAPI_Document.h"
-#include "MockModelAPI_Feature.h"
+#include <MockEvents_Listener.h>
+
+#include <MockModelAPI_AttributeDouble.h>
+#include <MockModelAPI_Data.h>
+#include <MockModelAPI_Document.h>
+#include <MockModelAPI_Feature.h>
 
 using ::testing::_;
 using ::testing::Return;
@@ -20,12 +22,6 @@ using ::testing::Test;
 
 // TODO(spo): should be common function
 void null_deleter(void *) {}
-
-class MockEvents_Listener : public Events_Listener {
-public:
-  MOCK_METHOD1(processEvent,
-    void(const std::shared_ptr<Events_Message>& theMessage));
-};
 
 class ConstructionAPI_Point_Constructor_Test : public Test {
 public:

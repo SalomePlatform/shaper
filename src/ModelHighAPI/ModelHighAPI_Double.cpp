@@ -11,10 +11,6 @@
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
-ModelHighAPI_Double::ModelHighAPI_Double()
-{
-}
-
 ModelHighAPI_Double::ModelHighAPI_Double(double theValue)
 : myValue(theValue)
 {

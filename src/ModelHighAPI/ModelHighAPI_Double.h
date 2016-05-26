@@ -22,10 +22,8 @@ class ModelAPI_AttributeDouble;
 class ModelHighAPI_Double
 {
 public:
-  /// Default constructor
-  ModelHighAPI_Double();
   /// Constructor for double
-  ModelHighAPI_Double(double theValue);
+  ModelHighAPI_Double(double theValue = 0.);
   /// Constructor for std::string
   ModelHighAPI_Double(const std::string & theValue);
   /// Constructor for char *
