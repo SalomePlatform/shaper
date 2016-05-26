@@ -16,9 +16,9 @@ include(FindGTest)
 add_definitions(-DGTEST_LANG_CXX11=0)
 
 include_directories(
-    $ENV{GTEST_ROOT}/googletest/include
-    $ENV{GTEST_ROOT}/googlemock/include
-    )
+  $ENV{GTEST_ROOT}/googletest/include
+  $ENV{GTEST_ROOT}/googlemock/include
+)
     
 set(GTEST_LIBRARY $ENV{GTEST_ROOT}/googlemock/make/gmock_main.a)
   
