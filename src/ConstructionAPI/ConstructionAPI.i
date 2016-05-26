@@ -1,5 +1,7 @@
 /* ConstructionAPI.i */
+
 %module ConstructionAPI
+
 %{
   #include "ConstructionAPI_swig.h"
 %}
