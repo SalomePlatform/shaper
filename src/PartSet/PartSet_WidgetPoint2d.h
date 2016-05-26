@@ -199,8 +199,6 @@ private:
   ModuleBase_ParamSpinBox* myXSpin;  ///< the spin box for the X coordinate
   ModuleBase_ParamSpinBox* myYSpin;  ///< the spin box for the Y coordinate
 
-  //std::string myOptionParam;  /// Parameter name which has to be taken from previous feature
-
   CompositeFeaturePtr mySketch;
 
   bool myValueIsCashed; /// boolean state if the value is cashed during value state change

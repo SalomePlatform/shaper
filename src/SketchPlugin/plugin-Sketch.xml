@@ -26,7 +26,7 @@
       
       <!-- SketchLine -->
       <feature id="SketchLine" title="Line" tooltip="Create line" icon="icons/Sketch/line.png">
-        <sketch-2dpoint_selector id="StartPoint" accept_expressions="0" title="Start point" tooltip="Start point coordinates" previous_feature_param="EndPoint"/>
+        <sketch-2dpoint_selector id="StartPoint" accept_expressions="0" title="Start point" tooltip="Start point coordinates"/>
         <sketch-2dpoint_selector id="EndPoint" accept_expressions="0" title="End point" tooltip="End point coordinates"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
         <validator id="GeomValidators_Different" parameters="StartPoint,EndPoint"/>
