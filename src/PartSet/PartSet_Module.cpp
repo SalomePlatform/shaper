@@ -1332,12 +1332,15 @@ bool PartSet_Module::canActivateSelectionMode(const Handle(AIS_InteractiveObject
         ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
         if (anOperation) {
           ModuleBase_IPropertyPanel* aPropPanel = anOperation->propertyPanel();
-          ModuleBase_ModelWidget* aModelWgt = aPropPanel->activeWidget();
-          ModuleBase_WidgetSelector* aWgtSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aModelWgt);
-          if (aWgtSelector) {
-            return aWgtSelector->isFilterActivated();
+          if (aPropPanel) {
+            ModuleBase_ModelWidget* aModelWgt = aPropPanel->activeWidget();
+            ModuleBase_WidgetSelector* aWgtSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aModelWgt);
+            if (aWgtSelector) {
+              return aWgtSelector->isFilterActivated();
+            } else
+              return true;
           } else
-            return true;
+            return false;
         } else
           return false;
     }
