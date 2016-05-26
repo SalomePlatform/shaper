@@ -13,6 +13,7 @@
                   label="Path object:"
                   tooltip="Select an edge or wire for path"
                   shape_types="edge wire">
+    <validator id="FeaturesPlugin_ValidatorPipePath"/>
   </shape_selector>
   <toolbox id="creation_method">
     <box id="simple" title="Simple pipe by objects and path" icon="icons/Features/pipe_simple_32x32.png"/>

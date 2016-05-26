@@ -10,6 +10,21 @@
 #include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_FeatureValidator.h>
 
+/// \class FeaturesPlugin_ValidatorPipePath
+/// \ingroup Validators
+/// \brief A validator for selection pipe path.
+class FeaturesPlugin_ValidatorPipePath: public ModelAPI_AttributeValidator
+{
+public:
+  //! \return True if the attribute is valid.
+  //! \param[in] theAttribute the checked attribute.
+  //! \param[in] theArguments arguments of the attribute.
+  //! \param[out] theError error message.
+   virtual bool isValid(const AttributePtr& theAttribute,
+                        const std::list<std::string>& theArguments,
+                        std::string& theError) const;
+};
+
 /// \class FeaturesPlugin_ValidatorPipeLocations
 /// \ingroup Validators
 /// \brief Validator for the pipe locations.
@@ -35,7 +50,7 @@ class FeaturesPlugin_ValidatorPipeLocations: public ModelAPI_FeatureValidator
 class FeaturesPlugin_ValidatorBaseForGeneration: public ModelAPI_AttributeValidator
 {
 public:
-  //! Returns true if attribute has selection type listed in the parameter arguments.
+  //! \return true if attribute has selection type listed in the parameter arguments.
   //! \param[in] theAttribute the checked attribute.
   //! \param[in] theArguments arguments of the attribute.
   //! \param[out] theError error message.
@@ -55,7 +70,7 @@ private:
 class FeaturesPlugin_ValidatorCompositeLauncher: public ModelAPI_AttributeValidator
 {
 public:
-  //! Returns true if attribute has selection type listed in the parameter arguments.
+  //! \return true if attribute has selection type listed in the parameter arguments.
   //! \param[in] theAttribute the checked attribute.
   //! \param[in] theArguments arguments of the attribute.
   //! \param[out] theError error message.
@@ -71,7 +86,7 @@ public:
 class FeaturesPlugin_ValidatorCanBeEmpty: public ModelAPI_FeatureValidator
 {
 public:
-  //! Returns true if attribute listed in the parameter arguments are planar.
+  //! \return true if attribute listed in the parameter arguments are planar.
   //! \param[in] theFeature the checked feature.
   //! \param[in] theArguments arguments of the attribute.
   //! \param[out] theError error message.
@@ -79,7 +94,7 @@ public:
                        const std::list<std::string>& theArguments,
                        std::string& theError) const;
 
-  /// Returns true if the attribute in feature is not obligatory for the feature execution
+  /// \return true if the attribute in feature is not obligatory for the feature execution
   virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 
 private:
@@ -149,7 +164,7 @@ class FeaturesPlugin_ValidatorRemoveSubShapesResult: public ModelAPI_FeatureVali
                        const std::list<std::string>& theArguments,
                        std::string& theError) const;
 
-  /// Returns true if the attribute in feature is not obligatory for the feature execution
+  /// \return true if the attribute in feature is not obligatory for the feature execution
   virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 

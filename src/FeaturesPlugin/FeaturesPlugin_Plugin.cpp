@@ -53,6 +53,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorRemoveSubShapesSelection);
   aFactory->registerValidator("FeaturesPlugin_ValidatorRemoveSubShapesResult",
                               new FeaturesPlugin_ValidatorRemoveSubShapesResult);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorPipePath",
+                              new FeaturesPlugin_ValidatorPipePath);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

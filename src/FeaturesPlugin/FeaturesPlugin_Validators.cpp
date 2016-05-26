@@ -30,6 +30,32 @@
 #include <GeomAlgoAPI_WireBuilder.h>
 
 //==================================================================================================
+bool FeaturesPlugin_ValidatorPipePath::isValid(const AttributePtr& theAttribute,
+                                               const std::list<std::string>& theArguments,
+                                               std::string& theError) const
+{
+  AttributeSelectionPtr aPathAttrSelection = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  if(!aPathAttrSelection.get()) {
+    theError = "Error: This validator can only work with path selector in \"Pipe\" feature.";
+    return false;
+  }
+
+  GeomShapePtr aPathShape = aPathAttrSelection->value();
+  ResultPtr aContext = aPathAttrSelection->context();
+  if(!aContext.get()) {
+    theError = "Error: Empty context.";
+    return false;
+  }
+  GeomShapePtr aContextShape = aContext->shape();
+  if(aPathShape.get() && aPathShape->shapeType() == GeomAPI_Shape::WIRE && !aPathShape->isEqual(aContextShape)) {
+    theError = "Error: Local selection of wires not allowed.";
+    return false;
+  }
+
+  return true;
+}
+
+//==================================================================================================
 bool FeaturesPlugin_ValidatorPipeLocations::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                     const std::list<std::string>& theArguments,
                                                     std::string& theError) const
