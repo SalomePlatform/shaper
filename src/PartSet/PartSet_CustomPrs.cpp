@@ -60,9 +60,7 @@ bool PartSet_CustomPrs::activate(const FeaturePtr& theFeature,
 
   bool isModified = false;
   if (theFeature.get()) {
-    displayPresentation(ModuleBase_IModule::CustomizeArguments, theUpdateViewer);
-    displayPresentation(ModuleBase_IModule::CustomizeResults, theUpdateViewer);
-    displayPresentation(ModuleBase_IModule::CustomizeHighlightedObjects, theUpdateViewer);
+    displayPresentation(theFlag, theUpdateViewer);
     isModified = true;
   }
   return isModified;
@@ -72,14 +70,8 @@ bool PartSet_CustomPrs::deactivate(const ModuleBase_IModule::ModuleBase_Customiz
                                    const bool theUpdateViewer)
 {
   myIsActive[theFlag] = false;
-  bool isModified = false;
-
-  erasePresentation(ModuleBase_IModule::CustomizeArguments, theUpdateViewer);
-  erasePresentation(ModuleBase_IModule::CustomizeResults, theUpdateViewer);
-  erasePresentation(ModuleBase_IModule::CustomizeHighlightedObjects, theUpdateViewer);
-  isModified = true;
-
-  return isModified;
+  erasePresentation(theFlag, theUpdateViewer);
+  return true;
 }
 
 bool PartSet_CustomPrs::displayPresentation(
