@@ -18,7 +18,7 @@ class ModelHighAPI_Double;
 //--------------------------------------------------------------------------------------
 /**\class ConstructionAPI_Point
  * \ingroup CPPHighAPI
- * \brief C++ HighAPI interface for Point feature
+ * \brief Interface for Point feature
  */
 class ConstructionAPI_Point : public ModelHighAPI_Interface
 {
@@ -55,7 +55,7 @@ protected:
 typedef std::shared_ptr<ConstructionAPI_Point> PointPtr;
 
 /**\ingroup CPPHighAPI
- * \brief C++ HighAPI function for creating Point feature
+ * \brief Create Point feature
  */
 PointPtr addPoint(std::shared_ptr<ModelAPI_Document> thePart,
                   const ModelHighAPI_Double & theX,
