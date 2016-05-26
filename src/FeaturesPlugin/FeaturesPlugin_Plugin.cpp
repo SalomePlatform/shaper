@@ -12,6 +12,7 @@
 #include <FeaturesPlugin_Partition.h>
 #include <FeaturesPlugin_Pipe.h>
 #include <FeaturesPlugin_Placement.h>
+#include <FeaturesPlugin_RemoveSubShapes.h>
 #include <FeaturesPlugin_Revolution.h>
 #include <FeaturesPlugin_RevolutionCut.h>
 #include <FeaturesPlugin_RevolutionFuse.h>
@@ -48,6 +49,10 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorBooleanSelection);
   aFactory->registerValidator("FeaturesPlugin_ValidatorPartitionSelection",
                               new FeaturesPlugin_ValidatorPartitionSelection);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorRemoveSubShapesSelection",
+                              new FeaturesPlugin_ValidatorRemoveSubShapesSelection);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorRemoveSubShapesResult",
+                              new FeaturesPlugin_ValidatorRemoveSubShapesResult);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -83,6 +88,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_RevolutionCut);
   } else if (theFeatureID == FeaturesPlugin_RevolutionFuse::ID()) {
     return FeaturePtr(new FeaturesPlugin_RevolutionFuse);
+  } else if (theFeatureID == FeaturesPlugin_RemoveSubShapes::ID()) {
+    return FeaturePtr(new FeaturesPlugin_RemoveSubShapes);
   }
 
   // feature of such kind is not found

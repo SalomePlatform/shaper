@@ -23,6 +23,10 @@
 #include <GeomAPI_DataMapOfShapeShape.h>
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_ShapeIterator.h>
+
+#include <GeomAlgoAPI_ShapeBuilder.h>
+#include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_WireBuilder.h>
 
 //==================================================================================================
@@ -35,13 +39,13 @@ bool FeaturesPlugin_ValidatorPipeLocations::isValid(const std::shared_ptr<ModelA
   static const std::string aLocationsID = "locations_objects";
 
   if(theFeature->getKind() != "Pipe") {
-    theError = "Feature \"" + theFeature->getKind() + "\" does not supported by this validator.";
+    theError = "Error: Feature \"" + theFeature->getKind() + "\" does not supported by this validator.";
     return false;
   }
 
   AttributeStringPtr aCreationMethodAttr = theFeature->string(aCreationMethodID);
   if(!aCreationMethodAttr.get()) {
-    theError = "Could not get \"" + aCreationMethodID + "\" attribute.";
+    theError = "Error: Could not get \"" + aCreationMethodID + "\" attribute.";
     return false;
   }
 
@@ -51,18 +55,18 @@ bool FeaturesPlugin_ValidatorPipeLocations::isValid(const std::shared_ptr<ModelA
 
   AttributeSelectionListPtr aBaseObjectsSelectionList = theFeature->selectionList(aBaseObjectsID);
   if(!aBaseObjectsSelectionList.get()) {
-    theError = "Could not get \"" + aBaseObjectsID + "\" attribute.";
+    theError = "Error: Could not get \"" + aBaseObjectsID + "\" attribute.";
     return false;
   }
 
   AttributeSelectionListPtr aLocationsSelectionList = theFeature->selectionList(aLocationsID);
   if(!aLocationsSelectionList.get()) {
-    theError = "Could not get \"" + aBaseObjectsID + "\" attribute.";
+    theError = "Error: Could not get \"" + aBaseObjectsID + "\" attribute.";
     return false;
   }
 
   if(aLocationsSelectionList->size() > 0 && aLocationsSelectionList->size() != aBaseObjectsSelectionList->size()) {
-    theError = "Number of locations should be the same as base objects.";
+    theError = "Error: Number of locations should be the same as base objects.";
     return false;
   }
 
@@ -81,14 +85,14 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
                                                         std::string& theError) const
 {
   if(theArguments.empty()) {
-    theError = "Validator parameters is empty.";
+    theError = "Error: Validator parameters is empty.";
     return false;
   }
 
   // Checking attribute.
   if(!isValidAttribute(theAttribute, theArguments, theError)) {
     if(theError.empty()) {
-      theError = "Attribute contains unacceptable shape.";
+      theError = "Error: Attribute contains unacceptable shape.";
     }
     return false;
   }
@@ -112,7 +116,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
       if(!aShape.get()) {
         // Whole sketch selected.
         if(aSelectedSketchesFromObjects.find(aContext) != aSelectedSketchesFromObjects.cend()) {
-          theError = "Object from this sketch is already selected. Sketch is not allowed for selection.";
+          theError = "Error: Object from this sketch is already selected. Sketch is not allowed for selection.";
           return false;
         }
 
@@ -120,19 +124,19 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
       } else {
         // Object from sketch selected.
         if(aSelectedSketches.find(aContext) != aSelectedSketches.cend()) {
-          theError = "Whole sketch with this object is already selected. Don't allow to select this object.";
+          theError = "Error: Whole sketch with this object is already selected. Don't allow to select this object.";
           return false;
         }
 
         for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::WIRE); anExp.more(); anExp.next()) {
           GeomShapePtr aWire = anExp.current();
           if(aWire->orientation() != GeomAPI_Shape::FORWARD) {
-            theError = "Wire with wrong orientation selected.";
+            theError = "Error: Wire with wrong orientation selected.";
             return false;
           }
 
           if(aSelectedWiresFromObjects.isBound(aWire)) {
-            theError = "Objects with such wire already selected. Don't allow to select this object.";
+            theError = "Error: Objects with such wire already selected. Don't allow to select this object.";
             return false;
           }
 
@@ -152,7 +156,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
                                                                  std::string& theError) const
 {
   if(!theAttribute.get()) {
-    theError = "Empty attribute.";
+    theError = "Error: Empty attribute.";
     return false;
   }
 
@@ -170,7 +174,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     AttributeSelectionPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
     ResultPtr aContext = anAttr->context();
     if(!aContext.get()) {
-      theError = "Attribute have empty context.";
+      theError = "Error: Attribute have empty context.";
       return false;
     }
 
@@ -180,7 +184,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
       aShape = aContextShape;
     }
     if(!aShape.get()) {
-      theError = "Empty shape selected";
+      theError = "Error: Empty shape selected";
       return false;
     }
 
@@ -188,7 +192,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     if(aConstruction.get()) {
       // Construciotn selected. Check that is is not infinite.
       if(aConstruction->isInfinite()) {
-        theError = "Infinite constructions is not allowed as base.";
+        theError = "Error: Infinite constructions is not allowed as base.";
         return false;
       }
 
@@ -209,14 +213,14 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
 
     if(!aShape->isEqual(aContextShape)) {
       // Local selection on body does not allowed.
-      theError = "Selected shape is in the local selection. Only global selection is allowed.";
+      theError = "Error: Selected shape is in the local selection. Only global selection is allowed.";
       return false;
     }
 
     // Check that object is a shape with allowed type.
     GeomValidators_ShapeType aShapeTypeValidator;
     if(!aShapeTypeValidator.isValid(anAttr, theArguments, theError)) {
-      theError = "Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, "
+      theError = "Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, "
                  "whole sketch(if it has at least one face), and whole objects with shape types: ";
       std::list<std::string>::const_iterator anIt = theArguments.cbegin();
       theError += *anIt;
@@ -227,7 +231,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     }
 
   } else {
-    theError = "Following attribute does not supported: " + anAttributeType + ".";
+    theError = "Error: Attribute \"" + anAttributeType + "\" does not supported by this validator.";
     return false;
   }
 
@@ -240,11 +244,11 @@ bool FeaturesPlugin_ValidatorCompositeLauncher::isValid(const AttributePtr& theA
                                                         std::string& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeReference::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "Error: The attribute with the " + theAttribute->attributeType() + " type is not processed";
     return false;
   }
   if (theArguments.size() != 2) {
-    theError = "Wrong parameters in XML definition for " + theAttribute->attributeType() + " type";
+    theError = "Error: Wrong parameters in XML definition for " + theAttribute->attributeType() + " type";
     return false;
   }
   // first argument is for the base attribute, second - for skipping feature kind
@@ -285,7 +289,7 @@ bool FeaturesPlugin_ValidatorCanBeEmpty::isValid(const std::shared_ptr<ModelAPI_
                                                  std::string& theError) const
 {
   if(theArguments.size() != 2) {
-    theError = "Validator should be used with 2 parameters for extrusion.";
+    theError = "Error: Validator should be used with 2 parameters for extrusion.";
     return false;
   }
 
@@ -300,7 +304,7 @@ bool FeaturesPlugin_ValidatorCanBeEmpty::isValid(const std::shared_ptr<ModelAPI_
 
   AttributeSelectionPtr aSelAttr = theFeature->selection(*anArgsIt);
   if(!aSelAttr.get()) {
-    theError = "Could not get selection attribute \"" + *anArgsIt + "\".";
+    theError = "Error: Could not get selection attribute \"" + *anArgsIt + "\".";
     return false;
   }
 
@@ -308,7 +312,7 @@ bool FeaturesPlugin_ValidatorCanBeEmpty::isValid(const std::shared_ptr<ModelAPI_
   if(!aShape.get()) {
     ResultPtr aContext = aSelAttr->context();
     if(!aContext.get()) {
-      theError = "Base objects list contains vertex or edge, so attribute \"" + *anArgsIt
+      theError = "Error: Base objects list contains vertex or edge, so attribute \"" + *anArgsIt
                + "\" can not be used with default value. Select direction for extrusion.";
       return false;
     }
@@ -317,7 +321,7 @@ bool FeaturesPlugin_ValidatorCanBeEmpty::isValid(const std::shared_ptr<ModelAPI_
   }
 
   if(!aShape.get()) {
-    theError = "Base objects list contains vertex or edge, so attribute \"" + *anArgsIt
+    theError = "Error: Base objects list contains vertex or edge, so attribute \"" + *anArgsIt
               + "\" can not be used with default value. Select direction for extrusion.";
     return false;
   }
@@ -384,7 +388,7 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
 {
   AttributeSelectionListPtr anAttrSelectionList = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
   if(!anAttrSelectionList.get()) {
-    theError = "Error: this validator can only work with selection list attributes in Boolean feature.";
+    theError = "Error: This validator can only work with selection list attributes in \"Boolean\" feature.";
     return false;
   }
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
@@ -393,12 +397,12 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
   for(int anIndex = 0; anIndex < anAttrSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr anAttrSelection = anAttrSelectionList->value(anIndex);
     if(!anAttrSelection.get()) {
-      theError = "Error: empty attribute selection.";
+      theError = "Error: Empty attribute selection.";
       return false;
     }
     ResultPtr aContext = anAttrSelection->context();
     if(!aContext.get()) {
-      theError = "Error: empty selection context.";
+      theError = "Error: Empty selection context.";
       return false;
     }
     ResultConstructionPtr aResultConstruction =
@@ -412,7 +416,7 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
       aShape = aContext->shape();
     }
     if(!aShape.get()) {
-      theError = "Error: empty shape.";
+      theError = "Error: Empty shape.";
       return false;
     }
     int aShapeType = aShape->shapeType();
@@ -423,14 +427,14 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
          aShapeType != GeomAPI_Shape::SOLID &&
          aShapeType != GeomAPI_Shape::COMPSOLID &&
          aShapeType != GeomAPI_Shape::COMPOUND) {
-        theError = "Error: selected shape has the wrong type.";
+        theError = "Error: Selected shape has the wrong type.";
         return false;
       }
     } else {
       if(aShapeType != GeomAPI_Shape::SOLID &&
          aShapeType != GeomAPI_Shape::COMPSOLID &&
          aShapeType != GeomAPI_Shape::COMPOUND) {
-        theError = "Error: selected shape has the wrong type.";
+        theError = "Error: Selected shape has the wrong type.";
         return false;
       }
     }
@@ -444,31 +448,142 @@ bool FeaturesPlugin_ValidatorPartitionSelection::isValid(const AttributePtr& the
                                                          const std::list<std::string>& theArguments,
                                                          std::string& theError) const
 {
-  std::string anAttributeType = theAttribute->attributeType();
-  if(anAttributeType == ModelAPI_AttributeSelectionList::typeId()) {
-    AttributeSelectionListPtr aSelectionListAttr =
-        std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  AttributeSelectionListPtr anAttrSelectionList = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if(!anAttrSelectionList.get()) {
+    theError = "Error: This validator can only work with selection list in \"Partition\" feature.";
+    return false;
+  }
 
-    for(int anIndex = 0; anIndex < aSelectionListAttr->size(); ++anIndex) {
-      AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(anIndex);
+  for(int anIndex = 0; anIndex < anAttrSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr aSelectAttr = anAttrSelectionList->value(anIndex);
 
-      GeomValidators_BodyShapes aBodyValidator;
-      if(aBodyValidator.isValid(aSelectAttr, theArguments, theError)) {
-        continue;
-      }
+    //GeomValidators_BodyShapes aBodyValidator;
+    //if(aBodyValidator.isValid(aSelectAttr, theArguments, theError)) {
+    //  continue;
+    //}
 
-      GeomValidators_FeatureKind aFeatureKindValidator;
-      if(aFeatureKindValidator.isValid(aSelectAttr, theArguments, theError)) {
-        continue;
-      }
-
-      theError = "Only body shapes and construction planes are allowed for selection.";
-      return false;
+    GeomValidators_FeatureKind aFeatureKindValidator;
+    if(aFeatureKindValidator.isValid(aSelectAttr, theArguments, theError)) {
+      continue;
     }
-  } else {
-    theError = "This validator supports only " + ModelAPI_AttributeSelectionList::typeId() + " attribute type.";
+
+    ResultPtr aContext = aSelectAttr->context();
+    ResultConstructionPtr aResultConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    if(aResultConstruction.get()) {
+
+    }
+
+    theError = "Error: Only body shapes and construction planes are allowed for selection.";
     return false;
   }
 
   return true;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorRemoveSubShapesSelection::isValid(const AttributePtr& theAttribute,
+                                                               const std::list<std::string>& theArguments,
+                                                               std::string& theError) const
+{
+  AttributeSelectionListPtr aSubShapesAttrList = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if(!aSubShapesAttrList.get()) {
+    theError = "Error: This validator can only work with selection list in \"Remove Sub-Shapes\" feature.";
+    return false;
+  }
+
+  static const std::string aBaseShapeID = "base_shape";
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeSelectionPtr aShapeAttrSelection = aFeature->selection(aBaseShapeID);
+
+  if(!aShapeAttrSelection.get()) {
+    theError = "Error: Could not get \"" + aBaseShapeID + "\" attribute.";
+    return false;
+  }
+
+  GeomShapePtr aBaseShape = aShapeAttrSelection->value();
+  ResultPtr aContext = aShapeAttrSelection->context();
+  if(!aContext.get()) {
+    theError = "Error: Empty context.";
+    return false;
+  }
+  if(!aBaseShape.get()) {
+    aBaseShape = aContext->shape();
+  }
+  if(!aBaseShape.get()) {
+    theError = "Error: Empty base shape.";
+    return false;
+  }
+
+  for(int anIndex = 0; anIndex < aSubShapesAttrList->size(); ++anIndex) {
+    bool isSameFound = false;
+    AttributeSelectionPtr anAttrSelectionInList = aSubShapesAttrList->value(anIndex);
+    GeomShapePtr aShapeToAdd = anAttrSelectionInList->value();
+    for(GeomAPI_ShapeIterator anIt(aBaseShape); anIt.more(); anIt.next()) {
+      if(anIt.current()->isEqual(aShapeToAdd)) {
+        isSameFound = true;
+        break;
+      }
+    }
+    if(!isSameFound) {
+      theError = "Error: Only sub-shapes of selected shape is allowed for selection.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorRemoveSubShapesResult::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                                            const std::list<std::string>& theArguments,
+                                                            std::string& theError) const
+{
+  static const std::string aBaseShapeID = "base_shape";
+  static const std::string aSubShapesID = "subshapes";
+
+  if(theFeature->getKind() != "Remove_SubShapes") {
+    theError = "Error: Feature \"" + theFeature->getKind() + "\" does not supported by this validator.";
+    return false;
+  }
+
+  AttributeSelectionPtr aShapeAttrSelection = theFeature->selection(aBaseShapeID);
+  if(!aShapeAttrSelection.get()) {
+    theError = "Error: Could not get \"" + aBaseShapeID + "\" attribute.";
+    return false;
+  }
+
+  AttributeSelectionListPtr aSubShapesAttrList = theFeature->selectionList(aSubShapesID);
+  if(!aSubShapesAttrList.get()) {
+    theError = "Error: Could not get \"" + aSubShapesID + "\" attribute.";
+    return false;
+  }
+
+  // Copy base shape.
+  GeomShapePtr aBaseShape = aShapeAttrSelection->value();
+  if(!aBaseShape.get()) {
+    return false;
+  }
+  GeomShapePtr aResultShape = aBaseShape->emptyCopied();
+
+  // Copy sub-shapes from list to new shape.
+  for(int anIndex = 0; anIndex < aSubShapesAttrList->size(); ++anIndex) {
+    AttributeSelectionPtr anAttrSelectionInList = aSubShapesAttrList->value(anIndex);
+    GeomShapePtr aShapeToAdd = anAttrSelectionInList->value();
+    GeomAlgoAPI_ShapeBuilder::add(aResultShape, aShapeToAdd);
+  }
+
+  // Check new shape.
+  if(!GeomAlgoAPI_ShapeTools::isShapeValid(aResultShape)) {
+    theError = "Error: Resulting shape is not valid.";
+    return false;
+  }
+
+  return true;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorRemoveSubShapesResult::isNotObligatory(std::string theFeature,
+                                                                    std::string theAttribute)
+{
+  return false;
 }

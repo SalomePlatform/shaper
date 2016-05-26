@@ -42,9 +42,10 @@ void BuildPlugin_SubShapes::attributeChanged(const std::string& theID)
     if(!aShapeAttrSelection.get() || !aSubShapesAttrList.get()) {
       return;
     }
-    ResultPtr aContext = aShapeAttrSelection->context();
 
     aSubShapesAttrList->clear();
+
+    ResultPtr aContext = aShapeAttrSelection->context();
 
     GeomShapePtr aBaseShape = aShapeAttrSelection->value();
     if(!aBaseShape.get()) {
@@ -103,7 +104,7 @@ void BuildPlugin_SubShapes::execute()
 
   // Copy sub-shapes from list to new shape.
   if(!aShapesToAdd.empty()) {
-    aBuilder.add(aResultShape, aShapesToAdd);
+    aBuilder.addInternal(aResultShape, aShapesToAdd);
     aResultShape = aBuilder.shape();
   }
 

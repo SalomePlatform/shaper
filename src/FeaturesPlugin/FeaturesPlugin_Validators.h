@@ -110,13 +110,47 @@ class FeaturesPlugin_ValidatorPartitionSelection: public ModelAPI_AttributeValid
 {
 public:
   /// \return True if the attribute is valid. It checks whether the selection
-  /// is acceptable for boolean operation.
+  /// is acceptable for operation.
   /// \param[in] theAttribute an attribute to check.
   /// \param[in] theArguments a filter parameters.
   /// \param[out] theError error message.
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
                        std::string& theError) const;
+};
+
+/// \class FeaturesPlugin_ValidatorRemoveSubShapesSelection
+/// \ingroup Validators
+/// \brief Validates selection for "Remove Sub-Shapes" feature.
+class FeaturesPlugin_ValidatorRemoveSubShapesSelection: public ModelAPI_AttributeValidator
+{
+public:
+  /// \return True if the attribute is valid. It checks whether the selection
+  /// is acceptable for operation.
+  /// \param[in] theAttribute an attribute to check.
+  /// \param[in] theArguments a filter parameters.
+  /// \param[out] theError error message.
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
+};
+
+/// \class FeaturesPlugin_ValidatorRemoveSubShapesResult
+/// \ingroup Validators
+/// \brief Validator for the Remove Sub-Shapes feature.
+class FeaturesPlugin_ValidatorRemoveSubShapesResult: public ModelAPI_FeatureValidator
+{
+ public:
+  //! \return true if result is valid shape.
+  //! \param theFeature the checked feature
+  //! \param theArguments arguments of the feature (not used)
+  //! \param theError error message
+  virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
+
+  /// Returns true if the attribute in feature is not obligatory for the feature execution
+  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
 #endif

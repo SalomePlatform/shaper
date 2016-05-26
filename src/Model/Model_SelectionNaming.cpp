@@ -261,31 +261,44 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
 TopAbs_ShapeEnum translateType (const std::string& theType)
 {
   // map from the textual shape types to OCCT enumeration
-  static std::map<std::string, TopAbs_ShapeEnum> MyShapeTypes;
-  if (MyShapeTypes.size() == 0) {
-    MyShapeTypes["face"] = TopAbs_FACE;
-    MyShapeTypes["faces"] = TopAbs_FACE;
-    MyShapeTypes["vertex"] = TopAbs_VERTEX;
-    MyShapeTypes["vertices"] = TopAbs_VERTEX;
-    MyShapeTypes["wire"] = TopAbs_WIRE;
-    MyShapeTypes["edge"] = TopAbs_EDGE;
-    MyShapeTypes["edges"] = TopAbs_EDGE;
-    MyShapeTypes["shell"] = TopAbs_SHELL;
-    MyShapeTypes["solid"] = TopAbs_SOLID;
-    MyShapeTypes["solids"] = TopAbs_SOLID;
-    MyShapeTypes["FACE"] = TopAbs_FACE;
-    MyShapeTypes["FACES"] = TopAbs_FACE;
-    MyShapeTypes["VERTEX"] = TopAbs_VERTEX;
-    MyShapeTypes["VERTICES"] = TopAbs_VERTEX;
-    MyShapeTypes["WIRE"] = TopAbs_WIRE;
-    MyShapeTypes["EDGE"] = TopAbs_EDGE;
-    MyShapeTypes["EDGES"] = TopAbs_EDGE;
-    MyShapeTypes["SHELL"] = TopAbs_SHELL;
-    MyShapeTypes["SOLID"] = TopAbs_SOLID;
-    MyShapeTypes["SOLIDS"] = TopAbs_SOLID;
+  static std::map<std::string, TopAbs_ShapeEnum> aShapeTypes;
+
+  if(aShapeTypes.size() == 0) {
+    aShapeTypes["compound"]   = TopAbs_COMPOUND;
+    aShapeTypes["compounds"]  = TopAbs_COMPOUND;
+    aShapeTypes["compsolid"]  = TopAbs_COMPSOLID;
+    aShapeTypes["compsolids"] = TopAbs_COMPSOLID;
+    aShapeTypes["solid"]      = TopAbs_SOLID;
+    aShapeTypes["solids"]     = TopAbs_SOLID;
+    aShapeTypes["shell"]      = TopAbs_SHELL;
+    aShapeTypes["shells"]     = TopAbs_SHELL;
+    aShapeTypes["face"]       = TopAbs_FACE;
+    aShapeTypes["faces"]      = TopAbs_FACE;
+    aShapeTypes["wire"]       = TopAbs_WIRE;
+    aShapeTypes["wires"]      = TopAbs_WIRE;
+    aShapeTypes["edge"]       = TopAbs_EDGE;
+    aShapeTypes["edges"]      = TopAbs_EDGE;
+    aShapeTypes["vertex"]     = TopAbs_VERTEX;
+    aShapeTypes["vertices"]   = TopAbs_VERTEX;
+    aShapeTypes["COMPOUND"]   = TopAbs_COMPOUND;
+    aShapeTypes["COMPOUNDS"]  = TopAbs_COMPOUND;
+    aShapeTypes["COMPSOLID"]  = TopAbs_COMPSOLID;
+    aShapeTypes["COMPSOLIDS"] = TopAbs_COMPSOLID;
+    aShapeTypes["SOLID"]      = TopAbs_SOLID;
+    aShapeTypes["SOLIDS"]     = TopAbs_SOLID;
+    aShapeTypes["SHELL"]      = TopAbs_SHELL;
+    aShapeTypes["SHELLS"]     = TopAbs_SHELL;
+    aShapeTypes["FACE"]       = TopAbs_FACE;
+    aShapeTypes["FACES"]      = TopAbs_FACE;
+    aShapeTypes["WIRE"]       = TopAbs_WIRE;
+    aShapeTypes["WIRES"]      = TopAbs_WIRE;
+    aShapeTypes["EDGE"]       = TopAbs_EDGE;
+    aShapeTypes["EDGES"]      = TopAbs_EDGE;
+    aShapeTypes["VERTEX"]     = TopAbs_VERTEX;
+    aShapeTypes["VERTICES"]   = TopAbs_VERTEX;
   }
-  if (MyShapeTypes.find(theType) != MyShapeTypes.end())
-    return MyShapeTypes[theType];
+  if (aShapeTypes.find(theType) != aShapeTypes.end())
+    return aShapeTypes[theType];
   Events_Error::send("Shape type defined in XML is not implemented!");
   return TopAbs_SHAPE;
 }

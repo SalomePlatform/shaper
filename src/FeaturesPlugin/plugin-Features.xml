@@ -38,6 +38,9 @@
                auto_preview="false">
           <source path="partition_widget.xml"/>
       </feature>
+      <feature id="Remove_SubShapes" title="Remove Sub-Shapes" tooltip="Allows to remove sub-shapes from wires, shells, compsolids and compounds" icon="icons/Features/remove_subshapes.png">
+          <source path="remove_subshapes_widget.xml"/>
+      </feature>
       <feature id="Intersection" title="Intersection" tooltip="Intersect objects with tools" icon="icons/Features/intersection.png">
           <source path="intersection_widget.xml"/>
       </feature>

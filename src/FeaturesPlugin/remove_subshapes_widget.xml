@@ -1,0 +1,20 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<source>
+  <shape_selector id="base_shape"
+                  label="Shape:"
+                  tooltip="Select a shape to modify."
+                  shape_types="objects"
+                  concealment="true">
+    <validator id="GeomValidators_ShapeType" parameters="wire,shell,compsolid,compound"/>
+    <validator id="GeomValidators_BodyShapes"/>
+  </shape_selector>
+  <multi_selector id="subshapes"
+                  label="Sub-Shapes:"
+                  tooltip="Select shapes to keep."
+                  type_choice="vertices edges wires faces shells solids compsolids compounds"
+                  clear_in_neutral_point="false">
+    <validator id="FeaturesPlugin_ValidatorRemoveSubShapesSelection"/>
+  </multi_selector>
+  <validator id="FeaturesPlugin_ValidatorRemoveSubShapesResult"/>
+</source>

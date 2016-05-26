@@ -90,6 +90,10 @@ public:
   /// \return true if edge inside the face.
   GEOMALGOAPI_EXPORT static bool isSubShapeInsideShape(const std::shared_ptr<GeomAPI_Shape> theSubShape,
                                                        const std::shared_ptr<GeomAPI_Shape> theBaseShape);
+
+  /// \return true if theShape is valid.
+  GEOMALGOAPI_EXPORT static bool isShapeValid(const std::shared_ptr<GeomAPI_Shape> theShape);
+
 };
 
 #endif

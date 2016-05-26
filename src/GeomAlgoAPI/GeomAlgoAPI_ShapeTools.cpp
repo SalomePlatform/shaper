@@ -22,6 +22,7 @@
 #include <BRepBuilderAPI_FindPlane.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
+#include <BRepCheck_Analyzer.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
 #include <BRepGProp.hxx>
 #include <BRepTopAdaptor_FClass2d.hxx>
@@ -598,4 +599,15 @@ bool GeomAlgoAPI_ShapeTools::isSubShapeInsideShape(const std::shared_ptr<GeomAPI
   }
 
   return true;
+}
+
+//==================================================================================================
+bool GeomAlgoAPI_ShapeTools::isShapeValid(const std::shared_ptr<GeomAPI_Shape> theShape)
+{
+  if(!theShape.get()) {
+    return false;
+  }
+
+  BRepCheck_Analyzer aChecker(theShape->impl<TopoDS_Shape>());
+  return (aChecker.IsValid() == Standard_True);
 }

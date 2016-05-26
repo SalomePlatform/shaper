@@ -302,27 +302,32 @@ QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
 }
 
 typedef QMap<QString, TopAbs_ShapeEnum> ShapeTypes;
-static ShapeTypes MyShapeTypes;
+static ShapeTypes myShapeTypes;
 
 TopAbs_ShapeEnum shapeType(const QString& theType)
 {
-  if (MyShapeTypes.count() == 0) {
-    MyShapeTypes["face"] = TopAbs_FACE;
-    MyShapeTypes["faces"] = TopAbs_FACE;
-    MyShapeTypes["vertex"] = TopAbs_VERTEX;
-    MyShapeTypes["vertices"] = TopAbs_VERTEX;
-    MyShapeTypes["wire"] = TopAbs_WIRE;
-    MyShapeTypes["wires"] = TopAbs_WIRE;
-    MyShapeTypes["edge"] = TopAbs_EDGE;
-    MyShapeTypes["edges"] = TopAbs_EDGE;
-    MyShapeTypes["shell"] = TopAbs_SHELL;
-    MyShapeTypes["solid"] = TopAbs_SOLID;
-    MyShapeTypes["solids"] = TopAbs_SOLID;
-    MyShapeTypes["objects"] = TopAbs_SHAPE;
+  if (myShapeTypes.count() == 0) {
+    myShapeTypes["compound"]   = TopAbs_COMPOUND;
+    myShapeTypes["compounds"]  = TopAbs_COMPOUND;
+    myShapeTypes["compsolid"]  = TopAbs_COMPSOLID;
+    myShapeTypes["compsolids"] = TopAbs_COMPSOLID;
+    myShapeTypes["solid"]      = TopAbs_SOLID;
+    myShapeTypes["solids"]     = TopAbs_SOLID;
+    myShapeTypes["shell"]      = TopAbs_SHELL;
+    myShapeTypes["shells"]     = TopAbs_SHELL;
+    myShapeTypes["face"]       = TopAbs_FACE;
+    myShapeTypes["faces"]      = TopAbs_FACE;
+    myShapeTypes["wire"]       = TopAbs_WIRE;
+    myShapeTypes["wires"]      = TopAbs_WIRE;
+    myShapeTypes["edge"]       = TopAbs_EDGE;
+    myShapeTypes["edges"]      = TopAbs_EDGE;
+    myShapeTypes["vertex"]     = TopAbs_VERTEX;
+    myShapeTypes["vertices"]   = TopAbs_VERTEX;
+    myShapeTypes["objects"]    = TopAbs_SHAPE;
   }
   QString aType = theType.toLower();
-  if (MyShapeTypes.contains(aType))
-    return MyShapeTypes[aType];
+  if(myShapeTypes.contains(aType))
+    return myShapeTypes[aType];
   Events_Error::send("Shape type defined in XML is not implemented!");
   return TopAbs_SHAPE;
 }

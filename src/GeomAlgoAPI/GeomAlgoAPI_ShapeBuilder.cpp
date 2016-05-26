@@ -105,8 +105,8 @@ void GeomAlgoAPI_ShapeBuilder::removeInternal(const std::shared_ptr<GeomAPI_Shap
 }
 
 //==================================================================================================
-void GeomAlgoAPI_ShapeBuilder::add(const std::shared_ptr<GeomAPI_Shape> theShape,
-                                   const ListOfShape& theShapesToAdd)
+void GeomAlgoAPI_ShapeBuilder::addInternal(const std::shared_ptr<GeomAPI_Shape> theShape,
+                                           const ListOfShape& theShapesToAdd)
 {
   // Get base shape.
   if(!theShape.get()) {

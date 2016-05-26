@@ -25,16 +25,18 @@ static EdgeTypes MyShapeTypes;
 GeomValidators_ShapeType::TypeOfShape GeomValidators_ShapeType::shapeType(const std::string& theType)
 {
   if (MyShapeTypes.size() == 0) {
-    MyShapeTypes["empty"]  = Empty;
-    MyShapeTypes["vertex"] = Vertex;
-    MyShapeTypes["edge"]   = Edge;
-    MyShapeTypes["line"]   = Line;
-    MyShapeTypes["circle"] = Circle;
-    MyShapeTypes["wire"]   = Wire;
-    MyShapeTypes["face"]   = Face;
-    MyShapeTypes["plane"]  = Plane;
-    MyShapeTypes["shell"]  = Shell;
-    MyShapeTypes["solid"]  = Solid;
+    MyShapeTypes["empty"]     = Empty;
+    MyShapeTypes["vertex"]    = Vertex;
+    MyShapeTypes["edge"]      = Edge;
+    MyShapeTypes["line"]      = Line;
+    MyShapeTypes["circle"]    = Circle;
+    MyShapeTypes["wire"]      = Wire;
+    MyShapeTypes["face"]      = Face;
+    MyShapeTypes["plane"]     = Plane;
+    MyShapeTypes["shell"]     = Shell;
+    MyShapeTypes["solid"]     = Solid;
+    MyShapeTypes["compsolid"] = CompSolid;
+    MyShapeTypes["compound"]  = Compound;
   }
   std::string aType = std::string(theType.c_str());
   if (MyShapeTypes.find(aType) != MyShapeTypes.end())
@@ -223,6 +225,9 @@ bool GeomValidators_ShapeType::isValidShape(const GeomShapePtr theShape,
     case Solid:
       aValid = theShape->isSolid() || theShape->isCompSolid() ||
                theShape->isCompoundOfSolids();
+      break;
+    case CompSolid:
+      aValid = theShape->shapeType() == GeomAPI_Shape::COMPSOLID;
       break;
     case Compound:
       aValid = theShape->isCompound();

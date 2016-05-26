@@ -37,11 +37,11 @@ class GeomAlgoAPI_ShapeBuilder: public GeomAlgoAPI_MakeShapeList
    /// \param[in] theShape base shape.
    GEOMALGOAPI_EXPORT void removeInternal(const std::shared_ptr<GeomAPI_Shape> theShape);
 
-   /// \brief Store new shape as result of adding theShapesToAdd to theShape.
+   /// \brief Store new shape as result of adding theShapesToAdd to theShape as internal shapes.
    /// \param[in] theShape base shape.
    /// \param[in] theShapesToAdd shapes which will be added.
-   GEOMALGOAPI_EXPORT void add(const std::shared_ptr<GeomAPI_Shape> theShape,
-                               const ListOfShape& theShapesToAdd);
+   GEOMALGOAPI_EXPORT void addInternal(const std::shared_ptr<GeomAPI_Shape> theShape,
+                                       const ListOfShape& theShapesToAdd);
 };
 
 #endif
