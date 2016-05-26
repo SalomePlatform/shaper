@@ -73,6 +73,17 @@ void ModuleBase_WidgetSelector::updateOnSelectionChanged(const bool theDone)
 }
 
 //********************************************************************
+QIntList ModuleBase_WidgetSelector::getShapeTypes() const
+{
+  QIntList aShapeTypes = shapeTypes();
+  if (aShapeTypes.contains(TopAbs_SOLID) || aShapeTypes.contains(TopAbs_SHAPE)) {
+    // it should be selectable for both, "solids" and "objects" types
+    aShapeTypes.append(TopAbs_COMPSOLID);
+  }
+  return aShapeTypes;
+}
+
+//********************************************************************
 QList<ModuleBase_ViewerPrsPtr> ModuleBase_WidgetSelector::getAttributeSelection() const
 {
   return QList<ModuleBase_ViewerPrsPtr>();

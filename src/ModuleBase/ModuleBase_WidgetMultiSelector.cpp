@@ -423,7 +423,7 @@ void ModuleBase_WidgetMultiSelector::updateSelectionName()
 }
 
 //********************************************************************
-QIntList ModuleBase_WidgetMultiSelector::getShapeTypes() const
+QIntList ModuleBase_WidgetMultiSelector::shapeTypes() const
 {
   QIntList aShapeTypes;
 
@@ -431,12 +431,8 @@ QIntList ModuleBase_WidgetMultiSelector::getShapeTypes() const
     aShapeTypes.append(ModuleBase_Tools::shapeType(myTypeCombo->currentText()));
   }
   else {
-    for (int i = 0, aCount = myTypeCombo->count(); i < aCount; i++) {
-      TopAbs_ShapeEnum aType = ModuleBase_Tools::shapeType(myTypeCombo->itemText(i));
-      aShapeTypes.append(aType);
-      if (aType == TopAbs_SOLID)
-        aShapeTypes.append(TopAbs_COMPSOLID);
-    }
+    for (int i = 0, aCount = myTypeCombo->count(); i < aCount; i++)
+      aShapeTypes.append(ModuleBase_Tools::shapeType(myTypeCombo->itemText(i)));
   }
   return aShapeTypes;
 }
