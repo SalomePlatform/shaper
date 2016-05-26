@@ -3,20 +3,20 @@
 INCLUDE(Common)
 
 SET(PROJECT_HEADERS
-    ModelHighAPI.h
-    ModelHighAPI_Double.h
-    ModelHighAPI_Interface.h
-    )
+  ModelHighAPI.h
+  ModelHighAPI_Double.h
+  ModelHighAPI_Interface.h
+)
 
 SET(PROJECT_SOURCES
-    ModelHighAPI_Double.cpp
-    ModelHighAPI_Interface.cpp
-    )
+  ModelHighAPI_Double.cpp
+  ModelHighAPI_Interface.cpp
+)
 
 SET(PROJECT_LIBRARIES
-    Config
-    Events
-    )
+  Config
+  Events
+)
 
 ADD_DEFINITIONS(-DMODELHIGHAPI_EXPORTS)
 ADD_LIBRARY(ModelHighAPI SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
@@ -28,27 +28,22 @@ TARGET_LINK_LIBRARIES(ModelHighAPI ${PROJECT_LIBRARIES})
 
 INCLUDE(PythonAPI)
 
-#TODO(spo): is it necessary?
-SET(CMAKE_SWIG_FLAGS -threads -Wall)
-
 SET_SOURCE_FILES_PROPERTIES(ModelHighAPI.i PROPERTIES CPLUSPLUS ON)
 SET_SOURCE_FILES_PROPERTIES(ModelHighAPI.i PROPERTIES SWIG_DEFINITIONS "-shadow")
 
 SET(SWIG_LINK_LIBRARIES
-    ModelHighAPI
-    ${PYTHON_LIBRARIES}
-    )
+  ModelHighAPI
+  ${PYTHON_LIBRARIES}
+)
 
 INCLUDE_DIRECTORIES(
-    ${PROJECT_SOURCE_DIR}/src/Events
-    ${PROJECT_SOURCE_DIR}/src/ModelAPI
-#                    ${PROJECT_SOURCE_DIR}/src/GeomAPI
-#                    ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
+  ${PROJECT_SOURCE_DIR}/src/Events
+  ${PROJECT_SOURCE_DIR}/src/ModelAPI
 )
 
 SET(SWIG_SCRIPTS
-    ${CMAKE_CURRENT_BINARY_DIR}/ModelHighAPI.py
-    )
+  ${CMAKE_CURRENT_BINARY_DIR}/ModelHighAPI.py
+)
 
 SWIG_ADD_MODULE(ModelHighAPI python ModelHighAPI.i ${PROJECT_HEADERS})
 SWIG_LINK_LIBRARIES(ModelHighAPI ${SWIG_LINK_LIBRARIES})
@@ -66,5 +61,5 @@ INSTALL(FILES ${SWIG_SCRIPTS} DESTINATION ${SHAPER_INSTALL_SWIG})
 INCLUDE(UnitTest)
 
 ADD_UNIT_TESTS(
-    TestDouble.py
-    )
+  TestDouble.py
+)

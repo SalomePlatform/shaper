@@ -3,23 +3,23 @@
 INCLUDE(Common)
 
 SET(PROJECT_HEADERS
-    ConstructionAPI.h
-    ConstructionAPI_Point.h
-    )
+  ConstructionAPI.h
+  ConstructionAPI_Point.h
+)
 
 SET(PROJECT_SOURCES
-    ConstructionAPI_Point.cpp
-    )
+  ConstructionAPI_Point.cpp
+)
 
 SET(PROJECT_LIBRARIES
-    ModelAPI
-    ModelHighAPI
-    )
+  ModelAPI
+  ModelHighAPI
+)
 
 INCLUDE_DIRECTORIES(
-    ${PROJECT_SOURCE_DIR}/src/ModelAPI
-    ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
-    )
+  ${PROJECT_SOURCE_DIR}/src/ModelAPI
+  ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
+)
 
 #TODO(spo): is ${CAS_DEFINITIONS} necessary?
 ADD_DEFINITIONS(-DCONSTRUCTIONAPI_EXPORTS ${CAS_DEFINITIONS})
@@ -35,16 +35,16 @@ SET_SOURCE_FILES_PROPERTIES(ConstructionAPI.i PROPERTIES SWIG_DEFINITIONS "-shad
 
 #TODO(spo): is ModelAPI necessary or it could be received by INTERFACE_ ?
 SET(SWIG_LINK_LIBRARIES
-    ConstructionAPI
-    ModelHighAPI
-    ModelAPI
-    ${PYTHON_LIBRARIES}
-    )
+  ConstructionAPI
+  ModelHighAPI
+  ModelAPI
+  ${PYTHON_LIBRARIES}
+)
 
 SET(SWIG_MODULE_ConstructionAPI_EXTRA_DEPS ${SWIG_MODULE_ConstructionAPI_EXTRA_DEPS}
-    ${PROJECT_SOURCE_DIR}/src/ModelHighAPI/ModelHighAPI.i
-    ${PROJECT_HEADERS}
-    )
+  ${PROJECT_SOURCE_DIR}/src/ModelHighAPI/ModelHighAPI.i
+  ${PROJECT_HEADERS}
+)
 
 SWIG_ADD_MODULE(ConstructionAPI python ConstructionAPI.i ${PROJECT_HEADERS})
 SWIG_LINK_LIBRARIES(ConstructionAPI ${SWIG_LINK_LIBRARIES})
@@ -62,7 +62,7 @@ INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/ConstructionAPI.py DESTINATION ${SHAPE
 INCLUDE(UnitTest)
 
 ADD_UNIT_TESTS(
-    TestPoint.py
-    )
+  TestPoint.py
+)
 
 ADD_SUBDIRECTORY (Test)

@@ -3,7 +3,8 @@
 find_package(SWIG REQUIRED)
 include(${SWIG_USE_FILE})
 
-set(CMAKE_SWIG_FLAGS "-Wall")
+#TODO(spo): is -threads necessary?
+set(CMAKE_SWIG_FLAGS -threads -Wall)
 
 # For doxyhelp.i
 include_directories(
