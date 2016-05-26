@@ -7,6 +7,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/src/ModelAPI
   ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
   ${PROJECT_SOURCE_DIR}/src/ConstructionAPI
+  ${PROJECT_SOURCE_DIR}/src/ModelHighAPI/Mock
 )
 
 set(PROJECT_SOURCES
