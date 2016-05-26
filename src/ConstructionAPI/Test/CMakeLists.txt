@@ -1,45 +1,28 @@
 ## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-add_definitions(-DGTEST_LANG_CXX11=0)
+include(GTest)
 
-INCLUDE(FindGTest)
-#FIND_PACKAGE(GTest REQUIRED)
-#INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
+include_directories(
+  ${PROJECT_SOURCE_DIR}/src/Events
+  ${PROJECT_SOURCE_DIR}/src/ModelAPI
+  ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
+  ${PROJECT_SOURCE_DIR}/src/ConstructionAPI
+)
 
-#FIND_PACKAGE(GMock REQUIRED)
-#INCLUDE_DIRECTORIES(${GMOCK_INCLUDE_DIRS})
+set(PROJECT_SOURCES
+  TestPoint.cpp
+)
 
-INCLUDE_DIRECTORIES(
-    ${PROJECT_SOURCE_DIR}/src/Events
-    ${PROJECT_SOURCE_DIR}/src/ModelAPI
-    ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
-  
-    $ENV{GTEST_ROOT}/googletest/include
-    $ENV{GTEST_ROOT}/googlemock/include
-    )
+set(PROJECT_LIBRARIES
+  ModelAPI
+  ModelHighAPI
+  ConstructionAPI
+)
 
-SET(TEST_LIBRARIES
-    ModelAPI
-    ModelHighAPI
-    ConstructionAPI
-    )
+set(PACKAGE_NAME "ConstructionAPI")
+set(TARGET_NAME "Test${PACKAGE_NAME}")
 
-SET(PACKAGE_NAME "ConstructionAPI")
-SET(TEST_NAME "${PACKAGE_NAME}_GTest")
-SET(TARGET_NAME "Test${PACKAGE_NAME}")
+add_executable(${TARGET_NAME} ${PROJECT_SOURCES})
+target_link_libraries(${TARGET_NAME} ${PROJECT_LIBRARIES} ${GTEST_LIBRARY})
 
-ADD_EXECUTABLE(${TARGET_NAME}
-    TestPoint.cpp
-    )
-
-TARGET_LINK_LIBRARIES(${TARGET_NAME} 
-    ${TEST_LIBRARIES}
-    
-    $ENV{GTEST_ROOT}/googlemock/make/gmock_main.a
-    )
-
-GET_TARGET_PROPERTY(TEST_SOURCES ${TARGET_NAME} SOURCES)
-GTEST_ADD_TESTS(${CMAKE_BINARY_DIR}/bin/${TARGET_NAME} 
-    ""
-    ${TEST_SOURCES}
-    )
+GTEST_ADD_TESTS(${CMAKE_BINARY_DIR}/bin/${TARGET_NAME} "" ${PROJECT_SOURCES})
