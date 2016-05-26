@@ -29,12 +29,6 @@ public:
   /// \param theResult a result object
   Standard_EXPORT PartSet_ResultSketchPrs(ResultPtr theResult);
 
-  /// Returns true if the checked type can be accepted for the base selection type
-  /// It returns true if they are coicide or if the base type is face and the checked type is wire
-  /// @return boolean result
-  static Standard_EXPORT bool isValidShapeType(const TopAbs_ShapeEnum& theBaseType,
-                                               const TopAbs_ShapeEnum& theCheckedType);
-
   DEFINE_STANDARD_RTTI(PartSet_ResultSketchPrs)
 protected:
   /// Redefinition of virtual function

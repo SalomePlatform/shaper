@@ -61,18 +61,6 @@ PartSet_ResultSketchPrs::PartSet_ResultSketchPrs(ResultPtr theResult)
   SetAutoHilight(aCompSolid.get() == NULL);
 }
 
-bool PartSet_ResultSketchPrs::isValidShapeType(const TopAbs_ShapeEnum& theBaseType,
-                                            const TopAbs_ShapeEnum& theCheckedType)
-{
-  bool aValid = theBaseType == theCheckedType;
-  if (!aValid) {
-    // currently this functionality is for all, as we have no separate wire selection mode
-    // lately it should be corrected to have the following check only for sketch presentations
-    aValid = theBaseType == TopAbs_FACE && theCheckedType == TopAbs_WIRE;
-  }
-  return aValid;
-}
-
 void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                       const Handle(Prs3d_Presentation)& thePresentation, 
                                       const Standard_Integer theMode)

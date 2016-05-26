@@ -114,7 +114,7 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
   }
 
   QIntList::const_iterator anIt = aShapeTypes.begin(), aLast = aShapeTypes.end();
-  for (; anIt != aLast; anIt++) {
+  for (; anIt != aLast && !aValid; anIt++) {
     TopAbs_ShapeEnum aCurrentShapeType = (TopAbs_ShapeEnum)*anIt;
     if (aShapeType == aCurrentShapeType)
       aValid = true;
@@ -125,7 +125,11 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
                                 std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theResult);
         aValid = aCResult.get() && aCResult->facesNum() > 0;
       }
-      aValid = ModuleBase_ResultPrs::isValidShapeType(aCurrentShapeType, aShapeType);
+      if (!aValid) {
+        // the compared shape types are not equal but presentation might allow some type for another
+        // exactly it allow Wire type of the shape for Face XML shape type
+        aValid = ModuleBase_ResultPrs::isValidShapeType(aCurrentShapeType, aShapeType);
+      }
     }
   }
   return aValid;
