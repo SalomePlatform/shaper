@@ -61,13 +61,6 @@ public:
   /// \param theResult a result object
   Standard_EXPORT ModuleBase_ResultPrs(ResultPtr theResult);
 
-  /// Returns true if the checked type can be accepted for the base selection type
-  /// It returns true if they are coicide or if the base type is face and the checked type is wire
-  /// @return boolean result
-  static Standard_EXPORT bool isValidShapeType(const TopAbs_ShapeEnum& theBaseType,
-                                               const TopAbs_ShapeEnum& theCheckedType);
-
-
   //! Method which draws selected owners ( for fast presentation draw )
   Standard_EXPORT virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
                                                const SelectMgr_SequenceOfOwner& theOwners);

@@ -4,7 +4,7 @@
   <multi_selector id="base_objects"
                   label="Base objects:"
                   tooltip="Select a base objects"
-                  type_choice="faces objects"
+                  type_choice="wires faces objects"
                   use_choice="false"
                   concealment="true">
     <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell"/>

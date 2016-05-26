@@ -1326,7 +1326,7 @@ void PartSet_Module::setDefaultConstraintShown()
 //******************************************************
 bool PartSet_Module::canActivateSelectionMode(const Handle(AIS_InteractiveObject)& theIO, int theMode) const
 {
-  if (theMode == TopAbs_FACE) {
+  /*if (theMode == TopAbs_FACE) {
     Handle(PartSet_ResultSketchPrs) aSketchPrs = Handle(PartSet_ResultSketchPrs)::DownCast(theIO);
     if (!aSketchPrs.IsNull()) {
         ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
@@ -1344,7 +1344,7 @@ bool PartSet_Module::canActivateSelectionMode(const Handle(AIS_InteractiveObject
         } else
           return false;
     }
-  }
+  }*/
   return true; 
 }
 
@@ -1352,8 +1352,8 @@ bool PartSet_Module::canActivateSelectionMode(const Handle(AIS_InteractiveObject
 bool PartSet_Module::needDeactivateSelectionMode(const Handle(AIS_InteractiveObject)& theIO, int theMode) const
 {
   if (theMode == TopAbs_FACE) {
-    Handle(PartSet_ResultSketchPrs) aSketchPrs = Handle(PartSet_ResultSketchPrs)::DownCast(theIO);
-    return !aSketchPrs.IsNull();
+   // Handle(PartSet_ResultSketchPrs) aSketchPrs = Handle(PartSet_ResultSketchPrs)::DownCast(theIO);
+   // return !aSketchPrs.IsNull();
   }
   return false;
 }

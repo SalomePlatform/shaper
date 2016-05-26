@@ -312,6 +312,7 @@ TopAbs_ShapeEnum shapeType(const QString& theType)
     MyShapeTypes["vertex"] = TopAbs_VERTEX;
     MyShapeTypes["vertices"] = TopAbs_VERTEX;
     MyShapeTypes["wire"] = TopAbs_WIRE;
+    MyShapeTypes["wires"] = TopAbs_WIRE;
     MyShapeTypes["edge"] = TopAbs_EDGE;
     MyShapeTypes["edges"] = TopAbs_EDGE;
     MyShapeTypes["shell"] = TopAbs_SHELL;

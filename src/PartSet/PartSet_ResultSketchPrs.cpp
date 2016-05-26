@@ -126,7 +126,9 @@ void PartSet_ResultSketchPrs::ComputeSelection(const Handle(SelectMgr_Selection)
     // In order to avoid using custom selection modes
     return;
 
-  if (aMode == AIS_Shape::SelectionMode(TopAbs_FACE)) {
+  bool aShapeIsChanged = false;
+  if (aMode == AIS_Shape::SelectionMode(TopAbs_FACE) ||
+      aMode == AIS_Shape::SelectionMode(TopAbs_WIRE)) {
 #ifdef DEBUG_WIRE
     const TopoDS_Shape& aShape = Shape();
     debugInfo(aShape, TopAbs_VERTEX); // 24
@@ -142,9 +144,6 @@ void PartSet_ResultSketchPrs::ComputeSelection(const Handle(SelectMgr_Selection)
     for(NCollection_List<TopoDS_Shape>::Iterator anIt(mySketchFaceList); anIt.More(); anIt.Next()) {
       const TopoDS_Shape& aFace = anIt.Value();
       aBuilder.Add(aComp, aFace);
-      // for sketch presentation in the face mode wires should be selectable also
-      // accoring to #1343 Improvement of Extrusion and Revolution operations
-      appendShapeSelection(aSelection, aFace, TopAbs_WIRE);
     }
 #ifdef DEBUG_WIRE
     debugInfo(aComp, TopAbs_VERTEX); // 24
@@ -153,18 +152,23 @@ void PartSet_ResultSketchPrs::ComputeSelection(const Handle(SelectMgr_Selection)
     debugInfo(aComp, TopAbs_FACE); // 2
 #endif
     Set(aComp);
-  } else
+    aShapeIsChanged = true;
+  }
+  else
     Set(myOriginalShape);
 
   // append auxiliary compound to selection of edges/vertices
   if (aMode == AIS_Shape::SelectionMode(TopAbs_EDGE) ||
       aMode == AIS_Shape::SelectionMode(TopAbs_VERTEX)) {
 
-        bool isVertex = aMode == AIS_Shape::SelectionMode(TopAbs_VERTEX);
+    bool isVertex = aMode == AIS_Shape::SelectionMode(TopAbs_VERTEX);
     appendShapeSelection(aSelection, myAuxiliaryCompound, isVertex ? TopAbs_VERTEX : TopAbs_EDGE);
   }
 
   AIS_Shape::ComputeSelection(aSelection, aMode);
+
+  if (aShapeIsChanged)
+    Set(myOriginalShape);
 }
 
 void PartSet_ResultSketchPrs::appendShapeSelection(const Handle(SelectMgr_Selection)& theSelection,

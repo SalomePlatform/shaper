@@ -136,11 +136,6 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
                                 std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theResult);
         aValid = aCResult.get() && aCResult->facesNum() > 0;
       }
-      if (!aValid) {
-        // the compared shape types are not equal but presentation might allow some type for another
-        // exactly it allow Wire type of the shape for Face XML shape type
-        aValid = ModuleBase_ResultPrs::isValidShapeType(aCurrentShapeType, aShapeType);
-      }
     }
   }
   return aValid;
