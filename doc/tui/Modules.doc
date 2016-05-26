@@ -35,6 +35,15 @@
  *
  */
  
+/**
+ * \defgroup CPPHighAPI C++ High API
+ *
+ * \brief C++ API for using fetures concentrated in plugins.
+ *
+ * The API intendend to be wrapped by SWIG and used in Python.
+ *
+ */
+
  /**
  * \defgroup Config Config 
  *
@@ -87,4 +96,3 @@
  * (like in ExchangePlugin_ImportFormatValidator).
  *
  */
-

@@ -13,13 +13,16 @@
 //--------------------------------------------------------------------------------------
 class ModelAPI_Feature;
 //--------------------------------------------------------------------------------------
-/*
- *
+/**\class ModelHighAPI_Interface
+ * \ingroup CPPHighAPI
+ * \brief Base class for feature interfaces
  */
 class ModelHighAPI_Interface
 {
 public:
+  /// Constructor
   explicit ModelHighAPI_Interface(const std::shared_ptr<ModelAPI_Feature> & theFeature);
+  /// Destructor
   virtual ~ModelHighAPI_Interface();
 
   /// Return ModelAPI_Feature
@@ -28,7 +31,7 @@ public:
   /// Shortcut for feature()->execute()
   void execute();
 
-  /// Throw exception to event loop.
+  /// Throw exception to event loop
   void throwException(const std::string & theDescription);
 
 protected:
