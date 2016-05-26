@@ -56,6 +56,13 @@ void FeaturesPlugin_Partition::execute()
       anObjects.push_back(anObject);
     }
   }
+
+  if(anObjects.empty()) {
+    static const std::string aFeatureError = "Error: No objects for partition.";
+    setError(aFeatureError);
+    return;
+  }
+
   std::list<std::shared_ptr<GeomAPI_Pnt> > aBoundingPoints = GeomAlgoAPI_ShapeTools::getBoundingBox(anObjects, 1.0);
 
   // Resize planes.

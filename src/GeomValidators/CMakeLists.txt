@@ -19,6 +19,7 @@ SET(PROJECT_HEADERS
     GeomValidators_ZeroOffset.h
     GeomValidators_Different.h
     GeomValidators_IntersectionSelection.h
+    GeomValidators_MinObjectsSelected.h
 )
 
 SET(PROJECT_SOURCES
@@ -37,6 +38,7 @@ SET(PROJECT_SOURCES
     GeomValidators_ZeroOffset.cpp
     GeomValidators_Different.cpp
     GeomValidators_IntersectionSelection.cpp
+    GeomValidators_MinObjectsSelected.cpp
 )
 
 SET(PROJECT_LIBRARIES
