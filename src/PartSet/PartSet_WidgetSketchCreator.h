@@ -100,7 +100,7 @@ protected:
 
   /// Retunrs a list of possible shape types
   /// \return a list of shapes
-  virtual QIntList getShapeTypes() const;
+  virtual QIntList shapeTypes() const;
 
   /// Emits model changed info, updates the current control by selection change
   /// \param theDone a state whether the selection is set

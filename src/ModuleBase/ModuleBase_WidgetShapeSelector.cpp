@@ -173,7 +173,7 @@ void ModuleBase_WidgetShapeSelector::updateFocus()
 }
 
 //********************************************************************
-QIntList ModuleBase_WidgetShapeSelector::getShapeTypes() const
+QIntList ModuleBase_WidgetShapeSelector::shapeTypes() const
 {
   QIntList aShapeTypes;
   foreach(QString aType, myShapeTypes) {

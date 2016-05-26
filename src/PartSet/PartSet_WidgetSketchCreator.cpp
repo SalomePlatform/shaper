@@ -208,7 +208,7 @@ void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelec
   }
 }
 
-QIntList PartSet_WidgetSketchCreator::getShapeTypes() const
+QIntList PartSet_WidgetSketchCreator::shapeTypes() const
 {
   QIntList aShapeTypes;
   foreach(QString aType, myShapeTypes) {

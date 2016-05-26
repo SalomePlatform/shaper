@@ -80,7 +80,11 @@ protected:
 
   /// Retunrs a list of possible shape types
   /// \return a list of shapes
-  virtual QIntList getShapeTypes() const = 0;
+  QIntList getShapeTypes() const;
+
+  /// Retunrs a list of possible shape types
+  /// \return a list of shapes
+  virtual QIntList shapeTypes() const = 0;
 
   /// Computes and updates name of selected object in the widget
   // NDS: has body is temporary

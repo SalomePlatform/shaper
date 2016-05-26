@@ -121,7 +121,7 @@ protected:
 
   /// Retunrs a list of possible shape types
   /// \return a list of shapes
-  virtual QIntList getShapeTypes() const;
+  virtual QIntList shapeTypes() const;
 
   /// Set current shape type for selection
   void setCurrentShapeType(const TopAbs_ShapeEnum theShapeType);

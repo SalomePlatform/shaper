@@ -96,7 +96,7 @@ Q_OBJECT
 
   /// Retunrs a list of possible shape types
   /// \return a list of shapes
-  virtual QIntList getShapeTypes() const;
+  virtual QIntList shapeTypes() const;
 
   /// Get the shape from the attribute if the attribute contains a shape, e.g. selection attribute
   /// \return a shape
