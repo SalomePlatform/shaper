@@ -98,7 +98,8 @@
             label="Points:"
             tooltip="Select points for fillets"
             type_choice="Vertices"
-            greed ="true">
+            greed = "true"
+            clear_in_neutral_point="false">
           <validator id="SketchPlugin_FilletVertexValidator"/>
         </sketch_multi_selector>
         <doublevalue label="Radius" tooltip="Fillet arc radius" id="ConstraintValue" accept_expressions="0" min="0" use_reset="false">
