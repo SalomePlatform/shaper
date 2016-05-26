@@ -1287,6 +1287,32 @@ FeaturePtr Model_Document::lastFeature()
   return FeaturePtr();
 }
 
+static Handle(TNaming_NamedShape) searchForOriginalShape(TopoDS_Shape theShape, TDF_Label aMain) {
+  Handle(TNaming_NamedShape) aResult;
+  while(!theShape.IsNull()) { // searching for the very initial shape that produces this one
+    TopoDS_Shape aShape = theShape;
+    theShape.Nullify();
+    for(TNaming_SameShapeIterator anIter(aShape, aMain); anIter.More(); anIter.Next()) {
+      TDF_Label aNSLab = anIter.Label();
+      Handle(TNaming_NamedShape) aNS;
+      if (aNSLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        for(TNaming_Iterator aShapesIter(aNS); aShapesIter.More(); aShapesIter.Next()) {
+          if (aShapesIter.Evolution() == TNaming_SELECTED || aShapesIter.Evolution() == TNaming_DELETE)
+            continue; // don't use the selection evolution
+          if (aShapesIter.NewShape().IsSame(aShape)) { // found the original shape
+            aResult = aNS;
+            if (aResult->Evolution() == TNaming_MODIFY)
+              theShape = aShapesIter.OldShape();
+            if (!theShape.IsNull()) // otherwise may me searching for another item of this shape with longer history
+              break;
+          }
+        }
+      }
+    }
+  }
+  return aResult;
+}
+
 std::shared_ptr<ModelAPI_Feature> Model_Document::producedByFeature(
     std::shared_ptr<ModelAPI_Result> theResult,
     const std::shared_ptr<GeomAPI_Shape>& theShape)
@@ -1359,34 +1385,24 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::producedByFeature(
     }
   }
   if (aCandidatInThis.IsNull()) {
-    if (aCandidatContainer.IsNull())
-      return FeaturePtr();
-    // with the lower priority use the higher level shape that contains aShape
-    aCandidatInThis = aCandidatContainer;
-    anOldShape = aShapeContainer;
-  }
-
-  while(!anOldShape.IsNull()) { // searching for the very initial shape that produces this one
-    aShape = anOldShape;
-    anOldShape.Nullify();
-    for(TNaming_SameShapeIterator anIter(aShape, myDoc->Main()); anIter.More(); anIter.Next()) {
-      TDF_Label aNSLab = anIter.Label();
-      Handle(TNaming_NamedShape) aNS;
-      if (aNSLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-        for(TNaming_Iterator aShapesIter(aNS); aShapesIter.More(); aShapesIter.Next()) {
-          if (aShapesIter.Evolution() == TNaming_SELECTED || aShapesIter.Evolution() == TNaming_DELETE)
-            continue; // don't use the selection evolution
-          if (aShapesIter.NewShape().IsSame(aShape)) { // found the original shape
-            aCandidatInThis = aNS;
-            if (aCandidatInThis->Evolution() == TNaming_MODIFY)
-              anOldShape = aShapesIter.OldShape();
-            if (!anOldShape.IsNull()) // otherwise may me searching for another item of this shape with longer history
-              break;
-          }
-        }
-      }
+    // to fix 1512: searching for original shape of this shape if modification of it is not in this result
+    aCandidatInThis = searchForOriginalShape(aShape, myDoc->Main());
+    if (aCandidatInThis.IsNull()) {
+      if (aCandidatContainer.IsNull())
+        return FeaturePtr();
+      // with the lower priority use the higher level shape that contains aShape
+      aCandidatInThis = aCandidatContainer;
+      anOldShape = aShapeContainer;
+    } else {
+      // to stop the searching by the following searchForOriginalShape
+      anOldShape.Nullify();
     }
   }
+
+  Handle(TNaming_NamedShape) aNS = searchForOriginalShape(anOldShape, myDoc->Main());
+  if (!aNS.IsNull())
+    aCandidatInThis = aNS;
+
   FeaturePtr aResult;
   TDF_Label aResultLab = aCandidatInThis->Label();
   while(aResultLab.Depth() > 3)
