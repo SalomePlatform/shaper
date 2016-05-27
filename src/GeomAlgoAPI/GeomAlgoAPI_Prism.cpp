@@ -39,7 +39,20 @@
 #include <TopoDS_Solid.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
-//=================================================================================================
+
+static void storeGenerationHistory(GeomAlgoAPI_Prism* thePrismAlgo,
+                                   const TopoDS_Shape& theBase,
+                                   const TopAbs_ShapeEnum theType,
+                                   BRepPrimAPI_MakePrism* thePrismBuilder);
+
+static void storeGenerationHistory(GeomAlgoAPI_Prism* thePrismAlgo,
+                                   const TopoDS_Shape& theResult,
+                                   const TopAbs_ShapeEnum theType,
+                                   const TopoDS_Face& theToFace,
+                                   const TopoDS_Face& theFromFace);
+
+
+//==================================================================================================
 GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
                                      const double       theToSize,
                                      const double       theFromSize)
@@ -47,7 +60,7 @@ GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
   build(theBaseShape, std::shared_ptr<GeomAPI_Dir>(), GeomShapePtr(), theToSize, GeomShapePtr(), theFromSize);
 }
 
-//=================================================================================================
+//==================================================================================================
 GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr                 theBaseShape,
                                      const std::shared_ptr<GeomAPI_Dir> theDirection,
                                      const double                       theToSize,
@@ -56,7 +69,7 @@ GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr                 theBaseS
   build(theBaseShape, theDirection, GeomShapePtr(), theToSize, GeomShapePtr(), theFromSize);
 }
 
-//=================================================================================================
+//==================================================================================================
 GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
                                      const GeomShapePtr theToShape,
                                      const double       theToSize,
@@ -66,7 +79,7 @@ GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
   build(theBaseShape, std::shared_ptr<GeomAPI_Dir>(), theToShape, theToSize, theFromShape, theFromSize);
 }
 
-//=================================================================================================
+//==================================================================================================
 GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr                 theBaseShape,
                                      const std::shared_ptr<GeomAPI_Dir> theDirection,
                                      const GeomShapePtr                 theToShape,
@@ -77,7 +90,7 @@ GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr                 theBaseS
   build(theBaseShape, theDirection, theToShape, theToSize, theFromShape, theFromSize);
 }
 
-//=================================================================================================
+//==================================================================================================
 void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
                               const std::shared_ptr<GeomAPI_Dir> theDirection,
                               const GeomShapePtr&                theToShape,
@@ -105,6 +118,9 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     case TopAbs_FACE:
     case TopAbs_SHELL:
       aShapeTypeToExp = TopAbs_FACE;
+      break;
+    case TopAbs_COMPOUND:
+      aShapeTypeToExp = TopAbs_COMPOUND;
       break;
     default:
       return;
@@ -193,13 +209,11 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     aResult = aPrismBuilder->Shape();
 
     // Setting naming.
-    for(TopExp_Explorer anExp(aMovedBase, aShapeTypeToExp); anExp.More(); anExp.Next()) {
-      const TopoDS_Shape& aShape = anExp.Current();
-      GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
-      aFromShape->setImpl(new TopoDS_Shape(aPrismBuilder->FirstShape(aShape)));
-      aToShape->setImpl(new TopoDS_Shape(aPrismBuilder->LastShape(aShape)));
-      this->addFromShape(aFromShape);
-      this->addToShape(aToShape);
+    if(aShapeTypeToExp == TopAbs_COMPOUND) {
+      storeGenerationHistory(this, aMovedBase, TopAbs_EDGE, aPrismBuilder);
+      storeGenerationHistory(this, aMovedBase, TopAbs_FACE, aPrismBuilder);
+    } else {
+      storeGenerationHistory(this, aMovedBase, aShapeTypeToExp, aPrismBuilder);
     }
   } else {
     GeomShapePtr aBoundingFromShape = theFromShape ? theFromShape : aBasePlane;
@@ -349,7 +363,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     if(aResult.ShapeType() == TopAbs_COMPOUND) {
       aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
     }
-    if(aShapeTypeToExp == TopAbs_FACE) {
+    if(aShapeTypeToExp == TopAbs_FACE || aShapeTypeToExp == TopAbs_COMPOUND) {
       const TopTools_ListOfShape& aToShapes = aToCutBuilder->Modified(aToShape);
       for(TopTools_ListIteratorOfListOfShape anIt(aToShapes); anIt.More(); anIt.Next()) {
         GeomShapePtr aGeomSh(new GeomAPI_Shape());
@@ -373,7 +387,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     if(aResult.ShapeType() == TopAbs_COMPOUND) {
       aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
     }
-    if(aShapeTypeToExp == TopAbs_FACE) {
+    if(aShapeTypeToExp == TopAbs_FACE || aShapeTypeToExp == TopAbs_COMPOUND) {
       const TopTools_ListOfShape& aFromShapes = aFromCutBuilder->Modified(aFromShape);
       for(TopTools_ListIteratorOfListOfShape anIt(aFromShapes); anIt.More(); anIt.Next()) {
         GeomShapePtr aGeomSh(new GeomAPI_Shape());
@@ -383,37 +397,11 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     }
 
     // Naming for extrusion from vertex, edge.
-    for(TopExp_Explorer anExp(aResult, aShapeTypeToExp); anExp.More(); anExp.Next()) {
-      const TopoDS_Shape& aShape = anExp.Current();
-      GeomShapePtr aGeomSh(new GeomAPI_Shape());
-      if(aShapeTypeToExp == TopAbs_VERTEX) {
-        gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
-        IntTools_Context anIntTools;
-        if(anIntTools.IsValidPointForFace(aPnt, aToFace, Precision::Confusion()) == Standard_True) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          this->addToShape(aGeomSh);
-        }
-        if(anIntTools.IsValidPointForFace(aPnt, aFromFace, Precision::Confusion()) == Standard_True) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          this->addFromShape(aGeomSh);
-        }
-      } else if(aShapeTypeToExp == TopAbs_EDGE) {
-        TopoDS_Edge anEdge = TopoDS::Edge(aShape);
-        BRepLib_CheckCurveOnSurface anEdgeCheck(anEdge, aToFace);
-        anEdgeCheck.Perform();
-        if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          this->addToShape(aGeomSh);
-        }
-        anEdgeCheck.Init(anEdge, aFromFace);
-        anEdgeCheck.Perform();
-        if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          this->addFromShape(aGeomSh);
-        }
-      } else {
-        break;
-      }
+    if(aShapeTypeToExp == TopAbs_COMPOUND) {
+      storeGenerationHistory(this, aResult, TopAbs_EDGE, aToFace, aFromFace);
+      storeGenerationHistory(this, aResult, TopAbs_FACE, aToFace, aFromFace);
+    } else {
+      storeGenerationHistory(this, aResult, aShapeTypeToExp, aToFace, aFromFace);
     }
 
     if(aResult.ShapeType() == TopAbs_COMPOUND) {
@@ -437,4 +425,62 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
   aGeomSh->setImpl(new TopoDS_Shape(aResult));
   this->setShape(aGeomSh);
   this->setDone(true);
+}
+
+// Auxilary functions:
+//==================================================================================================
+void storeGenerationHistory(GeomAlgoAPI_Prism* thePrismAlgo,
+                            const TopoDS_Shape& theBase,
+                            const TopAbs_ShapeEnum theType,
+                            BRepPrimAPI_MakePrism* thePrismBuilder)
+{
+  for(TopExp_Explorer anExp(theBase, theType); anExp.More(); anExp.Next()) {
+    const TopoDS_Shape& aShape = anExp.Current();
+    GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
+    aFromShape->setImpl(new TopoDS_Shape(thePrismBuilder->FirstShape(aShape)));
+    aToShape->setImpl(new TopoDS_Shape(thePrismBuilder->LastShape(aShape)));
+    thePrismAlgo->addFromShape(aFromShape);
+    thePrismAlgo->addToShape(aToShape);
+  }
+}
+
+//==================================================================================================
+void storeGenerationHistory(GeomAlgoAPI_Prism* thePrismAlgo,
+                            const TopoDS_Shape& theResult,
+                            const TopAbs_ShapeEnum theType,
+                            const TopoDS_Face& theToFace,
+                            const TopoDS_Face& theFromFace)
+{
+  for(TopExp_Explorer anExp(theResult, theType); anExp.More(); anExp.Next()) {
+    const TopoDS_Shape& aShape = anExp.Current();
+    GeomShapePtr aGeomSh(new GeomAPI_Shape());
+    if(theType == TopAbs_VERTEX) {
+      gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
+      IntTools_Context anIntTools;
+      if(anIntTools.IsValidPointForFace(aPnt, theToFace, Precision::Confusion()) == Standard_True) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        thePrismAlgo->addToShape(aGeomSh);
+      }
+      if(anIntTools.IsValidPointForFace(aPnt, theFromFace, Precision::Confusion()) == Standard_True) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        thePrismAlgo->addFromShape(aGeomSh);
+      }
+    } else if(theType == TopAbs_EDGE) {
+      TopoDS_Edge anEdge = TopoDS::Edge(aShape);
+      BRepLib_CheckCurveOnSurface anEdgeCheck(anEdge, theToFace);
+      anEdgeCheck.Perform();
+      if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        thePrismAlgo->addToShape(aGeomSh);
+      }
+      anEdgeCheck.Init(anEdge, theFromFace);
+      anEdgeCheck.Perform();
+      if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        thePrismAlgo->addFromShape(aGeomSh);
+      }
+    } else {
+      break;
+    }
+  }
 }

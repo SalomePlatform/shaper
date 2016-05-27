@@ -16,7 +16,7 @@
       icon="icons/Features/sketch.png"
       tooltip="Select a sketch face"
       type_choice="wires faces objects">
-      <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell"/>
+      <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell,compound"/>
     </multi_selector>
     <shape_selector id="direction_object"
                     icon="icons/Features/axis.png"

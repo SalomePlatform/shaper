@@ -27,30 +27,30 @@ class GeomAlgoAPI_MakeSweep : public GeomAlgoAPI_MakeShapeList
 {
 public:
   /// \returns the list of from shapes.
-  GEOMALGOAPI_EXPORT virtual const ListOfShape& fromShapes() const;
+  GEOMALGOAPI_EXPORT const ListOfShape& fromShapes() const;
 
   /// \return the list of to shapes.
-  GEOMALGOAPI_EXPORT virtual const ListOfShape& toShapes() const;
+  GEOMALGOAPI_EXPORT const ListOfShape& toShapes() const;
+
+  /// \brief Adds a shape to list of from shape.
+  /// \param[in] theShape a shape to add.
+  GEOMALGOAPI_EXPORT void addFromShape(const std::shared_ptr<GeomAPI_Shape> theShape);
+
+  /// \brief Sets from shapes
+  /// \param[in] theListOfShapes list of from shapes.
+  GEOMALGOAPI_EXPORT void setFromShapes(const ListOfShape& theListOfShapes);
+
+  /// \brief Adds a face to list of to shape.
+  /// \param[in] theShape a face to add.
+  GEOMALGOAPI_EXPORT void addToShape(const std::shared_ptr<GeomAPI_Shape> theShape);
+
+  /// \brief Sets to shapes
+  /// \param[in] theListOfShapes list of to shapes.
+  GEOMALGOAPI_EXPORT void setToShapes(const ListOfShape& theListOfShapes);
 
 protected:
   /// Empty constructor.
   GeomAlgoAPI_MakeSweep() : GeomAlgoAPI_MakeShapeList() {};
-
-  /// \brief Adds a shape to list of from shape.
-  /// \param[in] theShape a shape to add.
-  void addFromShape(const std::shared_ptr<GeomAPI_Shape> theShape);
-
-  /// \brief Sets from shapes
-  /// \param[in] theListOfShapes list of from shapes.
-  void setFromShapes(const ListOfShape& theListOfShapes);
-
-  /// \brief Adds a face to list of to shape.
-  /// \param[in] theShape a face to add.
-  void addToShape(const std::shared_ptr<GeomAPI_Shape> theShape);
-
-  /// \brief Sets to shapes
-  /// \param[in] theListOfShapes list of to shapes.
-  void setToShapes(const ListOfShape& theListOfShapes);
 
 private:
   ListOfShape myFromShapes;

@@ -25,6 +25,14 @@
 #include <map>
 #include <sstream>
 
+static void storeSubShape(ResultBodyPtr theResultBody,
+                          const GeomShapePtr theShape,
+                          const GeomAPI_Shape::ShapeType theType,
+                          const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
+                          const std::string theName,
+                          int& theShapeIndex,
+                          int& theTag);
+
 //=================================================================================================
 void FeaturesPlugin_CompositeSketch::initCompositeSketchAttribtues(const int theInitFlags)
 {
@@ -134,8 +142,7 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
     GeomShapePtr aBaseShape = aBaseObjectSelection->value();
     if(aBaseShape.get() && !aBaseShape->isNull()) {
       GeomAPI_Shape::ShapeType aST = aBaseShape->shapeType();
-      if(aST != GeomAPI_Shape::VERTEX && aST != GeomAPI_Shape::EDGE && aST != GeomAPI_Shape::WIRE &&
-         aST != GeomAPI_Shape::FACE && aST != GeomAPI_Shape::SHELL) {
+      if(aST == GeomAPI_Shape::SOLID || aST == GeomAPI_Shape::COMPSOLID) {
         setError("Error: Selected shapes has unsupported type.");
         return;
       }
@@ -290,9 +297,19 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
       aGenName += "Face";
       break;
     }
+    case GeomAPI_Shape::COMPOUND: {
+      aShapeTypeToExplode = GeomAPI_Shape::COMPOUND;
+    }
   }
-  theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape, aShapeTypeToExplode,
-                                              theTag++, aGenName, *aMapOfSubShapes.get());
+
+  if(aShapeTypeToExplode == GeomAPI_Shape::VERTEX || aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
+    theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape, GeomAPI_Shape::VERTEX,
+                                                theTag++, aGenName + "Edge", *aMapOfSubShapes.get());
+  }
+  if(aShapeTypeToExplode == GeomAPI_Shape::EDGE || aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
+    theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape, GeomAPI_Shape::EDGE,
+                                                theTag++, aGenName + "Face", *aMapOfSubShapes.get());
+  }
 
   std::shared_ptr<GeomAlgoAPI_MakeSweep> aMakeSweep = std::dynamic_pointer_cast<GeomAlgoAPI_MakeSweep>(theMakeShape);
   if(aMakeSweep.get()) {
@@ -332,21 +349,50 @@ void FeaturesPlugin_CompositeSketch::storeShapes(ResultBodyPtr theResultBody,
       aShapeTypeStr = "Face";
       break;
     }
+    case GeomAPI_Shape::COMPOUND: {
+      aShapeTypeToExplore = GeomAPI_Shape::COMPOUND;
+      break;
+    }
   }
 
   // Store shapes.
   int aShapeIndex = 1;
-  std::string aName = theName + aShapeTypeStr;
+  int aFaceIndex = 1;
   for(ListOfShape::const_iterator anIt = theShapes.cbegin(); anIt != theShapes.cend(); ++anIt) {
     GeomShapePtr aShape = *anIt;
-    for(GeomAPI_ShapeExplorer anExp(aShape, aShapeTypeToExplore); anExp.more(); anExp.next()) {
-      GeomShapePtr aSubShape = anExp.current();
-      if(theMapOfSubShapes->isBound(aSubShape)) {
-        aSubShape = theMapOfSubShapes->find(aSubShape);
-      }
-      std::ostringstream aStr;
-      aStr << aName << "_" << aShapeIndex++;
-      theResultBody->generated(aSubShape, aStr.str(), theTag++);
+
+    if(aShapeTypeToExplore == GeomAPI_Shape::COMPOUND) {
+      std::string aName = theName + (aShape->shapeType() == GeomAPI_Shape::EDGE ? "Edge" : "Face");
+      storeSubShape(theResultBody,
+                    aShape,
+                    aShape->shapeType(),
+                    theMapOfSubShapes,
+                    aName,
+                    aShape->shapeType() == GeomAPI_Shape::EDGE ? aShapeIndex : aFaceIndex,
+                    theTag);
+    } else {
+      std::string aName = theName + aShapeTypeStr;
+      storeSubShape(theResultBody, aShape, aShapeTypeToExplore,
+                    theMapOfSubShapes, aName, aShapeIndex, theTag);
     }
+  }
+}
+
+void storeSubShape(ResultBodyPtr theResultBody,
+                   const GeomShapePtr theShape,
+                   const GeomAPI_Shape::ShapeType theType,
+                   const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
+                   const std::string theName,
+                   int& theShapeIndex,
+                   int& theTag)
+{
+  for(GeomAPI_ShapeExplorer anExp(theShape, theType); anExp.more(); anExp.next()) {
+    GeomShapePtr aSubShape = anExp.current();
+    if(theMapOfSubShapes->isBound(aSubShape)) {
+      aSubShape = theMapOfSubShapes->find(aSubShape);
+    }
+    std::ostringstream aStr;
+    aStr << theName << "_" << theShapeIndex++;
+    theResultBody->generated(aSubShape, aStr.str(), theTag++);
   }
 }

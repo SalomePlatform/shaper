@@ -15,7 +15,7 @@
                   tooltip="Select a base objects"
                   type_choice="wires faces objects"
                   concealment="true">
-    <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell"/>
+    <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell,compound"/>
   </multi_selector>
   <shape_selector id="direction_object"
                   icon="icons/Features/axis.png"

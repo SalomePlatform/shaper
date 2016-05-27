@@ -145,6 +145,7 @@ void FeaturesPlugin_Partition::storeResult(const ListOfShape& theObjects,
   // Store modified shape.
   if(aBaseShape->isEqual(theResultShape)) {
     aResultBody->store(theResultShape);
+    setResult(aResultBody, theIndex);
     return;
   }
 
