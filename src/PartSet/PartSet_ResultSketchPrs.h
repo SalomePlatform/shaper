@@ -37,7 +37,7 @@ protected:
 
   /// Redefinition of virtual function
   Standard_EXPORT virtual void ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
-    const Standard_Integer aMode) ;
+    const Standard_Integer theMode) ;
 
 private:
   /// Appens sensitive and owners for wires of the given shape into selection

@@ -183,16 +183,6 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theObject a model object
   virtual bool canActivateSelection(const ObjectPtr& theObject) const;
 
-  /// Returns true if the given selection mode can be activated for the given presentgation
-  /// \param theIO an object presentation
-  /// \param theMode selection mode
-  virtual bool canActivateSelectionMode(const Handle(AIS_InteractiveObject)& theIO, int theMode) const { return true; }
-
-  /// Returns true if the given selection mode must be deactivated for the given presentgation in any case
-  /// \param theIO an object presentation
-  /// \param theMode selection mode
-  virtual bool needDeactivateSelectionMode(const Handle(AIS_InteractiveObject)& theIO, int theMode) const { return false; }
-
   /// Reacts to the delete action in module
   /// \returns true if the action is processed
   virtual bool deleteObjects() { return false; };
@@ -206,6 +196,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Returns a list of modes, where the AIS objects should be activated
   /// \param theModes a list of modes
   virtual void activeSelectionModes(QIntList& theModes) {}
+
+  /// Appends specific selection modes for the module to the list of types
+  /// \param theTypes a selection modes to be extended
+  virtual void customSubShapesSelectionModes(QIntList& theTypes) {}
 
   /// Activate custom presentation for the object. Default realization is empty.
   /// \param theFeature a feature instance

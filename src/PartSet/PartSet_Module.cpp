@@ -526,6 +526,14 @@ void PartSet_Module::activeSelectionModes(QIntList& theModes)
     PartSet_SketcherMgr::sketchSelectionModes(theModes);
 }
 
+void PartSet_Module::customSubShapesSelectionModes(QIntList& theTypes)
+{
+  if (theTypes.contains(TopAbs_FACE))
+    theTypes.append(SketcherPrs_Tools::Sel_Sketch_Face);
+  if (theTypes.contains(TopAbs_WIRE))
+    theTypes.append(SketcherPrs_Tools::Sel_Sketch_Wire);
+}
+
 bool PartSet_Module::isMouseOverWindow()
 {
   return mySketchMgr->isMouseOverWindow();
@@ -1321,39 +1329,4 @@ void PartSet_Module::setDefaultConstraintShown()
   myHasConstraintShown[PartSet_Tools::Geometrical] = true;
   myHasConstraintShown[PartSet_Tools::Dimensional] = true;
   myHasConstraintShown[PartSet_Tools::Expressions] = false;
-}
-
-//******************************************************
-bool PartSet_Module::canActivateSelectionMode(const Handle(AIS_InteractiveObject)& theIO, int theMode) const
-{
-  /*if (theMode == TopAbs_FACE) {
-    Handle(PartSet_ResultSketchPrs) aSketchPrs = Handle(PartSet_ResultSketchPrs)::DownCast(theIO);
-    if (!aSketchPrs.IsNull()) {
-        ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-        if (anOperation) {
-          ModuleBase_IPropertyPanel* aPropPanel = anOperation->propertyPanel();
-          if (aPropPanel) {
-            ModuleBase_ModelWidget* aModelWgt = aPropPanel->activeWidget();
-            ModuleBase_WidgetSelector* aWgtSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aModelWgt);
-            if (aWgtSelector) {
-              return aWgtSelector->isFilterActivated();
-            } else
-              return true;
-          } else
-            return false;
-        } else
-          return false;
-    }
-  }*/
-  return true; 
-}
-
-//******************************************************
-bool PartSet_Module::needDeactivateSelectionMode(const Handle(AIS_InteractiveObject)& theIO, int theMode) const
-{
-  if (theMode == TopAbs_FACE) {
-   // Handle(PartSet_ResultSketchPrs) aSketchPrs = Handle(PartSet_ResultSketchPrs)::DownCast(theIO);
-   // return !aSketchPrs.IsNull();
-  }
-  return false;
 }

@@ -887,8 +887,7 @@ void XGUI_Displayer::activateAIS(const Handle(AIS_InteractiveObject)& theIO,
   if (!aContext.IsNull()) {
     if (myWorkshop->module()) {
       int aMode = (theMode > 8)? theMode : AIS_Shape::SelectionType(theMode);
-      if (myWorkshop->module()->canActivateSelectionMode(theIO, aMode))
-        aContext->Activate(theIO, theMode, false);
+      aContext->Activate(theIO, theMode, false);
     } else
       aContext->Activate(theIO, theMode, false);
 
@@ -1160,7 +1159,7 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   for (; itr.More(); itr.Next() ) {
     Standard_Integer aMode = itr.Value();
     int aShapeMode = (aMode > 8)? aMode : AIS_Shape::SelectionType(aMode);
-    if (!theModes.contains(aMode) || (myWorkshop->module()->needDeactivateSelectionMode(theIO, aShapeMode))) {
+    if (!theModes.contains(aMode)) {
       deactivateAIS(theIO, aMode);
       isDeactivated = true;
     }

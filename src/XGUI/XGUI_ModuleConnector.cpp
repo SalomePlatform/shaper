@@ -79,8 +79,11 @@ QObjectPtrList XGUI_ModuleConnector::activeObjects(const QObjectPtrList& theObjL
 
 void XGUI_ModuleConnector::activateSubShapesSelection(const QIntList& theTypes)
 {
+  QIntList aTypes = theTypes;
+
   XGUI_Displayer* aDisp = myWorkshop->displayer();
-  aDisp->activateObjects(theTypes, activeObjects(aDisp->displayedObjects()));
+  myWorkshop->module()->customSubShapesSelectionModes(aTypes);
+  aDisp->activateObjects(aTypes, activeObjects(aDisp->displayedObjects()));
 }
 
 void XGUI_ModuleConnector::deactivateSubShapesSelection()

@@ -18,6 +18,8 @@
 
 #include <SketchPlugin_SketchEntity.h>
 
+#include <SketcherPrs_Tools.h>
+
 #include <Config_PropManager.h>
 
 #include <BRep_Builder.hxx>
@@ -120,15 +122,21 @@ void debugInfo(const TopoDS_Shape& theShape, const TopAbs_ShapeEnum theType)
 #endif
 
 void PartSet_ResultSketchPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
-                                            const Standard_Integer aMode)
+                                            const Standard_Integer theMode)
 {
-  if (aMode > 8)
+  int aMode = theMode;
+
+  if (aMode > 8 &&
+      aMode != SketcherPrs_Tools::Sel_Sketch_Face &&
+      aMode != SketcherPrs_Tools::Sel_Sketch_Wire)
     // In order to avoid using custom selection modes
     return;
 
   bool aShapeIsChanged = false;
-  if (aMode == AIS_Shape::SelectionMode(TopAbs_FACE) ||
-      aMode == AIS_Shape::SelectionMode(TopAbs_WIRE)) {
+  if (aMode == SketcherPrs_Tools::Sel_Sketch_Face ||
+      aMode == SketcherPrs_Tools::Sel_Sketch_Wire) {
+    aMode = (aMode == SketcherPrs_Tools::Sel_Sketch_Face) ? AIS_Shape::SelectionMode(TopAbs_FACE)
+                                                          : AIS_Shape::SelectionMode(TopAbs_WIRE);
 #ifdef DEBUG_WIRE
     const TopoDS_Shape& aShape = Shape();
     debugInfo(aShape, TopAbs_VERTEX); // 24

@@ -189,6 +189,10 @@ public:
   /// \param theModes a list of modes
   virtual void activeSelectionModes(QIntList& theModes);
 
+  /// Appends specific selection modes for the module to the list of types
+  /// \param theTypes a selection modes to be extended
+  virtual void customSubShapesSelectionModes(QIntList& theTypes);
+
   /// Returns whether the mouse enter the viewer's window
   /// \return true if items are added and there is no necessity to provide standard menu
   bool isMouseOverWindow();
@@ -306,16 +310,6 @@ public:
   /// \param theGeomShape a geom shape
   /// \return theAttribute
   virtual AttributePtr findAttribute(const ObjectPtr& theObject, const GeomShapePtr& theGeomShape);
-
-  /// Returns true if the given selection mode can be activated for the given presentgation
-  /// \param theIO an object presentation
-  /// \param theMode selection mode
-  virtual bool canActivateSelectionMode(const Handle(AIS_InteractiveObject)& theIO, int theMode) const;
-
-  /// Returns true if the given selection mode must be deactivated for the given presentgation in any case
-  /// \param theIO an object presentation
-  /// \param theMode selection mode
-  virtual bool needDeactivateSelectionMode(const Handle(AIS_InteractiveObject)& theIO, int theMode) const;
 
 public slots:
   /// Redefines the parent method in order to customize the next case:

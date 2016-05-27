@@ -72,8 +72,14 @@ namespace SketcherPrs_Tools {
     /// Selection mode for line of dimension
     Sel_Dimension_Line,
 
-    /// Selection mode foe text of dimension
-    Sel_Dimension_Text
+    /// Selection mode for text of dimension
+    Sel_Dimension_Text,
+
+    /// Selectiom mode for faces selection on sketch
+    Sel_Sketch_Face,
+
+    /// Selectiom mode for wires selection on sketch
+    Sel_Sketch_Wire
   };
 
   /// Type of angle
