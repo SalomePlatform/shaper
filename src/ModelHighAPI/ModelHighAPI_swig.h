@@ -11,5 +11,6 @@
 
   #include "ModelHighAPI_Double.h"
   #include "ModelHighAPI_Interface.h"
+  #include "ModelHighAPI_Macro.h"
 
 #endif /* SRC_MODELHIGHAPI_MODELHIGHAPI_SWIG_H_ */

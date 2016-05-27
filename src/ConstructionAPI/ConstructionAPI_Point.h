@@ -11,6 +11,7 @@
 #include "ConstructionAPI.h"
 
 #include <ModelHighAPI_Interface.h>
+#include <ModelHighAPI_Macro.h>
 //--------------------------------------------------------------------------------------
 class ModelAPI_AttributeDouble;
 class ModelAPI_Document;
@@ -33,25 +34,18 @@ public:
   /// Destructor
   virtual ~ConstructionAPI_Point();
 
+  INTERFACE_3("Point",
+              x, "x", Double, /** X attribute */,
+              y, "y", Double, /** Y attribute */,
+              z, "z", Double, /** Z attribute */)
+
   /// Set point values
   void setPoint(const ModelHighAPI_Double & theX,
                 const ModelHighAPI_Double & theY,
                 const ModelHighAPI_Double & theZ);
-
-  /// X attribute
-  std::shared_ptr<ModelAPI_AttributeDouble> x() const;
-  /// Y attribute
-  std::shared_ptr<ModelAPI_AttributeDouble> y() const;
-  /// Z attribute
-  std::shared_ptr<ModelAPI_AttributeDouble> z() const;
-
-protected:
-  std::shared_ptr<ModelAPI_AttributeDouble> myX, myY, myZ;
-
-  bool initialize();
 };
 
-//! Pointer on point object
+//! Pointer on Point object
 typedef std::shared_ptr<ConstructionAPI_Point> PointPtr;
 
 /**\ingroup CPPHighAPI

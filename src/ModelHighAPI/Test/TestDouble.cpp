@@ -35,9 +35,9 @@ TEST_F(HighModelAPI_Double_Test, Default) {
 }
 
 TEST_F(HighModelAPI_Double_Test, Double) {
-  ModelHighAPI_Double aValue(100);
+  ModelHighAPI_Double aValue(100.5);
 
-  EXPECT_CALL(aMockAttributeDouble, setValue(100.));
+  EXPECT_CALL(aMockAttributeDouble, setValue(100.5));
 
   aValue.fillAttribute(anAttributeDouble);
 }

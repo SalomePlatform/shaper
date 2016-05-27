@@ -117,7 +117,8 @@ TEST_F(ConstructionAPI_Point_Constructor_Test, GetFeatureAndValues) {
   ConstructionAPI_Point aPoint(aFeature, 10, "20", std::string("x + 30"));
 }
 
-TEST_F(ConstructionAPI_Point_Constructor_Test, addPointWithValues) {
+
+TEST_F(ConstructionAPI_Point_Constructor_Test, addPoint) {
   DocumentPtr aDocument(&aMockDocument, &null_deleter);
 
   EXPECT_CALL(aMockDocument, addFeature("Point", true));

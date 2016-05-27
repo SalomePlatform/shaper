@@ -33,5 +33,5 @@ endforeach()
 add_custom_command(OUTPUT doxyhelp.i
   COMMAND "${DOXYGEN_EXECUTABLE}"
   COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/scripts/doxy2swig.py xml/index.xml doxyhelp.i
-  DEPENDS ${doc_sources}
+  DEPENDS ${doc_sources} ${PROJECT_SOURCE_DIR}/doc/swig/doxyfile.in
 )

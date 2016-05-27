@@ -6,6 +6,7 @@ SET(PROJECT_HEADERS
   ModelHighAPI.h
   ModelHighAPI_Double.h
   ModelHighAPI_Interface.h
+  ModelHighAPI_Macro.h
 )
 
 SET(PROJECT_SOURCES

@@ -28,6 +28,9 @@ public:
   /// Return ModelAPI_Feature
   std::shared_ptr<ModelAPI_Feature> feature() const;
 
+  /// Shortcut for feature()->getKind()
+  const std::string& getKind();
+
   /// Shortcut for feature()->execute()
   void execute();
 

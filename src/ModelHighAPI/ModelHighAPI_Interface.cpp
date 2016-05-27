@@ -28,6 +28,11 @@ std::shared_ptr<ModelAPI_Feature> ModelHighAPI_Interface::feature() const
   return myFeature;
 }
 
+const std::string& ModelHighAPI_Interface::getKind()
+{
+  return feature()->getKind();
+}
+
 void ModelHighAPI_Interface::execute()
 {
   feature()->execute();
