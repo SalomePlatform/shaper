@@ -34,7 +34,7 @@ INCLUDE(PythonAPI)
 SET_SOURCE_FILES_PROPERTIES(ConstructionAPI.i PROPERTIES CPLUSPLUS ON)
 SET_SOURCE_FILES_PROPERTIES(ConstructionAPI.i PROPERTIES SWIG_DEFINITIONS "-shadow")
 
-#TODO(spo): is ModelAPI necessary or it could be received by INTERFACE_ ?
+#TODO(spo): is ModelAPI necessary or it could be received by INTERFACE_ (may require modern CMake)?
 SET(SWIG_LINK_LIBRARIES
   ConstructionAPI
   ModelHighAPI
@@ -44,6 +44,7 @@ SET(SWIG_LINK_LIBRARIES
 
 SET(SWIG_MODULE_ConstructionAPI_EXTRA_DEPS ${SWIG_MODULE_ConstructionAPI_EXTRA_DEPS}
   ${PROJECT_SOURCE_DIR}/src/ModelHighAPI/ModelHighAPI.i
+  doxyhelp.i
   ${PROJECT_HEADERS}
 )
 

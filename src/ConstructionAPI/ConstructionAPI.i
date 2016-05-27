@@ -6,6 +6,8 @@
   #include "ConstructionAPI_swig.h"
 %}
 
+%include "doxyhelp.i"
+
 // import other modules
 %import "ModelHighAPI.i"
 

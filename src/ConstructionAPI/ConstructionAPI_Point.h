@@ -23,7 +23,7 @@ class ModelHighAPI_Double;
 class ConstructionAPI_Point : public ModelHighAPI_Interface
 {
 public:
-  /// Constructor
+  /// Constructor without values
   explicit ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature> & theFeature);
   /// Constructor with values
   ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature> & theFeature,
@@ -38,11 +38,11 @@ public:
                 const ModelHighAPI_Double & theY,
                 const ModelHighAPI_Double & theZ);
 
-  /// X coordinate for the point
+  /// X attribute
   std::shared_ptr<ModelAPI_AttributeDouble> x() const;
-  /// Y coordinate for the point
+  /// Y attribute
   std::shared_ptr<ModelAPI_AttributeDouble> y() const;
-  /// Z coordinate for the point
+  /// Z attribute
   std::shared_ptr<ModelAPI_AttributeDouble> z() const;
 
 protected:
@@ -57,7 +57,7 @@ typedef std::shared_ptr<ConstructionAPI_Point> PointPtr;
 /**\ingroup CPPHighAPI
  * \brief Create Point feature
  */
-PointPtr addPoint(std::shared_ptr<ModelAPI_Document> thePart,
+PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Double & theX,
                   const ModelHighAPI_Double & theY,
                   const ModelHighAPI_Double & theZ);

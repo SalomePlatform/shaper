@@ -1,8 +1,11 @@
 /* ModelHighAPI.i */
 %module ModelHighAPI
+
 %{
   #include "ModelHighAPI_swig.h"
 %}
+
+%include "doxyhelp.i"
 
 // to avoid error on this
 #define ModelHighAPI_EXPORT

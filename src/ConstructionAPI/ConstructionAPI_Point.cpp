@@ -89,7 +89,7 @@ std::shared_ptr<ModelAPI_AttributeDouble> ConstructionAPI_Point::z() const
 //--------------------------------------------------------------------------------------
 // TODO(spo): make add* as static functions of the class
 PointPtr addPoint(
-    std::shared_ptr<ModelAPI_Document> thePart,
+    const std::shared_ptr<ModelAPI_Document> & thePart,
     const ModelHighAPI_Double& theX,
     const ModelHighAPI_Double& theY,
     const ModelHighAPI_Double& theZ)
