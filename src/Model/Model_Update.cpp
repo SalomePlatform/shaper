@@ -109,7 +109,8 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
   bool aIsDisabled = theFeature->isDisabled();
   if (!aIsDisabled) {
     std::set<std::shared_ptr<ModelAPI_Feature> > aNewSet;
-    if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated) {
+    if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated ||
+        theFeature->data()->execState() == ModelAPI_StateInvalidArgument) { // issue 1519
       // do not forget that in this case all were the reasons
       aNewSet.insert(theFeature);
     } else {
