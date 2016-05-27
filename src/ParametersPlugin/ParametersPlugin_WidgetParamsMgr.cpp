@@ -417,7 +417,7 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
           aText.replace(" ", "");
         }
         if (hasName(aText)) {
-          myMessage = tr("Name %1 already exists.").arg(aText);
+          myMessage = tr("Name '%1' already exists.").arg(aText);
           QTimer::singleShot(50, this, SLOT(sendWarning()));
           return;
         }
@@ -457,6 +457,8 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
   if (aColumn == Col_Equation)
     updateParametersPart();
   updateFeaturesPart();
+          
+  onSelectionChanged();
 }
 
 void ParametersPlugin_WidgetParamsMgr::updateItem(QTreeWidgetItem* theItem, 
@@ -700,9 +702,9 @@ void ParametersPlugin_WidgetParamsMgr::sendWarning()
 
 void ParametersPlugin_WidgetParamsMgr::onSelectionChanged()
 {
+  QList<QTreeWidgetItem*> aItemsList = myTable->selectedItems();
   bool isValid = checkIsValid();
   if (isValid) {
-    QList<QTreeWidgetItem*> aItemsList = myTable->selectedItems();
     bool isParameter = false;
     foreach(QTreeWidgetItem* aItem, aItemsList) {
       if (aItem->parent() == myParameters) {
@@ -711,15 +713,16 @@ void ParametersPlugin_WidgetParamsMgr::onSelectionChanged()
       }
     }
     myInsertBtn->setEnabled(isParameter);
-    myRemoveBtn->setEnabled(isParameter);
+    //myRemoveBtn->setEnabled(isParameter);
     myUpBtn->setEnabled(isParameter);
     myDownBtn->setEnabled(isParameter);
   } else {
     myInsertBtn->setEnabled(false);
-    myRemoveBtn->setEnabled(false);
+    //myRemoveBtn->setEnabled(false);
     myUpBtn->setEnabled(false);
     myDownBtn->setEnabled(false);
   }
+  myRemoveBtn->setEnabled(!aItemsList.isEmpty());
 }
 
 void ParametersPlugin_WidgetParamsMgr::enableButtons(bool theEnable)
