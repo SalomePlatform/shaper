@@ -320,13 +320,17 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(const
   aBuilder.MakeCompound(aCompound);
   ListOfShape aCompSolids, aFreeSolids;
   for(NCollection_Vector<NCollection_List<TopoDS_Shape>>::Iterator anIt(aGroups); anIt.More(); anIt.Next()) {
-    TopoDS_Compound aGroupCompound = makeCompound(anIt.Value());
+    NCollection_List<TopoDS_Shape> aGroup = anIt.Value();
     GeomShapePtr aGeomShape(new GeomAPI_Shape());
-    aGeomShape->setImpl(new TopoDS_Shape(aGroupCompound));
-    aGeomShape = GeomAlgoAPI_ShapeTools::combineShapes(aGeomShape,
-                                                       GeomAPI_Shape::COMPSOLID,
-                                                       aCompSolids,
-                                                       aFreeSolids);
+    if(aGroup.Size() == 1) {
+      aGeomShape->setImpl(new TopoDS_Shape(aGroup.First()));
+    } else {
+      aGeomShape->setImpl(new TopoDS_Shape(makeCompound(anIt.Value())));
+      aGeomShape = GeomAlgoAPI_ShapeTools::combineShapes(aGeomShape,
+                                                         GeomAPI_Shape::COMPSOLID,
+                                                         aCompSolids,
+                                                         aFreeSolids);
+    }
     aBuilder.Add(aCompound, aGeomShape->impl<TopoDS_Shape>());
   }
 

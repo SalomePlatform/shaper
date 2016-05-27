@@ -12,6 +12,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
 
 #include <Events_Error.h>
@@ -131,25 +132,47 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
     AttributeSelectionListPtr aListAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
     for(int anIndex = 0; anIndex < aListAttr->size(); ++anIndex) {
       AttributeSelectionPtr aSelectionAttr = aListAttr->value(anIndex);
-      ResultConstructionPtr aContext = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSelectionAttr->context());
+      ResultPtr aContext = aSelectionAttr->context();
       if(!aContext.get()) {
-        // It is not a result construction, continue.
+        theError = "Error: Empty context.";
+        return false;
+      }
+
+      ResultConstructionPtr aResultConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+      if(!aResultConstruction.get()) {
+        // It is not a result construction. If shape is compound check that it contains only faces and edges.
+        GeomShapePtr aShape = aSelectionAttr->value();
+        if(!aShape.get()) {
+          aShape = aContext->shape();
+        }
+
+        if(aShape->shapeType() == GeomAPI_Shape::COMPOUND) {
+          for(GeomAPI_ShapeIterator anIt(aShape); anIt.more(); anIt.next()) {
+            GeomShapePtr aSubShape = anIt.current();
+            if(aSubShape->shapeType() != GeomAPI_Shape::EDGE
+                && aSubShape->shapeType() != GeomAPI_Shape::FACE) {
+              theError = "Error: Compound should contain only faces and edges.";
+              return false;
+            }
+          }
+        }
+
         continue;
       }
 
       GeomShapePtr aShape = aSelectionAttr->value();
-      GeomShapePtr aContextShape = aContext->shape();
+      GeomShapePtr aContextShape = aResultConstruction->shape();
       if(!aShape.get()) {
         // Whole sketch selected.
-        if(aSelectedSketchesFromObjects.find(aContext) != aSelectedSketchesFromObjects.cend()) {
+        if(aSelectedSketchesFromObjects.find(aResultConstruction) != aSelectedSketchesFromObjects.cend()) {
           theError = "Error: Object from this sketch is already selected. Sketch is not allowed for selection.";
           return false;
         }
 
-        aSelectedSketches.insert(aContext);
+        aSelectedSketches.insert(aResultConstruction);
       } else {
         // Object from sketch selected.
-        if(aSelectedSketches.find(aContext) != aSelectedSketches.cend()) {
+        if(aSelectedSketches.find(aResultConstruction) != aSelectedSketches.cend()) {
           theError = "Error: Whole sketch with this object is already selected. Don't allow to select this object.";
           return false;
         }
@@ -167,7 +190,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
           }
 
           aSelectedWiresFromObjects.bind(aWire, aWire);
-          aSelectedSketchesFromObjects.insert(aContext);
+          aSelectedSketchesFromObjects.insert(aResultConstruction);
         }
       }
     }
@@ -496,13 +519,20 @@ bool FeaturesPlugin_ValidatorPartitionSelection::isValid(const AttributePtr& the
     ResultPtr aContext = aSelectAttr->context();
     ResultConstructionPtr aResultConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
     if(aResultConstruction.get()) {
+      theError = "Error: Only body shapes and construction planes are allowed for selection.";
+      return false;
+    }
 
+    ResultCompSolidPtr aResultCompsolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aContext);
+    if(aResultCompsolid.get()) {
+      continue;
     }
 
     theError = "Error: Only body shapes and construction planes are allowed for selection.";
     return false;
   }
 
+  theError = "";
   return true;
 }
 
