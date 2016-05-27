@@ -43,6 +43,7 @@
 #include <TNaming_SameShapeIterator.hxx>
 #include <TNaming_Iterator.hxx>
 #include <TNaming_NamedShape.hxx>
+#include <TNaming_Tool.hxx>
 #include <TopExp_Explorer.hxx>
 
 #include <climits>
@@ -1292,6 +1293,8 @@ static Handle(TNaming_NamedShape) searchForOriginalShape(TopoDS_Shape theShape, 
   while(!theShape.IsNull()) { // searching for the very initial shape that produces this one
     TopoDS_Shape aShape = theShape;
     theShape.Nullify();
+    if (!TNaming_Tool::HasLabel(aMain, aShape)) // to avoid crash of TNaming_SameShapeIterator if pure shape does not exists
+      break;
     for(TNaming_SameShapeIterator anIter(aShape, aMain); anIter.More(); anIter.Next()) {
       TDF_Label aNSLab = anIter.Label();
       Handle(TNaming_NamedShape) aNS;
