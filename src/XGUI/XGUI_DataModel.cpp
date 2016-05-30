@@ -727,6 +727,10 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
     // An object
     if (aObj->isDisabled()) 
       return theIndex.column() == 1? Qt::ItemIsSelectable : aNullFlag;
+
+    if (aSession->moduleDocument() != aObj->document())
+      if (aActiveDoc != aObj->document())
+        return theIndex.column() == 1? Qt::ItemIsSelectable : aNullFlag;
     
     bool isCompositeSub = false;
     // An object which is sub-object of a composite object can not be accessible in column 1
