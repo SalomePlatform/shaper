@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <string>
 
 namespace XGUI_Tools {
 //******************************************************************
@@ -106,8 +107,8 @@ std::string featureInfo(FeaturePtr theFeature)
 bool canRemoveOrRename(QWidget* theParent, const QObjectPtrList& theObjects)
 {
   bool aResult = true;
-  QString aNotActivatedNames;
-  if (!XGUI_Tools::allDocumentsActivated(aNotActivatedNames)) {
+  std::string aNotActivatedNames;
+  if (!ModelAPI_Tools::allDocumentsActivated(aNotActivatedNames)) {
     DocumentPtr aModuleDoc = ModelAPI_Session::get()->moduleDocument();
     bool aFoundPartSetObject = false;
     foreach (ObjectPtr aObj, theObjects) {
@@ -118,7 +119,7 @@ bool canRemoveOrRename(QWidget* theParent, const QObjectPtrList& theObjects)
     if (aFoundPartSetObject) {
       QMessageBox::StandardButton aRes = QMessageBox::warning(theParent, QObject::tr("Warning"),
                QObject::tr("Selected objects can be used in Part documents which are not loaded: \
-%1. Whould you like to continue?").arg(aNotActivatedNames),
+%1. Whould you like to continue?").arg(aNotActivatedNames.c_str()),
                QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
       aResult = aRes == QMessageBox::Yes;
     }
@@ -143,26 +144,6 @@ bool canRename(const ObjectPtr& theObject, const QString& theName)
   }
 
   return true;
-}
-
-//******************************************************************
-bool allDocumentsActivated(QString& theNotActivatedNames)
-{
-  bool anAllPartActivated = true;
-  QStringList aRefNames;
-
-  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-  int aSize = aRootDoc->size(ModelAPI_ResultPart::group());
-  for (int i = 0; i < aSize; i++) {
-    ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), i);
-    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-    if (!aPart->isActivated()) {
-      anAllPartActivated = false;
-      aRefNames.append(aObject->data()->name().c_str());
-    }
-  }
-  theNotActivatedNames = aRefNames.join(", ");
-  return anAllPartActivated;
 }
 
 //**************************************************************

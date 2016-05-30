@@ -61,6 +61,14 @@ bool ModuleBase_ModelWidget::isInitialized(ObjectPtr theObject) const
   return theObject->data()->attribute(attributeID())->isInitialized();
 }
 
+void ModuleBase_ModelWidget::processValueState()
+{
+  myIsValueStateBlocked = false;
+  if (myState == ModifiedInPP || myState == ModifiedInViewer)
+    storeValue();
+  myState = Stored;
+}
+
 QString ModuleBase_ModelWidget::getValueStateError() const
 {
   QString anError = "";
@@ -185,11 +193,6 @@ void ModuleBase_ModelWidget::activate()
 
 void ModuleBase_ModelWidget::deactivate()
 {
-  myIsValueStateBlocked = false;
-  if (myState == ModifiedInPP || myState == ModifiedInViewer)
-    storeValue();
-  myState = Stored;
-
   if (myWidgetValidator)
     myWidgetValidator->activateFilters(false);
 }

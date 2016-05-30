@@ -358,6 +358,27 @@ void allResults(const FeaturePtr& theFeature, std::list<ResultPtr>& theResults)
   }
 }
 
+//******************************************************************
+bool allDocumentsActivated(std::string& theNotActivatedNames)
+{
+  theNotActivatedNames = "";
+  bool anAllPartActivated = true;
+
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+  int aSize = aRootDoc->size(ModelAPI_ResultPart::group());
+  for (int i = 0; i < aSize; i++) {
+    ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), i);
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+    if (!aPart->isActivated()) {
+      anAllPartActivated = false;
+      if (!theNotActivatedNames.empty())
+        theNotActivatedNames += ", ";
+      theNotActivatedNames += aObject->data()->name().c_str();
+    }
+  }
+  return anAllPartActivated;
+}
+
 bool removeFeaturesAndReferences(const std::set<FeaturePtr>& theFeatures,
                                  const bool theFlushRedisplay,
                                  const bool theUseComposite,

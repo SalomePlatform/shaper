@@ -26,6 +26,8 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
 
+#include <QMessageBox>
+
 #include <string>
 #include <set>
 #include <sstream>
@@ -355,27 +357,6 @@ void setParameterName(ResultParameterPtr theResultParameter, const std::string& 
   aParameter->data()->blockSendAttributeUpdated(false);
 }
 
-#include <QMessageBox>
-#include <ModelAPI_ResultPart.h>
-bool allDocumentsActivated(QString& theNotActivatedNames)
-{
-  bool anAllPartActivated = true;
-  QStringList aRefNames;
-
-  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-  int aSize = aRootDoc->size(ModelAPI_ResultPart::group());
-  for (int i = 0; i < aSize; i++) {
-    ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), i);
-    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-    if (!aPart->isActivated()) {
-      anAllPartActivated = false;
-      aRefNames.append(aObject->data()->name().c_str());
-    }
-  }
-  theNotActivatedNames = aRefNames.join(", ");
-  return anAllPartActivated;
-}
-
 void ParametersPlugin_EvalListener::processObjectRenamedEvent(
     const std::shared_ptr<Events_Message>& theMessage)
 {
@@ -400,11 +381,11 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
   if (!aParameter.get())
     return;
 
-  QString aNotActivatedNames;
-  if (!allDocumentsActivated(aNotActivatedNames)) {
+  std::string aNotActivatedNames;
+  if (!ModelAPI_Tools::allDocumentsActivated(aNotActivatedNames)) {
     QMessageBox::StandardButton aRes = QMessageBox::warning(0, QObject::tr("Warning"),
                QObject::tr("Selected objects can be used in Part documents which are not loaded: \
-%1. Whould you like to continue?").arg(aNotActivatedNames),
+%1. Whould you like to continue?").arg(aNotActivatedNames.c_str()),
                QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
     if (aRes != QMessageBox::Yes) {
       setParameterName(aResultParameter, aMessage->oldName());

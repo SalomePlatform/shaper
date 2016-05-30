@@ -94,13 +94,6 @@ bool XGUI_EXPORT canRemoveOrRename(QWidget* theParent, const QObjectPtrList& aLi
 bool canRename(const ObjectPtr& theObject, const QString& theName);
 
 /*!
- Returns true if there are no parts in the document, which are not activated
- \param theNotActivatedNames out string which contains not activated names
- \return a boolean value
- */
-bool XGUI_EXPORT allDocumentsActivated(QString& theNotActivatedNames);
-
-/*!
  Returns converted workshop
  \param theWorkshop an interface workshop
  \return XGUI workshop instance

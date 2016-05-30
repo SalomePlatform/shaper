@@ -85,6 +85,9 @@ Q_OBJECT
   /// \return the enumeration result
   ValueState getValueState() const { return myState; }
 
+  /// Stores the widget value if it is modified
+  void processValueState();
+
   /// Returns an attribute error according to the value state
   /// It exists in all cases excepring the "Store" case
   QString getValueStateError() const;

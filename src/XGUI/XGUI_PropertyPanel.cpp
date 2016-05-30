@@ -426,6 +426,7 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
   std::string aPreviosAttributeID;
   if(myActiveWidget) {
     aPreviosAttributeID = myActiveWidget->attributeID();
+    myActiveWidget->processValueState();
     myActiveWidget->deactivate();
     myActiveWidget->setHighlighted(false);
   }

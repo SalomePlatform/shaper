@@ -100,6 +100,13 @@ MODELAPI_EXPORT bool hasSubResults(const ResultPtr& theResult);
 */
 MODELAPI_EXPORT void allResults(const FeaturePtr& theFeature, std::list<ResultPtr>& theResults);
 
+/*!
+ Returns true if there are no parts in the document, which are not activated
+ \param theNotActivatedNames out string which contains not activated names
+ \return a boolean value
+ */
+MODELAPI_EXPORT bool allDocumentsActivated(std::string& theNotActivatedNames);
+
 
 /*! Removes features from the document
 * \param theFeatures a list of features to be removed
