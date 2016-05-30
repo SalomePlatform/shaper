@@ -22,12 +22,20 @@
 #include <map>
 #include <sstream>
 
-//=================================================================================================
+static void storeSubShape(ResultBodyPtr theResultBody,
+                          const GeomShapePtr theShape,
+                          const GeomAPI_Shape::ShapeType theType,
+                          const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
+                          const std::string theName,
+                          int& theShapeIndex,
+                          int& theTag);
+
+//==================================================================================================
 FeaturesPlugin_Pipe::FeaturesPlugin_Pipe()
 {
 }
 
-//=================================================================================================
+//==================================================================================================
 void FeaturesPlugin_Pipe::initAttributes()
 {
   data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
@@ -41,7 +49,7 @@ void FeaturesPlugin_Pipe::initAttributes()
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), LOCATIONS_ID());
 }
 
-//=================================================================================================
+//==================================================================================================
 void FeaturesPlugin_Pipe::execute()
 {
   // Getting creation method.
@@ -253,7 +261,7 @@ void FeaturesPlugin_Pipe::execute()
   removeResults(aResultIndex);
 }
 
-//=================================================================================================
+//==================================================================================================
 void FeaturesPlugin_Pipe::storeResult(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                                       GeomAlgoAPI_Pipe& thePipeAlgo,
                                       const int theResultIndex)
@@ -274,7 +282,6 @@ void FeaturesPlugin_Pipe::storeResult(const std::shared_ptr<GeomAPI_Shape> theBa
   switch(aBaseShapeType) {
     case GeomAPI_Shape::VERTEX: {
       aShapeTypeToExplode = GeomAPI_Shape::VERTEX;
-      aGenName += "Edge";
       break;
     }
     case GeomAPI_Shape::EDGE:
@@ -294,10 +301,22 @@ void FeaturesPlugin_Pipe::storeResult(const std::shared_ptr<GeomAPI_Shape> theBa
     case GeomAPI_Shape::FACE:
     case GeomAPI_Shape::SHELL: {
       aShapeTypeToExplode = GeomAPI_Shape::EDGE;
-      aGenName += "Face";
       break;
     }
+    case GeomAPI_Shape::COMPOUND: {
+      aShapeTypeToExplode = GeomAPI_Shape::COMPOUND;
+    }
   }
+
+  if(aShapeTypeToExplode == GeomAPI_Shape::VERTEX || aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
+    aResultBody->loadAndOrientGeneratedShapes(&thePipeAlgo, theBaseShape, GeomAPI_Shape::VERTEX,
+                                              aGenTag++, aGenName + "Edge", *aMapOfSubShapes.get());
+  }
+  if(aShapeTypeToExplode == GeomAPI_Shape::EDGE || aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
+    aResultBody->loadAndOrientGeneratedShapes(&thePipeAlgo, theBaseShape, GeomAPI_Shape::EDGE,
+                                              aGenTag++, aGenName + "Face", *aMapOfSubShapes.get());
+  }
+
   aResultBody->loadAndOrientGeneratedShapes(&thePipeAlgo, theBaseShape, aShapeTypeToExplode, aGenTag++, aGenName, *aMapOfSubShapes.get());
 
   // Store from shapes.
@@ -311,7 +330,7 @@ void FeaturesPlugin_Pipe::storeResult(const std::shared_ptr<GeomAPI_Shape> theBa
   setResult(aResultBody, theResultIndex);
 }
 
-//=================================================================================================
+//==================================================================================================
 void FeaturesPlugin_Pipe::storeResult(const ListOfShape& theBaseShapes,
                                       GeomAlgoAPI_Pipe& thePipeAlgo,
                                       const int theResultIndex)
@@ -369,7 +388,7 @@ void FeaturesPlugin_Pipe::storeResult(const ListOfShape& theBaseShapes,
   setResult(aResultBody, theResultIndex);
 }
 
-//=================================================================================================
+//==================================================================================================
 void FeaturesPlugin_Pipe::storeShapes(ResultBodyPtr theResultBody,
                                       const GeomAPI_Shape::ShapeType theBaseShapeType,
                                       const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
@@ -397,21 +416,51 @@ void FeaturesPlugin_Pipe::storeShapes(ResultBodyPtr theResultBody,
       aShapeTypeStr = "Face";
       break;
     }
+    case GeomAPI_Shape::COMPOUND: {
+      aShapeTypeToExplore = GeomAPI_Shape::COMPOUND;
+      break;
+    }
   }
 
   // Store shapes.
   int aShapeIndex = 1;
-  std::string aName = theName + aShapeTypeStr;
+  int aFaceIndex = 1;
   for(ListOfShape::const_iterator anIt = theShapes.cbegin(); anIt != theShapes.cend(); ++anIt) {
-    std::shared_ptr<GeomAPI_Shape> aShape = *anIt;
-    for(GeomAPI_ShapeExplorer anExp(aShape, aShapeTypeToExplore); anExp.more(); anExp.next()) {
-      std::shared_ptr<GeomAPI_Shape> aSubShape = anExp.current();
-      if(theMapOfSubShapes->isBound(aSubShape)) {
-        aSubShape = theMapOfSubShapes->find(aSubShape);
-      }
-      std::ostringstream aStr;
-      aStr << aName << "_" << aShapeIndex++;
-      theResultBody->generated(aSubShape, aStr.str(), theTag++);
+    GeomShapePtr aShape = *anIt;
+
+    if(aShapeTypeToExplore == GeomAPI_Shape::COMPOUND) {
+      std::string aName = theName + (aShape->shapeType() == GeomAPI_Shape::EDGE ? "Edge" : "Face");
+      storeSubShape(theResultBody,
+                    aShape,
+                    aShape->shapeType(),
+                    theMapOfSubShapes,
+                    aName,
+                    aShape->shapeType() == GeomAPI_Shape::EDGE ? aShapeIndex : aFaceIndex,
+                    theTag);
+    } else {
+      std::string aName = theName + aShapeTypeStr;
+      storeSubShape(theResultBody, aShape, aShapeTypeToExplore,
+                    theMapOfSubShapes, aName, aShapeIndex, theTag);
     }
+  }
+}
+
+//==================================================================================================
+void storeSubShape(ResultBodyPtr theResultBody,
+                   const GeomShapePtr theShape,
+                   const GeomAPI_Shape::ShapeType theType,
+                   const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
+                   const std::string theName,
+                   int& theShapeIndex,
+                   int& theTag)
+{
+  for(GeomAPI_ShapeExplorer anExp(theShape, theType); anExp.more(); anExp.next()) {
+    GeomShapePtr aSubShape = anExp.current();
+    if(theMapOfSubShapes->isBound(aSubShape)) {
+      aSubShape = theMapOfSubShapes->find(aSubShape);
+    }
+    std::ostringstream aStr;
+    aStr << theName << "_" << theShapeIndex++;
+    theResultBody->generated(aSubShape, aStr.str(), theTag++);
   }
 }

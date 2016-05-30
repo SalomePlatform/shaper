@@ -274,7 +274,6 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
   switch(aBaseShapeType) {
     case GeomAPI_Shape::VERTEX: {
       aShapeTypeToExplode = GeomAPI_Shape::VERTEX;
-      aGenName += "Edge";
       break;
     }
     case GeomAPI_Shape::EDGE:
@@ -294,7 +293,6 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
     case GeomAPI_Shape::FACE:
     case GeomAPI_Shape::SHELL: {
       aShapeTypeToExplode = GeomAPI_Shape::EDGE;
-      aGenName += "Face";
       break;
     }
     case GeomAPI_Shape::COMPOUND: {

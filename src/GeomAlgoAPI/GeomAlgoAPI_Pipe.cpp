@@ -30,15 +30,16 @@ static bool getBase(TopoDS_Shape& theBaseOut,
 static bool getPath(TopoDS_Wire& thePathOut,
                     const GeomShapePtr thePathShape);
 static bool buildPipe(BRepOffsetAPI_MakePipeShell* thePipeBuilder);
+static ListOfShape getListFromShape(const TopoDS_Shape& theShape);
 
-//=================================================================================================
+//==================================================================================================
 GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const GeomShapePtr theBaseShape,
                                    const GeomShapePtr thePathShape)
 {
   build(theBaseShape, thePathShape);
 }
 
-//=================================================================================================
+//==================================================================================================
 GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const GeomShapePtr theBaseShape,
                                    const GeomShapePtr thePathShape,
                                    const GeomShapePtr theBiNormal)
@@ -46,7 +47,7 @@ GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const GeomShapePtr theBaseShape,
   build(theBaseShape, thePathShape, theBiNormal);
 }
 
-//=================================================================================================
+//==================================================================================================
 GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const ListOfShape& theBaseShapes,
                                    const ListOfShape& theLocations,
                                    const GeomShapePtr thePathShape)
@@ -54,7 +55,7 @@ GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const ListOfShape& theBaseShapes,
   build(theBaseShapes, theLocations, thePathShape);
 }
 
-//=================================================================================================
+//==================================================================================================
 void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
                              const GeomShapePtr thePathShape)
 {
@@ -69,7 +70,7 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
   TopAbs_ShapeEnum aBaseShapeType = aBaseShape.ShapeType();
   if(aBaseShapeType != TopAbs_VERTEX && aBaseShapeType != TopAbs_EDGE &&
      aBaseShapeType != TopAbs_WIRE && aBaseShapeType != TopAbs_FACE &&
-     aBaseShapeType != TopAbs_SHELL) {
+     aBaseShapeType != TopAbs_SHELL && aBaseShapeType != TopAbs_COMPOUND) {
     return;
   }
 
@@ -94,11 +95,8 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
   this->initialize(aPipeBuilder);
 
   // Setting naming.
-  GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
-  aFromShape->setImpl(new TopoDS_Shape(aPipeBuilder->FirstShape()));
-  aToShape->setImpl(new TopoDS_Shape(aPipeBuilder->LastShape()));
-  this->addFromShape(aFromShape);
-  this->addToShape(aToShape);
+  this->setToShapes(getListFromShape(aPipeBuilder->LastShape()));
+  this->setFromShapes(getListFromShape(aPipeBuilder->FirstShape()));
 
   // Setting result.
   TopoDS_Shape aResult = aPipeBuilder->Shape();
@@ -109,7 +107,7 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
   this->setDone(true);
 }
 
-//=================================================================================================
+//==================================================================================================
 void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
                              const GeomShapePtr thePathShape,
                              const GeomShapePtr theBiNormal)
@@ -164,18 +162,15 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
     }
   }
   TopoDS_Shape aResult = aPipeBuilder->Shape();
-
-  // Setting naming.
-  GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
-  aFromShape->setImpl(new TopoDS_Shape(aPipeBuilder->FirstShape()));
-  aToShape->setImpl(new TopoDS_Shape(aPipeBuilder->LastShape()));
-  this->addFromShape(aFromShape);
-  this->addToShape(aToShape);
-
-  // Setting result.
   if(aResult.IsNull()) {
     return;
   }
+
+  // Setting naming.
+  this->setToShapes(getListFromShape(aPipeBuilder->LastShape()));
+  this->setFromShapes(getListFromShape(aPipeBuilder->FirstShape()));
+
+  // Setting result.
   aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
   GeomShapePtr aGeomSh(new GeomAPI_Shape());
   aGeomSh->setImpl(new TopoDS_Shape(aResult));
@@ -183,7 +178,7 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
   this->setDone(true);
 }
 
-//=================================================================================================
+//==================================================================================================
 void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
                              const ListOfShape& theLocations,
                              const GeomShapePtr thePathShape)
@@ -275,7 +270,7 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
   this->setDone(true);
 }
 
-//=================================================================================================
+//==================================================================================================
 void GeomAlgoAPI_Pipe::generated(const GeomShapePtr theShape,
                                  ListOfShape& theHistory)
 {
@@ -283,7 +278,7 @@ void GeomAlgoAPI_Pipe::generated(const GeomShapePtr theShape,
 }
 
 // Auxilary functions:
-//=================================================================================================
+//==================================================================================================
 bool getBase(TopoDS_Shape& theBaseOut,
              TopAbs_ShapeEnum& theBaseTypeOut,
              const GeomShapePtr theBaseShape)
@@ -313,7 +308,7 @@ bool getBase(TopoDS_Shape& theBaseOut,
   return true;
 }
 
-//=================================================================================================
+//==================================================================================================
 bool getPath(TopoDS_Wire& thePathOut,
              const GeomShapePtr thePathShape)
 {
@@ -338,7 +333,7 @@ bool getPath(TopoDS_Wire& thePathOut,
   return true;
 }
 
-//=================================================================================================
+//==================================================================================================
 bool buildPipe(BRepOffsetAPI_MakePipeShell* thePipeBuilder)
 {
   thePipeBuilder->Build();
@@ -353,4 +348,25 @@ bool buildPipe(BRepOffsetAPI_MakePipeShell* thePipeBuilder)
   }
 
   return isDone == Standard_True;
+}
+
+//==================================================================================================
+ListOfShape getListFromShape(const TopoDS_Shape& theShape)
+{
+  ListOfShape aList;
+
+  TopAbs_ShapeEnum aType = theShape.ShapeType();
+  if(aType == TopAbs_WIRE || aType == TopAbs_SHELL || aType == TopAbs_COMPOUND) {
+    for(TopoDS_Iterator anIt(theShape); anIt.More(); anIt.Next()) {
+      GeomShapePtr aGeomShape(new GeomAPI_Shape());
+      aGeomShape->setImpl(new TopoDS_Shape(anIt.Value()));
+      aList.push_back(aGeomShape);
+    }
+  } else {
+    GeomShapePtr aGeomShape(new GeomAPI_Shape());
+    aGeomShape->setImpl(new TopoDS_Shape(theShape));
+    aList.push_back(aGeomShape);
+  }
+
+  return aList;
 }
