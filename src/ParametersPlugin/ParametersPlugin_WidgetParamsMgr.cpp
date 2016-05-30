@@ -454,7 +454,7 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 
-  if (aColumn == Col_Equation)
+  if (aColumn != Col_Comment)
     updateParametersPart();
   updateFeaturesPart();
           
