@@ -56,7 +56,24 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
     return STATUS_INCONSISTENT;
 
   Events_LongOp::start(this);
-  GCS::SolveStatus aResult = (GCS::SolveStatus)myEquationSystem.solve(myParameters);
+  GCS::SolveStatus aResult = GCS::Success;
+  // if there is a constraint with all attributes constant, set fail status
+  GCS::SET_pD aParameters;
+  aParameters.insert(myParameters.begin(), myParameters.end());
+  std::set<GCS::Constraint*>::const_iterator aConstrIt = myConstraints.begin();
+  for (; aConstrIt != myConstraints.end(); ++aConstrIt) {
+    GCS::VEC_pD aParams = (*aConstrIt)->params();
+    GCS::VEC_pD::const_iterator aPIt = aParams.begin();
+    for (; aPIt != aParams.end(); ++aPIt)
+      if (aParameters.find(*aPIt) != aParameters.end())
+        break;
+    if (aPIt == aParams.end()) {
+      aResult = GCS::Failed;
+    }
+  }
+  // solve equations
+  if (aResult == GCS::Success)
+    aResult = (GCS::SolveStatus)myEquationSystem.solve(myParameters);
   Events_LongOp::end(this);
 
   SketchSolver_SolveStatus aStatus;

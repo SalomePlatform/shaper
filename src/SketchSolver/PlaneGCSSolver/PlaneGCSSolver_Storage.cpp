@@ -212,6 +212,10 @@ bool PlaneGCSSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
     std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(theConstraint);
 
   bool isFullyRemoved = true;
+  // remove point-point coincidence
+  if (aConstraint->type() == CONSTRAINT_PT_PT_COINCIDENT)
+    isFullyRemoved = removeCoincidence(theConstraint) && isFullyRemoved;
+  // remove sub-entities
   const std::list<EntityWrapperPtr>& aSubs = aConstraint->entities();
   std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
   for (; aSIt != aSubs.end(); ++ aSIt)
@@ -234,10 +238,6 @@ bool PlaneGCSSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
 
 bool PlaneGCSSolver_Storage::remove(EntityWrapperPtr theEntity)
 {
-  if ((theEntity->baseAttribute() && isUsed(theEntity->baseAttribute())) ||
-      (theEntity->baseFeature() && isUsed(theEntity->baseFeature())))
-    return false;
-
   bool isFullyRemoved = SketchSolver_Storage::remove(theEntity);
   if (isFullyRemoved && theEntity->id() == myEntityLastID)
     --myEntityLastID;

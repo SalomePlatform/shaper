@@ -64,9 +64,6 @@ protected:
   /// \return \c true if the parameter has been removed
   virtual bool remove(ParameterWrapperPtr theParameter);
 
-  /// \brief Remove point-point coincidence
-  bool removeCoincidence(ConstraintWrapperPtr theConstraint);
-
   /// \brief Update the group for the given entity, its sub-entities and parameters
   virtual void changeGroup(EntityWrapperPtr theEntity, const GroupID& theGroup);
   /// \brief Update the group for the given parameter

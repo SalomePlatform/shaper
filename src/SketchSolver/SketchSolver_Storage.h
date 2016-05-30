@@ -37,6 +37,7 @@ private:
 public:
   SketchSolver_Storage(const GroupID& theGroup)
     : myGroupID(theGroup),
+      mySketchID(EID_UNKNOWN),
       myNeedToResolve(false),
       myEventsBlocked(false),
       myExistArc(false)
@@ -189,6 +190,9 @@ protected:
   /// \return \c true if the parameter has been removed
   virtual bool remove(ParameterWrapperPtr theParameter) = 0;
 
+  /// \brief Remove point-point coincidence
+  SKETCHSOLVER_EXPORT bool removeCoincidence(ConstraintWrapperPtr theConstraint);
+
   /// \brief Update the group for the given entity, its sub-entities and parameters
   virtual void changeGroup(EntityWrapperPtr theEntity, const GroupID& theGroup) = 0;
   /// \brief Update the group for the given parameter
@@ -207,6 +211,7 @@ private:
   EntityWrapperPtr getNormal() const;
 
 protected:
+  EntityID mySketchID;     ///< identifier of the sketch
   GroupID myGroupID;       ///< identifier of the group, this storage belongs to
   bool    myNeedToResolve; ///< parameters are changed and group needs to be resolved
   bool    myEventsBlocked; ///< indicates that features do not send events
