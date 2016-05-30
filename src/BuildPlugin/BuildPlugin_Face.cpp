@@ -65,9 +65,13 @@ void BuildPlugin_Face::execute()
   // Get wires from faces.
   ListOfShape aWires;
   for(ListOfShape::const_iterator anIt = aFaces.cbegin(); anIt != aFaces.cend(); ++anIt) {
-    for(GeomAPI_ShapeExplorer anExp(*anIt, GeomAPI_Shape::WIRE); anExp.more(); anExp.next()) {
-      aWires.push_back(anExp.current());
-    }
+    aWires.push_back(GeomAlgoAPI_ShapeTools::getFaceOuterWire(*anIt));
+    //for(GeomAPI_ShapeExplorer anExp(*anIt, GeomAPI_Shape::WIRE); anExp.more(); anExp.next()) {
+    //  if(anExp.current()->orientation() == GeomAPI_Shape::REVERSED) {
+    //    continue;
+    //  }
+    //  aWires.push_back(anExp.current());
+    //}
   }
 
   // Make faces with holes.

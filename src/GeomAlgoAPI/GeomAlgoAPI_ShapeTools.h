@@ -94,6 +94,9 @@ public:
   /// \return true if theShape is valid.
   GEOMALGOAPI_EXPORT static bool isShapeValid(const std::shared_ptr<GeomAPI_Shape> theShape);
 
+  /// \return outer wire for face. If theShape has different type returns empty pointer.
+  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> getFaceOuterWire(const std::shared_ptr<GeomAPI_Shape> theFace);
+
 };
 
 #endif

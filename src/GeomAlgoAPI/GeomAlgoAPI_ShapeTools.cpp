@@ -25,6 +25,7 @@
 #include <BRepCheck_Analyzer.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
 #include <BRepGProp.hxx>
+#include <BRepTools.hxx>
 #include <BRepTopAdaptor_FClass2d.hxx>
 #include <Geom_Curve.hxx>
 #include <Geom2d_Curve.hxx>
@@ -614,4 +615,22 @@ bool GeomAlgoAPI_ShapeTools::isShapeValid(const std::shared_ptr<GeomAPI_Shape> t
 
   BRepCheck_Analyzer aChecker(theShape->impl<TopoDS_Shape>());
   return (aChecker.IsValid() == Standard_True);
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::getFaceOuterWire(const std::shared_ptr<GeomAPI_Shape> theFace)
+{
+  GeomShapePtr anOuterWire;
+
+  if(!theFace.get() || !theFace->isFace()) {
+    return anOuterWire;
+  }
+
+  TopoDS_Face aFace = TopoDS::Face(theFace->impl<TopoDS_Shape>());
+  TopoDS_Wire aWire = BRepTools::OuterWire(aFace);
+
+  anOuterWire.reset(new GeomAPI_Shape());
+  anOuterWire->setImpl(new TopoDS_Shape(aWire));
+
+  return anOuterWire;
 }

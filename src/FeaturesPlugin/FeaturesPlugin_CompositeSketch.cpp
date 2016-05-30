@@ -206,7 +206,7 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
   }
 
   // Searching faces with common edges.
-  if(theIsMakeShells) {
+  if(theIsMakeShells && aBaseFacesList.size() > 1) {
     ListOfShape aShells;
     ListOfShape aFreeFaces;
     GeomShapePtr aFacesCompound = GeomAlgoAPI_CompoundBuilder::compound(aBaseFacesList);
