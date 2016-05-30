@@ -56,7 +56,25 @@ static gp_Pnt centreOfMass(const TopoDS_Shape& theShape);
 /// \return solid.
 static TopoDS_Shape findClosest(const TopoDS_Shape& theShape, const gp_Pnt& thePoint);
 
-//=================================================================================================
+static void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
+                                   const TopoDS_Shape& theBase,
+                                   const TopAbs_ShapeEnum theType,
+                                   BRepPrimAPI_MakeRevol* theRevolBuilder);
+
+static void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
+                                   const TopoDS_Shape& theResult,
+                                   const TopAbs_ShapeEnum theType,
+                                   const TopoDS_Shape& theToFace,
+                                   const TopoDS_Shape& theFromFace);
+
+static void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
+                                   const TopoDS_Shape& theResult,
+                                   const TopAbs_ShapeEnum theType,
+                                   const TopoDS_Shape& theRotatedBoundingFace,
+                                   const TopoDS_Shape& theModifiedBaseShape,
+                                   const bool theIsFromFaceSet);
+
+//==================================================================================================
 GeomAlgoAPI_Revolution::GeomAlgoAPI_Revolution(const GeomShapePtr                 theBaseShape,
                                                const std::shared_ptr<GeomAPI_Ax1> theAxis,
                                                const double                       theToAngle,
@@ -65,7 +83,7 @@ GeomAlgoAPI_Revolution::GeomAlgoAPI_Revolution(const GeomShapePtr               
   build(theBaseShape, theAxis, GeomShapePtr(), theToAngle, GeomShapePtr(), theFromAngle);
 }
 
-//=================================================================================================
+//==================================================================================================
 GeomAlgoAPI_Revolution::GeomAlgoAPI_Revolution(const GeomShapePtr                 theBaseShape,
                                                const std::shared_ptr<GeomAPI_Ax1> theAxis,
                                                const GeomShapePtr                 theToShape,
@@ -76,7 +94,7 @@ GeomAlgoAPI_Revolution::GeomAlgoAPI_Revolution(const GeomShapePtr               
   build(theBaseShape, theAxis, theToShape, theToAngle, theFromShape, theFromAngle);
 }
 
-//=================================================================================================
+//==================================================================================================
 void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseShape,
                                    const std::shared_ptr<GeomAPI_Ax1>& theAxis,
                                    const GeomShapePtr&                 theToShape,
@@ -104,6 +122,9 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     case TopAbs_FACE:
     case TopAbs_SHELL:
       aShapeTypeToExp = TopAbs_FACE;
+      break;
+    case TopAbs_COMPOUND:
+      aShapeTypeToExp = TopAbs_COMPOUND;
       break;
     default:
       return;
@@ -187,13 +208,11 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     aResult = aRevolBuilder->Shape();
 
     // Setting naming.
-    for(TopExp_Explorer anExp(aRotatedBase, aShapeTypeToExp); anExp.More(); anExp.Next()) {
-      const TopoDS_Shape& aShape = anExp.Current();
-      GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
-      aFromShape->setImpl(new TopoDS_Shape(aRevolBuilder->FirstShape(aShape)));
-      aToShape->setImpl(new TopoDS_Shape(aRevolBuilder->LastShape(aShape)));
-      this->addFromShape(aFromShape);
-      this->addToShape(aToShape);
+    if(aShapeTypeToExp == TopAbs_COMPOUND) {
+      storeGenerationHistory(this, aRotatedBase, TopAbs_EDGE, aRevolBuilder);
+      storeGenerationHistory(this, aRotatedBase, TopAbs_FACE, aRevolBuilder);
+    } else {
+      storeGenerationHistory(this, aRotatedBase, aShapeTypeToExp, aRevolBuilder);
     }
   } else if(theFromShape && theToShape) { // Case 2: When both bounding planes were set.
     // Making revolution to the 360 angle.
@@ -285,47 +304,11 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     aResult = findClosest(aResult, aBaseCentre);
 
     // Setting naming.
-    for(TopExp_Explorer anExp(aResult, aShapeTypeToExp); anExp.More (); anExp.Next ()) {
-      const TopoDS_Shape& aShape = anExp.Current();
-      GeomShapePtr aGeomSh(new GeomAPI_Shape());
-      if(aShapeTypeToExp == TopAbs_VERTEX) {
-        gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
-        IntTools_Context anIntTools;
-        if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(aRotatedToFace), Precision::Confusion()) == Standard_True) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          this->addToShape(aGeomSh);
-        }
-        if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(aRotatedFromFace), Precision::Confusion()) == Standard_True) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          this->addFromShape(aGeomSh);
-        }
-      } else if(aShapeTypeToExp == TopAbs_EDGE) {
-        TopoDS_Edge anEdge = TopoDS::Edge(aShape);
-        BRepLib_CheckCurveOnSurface anEdgeCheck(anEdge, TopoDS::Face(aRotatedToFace));
-        anEdgeCheck.Perform();
-        if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          this->addToShape(aGeomSh);
-        }
-        anEdgeCheck.Init(anEdge, TopoDS::Face(aRotatedFromFace));
-        anEdgeCheck.Perform();
-        if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          this->addFromShape(aGeomSh);
-        }
-      } else {
-        Handle(Geom_Surface) aFaceSurface = BRep_Tool::Surface(TopoDS::Face(aShape));
-        Handle(Geom_Surface) aFromSurface = BRep_Tool::Surface(TopoDS::Face(aRotatedFromFace));
-        Handle(Geom_Surface) aToSurface = BRep_Tool::Surface(TopoDS::Face(aRotatedToFace));
-        if(aFaceSurface == aFromSurface) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          this->addFromShape(aGeomSh);
-        }
-        if(aFaceSurface == aToSurface) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          this->addToShape(aGeomSh);
-        }
-      }
+    if(aShapeTypeToExp == TopAbs_COMPOUND) {
+      storeGenerationHistory(this, aResult, TopAbs_EDGE, aRotatedToFace, aRotatedFromFace);
+      storeGenerationHistory(this, aResult, TopAbs_FACE, aRotatedToFace, aRotatedFromFace);
+    } else {
+      storeGenerationHistory(this, aResult, aShapeTypeToExp, aRotatedToFace, aRotatedFromFace);
     }
   } else { //Case 3: When only one bounding plane was set.
     // Making revolution to the 360 angle.
@@ -393,7 +376,7 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     }
 
     // Setting naming.
-    if(aShapeTypeToExp == TopAbs_FACE) {
+    if(aShapeTypeToExp == TopAbs_FACE || aShapeTypeToExp == TopAbs_COMPOUND) {
       const TopTools_ListOfShape& aBndShapes = aBoundingCutBuilder->Modified(aBoundingFace);
       for(TopTools_ListIteratorOfListOfShape anIt(aBndShapes); anIt.More(); anIt.Next()) {
         GeomShapePtr aShape(new GeomAPI_Shape());
@@ -455,7 +438,7 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
         if(aResult.ShapeType() == TopAbs_COMPOUND) {
           aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
         }
-        if(aShapeTypeToExp == TopAbs_FACE) {
+        if(aShapeTypeToExp == TopAbs_FACE || aShapeTypeToExp == TopAbs_COMPOUND) {
           const TopTools_ListOfShape& aBsShapes = aBaseCutBuilder->Modified(aBoundingFace);
           for(TopTools_ListIteratorOfListOfShape anIt(aBsShapes); anIt.More(); anIt.Next()) {
             GeomShapePtr aShape(new GeomAPI_Shape());
@@ -481,47 +464,11 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     aResult = findClosest(aResult, aBaseCentre);
 
     // Setting naming.
-    for(TopExp_Explorer anExp(aResult, aShapeTypeToExp); anExp.More (); anExp.Next ()) {
-      const TopoDS_Shape& aShape = anExp.Current();
-      GeomShapePtr aGeomSh(new GeomAPI_Shape());
-      if(aShapeTypeToExp == TopAbs_VERTEX) {
-        gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
-        IntTools_Context anIntTools;
-        if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(aRotatedBoundingFace), Precision::Confusion()) == Standard_True) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          isFromFaceSet ? this->addFromShape(aGeomSh) : this->addToShape(aGeomSh);
-        }
-        if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(aModifiedBaseShape), Precision::Confusion()) == Standard_True) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          isFromFaceSet ? this->addToShape(aGeomSh) : this->addFromShape(aGeomSh);
-        }
-      } else if(aShapeTypeToExp == TopAbs_EDGE) {
-        TopoDS_Edge anEdge = TopoDS::Edge(aShape);
-        BRepLib_CheckCurveOnSurface anEdgeCheck(anEdge, TopoDS::Face(aRotatedBoundingFace));
-        anEdgeCheck.Perform();
-        if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          isFromFaceSet ? this->addFromShape(aGeomSh) : this->addToShape(aGeomSh);
-        }
-        anEdgeCheck.Init(anEdge, TopoDS::Face(aModifiedBaseShape));
-        anEdgeCheck.Perform();
-        if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          isFromFaceSet ? this->addToShape(aGeomSh) : this->addFromShape(aGeomSh);
-        }
-      } else {
-        Handle(Geom_Surface) aFaceSurface = BRep_Tool::Surface(TopoDS::Face(aShape));
-        Handle(Geom_Surface) aBoundingSurface = BRep_Tool::Surface(TopoDS::Face(aRotatedBoundingFace));
-        Handle(Geom_Surface) aBaseSurface = BRep_Tool::Surface(TopoDS::Face(aModifiedBaseShape));
-        if(aFaceSurface == aBoundingSurface) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          isFromFaceSet ? this->addFromShape(aGeomSh) : this->addToShape(aGeomSh);
-        }
-        if(aFaceSurface == aBaseSurface) {
-          aGeomSh->setImpl(new TopoDS_Shape(aShape));
-          isFromFaceSet ? this->addToShape(aGeomSh) : this->addFromShape(aGeomSh);
-        }
-      }
+    if(aShapeTypeToExp == TopAbs_COMPOUND) {
+      storeGenerationHistory(this, aResult, TopAbs_EDGE, aRotatedBoundingFace, aModifiedBaseShape, isFromFaceSet);
+      storeGenerationHistory(this, aResult, TopAbs_FACE, aRotatedBoundingFace, aModifiedBaseShape, isFromFaceSet);
+    } else {
+      storeGenerationHistory(this, aResult, aShapeTypeToExp, aRotatedBoundingFace, aModifiedBaseShape, isFromFaceSet);
     }
   }
 
@@ -536,7 +483,7 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
   this->setDone(true);
 }
 
-//=================================================================================================
+//==================================================================================================
 TopoDS_Face makeFaceFromPlane(gp_Pln& thePlane, const gp_Pnt& thePoint)
 {
   if(!thePlane.Contains(thePoint, Precision::Confusion())) {
@@ -551,7 +498,7 @@ TopoDS_Face makeFaceFromPlane(gp_Pln& thePlane, const gp_Pnt& thePoint)
   return aResultFace;
 }
 
-//=================================================================================================
+//==================================================================================================
 TopoDS_Solid makeSolidFromShape(const TopoDS_Shape& theShape)
 {
   TopoDS_Shell aShell;
@@ -570,7 +517,7 @@ TopoDS_Solid makeSolidFromShape(const TopoDS_Shape& theShape)
   return aSolid;
 }
 
-//=================================================================================================
+//==================================================================================================
 gp_Pnt centreOfMass(const TopoDS_Shape& theShape)
 {
   TopAbs_ShapeEnum aShType = theShape.ShapeType();
@@ -587,7 +534,7 @@ gp_Pnt centreOfMass(const TopoDS_Shape& theShape)
   return aGProps.CentreOfMass();
 }
 
-//=================================================================================================
+//==================================================================================================
 TopoDS_Shape findClosest(const TopoDS_Shape& theShape, const gp_Pnt& thePoint)
 {
   TopoDS_Shape aResult = theShape;
@@ -609,4 +556,122 @@ TopoDS_Shape findClosest(const TopoDS_Shape& theShape, const gp_Pnt& thePoint)
   }
 
   return aResult;
+}
+
+//==================================================================================================
+void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
+                            const TopoDS_Shape& theBase,
+                            const TopAbs_ShapeEnum theType,
+                            BRepPrimAPI_MakeRevol* theRevolBuilder)
+{
+  for(TopExp_Explorer anExp(theBase, theType); anExp.More(); anExp.Next()) {
+    const TopoDS_Shape& aShape = anExp.Current();
+    GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
+    aFromShape->setImpl(new TopoDS_Shape(theRevolBuilder->FirstShape(aShape)));
+    aToShape->setImpl(new TopoDS_Shape(theRevolBuilder->LastShape(aShape)));
+    theRevolutionAlgo->addFromShape(aFromShape);
+    theRevolutionAlgo->addToShape(aToShape);
+  }
+}
+
+//==================================================================================================
+void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
+                            const TopoDS_Shape& theResult,
+                            const TopAbs_ShapeEnum theType,
+                            const TopoDS_Shape& theToFace,
+                            const TopoDS_Shape& theFromFace)
+{
+  for(TopExp_Explorer anExp(theResult, theType); anExp.More (); anExp.Next ()) {
+    const TopoDS_Shape& aShape = anExp.Current();
+    GeomShapePtr aGeomSh(new GeomAPI_Shape());
+    if(theType == TopAbs_VERTEX) {
+      gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
+      IntTools_Context anIntTools;
+      if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(theToFace), Precision::Confusion()) == Standard_True) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->addToShape(aGeomSh);
+      }
+      if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(theFromFace), Precision::Confusion()) == Standard_True) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->addFromShape(aGeomSh);
+      }
+    } else if(theType == TopAbs_EDGE) {
+      TopoDS_Edge anEdge = TopoDS::Edge(aShape);
+      BRepLib_CheckCurveOnSurface anEdgeCheck(anEdge, TopoDS::Face(theToFace));
+      anEdgeCheck.Perform();
+      if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->addToShape(aGeomSh);
+      }
+      anEdgeCheck.Init(anEdge, TopoDS::Face(theFromFace));
+      anEdgeCheck.Perform();
+      if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->addFromShape(aGeomSh);
+      }
+    } else {
+      Handle(Geom_Surface) aFaceSurface = BRep_Tool::Surface(TopoDS::Face(aShape));
+      Handle(Geom_Surface) aFromSurface = BRep_Tool::Surface(TopoDS::Face(theFromFace));
+      Handle(Geom_Surface) aToSurface = BRep_Tool::Surface(TopoDS::Face(theToFace));
+      if(aFaceSurface == aFromSurface) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->addFromShape(aGeomSh);
+      }
+      if(aFaceSurface == aToSurface) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->addToShape(aGeomSh);
+      }
+    }
+  }
+}
+
+void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
+                            const TopoDS_Shape& theResult,
+                            const TopAbs_ShapeEnum theType,
+                            const TopoDS_Shape& theRotatedBoundingFace,
+                            const TopoDS_Shape& theModifiedBaseShape,
+                            const bool theIsFromFaceSet)
+{
+  for(TopExp_Explorer anExp(theResult, theType); anExp.More (); anExp.Next ()) {
+    const TopoDS_Shape& aShape = anExp.Current();
+    GeomShapePtr aGeomSh(new GeomAPI_Shape());
+    if(theType == TopAbs_VERTEX) {
+      gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
+      IntTools_Context anIntTools;
+      if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(theRotatedBoundingFace), Precision::Confusion()) == Standard_True) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theIsFromFaceSet ? theRevolutionAlgo->addFromShape(aGeomSh) : theRevolutionAlgo->addToShape(aGeomSh);
+      }
+      if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(theModifiedBaseShape), Precision::Confusion()) == Standard_True) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theIsFromFaceSet ? theRevolutionAlgo->addToShape(aGeomSh) : theRevolutionAlgo->addFromShape(aGeomSh);
+      }
+    } else if(theType == TopAbs_EDGE) {
+      TopoDS_Edge anEdge = TopoDS::Edge(aShape);
+      BRepLib_CheckCurveOnSurface anEdgeCheck(anEdge, TopoDS::Face(theRotatedBoundingFace));
+      anEdgeCheck.Perform();
+      if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theIsFromFaceSet ? theRevolutionAlgo->addFromShape(aGeomSh) : theRevolutionAlgo->addToShape(aGeomSh);
+      }
+      anEdgeCheck.Init(anEdge, TopoDS::Face(theModifiedBaseShape));
+      anEdgeCheck.Perform();
+      if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theIsFromFaceSet ? theRevolutionAlgo->addToShape(aGeomSh) : theRevolutionAlgo->addFromShape(aGeomSh);
+      }
+    } else {
+      Handle(Geom_Surface) aFaceSurface = BRep_Tool::Surface(TopoDS::Face(aShape));
+      Handle(Geom_Surface) aBoundingSurface = BRep_Tool::Surface(TopoDS::Face(theRotatedBoundingFace));
+      Handle(Geom_Surface) aBaseSurface = BRep_Tool::Surface(TopoDS::Face(theModifiedBaseShape));
+      if(aFaceSurface == aBoundingSurface) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theIsFromFaceSet ? theRevolutionAlgo->addFromShape(aGeomSh) : theRevolutionAlgo->addToShape(aGeomSh);
+      }
+      if(aFaceSurface == aBaseSurface) {
+        aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theIsFromFaceSet ? theRevolutionAlgo->addToShape(aGeomSh) : theRevolutionAlgo->addFromShape(aGeomSh);
+      }
+    }
+  }
 }
