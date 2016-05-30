@@ -32,6 +32,7 @@ class Model_ResultBody : public ModelAPI_ResultBody
   /// Flag that stores the previous state of "concealed": if it is changed,
   /// The event is used to redisplay the body.
   bool myWasConcealed;
+
 public:
   /// Request for initialization of data model of the result: adding all attributes
   virtual void initAttributes();

@@ -19,6 +19,7 @@ Model_ResultBody::Model_ResultBody()
 {
   myBuilder = new Model_BodyBuilder(this);
   myWasConcealed = false;
+  myConnect = ConnectionNotComputed;
 }
 
 void Model_ResultBody::initAttributes()

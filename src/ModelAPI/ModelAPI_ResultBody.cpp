@@ -12,6 +12,7 @@
 ModelAPI_ResultBody::ModelAPI_ResultBody()
 : myBuilder(0)
 {
+  myConnect = ConnectionNotComputed;
 }
 
 ModelAPI_ResultBody::~ModelAPI_ResultBody()
@@ -29,6 +30,7 @@ void ModelAPI_ResultBody::store(const std::shared_ptr<GeomAPI_Shape>& theShape,
                                 const bool theIsStoreSameShapes)
 {
   myBuilder->store(theShape, theIsStoreSameShapes);
+  myConnect = ConnectionNotComputed;
 
   static Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
@@ -40,6 +42,7 @@ void ModelAPI_ResultBody::storeGenerated(const std::shared_ptr<GeomAPI_Shape>& t
 	                          const std::shared_ptr<GeomAPI_Shape>& theToShape)
 {
   myBuilder->storeGenerated(theFromShape, theToShape);
+  myConnect = ConnectionNotComputed;
 
   static Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
@@ -52,6 +55,7 @@ void ModelAPI_ResultBody::storeModified(const std::shared_ptr<GeomAPI_Shape>& th
                             const int theDecomposeSolidsTag)
 {
   myBuilder->storeModified(theOldShape, theNewShape, theDecomposeSolidsTag);
+  myConnect = ConnectionNotComputed;
 
   static Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
@@ -62,6 +66,7 @@ void ModelAPI_ResultBody::storeModified(const std::shared_ptr<GeomAPI_Shape>& th
 void ModelAPI_ResultBody::storeWithoutNaming(const std::shared_ptr<GeomAPI_Shape>& theShape)
 {
   myBuilder->storeWithoutNaming(theShape);
+  myConnect = ConnectionNotComputed;
 
   static Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
@@ -141,4 +146,12 @@ void ModelAPI_ResultBody::loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape
     const std::string& theName,int&  theTag)
 {
   myBuilder->loadDisconnectedVertexes(theShape, theName, theTag);
+}
+
+bool ModelAPI_ResultBody::isConnectedTopology()
+{
+  if (myConnect == ConnectionNotComputed) {
+    myConnect = shape()->isConnectedTopology() ? IsConnected : IsNotConnected;
+  }
+  return myConnect == IsConnected;
 }

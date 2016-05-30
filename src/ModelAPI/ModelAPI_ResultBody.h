@@ -44,6 +44,15 @@ public:
     return RESULT_BODY_COLOR;
   }
 
+  /// Iternal enumeration for storage the information of connected topology flag
+  enum ConnectedTopologyFlag {
+    ConnectionNotComputed, ///< not yet computed
+    IsConnected,           ///< the topology is connected
+    IsNotConnected         ///< the topology is connected
+  };
+  /// Keeps (not persistently) the connected topology flag
+  ConnectedTopologyFlag myConnect;
+
   /// \brief Stores the shape (called by the execution method).
   /// param[in] theShape shape to store.
   /// param[in] theIsStoreSameShapes if false stores reference to the same shape if it is already in document.
@@ -117,6 +126,10 @@ public:
   /// Returns true if the latest modification of this body in the naming history
   // is equal to the given shape
   MODELAPI_EXPORT virtual bool isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
+
+  /// Returns true is the topology is connected. Cashes this information for the current shape,
+  /// so it is more effective to use this method than directly GeomAPI_Shape.
+  MODELAPI_EXPORT virtual bool isConnectedTopology();
 
 protected:
   /// Default constructor accessible only from Model_Objects

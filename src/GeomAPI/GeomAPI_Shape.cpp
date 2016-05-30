@@ -131,15 +131,21 @@ bool GeomAPI_Shape::isConnectedTopology() const
     NCollection_List<TopoDS_Shape> aNew; // very new connected to new connected
     NCollection_List<TopoDS_Shape>::Iterator aNotIter(aNotConnected);
     while(aNotIter.More()) {
+      // optimization to avoid TopExp_Explorer double-cycle, collect all vertices in the list first
+      NCollection_List<TopoDS_Shape> aNotVertices;
+      for(TopExp_Explorer anExp1(aNotIter.Value(), TopAbs_VERTEX); anExp1.More(); anExp1.Next()) {
+        aNotVertices.Append(anExp1.Current());
+      }
+
       bool aConnected =  false;
       NCollection_List<TopoDS_Shape>::Iterator aNewIter(aNewConnected);
       for(; !aConnected && aNewIter.More(); aNewIter.Next()) {
         // checking topological connecion of aNotIter and aNewIter (if shapes are connected, vertices are connected for sure)
-        TopExp_Explorer anExp1(aNotIter.Value(), TopAbs_VERTEX);
-        for(; !aConnected && anExp1.More(); anExp1.Next()) {
-          TopExp_Explorer anExp2(aNewIter.Value(), TopAbs_VERTEX);
-          for(; anExp2.More(); anExp2.Next()) {
-            if (anExp1.Current().IsSame(anExp2.Current())) {
+        TopExp_Explorer anExp2(aNewIter.Value(), TopAbs_VERTEX);
+        for(; !aConnected && anExp2.More(); anExp2.Next()) {
+          NCollection_List<TopoDS_Shape>::Iterator aNotIter(aNotVertices);
+          for(; aNotIter.More(); aNotIter.Next()) {
+            if (aNotIter.Value().IsSame(anExp2.Current())) {
               aConnected = true;
               break;
             }
