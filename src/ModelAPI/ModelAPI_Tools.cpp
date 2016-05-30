@@ -159,14 +159,9 @@ bool findVariable(FeaturePtr theSearcher, const std::string& theName, double& ou
     return true;
   DocumentPtr aRootDocument = aSession->moduleDocument();
   if (aDocument != aRootDocument) {
-    ResultPtr aPartResult = findPartResult(aRootDocument, aDocument);
-    if (aPartResult.get()) {
-      FeaturePtr aPartFeature;
-      if (theSearcher.get()) // only if the relative search is needed
-        aPartFeature = aRootDocument->feature(aPartResult);
-      if (findVariable(aRootDocument, aPartFeature, theName, outValue, theParam))
-        return true;
-    }
+    // any parameters in PartSet is okindependently on the Part position (issu #1504)
+    if (findVariable(aRootDocument, FeaturePtr(), theName, outValue, theParam))
+      return true;
   }
   return false;
 }
