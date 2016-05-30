@@ -149,28 +149,29 @@ bool BuildPlugin_Wire::addContour()
     std::shared_ptr<GeomAPI_Edge> anEdgeInList(new GeomAPI_Edge(aSelection->value()));
 
     ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSelection->context());
-    std::shared_ptr<GeomAPI_PlanarEdges> aPlanarEdges = std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aConstruction->shape());
 
-    // Iterate on faces and add face with this edge.
-    std::shared_ptr<GeomAPI_Face> aFoundFace;
+    // Iterate on wires and add wire with this edge.
+    std::shared_ptr<GeomAPI_Shape> aFoundWire;
     for(int anIndex = 0; anIndex < aConstruction->facesNum(); ++anIndex) {
       std::shared_ptr<GeomAPI_Face> aFace = aConstruction->face(anIndex);
-      for(GeomAPI_ShapeExplorer anExp(aFace, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
-        std::shared_ptr<GeomAPI_Edge> anEdgeOnFace(new GeomAPI_Edge(anExp.current()));
-        if(anEdgeInList->isEqual(anEdgeOnFace)) {
-          aFoundFace = aFace;
-          break;
+      for(GeomAPI_ShapeExplorer aWireExp(aFace, GeomAPI_Shape::WIRE); aWireExp.more(); aWireExp.next()) {
+        GeomShapePtr aWireOnFace = aWireExp.current();
+        for(GeomAPI_ShapeExplorer anExp(aWireOnFace, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
+          std::shared_ptr<GeomAPI_Edge> anEdgeOnFace(new GeomAPI_Edge(anExp.current()));
+          if(anEdgeInList->isEqual(anEdgeOnFace)) {
+            aFoundWire = aWireOnFace;
+            break;
+          }
         }
       }
-
-      if(aFoundFace.get()) {
+      if(aFoundWire.get()) {
         break;
       }
     }
 
-    // If face with the same edge found. Add all other edges to list.
-    if(aFoundFace.get()) {
-      for(GeomAPI_ShapeExplorer anExp(aFoundFace, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
+    // If wire with the same edge found. Add all other edges to list.
+    if(aFoundWire.get()) {
+      for(GeomAPI_ShapeExplorer anExp(aFoundWire, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
         std::shared_ptr<GeomAPI_Edge> anEdgeOnFace(new GeomAPI_Edge(anExp.current()));
         ListOfShape::const_iterator anEdgesIt = anAddedEdges.cbegin();
         for(; anEdgesIt != anAddedEdges.cend(); ++anEdgesIt) {
