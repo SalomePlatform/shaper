@@ -328,7 +328,7 @@ bool SketchSolver_Group::resolveConstraints()
 {
   bool aResolved = false;
   bool isGroupEmpty = isEmpty() && myStorage->isEmpty();
-  if (myStorage->isNeedToResolve() && !isGroupEmpty) {
+  if (myStorage->isNeedToResolve() && (!isGroupEmpty || !myConflictingConstraints.empty())) {
     if (!mySketchSolver)
       mySketchSolver = SketchSolver_Manager::instance()->builder()->createSolver();
 
