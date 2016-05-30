@@ -1,5 +1,10 @@
 #include <SketchSolver_ConstraintMiddle.h>
 
+#include <SketchSolver_Builder.h>
+#include <SketchSolver_Manager.h>
+
+#include <GeomAPI_XY.h>
+
 SketchSolver_ConstraintMiddle::SketchSolver_ConstraintMiddle(ConstraintPtr theConstraint)
   : SketchSolver_Constraint(theConstraint)
 {
@@ -37,5 +42,33 @@ void SketchSolver_ConstraintMiddle::notifyCoincidenceChanged(
   if (isSameAttr) {
     remove();
     process();
+  }
+}
+
+void SketchSolver_ConstraintMiddle::adjustConstraint()
+{
+  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
+
+  ConstraintWrapperPtr aConstraint = myStorage->constraint(myBaseConstraint).front();
+  const std::list<EntityWrapperPtr>& aSubs = aConstraint->entities();
+  std::shared_ptr<GeomAPI_Pnt2d> aMidPoint, aStart, aEnd;
+  std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
+  for (; aSIt != aSubs.end(); ++aSIt) {
+    if ((*aSIt)->type() == ENTITY_POINT)
+      aMidPoint = aBuilder->point(*aSIt);
+    else if ((*aSIt)->type() == ENTITY_LINE) {
+      const std::list<EntityWrapperPtr>& aLinePoints = (*aSIt)->subEntities();
+      aStart = aBuilder->point(aLinePoints.front());
+      aEnd = aBuilder->point(aLinePoints.back());
+    }
+  }
+
+  if (aMidPoint && aStart && aEnd) {
+    std::shared_ptr<GeomAPI_XY> aMP = aMidPoint->xy();
+    double aDot = aMP->decreased(aStart->xy())->dot(aMP->decreased(aEnd->xy()));
+    if (aDot > 0.0) {
+      aBuilder->adjustConstraint(aConstraint);
+      myStorage->addConstraint(myBaseConstraint, aConstraint);
+    }
   }
 }

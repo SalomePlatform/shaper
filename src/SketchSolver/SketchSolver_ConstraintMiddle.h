@@ -23,6 +23,10 @@ public:
 
   /// \brief Notify constraint, that coincidence appears or removed
   virtual void notifyCoincidenceChanged(EntityWrapperPtr theCoincAttr1, EntityWrapperPtr theCoincAttr2);
+
+protected:
+  /// \brief This method is used in derived objects to check consistence of constraint.
+  virtual void adjustConstraint();
 };
 
 #endif

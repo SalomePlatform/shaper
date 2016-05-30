@@ -21,6 +21,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <SketchPlugin_Arc.h>
+#include <SketchPlugin_ConstraintMiddle.h>
 
 /** \brief Search the entity/parameter with specified ID in the list of elements
  *  \param[in] theEntityID unique ID of the element
@@ -75,8 +76,11 @@ bool SolveSpaceSolver_Storage::update(ConstraintWrapperPtr theConstraint)
   std::list<EntityWrapperPtr>::iterator anIt = anEntities.begin();
   for (; anIt != anEntities.end(); ++anIt) {
     isUpdated = update(*anIt) || isUpdated;
-    // do not update constrained entities for Multi constraints
-    if (aSlvsConstr.type == SLVS_C_MULTI_ROTATION || aSlvsConstr.type == SLVS_C_MULTI_TRANSLATION)
+    // do not update constrained entities for Multi constraints,
+    // and for middle point constraint translated to equal lines
+    if (aSlvsConstr.type == SLVS_C_MULTI_ROTATION || aSlvsConstr.type == SLVS_C_MULTI_TRANSLATION ||
+       (theConstraint->baseConstraint()->getKind() == SketchPlugin_ConstraintMiddle::ID() &&
+        aSlvsConstr.type != SLVS_C_AT_MIDPOINT))
       continue;
 
     Slvs_hEntity anID = (Slvs_hEntity)(*anIt)->id();
