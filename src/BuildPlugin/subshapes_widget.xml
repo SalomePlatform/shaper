@@ -5,7 +5,8 @@
                   label="Shape:"
                   tooltip="Select a shape to modify."
                   shape_types="objects"
-                  concealment="true">
+                  concealment="true"
+                  greed="true">
     <validator id="GeomValidators_ShapeType" parameters="wire,face"/>
   </shape_selector>
   <multi_selector id="subshapes"
