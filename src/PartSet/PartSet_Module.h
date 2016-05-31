@@ -355,6 +355,11 @@ protected:
   /// \param theFeatureKindId a feature kind
   void storeConstraintsState(const std::string& theFeatureKindId);
 
+  /// If the feature kind is a geometrical or dimensional constraint, set visible state for
+  /// all types of constraints
+  /// \param theFeatureKindId a feature kind
+  void updateConstraintsState(const std::string& theFeatureKind);
+
   /// Register validators for this module
   virtual void registerValidators();
 

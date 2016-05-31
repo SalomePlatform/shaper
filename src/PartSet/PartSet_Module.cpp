@@ -825,6 +825,8 @@ bool PartSet_Module::canCommitOperation() const
 void PartSet_Module::launchOperation(const QString& theCmdId)
 {
   storeConstraintsState(theCmdId.toStdString());
+  updateConstraintsState(theCmdId.toStdString());
+
   ModuleBase_IModule::launchOperation(theCmdId);
 }
 
@@ -836,6 +838,10 @@ void PartSet_Module::storeConstraintsState(const std::string& theFeatureKind)
                                                   mySketchMgr->showConstraintStates();
     myHasConstraintShown = aShownStates;
   }
+}
+
+void PartSet_Module::updateConstraintsState(const std::string& theFeatureKind)
+{
   if (PartSet_SketcherMgr::constraintsIdList().contains(theFeatureKind.c_str())) {
     // Show constraints if a constraint was anOperation
     mySketchMgr->updateBySketchParameters(PartSet_Tools::Geometrical, true);
