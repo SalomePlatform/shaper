@@ -187,7 +187,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   //Config_PropManager::registerProp("Visualization", "object_default_color", "Object color",
   //                                 Config_Prop::Color, "225,225,225");
 
-  Config_PropManager::registerProp("Visualization", "result_body_color", "Body color",
+  Config_PropManager::registerProp("Visualization", "result_body_color", "Result color",
                                    Config_Prop::Color, ModelAPI_ResultBody::DEFAULT_COLOR());
   Config_PropManager::registerProp("Visualization", "result_group_color", "Group color",
                                    Config_Prop::Color, ModelAPI_ResultGroup::DEFAULT_COLOR());
