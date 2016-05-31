@@ -128,4 +128,5 @@ ADD_UNIT_TESTS(TestConstants.py
                TestUndoRedo.py
                TestDocument.py
                Test1064.py
-               TestResults.py)
+               TestResults.py
+               Test1512.py)

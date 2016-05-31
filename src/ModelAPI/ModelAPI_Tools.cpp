@@ -565,5 +565,3 @@ void findRefsToFeatures(const std::set<FeaturePtr>& theFeatures,
 }
 
 } // namespace ModelAPI_Tools
-
-
