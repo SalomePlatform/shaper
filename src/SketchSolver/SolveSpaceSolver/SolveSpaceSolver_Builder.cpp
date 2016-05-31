@@ -56,8 +56,6 @@ static void adjustAngle(ConstraintWrapperPtr theConstraint);
 static void adjustMirror(ConstraintWrapperPtr theConstraint);
 /// \brief Update a sign of the point-line distance constraint
 static void adjustPtLineDistance(ConstraintWrapperPtr theConstraint);
-/// \brief Update point to be a middle of a line
-static void adjustMiddlePoint(ConstraintWrapperPtr theConstraint);
 
 /// \brief Transform points to be symmetric regarding to the mirror line
 static void makeMirrorPoints(EntityWrapperPtr theOriginal,
@@ -299,8 +297,6 @@ void SolveSpaceSolver_Builder::adjustConstraint(ConstraintWrapperPtr theConstrai
     adjustMirror(theConstraint);
   else if (aType == CONSTRAINT_PT_LINE_DISTANCE)
     adjustPtLineDistance(theConstraint);
-  else if (aType == CONSTRAINT_MIDDLE_POINT)
-    adjustMiddlePoint(theConstraint);
 }
 
 EntityWrapperPtr SolveSpaceSolver_Builder::createFeature(
@@ -830,27 +826,4 @@ void adjustPtLineDistance(ConstraintWrapperPtr theConstraint)
   std::shared_ptr<GeomAPI_XY> aPtLineVec = aPoint->xy()->decreased(aLine->location()->xy());
   if (aPtLineVec->cross(aLineVec) * theConstraint->value() < 0.0)
     theConstraint->setValue(theConstraint->value() * (-1.0));
-}
-
-void adjustMiddlePoint(ConstraintWrapperPtr theConstraint)
-{
-  BuilderPtr aBuilder = SolveSpaceSolver_Builder::getInstance();
-
-  const std::list<EntityWrapperPtr>& aSubs = theConstraint->entities();
-  std::shared_ptr<GeomAPI_Pnt2d> aStart, aEnd;
-  std::shared_ptr<GeomDataAPI_Point2D> aMidPoint;
-  std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
-  for (; aSIt != aSubs.end(); ++aSIt) {
-    if ((*aSIt)->type() == ENTITY_POINT)
-      aMidPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>((*aSIt)->baseAttribute());
-    else if ((*aSIt)->type() == ENTITY_LINE) {
-      const std::list<EntityWrapperPtr>& aLinePoints = (*aSIt)->subEntities();
-      aStart = aBuilder->point(aLinePoints.front());
-      aEnd = aBuilder->point(aLinePoints.back());
-    }
-  }
-  if (aMidPoint && aStart && aEnd) {
-    std::shared_ptr<GeomAPI_XY> aMid = aStart->xy()->added(aEnd->xy())->multiplied(0.5);
-    aMidPoint->setValue(aMid->x(), aMid->y());
-  }
 }
