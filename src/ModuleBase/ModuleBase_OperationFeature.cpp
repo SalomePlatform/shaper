@@ -371,7 +371,7 @@ ModuleBase_ModelWidget* ModuleBase_OperationFeature::activateByPreselection(
           if (!aWgt->canAcceptFocus())
             continue;
           aPropertyPanel->setPreselectionWidget(aWgt);
-          if (!aWgt->setSelection(myPreSelection, true)) {
+          if (myPreSelection.empty() || !aWgt->setSelection(myPreSelection, true)) {
             isSet = false;
             break;
           } else {
