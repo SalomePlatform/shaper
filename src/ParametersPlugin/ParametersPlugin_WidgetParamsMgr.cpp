@@ -30,6 +30,7 @@
 #include <QTimer>
 #include <QEvent>
 #include <QKeyEvent>
+#include <QDialogButtonBox>
 
 enum ColumnType {
   Col_Name,
@@ -155,7 +156,7 @@ void ParametersPlugin_TreeWidget::closeEditor(QWidget* theEditor, QAbstractItemD
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theParent, const Config_WidgetAPI* theData)
-  : ModuleBase_ModelWidget(theParent, theData)
+  : ModuleBase_ModelDialogWidget(theParent, theData)
 {
   QVBoxLayout* aLayout = new QVBoxLayout(this);
 
@@ -304,7 +305,7 @@ void ParametersPlugin_WidgetParamsMgr::updateFeaturesPart()
 void ParametersPlugin_WidgetParamsMgr::updateParametersPart()
 {
   updateItem(myParameters, parametersItems(myParametersList));
-  bool aIsValid = checkIsValid();
+  bool aIsValid = isValid();
   enableButtons(aIsValid);
 }
 
@@ -698,13 +699,16 @@ bool ParametersPlugin_WidgetParamsMgr::hasName(const QString& theName) const
 void ParametersPlugin_WidgetParamsMgr::sendWarning()
 {
   QMessageBox::warning(this, tr("Warning"), myMessage);
+  QTreeWidgetItem* aItem = myTable->currentItem();
+  if (aItem)
+    myTable->editItem(aItem);
 }
 
 void ParametersPlugin_WidgetParamsMgr::onSelectionChanged()
 {
   QList<QTreeWidgetItem*> aItemsList = myTable->selectedItems();
-  bool isValid = checkIsValid();
-  if (isValid) {
+  bool aIsValid = isValid();
+  if (aIsValid) {
     bool isParameter = false;
     foreach(QTreeWidgetItem* aItem, aItemsList) {
       if (aItem->parent() == myParameters) {
@@ -736,9 +740,10 @@ void ParametersPlugin_WidgetParamsMgr::enableButtons(bool theEnable)
     myUpBtn->setEnabled(theEnable);
     myDownBtn->setEnabled(theEnable);
   }
+  myOkCancelBtn->button(QDialogButtonBox::Ok)->setEnabled(theEnable);
 }
 
-bool ParametersPlugin_WidgetParamsMgr::checkIsValid()
+bool ParametersPlugin_WidgetParamsMgr::isValid()
 {
   QTreeWidgetItem* aItem;
   bool aIsValid = true;

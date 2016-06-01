@@ -7,7 +7,7 @@
 #ifndef ParametersPlugin_WidgetParamsMgr_H_
 #define ParametersPlugin_WidgetParamsMgr_H_
 
-#include <ModuleBase_ModelWidget.h>
+#include <ModuleBase_ModelDialogWidget.h>
 #include <QModelIndex>
 #include <QAbstractItemDelegate>
 #include <QTreeWidget>
@@ -43,7 +43,7 @@ protected slots:
  * \ingroup GUI
  * Represent a content of the property panel to show/modify parameters of some feature.
  */
-class ParametersPlugin_WidgetParamsMgr : public ModuleBase_ModelWidget
+class ParametersPlugin_WidgetParamsMgr : public ModuleBase_ModelDialogWidget
 {
  Q_OBJECT
 public:
@@ -119,13 +119,14 @@ private:
 
   void updateParametersPart();
 
+  /// Returns true if values in the widget are valid
+  bool isValid();
+
   /// Returns true if parameter with the given name already exists
   bool hasName(const QString& theName) const;
 
   /// Enable or disable buttons for parameters managemnt
   void enableButtons(bool theEnable);
-
-  bool checkIsValid();
 
   QList<QStringList> featuresItems(const QList<FeaturePtr>& theFeatures, QList<FeaturePtr>& theFeatureList) const;
   QList<QStringList> parametersItems(const QList<FeaturePtr>& theFeatures) const;

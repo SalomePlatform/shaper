@@ -6,6 +6,7 @@
 #include "ModuleBase_IWorkshop.h"
 #include "ModuleBase_IPropertyPanel.h"
 #include "ModuleBase_PageWidget.h"
+#include "ModuleBase_ModelDialogWidget.h"
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Events.h>
@@ -52,9 +53,6 @@ ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QStr
 
   aFactory.createWidget(aPage, false);
   myWidgets = aFactory.getModelWidgets();
-  foreach (ModuleBase_ModelWidget* aWidget, myWidgets) {
-    initializeWidget(aWidget);
-  }
 
   QFrame* aFrame = new QFrame(this);
   aFrame->setFrameStyle(QFrame::WinPanel | QFrame::Raised);
@@ -63,19 +61,27 @@ ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QStr
   QVBoxLayout* aBtnLayout = new QVBoxLayout(aFrame);
   ModuleBase_Tools::adjustMargins(aBtnLayout);
 
-  QDialogButtonBox* aBtnBox = new QDialogButtonBox(
+  myButtonsBox = new QDialogButtonBox(
     QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, aFrame);
-  aBtnLayout->addWidget(aBtnBox);
+  aBtnLayout->addWidget(myButtonsBox);
 
-  aBtnBox->button(QDialogButtonBox::Ok)->setIcon(QIcon(":pictures/button_ok.png"));
-  aBtnBox->button(QDialogButtonBox::Cancel)->setIcon(QIcon(":pictures/button_cancel.png"));
+  myButtonsBox->button(QDialogButtonBox::Ok)->setIcon(QIcon(":pictures/button_ok.png"));
+  myButtonsBox->button(QDialogButtonBox::Cancel)->setIcon(QIcon(":pictures/button_cancel.png"));
 
-  connect(aBtnBox, SIGNAL(accepted()), this, SLOT(accept()));
-  connect(aBtnBox, SIGNAL(rejected()), this, SLOT(reject()));
+  connect(myButtonsBox, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(myButtonsBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+  foreach (ModuleBase_ModelWidget* aWidget, myWidgets) {
+    initializeWidget(aWidget);
+  }
 }
 
 void ModuleBase_Dialog::initializeWidget(ModuleBase_ModelWidget* theWidget)
 {
+  ModuleBase_ModelDialogWidget* aDlgWgt = dynamic_cast<ModuleBase_ModelDialogWidget*>(theWidget);
+  if (aDlgWgt)
+    aDlgWgt->setDialogButtons(myButtonsBox);
+
   theWidget->setFeature(myFeature);
   theWidget->restoreValue();
 }

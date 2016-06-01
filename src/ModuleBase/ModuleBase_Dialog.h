@@ -12,6 +12,8 @@
 
 class ModuleBase_IWorkshop;
 class ModuleBase_ModelWidget;
+class QDialogButtonBox;
+
 
 /**
  * \ingroup GUI
@@ -35,7 +37,6 @@ protected:
   /// Redefinition of virtual method
   virtual void showEvent(QShowEvent* theEvent);
 
-
 private:
   /// Initialising of the widget
   void initializeWidget(ModuleBase_ModelWidget* theWidget);
@@ -57,6 +58,9 @@ private:
 
   /// Pointer on active widget
   ModuleBase_ModelWidget* myActiveWidget;
+
+  /// Buttons of the dialog
+  QDialogButtonBox* myButtonsBox;
 };
 
 #endif

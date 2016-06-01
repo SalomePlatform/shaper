@@ -62,6 +62,7 @@ SET(PROJECT_HEADERS
   ModuleBase_WidgetValidator.h
   ModuleBase_IconFactory.h
   ModuleBase_Dialog.h
+  ModuleBase_ModelDialogWidget.h
 )
 
 SET(PROJECT_SOURCES
