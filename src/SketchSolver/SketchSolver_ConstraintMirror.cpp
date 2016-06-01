@@ -121,14 +121,8 @@ void SketchSolver_ConstraintMirror::process()
 void SketchSolver_ConstraintMirror::update()
 {
   cleanErrorMsg();
-  AttributeRefListPtr aMirroredRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-    myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_C()));
-  if (aMirroredRefList->size() != myNumberOfObjects) {
-    remove();
-    process();
-    return;
-  }
-  adjustConstraint();
+  remove();
+  process();
 }
 
 void SketchSolver_ConstraintMirror::adjustConstraint()

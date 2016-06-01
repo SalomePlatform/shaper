@@ -248,13 +248,12 @@ void SolveSpaceSolver_Storage::changeGroup(EntityWrapperPtr theEntity, const Gro
   for (; aSIt != aSubs.end(); ++aSIt)
     changeGroup(*aSIt, theGroup);
 
-  if (theEntity->group() != theGroup) {
-    theEntity->setGroup(theGroup);
-    int aPos = Search((Slvs_hEntity)theEntity->id(), myEntities);
-    if (aPos >= 0 && aPos < (int)myEntities.size()) {
-      myEntities[aPos].group = (Slvs_hGroup)theGroup;
+  theEntity->setGroup(theGroup);
+  int aPos = Search((Slvs_hEntity)theEntity->id(), myEntities);
+  if (aPos >= 0 && aPos < (int)myEntities.size()) {
+    if (myEntities[aPos].group != (Slvs_hGroup)theGroup)
       setNeedToResolve(true);
-    }
+    myEntities[aPos].group = (Slvs_hGroup)theGroup;
   }
 }
 
