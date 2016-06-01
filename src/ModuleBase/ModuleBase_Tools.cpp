@@ -123,7 +123,7 @@ void setShadowEffect(QWidget* theWidget, const bool isSetEffect)
   else {
     QGraphicsEffect* anEffect = theWidget->graphicsEffect();
     if(anEffect)
-    anEffect->deleteLater();
+      anEffect->deleteLater();
     theWidget->setGraphicsEffect(NULL);
   }
 }

@@ -142,10 +142,13 @@ std::list<std::pair<ObjectPtr, AttributePtr> > Model_AttributeRefAttrList::list(
     TDataStd_ListIteratorOfListOfExtendedString anIDIter(anIDList);
     for (; aLIter.More(); aLIter.Next(), anIDIter.Next()) {
       ObjectPtr anObj;
-      if (!aLIter.Value().IsNull())
+      if (!aLIter.Value().IsNull()) {
         anObj = aDoc->objects()->object(aLIter.Value());
-      aResult.push_back(std::pair<ObjectPtr, AttributePtr>(anObj, 
-        anObj->data()->attribute(TCollection_AsciiString(anIDIter.Value()).ToCString())));
+        aResult.push_back(std::pair<ObjectPtr, AttributePtr>(anObj, 
+          anObj->data()->attribute(TCollection_AsciiString(anIDIter.Value()).ToCString())));
+      } else {
+        aResult.push_back(std::pair<ObjectPtr, AttributePtr>(ObjectPtr(), AttributePtr()));
+      }
     }
   }
   return aResult;
