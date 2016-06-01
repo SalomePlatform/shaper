@@ -14,15 +14,38 @@
 #include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_WidgetValidator.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_Tools.h>
 
 IMPLEMENT_STANDARD_HANDLE(ModuleBase_FilterValidated, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_FilterValidated, SelectMgr_Filter);
+
+//#define DEBUG_CURRENT_SELECTION
 
 Standard_Boolean ModuleBase_FilterValidated::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   bool aValid = true;
   ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();
   if (anOperation) {
+#ifdef DEBUG_CURRENT_SELECTION
+    QString aPrefix = "ModuleBase_FilterValidated::IsOk: ";
+    QList<ModuleBase_ViewerPrsPtr> aSelected = myWorkshop->selection()->getSelected(ModuleBase_ISelection::Viewer);
+    QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = aSelected.begin(), aLast = aSelected.end();
+    QStringList anInfo;
+    ModuleBase_ViewerPrsPtr aPrs;
+    for (; anIt != aLast; anIt++) {
+      aPrs = (*anIt);
+      if (!aPrs.get())
+        continue;
+
+      //GeomShapePtr aShape = aPrs->shape();
+      ObjectPtr anObject = aPrs->object();
+      QString anObjectInfo = anObject.get() ? ModuleBase_Tools::objectInfo(anObject) : "";
+      anInfo.append(anObjectInfo);
+    }
+    QString anInfoStr = anInfo.join(";\t");
+    qDebug(QString("%1: %2, %3").arg(aPrefix).arg(anInfo.size()).arg(anInfoStr).toStdString().c_str());
+#endif
+
     ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
     ModuleBase_ModelWidget* aCurrentWidget = aPanel->preselectionWidget();
     if (!aCurrentWidget)
