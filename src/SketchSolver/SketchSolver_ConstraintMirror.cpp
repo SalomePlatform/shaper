@@ -50,6 +50,12 @@ void SketchSolver_ConstraintMirror::getAttributes(
     }
   }
 
+  // Mirrored entities are placed out-of-group by default, due to they are copies.
+  // Place them into current group manually.
+  std::vector<EntityWrapperPtr>::iterator aMirIt = theMirrorEntities.begin();
+  for (; aMirIt != theMirrorEntities.end(); ++aMirIt)
+    (*aMirIt)->setGroup(myGroupID);
+
   if (theBaseEntities.size() > theMirrorEntities.size())
     myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
 }
@@ -105,10 +111,10 @@ void SketchSolver_ConstraintMirror::process()
     aMirConstrList.insert(aMirConstrList.end(), aNewConstraints.begin(), aNewConstraints.end());
   }
 
-  myStorage->addConstraint(myBaseConstraint, aMirConstrList);
   // update mirrored features to be in the current group
   for (aMIt = aMirrorList.begin(); aMIt != aMirrorList.end(); ++aMIt)
     myStorage->update((*aMIt)->baseFeature(), myGroupID);
+  myStorage->addConstraint(myBaseConstraint, aMirConstrList);
 }
 
 

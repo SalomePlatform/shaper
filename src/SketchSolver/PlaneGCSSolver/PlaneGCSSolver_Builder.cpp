@@ -342,9 +342,9 @@ std::list<ConstraintWrapperPtr> PlaneGCSSolver_Builder::createMirror(
         std::dynamic_pointer_cast<GCS::Line>(aMirrorLine->entity());
 
     std::list<GCSConstraintPtr> aConstrList;
-    aConstrList.push_back(GCSConstraintPtr(new GCS::ConstraintPerpendicular(
-        *(aPoint1->point()), *(aPoint2->point()), aLine->p1, aLine->p2)));
     aConstrList.push_back(GCSConstraintPtr(new GCS::ConstraintMidpointOnLine(
+        *(aPoint1->point()), *(aPoint2->point()), aLine->p1, aLine->p2)));
+    aConstrList.push_back(GCSConstraintPtr(new GCS::ConstraintPerpendicular(
         *(aPoint1->point()), *(aPoint2->point()), aLine->p1, aLine->p2)));
 
     ConstraintWrapperPtr aSubResult(new PlaneGCSSolver_ConstraintWrapper(
