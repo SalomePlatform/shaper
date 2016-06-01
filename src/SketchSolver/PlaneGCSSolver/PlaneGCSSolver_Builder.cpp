@@ -142,8 +142,6 @@ static ConstraintWrapperPtr
 
 
 
-/// \brief Set flags for angle constraint
-static void adjustAngle(ConstraintWrapperPtr theConstraint);
 /// \brief Update mirror points
 static void adjustMirror(ConstraintWrapperPtr theConstraint);
 /// \brief Update a sign of the point-line distance constraint
@@ -459,9 +457,7 @@ void PlaneGCSSolver_Builder::adjustConstraint(ConstraintWrapperPtr theConstraint
 {
   SketchSolver_ConstraintType aType = theConstraint->type();
   // Update flags and parameters in constraints
-  if (aType == CONSTRAINT_ANGLE)
-    adjustAngle(theConstraint);
-  else if (aType == CONSTRAINT_PT_LINE_DISTANCE)
+  if (aType == CONSTRAINT_PT_LINE_DISTANCE)
     adjustPtLineDistance(theConstraint);
   else if (aType == CONSTRAINT_SYMMETRIC)
     adjustMirror(theConstraint);
@@ -1137,24 +1133,6 @@ ConstraintWrapperPtr createConstraintTangent(
 
 
 
-
-void adjustAngle(ConstraintWrapperPtr theConstraint)
-{
-  BuilderPtr aBuilder = PlaneGCSSolver_Builder::getInstance();
-
-  std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aConstraint =
-    std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(theConstraint);
-
-  bool isReversed[2] = {
-    aConstraint->baseConstraint()->boolean(
-        SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID())->value(),
-    aConstraint->baseConstraint()->boolean(
-        SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID())->value()
-  };
-
-  if (isReversed[0] != isReversed[1])
-    aConstraint->setValue(aConstraint->value() - 180.0);
-}
 
 void makeMirrorPoints(EntityWrapperPtr theOriginal,
                       EntityWrapperPtr theMirrored,
