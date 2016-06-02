@@ -42,6 +42,8 @@
 #include <ModelAPI_AttributeRefList.h>
 #endif
 
+//#define DEBUG_OPERATION_START
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
@@ -231,6 +233,9 @@ bool ModuleBase_OperationFeature::isDisplayedOnStart(ObjectPtr theObject)
 
 bool ModuleBase_OperationFeature::start()
 {
+#ifdef DEBUG_OPERATION_START
+  qDebug("ModuleBase_OperationFeature::start -- begin");
+#endif
   setIsModified(false);
   QString anId = getDescription()->operationId();
   if (myIsEditing) {
@@ -249,16 +254,26 @@ bool ModuleBase_OperationFeature::start()
       // in order to update commands status in the workshop, to be exact the feature action
       // to be unchecked
       abort();
+#ifdef DEBUG_OPERATION_START
+  qDebug("ModuleBase_OperationFeature::start -- end : IMPOSSIBLE to start");
+#endif
       return false;
     }
   }
   //Already called startOperation();
   emit started();
+#ifdef DEBUG_OPERATION_START
+  qDebug("ModuleBase_OperationFeature::start -- end");
+#endif
   return true;
 }
 
 void ModuleBase_OperationFeature::abort()
 {
+#ifdef DEBUG_OPERATION_START
+  qDebug("ModuleBase_OperationFeature::abort -- begin");
+#endif
+
   emit beforeAborted();
 
   // the viewer update should be blocked in order to avoid the features blinking before they are
@@ -293,10 +308,16 @@ void ModuleBase_OperationFeature::abort()
   Events_Loop::loop()->send(aMsg);
 
   emit aborted();
+#ifdef DEBUG_OPERATION_START
+  qDebug("ModuleBase_OperationFeature::abort -- end");
+#endif
 }
 
 bool ModuleBase_OperationFeature::commit()
 {
+#ifdef DEBUG_OPERATION_START
+  qDebug("ModuleBase_OperationFeature::commit -- begin");
+#endif
   ModuleBase_IPropertyPanel* aPanel = propertyPanel();
   if (aPanel) {
     ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
@@ -328,8 +349,14 @@ bool ModuleBase_OperationFeature::commit()
     emit committed();
 
     afterCommitOperation();
+#ifdef DEBUG_OPERATION_START
+  qDebug("ModuleBase_OperationFeature::commit -- end : IMPOSSIBLE to commit");
+#endif
     return true;
   }
+#ifdef DEBUG_OPERATION_START
+  qDebug("ModuleBase_OperationFeature::commit -- end");
+#endif
   return false;
 }
 

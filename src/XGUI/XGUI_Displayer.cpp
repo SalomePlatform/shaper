@@ -260,6 +260,7 @@ bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
     if (!anAIS.IsNull()) {
       emit beforeObjectErase(theObject, anObject);
       aContext->Remove(anAIS, false/*update viewer*/);
+      ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::erase -- Remove");
       aErased = true;
     }
   }
@@ -346,6 +347,8 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
         aContext->Deactivate(aAISIO, 0);
 #endif
 
+      ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::redisplay -- Redisplay");
+
       if (aNeedToRestoreSelection)
         myWorkshop->module()->restoreSelection();
 
@@ -390,6 +393,7 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject, const bool theUpdateViewer)
     deactivateAIS(anAIS);
     // the selection from the previous activation modes should be cleared manually (#26172)
     aContext->LocalContext()->ClearOutdatedSelection(anAIS, true);
+    ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::deactivate -- ClearOutdatedSelection");
     if (theUpdateViewer)
       updateViewer();
   }
@@ -631,7 +635,7 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValue
     }
     if (!aShapesToBeSelected.IsEmpty())
       XGUI_Displayer::AddOrRemoveSelectedShapes(aContext, aShapesToBeSelected);
-  } else {
+  } else { // it seems the next code is obsolete as the context is always opened in SHAPER
     aContext->UnhilightCurrents(false);
     aContext->ClearCurrents(false);
     foreach (ModuleBase_ViewerPrsPtr aPrs, theValues) {
@@ -645,6 +649,7 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValue
       }
     }
   }
+  ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::setSelected -- AddOrRemoveSelected/UnhilightCurrents(no local context)");
   if (theUpdateViewer)
     updateViewer();
 }
@@ -676,6 +681,7 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
     if (theUpdateViewer)
       updateViewer();
   }
+  ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::eraseAll -- Remove");
   myResult2AISObjectMap.clear();
 #ifdef DEBUG_DISPLAY
   qDebug("eraseAll");
@@ -690,6 +696,7 @@ void deactivateObject(Handle(AIS_InteractiveContext) theContext,
 {
   if (!theObject.IsNull()) {
     theContext->Deactivate(theObject);
+    ModuleBase_Tools::selectionInfo(theContext, "XGUI_Displayer::deactivateObject -- Deactivate");
     //if (theClear) {
       //theObject->ClearSelected();
       //  theContext->LocalContext()->ClearOutdatedSelection(theObject, true);
@@ -891,6 +898,8 @@ void XGUI_Displayer::activateAIS(const Handle(AIS_InteractiveObject)& theIO,
     } else
       aContext->Activate(theIO, theMode, false);
 
+    ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::activateAIS -- Activate");
+
 #ifdef DEBUG_ACTIVATE_AIS
     ObjectPtr anObject = getObject(theIO);
     anInfo.append(ModuleBase_Tools::objectInfo((*anIt)));
@@ -909,6 +918,7 @@ void XGUI_Displayer::deactivateAIS(const Handle(AIS_InteractiveObject)& theIO, c
       aContext->Deactivate(theIO);
     else 
       aContext->Deactivate(theIO, theMode);
+    ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::deactivateAIS -- Deactivate");
    
 #ifdef DEBUG_DEACTIVATE_AIS
     ObjectPtr anObject = getObject(theIO);
@@ -977,6 +987,7 @@ bool XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer)
     Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
     if (!anAISIO.IsNull() && aContext->IsDisplayed(anAISIO)) {
       aContext->Remove(anAISIO, false/*update viewer*/);
+      ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::eraseAIS -- Remove");
       aErased = true;
     }
   }
@@ -1171,6 +1182,7 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
     // the selection from the previous activation modes should be cleared manually (#26172)
     theIO->ClearSelected();
     aContext->LocalContext()->ClearOutdatedSelection(theIO, true);
+    ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::activate -- ClearSelected/ClearOutdatedSelection");
     // For performance issues
     //if (theUpdateViewer)
     //  updateViewer();

@@ -26,6 +26,8 @@
 
 //#define DEBUG_VALUE_STATE
 
+//#define DEBUG_WIDGET_INSTANCE
+
 ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
                                                const Config_WidgetAPI* theData)
     : QWidget(theParent),
@@ -35,6 +37,10 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
       myFlushUpdateBlocked(false),
       myWidgetValidator(0)
 {
+#ifdef DEBUG_WIDGET_INSTANCE
+  qDebug("ModuleBase_ModelWidget::ModuleBase_ModelWidget");
+#endif
+
   myIsInternal = theData->getBooleanAttribute(ATTR_INTERNAL, false);
 
   myDefaultValue = theData->getProperty(ATTR_DEFAULT);
@@ -45,6 +51,13 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
 
   connect(this, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
   connect(this, SIGNAL(valuesModified()), this, SLOT(onWidgetValuesModified()));
+}
+
+ModuleBase_ModelWidget::~ModuleBase_ModelWidget()
+{
+#ifdef DEBUG_WIDGET_INSTANCE
+  qDebug("ModuleBase_ModelWidget::~ModuleBase_ModelWidget");
+#endif
 }
 
 bool ModuleBase_ModelWidget::reset()
@@ -159,6 +172,9 @@ void ModuleBase_ModelWidget::setFeature(const FeaturePtr& theFeature, const bool
 
 bool ModuleBase_ModelWidget::focusTo()
 {
+#ifdef DEBUG_WIDGET_INSTANCE
+  qDebug("ModuleBase_ModelWidget::focusTo");
+#endif
   QList<QWidget*> aControls = getControls();
   QList<QWidget*>::const_iterator anIt = aControls.begin(), aLast = aControls.end();
   bool isFocusAccepted = false;
@@ -174,6 +190,9 @@ bool ModuleBase_ModelWidget::focusTo()
 
 void ModuleBase_ModelWidget::activate()
 {
+#ifdef DEBUG_WIDGET_INSTANCE
+  qDebug("ModuleBase_ModelWidget::activate");
+#endif
   // the control value is stored to the mode by the focus in on the widget
   // we need the value is initialized in order to enable the apply button in the property panel.
   // It should happens in the creation mode only because all fields are filled in the edition mode
@@ -191,6 +210,9 @@ void ModuleBase_ModelWidget::activate()
 
 void ModuleBase_ModelWidget::deactivate()
 {
+#ifdef DEBUG_WIDGET_INSTANCE
+  qDebug("ModuleBase_ModelWidget::deactivate");
+#endif
   myIsValueStateBlocked = false;
   myState = Stored;
   if (myWidgetValidator)
@@ -297,6 +319,9 @@ bool ModuleBase_ModelWidget::restoreValue()
 void ModuleBase_ModelWidget::updateObject(ObjectPtr theObject)
 {
   if (!myFlushUpdateBlocked) {
+#ifdef DEBUG_WIDGET_INSTANCE
+    qDebug("ModuleBase_ModelWidget::updateObject");
+#endif
     ModuleBase_Tools::flushUpdated(theObject);
     emit objectUpdated();
   }
@@ -305,6 +330,9 @@ void ModuleBase_ModelWidget::updateObject(ObjectPtr theObject)
 void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
 {
   //blockUpdateViewer(true);
+#ifdef DEBUG_WIDGET_INSTANCE
+  qDebug("ModuleBase_ModelWidget::moveObject");
+#endif
 
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
   ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);

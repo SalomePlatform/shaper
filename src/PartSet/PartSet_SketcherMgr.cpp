@@ -37,6 +37,7 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_Tools.h>
 
 #include <GeomDataAPI_Point2D.h>
 
@@ -386,6 +387,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
     if (!aContext.IsNull()) {
       // MoveTo in order to highlight current object
       aContext->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
+      ModuleBase_Tools::selectionInfo(aContext, "PartSet_SketcherMgr::onMousePressed -- MoveTo");
     }
     // Remember highlighted objects for editing
     ModuleBase_ISelection* aSelect = aWorkshop->selection();

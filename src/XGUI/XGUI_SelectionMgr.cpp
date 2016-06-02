@@ -22,6 +22,7 @@
 #include <ModelAPI_ResultCompSolid.h>
 
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_Tools.h>
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
@@ -64,6 +65,7 @@ void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& the
       aContext->AddOrRemoveSelected(anOwner, isUpdateViewer);
     }
   }
+  ModuleBase_Tools::selectionInfo(aContext, "XGUI_SelectionMgr::setSelectedOwners -- AddOrRemoveSelected");
 }
 
 //**************************************************************

@@ -42,8 +42,11 @@
 #include <gp_Pnt.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
+#include <BRep_Builder.hxx>
+#include <TopoDS_Compound.hxx>
 
 //#define DEBUG_EMPTY_SHAPE
+#define DEBUG_OPERATION_PRS
 
 // multi-rotation/translation operation
 //#define DEBUG_HIDE_COPY_ATTRIBUTE
@@ -58,6 +61,9 @@ IMPLEMENT_STANDARD_RTTIEXT(PartSet_OperationPrs, ViewerData_AISShape);
 PartSet_OperationPrs::PartSet_OperationPrs(ModuleBase_IWorkshop* theWorkshop)
 : ViewerData_AISShape(TopoDS_Shape()), myWorkshop(theWorkshop), myUseAISWidth(false)
 {
+#ifdef DEBUG_OPERATION_PRS
+  qDebug("PartSet_OperationPrs::PartSet_OperationPrs");
+#endif
   myShapeColor = Quantity_Color(1, 1, 1, Quantity_TOC_RGB);
 
   // first presentation for having correct Compute until presentation with shapes are set
@@ -86,6 +92,10 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
+#ifdef DEBUG_OPERATION_PRS
+  qDebug("PartSet_OperationPrs::Compute -- begin");
+#endif
+
   SetColor(myShapeColor);
   thePresentation->Clear();
   bool aReadyToDisplay = !myShapeToPrsMap.IsEmpty();
@@ -93,9 +103,13 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(myWorkshop)->displayer();
   Handle(Prs3d_Drawer) aDrawer = Attributes();
   // create presentations on the base of the shapes
+  BRep_Builder aBuilder;
+  TopoDS_Compound aComp;
+  aBuilder.MakeCompound(aComp);
   for(NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)>::Iterator anIter(myShapeToPrsMap);
       anIter.More(); anIter.Next()) {
     const TopoDS_Shape& aShape = anIter.Key();
+    aBuilder.Add(aComp, aShape);
     // change deviation coefficient to provide more precise circle
     ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
 
@@ -113,13 +127,16 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
     }
     StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
   }
-
+  Set(aComp);
   if (!aReadyToDisplay) {
     Events_Error::throwException("An empty AIS presentation: PartSet_OperationPrs");
     std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
                 new Events_Message(Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION)));
     Events_Loop::loop()->send(aMsg);
   }
+#ifdef DEBUG_OPERATION_PRS
+  qDebug("PartSet_OperationPrs::Compute -- end");
+#endif
 }
 
 void PartSet_OperationPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,

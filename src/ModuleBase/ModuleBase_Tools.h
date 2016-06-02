@@ -24,6 +24,8 @@
 
 #include <map>
 
+class Handle_AIS_InteractiveContext;
+
 class QWidget;
 class QLayout;
 class QDoubleSpinBox;
@@ -139,6 +141,12 @@ MODULEBASE_EXPORT QAction* createAction(const QIcon& theIcon, const QString& the
 /// \param isUseAttributesInfo a flag whether the attribute values information is used
 /// \return a string
 MODULEBASE_EXPORT QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo = false);
+
+/// Converts the AIS context information in a string information.
+/// \param theContext a viewer context
+/// \param thePrefix additional information where the method is called
+MODULEBASE_EXPORT void selectionInfo(Handle_AIS_InteractiveContext& theContext,
+                                     const std::string& thePrefix);
 
 /// Converts string value (name of shape type) to shape enum value
 /// \param theType - string with shape type name

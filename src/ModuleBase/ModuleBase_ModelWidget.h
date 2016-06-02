@@ -46,9 +46,7 @@ Q_OBJECT
   /// a low-level API for reading xml definitions of widgets
   ModuleBase_ModelWidget(QWidget* theParent, const Config_WidgetAPI* theData);
   /// Destructor
-  virtual ~ModuleBase_ModelWidget()
-  {
-  }
+  virtual ~ModuleBase_ModelWidget();
 
   /// Fills the widget with default values. It calls the resetCustom method and change
   /// the widget state to Reset if the reset is performed.
