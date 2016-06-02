@@ -361,6 +361,10 @@ void PlaneGCSSolver_Storage::verifyFixed()
 
 void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
 {
+  // no need to constraint a fixed arc
+  if (theArc->group() == GID_OUTOFGROUP)
+    return;
+
   // Calculate additional parameters necessary for PlaneGCS
   const std::list<EntityWrapperPtr>& aSubs = theArc->subEntities();
   std::list<EntityWrapperPtr>::const_iterator aSubIt = aSubs.begin();

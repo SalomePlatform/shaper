@@ -328,7 +328,8 @@ bool SketchSolver_Group::resolveConstraints()
 {
   bool aResolved = false;
   bool isGroupEmpty = isEmpty() && myStorage->isEmpty();
-  if (myStorage->isNeedToResolve() && (!isGroupEmpty || !myConflictingConstraints.empty())) {
+  if (myStorage->isNeedToResolve() &&
+      (!isGroupEmpty || !myConflictingConstraints.empty() || myPrevResult == STATUS_FAILED)) {
     if (!mySketchSolver)
       mySketchSolver = SketchSolver_Manager::instance()->builder()->createSolver();
 
@@ -341,7 +342,7 @@ bool SketchSolver_Group::resolveConstraints()
     try {
       if (myStorage->hasDuplicatedConstraint())
         aResult = STATUS_INCONSISTENT;
-      else {
+      else if (!isGroupEmpty) {
         // To avoid overconstraint situation, we will remove temporary constraints one-by-one
         // and try to find the case without overconstraint
         bool isLastChance = false;
