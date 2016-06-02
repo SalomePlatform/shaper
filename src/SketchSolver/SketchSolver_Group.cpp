@@ -377,10 +377,11 @@ bool SketchSolver_Group::resolveConstraints()
       updateMultiConstraints(myConstraints);
       if (myPrevResult != STATUS_OK || myPrevResult == STATUS_UNKNOWN) {
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
+        std::set<ObjectPtr> aConflicting = myConflictingConstraints;
         myConflictingConstraints.clear();
         myPrevResult = STATUS_OK;
         // the error message should be changed before sending the message
-        sendMessage(EVENT_SOLVER_REPAIRED, myConflictingConstraints);
+        sendMessage(EVENT_SOLVER_REPAIRED, aConflicting);
       }
     } else {
       mySketchSolver->undo();

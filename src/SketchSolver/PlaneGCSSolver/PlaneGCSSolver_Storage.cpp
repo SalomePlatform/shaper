@@ -239,18 +239,20 @@ bool PlaneGCSSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
 bool PlaneGCSSolver_Storage::remove(EntityWrapperPtr theEntity)
 {
   bool isFullyRemoved = SketchSolver_Storage::remove(theEntity);
-  if (theEntity->type() == ENTITY_ARC) {
-    // remove arc additional constraints
-    std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >::iterator
-        aFound = myArcConstraintMap.find(theEntity);
-    if (aFound != myArcConstraintMap.end()) {
-      myRemovedConstraints.insert(myRemovedConstraints.end(),
-          aFound->second.begin(), aFound->second.end());
-      myArcConstraintMap.erase(aFound);
+  if (isFullyRemoved) {
+    if (theEntity->type() == ENTITY_ARC) {
+      // remove arc additional constraints
+      std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >::iterator
+          aFound = myArcConstraintMap.find(theEntity);
+      if (aFound != myArcConstraintMap.end()) {
+        myRemovedConstraints.insert(myRemovedConstraints.end(),
+            aFound->second.begin(), aFound->second.end());
+        myArcConstraintMap.erase(aFound);
+      }
     }
+    if (theEntity->id() == myEntityLastID)
+      --myEntityLastID;
   }
-  if (isFullyRemoved && theEntity->id() == myEntityLastID)
-    --myEntityLastID;
   return isFullyRemoved;
 }
 
