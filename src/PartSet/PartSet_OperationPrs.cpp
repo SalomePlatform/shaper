@@ -46,7 +46,7 @@
 #include <TopoDS_Compound.hxx>
 
 //#define DEBUG_EMPTY_SHAPE
-#define DEBUG_OPERATION_PRS
+//#define DEBUG_OPERATION_PRS
 
 // multi-rotation/translation operation
 //#define DEBUG_HIDE_COPY_ATTRIBUTE
