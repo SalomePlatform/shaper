@@ -748,34 +748,43 @@ const QStringList& PartSet_SketcherMgr::sketchOperationIdList()
     // TODO
     // SketchRectangle is a python feature, so its ID is passed just as a string
     aIds << "SketchRectangle";
+    aIds.append(replicationsIdList());
     aIds.append(constraintsIdList());
   }
   return aIds;
 }
 
+const QStringList& PartSet_SketcherMgr::replicationsIdList()
+{
+  static QStringList aReplicationIds;
+  if (aReplicationIds.size() == 0) {
+    aReplicationIds << SketchPlugin_ConstraintMirror::ID().c_str();
+    aReplicationIds << SketchPlugin_MultiRotation::ID().c_str();
+    aReplicationIds << SketchPlugin_MultiTranslation::ID().c_str();
+  }
+  return aReplicationIds;
+}
+
 const QStringList& PartSet_SketcherMgr::constraintsIdList()
 {
-  static QStringList aIds;
-  if (aIds.size() == 0) {
-    aIds << SketchPlugin_ConstraintLength::ID().c_str();
-    aIds << SketchPlugin_ConstraintDistance::ID().c_str();
-    aIds << SketchPlugin_ConstraintRigid::ID().c_str();
-    aIds << SketchPlugin_ConstraintRadius::ID().c_str();
-    aIds << SketchPlugin_ConstraintPerpendicular::ID().c_str();
-    aIds << SketchPlugin_ConstraintParallel::ID().c_str();
-    aIds << SketchPlugin_ConstraintHorizontal::ID().c_str();
-    aIds << SketchPlugin_ConstraintVertical::ID().c_str();
-    aIds << SketchPlugin_ConstraintEqual::ID().c_str();
-    aIds << SketchPlugin_ConstraintTangent::ID().c_str();
-    aIds << SketchPlugin_ConstraintCoincidence::ID().c_str();
-    aIds << SketchPlugin_ConstraintMirror::ID().c_str();
-    aIds << SketchPlugin_ConstraintAngle::ID().c_str();
-    aIds << SketchPlugin_MultiRotation::ID().c_str();
-    aIds << SketchPlugin_MultiTranslation::ID().c_str();
-    aIds << SketchPlugin_ConstraintCollinear::ID().c_str();
-    aIds << SketchPlugin_ConstraintMiddle::ID().c_str();
+  static QStringList aConstraintIds;
+  if (aConstraintIds.size() == 0) {
+    aConstraintIds << SketchPlugin_ConstraintLength::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintDistance::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintRigid::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintRadius::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintPerpendicular::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintParallel::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintHorizontal::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintVertical::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintEqual::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintTangent::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintCoincidence::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintAngle::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintCollinear::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintMiddle::ID().c_str();
   }
-  return aIds;
+  return aConstraintIds;
 }
 
 void PartSet_SketcherMgr::sketchSelectionModes(QIntList& theModes)

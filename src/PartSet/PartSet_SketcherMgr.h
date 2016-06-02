@@ -233,6 +233,9 @@ public:
   /// Returns list of strings which contains id's of sketch operations
   static const QStringList& sketchOperationIdList();
 
+  /// Returns list of strings which contains id's of sketch replication operations
+  static const QStringList& replicationsIdList();
+
   /// Returns list of strings which contains id's of constraints operations
   static const QStringList& constraintsIdList();
 
