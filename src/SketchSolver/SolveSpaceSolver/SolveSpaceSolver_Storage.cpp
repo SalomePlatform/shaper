@@ -78,8 +78,9 @@ bool SolveSpaceSolver_Storage::update(ConstraintWrapperPtr theConstraint)
     isUpdated = update(*anIt) || isUpdated;
     // do not update constrained entities for Multi constraints,
     // and for middle point constraint translated to equal lines
+    ConstraintPtr aBaseConstraint = theConstraint->baseConstraint();
     if (aSlvsConstr.type == SLVS_C_MULTI_ROTATION || aSlvsConstr.type == SLVS_C_MULTI_TRANSLATION ||
-       (theConstraint->baseConstraint()->getKind() == SketchPlugin_ConstraintMiddle::ID() &&
+       (aBaseConstraint && aBaseConstraint->getKind() == SketchPlugin_ConstraintMiddle::ID() &&
         aSlvsConstr.type != SLVS_C_AT_MIDPOINT))
       continue;
 
