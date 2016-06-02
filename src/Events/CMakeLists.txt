@@ -13,6 +13,7 @@ SET(PROJECT_HEADERS
     Events_Loop.h
     Events_Error.h
     Events_LongOp.h
+	Events_InfoMessage.h
 )
 
 SET(PROJECT_SOURCES

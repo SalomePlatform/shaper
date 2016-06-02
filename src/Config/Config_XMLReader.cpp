@@ -51,7 +51,8 @@ Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
 
   myDocumentPath = prefix + FSEP + theXmlFileName;
   std::ifstream aTestFile(myDocumentPath);
-  if (!aTestFile) Events_Error::send("Unable to open " + myDocumentPath);
+  if (!aTestFile) 
+    Events_Error::send("Unable to open " + myDocumentPath);
   aTestFile.close();
 }
 

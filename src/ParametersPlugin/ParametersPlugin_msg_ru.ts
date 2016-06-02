@@ -24,8 +24,9 @@
         <translation>Коментарий</translation>
     </message>
     <message>
+        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="188"/>
         <source>Parameters</source>
-        <translation type="obsolete">Параметры</translation>
+        <translation type="unfinished">Параметры</translation>
     </message>
     <message>
         <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="194"/>
@@ -62,9 +63,8 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="188"/>
         <source>Parameters</source>
-        <translation type="unfinished">Параметры</translation>
+        <translation type="obsolete">Параметры</translation>
     </message>
 </context>
 </TS>

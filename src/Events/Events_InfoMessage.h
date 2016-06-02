@@ -11,13 +11,13 @@
 #include <Events_Message.h>
 #include <Events_Loop.h>
 
-class EVENTS_EXPORT Events_InfoMessage: public Events_Message
+class Events_InfoMessage: public Events_Message
 {
 public:
   Events_InfoMessage(const void* theSender = 0) : 
       Events_Message(Events_Loop::eventByName("InfoMessage"), theSender) {}
 
-  void setContext(const std::string& theContext) { myContext = theContext; } 
+  void  setContext(const std::string& theContext) { myContext = theContext; } 
 
   std::string context() const { return myContext; }
 
@@ -33,7 +33,7 @@ public:
   void addParameter(double theParam) 
   { 
     char aBuf[50];
-    int n = sprintf(aBuf, "%g", theParam);
+    int n = sprintf_s(aBuf, "%g", theParam);
     std::string aStr(aBuf);
     myParameters.push_back(aStr); 
   }
@@ -41,7 +41,7 @@ public:
   void addParameter(int theParam) 
   { 
     char aBuf[50];
-    int n = sprintf(aBuf, "%d", theParam);
+    int n = sprintf_s(aBuf, "%d", theParam);
     std::string aStr(aBuf);
     myParameters.push_back(aStr); 
   }

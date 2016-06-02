@@ -78,6 +78,7 @@
 #include <Config_PropManager.h>
 #include <Config_SelectionFilterMessage.h>
 #include <Config_DataModelReader.h>
+#include <Config_Translator.h>
 
 #include <SUIT_ResourceMgr.h>
 
@@ -135,6 +136,15 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   else 
     QLocale::setDefault( QLocale::system() );
 #endif
+  QString aPath = Config_XMLReader::pluginConfigFile().c_str();
+  QDir aDir(aPath);
+
+  QStringList aFilters;
+  aFilters << "*_en.ts";
+  QStringList aTsFiles = aDir.entryList(aFilters, QDir::Files);
+  foreach(QString aFileName, aTsFiles) {
+    Config_Translator::load(aFileName.toStdString());
+  }
 
   myDataModelXMLReader = new Config_DataModelReader();
   myDataModelXMLReader->readAll();
