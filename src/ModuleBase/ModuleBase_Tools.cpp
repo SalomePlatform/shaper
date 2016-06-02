@@ -35,6 +35,7 @@
 #include <TopoDS_Iterator.hxx>
 
 #include <GeomDataAPI_Point2D.h>
+#include <GeomAPI_ShapeExplorer.h>
 #include <Events_Error.h>
 
 #include <Config_PropManager.h>
@@ -54,6 +55,7 @@
 #include <string>
 
 const double tolerance = 1e-7;
+const double DEFAULT_DEVIATION_COEFFICIENT = 1.e-4;
 
 //#define DEBUG_ACTIVATE_WINDOW
 //#define DEBUG_SET_FOCUS
@@ -557,14 +559,34 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
   }
 }
 
+bool setDefaultDeviationCoefficient(std::shared_ptr<GeomAPI_Shape> theGeomShape)
+{
+  if (!theGeomShape.get())
+    return false;
+  // if the shape could not be exploded on faces, it contains only wires, edges, and vertices
+  // correction of deviation for them should not influence to the application performance
+  GeomAPI_ShapeExplorer anExp(theGeomShape, GeomAPI_Shape::FACE);
+  bool anEmpty = anExp.empty();
+  return !anExp.more();
+}
+
 void setDefaultDeviationCoefficient(const std::shared_ptr<ModelAPI_Result>& theResult,
                                     const Handle(Prs3d_Drawer)& theDrawer)
 {
   if (!theResult.get())
     return;
+  bool aUseDeviation = false;
 
-  if (theResult->groupName() == ModelAPI_ResultConstruction::group())
-    theDrawer->SetDeviationCoefficient(1.e-4);
+  std::string aResultGroup = theResult->groupName();
+  if (aResultGroup == ModelAPI_ResultConstruction::group())
+    aUseDeviation = true;
+  else if (aResultGroup == ModelAPI_ResultBody::group()) {
+    GeomShapePtr aGeomShape = theResult->shape();
+    if (aGeomShape.get())
+      aUseDeviation = setDefaultDeviationCoefficient(aGeomShape);
+  }
+  if (aUseDeviation)
+    theDrawer->SetDeviationCoefficient(DEFAULT_DEVIATION_COEFFICIENT);
 }
 
 void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
@@ -572,9 +594,11 @@ void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
 {
   if (theShape.IsNull())
     return;
-  TopAbs_ShapeEnum aType = theShape.ShapeType();
-  if ((aType == TopAbs_EDGE) || (aType == TopAbs_WIRE)) 
-    theDrawer->SetDeviationCoefficient(1.e-4);
+
+  std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape());
+  aGeomShape->setImpl(new TopoDS_Shape(theShape));
+  if (setDefaultDeviationCoefficient(aGeomShape))
+    theDrawer->SetDeviationCoefficient(DEFAULT_DEVIATION_COEFFICIENT);
 }
 
 Quantity_Color color(const std::string& theSection,
