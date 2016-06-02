@@ -111,6 +111,7 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
     const TopoDS_Shape& aShape = anIter.Key();
     aBuilder.Add(aComp, aShape);
     // change deviation coefficient to provide more precise circle
+    // as there is no result, the shape is processed to correct deviation. To be unified
     ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
 
     if (myUseAISWidth) {

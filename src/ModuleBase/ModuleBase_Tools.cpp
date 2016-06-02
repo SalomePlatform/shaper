@@ -21,6 +21,7 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttrList.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_ResultConstruction.h>
 #include <Events_Loop.h>
 
 #include <ModelAPI_Data.h>
@@ -554,6 +555,16 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
     if (hasFeature && hasResult  && hasParameter && hasCompositeOwner)
       break;
   }
+}
+
+void setDefaultDeviationCoefficient(const std::shared_ptr<ModelAPI_Result>& theResult,
+                                    const Handle(Prs3d_Drawer)& theDrawer)
+{
+  if (!theResult.get())
+    return;
+
+  if (theResult->groupName() == ModelAPI_ResultConstruction::group())
+    theDrawer->SetDeviationCoefficient(1.e-4);
 }
 
 void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,

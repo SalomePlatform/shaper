@@ -88,7 +88,7 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
   setAuxiliaryPresentationStyle(false);
 
   // change deviation coefficient to provide more precise circle
-  ModuleBase_Tools::setDefaultDeviationCoefficient(Shape(), Attributes());
+  ModuleBase_Tools::setDefaultDeviationCoefficient(myResult, Attributes());
   AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
 
   if (!myAuxiliaryCompound.IsNull()) {

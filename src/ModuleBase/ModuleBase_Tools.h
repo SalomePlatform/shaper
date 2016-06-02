@@ -170,6 +170,15 @@ MODULEBASE_EXPORT void checkObjects(const QObjectPtrList& theObjects, bool& hasR
                            bool& hasFeature, bool& hasParameter, bool& hasCompositeOwner);
 
 /*! Sets the default coeffient into the driver calculated accordingly the shape type.
+It provides 1.e-4 for results of construction type
+\param theResult a result object to define the deviation coeffient
+\param theDrawer a drawer
+*/
+MODULEBASE_EXPORT void setDefaultDeviationCoefficient(
+                           const std::shared_ptr<ModelAPI_Result>& theResult,
+                           const Handle(Prs3d_Drawer)& theDrawer);
+
+/*! Sets the default coeffient into the driver calculated accordingly the shape type.
 It provides 1.e-4 for a shape withe Edge shape type
 \param theShape a shape to define the deviation coeffient, 
 \param theDrawer a drawer
