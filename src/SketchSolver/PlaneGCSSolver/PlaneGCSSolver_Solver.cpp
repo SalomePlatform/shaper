@@ -15,9 +15,7 @@ PlaneGCSSolver_Solver::~PlaneGCSSolver_Solver()
 
 void PlaneGCSSolver_Solver::clear()
 {
-  std::set<GCS::Constraint*>::const_iterator anIt = myConstraints.begin();
-  for (; anIt != myConstraints.end(); ++anIt)
-    myEquationSystem.removeConstraint(*anIt);
+  myEquationSystem.clear();
   myConstraints.clear();
   myParameters.clear();
 }
@@ -80,8 +78,10 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
   if (aResult == GCS::Success) {
     myEquationSystem.applySolution();
     aStatus = STATUS_OK;
-  } else
+  } else {
+    undo();
     aStatus = STATUS_FAILED;
+  }
 
   return aStatus;
 }

@@ -239,6 +239,16 @@ bool PlaneGCSSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
 bool PlaneGCSSolver_Storage::remove(EntityWrapperPtr theEntity)
 {
   bool isFullyRemoved = SketchSolver_Storage::remove(theEntity);
+  if (theEntity->type() == ENTITY_ARC) {
+    // remove arc additional constraints
+    std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >::iterator
+        aFound = myArcConstraintMap.find(theEntity);
+    if (aFound != myArcConstraintMap.end()) {
+      myRemovedConstraints.insert(myRemovedConstraints.end(),
+          aFound->second.begin(), aFound->second.end());
+      myArcConstraintMap.erase(aFound);
+    }
+  }
   if (isFullyRemoved && theEntity->id() == myEntityLastID)
     --myEntityLastID;
   return isFullyRemoved;
@@ -257,6 +267,7 @@ bool PlaneGCSSolver_Storage::remove(ParameterWrapperPtr theParameter)
     if (anIt != myParameters.end()) {
       myParameters.erase(anIt);
       setNeedToResolve(true);
+      aParam->setProcessed(false);
     }
     else {
       for (anIt = myConst.begin(); anIt != myConst.end(); ++anIt)
@@ -265,10 +276,10 @@ bool PlaneGCSSolver_Storage::remove(ParameterWrapperPtr theParameter)
       if (anIt != myConst.end()) {
         myConst.erase(anIt);
         setNeedToResolve(true);
+        aParam->setProcessed(false);
       }
     }
   }
-  aParam->setProcessed(false);
   return true;
 }
 
@@ -531,6 +542,7 @@ void PlaneGCSSolver_Storage::initializeSolver(SolverPtr theSolver)
       std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(theSolver);
   if (!aSolver)
     return;
+  aSolver->clear();
 
   if (myExistArc)
     processArcs();

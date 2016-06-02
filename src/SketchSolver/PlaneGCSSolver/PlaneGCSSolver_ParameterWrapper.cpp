@@ -16,7 +16,8 @@ PlaneGCSSolver_ParameterWrapper::PlaneGCSSolver_ParameterWrapper(double *const t
 
 PlaneGCSSolver_ParameterWrapper::~PlaneGCSSolver_ParameterWrapper()
 {
-  delete myValue;
+  if (!myProcessing)
+    delete myValue;
 }
 
 void PlaneGCSSolver_ParameterWrapper::setValue(double theValue)

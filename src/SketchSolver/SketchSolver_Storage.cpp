@@ -602,8 +602,13 @@ bool SketchSolver_Storage::remove(EntityWrapperPtr theEntity)
     FeaturePtr aBaseFeature = (*anEntIt)->baseFeature();
     if (aBaseFeature)
       isFullyRemoved = SketchSolver_Storage::removeEntity(aBaseFeature) && isFullyRemoved;
-    else
-      isFullyRemoved = SketchSolver_Storage::removeEntity((*anEntIt)->baseAttribute()) && isFullyRemoved;
+    else {
+      AttributePtr aBaseAttr = (*anEntIt)->baseAttribute();
+      if (aBaseAttr)
+        isFullyRemoved = SketchSolver_Storage::removeEntity(aBaseAttr) && isFullyRemoved;
+      else
+        remove(*anEntIt);
+    }
   }
 
   std::list<ParameterWrapperPtr>::const_iterator aParIt = theEntity->parameters().begin();
