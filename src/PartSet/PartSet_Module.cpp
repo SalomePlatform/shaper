@@ -446,8 +446,9 @@ bool PartSet_Module::canApplyAction(const ObjectPtr& theObject, const QString& t
   if (theActionId == "MOVE_CMD") {
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     if (aFeature) {
+      ResultPtr aResult = ModuleBase_Tools::firstResult(aFeature);
       // part features can not be moved in the history.
-      if (aFeature->getKind() == PartSetPlugin_Part::ID())
+      if (aResult.get() && aResult->groupName() == ModelAPI_ResultPart::group())
         aValid = false;
     }
   }

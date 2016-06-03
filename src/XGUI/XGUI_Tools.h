@@ -81,10 +81,10 @@ std::string XGUI_EXPORT featureInfo(FeaturePtr theFeature);
  all objects in the list are not PartSet document.
  It shows the warning control if the result is false.
  \param theParent a parent for the warning control
- \param aList a list of object
+ \param theFeatures a list of checked features
  \return a boolean value
  */
-bool XGUI_EXPORT canRemoveOrRename(QWidget* theParent, const QObjectPtrList& aList);
+bool XGUI_EXPORT canRemoveOrRename(QWidget* theParent, const std::set<FeaturePtr>& theFeatures);
 
 /*! 
  Check possibility to rename object

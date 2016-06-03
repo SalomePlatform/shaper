@@ -61,6 +61,9 @@ Q_OBJECT
   /// \return a list of group names
   QStringList actionObjectGroups(const QString& theName);
 
+  /// Updates menu for object browser
+  void updateObjectBrowserMenu();
+
   /// Updates menu for viewer
   void updateViewerMenu();
 
@@ -102,9 +105,6 @@ signals:
   void addAction(const QString& theId, QAction* theAction);
 
   void addFeatures(QMenu* theMenu) const;
-
-  /// Updates menu for object browser
-  void updateObjectBrowserMenu();
 
   /// Creates menu for object browser
   void buildObjBrowserMenu();

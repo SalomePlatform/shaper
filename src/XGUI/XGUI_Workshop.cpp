@@ -1279,9 +1279,6 @@ void XGUI_Workshop::deleteObjects()
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
   if (!abortAllOperations())
     return;
-  // check whether the object can be deleted. There should not be parts which are not loaded
-  if (!XGUI_Tools::canRemoveOrRename(desktop(), anObjects))
-    return;
 
   bool hasResult = false;
   bool hasFeature = false;
@@ -1480,20 +1477,21 @@ void XGUI_Workshop::moveObjects()
   // moving and negative consequences connected with processing of already moved items
   mySelector->clearSelection();
   // check whether the object can be moved. There should not be parts which are not loaded
-  if (!XGUI_Tools::canRemoveOrRename(desktop(), anObjects))
+  std::set<FeaturePtr> aFeatures;
+  ModuleBase_Tools::convertToFeatures(anObjects, aFeatures);
+  if (!XGUI_Tools::canRemoveOrRename(desktop(), aFeatures))
     return;
 
   DocumentPtr anActiveDocument = aMgr->activeDocument();
   FeaturePtr aCurrentFeature = anActiveDocument->currentFeature(true);
-  foreach (ObjectPtr aObject, anObjects) {
-    if (!myModule->canApplyAction(aObject, anActionId))
+  std::set<FeaturePtr>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aFeature = *anIt;
+    if (!aFeature.get() || !myModule->canApplyAction(aFeature, anActionId))
       continue;
 
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
-    if (aFeature.get()) {
-      anActiveDocument->moveFeature(aFeature, aCurrentFeature);
-      aCurrentFeature = anActiveDocument->currentFeature(true);
-    }
+    anActiveDocument->moveFeature(aFeature, aCurrentFeature);
+    aCurrentFeature = anActiveDocument->currentFeature(true);
   }
   aMgr->finishOperation();
 }

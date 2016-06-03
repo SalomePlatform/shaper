@@ -38,63 +38,55 @@ class GeomAPI_Shape;
 
 namespace ModuleBase_Tools {
 
-/*
- * Methods to adjust margins and spacings.
- */
+/// Methods to adjust margins and spacings.
 MODULEBASE_EXPORT void adjustMargins(QWidget* theWidget);
 MODULEBASE_EXPORT void adjustMargins(QLayout* theLayout);
 
 MODULEBASE_EXPORT void zeroMargins(QWidget* theWidget);
 MODULEBASE_EXPORT void zeroMargins(QLayout* theLayout);
 
-/*
- * Calls the same-named Qt method for the given widget.
- * It sets the top-level widget containing this widget to be the active window.
- * An active window is a visible top-level window that has the keyboard input focus.
- * \param theWidget a widget to be activated
- * \param theIndo a debug information
- */
+/// Calls the same-named Qt method for the given widget.
+/// It sets the top-level widget containing this widget to be the active window.
+/// An active window is a visible top-level window that has the keyboard input focus.
+/// \param theWidget a widget to be activated
+/// \param theIndo a debug information
 MODULEBASE_EXPORT void activateWindow(QWidget* theWidget, const QString& theInfo = QString());
 
-/*
- * Calls the same-named Qt method for the given widget.
- * Gives the keyboard input focus to this widget (or its focus proxy) if this widget or
- * one of its parents is the active window.
- * \param theWidget a widget to be activated
- * \param theIndo a debug information
- */
+/// Calls the same-named Qt method for the given widget.
+/// Gives the keyboard input focus to this widget (or its focus proxy) if this widget or
+/// one of its parents is the active window.
+/// \param theWidget a widget to be activated
+/// \param theIndo a debug information
 MODULEBASE_EXPORT void setFocus(QWidget* theWidget, const QString& theInfo = QString());
 
 
-//! Sets or removes the shadow effect to the widget
-//! \param theWidget a widget to be styled
-//! \param isSetEffect if true, the shadow effect is set, overwise cleared
-//! \return resulting pixmap
+/// Sets or removes the shadow effect to the widget
+/// \param theWidget a widget to be styled
+/// \param isSetEffect if true, the shadow effect is set, overwise cleared
+/// \return resulting pixmap
 MODULEBASE_EXPORT void setShadowEffect(QWidget* theWidget, const bool isSetEffect);
 
-/**
- * \ingroup GUI
- * Methods to modify a resource pixmap
- */
+/// \ingroup GUI
+/// Methods to modify a resource pixmap
 
-//! Create composite pixmap. 
-//! Pixmap \a theAdditionalIcon is drawn over pixmap \a dest with coordinates
-//! specified relatively to the upper left corner of \a theIcon.
+/// Create composite pixmap. 
+/// Pixmap \a theAdditionalIcon is drawn over pixmap \a dest with coordinates
+/// specified relatively to the upper left corner of \a theIcon.
 
-//! \param theAdditionalIcon resource text of the additional pixmap
-//! \param theIcon resource text of the background pixmap
-//! \return resulting pixmap
+/// \param theAdditionalIcon resource text of the additional pixmap
+/// \param theIcon resource text of the background pixmap
+/// \return resulting pixmap
 MODULEBASE_EXPORT QPixmap composite(const QString& theAdditionalIcon, const QString& theIcon);
 
-//! Generates the pixmap lighter than the resources pixmap. 
-//! Pixmap \a theIcon is lighted according to the given value.
-//! If the lighter value is greater than 100, this functions returns a lighter pixmap.
-//! Setting lighter value to 150 returns a color that is 50% brighter. If the factor is less than 100,
-//! the return pixmap is darker. If the factor is 0 or negative, the return pixmap is unspecified.
+/// Generates the pixmap lighter than the resources pixmap. 
+/// Pixmap \a theIcon is lighted according to the given value.
+/// If the lighter value is greater than 100, this functions returns a lighter pixmap.
+/// Setting lighter value to 150 returns a color that is 50% brighter. If the factor is less than 100,
+/// the return pixmap is darker. If the factor is 0 or negative, the return pixmap is unspecified.
 
-//! \param resource text of the pixmap
-//! \param theLighterValue a lighter factor
-//! \return resulting pixmap
+/// \param resource text of the pixmap
+/// \param theLighterValue a lighter factor
+/// \return resulting pixmap
 MODULEBASE_EXPORT QPixmap lighter(const QString& theIcon, const int theLighterValue = 200);
 
 /// Sets programmatically the value to the spin box without emitting any signals(e.g. valueChanged)
@@ -158,44 +150,38 @@ MODULEBASE_EXPORT TopAbs_ShapeEnum shapeType(const QString& theType);
 /// \return boolean result
 MODULEBASE_EXPORT bool isSubResult(ObjectPtr theObject);
 
-/*!
-Check types of objects which are in the given list
-\param theObjects the list of objects
-\param hasResult will be set to true if list contains Result objects
-\param hasFeature will be set to true if list contains Feature objects
-\param hasParameter will be set to true if list contains Parameter objects
-\param hasCompositeOwner will be set to true if list contains Sub-Feature objects
-*/
+/// Check types of objects which are in the given list
+/// \param theObjects the list of objects
+/// \param hasResult will be set to true if list contains Result objects
+/// \param hasFeature will be set to true if list contains Feature objects
+/// \param hasParameter will be set to true if list contains Parameter objects
+/// \param hasCompositeOwner will be set to true if list contains Sub-Feature objects
 MODULEBASE_EXPORT void checkObjects(const QObjectPtrList& theObjects, bool& hasResult,
                            bool& hasFeature, bool& hasParameter, bool& hasCompositeOwner);
 
-/*! Sets the default coeffient into the driver calculated accordingly the shape type.
-It provides 1.e-4 for results of construction type
-\param theResult a result object to define the deviation coeffient
-\param theDrawer a drawer
-*/
+/// Sets the default coeffient into the driver calculated accordingly the shape type.
+/// It provides 1.e-4 for results of construction type
+/// \param theResult a result object to define the deviation coeffient
+/// \param theDrawer a drawer
 MODULEBASE_EXPORT void setDefaultDeviationCoefficient(
                            const std::shared_ptr<ModelAPI_Result>& theResult,
                            const Handle(Prs3d_Drawer)& theDrawer);
 
-/*! Sets the default coeffient into the driver calculated accordingly the shape type.
-It provides 1.e-4 for a shape withe Edge shape type
-\param theShape a shape to define the deviation coeffient, 
-\param theDrawer a drawer
-*/
+/// Sets the default coeffient into the driver calculated accordingly the shape type.
+/// It provides 1.e-4 for a shape withe Edge shape type
+/// \param theShape a shape to define the deviation coeffient, 
+/// \param theDrawer a drawer
 MODULEBASE_EXPORT void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
                                                       const Handle(Prs3d_Drawer)& theDrawer);
 
-/*! Obtains the color from the property manager and converts it to the OCCT color
-\param theSection a property section
-\param theName a property item name
-\param theDefault a default color value
-\return quantity color
-*/
+/// Obtains the color from the property manager and converts it to the OCCT color
+/// \param theSection a property section
+/// \param theName a property item name
+/// \param theDefault a default color value
+/// \return quantity color
 MODULEBASE_EXPORT Quantity_Color color(const std::string& theSection,
                                        const std::string& theName,
                                        const std::string& theDefault);
-
 
 /// Returns the object from the attribute
 /// \param theObj an object
@@ -264,54 +250,56 @@ MODULEBASE_EXPORT void blockUpdateViewer(const bool theValue);
 MODULEBASE_EXPORT QString wrapTextByWords(const QString& theValue, QWidget* theWidget,
                                              int theMaxLineInPixels = 150);
 
-/*!
-  Returns a container of referenced feature to the current object in the object document.
-  \param theObject an object, which will be casted to a feature type
-  \param theRefFeatures an output container
- */
+/// Returns a container of referenced feature to the current object in the object document.
+/// \param theObject an object, which will be casted to a feature type
+/// \param theRefFeatures an output container
 void MODULEBASE_EXPORT refsToFeatureInFeatureDocument(const ObjectPtr& theObject,
                                                       std::set<FeaturePtr>& theRefFeatures);
 
 
-/*!
- Returns true if the object if a sub child of the feature. The feature is casted to the
- composite one. If it is possible, the sub object check happens. The method is applyed
- recursively to the feature subs.
- \param theObject a candidate to be a sub object
- \param theFeature a candidate to be a composite feature
- \return a boolean value
- */
+/// Returns true if the object if a sub child of the feature. The feature is casted to the
+/// composite one. If it is possible, the sub object check happens. The method is applyed
+/// recursively to the feature subs.
+/// \param theObject a candidate to be a sub object
+/// \param theFeature a candidate to be a composite feature
+/// \return a boolean value
 bool MODULEBASE_EXPORT isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature);
 
 
-/*!
-* Returns true if the result is a sub object of some composite object
-* \param theObject a result object
-* \returns boolean value
-*/
+/// Returns true if the result is a sub object of some composite object
+/// \param theObject a result object
+/// \returns boolean value
 bool MODULEBASE_EXPORT isSubOfComposite(const ObjectPtr& theObject);
 
 
-/*!
-* Shows a dialog box about references. Ask whether they should be also removed.
-* \param theFeatures a list of features
-* \param theReferences a map of all references to the features
-* \param theParent a parent widget for the question message box
-* \param theReferencesToDelete an out set for references features to be removed
-* \return true if in message box answer is Yes
-*/
+/// Returns first result of the feature: the object itself if it is a result of
+/// first result of the object's feature
+/// \param theObject an object
+/// \return first result or NULL
+std::shared_ptr<ModelAPI_Result> MODULEBASE_EXPORT firstResult(const ObjectPtr& theObject);
+
+/// Returns true if the list contains at least one feature from the module document(PartSet)
+/// The Part features are skipped.
+/// \param theFeatures a list of features
+/// \bool true if it is found
+bool MODULEBASE_EXPORT hasModuleDocumentFeature(const std::set<FeaturePtr>& theFeatures);
+
+/// Shows a dialog box about references. Ask whether they should be also removed.
+/// \param theFeatures a list of features
+/// \param theReferences a map of all references to the features
+/// \param theParent a parent widget for the question message box
+/// \param theReferencesToDelete an out set for references features to be removed
+/// \return true if in message box answer is Yes
 bool MODULEBASE_EXPORT askToDelete(const std::set<FeaturePtr> aFeatures,
                                    const std::map<FeaturePtr, std::set<FeaturePtr> >& theReferences,
                                    QWidget* theParent,
                                    std::set<FeaturePtr>& theReferencesToDelete);
 
-/*!
-* Converts a list of objects to set of corresponded features. If object is result, it is ingored
-* because the feauture only might be removed. But if result is in a parameter group, the feature
-* of this parameter is to be removed
-* \param theObjects a list of objects
-* \param theFeatures an out conteiner of features
-*/
+/// Converts a list of objects to set of corresponded features. If object is result, it is ingored
+/// because the feauture only might be removed. But if result is in a parameter group, the feature
+/// of this parameter is to be removed
+/// \param theObjects a list of objects
+/// \param theFeatures an out conteiner of features
 void MODULEBASE_EXPORT convertToFeatures(const QObjectPtrList& theObjects, std::set<FeaturePtr>& theFeatures);
 
 }

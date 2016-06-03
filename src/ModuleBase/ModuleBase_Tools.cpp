@@ -962,6 +962,18 @@ bool isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature)
 }
 
 //**************************************************************
+ResultPtr firstResult(const ObjectPtr& theObject)
+{
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+  if (!aResult.get()) {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+    if (aFeature.get())
+      aResult = aFeature->firstResult();
+  }
+  return aResult;
+}
+
+//**************************************************************
 bool isFeatureOfResult(const FeaturePtr& theFeature, const std::string& theGroupOfResult)
 {
   bool isResult = false;
@@ -977,14 +989,41 @@ bool isFeatureOfResult(const FeaturePtr& theFeature, const std::string& theGroup
 }
 
 //**************************************************************
+bool hasModuleDocumentFeature(const std::set<FeaturePtr>& theFeatures)
+{
+  bool aFoundModuleDocumentObject = false;
+  DocumentPtr aModuleDoc = ModelAPI_Session::get()->moduleDocument();
+
+  std::set<FeaturePtr>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
+  for (; anIt != aLast && !aFoundModuleDocumentObject; anIt++) {
+    FeaturePtr aFeature = *anIt;
+    ResultPtr aResult = ModuleBase_Tools::firstResult(aFeature);
+    if (aResult.get() && aResult->groupName() == ModelAPI_ResultPart::group())
+      continue;
+    aFoundModuleDocumentObject = aFeature->document() == aModuleDoc;
+  }
+
+  return aFoundModuleDocumentObject;
+}
+
+//**************************************************************
 bool askToDelete(const std::set<FeaturePtr> theFeatures,
                  const std::map<FeaturePtr, std::set<FeaturePtr> >& theReferences,
                  QWidget* theParent,
                  std::set<FeaturePtr>& theReferencesToDelete)
 {
+  QString aNotActivatedDocWrn;
+  std::string aNotActivatedNames;
+  if (!ModelAPI_Tools::allDocumentsActivated(aNotActivatedNames)) {
+    if (ModuleBase_Tools::hasModuleDocumentFeature(theFeatures))
+      aNotActivatedDocWrn = QObject::tr("Selected objects can be used in Part documents which are not loaded:%1.\n")
+                            .arg(aNotActivatedNames.c_str());
+  }
+  
   std::set<FeaturePtr> aFeaturesRefsTo;
   std::set<FeaturePtr> aFeaturesRefsToParameter;
   std::set<FeaturePtr> aParameterFeatures;
+  QStringList aPartFeatureNames;
   std::set<FeaturePtr>::const_iterator anIt = theFeatures.begin(),
                                        aLast = theFeatures.end();
   // separate features to references to parameter features and references to others
@@ -992,6 +1031,9 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
     FeaturePtr aFeature = *anIt;
     if (theReferences.find(aFeature) == theReferences.end())
       continue;
+
+    if (isFeatureOfResult(aFeature, ModelAPI_ResultPart::group()))
+      aPartFeatureNames.append(aFeature->name().c_str());
 
     std::set<FeaturePtr> aRefFeatures;
     std::set<FeaturePtr> aRefList = theReferences.at(aFeature);
@@ -1025,7 +1067,7 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
     }
   }
   aParamFeatureNames.sort();
-  QStringList aPartFeatureNames, anOtherFeatureNames;
+  QStringList anOtherFeatureNames;
   anIt = theReferencesToDelete.begin();
   aLast = theReferencesToDelete.end();
   for (; anIt != aLast; anIt++) {
@@ -1050,6 +1092,8 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
   QString aSep = ", ";
   if (!aPartFeatureNames.empty())
     aText += QString(QObject::tr("The following parts will be deleted: %1.\n")).arg(aPartFeatureNames.join(aSep));
+  if (!aNotActivatedDocWrn.isEmpty())
+    aText += aNotActivatedDocWrn;
   if (!anOtherFeatureNames.empty())
     aText += QString(QObject::tr("Selected features are used in the following features: %1.\nThese features will be deleted.\n"))
                      .arg(anOtherFeatureNames.join(aSep));

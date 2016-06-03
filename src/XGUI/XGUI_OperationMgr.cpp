@@ -10,6 +10,7 @@
 #include "XGUI_ErrorMgr.h"
 #include "XGUI_Tools.h"
 #include "XGUI_ObjectsBrowser.h"
+#include "XGUI_ContextMenuMgr.h"
 
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_ModelWidget.h>
@@ -686,12 +687,25 @@ bool XGUI_OperationMgr::onProcessDelete(QObject* theObject)
     /// processing delete by workshop
     XGUI_ObjectsBrowser* aBrowser = XGUI_Tools::workshop(myWorkshop)->objectBrowser();
     QWidget* aViewPort = myWorkshop->viewer()->activeViewPort();
-    // property panel child object is processed to process delete performed on Apply button of PP
-    if (theObject == aBrowser->treeView() ||
-        isChildObject(theObject, aViewPort) ||
-        isPPChildObject)
-      XGUI_Tools::workshop(myWorkshop)->deleteObjects();
-    isAccepted = true;
+    bool isToDeleteObject = false;
+    XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
+    XGUI_ContextMenuMgr* aContextMenuMgr = aWorkshop->contextMenuMgr();
+    if (theObject == aBrowser->treeView()) {
+      aContextMenuMgr->updateObjectBrowserMenu();
+      isToDeleteObject = aContextMenuMgr->action("DELETE_CMD")->isEnabled();
+    }
+    else if (isChildObject(theObject, aViewPort)) {
+      aContextMenuMgr->updateViewerMenu();
+      isToDeleteObject = aContextMenuMgr->action("DELETE_CMD")->isEnabled();
+    }
+    else if (isPPChildObject) {
+      // property panel child object is processed to process delete performed on Apply button of PP
+      isToDeleteObject = true;
+    }
+    if (isToDeleteObject) {
+      aWorkshop->deleteObjects();
+      isAccepted = true;
+    }
   }
 
   return isAccepted;

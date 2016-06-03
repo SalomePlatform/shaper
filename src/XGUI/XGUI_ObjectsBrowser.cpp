@@ -424,19 +424,19 @@ void XGUI_ObjectsBrowser::onEditItem()
 {
   QObjectPtrList aSelectedData = selectedObjects();
   if (aSelectedData.size() > 0) {
-    ObjectPtr aFeature = aSelectedData.first();
-    if (aFeature) {  // Selection happens in TreeView
-      QObjectPtrList aList;
-      aList.append(aFeature);
-      // check whether the object can be deleted. There should not be parts which are not loaded
-      if (!XGUI_Tools::canRemoveOrRename((QWidget*)parent(), aList))
+    ObjectPtr anObject = aSelectedData.first();
+    if (anObject.get()) {  // Selection happens in TreeView
+      // check whether the object can be renamed. There should not be parts which are not loaded
+      std::set<FeaturePtr> aFeatures;
+      aFeatures.insert(ModelAPI_Feature::feature(anObject));
+      if (!XGUI_Tools::canRemoveOrRename((QWidget*)parent(), aFeatures))
         return;
 
       // Find index which corresponds the feature
       QModelIndex aIndex;
       foreach(QModelIndex aIdx, selectedIndexes()) {
         ObjectPtr aFea = dataModel()->object(aIdx);
-        if (dataModel()->object(aIdx)->isSame(aFeature)) {
+        if (dataModel()->object(aIdx)->isSame(anObject)) {
           aIndex = aIdx;
           break;
         }

@@ -6,6 +6,7 @@
 #include "XGUI_Workshop.h"
 
 #include "ModuleBase_IWorkshop.h"
+#include "ModuleBase_Tools.h"
 
 #include <TopoDS_Shape.hxx>
 #include <ModelAPI_Object.h>
@@ -103,19 +104,14 @@ std::string featureInfo(FeaturePtr theFeature)
  }
  }*/
 
+
 //******************************************************************
-bool canRemoveOrRename(QWidget* theParent, const QObjectPtrList& theObjects)
+bool canRemoveOrRename(QWidget* theParent, const std::set<FeaturePtr>& theFeatures)
 {
   bool aResult = true;
   std::string aNotActivatedNames;
   if (!ModelAPI_Tools::allDocumentsActivated(aNotActivatedNames)) {
-    DocumentPtr aModuleDoc = ModelAPI_Session::get()->moduleDocument();
-    bool aFoundPartSetObject = false;
-    foreach (ObjectPtr aObj, theObjects) {
-      if (aObj->groupName() == ModelAPI_ResultPart::group())
-        continue;
-      aFoundPartSetObject = aObj->document() == aModuleDoc;
-    }
+    bool aFoundPartSetObject = ModuleBase_Tools::hasModuleDocumentFeature(theFeatures);
     if (aFoundPartSetObject) {
       QMessageBox::StandardButton aRes = QMessageBox::warning(theParent, QObject::tr("Warning"),
                QObject::tr("Selected objects can be used in Part documents which are not loaded: \
