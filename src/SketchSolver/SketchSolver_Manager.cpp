@@ -491,7 +491,15 @@ void SketchSolver_Manager::degreesOfFreedom()
   std::list<SketchSolver_Group*>::const_iterator aGroupIt = myGroups.begin();
   for (; aGroupIt != myGroups.end(); ++aGroupIt) {
     CompositeFeaturePtr aSketch = (*aGroupIt)->getWorkplane();
-    if (!aSketch->data()->isValid()) {
+    bool isSketchValid = aSketch->data() && aSketch->data()->isValid();
+
+    if (isSketchValid) {
+      std::shared_ptr<GeomDataAPI_Dir> aNormal =
+          std::dynamic_pointer_cast<GeomDataAPI_Dir>(aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
+      isSketchValid = aNormal && aNormal->isInitialized();
+    }
+
+    if (!isSketchValid) {
       myDoF.erase(aSketch);
       continue;
     }
