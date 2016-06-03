@@ -73,33 +73,52 @@ bool Config_Translator::load(const std::string& theFileName)
   return true;
 }
 
-std::string Config_Translator::translate(const Events_InfoMessage& theInfo)
+std::string Config_Translator::translate(std::shared_ptr<Events_InfoMessage> theInfo)
 {
-  std::string aContext = theInfo.context();
-  std::string aMessage = theInfo.message();
-  std::list<std::string> aParameters = theInfo.parameters();
-  if (myTranslator.count(aContext) > 0) {
-    if (myTranslator[aContext].count(aMessage) > 0) {
-      std::string aTranslation = myTranslator[aContext][aMessage];
-      if (aParameters.size() > 0) {
-        std::list<std::string>::const_iterator aIt;
-        int i;
-        char aBuf[20];
-        std::string aParam;
-        for (i=1, aIt = aParameters.cbegin(); aIt != aParameters.cend(); aIt++, i++) {
-          aParam = (*aIt);
-          sprintf(aBuf, "%d ", i);
-          std::string aCode = std::string("%") + std::string(aBuf);
-          size_t aPos = aTranslation.find(aCode);
-          if (aPos != std::string::npos) {
-            std::string aFirst = aTranslation.substr(0, aPos);
-            std::string aLast = aTranslation.substr(aPos + aCode.length(), std::string::npos);
-            aTranslation = aFirst + aParam + aLast;
-          }
-        }
+  std::string aContext = theInfo->context();
+  std::string aMessage = theInfo->message();
+  std::list<std::string> aParameters = theInfo->parameters();
+  return translate(aContext, aMessage, aParameters);
+}
+
+
+std::string insertParameters(const std::string& theString, const std::list<std::string>& theParams)
+{
+  std::string aResult = theString;
+  std::list<std::string>::const_iterator aIt;
+  int i;
+  char aBuf[20];
+  std::string aParam;
+  for (i=1, aIt = theParams.cbegin(); aIt != theParams.cend(); aIt++, i++) {
+    aParam = (*aIt);
+    sprintf_s(aBuf, "%d", i);
+    std::string aCode = std::string("%") + std::string(aBuf);
+    size_t aPos = aResult.find(aCode);
+    if (aPos != std::string::npos) {
+      std::string aFirst = aResult.substr(0, aPos);
+      std::string aLast = aResult.substr(aPos + aCode.length(), std::string::npos);
+      aResult = aFirst + aParam + aLast;
+    }
+  }
+  return aResult;
+}
+
+std::string Config_Translator::translate(const std::string& theContext,
+                                         const std::string& theMessage, 
+                                         const std::list<std::string>& theParams)
+{
+  if (myTranslator.count(theContext) > 0) {
+    if (myTranslator[theContext].count(theMessage) > 0) {
+      std::string aTranslation = myTranslator[theContext][theMessage];
+      if (theParams.size() > 0) {
+        aTranslation = insertParameters(aTranslation, theParams);
       }
       return aTranslation;
     }
   }
-  return "";
+  std::string aMsg = theMessage;
+  if (theParams.size() > 0) {
+    aMsg = insertParameters(aMsg, theParams);
+  }
+  return aMsg;
 }

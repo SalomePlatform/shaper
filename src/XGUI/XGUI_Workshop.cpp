@@ -126,6 +126,13 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
       myDisplayer(0)
       //myViewerSelMode(TopAbs_FACE)
 {
+  mySelector = new XGUI_SelectionMgr(this);
+  myModuleConnector = new XGUI_ModuleConnector(this);
+  myOperationMgr = new XGUI_OperationMgr(this, 0);
+  ModuleBase_IWorkshop* aWorkshop = moduleConnector();
+  // Has to be defined first in order to get errors and messages from other components
+  myEventsListener = new XGUI_WorkshopListener(aWorkshop);
+
 #ifndef HAVE_SALOME
   myMainWindow = new AppElements_MainWindow();
 
@@ -147,14 +154,12 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   }
 
   myDataModelXMLReader = new Config_DataModelReader();
-  myDataModelXMLReader->readAll();
+  //myDataModelXMLReader->readAll();
 
   myDisplayer = new XGUI_Displayer(this);
 
-  mySelector = new XGUI_SelectionMgr(this);
   connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(updateCommandStatus()));
 
-  myOperationMgr = new XGUI_OperationMgr(this, 0);
   myActionsMgr = new XGUI_ActionsMgr(this);
   myMenuMgr = new XGUI_MenuMgr(this);
   myErrorDlg = new XGUI_ErrorDialog(QApplication::desktop());
@@ -166,13 +171,9 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   //connect(myViewerProxy, SIGNAL(selectionChanged()),
   //        myActionsMgr,  SLOT(updateOnViewSelection()));
 
-  myModuleConnector = new XGUI_ModuleConnector(this);
-
-  ModuleBase_IWorkshop* aWorkshop = moduleConnector();
   myOperationMgr->setWorkshop(aWorkshop);
 
   myErrorMgr = new XGUI_ErrorMgr(this, aWorkshop);
-  myEventsListener = new XGUI_WorkshopListener(aWorkshop);
 
   connect(myOperationMgr, SIGNAL(operationStarted(ModuleBase_Operation*)), 
           SLOT(onOperationStarted(ModuleBase_Operation*)));
@@ -190,9 +191,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   onTrihedronVisibilityChanged(true);
 #endif
 
-  connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
-  connect(myEventsListener, SIGNAL(errorOccurred(const QString&)),
-          myErrorDlg, SLOT(addError(const QString&)));
+  connect(myEventsListener, SIGNAL(errorOccurred(std::shared_ptr<Events_InfoMessage>)),
+          myErrorDlg, SLOT(addError(std::shared_ptr<Events_InfoMessage>)));
 
   //Config_PropManager::registerProp("Visualization", "object_default_color", "Object color",
   //                                 Config_Prop::Color, "225,225,225");
@@ -224,13 +224,15 @@ XGUI_Workshop::~XGUI_Workshop(void)
 //******************************************************
 void XGUI_Workshop::startApplication()
 {
+  //Initialize event listening
+  myEventsListener->initializeEventListening();
+
+  myDataModelXMLReader->readAll();
   initMenu();
 
   Config_PropManager::registerProp("Plugins", "default_path", "Default Path",
                                    Config_Prop::Directory, "");
 
-  //Initialize event listening
-  myEventsListener->initializeEventListening();
 
   registerValidators();
 

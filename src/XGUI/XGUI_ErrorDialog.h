@@ -14,6 +14,7 @@
 #include <QDialog>
 
 class QTextEdit;
+class Events_InfoMessage;
 
 /**
 * \ingroup GUI
@@ -36,7 +37,7 @@ Q_OBJECT
   XGUI_EXPORT void clear();
 
   /// Add error message
-  XGUI_EXPORT void addError(const QString&);
+  XGUI_EXPORT void addError(std::shared_ptr<Events_InfoMessage> theMsg);
 
   /// Remove error message
   XGUI_EXPORT void removeError(const QString&);

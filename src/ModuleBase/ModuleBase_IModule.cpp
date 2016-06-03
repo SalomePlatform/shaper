@@ -23,6 +23,7 @@
 #include <Config_PointerMessage.h>
 #include <Config_WidgetReader.h>
 #include <Config_ModuleReader.h>
+#include <Config_Translator.h>
 
 #include <QAction>
 #include <QMainWindow>
@@ -106,7 +107,10 @@ bool ModuleBase_IModule::canBeShaded(Handle(AIS_InteractiveObject) theAIS) const
 
 QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
 {
-  return ModelAPI_Tools::getFeatureError(theFeature).c_str();
+  QString aMsg = ModelAPI_Tools::getFeatureError(theFeature).c_str();
+  if (!aMsg.isEmpty())
+    aMsg = Config_Translator::translate(theFeature->getKind(), aMsg.toStdString()).c_str();
+  return aMsg;
 }
 
 void ModuleBase_IModule::grantedOperationIds(ModuleBase_Operation* theOperation,

@@ -5,7 +5,7 @@
     <name>SketchConstraintVertical</name>
     <message>
         <source>Model_FeatureValidator: Attribute &quot;ConstraintEntityA&quot; is not initialized.</source>
-        <translation>Line for constraint is not selected.</translation>
+        <translation>Select a line for the constraint definition.</translation>
     </message>
     <message>
         <source>ModelAPI_StateInvalidArgument</source>

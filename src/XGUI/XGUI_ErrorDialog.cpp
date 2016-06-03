@@ -9,6 +9,7 @@
 #include <XGUI_ErrorDialog.h>
 
 #include <ModuleBase_Tools.h>
+#include <Config_Translator.h>
 
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
@@ -56,9 +57,10 @@ void XGUI_ErrorDialog::clear()
   QDialog::reject();
 }
 
-void XGUI_ErrorDialog::addError(const QString& theError)
+void XGUI_ErrorDialog::addError(std::shared_ptr<Events_InfoMessage> theMsg)
 {
-  myErrors.append(theError);
+  std::string aError = Config_Translator::translate(theMsg);
+  myErrors.append(aError.c_str());
   refresh();
   if (!isVisible()) {
     show();

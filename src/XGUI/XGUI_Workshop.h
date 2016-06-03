@@ -306,9 +306,6 @@ signals:
   /// Emitted when selection happens in Salome viewer
   void salomeViewerSelection();
 
-  /// Emitted when error in application happens
-  void errorOccurred(const QString&);
-
   //! the signal about the workshop actions states are updated.
   void commandStatusUpdated();
 

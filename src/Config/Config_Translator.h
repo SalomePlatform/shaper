@@ -13,6 +13,12 @@
 #include <string>
 #include <map>
 
+/**
+ * \class Config_Translator
+ * \ingroup Config
+ * \brief Class for messages translation on different languages. It can load TS
+ * files wich contain translation string and provides translations of messages from source code
+ */
 class Config_Translator
 {
 public:
@@ -34,7 +40,19 @@ public:
   * from the info data without translation
   * \param theInfo an info message
   */
-  static CONFIG_EXPORT std::string translate(const Events_InfoMessage& theInfo);
+  static CONFIG_EXPORT std::string translate(std::shared_ptr<Events_InfoMessage> theInfo);
+
+  /**
+  * Returns translation from the given data.
+  * If transdlation is not exists then it returns a string 
+  * from the info data without translation
+  * \param theContext context of the message (Feature Id)
+  * \param theMessage a message which dave to be translated
+  * \param theParams a list of parameters (can be empty)
+  */
+  static CONFIG_EXPORT std::string translate(const std::string& theContext,
+    const std::string& theMessage, 
+    const std::list<std::string>& theParams = std::list<std::string>());
 
 private:
   static Translator myTranslator;

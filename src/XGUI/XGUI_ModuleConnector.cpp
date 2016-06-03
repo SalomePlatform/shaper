@@ -31,8 +31,6 @@ XGUI_ModuleConnector::XGUI_ModuleConnector(XGUI_Workshop* theWorkshop)
 {
   XGUI_SelectionMgr* aSelector = myWorkshop->selector();
   connect(aSelector, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
-  
-  XGUI_OperationMgr* anOperationMgr = myWorkshop->operationMgr();
 }
 
 XGUI_ModuleConnector::~XGUI_ModuleConnector()
