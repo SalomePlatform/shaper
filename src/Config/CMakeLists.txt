@@ -67,7 +67,7 @@ TARGET_LINK_LIBRARIES(Config ${PROJECT_LIBRARIES})
 # Prepare plugins.xml
 
 # the solver to activate after installation
-SET(DEFAULT_SOLVER "SolveSpace")
+SET(DEFAULT_SOLVER "PlaneGCS")
 
 # the list of all solvers
 SET(SOLVERS "SolveSpace" "PlaneGCS")
