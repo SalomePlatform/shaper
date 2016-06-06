@@ -62,6 +62,22 @@ public:
 //! Pointer on Plane object
 typedef std::shared_ptr<ConstructionAPI_Plane> PlanePtr;
 
+/**\ingroup CPPHighAPI
+ * \brief Create Plane feature
+ */
+PlanePtr addPlane(const std::shared_ptr<ModelAPI_Document> & thePart,
+                  const ModelHighAPI_Selection & theFace,
+                  const ModelHighAPI_Double & theDistance);
+
+/**\ingroup CPPHighAPI
+ * \brief Create Plane feature
+ */
+PlanePtr addPlane(const std::shared_ptr<ModelAPI_Document> & thePart,
+                  const ModelHighAPI_Double & theA,
+                  const ModelHighAPI_Double & theB,
+                  const ModelHighAPI_Double & theC,
+                  const ModelHighAPI_Double & theD);
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 #endif /* SRC_CONSTRUCTIONAPI_CONSTRUCTIONAPI_PLANE_H_ */

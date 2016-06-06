@@ -44,6 +44,7 @@ ConstructionAPI_Plane::~ConstructionAPI_Plane()
 
 }
 
+//--------------------------------------------------------------------------------------
 void ConstructionAPI_Plane::setFaceAndDistance(
     const ModelHighAPI_Selection & theFace,
     const ModelHighAPI_Double & theDistance)
@@ -66,4 +67,27 @@ void ConstructionAPI_Plane::setGeneralEquation(
   theD.fillAttribute(myD);
 
   execute();
+}
+
+//--------------------------------------------------------------------------------------
+// TODO(spo): make add* as static functions of the class
+
+PlanePtr addPlane(const std::shared_ptr<ModelAPI_Document> & thePart,
+                  const ModelHighAPI_Selection & theFace,
+                  const ModelHighAPI_Double & theDistance)
+{
+  // TODO(spo): check that thePart is not empty
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Plane::ID());
+  return PlanePtr(new ConstructionAPI_Plane(aFeature, theFace, theDistance));
+}
+
+PlanePtr addPlane(const std::shared_ptr<ModelAPI_Document> & thePart,
+                  const ModelHighAPI_Double & theA,
+                  const ModelHighAPI_Double & theB,
+                  const ModelHighAPI_Double & theC,
+                  const ModelHighAPI_Double & theD)
+{
+  // TODO(spo): check that thePart is not empty
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Plane::ID());
+  return PlanePtr(new ConstructionAPI_Plane(aFeature, theA, theB, theC, theD));
 }
