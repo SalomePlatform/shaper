@@ -143,6 +143,9 @@ check_owner("Boolean_2_1/Modified_2", "face", aTower)
 check_owner("Boolean_2_1/Modified_3&Extrusion_1_1/Generated_Face_2", "edge", aBox)
 check_owner("Boolean_2_1/Modified_2&Extrusion_3_1/To_Face_1_1", "edge", aTower)
 
+# check the connected topology method: solid is not a compound of connected topology
+assert(aFuse.firstResult().shape().isConnectedTopology() == False)
+
 #=========================================================================
 # End of test
 #=========================================================================

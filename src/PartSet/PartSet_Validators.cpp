@@ -367,15 +367,14 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
     AttributeRefAttrPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
     bool isObject = anAttr->isObject();
     ObjectPtr anObject = anAttr->object();
-    AttributePtr anAttributeAttr = anAttr->attr();
 
     anAttrs = aFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
     if (anAttrs.size() > 0) {
-      std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-      for(; anAttr != anAttrs.end(); anAttr++) {
-      if ((*anAttr).get() && (*anAttr)->id() != theAttribute->id()) {
+      std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttrIter = anAttrs.begin();
+      for(; anAttrIter != anAttrs.end(); anAttrIter++) {
+      if ((*anAttrIter).get() && (*anAttrIter)->id() != theAttribute->id()) {
           std::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
-                                      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
+                                      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIter);
           if (aRef->isObject() != isObject)
             continue;
           if (isObject) {
@@ -386,6 +385,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
             }
           }
           else { // the attribute reference
+            AttributePtr anAttributeAttr = anAttr->attr();
             if (aRef->attr() == anAttributeAttr) {
               theError = errorMessage(EqualAttributes,
                                       anAttributeAttr.get() ? anAttributeAttr->id() : "",

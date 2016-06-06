@@ -106,11 +106,8 @@ void SketchPlugin_Arc::initDerivedClassAttributes()
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
 
-  data()->addAttribute(INVERSED_ID(), ModelAPI_AttributeBoolean::typeId());
-  AttributeBooleanPtr isInversed =
-      std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(attribute(INVERSED_ID()));
-  if (!isInversed->isInitialized())
-    isInversed->setValue(false);
+  AttributeBooleanPtr isInversed = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
+    data()->addAttribute(INVERSED_ID(), ModelAPI_AttributeBoolean::typeId()));
 
   // get the initial values
   if (anEndAttr->isInitialized()) {
@@ -118,14 +115,18 @@ void SketchPlugin_Arc::initDerivedClassAttributes()
     myYEndBefore = anEndAttr->y();
   }
 
-  data()->addAttribute(ARC_TYPE(), ModelAPI_AttributeString::typeId());
-  std::dynamic_pointer_cast<ModelAPI_AttributeString>(
-      data()->attribute(ARC_TYPE()))->setValue(ARC_TYPE_CENTER_START_END());
+  AttributeStringPtr anArcType = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
+    data()->addAttribute(ARC_TYPE(), ModelAPI_AttributeString::typeId()));
 
   data()->addAttribute(PASSED_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(TANGENT_POINT_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
+
+  // set after all to avoid in attributeChanged reference to not existing attributes
+  if (!isInversed->isInitialized())
+    isInversed->setValue(false);
+  anArcType->setValue(ARC_TYPE_CENTER_START_END());
 }
 
 void SketchPlugin_Arc::execute()
