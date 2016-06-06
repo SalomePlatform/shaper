@@ -383,10 +383,14 @@ ModuleBase_ModelWidget* ModuleBase_OperationFeature::activateByPreselection(
           aWgt = (*aWIt);
           if (aWgt->attributeID() == theGreedAttributeId) {
             aPropertyPanel->setPreselectionWidget(aWgt);
-            aWgt->setSelection(myPreSelection, true);
-            aPropertyPanel->setPreselectionWidget(NULL);
-            aFilledWgt = aWgt;
-            break;
+            if (aWgt->setSelection(myPreSelection, true)) {
+              aPropertyPanel->setPreselectionWidget(NULL);
+              aFilledWgt = aWgt;
+              break;
+            }
+            else { // do not process invalid for greed widget selection
+              break;
+            }
           }
         }
       }
