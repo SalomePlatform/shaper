@@ -8,6 +8,8 @@
 #define SRC_MODELHIGHAPI_MODELHIGHAPI_INTERFACE_H_
 
 //--------------------------------------------------------------------------------------
+#include "ModelHighAPI.h"
+
 #include <memory>
 #include <string>
 //--------------------------------------------------------------------------------------
@@ -21,21 +23,21 @@ class ModelHighAPI_Interface
 {
 public:
   /// Constructor
-  explicit ModelHighAPI_Interface(const std::shared_ptr<ModelAPI_Feature> & theFeature);
+  MODELHIGHAPI_EXPORT explicit ModelHighAPI_Interface(const std::shared_ptr<ModelAPI_Feature> & theFeature);
   /// Destructor
-  virtual ~ModelHighAPI_Interface();
+  MODELHIGHAPI_EXPORT virtual ~ModelHighAPI_Interface();
 
   /// Return ModelAPI_Feature
-  std::shared_ptr<ModelAPI_Feature> feature() const;
+  MODELHIGHAPI_EXPORT std::shared_ptr<ModelAPI_Feature> feature() const;
 
   /// Shortcut for feature()->getKind()
-  const std::string& getKind();
+  MODELHIGHAPI_EXPORT const std::string& getKind();
 
   /// Shortcut for feature()->execute()
-  void execute();
+  MODELHIGHAPI_EXPORT void execute();
 
   /// Throw exception to event loop
-  void throwException(const std::string & theDescription);
+  MODELHIGHAPI_EXPORT void throwException(const std::string & theDescription);
 
 protected:
   std::shared_ptr<ModelAPI_Feature> myFeature;

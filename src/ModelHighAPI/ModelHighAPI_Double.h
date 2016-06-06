@@ -8,6 +8,8 @@
 #define SRC_MODELHIGHAPI_MODELHIGHAPI_DOUBLE_H_
 
 //--------------------------------------------------------------------------------------
+#include "ModelHighAPI.h"
+
 #include <memory>
 #include <string>
 
@@ -23,16 +25,16 @@ class ModelHighAPI_Double
 {
 public:
   /// Constructor for double
-  ModelHighAPI_Double(double theValue = 0.);
+  MODELHIGHAPI_EXPORT ModelHighAPI_Double(double theValue = 0.);
   /// Constructor for std::string
-  ModelHighAPI_Double(const std::string & theValue);
+  MODELHIGHAPI_EXPORT ModelHighAPI_Double(const std::string & theValue);
   /// Constructor for char *
-  ModelHighAPI_Double(const char * theValue);
+  MODELHIGHAPI_EXPORT ModelHighAPI_Double(const char * theValue);
   /// Destructor
-  virtual ~ModelHighAPI_Double();
+  MODELHIGHAPI_EXPORT virtual ~ModelHighAPI_Double();
 
   /// Fill attribute values
-  virtual void fillAttribute(std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute) const;
+  MODELHIGHAPI_EXPORT virtual void fillAttribute(std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute) const;
 
 private:
   boost::variant<double, std::string> myValue;

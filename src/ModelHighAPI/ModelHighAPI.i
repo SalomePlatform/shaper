@@ -8,7 +8,7 @@
 %include "doxyhelp.i"
 
 // to avoid error on this
-#define ModelHighAPI_EXPORT
+#define MODELHIGHAPI_EXPORT
 
 // standard definitions
 %include "typemaps.i"

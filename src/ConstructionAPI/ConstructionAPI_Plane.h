@@ -24,18 +24,22 @@ class ConstructionAPI_Plane : public ModelHighAPI_Interface
 {
 public:
   /// Constructor without values
+  CONSTRUCTIONAPI_EXPORT
   explicit ConstructionAPI_Plane(const std::shared_ptr<ModelAPI_Feature> & theFeature);
   /// Constructor with values
+  CONSTRUCTIONAPI_EXPORT
   ConstructionAPI_Plane(const std::shared_ptr<ModelAPI_Feature> & theFeature,
                         const ModelHighAPI_Selection & theFace,
                         const ModelHighAPI_Double & theDistance);
   /// Constructor with values
+  CONSTRUCTIONAPI_EXPORT
   ConstructionAPI_Plane(const std::shared_ptr<ModelAPI_Feature> & theFeature,
                         const ModelHighAPI_Double & theA,
                         const ModelHighAPI_Double & theB,
                         const ModelHighAPI_Double & theC,
                         const ModelHighAPI_Double & theD);
   /// Destructor
+  CONSTRUCTIONAPI_EXPORT
   virtual ~ConstructionAPI_Plane();
 
   INTERFACE_7("Plane",
@@ -49,10 +53,12 @@ public:
   )
 
   /// Set face and distance
+  CONSTRUCTIONAPI_EXPORT
   void setFaceAndDistance(const ModelHighAPI_Selection & theFace,
                           const ModelHighAPI_Double & theDistance);
 
   /// Set GeneralEquation parameters of the feature
+  CONSTRUCTIONAPI_EXPORT
   void setGeneralEquation(const ModelHighAPI_Double & theA,
                           const ModelHighAPI_Double & theB,
                           const ModelHighAPI_Double & theC,
@@ -65,6 +71,7 @@ typedef std::shared_ptr<ConstructionAPI_Plane> PlanePtr;
 /**\ingroup CPPHighAPI
  * \brief Create Plane feature
  */
+CONSTRUCTIONAPI_EXPORT
 PlanePtr addPlane(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Selection & theFace,
                   const ModelHighAPI_Double & theDistance);
@@ -72,6 +79,7 @@ PlanePtr addPlane(const std::shared_ptr<ModelAPI_Document> & thePart,
 /**\ingroup CPPHighAPI
  * \brief Create Plane feature
  */
+CONSTRUCTIONAPI_EXPORT
 PlanePtr addPlane(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Double & theA,
                   const ModelHighAPI_Double & theB,

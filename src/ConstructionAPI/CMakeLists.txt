@@ -69,4 +69,4 @@ ADD_UNIT_TESTS(
   TestPoint.py
 )
 
-ADD_SUBDIRECTORY (Test)
+# ADD_SUBDIRECTORY (Test)

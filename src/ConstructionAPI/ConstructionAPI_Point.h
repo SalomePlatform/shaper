@@ -25,13 +25,16 @@ class ConstructionAPI_Point : public ModelHighAPI_Interface
 {
 public:
   /// Constructor without values
+  CONSTRUCTIONAPI_EXPORT
   explicit ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature> & theFeature);
   /// Constructor with values
+  CONSTRUCTIONAPI_EXPORT
   ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature> & theFeature,
                         const ModelHighAPI_Double & theX,
                         const ModelHighAPI_Double & theY,
                         const ModelHighAPI_Double & theZ);
   /// Destructor
+  CONSTRUCTIONAPI_EXPORT
   virtual ~ConstructionAPI_Point();
 
   INTERFACE_3("Point",
@@ -40,6 +43,7 @@ public:
               z, "z", Double, /** Z attribute */)
 
   /// Set point values
+  CONSTRUCTIONAPI_EXPORT
   void setPoint(const ModelHighAPI_Double & theX,
                 const ModelHighAPI_Double & theY,
                 const ModelHighAPI_Double & theZ);
@@ -51,6 +55,7 @@ typedef std::shared_ptr<ConstructionAPI_Point> PointPtr;
 /**\ingroup CPPHighAPI
  * \brief Create Point feature
  */
+CONSTRUCTIONAPI_EXPORT
 PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Double & theX,
                   const ModelHighAPI_Double & theY,
