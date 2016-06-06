@@ -17,12 +17,14 @@ public:
   Config_TSReader(const std::string& theTSFile) : Config_XMLReader(theTSFile) {}
 
   const Config_Translator::Translator& translator() const { return myTranslator; }
+  const Config_Translator::Dictionary& codecs() const { return myCodecs; }
 
 protected:
   /// Overloaded method. Defines how to process each node
   virtual void processNode(xmlNodePtr theNode);
 private:
   Config_Translator::Translator myTranslator;
+  Config_Translator::Dictionary myCodecs;
 };
 
 void Config_TSReader::processNode(xmlNodePtr theNode)
@@ -35,6 +37,7 @@ void Config_TSReader::processNode(xmlNodePtr theNode)
     aName = "";
   } else if (isNode(theNode, "name", NULL)) {
     aName = getContent(theNode);
+    myCodecs[aName] = encoding();
   } else if (isNode(theNode, "message", NULL)) {
     aSource = "";
   } else if (isNode(theNode, "source", NULL)) {
@@ -50,6 +53,8 @@ void Config_TSReader::processNode(xmlNodePtr theNode)
 //******************************************************************************
 //******************************************************************************
 Config_Translator::Translator Config_Translator::myTranslator;
+Config_Translator::Dictionary Config_Translator::myCodecs;
+
 #ifdef _DEBUG
 #ifdef MISSED_TRANSLATION
 Config_Translator::Translator Config_Translator::myMissed;
@@ -78,6 +83,11 @@ bool Config_Translator::load(const std::string& theFileName)
     }
   }
 
+  const Dictionary aCodecs = aReader.codecs();
+  Dictionary::const_iterator aDictIt;
+  for (aDictIt = aCodecs.cbegin(); aDictIt != aCodecs.cend(); aDictIt++) {
+    myCodecs[aDictIt->first] = aDictIt->second;
+  }
   return true;
 }
 
@@ -135,6 +145,13 @@ std::string Config_Translator::translate(const std::string& theContext,
 #endif
   return aMsg;
 }
+
+
+std::string Config_Translator::codec(const std::string& theContext)
+{ 
+  return (myCodecs.count(theContext) > 0)? myCodecs[theContext] : "UTF-8"; 
+}
+
 
 #ifdef _DEBUG
 #ifdef MISSED_TRANSLATION

@@ -146,6 +146,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   QString aPath = Config_XMLReader::pluginConfigFile().c_str();
   QDir aDir(aPath);
 
+  // Load translations
   QStringList aFilters;
   aFilters << "*_en.ts";
   QStringList aTsFiles = aDir.entryList(aFilters, QDir::Files);

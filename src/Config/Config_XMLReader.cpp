@@ -199,3 +199,8 @@ bool Config_XMLReader::cleanupAttribute(const char* theNodeName, const char* the
   }
   return result;
 }
+
+const char* Config_XMLReader::encoding() const
+{ 
+  return (const char*) myXmlDoc->encoding; 
+}

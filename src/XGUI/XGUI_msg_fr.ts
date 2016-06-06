@@ -141,7 +141,7 @@
 <context>
     <name>XGUI_ErrorDialog</name>
     <message>
-        <location filename="XGUI_ErrorDialog.cpp" line="24"/>
+        <location filename="XGUI_ErrorDialog.cpp" line="25"/>
         <source>Application errors</source>
         <translation type="unfinished"></translation>
     </message>
@@ -185,181 +185,181 @@
 <context>
     <name>XGUI_Workshop</name>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="309"/>
-        <location filename="XGUI_Workshop.cpp" line="363"/>
+        <location filename="XGUI_Workshop.cpp" line="310"/>
+        <location filename="XGUI_Workshop.cpp" line="364"/>
         <source>Undo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="310"/>
-        <location filename="XGUI_Workshop.cpp" line="363"/>
+        <location filename="XGUI_Workshop.cpp" line="311"/>
+        <location filename="XGUI_Workshop.cpp" line="364"/>
         <source>Undo last command</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="313"/>
+        <location filename="XGUI_Workshop.cpp" line="314"/>
         <source>INF_DESK_TOOLBAR_STANDARD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="319"/>
-        <location filename="XGUI_Workshop.cpp" line="372"/>
+        <location filename="XGUI_Workshop.cpp" line="320"/>
+        <location filename="XGUI_Workshop.cpp" line="373"/>
         <source>Redo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="319"/>
-        <location filename="XGUI_Workshop.cpp" line="372"/>
+        <location filename="XGUI_Workshop.cpp" line="320"/>
+        <location filename="XGUI_Workshop.cpp" line="373"/>
         <source>Redo last command</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="336"/>
+        <location filename="XGUI_Workshop.cpp" line="337"/>
         <source>Export native...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="336"/>
+        <location filename="XGUI_Workshop.cpp" line="337"/>
         <source>Export the current document into a native file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="341"/>
+        <location filename="XGUI_Workshop.cpp" line="342"/>
         <source>Import native...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="341"/>
+        <location filename="XGUI_Workshop.cpp" line="342"/>
         <source>Import native file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="353"/>
-        <location filename="XGUI_Workshop.cpp" line="841"/>
+        <location filename="XGUI_Workshop.cpp" line="354"/>
+        <location filename="XGUI_Workshop.cpp" line="842"/>
         <source>Save</source>
         <extracomment>Title of the dialog which asks user if he wants to save study in existing non-empty folder</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="353"/>
+        <location filename="XGUI_Workshop.cpp" line="354"/>
         <source>Save the document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="358"/>
+        <location filename="XGUI_Workshop.cpp" line="359"/>
         <source>Save as...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="358"/>
+        <location filename="XGUI_Workshop.cpp" line="359"/>
         <source>Save the document into a file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="386"/>
+        <location filename="XGUI_Workshop.cpp" line="387"/>
         <source>Open...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="386"/>
+        <location filename="XGUI_Workshop.cpp" line="387"/>
         <source>Open a new document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="390"/>
+        <location filename="XGUI_Workshop.cpp" line="391"/>
         <source>Preferences</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="390"/>
+        <location filename="XGUI_Workshop.cpp" line="391"/>
         <source>Edit preferences</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="394"/>
+        <location filename="XGUI_Workshop.cpp" line="395"/>
         <source>Exit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="394"/>
+        <location filename="XGUI_Workshop.cpp" line="395"/>
         <source>Exit application</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="703"/>
-        <location filename="XGUI_Workshop.cpp" line="759"/>
+        <location filename="XGUI_Workshop.cpp" line="704"/>
+        <location filename="XGUI_Workshop.cpp" line="760"/>
         <source>Save current file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="704"/>
+        <location filename="XGUI_Workshop.cpp" line="705"/>
         <source>The document is modified, save before opening another?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="715"/>
+        <location filename="XGUI_Workshop.cpp" line="716"/>
         <source>Select directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="720"/>
+        <location filename="XGUI_Workshop.cpp" line="721"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="720"/>
+        <location filename="XGUI_Workshop.cpp" line="721"/>
         <source>Unable to open the file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="759"/>
+        <location filename="XGUI_Workshop.cpp" line="760"/>
         <source>The document is modified, save before exit?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="825"/>
+        <location filename="XGUI_Workshop.cpp" line="826"/>
         <source>Select directory to save files...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="827"/>
+        <location filename="XGUI_Workshop.cpp" line="828"/>
         <source>Directories (*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="842"/>
+        <location filename="XGUI_Workshop.cpp" line="843"/>
         <source>The directory already contains some files, save anyway?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="975"/>
+        <location filename="XGUI_Workshop.cpp" line="976"/>
         <source>Information about module &quot;%1&quot; doesn&apos;t exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1106"/>
+        <location filename="XGUI_Workshop.cpp" line="1107"/>
         <source>Object browser</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1438"/>
+        <location filename="XGUI_Workshop.cpp" line="1439"/>
         <source>Unused features are the following: %1.
 These features will be deleted.
 Would you like to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1476"/>
+        <location filename="XGUI_Workshop.cpp" line="1477"/>
         <source>All features are relevant, there is nothing to be deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1976"/>
+        <location filename="XGUI_Workshop.cpp" line="1977"/>
         <source>Find results</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1977"/>
+        <location filename="XGUI_Workshop.cpp" line="1978"/>
         <source>Results not found</source>
         <translation type="unfinished"></translation>
     </message>

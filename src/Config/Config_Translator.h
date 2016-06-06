@@ -56,6 +56,13 @@ public:
     const std::string& theMessage, 
     const std::list<std::string>& theParams = std::list<std::string>());
 
+
+  /**
+  * Returns codec for the context
+  * \param theContext the context
+  */ 
+  static CONFIG_EXPORT std::string codec(const std::string& theContext);
+
 #ifdef _DEBUG
 #ifdef MISSED_TRANSLATION
   static CONFIG_EXPORT void saveMissedTranslations();
@@ -64,7 +71,11 @@ public:
 
 
 private:
+  /// A map of translations
   static Translator myTranslator;
+
+  /// aMap of codecs for contexts
+  static Dictionary myCodecs;
 
 #ifdef _DEBUG
 #ifdef MISSED_TRANSLATION
