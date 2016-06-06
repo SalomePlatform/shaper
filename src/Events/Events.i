@@ -2,7 +2,7 @@
 %module EventsAPI
 %{
   #include "Events.h"
-  #include "Events_Error.h"
+  #include "Events_InfoMessage.h"
   #include "Events_Message.h"
 %}
 
@@ -16,4 +16,4 @@
 
 // all supported interfaces
 %include "Events_Message.h"
-%include "Events_Error.h"
+%include "Events_InfoMessage.h"

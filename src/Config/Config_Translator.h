@@ -13,7 +13,7 @@
 #include <string>
 #include <map>
 
-#define MISSED_TRANSLATION
+//#define MISSED_TRANSLATION
 
 /**
  * \class Config_Translator

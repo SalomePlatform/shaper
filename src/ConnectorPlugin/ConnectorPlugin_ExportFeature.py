@@ -55,7 +55,7 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
         kResultBodyType = "Bodies"
         aPartSize = self.Part.size(kResultBodyType)
         if aPartSize == 0:
-            EventsAPI.Events_Error_send("No results in the active document")
+            EventsAPI.Events_InfoMessage("ExportFeature","No results in the active document").send()
             return
 
         anObjList = [self.Part.object(kResultBodyType, idx) for idx in xrange(aPartSize)]

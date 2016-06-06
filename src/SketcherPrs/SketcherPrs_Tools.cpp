@@ -17,7 +17,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Events.h>
 
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAPI_Lin2d.h>
@@ -376,7 +376,7 @@ void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect, double theDimValue
 
 void sendEmptyPresentationError(ModelAPI_Feature* theFeature, const std::string theError)
 {
-  Events_Error::throwException("An empty AIS presentation: SketcherPrs_LengthDimension");
+  Events_InfoMessage("SketcherPrs_Tools", "An empty AIS presentation: SketcherPrs_LengthDimension").send();
   static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
   std::shared_ptr<ModelAPI_Object> aConstraintPtr(theFeature);
   ModelAPI_EventCreator::get()->sendUpdated(aConstraintPtr, anEvent);

@@ -30,7 +30,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultCompSolid.h>
 
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 #include <Events_Loop.h>
 
 #include <GeomAPI_IPresentable.h>
@@ -115,7 +115,8 @@ void PartSet_OperationPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   }
 
   if (!aReadyToDisplay) {
-    Events_Error::throwException("An empty AIS presentation: PartSet_OperationPrs");
+    Events_InfoMessage("PartSet_OperationPrs", 
+      "An empty AIS presentation: PartSet_OperationPrs").send();
     std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
                 new Events_Message(Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION)));
     Events_Loop::loop()->send(aMsg);
