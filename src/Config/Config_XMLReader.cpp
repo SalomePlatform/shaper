@@ -13,7 +13,7 @@
 #include <Config_PropManager.h>
 
 #include <Events_Loop.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
@@ -52,7 +52,7 @@ Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
   myDocumentPath = prefix + FSEP + theXmlFileName;
   std::ifstream aTestFile(myDocumentPath);
   if (!aTestFile) 
-    Events_Error::send("Unable to open " + myDocumentPath);
+    Events_InfoMessage("Config_XMLReader", "Unable to open %1").arg(myDocumentPath).send();
   aTestFile.close();
 }
 

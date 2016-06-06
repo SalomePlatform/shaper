@@ -13,8 +13,6 @@
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Prs3d_Root.hxx>
 
-#include <Events_Error.h>
-
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_HVDirection, SketcherPrs_SymbolPrs);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_HVDirection, SketcherPrs_SymbolPrs);

@@ -10,7 +10,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
 
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_ShapeExplorer.h>
@@ -88,7 +88,8 @@ bool BuildPlugin_Wire::customAction(const std::string& theActionId)
   if(theActionId == "add_contour") {
     return addContour();
   } else {
-    Events_Error::send("Error: Feature \"" + getKind() + "\" does not support action \"" + theActionId + "\".");
+    std::string aMsg = "Error: Feature \"%1\" does not support action \"%2\".";
+    Events_InfoMessage("BuildPlugin_Wire", aMsg).arg(getKind()).arg(theActionId).send();
   }
 
   return false;
@@ -100,7 +101,7 @@ bool BuildPlugin_Wire::addContour()
   // Get base objects list.
   AttributeSelectionListPtr aSelectionList = selectionList(BASE_OBJECTS_ID());
   if(aSelectionList->size() == 0) {
-    Events_Error::send("Error: Empty selection list.");
+    Events_InfoMessage("BuildPlugin_Wire", "Error: Empty selection list.").send();
     return false;
   }
 
@@ -188,7 +189,8 @@ bool BuildPlugin_Wire::addContour()
   }
 
   if(!isAnyContourAdded) {
-    Events_Error::send("Error: Contours already closed or no contours found for selected edges.");
+    Events_InfoMessage("BuildPlugin_Wire", 
+      "Error: Contours already closed or no contours found for selected edges.").send();
     return false;
   }
 

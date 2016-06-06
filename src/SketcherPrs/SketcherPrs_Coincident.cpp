@@ -18,8 +18,6 @@
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Pnt2d.h>
 
-#include <Events_Error.h>
-
 #include <SketchPlugin_Constraint.h>
 
 #include <Graphic3d_AspectMarker3d.hxx>

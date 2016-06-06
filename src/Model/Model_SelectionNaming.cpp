@@ -7,7 +7,7 @@
 #include "Model_SelectionNaming.h"
 #include "Model_Document.h"
 #include <ModelAPI_Feature.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS.hxx>
@@ -286,7 +286,7 @@ TopAbs_ShapeEnum translateType (const std::string& theType)
   }
   if (MyShapeTypes.find(theType) != MyShapeTypes.end())
     return MyShapeTypes[theType];
-  Events_Error::send("Shape type defined in XML is not implemented!");
+  Events_InfoMessage("Model_SelectionNaming", "Shape type defined in XML is not implemented!").send();
   return TopAbs_SHAPE;
 }
 

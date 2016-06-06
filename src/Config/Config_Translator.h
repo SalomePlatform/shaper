@@ -13,6 +13,8 @@
 #include <string>
 #include <map>
 
+#define MISSED_TRANSLATION
+
 /**
  * \class Config_Translator
  * \ingroup Config
@@ -54,8 +56,21 @@ public:
     const std::string& theMessage, 
     const std::list<std::string>& theParams = std::list<std::string>());
 
+#ifdef _DEBUG
+#ifdef MISSED_TRANSLATION
+  static CONFIG_EXPORT void saveMissedTranslations();
+#endif
+#endif
+
+
 private:
   static Translator myTranslator;
+
+#ifdef _DEBUG
+#ifdef MISSED_TRANSLATION
+  static Translator myMissed;
+#endif
+#endif
 };
 
 #endif

@@ -36,7 +36,7 @@
 #include <GeomData_Point2D.h>
 #include <GeomData_Dir.h>
 #include <Events_Loop.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <TDataStd_Name.hxx>
 #include <TDataStd_AsciiString.hxx>
@@ -182,7 +182,7 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
     anAttr->setObject(myObject);
     anAttr->setID(theID);
   } else {
-    Events_Error::send("Can not create unknown type of attribute " + theAttrType);
+    Events_InfoMessage("Model_Data", "Can not create unknown type of attribute %1").arg(theAttrType).send();
   }
   return aResult;
 }
@@ -370,7 +370,7 @@ void Model_Data::setError(const std::string& theError, bool theSend)
 {
   execState(ModelAPI_StateExecFailed);
   if (theSend) {
-    Events_Error::send(theError);
+    Events_InfoMessage("Model_Data", theError).send();
   }
   TDataStd_AsciiString::Set(myLab, theError.c_str());
 }

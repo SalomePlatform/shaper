@@ -13,8 +13,6 @@
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Arc.h>
 
-#include <Events_Error.h>
-
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Circ.h>

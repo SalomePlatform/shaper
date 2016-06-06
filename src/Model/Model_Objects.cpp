@@ -20,7 +20,7 @@
 #include <ModelAPI_Tools.h>
 
 #include <Events_Loop.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
@@ -224,8 +224,8 @@ void Model_Objects::refsToFeature(FeaturePtr theFeature,
   }
 
   if (!theRefs.empty() && isSendError) {
-    Events_Error::send(
-      "Feature '" + theFeature->data()->name() + "' is used and can not be deleted");
+    Events_InfoMessage("Model_Objects", 
+      "Feature '%1' is used and can not be deleted").arg(theFeature->data()->name()).send();
   }
 }
 
@@ -302,10 +302,10 @@ void Model_Objects::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
   if (!aPassedMovedFrom || !aPassedMovedTo) {// not found: unknown situation
     if (!aPassedMovedFrom) {
       static std::string aMovedFromError("The moved feature is not found");
-      Events_Error::send(aMovedFromError);
+      Events_InfoMessage("Model_Objects", aMovedFromError).send();
     } else {
       static std::string aMovedToError("The 'after' feature for movement is not found");
-      Events_Error::send(aMovedToError);
+      Events_InfoMessage("Model_Objects", aMovedToError).send();
     }
     return;
   }
@@ -643,7 +643,7 @@ void Model_Objects::synchronizeFeatures(
         TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
         .ToCString(), anOwner);
       if (!aFeature.get()) {  // somethig is wrong, most probably, the opened document has invalid structure
-        Events_Error::send("Invalid type of object in the document");
+        Events_InfoMessage("Model_Objects", "Invalid type of object in the document").send();
         aLabIter.Value()->Label().ForgetAllAttributes();
         continue;
       }
@@ -1082,8 +1082,8 @@ void Model_Objects::updateResults(FeaturePtr theFeature)
           theFeature->attributeChanged("expression"); // just produce a value
           break;
         } else {
-          Events_Error::send(std::string("Unknown type of result is found in the document:") +
-            TCollection_AsciiString(aGroup->Get()).ToCString());
+          Events_InfoMessage("Model_Objects", "Unknown type of result is found in the document:")
+            .arg(TCollection_AsciiString(aGroup->Get()).ToCString()).send();
         }
       }
       if (aNewBody && !aNewBody->data()->isDeleted()) {

@@ -14,7 +14,7 @@
 #include <ModelAPI_Session.h>
 #include <Config_PropManager.h>
 
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <vector>
 #include <QColor>
@@ -50,7 +50,8 @@ void XGUI_CustomPrs::getDefaultColor(ObjectPtr theObject, const bool isEmptyColo
     // all AIS objects, where the color is not set, are in black.
     // The color should be defined in XML or set in the attribute
     theColor = Config_PropManager::color("Visualization", "object_default_color", "#000000");
-    Events_Error::send("A default color is not defined in the preferences for this kind of result");
+    Events_InfoMessage("XGUI_CustomPrs", 
+      "A default color is not defined in the preferences for this kind of result").send();
   }
 }
 

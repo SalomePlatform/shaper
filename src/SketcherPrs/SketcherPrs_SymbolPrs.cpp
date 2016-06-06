@@ -12,7 +12,7 @@
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_Curve.h>
 
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <Graphic3d_ArrayOfSegments.hxx>
 #include <Graphic3d_BndBox4f.hxx>
@@ -294,7 +294,7 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
   // The icon for constraint is not found
   static const char aMsg[] = "Error! constraint images are not found";
   cout<<aMsg<<endl;
-  Events_Error::send(aMsg);
+  Events_InfoMessage("SketcherPrs_SymbolPrs", aMsg).send();
   myIconsMap[iconName()] = Handle(Image_AlienPixMap)();
   return Handle(Image_AlienPixMap)();
 }

@@ -13,7 +13,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeReference.h>
 
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <string>
 #include <map>
@@ -40,7 +40,7 @@ GeomValidators_ShapeType::TypeOfShape GeomValidators_ShapeType::shapeType(const 
   if (MyShapeTypes.find(aType) != MyShapeTypes.end())
     return MyShapeTypes[aType];
 
-  Events_Error::send("Shape type defined in XML is not implemented!");
+  Events_InfoMessage("Shape type defined in XML is not implemented!").send();
   return AnyShape;
 }
 

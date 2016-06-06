@@ -10,8 +10,6 @@
 
 #include <SketchPlugin_Constraint.h>
 
-#include "Events_Error.h"
-
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Prs3d_Root.hxx>
 

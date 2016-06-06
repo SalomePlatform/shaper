@@ -10,7 +10,7 @@
 
 #include <GeomAbs_SurfaceType.hxx>
 
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <QString>
 #include <QMap>
@@ -28,7 +28,7 @@ GeomAbs_SurfaceType faceType(const std::string& theType)
   if (MyFaceTypes.find(aType) != MyFaceTypes.end())
     return MyFaceTypes[aType];
   
-  Events_Error::send("Face type defined in XML is not implemented!");
+  Events_InfoMessage("GeomValidators_Face", "Face type defined in XML is not implemented!").send();
   return GeomAbs_Plane;
 }
 

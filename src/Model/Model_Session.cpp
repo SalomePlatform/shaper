@@ -15,7 +15,7 @@
 #include <Model_Validator.h>
 #include <ModelAPI_Events.h>
 #include <Events_Loop.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 #include <Config_FeatureMessage.h>
 #include <Config_AttributeMessage.h>
 #include <Config_ValidatorMessage.h>
@@ -156,9 +156,9 @@ FeaturePtr Model_Session::createFeature(string theFeatureID, Model_Document* the
   if (myPlugins.find(theFeatureID) != myPlugins.end()) {
     std::pair<std::string, std::string>& aPlugin = myPlugins[theFeatureID]; // plugin and doc kind
     if (!aPlugin.second.empty() && aPlugin.second != theDocOwner->kind()) {
-      Events_Error::send(
-          string("Feature '") + theFeatureID + "' can be created only in document '"
-              + aPlugin.second + "' by the XML definition");
+      Events_InfoMessage("Model_Session",
+          "Feature '%1' can be created only in document '%2' by the XML definition")
+          .arg(theFeatureID).arg(aPlugin.second).send();
       return FeaturePtr();
     }
     myCurrentPluginName = aPlugin.first;
@@ -169,16 +169,16 @@ FeaturePtr Model_Session::createFeature(string theFeatureID, Model_Document* the
     if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {
       FeaturePtr aCreated = myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);
       if (!aCreated) {
-        Events_Error::send(
-            string("Can not initialize feature '") + theFeatureID + "' in plugin '"
-                + myCurrentPluginName + "'");
+        Events_InfoMessage("Model_Session",
+            "Can not initialize feature '%1' in plugin '%2'")
+            .arg(theFeatureID).arg(myCurrentPluginName).send();
       }
       return aCreated;
     } else {
-      Events_Error::send(string("Can not load plugin '") + myCurrentPluginName + "'");
+      Events_InfoMessage("Model_Session","Can not load plugin '%1'").arg(myCurrentPluginName).send();
     }
   } else {
-    Events_Error::send(string("Feature '") + theFeatureID + "' not found in any plugin");
+    Events_InfoMessage("Model_Session","Feature '%1' not found in any plugin").arg(theFeatureID).send();
   }
 
   return FeaturePtr();  // return nothing
@@ -394,7 +394,7 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
     }
   } else {  // create/update/delete
     if (myCheckTransactions && !isOperation())
-      Events_Error::send("Modification of data structure outside of the transaction");
+      Events_InfoMessage("Model_Session", "Modification of data structure outside of the transaction").send();
     // if part is deleted, make the root as the current document (on undo of Parts creations)
     static const Events_ID kDeletedEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
     if (theMessage->eventID() == kDeletedEvent) {

@@ -11,7 +11,6 @@
 #include <Config_Keywords.h>
 #include "Config_Common.h"
 
-#include <Events_Error.h>
 #include <Events_InfoMessage.h>
 
 

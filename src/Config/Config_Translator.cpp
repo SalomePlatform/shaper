@@ -8,6 +8,9 @@
 #include "Config_XMLReader.h"
 #include "Config_Common.h"
 
+#include <fstream>
+#include <ostream>
+
 class Config_TSReader : public Config_XMLReader
 {
 public:
@@ -47,6 +50,11 @@ void Config_TSReader::processNode(xmlNodePtr theNode)
 //******************************************************************************
 //******************************************************************************
 Config_Translator::Translator Config_Translator::myTranslator;
+#ifdef _DEBUG
+#ifdef MISSED_TRANSLATION
+Config_Translator::Translator Config_Translator::myMissed;
+#endif
+#endif
 
 bool Config_Translator::load(const std::string& theFileName)
 {
@@ -120,5 +128,63 @@ std::string Config_Translator::translate(const std::string& theContext,
   if (theParams.size() > 0) {
     aMsg = insertParameters(aMsg, theParams);
   }
+#ifdef _DEBUG
+#ifdef MISSED_TRANSLATION
+  myMissed[theContext][theMessage] = "";
+#endif
+#endif
   return aMsg;
 }
+
+#ifdef _DEBUG
+#ifdef MISSED_TRANSLATION
+void Config_Translator::saveMissedTranslations()
+{
+  if (myMissed.size() == 0)
+    return;
+
+  char* aPath = getenv("ROOT_DIR");
+#ifdef WIN32
+  std::string aFile = aPath + std::string("\\MissedTranslation.ts");
+#else
+  std::string aFile = aPath + std::string("/MissedTranslation.ts");
+#endif
+  std::ofstream oFStream;
+
+  // Delete old file
+  int aa = remove(aFile.c_str());
+
+  oFStream.open(aFile, std::ofstream::out | std::ofstream::app);
+  if (oFStream.is_open()) {
+    Translator::const_iterator aContIt;
+    Dictionary::const_iterator aDictIt;
+    std::string aContext;
+    std::string aSrc;
+    Dictionary aDict;
+
+    oFStream << "<TS version=\"2.0\">" << std::endl;
+    for(aContIt = myMissed.cbegin(); aContIt != myMissed.cend(); aContIt++) {
+      oFStream << "<context>" << std::endl;
+
+      aContext = aContIt->first;
+      oFStream << "  <name>" << aContext << "</name>" << std::endl;
+
+      aDict = aContIt->second;
+      for(aDictIt = aDict.cbegin(); aDictIt != aDict.cend(); aDictIt++) {
+        oFStream << "  <message>" << std::endl;
+        aSrc = aDictIt->first;
+
+        oFStream << "    <source>" << aSrc << "</source>" << std::endl;
+        oFStream << "    <translation>" << "</translation>" << std::endl;
+
+        oFStream << "  </message>" << std::endl;
+      }
+      oFStream << "</context>" << std::endl;
+    }
+
+    oFStream << "</TS>" << std::endl;
+    oFStream.close();
+  }
+}
+#endif
+#endif

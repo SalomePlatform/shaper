@@ -22,7 +22,6 @@
 #include <Config_DataModelReader.h>
 
 #include <Events_Loop.h>
-#include <Events_Error.h>
 
 #include <QIcon>
 #include <QBrush>

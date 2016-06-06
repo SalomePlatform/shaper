@@ -22,7 +22,7 @@
 #include <SketchSolver_ConstraintMovement.h>
 
 #ifdef _DEBUG
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <SketchSolver_Error.h>
@@ -61,7 +61,7 @@ SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theCons
         ResultConstructionPtr aRC =
             std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aRefAttr->object());
         if (!aRC)
-          Events_Error::send(SketchSolver_Error::NEED_OBJECT_NOT_FEATURE(), this);
+          Events_InfoMessage("SketchSolver_Builder", SketchSolver_Error::NEED_OBJECT_NOT_FEATURE(), this).send();
       }
       continue;
     }
@@ -73,7 +73,7 @@ SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theCons
         ResultConstructionPtr aRC =
             std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aListIter);
         if (*aListIter && !aRC)
-          Events_Error::send(SketchSolver_Error::NEED_OBJECT_NOT_FEATURE(), this);
+          Events_InfoMessage("SketchSolver_Builder", SketchSolver_Error::NEED_OBJECT_NOT_FEATURE(), this).send();
       }
     }
   }

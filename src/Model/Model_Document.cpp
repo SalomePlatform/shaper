@@ -18,7 +18,7 @@
 #include <ModelAPI_ResultBody.h>
 
 #include <Events_Loop.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
@@ -119,61 +119,61 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
     aStatus = anApp->Open(aPath, aLoaded);
   } catch (Standard_Failure) {
     Handle(Standard_Failure) aFail = Standard_Failure::Caught();
-    Events_Error::send(
-        std::string("Exception in opening of document: ") + aFail->GetMessageString());
+    Events_InfoMessage("Model_Document",
+        "Exception in opening of document: %1").arg(aFail->GetMessageString()).send();
     return false;
   }
   bool isError = aStatus != PCDM_RS_OK;
   if (isError) {
     switch (aStatus) {
       case PCDM_RS_UnknownDocument:
-        Events_Error::send(std::string("Can not open document"));
+        Events_InfoMessage("Model_Document", "Can not open document").send();
         break;
       case PCDM_RS_AlreadyRetrieved:
-        Events_Error::send(std::string("Can not open document: already opened"));
+        Events_InfoMessage("Model_Document", "Can not open document: already opened").send();
         break;
       case PCDM_RS_AlreadyRetrievedAndModified:
-        Events_Error::send(
-            std::string("Can not open document: already opened and modified"));
+        Events_InfoMessage("Model_Document", 
+            "Can not open document: already opened and modified").send();
         break;
       case PCDM_RS_NoDriver:
-        Events_Error::send(std::string("Can not open document: driver library is not found"));
+        Events_InfoMessage("Model_Document", "Can not open document: driver library is not found").send();
         break;
       case PCDM_RS_UnknownFileDriver:
-        Events_Error::send(std::string("Can not open document: unknown driver for opening"));
+        Events_InfoMessage("Model_Document", "Can not open document: unknown driver for opening").send();
         break;
       case PCDM_RS_OpenError:
-        Events_Error::send(std::string("Can not open document: file open error"));
+        Events_InfoMessage("Model_Document", "Can not open document: file open error").send();
         break;
       case PCDM_RS_NoVersion:
-        Events_Error::send(std::string("Can not open document: invalid version"));
+        Events_InfoMessage("Model_Document", "Can not open document: invalid version").send();
         break;
       case PCDM_RS_NoModel:
-        Events_Error::send(std::string("Can not open document: no data model"));
+        Events_InfoMessage("Model_Document", "Can not open document: no data model").send();
         break;
       case PCDM_RS_NoDocument:
-        Events_Error::send(std::string("Can not open document: no document inside"));
+        Events_InfoMessage("Model_Document", "Can not open document: no document inside").send();
         break;
       case PCDM_RS_FormatFailure:
-        Events_Error::send(std::string("Can not open document: format failure"));
+        Events_InfoMessage("Model_Document", "Can not open document: format failure").send();
         break;
       case PCDM_RS_TypeNotFoundInSchema:
-        Events_Error::send(std::string("Can not open document: invalid object"));
+        Events_InfoMessage("Model_Document", "Can not open document: invalid object").send();
         break;
       case PCDM_RS_UnrecognizedFileFormat:
-        Events_Error::send(std::string("Can not open document: unrecognized file format"));
+        Events_InfoMessage("Model_Document", "Can not open document: unrecognized file format").send();
         break;
       case PCDM_RS_MakeFailure:
-        Events_Error::send(std::string("Can not open document: make failure"));
+        Events_InfoMessage("Model_Document", "Can not open document: make failure").send();
         break;
       case PCDM_RS_PermissionDenied:
-        Events_Error::send(std::string("Can not open document: permission denied"));
+        Events_InfoMessage("Model_Document", "Can not open document: permission denied").send();
         break;
       case PCDM_RS_DriverFailure:
-        Events_Error::send(std::string("Can not open document: driver failure"));
+        Events_InfoMessage("Model_Document", "Can not open document: driver failure").send();
         break;
       default:
-        Events_Error::send(std::string("Can not open document: unknown error"));
+        Events_InfoMessage("Model_Document", "Can not open document: unknown error").send();
         break;
     }
   }
@@ -231,22 +231,22 @@ bool Model_Document::save(
     aStatus = anApp->SaveAs(myDoc, aPath);
   } catch (Standard_Failure) {
     Handle(Standard_Failure) aFail = Standard_Failure::Caught();
-    Events_Error::send(
-        std::string("Exception in saving of document: ") + aFail->GetMessageString());
+    Events_InfoMessage("Model_Document", 
+        "Exception in saving of document: %1").arg(aFail->GetMessageString()).send();
     return false;
   }
   bool isDone = aStatus == PCDM_SS_OK || aStatus == PCDM_SS_No_Obj;
   if (!isDone) {
     switch (aStatus) {
       case PCDM_SS_DriverFailure:
-        Events_Error::send(std::string("Can not save document: save driver-library failure"));
+        Events_InfoMessage("Model_Document", "Can not save document: save driver-library failure").send();
         break;
       case PCDM_SS_WriteFailure:
-        Events_Error::send(std::string("Can not save document: file writing failure"));
+        Events_InfoMessage("Model_Document", "Can not save document: file writing failure").send();
         break;
       case PCDM_SS_Failure:
       default:
-        Events_Error::send(std::string("Can not save document"));
+        Events_InfoMessage("Model_Document", "Can not save document").send();
         break;
     }
   }
@@ -273,8 +273,8 @@ bool Model_Document::save(
             aFile.Copy(aDestination);
             theResults.push_back(aDestinationDir.ToCString());
           } else {
-            Events_Error::send(
-              std::string("Can not open file ") + aSubPath.ToCString() + " for saving");
+            Events_InfoMessage("Model_Document", 
+              "Can not open file %1 for saving").arg(aSubPath.ToCString()).send();
           }
         }
       } else { // simply save opened document

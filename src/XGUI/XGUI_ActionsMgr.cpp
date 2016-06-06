@@ -12,7 +12,7 @@
 #include <XGUI_SelectionMgr.h>
 
 #include <Events_Loop.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Events.h>
@@ -175,7 +175,7 @@ QKeySequence XGUI_ActionsMgr::registerShortcut(const QKeySequence& theKeySequenc
   if (myShortcuts.contains(theKeySequence)) {
     QString aMessage = tr("Shortcut %1 is already defined. Ignore.");
     aMessage = aMessage.arg(theKeySequence.toString());
-    Events_Error::send(aMessage.toStdString());
+    Events_InfoMessage("XGUI_ActionsMgr", aMessage.toStdString()).send();
     return QKeySequence();
   }
   myShortcuts.append(theKeySequence);

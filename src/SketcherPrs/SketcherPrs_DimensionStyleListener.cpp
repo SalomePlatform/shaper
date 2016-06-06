@@ -7,7 +7,6 @@
 #include "SketcherPrs_DimensionStyleListener.h"
 #include "SketcherPrs_Tools.h"
 
-#include <Events_Error.h>
 #include <Events_Loop.h>
 
 SketcherPrs_DimensionStyleListener::SketcherPrs_DimensionStyleListener()

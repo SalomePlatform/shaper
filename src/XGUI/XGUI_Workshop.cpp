@@ -52,7 +52,7 @@
 //#include <PartSetPlugin_Part.h>
 
 #include <Events_Loop.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 #include <Events_LongOp.h>
 
 #include <ModuleBase_FilterFactory.h>
@@ -217,6 +217,13 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 //******************************************************
 XGUI_Workshop::~XGUI_Workshop(void)
 {
+#ifdef _DEBUG
+#ifdef MISSED_TRANSLATION
+  // Save Missed translations
+  Config_Translator::saveMissedTranslations();
+#endif
+#endif
+
   delete myDisplayer;
   delete myDataModelXMLReader;
 }
@@ -498,10 +505,9 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
   std::string aFeatureKind = aFeature->getKind();
   foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
     if (!aWidget->attributeID().empty() && !aFeature->attribute(aWidget->attributeID()).get()) {
-      std::string anErrorMsg = "The feature '" + aFeatureKind + "' has no attribute '"
-          + aWidget->attributeID() + "' used by widget '"
-          + aWidget->metaObject()->className() + "'.";
-      Events_Error::send(anErrorMsg);
+      std::string anErrorMsg = "The feature '%1' has no attribute '%2' used by widget '%3'.";
+      Events_InfoMessage("XGUI_Workshop", anErrorMsg)
+        .arg(aFeatureKind).arg(aWidget->attributeID()).arg(aWidget->metaObject()->className()).send();
       myPropertyPanel->cleanContent();
       return;
     }
@@ -1012,7 +1018,7 @@ ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
 
   if (!err.isEmpty()) {
     if (desktop()) {
-      Events_Error::send(err.toStdString());
+      Events_InfoMessage("XGUI_Workshop", err.toStdString()).send();
     } else {
       qWarning(qPrintable(err));
     }

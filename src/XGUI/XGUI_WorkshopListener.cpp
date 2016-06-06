@@ -29,7 +29,6 @@
 #include <ModelAPI_Tools.h>
 
 #include <Events_Loop.h>
-#include <Events_Error.h>
 #include <Events_LongOp.h>
 
 #include <ModuleBase_IWorkshop.h>
@@ -83,7 +82,6 @@ void XGUI_WorkshopListener::initializeEventListening()
 {
   //Initialize event listening
   Events_Loop* aLoop = Events_Loop::loop();
-  //aLoop->registerListener(this, Events_Error::errorID());  //!< Listening application errors.
   aLoop->registerListener(this, Events_InfoMessage::errorID());  //!< Listening application errors.
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OPERATION_LAUNCHED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));

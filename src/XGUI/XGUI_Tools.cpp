@@ -17,7 +17,7 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Tools.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <GeomAPI_Shape.h>
 
@@ -137,7 +137,7 @@ bool canRename(const ObjectPtr& theObject, const QString& theName)
       QString aErrMsg(QObject::tr("Selected parameter can not be renamed to: %1. \
  There is a parameter with the same name. Its value is: %2.").arg(qPrintable(theName)).arg(aValue));
       // We can not use here a dialog box for message - it will crash editing process in ObjectBrowser
-      Events_Error::send(aErrMsg.toStdString());
+      Events_InfoMessage("XGUI_Tools", aErrMsg.toStdString()).send();
       return false;
     }
   }

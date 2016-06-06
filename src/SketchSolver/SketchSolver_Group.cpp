@@ -12,7 +12,7 @@
 #include <SketchSolver_Error.h>
 #include <SketchSolver_Manager.h>
 
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 #include <Events_Loop.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Events.h>
@@ -166,7 +166,7 @@ bool SketchSolver_Group::changeConstraint(
     if (!aConstraint->error().empty()) {
       if (aConstraint->error() == SketchSolver_Error::NOT_INITIALIZED())
         return false; // some attribute are not initialized yet, don't show message
-      Events_Error::send(aConstraint->error(), this);
+      Events_InfoMessage("SketchSolver_Group", aConstraint->error(), this).send();
     }
     myConstraints[theConstraint] = aConstraint;
 

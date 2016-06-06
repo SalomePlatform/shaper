@@ -15,7 +15,6 @@
 #include <Config_PropManager.h>
 
 #include <Events_Loop.h>
-#include <Events_Error.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
