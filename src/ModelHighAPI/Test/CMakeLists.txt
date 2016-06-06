@@ -4,6 +4,7 @@ include(GTest)
 
 set(PROJECT_SOURCES
   TestDouble.cpp
+  TestSelection.cpp
 )
 
 include_directories(

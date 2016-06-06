@@ -19,7 +19,9 @@
 %include "std_shared_ptr.i"
 
 // shared pointers
+%shared_ptr(ConstructionAPI_Plane)
 %shared_ptr(ConstructionAPI_Point)
 
 // all supported interfaces
+%include "ConstructionAPI_Plane.h"
 %include "ConstructionAPI_Point.h"

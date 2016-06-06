@@ -11,7 +11,7 @@ using ::testing::ReturnRefOfCopy;
 using ::testing::Test;
 
 // TODO(spo): should be common function
-void null_deleter(void *) {}
+static void null_deleter(void *) {}
 
 class HighModelAPI_Double_Test : public Test {
 public:

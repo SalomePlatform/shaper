@@ -9,6 +9,7 @@
 
   #include <ModelHighAPI_swig.h>
 
+  #include "ConstructionAPI_Plane.h"
   #include "ConstructionAPI_Point.h"
 
 #endif /* SRC_CONSTRUCTIONAPI_CONSTRUCTIONAPI_SWIG_H_ */

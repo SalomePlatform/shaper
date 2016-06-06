@@ -7,11 +7,13 @@ SET(PROJECT_HEADERS
   ModelHighAPI_Double.h
   ModelHighAPI_Interface.h
   ModelHighAPI_Macro.h
+  ModelHighAPI_Selection.h
 )
 
 SET(PROJECT_SOURCES
   ModelHighAPI_Double.cpp
   ModelHighAPI_Interface.cpp
+  ModelHighAPI_Selection.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -40,6 +42,7 @@ SET(SWIG_LINK_LIBRARIES
 
 INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/Events
+  ${PROJECT_SOURCE_DIR}/src/GeomAPI
   ${PROJECT_SOURCE_DIR}/src/ModelAPI
 )
 

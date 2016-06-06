@@ -4,10 +4,12 @@ INCLUDE(Common)
 
 SET(PROJECT_HEADERS
   ConstructionAPI.h
+  ConstructionAPI_Plane.h
   ConstructionAPI_Point.h
 )
 
 SET(PROJECT_SOURCES
+  ConstructionAPI_Plane.cpp
   ConstructionAPI_Point.cpp
 )
 
