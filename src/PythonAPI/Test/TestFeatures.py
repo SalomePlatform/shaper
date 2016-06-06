@@ -28,9 +28,9 @@ class FeaturesTestCase(FeaturesFixture):
     def test_assert_error_on_empty_args(self):
         features = [
             # Implemented in C++, add* without arguments doesn't exist
-            # "addPoint",
+            # "addPoint", "addPlane",
 
-            "addAxis", "addPlane",
+            "addAxis",
             "addImport", "exportToFile",
             "addAddition", "addSubtraction", "addIntersection",
             "addExtrusion",
@@ -54,7 +54,7 @@ class FeaturesTestCase(FeaturesFixture):
     def test_initialize_without_attributes(self):
         import ConstructionAPI
         model.construction.axis.Axis(self.part.addFeature("Axis"))
-        model.construction.plane.Plane(self.part.addFeature("Plane"))
+        ConstructionAPI.ConstructionAPI_Plane(self.part.addFeature("Plane"))
         ConstructionAPI.ConstructionAPI_Point(self.part.addFeature("Point"))
 
         model.exchange.Import(self.part.addFeature("Import"))
