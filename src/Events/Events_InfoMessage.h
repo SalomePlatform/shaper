@@ -11,6 +11,9 @@
 #include <Events_Message.h>
 #include <Events_Loop.h>
 
+#include <string>
+#include <list>
+
 /**\class Events_InfoMessage
  * \ingroup EventsLoop
  * \brief An event message for sending a string message which has to be translated.
