@@ -284,6 +284,8 @@ protected:
   /// The method called when widget is activated
   virtual void activateCustom() {};
 
+  QString translateString(const QString& theMsg) const;
+
 protected slots:
   /// Processing of values changed in model widget by store the current value to the feature
   void onWidgetValuesChanged();

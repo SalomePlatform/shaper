@@ -110,7 +110,7 @@ QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
 {
   QString aMsg = ModelAPI_Tools::getFeatureError(theFeature).c_str();
   if (!aMsg.isEmpty()) {
-    std::string aStr = Config_Translator::translate(theFeature->getKind(), aMsg.toStdString()).c_str();
+    std::string aStr = Config_Translator::translate(theFeature->getKind(), aMsg.toStdString());
     std::string aCodec = Config_Translator::codec(theFeature->getKind());
     aMsg = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aStr.c_str());
   }

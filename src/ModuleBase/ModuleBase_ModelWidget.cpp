@@ -17,12 +17,14 @@
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
+#include <Config_Translator.h>
 
 #include <Events_Loop.h>
 
 #include <QEvent>
 #include <QLabel>
 #include <QFocusEvent>
+#include <QTextCodec>
 
 //#define DEBUG_VALUE_STATE
 
@@ -132,8 +134,22 @@ QString ModuleBase_ModelWidget::getError(const bool theValueStateChecked) const
   if (anError.isEmpty() && theValueStateChecked)
     anError = getValueStateError();
 
+  anError = translateString(anError);
   return anError;
 }
+
+
+QString ModuleBase_ModelWidget::translateString(const QString& theMsg) const
+{
+  if (!theMsg.isEmpty()) {
+    std::string aContext = feature()->getKind();
+    std::string aStr = Config_Translator::translate(aContext, theMsg.toStdString().c_str());
+    std::string aCodec = Config_Translator::codec(aContext);
+    return QTextCodec::codecForName(aCodec.c_str())->toUnicode(aStr.c_str());
+  }
+  return theMsg;
+}
+
 
 void ModuleBase_ModelWidget::enableFocusProcessing()
 {
