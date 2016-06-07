@@ -12,16 +12,16 @@
 
 //--------------------------------------------------------------------------------------
 // See ModelAPI_Feature functions
-#define FN_Boolean boolean
-#define FN_DocRef document
-#define FN_Double real
-#define FN_Integer integer
-#define FN_RefAttr refattr
-#define FN_Reference reference
-#define FN_RefList reflist
-#define FN_Selection selection
-#define FN_SelectionList selectionList
-#define FN_String string
+#define FN_ModelAPI_AttributeBoolean boolean
+#define FN_ModelAPI_AttributeDocRef document
+#define FN_ModelAPI_AttributeDouble real
+#define FN_ModelAPI_AttributeInteger integer
+#define FN_ModelAPI_AttributeRefAttr refattr
+#define FN_ModelAPI_AttributeReference reference
+#define FN_ModelAPI_AttributeRefList reflist
+#define FN_ModelAPI_AttributeSelection selection
+#define FN_ModelAPI_AttributeSelectionList selectionList
+#define FN_ModelAPI_AttributeString string
 
 //--------------------------------------------------------------------------------------
 #define VAR_NAME(NAME) my##NAME
@@ -30,9 +30,9 @@
 // Used in INTERFACE_N for create variable and getter
 #define DEFINE_ATTRIBUTE(NAME, TYPE, COMMENT) \
     COMMENT \
-    std::shared_ptr<ModelAPI_Attribute##TYPE> NAME() const { return VAR_NAME(NAME); } \
+    std::shared_ptr<TYPE> NAME() const { return VAR_NAME(NAME); } \
   protected: \
-    std::shared_ptr<ModelAPI_Attribute##TYPE> VAR_NAME(NAME); \
+    std::shared_ptr<TYPE> VAR_NAME(NAME); \
   public:
 
 //--------------------------------------------------------------------------------------

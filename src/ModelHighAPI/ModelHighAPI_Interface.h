@@ -51,4 +51,4 @@ protected:
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
-#endif /* SRC_MODELHIGHAPI_MODELHIGHAPI_INTERFACE_H_ */ 
+#endif /* SRC_MODELHIGHAPI_MODELHIGHAPI_INTERFACE_H_ */

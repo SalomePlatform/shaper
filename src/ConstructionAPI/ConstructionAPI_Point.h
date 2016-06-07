@@ -40,9 +40,9 @@ public:
   virtual ~ConstructionAPI_Point();
 
   INTERFACE_3(ConstructionPlugin_Point::ID(),
-              x, ConstructionPlugin_Point::X(), Double, /** X attribute */,
-              y, ConstructionPlugin_Point::Y(), Double, /** Y attribute */,
-              z, ConstructionPlugin_Point::Z(), Double, /** Z attribute */)
+              x, ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble, /** X attribute */,
+              y, ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble, /** Y attribute */,
+              z, ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble, /** Z attribute */)
 
   /// Set point values
   CONSTRUCTIONAPI_EXPORT

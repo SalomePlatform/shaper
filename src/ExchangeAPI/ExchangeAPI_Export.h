@@ -41,9 +41,9 @@ public:
   virtual ~ExchangeAPI_Export();
 
   INTERFACE_3(ExchangePlugin_ExportFeature::ID(),
-              filePath, ExchangePlugin_ExportFeature::FILE_PATH_ID(), String, /** File path */,
-              fileFormat, ExchangePlugin_ExportFeature::FILE_FORMAT_ID(), String, /** File format */,
-              selectionList, ExchangePlugin_ExportFeature::SELECTION_LIST_ID(), SelectionList, /** Selection list */
+              filePath, ExchangePlugin_ExportFeature::FILE_PATH_ID(), ModelAPI_AttributeString, /** File path */,
+              fileFormat, ExchangePlugin_ExportFeature::FILE_FORMAT_ID(), ModelAPI_AttributeString, /** File format */,
+              selectionList, ExchangePlugin_ExportFeature::SELECTION_LIST_ID(), ModelAPI_AttributeSelectionList, /** Selection list */
   )
 
   /// Set file path (without execute)

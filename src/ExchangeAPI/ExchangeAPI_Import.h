@@ -36,14 +36,14 @@ public:
   virtual ~ExchangeAPI_Import();
 
   INTERFACE_1(ExchangePlugin_ImportFeature::ID(),
-              filePath, ExchangePlugin_ImportFeature::FILE_PATH_ID(), String, /** File path */)
+              filePath, ExchangePlugin_ImportFeature::FILE_PATH_ID(), ModelAPI_AttributeString, /** File path */)
 
   /// Set point values
   EXCHANGEAPI_EXPORT
   void setFilePath(const std::string & theFilePath);
 };
 
-//! Importer on Import object
+//! Pointer on Import object
 typedef std::shared_ptr<ExchangeAPI_Import> ImportPtr;
 
 /**\ingroup CPPHighAPI
