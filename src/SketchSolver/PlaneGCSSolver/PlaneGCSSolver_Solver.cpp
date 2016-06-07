@@ -98,10 +98,8 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
   if (aResult == GCS::Success) {
     myEquationSystem.applySolution();
     aStatus = STATUS_OK;
-  } else {
-    undo();
+  } else
     aStatus = STATUS_FAILED;
-  }
 
   return aStatus;
 }
