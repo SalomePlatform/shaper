@@ -94,7 +94,7 @@ bool Config_Translator::load(const std::string& theFileName)
 std::string Config_Translator::translate(std::shared_ptr<Events_InfoMessage> theInfo)
 {
   std::string aContext = theInfo->context();
-  std::string aMessage = theInfo->message();
+  std::string aMessage = theInfo->messageString();
   std::list<std::string> aParameters = theInfo->parameters();
   return translate(aContext, aMessage, aParameters);
 }

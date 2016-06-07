@@ -46,10 +46,10 @@ public:
 
   /// Set message string for translation
   /// \param theMsg the string of message
-  void setMessage(const std::string& theMsg) { myMessage = theMsg; } 
+  void setMessageString(const std::string& theMsg) { myMessage = theMsg; } 
 
   /// Returns message
-  std::string message() const { return myMessage; }
+  std::string messageString() const { return myMessage; }
 
   /// Add parameter for message string of string type
   /// \param theParam the parameter
