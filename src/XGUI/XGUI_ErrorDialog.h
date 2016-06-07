@@ -12,9 +12,9 @@
 
 #include <XGUI.h>
 #include <QDialog>
+#include <Events_InfoMessage.h>
 
 class QTextEdit;
-class Events_InfoMessage;
 
 /**
 * \ingroup GUI
