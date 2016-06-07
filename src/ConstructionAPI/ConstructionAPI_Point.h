@@ -42,7 +42,8 @@ public:
   INTERFACE_3(ConstructionPlugin_Point::ID(),
               x, ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble, /** X attribute */,
               y, ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble, /** Y attribute */,
-              z, ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble, /** Z attribute */)
+              z, ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble, /** Z attribute */
+  )
 
   /// Set point values
   CONSTRUCTIONAPI_EXPORT

@@ -36,7 +36,8 @@ public:
   virtual ~ExchangeAPI_Import();
 
   INTERFACE_1(ExchangePlugin_ImportFeature::ID(),
-              filePath, ExchangePlugin_ImportFeature::FILE_PATH_ID(), ModelAPI_AttributeString, /** File path */)
+              filePath, ExchangePlugin_ImportFeature::FILE_PATH_ID(), ModelAPI_AttributeString, /** File path */
+  )
 
   /// Set point values
   EXCHANGEAPI_EXPORT

@@ -8,20 +8,19 @@
 #define SRC_MODELHIGHAPI_MODELHIGHAPI_MACRO_H_
 
 //--------------------------------------------------------------------------------------
+#include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeDocRef.h>
+#include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeRefAttrList.h>
+#include <ModelAPI_AttributeReference.h>
+#include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Feature.h>
-
-//--------------------------------------------------------------------------------------
-// See ModelAPI_Feature functions
-#define FN_ModelAPI_AttributeBoolean boolean
-#define FN_ModelAPI_AttributeDocRef document
-#define FN_ModelAPI_AttributeDouble real
-#define FN_ModelAPI_AttributeInteger integer
-#define FN_ModelAPI_AttributeRefAttr refattr
-#define FN_ModelAPI_AttributeReference reference
-#define FN_ModelAPI_AttributeRefList reflist
-#define FN_ModelAPI_AttributeSelection selection
-#define FN_ModelAPI_AttributeSelectionList selectionList
-#define FN_ModelAPI_AttributeString string
 
 //--------------------------------------------------------------------------------------
 #define VAR_NAME(NAME) my##NAME
@@ -38,7 +37,7 @@
 //--------------------------------------------------------------------------------------
 // Used in INTERFACE_N inside START_INIT/END_INIT for set variable with attribute received from feature
 #define SET_ATTRIBUTE(NAME, TYPE, ATT_NAME) \
-  VAR_NAME(NAME) = feature()->FN_##TYPE(ATT_NAME); \
+  VAR_NAME(NAME) = std::dynamic_pointer_cast<TYPE>(feature()->attribute(ATT_NAME)); \
   if (!VAR_NAME(NAME)) \
     return false;
 

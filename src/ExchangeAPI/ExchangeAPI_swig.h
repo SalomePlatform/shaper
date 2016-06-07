@@ -8,8 +8,8 @@
 #define SRC_EXCHANGEAPI_EXCHANGEAPI_SWIG_H_
 
   #include <ModelHighAPI_swig.h>
-  #include "ExchangeAPI.h"
 
+  #include "ExchangeAPI.h"
   #include "ExchangeAPI_Export.h"
   #include "ExchangeAPI_Import.h"
 
