@@ -19,10 +19,10 @@
 class ModelAPI_AttributeString : public ModelAPI_Attribute
 {
  public:
-  /// Defines the double value
+  /// Defines the string value
   MODELAPI_EXPORT virtual void setValue(const std::string& theValue) = 0;
 
-  /// Returns the double value
+  /// Returns the string value
   MODELAPI_EXPORT virtual std::string value() = 0;
 
   /// Returns the type of this class of attributes
@@ -42,7 +42,7 @@ class ModelAPI_AttributeString : public ModelAPI_Attribute
   MODELAPI_EXPORT ModelAPI_AttributeString();
 };
 
-//! Pointer on double attribute
+//! Pointer on string attribute
 typedef std::shared_ptr<ModelAPI_AttributeString> AttributeStringPtr;
 
 #endif
