@@ -7,11 +7,7 @@
 //--------------------------------------------------------------------------------------
 #include "ConstructionAPI_Point.h"
 //--------------------------------------------------------------------------------------
-#include <ModelAPI_AttributeDouble.h>
-#include <ModelAPI_Document.h>
-#include <ModelAPI_Feature.h>
-
-#include <ModelHighAPI_Double.h>
+#include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 ConstructionAPI_Point::ConstructionAPI_Point(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
@@ -41,9 +37,9 @@ void ConstructionAPI_Point::setPoint(const ModelHighAPI_Double & theX,
                                      const ModelHighAPI_Double & theY,
                                      const ModelHighAPI_Double & theZ)
 {
-  theX.fillAttribute(myx);
-  theY.fillAttribute(myy);
-  theZ.fillAttribute(myz);
+  fillAttribute(theX, myx);
+  fillAttribute(theY, myy);
+  fillAttribute(theZ, myz);
 
   execute();
 }

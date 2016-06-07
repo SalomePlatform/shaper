@@ -14,11 +14,30 @@
 #include <memory>
 #include <string>
 //--------------------------------------------------------------------------------------
+class ModelAPI_AttributeBoolean;
+class ModelAPI_AttributeDocRef;
+class ModelAPI_AttributeDouble;
+class ModelAPI_AttributeIntArray;
+class ModelAPI_AttributeInteger;
+class ModelAPI_AttributeRefAttr;
+class ModelAPI_AttributeRefAttrList;
+class ModelAPI_AttributeReference;
+class ModelAPI_AttributeRefList;
+class ModelAPI_AttributeSelection;
 class ModelAPI_AttributeSelectionList;
 class ModelAPI_AttributeString;
 //--------------------------------------------------------------------------------------
+class ModelHighAPI_Double;
 class ModelHighAPI_Selection;
 //--------------------------------------------------------------------------------------
+MODELHIGHAPI_EXPORT
+void fillAttribute(const ModelHighAPI_Double & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute);
+
+MODELHIGHAPI_EXPORT
+void fillAttribute(const ModelHighAPI_Selection & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeSelection> & theAttribute);
+
 MODELHIGHAPI_EXPORT
 void fillAttribute(const std::list<ModelHighAPI_Selection> & theValue,
                    const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute);

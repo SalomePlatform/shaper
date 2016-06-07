@@ -7,8 +7,7 @@
 //--------------------------------------------------------------------------------------
 #include "ConstructionAPI_Plane.h"
 //--------------------------------------------------------------------------------------
-#include <ModelHighAPI_Double.h>
-#include <ModelHighAPI_Selection.h>
+#include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 ConstructionAPI_Plane::ConstructionAPI_Plane(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
@@ -49,8 +48,8 @@ void ConstructionAPI_Plane::setFaceAndDistance(
     const ModelHighAPI_Selection & theFace,
     const ModelHighAPI_Double & theDistance)
 {
-  theFace.fillAttribute(myface);
-  theDistance.fillAttribute(mydistance);
+  fillAttribute(theFace, myface);
+  fillAttribute(theDistance, mydistance);
 
   execute();
 }
@@ -61,10 +60,10 @@ void ConstructionAPI_Plane::setGeneralEquation(
     const ModelHighAPI_Double & theC,
     const ModelHighAPI_Double & theD)
 {
-  theA.fillAttribute(myA);
-  theB.fillAttribute(myB);
-  theC.fillAttribute(myC);
-  theD.fillAttribute(myD);
+  fillAttribute(theA, myA);
+  fillAttribute(theB, myB);
+  fillAttribute(theC, myC);
+  fillAttribute(theD, myD);
 
   execute();
 }

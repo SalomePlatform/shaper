@@ -39,7 +39,7 @@ public:
 
   /// Fill attribute values
   MODELHIGHAPI_EXPORT
-  virtual void fillAttribute(std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute) const;
+  virtual void fillAttribute(const std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute) const;
 
 private:
   boost::variant<double, std::string> myValue;

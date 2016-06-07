@@ -35,7 +35,7 @@ struct fill_visitor : boost::static_visitor<void>
 {
   mutable std::shared_ptr<ModelAPI_AttributeDouble> myAttribute;
 
-  fill_visitor(std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute)
+  fill_visitor(const std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute)
   : myAttribute(theAttribute) {}
 
   void operator()(double theValue) const { myAttribute->setValue(theValue); }
@@ -43,7 +43,7 @@ struct fill_visitor : boost::static_visitor<void>
 };
 
 void ModelHighAPI_Double::fillAttribute(
-    std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute) const
+    const std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute) const
 {
   boost::apply_visitor(fill_visitor(theAttribute), myValue);
 }
