@@ -1197,6 +1197,7 @@ void adjustMirror(ConstraintWrapperPtr theConstraint)
       aMirrorLine = *anIt;
   }
 
-  makeMirrorPoints(aPoints[0], aPoints[1], aMirrorLine);
+  if (aPoints.size() == 2)
+    makeMirrorPoints(aPoints[0], aPoints[1], aMirrorLine);
 }
 

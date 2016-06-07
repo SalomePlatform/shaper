@@ -88,23 +88,6 @@ void SketchSolver_ConstraintMirror::process()
   std::vector<EntityWrapperPtr>::iterator aBIt = aBaseList.begin();
   std::vector<EntityWrapperPtr>::iterator aMIt = aMirrorList.begin();
   for (; aBIt != aBaseList.end(); ++aBIt, ++aMIt) {
-    if ((*aBIt)->type() == ENTITY_ARC) {
-      // add new points on arcs and mirror them
-      EntityWrapperPtr aBasePnt = myStorage->calculateMiddlePoint(*aBIt, 0.5);
-      EntityWrapperPtr aMirrPnt = myStorage->calculateMiddlePoint(*aMIt, 0.5);
-      // point on base arc
-      aNewConstraints = aBuilder->createConstraint(myBaseConstraint, myGroupID, mySketchID,
-          CONSTRAINT_PT_ON_CIRCLE, 0.0, aBasePnt, EntityWrapperPtr(), *aBIt);
-      aMirConstrList.insert(aMirConstrList.end(), aNewConstraints.begin(), aNewConstraints.end());
-      // point on mirrored arc
-      aNewConstraints = aBuilder->createConstraint(myBaseConstraint, myGroupID, mySketchID,
-          CONSTRAINT_PT_ON_CIRCLE, 0.0, aMirrPnt, EntityWrapperPtr(), *aMIt);
-      aMirConstrList.insert(aMirConstrList.end(), aNewConstraints.begin(), aNewConstraints.end());
-      // mirror these points
-      aNewConstraints = aBuilder->createConstraint(myBaseConstraint, myGroupID, mySketchID,
-          aConstrType, 0.0, aBasePnt, aMirrPnt, aMirrorLine);
-      aMirConstrList.insert(aMirConstrList.end(), aNewConstraints.begin(), aNewConstraints.end());
-    }
     aNewConstraints = aBuilder->createConstraint(
         myBaseConstraint, myGroupID, mySketchID, aConstrType,
         0.0, *aBIt, *aMIt, aMirrorLine);
@@ -115,6 +98,8 @@ void SketchSolver_ConstraintMirror::process()
   for (aMIt = aMirrorList.begin(); aMIt != aMirrorList.end(); ++aMIt)
     myStorage->update((*aMIt)->baseFeature(), myGroupID);
   myStorage->addConstraint(myBaseConstraint, aMirConstrList);
+
+  adjustConstraint();
 }
 
 

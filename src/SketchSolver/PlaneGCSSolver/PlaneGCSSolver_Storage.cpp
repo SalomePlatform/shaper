@@ -387,7 +387,8 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
   double* aEndAngle   = std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(*aSubIt++)->scalar();
   double* aRadius     = std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(*aSubIt)->scalar();
 
-  FeaturePtr anArcFeature = theArc->baseFeature();
+  std::shared_ptr<SketchPlugin_Feature> anArcFeature =
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(theArc->baseFeature());
   std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       anArcFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
   std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -409,6 +410,9 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
     return;
   anArcEdge->getRange(*aStartAngle, *aEndAngle);
 
+  // do not constraint copied arc
+  if (anArcFeature->isCopy())
+    return;
   // No need to add constraints if they are already exist
   std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >::const_iterator
       aFound = myArcConstraintMap.find(theArc);
