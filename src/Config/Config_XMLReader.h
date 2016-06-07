@@ -60,6 +60,8 @@ class Config_XMLReader
    */
   CONFIG_EXPORT xmlNodePtr findRoot();
 
+  CONFIG_EXPORT const char* encoding() const;
+
  protected:
   /*!
    * \brief Allows to customize reader's behavior for a node. Virtual.

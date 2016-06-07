@@ -225,14 +225,26 @@ bool BothAreSpaces(char lhs, char rhs) { return (lhs == rhs) && (lhs == ' '); }
 std::string getProperty(xmlNodePtr theNode, const char* thePropName)
 {
   std::string result = "";
-  char* aPropChars = (char*) xmlGetProp(theNode, BAD_CAST thePropName);
+  xmlChar* aPropChars = xmlGetProp(theNode, BAD_CAST thePropName);
   if (!aPropChars || aPropChars[0] == 0)
     return result;
-  result = std::string(aPropChars);
+  result = std::string((char*)aPropChars);
+  xmlFree(aPropChars);
 
   std::string::iterator new_end = std::unique(result.begin(), result.end(), BothAreSpaces);
   result.erase(new_end, result.end()); 
 
+  return result;
+}
+
+std::string getContent(xmlNodePtr theNode)
+{
+  std::string result = "";
+  xmlChar* aContent = xmlNodeGetContent(theNode);
+  if (!aContent || aContent[0] == 0)
+    return result;
+  result = std::string((char*)aContent);
+  xmlFree(aContent);
   return result;
 }
 

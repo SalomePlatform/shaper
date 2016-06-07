@@ -39,7 +39,6 @@
 #include <ModelAPI_AttributeValidator.h>
 
 #include <Config_WidgetAPI.h>
-#include <Events_Error.h>
 
 #include <GeomAPI_Shape.h>
 

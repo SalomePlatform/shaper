@@ -13,7 +13,7 @@
 #include <Config_Common.h>
 #include <Config_ModuleReader.h>
 #include <Config_FeatureReader.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
@@ -70,9 +70,9 @@ void Config_ModuleReader::addFeature(const std::string& theFeatureName,
                                      const std::string& thePluginConfig)
 {
   if (myFeaturesInFiles.count(theFeatureName)) {
-    std::string anErrorMsg = "Can not register feature '" + theFeatureName + "' in plugin '"
-        + thePluginConfig + "'. There is a feature with the same ID.";
-    Events_Error::send(anErrorMsg);
+    std::string anErrorMsg = "Can not register feature '%1' in plugin '%2'."
+      " There is a feature with the same ID.";
+    Events_InfoMessage("Config_ModuleReader", anErrorMsg).arg(theFeatureName).arg(thePluginConfig).send();
     return;
   }
 
@@ -194,7 +194,7 @@ void Config_ModuleReader::loadScript(const std::string& theFileName)
       Py_XDECREF(pvalue);
       Py_XDECREF(ptraceback);
     }
-    Events_Error::send(anErrorMsg);
+    Events_InfoMessage("Config_ModuleReader", anErrorMsg).send();
   }
 
   /* release python thread */
@@ -229,7 +229,7 @@ void Config_ModuleReader::loadLibrary(const std::string& theLibName)
     anErrorMsg += ": " + std::string(dlerror());
     #endif
     std::cerr << anErrorMsg << std::endl;
-    Events_Error::send(anErrorMsg);
+    Events_InfoMessage("Config_ModuleReader", anErrorMsg).send();
   }
 }
 

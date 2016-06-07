@@ -37,7 +37,7 @@ static const char * EVENT_OBJECT_TO_REDISPLAY = "ObjectsToRedisplay";
 /// Event ID that visualization must be redisplayed (comes with ModelAPI_ObjectUpdatedMessage)
 static const char * EVENT_OPERATION_LAUNCHED = "OperationLaunched";
 /// Event ID that plugin is loaded (comes with ModelAPI_ObjectUpdatedMessage)
-static const char * EVENT_PLUGIN_LOADED = "PliginLoaded";
+static const char * EVENT_PLUGIN_LOADED = "PluginLoaded";
 //
 static const char * EVENT_DOCUMENT_CHANGED = "CurrentDocumentChanged";
 

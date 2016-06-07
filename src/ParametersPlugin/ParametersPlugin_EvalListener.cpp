@@ -11,7 +11,7 @@
 #include <ParametersPlugin_Parameter.h>
 #include <ParametersPlugin_PyInterp.h>
 
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
@@ -91,8 +91,9 @@ void ParametersPlugin_EvalListener::processEvent(
   } else if (theMessage->eventID() == kReplaceParameterEvent) {
     processReplaceParameterEvent(theMessage);
   } else {
-    Events_Error::send(std::string("ParametersPlugin python interpreter, unhandled message caught: ")
-                       + theMessage->eventID().eventText());
+    Events_InfoMessage("ParametersPlugin_EvalListener", 
+      "ParametersPlugin python interpreter, unhandled message caught: ")
+      .arg(theMessage->eventID().eventText()).send();
   }
 }
 

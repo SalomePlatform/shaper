@@ -11,7 +11,7 @@
 #include <Config_Keywords.h>
 #include "Config_Common.h"
 
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 
 Config_DataModelReader::Config_DataModelReader()
@@ -29,7 +29,7 @@ void Config_DataModelReader::processNode(xmlNodePtr theNode)
     std::string aName = getProperty(theNode, FOLDER_NAME);
     std::string aGroupType = getProperty(theNode, GROUP_TYPE);
     if (aName.empty() || aGroupType.empty())
-      Events_Error::send("Reading dataModel.xml: wrong folder definition");
+      Events_InfoMessage("Config_DataModelReader", "Reading dataModel.xml: wrong folder definition.").send();
    
     std::string aIcon = getProperty(theNode, NODE_ICON);
     std::string aEmpty = getProperty(theNode, SHOW_EMPTY);

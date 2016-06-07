@@ -12,14 +12,14 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_Data.h>
 //#include <ModelAPI_AttributeValidator.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 
 void ModuleBase_FilterFactory::registerFilter(const std::string& theID,
                                               ModuleBase_Filter* theFilter)
 {
   if (myIDs.find(theID) != myIDs.end()) {
-    Events_Error::send(std::string("Filter ") + theID + " is already registered");
+    Events_InfoMessage("ModuleBase_FilterFactory", "Filter %1 is already registered").arg(theID).send();
   } else {
     myIDs[theID] = theFilter;
   }
@@ -63,7 +63,8 @@ void ModuleBase_FilterFactory::filters(const std::string& theFeatureID,
         std::map<std::string, ModuleBase_Filter*>::const_iterator aFound = myIDs.find(
           aValIter->first);
         if (aFound == myIDs.end()) {
-          Events_Error::send(std::string("Filter ") + aValIter->first + " was not registered");
+          Events_InfoMessage("ModuleBase_FilterFactory", "Filter %1 was not registered")
+            .arg(aValIter->first).send();
         } else {
           ModuleBase_Filter* aFilter = aFound->second;
           aFilter->setArguments(aValIter->second);

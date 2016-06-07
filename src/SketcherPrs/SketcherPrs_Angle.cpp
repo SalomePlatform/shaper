@@ -25,8 +25,6 @@
 #include <TopExp.hxx>
 #include <BRep_Tool.hxx>
 
-#include <Events_Error.h>
-
 #define PI 3.1415926535897932
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension_);

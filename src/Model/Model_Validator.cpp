@@ -15,13 +15,13 @@
 #include <ModelAPI_Feature.h>
 #include <Model_Data.h>
 
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 void Model_ValidatorsFactory::registerValidator(const std::string& theID,
   ModelAPI_Validator* theValidator)
 {
   if (myIDs.find(theID) != myIDs.end()) {
-    Events_Error::send(std::string("Validator ") + theID + " is already registered");
+    Events_InfoMessage("Model_Validator", "Validator %1 is already registered").arg(theID).send();
   } else {
     myIDs[theID] = theValidator;
   }
@@ -86,7 +86,8 @@ void Model_ValidatorsFactory::validators(const std::string& theFeatureID,
     AttrValidators::const_iterator aValidatorsIt = aFeatureIt->second.cbegin();
     for (; aValidatorsIt != aFeatureIt->second.cend(); aValidatorsIt++) {
       if (!validator(aValidatorsIt->first)) {
-        Events_Error::send(std::string("Validator ") + aValidatorsIt->first + " was not registered");
+        Events_InfoMessage("Model_Validator", "Validator %1 was not registered")
+          .arg(aValidatorsIt->first).send();
       } else {
         theValidators.push_back(std::make_pair(aValidatorsIt->first, aValidatorsIt->second));
       }
@@ -106,7 +107,8 @@ void Model_ValidatorsFactory::validators(const std::string& theFeatureID, const 
       AttrValidators::const_iterator aValidatorsIt = anAttrIt->second.cbegin();
       for (; aValidatorsIt != anAttrIt->second.cend(); aValidatorsIt++) {
         if (!validator(aValidatorsIt->first)) {
-          Events_Error::send(std::string("Validator ") + aValidatorsIt->first + " was not registered");
+          Events_InfoMessage("Model_Validator", "Validator %1 was not registered")
+            .arg(aValidatorsIt->first).send();
         } else {
           theValidators.push_back(std::make_pair(aValidatorsIt->first, aValidatorsIt->second));
         }

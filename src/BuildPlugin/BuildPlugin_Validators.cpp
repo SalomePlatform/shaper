@@ -23,7 +23,7 @@
 #include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_ShapeType.h>
 
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 //=================================================================================================
 bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute,
@@ -32,9 +32,9 @@ bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute
 {
   // Get base objects list.
   if(theAttribute->attributeType() != ModelAPI_AttributeSelectionList::typeId()) {
-    Events_Error::send("Error: BuildPlugin_ValidatorBaseForBuild does not support attribute type \""
-      + theAttribute->attributeType() + "\"\n Only \"" + ModelAPI_AttributeSelectionList::typeId()
-      + "\" supported.");
+    std::string aMsg = "Error: BuildPlugin_ValidatorBaseForBuild does not support attribute type '%1'\nOnly '%2' is supported.";
+    Events_InfoMessage("BuildPlugin_Validators", aMsg).
+      arg(theAttribute->attributeType()).arg(ModelAPI_AttributeSelectionList::typeId()).send();
     return false;
   }
   AttributeSelectionListPtr aSelectionList =
@@ -113,8 +113,8 @@ bool BuildPlugin_ValidatorBaseForWire::isValid(const std::shared_ptr<ModelAPI_Fe
 {
   // Get attribute.
   if(theArguments.size() != 1) {
-    Events_Error::send("Error: BuildPlugin_ValidatorBaseForWire should be used only with "
-      "1 parameter (ID of base objects list).");
+    std::string aMsg = "Error: BuildPlugin_ValidatorBaseForWire should be used only with 1 parameter (ID of base objects list).";
+    Events_InfoMessage("BuildPlugin_Validators", aMsg).send();
     return false;
   }
   AttributeSelectionListPtr aSelectionList = theFeature->selectionList(theArguments.front());
@@ -158,8 +158,9 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
 {
   // Get attribute.
   if(theArguments.size() != 1) {
-    Events_Error::send("Error: BuildPlugin_ValidatorBaseForFace should be used only with "
-      "1 parameter (ID of base objects list).");
+    std::string aMsg = "Error: BuildPlugin_ValidatorBaseForFace should be used only with "
+      "1 parameter (ID of base objects list).";
+    Events_InfoMessage("BuildPlugin_Validators", aMsg).send();
     return false;
   }
   AttributeSelectionListPtr aSelectionList = theFeature->selectionList(theArguments.front());
@@ -231,16 +232,18 @@ bool BuildPlugin_ValidatorSubShapesSelection::isValid(const AttributePtr& theAtt
                                                       std::string& theError) const
 {
   if(theArguments.size() != 1) {
-    Events_Error::send("Error: BuildPlugin_ValidatorSubShapesSelection should be used only with "
-      "1 parameter(Sketch feature id).");
+    std::string aMsg = "Error: BuildPlugin_ValidatorSubShapesSelection should be used only with "
+      "1 parameter(Sketch feature id).";
+    Events_InfoMessage("BuildPlugin_Validators", aMsg).send();
     return false;
   }
 
   // Get base objects list.
   if(theAttribute->attributeType() != ModelAPI_AttributeSelectionList::typeId()) {
-    Events_Error::send("Error: BuildPlugin_ValidatorSubShapesSelection does not support attribute type \""
-      + theAttribute->attributeType() + "\"\n Only \"" + ModelAPI_AttributeSelectionList::typeId()
-      + "\" supported.");
+    std::string aMsg = "Error: BuildPlugin_ValidatorSubShapesSelection does not support attribute type \""
+      "%1\"\n Only \"%2\" supported.";
+    Events_InfoMessage("BuildPlugin_Validators", aMsg).
+      arg(theAttribute->attributeType()).arg(ModelAPI_AttributeSelectionList::typeId()).send();
     return false;
   }
   AttributeSelectionListPtr aSelectionList =

@@ -12,7 +12,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <GeomAPI_PlanarEdges.h>
 
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 #include <Events_Loop.h>
 
 #include <BRep_Builder.hxx>
@@ -75,7 +75,7 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
 
   if (!aReadyToDisplay) {
-    Events_Error::throwException("An empty AIS presentation: ModuleBase_ResultPrs");
+    Events_InfoMessage("ModuleBase_ResultPrs", "An empty AIS presentation: ModuleBase_ResultPrs").send();
     static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
     ModelAPI_EventCreator::get()->sendUpdated(myResult, anEvent);
   }

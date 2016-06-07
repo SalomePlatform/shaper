@@ -9,7 +9,7 @@
 
 #include <Config_WidgetAPI.h>
 
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <QStringList>
 
@@ -43,8 +43,8 @@ void ModuleBase_WidgetCreatorFactory::registerCreator(const WidgetCreatorPtr& th
     if (!myPanelToCreator.contains(aKey))
       myPanelToCreator[aKey] = theCreator;
     else {
-      Events_Error::send("The" + aKey + " panel XML definition has been already \
-used by another widget creator");
+      Events_InfoMessage("ModuleBase_WidgetCreatorFactory", 
+        "The %1 panel XML definition has been already used by another widget creator").arg(aKey).send();
     }
   }
 
@@ -56,8 +56,8 @@ used by another widget creator");
     if (!myCreators.contains(aKey))
       myCreators[aKey] = theCreator;
     else {
-      Events_Error::send("The" + aKey + " widget XML definition has been already \
-used by another widget creator");
+      Events_InfoMessage("ModuleBase_WidgetCreatorFactory",
+        "The %1 widget XML definition has been already used by another widget creator").arg(aKey).send();
     }
   }
 
@@ -69,8 +69,8 @@ used by another widget creator");
     if (!myPageToCreator.contains(aKey))
       myPageToCreator[aKey] = theCreator;
     else {
-      Events_Error::send("The" + aKey + " page XML definition has been already \
-used by another widget creator");
+      Events_InfoMessage("ModuleBase_WidgetCreatorFactory",
+        "The %1 page XML definition has been already used by another widget creator").arg(aKey).send();
     }
   }
 }

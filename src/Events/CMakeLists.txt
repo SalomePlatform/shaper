@@ -11,8 +11,8 @@ SET(PROJECT_HEADERS
     Events_MessageGroup.h
     Events_Listener.h
     Events_Loop.h
-    Events_Error.h
     Events_LongOp.h
+	Events_InfoMessage.h
 )
 
 SET(PROJECT_SOURCES
@@ -20,7 +20,6 @@ SET(PROJECT_SOURCES
     Events_MessageGroup.cpp
     Events_Listener.cpp
     Events_Loop.cpp
-    Events_Error.cpp
     Events_LongOp.cpp
 )
 

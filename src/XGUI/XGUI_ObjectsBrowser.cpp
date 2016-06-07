@@ -8,7 +8,6 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Tools.h>
-#include <Events_Error.h>
 
 #include <ModuleBase_Tools.h>
 

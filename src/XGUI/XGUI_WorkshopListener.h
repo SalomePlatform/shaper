@@ -8,6 +8,7 @@
 #include <Events_Message.h>
 
 #include <ModelAPI_Feature.h>
+#include <Events_InfoMessage.h>
 
 #include <QObject>
 
@@ -19,6 +20,7 @@ class XGUI_Workshop;
 class ModuleBase_IWorkshop;
 
 class QString;
+class Events_InfoMessage;
 
 /**\class XGUI_WorkshopListener
  * \ingroup GUI
@@ -41,7 +43,7 @@ public:
 
 signals:
   /// Emitted when error in applivation happens
-  void errorOccurred(const QString&);
+  void errorOccurred(std::shared_ptr<Events_InfoMessage> theMsg);
 
 protected:
   /// Procedure to process postponed events

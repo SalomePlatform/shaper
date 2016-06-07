@@ -15,8 +15,6 @@
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Circle.h>
 
-#include <Events_Error.h>
-
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_XYZ.h>

@@ -11,7 +11,7 @@
 #include <ModelAPI_Result.h>
 
 #include <Events_Message.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <memory>
 
@@ -79,9 +79,9 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
     Events_Loop::loop()->send(aMsg);
 
   } else if (theMessage.get()) {
-    Events_Error::send(
-        std::string("InitializationPlugin_Plugin::processEvent: unhandled message caught: ")
-            + theMessage->eventID().eventText());
+    Events_InfoMessage("InitializationPlugin_Plugin",
+        "InitializationPlugin_Plugin::processEvent: unhandled message caught: %1")
+            .arg(theMessage->eventID().eventText()).send();
   }
 }
 

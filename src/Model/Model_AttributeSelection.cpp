@@ -18,7 +18,7 @@
 #include <ModelAPI_Tools.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_PlanarEdges.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <TNaming_Selector.hxx>
 #include <TNaming_NamedShape.hxx>
@@ -662,7 +662,7 @@ void Model_AttributeSelection::selectBody(
     if (aResult) {
       aContext = aResult->shape()->impl<TopoDS_Shape>();
     } else {
-      Events_Error::send("A result with shape is expected");
+      Events_InfoMessage("Model_AttributeSelection", "A result with shape is expected").send();
       return;
     }
   }

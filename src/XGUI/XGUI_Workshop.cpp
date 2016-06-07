@@ -52,7 +52,7 @@
 //#include <PartSetPlugin_Part.h>
 
 #include <Events_Loop.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 #include <Events_LongOp.h>
 
 #include <ModuleBase_FilterFactory.h>
@@ -78,6 +78,7 @@
 #include <Config_PropManager.h>
 #include <Config_SelectionFilterMessage.h>
 #include <Config_DataModelReader.h>
+#include <Config_Translator.h>
 
 #include <SUIT_ResourceMgr.h>
 
@@ -125,6 +126,13 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
       myDisplayer(0)
       //myViewerSelMode(TopAbs_FACE)
 {
+  mySelector = new XGUI_SelectionMgr(this);
+  myModuleConnector = new XGUI_ModuleConnector(this);
+  myOperationMgr = new XGUI_OperationMgr(this, 0);
+  ModuleBase_IWorkshop* aWorkshop = moduleConnector();
+  // Has to be defined first in order to get errors and messages from other components
+  myEventsListener = new XGUI_WorkshopListener(aWorkshop);
+
 #ifndef HAVE_SALOME
   myMainWindow = new AppElements_MainWindow();
 
@@ -135,16 +143,24 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   else 
     QLocale::setDefault( QLocale::system() );
 #endif
+  QString aPath = Config_XMLReader::pluginConfigFile().c_str();
+  QDir aDir(aPath);
+
+  // Load translations
+  QStringList aFilters;
+  aFilters << "*_en.ts";
+  QStringList aTsFiles = aDir.entryList(aFilters, QDir::Files);
+  foreach(QString aFileName, aTsFiles) {
+    Config_Translator::load(aFileName.toStdString());
+  }
 
   myDataModelXMLReader = new Config_DataModelReader();
-  myDataModelXMLReader->readAll();
+  //myDataModelXMLReader->readAll();
 
   myDisplayer = new XGUI_Displayer(this);
 
-  mySelector = new XGUI_SelectionMgr(this);
   connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(updateCommandStatus()));
 
-  myOperationMgr = new XGUI_OperationMgr(this, 0);
   myActionsMgr = new XGUI_ActionsMgr(this);
   myMenuMgr = new XGUI_MenuMgr(this);
   myErrorDlg = new XGUI_ErrorDialog(QApplication::desktop());
@@ -156,13 +172,9 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   //connect(myViewerProxy, SIGNAL(selectionChanged()),
   //        myActionsMgr,  SLOT(updateOnViewSelection()));
 
-  myModuleConnector = new XGUI_ModuleConnector(this);
-
-  ModuleBase_IWorkshop* aWorkshop = moduleConnector();
   myOperationMgr->setWorkshop(aWorkshop);
 
   myErrorMgr = new XGUI_ErrorMgr(this, aWorkshop);
-  myEventsListener = new XGUI_WorkshopListener(aWorkshop);
 
   connect(myOperationMgr, SIGNAL(operationStarted(ModuleBase_Operation*)), 
           SLOT(onOperationStarted(ModuleBase_Operation*)));
@@ -180,9 +192,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   onTrihedronVisibilityChanged(true);
 #endif
 
-  connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
-  connect(myEventsListener, SIGNAL(errorOccurred(const QString&)),
-          myErrorDlg, SLOT(addError(const QString&)));
+  connect(myEventsListener, SIGNAL(errorOccurred(std::shared_ptr<Events_InfoMessage>)),
+          myErrorDlg, SLOT(addError(std::shared_ptr<Events_InfoMessage>)));
 
   //Config_PropManager::registerProp("Visualization", "object_default_color", "Object color",
   //                                 Config_Prop::Color, "225,225,225");
@@ -207,6 +218,13 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 //******************************************************
 XGUI_Workshop::~XGUI_Workshop(void)
 {
+#ifdef _DEBUG
+#ifdef MISSED_TRANSLATION
+  // Save Missed translations
+  Config_Translator::saveMissedTranslations();
+#endif
+#endif
+
   delete myDisplayer;
   delete myDataModelXMLReader;
 }
@@ -214,13 +232,15 @@ XGUI_Workshop::~XGUI_Workshop(void)
 //******************************************************
 void XGUI_Workshop::startApplication()
 {
+  //Initialize event listening
+  myEventsListener->initializeEventListening();
+
+  myDataModelXMLReader->readAll();
   initMenu();
 
   Config_PropManager::registerProp("Plugins", "default_path", "Default Path",
                                    Config_Prop::Directory, "");
 
-  //Initialize event listening
-  myEventsListener->initializeEventListening();
 
   registerValidators();
 
@@ -486,10 +506,9 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
   std::string aFeatureKind = aFeature->getKind();
   foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
     if (!aWidget->attributeID().empty() && !aFeature->attribute(aWidget->attributeID()).get()) {
-      std::string anErrorMsg = "The feature '" + aFeatureKind + "' has no attribute '"
-          + aWidget->attributeID() + "' used by widget '"
-          + aWidget->metaObject()->className() + "'.";
-      Events_Error::send(anErrorMsg);
+      std::string anErrorMsg = "The feature '%1' has no attribute '%2' used by widget '%3'.";
+      Events_InfoMessage("XGUI_Workshop", anErrorMsg)
+        .arg(aFeatureKind).arg(aWidget->attributeID()).arg(aWidget->metaObject()->className()).send();
       myPropertyPanel->cleanContent();
       return;
     }
@@ -1000,7 +1019,7 @@ ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
 
   if (!err.isEmpty()) {
     if (desktop()) {
-      Events_Error::send(err.toStdString());
+      Events_InfoMessage("XGUI_Workshop", err.toStdString()).send();
     } else {
       qWarning(qPrintable(err));
     }

@@ -35,8 +35,8 @@
 #include <TopoDS_Iterator.hxx>
 
 #include <GeomDataAPI_Point2D.h>
+#include <Events_InfoMessage.h>
 #include <GeomAPI_ShapeExplorer.h>
-#include <Events_Error.h>
 
 #include <Config_PropManager.h>
 
@@ -533,7 +533,7 @@ TopAbs_ShapeEnum shapeType(const QString& theType)
   QString aType = theType.toLower();
   if(myShapeTypes.contains(aType))
     return myShapeTypes[aType];
-  Events_Error::send("Shape type defined in XML is not implemented!");
+  Events_InfoMessage("ModuleBase_Tools", "Shape type defined in XML is not implemented!").send();
   return TopAbs_SHAPE;
 }
 

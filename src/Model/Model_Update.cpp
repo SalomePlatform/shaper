@@ -27,7 +27,7 @@
 #include <GeomDataAPI_Point2D.h>
 #include <Events_Loop.h>
 #include <Events_LongOp.h>
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 #include <Config_PropManager.h>
 
 using namespace std;
@@ -351,8 +351,8 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
   } else {
     int aCount = myProcessed[theFeature];
     if (aCount > 100) { // too many repetition of processing (in VS it may crash on 330 with stack overflow)
-      Events_Error::send(
-        "Feature '" + theFeature->data()->name() + "' is updated in infinitive loop");
+      Events_InfoMessage("Model_Update",
+        "Feature '%1' is updated in infinitive loop").arg(theFeature->data()->name()).send();
       return false;
     }
     myProcessed[theFeature] = aCount + 1;
@@ -726,8 +726,8 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
     }
   } catch(...) {
     aState = ModelAPI_StateExecFailed;
-    Events_Error::send(
-      "Feature " + theFeature->getKind() + " has failed during the execution");
+    Events_InfoMessage("Model_Update",
+      "Feature %1 has failed during the execution").arg(theFeature->getKind()).send();
   }
   // The macro feature has to be deleted in any case even its execution is failed 
   myWaitForFinish.insert(theFeature);

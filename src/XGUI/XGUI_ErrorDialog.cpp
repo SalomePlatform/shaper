@@ -9,12 +9,14 @@
 #include <XGUI_ErrorDialog.h>
 
 #include <ModuleBase_Tools.h>
+#include <Config_Translator.h>
 
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QTextEdit>
+#include <QTextCodec>
 
 XGUI_ErrorDialog::XGUI_ErrorDialog(QWidget* parent)
     : QDialog(parent)
@@ -56,9 +58,12 @@ void XGUI_ErrorDialog::clear()
   QDialog::reject();
 }
 
-void XGUI_ErrorDialog::addError(const QString& theError)
+void XGUI_ErrorDialog::addError(std::shared_ptr<Events_InfoMessage> theMsg)
 {
-  myErrors.append(theError);
+  std::string aError = Config_Translator::translate(theMsg);
+  std::string aCodec = Config_Translator::codec(theMsg->context());
+  QString aMsg = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aError.c_str());
+  myErrors.append(aMsg);
   refresh();
   if (!isVisible()) {
     show();

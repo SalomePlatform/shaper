@@ -29,7 +29,6 @@
 #include <ModelAPI_Tools.h>
 
 #include <Events_Loop.h>
-#include <Events_Error.h>
 #include <Events_LongOp.h>
 
 #include <ModuleBase_IWorkshop.h>
@@ -45,6 +44,7 @@
 #include <Config_PointerMessage.h>
 #include <Config_SelectionFilterMessage.h>
 #include <Config_Keywords.h>
+#include <Events_InfoMessage.h>
 
 #include <QApplication>
 #include <QMainWindow>
@@ -82,7 +82,7 @@ void XGUI_WorkshopListener::initializeEventListening()
 {
   //Initialize event listening
   Events_Loop* aLoop = Events_Loop::loop();
-  aLoop->registerListener(this, Events_Error::errorID());  //!< Listening application errors.
+  aLoop->registerListener(this, Events_InfoMessage::errorID());  //!< Listening application errors.
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OPERATION_LAUNCHED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
@@ -186,9 +186,9 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     aDisplayer->enableUpdateViewer(true);
   } else {
     //Show error dialog if error message received.
-    std::shared_ptr<Events_Error> anAppError = std::dynamic_pointer_cast<Events_Error>(theMessage);
-    if (anAppError) {
-      emit errorOccurred(QString::fromLatin1(anAppError->description()));
+    std::shared_ptr<Events_InfoMessage> anIngfoMsg = std::dynamic_pointer_cast<Events_InfoMessage>(theMessage);
+    if (anIngfoMsg) {
+      emit errorOccurred(anIngfoMsg);
     }
     return;
   }

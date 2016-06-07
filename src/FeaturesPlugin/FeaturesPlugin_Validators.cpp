@@ -15,8 +15,6 @@
 #include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
 
-#include <Events_Error.h>
-
 #include <GeomValidators_BodyShapes.h>
 #include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_ShapeType.h>
