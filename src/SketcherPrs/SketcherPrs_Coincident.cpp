@@ -35,7 +35,7 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Coincident, AIS_InteractiveObject);
 SketcherPrs_Coincident::SketcherPrs_Coincident(ModelAPI_Feature* theConstraint, 
                                                const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
 : AIS_InteractiveObject(), myConstraint(theConstraint), mySketcherPlane(thePlane),
-  myPoint(gp_Pnt(0.0, 0.0, 0.0))
+  myPoint(gp_Pnt(0.0, 0.0, 0.0)), myIsConflicting(false)
 {
 }
 
@@ -82,10 +82,11 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
   }
   // Create the presentation as a combination of standard point markers
 
+  bool aValid = !myIsConflicting;
   // The external yellow contour
   aPtA->SetType(Aspect_TOM_RING3);
   aPtA->SetScale(2.);
-  aPtA->SetColor(Quantity_NOC_YELLOW);
+  aPtA->SetColor(aValid ? Quantity_NOC_YELLOW : Quantity_NOC_BLACK);
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
   aGroup->SetPrimitivesAspect(aPtA);
@@ -127,4 +128,24 @@ void SketcherPrs_Coincident::SetColor(const Quantity_Color &aCol)
 {
   hasOwnColor=Standard_True;
   myOwnColor=aCol;
+}
+
+void SketcherPrs_Coincident::SetConflictingConstraint(const bool& theConflicting,
+                                                     const std::vector<int>& theColor)
+{
+  myIsConflicting = theConflicting;
+
+    /*if (theConflicting)
+  {
+    if (!myAspect.IsNull())
+      myAspect->SetColor (Quantity_Color (theColor[0] / 255., theColor[1] / 255., theColor[2] / 255.,
+                          Quantity_TOC_RGB));
+    myIsConflicting = true;
+  }
+  else
+  {
+    if (!myAspect.IsNull())
+      myAspect->SetColor (Quantity_Color (1.0, 1.0, 0.0, Quantity_TOC_RGB));
+    myIsConflicting = false;
+  }*/
 }

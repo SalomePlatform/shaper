@@ -80,6 +80,7 @@
 #include <SketchPlugin_ConstraintRadius.h>
 
 #include <SketcherPrs_SymbolPrs.h>
+#include <SketcherPrs_Coincident.h>
 #include <SketcherPrs_Tools.h>
 
 #include <Events_Loop.h>
@@ -962,6 +963,14 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
       if (!anAISIO.IsNull()) {
         if (!Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO).IsNull()) {
           Handle(SketcherPrs_SymbolPrs) aPrs = Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO);
+          if (!aPrs.IsNull()) {
+            std::vector<int> aColor;
+            myOverconstraintListener->getConflictingColor(aColor);
+            aPrs->SetConflictingConstraint(isConflicting, aColor);
+            aCustomized = true;
+          }
+        } else if (!Handle(SketcherPrs_Coincident)::DownCast(anAISIO).IsNull()) {
+          Handle(SketcherPrs_Coincident) aPrs = Handle(SketcherPrs_Coincident)::DownCast(anAISIO);
           if (!aPrs.IsNull()) {
             std::vector<int> aColor;
             myOverconstraintListener->getConflictingColor(aColor);
