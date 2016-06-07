@@ -8,6 +8,8 @@
 #define SRC_MODELHIGHAPI_MODELHIGHAPI_SELECTION_H_
 
 //--------------------------------------------------------------------------------------
+#include "ModelHighAPI.h"
+
 #include <memory>
 #include <string>
 #include <utility>
@@ -16,6 +18,7 @@
 //--------------------------------------------------------------------------------------
 class GeomAPI_Shape;
 class ModelAPI_AttributeSelection;
+class ModelAPI_AttributeSelectionList;
 class ModelAPI_Result;
 //--------------------------------------------------------------------------------------
 typedef std::pair<std::shared_ptr<ModelAPI_Result>, std::shared_ptr<GeomAPI_Shape> > ResultSubShapePair;
@@ -29,16 +32,24 @@ class ModelHighAPI_Selection
 {
 public:
   /// Constructor for result and sub-shape
+  MODELHIGHAPI_EXPORT
   ModelHighAPI_Selection(const std::shared_ptr<ModelAPI_Result>& theContext = std::shared_ptr<ModelAPI_Result>(),
                          const std::shared_ptr<GeomAPI_Shape>& theSubShape = std::shared_ptr<GeomAPI_Shape>());
   /// Constructor for sub-shape by the textual Name
+  MODELHIGHAPI_EXPORT
   ModelHighAPI_Selection(const std::string& theType,
                          const std::string& theSubShapeName);
   /// Destructor
+  MODELHIGHAPI_EXPORT
   virtual ~ModelHighAPI_Selection();
 
   /// Fill attribute values
-  virtual void fillAttribute(std::shared_ptr<ModelAPI_AttributeSelection> & theAttribute) const;
+  MODELHIGHAPI_EXPORT
+  virtual void fillAttribute(const std::shared_ptr<ModelAPI_AttributeSelection> & theAttribute) const;
+
+  /// Append to list attribute
+  MODELHIGHAPI_EXPORT
+  virtual void appendToList(const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute) const;
 
 private:
   boost::variant<ResultSubShapePair, TypeSubShapeNamePair> myValue;

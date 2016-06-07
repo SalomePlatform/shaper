@@ -13,5 +13,7 @@
   #include "ModelHighAPI_Double.h"
   #include "ModelHighAPI_Interface.h"
   #include "ModelHighAPI_Macro.h"
+  #include "ModelHighAPI_Selection.h"
+  #include "ModelHighAPI_Tools.h"
 
 #endif /* SRC_MODELHIGHAPI_MODELHIGHAPI_SWIG_H_ */

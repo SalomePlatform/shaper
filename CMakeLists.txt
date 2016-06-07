@@ -97,6 +97,7 @@ ADD_SUBDIRECTORY (src/PythonAPI)
 # High Level C++/Python API
 ADD_SUBDIRECTORY (src/ModelHighAPI)
 ADD_SUBDIRECTORY (src/ConstructionAPI)
+ADD_SUBDIRECTORY (src/ExchangeAPI)
 
 IF(${HAVE_SALOME})
     ADD_SUBDIRECTORY (src/SHAPERGUI)

@@ -8,12 +8,14 @@ SET(PROJECT_HEADERS
   ModelHighAPI_Interface.h
   ModelHighAPI_Macro.h
   ModelHighAPI_Selection.h
+  ModelHighAPI_Tools.h
 )
 
 SET(PROJECT_SOURCES
   ModelHighAPI_Double.cpp
   ModelHighAPI_Interface.cpp
   ModelHighAPI_Selection.cpp
+  ModelHighAPI_Tools.cpp
 )
 
 SET(PROJECT_LIBRARIES

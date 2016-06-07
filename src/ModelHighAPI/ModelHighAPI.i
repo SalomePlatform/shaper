@@ -12,6 +12,7 @@
 
 // standard definitions
 %include "typemaps.i"
+%include "std_list.i"
 %include "std_string.i"
 %include "std_shared_ptr.i"
 
@@ -41,3 +42,8 @@
 %include "ModelHighAPI_Double.h"
 %include "ModelHighAPI_Interface.h"
 %include "ModelHighAPI_Macro.h"
+%include "ModelHighAPI_Selection.h"
+%include "ModelHighAPI_Tools.h"
+
+// std::list -> []
+%template(SelectionList) std::list<ModelHighAPI_Selection>;
