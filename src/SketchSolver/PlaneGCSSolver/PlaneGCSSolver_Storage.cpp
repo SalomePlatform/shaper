@@ -19,6 +19,7 @@
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
 #include <SketchPlugin_Arc.h>
+#include <SketchPlugin_ConstraintTangent.h>
 
 #include <cmath>
 
@@ -556,6 +557,7 @@ void PlaneGCSSolver_Storage::initializeSolver(SolverPtr theSolver)
   // initialize constraints
   std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
       aCIt = myConstraintMap.begin();
+  GCS::SET_I aTangentIDs;
   for (; aCIt != myConstraintMap.end(); ++aCIt) {
     std::list<ConstraintWrapperPtr>::const_iterator aCWIt = aCIt->second.begin();
     for (; aCWIt != aCIt->second.end(); ++ aCWIt) {
@@ -566,6 +568,14 @@ void PlaneGCSSolver_Storage::initializeSolver(SolverPtr theSolver)
         if (!isRedundant(*anIt, aGCS))
           aSolver->addConstraint(*anIt);
     }
+    // store IDs of tangent constraints to avoid incorrect report of redundant constraints
+    if (aCIt->first && aCIt->first->getKind() == SketchPlugin_ConstraintTangent::ID())
+      for (aCWIt = aCIt->second.begin(); aCWIt != aCIt->second.end(); ++ aCWIt) {
+        std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aGCS =
+            std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(*aCWIt);
+        if (aGCS->constraints().front()->getTypeId() == GCS::P2LDistance)
+          aTangentIDs.insert((int)(*aCWIt)->id());
+      }
   }
   // additional constraints for arcs
   std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >::const_iterator
@@ -580,6 +590,8 @@ void PlaneGCSSolver_Storage::initializeSolver(SolverPtr theSolver)
   for (; aRemIt != myRemovedConstraints.end(); ++aRemIt)
     aSolver->removeConstraint(*aRemIt);
   myRemovedConstraints.clear();
+  // set list of tangent constraints
+  aSolver->setTangent(aTangentIDs);
   // initialize unknowns
   aSolver->setParameters(myParameters);
 }

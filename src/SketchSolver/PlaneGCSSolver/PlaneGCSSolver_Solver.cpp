@@ -40,6 +40,17 @@ void PlaneGCSSolver_Solver::removeConstraint(GCSConstraintPtr theConstraint)
   myConstraints.erase(aConstraint);
 }
 
+static void removeTangent(GCS::VEC_I& theRedundant, const GCS::SET_I& theTangent)
+{
+  int i = 0;
+  while (i < theRedundant.size()) {
+    if (theTangent.find(theRedundant[i]) == theTangent.end())
+      ++i;
+    else
+      theRedundant.erase(theRedundant.begin() + i);
+  }
+}
+
 SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
 {
   // clear list of conflicting constraints
@@ -76,6 +87,8 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
     // additionally check redundant constraints
     GCS::VEC_I aRedundantID;
     myEquationSystem.getRedundant(aRedundantID);
+    // remove redundant constraints relative to tangency
+    removeTangent(aRedundantID, myTangent);
     if (!aRedundantID.empty())
       aResult = GCS::Failed;
   }

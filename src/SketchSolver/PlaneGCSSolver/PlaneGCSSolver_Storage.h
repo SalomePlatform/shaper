@@ -116,7 +116,7 @@ private:
   ConstraintID                     myConstraintLastID;   ///< identifier of last added constraint
 
   std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >
-                                  myArcConstraintMap;    ///< additional constraints for correct processing of the arcs
+                                   myArcConstraintMap;   ///< additional constraints for correct processing of the arcs
 
   std::list<GCSConstraintPtr>      myRemovedConstraints; ///< list of removed constraints to notify solver
 };

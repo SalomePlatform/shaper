@@ -34,6 +34,13 @@ public:
   void setParameters(const GCS::VEC_pD& theParams)
   { myParameters = theParams; }
 
+  /// \brief Set list of IDs of tangent constraints
+  ///
+  /// Workaround to avoid incorrect report about redundant constraints
+  /// if an arc is already smoothly connected to a line.
+  void setTangent(const GCS::SET_I& theTangentIDs)
+  { myTangent = theTangentIDs; }
+
   /** \brief Solve the set of equations
    *  \return identifier whether solution succeeded
    */
@@ -62,6 +69,8 @@ private:
 
   GCS::VEC_I                 myConflictingIDs; ///< list of IDs of conflicting constraints
   bool                       myConfCollected;  ///< specifies the conflicting constraints are already collected
+
+  GCS::SET_I                 myTangent;        ///< list of tangent IDs to check incorrect redundant constraints
 };
 
 #endif
