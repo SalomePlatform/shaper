@@ -29,9 +29,9 @@ class FeaturesTestCase(FeaturesFixture):
         features = [
             # Implemented in C++, add* without arguments doesn't exist
             # "addPoint", "addPlane",
+            # "addImport", "exportToFile",
 
             "addAxis",
-            "addImport", "exportToFile",
             "addAddition", "addSubtraction", "addIntersection",
             "addExtrusion",
             # "addExtrusionCut", "addExtrusionFuse",
@@ -57,8 +57,9 @@ class FeaturesTestCase(FeaturesFixture):
         ConstructionAPI.ConstructionAPI_Plane(self.part.addFeature("Plane"))
         ConstructionAPI.ConstructionAPI_Point(self.part.addFeature("Point"))
 
-        model.exchange.Import(self.part.addFeature("Import"))
-        model.exchange.Export(self.part.addFeature("Export"))
+        import ExchangeAPI
+        ExchangeAPI.ExchangeAPI_Import(self.part.addFeature("Import"))
+        ExchangeAPI.ExchangeAPI_Export(self.part.addFeature("Export"))
 
         model.features.boolean.Boolean(self.part.addFeature("Boolean"))
         model.features.extrusion.Extrusion(self.part.addFeature("Extrusion"))
