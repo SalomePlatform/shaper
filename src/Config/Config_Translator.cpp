@@ -109,7 +109,7 @@ std::string insertParameters(const std::string& theString, const std::list<std::
   std::string aParam;
   for (i=1, aIt = theParams.cbegin(); aIt != theParams.cend(); aIt++, i++) {
     aParam = (*aIt);
-    sprintf_s(aBuf, "%d", i);
+    sprintf(aBuf, "%d", i);
     std::string aCode = std::string("%") + std::string(aBuf);
     size_t aPos = aResult.find(aCode);
     if (aPos != std::string::npos) {

@@ -13,6 +13,8 @@
 #include <string>
 #include <map>
 
+
+/// The definition provides collection and writing of missed translations
 //#define MISSED_TRANSLATION
 
 /**

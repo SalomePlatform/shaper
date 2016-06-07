@@ -63,7 +63,7 @@ public:
   void addParameter(double theParam) 
   { 
     char aBuf[50];
-    int n = sprintf_s(aBuf, "%g", theParam);
+    int n = sprintf(aBuf, "%g", theParam);
     std::string aStr(aBuf);
     myParameters.push_back(aStr); 
   }
@@ -73,7 +73,7 @@ public:
   void addParameter(int theParam) 
   { 
     char aBuf[50];
-    int n = sprintf_s(aBuf, "%d", theParam);
+    int n = sprintf(aBuf, "%d", theParam);
     std::string aStr(aBuf);
     myParameters.push_back(aStr); 
   }
