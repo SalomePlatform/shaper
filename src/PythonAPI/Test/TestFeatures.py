@@ -69,7 +69,7 @@ class FeaturesTestCase(FeaturesFixture):
         model.features.revolution.Revolution(self.part.addFeature("Revolution"))
         # model.features.revolution_boolean.RevolutionBoolean(self.part.addFeature("RevolutionCut"))
         # model.features.revolution_boolean.RevolutionBoolean(self.part.addFeature("RevolutionFuse"))
-        model.features.placement.Placement(self.part.addFeature("Placement"))
+        FeaturesAPI.FeaturesAPI_Placement(self.part.addFeature("Placement"))
         FeaturesAPI.FeaturesAPI_Rotation(self.part.addFeature("Rotation"))
         FeaturesAPI.FeaturesAPI_Translation(self.part.addFeature("Translation"))
         model.features.group.Group(self.part.addFeature("Group"))

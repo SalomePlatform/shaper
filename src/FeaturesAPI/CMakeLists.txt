@@ -4,11 +4,13 @@ INCLUDE(Common)
 
 SET(PROJECT_HEADERS
   FeaturesAPI.h
+  FeaturesAPI_Placement.h
   FeaturesAPI_Rotation.h
   FeaturesAPI_Translation.h
 )
 
 SET(PROJECT_SOURCES
+  FeaturesAPI_Placement.cpp
   FeaturesAPI_Rotation.cpp
   FeaturesAPI_Translation.cpp
 )
