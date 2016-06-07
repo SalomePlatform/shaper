@@ -4,59 +4,72 @@
 <context>
     <name>ParametersPlugin_WidgetParamsMgr</name>
     <message>
-        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="165"/>
+        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="166"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="165"/>
+        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="166"/>
         <source>Equation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="165"/>
+        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="166"/>
         <source>Result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="165"/>
+        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="166"/>
         <source>Comment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="188"/>
+        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="189"/>
         <source>Parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="194"/>
+        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="195"/>
         <source>Features</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="213"/>
+        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="214"/>
         <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="217"/>
+        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="218"/>
         <source>Insert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="221"/>
+        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="222"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="258"/>
-        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="698"/>
+        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="259"/>
+        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="701"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="420"/>
-        <source>Name %1 already exists.</source>
+        <location filename="ParametersPlugin_WidgetParamsMgr.cpp" line="421"/>
+        <source>Name &apos;%1&apos; already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="ParametersPlugin_EvalListener.cpp" line="387"/>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ParametersPlugin_EvalListener.cpp" line="388"/>
+        <source>Selected objects can be used in Part documents which are not loaded: %1. Whould you like to continue?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

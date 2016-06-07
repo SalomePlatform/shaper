@@ -4,17 +4,17 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="XGUI_Tools.cpp" line="119"/>
+        <location filename="XGUI_Tools.cpp" line="116"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Tools.cpp" line="120"/>
+        <location filename="XGUI_Tools.cpp" line="117"/>
         <source>Selected objects can be used in Part documents which are not loaded: %1. Whould you like to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Tools.cpp" line="137"/>
+        <location filename="XGUI_Tools.cpp" line="134"/>
         <source>Selected parameter can not be renamed to: %1.  There is a parameter with the same name. Its value is: %2.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -157,18 +157,18 @@
 <context>
     <name>XGUI_OperationMgr</name>
     <message>
-        <location filename="XGUI_OperationMgr.cpp" line="221"/>
-        <location filename="XGUI_OperationMgr.cpp" line="299"/>
+        <location filename="XGUI_OperationMgr.cpp" line="222"/>
+        <location filename="XGUI_OperationMgr.cpp" line="300"/>
         <source>Abort operation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_OperationMgr.cpp" line="222"/>
+        <location filename="XGUI_OperationMgr.cpp" line="223"/>
         <source>All active operations will be aborted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_OperationMgr.cpp" line="297"/>
+        <location filename="XGUI_OperationMgr.cpp" line="298"/>
         <source>%1 operation will be aborted.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -342,24 +342,24 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1439"/>
+        <location filename="XGUI_Workshop.cpp" line="1436"/>
         <source>Unused features are the following: %1.
 These features will be deleted.
 Would you like to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1477"/>
+        <location filename="XGUI_Workshop.cpp" line="1474"/>
         <source>All features are relevant, there is nothing to be deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1977"/>
+        <location filename="XGUI_Workshop.cpp" line="1975"/>
         <source>Find results</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1978"/>
+        <location filename="XGUI_Workshop.cpp" line="1976"/>
         <source>Results not found</source>
         <translation type="unfinished"></translation>
     </message>
