@@ -10,6 +10,8 @@
 //--------------------------------------------------------------------------------------
 #include "ConstructionAPI.h"
 
+#include <ConstructionPlugin_Point.h>
+
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
 //--------------------------------------------------------------------------------------
@@ -37,10 +39,10 @@ public:
   CONSTRUCTIONAPI_EXPORT
   virtual ~ConstructionAPI_Point();
 
-  INTERFACE_3("Point",
-              x, "x", Double, /** X attribute */,
-              y, "y", Double, /** Y attribute */,
-              z, "z", Double, /** Z attribute */)
+  INTERFACE_3(ConstructionPlugin_Point::ID(),
+              x, ConstructionPlugin_Point::X(), Double, /** X attribute */,
+              y, ConstructionPlugin_Point::Y(), Double, /** Y attribute */,
+              z, ConstructionPlugin_Point::Z(), Double, /** Z attribute */)
 
   /// Set point values
   CONSTRUCTIONAPI_EXPORT

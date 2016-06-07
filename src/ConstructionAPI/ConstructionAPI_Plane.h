@@ -10,6 +10,8 @@
 //--------------------------------------------------------------------------------------
 #include "ConstructionAPI.h"
 
+#include <ConstructionPlugin_Plane.h>
+
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
 //--------------------------------------------------------------------------------------
@@ -42,14 +44,14 @@ public:
   CONSTRUCTIONAPI_EXPORT
   virtual ~ConstructionAPI_Plane();
 
-  INTERFACE_7("Plane",
-              creationMethod, "CreationMethod", String, /** Creation method */,
-              face, "planeFace", Selection, /** Plane face */,
-              distance, "distance", Double, /** Distance */,
-              A, "A", Double, /** Parameter A for general equation */,
-              B, "B", Double, /** Parameter B for general equation */,
-              C, "C", Double, /** Parameter C for general equation */,
-              D, "D", Double, /** Parameter D for general equation */
+  INTERFACE_7(ConstructionPlugin_Plane::ID(),
+              creationMethod, ConstructionPlugin_Plane::METHOD(), String, /** Creation method */,
+              face, ConstructionPlugin_Plane::FACE(), Selection, /** Plane face */,
+              distance, ConstructionPlugin_Plane::DISTANCE(), Double, /** Distance */,
+              A, ConstructionPlugin_Plane::A(), Double, /** Parameter A for general equation */,
+              B, ConstructionPlugin_Plane::B(), Double, /** Parameter B for general equation */,
+              C, ConstructionPlugin_Plane::C(), Double, /** Parameter C for general equation */,
+              D, ConstructionPlugin_Plane::D(), Double, /** Parameter D for general equation */
   )
 
   /// Set face and distance
