@@ -72,6 +72,13 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
   // solve equations
   if (aResult == GCS::Success)
     aResult = (GCS::SolveStatus)myEquationSystem.solve(myParameters);
+  if (aResult == GCS::Success) {
+    // additionally check redundant constraints
+    GCS::VEC_I aRedundantID;
+    myEquationSystem.getRedundant(aRedundantID);
+    if (!aRedundantID.empty())
+      aResult = GCS::Failed;
+  }
   Events_LongOp::end(this);
 
   SketchSolver_SolveStatus aStatus;
