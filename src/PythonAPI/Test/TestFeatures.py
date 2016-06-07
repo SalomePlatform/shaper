@@ -61,6 +61,7 @@ class FeaturesTestCase(FeaturesFixture):
         ExchangeAPI.ExchangeAPI_Import(self.part.addFeature("Import"))
         ExchangeAPI.ExchangeAPI_Export(self.part.addFeature("Export"))
 
+        import FeaturesAPI
         model.features.boolean.Boolean(self.part.addFeature("Boolean"))
         model.features.extrusion.Extrusion(self.part.addFeature("Extrusion"))
         # model.features.extrusion_boolean.ExtrusionBoolean(self.part.addFeature("ExtrusionCut"))
@@ -69,8 +70,8 @@ class FeaturesTestCase(FeaturesFixture):
         # model.features.revolution_boolean.RevolutionBoolean(self.part.addFeature("RevolutionCut"))
         # model.features.revolution_boolean.RevolutionBoolean(self.part.addFeature("RevolutionFuse"))
         model.features.placement.Placement(self.part.addFeature("Placement"))
-        model.features.rotation.Rotation(self.part.addFeature("Rotation"))
-        model.features.translation.Translation(self.part.addFeature("Translation"))
+        FeaturesAPI.FeaturesAPI_Rotation(self.part.addFeature("Rotation"))
+        FeaturesAPI.FeaturesAPI_Translation(self.part.addFeature("Translation"))
         model.features.group.Group(self.part.addFeature("Group"))
 
         model.parameter.Parameter(self.part.addFeature("Parameter"))
