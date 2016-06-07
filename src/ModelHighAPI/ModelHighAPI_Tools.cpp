@@ -7,6 +7,14 @@
 //--------------------------------------------------------------------------------------
 #include "ModelHighAPI_Tools.h"
 //--------------------------------------------------------------------------------------
+#include <GeomAPI_Dir.h>
+#include <GeomAPI_Pnt.h>
+#include <GeomAPI_Pnt2d.h>
+//--------------------------------------------------------------------------------------
+#include <GeomDataAPI_Dir.h>
+#include <GeomDataAPI_Point.h>
+#include <GeomDataAPI_Point2D.h>
+//--------------------------------------------------------------------------------------
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -22,6 +30,35 @@
 //--------------------------------------------------------------------------------------
 #include "ModelHighAPI_Double.h"
 #include "ModelHighAPI_Selection.h"
+
+//--------------------------------------------------------------------------------------
+void fillAttribute(const std::shared_ptr<GeomAPI_Pnt2d> & theValue,
+                   const std::shared_ptr<GeomDataAPI_Point2D> & theAttribute)
+{
+  theAttribute->setValue(theValue);
+}
+
+//--------------------------------------------------------------------------------------
+void fillAttribute(const std::shared_ptr<GeomAPI_Dir> & theValue,
+                   const std::shared_ptr<GeomDataAPI_Dir> & theAttribute)
+{
+  theAttribute->setValue(theValue);
+}
+
+//--------------------------------------------------------------------------------------
+void fillAttribute(const std::shared_ptr<GeomAPI_Pnt> & theValue,
+                   const std::shared_ptr<GeomDataAPI_Point> & theAttribute)
+{
+  theAttribute->setValue(theValue);
+}
+
+//--------------------------------------------------------------------------------------
+void fillAttribute(bool theValue,
+                   const std::shared_ptr<ModelAPI_AttributeBoolean> & theAttribute)
+{
+  theAttribute->setValue(theValue);
+}
+
 //--------------------------------------------------------------------------------------
 void fillAttribute(const ModelHighAPI_Double & theValue,
                    const std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute)

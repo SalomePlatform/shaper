@@ -14,6 +14,14 @@
 #include <memory>
 #include <string>
 //--------------------------------------------------------------------------------------
+class GeomAPI_Dir;
+class GeomAPI_Pnt;
+class GeomAPI_Pnt2d;
+//--------------------------------------------------------------------------------------
+class GeomDataAPI_Dir;
+class GeomDataAPI_Point;
+class GeomDataAPI_Point2D;
+//--------------------------------------------------------------------------------------
 class ModelAPI_AttributeBoolean;
 class ModelAPI_AttributeDocRef;
 class ModelAPI_AttributeDouble;
@@ -30,6 +38,23 @@ class ModelAPI_AttributeString;
 class ModelHighAPI_Double;
 class ModelHighAPI_Selection;
 //--------------------------------------------------------------------------------------
+MODELHIGHAPI_EXPORT
+void fillAttribute(const std::shared_ptr<GeomAPI_Pnt2d> & theValue,
+                   const std::shared_ptr<GeomDataAPI_Point2D> & theAttribute);
+
+MODELHIGHAPI_EXPORT
+void fillAttribute(const std::shared_ptr<GeomAPI_Dir> & theValue,
+                   const std::shared_ptr<GeomDataAPI_Dir> & theAttribute);
+
+MODELHIGHAPI_EXPORT
+void fillAttribute(const std::shared_ptr<GeomAPI_Pnt> & theValue,
+                   const std::shared_ptr<GeomDataAPI_Point> & theAttribute);
+
+//--------------------------------------------------------------------------------------
+MODELHIGHAPI_EXPORT
+void fillAttribute(bool theValue,
+                   const std::shared_ptr<ModelAPI_AttributeBoolean> & theAttribute);
+
 MODELHIGHAPI_EXPORT
 void fillAttribute(const ModelHighAPI_Double & theValue,
                    const std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute);
