@@ -25,16 +25,21 @@ class ModelHighAPI_Double
 {
 public:
   /// Constructor for double
-  MODELHIGHAPI_EXPORT ModelHighAPI_Double(double theValue = 0.);
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Double(double theValue = 0.);
   /// Constructor for std::string
-  MODELHIGHAPI_EXPORT ModelHighAPI_Double(const std::string & theValue);
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Double(const std::string & theValue);
   /// Constructor for char *
-  MODELHIGHAPI_EXPORT ModelHighAPI_Double(const char * theValue);
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Double(const char * theValue);
   /// Destructor
-  MODELHIGHAPI_EXPORT virtual ~ModelHighAPI_Double();
+  MODELHIGHAPI_EXPORT
+  virtual ~ModelHighAPI_Double();
 
   /// Fill attribute values
-  MODELHIGHAPI_EXPORT virtual void fillAttribute(std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute) const;
+  MODELHIGHAPI_EXPORT
+  virtual void fillAttribute(std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute) const;
 
 private:
   boost::variant<double, std::string> myValue;

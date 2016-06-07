@@ -65,6 +65,18 @@
 
 
 //--------------------------------------------------------------------------------------
+#define INTERFACE_1(KIND, \
+                    N_0, AN_0, T_0, C_0) \
+  public: \
+    INTERFACE_COMMON(KIND) \
+    DEFINE_ATTRIBUTE(N_0, T_0, C_0) \
+  protected: \
+    START_INIT() \
+      SET_ATTRIBUTE(N_0, T_0, AN_0) \
+    END_INIT() \
+  public:
+
+//--------------------------------------------------------------------------------------
 #define INTERFACE_2(KIND, \
                     N_0, AN_0, T_0, C_0, \
                     N_1, AN_1, T_1, C_1) \

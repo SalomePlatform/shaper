@@ -23,21 +23,27 @@ class ModelHighAPI_Interface
 {
 public:
   /// Constructor
-  MODELHIGHAPI_EXPORT explicit ModelHighAPI_Interface(const std::shared_ptr<ModelAPI_Feature> & theFeature);
+  MODELHIGHAPI_EXPORT
+  explicit ModelHighAPI_Interface(const std::shared_ptr<ModelAPI_Feature> & theFeature);
   /// Destructor
-  MODELHIGHAPI_EXPORT virtual ~ModelHighAPI_Interface();
+  MODELHIGHAPI_EXPORT
+  virtual ~ModelHighAPI_Interface();
 
   /// Return ModelAPI_Feature
-  MODELHIGHAPI_EXPORT std::shared_ptr<ModelAPI_Feature> feature() const;
+  MODELHIGHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> feature() const;
 
   /// Shortcut for feature()->getKind()
-  MODELHIGHAPI_EXPORT const std::string& getKind();
+  MODELHIGHAPI_EXPORT
+  const std::string& getKind();
 
   /// Shortcut for feature()->execute()
-  MODELHIGHAPI_EXPORT void execute();
+  MODELHIGHAPI_EXPORT
+  void execute();
 
   /// Throw exception to event loop
-  MODELHIGHAPI_EXPORT void throwException(const std::string & theDescription);
+  MODELHIGHAPI_EXPORT
+  void throwException(const std::string & theDescription);
 
 protected:
   std::shared_ptr<ModelAPI_Feature> myFeature;
