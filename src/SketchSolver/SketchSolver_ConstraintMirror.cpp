@@ -50,12 +50,6 @@ void SketchSolver_ConstraintMirror::getAttributes(
     }
   }
 
-  // Mirrored entities are placed out-of-group by default, due to they are copies.
-  // Place them into current group manually.
-  std::vector<EntityWrapperPtr>::iterator aMirIt = theMirrorEntities.begin();
-  for (; aMirIt != theMirrorEntities.end(); ++aMirIt)
-    (*aMirIt)->setGroup(myGroupID);
-
   if (theBaseEntities.size() > theMirrorEntities.size())
     myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
 }
