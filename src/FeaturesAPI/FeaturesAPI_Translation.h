@@ -20,16 +20,16 @@ class ModelHighAPI_Selection;
 /// \class FeaturesAPI_Translation
 /// \ingroup CPPHighAPI
 /// \brief Interface for Translation feature.
-class FeaturesAPI_Translation : public ModelHighAPI_Interface
+class FeaturesAPI_Translation: public ModelHighAPI_Interface
 {
 public:
   /// Constructor without values.
   FEATURESAPI_EXPORT
-  explicit FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature> & theFeature);
+  explicit FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
   /// Constructor with values.
   FEATURESAPI_EXPORT
-  FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature> & theFeature,
+  FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                           const std::list<ModelHighAPI_Selection>& theMainObjects,
                           const ModelHighAPI_Selection& theAxisObject,
                           const ModelHighAPI_Double& theDistance);
@@ -62,7 +62,7 @@ typedef std::shared_ptr<FeaturesAPI_Translation> TranslationPtr;
 /// \ingroup CPPHighAPI
 /// \brief Create Translation feature.
 FEATURESAPI_EXPORT
-TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document> & thePart,
+TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
                               const std::list<ModelHighAPI_Selection>& theMainObjects,
                               const ModelHighAPI_Selection& theAxisObject,
                               const ModelHighAPI_Double& theDistance);

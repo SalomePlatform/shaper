@@ -11,14 +11,14 @@
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
-FeaturesAPI_Boolean::FeaturesAPI_Boolean(const std::shared_ptr<ModelAPI_Feature> & theFeature)
+FeaturesAPI_Boolean::FeaturesAPI_Boolean(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
 {
   initialize();
 }
 
 //==================================================================================================
-FeaturesAPI_Boolean::FeaturesAPI_Boolean(const std::shared_ptr<ModelAPI_Feature> & theFeature,
+FeaturesAPI_Boolean::FeaturesAPI_Boolean(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                          const ModelHighAPI_Integer& theBoolType,
                                          const std::list<ModelHighAPI_Selection>& theMainObjects,
                                          const std::list<ModelHighAPI_Selection>& theToolObjects)
@@ -63,7 +63,7 @@ void FeaturesAPI_Boolean::setToolObjects(const std::list<ModelHighAPI_Selection>
 
 // TODO(spo): make add* as static functions of the class
 //==================================================================================================
-BooleanPtr addCut(const std::shared_ptr<ModelAPI_Document> & thePart,
+BooleanPtr addCut(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const std::list<ModelHighAPI_Selection>& theMainObjects,
                   const std::list<ModelHighAPI_Selection>& theToolObjects)
 {
@@ -75,7 +75,7 @@ BooleanPtr addCut(const std::shared_ptr<ModelAPI_Document> & thePart,
 }
 
 //==================================================================================================
-BooleanPtr addFuse(const std::shared_ptr<ModelAPI_Document> & thePart,
+BooleanPtr addFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
                    const std::list<ModelHighAPI_Selection>& theObjects)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Boolean::ID());
@@ -87,7 +87,7 @@ BooleanPtr addFuse(const std::shared_ptr<ModelAPI_Document> & thePart,
 }
 
 //==================================================================================================
-BooleanPtr addFuse(const std::shared_ptr<ModelAPI_Document> & thePart,
+BooleanPtr addFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
                    const std::list<ModelHighAPI_Selection>& theMainObjects,
                    const std::list<ModelHighAPI_Selection>& theToolObjects)
 {
@@ -99,7 +99,7 @@ BooleanPtr addFuse(const std::shared_ptr<ModelAPI_Document> & thePart,
 }
 
 //==================================================================================================
-BooleanPtr addCommon(const std::shared_ptr<ModelAPI_Document> & thePart,
+BooleanPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
                      const std::list<ModelHighAPI_Selection>& theMainObjects,
                      const std::list<ModelHighAPI_Selection>& theToolObjects)
 {

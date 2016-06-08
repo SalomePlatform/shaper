@@ -20,16 +20,16 @@ class ModelHighAPI_Selection;
 /// \class FeaturesAPI_Boolean
 /// \ingroup CPPHighAPI
 /// \brief Interface for Boolean feature.
-class FeaturesAPI_Boolean : public ModelHighAPI_Interface
+class FeaturesAPI_Boolean: public ModelHighAPI_Interface
 {
 public:
   /// Constructor without values.
   FEATURESAPI_EXPORT
-  explicit FeaturesAPI_Boolean(const std::shared_ptr<ModelAPI_Feature> & theFeature);
+  explicit FeaturesAPI_Boolean(const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
   /// Constructor with values.
   FEATURESAPI_EXPORT
-  FeaturesAPI_Boolean(const std::shared_ptr<ModelAPI_Feature> & theFeature,
+  FeaturesAPI_Boolean(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                       const ModelHighAPI_Integer& theBoolType,
                       const std::list<ModelHighAPI_Selection>& theMainObjects,
                       const std::list<ModelHighAPI_Selection>& theToolObjects);
@@ -62,27 +62,27 @@ typedef std::shared_ptr<FeaturesAPI_Boolean> BooleanPtr;
 /// \ingroup CPPHighAPI
 /// \brief Create Boolean Cut feature.
 FEATURESAPI_EXPORT
-BooleanPtr addCut(const std::shared_ptr<ModelAPI_Document> & thePart,
+BooleanPtr addCut(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const std::list<ModelHighAPI_Selection>& theMainObjects,
                   const std::list<ModelHighAPI_Selection>& theToolObjects);
 
 /// \ingroup CPPHighAPI
 /// \brief Create Boolean Fuse feature.
 FEATURESAPI_EXPORT
-BooleanPtr addFuse(const std::shared_ptr<ModelAPI_Document> & thePart,
+BooleanPtr addFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
                    const std::list<ModelHighAPI_Selection>& theObjects);
 
 /// \ingroup CPPHighAPI
 /// \brief Create Boolean Fuse feature.
 FEATURESAPI_EXPORT
-BooleanPtr addFuse(const std::shared_ptr<ModelAPI_Document> & thePart,
+BooleanPtr addFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
                    const std::list<ModelHighAPI_Selection>& theMainObjects,
                    const std::list<ModelHighAPI_Selection>& theToolObjects);
 
 /// \ingroup CPPHighAPI
 /// \brief Create Boolean Common feature.
 FEATURESAPI_EXPORT
-BooleanPtr addCommon(const std::shared_ptr<ModelAPI_Document> & thePart,
+BooleanPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
                      const std::list<ModelHighAPI_Selection>& theMainObjects,
                      const std::list<ModelHighAPI_Selection>& theToolObjects);
 

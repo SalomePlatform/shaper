@@ -20,12 +20,14 @@
 
 // shared pointers
 %shared_ptr(FeaturesAPI_Boolean)
+%shared_ptr(FeaturesAPI_Group)
 %shared_ptr(FeaturesAPI_Placement)
 %shared_ptr(FeaturesAPI_Rotation)
 %shared_ptr(FeaturesAPI_Translation)
 
 // all supported interfaces
 %include "FeaturesAPI_Boolean.h"
+%include "FeaturesAPI_Group.h"
 %include "FeaturesAPI_Placement.h"
 %include "FeaturesAPI_Rotation.h"
 %include "FeaturesAPI_Translation.h"

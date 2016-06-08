@@ -9,14 +9,14 @@
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
-FeaturesAPI_Rotation::FeaturesAPI_Rotation(const std::shared_ptr<ModelAPI_Feature> & theFeature)
+FeaturesAPI_Rotation::FeaturesAPI_Rotation(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
 {
   initialize();
 }
 
 //==================================================================================================
-FeaturesAPI_Rotation::FeaturesAPI_Rotation(const std::shared_ptr<ModelAPI_Feature> & theFeature,
+FeaturesAPI_Rotation::FeaturesAPI_Rotation(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                            const std::list<ModelHighAPI_Selection>& theMainObjects,
                                            const ModelHighAPI_Selection& theAxisObject,
                                            const ModelHighAPI_Double& theAngle)
@@ -61,7 +61,7 @@ void FeaturesAPI_Rotation::setAngle(const ModelHighAPI_Double& theAngle)
 
 // TODO(spo): make add* as static functions of the class
 //==================================================================================================
-RotationPtr addRotation(const std::shared_ptr<ModelAPI_Document> & thePart,
+RotationPtr addRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const std::list<ModelHighAPI_Selection>& theMainObjects,
                         const ModelHighAPI_Selection& theAxisObject,
                         const ModelHighAPI_Double& theDistance)

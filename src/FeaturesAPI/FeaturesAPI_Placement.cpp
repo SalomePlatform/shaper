@@ -9,14 +9,14 @@
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
-FeaturesAPI_Placement::FeaturesAPI_Placement(const std::shared_ptr<ModelAPI_Feature> & theFeature)
+FeaturesAPI_Placement::FeaturesAPI_Placement(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
 {
   initialize();
 }
 
 //==================================================================================================
-FeaturesAPI_Placement::FeaturesAPI_Placement(const std::shared_ptr<ModelAPI_Feature> & theFeature,
+FeaturesAPI_Placement::FeaturesAPI_Placement(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                              const std::list<ModelHighAPI_Selection>& theObjects,
                                              const ModelHighAPI_Selection& theStartShape,
                                              const ModelHighAPI_Selection& theEndShape,
@@ -81,7 +81,7 @@ void FeaturesAPI_Placement::setCentering(const bool theCentering)
 
 // TODO(spo): make add* as static functions of the class
 //==================================================================================================
-PlacementPtr addPlacement(const std::shared_ptr<ModelAPI_Document> & thePart,
+PlacementPtr addPlacement(const std::shared_ptr<ModelAPI_Document>& thePart,
                           const std::list<ModelHighAPI_Selection>& theObjects,
                           const ModelHighAPI_Selection& theStartShape,
                           const ModelHighAPI_Selection& theEndShape,

@@ -72,7 +72,7 @@ class FeaturesTestCase(FeaturesFixture):
         FeaturesAPI.FeaturesAPI_Placement(self.part.addFeature("Placement"))
         FeaturesAPI.FeaturesAPI_Rotation(self.part.addFeature("Rotation"))
         FeaturesAPI.FeaturesAPI_Translation(self.part.addFeature("Translation"))
-        model.features.group.Group(self.part.addFeature("Group"))
+        FeaturesAPI.FeaturesAPI_Group(self.part.addFeature("Group"))
 
         model.parameter.Parameter(self.part.addFeature("Parameter"))
 

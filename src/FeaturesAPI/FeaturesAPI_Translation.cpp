@@ -9,14 +9,14 @@
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
-FeaturesAPI_Translation::FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature> & theFeature)
+FeaturesAPI_Translation::FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
 {
   initialize();
 }
 
 //==================================================================================================
-FeaturesAPI_Translation::FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature> & theFeature,
+FeaturesAPI_Translation::FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                  const std::list<ModelHighAPI_Selection>& theMainObjects,
                                                  const ModelHighAPI_Selection& theAxisObject,
                                                  const ModelHighAPI_Double& theDistance)
@@ -61,7 +61,7 @@ void FeaturesAPI_Translation::setDistance(const ModelHighAPI_Double& theDistance
 
 // TODO(spo): make add* as static functions of the class
 //==================================================================================================
-TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document> & thePart,
+TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
                               const std::list<ModelHighAPI_Selection>& theMainObjects,
                               const ModelHighAPI_Selection& theAxisObject,
                               const ModelHighAPI_Double& theDistance)

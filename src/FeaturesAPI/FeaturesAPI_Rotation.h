@@ -20,16 +20,16 @@ class ModelHighAPI_Selection;
 /// \class FeaturesAPI_Rotation
 /// \ingroup CPPHighAPI
 /// \brief Interface for Rotation feature.
-class FeaturesAPI_Rotation : public ModelHighAPI_Interface
+class FeaturesAPI_Rotation: public ModelHighAPI_Interface
 {
 public:
   /// Constructor without values.
   FEATURESAPI_EXPORT
-  explicit FeaturesAPI_Rotation(const std::shared_ptr<ModelAPI_Feature> & theFeature);
+  explicit FeaturesAPI_Rotation(const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
   /// Constructor with values.
   FEATURESAPI_EXPORT
-  FeaturesAPI_Rotation(const std::shared_ptr<ModelAPI_Feature> & theFeature,
+  FeaturesAPI_Rotation(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<ModelHighAPI_Selection>& theMainObjects,
                        const ModelHighAPI_Selection& theAxisObject,
                        const ModelHighAPI_Double& theAngle);
@@ -62,7 +62,7 @@ typedef std::shared_ptr<FeaturesAPI_Rotation> RotationPtr;
 /// \ingroup CPPHighAPI
 /// \brief Create Rotation feature.
 FEATURESAPI_EXPORT
-RotationPtr addRotation(const std::shared_ptr<ModelAPI_Document> & thePart,
+RotationPtr addRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const std::list<ModelHighAPI_Selection>& theMainObjects,
                         const ModelHighAPI_Selection& theAxisObject,
                         const ModelHighAPI_Double& theDistance);
