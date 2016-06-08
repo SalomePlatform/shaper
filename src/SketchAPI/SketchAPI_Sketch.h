@@ -17,6 +17,7 @@
 #include <ModelHighAPI_Macro.h>
 //--------------------------------------------------------------------------------------
 class ModelAPI_CompositeFeature;
+class ModelHighAPI_Double;
 class ModelHighAPI_Selection;
 class SketchAPI_Line;
 //--------------------------------------------------------------------------------------

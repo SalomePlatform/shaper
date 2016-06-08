@@ -29,6 +29,7 @@
 #include <ModelAPI_AttributeString.h>
 //--------------------------------------------------------------------------------------
 #include "ModelHighAPI_Double.h"
+#include "ModelHighAPI_Integer.h"
 #include "ModelHighAPI_Selection.h"
 
 //--------------------------------------------------------------------------------------
@@ -68,6 +69,13 @@ void fillAttribute(bool theValue,
 //--------------------------------------------------------------------------------------
 void fillAttribute(const ModelHighAPI_Double & theValue,
                    const std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute)
+{
+  theValue.fillAttribute(theAttribute);
+}
+
+//--------------------------------------------------------------------------------------
+void fillAttribute(const ModelHighAPI_Integer & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeInteger> & theAttribute)
 {
   theValue.fillAttribute(theAttribute);
 }

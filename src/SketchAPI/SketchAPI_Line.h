@@ -14,7 +14,7 @@
 
 #include <SketchPlugin_Line.h>
 
-#include <SketchAPI_SketchEntity.h>
+#include "SketchAPI_SketchEntity.h"
 //--------------------------------------------------------------------------------------
 class ModelHighAPI_Selection;
 //--------------------------------------------------------------------------------------

@@ -36,6 +36,7 @@ class ModelAPI_AttributeSelectionList;
 class ModelAPI_AttributeString;
 //--------------------------------------------------------------------------------------
 class ModelHighAPI_Double;
+class ModelHighAPI_Integer;
 class ModelHighAPI_Selection;
 //--------------------------------------------------------------------------------------
 MODELHIGHAPI_EXPORT
@@ -62,6 +63,10 @@ void fillAttribute(bool theValue,
 MODELHIGHAPI_EXPORT
 void fillAttribute(const ModelHighAPI_Double & theValue,
                    const std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute);
+
+MODELHIGHAPI_EXPORT
+void fillAttribute(const ModelHighAPI_Integer & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeInteger> & theAttribute);
 
 MODELHIGHAPI_EXPORT
 void fillAttribute(const ModelHighAPI_Selection & theValue,

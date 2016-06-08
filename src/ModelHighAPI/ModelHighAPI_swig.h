@@ -11,6 +11,7 @@
 
   #include "ModelHighAPI.h"
   #include "ModelHighAPI_Double.h"
+  #include "ModelHighAPI_Integer.h"
   #include "ModelHighAPI_Interface.h"
   #include "ModelHighAPI_Macro.h"
   #include "ModelHighAPI_Selection.h"
