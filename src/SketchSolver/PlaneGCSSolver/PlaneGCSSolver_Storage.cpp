@@ -527,7 +527,8 @@ void PlaneGCSSolver_Storage::updateCoincident(const EntityWrapperPtr& thePoint)
 
 bool PlaneGCSSolver_Storage::isRedundant(
     GCSConstraintPtr theCheckedConstraint,
-    ConstraintWrapperPtr theParentConstraint) const
+    ConstraintWrapperPtr theParentConstraint,
+    std::list<std::set<double*> >& theCoincidentPoints) const
 {
   if (theParentConstraint->type() == CONSTRAINT_SYMMETRIC) {
     if (theCheckedConstraint->getTypeId() == GCS::Perpendicular) {
@@ -540,13 +541,36 @@ bool PlaneGCSSolver_Storage::isRedundant(
     }
   }
   else if (theParentConstraint->type() == CONSTRAINT_PT_PT_COINCIDENT) {
-    // Mark constraint redundant if the coincident points both are slaves in the list of stored coincidences
-    const std::list<EntityWrapperPtr>& aPoints = theParentConstraint->entities();
-    CoincidentPointsMap::const_iterator aCoincIt = myCoincidentPoints.begin();
-    for (; aCoincIt != myCoincidentPoints.end(); ++aCoincIt) {
-      if (aCoincIt->second.find(aPoints.front()) != aCoincIt->second.end() &&
-          aCoincIt->second.find(aPoints.back()) != aCoincIt->second.end())
+    // Verify that the coincidence between points is already added
+    GCS::VEC_pD aParams = theCheckedConstraint->params();
+
+    std::list<std::set<double*> >::iterator aCoincIt, aFound1, aFound2;
+    aFound1 = aFound2 = theCoincidentPoints.end();
+    for (aCoincIt = theCoincidentPoints.begin(); aCoincIt != theCoincidentPoints.end(); ++aCoincIt) {
+      if (aFound1 == theCoincidentPoints.end() && aCoincIt->find(aParams[0]) != aCoincIt->end())
+        aFound1 = aCoincIt;
+      if (aFound2 == theCoincidentPoints.end() && aCoincIt->find(aParams[1]) != aCoincIt->end())
+        aFound2 = aCoincIt;
+      if (aFound1 != theCoincidentPoints.end() && aFound2 != theCoincidentPoints.end())
+        break;
+    }
+    if (aCoincIt != theCoincidentPoints.end()) { // both point are found
+      if (aFound1 == aFound2)
         return true;
+      // merge two groups of coincidence
+      aFound1->insert(aFound2->begin(), aFound2->end());
+      theCoincidentPoints.erase(aFound2);
+    } else {
+      if (aFound1 != theCoincidentPoints.end())
+        aFound1->insert(aParams[1]);
+      else if (aFound2 != theCoincidentPoints.end())
+        aFound2->insert(aParams[0]);
+      else {
+        std::set<double*> aNewCoincidence;
+        aNewCoincidence.insert(aParams[0]);
+        aNewCoincidence.insert(aParams[1]);
+        theCoincidentPoints.push_back(aNewCoincidence);
+      }
     }
   }
 
@@ -568,6 +592,7 @@ void PlaneGCSSolver_Storage::initializeSolver(SolverPtr theSolver)
   std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
       aCIt = myConstraintMap.begin();
   GCS::SET_I aTangentIDs;
+  std::list<std::set<double*> > aCoincidentPoints;
   for (; aCIt != myConstraintMap.end(); ++aCIt) {
     std::list<ConstraintWrapperPtr>::const_iterator aCWIt = aCIt->second.begin();
     for (; aCWIt != aCIt->second.end(); ++ aCWIt) {
@@ -575,7 +600,7 @@ void PlaneGCSSolver_Storage::initializeSolver(SolverPtr theSolver)
           std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(*aCWIt);
       std::list<GCSConstraintPtr>::const_iterator anIt = aGCS->constraints().begin();
       for (; anIt != aGCS->constraints().end(); ++anIt)
-        if (!isRedundant(*anIt, aGCS))
+        if (!isRedundant(*anIt, aGCS, aCoincidentPoints))
           aSolver->addConstraint(*anIt);
     }
     // store IDs of tangent constraints to avoid incorrect report of redundant constraints

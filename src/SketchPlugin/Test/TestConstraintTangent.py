@@ -301,7 +301,7 @@ aRefObjectB.setObject(anObjectB)
 aTangency.execute()
 aSession.finishOperation()
 
-assert(math.fabs(distancePointLine(aCircleCenter, aLine) - aCircleRadius.value()) < 1.e-10)
+assert(math.fabs(distancePointLine(aCircleCenter, aLine) - round(aCircleRadius.value(), 5)) < 1.e-10)
 #=========================================================================
 # End of test
 #=========================================================================

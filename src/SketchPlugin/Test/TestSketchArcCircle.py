@@ -53,6 +53,19 @@ def distancePointPoint(thePointA, thePointB):
     ydiff = math.pow((thePointA.y() - thePointB.y()), 2)
     return round(math.sqrt(xdiff + ydiff), 5)
 
+def dot(thePoint11, thePoint12, thePoint21, thePoint22):
+    """
+    subroutine to calculate dit product between lines given by their points
+    """
+    aDirX1 = thePoint12.x() - thePoint11.x()
+    aDirY1 = thePoint12.y() - thePoint11.y()
+    aLen1 = math.hypot(aDirX1, aDirY1)
+    aDirX2 = thePoint22.x() - thePoint21.x()
+    aDirY2 = thePoint22.y() - thePoint21.y()
+    aLen2 = math.hypot(aDirX2, aDirY2)
+    aDot = aDirX1 * aDirX2 + aDirY1 * aDirY2
+    return aDot / aLen1 / aLen2
+
 
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
@@ -217,7 +230,8 @@ aSession.startOperation()
 anArcEndPoint.setValue(100., 25.)
 aSession.finishOperation()
 anArcCenter = geomDataAPI_Point2D(aSketchArcTangent.attribute("ArcCenter"))
-assert(anArcCenter.x() == 50.)
+aDot = dot(anArcCenter, aLineEnd, aLineStart, aLineEnd)
+assert math.fabs(aDot) <= 2.e-4, "Observed dot product: {0}".format(aDot)
 #=========================================================================
 # Create an arc, tangent to the previous arc
 #=========================================================================

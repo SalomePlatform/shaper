@@ -125,7 +125,7 @@ def body_3():
     geom_points = [geom.Pnt2d(*p) for p in points]
     left, top_left, top_middle, top_right, right, bottom, = sketch.addPolygon(*geom_points)
 
-    points = [(l + r, H), (l, H), (l + 2 * r, H)]
+    points = [(l + r, H), (l + 2 * r, H), (l, H)]
     points = [(p[0], -p[1]) for p in points]  # as we look to back of the face
     center, start, end = [geom.Pnt2d(*p) for p in points]
     arc = sketch.addArc(center, start, end)

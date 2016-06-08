@@ -1077,6 +1077,11 @@ ConstraintWrapperPtr createConstraintEqual(
         new GCS::ConstraintP2PDistance(aLine1->p1, aLine1->p2, theIntermed->parameter())));
     aConstrList.push_back(GCSConstraintPtr(
         new GCS::ConstraintP2PDistance(aLine2->p1, aLine2->p2, theIntermed->parameter())));
+    // update value of intermediate parameter
+    double x = *aLine1->p1.x - *aLine1->p2.x;
+    double y = *aLine1->p1.y - *aLine1->p2.y;
+    double aLen = sqrt(x*x + y*y);
+    theIntermed->setValue(aLen);
   } else {
     std::shared_ptr<GCS::Circle> aCirc1 =
         std::dynamic_pointer_cast<GCS::Circle>(theEntity1->entity());

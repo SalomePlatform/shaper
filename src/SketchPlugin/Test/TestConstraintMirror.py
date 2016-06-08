@@ -21,14 +21,20 @@ __updated__ = "2015-03-17"
 #=========================================================================
 # Auxiliary functions
 #=========================================================================
+def normalize(theDir):
+    aLen = math.hypot(theDir[0], theDir[1])
+    if aLen < 1.e-10:
+        aLen = 1.0
+    return [theDir[0] / aLen, theDir[1] / aLen]
+
 def checkMirror(theListInit, theListMirr, theMirrorLine):
-    TOL = 1.e-8
+    TOL = 5.e-5
     aListSize = theListInit.size()
     
     aLineStartPoint = geomDataAPI_Point2D(theMirrorLine.attribute("StartPoint"))
     aLineEndPoint = geomDataAPI_Point2D(theMirrorLine.attribute("EndPoint"))
-    aLineDirX = aLineEndPoint.x() - aLineStartPoint.x()
-    aLineDirY = aLineEndPoint.y() - aLineStartPoint.y()
+    aLineDir = [aLineEndPoint.x() - aLineStartPoint.x(), aLineEndPoint.y() - aLineStartPoint.y()]
+    aLineDir = normalize(aLineDir)
 
     for ind in range(0, aListSize):
         aFeatureB = ModelAPI_Feature.feature(theListInit.object(ind))
@@ -46,13 +52,13 @@ def checkMirror(theListInit, theListMirr, theMirrorLine):
         for key in anAttributes:
             aPointB = geomDataAPI_Point2D(aFeatureB.attribute(key))
             aPointC = geomDataAPI_Point2D(aFeatureC.attribute(anAttributes[key]))
-            aDirX = aPointC.x() - aPointB.x()
-            aDirY = aPointC.y() - aPointB.y()
-            aDot = aLineDirX * aDirX + aLineDirY * aDirY
+            aDir = [aPointC.x() - aPointB.x(), aPointC.y() - aPointB.y()]
+            aDir = normalize(aDir)
+            aDot = aLineDir[0] * aDir[0] + aLineDir[1] * aDir[1]
             assert math.fabs(aDot) < TOL, "aDot = {0}".format(aDot)
             aDirX = aLineEndPoint.x() - 0.5 * (aPointB.x() + aPointC.x())
             aDirY = aLineEndPoint.y() - 0.5 * (aPointB.y() + aPointC.y())
-            aCross = aLineDirX * aDirY - aLineDirY * aDirX
+            aCross = aLineDir[0] * aDir[0] - aLineDir[1] * aDir[1]
             assert math.fabs(aCross) < TOL, "aCross = {0}".format(aCross)
 
 
