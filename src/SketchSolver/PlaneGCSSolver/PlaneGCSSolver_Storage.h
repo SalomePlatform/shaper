@@ -109,7 +109,7 @@ private:
   ///   * symmetric of two points placed on the mirror line (do not add perpendicular constraint)
   bool isRedundant(GCSConstraintPtr theCheckedConstraint,
                    ConstraintWrapperPtr theParentConstraint,
-                   std::list<std::set<double*> >& theCoincidentPoints = std::list<std::set<double*> >() ) const;
+                   std::list<std::set<double*> >& theCoincidentPoints) const;
 
 private:
   GCS::VEC_pD                      myParameters;         ///< list of parameters
