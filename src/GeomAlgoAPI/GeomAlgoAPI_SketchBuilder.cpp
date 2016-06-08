@@ -115,7 +115,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
         if (!aStartFound) {
           const TopoDS_Edge& anEdge = TopoDS::Edge(anExp.Current());
           TopoDS_Vertex aV1, aV2;
-          TopExp::Vertices(anEdge, aV1, aV2);
+          TopExp::Vertices(anEdge, aV1, aV2, Standard_True);
           if (aV1.IsSame(aStartVertex) == Standard_True)
             aStartFound = true;
           else

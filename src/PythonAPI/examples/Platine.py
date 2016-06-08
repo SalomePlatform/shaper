@@ -60,7 +60,7 @@ def vertical_body():
 
 def bottom_body():
     # Create XOY sketch
-    sketch = model.addSketch(part, "Extrusion_1_1/Generated_Face_4")
+    sketch = model.addSketch(part, "Extrusion_1_1/Generated_Face_3")
 
     # Create base polygon
     points = [(0, 0), (0, L), (P, L), (P, 16 + 16), (P - 20, 16 + 16), (P - 20, 16), (P, 16), (P, 0)]
@@ -93,7 +93,7 @@ def bottom_body():
     sketch.setCoincident(arc.endPoint(), h1.startPoint())
 
     # Binding
-    left_e = sketch.addLine("Extrusion_1_1/Generated_Face_4&Extrusion_1_1/To_Face_1_1")
+    left_e = sketch.addLine("Extrusion_1_1/Generated_Face_3&Extrusion_1_1/To_Face_1_1")
     sketch.setCoincident(left_e.startPoint(), left.endPoint())
     sketch.setCoincident(left_e.endPoint(), left.startPoint())
 
