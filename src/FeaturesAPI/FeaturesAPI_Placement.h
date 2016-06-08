@@ -14,7 +14,6 @@
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
 
-class ModelHighAPI_Double;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Placement

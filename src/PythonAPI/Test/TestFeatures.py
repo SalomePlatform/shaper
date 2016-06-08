@@ -32,7 +32,7 @@ class FeaturesTestCase(FeaturesFixture):
             # "addImport", "exportToFile",
 
             "addAxis",
-            "addAddition", "addSubtraction", "addIntersection",
+            "addCut", "addFuse", "addCommon",
             "addExtrusion",
             # "addExtrusionCut", "addExtrusionFuse",
             "addRevolution",
@@ -62,7 +62,7 @@ class FeaturesTestCase(FeaturesFixture):
         ExchangeAPI.ExchangeAPI_Export(self.part.addFeature("Export"))
 
         import FeaturesAPI
-        model.features.boolean.Boolean(self.part.addFeature("Boolean"))
+        FeaturesAPI.FeaturesAPI_Boolean(self.part.addFeature("Boolean"))
         model.features.extrusion.Extrusion(self.part.addFeature("Extrusion"))
         # model.features.extrusion_boolean.ExtrusionBoolean(self.part.addFeature("ExtrusionCut"))
         # model.features.extrusion_boolean.ExtrusionBoolean(self.part.addFeature("ExtrusionFuse"))

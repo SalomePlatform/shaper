@@ -10,6 +10,7 @@
   #include <ModelHighAPI_swig.h>
 
   #include "FeaturesAPI.h"
+  #include "FeaturesAPI_Boolean.h"
   #include "FeaturesAPI_Placement.h"
   #include "FeaturesAPI_Rotation.h"
   #include "FeaturesAPI_Translation.h"
