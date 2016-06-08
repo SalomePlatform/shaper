@@ -38,6 +38,12 @@ void fillAttribute(const std::shared_ptr<GeomAPI_Pnt2d> & theValue,
   theAttribute->setValue(theValue);
 }
 
+void fillAttribute(const std::shared_ptr<GeomDataAPI_Point2D> & theAttribute,
+                   double theX, double theY)
+{
+  theAttribute->setValue(theX, theY);
+}
+
 //--------------------------------------------------------------------------------------
 void fillAttribute(const std::shared_ptr<GeomAPI_Dir> & theValue,
                    const std::shared_ptr<GeomDataAPI_Dir> & theAttribute)

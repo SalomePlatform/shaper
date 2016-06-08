@@ -43,6 +43,10 @@ void fillAttribute(const std::shared_ptr<GeomAPI_Pnt2d> & theValue,
                    const std::shared_ptr<GeomDataAPI_Point2D> & theAttribute);
 
 MODELHIGHAPI_EXPORT
+void fillAttribute(const std::shared_ptr<GeomDataAPI_Point2D> & theAttribute,
+                   double theX, double theY);
+
+MODELHIGHAPI_EXPORT
 void fillAttribute(const std::shared_ptr<GeomAPI_Dir> & theValue,
                    const std::shared_ptr<GeomDataAPI_Dir> & theAttribute);
 
