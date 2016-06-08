@@ -107,4 +107,5 @@ std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(const std::string & th
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Line::ID());
   return LinePtr(new SketchAPI_Line(aFeature, theExternalName));
 }
+
 //--------------------------------------------------------------------------------------

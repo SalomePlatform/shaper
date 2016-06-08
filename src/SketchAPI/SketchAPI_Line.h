@@ -14,8 +14,7 @@
 
 #include <SketchPlugin_Line.h>
 
-#include <ModelHighAPI_Interface.h>
-#include <ModelHighAPI_Macro.h>
+#include <SketchAPI_SketchEntity.h>
 //--------------------------------------------------------------------------------------
 class ModelHighAPI_Selection;
 //--------------------------------------------------------------------------------------
@@ -23,7 +22,7 @@ class ModelHighAPI_Selection;
  * \ingroup CPPHighAPI
  * \brief Interface for Line feature
  */
-class SketchAPI_Line : public ModelHighAPI_Interface
+class SketchAPI_Line : public SketchAPI_SketchEntity
 {
 public:
   /// Constructor without values

@@ -14,7 +14,7 @@
 //--------------------------------------------------------------------------------------
 SketchAPI_Line::SketchAPI_Line(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
-: ModelHighAPI_Interface(theFeature)
+: SketchAPI_SketchEntity(theFeature)
 {
   initialize();
 }
@@ -22,7 +22,7 @@ SketchAPI_Line::SketchAPI_Line(
 SketchAPI_Line::SketchAPI_Line(
     const std::shared_ptr<ModelAPI_Feature> & theFeature,
     double theX1, double theY1, double theX2, double theY2)
-: ModelHighAPI_Interface(theFeature)
+: SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
     setByCoordinates(theX1, theY1, theX2, theY2);
@@ -33,7 +33,7 @@ SketchAPI_Line::SketchAPI_Line(
     const std::shared_ptr<ModelAPI_Feature> & theFeature,
     const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
     const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint)
-: ModelHighAPI_Interface(theFeature)
+: SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
     setByPoints(theStartPoint, theEndPoint);
@@ -43,7 +43,7 @@ SketchAPI_Line::SketchAPI_Line(
 SketchAPI_Line::SketchAPI_Line(
     const std::shared_ptr<ModelAPI_Feature> & theFeature,
     const ModelHighAPI_Selection & theExternal )
-: ModelHighAPI_Interface(theFeature)
+: SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
     setByExternal(theExternal);
@@ -53,7 +53,7 @@ SketchAPI_Line::SketchAPI_Line(
 SketchAPI_Line::SketchAPI_Line(
     const std::shared_ptr<ModelAPI_Feature> & theFeature,
     const std::string & theExternalName )
-: ModelHighAPI_Interface(theFeature)
+: SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
     setByExternalName(theExternalName);

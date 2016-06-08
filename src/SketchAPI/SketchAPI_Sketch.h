@@ -60,6 +60,8 @@ public:
   SKETCHAPI_EXPORT
   void setExternal(const ModelHighAPI_Selection & theExternal);
 
+  // TODO(spo): addPoint
+
   /// Add line
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Line> addLine(
@@ -75,6 +77,14 @@ public:
   /// Add line
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Line> addLine(const std::string & theExternalName);
+
+  // TODO(spo): addCircle
+  // TODO(spo): addArc
+
+  // TODO(spo): set* (constraints)
+
+  // TODO(spo): setValue
+  // TODO(spo): setText
 
 protected:
   std::shared_ptr<ModelAPI_CompositeFeature> compositeFeature() const;
