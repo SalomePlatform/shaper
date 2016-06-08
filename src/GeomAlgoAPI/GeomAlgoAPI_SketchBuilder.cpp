@@ -19,10 +19,13 @@
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
 #include <list>
+#include <cmath>
 
 
 static TopoDS_Vertex findStartVertex(const TopoDS_Shape& theShape)
 {
+  static const double aTol = Precision::PConfusion();
+
   TopExp_Explorer anExp(theShape, TopAbs_VERTEX);
   TopoDS_Vertex aStart = TopoDS::Vertex(anExp.Current());
   gp_Pnt aStartPnt(BRep_Tool::Pnt(aStart));
@@ -32,10 +35,10 @@ static TopoDS_Vertex findStartVertex(const TopoDS_Shape& theShape)
   for (anExp.Next(); anExp.More(); anExp.Next()) {
     aCurrent = TopoDS::Vertex(anExp.Current());
     aCurrentPnt = BRep_Tool::Pnt(aCurrent);
-    if ((aCurrentPnt.X() > aStartPnt.X()) ||
-        (aCurrentPnt.X() == aStartPnt.X() && aCurrentPnt.Y() > aStartPnt.Y()) ||
-        (aCurrentPnt.X() == aStartPnt.X() && aCurrentPnt.Y() == aStartPnt.Y() &&
-            aCurrentPnt.Z() > aStartPnt.Z())) {
+    if ((aCurrentPnt.X() > aStartPnt.X() + aTol) ||
+        (aCurrentPnt.X() > aStartPnt.X() - aTol && aCurrentPnt.Y() > aStartPnt.Y() + aTol) ||
+        (aCurrentPnt.X() > aStartPnt.X() - aTol && aCurrentPnt.Y() > aStartPnt.Y() - aTol &&
+            aCurrentPnt.Z() > aStartPnt.Z() + aTol)) {
       aStart = aCurrent;
       aStartPnt = aCurrentPnt;
     }
