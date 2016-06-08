@@ -33,22 +33,16 @@ void PlaneGCSSolver_Solver::addConstraint(GCSConstraintPtr theConstraint)
 void PlaneGCSSolver_Solver::removeConstraint(GCSConstraintPtr theConstraint)
 {
   GCS::Constraint* aConstraint = theConstraint.get();
-  if (myConstraints.find(aConstraint) == myConstraints.end())
-    return; // no constraint, no need to remove it
-
-  myEquationSystem.removeConstraint(aConstraint);
-  myConstraints.erase(aConstraint);
+  removeConstraint(aConstraint);
 }
 
-static void removeTangent(GCS::VEC_I& theRedundant, const GCS::SET_I& theTangent)
+void PlaneGCSSolver_Solver::removeConstraint(GCS::Constraint* theConstraint)
 {
-  int i = 0;
-  while (i < theRedundant.size()) {
-    if (theTangent.find(theRedundant[i]) == theTangent.end())
-      ++i;
-    else
-      theRedundant.erase(theRedundant.begin() + i);
-  }
+  if (myConstraints.find(theConstraint) == myConstraints.end())
+    return; // no constraint, no need to remove it
+
+  myEquationSystem.removeConstraint(theConstraint);
+  myConstraints.erase(theConstraint);
 }
 
 SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
@@ -87,10 +81,11 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
     // additionally check redundant constraints
     GCS::VEC_I aRedundantID;
     myEquationSystem.getRedundant(aRedundantID);
-    // remove redundant constraints relative to tangency
-    removeTangent(aRedundantID, myTangent);
+    // The system with tangent constraints may show redundant constraints if the entities are coupled smoothly.
+    // Sometimes tangent constraints are fall to both conflicting and redundant constraints.
+    // Need to check if there are redundant constraints without these tangencies.
     if (!aRedundantID.empty())
-      aResult = GCS::Failed;
+      aResult = myTangent.empty() ? GCS::Failed : (GCS::SolveStatus)solveWithoutTangent();
   }
   Events_LongOp::end(this);
 
@@ -102,6 +97,36 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
     aStatus = STATUS_FAILED;
 
   return aStatus;
+}
+
+SketchSolver_SolveStatus PlaneGCSSolver_Solver::solveWithoutTangent()
+{
+  // Remove tangency which leads to redundant or conflicting constraints
+  GCS::VEC_I aConflicting, aRedundant;
+  myEquationSystem.getRedundant(aRedundant);
+  size_t aNbRemove = aRedundant.size(); // number of tangent constraints which can be removed
+  myEquationSystem.getConflicting(aConflicting);
+  aRedundant.insert(aRedundant.end(), aConflicting.begin(), aConflicting.end());
+
+  GCS::SET_I aTangentToRemove;
+  GCS::VEC_I::iterator aCIt = aRedundant.begin();
+  for (; aCIt != aRedundant.end() && aNbRemove > 0; ++aCIt)
+    if (myTangent.find(*aCIt) != myTangent.end()) {
+      aTangentToRemove.insert(*aCIt);
+      --aNbRemove;
+    }
+
+  std::set<GCS::Constraint*>::const_iterator aConstrIt = myConstraints.begin();
+  while (aConstrIt != myConstraints.end()) {
+    GCS::Constraint* aConstraint = *aConstrIt;
+    int anID = aConstraint->getTag();
+    ++aConstrIt;
+    if (aTangentToRemove.find(anID) != aTangentToRemove.end())
+      removeConstraint(aConstraint);
+  }
+
+  myTangent.clear();
+  return solve();
 }
 
 void PlaneGCSSolver_Solver::undo()

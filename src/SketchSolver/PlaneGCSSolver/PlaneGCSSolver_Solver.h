@@ -62,6 +62,12 @@ public:
 private:
   void collectConflicting();
 
+  /// \brief Remove constraint from the system of equations
+  void removeConstraint(GCS::Constraint* theConstraint);
+
+  /// \brief Remove redundant tangent constraints and try to solve the system again
+  SketchSolver_SolveStatus solveWithoutTangent();
+
 private:
   GCS::VEC_pD                myParameters;     ///< list of unknowns
   std::set<GCS::Constraint*> myConstraints;    ///< list of constraints already processed by the system

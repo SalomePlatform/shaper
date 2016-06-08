@@ -539,6 +539,16 @@ bool PlaneGCSSolver_Storage::isRedundant(
       return aLine->distance(aPoint) < tolerance;
     }
   }
+  else if (theParentConstraint->type() == CONSTRAINT_PT_PT_COINCIDENT) {
+    // Mark constraint redundant if the coincident points both are slaves in the list of stored coincidences
+    const std::list<EntityWrapperPtr>& aPoints = theParentConstraint->entities();
+    CoincidentPointsMap::const_iterator aCoincIt = myCoincidentPoints.begin();
+    for (; aCoincIt != myCoincidentPoints.end(); ++aCoincIt) {
+      if (aCoincIt->second.find(aPoints.front()) != aCoincIt->second.end() &&
+          aCoincIt->second.find(aPoints.back()) != aCoincIt->second.end())
+        return true;
+    }
+  }
 
   return false;
 }
@@ -570,12 +580,8 @@ void PlaneGCSSolver_Storage::initializeSolver(SolverPtr theSolver)
     }
     // store IDs of tangent constraints to avoid incorrect report of redundant constraints
     if (aCIt->first && aCIt->first->getKind() == SketchPlugin_ConstraintTangent::ID())
-      for (aCWIt = aCIt->second.begin(); aCWIt != aCIt->second.end(); ++ aCWIt) {
-        std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aGCS =
-            std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(*aCWIt);
-        if (aGCS->constraints().front()->getTypeId() == GCS::P2LDistance)
-          aTangentIDs.insert((int)(*aCWIt)->id());
-      }
+      for (aCWIt = aCIt->second.begin(); aCWIt != aCIt->second.end(); ++ aCWIt)
+        aTangentIDs.insert((int)(*aCWIt)->id());
   }
   // additional constraints for arcs
   std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >::const_iterator
