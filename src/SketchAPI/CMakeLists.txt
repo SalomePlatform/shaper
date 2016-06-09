@@ -4,12 +4,14 @@ INCLUDE(Common)
 
 SET(PROJECT_HEADERS
   SketchAPI.h
+  SketchAPI_Circle.h
   SketchAPI_Line.h
   SketchAPI_Sketch.h
   SketchAPI_SketchEntity.h
 )
 
 SET(PROJECT_SOURCES
+  SketchAPI_Circle.cpp
   SketchAPI_Line.cpp
   SketchAPI_Sketch.cpp
   SketchAPI_SketchEntity.cpp

@@ -10,6 +10,7 @@
   #include <ModelHighAPI_swig.h>
 
   #include "SketchAPI.h"
+  #include "SketchAPI_Circle.h"
   #include "SketchAPI_Line.h"
   #include "SketchAPI_Sketch.h"
   #include "SketchAPI_SketchEntity.h"
