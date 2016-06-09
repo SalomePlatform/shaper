@@ -3,7 +3,7 @@ import unittest
 import ModelAPI
 import ExchangeAPI
 
-class PointTestCase(unittest.TestCase):
+class ExchangeTestCase(unittest.TestCase):
 
     def setUp(self):
         self.session = ModelAPI.ModelAPI_Session.get()

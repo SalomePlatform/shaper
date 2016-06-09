@@ -7,6 +7,10 @@
 
 %include "doxyhelp.i"
 
+// import other modules
+%import "ModelAPI.i"
+%import "GeomDataAPI.i"
+
 // to avoid error on this
 #define MODELHIGHAPI_EXPORT
 
@@ -34,7 +38,6 @@
     return NULL;
   }
 }
-
 %typecheck(SWIG_TYPECHECK_POINTER) ModelHighAPI_Double, const ModelHighAPI_Double & {
   $1 = (PyFloat_Check($input) || PyInt_Check($input) || PyLong_Check($input) || PyString_Check($input)) ? 1 : 0;
 }
@@ -52,9 +55,33 @@
     return NULL;
   }
 }
-
 %typecheck(SWIG_TYPECHECK_POINTER) ModelHighAPI_Integer, const ModelHighAPI_Integer & {
   $1 = (PyInt_Check($input) || PyString_Check($input)) ? 1 : 0;
+}
+
+%typemap(in) const ModelHighAPI_RefAttr & (ModelHighAPI_RefAttr temp) {
+  std::shared_ptr<ModelAPI_Attribute> * temp_attribute;
+  std::shared_ptr<ModelAPI_Object> * temp_object;
+  int newmem = 0;
+  if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_attribute, $descriptor(std::shared_ptr<ModelAPI_Attribute> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    temp = ModelHighAPI_RefAttr(*temp_attribute);
+    if (newmem & SWIG_CAST_NEW_MEMORY) {
+      delete temp_attribute;
+    }
+    $1 = &temp;
+  } else
+  if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_object, $descriptor(std::shared_ptr<ModelAPI_Object> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    temp = ModelHighAPI_RefAttr(*temp_object);
+    if (newmem & SWIG_CAST_NEW_MEMORY) {
+      delete temp_object;
+    }
+    $1 = &temp;
+  } else
+  if ((SWIG_ConvertPtr($input, (void **)&$1, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
+  } else {
+    PyErr_SetString(PyExc_ValueError, "argument must be ModelHighAPI_Double, float, int or string.");
+    return NULL;
+  }
 }
 
 // all supported interfaces
@@ -62,8 +89,6 @@
 %include "ModelHighAPI_Integer.h"
 %include "ModelHighAPI_Interface.h"
 %include "ModelHighAPI_Macro.h"
+%include "ModelHighAPI_RefAttr.h"
 %include "ModelHighAPI_Selection.h"
 %include "ModelHighAPI_Tools.h"
-
-// std::list -> []
-%template(SelectionList) std::list<ModelHighAPI_Selection>;

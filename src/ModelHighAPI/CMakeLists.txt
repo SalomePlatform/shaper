@@ -8,6 +8,7 @@ SET(PROJECT_HEADERS
   ModelHighAPI_Integer.h
   ModelHighAPI_Interface.h
   ModelHighAPI_Macro.h
+  ModelHighAPI_RefAttr.h
   ModelHighAPI_Selection.h
   ModelHighAPI_Tools.h
 )
@@ -16,6 +17,7 @@ SET(PROJECT_SOURCES
   ModelHighAPI_Double.cpp
   ModelHighAPI_Integer.cpp
   ModelHighAPI_Interface.cpp
+  ModelHighAPI_RefAttr.cpp
   ModelHighAPI_Selection.cpp
   ModelHighAPI_Tools.cpp
 )
@@ -76,6 +78,7 @@ INCLUDE(UnitTest)
 ADD_UNIT_TESTS(
   TestDouble.py
   TestInteger.py
+  TestRefAttr.py
 )
 
 # ADD_SUBDIRECTORY (Test)

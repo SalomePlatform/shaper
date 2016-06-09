@@ -18,6 +18,7 @@
 //--------------------------------------------------------------------------------------
 class ModelAPI_CompositeFeature;
 class ModelHighAPI_Double;
+class ModelHighAPI_RefAttr;
 class ModelHighAPI_Selection;
 class SketchAPI_Line;
 //--------------------------------------------------------------------------------------
@@ -82,10 +83,24 @@ public:
   // TODO(spo): addCircle
   // TODO(spo): addArc
 
+  /// Set coincident
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setCoincident(
+      // TODO(spo): should it be more concrete type (e.g. ModelAPI_Object)?
+      const ModelHighAPI_RefAttr & thePoint1,
+      const ModelHighAPI_RefAttr & thePoint2);
+
   // TODO(spo): set* (constraints)
 
-  // TODO(spo): setValue
-  // TODO(spo): setText
+  // TODO(spo): addMirror
+
+  /// Set value
+  SKETCHAPI_EXPORT
+  void setValue(
+      const std::shared_ptr<ModelAPI_Feature> & theConstraint,
+      const ModelHighAPI_Double & theValue);
+
+  // TODO(spo): setText. Is it necessary as setValue accepts text expressions?
 
 protected:
   std::shared_ptr<ModelAPI_CompositeFeature> compositeFeature() const;

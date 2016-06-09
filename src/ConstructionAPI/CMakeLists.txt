@@ -28,6 +28,8 @@ INCLUDE_DIRECTORIES(
 INCLUDE_DIRECTORIES(
   # TODO(spo): modify ConstructionPlugin headers to remove dependency on GeomAPI headers
   ${PROJECT_SOURCE_DIR}/src/GeomAPI
+  # TODO(spo): it is for *_swig.h files. Can we eliminate it?
+  ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
   ${PROJECT_SOURCE_DIR}/src/ConstructionPlugin
 )
 

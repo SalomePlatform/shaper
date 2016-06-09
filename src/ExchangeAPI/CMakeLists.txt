@@ -26,8 +26,9 @@ INCLUDE_DIRECTORIES(
 
 # Plugin headers dependency
 INCLUDE_DIRECTORIES(
-  # TODO(spo): modify ConstructionPlugin headers to remove dependency on GeomAPI headers
+  # TODO(spo): modify ExchangePlugin headers to remove dependency on GeomAPI headers
   ${PROJECT_SOURCE_DIR}/src/GeomAPI
+  ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
   ${PROJECT_SOURCE_DIR}/src/ExchangePlugin
 )
 

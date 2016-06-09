@@ -7,6 +7,25 @@
 //--------------------------------------------------------------------------------------
 #include "SketchAPI_Sketch.h"
 //--------------------------------------------------------------------------------------
+#include <SketchPlugin_Constraint.h>
+#include <SketchPlugin_ConstraintAngle.h>
+//#include <SketchPlugin_ConstraintBase.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintCollinear.h>
+#include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintEqual.h>
+#include <SketchPlugin_ConstraintFillet.h>
+#include <SketchPlugin_ConstraintHorizontal.h>
+#include <SketchPlugin_ConstraintLength.h>
+#include <SketchPlugin_ConstraintMiddle.h>
+#include <SketchPlugin_ConstraintMirror.h>
+#include <SketchPlugin_ConstraintParallel.h>
+#include <SketchPlugin_ConstraintPerpendicular.h>
+#include <SketchPlugin_ConstraintRadius.h>
+#include <SketchPlugin_ConstraintRigid.h>
+#include <SketchPlugin_ConstraintTangent.h>
+#include <SketchPlugin_ConstraintVertical.h>
+//--------------------------------------------------------------------------------------
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelHighAPI_Tools.h>
 #include "SketchAPI_Line.h"
@@ -106,6 +125,26 @@ std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(const std::string & th
   // TODO(spo): Add constraint SketchConstraintRigid like in PythonAPI. Is it necessary?
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Line::ID());
   return LinePtr(new SketchAPI_Line(aFeature, theExternalName));
+}
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setCoincident(
+    const ModelHighAPI_RefAttr & thePoint1,
+    const ModelHighAPI_RefAttr & thePoint2)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+  fillAttribute(thePoint1, aFeature->refattr(SketchPlugin_ConstraintCoincidence::ENTITY_A()));
+  fillAttribute(thePoint2, aFeature->refattr(SketchPlugin_ConstraintCoincidence::ENTITY_B()));
+  aFeature->execute();
+  return aFeature;
+}
+
+//--------------------------------------------------------------------------------------
+void SketchAPI_Sketch::setValue(
+    const std::shared_ptr<ModelAPI_Feature> & theConstraint,
+    const ModelHighAPI_Double & theValue)
+{
+  fillAttribute(theValue, theConstraint->real(SketchPlugin_Constraint::VALUE()));
 }
 
 //--------------------------------------------------------------------------------------

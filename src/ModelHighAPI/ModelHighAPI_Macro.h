@@ -8,6 +8,10 @@
 #define SRC_MODELHIGHAPI_MODELHIGHAPI_MACRO_H_
 
 //--------------------------------------------------------------------------------------
+#include <GeomDataAPI_Dir.h>
+#include <GeomDataAPI_Point.h>
+#include <GeomDataAPI_Point2D.h>
+//--------------------------------------------------------------------------------------
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_AttributeDouble.h>

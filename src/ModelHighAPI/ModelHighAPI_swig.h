@@ -7,13 +7,15 @@
 #ifndef SRC_MODELHIGHAPI_MODELHIGHAPI_SWIG_H_
 #define SRC_MODELHIGHAPI_MODELHIGHAPI_SWIG_H_
 
-  #include <ModelAPI.h>
+  #include <ModelAPI_swig.h>
+  #include <GeomDataAPI_swig.h>
 
   #include "ModelHighAPI.h"
   #include "ModelHighAPI_Double.h"
   #include "ModelHighAPI_Integer.h"
   #include "ModelHighAPI_Interface.h"
   #include "ModelHighAPI_Macro.h"
+  #include "ModelHighAPI_RefAttr.h"
   #include "ModelHighAPI_Selection.h"
   #include "ModelHighAPI_Tools.h"
 
