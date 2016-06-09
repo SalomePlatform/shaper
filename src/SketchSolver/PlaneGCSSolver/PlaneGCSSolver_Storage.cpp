@@ -242,6 +242,11 @@ bool PlaneGCSSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
 
 bool PlaneGCSSolver_Storage::remove(EntityWrapperPtr theEntity)
 {
+  // do not remove entity, if it is used by constraints or other entities
+  if ((theEntity->baseFeature() && isUsed(theEntity->baseFeature())) ||
+      (theEntity->baseAttribute() && isUsed(theEntity->baseAttribute())))
+    return false;
+
   bool isFullyRemoved = SketchSolver_Storage::remove(theEntity);
   if (isFullyRemoved) {
     if (theEntity->type() == ENTITY_ARC) {
