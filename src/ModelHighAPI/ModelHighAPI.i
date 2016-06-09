@@ -87,7 +87,7 @@
   } else
   if ((SWIG_ConvertPtr($input, (void **)&$1, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
   } else {
-    PyErr_SetString(PyExc_ValueError, "argument must be ModelHighAPI_Double, float, int or string.");
+    PyErr_SetString(PyExc_ValueError, "argument must be ModelHighAPI_RefAttr, ModelAPI_Attribute, int or ModelAPI_Object.");
     return NULL;
   }
 }
