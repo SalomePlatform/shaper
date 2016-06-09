@@ -42,13 +42,6 @@ class FeaturesExtrusionFixture(FeaturesAddExtrusionFixture):
 
 class FeaturesAddExtrusionTestCase(FeaturesAddExtrusionFixture):
 
-    def test_add_extrusion_no_base(self):
-        try:
-            extrusion = model.addExtrusion(self.part)
-            fail("addExtrusion should assert if base is not None")
-        except AssertionError:
-            pass
-
     def test_add_extrusion_by_face_and_size(self):
         sketch = model.addSketch(self.part, model.defaultPlane("XOY"))
         circle = sketch.addCircle(0, 0, 10)

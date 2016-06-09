@@ -284,4 +284,43 @@
   public:
 
 //--------------------------------------------------------------------------------------
+#define INTERFACE_10(KIND, \
+                     N_0, AN_0, T_0, C_0, \
+                     N_1, AN_1, T_1, C_1, \
+                     N_2, AN_2, T_2, C_2, \
+                     N_3, AN_3, T_3, C_3, \
+                     N_4, AN_4, T_4, C_4, \
+                     N_5, AN_5, T_5, C_5, \
+                     N_6, AN_6, T_6, C_6, \
+                     N_7, AN_7, T_7, C_7, \
+                     N_8, AN_8, T_8, C_8, \
+                     N_9, AN_9, T_9, C_9) \
+  public: \
+    INTERFACE_COMMON(KIND) \
+    DEFINE_ATTRIBUTE(N_0, T_0, C_0) \
+    DEFINE_ATTRIBUTE(N_1, T_1, C_1) \
+    DEFINE_ATTRIBUTE(N_2, T_2, C_2) \
+    DEFINE_ATTRIBUTE(N_3, T_3, C_3) \
+    DEFINE_ATTRIBUTE(N_4, T_4, C_4) \
+    DEFINE_ATTRIBUTE(N_5, T_5, C_5) \
+    DEFINE_ATTRIBUTE(N_6, T_6, C_6) \
+    DEFINE_ATTRIBUTE(N_7, T_7, C_7) \
+    DEFINE_ATTRIBUTE(N_8, T_8, C_8) \
+    DEFINE_ATTRIBUTE(N_9, T_9, C_9) \
+  protected: \
+    START_INIT() \
+      SET_ATTRIBUTE(N_0, T_0, AN_0) \
+      SET_ATTRIBUTE(N_1, T_1, AN_1) \
+      SET_ATTRIBUTE(N_2, T_2, AN_2) \
+      SET_ATTRIBUTE(N_3, T_3, AN_3) \
+      SET_ATTRIBUTE(N_4, T_4, AN_4) \
+      SET_ATTRIBUTE(N_5, T_5, AN_5) \
+      SET_ATTRIBUTE(N_6, T_6, AN_6) \
+      SET_ATTRIBUTE(N_7, T_7, AN_7) \
+      SET_ATTRIBUTE(N_8, T_8, AN_8) \
+      SET_ATTRIBUTE(N_9, T_9, AN_9) \
+    END_INIT() \
+  public:
+
+//--------------------------------------------------------------------------------------
 #endif /* SRC_MODELHIGHAPI_MODELHIGHAPI_MACRO_H_ */

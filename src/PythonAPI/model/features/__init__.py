@@ -5,7 +5,7 @@ from boolean import addAddition, addSubtraction, addIntersection
 
 from partition import addPartition
 
-from extrusion import addExtrusion
+from FeaturesAPI import addExtrusion
 from extrusion_boolean import addExtrusionCut, addExtrusionFuse
 
 from revolution import addRevolution

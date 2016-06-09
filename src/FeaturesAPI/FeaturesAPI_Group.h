@@ -36,7 +36,7 @@ public:
   virtual ~FeaturesAPI_Group();
 
   INTERFACE_1(FeaturesPlugin_Group::ID(),
-              groupList, FeaturesPlugin_Group::LIST_ID()(), ModelAPI_AttributeSelectionList, /** Group list*/)
+              groupList, FeaturesPlugin_Group::LIST_ID(), ModelAPI_AttributeSelectionList, /** Group list*/)
 
   /// Set main objects.
   FEATURESAPI_EXPORT
