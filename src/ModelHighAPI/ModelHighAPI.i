@@ -64,6 +64,10 @@
   std::shared_ptr<ModelAPI_Object> * temp_object;
   int newmem = 0;
   if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_attribute, $descriptor(std::shared_ptr<ModelAPI_Attribute> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (!temp_attribute) {
+      PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_RefAttr, ModelAPI_Attribute, int or ModelAPI_Object.");
+      return NULL;
+    }
     temp = ModelHighAPI_RefAttr(*temp_attribute);
     if (newmem & SWIG_CAST_NEW_MEMORY) {
       delete temp_attribute;
@@ -71,6 +75,10 @@
     $1 = &temp;
   } else
   if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_object, $descriptor(std::shared_ptr<ModelAPI_Object> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (!temp_object) {
+      PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_RefAttr, ModelAPI_Attribute, int or ModelAPI_Object.");
+      return NULL;
+    }
     temp = ModelHighAPI_RefAttr(*temp_object);
     if (newmem & SWIG_CAST_NEW_MEMORY) {
       delete temp_object;
