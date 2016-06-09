@@ -418,6 +418,17 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
   if (!anArcEdge)
     return;
   anArcEdge->getRange(*aStartAngle, *aEndAngle);
+  // verify the range is correct and not shifted to an angle
+  std::shared_ptr<GeomAPI_Dir2d> aDir(new GeomAPI_Dir2d(cos(*aStartAngle), sin(*aStartAngle)));
+  std::shared_ptr<GeomAPI_Pnt2d> aCalcStartPnt(
+      new GeomAPI_Pnt2d(aCenterPnt->xy()->added(aDir->xy()->multiplied(*aRadius))));
+  if (aCalcStartPnt->distance(aStartPnt) > tolerance) {
+    std::shared_ptr<GeomAPI_Dir2d> aDirToStart(
+        new GeomAPI_Dir2d(aStartPnt->xy()->decreased(aCenterPnt->xy())));
+    double anAngle = aDir->angle(aDirToStart);
+    *aStartAngle += anAngle;
+    *aEndAngle += anAngle;
+  }
 
   // do not constraint copied arc
   if (anArcFeature->isCopy())
