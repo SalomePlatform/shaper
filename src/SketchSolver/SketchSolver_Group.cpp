@@ -254,6 +254,9 @@ void SketchSolver_Group::moveFeature(FeaturePtr theFeature)
   myStorage->blockEvents(true);
   myStorage->refresh(true);
 
+  // Secondly, search attributes of the feature in the list of the Multi constraints and update them
+  updateMultiConstraints(myConstraints, theFeature);
+
   // Then, create temporary Fixed constraint
   SolverConstraintPtr aConstraint = aBuilder->createMovementConstraint(theFeature);
   if (!aConstraint)
@@ -261,9 +264,6 @@ void SketchSolver_Group::moveFeature(FeaturePtr theFeature)
   aConstraint->process(myStorage, getId(), getWorkplaneId());
   if (aConstraint->error().empty())
     setTemporary(aConstraint);
-
-  // Secondly, search attributes of the feature in the list of the Multi constraints and update them
-  updateMultiConstraints(myConstraints, theFeature);
 
   // Workaround to process arcs.
   // When move unconstrained arc, add temporary constraint to fix radius.

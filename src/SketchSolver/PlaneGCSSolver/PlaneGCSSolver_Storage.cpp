@@ -149,8 +149,11 @@ bool PlaneGCSSolver_Storage::update(EntityWrapperPtr theEntity)
 
   if (theEntity->baseAttribute()) {
     isUpdated = updateValues(theEntity);
-    if (isUpdated)
+    if (isUpdated) {
       setNeedToResolve(true);
+      if (theEntity->type() == ENTITY_POINT && theEntity->group() != myGroupID)
+        updateCoincident(theEntity);
+    }
   }
 
   // update parameters
