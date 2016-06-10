@@ -86,7 +86,7 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
   // The external yellow contour
   aPtA->SetType(Aspect_TOM_RING3);
   aPtA->SetScale(2.);
-  aPtA->SetColor(aValid ? Quantity_NOC_YELLOW : Quantity_NOC_BLACK);
+  aPtA->SetColor(aValid ? Quantity_NOC_YELLOW : myConflictingColor);
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
   aGroup->SetPrimitivesAspect(aPtA);
@@ -97,7 +97,7 @@ void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)&
   // Make a black mid ring
   aPtA->SetType(Aspect_TOM_RING1);
   aPtA->SetScale(1.);
-  aPtA->SetColor(Quantity_NOC_BLACK);
+  aPtA->SetColor(aValid ? Quantity_NOC_BLACK : myConflictingColor);
   aGroup->SetPrimitivesAspect(aPtA);
   aGroup->AddPrimitiveArray (aPntArray);
 
@@ -134,18 +134,6 @@ void SketcherPrs_Coincident::SetConflictingConstraint(const bool& theConflicting
                                                      const std::vector<int>& theColor)
 {
   myIsConflicting = theConflicting;
-
-    /*if (theConflicting)
-  {
-    if (!myAspect.IsNull())
-      myAspect->SetColor (Quantity_Color (theColor[0] / 255., theColor[1] / 255., theColor[2] / 255.,
-                          Quantity_TOC_RGB));
-    myIsConflicting = true;
-  }
-  else
-  {
-    if (!myAspect.IsNull())
-      myAspect->SetColor (Quantity_Color (1.0, 1.0, 0.0, Quantity_TOC_RGB));
-    myIsConflicting = false;
-  }*/
+  myConflictingColor = Quantity_Color(theColor[0] / 255., theColor[1] / 255., theColor[2] / 255.,
+                                      Quantity_TOC_RGB);
 }

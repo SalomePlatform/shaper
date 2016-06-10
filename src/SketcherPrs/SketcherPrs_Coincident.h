@@ -72,6 +72,7 @@ private:
   std::shared_ptr<GeomAPI_Ax3> mySketcherPlane;
   gp_Pnt myPoint;
   bool myIsConflicting; /// state if the presentation is visualized in error state
+  Quantity_Color myConflictingColor; /// the color of mid ring if there is a conflict
 };
 
 
