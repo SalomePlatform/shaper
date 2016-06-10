@@ -71,6 +71,8 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
       if (aParameters.find(*aPIt) != aParameters.end())
         break;
     if (aPIt == aParams.end()) {
+      myConflictingIDs.push_back((*aConstrIt)->getTag());
+      myConfCollected = true;
       aResult = GCS::Failed;
     }
   }
@@ -148,11 +150,12 @@ bool PlaneGCSSolver_Solver::isConflicting(const ConstraintID& theConstraint) con
 
 void PlaneGCSSolver_Solver::collectConflicting()
 {
+  GCS::VEC_I aConflict;
   myEquationSystem.getConflicting(myConflictingIDs);
+  myConflictingIDs.insert(myConflictingIDs.end(), aConflict.begin(), aConflict.end());
 
-  GCS::VEC_I aRedundantID;
-  myEquationSystem.getRedundant(aRedundantID);
-  myConflictingIDs.insert(myConflictingIDs.end(), aRedundantID.begin(), aRedundantID.end());
+  myEquationSystem.getRedundant(aConflict);
+  myConflictingIDs.insert(myConflictingIDs.end(), aConflict.begin(), aConflict.end());
 
   myConfCollected = true;
 }

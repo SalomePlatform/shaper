@@ -107,6 +107,7 @@ bool SketchSolver_ConstraintFixed::remove()
   }
   if (aFeature)
     myStorage->update(aFeature, myGroupID);
+  myStorage->setNeedToResolve(true);
 
   // Remove constraint or base feature
   if (myBaseConstraint) {
