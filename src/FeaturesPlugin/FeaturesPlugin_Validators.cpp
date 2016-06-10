@@ -615,6 +615,7 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesResult::isValid(const std::shared_pt
   // Copy base shape.
   GeomShapePtr aBaseShape = aShapeAttrSelection->value();
   if(!aBaseShape.get()) {
+    theError = "Error: Base shape is empty.";
     return false;
   }
   GeomShapePtr aResultShape = aBaseShape->emptyCopied();
