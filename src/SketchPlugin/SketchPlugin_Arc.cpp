@@ -766,10 +766,10 @@ void SketchPlugin_Arc::tangencyArcConstraints()
       Events_Loop::loop()->flush(aDeleteEvent);
 
     // Wait all constraints being created, then send update events
-    static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-    bool isUpdateFlushed = Events_Loop::loop()->isFlushed(anUpdateEvent);
-    if (isUpdateFlushed)
-      Events_Loop::loop()->setFlushed(anUpdateEvent, false);
+    static Events_ID aCreateEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+    bool isCreateFlushed = Events_Loop::loop()->isFlushed(aCreateEvent);
+    if (isCreateFlushed)
+      Events_Loop::loop()->setFlushed(aCreateEvent, false);
 
     // Create new constraints
     FeaturePtr aConstraint = sketch()->addFeature(SketchPlugin_ConstraintCoincidence::ID());
@@ -780,7 +780,7 @@ void SketchPlugin_Arc::tangencyArcConstraints()
     aRefAttrA->setAttr(aStartAttr);
     aRefAttrB->setAttr(aTangPtAttr->attr());
     aConstraint->execute();
-    ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
+    ModelAPI_EventCreator::get()->sendUpdated(aConstraint, aCreateEvent);
 
     aConstraint = sketch()->addFeature(SketchPlugin_ConstraintTangent::ID());
     aRefAttrA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
@@ -790,11 +790,13 @@ void SketchPlugin_Arc::tangencyArcConstraints()
     aRefAttrA->setObject(aThisArc);
     aRefAttrB->setObject(aTangFeature);
     aConstraint->execute();
-    ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
+    ModelAPI_EventCreator::get()->sendUpdated(aConstraint, aCreateEvent);
 
     // Send events to update the sub-features by the solver.
-    if(isUpdateFlushed)
-      Events_Loop::loop()->setFlushed(anUpdateEvent, true);
+    if(isCreateFlushed)
+      Events_Loop::loop()->setFlushed(aCreateEvent, true);
+    else
+      Events_Loop::loop()->flush(aCreateEvent);
   }
 }
 
