@@ -717,7 +717,8 @@ void SketchPlugin_Arc::tangencyArcConstraints()
           (*aTIt)->attribute(SketchPlugin_Constraint::ENTITY_B()));
       ObjectPtr anOtherObject = aRefAttrA->object() == aThisArc ?
           aRefAttrB->object() : aRefAttrA->object();
-      if (anOtherPoint->owner() == anOtherObject) {
+      FeaturePtr anOtherFeature = ModelAPI_Feature::feature(anOtherObject);
+      if (anOtherPoint->owner() == anOtherFeature) {
         isFound = true;
         aPrevCoincidence = *aCIt;
         aPrevTangency = *aTIt;
