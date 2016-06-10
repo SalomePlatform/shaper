@@ -216,16 +216,20 @@
   <context>
     <name>Placement</name>
     <message>
+      <source>Model_FeatureValidator: Attribute "placement_end_shape" is not initialized.</source>
+      <translation>End placement shape is not defined</translation>
+    </message>
+    <message>
+      <source>placement_end_shape - PartSet_DifferentObjects: The feature uses one shape in placement_end_shape and placement_start_shape attributes.</source>
+      <translation>Start and end placement shapes are not defined</translation>
+    </message>
+    <message>
       <source>Model_FeatureValidator: Attribute "placement_centering" is not initialized.</source>
       <translation></translation>
     </message>
     <message>
-      <source>Model_FeatureValidator: Attribute "placement_end_shape" is not initialized.</source>
-      <translation></translation>
-    </message>
-    <message>
-      <source>placement_end_shape - PartSet_DifferentObjects: The feature uses one shape in placement_end_shape and placement_start_shape attributes.</source>
-      <translation></translation>
+      <source>Model_FeatureValidator: Attribute "placement_objects_list" is not initialized.</source>
+      <translation>Objects for placement are not selected</translation>
     </message>
   </context>
 </TS>
