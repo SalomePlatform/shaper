@@ -232,4 +232,30 @@
       <translation>Objects for placement are not selected</translation>
     </message>
   </context>
+  <context>
+    <name>Rotation</name>
+    <message>
+      <source>Model_FeatureValidator: Attribute "angle" is not initialized.</source>
+      <translation>Angle is not defined</translation>
+    </message>
+    <message>
+      <source>Model_FeatureValidator: Attribute "axis_object" is not initialized.</source>
+      <translation>Rotation axis is not selected</translation>
+    </message>
+    <message>
+      <source>axis_object - GeomValidators_ShapeType: The object is empty</source>
+      <translation>Rotation axis is not selected</translation>
+    </message>
+  </context>
+  <context>
+    <name>Translation</name>
+    <message>
+      <source>Model_FeatureValidator: Attribute "axis_object" is not initialized.</source>
+      <translation>Translation axis is not selected</translation>
+    </message>
+    <message>
+      <source>axis_object - GeomValidators_ShapeType: The object is empty</source>
+      <translation>Translation axis is not selected</translation>
+    </message>
+  </context>
 </TS>
