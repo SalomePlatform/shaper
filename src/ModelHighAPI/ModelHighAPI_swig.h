@@ -7,6 +7,7 @@
 #ifndef SRC_MODELHIGHAPI_MODELHIGHAPI_SWIG_H_
 #define SRC_MODELHIGHAPI_MODELHIGHAPI_SWIG_H_
 
+  #include <GeomAPI_swig.h>
   #include <ModelAPI_swig.h>
   #include <GeomDataAPI_swig.h>
 

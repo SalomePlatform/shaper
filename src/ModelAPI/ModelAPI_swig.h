@@ -7,7 +7,7 @@
 #ifndef SRC_MODELAPI_MODELAPI_SWIG_H_
 #define SRC_MODELAPI_MODELAPI_SWIG_H_
 
-  #include "GeomAPI_swig.h"
+  #include <GeomAPI_swig.h>
 
   #include "ModelAPI.h"
   #include "ModelAPI_Entity.h"

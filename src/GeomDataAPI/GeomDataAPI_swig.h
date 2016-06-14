@@ -7,6 +7,7 @@
 #ifndef SRC_GEOMDATAAPI_GEOMDATAAPI_SWIG_H_
 #define SRC_GEOMDATAAPI_GEOMDATAAPI_SWIG_H_
 
+  #include <GeomAPI_swig.h>
   #include <ModelAPI_swig.h>
 
   #include "GeomDataAPI.h"

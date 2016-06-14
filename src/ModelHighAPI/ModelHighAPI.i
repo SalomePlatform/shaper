@@ -11,6 +11,7 @@
 %include "doxyhelp.i"
 
 // import other modules
+%import "GeomAPI.i"
 %import "ModelAPI.i"
 %import "GeomDataAPI.i"
 
@@ -111,9 +112,9 @@
 %include "ModelHighAPI_Double.h"
 %include "ModelHighAPI_Integer.h"
 %include "ModelHighAPI_Interface.h"
-%include "ModelHighAPI_Macro.h"
 %include "ModelHighAPI_RefAttr.h"
 %include "ModelHighAPI_Selection.h"
+%include "ModelHighAPI_Macro.h"
 %include "ModelHighAPI_Tools.h"
 
 %template(SelectionList) std::list<ModelHighAPI_Selection>;

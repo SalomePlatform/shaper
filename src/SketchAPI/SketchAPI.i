@@ -25,8 +25,8 @@
 %shared_ptr(SketchAPI_Sketch)
 %shared_ptr(SketchAPI_SketchEntity)
 
-// all supported interfaces
+// all supported interfaces (the order is very important: base class first)
+%include "SketchAPI_SketchEntity.h"
 %include "SketchAPI_Circle.h"
 %include "SketchAPI_Line.h"
 %include "SketchAPI_Sketch.h"
-%include "SketchAPI_SketchEntity.h"
