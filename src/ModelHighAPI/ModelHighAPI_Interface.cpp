@@ -28,7 +28,7 @@ std::shared_ptr<ModelAPI_Feature> ModelHighAPI_Interface::feature() const
   return myFeature;
 }
 
-const std::string& ModelHighAPI_Interface::getKind()
+const std::string& ModelHighAPI_Interface::getKind() const
 {
   return feature()->getKind();
 }

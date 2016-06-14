@@ -35,7 +35,7 @@ public:
 
   /// Shortcut for feature()->getKind()
   MODELHIGHAPI_EXPORT
-  const std::string& getKind();
+  const std::string& getKind() const;
 
   /// Shortcut for feature()->execute()
   MODELHIGHAPI_EXPORT
