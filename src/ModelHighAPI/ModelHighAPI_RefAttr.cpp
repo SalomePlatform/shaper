@@ -8,6 +8,9 @@
 #include "ModelHighAPI_RefAttr.h"
 
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_Feature.h>
+#include <ModelAPI_Result.h>
+#include "ModelHighAPI_Interface.h"
 //--------------------------------------------------------------------------------------
 #include <iostream>
 //--------------------------------------------------------------------------------------
@@ -25,6 +28,13 @@ ModelHighAPI_RefAttr::ModelHighAPI_RefAttr(
     const std::shared_ptr<ModelAPI_Object> & theValue)
 : myValue(theValue)
 {
+}
+
+ModelHighAPI_RefAttr::ModelHighAPI_RefAttr(
+    const std::shared_ptr<ModelHighAPI_Interface> & theValue)
+: myValue(std::shared_ptr<ModelAPI_Object>(theValue->feature()->firstResult()))
+{
+  // TODO(spo): make firstResult() a member of ModelHighAPI_Interface and use it
 }
 
 ModelHighAPI_RefAttr::~ModelHighAPI_RefAttr()

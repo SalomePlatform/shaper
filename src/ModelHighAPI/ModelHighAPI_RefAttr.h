@@ -18,6 +18,7 @@
 class ModelAPI_Attribute;
 class ModelAPI_AttributeRefAttr;
 class ModelAPI_Object;
+class ModelHighAPI_Interface;
 //--------------------------------------------------------------------------------------
 /**\class ModelHighAPI_RefAttr
  * \ingroup CPPHighAPI
@@ -31,10 +32,13 @@ public:
   ModelHighAPI_RefAttr();
   /// Constructor for attribute
   MODELHIGHAPI_EXPORT
-  explicit ModelHighAPI_RefAttr(const std::shared_ptr<ModelAPI_Attribute> & theValue);
+  ModelHighAPI_RefAttr(const std::shared_ptr<ModelAPI_Attribute> & theValue);
   /// Constructor for object
   MODELHIGHAPI_EXPORT
-  explicit ModelHighAPI_RefAttr(const std::shared_ptr<ModelAPI_Object> & theValue);
+  ModelHighAPI_RefAttr(const std::shared_ptr<ModelAPI_Object> & theValue);
+  /// Constructor for Interface (use result() for object)
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_RefAttr(const std::shared_ptr<ModelHighAPI_Interface> & theValue);
   /// Destructor
   MODELHIGHAPI_EXPORT
   virtual ~ModelHighAPI_RefAttr();
