@@ -118,7 +118,11 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// makes attribute initialized
   virtual void sendAttributeUpdated(ModelAPI_Attribute* theAttr) = 0;
   /// Blocks sending "attribute updated" if theBlock is true
-  virtual void blockSendAttributeUpdated(const bool theBlock) = 0;
+  /// \param theID identifier of the attribute that can be referenced by this ID later
+  /// \param theAttrType type of the created attribute (received from the type method)
+  /// \returns the just created attribute
+  virtual void blockSendAttributeUpdated(
+    const bool theBlock, const bool theSendMessage = true) = 0;
 
   /// Erases all the data from the data model
   virtual void erase() = 0;

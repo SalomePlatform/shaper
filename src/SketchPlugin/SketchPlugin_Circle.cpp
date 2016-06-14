@@ -121,8 +121,6 @@ void SketchPlugin_Circle::execute()
       aConstr2->setShape(aCircleShape);
       aConstr2->setIsInHistory(false);
       setResult(aConstr2, 1);
-
-      adjustThreePoints();
     }
   }
 }
@@ -221,23 +219,15 @@ void SketchPlugin_Circle::attributeChanged(const std::string& theID) {
   else if (theID == CENTER_ID() || theID == RADIUS_ID()) {
     std::string aType = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
       data()->attribute(CIRCLE_TYPE()))->value();
-    if (aType == CIRCLE_TYPE_THREE_POINTS())
-      return;
-
-    // check the execute() was called and the shape was built
-    if (!lastResult())
-      return;
-
-    adjustThreePoints();
-  }
-  else if (theID == FIRST_POINT_ID() || theID == SECOND_POINT_ID() || theID == THIRD_POINT_ID()) {
+    if (aType == CIRCLE_TYPE_THREE_POINTS() && lastResult())  // adjust data from the solver
+      adjustThreePoints();
+  } else if (theID == FIRST_POINT_ID() || theID == SECOND_POINT_ID() || theID == THIRD_POINT_ID()) {
+    // support the center and radius attributes enev in other mode: solver uses them
     std::string aType = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
       data()->attribute(CIRCLE_TYPE()))->value();
     if (aType == CIRCLE_TYPE_CENTER_AND_RADIUS())
       return;
-
-    data()->blockSendAttributeUpdated(true);
-
+    data()->blockSendAttributeUpdated(true); // to modify two attributes at once
     std::shared_ptr<GeomAPI_Pnt2d> aPoints[3];
     int aNbInitialized = 0;
     for (int i = 1; i <= 3; ++i) {
@@ -271,8 +261,14 @@ void SketchPlugin_Circle::attributeChanged(const std::string& theID) {
         aRadiusAttr->setValue(aRadius);
       }
     }
+    data()->blockSendAttributeUpdated(false, false);
 
-    data()->blockSendAttributeUpdated(false);
+  } else if (theID == CIRCLE_TYPE()) { // if switched to 3 points mode, adjust the needed attributes
+    std::string aType = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
+      data()->attribute(CIRCLE_TYPE()))->value();
+    if (aType == CIRCLE_TYPE_THREE_POINTS()) {
+      adjustThreePoints();
+    }
   }
 }
 
@@ -303,5 +299,5 @@ void SketchPlugin_Circle::adjustThreePoints()
     aSecondPnt->setValue(aCenterAttr->x(), aCenterAttr->y() + aRadius);
     aThirdPnt->setValue(aCenterAttr->x() - aRadius, aCenterAttr->y());
   }
-  data()->blockSendAttributeUpdated(false);
+  data()->blockSendAttributeUpdated(false, false);
 }

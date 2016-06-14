@@ -405,13 +405,25 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
   // check all features this feature depended on (recursive call of updateFeature)
   std::set<std::shared_ptr<ModelAPI_Feature> >& aReasons = myModified[theFeature];
   if (aReasons.find(theFeature) == aReasons.end()) {
-    std::set<std::shared_ptr<ModelAPI_Feature> >::iterator aReasonIter = aReasons.begin();
-    for(; aReasonIter != aReasons.end(); aReasonIter++) {
-      if (*aReasonIter != theFeature && (*aReasonIter)->data()->isValid()) {
-        if (processFeature(*aReasonIter))
+    // take reasons one by one (they may be added during the feature process (circle by the radius of sketch)
+    std::set<FeaturePtr> aProcessedReasons;
+    FeaturePtr aReason = aReasons.empty() ? FeaturePtr() : *(aReasons.begin());
+    while(aReason.get()) {
+      if (aReason != theFeature && (aReason)->data()->isValid()) {
+        if (processFeature(aReason))
           aIsModified = true;
-        if ((*aReasonIter)->data()->execState() == ModelAPI_StateInvalidArgument)
+        if (aReason->data()->execState() == ModelAPI_StateInvalidArgument)
           isReferencedInvalid = true;
+      }
+      // searching for the next not used reason
+      aProcessedReasons.insert(aReason);
+      aReason.reset();
+      std::set<std::shared_ptr<ModelAPI_Feature> >::iterator aReasonIter = aReasons.begin();
+      for(; aReasonIter != aReasons.end(); aReasonIter++) {
+        if (aProcessedReasons.find(*aReasonIter) == aProcessedReasons.end()) {
+          aReason = *aReasonIter;
+          break;
+        }
       }
     }
   } else { // check all features this feature depended on because here which one was modified is unknown

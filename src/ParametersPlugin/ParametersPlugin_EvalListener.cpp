@@ -346,7 +346,7 @@ void setParameterName(ResultParameterPtr theResultParameter, const std::string& 
 {
   theResultParameter->data()->blockSendAttributeUpdated(true);
   theResultParameter->data()->setName(theName);
-  theResultParameter->data()->blockSendAttributeUpdated(false);
+  theResultParameter->data()->blockSendAttributeUpdated(false, false);
 
   std::shared_ptr<ParametersPlugin_Parameter> aParameter = 
       std::dynamic_pointer_cast<ParametersPlugin_Parameter>(

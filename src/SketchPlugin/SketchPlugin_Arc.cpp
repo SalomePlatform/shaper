@@ -135,8 +135,7 @@ void SketchPlugin_Arc::execute()
   // result for the arc is set only when all obligatory attributes are initialized,
   // otherwise AIS object is used to visualize the arc's preview
   if (aSketch && isFeatureValid()) {
-    ResultPtr aLastResult = lastResult();
-    bool hasResult = aLastResult && aLastResult.get();
+    bool hasResult = lastResult().get() != NULL;
 
     // compute a circle point in 3D view
     std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
@@ -201,9 +200,6 @@ void SketchPlugin_Arc::execute()
       aConstr2->setIsInHistory(false);
       setResult(aConstr2, 1);
     }
-
-    // update radius and angle
-    updateDependentAttributes();
   }
 }
 
@@ -220,9 +216,6 @@ AISObjectPtr SketchPlugin_Arc::getAISObject(AISObjectPtr thePrevious)
       std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
       if (aCenterAttr->isInitialized()) {
         std::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
-        // make a visible point
-        std::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
-        aShapes.push_back(aCenterPointShape);
 
         std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<
             GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Arc::START_ID()));
@@ -241,8 +234,22 @@ AISObjectPtr SketchPlugin_Arc::getAISObject(AISObjectPtr thePrevious)
             std::shared_ptr<GeomAPI_Pnt> aStartPoint(aSketch->to3D(aStartAttr->x(), aStartAttr->y()));
             std::shared_ptr<GeomAPI_Pnt> aEndPoint = aStartPoint;
             if (aTypeAttr && aTypeAttr->isInitialized() &&
-                aTypeAttr->value() == ARC_TYPE_THREE_POINTS() && aEndAttr->isInitialized())
+                aTypeAttr->value() == ARC_TYPE_THREE_POINTS() && aEndAttr->isInitialized() &&
+                aEndAttr->pnt()->distance(aStartAttr->pnt()) > tolerance) {
               aEndPoint = aSketch->to3D(aEndAttr->x(), aEndAttr->y());
+              std::shared_ptr<GeomDataAPI_Point2D> aPassedAttr = 
+                std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(PASSED_POINT_ID()));
+              if (!aPassedAttr->isInitialized()) { // calculate the appropriate center for the presentation
+                std::shared_ptr<GeomAPI_XY> aDir = 
+                  aEndAttr->pnt()->xy()->decreased(aStartAttr->pnt()->xy())->multiplied(0.5);
+                double x = aDir->x();
+                double y = aDir->y();
+                aDir->setX(x - y);
+                aDir->setY(y + x);
+                std::shared_ptr<GeomAPI_XY> aCenterXY = aStartAttr->pnt()->xy()->added(aDir);
+                aCenter = aSketch->to3D(aCenterXY->x(), aCenterXY->y());
+              }
+            }
 
             std::shared_ptr<GeomAPI_Shape> aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircleArc(
                                                             aCenter, aStartPoint, aEndPoint, aNormal);
@@ -250,6 +257,9 @@ AISObjectPtr SketchPlugin_Arc::getAISObject(AISObjectPtr thePrevious)
               aShapes.push_back(aCircleShape);
           }
         }
+        // make a visible point
+        std::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
+        aShapes.push_back(aCenterPointShape);
       }
       if (!aShapes.empty()) {
         std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
@@ -332,93 +342,6 @@ static inline void adjustPeriod(double& theParam)
   while (theParam >= PERIOD) theParam -= PERIOD;
 }
 
-static inline void calculateArcAngleRadius(
-    const std::shared_ptr<GeomAPI_Circ2d>& theCircle,
-    const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint,
-    const std::shared_ptr<GeomAPI_Pnt2d>& theEndPoint,
-    const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint,
-    AttributeDoublePtr theAngleAttr,
-    AttributeDoublePtr theRadiusAttr)
-{
-  double aStartParam, aEndParam, aPassedParam;
-  theCircle->parameter(theStartPoint, paramTolerance, aStartParam);
-  theCircle->parameter(theEndPoint, paramTolerance, aEndParam);
-  theCircle->parameter(thePassedPoint, paramTolerance, aPassedParam);
-  adjustPeriod(aStartParam);
-  adjustPeriod(aEndParam);
-  adjustPeriod(aPassedParam);
-
-  if (aPassedParam >= aStartParam && aPassedParam <= aEndParam)
-    theAngleAttr->setValue((aEndParam - aStartParam) * 180.0 / PI);
-  else
-    theAngleAttr->setValue((aEndParam - aStartParam - 2.0 * PI) * 180.0 / PI);
-  theRadiusAttr->setValue(theCircle->radius());
-}
-
-static inline bool calculatePassedPoint(
-    const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
-    const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint,
-    const std::shared_ptr<GeomAPI_Pnt2d>& theEndPoint,
-    bool theArcReversed,
-    std::shared_ptr<GeomDataAPI_Point2D> thePassedPoint)
-{
-  if (theCenter->distance(theStartPoint) < tolerance ||
-      theCenter->distance(theEndPoint) < tolerance)
-    return false;
-
-  std::shared_ptr<GeomAPI_Dir2d> aStartDir(new GeomAPI_Dir2d(
-      theStartPoint->xy()->decreased(theCenter->xy())));
-  std::shared_ptr<GeomAPI_Dir2d> aEndDir(new GeomAPI_Dir2d(
-      theEndPoint->xy()->decreased(theCenter->xy())));
-  std::shared_ptr<GeomAPI_XY> aMidDirXY = aStartDir->xy()->added(aEndDir->xy());
-  if (aMidDirXY->dot(aMidDirXY) < tolerance * tolerance) {
-    // start and end directions are opposite, so middle direction will be orthogonal
-    aMidDirXY->setX(-aStartDir->y());
-    aMidDirXY->setY(aStartDir->x());
-  }
-  std::shared_ptr<GeomAPI_Dir2d> aMidDir(new GeomAPI_Dir2d(aMidDirXY));
-  if ((aStartDir->cross(aMidDir) > 0) ^ !theArcReversed)
-    aMidDir->reverse();
-
-  double aRadius = theCenter->distance(theStartPoint);
-  std::shared_ptr<GeomAPI_XY> aPassedPnt = theCenter->xy()->added( aMidDir->xy()->multiplied(aRadius) );
-  thePassedPoint->setValue(aPassedPnt->x(), aPassedPnt->y());
-  return true;
-}
-
-void SketchPlugin_Arc::updateDependentAttributes()
-{
-  std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(data()->attribute(START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> anEndAttr = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(data()->attribute(END_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aPassedPoint =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(PASSED_POINT_ID()));
-  AttributeDoublePtr aRadiusAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      data()->attribute(RADIUS_ID()));
-  AttributeDoublePtr anAngleAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      data()->attribute(ANGLE_ID()));
-
-  if (!aPassedPoint)
-    return;
-
-  data()->blockSendAttributeUpdated(true);
-
-  bool isOk = calculatePassedPoint(aCenterAttr->pnt(), aStartAttr->pnt(), anEndAttr->pnt(),
-                       isReversed(), aPassedPoint);
-  if (isOk && aRadiusAttr && anAngleAttr) {
-    std::shared_ptr<GeomAPI_Circ2d> aCircle(
-        new GeomAPI_Circ2d(aStartAttr->pnt(), anEndAttr->pnt(), aPassedPoint->pnt()));
-    if (aCircle->implPtr<void*>())
-      calculateArcAngleRadius(aCircle, aStartAttr->pnt(), anEndAttr->pnt(), aPassedPoint->pnt(),
-                              anAngleAttr, aRadiusAttr);
-  }
-  data()->blockSendAttributeUpdated(false);
-}
-
-
 void SketchPlugin_Arc::attributeChanged(const std::string& theID)
 {
   std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
@@ -442,161 +365,16 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
     }
     return;
   }
-
-  AttributeDoublePtr aRadiusAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      data()->attribute(RADIUS_ID()));
-  AttributeDoublePtr anAngleAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      data()->attribute(ANGLE_ID()));
-
-  if (theID == RADIUS_ID()) {
-    if (!aStartAttr->isInitialized() || !anEndAttr->isInitialized())
-      return;
-    // move center and passed point
-    std::shared_ptr<GeomAPI_XY> aStartPnt = aStartAttr->pnt()->xy();
-    std::shared_ptr<GeomAPI_XY> aEndPnt = anEndAttr->pnt()->xy();
-    double aDist = aStartPnt->distance(aEndPnt);
-    if (fabs(aDist) < tolerance)
-      return;
-    std::shared_ptr<GeomAPI_Dir2d> aDir(new GeomAPI_Dir2d(aEndPnt->decreased(aStartPnt)));
-    std::shared_ptr<GeomAPI_Dir2d> aMidPerpDir(new GeomAPI_Dir2d(-aDir->y(), aDir->x()));
-    std::shared_ptr<GeomAPI_XY> aMidPnt = aStartPnt->added(aEndPnt)->multiplied(0.5);
-
-    double anAngle = anAngleAttr->value() * PI / 180.0;
-    adjustPeriod(anAngle);
-    if (anAngle > PI)
-      aMidPerpDir->reverse();
-
-    double aRadius = aRadiusAttr->value();
-    // The center is placed on a perpendicular bisector of a start-end points segment.
-    // If the radius is smaller that necessary, start and end points are moved too.
-    double aDist2 = aRadius * aRadius - aDist * aDist / 4.0;
-    aDist = aDist2 > 0.0 ? sqrt(aDist2) : 0.0;
-    // distance between middle point and start point (does not changed if the arc diameter is greater than start-end distance)
-    aDist2 = sqrt(aRadius * aRadius - aDist * aDist);
-
-    std::shared_ptr<GeomAPI_XY> aCenter = aMidPnt->added(aMidPerpDir->xy()->multiplied(aDist));
-    aStartPnt = aMidPnt->added(aDir->xy()->multiplied(-aDist2));
-    aEndPnt = aMidPnt->added(aDir->xy()->multiplied(aDist2));
-
-    data()->blockSendAttributeUpdated(true);
-    aCenterAttr->setValue(aCenter->x(), aCenter->y());
-    aStartAttr->setValue(aStartPnt->x(), aStartPnt->y());
-    anEndAttr->setValue(aEndPnt->x(), aEndPnt->y());
-    updateDependentAttributes();
-    data()->blockSendAttributeUpdated(false);
-    return;
-  }
-  if (theID == ANGLE_ID()) {
-    if (!aStartAttr->isInitialized() || !aCenterAttr->isInitialized())
-      return;
-    data()->blockSendAttributeUpdated(true);
-    // move end point and passed point
-    std::shared_ptr<GeomAPI_XY> aCenter = aCenterAttr->pnt()->xy();
-    double anAngle = anAngleAttr->value() * PI / 180.0;
-    double sinA = sin(anAngle);
-    double cosA = cos(anAngle);
-    std::shared_ptr<GeomAPI_XY> aStartDir = aStartAttr->pnt()->xy()->decreased(aCenter);
-    std::shared_ptr<GeomAPI_XY> aDir(new GeomAPI_XY(
-        aStartDir->x() * cosA - aStartDir->y() * sinA,
-        aStartDir->x() * sinA + aStartDir->y() * cosA));
-    anEndAttr->setValue(aCenter->x() + aDir->x(), aCenter->y() + aDir->y());
-
-    anAngle /= 2.0;
-    sinA = sin(anAngle);
-    cosA = cos(anAngle);
-    aDir = std::shared_ptr<GeomAPI_XY>(new GeomAPI_XY(
-        aStartDir->x() * cosA - aStartDir->y() * sinA,
-        aStartDir->x() * sinA + aStartDir->y() * cosA));
-    std::shared_ptr<GeomDataAPI_Point2D> aPassedPoint =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(PASSED_POINT_ID()));
-    aPassedPoint->setValue(aCenter->x() + aDir->x(), aCenter->y() + aDir->y());
-
-    std::shared_ptr<GeomAPI_Circ2d> aCircle(
-        new GeomAPI_Circ2d(aStartAttr->pnt(), anEndAttr->pnt(), aPassedPoint->pnt()));
-    calculateArcAngleRadius(aCircle, aStartAttr->pnt(), anEndAttr->pnt(), aPassedPoint->pnt(),
-                            anAngleAttr, aRadiusAttr);
-    data()->blockSendAttributeUpdated(false);
-    return;
-  }
-
-  if (theID == CENTER_ID()) {
-    if (isFeatureValid())
-      projectEndPoint();
-    return;
-  }
-
   AttributeStringPtr aTypeAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeString>(attribute(ARC_TYPE()));
-  if (!aTypeAttr)
-    return;
-  std::string anArcType = aTypeAttr->value();
 
-  // update the points in accordance to the changed point changes
-  if (anArcType == ARC_TYPE_CENTER_START_END()) {
-    if (!isFeatureValid())
-      return;
-    if (theID == END_ID() && isStable()) {
-      // The arc is under construction, so its end point projected
-      // on the circle formed by center and start points
-      projectEndPoint();
-    }
-    updateDependentAttributes();
-  }
-  else if (anArcType == ARC_TYPE_THREE_POINTS() &&
-          (theID == START_ID() || theID == END_ID() || theID == PASSED_POINT_ID())) {
-    data()->blockSendAttributeUpdated(true);
-
-    std::shared_ptr<GeomAPI_Pnt2d> aPoints[3];
-    int aNbInitialized = 0;
-    for (int i = 1; i <= 3; ++i) {
-      std::shared_ptr<GeomDataAPI_Point2D> aCurPnt =
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(POINT_ID(i)));
-      if (aCurPnt->isInitialized())
-        aPoints[aNbInitialized++] = aCurPnt->pnt();
-    }
-
-    if (aNbInitialized == 1)
-      aCenterAttr->setValue(aPoints[0]->x(), aPoints[0]->y());
-    else if (aNbInitialized == 2) {
-      // calculate center point, which gives a quarter of circle for the given start and end points
-      std::shared_ptr<GeomAPI_Pnt2d> aStartPnt = aPoints[0];
-      std::shared_ptr<GeomAPI_Pnt2d> aEndPnt = aPoints[1];
-      std::shared_ptr<GeomAPI_XY> aDir = aEndPnt->xy()->decreased(aStartPnt->xy())->multiplied(0.5);
-      double x = aDir->x();
-      double y = aDir->y();
-      aDir->setX(x - y);
-      aDir->setY(y + x);
-      std::shared_ptr<GeomAPI_XY> aCenter = aStartPnt->xy()->added(aDir);
-      double aRadius = sqrt(aDir->dot(aDir));
-
-      aCenterAttr->setValue(aCenter->x(), aCenter->y());
-      aRadiusAttr->setValue(aRadius);
-      anAngleAttr->setValue(90.0);
-    }
-    else {
-      std::shared_ptr<GeomAPI_Circ2d> aCircle(
-          new GeomAPI_Circ2d(aPoints[0], aPoints[1], aPoints[2]));
-
-      std::shared_ptr<GeomAPI_Pnt2d> aCenter = aCircle->center();
-      if (aCenter) {
-        aCenterAttr->setValue(aCenter);
-        if (theID == START_ID() || theID == END_ID())
-          updateDependentAttributes();
-        else
-          calculateArcAngleRadius(aCircle, aPoints[0], aPoints[1], aPoints[2],
-                                  anAngleAttr, aRadiusAttr);
-      }
-    }
-
-    data()->blockSendAttributeUpdated(false);
-  }
-  else if (anArcType == ARC_TYPE_TANGENT() && (theID == TANGENT_POINT_ID() || theID == END_ID())) {
+  // this is before others since here end attribute may be changed, but with the special behavior
+  if (aTypeAttr->value() == ARC_TYPE_TANGENT() && (theID == TANGENT_POINT_ID() || theID == END_ID())) {
     SketchPlugin_Sketch* aSketch = sketch();
     AttributeRefAttrPtr aTangPtAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
         data()->attribute(TANGENT_POINT_ID()));
 
     if (aTangPtAttr->isInitialized() && anEndAttr->isInitialized()) {
-      data()->blockSendAttributeUpdated(true);
       // compute orthogonal direction
       std::shared_ptr<GeomAPI_Dir2d> anOrthoDir;
       std::shared_ptr<GeomDataAPI_Point2D> aTangentPoint =
@@ -630,14 +408,171 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
       std::shared_ptr<GeomAPI_Lin2d> aMiddleLine(new GeomAPI_Lin2d(aMidPnt, aMidDir));
       std::shared_ptr<GeomAPI_Pnt2d> aCenter = anOrthoLine->intersect(aMiddleLine);
       if (aCenter) {
+        data()->blockSendAttributeUpdated(true);
         aCenterAttr->setValue(aCenter);
         aStartAttr->setValue(aTangPnt2d);
-        updateDependentAttributes();
+        data()->blockSendAttributeUpdated(false);
       }
 
-      data()->blockSendAttributeUpdated(false);
       tangencyArcConstraints();
     }
+    return;
+  }
+
+  // if changed the base attributes, update all other (is necessary) without recursion
+  if (theID == CENTER_ID() || theID == START_ID() || theID == END_ID() || theID == ARC_TYPE()) {
+    if (!isFeatureValid())
+      return;
+    std::shared_ptr<GeomAPI_Pnt2d> aCenter = aCenterAttr->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> aStart = aStartAttr->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> anEnd = anEndAttr->pnt();
+    double aRadius = aCenter->distance(aStart);
+    if (aRadius < tolerance)
+      return;
+    std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(new GeomAPI_Circ2d(aCenter, aStart));
+
+    data()->blockSendAttributeUpdated(true);
+    if (theID == END_ID() && isStable()) {
+      // The arc is under construction, so its end point projected
+      // on the circle formed by center and start points
+      std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEnd);
+      if (aProjection && anEnd->distance(aProjection) > tolerance) {
+        anEndAttr->setValue(aProjection);
+        anEnd = aProjection;
+      }
+    }
+    // update all other attributes due to the base attributes values
+    if (aTypeAttr->value() == ARC_TYPE_THREE_POINTS()) { // update passed point due to start, end and center
+      if (aCenter->distance(aStart) > tolerance && aCenter->distance(anEnd) > tolerance) {
+        // project passed point t othe circle
+        std::shared_ptr<GeomDataAPI_Point2D> aPassedAttr =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(PASSED_POINT_ID()));
+        if (aPassedAttr->isInitialized()) {
+          std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(aPassedAttr->pnt());
+          if (aProjection && aPassedAttr->pnt()->distance(aProjection) > tolerance) {
+            aPassedAttr->setValue(aProjection);
+          }
+        } else { // initialize it by some middle - value
+          std::shared_ptr<GeomAPI_Dir2d> aStartDir(new GeomAPI_Dir2d(
+            aStart->xy()->decreased(aCenter->xy())));
+          std::shared_ptr<GeomAPI_Dir2d> aEndDir(new GeomAPI_Dir2d(
+            anEnd->xy()->decreased(aCenter->xy())));
+          std::shared_ptr<GeomAPI_XY> aMidDirXY = aStartDir->xy()->added(aEndDir->xy());
+          if (aMidDirXY->dot(aMidDirXY) < tolerance * tolerance) {
+            // start and end directions are opposite, so middle direction will be orthogonal
+            aMidDirXY->setX(-aStartDir->y());
+            aMidDirXY->setY(aStartDir->x());
+          }
+          std::shared_ptr<GeomAPI_Dir2d> aMidDir(new GeomAPI_Dir2d(aMidDirXY));
+          if ((aStartDir->cross(aMidDir) > 0) ^ !isReversed())
+            aMidDir->reverse();
+          std::shared_ptr<GeomAPI_XY> aPassedPnt = 
+            aCenter->xy()->added(aMidDir->xy()->multiplied(aCenter->distance(aStart)));
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(PASSED_POINT_ID()))->
+            setValue(aPassedPnt->x(), aPassedPnt->y());
+        }
+      }
+    }
+    // update radius and angle
+    AttributeDoublePtr aRadiusAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+        data()->attribute(RADIUS_ID()));
+    aRadiusAttr->setValue(aRadius);
+    AttributeDoublePtr anAngleAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+        data()->attribute(ANGLE_ID()));
+    std::shared_ptr<GeomAPI_Circ2d> aCircle(new GeomAPI_Circ2d(aCenter, aStart));
+    double aStartParam, aEndParam;
+    aCircle->parameter(aStart, paramTolerance, aStartParam);
+    aCircle->parameter(anEnd, paramTolerance, aEndParam);
+    adjustPeriod(aStartParam);
+    adjustPeriod(aEndParam);
+    if (aTypeAttr->value() == ARC_TYPE_THREE_POINTS()) { // use the passed point for the angle calculation
+      std::shared_ptr<GeomDataAPI_Point2D> aPassedAttr =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(PASSED_POINT_ID()));
+      double aPassedParam;
+      aCircle->parameter(aPassedAttr->pnt(), paramTolerance, aPassedParam);
+      adjustPeriod(aPassedParam);
+      double aNewAngle = aPassedParam >= aStartParam && aPassedParam <= aEndParam ?
+        ((aEndParam - aStartParam) * 180.0 / PI) :
+        ((aEndParam - aStartParam - 2.0 * PI) * 180.0 / PI);
+      if (fabs(aNewAngle - anAngleAttr->value()) > tolerance)
+        anAngleAttr->setValue(aNewAngle);
+    } else {
+      double aNewAngle = (aEndParam - aStartParam) * 180.0 / PI;
+      if (fabs(aNewAngle - anAngleAttr->value()) > tolerance)
+        anAngleAttr->setValue(aNewAngle);
+    }
+    // do not need to inform that other parameters were changed in this basis mode: these arguments
+    // change is enough
+    data()->blockSendAttributeUpdated(false, false);
+    return;
+  }
+
+  if (theID == PASSED_POINT_ID()) {
+    data()->blockSendAttributeUpdated(true);
+
+    std::shared_ptr<GeomAPI_Pnt2d> aPoints[3];
+    int aNbInitialized = 0;
+    for (int i = 1; i <= 3; ++i) {
+      std::shared_ptr<GeomDataAPI_Point2D> aCurPnt =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(POINT_ID(i)));
+      if (aCurPnt->isInitialized())
+        aPoints[aNbInitialized++] = aCurPnt->pnt();
+    }
+
+    if (aNbInitialized == 3) {
+      std::shared_ptr<GeomAPI_Circ2d> aCircle(
+          new GeomAPI_Circ2d(aPoints[0], aPoints[1], aPoints[2]));
+
+      std::shared_ptr<GeomAPI_Pnt2d> aCenter = aCircle->center();
+      if (aCenter) {
+        aCenterAttr->setValue(aCenter);
+      }
+    }
+    data()->blockSendAttributeUpdated(false);
+    return;
+  }
+
+  if (theID == RADIUS_ID()) {
+    if (!aStartAttr->isInitialized() || !anEndAttr->isInitialized() || !aCenterAttr->isInitialized())
+      return;
+    // move center and passed point
+    std::shared_ptr<GeomAPI_Pnt2d> aStart = aStartAttr->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> anEnd = anEndAttr->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> aCenter = aCenterAttr->pnt();
+    if (aStart->distance(aCenter) < tolerance || anEnd->distance(aCenter) < tolerance)
+      return;
+    AttributeDoublePtr aRadiusAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+        data()->attribute(RADIUS_ID()));
+    double aRadius = aRadiusAttr->value();
+
+    data()->blockSendAttributeUpdated(true);
+    std::shared_ptr<GeomAPI_Dir2d> aStartDir(new GeomAPI_Dir2d(aStart->xy()->decreased(aCenter->xy())));
+    std::shared_ptr<GeomAPI_XY> aNewStart = aStartDir->xy()->multiplied(aRadius)->added(aCenter->xy());
+    aStartAttr->setValue(aNewStart->x(), aNewStart->y());
+    std::shared_ptr<GeomAPI_Dir2d> anEndDir(new GeomAPI_Dir2d(anEnd->xy()->decreased(aCenter->xy())));
+    std::shared_ptr<GeomAPI_XY> aNewEnd = anEndDir->xy()->multiplied(aRadius)->added(aCenter->xy());
+    anEndAttr->setValue(aNewEnd->x(), aNewEnd->y());
+    data()->blockSendAttributeUpdated(false);
+    return;
+  }
+  if (theID == ANGLE_ID()) {
+    if (!aStartAttr->isInitialized() || !aCenterAttr->isInitialized())
+      return;
+    AttributeDoublePtr anAngleAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+        data()->attribute(ANGLE_ID()));
+    data()->blockSendAttributeUpdated(true);
+    // move end point and passed point
+    std::shared_ptr<GeomAPI_XY> aCenter = aCenterAttr->pnt()->xy();
+    double anAngle = anAngleAttr->value() * PI / 180.0;
+    double sinA = sin(anAngle);
+    double cosA = cos(anAngle);
+    std::shared_ptr<GeomAPI_XY> aStartDir = aStartAttr->pnt()->xy()->decreased(aCenter);
+    std::shared_ptr<GeomAPI_XY> aDir(new GeomAPI_XY(
+        aStartDir->x() * cosA - aStartDir->y() * sinA,
+        aStartDir->x() * sinA + aStartDir->y() * cosA));
+    anEndAttr->setValue(aCenter->x() + aDir->x(), aCenter->y() + aDir->y());
+    data()->blockSendAttributeUpdated(false);
+    return;
   }
 }
 
@@ -799,26 +734,4 @@ void SketchPlugin_Arc::tangencyArcConstraints()
     else
       Events_Loop::loop()->flush(aCreateEvent);
   }
-}
-
-void SketchPlugin_Arc::projectEndPoint()
-{
-  std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(data()->attribute(START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> anEndAttr = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(data()->attribute(END_ID()));
-
-  if (aCenterAttr->pnt()->distance(aStartAttr->pnt()) < tolerance)
-    return;
-  data()->blockSendAttributeUpdated(true);
-  // compute and change the arc end point
-  std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
-      new GeomAPI_Circ2d(aCenterAttr->pnt(), aStartAttr->pnt()));
-  std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEndAttr->pnt());
-  if (aProjection && anEndAttr->pnt()->distance(aProjection) > tolerance)
-    anEndAttr->setValue(aProjection);
-  updateDependentAttributes();
-  data()->blockSendAttributeUpdated(false);
 }

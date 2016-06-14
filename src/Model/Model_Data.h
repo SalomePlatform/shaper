@@ -56,8 +56,8 @@ class Model_Data : public ModelAPI_Data
   std::set<AttributePtr> myRefsToMe;
   /// flag that may block the "attribute updated" sending
   bool mySendAttributeUpdated;
-  /// if some attribute was changed, but mySendAttributeUpdated was false, this flag stores this
-  bool myWasChangedButBlocked;
+  /// if some attribute was changed, but mySendAttributeUpdated was false, this stores this
+  std::list<ModelAPI_Attribute*> myWasChangedButBlocked;
 
   /// Returns label of this feature
   TDF_Label label()
@@ -155,7 +155,11 @@ class Model_Data : public ModelAPI_Data
   /// makes attribute initialized
   MODEL_EXPORT virtual void sendAttributeUpdated(ModelAPI_Attribute* theAttr);
   /// Blocks sending "attribute updated" if theBlock is true
-  MODEL_EXPORT virtual void blockSendAttributeUpdated(const bool theBlock);
+  /// \param theBlock allows switching on/off the blocking state
+  /// \param theSendMessage if false, it does not send the update message even if something is changed
+  ///            (normally is it used in attributeChanged because this message will be sent anyway)
+  MODEL_EXPORT virtual void blockSendAttributeUpdated(
+    const bool theBlock, const bool theSendMessage = true);
 
   /// Puts feature to the document data sub-structure
   MODEL_EXPORT void setLabel(TDF_Label theLab);

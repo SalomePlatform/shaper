@@ -283,19 +283,31 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
         ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
       }
     } else {
-      myWasChangedButBlocked = true;
+      // to avoid too many duplications do not add the same like the last
+      if (myWasChangedButBlocked.empty() || *(myWasChangedButBlocked.rbegin()) != theAttr)
+        myWasChangedButBlocked.push_back(theAttr);
     }
   }
 }
 
-void Model_Data::blockSendAttributeUpdated(const bool theBlock)
+void Model_Data::blockSendAttributeUpdated(const bool theBlock, const bool theSendMessage)
 {
   if (mySendAttributeUpdated == theBlock) {
     mySendAttributeUpdated = !theBlock;
-    if (mySendAttributeUpdated && myWasChangedButBlocked) { // so, now it is ok to send the update signal
-      static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-      ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
-      myWasChangedButBlocked = false;
+    if (mySendAttributeUpdated && !myWasChangedButBlocked.empty()) { // so, now it is ok to send the update signal
+      if (theSendMessage) {
+        // make a copy to avoid iteration on modified list (may be cleared by attribute changed call)
+        std::list<ModelAPI_Attribute*> aWasChangedButBlocked = myWasChangedButBlocked;
+        myWasChangedButBlocked.clear();
+        std::list<ModelAPI_Attribute*>::iterator aChangedIter = aWasChangedButBlocked.begin();
+        for(; aChangedIter != aWasChangedButBlocked.end(); aChangedIter++) {
+          myObject->attributeChanged((*aChangedIter)->id());
+        }
+        static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+        ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
+      } else {
+        myWasChangedButBlocked.clear();
+      }
     }
   }
 }

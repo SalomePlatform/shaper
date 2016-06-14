@@ -124,14 +124,9 @@ private:
   /// Returns true if all obligatory attributes are initialized
   bool isFeatureValid();
 
-  /// Update attributes like passed point, radius and angle of the arc
-  void updateDependentAttributes();
-
   /// Compose constraints to build tangency arc
   void tangencyArcConstraints();
 
-  /// Project end point of arc to the circle
-  void projectEndPoint();
 };
 
 #endif
