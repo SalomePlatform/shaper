@@ -162,14 +162,14 @@ std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(const std::shared_
 
 std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(const ModelHighAPI_Selection & theExternal)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Line::ID());
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Circle::ID());
   return CirclePtr(new SketchAPI_Circle(aFeature, theExternal));
 }
 
 std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(const std::string & theExternalName)
 {
   // TODO(spo): Add constraint SketchConstraintRigid like in PythonAPI. Is it necessary?
-  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Line::ID());
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Circle::ID());
   return CirclePtr(new SketchAPI_Circle(aFeature, theExternalName));
 }
 

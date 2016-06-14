@@ -81,34 +81,32 @@ public:
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Line> addLine(const std::string & theExternalName);
 
-  // Add circle.
+  /// Add circle
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Circle> addCircle(double theCenterX,
-                                              double theCenterY,
-                                              double theRadius);
-
-  // Add circle.
+  std::shared_ptr<SketchAPI_Circle> addCircle(
+      double theCenterX, double theCenterY,
+      double theRadius);
+  /// Add circle
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Circle> addCircle(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
-                                              double theRadius);
-
-  // Add circle.
+  std::shared_ptr<SketchAPI_Circle> addCircle(
+      const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+      double theRadius);
+  /// Add circle
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Circle> addCircle(double theX1, double theY1,
-                                              double theX2, double theY2,
-                                              double theX3, double theY3);
-
-  // Add circle.
+  std::shared_ptr<SketchAPI_Circle> addCircle(
+      double theX1, double theY1,
+      double theX2, double theY2,
+      double theX3, double theY3);
+  /// Add circle
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Circle> addCircle(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
-                                              const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
-                                              const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3);
-
-  /// Add circle.
+  std::shared_ptr<SketchAPI_Circle> addCircle(
+      const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
+      const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
+      const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3);
+  /// Add circle
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Circle> addCircle(const ModelHighAPI_Selection & theExternal);
-
-  /// Add circle.
+  /// Add circle
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Circle> addCircle(const std::string & theExternalName);
 
