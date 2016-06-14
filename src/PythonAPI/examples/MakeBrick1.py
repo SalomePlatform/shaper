@@ -38,8 +38,6 @@ mybase.setPerpendicular(l1, l4)
 mywidth = mybase.setLength(l1, 50)
 mylength = mybase.setDistance(l1.startPoint(), l3, 50)
 
-mybase.execute()
-
 # Creating the extrusion
 
 mybox = model.addExtrusion(mypart, mybase.selectFace(), 50)

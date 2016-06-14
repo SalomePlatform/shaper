@@ -97,12 +97,14 @@ void SketchAPI_Sketch::setValue(
   // TODO(spo): check somehow that the feature is a constraint or eliminate crash if the feature have no real attribute VALUE
   fillAttribute(theValue, theConstraint->real(SketchPlugin_Constraint::VALUE()));
 
-  theConstraint->execute();
+//  theConstraint->execute();
 }
 
 //--------------------------------------------------------------------------------------
 std::list<ModelHighAPI_Selection> SketchAPI_Sketch::selectFace() const
 {
+  const_cast<SketchAPI_Sketch*>(this)->execute();
+
   std::list<ModelHighAPI_Selection> aSelectionList;
 
   ResultConstructionPtr aResultConstruction =

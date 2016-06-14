@@ -42,6 +42,9 @@ void ModelHighAPI_Interface::execute()
 
 std::list<ModelHighAPI_Selection> ModelHighAPI_Interface::result() const
 {
+  // TODO(spo): should I use more common function for the whole model to prepare results?
+  const_cast<ModelHighAPI_Interface*>(this)->execute();
+
   std::list<ModelHighAPI_Selection> aSelectionList;
 
   std::list<std::shared_ptr<ModelAPI_Result> > aResults = feature()->results();
