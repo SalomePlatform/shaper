@@ -238,7 +238,7 @@ void ModuleBase_WidgetValidated::blockAttribute(const AttributePtr& theAttribute
     isAttributeSetInitializedBlocked = theAttribute->blockSetInitialized(true);
   }
   else {
-    aData->blockSendAttributeUpdated(false);
+    aData->blockSendAttributeUpdated(false, false);
     theAttribute->blockSetInitialized(isAttributeSetInitializedBlocked);
     aLoop->activateFlushes(isFlushesActived);
   }
