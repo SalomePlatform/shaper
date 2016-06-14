@@ -25,10 +25,10 @@ FeaturesAPI_Placement::FeaturesAPI_Placement(const std::shared_ptr<ModelAPI_Feat
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setObjects(theObjects);
-    setStartShape(theStartShape);
-    setEndShape(theEndShape);
-    setReverseDirection(theReverseDirection);
+    fillAttribute(theObjects, myobjects);
+    fillAttribute(theStartShape, mystartShape);
+    fillAttribute(theEndShape, myendShape);
+    fillAttribute(theReverseDirection, myreverseDirection);
     setCentering(theCentering);
   }
 }

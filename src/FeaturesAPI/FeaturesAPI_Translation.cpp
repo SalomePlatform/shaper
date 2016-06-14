@@ -23,8 +23,8 @@ FeaturesAPI_Translation::FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setMainObjects(theMainObjects);
-    setAxisObject(theAxisObject);
+    fillAttribute(theMainObjects, mymainObjects);
+    fillAttribute(theAxisObject, myaxisObject);
     setDistance(theDistance);
   }
 }

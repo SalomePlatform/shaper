@@ -23,8 +23,8 @@ FeaturesAPI_Rotation::FeaturesAPI_Rotation(const std::shared_ptr<ModelAPI_Featur
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setMainObjects(theMainObjects);
-    setAxisObject(theAxisObject);
+    fillAttribute(theMainObjects, mymainObjects);
+    fillAttribute(theAxisObject, myaxisObject);
     setAngle(theAngle);
   }
 }
