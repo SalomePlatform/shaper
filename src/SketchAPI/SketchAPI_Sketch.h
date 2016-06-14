@@ -115,15 +115,39 @@ public:
   /// Set coincident
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelAPI_Feature> setCoincident(
-      // TODO(spo): should it be more concrete type (e.g. ModelAPI_Object)?
       const ModelHighAPI_RefAttr & thePoint1,
       const ModelHighAPI_RefAttr & thePoint2);
+
+  /// Set distance
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setDistance(
+      const ModelHighAPI_RefAttr & thePoint,
+      const ModelHighAPI_RefAttr & theLine,
+      const ModelHighAPI_Double & theValue);
+
+  /// Set length
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setLength(
+      const ModelHighAPI_RefAttr & theLine,
+      const ModelHighAPI_Double & theValue);
+
+  /// Set parallel
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setParallel(
+      const ModelHighAPI_RefAttr & theLine1,
+      const ModelHighAPI_RefAttr & theLine2);
+
+  /// Set perpendicular
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setPerpendicular(
+      const ModelHighAPI_RefAttr & theLine1,
+      const ModelHighAPI_RefAttr & theLine2);
 
   // TODO(spo): set* (constraints)
 
   // TODO(spo): addMirror
 
-  /// Set value
+  /// Set constraint value
   SKETCHAPI_EXPORT
   void setValue(
       const std::shared_ptr<ModelAPI_Feature> & theConstraint,
@@ -152,6 +176,13 @@ SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
 SKETCHAPI_EXPORT
 SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
                     const ModelHighAPI_Selection & theExternal);
+
+/**\ingroup CPPHighAPI
+ * \brief Create Sketch feature
+ */
+SKETCHAPI_EXPORT
+SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
+                    const std::string & theExternalName);
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------

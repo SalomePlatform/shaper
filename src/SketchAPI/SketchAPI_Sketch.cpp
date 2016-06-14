@@ -9,7 +9,6 @@
 //--------------------------------------------------------------------------------------
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintAngle.h>
-//#include <SketchPlugin_ConstraintBase.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
@@ -27,7 +26,10 @@
 #include <SketchPlugin_ConstraintVertical.h>
 //--------------------------------------------------------------------------------------
 #include <ModelAPI_CompositeFeature.h>
+#include <ModelHighAPI_RefAttr.h>
+#include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
+//--------------------------------------------------------------------------------------
 #include "SketchAPI_Circle.h"
 #include "SketchAPI_Line.h"
 //--------------------------------------------------------------------------------------
@@ -87,6 +89,17 @@ void SketchAPI_Sketch::setExternal(const ModelHighAPI_Selection & theExternal)
 }
 
 //--------------------------------------------------------------------------------------
+void SketchAPI_Sketch::setValue(
+    const std::shared_ptr<ModelAPI_Feature> & theConstraint,
+    const ModelHighAPI_Double & theValue)
+{
+  // TODO(spo): check somehow that the feature is a constraint or eliminate crash if the feature have no real attribute VALUE
+  fillAttribute(theValue, theConstraint->real(SketchPlugin_Constraint::VALUE()));
+
+  theConstraint->execute();
+}
+
+//--------------------------------------------------------------------------------------
 SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
                     const std::shared_ptr<GeomAPI_Ax3> & thePlane)
 {
@@ -101,6 +114,14 @@ SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
   // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(SketchAPI_Sketch::ID());
   return SketchPtr(new SketchAPI_Sketch(aFeature, theExternal));
+}
+
+SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
+                    const std::string & theExternalName)
+{
+  // TODO(spo): check that thePart is not empty
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(SketchAPI_Sketch::ID());
+  return SketchPtr(new SketchAPI_Sketch(aFeature, ModelHighAPI_Selection("FACE", theExternalName)));
 }
 
 //--------------------------------------------------------------------------------------
@@ -178,19 +199,61 @@ std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setCoincident(
     const ModelHighAPI_RefAttr & thePoint1,
     const ModelHighAPI_RefAttr & thePoint2)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_ConstraintCoincidence::ID());
-  fillAttribute(thePoint1, aFeature->refattr(SketchPlugin_ConstraintCoincidence::ENTITY_A()));
-  fillAttribute(thePoint2, aFeature->refattr(SketchPlugin_ConstraintCoincidence::ENTITY_B()));
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+  fillAttribute(thePoint1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(thePoint2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
   aFeature->execute();
   return aFeature;
 }
 
-//--------------------------------------------------------------------------------------
-void SketchAPI_Sketch::setValue(
-    const std::shared_ptr<ModelAPI_Feature> & theConstraint,
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setDistance(
+    const ModelHighAPI_RefAttr & thePoint,
+    const ModelHighAPI_RefAttr & theLine,
     const ModelHighAPI_Double & theValue)
 {
-  fillAttribute(theValue, theConstraint->real(SketchPlugin_Constraint::VALUE()));
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintDistance::ID());
+  fillAttribute(thePoint, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+  fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  aFeature->execute();
+  return aFeature;
 }
 
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setLength(
+    const ModelHighAPI_RefAttr & theLine,
+    const ModelHighAPI_Double & theValue)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintLength::ID());
+  fillAttribute(theLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  aFeature->execute();
+  return aFeature;
+}
+
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setParallel(
+    const ModelHighAPI_RefAttr & theLine1,
+    const ModelHighAPI_RefAttr & theLine2)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintParallel::ID());
+  fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+  aFeature->execute();
+  return aFeature;
+}
+
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setPerpendicular(
+    const ModelHighAPI_RefAttr & theLine1,
+    const ModelHighAPI_RefAttr & theLine2)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintPerpendicular::ID());
+  fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+  aFeature->execute();
+  return aFeature;
+}
 //--------------------------------------------------------------------------------------
