@@ -56,6 +56,8 @@ c1 = mystand.addCircle(0, 25, 5)
 mystand.setDistance(c1.center(), mystand.addLine(thisxmin), 10)
 mystand.setDistance(c1.center(), mystand.addLine(thiszmax), 10)
 
+mystand.execute()
+
 myboss = model.addExtrusion(mypart, mystand.selectFace(), -5)
 
 # Subtracting the cylinder to the box

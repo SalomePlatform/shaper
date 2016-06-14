@@ -25,9 +25,11 @@ FeaturesAPI_Boolean::FeaturesAPI_Boolean(const std::shared_ptr<ModelAPI_Feature>
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setBoolType(theBoolType);
-    setMainObjects(theMainObjects);
-    setToolObjects(theToolObjects);
+    fillAttribute(theBoolType, myboolType);
+    fillAttribute(theMainObjects, mymainObjects);
+    fillAttribute(theToolObjects, mytoolObjects);
+
+    execute();
   }
 }
 

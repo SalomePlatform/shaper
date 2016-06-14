@@ -23,8 +23,8 @@ FeaturesAPI_Extrusion::FeaturesAPI_Extrusion(const std::shared_ptr<ModelAPI_Feat
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setBase(theBaseObjects);
-    setSize(theSize);
+    fillAttribute(theBaseObjects, mybaseObjects);
+    setSizes(theSize, ModelHighAPI_Double());
   }
 }
 
@@ -36,9 +36,9 @@ FeaturesAPI_Extrusion::FeaturesAPI_Extrusion(const std::shared_ptr<ModelAPI_Feat
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setBase(theBaseObjects);
-    setDirection(theDirection);
-    setSize(theSize);
+    fillAttribute(theBaseObjects, mybaseObjects);
+    fillAttribute(theDirection, mydirection);
+    setSizes(theSize, ModelHighAPI_Double());
   }
 }
 
@@ -50,7 +50,7 @@ FeaturesAPI_Extrusion::FeaturesAPI_Extrusion(const std::shared_ptr<ModelAPI_Feat
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setBase(theBaseObjects);
+    fillAttribute(theBaseObjects, mybaseObjects);
     setSizes(theToSize, theFromSize);
   }
 }
@@ -64,8 +64,8 @@ FeaturesAPI_Extrusion::FeaturesAPI_Extrusion(const std::shared_ptr<ModelAPI_Feat
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setBase(theBaseObjects);
-    setDirection(theDirection);
+    fillAttribute(theBaseObjects, mybaseObjects);
+    fillAttribute(theDirection, mydirection);
     setSizes(theToSize, theFromSize);
   }
 }
@@ -80,7 +80,7 @@ FeaturesAPI_Extrusion::FeaturesAPI_Extrusion(const std::shared_ptr<ModelAPI_Feat
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setBase(theBaseObjects);
+    fillAttribute(theBaseObjects, mybaseObjects);
     setPlanesAndOffsets(theToObject, theToOffset, theFromObject, theFromOffset);
   }
 }
@@ -96,8 +96,8 @@ FeaturesAPI_Extrusion::FeaturesAPI_Extrusion(const std::shared_ptr<ModelAPI_Feat
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setBase(theBaseObjects);
-    setDirection(theDirection);
+    fillAttribute(theBaseObjects, mybaseObjects);
+    fillAttribute(theDirection, mydirection);
     setPlanesAndOffsets(theToObject, theToOffset, theFromObject, theFromOffset);
   }
 }
