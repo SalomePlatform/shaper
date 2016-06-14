@@ -73,6 +73,11 @@ void fillAttribute(const ModelHighAPI_Double & theValue,
 {
   theValue.fillAttribute(theAttribute);
 }
+void fillAttribute(double theValue,
+                   const std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute)
+{
+  theAttribute->setValue(theValue);
+}
 
 //--------------------------------------------------------------------------------------
 void fillAttribute(const ModelHighAPI_Integer & theValue,
@@ -110,4 +115,10 @@ void fillAttribute(const std::string & theValue,
 {
   theAttribute->setValue(theValue);
 }
+void fillAttribute(const char * theValue,
+                   const std::shared_ptr<ModelAPI_AttributeString> & theAttribute)
+{
+  theAttribute->setValue(theValue);
+}
+
 //--------------------------------------------------------------------------------------

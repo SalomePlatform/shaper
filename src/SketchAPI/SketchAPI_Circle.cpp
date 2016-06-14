@@ -97,7 +97,7 @@ void SketchAPI_Circle::setByCenterAndRadius(double theCenterX, double theCenterY
 {
   fillAttribute(SketchPlugin_Circle::CIRCLE_TYPE_CENTER_AND_RADIUS(), mycircleType);
   fillAttribute(center(), theCenterX, theCenterY);
-  fillAttribute(ModelHighAPI_Double(theRadius), myradius);
+  fillAttribute(theRadius, myradius);
 
   execute();
 }
@@ -108,7 +108,7 @@ void SketchAPI_Circle::setByCenterAndRadius(const std::shared_ptr<GeomAPI_Pnt2d>
 {
   fillAttribute(SketchPlugin_Circle::CIRCLE_TYPE_CENTER_AND_RADIUS(), mycircleType);
   fillAttribute(theCenter, mycenter);
-  fillAttribute(ModelHighAPI_Double(theRadius), myradius);
+  fillAttribute(theRadius, myradius);
 
   execute();
 }

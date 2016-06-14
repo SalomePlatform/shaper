@@ -10,8 +10,6 @@
 #include "SketchAPI.h"
 #include "SketchAPI_SketchEntity.h"
 
-#include <GeomDataAPI_Point2D.h>
-
 #include <SketchPlugin_Circle.h>
 
 class ModelHighAPI_Selection;
