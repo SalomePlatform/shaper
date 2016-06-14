@@ -10,6 +10,8 @@
 #include <Events_Error.h>
 
 #include <ModelAPI_Feature.h>
+
+#include "ModelHighAPI_Selection.h"
 //--------------------------------------------------------------------------------------
 ModelHighAPI_Interface::ModelHighAPI_Interface(const std::shared_ptr<ModelAPI_Feature> & theFeature)
 : myFeature(theFeature)
@@ -36,6 +38,18 @@ const std::string& ModelHighAPI_Interface::getKind() const
 void ModelHighAPI_Interface::execute()
 {
   feature()->execute();
+}
+
+std::list<ModelHighAPI_Selection> ModelHighAPI_Interface::result() const
+{
+  std::list<ModelHighAPI_Selection> aSelectionList;
+
+  std::list<std::shared_ptr<ModelAPI_Result> > aResults = feature()->results();
+  for (auto it = aResults.begin(), end = aResults.end(); it != end; ++it) {
+    aSelectionList.push_back(ModelHighAPI_Selection(*it));
+  }
+
+  return aSelectionList;
 }
 
 void ModelHighAPI_Interface::throwException(const std::string & theDescription)

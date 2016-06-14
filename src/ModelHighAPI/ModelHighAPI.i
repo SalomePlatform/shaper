@@ -3,6 +3,9 @@
 
 %{
   #include "ModelHighAPI_swig.h"
+
+  // fix for SWIG v2.0.4
+  #define SWIGPY_SLICE_ARG(obj) ((PySliceObject*)(obj))
 %}
 
 %include "doxyhelp.i"
@@ -112,3 +115,5 @@
 %include "ModelHighAPI_RefAttr.h"
 %include "ModelHighAPI_Selection.h"
 %include "ModelHighAPI_Tools.h"
+
+%template(SelectionList) std::list<ModelHighAPI_Selection>;

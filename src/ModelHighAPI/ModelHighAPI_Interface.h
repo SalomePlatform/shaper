@@ -10,10 +10,12 @@
 //--------------------------------------------------------------------------------------
 #include "ModelHighAPI.h"
 
+#include <list>
 #include <memory>
 #include <string>
 //--------------------------------------------------------------------------------------
 class ModelAPI_Feature;
+class ModelHighAPI_Selection;
 //--------------------------------------------------------------------------------------
 /**\class ModelHighAPI_Interface
  * \ingroup CPPHighAPI
@@ -40,6 +42,10 @@ public:
   /// Shortcut for feature()->execute()
   MODELHIGHAPI_EXPORT
   void execute();
+
+  /// Return all objects of the feature
+  MODELHIGHAPI_EXPORT
+  virtual std::list<ModelHighAPI_Selection> result() const;
 
   /// Throw exception to event loop
   MODELHIGHAPI_EXPORT

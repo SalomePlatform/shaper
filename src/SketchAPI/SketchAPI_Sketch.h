@@ -10,6 +10,8 @@
 //--------------------------------------------------------------------------------------
 #include "SketchAPI.h"
 
+#include <list>
+
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_SketchEntity.h>
 
@@ -154,6 +156,11 @@ public:
       const ModelHighAPI_Double & theValue);
 
   // TODO(spo): setText. Is it necessary as setValue accepts text expressions?
+
+  // TODO(spo): rename to selectFaces() or faces() (or add faces() -> list to SWIG)
+  /// Select face
+  SKETCHAPI_EXPORT
+  std::list<ModelHighAPI_Selection> selectFace() const;
 
 protected:
   std::shared_ptr<ModelAPI_CompositeFeature> compositeFeature() const;

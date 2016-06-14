@@ -26,6 +26,7 @@
 #include <SketchPlugin_ConstraintVertical.h>
 //--------------------------------------------------------------------------------------
 #include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_ResultConstruction.h>
 #include <ModelHighAPI_RefAttr.h>
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
@@ -97,6 +98,25 @@ void SketchAPI_Sketch::setValue(
   fillAttribute(theValue, theConstraint->real(SketchPlugin_Constraint::VALUE()));
 
   theConstraint->execute();
+}
+
+//--------------------------------------------------------------------------------------
+std::list<ModelHighAPI_Selection> SketchAPI_Sketch::selectFace() const
+{
+  std::list<ModelHighAPI_Selection> aSelectionList;
+
+  ResultConstructionPtr aResultConstruction =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(feature()->firstResult());
+  if (aResultConstruction.get() == NULL)
+    return aSelectionList;
+
+  for (int anIndex = 0; anIndex < aResultConstruction->facesNum(); ++anIndex) {
+    aSelectionList.push_back(
+        ModelHighAPI_Selection(aResultConstruction,
+                               aResultConstruction->face(anIndex)));
+  }
+
+  return aSelectionList;
 }
 
 //--------------------------------------------------------------------------------------
