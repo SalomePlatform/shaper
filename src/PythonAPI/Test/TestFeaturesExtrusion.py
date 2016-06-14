@@ -65,12 +65,12 @@ class FeaturesAddExtrusionTestCase(FeaturesAddExtrusionFixture):
         base_circle = base_sketch.addCircle(0, 0, 10)
         # to
         to_plane = model.defaultPlane("XOY")
-        to_plane.location().setZ(10)
+        to_plane.origin().setZ(10)
         to_sketch = model.addSketch(self.part, to_plane)
         to_circle = to_sketch.addCircle(0, 0, 10)
         # from
         from_plane = model.defaultPlane("XOY")
-        from_plane.location().setZ(-10)
+        from_plane.origin().setZ(-10)
         from_sketch = model.addSketch(self.part, from_plane)
         from_circle = from_sketch.addCircle(0, 0, 10)
 
@@ -132,12 +132,12 @@ class FeaturesExtrusionTestCase(FeaturesExtrusionFixture):
     def test_extrusion_set_planes_and_offsets(self):
         # to
         to_plane = model.defaultPlane("XOY")
-        to_plane.location().setZ(10)
+        to_plane.origin().setZ(10)
         to_sketch = model.addSketch(self.part, to_plane)
         to_circle = to_sketch.addCircle(0, 0, 10)
         # from
         from_plane = model.defaultPlane("XOY")
-        from_plane.location().setZ(-10)
+        from_plane.origin().setZ(-10)
         from_sketch = model.addSketch(self.part, from_plane)
         from_circle = from_sketch.addCircle(0, 0, 10)
 
