@@ -1,7 +1,7 @@
 """Package for Features plugin for the Parametric Geometry API of the Modeler.
 """
 
-from boolean import addAddition, addSubtraction, addIntersection
+from FeaturesAPI import addFuse, addCut, addCommon
 
 from partition import addPartition
 
