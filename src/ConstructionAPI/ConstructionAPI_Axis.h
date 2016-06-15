@@ -82,20 +82,23 @@ typedef std::shared_ptr<ConstructionAPI_Axis> AxisPtr;
  * \brief Create Axis feature
  */
 CONSTRUCTIONAPI_EXPORT
-AxisPtr addAxis(const ModelHighAPI_Selection & thePoint1,
+AxisPtr addAxis(const std::shared_ptr<ModelAPI_Document> & thePart,
+                const ModelHighAPI_Selection & thePoint1,
                 const ModelHighAPI_Selection & thePoint2);
 
 /**\ingroup CPPHighAPI
  * \brief Create Axis feature
  */
 CONSTRUCTIONAPI_EXPORT
-AxisPtr addAxis(const ModelHighAPI_Selection & theCylindricalFace);
+AxisPtr addAxis(const std::shared_ptr<ModelAPI_Document> & thePart,
+                const ModelHighAPI_Selection & theCylindricalFace);
 
 /**\ingroup CPPHighAPI
  * \brief Create Axis feature
  */
 CONSTRUCTIONAPI_EXPORT
-AxisPtr addAxis(const ModelHighAPI_Selection & thePoint,
+AxisPtr addAxis(const std::shared_ptr<ModelAPI_Document> & thePart,
+                const ModelHighAPI_Selection & thePoint,
                 const ModelHighAPI_Double & theX,
                 const ModelHighAPI_Double & theY,
                 const ModelHighAPI_Double & theZ);
