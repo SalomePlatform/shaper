@@ -5,10 +5,8 @@ from FeaturesAPI import addFuse, addCut, addCommon
 
 from partition import addPartition
 
-from FeaturesAPI import addExtrusion
+from FeaturesAPI import addExtrusion, addRevolution
 from extrusion_boolean import addExtrusionCut, addExtrusionFuse
-
-from revolution import addRevolution
 from revolution_boolean import addRevolutionCut, addRevolutionFuse
 
 from placement import addPlacement

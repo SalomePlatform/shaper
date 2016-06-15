@@ -53,7 +53,7 @@ class FeaturesTestCase(FeaturesFixture):
 
     def test_initialize_without_attributes(self):
         import ConstructionAPI
-        model.construction.axis.Axis(self.part.addFeature("Axis"))
+        ConstructionAPI.ConstructionAPI_Axis(self.part.addFeature("Axis"))
         ConstructionAPI.ConstructionAPI_Plane(self.part.addFeature("Plane"))
         ConstructionAPI.ConstructionAPI_Point(self.part.addFeature("Point"))
 
@@ -66,7 +66,7 @@ class FeaturesTestCase(FeaturesFixture):
         FeaturesAPI.FeaturesAPI_Extrusion(self.part.addFeature("Extrusion"))
         # model.features.extrusion_boolean.ExtrusionBoolean(self.part.addFeature("ExtrusionCut"))
         # model.features.extrusion_boolean.ExtrusionBoolean(self.part.addFeature("ExtrusionFuse"))
-        model.features.revolution.Revolution(self.part.addFeature("Revolution"))
+        FeaturesAPI.FeaturesAPI_Revolution(self.part.addFeature("Revolution"))
         # model.features.revolution_boolean.RevolutionBoolean(self.part.addFeature("RevolutionCut"))
         # model.features.revolution_boolean.RevolutionBoolean(self.part.addFeature("RevolutionFuse"))
         FeaturesAPI.FeaturesAPI_Placement(self.part.addFeature("Placement"))
