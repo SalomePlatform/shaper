@@ -485,7 +485,7 @@ void findReferences(const std::set<FeaturePtr>& theFeatures,
         theReferences[aFeature] = aFilteredFeatures;
       }
       if (theUseRecursion)
-        findReferences(aSelRefFeatures, theReferences, theUseComposite, theUseRecursion);
+        findReferences(theReferences[aFeature], theReferences, theUseComposite, theUseRecursion);
     }
   }
 }
