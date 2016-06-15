@@ -127,6 +127,17 @@ public:
       const ModelHighAPI_RefAttr & theLine,
       const ModelHighAPI_Double & theValue);
 
+  /// Set fillet
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setFillet(
+      const std::list<ModelHighAPI_RefAttr> & thePoints,
+      const ModelHighAPI_Double & theRadius);
+
+  /// Set horizontal
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setHorizontal(
+      const ModelHighAPI_RefAttr & theLine);
+
   /// Set length
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelAPI_Feature> setLength(
@@ -144,6 +155,16 @@ public:
   std::shared_ptr<ModelAPI_Feature> setPerpendicular(
       const ModelHighAPI_RefAttr & theLine1,
       const ModelHighAPI_RefAttr & theLine2);
+
+  /// Set rigid
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setRigid(
+      const ModelHighAPI_RefAttr & theObject);
+
+  /// Set vertical
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setVertical(
+      const ModelHighAPI_RefAttr & theLine);
 
   // TODO(spo): set* (constraints)
 

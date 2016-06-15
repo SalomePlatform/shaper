@@ -243,6 +243,28 @@ std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setDistance(
   return aFeature;
 }
 
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setFillet(
+    const std::list<ModelHighAPI_RefAttr> & thePoints,
+    const ModelHighAPI_Double & theRadius)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintFillet::ID());
+  fillAttribute(thePoints, aFeature->data()->refattrlist(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theRadius, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  aFeature->execute();
+  return aFeature;
+}
+
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setHorizontal(
+    const ModelHighAPI_RefAttr & theLine)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintHorizontal::ID());
+  fillAttribute(theLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  aFeature->execute();
+  return aFeature;
+}
+
 std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setLength(
     const ModelHighAPI_RefAttr & theLine,
     const ModelHighAPI_Double & theValue)
@@ -278,4 +300,25 @@ std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setPerpendicular(
   aFeature->execute();
   return aFeature;
 }
+
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setRigid(
+    const ModelHighAPI_RefAttr & theObject)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintRigid::ID());
+  fillAttribute(theObject, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  aFeature->execute();
+  return aFeature;
+}
+
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setVertical(
+    const ModelHighAPI_RefAttr & theLine)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintVertical::ID());
+  fillAttribute(theLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  aFeature->execute();
+  return aFeature;
+}
+
 //--------------------------------------------------------------------------------------
