@@ -43,39 +43,12 @@ const double paramTolerance = 1.e-4;
 const double PI =3.141592653589793238463;
 
 namespace {
-  static const std::string& ARC_TYPE_CENTER_START_END()
-  {
-    static const std::string TYPE("CenterStartEnd");
-    return TYPE;
-  }
-  static const std::string& ARC_TYPE_THREE_POINTS()
-  {
-    static const std::string TYPE("ThreePoints");
-    return TYPE;
-  }
-
-  static const std::string& PASSED_POINT_ID()
-  {
-    static const std::string PASSED_PNT("ArcPassedPoint");
-    return PASSED_PNT;
-  }
-  static const std::string& RADIUS_ID()
-  {
-    static const std::string RADIUS("ArcRadius");
-    return RADIUS;
-  }
-  static const std::string& ANGLE_ID()
-  {
-    static const std::string ANGLE("ArcAngle");
-    return ANGLE;
-  }
-
   static const std::string& POINT_ID(int theIndex)
   {
     switch (theIndex) {
     case 1: return SketchPlugin_Arc::START_ID();
     case 2: return SketchPlugin_Arc::END_ID();
-    case 3: return PASSED_POINT_ID();
+    case 3: return SketchPlugin_Arc::PASSED_POINT_ID();
     }
 
     static const std::string DUMMY;

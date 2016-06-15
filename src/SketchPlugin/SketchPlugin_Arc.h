@@ -50,6 +50,17 @@ class SketchPlugin_Arc : public SketchPlugin_SketchEntity, public GeomAPI_IPrese
     return TYPE;
   }
 
+  static const std::string& ARC_TYPE_CENTER_START_END()
+  {
+    static const std::string TYPE("CenterStartEnd");
+    return TYPE;
+  }
+  static const std::string& ARC_TYPE_THREE_POINTS()
+  {
+    static const std::string TYPE("ThreePoints");
+    return TYPE;
+  }
+
   static const std::string& TANGENT_POINT_ID()
   {
     static const std::string TANGENT_PNT("ArcTangentPoint");
@@ -80,6 +91,27 @@ class SketchPlugin_Arc : public SketchPlugin_SketchEntity, public GeomAPI_IPrese
   {
     static const std::string MY_INVERSED_ID("InversedArc");
     return MY_INVERSED_ID;
+  }
+
+  /// Passed point of the arc.
+  static const std::string& PASSED_POINT_ID()
+  {
+    static const std::string PASSED_PNT("ArcPassedPoint");
+    return PASSED_PNT;
+  }
+
+  /// Arc radius.
+  static const std::string& RADIUS_ID()
+  {
+    static const std::string RADIUS("ArcRadius");
+    return RADIUS;
+  }
+
+  /// Arc angle.
+  static const std::string& ANGLE_ID()
+  {
+    static const std::string ANGLE("ArcAngle");
+    return ANGLE;
   }
 
   /// Returns the kind of a feature

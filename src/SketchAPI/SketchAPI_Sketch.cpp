@@ -31,6 +31,7 @@
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
+#include "SketchAPI_Arc.h"
 #include "SketchAPI_Circle.h"
 #include "SketchAPI_Line.h"
 //--------------------------------------------------------------------------------------
@@ -214,6 +215,77 @@ std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(const std::string 
   // TODO(spo): Add constraint SketchConstraintRigid like in PythonAPI. Is it necessary?
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Circle::ID());
   return CirclePtr(new SketchAPI_Circle(aFeature, theExternalName));
+}
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(double theCenterX, double theCenterY,
+                                                        double theStartX, double theStartY,
+                                                        double theEndX, double theEndY,
+                                                        bool theInversed)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Arc::ID());
+  return ArcPtr(new SketchAPI_Arc(aFeature,
+                                  theCenterX, theCenterY,
+                                  theStartX, theStartY,
+                                  theEndX, theEndY,
+                                  theInversed));
+}
+
+std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+                                                        const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
+                                                        const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+                                                        bool theInversed)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Arc::ID());
+  return ArcPtr(new SketchAPI_Arc(aFeature, theCenter, theStart, theEnd, theInversed));
+}
+
+std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(double theStartX, double theStartY,
+                                                        double theEndX, double theEndY,
+                                                        double thePassedX, double thePassedY)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Arc::ID());
+  return ArcPtr(new SketchAPI_Arc(aFeature,
+                                  theStartX, theStartY,
+                                  theEndX, theEndY,
+                                  thePassedX, thePassedY));
+}
+
+std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
+                                                        const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+                                                        const std::shared_ptr<GeomAPI_Pnt2d>& thePassed)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Arc::ID());
+  return ArcPtr(new SketchAPI_Arc(aFeature, theStart, theEnd, thePassed));
+}
+
+std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const ModelHighAPI_RefAttr& theTangentPoint,
+                                                        double theEndX, double theEndY,
+                                                        bool theInversed)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Arc::ID());
+  return ArcPtr(new SketchAPI_Arc(aFeature, theTangentPoint, theEndX, theEndY, theInversed));
+}
+
+std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const ModelHighAPI_RefAttr& theTangentPoint,
+                                                        const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+                                                        bool theInversed)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Arc::ID());
+  return ArcPtr(new SketchAPI_Arc(aFeature, theTangentPoint, theEnd, theInversed));
+}
+
+std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const ModelHighAPI_Selection & theExternal)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Arc::ID());
+  return ArcPtr(new SketchAPI_Arc(aFeature, theExternal));
+}
+
+std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const std::string & theExternalName)
+{
+  // TODO(spo): Add constraint SketchConstraintRigid like in PythonAPI. Is it necessary?
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Arc::ID());
+  return ArcPtr(new SketchAPI_Arc(aFeature, theExternalName));
 }
 
 //--------------------------------------------------------------------------------------

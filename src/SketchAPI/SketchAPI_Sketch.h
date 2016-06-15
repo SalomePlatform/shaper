@@ -22,6 +22,7 @@ class ModelAPI_CompositeFeature;
 class ModelHighAPI_Double;
 class ModelHighAPI_RefAttr;
 class ModelHighAPI_Selection;
+class SketchAPI_Arc;
 class SketchAPI_Circle;
 class SketchAPI_Line;
 //--------------------------------------------------------------------------------------
@@ -112,7 +113,57 @@ public:
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Circle> addCircle(const std::string & theExternalName);
 
-  // TODO(spo): addArc
+  /// Add arc
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Arc> addArc(
+      double theCenterX, double theCenterY,
+      double theStartX, double theStartY,
+      double theEndX, double theEndY,
+      bool theInversed);
+
+  /// Add arc
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Arc> addArc(
+      const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+      const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
+      const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+      bool theInversed);
+
+  /// Add arc
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Arc> addArc(
+      double theStartX, double theStartY,
+      double theEndX, double theEndY,
+      double thePassedX, double thePassedY);
+
+  /// Add arc
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Arc> addArc(
+      const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
+      const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+      const std::shared_ptr<GeomAPI_Pnt2d>& thePassed);
+
+  /// Add arc
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Arc> addArc(
+      const ModelHighAPI_RefAttr& theTangentPoint,
+      double theEndX, double theEndY,
+      bool theInversed);
+
+  /// Add arc
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Arc> addArc(
+      const ModelHighAPI_RefAttr& theTangentPoint,
+      const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+      bool theInversed);
+
+  /// Add arc
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Arc> addArc(const ModelHighAPI_Selection & theExternal);
+
+  /// Add arc
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Arc> addArc(const std::string & theExternalName);
 
   /// Set coincident
   SKETCHAPI_EXPORT
