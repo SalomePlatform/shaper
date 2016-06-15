@@ -86,7 +86,7 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
   {
     AttributeSelectionPtr aAttr = data()->selection(EXTERNAL_ID());
     if (aAttr)
-      return aAttr->context().get() != NULL;
+      return aAttr->context().get() != NULL && !aAttr->isInvalid();
     return false;
   }
 

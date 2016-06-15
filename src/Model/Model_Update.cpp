@@ -442,7 +442,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
   bool isReferencedInvalid = false;
   // check all features this feature depended on (recursive call of updateFeature)
   std::set<FeaturePtr>& aReasons = myModified[theFeature];
-  bool allSubsUsed = aReasons.find(theFeature) == aReasons.end();
+  bool allSubsUsed = aReasons.find(theFeature) != aReasons.end();
   if (allSubsUsed) { // add all subs in aReasons and temporary remove "theFeature" to avoid processing itself
     allReasons(theFeature, aReasons);
     aReasons.erase(theFeature);
@@ -452,7 +452,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
   while(!aReasons.empty()) {
     FeaturePtr aReason = *(aReasons.begin());
 #ifdef DEB_UPDATE
-    cout<<theFeature->name()<<" process next reason "<<aReason->name()<<endl;
+    //cout<<theFeature->name()<<" process next reason "<<aReason->name()<<endl;
 #endif
     if (aReason != theFeature && (aReason)->data()->isValid()) {
       if (processFeature(aReason))

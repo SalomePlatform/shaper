@@ -438,18 +438,20 @@ bool Model_AttributeSelection::update()
   if (aSelLab.IsAttribute(kPART_REF_ID)) { // it is reference to the part object
     std::shared_ptr<GeomAPI_Shape> aNoSelection;
     bool aResult = selectPart(aContext, aNoSelection, true);
+    aResult = setInvalidIfFalse(aSelLab, aResult);
     if (aResult) {
       owner()->data()->sendAttributeUpdated(this);
     }
-    return setInvalidIfFalse(aSelLab, aResult);
+    return aResult;
   }
 
   if (aContext->groupName() == ModelAPI_ResultBody::group()) {
     // body: just a named shape, use selection mechanism from OCCT
     TNaming_Selector aSelector(aSelLab);
     bool aResult = aSelector.Solve(scope()) == Standard_True;
+    aResult = setInvalidIfFalse(aSelLab, aResult); // must be before sending of updated attribute (1556)
     owner()->data()->sendAttributeUpdated(this);
-    return setInvalidIfFalse(aSelLab, aResult);
+    return aResult;
   } else if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {
     // construction: identification by the results indexes, recompute faces and
     // take the face that more close by the indexes
@@ -565,8 +567,9 @@ bool Model_AttributeSelection::update()
             }
           }
           selectConstruction(aContext, aNewSelected);
+          setInvalidIfFalse(aSelLab, true);
           owner()->data()->sendAttributeUpdated(this);
-          return setInvalidIfFalse(aSelLab, true);
+          return true;
         } else { // if the selection is not found, put the empty shape: it's better to have disappeared shape, than the old, the lost one
           TNaming_Builder anEmptyBuilder(selectionLabel());
           return setInvalidIfFalse(aSelLab, false);
@@ -586,8 +589,9 @@ bool Model_AttributeSelection::update()
                 std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aResIter);
               if (aRes && aRes->shape() && aRes->shape()->isEdge()) { // found!
                 selectConstruction(aContext, aRes->shape());
+                setInvalidIfFalse(aSelLab, true);
                 owner()->data()->sendAttributeUpdated(this);
-                return setInvalidIfFalse(aSelLab, true);
+                return true;
               }
             }
           }
@@ -615,8 +619,9 @@ bool Model_AttributeSelection::update()
                 if (aRes && aRes->shape()) {
                   if (aRes->shape()->isVertex() && aVertexNum == 0) { // found!
                     selectConstruction(aContext, aRes->shape());
+                    setInvalidIfFalse(aSelLab, true);
                     owner()->data()->sendAttributeUpdated(this);
-                    return setInvalidIfFalse(aSelLab, true);
+                    return true;
                   } else if (aRes->shape()->isEdge() && aVertexNum > 0) {
                     const TopoDS_Shape& anEdge = aRes->shape()->impl<TopoDS_Shape>();
                     int aVIndex = 1;
@@ -625,8 +630,9 @@ bool Model_AttributeSelection::update()
                         std::shared_ptr<GeomAPI_Shape> aVertex(new GeomAPI_Shape);
                         aVertex->setImpl(new TopoDS_Shape(aVExp.Current()));
                         selectConstruction(aContext, aVertex);
+                        setInvalidIfFalse(aSelLab, true);
                         owner()->data()->sendAttributeUpdated(this);
-                        return setInvalidIfFalse(aSelLab, true);
+                        return true;
                       }
                       aVIndex++;
                     }
@@ -638,8 +644,9 @@ bool Model_AttributeSelection::update()
       }
     } else { // simple construction element: the selected is that needed
       selectConstruction(aContext, aContext->shape());
+      setInvalidIfFalse(aSelLab, true);
       owner()->data()->sendAttributeUpdated(this);
-      return setInvalidIfFalse(aSelLab, true);
+      return true;
     }
   }
   return setInvalidIfFalse(aSelLab, false); // unknown case
