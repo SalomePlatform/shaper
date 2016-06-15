@@ -17,6 +17,7 @@
 //--------------------------------------------------------------------------------------
 class ModelAPI_Attribute;
 class ModelAPI_AttributeRefAttr;
+class ModelAPI_AttributeRefAttrList;
 class ModelAPI_Object;
 class ModelHighAPI_Interface;
 //--------------------------------------------------------------------------------------
@@ -46,6 +47,10 @@ public:
   /// Fill attribute values
   MODELHIGHAPI_EXPORT
   virtual void fillAttribute(const std::shared_ptr<ModelAPI_AttributeRefAttr> & theAttribute) const;
+
+  /// Append to list attribute
+  MODELHIGHAPI_EXPORT
+  virtual void appendToList(const std::shared_ptr<ModelAPI_AttributeRefAttrList> & theAttribute) const;
 
 private:
   boost::variant<

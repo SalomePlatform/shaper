@@ -118,3 +118,4 @@
 %include "ModelHighAPI_Tools.h"
 
 %template(SelectionList) std::list<ModelHighAPI_Selection>;
+%template(RefAttrList) std::list<ModelHighAPI_RefAttr>;

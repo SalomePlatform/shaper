@@ -94,6 +94,15 @@ void fillAttribute(const ModelHighAPI_RefAttr & theValue,
 }
 
 //--------------------------------------------------------------------------------------
+void fillAttribute(const std::list<ModelHighAPI_RefAttr> & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeRefAttrList> & theAttribute)
+{
+  theAttribute->clear();
+  for (auto it = theValue.begin(); it != theValue.end(); ++it)
+    it->appendToList(theAttribute);
+}
+
+//--------------------------------------------------------------------------------------
 void fillAttribute(const ModelHighAPI_Selection & theValue,
                    const std::shared_ptr<ModelAPI_AttributeSelection> & theAttribute)
 {
