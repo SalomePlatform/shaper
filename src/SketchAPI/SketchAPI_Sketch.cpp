@@ -314,6 +314,21 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const std::string & theE
 }
 
 //--------------------------------------------------------------------------------------
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setAngle(
+    const ModelHighAPI_RefAttr & theLine1,
+    const ModelHighAPI_RefAttr & theLine2,
+    const ModelHighAPI_Double & theValue)
+{
+  // TODO(spo): is support of angle type necessary?
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
+  fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+  fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  aFeature->execute();
+  return aFeature;
+}
+
 std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setCoincident(
     const ModelHighAPI_RefAttr & thePoint1,
     const ModelHighAPI_RefAttr & thePoint2)
@@ -326,16 +341,40 @@ std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setCoincident(
   return aFeature;
 }
 
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setCollinear(
+    const ModelHighAPI_RefAttr & theLine1,
+    const ModelHighAPI_RefAttr & theLine2)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintCollinear::ID());
+  fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+  aFeature->execute();
+  return aFeature;
+}
+
 std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setDistance(
     const ModelHighAPI_RefAttr & thePoint,
-    const ModelHighAPI_RefAttr & theLine,
+    const ModelHighAPI_RefAttr & thePointOrLine,
     const ModelHighAPI_Double & theValue)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintDistance::ID());
   fillAttribute(thePoint, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
-  fillAttribute(theLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+  fillAttribute(thePointOrLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  aFeature->execute();
+  return aFeature;
+}
+
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setEqual(
+    const ModelHighAPI_RefAttr & theObject1,
+    const ModelHighAPI_RefAttr & theObject2)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintEqual::ID());
+  fillAttribute(theObject1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theObject2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
   aFeature->execute();
   return aFeature;
 }
@@ -374,6 +413,18 @@ std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setLength(
   return aFeature;
 }
 
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setMiddlePoint(
+    const ModelHighAPI_RefAttr & thePoint,
+    const ModelHighAPI_RefAttr & theLine)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintMiddle::ID());
+  fillAttribute(thePoint, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+  aFeature->execute();
+  return aFeature;
+}
+
 std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setParallel(
     const ModelHighAPI_RefAttr & theLine1,
     const ModelHighAPI_RefAttr & theLine2)
@@ -398,12 +449,37 @@ std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setPerpendicular(
   return aFeature;
 }
 
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setRadius(
+    const ModelHighAPI_RefAttr & theCircleOrArc,
+    const ModelHighAPI_Double & theValue)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintRadius::ID());
+  fillAttribute(theCircleOrArc, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  aFeature->execute();
+  return aFeature;
+}
+
 std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setRigid(
     const ModelHighAPI_RefAttr & theObject)
 {
+  // TODO(spo): should it be renamed to Fixed?
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintRigid::ID());
   fillAttribute(theObject, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  aFeature->execute();
+  return aFeature;
+}
+
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setTangent(
+    const ModelHighAPI_RefAttr & theLine,
+    const ModelHighAPI_RefAttr & theCircle)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintTangent::ID());
+  fillAttribute(theLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theCircle, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
   aFeature->execute();
   return aFeature;
 }

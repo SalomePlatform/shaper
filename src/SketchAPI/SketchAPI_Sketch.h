@@ -181,18 +181,37 @@ public:
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Arc> addArc(const std::string & theExternalName);
 
+  /// Set angle
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setAngle(
+      const ModelHighAPI_RefAttr & theLine1,
+      const ModelHighAPI_RefAttr & theLine2,
+      const ModelHighAPI_Double & theValue);
+
   /// Set coincident
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelAPI_Feature> setCoincident(
       const ModelHighAPI_RefAttr & thePoint1,
       const ModelHighAPI_RefAttr & thePoint2);
 
+  /// Set collinear
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setCollinear(
+      const ModelHighAPI_RefAttr & theLine1,
+      const ModelHighAPI_RefAttr & theLine2);
+
   /// Set distance
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelAPI_Feature> setDistance(
       const ModelHighAPI_RefAttr & thePoint,
-      const ModelHighAPI_RefAttr & theLine,
+      const ModelHighAPI_RefAttr & thePointOrLine,
       const ModelHighAPI_Double & theValue);
+
+  /// Set equal
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setEqual(
+      const ModelHighAPI_RefAttr & theObject1,
+      const ModelHighAPI_RefAttr & theObject2);
 
   /// Set fillet
   SKETCHAPI_EXPORT
@@ -211,6 +230,14 @@ public:
       const ModelHighAPI_RefAttr & theLine,
       const ModelHighAPI_Double & theValue);
 
+  /// Set middle
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setMiddlePoint(
+      const ModelHighAPI_RefAttr & thePoint,
+      const ModelHighAPI_RefAttr & theLine);
+
+  // TODO(spo): setMirror
+
   /// Set parallel
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelAPI_Feature> setParallel(
@@ -223,19 +250,29 @@ public:
       const ModelHighAPI_RefAttr & theLine1,
       const ModelHighAPI_RefAttr & theLine2);
 
+  /// Set radius
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setRadius(
+      const ModelHighAPI_RefAttr & theCircleOrArc,
+      const ModelHighAPI_Double & theValue);
+
   /// Set rigid
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelAPI_Feature> setRigid(
       const ModelHighAPI_RefAttr & theObject);
+
+  /// Set tangent
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setTangent(
+      const ModelHighAPI_RefAttr & theLine,
+      const ModelHighAPI_RefAttr & theCircle);
 
   /// Set vertical
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelAPI_Feature> setVertical(
       const ModelHighAPI_RefAttr & theLine);
 
-  // TODO(spo): set* (constraints)
-
-  // TODO(spo): addMirror
+  // TODO(spo): addRectagle, projection, Translation, Rotation
 
   /// Set constraint value
   SKETCHAPI_EXPORT
