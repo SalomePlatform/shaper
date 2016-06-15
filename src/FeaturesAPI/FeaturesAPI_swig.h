@@ -14,6 +14,7 @@
   #include "FeaturesAPI_Extrusion.h"
   #include "FeaturesAPI_Group.h"
   #include "FeaturesAPI_Placement.h"
+  #include "FeaturesAPI_Revolution.h"
   #include "FeaturesAPI_Rotation.h"
   #include "FeaturesAPI_Translation.h"
 

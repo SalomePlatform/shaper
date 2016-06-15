@@ -35,6 +35,20 @@ public:
     return MY_CREATION_METHOD_ID;
   }
 
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_ANGLES()
+  {
+    static const std::string MY_CREATION_METHOD_ID("ByAngles");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_PLANES()
+  {
+    static const std::string MY_CREATION_METHOD_ID("ByPlanesAndOffsets");
+    return MY_CREATION_METHOD_ID;
+  }
+
   /// Attribute name of an revolution axis.
   inline static const std::string& AXIS_OBJECT_ID()
   {

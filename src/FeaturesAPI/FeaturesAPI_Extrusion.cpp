@@ -128,7 +128,7 @@ void FeaturesAPI_Extrusion::setDirection(const ModelHighAPI_Selection& theDirect
 void FeaturesAPI_Extrusion::setSizes(const ModelHighAPI_Double& theToSize,
                                      const ModelHighAPI_Double& theFromSize)
 {
-  fillAttribute("BySizes", mycreationMethod);
+  fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
   fillAttribute(theToSize, mytoSize);
   fillAttribute(theFromSize, myfromSize);
 
@@ -138,7 +138,7 @@ void FeaturesAPI_Extrusion::setSizes(const ModelHighAPI_Double& theToSize,
 //==================================================================================================
 void FeaturesAPI_Extrusion::setSize(const ModelHighAPI_Double& theSize)
 {
-  fillAttribute("BySizes", mycreationMethod);
+  fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
   fillAttribute(theSize, mytoSize);
   fillAttribute(ModelHighAPI_Double(), myfromSize);
 
@@ -151,7 +151,7 @@ void FeaturesAPI_Extrusion::setPlanesAndOffsets(const ModelHighAPI_Selection& th
                                                 const ModelHighAPI_Selection& theFromObject,
                                                 const ModelHighAPI_Double& theFromOffset)
 {
-  fillAttribute("ByPlanesAndOffsets", mycreationMethod);
+  fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_PLANES(), mycreationMethod);
   fillAttribute(theToObject, mytoObject);
   fillAttribute(theToOffset, mytoOffset);
   fillAttribute(theFromObject, myfromObject);

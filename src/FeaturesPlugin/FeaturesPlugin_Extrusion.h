@@ -40,6 +40,20 @@ public:
     return MY_CREATION_METHOD_ID;
   }
 
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_SIZES()
+  {
+    static const std::string MY_CREATION_METHOD_ID("BySizes");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_PLANES()
+  {
+    static const std::string MY_CREATION_METHOD_ID("ByPlanesAndOffsets");
+    return MY_CREATION_METHOD_ID;
+  }
+
   /// Attribute name of an object to which the extrusion grows.
   inline static const std::string& DIRECTION_OBJECT_ID()
   {

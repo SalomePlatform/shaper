@@ -8,6 +8,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_Extrusion.h
   FeaturesAPI_Group.h
   FeaturesAPI_Placement.h
+  FeaturesAPI_Revolution.h
   FeaturesAPI_Rotation.h
   FeaturesAPI_Translation.h
 )
@@ -18,6 +19,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_Group.cpp
   FeaturesAPI_Placement.cpp
   FeaturesAPI_Rotation.cpp
+  FeaturesAPI_Revolution.cpp
   FeaturesAPI_Translation.cpp
 )
 

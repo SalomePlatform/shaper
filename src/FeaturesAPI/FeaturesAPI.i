@@ -23,6 +23,7 @@
 %shared_ptr(FeaturesAPI_Extrusion)
 %shared_ptr(FeaturesAPI_Group)
 %shared_ptr(FeaturesAPI_Placement)
+%shared_ptr(FeaturesAPI_Revolution)
 %shared_ptr(FeaturesAPI_Rotation)
 %shared_ptr(FeaturesAPI_Translation)
 
@@ -31,5 +32,6 @@
 %include "FeaturesAPI_Extrusion.h"
 %include "FeaturesAPI_Group.h"
 %include "FeaturesAPI_Placement.h"
+%include "FeaturesAPI_Revolution.h"
 %include "FeaturesAPI_Rotation.h"
 %include "FeaturesAPI_Translation.h"

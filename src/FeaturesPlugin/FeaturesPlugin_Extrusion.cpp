@@ -100,7 +100,7 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
   double aToSize = 0.0;
   double aFromSize = 0.0;
 
-  if(string(CREATION_METHOD())->value() == "BySizes") {
+  if(string(CREATION_METHOD())->value() == CREATION_METHOD_BY_SIZES()) {
     aToSize = real(TO_SIZE_ID())->value();
     aFromSize = real(FROM_SIZE_ID())->value();
   } else {
@@ -112,7 +112,7 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
   GeomShapePtr aToShape;
   GeomShapePtr aFromShape;
 
-  if(string(CREATION_METHOD())->value() == "ByPlanesAndOffsets") {
+  if(string(CREATION_METHOD())->value() == CREATION_METHOD_BY_PLANES()) {
     aSelection = selection(TO_OBJECT_ID());
     if(aSelection.get()) {
       aToShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aSelection->value());
