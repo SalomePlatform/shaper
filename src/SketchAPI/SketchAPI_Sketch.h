@@ -25,6 +25,7 @@ class ModelHighAPI_Selection;
 class SketchAPI_Arc;
 class SketchAPI_Circle;
 class SketchAPI_Line;
+class SketchAPI_Point;
 //--------------------------------------------------------------------------------------
 /**\class SketchAPI_Sketch
  * \ingroup CPPHighAPI
@@ -66,7 +67,22 @@ public:
   SKETCHAPI_EXPORT
   void setExternal(const ModelHighAPI_Selection & theExternal);
 
-  // TODO(spo): addPoint
+  // TODO(spo): addIntersection
+
+  /// Add point
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Point> addPoint(
+      double theX, double theY);
+  /// Add point
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Point> addPoint(
+      const std::shared_ptr<GeomAPI_Pnt2d> & thePoint);
+  /// Add point
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Point> addPoint(const ModelHighAPI_Selection & theExternal);
+  /// Add point
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Point> addPoint(const std::string & theExternalName);
 
   /// Add line
   SKETCHAPI_EXPORT

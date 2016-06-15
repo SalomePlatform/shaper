@@ -9,6 +9,7 @@ SET(PROJECT_HEADERS
   SketchAPI_Line.h
   SketchAPI_Sketch.h
   SketchAPI_SketchEntity.h
+  SketchAPI_Point.h
 )
 
 SET(PROJECT_SOURCES
@@ -17,6 +18,7 @@ SET(PROJECT_SOURCES
   SketchAPI_Line.cpp
   SketchAPI_Sketch.cpp
   SketchAPI_SketchEntity.cpp
+  SketchAPI_Point.cpp
 )
 
 SET(PROJECT_LIBRARIES

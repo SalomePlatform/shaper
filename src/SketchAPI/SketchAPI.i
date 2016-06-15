@@ -25,6 +25,7 @@
 %shared_ptr(SketchAPI_Line)
 %shared_ptr(SketchAPI_Sketch)
 %shared_ptr(SketchAPI_SketchEntity)
+%shared_ptr(SketchAPI_Point)
 
 // fix compilarion error: ‘res2’ was not declared in this scope
 %typemap(freearg) const std::list<ModelHighAPI_RefAttr> & {}
@@ -54,9 +55,10 @@
   }
 }
 
-// all supported interfaces (the order is very important: base class first)
+// all supported interfaces (the order is very important according dependencies: base class first)
 %include "SketchAPI_SketchEntity.h"
-%include "SketchAPI_Arc.h"
-%include "SketchAPI_Circle.h"
+%include "SketchAPI_Point.h"
 %include "SketchAPI_Line.h"
+%include "SketchAPI_Circle.h"
+%include "SketchAPI_Arc.h"
 %include "SketchAPI_Sketch.h"

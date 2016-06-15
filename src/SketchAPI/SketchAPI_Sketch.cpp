@@ -34,6 +34,7 @@
 #include "SketchAPI_Arc.h"
 #include "SketchAPI_Circle.h"
 #include "SketchAPI_Line.h"
+#include "SketchAPI_Point.h"
 //--------------------------------------------------------------------------------------
 SketchAPI_Sketch::SketchAPI_Sketch(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
@@ -145,6 +146,30 @@ SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
   // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(SketchAPI_Sketch::ID());
   return SketchPtr(new SketchAPI_Sketch(aFeature, ModelHighAPI_Selection("FACE", theExternalName)));
+}
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<SketchAPI_Point> SketchAPI_Sketch::addPoint(
+    double theX, double theY)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Point::ID());
+  return PointPtr(new SketchAPI_Point(aFeature, theX, theY));
+}
+std::shared_ptr<SketchAPI_Point> SketchAPI_Sketch::addPoint(
+    const std::shared_ptr<GeomAPI_Pnt2d> & thePoint)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Point::ID());
+  return PointPtr(new SketchAPI_Point(aFeature, thePoint));
+}
+std::shared_ptr<SketchAPI_Point> SketchAPI_Sketch::addPoint(const ModelHighAPI_Selection & theExternal)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Point::ID());
+  return PointPtr(new SketchAPI_Point(aFeature, theExternal));
+}
+std::shared_ptr<SketchAPI_Point> SketchAPI_Sketch::addPoint(const std::string & theExternalName)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Point::ID());
+  return PointPtr(new SketchAPI_Point(aFeature, theExternalName));
 }
 
 //--------------------------------------------------------------------------------------
