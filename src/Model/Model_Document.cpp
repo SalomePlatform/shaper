@@ -1047,8 +1047,9 @@ void Model_Document::setCurrentFeatureUp()
     FeaturePtr aPrev = myObjs->nextFeature(aCurrent, true);
     // make the higher level composite as current (sketch becomes disabled if line is enabled)
     if (aPrev.get()) {
-      for(FeaturePtr aComp = ModelAPI_Tools::compositeOwner(aPrev); aComp.get();
-        aComp = ModelAPI_Tools::compositeOwner(aPrev))
+      FeaturePtr aComp = ModelAPI_Tools::compositeOwner(aPrev);
+      // without cycle (issue 1555): otherwise extrusion fuse will be enabled and displayed whaen inside sketch
+      if (aComp.get()) 
           aPrev = aComp;
     }
     // do not flush: it is called only on remove, it will be flushed in the end of transaction
