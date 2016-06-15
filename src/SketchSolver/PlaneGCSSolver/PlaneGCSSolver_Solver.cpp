@@ -70,7 +70,7 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
     for (; aPIt != aParams.end(); ++aPIt)
       if (aParameters.find(*aPIt) != aParameters.end())
         break;
-    if (aPIt == aParams.end()) {
+    if (aPIt == aParams.end() && (*aConstrIt)->getTag() > 0) {
       myConflictingIDs.push_back((*aConstrIt)->getTag());
       myConfCollected = true;
       aResult = GCS::Failed;
@@ -106,7 +106,7 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solveWithoutTangent()
   // Remove tangency which leads to redundant or conflicting constraints
   GCS::VEC_I aConflicting, aRedundant;
   myEquationSystem.getRedundant(aRedundant);
-  size_t aNbRemove = aRedundant.size(); // number of tangent constraints which can be removed
+  size_t aNbRemove = myTangent.size(); // number of tangent constraints which can be removed
   myEquationSystem.getConflicting(aConflicting);
   aRedundant.insert(aRedundant.end(), aConflicting.begin(), aConflicting.end());
 
