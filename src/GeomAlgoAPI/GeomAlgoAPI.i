@@ -4,6 +4,9 @@
   #include "GeomAlgoAPI_swig.h"
 %}
 
+// import other modules
+%import "GeomAPI.i"
+
 // to avoid error on this
 #define GEOMALGOAPI_EXPORT
 
@@ -12,6 +15,24 @@
 %include "std_string.i"
 %include "std_list.i"
 %include "std_shared_ptr.i"
+
+// shared pointers
+%shared_ptr(GeomAlgoAPI_Boolean)
+%shared_ptr(GeomAlgoAPI_Intersection)
+%shared_ptr(GeomAlgoAPI_MakeShape)
+%shared_ptr(GeomAlgoAPI_MakeShapeCustom)
+%shared_ptr(GeomAlgoAPI_MakeShapeList)
+%shared_ptr(GeomAlgoAPI_MakeSweep)
+%shared_ptr(GeomAlgoAPI_PaveFiller)
+%shared_ptr(GeomAlgoAPI_Pipe)
+%shared_ptr(GeomAlgoAPI_Placement)
+%shared_ptr(GeomAlgoAPI_Prism)
+%shared_ptr(GeomAlgoAPI_Revolution)
+%shared_ptr(GeomAlgoAPI_Rotation)
+%shared_ptr(GeomAlgoAPI_Sewing)
+%shared_ptr(GeomAlgoAPI_ShapeBuilder)
+%shared_ptr(GeomAlgoAPI_Translation)
+%shared_ptr(GeomAlgoAPI_Transform)
 
 // all supported interfaces
 %include "GeomAlgoAPI_MakeShape.h"
