@@ -99,7 +99,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
   if (myModified.find(theFeature) != myModified.end()) {
     if (theReason.get()) {
 #ifdef DEB_UPDATE
-      std::cout<<"*** Add already modified "<<theFeature->name()<<std::endl;
+      std::cout<<"*** Add already modified "<<theFeature->name()<<" reason "<<theReason->name()<<std::endl;
 #endif
       myModified[theFeature].insert(theReason);
     }
@@ -119,7 +119,10 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
     }
     myModified[theFeature] = aNewSet;
 #ifdef DEB_UPDATE
-    std::cout<<"*** Add modified "<<theFeature->name()<<std::endl;
+    if (theReason.get())
+      std::cout<<"*** Add modified "<<theFeature->name()<<" reason "<<theReason->name()<<std::endl;
+    else 
+      std::cout<<"*** Add modified "<<theFeature->name()<<std::endl;
 #endif
   } else { // will be updated during the finish of the operation, or when it becomes enabled
     if (theFeature->data()->execState() == ModelAPI_StateDone)
@@ -221,7 +224,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       if (!(*anObjIter)->data()->isValid())
         continue;
 #ifdef DEB_UPDATE
-      std::cout<<">>> in event updated "<<(*anObjIter)->data()->name()<<std::endl;
+      std::cout<<">>> in event updated "<<(*anObjIter)->groupName()<<" "<<(*anObjIter)->data()->name()<<std::endl;
 #endif
       if ((*anObjIter)->groupName() == ModelAPI_ResultParameter::group()) {
         myIsParamUpdated = true;
@@ -331,6 +334,41 @@ void Model_Update::processFeatures(const bool theFlushRedisplay)
   }
 }
 
+// collects all the feautres this feature depends on: reasons
+static void allReasons(FeaturePtr theFeature, std::set<FeaturePtr>& theReasons) {
+  std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > > aDeps;
+  theFeature->data()->referencesToObjects(aDeps);
+  std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > >::iterator
+    anAttrsIter = aDeps.begin();
+  for(; anAttrsIter != aDeps.end(); anAttrsIter++) {
+    if (theFeature->attribute(anAttrsIter->first)->isArgument()) {
+      std::list<std::shared_ptr<ModelAPI_Object> >::iterator aDepIter = anAttrsIter->second.begin();
+      for(; aDepIter != anAttrsIter->second.end(); aDepIter++) {
+        FeaturePtr aDepFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(*aDepIter);
+        if (!aDepFeat.get()) { // so, it depends on the result and process the feature owner of it
+          ResultPtr aDepRes = std::dynamic_pointer_cast<ModelAPI_Result>(*aDepIter);
+          if (aDepRes.get()) {
+            aDepFeat = (*aDepIter)->document()->feature(aDepRes);
+          }
+        }
+        if (aDepFeat.get() && aDepFeat->data()->isValid()) {
+          theReasons.insert(aDepFeat);
+        }
+      }
+    }
+  }
+  if (theFeature->getKind() == "Part") { // part is not depended on its subs directly, but subs must be iterated anyway
+    CompositeFeaturePtr aPart = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
+    int aNum = aPart->numberOfSubs();
+    for(int a = 0; a < aNum; a++) {
+      FeaturePtr aSub = aPart->subFeature(a);
+      if (aSub.get() && aSub->data()->isValid()) {
+        theReasons.insert(aSub);
+      }
+    }
+  }
+}
+
 bool Model_Update::processFeature(FeaturePtr theFeature)
 {
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
@@ -403,68 +441,34 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
 
   bool isReferencedInvalid = false;
   // check all features this feature depended on (recursive call of updateFeature)
-  std::set<std::shared_ptr<ModelAPI_Feature> >& aReasons = myModified[theFeature];
-  if (aReasons.find(theFeature) == aReasons.end()) {
-    // take reasons one by one (they may be added during the feature process (circle by the radius of sketch)
-    std::set<FeaturePtr> aProcessedReasons;
-    FeaturePtr aReason = aReasons.empty() ? FeaturePtr() : *(aReasons.begin());
-    while(aReason.get()) {
-      if (aReason != theFeature && (aReason)->data()->isValid()) {
-        if (processFeature(aReason))
-          aIsModified = true;
-        if (aReason->data()->execState() == ModelAPI_StateInvalidArgument)
-          isReferencedInvalid = true;
-      }
-      // searching for the next not used reason
-      aProcessedReasons.insert(aReason);
-      aReason.reset();
-      std::set<std::shared_ptr<ModelAPI_Feature> >::iterator aReasonIter = aReasons.begin();
-      for(; aReasonIter != aReasons.end(); aReasonIter++) {
-        if (aProcessedReasons.find(*aReasonIter) == aProcessedReasons.end()) {
-          aReason = *aReasonIter;
-          break;
-        }
-      }
-    }
-  } else { // check all features this feature depended on because here which one was modified is unknown
-    std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > > aDeps;
-    theFeature->data()->referencesToObjects(aDeps);
-    std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > >::iterator
-      anAttrsIter = aDeps.begin();
-    for(; anAttrsIter != aDeps.end(); anAttrsIter++) {
-      if (theFeature->attribute(anAttrsIter->first)->isArgument()) {
-        std::list<std::shared_ptr<ModelAPI_Object> >::iterator aDepIter = anAttrsIter->second.begin();
-        for(; aDepIter != anAttrsIter->second.end(); aDepIter++) {
-          FeaturePtr aDepFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(*aDepIter);
-          if (!aDepFeat.get()) { // so, it depends on the result and process the feature owner of it
-            ResultPtr aDepRes = std::dynamic_pointer_cast<ModelAPI_Result>(*aDepIter);
-            if (aDepRes.get()) {
-              aDepFeat = (*aDepIter)->document()->feature(aDepRes);
-            }
-          }
-          if (aDepFeat.get() && aDepFeat->data()->isValid()) {
-            if (processFeature(aDepFeat))
-              aIsModified = true;
-            if (aDepFeat->data()->execState() == ModelAPI_StateInvalidArgument)
-              isReferencedInvalid = true;
-          }
-        }
-      }
-    }
-    if (theFeature->getKind() == "Part") { // part is not depended on its subs directly, but subs must be iterated anyway
-      CompositeFeaturePtr aPart = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
-      int aNum = aPart->numberOfSubs();
-      for(int a = 0; a < aNum; a++) {
-        FeaturePtr aSub = aPart->subFeature(a);
-        if (aSub.get() && aSub->data()->isValid()) {
-          if (processFeature(aSub))
-            aIsModified = true;
-          if (aSub->data()->execState() == ModelAPI_StateInvalidArgument)
-            isReferencedInvalid = true;
-        }
-      }
-    }
+  std::set<FeaturePtr>& aReasons = myModified[theFeature];
+  bool allSubsUsed = aReasons.find(theFeature) == aReasons.end();
+  if (allSubsUsed) { // add all subs in aReasons and temporary remove "theFeature" to avoid processing itself
+    allReasons(theFeature, aReasons);
+    aReasons.erase(theFeature);
   }
+  // take reasons one by one (they may be added during the feature process (circle by the radius of sketch)
+  std::set<FeaturePtr> aProcessedReasons;
+  while(!aReasons.empty()) {
+    FeaturePtr aReason = *(aReasons.begin());
+#ifdef DEB_UPDATE
+    cout<<theFeature->name()<<" process next reason "<<aReason->name()<<endl;
+#endif
+    if (aReason != theFeature && (aReason)->data()->isValid()) {
+      if (processFeature(aReason))
+        aIsModified = true;
+      if (aReason->data()->execState() == ModelAPI_StateInvalidArgument)
+        isReferencedInvalid = true;
+    }
+    // searching for the next not used reason
+    aProcessedReasons.insert(aReason);
+    aReasons.erase(aReason);
+  }
+  // restore the modified reasons: they will be used in the update of arguments
+  if (allSubsUsed) { // restore theFeature in this set
+    aProcessedReasons.insert(theFeature);
+  }
+  myModified[theFeature] = aProcessedReasons;
 
   // do not execute the composite that contains the current
   bool isPostponedMain = false;
