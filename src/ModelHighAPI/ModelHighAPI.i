@@ -108,6 +108,11 @@
   }
 }
 
+%typemap(out) const ModelHighAPI_Selection & {
+  $1_basetype * ptr = new $1_basetype(*$1);
+  $result = SWIG_NewPointerObj( (void*) ptr, $1_descriptor, 1 );
+}
+
 // all supported interfaces
 %include "ModelHighAPI_Double.h"
 %include "ModelHighAPI_Integer.h"
