@@ -2,10 +2,10 @@ import unittest
 import model
 from TestSketcher import SketcherTestCase
 
-class SketcherSetVertical(SketcherTestCase):   
+class SketcherSetVertical(SketcherTestCase):
     def runTest(self):
         line = self.sketch.addLine(0, 0, 1, 1)
-        self.sketch.setVertical(line.result())
+        self.sketch.setVertical(line)
         model.do()
         self.assertEqual(line.startPoint().x(), line.endPoint().x())
 

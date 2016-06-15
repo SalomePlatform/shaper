@@ -5,7 +5,7 @@ from TestSketcher import SketcherTestCase
 class SketcherSetRigid(SketcherTestCase):
     def runTest(self):
         circle = self.sketch.addCircle(0, 10, 20)
-        self.sketch.setRigid(circle.result())
+        self.sketch.setRigid(circle)
         model.do()
         circle.setCenter(0, 0)
         model.do()

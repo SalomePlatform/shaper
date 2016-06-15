@@ -8,9 +8,9 @@ class SketcherSetPerpendicular(SketcherTestCase):
     def runTest(self):
         l1 = self.sketch.addLine(0, 0, 0, 1)
         l2 = self.sketch.addLine(0, 0, 1, 1)
-        self.sketch.setPerpendicular(l1.result(), l2.result())
+        self.sketch.setPerpendicular(l1, l2)
         model.do()
-        
+
         dot_product = (l1.endPoint().x() - l1.startPoint().x()) * \
                       (l2.endPoint().x() - l2.startPoint().x()) + \
                       (l1.endPoint().y() - l1.startPoint().y()) * \
