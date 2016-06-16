@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_Partition.h
   FeaturesAPI_Pipe.h
   FeaturesAPI_Placement.h
+  FeaturesAPI_RemoveSubShapes.h
   FeaturesAPI_Revolution.h
   FeaturesAPI_RevolutionBoolean.h
   FeaturesAPI_Rotation.h
@@ -27,9 +28,10 @@ SET(PROJECT_SOURCES
   FeaturesAPI_Partition.cpp
   FeaturesAPI_Pipe.cpp
   FeaturesAPI_Placement.cpp
-  FeaturesAPI_Rotation.cpp
+  FeaturesAPI_RemoveSubShapes.cpp
   FeaturesAPI_Revolution.cpp
   FeaturesAPI_RevolutionBoolean.cpp
+  FeaturesAPI_Rotation.cpp
   FeaturesAPI_Translation.cpp
 )
 

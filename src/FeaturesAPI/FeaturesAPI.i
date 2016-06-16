@@ -29,6 +29,7 @@
 %shared_ptr(FeaturesAPI_Partition)
 %shared_ptr(FeaturesAPI_Pipe)
 %shared_ptr(FeaturesAPI_Placement)
+%shared_ptr(FeaturesAPI_RemoveSubShapes)
 %shared_ptr(FeaturesAPI_Revolution)
 %shared_ptr(FeaturesAPI_RevolutionBoolean)
 %shared_ptr(FeaturesAPI_RevolutionCut)
@@ -45,6 +46,7 @@
 %include "FeaturesAPI_Partition.h"
 %include "FeaturesAPI_Pipe.h"
 %include "FeaturesAPI_Placement.h"
+%include "FeaturesAPI_RemoveSubShapes.h"
 %include "FeaturesAPI_Revolution.h"
 %include "FeaturesAPI_RevolutionBoolean.h"
 %include "FeaturesAPI_Rotation.h"
