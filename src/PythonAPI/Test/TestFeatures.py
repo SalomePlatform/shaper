@@ -74,7 +74,8 @@ class FeaturesTestCase(FeaturesFixture):
         FeaturesAPI.FeaturesAPI_Translation(self.part.addFeature("Translation"))
         FeaturesAPI.FeaturesAPI_Group(self.part.addFeature("Group"))
 
-        model.parameter.Parameter(self.part.addFeature("Parameter"))
+        import ParametersAPI
+        ParametersAPI.ParametersAPI_Parameter(self.part.addFeature("Parameter"))
 
 #-----------------------------------------------------------------------------
 

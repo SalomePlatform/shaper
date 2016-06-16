@@ -1,0 +1,69 @@
+## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
+INCLUDE(Common)
+
+SET(PROJECT_HEADERS
+  ParametersAPI.h
+  ParametersAPI_Parameter.h
+)
+
+SET(PROJECT_SOURCES
+  ParametersAPI_Parameter.cpp
+)
+
+SET(PROJECT_LIBRARIES
+  ModelAPI
+  ModelHighAPI
+)
+
+INCLUDE_DIRECTORIES(
+  ${PROJECT_SOURCE_DIR}/src/Events
+  ${PROJECT_SOURCE_DIR}/src/ModelAPI
+  ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
+)
+
+# Plugin headers dependency
+INCLUDE_DIRECTORIES(
+  # TODO(spo): modify ParametersPlugin headers to remove dependency on GeomAPI headers
+  ${PROJECT_SOURCE_DIR}/src/GeomAPI
+  # TODO(spo): it is for *_swig.h files. Can we eliminate it?
+  ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
+  ${PROJECT_SOURCE_DIR}/src/ParametersPlugin
+)
+
+#TODO(spo): is ${CAS_DEFINITIONS} necessary?
+ADD_DEFINITIONS(-DCONSTRUCTIONAPI_EXPORTS ${CAS_DEFINITIONS})
+ADD_LIBRARY(ParametersAPI SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
+TARGET_LINK_LIBRARIES(ParametersAPI ${PROJECT_LIBRARIES})
+
+# SWIG wrapper
+
+INCLUDE(PythonAPI)
+
+SET_SOURCE_FILES_PROPERTIES(ParametersAPI.i PROPERTIES CPLUSPLUS ON)
+SET_SOURCE_FILES_PROPERTIES(ParametersAPI.i PROPERTIES SWIG_DEFINITIONS "-shadow")
+
+#TODO(spo): is ModelAPI necessary or it could be received by INTERFACE_ (may require modern CMake)?
+SET(SWIG_LINK_LIBRARIES
+  ParametersAPI
+  ModelHighAPI
+  ModelAPI
+  ${PYTHON_LIBRARIES}
+)
+
+SET(SWIG_MODULE_ParametersAPI_EXTRA_DEPS ${SWIG_MODULE_ParametersAPI_EXTRA_DEPS}
+  ${PROJECT_SOURCE_DIR}/src/ModelHighAPI/ModelHighAPI.i
+  doxyhelp.i
+  ${PROJECT_HEADERS}
+)
+
+SWIG_ADD_MODULE(ParametersAPI python ParametersAPI.i ${PROJECT_HEADERS})
+SWIG_LINK_LIBRARIES(ParametersAPI ${SWIG_LINK_LIBRARIES})
+
+IF(WIN32)
+  SET_TARGET_PROPERTIES(_ParametersAPI PROPERTIES DEBUG_OUTPUT_NAME _ParametersAPI_d)
+ENDIF(WIN32)
+
+INSTALL(TARGETS _ParametersAPI DESTINATION ${SHAPER_INSTALL_SWIG})
+INSTALL(TARGETS ParametersAPI DESTINATION ${SHAPER_INSTALL_BIN})
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/ParametersAPI.py DESTINATION ${SHAPER_INSTALL_SWIG})
