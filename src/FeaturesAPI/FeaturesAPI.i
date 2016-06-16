@@ -25,6 +25,7 @@
 %shared_ptr(FeaturesAPI_ExtrusionCut)
 %shared_ptr(FeaturesAPI_ExtrusionFuse)
 %shared_ptr(FeaturesAPI_Group)
+%shared_ptr(FeaturesAPI_Partition)
 %shared_ptr(FeaturesAPI_Pipe)
 %shared_ptr(FeaturesAPI_Placement)
 %shared_ptr(FeaturesAPI_Revolution)
@@ -39,6 +40,7 @@
 %include "FeaturesAPI_Extrusion.h"
 %include "FeaturesAPI_ExtrusionBoolean.h"
 %include "FeaturesAPI_Group.h"
+%include "FeaturesAPI_Partition.h"
 %include "FeaturesAPI_Pipe.h"
 %include "FeaturesAPI_Placement.h"
 %include "FeaturesAPI_Revolution.h"
