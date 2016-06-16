@@ -83,6 +83,10 @@ void fillAttribute(const std::list<ModelHighAPI_RefAttr> & theValue,
                    const std::shared_ptr<ModelAPI_AttributeRefAttrList> & theAttribute);
 
 MODELHIGHAPI_EXPORT
+void fillAttribute(const std::shared_ptr<ModelAPI_Object> & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeReference> & theAttribute);
+
+MODELHIGHAPI_EXPORT
 void fillAttribute(const std::list<std::shared_ptr<ModelAPI_Object> > & theValue,
                    const std::shared_ptr<ModelAPI_AttributeRefList> & theAttribute);
 

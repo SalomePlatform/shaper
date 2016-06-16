@@ -67,6 +67,14 @@
     return true; \
   }
 
+//--------------------------------------------------------------------------------------
+#define INTERFACE_0(KIND) \
+  public: \
+    INTERFACE_COMMON(KIND) \
+  protected: \
+    START_INIT() \
+    END_INIT() \
+  public:
 
 //--------------------------------------------------------------------------------------
 #define INTERFACE_1(KIND, \
