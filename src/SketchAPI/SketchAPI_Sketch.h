@@ -21,6 +21,7 @@
 class ModelAPI_CompositeFeature;
 class ModelAPI_Object;
 class ModelHighAPI_Double;
+class ModelHighAPI_Integer;
 class ModelHighAPI_RefAttr;
 class ModelHighAPI_Selection;
 class SketchAPI_Arc;
@@ -28,6 +29,7 @@ class SketchAPI_Circle;
 class SketchAPI_Line;
 class SketchAPI_Mirror;
 class SketchAPI_Point;
+class SketchAPI_Translation;
 //--------------------------------------------------------------------------------------
 /**\class SketchAPI_Sketch
  * \ingroup CPPHighAPI
@@ -188,6 +190,15 @@ public:
   std::shared_ptr<SketchAPI_Mirror> addMirror(
       const ModelHighAPI_RefAttr & theMirrorLine,
       const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects);
+
+  /// Add translation
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Translation> addTranslation(
+      const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects,
+      const ModelHighAPI_RefAttr & thePoint1,
+      const ModelHighAPI_RefAttr & thePoint2,
+      const ModelHighAPI_Integer & theNumberOfObjects,
+      bool theFullValue = false);
 
   /// Set angle
   SKETCHAPI_EXPORT

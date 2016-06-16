@@ -17,5 +17,6 @@
   #include "SketchAPI_Sketch.h"
   #include "SketchAPI_SketchEntity.h"
   #include "SketchAPI_Point.h"
+  #include "SketchAPI_Translation.h"
 
 #endif /* SRC_SKETCHAPI_SKETCHAPI_SWIG_H_ */

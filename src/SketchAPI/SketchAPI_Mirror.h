@@ -41,7 +41,7 @@ public:
   INTERFACE_4(SketchPlugin_ConstraintMirror::ID(),
               mirrorLine, SketchPlugin_ConstraintMirror::ENTITY_A(), ModelAPI_AttributeRefAttr, /** Mirror line */,
               mirrorList, SketchPlugin_ConstraintMirror::MIRROR_LIST_ID(), ModelAPI_AttributeRefList, /** Mirror list */,
-              sourceObjects, SketchPlugin_ConstraintMirror::ENTITY_B(), ModelAPI_AttributeRefList, /** Source objects */,
+              referenceObjects, SketchPlugin_ConstraintMirror::ENTITY_B(), ModelAPI_AttributeRefList, /** Reference objects */,
               mirroredObjects, SketchPlugin_ConstraintMirror::ENTITY_C(), ModelAPI_AttributeRefList, /** Mirrored objects */
   )
 

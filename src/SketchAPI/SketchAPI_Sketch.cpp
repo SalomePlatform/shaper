@@ -36,6 +36,7 @@
 #include "SketchAPI_Line.h"
 #include "SketchAPI_Mirror.h"
 #include "SketchAPI_Point.h"
+#include "SketchAPI_Translation.h"
 //--------------------------------------------------------------------------------------
 SketchAPI_Sketch::SketchAPI_Sketch(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
@@ -321,6 +322,18 @@ std::shared_ptr<SketchAPI_Mirror> SketchAPI_Sketch::addMirror(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_ConstraintMirror::ID());
   return MirrorPtr(new SketchAPI_Mirror(aFeature, theMirrorLine, theObjects));
+}
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<SketchAPI_Translation> SketchAPI_Sketch::addTranslation(
+    const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects,
+    const ModelHighAPI_RefAttr & thePoint1,
+    const ModelHighAPI_RefAttr & thePoint2,
+    const ModelHighAPI_Integer & theNumberOfObjects,
+    bool theFullValue)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_MultiTranslation::ID());
+  return TranslationPtr(new SketchAPI_Translation(aFeature, theObjects, thePoint1, thePoint2, theNumberOfObjects, theFullValue));
 }
 
 //--------------------------------------------------------------------------------------
