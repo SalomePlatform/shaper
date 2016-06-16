@@ -13,6 +13,7 @@ SET(PROJECT_HEADERS
   SketchAPI_SketchEntity.h
   SketchAPI_Point.h
   SketchAPI_Projection.h
+  SketchAPI_Rectangle.h
   SketchAPI_Rotation.h
   SketchAPI_Translation.h
 )
@@ -27,6 +28,7 @@ SET(PROJECT_SOURCES
   SketchAPI_SketchEntity.cpp
   SketchAPI_Point.cpp
   SketchAPI_Projection.cpp
+  SketchAPI_Rectangle.cpp
   SketchAPI_Rotation.cpp
   SketchAPI_Translation.cpp
 )

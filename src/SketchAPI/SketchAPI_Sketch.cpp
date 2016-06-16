@@ -38,6 +38,7 @@
 #include "SketchAPI_Mirror.h"
 #include "SketchAPI_Point.h"
 #include "SketchAPI_Projection.h"
+#include "SketchAPI_Rectangle.h"
 #include "SketchAPI_Rotation.h"
 #include "SketchAPI_Translation.h"
 //--------------------------------------------------------------------------------------
@@ -214,6 +215,20 @@ std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(const std::string & th
   // TODO(spo): Add constraint SketchConstraintRigid like in PythonAPI. Is it necessary?
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Line::ID());
   return LinePtr(new SketchAPI_Line(aFeature, theExternalName));
+}
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangle(double theX1, double theY1, double theX2, double theY2)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchAPI_Rectangle::ID());
+  return RectanglePtr(new SketchAPI_Rectangle(aFeature, theX1, theY1, theX2, theY2));
+}
+std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangle(
+    const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
+    const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchAPI_Rectangle::ID());
+  return RectanglePtr(new SketchAPI_Rectangle(aFeature, theStartPoint, theEndPoint));
 }
 
 //--------------------------------------------------------------------------------------

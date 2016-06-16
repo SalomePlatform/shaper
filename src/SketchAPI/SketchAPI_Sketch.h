@@ -31,6 +31,7 @@ class SketchAPI_Line;
 class SketchAPI_Mirror;
 class SketchAPI_Point;
 class SketchAPI_Projection;
+class SketchAPI_Rectangle;
 class SketchAPI_Rotation;
 class SketchAPI_Translation;
 //--------------------------------------------------------------------------------------
@@ -113,6 +114,16 @@ public:
   /// Add line
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Line> addLine(const std::string & theExternalName);
+
+  /// Add rectangle
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Rectangle> addRectangle(
+      double theX1, double theY1, double theX2, double theY2);
+  /// Add rectangle
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Rectangle> addRectangle(
+      const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
+      const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint);
 
   /// Add circle
   SKETCHAPI_EXPORT

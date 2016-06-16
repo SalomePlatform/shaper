@@ -19,6 +19,7 @@
   #include "SketchAPI_SketchEntity.h"
   #include "SketchAPI_Point.h"
   #include "SketchAPI_Projection.h"
+  #include "SketchAPI_Rectangle.h"
   #include "SketchAPI_Rotation.h"
   #include "SketchAPI_Translation.h"
 

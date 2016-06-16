@@ -29,6 +29,7 @@
 %shared_ptr(SketchAPI_SketchEntity)
 %shared_ptr(SketchAPI_Point)
 %shared_ptr(SketchAPI_Projection)
+%shared_ptr(SketchAPI_Rectangle)
 %shared_ptr(SketchAPI_Rotation)
 %shared_ptr(SketchAPI_Translation)
 
@@ -109,5 +110,6 @@
 %include "SketchAPI_Projection.h"
 %include "SketchAPI_Mirror.h"
 %include "SketchAPI_Translation.h"
+%include "SketchAPI_Rectangle.h"
 %include "SketchAPI_Rotation.h"
 %include "SketchAPI_Sketch.h"
