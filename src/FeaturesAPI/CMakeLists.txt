@@ -8,6 +8,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_Extrusion.h
   FeaturesAPI_ExtrusionBoolean.h
   FeaturesAPI_Group.h
+  FeaturesAPI_Pipe.h
   FeaturesAPI_Placement.h
   FeaturesAPI_Revolution.h
   FeaturesAPI_RevolutionBoolean.h
@@ -20,6 +21,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_Extrusion.cpp
   FeaturesAPI_ExtrusionBoolean.cpp
   FeaturesAPI_Group.cpp
+  FeaturesAPI_Pipe.cpp
   FeaturesAPI_Placement.cpp
   FeaturesAPI_Rotation.cpp
   FeaturesAPI_Revolution.cpp

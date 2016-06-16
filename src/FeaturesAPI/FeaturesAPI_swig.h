@@ -14,6 +14,7 @@
   #include "FeaturesAPI_Extrusion.h"
   #include "FeaturesAPI_ExtrusionBoolean.h"
   #include "FeaturesAPI_Group.h"
+  #include "FeaturesAPI_Pipe.h"
   #include "FeaturesAPI_Placement.h"
   #include "FeaturesAPI_Revolution.h"
   #include "FeaturesAPI_RevolutionBoolean.h"
