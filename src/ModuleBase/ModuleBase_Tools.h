@@ -16,6 +16,7 @@
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS_Shape.hxx>
 #include <Prs3d_Drawer.hxx>
+#include <AIS_Shape.hxx>
 
 #include <Quantity_Color.hxx>
 
@@ -310,6 +311,10 @@ void MODULEBASE_EXPORT convertToFeatures(const QObjectPtrList& theObjects, std::
 /// \param theMessage a message which dave to be translated
 /// \param theParams a list of parameters (can be empty)
 void MODULEBASE_EXPORT translate(const std::string& theContext, std::string& theMessage);
+
+/// Set Highlighting of points as a Ball shape
+/// \param theAIS - the presentation
+void MODULEBASE_EXPORT setPointBallHighlighting(AIS_Shape* theAIS);
 
 }
 

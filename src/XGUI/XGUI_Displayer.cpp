@@ -186,6 +186,11 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
           Handle(AIS_InteractiveObject) anAISPrs = myWorkshop->module()->createPresentation(aResult);
           if (anAISPrs.IsNull())
             anAISPrs = new ModuleBase_ResultPrs(aResult);
+          else {
+            Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(anAISPrs);
+            if (!aShapePrs.IsNull())
+              ModuleBase_Tools::setPointBallHighlighting((AIS_Shape*) aShapePrs.Access());
+          }
           anAIS->setImpl(new Handle(AIS_InteractiveObject)(anAISPrs));
           //anAIS->createShape(aShapePtr);
           isShading = true;

@@ -21,6 +21,7 @@
 #include <Prs3d_PointAspect.hxx>
 #include <Prs3d_IsoAspect.hxx>
 #include <TopoDS_Builder.hxx>
+#include <TopoDS.hxx>
 #include <SelectMgr_SequenceOfOwner.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <SelectMgr_SelectionManager.hxx>
@@ -29,6 +30,7 @@
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Selection.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
+#include <Graphic3d_AspectMarker3d.hxx>
 
 IMPLEMENT_STANDARD_HANDLE(ModuleBase_BRepOwner, StdSelect_BRepOwner);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_BRepOwner, StdSelect_BRepOwner);
@@ -57,6 +59,8 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   // Activate individual repaintng if this is a part of compsolid
   ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(myResult);
   SetAutoHilight(aCompSolid.get() == NULL);
+
+  ModuleBase_Tools::setPointBallHighlighting(this);
 }
 
 void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,

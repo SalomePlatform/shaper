@@ -41,6 +41,9 @@
 #include <Config_PropManager.h>
 #include <Config_Translator.h>
 
+#include <Prs3d_PointAspect.hxx>
+#include <Graphic3d_AspectMarker3d.hxx>
+
 #include <QWidget>
 #include <QLayout>
 #include <QPainter>
@@ -1147,6 +1150,17 @@ void translate(const std::string& theContext, std::string& theMessage)
       std::string aCodec = Config_Translator::codec(theContext);
       theMessage = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aStr.c_str()).toStdString();
     }
+  }
+}
+
+void setPointBallHighlighting(AIS_Shape* theAIS)
+{
+  Handle(Prs3d_Drawer) aDrawer = theAIS->HilightAttributes();
+  if (aDrawer->HasOwnPointAspect()) {
+    Handle(Prs3d_PointAspect) aPntAspect = aDrawer->PointAspect();
+    aPntAspect->Aspect()->SetType(Aspect_TOM_BALL);
+    aDrawer->SetPointAspect(aPntAspect);
+    theAIS->SetHilightAttributes(aDrawer);
   }
 }
 

@@ -32,6 +32,7 @@
 #include <StdSelect_BRepSelectionTool.hxx>
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Prs3d_LineAspect.hxx>
+#include <Graphic3d_AspectMarker3d.hxx>
 
 #define DEBUG_WIRE
 
@@ -61,6 +62,8 @@ PartSet_ResultSketchPrs::PartSet_ResultSketchPrs(ResultPtr theResult)
   // Activate individual repaintng if this is a part of compsolid
   ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(myResult);
   SetAutoHilight(aCompSolid.get() == NULL);
+
+  ModuleBase_Tools::setPointBallHighlighting(this);
 }
 
 void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
