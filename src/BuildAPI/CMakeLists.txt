@@ -4,10 +4,12 @@ INCLUDE(Common)
 
 SET(PROJECT_HEADERS
   BuildAPI.h
+  BuildAPI_Edge.h
   BuildAPI_Vertex.h
 )
 
 SET(PROJECT_SOURCES
+  BuildAPI_Edge.cpp
   BuildAPI_Vertex.cpp
 )
 

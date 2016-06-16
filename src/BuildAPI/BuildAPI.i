@@ -19,7 +19,9 @@
 %include "std_shared_ptr.i"
 
 // shared pointers
+%shared_ptr(BuildAPI_Edge)
 %shared_ptr(BuildAPI_Vertex)
 
 // all supported interfaces
+%include "BuildAPI_Edge.h"
 %include "BuildAPI_Vertex.h"

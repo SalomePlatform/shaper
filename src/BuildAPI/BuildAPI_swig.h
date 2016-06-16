@@ -9,6 +9,7 @@
 
   #include <ModelHighAPI_swig.h>
 
+  #include "BuildAPI_Edge.h"
   #include "BuildAPI_Vertex.h"
 
 #endif // FeaturesAPI_swig_H_
