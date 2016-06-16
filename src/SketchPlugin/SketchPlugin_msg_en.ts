@@ -17,7 +17,7 @@
     <name>SketchCircle</name>
     <message>
       <source>CircleRadius - GeomValidators_Positive: Double is not positive.</source>
-      <translation>Radius value is not defined</translation>
+      <translation>Radius value is not positive</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "CircleCenter" is not initialized.</source>
@@ -85,19 +85,19 @@
     <name>SketchConstraintRadius</name>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation>Circle is nopt selected</translation>
+      <translation>Circle is not selected</translation>
     </message>
     <message>
       <source>Attribute "ConstraintFlyoutValuePnt" is locked by modification value in the viewer.</source>
-      <translation></translation>
+      <translation>Flyout value point is not clicked in the viewer</translation>
     </message>
     <message>
       <source>ConstraintEntityA - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
+      <translation>Object is not selected</translation>
     </message>
     <message>
       <source>ConstraintValue - GeomValidators_Positive: Double is not initialized.</source>
-      <translation></translation>
+      <translation>Radius value is not positive</translation>
     </message>
   </context>
   
@@ -141,7 +141,7 @@
     </message>
     <message>
       <source>Attribute "EndPoint" is not initialized.</source>
-      <translation></translation>
+      <translation>End point is not selected</translation>
     </message>
   </context>
   
@@ -177,11 +177,11 @@
     <name>SketchArc</name>
     <message>
       <source>ArcRadius - GeomValidators_Positive: Double is not initialized.</source>
-      <translation>Radius is not defined</translation>
+      <translation>Radius value is not positive</translation>
     </message>
     <message>
       <source>ArcTangentPoint - SketchPlugin_ArcTangentPoint: The attribute ArcTangentPoint should be a point</source>
-      <translation></translation>
+      <translation>Arc tangent point is not selected</translation>
     </message>
     <message>
       <source>Attribute "ArcCenter" is locked by modification value in the viewer.</source>
@@ -277,19 +277,15 @@
     <name>SketchConstraintAngle</name>
     <message>
       <source>Attribute "ConstraintFlyoutValuePnt" is locked by modification value in the viewer.</source>
-      <translation></translation>
+      <translation>Flyout value point is not clicked in the viewer</translation>
     </message>
     <message>
       <source>ConstraintEntityA - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
+      <translation>First object is not selected</translation>
     </message>
     <message>
       <source>ConstraintEntityB - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
-    </message>
-    <message>
-      <source>Model_FeatureValidator: Attribute "AngleReversedLine1" is not initialized.</source>
-      <translation></translation>
+      <translation>Second object is not selected</translation>
     </message>
   </context>
 
@@ -297,19 +293,19 @@
     <name>SketchConstraintCoincidence</name>
     <message>
       <source>ConstraintEntityA - PartSet_DifferentObjects: The feature uses one  object in ConstraintEntityA and ConstraintEntityB attributes.</source>
-      <translation></translation>
+      <translation>Diferent objects should be selected</translation>
     </message>
     <message>
       <source>ConstraintEntityB - PartSet_DifferentObjects: The feature uses one  object in ConstraintEntityB and ConstraintEntityA attributes.</source>
-      <translation></translation>
+      <translation>Diferent objects should be selected</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation></translation>
+      <translation>First object is not selected</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityB" is not initialized.</source>
-      <translation></translation>
+      <translation>Second object is not selected</translation>
     </message>
   </context>
 
@@ -317,27 +313,27 @@
     <name>SketchConstraintDistance</name>
     <message>
       <source>Attribute "ConstraintFlyoutValuePnt" is locked by modification value in the viewer.</source>
-      <translation></translation>
+      <translation>Flyout value point is not clicked in the viewer</translation>
     </message>
     <message>
       <source>ConstraintEntityA - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
+      <translation>First object is not selected</translation>
     </message>
     <message>
       <source>ConstraintEntityB - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
+      <translation>Second object is not selected</translation>
     </message>
     <message>
       <source>ConstraintValue - GeomValidators_Positive: Double is not initialized.</source>
-      <translation></translation>
+      <translation>Distance value is not positive</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation></translation>
+      <translation>First object is not selected</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityB" is not initialized.</source>
-      <translation></translation>
+      <translation>Second object is not selected</translation>
     </message>
   </context>
 
@@ -345,23 +341,23 @@
     <name>SketchConstraintEqual</name>
     <message>
       <source>ConstraintEntityA - PartSet_DifferentObjects: The feature uses one  object in ConstraintEntityA and ConstraintEntityB attributes.</source>
-      <translation></translation>
+      <translation>Diferent objects should be selected</translation>
     </message>
     <message>
       <source>ConstraintEntityB - PartSet_DifferentObjects: The feature uses one  object in ConstraintEntityB and ConstraintEntityA attributes.</source>
-      <translation></translation>
+      <translation>Diferent objects should be selected</translation>
     </message>
     <message>
       <source>ConstraintEntityB - SketchPlugin_EqualAttr: An empty object is used.</source>
-      <translation></translation>
+      <translation>An empty object is used</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation></translation>
+      <translation>First object is not selected</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityB" is not initialized.</source>
-      <translation></translation>
+      <translation>Second object is not selected</translation>
     </message>
   </context>
 
@@ -369,19 +365,19 @@
     <name>SketchConstraintLength</name>
     <message>
       <source>Attribute "ConstraintFlyoutValuePnt" is locked by modification value in the viewer.</source>
-      <translation></translation>
+      <translation>Flyout value point is not clicked in the viewer</translation>
     </message>
     <message>
       <source>ConstraintEntityA - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
+      <translation>Object is not selected</translation>
     </message>
     <message>
       <source>ConstraintValue - GeomValidators_Positive: Double is not initialized.</source>
-      <translation></translation>
+      <translation>Length value is not positive</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation></translation>
+      <translation>Line is not selected</translation>
     </message>
   </context>
 
@@ -389,23 +385,23 @@
     <name>SketchConstraintMiddle</name>
     <message>
       <source>ConstraintEntityA - PartSet_DifferentObjects: The feature uses one  object in ConstraintEntityA and ConstraintEntityB attributes.</source>
-      <translation></translation>
+      <translation>Diferent objects should be selected</translation>
     </message>
     <message>
       <source>ConstraintEntityB - PartSet_DifferentObjects: The feature uses one  object in ConstraintEntityB and ConstraintEntityA attributes.</source>
-      <translation></translation>
+      <translation>Diferent objects should be selected</translation>
     </message>
     <message>
       <source>ConstraintEntityB - SketchPlugin_MiddlePointAttr: Middle point constraint allows points and lines only</source>
-      <translation></translation>
+      <translation>Not point or line is selected</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation></translation>
+      <translation>First object is not selected</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityB" is not initialized.</source>
-      <translation></translation>
+      <translation>Second object is not selected</translation>
     </message>
   </context>
 
@@ -413,19 +409,19 @@
     <name>SketchConstraintParallel</name>
     <message>
       <source>ConstraintEntityA - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
+      <translation>First object is not selected</translation>
     </message>
     <message>
       <source>ConstraintEntityB - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
+      <translation>Second object is not selected</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation></translation>
+      <translation>First line is not selected</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityB" is not initialized.</source>
-      <translation></translation>
+      <translation>Second line is not selected</translation>
     </message>
   </context>
 
@@ -433,11 +429,11 @@
     <name>SketchConstraintRigid</name>
     <message>
       <source>ConstraintEntityA - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
+      <translation>Object is not selected</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation></translation>
+      <translation>Object is not selected</translation>
     </message>
   </context>
 
@@ -445,23 +441,23 @@
     <name>SketchConstraintTangent</name>
     <message>
       <source>ConstraintEntityA - PartSet_DifferentObjects: The feature uses one  object in ConstraintEntityA and ConstraintEntityB attributes.</source>
-      <translation></translation>
+      <translation>Diferent objects should be selected</translation>
     </message>
     <message>
       <source>ConstraintEntityB - PartSet_DifferentObjects: The feature uses one  object in ConstraintEntityB and ConstraintEntityA attributes.</source>
-      <translation></translation>
+      <translation>Diferent objects should be selected</translation>
     </message>
     <message>
       <source>ConstraintEntityB - SketchPlugin_TangentAttr: It uses an empty object</source>
-      <translation></translation>
+      <translation>Selection is not valid</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation></translation>
+      <translation>First object is not selected</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityB" is not initialized.</source>
-      <translation></translation>
+      <translation>Second object is not selected</translation>
     </message>
   </context>
 </TS>
