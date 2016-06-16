@@ -63,23 +63,11 @@ public:
 
   /// Add parameter for message string of double type
   /// \param theParam the parameter
-  void addParameter(double theParam) 
-  { 
-    char aBuf[50];
-    int n = sprintf(aBuf, "%g", theParam);
-    std::string aStr(aBuf);
-    myParameters.push_back(aStr); 
-  }
+  EVENTS_EXPORT void addParameter(double theParam);
 
   /// Add parameter for message string of integer type
   /// \param theParam the parameter
-  void addParameter(int theParam) 
-  { 
-    char aBuf[50];
-    int n = sprintf(aBuf, "%d", theParam);
-    std::string aStr(aBuf);
-    myParameters.push_back(aStr); 
-  }
+  EVENTS_EXPORT void addParameter(int theParam);
 
   /// Returns list of parameters
   std::list<std::string> parameters() const { return myParameters; }
@@ -96,10 +84,8 @@ public:
   /// \param theParam the parameter
   Events_InfoMessage& arg(double theParam) { addParameter(theParam); return *this; }
 
-  void send() { 
-    std::shared_ptr<Events_Message> aMsg(new Events_InfoMessage(*this));
-    Events_Loop::loop()->send(aMsg); 
-  }
+  /// Send the message
+  EVENTS_EXPORT void send();
 
 private:
 

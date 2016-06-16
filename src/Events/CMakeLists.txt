@@ -21,6 +21,7 @@ SET(PROJECT_SOURCES
     Events_Listener.cpp
     Events_Loop.cpp
     Events_LongOp.cpp
+	Events_InfoMessage.cpp
 )
 
 ADD_DEFINITIONS(-DEVENTS_EXPORTS)
