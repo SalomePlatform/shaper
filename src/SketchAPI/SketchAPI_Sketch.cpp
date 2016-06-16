@@ -34,6 +34,7 @@
 #include "SketchAPI_Arc.h"
 #include "SketchAPI_Circle.h"
 #include "SketchAPI_Line.h"
+#include "SketchAPI_Mirror.h"
 #include "SketchAPI_Point.h"
 //--------------------------------------------------------------------------------------
 SketchAPI_Sketch::SketchAPI_Sketch(
@@ -311,6 +312,15 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const std::string & theE
   // TODO(spo): Add constraint SketchConstraintRigid like in PythonAPI. Is it necessary?
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Arc::ID());
   return ArcPtr(new SketchAPI_Arc(aFeature, theExternalName));
+}
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<SketchAPI_Mirror> SketchAPI_Sketch::addMirror(
+    const ModelHighAPI_RefAttr & theMirrorLine,
+    const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_ConstraintMirror::ID());
+  return MirrorPtr(new SketchAPI_Mirror(aFeature, theMirrorLine, theObjects));
 }
 
 //--------------------------------------------------------------------------------------

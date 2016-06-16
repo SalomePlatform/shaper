@@ -19,12 +19,14 @@
 #include <ModelHighAPI_Macro.h>
 //--------------------------------------------------------------------------------------
 class ModelAPI_CompositeFeature;
+class ModelAPI_Object;
 class ModelHighAPI_Double;
 class ModelHighAPI_RefAttr;
 class ModelHighAPI_Selection;
 class SketchAPI_Arc;
 class SketchAPI_Circle;
 class SketchAPI_Line;
+class SketchAPI_Mirror;
 class SketchAPI_Point;
 //--------------------------------------------------------------------------------------
 /**\class SketchAPI_Sketch
@@ -181,6 +183,12 @@ public:
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Arc> addArc(const std::string & theExternalName);
 
+  /// Add mirror
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Mirror> addMirror(
+      const ModelHighAPI_RefAttr & theMirrorLine,
+      const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects);
+
   /// Set angle
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelAPI_Feature> setAngle(
@@ -235,8 +243,6 @@ public:
   std::shared_ptr<ModelAPI_Feature> setMiddlePoint(
       const ModelHighAPI_RefAttr & thePoint,
       const ModelHighAPI_RefAttr & theLine);
-
-  // TODO(spo): setMirror
 
   /// Set parallel
   SKETCHAPI_EXPORT

@@ -55,6 +55,11 @@ std::list<ModelHighAPI_Selection> ModelHighAPI_Interface::result() const
   return aSelectionList;
 }
 
+std::shared_ptr<ModelAPI_Result> ModelHighAPI_Interface::defaultResult() const
+{
+  return feature()->lastResult();
+}
+
 void ModelHighAPI_Interface::throwException(const std::string & theDescription)
 {
   Events_Error::send(theDescription);

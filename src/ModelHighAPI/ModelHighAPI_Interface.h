@@ -15,6 +15,7 @@
 #include <string>
 //--------------------------------------------------------------------------------------
 class ModelAPI_Feature;
+class ModelAPI_Result;
 class ModelHighAPI_Selection;
 //--------------------------------------------------------------------------------------
 /**\class ModelHighAPI_Interface
@@ -43,9 +44,14 @@ public:
   MODELHIGHAPI_EXPORT
   void execute();
 
+  // TODO(spo): rename to selectAll()
   /// Return all objects of the feature
   MODELHIGHAPI_EXPORT
   virtual std::list<ModelHighAPI_Selection> result() const;
+
+  /// Return default result. Default implementation feature()->lastResult()
+  MODELHIGHAPI_EXPORT
+  virtual std::shared_ptr<ModelAPI_Result> defaultResult() const;
 
   /// Throw exception to event loop
   MODELHIGHAPI_EXPORT

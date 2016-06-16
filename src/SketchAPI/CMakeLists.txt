@@ -7,6 +7,7 @@ SET(PROJECT_HEADERS
   SketchAPI_Arc.h
   SketchAPI_Circle.h
   SketchAPI_Line.h
+  SketchAPI_Mirror.h
   SketchAPI_Sketch.h
   SketchAPI_SketchEntity.h
   SketchAPI_Point.h
@@ -16,6 +17,7 @@ SET(PROJECT_SOURCES
   SketchAPI_Arc.cpp
   SketchAPI_Circle.cpp
   SketchAPI_Line.cpp
+  SketchAPI_Mirror.cpp
   SketchAPI_Sketch.cpp
   SketchAPI_SketchEntity.cpp
   SketchAPI_Point.cpp
