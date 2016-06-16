@@ -5,12 +5,14 @@ INCLUDE(Common)
 SET(PROJECT_HEADERS
   BuildAPI.h
   BuildAPI_Edge.h
+  BuildAPI_Face.h
   BuildAPI_Vertex.h
   BuildAPI_Wire.h
 )
 
 SET(PROJECT_SOURCES
   BuildAPI_Edge.cpp
+  BuildAPI_Face.cpp
   BuildAPI_Vertex.cpp
   BuildAPI_Wire.cpp
 )
