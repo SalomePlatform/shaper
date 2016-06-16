@@ -11,12 +11,22 @@
 #include <fstream>
 #include <ostream>
 
+/**
+ * \class Config_TSReader
+ * \ingroup Config
+ * \brief Class for reading translations from TS files (an XML format).
+ */
 class Config_TSReader : public Config_XMLReader
 {
 public:
+  /// Constructor
+  /// \param theTSFile name of TS file
   Config_TSReader(const std::string& theTSFile) : Config_XMLReader(theTSFile) {}
 
+  /// Returns content of TS file
   const Config_Translator::Translator& translator() const { return myTranslator; }
+
+  /// Returns codecs defined in TS files
   const Config_Translator::Dictionary& codecs() const { return myCodecs; }
 
 protected:
@@ -131,7 +141,8 @@ std::string Config_Translator::translate(const std::string& theContext,
       if (theParams.size() > 0) {
         aTranslation = insertParameters(aTranslation, theParams);
       }
-      return aTranslation;
+      if (aTranslation.size() > 0)
+        return aTranslation;
     }
   }
   std::string aMsg = theMessage;
