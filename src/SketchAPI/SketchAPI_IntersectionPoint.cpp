@@ -2,7 +2,7 @@
 // Purpose: 
 //
 // History:
-// 15/06/16 - Sergey POKHODENKO - Creation of the file
+// 16/06/16 - Sergey POKHODENKO - Creation of the file
 
 //--------------------------------------------------------------------------------------
 #include "SketchAPI_IntersectionPoint.h"

@@ -26,6 +26,7 @@ class ModelHighAPI_RefAttr;
 class ModelHighAPI_Selection;
 class SketchAPI_Arc;
 class SketchAPI_Circle;
+class SketchAPI_IntersectionPoint;
 class SketchAPI_Line;
 class SketchAPI_Mirror;
 class SketchAPI_Point;
@@ -88,6 +89,13 @@ public:
   /// Add point
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Point> addPoint(const std::string & theExternalName);
+
+  /// Add intersection point
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_IntersectionPoint> addIntersectionPoint(const ModelHighAPI_Selection & theExternal);
+  /// Add point
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_IntersectionPoint> addIntersectionPoint(const std::string & theExternalName);
 
   /// Add line
   SKETCHAPI_EXPORT

@@ -2,7 +2,7 @@
 // Purpose: 
 //
 // History:
-// 15/06/16 - Sergey POKHODENKO - Creation of the file
+// 16/06/16 - Sergey POKHODENKO - Creation of the file
 
 #ifndef SRC_SKETCHAPI_SKETCHAPI_INTERSECTIONPOINT_H_
 #define SRC_SKETCHAPI_SKETCHAPI_INTERSECTIONPOINT_H_

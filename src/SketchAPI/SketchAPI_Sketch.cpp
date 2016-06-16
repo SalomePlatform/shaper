@@ -33,6 +33,7 @@
 //--------------------------------------------------------------------------------------
 #include "SketchAPI_Arc.h"
 #include "SketchAPI_Circle.h"
+#include "SketchAPI_IntersectionPoint.h"
 #include "SketchAPI_Line.h"
 #include "SketchAPI_Mirror.h"
 #include "SketchAPI_Point.h"
@@ -173,6 +174,20 @@ std::shared_ptr<SketchAPI_Point> SketchAPI_Sketch::addPoint(const std::string & 
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Point::ID());
   return PointPtr(new SketchAPI_Point(aFeature, theExternalName));
+}
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<SketchAPI_IntersectionPoint> SketchAPI_Sketch::addIntersectionPoint(
+    const ModelHighAPI_Selection & theExternal)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_IntersectionPoint::ID());
+  return IntersectionPointPtr(new SketchAPI_IntersectionPoint(aFeature, theExternal));
+}
+std::shared_ptr<SketchAPI_IntersectionPoint> SketchAPI_Sketch::addIntersectionPoint(
+    const std::string & theExternalName)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_IntersectionPoint::ID());
+  return IntersectionPointPtr(new SketchAPI_IntersectionPoint(aFeature, theExternalName));
 }
 
 //--------------------------------------------------------------------------------------
