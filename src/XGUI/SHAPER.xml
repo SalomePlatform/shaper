@@ -14,6 +14,7 @@
     <parameter name="face-selection" value="true" />
     <parameter name="edge-selection" value="true" />
     <parameter name="vertex-selection" value="true" />
+    <parameter name="point-selection-sensitivity" value="20" />
   </section>
   <section name="Menu" >
     <!-- Menu bar preferences -->

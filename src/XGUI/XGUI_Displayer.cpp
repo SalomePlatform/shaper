@@ -26,10 +26,13 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_Preferences.h>
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_IPresentable.h>
 #include <GeomAPI_ICustomPrs.h>
+
+#include <SUIT_ResourceMgr.h>
 
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_LocalContext.hxx>
@@ -240,15 +243,6 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
 
     emit objectDisplayed(theObject, theAIS);
     activate(anAISIO, myActiveSelectionModes, theUpdateViewer);
-    // the fix from VPA for more suitable selection of sketcher lines
-    if(anAISIO->Width() > 1) {
-      for(int aModeIdx = 0; aModeIdx < myActiveSelectionModes.length(); ++aModeIdx) {
-        int aMode = myActiveSelectionModes.value(aModeIdx);
-        double aPrecision = (aMode == getSelectionMode(TopAbs_VERTEX))? 20 : 
-                                                    (anAISIO->Width() + 2);
-        aContext->SetSelectionSensitivity(anAISIO, aMode, aPrecision);
-      }
-    }
   } 
   if (theUpdateViewer)
     updateViewer();
@@ -587,13 +581,6 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
     if (activate(anAISIO, myActiveSelectionModes, false))
       isActivationChanged = true;
   }
-  if (!aTrihedron.IsNull()) {
-    foreach(int aMode, myActiveSelectionModes)
-      aContext->SetSelectionSensitivity(aTrihedron, aMode, 20);
-  }
-  // VSV It seems that there is no necessity to update viewer on activation
-  //if (theUpdateViewer && isActivationChanged)
-  //  updateViewer();
 }
 
 bool XGUI_Displayer::isActive(ObjectPtr theObject) const
@@ -909,6 +896,12 @@ void XGUI_Displayer::activateAIS(const Handle(AIS_InteractiveObject)& theIO,
       aContext->Activate(theIO, theMode, false);
     } else
       aContext->Activate(theIO, theMode, false);
+
+    // the fix from VPA for more suitable selection of sketcher lines
+    double aPrecision = theIO->Width() + 2;
+    if (theMode == getSelectionMode(TopAbs_VERTEX)) 
+      aPrecision = ModuleBase_Preferences::resourceMgr()->doubleValue("Viewer", "point-selection-sensitivity", 20);
+    aContext->SetSelectionSensitivity(theIO, theMode, aPrecision);
 
     ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::activateAIS -- Activate");
 

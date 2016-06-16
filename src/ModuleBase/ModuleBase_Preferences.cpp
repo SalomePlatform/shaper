@@ -239,7 +239,7 @@ ModuleBase_PreferencesDlg::ModuleBase_PreferencesDlg(SUIT_ResourceMgr* theResurc
   createEditors();
 
   myPreferences->retrieve();
-  setMinimumSize(800, 200);
+  setMinimumSize(800, 220);
 }
 
 ModuleBase_PreferencesDlg::~ModuleBase_PreferencesDlg()
@@ -302,6 +302,9 @@ void ModuleBase_PreferencesDlg::createViewerPage(int thePageId)
   myPreferences->addItem(tr("Vertices"), otherGroup, 
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "vertex-selection");
+
+  myPreferences->addItem(tr("Vertex selection sensitivity"), otherGroup, SUIT_PreferenceMgr::Double,
+                         ModuleBase_Preferences::VIEWER_SECTION, "point-selection-sensitivity");
 }
 
 void ModuleBase_PreferencesDlg::createMenuPage(int thePageId)
