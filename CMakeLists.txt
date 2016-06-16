@@ -96,6 +96,7 @@ ADD_SUBDIRECTORY (src/PythonAddons)
 ADD_SUBDIRECTORY (src/PythonAPI)
 # High Level C++/Python API
 ADD_SUBDIRECTORY (src/ModelHighAPI)
+ADD_SUBDIRECTORY (src/BuildAPI)
 ADD_SUBDIRECTORY (src/ConnectorAPI)
 ADD_SUBDIRECTORY (src/ConstructionAPI)
 ADD_SUBDIRECTORY (src/ExchangeAPI)
