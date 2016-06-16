@@ -4,7 +4,8 @@
   <multi_selector id="group_list"
     tooltip="Select a set of objects"
     type_choice="Vertices Edges Faces Solids"
-    use_choice="true">
+    use_choice="true"
+    clear_in_neutral_point="false">
     <validator id="GeomValidators_BodyShapes"/>
   </multi_selector>
 </source>
