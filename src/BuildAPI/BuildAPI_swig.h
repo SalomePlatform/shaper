@@ -11,6 +11,7 @@
 
   #include "BuildAPI_Edge.h"
   #include "BuildAPI_Face.h"
+  #include "BuildAPI_Shell.h"
   #include "BuildAPI_Vertex.h"
   #include "BuildAPI_Wire.h"
 
