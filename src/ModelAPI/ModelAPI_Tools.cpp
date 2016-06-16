@@ -19,7 +19,28 @@
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
 
+#define RECURSE_TOP_LEVEL 50
+
 //#define DEBUG_REMOVE_FEATURES
+//#define DEBUG_REMOVE_FEATURES_RECURSE
+//#define DEBUG_CYCLING_1550
+
+#ifdef DEBUG_REMOVE_FEATURES_RECURSE
+#include <sstream>
+std::string getFeatureInfo(FeaturePtr theFeature)
+{
+  if (!theFeature.get())
+    return "";
+  //std::ostringstream aPtrStr;
+  //aPtrStr << "[" << theFeature.get() << "] ";
+  std::string aFeatureInfo = /*aPtrStr.str() + */theFeature->name();
+  CompositeFeaturePtr aComposite = ModelAPI_Tools::compositeOwner(theFeature);
+  if (aComposite.get()) {
+      aFeatureInfo = aFeatureInfo + "[in " + aComposite->name() + "]";
+  }
+  return aFeatureInfo;
+}
+#endif
 
 #ifdef DEBUG_REMOVE_FEATURES
 void printMapInfo(const std::map<FeaturePtr, std::set<FeaturePtr> >& theMainList,
@@ -42,7 +63,7 @@ void printMapInfo(const std::map<FeaturePtr, std::set<FeaturePtr> >& theMainList
       anInfo = anInfo + aMainListFeature->name().c_str() + ": " + aRefsInfo + "\n";
     }
   }
-  std::cout << thePrefix.c_str() << ": " << anInfo.c_str() << std::endl;
+  std::cout << thePrefix.c_str() << " [feature: references to]: \n" << anInfo.c_str() << std::endl;
 }
 
 void printListInfo(const std::set<FeaturePtr>& theMainList,
@@ -435,19 +456,41 @@ bool removeFeatures(const std::set<FeaturePtr>& theFeatures,
 // \param theReferences an out container of references
 void addRefsToFeature(const FeaturePtr& theFeature,
                       const std::map<FeaturePtr, std::set<FeaturePtr> >& theReferencesMap,
+                      std::map<FeaturePtr, std::set<FeaturePtr> >& theProcessedReferences,
+                      int theRecLevel,
                       std::set<FeaturePtr>& theReferences)
 {
+  if (theRecLevel > RECURSE_TOP_LEVEL)
+    return;
+  theRecLevel++;
+
+  // if the feature is already processed, get the ready references from the map
+  if (theProcessedReferences.find(theFeature) != theProcessedReferences.end()) {
+    std::set<FeaturePtr> aReferences = theProcessedReferences.at(theFeature);
+    theReferences.insert(aReferences.begin(), aReferences.end());
+    return;
+  }
+
   if (theReferencesMap.find(theFeature) == theReferencesMap.end())
     return; // this feature is not in the selection list, so exists without references to it
   std::set<FeaturePtr> aMainReferences = theReferencesMap.at(theFeature);
 
   std::set<FeaturePtr>::const_iterator anIt = aMainReferences.begin(),
                                        aLast = aMainReferences.end();
+#ifdef DEBUG_REMOVE_FEATURES_RECURSE
+  std::string aSpacing;
+  for (int i = 0; i < theRecLevel; i++)
+    aSpacing.append(" ");
+#endif
+
   for (; anIt != aLast; anIt++) {
     FeaturePtr aRefFeature = *anIt;
+#ifdef DEBUG_REMOVE_FEATURES_RECURSE
+  std::cout << aSpacing << " Ref: " << getFeatureInfo(aRefFeature) << std::endl;
+#endif
     if (theReferences.find(aRefFeature) == theReferences.end())
       theReferences.insert(aRefFeature);
-    addRefsToFeature(aRefFeature, theReferencesMap, theReferences);
+    addRefsToFeature(aRefFeature, theReferencesMap, theProcessedReferences, theRecLevel, theReferences);
   }
 }
 
@@ -458,8 +501,11 @@ void addRefsToFeature(const FeaturePtr& theFeature,
 // \param theReferences an out container of references
 void findReferences(const std::set<FeaturePtr>& theFeatures,
                     std::map<FeaturePtr, std::set<FeaturePtr> >& theReferences,
-                    const bool theUseComposite, const bool theUseRecursion)
+                    const bool theUseComposite, const bool theUseRecursion, int theRecLevel)
 {
+  if (theRecLevel > RECURSE_TOP_LEVEL)
+    return;
+  theRecLevel++;
   std::set<FeaturePtr>::const_iterator anIt = theFeatures.begin(),
                                         aLast = theFeatures.end();
   for (; anIt != aLast; anIt++) {
@@ -484,8 +530,14 @@ void findReferences(const std::set<FeaturePtr>& theFeatures,
         }
         theReferences[aFeature] = aFilteredFeatures;
       }
-      if (theUseRecursion)
-        findReferences(theReferences[aFeature], theReferences, theUseComposite, theUseRecursion);
+      if (theUseRecursion) {
+#ifdef DEBUG_CYCLING_1550
+        findReferences(aSelRefFeatures, theReferences, theUseComposite, theUseRecursion, theRecLevel);
+#else
+        findReferences(theReferences[aFeature], theReferences, theUseComposite, theUseRecursion,
+                       theRecLevel);
+#endif
+      }
     }
   }
 }
@@ -505,7 +557,8 @@ void findAllReferences(const std::set<FeaturePtr>& theFeatures,
   // Information: bool_1 is not selected, ext_2(bool_2) exists
   // find all referenced features
   std::map<FeaturePtr, std::set<FeaturePtr> > aMainList;
-  findReferences(theFeatures, aMainList, theUseComposite, theUseRecursion);
+  int aRecLevel = 0;
+  findReferences(theFeatures, aMainList, theUseComposite, theUseRecursion, aRecLevel);
 
 #ifdef DEBUG_REMOVE_FEATURES
   printMapInfo(aMainList, "firstDependencies");
@@ -521,18 +574,35 @@ void findAllReferences(const std::set<FeaturePtr>& theFeatures,
                                                               aMainLast = aMainList.end();
   for (; aMainIt != aMainLast; aMainIt++) {
     FeaturePtr aMainListFeature = aMainIt->first;
+
     //std::string aName = aMainListFeature->name();
     std::set<FeaturePtr> aMainRefList = aMainIt->second;
-    std::set<FeaturePtr> anAddRefFeatures;
 
+#ifdef DEBUG_REMOVE_FEATURES_RECURSE
+    char aBuf[50];
+    int n = sprintf(aBuf, "%d", aMainRefList.size());
+    std::string aSize(aBuf);
+    std::cout << "_findAllReferences for the Feature: " << getFeatureInfo(aMainListFeature)
+              << ", references size = " << aSize << std::endl;
+#endif
     std::set<FeaturePtr>::const_iterator anIt = aMainRefList.begin(),
                                          aLast = aMainRefList.end();
+    std::set<FeaturePtr> aResultRefList;
+    aResultRefList.insert(aMainRefList.begin(), aMainRefList.end());
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = *anIt;
-      addRefsToFeature(aFeature, aMainList, aMainRefList);
+      int aRecLevel = 0;
+#ifdef DEBUG_REMOVE_FEATURES_RECURSE
+      std::cout << " Ref: " << getFeatureInfo(aFeature) << std::endl;
+#endif
+      aRecLevel++;
+      addRefsToFeature(aFeature, aMainList, theReferences, aRecLevel, aResultRefList/*aMainRefList*/);
     }
-    theReferences[aMainListFeature] = aMainRefList;
+    theReferences[aMainListFeature] = aResultRefList;
   }
+#ifdef DEBUG_REMOVE_FEATURES_RECURSE
+    std::cout << std::endl;
+#endif
 
 #ifdef DEBUG_REMOVE_FEATURES
   printMapInfo(theReferences, "allDependencies");
