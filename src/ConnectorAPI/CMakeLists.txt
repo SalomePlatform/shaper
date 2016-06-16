@@ -1,0 +1,69 @@
+## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
+INCLUDE(Common)
+
+SET(PROJECT_HEADERS
+  ConnectorAPI.h
+  ConnectorAPI_Connector.h
+)
+
+SET(PROJECT_SOURCES
+  ConnectorAPI_Connector.cpp
+)
+
+SET(PROJECT_LIBRARIES
+  ModelAPI
+  ModelHighAPI
+)
+
+INCLUDE_DIRECTORIES(
+  ${PROJECT_SOURCE_DIR}/src/Events
+  ${PROJECT_SOURCE_DIR}/src/ModelAPI
+  ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
+)
+
+# Plugin headers dependency
+INCLUDE_DIRECTORIES(
+  # TODO(spo): modify ConnectorPlugin headers to remove dependency on GeomAPI headers
+  ${PROJECT_SOURCE_DIR}/src/GeomAPI
+  # TODO(spo): it is for *_swig.h files. Can we eliminate it?
+  ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
+  ${PROJECT_SOURCE_DIR}/src/ConnectorPlugin
+)
+
+#TODO(spo): is ${CAS_DEFINITIONS} necessary?
+ADD_DEFINITIONS(-DCONSTRUCTIONAPI_EXPORTS ${CAS_DEFINITIONS})
+ADD_LIBRARY(ConnectorAPI SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
+TARGET_LINK_LIBRARIES(ConnectorAPI ${PROJECT_LIBRARIES})
+
+# SWIG wrapper
+
+INCLUDE(PythonAPI)
+
+SET_SOURCE_FILES_PROPERTIES(ConnectorAPI.i PROPERTIES CPLUSPLUS ON)
+SET_SOURCE_FILES_PROPERTIES(ConnectorAPI.i PROPERTIES SWIG_DEFINITIONS "-shadow")
+
+#TODO(spo): is ModelAPI necessary or it could be received by INTERFACE_ (may require modern CMake)?
+SET(SWIG_LINK_LIBRARIES
+  ConnectorAPI
+  ModelHighAPI
+  ModelAPI
+  ${PYTHON_LIBRARIES}
+)
+
+SET(SWIG_MODULE_ConnectorAPI_EXTRA_DEPS ${SWIG_MODULE_ConnectorAPI_EXTRA_DEPS}
+  ${PROJECT_SOURCE_DIR}/src/ModelHighAPI/ModelHighAPI.i
+  doxyhelp.i
+  ${PROJECT_HEADERS}
+)
+
+SWIG_ADD_MODULE(ConnectorAPI python ConnectorAPI.i ${PROJECT_HEADERS})
+SWIG_LINK_LIBRARIES(ConnectorAPI ${SWIG_LINK_LIBRARIES})
+
+IF(WIN32)
+  SET_TARGET_PROPERTIES(_ConnectorAPI PROPERTIES DEBUG_OUTPUT_NAME _ConnectorAPI_d)
+ENDIF(WIN32)
+
+INSTALL(TARGETS _ConnectorAPI DESTINATION ${SHAPER_INSTALL_SWIG})
+INSTALL(TARGETS ConnectorAPI DESTINATION ${SHAPER_INSTALL_BIN})
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/ConnectorAPI.py DESTINATION ${SHAPER_INSTALL_SWIG})
