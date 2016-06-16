@@ -57,7 +57,7 @@ public:
   virtual ~FeaturesAPI_Revolution();
 
   INTERFACE_10(FeaturesPlugin_Revolution::ID(),
-               baseObjects, FeaturesPlugin_CompositeSketch::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */,
+               baseObjects, FeaturesPlugin_Revolution::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */,
                axis, FeaturesPlugin_Revolution::AXIS_OBJECT_ID(), ModelAPI_AttributeSelection, /** Axis */,
                creationMethod, FeaturesPlugin_Revolution::CREATION_METHOD(), ModelAPI_AttributeString, /** Creation method */,
                toAngle, FeaturesPlugin_Revolution::TO_ANGLE_ID(), ModelAPI_AttributeDouble, /** To angle */,
@@ -66,7 +66,7 @@ public:
                toOffset, FeaturesPlugin_Revolution::TO_OFFSET_ID(), ModelAPI_AttributeDouble, /** To offset */,
                fromObject, FeaturesPlugin_Revolution::FROM_OBJECT_ID(), ModelAPI_AttributeSelection, /** From object */,
                fromOffset, FeaturesPlugin_Revolution::FROM_OFFSET_ID(), ModelAPI_AttributeDouble, /** From offset */,
-               sketchLauncher, FeaturesPlugin_CompositeSketch::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */)
+               sketchLauncher, FeaturesPlugin_Revolution::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */)
 
   /// Modify base attribute of the feature.
   FEATURESAPI_EXPORT

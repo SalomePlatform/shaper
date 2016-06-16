@@ -21,6 +21,9 @@
 // shared pointers
 %shared_ptr(FeaturesAPI_Boolean)
 %shared_ptr(FeaturesAPI_Extrusion)
+%shared_ptr(FeaturesAPI_ExtrusionBoolean)
+%shared_ptr(FeaturesAPI_ExtrusionCut)
+%shared_ptr(FeaturesAPI_ExtrusionFuse)
 %shared_ptr(FeaturesAPI_Group)
 %shared_ptr(FeaturesAPI_Placement)
 %shared_ptr(FeaturesAPI_Revolution)
@@ -30,6 +33,7 @@
 // all supported interfaces
 %include "FeaturesAPI_Boolean.h"
 %include "FeaturesAPI_Extrusion.h"
+%include "FeaturesAPI_ExtrusionBoolean.h"
 %include "FeaturesAPI_Group.h"
 %include "FeaturesAPI_Placement.h"
 %include "FeaturesAPI_Revolution.h"

@@ -78,7 +78,7 @@ public:
   virtual ~FeaturesAPI_Extrusion();
 
   INTERFACE_10(FeaturesPlugin_Extrusion::ID(),
-               baseObjects, FeaturesPlugin_CompositeSketch::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */,
+               baseObjects, FeaturesPlugin_Extrusion::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */,
                creationMethod, FeaturesPlugin_Extrusion::CREATION_METHOD(), ModelAPI_AttributeString, /** Creation method */,
                toSize, FeaturesPlugin_Extrusion::TO_SIZE_ID(), ModelAPI_AttributeDouble, /** To size */,
                fromSize, FeaturesPlugin_Extrusion::FROM_SIZE_ID(), ModelAPI_AttributeDouble, /** From size */,
@@ -87,7 +87,7 @@ public:
                fromObject, FeaturesPlugin_Extrusion::FROM_OBJECT_ID(), ModelAPI_AttributeSelection, /** From object */,
                fromOffset, FeaturesPlugin_Extrusion::FROM_OFFSET_ID(), ModelAPI_AttributeDouble, /** From offset */,
                direction, FeaturesPlugin_Extrusion::DIRECTION_OBJECT_ID(), ModelAPI_AttributeSelection, /** Direction */,
-               sketchLauncher, FeaturesPlugin_CompositeSketch::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */)
+               sketchLauncher, FeaturesPlugin_Extrusion::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */)
 
   /// Modify base attribute of the feature.
   FEATURESAPI_EXPORT

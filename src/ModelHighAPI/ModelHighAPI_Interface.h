@@ -13,6 +13,7 @@
 #include <list>
 #include <memory>
 #include <string>
+#include <iostream>
 //--------------------------------------------------------------------------------------
 class ModelAPI_Feature;
 class ModelAPI_Result;

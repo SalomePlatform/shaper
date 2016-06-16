@@ -64,8 +64,8 @@ class FeaturesTestCase(FeaturesFixture):
         import FeaturesAPI
         FeaturesAPI.FeaturesAPI_Boolean(self.part.addFeature("Boolean"))
         FeaturesAPI.FeaturesAPI_Extrusion(self.part.addFeature("Extrusion"))
-        # model.features.extrusion_boolean.ExtrusionBoolean(self.part.addFeature("ExtrusionCut"))
-        # model.features.extrusion_boolean.ExtrusionBoolean(self.part.addFeature("ExtrusionFuse"))
+        FeaturesAPI.FeaturesAPI_ExtrusionCut(self.part.addFeature("ExtrusionCut"))
+        FeaturesAPI.FeaturesAPI_ExtrusionFuse(self.part.addFeature("ExtrusionFuse"))
         FeaturesAPI.FeaturesAPI_Revolution(self.part.addFeature("Revolution"))
         # model.features.revolution_boolean.RevolutionBoolean(self.part.addFeature("RevolutionCut"))
         # model.features.revolution_boolean.RevolutionBoolean(self.part.addFeature("RevolutionFuse"))
