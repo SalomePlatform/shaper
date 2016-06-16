@@ -85,7 +85,7 @@ void BuildPlugin_Wire::execute()
 //=================================================================================================
 bool BuildPlugin_Wire::customAction(const std::string& theActionId)
 {
-  if(theActionId == "add_contour") {
+  if(theActionId == ADD_CONTOUR_ACTION_ID()) {
     return addContour();
   } else {
     std::string aMsg = "Error: Feature \"%1\" does not support action \"%2\".";

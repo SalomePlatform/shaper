@@ -34,6 +34,13 @@ public:
     return MY_BASE_OBJECTS_ID;
   }
 
+  /// Attribute name of base objects.
+  inline static const std::string& ADD_CONTOUR_ACTION_ID()
+  {
+    static const std::string MY_ADD_CONTOUR_ACTION_ID("add_contour");
+    return MY_ADD_CONTOUR_ACTION_ID;
+  }
+
   /// \return the kind of a feature.
   BUILDPLUGIN_EXPORT virtual const std::string& getKind()
   {

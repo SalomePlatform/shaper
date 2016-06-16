@@ -11,5 +11,6 @@
 
   #include "BuildAPI_Edge.h"
   #include "BuildAPI_Vertex.h"
+  #include "BuildAPI_Wire.h"
 
 #endif // FeaturesAPI_swig_H_
