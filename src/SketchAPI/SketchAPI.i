@@ -28,6 +28,7 @@
 %shared_ptr(SketchAPI_Sketch)
 %shared_ptr(SketchAPI_SketchEntity)
 %shared_ptr(SketchAPI_Point)
+%shared_ptr(SketchAPI_Projection)
 %shared_ptr(SketchAPI_Rotation)
 %shared_ptr(SketchAPI_Translation)
 
@@ -105,6 +106,7 @@
 %include "SketchAPI_Line.h"
 %include "SketchAPI_Circle.h"
 %include "SketchAPI_Arc.h"
+%include "SketchAPI_Projection.h"
 %include "SketchAPI_Mirror.h"
 %include "SketchAPI_Translation.h"
 %include "SketchAPI_Rotation.h"

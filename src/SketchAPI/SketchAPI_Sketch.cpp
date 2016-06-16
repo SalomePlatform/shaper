@@ -37,6 +37,7 @@
 #include "SketchAPI_Line.h"
 #include "SketchAPI_Mirror.h"
 #include "SketchAPI_Point.h"
+#include "SketchAPI_Projection.h"
 #include "SketchAPI_Rotation.h"
 #include "SketchAPI_Translation.h"
 //--------------------------------------------------------------------------------------
@@ -329,6 +330,14 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const std::string & theE
   // TODO(spo): Add constraint SketchConstraintRigid like in PythonAPI. Is it necessary?
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Arc::ID());
   return ArcPtr(new SketchAPI_Arc(aFeature, theExternalName));
+}
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
+    const ModelHighAPI_Selection & theExternalFeature)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Projection::ID());
+  return ProjectionPtr(new SketchAPI_Projection(aFeature, theExternalFeature));
 }
 
 //--------------------------------------------------------------------------------------

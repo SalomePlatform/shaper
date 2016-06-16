@@ -30,6 +30,7 @@ class SketchAPI_IntersectionPoint;
 class SketchAPI_Line;
 class SketchAPI_Mirror;
 class SketchAPI_Point;
+class SketchAPI_Projection;
 class SketchAPI_Rotation;
 class SketchAPI_Translation;
 //--------------------------------------------------------------------------------------
@@ -193,6 +194,11 @@ public:
   /// Add arc
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Arc> addArc(const std::string & theExternalName);
+
+  /// Add projection
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Projection> addProjection(
+      const ModelHighAPI_Selection & theExternalFeature);
 
   /// Add mirror
   SKETCHAPI_EXPORT
