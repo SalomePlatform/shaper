@@ -6,6 +6,7 @@ SET(PROJECT_HEADERS
   SketchAPI.h
   SketchAPI_Arc.h
   SketchAPI_Circle.h
+  SketchAPI_IntersectionPoint.h
   SketchAPI_Line.h
   SketchAPI_Mirror.h
   SketchAPI_Sketch.h
@@ -18,6 +19,7 @@ SET(PROJECT_HEADERS
 SET(PROJECT_SOURCES
   SketchAPI_Arc.cpp
   SketchAPI_Circle.cpp
+  SketchAPI_IntersectionPoint.cpp
   SketchAPI_Line.cpp
   SketchAPI_Mirror.cpp
   SketchAPI_Sketch.cpp

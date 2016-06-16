@@ -22,6 +22,7 @@
 // shared pointers
 %shared_ptr(SketchAPI_Arc)
 %shared_ptr(SketchAPI_Circle)
+%shared_ptr(SketchAPI_IntersectionPoint)
 %shared_ptr(SketchAPI_Line)
 %shared_ptr(SketchAPI_Mirror)
 %shared_ptr(SketchAPI_Sketch)
@@ -100,6 +101,7 @@
 // all supported interfaces (the order is very important according dependencies: base class first)
 %include "SketchAPI_SketchEntity.h"
 %include "SketchAPI_Point.h"
+%include "SketchAPI_IntersectionPoint.h"
 %include "SketchAPI_Line.h"
 %include "SketchAPI_Circle.h"
 %include "SketchAPI_Arc.h"
