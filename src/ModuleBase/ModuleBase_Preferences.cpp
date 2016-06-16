@@ -239,7 +239,7 @@ ModuleBase_PreferencesDlg::ModuleBase_PreferencesDlg(SUIT_ResourceMgr* theResurc
   createEditors();
 
   myPreferences->retrieve();
-  setMinimumSize(800, 220);
+  setMinimumSize(800, 240);
 }
 
 ModuleBase_PreferencesDlg::~ModuleBase_PreferencesDlg()
@@ -291,20 +291,24 @@ void ModuleBase_PreferencesDlg::createViewerPage(int thePageId)
   myPreferences->setItemProperty("image_formats", aImgFiles, bgId);
 
   // Create other parameters group in viewer tab
-  int otherGroup = myPreferences->addItem(tr("Default selection"), viewTab);
-  myPreferences->setItemProperty("columns", 3, otherGroup);
-  myPreferences->addItem(tr("Faces"), otherGroup, 
+  int selectionGroup = myPreferences->addItem(tr("Default selection"), viewTab);
+  myPreferences->setItemProperty("columns", 3, selectionGroup);
+  myPreferences->addItem(tr("Faces"), selectionGroup, 
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "face-selection");
-  myPreferences->addItem(tr("Edges"), otherGroup, 
+  myPreferences->addItem(tr("Edges"), selectionGroup, 
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "edge-selection");
-  myPreferences->addItem(tr("Vertices"), otherGroup, 
+  myPreferences->addItem(tr("Vertices"), selectionGroup, 
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "vertex-selection");
 
-  myPreferences->addItem(tr("Vertex selection sensitivity"), otherGroup, SUIT_PreferenceMgr::Double,
+  int sensitivityGroup = myPreferences->addItem(tr("Selection sensitivity"), viewTab);
+  myPreferences->setItemProperty("columns", 2, sensitivityGroup);
+  myPreferences->addItem(tr("Vertex"), sensitivityGroup, SUIT_PreferenceMgr::Double,
                          ModuleBase_Preferences::VIEWER_SECTION, "point-selection-sensitivity");
+  myPreferences->addItem(tr("Edge"), sensitivityGroup, SUIT_PreferenceMgr::Double,
+                         ModuleBase_Preferences::VIEWER_SECTION, "edge-selection-sensitivity");
 }
 
 void ModuleBase_PreferencesDlg::createMenuPage(int thePageId)
