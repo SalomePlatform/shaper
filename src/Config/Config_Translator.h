@@ -48,7 +48,7 @@ public:
 
   /**
   * Returns translation from the given data.
-  * If transdlation is not exists then it returns a string 
+  * If translation is not exists then it returns a string 
   * from the info data without translation
   * \param theContext context of the message (Feature Id)
   * \param theMessage a message which dave to be translated

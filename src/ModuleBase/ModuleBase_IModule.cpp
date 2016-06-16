@@ -23,7 +23,6 @@
 #include <Config_PointerMessage.h>
 #include <Config_WidgetReader.h>
 #include <Config_ModuleReader.h>
-#include <Config_Translator.h>
 
 #include <QAction>
 #include <QMainWindow>
@@ -31,7 +30,6 @@
 #include <QLayout>
 #include <QDialogButtonBox>
 #include <QPushButton>
-#include <QTextCodec>
 
 ModuleBase_IModule::ModuleBase_IModule(ModuleBase_IWorkshop* theParent)
   : QObject(theParent), myWorkshop(theParent) 
@@ -108,13 +106,10 @@ bool ModuleBase_IModule::canBeShaded(Handle(AIS_InteractiveObject) theAIS) const
 
 QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
 {
-  QString aMsg = ModelAPI_Tools::getFeatureError(theFeature).c_str();
-  if (!aMsg.isEmpty()) {
-    std::string aStr = Config_Translator::translate(theFeature->getKind(), aMsg.toStdString());
-    std::string aCodec = Config_Translator::codec(theFeature->getKind());
-    aMsg = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aStr.c_str());
-  }
-  return aMsg;
+  std::string aMsg = ModelAPI_Tools::getFeatureError(theFeature);
+  ModuleBase_Tools::translate(theFeature->getKind(), aMsg);
+
+  return aMsg.c_str();
 }
 
 void ModuleBase_IModule::grantedOperationIds(ModuleBase_Operation* theOperation,

@@ -102,6 +102,7 @@ bool ModuleBase_OperationFeature::isValid() const
     return true;
 
   std::string anError = ModelAPI_Tools::getFeatureError(myFeature);
+  ModuleBase_Tools::translate(myFeature->getKind(), anError);
   return anError.empty();
 }
 

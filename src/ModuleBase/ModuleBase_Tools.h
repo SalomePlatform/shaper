@@ -302,6 +302,15 @@ bool MODULEBASE_EXPORT askToDelete(const std::set<FeaturePtr> aFeatures,
 /// \param theFeatures an out conteiner of features
 void MODULEBASE_EXPORT convertToFeatures(const QObjectPtrList& theObjects, std::set<FeaturePtr>& theFeatures);
 
+
+/// Returns translation from the given data.
+/// If translation is not exists then it returns a string 
+/// from the info data without translation
+/// \param theContext context of the message (Feature Id)
+/// \param theMessage a message which dave to be translated
+/// \param theParams a list of parameters (can be empty)
+void MODULEBASE_EXPORT translate(const std::string& theContext, std::string& theMessage);
+
 }
 
 #endif

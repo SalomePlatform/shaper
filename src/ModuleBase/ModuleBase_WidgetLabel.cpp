@@ -55,6 +55,7 @@ bool ModuleBase_WidgetLabel::restoreValueCustom()
     if (aStrAttr.get()) {
       aMsg = aStrAttr->value();
     }
+    ModuleBase_Tools::translate(myFeature->getKind(), aMsg);
     myLabel->setText(aMsg.c_str());
   }
   return true;

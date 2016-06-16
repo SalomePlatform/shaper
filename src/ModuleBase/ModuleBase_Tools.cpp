@@ -39,6 +39,7 @@
 #include <GeomAPI_ShapeExplorer.h>
 
 #include <Config_PropManager.h>
+#include <Config_Translator.h>
 
 #include <QWidget>
 #include <QLayout>
@@ -50,6 +51,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QAction>
+#include <QTextCodec>
 
 #include <sstream>
 #include <string>
@@ -1134,6 +1136,17 @@ void convertToFeatures(const QObjectPtrList& theObjects, std::set<FeaturePtr>& t
       aFeature = ModelAPI_Feature::feature(anObject);
     }
     theFeatures.insert(aFeature);
+  }
+}
+
+void translate(const std::string& theContext, std::string& theMessage)
+{
+  if (!theMessage.empty()) {
+    std::string aStr = Config_Translator::translate(theContext, theMessage);
+    if (!aStr.empty()) {
+      std::string aCodec = Config_Translator::codec(theContext);
+      theMessage = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aStr.c_str()).toStdString();
+    }
   }
 }
 
