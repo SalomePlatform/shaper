@@ -115,17 +115,14 @@ public:
 class MODELAPI_EXPORT ModelAPI_OrderUpdatedMessage : public Events_Message
 {
 protected:
-  /// Creates an empty message
+  /// Creates a message: 
   ModelAPI_OrderUpdatedMessage(const Events_ID theID, const void* theSender = 0);
   /// The virtual destructor
   virtual ~ModelAPI_OrderUpdatedMessage();
 
 public:
   /// Returns the document that has been updated
-  virtual std::shared_ptr<ModelAPI_Document> document() const = 0;
-
-  /// Returns the groups where the objects were reordered
-  virtual const std::string& group() const = 0;
+  virtual std::shared_ptr<ModelAPI_Feature> reordered() = 0;
 
   /// Returns the identifier of the kind of a message
   virtual const Events_ID messageId() = 0;
@@ -142,8 +139,7 @@ public:
   virtual void sendDeleted(const std::shared_ptr<ModelAPI_Document>& theDoc,
                            const std::string& theGroup) const = 0;
   /// creates reordered message and sends to the loop
-  virtual void sendReordered(const std::shared_ptr<ModelAPI_Document>& theDoc,
-                             const std::string& theGroup) const = 0;
+  virtual void sendReordered(const std::shared_ptr<ModelAPI_Feature>& theReordered) const = 0;
 
   /// returns the creator instance
   static const ModelAPI_EventCreator* get();

@@ -56,6 +56,8 @@ Model_Update::Model_Update()
   aLoop->registerListener(this, kPreviewBlockedEvent);
   static const Events_ID kPreviewRequestedEvent = aLoop->eventByName(EVENT_PREVIEW_REQUESTED);
   aLoop->registerListener(this, kPreviewRequestedEvent);
+  static const Events_ID kReorderEvent = aLoop->eventByName(EVENT_ORDER_UPDATED);
+  aLoop->registerListener(this, kReorderEvent);
 
   //  Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
   myIsParamUpdated = false;
@@ -182,6 +184,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   static const Events_ID kStabilityEvent = aLoop->eventByName(EVENT_STABILITY_CHANGED);
   static const Events_ID kPreviewBlockedEvent = aLoop->eventByName(EVENT_PREVIEW_BLOCKED);
   static const Events_ID kPreviewRequestedEvent = aLoop->eventByName(EVENT_PREVIEW_REQUESTED);
+  static const Events_ID kReorderEvent = aLoop->eventByName(EVENT_ORDER_UPDATED);
 
 #ifdef DEB_UPDATE
   std::cout<<"****** Event "<<theMessage->eventID().eventText()<<std::endl;
@@ -298,6 +301,10 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     // in the end of transaction everything is updated, so clear the old objects
     myIsParamUpdated = false;
     myWaitForFinish.clear();
+  } else if (theMessage->eventID() == kReorderEvent) {
+    std::shared_ptr<ModelAPI_OrderUpdatedMessage> aMsg = 
+      std::dynamic_pointer_cast<ModelAPI_OrderUpdatedMessage>(theMessage);
+    addModified(aMsg->reordered(), aMsg->reordered()); // to update all attributes
   }
 }
 

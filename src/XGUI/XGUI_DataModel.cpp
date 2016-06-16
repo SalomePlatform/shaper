@@ -255,8 +255,8 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_ORDER_UPDATED)) {
     std::shared_ptr<ModelAPI_OrderUpdatedMessage> aUpdMsg =
         std::dynamic_pointer_cast<ModelAPI_OrderUpdatedMessage>(theMessage);
-    DocumentPtr aDoc = aUpdMsg->document();
-    std::string aGroup = aUpdMsg->group();
+    DocumentPtr aDoc = aUpdMsg->reordered()->document();
+    std::string aGroup = aUpdMsg->reordered()->group();
 
     QModelIndex aParent;
     int aStartId = 0;

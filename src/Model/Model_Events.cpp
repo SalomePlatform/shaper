@@ -27,11 +27,10 @@ void Model_EventCreator::sendDeleted(const std::shared_ptr<ModelAPI_Document>& t
   Events_Loop::loop()->send(aMsg, true);
 }
 
-void Model_EventCreator::sendReordered(const std::shared_ptr<ModelAPI_Document>& theDoc,
-                                       const std::string& theGroup) const
+void Model_EventCreator::sendReordered(const std::shared_ptr<ModelAPI_Feature>& theReordered) const
 {
   std::shared_ptr<Model_OrderUpdatedMessage> aMsg(
-    new Model_OrderUpdatedMessage(theDoc, theGroup));
+    new Model_OrderUpdatedMessage(theReordered));
   Events_Loop::loop()->send(aMsg, true);
 }
 
@@ -105,9 +104,9 @@ void Model_ObjectDeletedMessage::Join(const std::shared_ptr<Events_MessageGroup>
 
 /////////////////////// REORDERED MESSAGE /////////////////////////////
 Model_OrderUpdatedMessage::Model_OrderUpdatedMessage(
-    const std::shared_ptr<ModelAPI_Document>& theDoc, const std::string& theGroup)
-    : ModelAPI_OrderUpdatedMessage(messageId(), 0),
-      myDoc(theDoc), myGroup(theGroup)
+    FeaturePtr theReordered, const void* theSender)
+    : ModelAPI_OrderUpdatedMessage(messageId(), theSender),
+    myReordered(theReordered)
 {
 }
 

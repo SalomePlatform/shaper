@@ -35,7 +35,7 @@ ModelAPI_ObjectDeletedMessage::~ModelAPI_ObjectDeletedMessage()
 }
 
 ModelAPI_OrderUpdatedMessage::ModelAPI_OrderUpdatedMessage(const Events_ID theID,
-                                                             const void* theSender)
+                                                           const void* theSender)
     : Events_Message(theID, theSender)
 {
 

@@ -24,8 +24,7 @@ class Model_EventCreator : public ModelAPI_EventCreator
                            const std::string& theGroup) const;
 
   /// creates reordered message and sends to the loop
-  virtual void sendReordered(const std::shared_ptr<ModelAPI_Document>& theDoc,
-                             const std::string& theGroup) const;
+  virtual void sendReordered(const std::shared_ptr<ModelAPI_Feature>& theReordered) const;
 
   /// must be one per application, the constructor for internal usage only
   Model_EventCreator();
@@ -90,25 +89,18 @@ class Model_ObjectDeletedMessage : public ModelAPI_ObjectDeletedMessage
 /// Message that feature was deleted (used for Object Browser update)
 class Model_OrderUpdatedMessage : public ModelAPI_OrderUpdatedMessage
 {
-  std::shared_ptr<ModelAPI_Document> myDoc;  ///< document owner of the feature
-  std::string myGroup;  ///< group identifier that contained the deleted feature
+  std::shared_ptr<ModelAPI_Feature> myReordered;  ///< the feature that was moved
 
   /// Use ModelAPI for creation of this event.
-  Model_OrderUpdatedMessage(const std::shared_ptr<ModelAPI_Document>& theDoc,
-                             const std::string& theGroup);
+  Model_OrderUpdatedMessage(FeaturePtr theReordered,
+                            const void* theSender = 0);
 
   friend class Model_EventCreator;
  public:
   /// Returns the document that has been updated
-  virtual std::shared_ptr<ModelAPI_Document> document() const
+  virtual std::shared_ptr<ModelAPI_Feature> reordered()
   {
-    return myDoc;
-  }
-
-  /// Returns the group where the objects were reordered
-  virtual const std::string& group() const
-  {
-    return myGroup;
+    return myReordered;
   }
 
   /// Returns the identifier of this message

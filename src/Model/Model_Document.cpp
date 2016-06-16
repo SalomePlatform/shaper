@@ -831,11 +831,36 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
   myObjs->removeFeature(theFeature);
 }
 
+// recursive function to check if theSub is a child of theMain composite feature
+// through all the hierarchy of parents
+static bool isSub(const CompositeFeaturePtr theMain, const FeaturePtr theSub) {
+  CompositeFeaturePtr aParent = ModelAPI_Tools::compositeOwner(theSub);
+  if (!aParent.get())
+    return false;
+  if (aParent == theMain)
+    return true;
+  return isSub(theMain, aParent);
+}
+
+
 void Model_Document::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
 {
   bool aCurrentUp = theMoved == currentFeature(false);
   if (aCurrentUp) {
     setCurrentFeatureUp();
+  }
+  // if user adds after high-level feature with nested, add it after all nested (otherwise the nested will be disabled)
+  CompositeFeaturePtr aCompositeAfter = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theAfterThis);
+  if (aCompositeAfter.get()) {
+    FeaturePtr aSub = aCompositeAfter;
+    do {
+      FeaturePtr aNext = myObjs->nextFeature(aSub);
+      if (!isSub(aCompositeAfter, aNext)) {
+        theAfterThis = aSub;
+        break;
+      }
+      aSub = aNext;
+    } while (aSub.get());
   }
 
   myObjs->moveFeature(theMoved, theAfterThis);
@@ -919,17 +944,6 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature(const bool theV
     return aResult;
   }
   return std::shared_ptr<ModelAPI_Feature>(); // null feature means the higher than first
-}
-
-// recursive function to check if theSub is a child of theMain composite feature
-// through all the hierarchy of parents
-static bool isSub(const CompositeFeaturePtr theMain, const FeaturePtr theSub) {
-  CompositeFeaturePtr aParent = ModelAPI_Tools::compositeOwner(theSub);
-  if (!aParent.get())
-    return false;
-  if (aParent == theMain)
-    return true;
-  return isSub(theMain, aParent);
 }
 
 void Model_Document::setCurrentFeature(
