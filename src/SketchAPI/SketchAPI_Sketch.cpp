@@ -36,6 +36,7 @@
 #include "SketchAPI_Line.h"
 #include "SketchAPI_Mirror.h"
 #include "SketchAPI_Point.h"
+#include "SketchAPI_Rotation.h"
 #include "SketchAPI_Translation.h"
 //--------------------------------------------------------------------------------------
 SketchAPI_Sketch::SketchAPI_Sketch(
@@ -334,6 +335,18 @@ std::shared_ptr<SketchAPI_Translation> SketchAPI_Sketch::addTranslation(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_MultiTranslation::ID());
   return TranslationPtr(new SketchAPI_Translation(aFeature, theObjects, thePoint1, thePoint2, theNumberOfObjects, theFullValue));
+}
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<SketchAPI_Rotation> SketchAPI_Sketch::addRotation(
+    const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects,
+    const ModelHighAPI_RefAttr & theCenter,
+    const ModelHighAPI_Double & theAngle,
+    const ModelHighAPI_Integer & theNumberOfObjects,
+    bool theFullValue)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_MultiRotation::ID());
+  return RotationPtr(new SketchAPI_Rotation(aFeature, theObjects, theCenter, theAngle, theNumberOfObjects, theFullValue));
 }
 
 //--------------------------------------------------------------------------------------

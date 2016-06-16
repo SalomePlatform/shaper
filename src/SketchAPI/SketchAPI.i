@@ -27,6 +27,7 @@
 %shared_ptr(SketchAPI_Sketch)
 %shared_ptr(SketchAPI_SketchEntity)
 %shared_ptr(SketchAPI_Point)
+%shared_ptr(SketchAPI_Rotation)
 %shared_ptr(SketchAPI_Translation)
 
 // TODO(spo): move typemaps into ModelHighAPI package
@@ -104,4 +105,5 @@
 %include "SketchAPI_Arc.h"
 %include "SketchAPI_Mirror.h"
 %include "SketchAPI_Translation.h"
+%include "SketchAPI_Rotation.h"
 %include "SketchAPI_Sketch.h"

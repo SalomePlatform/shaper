@@ -29,6 +29,7 @@ class SketchAPI_Circle;
 class SketchAPI_Line;
 class SketchAPI_Mirror;
 class SketchAPI_Point;
+class SketchAPI_Rotation;
 class SketchAPI_Translation;
 //--------------------------------------------------------------------------------------
 /**\class SketchAPI_Sketch
@@ -200,6 +201,15 @@ public:
       const ModelHighAPI_Integer & theNumberOfObjects,
       bool theFullValue = false);
 
+  /// Add rotation
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Rotation> addRotation(
+      const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects,
+      const ModelHighAPI_RefAttr & theCenter,
+      const ModelHighAPI_Double & theAngle,
+      const ModelHighAPI_Integer & theNumberOfObjects,
+      bool theFullValue = false);
+
   /// Set angle
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelAPI_Feature> setAngle(
@@ -289,7 +299,7 @@ public:
   std::shared_ptr<ModelAPI_Feature> setVertical(
       const ModelHighAPI_RefAttr & theLine);
 
-  // TODO(spo): addRectagle, projection, Translation, Rotation
+  // TODO(spo): addRectagle, projection
 
   /// Set constraint value
   SKETCHAPI_EXPORT
