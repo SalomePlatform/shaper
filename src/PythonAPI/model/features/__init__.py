@@ -8,7 +8,6 @@ from FeaturesAPI import addFuse, addCut, addCommon
 from partition import addPartition
 
 from FeaturesAPI import addExtrusion, addExtrusionCut, addExtrusionFuse
-from FeaturesAPI import addRevolution
-from revolution_boolean import addRevolutionCut, addRevolutionFuse
+from FeaturesAPI import addRevolution, addRevolutionCut, addRevolutionFuse
 
-from group import addGroup
+from FeaturesAPI import addGroup

@@ -10,6 +10,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_Group.h
   FeaturesAPI_Placement.h
   FeaturesAPI_Revolution.h
+  FeaturesAPI_RevolutionBoolean.h
   FeaturesAPI_Rotation.h
   FeaturesAPI_Translation.h
 )
@@ -22,6 +23,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_Placement.cpp
   FeaturesAPI_Rotation.cpp
   FeaturesAPI_Revolution.cpp
+  FeaturesAPI_RevolutionBoolean.cpp
   FeaturesAPI_Translation.cpp
 )
 

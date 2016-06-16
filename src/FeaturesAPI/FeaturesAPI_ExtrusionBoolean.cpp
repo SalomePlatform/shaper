@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
-// File:        FeaturesAPI_Extrusion.cpp
+// File:        FeaturesAPI_ExtrusionBoolean.cpp
 // Created:     09 June 2016
 // Author:      Dmitry Bobylev
 
