@@ -903,14 +903,15 @@ void XGUI_Displayer::activateAIS(const Handle(AIS_InteractiveObject)& theIO,
       aContext->Activate(theIO, theMode, false);
 
     // the fix from VPA for more suitable selection of sketcher lines
-    double aPrecision = theIO->Width() + 2;
-    if (theMode == getSelectionMode(TopAbs_VERTEX)) 
-      aPrecision = ModuleBase_Preferences::resourceMgr()->doubleValue("Viewer", "point-selection-sensitivity", 20);
-    else if ((theMode == getSelectionMode(TopAbs_EDGE)) || (theMode == getSelectionMode(TopAbs_WIRE)))
-      aPrecision = theIO->Width() + 
-                   ModuleBase_Preferences::resourceMgr()->doubleValue("Viewer", "edge-selection-sensitivity", 2);
-    aContext->SetSelectionSensitivity(theIO, theMode, aPrecision);
-
+    if (theIO->Width() > 1) {
+      double aPrecision = theIO->Width() + 2;
+      if (theMode == getSelectionMode(TopAbs_VERTEX)) 
+        aPrecision = ModuleBase_Preferences::resourceMgr()->doubleValue("Viewer", "point-selection-sensitivity", 20);
+      else if ((theMode == getSelectionMode(TopAbs_EDGE)) || (theMode == getSelectionMode(TopAbs_WIRE)))
+        aPrecision = theIO->Width() + 
+                     ModuleBase_Preferences::resourceMgr()->doubleValue("Viewer", "edge-selection-sensitivity", 2);
+      aContext->SetSelectionSensitivity(theIO, theMode, aPrecision);
+    }
     ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::activateAIS -- Activate");
 
 #ifdef DEBUG_ACTIVATE_AIS
