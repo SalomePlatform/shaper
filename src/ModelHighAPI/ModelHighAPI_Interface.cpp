@@ -7,7 +7,7 @@
 //--------------------------------------------------------------------------------------
 #include "ModelHighAPI_Interface.h"
 //--------------------------------------------------------------------------------------
-#include <Events_Error.h>
+#include <Events_InfoMessage.h>
 
 #include <ModelAPI_Feature.h>
 
@@ -62,5 +62,5 @@ std::shared_ptr<ModelAPI_Result> ModelHighAPI_Interface::defaultResult() const
 
 void ModelHighAPI_Interface::throwException(const std::string & theDescription)
 {
-  Events_Error::send(theDescription);
+  Events_InfoMessage("ModelHighAPI_Interface", theDescription).send();
 }
