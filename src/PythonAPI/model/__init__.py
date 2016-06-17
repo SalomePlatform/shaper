@@ -10,7 +10,6 @@ All features are available via model.add*() functions. Exceptions are:
 
 from services  import *
 from roots     import *
-from tools import Selection
 
 # Built-in features
 
@@ -21,8 +20,3 @@ from exchange import *
 from features import *
 from parameter import *
 from partset import *
-
-# Custom exceptions
-
-from errors import WrongNumberOfArguments
-from errors import FeatureInputInvalid

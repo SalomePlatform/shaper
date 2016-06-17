@@ -6,9 +6,6 @@ Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 import ModelAPI
 import GeomAPI
 
-import geom  # To be removed when gp_Ax3 will be Pythonized
-
-
 def moduleDocument ():
     """Return the main document (the Partset) created or open from the Modeler.
 

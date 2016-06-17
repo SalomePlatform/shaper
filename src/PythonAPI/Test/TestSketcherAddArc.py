@@ -2,7 +2,6 @@ import unittest
 
 import model
 import geom
-from model import WrongNumberOfArguments
 
 from TestSketcher import SketcherTestCase
 
@@ -21,12 +20,6 @@ class SketcherAddArc(SketcherTestCase):
         model.do()
         self.assertEqual(arc.startPoint().x(), 0)
         self.assertEqual(arc.startPoint().y(), 0)
-
-    # def test_number_of_args(self):
-    #     with self.assertRaises(WrongNumberOfArguments):
-    #         self.sketch.addArc(0, 1, 1, 1)
-    #     with self.assertRaises(WrongNumberOfArguments):
-    #         self.sketch.addArc(0, 1)
 
     def test_modify_arc(self):
         # Note: arc will modify startPoint and endPoint to be in circle

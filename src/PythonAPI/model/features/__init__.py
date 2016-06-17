@@ -5,7 +5,7 @@ from FeaturesAPI import addPlacement, addRotation, addTranslation
 
 from FeaturesAPI import addFuse, addCut, addCommon
 
-from partition import addPartition
+from FeaturesAPI import addPartition
 
 from FeaturesAPI import addExtrusion, addExtrusionCut, addExtrusionFuse
 from FeaturesAPI import addRevolution, addRevolutionCut, addRevolutionFuse
