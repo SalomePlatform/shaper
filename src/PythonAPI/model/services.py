@@ -43,7 +43,7 @@ def defaultPlane (name):
         n = GeomAPI.GeomAPI_Dir(1, 0, 0)
         x = GeomAPI.GeomAPI_Dir(0, 1, 0)
 
-    return GeomAPI.GeomAPI_Ax3(o, n, x)
+    return GeomAPI.GeomAPI_Ax3(o, x, n)
 
 
 def begin ():
