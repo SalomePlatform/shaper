@@ -123,5 +123,6 @@
 %include "ModelHighAPI_Interface.h"
 %include "ModelHighAPI_RefAttr.h"
 %include "ModelHighAPI_Selection.h"
+%include "ModelHighAPI_Services.h"
 %include "ModelHighAPI_Macro.h"
 %include "ModelHighAPI_Tools.h"
