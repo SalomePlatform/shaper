@@ -7,6 +7,7 @@ SET(PROJECT_HEADERS
   BuildAPI_Edge.h
   BuildAPI_Face.h
   BuildAPI_Shell.h
+  BuildAPI_SubShapes.h
   BuildAPI_Vertex.h
   BuildAPI_Wire.h
 )
@@ -15,6 +16,7 @@ SET(PROJECT_SOURCES
   BuildAPI_Edge.cpp
   BuildAPI_Face.cpp
   BuildAPI_Shell.cpp
+  BuildAPI_SubShapes.cpp
   BuildAPI_Vertex.cpp
   BuildAPI_Wire.cpp
 )

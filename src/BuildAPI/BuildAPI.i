@@ -22,6 +22,7 @@
 %shared_ptr(BuildAPI_Edge)
 %shared_ptr(BuildAPI_Face)
 %shared_ptr(BuildAPI_Shell)
+%shared_ptr(BuildAPI_SubShapes)
 %shared_ptr(BuildAPI_Vertex)
 %shared_ptr(BuildAPI_Wire)
 
@@ -29,5 +30,6 @@
 %include "BuildAPI_Edge.h"
 %include "BuildAPI_Face.h"
 %include "BuildAPI_Shell.h"
+%include "BuildAPI_SubShapes.h"
 %include "BuildAPI_Vertex.h"
 %include "BuildAPI_Wire.h"
