@@ -113,6 +113,10 @@
   $result = SWIG_NewPointerObj( (void*) ptr, $1_descriptor, 1 );
 }
 
+// std::list -> []
+%template(SelectionList) std::list<ModelHighAPI_Selection>;
+%template(RefAttrList) std::list<ModelHighAPI_RefAttr>;
+
 // all supported interfaces
 %include "ModelHighAPI_Double.h"
 %include "ModelHighAPI_Integer.h"
@@ -121,6 +125,3 @@
 %include "ModelHighAPI_Selection.h"
 %include "ModelHighAPI_Macro.h"
 %include "ModelHighAPI_Tools.h"
-
-%template(SelectionList) std::list<ModelHighAPI_Selection>;
-%template(RefAttrList) std::list<ModelHighAPI_RefAttr>;

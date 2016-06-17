@@ -19,12 +19,14 @@ ParametersAPI_Parameter::ParametersAPI_Parameter(
 ParametersAPI_Parameter::ParametersAPI_Parameter(
     const std::shared_ptr<ModelAPI_Feature> & theFeature,
     const std::string & theName,
-    const ModelHighAPI_Double & theExpression)
+    const std::string & theExpression,
+    const std::string & theComment)
 : ModelHighAPI_Interface(theFeature)
 {
   if (initialize()) {
     fillAttribute(theName, name());
     fillAttribute(theExpression, expression());
+    fillAttribute(theComment, comment());
 
     execute();
   }
@@ -37,9 +39,10 @@ ParametersAPI_Parameter::~ParametersAPI_Parameter()
 //--------------------------------------------------------------------------------------
 ParameterPtr addParameter(const std::shared_ptr<ModelAPI_Document> & theParameter,
                           const std::string & theName,
-                          const ModelHighAPI_Double & theExpression)
+                          const std::string & theExpression,
+                          const std::string & theComment)
 {
   // TODO(spo): check that theParameter is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = theParameter->addFeature(ParametersAPI_Parameter::ID());
-  return ParameterPtr(new ParametersAPI_Parameter(aFeature));
+  return ParameterPtr(new ParametersAPI_Parameter(aFeature, theName, theExpression, theComment));
 }

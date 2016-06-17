@@ -31,14 +31,16 @@ public:
   PARAMETERSAPI_EXPORT
   explicit ParametersAPI_Parameter(const  std::shared_ptr<ModelAPI_Feature> & theFeature,
                                    const std::string & theName,
-                                   const ModelHighAPI_Double & theExpression);
+                                   const std::string & theExpression,
+                                   const std::string & theComment = std::string());
   /// Destructor
   PARAMETERSAPI_EXPORT
   virtual ~ParametersAPI_Parameter();
 
-  INTERFACE_2(ParametersPlugin_Parameter::ID(),
+  INTERFACE_3(ParametersPlugin_Parameter::ID(),
               name, ParametersPlugin_Parameter::VARIABLE_ID(), ModelAPI_AttributeString, /** Name */,
-              expression, ParametersPlugin_Parameter::EXPRESSION_ID(), ModelAPI_AttributeDouble, /** Expression */
+              expression, ParametersPlugin_Parameter::EXPRESSION_ID(), ModelAPI_AttributeString, /** Expression */,
+              comment, ParametersPlugin_Parameter::COMMENT_ID(), ModelAPI_AttributeString, /** Comment */
   )
 
 };
@@ -52,7 +54,8 @@ typedef std::shared_ptr<ParametersAPI_Parameter> ParameterPtr;
 PARAMETERSAPI_EXPORT
 ParameterPtr addParameter(const std::shared_ptr<ModelAPI_Document> & thePart,
                           const std::string & theName,
-                          const ModelHighAPI_Double & theExpression);
+                          const std::string & theExpression,
+                          const std::string & theComment = std::string());
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
