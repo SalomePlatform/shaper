@@ -59,7 +59,6 @@ void FeaturesAPI_Translation::setDistance(const ModelHighAPI_Double& theDistance
   execute();
 }
 
-// TODO(spo): make add* as static functions of the class
 //==================================================================================================
 TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
                               const std::list<ModelHighAPI_Selection>& theMainObjects,

@@ -110,7 +110,6 @@ void FeaturesAPI_Pipe::setByBasePathLocations(const std::list<ModelHighAPI_Selec
   execute();
 }
 
-// TODO(spo): make add* as static functions of the class
 //==================================================================================================
 PipePtr addPipe(const std::shared_ptr<ModelAPI_Document>& thePart,
                 const std::list<ModelHighAPI_Selection>& theBaseObjects,

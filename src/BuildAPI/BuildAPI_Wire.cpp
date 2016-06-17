@@ -45,7 +45,6 @@ void BuildAPI_Wire::addContour()
   feature()->customAction(BuildPlugin_Wire::ADD_CONTOUR_ACTION_ID());
 }
 
-// TODO(spo): make add* as static functions of the class
 //==================================================================================================
 WirePtr addWire(const std::shared_ptr<ModelAPI_Document>& thePart,
                 const std::list<ModelHighAPI_Selection>& theBaseObjects)

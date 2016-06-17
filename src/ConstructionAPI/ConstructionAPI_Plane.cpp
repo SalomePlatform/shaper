@@ -69,8 +69,6 @@ void ConstructionAPI_Plane::setGeneralEquation(
 }
 
 //--------------------------------------------------------------------------------------
-// TODO(spo): make add* as static functions of the class
-
 PlanePtr addPlane(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Selection & theFace,
                   const ModelHighAPI_Double & theDistance)

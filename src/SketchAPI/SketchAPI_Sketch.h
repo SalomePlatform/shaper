@@ -75,8 +75,6 @@ public:
   SKETCHAPI_EXPORT
   void setExternal(const ModelHighAPI_Selection & theExternal);
 
-  // TODO(spo): addIntersection
-
   /// Add point
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Point> addPoint(

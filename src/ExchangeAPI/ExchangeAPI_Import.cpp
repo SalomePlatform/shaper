@@ -39,7 +39,6 @@ void ExchangeAPI_Import::setFilePath(const std::string & theFilePath)
 }
 
 //--------------------------------------------------------------------------------------
-// TODO(spo): make add* as static functions of the class
 ImportPtr addImport(
     const std::shared_ptr<ModelAPI_Document> & thePart,
     const std::string & theFilePath)

@@ -45,7 +45,6 @@ void ConstructionAPI_Point::setPoint(const ModelHighAPI_Double & theX,
 }
 
 //--------------------------------------------------------------------------------------
-// TODO(spo): make add* as static functions of the class
 PointPtr addPoint(
     const std::shared_ptr<ModelAPI_Document> & thePart,
     const ModelHighAPI_Double& theX,

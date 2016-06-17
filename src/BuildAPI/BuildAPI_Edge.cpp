@@ -39,7 +39,6 @@ void BuildAPI_Edge::setBase(const std::list<ModelHighAPI_Selection>& theBaseObje
   execute();
 }
 
-// TODO(spo): make add* as static functions of the class
 //==================================================================================================
 EdgePtr addEdge(const std::shared_ptr<ModelAPI_Document>& thePart,
                 const std::list<ModelHighAPI_Selection>& theBaseObjects)

@@ -39,7 +39,6 @@ void BuildAPI_Shell::setBase(const std::list<ModelHighAPI_Selection>& theBaseObj
   execute();
 }
 
-// TODO(spo): make add* as static functions of the class
 //==================================================================================================
 ShellPtr addShell(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const std::list<ModelHighAPI_Selection>& theBaseObjects)

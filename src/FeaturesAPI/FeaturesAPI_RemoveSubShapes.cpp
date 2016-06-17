@@ -49,7 +49,6 @@ void FeaturesAPI_RemoveSubShapes::setSubShapesToKeep(const std::list<ModelHighAP
   execute();
 }
 
-// TODO(spo): make add* as static functions of the class
 //==================================================================================================
 RemoveSubShapesPtr addRemoveSubShapes(const std::shared_ptr<ModelAPI_Document>& thePart,
                                       const ModelHighAPI_Selection& theBase)

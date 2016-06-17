@@ -144,7 +144,6 @@ FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(const std::shared_ptr<Model
   }
 }
 
-// TODO(spo): make add* as static functions of the class
 //==================================================================================================
 RevolutionCutPtr addRevolutionCut(const std::shared_ptr<ModelAPI_Document>& thePart,
                                   const std::list<ModelHighAPI_Selection>& theBaseObjects,
@@ -259,7 +258,6 @@ FeaturesAPI_RevolutionFuse::FeaturesAPI_RevolutionFuse(const std::shared_ptr<Mod
   }
 }
 
-// TODO(spo): make add* as static functions of the class
 //==================================================================================================
 RevolutionFusePtr addRevolutionFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
                                     const std::list<ModelHighAPI_Selection>& theBaseObjects,

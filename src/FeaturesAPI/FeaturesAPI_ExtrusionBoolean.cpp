@@ -195,7 +195,6 @@ FeaturesAPI_ExtrusionCut::FeaturesAPI_ExtrusionCut(const std::shared_ptr<ModelAP
   }
 }
 
-// TODO(spo): make add* as static functions of the class
 //==================================================================================================
 ExtrusionCutPtr addExtrusionCut(const std::shared_ptr<ModelAPI_Document>& thePart,
                                 const std::list<ModelHighAPI_Selection>& theBaseObjects,
@@ -401,7 +400,6 @@ FeaturesAPI_ExtrusionFuse::FeaturesAPI_ExtrusionFuse(const std::shared_ptr<Model
   }
 }
 
-// TODO(spo): make add* as static functions of the class
 //==================================================================================================
 ExtrusionFusePtr addExtrusionFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
                                   const std::list<ModelHighAPI_Selection>& theBaseObjects,

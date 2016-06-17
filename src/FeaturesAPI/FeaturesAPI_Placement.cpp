@@ -79,7 +79,6 @@ void FeaturesAPI_Placement::setCentering(const bool theCentering)
   execute();
 }
 
-// TODO(spo): make add* as static functions of the class
 //==================================================================================================
 PlacementPtr addPlacement(const std::shared_ptr<ModelAPI_Document>& thePart,
                           const std::list<ModelHighAPI_Selection>& theObjects,

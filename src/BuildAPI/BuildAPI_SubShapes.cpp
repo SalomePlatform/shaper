@@ -49,7 +49,6 @@ void BuildAPI_SubShapes::setSubShapes(const std::list<ModelHighAPI_Selection>& t
   execute();
 }
 
-// TODO(spo): make add* as static functions of the class
 //==================================================================================================
 SubShapesPtr addSubShapes(const std::shared_ptr<ModelAPI_Document>& thePart,
                           const ModelHighAPI_Selection& theBaseShape,

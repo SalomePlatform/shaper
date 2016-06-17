@@ -89,8 +89,6 @@ void ConstructionAPI_Axis::setPointAndDirection(
 }
 
 //--------------------------------------------------------------------------------------
-// TODO(spo): make add* as static functions of the class
-
 AxisPtr addAxis(const std::shared_ptr<ModelAPI_Document> & thePart,
                 const ModelHighAPI_Selection & thePoint1,
                 const ModelHighAPI_Selection & thePoint2)

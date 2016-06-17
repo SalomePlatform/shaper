@@ -59,7 +59,6 @@ void FeaturesAPI_Rotation::setAngle(const ModelHighAPI_Double& theAngle)
   execute();
 }
 
-// TODO(spo): make add* as static functions of the class
 //==================================================================================================
 RotationPtr addRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const std::list<ModelHighAPI_Selection>& theMainObjects,

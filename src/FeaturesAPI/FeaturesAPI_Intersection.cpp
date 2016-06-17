@@ -51,7 +51,6 @@ void FeaturesAPI_Intersection::setTools(const std::list<ModelHighAPI_Selection>&
   execute();
 }
 
-// TODO(spo): make add* as static functions of the class
 //==================================================================================================
 IntersectionPtr addIntersection(const std::shared_ptr<ModelAPI_Document>& thePart,
                                 const std::list<ModelHighAPI_Selection>& theObjects,
