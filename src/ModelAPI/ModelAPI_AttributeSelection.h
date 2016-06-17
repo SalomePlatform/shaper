@@ -49,7 +49,7 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   /// Returns a textual string of the selection
   /// \param theDefaultValue a value, which is used if the naming name can not be obtained
   virtual std::string namingName(const std::string& theDefaultValue = "") = 0;
-  
+
   /// Returns an id of the selection
   virtual int Id() = 0;
 

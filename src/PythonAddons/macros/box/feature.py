@@ -65,17 +65,17 @@ class BoxFeature(model.Feature):
         p3 = geom.Pnt2d(1, 1)
         p4 = geom.Pnt2d(1, 0)
 
-        line = self.base.addPolygon(p1, p2, p3, p4)
+        line = model.addPolygon(self.base, p1, p2, p3, p4)
 
-        self.base.setParallel(line[0].result(), line[2].result())
-        self.base.setParallel(line[1].result(), line[3].result())
-        self.base.setPerpendicular(line[0].result(), line[3].result())
+        self.base.setParallel(line[0], line[2])
+        self.base.setParallel(line[1], line[3])
+        self.base.setPerpendicular(line[0], line[3])
 
         # Setting the size of the base with default values
         # Width
-        self.width = self.base.setLength(line[0].result(), 50)  # Keeps the constraint for edition
+        self.width = self.base.setLength(line[0], 50)  # Keeps the constraint for edition
         # Length
-        self.length = self.base.setLength(line[3].result(), 50)  # Keeps the constraint for edition
+        self.length = self.base.setLength(line[3], 50)  # Keeps the constraint for edition
 
         # Creating the extrusion (the box) at default size
         # A box result
@@ -86,26 +86,25 @@ class BoxFeature(model.Feature):
     def execute(self):
         """F.execute() -- execute the feature"""
         # Retrieving the user inputs
-        width = self.getRealInput(self.WIDTH_ID())
-        length = self.getRealInput(self.LENGTH_ID())
-        height = self.getRealInput(self.HEIGHT_ID())
-
-        width_text = self.getTextInput(self.WIDTH_ID())
-        length_text = self.getTextInput(self.LENGTH_ID())
-        height_text = self.getTextInput(self.HEIGHT_ID())
+        width = self.real(self.WIDTH_ID())
+        length = self.real(self.LENGTH_ID())
+        height = self.real(self.HEIGHT_ID())
 
         # Editing the box
-        if width_text == "":
-            self.base.setValue(self.width, width)
+        if width.text() == "":
+            self.base.setValue(self.width, width.value())
         else:
-            self.base.setText(self.width, width_text)
+            self.base.setValue(self.width, width.text())
 
-        if length_text == "":
-            self.base.setValue(self.length, length)
+        if length.text() == "":
+            self.base.setValue(self.length, length.value())
         else:
-            self.base.setText(self.length, length_text)
+            self.base.setValue(self.length, length.text())
 
-        self.box.setSize(height, height_text)
+        if (height.text() == ""):
+            self.box.setSize(height.value())
+        else:
+            self.box.setSize(height.text())
 
         # Publishing the result: not needed for Macro feature
         # self.addResult( self.box.result() )

@@ -129,7 +129,7 @@ void FeaturesPlugin_Pipe::execute()
   }
 
   // Searching faces with common edges.
-  if(aCreationMethod == "simple") {
+  if(aCreationMethod == CREATION_METHOD_SIMPLE()) {
     ListOfShape aShells;
     ListOfShape aFreeFaces;
     std::shared_ptr<GeomAPI_Shape> aFacesCompound = GeomAlgoAPI_CompoundBuilder::compound(aBaseFacesList);
@@ -158,7 +158,7 @@ void FeaturesPlugin_Pipe::execute()
 
   // Getting Bi-Normal
   std::shared_ptr<GeomAPI_Shape> aBiNormal;
-  if(aCreationMethod == "binormal") {
+  if(aCreationMethod == CREATION_METHOD_BINORMAL()) {
     AttributeSelectionPtr aBiNormalSelection = selection(BINORMAL_ID());
     if(!aBiNormalSelection.get()) {
       setError("Error: Bi-Normal selection is empty.");
@@ -177,7 +177,7 @@ void FeaturesPlugin_Pipe::execute()
 
   // Getting locations.
   ListOfShape aLocations;
-  if(aCreationMethod == "locations") {
+  if(aCreationMethod == CREATION_METHOD_LOCATIONS()) {
     AttributeSelectionListPtr aLocationsSelectionList = selectionList(LOCATIONS_ID());
     if(!aLocationsSelectionList.get()) {
       setError("Error: Could not get locations selection list.");
@@ -204,12 +204,13 @@ void FeaturesPlugin_Pipe::execute()
 
   // Generating result for each object.
   int aResultIndex = 0;
-  if(aCreationMethod == "simple" || aCreationMethod == "binormal") {
+  if(aCreationMethod == CREATION_METHOD_SIMPLE() || aCreationMethod == CREATION_METHOD_BINORMAL()) {
     for(ListOfShape::const_iterator anIter = aBaseShapesList.cbegin(); anIter != aBaseShapesList.cend(); anIter++) {
       std::shared_ptr<GeomAPI_Shape> aBaseShape = *anIter;
 
-      GeomAlgoAPI_Pipe aPipeAlgo = aCreationMethod == "simple" ? GeomAlgoAPI_Pipe(aBaseShape, aPathShape) :
-                                                                 GeomAlgoAPI_Pipe(aBaseShape, aPathShape, aBiNormal);
+      GeomAlgoAPI_Pipe aPipeAlgo = aCreationMethod ==
+        CREATION_METHOD_SIMPLE() ? GeomAlgoAPI_Pipe(aBaseShape, aPathShape) :
+                                   GeomAlgoAPI_Pipe(aBaseShape, aPathShape, aBiNormal);
 
       if(!aPipeAlgo.isDone()) {
         setError("Error: Pipe algorithm failed.");
@@ -231,7 +232,7 @@ void FeaturesPlugin_Pipe::execute()
 
       storeResult(aBaseShape, aPipeAlgo, aResultIndex++);
     }
-  } else if(aCreationMethod == "locations") {
+  } else if(aCreationMethod == CREATION_METHOD_LOCATIONS()) {
     GeomAlgoAPI_Pipe aPipeAlgo = GeomAlgoAPI_Pipe(aBaseShapesList, aLocations, aPathShape);
 
     if(!aPipeAlgo.isDone()) {

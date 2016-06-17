@@ -39,6 +39,27 @@ public:
     return MY_CREATION_METHOD;
   }
 
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_SIMPLE()
+  {
+    static const std::string MY_CREATION_METHOD("simple");
+    return MY_CREATION_METHOD;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BINORMAL()
+  {
+    static const std::string MY_CREATION_METHOD("binormal");
+    return MY_CREATION_METHOD;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_LOCATIONS()
+  {
+    static const std::string MY_CREATION_METHOD("locations");
+    return MY_CREATION_METHOD;
+  }
+
   /// Attribute name of base objects.
   inline static const std::string& BASE_OBJECTS_ID()
   {

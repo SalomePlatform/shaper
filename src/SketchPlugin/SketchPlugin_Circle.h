@@ -32,6 +32,20 @@ class SketchPlugin_Circle : public SketchPlugin_SketchEntity, public GeomAPI_IPr
     return TYPE;
   }
 
+  /// Creation method by center and radius.
+  inline static const std::string& CIRCLE_TYPE_CENTER_AND_RADIUS()
+  {
+    static const std::string TYPE("CenterRadius");
+    return TYPE;
+  }
+
+  /// Creation method by three points.
+  inline static const std::string& CIRCLE_TYPE_THREE_POINTS()
+  {
+    static const std::string TYPE("ThreePoints");
+    return TYPE;
+  }
+
   /// 2D point - center of the circle
   inline static const std::string& CENTER_ID()
   {
@@ -44,6 +58,27 @@ class SketchPlugin_Circle : public SketchPlugin_SketchEntity, public GeomAPI_IPr
   {
     static const std::string MY_CIRCLE_RADIUS_ID("CircleRadius");
     return MY_CIRCLE_RADIUS_ID;
+  }
+
+  /// First point id.
+  inline static const std::string& FIRST_POINT_ID()
+  {
+    static const std::string FIRST_PNT("FirstPoint");
+    return FIRST_PNT;
+  }
+
+  /// Second point id.
+  inline static const std::string& SECOND_POINT_ID()
+  {
+    static const std::string SECOND_PNT("SecondPoint");
+    return SECOND_PNT;
+  }
+
+  /// Third point id.
+  inline static const std::string& THIRD_POINT_ID()
+  {
+    static const std::string THIRD_PNT("ThirdPoint");
+    return THIRD_PNT;
   }
 
   /// Returns the kind of a feature

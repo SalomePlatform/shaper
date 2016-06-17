@@ -7,6 +7,8 @@
 #ifndef SRC_GEOMALGOAPI_GEOMALGOAPI_SWIG_H_
 #define SRC_GEOMALGOAPI_GEOMALGOAPI_SWIG_H_
 
+  #include <GeomAPI_swig.h>
+
   #include "GeomAlgoAPI.h"
   #include "GeomAlgoAPI_MakeShape.h"
   #include "GeomAlgoAPI_Boolean.h"

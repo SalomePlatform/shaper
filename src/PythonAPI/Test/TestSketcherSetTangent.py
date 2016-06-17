@@ -12,13 +12,13 @@ class SketcherSetTangent(SketcherTestCase):
             )
         
     def test_set_tangent(self):
-        self.sketch.setTangent(self.line.result(), self.arc.result())
+        self.sketch.setTangent(self.line, self.arc)
         model.do()
         # TODO : find a way to check that the constraint as been set
     
     def test_none_type_arguments(self):
         with self.assertRaises(TypeError):
-            self.sketch.setTangent(None, self.arc.result())
+            self.sketch.setTangent(None, self.arc)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -14,15 +14,13 @@ class SketcherAddLine(SketcherTestCase):
         model.do()
 
     def test_add_mirror(self):
-        mirror = self.sketch.addMirror(
-            self.line.result(), self.circle_1.result()
-            )
+        mirror = self.sketch.addMirror(self.line, [self.circle_1])
         model.do()
         mirrored_objects = mirror.mirroredObjects()
         mirrored_circle = mirrored_objects.object(0)
         circle_feature = ModelAPI_Feature.feature(mirrored_circle)
         center = geomDataAPI_Point2D(circle_feature.attribute("CircleCenter"))
-        self.assertEqual(center.x(), -30, msg="%s" % center.x())
+        self.assertEqual(center.x(), -30)
         # dir(mirrored_circle)
         # center = geomDataAPI_Point2D(mirrored_circle.data().attribute("CircleCenter"))
         # self.assertEqual(center.x(), -30, msg="%s"%(dir(mirrored_circle)))

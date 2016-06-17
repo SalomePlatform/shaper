@@ -30,7 +30,7 @@ class FeaturesExtrusionFixture(FeaturesAddExtrusionFixture):
         circle = sketch.addCircle(0, 0, 10)
         model.do()
 
-        base = sketch.selectFace(circle.result())
+        base = sketch.selectFace()
         self.extrusion = model.addExtrusion(self.part, base, 10, 0)
         model.do()
 
@@ -42,29 +42,22 @@ class FeaturesExtrusionFixture(FeaturesAddExtrusionFixture):
 
 class FeaturesAddExtrusionTestCase(FeaturesAddExtrusionFixture):
 
-    def test_add_extrusion_no_base(self):
-        try:
-            extrusion = model.addExtrusion(self.part)
-            fail("addExtrusion should assert if base is not None")
-        except AssertionError:
-            pass
-
     def test_add_extrusion_by_face_and_size(self):
         sketch = model.addSketch(self.part, model.defaultPlane("XOY"))
         circle = sketch.addCircle(0, 0, 10)
         model.do()
 
-        base = sketch.selectFace(circle.result())
+        base = sketch.selectFace()
         extrusion = model.addExtrusion(self.part, base, 10, 0)
         model.do()
 
-        self.assertEqual(extrusion.getCreationMethod().value(), "BySizes")
-        self.assertEqual(extrusion.getToSize().value(), 10)
-        self.assertEqual(extrusion.getFromSize().value(), 0)
-        self.assertEqual(extrusion.getToObject().context(), None)
-        self.assertEqual(extrusion.getToOffset().value(), 0)
-        self.assertEqual(extrusion.getFromObject().context(), None)
-        self.assertEqual(extrusion.getFromOffset().value(), 0)
+        self.assertEqual(extrusion.creationMethod().value(), "BySizes")
+        self.assertEqual(extrusion.toSize().value(), 10)
+        self.assertEqual(extrusion.fromSize().value(), 0)
+        self.assertEqual(extrusion.toObject().context(), None)
+        self.assertEqual(extrusion.toOffset().value(), 0)
+        self.assertEqual(extrusion.fromObject().context(), None)
+        self.assertEqual(extrusion.fromOffset().value(), 0)
 
     def test_add_extrusion_by_face_and_planes(self):
         # base
@@ -72,33 +65,33 @@ class FeaturesAddExtrusionTestCase(FeaturesAddExtrusionFixture):
         base_circle = base_sketch.addCircle(0, 0, 10)
         # to
         to_plane = model.defaultPlane("XOY")
-        to_plane.location().setZ(10)
+        to_plane.origin().setZ(10)
         to_sketch = model.addSketch(self.part, to_plane)
         to_circle = to_sketch.addCircle(0, 0, 10)
         # from
         from_plane = model.defaultPlane("XOY")
-        from_plane.location().setZ(-10)
+        from_plane.origin().setZ(-10)
         from_sketch = model.addSketch(self.part, from_plane)
         from_circle = from_sketch.addCircle(0, 0, 10)
 
         model.do()
 
-        base = base_sketch.selectFace(base_circle.result())
-        to_object = to_sketch.selectFace(to_circle.result())[0]
-        from_object = from_sketch.selectFace(from_circle.result())[0]
+        base = base_sketch.selectFace()
+        to_object = to_sketch.selectFace()[0]
+        from_object = from_sketch.selectFace()[0]
         extrusion = model.addExtrusion(self.part, base,
                                        to_object, 15,
                                        from_object, 20)
 
-        self.assertEqual(extrusion.getCreationMethod().value(), "ByPlanesAndOffsets")
-        self.assertEqual(extrusion.getToSize().value(), 0)
-        self.assertEqual(extrusion.getFromSize().value(), 0)
+        self.assertEqual(extrusion.creationMethod().value(), "ByPlanesAndOffsets")
+        self.assertEqual(extrusion.toSize().value(), 0)
+        self.assertEqual(extrusion.fromSize().value(), 0)
 #         self.assertEqual(extrusion.getToObject().context(),
 #                          to_sketch.result())
-        self.assertEqual(extrusion.getToOffset().value(), 15)
+        self.assertEqual(extrusion.toOffset().value(), 15)
 #         self.assertEqual(extrusion.getFromObject().context(),
 #                          from_sketch.result())
-        self.assertEqual(extrusion.getFromOffset().value(), 20)
+        self.assertEqual(extrusion.fromOffset().value(), 20)
 
 
 class FeaturesExtrusionTestCase(FeaturesExtrusionFixture):
@@ -109,49 +102,49 @@ class FeaturesExtrusionTestCase(FeaturesExtrusionFixture):
 
     def test_extrusion_get_attribute(self):
         # call method of the feature
-        self.assertTrue(isinstance(self.extrusion.getBase(),
+        self.assertTrue(isinstance(self.extrusion.baseObjects(),
                                    ModelAPI.ModelAPI_AttributeSelectionList))
-        self.assertTrue(isinstance(self.extrusion.getCreationMethod(),
+        self.assertTrue(isinstance(self.extrusion.creationMethod(),
                                    ModelAPI.ModelAPI_AttributeString))
-        self.assertTrue(isinstance(self.extrusion.getToSize(),
+        self.assertTrue(isinstance(self.extrusion.toSize(),
                                    ModelAPI.ModelAPI_AttributeDouble))
-        self.assertTrue(isinstance(self.extrusion.getFromSize(),
+        self.assertTrue(isinstance(self.extrusion.fromSize(),
                                    ModelAPI.ModelAPI_AttributeDouble))
-        self.assertTrue(isinstance(self.extrusion.getToObject(),
+        self.assertTrue(isinstance(self.extrusion.toObject(),
                                    ModelAPI.ModelAPI_AttributeSelection))
-        self.assertTrue(isinstance(self.extrusion.getToOffset(),
+        self.assertTrue(isinstance(self.extrusion.toOffset(),
                                    ModelAPI.ModelAPI_AttributeDouble))
-        self.assertTrue(isinstance(self.extrusion.getFromObject(),
+        self.assertTrue(isinstance(self.extrusion.fromObject(),
                                    ModelAPI.ModelAPI_AttributeSelection))
-        self.assertTrue(isinstance(self.extrusion.getFromOffset(),
+        self.assertTrue(isinstance(self.extrusion.fromOffset(),
                                    ModelAPI.ModelAPI_AttributeDouble))
 
     def test_extrusion_set_sizes(self):
         self.extrusion.setSizes(15, 20)
-        self.assertEqual(self.extrusion.getCreationMethod().value(), "BySizes")
-        self.assertEqual(self.extrusion.getToSize().value(), 15)
-        self.assertEqual(self.extrusion.getFromSize().value(), 20)
-        self.assertEqual(self.extrusion.getToObject().context(), None)
-        self.assertEqual(self.extrusion.getToOffset().value(), 0)
-        self.assertEqual(self.extrusion.getFromObject().context(), None)
-        self.assertEqual(self.extrusion.getFromOffset().value(), 0)
+        self.assertEqual(self.extrusion.creationMethod().value(), "BySizes")
+        self.assertEqual(self.extrusion.toSize().value(), 15)
+        self.assertEqual(self.extrusion.fromSize().value(), 20)
+        self.assertEqual(self.extrusion.toObject().context(), None)
+        self.assertEqual(self.extrusion.toOffset().value(), 0)
+        self.assertEqual(self.extrusion.fromObject().context(), None)
+        self.assertEqual(self.extrusion.fromOffset().value(), 0)
 
     def test_extrusion_set_planes_and_offsets(self):
         # to
         to_plane = model.defaultPlane("XOY")
-        to_plane.location().setZ(10)
+        to_plane.origin().setZ(10)
         to_sketch = model.addSketch(self.part, to_plane)
         to_circle = to_sketch.addCircle(0, 0, 10)
         # from
         from_plane = model.defaultPlane("XOY")
-        from_plane.location().setZ(-10)
+        from_plane.origin().setZ(-10)
         from_sketch = model.addSketch(self.part, from_plane)
         from_circle = from_sketch.addCircle(0, 0, 10)
 
         model.do()
 
-        to_object = to_sketch.selectFace(to_circle.result())[0]
-        from_object = from_sketch.selectFace(from_circle.result())[0]
+        to_object = to_sketch.selectFace()[0]
+        from_object = from_sketch.selectFace()[0]
         self.extrusion.setPlanesAndOffsets(to_object, 15, from_object, 20)
 
 

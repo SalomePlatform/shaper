@@ -23,9 +23,9 @@ E = 16
 P = 80
 
 # Create Parameters
-model.addParameter(part, "L", L)
-model.addParameter(part, "E", E)
-model.addParameter(part, "P", P)
+model.addParameter(part, "L", str(L))
+model.addParameter(part, "E", str(E))
+model.addParameter(part, "P", str(P))
 
 def vertical_body():
     # Create YOZ sketch
@@ -33,21 +33,21 @@ def vertical_body():
 
     points = [(0, 0), (0, L), (L, L), (L, 0)]
     geom_points = [geom.Pnt2d(*p) for p in points]
-    left, top, right, bottom = sketch.addPolygon(*geom_points)
+    left, top, right, bottom = model.addPolygon(sketch, *geom_points)
 
     # Set constraints
-    sketch.setRigid(left.startPoint())
+    sketch.setFixed(left.startPoint())
 
-    sketch.setHorizontal(bottom.result())
-    sketch.setHorizontal(top.result())
+    sketch.setHorizontal(bottom)
+    sketch.setHorizontal(top)
 
-    sketch.setVertical(right.result())
-    sketch.setVertical(left.result())
+    sketch.setVertical(right)
+    sketch.setVertical(left)
 
-    sketch.setLength(top.result(), "L")
-    sketch.setLength(left.result(), "L")
+    sketch.setLength(top, "L")
+    sketch.setLength(left, "L")
 
-    sketch.setFillet(left.endPoint(), 32)
+    sketch.setFillet([left.endPoint()], 32)
 
     model.do()  #!!!
 
@@ -66,29 +66,29 @@ def bottom_body():
     points = [(0, 0), (0, L), (P, L), (P, 16 + 16), (P - 20, 16 + 16), (P - 20, 16), (P, 16), (P, 0)]
     points = [(p[0], -p[1]) for p in points]  # as we look to back of the face
     geom_points = [geom.Pnt2d(*p) for p in points]
-    left, top, v2, h2, v1, h1, right, bottom = sketch.addPolygon(*geom_points)
+    left, top, v2, h2, v1, h1, right, bottom = model.addPolygon(sketch, *geom_points)
 
     points = [(P - 20, 16 + 16 / 2), (P - 20, 16), (P - 20, 16 + 16)]
     points = [(p[0], -p[1]) for p in points]  # as we look to back of the face
     center, start, end = [geom.Pnt2d(*p) for p in points]
-    arc = sketch.addArc(center, start, end, inversed=True)
+    arc = sketch.addArc(center, start, end, True)
 
     # Set Auxiliarity
     v1.setAuxiliary(True)
 
     # Set constraints
-    sketch.setParallel(left.result(), right.result())
-    sketch.setParallel(left.result(), v2.result())
-    sketch.setParallel(bottom.result(), h1.result())
-    sketch.setParallel(top.result(), h2.result())
+    sketch.setParallel(left, right)
+    sketch.setParallel(left, v2)
+    sketch.setParallel(bottom, h1)
+    sketch.setParallel(top, h2)
 
-    sketch.setPerpendicular(left.result(), bottom.result())
-    sketch.setPerpendicular(left.result(), top.result())
+    sketch.setPerpendicular(left, bottom)
+    sketch.setPerpendicular(left, top)
 
-    sketch.setEqual(top.result(), bottom.result())
-    sketch.setEqual(h1.result(), h2.result())
+    sketch.setEqual(top, bottom)
+    sketch.setEqual(h1, h2)
 
-    sketch.setCoincident(arc.center(), v1.result())
+    sketch.setCoincident(arc.center(), v1)
     sketch.setCoincident(arc.startPoint(), h2.endPoint())
     sketch.setCoincident(arc.endPoint(), h1.startPoint())
 
@@ -100,10 +100,10 @@ def bottom_body():
     model.do()  #!!!
 
     # Dimensions
-    sketch.setLength(v1.result(), 16)
-    sketch.setLength(h2.result(), 20)
-    sketch.setLength(right.result(), 16)
-    sketch.setLength(top.result(), "P")
+    sketch.setLength(v1, 16)
+    sketch.setLength(h2, 20)
+    sketch.setLength(right, 16)
+    sketch.setLength(top, "P")
     model.do()
 
     # Create extrusion
@@ -123,38 +123,38 @@ def body_3():
     points = [(0, 0), (0, H), (l, H), (l + 2 * r, H), (L, H), (L, 0)]
     points = [(p[0], -p[1]) for p in points]  # as we look to back of the face
     geom_points = [geom.Pnt2d(*p) for p in points]
-    left, top_left, top_middle, top_right, right, bottom, = sketch.addPolygon(*geom_points)
+    left, top_left, top_middle, top_right, right, bottom, = model.addPolygon(sketch, *geom_points)
 
     points = [(l + r, H), (l + 2 * r, H), (l, H)]
     points = [(p[0], -p[1]) for p in points]  # as we look to back of the face
     center, start, end = [geom.Pnt2d(*p) for p in points]
-    arc = sketch.addArc(center, start, end)
+    arc = sketch.addArc(center, start, end, False)
 
     # Set Auxiliarity
     top_middle.setAuxiliary(True)
 
     # Set constraints
-    sketch.setParallel(bottom.result(), top_left.result())
-    sketch.setParallel(bottom.result(), top_right.result())
+    sketch.setParallel(bottom, top_left)
+    sketch.setParallel(bottom, top_right)
 
-    sketch.setPerpendicular(bottom.result(), left.result())
-    sketch.setPerpendicular(bottom.result(), right.result())
+    sketch.setPerpendicular(bottom, left)
+    sketch.setPerpendicular(bottom, right)
 
-    sketch.setEqual(left.result(), right.result())
+    sketch.setEqual(left, right)
 
-    sketch.setLength(bottom.result(), L)
-    sketch.setLength(right.result(), H)
-    sketch.setLength(top_left.result(), l)
+    sketch.setLength(bottom, L)
+    sketch.setLength(right, H)
+    sketch.setLength(top_left, l)
 
-    sketch.setCoincident(top_middle.result(), arc.center())
+    sketch.setCoincident(top_middle, arc.center())
     sketch.setCoincident(top_middle.endPoint(), arc.startPoint())
     sketch.setCoincident(top_middle.startPoint(), arc.endPoint())
 
-    sketch.setRadius(arc.result(), r)
+    sketch.setRadius(arc, r)
 
     # Binding
     bottom_e = sketch.addLine("Boolean_1_1/Modified_5&Boolean_1_1/Modified_8")
-    sketch.setCoincident(bottom_e.result(), bottom.startPoint())
+    sketch.setCoincident(bottom_e, bottom.startPoint())
     sketch.setCoincident(bottom_e.startPoint(), bottom.endPoint())
 
     model.do()  #!!!
@@ -174,7 +174,7 @@ def body_4():
     points = [(0, 0), (0, 1), (1, 0)]
     points = [(p[0], -p[1]) for p in points]  # as we look to back of the face
     geom_points = [geom.Pnt2d(*p) for p in points]
-    left, diagonal, bottom = sketch.addPolygon(*geom_points)
+    left, diagonal, bottom = model.addPolygon(sketch, *geom_points)
 
     # Binding
     bottom_e = sketch.addLine("Boolean_2_1/Modified_3&Boolean_2_1/Modified_4")
@@ -197,12 +197,12 @@ def body_4():
 b1 = vertical_body()
 b2 = bottom_body()
 
-boolean = model.addAddition(part, b1.result() + b2.result())
+boolean = model.addFuse(part, b1.result() + b2.result())
 model.do()
 
 b3 = body_3()
 
-boolean = model.addAddition(part, boolean.result() + b3.result())
+boolean = model.addFuse(part, boolean.result() + b3.result())
 model.do()
 
 # START DEBUG PURPOSES
@@ -216,5 +216,5 @@ model.do()
 # END DEBUG PURPOSES
 b4 = body_4()
 
-boolean = model.addAddition(part, boolean.result() + b4.result())
-model.do()
+boolean = model.addFuse(part, boolean.result() + b4.result())
+model.end()

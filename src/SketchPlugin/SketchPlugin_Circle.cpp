@@ -29,38 +29,12 @@
 const double tolerance = 1e-7;
 
 namespace {
-  static const std::string& CIRCLE_TYPE_CENTER_AND_RADIUS()
-  {
-    static const std::string TYPE("CenterRadius");
-    return TYPE;
-  }
-  static const std::string& CIRCLE_TYPE_THREE_POINTS()
-  {
-    static const std::string TYPE("ThreePoints");
-    return TYPE;
-  }
-
-  static const std::string& FIRST_POINT_ID()
-  {
-    static const std::string FIRST_PNT("FirstPoint");
-    return FIRST_PNT;
-  }
-  static const std::string& SECOND_POINT_ID()
-  {
-    static const std::string SECOND_PNT("SecondPoint");
-    return SECOND_PNT;
-  }
-  static const std::string& THIRD_POINT_ID()
-  {
-    static const std::string THIRD_PNT("ThirdPoint");
-    return THIRD_PNT;
-  }
   static const std::string& POINT_ID(int theIndex)
   {
     switch (theIndex) {
-    case 1: return FIRST_POINT_ID();
-    case 2: return SECOND_POINT_ID();
-    case 3: return THIRD_POINT_ID();
+    case 1: return SketchPlugin_Circle::FIRST_POINT_ID();
+    case 2: return SketchPlugin_Circle::SECOND_POINT_ID();
+    case 3: return SketchPlugin_Circle::THIRD_POINT_ID();
     }
 
     static const std::string DUMMY;

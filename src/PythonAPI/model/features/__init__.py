@@ -1,18 +1,13 @@
 """Package for Features plugin for the Parametric Geometry API of the Modeler.
 """
 
-from boolean import addAddition, addSubtraction, addIntersection
+from FeaturesAPI import addPlacement, addRotation, addTranslation
 
-from partition import addPartition
+from FeaturesAPI import addFuse, addCut, addCommon
 
-from extrusion import addExtrusion
-from extrusion_boolean import addExtrusionCut, addExtrusionFuse
+from FeaturesAPI import addPartition
 
-from revolution import addRevolution
-from revolution_boolean import addRevolutionCut, addRevolutionFuse
+from FeaturesAPI import addExtrusion, addExtrusionCut, addExtrusionFuse
+from FeaturesAPI import addRevolution, addRevolutionCut, addRevolutionFuse
 
-from placement import addPlacement
-from rotation import addRotation
-from translation import addTranslation
-
-from group import addGroup
+from FeaturesAPI import addGroup

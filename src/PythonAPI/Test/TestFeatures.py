@@ -25,47 +25,57 @@ class FeaturesFixture(unittest.TestCase):
 
 class FeaturesTestCase(FeaturesFixture):
 
-    def test_assert_error_on_empty_args(self):
-        features = [
-            "addPoint", "addAxis", "addPlane",
-            "addImport", "exportToFile",
-            "addAddition", "addSubtraction", "addIntersection",
-            "addExtrusion",
-            # "addExtrusionCut", "addExtrusionFuse",
-            "addRevolution",
-            # "addRevolutionCut", "addRevolutionFuse",
-            "addPlacement", "addRotation", "addTranslation",
-            "addGroup",
-            "addParameter",
-            ]
-        for name in features:
-            try:
-                with self.assertRaises(AssertionError):
-                    feature = getattr(model, name)(self.part)
-            except AssertionError as e:
-                self.fail("%s does not check empty args" % name)
+    # def test_assert_error_on_empty_args(self):
+    #     features = [
+    #         # Implemented in C++, add* without arguments doesn't exist
+    #         # "addPoint", "addPlane",
+    #         # "addImport", "exportToFile",
+    #
+    #         "addAxis",
+    #         "addCut", "addFuse", "addCommon",
+    #         "addExtrusion",
+    #         # "addExtrusionCut", "addExtrusionFuse",
+    #         "addRevolution",
+    #         # "addRevolutionCut", "addRevolutionFuse",
+    #         "addPlacement", "addRotation", "addTranslation",
+    #         "addGroup",
+    #         "addParameter",
+    #         ]
+    #     for name in features:
+    #         try:
+    #             with self.assertRaises(AssertionError):
+    #                 feature = getattr(model, name)(self.part)
+    #         except AssertionError as e:
+    #             self.fail("%s does not check empty args" % name)
+
+    def test_addPoint(self):
+        model.addPoint(self.part, 10, "20", "x + 30")
 
     def test_initialize_without_attributes(self):
-        model.construction.axis.Axis(self.part.addFeature("Axis"))
-        model.construction.plane.Plane(self.part.addFeature("Plane"))
-        model.construction.point.Point(self.part.addFeature("Point"))
+        import ConstructionAPI
+        ConstructionAPI.ConstructionAPI_Axis(self.part.addFeature("Axis"))
+        ConstructionAPI.ConstructionAPI_Plane(self.part.addFeature("Plane"))
+        ConstructionAPI.ConstructionAPI_Point(self.part.addFeature("Point"))
 
-        model.exchange.Import(self.part.addFeature("Import"))
-        model.exchange.Export(self.part.addFeature("Export"))
+        import ExchangeAPI
+        ExchangeAPI.ExchangeAPI_Import(self.part.addFeature("Import"))
+        ExchangeAPI.ExchangeAPI_Export(self.part.addFeature("Export"))
 
-        model.features.boolean.Boolean(self.part.addFeature("Boolean"))
-        model.features.extrusion.Extrusion(self.part.addFeature("Extrusion"))
-        # model.features.extrusion_boolean.ExtrusionBoolean(self.part.addFeature("ExtrusionCut"))
-        # model.features.extrusion_boolean.ExtrusionBoolean(self.part.addFeature("ExtrusionFuse"))
-        model.features.revolution.Revolution(self.part.addFeature("Revolution"))
-        # model.features.revolution_boolean.RevolutionBoolean(self.part.addFeature("RevolutionCut"))
-        # model.features.revolution_boolean.RevolutionBoolean(self.part.addFeature("RevolutionFuse"))
-        model.features.placement.Placement(self.part.addFeature("Placement"))
-        model.features.rotation.Rotation(self.part.addFeature("Rotation"))
-        model.features.translation.Translation(self.part.addFeature("Translation"))
-        model.features.group.Group(self.part.addFeature("Group"))
+        import FeaturesAPI
+        FeaturesAPI.FeaturesAPI_Boolean(self.part.addFeature("Boolean"))
+        FeaturesAPI.FeaturesAPI_Extrusion(self.part.addFeature("Extrusion"))
+        FeaturesAPI.FeaturesAPI_ExtrusionCut(self.part.addFeature("ExtrusionCut"))
+        FeaturesAPI.FeaturesAPI_ExtrusionFuse(self.part.addFeature("ExtrusionFuse"))
+        FeaturesAPI.FeaturesAPI_Revolution(self.part.addFeature("Revolution"))
+        FeaturesAPI.FeaturesAPI_RevolutionCut(self.part.addFeature("RevolutionCut"))
+        FeaturesAPI.FeaturesAPI_RevolutionFuse(self.part.addFeature("RevolutionFuse"))
+        FeaturesAPI.FeaturesAPI_Placement(self.part.addFeature("Placement"))
+        FeaturesAPI.FeaturesAPI_Rotation(self.part.addFeature("Rotation"))
+        FeaturesAPI.FeaturesAPI_Translation(self.part.addFeature("Translation"))
+        FeaturesAPI.FeaturesAPI_Group(self.part.addFeature("Group"))
 
-        model.parameter.Parameter(self.part.addFeature("Parameter"))
+        import ParametersAPI
+        ParametersAPI.ParametersAPI_Parameter(self.part.addFeature("Parameter"))
 
 #-----------------------------------------------------------------------------
 

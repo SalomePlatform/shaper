@@ -21,7 +21,7 @@ public:
   GEOMAPI_EXPORT 
   GeomAPI_Ax2();
 
-  /** \brief Ñonstructor.
+  /** \brief Constructor.
    *  \param[in] theOrigin point of origin.
    *  \param[in] theN direction of axis.
    *  \param[in] theVX x direction of axis.
@@ -31,7 +31,7 @@ public:
               std::shared_ptr<GeomAPI_Dir> theN,
               std::shared_ptr<GeomAPI_Dir> theVX);
 
-  /** \brief Ñonstructor.
+  /** \brief Constructor.
    *  \param[in] theOrigin point of origin.
    *  \param[in] theDir direction of axis.
    */

@@ -103,7 +103,7 @@ bool FeaturesPlugin_Revolution::makeRevolutions(ListOfShape& theBaseShapes,
   double aToAngle = 0.0;
   double aFromAngle = 0.0;
 
-  if(string(CREATION_METHOD())->value() == "ByAngles") {
+  if(string(CREATION_METHOD())->value() == CREATION_METHOD_BY_ANGLES()) {
     aToAngle = real(TO_ANGLE_ID())->value();
     aFromAngle = real(FROM_ANGLE_ID())->value();
   } else {
@@ -115,7 +115,7 @@ bool FeaturesPlugin_Revolution::makeRevolutions(ListOfShape& theBaseShapes,
   GeomShapePtr aToShape;
   GeomShapePtr aFromShape;
 
-  if(string(CREATION_METHOD())->value() == "ByPlanesAndOffsets") {
+  if(string(CREATION_METHOD())->value() == CREATION_METHOD_BY_PLANES()) {
     aSelection = selection(TO_OBJECT_ID());
     if(aSelection.get()) {
       aToShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aSelection->value());

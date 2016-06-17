@@ -23,7 +23,7 @@ public:
   GEOMAPI_EXPORT 
   GeomAPI_Ax3();
 
-  /// Ñonstructor
+  /// Constructor
   /// \param theOrigin point of origin
   /// \param theDirX direction of X axis
   /// \param theNorm direction of normal vector

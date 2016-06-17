@@ -5,6 +5,7 @@
 %}
 
 // import other modules
+%import "GeomAPI.i"
 %import "ModelAPI.i"
 
 // to avoid error on this
