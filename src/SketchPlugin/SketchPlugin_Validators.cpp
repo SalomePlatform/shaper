@@ -860,16 +860,24 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
 
   std::shared_ptr<GeomAPI_Pln> aPlane = aSketch->plane();
   std::shared_ptr<GeomAPI_Dir> aNormal = aPlane->direction();
+  std::shared_ptr<GeomAPI_Pnt> anOrigin = aPlane->location();
 
   if (anEdge->isLine()) {
-    std::shared_ptr<GeomAPI_Dir> aLineDir = anEdge->line()->direction();
+    std::shared_ptr<GeomAPI_Lin> aLine = anEdge->line();
+    std::shared_ptr<GeomAPI_Dir> aLineDir = aLine->direction();
+    std::shared_ptr<GeomAPI_Pnt> aLineLoc = aLine->location();
     double aDot = aNormal->dot(aLineDir);
-    return aDot > -1.0 + tolerance && aDot < 1.0 - tolerance;
+    double aDist = aLineLoc->xyz()->decreased(anOrigin->xyz())->dot(aNormal->xyz());
+    return (fabs(aDot) >= tolerance && fabs(aDot) < 1.0 - tolerance) ||
+           (fabs(aDot) < tolerance && fabs(aDist) > tolerance);
   }
   else if (anEdge->isCircle() || anEdge->isArc()) {
-    std::shared_ptr<GeomAPI_Dir> aCircNormal = anEdge->circle()->normal();
+    std::shared_ptr<GeomAPI_Circ> aCircle = anEdge->circle();
+    std::shared_ptr<GeomAPI_Dir> aCircNormal = aCircle->normal();
+    std::shared_ptr<GeomAPI_Pnt> aCircCenter = aCircle->center();
     double aDot = fabs(aNormal->dot(aCircNormal));
-    return fabs(aDot - 1.0) < tolerance * tolerance;
+    double aDist = aCircCenter->xyz()->decreased(anOrigin->xyz())->dot(aNormal->xyz());
+    return fabs(aDot - 1.0) < tolerance * tolerance && fabs(aDist) > tolerance;
   }
 
   return false;
