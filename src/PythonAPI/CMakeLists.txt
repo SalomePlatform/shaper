@@ -24,7 +24,7 @@ ADD_UNIT_TESTS(
   TestSketcherSetPerpendicular.py
   TestSketcherSetHorizontal.py
   TestSketcherSetVertical.py
-  TestSketcherSetRigid.py
+  TestSketcherSetFixed.py
   TestSketcherSetLength.py
   TestSketcherSetRadius.py
   #TestSketcherSetAngle.py

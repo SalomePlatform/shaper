@@ -273,6 +273,11 @@ public:
       const std::list<ModelHighAPI_RefAttr> & thePoints,
       const ModelHighAPI_Double & theRadius);
 
+  /// Set fixed
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setFixed(
+      const ModelHighAPI_RefAttr & theObject);
+
   /// Set horizontal
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelAPI_Feature> setHorizontal(
@@ -308,11 +313,6 @@ public:
       const ModelHighAPI_RefAttr & theCircleOrArc,
       const ModelHighAPI_Double & theValue);
 
-  /// Set rigid
-  SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setRigid(
-      const ModelHighAPI_RefAttr & theObject);
-
   /// Set tangent
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelAPI_Feature> setTangent(
@@ -324,15 +324,11 @@ public:
   std::shared_ptr<ModelAPI_Feature> setVertical(
       const ModelHighAPI_RefAttr & theLine);
 
-  // TODO(spo): addRectagle, projection
-
   /// Set constraint value
   SKETCHAPI_EXPORT
   void setValue(
       const std::shared_ptr<ModelAPI_Feature> & theConstraint,
       const ModelHighAPI_Double & theValue);
-
-  // TODO(spo): setText. Is it necessary as setValue accepts text expressions?
 
   // TODO(spo): rename to selectFaces() or faces() (or add faces() -> list to SWIG)
   /// Select face

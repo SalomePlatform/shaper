@@ -36,7 +36,7 @@ def vertical_body():
     left, top, right, bottom = model.addPolygon(sketch, *geom_points)
 
     # Set constraints
-    sketch.setRigid(left.startPoint())
+    sketch.setFixed(left.startPoint())
 
     sketch.setHorizontal(bottom)
     sketch.setHorizontal(top)

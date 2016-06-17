@@ -209,14 +209,14 @@ std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(const ModelHighAPI_Sel
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Line::ID());
   LinePtr aLine(new SketchAPI_Line(aFeature, theExternal));
-  setRigid(InterfacePtr(aLine));
+  setFixed(InterfacePtr(aLine));
   return aLine;
 }
 std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(const std::string & theExternalName)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Line::ID());
   LinePtr aLine(new SketchAPI_Line(aFeature, theExternalName));
-  setRigid(InterfacePtr(aLine));
+  setFixed(InterfacePtr(aLine));
   return aLine;
 }
 
@@ -469,6 +469,16 @@ std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setFillet(
   return aFeature;
 }
 
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setFixed(
+    const ModelHighAPI_RefAttr & theObject)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintRigid::ID());
+  fillAttribute(theObject, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  aFeature->execute();
+  return aFeature;
+}
+
 std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setHorizontal(
     const ModelHighAPI_RefAttr & theLine)
 {
@@ -535,17 +545,6 @@ std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setRadius(
       compositeFeature()->addFeature(SketchPlugin_ConstraintRadius::ID());
   fillAttribute(theCircleOrArc, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
-  aFeature->execute();
-  return aFeature;
-}
-
-std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setRigid(
-    const ModelHighAPI_RefAttr & theObject)
-{
-  // TODO(spo): should it be renamed to Fixed?
-  std::shared_ptr<ModelAPI_Feature> aFeature =
-      compositeFeature()->addFeature(SketchPlugin_ConstraintRigid::ID());
-  fillAttribute(theObject, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   aFeature->execute();
   return aFeature;
 }
