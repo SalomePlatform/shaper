@@ -79,5 +79,3 @@ INCLUDE(UnitTest)
 ADD_UNIT_TESTS(
   TestPoint.py
 )
-
-# ADD_SUBDIRECTORY (Test)

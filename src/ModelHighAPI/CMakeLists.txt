@@ -80,5 +80,3 @@ ADD_UNIT_TESTS(
   TestInteger.py
   TestRefAttr.py
 )
-
-# ADD_SUBDIRECTORY (Test)
