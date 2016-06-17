@@ -208,13 +208,16 @@ std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(
 std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(const ModelHighAPI_Selection & theExternal)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Line::ID());
-  return LinePtr(new SketchAPI_Line(aFeature, theExternal));
+  LinePtr aLine(new SketchAPI_Line(aFeature, theExternal));
+  setRigid(InterfacePtr(aLine));
+  return aLine;
 }
 std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(const std::string & theExternalName)
 {
-  // TODO(spo): Add constraint SketchConstraintRigid like in PythonAPI. Is it necessary?
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Line::ID());
-  return LinePtr(new SketchAPI_Line(aFeature, theExternalName));
+  LinePtr aLine(new SketchAPI_Line(aFeature, theExternalName));
+  setRigid(InterfacePtr(aLine));
+  return aLine;
 }
 
 //--------------------------------------------------------------------------------------

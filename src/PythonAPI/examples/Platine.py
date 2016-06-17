@@ -23,9 +23,9 @@ E = 16
 P = 80
 
 # Create Parameters
-model.addParameter(part, "L", L)
-model.addParameter(part, "E", E)
-model.addParameter(part, "P", P)
+model.addParameter(part, "L", str(L))
+model.addParameter(part, "E", str(E))
+model.addParameter(part, "P", str(P))
 
 def vertical_body():
     # Create YOZ sketch
@@ -71,7 +71,7 @@ def bottom_body():
     points = [(P - 20, 16 + 16 / 2), (P - 20, 16), (P - 20, 16 + 16)]
     points = [(p[0], -p[1]) for p in points]  # as we look to back of the face
     center, start, end = [geom.Pnt2d(*p) for p in points]
-    arc = sketch.addArc(center, start, end, inversed=True)
+    arc = sketch.addArc(center, start, end, True)
 
     # Set Auxiliarity
     v1.setAuxiliary(True)
@@ -128,7 +128,7 @@ def body_3():
     points = [(l + r, H), (l + 2 * r, H), (l, H)]
     points = [(p[0], -p[1]) for p in points]  # as we look to back of the face
     center, start, end = [geom.Pnt2d(*p) for p in points]
-    arc = sketch.addArc(center, start, end)
+    arc = sketch.addArc(center, start, end, False)
 
     # Set Auxiliarity
     top_middle.setAuxiliary(True)
@@ -197,12 +197,12 @@ def body_4():
 b1 = vertical_body()
 b2 = bottom_body()
 
-boolean = model.addAddition(part, b1.result() + b2.result())
+boolean = model.addFuse(part, b1.result() + b2.result())
 model.do()
 
 b3 = body_3()
 
-boolean = model.addAddition(part, boolean.result() + b3.result())
+boolean = model.addFuse(part, boolean.result() + b3.result())
 model.do()
 
 # START DEBUG PURPOSES
@@ -216,5 +216,5 @@ model.do()
 # END DEBUG PURPOSES
 b4 = body_4()
 
-boolean = model.addAddition(part, boolean.result() + b4.result())
-model.do()
+boolean = model.addFuse(part, boolean.result() + b4.result())
+model.end()

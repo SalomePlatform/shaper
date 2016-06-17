@@ -62,6 +62,9 @@ protected:
   std::shared_ptr<ModelAPI_Feature> myFeature;
 };
 
+//! Pointer on Interface object
+typedef std::shared_ptr<ModelHighAPI_Interface> InterfacePtr;
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 #endif /* SRC_MODELHIGHAPI_MODELHIGHAPI_INTERFACE_H_ */
