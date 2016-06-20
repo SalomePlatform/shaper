@@ -34,15 +34,18 @@
                auto_preview="false">
           <source path="boolean_widget.xml"/>
       </feature>
+      <feature id="Intersection" title="Intersection" tooltip="Intersect objects with tools" icon="icons/Features/intersection.png">
+        <source path="intersection_widget.xml"/>
+      </feature>
       <feature id="Partition" title="Partition" tooltip="Perform partition operations with solids" icon="icons/Features/partition.png"
                auto_preview="false">
           <source path="partition_widget.xml"/>
       </feature>
+      <feature id="Union" title="Union" tooltip="Perform union operations with shapes" icon="icons/Features/union.png">
+          <source path="union_widget.xml"/>
+      </feature>
       <feature id="Remove_SubShapes" title="Remove Sub-Shapes" tooltip="Allows to remove sub-shapes from wires, shells, compsolids and compounds" icon="icons/Features/remove_subshapes.png">
           <source path="remove_subshapes_widget.xml"/>
-      </feature>
-      <feature id="Intersection" title="Intersection" tooltip="Intersect objects with tools" icon="icons/Features/intersection.png">
-          <source path="intersection_widget.xml"/>
       </feature>
     </group>
     <group id="Collections">

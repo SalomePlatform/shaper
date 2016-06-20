@@ -24,6 +24,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_RevolutionBoolean.h
     FeaturesPlugin_RevolutionCut.h
     FeaturesPlugin_RevolutionFuse.h
+    FeaturesPlugin_Union.h
     FeaturesPlugin_ValidatorTransform.h
     FeaturesPlugin_Validators.h
     FeaturesPlugin_RemoveSubShapes.h
@@ -49,6 +50,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_RevolutionBoolean.cpp
     FeaturesPlugin_RevolutionCut.cpp
     FeaturesPlugin_RevolutionFuse.cpp
+    FeaturesPlugin_Union.cpp
     FeaturesPlugin_ValidatorTransform.cpp
     FeaturesPlugin_Validators.cpp
     FeaturesPlugin_RemoveSubShapes.cpp
@@ -71,6 +73,7 @@ SET(XML_RESOURCES
   intersection_widget.xml
   pipe_widget.xml
   remove_subshapes_widget.xml
+  union_widget.xml
 )
 
 SET(TEXT_RESOURCES

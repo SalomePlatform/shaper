@@ -17,6 +17,7 @@
 #include <FeaturesPlugin_RevolutionCut.h>
 #include <FeaturesPlugin_RevolutionFuse.h>
 #include <FeaturesPlugin_Rotation.h>
+#include <FeaturesPlugin_Union.h>
 #include <FeaturesPlugin_ValidatorTransform.h>
 #include <FeaturesPlugin_Validators.h>
 
@@ -55,6 +56,10 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorRemoveSubShapesResult);
   aFactory->registerValidator("FeaturesPlugin_ValidatorPipePath",
                               new FeaturesPlugin_ValidatorPipePath);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorUnionSelection",
+                              new FeaturesPlugin_ValidatorUnionSelection);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorUnionArguments",
+                              new FeaturesPlugin_ValidatorUnionArguments);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -92,6 +97,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_RevolutionFuse);
   } else if (theFeatureID == FeaturesPlugin_RemoveSubShapes::ID()) {
     return FeaturePtr(new FeaturesPlugin_RemoveSubShapes);
+  } else if (theFeatureID == FeaturesPlugin_Union::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Union);
   }
 
   // feature of such kind is not found

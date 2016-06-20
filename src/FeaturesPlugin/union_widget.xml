@@ -1,0 +1,13 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<source>
+  <multi_selector id="base_objects"
+    label="Base objects:"
+    tooltip="Select solids for union."
+    type_choice="solids"
+    concealment="true">
+    <validator id="FeaturesPlugin_ValidatorUnionSelection"/>
+  </multi_selector>
+  <validator id="GeomValidators_MinObjectsSelected" parameters="base_objects,2"/>
+  <validator id="FeaturesPlugin_ValidatorUnionArguments"/>
+</source>

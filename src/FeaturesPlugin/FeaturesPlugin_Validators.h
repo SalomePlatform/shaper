@@ -168,4 +168,38 @@ class FeaturesPlugin_ValidatorRemoveSubShapesResult: public ModelAPI_FeatureVali
   virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
+/// \class FeaturesPlugin_ValidatorUnionSelection
+/// \ingroup Validators
+/// \brief Validates selection for "Union" feature.
+class FeaturesPlugin_ValidatorUnionSelection: public ModelAPI_AttributeValidator
+{
+public:
+  /// \return True if the attribute is valid. It checks whether the selection
+  /// is acceptable for operation.
+  /// \param[in] theAttribute an attribute to check.
+  /// \param[in] theArguments a filter parameters.
+  /// \param[out] theError error message.
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
+};
+
+/// \class FeaturesPlugin_ValidatorUnionArguments
+/// \ingroup Validators
+/// \brief Validator for the "Union" feature.
+class FeaturesPlugin_ValidatorUnionArguments: public ModelAPI_FeatureValidator
+{
+ public:
+  //! \return true if result is valid shape.
+  //! \param theFeature the checked feature
+  //! \param theArguments arguments of the feature (not used)
+  //! \param theError error message
+  virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                       const std::list<std::string>& theArguments,
+                       std::string& theError) const;
+
+  /// \return true if the attribute in feature is not obligatory for the feature execution
+  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
+};
+
 #endif

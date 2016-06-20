@@ -143,7 +143,7 @@ void FeaturesPlugin_Partition::storeResult(const ListOfShape& theObjects,
   ResultBodyPtr aResultBody = document()->createBody(data(), theIndex);
 
   // Store modified shape.
-  if(aBaseShape->isEqual(theResultShape)) {
+  if(!aBaseShape.get() || aBaseShape->isEqual(theResultShape)) {
     aResultBody->store(theResultShape);
     setResult(aResultBody, theIndex);
     return;

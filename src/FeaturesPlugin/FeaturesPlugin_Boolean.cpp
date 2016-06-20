@@ -143,7 +143,7 @@ void FeaturesPlugin_Boolean::execute()
         std::shared_ptr<GeomAPI_Shape> anObject = *anObjectsIt;
         ListOfShape aListWithObject;
         aListWithObject.push_back(anObject);
-        GeomAlgoAPI_MakeShape aBoolAlgo; (aListWithObject, aTools, (GeomAlgoAPI_Boolean::OperationType)aType);
+        GeomAlgoAPI_MakeShape aBoolAlgo;
 
         switch(aType) {
           case BOOL_CUT:    aBoolAlgo = GeomAlgoAPI_Boolean(aListWithObject, aTools, GeomAlgoAPI_Boolean::BOOL_CUT); break;
@@ -346,7 +346,7 @@ void FeaturesPlugin_Boolean::execute()
       } else if((anObjects.size() + aTools.size()) > 1){
         std::shared_ptr<GeomAlgoAPI_Boolean> aFuseAlgo(new GeomAlgoAPI_Boolean(anObjects,
                                                                                aTools,
-                                                                               (GeomAlgoAPI_Boolean::OperationType)aType));
+                                                                               GeomAlgoAPI_Boolean::BOOL_FUSE));
 
         // Checking that the algorithm worked properly.
         if(!aFuseAlgo->isDone()) {

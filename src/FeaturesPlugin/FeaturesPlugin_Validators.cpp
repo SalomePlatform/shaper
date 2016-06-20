@@ -6,6 +6,8 @@
 
 #include "FeaturesPlugin_Validators.h"
 
+#include "FeaturesPlugin_Union.h"
+
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -24,6 +26,7 @@
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
+#include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_ShapeBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_WireBuilder.h>
@@ -639,6 +642,79 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesResult::isValid(const std::shared_pt
 //==================================================================================================
 bool FeaturesPlugin_ValidatorRemoveSubShapesResult::isNotObligatory(std::string theFeature,
                                                                     std::string theAttribute)
+{
+  return false;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorUnionSelection::isValid(const AttributePtr& theAttribute,
+                                                     const std::list<std::string>& theArguments,
+                                                     std::string& theError) const
+{
+  AttributeSelectionListPtr aBaseObjectsAttrList = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if(!aBaseObjectsAttrList.get()) {
+    theError = "Error: This validator can only work with selection list in \"" + FeaturesPlugin_Union::ID() + "\" feature.";
+    return false;
+  }
+
+  for(int anIndex = 0; anIndex < aBaseObjectsAttrList->size(); ++anIndex) {
+    bool isSameFound = false;
+    AttributeSelectionPtr anAttrSelectionInList = aBaseObjectsAttrList->value(anIndex);
+    ResultCompSolidPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anAttrSelectionInList->context());
+    if(!aResult.get()) {
+      continue;
+    }
+    if(aResult->numberOfSubs() > 0) {
+      theError = "Error: Whole compsolids not allowed for selection.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorUnionArguments::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                                     const std::list<std::string>& theArguments,
+                                                     std::string& theError) const
+{
+  // Check feature kind.
+  if(theFeature->getKind() != FeaturesPlugin_Union::ID()) {
+    theError = "Error: This validator supports only \"" + FeaturesPlugin_Union::ID() + "\" feature.";
+    return false;
+  }
+
+  // Get base objects attribute list.
+  AttributeSelectionListPtr aBaseObejctsAttrList = theFeature->selectionList(FeaturesPlugin_Union::BASE_OBJECTS_ID());
+  if(!aBaseObejctsAttrList.get()) {
+    theError = "Error: Could not get \"" + FeaturesPlugin_Union::BASE_OBJECTS_ID() + "\" attribute.";
+    return false;
+  }
+
+  // Get all shapes.
+  ListOfShape aBaseShapesList;
+  for(int anIndex = 0; anIndex < aBaseObejctsAttrList->size(); ++anIndex) {
+    AttributeSelectionPtr anAttrSelectionInList = aBaseObejctsAttrList->value(anIndex);
+    GeomShapePtr aShape = anAttrSelectionInList->value();
+    aBaseShapesList.push_back(aShape);
+  }
+
+  // Make componud and find connected.
+  GeomShapePtr aCompound = GeomAlgoAPI_CompoundBuilder::compound(aBaseShapesList);
+  ListOfShape aCombined, aFree;
+  GeomAlgoAPI_ShapeTools::combineShapes(aCompound, GeomAPI_Shape::COMPSOLID, aCombined, aFree);
+
+  if(aFree.size() > 0 || aCombined.size() > 1) {
+    theError = "Error: Not all shapes have shared topology.";
+    return false;
+  }
+
+  return true;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorUnionArguments::isNotObligatory(std::string theFeature,
+                                                             std::string theAttribute)
 {
   return false;
 }
