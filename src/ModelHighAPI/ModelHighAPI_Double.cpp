@@ -12,17 +12,20 @@
 
 //--------------------------------------------------------------------------------------
 ModelHighAPI_Double::ModelHighAPI_Double(double theValue)
-: myValue(theValue)
+: myVariantType(VT_DOUBLE)
+, myDouble(theValue)
 {
 }
 
 ModelHighAPI_Double::ModelHighAPI_Double(const std::string & theValue)
-: myValue(theValue)
+: myVariantType(VT_STRING)
+, myString(theValue)
 {
 }
 
 ModelHighAPI_Double::ModelHighAPI_Double(const char * theValue)
-: myValue(theValue)
+: myVariantType(VT_STRING)
+, myString(theValue)
 {
 }
 
@@ -31,19 +34,11 @@ ModelHighAPI_Double::~ModelHighAPI_Double()
 }
 
 //--------------------------------------------------------------------------------------
-struct fill_visitor : boost::static_visitor<void>
-{
-  mutable std::shared_ptr<ModelAPI_AttributeDouble> myAttribute;
-
-  fill_visitor(const std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute)
-  : myAttribute(theAttribute) {}
-
-  void operator()(double theValue) const { myAttribute->setValue(theValue); }
-  void operator()(const std::string & theValue) const { myAttribute->setText(theValue); }
-};
-
 void ModelHighAPI_Double::fillAttribute(
     const std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute) const
 {
-  boost::apply_visitor(fill_visitor(theAttribute), myValue);
+  switch(myVariantType) {
+    case VT_DOUBLE: theAttribute->setValue(myDouble); return;
+    case VT_STRING: theAttribute->setText(myString); return;
+  }
 }

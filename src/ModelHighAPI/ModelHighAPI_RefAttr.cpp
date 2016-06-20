@@ -14,24 +14,28 @@
 #include "ModelHighAPI_Interface.h"
 //--------------------------------------------------------------------------------------
 ModelHighAPI_RefAttr::ModelHighAPI_RefAttr()
+: myVariantType(VT_ATTRIBUTE)
 {
 }
 
 ModelHighAPI_RefAttr::ModelHighAPI_RefAttr(
     const std::shared_ptr<ModelAPI_Attribute> & theValue)
-: myValue(theValue)
+: myVariantType(VT_ATTRIBUTE)
+, myAttribute(theValue)
 {
 }
 
 ModelHighAPI_RefAttr::ModelHighAPI_RefAttr(
     const std::shared_ptr<ModelAPI_Object> & theValue)
-: myValue(theValue)
+: myVariantType(VT_OBJECT)
+, myObject(theValue)
 {
 }
 
 ModelHighAPI_RefAttr::ModelHighAPI_RefAttr(
     const std::shared_ptr<ModelHighAPI_Interface> & theValue)
-: myValue(std::shared_ptr<ModelAPI_Object>(theValue->defaultResult()))
+: myVariantType(VT_OBJECT)
+, myObject(std::shared_ptr<ModelAPI_Object>(theValue->defaultResult()))
 {
 }
 
@@ -40,37 +44,21 @@ ModelHighAPI_RefAttr::~ModelHighAPI_RefAttr()
 }
 
 //--------------------------------------------------------------------------------------
-struct fill_visitor : boost::static_visitor<void>
-{
-  mutable std::shared_ptr<ModelAPI_AttributeRefAttr> myAttribute;
-
-  fill_visitor(const std::shared_ptr<ModelAPI_AttributeRefAttr> & theAttribute)
-  : myAttribute(theAttribute) {}
-
-  void operator()(const std::shared_ptr<ModelAPI_Attribute>& theValue) const { myAttribute->setAttr(theValue); }
-  void operator()(const std::shared_ptr<ModelAPI_Object>& theValue) const { myAttribute->setObject(theValue); }
-};
-
 void ModelHighAPI_RefAttr::fillAttribute(
     const std::shared_ptr<ModelAPI_AttributeRefAttr> & theAttribute) const
 {
-  boost::apply_visitor(fill_visitor(theAttribute), myValue);
+  switch(myVariantType) {
+    case VT_ATTRIBUTE: theAttribute->setAttr(myAttribute); return;
+    case VT_OBJECT: theAttribute->setObject(myObject); return;
+  }
 }
 
 //--------------------------------------------------------------------------------------
-struct append_visitor : boost::static_visitor<void>
-{
-  mutable std::shared_ptr<ModelAPI_AttributeRefAttrList> myAttribute;
-
-  append_visitor(const std::shared_ptr<ModelAPI_AttributeRefAttrList> & theAttribute)
-  : myAttribute(theAttribute) {}
-
-  void operator()(const std::shared_ptr<ModelAPI_Attribute>& theValue) const { myAttribute->append(theValue); }
-  void operator()(const std::shared_ptr<ModelAPI_Object>& theValue) const { myAttribute->append(theValue); }
-};
-
 void ModelHighAPI_RefAttr::appendToList(
     const std::shared_ptr<ModelAPI_AttributeRefAttrList> & theAttribute) const
 {
-  boost::apply_visitor(append_visitor(theAttribute), myValue);
+  switch(myVariantType) {
+    case VT_ATTRIBUTE: theAttribute->append(myAttribute); return;
+    case VT_OBJECT: theAttribute->append(myObject); return;
+  }
 }

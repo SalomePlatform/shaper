@@ -12,8 +12,6 @@
 
 #include <memory>
 #include <string>
-
-#include <boost/variant.hpp>
 //--------------------------------------------------------------------------------------
 class ModelAPI_AttributeInteger;
 //--------------------------------------------------------------------------------------
@@ -42,7 +40,9 @@ public:
   virtual void fillAttribute(const std::shared_ptr<ModelAPI_AttributeInteger> & theAttribute) const;
 
 private:
-  boost::variant<int, std::string> myValue;
+  enum VariantType { VT_INT, VT_STRING } myVariantType;
+  int myInt;
+  std::string myString;
 };
 
 //--------------------------------------------------------------------------------------

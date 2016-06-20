@@ -12,17 +12,20 @@
 
 //--------------------------------------------------------------------------------------
 ModelHighAPI_Integer::ModelHighAPI_Integer(int theValue)
-: myValue(theValue)
+: myVariantType(VT_INT)
+, myInt(theValue)
 {
 }
 
 ModelHighAPI_Integer::ModelHighAPI_Integer(const std::string & theValue)
-: myValue(theValue)
+: myVariantType(VT_STRING)
+, myString(theValue)
 {
 }
 
 ModelHighAPI_Integer::ModelHighAPI_Integer(const char * theValue)
-: myValue(theValue)
+: myVariantType(VT_STRING)
+, myString(theValue)
 {
 }
 
@@ -31,19 +34,11 @@ ModelHighAPI_Integer::~ModelHighAPI_Integer()
 }
 
 //--------------------------------------------------------------------------------------
-struct fill_visitor : boost::static_visitor<void>
-{
-  mutable std::shared_ptr<ModelAPI_AttributeInteger> myAttribute;
-
-  fill_visitor(const std::shared_ptr<ModelAPI_AttributeInteger> & theAttribute)
-  : myAttribute(theAttribute) {}
-
-  void operator()(int theValue) const { myAttribute->setValue(theValue); }
-  void operator()(const std::string & theValue) const { myAttribute->setText(theValue); }
-};
-
 void ModelHighAPI_Integer::fillAttribute(
     const std::shared_ptr<ModelAPI_AttributeInteger> & theAttribute) const
 {
-  boost::apply_visitor(fill_visitor(theAttribute), myValue);
+  switch(myVariantType) {
+    case VT_INT: theAttribute->setValue(myInt); return;
+    case VT_STRING: theAttribute->setText(myString); return;
+  }
 }

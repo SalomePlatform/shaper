@@ -12,8 +12,6 @@
 
 #include <memory>
 #include <string>
-
-#include <boost/variant.hpp>
 //--------------------------------------------------------------------------------------
 class ModelAPI_Attribute;
 class ModelAPI_AttributeRefAttr;
@@ -53,10 +51,9 @@ public:
   virtual void appendToList(const std::shared_ptr<ModelAPI_AttributeRefAttrList> & theAttribute) const;
 
 private:
-  boost::variant<
-    std::shared_ptr<ModelAPI_Attribute>,
-    std::shared_ptr<ModelAPI_Object>
-  > myValue;
+  enum VariantType { VT_ATTRIBUTE, VT_OBJECT } myVariantType;
+  std::shared_ptr<ModelAPI_Attribute> myAttribute;
+  std::shared_ptr<ModelAPI_Object> myObject;
 };
 
 //--------------------------------------------------------------------------------------

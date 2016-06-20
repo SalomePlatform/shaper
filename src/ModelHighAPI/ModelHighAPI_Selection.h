@@ -13,8 +13,6 @@
 #include <memory>
 #include <string>
 #include <utility>
-
-#include <boost/variant.hpp>
 //--------------------------------------------------------------------------------------
 class GeomAPI_Shape;
 class ModelAPI_AttributeSelection;
@@ -52,7 +50,9 @@ public:
   virtual void appendToList(const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute) const;
 
 private:
-  boost::variant<ResultSubShapePair, TypeSubShapeNamePair> myValue;
+  enum VariantType { VT_ResultSubShapePair, VT_TypeSubShapeNamePair } myVariantType;
+  ResultSubShapePair myResultSubShapePair;
+  TypeSubShapeNamePair myTypeSubShapeNamePair;
 };
 
 //--------------------------------------------------------------------------------------
