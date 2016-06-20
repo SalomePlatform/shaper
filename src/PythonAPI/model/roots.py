@@ -5,9 +5,6 @@ Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 import ModelAPI
 
-from model import tools
-
-
 class Feature(ModelAPI.ModelAPI_Feature):
     """Base class of user-defined Python features."""
 
@@ -42,28 +39,6 @@ class Interface():
     def __init__(self, feature):
         """x.__init__(...) initializes x; see x.__class__.__doc__ for signature"""
         self._feature = feature
-
-    def __getattr__(self, name):
-        """Process missing attributes.
-
-        Add get*() methods for access feature attributes.
-        """
-        if name.startswith("get"):
-            possible_names = [
-                "_" + name[3:],
-                "_" + tools.convert_to_underscore(name[3:]),
-                ]
-            for possible_name in possible_names:
-                if hasattr(self, possible_name):
-                    def getter():
-                        return getattr(self, possible_name)
-                    return getter
-
-        raise AttributeError()
-
-    def _fillAttribute(self, attribute, value):
-        """Fill ModelAPI_Attribute* with value."""
-        tools.fill_attribute(attribute, value)
 
     def feature(self):
         """Return ModelAPI_Feature."""
