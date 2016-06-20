@@ -3,7 +3,6 @@ import unittest
 import ModelAPI
 
 import model
-from model.tools import Selection
 
 #-----------------------------------------------------------------------------
 # Fixtures
