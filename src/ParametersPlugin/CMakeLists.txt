@@ -59,17 +59,17 @@ SET(TEXT_RESOURCES
 	ParametersPlugin_msg_ru.ts
 )
 
-QT4_CREATE_TRANSLATION(QM_RESOURCES
-					   ${PROJECT_SOURCES}
-					   ${TEXT_RESOURCES}
-					   OPTIONS -extensions cpp -no-recursive
-					   )
+# QT4_CREATE_TRANSLATION(QM_RESOURCES
+# 					   ${PROJECT_SOURCES}
+# 					   ${TEXT_RESOURCES}
+# 					   OPTIONS -extensions cpp -no-recursive
+# 					   )
 
 SET(PROJECT_AUTOMOC
     ${CMAKE_CURRENT_BINARY_DIR}/ParametersPlugin_automoc.cpp
 )
-                       
-                       
+
+
 SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC} ${QM_RESOURCES})
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
 
