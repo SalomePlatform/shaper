@@ -100,23 +100,23 @@ aSession.finishOperation()
 
 # Test results
 assert (len(aPipeFeature.results()) > 0)
-aSession.undo()
-
-# Create pipe with bi-normal
-aSession.startOperation()
-aPipeFeature = aPart.addFeature("Pipe")
-aBaseObjectsList = aPipeFeature.selectionList("base_objects")
-aBaseObjectsList.append(aFaceResult1, None)
-aPathObjectSelection = aPipeFeature.selection("path_object")
-aPathObjectSelection.setValue(aWireResult, None)
-aPipeFeature.string("creation_method").setValue("binormal")
-aBinormalObjectSelection = aPipeFeature.selection("binormal")
-aShapeExplorer = GeomAPI_ShapeExplorer(aSketchShape, GeomAPI_Shape.EDGE)
-aBinormalObjectSelection.setValue(aSketchResult, aShapeExplorer.current())
-aSession.finishOperation()
-
-# Test results
-assert (len(aPipeFeature.results()) > 0)
+# aSession.undo()
+#
+# # Create pipe with bi-normal
+# aSession.startOperation()
+# aPipeFeature = aPart.addFeature("Pipe")
+# aBaseObjectsList = aPipeFeature.selectionList("base_objects")
+# aBaseObjectsList.append(aFaceResult1, None)
+# aPathObjectSelection = aPipeFeature.selection("path_object")
+# aPathObjectSelection.setValue(aWireResult, None)
+# aPipeFeature.string("creation_method").setValue("binormal")
+# aBinormalObjectSelection = aPipeFeature.selection("binormal")
+# aShapeExplorer = GeomAPI_ShapeExplorer(aSketchShape, GeomAPI_Shape.EDGE)
+# aBinormalObjectSelection.setValue(aSketchResult, aShapeExplorer.current())
+# aSession.finishOperation()
+#
+# # Test results
+# assert (len(aPipeFeature.results()) > 0)
 # aSession.undo()
 #
 # # Create pipe with locations
