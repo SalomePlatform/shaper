@@ -26,6 +26,15 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_EdgeBuilder
   /// \param theEnd an end point of an edge
   static std::shared_ptr<GeomAPI_Edge> line(std::shared_ptr<GeomAPI_Pnt> theStart,
                                             std::shared_ptr<GeomAPI_Pnt> theEnd);
+
+  /// Creates linear edge by three dimensions.
+  /// \param theX the X dimension
+  /// \param theY the Y dimension
+  /// \param theZ the Z dimension
+  static std::shared_ptr<GeomAPI_Edge> line(double theDX,
+                                            double theDY,
+                                            double theDZ);
+
   /// Creates edge - axis of the given cylindrical face. The result axis edge is infinite
   static std::shared_ptr<GeomAPI_Edge> cylinderAxis(
     std::shared_ptr<GeomAPI_Shape> theCylindricalFace);

@@ -58,5 +58,6 @@ INCLUDE_DIRECTORIES(
 
 
 ADD_UNIT_TESTS(TestAxisCreation.py
+               UnitTestAxis.py
                TestPointName.py
                TestPoint.py)

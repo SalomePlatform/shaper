@@ -1,8 +1,10 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+// Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
 // File:        ConstructionPlugin_Axis.h
 // Created:     12 Dec 2014
 // Author:      Vitaly Smetannikov
+
+// Modified by CEA (delegation to Alyotech) : 29 Mar 2016 
 
 #ifndef ConstructionPlugin_Axis_H
 #define ConstructionPlugin_Axis_H
@@ -57,6 +59,24 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
     static const std::string CYLINDRICAL_FACE_ATTR("CylindricalFace");
     return CYLINDRICAL_FACE_ATTR;
   }
+  /// attribute name for the X dimension
+  inline static const std::string& DX()
+  {
+    static const std::string DX_ATTR("DX");
+    return DX_ATTR;
+  }
+  /// attribute name for the Y dimension
+  inline static const std::string& DY()
+  {
+    static const std::string DY_ATTR("DY");
+    return DY_ATTR;
+  }
+  /// attribute name for the Z dimension
+  inline static const std::string& DZ()
+  {
+    static const std::string DZ_ATTR("DZ");
+    return DZ_ATTR;
+  }
 
   /// attribute name for X direction
   inline static const std::string& X_DIRECTION()
@@ -101,6 +121,8 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
  protected:
   /// Creates a new axis by two defined points
   void createAxisByTwoPoints();
+  /// Creates a new axis using three dimensions
+  void createAxisByDimensions();
   /// Creates a new axis as copy of cylindrical face axis
   void createAxisByCylindricalFace();
   /// Creates a new axis by point and direction

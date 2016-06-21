@@ -1,8 +1,10 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+// Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
 // File:        ConstructionPlugin_Axis.cpp
 // Created:     12 Dec 2014
 // Author:      Vitaly Smetannikov
+
+// Modified by CEA (delegation to Alyotech) : 29 Mar 2016 
 
 #include "ConstructionPlugin_Axis.h"
 
@@ -20,6 +22,8 @@
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_PointBuilder.h>
 
+#include <math.h>
+
 #ifdef _DEBUG
 #include <iostream>
 #endif
@@ -34,10 +38,14 @@ void ConstructionPlugin_Axis::initAttributes()
 {
   data()->addAttribute(ConstructionPlugin_Axis::METHOD(),
                        ModelAPI_AttributeString::typeId());
+  
+  // Attributes needed to build the axis using the "two points" method
   data()->addAttribute(ConstructionPlugin_Axis::POINT_FIRST(),
                        ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(ConstructionPlugin_Axis::POINT_SECOND(),
                        ModelAPI_AttributeSelection::typeId());
+
+  // Attributes needed to build the axis using the "cylindrical face" method"
   data()->addAttribute(ConstructionPlugin_Axis::CYLINDRICAL_FACE(),
                        ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(ConstructionPlugin_Axis::X_DIRECTION(),
@@ -52,6 +60,14 @@ void ConstructionPlugin_Axis::initAttributes()
       ConstructionPlugin_Axis::Y_DIRECTION());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), 
       ConstructionPlugin_Axis::Z_DIRECTION());
+
+  //Attributes needed to build the axis using the "three dimensions" method
+  data()->addAttribute(ConstructionPlugin_Axis::DX(),
+                       ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(ConstructionPlugin_Axis::DY(),
+                       ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(ConstructionPlugin_Axis::DZ(),
+                       ModelAPI_AttributeDouble::typeId());
 }
 
 void ConstructionPlugin_Axis::createAxisByTwoPoints()
@@ -126,7 +142,25 @@ void ConstructionPlugin_Axis::createAxisByCylindricalFace()
     }
 }
 
+void ConstructionPlugin_Axis::createAxisByDimensions()
+{
+  // Start by getting these dimensions
+  double aDX = data()->real(DX())->value();
+  double aDY = data()->real(DY())->value();
+  double aDZ = data()->real(DZ())->value();
 
+  if (fabs(aDX) < MINIMAL_LENGTH()  && fabs(aDY) < MINIMAL_LENGTH() && fabs(aDZ) < MINIMAL_LENGTH()){
+    setError("Axis builder with dimensions  :: all dimensions are null", false);
+    return ;
+  }
+
+  // Make the axis, build the ResultConstructionPtr and write it
+  std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aDX, aDY, aDZ);
+  ResultConstructionPtr aConstr = document()->createConstruction(data());
+  aConstr->setInfinite(true);
+  aConstr->setShape(anEdge);
+  setResult(aConstr);    
+}
 
 void ConstructionPlugin_Axis::execute()
 {
@@ -138,6 +172,8 @@ void ConstructionPlugin_Axis::execute()
     createAxisByCylindricalFace();
   } else if (aMethodType == "AxisByPointAndDirection") {
     createAxisByPointAndDirection();
+  } else if (aMethodType == "AxisByDimensionsCase") {
+    createAxisByDimensions();
   }
 }
 

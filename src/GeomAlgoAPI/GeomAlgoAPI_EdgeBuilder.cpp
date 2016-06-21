@@ -36,6 +36,23 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
   aRes->setImpl(new TopoDS_Shape(anEdge));
   return aRes;
 }
+std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(                                                            
+    double theDX, double theDY, double theDZ)
+{
+  
+  const gp_Pnt& aStart = gp_Pnt(0, 0, 0);
+  const gp_Pnt& anEnd = gp_Pnt(theDX, theDY, theDZ);
+
+  if (aStart.IsEqual(anEnd, Precision::Confusion()))
+    return std::shared_ptr<GeomAPI_Edge>();
+  if (Abs(aStart.SquareDistance(anEnd)) > 1.e+100)
+    return std::shared_ptr<GeomAPI_Edge>();
+  BRepBuilderAPI_MakeEdge anEdgeBuilder(aStart, anEnd);
+  std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
+  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
+  aRes->setImpl(new TopoDS_Shape(anEdge));
+  return aRes;
+}
 
 std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::cylinderAxis(
     std::shared_ptr<GeomAPI_Shape> theCylindricalFace)
