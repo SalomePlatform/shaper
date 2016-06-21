@@ -195,8 +195,10 @@ void Model_Objects::refsToFeature(FeaturePtr theFeature,
 {
   // check the feature: it must have no depended objects on it
   // the dependencies can be in the feature results
-  std::list<ResultPtr>::const_iterator aResIter = theFeature->results().cbegin();
-  for (; aResIter != theFeature->results().cend(); aResIter++) {
+  std::list<ResultPtr> aResults;
+  ModelAPI_Tools::allResults(theFeature, aResults);
+  std::list<ResultPtr>::const_iterator aResIter = aResults.cbegin();
+  for (; aResIter != aResults.cend(); aResIter++) {
     ResultPtr aResult = (*aResIter);
     std::shared_ptr<Model_Data> aData = 
         std::dynamic_pointer_cast<Model_Data>(aResult->data());
