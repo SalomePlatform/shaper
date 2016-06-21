@@ -64,7 +64,7 @@ void ExchangePlugin_ExportFeature::initAttributes()
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::XAO_AUTHOR_ID());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID());
 }
 
 /*
