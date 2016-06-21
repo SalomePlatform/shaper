@@ -83,6 +83,18 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
     // additionally check redundant constraints
     GCS::VEC_I aRedundantID;
     myEquationSystem.getRedundant(aRedundantID);
+    // Workaround: remove all constraints "Equal"
+    if (!aRedundantID.empty()) {
+      std::set<GCS::Constraint*>::const_iterator aCIt = myConstraints.begin();
+      for (; aCIt != myConstraints.end(); ++aCIt) {
+        GCS::VEC_I::iterator aRIt = aRedundantID.begin();
+        for (; aRIt != aRedundantID.end(); ++aRIt)
+          if ((*aCIt)->getTag() == *aRIt) {
+            aRedundantID.erase(aRIt);
+            break;
+          }
+      }
+    }
     // The system with tangent constraints may show redundant constraints if the entities are coupled smoothly.
     // Sometimes tangent constraints are fall to both conflicting and redundant constraints.
     // Need to check if there are redundant constraints without these tangencies.

@@ -60,12 +60,15 @@ public:
   /// \brief Convert feature to the form applicable for specific solver and map it
   /// \param theFeature [in]  feature to convert
   /// \param theGroup   [in]  id of the group where the feature should be placed
+  /// \param theForce   [in]  forced feature creation
   /// \return \c true if the feature has been created or updated
-  SKETCHSOLVER_EXPORT bool update(FeaturePtr theFeature, const GroupID& theGroup = GID_UNKNOWN);
+  SKETCHSOLVER_EXPORT bool update(FeaturePtr theFeature, const GroupID& theGroup = GID_UNKNOWN, bool theForce = false);
   /// \brief Convert attribute to the form applicable for specific solver and map it
-  /// \param theFeature [in]  feature to convert
+  /// \param theAttribute [in]  attribute to convert
+  /// \param theGroup     [in]  id of the group where the feature should be placed
+  /// \param theForce     [in]  forced feature creation
   /// \return \c true if the attribute has been created or updated
-  SKETCHSOLVER_EXPORT bool update(AttributePtr theAttribute, const GroupID& theGroup = GID_UNKNOWN);
+  SKETCHSOLVER_EXPORT bool update(AttributePtr theAttribute, const GroupID& theGroup = GID_UNKNOWN, bool theForce = false);
 
   /// \brief Returns constraint related to corresponding constraint
   SKETCHSOLVER_EXPORT

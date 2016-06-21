@@ -226,6 +226,11 @@ void SketchSolver_Constraint::getAttributes(
 
     myStorage->update(*anIter/*, myGroupID*/);
     EntityWrapperPtr anEntity = myStorage->entity(*anIter);
+    if (!anEntity) {
+      // Force creation of an entity
+      myStorage->update(*anIter, GID_UNKNOWN, true);
+      anEntity = myStorage->entity(*anIter);
+    }
     myAttributes.push_back(anEntity);
 
     SketchSolver_EntityType aType = anEntity->type();

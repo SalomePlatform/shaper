@@ -149,6 +149,8 @@ void SketchSolver_Storage::addEntity(AttributePtr     theAttribute,
 static bool isCopyInMulti(std::shared_ptr<SketchPlugin_Feature> theFeature,
     const std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >& theConstraints)
 {
+  if (!theFeature)
+    return false;
   bool aResult = theFeature->isCopy();
   if (aResult) {
     std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
@@ -170,11 +172,17 @@ static bool isCopyInMulti(std::shared_ptr<SketchPlugin_Feature> theFeature,
   return aResult;
 }
 
-bool SketchSolver_Storage::update(FeaturePtr theFeature, const GroupID& theGroup)
+bool SketchSolver_Storage::update(FeaturePtr theFeature, const GroupID& theGroup, bool theForce)
 {
   bool isUpdated = false;
   EntityWrapperPtr aRelated = entity(theFeature);
   if (!aRelated) { // Feature is not exist, create it
+    std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
+    bool isCopy = isCopyInMulti(aSketchFeature, myConstraintMap);
+    if (!theForce && isCopy && myFeatureMap.find(theFeature) == myFeatureMap.end())
+      return false; // the feature is a copy in "Multi" constraint and does not used in other constraints
+
     std::list<EntityWrapperPtr> aSubs;
     // Reserve the feature in the map of features (do not want to add several copies of it)
     myFeatureMap[theFeature] = aRelated;
@@ -182,13 +190,13 @@ bool SketchSolver_Storage::update(FeaturePtr theFeature, const GroupID& theGroup
     std::list<AttributePtr> anAttrs = pointAttributes(theFeature);
     std::list<AttributePtr>::const_iterator anIt = anAttrs.begin();
     for (; anIt != anAttrs.end(); ++anIt) {
-      isUpdated = update(*anIt, theGroup) || isUpdated;
+      isUpdated = update(*anIt, theGroup, theForce) || isUpdated;
       aSubs.push_back(entity(*anIt));
     }
     // If the feature is a circle, add its radius as a sub
     if (theFeature->getKind() == SketchPlugin_Circle::ID()) {
       AttributePtr aRadius = theFeature->attribute(SketchPlugin_Circle::RADIUS_ID());
-      isUpdated = update(aRadius, theGroup) || isUpdated;
+      isUpdated = update(aRadius, theGroup, theForce) || isUpdated;
       aSubs.push_back(entity(aRadius));
     }
     // If the feature if circle or arc, we need to add normal of the sketch to the list of subs
@@ -201,9 +209,7 @@ bool SketchSolver_Storage::update(FeaturePtr theFeature, const GroupID& theGroup
     BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
     GroupID aGroup = theGroup != GID_UNKNOWN ? theGroup : myGroupID;
     // Check external feature
-    std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
-        std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
-    if (aSketchFeature && (aSketchFeature->isExternal() || isCopyInMulti(aSketchFeature, myConstraintMap)))
+    if (aSketchFeature && (aSketchFeature->isExternal() || isCopy))
       aGroup = GID_OUTOFGROUP;
     aRelated = aBuilder->createFeature(theFeature, aSubs, aGroup);
     if (!aRelated)
@@ -214,14 +220,14 @@ bool SketchSolver_Storage::update(FeaturePtr theFeature, const GroupID& theGroup
   return update(aRelated) || isUpdated;
 }
 
-bool SketchSolver_Storage::update(AttributePtr theAttribute, const GroupID& theGroup)
+bool SketchSolver_Storage::update(AttributePtr theAttribute, const GroupID& theGroup, bool theForce)
 {
   AttributePtr anAttribute = theAttribute;
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
   if (aRefAttr) {
     if (aRefAttr->isObject()) {
       FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
-      return update(aFeature, theGroup);
+      return update(aFeature, theGroup, theForce);
     } else
       anAttribute = aRefAttr->attr();
   }
@@ -237,7 +243,7 @@ bool SketchSolver_Storage::update(AttributePtr theAttribute, const GroupID& theG
         if (aFeature->attribute(SketchPlugin_Arc::CENTER_ID())->isInitialized() && 
             aFeature->attribute(SketchPlugin_Arc::START_ID())->isInitialized() && 
             aFeature->attribute(SketchPlugin_Arc::END_ID())->isInitialized()) {
-          return SketchSolver_Storage::update(aFeature);
+          return SketchSolver_Storage::update(aFeature, theGroup, theForce);
         } else {
           myFeatureMap[aFeature] = EntityWrapperPtr();
           myExistArc = true;
