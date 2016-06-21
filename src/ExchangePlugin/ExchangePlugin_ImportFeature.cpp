@@ -202,6 +202,74 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
 }
 
 //============================================================================
+std::shared_ptr<ModelAPI_Feature> ExchangePlugin_ImportFeature::addFeature(
+    std::string theID)
+{
+  std::shared_ptr<ModelAPI_Feature> aNew = document()->addFeature(theID, false);
+  if (aNew)
+    data()->reflist(FEATURES_ID())->append(aNew);
+  // set as current also after it becomes sub to set correctly enabled for other subs
+  //document()->setCurrentFeature(aNew, false);
+  return aNew;
+}
+
+void ExchangePlugin_ImportFeature::removeFeature(
+    std::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  if (!data()->isValid())
+    return;
+  AttributeRefListPtr aList = reflist(FEATURES_ID());
+  // if the object is last, remove it from the list (needed to skip empty transaction on edit of sketch feature)
+  if (aList->object(aList->size(true) - 1, true) == theFeature) {
+    aList->remove(theFeature);
+  } else {
+    // to keep the persistent sub-elements indexing, do not remove elements from list,
+    // but substitute by nulls
+    aList->substitute(theFeature, ObjectPtr());
+  }
+}
+
+int ExchangePlugin_ImportFeature::numberOfSubs(bool forTree) const
+{
+  return data()->reflist(FEATURES_ID())->size(false);
+}
+
+std::shared_ptr<ModelAPI_Feature> ExchangePlugin_ImportFeature::subFeature(
+    const int theIndex, bool forTree)
+{
+  ObjectPtr anObj = data()->reflist(FEATURES_ID())->object(theIndex, false);
+  FeaturePtr aRes = std::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
+  return aRes;
+}
+
+int ExchangePlugin_ImportFeature::subFeatureId(const int theIndex) const
+{
+  std::shared_ptr<ModelAPI_AttributeRefList> aRefList = std::dynamic_pointer_cast<
+      ModelAPI_AttributeRefList>(data()->attribute(FEATURES_ID()));
+  std::list<ObjectPtr> aFeatures = aRefList->list();
+  std::list<ObjectPtr>::const_iterator anIt = aFeatures.begin();
+  int aResultIndex = 1; // number of the counted (created) features, started from 1
+  int aFeatureIndex = -1; // number of the not-empty features in the list
+  for (; anIt != aFeatures.end(); anIt++) {
+    if (anIt->get())
+      aFeatureIndex++;
+    if (aFeatureIndex == theIndex)
+      break;
+    aResultIndex++;
+  }
+  return aResultIndex;
+}
+
+bool ExchangePlugin_ImportFeature::isSub(ObjectPtr theObject) const
+{
+  // check is this feature of result
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (aFeature)
+    return data()->reflist(FEATURES_ID())->isInList(aFeature);
+  return false;
+}
+
+//============================================================================
 void ExchangePlugin_ImportFeature::loadNamingDS(
     std::shared_ptr<GeomAPI_Shape> theGeomShape,
     std::shared_ptr<ModelAPI_ResultBody> theResultBody)

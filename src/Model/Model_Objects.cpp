@@ -354,12 +354,14 @@ void Model_Objects::createHistory(const std::string& theGroupID)
         FeaturePtr aFeature = feature(aRefs->Value(a));
         if (aFeature.get()) {
           // if feature is in sub-component, remove it from history: it is in sub-tree of sub-component
-          if (!ModelAPI_Tools::compositeOwner(aFeature).get()) {
-            if (isFeature) { // here may be also disabled features
-              if (aFeature->isInHistory()) {
-                aResult.push_back(aFeature);
-              }
-            } else if (!aFeature->isDisabled()) { // iterate all results of not-disabled feature
+          bool isSub = ModelAPI_Tools::compositeOwner(aFeature).get() != NULL;
+          if (isFeature) { // here may be also disabled features
+            if (!isSub && aFeature->isInHistory()) {
+              aResult.push_back(aFeature);
+            }
+          } else if (!aFeature->isDisabled()) { // iterate all results of not-disabled feature
+            // construction results of sub-features should not be in the tree
+            if (!isSub || theGroupID != ModelAPI_ResultConstruction::group()) {
               // do not use reference to the list here since results can be changed by "isConcealed"
               const std::list<std::shared_ptr<ModelAPI_Result> > aResults = aFeature->results();
               std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
