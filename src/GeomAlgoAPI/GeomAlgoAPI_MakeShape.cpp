@@ -3,6 +3,8 @@
 // File:        GeomAlgoAPI_MakeShape.cpp
 // Created:     20 Oct 2014
 // Author:      Sergey ZARITCHNY
+//
+// Modified by Clarisse Genrault (CEA) : 17 Mar 2016
 
 #include "GeomAlgoAPI_MakeShape.h"
 
@@ -15,6 +17,7 @@
 #include <TopExp_Explorer.hxx>
 #include <TopTools_ListOfShape.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
+#include <GeomAPI_ShapeExplorer.h>
 
 //=================================================================================================
 GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape()
@@ -154,11 +157,6 @@ void GeomAlgoAPI_MakeShape::setShape(const std::shared_ptr<GeomAPI_Shape> theSha
     }
 
     const TopoDS_Shape& aTopoDSShape = myShape->impl<TopoDS_Shape>();
-    for(TopExp_Explorer anExp(aTopoDSShape,TopAbs_EDGE); anExp.More(); anExp.Next()) {
-      std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
-      aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
-      myMap->bind(aCurrentShape, aCurrentShape);
-    }
     for(TopExp_Explorer anExp(aTopoDSShape,TopAbs_FACE); anExp.More(); anExp.Next()) {
       std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
       aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
@@ -201,3 +199,41 @@ void GeomAlgoAPI_MakeShape::initialize() {
     myMap->bind(aCurrentShape, aCurrentShape);
   }
 }
+
+
+//=================================================================================================
+void GeomAlgoAPI_MakeShape::prepareNamingFaces()
+{
+  int index = 1;
+  GeomAPI_ShapeExplorer anExp(shape(), GeomAPI_Shape::FACE);
+  for(GeomAPI_ShapeExplorer anExp(shape(), GeomAPI_Shape::FACE); anExp.more(); anExp.next()) {
+    std::shared_ptr<GeomAPI_Shape> aFace = anExp.current();
+    myCreatedFaces["Face_" + std::to_string(index++)] = aFace;
+  }
+}
+
+
+//=================================================================================================
+bool GeomAlgoAPI_MakeShape::checkValid(std::string theMessage){
+
+  // isValid() is called from this method
+  if (!isValid()) {
+    myError = theMessage + " :: resulting shape is not valid.";
+    return false;
+  }
+
+  // Check the number of volumes in myShape, make sure there's one and only one.
+  TopoDS_Shape aTopoDSShape = myShape->impl<TopoDS_Shape>();
+  int aNbVolumes = 0;
+  for(TopExp_Explorer anExp(aTopoDSShape,TopAbs_SOLID); anExp.More(); anExp.Next()) {
+    aNbVolumes ++;
+  }
+  
+  if (aNbVolumes != 1) {
+    myError = theMessage + " :: connexity error, the resulting shape is made of several separate solids."; 
+    return false;
+  }
+  
+  return true ;
+}
+  
