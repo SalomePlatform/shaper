@@ -34,6 +34,8 @@ std::string ExchangePlugin_Tools::selectionType2xaoDimension(const std::string& 
 
 std::string ExchangePlugin_Tools::xaoDimension2selectionType(const std::string& theDimension)
 {
+//  return theDimension;
+
   if (theDimension == "vertex")
     return "Vertices";
   else if (theDimension == "edge")

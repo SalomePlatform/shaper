@@ -2,13 +2,14 @@
 
 // File:    ExchangePlugin_ImportFeature.h
 // Created: Aug 28, 2014
-// Author:  Sergey BELASH
+// Authors:  Sergey BELASH, Sergey POKHODENKO
 
 #ifndef EXCHANGEPLUGIN_IMPORTFEATURE_H_
 #define EXCHANGEPLUGIN_IMPORTFEATURE_H_
 
-#include <ExchangePlugin.h>
-#include <ModelAPI_Feature.h>
+#include "ExchangePlugin.h"
+
+#include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Result.h>
 
 #include <map>
@@ -20,7 +21,7 @@
  *
  * The list of supported formats is defined in the configuration file.
  */
-class ExchangePlugin_ImportFeature : public ModelAPI_Feature
+class ExchangePlugin_ImportFeature : public ModelAPI_CompositeFeature
 {
  public:
   /// Feature kind
@@ -35,11 +36,11 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
     static const std::string MY_FILE_PATH_ID("file_path");
     return MY_FILE_PATH_ID;
   }
-  /// attribute name of group list
-  inline static const std::string& GROUP_LIST_ID()
+  /// All features (list of references)
+  inline static const std::string& FEATURES_ID()
   {
-    static const std::string MY_GROUP_LIST_ID("group_list");
-    return MY_GROUP_LIST_ID;
+    static const std::string MY_FEATURES_ID("Features");
+    return MY_FEATURES_ID;
   }
   /// Default constructor
   EXCHANGEPLUGIN_EXPORT ExchangePlugin_ImportFeature();
@@ -60,6 +61,24 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
 
   /// Reimplemented from ModelAPI_Feature::isPreviewNeeded(). Returns false.
   EXCHANGEPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return false; }
+
+  /// Reimplemented from ModelAPI_CompositeFeature::addFeature()
+  virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID);
+
+  /// Reimplemented from ModelAPI_CompositeFeature::numberOfSubs()
+  virtual int numberOfSubs(bool forTree = false) const;
+
+  /// Reimplemented from ModelAPI_CompositeFeature::subFeature()
+  virtual std::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex, bool forTree = false);
+
+  /// Reimplemented from ModelAPI_CompositeFeature::subFeatureId()
+  virtual int subFeatureId(const int theIndex) const;
+
+  /// Reimplemented from ModelAPI_CompositeFeature::isSub()
+  virtual bool isSub(ObjectPtr theObject) const;
+
+  /// Reimplemented from ModelAPI_CompositeFeature::removeFeature()
+  virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
 
  protected:
   /// Performs the import of the file

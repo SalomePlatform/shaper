@@ -2,16 +2,12 @@
 
 // File:    ExchangePlugin_ImportFeature.cpp
 // Created: Aug 28, 2014
-// Author:  Sergey BELASH
+// Authors:  Sergey BELASH, Sergey POKHODENKO
 
 #include <ExchangePlugin_ImportFeature.h>
 
 #include <algorithm>
 #include <string>
-#ifdef _DEBUG
-#include <iostream>
-#include <ostream>
-#endif
 
 #include <Config_Common.h>
 #include <Config_PropManager.h>
@@ -57,9 +53,10 @@ ExchangePlugin_ImportFeature::~ExchangePlugin_ImportFeature()
 void ExchangePlugin_ImportFeature::initAttributes()
 {
   data()->addAttribute(ExchangePlugin_ImportFeature::FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(ExchangePlugin_ImportFeature::GROUP_LIST_ID(), ModelAPI_AttributeRefList::typeId());
+  data()->addAttribute(ExchangePlugin_ImportFeature::FEATURES_ID(), ModelAPI_AttributeRefList::typeId());
 
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ImportFeature::GROUP_LIST_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+      getKind(), ExchangePlugin_ImportFeature::FEATURES_ID());
 }
 
 /*
@@ -138,23 +135,23 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
   XAO::Geometry* aXaoGeometry = aXao.getGeometry();
 
   // use the geometry name or the file name for the feature
-  std::string aBodyName = aXaoGeometry->getName().empty()
-      ? GeomAlgoAPI_Tools::File_Tools::name(theFileName)
-      : aXaoGeometry->getName();
+  std::string aBodyName = aXaoGeometry->getName();
+  if (aBodyName.empty())
+    aBodyName = GeomAlgoAPI_Tools::File_Tools::name(theFileName);
   data()->setName(aBodyName);
 
   ResultBodyPtr aResultBody = createResultBody(aGeomShape);
   setResult(aResultBody);
 
   // Process groups
-  AttributeRefListPtr aRefListOfGroups = reflist(ExchangePlugin_ImportFeature::GROUP_LIST_ID());
+  std::shared_ptr<ModelAPI_AttributeRefList> aRefListOfGroups =
+      std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(data()->attribute(FEATURES_ID()));
 
   // Remove previous groups stored in RefList
   std::list<ObjectPtr> anGroupList = aRefListOfGroups->list();
   std::list<ObjectPtr>::iterator anGroupIt = anGroupList.begin();
   for (; anGroupIt != anGroupList.end(); ++anGroupIt) {
-    std::shared_ptr<ModelAPI_Feature> aFeature =
-        std::dynamic_pointer_cast<ModelAPI_Feature>(*anGroupIt);
+    std::shared_ptr<ModelAPI_Feature> aFeature = ModelAPI_Feature::feature(*anGroupIt);
     if (aFeature)
       document()->removeFeature(aFeature);
   }
@@ -163,7 +160,7 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
   for (int aGroupIndex = 0; aGroupIndex < aXao.countGroups(); ++aGroupIndex) {
     XAO::Group* aXaoGroup = aXao.getGroup(aGroupIndex);
 
-    std::shared_ptr<ModelAPI_Feature> aGroupFeature = document()->addFeature("Group", false);
+    std::shared_ptr<ModelAPI_Feature> aGroupFeature = addFeature("Group");
 
     // group name
     if (!aXaoGroup->getName().empty())
@@ -188,13 +185,13 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
 
       aSelectionList->value(anElementIndex)->setId(aReferenceID);
     }
-
-    aRefListOfGroups->append(aGroupFeature);
-
-    // hide the group in the history
-    document()->setCurrentFeature(aGroupFeature, false);
-    // groups features is internal part of the import
-    aGroupFeature->setInHistory(aGroupFeature, false);
+//
+//    aRefListOfGroups->append(aGroupFeature);
+//
+//    // hide the group in the history
+//    document()->setCurrentFeature(aGroupFeature, false);
+//    // groups features is internal part of the import
+//    aGroupFeature->setInHistory(aGroupFeature, false);
   }
 
   } catch (XAO::XAO_Exception& e) {
