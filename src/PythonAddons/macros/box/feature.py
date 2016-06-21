@@ -22,7 +22,7 @@ class BoxFeature(model.Feature):
     @staticmethod
     def ID():
         """Return Id of the feature."""
-        return "Box"
+        return "Box_script"
 
     @staticmethod
     def WIDTH_ID():
