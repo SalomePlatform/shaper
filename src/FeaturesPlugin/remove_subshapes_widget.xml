@@ -11,7 +11,7 @@
     <validator id="GeomValidators_BodyShapes"/>
   </shape_selector>
   <multi_selector id="subshapes"
-                  label="Sub-Shapes:"
+                  label="Sub-Shapes to keep:"
                   tooltip="Select shapes to keep."
                   type_choice="vertices edges wires faces shells solids compsolids compounds"
                   clear_in_neutral_point="false">
