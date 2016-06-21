@@ -390,8 +390,9 @@ QString displayedInteractiveObjects(Handle(AIS_InteractiveContext)& theContext,
 
     if (!aShapePrs.IsNull()) {
       const TopoDS_Shape& aShape = aShapePrs->Shape();
-      if (aShape.IsNull())
-        Events_Error::throwException("An empty AIS presentation");
+      if (aShape.IsNull()) {
+        //Events_Error::throwException("An empty AIS presentation");
+      }
       else
         anInfo += QString(", shape type: %1").arg(getShapeTypeInfo(aShape.ShapeType()));
     }
@@ -451,8 +452,9 @@ QString activeOwners(Handle(AIS_InteractiveContext)& theContext, const bool theS
 
     if (!BROwnr.IsNull() && BROwnr->HasShape()) {
       const TopoDS_Shape& aShape = BROwnr->Shape();
-      if (aShape.IsNull())
-        Events_Error::throwException("An empty AIS presentation");
+      if (aShape.IsNull()) {
+        //Events_Error::throwException("An empty AIS presentation");
+      }
       else
         anInfo += QString(", shape type: %1").arg(getShapeTypeInfo(aShape.ShapeType()));
     }
@@ -851,6 +853,8 @@ GeomShapePtr getShape(const AttributePtr& theAttribute, ModuleBase_IWorkshop* th
                                                                                  (theAttribute);
     aShape = aSelectAttr->value();
   }
+  else // Geom2D point processing
+    aShape = theWorkshop->module()->findShape(theAttribute);
   return aShape;
 }
 
@@ -934,7 +938,7 @@ void refsToFeatureInFeatureDocument(const ObjectPtr& theObject, std::set<Feature
 
 
 //**************************************************************
-bool isSubOfComposite(const ObjectPtr& theObject)
+/*bool isSubOfComposite(const ObjectPtr& theObject)
 {
   bool isSub = false;
   std::set<FeaturePtr> aRefFeatures;
@@ -945,10 +949,10 @@ bool isSubOfComposite(const ObjectPtr& theObject)
     isSub = isSubOfComposite(theObject, *anIt);
   }
   return isSub;
-}
+}*/
 
 //**************************************************************
-bool isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature)
+/*bool isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature)
 {
   bool isSub = false;
   CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
@@ -964,7 +968,7 @@ bool isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature)
     }
   }
   return isSub;
-}
+}*/
 
 //**************************************************************
 ResultPtr firstResult(const ObjectPtr& theObject)

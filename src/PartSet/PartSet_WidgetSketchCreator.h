@@ -13,7 +13,6 @@
 
 class QLabel;
 class PartSet_Module;
-class ModelAPI_Tools;
 class ModuleBase_Operation;
 class ModuleBase_IWorkshop;
 class PartSet_PreviewPlanes;

@@ -51,6 +51,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point.h>
@@ -332,7 +333,8 @@ void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
         // the objects of the current operation should be deactivated
         QObjectPtrList anObjects;
         anObjects.append(aFeature);
-        std::list<ResultPtr> aResults = aFeature->results();
+        std::list<ResultPtr> aResults;
+        ModelAPI_Tools::allResults(aFeature, aResults);
         std::list<ResultPtr>::const_iterator aIt;
         for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
           anObjects.append(*aIt);
@@ -949,13 +951,13 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
 {
   bool aCustomized = false;
 
-  if (theResult.get())
-    return aCustomized;
-
   XGUI_Workshop* aWorkshop = getWorkshop();
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
   ObjectPtr anObject = aDisplayer->getObject(thePrs);
-  if (anObject.get()) {
+  if (!anObject)
+    return aCustomized;
+
+  if (!theResult.get()) {
     bool isConflicting = myOverconstraintListener->isConflictingObject(anObject);
     // customize sketch symbol presentation
     if (thePrs.get()) {
@@ -992,10 +994,9 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
         aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
       }
     }
-
-    // customize dimentional constrains
-    sketchMgr()->customizePresentation(anObject);
   }
+  // customize dimentional constrains
+  sketchMgr()->customizePresentation(anObject);
 
   return aCustomized;
 }

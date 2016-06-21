@@ -16,6 +16,7 @@
 #endif
 
 #include <ModuleBase_IModule.h>
+#include <ModuleBase_Events.h>
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
@@ -39,6 +40,7 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_FilterFactory.h>
+#include <ModuleBase_WidgetSelector.h>
 
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
@@ -94,6 +96,7 @@ void XGUI_WorkshopListener::initializeEventListening()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION));
 }
 
 //******************************************************
@@ -133,7 +136,15 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     onFeatureEmptyPresentationMsg(aUpdMsg);
+  } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION)) {
+    ModuleBase_ModelWidget* aWidget = workshop()->propertyPanel()->activeWidget();
+    if (aWidget) {
+      ModuleBase_WidgetSelector* aWidgetSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aWidget);
+      if (aWidgetSelector)
+        myWorkshop->setSelected(aWidgetSelector->getAttributeSelection());
+    }
   }
+
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {

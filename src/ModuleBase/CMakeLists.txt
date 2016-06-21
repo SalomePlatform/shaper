@@ -8,6 +8,7 @@ SET(PROJECT_HEADERS
   ModuleBase_ActionInfo.h
   ModuleBase_Definitions.h
   ModuleBase_DoubleSpinBox.h
+  ModuleBase_Events.h
   ModuleBase_Filter.h
   ModuleBase_FilterFactory.h
   ModuleBase_FilterValidated.h

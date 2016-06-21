@@ -59,6 +59,11 @@ Q_OBJECT
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
+  /// Return the attribute values wrapped in a list of viewer presentations
+  /// \return a list of viewer presentations, which contains an attribute result and
+  /// a shape. If the attribute do not uses the shape, it is empty
+  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getAttributeSelection() const;
+
 protected slots:
   /// Slot which is called on selection event
   virtual void onSelectionChanged();
@@ -71,12 +76,6 @@ protected:
   /// Update focus after the attribute value change
   // NDS: has body is temporary
    virtual void updateFocus() {};
-
-  /// Return the attribute values wrapped in a list of viewer presentations
-  /// \return a list of viewer presentations, which contains an attribute result and
-  /// a shape. If the attribute do not uses the shape, it is empty
-  // NDS: has body is temporary
-  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getAttributeSelection() const;
 
   /// Retunrs a list of possible shape types
   /// \return a list of shapes

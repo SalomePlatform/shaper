@@ -17,6 +17,7 @@
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_IconFactory.h>
+#include <ModuleBase_Events.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
@@ -24,6 +25,7 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttrList.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_Events.h>
 
 #include <Config_WidgetAPI.h>
 
@@ -302,10 +304,11 @@ bool ModuleBase_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_Vie
     if (aValid) {
       if (myFeature) {
         // We can not select a result of our feature
-        const std::list<ResultPtr>& aResList = myFeature->results();
+        std::list<ResultPtr> aResults;
+        ModelAPI_Tools::allResults(myFeature, aResults);
         std::list<ResultPtr>::const_iterator aIt;
         bool isSkipSelf = false;
-        for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
+        for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
           if ((*aIt) == aResult) {
             isSkipSelf = true;
             break;
@@ -402,8 +405,15 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
 {
   if (!myIsNeutralPointClear) {
     QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
-    if (aSelected.size() == 0)
-      return;
+    // do not clear selected object
+    if (aSelected.size() == 0) {
+      if (!getAttributeSelection().empty()) {
+        // Restore selection in the viewer by the attribute selection list
+        // it should be postponed to exit from the selectionChanged processing
+        static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
+        ModelAPI_EventCreator::get()->sendUpdated(myFeature, anEvent);
+      }
+    }
   }
   ModuleBase_WidgetSelector::onSelectionChanged();
 }

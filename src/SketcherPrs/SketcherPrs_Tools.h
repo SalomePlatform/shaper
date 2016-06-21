@@ -25,7 +25,7 @@ class Handle_Prs3d_DimensionAspect;
 
 //#define MyTextHeight 20
 
-/// Message that document (Part, PartSet) was created
+/// Message that style of visualization of parameter is changed. It will be shown as expression or value
 class SketcherPrs_ParameterStyleMessage : public Events_Message
 {
 public:

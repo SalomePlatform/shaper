@@ -15,8 +15,10 @@
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_ResultPrs.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_Events.h>
 
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_Events.h>
 
 #include <TopoDS_Iterator.hxx>
 
@@ -163,7 +165,9 @@ void ModuleBase_WidgetSelector::activateCustom()
   activateSelectionAndFilters(true);
 
   // Restore selection in the viewer by the attribute selection list
-  myWorkshop->setSelected(getAttributeSelection());
+  // it should be postponed to have current widget as active to validate restored selection
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
+  ModelAPI_EventCreator::get()->sendUpdated(myFeature, anEvent);
 }
 
 //********************************************************************

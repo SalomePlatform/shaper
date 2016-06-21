@@ -85,11 +85,7 @@ bool XGUI_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr the
     }
     aCustomized = !aColor.empty() && thePrs->setColor(aColor[0], aColor[1], aColor[2]);
   }
-  else {
-   if (!aCustomized) {
-      ModuleBase_IModule* aModule = myWorkshop->module();
-      aCustomized = aModule->customisePresentation(theResult, thePrs, theCustomPrs);
-    }
-  }
+  ModuleBase_IModule* aModule = myWorkshop->module();
+  aCustomized = aModule->customisePresentation(theResult, thePrs, theCustomPrs) || aCustomized;
   return aCustomized;
 }

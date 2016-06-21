@@ -13,7 +13,8 @@
 #include <TopoDS_Shape.hxx>
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_InteractiveContext.hxx>
-#include <NCollection_List.hxx>
+#include <NCollection_Map.hxx>
+#include <NCollection_DataMap.hxx>
 
 #include <ModelAPI_Result.h>
 
@@ -322,6 +323,13 @@ private:
   /// \return a string representation
   std::string getResult2AISObjectMapInfo() const;
 
+  /// Returns container of visible presentations for the object. For a feature object,
+  /// the feature results are processed also. The presentations map is not cleared inside.
+  /// \param theObject a feature or result
+  /// \param thePresentations result map of presentations
+  void getPresentations(const ObjectPtr& theObject,
+                        NCollection_Map<Handle(AIS_InteractiveObject)>& thePresentations);
+
   /// Sets the shapes selected in the context. It contains logic of the similar method
   /// in OCCT but improved for performance. The modification is to iterates by a list
   /// of owners in the context only once.
@@ -329,7 +337,10 @@ private:
   /// \param theShapesToBeSelected a map of shapes. Owner's shape is searched in the map and the owner
   /// is selected if it is found there. Only first owner is processed(according to OCCT logic)
   static void AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) theContext,
-                                        const NCollection_Map<TopoDS_Shape>& theShapesToBeSelected);
+          const NCollection_DataMap<TopoDS_Shape,
+                          NCollection_Map<Handle(AIS_InteractiveObject)>>& theShapesToBeSelected);
+
+                                        //const NCollection_Map<TopoDS_Shape>& theShapesToBeSelected);
 
  protected:
    /// Reference to workshop

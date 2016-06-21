@@ -117,7 +117,8 @@ void ModuleBase_OperationFeature::startOperation()
 
   myVisualizedObjects.clear();
   // store hidden result features
-  std::list<ResultPtr> aResults = aFeature->results();
+  std::list<ResultPtr> aResults;
+  ModelAPI_Tools::allResults(aFeature, aResults);
   std::list<ResultPtr>::const_iterator aIt;
   for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
     ObjectPtr anObject = *aIt;
@@ -140,7 +141,8 @@ void ModuleBase_OperationFeature::stopOperation()
     return;
 
   // store hidden result features
-  std::list<ResultPtr> aResults = aFeature->results();
+  std::list<ResultPtr> aResults;
+  ModelAPI_Tools::allResults(aFeature, aResults);
   std::list<ResultPtr>::const_iterator aIt;
   for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
     ObjectPtr anObject = *aIt;
@@ -194,11 +196,13 @@ bool ModuleBase_OperationFeature::hasObject(ObjectPtr theObj) const
   if (aFeature) {
     if (aFeature == theObj)
       return true;
-    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr> aResults;
+    ModelAPI_Tools::allResults(aFeature, aResults);
     std::list<ResultPtr>::const_iterator aIt;
     for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-      if (theObj == (*aIt))
-        return true;
+      ResultPtr aResult = *aIt;
+      if (theObj == aResult)
+         return true;
     }
 #ifdef DEBUG_DO_NOT_ACTIVATE_SUB_FEATURE
     if (aFeature->isMacro()) {
@@ -453,7 +457,8 @@ void ModuleBase_OperationFeature::initSelection(ModuleBase_ISelection* theSelect
   if (aFeature) {
     QList<ModuleBase_ViewerPrsPtr> aSelected = theSelection->getSelected(ModuleBase_ISelection::AllControls);
 
-    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr> aResults;
+    ModelAPI_Tools::allResults(aFeature, aResults);
     QObjectPtrList aResList;
     std::list<ResultPtr>::const_iterator aIt;
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)

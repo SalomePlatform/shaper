@@ -29,6 +29,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_Tools.h>
 
 #include <Events_InfoMessage.h>
 #include <Events_Loop.h>
@@ -331,9 +332,10 @@ void PartSet_OperationPrs::getResultShapes(const FeaturePtr& theFeature,
 
   XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(theWorkshop)->displayer();
 
-  std::list<ResultPtr> aFeatureResults = theFeature->results();
-  std::list<ResultPtr>::const_iterator aRIt = aFeatureResults.begin(),
-                                       aRLast = aFeatureResults.end();
+  std::list<ResultPtr> aResults;
+  ModelAPI_Tools::allResults(theFeature, aResults);
+  std::list<ResultPtr>::const_iterator aRIt = aResults.begin(),
+                                       aRLast = aResults.end();
   for (; aRIt != aRLast; aRIt++) {
     ResultPtr aResult = *aRIt;
     GeomShapePtr aGeomShape = aResult->shape();

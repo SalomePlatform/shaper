@@ -17,6 +17,9 @@
 #include <ModuleBase_PageWidget.h>
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_OperationDescription.h>
+#include <ModuleBase_Events.h>
+
+#include <Events_Loop.h>
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -436,6 +439,9 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
     theWidget->activate();
   }
   myActiveWidget = theWidget;
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
+  Events_Loop::loop()->flush(anEvent);
+
   return true;
 }
 

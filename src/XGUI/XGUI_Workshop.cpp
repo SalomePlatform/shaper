@@ -627,7 +627,8 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   if (aFeature.get()) { // feature may be not created (plugin load fail)
     if (myDisplayer->isVisible(aFeature) && !myDisplayer->isActive(aFeature))
       anObjects.append(aFeature);
-    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr> aResults;
+    ModelAPI_Tools::allResults(aFeature, aResults);
     std::list<ResultPtr>::const_iterator aIt;
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
       ResultPtr anObject = *aIt;
@@ -1552,7 +1553,9 @@ std::list<FeaturePtr> allFeatures(const DocumentPtr& theDocument)
     // The order of appending features of the part and the part itself is important
 
     // Append features from a part feature
-    foreach (const ResultPtr& aResult, aFeature->results()) {
+    std::list<ResultPtr> aResults;
+    ModelAPI_Tools::allResults(aFeature, aResults);
+    foreach (const ResultPtr& aResult, aResults) {
       ResultPartPtr aResultPart =
           std::dynamic_pointer_cast<ModelAPI_ResultPart>(aResult);
       if (aResultPart.get() && aResultPart->partDoc().get()) {
@@ -1957,7 +1960,8 @@ void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
   foreach(ObjectPtr aObj, theObjects) {
     aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
     if (aFeature.get()) {
-      aResList = aFeature->results();
+      std::list<ResultPtr> aResults;
+      ModelAPI_Tools::allResults(aFeature, aResults);
       std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
       for(aIt = aResList.cbegin(); aIt != aResList.cend(); aIt++) {
         aHasHidden |= (*aIt)->isConcealed();

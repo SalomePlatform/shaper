@@ -31,6 +31,7 @@
 #include <AIS_Selection.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
+#include <TopExp_Explorer.hxx>
 
 IMPLEMENT_STANDARD_HANDLE(ModuleBase_BRepOwner, StdSelect_BRepOwner);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_BRepOwner, StdSelect_BRepOwner);
@@ -45,7 +46,7 @@ IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ResultPrs, ViewerData_AISShape);
 
 
 ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
-  : ViewerData_AISShape(TopoDS_Shape()), myResult(theResult)
+  : ViewerData_AISShape(TopoDS_Shape()), myResult(theResult), myAdditionalSelectionPriority(0)
 {
   std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(theResult);
   TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
@@ -61,6 +62,11 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   SetAutoHilight(aCompSolid.get() == NULL);
 
   ModuleBase_Tools::setPointBallHighlighting(this);
+}
+
+void ModuleBase_ResultPrs::setAdditionalSelectionPriority(const int thePriority)
+{
+  myAdditionalSelectionPriority = thePriority;
 }
 
 void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
@@ -92,6 +98,16 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
     // In order to avoid using custom selection modes
     return;
 
+  // TODO: OCCT issue should be created for the COMPOUND processing
+  // before it is fixed, the next workaround in necessary
+  if (aMode == AIS_Shape::SelectionMode(TopAbs_COMPOUND)) {
+    const TopoDS_Shape& aShape = Shape();
+    TopExp_Explorer aCompExp(aShape, TopAbs_COMPOUND);
+    // do not activate in compound mode shapes which do not contain compounds
+    if (!aCompExp.More())
+      return;
+  }
+
   if (aMode == AIS_Shape::SelectionMode(TopAbs_COMPSOLID)) {
     // Limit selection area only by actual object (Shape)
     ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(myResult);
@@ -117,6 +133,14 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
     //AIS_Shape::ComputeSelection(aSelection, 0);
   } 
   AIS_Shape::ComputeSelection(aSelection, aMode);
+
+  if (myAdditionalSelectionPriority > 0) {
+    for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
+      Handle(SelectBasics_EntityOwner) aBasicsOwner = aSelection->Sensitive()->BaseSensitive()->OwnerId();
+      if (!aBasicsOwner.IsNull())
+        aBasicsOwner->Set(aBasicsOwner->Priority() + myAdditionalSelectionPriority);
+    }
+  }
 }
 
 void ModuleBase_ResultPrs::appendWiresSelection(const Handle(SelectMgr_Selection)& theSelection,

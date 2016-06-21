@@ -38,6 +38,7 @@
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_ResultPrs.h>
 
 #include <GeomDataAPI_Point2D.h>
 
@@ -384,11 +385,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       return;
 
     Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
-    if (!aContext.IsNull()) {
-      // MoveTo in order to highlight current object
-      aContext->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
-      ModuleBase_Tools::selectionInfo(aContext, "PartSet_SketcherMgr::onMousePressed -- MoveTo");
-    }
     // Remember highlighted objects for editing
     ModuleBase_ISelection* aSelect = aWorkshop->selection();
 
@@ -433,13 +429,8 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
 
-      // this is temporary commented in order to avoid the following wrong case:
-      // Distance constraint is under edition, double click on the digit -> nothing happens
-      // because QApplication::processEvents() calls onMouseDoubleClick, which try to show editor
-      // but as the prev edit is commited an new one is not started, editor is not shown.
-      // This is necessary in order to finalize previous operation
-      //QApplication::processEvents();
       launchEditing();
+      restoreSelection();
     }
   }
 }
@@ -1003,6 +994,9 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
     qDebug("stopNestedSketch() : None");
 #endif
   }
+  /// improvement to deselect automatically all eventual selected objects, when
+  // returning to the neutral point of the Sketcher
+  workshop()->selector()->clearSelection();
 }
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
@@ -1576,6 +1570,18 @@ void PartSet_SketcherMgr::customizePresentation(const ObjectPtr& theObject)
   if (aFOperation && (PartSet_SketcherMgr::isSketchOperation(aFOperation) ||
                       PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)))
     SketcherPrs_Tools::sendExpressionShownEvent(myIsConstraintsShown[PartSet_Tools::Expressions]);
+
+  // update entities selection priorities
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (aFeature.get() && PartSet_SketcherMgr::isEntity(aFeature->getKind())) {
+    // update priority for feature
+    updateSelectionPriority(aFeature, aFeature);
+    // update priority for results of the feature
+    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr>::const_iterator anIt = aResults.begin(), aLastIt = aResults.end();
+    for (; anIt != aLastIt; anIt++)
+      updateSelectionPriority(*anIt, aFeature);
+  }
 }
 
 ModuleBase_Operation* PartSet_SketcherMgr::getCurrentOperation() const
@@ -1725,6 +1731,53 @@ void PartSet_SketcherMgr::updateBySketchParameters(
       }
     }
     break;
+  }
+}
+
+void PartSet_SketcherMgr::updateSelectionPriority(ObjectPtr theObject,
+                                                  FeaturePtr theFeature)
+{
+  if (!theObject.get() || !theFeature.get())
+    return;
+
+  AISObjectPtr anAIS = workshop()->displayer()->getAISObject(theObject);
+  Handle(AIS_InteractiveObject) anAISIO;
+  if (anAIS.get() != NULL) {
+    anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
+  }
+
+  if (!anAISIO.IsNull()) { // the presentation for the object is visualized
+    int anAdditionalPriority = 0;
+    // current feature
+    std::shared_ptr<SketchPlugin_Feature> aSPFeature =
+            std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
+    if (aSPFeature.get() != NULL) {
+      // 1. Vertices
+      // 2. Simple segments
+      // 3. External objects (violet color)
+      // 4. Auxiliary segments (dotted)
+      // StdSelect_BRepSelectionTool::Load uses priority calculating:
+      // Standard_Integer aPriority = (thePriority == -1) ? GetStandardPriority (theShape, theType) : thePriority;
+      // Priority of Vertex is 8, edge(segment) is 7.
+      // It might be not corrected as provides the condition above.
+      bool isExternal = aSPFeature->isExternal();
+      bool isAuxiliary = PartSet_Tools::isAuxiliarySketchEntity(aSPFeature);
+      // current feature
+      if (!isExternal && !isAuxiliary)
+        anAdditionalPriority = 30;
+      // external feature
+      if (isExternal)
+        anAdditionalPriority = 20;
+      // auxiliary feature
+      if (isAuxiliary) {
+        anAdditionalPriority = 10; /// auxiliary objects should have less priority that
+        // edges/vertices of local selection on not-sketch objects
+      }
+      Handle(ModuleBase_ResultPrs) aResult = Handle(ModuleBase_ResultPrs)::DownCast(anAISIO);
+      if (!aResult.IsNull()) {
+        aResult->setAdditionalSelectionPriority(anAdditionalPriority);
+      }
+    }
   }
 }
 

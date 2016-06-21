@@ -79,7 +79,7 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse
 
 //#define DEBUG_OCCT_SHAPE_SELECTION
 
-#define WORKAROUND_UNTIL_27523_IS_FIXED
+//#define WORKAROUND_UNTIL_27523_IS_FIXED
 
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
 {
@@ -476,7 +476,8 @@ bool XGUI_Displayer::isVisible(XGUI_Displayer* theDisplayer, const ObjectPtr& th
   if (!aVisible) {
     // check if all results of the feature are visible
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr> aResults;
+    ModelAPI_Tools::allResults(aFeature, aResults);
     std::list<ResultPtr>::const_iterator aIt;
     aVisible = !aResults.empty();
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
@@ -601,6 +602,8 @@ bool XGUI_Displayer::isActive(ObjectPtr theObject) const
   aContext->ActivatedModes(anAIS, aModes);
   return aModes.Extent() > 0;
 }
+
+
 void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValues, bool theUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -609,16 +612,25 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValue
   if (aContext->HasOpenedContext()) {
     aContext->UnhilightSelected(false);
     aContext->ClearSelected(false);
-    NCollection_Map<TopoDS_Shape> aShapesToBeSelected;
+    NCollection_DataMap<TopoDS_Shape, NCollection_Map<Handle(AIS_InteractiveObject)>> aShapesToBeSelected;
 
     foreach (ModuleBase_ViewerPrsPtr aPrs, theValues) {
       const GeomShapePtr& aGeomShape = aPrs->shape();
       if (aGeomShape.get() && !aGeomShape->isNull()) {
         const TopoDS_Shape& aShape = aGeomShape->impl<TopoDS_Shape>();
 #ifdef DEBUG_OCCT_SHAPE_SELECTION
+        // problem 1: performance
+        // problem 2: IO is not specified, so the first found owner is selected, as a result
+        // it might belong to another result
         aContext->AddOrRemoveSelected(aShape, false);
 #else
-        aShapesToBeSelected.Add(aShape);
+        NCollection_Map<Handle(AIS_InteractiveObject)> aPresentations;
+        if (aShapesToBeSelected.IsBound(aShape))
+          aPresentations = aShapesToBeSelected.Find(aShape);
+        ObjectPtr anObject = aPrs->object();
+        getPresentations(anObject, aPresentations);
+
+        aShapesToBeSelected.Bind(aShape, aPresentations);
 #endif
       } else {
         ObjectPtr anObject = aPrs->object();
@@ -1297,6 +1309,42 @@ std::string XGUI_Displayer::getResult2AISObjectMapInfo() const
                                             arg(aContent.join("\n")).toStdString().c_str();
 }
 
+void XGUI_Displayer::getPresentations(const ObjectPtr& theObject,
+                                  NCollection_Map<Handle(AIS_InteractiveObject)>& thePresentations)
+{
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+  if (aResult.get()) {
+    AISObjectPtr aAISObj = getAISObject(aResult);
+    if (aAISObj.get() != NULL) {
+      Handle(AIS_InteractiveObject) anAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+      if (!anAIS.IsNull() && !thePresentations.Contains(anAIS))
+        thePresentations.Add(anAIS);
+    }
+  }
+  else {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+    // find presentation of the feature
+    AISObjectPtr aAISObj = getAISObject(aFeature);
+    if (aAISObj.get() != NULL) {
+      Handle(AIS_InteractiveObject) anAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+      if (!anAIS.IsNull() && !thePresentations.Contains(anAIS))
+        thePresentations.Add(anAIS);
+    }
+    // find presentations of the feature results
+    std::list<ResultPtr> aResults;
+    ModelAPI_Tools::allResults(aFeature, aResults);
+    std::list<ResultPtr>::const_iterator anIt = aResults.begin(), aLast = aResults.end();
+    for (; anIt != aLast; ++anIt) {
+      AISObjectPtr aAISObj = getAISObject(*anIt);
+      if (aAISObj.get() != NULL) {
+        Handle(AIS_InteractiveObject) anAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+        if (!anAIS.IsNull() && !thePresentations.Contains(anAIS))
+          thePresentations.Add(anAIS);
+      }
+    }
+  }
+}
+
 void XGUI_Displayer::activateTrihedron(bool theIsActive) 
 {  
   myIsTrihedronActive = theIsActive; 
@@ -1348,13 +1396,12 @@ QIntList XGUI_Displayer::activeSelectionModes() const
 }
 
 void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) theContext,
-                                      const NCollection_Map<TopoDS_Shape>& theShapesToBeSelected)
+ const NCollection_DataMap<TopoDS_Shape,
+                           NCollection_Map<Handle(AIS_InteractiveObject)>>& theShapesToBeSelected)
 {
   Handle(AIS_LocalContext) aLContext = theContext->LocalContext();
   TCollection_AsciiString aSelectionName = aLContext->SelectionName();
   aLContext->UnhilightPicked(Standard_False);
-
-  NCollection_Map<TopoDS_Shape> aShapesSelected;
 
   NCollection_List<Handle(SelectBasics_EntityOwner)> anActiveOwners;
   aLContext->MainSelector()->ActiveOwners(anActiveOwners);
@@ -1363,12 +1410,18 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
   for (; anOwnersIt.More(); anOwnersIt.Next()) {
     anOwner = Handle(SelectMgr_EntityOwner)::DownCast (anOwnersIt.Value());
     Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast(anOwner);
-    if (!BROwnr.IsNull() && BROwnr->HasShape() && theShapesToBeSelected.Contains(BROwnr->Shape())) {
-      if (aShapesSelected.Contains(BROwnr->Shape()))
-        continue;
-      AIS_Selection::Selection(aSelectionName.ToCString())->Select(anOwner);
-      anOwner->SetSelected (Standard_True);
-      aShapesSelected.Add(BROwnr->Shape());
+    if (!BROwnr.IsNull() && BROwnr->HasShape()) {
+      const TopoDS_Shape& aShape = BROwnr->Shape();
+      if (!aShape.IsNull() && theShapesToBeSelected.IsBound(aShape)) {
+        Handle(AIS_InteractiveObject) anOwnerPresentation =
+                                    Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
+        NCollection_Map<Handle(AIS_InteractiveObject)> aPresentations =
+                                    theShapesToBeSelected.Find(aShape);
+        if (aPresentations.Contains(anOwnerPresentation)) {
+          AIS_Selection::Selection(aSelectionName.ToCString())->Select(anOwner);
+          anOwner->SetSelected (Standard_True);
+        }
+      }
     }
   }
   aLContext->HilightPicked(Standard_False);

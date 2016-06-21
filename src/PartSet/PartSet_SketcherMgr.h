@@ -366,6 +366,10 @@ private:
                         const bool isToDisplay, const bool isFlushRedisplay = true);
 
 private:
+  /// Updates selection priority of the presentation
+  /// \param theObject object to find a presentation which will be corrected
+  /// \param theFeature a feature of the presentation
+  void updateSelectionPriority(ObjectPtr theObject, FeaturePtr theFeature);
   /// Returns current workshop
   XGUI_Workshop* workshop() const;
   /// Returns operation manager

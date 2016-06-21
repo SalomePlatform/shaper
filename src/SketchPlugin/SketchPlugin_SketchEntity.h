@@ -104,7 +104,9 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
   virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                      std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
   {
-    bool isCustomized = false;
+    //bool isCustomized = false;
+    bool isCustomized = theDefaultPrs.get() != NULL &&
+                        theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
     int aShapeType = thePrs->getShapeType();
     // a compound is processed like the edge because the arc feature uses the compound for presentable AIS
     if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/ && aShapeType != 0/*compound*/)

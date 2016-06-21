@@ -264,13 +264,13 @@ void MODULEBASE_EXPORT refsToFeatureInFeatureDocument(const ObjectPtr& theObject
 /// \param theObject a candidate to be a sub object
 /// \param theFeature a candidate to be a composite feature
 /// \return a boolean value
-bool MODULEBASE_EXPORT isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature);
+//bool MODULEBASE_EXPORT isSubOfComposite(const ObjectPtr& theObject, const FeaturePtr& theFeature);
 
 
 /// Returns true if the result is a sub object of some composite object
 /// \param theObject a result object
 /// \returns boolean value
-bool MODULEBASE_EXPORT isSubOfComposite(const ObjectPtr& theObject);
+//bool MODULEBASE_EXPORT isSubOfComposite(const ObjectPtr& theObject);
 
 
 /// Returns first result of the feature: the object itself if it is a result of

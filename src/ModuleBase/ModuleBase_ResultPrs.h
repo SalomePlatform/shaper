@@ -15,6 +15,8 @@
 #include <Standard_DefineHandle.hxx>
 #include <StdSelect_BRepOwner.hxx>
 
+#include <QMap>
+
 DEFINE_STANDARD_HANDLE(ModuleBase_BRepOwner, StdSelect_BRepOwner)
 
 /**
@@ -73,6 +75,15 @@ public:
   /// Returns result object
   Standard_EXPORT ResultPtr getResult() const { return myResult; }
 
+  /// Returns selection priorities that will be added to created selection owner
+  /// \return integer value
+  Standard_EXPORT int getAdditionalSelectionPriority() const { return myAdditionalSelectionPriority; }
+
+  /// Appends a special priority for the mode of selection
+  /// \param theSelectionMode a mode of selection, used in ComputeSelection
+  /// \param thePriority a new priority value
+  Standard_EXPORT void setAdditionalSelectionPriority(const int thePriority);
+
   DEFINE_STANDARD_RTTI(ModuleBase_ResultPrs)
 protected:
   /// Redefinition of virtual function
@@ -95,6 +106,8 @@ private:
 
   /// Original shape of the result object
   TopoDS_Shape myOriginalShape;
+  /// selection priority that will be added to the standard selection priority of the selection entity
+  int myAdditionalSelectionPriority;
 };
 
 
