@@ -1,0 +1,13 @@
+<!-- Copyright (C) 2014-2016 CEA/DEN, EDF R&D -->
+
+<!--  Modified by CEA (delegation to Alyotech) : 29 Mar 2016 -->
+
+<plugin> 
+  <workbench id="Primitives" document="Part">
+    <group id="Primitives">
+      <feature id="Box" title="Box" tooltip="Create a box" icon="icons/Primitives/box.png">
+        <source path="box_widget.xml"/>
+      </feature>
+    </group>
+  </workbench>
+</plugin>

@@ -39,6 +39,10 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_WireBuilder.h
     GeomAlgoAPI_Sewing.h
     GeomAlgoAPI_ShapeBuilder.h
+    GeomAlgoAPI_DirectAPI.h
+    GeomAlgoAPI_Exception.h
+    GeomAlgoAPI_Box.h
+    GeomAlgoAPI_BoxPoints.h
     GeomAlgoAPI_XAOExport.h
     GeomAlgoAPI_XAOImport.h
 )
@@ -76,6 +80,10 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_WireBuilder.cpp
     GeomAlgoAPI_Sewing.cpp
     GeomAlgoAPI_ShapeBuilder.cpp
+    GeomAlgoAPI_DirectAPI.cpp
+    GeomAlgoAPI_Exception.cpp
+    GeomAlgoAPI_Box.cpp
+    GeomAlgoAPI_BoxPoints.cpp
     GeomAlgoAPI_XAOExport.cpp
     GeomAlgoAPI_XAOImport.cpp
 )
