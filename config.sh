@@ -45,12 +45,15 @@ include_products() {
     if   [[ "${platform}" = 'CentOS' ]]; then export PRODUCTS_ROOT=/dn23/NEWGEOM/common/PRODUCTS/CentOS.6.3.64/7.7.0
     elif [[ "${platform}" = 'Debian' && ${release} =~ ^6 ]]; then export PRODUCTS_ROOT=/dn23/NEWGEOM/common/PRODUCTS/DEBIAN.6.0.64/7.7.0
     fi
+  elif [[ ${salome_version} = '7.8.0' ]]; then
+    if   [[ "${platform}" = 'CentOS' ]]; then export PRODUCTS_ROOT=/dn23/NEWGEOM/common/PRODUCTS/CentOS.6.3.64/7.8.0
+    fi
   else
     echo "Could not find PRODUCTS for the platform ${platform} ${release}"
     exit 1
   fi
 }
-include_products '7.7.0'
+include_products '7.8.0'
 
 include_suit() {
   local salome_version=$1
@@ -60,12 +63,15 @@ include_suit() {
     if   [[ "${platform}" = 'CentOS' ]]; then export SUIT_DIR=/dn46/SALOME/series7x/V7_7_0/CentOS63-64/GUI
     elif [[ "${platform}" = 'Debian' && ${release} =~ ^6 ]]; then export SUIT_DIR=/dn46/SALOME/series7x/V7_7_0/Debian60-64/GUI
     fi
+  elif [[ ${salome_version} = '7.8.0' ]]; then
+    if   [[ "${platform}" = 'CentOS' ]]; then export SUIT_DIR=/dn46/SALOME/series7x/V7_8_0/CentOS63-64/GUI
+    fi
   else
     echo "Could not find PRODUCTS for the platform ${platform} ${release}"
     exit 1
   fi
 }
-include_suit '7.7.0'
+include_suit '7.8.0'
 
 include_salome() {
   local salome_version=$1
@@ -84,12 +90,15 @@ include_salome() {
     if   [[ "${platform}" = 'CentOS' ]]; then export SALOME_ROOT=/dn23/NEWGEOM/common/SALOME-7.7.0_CentOS63-64
     elif [[ "${platform}" = 'Debian' && ${release} =~ ^6 ]]; then export SALOME_ROOT=/dn23/NEWGEOM/common/SALOME-7.7.0_Debian60-64
     fi
+  elif [[ ${salome_version} = '7.8.0' ]]; then
+    if   [[ "${platform}" = 'CentOS' ]]; then export SALOME_ROOT=/dn23/NEWGEOM/common/SALOME-7.8.0_CentOS63-64
+    fi
   else 
     echo "Could not find SALOME for the platform ${platform} ${release}"
     exit 1
   fi
 }
-include_salome '7.7.0'
+include_salome '7.8.0'
 
 
 if [[ ${MODE} = 'Standalone' ]]; then
