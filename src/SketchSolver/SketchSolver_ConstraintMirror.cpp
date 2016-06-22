@@ -45,7 +45,7 @@ void SketchSolver_ConstraintMirror::getAttributes(
       if (!aFeature)
         continue;
 
-      myStorage->update(aFeature/*, myGroupID*/);
+      myStorage->update(aFeature, GID_UNKNOWN, true);
       aList->push_back(myStorage->entity(aFeature));
     }
   }
