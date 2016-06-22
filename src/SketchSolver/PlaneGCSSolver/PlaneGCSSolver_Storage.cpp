@@ -383,10 +383,6 @@ void PlaneGCSSolver_Storage::verifyFixed()
 
 void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
 {
-  // no need to constraint a fixed arc
-  if (theArc->group() == GID_OUTOFGROUP)
-    return;
-
   // Calculate additional parameters necessary for PlaneGCS
   const std::list<EntityWrapperPtr>& aSubs = theArc->subEntities();
   std::list<EntityWrapperPtr>::const_iterator aSubIt = aSubs.begin();
@@ -430,8 +426,8 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
     *aEndAngle += anAngle;
   }
 
-  // do not constraint copied arc
-  if (anArcFeature->isCopy())
+  // no need to constraint a fixed or a copied arc
+  if (theArc->group() == GID_OUTOFGROUP || anArcFeature->isCopy())
     return;
   // No need to add constraints if they are already exist
   std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >::const_iterator
