@@ -204,7 +204,7 @@ void GeomAlgoAPI_MakeShape::initialize() {
 //=================================================================================================
 void GeomAlgoAPI_MakeShape::prepareNamingFaces()
 {
-  int index = 1;
+  long double index = 1;
   GeomAPI_ShapeExplorer anExp(shape(), GeomAPI_Shape::FACE);
   for(GeomAPI_ShapeExplorer anExp(shape(), GeomAPI_Shape::FACE); anExp.more(); anExp.next()) {
     std::shared_ptr<GeomAPI_Shape> aFace = anExp.current();

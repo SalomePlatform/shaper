@@ -19,7 +19,7 @@ namespace GeomAlgoAPI_DirectAPI
  * \ingroup DataAlgo
  * \brief Allows to access the direct API
  */
-class GeomAlgoAPI_DirectAPI
+class GEOMALGOAPI_EXPORT GeomAlgoAPI_DirectAPI
 {
 public:
   /// Creates a box using the dimensions.
