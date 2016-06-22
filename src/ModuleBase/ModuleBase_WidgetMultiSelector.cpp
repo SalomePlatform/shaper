@@ -448,13 +448,13 @@ QIntList ModuleBase_WidgetMultiSelector::shapeTypes() const
 }
 
 //********************************************************************
-void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum theShapeType)
+void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const int theShapeType)
 {
   QString aShapeTypeName;
   
   for (int idx = 0; idx < myTypeCombo->count(); ++idx) {
     aShapeTypeName = myTypeCombo->itemText(idx);
-    TopAbs_ShapeEnum aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);
+    int aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);
     if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
       bool aWasActivated = activateSelectionAndFilters(false);
       bool isBlocked = myTypeCombo->blockSignals(true);

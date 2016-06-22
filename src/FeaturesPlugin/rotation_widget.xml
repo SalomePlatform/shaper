@@ -5,7 +5,7 @@
     label="Main objects"
     icon="icons/Features/cut_shape.png"
     tooltip="Select solid objects"
-    type_choice="solids objects"
+    type_choice="objects"
     concealment="true">
     <validator id="FeaturesPlugin_ValidatorTransform"/>
   </multi_selector>

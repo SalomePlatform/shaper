@@ -59,6 +59,13 @@ DEFINE_STANDARD_HANDLE(ModuleBase_ResultPrs, ViewerData_AISShape)
 class ModuleBase_ResultPrs: public ViewerData_AISShape
 {
 public:
+  enum SelectionModes {
+    Sel_Result = TopAbs_SHAPE + 1 /// it should be combined with Compsolid results, so it is not
+                                  /// the Shape type. It is not defined in XML as compound type
+                                  /// because this type is processed as shape with compounds inside.
+  };
+
+public:
   /// Constructor
   /// \param theResult a result object
   Standard_EXPORT ModuleBase_ResultPrs(ResultPtr theResult);

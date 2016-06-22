@@ -94,9 +94,13 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
 void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                             const Standard_Integer aMode)
 {
-  if (aMode > 8)
+  if (aMode > TopAbs_SHAPE) {
     // In order to avoid using custom selection modes
+    if (aMode == ModuleBase_ResultPrs::Sel_Result) {
+      AIS_Shape::ComputeSelection(aSelection, TopAbs_COMPOUND);
+    }
     return;
+  }
 
   // TODO: OCCT issue should be created for the COMPOUND processing
   // before it is fixed, the next workaround in necessary

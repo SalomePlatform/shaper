@@ -124,7 +124,7 @@ protected:
   virtual QIntList shapeTypes() const;
 
   /// Set current shape type for selection
-  void setCurrentShapeType(const TopAbs_ShapeEnum theShapeType);
+  void setCurrentShapeType(const int theShapeType);
 
   /// Return the attribute values wrapped in a list of viewer presentations
   /// \return a list of viewer presentations, which contains an attribute result and

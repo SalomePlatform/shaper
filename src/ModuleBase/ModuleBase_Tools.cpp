@@ -12,6 +12,7 @@
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_IconFactory.h>
+#include <ModuleBase_ResultPrs.h>
 
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeRefAttr.h>
@@ -348,6 +349,8 @@ QString getShapeTypeInfo(const int theType)
     case TopAbs_EDGE:      anInfo = "edge"; break;
     case TopAbs_VERTEX:    anInfo = "vertex"; break;
     case TopAbs_SHAPE:     anInfo = "shape"; break;
+    case ModuleBase_ResultPrs::Sel_Result:
+                           anInfo = "result_shape"; break;
     default: break;
   }
   return anInfo;
@@ -521,10 +524,10 @@ void selectionInfo(Handle(AIS_InteractiveContext)& theContext, const std::string
 #endif
 }
 
-typedef QMap<QString, TopAbs_ShapeEnum> ShapeTypes;
+typedef QMap<QString, int> ShapeTypes;
 static ShapeTypes myShapeTypes;
 
-TopAbs_ShapeEnum shapeType(const QString& theType)
+int shapeType(const QString& theType)
 {
   if (myShapeTypes.count() == 0) {
     myShapeTypes["compound"]   = TopAbs_COMPOUND;
@@ -543,7 +546,8 @@ TopAbs_ShapeEnum shapeType(const QString& theType)
     myShapeTypes["edges"]      = TopAbs_EDGE;
     myShapeTypes["vertex"]     = TopAbs_VERTEX;
     myShapeTypes["vertices"]   = TopAbs_VERTEX;
-    myShapeTypes["objects"]    = TopAbs_SHAPE;
+    myShapeTypes["object"]     = ModuleBase_ResultPrs::Sel_Result;
+    myShapeTypes["objects"]    = ModuleBase_ResultPrs::Sel_Result;
   }
   QString aType = theType.toLower();
   if(myShapeTypes.contains(aType))

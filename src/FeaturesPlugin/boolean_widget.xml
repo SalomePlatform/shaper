@@ -15,7 +15,7 @@
     label="Main objects"
     icon=""
     tooltip="Select solid objects"
-    type_choice="Solids Objects"
+    type_choice="solids edges faces"
     use_choice="false"
     concealment="true">
     <validator id="PartSet_DifferentObjects"/>
@@ -25,7 +25,7 @@
     label="Tool objects"
     icon=""
     tooltip="Select a tool solid"
-    type_choice="Solids Objects"
+    type_choice="solids edges faces"
     use_choice="false"
     concealment="true" >
     <validator id="PartSet_DifferentObjects"/>

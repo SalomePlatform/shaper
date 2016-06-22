@@ -447,8 +447,8 @@ void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theMode
 
 int XGUI_Displayer::getSelectionMode(int theShapeType)
 {
-  return (theShapeType >= TopAbs_SHAPE)? theShapeType : 
-    AIS_Shape::SelectionMode((TopAbs_ShapeEnum)theShapeType);
+  return (theShapeType > TopAbs_SHAPE) ? theShapeType : 
+                                         AIS_Shape::SelectionMode((TopAbs_ShapeEnum)theShapeType);
 }
 
 bool XGUI_Displayer::isVisible(XGUI_Displayer* theDisplayer, const ObjectPtr& theObject)

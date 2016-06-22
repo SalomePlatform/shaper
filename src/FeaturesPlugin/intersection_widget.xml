@@ -4,8 +4,8 @@
   <multi_selector id="main_objects"
     label="Main objects"
     icon="icons/Features/cut_shape.png"
-    tooltip="Select objects(objects, compsoilds, solids, shells, faces or edges)"
-    type_choice="Solids Objects"
+    tooltip="Select objects(compounds, compsolids, solids, shells, faces or edges)"
+    type_choice="edges faces shells solids compsolids compounds"
     use_choice="false"
     concealment="true">
     <validator id="PartSet_DifferentObjects"/>
@@ -14,8 +14,8 @@
   <multi_selector id="tool_objects"
     label="Tool objects"
     icon="icons/Features/cut_tool.png"
-    tooltip="Select tools(objects, compsoilds, solids, shells, faces or edges)"
-    type_choice="Solids Objects"
+    tooltip="Select tools(compounds, compsolids, solids, shells, faces or edges)"
+    type_choice="edges faces shells solids compsolids compounds"
     use_choice="false"
     concealment="true">
     <validator id="PartSet_DifferentObjects"/>
