@@ -334,6 +334,11 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
         aStartAttr->setValue(sketch()->to2D(anEdge->firstPoint()));
         anEndAttr->setValue(sketch()->to2D(anEdge->lastPoint()));
         aCenterAttr->setValue(sketch()->to2D(aCirc->center()));
+
+        data()->real(RADIUS_ID())->setValue(aCirc->radius());
+        double aStartAngle, aEndAngle;
+        anEdge->getRange(aStartAngle, aEndAngle);
+        data()->real(ANGLE_ID())->setValue(aEndAngle - aStartAngle);
       }
     }
     return;
