@@ -9,58 +9,30 @@
 //--------------------------------------------------------------------------------------
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
-ExchangeAPI_Export::ExchangeAPI_Export(
-    const std::shared_ptr<ModelAPI_Feature> & theFeature)
-: ModelHighAPI_Interface(theFeature)
-{
-  initialize();
-}
-
-ExchangeAPI_Export::ExchangeAPI_Export(
-    const std::shared_ptr<ModelAPI_Feature> & theFeature,
-    const std::string & theFilePath,
-    const std::string & theFileFormat,
-    const std::list<ModelHighAPI_Selection> & theSelectionList)
-: ModelHighAPI_Interface(theFeature)
-{
-  if (initialize()) {
-    setFilePath(theFilePath);
-    setFileFormat(theFileFormat);
-    setSelectionList(theSelectionList);
-    execute();
-  }
-}
-
-ExchangeAPI_Export::~ExchangeAPI_Export()
-{
-
-}
-
-//--------------------------------------------------------------------------------------
-void ExchangeAPI_Export::setFilePath(const std::string & theFilePath)
-{
-  fillAttribute(theFilePath, myfilePath);
-}
-
-void ExchangeAPI_Export::setFileFormat(const std::string & theFileFormat)
-{
-  fillAttribute(theFileFormat, myfileFormat);
-}
-
-void ExchangeAPI_Export::setSelectionList(
-    const std::list<ModelHighAPI_Selection> & theSelectionList)
-{
-  fillAttribute(theSelectionList, myselectionList);
-}
-
-//--------------------------------------------------------------------------------------
-ExportPtr exportToFile(
-    const std::shared_ptr<ModelAPI_Document> & thePart,
-    const std::string & theFilePath,
-    const std::string & theFileFormat,
-    const std::list<ModelHighAPI_Selection> & theSelectionList)
+void exportToFile(const std::shared_ptr<ModelAPI_Document> & thePart,
+                  const std::string & theFilePath,
+                  const std::list<ModelHighAPI_Selection> & theSelectionList,
+                  const std::string & theFileFormat)
 {
   // TODO(spo): check that thePart is not empty
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ExchangeAPI_Export::ID());
-  return ExportPtr(new ExchangeAPI_Export(aFeature, theFilePath, theFileFormat, theSelectionList));
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ExchangePlugin_ExportFeature::ID());
+  fillAttribute(theFilePath, aFeature->string(ExchangePlugin_ExportFeature::FILE_PATH_ID()));
+  fillAttribute(theSelectionList, aFeature->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID()));
+  fillAttribute(theFileFormat, aFeature->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID()));
+  aFeature->execute();
 }
+
+void exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
+                 const std::string & theFilePath,
+                 const std::string & theAuthor,
+                 const std::string & theGeometryName)
+{
+  // TODO(spo): check that thePart is not empty
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ExchangePlugin_ExportFeature::ID());
+  fillAttribute(theFilePath, aFeature->string(ExchangePlugin_ExportFeature::FILE_PATH_ID()));
+  fillAttribute(theAuthor, aFeature->string(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID()));
+  fillAttribute(theGeometryName, aFeature->string(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID()));
+  aFeature->execute();
+}
+
+//--------------------------------------------------------------------------------------

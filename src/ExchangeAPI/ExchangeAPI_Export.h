@@ -20,57 +20,23 @@
 //--------------------------------------------------------------------------------------
 class ModelHighAPI_Selection;
 //--------------------------------------------------------------------------------------
-/**\class ExchangeAPI_Export
- * \ingroup CPPHighAPI
- * \brief Interface for Export feature
- */
-class ExchangeAPI_Export : public ModelHighAPI_Interface
-{
-public:
-  /// Constructor without values
-  EXCHANGEAPI_EXPORT
-  explicit ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature> & theFeature);
-  /// Constructor with values
-  EXCHANGEAPI_EXPORT
-  ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature> & theFeature,
-                     const std::string & theFilePath,
-                     const std::string & theFileFormat,
-                     const std::list<ModelHighAPI_Selection> & theSelectionList);
-  /// Destructor
-  EXCHANGEAPI_EXPORT
-  virtual ~ExchangeAPI_Export();
-
-  INTERFACE_3(ExchangePlugin_ExportFeature::ID(),
-              filePath, ExchangePlugin_ExportFeature::FILE_PATH_ID(), ModelAPI_AttributeString, /** File path */,
-              fileFormat, ExchangePlugin_ExportFeature::FILE_FORMAT_ID(), ModelAPI_AttributeString, /** File format */,
-              selectionList, ExchangePlugin_ExportFeature::SELECTION_LIST_ID(), ModelAPI_AttributeSelectionList, /** Selection list */
-  )
-
-  /// Set file path (without execute)
-  EXCHANGEAPI_EXPORT
-  void setFilePath(const std::string & theFilePath);
-
-  /// Set file format (without execute)
-  EXCHANGEAPI_EXPORT
-  void setFileFormat(const std::string & theFileFormat);
-
-
-  /// Set selection list (without execute)
-  EXCHANGEAPI_EXPORT
-  void setSelectionList(const std::list<ModelHighAPI_Selection> & theSelectionList);
-};
-
-//! Pointer on Export object
-typedef std::shared_ptr<ExchangeAPI_Export> ExportPtr;
-
 /**\ingroup CPPHighAPI
- * \brief Create Export feature
+ * \brief Export to file
  */
 EXCHANGEAPI_EXPORT
-ExportPtr exportToFile(const std::shared_ptr<ModelAPI_Document> & thePart,
-                       const std::string & theFilePath,
-                       const std::string & theFileFormat,
-                       const std::list<ModelHighAPI_Selection> & theSelectionList);
+void exportToFile(const std::shared_ptr<ModelAPI_Document> & thePart,
+                  const std::string & theFilePath,
+                  const std::list<ModelHighAPI_Selection> & theSelectionList,
+                  const std::string & theFileFormat = std::string());
+
+/**\ingroup CPPHighAPI
+ * \brief Export XAO
+ */
+EXCHANGEAPI_EXPORT
+void exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
+                 const std::string & theFilePath,
+                 const std::string & theAuthor = std::string(),
+                 const std::string & theGeometryName = std::string());
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
