@@ -84,5 +84,5 @@
     </box>
   </toolbox>
   <validator id="GeomValidators_ZeroOffset" parameters="CreationMethod,BySizes,base,to_size,from_size,to_object,to_offset,from_object,from_offset"/>
-  <validator id="FeaturesPlugin_ValidatorCanBeEmpty" parameters="base,direction_object"/>
+  <validator id="FeaturesPlugin_ValidatorExtrusionDir" parameters="base,direction_object"/>
 </source>

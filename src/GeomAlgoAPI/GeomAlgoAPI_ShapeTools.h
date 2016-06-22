@@ -12,7 +12,9 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Vertex.h>
 
+class GeomAPI_Edge;
 class GeomAPI_Dir;
+class GeomAPI_Face;
 class GeomAPI_PlanarEdges;
 class GeomAPI_Pln;
 class GeomAPI_Pnt;
@@ -96,6 +98,10 @@ public:
 
   /// \return outer wire for face. If theShape has different type returns empty pointer.
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> getFaceOuterWire(const std::shared_ptr<GeomAPI_Shape> theFace);
+
+  /// \return true if edge is parallel to face.
+  GEOMALGOAPI_EXPORT static bool isParallel(const std::shared_ptr<GeomAPI_Edge> theEdge,
+                                            const std::shared_ptr<GeomAPI_Face> theFace);
 
 };
 

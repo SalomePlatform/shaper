@@ -22,6 +22,7 @@
 #include <GeomValidators_ShapeType.h>
 
 #include <GeomAPI_DataMapOfShapeShape.h>
+#include <GeomAPI_Lin.h>
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
@@ -30,6 +31,9 @@
 #include <GeomAlgoAPI_ShapeBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_WireBuilder.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 //==================================================================================================
 bool FeaturesPlugin_ValidatorPipePath::isValid(const AttributePtr& theAttribute,
@@ -334,7 +338,7 @@ bool FeaturesPlugin_ValidatorCompositeLauncher::isValid(const AttributePtr& theA
 }
 
 //==================================================================================================
-bool FeaturesPlugin_ValidatorCanBeEmpty::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+bool FeaturesPlugin_ValidatorExtrusionDir::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                  const std::list<std::string>& theArguments,
                                                  std::string& theError) const
 {
@@ -348,45 +352,81 @@ bool FeaturesPlugin_ValidatorCanBeEmpty::isValid(const std::shared_ptr<ModelAPI_
   AttributePtr aCheckAttribute = theFeature->attribute(*anArgsIt);
   ++anArgsIt;
 
-  if(isShapesCanBeEmpty(aCheckAttribute, theError)) {
-    return true;
-  }
-
+  GeomShapePtr aDirShape;
   AttributeSelectionPtr aSelAttr = theFeature->selection(*anArgsIt);
-  if(!aSelAttr.get()) {
-    theError = "Error: Could not get selection attribute \"" + *anArgsIt + "\".";
-    return false;
+  if(aSelAttr.get()) {
+    aDirShape = aSelAttr->value();
+    if(!aDirShape.get()) {
+      ResultPtr aContext = aSelAttr->context();
+      if(aContext.get()) {
+        aDirShape = aContext->shape();
+      }
+    }
   }
 
-  GeomShapePtr aShape = aSelAttr->value();
-  if(!aShape.get()) {
-    ResultPtr aContext = aSelAttr->context();
-    if(!aContext.get()) {
+  if(!aDirShape.get()) {
+    // Check that dir can be empty.
+    if(!isShapesCanBeEmpty(aCheckAttribute, theError)) {
       theError = "Error: Base objects list contains vertex or edge, so attribute \"" + *anArgsIt
                + "\" can not be used with default value. Select direction for extrusion.";
       return false;
+    } else {
+      return true;
     }
-
-    aShape = aContext->shape();
   }
 
-  if(!aShape.get()) {
-    theError = "Error: Base objects list contains vertex or edge, so attribute \"" + *anArgsIt
-              + "\" can not be used with default value. Select direction for extrusion.";
-    return false;
+  std::shared_ptr<GeomAPI_Edge> aDirEdge(new GeomAPI_Edge(aDirShape));
+
+  // If faces selected check that direction not parallel with them.
+  AttributeSelectionListPtr aListAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aCheckAttribute);
+  for(int anIndex = 0; anIndex < aListAttr->size(); ++anIndex) {
+    AttributeSelectionPtr anAttr = aListAttr->value(anIndex);
+    GeomShapePtr aShapeInList = anAttr->value();
+    if(!aShapeInList.get()) {
+      aShapeInList = anAttr->context()->shape();
+    }
+    bool isParallel = true;
+    if(aShapeInList->shapeType() == GeomAPI_Shape::FACE || aShapeInList->shapeType() == GeomAPI_Shape::SHELL) {
+      for(GeomAPI_ShapeExplorer anExp(aShapeInList, GeomAPI_Shape::FACE); anExp.more(); anExp.next()) {
+        std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(anExp.current()));
+        isParallel = GeomAlgoAPI_ShapeTools::isParallel(aDirEdge, aFace);
+        if(isParallel) {
+          break;
+        }
+      }
+    } else if(aShapeInList->shapeType() == GeomAPI_Shape::COMPOUND) {
+      std::shared_ptr<GeomAPI_PlanarEdges> aPlanarEdges = std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aShapeInList);
+      if(aPlanarEdges.get()) {
+        std::shared_ptr<GeomAPI_Dir> aSketchDir = aPlanarEdges->norm();
+        if(aDirEdge->isLine()) {
+          std::shared_ptr<GeomAPI_Dir> aDir = aDirEdge->line()->direction();
+          isParallel = abs(aSketchDir->angle(aDir) - M_PI / 2.0) < 10e-7;
+        } else {
+          isParallel = false;
+        }
+      } else {
+        isParallel = false;
+      }
+    } else {
+      isParallel = false;
+    }
+    if(isParallel) {
+      theError = "Error: Direction is parallel to one of the selected face or face on selected shell.";
+      return false;
+    }
   }
 
   return true;
 }
 
 //==================================================================================================
-bool FeaturesPlugin_ValidatorCanBeEmpty::isNotObligatory(std::string theFeature, std::string theAttribute)
+bool FeaturesPlugin_ValidatorExtrusionDir::isNotObligatory(std::string theFeature, std::string theAttribute)
 {
   return false;
 }
 
 //==================================================================================================
-bool FeaturesPlugin_ValidatorCanBeEmpty::isShapesCanBeEmpty(const AttributePtr& theAttribute,
+bool FeaturesPlugin_ValidatorExtrusionDir::isShapesCanBeEmpty(const AttributePtr& theAttribute,
                                                             std::string& theError) const
 {
   if(!theAttribute.get()) {

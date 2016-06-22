@@ -9,6 +9,7 @@
 #include "GeomAlgoAPI_SketchBuilder.h"
 
 #include <GeomAPI_Dir.h>
+#include <GeomAPI_Face.h>
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Pnt.h>
@@ -24,6 +25,7 @@
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepCheck_Analyzer.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
+#include <BRepExtrema_ExtCF.hxx>
 #include <BRepGProp.hxx>
 #include <BRepTools.hxx>
 #include <BRepTopAdaptor_FClass2d.hxx>
@@ -633,4 +635,19 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::getFaceOuterWire(const st
   anOuterWire->setImpl(new TopoDS_Shape(aWire));
 
   return anOuterWire;
+}
+
+//==================================================================================================
+bool GeomAlgoAPI_ShapeTools::isParallel(const std::shared_ptr<GeomAPI_Edge> theEdge,
+                                        const std::shared_ptr<GeomAPI_Face> theFace)
+{
+  if(!theEdge.get() || !theFace.get()) {
+    return false;
+  }
+
+  TopoDS_Edge anEdge = TopoDS::Edge(theEdge->impl<TopoDS_Shape>());
+  TopoDS_Face aFace  = TopoDS::Face(theFace->impl<TopoDS_Shape>());
+
+  BRepExtrema_ExtCF anExt(anEdge, aFace);
+  return anExt.IsParallel() == Standard_True;
 }

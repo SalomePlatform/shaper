@@ -79,11 +79,11 @@ public:
                         std::string& theError) const;
 };
 
-/// \class FeaturesPlugin_ValidatorCanBeEmpty
+/// \class FeaturesPlugin_ValidatorExtrusionDir
 /// \ingroup Validators
 /// \brief A validator for extrusion direction attribute. Allows it to be empty if base objects are
 ///        planar and do not contain vertices and edges.
-class FeaturesPlugin_ValidatorCanBeEmpty: public ModelAPI_FeatureValidator
+class FeaturesPlugin_ValidatorExtrusionDir: public ModelAPI_FeatureValidator
 {
 public:
   //! \return true if attribute listed in the parameter arguments are planar.

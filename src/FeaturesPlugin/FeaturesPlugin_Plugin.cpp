@@ -44,8 +44,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorBaseForGeneration);
   aFactory->registerValidator("FeaturesPlugin_ValidatorPipeLocations",
                               new FeaturesPlugin_ValidatorPipeLocations);
-  aFactory->registerValidator("FeaturesPlugin_ValidatorCanBeEmpty",
-                              new FeaturesPlugin_ValidatorCanBeEmpty);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorExtrusionDir",
+                              new FeaturesPlugin_ValidatorExtrusionDir);
   aFactory->registerValidator("FeaturesPlugin_ValidatorBooleanSelection",
                               new FeaturesPlugin_ValidatorBooleanSelection);
   aFactory->registerValidator("FeaturesPlugin_ValidatorPartitionSelection",
