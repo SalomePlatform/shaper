@@ -33,7 +33,6 @@ def testImport(theType, theFile, theVolume, theDelta):
     file = anImportFeature.string(aFieldName)
     assert file, "{0}: Can not receive string field {1}".format(theType, aFieldName)
     file.setValue(theFile)
-    anImportFeature.execute()
     aSession.finishOperation()
 
     # Check results
@@ -59,7 +58,6 @@ def testImportXAO():
     aSession.startOperation("Import XAO")
     anImportFeature = aPart.addFeature("Import")
     anImportFeature.string("file_path").setValue("Data/test.xao")
-    anImportFeature.execute()
     aSession.finishOperation()
 
     # Check results
@@ -109,7 +107,7 @@ if __name__ == '__main__':
 #=========================================================================
 # Create a shape imported from XAO
 #=========================================================================
-#     testImportXAO()
+    testImportXAO()
 #=========================================================================
 # End of test
 #=========================================================================

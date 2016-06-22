@@ -486,9 +486,12 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     isPostponedMain = aCurrentOwner.get() && aCompos->isSub(aCurrentOwner);
   }
 
-  #ifdef DEB_UPDATE
-    std::cout<<"Update args "<<theFeature->name()<<std::endl;
-  #endif
+#ifdef DEB_UPDATE
+  std::cout<<"Update args "<<theFeature->name()<<std::endl;
+#endif
+  // TestImport.py : after arguments are updated, theFeature may be removed
+  if (!theFeature->data()->isValid())
+    return false;
   // Update selection and parameters attributes first, before sub-features analysis (sketch plane).
   updateArguments(theFeature);
 

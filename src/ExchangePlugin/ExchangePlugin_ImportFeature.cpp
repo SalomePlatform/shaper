@@ -213,19 +213,12 @@ void ExchangePlugin_ImportFeature::removeFeature(
   if (!data()->isValid())
     return;
   AttributeRefListPtr aList = reflist(FEATURES_ID());
-  // if the object is last, remove it from the list (needed to skip empty transaction on edit of sketch feature)
-  if (aList->object(aList->size(true) - 1, true) == theFeature) {
-    aList->remove(theFeature);
-  } else {
-    // to keep the persistent sub-elements indexing, do not remove elements from list,
-    // but substitute by nulls
-    aList->substitute(theFeature, ObjectPtr());
-  }
+  aList->remove(theFeature);
 }
 
 int ExchangePlugin_ImportFeature::numberOfSubs(bool forTree) const
 {
-  return data()->reflist(FEATURES_ID())->size(false);
+  return data()->reflist(FEATURES_ID())->size(true);
 }
 
 std::shared_ptr<ModelAPI_Feature> ExchangePlugin_ImportFeature::subFeature(
