@@ -79,8 +79,9 @@ protected:
 
   /** \brief Updates entity which is moved in GUI
    *  \param[in] theFeature entity to be updated
+   *  \return \c true, if the entity has been moved
    */
-  void moveEntity(std::shared_ptr<SketchPlugin_Feature> theFeature);
+  bool moveEntity(std::shared_ptr<SketchPlugin_Feature> theFeature);
 
   /** \brief Goes through the list of groups and solve the constraints
    *  \param[in] theGroups  list of groups to be resolved (if empty list, all groups are resolved)

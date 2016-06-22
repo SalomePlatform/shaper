@@ -130,8 +130,9 @@ void SketchSolver_Manager::processEvent(
       for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
         std::shared_ptr<SketchPlugin_Feature> aSFeature = 
             std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-        if (aSFeature) {
-          moveEntity(aSFeature);
+        if (aSFeature && moveEntity(aSFeature)) {
+          // Want to avoid recalculation of DoF too frequently.
+          // So, set the flag when the feature is really moved.
           hasProperFeature = true;
         }
       }
@@ -365,23 +366,22 @@ bool SketchSolver_Manager::changeFeature(std::shared_ptr<SketchPlugin_Feature> t
 //  Function: moveEntity
 //  Purpose:  update element moved on the sketch, which is used by constraints
 // ============================================================================
-void SketchSolver_Manager::moveEntity(std::shared_ptr<SketchPlugin_Feature> theFeature)
+bool SketchSolver_Manager::moveEntity(std::shared_ptr<SketchPlugin_Feature> theFeature)
 {
   bool isMoved = false;
   std::list<SketchSolver_Group*>::iterator aGroupIt = myGroups.begin();
   for (; aGroupIt != myGroups.end(); aGroupIt++)
-    if (!(*aGroupIt)->isEmpty() && (*aGroupIt)->isInteract(theFeature)) {
-      (*aGroupIt)->moveFeature(theFeature);
-      isMoved = true;
-    }
+    if (!(*aGroupIt)->isEmpty() && (*aGroupIt)->isInteract(theFeature))
+      isMoved = (*aGroupIt)->moveFeature(theFeature) || isMoved;
 
   if (!isMoved && theFeature->getKind() == SketchPlugin_Arc::ID()) {
     // Workaround to move arc.
     // If the arc has not been constrained, we will push it into empty group and apply movement.
     for (aGroupIt = myGroups.begin(); aGroupIt != myGroups.end(); aGroupIt++)
       if ((*aGroupIt)->isEmpty())
-        (*aGroupIt)->moveFeature(theFeature);
+        isMoved = (*aGroupIt)->moveFeature(theFeature) || isMoved;
   }
+  return isMoved;
 }
 
 // ============================================================================

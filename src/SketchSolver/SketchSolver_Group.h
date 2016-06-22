@@ -81,8 +81,9 @@ class SketchSolver_Group
   /** \brief Updates the data corresponding the specified feature moved in GUI.
    *         Additional Fixed constraints are created.
    *  \param[in] theFeature the feature to be updated
+   *  \return \c true, if the feature is moved
    */
-  void moveFeature(FeaturePtr theFeature);
+  bool moveFeature(FeaturePtr theFeature);
 
   /** \brief Verifies the feature attributes are used in this group
    *  \param[in] theFeature constraint or any other object for verification of interaction

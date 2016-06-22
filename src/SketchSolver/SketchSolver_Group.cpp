@@ -246,7 +246,7 @@ bool SketchSolver_Group::updateFeature(FeaturePtr theFeature)
   return isUpdated;
 }
 
-void SketchSolver_Group::moveFeature(FeaturePtr theFeature)
+bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
 {
   BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
 
@@ -260,7 +260,7 @@ void SketchSolver_Group::moveFeature(FeaturePtr theFeature)
   // Then, create temporary Fixed constraint
   SolverConstraintPtr aConstraint = aBuilder->createMovementConstraint(theFeature);
   if (!aConstraint)
-    return;
+    return false;
   aConstraint->process(myStorage, getId(), getWorkplaneId());
   if (aConstraint->error().empty())
     setTemporary(aConstraint);
@@ -279,6 +279,7 @@ void SketchSolver_Group::moveFeature(FeaturePtr theFeature)
         aFixedRadius->remove();
     }
   }
+  return true;
 }
 
 // ============================================================================
