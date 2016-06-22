@@ -828,12 +828,13 @@ bool PartSet_Module::canCommitOperation() const
   return true;
 }
 
-void PartSet_Module::launchOperation(const QString& theCmdId)
+void PartSet_Module::launchOperation(const QString& theCmdId,
+                                     const bool isUpdatePropertyPanel)
 {
   storeConstraintsState(theCmdId.toStdString());
   updateConstraintsState(theCmdId.toStdString());
 
-  ModuleBase_IModule::launchOperation(theCmdId);
+  ModuleBase_IModule::launchOperation(theCmdId, isUpdatePropertyPanel);
 }
 
 void PartSet_Module::storeConstraintsState(const std::string& theFeatureKind)

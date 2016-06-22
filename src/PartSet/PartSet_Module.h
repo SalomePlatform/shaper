@@ -102,7 +102,8 @@ public:
 
   /// Creates an operation and send it to loop
   /// \param theCmdId the operation name
-  virtual void launchOperation(const QString& theCmdId);
+  /// \param isUpdatePropertyPanel if false, the property panel filling might be postponed
+  virtual void launchOperation(const QString& theCmdId, const bool isUpdatePropertyPanel = true);
 
   /// Realizes some functionality by an operation start
   /// Displays all sketcher sub-Objects, hides sketcher result, appends selection filters

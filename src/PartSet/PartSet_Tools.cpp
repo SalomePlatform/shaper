@@ -15,6 +15,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Validator.h>
 
 #include <Events_Loop.h>
 
@@ -333,10 +334,14 @@ std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findFirstEqualPoint(const Fe
                                     theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
   std::list<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
       aLast = anAttiributes.end();
+  ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
+
   for (; anIt != aLast && !aFPoint; anIt++) {
     std::shared_ptr<GeomDataAPI_Point2D> aCurPoint = 
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
-    if (aCurPoint && (aCurPoint->pnt()->distance(thePoint) < Precision::Confusion())) {
+                                             std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
+    if (aCurPoint && aCurPoint->isInitialized() &&
+        aValidators->isCase(theFeature, aCurPoint->id()) &&
+        (aCurPoint->pnt()->distance(thePoint) < Precision::Confusion())) {
       aFPoint = aCurPoint;
       break;
     }

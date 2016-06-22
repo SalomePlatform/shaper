@@ -76,6 +76,10 @@ Q_OBJECT
   //! Returns true if the operation with id theId can be started
   virtual bool canStartOperation(QString theId) = 0;
 
+  //! Performs the operation launch
+  //! \param theOperation an operation to be launched
+  virtual void processLaunchOperation(ModuleBase_Operation* theOperation, const bool isUpdatePropertyPanel) = 0;
+
   //! Returns started operation by the operation identifier
   //! \param theId an operation id
   //! \return an operation instance or NULL

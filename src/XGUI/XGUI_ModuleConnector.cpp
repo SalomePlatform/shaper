@@ -16,6 +16,7 @@
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_OperationDescription.h>
 
 #include <AIS_Shape.hxx>
 
@@ -127,6 +128,26 @@ void XGUI_ModuleConnector::setStatusBarMessage(const QString& theMessage)
 bool XGUI_ModuleConnector::canStartOperation(QString theId)
 {
   return myWorkshop->operationMgr()->canStartOperation(theId);
+}
+
+void XGUI_ModuleConnector::processLaunchOperation(ModuleBase_Operation* theOperation,
+                                                  const bool isUpdatePropertyPanel)
+{
+  XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
+
+  if (anOperationMgr->startOperation(theOperation)) {
+    if (isUpdatePropertyPanel) {
+      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+      if (aFOperation) {
+        workshop()->propertyPanel()->updateContentWidget(aFOperation->feature());
+        workshop()->propertyPanel()->createContentPanel(aFOperation->feature());
+      }
+    }
+    if (!theOperation->getDescription()->hasXmlRepresentation()) {
+      if (theOperation->commit())
+        workshop()->updateCommandStatus();
+    }
+  }
 }
 
 ModuleBase_Operation* XGUI_ModuleConnector::findStartedOperation(const QString& theId)

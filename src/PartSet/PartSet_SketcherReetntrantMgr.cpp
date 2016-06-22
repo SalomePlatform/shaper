@@ -451,11 +451,15 @@ void PartSet_SketcherReetntrantMgr::restartOperation()
       myIsFlagsBlocked = true;
       FeaturePtr aPrevFeature = aFOperation->feature();
       aFOperation->commit();
-      module()->launchOperation(aFOperation->id());
+      module()->launchOperation(aFOperation->id(), false);
       // allow the same attribute values in restarted operation
       ModuleBase_OperationFeature* aCurrentOperation = dynamic_cast<ModuleBase_OperationFeature*>(
                                                                   myWorkshop->currentOperation());
       copyReetntrantAttributes(aPrevFeature, aCurrentOperation->feature());
+
+      // update property panel: it should be done because in launchOperation, the 'false' is given
+      workshop()->propertyPanel()->updateContentWidget(aCurrentOperation->feature());
+      workshop()->propertyPanel()->createContentPanel(aCurrentOperation->feature());
 
       myIsFlagsBlocked = false;
       resetFlags();

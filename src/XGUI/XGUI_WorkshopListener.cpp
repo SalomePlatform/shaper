@@ -85,7 +85,6 @@ void XGUI_WorkshopListener::initializeEventListening()
   //Initialize event listening
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_InfoMessage::errorID());  //!< Listening application errors.
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OPERATION_LAUNCHED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
@@ -158,26 +157,6 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
       QApplication::restoreOverrideCursor();
     }
   }
-  //An operation passed by message. Start it, process and commit.
-  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OPERATION_LAUNCHED)) {
-    std::shared_ptr<Config_PointerMessage> aPartSetMsg =
-        std::dynamic_pointer_cast<Config_PointerMessage>(theMessage);
-    //myPropertyPanel->cleanContent();
-    ModuleBase_Operation* anOperation = (ModuleBase_Operation*) aPartSetMsg->pointer();
-    XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
-
-    if (anOperationMgr->startOperation(anOperation)) {
-      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(anOperation);
-      if (aFOperation) {
-        workshop()->propertyPanel()->updateContentWidget(aFOperation->feature());
-        workshop()->propertyPanel()->createContentPanel(aFOperation->feature());
-      }
-      if (!anOperation->getDescription()->hasXmlRepresentation()) {
-        if (anOperation->commit())
-          workshop()->updateCommandStatus();
-      }
-    }
-  } 
   else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_SELFILTER_LOADED)) {
     std::shared_ptr<Config_SelectionFilterMessage> aMsg = 
       std::dynamic_pointer_cast<Config_SelectionFilterMessage>(theMessage);

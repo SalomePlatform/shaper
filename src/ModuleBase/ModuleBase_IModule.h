@@ -82,7 +82,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Creates an operation and send it to loop
   /// \param theCmdId the operation name
-  virtual void launchOperation(const QString& theCmdId);
+  /// \param isUpdatePropertyPanel if false, the property panel filling might be postponed
+  virtual void launchOperation(const QString& theCmdId, const bool isUpdatePropertyPanel = true);
 
   /// Executes feature as a modal dialog box
   /// \param theCmdId the operation name
@@ -240,7 +241,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Sends the operation for launching
   /// \param theOperation the operation
-  virtual void sendOperation(ModuleBase_Operation* theOperation);
+  /// \param isUpdatePropertyPanel if false, the property panel filling might be postponed
+  virtual void sendOperation(ModuleBase_Operation* theOperation, const bool isUpdatePropertyPanel = true);
 
   /// Create specific for the module presentation
   /// \param theResult an object for presentation
