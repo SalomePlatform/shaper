@@ -368,16 +368,21 @@ bool XGUI_OperationMgr::canStartOperation(const QString& theId)
       else if (canStopOperation(aCurrentOp)) {
         // the started operation is granted in the parrent operation,
         // e.g. current - Line in Sketch, started Circle 
-        if (XGUI_Tools::workshop(myWorkshop)->errorMgr()->isApplyEnabled() && aCurrentOp->isModified())
-          aCurrentOp->commit();
-        else
-          abortOperation(aCurrentOp);
+        stopOperation(aCurrentOp);
       } else {
         aCanStart = false;
       }
     }
   }
   return aCanStart;
+}
+
+void XGUI_OperationMgr::stopOperation(ModuleBase_Operation* theOperation)
+{
+  if (XGUI_Tools::workshop(myWorkshop)->errorMgr()->isApplyEnabled() && theOperation->isModified())
+    theOperation->commit();
+  else
+    abortOperation(theOperation);
 }
 
 void XGUI_OperationMgr::abortOperation(ModuleBase_Operation* theOperation)

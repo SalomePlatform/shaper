@@ -139,9 +139,9 @@ bool XGUI_ModuleConnector::canStopOperation(ModuleBase_Operation* theOperation)
   return myWorkshop->operationMgr()->canStopOperation(theOperation);
 }
 
-void XGUI_ModuleConnector::abortOperation(ModuleBase_Operation* theOperation)
+void XGUI_ModuleConnector::stopOperation(ModuleBase_Operation* theOperation)
 {
-  myWorkshop->operationMgr()->abortOperation(theOperation);
+  myWorkshop->operationMgr()->stopOperation(theOperation);
 }
 
 void XGUI_ModuleConnector::updateCommandStatus()

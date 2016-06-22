@@ -148,6 +148,10 @@ signals:
   /// Changes the modified flag of the operation
   void onValuesChanged();
 
+  /// Changes the modified flag of the operation if the current state of the widget is modified
+  /// \param thePreviousState the previous vlaue state of the widget
+  void onValueStateChanged(int thePreviousState);
+
  protected:
   /// Virtual method called when operation started (see start() method for more description)
   /// Default impl calls corresponding slot and commits immediately.

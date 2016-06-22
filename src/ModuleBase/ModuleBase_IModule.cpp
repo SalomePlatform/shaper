@@ -201,7 +201,7 @@ void ModuleBase_IModule::onFeatureTriggered()
   if (aCmd->isCheckable() && !aCmd->isChecked()) {
     ModuleBase_Operation* anOperation = myWorkshop->findStartedOperation(aCmd->data().toString());
     if (myWorkshop->canStopOperation(anOperation))
-      myWorkshop->abortOperation(anOperation);
+      myWorkshop->stopOperation(anOperation);
     else {
       aCmd->setChecked(true);
     }

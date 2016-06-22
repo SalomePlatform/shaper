@@ -497,6 +497,7 @@ void ModuleBase_OperationFeature::setPropertyPanel(ModuleBase_IPropertyPanel* th
     for (aWIt = aWidgets.constBegin(); aWIt != aWidgets.constEnd(); ++aWIt) {
       ModuleBase_ModelWidget* aWgt = (*aWIt);
       connect(aWgt, SIGNAL(valuesChanged()), this, SLOT(onValuesChanged()));
+      connect(aWgt, SIGNAL(valueStateChanged(int)), this, SLOT(onValueStateChanged(int)));
     }
   }
 

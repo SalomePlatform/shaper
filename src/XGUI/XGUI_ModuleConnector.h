@@ -67,9 +67,9 @@ Q_OBJECT
   //! \return boolean result
   virtual bool canStopOperation(ModuleBase_Operation* theOperation);
 
-  //! Aborts the operation. The operation manager is called.
+  //! Commits if possible or aborts the given operation.
   //! \param theOperation an aborted operation
-  void abortOperation(ModuleBase_Operation* theOperation);
+  virtual void stopOperation(ModuleBase_Operation* theOperation);
 
   //! Returns AIS object by data object
   virtual AISObjectPtr findPresentation(const ObjectPtr& theObject) const;

@@ -86,9 +86,9 @@ Q_OBJECT
   //! \return boolean result
   virtual bool canStopOperation(ModuleBase_Operation* theOperation) = 0;
 
-  //! Aborts the operation.
+  //! Commits if possible or aborts the given operation.
   //! \param theOperation an aborted operation
-  virtual void abortOperation(ModuleBase_Operation* theOperation) = 0;
+  virtual void stopOperation(ModuleBase_Operation* theOperation) = 0;
 
   //! Returns AIS object by data object
   //! \param theObject a data object

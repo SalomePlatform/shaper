@@ -142,6 +142,17 @@ void ModuleBase_Operation::onValuesChanged()
   myIsModified = true;
 }
 
+void ModuleBase_Operation::onValueStateChanged(int thePreviousState)
+{
+  if (propertyPanel()) {
+    ModuleBase_ModelWidget* aWidget = propertyPanel()->activeWidget();
+    if (aWidget) {
+      if (aWidget->getValueState() == ModuleBase_ModelWidget::ModifiedInPP)
+        myIsModified = true;
+    }
+  }
+}
+
 void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp) 
 { 
   myPropertyPanel = theProp; 

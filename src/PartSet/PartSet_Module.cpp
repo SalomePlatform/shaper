@@ -796,7 +796,9 @@ bool PartSet_Module::deleteObjects()
 
 void PartSet_Module::onFeatureTriggered()
 {
-  QAction* aCmd = dynamic_cast<QAction*>(sender());
+  // is commented for imp: Unpressing the button of the current action must behave like
+  // a validation if the entity can be created (instead of Cancel, as currently)
+  /*QAction* aCmd = dynamic_cast<QAction*>(sender());
   if (aCmd->isCheckable() && aCmd->isChecked()) {
     // 1. check whether the delete should be processed in the module
     ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
@@ -811,7 +813,7 @@ void PartSet_Module::onFeatureTriggered()
         launchOperation(aCmd->data().toString());
       }
     }
-  }
+  }*/
   ModuleBase_IModule::onFeatureTriggered();
 }
 
