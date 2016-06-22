@@ -9,6 +9,7 @@
 #include <ModuleBase_IWorkshop.h>
 
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <XGUI_Tools.h>
 #include <XGUI_Displayer.h>
@@ -58,9 +59,15 @@ bool PartSet_PreviewPlanes::hasVisualizedSketch(ModuleBase_IWorkshop* theWorksho
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {
       FeaturePtr aFeature = ModelAPI_Feature::feature(aResult);
-      aSketchIsVisualized = aFeature.get() && aFeature->getKind() == SketchPlugin_Sketch::ID();
-      if (aSketchIsVisualized)
-        break;
+      if (aFeature.get() && aFeature->getKind() == SketchPlugin_Sketch::ID()) {
+        ResultConstructionPtr aCResult =  std::dynamic_pointer_cast<ModelAPI_ResultConstruction>
+                                                                                      (aResult);
+        if (aCResult.get() && aCResult->facesNum() > 0) {
+          aSketchIsVisualized = true;
+          break;
+        }
+      }
+      break;
     }
   }
   return aSketchIsVisualized;
