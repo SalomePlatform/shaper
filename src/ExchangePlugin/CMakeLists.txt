@@ -59,9 +59,22 @@ INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
 ADD_UNIT_TESTS(TestImport.py TestExport.py)
 
-CONFIGURE_FILE(Test/Data/solid.brep Data/solid.brep COPYONLY)
-CONFIGURE_FILE(Test/Data/solid.brp Data/solid.brp COPYONLY)
-CONFIGURE_FILE(Test/Data/screw.step Data/screw.step COPYONLY)
-CONFIGURE_FILE(Test/Data/screw.stp Data/screw.stp COPYONLY)
-CONFIGURE_FILE(Test/Data/bearing.iges Data/bearing.iges COPYONLY)
-CONFIGURE_FILE(Test/Data/bearing.igs Data/bearing.igs COPYONLY)
+SET(DATA_FILES
+  solid.brep
+  solid.brp
+  screw.step
+  screw.stp
+  bearing.iges
+  bearing.igs
+  Box_1.brep
+  test.xao
+  export_ref.xao
+)
+
+FOREACH(file ${DATA_FILES})
+  CONFIGURE_FILE(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Test/Data/${file}
+    ${CMAKE_CURRENT_BINARY_DIR}/Data/${file}
+    COPYONLY)
+ENDFOREACH(file ${DATA_FIELS})
+

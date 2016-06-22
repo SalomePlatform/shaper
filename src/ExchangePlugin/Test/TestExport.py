@@ -74,6 +74,54 @@ def testExport(theType, theFormat, theFile, theVolume, theDelta):
     # Test exported file by importing
     testImport(theType, theFile, theVolume, theDelta)
 
+def testExportXAO():
+    # Import a reference part
+    aSession.startOperation("Add part")
+    aPartFeature = aSession.moduleDocument().addFeature("Part")
+    aSession.finishOperation()
+    aPart = aSession.activeDocument()
+
+    aSession.startOperation("Import Box_1")
+    anImportFeature = aPart.addFeature("Import")
+    anImportFeature.string("file_path").setValue("Data/Box_1.brep")
+    anImportFeature.execute()
+    aSession.finishOperation()
+
+    # Create groups
+    aSession.startOperation()
+    aGroupFeature = aSession.activeDocument().addFeature("Group")
+    aGroupFeature.data().setName("boite_1")
+    aSelectionListAttr = aGroupFeature.selectionList("group_list")
+    aSelectionListAttr.setSelectionType("Solids")
+    aSelectionListAttr.append(anImportFeature.lastResult(), None)
+    aGroupFeature.execute()
+    aSession.finishOperation()
+
+    aSession.startOperation()
+    aGroupFeature = aSession.activeDocument().addFeature("Group")
+    aGroupFeature.data().setName("")
+    aSelectionListAttr = aGroupFeature.selectionList("group_list")
+    aSelectionListAttr.setSelectionType("Faces")
+    aSelectionListAttr.append("Box_1_1/Shape1_1", "face")
+    aSelectionListAttr.append("Box_1_1/Shape2_1", "face")
+    aGroupFeature.execute()
+    aSession.finishOperation()
+
+    # Export
+    aSession.startOperation("Export")
+    anExportFeature = aPart.addFeature("Export")
+    anExportFeature.string("ExportType").setValue("XAO")
+    anExportFeature.string("file_path").setValue("Data/export.xao")
+    anExportFeature.string("file_format").setValue("XAO")
+    anExportFeature.string("xao_author").setValue("me")
+    anExportFeature.string("xao_geometry_name").setValue("mygeom")
+    anExportFeature.execute()
+    aSession.finishOperation()
+
+    # Check exported file
+    import filecmp
+    assert filecmp.cmp("Data/export.xao", "Data/export_ref.xao")
+
 if __name__ == '__main__':
 #=========================================================================
 # Export a shape into BREP
@@ -93,6 +141,10 @@ if __name__ == '__main__':
     testExport("IGS-5.1", "IGES-5.1", os.path.join(os.getcwd(), "Data", "screw_export-5.1.igs"), 3.78829613776e-06, 10 ** -17)
     testExport("IGES-5.3", "IGES-5.3", os.path.join(os.getcwd(), "Data", "screw_export-5.3.iges"), 3.78827401651e-06, 10 ** -17)
     testExport("IGS-5.3", "IGES-5.3", os.path.join(os.getcwd(), "Data", "screw_export-5.3.igs"), 3.78827401651e-06, 10 ** -17)
+#=========================================================================
+# Export a shape into XAO
+#=========================================================================
+    testExportXAO()
 #=========================================================================
 # End of test
 #=========================================================================

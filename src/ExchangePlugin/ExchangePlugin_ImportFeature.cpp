@@ -53,7 +53,8 @@ ExchangePlugin_ImportFeature::~ExchangePlugin_ImportFeature()
 void ExchangePlugin_ImportFeature::initAttributes()
 {
   data()->addAttribute(ExchangePlugin_ImportFeature::FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(ExchangePlugin_ImportFeature::FEATURES_ID(), ModelAPI_AttributeRefList::typeId());
+  AttributePtr aFeaturesAttribute = data()->addAttribute(ExchangePlugin_ImportFeature::FEATURES_ID(), ModelAPI_AttributeRefList::typeId());
+  aFeaturesAttribute->setIsArgument(false);
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(
       getKind(), ExchangePlugin_ImportFeature::FEATURES_ID());
@@ -185,13 +186,6 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
 
       aSelectionList->value(anElementIndex)->setId(aReferenceID);
     }
-//
-//    aRefListOfGroups->append(aGroupFeature);
-//
-//    // hide the group in the history
-//    document()->setCurrentFeature(aGroupFeature, false);
-//    // groups features is internal part of the import
-//    aGroupFeature->setInHistory(aGroupFeature, false);
   }
 
   } catch (XAO::XAO_Exception& e) {
