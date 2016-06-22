@@ -44,6 +44,8 @@
 #include <Prs3d_PointAspect.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
 
+#include <Image_AlienPixMap.hxx>
+
 #include <QWidget>
 #include <QLayout>
 #include <QPainter>
@@ -80,6 +82,12 @@ const double DEFAULT_DEVIATION_COEFFICIENT = 1.e-4;
 #include <StdSelect_BRepOwner.hxx>
 #include <TColStd_ListOfInteger.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
+#endif
+
+#ifdef WIN32
+# define FSEP "\\"
+#else
+# define FSEP "/"
 #endif
 
 namespace ModuleBase_Tools {
@@ -1159,10 +1167,47 @@ void translate(const std::string& theContext, std::string& theMessage)
 
 void setPointBallHighlighting(AIS_Shape* theAIS)
 {
+  static Handle(Image_AlienPixMap) aPixMap;
+  if(aPixMap.IsNull()) {
+    // Load icon for the presentation
+    std::string aFile;
+    char* anEnv = getenv("SHAPER_ROOT_DIR");
+    if(anEnv) {
+      aFile = std::string(anEnv) +
+        FSEP + "share" + FSEP + "salome" + FSEP + "resources" + FSEP + "shaper";
+    } else {
+      anEnv = getenv("OPENPARTS_ROOT_DIR");
+      if (anEnv)
+        aFile = std::string(anEnv) + FSEP + "resources";
+    }
+
+    aFile += FSEP;
+    static const std::string aMarkerName = "marker_dot.png";
+    aFile += aMarkerName;
+    aPixMap = new Image_AlienPixMap();
+    if(!aPixMap->Load(aFile.c_str())) {
+      // The icon for constraint is not found
+      static const std::string aMsg = "Error: Point market not found by path: \"" + aFile + "\". Falling back.";
+      //Events_InfoMessage("ModuleBase_Tools::setPointBallHighlighting", aMsg).send();
+    }
+  }
+
+  Handle(Graphic3d_AspectMarker3d) anAspect;
   Handle(Prs3d_Drawer) aDrawer = theAIS->HilightAttributes();
-  if (aDrawer->HasOwnPointAspect()) {
+  if(aDrawer->HasOwnPointAspect()) {
     Handle(Prs3d_PointAspect) aPntAspect = aDrawer->PointAspect();
-    aPntAspect->Aspect()->SetType(Aspect_TOM_BALL);
+    if(aPixMap->IsEmpty()) {
+      anAspect = aPntAspect->Aspect();
+      anAspect->SetType(Aspect_TOM_BALL);
+    } else {
+      if(aPixMap->Format() == Image_PixMap::ImgGray) {
+        aPixMap->SetFormat (Image_PixMap::ImgAlpha);
+      } else if(aPixMap->Format() == Image_PixMap::ImgGrayF) {
+        aPixMap->SetFormat (Image_PixMap::ImgAlphaF);
+      }
+      anAspect = new Graphic3d_AspectMarker3d(aPixMap);
+      aPntAspect->SetAspect(anAspect);
+    }
     aDrawer->SetPointAspect(aPntAspect);
     theAIS->SetHilightAttributes(aDrawer);
   }
