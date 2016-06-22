@@ -20,13 +20,13 @@ std::list<std::string> ExchangePlugin_Tools::split(const std::string& theString,
 
 std::string ExchangePlugin_Tools::selectionType2xaoDimension(const std::string& theType)
 {
-  if (theType == "Vertices")
+  if (theType == "Vertices" || theType == "vertex")
     return "vertex";
-  else if (theType == "Edges")
+  else if (theType == "Edges" || theType == "edge")
     return "edge";
-  else if (theType == "Faces")
+  else if (theType == "Faces" || theType == "face")
     return "face";
-  else if (theType == "Solids")
+  else if (theType == "Solids" || theType == "solid")
     return "solid";
 
   return std::string();
@@ -34,16 +34,14 @@ std::string ExchangePlugin_Tools::selectionType2xaoDimension(const std::string& 
 
 std::string ExchangePlugin_Tools::xaoDimension2selectionType(const std::string& theDimension)
 {
-//  return theDimension;
-
   if (theDimension == "vertex")
-    return "Vertices";
+    return "vertex";
   else if (theDimension == "edge")
-    return "Edges";
+    return "edge";
   else if (theDimension == "face")
-    return "Faces";
+    return "face";
   else if (theDimension == "solid")
-    return "Solids";
+    return "solid";
 
   return std::string();
 }
