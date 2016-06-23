@@ -12,7 +12,7 @@
       </export_file_selector>
       <multi_selector id="selection_list" 
                       tooltip="Select a set of objects" 
-                      type_choice="Vertices Edges Faces Solids Objects">
+                      type_choice="Vertices Edges Faces Solids Compsolids Objects">
         <validator id="GeomValidators_Finite"/>
       </multi_selector>
     </case>

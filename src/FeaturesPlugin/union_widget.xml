@@ -4,7 +4,8 @@
   <multi_selector id="base_objects"
     label="Base objects:"
     tooltip="Select solids for union."
-    type_choice="solids"
+    type_choice="solids compsolids"
+    use_choice="false"
     concealment="true">
     <validator id="FeaturesPlugin_ValidatorUnionSelection"/>
   </multi_selector>

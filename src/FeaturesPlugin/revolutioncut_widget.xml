@@ -87,7 +87,8 @@
     label="Cut from:"
     icon="icons/Features/cut_shape.png"
     tooltip="Objects to Cut"
-    type_choice="Solids"
+    type_choice="Solids Compsolids"
+    use_choice="false"
     concealment="true">
     <validator id="GeomValidators_ShapeType" parameters="solid"/>
   </multi_selector>

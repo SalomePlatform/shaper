@@ -78,7 +78,8 @@ void ModuleBase_WidgetSelector::updateOnSelectionChanged(const bool theDone)
 QIntList ModuleBase_WidgetSelector::getShapeTypes() const
 {
   QIntList aShapeTypes = shapeTypes();
-  if (aShapeTypes.contains(TopAbs_SOLID) || aShapeTypes.contains(ModuleBase_ResultPrs::Sel_Result/*TopAbs_SHAPE*/)) {
+  if (/*aShapeTypes.contains(TopAbs_SOLID) ||*/ // this type should be mentioned in XML, poor selection otherwise
+      aShapeTypes.contains(ModuleBase_ResultPrs::Sel_Result/*TopAbs_SHAPE*/)) {
     // it should be selectable for both, "solids" and "objects" types
     aShapeTypes.append(TopAbs_COMPSOLID);
   }
