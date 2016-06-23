@@ -456,6 +456,87 @@ bool SketchSolver_Manager::resolveConstraints(const std::list<SketchSolver_Group
   return needToUpdate;
 }
 
+
+// Obtain points and their copies for Mirror, Multi-Rotation and Multi-Translation constraints
+static void collectPointsAndCopies(FeaturePtr theConstraint, std::list<std::set<AttributePtr> >& thePoints)
+{
+  typedef std::list<std::string> strlist;
+  static strlist aPointAttributes(1, SketchPlugin_Point::COORD_ID());
+  static strlist aLineAttributes;
+  if (aLineAttributes.empty()) {
+    aLineAttributes.push_back(SketchPlugin_Line::START_ID());
+    aLineAttributes.push_back(SketchPlugin_Line::END_ID());
+  };
+  static strlist aCircleAttributes(1, SketchPlugin_Circle::CENTER_ID());
+  static strlist anArcAttributes;
+  if (anArcAttributes.empty()) {
+    anArcAttributes.push_back(SketchPlugin_Arc::CENTER_ID());
+    anArcAttributes.push_back(SketchPlugin_Arc::START_ID());
+    anArcAttributes.push_back(SketchPlugin_Arc::END_ID());
+  };
+
+  static std::map<std::string, strlist> aFeatureAttributes;
+  if (aFeatureAttributes.empty()) {
+    aFeatureAttributes[SketchPlugin_Point::ID()] = aPointAttributes;
+    aFeatureAttributes[SketchPlugin_Line::ID()] = aLineAttributes;
+    aFeatureAttributes[SketchPlugin_Circle::ID()] = aCircleAttributes;
+    aFeatureAttributes[SketchPlugin_Arc::ID()] = anArcAttributes;
+  }
+
+
+  std::set<AttributePtr> aPoints;
+  if (theConstraint->getKind() == SketchPlugin_ConstraintMirror::ID()) {
+    AttributeRefListPtr aBaseRefList = theConstraint->reflist(SketchPlugin_Constraint::ENTITY_B());
+    AttributeRefListPtr aMirrRefList = theConstraint->reflist(SketchPlugin_Constraint::ENTITY_C());
+
+    std::list<ObjectPtr> aBaseList = aBaseRefList->list();
+    std::list<ObjectPtr> aMirrList = aMirrRefList->list();
+    std::list<ObjectPtr>::const_iterator aBIt, aMIt;
+    for (aBIt = aBaseList.begin(), aMIt = aMirrList.begin();
+         aBIt != aBaseList.end() && aMIt != aMirrList.end(); ++aBIt, ++aMIt) {
+      FeaturePtr aBaseFeature = ModelAPI_Feature::feature(*aBIt);
+      FeaturePtr aMirrFeature = ModelAPI_Feature::feature(*aMIt);
+
+      strlist anAttrList = aFeatureAttributes[aBaseFeature->getKind()];
+      strlist::iterator anIt = anAttrList.begin();
+      for (; anIt != anAttrList.end(); ++anIt) {
+        aPoints.clear();
+        aPoints.insert(aBaseFeature->attribute(*anIt));
+        aPoints.insert(aMirrFeature->attribute(*anIt));
+        thePoints.push_back(aPoints);
+      }
+    }
+  }
+  else { // the "Multi" constraints
+    std::string aNbObjName;
+    if (theConstraint->getKind() == SketchPlugin_MultiRotation::ID())
+      aNbObjName = SketchPlugin_MultiRotation::NUMBER_OF_OBJECTS_ID();
+    else
+      aNbObjName = SketchPlugin_MultiTranslation::NUMBER_OF_OBJECTS_ID();
+    int aNbCopies = theConstraint->integer(aNbObjName)->value();
+
+    AttributeRefListPtr aRefList = theConstraint->reflist(SketchPlugin_Constraint::ENTITY_B());
+    std::list<ObjectPtr> aFullList = aRefList->list();
+    std::list<ObjectPtr>::const_iterator anObjIt = aFullList.begin();
+    std::list<ObjectPtr>::const_iterator aCopyIt;
+    while (anObjIt != aFullList.end()) {
+      FeaturePtr aBaseFeature = ModelAPI_Feature::feature(*anObjIt);
+      strlist anAttrList = aFeatureAttributes[aBaseFeature->getKind()];
+      strlist::iterator anIt = anAttrList.begin();
+      for (; anIt != anAttrList.end(); ++anIt) {
+        aPoints.clear();
+        aCopyIt = anObjIt;
+        for (int i = 0; i < aNbCopies; ++i, ++aCopyIt) {
+          FeaturePtr aFeature = ModelAPI_Feature::feature(*aCopyIt);
+          aPoints.insert(aFeature->attribute(*anIt));
+        }
+        thePoints.push_back(aPoints);
+      }
+      anObjIt = aCopyIt;
+    }
+  }
+}
+
 // ============================================================================
 //  Function: degreesOfFreedom
 //  Purpose:  calculate DoFs for each sketch
@@ -512,6 +593,7 @@ void SketchSolver_Manager::degreesOfFreedom()
       continue;
 
     std::set<AttributePtr> aCoincidentPoints;
+    std::list<std::set<AttributePtr> > aPointsInMultiConstraints;
     int aDoF = 0;
     int aNbSubs = aSketch->numberOfSubs();
     for (int i = 0; i < aNbSubs; ++i) {
@@ -546,6 +628,17 @@ void SketchSolver_Manager::degreesOfFreedom()
           if (aCoincidentPoints.find(aCoincPoint[0]) == aCoincidentPoints.end() ||
               aCoincidentPoints.find(aCoincPoint[1]) == aCoincidentPoints.end())
             aDoF -= 2;
+          // check the coincident point is used in "multi" constraints
+          std::list<std::set<AttributePtr> >::const_iterator
+              aPtIt = aPointsInMultiConstraints.begin();
+          bool isFound[2] = {false, false};
+          for (; aPtIt != aPointsInMultiConstraints.end(); ++aPtIt) {
+            if ((!isFound[0] && (isFound[0] = (aPtIt->find(aCoincPoint[0]) != aPtIt->end())))
+             || (!isFound[1] && (isFound[1] = (aPtIt->find(aCoincPoint[1]) != aPtIt->end()))))
+              aCoincidentPoints.insert(aPtIt->begin(), aPtIt->end());
+            if (isFound[0] && isFound[1])
+              break;
+          }
         } else 
           aDoF -= 1;
         for (int j = 0; j < 2; ++j)
@@ -587,6 +680,8 @@ void SketchSolver_Manager::degreesOfFreedom()
           FeaturePtr aSub = ModelAPI_Feature::feature(*anObjIt);
           aDoF -= aDoFDelta[aSub->getKind()] * aNbCopies;
         }
+        // collect points and their copies for correct calculation of DoF for coincident points
+        collectPointsAndCopies(aFeature, aPointsInMultiConstraints);
       }
     }
 
