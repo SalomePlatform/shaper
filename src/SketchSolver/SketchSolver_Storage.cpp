@@ -419,7 +419,7 @@ bool SketchSolver_Storage::isUsed(AttributePtr theAttribute) const
         return true;
     // Additional check for the Fixed constraints, which have no wrapper associated.
     if (aCIt->first->getKind() == SketchPlugin_ConstraintRigid::ID() &&
-        ::isUsed(aCIt->first, anAttribute))
+        ::isUsed(FeaturePtr(aCIt->first), anAttribute))
       return true;
   }
   // check in features
