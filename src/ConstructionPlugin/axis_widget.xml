@@ -26,7 +26,7 @@
         label="Main object" 
         icon="icons/Construction/circle.png" 
         tooltip="Select a cylindrical object"
-        shape_types="face solid shell">
+        shape_types="face">
         <validator id="GeomValidators_Face" parameters="cylinder"/>
       </shape_selector>
     </box>
