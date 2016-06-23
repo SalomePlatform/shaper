@@ -359,11 +359,11 @@ static bool isUsed(EntityWrapperPtr theFeature, AttributePtr theSubEntity)
   return false;
 }
 
-static bool isUsed(ConstraintPtr theConstraint, AttributePtr theAttribute)
+static bool isUsed(FeaturePtr theFeature, AttributePtr theAttribute)
 {
-  if (!theConstraint || !theAttribute)
+  if (!theFeature || !theAttribute)
     return false;
-  std::list<AttributePtr> anAttrList = theConstraint->data()->attributes(std::string());
+  std::list<AttributePtr> anAttrList = theFeature->data()->attributes(std::string());
   std::list<AttributePtr>::const_iterator anIt = anAttrList.begin();
   for (; anIt != anAttrList.end(); ++anIt) {
     if (*anIt == theAttribute)
@@ -505,29 +505,37 @@ bool SketchSolver_Storage::removeCoincidence(ConstraintWrapperPtr theConstraint)
       aConstrIt = myConstraintMap.begin();
   for (; aConstrIt != myConstraintMap.end(); ++aConstrIt)
     if (aConstrIt->first->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
-      AttributeRefAttrPtr aRefAttrA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-          aConstrIt->first->attribute(SketchPlugin_Constraint::ENTITY_A()));
-      AttributeRefAttrPtr aRefAttrB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-          aConstrIt->first->attribute(SketchPlugin_Constraint::ENTITY_B()));
-      AttributePtr anAttrA, anAttrB;
+      AttributeRefAttrPtr aRefAttr[2] = {
+          aConstrIt->first->refattr(SketchPlugin_Constraint::ENTITY_A()),
+          aConstrIt->first->refattr(SketchPlugin_Constraint::ENTITY_B())
+      };
+      AttributePtr anAttr[2];
       if (aConstrIt->first->data()->isValid()) {
-        if (!aRefAttrA || !aRefAttrB || aRefAttrA->isObject() || aRefAttrB->isObject())
+        if (!aRefAttr[0] || !aRefAttr[1])
           continue;
-        anAttrA = aRefAttrA->attr();
-        anAttrB = aRefAttrB->attr();
+
+        for (int i = 0; i < 2; ++i) {
+          if (aRefAttr[i]->isObject()) {
+            FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr[i]->object());
+            if (!aFeature || (aFeature->getKind() != SketchPlugin_Point::ID() &&
+                aFeature->getKind() != SketchPlugin_IntersectionPoint::ID()))
+              continue;
+            anAttr[i] = aFeature->attribute(SketchPlugin_Point::COORD_ID());
+          } else
+            anAttr[i] = aRefAttr[i]->attr();
+        }
       } else {
         // obtain attributes from the constraint wrapper
         ConstraintWrapperPtr aWrapper = aConstrIt->second.front();
-        anAttrA = aWrapper->entities().front()->baseAttribute();
-        anAttrB = aWrapper->entities().back()->baseAttribute();
+        anAttr[0] = aWrapper->entities().front()->baseAttribute();
+        anAttr[1] = aWrapper->entities().back()->baseAttribute();
       }
-      std::map<AttributePtr, EntityWrapperPtr>::iterator
-          aFound = myAttributeMap.find(anAttrA);
-      if (aFound != myAttributeMap.end())
-        aNotCoinc.erase(aFound->second);
-      aFound = myAttributeMap.find(anAttrB);
-      if (aFound != myAttributeMap.end())
-        aNotCoinc.erase(aFound->second);
+      for (int i = 0; i < 2; ++i) {
+        std::map<AttributePtr, EntityWrapperPtr>::iterator
+            aFound = myAttributeMap.find(anAttr[i]);
+        if (aFound != myAttributeMap.end())
+          aNotCoinc.erase(aFound->second);
+      }
     }
   if (aNotCoinc.empty())
     return false;
@@ -546,14 +554,15 @@ bool SketchSolver_Storage::removeCoincidence(ConstraintWrapperPtr theConstraint)
     if (!aFIt->second)
       continue; // avoid not completed arcs
     for (aNotCIt = aNotCoinc.begin(); aNotCIt != aNotCoinc.end(); ++aNotCIt) {
-      if (!aNotCIt->second || !aFIt->second->isUsed(aNotCIt->first->baseAttribute()))
+      if (!aNotCIt->second || !::isUsed(aFIt->first, aNotCIt->first->baseAttribute()))
         continue;
       std::list<EntityWrapperPtr> aSubs = aFIt->second->subEntities();
       std::list<EntityWrapperPtr>::iterator aSIt = aSubs.begin();
       bool isUpd = false;
       for (; aSIt != aSubs.end(); ++aSIt)
         if (*aSIt == aNotCIt->first) {
-          *aSIt = aNotCIt->second;
+          (*aSIt)->update(aNotCIt->second);
+          (*aSIt)->setGroup(aFIt->second->group());
           isUpd = true;
         }
       if (isUpd) {
