@@ -359,6 +359,8 @@ bool hasSubResults(const ResultPtr& theResult)
 
 void allResults(const FeaturePtr& theFeature, std::list<ResultPtr>& theResults)
 {
+  if (!theFeature.get()) // safety: for empty feature no results
+    return;
   const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
   std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
   for (; aRIter != aResults.cend(); aRIter++) {
