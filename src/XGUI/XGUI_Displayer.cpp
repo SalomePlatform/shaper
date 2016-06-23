@@ -1407,8 +1407,19 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
   aLContext->MainSelector()->ActiveOwners(anActiveOwners);
   NCollection_List<Handle(SelectBasics_EntityOwner)>::Iterator anOwnersIt (anActiveOwners);
   Handle(SelectMgr_EntityOwner) anOwner;
+
+  /// It is very important to check that the owner is processed only once and has a map of
+  /// processed owners because SetSelected works as a switch.
+  /// If count of calls setSelectec is even, the object stays in the previous state
+  /// (selected, deselected)
+  /// OCCT: to write about the problem that active owners method returns one owner several times
+  QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
   for (; anOwnersIt.More(); anOwnersIt.Next()) {
     anOwner = Handle(SelectMgr_EntityOwner)::DownCast (anOwnersIt.Value());
+    if (aSelectedIds.contains((long)anOwner.Access()))
+      continue;
+    aSelectedIds.append((long)anOwner.Access());
+
     Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast(anOwner);
     if (!BROwnr.IsNull() && BROwnr->HasShape()) {
       const TopoDS_Shape& aShape = BROwnr->Shape();
