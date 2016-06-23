@@ -87,6 +87,8 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
     if (!aRedundantID.empty()) {
       std::set<GCS::Constraint*>::const_iterator aCIt = myConstraints.begin();
       for (; aCIt != myConstraints.end(); ++aCIt) {
+        if ((*aCIt)->getTypeId() != GCS::Equal)
+          continue;
         GCS::VEC_I::iterator aRIt = aRedundantID.begin();
         for (; aRIt != aRedundantID.end(); ++aRIt)
           if ((*aCIt)->getTag() == *aRIt) {
