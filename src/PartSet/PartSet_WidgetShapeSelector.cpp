@@ -79,7 +79,7 @@ void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr
   // there is no a sketch feature is selected, but the shape exists, try to create an exernal object
   // TODO: unite with the same functionality in PartSet_WidgetShapeSelector
   if (aSPFeature.get() == NULL)
-    theObject = NULL;
+    theObject = ObjectPtr();
   if (myExternalObjectMgr->useExternal()) {
     GeomShapePtr aShape = theShape;
     if (!aShape.get()) {
