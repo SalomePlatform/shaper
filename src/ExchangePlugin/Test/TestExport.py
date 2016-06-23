@@ -9,9 +9,6 @@ import os
 import math
 
 from ModelAPI import *
-from GeomDataAPI import *
-from GeomAlgoAPI import *
-from GeomAPI import *
 
 from TestImport import testImport
 

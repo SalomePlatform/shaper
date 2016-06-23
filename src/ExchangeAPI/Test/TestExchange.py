@@ -19,7 +19,7 @@ class ExchangeTestCase(unittest.TestCase):
 
     def test_addExport(self):
         self.session.startOperation()
-        self.feature = ExchangeAPI.exportToFile(self.doc, "file_path", "file_format", [])
+        self.feature = ExchangeAPI.exportToFile(self.doc, "file_path", [], "file_format")
         self.session.finishOperation()
 
 if __name__ == "__main__":

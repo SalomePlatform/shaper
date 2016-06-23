@@ -59,7 +59,6 @@ class FeaturesTestCase(FeaturesFixture):
 
         import ExchangeAPI
         ExchangeAPI.ExchangeAPI_Import(self.part.addFeature("Import"))
-        ExchangeAPI.ExchangeAPI_Export(self.part.addFeature("Export"))
 
         import FeaturesAPI
         FeaturesAPI.FeaturesAPI_Boolean(self.part.addFeature("Boolean"))

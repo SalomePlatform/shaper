@@ -6,10 +6,7 @@
 # Initialization of the test
 #=========================================================================
 from ModelAPI import *
-from GeomDataAPI import *
 from GeomAlgoAPI import *
-from GeomAPI import *
-import os
 import math
 
 __updated__ = "2015-05-22"
@@ -73,8 +70,8 @@ def testImportXAO():
     assert aFeature1.getKind() == "Group"
     assert aFeature1.name() == "boite_1"
 
-    aSelectionList = aFeature1.selectionList("group_list") 
-    assert aSelectionList.selectionType() == "Solids"
+    aSelectionList = aFeature1.selectionList("group_list")
+    assert aSelectionList.selectionType() == "solid"
     assert aSelectionList.size() == 1
     assert aSelectionList.value(0).namingName("") == "mygeom_1_1"
 
@@ -83,7 +80,7 @@ def testImportXAO():
     assert aFeature2.name() == "Group_2"
 
     aSelectionList = aFeature2.selectionList("group_list") 
-    assert aSelectionList.selectionType() == "Faces"
+    assert aSelectionList.selectionType() == "face"
     assert aSelectionList.size() == 2
     assert aSelectionList.value(0).namingName("") == "mygeom_1/Shape1_1"
     assert aSelectionList.value(1).namingName("") == "mygeom_1/Shape2_1"
