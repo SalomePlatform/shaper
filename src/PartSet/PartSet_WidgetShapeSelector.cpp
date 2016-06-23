@@ -78,7 +78,9 @@ void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
   // there is no a sketch feature is selected, but the shape exists, try to create an exernal object
   // TODO: unite with the same functionality in PartSet_WidgetShapeSelector
-  if (aSPFeature.get() == NULL && myExternalObjectMgr->useExternal()) {
+  if (aSPFeature.get() == NULL)
+    theObject = NULL;
+  if (myExternalObjectMgr->useExternal()) {
     GeomShapePtr aShape = theShape;
     if (!aShape.get()) {
       ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);

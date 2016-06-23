@@ -195,8 +195,7 @@ bool ModuleBase_WidgetSelector::setSelectionCustom(const ModuleBase_ViewerPrsPtr
   getGeomSelection(thePrs, anObject, aShape);
 
   // the last flag is to be depending on hasObject is called before. To be corrected later
-  ModuleBase_Tools::setObject(attribute(), anObject, aShape, myWorkshop, myIsInValidate, true);
-  return true;
+  return ModuleBase_Tools::setObject(attribute(), anObject, aShape, myWorkshop, myIsInValidate, true);
 }
 
 //********************************************************************

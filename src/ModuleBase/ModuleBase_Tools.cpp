@@ -785,13 +785,14 @@ bool hasObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
   return aHasObject;
 }
 
-void setObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
+bool setObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
                const GeomShapePtr& theShape, ModuleBase_IWorkshop* theWorkshop,
                const bool theTemporarily, const bool theCheckIfAttributeHasObject)
 {
   if (!theAttribute.get())
-    return;
+    return false;
 
+  bool isDone = true;
   std::string aType = theAttribute->attributeType();
   if (aType == ModelAPI_AttributeReference::typeId()) {
     AttributeReferencePtr aRef = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
@@ -828,8 +829,12 @@ void setObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
     AttributeRefListPtr aRefListAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttribute);
-    if (!theCheckIfAttributeHasObject || !aRefListAttr->isInList(theObject))
-      aRefListAttr->append(theObject);
+    if (!theCheckIfAttributeHasObject || !aRefListAttr->isInList(theObject)) {
+      if (theObject.get())
+        aRefListAttr->append(theObject);
+      else
+        isDone = false;
+    }
   }
   else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
     AttributeRefAttrListPtr aRefAttrListAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(theAttribute);
@@ -840,10 +845,15 @@ void setObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
         aRefAttrListAttr->append(anAttribute);
     }
     else {
-      if (!theCheckIfAttributeHasObject || !aRefAttrListAttr->isInList(theObject))
-        aRefAttrListAttr->append(theObject);
+      if (!theCheckIfAttributeHasObject || !aRefAttrListAttr->isInList(theObject)) {
+        if (theObject.get())
+          aRefAttrListAttr->append(theObject);
+        else
+          isDone = false;
+      }
     }
   }
+  return isDone;
 }
 
 GeomShapePtr getShape(const AttributePtr& theAttribute, ModuleBase_IWorkshop* theWorkshop)
