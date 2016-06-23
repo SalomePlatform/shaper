@@ -143,15 +143,23 @@ bool SketchPlugin_Circle::isFeatureValid()
 {
   std::shared_ptr<GeomDataAPI_Point2D> aCenter = 
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aFirstPnt =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(FIRST_POINT_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aSecondPnt =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(SECOND_POINT_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aThirdPnt =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(THIRD_POINT_ID()));
+  bool aValid = aCenter->isInitialized();
 
-  return aCenter->isInitialized() && aFirstPnt->isInitialized() &&
-         aSecondPnt->isInitialized() && aThirdPnt->isInitialized();
+  std::string aType = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
+                                         data()->attribute(CIRCLE_TYPE()))->value();
+  if (aType == CIRCLE_TYPE_THREE_POINTS()) {
+    std::shared_ptr<GeomDataAPI_Point2D> aFirstPnt =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(FIRST_POINT_ID()));
+    std::shared_ptr<GeomDataAPI_Point2D> aSecondPnt =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(SECOND_POINT_ID()));
+    std::shared_ptr<GeomDataAPI_Point2D> aThirdPnt =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(THIRD_POINT_ID()));
+    aValid = aValid &&
+             aFirstPnt->isInitialized() &&
+             aSecondPnt->isInitialized() &&
+             aThirdPnt->isInitialized();
+  }
+  return aValid;
 }
 
 void SketchPlugin_Circle::move(double theDeltaX, double theDeltaY)
