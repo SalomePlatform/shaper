@@ -70,6 +70,7 @@
 #include <ModuleBase_PagedContainer.h>
 #include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_ModelWidget.h>
+#include <ModuleBase_ResultPrs.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -213,6 +214,9 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
     myViewerSelMode.append(TopAbs_EDGE);
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "vertex-selection", true))
     myViewerSelMode.append(TopAbs_VERTEX);
+  //IMP: an attempt to use result selection with other selection modes
+  myViewerSelMode.append(ModuleBase_ResultPrs::Sel_Result);//TopAbs_VERTEX);
+  myViewerSelMode.append(TopAbs_COMPSOLID);
 }
 
 //******************************************************
@@ -1254,7 +1258,10 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   } else if (theId == "SELECT_FACE_CMD") {
     setViewerSelectionMode(TopAbs_FACE);
   } else if (theId == "SELECT_RESULT_CMD") {
-    setViewerSelectionMode(-1);
+    //setViewerSelectionMode(-1);
+    //IMP: an attempt to use result selection with other selection modes
+    setViewerSelectionMode(ModuleBase_ResultPrs::Sel_Result);
+    setViewerSelectionMode(TopAbs_COMPSOLID);
   } else if (theId == "SHOW_RESULTS_CMD") {
     highlightResults(aObjects);
   } else if (theId == "SHOW_FEATURE_CMD") {
