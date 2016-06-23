@@ -26,7 +26,7 @@ public:
   /// \returns true if attribute is valid
   MODEL_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                     const std::list<std::string>& theArguments,
-                                    std::string& theError) const;
+                                    Events_InfoMessage& theError) const;
 };
 
 #endif // Model_AttributeValidator_H

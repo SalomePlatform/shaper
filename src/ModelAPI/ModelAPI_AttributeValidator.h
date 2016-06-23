@@ -23,7 +23,7 @@ public:
   //! \param theError the error string message if validation fails
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const = 0;
+                       Events_InfoMessage& theError) const = 0;
 
   MODELAPI_EXPORT ~ModelAPI_AttributeValidator();
 };

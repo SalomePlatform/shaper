@@ -6,6 +6,8 @@
 
 #include <GeomValidators_ZeroOffset.h>
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -21,7 +23,7 @@
 //=================================================================================================
 bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                         const std::list<std::string>& theArguments,
-                                        std::string& theError) const
+                                        Events_InfoMessage& theError) const
 {
   if(theArguments.size() != 9) {
     theError = "Wrong number of validator arguments in xml(expected 9).";

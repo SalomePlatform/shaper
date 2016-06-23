@@ -8,6 +8,8 @@
 
 #include <ExchangePlugin_Tools.h>
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Session.h>
@@ -39,7 +41,7 @@ bool ExchangePlugin_FormatValidator::parseFormats(const std::list<std::string>& 
 
 bool ExchangePlugin_FormatValidator::isValid(const AttributePtr& theAttribute,
                                              const std::list<std::string>& theArguments,
-                                             std::string& theError) const
+                                             Events_InfoMessage& theError) const
 {
   if (!theAttribute->isInitialized()) {
     theError = "Is not initialized.";

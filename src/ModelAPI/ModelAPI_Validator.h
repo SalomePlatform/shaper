@@ -13,6 +13,7 @@
 #include <list>
 
 class ModelAPI_Feature;
+class Events_InfoMessage;
 
 /**\class ModelAPI_Validator
  * \ingroup DataModel
@@ -84,7 +85,7 @@ class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
 
   /// Returns true if the attribute is valid.
   virtual bool validate(const std::shared_ptr<ModelAPI_Attribute>& theAttribute,
-                        std::string& theValidator, std::string& theError) const = 0;
+                        std::string& theValidator, Events_InfoMessage& theError) const = 0;
 
   /// register that this attribute in feature is not obligatory for the feature execution
   /// so, it is not needed for the standard validation mechanism

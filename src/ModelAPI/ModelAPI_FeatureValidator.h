@@ -32,7 +32,7 @@ class MODELAPI_EXPORT ModelAPI_FeatureValidator : public ModelAPI_Validator
   /// \param theError the error string message if validation fails
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const = 0;
+                       Events_InfoMessage& theError) const = 0;
 
   /// Returns true if the attribute in feature is not obligatory for the feature execution
   virtual bool isNotObligatory(std::string theFeature, std::string theAttribute) = 0;

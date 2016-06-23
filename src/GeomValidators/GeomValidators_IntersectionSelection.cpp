@@ -6,13 +6,15 @@
 
 #include "GeomValidators_IntersectionSelection.h"
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Feature.h>
 
 bool GeomValidators_IntersectionSelection::isValid(const AttributePtr& theAttribute,
                                                    const std::list<std::string>& theArguments,
-                                                   std::string& theError) const
+                                                   Events_InfoMessage& theError) const
 {
   if(!theAttribute.get()) {
     theError = "Error: empty selection.";
@@ -40,9 +42,8 @@ bool GeomValidators_IntersectionSelection::isValid(const AttributePtr& theAttrib
     if(aFeatureKind == "Sketch" ||
        aFeatureKind == "Plane" ||
        aFeatureKind == "Axis") {
-      theError = "Error: ";
-      theError += aFeatureKind;
-      theError += " shape is not allowed for selection.";
+      theError = "Error: %1 shape is not allowed for selection.";
+      theError.arg(aFeatureKind);
       return false;
     }
     std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();

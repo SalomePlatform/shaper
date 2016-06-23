@@ -2,13 +2,15 @@
 
 #include "GeomValidators_ConstructionComposite.h"
 
+#include <Events_InfoMessage.h>
+
 #include "ModelAPI_AttributeSelection.h"
 #include "ModelAPI_ResultConstruction.h"
 #include "ModelAPI_CompositeFeature.h"
 
 bool GeomValidators_ConstructionComposite::isValid(const AttributePtr& theAttribute,
                                                    const std::list<std::string>& theArguments,
-                                                   std::string& theError) const
+                                                   Events_InfoMessage& theError) const
 {
   bool aValid = true;
   if (theAttribute->attributeType() != ModelAPI_AttributeSelection::typeId()) {

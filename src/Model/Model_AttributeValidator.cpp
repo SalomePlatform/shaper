@@ -6,6 +6,8 @@
 
 #include "Model_AttributeValidator.h"
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
 
@@ -14,7 +16,7 @@
 
 bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute, 
                                        const std::list<std::string>& theArguments, 
-                                       std::string& theError) const
+                                       Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() == ModelAPI_AttributeInteger::typeId()) {
     AttributeIntegerPtr anAttribue =

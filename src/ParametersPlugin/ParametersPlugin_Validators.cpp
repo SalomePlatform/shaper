@@ -9,6 +9,8 @@
 
 #include <ParametersPlugin_Parameter.h>
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultParameter.h>
@@ -24,7 +26,7 @@ ParametersPlugin_VariableValidator::~ParametersPlugin_VariableValidator()
 
 bool ParametersPlugin_VariableValidator::isValid(const AttributePtr& theAttribute,
                                                  const std::list<std::string>& theArguments,
-                                                 std::string& theError) const
+                                                 Events_InfoMessage& theError) const
 {
   AttributeStringPtr aStrAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
   if (!aStrAttr->isInitialized()) {
@@ -95,7 +97,7 @@ ParametersPlugin_ExpressionValidator::~ParametersPlugin_ExpressionValidator()
 
 bool ParametersPlugin_ExpressionValidator::isValid(const AttributePtr& theAttribute,
                                                    const std::list<std::string>& theArguments,
-                                                   std::string& theError) const
+                                                   Events_InfoMessage& theError) const
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   ResultParameterPtr aParam =

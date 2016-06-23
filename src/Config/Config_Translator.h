@@ -40,11 +40,11 @@ public:
 
   /**
   * Returns translation from the given info message.
-  * If transdlation is not exists then it returns a string 
+  * If translation is not exists then it returns a string
   * from the info data without translation
   * \param theInfo an info message
   */
-  static CONFIG_EXPORT std::string translate(std::shared_ptr<Events_InfoMessage> theInfo);
+  static CONFIG_EXPORT std::string translate(const Events_InfoMessage& theInfo);
 
   /**
   * Returns translation from the given data.

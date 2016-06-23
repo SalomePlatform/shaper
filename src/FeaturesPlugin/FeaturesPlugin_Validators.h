@@ -22,7 +22,7 @@ public:
   //! \param[out] theError error message.
    virtual bool isValid(const AttributePtr& theAttribute,
                         const std::list<std::string>& theArguments,
-                        std::string& theError) const;
+                        Events_InfoMessage& theError) const;
 };
 
 /// \class FeaturesPlugin_ValidatorPipeLocations
@@ -37,7 +37,7 @@ class FeaturesPlugin_ValidatorPipeLocations: public ModelAPI_FeatureValidator
   //! \param theError error message
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 
   /// Returns true if the attribute in feature is not obligatory for the feature execution
   virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
@@ -56,12 +56,12 @@ public:
   //! \param[out] theError error message.
    virtual bool isValid(const AttributePtr& theAttribute,
                         const std::list<std::string>& theArguments,
-                        std::string& theError) const;
+                        Events_InfoMessage& theError) const;
 
 private:
   bool isValidAttribute(const AttributePtr& theAttribute,
                         const std::list<std::string>& theArguments,
-                        std::string& theError) const;
+                        Events_InfoMessage& theError) const;
 };
 
 /// \class FeaturesPlugin_ValidatorCompositeLauncher
@@ -76,7 +76,7 @@ public:
   //! \param[out] theError error message.
    virtual bool isValid(const AttributePtr& theAttribute,
                         const std::list<std::string>& theArguments,
-                        std::string& theError) const;
+                        Events_InfoMessage& theError) const;
 };
 
 /// \class FeaturesPlugin_ValidatorExtrusionDir
@@ -92,14 +92,14 @@ public:
   //! \param[out] theError error message.
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 
   /// \return true if the attribute in feature is not obligatory for the feature execution
   virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 
 private:
   bool isShapesCanBeEmpty(const AttributePtr& theAttribute,
-                          std::string& theError) const;
+                          Events_InfoMessage& theError) const;
 };
 
 /// \class FeaturesPlugin_ValidatorBooleanSelection
@@ -115,7 +115,7 @@ public:
   /// \param[out] theError error message.
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 /// \class FeaturesPlugin_ValidatorPartitionSelection
@@ -131,7 +131,7 @@ public:
   /// \param[out] theError error message.
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 /// \class FeaturesPlugin_ValidatorRemoveSubShapesSelection
@@ -147,7 +147,7 @@ public:
   /// \param[out] theError error message.
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 /// \class FeaturesPlugin_ValidatorRemoveSubShapesResult
@@ -162,7 +162,7 @@ class FeaturesPlugin_ValidatorRemoveSubShapesResult: public ModelAPI_FeatureVali
   //! \param theError error message
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 
   /// \return true if the attribute in feature is not obligatory for the feature execution
   virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
@@ -181,7 +181,7 @@ public:
   /// \param[out] theError error message.
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 /// \class FeaturesPlugin_ValidatorUnionArguments
@@ -196,7 +196,7 @@ class FeaturesPlugin_ValidatorUnionArguments: public ModelAPI_FeatureValidator
   //! \param theError error message
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 
   /// \return true if the attribute in feature is not obligatory for the feature execution
   virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);

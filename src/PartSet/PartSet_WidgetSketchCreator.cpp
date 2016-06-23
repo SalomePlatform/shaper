@@ -22,6 +22,8 @@
 
 #include <GeomAPI_Face.h>
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelection.h>
@@ -461,7 +463,8 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
         SessionPtr aMgr = ModelAPI_Session::get();
         ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
         AttributePtr anAttribute = myFeature->attribute(anObjectsAttribute);
-        std::string aValidatorID, anError;
+        std::string aValidatorID;
+        Events_InfoMessage anError;
         aSelList->append(aRes, GeomShapePtr());
         if (aFactory->validate(anAttribute, aValidatorID, anError))
           updateObject(aCompFeature);
@@ -479,12 +482,14 @@ bool PartSet_WidgetSketchCreator::validateSelectionList() const
 
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  std::string aValidatorID, anError;
+  std::string aValidatorID;
+  Events_InfoMessage anError;
   bool isValidPComposite = aFactory->validate(anAttrList, aValidatorID, anError);
   if (!isValidPComposite) {
     XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myModule->workshop());
+    // TODO(spo): translate
     QMessageBox::question(aWorkshop->desktop(), tr("Apply current feature"),
-                  tr("Sketch is invalid and will be deleted.\nError: %1").arg(anError.c_str()),
+                  tr("Sketch is invalid and will be deleted.\nError: %1").arg(anError.messageString().c_str()),
                   QMessageBox::Ok);
   }
   return isValidPComposite;

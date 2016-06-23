@@ -28,7 +28,7 @@
 //=================================================================================================
 bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute,
                                                 const std::list<std::string>& theArguments,
-                                                std::string& theError) const
+                                                Events_InfoMessage& theError) const
 {
   // Get base objects list.
   if(theAttribute->attributeType() != ModelAPI_AttributeSelectionList::typeId()) {
@@ -109,7 +109,7 @@ bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute
 //=================================================================================================
 bool BuildPlugin_ValidatorBaseForWire::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                const std::list<std::string>& theArguments,
-                                               std::string& theError) const
+                                               Events_InfoMessage& theError) const
 {
   // Get attribute.
   if(theArguments.size() != 1) {
@@ -154,7 +154,7 @@ bool BuildPlugin_ValidatorBaseForWire::isNotObligatory(std::string theFeature, s
 //=================================================================================================
 bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                const std::list<std::string>& theArguments,
-                                               std::string& theError) const
+                                               Events_InfoMessage& theError) const
 {
   // Get attribute.
   if(theArguments.size() != 1) {
@@ -229,7 +229,7 @@ bool BuildPlugin_ValidatorBaseForFace::isNotObligatory(std::string theFeature, s
 //=================================================================================================
 bool BuildPlugin_ValidatorSubShapesSelection::isValid(const AttributePtr& theAttribute,
                                                       const std::list<std::string>& theArguments,
-                                                      std::string& theError) const
+                                                      Events_InfoMessage& theError) const
 {
   if(theArguments.size() != 1) {
     std::string aMsg = "Error: BuildPlugin_ValidatorSubShapesSelection should be used only with "

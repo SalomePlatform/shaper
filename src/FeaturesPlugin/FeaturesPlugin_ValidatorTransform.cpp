@@ -2,6 +2,8 @@
 
 #include "FeaturesPlugin_ValidatorTransform.h"
 
+#include <Events_InfoMessage.h>
+
 #include "ModelAPI_AttributeSelectionList.h"
 #include "ModelAPI_ResultPart.h"
 #include "ModelAPI_ResultBody.h"
@@ -10,7 +12,7 @@
 
 bool FeaturesPlugin_ValidatorTransform::isValid(const AttributePtr& theAttribute,
                                                 const std::list<std::string>& theArguments,
-                                                std::string& theError) const
+                                                Events_InfoMessage& theError) const
 {
   bool aValid = true;
   std::string anAttributeType = theAttribute->attributeType();

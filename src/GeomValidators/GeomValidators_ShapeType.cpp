@@ -64,7 +64,7 @@ std::string getShapeTypeDescription(const GeomValidators_ShapeType::TypeOfShape&
 
 bool GeomValidators_ShapeType::isValid(const AttributePtr& theAttribute,
                                        const std::list<std::string>& theArguments,
-                                       std::string& theError) const
+                                       Events_InfoMessage& theError) const
 {
   bool aValid = false;
 
@@ -99,7 +99,7 @@ bool GeomValidators_ShapeType::isValid(const AttributePtr& theAttribute,
 
 bool GeomValidators_ShapeType::isValidAttribute(const AttributePtr& theAttribute,
                                                 const TypeOfShape theShapeType,
-                                                std::string& theError) const
+                                                Events_InfoMessage& theError) const
 {
   bool aValid = true;
 
@@ -160,7 +160,7 @@ bool GeomValidators_ShapeType::isValidAttribute(const AttributePtr& theAttribute
 
 bool GeomValidators_ShapeType::isValidObject(const ObjectPtr& theObject,
                                              const TypeOfShape theShapeType,
-                                             std::string& theError) const
+                                             Events_InfoMessage& theError) const
 {
   bool aValid = true;
   if (!theObject.get()) {
@@ -191,7 +191,7 @@ bool GeomValidators_ShapeType::isValidObject(const ObjectPtr& theObject,
 
 bool GeomValidators_ShapeType::isValidShape(const GeomShapePtr theShape,
                                             const TypeOfShape theShapeType,
-                                            std::string& theError) const
+                                            Events_InfoMessage& theError) const
 {
   bool aValid = true;
 

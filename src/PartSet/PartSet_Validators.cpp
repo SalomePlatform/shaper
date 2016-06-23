@@ -19,6 +19,8 @@
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_ViewerPrs.h>
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeReference.h>
@@ -354,7 +356,7 @@ std::string PartSet_DifferentObjectsValidator::errorMessage(
 
 bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute, 
                                                 const std::list<std::string>& theArguments,
-                                                std::string& theError) const
+                                                Events_InfoMessage& theError) const
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
 
@@ -524,7 +526,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
 
 bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute, 
                                      const std::list<std::string>& theArguments,
-                                     std::string& theError) const
+                                     Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";

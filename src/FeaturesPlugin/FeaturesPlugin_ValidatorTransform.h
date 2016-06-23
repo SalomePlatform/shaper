@@ -23,7 +23,7 @@ class FeaturesPlugin_ValidatorTransform : public ModelAPI_AttributeValidator
    */
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 #endif

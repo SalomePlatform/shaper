@@ -9,6 +9,8 @@
 #include "ModuleBase_Tools.h"
 #include "ModuleBase_WidgetValidator.h"
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_Events.h>
@@ -121,16 +123,21 @@ QString ModuleBase_ModelWidget::getError(const bool theValueStateChecked) const
     return anError;
 
   std::string aValidatorID;
-  std::string anErrorMsg;
+  Events_InfoMessage anErrorMsg;
 
   static ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
   if (!aValidators->validate(anAttribute, aValidatorID, anErrorMsg)) {
     if (anErrorMsg.empty())
       anErrorMsg = "unknown error.";
-    anErrorMsg = anAttributeID + " - " + aValidatorID + ": " + anErrorMsg;
+    anErrorMsg = anAttributeID + " - " + aValidatorID + ": " + anErrorMsg.messageString();
   }
 
-  anError = QString::fromStdString(anErrorMsg);
+  if (!anErrorMsg.empty()) {
+    std::string aStr = Config_Translator::translate(anErrorMsg);
+    std::string aCodec = Config_Translator::codec(anErrorMsg.context());
+    anError = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aStr.c_str());
+  }
+
   if (anError.isEmpty() && theValueStateChecked)
     anError = getValueStateError();
 

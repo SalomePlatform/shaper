@@ -177,12 +177,12 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
       const ModelAPI_FeatureValidator* aFValidator = 
         dynamic_cast<const ModelAPI_FeatureValidator*>(validator(aValidatorID));
       if (aFValidator) {
-        std::string anError;
+        Events_InfoMessage anError;
         if (!aFValidator->isValid(theFeature, anArguments, anError)) {
           if (anError.empty())
             anError = "Unknown error.";
-          anError = aValidatorID + ": " + anError;
-          theFeature->setError(anError, false);
+          anError = aValidatorID + ": " + anError.messageString();
+          theFeature->setError(anError.messageString(), false);
           theFeature->data()->execState(ModelAPI_StateInvalidArgument);
           return false;
         }
@@ -221,12 +221,12 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
     AttributePtr anAttribute = theFeature->data()->attribute(anAttributeID);
 
     std::string aValidatorID;
-    std::string anError;
+    Events_InfoMessage anError;
     if (!validate(anAttribute, aValidatorID, anError)) {
       if (anError.empty())
         anError = "Unknown error.";
-      anError = anAttributeID + " - " + aValidatorID + ": " + anError;
-      theFeature->setError(anError, false);
+      anError = anAttributeID + " - " + aValidatorID + ": " + anError.messageString();
+      theFeature->setError(anError.messageString(), false);
       theFeature->data()->execState(ModelAPI_StateInvalidArgument);
       return false;
     } 
@@ -237,7 +237,7 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
 
 bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Attribute>& theAttribute,
                                        std::string& theValidator,
-                                       std::string& theError) const
+                                       Events_InfoMessage& theError) const
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
   if (!aFeature.get()) {

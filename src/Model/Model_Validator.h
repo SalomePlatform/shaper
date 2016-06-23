@@ -78,7 +78,7 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
 
   /// Returns true if the attribute is valid.
   MODEL_EXPORT virtual bool validate(const std::shared_ptr<ModelAPI_Attribute>& theAttribute,
-                                     std::string& theValidator, std::string& theError) const;
+                                     std::string& theValidator, Events_InfoMessage& theError) const;
 
   /// register that this attribute in feature is not obligatory for the feature execution
   /// so, it is not needed for the standard validation mechanism

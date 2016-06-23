@@ -24,7 +24,7 @@ class GeomValidators_ConstructionComposite : public ModelAPI_AttributeValidator
   //! \param[out] theError error message.
   GEOMVALIDATORS_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                              const std::list<std::string>& theArguments,
-                                             std::string& theError) const;
+                                             Events_InfoMessage& theError) const;
 };
 
 #endif

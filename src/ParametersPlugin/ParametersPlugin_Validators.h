@@ -34,7 +34,7 @@ class ParametersPlugin_VariableValidator : public ModelAPI_AttributeValidator
    */
   PARAMETERSPLUGIN_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                                const std::list<std::string>& theArguments,
-                                               std::string& theError) const;
+                                               Events_InfoMessage& theError) const;
 
  protected:
   /// Returns true if theString is a valid variable name.
@@ -63,7 +63,7 @@ class ParametersPlugin_ExpressionValidator: public ModelAPI_AttributeValidator
    */
   PARAMETERSPLUGIN_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                                const std::list<std::string>& theArguments,
-                                               std::string& theError) const;
+                                               Events_InfoMessage& theError) const;
 };
 
 

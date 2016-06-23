@@ -5,6 +5,9 @@
 // Author:      Mikhail PONIKAROV
 
 #include "GeomValidators_Positive.h"
+
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Session.h>
@@ -25,7 +28,7 @@ GeomValidators_Positive::GeomValidators_Positive()
 
 bool GeomValidators_Positive::isValid(const AttributePtr& theAttribute, 
                                       const std::list<std::string>& theArguments,
-                                      std::string& theError) const
+                                      Events_InfoMessage& theError) const
 {
   double aMinValue = 1.e-5;
   if(theArguments.size() == 1) {

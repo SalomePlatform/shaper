@@ -24,7 +24,7 @@ public:
 
   /// Constructor
   /// \param theSender a pointer on sender object
-  Events_InfoMessage(const void* theSender = 0):Events_Message(Events_Loop::eventByName("InfoMessage"), theSender) {}
+  explicit Events_InfoMessage(const void* theSender = 0):Events_Message(Events_Loop::eventByName("InfoMessage"), theSender) {}
 
   /// Constructor
   /// \param theSender a pointer on sender object
@@ -53,6 +53,15 @@ public:
 
   /// Returns message
   std::string messageString() const { return myMessage; }
+
+  Events_InfoMessage& operator=(const std::string& theMsg) {
+    setMessageString(theMsg);
+    return *this;
+  }
+
+  bool empty() const {
+    return myMessage.empty();
+  }
 
   /// Add parameter for message string of string type
   /// \param theParam the parameter

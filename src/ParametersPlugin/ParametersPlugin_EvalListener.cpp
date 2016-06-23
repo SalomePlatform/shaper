@@ -338,7 +338,8 @@ void ParametersPlugin_EvalListener::renameInDependents(std::shared_ptr<ModelAPI_
 
 bool isValidAttribute(const AttributePtr& theAttribute)
 {
-  std::string aValidator, anError;
+  std::string aValidator;
+  Events_InfoMessage anError;
   return ModelAPI_Session::get()->validators()->validate(theAttribute, aValidator, anError);
 }
 

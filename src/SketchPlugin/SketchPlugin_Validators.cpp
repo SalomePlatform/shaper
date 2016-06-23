@@ -20,6 +20,8 @@
 
 #include "SketcherPrs_Tools.h"
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -45,7 +47,7 @@ const double tolerance = 1.e-7;
 
 bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribute, 
                                                  const std::list<std::string>& theArguments,
-                                                 std::string& theError) const
+                                                 Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
@@ -70,7 +72,7 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribut
       dynamic_cast<const ModelAPI_AttributeValidator*>(aFactory->validator("GeomValidators_ShapeType"));
     std::list<std::string> anArguments;
     anArguments.push_back("circle");
-    std::string aCircleError;
+    Events_InfoMessage aCircleError;
     bool aShapeValid = aShapeValidator->isValid(aRefAttr, anArguments, aCircleError);
     // the circle line is not a valid case
     if (aShapeValid) {
@@ -80,7 +82,7 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribut
       
     anArguments.clear();
     anArguments.push_back("line");
-    std::string aLineError;
+    Events_InfoMessage aLineError;
     aShapeValid = aShapeValidator->isValid(aRefAttr, anArguments, aLineError);
     // if the attribute value is not a line, that means it is a vertex. A vertex is always valid
     if (aShapeValid) {
@@ -146,7 +148,7 @@ static bool hasCoincidentPoint(FeaturePtr theFeature1, FeaturePtr theFeature2)
 
 bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute, 
                                                 const std::list<std::string>& theArguments,
-                                                std::string& theError) const
+                                                Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
@@ -217,7 +219,7 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
 
 bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute,
                                              const std::list<std::string>& theArguments,
-                                             std::string& theError) const
+                                             Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
@@ -259,7 +261,7 @@ bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute,
 
 bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute, 
                                               const std::list<std::string>& theArguments,
-                                              std::string& theError) const
+                                              Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
@@ -314,7 +316,7 @@ bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute,
 
 bool SketchPlugin_MirrorAttrValidator::isValid(const AttributePtr& theAttribute, 
                                                const std::list<std::string>& theArguments,
-                                               std::string& theError) const
+                                               Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefList::typeId()) {
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
@@ -343,7 +345,7 @@ bool SketchPlugin_MirrorAttrValidator::isValid(const AttributePtr& theAttribute,
 
 bool SketchPlugin_CoincidenceAttrValidator::isValid(const AttributePtr& theAttribute, 
                                                     const std::list<std::string>& theArguments,
-                                                    std::string& theError) const
+                                                    Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
@@ -402,7 +404,7 @@ bool SketchPlugin_CoincidenceAttrValidator::isValid(const AttributePtr& theAttri
 
 bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute, 
                                          const std::list<std::string>& theArguments,
-                                         std::string& theError) const
+                                         Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefList::typeId()) {
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
@@ -442,7 +444,7 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
 
 bool SketchPlugin_SolverErrorValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                 const std::list<std::string>& theArguments,
-                                                std::string& theError) const
+                                                Events_InfoMessage& theError) const
 {
   AttributeStringPtr aAttributeString = theFeature->string(SketchPlugin_Sketch::SOLVER_ERROR());
 
@@ -500,7 +502,7 @@ static bool hasSameTangentFeature(const std::set<AttributePtr>& theRefsList, con
 
 bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribute,
                                                  const std::list<std::string>& theArguments,
-                                                 std::string& theError) const
+                                                 Events_InfoMessage& theError) const
 {
   std::shared_ptr<SketchPlugin_ConstraintFillet> aFilletFeature = std::dynamic_pointer_cast<SketchPlugin_ConstraintFillet>(theAttribute->owner());
   AttributeRefAttrListPtr aPointsRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(theAttribute);
@@ -673,7 +675,7 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
 
 bool SketchPlugin_MiddlePointAttrValidator::isValid(const AttributePtr& theAttribute, 
                                                     const std::list<std::string>& theArguments,
-                                                    std::string& theError) const
+                                                    Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
@@ -719,7 +721,7 @@ bool SketchPlugin_MiddlePointAttrValidator::isValid(const AttributePtr& theAttri
 
 bool SketchPlugin_ArcTangentPointValidator::isValid(const AttributePtr& theAttribute,
                                                     const std::list<std::string>& /*theArguments*/,
-                                                    std::string& theError) const
+                                                    Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
@@ -773,7 +775,7 @@ bool SketchPlugin_ArcTangentPointValidator::isValid(const AttributePtr& theAttri
 
 bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribute,
                                                  const std::list<std::string>& theArguments,
-                                                 std::string& theError) const
+                                                 Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeSelection::typeId()) {
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
@@ -819,7 +821,7 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
 
 bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
                                                const std::list<std::string>& theArguments,
-                                               std::string& theError) const
+                                               Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeSelection::typeId()) {
     theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";

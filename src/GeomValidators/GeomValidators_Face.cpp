@@ -34,7 +34,7 @@ GeomAbs_SurfaceType faceType(const std::string& theType)
 
 bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
                                   const std::list<std::string>& theArguments,
-                                  std::string& theError) const
+                                  Events_InfoMessage& theError) const
 {
   std::string anAttributeType = theAttribute->attributeType();
   if (anAttributeType != ModelAPI_AttributeSelection::typeId()) {

@@ -26,7 +26,7 @@ class SketchPlugin_DistanceAttrValidator : public ModelAPI_AttributeValidator
   //! \param theError error message
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 /**\class SketchPlugin_TangentAttrValidator
@@ -44,7 +44,7 @@ class SketchPlugin_TangentAttrValidator : public ModelAPI_AttributeValidator
   //! \param theError error message
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 
@@ -63,7 +63,7 @@ class SketchPlugin_NotFixedValidator : public ModelAPI_AttributeValidator
   //! \param theError error message
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 /**\class SketchPlugin_EqualAttrValidator
@@ -81,7 +81,7 @@ class SketchPlugin_EqualAttrValidator : public ModelAPI_AttributeValidator
   //! \param theError error message
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 /**\class SketchPlugin_MirrorAttrValidator
@@ -99,7 +99,7 @@ class SketchPlugin_MirrorAttrValidator : public ModelAPI_AttributeValidator
   //! \param theError error message
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 
@@ -118,7 +118,7 @@ class SketchPlugin_CoincidenceAttrValidator : public ModelAPI_AttributeValidator
   //! \param theError error message
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 
@@ -138,7 +138,7 @@ class SketchPlugin_CopyValidator : public ModelAPI_AttributeValidator
   //! \param theError error message
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 /**\class SketchPlugin_SolverErrorValidator
@@ -156,7 +156,7 @@ class SketchPlugin_SolverErrorValidator : public ModelAPI_FeatureValidator
   //! \param theError error message
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 
   /// Returns true if the attribute in feature is not obligatory for the feature execution
   virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
@@ -177,7 +177,7 @@ public:
   //! \param theError error message
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 
@@ -196,7 +196,7 @@ class SketchPlugin_MiddlePointAttrValidator : public ModelAPI_AttributeValidator
   //! \param theError error message
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 
@@ -215,7 +215,7 @@ class SketchPlugin_ArcTangentPointValidator : public ModelAPI_AttributeValidator
   //! \param theError error message
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 /**\class SketchPlugin_IntersectionValidator
@@ -231,7 +231,7 @@ class SketchPlugin_IntersectionValidator : public ModelAPI_AttributeValidator
   //! \param theError error message
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 /**\class SketchPlugin_ProjectionValidator
@@ -247,7 +247,7 @@ class SketchPlugin_ProjectionValidator : public ModelAPI_AttributeValidator
   //! \param theError error message
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 #endif

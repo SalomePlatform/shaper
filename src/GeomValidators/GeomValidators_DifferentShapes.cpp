@@ -6,12 +6,14 @@
 
 #include "GeomValidators_DifferentShapes.h"
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_AttributeSelection.h>
 #include "ModelAPI_Object.h"
 
 bool GeomValidators_DifferentShapes::isValid(const AttributePtr& theAttribute,
                                       const std::list<std::string>& theArguments,
-                                      std::string& theError) const
+                                      Events_InfoMessage& theError) const
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeSelectionPtr aSelectionAttribute = 

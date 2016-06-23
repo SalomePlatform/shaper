@@ -154,7 +154,7 @@ class PartSet_DifferentObjectsValidator : public ModelAPI_AttributeValidator
   //! \param theError an output error string
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 private:
   //! Returns error message for the error type
   //! \param theType a type of error
@@ -179,7 +179,7 @@ class PartSet_CoincidentAttr : public ModelAPI_AttributeValidator
   //! \param theError an output error string
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments,
-                       std::string& theError) const;
+                       Events_InfoMessage& theError) const;
 };
 
 

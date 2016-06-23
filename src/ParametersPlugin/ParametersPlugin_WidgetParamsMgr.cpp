@@ -8,6 +8,8 @@
 #include "ParametersPlugin_Parameter.h"
 #include "ParametersPlugin_Validators.h"
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeRefList.h>
@@ -252,11 +254,12 @@ bool ParametersPlugin_WidgetParamsMgr::storeValueCustom()
   ParametersPlugin_ExpressionValidator aValidator;
   std::list<std::string> aArgs;
   std::string aAttrId = ParametersPlugin_Parameter::VARIABLE_ID();
-  std::string aErr;
+  Events_InfoMessage aErr;
   int aId = 0;
   foreach(FeaturePtr aFeature, myParametersList) {
     if (!aValidator.isValid(aFeature->attribute(aAttrId), aArgs, aErr)) {
-      QMessageBox::warning(this, tr("Warning"), aErr.c_str());
+      // TODO(spo): translate
+      QMessageBox::warning(this, tr("Warning"), aErr.messageString().c_str());
       selectItemScroll(myParameters->child(aId));
       return false;
     }

@@ -6,13 +6,15 @@
 
 #include "GeomValidators_BodyShapes.h"
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultConstruction.h>
 
 bool GeomValidators_BodyShapes::isValid(const AttributePtr& theAttribute,
                                         const std::list<std::string>& theArguments,
-                                        std::string& theError) const
+                                        Events_InfoMessage& theError) const
 {
   std::string anAttributeType = theAttribute->attributeType();
   if(anAttributeType == ModelAPI_AttributeSelection::typeId()) {

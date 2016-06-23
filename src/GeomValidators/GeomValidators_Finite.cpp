@@ -6,12 +6,14 @@
 
 #include <GeomValidators_Finite.h>
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_ResultConstruction.h>
 
 bool GeomValidators_Finite::isValid(const AttributePtr& theAttribute,
                                    const std::list<std::string>& theArguments,
-                                   std::string& theError) const
+                                   Events_InfoMessage& theError) const
 {
   bool aValid = true;
 

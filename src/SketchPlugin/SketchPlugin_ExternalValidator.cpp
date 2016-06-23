@@ -7,6 +7,8 @@
 #include "SketchPlugin_ExternalValidator.h"
 #include "SketchPlugin_Feature.h"
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Tools.h>
@@ -14,7 +16,7 @@
 
 bool SketchPlugin_ExternalValidator::isValid(const AttributePtr& theAttribute,
                                              const std::list<std::string>& theArguments,
-                                             std::string& theError) const
+                                             Events_InfoMessage& theError) const
 {
   if (theArguments.size() != 1)
     return true;

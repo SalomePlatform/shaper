@@ -5,6 +5,9 @@
 // Author:      Vitaly SMETANNIKOV
 
 #include <Model_FeatureValidator.h>
+
+#include <Events_InfoMessage.h>
+
 #include <Model_Validator.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_Data.h>
@@ -17,7 +20,7 @@
 
 bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                      const std::list<std::string>& theArguments,
-                                     std::string& theError) const
+                                     Events_InfoMessage& theError) const
 {
   static Model_ValidatorsFactory* aValidators = 
     static_cast<Model_ValidatorsFactory*>(ModelAPI_Session::get()->validators());

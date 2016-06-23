@@ -6,6 +6,8 @@
 
 #include "GeomValidators_FeatureKind.h"
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttr.h>
@@ -19,7 +21,7 @@
 
 bool GeomValidators_FeatureKind::isValid(const AttributePtr& theAttribute,
                                       const std::list<std::string>& theArguments,
-                                      std::string& theError) const
+                                      Events_InfoMessage& theError) const
 {
   bool isSketchEntities = true;
   std::set<std::string> anEntityKinds;

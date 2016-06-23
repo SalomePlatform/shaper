@@ -60,7 +60,7 @@ void XGUI_ErrorDialog::clear()
 
 void XGUI_ErrorDialog::addError(std::shared_ptr<Events_InfoMessage> theMsg)
 {
-  std::string aError = Config_Translator::translate(theMsg);
+  std::string aError = Config_Translator::translate(*theMsg);
   std::string aCodec = Config_Translator::codec(theMsg->context());
   QString aMsg = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aError.c_str());
   myErrors.append(aMsg);

@@ -49,7 +49,7 @@ class GeomValidators_ShapeType : public ModelAPI_AttributeValidator
   //! \param[out] theError error message.
   GEOMVALIDATORS_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                              const std::list<std::string>& theArguments,
-                                             std::string& theError) const;
+                                             Events_InfoMessage& theError) const;
 protected:
   /// Convert string to TypeOfShape value
   /// \param theType a string value
@@ -61,7 +61,7 @@ protected:
   /// \param[out] theError error message.
   bool isValidAttribute(const AttributePtr& theAttribute,
                         const TypeOfShape theShapeType,
-                        std::string& theError) const;
+                        Events_InfoMessage& theError) const;
 
   /// Returns true if the attibute's object type satisfies the argument value
   /// \param[in] theObject a checked object
@@ -69,7 +69,7 @@ protected:
   /// \param[out] theError error message.
   bool isValidObject(const ObjectPtr& theObject,
                      const TypeOfShape theShapeType,
-                     std::string& theError) const;
+                     Events_InfoMessage& theError) const;
 
   /// Returns true if the attibute's object type satisfies the argument value
   /// \param[in] theShape a checked shape
@@ -77,7 +77,7 @@ protected:
   /// \param[out] theError error message.
   bool isValidShape(const GeomShapePtr theShape,
                     const TypeOfShape theShapeType,
-                    std::string& theError) const;
+                    Events_InfoMessage& theError) const;
 
 };
 

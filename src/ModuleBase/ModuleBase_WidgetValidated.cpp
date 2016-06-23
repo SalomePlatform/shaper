@@ -7,6 +7,8 @@
 #include <ModuleBase_WidgetSelectorStore.h>
 #include <ModuleBase_ViewerPrs.h>
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeValidator.h>
@@ -190,7 +192,8 @@ bool ModuleBase_WidgetValidated::isValidAttribute(const AttributePtr& theAttribu
 {
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  std::string aValidatorID, anError;
+  std::string aValidatorID;
+  Events_InfoMessage anError;
   return aFactory->validate(theAttribute, aValidatorID, anError);
 }
 

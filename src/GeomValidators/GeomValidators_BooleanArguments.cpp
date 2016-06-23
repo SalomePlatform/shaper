@@ -6,13 +6,15 @@
 
 #include <GeomValidators_BooleanArguments.h>
 
+#include <Events_InfoMessage.h>
+
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeSelectionList.h>
 
 //=================================================================================================
 bool GeomValidators_BooleanArguments::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                               const std::list<std::string>& theArguments,
-                                              std::string& theError) const
+                                              Events_InfoMessage& theError) const
 {
   if(theArguments.size() != 3) {
     theError = "Wrong number of arguments (expected 3).";
