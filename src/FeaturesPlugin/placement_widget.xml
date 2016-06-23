@@ -4,7 +4,7 @@
   <multi_selector id="placement_objects_list"
     label="Select objects to move"
     icon="icons/Features/cut_shape.png"
-    tooltip="Select solid objects"
+    tooltip="Select objects"
     type_choice="objects"
     concealment="true" >
     <validator id="FeaturesPlugin_ValidatorTransform"/>
