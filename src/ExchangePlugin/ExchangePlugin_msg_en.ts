@@ -30,7 +30,7 @@
     
     <message>
       <source>selection_list - GeomValidators_Finite: Infinite result is selected.</source>
-      <translation></translation>
+      <translation>Olny finitive shapes can be exported</translation>
     </message>    
   </context>
 </TS>
