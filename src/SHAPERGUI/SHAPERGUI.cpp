@@ -380,18 +380,20 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const ActionInfo& theIn
   return addFeature(theWBName,
                     theInfo.id,
                     theInfo.text,
-                    theInfo.toolTip,
+                    theInfo.text, //Issue #650: in the SALOME mode the tooltip should be same as text
                     theInfo.icon,
                     theInfo.shortcut,
                     theInfo.checkable,
-                    isAddSeparator);
+                    isAddSeparator,
+                    theInfo.toolTip);
 }
 
 //******************************************************
 QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theId,
                                const QString& theTitle, const QString& theTip,
                                const QIcon& theIcon, const QKeySequence& theKeys,
-                               bool isCheckable, const bool isAddSeparator)
+                               bool isCheckable, const bool isAddSeparator,
+                               const QString& theStatusTip)
 {
   static QString aLastTool = "";
   static int aNb = 0;
@@ -414,6 +416,8 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theId,
     aKeys += theKeys[i];
   QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk,
                                   isCheckable);
+  aAction->setStatusTip(theStatusTip);
+
   aAction->setData(theId);
 
   int aWBMenu = createMenu(theWBName, -1, -1, 50/*10-Window, 1000 - Help*/);
@@ -480,6 +484,7 @@ QAction* SHAPERGUI::addDesktopCommand(const QString& theId, const QString& theTi
     aKeys += theKeys[i];
   QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk,
                                   isCheckable);
+  aAction->setStatusTip(theTip);
   aAction->setData(theId);
   createMenu(aId, aMenu, theMenuPosition);
   return aAction;

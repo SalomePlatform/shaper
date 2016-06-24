@@ -166,7 +166,6 @@ void ModuleBase_IModule::createFeatures()
 
 void ModuleBase_IModule::actionCreated(QAction* theFeature)
 {
-  theFeature->setStatusTip(theFeature->text());
   connect(theFeature, SIGNAL(triggered(bool)), this, SLOT(onFeatureTriggered()));
 }
 

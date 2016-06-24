@@ -51,8 +51,9 @@ Q_OBJECT
 
   virtual QAction* addFeature(const QString& theWBName, const QString& theId,
                               const QString& theTitle, const QString& theTip, const QIcon& theIcon,
-                              const QKeySequence& theKeys = QKeySequence(),
-                              bool isCheckable = false, const bool isAddSeparator = false);
+                              const QKeySequence& theKeys/* = QKeySequence()*/,
+                              bool isCheckable /*= false*/, const bool isAddSeparator/* = false*/,
+                              const QString& theStatusTip);
 
   //! Add feature (QAction) in the \a theWBName toolbar with given \a theInfo about action
   virtual QAction* addFeature(const QString& theWBName,
