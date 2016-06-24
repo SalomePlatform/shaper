@@ -42,7 +42,6 @@ SET(PROJECT_HEADERS
   ModuleBase_ViewerPrs.h
   ModuleBase_WidgetAction.h
   ModuleBase_WidgetBoolValue.h
-  ModuleBase_WidgetCheckDoubleValue.h
   ModuleBase_WidgetCheckGroupBox.h
   ModuleBase_WidgetChoice.h
   ModuleBase_WidgetCreatorFactory.h
@@ -102,7 +101,6 @@ SET(PROJECT_SOURCES
   ModuleBase_ViewerPrs.cpp
   ModuleBase_WidgetAction.cpp
   ModuleBase_WidgetBoolValue.cpp
-  ModuleBase_WidgetCheckDoubleValue.cpp
   ModuleBase_WidgetCheckGroupBox.cpp
   ModuleBase_WidgetChoice.cpp
   ModuleBase_WidgetCreatorFactory.cpp
