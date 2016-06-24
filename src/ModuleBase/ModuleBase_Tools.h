@@ -295,7 +295,8 @@ bool MODULEBASE_EXPORT hasModuleDocumentFeature(const std::set<FeaturePtr>& theF
 bool MODULEBASE_EXPORT askToDelete(const std::set<FeaturePtr> aFeatures,
                                    const std::map<FeaturePtr, std::set<FeaturePtr> >& theReferences,
                                    QWidget* theParent,
-                                   std::set<FeaturePtr>& theReferencesToDelete);
+                                   std::set<FeaturePtr>& theReferencesToDelete,
+                                   const std::string& thePrefixInfo = "");
 
 /// Converts a list of objects to set of corresponded features. If object is result, it is ingored
 /// because the feauture only might be removed. But if result is in a parameter group, the feature

@@ -1041,7 +1041,8 @@ bool hasModuleDocumentFeature(const std::set<FeaturePtr>& theFeatures)
 bool askToDelete(const std::set<FeaturePtr> theFeatures,
                  const std::map<FeaturePtr, std::set<FeaturePtr> >& theReferences,
                  QWidget* theParent,
-                 std::set<FeaturePtr>& theReferencesToDelete)
+                 std::set<FeaturePtr>& theReferencesToDelete,
+                 const std::string& thePrefixInfo)
 {
   QString aNotActivatedDocWrn;
   std::string aNotActivatedNames;
@@ -1120,16 +1121,18 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
   aMessageBox.setDefaultButton(QMessageBox::No);
 
   QString aText;
+  if (!thePrefixInfo.empty())
+    aText = thePrefixInfo.c_str();
   QString aSep = ", ";
   if (!aPartFeatureNames.empty())
     aText += QString(QObject::tr("The following parts will be deleted: %1.\n")).arg(aPartFeatureNames.join(aSep));
   if (!aNotActivatedDocWrn.isEmpty())
     aText += aNotActivatedDocWrn;
   if (!anOtherFeatureNames.empty())
-    aText += QString(QObject::tr("Selected features are used in the following features: %1.\nThese features will be deleted.\n"))
+    aText += QString(QObject::tr("Features are used in the following features: %1.\nThese features will be deleted.\n"))
                      .arg(anOtherFeatureNames.join(aSep));
   if (!aParamFeatureNames.empty()) {
-    aText += QString(QObject::tr("Selected parameters are used in the following features: %1.\nThese features will be deleted.\nOr parameters could be replaced by their values.\n"))
+    aText += QString(QObject::tr("Parameters are used in the following features: %1.\nThese features will be deleted.\nOr parameters could be replaced by their values.\n"))
                      .arg(aParamFeatureNames.join(aSep));
     QPushButton *aReplaceButton = aMessageBox.addButton(QObject::tr("Replace"), QMessageBox::ActionRole);
   }

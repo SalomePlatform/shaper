@@ -875,7 +875,6 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   myCurrentSketch->setDisplayed(false);
 
   // Remove invalid sketch entities
-  /*
   std::set<FeaturePtr> anInvalidFeatures;
   ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
   for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
@@ -885,17 +884,30 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
         anInvalidFeatures.insert(aFeature);
     }
   }
-  std::map<FeaturePtr, std::set<FeaturePtr> > aReferences;
-  ModelAPI_Tools::findAllReferences(anInvalidFeatures, aReferences, false);
-  std::set<FeaturePtr> aFeatureRefsToDelete;
-  if (ModuleBase_Tools::askToDelete(anInvalidFeatures, aReferences, aConnector->desktop(), aFeatureRefsToDelete)) {
-    if (!aFeatureRefsToDelete.empty())
-      anInvalidFeatures.insert(aFeatureRefsToDelete.begin(), aFeatureRefsToDelete.end());
-    bool aDone = ModelAPI_Tools::removeFeatures(anInvalidFeatures, false);
+  if (!anInvalidFeatures.empty()) {
+    std::map<FeaturePtr, std::set<FeaturePtr> > aReferences;
+    ModelAPI_Tools::findAllReferences(anInvalidFeatures, aReferences, false);
+
+    std::set<FeaturePtr>::const_iterator anIt = anInvalidFeatures.begin(),
+                                         aLast = anInvalidFeatures.end();
+    // separate features to references to parameter features and references to others
+    QStringList anInvalidFeatureNames;
+    for (; anIt != aLast; anIt++) {
+      FeaturePtr aFeature = *anIt;
+      if (aFeature.get())
+        anInvalidFeatureNames.append(aFeature->name().c_str());
+    }
+    std::string aPrefixInfo = QString("Invalid features of the sketch will be deleted: %1.\n").
+                                  arg(anInvalidFeatureNames.join(", ")).toStdString().c_str();
+    std::set<FeaturePtr> aFeatureRefsToDelete;
+    if (ModuleBase_Tools::askToDelete(anInvalidFeatures, aReferences, aConnector->desktop(),
+                                      aFeatureRefsToDelete, aPrefixInfo)) {
+      if (!aFeatureRefsToDelete.empty())
+        anInvalidFeatures.insert(aFeatureRefsToDelete.begin(), aFeatureRefsToDelete.end());
+      ModelAPI_Tools::removeFeatures(anInvalidFeatures, false);
+    }
   }
-  else
-    return;
-  */
+
   // Display sketcher objects
   for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
     FeaturePtr aFeature = myCurrentSketch->subFeature(i);
