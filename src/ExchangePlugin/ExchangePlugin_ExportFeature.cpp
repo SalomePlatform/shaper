@@ -57,14 +57,24 @@ void ExchangePlugin_ExportFeature::initAttributes()
 {
   data()->addAttribute(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::FILE_FORMAT_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::SELECTION_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID(), ModelAPI_AttributeString::typeId());
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::XAO_AUTHOR_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID());
+}
+
+void ExchangePlugin_ExportFeature::attributeChanged(const std::string& theID)
+{
+  if (theID == XAO_FILE_PATH_ID()) {
+    string(ExchangePlugin_ExportFeature::FILE_PATH_ID())->setValue(
+      string(ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID())->value());
+  }
 }
 
 /*

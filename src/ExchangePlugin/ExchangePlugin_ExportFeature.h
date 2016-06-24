@@ -41,6 +41,12 @@ public:
     static const std::string MY_FILE_PATH_ID("file_path");
     return MY_FILE_PATH_ID;
   }
+  /// attribute name of xao file path
+  inline static const std::string& XAO_FILE_PATH_ID()
+  {
+    static const std::string MY_XAO_FILE_PATH_ID("xao_file_path");
+    return MY_XAO_FILE_PATH_ID;
+  }
   /// attribute name of file format
   inline static const std::string& FILE_FORMAT_ID()
   {
@@ -78,6 +84,9 @@ public:
 
   /// Request for initialization of data model of the feature: adding all attributes
   EXCHANGEPLUGIN_EXPORT virtual void initAttributes();
+
+  /// Reimplemented from ModelAPI_Feature::attributeChanged()
+  EXCHANGEPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
   /// Computes or recomputes the results
   EXCHANGEPLUGIN_EXPORT virtual void execute();

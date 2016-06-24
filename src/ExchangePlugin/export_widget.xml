@@ -17,7 +17,7 @@
       </multi_selector>
     </case>
     <case id="XAO" title="XAO">
-      <export_file_selector id="file_path"
+      <export_file_selector id="xao_file_path"
                             type="save"
                             title="Export file"
                             path="">
