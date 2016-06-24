@@ -24,6 +24,7 @@
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_ViewerProxy.h>
 #include <XGUI_OperationMgr.h>
+#include <XGUI_ErrorMgr.h>
 #include <XGUI_Tools.h>
 
 #include <ModuleBase_IPropertyPanel.h>
@@ -92,6 +93,7 @@
 #include <QMainWindow>
 
 //#define DEBUG_DO_NOT_BY_ENTER
+//#define DEBUG_SKETCHER_ENTITIES
 
 //#define DEBUG_CURSOR
 
@@ -904,13 +906,20 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
                                       aFeatureRefsToDelete, aPrefixInfo)) {
       if (!aFeatureRefsToDelete.empty())
         anInvalidFeatures.insert(aFeatureRefsToDelete.begin(), aFeatureRefsToDelete.end());
-      ModelAPI_Tools::removeFeatures(anInvalidFeatures, false);
+      ModelAPI_Tools::removeFeatures(anInvalidFeatures, true);
+      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+      // TODO: call the next method in the XGUI_OperationMgr::onOperationStarted().
+      workshop()->errorMgr()->updateAcceptAllAction(myCurrentSketch);
     }
   }
 
   // Display sketcher objects
+  QStringList anInfo;
   for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
     FeaturePtr aFeature = myCurrentSketch->subFeature(i);
+#ifdef DEBUG_SKETCHER_ENTITIES
+    anInfo.append(ModuleBase_Tools::objectInfo(aFeature));
+#endif
     std::list<ResultPtr> aResults = aFeature->results();
     std::list<ResultPtr>::const_iterator aIt;
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
@@ -918,6 +927,10 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
     }
     aFeature->setDisplayed(true);
   }
+#ifdef DEBUG_SKETCHER_ENTITIES
+  QString anInfoStr = anInfo.join(";\t");
+  qDebug(QString("startSketch: %1, %2").arg(anInfo.size()).arg(anInfoStr).toStdString().c_str());
+#endif
 
   if(myCirclePointFilter.IsNull()) {
     myCirclePointFilter = new PartSet_CirclePointFilter(myModule->workshop());
