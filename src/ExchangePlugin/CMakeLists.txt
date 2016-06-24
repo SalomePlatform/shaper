@@ -34,7 +34,7 @@ SET(XML_RESOURCES
 )
 
 SET(TEXT_RESOURCES
-	ExchangePlugin_msg_en.ts
+    ExchangePlugin_msg_en.ts
 )
 
 SET(PROJECT_LIBRARIES

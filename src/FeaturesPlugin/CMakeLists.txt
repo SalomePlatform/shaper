@@ -77,7 +77,7 @@ SET(XML_RESOURCES
 )
 
 SET(TEXT_RESOURCES
-	FeaturesPlugin_msg_en.ts
+    FeaturesPlugin_msg_en.ts
 )
 
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
