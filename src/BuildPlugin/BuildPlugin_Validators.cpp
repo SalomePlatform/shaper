@@ -119,7 +119,8 @@ bool BuildPlugin_ValidatorBaseForWire::isValid(const std::shared_ptr<ModelAPI_Fe
   }
   AttributeSelectionListPtr aSelectionList = theFeature->selectionList(theArguments.front());
   if(!aSelectionList.get()) {
-    theError = "Empty attribute \"" + theArguments.front() + "\".";
+    theError = "Empty attribute \"%1\".";
+    theError.arg(theArguments.front());
     return false;
   }
 
@@ -165,7 +166,8 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
   }
   AttributeSelectionListPtr aSelectionList = theFeature->selectionList(theArguments.front());
   if(!aSelectionList.get()) {
-    theError = "Empty attribute \"" + theArguments.front() + "\".";
+    theError = "Empty attribute \"%1\".";
+    theError.arg(theArguments.front());
     return false;
   }
 

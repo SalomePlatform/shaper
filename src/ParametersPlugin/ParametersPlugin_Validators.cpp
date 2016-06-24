@@ -30,12 +30,14 @@ bool ParametersPlugin_VariableValidator::isValid(const AttributePtr& theAttribut
 {
   AttributeStringPtr aStrAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
   if (!aStrAttr->isInitialized()) {
-    theError = "Attribute \"" + aStrAttr->id() + "\" is not initialized.";
+    theError = "Attribute \"%1\" is not initialized.";
+    theError.arg(aStrAttr->id());
     return false;
   }
   bool isEmptyExpr = aStrAttr->value().empty();
   if (isEmptyExpr) {
-    theError = "Attribute \"" + aStrAttr->id() + "\" value is empty.";
+    theError = "Attribute \"%1\" value is empty.";
+    theError.arg(aStrAttr->id());
     return false;
   }
   if (!isVariable(aStrAttr->value())) {
@@ -106,7 +108,8 @@ bool ParametersPlugin_ExpressionValidator::isValid(const AttributePtr& theAttrib
   AttributeStringPtr aStrAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
   if (!aStrAttr->isInitialized()) {
-    theError = "Attribute \"" + aStrAttr->id() + "\" is not initialized.";
+    theError = "Attribute \"%1\" is not initialized.";
+    theError.arg(aStrAttr->id());
     return false;
   }
   bool isEmptyExpr = aStrAttr->value().empty();

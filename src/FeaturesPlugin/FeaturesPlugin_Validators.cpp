@@ -73,13 +73,15 @@ bool FeaturesPlugin_ValidatorPipeLocations::isValid(const std::shared_ptr<ModelA
   static const std::string aLocationsID = "locations_objects";
 
   if(theFeature->getKind() != "Pipe") {
-    theError = "Error: Feature \"" + theFeature->getKind() + "\" does not supported by this validator.";
+    theError = "Error: Feature \"%1\" does not supported by this validator.";
+    theError.arg(theFeature->getKind());
     return false;
   }
 
   AttributeStringPtr aCreationMethodAttr = theFeature->string(aCreationMethodID);
   if(!aCreationMethodAttr.get()) {
-    theError = "Error: Could not get \"" + aCreationMethodID + "\" attribute.";
+    theError = "Error: Could not get \"%1\" attribute.";
+    theError.arg(aCreationMethodID);
     return false;
   }
 
@@ -89,13 +91,15 @@ bool FeaturesPlugin_ValidatorPipeLocations::isValid(const std::shared_ptr<ModelA
 
   AttributeSelectionListPtr aBaseObjectsSelectionList = theFeature->selectionList(aBaseObjectsID);
   if(!aBaseObjectsSelectionList.get()) {
-    theError = "Error: Could not get \"" + aBaseObjectsID + "\" attribute.";
+    theError = "Error: Could not get \"%1\" attribute.";
+    theError.arg(aBaseObjectsID);
     return false;
   }
 
   AttributeSelectionListPtr aLocationsSelectionList = theFeature->selectionList(aLocationsID);
   if(!aLocationsSelectionList.get()) {
-    theError = "Error: Could not get \"" + aBaseObjectsID + "\" attribute.";
+    theError = "Error: Could not get \"%1\" attribute.";
+    theError.arg(aBaseObjectsID);
     return false;
   }
 
@@ -276,8 +280,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     // Check that object is a shape with allowed type.
     GeomValidators_ShapeType aShapeTypeValidator;
     if(!aShapeTypeValidator.isValid(anAttr, theArguments, theError)) {
-      theError = "Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, "
-                 "whole sketch(if it has at least one face), and whole objects with shape types: %1";
+      theError = "Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1";
       std::string anArgumentString;
       for(auto anIt = theArguments.cbegin(); anIt != theArguments.cend(); ++anIt) {
         if (!anArgumentString.empty())
@@ -289,7 +292,8 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     }
 
   } else {
-    theError = "Error: Attribute \"" + anAttributeType + "\" does not supported by this validator.";
+    theError = "Error: Attribute \"%1\" does not supported by this validator.";
+    theError.arg(anAttributeType);
     return false;
   }
 
@@ -302,11 +306,13 @@ bool FeaturesPlugin_ValidatorCompositeLauncher::isValid(const AttributePtr& theA
                                                         Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeReference::typeId()) {
-    theError = "Error: The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "Error: The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
   if (theArguments.size() != 2) {
-    theError = "Error: Wrong parameters in XML definition for " + theAttribute->attributeType() + " type";
+    theError = "Error: Wrong parameters in XML definition for %1 type";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
   // first argument is for the base attribute, second - for skipping feature kind
@@ -315,7 +321,8 @@ bool FeaturesPlugin_ValidatorCompositeLauncher::isValid(const AttributePtr& theA
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
   AttributePtr aBaseAttribute = aFeature->attribute(aBaseAttributeId);
   if (!aBaseAttribute.get()) {
-    theError = "Wrong parameters in XML definition for " + theAttribute->attributeType() + " type";
+    theError = "Wrong parameters in XML definition for %1 type";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
   if (aBaseAttribute->isInitialized()) // when base list of composite feature is already filled,
@@ -371,8 +378,8 @@ bool FeaturesPlugin_ValidatorExtrusionDir::isValid(const std::shared_ptr<ModelAP
   if(!aDirShape.get()) {
     // Check that dir can be empty.
     if(!isShapesCanBeEmpty(aCheckAttribute, theError)) {
-      theError = "Error: Base objects list contains vertex or edge, so attribute \"" + *anArgsIt
-               + "\" can not be used with default value. Select direction for extrusion.";
+      theError = "Error: Base objects list contains vertex or edge, so attribute \"%1\" can not be used with default value. Select direction for extrusion.";
+      theError.arg(*anArgsIt);
       return false;
     } else {
       return true;
@@ -603,7 +610,8 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesSelection::isValid(const AttributePt
   AttributeSelectionPtr aShapeAttrSelection = aFeature->selection(aBaseShapeID);
 
   if(!aShapeAttrSelection.get()) {
-    theError = "Error: Could not get \"" + aBaseShapeID + "\" attribute.";
+    theError = "Error: Could not get \"%1\" attribute.";
+    theError.arg(aBaseShapeID);
     return false;
   }
 
@@ -649,19 +657,22 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesResult::isValid(const std::shared_pt
   static const std::string aSubShapesID = "subshapes";
 
   if(theFeature->getKind() != "Remove_SubShapes") {
-    theError = "Error: Feature \"" + theFeature->getKind() + "\" does not supported by this validator.";
+    theError = "Error: Feature \"%1\" does not supported by this validator.";
+    theError.arg(theFeature->getKind());
     return false;
   }
 
   AttributeSelectionPtr aShapeAttrSelection = theFeature->selection(aBaseShapeID);
   if(!aShapeAttrSelection.get()) {
-    theError = "Error: Could not get \"" + aBaseShapeID + "\" attribute.";
+    theError = "Error: Could not get \"%1\" attribute.";
+    theError.arg(aBaseShapeID);
     return false;
   }
 
   AttributeSelectionListPtr aSubShapesAttrList = theFeature->selectionList(aSubShapesID);
   if(!aSubShapesAttrList.get()) {
-    theError = "Error: Could not get \"" + aSubShapesID + "\" attribute.";
+    theError = "Error: Could not get \"%1\" attribute.";
+    theError.arg(aSubShapesID);
     return false;
   }
 
@@ -703,7 +714,8 @@ bool FeaturesPlugin_ValidatorUnionSelection::isValid(const AttributePtr& theAttr
 {
   AttributeSelectionListPtr aBaseObjectsAttrList = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
   if(!aBaseObjectsAttrList.get()) {
-    theError = "Error: This validator can only work with selection list in \"" + FeaturesPlugin_Union::ID() + "\" feature.";
+    theError = "Error: This validator can only work with selection list in \"%1\" feature.";
+    theError.arg(FeaturesPlugin_Union::ID());
     return false;
   }
 
@@ -730,14 +742,16 @@ bool FeaturesPlugin_ValidatorUnionArguments::isValid(const std::shared_ptr<Model
 {
   // Check feature kind.
   if(theFeature->getKind() != FeaturesPlugin_Union::ID()) {
-    theError = "Error: This validator supports only \"" + FeaturesPlugin_Union::ID() + "\" feature.";
+    theError = "Error: This validator supports only \"%1\" feature.";
+    theError.arg(FeaturesPlugin_Union::ID());
     return false;
   }
 
   // Get base objects attribute list.
   AttributeSelectionListPtr aBaseObejctsAttrList = theFeature->selectionList(FeaturesPlugin_Union::BASE_OBJECTS_ID());
   if(!aBaseObejctsAttrList.get()) {
-    theError = "Error: Could not get \"" + FeaturesPlugin_Union::BASE_OBJECTS_ID() + "\" attribute.";
+    theError = "Error: Could not get \"%1\" attribute.";
+    theError.arg(FeaturesPlugin_Union::BASE_OBJECTS_ID());
     return false;
   }
 

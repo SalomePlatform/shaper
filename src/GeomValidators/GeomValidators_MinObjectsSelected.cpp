@@ -24,7 +24,8 @@ bool GeomValidators_MinObjectsSelected::isValid(const std::shared_ptr<ModelAPI_F
   std::string aSelectionListId = theArguments.front();
   AttributeSelectionListPtr anAttrSelList = theFeature->selectionList(aSelectionListId);
   if(!anAttrSelList.get()) {
-    theError = "Error: Could not get attribute \"" + aSelectionListId + "\".";
+    theError = "Error: Could not get attribute \"%1\".";
+    theError.arg(aSelectionListId);
     return false;
   }
   int anObjectsNb = anAttrSelList->size();
@@ -32,8 +33,8 @@ bool GeomValidators_MinObjectsSelected::isValid(const std::shared_ptr<ModelAPI_F
   int aMinObjectsNb = atoi(theArguments.back().c_str());
 
   if(anObjectsNb < aMinObjectsNb) {
-    theError = "Error: Attribute \"" + aSelectionListId + "\" should contain at least "
-      + theArguments.back() + " items.";
+    theError = "Error: Attribute \"%1\" should contain at least %2 items.";
+    theError.arg(aSelectionListId).arg(theArguments.back());
     return false;
   }
 

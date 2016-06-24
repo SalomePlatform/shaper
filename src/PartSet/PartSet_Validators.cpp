@@ -529,7 +529,8 @@ bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute,
                                      Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
 

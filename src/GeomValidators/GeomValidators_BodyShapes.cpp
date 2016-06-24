@@ -43,7 +43,8 @@ bool GeomValidators_BodyShapes::isValid(const AttributePtr& theAttribute,
       }
     }
   } else {
-    theError = "Error: Attribute \"" + anAttributeType + "\" does not supported by this validator.";
+    theError = "Error: Attribute \"%1\" does not supported by this validator.";
+    theError.arg(anAttributeType);
     return false;
   }
 

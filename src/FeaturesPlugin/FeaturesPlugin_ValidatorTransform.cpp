@@ -17,7 +17,8 @@ bool FeaturesPlugin_ValidatorTransform::isValid(const AttributePtr& theAttribute
   bool aValid = true;
   std::string anAttributeType = theAttribute->attributeType();
   if (anAttributeType != ModelAPI_AttributeSelectionList::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
 
@@ -47,10 +48,8 @@ bool FeaturesPlugin_ValidatorTransform::isValid(const AttributePtr& theAttribute
   if (!aValid) {
     std::string aResultGroupName = isPartSetDocument ? ModelAPI_ResultPart::group()
                                                      : ModelAPI_ResultBody::group();
-    theError = "Objects from the " + aResultGroupName  +
-                " group can be selected in the " + aDocument->kind() +
-                "document, but an objects from the " + anErrorGroupName +
-                " group is selected.";
+    theError = "Objects from the %1 group can be selected in the %2 document, but an objects from the %3 group is selected.";
+    theError.arg(aResultGroupName).arg(aDocument->kind()).arg(anErrorGroupName);
   }
   return aValid;
 }

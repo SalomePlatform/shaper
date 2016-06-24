@@ -50,7 +50,8 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribut
                                                  Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
 
@@ -151,7 +152,8 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
                                                 Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
 
@@ -182,29 +184,33 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
     if (aRefFea->getKind() == SketchPlugin_Line::ID()) {
       if (aOtherFea->getKind() != SketchPlugin_Arc::ID() &&
           aOtherFea->getKind() != SketchPlugin_Circle::ID()) {
-        theError = "It refers to a " + SketchPlugin_Line::ID() + ", but " + aParamA + " is neither an "
-          + SketchPlugin_Arc::ID() + " nor " + SketchPlugin_Circle::ID();
+        theError = "It refers to a %1, but %2 is neither an %3 nor %4";
+        theError.arg(SketchPlugin_Line::ID()).arg(aParamA)
+            .arg(SketchPlugin_Arc::ID()).arg(SketchPlugin_Circle::ID());
         return false;
       }
     }
     else if (aRefFea->getKind() == SketchPlugin_Arc::ID()) {
       if (aOtherFea->getKind() != SketchPlugin_Line::ID() &&
         aOtherFea->getKind() != SketchPlugin_Arc::ID()) {
-        theError = "It refers to an " + SketchPlugin_Arc::ID() + ", but " + aParamA + " is not a "
-          + SketchPlugin_Line::ID() + " or an " + SketchPlugin_Arc::ID();
+        theError = "It refers to an %1, but %2 is not a %3 or an %4";
+        theError.arg(SketchPlugin_Arc::ID()).arg(aParamA)
+            .arg(SketchPlugin_Line::ID()).arg(SketchPlugin_Arc::ID());
         return false;
       }
     }
     else if (aRefFea->getKind() == SketchPlugin_Circle::ID()) {
       if (aOtherFea->getKind() != SketchPlugin_Line::ID()) {
-        theError = "It refers to an " + SketchPlugin_Circle::ID() + ", but " + aParamA + " is not a "
-          + SketchPlugin_Line::ID();
+        theError = "It refers to an %1, but %2 is not a %3";
+        theError.arg(SketchPlugin_Circle::ID()).arg(aParamA)
+            .arg(SketchPlugin_Line::ID());
         return false;
       }
     }
     else {
-      theError = "It refers to " + aRefFea->getKind() + ", but should refer to " + SketchPlugin_Line::ID()
-        + " or " + SketchPlugin_Arc::ID() + " or " + SketchPlugin_Circle::ID();
+      theError = "It refers to %1, but should refer to %2 or %3 or %4";
+      theError.arg(aRefFea->getKind()).arg(SketchPlugin_Line::ID())
+          .arg(SketchPlugin_Arc::ID()).arg(SketchPlugin_Circle::ID());
       return false;
     }
     return true;
@@ -222,7 +228,8 @@ bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute,
                                              Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
 
@@ -245,14 +252,16 @@ bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute,
       if (aRefAttr->object() == aRAttr->object()) {
         ObjectPtr anObject = aRefAttr->object();
         std::string aName = anObject.get() ? anObject->data()->name() : "";
-        theError = "The object " + aName + " has been already fixed.";
+        theError = "The object %1 has been already fixed.";
+        theError.arg(aName);
         return false;
       }
     }
     else if (aRefAttr->attr() == aRAttr->attr()) {
       AttributePtr anAttribute = aRefAttr->attr();
       std::string aName = anAttribute.get() ? anAttribute->id() : "";
-      theError = "The attribute " + aName + " has been already fixed.";
+      theError = "The attribute %1 has been already fixed.";
+      theError.arg(aName);
       return false;
     }
   }
@@ -264,7 +273,8 @@ bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute,
                                               Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
 
@@ -298,9 +308,9 @@ bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute,
     if (aFeature->getKind() != SketchPlugin_Line::ID() &&
         aFeature->getKind() != SketchPlugin_Circle::ID() &&
         aFeature->getKind() != SketchPlugin_Arc::ID()) {
-      theError = "The " + aFeature->getKind() + " feature kind of attribute is wrong. It should be " +
-                 SketchPlugin_Line::ID() + " or " + SketchPlugin_Circle::ID() + " or " + 
-                 SketchPlugin_Arc::ID();
+      theError = "The %1 feature kind of attribute is wrong. It should be %2 or %3 or %4";
+      theError.arg(aFeature->getKind()).arg(SketchPlugin_Line::ID())
+          .arg(SketchPlugin_Circle::ID()).arg(SketchPlugin_Arc::ID());
       // wrong type of attribute
       return false;
     }
@@ -308,7 +318,8 @@ bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute,
 
   if ((aType[0] == SketchPlugin_Line::ID() || aType[1] == SketchPlugin_Line::ID()) &&
       aType[0] != aType[1]) {
-    theError = "Feature with kinds " + aType[0] + " and " + aType[1] + "can not be equal.";
+    theError = "Feature with kinds %1 and %2 can not be equal.";
+    theError.arg(aType[0]).arg(aType[1]);
     return false;
   }
   return true;
@@ -319,7 +330,8 @@ bool SketchPlugin_MirrorAttrValidator::isValid(const AttributePtr& theAttribute,
                                                Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefList::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
 
@@ -336,7 +348,8 @@ bool SketchPlugin_MirrorAttrValidator::isValid(const AttributePtr& theAttribute,
     std::list<ObjectPtr>::iterator aMirIter = aMirroredObjects.begin();
     for (; aMirIter != aMirroredObjects.end(); aMirIter++)
       if (aSelObject == *aMirIter) {
-        theError = "The object " + aName + " is a result of mirror";
+        theError = "The object %1 is a result of mirror";
+        theError.arg(aName);
         return false;
       }
   }
@@ -348,7 +361,8 @@ bool SketchPlugin_CoincidenceAttrValidator::isValid(const AttributePtr& theAttri
                                                     Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
 
@@ -360,7 +374,8 @@ bool SketchPlugin_CoincidenceAttrValidator::isValid(const AttributePtr& theAttri
   FeaturePtr aConstraint = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeRefAttrPtr aRefAttrA = aConstraint->data()->refattr(aParamA);
   if (!aRefAttrA) {
-    theError = "The " + aParamA + " attribute " + " should be " + ModelAPI_AttributeRefAttr::typeId();
+    theError = "The %1 attribute should be %2";
+    theError.arg(aParamA).arg(ModelAPI_AttributeRefAttr::typeId());
     return false;
   }
 
@@ -372,12 +387,14 @@ bool SketchPlugin_CoincidenceAttrValidator::isValid(const AttributePtr& theAttri
   else {
     ObjectPtr anObject = aRefAttrA->object();
     if (!anObject.get()) {
-      theError = aParamA + " attribute has an empty object";
+      theError = "%1 attribute has an empty object";
+      theError.arg(aParamA);
       return false;
     }
     FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttrA->object());
     if (!aFeature.get()) {
-      theError = aParamA + " attribute has an empty feature";
+      theError = "%1 attribute has an empty feature";
+      theError.arg(aParamA);
       return false;
     }
 
@@ -391,7 +408,8 @@ bool SketchPlugin_CoincidenceAttrValidator::isValid(const AttributePtr& theAttri
   else {
     FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttrB->object());
     if (!aFeature) {
-      theError = theAttribute->id() + " attribute has an empty object";
+      theError = "%1 attribute has an empty object";
+      theError.arg(theAttribute->id());
       return false;
     }
     if (aFeature->getKind() == SketchPlugin_Point::ID())
@@ -407,7 +425,8 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
                                          Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefList::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
 
@@ -435,7 +454,8 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
     for (; anObjIter != aCopiedObjects.end(); anObjIter++)
       if (aSelObject == *anObjIter) {
         std::string aName = aSelObject.get() ? aSelObject->data()->name() : "";
-        theError = "The object " + aName + " is a result of copy";
+        theError = "The object %1 is a result of copy";
+        theError.arg(aName);
         return false;
       }
   }
@@ -678,7 +698,8 @@ bool SketchPlugin_MiddlePointAttrValidator::isValid(const AttributePtr& theAttri
                                                     Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
 
@@ -724,13 +745,15 @@ bool SketchPlugin_ArcTangentPointValidator::isValid(const AttributePtr& theAttri
                                                     Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
   AttributePtr anAttr = aRefAttr->attr();
   if (!anAttr) {
-    theError = "The attribute " + theAttribute->id() + " should be a point";
+    theError = "The attribute %1 should be a point";
+    theError.arg(theAttribute->id());
     return false;
   }
 
@@ -740,7 +763,8 @@ bool SketchPlugin_ArcTangentPointValidator::isValid(const AttributePtr& theAttri
     // selected point should not be a center of arc
     const std::string& aPntId = anAttr->id();
     if (aPntId != SketchPlugin_Arc::START_ID() && aPntId != SketchPlugin_Arc::END_ID()) {
-      theError = "The attribute " + aPntId + " is not supported";
+      theError = "The attribute %1 is not supported";
+      theError.arg(aPntId);
       return false;
     }
   }
@@ -748,12 +772,14 @@ bool SketchPlugin_ArcTangentPointValidator::isValid(const AttributePtr& theAttri
     // selected point should be bound point of line
     const std::string& aPntId = anAttr->id();
     if (aPntId != SketchPlugin_Line::START_ID() && aPntId != SketchPlugin_Line::END_ID()) {
-      theError = "The attribute " + aPntId + " is not supported";
+      theError = "The attribute %1 is not supported";
+      theError.arg(aPntId);
       return false;
     }
   }
   else {
-    theError = "Unable to build tangent arc on " + anAttrFeature->getKind();
+    theError = "Unable to build tangent arc on %1";
+    theError.arg(anAttrFeature->getKind());
     return false;
   }
 
@@ -778,7 +804,8 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
                                                  Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeSelection::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
   AttributeSelectionPtr aLineAttr =
@@ -791,7 +818,8 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
   }
 
   if (!anEdge || !anEdge->isLine()) {
-    theError = "The attribute " + theAttribute->id() + " should be a line";
+    theError = "The attribute %1 should be a line";
+    theError.arg(theAttribute->id());
     return false;
   }
 
@@ -824,7 +852,8 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
                                                Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeSelection::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
 
@@ -839,7 +868,8 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
   }
 
   if (!anEdge) {
-    theError = "The attribute " + theAttribute->id() + " should be an edge";
+    theError = "The attribute %1 should be an edge";
+    theError.arg(theAttribute->id());
     return false;
   }
 

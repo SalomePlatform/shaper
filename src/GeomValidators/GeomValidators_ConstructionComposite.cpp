@@ -15,7 +15,8 @@ bool GeomValidators_ConstructionComposite::isValid(const AttributePtr& theAttrib
   bool aValid = true;
   if (theAttribute->attributeType() != ModelAPI_AttributeSelection::typeId()) {
     aValid = false;
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return aValid;
   }
 

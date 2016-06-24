@@ -38,7 +38,8 @@ bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
 {
   std::string anAttributeType = theAttribute->attributeType();
   if (anAttributeType != ModelAPI_AttributeSelection::typeId()) {
-    theError = "The attribute with the " + theAttribute->attributeType() + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
     return false;
   }
 

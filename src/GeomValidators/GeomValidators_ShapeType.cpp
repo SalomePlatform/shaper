@@ -90,8 +90,8 @@ bool GeomValidators_ShapeType::isValid(const AttributePtr& theAttribute,
       if (!aTypes.empty())
         aTypes += ", ";
     }
-    theError = "It does not contain element with acceptable shape type. The type should be one of the next: "
-               + aTypes;
+    theError = "It does not contain element with acceptable shape type. The type should be one of the next: %1";
+    theError.arg(aTypes);
   }
 
   return aValid;
@@ -126,9 +126,10 @@ bool GeomValidators_ShapeType::isValidAttribute(const AttributePtr& theAttribute
       else {
         std::string anAttributeType = aRefAttr->attributeType();
         aValid = anAttributeType == GeomDataAPI_Point2D::typeId();
-        if (!aValid)
-          theError = "Shape type is \"" + anAttributeType +
-                     "\", it should be \"" + getShapeTypeDescription(theShapeType) + "\"";
+        if (!aValid) {
+          theError = "Shape type is \"%1\", it should be \"%2\"";
+          theError.arg(anAttributeType).arg(getShapeTypeDescription(theShapeType));
+        }
       }
     }
   }
@@ -153,7 +154,8 @@ bool GeomValidators_ShapeType::isValidAttribute(const AttributePtr& theAttribute
   }
   else {
     aValid = false;
-    theError = "The attribute with the " + anAttributeType  + " type is not processed";
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(anAttributeType);
   }
   return aValid;
 }
