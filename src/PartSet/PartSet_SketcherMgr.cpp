@@ -897,7 +897,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
       if (aFeature.get())
         anInvalidFeatureNames.append(aFeature->name().c_str());
     }
-    std::string aPrefixInfo = QString("Invalid features of the sketch will be deleted: %1.\n").
+    std::string aPrefixInfo = QString("Invalid features of the sketch will be deleted: %1.\n\n").
                                   arg(anInvalidFeatureNames.join(", ")).toStdString().c_str();
     std::set<FeaturePtr> aFeatureRefsToDelete;
     if (ModuleBase_Tools::askToDelete(anInvalidFeatures, aReferences, aConnector->desktop(),
