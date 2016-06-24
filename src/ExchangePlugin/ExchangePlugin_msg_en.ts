@@ -27,5 +27,10 @@
       <source>file_path - ExchangePlugin_ExportFormat: File name is empty.</source>
       <translation>Export file name is not defined</translation>
     </message>
+    
+    <message>
+      <source>selection_list - GeomValidators_Finite: Infinite result is selected.</source>
+      <translation></translation>
+    </message>    
   </context>
 </TS>

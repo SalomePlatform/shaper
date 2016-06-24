@@ -22,7 +22,8 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
     AttributeIntegerPtr anAttribue =
         std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(theAttribute);
     if (!anAttribue->expressionError().empty()) {
-      theError = anAttribue->expressionError();
+      theError = "Expression error: %1";
+      theError.arg(anAttribue->expressionError());
       return false;
     }
   } else
@@ -30,7 +31,8 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
     AttributeDoublePtr anAttribue = 
         std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
     if (!anAttribue->expressionError().empty()) {
-      theError = anAttribue->expressionError();
+      theError = "Expression error: %1";
+      theError.arg(anAttribue->expressionError());
       return false;
     }
   } else
@@ -45,7 +47,8 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
         anErrorMessage.append("\n").append(aComponent[i]).append(": ").append(anAttribue->expressionError(i));
     }
     if (!anErrorMessage.empty()) {
-      theError = anErrorMessage;
+      theError = "Expression error: %1";
+      theError.arg(anErrorMessage);
       return false;
     }
   } else
@@ -60,7 +63,8 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
         anErrorMessage.append("\n").append(aComponent[i]).append(": ").append(anAttribue->expressionError(i));
     }
     if (!anErrorMessage.empty()) {
-      theError = anErrorMessage;
+      theError = "Expression error: %1";
+      theError.arg(anErrorMessage);
       return false;
     }
   }

@@ -7,5 +7,22 @@
     <source>Model_FeatureValidator: Attribute "height" is not initialized.</source>
     <translation>Height of the box is not defined</translation>
   </message>
+  
+    <message>
+      <source>height - GeomValidators_Positive: Double is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>height - GeomValidators_Positive: Double is not positive.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>height - GeomValidators_Positive: Integer is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>height - GeomValidators_Positive: Integer is not positive.</source>
+      <translation></translation>
+    </message>  
 </context>
 </TS>

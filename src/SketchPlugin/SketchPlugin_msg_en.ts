@@ -11,6 +11,31 @@
       <source>Model_FeatureValidator: Attribute "Features" is not initialized.</source>
       <translation>Sketch objects are not defined</translation>
     </message>
+    
+    <message>
+      <source>External - GeomValidators_Face: The attribute with the %1 type is not processed</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>External - GeomValidators_Face: The shape is not a face.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>External - GeomValidators_Face: The shape is not a face.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>External - GeomValidators_Face: The shape is not a plane.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>External - GeomValidators_Face: The shape is not a cylinder.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>External - GeomValidators_Face: The shape is not an available face.</source>
+      <translation></translation>
+    </message>
   </context>
   
   <context>
@@ -43,6 +68,19 @@
       <source>Attribute "CircleRadius" is locked by modification value in the viewer.</source>
       <translation>Select a radius distance</translation>
     </message>
+    
+    <message>
+      <source>CircleRadius - GeomValidators_Positive: Double is not positive.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>CircleRadius - GeomValidators_Positive: Integer is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>CircleRadius - GeomValidators_Positive: Integer is not positive.</source>
+      <translation></translation>
+    </message>
   </context>
   
   <context>
@@ -58,6 +96,31 @@
     <message>
       <source>ConstraintEntityA - GeomValidators_ShapeType: The object is empty</source>
       <translation>Line is not selected</translation>
+    </message>
+    
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: It has reference to an empty attribute</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: The result is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: The shape is empty</source>
+      <translation></translation>
     </message>
   </context>
   
@@ -79,6 +142,31 @@
       <source>ConstraintEntityB - GeomValidators_ShapeType: The object is empty</source>
       <translation>Second line is not selected</translation>
     </message>
+    
+    <message>
+      <source>ConstraintEntityB - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityB - GeomValidators_ShapeType: It has reference to an empty attribute</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityB - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityB - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityB - GeomValidators_ShapeType: The result is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityB - GeomValidators_ShapeType: The shape is empty</source>
+      <translation></translation>
+    </message>    
   </context>
   
   <context>
@@ -99,6 +187,19 @@
       <source>ConstraintValue - GeomValidators_Positive: Double is not initialized.</source>
       <translation>Radius value is not positive</translation>
     </message>
+    
+    <message>
+      <source>ConstraintValue - GeomValidators_Positive: Double is not positive.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintValue - GeomValidators_Positive: Integer is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintValue - GeomValidators_Positive: Integer is not positive.</source>
+      <translation></translation>
+    </message>
   </context>
   
   <context>
@@ -114,6 +215,31 @@
     <message>
       <source>ConstraintEntityA - GeomValidators_ShapeType: The object is empty</source>
       <translation>Line is not selected</translation>
+    </message>
+    
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: It has reference to an empty attribute</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: The result is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: The shape is empty</source>
+      <translation></translation>
     </message>
   </context>
   
@@ -171,6 +297,15 @@
       <source>Attribute "RectStartPoint" is locked by modification value in the viewer.</source>
       <translation>Select a first point of the rectangle</translation>
     </message>
+    
+    <message>
+      <source>Model_FeatureValidator: Attribute "RectStartPoint" is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>Model_FeatureValidator: Attribute "RectEndPoint" is not initialized.</source>
+      <translation></translation>
+    </message>
   </context>
 
   <context>
@@ -219,6 +354,19 @@
       <source>Model_FeatureValidator: Attribute "ArcPassedPoint" is not initialized.</source>
       <translation>Intermediate point is not defined</translation>
     </message>
+    
+    <message>
+      <source>ArcRadius - GeomValidators_Positive: Double is not positive.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ArcRadius - GeomValidators_Positive: Integer is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ArcRadius - GeomValidators_Positive: Integer is not positive.</source>
+      <translation></translation>
+    </message>    
   </context>
 
   <context>
@@ -235,6 +383,31 @@
       <source>Model_FeatureValidator: Attribute "ConstraintMirrorList" is not initialized.</source>
       <translation>Objects for mirror are not selected</translation>
     </message>
+    
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: It has reference to an empty attribute</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: The result is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: The shape is empty</source>
+      <translation></translation>
+    </message>
   </context>
 
   <context>
@@ -250,6 +423,23 @@
     <message>
       <source>MultiRotationCenter - GeomValidators_ShapeType: The object is empty</source>
       <translation>Rotation center is not selected</translation>
+    </message>
+    
+    <message>
+      <source>MultiRotationObjects - GeomValidators_Positive: Double is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>MultiRotationObjects - GeomValidators_Positive: Double is not positive.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>MultiRotationObjects - GeomValidators_Positive: Integer is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>MultiRotationObjects - GeomValidators_Positive: Integer is not positive.</source>
+      <translation></translation>
     </message>
   </context>
   
@@ -271,6 +461,23 @@
       <source>MultiTranslationStartPoint - GeomValidators_ShapeType: The object is empty</source>
       <translation>Start point of translation vector is not selected</translation>
     </message>
+    
+    <message>
+      <source>MultiTranslationObjects - GeomValidators_Positive: Double is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>MultiTranslationObjects - GeomValidators_Positive: Double is not positive.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>MultiTranslationObjects - GeomValidators_Positive: Integer is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>MultiTranslationObjects - GeomValidators_Positive: Integer is not positive.</source>
+      <translation></translation>
+    </message>
   </context>
 
   <context>
@@ -286,6 +493,11 @@
     <message>
       <source>ConstraintEntityB - GeomValidators_ShapeType: The object is empty</source>
       <translation>Second object is not selected</translation>
+    </message>
+    
+    <message>
+      <source>ConstraintEntityB - SketchPlugin_ExternalValidator: Both features, attribute and attribute in parameter, are external.</source>
+      <translation></translation>
     </message>
   </context>
 
@@ -307,6 +519,11 @@
       <source>Model_FeatureValidator: Attribute "ConstraintEntityB" is not initialized.</source>
       <translation>Second object is not selected</translation>
     </message>
+    
+    <message>
+      <source>ConstraintEntityB - SketchPlugin_ExternalValidator: Both features, attribute and attribute in parameter, are external.</source>
+      <translation></translation>
+    </message>    
   </context>
 
   <context>
@@ -335,6 +552,19 @@
       <source>Model_FeatureValidator: Attribute "ConstraintEntityB" is not initialized.</source>
       <translation>Second object is not selected</translation>
     </message>
+    
+    <message>
+      <source>ConstraintValue - GeomValidators_Positive: Double is not positive.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintValue - GeomValidators_Positive: Integer is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintValue - GeomValidators_Positive: Integer is not positive.</source>
+      <translation></translation>
+    </message>    
   </context>
 
   <context>
@@ -359,6 +589,11 @@
       <source>Model_FeatureValidator: Attribute "ConstraintEntityB" is not initialized.</source>
       <translation>Second object is not selected</translation>
     </message>
+    
+    <message>
+      <source>ConstraintEntityB - SketchPlugin_ExternalValidator: Both features, attribute and attribute in parameter, are external.</source>
+      <translation></translation>
+    </message>    
   </context>
 
   <context>
@@ -379,6 +614,19 @@
       <source>Model_FeatureValidator: Attribute "ConstraintEntityA" is not initialized.</source>
       <translation>Line is not selected</translation>
     </message>
+    
+    <message>
+      <source>ConstraintValue - GeomValidators_Positive: Double is not positive.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintValue - GeomValidators_Positive: Integer is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintValue - GeomValidators_Positive: Integer is not positive.</source>
+      <translation></translation>
+    </message>    
   </context>
 
   <context>
@@ -403,6 +651,11 @@
       <source>Model_FeatureValidator: Attribute "ConstraintEntityB" is not initialized.</source>
       <translation>Second object is not selected</translation>
     </message>
+    
+    <message>
+      <source>ConstraintEntityB - SketchPlugin_ExternalValidator: Both features, attribute and attribute in parameter, are external.</source>
+      <translation></translation>
+    </message>
   </context>
 
   <context>
@@ -423,6 +676,11 @@
       <source>Model_FeatureValidator: Attribute "ConstraintEntityB" is not initialized.</source>
       <translation>Second line is not selected</translation>
     </message>
+    
+    <message>
+      <source>ConstraintEntityB - SketchPlugin_ExternalValidator: Both features, attribute and attribute in parameter, are external.</source>
+      <translation></translation>
+    </message>
   </context>
 
   <context>
@@ -434,6 +692,31 @@
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityA" is not initialized.</source>
       <translation>Object is not selected</translation>
+    </message>
+    
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: It has reference to an empty attribute</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: The result is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintEntityA - GeomValidators_ShapeType: The shape is empty</source>
+      <translation></translation>
     </message>
   </context>
 
@@ -458,6 +741,42 @@
     <message>
       <source>Model_FeatureValidator: Attribute "ConstraintEntityB" is not initialized.</source>
       <translation>Second object is not selected</translation>
+    </message>
+  </context>
+  
+  <context>
+    <name>SketchConstraintFillet</name>
+    <message>
+      <source>ConstraintValue - GeomValidators_Positive: Double is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintValue - GeomValidators_Positive: Double is not positive.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintValue - GeomValidators_Positive: Integer is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ConstraintValue - GeomValidators_Positive: Integer is not positive.</source>
+      <translation></translation>
+    </message>
+  </context>
+  
+  <context>
+    <name>SketchConstraintFillet</name>
+    <message>
+      <source>ExternalFeature - SketchPlugin_ProjectionValidator: The attribute with the %1 type is not processed</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ExternalFeature - SketchPlugin_ProjectionValidator: The attribute %1 should be an edge</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>ExternalFeature - SketchPlugin_ProjectionValidator: There is no sketch referring to the current feature</source>
+      <translation></translation>
     </message>
   </context>
 </TS>
