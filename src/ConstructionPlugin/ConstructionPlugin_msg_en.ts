@@ -23,102 +23,101 @@
       <source>CylindricalFace - GeomValidators_Face: The shape is not an available face.</source>
       <translation>The axis by a face cannot be created on the selected face</translation>
     </message>
-    
     <message>
       <source>Model_FeatureValidator: Attribute "FirstPoint" is not initialized.</source>
-      <translation></translation>
+      <translation>Select the first point</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "SecondPoint" is not initialized.</source>
-      <translation></translation>
+      <translation>Select the second point</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "CylindricalFace" is not initialized.</source>
-      <translation></translation>
+      <translation>Select the cylindrical face</translation>
     </message>
     <message>
       <source>FirstPoint - GeomValidators_ConstructionComposite: The attribute with the %1 type is not processed</source>
-      <translation></translation>
+      <translation>Only attribute selection can be used for the first point, not %1</translation>
     </message>
     <message>
       <source>FirstPoint - GeomValidators_ConstructionComposite: The result is empty</source>
-      <translation></translation>
+      <translation>The first point refers to not existing item</translation>
     </message>
     <message>
       <source>FirstPoint - GeomValidators_ConstructionComposite: Uses composite construction feature without sub-features.</source>
-      <translation></translation>
+      <translation>The first point uses composite construction feature without sub-features</translation>
     </message>
     <message>
       <source>FirstPoint - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>THe first point does not contain element with acceptable shape type. The type should be: %1</translation>
     </message>
     <message>
       <source>FirstPoint - GeomValidators_ShapeType: It has reference to an empty attribute</source>
-      <translation></translation>
+      <translation>The first point refers to nothing</translation>
     </message>
     <message>
-      <source>FirstPoint - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <source>FirstPoint - GeomValidators_ShapeType: Shape type is "%1", it should be "%2"</source>
+      <translation>The first point refers to %1 but must be %2</translation>
     </message>
     <message>
       <source>FirstPoint - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
-      <translation></translation>
+      <translation>The first point of type %1 is not supported</translation>
     </message>
     <message>
       <source>FirstPoint - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
+      <translation>The first point refers to not existing item</translation>
     </message>
     <message>
       <source>FirstPoint - GeomValidators_ShapeType: The result is empty</source>
-      <translation></translation>
+      <translation>The first point refers to not existing item</translation>
     </message>
     <message>
       <source>FirstPoint - GeomValidators_ShapeType: The shape is empty</source>
-      <translation></translation>
+      <translation>The first point refers to the empty shape</translation>
     </message>
     <message>
       <source>SecondPoint - GeomValidators_ConstructionComposite: The attribute with the %1 type is not processed</source>
-      <translation></translation>
+      <translation>Only attribute selection can be used for the second point, not %1</translation>
     </message>
     <message>
       <source>SecondPoint - GeomValidators_ConstructionComposite: The result is empty</source>
-      <translation></translation>
+      <translation>The second point refers to not existing item</translation>
     </message>
     <message>
       <source>SecondPoint - GeomValidators_ConstructionComposite: Uses composite construction feature without sub-features.</source>
-      <translation></translation>
+      <translation>The second point uses composite construction feature without sub-features</translation>
     </message>
     <message>
       <source>SecondPoint - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>THe second point does not contain element with acceptable shape type. The type should be: %1</translation>
     </message>
     <message>
       <source>SecondPoint - GeomValidators_ShapeType: It has reference to an empty attribute</source>
-      <translation></translation>
+      <translation>The second point refers to nothing</translation>
     </message>
     <message>
-      <source>SecondPoint - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <source>SecondPoint - GeomValidators_ShapeType: Shape type is "%1", it should be "%2"</source>
+      <translation>The second point refers to %1 but must be %2</translation>
     </message>
     <message>
       <source>SecondPoint - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
-      <translation></translation>
+      <translation>The second point of type %1 is not supported</translation>
     </message>
     <message>
       <source>SecondPoint - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
+      <translation>The second point refers to not existing item</translation>
     </message>
     <message>
       <source>SecondPoint - GeomValidators_ShapeType: The result is empty</source>
-      <translation></translation>
+      <translation>The second point refers to not existing item</translation>
     </message>
     <message>
       <source>SecondPoint - GeomValidators_ShapeType: The shape is empty</source>
-      <translation></translation>
+      <translation>The second point refers to the empty shape</translation>
     </message>
     <message>
       <source>SecondPoint - GeomValidators_DifferentShapes: The feature uses equal shapes.</source>
-      <translation></translation>
+      <translation>The axis points must be different</translation>
     </message>
   </context>
   
@@ -144,14 +143,13 @@
       <source>planeFace - GeomValidators_Face: The shape is not an available face.</source>
       <translation>The plane cannot be created on the selected face</translation>
     </message>
-
     <message>
       <source>Model_FeatureValidator: Attribute "planeFace" is not initialized.</source>
-      <translation></translation>
+      <translation>Select the plane face</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "distance" is not initialized.</source>
-      <translation></translation>
+      <translation>Set the distance</translation>
     </message>
   </context>
   

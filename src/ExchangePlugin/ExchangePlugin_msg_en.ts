@@ -27,31 +27,29 @@
       <source>file_path - ExchangePlugin_ExportFormat: File name is empty.</source>
       <translation>Export file name is not defined</translation>
     </message>
-    
     <message>
       <source>selection_list - GeomValidators_Finite: Infinite result is selected.</source>
       <translation>Olny finitive shapes can be exported</translation>
     </message>    
-    
     <message>
       <source>Model_FeatureValidator: Attribute "file_path" is not initialized.</source>
-      <translation></translation>
+      <translation>Define the path of the exported file</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "selection_list" is not initialized.</source>
-      <translation></translation>
+      <translation>Select the exported shapes</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "xao_file_path" is not initialized.</source>
-      <translation></translation>
+      <translation>Define the path of the exported XAO file</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "xao_author" is not initialized.</source>
-      <translation></translation>
+      <translation>Set the XAO file author</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "xao_geometry_name" is not initialized.</source>
-      <translation></translation>
+      <translation>Set the XAO file geometry name</translation>
     </message>
   </context>
 </TS>

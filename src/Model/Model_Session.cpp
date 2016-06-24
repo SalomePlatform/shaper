@@ -31,8 +31,6 @@
 
 using namespace std;
 
-#include <iostream>
-
 static Model_Session* myImpl = new Model_Session();
 
 // t oredirect all calls to the root document
@@ -361,8 +359,6 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
       std::dynamic_pointer_cast<Config_FeatureMessage>(theMessage);
     if (aMsg) {
 
-//      std::cout << "Feature: " << aMsg->id() << std::endl;
-
       // process the plugin info, load plugin
       if (myPlugins.find(aMsg->id()) == myPlugins.end()) {
         myPlugins[aMsg->id()] = std::pair<std::string, std::string>(
@@ -373,16 +369,8 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
         std::dynamic_pointer_cast<Config_AttributeMessage>(theMessage);
       if (aMsgAttr) {
 
-//        std::cout << "Feature: " << aMsgAttr->featureId()
-//            << ", Attribute: " << aMsgAttr->attributeId() << std::endl;
-
         if (!aMsgAttr->isObligatory()) {
           validators()->registerNotObligatory(aMsgAttr->featureId(), aMsgAttr->attributeId());
-        } else {
-          std::cout << "F: " << aMsgAttr->featureId()
-              << ", V: Model_FeatureValidator"
-              << ", A: " << aMsgAttr->attributeId()
-              << std::endl;
         }
         if(aMsgAttr->isConcealment()) {
           validators()->registerConcealment(aMsgAttr->featureId(), aMsgAttr->attributeId());
@@ -396,38 +384,12 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
     // plugins information was started to load, so, it will be loaded
     myPluginsInfoLoaded = true;
   } else if (theMessage->eventID() == kValidatorEvent) {
-
-    static bool done = false;
-    if (!done) {
-      std::set<std::string> aPlugins;
-      for (auto it = myPlugins.begin(); it != myPlugins.end(); ++it) {
-        std::string aPluginName = it->second.first;
-        aPlugins.insert(aPluginName);
-      }
-
-      for (auto it = aPlugins.begin(); it != aPlugins.end(); ++it) {
-        myCurrentPluginName = *it;
-        Config_ModuleReader::loadPlugin(*it);
-      }
-
-      done = true;
-    }
-
     std::shared_ptr<Config_ValidatorMessage> aMsg = 
       std::dynamic_pointer_cast<Config_ValidatorMessage>(theMessage);
     if (aMsg) {
       if (aMsg->attributeId().empty()) {  // feature validator
-
-        std::cout << "F: " << aMsg->featureId()
-          << ", V: " << aMsg->validatorId() << std::endl;
-
         validators()->assignValidator(aMsg->validatorId(), aMsg->featureId(), aMsg->parameters());
       } else {  // attribute validator
-
-        std::cout << "F: " << aMsg->featureId()
-          << ", A: " << aMsg->attributeId()
-          << ", V: " << aMsg->validatorId() << std::endl;
-
         validators()->assignValidator(aMsg->validatorId(), aMsg->featureId(), aMsg->attributeId(),
                                       aMsg->parameters());
       }
