@@ -94,11 +94,16 @@ void XGUI_ErrorMgr::updateAcceptAllAction(const FeaturePtr& theFeature)
   if (myAcceptAllToolTip.isEmpty() && myAcceptToolTip.isEmpty())
     storeInitialActionValues();
 
-  QString anError = myWorkshop->module()->getFeatureError(theFeature);
-  if (anError.isEmpty()) {
-    ModuleBase_ModelWidget* anActiveWidget = activeWidget();
-    if (anActiveWidget)
-      anError = anActiveWidget->getError();
+  QString anError = "";
+  /// to allow the module have the button always enabled
+  bool isActionStateEnabled = myWorkshop->module()->isActionEnableStateFixed(XGUI_ActionsMgr::AcceptAll);
+  if (!isActionStateEnabled) {
+    anError = myWorkshop->module()->getFeatureError(theFeature);
+    if (anError.isEmpty()) {
+      ModuleBase_ModelWidget* anActiveWidget = activeWidget();
+      if (anActiveWidget)
+        anError = anActiveWidget->getError();
+    }
   }
   XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
   if (workshop()->isFeatureOfNested(theFeature)) {

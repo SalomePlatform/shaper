@@ -132,7 +132,7 @@ void XGUI_ContextMenuMgr::createActions()
   addAction("SELECT_FACE_CMD", aAction);
   //mySelectActions->addAction(aAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/result.png"), tr("Result"), aDesktop,
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/result.png"), tr("Results"), aDesktop,
                                            this, SLOT(onResultSelection(bool)));
   aAction->setCheckable(true);
   addAction("SELECT_RESULT_CMD", aAction);

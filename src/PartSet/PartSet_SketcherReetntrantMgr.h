@@ -97,6 +97,10 @@ public:
   /// Returns false if the reentrant mode of the operation is not empty.
   bool canBeCommittedByPreselection();
 
+  /// returns true if an internal edit operation is started
+  /// \return boolean value
+  bool isInternalEditStarted() const;
+
 private slots:
   /// SLOT, that is called by a widget activating in the property panel
   /// If the 'internal' edit operation is started, it activates the first widget selection
@@ -151,6 +155,9 @@ private:
                                        const FeaturePtr& theNewFeature);
 
   static bool isTangentArc(ModuleBase_Operation* theOperation);
+
+  /// Accept All action is enabled if an internal edit is started. It updates the state of the button
+  void updateAcceptAllAction();
 
   /// Returns the workshop
   XGUI_Workshop* workshop() const;

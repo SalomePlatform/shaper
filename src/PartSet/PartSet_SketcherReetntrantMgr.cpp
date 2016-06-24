@@ -31,6 +31,7 @@
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_OperationMgr.h>
 #include <XGUI_PropertyPanel.h>
+#include <XGUI_ErrorMgr.h>
 
 #include <QToolButton>
 
@@ -84,6 +85,7 @@ void PartSet_SketcherReetntrantMgr::updateInternalEditActiveState()
         //workshop()->operationMgr()->updateApplyOfOperations();
         beforeStopInternalEdit();
         myIsInternalEditOperation = false;
+        updateAcceptAllAction();
       }
     }
   }
@@ -341,6 +343,11 @@ bool PartSet_SketcherReetntrantMgr::canBeCommittedByPreselection()
   return !isActiveMgr() || myRestartingMode == RM_None;
 }
 
+bool PartSet_SketcherReetntrantMgr::isInternalEditStarted() const
+{
+  return myIsInternalEditOperation;
+}
+
 bool PartSet_SketcherReetntrantMgr::isActiveMgr() const
 {
   ModuleBase_Operation* aCurrentOperation = myWorkshop->currentOperation();
@@ -372,11 +379,11 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
 
   if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
     aFOperation->setEditOperation(true/*, false*/);
-    workshop()->operationMgr()->updateApplyOfOperations();
-
     createInternalFeature();
 
     myIsInternalEditOperation = true;
+    updateAcceptAllAction();
+
     isDone = true;
     connect(aFOperation, SIGNAL(beforeCommitted()), this, SLOT(onBeforeStopped()));
     connect(aFOperation, SIGNAL(beforeAborted()), this, SLOT(onBeforeStopped()));
@@ -537,6 +544,7 @@ void PartSet_SketcherReetntrantMgr::resetFlags()
 {
   if (!myIsFlagsBlocked) {
     myIsInternalEditOperation = false;
+    updateAcceptAllAction();
     myRestartingMode = RM_None;
   }
 }
@@ -576,6 +584,13 @@ bool PartSet_SketcherReetntrantMgr::isTangentArc(ModuleBase_Operation* theOperat
     }
   }
   return aTangentArc;
+}
+
+void PartSet_SketcherReetntrantMgr::updateAcceptAllAction()
+{
+  CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
+  if (aSketch.get())
+    workshop()->errorMgr()->updateAcceptAllAction(aSketch);
 }
 
 XGUI_Workshop* PartSet_SketcherReetntrantMgr::workshop() const

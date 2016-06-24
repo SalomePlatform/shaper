@@ -70,6 +70,7 @@
 #include <XGUI_ErrorMgr.h>
 #include <XGUI_CustomPrs.h>
 #include <XGUI_SelectionMgr.h>
+#include <XGUI_ActionsMgr.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
@@ -501,6 +502,15 @@ bool PartSet_Module::addViewerMenu(const QMap<QString, QAction*>& theStdActions,
 void PartSet_Module::updateViewerMenu(const QMap<QString, QAction*>& theStdActions)
 {
   myMenuMgr->updateViewerMenu(theStdActions);
+}
+
+bool PartSet_Module::isActionEnableStateFixed(const int theActionId) const
+{
+  bool isEnabledFixed = false;
+  if (theActionId == XGUI_ActionsMgr::AcceptAll &&
+      mySketchReentrantMgr->isInternalEditStarted())
+    isEnabledFixed = true;
+  return isEnabledFixed;
 }
 
 QString PartSet_Module::getFeatureError(const FeaturePtr& theFeature)

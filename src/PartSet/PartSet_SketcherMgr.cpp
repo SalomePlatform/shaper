@@ -82,10 +82,14 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_AttributeString.h>
 
+#include <ModelAPI_Validator.h>
+#include <ModelAPI_Tools.h>
+
 #include <QMouseEvent>
 #include <QApplication>
 #include <QCursor>
 #include <QMessageBox>
+#include <QMainWindow>
 
 //#define DEBUG_DO_NOT_BY_ENTER
 
@@ -870,6 +874,28 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   }
   myCurrentSketch->setDisplayed(false);
 
+  // Remove invalid sketch entities
+  /*
+  std::set<FeaturePtr> anInvalidFeatures;
+  ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+  for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
+    FeaturePtr aFeature = myCurrentSketch->subFeature(i);
+    if (aFeature.get()) {
+      if (!aFactory->validate(aFeature))
+        anInvalidFeatures.insert(aFeature);
+    }
+  }
+  std::map<FeaturePtr, std::set<FeaturePtr> > aReferences;
+  ModelAPI_Tools::findAllReferences(anInvalidFeatures, aReferences, false);
+  std::set<FeaturePtr> aFeatureRefsToDelete;
+  if (ModuleBase_Tools::askToDelete(anInvalidFeatures, aReferences, aConnector->desktop(), aFeatureRefsToDelete)) {
+    if (!aFeatureRefsToDelete.empty())
+      anInvalidFeatures.insert(aFeatureRefsToDelete.begin(), aFeatureRefsToDelete.end());
+    bool aDone = ModelAPI_Tools::removeFeatures(anInvalidFeatures, false);
+  }
+  else
+    return;
+  */
   // Display sketcher objects
   for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
     FeaturePtr aFeature = myCurrentSketch->subFeature(i);
@@ -996,7 +1022,9 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
   }
   /// improvement to deselect automatically all eventual selected objects, when
   // returning to the neutral point of the Sketcher
-  workshop()->selector()->clearSelection();
+  // if the operation is restarted, the previous selection is used to initialize started operation
+  if (!myModule->sketchReentranceMgr()->isInternalEditStarted())
+    workshop()->selector()->clearSelection();
 }
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)

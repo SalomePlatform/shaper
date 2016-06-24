@@ -277,6 +277,11 @@ public:
   /// \param theStdActions - a map of standard actions
   virtual void updateViewerMenu(const QMap<QString, QAction*>& theStdActions); 
 
+  /// Returns true if the action should be always enabled
+  /// \param theActionId an action index: Accept or Accept All
+  /// \return boolean value
+  virtual bool isActionEnableStateFixed(const int theActionId) const;
+
   //! Returns the feature error if the current state of the feature in the module is not correct
   //! If the feature is correct, it returns an empty value
   //! \return string value
