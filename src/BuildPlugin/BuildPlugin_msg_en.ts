@@ -30,6 +30,11 @@
     <message>
       <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
+    </message>    
+    
+    <message>
+      <source>Model_FeatureValidator: Attribute "base_objects" is not initialized.</source>
+      <translation></translation>
     </message>
   </context>
 
@@ -54,6 +59,39 @@
     <message>
       <source>BuildPlugin_ValidatorBaseForFace: Selected objects does not have closed contours.</source>
       <translation>Selected objects does not have closed contours.</translation>
+    </message>
+
+    <message>
+      <source>Model_FeatureValidator: Attribute "base_objects" is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Could not get selection list.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Empty selection list.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Could not get selection.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Attribute have empty context.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Empty shape selected.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Inifinte objects not acceptable.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Selected shape is in the local selection. Only global selection is allowed.</source>
+      <translation></translation>
     </message>
   </context>
 
@@ -87,6 +125,11 @@
       <source>base_objects - GeomValidators_ShapeType: The shape is empty</source>
       <translation>Objects not selected.</translation>
     </message>
+
+    <message>
+      <source>Model_FeatureValidator: Attribute "base_objects" is not initialized.</source>
+      <translation></translation>
+    </message>
   </context>
 
 
@@ -112,10 +155,47 @@
       <source>subshapes - BuildPlugin_ValidatorSubShapesSelection: Selected shape is not inside base face.</source>
       <translation>Selected shape is not inside base.</translation>
     </message>
+
+    <message>
+      <source>Model_FeatureValidator: Attribute "base_shape" is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>Model_FeatureValidator: Attribute "subshapes" is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_shape - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_shape - GeomValidators_ShapeType: It has reference to an empty attribute</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_shape - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_shape - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_shape - GeomValidators_ShapeType: The object is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_shape - GeomValidators_ShapeType: The result is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_shape - GeomValidators_ShapeType: The shape is empty</source>
+      <translation></translation>
+    </message>
   </context>
 
   <context>
-    <name>SubShapes</name>
+    <name>Vertex</name>
     <message>
       <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Could not get selection list.</source>
       <translation>Objects not selected.</translation>
@@ -144,6 +224,11 @@
       <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Selected shape is in the local selection. Only global selection is allowed.</source>
       <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
     </message>
+
+    <message>
+      <source>Model_FeatureValidator: Attribute "base_objects" is not initialized.</source>
+      <translation></translation>
+    </message>
   </context>
 
   <context>
@@ -155,6 +240,43 @@
     <message>
       <source>BuildPlugin_ValidatorBaseForWire: Result wire empty. Probably it has disconnected edges or non-manifold.</source>
       <translation>Result wire empty. Probably it has disconnected edges or non-manifold.</translation>
+    </message>
+
+    <message>
+      <source>Model_FeatureValidator: Attribute "base_objects" is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>Model_FeatureValidator: Attribute "add_contour" is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Could not get selection list.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Empty selection list.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Could not get selection.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Attribute have empty context.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Empty shape selected.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Inifinte objects not acceptable.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Selected shape is in the local selection. Only global selection is allowed.</source>
+      <translation></translation>
     </message>
   </context>
 </TS>

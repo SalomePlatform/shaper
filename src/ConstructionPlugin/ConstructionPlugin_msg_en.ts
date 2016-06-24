@@ -23,6 +23,103 @@
       <source>CylindricalFace - GeomValidators_Face: The shape is not an available face.</source>
       <translation>The axis by a face cannot be created on the selected face</translation>
     </message>
+    
+    <message>
+      <source>Model_FeatureValidator: Attribute "FirstPoint" is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>Model_FeatureValidator: Attribute "SecondPoint" is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>Model_FeatureValidator: Attribute "CylindricalFace" is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>FirstPoint - GeomValidators_ConstructionComposite: The attribute with the %1 type is not processed</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>FirstPoint - GeomValidators_ConstructionComposite: The result is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>FirstPoint - GeomValidators_ConstructionComposite: Uses composite construction feature without sub-features.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>FirstPoint - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>FirstPoint - GeomValidators_ShapeType: It has reference to an empty attribute</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>FirstPoint - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>FirstPoint - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>FirstPoint - GeomValidators_ShapeType: The object is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>FirstPoint - GeomValidators_ShapeType: The result is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>FirstPoint - GeomValidators_ShapeType: The shape is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>SecondPoint - GeomValidators_ConstructionComposite: The attribute with the %1 type is not processed</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>SecondPoint - GeomValidators_ConstructionComposite: The result is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>SecondPoint - GeomValidators_ConstructionComposite: Uses composite construction feature without sub-features.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>SecondPoint - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>SecondPoint - GeomValidators_ShapeType: It has reference to an empty attribute</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>SecondPoint - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>SecondPoint - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>SecondPoint - GeomValidators_ShapeType: The object is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>SecondPoint - GeomValidators_ShapeType: The result is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>SecondPoint - GeomValidators_ShapeType: The shape is empty</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>SecondPoint - GeomValidators_DifferentShapes: The feature uses equal shapes.</source>
+      <translation></translation>
+    </message>
   </context>
   
   <context>
@@ -46,6 +143,15 @@
     <message>
       <source>planeFace - GeomValidators_Face: The shape is not an available face.</source>
       <translation>The plane cannot be created on the selected face</translation>
+    </message>
+
+    <message>
+      <source>Model_FeatureValidator: Attribute "planeFace" is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>Model_FeatureValidator: Attribute "distance" is not initialized.</source>
+      <translation></translation>
     </message>
   </context>
   

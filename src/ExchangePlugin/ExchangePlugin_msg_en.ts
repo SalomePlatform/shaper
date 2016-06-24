@@ -32,5 +32,26 @@
       <source>selection_list - GeomValidators_Finite: Infinite result is selected.</source>
       <translation>Olny finitive shapes can be exported</translation>
     </message>    
+    
+    <message>
+      <source>Model_FeatureValidator: Attribute "file_path" is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>Model_FeatureValidator: Attribute "selection_list" is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>Model_FeatureValidator: Attribute "xao_file_path" is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>Model_FeatureValidator: Attribute "xao_author" is not initialized.</source>
+      <translation></translation>
+    </message>
+    <message>
+      <source>Model_FeatureValidator: Attribute "xao_geometry_name" is not initialized.</source>
+      <translation></translation>
+    </message>
   </context>
 </TS>
