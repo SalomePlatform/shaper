@@ -34,7 +34,7 @@
     
     <message>
       <source>Model_FeatureValidator: Attribute "base_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
   </context>
 
@@ -63,7 +63,7 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "base_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
     <message>
       <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Could not get selection list.</source>
@@ -71,7 +71,7 @@
     </message>
     <message>
       <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Empty selection list.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
     <message>
       <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Could not get selection.</source>
@@ -87,11 +87,11 @@
     </message>
     <message>
       <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Inifinte objects not acceptable.</source>
-      <translation></translation>
+      <translation>Inifinte objects not acceptable.</translation>
     </message>
     <message>
       <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Selected shape is in the local selection. Only global selection is allowed.</source>
-      <translation></translation>
+      <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
     </message>
   </context>
 
@@ -128,7 +128,7 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "base_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
   </context>
 
@@ -158,15 +158,15 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "base_shape" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "subshapes" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
     <message>
       <source>base_shape - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
     <message>
       <source>base_shape - GeomValidators_ShapeType: It has reference to an empty attribute</source>
@@ -174,7 +174,7 @@
     </message>
     <message>
       <source>base_shape - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
     <message>
       <source>base_shape - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
@@ -182,15 +182,15 @@
     </message>
     <message>
       <source>base_shape - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
+      <translation>Base shape not selected.</translation>
     </message>
     <message>
       <source>base_shape - GeomValidators_ShapeType: The result is empty</source>
-      <translation></translation>
+      <translation>Base shape not selected.</translation>
     </message>
     <message>
       <source>base_shape - GeomValidators_ShapeType: The shape is empty</source>
-      <translation></translation>
+      <translation>Base shape not selected.</translation>
     </message>
   </context>
 
@@ -227,7 +227,7 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "base_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
   </context>
 
@@ -244,7 +244,7 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "base_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "add_contour" is not initialized.</source>
@@ -256,7 +256,7 @@
     </message>
     <message>
       <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Empty selection list.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
     <message>
       <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Could not get selection.</source>
@@ -272,11 +272,11 @@
     </message>
     <message>
       <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Inifinte objects not acceptable.</source>
-      <translation></translation>
+      <translation>Inifinte objects not acceptable.</translation>
     </message>
     <message>
       <source>base_objects - BuildPlugin_ValidatorBaseForBuild: Selected shape is in the local selection. Only global selection is allowed.</source>
-      <translation></translation>
+      <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
     </message>
   </context>
 </TS>

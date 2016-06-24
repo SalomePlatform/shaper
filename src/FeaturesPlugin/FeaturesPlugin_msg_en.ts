@@ -35,15 +35,15 @@
     
     <message>
       <source>Model_FeatureValidator: Attribute "sketch" is not initialized.</source>
-      <translation></translation>
+      <translation>Base object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "base" is not initialized.</source>
-      <translation></translation>
+      <translation>Base object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "direction_object" is not initialized.</source>
-      <translation></translation>
+      <translation>Direction object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_size" is not initialized.</source>
@@ -55,7 +55,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "from_object" is not initialized.</source>
-      <translation></translation>
+      <translation>From object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "from_offset" is not initialized.</source>
@@ -63,7 +63,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_object" is not initialized.</source>
-      <translation></translation>
+      <translation>To object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_offset" is not initialized.</source>
@@ -87,7 +87,7 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute contains unacceptable shape.</source>
-      <translation></translation>
+      <translation>Shape with unacceptable type selected.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Empty context.</source>
@@ -95,23 +95,23 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Compound should contain only faces and edges.</source>
-      <translation></translation>
+      <translation>Compound should contain only faces and edges.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>
-      <translation></translation>
+      <translation>Object from this sketch is already selected. Sketch is not allowed for selection.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Whole sketch with this object is already selected. Don't allow to select this object.</source>
-      <translation></translation>
+      <translation>Whole sketch with this object is already selected. Don't allow to select this object.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Wire with wrong orientation selected.</source>
-      <translation></translation>
+      <translation>Wire with wrong orientation selected.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Objects with such wire already selected. Don't allow to select this object.</source>
-      <translation></translation>
+      <translation>Objects with such wire already selected. Don't allow to select this object.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Empty attribute.</source>
@@ -127,15 +127,15 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Infinite constructions is not allowed as base.</source>
-      <translation></translation>
+      <translation>Infinite constructions is not allowed as base.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Selected shape is in the local selection. Only global selection is allowed.</source>
-      <translation></translation>
+      <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
-      <translation></translation>
+      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute \"%1\" does not supported by this validator.</source>
@@ -143,7 +143,7 @@
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: It has reference to an empty attribute</source>
@@ -151,7 +151,7 @@
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
@@ -159,15 +159,15 @@
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
+      <translation>Direction object not selected.</translation>
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: The result is empty</source>
-      <translation></translation>
+      <translation>Direction object not selected.</translation>
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: The shape is empty</source>
-      <translation></translation>
+      <translation>Direction object not selected.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The attribute with the %1 type is not processed</source>
@@ -175,15 +175,15 @@
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a plane.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a cylinder.</source>
@@ -199,15 +199,15 @@
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a plane.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a cylinder.</source>
@@ -223,27 +223,27 @@
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: ToSize = -FromSize.</source>
-      <translation></translation>
+      <translation>ToSize = -FromSize.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: From face selection is invalid.</source>
-      <translation></translation>
+      <translation>From face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: To face selection is invalid.</source>
-      <translation></translation>
+      <translation>To face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: From face selection is invalid.</source>
-      <translation></translation>
+      <translation>From face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: To face selection is invalid.</source>
-      <translation></translation>
+      <translation>To face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: FromSize = -ToSize and bounding planes are coincident.</source>
-      <translation></translation>
+      <translation>FromSize = -ToSize and bounding planes are coincident.</translation>
     </message>
   </context>
   
@@ -285,11 +285,11 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "sketch" is not initialized.</source>
-      <translation></translation>
+      <translation>Base object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "direction_object" is not initialized.</source>
-      <translation></translation>
+      <translation>Direction object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_size" is not initialized.</source>
@@ -301,7 +301,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "from_object" is not initialized.</source>
-      <translation></translation>
+      <translation>From object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "from_offset" is not initialized.</source>
@@ -309,7 +309,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_object" is not initialized.</source>
-      <translation></translation>
+      <translation>To object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_offset" is not initialized.</source>
@@ -317,7 +317,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "main_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects for cut are not selected.</translation>
     </message>
     <message>
       <source>sketch - FeaturesPlugin_ValidatorCompositeLauncher: Error: The attribute with the %1 type is not processed</source>
@@ -337,7 +337,7 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute contains unacceptable shape.</source>
-      <translation></translation>
+      <translation>Shape with unacceptable type selected.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Empty context.</source>
@@ -345,23 +345,23 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Compound should contain only faces and edges.</source>
-      <translation></translation>
+      <translation>Compound should contain only faces and edges.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>
-      <translation></translation>
+      <translation>Object from this sketch is already selected. Sketch is not allowed for selection.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Whole sketch with this object is already selected. Don't allow to select this object.</source>
-      <translation></translation>
+      <translation>Whole sketch with this object is already selected. Don't allow to select this object.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Wire with wrong orientation selected.</source>
-      <translation></translation>
+      <translation>Wire with wrong orientation selected.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Objects with such wire already selected. Don't allow to select this object.</source>
-      <translation></translation>
+      <translation>Objects with such wire already selected. Don't allow to select this object.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Empty attribute.</source>
@@ -377,15 +377,15 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Infinite constructions is not allowed as base.</source>
-      <translation></translation>
+      <translation>Infinite constructions is not allowed as base.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Selected shape is in the local selection. Only global selection is allowed.</source>
-      <translation></translation>
+      <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
-      <translation></translation>
+      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute \"%1\" does not supported by this validator.</source>
@@ -393,7 +393,7 @@
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: It has reference to an empty attribute</source>
@@ -401,7 +401,7 @@
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
@@ -425,15 +425,15 @@
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a plane.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a cylinder.</source>
@@ -449,15 +449,15 @@
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a plane.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a cylinder.</source>
@@ -469,7 +469,7 @@
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: It has reference to an empty attribute</source>
@@ -477,7 +477,7 @@
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
@@ -501,27 +501,27 @@
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: ToSize = -FromSize.</source>
-      <translation></translation>
+      <translation>ToSize = -FromSize.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: From face selection is invalid.</source>
-      <translation></translation>
+      <translation>From face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: To face selection is invalid.</source>
-      <translation></translation>
+      <translation>To face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: From face selection is invalid.</source>
-      <translation></translation>
+      <translation>From face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: To face selection is invalid.</source>
-      <translation></translation>
+      <translation>To face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: FromSize = -ToSize and bounding planes are coincident.</source>
-      <translation></translation>
+      <translation>FromSize = -ToSize and bounding planes are coincident.</translation>
     </message>
   </context>
   
@@ -563,15 +563,15 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "sketch" is not initialized.</source>
-      <translation></translation>
+      <translation>Base object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "base" is not initialized.</source>
-      <translation></translation>
+      <translation>Base object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "axis_object" is not initialized.</source>
-      <translation></translation>
+      <translation>Axis object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_angle" is not initialized.</source>
@@ -583,7 +583,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "from_object" is not initialized.</source>
-      <translation></translation>
+      <translation>From object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "from_offset" is not initialized.</source>
@@ -591,7 +591,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_object" is not initialized.</source>
-      <translation></translation>
+      <translation>To object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_offset" is not initialized.</source>
@@ -615,7 +615,7 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute contains unacceptable shape.</source>
-      <translation></translation>
+      <translation>Shape with unacceptable type selected.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Empty context.</source>
@@ -623,23 +623,23 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Compound should contain only faces and edges.</source>
-      <translation></translation>
+      <translation>Compound should contain only faces and edges.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>
-      <translation></translation>
+      <translation>Object from this sketch is already selected. Sketch is not allowed for selection.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Whole sketch with this object is already selected. Don't allow to select this object.</source>
-      <translation></translation>
+      <translation>Whole sketch with this object is already selected. Don't allow to select this object.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Wire with wrong orientation selected.</source>
-      <translation></translation>
+      <translation>Wire with wrong orientation selected.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Objects with such wire already selected. Don't allow to select this object.</source>
-      <translation></translation>
+      <translation>Objects with such wire already selected. Don't allow to select this object.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Empty attribute.</source>
@@ -655,15 +655,15 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Infinite constructions is not allowed as base.</source>
-      <translation></translation>
+      <translation>Infinite constructions is not allowed as base.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Selected shape is in the local selection. Only global selection is allowed.</source>
-      <translation></translation>
+      <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
-      <translation></translation>
+      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute \"%1\" does not supported by this validator.</source>
@@ -671,7 +671,7 @@
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: It has reference to an empty attribute</source>
@@ -679,7 +679,7 @@
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
@@ -703,15 +703,15 @@
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a plane.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a cylinder.</source>
@@ -727,15 +727,15 @@
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a plane.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a cylinder.</source>
@@ -793,15 +793,15 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "sketch" is not initialized.</source>
-      <translation></translation>
+      <translation>Base object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "base" is not initialized.</source>
-      <translation></translation>
+      <translation>Base object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "axis_object" is not initialized.</source>
-      <translation></translation>
+      <translation>Axis object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_angle" is not initialized.</source>
@@ -813,7 +813,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "from_object" is not initialized.</source>
-      <translation></translation>
+      <translation>From object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "from_offset" is not initialized.</source>
@@ -821,7 +821,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_object" is not initialized.</source>
-      <translation></translation>
+      <translation>To object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_offset" is not initialized.</source>
@@ -829,7 +829,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "main_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects for cut is not selected.</translation>
     </message>
     <message>
       <source>sketch - FeaturesPlugin_ValidatorCompositeLauncher: Error: The attribute with the %1 type is not processed</source>
@@ -849,7 +849,7 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute contains unacceptable shape.</source>
-      <translation></translation>
+      <translation>Shape with unacceptable type selected.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Empty context.</source>
@@ -857,23 +857,23 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Compound should contain only faces and edges.</source>
-      <translation></translation>
+      <translation>Compound should contain only faces and edges.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>
-      <translation></translation>
+      <translation>Object from this sketch is already selected. Sketch is not allowed for selection.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Whole sketch with this object is already selected. Don't allow to select this object.</source>
-      <translation></translation>
+      <translation>Whole sketch with this object is already selected. Don't allow to select this object.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Wire with wrong orientation selected.</source>
-      <translation></translation>
+      <translation>Wire with wrong orientation selected.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Objects with such wire already selected. Don't allow to select this object.</source>
-      <translation></translation>
+      <translation>Objects with such wire already selected. Don't allow to select this object.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Empty attribute.</source>
@@ -889,15 +889,15 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Infinite constructions is not allowed as base.</source>
-      <translation></translation>
+      <translation>Infinite constructions is not allowed as base.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Selected shape is in the local selection. Only global selection is allowed.</source>
-      <translation></translation>
+      <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
-      <translation></translation>
+      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute \"%1\" does not supported by this validator.</source>
@@ -905,7 +905,7 @@
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: It has reference to an empty attribute</source>
@@ -913,7 +913,7 @@
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
@@ -937,15 +937,15 @@
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a plane.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a cylinder.</source>
@@ -961,15 +961,15 @@
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a plane.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a cylinder.</source>
@@ -981,7 +981,7 @@
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: It has reference to an empty attribute</source>
@@ -989,7 +989,7 @@
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
@@ -1047,15 +1047,15 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "sketch" is not initialized.</source>
-      <translation></translation>
+      <translation>Base object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "base" is not initialized.</source>
-      <translation></translation>
+      <translation>Base object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "direction_object" is not initialized.</source>
-      <translation></translation>
+      <translation>Direction object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_size" is not initialized.</source>
@@ -1067,7 +1067,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "from_object" is not initialized.</source>
-      <translation></translation>
+      <translation>From object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "from_offset" is not initialized.</source>
@@ -1075,7 +1075,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_object" is not initialized.</source>
-      <translation></translation>
+      <translation>To object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_offset" is not initialized.</source>
@@ -1083,7 +1083,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "main_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects for fuse is not selected.</translation>
     </message>
     <message>
       <source>sketch - FeaturesPlugin_ValidatorCompositeLauncher: Error: The attribute with the %1 type is not processed</source>
@@ -1103,7 +1103,7 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute contains unacceptable shape.</source>
-      <translation></translation>
+      <translation>Shape with unacceptable type selected.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Empty context.</source>
@@ -1111,23 +1111,23 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Compound should contain only faces and edges.</source>
-      <translation></translation>
+      <translation>Compound should contain only faces and edges.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>
-      <translation></translation>
+      <translation>Object from this sketch is already selected. Sketch is not allowed for selection.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Whole sketch with this object is already selected. Don't allow to select this object.</source>
-      <translation></translation>
+      <translation>Whole sketch with this object is already selected. Don't allow to select this object.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Wire with wrong orientation selected.</source>
-      <translation></translation>
+      <translation>Wire with wrong orientation selected.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Objects with such wire already selected. Don't allow to select this object.</source>
-      <translation></translation>
+      <translation>Objects with such wire already selected. Don't allow to select this object.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Empty attribute.</source>
@@ -1143,15 +1143,15 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Infinite constructions is not allowed as base.</source>
-      <translation></translation>
+      <translation>Infinite constructions is not allowed as base.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Selected shape is in the local selection. Only global selection is allowed.</source>
-      <translation></translation>
+      <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
-      <translation></translation>
+      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute \"%1\" does not supported by this validator.</source>
@@ -1159,7 +1159,7 @@
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: It has reference to an empty attribute</source>
@@ -1167,7 +1167,7 @@
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
     <message>
       <source>direction_object - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
@@ -1191,15 +1191,15 @@
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a plane.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a cylinder.</source>
@@ -1215,15 +1215,15 @@
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a plane.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a cylinder.</source>
@@ -1235,7 +1235,7 @@
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: It has reference to an empty attribute</source>
@@ -1243,7 +1243,7 @@
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
@@ -1267,27 +1267,27 @@
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: ToSize = -FromSize.</source>
-      <translation></translation>
+      <translation>ToSize = -FromSize.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: From face selection is invalid.</source>
-      <translation></translation>
+      <translation>From face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: To face selection is invalid.</source>
-      <translation></translation>
+      <translation>To face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: From face selection is invalid.</source>
-      <translation></translation>
+      <translation>From face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: To face selection is invalid.</source>
-      <translation></translation>
+      <translation>To face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: FromSize = -ToSize and bounding planes are coincident.</source>
-      <translation></translation>
+      <translation>FromSize = -ToSize and bounding planes are coincident.</translation>
     </message>
   </context>
   
@@ -1337,15 +1337,15 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "sketch" is not initialized.</source>
-      <translation></translation>
+      <translation>Base object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "base" is not initialized.</source>
-      <translation></translation>
+      <translation>Base object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "axis_object" is not initialized.</source>
-      <translation></translation>
+      <translation>Axis object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_angle" is not initialized.</source>
@@ -1357,7 +1357,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "from_object" is not initialized.</source>
-      <translation></translation>
+      <translation>From object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "from_offset" is not initialized.</source>
@@ -1365,7 +1365,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_object" is not initialized.</source>
-      <translation></translation>
+      <translation>To object for revolution is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "to_offset" is not initialized.</source>
@@ -1373,7 +1373,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "main_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects for fuse is not selected.</translation>
     </message>
     <message>
       <source>sketch - FeaturesPlugin_ValidatorCompositeLauncher: Error: The attribute with the %1 type is not processed</source>
@@ -1393,7 +1393,7 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute contains unacceptable shape.</source>
-      <translation></translation>
+      <translation>Shape with unacceptable type selected.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Empty context.</source>
@@ -1401,23 +1401,23 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Compound should contain only faces and edges.</source>
-      <translation></translation>
+      <translation>Compound should contain only faces and edges.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>
-      <translation></translation>
+      <translation>Object from this sketch is already selected. Sketch is not allowed for selection.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Whole sketch with this object is already selected. Don't allow to select this object.</source>
-      <translation></translation>
+      <translation>Whole sketch with this object is already selected. Don't allow to select this object.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Wire with wrong orientation selected.</source>
-      <translation></translation>
+      <translation>Wire with wrong orientation selected.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Objects with such wire already selected. Don't allow to select this object.</source>
-      <translation></translation>
+      <translation>Objects with such wire already selected. Don't allow to select this object.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Empty attribute.</source>
@@ -1433,15 +1433,15 @@
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Infinite constructions is not allowed as base.</source>
-      <translation></translation>
+      <translation>Infinite constructions is not allowed as base.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Selected shape is in the local selection. Only global selection is allowed.</source>
-      <translation></translation>
+      <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
-      <translation></translation>
+      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
     </message>
     <message>
       <source>base - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute \"%1\" does not supported by this validator.</source>
@@ -1449,7 +1449,7 @@
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: It has reference to an empty attribute</source>
@@ -1457,7 +1457,7 @@
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
@@ -1481,15 +1481,15 @@
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a plane.</source>
-      <translation></translation>
+      <translation>"From" should be a planar face.</translation>
     </message>
     <message>
       <source>from_object - GeomValidators_Face: The shape is not a cylinder.</source>
@@ -1505,15 +1505,15 @@
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a face.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a plane.</source>
-      <translation></translation>
+      <translation>"To" should be a planar face.</translation>
     </message>
     <message>
       <source>to_object - GeomValidators_Face: The shape is not a cylinder.</source>
@@ -1525,7 +1525,7 @@
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: It has reference to an empty attribute</source>
@@ -1533,7 +1533,7 @@
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
@@ -1571,11 +1571,11 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "main_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "tool_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Tools not selected.</translation>
     </message>
     <message>
       <source>main_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: This validator can only work with selection list attributes in \"Boolean\" feature.</source>
@@ -1583,7 +1583,7 @@
     </message>
     <message>
       <source>main_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: Empty attribute selection.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
     <message>
       <source>main_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: Empty selection context.</source>
@@ -1591,7 +1591,7 @@
     </message>
     <message>
       <source>main_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: Result construction not allowed for selection.</source>
-      <translation></translation>
+      <translation>Result construction not allowed for selection.</translation>
     </message>
     <message>
       <source>main_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: Empty shape.</source>
@@ -1599,15 +1599,15 @@
     </message>
     <message>
       <source>main_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: Local selection not allowed.</source>
-      <translation></translation>
+      <translation>Local selection not allowed.</translation>
     </message>
     <message>
       <source>main_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: Selected shape has the wrong type.</source>
-      <translation></translation>
+      <translation>Selected shape has the wrong type.</translation>
     </message>
     <message>
       <source>main_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: Selected shape has the wrong type.</source>
-      <translation></translation>
+      <translation>Selected shape has the wrong type.</translation>
     </message>
     <message>
       <source>tool_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: This validator can only work with selection list attributes in \"Boolean\" feature.</source>
@@ -1615,7 +1615,7 @@
     </message>
     <message>
       <source>tool_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: Empty attribute selection.</source>
-      <translation></translation>
+      <translation>Tools not selected.</translation>
     </message>
     <message>
       <source>tool_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: Empty selection context.</source>
@@ -1623,7 +1623,7 @@
     </message>
     <message>
       <source>tool_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: Result construction not allowed for selection.</source>
-      <translation></translation>
+      <translation>Result construction not allowed for selection.</translation>
     </message>
     <message>
       <source>tool_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: Empty shape.</source>
@@ -1631,15 +1631,15 @@
     </message>
     <message>
       <source>tool_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: Local selection not allowed.</source>
-      <translation></translation>
+      <translation>Local selection not allowed.</translation>
     </message>
     <message>
       <source>tool_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: Selected shape has the wrong type.</source>
-      <translation></translation>
+      <translation>Selected shape has the wrong type.</translation>
     </message>
     <message>
       <source>tool_objects - FeaturesPlugin_ValidatorBooleanSelection: Error: Selected shape has the wrong type.</source>
-      <translation></translation>
+      <translation>Selected shape has the wrong type.</translation>
     </message>
   </context>
   
@@ -1661,7 +1661,7 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "base_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorPartitionSelection: Error: This validator can only work with selection list in \"Partition\" feature.</source>
@@ -1669,15 +1669,11 @@
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorPartitionSelection: Error: Only body shapes and construction planes are allowed for selection.</source>
-      <translation></translation>
+      <translation>Only body shapes and construction planes are allowed for selection.</translation>
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorPartitionSelection: Error: Only body shapes and construction planes are allowed for selection.</source>
-      <translation></translation>
-    </message>
-    <message>
-      <source>base_objects - FeaturesPlugin_ValidatorPartitionSelection: </source>
-      <translation></translation>
+      <translation>Only body shapes and construction planes are allowed for selection.</translation>
     </message>
   </context>
   
@@ -1719,19 +1715,19 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "base_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>>Base object for pipe is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "path_object" is not initialized.</source>
-      <translation></translation>
+      <translation>Object for pipe path is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "binormal" is not initialized.</source>
-      <translation></translation>
+      <translation>Binormal vector is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "locations_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Locations not selected.</translation>
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorBaseForGeneration: Error: Validator parameters is empty.</source>
@@ -1747,23 +1743,23 @@
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorBaseForGeneration: Error: Compound should contain only faces and edges.</source>
-      <translation></translation>
+      <translation>Compound should contain only faces and edges.</translation>
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorBaseForGeneration: Error: Object from this sketch is already selected. Sketch is not allowed for selection.</source>
-      <translation></translation>
+      <translation>Object from this sketch is already selected. Sketch is not allowed for selection.</translation>
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorBaseForGeneration: Error: Whole sketch with this object is already selected. Don't allow to select this object.</source>
-      <translation></translation>
+      <translation>Whole sketch with this object is already selected. Don't allow to select this object.</translation>
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorBaseForGeneration: Error: Wire with wrong orientation selected.</source>
-      <translation></translation>
+      <translation>Wire with wrong orientation selected.</translation>
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorBaseForGeneration: Error: Objects with such wire already selected. Don't allow to select this object.</source>
-      <translation></translation>
+      <translation>Objects with such wire already selected. Don't allow to select this object.</translation>
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorBaseForGeneration: Error: Empty attribute.</source>
@@ -1779,15 +1775,15 @@
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorBaseForGeneration: Error: Infinite constructions is not allowed as base.</source>
-      <translation></translation>
+      <translation>Infinite constructions is not allowed as base.</translation>
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorBaseForGeneration: Error: Selected shape is in the local selection. Only global selection is allowed.</source>
-      <translation></translation>
+      <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorBaseForGeneration: Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
-      <translation></translation>
+      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorBaseForGeneration: Error: Attribute \"%1\" does not supported by this validator.</source>
@@ -1803,11 +1799,11 @@
     </message>
     <message>
       <source>path_object - FeaturesPlugin_ValidatorPipePath: Error: Local selection of wires not allowed.</source>
-      <translation></translation>
+      <translation>Local selection of wires not allowed.</translation>
     </message>
     <message>
       <source>binormal - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
     <message>
       <source>binormal - GeomValidators_ShapeType: It has reference to an empty attribute</source>
@@ -1815,7 +1811,7 @@
     </message>
     <message>
       <source>binormal - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
     <message>
       <source>binormal - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
@@ -1869,15 +1865,15 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "base_shape" is not initialized.</source>
-      <translation></translation>
+      <translation>Base shape is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "subshapes" is not initialized.</source>
-      <translation></translation>
+      <translation>Sub-shapes is not selected.</translation>
     </message>
     <message>
       <source>base_shape - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
     <message>
       <source>base_shape - GeomValidators_ShapeType: It has reference to an empty attribute</source>
@@ -1885,7 +1881,7 @@
     </message>
     <message>
       <source>base_shape - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2"</translation>
     </message>
     <message>
       <source>base_shape - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
@@ -1929,11 +1925,11 @@
     </message>
     <message>
       <source>subshapes - FeaturesPlugin_ValidatorRemoveSubShapesSelection: Error: Empty base shape.</source>
-      <translation></translation>
+      <translation>Base shape not selected.</translation>
     </message>
     <message>
       <source>subshapes - FeaturesPlugin_ValidatorRemoveSubShapesSelection: Error: Only sub-shapes of selected shape is allowed for selection.</source>
-      <translation></translation>
+      <translation>Only sub-shapes of selected shape is allowed for selection.</translation>
     </message>
   </context>
   
@@ -1945,7 +1941,7 @@
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "tool_objects" is not initialized.</source>
-      <translation>A tool objects is not selected.</translation>
+      <translation>Tool objects is not selected.</translation>
     </message>
     
     <message>
@@ -1979,11 +1975,11 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "main_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Main objects is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "tool_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Tool objects is not selected.</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_IntersectionSelection: Error: empty selection.</source>
@@ -2003,7 +1999,7 @@
     </message>
     <message>
       <source>main_objects - GeomValidators_IntersectionSelection: Error: %1 shape is not allowed for selection.</source>
-      <translation></translation>
+      <translation>%1 shape is not allowed for selection.</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_IntersectionSelection: Error: empty shape.</source>
@@ -2011,11 +2007,11 @@
     </message>
     <message>
       <source>main_objects - GeomValidators_IntersectionSelection: Error: Local selection not allowed.</source>
-      <translation></translation>
+      <translation>Local selection not allowed.</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_IntersectionSelection: Error: selected shape has the wrong type.</source>
-      <translation></translation>
+      <translation>Selected shape has the wrong type.</translation>
     </message>
   </context>
   
@@ -2049,7 +2045,7 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "placement_start_shape" is not initialized.</source>
-      <translation></translation>
+      <translation>Start placement shape is not defined.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "placement_reverse_direction" is not initialized.</source>
@@ -2103,11 +2099,11 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "main_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "axis_object" is not initialized.</source>
-      <translation></translation>
+      <translation>Axis not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "angle" is not initialized.</source>
@@ -2119,7 +2115,7 @@
     </message>
     <message>
       <source>main_objects - FeaturesPlugin_ValidatorTransform: Objects from the %1 group can be selected in the %2 document, but an objects from the %3 group is selected.</source>
-      <translation></translation>
+      <translation>Objects from the %1 group can be selected in the %2 document, but an objects from the %3 group is selected.</translation>
     </message>
   </context>
   
@@ -2173,7 +2169,7 @@
     </message>
     <message>
       <source>main_objects - FeaturesPlugin_ValidatorTransform: Objects from the %1 group can be selected in the %2 document, but an objects from the %3 group is selected.</source>
-      <translation></translation>
+      <translation>Objects from the %1 group can be selected in the %2 document, but an objects from the %3 group is selected.</translation>
     </message>
   </context>
   
@@ -2194,7 +2190,7 @@
     
     <message>
       <source>Model_FeatureValidator: Attribute "group_list" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
   </context>
 
@@ -2215,7 +2211,7 @@
 
     <message>
       <source>Model_FeatureValidator: Attribute "base_objects" is not initialized.</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorUnionSelection: Error: This validator can only work with selection list in \"%1\" feature.</source>
@@ -2223,7 +2219,7 @@
     </message>
     <message>
       <source>base_objects - FeaturesPlugin_ValidatorUnionSelection: Error: Whole compsolids not allowed for selection.</source>
-      <translation></translation>
+      <translation>Whole compsolids not allowed for selection.</translation>
     </message>
     <message>
       <source>GeomValidators_MinObjectsSelected: Error: Wrong number of arguments (expected 2): selection list id and min number of objects</source>
