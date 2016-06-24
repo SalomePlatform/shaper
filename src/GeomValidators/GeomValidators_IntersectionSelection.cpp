@@ -47,13 +47,19 @@ bool GeomValidators_IntersectionSelection::isValid(const AttributePtr& theAttrib
       return false;
     }
     std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
+    GeomShapePtr aContextShape = aContext->shape();
     if(!aShape.get()) {
-      aShape = aContext->shape();
+      aShape = aContextShape;
     }
     if(!aShape.get()) {
       theError = "Error: empty shape.";
       return false;
     }
+    if(!aShape->isEqual(aContextShape)) {
+      theError = "Error: Local selection not allowed.";
+      return false;
+    }
+
     int aShapeType = aShape->shapeType();
     // Allow to select edges, faces and solids.
     if(aShapeType != GeomAPI_Shape::EDGE &&

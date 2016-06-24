@@ -506,13 +506,19 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
       return false;
     }
     std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
+    GeomShapePtr aContextShape = aContext->shape();
     if(!aShape.get()) {
-      aShape = aContext->shape();
+      aShape = aContextShape;
     }
     if(!aShape.get()) {
       theError = "Error: Empty shape.";
       return false;
     }
+    if(!aShape->isEqual(aContextShape)) {
+      theError = "Error: Local selection not allowed.";
+      return false;
+    }
+
     int aShapeType = aShape->shapeType();
     if(anOperationType == 1) {
       // Fuse operation. Allow to select edges, faces and solids.
