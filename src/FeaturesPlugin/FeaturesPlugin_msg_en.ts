@@ -5,32 +5,32 @@
     <name>Extrusion</name>
     <message>
       <source>GeomValidators_ZeroOffset: FromSize = -ToSize and bounding planes are coincident.</source>
-      <translation>Extrusion offset is not defined</translation>
+      <translation>FromSize = -ToSize and bounding planes are coincident.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "base" is not initialized.</source>
-      <translation>Base object for extrusion is not defined</translation>
+      <translation>Base object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>sketch - FeaturesPlugin_ValidatorCompositeLauncher: The object is empty</source>
-      <translation>Sketch is not selected</translation>
+      <translation>Object is not selected.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: ToSize = -FromSize.</source>
-      <translation>Extrusion offset is not defined</translation>
+      <translation>ToSize = -FromSize.</translation>
     </message>
     
     <message>
       <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Validator should be used with 2 parameters for extrusion.</source>
-      <translation></translation>
+      <translation>Validator "FeaturesPlugin_ValidatorExtrusionDir" should be used with 2 parameters for extrusion.</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Base objects list contains vertex or edge, so attribute \"%1\" can not be used with default value. Select direction for extrusion.</source>
-      <translation></translation>
+      <translation>Base objects list contains vertex or edge, so attribute "%1" can not be used with default value. Select direction for extrusion.</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Direction is parallel to one of the selected face or face on selected shell.</source>
-      <translation></translation>
+      <translation>Direction is parallel to one of the selected face or face on selected shell.</translation>
     </message>
     
   </context>
@@ -39,36 +39,36 @@
     <name>ExtrusionCut</name>
     <message>
       <source>GeomValidators_ZeroOffset: FromSize = -ToSize and bounding planes are coincident.</source>
-      <translation>Extrusion offset is not defined</translation>
+      <translation>FromSize = -ToSize and bounding planes are coincident.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "base" is not initialized.</source>
-      <translation>Base object for extrusion is not defined</translation>
+      <translation>Base object for extrusion is not selected.</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: </source>
-      <translation>Objects for extrusion are not selected</translation>
+      <translation>Selected objects contain element with unacceptable shape type.</translation>
     </message>
     <message>
       <source>sketch - FeaturesPlugin_ValidatorCompositeLauncher: The object is empty</source>
-      <translation>Sketch is not selected</translation>
+      <translation>Object is not selected.</translation>
     </message>
     <message>
       <source>sketch - FeaturesPlugin_ValidatorCompositeLauncher: The result is empty</source>
-      <translation>Sketch is not selected</translation>
+      <translation>Object is not selected.</translation>
     </message>
     
     <message>
       <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Validator should be used with 2 parameters for extrusion.</source>
-      <translation></translation>
+      <translation>Validator "FeaturesPlugin_ValidatorExtrusionDir" should be used with 2 parameters for extrusion.</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Base objects list contains vertex or edge, so attribute \"%1\" can not be used with default value. Select direction for extrusion.</source>
-      <translation></translation>
+      <translation>Base objects list contains vertex or edge, so attribute "%1" can not be used with default value. Select direction for extrusion.</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Direction is parallel to one of the selected face or face on selected shell.</source>
-      <translation></translation>
+      <translation>Direction is parallel to one of the selected face or face on selected shell.</translation>
     </message>
   </context>
   
@@ -76,44 +76,36 @@
     <name>Revolution</name>
     <message>
       <source>GeomValidators_ZeroOffset: FromSize = -ToSize and bounding planes are coincident.</source>
-      <translation>Angle offset is not defined</translation>
+      <translation>FromAngle = -ToAngle and bounding planes are coincident.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "axis_object" is not initialized.</source>
-      <translation>Revolution axis is not selected</translation>
+      <translation>Revolution axis is not selected.</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The object is empty</source>
-      <translation>Revolution axis is not selected</translation>
+      <translation>Revolution axis is not selected.</translation>
     </message>
     <message>
       <source>sketch - FeaturesPlugin_ValidatorCompositeLauncher: The object is empty</source>
-      <translation>Sketch is not selected</translation>
+      <translation>Object is not selected.</translation>
     </message>
     
     <message>
       <source>GeomValidators_ZeroOffset: Wrong number of validator arguments in xml(expected 9).</source>
-      <translation></translation>
+      <translation>Wrong number of validator "GeomValidators_ZeroOffset" arguments in xml(expected 9).</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: ToSize = -FromSize.</source>
-      <translation></translation>
+      <translation>ToAngle = -FromAngle.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: From face selection is invalid.</source>
-      <translation></translation>
+      <translation>From face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: To face selection is invalid.</source>
-      <translation></translation>
-    </message>
-    <message>
-      <source>GeomValidators_ZeroOffset: From face selection is invalid.</source>
-      <translation></translation>
-    </message>
-    <message>
-      <source>GeomValidators_ZeroOffset: To face selection is invalid.</source>
-      <translation></translation>
+      <translation>To face selection is invalid.</translation>
     </message>
   </context>
   
@@ -121,52 +113,44 @@
     <name>RevolutionCut</name>
     <message>
       <source>GeomValidators_ZeroOffset: FromSize = -ToSize and bounding planes are coincident.</source>
-      <translation>Angle offset is not defined</translation>
+      <translation>FromAngle = -ToAngle and bounding planes are coincident.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "axis_object" is not initialized.</source>
-      <translation>Revolution axis is not selected</translation>
+      <translation>Revolution axis is not selected.</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The object is empty</source>
-      <translation>Revolution axis is not selected</translation>
+      <translation>Revolution axis is not selected.</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: </source>
-      <translation>Objects for revolution are not selected</translation>
+      <translation>Selected objects contain element with unacceptable shape type.</translation>
     </message>
     <message>
       <source>sketch - FeaturesPlugin_ValidatorCompositeLauncher: The object is empty</source>
-      <translation>Sketch is not selected</translation>
+      <translation>Object is not selected.</translation>
     </message>
     <message>
       <source>sketch - FeaturesPlugin_ValidatorCompositeLauncher: The result is empty</source>
-      <translation>Sketch is not selected</translation>
+      <translation>Object is not selected.</translation>
     </message>
     
     <message>
       <source>GeomValidators_ZeroOffset: Wrong number of validator arguments in xml(expected 9).</source>
-      <translation></translation>
+      <translation>Wrong number of validator "GeomValidators_ZeroOffset" arguments in xml(expected 9).</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: ToSize = -FromSize.</source>
-      <translation></translation>
+      <translation>ToAngle = -FromAngle.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: From face selection is invalid.</source>
-      <translation></translation>
+      <translation>From face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: To face selection is invalid.</source>
-      <translation></translation>
-    </message>
-    <message>
-      <source>GeomValidators_ZeroOffset: From face selection is invalid.</source>
-      <translation></translation>
-    </message>
-    <message>
-      <source>GeomValidators_ZeroOffset: To face selection is invalid.</source>
-      <translation></translation>
+      <translation>To face selection is invalid.</translation>
     </message>
   </context>
   
@@ -174,36 +158,36 @@
     <name>ExtrusionFuse</name>
     <message>
       <source>GeomValidators_ZeroOffset: FromSize = -ToSize and bounding planes are coincident.</source>
-      <translation>Extrusion offset is not defined</translation>
+      <translation>FromSize = -ToSize and bounding planes are coincident.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "base" is not initialized.</source>
-      <translation>Base objects for extrusion are not selected</translation>
+      <translation>Base objects for extrusion are not selected.</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: </source>
-      <translation>Base objects for extrusion are not selected</translation>
+      <translation>Selected objects contain element with unacceptable shape type.</translation>
     </message>
     <message>
       <source>sketch - FeaturesPlugin_ValidatorCompositeLauncher: The object is empty</source>
-      <translation>Sketch is not selected</translation>
+      <translation>Object is not selected.</translation>
     </message>
     <message>
       <source>sketch - FeaturesPlugin_ValidatorCompositeLauncher: The result is empty</source>
-      <translation>Sketch is not selected</translation>
+      <translation>Object is not selected.</translation>
     </message>
     
     <message>
       <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Validator should be used with 2 parameters for extrusion.</source>
-      <translation></translation>
+      <translation>Validator "FeaturesPlugin_ValidatorExtrusionDir" should be used with 2 parameters for extrusion.</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Base objects list contains vertex or edge, so attribute \"%1\" can not be used with default value. Select direction for extrusion.</source>
-      <translation></translation>
+      <translation>Base objects list contains vertex or edge, so attribute "%1" can not be used with default value. Select direction for extrusion.</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Direction is parallel to one of the selected face or face on selected shell.</source>
-      <translation></translation>
+      <translation>Direction is parallel to one of the selected face or face on selected shell.</translation>
     </message>
   </context>
   
@@ -211,52 +195,44 @@
     <name>RevolutionFuse</name>
     <message>
       <source>GeomValidators_ZeroOffset: FromSize = -ToSize and bounding planes are coincident.</source>
-      <translation>Offset angle is not defined</translation>
+      <translation>FromAngle = -ToAngle and bounding planes are coincident.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "axis_object" is not initialized.</source>
-      <translation>Rotation axis is not selected</translation>
+      <translation>Revolution axis is not selected.</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The object is empty</source>
-      <translation>Rotation axis is not selected</translation>
+      <translation>Revolution axis is not selected.</translation>
     </message>
     <message>
       <source>main_objects - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: </source>
-      <translation>Base objects for revolution are not selected</translation>
+      <translation>Selected objects contain element with unacceptable shape type.</translation>
     </message>
     <message>
       <source>sketch - FeaturesPlugin_ValidatorCompositeLauncher: The object is empty</source>
-      <translation>Sketch is not selected</translation>
+      <translation>Object is not selected.</translation>
     </message>
     <message>
       <source>sketch - FeaturesPlugin_ValidatorCompositeLauncher: The result is empty</source>
-      <translation>Sketch is not selected</translation>
+      <translation>Object is not selected.</translation>
     </message>
     
     <message>
       <source>GeomValidators_ZeroOffset: Wrong number of validator arguments in xml(expected 9).</source>
-      <translation></translation>
+      <translation>Wrong number of validator "GeomValidators_ZeroOffset" arguments in xml(expected 9).</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: ToSize = -FromSize.</source>
-      <translation></translation>
+      <translation>ToAngle = -FromAngle.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: From face selection is invalid.</source>
-      <translation></translation>
+      <translation>From face selection is invalid.</translation>
     </message>
     <message>
       <source>GeomValidators_ZeroOffset: To face selection is invalid.</source>
-      <translation></translation>
-    </message>
-    <message>
-      <source>GeomValidators_ZeroOffset: From face selection is invalid.</source>
-      <translation></translation>
-    </message>
-    <message>
-      <source>GeomValidators_ZeroOffset: To face selection is invalid.</source>
-      <translation></translation>
+      <translation>To face selection is invalid.</translation>
     </message>
   </context>
 
@@ -269,7 +245,7 @@
 
     <message>
       <source>GeomValidators_BooleanArguments: Wrong number of arguments (expected 3).</source>
-      <translation></translation>
+      <translation>Wrong number of validator "GeomValidators_BooleanArguments" arguments (expected 3).</translation>
     </message>
   </context>
   
@@ -277,16 +253,16 @@
     <name>Partition</name>
     <message>
       <source>GeomValidators_MinObjectsSelected: Error: Attribute \"%1\" should contain at least %2 items.</source>
-      <translation>At least two objects has to be selected for the operation</translation>
+      <translation>At least %2 object(s) should be selected in "%1"</translation>
     </message>
     
     <message>
       <source>GeomValidators_MinObjectsSelected: Error: Wrong number of arguments (expected 2): selection list id and min number of objects</source>
-      <translation></translation>
+      <translation>Wrong number of validator "GeomValidators_MinObjectsSelected" arguments(expected 2): selection list id and min number of objects.</translation>
     </message>
     <message>
       <source>GeomValidators_MinObjectsSelected: Error: Could not get attribute \"%1\".</source>
-      <translation></translation>
+      <translation>Objects not selected.</translation>
     </message>
   </context>
   
@@ -294,44 +270,36 @@
     <name>Pipe</name>
     <message>
       <source>Model_FeatureValidator: Attribute "base_objects" is not initialized.</source>
-      <translation>Base object for pipe is not selected</translation>
+      <translation>Base object for pipe is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "binormal" is not initialized.</source>
-      <translation>Binormal vector is not selected</translation>
+      <translation>Binormal vector is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "path_object" is not initialized.</source>
-      <translation>Object for pipe path is not selected</translation>
+      <translation>Object for pipe path is not selected.</translation>
     </message>
     <message>
       <source>binormal - GeomValidators_ShapeType: The object is empty</source>
-      <translation>Binormal vector is not selected</translation>
+      <translation>Binormal vector is not selected.</translation>
     </message>
     <message>
       <source>path_object - FeaturesPlugin_ValidatorPipePath: Error: Empty context.</source>
-      <translation>Object for pipe path is not selected</translation>
+      <translation>Object for pipe path is not selected.</translation>
     </message>
     
     <message>
       <source>FeaturesPlugin_ValidatorPipeLocations: Error: Feature \"%1\" does not supported by this validator.</source>
-      <translation></translation>
+      <translation>Feature "%1" does not supported validator "FeaturesPlugin_ValidatorPipeLocations".</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorPipeLocations: Error: Could not get \"%1\" attribute.</source>
-      <translation></translation>
-    </message>
-    <message>
-      <source>FeaturesPlugin_ValidatorPipeLocations: Error: Could not get \"%1\" attribute.</source>
-      <translation></translation>
-    </message>
-    <message>
-      <source>FeaturesPlugin_ValidatorPipeLocations: Error: Could not get \"%1\" attribute.</source>
-      <translation></translation>
+      <translation>Could not get "%1" attribute</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorPipeLocations: Error: Number of locations should be the same as base objects.</source>
-      <translation></translation>
+      <translation>Number of locations should be the same as base objects.</translation>
     </message>
   </context>
   
@@ -339,36 +307,32 @@
     <name>Remove_SubShapes</name>
     <message>
       <source>FeaturesPlugin_ValidatorRemoveSubShapesResult: Error: Base shape is empty.</source>
-      <translation>Base shape is not selected</translation>
+      <translation>Base shape is not selected.</translation>
     </message>
     <message>
       <source>base_shape - GeomValidators_BodyShapes: Error: Context is empty.</source>
-      <translation>Context object is not selected</translation>
+      <translation>Selected object has empty context.</translation>
     </message>
     <message>
       <source>subshapes - FeaturesPlugin_ValidatorRemoveSubShapesSelection: Error: Empty context.</source>
-      <translation>Context object is not selected</translation>
+      <translation>Selected object has empty context.</translation>
     </message>
     
     <message>
       <source>FeaturesPlugin_ValidatorRemoveSubShapesResult: Error: Feature \"%1\" does not supported by this validator.</source>
-      <translation></translation>
+      <translation>Feature "%1" does not supported validator "FeaturesPlugin_ValidatorRemoveSubShapesResult".</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorRemoveSubShapesResult: Error: Could not get \"%1\" attribute.</source>
-      <translation></translation>
-    </message>
-    <message>
-      <source>FeaturesPlugin_ValidatorRemoveSubShapesResult: Error: Could not get \"%1\" attribute.</source>
-      <translation></translation>
+      <translation>Could not get "%1" attribute.</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorRemoveSubShapesResult: Error: Base shape is empty.</source>
-      <translation></translation>
+      <translation>Base shape is empty.</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorRemoveSubShapesResult: Error: Resulting shape is not valid.</source>
-      <translation></translation>
+      <translation>Resulting shape is not valid.</translation>
     </message>
   </context>
   
@@ -376,40 +340,40 @@
     <name>Intersection</name>
     <message>
       <source>Model_FeatureValidator: Attribute "main_objects" is not initialized.</source>
-      <translation>Main object is not selected</translation>
+      <translation>Main objects is not selected.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "tool_objects" is not initialized.</source>
-      <translation>A tool object is not selected</translation>
+      <translation>A tool objects is not selected.</translation>
     </message>
     
     <message>
       <source>tool_objects - GeomValidators_IntersectionSelection: Error: empty selection.</source>
-      <translation></translation>
+      <translation>Empty selection.</translation>
     </message>
     <message>
       <source>tool_objects - GeomValidators_IntersectionSelection: Error: empty attribute selection.</source>
-      <translation></translation>
+      <translation>Attribute selection is empty.</translation>
     </message>
     <message>
       <source>tool_objects - GeomValidators_IntersectionSelection: Error: empty selection context.</source>
-      <translation></translation>
+      <translation>Selected object has empty context.</translation>
     </message>
     <message>
       <source>tool_objects - GeomValidators_IntersectionSelection: Error: empty feature.</source>
-      <translation></translation>
+      <translation>Selected objects has empty feature.</translation>
     </message>
     <message>
       <source>tool_objects - GeomValidators_IntersectionSelection: Error: %1 shape is not allowed for selection.</source>
-      <translation></translation>
+      <translation>%1 shape is not allowed for selection.</translation>
     </message>
     <message>
       <source>tool_objects - GeomValidators_IntersectionSelection: Error: empty shape.</source>
-      <translation></translation>
+      <translation>Empty shape selected.</translation>
     </message>
     <message>
       <source>tool_objects - GeomValidators_IntersectionSelection: Error: selected shape has the wrong type.</source>
-      <translation></translation>
+      <translation>Selected shape has the wrong type.</translation>
     </message>
   </context>
   
@@ -417,112 +381,112 @@
     <name>Placement</name>
     <message>
       <source>Model_FeatureValidator: Attribute "placement_end_shape" is not initialized.</source>
-      <translation>End placement shape is not defined</translation>
+      <translation>End placement shape is not defined.</translation>
     </message>
     <message>
       <source>placement_end_shape - PartSet_DifferentObjects: The feature uses one shape in placement_end_shape and placement_start_shape attributes.</source>
-      <translation>Start and end placement shapes are not defined</translation>
+      <translation>Start and end placement shapes are the same.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "placement_centering" is not initialized.</source>
-      <translation></translation>
+      <translation>Attribute "placement_centering" is not initialized.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "placement_objects_list" is not initialized.</source>
-      <translation>Objects for placement are not selected</translation>
+      <translation>Objects for placement are not selected.</translation>
     </message>
     
     <message>
       <source>placement_objects_list - FeaturesPlugin_ValidatorTransform: The attribute with the %1 type is not processed</source>
-      <translation></translation>
+      <translation>The attribute with the %1 type is not processed.</translation>
     </message>
     <message>
       <source>placement_objects_list - FeaturesPlugin_ValidatorTransform: Objects from the %1 group can be selected in the %2 document, but an objects from the %3 group is selected.</source>
-      <translation></translation>
+      <translation>Objects from the %1 group can be selected in the %2 document, but an objects from the %3 group is selected.</translation>
     </message>
   </context>
   <context>
     <name>Rotation</name>
     <message>
       <source>Model_FeatureValidator: Attribute "angle" is not initialized.</source>
-      <translation>Angle is not defined</translation>
+      <translation>Angle is not defined.</translation>
     </message>
     <message>
       <source>Model_FeatureValidator: Attribute "axis_object" is not initialized.</source>
-      <translation>Rotation axis is not selected</translation>
+      <translation>Rotation axis is not selected.</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The object is empty</source>
-      <translation>Rotation axis is not selected</translation>
+      <translation>Rotation axis is not selected.</translation>
     </message>
     
     <message>
       <source>axis_object - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>Selected objects contain element with unacceptable shape type.</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: It has reference to an empty attribute</source>
-      <translation></translation>
+      <translation>It has reference to an empty attribute.</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2".</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
-      <translation></translation>
+      <translation>The attribute with the %1 type is not processed.</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
+      <translation>Rotation axis is not selected.</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The result is empty</source>
-      <translation></translation>
+      <translation>Rotation axis is not selected.</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The shape is empty</source>
-      <translation></translation>
+      <translation>Rotation axis is not selected.</translation>
     </message>
   </context>
   <context>
     <name>Translation</name>
     <message>
       <source>Model_FeatureValidator: Attribute "axis_object" is not initialized.</source>
-      <translation>Translation axis is not selected</translation>
+      <translation>Translation axis is not selected.</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The object is empty</source>
-      <translation>Translation axis is not selected</translation>
+      <translation>Translation axis is not selected.</translation>
     </message>
     
     <message>
       <source>axis_object - GeomValidators_ShapeType: It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation></translation>
+      <translation>It does not contain element with acceptable shape type. The type should be one of the next: %1</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: It has reference to an empty attribute</source>
-      <translation></translation>
+      <translation>It has reference to an empty attribute</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: Shape type is \"%1\", it should be \"%2\"</source>
-      <translation></translation>
+      <translation>Shape type is "%1", it should be "%2".</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The attribute with the %1 type is not processed</source>
-      <translation></translation>
+      <translation>The attribute with the %1 type is not processed</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The object is empty</source>
-      <translation></translation>
+      <translation>Translation axis is not selected.</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The result is empty</source>
-      <translation></translation>
+      <translation>Translation axis is not selected.</translation>
     </message>
     <message>
       <source>axis_object - GeomValidators_ShapeType: The shape is empty</source>
-      <translation></translation>
+      <translation>Translation axis is not selected.</translation>
     </message>
   </context>
   
@@ -530,15 +494,15 @@
     <name>Group</name>
     <message>
       <source>group_list - GeomValidators_BodyShapes: Error: Context is empty.</source>
-      <translation></translation>
+      <translation>Selected object has empty context.</translation>
     </message>
     <message>
       <source>group_list - GeomValidators_BodyShapes: Error: Result construction selected.</source>
-      <translation></translation>
+      <translation>Constructions not allowed for selection.</translation>
     </message>
     <message>
       <source>group_list - GeomValidators_BodyShapes: Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
+      <translation>Attribute "%1" does not supported by "GeomValidators_BodyShapes" validator.</translation>
     </message>
   </context>
 
@@ -546,15 +510,15 @@
     <name>Union</name>
     <message>
       <source>FeaturesPlugin_ValidatorUnionArguments: Error: This validator supports only \"%1\" feature.</source>
-      <translation></translation>
+      <translation>This validator "FeaturesPlugin_ValidatorUnionArguments" supports only "%1" feature.</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorUnionArguments: Error: Could not get \"%1\" attribute.</source>
-      <translation></translation>
+      <translation>Could not get "%1" attribute.</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorUnionArguments: Error: Not all shapes have shared topology.</source>
-      <translation></translation>
+      <translation>Not all shapes have shared topology.</translation>
     </message>
   </context>
 </TS>
