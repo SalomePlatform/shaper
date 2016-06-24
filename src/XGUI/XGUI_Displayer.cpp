@@ -907,7 +907,7 @@ void XGUI_Displayer::activateAIS(const Handle(AIS_InteractiveObject)& theIO,
                                  const int theMode, const bool theUpdateViewer) const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (theIO == getTrihedron()) {
+  if (!theIO.IsNull() && theIO == getTrihedron()) {
     if (theMode != AIS_Shape::SelectionType(TopAbs_EDGE) &&
         theMode != AIS_Shape::SelectionType(TopAbs_VERTEX))
       return;
