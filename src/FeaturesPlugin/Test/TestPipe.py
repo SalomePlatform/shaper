@@ -100,66 +100,66 @@ aSession.finishOperation()
 
 # Test results
 assert (len(aPipeFeature.results()) > 0)
-# aSession.undo()
-#
-# # Create pipe with bi-normal
-# aSession.startOperation()
-# aPipeFeature = aPart.addFeature("Pipe")
-# aBaseObjectsList = aPipeFeature.selectionList("base_objects")
-# aBaseObjectsList.append(aFaceResult1, None)
-# aPathObjectSelection = aPipeFeature.selection("path_object")
-# aPathObjectSelection.setValue(aWireResult, None)
-# aPipeFeature.string("creation_method").setValue("binormal")
-# aBinormalObjectSelection = aPipeFeature.selection("binormal")
-# aShapeExplorer = GeomAPI_ShapeExplorer(aSketchShape, GeomAPI_Shape.EDGE)
-# aBinormalObjectSelection.setValue(aSketchResult, aShapeExplorer.current())
-# aSession.finishOperation()
-#
-# # Test results
-# assert (len(aPipeFeature.results()) > 0)
-# aSession.undo()
-#
-# # Create pipe with locations
-# # Create a sketch with circle for pipe profile
-# aSession.startOperation()
-# aSketchFeature = featureToCompositeFeature(aPart.addFeature("Sketch"))
-# origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
-# origin.setValue(0, 0, 200)
-# dirx = geomDataAPI_Dir(aSketchFeature.attribute("DirX"))
-# dirx.setValue(1, 0, 0)
-# norm = geomDataAPI_Dir(aSketchFeature.attribute("Norm"))
-# norm.setValue(0, 0, 1)
-#
-# # Create circle
-# aSketchCircleFeature = aSketchFeature.addFeature("SketchCircle")
-# anCircleCentr = geomDataAPI_Point2D(aSketchCircleFeature.attribute("CircleCenter"))
-# aCircleRadius = aSketchCircleFeature.real("CircleRadius")
-# anCircleCentr.setValue(0, 0)
-# aCircleRadius.setValue(20)
-# aSession.finishOperation()
-# aSketchResult = aSketchFeature.firstResult()
-# aSketchShape = aSketchResult.shape()
-#
-# # Create face
-# aSession.startOperation()
-# aFaceFeature = aPart.addFeature("Face")
-# aBaseObjectsList = aFaceFeature.selectionList("base_objects")
-# aShapeExplorer = GeomAPI_ShapeExplorer(aSketchShape, GeomAPI_Shape.EDGE)
-# while aShapeExplorer.more():
-#     aBaseObjectsList.append(aSketchResult, aShapeExplorer.current())
-#     aShapeExplorer.next()
-# aSession.finishOperation()
-# aFaceResult2 = aFaceFeature.firstResult()
-#
-# aSession.startOperation()
-# aPipeFeature = aPart.addFeature("Pipe")
-# aBaseObjectsList = aPipeFeature.selectionList("base_objects")
-# aBaseObjectsList.append(aFaceResult1, None)
-# aBaseObjectsList.append(aFaceResult2, None)
-# aPathObjectSelection = aPipeFeature.selection("path_object")
-# aPathObjectSelection.setValue(aWireResult, None)
-# aPipeFeature.string("creation_method").setValue("locations")
-# aSession.finishOperation()
-#
-# # Test results
-# assert (len(aPipeFeature.results()) > 0)
+aSession.undo()
+
+# Create pipe with bi-normal
+aSession.startOperation()
+aPipeFeature = aPart.addFeature("Pipe")
+aBaseObjectsList = aPipeFeature.selectionList("base_objects")
+aBaseObjectsList.append(aFaceResult1, None)
+aPathObjectSelection = aPipeFeature.selection("path_object")
+aPathObjectSelection.setValue(aWireResult, None)
+aPipeFeature.string("creation_method").setValue("binormal")
+aBinormalObjectSelection = aPipeFeature.selection("binormal")
+aShapeExplorer = GeomAPI_ShapeExplorer(aSketchShape, GeomAPI_Shape.EDGE)
+aBinormalObjectSelection.setValue(aSketchResult, aShapeExplorer.current())
+aSession.finishOperation()
+
+# Test results
+assert (len(aPipeFeature.results()) > 0)
+aSession.undo()
+
+# Create pipe with locations
+# Create a sketch with circle for pipe profile
+aSession.startOperation()
+aSketchFeature = featureToCompositeFeature(aPart.addFeature("Sketch"))
+origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
+origin.setValue(0, 0, 200)
+dirx = geomDataAPI_Dir(aSketchFeature.attribute("DirX"))
+dirx.setValue(1, 0, 0)
+norm = geomDataAPI_Dir(aSketchFeature.attribute("Norm"))
+norm.setValue(0, 0, 1)
+
+# Create circle
+aSketchCircleFeature = aSketchFeature.addFeature("SketchCircle")
+anCircleCentr = geomDataAPI_Point2D(aSketchCircleFeature.attribute("CircleCenter"))
+aCircleRadius = aSketchCircleFeature.real("CircleRadius")
+anCircleCentr.setValue(0, 0)
+aCircleRadius.setValue(20)
+aSession.finishOperation()
+aSketchResult = aSketchFeature.firstResult()
+aSketchShape = aSketchResult.shape()
+
+# Create face
+aSession.startOperation()
+aFaceFeature = aPart.addFeature("Face")
+aBaseObjectsList = aFaceFeature.selectionList("base_objects")
+aShapeExplorer = GeomAPI_ShapeExplorer(aSketchShape, GeomAPI_Shape.EDGE)
+while aShapeExplorer.more():
+    aBaseObjectsList.append(aSketchResult, aShapeExplorer.current())
+    aShapeExplorer.next()
+aSession.finishOperation()
+aFaceResult2 = aFaceFeature.firstResult()
+
+aSession.startOperation()
+aPipeFeature = aPart.addFeature("Pipe")
+aBaseObjectsList = aPipeFeature.selectionList("base_objects")
+aBaseObjectsList.append(aFaceResult1, None)
+aBaseObjectsList.append(aFaceResult2, None)
+aPathObjectSelection = aPipeFeature.selection("path_object")
+aPathObjectSelection.setValue(aWireResult, None)
+aPipeFeature.string("creation_method").setValue("locations")
+aSession.finishOperation()
+
+# Test results
+assert (len(aPipeFeature.results()) > 0)

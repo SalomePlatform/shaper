@@ -127,4 +127,5 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestGroup.py
                TestIntersection.py
                TestUnion.py
-               TestRemoveSubShapes.py)
+               TestRemoveSubShapes.py
+               TestPipe.py)
