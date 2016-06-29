@@ -3,7 +3,7 @@
 
 from FeaturesAPI import addPlacement, addRotation, addTranslation
 
-from FeaturesAPI import addFuse, addCut, addCommon
+from FeaturesAPI import addCut, addFuse, addCommon, addSmash, addFill
 
 from FeaturesAPI import addPartition
 

@@ -110,3 +110,27 @@ BooleanPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
                                             theMainObjects,
                                             theToolObjects));
 }
+
+//==================================================================================================
+BooleanPtr addSmash(const std::shared_ptr<ModelAPI_Document>& thePart,
+                    const std::list<ModelHighAPI_Selection>& theMainObjects,
+                    const std::list<ModelHighAPI_Selection>& theToolObjects)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Boolean::ID());
+  return BooleanPtr(new FeaturesAPI_Boolean(aFeature,
+                                            FeaturesPlugin_Boolean::BOOL_SMASH,
+                                            theMainObjects,
+                                            theToolObjects));
+}
+
+//==================================================================================================
+BooleanPtr addFill(const std::shared_ptr<ModelAPI_Document>& thePart,
+                   const std::list<ModelHighAPI_Selection>& theMainObjects,
+                   const std::list<ModelHighAPI_Selection>& theToolObjects)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Boolean::ID());
+  return BooleanPtr(new FeaturesAPI_Boolean(aFeature,
+                                            FeaturesPlugin_Boolean::BOOL_FILL,
+                                            theMainObjects,
+                                            theToolObjects));
+}

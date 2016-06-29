@@ -86,4 +86,18 @@ BooleanPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
                      const std::list<ModelHighAPI_Selection>& theMainObjects,
                      const std::list<ModelHighAPI_Selection>& theToolObjects);
 
+/// \ingroup CPPHighAPI
+/// \brief Create Boolean Smash feature.
+FEATURESAPI_EXPORT
+BooleanPtr addSmash(const std::shared_ptr<ModelAPI_Document>& thePart,
+                    const std::list<ModelHighAPI_Selection>& theMainObjects,
+                    const std::list<ModelHighAPI_Selection>& theToolObjects);
+
+/// \ingroup CPPHighAPI
+/// \brief Create Boolean Fill feature.
+FEATURESAPI_EXPORT
+BooleanPtr addFill(const std::shared_ptr<ModelAPI_Document>& thePart,
+                   const std::list<ModelHighAPI_Selection>& theMainObjects,
+                   const std::list<ModelHighAPI_Selection>& theToolObjects);
+
 #endif // FeaturesAPI_Boolean_H_
