@@ -72,6 +72,9 @@ class FeaturesTestCase(FeaturesFixture):
         FeaturesAPI.FeaturesAPI_Rotation(self.part.addFeature("Rotation"))
         FeaturesAPI.FeaturesAPI_Translation(self.part.addFeature("Translation"))
         FeaturesAPI.FeaturesAPI_Group(self.part.addFeature("Group"))
+        
+        import PrimitivesAPI
+        PrimitivesAPI.PrimitivesAPI_Box(self.part.addFeature("Box"))
 
         import ParametersAPI
         ParametersAPI.ParametersAPI_Parameter(self.part.addFeature("Parameter"))

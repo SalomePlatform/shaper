@@ -7,7 +7,7 @@ from model import Interface
 from macros.box.feature import BoxFeature as MY
 
 
-def addBox(part, *args):
+def addBoxScript(part, *args):
     """Add Box feature to the part and return Box.
 
     Pass all args to Box __init__ function.

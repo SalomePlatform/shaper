@@ -24,35 +24,35 @@ PrimitivesPlugin_Box::PrimitivesPlugin_Box() // Nothing to do during instantiati
 //=================================================================================================
 void PrimitivesPlugin_Box::initAttributes()
 {
-  data()->addAttribute(PrimitivesPlugin_Box::METHOD(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(PrimitivesPlugin_Box::CREATION_METHOD(), ModelAPI_AttributeString::typeId());
 
-  data()->addAttribute(PrimitivesPlugin_Box::DX(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(PrimitivesPlugin_Box::DY(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(PrimitivesPlugin_Box::DZ(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(PrimitivesPlugin_Box::DX_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(PrimitivesPlugin_Box::DY_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(PrimitivesPlugin_Box::DZ_ID(), ModelAPI_AttributeDouble::typeId());
 
-  data()->addAttribute(PrimitivesPlugin_Box::POINT_FIRST(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(PrimitivesPlugin_Box::POINT_SECOND(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(PrimitivesPlugin_Box::POINT_FIRST_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(PrimitivesPlugin_Box::POINT_SECOND_ID(), ModelAPI_AttributeSelection::typeId());
 }
 
 //=================================================================================================
 void PrimitivesPlugin_Box::execute()
 {
-  AttributeStringPtr aMethodTypeAttr = string(PrimitivesPlugin_Box::METHOD());
+  AttributeStringPtr aMethodTypeAttr = string(PrimitivesPlugin_Box::CREATION_METHOD());
   std::string aMethodType = aMethodTypeAttr->value();
   
-  if (aMethodType == "BoxByDimensions") 
+  if (aMethodType == CREATION_METHOD_BY_DIMENSIONS()) 
     createBoxByDimensions();
   
-  if (aMethodType == "BoxByTwoPoints") 
+  if (aMethodType == CREATION_METHOD_BY_TWO_POINTS()) 
     createBoxByTwoPoints();
 }
 
 //=================================================================================================
 void PrimitivesPlugin_Box::createBoxByDimensions()
 {
-  double aDx = real(PrimitivesPlugin_Box::DX())->value();
-  double aDy = real(PrimitivesPlugin_Box::DY())->value();
-  double aDz = real(PrimitivesPlugin_Box::DZ())->value();
+  double aDx = real(PrimitivesPlugin_Box::DX_ID())->value();
+  double aDy = real(PrimitivesPlugin_Box::DY_ID())->value();
+  double aDz = real(PrimitivesPlugin_Box::DZ_ID())->value();
 
   std::shared_ptr<GeomAlgoAPI_Box> aBoxAlgo(new GeomAlgoAPI_Box(aDx,aDy,aDz));
   
@@ -85,8 +85,8 @@ void PrimitivesPlugin_Box::createBoxByDimensions()
 //=================================================================================================
 void PrimitivesPlugin_Box::createBoxByTwoPoints() 
 {
-  AttributeSelectionPtr aRef1 = data()->selection(PrimitivesPlugin_Box::POINT_FIRST());
-  AttributeSelectionPtr aRef2 = data()->selection(PrimitivesPlugin_Box::POINT_SECOND());
+  AttributeSelectionPtr aRef1 = data()->selection(PrimitivesPlugin_Box::POINT_FIRST_ID());
+  AttributeSelectionPtr aRef2 = data()->selection(PrimitivesPlugin_Box::POINT_SECOND_ID());
   
   std::shared_ptr<GeomAlgoAPI_BoxPoints> aBoxAlgo;
   

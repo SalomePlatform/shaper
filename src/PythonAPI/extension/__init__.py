@@ -1,4 +1,4 @@
 """User-defined features.
 """
 
-from box import addBox
+from box import addBoxScript

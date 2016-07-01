@@ -19,6 +19,6 @@ mypart = model.addPart(mypartset).document()
 
 # Creating the base of the box
 
-extension.addBox( mypart, 10, 20, 30 )
+extension.addBoxScript( mypart, 10, 20, 30 )
 model.end()
 

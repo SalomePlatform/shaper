@@ -33,46 +33,60 @@ class PrimitivesPlugin_Box : public ModelAPI_Feature
     return MY_BOX_ID;
   }
 
-  /// attribute name for creation method
-  inline static const std::string& METHOD()
+  /// Attribute name for creation method
+  inline static const std::string& CREATION_METHOD()
   {
-    static const std::string METHOD_ATTR("CreationMethod");
-    return METHOD_ATTR;
+    static const std::string MY_CREATION_METHOD_ID("CreationMethod");
+    return MY_CREATION_METHOD_ID;
+  }
+  
+  /// Attribute name for creation method
+  inline static const std::string& CREATION_METHOD_BY_DIMENSIONS()
+  {
+    static const std::string MY_CREATION_METHOD_ID("BoxByDimensions");
+    return MY_CREATION_METHOD_ID;
+  }
+  
+  /// Attribute name for creation method
+  inline static const std::string& CREATION_METHOD_BY_TWO_POINTS()
+  {
+    static const std::string MY_CREATION_METHOD_ID("BoxByTwoPoints");
+    return MY_CREATION_METHOD_ID;
   }
 
-  /// attribute name of first point
-  inline static const std::string& POINT_FIRST()
+  /// Attribute name of first point
+  inline static const std::string& POINT_FIRST_ID()
   {
-    static const std::string MY_POINT_FIRST("FirstPoint");
-    return MY_POINT_FIRST;
+    static const std::string MY_POINT_FIRST_ID("FirstPoint");
+    return MY_POINT_FIRST_ID;
   }
 
-  /// attribute name of second point
-  inline static const std::string& POINT_SECOND()
+  /// Attribute name of second point
+  inline static const std::string& POINT_SECOND_ID()
   {
-    static const std::string MY_POINT_SECOND("SecondPoint");
-    return MY_POINT_SECOND;
+    static const std::string MY_POINT_SECOND_ID("SecondPoint");
+    return MY_POINT_SECOND_ID;
   }
 
-  /// attribute first coordinate
-  inline static const std::string& DX()
+  /// Attribute first coordinate
+  inline static const std::string& DX_ID()
   {
-    static const std::string MY_DX("dx");
-    return MY_DX;
+    static const std::string MY_DX_ID("dx");
+    return MY_DX_ID;
   }
 
-  /// attribute second coordinate
-  inline static const std::string& DY()
+  /// Attribute second coordinate
+  inline static const std::string& DY_ID()
   {
-    static const std::string MY_DY("dy");
-    return MY_DY;
+    static const std::string MY_DY_ID("dy");
+    return MY_DY_ID;
   }
 
-  /// attribute third coordinate
-  inline static const std::string& DZ()
+  /// Attribute third coordinate
+  inline static const std::string& DZ_ID()
   {
-    static const std::string MY_DZ("dz");
-    return MY_DZ;
+    static const std::string MY_DZ_ID("dz");
+    return MY_DZ_ID;
   }
 
   /// Returns the kind of a feature
