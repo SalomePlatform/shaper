@@ -1,6 +1,6 @@
 // Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
-// File:        GeomAlgoAPI_DirectAPI.h
+// File:        GeomAlgoAPI_ShapeAPI.h
 // Created:     17 Mar 2016
 // Author:      Clarisse Genrault (CEA)
 
@@ -13,13 +13,13 @@
 
 #include <GeomAlgoAPI_Exception.h>
 
-namespace GeomAlgoAPI_DirectAPI
+namespace GeomAlgoAPI_ShapeAPI
 {
-/**\class GeomAlgoAPI_DirectAPI
+/**\class GeomAlgoAPI_ShapeAPI
  * \ingroup DataAlgo
  * \brief Allows to access the direct API
  */
-class GEOMALGOAPI_EXPORT GeomAlgoAPI_DirectAPI
+class GEOMALGOAPI_EXPORT GeomAlgoAPI_ShapeAPI
 {
 public:
   /// Creates a box using the dimensions.

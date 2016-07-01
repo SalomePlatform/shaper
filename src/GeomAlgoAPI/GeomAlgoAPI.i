@@ -69,7 +69,7 @@
 %include "GeomAlgoAPI_Sewing.h"
 %include "GeomAlgoAPI_ShapeBuilder.h"
 %include "GeomAlgoAPI_Exception.h"
-%include "GeomAlgoAPI_DirectAPI.h"
+%include "GeomAlgoAPI_ShapeAPI.h"
 
 %typemap(out) std::list< std::shared_ptr< GeomAPI_Shape > >::value_type & {
   $result = SWIG_NewPointerObj(SWIG_as_voidptr(new std::shared_ptr<GeomAPI_Shape>(*$1)), $descriptor(std::shared_ptr<GeomAPI_Shape> *), SWIG_POINTER_OWN | 0 );

@@ -1,4 +1,4 @@
-from GeomAlgoAPI import GeomAlgoAPI_DirectAPI as shaperpy
+from GeomAlgoAPI import GeomAlgoAPI_ShapeAPI as shaperpy
 from GeomAlgoAPI import GeomAlgoAPI_Exception as myExcept
 from GeomAPI import GeomAPI_Pnt as pnt
 

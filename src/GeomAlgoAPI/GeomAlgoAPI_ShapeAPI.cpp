@@ -1,10 +1,10 @@
 // Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
-// File:        GeomAlgoAPI_DirectAPI.cpp
+// File:        GeomAlgoAPI_ShapeAPI.cpp
 // Created:     17 Mar 2016
 // Author:      Clarisse Genrault (CEA)
 
-#include "GeomAlgoAPI_DirectAPI.h"
+#include "GeomAlgoAPI_ShapeAPI.h"
 #include <GeomAlgoAPI_Box.h>
 #include <GeomAlgoAPI_BoxPoints.h>
 
@@ -14,10 +14,10 @@
 
 #include <iostream>
 
-namespace GeomAlgoAPI_DirectAPI
+namespace GeomAlgoAPI_ShapeAPI
 {
   //=========================================================================================================
-  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_DirectAPI::makeBox(const double theDx, const double theDy, 
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeBox(const double theDx, const double theDy, 
                                                                 const double theDz) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Box aBoxAlgo(theDx,theDy,theDz);
@@ -38,7 +38,7 @@ namespace GeomAlgoAPI_DirectAPI
   }
   
   //=========================================================================================================
-  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_DirectAPI::makeBox(std::shared_ptr<GeomAPI_Pnt> theFirstPoint,
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeBox(std::shared_ptr<GeomAPI_Pnt> theFirstPoint,
                                                                 std::shared_ptr<GeomAPI_Pnt> theSecondPoint) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_BoxPoints aBoxAlgo(theFirstPoint, theSecondPoint);

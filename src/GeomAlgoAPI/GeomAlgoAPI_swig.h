@@ -42,7 +42,7 @@
   #include "GeomAlgoAPI_Sewing.h"
   #include "GeomAlgoAPI_ShapeBuilder.h"  
   #include "GeomAlgoAPI_Exception.h"
-  #include "GeomAlgoAPI_DirectAPI.h"
+  #include "GeomAlgoAPI_ShapeAPI.h"
   #include "GeomAlgoAPI_Box.h"
   #include "GeomAlgoAPI_BoxPoints.h"
 
