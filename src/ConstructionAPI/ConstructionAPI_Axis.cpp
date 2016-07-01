@@ -47,6 +47,17 @@ ConstructionAPI_Axis::ConstructionAPI_Axis(
     setPointAndDirection(thePoint, theX, theY, theZ);
 }
 
+ConstructionAPI_Axis::ConstructionAPI_Axis(
+    const std::shared_ptr<ModelAPI_Feature> & theFeature,
+    const ModelHighAPI_Double & theDX,
+    const ModelHighAPI_Double & theDY,
+    const ModelHighAPI_Double & theDZ)
+: ModelHighAPI_Interface(theFeature)
+{
+  if (initialize())
+    setDimensions(theDX, theDY, theDZ);
+}
+
 ConstructionAPI_Axis::~ConstructionAPI_Axis()
 {
 
@@ -88,6 +99,19 @@ void ConstructionAPI_Axis::setPointAndDirection(
   execute();
 }
 
+void ConstructionAPI_Axis::setDimensions(
+    const ModelHighAPI_Double & theDX,
+    const ModelHighAPI_Double & theDY,
+    const ModelHighAPI_Double & theDZ)
+{
+  fillAttribute("AxisByDimensionsCase", creationMethod());
+  fillAttribute(theDX, xDimension());
+  fillAttribute(theDY, yDimension());
+  fillAttribute(theDZ, zDimension());
+
+  execute();
+}
+
 //--------------------------------------------------------------------------------------
 AxisPtr addAxis(const std::shared_ptr<ModelAPI_Document> & thePart,
                 const ModelHighAPI_Selection & thePoint1,
@@ -115,4 +139,14 @@ AxisPtr addAxis(const std::shared_ptr<ModelAPI_Document> & thePart,
   // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Axis::ID());
   return AxisPtr(new ConstructionAPI_Axis(aFeature, thePoint, theX, theY, theZ));
+}
+
+AxisPtr addAxis(const std::shared_ptr<ModelAPI_Document> & thePart,
+                const ModelHighAPI_Double & theDX,
+                const ModelHighAPI_Double & theDY,
+                const ModelHighAPI_Double & theDZ)
+{
+  // TODO(spo): check that thePart is not empty
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Axis::ID());
+  return AxisPtr(new ConstructionAPI_Axis(aFeature, theDX, theDY, theDZ));
 }

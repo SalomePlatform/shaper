@@ -78,4 +78,5 @@ INCLUDE(UnitTest)
 
 ADD_UNIT_TESTS(
   TestPoint.py
+  TestAxis.py
 )
