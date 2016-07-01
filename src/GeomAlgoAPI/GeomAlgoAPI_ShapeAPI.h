@@ -4,8 +4,8 @@
 // Created:     17 Mar 2016
 // Author:      Clarisse Genrault (CEA)
 
-#ifndef GEOMALGOAPI_DIRECTAPI_H
-#define GEOMALGOAPI_DIRECTAPI_H
+#ifndef GEOMALGOAPI_SHAPEAPI_H
+#define GEOMALGOAPI_SHAPERAPI_H
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Pnt.h>
