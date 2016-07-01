@@ -11,6 +11,8 @@
 #include<GeomAPI_Dir.h>
 #include<GeomAPI_Lin.h>
 
+#include <BRepAdaptor_Curve.hxx>
+
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS.hxx>
@@ -22,6 +24,8 @@
 #include <GeomAdaptor_Curve.hxx>
 #include <gp_Ax1.hxx>
 #include <gp_Pln.hxx>
+
+#include <GCPnts_AbscissaPoint.hxx>
 
 GeomAPI_Edge::GeomAPI_Edge()
 {
@@ -218,4 +222,10 @@ bool GeomAPI_Edge::isInPlane(std::shared_ptr<GeomAPI_Pln> thePlane) const
               aPlane.SquareDistance(aLastPnt) < Precision::SquareConfusion();
   }
   return inPlane;
+}
+
+double GeomAPI_Edge::length() const
+{
+  const TopoDS_Edge& anEdge = TopoDS::Edge(impl<TopoDS_Shape>());
+  return GCPnts_AbscissaPoint::Length(BRepAdaptor_Curve(anEdge));
 }

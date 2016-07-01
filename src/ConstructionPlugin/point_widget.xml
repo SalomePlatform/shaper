@@ -1,7 +1,53 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <doublevalue id="x" label="X " tooltip="X coordinate" default="0"/>
-  <doublevalue id="y" label="Y " tooltip="Y coordinate" default="0"/>
-  <doublevalue id="z" label="Z " tooltip="Z coordinate" default="0"/>
+  <toolbox id="creation_method">
+    <box id="by_xyz"
+         title="By X, Y, Z"
+         tooltip="Point at a given distance from the origin."
+         icon="icons/Construction/point_by_xyz_32x32.png">
+      <doublevalue id="x"
+                   label="X "
+                   tooltip="X coordinate."
+                   icon="icons/Construction/x_size.png"
+                   default="0"/>
+      <doublevalue id="y"
+                   label="Y "
+                   tooltip="Y coordinate."
+                   icon="icons/Construction/y_size.png"
+                   default="0"/>
+      <doublevalue id="z"
+                   label="Z "
+                   tooltip="Z coordinate."
+                   icon="icons/Construction/z_size.png"
+                   default="0"/>
+    </box>
+    <box id="by_distance_on_edge"
+         title="By distance on edge"
+         tooltip="Point on an edge, at a given distance of one of its end."
+         icon="icons/Construction/point_by_distance_on_edge_32x32.png">
+      <shape_selector id="edge"
+                      label="Edge"
+                      tooltip="Edge for creating point on it."
+                      icon="icons/Construction/edge.png"
+                      shape_types="edge">
+        <validator id="GeomValidators_Finite"/>
+      </shape_selector>
+      <groupbox title="Distance">
+        <doublevalue id="value"
+                     label="Value"
+                     tooltip="Distance value."
+                     icon="icons/Construction/distance_value.png"
+                     default="50"/>
+        <boolvalue id="percent"
+                   label="Percent(%)"
+                   tooltip="Distance in percent from length."
+                   default="true"/>
+      </groupbox>
+      <boolvalue id="reverse"
+           label="Reverse"
+           tooltip="Distance from edge end point."
+           default="false"/>
+    </box>
+  </toolbox>
 </source>

@@ -69,6 +69,10 @@ public:
   /// Returns true, if the edge is fully placed in the specified plane
   GEOMAPI_EXPORT
   bool isInPlane(const std::shared_ptr<GeomAPI_Pln> thePlane) const;
+
+  /// Returns edge length.
+  GEOMAPI_EXPORT
+  double length() const;
 };
 
 #endif

@@ -1,7 +1,7 @@
 """
     TestConstraintCoincidence.py
     Unit test of SketchPlugin_ConstraintCoincidence class
-    
+
     SketchPlugin_Constraint
         static const std::string MY_CONSTRAINT_VALUE("ConstraintValue");
         static const std::string MY_FLYOUT_VALUE_PNT("ConstraintFlyoutValuePnt");
@@ -9,7 +9,7 @@
         static const std::string MY_ENTITY_B("ConstraintEntityB");
         static const std::string MY_ENTITY_C("ConstraintEntityC");
         static const std::string MY_ENTITY_D("ConstraintEntityD");
-        
+
     SketchPlugin_ConstraintCoincidence
         static const std::string MY_CONSTRAINT_COINCIDENCE_ID("SketchConstraintCoincidence");
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
@@ -61,6 +61,7 @@ aDocument = aSession.moduleDocument()
 # add an origin
 aSession.startOperation()
 aFeature = aDocument.addFeature("Point")
+aFeature.string("creation_method").setValue("by_xyz")
 aFeature.real("x").setValue(0.)
 aFeature.real("y").setValue(0.)
 aFeature.real("z").setValue(0.)

@@ -5,53 +5,101 @@
 // Author:      Mikhail PONIKAROV
 
 #include "ConstructionPlugin_Point.h"
-#include "ModelAPI_Session.h"
-#include "ModelAPI_Document.h"
-#include "ModelAPI_Data.h"
-#include "ModelAPI_AttributeDouble.h"
+
+#include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultConstruction.h>
+
 #include <GeomAlgoAPI_PointBuilder.h>
+#include <GeomAlgoAPI_ShapeTools.h>
+
+#include <GeomAPI_Edge.h>
 #include <GeomAPI_Pnt.h>
 
-#include <Config_PropManager.h>
-
-using namespace std;
-
+//==================================================================================================
 ConstructionPlugin_Point::ConstructionPlugin_Point()
 {
 }
 
+//==================================================================================================
 const std::string& ConstructionPlugin_Point::getKind()
 {
   static std::string MY_KIND = ConstructionPlugin_Point::ID();
   return MY_KIND;
 }
 
+//==================================================================================================
 void ConstructionPlugin_Point::initAttributes()
 {
-  data()->addAttribute(ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(X(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(Y(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(Z(), ModelAPI_AttributeDouble::typeId());
+
+  data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
+
+  data()->addAttribute(EDGE(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(DISTANCE_VALUE(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(DISTANCE_PERCENT(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(REVERSE(), ModelAPI_AttributeBoolean::typeId());
 }
 
+//==================================================================================================
 void ConstructionPlugin_Point::execute()
 {
-  std::shared_ptr<GeomAPI_Pnt> aPnt(
-      new GeomAPI_Pnt(data()->real(ConstructionPlugin_Point::X())->value(),
-                      data()->real(ConstructionPlugin_Point::Y())->value(),
-                      data()->real(ConstructionPlugin_Point::Z())->value()));
+  GeomShapePtr aShape;
 
-  std::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
-  aConstr->setShape(GeomAlgoAPI_PointBuilder::point(aPnt));
-  setResult(aConstr);
+  std::string aCreationMethod = string(CREATION_METHOD())->value();
+  if(aCreationMethod == CREATION_METHOD_BY_XYZ()) {
+    aShape = createByXYZ();
+  } else if(aCreationMethod == CREATION_METHOD_BY_DISTANCE_ON_EDGE()) {
+    aShape = createByDistanceOnEdge();
+  }
+
+  if(aShape.get()) {
+    std::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
+    aConstr->setShape(aShape);
+    setResult(aConstr);
+  }
 }
 
-bool ConstructionPlugin_Point::customisePresentation(ResultPtr theResult, 
+//==================================================================================================
+bool ConstructionPlugin_Point::customisePresentation(ResultPtr theResult,
                                                      AISObjectPtr thePrs,
-                               std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
+                                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
 {
   bool isCustomized = theDefaultPrs.get() != NULL &&
                       theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
   //thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
   return true;
+}
+
+//==================================================================================================
+GeomShapePtr ConstructionPlugin_Point::createByXYZ()
+{
+  return GeomAlgoAPI_PointBuilder::point(real(X())->value(),
+                                         real(Y())->value(),
+                                         real(Z())->value());
+}
+
+//==================================================================================================
+GeomShapePtr ConstructionPlugin_Point::createByDistanceOnEdge()
+{
+  // Get edge.
+  AttributeSelectionPtr anEdgeSelection = selection(EDGE());
+  GeomShapePtr aShape = anEdgeSelection->value();
+  if(!aShape.get()) {
+    aShape = anEdgeSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aShape));
+
+  // Get distance value and percent flag.
+  double aValue = real(DISTANCE_VALUE())->value();
+  bool anIsPercent = boolean(DISTANCE_PERCENT())->value();
+
+  // Get reverse flag.
+  bool anIsReverse = boolean(REVERSE())->value();
+
+  return GeomAlgoAPI_ShapeTools::findVertexOnEdge(anEdge, aValue, anIsPercent, anIsReverse);
 }

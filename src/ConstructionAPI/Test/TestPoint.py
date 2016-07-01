@@ -28,7 +28,7 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual(0, point.y().value())
         self.assertEqual(0, point.z().value())
 
-        point.setPoint(10, "20", "x + 30")
+        point.setByXYZ(10, "20", "x + 30")
         self.assertEqual(10, point.x().value())
         self.assertEqual("20", point.y().text())
         self.assertEqual("x + 30", point.z().text())
