@@ -17,6 +17,7 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Circ.h>
 #include <GeomAPI_Circ2d.h>
+#include <GeomAPI_Vertex.h>
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
@@ -122,7 +123,7 @@ AISObjectPtr SketchPlugin_Circle::getAISObject(AISObjectPtr thePrevious)
         if (aCircleShape && aRadius != 0) {
           std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
           // make a visible point
-          std::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
+          std::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::vertex(aCenter);
           aShapes.push_back(aCenterPointShape);
           aShapes.push_back(aCircleShape);
 

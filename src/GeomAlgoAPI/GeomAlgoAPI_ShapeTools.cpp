@@ -8,9 +8,9 @@
 
 #include "GeomAlgoAPI_SketchBuilder.h"
 
+#include <GeomAPI_Edge.h>
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Face.h>
-#include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Pnt.h>
 
@@ -21,24 +21,20 @@
 #include <BRepAlgo_FaceRestrictor.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_FindPlane.hxx>
-#include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
-#include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepCheck_Analyzer.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
 #include <BRepExtrema_ExtCF.hxx>
 #include <BRepGProp.hxx>
 #include <BRepTools.hxx>
 #include <BRepTopAdaptor_FClass2d.hxx>
-#include <GCPnts_AbscissaPoint.hxx>
-#include <Geom_Curve.hxx>
 #include <Geom2d_Curve.hxx>
+#include <Handle_Geom2d_Curve.hxx>
 #include <BRepLib_CheckCurveOnSurface.hxx>
 #include <BRep_Tool.hxx>
 #include <Geom_Plane.hxx>
 #include <GeomLib_IsPlanarSurface.hxx>
 #include <GeomLib_Tool.hxx>
-#include <GeomProjLib.hxx>
 #include <gp_Pln.hxx>
 #include <GProp_GProps.hxx>
 #include <IntAna_IntConicQuad.hxx>
@@ -666,47 +662,4 @@ bool GeomAlgoAPI_ShapeTools::isParallel(const std::shared_ptr<GeomAPI_Edge> theE
 
   BRepExtrema_ExtCF anExt(anEdge, aFace);
   return anExt.IsParallel() == Standard_True;
-}
-
-//==================================================================================================
-std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_ShapeTools::findVertexOnEdge(const std::shared_ptr<GeomAPI_Edge> theEdge,
-                                                                         const double theValue,
-                                                                         const bool theIsPercent,
-                                                                         const bool theIsReverse)
-{
-  std::shared_ptr<GeomAPI_Vertex> aVertex;
-
-  if(!theEdge.get()) {
-    return aVertex;
-  }
-
-  double aValue = theValue;
-  if(theIsPercent) {
-    aValue = theEdge->length() / 100.0 * aValue;
-  }
-
-  const TopoDS_Edge& anEdge = TopoDS::Edge(theEdge->impl<TopoDS_Shape>());
-  Standard_Real aUFirst, aULast;
-  Handle(Geom_Curve) anEdgeCurve = BRep_Tool::Curve(anEdge, aUFirst, aULast);
-
-  if(!anEdgeCurve.IsNull() ) {
-    Handle(Geom_Curve) aReOrientedCurve = anEdgeCurve;
-
-    if(theIsReverse) {
-      aReOrientedCurve = anEdgeCurve->Reversed();
-      aUFirst = anEdgeCurve->ReversedParameter(aULast);
-    }
-
-    // Get the point by length
-    GeomAdaptor_Curve anAdapCurve = GeomAdaptor_Curve(aReOrientedCurve);
-    GCPnts_AbscissaPoint anAbsPnt(anAdapCurve, aValue, aUFirst);
-    Standard_Real aParam = anAbsPnt.Parameter();
-    gp_Pnt aPnt = anAdapCurve.Value(aParam);
-    BRepBuilderAPI_MakeVertex aMkVertex(aPnt);
-    const TopoDS_Vertex& aShape = aMkVertex.Vertex();
-    aVertex.reset(new GeomAPI_Vertex());
-    aVertex->setImpl(new TopoDS_Vertex(aShape));
-  }
-
-  return aVertex;
 }

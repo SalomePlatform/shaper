@@ -42,7 +42,7 @@ void SketchPlugin_Point::execute()
             data()->attribute(SketchPlugin_Point::COORD_ID()));
     std::shared_ptr<GeomAPI_Pnt> aPoint3D(aSketch->to3D(aPoint->x(), aPoint->y()));
     // make a visible point
-    std::shared_ptr<GeomAPI_Shape> aPointShape = GeomAlgoAPI_PointBuilder::point(aPoint3D);
+    std::shared_ptr<GeomAPI_Shape> aPointShape = GeomAlgoAPI_PointBuilder::vertex(aPoint3D);
     std::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
     aConstr->setShape(aPointShape);
     aConstr->setIsInHistory(false);

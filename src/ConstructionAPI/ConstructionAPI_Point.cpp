@@ -41,6 +41,19 @@ ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feat
 }
 
 //==================================================================================================
+ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                             const ModelHighAPI_Selection& theObject1,
+                                             const ModelHighAPI_Selection& theObject2)
+: ModelHighAPI_Interface(theFeature)
+{
+  if(initialize()) {
+    /// If first object is vertex and second object is face then set by projection.
+    /// TODO: check
+    setByProjection(theObject1, theObject2);
+  }
+}
+
+//==================================================================================================
 ConstructionAPI_Point::~ConstructionAPI_Point()
 {
 
@@ -75,6 +88,17 @@ void ConstructionAPI_Point::setByDistanceOnEdge(const ModelHighAPI_Selection& th
 }
 
 //==================================================================================================
+void ConstructionAPI_Point::setByProjection(const ModelHighAPI_Selection& theVertex,
+                                            const ModelHighAPI_Selection& thePlane)
+{
+  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION(), mycreationMethod);
+  fillAttribute(theVertex, mypoint);
+  fillAttribute(thePlane, myplane);
+
+  execute();
+}
+
+//==================================================================================================
 PointPtr addPoint(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Double& theX,
                   const ModelHighAPI_Double& theY,
@@ -95,4 +119,14 @@ PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
   // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Point::ID());
   return PointPtr(new ConstructionAPI_Point(aFeature, theEdge, theDistanceValue, theDistancePercent, theReverse));
+}
+
+//==================================================================================================
+PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
+                  const ModelHighAPI_Selection& theObject1,
+                  const ModelHighAPI_Selection& theObject2)
+{
+  // TODO(spo): check that thePart is not empty
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Point::ID());
+  return PointPtr(new ConstructionAPI_Point(aFeature, theObject1, theObject2));
 }

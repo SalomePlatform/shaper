@@ -13,6 +13,8 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
 
+class GeomAPI_Vertex;
+
 /// \class ConstructionPlugin_Point
 /// \ingroup Plugins
 /// \brief Feature for creation of the new part in PartSet.
@@ -47,6 +49,13 @@ public:
   inline static const std::string& CREATION_METHOD_BY_DISTANCE_ON_EDGE()
   {
     static const std::string MY_CREATION_METHOD_ID("by_distance_on_edge");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_PROJECTION()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_projection");
     return MY_CREATION_METHOD_ID;
   }
 
@@ -99,6 +108,20 @@ public:
     return ATTR_ID;
   }
 
+  /// Attribute name for point.
+  inline static const std::string& POINT()
+  {
+    static const std::string ATTR_ID("point");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for plane.
+  inline static const std::string& PLANE()
+  {
+    static const std::string ATTR_ID("plane");
+    return ATTR_ID;
+  }
+
   /// Creates a new part document if needed.
   CONSTRUCTIONPLUGIN_EXPORT virtual void execute();
 
@@ -116,8 +139,9 @@ public:
                                      std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs);
 
 private:
-  std::shared_ptr<GeomAPI_Shape> createByXYZ();
-  std::shared_ptr<GeomAPI_Shape> createByDistanceOnEdge();
+  std::shared_ptr<GeomAPI_Vertex> createByXYZ();
+  std::shared_ptr<GeomAPI_Vertex> createByDistanceOnEdge();
+  std::shared_ptr<GeomAPI_Vertex> createByProjection();
 
 };
 

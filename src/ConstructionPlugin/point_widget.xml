@@ -49,5 +49,23 @@
            tooltip="Distance from edge end point."
            default="false"/>
     </box>
+    <box id="by_projection"
+         title="By projection"
+         tooltip="Point on face surface by projection selected point."
+         icon="icons/Construction/point_by_projection_32x32.png">
+      <shape_selector id="point"
+                      label="Point"
+                      tooltip="Point for projection."
+                      icon="icons/Construction/point.png"
+                      shape_types="vertex">
+      </shape_selector>
+      <shape_selector id="plane"
+                      label="Plane"
+                      tooltip="Plane for projection."
+                      icon="icons/Construction/face.png"
+                      shape_types="face">
+        <validator id="GeomValidators_Face" parameters="plane"/>
+      </shape_selector>
+    </box>
   </toolbox>
 </source>

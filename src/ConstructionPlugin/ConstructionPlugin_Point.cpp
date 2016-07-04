@@ -13,10 +13,10 @@
 #include <ModelAPI_ResultConstruction.h>
 
 #include <GeomAlgoAPI_PointBuilder.h>
-#include <GeomAlgoAPI_ShapeTools.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Pnt.h>
+#include <GeomAPI_Vertex.h>
 
 //==================================================================================================
 ConstructionPlugin_Point::ConstructionPlugin_Point()
@@ -43,6 +43,9 @@ void ConstructionPlugin_Point::initAttributes()
   data()->addAttribute(DISTANCE_VALUE(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(DISTANCE_PERCENT(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(REVERSE(), ModelAPI_AttributeBoolean::typeId());
+
+  data()->addAttribute(POINT(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(PLANE(), ModelAPI_AttributeSelection::typeId());
 }
 
 //==================================================================================================
@@ -55,6 +58,8 @@ void ConstructionPlugin_Point::execute()
     aShape = createByXYZ();
   } else if(aCreationMethod == CREATION_METHOD_BY_DISTANCE_ON_EDGE()) {
     aShape = createByDistanceOnEdge();
+  } else if(aCreationMethod == CREATION_METHOD_BY_PROJECTION()) {
+    aShape = createByProjection();
   }
 
   if(aShape.get()) {
@@ -76,15 +81,15 @@ bool ConstructionPlugin_Point::customisePresentation(ResultPtr theResult,
 }
 
 //==================================================================================================
-GeomShapePtr ConstructionPlugin_Point::createByXYZ()
+std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByXYZ()
 {
-  return GeomAlgoAPI_PointBuilder::point(real(X())->value(),
-                                         real(Y())->value(),
-                                         real(Z())->value());
+  return GeomAlgoAPI_PointBuilder::vertex(real(X())->value(),
+                                          real(Y())->value(),
+                                          real(Z())->value());
 }
 
 //==================================================================================================
-GeomShapePtr ConstructionPlugin_Point::createByDistanceOnEdge()
+std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByDistanceOnEdge()
 {
   // Get edge.
   AttributeSelectionPtr anEdgeSelection = selection(EDGE());
@@ -101,5 +106,27 @@ GeomShapePtr ConstructionPlugin_Point::createByDistanceOnEdge()
   // Get reverse flag.
   bool anIsReverse = boolean(REVERSE())->value();
 
-  return GeomAlgoAPI_ShapeTools::findVertexOnEdge(anEdge, aValue, anIsPercent, anIsReverse);
+  return GeomAlgoAPI_PointBuilder::vertexOnEdge(anEdge, aValue, anIsPercent, anIsReverse);
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByProjection()
+{
+  // Get point.
+  AttributeSelectionPtr aPointSelection = selection(POINT());
+  GeomShapePtr aPointShape = aPointSelection->value();
+  if(!aPointShape.get()) {
+    aPointShape = aPointSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aPointShape));
+
+  // Get plane.
+  AttributeSelectionPtr aPlaneSelection = selection(PLANE());
+  GeomShapePtr aPlaneShape = aPlaneSelection->value();
+  if(!aPlaneShape.get()) {
+    aPlaneShape = aPlaneSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aPlaneShape));
+
+  return GeomAlgoAPI_PointBuilder::vertexByProjection(aVertex, aFace);
 }

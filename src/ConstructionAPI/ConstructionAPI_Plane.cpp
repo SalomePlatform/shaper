@@ -48,6 +48,7 @@ void ConstructionAPI_Plane::setFaceAndDistance(
     const ModelHighAPI_Selection & theFace,
     const ModelHighAPI_Double & theDistance)
 {
+  fillAttribute("PlaneByFaceAndDistance", mycreationMethod);
   fillAttribute(theFace, myface);
   fillAttribute(theDistance, mydistance);
 
@@ -60,6 +61,7 @@ void ConstructionAPI_Plane::setGeneralEquation(
     const ModelHighAPI_Double & theC,
     const ModelHighAPI_Double & theD)
 {
+  fillAttribute("PlaneByGeneralEquation", mycreationMethod);
   fillAttribute(theA, myA);
   fillAttribute(theB, myB);
   fillAttribute(theC, myC);
