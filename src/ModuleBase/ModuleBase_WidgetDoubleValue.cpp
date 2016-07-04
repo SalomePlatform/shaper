@@ -92,6 +92,7 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
 
   aControlLay->addRow(myLabel, mySpinBox);
   connect(mySpinBox, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
+  mySpinBox->setValueEnabled(isValueEnabled());
 }
 
 ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()

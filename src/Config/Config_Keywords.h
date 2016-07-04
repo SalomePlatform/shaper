@@ -88,6 +88,7 @@ const static char* DOUBLE_WDG_MAX = "max";
 const static char* DOUBLE_WDG_STEP = "step";
 const static char* DOUBLE_WDG_DEFAULT_COMPUTED = "computed";
 const static char* DOUBLE_WDG_ACCEPT_EXPRESSIONS = "accept_expressions";
+const static char* DOUBLE_WDG_ENABLE_VALUE = "enable_value";
 // WDG_TOOLBOX/WDG_SWITCH properties
 const static char* CONTAINER_PAGE_NAME = "title";
 const static char* CONTAINER_PAGE_ICON = "icon";

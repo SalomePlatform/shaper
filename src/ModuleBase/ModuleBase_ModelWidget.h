@@ -75,6 +75,11 @@ Q_OBJECT
   /// \return the boolean result
   bool isObligatory() const { return myIsObligatory; }
 
+  /// Returns true, if the widget value is enabled and might be modified manualy. It returns false if
+  /// the application preferences allow having disabled value and the internal state tells to disable
+  /// \return the boolean result
+  virtual bool isValueEnabled() const;
+
   /// Returns this parameter value in the xml file
   /// \return the boolean result
   bool isUseReset() const { return myUseReset; }
@@ -309,6 +314,9 @@ protected slots:
   /// Flag which shows whether current widget is obligatory
   /// The non-obligatory widgets should not accept the focus in the property panel
   bool myIsObligatory;
+
+  /// Flag about value of the control is enabled (can be modified)
+  bool myIsValueEnabled;
 
   /// The widget value state
   ValueState myState;

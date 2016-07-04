@@ -11,6 +11,8 @@
 #include <QDoubleSpinBox>
 #include <QValidator>
 
+#include <QColor>
+
 class QKeyEvent;
 
 /**
@@ -54,6 +56,10 @@ Q_OBJECT
   /// \return the previous value
   bool enableKeyPressEvent(const bool& theEnable);
 
+  /// Imitation of disable control value. If theEnable is false, the control becomes
+  /// read only and base color is disabled. 
+  void setValueEnabled(const bool& theEnable);
+
 signals:
   /// The signal about key release on the control, that corresponds to the attribute
   void enterReleased();
@@ -80,6 +86,9 @@ signals:
 
   /// Precision value
   int myPrecision;
+
+  /// Cashed color of active base palette
+  QColor myEnabledBaseColor;
 };
 
 #endif

@@ -101,6 +101,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     aGroupLay->addWidget(myXSpin, 0, 1);
 
     connect(myXSpin, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
+    myXSpin->setValueEnabled(isValueEnabled());
   }
   {
     QLabel* aLabel = new QLabel(myGroupBox);
@@ -115,6 +116,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     aGroupLay->addWidget(myYSpin, 1, 1);
 
     connect(myYSpin, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
+    myYSpin->setValueEnabled(isValueEnabled());
   }
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);

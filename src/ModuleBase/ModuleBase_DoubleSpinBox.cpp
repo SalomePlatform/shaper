@@ -77,6 +77,8 @@ ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePr
 
   connect(lineEdit(), SIGNAL(textChanged( const QString& )), this,
           SLOT(onTextChanged( const QString& )));
+
+  myEnabledBaseColor = palette().color(QPalette::Active, QPalette::Base);
 }
 
 /*!
@@ -352,4 +354,14 @@ bool ModuleBase_DoubleSpinBox::enableKeyPressEvent(const bool& theEnable)
   myIsEmitKeyPressEvent = theEnable;
 
   return aPreviousValue;
+}
+
+void ModuleBase_DoubleSpinBox::setValueEnabled(const bool& theEnable)
+{
+  setReadOnly(!theEnable);
+  
+  QPalette aPal = palette();
+  aPal.setColor(QPalette::All, QPalette::Base,
+                theEnable? myEnabledBaseColor : aPal.color(QPalette::Disabled, QPalette::Base));
+  setPalette(aPal);
 }

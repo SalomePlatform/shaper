@@ -162,6 +162,10 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Config_PropManager::registerProp("Visualization", "operation_highlight_color",
                           "Multi selector item color in operation", Config_Prop::Color,
                           PartSet_CustomPrs::OPERATION_HIGHLIGHT_COLOR());
+
+
+  Config_PropManager::registerProp("Sketch planes", "disable_input_fields", "Disable input fields",
+                          Config_Prop::Boolean, "true");
 }
 
 PartSet_Module::~PartSet_Module()
