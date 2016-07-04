@@ -17,11 +17,14 @@ ModuleBase_ToolBox::ModuleBase_ToolBox( QWidget* theParent )
   : QFrame( theParent )
 {
   QVBoxLayout* aMainLayout = new QVBoxLayout( this );
-  aMainLayout->setMargin( 0 );
-  aMainLayout->setSpacing( 0 );
+  aMainLayout->setMargin(0);
+  aMainLayout->setSpacing(2);
 
   myButtonsFrame = new QFrame( this );
+
   myStack = new QStackedWidget( this );
+  myStack->setFrameStyle(QFrame::Box | QFrame::Raised);
+
   aMainLayout->addWidget( myButtonsFrame, 0 );
   aMainLayout->addWidget( myStack, 1 );
 
