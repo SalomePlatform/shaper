@@ -23,7 +23,6 @@ ModuleBase_ToolBox::ModuleBase_ToolBox( QWidget* theParent )
   myButtonsFrame = new QFrame( this );
 
   myStack = new QStackedWidget( this );
-  myStack->setFrameStyle(QFrame::Box | QFrame::Raised);
 
   aMainLayout->addWidget( myButtonsFrame, 0 );
   aMainLayout->addWidget( myStack, 1 );
