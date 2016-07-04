@@ -40,6 +40,10 @@ Q_OBJECT
                      ModifiedInViewer, /// modification performed by viewer events
                      Reset }; /// the value is reset
 
+   enum EnableState { On,  /// the widget value is always enabled
+                      Off, /// the widget value is always disabled
+                      DefinedInPreferences }; /// the widget value enable state is defined in preferences
+
   /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuration. The attribute of the model widget is obtained from
@@ -316,7 +320,7 @@ protected slots:
   bool myIsObligatory;
 
   /// Flag about value of the control is enabled (can be modified)
-  bool myIsValueEnabled;
+  EnableState myIsValueEnabled;
 
   /// The widget value state
   ValueState myState;

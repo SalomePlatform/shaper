@@ -54,7 +54,12 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
   myAttributeID = theData ? theData->widgetId() : "";
   myIsObligatory = theData->getBooleanAttribute(ATTR_OBLIGATORY, true);
 
-  myIsValueEnabled = theData->getBooleanAttribute(DOUBLE_WDG_ENABLE_VALUE, true);
+  myIsValueEnabled = On; // not defined or "true"
+  std::string anEnableValue = theData->getProperty(DOUBLE_WDG_ENABLE_VALUE);
+  if (anEnableValue == "false")
+    myIsValueEnabled = Off;
+  if (anEnableValue == DOUBLE_WDG_ENABLE_VALUE_BY_PREFERENCES)
+    myIsValueEnabled = DefinedInPreferences;
 
   connect(this, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
   connect(this, SIGNAL(valuesModified()), this, SLOT(onWidgetValuesModified()));
@@ -84,9 +89,13 @@ bool ModuleBase_ModelWidget::isInitialized(ObjectPtr theObject) const
 bool ModuleBase_ModelWidget::isValueEnabled() const
 {
   bool anEnabled = true;
-  bool aCanDisable = Config_PropManager::boolean("Sketch planes", "disable_input_fields", "true");
-  if (aCanDisable)
-    anEnabled = myIsValueEnabled;
+  if (myIsValueEnabled == DefinedInPreferences) {
+    bool aCanDisable = Config_PropManager::boolean("Sketch planes", "disable_input_fields", "true");
+    if (aCanDisable)
+      anEnabled = false;
+  }
+  else if (myIsValueEnabled == Off)
+    anEnabled = false;
   return anEnabled;
 }
 

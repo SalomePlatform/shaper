@@ -89,6 +89,9 @@ const static char* DOUBLE_WDG_STEP = "step";
 const static char* DOUBLE_WDG_DEFAULT_COMPUTED = "computed";
 const static char* DOUBLE_WDG_ACCEPT_EXPRESSIONS = "accept_expressions";
 const static char* DOUBLE_WDG_ENABLE_VALUE = "enable_value";
+
+const static char* DOUBLE_WDG_ENABLE_VALUE_BY_PREFERENCES = "enable_by_preferences";
+
 // WDG_TOOLBOX/WDG_SWITCH properties
 const static char* CONTAINER_PAGE_NAME = "title";
 const static char* CONTAINER_PAGE_ICON = "icon";

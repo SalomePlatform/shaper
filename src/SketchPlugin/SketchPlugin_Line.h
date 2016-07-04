@@ -40,6 +40,13 @@ class SketchPlugin_Line : public SketchPlugin_SketchEntity
     return MY_END_ID;
   }
 
+  /// Line length.
+  static const std::string& LENGTH_ID()
+  {
+    static const std::string MY_LENGTH("LineLength");
+    return MY_LENGTH;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind();
 
@@ -63,6 +70,10 @@ class SketchPlugin_Line : public SketchPlugin_SketchEntity
 
   /// Use plugin manager for features creation
   SketchPlugin_Line();
+
+private:
+  /// Calculates the lenght of the line and fill the lenght attribute with the value
+  void updateLenghtValue();
 
 protected:
   /// \brief Initializes attributes of derived class.
