@@ -113,19 +113,19 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
     return;
   }
 
-  FeaturePtr aFeature;
+  FeaturePtr anOriginal, aFeature;
   std::list<ObjectPtr> anObjectList = aRefList->list();
   std::list<ObjectPtr>::iterator anObjIt = anObjectList.begin();
   while (anObjIt != anObjectList.end()) {
-    aFeature = ModelAPI_Feature::feature(*anObjIt++);
-    if (!aFeature)
+    anOriginal = ModelAPI_Feature::feature(*anObjIt++);
+    if (!anOriginal)
       continue;
 
     // Fill lists of coordinates of points composing a feature
     std::list<double> aX, aY;
     std::list<double>::iterator aXIt, aYIt;
     double aXCoord, aYCoord;
-    EntityWrapperPtr anEntity = myStorage->entity(aFeature);
+    EntityWrapperPtr anEntity = myStorage->entity(anOriginal);
     std::list<EntityWrapperPtr> aSubs = anEntity->subEntities();
     std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
     for (; aSIt != aSubs.end(); ++aSIt) {
@@ -157,9 +157,12 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
       } else if (aFeature->getKind() == SketchPlugin_Line::ID()) {
         aPoints.push_back(aFeature->attribute(SketchPlugin_Line::START_ID()));
         aPoints.push_back(aFeature->attribute(SketchPlugin_Line::END_ID()));
-      } else if (aFeature->getKind() == SketchPlugin_Circle::ID())
+      } else if (aFeature->getKind() == SketchPlugin_Circle::ID()) {
         aPoints.push_back(aFeature->attribute(SketchPlugin_Circle::CENTER_ID()));
-      else if (aFeature->getKind() == SketchPlugin_Point::ID() ||
+        // update circle's radius
+        aFeature->real(SketchPlugin_Circle::RADIUS_ID())->setValue(
+            anOriginal->real(SketchPlugin_Circle::RADIUS_ID())->value());
+      } else if (aFeature->getKind() == SketchPlugin_Point::ID() ||
                aFeature->getKind() == SketchPlugin_IntersectionPoint::ID())
         aPoints.push_back(aFeature->attribute(SketchPlugin_Point::COORD_ID()));
 
