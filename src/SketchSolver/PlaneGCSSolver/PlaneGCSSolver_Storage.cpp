@@ -76,6 +76,8 @@ bool PlaneGCSSolver_Storage::update(ConstraintWrapperPtr theConstraint)
           anIt = myConstraintMap.begin();
       for (; anIt != myConstraintMap.end(); ++anIt) {
         EntityWrapperPtr aPoint, aLine;
+        if (anIt->second.empty())
+          continue;
         ConstraintWrapperPtr aCurrentConstr = anIt->second.front();
         if (aCurrentConstr->type() != CONSTRAINT_PT_ON_LINE)
           continue;

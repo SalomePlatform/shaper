@@ -557,7 +557,6 @@ void SketchSolver_Manager::degreesOfFreedom()
     aDoFDelta[SketchPlugin_ConstraintEqual::ID()] = -1;
     aDoFDelta[SketchPlugin_ConstraintHorizontal::ID()] = -1;
     aDoFDelta[SketchPlugin_ConstraintLength::ID()] = -1;
-    aDoFDelta[SketchPlugin_ConstraintMiddle::ID()] = -1;
     aDoFDelta[SketchPlugin_ConstraintParallel::ID()] = -1;
     aDoFDelta[SketchPlugin_ConstraintPerpendicular::ID()] = -1;
     aDoFDelta[SketchPlugin_ConstraintRadius::ID()] = -1;
@@ -593,6 +592,7 @@ void SketchSolver_Manager::degreesOfFreedom()
       continue;
 
     std::set<AttributePtr> aCoincidentPoints;
+    std::map<AttributePtr, std::set<FeaturePtr> > aPointOnLine;
     std::list<std::set<AttributePtr> > aPointsInMultiConstraints;
     int aDoF = 0;
     int aNbSubs = aSketch->numberOfSubs();
@@ -608,19 +608,22 @@ void SketchSolver_Manager::degreesOfFreedom()
       // DoF delta in specific cases
       if (aFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
         AttributePtr aCoincPoint[2] = {AttributePtr(), AttributePtr()};
+        FeaturePtr aCoincLine;
         for (int j = 0; j < 2; ++j) {
           AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
               aFeature->attribute(SketchPlugin_Constraint::ATTRIBUTE(j)));
           if (!aRefAttr)
             continue;
-          bool isPoint = !aRefAttr->isObject();
-          if (isPoint)
+          if (!aRefAttr->isObject())
             aCoincPoint[j] = aRefAttr->attr();
           else {
             FeaturePtr anAttr = ModelAPI_Feature::feature(aRefAttr->object());
-            isPoint = anAttr && anAttr->getKind() == SketchPlugin_Point::ID();
-            if (isPoint)
+            if (!anAttr)
+              continue;
+            if (anAttr->getKind() == SketchPlugin_Point::ID())
               aCoincPoint[j] = anAttr->attribute(SketchPlugin_Point::COORD_ID());
+            else if (anAttr->getKind() == SketchPlugin_Line::ID())
+              aCoincLine = anAttr;
           }
         }
         if (aCoincPoint[0] && aCoincPoint[1]) {
@@ -639,11 +642,48 @@ void SketchSolver_Manager::degreesOfFreedom()
             if (isFound[0] && isFound[1])
               break;
           }
-        } else 
+        } else {
           aDoF -= 1;
+          if (aCoincPoint[0] && aCoincLine) {
+            // if the point is already coincident to a line (by middle point constraint), do not decrease DoF
+            std::map<AttributePtr, std::set<FeaturePtr> >::iterator
+                aPtFound = aPointOnLine.find(aCoincPoint[0]);
+            if (aPtFound != aPointOnLine.end() &&
+                aPtFound->second.find(aCoincLine) != aPtFound->second.end())
+              aDoF += 1; // restore value decreased above
+            else
+              aPointOnLine[aCoincPoint[0]].insert(aCoincLine);
+          }
+        }
         for (int j = 0; j < 2; ++j)
           if (aCoincPoint[j])
             aCoincidentPoints.insert(aCoincPoint[j]);
+      }
+      else if (aFeature->getKind() == SketchPlugin_ConstraintMiddle::ID()) {
+        AttributePtr aPoint;
+        FeaturePtr aLine;
+        for (int j = 0; j < 2; ++j) {
+          AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+              aFeature->attribute(SketchPlugin_Constraint::ATTRIBUTE(j)));
+          if (!aRefAttr)
+            continue;
+          if (aRefAttr->isObject())
+            aLine = ModelAPI_Feature::feature(aRefAttr->object());
+          else
+            aPoint = aRefAttr->attr();
+        }
+        if (aPoint && aLine) {
+          // if the point is already on the line, decrease 1 DoF, instead decrease 2 DoF
+          std::map<AttributePtr, std::set<FeaturePtr> >::iterator
+              aPtFound = aPointOnLine.find(aPoint);
+          if (aPtFound != aPointOnLine.end() &&
+              aPtFound->second.find(aLine) != aPtFound->second.end())
+            aDoF -= 1;
+          else {
+            aDoF -= 2;
+            aPointOnLine[aPoint].insert(aLine);
+          }
+        }
       }
       else if (aFeature->getKind() == SketchPlugin_ConstraintRigid::ID()) {
         AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
