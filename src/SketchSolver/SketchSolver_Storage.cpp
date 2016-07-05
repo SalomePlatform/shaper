@@ -254,7 +254,7 @@ bool SketchSolver_Storage::update(AttributePtr theAttribute, const GroupID& theG
     GroupID aGroup = theGroup != GID_UNKNOWN ? theGroup : myGroupID;
     // Check attribute of external features
     std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
-        std::dynamic_pointer_cast<SketchPlugin_Feature>(theAttribute->owner());
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(anAttribute->owner());
     if (aSketchFeature && (aSketchFeature->isExternal() || isCopyInMulti(aSketchFeature, myConstraintMap)))
       aGroup = GID_OUTOFGROUP;
     aRelated = aBuilder->createAttribute(anAttribute, aGroup);

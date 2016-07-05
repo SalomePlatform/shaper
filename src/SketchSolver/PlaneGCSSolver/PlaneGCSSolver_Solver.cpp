@@ -79,7 +79,7 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
   // solve equations
   if (aResult == GCS::Success)
     aResult = (GCS::SolveStatus)myEquationSystem.solve(myParameters);
-  if (aResult == GCS::Success) {
+  if (aResult == GCS::Success || aResult == GCS::Converged) {
     // additionally check redundant constraints
     GCS::VEC_I aRedundantID;
     myEquationSystem.getRedundant(aRedundantID);
@@ -102,6 +102,8 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
     // Need to check if there are redundant constraints without these tangencies.
     if (!aRedundantID.empty())
       aResult = myTangent.empty() ? GCS::Failed : (GCS::SolveStatus)solveWithoutTangent();
+    else
+      aResult = GCS::Success;
   }
   Events_LongOp::end(this);
 

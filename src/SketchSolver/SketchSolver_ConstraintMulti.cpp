@@ -179,6 +179,13 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
       // update feature in the storage if it is used by another constraints
       if (anEntity)
         myStorage->update(aFeature);
+      else { // update attributes, if they exist in the storage
+        for (aPtIt = aPoints.begin(); aPtIt != aPoints.end(); ++aPtIt) {
+          EntityWrapperPtr aPntEnt = myStorage->entity(*aPtIt);
+          if (aPntEnt)
+            myStorage->update(*aPtIt);
+        }
+      }
 
       if (!anEntity || !myStorage->isEventsBlocked())
         aFeature->data()->blockSendAttributeUpdated(false);
@@ -192,4 +199,20 @@ bool SketchSolver_ConstraintMulti::isUsed(FeaturePtr theFeature) const
 {
   return myFeatures.find(theFeature) != myFeatures.end() ||
          SketchSolver_Constraint::isUsed(theFeature);
+}
+
+bool SketchSolver_ConstraintMulti::isUsed(AttributePtr theAttribute) const
+{
+  AttributePtr anAttribute = theAttribute;
+  AttributeRefAttrPtr aRefAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
+  if (aRefAttr) {
+    if (aRefAttr->isObject())
+      return isUsed(ModelAPI_Feature::feature(aRefAttr->object()));
+    else
+      anAttribute = aRefAttr->attr();
+  }
+
+  FeaturePtr anOwner = ModelAPI_Feature::feature(anAttribute->owner());
+  return myFeatures.find(anOwner) != myFeatures.end();
 }

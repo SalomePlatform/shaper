@@ -130,8 +130,21 @@ bool SketchSolver_Group::isInteract(FeaturePtr theFeature) const
   ConstraintConstraintMap::const_iterator anIt = myConstraints.begin();
   for (; !isInteracted && anIt != myConstraints.end(); ++anIt)
     if (anIt->first->getKind() == SketchPlugin_MultiRotation::ID() ||
-        anIt->first->getKind() == SketchPlugin_MultiTranslation::ID())
+        anIt->first->getKind() == SketchPlugin_MultiTranslation::ID()) {
       isInteracted = anIt->second->isUsed(theFeature);
+      if (isInteracted)
+        break;
+      // if theFeature is a constraint, check its attributes
+      ConstraintPtr aConstraint = std::dynamic_pointer_cast<SketchPlugin_Constraint>(theFeature);
+      if (!aConstraint)
+        continue;
+      for (int i = 0; i < 4 && !isInteracted; ++i) {
+        AttributeRefAttrPtr aRefAttr = aConstraint->refattr(aConstraint->ATTRIBUTE(i));
+        if (!aRefAttr)
+          continue;
+        isInteracted = anIt->second->isUsed(aRefAttr);
+      }
+    }
   return isInteracted;
 }
 
@@ -374,8 +387,12 @@ bool SketchSolver_Group::resolveConstraints()
       return false;
     }
     if (aResult == STATUS_OK || aResult == STATUS_EMPTYSET) {  // solution succeeded, store results into correspondent attributes
+      myStorage->setNeedToResolve(false);
       myStorage->refresh();
       updateMultiConstraints(myConstraints);
+      if (myStorage->isNeedToResolve()) // multi-constraints updated some parameters, need to store them
+        myStorage->refresh();
+
       if (myPrevResult != STATUS_OK || myPrevResult == STATUS_UNKNOWN) {
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
         std::set<ObjectPtr> aConflicting = myConflictingConstraints;

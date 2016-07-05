@@ -39,6 +39,8 @@ public:
 
   /// \brief Check the feature is a source or a copy of Multi-constraint
   virtual bool isUsed(FeaturePtr theFeature) const;
+  /// \brief Check the attribute is used in Multi-constraint
+  virtual bool isUsed(AttributePtr theAttribute) const;
 
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
