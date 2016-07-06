@@ -8,6 +8,7 @@
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Face.h>
+#include <GeomAPI_Lin.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Shape.h>
@@ -16,7 +17,9 @@
 #include <BRep_Tool.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <GCPnts_AbscissaPoint.hxx>
+#include <Geom_Line.hxx>
 #include <GeomAdaptor_Curve.hxx>
+#include <GeomAPI_ExtremaCurveCurve.hxx>
 #include <gp_Pln.hxx>
 #include <gp_Pnt.hxx>
 #include <TopoDS.hxx>
@@ -65,8 +68,10 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexOnEdge(const std
                                                                        const bool theIsPercent,
                                                                        const bool theIsReverse)
 {
+  std::shared_ptr<GeomAPI_Vertex> aVertex;
+
   if(!theEdge.get()) {
-    return NULL;
+    return aVertex;
   }
 
   double aValue = theValue;
@@ -78,7 +83,6 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexOnEdge(const std
   Standard_Real aUFirst, aULast;
   Handle(Geom_Curve) anEdgeCurve = BRep_Tool::Curve(anEdge, aUFirst, aULast);
 
-  std::shared_ptr<GeomAPI_Vertex> aVertex;
   if(!anEdgeCurve.IsNull() ) {
     Handle(Geom_Curve) aReOrientedCurve = anEdgeCurve;
 
@@ -106,8 +110,10 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexByProjection(
     const std::shared_ptr<GeomAPI_Vertex> theVertex,
     const std::shared_ptr<GeomAPI_Face> thePlane)
 {
+  std::shared_ptr<GeomAPI_Vertex> aVertex;
+
   if(!theVertex.get() || !thePlane.get() || !thePlane->isPlanar()) {
-    return NULL;
+    return aVertex;
   }
 
   std::shared_ptr<GeomAPI_Pnt> aGeomPnt = theVertex->point();
@@ -126,5 +132,48 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexByProjection(
   double aDistance = aPln.Distance(aPnt);
   aPnt.Translate(gp_Vec(aPlnNorm) * aDistance);
 
-  return std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex(aPnt.X(), aPnt.Y(), aPnt.Z()));
+  aVertex.reset(new GeomAPI_Vertex(aPnt.X(), aPnt.Y(), aPnt.Z()));
+
+  return aVertex;
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexByIntersection(
+    const std::shared_ptr<GeomAPI_Edge> theEdge1,
+    const std::shared_ptr<GeomAPI_Edge> theEdge2)
+{
+  std::shared_ptr<GeomAPI_Vertex> aVertex;
+
+  if(!theEdge1.get() || !theEdge2.get() || !theEdge1->isLine() || !theEdge2->isLine()) {
+    return aVertex;
+  }
+
+  gp_Lin aLin1 = theEdge1->line()->impl<gp_Lin>();
+  gp_Lin aLin2 = theEdge2->line()->impl<gp_Lin>();
+
+  if(aLin1.Distance(aLin2) > Precision::Confusion()) {
+    return aVertex;
+  }
+
+  Handle(Geom_Line) aLine1 = new Geom_Line(aLin1);
+  Handle(Geom_Line) aLine2 = new Geom_Line(aLin2);
+
+  GeomAPI_ExtremaCurveCurve anExtrema(aLine1, aLine2);
+
+  Standard_Integer aNbExtrema = anExtrema.NbExtrema();
+
+  if(aNbExtrema == 0) {
+    return aVertex;
+  }
+
+  gp_Pnt aPnt1, aPnt2;
+  for(Standard_Integer anIndex = 1; anIndex <= aNbExtrema; ++anIndex) {
+    if(anExtrema.Distance(anIndex) <= Precision::Confusion()) {
+      anExtrema.Points(anIndex, aPnt1, aPnt2);
+    }
+  }
+
+  aVertex.reset(new GeomAPI_Vertex(aPnt1.X(), aPnt1.Y(), aPnt1.Z()));
+
+  return aVertex;
 }

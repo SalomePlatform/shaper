@@ -48,6 +48,13 @@ public:
   static std::shared_ptr<GeomAPI_Vertex> vertexByProjection(const std::shared_ptr<GeomAPI_Vertex> theVertex,
                                                             const std::shared_ptr<GeomAPI_Face> thePlane);
 
+  /// \brief Creates vertex by intersection two coplanar lines.
+  /// \param[in] theEdge1 first linear edge.
+  /// \param[in] theEdge2 second linear edge.
+  /// \return created vertex.
+  static std::shared_ptr<GeomAPI_Vertex> vertexByIntersection(const std::shared_ptr<GeomAPI_Edge> theEdge1,
+                                                              const std::shared_ptr<GeomAPI_Edge> theEdge2);
+
   /// Return point by shape vertex
   static std::shared_ptr<GeomAPI_Pnt> point(const std::shared_ptr<GeomAPI_Shape> theVertex);
 };
