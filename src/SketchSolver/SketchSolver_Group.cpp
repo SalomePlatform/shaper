@@ -142,7 +142,7 @@ bool SketchSolver_Group::isInteract(FeaturePtr theFeature) const
         AttributeRefAttrPtr aRefAttr = aConstraint->refattr(aConstraint->ATTRIBUTE(i));
         if (!aRefAttr)
           continue;
-        isInteracted = anIt->second->isUsed(aRefAttr);
+        isInteracted = anIt->second->isUsed((AttributePtr)aRefAttr);
       }
     }
   return isInteracted;
