@@ -227,5 +227,7 @@ bool GeomAPI_Edge::isInPlane(std::shared_ptr<GeomAPI_Pln> thePlane) const
 double GeomAPI_Edge::length() const
 {
   const TopoDS_Edge& anEdge = TopoDS::Edge(impl<TopoDS_Shape>());
-  return GCPnts_AbscissaPoint::Length(BRepAdaptor_Curve(anEdge));
+  BRepAdaptor_Curve aBRepAdaptor = BRepAdaptor_Curve(anEdge);
+  Adaptor3d_Curve* anAdaptor3d = &aBRepAdaptor;
+  return GCPnts_AbscissaPoint::Length(*anAdaptor3d);
 }
