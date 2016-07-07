@@ -77,7 +77,7 @@ aPlaneTop.execute()
 #The face should be at 1.6, so the plane should be at 1.6 + 0.4 = 2.
 aRefPlaneTopLocation = 2.
 
-#location() is a method from GeomAPI_Face that returns a GeomAPI_Pnt, from which we can extract the z coordinate 
+#location() is a method from GeomAPI_Face that returns a GeomAPI_Pnt, from which we can extract the z coordinate
 aPlaneTopResult = aPlaneTop.firstResult()
 aPlaneTopFace = GeomAPI_Face(aPlaneTopResult.shape())
 aPlaneTestLocation = aPlaneTopFace.getPlane()
@@ -97,9 +97,11 @@ aPoint1 = aPart.addFeature("Point")
 aPoint2 = aPart.addFeature("Point")
 assert(aPoint1.getKind() == "Point")
 assert(aPoint2.getKind() == "Point")
+aPoint1.string("creation_method").setValue("by_xyz")
 aPoint1.real("x").setValue(2.0)
 aPoint1.real("y").setValue(2.0)
 aPoint1.real("z").setValue(2.0)
+aPoint2.string("creation_method").setValue("by_xyz")
 aPoint2.real("x").setValue(2.5)
 aPoint2.real("y").setValue(2.5)
 aPoint2.real("z").setValue(2.5)
@@ -119,7 +121,7 @@ aBoxBy2Pts.execute()
 
 # Check box volume
 aBoxResult2 = modelAPI_ResultBody(aBoxBy2Pts.firstResult())
-aRefVolume2 = 0.5 * 0.5 * 0.5 
+aRefVolume2 = 0.5 * 0.5 * 0.5
 aResVolume2 = GeomAlgoAPI_ShapeTools_volume(aBoxResult2.shape())
 assert (math.fabs(aResVolume2 - aRefVolume2) < 10 ** -5)
 
