@@ -15,6 +15,7 @@
 #include <list>
 #include <memory>
 #include <map>
+#include <string>
 
 /// \class GeomAlgoAPI_MakeShape
 /// \ingroup DataAlgo

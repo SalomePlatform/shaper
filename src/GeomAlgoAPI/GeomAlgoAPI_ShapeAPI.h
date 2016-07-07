@@ -5,7 +5,7 @@
 // Author:      Clarisse Genrault (CEA)
 
 #ifndef GEOMALGOAPI_SHAPEAPI_H
-#define GEOMALGOAPI_SHAPERAPI_H
+#define GEOMALGOAPI_SHAPEAPI_H
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Pnt.h>
