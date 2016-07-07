@@ -105,3 +105,16 @@ const std::shared_ptr<GeomAPI_Pnt> GeomAPI_Lin::project(
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aResult.X(), aResult.Y(), aResult.Z()));
 }
 
+bool GeomAPI_Lin::isParallel(const std::shared_ptr<GeomAPI_Lin> theLin) const
+{
+  return MY_LIN->Direction().IsParallel(theLin->impl<gp_Lin>().Direction(), Precision::Confusion()) == Standard_True;
+}
+
+bool GeomAPI_Lin::isCoplanar(const std::shared_ptr<GeomAPI_Lin> theLin) const
+{
+  if(MY_LIN->SquareDistance(theLin->impl<gp_Lin>()) > Precision::Confusion()) {
+    return false;
+  }
+
+  return true;
+}

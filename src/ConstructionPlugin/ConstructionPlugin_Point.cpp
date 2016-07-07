@@ -46,6 +46,9 @@ void ConstructionPlugin_Point::initAttributes()
 
   data()->addAttribute(POINT(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(PLANE(), ModelAPI_AttributeSelection::typeId());
+
+  data()->addAttribute(FIRST_LINE(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(SECOND_LINE(), ModelAPI_AttributeSelection::typeId());
 }
 
 //==================================================================================================
@@ -60,6 +63,8 @@ void ConstructionPlugin_Point::execute()
     aShape = createByDistanceOnEdge();
   } else if(aCreationMethod == CREATION_METHOD_BY_PROJECTION()) {
     aShape = createByProjection();
+  } else if(aCreationMethod == CREATION_METHOD_BY_LINES_INTERSECTION()) {
+    aShape = createByIntersection();
   }
 
   if(aShape.get()) {
@@ -129,4 +134,26 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByProjection()
   std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aPlaneShape));
 
   return GeomAlgoAPI_PointBuilder::vertexByProjection(aVertex, aFace);
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByIntersection()
+{
+  // Get first line.
+  AttributeSelectionPtr aFirstLineSelection= selection(FIRST_LINE());
+  GeomShapePtr aFirstLineShape = aFirstLineSelection->value();
+  if(!aFirstLineShape.get()) {
+    aFirstLineShape = aFirstLineSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Edge> aFirstEdge(new GeomAPI_Edge(aFirstLineShape));
+
+  // Get first line.
+  AttributeSelectionPtr aSecondLineSelection= selection(SECOND_LINE());
+  GeomShapePtr aSecondLineShape = aSecondLineSelection->value();
+  if(!aSecondLineShape.get()) {
+    aSecondLineShape = aSecondLineSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Edge> aSecondEdge(new GeomAPI_Edge(aSecondLineShape));
+
+  return GeomAlgoAPI_PointBuilder::vertexByIntersection(aFirstEdge, aSecondEdge);
 }

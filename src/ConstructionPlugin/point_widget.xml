@@ -67,5 +67,26 @@
         <validator id="GeomValidators_Face" parameters="plane"/>
       </shape_selector>
     </box>
+    <box id="by_lines_intersection"
+         title="By intersection"
+         tooltip="Point by intersection of two coplanar lines."
+         icon="icons/Construction/point_by_lines_intersection_32x32.png">
+      <shape_selector id="first_line"
+                      label="First line"
+                      tooltip="First line."
+                      icon="icons/Construction/point.png"
+                      shape_types="edge">
+        <validator id="GeomValidators_ShapeType" parameters="line"/>
+        <validator id="ConstructionPlugin_ValidatorPointLines" parameters="second_line"/>
+      </shape_selector>
+      <shape_selector id="second_line"
+                      label="Second line"
+                      tooltip="Second line."
+                      icon="icons/Construction/point.png"
+                      shape_types="edge">
+        <validator id="GeomValidators_ShapeType" parameters="line"/>
+        <validator id="ConstructionPlugin_ValidatorPointLines" parameters="first_line"/>
+      </shape_selector>
+    </box>
   </toolbox>
 </source>

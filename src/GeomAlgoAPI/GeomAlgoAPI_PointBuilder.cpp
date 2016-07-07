@@ -148,32 +148,16 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexByIntersection(
     return aVertex;
   }
 
-  gp_Lin aLin1 = theEdge1->line()->impl<gp_Lin>();
-  gp_Lin aLin2 = theEdge2->line()->impl<gp_Lin>();
+  std::shared_ptr<GeomAPI_Lin> aLin1 = theEdge1->line();
+  std::shared_ptr<GeomAPI_Lin> aLin2 = theEdge2->line();
 
-  if(aLin1.Distance(aLin2) > Precision::Confusion()) {
+  std::shared_ptr<GeomAPI_Pnt> aPnt = aLin1->intersect(aLin2);
+
+  if(!aPnt.get()) {
     return aVertex;
   }
 
-  Handle(Geom_Line) aLine1 = new Geom_Line(aLin1);
-  Handle(Geom_Line) aLine2 = new Geom_Line(aLin2);
-
-  GeomAPI_ExtremaCurveCurve anExtrema(aLine1, aLine2);
-
-  Standard_Integer aNbExtrema = anExtrema.NbExtrema();
-
-  if(aNbExtrema == 0) {
-    return aVertex;
-  }
-
-  gp_Pnt aPnt1, aPnt2;
-  for(Standard_Integer anIndex = 1; anIndex <= aNbExtrema; ++anIndex) {
-    if(anExtrema.Distance(anIndex) <= Precision::Confusion()) {
-      anExtrema.Points(anIndex, aPnt1, aPnt2);
-    }
-  }
-
-  aVertex.reset(new GeomAPI_Vertex(aPnt1.X(), aPnt1.Y(), aPnt1.Z()));
+  aVertex.reset(new GeomAPI_Vertex(aPnt->x(), aPnt->y(), aPnt->z()));
 
   return aVertex;
 }

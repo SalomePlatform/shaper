@@ -59,6 +59,13 @@ public:
     return MY_CREATION_METHOD_ID;
   }
 
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_LINES_INTERSECTION()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_lines_intersection");
+    return MY_CREATION_METHOD_ID;
+  }
+
   /// Attribute name for X coordinate.
   inline static const std::string& X()
   {
@@ -122,6 +129,20 @@ public:
     return ATTR_ID;
   }
 
+  /// Attribute name for seleted first line.
+  inline static const std::string& FIRST_LINE()
+  {
+    static const std::string ATTR_ID("first_line");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for seleted second line.
+  inline static const std::string& SECOND_LINE()
+  {
+    static const std::string ATTR_ID("second_line");
+    return ATTR_ID;
+  }
+
   /// Creates a new part document if needed.
   CONSTRUCTIONPLUGIN_EXPORT virtual void execute();
 
@@ -142,6 +163,7 @@ private:
   std::shared_ptr<GeomAPI_Vertex> createByXYZ();
   std::shared_ptr<GeomAPI_Vertex> createByDistanceOnEdge();
   std::shared_ptr<GeomAPI_Vertex> createByProjection();
+  std::shared_ptr<GeomAPI_Vertex> createByIntersection();
 
 };
 

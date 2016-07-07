@@ -9,6 +9,7 @@ SET(PROJECT_HEADERS
     ConstructionPlugin_Point.h
     ConstructionPlugin_Axis.h
     ConstructionPlugin_Plane.h
+    ConstructionPlugin_Validators.h
 )
 
 SET(PROJECT_SOURCES
@@ -16,6 +17,7 @@ SET(PROJECT_SOURCES
     ConstructionPlugin_Point.cpp
     ConstructionPlugin_Axis.cpp
     ConstructionPlugin_Plane.cpp
+    ConstructionPlugin_Validators.cpp
 )
 
 SET(XML_RESOURCES
@@ -51,6 +53,7 @@ INCLUDE_DIRECTORIES(
   ../ModelAPI
   ../GeomAPI
   ../GeomAlgoAPI
+  ../Events
 )
 
 

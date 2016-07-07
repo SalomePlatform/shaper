@@ -53,6 +53,14 @@ class GeomAPI_Lin : public GeomAPI_Interface
   GEOMAPI_EXPORT 
   const std::shared_ptr<GeomAPI_Pnt> project(
       const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
+
+  /// \return true if lines are parallel.
+  GEOMAPI_EXPORT
+  bool isParallel(const std::shared_ptr<GeomAPI_Lin> theLin) const;
+
+  /// \return true if lines are coplanar.
+  GEOMAPI_EXPORT
+  bool isCoplanar(const std::shared_ptr<GeomAPI_Lin> theLin) const;
 };
 
 #endif
