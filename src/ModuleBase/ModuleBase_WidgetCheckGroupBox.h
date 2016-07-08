@@ -29,6 +29,10 @@ public:
   ModuleBase_WidgetCheckGroupBox(QWidget* theParent, const Config_WidgetAPI* theData);
   virtual ~ModuleBase_WidgetCheckGroupBox();
 
+  /// Defines if it is supported to set the value in this widget
+  /// \return false because this is an info widget
+  virtual bool canAcceptFocus() const { return false; };
+
   /// Set the title of the group box
   /// \param theTitle the text of the title
   void setTitle(const QString& theTitle);

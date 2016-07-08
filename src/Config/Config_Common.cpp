@@ -73,7 +73,7 @@ bool isWidgetNode(xmlNodePtr theNode)
   if(!isElementNode(theNode))
     return false;
   // it's parent is "feature" or "source" or a page ("box", "case")
-  if(!hasParent(theNode, NODE_FEATURE, NODE_SOURCE, WDG_GROUP,
+  if(!hasParent(theNode, NODE_FEATURE, NODE_SOURCE, WDG_GROUP, WDG_CHECK_GROUP,
                          WDG_TOOLBOX_BOX, WDG_SWITCH_CASE, NULL))
     return false;
 
@@ -87,7 +87,7 @@ bool isCaseNode(xmlNodePtr theNode)
   if(!isElementNode(theNode))
     return false;
 
-  return isNode(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, NULL);
+  return isNode(theNode, WDG_CHECK_GROUP, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, NULL);
 }
 
 bool hasChild(xmlNodePtr theNode)

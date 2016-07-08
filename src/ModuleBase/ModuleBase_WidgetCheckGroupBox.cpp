@@ -5,7 +5,7 @@
 // Author:      Natalia ERMOLAEVA
 
 #include <ModuleBase_WidgetCheckGroupBox.h>
-#include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeString.h>
 
 #include <Config_WidgetAPI.h>
 #include <Config_Keywords.h>
@@ -106,8 +106,9 @@ QLayout* ModuleBase_WidgetCheckGroupBox::pageLayout()
 bool ModuleBase_WidgetCheckGroupBox::storeValueCustom()
 {
   DataPtr aData = myFeature->data();
-  std::shared_ptr<ModelAPI_AttributeBoolean> aBool = aData->boolean(attributeID());
-  aBool->setValue(myGroupBox->isChecked());
+  AttributeStringPtr aStringAttr = aData->string(attributeID());
+  aStringAttr->setValue(myGroupBox->isChecked() ? attributeID() : "");
+
   updateObject(myFeature);
 
   return true;
@@ -116,10 +117,10 @@ bool ModuleBase_WidgetCheckGroupBox::storeValueCustom()
 bool ModuleBase_WidgetCheckGroupBox::restoreValueCustom()
 {
   DataPtr aData = myFeature->data();
-  std::shared_ptr<ModelAPI_AttributeBoolean> aRef = aData->boolean(attributeID());
+  AttributeStringPtr aStringAttr = aData->string(attributeID());
 
   bool isBlocked = myGroupBox->blockSignals(true);
-  myGroupBox->setChecked(aRef->value());
+  myGroupBox->setChecked(!aStringAttr->value().empty());
   myGroupBox->blockSignals(isBlocked);
 
   return true;

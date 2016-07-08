@@ -71,8 +71,14 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
         aMessage->setAttributeId(anAttributeID);
         aMessage->setObligatory(getBooleanAttribute(theNode, ATTR_OBLIGATORY, true));
         aMessage->setConcealment(getBooleanAttribute(theNode, ATTR_CONCEALMENT, false));
+        if (hasParentRecursive(theNode, WDG_CHECK_GROUP, NULL)) {
+          const char* kWdgCase = WDG_CHECK_GROUP;
+          const char* kWdgSwitch = WDG_CHECK_GROUP;
+          aMessage->setCaseId(restoreAttribute(kWdgCase, _ID));
+          aMessage->setSwitchId(restoreAttribute(kWdgSwitch, _ID));
+        }
         // nested "paged" widgets are not allowed, this issue may be resolved here:
-        if (hasParentRecursive(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, NULL)) {
+        else if (hasParentRecursive(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, NULL)) {
           const char* kWdgCase = hasParentRecursive(theNode, WDG_SWITCH_CASE, NULL)
                                  ? WDG_SWITCH_CASE
                                  : WDG_TOOLBOX_BOX;
@@ -85,7 +91,8 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
         Events_Loop::loop()->send(aMessage);
       }
     // container pages, like "case" or "box"
-    } else if (isNode(theNode, WDG_SWITCH, WDG_SWITCH_CASE, WDG_TOOLBOX, WDG_TOOLBOX_BOX, NULL)) {
+    } else if (isNode(theNode, WDG_CHECK_GROUP, WDG_SWITCH, WDG_SWITCH_CASE,
+                      WDG_TOOLBOX, WDG_TOOLBOX_BOX, NULL)) {
       storeAttribute(theNode, _ID); // save case:caseId (or box:boxId)
     }
   }
@@ -95,7 +102,8 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
 
 void Config_FeatureReader::cleanup(xmlNodePtr theNode)
 {
-  if (isNode(theNode, WDG_SWITCH, WDG_SWITCH_CASE, WDG_TOOLBOX, WDG_TOOLBOX_BOX, NULL)) {
+  if (isNode(theNode, WDG_CHECK_GROUP, WDG_SWITCH, WDG_SWITCH_CASE,
+             WDG_TOOLBOX, WDG_TOOLBOX_BOX, NULL)) {
     // cleanup id of cases when leave case node
     cleanupAttribute(theNode, _ID);
   }
