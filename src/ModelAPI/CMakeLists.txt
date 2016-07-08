@@ -131,4 +131,5 @@ ADD_UNIT_TESTS(TestConstants.py
                TestDocument.py
                Test1064.py
                TestResults.py
+               TestIntArray.py
                Test1512.py)
