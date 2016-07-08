@@ -8,6 +8,7 @@
 #include <Model_AttributeDocRef.h>
 #include <Model_AttributeInteger.h>
 #include <Model_AttributeDouble.h>
+#include <Model_AttributeDoubleArray.h>
 #include <Model_AttributeReference.h>
 #include <Model_AttributeRefAttr.h>
 #include <Model_AttributeRefList.h>
@@ -151,7 +152,9 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
     anAttr = new Model_AttributeRefAttrList(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeIntArray::typeId()) {
     anAttr = new Model_AttributeIntArray(anAttrLab);
-  } 
+  } else if (theAttrType == ModelAPI_AttributeDoubleArray::typeId()) {
+    anAttr = new Model_AttributeDoubleArray(anAttrLab);
+  }
   // create also GeomData attributes here because only here the OCAF structure is known
   else if (theAttrType == GeomData_Point::typeId()) {
     GeomData_Point* anAttribute = new GeomData_Point();
@@ -211,6 +214,7 @@ GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeRefAttr, refattr);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeRefList, reflist);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeRefAttrList, refattrlist);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeIntArray, intArray);
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeDoubleArray, realArray);
 
 std::shared_ptr<ModelAPI_Attribute> Model_Data::attribute(const std::string& theID)
 {

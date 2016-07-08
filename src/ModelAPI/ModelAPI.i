@@ -45,6 +45,7 @@
 %shared_ptr(ModelAPI_Attribute)
 %shared_ptr(ModelAPI_AttributeDocRef)
 %shared_ptr(ModelAPI_AttributeDouble)
+%shared_ptr(ModelAPI_AttributeDoubleArray)
 %shared_ptr(ModelAPI_AttributeInteger)
 %shared_ptr(ModelAPI_AttributeIntArray)
 %shared_ptr(ModelAPI_AttributeString)
@@ -78,6 +79,7 @@
 %include "ModelAPI_Attribute.h"
 %include "ModelAPI_AttributeDocRef.h"
 %include "ModelAPI_AttributeDouble.h"
+%include "ModelAPI_AttributeDoubleArray.h"
 %include "ModelAPI_AttributeInteger.h"
 %include "ModelAPI_AttributeIntArray.h"
 %include "ModelAPI_AttributeString.h"
@@ -100,7 +102,7 @@
 %include "ModelAPI_Tools.h"
 %include "ModelAPI_ResultCompSolid.h"
 
-// std::list -> [] 
+// std::list -> []
 %template(StringList) std::list<std::string>;
 %template(ObjectList) std::list<std::shared_ptr<ModelAPI_Object> >;
 %template(ResultList) std::list<std::shared_ptr<ModelAPI_Result> >;
@@ -126,6 +128,7 @@ template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr
 // Attribute casts
 %template(modelAPI_AttributeDocRef)        shared_ptr_cast<ModelAPI_AttributeDocRef, ModelAPI_Attribute>;
 %template(modelAPI_AttributeDouble)        shared_ptr_cast<ModelAPI_AttributeDouble, ModelAPI_Attribute>;
+%template(modelAPI_AttributeDoubleArray)   shared_ptr_cast<ModelAPI_AttributeDoubleArray, ModelAPI_Attribute>;
 %template(modelAPI_AttributeInteger)       shared_ptr_cast<ModelAPI_AttributeInteger, ModelAPI_Attribute>;
 %template(modelAPI_AttributeIntArray)      shared_ptr_cast<ModelAPI_AttributeIntArray, ModelAPI_Attribute>;
 %template(modelAPI_AttributeString)        shared_ptr_cast<ModelAPI_AttributeString, ModelAPI_Attribute>;

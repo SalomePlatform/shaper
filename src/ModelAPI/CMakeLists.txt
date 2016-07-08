@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
     ModelAPI_AttributeIntArray.h
     ModelAPI_AttributeDocRef.h
     ModelAPI_AttributeDouble.h
+    ModelAPI_AttributeDoubleArray.h
     ModelAPI_AttributeInteger.h
     ModelAPI_AttributeRefAttr.h
     ModelAPI_AttributeReference.h
@@ -50,6 +51,7 @@ SET(PROJECT_SOURCES
     ModelAPI_AttributeIntArray.cpp
     ModelAPI_AttributeDocRef.cpp
     ModelAPI_AttributeDouble.cpp
+    ModelAPI_AttributeDoubleArray.cpp
     ModelAPI_AttributeInteger.cpp
     ModelAPI_AttributeRefAttr.cpp
     ModelAPI_AttributeReference.cpp

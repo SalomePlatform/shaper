@@ -21,6 +21,7 @@
   #include "ModelAPI_Attribute.h"
   #include "ModelAPI_AttributeDocRef.h"
   #include "ModelAPI_AttributeDouble.h"
+  #include "ModelAPI_AttributeDoubleArray.h"
   #include "ModelAPI_AttributeInteger.h"
   #include "ModelAPI_AttributeIntArray.h"
   #include "ModelAPI_AttributeString.h"

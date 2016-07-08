@@ -86,6 +86,8 @@ class Model_Data : public ModelAPI_Data
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeDocRef> document(const std::string& theID);
   /// Returns the attribute that contains real value with double precision
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID);
+  /// Returns the attribute that contains double values array
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeDoubleArray> realArray(const std::string& theID);
   /// Returns the attribute that contains integer value
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeInteger>
     integer(const std::string& theID);

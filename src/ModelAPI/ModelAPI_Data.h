@@ -21,6 +21,7 @@ class ModelAPI_Attribute;
 class ModelAPI_AttributeDocRef;
 class ModelAPI_AttributeInteger;
 class ModelAPI_AttributeDouble;
+class ModelAPI_AttributeDoubleArray;
 class ModelAPI_AttributeReference;
 class ModelAPI_AttributeRefAttr;
 class ModelAPI_AttributeRefList;
@@ -65,6 +66,8 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual std::shared_ptr<ModelAPI_AttributeDocRef> document(const std::string& theID) = 0;
   /// Returns the attribute that contains real value with double precision
   virtual std::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID) = 0;
+  /// Returns the attribute that contains double values array
+  virtual std::shared_ptr<ModelAPI_AttributeDoubleArray> realArray(const std::string& theID) = 0;
   /// Returns the attribute that contains integer value
   virtual std::shared_ptr<ModelAPI_AttributeInteger> integer(const std::string& theID) = 0;
   /// Returns the attribute that contains reference to a feature
