@@ -197,8 +197,8 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
 
 bool SketchSolver_ConstraintMulti::isUsed(FeaturePtr theFeature) const
 {
-  return myFeatures.find(theFeature) != myFeatures.end() ||
-         SketchSolver_Constraint::isUsed(theFeature);
+  return theFeature && (myFeatures.find(theFeature) != myFeatures.end() ||
+         SketchSolver_Constraint::isUsed(theFeature));
 }
 
 bool SketchSolver_ConstraintMulti::isUsed(AttributePtr theAttribute) const
@@ -212,6 +212,8 @@ bool SketchSolver_ConstraintMulti::isUsed(AttributePtr theAttribute) const
     else
       anAttribute = aRefAttr->attr();
   }
+  if (!anAttribute)
+    return false;
 
   FeaturePtr anOwner = ModelAPI_Feature::feature(anAttribute->owner());
   return myFeatures.find(anOwner) != myFeatures.end();
