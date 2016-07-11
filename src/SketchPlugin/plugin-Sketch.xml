@@ -31,8 +31,9 @@
                                  enable_value="enable_by_preferences"/>
         <sketch-2dpoint_selector id="EndPoint" accept_expressions="0" title="End point" tooltip="End point coordinates"
                                  enable_value="enable_by_preferences"/>
+        <!--LINE_LENGHT_BLOCKED
         <doublevalue id="LineLength" accept_expressions="0" label="Length:" default="computed" icon="icons/Sketch/distance_value.png"
-                     tooltip="Line length" obligatory="0" enable_value="false"/>
+                     tooltip="Line length" obligatory="0" enable_value="false"/> -->
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
         <validator id="GeomValidators_Different" parameters="StartPoint,EndPoint"/>
       </feature>

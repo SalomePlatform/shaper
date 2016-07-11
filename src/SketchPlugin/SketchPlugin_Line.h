@@ -12,6 +12,7 @@
 #include <SketchPlugin_Sketch.h>
 #include <list>
 
+#define LINE_LENGHT_BLOCKED
 class GeomAPI_Pnt2d;
 
 /**\class SketchPlugin_Line
@@ -41,12 +42,13 @@ class SketchPlugin_Line : public SketchPlugin_SketchEntity
   }
 
   /// Line length.
+#ifndef LINE_LENGHT_BLOCKED
   static const std::string& LENGTH_ID()
   {
     static const std::string MY_LENGTH("LineLength");
     return MY_LENGTH;
   }
-
+#endif
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind();
 

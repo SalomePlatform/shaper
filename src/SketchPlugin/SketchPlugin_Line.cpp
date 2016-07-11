@@ -32,7 +32,9 @@ void SketchPlugin_Line::initDerivedClassAttributes()
   data()->addAttribute(START_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(END_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
+#ifndef LINE_LENGHT_BLOCKED
   data()->addAttribute(LENGTH_ID(), ModelAPI_AttributeDouble::typeId());
+#endif
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
 }
 
@@ -135,6 +137,7 @@ void SketchPlugin_Line::attributeChanged(const std::string& theID) {
 
 void SketchPlugin_Line::updateLenghtValue()
 {
+#ifndef LINE_LENGHT_BLOCKED
   std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(data()->attribute(START_ID()));
   std::shared_ptr<GeomDataAPI_Point2D> anEndAttr = std::dynamic_pointer_cast<
@@ -143,4 +146,5 @@ void SketchPlugin_Line::updateLenghtValue()
     double aDistance = aStartAttr->pnt()->distance(anEndAttr->pnt());
     data()->real(LENGTH_ID())->setValue(aDistance);
   }
+#endif
 }
