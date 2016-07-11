@@ -12,6 +12,8 @@
 #include <AIS_Dimension.hxx>
 #include <TCollection_ExtendedString.hxx>
 
+#define COMPILATION_CORRECTION
+
 // it is not possible to use 0x2211 as summ symbol because it is not supported by
 // debian Linux platform
 static const Standard_ExtCharacter MyEmptySymbol(' ');
@@ -101,6 +103,10 @@ void SketcherPrs_DimensionStyleListener::updateDimensions(AIS_Dimension* theDime
     sprintf (aFmtBuffer, aFormatStr.ToCString(), theDoubleValue);
     aCustomValue = TCollection_ExtendedString (aFmtBuffer);
   }
+#ifdef COMPILATION_CORRECTION
+  theDimension->SetCustomValue(theDoubleValue);
+#else
   theDimension->SetCustomValue(aCustomValue);
+#endif
 }
 
