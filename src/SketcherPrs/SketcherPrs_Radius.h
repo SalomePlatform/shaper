@@ -14,7 +14,7 @@
 #include <AIS_RadiusDimension.hxx>
 #include <Standard_DefineHandle.hxx>
 
-class SketcherPrs_DimensionStyleListener;
+#include <SketcherPrs_DimensionStyleListener.h>
 
 DEFINE_STANDARD_HANDLE(SketcherPrs_Radius, AIS_RadiusDimension)
 
@@ -48,12 +48,10 @@ private:
   /// \param thePlane a coordinate plane of current sketch
   /// \param theCircle a circle build on the constraint values
   /// \param thePoint an anchor point to show text value
-  /// \param theRadius a circle custom radius value to be visualized
   /// \return boolean result value
   static bool readyToDisplay(ModelAPI_Feature* theConstraint,
                              const std::shared_ptr<GeomAPI_Ax3>& thePlane,
-                             gp_Circ& theCircle, gp_Pnt& theAnchorPoint,
-                             double& theRadius);
+                             gp_Circ& theCircle, gp_Pnt& theAnchorPoint);
 protected:
   /// Redefinition of virtual function
   Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
@@ -76,9 +74,8 @@ private:
   /// container of values obtained from the constraint, which are necessary to fill the presentation
   gp_Circ myCircle; ///< the radius circle
   gp_Pnt myAnchorPoint; ///< an ancor for the radius value visualization
-  bool myHasParameters; ///< true if the atrribute value has used parameters
-  std::string myValue; ///< dimension value
-  double myRadius; ///< the radius custom value
+
+  SketcherPrs_DimensionStyleListener::DimensionValue myValue; /// the structure filled by constraint
 };
 
 #endif

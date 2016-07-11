@@ -27,7 +27,6 @@ SET(PROJECT_HEADERS
     SketcherPrs_Mirror.h
     SketcherPrs_Transformation.h
     SketcherPrs_Angle.h
-    AIS_AngleDimension_.hxx
 )
 
 SET(PROJECT_SOURCES
@@ -51,7 +50,6 @@ SET(PROJECT_SOURCES
     SketcherPrs_Mirror.cpp
     SketcherPrs_Transformation.cpp
     SketcherPrs_Angle.cpp
-    AIS_AngleDimension_.cxx
 )
 
 SET(PROJECT_LIBRARIES
@@ -91,7 +89,7 @@ SET(PROJECT_PICTURES
     icons/translate.png
 )
 
-ADD_DEFINITIONS(-DSKETCHERPRS_EXPORTS ${CAS_DEFINITIONS})
+ADD_DEFINITIONS(-DSKETCHERPRS_EXPORTS ${CAS_DEFINITIONS} -D_CRT_SECURE_NO_WARNINGS)
 ADD_LIBRARY(SketcherPrs SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
 
 INCLUDE_DIRECTORIES(

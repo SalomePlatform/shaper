@@ -27,15 +27,15 @@
 
 #define PI 3.1415926535897932
 
-IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension_);
-IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Angle, AIS_AngleDimension_);
+IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension);
+IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Angle, AIS_AngleDimension);
 
 SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint, 
                                      const std::shared_ptr<GeomAPI_Ax3>& thePlane)
-: AIS_AngleDimension_(gp_Pnt(0,0,0), gp_Pnt(1,0,0), gp_Pnt(0,1,0)), myConstraint(theConstraint),
+: AIS_AngleDimension(gp_Pnt(0,0,0), gp_Pnt(1,0,0), gp_Pnt(0,1,0)), myConstraint(theConstraint),
   mySketcherPlane(thePlane),
   myFirstPoint(gp_Pnt(0,0,0)), myCenterPoint(gp_Pnt(1,0,0)), mySecondPoint(gp_Pnt(0,1,0)),
-  myAngle(90), myValue("90"), myFlyOutPoint(0, 0.5, 0)
+  myValue(90., false, ""), myFlyOutPoint(0, 0.5, 0)
 {
   myAspect = new Prs3d_DimensionAspect();
   myAspect->MakeArrows3d(false);
@@ -143,11 +143,8 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
     myCenterPoint = aCenterPoint;
 
     DataPtr aData = myConstraint->data();
-    AttributeDoublePtr aVal = aData->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
-    myAngle = aVal->value();
-    myValue = aVal->text();
-
-    myHasParameters = aVal->usedParameters().size() > 0;
+    AttributeDoublePtr anAttributeValue = aData->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
+    myValue.init(anAttributeValue);
 
     std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
                                 std::dynamic_pointer_cast<GeomDataAPI_Point2D>
@@ -193,16 +190,13 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
     aDist = calculateDistanceToFlyoutPoint();
   SetFlyout(aDist);
 
-  // Angle value is in degrees
-  SetCustomValue(myAngle);
+  // Update text visualization: parameter value or parameter text
+  myStyleListener->updateDimensions(this, myValue);
 
   myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
   myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
 
-  // Update text visualization: parameter value or parameter text
-  myStyleListener->updateDimensions(this, myHasParameters, myValue);
-
-  AIS_AngleDimension_::Compute(thePresentationManager, thePresentation, theMode);
+  AIS_AngleDimension::Compute(thePresentationManager, thePresentation, theMode);
 
   if (!aReadyToDisplay)
     SketcherPrs_Tools::sendEmptyPresentationError(myConstraint,
@@ -232,7 +226,7 @@ void SketcherPrs_Angle::ComputeSelection(const Handle(SelectMgr_Selection)& aSel
     return; 
   }
   }
-  AIS_AngleDimension_::ComputeSelection(aSelection, aMode);
+  AIS_AngleDimension::ComputeSelection(aSelection, aMode);
 }
 
 bool SketcherPrs_Angle::isAnglePlaneReversedToSketchPlane()

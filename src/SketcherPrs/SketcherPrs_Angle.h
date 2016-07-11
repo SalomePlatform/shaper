@@ -11,18 +11,18 @@
 #include <GeomAPI_Ax3.h>
 #include <ModelAPI_Feature.h>
 
-#include <AIS_AngleDimension_.hxx>
+#include <AIS_AngleDimension.hxx>
 #include <Standard_DefineHandle.hxx>
 
-class SketcherPrs_DimensionStyleListener;
+#include <SketcherPrs_DimensionStyleListener.h>
 
-DEFINE_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension_)
+DEFINE_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension)
 
 /**
 * \ingroup GUI
 * A class for representation of angle constraint
 */
-class SketcherPrs_Angle : public AIS_AngleDimension_
+class SketcherPrs_Angle : public AIS_AngleDimension
 {
 public:
   /// Constructor
@@ -84,9 +84,8 @@ private:
   gp_Pnt mySecondPoint; ///< the dimension second point for measured geometry
   gp_Pnt myCenterPoint; ///< the dimension center point for measured geometry
   gp_Pnt myFlyOutPoint;  ///< the dimension fly out point for measured geometry
-  double myAngle; ///< the angle value to be shown as custom value of presentation
-  bool myHasParameters; ///< true if the atrribute value has used parameters
-  std::string myValue; ///< the angle value depending on angle type
+
+  SketcherPrs_DimensionStyleListener::DimensionValue myValue; /// the structure filled by constraint
 };
 
 

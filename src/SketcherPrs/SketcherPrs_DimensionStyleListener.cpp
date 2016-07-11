@@ -9,6 +9,30 @@
 
 #include <Events_Loop.h>
 
+#include <AIS_Dimension.hxx>
+#include <TCollection_ExtendedString.hxx>
+
+// it is not possible to use 0x2211 as summ symbol because it is not supported by
+// debian Linux platform
+static const Standard_ExtCharacter MyEmptySymbol(' ');
+static const Standard_ExtCharacter MySigmaSymbol('=');//0x03A3); // using equal instead of sigma
+
+SketcherPrs_DimensionStyleListener::DimensionValue::DimensionValue(double theDoubleValue,
+                                     bool theHasParameters, const std::string& theTextValue)
+: myDoubleValue(theDoubleValue),
+  myHasParameters(theHasParameters),
+  myTextValue(theTextValue)
+{
+}
+
+void SketcherPrs_DimensionStyleListener::DimensionValue::init(
+                                                const AttributeDoublePtr& theAttributeValue)
+{
+  myDoubleValue = theAttributeValue->value();
+  myHasParameters = theAttributeValue->usedParameters().size() > 0;
+  myTextValue = theAttributeValue->text();
+}
+
 SketcherPrs_DimensionStyleListener::SketcherPrs_DimensionStyleListener()
 {
   Events_Loop* aLoop = Events_Loop::loop();
@@ -34,29 +58,49 @@ void SketcherPrs_DimensionStyleListener::processEvent(const std::shared_ptr<Even
 }
 
 void SketcherPrs_DimensionStyleListener::updateDimensions(AIS_Dimension* theDimension,
-                                        const AttributeDoublePtr& theAttributeValue)
+          const SketcherPrs_DimensionStyleListener::DimensionValue& theDimensionValue)
 {
-  if (!theDimension || !theAttributeValue.get())
+  if (!theDimension)
     return;
-  updateDimensions(theDimension, theAttributeValue->usedParameters().size() > 0,
-                   theAttributeValue->text());
+  updateDimensions(theDimension, theDimensionValue.myHasParameters,
+                   theDimensionValue.myTextValue, theDimensionValue.myDoubleValue);
 }
 
 void SketcherPrs_DimensionStyleListener::updateDimensions(AIS_Dimension* theDimension,
                                                           const bool theHasParameters,
-                                                          const std::string& theValue)
+                                                          const std::string& theTextValue,
+                                                          const double theDoubleValue)
 {
   if (!theDimension)
     return;
 
+  /// do not show special symbols of dimension: previous implementation did not allow to unite them
+  theDimension->SetSpecialSymbol(MyEmptySymbol);
+  theDimension->SetDisplaySpecialSymbol(AIS_DSS_No);
+
+  TCollection_ExtendedString aCustomValue;
   if (theHasParameters) {
-    bool isParameterValueStyle = myStyle == SketcherPrs_ParameterStyleMessage::ParameterValue;
-    SketcherPrs_Tools::setDisplaySpecialSymbol(theDimension, isParameterValueStyle);
-    SketcherPrs_Tools::setDisplayParameter(theDimension, theValue, !isParameterValueStyle);
+    bool isParameterTextStyle = myStyle == SketcherPrs_ParameterStyleMessage::ParameterText;
+
+    if (isParameterTextStyle)
+      aCustomValue = theTextValue.c_str();
+    else {
+      // format value string using "sprintf"
+      TCollection_AsciiString aFormatStr = theDimension->Attributes()->DimensionAspect()->ValueStringFormat();
+      char aFmtBuffer[256];
+      sprintf (aFmtBuffer, aFormatStr.ToCString(), theDoubleValue);
+      aCustomValue = TCollection_ExtendedString (aFmtBuffer);
+
+      aCustomValue.Insert (1, MySigmaSymbol);
+    }
   }
   else {
-    SketcherPrs_Tools::setDisplaySpecialSymbol(theDimension, false);
-    SketcherPrs_Tools::setDisplayParameter(theDimension, theValue, false);
+    // format value string using "sprintf"
+    TCollection_AsciiString aFormatStr = theDimension->Attributes()->DimensionAspect()->ValueStringFormat();
+    char aFmtBuffer[256];
+    sprintf (aFmtBuffer, aFormatStr.ToCString(), theDoubleValue);
+    aCustomValue = TCollection_ExtendedString (aFmtBuffer);
   }
+  theDimension->SetCustomValue(aCustomValue);
 }
 

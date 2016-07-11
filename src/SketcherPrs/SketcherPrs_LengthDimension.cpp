@@ -42,9 +42,8 @@ SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theCo
   myFirstPoint(MyDefStart),
   mySecondPoint(MyDefEnd),
   myPlane(MyDefPln),
-  myHasParameters(false),
-  myValue(""),
-  myDistance(1)
+  myDistance(1),
+  myValue(0., false, "")
 {
   SetDimensionAspect(SketcherPrs_Tools::createDimensionAspect());
   SetSelToleranceForText2d(SketcherPrs_Tools::getTextHeight());
@@ -77,10 +76,9 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
     myDistance = SketcherPrs_Tools::getFlyoutDistance(myConstraint);
     myPlane = gp_Pln(mySketcherPlane->impl<gp_Ax3>());
 
-    AttributeDoublePtr anAttributeValue = myConstraint->data()->real(SketchPlugin_Constraint::VALUE());
-
-    myHasParameters = anAttributeValue->usedParameters().size() > 0;
-    myValue = anAttributeValue->text();
+    DataPtr aData = myConstraint->data();
+    AttributeDoublePtr anAttributeValue = aData->real(SketchPlugin_Constraint::VALUE());
+    myValue.init(anAttributeValue);
   }
 
   // compute flyout distance
@@ -93,7 +91,7 @@ void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManage
   SketcherPrs_Tools::updateArrows(DimensionAspect(), GetValue(), aTextSize);
 
   // Update text visualization: parameter value or parameter text
-  myStyleListener->updateDimensions(this, myHasParameters, myValue);
+  myStyleListener->updateDimensions(this, myValue);
 
   AIS_LengthDimension::Compute(thePresentationManager, thePresentation, theMode);
 

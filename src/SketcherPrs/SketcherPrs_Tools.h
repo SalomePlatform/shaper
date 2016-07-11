@@ -163,20 +163,6 @@ namespace SketcherPrs_Tools {
                                               const ModelAPI_Feature* theConstraint,
                                               const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
-  /// Display/hide sigma symbol in the dimension presentation
-  /// \param theDimension a dimension constraint
-  /// \param theToDisplay a boolean value
-  SKETCHERPRS_EXPORT void setDisplaySpecialSymbol(AIS_Dimension* theDimension,
-                                                  const bool& theToDisplay);
-
-  /// Display the parameter value instead of dimention digit
-  /// \param theDimension a dimension constraint
-  /// \param theParameter a parameter value
-  /// \param theToDisplay a boolean value
-  SKETCHERPRS_EXPORT void setDisplayParameter(AIS_Dimension* theDimension,
-                                              const std::string& theParameter,
-                                              const bool& theToDisplay);
-
   /// Sends event about expression visualization type is changed for dimension presentations
   /// Sends event to redisplay all sub-features of composite feature
   /// \param theState a new state

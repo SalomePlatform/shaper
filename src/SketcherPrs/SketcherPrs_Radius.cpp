@@ -31,9 +31,7 @@ SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint,
 : AIS_RadiusDimension(MyDefCirc), myConstraint(theConstraint), mySketcherPlane(thePlane),
   myCircle(MyDefCirc),
   myAnchorPoint(gp_Pnt(0, 0, 2)),
-  myHasParameters(false),
-  myValue(""),
-  myRadius(1)
+  myValue(1, false, "")
 {
   SetDimensionAspect(SketcherPrs_Tools::createDimensionAspect());
   SetSelToleranceForText2d(SketcherPrs_Tools::getDefaultTextHeight());
@@ -51,14 +49,12 @@ bool SketcherPrs_Radius::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
 {
   gp_Circ aCircle;
   gp_Pnt anAnchorPoint;
-  double aRadius;
-  return readyToDisplay(theConstraint, thePlane, aCircle, anAnchorPoint, aRadius);
+  return readyToDisplay(theConstraint, thePlane, aCircle, anAnchorPoint);
 }
 
 bool SketcherPrs_Radius::readyToDisplay(ModelAPI_Feature* theConstraint,
                                         const std::shared_ptr<GeomAPI_Ax3>& thePlane,
-                                        gp_Circ& theCircle, gp_Pnt& theAnchorPoint,
-                                        double& theRadius)
+                                        gp_Circ& theCircle, gp_Pnt& theAnchorPoint)
 {
   bool aReadyToDisplay = false;
 
@@ -80,7 +76,8 @@ bool SketcherPrs_Radius::readyToDisplay(ModelAPI_Feature* theConstraint,
     return aReadyToDisplay;
 
   std::shared_ptr<ModelAPI_Feature> aCyrcFeature = ModelAPI_Feature::feature(anAttr->object());
-  theRadius = 1;
+  //theRadius = 1;
+  double aRadius = 1;
   std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr;
   // it is possible that circle result becomes zero, in this case the presentation should disappear
   // for example, it happens when circle radius is set to zero
@@ -92,19 +89,23 @@ bool SketcherPrs_Radius::readyToDisplay(ModelAPI_Feature* theConstraint,
     AttributeDoublePtr aCircRadius = 
       std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
       aCyrcFeature->data()->attribute(SketchPlugin_Circle::RADIUS_ID()));
-    theRadius = aCircRadius->value();
+    aRadius = aCircRadius->value();
   } else { // arc
     aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aCyrcFeature->data()->attribute(SketchPlugin_Arc::CENTER_ID()));
-    std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-      (aCyrcFeature->data()->attribute(SketchPlugin_Arc::START_ID()));
-    theRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
+    //std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
+    //  std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+    //  (aCyrcFeature->data()->attribute(SketchPlugin_Arc::START_ID()));
+    //theRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
+    AttributeDoublePtr aCircRadius = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+      aCyrcFeature->data()->attribute(SketchPlugin_Arc::RADIUS_ID()));
+    aRadius = aCircRadius->value();
   }
   std::shared_ptr<GeomAPI_Pnt> aCenter = thePlane->to3D(aCenterAttr->x(), aCenterAttr->y());
   std::shared_ptr<GeomAPI_Dir> aNormal = thePlane->normal();
 
-  GeomAPI_Circ aCircle(aCenter, aNormal, theRadius);
+  GeomAPI_Circ aCircle(aCenter, aNormal, aRadius);
   std::shared_ptr<GeomAPI_Pnt> anAnchor = SketcherPrs_Tools::getAnchorPoint(theConstraint, thePlane);
 
   theCircle = aCircle.impl<gp_Circ>();
@@ -121,27 +122,24 @@ void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& the
 {
   gp_Circ aCircle;
   gp_Pnt anAnchorPoint;
-  double aRadius;
-  bool aReadyToDisplay = readyToDisplay(myConstraint, mySketcherPlane, aCircle, anAnchorPoint, aRadius);
+  bool aReadyToDisplay = readyToDisplay(myConstraint, mySketcherPlane, aCircle, anAnchorPoint);
   if (aReadyToDisplay) {
     myCircle = aCircle;
     myAnchorPoint = anAnchorPoint;
-    myRadius = aRadius;
 
-    AttributeDoublePtr anAttributeValue = myConstraint->data()->real(SketchPlugin_Constraint::VALUE());
-    myHasParameters = anAttributeValue->usedParameters().size() > 0;
-    myValue = anAttributeValue->text();
+    DataPtr aData = myConstraint->data();
+    AttributeDoublePtr anAttributeValue = aData->real(SketchPlugin_Constraint::VALUE());
+    myValue.init(anAttributeValue);
   }
 
   SetMeasuredGeometry(myCircle, myAnchorPoint);
-  SetCustomValue(myRadius);
+  myStyleListener->updateDimensions(this, myValue);
 
   // Update variable aspect parameters (depending on viewer scale)
   double aTextSize = 0.0;
   GetValueString(aTextSize);
   SketcherPrs_Tools::updateArrows(DimensionAspect(), GetValue(), aTextSize);
 
-  myStyleListener->updateDimensions(this, myHasParameters, myValue);
   
   AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);
 

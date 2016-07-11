@@ -33,11 +33,6 @@
 
 #include <AIS_Dimension.hxx>
 
-// it is not possible to use 0x2211 as summ symbol because it is not supported by
-// debian Linux platform
-static const Standard_ExtCharacter MyEmptySymbol(' ');
-static const Standard_ExtCharacter MySigmaSymbol('=');//0x03A3); // using equal instead of sigma
-
 namespace SketcherPrs_Tools {
 
 AttributePtr getAttribute(ModelAPI_Feature* theFeature, const std::string& theAttrName)
@@ -302,33 +297,6 @@ std::shared_ptr<GeomAPI_Pnt> getAnchorPoint(const ModelAPI_Feature* theConstrain
   aFlyoutPnt->setX(aCenter->x() + aFlyoutPnt->x() * aRadius / aLen);
   aFlyoutPnt->setY(aCenter->y() + aFlyoutPnt->y() * aRadius / aLen);
   return thePlane->to3D(aFlyoutPnt->x(), aFlyoutPnt->y());
-}
-
-void setDisplaySpecialSymbol(AIS_Dimension* theDimension, const bool& theToDisplay)
-{
-  if (theToDisplay) {
-    theDimension->SetSpecialSymbol(MySigmaSymbol);
-    theDimension->SetDisplaySpecialSymbol(AIS_DSS_Before);
-  }
-  else {
-    theDimension->SetSpecialSymbol(MyEmptySymbol);
-    theDimension->SetDisplaySpecialSymbol(AIS_DSS_No);
-  }
-}
-
-void setDisplayParameter(AIS_Dimension* theDimension, const std::string& theParameter,
-                         const bool& theToDisplay)
-{
-   if (theToDisplay) {
-    theDimension->DimensionAspect()->MakeUnitsDisplayed(true);
-    theDimension->SetDisplayUnits(TCollection_AsciiString(theParameter.c_str()));
-    theDimension->DimensionAspect()->SetValueStringFormat("");
-  }
-  else {
-    theDimension->DimensionAspect()->MakeUnitsDisplayed(false);
-    theDimension->SetDisplayUnits(TCollection_AsciiString()); // THE_UNDEFINED_UNITS in AIS_Dimension
-    theDimension->DimensionAspect()->SetValueStringFormat("%g");
-  }
 }
 
 void sendExpressionShownEvent(const bool& theState)
