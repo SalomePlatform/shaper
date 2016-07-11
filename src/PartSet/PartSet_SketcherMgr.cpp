@@ -1048,7 +1048,7 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
   /// improvement to deselect automatically all eventual selected objects, when
   // returning to the neutral point of the Sketcher
   // if the operation is restarted, the previous selection is used to initialize started operation
-  if (!myModule->sketchReentranceMgr()->isInternalEditStarted())
+  if (myModule->isSketchNeutralPointActivated())
     workshop()->selector()->clearSelection();
 }
 

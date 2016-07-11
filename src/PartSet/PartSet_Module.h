@@ -202,11 +202,16 @@ public:
   PartSet_SketcherMgr* sketchMgr() const { return mySketchMgr; }
 
   /// Returns sketch reentrant manager
-  PartSet_SketcherReetntrantMgr* sketchReentranceMgr() { return mySketchReentrantMgr; }
+  PartSet_SketcherReetntrantMgr* sketchReentranceMgr() const { return mySketchReentrantMgr; }
 
   /// Returns listener of overconstraint signal
   /// \return the listener
   PartSet_OverconstraintListener* overconstraintListener() { return myOverconstraintListener; }
+
+  /// Returns true if the current operation is not reentrant and the current state of the
+  /// application is not in launch operation mode
+  /// \return boolean value
+  bool isSketchNeutralPointActivated() const;
 
   /// Performs functionality on closing document
   virtual void closeDocument();
@@ -401,6 +406,7 @@ protected:
   void setDefaultConstraintShown();
 
 private:
+  bool myIsOperationIsLaunched; /// state of application between launch and stop operation
   SelectMgr_ListOfFilter mySelectionFilters;
 
   PartSet_SketcherMgr* mySketchMgr;

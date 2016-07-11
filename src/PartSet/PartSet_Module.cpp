@@ -123,7 +123,8 @@ extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop*
 
 PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 : ModuleBase_IModule(theWshop),
-  myVisualLayerId(0)
+  myVisualLayerId(0),
+  myIsOperationIsLaunched(false)
 {
   new PartSet_IconFactory();
 
@@ -557,6 +558,17 @@ bool PartSet_Module::isMouseOverWindow()
   return mySketchMgr->isMouseOverWindow();
 }
 
+bool PartSet_Module::isSketchNeutralPointActivated() const
+{
+  bool isNeutralPoint = true;
+  if (sketchReentranceMgr()->isInternalEditStarted())
+    isNeutralPoint = false;
+  if (myIsOperationIsLaunched)
+    isNeutralPoint = false;
+
+  return isNeutralPoint;
+}
+
 void PartSet_Module::closeDocument()
 {
   clearViewer();
@@ -845,10 +857,13 @@ bool PartSet_Module::canCommitOperation() const
 void PartSet_Module::launchOperation(const QString& theCmdId,
                                      const bool isUpdatePropertyPanel)
 {
+  myIsOperationIsLaunched = true;
   storeConstraintsState(theCmdId.toStdString());
   updateConstraintsState(theCmdId.toStdString());
 
   ModuleBase_IModule::launchOperation(theCmdId, isUpdatePropertyPanel);
+
+  myIsOperationIsLaunched = false;
 }
 
 void PartSet_Module::storeConstraintsState(const std::string& theFeatureKind)
