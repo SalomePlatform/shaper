@@ -863,7 +863,8 @@ void PartSet_Module::storeConstraintsState(const std::string& theFeatureKind)
 
 void PartSet_Module::updateConstraintsState(const std::string& theFeatureKind)
 {
-  if (PartSet_SketcherMgr::constraintsIdList().contains(theFeatureKind.c_str())) {
+  if (PartSet_SketcherMgr::constraintsIdList().contains(theFeatureKind.c_str()) ||
+      PartSet_SketcherMgr::replicationsIdList().contains(theFeatureKind.c_str())) {
     // Show constraints if a constraint was anOperation
     mySketchMgr->updateBySketchParameters(PartSet_Tools::Geometrical, true);
     mySketchMgr->updateBySketchParameters(PartSet_Tools::Dimensional, true);

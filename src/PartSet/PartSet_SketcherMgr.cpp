@@ -1233,9 +1233,11 @@ bool PartSet_SketcherMgr::canDisplayConstraint(const FeaturePtr& theFeature,
   bool aSwitchedOn = true;
 
   const QStringList& aConstrIds = constraintsIdList();
+  const QStringList& aReplicationIds = replicationsIdList();
 
   std::string aKind = theFeature->getKind();
-  if (aConstrIds.contains(QString(aKind.c_str()))) {
+  if (aConstrIds.contains(aKind.c_str()) ||
+      aReplicationIds.contains(aKind.c_str())) {
     bool isTypedConstraint = false;
 
     switch (theState) {
