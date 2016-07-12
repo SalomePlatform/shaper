@@ -52,3 +52,21 @@ void ModelHighAPI_Selection::appendToList(
       return;
   }
 }
+
+//==================================================================================================
+ModelHighAPI_Selection::VariantType ModelHighAPI_Selection::variantType() const
+{
+  return myVariantType;
+}
+
+//==================================================================================================
+ResultSubShapePair ModelHighAPI_Selection::resultSubShapePair() const
+{
+  return myResultSubShapePair;
+}
+
+//==================================================================================================
+TypeSubShapeNamePair ModelHighAPI_Selection::typeSubShapeNamePair() const
+{
+  return myTypeSubShapeNamePair;
+}

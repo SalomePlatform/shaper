@@ -53,7 +53,7 @@ public:
   CONSTRUCTIONAPI_EXPORT
   virtual ~ConstructionAPI_Point();
 
-  INTERFACE_10(ConstructionPlugin_Point::ID(),
+  INTERFACE_14(ConstructionPlugin_Point::ID(),
                creationMethod, ConstructionPlugin_Point::CREATION_METHOD(), ModelAPI_AttributeString, /** Creation method */,
                x, ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble, /** X attribute */,
                y, ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble, /** Y attribute */,
@@ -63,7 +63,11 @@ public:
                distancePercent, ConstructionPlugin_Point::DISTANCE_PERCENT(), ModelAPI_AttributeBoolean, /** Distance percent attribute */,
                reverse, ConstructionPlugin_Point::REVERSE(), ModelAPI_AttributeBoolean, /** Reverse attribute */,
                point, ConstructionPlugin_Point::POINT(), ModelAPI_AttributeSelection, /** Point attribute */,
-               plane, ConstructionPlugin_Point::PLANE(), ModelAPI_AttributeSelection, /** Plane attribute */
+               plane, ConstructionPlugin_Point::PLANE(), ModelAPI_AttributeSelection, /** Plane attribute */,
+               firstLine, ConstructionPlugin_Point::FIRST_LINE(), ModelAPI_AttributeSelection, /** First line attribute */,
+               secondLine, ConstructionPlugin_Point::SECOND_LINE(), ModelAPI_AttributeSelection, /** Second line attribute */,
+               intersectionLine, ConstructionPlugin_Point::INTERSECTION_LINE(), ModelAPI_AttributeSelection, /** Intersection line attribute */,
+               intersectionPlane, ConstructionPlugin_Point::INTERSECTION_PLANE(), ModelAPI_AttributeSelection, /** Intersection plane attribute */
   )
 
   /// Set point values.
@@ -82,7 +86,17 @@ public:
   /// Set point and plane for projection.
   CONSTRUCTIONAPI_EXPORT
   void setByProjection(const ModelHighAPI_Selection& theVertex,
-                       const ModelHighAPI_Selection& thePlane);
+                       const ModelHighAPI_Selection& theFace);
+
+  /// Set lines for intersections.
+  CONSTRUCTIONAPI_EXPORT
+  void setByLinesIntersection(const ModelHighAPI_Selection& theEdge1,
+                              const ModelHighAPI_Selection& theEdge2);
+
+  /// Set line and plane for intersections.
+  CONSTRUCTIONAPI_EXPORT
+  void setByLineAndPlaneIntersection(const ModelHighAPI_Selection& theEdge,
+                                     const ModelHighAPI_Selection& theFace);
 };
 
 /// Pointer on Point object.

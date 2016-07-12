@@ -49,6 +49,9 @@ void ConstructionPlugin_Point::initAttributes()
 
   data()->addAttribute(FIRST_LINE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(SECOND_LINE(), ModelAPI_AttributeSelection::typeId());
+
+  data()->addAttribute(INTERSECTION_LINE(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(INTERSECTION_PLANE(), ModelAPI_AttributeSelection::typeId());
 }
 
 //==================================================================================================
@@ -64,7 +67,9 @@ void ConstructionPlugin_Point::execute()
   } else if(aCreationMethod == CREATION_METHOD_BY_PROJECTION()) {
     aShape = createByProjection();
   } else if(aCreationMethod == CREATION_METHOD_BY_LINES_INTERSECTION()) {
-    aShape = createByIntersection();
+    aShape = createByLinesIntersection();
+  } else if(aCreationMethod == CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION()) {
+    aShape = createByLineAndPlaneIntersection();
   }
 
   if(aShape.get()) {
@@ -137,7 +142,7 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByProjection()
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByIntersection()
+std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByLinesIntersection()
 {
   // Get first line.
   AttributeSelectionPtr aFirstLineSelection= selection(FIRST_LINE());
@@ -156,4 +161,26 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByIntersection()
   std::shared_ptr<GeomAPI_Edge> aSecondEdge(new GeomAPI_Edge(aSecondLineShape));
 
   return GeomAlgoAPI_PointBuilder::vertexByIntersection(aFirstEdge, aSecondEdge);
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByLineAndPlaneIntersection()
+{
+  // Get line.
+  AttributeSelectionPtr aLineSelection= selection(INTERSECTION_LINE());
+  GeomShapePtr aLineShape = aLineSelection->value();
+  if(!aLineShape.get()) {
+    aLineShape = aLineSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aLineShape));
+
+  // Get plane.
+  AttributeSelectionPtr aPlaneSelection= selection(INTERSECTION_PLANE());
+  GeomShapePtr aPlaneShape = aPlaneSelection->value();
+  if(!aPlaneShape.get()) {
+    aPlaneShape = aPlaneSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aPlaneShape));
+
+  return GeomAlgoAPI_PointBuilder::vertexByIntersection(anEdge, aFace);
 }

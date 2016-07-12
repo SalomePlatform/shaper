@@ -22,6 +22,8 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("ConstructionPlugin_ValidatorPointLines",
                               new ConstructionPlugin_ValidatorPointLines());
+  aFactory->registerValidator("ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel",
+                              new ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel());
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

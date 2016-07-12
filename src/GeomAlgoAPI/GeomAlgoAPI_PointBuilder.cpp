@@ -116,23 +116,16 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexByProjection(
     return aVertex;
   }
 
-  std::shared_ptr<GeomAPI_Pnt> aGeomPnt = theVertex->point();
-  gp_Pnt aPnt = aGeomPnt->impl<gp_Pnt>();
+  std::shared_ptr<GeomAPI_Pnt> aProjPnt = theVertex->point();
+  std::shared_ptr<GeomAPI_Pln> aProjPln = thePlane->getPlane();
 
-  std::shared_ptr<GeomAPI_Pln> aGeomPln = thePlane->getPlane();
-  gp_Pln aPln = aGeomPln->impl<gp_Pln>();
+  std::shared_ptr<GeomAPI_Pnt> aPnt = aProjPln->project(aProjPnt);
 
-  gp_Dir aPntAxis = aPnt.XYZ() - aPln.Location().XYZ();
-  gp_Dir aPlnNorm = aPln.Axis().Direction();
-
-  if(aPntAxis * aPlnNorm > 0) {
-    aPlnNorm.Reverse();
+  if(!aPnt.get()) {
+    return aVertex;
   }
 
-  double aDistance = aPln.Distance(aPnt);
-  aPnt.Translate(gp_Vec(aPlnNorm) * aDistance);
-
-  aVertex.reset(new GeomAPI_Vertex(aPnt.X(), aPnt.Y(), aPnt.Z()));
+  aVertex.reset(new GeomAPI_Vertex(aPnt->x(), aPnt->y(), aPnt->z()));
 
   return aVertex;
 }
@@ -152,6 +145,31 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexByIntersection(
   std::shared_ptr<GeomAPI_Lin> aLin2 = theEdge2->line();
 
   std::shared_ptr<GeomAPI_Pnt> aPnt = aLin1->intersect(aLin2);
+
+  if(!aPnt.get()) {
+    return aVertex;
+  }
+
+  aVertex.reset(new GeomAPI_Vertex(aPnt->x(), aPnt->y(), aPnt->z()));
+
+  return aVertex;
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexByIntersection(
+    const std::shared_ptr<GeomAPI_Edge> theEdge,
+    const std::shared_ptr<GeomAPI_Face> theFace)
+{
+  std::shared_ptr<GeomAPI_Vertex> aVertex;
+
+  if(!theEdge.get() || !theFace.get() || !theEdge->isLine() || !theFace->isPlanar()) {
+    return aVertex;
+  }
+
+  std::shared_ptr<GeomAPI_Lin> aLin = theEdge->line();
+  std::shared_ptr<GeomAPI_Pln> aPln = theFace->getPlane();
+
+  std::shared_ptr<GeomAPI_Pnt> aPnt = aPln->intersect(aLin);
 
   if(!aPnt.get()) {
     return aVertex;

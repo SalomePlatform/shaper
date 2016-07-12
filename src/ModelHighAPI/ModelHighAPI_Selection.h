@@ -29,6 +29,12 @@ typedef std::pair<std::string, std::string> TypeSubShapeNamePair;
 class ModelHighAPI_Selection
 {
 public:
+  enum VariantType {
+    VT_ResultSubShapePair,
+    VT_TypeSubShapeNamePair
+  };
+
+public:
   /// Constructor for result and sub-shape
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Selection(const std::shared_ptr<ModelAPI_Result>& theContext = std::shared_ptr<ModelAPI_Result>(),
@@ -49,8 +55,20 @@ public:
   MODELHIGHAPI_EXPORT
   virtual void appendToList(const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute) const;
 
+  /// \return variant type.
+  MODELHIGHAPI_EXPORT
+  virtual VariantType variantType() const;
+
+  /// \return pair of result and sub-shape.
+  MODELHIGHAPI_EXPORT
+  virtual ResultSubShapePair resultSubShapePair() const;
+
+  /// \return pair of sub-shape type and name.
+  MODELHIGHAPI_EXPORT
+  virtual TypeSubShapeNamePair typeSubShapeNamePair() const;
+
 private:
-  enum VariantType { VT_ResultSubShapePair, VT_TypeSubShapeNamePair } myVariantType;
+  VariantType myVariantType;
   ResultSubShapePair myResultSubShapePair;
   TypeSubShapeNamePair myTypeSubShapeNamePair;
 };

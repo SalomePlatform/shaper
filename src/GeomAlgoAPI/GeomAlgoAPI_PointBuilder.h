@@ -55,6 +55,13 @@ public:
   static std::shared_ptr<GeomAPI_Vertex> vertexByIntersection(const std::shared_ptr<GeomAPI_Edge> theEdge1,
                                                               const std::shared_ptr<GeomAPI_Edge> theEdge2);
 
+  /// \brief Creates vertex by intersection line and plane.
+  /// \param[in] theEdge linear edge.
+  /// \param[in] theFace planar face.
+  /// \return created vertex.
+  static std::shared_ptr<GeomAPI_Vertex> vertexByIntersection(const std::shared_ptr<GeomAPI_Edge> theEdge,
+                                                              const std::shared_ptr<GeomAPI_Face> theFace);
+
   /// Return point by shape vertex
   static std::shared_ptr<GeomAPI_Pnt> point(const std::shared_ptr<GeomAPI_Shape> theVertex);
 };

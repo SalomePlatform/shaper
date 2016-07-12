@@ -19,7 +19,7 @@ class GeomAlgoAPI_Boolean : public GeomAlgoAPI_MakeShape
 {
 public:
   /// Type of booelan operation
-  enum OperationType{
+  enum OperationType {
     BOOL_CUT,   ///< Cut objects
     BOOL_FUSE,  ///< Fuse objects
     BOOL_COMMON ///< Take common part of objects

@@ -65,6 +65,18 @@ bool GeomAPI_Pln::isCoincident(const std::shared_ptr<GeomAPI_Pln> thePlane, cons
   return (aMyPln.Contains(anOtherPln.Location(), theTolerance) && aMyPln.Axis().IsParallel(anOtherPln.Axis(), theTolerance));
 }
 
+bool GeomAPI_Pln::isParallel(const std::shared_ptr<GeomAPI_Lin> theLine)
+{
+  std::shared_ptr<GeomAPI_XYZ> aLineDir = theLine->direction()->xyz();
+  std::shared_ptr<GeomAPI_XYZ> aLineLoc = theLine->location()->xyz();
+
+  std::shared_ptr<GeomAPI_XYZ> aNormal = direction()->xyz();
+  std::shared_ptr<GeomAPI_XYZ> aLocation = location()->xyz();
+
+  double aDot = aNormal->dot(aLineDir);
+  return Abs(aDot) < Precision::SquareConfusion();
+}
+
 std::shared_ptr<GeomAPI_Pnt> GeomAPI_Pln::intersect(const std::shared_ptr<GeomAPI_Lin>& theLine) const
 {
   std::shared_ptr<GeomAPI_XYZ> aLineDir = theLine->direction()->xyz();

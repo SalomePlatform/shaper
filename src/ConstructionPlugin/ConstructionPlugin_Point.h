@@ -66,6 +66,13 @@ public:
     return MY_CREATION_METHOD_ID;
   }
 
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_line_and_plane_intersection");
+    return MY_CREATION_METHOD_ID;
+  }
+
   /// Attribute name for X coordinate.
   inline static const std::string& X()
   {
@@ -87,7 +94,7 @@ public:
     return POINT_ATTR_Z;
   }
 
-  /// Attribute name for seleted edge.
+  /// Attribute name for selected edge.
   inline static const std::string& EDGE()
   {
     static const std::string ATTR_ID("edge");
@@ -129,17 +136,31 @@ public:
     return ATTR_ID;
   }
 
-  /// Attribute name for seleted first line.
+  /// Attribute name for selected first line.
   inline static const std::string& FIRST_LINE()
   {
     static const std::string ATTR_ID("first_line");
     return ATTR_ID;
   }
 
-  /// Attribute name for seleted second line.
+  /// Attribute name for selected second line.
   inline static const std::string& SECOND_LINE()
   {
     static const std::string ATTR_ID("second_line");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for selected intersection line.
+  inline static const std::string& INTERSECTION_LINE()
+  {
+    static const std::string ATTR_ID("intersection_line");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for selected intersection plane.
+  inline static const std::string& INTERSECTION_PLANE()
+  {
+    static const std::string ATTR_ID("intersection_plane");
     return ATTR_ID;
   }
 
@@ -163,7 +184,8 @@ private:
   std::shared_ptr<GeomAPI_Vertex> createByXYZ();
   std::shared_ptr<GeomAPI_Vertex> createByDistanceOnEdge();
   std::shared_ptr<GeomAPI_Vertex> createByProjection();
-  std::shared_ptr<GeomAPI_Vertex> createByIntersection();
+  std::shared_ptr<GeomAPI_Vertex> createByLinesIntersection();
+  std::shared_ptr<GeomAPI_Vertex> createByLineAndPlaneIntersection();
 
 };
 
