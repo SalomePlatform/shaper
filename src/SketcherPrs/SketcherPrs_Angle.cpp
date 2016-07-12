@@ -27,7 +27,9 @@
 
 #define PI 3.1415926535897932
 
-#define COMPILATION_CORRECTION
+#ifndef WNT
+  #define COMPILATION_CORRECTION
+#endif
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Angle, AIS_AngleDimension);
