@@ -74,6 +74,11 @@ protected:
   /// Methods to be redefined from ModuleBase_ModelWidget: end
 
 private:
+  /// Makes the children page of the group box visible if the checked state is on
+  /// otherwise, make the sub-pages is not visible.
+  void updatePagesVisibility();
+
+private:
   QGroupBox* myGroupBox;
   QGridLayout* myMainLayout; ///< page's layout
 };

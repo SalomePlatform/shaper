@@ -24,16 +24,18 @@ ModuleBase_WidgetCheckGroupBox::ModuleBase_WidgetCheckGroupBox(QWidget* theParen
 {
   QString aToolTip = QString::fromStdString(theData->widgetTooltip());
   bool isChecked = theData->getBooleanAttribute(ATTR_DEFAULT, false);
+  setDefaultValue(isChecked ? "true" : "false");
 
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aMainLayout);
+  aMainLayout->setMargin(2);
   myGroupBox = new QGroupBox(this);
   myGroupBox->setCheckable(true);
   myGroupBox->setToolTip(aToolTip);
   myGroupBox->setChecked(isChecked);
 
   myMainLayout = new QGridLayout(myGroupBox);
-  ModuleBase_Tools::adjustMargins(myMainLayout);
+  ModuleBase_Tools::zeroMargins(myMainLayout);
   myGroupBox->setLayout(myMainLayout);
 
   // default vertical size policy is preferred
@@ -66,6 +68,7 @@ QList<QWidget*> ModuleBase_WidgetCheckGroupBox::getControls() const
 void ModuleBase_WidgetCheckGroupBox::onPageClicked()
 {
   storeValue();
+  updatePagesVisibility();
 }
 
 void ModuleBase_WidgetCheckGroupBox::addPageStretch()
@@ -82,6 +85,7 @@ void ModuleBase_WidgetCheckGroupBox::placeModelWidget(ModuleBase_ModelWidget* th
   myMainLayout->addWidget(theWidget, kRow, kCol, Qt::AlignTop);// | Qt::AlignLeft);
   myMainLayout->setRowStretch(kRow, 0);
 
+  theWidget->setVisible(myGroupBox->isChecked());
 }
 
 void ModuleBase_WidgetCheckGroupBox::placeWidget(QWidget* theWidget)
@@ -121,7 +125,25 @@ bool ModuleBase_WidgetCheckGroupBox::restoreValueCustom()
 
   bool isBlocked = myGroupBox->blockSignals(true);
   myGroupBox->setChecked(!aStringAttr->value().empty());
+  updatePagesVisibility();
   myGroupBox->blockSignals(isBlocked);
 
   return true;
+}
+
+void ModuleBase_WidgetCheckGroupBox::updatePagesVisibility()
+{
+  bool aVisible = myGroupBox->isChecked();
+
+  if (aVisible)
+    ModuleBase_Tools::zeroMargins(myMainLayout);
+  else
+    ModuleBase_Tools::adjustMargins(myMainLayout);
+
+  int aNbSubControls = myMainLayout->count();
+  for (int i = 0; i < aNbSubControls; i++) {
+    QWidget* aWidget = myMainLayout->itemAt(i)->widget();
+    if (aWidget)
+      aWidget->setVisible(aVisible);
+  }
 }
