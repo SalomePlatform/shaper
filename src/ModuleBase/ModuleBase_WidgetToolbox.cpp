@@ -23,7 +23,15 @@ ModuleBase_WidgetToolbox::ModuleBase_WidgetToolbox(QWidget* theParent, const Con
 {
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aMainLayout);
-  myToolBox = new ModuleBase_ToolBox(this);
+
+  bool aHasContainerParent = false;
+  QWidget* aParent = dynamic_cast<QWidget*>(parent());
+  while(aParent && !aHasContainerParent) {
+    ModuleBase_PagedContainer* aPagedContainer = dynamic_cast<ModuleBase_PagedContainer*>(aParent);
+    aHasContainerParent = aPagedContainer;
+    aParent = dynamic_cast<QWidget*>(aParent->parent());
+  }
+  myToolBox = new ModuleBase_ToolBox(this, aHasContainerParent);
   // Dark-grey rounded tabs with button-like border #and bold font
   // TODO: apply style to custom widget
   QString css = "QToolBox::tab{background-color:#c8c8c8;"
@@ -49,7 +57,6 @@ int ModuleBase_WidgetToolbox::addPage(ModuleBase_PageBase* thePage,
 {
   ModuleBase_PagedContainer::addPage(thePage, theName, theCaseId, theIcon);
   QFrame* aFrame = dynamic_cast<QFrame*>(thePage);
-  aFrame->setFrameStyle(QFrame::Box | QFrame::Raised);
   myToolBox->addItem(aFrame, theName, theIcon );
   return myToolBox->count();
 }

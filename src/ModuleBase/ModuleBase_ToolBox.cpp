@@ -13,50 +13,57 @@
 #include <QVBoxLayout>
 #include <QToolButton>
 
-ModuleBase_ToolBox::ModuleBase_ToolBox( QWidget* theParent )
-  : QFrame( theParent )
+#include <ModuleBase_PagedContainer.h>
+
+ModuleBase_ToolBox::ModuleBase_ToolBox(QWidget* theParent, const bool theUseFrameStyleBox)
+: QFrame(theParent)
 {
-  QVBoxLayout* aMainLayout = new QVBoxLayout( this );
+  QVBoxLayout* aMainLayout = new QVBoxLayout(this);
   aMainLayout->setMargin(0);
   aMainLayout->setSpacing(2);
 
-  myButtonsFrame = new QFrame( this );
+  if (theUseFrameStyleBox) {
+    setFrameStyle(QFrame::Box | QFrame::Raised);
+    aMainLayout->setMargin(2);
+  }
 
-  myStack = new QStackedWidget( this );
+  myButtonsFrame = new QFrame(this);
 
-  aMainLayout->addWidget( myButtonsFrame, 0 );
-  aMainLayout->addWidget( myStack, 1 );
+  myStack = new QStackedWidget(this);
+
+  aMainLayout->addWidget(myButtonsFrame, 0);
+  aMainLayout->addWidget(myStack, 1);
 
   myButtonsGroup = new QButtonGroup(this);
-  myButtonsGroup->setExclusive( true );
-  myButtonsLayout = new QHBoxLayout( myButtonsFrame );
-  myButtonsLayout->setMargin( 0 );
-  myButtonsLayout->setSpacing( 5 );
-  myButtonsLayout->addStretch( 1 );
+  myButtonsGroup->setExclusive(true);
+  myButtonsLayout = new QHBoxLayout(myButtonsFrame);
+  myButtonsLayout->setMargin(0);
+  myButtonsLayout->setSpacing(5);
+  myButtonsLayout->addStretch(1);
 
-  connect( myStack, SIGNAL( currentChanged( int ) ), this, SIGNAL( currentChanged( int ) ) );
-  connect( myButtonsGroup, SIGNAL( buttonPressed( int ) ), this, SLOT( onButton( int ) ) );
+  connect(myStack, SIGNAL(currentChanged(int)), this, SIGNAL(currentChanged(int)));
+  connect(myButtonsGroup, SIGNAL(buttonPressed(int)), this, SLOT(onButton(int)));
 }
 
 ModuleBase_ToolBox::~ModuleBase_ToolBox()
 {
 }
 
-void ModuleBase_ToolBox::addItem( QWidget* thePage, const QString& theName, const QPixmap& theIcon )
+void ModuleBase_ToolBox::addItem(QWidget* thePage, const QString& theName, const QPixmap& theIcon)
 {
   int anOldCount = myStack->count();
 
-  myStack->addWidget( thePage );
+  myStack->addWidget(thePage);
 
-  QToolButton* aButton = new QToolButton( myButtonsFrame );
+  QToolButton* aButton = new QToolButton(myButtonsFrame);
   aButton->setFocusPolicy(Qt::StrongFocus);
-  aButton->setCheckable( true );
-  aButton->setIcon( theIcon );
-  aButton->setIconSize( theIcon.size() );
-  aButton->setToolTip( theName );
-  aButton->setObjectName( theName );
-  myButtonsGroup->addButton( aButton, anOldCount );
-  myButtonsLayout->insertWidget( anOldCount, aButton );
+  aButton->setCheckable(true);
+  aButton->setIcon(theIcon);
+  aButton->setIconSize(theIcon.size());
+  aButton->setToolTip(theName);
+  aButton->setObjectName(theName);
+  myButtonsGroup->addButton(aButton, anOldCount);
+  myButtonsLayout->insertWidget(anOldCount, aButton);
 }
 
 int ModuleBase_ToolBox::count() const
@@ -69,15 +76,15 @@ int ModuleBase_ToolBox::currentIndex() const
   return myStack->currentIndex();
 }
 
-void ModuleBase_ToolBox::setCurrentIndex( const int theIndex )
+void ModuleBase_ToolBox::setCurrentIndex(const int theIndex)
 {
-  myStack->setCurrentIndex( theIndex );
-  myButtonsGroup->button( theIndex )->setChecked( true );
+  myStack->setCurrentIndex(theIndex);
+  myButtonsGroup->button(theIndex)->setChecked(true);
 }
 
-void ModuleBase_ToolBox::onButton( int theIndex )
+void ModuleBase_ToolBox::onButton(int theIndex)
 {
-  myStack->setCurrentIndex( theIndex );
+  myStack->setCurrentIndex(theIndex);
 }
 
 bool ModuleBase_ToolBox::isOffToolBoxParent(ModuleBase_ModelWidget* theWidget)

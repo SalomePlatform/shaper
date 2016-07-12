@@ -28,14 +28,16 @@ class MODULEBASE_EXPORT ModuleBase_ToolBox : public QFrame
 public:
   /// Constructor
   /// \param theParent a parent widget
-  ModuleBase_ToolBox( QWidget* theParent );
+  /// \param theUseFrameStyleBox a flag if the tool box should have box covered
+  /// buttons and current page
+  ModuleBase_ToolBox(QWidget* theParent, const bool theUseFrameStyleBox = false);
   virtual ~ModuleBase_ToolBox();
 
   ///  Add a new item to the tool box
   /// \param thePage a widget of the new item
   /// \param theName a name of the item
   /// \param theIcon an icon of the item
-  void addItem( QWidget* thePage, const QString& theName, const QPixmap& theIcon );
+  void addItem(QWidget* thePage, const QString& theName, const QPixmap& theIcon);
 
   /// \return number of items
   int count() const;
@@ -45,7 +47,7 @@ public:
 
   /// Set current item
   /// \param theIdx an index
-  void setCurrentIndex( const int theIdx);
+  void setCurrentIndex(const int theIdx);
 
   /// Found in the controls of the model widget parent in Stacked Widget
   /// returns whether this controls are in the current widget of the stacked widgets
@@ -55,11 +57,11 @@ public:
 
 signals:
   /// A signal which is emited on current item changed
-  void currentChanged( int );
+  void currentChanged(int);
 
 private slots:
   /// A slot called on button press
-  void onButton( int );
+  void onButton(int);
 
 private:
   QButtonGroup*   myButtonsGroup;
