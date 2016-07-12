@@ -43,7 +43,8 @@ void SketchSolver_ConstraintMulti::getEntities(std::list<EntityWrapperPtr>& theE
     if (!aFeature)
       continue;
 
-    myStorage->update(aFeature);
+    if (!myStorage->update(aFeature)) // the entity is not created, so it is a copy in "multi" constraint, force its creation
+      myStorage->update(aFeature, myGroupID, true);
     theEntities.push_back(myStorage->entity(aFeature));
     myFeatures.insert(aFeature);
     for (int i = 0; i < myNumberOfCopies && anObjIt != anObjectList.end(); ++i, ++anObjIt) {

@@ -526,7 +526,7 @@ static void collectPointsAndCopies(FeaturePtr theConstraint, std::list<std::set<
       for (; anIt != anAttrList.end(); ++anIt) {
         aPoints.clear();
         aCopyIt = anObjIt;
-        for (int i = 0; i < aNbCopies; ++i, ++aCopyIt) {
+        for (int i = 0; i < aNbCopies && aCopyIt != aFullList.end(); ++i, ++aCopyIt) {
           FeaturePtr aFeature = ModelAPI_Feature::feature(*aCopyIt);
           aPoints.insert(aFeature->attribute(*anIt));
         }
