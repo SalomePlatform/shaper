@@ -696,70 +696,8 @@ void adjustAngle(ConstraintWrapperPtr theConstraint)
   std::shared_ptr<GeomAPI_Angle2d> anAngle(new GeomAPI_Angle2d(aLine[0], isReversed[0], aLine[1], isReversed[1]));
   std::shared_ptr<GeomAPI_Pnt2d> aCenter = anAngle->center();
 
-  std::shared_ptr<GeomAPI_Dir2d> aDir[2];
-
   Slvs_Constraint& aSlvsConstraint = aConstraint->changeConstraint();
-  aSlvsConstraint.other = false;
-  for (int i = 0; i < 2; i++) {
-    aDir[i] = aLine[i]->direction();
-    if (isReversed[i]) {
-      aSlvsConstraint.other = !aSlvsConstraint.other;
-      aDir[i]->reverse();
-    }
-  }
-
-  double aDist[2][2];
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 2; j++) {
-      aDist[i][j] = aDir[i]->xy()->dot(aPoints[i][j]->xy()->decreased(aCenter->xy()));
-      if (fabs(aDist[i][j]) <= tolerance)
-        aDist[i][j] = 0.0;
-    }
-  }
-
-  // Recalculate positions of lines to avoid conflicting constraints
-  // while changing angle value several times
-  double cosA = cos(aConstraint->value() * PI / 180.0);
-  double sinA = sin(aConstraint->value() * PI / 180.0);
-  //if (aDir[0]->cross(aDir[1]) < 0.0)
-  //  sinA *= -1.0;
-  int aLineToUpd = 1;
-  if (isFixed[1][0] && isFixed[1][1]) {
-    sinA *= -1.0;
-    aLineToUpd = 0;
-  }
-  double x = aDir[1-aLineToUpd]->x() * cosA - aDir[1-aLineToUpd]->y() * sinA;
-  double y = aDir[1-aLineToUpd]->x() * sinA + aDir[1-aLineToUpd]->y() * cosA;
-
-  std::shared_ptr<GeomAPI_Pnt2d> aNewPoints[2];
-  for (int i = 0; i < 2; i++) {
-    aNewPoints[i] = std::shared_ptr<GeomAPI_Pnt2d>(
-        new GeomAPI_Pnt2d(aCenter->x() + x * aDist[aLineToUpd][i],
-                          aCenter->y() + y * aDist[aLineToUpd][i]));
-  }
-
-  std::shared_ptr<GeomAPI_XY> aDelta;
-  if (isFixed[aLineToUpd][0] && !isFixed[aLineToUpd][1])
-    aDelta = aPoints[aLineToUpd][0]->xy()->decreased(aNewPoints[0]->xy());
-  else if (!isFixed[aLineToUpd][0] && isFixed[aLineToUpd][1])
-    aDelta = aPoints[aLineToUpd][1]->xy()->decreased(aNewPoints[1]->xy());
-  if (aDelta) {
-    for (int i = 0; i < 2; i++) {
-      aNewPoints[i]->setX(aNewPoints[i]->x() + aDelta->x());
-      aNewPoints[i]->setY(aNewPoints[i]->y() + aDelta->y());
-    }
-  }
-
-  // Update positions of points
-  std::list<EntityWrapperPtr>::const_iterator anUpdLine = aConstrLines.begin();
-  if (aLineToUpd > 0) ++anUpdLine;
-  const std::list<EntityWrapperPtr>& anUpdPoints = (*anUpdLine)->subEntities();
-  std::list<EntityWrapperPtr>::const_iterator aPIt = anUpdPoints.begin();
-  for (int i = 0; aPIt != anUpdPoints.end(); ++aPIt, ++i) {
-    std::shared_ptr<GeomDataAPI_Point2D> aPnt2D =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>((*aPIt)->baseAttribute());
-    aPnt2D->setValue(aNewPoints[i]);
-  }
+  aSlvsConstraint.other = isReversed[0] != isReversed[1];
 }
 
 void adjustMirror(ConstraintWrapperPtr theConstraint)
