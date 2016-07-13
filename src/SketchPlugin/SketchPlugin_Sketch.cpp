@@ -216,7 +216,8 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
       data()->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->value();
     if (aSelection) { // update arguments due to the selection value
       // update the sketch plane
-      std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aSelection);
+      std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aSelection));
+      std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aFace);
       if (aPlane) {
         double anA, aB, aC, aD;
         aPlane->coefficients(anA, aB, aC, aD);

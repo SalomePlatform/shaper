@@ -32,6 +32,9 @@ GeomAPI_Face::GeomAPI_Face(const std::shared_ptr<GeomAPI_Shape>& theShape)
 
 bool GeomAPI_Face::isEqual(std::shared_ptr<GeomAPI_Shape> theFace) const
 {
+  if (!theFace.get())
+    return false;
+
   if (!theFace->isFace())
     return false;
 

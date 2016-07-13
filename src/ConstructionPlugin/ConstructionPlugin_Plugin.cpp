@@ -24,6 +24,10 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
                               new ConstructionPlugin_ValidatorPointLines());
   aFactory->registerValidator("ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel",
                               new ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel());
+  aFactory->registerValidator("ConstructionPlugin_ValidatorPlaneThreePoints",
+                              new ConstructionPlugin_ValidatorPlaneThreePoints());
+  aFactory->registerValidator("ConstructionPlugin_ValidatorPlaneLinePoint",
+                              new ConstructionPlugin_ValidatorPlaneLinePoint());
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

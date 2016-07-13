@@ -45,19 +45,19 @@ public:
   virtual ~ConstructionAPI_Plane();
 
   INTERFACE_7(ConstructionPlugin_Plane::ID(),
-              creationMethod, ConstructionPlugin_Plane::METHOD(), ModelAPI_AttributeString, /** Creation method */,
-              face, ConstructionPlugin_Plane::FACE(), ModelAPI_AttributeSelection, /** Plane face */,
-              distance, ConstructionPlugin_Plane::DISTANCE(), ModelAPI_AttributeDouble, /** Distance */,
+              creationMethod, ConstructionPlugin_Plane::CREATION_METHOD(), ModelAPI_AttributeString, /** Creation method */,
               A, ConstructionPlugin_Plane::A(), ModelAPI_AttributeDouble, /** Parameter A for general equation */,
               B, ConstructionPlugin_Plane::B(), ModelAPI_AttributeDouble, /** Parameter B for general equation */,
               C, ConstructionPlugin_Plane::C(), ModelAPI_AttributeDouble, /** Parameter C for general equation */,
-              D, ConstructionPlugin_Plane::D(), ModelAPI_AttributeDouble, /** Parameter D for general equation */
-  )
+              D, ConstructionPlugin_Plane::D(), ModelAPI_AttributeDouble, /** Parameter D for general equation */,
+              plane, ConstructionPlugin_Plane::PLANE(), ModelAPI_AttributeSelection, /** Plane face */,
+              distance, ConstructionPlugin_Plane::DISTANCE(), ModelAPI_AttributeDouble, /** Distance */
+ )
 
   /// Set face and distance
   CONSTRUCTIONAPI_EXPORT
-  void setFaceAndDistance(const ModelHighAPI_Selection & theFace,
-                          const ModelHighAPI_Double & theDistance);
+  void setFaceAndDistance(const ModelHighAPI_Selection& theFace,
+                          const ModelHighAPI_Double& theDistance);
 
   /// Set GeneralEquation parameters of the feature
   CONSTRUCTIONAPI_EXPORT

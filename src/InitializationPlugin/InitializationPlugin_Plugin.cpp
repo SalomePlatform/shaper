@@ -15,6 +15,8 @@
 
 #include <memory>
 
+#define NESTED_TOOLBOX_FIX
+
 // the only created instance of this plugin
 static InitializationPlugin_Plugin* MY_INITIALIZATIONPLUGIN_INSTANCE =
     new InitializationPlugin_Plugin();
@@ -89,7 +91,11 @@ FeaturePtr InitializationPlugin_Plugin::createPlane(DocumentPtr theDoc, double t
                                                     double theZ)
 {
   FeaturePtr aPlane = theDoc->addFeature("Plane");
-  aPlane->string("CreationMethod")->setValue("PlaneByGeneralEquation");
+  aPlane->string("creation_method")->setValue("by_general_equation");
+#ifdef NESTED_TOOLBOX_FIX
+  aPlane->string("by_other_plane_option")->setValue("by_distance_from_other");
+  aPlane->real("distance")->setValue(0);
+#endif
   aPlane->real("A")->setValue(theX);
   aPlane->real("B")->setValue(theY);
   aPlane->real("C")->setValue(theZ);

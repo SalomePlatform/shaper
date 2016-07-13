@@ -33,11 +33,11 @@ const std::string& ConstructionPlugin_Point::getKind()
 //==================================================================================================
 void ConstructionPlugin_Point::initAttributes()
 {
+  data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
+
   data()->addAttribute(X(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(Y(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(Z(), ModelAPI_AttributeDouble::typeId());
-
-  data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
 
   data()->addAttribute(EDGE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(DISTANCE_VALUE(), ModelAPI_AttributeDouble::typeId());
@@ -72,11 +72,13 @@ void ConstructionPlugin_Point::execute()
     aShape = createByLineAndPlaneIntersection();
   }
 
-  if(aShape.get()) {
-    std::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
-    aConstr->setShape(aShape);
-    setResult(aConstr);
+  if(!aShape.get()) {
+    return;
   }
+
+  std::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
+  aConstr->setShape(aShape);
+  setResult(aConstr);
 }
 
 //==================================================================================================
@@ -152,7 +154,7 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByLinesIntersect
   }
   std::shared_ptr<GeomAPI_Edge> aFirstEdge(new GeomAPI_Edge(aFirstLineShape));
 
-  // Get first line.
+  // Get second line.
   AttributeSelectionPtr aSecondLineSelection= selection(SECOND_LINE());
   GeomShapePtr aSecondLineShape = aSecondLineSelection->value();
   if(!aSecondLineShape.get()) {

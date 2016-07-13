@@ -4,19 +4,28 @@
 // Created:     23 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#include <GeomAlgoAPI_FaceBuilder.h>
-#include <gp_Pln.hxx>
-#include <BRepBuilderAPI_MakeFace.hxx>
-#include <TopoDS_Face.hxx>
-#include <TopoDS.hxx>
+#include "GeomAlgoAPI_FaceBuilder.h"
+
+#include <GeomAPI_Face.h>
+#include <GeomAPI_Dir.h>
+#include <GeomAPI_Pln.h>
+#include <GeomAPI_Pnt.h>
+#include <GeomAPI_Shape.h>
+#include <GeomAPI_Vertex.h>
+
 #include <BRep_Tool.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
+#include <GC_MakePlane.hxx>
 #include <Geom_Plane.hxx>
 #include <GeomLib_IsPlanarSurface.hxx>
+#include <gp_Pln.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Face.hxx>
 
-
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::square(
-    std::shared_ptr<GeomAPI_Pnt> theCenter, std::shared_ptr<GeomAPI_Dir> theNormal,
-    const double theSize)
+//==================================================================================================
+std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::squareFace(const std::shared_ptr<GeomAPI_Pnt> theCenter,
+                                                                  const std::shared_ptr<GeomAPI_Dir> theNormal,
+                                                                  const double theSize)
 {
   const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
   const gp_Dir& aDir = theNormal->impl<gp_Dir>();
@@ -24,27 +33,79 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::square(
   // half of the size in each direction from the center
   BRepBuilderAPI_MakeFace aFaceBuilder(aPlane, -theSize / 2., theSize / 2., -theSize / 2.,
                                        theSize / 2.);
-  std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
-  aRes->setImpl(new TopoDS_Shape(aFaceBuilder.Face()));
+  std::shared_ptr<GeomAPI_Face> aRes(new GeomAPI_Face());
+  aRes->setImpl(new TopoDS_Face(aFaceBuilder.Face()));
   return aRes;
 }
 
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::square(
-    std::shared_ptr<GeomAPI_Pln> thePlane,
-    const double theSize)
+//==================================================================================================
+std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::squareFace(const std::shared_ptr<GeomAPI_Pln> thePlane,
+                                                                  const double theSize)
 {
   // half of the size in each direction from the center
   BRepBuilderAPI_MakeFace aFaceBuilder(thePlane->impl<gp_Pln>(),
                                        -theSize / 2., theSize / 2.,
                                        -theSize / 2., theSize / 2.);
-  std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
-  TopoDS_Shape aFace = aFaceBuilder.Face();
-  aRes->setImpl(new TopoDS_Shape(aFace/*aFaceBuilder.Face()*/));
+  std::shared_ptr<GeomAPI_Face> aRes(new GeomAPI_Face());
+  const TopoDS_Face& aFace = aFaceBuilder.Face();
+  aRes->setImpl(new TopoDS_Face(aFace));
   return aRes;
 }
 
-std::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_FaceBuilder::plane(
-    std::shared_ptr<GeomAPI_Shape> theFace)
+//==================================================================================================
+std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::planarFace(const std::shared_ptr<GeomAPI_Pnt> theCenter,
+                                                                  const std::shared_ptr<GeomAPI_Dir> theNormal)
+{
+  const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
+  const gp_Dir& aDir = theNormal->impl<gp_Dir>();
+  gp_Pln aPlane(aCenter, aDir);
+  BRepBuilderAPI_MakeFace aFaceBuilder(aPlane);
+  std::shared_ptr<GeomAPI_Face> aRes(new GeomAPI_Face());
+  aRes->setImpl(new TopoDS_Face(aFaceBuilder.Face()));
+  return aRes;
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::planarFace(const std::shared_ptr<GeomAPI_Pln> thePlane,
+                                                                  const double theX, const double theY,
+                                                                  const double theWidth, const double theHeight)
+{
+  double aA, aB, aC, aD;
+  thePlane->coefficients(aA, aB, aC, aD);
+  gp_Pln aPlane(aA, aB, aC, aD);
+
+  // half of the size in each direction from the center
+  BRepBuilderAPI_MakeFace aFaceBuilder(aPlane, theX, theX + theWidth, 
+                                       theY, theY + theHeight);
+  std::shared_ptr<GeomAPI_Face> aRes(new GeomAPI_Face());
+  aRes->setImpl(new TopoDS_Face(aFaceBuilder.Face()));
+  return aRes;
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::planarFaceByThreeVertices(
+    const std::shared_ptr<GeomAPI_Vertex> theVertex1,
+    const std::shared_ptr<GeomAPI_Vertex> theVertex2,
+    const std::shared_ptr<GeomAPI_Vertex> theVertex3)
+{
+  gp_Pnt aPnt1 = theVertex1->point()->impl<gp_Pnt>();
+  gp_Pnt aPnt2 = theVertex2->point()->impl<gp_Pnt>();
+  gp_Pnt aPnt3 = theVertex3->point()->impl<gp_Pnt>();
+
+  std::shared_ptr<GeomAPI_Face> aFace;
+  GC_MakePlane aMakePlane(aPnt1, aPnt2, aPnt3);
+  if(!aMakePlane.IsDone()) {
+    return aFace;
+  }
+
+  BRepBuilderAPI_MakeFace aMakeFace(aMakePlane.Value()->Pln());
+  aFace.reset(new GeomAPI_Face());
+  aFace->setImpl(new TopoDS_Face(aMakeFace.Face()));
+  return aFace;
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_FaceBuilder::plane(const std::shared_ptr<GeomAPI_Face> theFace)
 {
   std::shared_ptr<GeomAPI_Pln> aResult;
   if (!theFace)
@@ -75,32 +136,4 @@ std::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_FaceBuilder::plane(
   }
   aResult = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
   return aResult;
-}
-
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::planarFace(std::shared_ptr<GeomAPI_Pnt> theCenter,
-                                                                   std::shared_ptr<GeomAPI_Dir> theNormal)
-{
-  const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
-  const gp_Dir& aDir = theNormal->impl<gp_Dir>();
-  gp_Pln aPlane(aCenter, aDir);
-  BRepBuilderAPI_MakeFace aFaceBuilder(aPlane);
-  std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
-  aRes->setImpl(new TopoDS_Shape(aFaceBuilder.Face()));
-  return aRes;
-}
-
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::planarFace(std::shared_ptr<GeomAPI_Pln> thePlane,
-             double theX, double theY,
-             double theWidth, double theHeight)
-{
-  double aA, aB, aC, aD;
-  thePlane->coefficients(aA, aB, aC, aD);
-  gp_Pln aPlane(aA, aB, aC, aD);
-
-  // half of the size in each direction from the center
-  BRepBuilderAPI_MakeFace aFaceBuilder(aPlane, theX, theX + theWidth, 
-                                       theY, theY + theHeight);
-  std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
-  aRes->setImpl(new TopoDS_Shape(aFaceBuilder.Face()));
-  return aRes;
 }

@@ -1,8 +1,95 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <switch id="CreationMethod">
-    <case id="PlaneByFaceAndDistance" title="On some distance from a face">
+  <toolbox id="creation_method">
+    <box id="by_three_points"
+         title="By three points"
+         tooltip="Plane by three points."
+         icon="icons/Construction/plane_by_three_points_32x32.png">
+      <shape_selector id="point1"
+                      label="1st point"
+                      tooltip="First point."
+                      icon="icons/Construction/point.png"
+                      shape_types="vertex">
+        <validator id="ConstructionPlugin_ValidatorPlaneThreePoints" parameters="point2,point3"/>
+      </shape_selector>
+      <shape_selector id="point2"
+                      label="2nd point"
+                      tooltip="Second point."
+                      icon="icons/Construction/point.png"
+                      shape_types="vertex">
+        <validator id="ConstructionPlugin_ValidatorPlaneThreePoints" parameters="point1,point3"/>
+      </shape_selector>
+      <shape_selector id="point3"
+                      label="3rd point"
+                      tooltip="Third point."
+                      icon="icons/Construction/point.png"
+                      shape_types="vertex">
+        <validator id="ConstructionPlugin_ValidatorPlaneThreePoints" parameters="point1,point2"/>
+      </shape_selector>
+    </box>
+    <box id="by_line_and_point"
+         title="By line and point"
+         tooltip="Plane by line and point."
+         icon="icons/Construction/plane_by_line_and_point_32x32.png">
+      <shape_selector id="line"
+                      label="Line"
+                      tooltip="Select line."
+                      icon="icons/Construction/edge.png"
+                      shape_types="edge">
+        <validator id="GeomValidators_ShapeType" parameters="line"/>
+        <validator id="ConstructionPlugin_ValidatorPlaneLinePoint" parameters="point"/>
+      </shape_selector>
+      <shape_selector id="point"
+                      label="Point"
+                      tooltip="Select point."
+                      icon="icons/Construction/point.png"
+                      shape_types="vertex">
+        <validator id="ConstructionPlugin_ValidatorPlaneLinePoint" parameters="line"/>
+      </shape_selector>
+    </box>
+    <box id="by_other_plane"
+         title="By other plane"
+         tooltip="Plane by other plane with different options."
+         icon="icons/Construction/plane_by_other_plane_32x32.png">
+      <shape_selector id="plane"
+                      label="Plane"
+                      tooltip="Select a planar face."
+                      icon="icons/Construction/face.png"
+                      shape_types="face">
+        <validator id="GeomValidators_Face" parameters="plane"/>
+      </shape_selector>
+      <toolbox id="by_other_plane_option">
+        <box id="by_distance_from_other"
+             title="By distance from other"
+             tooltip="Plane by distance from other plane."
+             icon="icons/Construction/plane_by_distance_from_other_32x32.png">
+          <doublevalue id="distance"
+                       label="Distance"
+                       tooltip="Distance from selected face to plane."
+                       icon="icons/Construction/distance_value.png"
+                       default="0"/>
+        </box>
+        <box id="by_coincident_to_point"
+             title="By coincident to point"
+             tooltip="Plane by coincident to point."
+             icon="icons/Construction/plane_by_coincident_to_point_32x32.png">
+        </box>
+        <box id="by_rotation"
+             title="By rotation"
+             tooltip="Plane by rotation around axis."
+             icon="icons/Construction/plane_by_rotation_32x32.png">
+        </box>
+      </toolbox>
+    </box>
+    <box id="by_two_parallel_planes"
+         title="By two parallel planes"
+         tooltip="Plane equidistant from 2 parallel planes."
+         icon="icons/Construction/plane_by_two_parallel_planes_32x32.png">
+    </box>
+
+
+    <!--<box id="PlaneByFaceAndDistance" title="On some distance from a face">
       <shape_selector id="planeFace"
                       label="Plane face"
                       tooltip="Select a planar face"
@@ -13,6 +100,7 @@
                    label="Distance" 
                    tooltip="Distance from selected face to plane" 
                default="0" />
-    </case>
-  </switch>
+    </box>-->
+
+  </toolbox>
 </source>

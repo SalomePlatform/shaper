@@ -8,83 +8,180 @@
 #define ConstructionPlugin_Plane_H
 
 #include "ConstructionPlugin.h"
+
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
 #include <GeomAPI_ICustomPrs.h>
 
-
-
-/**\class ConstructionPlugin_Plane
- * \ingroup Plugins
- * \brief Feature for creation of the new planar surface in PartSet.
- */
-class ConstructionPlugin_Plane : public ModelAPI_Feature, public GeomAPI_ICustomPrs
+/// \class ConstructionPlugin_Plane
+/// \ingroup Plugins
+/// \brief Feature for creation of the new planar surface in PartSet.
+class ConstructionPlugin_Plane: public ModelAPI_Feature, public GeomAPI_ICustomPrs
 {
- public:
-  /// Returns the kind of a feature
+public:
+  /// \return the kind of a feature.
   CONSTRUCTIONPLUGIN_EXPORT virtual const std::string& getKind()
   {
     static std::string MY_KIND = ConstructionPlugin_Plane::ID();
     return MY_KIND;
   }
 
-  /// default color for a plane
+  /// Default color for a plane.
   inline static const std::string& DEFAULT_COLOR()
   {
     static const std::string CONSTRUCTION_PLANE_COLOR("150,150,180");
     return CONSTRUCTION_PLANE_COLOR;
   }
 
-  /// Plane kind
+  /// Plane kind.
   inline static const std::string& ID()
   {
     static const std::string CONSTRUCTION_PLANE_KIND("Plane");
     return CONSTRUCTION_PLANE_KIND;
   }
 
-  /// attribute name for first point
-  inline static const std::string& METHOD()
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD()
   {
-    static const std::string METHOD_ATTR("CreationMethod");
-    return METHOD_ATTR;
+    static const std::string MY_CREATION_METHOD_ID("creation_method");
+    return MY_CREATION_METHOD_ID;
   }
 
-  /// attribute name for base face
-  inline static const std::string& FACE()
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_GENERAL_EQUATION()
   {
-    static const std::string FACE_ATTR("planeFace");
-    return FACE_ATTR;
+    static const std::string MY_CREATION_METHOD_ID("by_general_equation");
+    return MY_CREATION_METHOD_ID;
   }
-  /// attribute name for distance
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_THREE_POINTS()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_three_points");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_LINE_AND_POINT()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_line_and_point");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_OTHER_PLANE()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_other_plane");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_OTHER_PLANE_OPTION()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_other_plane_option");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_DISTANCE_FROM_OTHER()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_distance_from_other");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_COINCIDENT_TO_POINT()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_coincident_to_point");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_ROTATION()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_rotation");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_TWO_PARALLEL_PLANES()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_two_parallel_planes");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for first point.
+  inline static const std::string& POINT1()
+  {
+    static const std::string ATTR_ID("point1");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for second point.
+  inline static const std::string& POINT2()
+  {
+    static const std::string ATTR_ID("point2");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for third point.
+  inline static const std::string& POINT3()
+  {
+    static const std::string ATTR_ID("point3");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for line.
+  inline static const std::string& LINE()
+  {
+    static const std::string ATTR_ID("line");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for point.
+  inline static const std::string& POINT()
+  {
+    static const std::string ATTR_ID("point");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for selected plane.
+  inline static const std::string& PLANE()
+  {
+    static const std::string ATTR_ID("plane");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for distance.
   inline static const std::string& DISTANCE()
   {
-    static const std::string DISTANCE_ATTR("distance");
-    return DISTANCE_ATTR;
+    static const std::string ATTR_ID("distance");
+    return ATTR_ID;
   }
 
-  /// the a parameter for the general equation of a plane (ax+by+cz+d=0)
+  /// Attribute name for a parameter for the general equation of a plane (ax+by+cz+d=0)
   inline static const std::string& A()
   {
-    static const std::string PARAM_A_ATTR("A");
-    return PARAM_A_ATTR;
+    static const std::string ATTR_ID("A");
+    return ATTR_ID;
   }
-  /// the b parameter for the general equation of a plane (ax+by+cz+d=0)
+  /// Attribute name for b parameter for the general equation of a plane (ax+by+cz+d=0)
   inline static const std::string& B()
   {
-    static const std::string PARAM_B_ATTR("B");
-    return PARAM_B_ATTR;
+    static const std::string ATTR_ID("B");
+    return ATTR_ID;
   }
-  /// the c parameter for the general equation of a plane (ax+by+cz+d=0)
+  /// Attribute name for c parameter for the general equation of a plane (ax+by+cz+d=0)
   inline static const std::string& C()
   {
-    static const std::string PARAM_C_ATTR("C");
-    return PARAM_C_ATTR;
+    static const std::string ATTR_ID("C");
+    return ATTR_ID;
   }
-  /// the d parameter for the general equation of a plane (ax+by+cz+d=0)
+  /// Attribute name for d parameter for the general equation of a plane (ax+by+cz+d=0)
   inline static const std::string& D()
   {
-    static const std::string PARAM_D_ATTR("D");
-    return PARAM_D_ATTR;
+    static const std::string ATTR_ID("D");
+    return ATTR_ID;
   }
 
   /// Creates a new part document if needed
@@ -103,12 +200,14 @@ class ConstructionPlugin_Plane : public ModelAPI_Feature, public GeomAPI_ICustom
   virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                      std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs);
 
- protected:
+protected:
+  /// Creates a new plane by general equation.
+  std::shared_ptr<GeomAPI_Shape> createByGeneralEquation();
+  std::shared_ptr<GeomAPI_Shape> createByThreePoints();
+  std::shared_ptr<GeomAPI_Shape> createByLineAndPoint();
   /// Creates a new plane by copy of face plane with translation along the normal
   /// to the specified distance.
-  std::shared_ptr<GeomAPI_Shape> createPlaneByFaceAndDistance();
-  /// Creates a new plane by general equation.
-  std::shared_ptr<GeomAPI_Shape> createPlaneByGeneralEquation();
+  std::shared_ptr<GeomAPI_Shape> createByDistanceFromOther();
 };
 
 #endif

@@ -26,8 +26,38 @@ public:
 
 /// \class ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel
 /// \ingroup Validators
-/// \brief A validator for selection line and plane for point by intersection..
+/// \brief A validator for selection line and plane for point by intersection.
 class ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel: public ModelAPI_AttributeValidator
+{
+public:
+  //! \return True if the attribute is valid.
+  //! \param[in] theAttribute the checked attribute.
+  //! \param[in] theArguments arguments of the attribute.
+  //! \param[out] theError error message.
+   virtual bool isValid(const AttributePtr& theAttribute,
+                        const std::list<std::string>& theArguments,
+                        Events_InfoMessage& theError) const;
+};
+
+/// \class ConstructionPlugin_ValidatorPlaneThreePoints
+/// \ingroup Validators
+/// \brief A validator for selection three points for plane.
+class ConstructionPlugin_ValidatorPlaneThreePoints: public ModelAPI_AttributeValidator
+{
+public:
+  //! \return True if the attribute is valid.
+  //! \param[in] theAttribute the checked attribute.
+  //! \param[in] theArguments arguments of the attribute.
+  //! \param[out] theError error message.
+   virtual bool isValid(const AttributePtr& theAttribute,
+                        const std::list<std::string>& theArguments,
+                        Events_InfoMessage& theError) const;
+};
+
+/// \class ConstructionPlugin_ValidatorPlaneLinePoint
+/// \ingroup Validators
+/// \brief A validator for selection line and point for plane.
+class ConstructionPlugin_ValidatorPlaneLinePoint: public ModelAPI_AttributeValidator
 {
 public:
   //! \return True if the attribute is valid.

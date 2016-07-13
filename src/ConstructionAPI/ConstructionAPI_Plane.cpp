@@ -49,7 +49,7 @@ void ConstructionAPI_Plane::setFaceAndDistance(
     const ModelHighAPI_Double & theDistance)
 {
   fillAttribute("PlaneByFaceAndDistance", mycreationMethod);
-  fillAttribute(theFace, myface);
+  fillAttribute(theFace, myplane);
   fillAttribute(theDistance, mydistance);
 
   execute();
