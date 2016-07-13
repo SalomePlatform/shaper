@@ -258,10 +258,8 @@ ModuleBase_PageBase* ModuleBase_WidgetFactory::createPageByType(const std::strin
     aResult = aPage;
   }
   else if (theType == WDG_CHECK_GROUP) {
-    QString aGroupName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
     ModuleBase_WidgetCheckGroupBox* aPage = new ModuleBase_WidgetCheckGroupBox(theParent,
                                                                 myWidgetApi);
-    aPage->setTitle(aGroupName);
     aResult = aPage;
   }
   if (!aResult)

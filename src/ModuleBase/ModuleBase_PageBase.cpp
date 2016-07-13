@@ -80,7 +80,7 @@ bool ModuleBase_PageBase::takeFocus()
   return myWidgetList.first()->focusTo();
 }
 
-QList<ModuleBase_ModelWidget*> ModuleBase_PageBase::modelWidgets()
+QList<ModuleBase_ModelWidget*> ModuleBase_PageBase::modelWidgets() const
 {
   return myWidgetList;
 }

@@ -39,7 +39,7 @@ class MODULEBASE_EXPORT ModuleBase_PageBase
   /// Passes focus from page to the first ModuleBase_ModelWidget contained on the page
   bool takeFocus();
   /// Returns list of ModuleBase_ModelWidgets contained on the page
-  QList<ModuleBase_ModelWidget*> modelWidgets();
+  QList<ModuleBase_ModelWidget*> modelWidgets() const;
   /// Aligns top all widgets on page
   void alignToTop();
 
