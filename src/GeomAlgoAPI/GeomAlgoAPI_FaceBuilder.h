@@ -47,6 +47,10 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_FaceBuilder
                                                                  const std::shared_ptr<GeomAPI_Vertex> theVertex2,
                                                                  const std::shared_ptr<GeomAPI_Vertex> theVertex3);
 
+  /// Creates a planar face parallel to theFace and passing through theVertex.
+  static std::shared_ptr<GeomAPI_Face> planarFaceByFaceAndVertex(const std::shared_ptr<GeomAPI_Face> theFace,
+                                                                 const std::shared_ptr<GeomAPI_Vertex> theVertex);
+
   /// Returns the plane of the planar face. If it is not planar, returns empty ptr.
   static std::shared_ptr<GeomAPI_Pln> plane(const std::shared_ptr<GeomAPI_Face> theFace);
 };

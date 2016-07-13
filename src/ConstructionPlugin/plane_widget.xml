@@ -74,6 +74,12 @@
              title="By coincident to point"
              tooltip="Plane by coincident to point."
              icon="icons/Construction/plane_by_coincident_to_point_32x32.png">
+          <shape_selector id="coincident_point"
+                          label="Point"
+                          tooltip="Select point."
+                          icon="icons/Construction/point.png"
+                          shape_types="vertex">
+          </shape_selector>
         </box>
         <box id="by_rotation"
              title="By rotation"

@@ -159,6 +159,13 @@ public:
     return ATTR_ID;
   }
 
+  /// Attribute name for coincident point.
+  inline static const std::string& COINCIDENT_POINT()
+  {
+    static const std::string ATTR_ID("coincident_point");
+    return ATTR_ID;
+  }
+
   /// Attribute name for a parameter for the general equation of a plane (ax+by+cz+d=0)
   inline static const std::string& A()
   {
@@ -205,6 +212,7 @@ protected:
   std::shared_ptr<GeomAPI_Shape> createByGeneralEquation();
   std::shared_ptr<GeomAPI_Shape> createByThreePoints();
   std::shared_ptr<GeomAPI_Shape> createByLineAndPoint();
+  std::shared_ptr<GeomAPI_Shape> createByCoincidentPoint();
   /// Creates a new plane by copy of face plane with translation along the normal
   /// to the specified distance.
   std::shared_ptr<GeomAPI_Shape> createByDistanceFromOther();
