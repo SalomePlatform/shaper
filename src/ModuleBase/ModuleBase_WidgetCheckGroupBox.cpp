@@ -63,7 +63,7 @@ QList<QWidget*> ModuleBase_WidgetCheckGroupBox::getControls() const
 void ModuleBase_WidgetCheckGroupBox::onPageClicked()
 {
   storeValue();
-  updatePagesVisibility();
+  updateControlsVisibility();
 }
 
 void ModuleBase_WidgetCheckGroupBox::addPageStretch()
@@ -85,7 +85,7 @@ void ModuleBase_WidgetCheckGroupBox::placeModelWidget(ModuleBase_ModelWidget* th
 
     ModuleBase_ModelWidget* aCheckBoxWidget = myCheckBoxWidget;
     myCheckBoxWidget = 0;
-    if (aCheckBoxWidget)
+    if (aCheckBoxWidget) // move the model widget from check box frame to group box frame
       placeModelWidget(aCheckBoxWidget);
 
     const int kCol = 0;
@@ -102,9 +102,9 @@ void ModuleBase_WidgetCheckGroupBox::placeWidget(QWidget* theWidget)
 {
   createControl(GroupBox);
   setOptionType(GroupBox);
-  if (isCheckBoxFilled()) {
+  if (isCheckBoxFilled())
     placeModelWidget(myCheckBoxWidget);
-  }
+
 
   if (!theWidget) {
 #ifdef _DEBUG
@@ -212,10 +212,10 @@ void ModuleBase_WidgetCheckGroupBox::setCurrentValue(const bool& theValue)
     myCheckBox->setChecked(theValue);
     myCheckBox->blockSignals(isBlocked);
   }
-  updatePagesVisibility();
+  updateControlsVisibility();
 }
 
-void ModuleBase_WidgetCheckGroupBox::updatePagesVisibility()
+void ModuleBase_WidgetCheckGroupBox::updateControlsVisibility()
 {
   if (myOptionType == GroupBox) {
     bool aChecked = myGroupBox->isChecked();
