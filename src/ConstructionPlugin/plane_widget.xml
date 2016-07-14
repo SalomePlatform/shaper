@@ -85,6 +85,18 @@
              title="By rotation"
              tooltip="Plane by rotation around axis."
              icon="icons/Construction/plane_by_rotation_32x32.png">
+          <shape_selector id="axis"
+                          label="Axis"
+                          tooltip="Select line for axis."
+                          icon="icons/Construction/axis.png"
+                          shape_types="edge">
+            <validator id="GeomValidators_ShapeType" parameters="line"/>
+          </shape_selector>
+          <doublevalue id="angle"
+                       label="Angle"
+                       tooltip="Angle for rotation around axis."
+                       icon="icons/Construction/angle.png"
+                       default="0"/>
         </box>
       </toolbox>
     </box>

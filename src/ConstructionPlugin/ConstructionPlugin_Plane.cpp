@@ -9,9 +9,12 @@
 #include <Config_PropManager.h>
 
 #include <GeomAlgoAPI_FaceBuilder.h>
+#include <GeomAlgoAPI_Rotation.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
+#include <GeomAPI_Ax1.h>
 #include <GeomAPI_Edge.h>
+#include <GeomAPI_Lin.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pnt2d.h>
@@ -65,6 +68,8 @@ void ConstructionPlugin_Plane::initAttributes()
   data()->addAttribute(PLANE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(DISTANCE(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(COINCIDENT_POINT(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(AXIS(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(ANGLE(), ModelAPI_AttributeDouble::typeId());
 }
 
 //==================================================================================================
@@ -85,6 +90,8 @@ void ConstructionPlugin_Plane::execute()
       aShape = createByDistanceFromOther();
     } else if(aCreationMethodOption == CREATION_METHOD_BY_COINCIDENT_TO_POINT()) {
       aShape = createByCoincidentPoint();
+    } else if(aCreationMethodOption == CREATION_METHOD_BY_ROTATION()) {
+      aShape = createByRotation();
     }
   }
 
@@ -270,6 +277,41 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByCoincidentPoint
   std::shared_ptr<GeomAPI_Pln> aNewPln(new GeomAPI_Pln(anOrig, aDir));
 
   return makeRectangularFace(aFace, aNewPln);
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
+{
+  // Get face.
+  AttributeSelectionPtr aFaceSelection = selection(PLANE());
+  GeomShapePtr aFaceShape = aFaceSelection->value();
+  if(!aFaceShape.get()) {
+    aFaceShape = aFaceSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aFaceShape));
+
+  // Get axis.
+  AttributeSelectionPtr anAxisSelection = selection(AXIS());
+  GeomShapePtr anAxisShape = anAxisSelection->value();
+  if(!anAxisShape.get()) {
+    anAxisShape = anAxisSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(anAxisShape));
+
+  std::shared_ptr<GeomAPI_Ax1> anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(),
+                                                                                     anEdge->line()->direction()));
+
+  // Getting angle.
+  double anAngle = real(ANGLE())->value();
+
+  GeomAlgoAPI_Rotation aRotationAlgo(aFace, anAxis, anAngle);
+
+  std::shared_ptr<GeomAPI_Face> aRes(new GeomAPI_Face(aRotationAlgo.shape()));
+  std::shared_ptr<GeomAPI_Pln> aNewPln = aRes->getPlane();
+
+  aRes = makeRectangularFace(aRes, aNewPln);
+
+  return aRes;
 }
 
 //==================================================================================================
