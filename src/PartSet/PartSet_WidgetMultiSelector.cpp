@@ -75,7 +75,7 @@ void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr
   // there is no a sketch feature is selected, but the shape exists, try to create an exernal object
   // TODO: unite with the same functionality in PartSet_WidgetShapeSelector
   if (aSPFeature.get() == NULL) {
-    theObject = ObjectPtr();
+    ObjectPtr anExternalObject = ObjectPtr();
     if (myExternalObjectMgr->useExternal()) {
       GeomShapePtr aShape = theShape;
       if (!aShape.get()) {
@@ -84,7 +84,10 @@ void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr
           aShape = aResult->shape();
       }
       if (aShape.get() != NULL && !aShape->isNull())
-        theObject = myExternalObjectMgr->externalObject(theObject, aShape, sketch(), myIsInValidate);
+        anExternalObject = myExternalObjectMgr->externalObject(theObject, aShape, sketch(), myIsInValidate);
     }
+    /// the object is null if the selected feature is "external"(not sketch entity feature of the
+    /// current sketch) and it is not created by object manager
+    theObject = anExternalObject;
   }
 }
