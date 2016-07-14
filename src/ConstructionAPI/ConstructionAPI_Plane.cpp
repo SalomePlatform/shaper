@@ -4,11 +4,10 @@
 // History:
 // 27/05/16 - Sergey POKHODENKO - Creation of the file
 
-//--------------------------------------------------------------------------------------
 #include "ConstructionAPI_Plane.h"
-//--------------------------------------------------------------------------------------
+
 #include <ModelHighAPI_Tools.h>
-//--------------------------------------------------------------------------------------
+
 ConstructionAPI_Plane::ConstructionAPI_Plane(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
 : ModelHighAPI_Interface(theFeature)
@@ -61,7 +60,7 @@ void ConstructionAPI_Plane::setGeneralEquation(
     const ModelHighAPI_Double & theC,
     const ModelHighAPI_Double & theD)
 {
-  fillAttribute("PlaneByGeneralEquation", mycreationMethod);
+  fillAttribute(ConstructionPlugin_Plane::CREATION_METHOD_BY_GENERAL_EQUATION(), mycreationMethod);
   fillAttribute(theA, myA);
   fillAttribute(theB, myB);
   fillAttribute(theC, myC);

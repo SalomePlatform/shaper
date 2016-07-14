@@ -10,11 +10,13 @@
 #include "GeomAPI_Pln.h"
 #include "GeomAPI_Pnt.h"
 
+#include <BOPTools_AlgoTools.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepAdaptor_Surface.hxx>
 #include <Geom_Surface.hxx>
 #include <Geom_CylindricalSurface.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
+#include <IntTools_Context.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Face.hxx>
 
@@ -41,8 +43,11 @@ bool GeomAPI_Face::isEqual(std::shared_ptr<GeomAPI_Shape> theFace) const
   const TopoDS_Shape& aMyShape = const_cast<GeomAPI_Face*>(this)->impl<TopoDS_Shape>();
   const TopoDS_Shape& aInShape = theFace->impl<TopoDS_Shape>();
 
-  Handle(Geom_Surface) aMySurf = BRep_Tool::Surface(TopoDS::Face(aMyShape));
-  Handle(Geom_Surface) aInSurf = BRep_Tool::Surface(TopoDS::Face(aInShape));
+  TopoDS_Face aMyFace = TopoDS::Face(aMyShape);
+  TopoDS_Face aInFace = TopoDS::Face(aInShape);
+
+  Handle(Geom_Surface) aMySurf = BRep_Tool::Surface(aMyFace);
+  Handle(Geom_Surface) aInSurf = BRep_Tool::Surface(aInFace);
 
   // Check that surfaces a the same type
   if (aMySurf->DynamicType() != aInSurf->DynamicType())
@@ -61,7 +66,10 @@ bool GeomAPI_Face::isEqual(std::shared_ptr<GeomAPI_Shape> theFace) const
       fabs(aMyVMax - aInVMax) > Precision::PConfusion())
     return false;
 
-  return true;
+  Handle(IntTools_Context) aContext = new IntTools_Context();
+  Standard_Boolean aRes = BOPTools_AlgoTools::CheckSameGeom(aMyFace, aInFace, aContext);
+
+  return aRes == Standard_True;
 }
 
 bool GeomAPI_Face::isCylindrical() const

@@ -81,7 +81,8 @@ assert (anExtrusionResult is not None)
 # Create from plane
 aSession.startOperation()
 aFromPlaneFeature = aPart.addFeature("Plane")
-aFromPlaneFeature.string("CreationMethod").setValue("PlaneByGeneralEquation")
+aFromPlaneFeature.string("creation_method").setValue("by_general_equation")
+aFromPlaneFeature.string("by_other_plane_option").setValue("by_distance_from_other") # TODO: remove
 aFromPlaneFeature.real("A").setValue(0.)
 aFromPlaneFeature.real("B").setValue(0.)
 aFromPlaneFeature.real("C").setValue(1.)
@@ -91,7 +92,8 @@ aSession.finishOperation()
 # Create to plane
 aSession.startOperation()
 aToPlaneFeature = aPart.addFeature("Plane")
-aToPlaneFeature.string("CreationMethod").setValue("PlaneByGeneralEquation")
+aToPlaneFeature.string("creation_method").setValue("by_general_equation")
+aToPlaneFeature.string("by_other_plane_option").setValue("by_distance_from_other") # TODO: remove
 aToPlaneFeature.real("A").setValue(0.)
 aToPlaneFeature.real("B").setValue(0.)
 aToPlaneFeature.real("C").setValue(1.)

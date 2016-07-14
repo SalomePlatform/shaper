@@ -7,10 +7,10 @@
         static const std::string MY_GROUP_LIST_ID("base");
         static const std::string MY_TO_OBJECT_ID("axis_object");
         static const std::string METHOD_ATTR("CreationMethod");
-        static const std::string MY_TO_ANGLE_ID("to_angle");		
+        static const std::string MY_TO_ANGLE_ID("to_angle");
         static const std::string MY_FROM_ANGLE_ID("from_angle");
         static const std::string MY_TO_OBJECT_ID("to_object");
-        static const std::string MY_TO_OFFSET_ID("to_offset");	
+        static const std::string MY_TO_OFFSET_ID("to_offset");
         static const std::string MY_FROM_OBJECT_ID("from_object");
         static const std::string MY_FROM_OFFSET_ID("from_offset");
 
@@ -133,7 +133,8 @@ assert (aRevolResult is not None)
 # Create from plane
 aSession.startOperation()
 aFromPlaneFeature = aPart.addFeature("Plane")
-aFromPlaneFeature.string("CreationMethod").setValue("PlaneByGeneralEquation")
+aFromPlaneFeature.string("creation_method").setValue("by_general_equation")
+aFromPlaneFeature.string("by_other_plane_option").setValue("by_distance_from_other") # TODO: remove
 aFromPlaneFeature.real("A").setValue(0.)
 aFromPlaneFeature.real("B").setValue(0.)
 aFromPlaneFeature.real("C").setValue(1.)
@@ -145,7 +146,8 @@ aFromShape = modelAPI_ResultConstruction(aFromResult).shape()
 # Create to plane
 aSession.startOperation()
 aToPlaneFeature = aPart.addFeature("Plane")
-aToPlaneFeature.string("CreationMethod").setValue("PlaneByGeneralEquation")
+aToPlaneFeature.string("creation_method").setValue("by_general_equation")
+aToPlaneFeature.string("by_other_plane_option").setValue("by_distance_from_other") # TODO: remove
 aToPlaneFeature.real("A").setValue(0.)
 aToPlaneFeature.real("B").setValue(0.)
 aToPlaneFeature.real("C").setValue(1.)

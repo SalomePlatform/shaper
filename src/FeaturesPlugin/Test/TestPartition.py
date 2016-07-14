@@ -80,7 +80,8 @@ assert (anExtrusionResult is not None)
 #=========================================================================
 aSession.startOperation()
 aPlaneFeature = aPart.addFeature("Plane")
-aPlaneFeature.string("CreationMethod").setValue("PlaneByGeneralEquation")
+aPlaneFeature.string("creation_method").setValue("by_general_equation")
+aPlaneFeature.string("by_other_plane_option").setValue("by_distance_from_other") # TODO: remove
 aPlaneFeature.real("A").setValue(0.)
 aPlaneFeature.real("B").setValue(1.)
 aPlaneFeature.real("C").setValue(0.)
