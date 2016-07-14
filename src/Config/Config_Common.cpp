@@ -143,24 +143,24 @@ bool hasParent(xmlNodePtr theNode, const char* theNodeName, ...)
   return false;
 }
 
-bool hasParentRecursive(xmlNodePtr theNode, const std::vector<const char*>& theNodeNames)
+xmlNodePtr hasParentRecursive(xmlNodePtr theNode, const std::vector<const char*>& theNodeNames)
 {
   if (!hasParent(theNode)) {
-    return false; // have no parents at all
+    return 0; // have no parents at all
   }
   xmlNodePtr aNode = theNode->parent;
   const xmlChar* aName = aNode->name;
   if (!aName || !isElementNode(aNode)) {
-    return false;
+    return 0;
   }
   for (size_t anIndex = 0; anIndex < theNodeNames.size(); ++anIndex) {
     if (!xmlStrcmp(aName, (const xmlChar *) theNodeNames[anIndex]))
-      return true;
+      return aNode;
   }
   return hasParentRecursive(aNode, theNodeNames);
 }
 
-bool hasParentRecursive(xmlNodePtr theNode, const char* theNodeName, ...)
+xmlNodePtr hasParentRecursive(xmlNodePtr theNode, const char* theNodeName, ...)
 {
   std::vector<const char*> aNodeNames;
   va_list args;  // define argument list variable

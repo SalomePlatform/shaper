@@ -64,6 +64,9 @@ void ModuleBase_WidgetCheckGroupBox::onPageClicked()
 {
   storeValue();
   updateControlsVisibility();
+
+  if (!isEditingMode())
+    emit focusOutWidget(this);
 }
 
 void ModuleBase_WidgetCheckGroupBox::addPageStretch()

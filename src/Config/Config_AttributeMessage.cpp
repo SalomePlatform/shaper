@@ -9,7 +9,6 @@ Config_AttributeMessage::Config_AttributeMessage(const Events_ID theId, const vo
   myFeatureId = std::string(); // Feature unique id
   myIsObligatory = true;
   myIsConcealment = false;
-  myCaseId = std::string();
 }
 
 Config_AttributeMessage::~Config_AttributeMessage()
@@ -57,22 +56,12 @@ void Config_AttributeMessage::setObligatory(bool theObligatory)
   this->myIsObligatory = theObligatory;
 }
 
-const std::string& Config_AttributeMessage::caseId() const
+const std::list<std::pair<std::string, std::string> >& Config_AttributeMessage::getCases() const
 {
-  return myCaseId;
+  return myCases;
 }
 
-const std::string& Config_AttributeMessage::switchId() const
+void Config_AttributeMessage::setCases(const std::list<std::pair<std::string, std::string> >& theCases)
 {
-  return mySwitchId;
-}
-
-void Config_AttributeMessage::setCaseId(const std::string& theId)
-{
-  this->myCaseId = theId;
-}
-
-void Config_AttributeMessage::setSwitchId(const std::string& theId)
-{
-  this->mySwitchId = theId;
+  myCases = theCases;
 }

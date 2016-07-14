@@ -71,23 +71,31 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
         aMessage->setAttributeId(anAttributeID);
         aMessage->setObligatory(getBooleanAttribute(theNode, ATTR_OBLIGATORY, true));
         aMessage->setConcealment(getBooleanAttribute(theNode, ATTR_CONCEALMENT, false));
-        if (hasParentRecursive(theNode, WDG_CHECK_GROUP, NULL)) {
-          const char* kWdgCase = WDG_CHECK_GROUP;
-          const char* kWdgSwitch = WDG_CHECK_GROUP;
-          aMessage->setCaseId(restoreAttribute(kWdgCase, _ID));
-          aMessage->setSwitchId(restoreAttribute(kWdgSwitch, _ID));
+
+        std::list<std::pair<std::string, std::string> > aCases;
+        xmlNodePtr aCaseNode = hasParentRecursive(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, WDG_CHECK_GROUP, NULL);
+        while(aCaseNode) {
+          std::string aCaseNodeID = getProperty(aCaseNode, _ID);
+          std::string aSwitchNodeID = "";
+          const xmlChar* aName = aCaseNode->name;
+          xmlNodePtr aSwitchNode;
+          if (!xmlStrcmp(aName, (const xmlChar *) WDG_SWITCH_CASE)) {
+            aSwitchNode = hasParentRecursive(aCaseNode, WDG_SWITCH, NULL);
+          }
+          else if (!xmlStrcmp(aName, (const xmlChar *) WDG_TOOLBOX_BOX)) {
+            aSwitchNode = hasParentRecursive(aCaseNode, WDG_TOOLBOX, NULL);
+          }
+          if (!xmlStrcmp(aName, (const xmlChar *) WDG_CHECK_GROUP)) {
+            /// the box is optional, attribute is in case if the optional attribute value is not empty
+            aSwitchNode = aCaseNode;
+          }
+          if (aSwitchNode)
+            aSwitchNodeID = getProperty(aSwitchNode, _ID);
+
+          aCases.push_back(std::make_pair(aSwitchNodeID, aCaseNodeID));
+          aCaseNode = hasParentRecursive(aSwitchNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, WDG_CHECK_GROUP, NULL);
         }
-        // nested "paged" widgets are not allowed, this issue may be resolved here:
-        else if (hasParentRecursive(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, NULL)) {
-          const char* kWdgCase = hasParentRecursive(theNode, WDG_SWITCH_CASE, NULL)
-                                 ? WDG_SWITCH_CASE
-                                 : WDG_TOOLBOX_BOX;
-          const char* kWdgSwitch = hasParentRecursive(theNode, WDG_SWITCH_CASE, NULL)
-                                   ? WDG_SWITCH
-                                   : WDG_TOOLBOX;
-          aMessage->setCaseId(restoreAttribute(kWdgCase, _ID));
-          aMessage->setSwitchId(restoreAttribute(kWdgSwitch, _ID));
-        }
+        aMessage->setCases(aCases);
         Events_Loop::loop()->send(aMessage);
       }
     // container pages, like "case" or "box"

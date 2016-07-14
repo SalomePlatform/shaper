@@ -84,7 +84,7 @@ CONFIG_EXPORT bool hasParent(xmlNodePtr theNode, const char* theNodeName, ...);
 /*!
  * Checks if the given node has any valid parent in hierarchy with any of the given node names.
  */
-CONFIG_EXPORT bool hasParentRecursive(xmlNodePtr theNode, const char* theNodeName, ...);
+CONFIG_EXPORT xmlNodePtr hasParentRecursive(xmlNodePtr theNode, const char* theNodeName, ...);
 
 
 /*!

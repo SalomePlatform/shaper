@@ -375,9 +375,9 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
         if(aMsgAttr->isConcealment()) {
           validators()->registerConcealment(aMsgAttr->featureId(), aMsgAttr->attributeId());
         }
-        if (!aMsgAttr->caseId().empty()) {
-          validators()->registerCase(aMsgAttr->featureId(), aMsgAttr->attributeId(),
-            aMsgAttr->switchId(), aMsgAttr->caseId());
+        const std::list<std::pair<std::string, std::string> >& aCases = aMsgAttr->getCases();
+        if (!aCases.empty()) {
+          validators()->registerCase(aMsgAttr->featureId(), aMsgAttr->attributeId(), aCases);
         }
       }
     }

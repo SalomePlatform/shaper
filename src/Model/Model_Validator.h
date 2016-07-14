@@ -41,7 +41,7 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   /// Map from feature kind to map of attribute IDs to pair 
   // (switchId (ID of the attribute) and case Ids (possible values of the switch attribute))
   std::map<std::string, std::map<std::string,
-    std::pair<std::string, std::set<std::string> > > > myCases;
+          std::map<std::string, std::set<std::string> > > > myCases;
 
  public:
   /// Registers the instance of the validator by the ID
@@ -95,8 +95,12 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   virtual bool isConcealed(std::string theFeature, std::string theAttribute);
 
   /// register the case-attribute (\a myCases set definition)
+  //virtual void registerCase(std::string theFeature, std::string theAttribute,
+  //  std::string theSwitchId, std::string theCaseId);
+
+  /// register the case-attribute (\a myCases set definition)
   virtual void registerCase(std::string theFeature, std::string theAttribute,
-    std::string theSwitchId, std::string theCaseId);
+                            const std::list<std::pair<std::string, std::string> >& theCases);
 
   /// Returns true if the attribute must be checked (the case is selected)
   virtual bool isCase(FeaturePtr theFeature, std::string theAttribute);

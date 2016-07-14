@@ -8,6 +8,7 @@
 #include <Events_Message.h>
 
 #include <string>
+#include <list>
 
 /*!
  * \class Config_AttributeMessage
@@ -22,10 +23,10 @@ class Config_AttributeMessage : public Events_Message
   std::string myFeatureId; ///< Attribute's feature's unique id
   bool myIsObligatory; ///< Required to be set by user, else it's feature is invalid.
   bool myIsConcealment; ///< If true, conceals features used as input
-  std::string myCaseId; ///< Attribute's case's id, if it placed inside a paged containers
-  std::string mySwitchId; ///< Attribute's switch id, if it placed inside a paged containers
+  ///< a list of pairs, if the attribute is placed inside paged containers: (case, switch)
+  std::list<std::pair<std::string, std::string> > myCases;
 
- public:
+public:
   /// Same event as Config_FeatureMessage::MODEL_EVENT()
   inline static const char* MODEL_EVENT()
   {
@@ -47,10 +48,10 @@ class Config_AttributeMessage : public Events_Message
   CONFIG_EXPORT bool isObligatory() const;
   /// Returns true if attribute should conceal input features
   CONFIG_EXPORT bool isConcealment() const;
-  /// Returns id of a case which contain the attribute
-  CONFIG_EXPORT const std::string& caseId() const;
-  /// Returns id of a switch which contain the attribute
-  CONFIG_EXPORT const std::string& switchId() const;
+  /// Returns container of ids of pair of a case and switches
+  CONFIG_EXPORT const std::list<std::pair<std::string, std::string> >& getCases() const;
+  /// Sets ids of pair of a case and switches
+  CONFIG_EXPORT void setCases(const std::list<std::pair<std::string, std::string> >& theCases);
 
   /// Set attribute's unique id
   CONFIG_EXPORT void setAttributeId(const std::string& theId);
@@ -60,10 +61,6 @@ class Config_AttributeMessage : public Events_Message
   CONFIG_EXPORT void setConcealment(bool isConcealment);
   /// Set attribute's obligatory state
   CONFIG_EXPORT void setObligatory(bool isObligatory);
-  /// Set attribute's case
-  CONFIG_EXPORT void setCaseId(const std::string& id);
-  /// Set attribute's switch
-  CONFIG_EXPORT void setSwitchId(const std::string& id);
 };
 
 #endif // ATTRIBUTE_MESSAGE_H

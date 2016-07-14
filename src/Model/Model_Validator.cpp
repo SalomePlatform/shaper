@@ -314,40 +314,55 @@ bool Model_ValidatorsFactory::isConcealed(std::string theFeature, std::string th
 }
 
 void Model_ValidatorsFactory::registerCase(std::string theFeature, std::string theAttribute,
-    std::string theSwitchId, std::string theCaseId)
+                            const std::list<std::pair<std::string, std::string> >& theCases)
 {
-  std::map<std::string, std::map<std::string, std::pair<std::string, std::set<std::string> > > >
+  std::map<std::string, std::map<std::string, std::map<std::string, std::set<std::string> > > >
     ::iterator aFindFeature = myCases.find(theFeature);
   if (aFindFeature == myCases.end()) {
-    myCases[theFeature] = std::map<std::string, std::pair<std::string, std::set<std::string> > >();
+    myCases[theFeature] = std::map<std::string, std::map<std::string, std::set<std::string> > >();
     aFindFeature = myCases.find(theFeature);
   }
-  std::map<std::string, std::pair<std::string, std::set<std::string> > >::iterator aFindAttrID =
+  std::map<std::string, std::map<std::string, std::set<std::string> > >::iterator aFindAttrID =
     aFindFeature->second.find(theAttribute);
+
   if (aFindAttrID == aFindFeature->second.end()) {
     aFindFeature->second[theAttribute] =
-      std::pair<std::string, std::set<std::string> >(theSwitchId, std::set<std::string>());
+      std::map<std::string, std::set<std::string> >();
     aFindAttrID = aFindFeature->second.find(theAttribute);
   }
-  aFindAttrID->second.second.insert(theCaseId);
+  std::list<std::pair<std::string, std::string> >::const_iterator aCasesIt = theCases.begin(),
+                                                                        aCasesLast = theCases.end();
+  std::map<std::string, std::set<std::string> > aFindCases = aFindAttrID->second;
+  for (; aCasesIt != aCasesLast; aCasesIt++) {
+    std::pair<std::string, std::string> aCasePair = *aCasesIt;
+    std::string aSwitch = aCasePair.first;
+    if (aFindAttrID->second.find(aSwitch) == aFindAttrID->second.end()) {
+      aFindAttrID->second[aSwitch] = std::set<std::string>();
+    }
+    aFindAttrID->second[aSwitch].insert(aCasePair.second);
+  }
 }
 
 bool Model_ValidatorsFactory::isCase(FeaturePtr theFeature, std::string theAttribute)
 {
-  std::map<std::string, std::map<std::string, std::pair<std::string, std::set<std::string> > > >
+  bool anInCase = true;
+  std::map<std::string, std::map<std::string, std::map<std::string, std::set<std::string> > > >
     ::iterator aFindFeature = myCases.find(theFeature->getKind());
   if (aFindFeature != myCases.end()) {
-    std::map<std::string, std::pair<std::string, std::set<std::string> > >::iterator
+    std::map<std::string, std::map<std::string, std::set<std::string> > >::iterator
       aFindAttrID = aFindFeature->second.find(theAttribute);
     if (aFindAttrID != aFindFeature->second.end()) {
-      // the the switch-attribute that contains the case value
-      AttributeStringPtr aSwitch = theFeature->string(aFindAttrID->second.first);
-      if (aSwitch.get()) {
-         // the second has the case identifier
-        return aFindAttrID->second.second.find(aSwitch->value()) != 
-               aFindAttrID->second.second.end();
+      std::map<std::string, std::set<std::string> >::iterator
+              aCasesIt = aFindAttrID->second.begin(), aCasesLast = aFindAttrID->second.end();
+      for (; aCasesIt != aCasesLast && anInCase; aCasesIt++) {
+        // the the switch-attribute that contains the case value
+        AttributeStringPtr aSwitch = theFeature->string(aCasesIt->first);
+        if (aSwitch.get()) {
+          // the second has the case identifier
+          anInCase =  aCasesIt->second.find(aSwitch->value()) != aCasesIt->second.end();
+        }
       }
     }
   }
-  return true; // if no additional conditions, this attribute is the case to be validated
+  return anInCase; // if no additional conditions, this attribute is the case to be validated
 }
