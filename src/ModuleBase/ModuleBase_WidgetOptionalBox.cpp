@@ -1,10 +1,10 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
-// File:        ModuleBase_WidgetCheckGroupBox.cpp
+// File:        ModuleBase_WidgetOptionalBox.cpp
 // Created:     13 Dec 2015
 // Author:      Natalia ERMOLAEVA
 
-#include <ModuleBase_WidgetCheckGroupBox.h>
+#include <ModuleBase_WidgetOptionalBox.h>
 #include <ModelAPI_AttributeString.h>
 
 #include <Config_WidgetAPI.h>
@@ -18,7 +18,7 @@
 
 #include <QList>
 
-ModuleBase_WidgetCheckGroupBox::ModuleBase_WidgetCheckGroupBox(QWidget* theParent,
+ModuleBase_WidgetOptionalBox::ModuleBase_WidgetOptionalBox(QWidget* theParent,
                                                                const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData),
   ModuleBase_PageBase(),
@@ -40,16 +40,16 @@ ModuleBase_WidgetCheckGroupBox::ModuleBase_WidgetCheckGroupBox(QWidget* theParen
   ModuleBase_Tools::adjustMargins(myMainLayout);
 }
 
-ModuleBase_WidgetCheckGroupBox::~ModuleBase_WidgetCheckGroupBox()
+ModuleBase_WidgetOptionalBox::~ModuleBase_WidgetOptionalBox()
 {
 }
 
-QWidget* ModuleBase_WidgetCheckGroupBox::pageWidget()
+QWidget* ModuleBase_WidgetOptionalBox::pageWidget()
 {
   return myOptionType == GroupBox ? myGroupBox : (QWidget*)myCheckBoxFrame;
 }
 
-QList<QWidget*> ModuleBase_WidgetCheckGroupBox::getControls() const
+QList<QWidget*> ModuleBase_WidgetOptionalBox::getControls() const
 {
   QList<QWidget*> aControls;
   if (myOptionType == GroupBox)
@@ -60,7 +60,7 @@ QList<QWidget*> ModuleBase_WidgetCheckGroupBox::getControls() const
   return aControls;
 }
 
-void ModuleBase_WidgetCheckGroupBox::onPageClicked()
+void ModuleBase_WidgetOptionalBox::onPageClicked()
 {
   storeValue();
   updateControlsVisibility();
@@ -69,11 +69,11 @@ void ModuleBase_WidgetCheckGroupBox::onPageClicked()
     emit focusOutWidget(this);
 }
 
-void ModuleBase_WidgetCheckGroupBox::addPageStretch()
+void ModuleBase_WidgetOptionalBox::addPageStretch()
 {
 }
 
-void ModuleBase_WidgetCheckGroupBox::placeModelWidget(ModuleBase_ModelWidget* theWidget)
+void ModuleBase_WidgetOptionalBox::placeModelWidget(ModuleBase_ModelWidget* theWidget)
 {
   if(!isCheckBoxFilled() && myOptionType == CheckBox) {
     createControl(CheckBox);
@@ -101,7 +101,7 @@ void ModuleBase_WidgetCheckGroupBox::placeModelWidget(ModuleBase_ModelWidget* th
   }
 }
 
-void ModuleBase_WidgetCheckGroupBox::placeWidget(QWidget* theWidget)
+void ModuleBase_WidgetOptionalBox::placeWidget(QWidget* theWidget)
 {
   createControl(GroupBox);
   setOptionType(GroupBox);
@@ -121,12 +121,12 @@ void ModuleBase_WidgetCheckGroupBox::placeWidget(QWidget* theWidget)
   myGroupBoxLayout->setRowStretch(kRow, 0);
 }
 
-QLayout* ModuleBase_WidgetCheckGroupBox::pageLayout()
+QLayout* ModuleBase_WidgetOptionalBox::pageLayout()
 {
   return myOptionType == GroupBox ? myGroupBoxLayout : (QLayout*)myCheckBoxLayout;
 }
 
-void ModuleBase_WidgetCheckGroupBox::createControl(const OptionType& theType)
+void ModuleBase_WidgetOptionalBox::createControl(const OptionType& theType)
 {
   if (theType == GroupBox && !myGroupBox) {
     // group box: more than one model widget is inside
@@ -159,7 +159,7 @@ void ModuleBase_WidgetCheckGroupBox::createControl(const OptionType& theType)
   }
 }
 
-bool ModuleBase_WidgetCheckGroupBox::storeValueCustom()
+bool ModuleBase_WidgetOptionalBox::storeValueCustom()
 {
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
@@ -170,7 +170,7 @@ bool ModuleBase_WidgetCheckGroupBox::storeValueCustom()
   return true;
 }
 
-bool ModuleBase_WidgetCheckGroupBox::restoreValueCustom()
+bool ModuleBase_WidgetOptionalBox::restoreValueCustom()
 {
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
@@ -179,8 +179,8 @@ bool ModuleBase_WidgetCheckGroupBox::restoreValueCustom()
   return true;
 }
 
-void ModuleBase_WidgetCheckGroupBox::setOptionType(
-                         const ModuleBase_WidgetCheckGroupBox::OptionType& theType)
+void ModuleBase_WidgetOptionalBox::setOptionType(
+                         const ModuleBase_WidgetOptionalBox::OptionType& theType)
 {
   myOptionType = theType;
 
@@ -191,18 +191,18 @@ void ModuleBase_WidgetCheckGroupBox::setOptionType(
     myGroupBox->setVisible(isGroupBox);
 }
 
-bool ModuleBase_WidgetCheckGroupBox::isCheckBoxFilled() const
+bool ModuleBase_WidgetOptionalBox::isCheckBoxFilled() const
 {
   return myCheckBoxWidget != 0;
 }
 
-bool ModuleBase_WidgetCheckGroupBox::getCurrentValue() const
+bool ModuleBase_WidgetOptionalBox::getCurrentValue() const
 {
   bool isGroupBox = myOptionType == GroupBox;
   return isGroupBox ? myGroupBox->isChecked() : myCheckBox->isChecked();
 }
 
-void ModuleBase_WidgetCheckGroupBox::setCurrentValue(const bool& theValue)
+void ModuleBase_WidgetOptionalBox::setCurrentValue(const bool& theValue)
 {
   bool isGroupBox = myOptionType == GroupBox;
   if (isGroupBox) {
@@ -218,7 +218,7 @@ void ModuleBase_WidgetCheckGroupBox::setCurrentValue(const bool& theValue)
   updateControlsVisibility();
 }
 
-void ModuleBase_WidgetCheckGroupBox::updateControlsVisibility()
+void ModuleBase_WidgetOptionalBox::updateControlsVisibility()
 {
   if (myOptionType == GroupBox) {
     bool aChecked = myGroupBox->isChecked();

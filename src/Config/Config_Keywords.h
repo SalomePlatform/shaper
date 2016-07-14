@@ -41,7 +41,7 @@ const static char* WDG_ACTION = "action";
 
 // Containers
 const static char* WDG_GROUP = "groupbox";
-const static char* WDG_CHECK_GROUP = "check_groupbox";
+const static char* WDG_OPTIONALBOX = "optionalbox";
 const static char* WDG_TOOLBOX = "toolbox";
 const static char* WDG_TOOLBOX_BOX = "box";
 const static char* WDG_SWITCH = "switch";

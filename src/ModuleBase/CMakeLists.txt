@@ -42,7 +42,6 @@ SET(PROJECT_HEADERS
   ModuleBase_ViewerPrs.h
   ModuleBase_WidgetAction.h
   ModuleBase_WidgetBoolValue.h
-  ModuleBase_WidgetCheckGroupBox.h
   ModuleBase_WidgetChoice.h
   ModuleBase_WidgetCreatorFactory.h
   ModuleBase_WidgetDoubleValue.h
@@ -54,6 +53,7 @@ SET(PROJECT_HEADERS
   ModuleBase_WidgetLabel.h
   ModuleBase_WidgetLineEdit.h
   ModuleBase_WidgetMultiSelector.h
+  ModuleBase_WidgetOptionalBox.h
   ModuleBase_WidgetSelector.h
   ModuleBase_WidgetSelectorStore.h
   ModuleBase_WidgetShapeSelector.h
@@ -101,7 +101,6 @@ SET(PROJECT_SOURCES
   ModuleBase_ViewerPrs.cpp
   ModuleBase_WidgetAction.cpp
   ModuleBase_WidgetBoolValue.cpp
-  ModuleBase_WidgetCheckGroupBox.cpp
   ModuleBase_WidgetChoice.cpp
   ModuleBase_WidgetCreatorFactory.cpp
   ModuleBase_WidgetDoubleValue.cpp
@@ -113,6 +112,7 @@ SET(PROJECT_SOURCES
   ModuleBase_WidgetLabel.cpp
   ModuleBase_WidgetLineEdit.cpp
   ModuleBase_WidgetMultiSelector.cpp
+  ModuleBase_WidgetOptionalBox.cpp
   ModuleBase_WidgetSelector.cpp
   ModuleBase_WidgetSelectorStore.cpp
   ModuleBase_WidgetShapeSelector.cpp

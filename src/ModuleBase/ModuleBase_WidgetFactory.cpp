@@ -29,7 +29,7 @@
 #include <ModuleBase_WidgetToolbox.h>
 #include <ModuleBase_PageBase.h>
 #include <ModuleBase_PageGroupBox.h>
-#include <ModuleBase_WidgetCheckGroupBox.h>
+#include <ModuleBase_WidgetOptionalBox.h>
 #include <ModuleBase_PageWidget.h>
 #include <ModuleBase_WidgetExprEditor.h>
 #include <ModuleBase_WidgetCreatorFactory.h>
@@ -257,8 +257,8 @@ ModuleBase_PageBase* ModuleBase_WidgetFactory::createPageByType(const std::strin
     aPage->setTitle(aGroupName);
     aResult = aPage;
   }
-  else if (theType == WDG_CHECK_GROUP) {
-    ModuleBase_WidgetCheckGroupBox* aPage = new ModuleBase_WidgetCheckGroupBox(theParent,
+  else if (theType == WDG_OPTIONALBOX) {
+    ModuleBase_WidgetOptionalBox* aPage = new ModuleBase_WidgetOptionalBox(theParent,
                                                                 myWidgetApi);
     aResult = aPage;
   }

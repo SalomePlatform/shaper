@@ -81,7 +81,7 @@ std::string Config_WidgetAPI::widgetType() const
 
 bool Config_WidgetAPI::isGroupBoxWidget() const
 {
-  return isNode(myCurrentNode, WDG_GROUP, WDG_CHECK_GROUP,
+  return isNode(myCurrentNode, WDG_GROUP, WDG_OPTIONALBOX,
                 NULL);
 }
 

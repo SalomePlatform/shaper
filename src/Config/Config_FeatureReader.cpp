@@ -73,7 +73,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
         aMessage->setConcealment(getBooleanAttribute(theNode, ATTR_CONCEALMENT, false));
 
         std::list<std::pair<std::string, std::string> > aCases;
-        xmlNodePtr aCaseNode = hasParentRecursive(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, WDG_CHECK_GROUP, NULL);
+        xmlNodePtr aCaseNode = hasParentRecursive(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, WDG_OPTIONALBOX, NULL);
         while(aCaseNode) {
           std::string aCaseNodeID = getProperty(aCaseNode, _ID);
           std::string aSwitchNodeID = "";
@@ -85,7 +85,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
           else if (!xmlStrcmp(aName, (const xmlChar *) WDG_TOOLBOX_BOX)) {
             aSwitchNode = hasParentRecursive(aCaseNode, WDG_TOOLBOX, NULL);
           }
-          if (!xmlStrcmp(aName, (const xmlChar *) WDG_CHECK_GROUP)) {
+          if (!xmlStrcmp(aName, (const xmlChar *) WDG_OPTIONALBOX)) {
             /// the box is optional, attribute is in case if the optional attribute value is not empty
             aSwitchNode = aCaseNode;
           }
@@ -93,13 +93,13 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
             aSwitchNodeID = getProperty(aSwitchNode, _ID);
 
           aCases.push_back(std::make_pair(aSwitchNodeID, aCaseNodeID));
-          aCaseNode = hasParentRecursive(aSwitchNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, WDG_CHECK_GROUP, NULL);
+          aCaseNode = hasParentRecursive(aSwitchNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, WDG_OPTIONALBOX, NULL);
         }
         aMessage->setCases(aCases);
         Events_Loop::loop()->send(aMessage);
       }
     // container pages, like "case" or "box"
-    } else if (isNode(theNode, WDG_CHECK_GROUP, WDG_SWITCH, WDG_SWITCH_CASE,
+    } else if (isNode(theNode, WDG_OPTIONALBOX, WDG_SWITCH, WDG_SWITCH_CASE,
                       WDG_TOOLBOX, WDG_TOOLBOX_BOX, NULL)) {
       storeAttribute(theNode, _ID); // save case:caseId (or box:boxId)
     }
@@ -110,7 +110,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
 
 void Config_FeatureReader::cleanup(xmlNodePtr theNode)
 {
-  if (isNode(theNode, WDG_CHECK_GROUP, WDG_SWITCH, WDG_SWITCH_CASE,
+  if (isNode(theNode, WDG_OPTIONALBOX, WDG_SWITCH, WDG_SWITCH_CASE,
              WDG_TOOLBOX, WDG_TOOLBOX_BOX, NULL)) {
     // cleanup id of cases when leave case node
     cleanupAttribute(theNode, _ID);
@@ -122,7 +122,7 @@ bool Config_FeatureReader::processChildren(xmlNodePtr theNode)
   bool result = isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NULL);
   if(!result && myIsProcessWidgets) {
     result = isNode(theNode, NODE_FEATURE, 
-                             WDG_GROUP, WDG_CHECK_GROUP,
+                             WDG_GROUP, WDG_OPTIONALBOX,
                              WDG_TOOLBOX, WDG_TOOLBOX_BOX,
                              WDG_SWITCH, WDG_SWITCH_CASE, NULL);
   }

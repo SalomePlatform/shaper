@@ -1,11 +1,11 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
-// File:        ModuleBase_WidgetCheckGroupBox.h
+// File:        ModuleBase_WidgetOptionalBox.h
 // Created:     13 Dec 2015
 // Author:      Natalia ERMOLAEVA
 
-#ifndef ModuleBase_WidgetCheckGroupBox_H_
-#define ModuleBase_WidgetCheckGroupBox_H_
+#ifndef ModuleBase_WidgetOptionalBox_H_
+#define ModuleBase_WidgetOptionalBox_H_
 
 #include <ModuleBase.h>
 #include <ModuleBase_PageBase.h>
@@ -22,7 +22,7 @@ class QGridLayout;
 * \ingroup GUI
 * Implements a model widget for switch as a container widget. It can be defined in XML with "toolbox" keyword
 */
-class MODULEBASE_EXPORT ModuleBase_WidgetCheckGroupBox : public ModuleBase_ModelWidget,
+class MODULEBASE_EXPORT ModuleBase_WidgetOptionalBox : public ModuleBase_ModelWidget,
                                                          public ModuleBase_PageBase
 {
   Q_OBJECT
@@ -32,8 +32,8 @@ public:
   /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuration. The attribute of the model widget is obtained from
-  ModuleBase_WidgetCheckGroupBox(QWidget* theParent, const Config_WidgetAPI* theData);
-  virtual ~ModuleBase_WidgetCheckGroupBox();
+  ModuleBase_WidgetOptionalBox(QWidget* theParent, const Config_WidgetAPI* theData);
+  virtual ~ModuleBase_WidgetOptionalBox();
 
   /// Defines if it is supported to set the value in this widget
   /// \return false because this is an info widget
@@ -115,4 +115,4 @@ private:
   QGridLayout* myGroupBoxLayout; ///< page's layout
 };
 
-#endif /* ModuleBase_WidgetCheckGroupBox_H_ */
+#endif /* ModuleBase_WidgetOptionalBox_H_ */
