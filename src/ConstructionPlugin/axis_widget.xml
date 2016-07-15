@@ -46,6 +46,21 @@
         <validator id="GeomValidators_ShapeType" parameters="line"/>
       </shape_selector>
     </box>
+    <box id="by_plane_and_point" title="By plane and point" icon="icons/Construction/axis_by_plane_and_point_32x32.png">
+      <shape_selector id="plane"
+                      label="Plane"
+                      tooltip="Select a planar face."
+                      icon="icons/Construction/face.png"
+                      shape_types="face">
+        <validator id="GeomValidators_Face" parameters="plane"/>
+      </shape_selector>
+      <shape_selector id="point"
+                      label="Point"
+                      tooltip="Select point."
+                      icon="icons/Construction/point.png"
+                      shape_types="vertex">
+      </shape_selector>
+    </box>
   </toolbox>
   
 </source>

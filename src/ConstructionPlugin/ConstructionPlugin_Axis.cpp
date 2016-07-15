@@ -18,6 +18,7 @@
 #include <ModelAPI_Validator.h>
 
 #include <GeomAPI_Edge.h>
+#include <GeomAPI_Pln.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_PointBuilder.h>
@@ -71,6 +72,10 @@ void ConstructionPlugin_Axis::initAttributes()
 
   /// Attributes for axis by line.
   data()->addAttribute(LINE(), ModelAPI_AttributeSelection::typeId());
+
+  /// Attributes for axis by plane and point.
+  data()->addAttribute(PLANE(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(POINT(), ModelAPI_AttributeSelection::typeId());
 }
 
 void ConstructionPlugin_Axis::createAxisByTwoPoints()
@@ -181,6 +186,40 @@ void ConstructionPlugin_Axis::createAxisByLine()
   setResult(aConstr);
 }
 
+void ConstructionPlugin_Axis::createAxisByPlaneAndPoint()
+{
+  // Get face.
+  AttributeSelectionPtr aFaceSelection = selection(PLANE());
+  GeomShapePtr aFaceShape = aFaceSelection->value();
+  if(!aFaceShape.get()) {
+    aFaceShape = aFaceSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aFaceShape));
+  std::shared_ptr<GeomAPI_Pln> aPln = aFace->getPlane();
+
+  // Get point.
+  AttributeSelectionPtr aPointSelection = selection(POINT());
+  GeomShapePtr aPointShape = aPointSelection->value();
+  if(!aPointShape.get()) {
+    aPointShape = aPointSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aPointShape));
+  std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
+
+  std::shared_ptr<GeomAPI_Pnt> aProjPnt = aPln->project(aPnt);
+
+  if(aProjPnt->isEqual(aPnt)) {
+    aPnt->translate(aPln->direction(), 10);
+  }
+
+  std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aProjPnt, aPnt);
+
+  ResultConstructionPtr aConstr = document()->createConstruction(data());
+  aConstr->setInfinite(true);
+  aConstr->setShape(anEdge);
+  setResult(aConstr);
+}
+
 void ConstructionPlugin_Axis::execute()
 {
   AttributeStringPtr aMethodTypeAttr = string(ConstructionPlugin_Axis::METHOD());
@@ -195,7 +234,8 @@ void ConstructionPlugin_Axis::execute()
     createAxisByDimensions();
   } else if(aMethodType == CREATION_METHOD_BY_LINE()) {
     createAxisByLine();
-
+  } else if(aMethodType == CREATION_METHOD_BY_PLANE_AND_POINT()) {
+    createAxisByPlaneAndPoint();
   }
 }
 

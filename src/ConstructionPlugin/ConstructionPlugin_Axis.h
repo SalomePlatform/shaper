@@ -49,6 +49,13 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
     return METHOD_ATTR;
   }
 
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_PLANE_AND_POINT()
+  {
+    static const std::string METHOD_ATTR("by_plane_and_point");
+    return METHOD_ATTR;
+  }
+
   /// attribute name for first point
   inline static const std::string& POINT_FIRST()
   {
@@ -114,6 +121,20 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
     return ATTR_ID;
   }
 
+  /// Attribute name for plane.
+  inline static const std::string& PLANE()
+  {
+    static const std::string ATTR_ID("plane");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for point.
+  inline static const std::string& POINT()
+  {
+    static const std::string ATTR_ID("point");
+    return ATTR_ID;
+  }
+
   /// Returns a minimal length for axis
   inline static const double MINIMAL_LENGTH() { return 1.e-5; }
 
@@ -143,6 +164,7 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
   /// Creates a new axis by point and direction
   void createAxisByPointAndDirection();
   void createAxisByLine();
+  void createAxisByPlaneAndPoint();
 };
 
 
