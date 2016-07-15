@@ -41,6 +41,14 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
     static const std::string METHOD_ATTR("CreationMethod");
     return METHOD_ATTR;
   }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_LINE()
+  {
+    static const std::string METHOD_ATTR("by_line");
+    return METHOD_ATTR;
+  }
+
   /// attribute name for first point
   inline static const std::string& POINT_FIRST()
   {
@@ -99,6 +107,13 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
     return ATTR_Z_DIRECTION;
   }
 
+  /// Attribute name for line.
+  inline static const std::string& LINE()
+  {
+    static const std::string ATTR_ID("line");
+    return ATTR_ID;
+  }
+
   /// Returns a minimal length for axis
   inline static const double MINIMAL_LENGTH() { return 1.e-5; }
 
@@ -127,6 +142,7 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
   void createAxisByCylindricalFace();
   /// Creates a new axis by point and direction
   void createAxisByPointAndDirection();
+  void createAxisByLine();
 };
 
 

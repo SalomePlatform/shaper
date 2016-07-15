@@ -68,6 +68,9 @@ void ConstructionPlugin_Axis::initAttributes()
                        ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(ConstructionPlugin_Axis::DZ(),
                        ModelAPI_AttributeDouble::typeId());
+
+  /// Attributes for axis by line.
+  data()->addAttribute(LINE(), ModelAPI_AttributeSelection::typeId());
 }
 
 void ConstructionPlugin_Axis::createAxisByTwoPoints()
@@ -162,6 +165,22 @@ void ConstructionPlugin_Axis::createAxisByDimensions()
   setResult(aConstr);    
 }
 
+void ConstructionPlugin_Axis::createAxisByLine()
+{
+  // Get edge.
+  AttributeSelectionPtr anEdgeSelection = selection(LINE());
+  GeomShapePtr aLineShape = anEdgeSelection->value();
+  if(!aLineShape.get()) {
+    aLineShape = anEdgeSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aLineShape));
+
+  ResultConstructionPtr aConstr = document()->createConstruction(data());
+  aConstr->setInfinite(true);
+  aConstr->setShape(anEdge);
+  setResult(aConstr);
+}
+
 void ConstructionPlugin_Axis::execute()
 {
   AttributeStringPtr aMethodTypeAttr = string(ConstructionPlugin_Axis::METHOD());
@@ -174,6 +193,9 @@ void ConstructionPlugin_Axis::execute()
     createAxisByPointAndDirection();
   } else if (aMethodType == "AxisByDimensionsCase") {
     createAxisByDimensions();
+  } else if(aMethodType == CREATION_METHOD_BY_LINE()) {
+    createAxisByLine();
+
   }
 }
 

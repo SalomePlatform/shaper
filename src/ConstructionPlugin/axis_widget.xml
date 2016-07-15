@@ -37,6 +37,15 @@
       <doublevalue id="DY" label="DY " tooltip="Y dimension" default="0"/>
       <doublevalue id="DZ" label="DZ " tooltip="Z dimension" default="10"/>
     </box>
+    <box id="by_line" title="By line" icon="icons/Construction/axis_by_line_32x32.png">
+      <shape_selector id="line"
+                      label="Line"
+                      tooltip="Select line."
+                      icon="icons/Construction/edge.png"
+                      shape_types="edge">
+        <validator id="GeomValidators_ShapeType" parameters="line"/>
+      </shape_selector>
+    </box>
   </toolbox>
   
 </source>
