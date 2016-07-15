@@ -6,6 +6,7 @@
 
 #include "ConstructionPlugin_Validators.h"
 
+#include <GeomAPI_Dir.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Lin.h>
@@ -245,6 +246,58 @@ bool ConstructionPlugin_ValidatorPlaneLinePoint::isValid(
 
   if(aLin->contains(aPnt)) {
     theError = "Point lies on the line.";
+    return false;
+  }
+
+  return true;
+}
+
+//==================================================================================================
+bool ConstructionPlugin_ValidatorPlaneTwoParallelPlanes::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& theArguments,
+    Events_InfoMessage& theError) const
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+
+  AttributeSelectionPtr anAttribute1 = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  AttributeSelectionPtr anAttribute2 = aFeature->selection(theArguments.front());
+
+  std::shared_ptr<GeomAPI_Pln> aPln1;
+  std::shared_ptr<GeomAPI_Pln> aPln2;
+
+  GeomShapePtr aShape1 = anAttribute1->value();
+  ResultPtr aContext1 = anAttribute1->context();
+  if(!aContext1.get()) {
+    theError = "One of the attribute not initialized.";
+    return false;
+  }
+  if(!aShape1.get()) {
+    aShape1 = aContext1->shape();
+  }
+
+  GeomShapePtr aShape2 = anAttribute2->value();
+  ResultPtr aContext2 = anAttribute2->context();
+  if(!aContext2.get()) {
+    return true;
+  }
+  if(!aShape2.get()) {
+    aShape2 = aContext2->shape();
+  }
+
+  aPln1 = getPln(aShape1);
+  aPln2 = getPln(aShape2);
+
+  if(!aPln1.get() || !aPln2.get()) {
+    theError = "Wrong shape types selected.";
+    return false;
+  }
+
+  std::shared_ptr<GeomAPI_Dir> aDir1 = aPln1->direction();
+  std::shared_ptr<GeomAPI_Dir> aDir2 = aPln2->direction();
+
+  if(!aDir1->isParallel(aDir2)) {
+    theError = "Planes not parallel.";
     return false;
   }
 

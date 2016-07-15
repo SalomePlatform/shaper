@@ -180,6 +180,19 @@ public:
     return ATTR_ID;
   }
 
+  inline static const std::string& PLANE1()
+  {
+    static const std::string ATTR_ID("plane1");
+    return ATTR_ID;
+  }
+
+  inline static const std::string& PLANE2()
+  {
+    static const std::string ATTR_ID("plane2");
+    return ATTR_ID;
+  }
+
+
   /// Attribute name for a parameter for the general equation of a plane (ax+by+cz+d=0)
   inline static const std::string& A()
   {
@@ -228,6 +241,7 @@ protected:
   std::shared_ptr<GeomAPI_Shape> createByLineAndPoint();
   std::shared_ptr<GeomAPI_Shape> createByCoincidentPoint();
   std::shared_ptr<GeomAPI_Shape> createByRotation();
+  std::shared_ptr<GeomAPI_Shape> createByTwoParallelPlanes();
   /// Creates a new plane by copy of face plane with translation along the normal
   /// to the specified distance.
   std::shared_ptr<GeomAPI_Shape> createByDistanceFromOther();

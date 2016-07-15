@@ -104,3 +104,11 @@ std::shared_ptr<GeomAPI_Pnt> GeomAPI_Pln::project(const std::shared_ptr<GeomAPI_
       aLocation->added(aVec->decreased(aNormal->multiplied(aDot)));
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aProjection));
 }
+
+double GeomAPI_Pln::distance(const std::shared_ptr<GeomAPI_Pln> thePlane) const
+{
+  const gp_Pln& aMyPln = impl<gp_Pln>();
+  const gp_Pln& anOtherPln = thePlane->impl<gp_Pln>();
+
+  return aMyPln.Distance(anOtherPln);
+}

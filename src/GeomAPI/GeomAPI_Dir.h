@@ -54,6 +54,12 @@ class GeomAPI_Dir : public GeomAPI_Interface
   /// calculates angle between two directions
   GEOMAPI_EXPORT 
   double angle(const std::shared_ptr<GeomAPI_Dir>& theArg) const;
+
+  /// \return true if the angle between this unit vector and theDir unit vector is equal to 0 or to Pi.
+  GEOMAPI_EXPORT 
+  bool isParallel(const std::shared_ptr<GeomAPI_Dir> theDir, const double theTolerance = 1.e-7) const;
+
+
 };
 
 #endif

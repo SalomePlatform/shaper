@@ -104,21 +104,22 @@
          title="By two parallel planes"
          tooltip="Plane equidistant from 2 parallel planes."
          icon="icons/Construction/plane_by_two_parallel_planes_32x32.png">
-    </box>
-
-
-    <!--<box id="PlaneByFaceAndDistance" title="On some distance from a face">
-      <shape_selector id="planeFace"
-                      label="Plane face"
-                      tooltip="Select a planar face"
+      <shape_selector id="plane1"
+                      label="1st plane"
+                      tooltip="Select a planar face."
+                      icon="icons/Construction/face.png"
                       shape_types="face">
         <validator id="GeomValidators_Face" parameters="plane"/>
+        <validator id="ConstructionPlugin_ValidatorPlaneTwoParallelPlanes" parameters="plane2"/>
       </shape_selector>
-      <doublevalue id="distance" 
-                   label="Distance" 
-                   tooltip="Distance from selected face to plane" 
-               default="0" />
-    </box>-->
-
+      <shape_selector id="plane2"
+                      label="2nd plane"
+                      tooltip="Select a planar face."
+                      icon="icons/Construction/face.png"
+                      shape_types="face">
+        <validator id="GeomValidators_Face" parameters="plane"/>
+        <validator id="ConstructionPlugin_ValidatorPlaneTwoParallelPlanes" parameters="plane1"/>
+      </shape_selector>
+    </box>
   </toolbox>
 </source>

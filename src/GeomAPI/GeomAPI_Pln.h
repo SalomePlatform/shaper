@@ -67,6 +67,10 @@ class GeomAPI_Pln : public GeomAPI_Interface
   /// Returns projection of the given point onto the plane
   GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt> project(const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
+
+  /// \return distance between planes.
+  GEOMAPI_EXPORT
+  double distance(const std::shared_ptr<GeomAPI_Pln> thePlane) const;
 };
 
 #endif

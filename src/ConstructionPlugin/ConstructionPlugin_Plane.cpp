@@ -70,6 +70,10 @@ void ConstructionPlugin_Plane::initAttributes()
   data()->addAttribute(COINCIDENT_POINT(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(AXIS(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(ANGLE(), ModelAPI_AttributeDouble::typeId());
+
+  // By two parallel planes.
+  data()->addAttribute(PLANE1(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(PLANE2(), ModelAPI_AttributeSelection::typeId());
 }
 
 //==================================================================================================
@@ -93,6 +97,8 @@ void ConstructionPlugin_Plane::execute()
     } else if(aCreationMethodOption == CREATION_METHOD_BY_ROTATION()) {
       aShape = createByRotation();
     }
+  } else if(aCreationMethod == CREATION_METHOD_BY_TWO_PARALLEL_PLANES()) {
+    aShape = createByTwoParallelPlanes();
   }
 
   if(!aShape.get()) {
@@ -100,7 +106,6 @@ void ConstructionPlugin_Plane::execute()
     return;
   }
 
-  removeResults(0);
   ResultConstructionPtr aConstr = document()->createConstruction(data());
   aConstr->setInfinite(true);
   aConstr->setShape(aShape);
@@ -310,6 +315,46 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
   std::shared_ptr<GeomAPI_Pln> aNewPln = aRes->getPlane();
 
   aRes = makeRectangularFace(aRes, aNewPln);
+
+  return aRes;
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByTwoParallelPlanes()
+{
+  // Get plane 1.
+  AttributeSelectionPtr aFaceSelection1 = selection(PLANE1());
+  GeomShapePtr aFaceShape1 = aFaceSelection1->value();
+  if(!aFaceShape1.get()) {
+    aFaceShape1 = aFaceSelection1->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Face> aFace1(new GeomAPI_Face(aFaceShape1));
+  std::shared_ptr<GeomAPI_Pln> aPln1 = aFace1->getPlane();
+
+  // Get plane 2.
+  AttributeSelectionPtr aFaceSelection2 = selection(PLANE2());
+  GeomShapePtr aFaceShape2 = aFaceSelection2->value();
+  if(!aFaceShape2.get()) {
+    aFaceShape2 = aFaceSelection2->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Face> aFace2(new GeomAPI_Face(aFaceShape2));
+  std::shared_ptr<GeomAPI_Pln> aPln2 = aFace2->getPlane();
+
+  double aDist = aPln1->distance(aPln2) / 2.0;
+
+  std::shared_ptr<GeomAPI_Pnt> aOrig1 = aPln1->location();
+  std::shared_ptr<GeomAPI_Dir> aDir1 = aPln1->direction();
+
+  aOrig1->translate(aDir1, aDist);
+  std::shared_ptr<GeomAPI_Pln> aNewPln(new GeomAPI_Pln(aOrig1, aDir1));
+
+  if((aNewPln->distance(aPln2) - aDist) > 1.e-7) {
+    aDir1->reverse();
+    aOrig1->translate(aDir1, 2.0 * aDist);
+    aNewPln.reset(new GeomAPI_Pln(aOrig1, aDir1));
+  }
+
+  std::shared_ptr<GeomAPI_Face> aRes = makeRectangularFace(aFace1, aNewPln);
 
   return aRes;
 }
