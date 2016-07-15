@@ -61,6 +61,32 @@
                       shape_types="vertex">
       </shape_selector>
     </box>
+    <box id="by_two_planes" title="By two planes" icon="icons/Construction/axis_by_two_planes_32x32.png">
+      <shape_selector id="plane1"
+                      label="1st plane"
+                      tooltip="Select a planar face."
+                      icon="icons/Construction/face.png"
+                      shape_types="face">
+        <validator id="GeomValidators_Face" parameters="plane"/>
+        <validator id="ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes" parameters="plane2"/>
+      </shape_selector>
+      <optionalbox id="use_offset1" title="Offset from 1st plane">
+        <doublevalue id="offset1" label="Distance " tooltip="Distance value" min="0" default="0"/>
+        <boolvalue id="reverse_offset1" label="Reverse" tooltip="Reverse offset value" default="false"/>
+      </optionalbox>
+      <shape_selector id="plane2"
+                      label="2nd plane"
+                      tooltip="Select a planar face."
+                      icon="icons/Construction/face.png"
+                      shape_types="face">
+        <validator id="GeomValidators_Face" parameters="plane"/>
+        <validator id="ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes" parameters="plane1"/>
+      </shape_selector>
+      <optionalbox id="use_offset2" title="Offset from 2nd plane">
+        <doublevalue id="offset2" label="Distance " tooltip="Distance value" min="0" default="0"/>
+        <boolvalue id="reverse_offset2" label="Reverse" tooltip="Reverse offset value" default="false"/>
+      </optionalbox>
+    </box>
   </toolbox>
   
 </source>

@@ -56,6 +56,13 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
     return METHOD_ATTR;
   }
 
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_TWO_PLANES()
+  {
+    static const std::string METHOD_ATTR("by_two_planes");
+    return METHOD_ATTR;
+  }
+
   /// attribute name for first point
   inline static const std::string& POINT_FIRST()
   {
@@ -135,6 +142,62 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
     return ATTR_ID;
   }
 
+  /// Attribute name for plane 1.
+  inline static const std::string& PLANE1()
+  {
+    static const std::string ATTR_ID("plane1");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for use offset for plane 1.
+  inline static const std::string& USE_OFFSET1()
+  {
+    static const std::string ATTR_ID("use_offset1");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for offset for plane 1.
+  inline static const std::string& OFFSET1()
+  {
+    static const std::string ATTR_ID("offset1");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for reverse offset for plane 1.
+  inline static const std::string& REVERSE_OFFSET1()
+  {
+    static const std::string ATTR_ID("reverse_offset1");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for plane 2.
+  inline static const std::string& PLANE2()
+  {
+    static const std::string ATTR_ID("plane2");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for use offset for plane 2.
+  inline static const std::string& USE_OFFSET2()
+  {
+    static const std::string ATTR_ID("use_offset2");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for offset for plane 2.
+  inline static const std::string& OFFSET2()
+  {
+    static const std::string ATTR_ID("offset2");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for reverse offset for plane 2.
+  inline static const std::string& REVERSE_OFFSET2()
+  {
+    static const std::string ATTR_ID("reverse_offset2");
+    return ATTR_ID;
+  }
+
   /// Returns a minimal length for axis
   inline static const double MINIMAL_LENGTH() { return 1.e-5; }
 
@@ -165,6 +228,7 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
   void createAxisByPointAndDirection();
   void createAxisByLine();
   void createAxisByPlaneAndPoint();
+  void createAxisByTwoPlanes();
 };
 
 

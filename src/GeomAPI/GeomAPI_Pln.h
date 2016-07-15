@@ -71,6 +71,14 @@ class GeomAPI_Pln : public GeomAPI_Interface
   /// \return distance between planes.
   GEOMAPI_EXPORT
   double distance(const std::shared_ptr<GeomAPI_Pln> thePlane) const;
+
+  /// Translates the plane along direction theDir on distance theDist
+  GEOMAPI_EXPORT
+  void translate(const std::shared_ptr<GeomAPI_Dir> theDir, const double theDist);
+
+  /// \return intersection line of two planes. Empty if they are parallel.
+  GEOMAPI_EXPORT
+  std::shared_ptr<GeomAPI_Lin> intersect(const std::shared_ptr<GeomAPI_Pln> thePlane) const;
 };
 
 #endif

@@ -84,4 +84,19 @@ public:
                         Events_InfoMessage& theError) const;
 };
 
+/// \class ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes
+/// \ingroup Validators
+/// \brief A validator for selection two parallel planes.
+class ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes: public ModelAPI_AttributeValidator
+{
+public:
+  //! \return True if the attribute is valid.
+  //! \param[in] theAttribute the checked attribute.
+  //! \param[in] theArguments arguments of the attribute.
+  //! \param[out] theError error message.
+   virtual bool isValid(const AttributePtr& theAttribute,
+                        const std::list<std::string>& theArguments,
+                        Events_InfoMessage& theError) const;
+};
+
 #endif

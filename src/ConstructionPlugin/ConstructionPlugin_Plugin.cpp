@@ -30,6 +30,8 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
                               new ConstructionPlugin_ValidatorPlaneLinePoint());
   aFactory->registerValidator("ConstructionPlugin_ValidatorPlaneTwoParallelPlanes",
                               new ConstructionPlugin_ValidatorPlaneTwoParallelPlanes());
+  aFactory->registerValidator("ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes",
+                              new ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes());
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
