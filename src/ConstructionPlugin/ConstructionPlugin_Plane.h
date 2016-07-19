@@ -159,6 +159,13 @@ public:
     return ATTR_ID;
   }
 
+  /// Attribute name for reverse in distance from other case
+  inline static const std::string& DISTANCE_REVERSE()
+  {
+    static const std::string ATTR_DISTANCE_REVERSE_ID("distance_reverse");
+    return ATTR_DISTANCE_REVERSE_ID;
+  }
+
   /// Attribute name for coincident point.
   inline static const std::string& COINCIDENT_POINT()
   {

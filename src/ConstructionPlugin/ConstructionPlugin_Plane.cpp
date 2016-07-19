@@ -24,6 +24,7 @@
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -67,6 +68,7 @@ void ConstructionPlugin_Plane::initAttributes()
   data()->addAttribute(CREATION_METHOD_BY_OTHER_PLANE_OPTION(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(PLANE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(DISTANCE(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(DISTANCE_REVERSE(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(COINCIDENT_POINT(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(AXIS(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(ANGLE(), ModelAPI_AttributeDouble::typeId());
