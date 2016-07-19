@@ -68,7 +68,7 @@ void ConstructionPlugin_Plane::initAttributes()
   data()->addAttribute(CREATION_METHOD_BY_OTHER_PLANE_OPTION(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(PLANE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(DISTANCE(), ModelAPI_AttributeDouble::typeId());
-  //data()->addAttribute(DISTANCE_REVERSE(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(DISTANCE_REVERSE(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(COINCIDENT_POINT(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(AXIS(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(ANGLE(), ModelAPI_AttributeDouble::typeId());

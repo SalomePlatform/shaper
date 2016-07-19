@@ -75,6 +75,7 @@ aPlane.string("creation_method").setValue("by_other_plane")
 aPlane.string("by_other_plane_option").setValue("by_distance_from_other")
 aPlane.selection("plane").selectSubShape("face", "Part_1/Extrusion_1_1/Generated_Face_3")
 aPlane.real("distance").setValue(0)
+aPlacementFt.boolean("distance_reverse").setValue(False)
 aSession.finishOperation()
 
 #=========================================================================

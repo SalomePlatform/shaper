@@ -68,13 +68,11 @@
                        label="Distance"
                        tooltip="Distance from selected face to plane."
                        icon="icons/Construction/distance_value.png"
-                       default="0">
-            <validator id="GeomValidators_Positive"/>
-          </doublevalue>
-          <!--<boolvalue id="distance_reverse"
+                       default="10"/>
+          <boolvalue id="distance_reverse"
                      label="Reverse"
                      tooltip="Distance from plane."
-                     default="false"/>-->
+                     default="false"/>
         </box>
         <box id="by_coincident_to_point"
              title="By coincident to point"
