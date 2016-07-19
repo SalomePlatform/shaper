@@ -71,10 +71,10 @@
                        default="10">
             <validator id="GeomValidators_Positive"/>
           </doublevalue>
-          <boolvalue id="distance_reverse"
+          <!--<boolvalue id="distance_reverse"
                      label="Reverse"
                      tooltip="Distance from plane."
-                     default="false"/>
+                     default="false"/>-->
         </box>
         <box id="by_coincident_to_point"
              title="By coincident to point"
