@@ -68,7 +68,7 @@
                        label="Distance"
                        tooltip="Distance from selected face to plane."
                        icon="icons/Construction/distance_value.png"
-                       default="10">
+                       default="0">
             <validator id="GeomValidators_Positive"/>
           </doublevalue>
           <!--<boolvalue id="distance_reverse"
