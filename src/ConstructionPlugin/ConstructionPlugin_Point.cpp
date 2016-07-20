@@ -39,6 +39,7 @@ void ConstructionPlugin_Point::initAttributes()
   data()->addAttribute(Y(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(Z(), ModelAPI_AttributeDouble::typeId());
 
+/*
   data()->addAttribute(EDGE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(DISTANCE_VALUE(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(DISTANCE_PERCENT(), ModelAPI_AttributeBoolean::typeId());
@@ -52,12 +53,15 @@ void ConstructionPlugin_Point::initAttributes()
 
   data()->addAttribute(INTERSECTION_LINE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(INTERSECTION_PLANE(), ModelAPI_AttributeSelection::typeId());
+*/
+  string("creation_method")->setValue("by_xyz");
 }
 
 //==================================================================================================
 void ConstructionPlugin_Point::execute()
 {
-  GeomShapePtr aShape;
+  GeomShapePtr aShape = createByXYZ();
+/*  GeomShapePtr aShape;
 
   std::string aCreationMethod = string(CREATION_METHOD())->value();
   if(aCreationMethod == CREATION_METHOD_BY_XYZ()) {
@@ -71,7 +75,7 @@ void ConstructionPlugin_Point::execute()
   } else if(aCreationMethod == CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION()) {
     aShape = createByLineAndPlaneIntersection();
   }
-
+  */
   if(!aShape.get()) {
     return;
   }

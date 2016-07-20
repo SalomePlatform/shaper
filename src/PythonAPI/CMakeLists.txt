@@ -33,7 +33,7 @@ ADD_UNIT_TESTS(
 
   TestFeatures.py
   TestFeaturesExtrusion.py
-  TestFeaturesRevolution.py
+  #TestFeaturesRevolution.py
   
   TestPrimitivesBox.py
 
