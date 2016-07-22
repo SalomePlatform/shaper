@@ -108,6 +108,12 @@ void PartSet_SketcherReetntrantMgr::operationStarted(ModuleBase_Operation* theOp
   if (!isActiveMgr())
     return;
 
+  if (myPreviousFeature.get() && myRestartingMode == RM_LastFeatureUsed) {
+    ModuleBase_OperationFeature* aCurrentOperation = dynamic_cast<ModuleBase_OperationFeature*>(
+                                                                myWorkshop->currentOperation());
+    CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
+    copyReetntrantAttributes(myPreviousFeature, aCurrentOperation->feature(), aSketch);
+  }
   resetFlags();
 }
 
@@ -136,7 +142,6 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* /*
       ModuleBase_IPropertyPanel* aPanel = myWorkshop->currentOperation()->propertyPanel();
       bool aWidgetIsFilled = false;
 
-      //bool aCanBeActivatedByMove = false;
       FeaturePtr aCurrentFeature = aFOperation->feature();
       bool isLineFeature = false, isArcFeature = false;
       if (aCurrentFeature->getKind() == SketchPlugin_Line::ID())
@@ -146,34 +151,15 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* /*
 
       bool aCanBeActivatedByMove = isLineFeature || isArcFeature;
       if (aCanBeActivatedByMove) {
+        myPreviousFeature = aFOperation->feature();
         restartOperation();
+        myPreviousFeature = FeaturePtr();
 
         anActiveWidget = module()->activeWidget();
         aCurrentFeature = anActiveWidget->feature();
         aProcessed = true;
-        if (isLineFeature) {
-          PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(anActiveWidget);
-          if (aPoint2DWdg) { // line, start point should be equal last point of the last feature line
-            QList<ModuleBase_ViewerPrsPtr> aSelection;
-            aSelection.append(std::shared_ptr<ModuleBase_ViewerPrs>(
-               new ModuleBase_ViewerPrs(aLastFeature, GeomShapePtr(), NULL)));
-            aWidgetIsFilled = aPoint2DWdg->setSelection(aSelection, true);
-          }
-        }
-        else if (isArcFeature) { // arc, start point should be equal last point of the last feature arc
-          if (aCurrentFeature->getKind() == SketchPlugin_Arc::ID()) {
-            // get the last point of the previuos arc feature(geom point 2d)
-            std::shared_ptr<ModelAPI_Data> aData = aLastFeature->data();
-            std::shared_ptr<GeomDataAPI_Point2D> aPointAttr = 
-                std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                           aData->attribute(SketchPlugin_Arc::END_ID()));
-            // get point attribute on the current feature
-            AttributeRefAttrPtr aTangentPointAttr = aCurrentFeature->data()->refattr(
-                                                         SketchPlugin_Arc::TANGENT_POINT_ID());
-            aTangentPointAttr->setAttr(aPointAttr);
-            aWidgetIsFilled = true;
-          }
-        }
+        if (isLineFeature || isArcFeature)
+          aWidgetIsFilled = true;
       }
       if (aWidgetIsFilled)
         aPanel->activateNextWidget(anActiveWidget);
@@ -209,7 +195,11 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
       // onMouseRelease happens, which correct the point position
       ModuleBase_Tools::blockUpdateViewer(true);
 
+      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                           (myWorkshop->currentOperation());
+      myPreviousFeature = aFOperation->feature();
       restartOperation();
+      myPreviousFeature = FeaturePtr();
       aProcessed = true;
 
       // fill the first widget by the mouse event point
@@ -218,7 +208,7 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
       PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
       ModuleBase_ModelWidget* aFirstWidget = aPanel->findFirstAcceptingValueWidget();
       if (aPoint2DWdg && aPoint2DWdg == aFirstWidget) {
-        aPoint2DWdg->onMouseRelease(theWnd, theEvent);
+        aPoint2DWdg->mouseReleased(theWnd, theEvent);
       }
       // unblock viewer update
       ModuleBase_Tools::blockUpdateViewer(false);
@@ -458,16 +448,7 @@ void PartSet_SketcherReetntrantMgr::restartOperation()
       myIsFlagsBlocked = true;
       FeaturePtr aPrevFeature = aFOperation->feature();
       aFOperation->commit();
-      module()->launchOperation(aFOperation->id(), false);
-      // allow the same attribute values in restarted operation
-      ModuleBase_OperationFeature* aCurrentOperation = dynamic_cast<ModuleBase_OperationFeature*>(
-                                                                  myWorkshop->currentOperation());
-      copyReetntrantAttributes(aPrevFeature, aCurrentOperation->feature());
-
-      // update property panel: it should be done because in launchOperation, the 'false' is given
-      workshop()->propertyPanel()->updateContentWidget(aCurrentOperation->feature());
-      workshop()->propertyPanel()->createContentPanel(aCurrentOperation->feature());
-
+      module()->launchOperation(aFOperation->id());
       myIsFlagsBlocked = false;
       resetFlags();
       // we should avoid processing of the signal about no more widgets attributes and 
@@ -493,7 +474,8 @@ void PartSet_SketcherReetntrantMgr::createInternalFeature()
     CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
     myInternalFeature = aSketch->addFeature(anOperationFeature->getKind());
 
-    bool isFeatureChanged = copyReetntrantAttributes(anOperationFeature, myInternalFeature);
+    bool isFeatureChanged = copyReetntrantAttributes(anOperationFeature, myInternalFeature,
+                                                     aSketch, false);
     XGUI_PropertyPanel* aPropertyPanel = dynamic_cast<XGUI_PropertyPanel*>
                                                   (aFOperation->propertyPanel());
 
@@ -538,6 +520,7 @@ void PartSet_SketcherReetntrantMgr::deleteInternalFeature()
   QObjectPtrList anObjects;
   anObjects.append(myInternalFeature);
   workshop()->deleteFeatures(anObjects);
+  myInternalFeature = FeaturePtr();
 }
 
 void PartSet_SketcherReetntrantMgr::resetFlags()
@@ -550,21 +533,66 @@ void PartSet_SketcherReetntrantMgr::resetFlags()
 }
 
 bool PartSet_SketcherReetntrantMgr::copyReetntrantAttributes(const FeaturePtr& theSourceFeature,
-                                                             const FeaturePtr& theNewFeature)
+                                                             const FeaturePtr& theNewFeature,
+                                                             const CompositeFeaturePtr& theSketch,
+                                                             const bool isTemporary)
 {
   bool aChanged = false;
-  std::string aTypeAttributeId;
-  if (theSourceFeature->getKind() == SketchPlugin_Circle::ID()) {
-    aTypeAttributeId = SketchPlugin_Circle::CIRCLE_TYPE();
+  if (!theSourceFeature.get())
+    return aChanged;
+
+  std::string aFeatureKind = theSourceFeature->getKind();
+  if (aFeatureKind == SketchPlugin_Line::ID()) {
+    // Initialize new line with first point equal to end of previous
+    std::shared_ptr<ModelAPI_Data> aSFData = theSourceFeature->data();
+    std::shared_ptr<GeomDataAPI_Point2D> aSPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                                 aSFData->attribute(SketchPlugin_Line::END_ID()));
+    std::shared_ptr<ModelAPI_Data> aNFData = theNewFeature->data();
+    std::shared_ptr<GeomDataAPI_Point2D> aNPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                                 aNFData->attribute(SketchPlugin_Line::START_ID()));
+    aNPoint->setValue(aSPoint->x(), aSPoint->y());
+    PartSet_Tools::createConstraint(theSketch, aSPoint, aNPoint);
+
+    aNPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                                 aSFData->attribute(SketchPlugin_Line::END_ID()));
+    aNPoint->setValue(aSPoint->x(), aSPoint->y());
   }
-  if (theSourceFeature->getKind() == SketchPlugin_Arc::ID()) {
-    aTypeAttributeId = SketchPlugin_Arc::ARC_TYPE();
-  }
-  if (!aTypeAttributeId.empty()) {
+  else if (aFeatureKind == SketchPlugin_Circle::ID()) {
+    // set circle type
+    std::string aTypeAttributeId = SketchPlugin_Circle::CIRCLE_TYPE();
     AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
     AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
     aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
-    ModuleBase_Tools::flushUpdated(theNewFeature);
+    //ModuleBase_Tools::flushUpdated(theNewFeature);
+    aChanged = true;
+  }
+  else if (aFeatureKind == SketchPlugin_Arc::ID()) {
+    // set arc type
+    std::string aTypeAttributeId = SketchPlugin_Arc::ARC_TYPE();
+    AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
+    AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
+    aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
+
+    // if the arc is tangent, set coincidence to end point of the previous arc
+    std::string anArcType = aSourceFeatureTypeAttr->value();
+    if (anArcType == SketchPlugin_Arc::ARC_TYPE_TANGENT()) {
+      // get the last point of the previuos arc feature(geom point 2d)
+      std::shared_ptr<ModelAPI_Data> aSData = theSourceFeature->data();
+      std::shared_ptr<GeomDataAPI_Point2D> aSPointAttr = 
+                                      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                      aSData->attribute(SketchPlugin_Arc::END_ID()));
+      // get point attribute on the current feature
+      AttributeRefAttrPtr aTangentPointAttr = theNewFeature->data()->refattr(
+                                                    SketchPlugin_Arc::TANGENT_POINT_ID());
+      aTangentPointAttr->setAttr(aSPointAttr);
+
+      std::shared_ptr<GeomDataAPI_Point2D> aNPointAttr = 
+                                    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                    theNewFeature->data()->attribute(SketchPlugin_Arc::END_ID()));
+      aNPointAttr->setValue(aSPointAttr->x(), aSPointAttr->y());
+
+    }
+    //ModuleBase_Tools::flushUpdated(theNewFeature);
     aChanged = true;
   }
   return aChanged;

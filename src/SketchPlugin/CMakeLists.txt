@@ -5,75 +5,77 @@ INCLUDE(UnitTest)
 
 SET(PROJECT_HEADERS
     SketchPlugin.h
-    SketchPlugin_Feature.h
-    SketchPlugin_Plugin.h
-    SketchPlugin_Sketch.h
-    SketchPlugin_SketchEntity.h
-    SketchPlugin_Line.h
-    SketchPlugin_Point.h
-    SketchPlugin_IntersectionPoint.h
-    SketchPlugin_Circle.h
     SketchPlugin_Arc.h
+    SketchPlugin_Circle.h
     SketchPlugin_Constraint.h
+    SketchPlugin_ConstraintAngle.h
     SketchPlugin_ConstraintBase.h
     SketchPlugin_ConstraintCoincidence.h
     SketchPlugin_ConstraintCollinear.h
     SketchPlugin_ConstraintDistance.h
+    SketchPlugin_ConstraintEqual.h
+    SketchPlugin_ConstraintFillet.h
+    SketchPlugin_ConstraintHorizontal.h
     SketchPlugin_ConstraintLength.h
     SketchPlugin_ConstraintMiddle.h
+    SketchPlugin_ConstraintMirror.h
     SketchPlugin_ConstraintParallel.h
     SketchPlugin_ConstraintPerpendicular.h
     SketchPlugin_ConstraintRadius.h
     SketchPlugin_ConstraintRigid.h
-    SketchPlugin_ConstraintHorizontal.h
-    SketchPlugin_ConstraintVertical.h
-    SketchPlugin_ConstraintEqual.h
+    SketchPlugin_ConstraintSplit.h
     SketchPlugin_ConstraintTangent.h
-    SketchPlugin_ConstraintMirror.h
-    SketchPlugin_ConstraintFillet.h
-    SketchPlugin_ConstraintAngle.h
+    SketchPlugin_ConstraintVertical.h
+    SketchPlugin_ExternalValidator.h
+    SketchPlugin_Feature.h
+    SketchPlugin_IntersectionPoint.h
+    SketchPlugin_Line.h
     SketchPlugin_MultiRotation.h
     SketchPlugin_MultiTranslation.h
-    SketchPlugin_ExternalValidator.h
-    SketchPlugin_Validators.h
-    SketchPlugin_Tools.h
+    SketchPlugin_Plugin.h
+    SketchPlugin_Point.h
     SketchPlugin_Projection.h
+    SketchPlugin_Sketch.h
+    SketchPlugin_SketchEntity.h
+    SketchPlugin_Tools.h
+    SketchPlugin_Validators.h
 )
 
 SET(PROJECT_SOURCES
-    SketchPlugin_Feature.cpp
-    SketchPlugin_Plugin.cpp
-    SketchPlugin_Sketch.cpp
-    SketchPlugin_SketchEntity.cpp
-    SketchPlugin_Line.cpp
-    SketchPlugin_Point.cpp
-    SketchPlugin_IntersectionPoint.cpp
-    SketchPlugin_Circle.cpp
     SketchPlugin_Arc.cpp
+    SketchPlugin_Circle.cpp
     SketchPlugin_Constraint.cpp
+    SketchPlugin_ConstraintAngle.cpp
     SketchPlugin_ConstraintBase.cpp
     SketchPlugin_ConstraintCoincidence.cpp
     SketchPlugin_ConstraintCollinear.cpp
     SketchPlugin_ConstraintDistance.cpp
+    SketchPlugin_ConstraintEqual.cpp
+    SketchPlugin_ConstraintFillet.cpp
+    SketchPlugin_ConstraintHorizontal.cpp
     SketchPlugin_ConstraintLength.cpp
     SketchPlugin_ConstraintMiddle.cpp
+    SketchPlugin_ConstraintMirror.cpp
     SketchPlugin_ConstraintParallel.cpp
     SketchPlugin_ConstraintPerpendicular.cpp
     SketchPlugin_ConstraintRadius.cpp
     SketchPlugin_ConstraintRigid.cpp
-    SketchPlugin_ConstraintHorizontal.cpp
-    SketchPlugin_ConstraintVertical.cpp
-    SketchPlugin_ConstraintEqual.cpp
+    SketchPlugin_ConstraintSplit.cpp
     SketchPlugin_ConstraintTangent.cpp
-    SketchPlugin_ConstraintMirror.cpp
-    SketchPlugin_ConstraintFillet.cpp
-    SketchPlugin_ConstraintAngle.cpp
+    SketchPlugin_ConstraintVertical.cpp
+    SketchPlugin_ExternalValidator.cpp
+    SketchPlugin_Feature.cpp
+    SketchPlugin_IntersectionPoint.cpp
+    SketchPlugin_Line.cpp
     SketchPlugin_MultiRotation.cpp
     SketchPlugin_MultiTranslation.cpp
-    SketchPlugin_ExternalValidator.cpp
-    SketchPlugin_Validators.cpp
-    SketchPlugin_Tools.cpp
+    SketchPlugin_Plugin.cpp
+    SketchPlugin_Point.cpp
     SketchPlugin_Projection.cpp
+    SketchPlugin_Sketch.cpp
+    SketchPlugin_SketchEntity.cpp
+    SketchPlugin_Tools.cpp
+    SketchPlugin_Validators.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -81,6 +83,7 @@ SET(PROJECT_LIBRARIES
     GeomAPI
     GeomAlgoAPI
     ModelAPI
+    ModelGeomAlgo
     SketcherPrs
     GeomDataAPI
 )
@@ -103,6 +106,7 @@ INCLUDE_DIRECTORIES(
   ../Config
   ../Events
   ../ModelAPI
+  ../ModelGeomAlgo
   ../GeomAPI
   ../GeomAlgoAPI
   ../GeomDataAPI

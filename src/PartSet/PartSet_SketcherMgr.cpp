@@ -7,8 +7,7 @@
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_SketcherReetntrantMgr.h"
 #include "PartSet_Module.h"
-#include "PartSet_WidgetPoint2d.h"
-#include "PartSet_WidgetPoint2dDistance.h"
+#include "PartSet_MouseProcessor.h"
 #include "PartSet_Tools.h"
 #include "PartSet_WidgetSketchLabel.h"
 #include "PartSet_WidgetEditor.h"
@@ -476,6 +475,11 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
 
   aWorkshop->viewer()->enableDrawMode(myPreviousDrawModeEnabled);
   myIsDragging = false;
+
+  ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
+  PartSet_MouseProcessor* aProcessor = dynamic_cast<PartSet_MouseProcessor*>(anActiveWidget);
+  if (aProcessor)
+    aProcessor->mouseReleased(theWnd, theEvent);
 }
 
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
@@ -483,31 +487,27 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
   if (myModule->sketchReentranceMgr()->processMouseMoved(theWnd, theEvent))
     return;
 
-  if (isNestedCreateOperation(getCurrentOperation()) && !myIsMouseOverViewProcessed) {
-    myIsMouseOverViewProcessed = true;
+  if (isNestedCreateOperation(getCurrentOperation())) {
     // 1. perform the widget mouse move functionality and display the presentation
     // the mouse move should be processed in the widget, if it can in order to visualize correct
     // presentation. These widgets correct the feature attribute according to the mouse position
     ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
-    PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(anActiveWidget);
-    if (aPoint2DWdg) {
-      aPoint2DWdg->onMouseMove(theWnd, theEvent);
-    }
-    PartSet_WidgetPoint2dDistance* aDistanceWdg = dynamic_cast<PartSet_WidgetPoint2dDistance*>
-                                                                (anActiveWidget);
-    if (aDistanceWdg) {
-      aDistanceWdg->onMouseMove(theWnd, theEvent);
-    }
-    // the feature is to be erased here, but it is correct to call canDisplayObject because
-    // there can be additional check (e.g. editor widget in distance constraint)
-    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                                             (getCurrentOperation());
-    if (aFOperation) {
-      FeaturePtr aFeature = aFOperation->feature();
-      visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
+    PartSet_MouseProcessor* aProcessor = dynamic_cast<PartSet_MouseProcessor*>(anActiveWidget);
+    if (aProcessor)
+      aProcessor->mouseMoved(theWnd, theEvent);
+    if (!myIsMouseOverViewProcessed) {
+      myIsMouseOverViewProcessed = true;
+
+      // the feature is to be erased here, but it is correct to call canDisplayObject because
+      // there can be additional check (e.g. editor widget in distance constraint)
+      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                               (getCurrentOperation());
+      if (aFOperation) {
+        FeaturePtr aFeature = aFOperation->feature();
+        visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
+      }
     }
   }
-
   //myClickedPoint.clear();
 
   if (myIsDragging) {
@@ -1048,7 +1048,7 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
   /// improvement to deselect automatically all eventual selected objects, when
   // returning to the neutral point of the Sketcher
   // if the operation is restarted, the previous selection is used to initialize started operation
-  if (myModule->isSketchNeutralPointActivated())
+  if (!myModule->sketchReentranceMgr()->isInternalEditStarted())
     workshop()->selector()->clearSelection();
 }
 
@@ -1233,11 +1233,9 @@ bool PartSet_SketcherMgr::canDisplayConstraint(const FeaturePtr& theFeature,
   bool aSwitchedOn = true;
 
   const QStringList& aConstrIds = constraintsIdList();
-  const QStringList& aReplicationIds = replicationsIdList();
 
   std::string aKind = theFeature->getKind();
-  if (aConstrIds.contains(aKind.c_str()) ||
-      aReplicationIds.contains(aKind.c_str())) {
+  if (aConstrIds.contains(QString(aKind.c_str()))) {
     bool isTypedConstraint = false;
 
     switch (theState) {

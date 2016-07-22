@@ -370,6 +370,8 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
       std::shared_ptr<GeomDataAPI_Point2D> aTangentPoint =
           std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aTangPtAttr->attr());
       std::shared_ptr<GeomAPI_Pnt2d> aTangPnt2d = aTangentPoint->pnt();
+      if (aTangPnt2d->isEqual(anEndAttr->pnt()))
+        return;
       FeaturePtr aTangFeature = ModelAPI_Feature::feature(aTangentPoint->owner());
       std::shared_ptr<GeomAPI_Edge> aTangEdge = std::dynamic_pointer_cast<GeomAPI_Edge>(
           aTangFeature->lastResult()->shape());

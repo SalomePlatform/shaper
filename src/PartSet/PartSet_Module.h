@@ -102,8 +102,7 @@ public:
 
   /// Creates an operation and send it to loop
   /// \param theCmdId the operation name
-  /// \param isUpdatePropertyPanel if false, the property panel filling might be postponed
-  virtual void launchOperation(const QString& theCmdId, const bool isUpdatePropertyPanel = true);
+  virtual void launchOperation(const QString& theCmdId);
 
   /// Realizes some functionality by an operation start
   /// Displays all sketcher sub-Objects, hides sketcher result, appends selection filters
@@ -303,10 +302,6 @@ public:
   /// \param thePreviousAttributeID an index of the previous active attribute
   virtual bool processEnter(const std::string& thePreviousAttributeID);
 
-  /// Performs some GUI actions after an operation transaction is opened
-  /// Default realization is empty
-  virtual void beforeOperationStarted(ModuleBase_Operation* theOperation);
-
   /// Performs some GUI actions before an operation transaction is stopped
   /// Default realization is empty
   virtual void beforeOperationStopped(ModuleBase_Operation* theOperation);
@@ -385,11 +380,13 @@ protected:
   /// \param isToConnect a boolean value whether connect or disconnect
   virtual void connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect);
 
-  /// Realizes some functionality by an operation start
-  /// Displays all sketcher sub-Objects, hides sketcher result, appends selection filters
-  /// Activate the operation presentation
-  /// \param theOperation a started operation
-  virtual void operationStartedInternal(ModuleBase_Operation* theOperation);
+  /// Updates reentrant manager state or sketcher operations for the started operation
+  /// \param theOperation the started operation
+  void updateSketcherOnStart(ModuleBase_Operation* theOperation);
+
+  /// Updates presetnations of results and arguments by operation start
+  /// \param theOperation the started operation
+  void updatePresentationsOnStart(ModuleBase_Operation* theOperation);
 
  private slots:
    void onTreeViewDoubleClick(const QModelIndex&);

@@ -59,8 +59,7 @@ Q_OBJECT
 
   //! Performs the operation launch
   //! \param theOperation an operation to be launched
-  virtual void processLaunchOperation(ModuleBase_Operation* theOperation,
-                                      const bool isUpdatePropertyPanel);
+  virtual void processLaunchOperation(ModuleBase_Operation* theOperation);
 
   //! Returns started operation by the operation identifier. The operation manager is called.
   //! \param theId an operation id

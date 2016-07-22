@@ -91,26 +91,7 @@ double PartSet_WidgetPoint2dDistance::computeValue(const std::shared_ptr<GeomAPI
   return theCurrentPnt->distance(theFirstPnt);
 }
 
-void PartSet_WidgetPoint2dDistance::activateCustom()
-{
-  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
-  connect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)),
-          this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
-  connect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
-          this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
-}
-
-void PartSet_WidgetPoint2dDistance::deactivate()
-{
-  ModuleBase_ModelWidget::deactivate();
-  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
-  disconnect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)), 
-             this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
-  disconnect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
-             this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
-}
-
-void PartSet_WidgetPoint2dDistance::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
+void PartSet_WidgetPoint2dDistance::mouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
   // the contex menu release by the right button should not be processed by this widget
   if (theEvent->button() != Qt::LeftButton)
@@ -132,7 +113,7 @@ void PartSet_WidgetPoint2dDistance::onMouseRelease(ModuleBase_IViewWindow* theWn
     emit focusOutWidget(this);
 }
 
-void PartSet_WidgetPoint2dDistance::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
+void PartSet_WidgetPoint2dDistance::mouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
   if (isEditingMode())
     return;

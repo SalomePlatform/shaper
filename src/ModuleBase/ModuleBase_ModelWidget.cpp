@@ -209,8 +209,13 @@ void ModuleBase_ModelWidget::setFeature(const FeaturePtr& theFeature, const bool
   /// after debug, it may be corrected
   myFlushUpdateBlocked = !isUpdateFlushed;
   myFeature = theFeature;
-  if (theToStoreValue)
-    storeValue();
+  if (theToStoreValue) {
+    /// it is possible that the attribute is filled before the operation is started,
+    /// e.g. by reentrant operation case some attributes are filled by values of
+    /// feature of previous operation, we should not lost them here
+    if (!theFeature->data()->attribute(attributeID())->isInitialized())
+      storeValue();
+  }
   myFlushUpdateBlocked = false;
 }
 

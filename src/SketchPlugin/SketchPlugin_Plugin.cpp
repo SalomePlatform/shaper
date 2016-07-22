@@ -14,6 +14,7 @@
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintFillet.h>
+#include <SketchPlugin_ConstraintSplit.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintMiddle.h>
@@ -76,6 +77,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_SolverErrorValidator);
   aFactory->registerValidator("SketchPlugin_FilletVertexValidator",
                               new SketchPlugin_FilletVertexValidator);
+  aFactory->registerValidator("SketchPlugin_SplitValidator",
+                              new SketchPlugin_SplitValidator);
   aFactory->registerValidator("SketchPlugin_MiddlePointAttr",
                               new SketchPlugin_MiddlePointAttrValidator);
   aFactory->registerValidator("SketchPlugin_ArcTangentPoint",
@@ -161,6 +164,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintMirror);
   } else if (theFeatureID == SketchPlugin_ConstraintFillet::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintFillet);
+  } else if (theFeatureID == SketchPlugin_ConstraintSplit::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintSplit);
   } else if (theFeatureID == SketchPlugin_MultiTranslation::ID()) {
     return FeaturePtr(new SketchPlugin_MultiTranslation);
   } else if (theFeatureID == SketchPlugin_MultiRotation::ID()) {
@@ -224,6 +229,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_ConstraintMiddle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintMirror::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintFillet::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintSplit::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintAngle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MultiRotation::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MultiTranslation::ID(), aHasSketchPlane);

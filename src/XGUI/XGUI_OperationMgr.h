@@ -127,9 +127,6 @@ public slots:
   bool abortAllOperations();
 
 signals:
-  /// Signal about an operation is started. It is emitted after the start() of operation is done.
-  void operationStarted(ModuleBase_Operation* theOperation);
-
   /// Signal about an operation is stopped. It is emitted after the stop() of operation is done.
   /// \param theOperation a stopped operation
   void operationStopped(ModuleBase_Operation* theOperation);

@@ -246,6 +246,12 @@ Q_OBJECT
    */
   bool abortAllOperations();
 
+  /// Updates workshop state according to the started operation, e.g. visualizes the property panel
+  /// and connect to it.
+  /// \param theOpertion a started operation
+  void operationStarted(ModuleBase_Operation* theOperation);
+
+
   //! Delete features. Delete the referenced features. There can be a question with a list of
   //! referenced objects.
   //! \param theFeatures a list of objects to be deleted
@@ -277,7 +283,7 @@ Q_OBJECT
   /// Update the property panel content by the XML description of the operation and set the panel
   /// into the operation
   /// \param theOperation an operation
-  void setPropertyPanel(ModuleBase_Operation* theOperation);
+  void fillPropertyPanel(ModuleBase_Operation* theOperation);
 
   /// Connects or disconnects to the value changed signal of the property panel widgets
   /// \param isToConnect a boolean value whether connect or disconnect
@@ -405,7 +411,7 @@ private:
   /// SLOT, that is called after the operation is started. Update workshop state according to
   /// the started operation, e.g. visualizes the property panel and connect to it.
   /// \param theOpertion a started operation
-  void onOperationStarted(ModuleBase_Operation* theOperation);
+  // void onOperationStarted(ModuleBase_Operation* theOperation);
 
   /// SLOT, that is called after the operation is resumed. Update workshop state according to
   /// the started operation, e.g. visualizes the property panel and connect to it.

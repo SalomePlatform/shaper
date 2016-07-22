@@ -8,6 +8,8 @@
 #define PartSet_WidgetPoint2D_H
 
 #include "PartSet.h"
+#include "PartSet_MouseProcessor.h"
+
 #include <ModelAPI_CompositeFeature.h>
 #include <ModuleBase_ModelWidget.h>
 
@@ -34,7 +36,8 @@ class QMouseEvent;
  * <sketch-2dpoint_selector id="CircleCenter" title="Center" tooltip="Center coordinates"/>
  * \endcode
  */
-class PARTSET_EXPORT PartSet_WidgetPoint2D : public ModuleBase_ModelWidget
+class PARTSET_EXPORT PartSet_WidgetPoint2D : public ModuleBase_ModelWidget,
+                                             public PartSet_MouseProcessor
 {
 Q_OBJECT
  public:
@@ -68,10 +71,6 @@ Q_OBJECT
 
   //bool initFromPrevious(ObjectPtr theObject);
 
-  /// Defines if the widget can be activated by mouse move.
-  /// By default it returns false
-  virtual bool canBeActivatedByMove();
-
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
@@ -100,20 +99,19 @@ Q_OBJECT
   /// and creating a coincidence constraint to them. This control use them.
   virtual bool useSelectedShapes() const;
 
+  /// Processing the mouse move event in the viewer
+  /// \param theWindow a view window
+  /// \param theEvent a mouse event
+  virtual void mouseMoved(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent);
+
+  /// Processing the mouse release event in the viewer
+  /// \param theWindow a view window
+  /// \param theEvent a mouse event
+  virtual void mouseReleased(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent);
+
 signals:
   /// Signal about selection of an existing vertex from an object
   void vertexSelected();
-
-public slots:
-  /// Process mouse move event
-  /// \param theWnd a view window
-  /// \param theEvent a mouse event
-  void onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
-
-  /// Process mouse release event
-  /// \param theWnd a view window
-  /// \param theEvent a mouse event
-  void onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
 protected:
   /// Saves the internal parameters to the given feature

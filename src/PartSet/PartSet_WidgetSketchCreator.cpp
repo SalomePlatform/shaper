@@ -335,7 +335,7 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_Vi
   aValues.push_back(aValue);
   aFOperation->setPreselection(aValues);
 
-  myModule->sendOperation(aFOperation);
+  myWorkshop->processLaunchOperation(aFOperation);
 
   return aSketchStarted;
 }

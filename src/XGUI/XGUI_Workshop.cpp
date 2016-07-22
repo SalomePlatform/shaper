@@ -177,8 +177,6 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 
   myErrorMgr = new XGUI_ErrorMgr(this, aWorkshop);
 
-  connect(myOperationMgr, SIGNAL(operationStarted(ModuleBase_Operation*)), 
-          SLOT(onOperationStarted(ModuleBase_Operation*)));
   connect(myOperationMgr, SIGNAL(operationResumed(ModuleBase_Operation*)),
           SLOT(onOperationResumed(ModuleBase_Operation*)));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
@@ -488,7 +486,7 @@ bool XGUI_Workshop::isFeatureOfNested(const FeaturePtr& theFeature)
   return aHasNested;
 }
 
-void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
+void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (!aFOperation)
@@ -584,19 +582,12 @@ void XGUI_Workshop::connectToPropertyPanel(const bool isToConnect)
 }
 
 //******************************************************
-void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
-{
-  setGrantedFeatures(theOperation);
-  myModule->operationStarted(theOperation);
-}
-
-//******************************************************
 void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
 {
   setGrantedFeatures(theOperation);
 
   if (theOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
-    setPropertyPanel(theOperation);
+    fillPropertyPanel(theOperation);
     connectToPropertyPanel(true);
   }
   updateCommandStatus();
@@ -679,10 +670,7 @@ void XGUI_Workshop::setGrantedFeatures(ModuleBase_Operation* theOperation)
   aFOperation->setGrantedOperationIds(aGrantedIds);
 }
 
-
-/*
- * Saves document with given name.
- */
+//******************************************************
 void XGUI_Workshop::saveDocument(const QString& theName, std::list<std::string>& theFileNames)
 {
   QApplication::restoreOverrideCursor();
@@ -691,9 +679,22 @@ void XGUI_Workshop::saveDocument(const QString& theName, std::list<std::string>&
   QApplication::restoreOverrideCursor();
 }
 
+//******************************************************
 bool XGUI_Workshop::abortAllOperations()
 {
   return myOperationMgr->abortAllOperations();
+}
+
+//******************************************************
+void XGUI_Workshop::operationStarted(ModuleBase_Operation* theOperation)
+{
+  setGrantedFeatures(theOperation);
+  if (!theOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
+    updateCommandStatus();
+  }
+  else {
+    myModule->operationStarted(theOperation);
+  }
 }
 
 //******************************************************

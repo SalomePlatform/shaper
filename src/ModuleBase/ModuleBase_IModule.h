@@ -82,8 +82,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Creates an operation and send it to loop
   /// \param theCmdId the operation name
-  /// \param isUpdatePropertyPanel if false, the property panel filling might be postponed
-  virtual void launchOperation(const QString& theCmdId, const bool isUpdatePropertyPanel = true);
+  virtual void launchOperation(const QString& theCmdId);
 
   /// Executes feature as a modal dialog box
   /// \param theCmdId the operation name
@@ -239,11 +238,6 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theCmdId the operation name
   virtual ModuleBase_Operation* createOperation(const std::string& theCmdId);
 
-  /// Sends the operation for launching
-  /// \param theOperation the operation
-  /// \param isUpdatePropertyPanel if false, the property panel filling might be postponed
-  virtual void sendOperation(ModuleBase_Operation* theOperation, const bool isUpdatePropertyPanel = true);
-
   /// Create specific for the module presentation
   /// \param theResult an object for presentation
   /// \return created presentation or NULL(default value)
@@ -291,10 +285,6 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Returns true if the event is processed.
   /// \param thePreviousAttributeID an index of the previous active attribute
   virtual bool processEnter(const std::string& thePreviousAttributeID) { return false; };
-
-  /// Performs some GUI actions after an operation transaction is opened
-  /// Default realization is empty
-  virtual void beforeOperationStarted(ModuleBase_Operation* theOperation) {};
 
   /// Performs some GUI actions before an operation transaction is stopped
   /// Default realization is empty

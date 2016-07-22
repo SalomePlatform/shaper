@@ -50,6 +50,11 @@
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS.hxx>
 #include <TopExp_Explorer.hxx>
+#include <TopTools_ListIteratorOfListOfShape.hxx>
+
+#include <BOPAlgo_Builder.hxx>
+#include <BRepBuilderAPI_MakeVertex.hxx>
+#include <TopoDS_Edge.hxx>
 
 //==================================================================================================
 double GeomAlgoAPI_ShapeTools::volume(const std::shared_ptr<GeomAPI_Shape> theShape)
@@ -662,4 +667,35 @@ bool GeomAlgoAPI_ShapeTools::isParallel(const std::shared_ptr<GeomAPI_Edge> theE
 
   BRepExtrema_ExtCF anExt(anEdge, aFace);
   return anExt.IsParallel() == Standard_True;
+}
+
+//==================================================================================================
+void GeomAlgoAPI_ShapeTools::splitShape(const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
+                                        const std::set<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
+                                        std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes)
+{
+  // General Fuse to split edge by vertices
+  BOPAlgo_Builder aBOP;
+  const TopoDS_Edge& aBaseEdge = theBaseShape->impl<TopoDS_Edge>();
+  aBOP.AddArgument(aBaseEdge);
+
+  std::set<std::shared_ptr<GeomAPI_Pnt> >::const_iterator aPtIt = thePoints.begin();
+  for (; aPtIt != thePoints.end(); ++aPtIt) {
+    std::shared_ptr<GeomAPI_Pnt> aPnt = *aPtIt;
+    TopoDS_Vertex aV = BRepBuilderAPI_MakeVertex(gp_Pnt(aPnt->x(), aPnt->y(), aPnt->z()));
+    aBOP.AddArgument(aV);
+  }
+
+  aBOP.Perform();
+  if (aBOP.ErrorStatus())
+    return;
+  
+  // Collect splits
+  const TopTools_ListOfShape& aSplits = aBOP.Modified(aBaseEdge);
+  TopTools_ListIteratorOfListOfShape anIt(aSplits);
+  for (; anIt.More(); anIt.Next()) {
+    std::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
+    anEdge->setImpl(new TopoDS_Shape(anIt.Value()));
+    theShapes.insert(anEdge);
+  }
 }

@@ -10,6 +10,7 @@ SET(PROJECT_HEADERS
 	PartSet_CustomPrs.h
 	PartSet_ExternalObjectsMgr.h
 	PartSet_Module.h
+	PartSet_MouseProcessor.h
 	PartSet_OperationPrs.h
         PartSet_OverconstraintListener.h
         PartSet_PreviewPlanes.h
@@ -32,6 +33,7 @@ SET(PROJECT_HEADERS
 	PartSet_WidgetSketchCreator.h
 	PartSet_IconFactory.h
 	PartSet_WidgetChoice.h
+	PartSet_WidgetSubShapeSelector.h
 )
 
 SET(PROJECT_SOURCES
@@ -59,6 +61,7 @@ SET(PROJECT_SOURCES
 	PartSet_MenuMgr.cpp
 	PartSet_WidgetSketchCreator.cpp
 	PartSet_IconFactory.cpp
+	PartSet_WidgetSubShapeSelector.cpp
 )
 
 SET(PROJECT_RESOURCES
@@ -71,10 +74,11 @@ SET(PROJECT_RESOURCES
 
 SET(PROJECT_LIBRARIES
     ModuleBase
+    ModelGeomAlgo
     Config
     GeomAPI
     GeomDataAPI
-	SketcherPrs
+    SketcherPrs
     ${QT_LIBRARIES}
     ${CAS_KERNEL}
     ${CAS_SHAPE}
@@ -102,6 +106,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/XGUI
                     ${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/ModuleBase
                     ${PROJECT_SOURCE_DIR}/src/ModelAPI
+                    ${PROJECT_SOURCE_DIR}/src/ModelGeomAlgo
                     ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
                     ${PROJECT_SOURCE_DIR}/src/SketchPlugin

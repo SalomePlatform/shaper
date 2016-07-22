@@ -130,18 +130,15 @@ bool XGUI_ModuleConnector::canStartOperation(QString theId)
   return myWorkshop->operationMgr()->canStartOperation(theId);
 }
 
-void XGUI_ModuleConnector::processLaunchOperation(ModuleBase_Operation* theOperation,
-                                                  const bool isUpdatePropertyPanel)
+void XGUI_ModuleConnector::processLaunchOperation(ModuleBase_Operation* theOperation)
 {
   XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
 
   if (anOperationMgr->startOperation(theOperation)) {
-    if (isUpdatePropertyPanel) {
-      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
-      if (aFOperation) {
-        workshop()->propertyPanel()->updateContentWidget(aFOperation->feature());
-        workshop()->propertyPanel()->createContentPanel(aFOperation->feature());
-      }
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    if (aFOperation) {
+      workshop()->propertyPanel()->updateContentWidget(aFOperation->feature());
+      workshop()->propertyPanel()->createContentPanel(aFOperation->feature());
     }
     if (!theOperation->getDescription()->hasXmlRepresentation()) {
       if (theOperation->commit())

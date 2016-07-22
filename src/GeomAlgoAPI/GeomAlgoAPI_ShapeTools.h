@@ -12,6 +12,8 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Vertex.h>
 
+#include <set>
+
 class GeomAPI_Edge;
 class GeomAPI_Dir;
 class GeomAPI_Face;
@@ -102,6 +104,13 @@ public:
   /// \return true if edge is parallel to face.
   GEOMALGOAPI_EXPORT static bool isParallel(const std::shared_ptr<GeomAPI_Edge> theEdge,
                                             const std::shared_ptr<GeomAPI_Face> theFace);
+  /// \brief Performs the split of the shape by points.
+  /// \param[in] theBaseShape shape that should be splitted.
+  /// \param[in] thePoints container of points to split
+  /// \param[out] theShapes container of shapes after split
+  GEOMALGOAPI_EXPORT static void splitShape(const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
+                                            const std::set<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
+                                            std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes);
 };
 
 #endif

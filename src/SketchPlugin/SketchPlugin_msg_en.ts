@@ -1186,7 +1186,15 @@
       <translation>Second object is not selected</translation>
     </message>
   </context>
-  
+
+  <context>
+    <name>SketchConstraintSplit</name>
+    <message>
+      <source>ConstraintEntityA - SketchPlugin_SplitValidator: The attribute with the %1 type is not processed</source>
+      <translation>Only attribute selection can be used for the sketch face, not %1</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchConstraintFillet</name>
     <message>

@@ -69,8 +69,7 @@ void ModuleBase_IModule::launchModal(const QString& theCmdId)
 }
 
 
-void ModuleBase_IModule::launchOperation(const QString& theCmdId,
-                                         const bool isUpdatePropertyPanel)
+void ModuleBase_IModule::launchOperation(const QString& theCmdId)
 {
   if (!myWorkshop->canStartOperation(theCmdId))
     return;
@@ -81,15 +80,8 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId,
     ModuleBase_ISelection* aSelection = myWorkshop->selection();
     // Initialise operation with preliminary selection
     aFOperation->initSelection(aSelection, myWorkshop->viewer());
-    sendOperation(aFOperation, isUpdatePropertyPanel);
+    workshop()->processLaunchOperation(aFOperation);
   }
-}
-
-
-void ModuleBase_IModule::sendOperation(ModuleBase_Operation* theOperation,
-                                       const bool isUpdatePropertyPanel)
-{
-  workshop()->processLaunchOperation(theOperation, isUpdatePropertyPanel);
 }
 
 Handle(AIS_InteractiveObject) ModuleBase_IModule::createPresentation(const ResultPtr& theResult)
@@ -225,7 +217,7 @@ void ModuleBase_IModule::editFeature(FeaturePtr theFeature)
                                                          (createOperation(aFeatureId));
   if (aFOperation) {
     aFOperation->setFeature(theFeature);
-    sendOperation(aFOperation);
+    workshop()->processLaunchOperation(aFOperation);
   }
 }
 

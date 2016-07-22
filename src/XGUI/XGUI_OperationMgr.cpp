@@ -470,9 +470,6 @@ void XGUI_OperationMgr::onBeforeOperationStarted()
     qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
             ModuleBase_Tools::objectInfo(ModelAPI_Session::get()->activeDocument()->currentFeature(false))).toStdString().c_str());
 #endif
-  ModuleBase_IModule* aModule = myWorkshop->module();
-  if (aModule)
-    aModule->beforeOperationStarted(aFOperation);
   }
 }
 
@@ -480,7 +477,8 @@ void XGUI_OperationMgr::onOperationStarted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
   updateApplyOfOperations(aSenderOperation);
-  emit operationStarted(aSenderOperation);
+  XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
+  aWorkshop->operationStarted(aSenderOperation);
 }
 
 void XGUI_OperationMgr::onBeforeOperationAborted()

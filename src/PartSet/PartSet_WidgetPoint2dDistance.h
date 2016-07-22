@@ -8,6 +8,8 @@
 #define PartSet_WidgetPoint2dDistance_H
 
 #include "PartSet.h"
+#include "PartSet_MouseProcessor.h"
+
 #include <ModuleBase_WidgetDoubleValue.h>
 
 #include <ModelAPI_CompositeFeature.h>
@@ -34,7 +36,8 @@ class QMouseEvent;
 * </point2ddistance>
 * \endcode
 */ 
-class PARTSET_EXPORT PartSet_WidgetPoint2dDistance : public ModuleBase_WidgetDoubleValue
+class PARTSET_EXPORT PartSet_WidgetPoint2dDistance : public ModuleBase_WidgetDoubleValue,
+                                                     public PartSet_MouseProcessor
 {
 Q_OBJECT
  public:
@@ -52,9 +55,6 @@ Q_OBJECT
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
 
-  /// The methiod called when widget is deactivated
-  virtual void deactivate();
-
   /// \returns the sketch instance
   CompositeFeaturePtr sketch() const { return mySketch; }
 
@@ -64,17 +64,15 @@ Q_OBJECT
   /// Returns true if the event is processed.
   virtual bool processEnter();
 
-public slots:
-   /// Process of mouse move
-   /// \param theWnd a pointer to a window
-   /// \param theEvent a mouse event
-  void onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+  /// Processing the mouse move event in the viewer
+  /// \param theWindow a view window
+  /// \param theEvent a mouse event
+  virtual void mouseMoved(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent);
 
-  protected slots:
-   /// Process of mouse release
-   /// \param theWnd a pointer to a window
-   /// \param theEvent a mouse event
-  void onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+  /// Processing the mouse release event in the viewer
+  /// \param theWindow a view window
+  /// \param theEvent a mouse event
+  virtual void mouseReleased(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent);
 
 protected:
   /// Store current value in cashed value
@@ -87,9 +85,6 @@ protected:
   /// Fills the widget with default values
   /// \return true if the widget current value is reset
   virtual bool resetCustom();
-
-  /// The methiod called when widget is activated
-  virtual void activateCustom();
 
   /// Set the second point which defines a value in the widget as a distance with a first point defined by feature
   void setPoint(FeaturePtr theFeature, const std::shared_ptr<GeomAPI_Pnt2d>& thePnt);

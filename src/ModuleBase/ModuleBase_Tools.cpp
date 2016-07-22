@@ -62,6 +62,10 @@
 #include <sstream>
 #include <string>
 
+#ifdef WIN32
+#pragma warning(disable : 4996) // for getenv
+#endif
+
 const double tolerance = 1e-7;
 const double DEFAULT_DEVIATION_COEFFICIENT = 1.e-4;
 
