@@ -46,6 +46,9 @@ Q_OBJECT
 
   virtual ~PartSet_WidgetSubShapeSelector();
 
+  /// The methiod called when widget is deactivated
+  virtual void deactivate();
+
   /// Processing the mouse move event in the viewer
   /// \param theWindow a view window
   /// \param theEvent a mouse event
@@ -69,6 +72,10 @@ protected:
   //                              ObjectPtr& theObject,
   //                              GeomShapePtr& theShape);
   void fillObjectShapes(const ObjectPtr& theObject);
+
+protected:
+  /// The methiod called when widget is activated
+  virtual void activateCustom();
 
 protected:
   std::shared_ptr<ModuleBase_ViewerPrs> myCurrentSubShape;

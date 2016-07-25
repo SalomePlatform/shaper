@@ -30,6 +30,10 @@
 
 #include <Config_WidgetAPI.h>
 
+#include <XGUI_Tools.h>
+#include <XGUI_Workshop.h>
+#include <XGUI_Displayer.h>
+
 #include <QWidget>
 #include <QMouseEvent>
 
@@ -38,12 +42,31 @@ PartSet_WidgetSubShapeSelector::PartSet_WidgetSubShapeSelector(QWidget* theParen
                                                          const Config_WidgetAPI* theData)
 : PartSet_WidgetShapeSelector(theParent, theWorkshop, theData)
 {
+  myCurrentSubShape = std::shared_ptr<ModuleBase_ViewerPrs>(new ModuleBase_ViewerPrs());
+
   //myUseSketchPlane = theData->getBooleanAttribute("use_sketch_plane", true);
   //myExternalObjectMgr = new PartSet_ExternalObjectsMgr(theData->getProperty("use_external"), true);
 }
 
 PartSet_WidgetSubShapeSelector::~PartSet_WidgetSubShapeSelector()
 {
+}
+
+//********************************************************************
+void PartSet_WidgetSubShapeSelector::activateCustom()
+{
+  PartSet_WidgetShapeSelector::activateCustom();
+
+  myWorkshop->module()->activateCustomPrs(myFeature,
+                            ModuleBase_IModule::CustomizeHighlightedObjects, true);
+}
+
+//********************************************************************
+void PartSet_WidgetSubShapeSelector::deactivate()
+{
+  PartSet_WidgetShapeSelector::deactivate();
+
+  myWorkshop->module()->deactivateCustomPrs(ModuleBase_IModule::CustomizeHighlightedObjects, true);
 }
 
 //********************************************************************
@@ -69,16 +92,22 @@ void PartSet_WidgetSubShapeSelector::mouseMoved(ModuleBase_IViewWindow* theWindo
           GeomShapePtr aBaseShape = *anIt;
           std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
           if (ModelGeomAlgo_Point2D::isPointOnEdge(aBaseShape, aPoint, aProjectedPoint)) {
-            myCurrentSubShape->setObject(anObject);
-            myCurrentSubShape->setShape(aBaseShape);
+            XGUI_Tools::workshop(myWorkshop)->displayer()->clearSelected(false);
+            if (myCurrentSubShape->object() != anObject ||
+                myCurrentSubShape->shape() != aBaseShape) {
+              myCurrentSubShape->setObject(anObject);
+              myCurrentSubShape->setShape(aBaseShape);
+              myWorkshop->module()->customizeObject(myFeature,
+                                       ModuleBase_IModule::CustomizeHighlightedObjects, true);
+            }
+            else
+              XGUI_Tools::workshop(myWorkshop)->displayer()->updateViewer();;
             break;
           }
         }
       }
     }
   }
-  myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeHighlightedObjects,
-                                        true);
 }
 
 //********************************************************************

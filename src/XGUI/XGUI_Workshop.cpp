@@ -719,16 +719,26 @@ void XGUI_Workshop::onOpen()
   }
 
   //show file dialog, check if readable and open
-  myCurrentDir = QFileDialog::getExistingDirectory(desktop(), tr("Select directory"));
+  QString aDirectory = QFileDialog::getExistingDirectory(desktop(), tr("Select directory"));
+  openDirectory(aDirectory);
+}
+
+//******************************************************
+void XGUI_Workshop::openDirectory(const QString& theDirectory)
+{
+  myCurrentDir = theDirectory;
   if (myCurrentDir.isEmpty())
     return;
+
   QFileInfo aFileInfo(myCurrentDir);
   if (!aFileInfo.exists() || !aFileInfo.isReadable()) {
     QMessageBox::critical(desktop(), tr("Warning"), tr("Unable to open the file."));
     myCurrentDir = "";
     return;
   }
+
   QApplication::setOverrideCursor(Qt::WaitCursor);
+  SessionPtr aSession = ModelAPI_Session::get();
   aSession->closeAll();
   aSession->load(myCurrentDir.toLatin1().constData());
   myObjectBrowser->rebuildDataTree();

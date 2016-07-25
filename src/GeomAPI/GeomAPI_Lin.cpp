@@ -101,7 +101,7 @@ const std::shared_ptr<GeomAPI_Pnt> GeomAPI_Lin::project(
   const gp_XYZ& aPnt = thePoint->impl<gp_Pnt>().XYZ();
   double aParam = aDir.Dot(aPnt - aLoc);
 
-  gp_XYZ aResult = aPnt + aDir * aParam;
+  gp_XYZ aResult = aLoc + aDir * aParam;
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aResult.X(), aResult.Y(), aResult.Z()));
 }
 

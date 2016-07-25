@@ -96,7 +96,9 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   void setSelected(const  QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues, bool theUpdateViewer = true);
 
   /// Unselect all objects
-  void clearSelected();
+  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
+  /// \param theUpdateViewer the parameter to update viewer
+  void clearSelected(const bool theUpdateViewer = true);
 
   /// Erase the feature and a shape.
   /// \param theObject an object instance

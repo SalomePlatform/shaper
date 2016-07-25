@@ -419,22 +419,10 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   ModuleBase_Operation* aOp = getCurrentOperation();
   if (aOp) {
     if (isNestedSketchOperation(aOp, activeSketch())) {
-      //get2dPoint(theWnd, theEvent, myClickedPoint);
-
       // Only for sketcher operations
       if (myIsDragging) {
         if (myDragDone) {
-          //aOp->commit();
           myCurrentSelection.clear();
-          /*Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
-          if (!aContext.IsNull()) {
-          // Reselect edited object
-          aContext->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
-          if (theEvent->modifiers() & Qt::ShiftModifier)
-            aContext->ShiftSelect();
-          else
-            aContext->Select();
-          */
         }
       }
     }

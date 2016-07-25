@@ -670,12 +670,12 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValue
     updateViewer();
 }
 
-void XGUI_Displayer::clearSelected()
+void XGUI_Displayer::clearSelected(const bool theUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
     aContext->UnhilightCurrents(false);
-    aContext->ClearSelected();
+    aContext->ClearSelected(theUpdateViewer);
   }
 }
 

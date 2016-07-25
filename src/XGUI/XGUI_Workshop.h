@@ -308,6 +308,10 @@ Q_OBJECT
   /// It is used for specific processing of Undo/Redo for this command.
   static QString MOVE_TO_END_COMMAND;
 
+  //! Closes all in the current session and load the directory
+  //! \param theDirectory a path to directory
+  void openDirectory(const QString& theDirectory);
+
 signals:
   /// Emitted when selection happens in Salome viewer
   void salomeViewerSelection();
