@@ -10,8 +10,10 @@
 
 #include "PartSet.h"
 
-#include <PartSet_WidgetShapeSelector.h>
+#include <ModuleBase_WidgetShapeSelector.h>
 #include <PartSet_MouseProcessor.h>
+
+#include <ModelAPI_CompositeFeature.h>
 
 #include <QObject>
 
@@ -32,7 +34,7 @@ class QMouseEvent;
 * by mouse move over shape in the viewer. Split of the object is performed by
 * coincident points to the object. Segment between nearest coincidence is highlighted
 */
-class PARTSET_EXPORT PartSet_WidgetSubShapeSelector: public PartSet_WidgetShapeSelector,
+class PARTSET_EXPORT PartSet_WidgetSubShapeSelector: public ModuleBase_WidgetShapeSelector,
                                                      public PartSet_MouseProcessor
 {
 Q_OBJECT
@@ -45,6 +47,13 @@ Q_OBJECT
                                  const Config_WidgetAPI* theData);
 
   virtual ~PartSet_WidgetSubShapeSelector();
+
+  /// Set sketcher
+  /// \param theSketch a sketcher object
+  void setSketcher(CompositeFeaturePtr theSketch) { mySketch = theSketch; }
+
+  /// Retrurns installed sketcher
+  CompositeFeaturePtr sketch() const { return mySketch; }
 
   /// The methiod called when widget is deactivated
   virtual void deactivate();
@@ -80,6 +89,9 @@ protected:
 protected:
   std::shared_ptr<ModuleBase_ViewerPrs> myCurrentSubShape;
   std::map<ObjectPtr, std::set<GeomShapePtr> > myCashedShapes;
+
+  /// Pointer to a sketch 
+  CompositeFeaturePtr mySketch;
 };
 
 #endif

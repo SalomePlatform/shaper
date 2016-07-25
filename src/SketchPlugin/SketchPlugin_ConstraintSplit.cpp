@@ -13,7 +13,7 @@
 //#include <GeomAPI_XY.h>
 //#include <GeomDataAPI_Point2D.h>
 //#include <ModelAPI_AttributeDouble.h>
-#include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeReference.h>
 //#include <ModelAPI_AttributeRefList.h>
 //#include <ModelAPI_AttributeRefAttrList.h>
 //#include <ModelAPI_Data.h>
@@ -70,7 +70,7 @@ SketchPlugin_ConstraintSplit::SketchPlugin_ConstraintSplit()
 
 void SketchPlugin_ConstraintSplit::initAttributes()
 {
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeReference::typeId());
 
   //data()->addAttribute(SketchPlugin_Constraint::VALUE(), ModelAPI_AttributeDouble::typeId());
   //data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttrList::typeId());

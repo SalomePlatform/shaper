@@ -25,6 +25,7 @@ void Model_AttributeReference::setValue(ObjectPtr theObject)
   //  return;
   ObjectPtr aValue = value();
   if (!myIsInitialized || aValue != theObject) {
+    myIsInitialized = true;
     REMOVE_BACK_REF(aValue);
 
     TDF_Label anObjLab;

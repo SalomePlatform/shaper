@@ -8,6 +8,7 @@
 #define ModelGeomAlgo_Point2D_H
 
 #include "ModelGeomAlgo.h"
+#include "ModelAPI_Feature.h"
 
 class ModelAPI_Feature;
 class ModelAPI_Object;
@@ -29,12 +30,13 @@ namespace ModelGeomAlgo_Point2D {
   /// \param theAttribute a name of AttributeRefAttr on the given feature
   /// \param theObjectFeatureKind a feature kind in object of attribute that satisfies the search
   /// \param theObjectFeatureAttribute a feature attribute in object that satisfies the search
+  /// \param isSkipFeatureAttributes a boolean value if coincidences to the feature attributes
   /// \returns found point attribute or NULL
   MODELGEOMALGO_EXPORT std::shared_ptr<GeomDataAPI_Point2D> getPointOfRefAttr(
-                                                ModelAPI_Feature* theFeature,
-                                                const std::string& theAttribute,
-                                                const std::string& theObjectFeatureKind = "",
-                                                const std::string& theObjectFeatureAttribute = "");
+                        ModelAPI_Feature* theFeature,
+                        const std::string& theAttribute,
+                        const std::string& theObjectFeatureKind = "",
+                        const std::string& theObjectFeatureAttribute = "");
 
   /// Fills container of point 2D attributes, which refer to the feature through the references
   /// features with the given kind
@@ -43,12 +45,15 @@ namespace ModelGeomAlgo_Point2D {
   /// \param theAttributes a container of found point 2D attributes
   /// \param theObjectFeatureKind a feature kind in object of attribute that satisfies the search
   /// \param theObjectFeatureAttribute a feature attribute in object that satisfies the search
+  /// \param isSkipFeatureAttributes a boolean value if coincidences to the feature attributes
+  /// should be skipped
   /// \returns found point attribute or NULL
   MODELGEOMALGO_EXPORT void getPointsOfReference(const std::shared_ptr<ModelAPI_Object>& theObject,
                                           const std::string& theReferenceFeatureKind,
                                           std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theAttributes,
                                           const std::string& theObjectFeatureKind = "",
-                                          const std::string& theObjectFeatureAttribute = "");
+                                          const std::string& theObjectFeatureAttribute = "",
+                                          const bool isSkipFeatureAttributes = true);
 
   /// Removes attributes which points are out of the base shape
   /// \param theBaseShape a shape of check

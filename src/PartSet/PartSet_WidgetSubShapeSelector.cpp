@@ -40,22 +40,20 @@
 PartSet_WidgetSubShapeSelector::PartSet_WidgetSubShapeSelector(QWidget* theParent,
                                                          ModuleBase_IWorkshop* theWorkshop,
                                                          const Config_WidgetAPI* theData)
-: PartSet_WidgetShapeSelector(theParent, theWorkshop, theData)
+: ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData)
 {
   myCurrentSubShape = std::shared_ptr<ModuleBase_ViewerPrs>(new ModuleBase_ViewerPrs());
-
-  //myUseSketchPlane = theData->getBooleanAttribute("use_sketch_plane", true);
-  //myExternalObjectMgr = new PartSet_ExternalObjectsMgr(theData->getProperty("use_external"), true);
 }
 
 PartSet_WidgetSubShapeSelector::~PartSet_WidgetSubShapeSelector()
 {
+  myCashedShapes.clear();
 }
 
 //********************************************************************
 void PartSet_WidgetSubShapeSelector::activateCustom()
 {
-  PartSet_WidgetShapeSelector::activateCustom();
+  ModuleBase_WidgetShapeSelector::activateCustom();
 
   myWorkshop->module()->activateCustomPrs(myFeature,
                             ModuleBase_IModule::CustomizeHighlightedObjects, true);
@@ -64,7 +62,7 @@ void PartSet_WidgetSubShapeSelector::activateCustom()
 //********************************************************************
 void PartSet_WidgetSubShapeSelector::deactivate()
 {
-  PartSet_WidgetShapeSelector::deactivate();
+  ModuleBase_WidgetShapeSelector::deactivate();
 
   myWorkshop->module()->deactivateCustomPrs(ModuleBase_IModule::CustomizeHighlightedObjects, true);
 }

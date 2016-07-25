@@ -19,6 +19,7 @@
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
+#include <GeomAPI_Circ.h>
 
 namespace ModelGeomAlgo_Point2D {
   std::shared_ptr<GeomDataAPI_Point2D> getPointOfRefAttr(ModelAPI_Feature* theFeature,
@@ -55,9 +56,12 @@ namespace ModelGeomAlgo_Point2D {
                             const std::string& theReferenceFeatureKind,
                             std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theAttributes,
                             const std::string& theObjectFeatureKind,
-                            const std::string& theObjectFeatureAttribute)
+                            const std::string& theObjectFeatureAttribute,
+                            const bool isSkipFeatureAttributes)
   {
     // find by feature
+    FeaturePtr aSourceFeature = ModelAPI_Feature::feature(theObject);
+
     const std::set<AttributePtr>& aRefsList = theObject->data()->refsToMe();
     std::set<AttributePtr>::const_iterator aIt;
     for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
@@ -66,15 +70,32 @@ namespace ModelGeomAlgo_Point2D {
       if (aRefFeature->getKind() == theReferenceFeatureKind) {
         std::list<AttributePtr> anAttributes =
                          aRefFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
-        std::list<AttributePtr>::iterator anIter = anAttributes.begin();
+        std::list<AttributePtr>::iterator anIter = anAttributes.begin(), aLast = anAttributes.end();
+        bool isSkippedAttribute = false;
+        if (isSkipFeatureAttributes) {
+          for(anIter = anAttributes.begin(); anIter != aLast && !isSkippedAttribute; anIter++) {
+            AttributeRefAttrPtr aRefAttribute =
+              std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anIter);
+            if (aRefAttribute.get() && !aRefAttribute->isObject()) {
+              std::shared_ptr<GeomDataAPI_Point2D> aPointAttr =
+                             std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRefAttribute->attr());
+              FeaturePtr anAttributeFeature = ModelAPI_Feature::feature(aPointAttr->owner());
+              isSkippedAttribute = aSourceFeature == anAttributeFeature;
+            }
+          }
+        }
+        if (isSkippedAttribute)
+          continue;
+
         // it searches the first point of AttributeRefAtt
         std::shared_ptr<GeomDataAPI_Point2D> aPointAttr;
-        for(; anIter != anAttributes.end() && !aPointAttr.get(); anIter++) {
+        for(anIter = anAttributes.begin(); anIter != aLast && !aPointAttr.get(); anIter++) {
           AttributeRefAttrPtr aRefAttribute =
             std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anIter);
-          if (aRefAttribute.get())
+          if (aRefAttribute.get()) {
             aPointAttr = getPointOfRefAttr(aRefFeature.get(), aRefAttribute->id(),
-                                           theObjectFeatureKind, theObjectFeatureAttribute);
+                         theObjectFeatureKind, theObjectFeatureAttribute);
+          }
         }
         if (aPointAttr.get()) {
           theAttributes.insert(aPointAttr);
@@ -119,13 +140,20 @@ namespace ModelGeomAlgo_Point2D {
   {
     bool isInside = false;
     if (theBaseShape->shapeType() == GeomAPI_Shape::EDGE) {
-      std::shared_ptr<GeomAPI_Edge> aLineEdge(new GeomAPI_Edge(theBaseShape));
-      std::shared_ptr<GeomAPI_Lin> aLine = aLineEdge->line();
-      theProjectedPoint = aLine->project(thePoint);
-
-      std::shared_ptr<GeomAPI_Vertex> aVertexShape(new GeomAPI_Vertex(theProjectedPoint->x(),
-                                                theProjectedPoint->y(), theProjectedPoint->z()));
-      isInside = GeomAlgoAPI_ShapeTools::isSubShapeInsideShape(aVertexShape, theBaseShape);
+      std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(theBaseShape));
+      if (anEdge->isLine()) {
+        std::shared_ptr<GeomAPI_Lin> aLine = anEdge->line();
+        theProjectedPoint = aLine->project(thePoint);
+      }
+      else if (anEdge->isCircle() || anEdge->isArc()) {
+        std::shared_ptr<GeomAPI_Circ> aCircle = anEdge->circle();
+        theProjectedPoint = aCircle->project(thePoint);
+      }
+      if (theProjectedPoint.get()) {
+        std::shared_ptr<GeomAPI_Vertex> aVertexShape(new GeomAPI_Vertex(theProjectedPoint->x(),
+                                                  theProjectedPoint->y(), theProjectedPoint->z()));
+        isInside = GeomAlgoAPI_ShapeTools::isSubShapeInsideShape(aVertexShape, theBaseShape);
+      }
     }
     return isInside;
   }
