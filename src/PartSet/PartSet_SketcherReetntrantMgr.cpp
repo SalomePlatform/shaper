@@ -146,7 +146,7 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* /*
       bool isLineFeature = false, isArcFeature = false;
       if (aCurrentFeature->getKind() == SketchPlugin_Line::ID())
         isLineFeature = anActiveWidget->attributeID() == SketchPlugin_Line::START_ID();
-      else if (isTangentArc(aFOperation))
+      else if (isTangentArc(aFOperation, module()->sketchMgr()->activeSketch()))
         isArcFeature = anActiveWidget->attributeID() == SketchPlugin_Arc::TANGENT_POINT_ID();
 
       bool aCanBeActivatedByMove = isLineFeature || isArcFeature;
@@ -254,7 +254,8 @@ void PartSet_SketcherReetntrantMgr::onNoMoreWidgets(const std::string& thePrevio
   if (!myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty())
     return;
 
-  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
+  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation,
+                                                    module()->sketchMgr()->activeSketch())) {
     bool isStarted = false;
     if (!module()->sketchMgr()->sketchSolverError()) {
       if (myRestartingMode != RM_Forbided) {
@@ -301,7 +302,8 @@ void PartSet_SketcherReetntrantMgr::onVertexSelected()
 
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
   std::string anOperationId = anOperation->id().toStdString();
-  if (anOperationId == SketchPlugin_Line::ID() || isTangentArc(anOperation)) {
+  if (anOperationId == SketchPlugin_Line::ID() ||
+      isTangentArc(anOperation, module()->sketchMgr()->activeSketch())) {
     /// If last line finished on vertex the lines creation sequence has to be break
     ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
     ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
@@ -344,7 +346,8 @@ bool PartSet_SketcherReetntrantMgr::isActiveMgr() const
 
   bool anActive = PartSet_SketcherMgr::isSketchOperation(aCurrentOperation);
   if (!anActive) {
-    anActive = PartSet_SketcherMgr::isNestedSketchOperation(aCurrentOperation);
+    anActive = PartSet_SketcherMgr::isNestedSketchOperation(aCurrentOperation,
+                                                    module()->sketchMgr()->activeSketch());
     if (anActive) { // the manager is not active when the current operation is a usual Edit
       ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                        (myWorkshop->currentOperation());
@@ -367,7 +370,8 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                      (myWorkshop->currentOperation());
 
-  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
+  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation,
+                                                module()->sketchMgr()->activeSketch())) {
     aFOperation->setEditOperation(true/*, false*/);
     createInternalFeature();
 
@@ -468,7 +472,8 @@ void PartSet_SketcherReetntrantMgr::createInternalFeature()
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                      (myWorkshop->currentOperation());
 
-  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
+  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation,
+                                                          module()->sketchMgr()->activeSketch())) {
     FeaturePtr anOperationFeature = aFOperation->feature();
 
     CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
@@ -598,12 +603,13 @@ bool PartSet_SketcherReetntrantMgr::copyReetntrantAttributes(const FeaturePtr& t
   return aChanged;
 }
 
-bool PartSet_SketcherReetntrantMgr::isTangentArc(ModuleBase_Operation* theOperation)
+bool PartSet_SketcherReetntrantMgr::isTangentArc(ModuleBase_Operation* theOperation,
+                                                 const CompositeFeaturePtr& theSketch)
 {
   bool aTangentArc = false;
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                         (theOperation);
-  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)) {
+  if (aFOperation && PartSet_SketcherMgr::isNestedSketchOperation(aFOperation, theSketch)) {
     FeaturePtr aFeature = aFOperation->feature();
     if (aFeature.get() && aFeature->getKind() == SketchPlugin_Arc::ID()) {
       AttributeStringPtr aTypeAttr = aFeature->data()->string(SketchPlugin_Arc::ARC_TYPE());

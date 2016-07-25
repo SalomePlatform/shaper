@@ -132,14 +132,14 @@
       </feature>
       <!--  SketchConstraintSplit  -->
       <feature id="SketchConstraintSplit" title="Split" tooltip="Create constraints defining split of linear segment, arc or circle" icon="icons/Sketch/split.png">
-        <sketch_shape_selector
+        <sketch_sub_shape_selector
             id="ConstraintEntityA"
             label="Split feature"
             tooltip="Select feature for split"
             shape_types="edge"
             use_external="false">
           <validator id="SketchPlugin_SplitValidator"/>
-        </sketch_shape_selector>
+        </sketch_sub_shape_selector>
       </feature>
     </group>
 

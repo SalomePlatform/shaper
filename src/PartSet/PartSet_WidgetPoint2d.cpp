@@ -134,10 +134,6 @@ bool PartSet_WidgetPoint2D::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr
   if (aModule->sketchReentranceMgr()->isInternalEditActive()) 
     return true; /// when internal edit is started a new feature is created. I has not results, AIS
 
-  // workaround for feature, where there is no results
-  //if (myFeature->getKind() == "SketchRectangle")
-  //  return true;
-
   /// the selection is not possible if the current feature has no presentation for the current
   /// attribute not in AIS not in results. If so, no object in current feature where make
   /// coincidence, so selection is not necessary
@@ -495,6 +491,15 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
                 anOrphanPoint = isOrphanPoint(aFixedFeature, mySketch, aX, aY);
               }
             }
+            else {
+              // point is taken from mouse event and set in attribute. It should be done before setting
+              // coinident constraint to the external line. If a point is created, it should be in the mouse
+              // clicked point
+              gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
+              double aX, anY;
+              PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, anY);
+              setPoint(aX, anY);
+            }
           }
           if (aFixedObject.get())
             setConstraintWith(aFixedObject);
@@ -528,11 +533,13 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
           PartSet_Tools::setConstraints(mySketch, feature(), attributeID(), aX, aY);
         }
         else if (aShape.ShapeType() == TopAbs_EDGE) {
-          if (!setConstraintWith(aObject)) {
-            gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
-            PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, aY);
-            setPoint(aX, aY);
-          }
+          // point is taken from mouse event and set in attribute. It should be done before setting
+          // coinident constraint to the external line. If a point is created, it should be in the mouse
+          // clicked point
+          gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
+          PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, aY);
+          setPoint(aX, aY);
+          setConstraintWith(aObject);
           setValueState(Stored); // in case of edge selection, Apply state should also be updated
           isAuxiliaryFeature = PartSet_Tools::isAuxiliarySketchEntity(aObject);
         }

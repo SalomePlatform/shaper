@@ -91,20 +91,25 @@ public:
   /// \return the boolean result
   static bool isSketchOperation(ModuleBase_Operation* theOperation);
 
-  /// Returns true if the operation id is in the sketch operation id list
+  /// Returns true if the operation feature is a sub in the given sketch
   /// \param theOperation an operation
+  /// \param theSketch a sketch feature
   /// \return the boolean result
-  static bool isNestedSketchOperation(ModuleBase_Operation* theOperation);
+  static bool isNestedSketchOperation(ModuleBase_Operation* theOperation,
+                                      const CompositeFeaturePtr& theSketch);
 
-  /// Returns true if the operation is a create nested feature one
+  /// Returns true if the operation is a create and nested sketch operationn
   /// \param theOperation a checked operation
+  /// \param theSketch a sketch feature
   //// \return boolean value
-  static bool isNestedCreateOperation(ModuleBase_Operation* theOperation);
+  static bool isNestedCreateOperation(ModuleBase_Operation* theOperation,
+                                      const CompositeFeaturePtr& theSketch);
 
   /// Returns true if the operation is an edit nested feature one
   /// \param theOperation a checked operation
   //// \return boolean value
-  static bool isNestedEditOperation(ModuleBase_Operation* theOperation);
+  static bool isNestedEditOperation(ModuleBase_Operation* theOperation,
+                                    const CompositeFeaturePtr& theSketch);
 
   /// Returns whether the current operation is a sketch entity - line, point, arc or circle
   /// \param theId is an id of object
@@ -230,9 +235,6 @@ public:
   /// It nullify internal flags concerned to clicked mouse event
   void clearClickedFlags();
 
-  /// Returns list of strings which contains id's of sketch operations
-  static const QStringList& sketchOperationIdList();
-
   /// Returns list of strings which contains id's of sketch replication operations
   static const QStringList& replicationsIdList();
 
@@ -314,20 +316,6 @@ private:
 
   typedef QMap<FeaturePtr, std::pair<std::set<AttributePtr>, std::set<ResultPtr> > >
                                                                        FeatureToSelectionMap;
-
-  /// Obtains the current selection of the object in the workshop viewer 
-  /// It includes the selection in all modes of activation, even local context - vertices, edges
-  /// It gets all results of the feature, find an AIS object in the viewer and takes all BRep
-  /// selection owners. If the owner is vertex, the corresponded attribute is seached in
-  /// the feature, if the owner is edge, the current result is added to the container of results.
-  /// \param theFeature a feature or result object
-  /// \param theSketch a current sketch feature
-  /// \param theWorkshop a workshop to have an access to AIS context and displayer
-  /// \param theSelection a container for the selection, to save results and attributres for a feature
-  static void getCurrentSelection(const FeaturePtr& theFeature,
-                                  const FeaturePtr& theSketch,
-                                  ModuleBase_IWorkshop* theWorkshop,
-                                  FeatureToSelectionMap& theSelection);
 
   /// Applyes the current selection to the object in the workshop viewer 
   /// It includes the selection in all modes of activation, even local context - vertexes, edges

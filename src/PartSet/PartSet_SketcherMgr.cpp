@@ -96,44 +96,6 @@
 
 //#define DEBUG_CURSOR
 
-/// Returns list of unique objects by sum of objects from List1 and List2
-/*QList<ModuleBase_ViewerPrsPtr> getSumList(const QList<ModuleBase_ViewerPrsPtr>& theList1,
-                                       const QList<ModuleBase_ViewerPrsPtr>& theList2)
-{
-  QList<ModuleBase_ViewerPrsPtr> aRes;
-  foreach (ModuleBase_ViewerPrsPtr aPrs, theList1) {
-    if (!aRes.contains(aPrs))
-      aRes.append(aPrs);
-  }
-  foreach (ModuleBase_ViewerPrsPtr aPrs, theList2) {
-    if (!aRes.contains(aPrs))
-      aRes.append(aPrs);
-  }
-  return aRes;
-}*/
-
-// Fills the list of features the list of selected presentations.
-// \param theList a list of selected presentations
-// \param theSketch a sketch to project a vertex shape of a presentation to the plane
-// and find the corresponded attribute
-// \param theFeatureList  an output list of features
-void fillFeatureList(const QList<ModuleBase_ViewerPrsPtr>& theList,
-                     const FeaturePtr theSketch,
-                     QList<FeaturePtr>& theFeatureList)
-{
-  QList<ModuleBase_ViewerPrsPtr> aRes;
-
-  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theList.begin(),
-                                              aLast = theList.end();
-  for (; anIt != aLast; anIt++)
-  {
-    ModuleBase_ViewerPrsPtr aPrs = *anIt;
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aPrs->object());
-    if (aFeature.get()  && !theFeatureList.contains(aFeature))
-      theFeatureList.append(aFeature);
-  }
-}
-
 /// Fills attribute and result lists by the selected owner. In case if the attribute is found,
 /// by the owner shape, it is put to the list. Otherwise if type of owner shape is edge, put the function
 /// result as is to the list of results.
@@ -229,7 +191,7 @@ void PartSet_SketcherMgr::onEnterViewPort()
     }
   }
 
-  if (!isNestedCreateOperation(getCurrentOperation()))
+  if (!isNestedCreateOperation(getCurrentOperation(), activeSketch()))
     return;
 
   operationMgr()->onValidateOperation();
@@ -266,7 +228,7 @@ void PartSet_SketcherMgr::onLeaveViewPort()
 #endif
   }
 
-  if (!isNestedCreateOperation(getCurrentOperation()))
+  if (!isNestedCreateOperation(getCurrentOperation(), activeSketch()))
     return;
 
   // the method should be performed if the popup menu is called,
@@ -305,7 +267,7 @@ void PartSet_SketcherMgr::onLeaveViewPort()
 
 void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
 {
-  if (!isNestedEditOperation(getCurrentOperation()) ||
+  if (!isNestedEditOperation(getCurrentOperation(), myModule->sketchMgr()->activeSketch()) ||
       myModule->sketchReentranceMgr()->isInternalEditActive())
     return;
   // it is necessary to save current selection in order to restore it after the values are modifed
@@ -319,7 +281,7 @@ void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
 
 void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
 {
-  if (!isNestedEditOperation(getCurrentOperation()) ||
+  if (!isNestedEditOperation(getCurrentOperation(), myModule->sketchMgr()->activeSketch()) ||
       myModule->sketchReentranceMgr()->isInternalEditActive()) {
     myModule->sketchReentranceMgr()->updateInternalEditActiveState();
     return;
@@ -377,7 +339,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       return;
 
     bool isSketcher = isSketchOperation(aFOperation);
-    bool isSketchOpe = isNestedSketchOperation(aFOperation);
+    bool isSketchOpe = isNestedSketchOperation(aFOperation, activeSketch());
 
     // Avoid non-sketch operations
     if ((!isSketchOpe) && (!isSketcher))
@@ -412,6 +374,9 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       myDragDone = false;
 
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
+      // selection should be restored before edit operation start to process the
+      // selected entities, e.g. selection of point(attribute on a line) should edit the point
+      restoreSelection();
       launchEditing();
       if (aFeature.get() != NULL) {
         std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
@@ -433,7 +398,9 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       myDragDone = false;
 
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
-
+      // selection should be restored before edit operation start to process the
+      // selected entities, e.g. selection of point(attribute on a line) should edit the point
+      restoreSelection();
       launchEditing();
       restoreSelection();
     }
@@ -451,7 +418,7 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
     return;
   ModuleBase_Operation* aOp = getCurrentOperation();
   if (aOp) {
-    if (isNestedSketchOperation(aOp)) {
+    if (isNestedSketchOperation(aOp, activeSketch())) {
       //get2dPoint(theWnd, theEvent, myClickedPoint);
 
       // Only for sketcher operations
@@ -487,7 +454,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
   if (myModule->sketchReentranceMgr()->processMouseMoved(theWnd, theEvent))
     return;
 
-  if (isNestedCreateOperation(getCurrentOperation())) {
+  if (isNestedCreateOperation(getCurrentOperation(), activeSketch())) {
     // 1. perform the widget mouse move functionality and display the presentation
     // the mouse move should be processed in the widget, if it can in order to visualize correct
     // presentation. These widgets correct the feature attribute according to the mouse position
@@ -733,25 +700,6 @@ void PartSet_SketcherMgr::clearClickedFlags()
   myCurrentPoint.clear();
 }
 
-const QStringList& PartSet_SketcherMgr::sketchOperationIdList()
-{
-  static QStringList aIds;
-  if (aIds.size() == 0) {
-    aIds << SketchPlugin_Line::ID().c_str();
-    aIds << SketchPlugin_Point::ID().c_str();
-    aIds << SketchPlugin_Arc::ID().c_str();
-    aIds << SketchPlugin_Circle::ID().c_str();
-    aIds << SketchPlugin_ConstraintFillet::ID().c_str();
-    aIds << SketchPlugin_IntersectionPoint::ID().c_str();
-    // TODO
-    // SketchRectangle is a python feature, so its ID is passed just as a string
-    aIds << "SketchRectangle";
-    aIds.append(replicationsIdList());
-    aIds.append(constraintsIdList());
-  }
-  return aIds;
-}
-
 const QStringList& PartSet_SketcherMgr::replicationsIdList()
 {
   static QStringList aReplicationIds;
@@ -812,24 +760,38 @@ bool PartSet_SketcherMgr::isSketchOperation(ModuleBase_Operation* theOperation)
   return theOperation && theOperation->id().toStdString() == SketchPlugin_Sketch::ID();
 }
 
-bool PartSet_SketcherMgr::isNestedSketchOperation(ModuleBase_Operation* theOperation)
+bool PartSet_SketcherMgr::isNestedSketchOperation(ModuleBase_Operation* theOperation,
+                                                  const CompositeFeaturePtr& theSketch)
 {
-  return theOperation &&
-         PartSet_SketcherMgr::sketchOperationIdList().contains(theOperation->id());
+  bool aNestedSketch = false;
+
+  if (theOperation && theSketch.get()) {
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                 (theOperation);
+    if (aFOperation) {
+      FeaturePtr aFeature = aFOperation->feature();
+      aNestedSketch = theSketch->isSub(aFeature);
+    }
+  }
+  return aNestedSketch;
 }
 
-bool PartSet_SketcherMgr::isNestedCreateOperation(ModuleBase_Operation* theOperation)
+bool PartSet_SketcherMgr::isNestedCreateOperation(ModuleBase_Operation* theOperation,
+                                                  const CompositeFeaturePtr& theSketch)
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                (theOperation);
-  return aFOperation && !aFOperation->isEditOperation() && isNestedSketchOperation(aFOperation);
+  return aFOperation && !aFOperation->isEditOperation() &&
+         isNestedSketchOperation(aFOperation, theSketch);
 }
 
-bool PartSet_SketcherMgr::isNestedEditOperation(ModuleBase_Operation* theOperation)
+bool PartSet_SketcherMgr::isNestedEditOperation(ModuleBase_Operation* theOperation,
+                                                const CompositeFeaturePtr& theSketch)
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                (theOperation);
-  return aFOperation && aFOperation->isEditOperation() && isNestedSketchOperation(aFOperation);
+  return aFOperation && aFOperation->isEditOperation() &&
+    isNestedSketchOperation(aFOperation, theSketch);
 }
 
 bool PartSet_SketcherMgr::isEntity(const std::string& theId)
@@ -973,7 +935,6 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
 
     // Erase all sketcher objects
-    QStringList aSketchIds = sketchOperationIdList();
     QObjectPtrList aObjects = aDisplayer->displayedObjects();
     foreach (ObjectPtr aObj, aObjects) {
       DataPtr aObjData = aObj->data();
@@ -1054,7 +1015,7 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
 {
-  if (isNestedCreateOperation(theOperation)) {
+  if (isNestedCreateOperation(theOperation, activeSketch())) {
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                              (theOperation);
     if (aFOperation) {
@@ -1080,7 +1041,7 @@ bool PartSet_SketcherMgr::operationActivatedByPreselection()
 {
   bool isOperationStopped = false;
   ModuleBase_Operation* anOperation = getCurrentOperation();
-  if(anOperation && PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
+  if(anOperation && PartSet_SketcherMgr::isNestedSketchOperation(anOperation, activeSketch())) {
     // Set final definitions if they are necessary
     //propertyPanelDefined(aOperation);
     /// Commit sketcher operations automatically
@@ -1108,12 +1069,12 @@ bool PartSet_SketcherMgr::operationActivatedByPreselection()
 
 bool PartSet_SketcherMgr::canUndo() const
 {
-  return isNestedCreateOperation(getCurrentOperation());
+  return isNestedCreateOperation(getCurrentOperation(), activeSketch());
 }
 
 bool PartSet_SketcherMgr::canRedo() const
 {
-  return isNestedCreateOperation(getCurrentOperation());
+  return isNestedCreateOperation(getCurrentOperation(), activeSketch());
 }
 
 bool PartSet_SketcherMgr::canEraseObject(const ObjectPtr& theObject) const
@@ -1197,7 +1158,7 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
       // b. the popup menu activated
       // c. widget editor control
       #ifndef DEBUG_DO_NOT_BY_ENTER
-      if (isNestedCreateOperation(getCurrentOperation())) {
+      if (isNestedCreateOperation(getCurrentOperation(), activeSketch())) {
         ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
         ModuleBase_WidgetEditor* anEditorWdg = anActiveWidget ? dynamic_cast<ModuleBase_WidgetEditor*>(anActiveWidget) : 0;
         // the active widget editor should not influence here. The presentation should be visible always
@@ -1362,7 +1323,7 @@ bool PartSet_SketcherMgr::canDisplayCurrentCreatedFeature() const
 
 bool PartSet_SketcherMgr::canChangeCursor(ModuleBase_Operation* theOperation) const
 {
-  return isNestedCreateOperation(theOperation) ||
+  return isNestedCreateOperation(theOperation, activeSketch()) ||
          myModule->sketchReentranceMgr()->isInternalEditActive();
 }
 
@@ -1470,54 +1431,6 @@ bool PartSet_SketcherMgr::setDistanceValueByPreselection(ModuleBase_Operation* t
   return isValueAccepted;
 }
 
-void PartSet_SketcherMgr::getCurrentSelection(const FeaturePtr& theFeature,
-                                              const FeaturePtr& theSketch,
-                                              ModuleBase_IWorkshop* theWorkshop,
-                                              FeatureToSelectionMap& theSelection)
-{
-  if (theFeature.get() == NULL)
-    return;
-
-  std::set<AttributePtr> aSelectedAttributes;
-  std::set<ResultPtr> aSelectedResults;
-
-  ModuleBase_IViewer* aViewer = theWorkshop->viewer();
-  Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
-  if (!aContext.IsNull()) {
-    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
-    XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
-
-    std::list<ResultPtr> aResults = theFeature->results();
-    std::list<ResultPtr>::const_iterator aIt;
-    for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
-    {
-      ResultPtr aResult = *aIt;
-      AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
-      if (aAISObj.get() == NULL)
-        continue;
-      Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-      for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
-      {
-        Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
-        if (anOwner->Selectable() != anAISIO)
-          continue;
-        getAttributesOrResults(anOwner, theFeature, theSketch, aResult,
-                               aSelectedAttributes, aSelectedResults);
-      }
-      for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
-        Handle(SelectMgr_EntityOwner) anOwner = aContext->DetectedOwner();
-        if (anOwner.IsNull())
-          continue;
-        if (anOwner->Selectable() != anAISIO)
-          continue;
-        getAttributesOrResults(anOwner, theFeature, theSketch, aResult,
-                               aSelectedAttributes, aSelectedResults);
-      }
-    }
-  }
-  theSelection[theFeature] = std::make_pair(aSelectedAttributes, aSelectedResults);
-}
-
 void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
                                              const FeaturePtr& theSketch,
                                              ModuleBase_IWorkshop* theWorkshop,
@@ -1608,7 +1521,7 @@ void PartSet_SketcherMgr::widgetStateChanged(int thePreviousState)
                                                                            (getCurrentOperation());
   if (aFOperation) {
     if (PartSet_SketcherMgr::isSketchOperation(aFOperation) ||
-        PartSet_SketcherMgr::isNestedSketchOperation(aFOperation) &&
+        PartSet_SketcherMgr::isNestedSketchOperation(aFOperation, activeSketch()) &&
         thePreviousState == ModuleBase_ModelWidget::ModifiedInPP) {
       FeaturePtr aFeature = aFOperation->feature();
       visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
@@ -1621,7 +1534,7 @@ void PartSet_SketcherMgr::customizePresentation(const ObjectPtr& theObject)
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                            (getCurrentOperation());
   if (aFOperation && (PartSet_SketcherMgr::isSketchOperation(aFOperation) ||
-                      PartSet_SketcherMgr::isNestedSketchOperation(aFOperation)))
+                      PartSet_SketcherMgr::isNestedSketchOperation(aFOperation, activeSketch())))
     SketcherPrs_Tools::sendExpressionShownEvent(myIsConstraintsShown[PartSet_Tools::Expressions]);
 
   // update entities selection priorities
@@ -1700,24 +1613,58 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_ISelection* aSelect = aWorkshop->selection();
-  QList<ModuleBase_ViewerPrsPtr> aHighlighted = aSelect->getHighlighted();
+  QList<ModuleBase_ViewerPrsPtr> aStoredPrs = aSelect->getHighlighted();
 
   QList<FeaturePtr> aFeatureList;
-  if (theHighlightedOnly) {
-    fillFeatureList(aHighlighted, myCurrentSketch, aFeatureList);
-  }
-  else {
-    fillFeatureList(aHighlighted, myCurrentSketch, aFeatureList);
-
-    QList<ModuleBase_ViewerPrsPtr> aSelected = aSelect->getSelected(ModuleBase_ISelection::AllControls);
-    fillFeatureList(aSelected, myCurrentSketch, aFeatureList);
+  if (!theHighlightedOnly) {
+    QList<ModuleBase_ViewerPrsPtr> aSelected = aSelect->getSelected(
+                                                              ModuleBase_ISelection::AllControls);
+    aStoredPrs.append(aSelected);
   }
 
   // 1. it is necessary to save current selection in order to restore it after the features moving
   myCurrentSelection.clear();
-  QList<FeaturePtr>::const_iterator anIt = aFeatureList.begin(), aLast = aFeatureList.end();
+
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = aStoredPrs.begin(), aLast = aStoredPrs.end();
+
+  CompositeFeaturePtr aSketch = activeSketch();
   for (; anIt != aLast; anIt++) {
-    getCurrentSelection(*anIt, myCurrentSketch, aWorkshop, myCurrentSelection);
+    ModuleBase_ViewerPrsPtr aPrs = *anIt;
+    ObjectPtr anObject = aPrs->object();
+    if (!anObject.get())
+      continue;
+
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+    FeaturePtr aFeature;
+    if (aResult.get())
+      aFeature = ModelAPI_Feature::feature(aResult);
+    else
+      aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+
+
+    std::set<AttributePtr> aSelectedAttributes;
+    std::set<ResultPtr> aSelectedResults;
+    if (myCurrentSelection.find(aFeature) != myCurrentSelection.end()) {
+      std::pair<std::set<AttributePtr>, std::set<ResultPtr> > aPair = myCurrentSelection.find(aFeature).value();
+      aSelectedAttributes = aPair.first;
+      aSelectedResults = aPair.second;
+    }
+
+    Handle(SelectMgr_EntityOwner) anOwner = aPrs->owner();
+    if (aResult.get()) {
+      getAttributesOrResults(anOwner, aFeature, aSketch, aResult,
+                             aSelectedAttributes, aSelectedResults);
+    }
+    else {
+      std::list<ResultPtr> aResults = aFeature->results();
+      std::list<ResultPtr>::const_iterator aIt;
+      for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+        ResultPtr aResult = *aIt;
+        getAttributesOrResults(anOwner, aFeature, aSketch, aResult,
+                               aSelectedAttributes, aSelectedResults);
+      }
+    }
+    myCurrentSelection[aFeature] = std::make_pair(aSelectedAttributes, aSelectedResults);
   }
   //qDebug(QString("  storeSelection: %1").arg(myCurrentSelection.size()).toStdString().c_str());
 }

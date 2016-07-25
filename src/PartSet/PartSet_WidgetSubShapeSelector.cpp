@@ -53,7 +53,7 @@ void PartSet_WidgetSubShapeSelector::mouseMoved(ModuleBase_IViewWindow* theWindo
   ModuleBase_ISelection* aSelect = myWorkshop->selection();
   QList<ModuleBase_ViewerPrsPtr> aHighlighted = aSelect->getHighlighted();
 
-  if (aHighlighted.empty()) {
+  if (!aHighlighted.empty()) {
     ModuleBase_ViewerPrsPtr aPrs = aHighlighted.first();
     if (aPrs.get() && aPrs->object().get()) {
       ObjectPtr anObject = aPrs->object();
@@ -62,12 +62,13 @@ void PartSet_WidgetSubShapeSelector::mouseMoved(ModuleBase_IViewWindow* theWindo
       const std::set<GeomShapePtr>& aShapes = myCashedShapes[anObject];
       if (!aShapes.empty()) {
         gp_Pnt aPnt = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
-        std::shared_ptr<GeomAPI_Vertex> aVertexShape(new GeomAPI_Vertex(aPnt.X(), aPnt.Y(), aPnt.Z()));
+        std::shared_ptr<GeomAPI_Pnt> aPoint(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
 
         std::set<GeomShapePtr>::const_iterator anIt = aShapes.begin(), aLast = aShapes.end();
         for (; anIt != aLast; anIt++) {
           GeomShapePtr aBaseShape = *anIt;
-          if (GeomAlgoAPI_ShapeTools::isSubShapeInsideShape(aVertexShape, aBaseShape)) {
+          std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
+          if (ModelGeomAlgo_Point2D::isPointOnEdge(aBaseShape, aPoint, aProjectedPoint)) {
             myCurrentSubShape->setObject(anObject);
             myCurrentSubShape->setShape(aBaseShape);
             break;
