@@ -22,6 +22,7 @@
 #include <ModelGeomAlgo_Point2D.h>
 
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_Point.h>
 
 #include <ModuleBase_IViewWindow.h>
@@ -106,6 +107,29 @@ void PartSet_WidgetSubShapeSelector::mouseMoved(ModuleBase_IViewWindow* theWindo
       }
     }
   }
+}
+
+//********************************************************************
+bool PartSet_WidgetSubShapeSelector::setSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
+{
+  bool aResult = ModuleBase_WidgetSelector::setSelectionCustom(thePrs);
+
+  //if (aResult)
+  //GeomShapePtr aBaseShape = *anIt;
+  //           myCurrentSubShape->setShape(aBaseShape);
+  
+  FeaturePtr aFeature = feature();
+  AttributePoint2DPtr anAPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                     aFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  AttributePoint2DPtr aBPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                     aFeature->attribute(SketchPlugin_Constraint::ENTITY_B()));
+
+
+   //GeomDataAPI_Point2D anAPointAttr = aFeature->attribute(SketchPlugin_Constraint::ENTITY_A())
+  //data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), GeomDataAPI_Point2D::typeId());
+  //data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), GeomDataAPI_Point2D::typeId());
+
+  return aResult;
 }
 
 //********************************************************************

@@ -133,7 +133,7 @@
       <!--  SketchConstraintSplit  -->
       <feature id="SketchConstraintSplit" title="Split" tooltip="Create constraints defining split of linear segment, arc or circle" icon="icons/Sketch/split.png">
         <sketch_sub_shape_selector
-            id="ConstraintEntityA"
+            id="ConstraintValue"
             label="Split feature"
             tooltip="Select feature for split"
             shape_types="edge"

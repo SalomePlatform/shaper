@@ -67,6 +67,10 @@ Q_OBJECT
   /// \param theValues a list of presentations
   virtual void getHighlighted(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
+  /// Fills the attribute with the value of the selected owner
+  /// \param thePrs a selected owner
+  virtual bool setSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
+
 protected:
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view

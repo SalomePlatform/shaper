@@ -25,7 +25,6 @@ void Model_AttributeReference::setValue(ObjectPtr theObject)
   //  return;
   ObjectPtr aValue = value();
   if (!myIsInitialized || aValue != theObject) {
-    myIsInitialized = true;
     REMOVE_BACK_REF(aValue);
 
     TDF_Label anObjLab;
@@ -64,34 +63,31 @@ void Model_AttributeReference::setValue(ObjectPtr theObject)
 
 ObjectPtr Model_AttributeReference::value()
 {
-  if (isInitialized()) {
-    Handle(TDataStd_Comment) aDocID;
-    if (myRef->Label().FindAttribute(TDataStd_Comment::GetID(), aDocID)) { // external ref
-      int anID = atoi(TCollection_AsciiString(aDocID->Get()).ToCString());
-      DocumentPtr aRefDoc = Model_Application::getApplication()->document(anID);
-      if (aRefDoc.get()) {
-        Handle(TDataStd_AsciiString) anEntry;
-        if (myRef->Label().FindAttribute(TDataStd_AsciiString::GetID(), anEntry)) {
-          std::shared_ptr<Model_Document> aDR = std::dynamic_pointer_cast<Model_Document>(aRefDoc);
-          TDF_Label aRefLab;
-          TDF_Tool::Label(aDR->objects()->featuresLabel().Data(), anEntry->Get().ToCString(), aRefLab);
-          if (!aRefLab.IsNull()) {
-            return aDR->objects()->object(aRefLab);
-          }
-        }
-      }
-    } else { // internal ref
-      std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
-          owner()->document());
-      if (aDoc) {
-        TDF_Label aRefLab = myRef->Get();
-        if (!aRefLab.IsNull()) {  // it may happen with old document, issue #285
-          return aDoc->objects()->object(aRefLab);
+  Handle(TDataStd_Comment) aDocID;
+  if (myRef->Label().FindAttribute(TDataStd_Comment::GetID(), aDocID)) { // external ref
+    int anID = atoi(TCollection_AsciiString(aDocID->Get()).ToCString());
+    DocumentPtr aRefDoc = Model_Application::getApplication()->document(anID);
+    if (aRefDoc.get()) {
+      Handle(TDataStd_AsciiString) anEntry;
+      if (myRef->Label().FindAttribute(TDataStd_AsciiString::GetID(), anEntry)) {
+        std::shared_ptr<Model_Document> aDR = std::dynamic_pointer_cast<Model_Document>(aRefDoc);
+        TDF_Label aRefLab;
+        TDF_Tool::Label(aDR->objects()->featuresLabel().Data(), anEntry->Get().ToCString(), aRefLab);
+        if (!aRefLab.IsNull()) {
+          return aDR->objects()->object(aRefLab);
         }
       }
     }
+  } else { // internal ref
+    std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
+        owner()->document());
+    if (aDoc) {
+      TDF_Label aRefLab = myRef->Get();
+      if (!aRefLab.IsNull()) {  // it may happen with old document, issue #285
+        return aDoc->objects()->object(aRefLab);
+      }
+    }
   }
-  // not initialized
   return FeaturePtr();
 }
 

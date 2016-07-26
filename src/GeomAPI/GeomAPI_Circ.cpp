@@ -70,11 +70,11 @@ const std::shared_ptr<GeomAPI_Pnt> GeomAPI_Circ::project(
   GeomAPI_ProjectPointOnCurve aProj(aPoint, aCircle);
   Standard_Integer aNbPoint = aProj.NbPoints();
   if (aNbPoint > 0) {
-    double aMinDistance = 0, aDistance;
+    double aMinDistance = Precision::Infinite(), aDistance;
     for (Standard_Integer j = 1; j <= aNbPoint; j++) {
       gp_Pnt aNewPoint = aProj.Point(j);
       aDistance = aNewPoint.Distance(aPoint);
-      if (!aMinDistance || aDistance < aMinDistance) {
+      if (aDistance < aMinDistance) {
         aMinDistance = aDistance;
         aResult = std::shared_ptr<GeomAPI_Pnt>(
             new GeomAPI_Pnt(aNewPoint.X(), aNewPoint.Y(), aNewPoint.Z()));

@@ -16,8 +16,8 @@
  *  \brief Feature for creation of a new constraint filleting two objects which have coincident point
  *
  *  This constraint has three attributes:
- *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B() for the filleting objects;
- *  SketchPlugin_Constraint::VALUE() contains radius of filleting circular arc
+ *  SketchPlugin_Constraint::VALUE() contains reference object to be splitted
+ *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B() for the points of split;
  *
  *  Also the constraint has attribute SketchPlugin_Constraint::ENTITY_C()
  *  which contains created list objects forming the fillet
