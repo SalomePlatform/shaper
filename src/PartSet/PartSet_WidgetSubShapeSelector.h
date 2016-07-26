@@ -14,6 +14,7 @@
 #include <PartSet_MouseProcessor.h>
 
 #include <ModelAPI_CompositeFeature.h>
+#include <GeomDataAPI_Point2D.h>
 
 #include <QObject>
 
@@ -67,9 +68,14 @@ Q_OBJECT
   /// \param theValues a list of presentations
   virtual void getHighlighted(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
-  /// Fills the attribute with the value of the selected owner
-  /// \param thePrs a selected owner
-  virtual bool setSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// The method is called by the current operation to process the operation preselection.
+  /// It is redefined to fill attributes responsible for the sub selection
+  /// \param theValues the wrapped selection values
+  /// \param theToValidate a flag on validation of the values
+  virtual bool setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
+                            const bool theToValidate);
 
 protected:
   /// Checks the widget validity. By default, it returns true.
@@ -93,6 +99,7 @@ protected:
 protected:
   std::shared_ptr<ModuleBase_ViewerPrs> myCurrentSubShape;
   std::map<ObjectPtr, std::set<GeomShapePtr> > myCashedShapes;
+  std::map<ObjectPtr, std::set<AttributePoint2DPtr> > myCashedReferences;
 
   /// Pointer to a sketch 
   CompositeFeaturePtr mySketch;

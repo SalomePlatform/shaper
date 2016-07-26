@@ -15,7 +15,7 @@
 //#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeReference.h>
 //#include <ModelAPI_AttributeRefList.h>
-//#include <ModelAPI_AttributeRefAttrList.h>
+#include <ModelAPI_AttributeRefAttr.h>
 //#include <ModelAPI_Data.h>
 //#include <ModelAPI_Events.h>
 //#include <ModelAPI_Session.h>
@@ -71,8 +71,8 @@ SketchPlugin_ConstraintSplit::SketchPlugin_ConstraintSplit()
 void SketchPlugin_ConstraintSplit::initAttributes()
 {
   data()->addAttribute(SketchPlugin_Constraint::VALUE(), ModelAPI_AttributeReference::typeId());
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
 
   //data()->addAttribute(SketchPlugin_Constraint::VALUE(), ModelAPI_AttributeDouble::typeId());
   //data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttrList::typeId());
