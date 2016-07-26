@@ -888,6 +888,7 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
     std::shared_ptr<SketchPlugin_Feature> aSFeature =
                                  std::dynamic_pointer_cast<SketchPlugin_Feature>(anAttrFeature);
     SketchPlugin_Sketch* aSketch = aSFeature->sketch();
+    
     std::shared_ptr<ModelAPI_Data> aData = aSketch->data();
     std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
         aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
@@ -895,10 +896,12 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
         aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
     std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
         aData->attribute(SketchPlugin_Sketch::NORM_ID()));
-    std::shared_ptr<GeomAPI_Dir> aY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
+    std::shared_ptr<GeomAPI_Dir> aDirY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
+    
     std::set<std::shared_ptr<GeomAPI_Pnt> > aPoints;
+
     ModelGeomAlgo_Point2D::getPointsInsideShape(anAttrShape, aRefAttributes, aC->pnt(),
-                                                aX->dir(), aY, aPoints);
+                                                aX->dir(), aDirY, aPoints);
 
     int aCoincidentToFeature = aPoints.size();
     if (aKind == SketchPlugin_Circle::ID())

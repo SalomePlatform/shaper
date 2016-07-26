@@ -92,6 +92,14 @@ protected:
   //                              GeomShapePtr& theShape);
   void fillObjectShapes(const ObjectPtr& theObject);
 
+  /// Return an object and geom shape by the viewer presentation
+  /// \param thePrs a selection
+  /// \param theObject an output object
+  /// \param theShape a shape of the selection
+  virtual void getGeomSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
+                                ObjectPtr& theObject,
+                                GeomShapePtr& theShape);
+
 protected:
   /// The methiod called when widget is activated
   virtual void activateCustom();

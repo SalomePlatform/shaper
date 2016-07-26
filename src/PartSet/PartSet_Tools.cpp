@@ -395,32 +395,15 @@ void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr the
 
 std::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(CompositeFeaturePtr theSketch)
 {
-  std::shared_ptr<GeomAPI_Pln> aPlane;
+  std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+      theSketch->data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      theSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
 
-  std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
-  if (aData) {
-    std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
-        aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-    std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-        aData->attribute(SketchPlugin_Sketch::NORM_ID()));
-    if (aNormal.get() && aNormal->isInitialized() &&
-        anOrigin.get() && anOrigin->isInitialized()) {
-      double adX = aNormal->x();
-      double adY = aNormal->y();
-      double adZ = aNormal->z();
+  if (!anOrigin || !aNorm)
+    return std::shared_ptr<GeomAPI_Pln>();
 
-      if ( (adX != 0) || (adY != 0) || (adZ != 0) ) { // Plane is valid
-        double aX = anOrigin->x();
-        double aY = anOrigin->y();
-        double aZ = anOrigin->z();
-        gp_Pln aPln(gp_Pnt(aX, aY, aZ), gp_Dir(adX, adY, adZ));
-        double aA, aB, aC, aD;
-        aPln.Coefficients(aA, aB, aC, aD);
-        aPlane = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
-      }
-    }
-  }
-  return aPlane;
+  return std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(anOrigin->pnt(), aNorm->dir()));
 }
 
 std::shared_ptr<GeomAPI_Pnt> PartSet_Tools::point3D(std::shared_ptr<GeomAPI_Pnt2d> thePoint2D,

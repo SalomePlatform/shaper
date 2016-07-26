@@ -112,24 +112,45 @@ void PartSet_WidgetSubShapeSelector::mouseMoved(ModuleBase_IViewWindow* theWindo
 }
 
 //********************************************************************
+void PartSet_WidgetSubShapeSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr& thePrs,
+                                                      ObjectPtr& theObject,
+                                                      GeomShapePtr& theShape)
+{
+  ModuleBase_ISelection* aSelection = myWorkshop->selection();
+  theObject = aSelection->getResult(thePrs);
+  if (!theObject.get() && myCurrentSubShape->object())
+    theObject = myCurrentSubShape->object();
+}
+
+//********************************************************************
 bool PartSet_WidgetSubShapeSelector::setSelection(
                                           QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
                                           const bool theToValidate)
 {
-  bool aResult = ModuleBase_WidgetShapeSelector::setSelection(theValues, theToValidate);
-
-  if (aResult && !theToValidate) {
-    ObjectPtr aBaseObject = myCurrentSubShape->object();
-    GeomShapePtr aBaseShape = myCurrentSubShape->shape();
-
+  //if (theToValidate)
+  //  bool aResult = ModuleBase_WidgetShapeSelector::setSelection(theValues, theToValidate);
+  //else {
+  // the sub-shape is selected, initial shape is not highlighted/selected, we need to use
+  // the sub-shape to fill attribute;
+  ObjectPtr aBaseObject = myCurrentSubShape->object();
+  GeomShapePtr aBaseShape = myCurrentSubShape->shape();
+  bool aResult = aBaseObject.get() && aBaseShape.get();
+  // firstly set the selection to the attribute
+  if (aResult) {
+    QList<ModuleBase_ViewerPrsPtr> aValues;
+    aValues.append(myCurrentSubShape);
+    aResult = ModuleBase_WidgetShapeSelector::setSelection(aValues, theToValidate);
+  }
+  // secondly fill additional attributes
+  if (aResult) {
     if (aBaseShape->shapeType() == GeomAPI_Shape::EDGE) {
       std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aBaseShape));
 
-      std::shared_ptr<GeomAPI_Pln> aSketchPlane = PartSet_Tools::sketchPlane(mySketch);
       std::shared_ptr<GeomAPI_Pnt> aFirstPnt = anEdge->firstPoint();
       std::shared_ptr<GeomAPI_Pnt> aLastPnt = anEdge->lastPoint();
-      std::shared_ptr<GeomAPI_Pnt2d> aFirstPnt2D = aFirstPnt->to2D(aSketchPlane);
-      std::shared_ptr<GeomAPI_Pnt2d> aLastPnt2D = aLastPnt->to2D(aSketchPlane);
+      std::shared_ptr<GeomAPI_Pnt2d> aFirstPnt2D = PartSet_Tools::convertTo2D(mySketch, aFirstPnt);
+      std::shared_ptr<GeomAPI_Pnt2d> aLastPnt2D = PartSet_Tools::convertTo2D(mySketch, aLastPnt);
+
 
       /// find the points in feature attributes
       FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObject);
@@ -153,6 +174,8 @@ bool PartSet_WidgetSubShapeSelector::setSelection(
                                                                         aRefLast = aRefAttributes.end();
         for (; aRefIt != aRefLast; aRefIt++) {
           std::shared_ptr<GeomDataAPI_Point2D> anAttributePoint = *aRefIt;
+          double anX = anAttributePoint->x();
+          double anY = anAttributePoint->y();
           if (!aFirstPointAttr.get() && aFirstPnt2D->isEqual(anAttributePoint->pnt()))
               aFirstPointAttr = anAttributePoint;
           if (!aLastPointAttr.get() && aLastPnt2D->isEqual(anAttributePoint->pnt()))
@@ -162,15 +185,19 @@ bool PartSet_WidgetSubShapeSelector::setSelection(
         }
       }
 
+      if (!aFirstPointAttr.get() || !aLastPointAttr)
+        return false;
+
       FeaturePtr aFeature = feature();
       AttributeRefAttrPtr anAPointAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                         aFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
+                                          aFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
       AttributeRefAttrPtr aBPointAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                         aFeature->attribute(SketchPlugin_Constraint::ENTITY_B()));
+                                          aFeature->attribute(SketchPlugin_Constraint::ENTITY_B()));
       anAPointAttr->setAttr(aFirstPointAttr);
       aBPointAttr->setAttr(aLastPointAttr);
     }
   }
+  //}
 
   return aResult;
 }
@@ -201,7 +228,7 @@ void PartSet_WidgetSubShapeSelector::fillObjectShapes(const ObjectPtr& theObject
     ModelGeomAlgo_Point2D::getPointsOfReference(aFeature, SketchPlugin_ConstraintCoincidence::ID(),
                          aRefAttributes, SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
     // layed on feature coincidences to divide it on several shapes
-    FeaturePtr aSketch = sketch();
+    CompositeFeaturePtr aSketch = sketch();
     std::shared_ptr<ModelAPI_Data> aData = aSketch->data();
     std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
         aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
