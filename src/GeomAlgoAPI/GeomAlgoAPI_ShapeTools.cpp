@@ -21,6 +21,7 @@
 #include <BRepAlgo_FaceRestrictor.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_FindPlane.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepCheck_Analyzer.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
@@ -676,7 +677,21 @@ void GeomAlgoAPI_ShapeTools::splitShape(const std::shared_ptr<GeomAPI_Shape>& th
 {
   // General Fuse to split edge by vertices
   BOPAlgo_Builder aBOP;
-  const TopoDS_Edge& aBaseEdge = theBaseShape->impl<TopoDS_Edge>();
+  TopoDS_Edge aBaseEdge = theBaseShape->impl<TopoDS_Edge>();
+  // Rebuild closed edge to place vertex to one of split points.
+  // This will prevent edge to be split on seam vertex.
+  if (BRep_Tool::IsClosed(aBaseEdge))
+  {
+    Standard_Real aFirst, aLast;
+    Handle(Geom_Curve) aCurve = BRep_Tool::Curve(aBaseEdge, aFirst, aLast);
+
+    std::set<std::shared_ptr<GeomAPI_Pnt> >::const_iterator aPIt = thePoints.begin();
+    gp_Pnt aPoint((*aPIt)->x(), (*aPIt)->y(), (*aPIt)->z());
+
+    TopAbs_Orientation anOrientation = aBaseEdge.Orientation();
+    aBaseEdge = BRepBuilderAPI_MakeEdge(aCurve, aPoint, aPoint).Edge();
+    aBaseEdge.Orientation(anOrientation);
+  }
   aBOP.AddArgument(aBaseEdge);
 
   std::set<std::shared_ptr<GeomAPI_Pnt> >::const_iterator aPtIt = thePoints.begin();
