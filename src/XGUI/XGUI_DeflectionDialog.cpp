@@ -8,7 +8,7 @@
 
 #include <ModelAPI_Tools.h>
 
-#include <QDoubleSpinBox>
+#include <ModuleBase_DoubleSpinBox.h>
 
 #include <QLabel>
 #include <QButtonGroup>
@@ -22,7 +22,8 @@ XGUI_DeflectionDialog::XGUI_DeflectionDialog(QWidget* theParent)
   setWindowTitle("Deflection");
   QGridLayout* aLay = new QGridLayout(this);
 
-  myDeflection = new QDoubleSpinBox(this);
+  myDeflection = new ModuleBase_DoubleSpinBox(this);
+  myDeflection->setDecimals(12);
   myDeflection->setRange(0, 1);
   aLay->addWidget(new QLabel("Deviation", this), 0, 0);
   aLay->addWidget(myDeflection, 0, 1);

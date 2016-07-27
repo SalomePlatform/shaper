@@ -1246,6 +1246,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     moveObjects();
   else if (theId == "COLOR_CMD")
     changeColor(aObjects);
+  else if (theId == "DEFLECTION_CMD")
+    changeDeflection(aObjects);
   else if (theId == "SHOW_CMD") {
     showObjects(aObjects, true);
     mySelector->updateSelectionBy(ModuleBase_ISelection::Browser);
