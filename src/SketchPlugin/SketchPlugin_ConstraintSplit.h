@@ -12,6 +12,7 @@
 #include "SketchPlugin_ConstraintBase.h"
 
 class GeomDataAPI_Point2D;
+class ModelAPI_Feature;
 
 /** \class SketchPlugin_ConstraintSplit
  *  \ingroup Plugins
@@ -85,9 +86,9 @@ private:
   /// Creates a new feature in the base shape type with bounding points given in parameters
   /// \param theStartPointAttr an attribute of the start point
   /// \param theEndPointAttr an attribute of the end point
-  FeaturePtr SketchPlugin_ConstraintSplit::createFeature(
-                          const std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
-                          const std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr);
+  std::shared_ptr<ModelAPI_Feature> FeaturePtr SketchPlugin_ConstraintSplit::createFeature(
+                                    const std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
+                                    const std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr);
 
 private:
   //std::set<AttributePtr> myNewPoints; ///< set of new points
