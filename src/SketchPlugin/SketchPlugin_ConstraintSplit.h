@@ -11,6 +11,8 @@
 #include <SketchPlugin_Sketch.h>
 #include "SketchPlugin_ConstraintBase.h"
 
+class GeomDataAPI_Point2D;
+
 /** \class SketchPlugin_ConstraintSplit
  *  \ingroup Plugins
  *  \brief Feature for creation of a new constraint filleting two objects which have coincident point
@@ -70,8 +72,22 @@ class SketchPlugin_ConstraintSplit : public SketchPlugin_ConstraintBase
   //};
 
 private:
-  /// \ Removes all produced features and restore base edges.
-  //void clearResults();
+  /// Returns geom point attribute of the feature
+  /// \param theStartPoint
+  /// \return geometical point
+  std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(const bool& theStartPoint);
+
+  /// Returns cast of attribute to geometrical point if the attribute is a ref attr attribute
+  /// \param theAttribute an attribute
+  /// \param geom point 2D or NULL
+  std::shared_ptr<GeomDataAPI_Point2D> getPointOfRefAttr(const AttributePtr& theAttribute);
+
+  /// Creates a new feature in the base shape type with bounding points given in parameters
+  /// \param theStartPointAttr an attribute of the start point
+  /// \param theEndPointAttr an attribute of the end point
+  FeaturePtr SketchPlugin_ConstraintSplit::createFeature(
+                          const std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
+                          const std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr);
 
 private:
   //std::set<AttributePtr> myNewPoints; ///< set of new points

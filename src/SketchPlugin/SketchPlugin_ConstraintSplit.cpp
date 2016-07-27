@@ -9,13 +9,18 @@
 //#include <GeomAPI_Circ2d.h>
 //#include <GeomAPI_Dir2d.h>
 //#include <GeomAPI_Lin2d.h>
-//#include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_Pnt2d.h>
 //#include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
 //#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeReference.h>
+#include <ModelAPI_AttributeString.h>
 //#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttr.h>
+
+#include <SketchPlugin_Line.h>
+#include <SketchPlugin_Arc.h>
+
 //#include <ModelAPI_Data.h>
 //#include <ModelAPI_Events.h>
 //#include <ModelAPI_Session.h>
@@ -80,16 +85,46 @@ void SketchPlugin_ConstraintSplit::initAttributes()
 
 void SketchPlugin_ConstraintSplit::execute()
 {
-/*  std::shared_ptr<ModelAPI_Data> aData = data();
+  std::shared_ptr<ModelAPI_Data> aData = data();
 
   // Check the base objects are initialized.
-  AttributeRefAttrListPtr aPointsRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(
-    aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  if(!aPointsRefList->isInitialized()) {
-    setError("Error: List of points is not initialized.");
+  AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                                            aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  if(!aBaseObjectAttr->isInitialized()) {
+    setError("Error: Base object is not initialized.");
+    return;
+  }
+  AttributePoint2DPtr aFirstPointAttr = getPointOfRefAttr(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  AttributePoint2DPtr aLastPointAttr = getPointOfRefAttr(aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
+  if (!aFirstPointAttr.get() || !aFirstPointAttr->isInitialized() ||
+      !aLastPointAttr.get() || !aLastPointAttr->isInitialized()) {
+    setError("Error: Sub-shape is not initialized.");
     return;
   }
 
+  AttributePoint2DPtr aStartPointAttr = getFeaturePoint(true);
+  AttributePoint2DPtr anEndPointAttr = getFeaturePoint(false);
+  if (!aStartPointAttr.get() && !anEndPointAttr.get()) {
+    setError("Error: Circle is not processed."); /// TODO
+    return;
+  }
+
+  /// if first point is closer to last point, wrap first and last values
+  if (aStartPointAttr->pnt()->distance(aFirstPointAttr->pnt()) >
+      anEndPointAttr->pnt()->distance(aLastPointAttr->pnt())) {
+    AttributePoint2DPtr aTmpPoint = aFirstPointAttr;
+    aFirstPointAttr = aLastPointAttr;
+    aLastPointAttr = aTmpPoint;
+  }
+  FeaturePtr aSplitFeature = createFeature(aFirstPointAttr, aLastPointAttr);
+
+  std::set<FeaturePtr> aLeftFeatures;
+  if (!aStartPointAttr->pnt()->isEqual(aFirstPointAttr->pnt()))
+    aLeftFeatures.insert(createFeature(aStartPointAttr, aFirstPointAttr));
+  if (!aLastPointAttr->pnt()->isEqual(anEndPointAttr->pnt()))
+    aLeftFeatures.insert(createFeature(aLastPointAttr, anEndPointAttr));
+
+  /*
   // Get fillet radius.
   double aFilletRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
     aData->attribute(SketchPlugin_Constraint::VALUE()))->value();
@@ -1087,3 +1122,79 @@ std::set<FeaturePtr> getCoincides(const FeaturePtr& theConstraintCoincidence)
   return aCoincides;
 }
 */
+
+std::shared_ptr<GeomDataAPI_Point2D> SketchPlugin_ConstraintSplit::getPointOfRefAttr(
+                                                                  const AttributePtr& theAttribute)
+{
+  AttributePoint2DPtr aPointAttribute;
+
+  if (theAttribute->id() == ModelAPI_AttributeRefAttr::typeId()) {
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+    if (aRefAttr.get() && aRefAttr->isInitialized()) {
+      AttributePtr anAttribute = aRefAttr->attr();
+      if (anAttribute.get() && anAttribute->id() == GeomDataAPI_Point2D::typeId())
+        aPointAttribute = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttribute);
+    }
+  }
+  return aPointAttribute;
+}
+
+AttributePoint2DPtr SketchPlugin_ConstraintSplit::getFeaturePoint(const bool& theStartPoint)
+{
+  AttributePoint2DPtr aPointAttribute;
+
+  AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                                           data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
+
+  std::string aFeatureKind = aBaseFeature->getKind();
+  std::string anAttributeName;
+  if (aFeatureKind == SketchPlugin_Line::ID())
+    anAttributeName = theStartPoint ? SketchPlugin_Line::START_ID()
+                                    : SketchPlugin_Line::END_ID();
+  else if (aFeatureKind == SketchPlugin_Arc::ID()) {
+    anAttributeName = theStartPoint ? SketchPlugin_Arc::START_ID()
+                                    : SketchPlugin_Arc::END_ID();
+  }
+  if (!anAttributeName.empty())
+    aPointAttribute = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                                         aBaseFeature->attribute(anAttributeName));
+  return aPointAttribute;
+}
+
+FeaturePtr SketchPlugin_ConstraintSplit::createFeature(const AttributePoint2DPtr& theStartPointAttr,
+                                                       const AttributePoint2DPtr& theEndPointAttr)
+{
+  FeaturePtr aFeature;
+
+  AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                                           data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
+
+  std::string aFeatureKind = aBaseFeature->getKind();
+  aFeature = sketch()->addFeature(aFeatureKind);
+
+  if (aFeatureKind == SketchPlugin_Line::ID()) {
+    AttributePoint2DPtr aStartAttribute = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                              aFeature->attribute(SketchPlugin_Line::START_ID()));
+    aStartAttribute->setValue(theStartPointAttr->pnt());
+
+    AttributePoint2DPtr anEndAttribute = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                              aFeature->attribute(SketchPlugin_Line::END_ID()));
+    anEndAttribute->setValue(theEndPointAttr->pnt());
+  }
+  else if (aFeatureKind == SketchPlugin_Arc::ID()) {
+    AttributeStringPtr anArcType = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
+             data()->addAttribute(SketchPlugin_Arc::ARC_TYPE(), ModelAPI_AttributeString::typeId()));
+
+    AttributePoint2DPtr aPointAttribute = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                                  aFeature->attribute(SketchPlugin_Arc::START_ID()));
+    aPointAttribute->setValue(theStartPointAttr->pnt());
+
+    AttributePoint2DPtr anEndAttribute = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                              aFeature->attribute(SketchPlugin_Arc::END_ID()));
+    anEndAttribute->setValue(theEndPointAttr->pnt());
+  }
+
+  return aFeature;
+}
