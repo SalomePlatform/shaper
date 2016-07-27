@@ -1166,7 +1166,7 @@ FeaturePtr SketchPlugin_ConstraintSplit::createFeature(const AttributePoint2DPtr
                                                        const AttributePoint2DPtr& theEndPointAttr)
 {
   FeaturePtr aFeature;
-
+/*
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                                            data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
@@ -1195,6 +1195,6 @@ FeaturePtr SketchPlugin_ConstraintSplit::createFeature(const AttributePoint2DPtr
                                               aFeature->attribute(SketchPlugin_Arc::END_ID()));
     anEndAttribute->setValue(theEndPointAttr->pnt());
   }
-
+*/
   return aFeature;
 }

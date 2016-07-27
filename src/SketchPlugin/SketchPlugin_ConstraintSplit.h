@@ -86,7 +86,7 @@ private:
   /// Creates a new feature in the base shape type with bounding points given in parameters
   /// \param theStartPointAttr an attribute of the start point
   /// \param theEndPointAttr an attribute of the end point
-  std::shared_ptr<ModelAPI_Feature> FeaturePtr SketchPlugin_ConstraintSplit::createFeature(
+  std::shared_ptr<ModelAPI_Feature> createFeature(
                                     const std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
                                     const std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr);
 
