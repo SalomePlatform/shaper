@@ -123,6 +123,13 @@ void PartSet_WidgetSubShapeSelector::getGeomSelection(const ModuleBase_ViewerPrs
 }
 
 //********************************************************************
+QList<ModuleBase_ViewerPrsPtr> PartSet_WidgetSubShapeSelector::getAttributeSelection() const
+{
+  return QList<ModuleBase_ViewerPrsPtr>();
+}
+
+
+//********************************************************************
 bool PartSet_WidgetSubShapeSelector::setSelection(
                                           QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
                                           const bool theToValidate)
