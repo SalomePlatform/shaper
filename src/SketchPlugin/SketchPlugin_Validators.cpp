@@ -903,7 +903,7 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
     ModelGeomAlgo_Point2D::getPointsInsideShape(anAttrShape, aRefAttributes, aC->pnt(),
                                                 aX->dir(), aDirY, aPoints);
 
-    int aCoincidentToFeature = aPoints.size();
+    int aCoincidentToFeature = (int)aPoints.size();
     if (aKind == SketchPlugin_Circle::ID())
       aValid = aCoincidentToFeature >= 2;
     else

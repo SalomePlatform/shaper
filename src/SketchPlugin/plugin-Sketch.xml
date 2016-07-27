@@ -31,9 +31,8 @@
                                  enable_value="enable_by_preferences"/>
         <sketch-2dpoint_selector id="EndPoint" accept_expressions="0" title="End point" tooltip="End point coordinates"
                                  enable_value="enable_by_preferences"/>
-        <!--LINE_LENGHT_BLOCKED
         <doublevalue id="LineLength" accept_expressions="0" label="Length:" default="computed" icon="icons/Sketch/distance_value.png"
-                     tooltip="Line length" obligatory="0" enable_value="false"/> -->
+                     tooltip="Line length" obligatory="0" enable_value="false"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
         <validator id="GeomValidators_Different" parameters="StartPoint,EndPoint"/>
       </feature>
@@ -49,11 +48,6 @@
           <box id="CenterRadius" title="Center and radius" icon="icons/Sketch/circle_pt_rad_32x32.png">
             <sketch-2dpoint_selector id="CircleCenter" accept_expressions="0" title="Center" tooltip="Center coordinates"
                                      enable_value="enable_by_preferences"/>
-            <point2ddistance id="CircleRadius" accept_expressions="0" first_point="CircleCenter" label="Radius:" min="0" step="1.0"
-                             default="0" icon="icons/Sketch/radius.png" tooltip="Set radius"
-                             enable_value="enable_by_preferences">
-              <validator id="GeomValidators_Positive"/>
-            </point2ddistance>
           </box>
           <box id="ThreePoints" title="Three points" icon="icons/Sketch/circle_3pt_32x32.png">
             <sketch-2dpoint_selector id="FirstPoint" accept_expressions="0" title="First point" tooltip="First point"
@@ -64,6 +58,11 @@
                                      enable_value="enable_by_preferences"/>
           </box>
         </toolbox>
+        <point2ddistance id="CircleRadius" accept_expressions="0" first_point="CircleCenter" label="Radius:" min="0" step="1.0"
+                         default="0" icon="icons/Sketch/radius.png" tooltip="Set radius"
+                         enable_value="enable_by_preferences">
+          <validator id="GeomValidators_Positive"/>
+        </point2ddistance>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
 

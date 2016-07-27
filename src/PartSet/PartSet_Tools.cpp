@@ -395,15 +395,18 @@ void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr the
 
 std::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(CompositeFeaturePtr theSketch)
 {
+  std::shared_ptr<GeomAPI_Pln> aPlane;
+
   std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
       theSketch->data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+  std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       theSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
 
-  if (!anOrigin || !aNorm)
-    return std::shared_ptr<GeomAPI_Pln>();
+  if (aNormal.get() && aNormal->isInitialized() &&
+      anOrigin.get() && anOrigin->isInitialized())
+    aPlane = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(anOrigin->pnt(), aNormal->dir()));
 
-  return std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(anOrigin->pnt(), aNorm->dir()));
+  return aPlane;
 }
 
 std::shared_ptr<GeomAPI_Pnt> PartSet_Tools::point3D(std::shared_ptr<GeomAPI_Pnt2d> thePoint2D,
