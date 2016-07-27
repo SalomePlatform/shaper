@@ -16,6 +16,8 @@
 
 #include <memory>
 
+#define NESTED_WIDGETS_FIX
+
 // the only created instance of this plugin
 static InitializationPlugin_Plugin* MY_INITIALIZATIONPLUGIN_INSTANCE =
     new InitializationPlugin_Plugin();
@@ -91,6 +93,10 @@ FeaturePtr InitializationPlugin_Plugin::createPlane(DocumentPtr theDoc, double t
 {
   FeaturePtr aPlane = theDoc->addFeature("Plane");
   aPlane->string("creation_method")->setValue("by_general_equation");
+#ifdef NESTED_WIDGETS_FIX
+  aPlane->string("by_other_plane_option")->setValue("by_distance_from_other");
+  aPlane->real("distance")->setValue(0);
+#endif
   aPlane->real("A")->setValue(theX);
   aPlane->real("B")->setValue(theY);
   aPlane->real("C")->setValue(theZ);
@@ -148,6 +154,15 @@ FeaturePtr InitializationPlugin_Plugin::createAxis(DocumentPtr theDoc, FeaturePt
   aAxis->real("X_Direction")->setValue(theX);
   aAxis->real("Y_Direction")->setValue(theY);
   aAxis->real("Z_Direction")->setValue(theZ);
+
+#ifdef NESTED_WIDGETS_FIX
+  aAxis->string("use_offset1")->setValue("");
+  aAxis->real("offset1")->setValue(0);
+  aAxis->boolean("reverse_offset1")->setValue(false);
+  aAxis->string("use_offset2")->setValue("");
+  aAxis->real("offset2")->setValue(0);
+  aAxis->boolean("reverse_offset2")->setValue(false);
+#endif
 
   if (theX != 0) {
     aAxis->data()->setName("OX");
