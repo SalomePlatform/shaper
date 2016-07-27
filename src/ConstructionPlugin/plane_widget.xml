@@ -63,7 +63,7 @@
         <box id="by_distance_from_other"
              title="By distance from other"
              tooltip="Plane by distance from other plane."
-             icon="icons/Construction/plane_by_distance_from_other_32x32.png">
+             icon="icons/Construction/plane_by_distance_from_other_24x24.png">
           <doublevalue id="distance"
                        label="Distance"
                        tooltip="Distance from selected face to plane."
@@ -77,7 +77,7 @@
         <box id="by_coincident_to_point"
              title="By coincident to point"
              tooltip="Plane by coincident to point."
-             icon="icons/Construction/plane_by_coincident_to_point_32x32.png">
+             icon="icons/Construction/plane_by_coincident_to_point_24x24.png">
           <shape_selector id="coincident_point"
                           label="Point"
                           tooltip="Select point."
@@ -88,7 +88,7 @@
         <box id="by_rotation"
              title="By rotation"
              tooltip="Plane by rotation around axis."
-             icon="icons/Construction/plane_by_rotation_32x32.png">
+             icon="icons/Construction/plane_by_rotation_24x24.png">
           <shape_selector id="axis"
                           label="Axis"
                           tooltip="Select line for axis."
