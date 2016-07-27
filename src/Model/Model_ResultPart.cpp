@@ -14,6 +14,7 @@
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeReference.h>
+#include <ModelAPI_AttributeDouble.h>
 #include <Model_Document.h>
 #include <Model_Application.h>
 #include <Events_Loop.h>
@@ -36,6 +37,7 @@ void Model_ResultPart::initAttributes()
     data()->addAttribute(DOC_REF(), ModelAPI_AttributeDocRef::typeId()));
   data()->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId());
   data()->addAttribute(BASE_REF_ID(), ModelAPI_AttributeReference::typeId());
+  data()->addAttribute(DEFLECTION_ID(), ModelAPI_AttributeDouble::typeId());
 
   if (aDocRef->isInitialized() && // initialized immideately means already exist and will be loaded
       !Model_Application::getApplication()->hasDocument(aDocRef->docId()))

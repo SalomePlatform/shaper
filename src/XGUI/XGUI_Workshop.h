@@ -196,10 +196,19 @@ Q_OBJECT
   //! \return boolean value
   bool canChangeColor() const;
 
-  //! Change color of the features if it is possible
+  //! Change color of the results if it is possible
   //! The operation is available for construction, body and group results
   //! theObjects a list of selected objects
   void changeColor(const QObjectPtrList& theObjects);
+
+  //! Returns true if there is at least one selected body/construction/group result
+  //! \return boolean value
+  bool canChangeDeflection() const;
+
+  //! Change deflection of the results if it is possible
+  //! The operation is available for construction, body and group results
+  //! theObjects a list of selected objects
+  void changeDeflection(const QObjectPtrList& theObjects);
 
   //! Show the given features in 3d Viewer
   void showObjects(const QObjectPtrList& theList, bool isVisible);

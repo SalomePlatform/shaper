@@ -34,6 +34,14 @@ class ModelAPI_Result : public ModelAPI_Object
     return MY_COLOR_ID;
   }
 
+  /// Reference to the deflection of the result.
+  /// The double value is used. The values is in [0, 1] range
+  inline static const std::string& DEFLECTION_ID()
+  {
+    static const std::string MY_DEFLECTION_ID("Deflection");
+    return MY_DEFLECTION_ID;
+  }
+
   /// Returns true if the result is concealed from the data tree (referenced by other objects)
   MODELAPI_EXPORT virtual bool isConcealed();
 
@@ -53,7 +61,7 @@ class ModelAPI_Result : public ModelAPI_Object
   MODELAPI_EXPORT virtual bool isDisabled();
 
   /// Request for initialization of data model of the result: adding all attributes
-  virtual void initAttributes() {};
+  MODELAPI_EXPORT virtual void initAttributes();
 
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Result();

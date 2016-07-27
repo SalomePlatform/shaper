@@ -6,6 +6,7 @@
 #include "XGUI_ActionsMgr.h"
 #include "XGUI_MenuMgr.h"
 #include "XGUI_ColorDialog.h"
+#include "XGUI_DeflectionDialog.h"
 #include "XGUI_ContextMenuMgr.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_ErrorDialog.h"
@@ -36,6 +37,7 @@
 
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Feature.h>
@@ -205,7 +207,10 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
                                    Config_Prop::Color, ModelAPI_ResultConstruction::DEFAULT_COLOR());
   Config_PropManager::registerProp("Visualization", "result_part_color", "Part color",
                                    Config_Prop::Color, ModelAPI_ResultPart::DEFAULT_COLOR());
-  
+
+  Config_PropManager::registerProp("Visualization", "result_deflection", "Result deflection",
+                                   Config_Prop::Double, "0.001");
+
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "face-selection", true))
     myViewerSelMode.append(TopAbs_FACE);
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "edge-selection", true))
@@ -1768,6 +1773,92 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
         }
       }
       setColor(aResult, !isRandomColor ? aColorResult : aDlg->getRandomColor());
+    }
+  }
+  aMgr->finishOperation();
+  updateCommandStatus();
+}
+
+//**************************************************************
+bool XGUI_Workshop::canChangeDeflection() const
+{
+  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
+
+  std::set<std::string> aTypes;
+  aTypes.insert(ModelAPI_ResultGroup::group());
+  aTypes.insert(ModelAPI_ResultConstruction::group());
+  aTypes.insert(ModelAPI_ResultBody::group());
+  aTypes.insert(ModelAPI_ResultPart::group());
+
+  return hasResults(aObjects, aTypes);
+}
+
+void setDeflection(ResultPtr theResult, const double theDeflection)
+{
+  if (!theResult.get())
+    return;
+
+  AttributeDoublePtr aDeflectionAttr = theResult->data()->real(ModelAPI_Result::DEFLECTION_ID());
+  if (aDeflectionAttr.get() != NULL)
+    aDeflectionAttr->setValue(theDeflection);
+}
+
+
+//**************************************************************
+void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
+{
+  AttributeDoublePtr aDoubleAttr;
+  // 1. find the current color of the object. This is a color of AIS presentation
+  // The objects are iterated until a first valid color is found 
+  double aDeflection = -1;
+  foreach(ObjectPtr anObject, theObjects) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+    if (aResult.get()) {
+      aDeflection = XGUI_CustomPrs::getResultDeflection(aResult);
+    }
+    else {
+      // TODO: remove the obtaining a color from the AIS object
+      // this does not happen never because:
+      // 1. The color can be changed only on results
+      // 2. The result can be not visualized in the viewer(e.g. Origin Construction)
+      AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
+      if (anAISObj.get()) {
+        aDeflection = anAISObj->getDeflection();
+      }
+    }
+    if (aDeflection > 0)
+      break;
+  }
+  if (aDeflection < 0)
+    return;
+
+  if (!abortAllOperations())
+  return; 
+  // 2. show the dialog to change the value
+  XGUI_DeflectionDialog* aDlg = new XGUI_DeflectionDialog(desktop());
+  aDlg->setDeflection(aDeflection);
+  aDlg->move(QCursor::pos());
+  bool isDone = aDlg->exec() == QDialog::Accepted;
+  if (!isDone)
+    return;
+
+  // 3. abort the previous operation and start a new one
+  SessionPtr aMgr = ModelAPI_Session::get();
+  QString aDescription = contextMenuMgr()->action("DEFLECTION_CMD")->text();
+  aMgr->startOperation(aDescription.toStdString());
+
+  // 4. set the value to all results
+  aDeflection = aDlg->getDeflection();
+  foreach(ObjectPtr anObj, theObjects) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+    if (aResult.get() != NULL) {
+      ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+      if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
+        for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
+          setDeflection(aCompsolidResult->subResult(i), aDeflection);
+        }
+      }
+      setDeflection(aResult, aDeflection);
     }
   }
   aMgr->finishOperation();

@@ -11,6 +11,7 @@
 #include <ModuleBase_IModule.h>
 
 #include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Session.h>
 #include <Config_PropManager.h>
 
@@ -19,8 +20,20 @@
 #include <vector>
 #include <QColor>
 
+double getDeflection(const ResultPtr& theResult)
+{
+  double aDeflection = -1;
+  // get color from the attribute of the result
+  if (theResult.get() != NULL &&
+      theResult->data()->attribute(ModelAPI_Result::DEFLECTION_ID()).get() != NULL) {
+    AttributeDoublePtr aDoubleAttr = theResult->data()->real(ModelAPI_Result::DEFLECTION_ID());
+    if (aDoubleAttr.get() && aDoubleAttr->isInitialized())
+      aDeflection = aDoubleAttr->value();
+  }
+  return aDeflection;
+}
 
-void getColor(ResultPtr theResult, std::vector<int>& theColor)
+void getColor(const ResultPtr& theResult, std::vector<int>& theColor)
 {
   theColor.clear();
   // get color from the attribute of the result
@@ -55,16 +68,29 @@ void XGUI_CustomPrs::getDefaultColor(ObjectPtr theObject, const bool isEmptyColo
   }
 }
 
+double XGUI_CustomPrs::getDefaultDeflection(const ObjectPtr& theObject)
+{
+  return Config_PropManager::real("Visualization", "result_deflection", "0.001");
+}
+
 XGUI_CustomPrs::XGUI_CustomPrs(XGUI_Workshop* theWorkshop)
 : myWorkshop(theWorkshop)
 {
 }
 
-void XGUI_CustomPrs::getResultColor(ResultPtr theResult, std::vector<int>& theColor)
+void XGUI_CustomPrs::getResultColor(const ResultPtr& theResult, std::vector<int>& theColor)
 {
   getColor(theResult, theColor);
   if (theColor.empty())
     getDefaultColor(theResult, false, theColor);
+}
+
+double XGUI_CustomPrs::getResultDeflection(const ResultPtr& theResult)
+{
+  double aDeflection = getDeflection(theResult);
+  if (aDeflection < 0)
+    aDeflection = getDefaultDeflection(theResult);
+  return aDeflection;
 }
 
 bool XGUI_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
@@ -84,6 +110,8 @@ bool XGUI_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr the
       aColor[2] = aNewColor.blue();
     }
     aCustomized = !aColor.empty() && thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+
+    aCustomized = thePrs->setDeflection(getResultDeflection(theResult)) | aCustomized;
   }
   ModuleBase_IModule* aModule = myWorkshop->module();
   aCustomized = aModule->customisePresentation(theResult, thePrs, theCustomPrs) || aCustomized;

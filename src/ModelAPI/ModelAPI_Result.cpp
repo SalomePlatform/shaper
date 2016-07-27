@@ -8,10 +8,21 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Attribute.h>
+#include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_AttributeDouble.h>
+
 #include <Events_Loop.h>
 
 ModelAPI_Result::~ModelAPI_Result()
 {
+}
+
+void ModelAPI_Result::initAttributes()
+{
+  // append the color attribute. It is empty, the attribute will be filled by a request
+  DataPtr aData = data();
+  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId());
+  aData->addAttribute(DEFLECTION_ID(), ModelAPI_AttributeDouble::typeId());
 }
 
 bool ModelAPI_Result::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, const bool theFlag)

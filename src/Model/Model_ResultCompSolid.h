@@ -31,9 +31,6 @@ public:
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultCompSolid();
 
-  /// Request for initialization of data model of the object: adding all attributes
-  MODEL_EXPORT virtual void initAttributes();
-
   /// Stores the shape (called by the execution method). Creates sub-results for compsolid.
   MODEL_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape);
 

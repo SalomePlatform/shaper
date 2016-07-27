@@ -122,6 +122,18 @@ class GeomAPI_AISObject : public GeomAPI_Interface
   GEOMAPI_EXPORT 
   void getColor(int& theR, int& theG, int& theB);
 
+  /** \brief Assigns the deflection to the shape
+   *  \param[in] theDeflection value of deflection
+   */
+  GEOMAPI_EXPORT 
+  bool setDeflection(const double theDeflection);
+
+  /** \brief Returns deflection for the shape
+   *  \return double value
+   */
+  GEOMAPI_EXPORT 
+  double getDeflection() const;
+
   /// \return Current width of the lines of shape
   GEOMAPI_EXPORT 
   double width();

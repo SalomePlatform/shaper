@@ -86,6 +86,9 @@ void XGUI_ContextMenuMgr::createActions()
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/color.png"), tr("Color..."), aDesktop);
   addAction("COLOR_CMD", aAction);
 
+  aAction = ModuleBase_Tools::createAction(QIcon(""), tr("Deflection..."), aDesktop);
+  addAction("DEFLECTION_CMD", aAction);
+
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil.png"), tr("Show"), aDesktop);
   addAction("SHOW_CMD", aAction);
 
@@ -322,6 +325,9 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
   if (myWorkshop->canChangeColor())
     action("COLOR_CMD")->setEnabled(true);
 
+  if (myWorkshop->canChangeDeflection())
+    action("DEFLECTION_CMD")->setEnabled(true);
+
   ModuleBase_IModule* aModule = myWorkshop->module();
   if (aModule)
     aModule->updateObjectBrowserMenu(myActions);
@@ -408,6 +414,9 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
   if (myWorkshop->canChangeColor())
     action("COLOR_CMD")->setEnabled(true);
 
+  if (myWorkshop->canChangeDeflection())
+    action("DEFLECTION_CMD")->setEnabled(true);
+
   action("DELETE_CMD")->setEnabled(true);
 }
 
@@ -438,6 +447,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(mySeparator);
   aList.append(action("RENAME_CMD"));
   aList.append(action("COLOR_CMD"));
+  aList.append(action("DEFLECTION_CMD"));
   aList.append(action("SHOW_FEATURE_CMD"));
   myObjBrowserMenus[ModelAPI_ResultConstruction::group()] = aList;
 
@@ -454,6 +464,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(mySeparator);
   aList.append(action("RENAME_CMD"));
   aList.append(action("COLOR_CMD"));
+  aList.append(action("DEFLECTION_CMD"));
   aList.append(action("SHOW_FEATURE_CMD"));
   myObjBrowserMenus[ModelAPI_ResultBody::group()] = aList;
   // Group menu
@@ -488,6 +499,7 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   aList.append(action("SHOW_ONLY_CMD"));
   aList.append(mySeparator);
   aList.append(action("COLOR_CMD"));
+  aList.append(action("DEFLECTION_CMD"));
   myViewerMenu[ModelAPI_ResultConstruction::group()] = aList;
   // Result part menu
   myViewerMenu[ModelAPI_ResultPart::group()] = aList;
@@ -501,6 +513,7 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   aList.append(action("SHOW_ONLY_CMD"));
   aList.append(mySeparator);
   aList.append(action("COLOR_CMD"));
+  aList.append(action("DEFLECTION_CMD"));
   myViewerMenu[ModelAPI_ResultBody::group()] = aList;
   // Group menu
   myViewerMenu[ModelAPI_ResultGroup::group()] = aList;
@@ -535,6 +548,8 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
       aActions.append(mySeparator);
       //aActions.append(action("MOVE_CMD"));
       aActions.append(action("COLOR_CMD"));
+      aActions.append(action("DEFLECTION_CMD"));
+
       aActions.append(action("CLEAN_HISTORY_CMD"));
       aActions.append(action("DELETE_CMD"));
   }
@@ -581,6 +596,7 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
   // hide all is shown always even if selection in the viewer is empty
   aActions.append(action("HIDEALL_CMD"));
   aActions.append(action("COLOR_CMD"));
+  aActions.append(action("DEFLECTION_CMD"));
 
   theMenu->addActions(aActions);
 

@@ -10,6 +10,7 @@ SET(PROJECT_HEADERS
 	XGUI_ContextMenuMgr.h
 	XGUI_CustomPrs.h
 	XGUI_DataModel.h
+	XGUI_DeflectionDialog.h
 	XGUI_Displayer.h
 	XGUI_ErrorDialog.h
 	XGUI_ErrorMgr.h
@@ -41,6 +42,7 @@ SET(PROJECT_SOURCES
 	XGUI_ContextMenuMgr.cpp
 	XGUI_CustomPrs.cpp
 	XGUI_DataModel.cpp
+	XGUI_DeflectionDialog.cpp
 	XGUI_Displayer.cpp
 	XGUI_ErrorDialog.cpp
 	XGUI_ErrorMgr.cpp

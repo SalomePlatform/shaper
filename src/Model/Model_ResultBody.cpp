@@ -6,7 +6,6 @@
 
 #include <Model_ResultBody.h>
 #include <Model_BodyBuilder.h>
-#include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_Tools.h>
 #include <Config_PropManager.h>
 #include <ModelAPI_Events.h>
@@ -20,13 +19,6 @@ Model_ResultBody::Model_ResultBody()
   myBuilder = new Model_BodyBuilder(this);
   myWasConcealed = false;
   myConnect = ConnectionNotComputed;
-}
-
-void Model_ResultBody::initAttributes()
-{
-  // append the color attribute. It is empty, the attribute will be filled by a request
-  DataPtr aData = data();
-  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId());
 }
 
 void Model_ResultBody::colorConfigInfo(std::string& theSection, std::string& theName,

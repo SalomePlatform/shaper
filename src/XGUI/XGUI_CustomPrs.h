@@ -34,7 +34,12 @@ public:
   /// Returns color of a result object
   /// \param theResult a result object
   /// \param theColor a color in form of RGB vector
-  static void getResultColor(ResultPtr theResult, std::vector<int>& theColor);
+  static void getResultColor(const ResultPtr& theResult, std::vector<int>& theColor);
+
+  /// Returns deflection of a result object
+  /// \param theResult a result object
+  /// \return theDeflection a real value
+  static double getResultDeflection(const ResultPtr& theResult);
 
   /// Returns the default object color. It obtains colorConfigInfo of the object
   /// and find it in preferences. If there are no this color in preference and an empty
@@ -45,6 +50,10 @@ public:
   static void XGUI_EXPORT getDefaultColor(ObjectPtr theObject, const bool isEmptyColorValid,
                                           std::vector<int>& theColor);
 
+  /// Returns the default deflection value. The value is obtained from the application preferences
+  /// \param theObject an investigated object
+  /// \return deflection value
+  static double XGUI_EXPORT getDefaultDeflection(const ObjectPtr& theObject);
 
 protected:
   XGUI_Workshop* myWorkshop; ///< the current workshop

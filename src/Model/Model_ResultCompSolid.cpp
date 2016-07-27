@@ -10,8 +10,6 @@
 #include <Model_Objects.h>
 #include <Model_BodyBuilder.h>
 #include <Model_Document.h>
-#include <ModelAPI_AttributeRefList.h>
-#include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
 #include <Events_Loop.h>
@@ -30,12 +28,6 @@ Model_ResultCompSolid::Model_ResultCompSolid()
 Model_ResultCompSolid::~Model_ResultCompSolid()
 {
   updateSubs(std::shared_ptr<GeomAPI_Shape>()); // erase sub-results
-}
-
-void Model_ResultCompSolid::initAttributes()
-{
-  DataPtr aData = data();
-  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId());
 }
 
 void Model_ResultCompSolid::store(const std::shared_ptr<GeomAPI_Shape>& theShape)
