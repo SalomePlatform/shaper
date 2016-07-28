@@ -379,13 +379,16 @@ bool GeomAPI_AISObject::setDeflection(const double theDeflection)
   bool isModified = false;
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (!anAIS.IsNull()) {
-    Handle(Prs3d_Drawer) aDrawer = anAIS->Attributes();
-    if (fabs(aDrawer->DeviationCoefficient() - theDeflection) > Precision::Confusion()) {
-      aDrawer->SetDeviationCoefficient(theDeflection);
-      isModified = true;
+    Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(anAIS);
+    if (!anAISShape.IsNull()) {
+      Standard_Real aCoefficient, aPreviousCoefficient;
+      anAISShape->OwnDeviationCoefficient(aCoefficient, aPreviousCoefficient);
+      if (fabs(aCoefficient-theDeflection) > Precision::Confusion()) {
+        isModified = true;
+        anAISShape->SetOwnDeviationCoefficient(theDeflection);
+      }
     }
   }
-
   return isModified;
 }
 

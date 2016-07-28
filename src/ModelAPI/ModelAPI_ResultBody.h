@@ -44,6 +44,12 @@ public:
     return RESULT_BODY_COLOR;
   }
 
+  /// default deflection for a result body
+  inline static const std::string DEFAULT_DEFLECTION()
+  {
+    return "0.001";
+  }
+
   /// Iternal enumeration for storage the information of connected topology flag
   enum ConnectedTopologyFlag {
     ConnectionNotComputed, ///< not yet computed

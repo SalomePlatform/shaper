@@ -13,6 +13,11 @@
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultConstruction.h>
+
+#include <GeomAPI_ShapeExplorer.h>
+
 #include <Config_PropManager.h>
 
 #include <Events_InfoMessage.h>
@@ -27,8 +32,11 @@ double getDeflection(const ResultPtr& theResult)
   if (theResult.get() != NULL &&
       theResult->data()->attribute(ModelAPI_Result::DEFLECTION_ID()).get() != NULL) {
     AttributeDoublePtr aDoubleAttr = theResult->data()->real(ModelAPI_Result::DEFLECTION_ID());
-    if (aDoubleAttr.get() && aDoubleAttr->isInitialized())
-      aDeflection = aDoubleAttr->value();
+    if (aDoubleAttr.get() && aDoubleAttr->isInitialized()) {
+      double aValue = aDoubleAttr->value();
+      if (aValue > 0) /// zero value should not be used as a deflection(previous studies)
+        aDeflection = aDoubleAttr->value();
+    }
   }
   return aDeflection;
 }
@@ -70,7 +78,31 @@ void XGUI_CustomPrs::getDefaultColor(ObjectPtr theObject, const bool isEmptyColo
 
 double XGUI_CustomPrs::getDefaultDeflection(const ObjectPtr& theObject)
 {
-  return Config_PropManager::real("Visualization", "result_deflection", "0.001");
+  double aDeflection = -1;
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+  if (aResult.get()) {
+    bool isConstruction = false;
+
+    std::string aResultGroup = aResult->groupName();
+    if (aResultGroup == ModelAPI_ResultConstruction::group())
+      isConstruction = true;
+    else if (aResultGroup == ModelAPI_ResultBody::group()) {
+      GeomShapePtr aGeomShape = aResult->shape();
+      if (aGeomShape.get()) {
+        // if the shape could not be exploded on faces, it contains only wires, edges, and vertices
+        // correction of deviation for them should not influence to the application performance
+        GeomAPI_ShapeExplorer anExp(aGeomShape, GeomAPI_Shape::FACE);
+        isConstruction = !anExp.more();
+      }
+    }
+    if (isConstruction)
+      aDeflection = Config_PropManager::real("Visualization", "construction_deflection",
+                                             ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());
+    else
+      aDeflection = Config_PropManager::real("Visualization", "body_deflection",
+                                             ModelAPI_ResultBody::DEFAULT_DEFLECTION());
+  }
+  return aDeflection;
 }
 
 XGUI_CustomPrs::XGUI_CustomPrs(XGUI_Workshop* theWorkshop)

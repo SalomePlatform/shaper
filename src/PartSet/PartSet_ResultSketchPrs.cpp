@@ -91,7 +91,7 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
   setAuxiliaryPresentationStyle(false);
 
   // change deviation coefficient to provide more precise circle
-  ModuleBase_Tools::setDefaultDeviationCoefficient(myResult, Attributes());
+  //ModuleBase_Tools::setDefaultDeviationCoefficient(myResult, Attributes());
   AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
 
   if (!myAuxiliaryCompound.IsNull()) {
@@ -136,6 +136,7 @@ void PartSet_ResultSketchPrs::ComputeSelection(const Handle(SelectMgr_Selection)
     return;
 
   bool aShapeIsChanged = false;
+  double aPrevDeviation = Attributes()->DeviationCoefficient();
   if (aMode == SketcherPrs_Tools::Sel_Sketch_Face ||
       aMode == SketcherPrs_Tools::Sel_Sketch_Wire) {
     aMode = (aMode == SketcherPrs_Tools::Sel_Sketch_Face) ? AIS_Shape::SelectionMode(TopAbs_FACE)
@@ -163,6 +164,9 @@ void PartSet_ResultSketchPrs::ComputeSelection(const Handle(SelectMgr_Selection)
     debugInfo(aComp, TopAbs_FACE); // 2
 #endif
     Set(aComp);
+    double aBodyDefDeflection = Config_PropManager::real("Visualization", "body_deflection",
+                                                         ModelAPI_ResultBody::DEFAULT_DEFLECTION());
+    Attributes()->SetDeviationCoefficient(aBodyDefDeflection);
     aShapeIsChanged = true;
   }
   else
@@ -178,8 +182,10 @@ void PartSet_ResultSketchPrs::ComputeSelection(const Handle(SelectMgr_Selection)
 
   AIS_Shape::ComputeSelection(aSelection, aMode);
 
-  if (aShapeIsChanged)
+  if (aShapeIsChanged) {
+    Attributes()->SetDeviationCoefficient(aPrevDeviation);
     Set(myOriginalShape);
+  }
 }
 
 void PartSet_ResultSketchPrs::appendShapeSelection(const Handle(SelectMgr_Selection)& theSelection,

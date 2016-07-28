@@ -154,15 +154,15 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
       anAIS = aPrs->getAISObject(anAIS);
       if (anAIS.get()) {
         // correct deviation coefficient for 
-        Handle(AIS_InteractiveObject) anAISPrs = anAIS->impl<Handle(AIS_InteractiveObject)>();
+        /*Handle(AIS_InteractiveObject) anAISPrs = anAIS->impl<Handle(AIS_InteractiveObject)>();
         if (!anAISPrs.IsNull()) {
           Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(anAISPrs);
           if (!aShapePrs.IsNull()) {
             TopoDS_Shape aShape = aShapePrs->Shape();
             if (!aShape.IsNull())
-              ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, anAISPrs->Attributes());
+              //ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, anAISPrs->Attributes());
           }
-        }
+        }*/
       }
     } else {
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);

@@ -40,6 +40,12 @@ class ModelAPI_ResultConstruction : public ModelAPI_Result
     return RESULT_CONSTRUCTION_COLOR;
   }
 
+  /// default deflection for a result construction
+  inline static const std::string DEFAULT_DEFLECTION()
+  {
+    return "0.0001";
+  }
+
   /// Sets the result
   virtual void setShape(std::shared_ptr<GeomAPI_Shape> theShape) = 0;
 

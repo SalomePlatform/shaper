@@ -582,7 +582,7 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
   }
 }
 
-bool setDefaultDeviationCoefficient(std::shared_ptr<GeomAPI_Shape> theGeomShape)
+/*bool setDefaultDeviationCoefficient(std::shared_ptr<GeomAPI_Shape> theGeomShape)
 {
   if (!theGeomShape.get())
     return false;
@@ -591,9 +591,9 @@ bool setDefaultDeviationCoefficient(std::shared_ptr<GeomAPI_Shape> theGeomShape)
   GeomAPI_ShapeExplorer anExp(theGeomShape, GeomAPI_Shape::FACE);
   bool anEmpty = anExp.empty();
   return !anExp.more();
-}
+}*/
 
-void setDefaultDeviationCoefficient(const std::shared_ptr<ModelAPI_Result>& theResult,
+/*void setDefaultDeviationCoefficient(const std::shared_ptr<ModelAPI_Result>& theResult,
                                     const Handle(Prs3d_Drawer)& theDrawer)
 {
   if (!theResult.get())
@@ -611,7 +611,7 @@ void setDefaultDeviationCoefficient(const std::shared_ptr<ModelAPI_Result>& theR
   if (aUseDeviation)
     theDrawer->SetDeviationCoefficient(DEFAULT_DEVIATION_COEFFICIENT);
 }
-
+*/
 void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
                                     const Handle(Prs3d_Drawer)& theDrawer)
 {
@@ -620,8 +620,21 @@ void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
 
   std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape());
   aGeomShape->setImpl(new TopoDS_Shape(theShape));
-  if (setDefaultDeviationCoefficient(aGeomShape))
-    theDrawer->SetDeviationCoefficient(DEFAULT_DEVIATION_COEFFICIENT);
+
+  // if the shape could not be exploded on faces, it contains only wires, edges, and vertices
+  // correction of deviation for them should not influence to the application performance
+  GeomAPI_ShapeExplorer anExp(aGeomShape, GeomAPI_Shape::FACE);
+  bool isConstruction = !anExp.more();
+
+  double aDeflection;
+  if (isConstruction)
+    aDeflection = Config_PropManager::real("Visualization", "construction_deflection",
+                                           ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());
+  else
+    aDeflection = Config_PropManager::real("Visualization", "body_deflection",
+                                           ModelAPI_ResultBody::DEFAULT_DEFLECTION());
+
+  theDrawer->SetDeviationCoefficient(aDeflection);
 }
 
 Quantity_Color color(const std::string& theSection,

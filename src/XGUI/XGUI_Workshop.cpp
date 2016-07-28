@@ -208,8 +208,11 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   Config_PropManager::registerProp("Visualization", "result_part_color", "Part color",
                                    Config_Prop::Color, ModelAPI_ResultPart::DEFAULT_COLOR());
 
-  Config_PropManager::registerProp("Visualization", "result_deflection", "Result deflection",
-                                   Config_Prop::Double, "0.001");
+  Config_PropManager::registerProp("Visualization", "body_deflection", "Body deflection coefficient",
+                                   Config_Prop::Double, ModelAPI_ResultBody::DEFAULT_DEFLECTION());//"0.001");
+
+  Config_PropManager::registerProp("Visualization", "construction_deflection", "Construction deflection coefficient",
+                                   Config_Prop::Double, ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());//"0.0001");
 
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "face-selection", true))
     myViewerSelMode.append(TopAbs_FACE);
