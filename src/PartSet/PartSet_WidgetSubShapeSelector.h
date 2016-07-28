@@ -9,12 +9,11 @@
 #define PartSet_WidgetSubShapeSelector_H
 
 #include "PartSet.h"
+#include "PartSet_MouseProcessor.h"
 
 #include <ModuleBase_WidgetShapeSelector.h>
-#include <PartSet_MouseProcessor.h>
 
 #include <ModelAPI_CompositeFeature.h>
-#include <GeomDataAPI_Point2D.h>
 
 #include <QObject>
 
@@ -25,6 +24,9 @@ class ModuleBase_IWorkshop;
 class Config_WidgetAPI;
 class ModuleBase_IViewWindow;
 class ModuleBase_ViewerPrs;
+
+class GeomAPI_Pnt;
+class GeomDataAPI_Point2D;
 
 class QWidget;
 class QMouseEvent;
@@ -112,7 +114,10 @@ protected:
 protected:
   std::shared_ptr<ModuleBase_ViewerPrs> myCurrentSubShape;
   std::map<ObjectPtr, std::set<GeomShapePtr> > myCashedShapes;
-  std::map<ObjectPtr, std::set<AttributePoint2DPtr> > myCashedReferences;
+
+  typedef std::map<std::shared_ptr<GeomDataAPI_Point2D>,
+                   std::shared_ptr<GeomAPI_Pnt> > PntToAttributesMap;
+  std::map<ObjectPtr, PntToAttributesMap> myCashedReferences;
 
   /// Pointer to a sketch 
   CompositeFeaturePtr mySketch;

@@ -201,6 +201,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theTypes a selection modes to be extended
   virtual void customSubShapesSelectionModes(QIntList& theTypes) {}
 
+  /// Return true if the custom presentation is activated
+  /// \param theFlag a flag of level of customization, which means that only part of sub-elements
+  /// \return boolean value
+  virtual bool isCustomPrsActivated(const ModuleBase_CustomizeFlag& theFlag) const { return false; };
+
   /// Activate custom presentation for the object. Default realization is empty.
   /// \param theFeature a feature instance
   /// \param theFlag a flag of level of customization, which means that only part of sub-elements

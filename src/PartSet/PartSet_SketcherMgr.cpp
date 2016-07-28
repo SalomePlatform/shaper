@@ -446,7 +446,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     // 1. perform the widget mouse move functionality and display the presentation
     // the mouse move should be processed in the widget, if it can in order to visualize correct
     // presentation. These widgets correct the feature attribute according to the mouse position
-    ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
+    ModuleBase_ModelWidget* anActiveWidget = myModule->activeWidget();
     PartSet_MouseProcessor* aProcessor = dynamic_cast<PartSet_MouseProcessor*>(anActiveWidget);
     if (aProcessor)
       aProcessor->mouseMoved(theWnd, theEvent);

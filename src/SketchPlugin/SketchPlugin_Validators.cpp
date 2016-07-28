@@ -899,9 +899,9 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
     std::shared_ptr<GeomAPI_Dir> aDirY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
     
     std::set<std::shared_ptr<GeomAPI_Pnt> > aPoints;
-
+    std::map<std::shared_ptr<GeomDataAPI_Point2D>, std::shared_ptr<GeomAPI_Pnt> > aPointToAttributes;
     ModelGeomAlgo_Point2D::getPointsInsideShape(anAttrShape, aRefAttributes, aC->pnt(),
-                                                aX->dir(), aDirY, aPoints);
+                                                aX->dir(), aDirY, aPoints, aPointToAttributes);
 
     int aCoincidentToFeature = (int)aPoints.size();
     if (aKind == SketchPlugin_Circle::ID())

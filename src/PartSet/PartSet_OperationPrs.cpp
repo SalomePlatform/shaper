@@ -349,13 +349,9 @@ void PartSet_OperationPrs::getHighlightedShapes(ModuleBase_IWorkshop* theWorksho
   theObjectShapes.clear();
 
   QList<ModuleBase_ViewerPrsPtr> aValues;
-  ModuleBase_IPropertyPanel* aPanel = theWorkshop->propertyPanel();
-  if (aPanel) {
-    ModuleBase_ModelWidget* aWidget = aPanel->activeWidget();
-    if (aWidget) {
-      aWidget->getHighlighted(aValues);
-    }
-  }
+  ModuleBase_ModelWidget* anActiveWidget = theWorkshop->module()->activeWidget();
+  if (anActiveWidget)
+    anActiveWidget->getHighlighted(aValues);
 
   QList<GeomShapePtr> aShapes;
   QList<ModuleBase_ViewerPrsPtr>::const_iterator anIIt = aValues.begin(),

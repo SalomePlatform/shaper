@@ -122,10 +122,18 @@ private:
   void fillAttribute(const AttributePtr& theModifiedAttribute,
                      const AttributePtr& theSourceAttribute);
 
+  /// Creates an arc feature filled by center of base feature and given points
+  /// \param theBaseFeature another arc feature
+  /// \param theFirstAttribute an attribute with coordinates for the start point
+  /// \param theSecondAttribute an attribute with coordinates for the end point
+  FeaturePtr createArcFeature(const FeaturePtr& theBaseFeature,
+                              const AttributePtr& theFirstPointAttr,
+                              const AttributePtr& theSecondPointAttr);
+
   /// Add feature coincidence constraint between given attributes
   /// \param theConstraintId a constraint index
   /// \param theFirstAttribute an attribute of further coincidence
-  /// \param theFirstAttribute an attribute of further coincidence
+  /// \param theSecondAttribute an attribute of further coincidence
   void createConstraint(const std::string& theConstraintId,
                         const std::shared_ptr<ModelAPI_Attribute>& theFirstAttribute,
                         const std::shared_ptr<ModelAPI_Attribute>& theSecondAttribute);

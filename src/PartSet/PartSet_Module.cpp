@@ -754,7 +754,7 @@ ModuleBase_ModelWidget* PartSet_Module::activeWidget() const
     ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
     if (aOperation) {
       ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-      anActiveWidget = aPanel->activeWidget();
+      anActiveWidget = aPanel ? aPanel->activeWidget() : 0;
     }
   }
   return anActiveWidget;
@@ -975,6 +975,11 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
   }
   if (isModified)
     aDisplayer->updateViewer();
+}
+
+bool PartSet_Module::isCustomPrsActivated(const ModuleBase_CustomizeFlag& theFlag) const
+{
+  return myCustomPrs->isActive(theFlag);
 }
 
 void PartSet_Module::activateCustomPrs(const FeaturePtr& theFeature, const ModuleBase_CustomizeFlag& theFlag,

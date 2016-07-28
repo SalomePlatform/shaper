@@ -18,6 +18,9 @@
 //#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttr.h>
 
+#include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
+
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
@@ -851,14 +854,10 @@ void SketchPlugin_ConstraintSplit::splitArc(FeaturePtr& theSplitFeature,
   arrangePoints(aStartPointAttr, anEndPointAttr, aFirstPointAttr, aSecondPointAttr);
 
   /// split feature
-  theSplitFeature = aSketch->addFeature(aFeatureKind);
-  theSplitFeature->string(SketchPlugin_Arc::ARC_TYPE())->setValue(
-                SketchPlugin_Arc::ARC_TYPE_CENTER_START_END());
-  fillAttribute(theSplitFeature->attribute(SketchPlugin_Arc::CENTER_ID()),
-                aBaseFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
-  fillAttribute(theSplitFeature->attribute(SketchPlugin_Arc::START_ID()), aFirstPointAttr);
-  fillAttribute(theSplitFeature->attribute(SketchPlugin_Arc::END_ID()), aSecondPointAttr);
-  theSplitFeature->execute(); /// to use result of the feature in constraint
+  theSplitFeature = createArcFeature(aBaseFeature, aFirstPointAttr, aSecondPointAttr);
+  static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+  aFactory->validate(theSplitFeature); // need to be validated to update the "Apply" state if not previewed
+  std::string anError = theSplitFeature->error();
 
   if (!aStartPointAttr->pnt()->isEqual(aFirstPointAttr->pnt())) {
     theBeforeFeature = aBaseFeature; ///< use base feature to store all constraints here
@@ -872,18 +871,11 @@ void SketchPlugin_ConstraintSplit::splitArc(FeaturePtr& theSplitFeature,
   if (!aSecondPointAttr->pnt()->isEqual(anEndPointAttr->pnt())) {
     if (!theBeforeFeature) {
       theAfterFeature = aBaseFeature; ///< use base feature to store all constraints here
-      fillAttribute(theBeforeFeature->attribute(SketchPlugin_Arc::START_ID()), aSecondPointAttr);
-    }
-    else {
-      theAfterFeature = aSketch->addFeature(aFeatureKind);
-      theAfterFeature->string(SketchPlugin_Arc::ARC_TYPE())->setValue(
-                    SketchPlugin_Arc::ARC_TYPE_CENTER_START_END());
-      fillAttribute(theAfterFeature->attribute(SketchPlugin_Arc::CENTER_ID()),
-                    aBaseFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
       fillAttribute(theAfterFeature->attribute(SketchPlugin_Arc::START_ID()), aSecondPointAttr);
-      fillAttribute(theAfterFeature->attribute(SketchPlugin_Arc::END_ID()), anEndPointAttr);
-      theAfterFeature->execute(); /// to use result of the feature in constraint
     }
+    else
+      theAfterFeature = createArcFeature(aBaseFeature, aSecondPointAttr, anEndPointAttr);
+
     createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
                      theSplitFeature->attribute(SketchPlugin_Arc::END_ID()),
                      theAfterFeature->attribute(SketchPlugin_Arc::START_ID()));
@@ -926,6 +918,32 @@ void SketchPlugin_ConstraintSplit::fillAttribute(const AttributePtr& theModified
 
   if (aModifiedAttribute.get() && aSourceAttribute.get())
     aSourceAttribute->setValue(aModifiedAttribute->pnt());
+}
+
+FeaturePtr SketchPlugin_ConstraintSplit::createArcFeature(const FeaturePtr& theBaseFeature,
+                                                          const AttributePtr& theFirstPointAttr,
+                                                          const AttributePtr& theSecondPointAttr)
+{
+  FeaturePtr aFeature;
+  SketchPlugin_Sketch* aSketch = sketch();
+  if (!aSketch || !theBaseFeature.get())
+    return aFeature;
+
+  aFeature = aSketch->addFeature(theBaseFeature->getKind());
+  // update fillet arc: make the arc correct for sure, so, it is not needed to process the "attribute updated"
+  // by arc; moreover, it may cause cyclicity in hte mechanism of updater
+  aFeature->data()->blockSendAttributeUpdated(true);
+
+  aFeature->string(SketchPlugin_Arc::ARC_TYPE())->setValue(
+                SketchPlugin_Arc::ARC_TYPE_CENTER_START_END());
+  fillAttribute(aFeature->attribute(SketchPlugin_Arc::CENTER_ID()),
+                theBaseFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
+  fillAttribute(aFeature->attribute(SketchPlugin_Arc::START_ID()), theFirstPointAttr);
+  fillAttribute(aFeature->attribute(SketchPlugin_Arc::END_ID()), theSecondPointAttr);
+  aFeature->data()->blockSendAttributeUpdated(false);
+  aFeature->execute();
+
+  return aFeature;
 }
 
 void SketchPlugin_ConstraintSplit::createConstraint(const std::string& theConstraintId,

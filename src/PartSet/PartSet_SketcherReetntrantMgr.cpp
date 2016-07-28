@@ -58,9 +58,11 @@ ModuleBase_ModelWidget* PartSet_SketcherReetntrantMgr::internalActiveWidget() co
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
   if (anOperation) {
     ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
-    ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
-    if (myIsInternalEditOperation && (!anActiveWidget || !anActiveWidget->isViewerSelector()))
-      aWidget = myInternalActiveWidget;
+    if (aPanel) { // check for case when the operation is started but property panel is not filled
+      ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
+      if (myIsInternalEditOperation && (!anActiveWidget || !anActiveWidget->isViewerSelector()))
+        aWidget = myInternalActiveWidget;
+    }
   }
   return aWidget;
 }
@@ -125,8 +127,8 @@ void PartSet_SketcherReetntrantMgr::operationAborted(ModuleBase_Operation* theOp
   resetFlags();
 }
 
-bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* /* theWnd*/,
-                                                      QMouseEvent* /* theEvent*/)
+bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* theWnd,
+                                                      QMouseEvent* theEvent)
 {
   bool aProcessed = false;
   if (!isActiveMgr())
@@ -140,7 +142,6 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* /*
     if (aLastFeature) {
       ModuleBase_ModelWidget* anActiveWidget = module()->activeWidget();
       ModuleBase_IPropertyPanel* aPanel = myWorkshop->currentOperation()->propertyPanel();
-      bool aWidgetIsFilled = false;
 
       FeaturePtr aCurrentFeature = aFOperation->feature();
       bool isLineFeature = false, isArcFeature = false;
@@ -158,11 +159,14 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* /*
         anActiveWidget = module()->activeWidget();
         aCurrentFeature = anActiveWidget->feature();
         aProcessed = true;
-        if (isLineFeature || isArcFeature)
-          aWidgetIsFilled = true;
-      }
-      if (aWidgetIsFilled)
         aPanel->activateNextWidget(anActiveWidget);
+      } else {
+        // processing mouse move in active widget of restarted operation
+        ModuleBase_ModelWidget* anActiveWidget = module()->activeWidget();
+        PartSet_MouseProcessor* aProcessor = dynamic_cast<PartSet_MouseProcessor*>(anActiveWidget);
+        if (aProcessor)
+          aProcessor->mouseMoved(theWnd, theEvent);
+      }
     }
   }
   return aProcessed;

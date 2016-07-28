@@ -226,6 +226,11 @@ public:
   /// \param theFeature a feature
   void setCustomized(const FeaturePtr& theFeature);
 
+  /// Return true if the custom presentation is activated
+  /// \param theFlag a flag of level of customization, which means that only part of sub-elements
+  /// \return boolean value
+  virtual bool isCustomPrsActivated(const ModuleBase_CustomizeFlag& theFlag) const;
+
   /// Activate custom presentation for the object
   /// \param theFeature a feature instance
   /// \param theFlag a flag of level of customization, which means that only part of sub-elements
