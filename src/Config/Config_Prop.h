@@ -12,6 +12,8 @@
 #include <string>
 #include <list>
 
+const static char* SKETCH_TAB_NAME = "Sketch";
+
 /*!
  * \class Config_Prop
  * \brief Class which describes a one property

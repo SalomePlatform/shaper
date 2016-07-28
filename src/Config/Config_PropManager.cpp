@@ -151,7 +151,7 @@ std::vector<int> stringToRGB(const std::string& theColor)
     aBuf[1] = theColor[6];
     aRes[2] = strtol(aBuf, &aP, 16);
   } else {
-    int aPos = theColor.find(",");
+    int aPos = (int)theColor.find(",");
     char aBuf[10];
     // Get Red
     std::size_t length = theColor.copy(aBuf, aPos, 0);
@@ -159,7 +159,7 @@ std::vector<int> stringToRGB(const std::string& theColor)
     aRes[0] = atoi(aBuf);
 
     // Get Green
-    int aNPos = theColor.find(",", aPos + 1);
+    int aNPos = (int)theColor.find(",", aPos + 1);
     length = theColor.copy(aBuf, aNPos - aPos - 1, aPos + 1);
     aBuf[length] = '\0';
     aRes[1] = atoi(aBuf);

@@ -90,7 +90,7 @@ bool ModuleBase_ModelWidget::isValueEnabled() const
 {
   bool anEnabled = true;
   if (myIsValueEnabled == DefinedInPreferences) {
-    bool aCanDisable = Config_PropManager::boolean("Sketch planes", "disable_input_fields", "true");
+    bool aCanDisable = Config_PropManager::boolean(SKETCH_TAB_NAME, "disable_input_fields", "true");
     if (aCanDisable)
       anEnabled = false;
   }

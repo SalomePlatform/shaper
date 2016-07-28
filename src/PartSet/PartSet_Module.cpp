@@ -166,7 +166,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
                           PartSet_CustomPrs::OPERATION_HIGHLIGHT_COLOR());
 
 
-  Config_PropManager::registerProp("Sketch planes", "disable_input_fields", "Disable input fields",
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "disable_input_fields", "Disable input fields",
                           Config_Prop::Boolean, "true");
 }
 
@@ -244,11 +244,11 @@ void PartSet_Module::registerFilters()
 
 void PartSet_Module::registerProperties()
 {
-  Config_PropManager::registerProp("Sketch planes", "planes_size", "Size", Config_Prop::Double,
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_size", "Size", Config_Prop::Double,
                                    PLANE_SIZE);
-  Config_PropManager::registerProp("Sketch planes", "planes_thickness", "Thickness",
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_thickness", "Thickness",
                                    Config_Prop::Integer, SKETCH_WIDTH);
-  Config_PropManager::registerProp("Sketch planes", "rotate_to_plane", "Rotate to plane when selected",
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "rotate_to_plane", "Rotate to plane when selected",
     Config_Prop::Boolean, "false");
 }
 
