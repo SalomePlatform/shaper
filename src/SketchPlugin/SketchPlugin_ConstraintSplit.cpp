@@ -886,7 +886,7 @@ void SketchPlugin_ConstraintSplit::splitArc(FeaturePtr& theSplitFeature,
                                                        getFeatureResult(theSplitFeature));
   createConstraint(SketchPlugin_ConstraintTangent::ID(), getFeatureResult(theSplitFeature),
                                                          getFeatureResult(aBaseFeature));
-  if (theAfterFeature.get()) {
+  if (theAfterFeature.get() && theAfterFeature != aBaseFeature) {
     createConstraint(SketchPlugin_ConstraintEqual::ID(), getFeatureResult(aBaseFeature),
                                                          getFeatureResult(theAfterFeature));
     createConstraint(SketchPlugin_ConstraintTangent::ID(), getFeatureResult(theSplitFeature),
@@ -901,7 +901,7 @@ void SketchPlugin_ConstraintSplit::arrangePoints(const AttributePoint2DPtr& theS
 {
   /// if first point is closer to last point, wrap first and last values
   if (theStartPointAttr->pnt()->distance(theFirstPointAttr->pnt()) >
-      theEndPointAttr->pnt()->distance(theLastPointAttr->pnt())) {
+      theStartPointAttr->pnt()->distance(theLastPointAttr->pnt())) {
     AttributePoint2DPtr aTmpPoint = theFirstPointAttr;
     theFirstPointAttr = theLastPointAttr;
     theLastPointAttr = aTmpPoint;
@@ -917,7 +917,7 @@ void SketchPlugin_ConstraintSplit::fillAttribute(const AttributePtr& theModified
                                             theSourceAttribute);
 
   if (aModifiedAttribute.get() && aSourceAttribute.get())
-    aSourceAttribute->setValue(aModifiedAttribute->pnt());
+    aModifiedAttribute->setValue(aSourceAttribute->pnt());
 }
 
 FeaturePtr SketchPlugin_ConstraintSplit::createArcFeature(const FeaturePtr& theBaseFeature,
