@@ -43,6 +43,7 @@ SET(PROJECT_HEADERS
   ModuleBase_WidgetAction.h
   ModuleBase_WidgetBoolValue.h
   ModuleBase_WidgetChoice.h
+  ModuleBase_WidgetConcealedObjects.h
   ModuleBase_WidgetCreatorFactory.h
   ModuleBase_WidgetDoubleValue.h
   ModuleBase_WidgetEditor.h
@@ -102,6 +103,7 @@ SET(PROJECT_SOURCES
   ModuleBase_WidgetAction.cpp
   ModuleBase_WidgetBoolValue.cpp
   ModuleBase_WidgetChoice.cpp
+  ModuleBase_WidgetConcealedObjects.cpp
   ModuleBase_WidgetCreatorFactory.cpp
   ModuleBase_WidgetDoubleValue.cpp
   ModuleBase_WidgetEditor.cpp

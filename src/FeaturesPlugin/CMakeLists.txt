@@ -7,6 +7,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin.h
     FeaturesPlugin_Plugin.h
     FeaturesPlugin_Extrusion.h
+    FeaturesPlugin_Recover.h
     FeaturesPlugin_Revolution.h
     FeaturesPlugin_Rotation.h
     FeaturesPlugin_Translation.h
@@ -33,6 +34,7 @@ SET(PROJECT_HEADERS
 SET(PROJECT_SOURCES
     FeaturesPlugin_Plugin.cpp
     FeaturesPlugin_Extrusion.cpp
+    FeaturesPlugin_Recover.cpp
     FeaturesPlugin_Revolution.cpp
     FeaturesPlugin_Rotation.cpp
     FeaturesPlugin_Translation.cpp
@@ -68,6 +70,7 @@ SET(XML_RESOURCES
   translation_widget.xml
   boolean_widget.xml
   group_widget.xml
+  recover_widget.xml
   partition_widget.xml
   placement_widget.xml
   intersection_widget.xml

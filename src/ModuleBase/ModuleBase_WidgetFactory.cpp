@@ -25,6 +25,7 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_WidgetLineEdit.h>
 #include <ModuleBase_WidgetMultiSelector.h>
+#include <ModuleBase_WidgetConcealedObjects.h>
 #include <ModuleBase_WidgetLabel.h>
 #include <ModuleBase_WidgetToolbox.h>
 #include <ModuleBase_PageBase.h>
@@ -302,6 +303,8 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
     result = new ModuleBase_WidgetExprEditor( theParent, myWidgetApi, aPlaceHolder );
   } else if (theType == WDG_MULTISELECTOR) {
     result = new ModuleBase_WidgetMultiSelector(theParent, myWorkshop, myWidgetApi);
+  } else if (theType == WDG_CONCEALED_OBJECTS_VIEW) {
+    result = new ModuleBase_WidgetConcealedObjects(theParent, myWidgetApi);
   } else if (theType == WDG_TOOLBOX) {
     result = new ModuleBase_WidgetToolbox(theParent, myWidgetApi);
   } else if (theType == WDG_SWITCH) {

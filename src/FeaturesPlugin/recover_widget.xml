@@ -1,0 +1,12 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<source>
+  <shape_selector id="base_shape"
+                  label="Shape:"
+                  tooltip="Select a feature of concealed objects."
+                  shape_types="objects"/>
+  <concealed_objects_view id="recovered_entities"
+                  tooltip="Concealed objects"
+                  base_shape_attribute="base_shape"
+                  obligatory="0"/>
+</source>
