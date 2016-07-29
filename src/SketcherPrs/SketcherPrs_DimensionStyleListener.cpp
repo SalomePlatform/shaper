@@ -12,9 +12,9 @@
 #include <AIS_Dimension.hxx>
 #include <TCollection_ExtendedString.hxx>
 
-#ifndef WNT
-  #define COMPILATION_CORRECTION
-#endif
+//#ifndef WNT
+//  #define COMPILATION_CORRECTION
+//#endif
 
 // it is not possible to use 0x2211 as summ symbol because it is not supported by
 // debian Linux platform
