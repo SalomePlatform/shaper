@@ -170,7 +170,7 @@ private:
   /// \param theConstraintId a constraint index
   /// \param theFirstAttribute an attribute of further coincidence
   /// \param theFirstAttribute an attribute of further coincidence
-  void createConstraint(const std::string& theConstraintId,
+  void createConstraintForObjects(const std::string& theConstraintId,
                         const std::shared_ptr<ModelAPI_Object>& theFirstObject,
                         const std::shared_ptr<ModelAPI_Object>& theSecondObject);
 

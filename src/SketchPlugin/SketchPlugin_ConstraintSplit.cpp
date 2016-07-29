@@ -461,14 +461,14 @@ void SketchPlugin_ConstraintSplit::splitArc(FeaturePtr& theSplitFeature,
                                        (theSplitFeature->attribute(SketchPlugin_Arc::START_ID())));
 
   // additional constraints between split and base features
-  createConstraint(SketchPlugin_ConstraintEqual::ID(), getFeatureResult(aBaseFeature),
+  createConstraintForObjects(SketchPlugin_ConstraintEqual::ID(), getFeatureResult(aBaseFeature),
                                                        getFeatureResult(theSplitFeature));
-  createConstraint(SketchPlugin_ConstraintTangent::ID(), getFeatureResult(theSplitFeature),
+  createConstraintForObjects(SketchPlugin_ConstraintTangent::ID(), getFeatureResult(theSplitFeature),
                                                          getFeatureResult(aBaseFeature));
   if (theAfterFeature.get()) {
-    createConstraint(SketchPlugin_ConstraintEqual::ID(), getFeatureResult(aBaseFeature),
+    createConstraintForObjects(SketchPlugin_ConstraintEqual::ID(), getFeatureResult(aBaseFeature),
                                                          getFeatureResult(theAfterFeature));
-    createConstraint(SketchPlugin_ConstraintTangent::ID(), getFeatureResult(theSplitFeature),
+    createConstraintForObjects(SketchPlugin_ConstraintTangent::ID(), getFeatureResult(theSplitFeature),
                                                          getFeatureResult(theAfterFeature));
   }
 }
@@ -539,7 +539,7 @@ void SketchPlugin_ConstraintSplit::createConstraint(const std::string& theConstr
   aRefAttr->setAttr(theSecondAttribute);
 }
 
-void SketchPlugin_ConstraintSplit::createConstraint(const std::string& theConstraintId,
+void SketchPlugin_ConstraintSplit::createConstraintForObjects(const std::string& theConstraintId,
                                                     const ObjectPtr& theFirstObject,
                                                     const ObjectPtr& theSecondObject)
 {
