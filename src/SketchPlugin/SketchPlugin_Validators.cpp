@@ -110,44 +110,9 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribut
 
 static bool hasCoincidentPoint(FeaturePtr theFeature1, FeaturePtr theFeature2)
 {
-  FeaturePtr aConstrFeature;
-  std::list<AttributePtr> anAttrList;
-  if (theFeature1->getKind() == SketchPlugin_Circle::ID() ||
-      theFeature2->getKind() == SketchPlugin_Circle::ID())
-    return false;
-  if (theFeature2->getKind() == SketchPlugin_Line::ID()) {
-    anAttrList.push_back(theFeature2->attribute(SketchPlugin_Line::START_ID()));
-    anAttrList.push_back(theFeature2->attribute(SketchPlugin_Line::END_ID()));
-  } else if (theFeature2->getKind() == SketchPlugin_Arc::ID()) {
-    anAttrList.push_back(theFeature2->attribute(SketchPlugin_Arc::START_ID()));
-    anAttrList.push_back(theFeature2->attribute(SketchPlugin_Arc::END_ID()));
-  }
-
-  const std::set<AttributePtr>& aRefsList = theFeature1->data()->refsToMe();
-  std::set<AttributePtr>::const_iterator aRefIt = aRefsList.begin();
-  for (; aRefIt != aRefsList.end(); ++aRefIt) {
-    aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIt)->owner());
-    if (aConstrFeature->getKind() != SketchPlugin_ConstraintCoincidence::ID())
-      continue;
-    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*aRefIt);
-    AttributePtr anAttr = aRefAttr->attr();
-    if (anAttr->id() == SketchPlugin_Arc::CENTER_ID())
-      continue;
-
-    anAttr = aConstrFeature->attribute(SketchPlugin_Constraint::ENTITY_A());
-    if (anAttr == *aRefIt)
-      anAttr = aConstrFeature->attribute(SketchPlugin_Constraint::ENTITY_B());
-
-    aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttr);
-    if (!aRefAttr)
-      continue;
-    anAttr = aRefAttr->attr();
-    for (std::list<AttributePtr>::const_iterator anIt = anAttrList.begin();
-         anIt != anAttrList.end(); ++anIt)
-      if (*anIt == anAttr)
-        return true;
-  }
-  return false;
+  FeaturePtr aCoincidenceFeature = SketchPlugin_ConstraintCoincidence::findCoincidenceFeature
+                                                                  (theFeature1, theFeature2);
+  return aCoincidenceFeature.get();
 }
 
 bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute, 

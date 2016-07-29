@@ -17,6 +17,8 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Validator.h>
 
+#include <ModelGeomAlgo_Point2D.h>
+
 #include <Events_Loop.h>
 
 #include <SketcherPrs_Tools.h>
@@ -740,26 +742,9 @@ GeomShapePtr PartSet_Tools::findShapeBy2DPoint(const AttributePtr& theAttribute,
 std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::getPoint(std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                        const std::string& theAttribute)
 {
-  std::shared_ptr<GeomDataAPI_Point2D> aPointAttr;
-
-  if (!theFeature->data())
-    return std::shared_ptr<GeomAPI_Pnt2d>();
-
-  FeaturePtr aFeature;
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = std::dynamic_pointer_cast<
-      ModelAPI_AttributeRefAttr>(theFeature->data()->attribute(theAttribute));
-  if (!anAttr)
-    return std::shared_ptr<GeomAPI_Pnt2d>();
-
-  aFeature = ModelAPI_Feature::feature(anAttr->object());
-
-  if (aFeature && aFeature->getKind() == SketchPlugin_Point::ID())
-    aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aFeature->data()->attribute(SketchPlugin_Point::COORD_ID()));
-
-  else if (anAttr->attr()) {
-    aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
-  }
+  std::shared_ptr<GeomDataAPI_Point2D> aPointAttr = ModelGeomAlgo_Point2D::getPointOfRefAttr(
+                                          theFeature.get(), theAttribute, SketchPlugin_Point::ID(),
+                                          SketchPlugin_Point::COORD_ID());
   if (aPointAttr.get() != NULL)
     return aPointAttr->pnt();
   return std::shared_ptr<GeomAPI_Pnt2d>();

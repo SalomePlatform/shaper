@@ -12,6 +12,8 @@
 #include <SketchPlugin_Sketch.h>
 #include <list>
 
+class GeomDataAPI_Point2D;
+
 /** \class SketchPlugin_ConstraintCoincidence
  *  \ingroup Plugins
  *  \brief Feature for creation of a new constraint which defines equivalence of two points
@@ -43,6 +45,17 @@ class SketchPlugin_ConstraintCoincidence : public SketchPlugin_ConstraintBase
 
   /// \brief Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
+
+  /// Returns coincident feature if there is a coincidence built on the given features
+  /// \param theFeature1 the first feature
+  /// \param theFeature2 the second feature
+  static FeaturePtr findCoincidenceFeature(const FeaturePtr& theFeature1,
+                                           const FeaturePtr& theFeature2);
+
+  /// Returns point of coincidence feature
+  /// \param theFeature a coincidence feature
+  /// \return point 2d attribute. Coincidence always has at least one point 2d attribute
+  static std::shared_ptr<GeomDataAPI_Point2D> getPoint(const FeaturePtr& theFeature);
 
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintCoincidence();
