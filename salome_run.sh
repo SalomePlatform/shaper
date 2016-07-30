@@ -1,7 +1,6 @@
 #!/bin/bash
 
 source env.sh
-source ${TOOLS_DIR}/env_salome.sh
 
 ${TOOLS_DIR}/solver.sh "$@"
 

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 source env.sh
-source env_salome.sh
 
 export PATH=${SHAPER_ROOT_DIR}/bin:${PATH}
 

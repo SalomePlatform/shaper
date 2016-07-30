@@ -2,22 +2,16 @@
 
 # This script uses:
 #
-# INST_ROOT - path of SALOME (env_products.sh)
 # SHAPER_PDIR - path of PRODUCTS for SHAPER (SolveSpace, lcov)
 # SHAPER_ROOT_DIR - path of SHAPER installation
 
-for path in INST_ROOT SHAPER_PDIR SHAPER_ROOT_DIR; do
+for path in SHAPER_PDIR SHAPER_ROOT_DIR; do
   if [[ -z ${!path+x} ]]; then
     echo "${path} not found."; exit 1
   else
     echo "Found ${path}: ${!path}"
   fi
 done
-
-set +u
-echo "Source ${INST_ROOT}/$(cd ${INST_ROOT} && ls *env_products.sh)"
-source ${INST_ROOT}/$(cd ${INST_ROOT} && ls *env_products.sh)
-set -u
 
 #------ SolveSpace ------
 export SOLVESPACE_ROOT_DIR=${SHAPER_PDIR}/solvespace-2.1

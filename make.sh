@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source env.sh
-
 while [[ $# > 0 ]]; do
   key="$1"
 
@@ -15,21 +13,13 @@ while [[ $# > 0 ]]; do
       USE_TEST_COVERAGE=ON
       shift
       ;;
-    standalone|Standalone)
-      MODE=Standalone
-      shift
-      ;;
     *)
       shift
       ;;
   esac
 done
 
-if [[ ${MODE} = 'Standalone' ]]; then
-  source ${TOOLS_DIR}/env_standalone.sh
-else
-  source ${TOOLS_DIR}/env_salome.sh
-fi
+source env.sh
 
 CMAKE_ARGS=""
 CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_BUILD_TYPE=${BUILD_TYPE:-Release}"

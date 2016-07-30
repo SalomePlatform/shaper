@@ -3,7 +3,6 @@
 a_dir=$(dirname $0)
 
 source ${a_dir}/env.sh
-source ${a_dir}/env_salome.sh
 
 set +e -x
 
