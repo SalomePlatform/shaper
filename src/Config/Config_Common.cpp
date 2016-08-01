@@ -62,9 +62,10 @@ bool isAttributeNode(xmlNodePtr theNode)
 
   //it should not be a "source" or a "validator" node
   bool isLogical = isNode(theNode, NODE_SOURCE, NODE_VALIDATOR, NODE_SELFILTER, NULL);
-  bool isPagedContainer = isNode(theNode, WDG_TOOLBOX, WDG_TOOLBOX_BOX,
-                                          WDG_GROUP, WDG_OPTIONALBOX,
-                                          WDG_SWITCH, WDG_SWITCH_CASE,  NULL);
+  // here must be only widgets not connected to attributes
+  bool isPagedContainer = isNode(theNode, WDG_TOOLBOX_BOX,
+                                          WDG_GROUP,
+                                          WDG_SWITCH_CASE,  NULL);
   return !isLogical && !isPagedContainer;
 }
 
