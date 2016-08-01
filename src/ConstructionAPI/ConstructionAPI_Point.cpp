@@ -13,8 +13,8 @@
 
 #include <algorithm>
 
-static GeomAPI_Shape::ShapeType shapeTypeByStr(const std::string& theShapeTypeStr);
-static GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection);
+/*static GeomAPI_Shape::ShapeType shapeTypeByStr(const std::string& theShapeTypeStr);
+static GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection);*/
 
 //==================================================================================================
 ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature)
@@ -35,7 +35,7 @@ ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feat
   }
 }
 
-//==================================================================================================
+/*//==================================================================================================
 ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                              const ModelHighAPI_Selection& theEdge,
                                              const ModelHighAPI_Double& theDistanceValue,
@@ -69,7 +69,7 @@ ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feat
       setByLineAndPlaneIntersection(theObject1, theObject2);
     }
   }
-}
+}*/
 
 //==================================================================================================
 ConstructionAPI_Point::~ConstructionAPI_Point()
@@ -82,7 +82,7 @@ void ConstructionAPI_Point::setByXYZ(const ModelHighAPI_Double& theX,
                                      const ModelHighAPI_Double& theY,
                                      const ModelHighAPI_Double& theZ)
 {
-  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_XYZ(), mycreationMethod);
+  //fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_XYZ(), mycreationMethod);
   fillAttribute(theX, myx);
   fillAttribute(theY, myy);
   fillAttribute(theZ, myz);
@@ -90,7 +90,7 @@ void ConstructionAPI_Point::setByXYZ(const ModelHighAPI_Double& theX,
   execute();
 }
 
-//==================================================================================================
+/*//==================================================================================================
 void ConstructionAPI_Point::setByDistanceOnEdge(const ModelHighAPI_Selection& theEdge,
                                                 const ModelHighAPI_Double& theDistanceValue,
                                                 const bool theDistancePercent,
@@ -136,7 +136,7 @@ void ConstructionAPI_Point::setByLineAndPlaneIntersection(const ModelHighAPI_Sel
   fillAttribute(theFace, myintersectionPlane);
 
   execute();
-}
+}*/
 
 //==================================================================================================
 PointPtr addPoint(const std::shared_ptr<ModelAPI_Document>& thePart,
@@ -149,7 +149,7 @@ PointPtr addPoint(const std::shared_ptr<ModelAPI_Document>& thePart,
   return PointPtr(new ConstructionAPI_Point(aFeature, theX, theY, theZ));
 }
 
-//==================================================================================================
+/*//==================================================================================================
 PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Selection& theEdge,
                   const ModelHighAPI_Double& theDistanceValue,
@@ -229,4 +229,4 @@ GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection
   }
 
   return aShapeType;
-}
+}*/

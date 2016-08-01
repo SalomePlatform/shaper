@@ -35,7 +35,7 @@ public:
                         const ModelHighAPI_Double& theY,
                         const ModelHighAPI_Double& theZ);
 
-  /// Constructor with values.
+  /*/// Constructor with values.
   CONSTRUCTIONAPI_EXPORT
   ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                         const ModelHighAPI_Selection& theEdge,
@@ -47,28 +47,33 @@ public:
   CONSTRUCTIONAPI_EXPORT
   ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                         const ModelHighAPI_Selection& theObject1,
-                        const ModelHighAPI_Selection& theObject2);
+                        const ModelHighAPI_Selection& theObject2);*/
 
   /// Destructor.
   CONSTRUCTIONAPI_EXPORT
   virtual ~ConstructionAPI_Point();
 
-  INTERFACE_14(ConstructionPlugin_Point::ID(),
-               creationMethod, ConstructionPlugin_Point::CREATION_METHOD(), ModelAPI_AttributeString, /** Creation method */,
-               x, ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble, /** X attribute */,
-               y, ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble, /** Y attribute */,
-               z, ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble, /** Z attribute */,
-               edge, ConstructionPlugin_Point::EDGE(), ModelAPI_AttributeSelection, /** Edge attribute */,
-               distanceValue, ConstructionPlugin_Point::DISTANCE_VALUE(), ModelAPI_AttributeDouble, /** Distance value attribute */,
-               distancePercent, ConstructionPlugin_Point::DISTANCE_PERCENT(), ModelAPI_AttributeBoolean, /** Distance percent attribute */,
-               reverse, ConstructionPlugin_Point::REVERSE(), ModelAPI_AttributeBoolean, /** Reverse attribute */,
-               point, ConstructionPlugin_Point::POINT(), ModelAPI_AttributeSelection, /** Point attribute */,
-               plane, ConstructionPlugin_Point::PLANE(), ModelAPI_AttributeSelection, /** Plane attribute */,
-               firstLine, ConstructionPlugin_Point::FIRST_LINE(), ModelAPI_AttributeSelection, /** First line attribute */,
-               secondLine, ConstructionPlugin_Point::SECOND_LINE(), ModelAPI_AttributeSelection, /** Second line attribute */,
-               intersectionLine, ConstructionPlugin_Point::INTERSECTION_LINE(), ModelAPI_AttributeSelection, /** Intersection line attribute */,
-               intersectionPlane, ConstructionPlugin_Point::INTERSECTION_PLANE(), ModelAPI_AttributeSelection, /** Intersection plane attribute */
-  )
+  INTERFACE_3(ConstructionPlugin_Point::ID(),
+              x, ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble, /** X attribute */,
+              y, ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble, /** Y attribute */,
+              z, ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble, /** Z attribute */)
+
+  //INTERFACE_14(ConstructionPlugin_Point::ID(),
+  //             creationMethod, ConstructionPlugin_Point::CREATION_METHOD(), ModelAPI_AttributeString, /** Creation method */,
+  //             x, ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble, /** X attribute */,
+  //             y, ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble, /** Y attribute */,
+  //             z, ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble, /** Z attribute */,
+  //             edge, ConstructionPlugin_Point::EDGE(), ModelAPI_AttributeSelection, /** Edge attribute */,
+  //             distanceValue, ConstructionPlugin_Point::DISTANCE_VALUE(), ModelAPI_AttributeDouble, /** Distance value attribute */,
+  //             distancePercent, ConstructionPlugin_Point::DISTANCE_PERCENT(), ModelAPI_AttributeBoolean, /** Distance percent attribute */,
+  //             reverse, ConstructionPlugin_Point::REVERSE(), ModelAPI_AttributeBoolean, /** Reverse attribute */,
+  //             point, ConstructionPlugin_Point::POINT(), ModelAPI_AttributeSelection, /** Point attribute */,
+  //             plane, ConstructionPlugin_Point::PLANE(), ModelAPI_AttributeSelection, /** Plane attribute */,
+  //             firstLine, ConstructionPlugin_Point::FIRST_LINE(), ModelAPI_AttributeSelection, /** First line attribute */,
+  //             secondLine, ConstructionPlugin_Point::SECOND_LINE(), ModelAPI_AttributeSelection, /** Second line attribute */,
+  //             intersectionLine, ConstructionPlugin_Point::INTERSECTION_LINE(), ModelAPI_AttributeSelection, /** Intersection line attribute */,
+  //             intersectionPlane, ConstructionPlugin_Point::INTERSECTION_PLANE(), ModelAPI_AttributeSelection, /** Intersection plane attribute */
+  //)
 
   /// Set point values.
   CONSTRUCTIONAPI_EXPORT
@@ -76,7 +81,7 @@ public:
                 const ModelHighAPI_Double & theY,
                 const ModelHighAPI_Double & theZ);
 
-  /// Set edge and distance on it for point.
+  /*/// Set edge and distance on it for point.
   CONSTRUCTIONAPI_EXPORT
   void setByDistanceOnEdge(const ModelHighAPI_Selection& theEdge,
                            const ModelHighAPI_Double& theDistanceValue,
@@ -96,7 +101,7 @@ public:
   /// Set line and plane for intersections.
   CONSTRUCTIONAPI_EXPORT
   void setByLineAndPlaneIntersection(const ModelHighAPI_Selection& theEdge,
-                                     const ModelHighAPI_Selection& theFace);
+                                     const ModelHighAPI_Selection& theFace);*/
 };
 
 /// Pointer on Point object.
@@ -110,7 +115,7 @@ PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Double & theY,
                   const ModelHighAPI_Double & theZ);
 
-/// \ingroup CPPHighAPI
+/*/// \ingroup CPPHighAPI
 /// \brief Create Point feature
 CONSTRUCTIONAPI_EXPORT
 PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
@@ -124,6 +129,6 @@ PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
 CONSTRUCTIONAPI_EXPORT
 PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Selection& theObject1,
-                  const ModelHighAPI_Selection& theObject2);
+                  const ModelHighAPI_Selection& theObject2);*/
 
 #endif /* SRC_CONSTRUCTIONAPI_CONSTRUCTIONAPI_POINT_H_ */ 

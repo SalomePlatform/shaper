@@ -33,14 +33,13 @@ const std::string& ConstructionPlugin_Point::getKind()
 //==================================================================================================
 void ConstructionPlugin_Point::initAttributes()
 {
-  data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
+  //data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
 
   data()->addAttribute(X(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(Y(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(Z(), ModelAPI_AttributeDouble::typeId());
 
-/*
-  data()->addAttribute(EDGE(), ModelAPI_AttributeSelection::typeId());
+  /*data()->addAttribute(EDGE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(DISTANCE_VALUE(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(DISTANCE_PERCENT(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(REVERSE(), ModelAPI_AttributeBoolean::typeId());
@@ -52,16 +51,15 @@ void ConstructionPlugin_Point::initAttributes()
   data()->addAttribute(SECOND_LINE(), ModelAPI_AttributeSelection::typeId());
 
   data()->addAttribute(INTERSECTION_LINE(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(INTERSECTION_PLANE(), ModelAPI_AttributeSelection::typeId());
-*/
-  string("creation_method")->setValue("by_xyz");
+  data()->addAttribute(INTERSECTION_PLANE(), ModelAPI_AttributeSelection::typeId());*/
 }
 
 //==================================================================================================
 void ConstructionPlugin_Point::execute()
 {
   GeomShapePtr aShape = createByXYZ();
-/*  GeomShapePtr aShape;
+
+  /*GeomShapePtr aShape;
 
   std::string aCreationMethod = string(CREATION_METHOD())->value();
   if(aCreationMethod == CREATION_METHOD_BY_XYZ()) {
@@ -74,8 +72,8 @@ void ConstructionPlugin_Point::execute()
     aShape = createByLinesIntersection();
   } else if(aCreationMethod == CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION()) {
     aShape = createByLineAndPlaneIntersection();
-  }
-  */
+  }*/
+
   if(!aShape.get()) {
     return;
   }
@@ -104,7 +102,7 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByXYZ()
                                           real(Z())->value());
 }
 
-//==================================================================================================
+/*//==================================================================================================
 std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByDistanceOnEdge()
 {
   // Get edge.
@@ -189,4 +187,4 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByLineAndPlaneIn
   std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aPlaneShape));
 
   return GeomAlgoAPI_PointBuilder::vertexByIntersection(anEdge, aFace);
-}
+}*/

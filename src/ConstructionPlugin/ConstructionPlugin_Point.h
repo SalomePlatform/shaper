@@ -31,7 +31,7 @@ public:
     return CONSTRUCTION_POINT_KIND;
   }
 
-  /// Attribute name for creation method.
+  /*/// Attribute name for creation method.
   inline static const std::string& CREATION_METHOD()
   {
     static const std::string MY_CREATION_METHOD_ID("creation_method");
@@ -71,7 +71,7 @@ public:
   {
     static const std::string MY_CREATION_METHOD_ID("by_line_and_plane_intersection");
     return MY_CREATION_METHOD_ID;
-  }
+  }*/
 
   /// Attribute name for X coordinate.
   inline static const std::string& X()
@@ -94,7 +94,7 @@ public:
     return POINT_ATTR_Z;
   }
 
-  /// Attribute name for selected edge.
+  /*/// Attribute name for selected edge.
   inline static const std::string& EDGE()
   {
     static const std::string ATTR_ID("edge");
@@ -162,7 +162,7 @@ public:
   {
     static const std::string ATTR_ID("intersection_plane");
     return ATTR_ID;
-  }
+  }*/
 
   /// Creates a new part document if needed.
   CONSTRUCTIONPLUGIN_EXPORT virtual void execute();
@@ -182,10 +182,10 @@ public:
 
 private:
   std::shared_ptr<GeomAPI_Vertex> createByXYZ();
-  std::shared_ptr<GeomAPI_Vertex> createByDistanceOnEdge();
+  /*std::shared_ptr<GeomAPI_Vertex> createByDistanceOnEdge();
   std::shared_ptr<GeomAPI_Vertex> createByProjection();
   std::shared_ptr<GeomAPI_Vertex> createByLinesIntersection();
-  std::shared_ptr<GeomAPI_Vertex> createByLineAndPlaneIntersection();
+  std::shared_ptr<GeomAPI_Vertex> createByLineAndPlaneIntersection();*/
 
 };
 
