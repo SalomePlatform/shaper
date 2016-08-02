@@ -107,7 +107,10 @@
                        label="Angle"
                        tooltip="Angle for rotation around axis."
                        icon="icons/Construction/angle.png"
-                       default="0"/>
+                       min="0"
+                       default="45">
+            <validator id="GeomValidators_Positive"/>
+          </doublevalue>
         </box>
       </toolbox>
     </box>

@@ -225,7 +225,7 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByLineAndPoint()
     std::shared_ptr<GeomAPI_Lin> aLin = anEdge->line();
     std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
     std::shared_ptr<GeomAPI_Pln> aNewPln(new GeomAPI_Pln(aPnt, aLin->direction()));
-    int aSize = aLin->distance(aPnt);
+    double aSize = aLin->distance(aPnt);
     aSize *= 2.0;
     aRes = GeomAlgoAPI_FaceBuilder::squareFace(aNewPln, aSize);
   } else {
@@ -248,6 +248,8 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByDistanceFromOth
       aFaceAttr->isInitialized() && aDistAttr->isInitialized()) {
 
     double aDist = aDistAttr->value();
+    bool anIsReverse = boolean(REVERSE())->value();
+    if(anIsReverse) aDist = -aDist;
     GeomShapePtr aShape = aFaceAttr->value();
     if (!aShape.get()) {
       aShape = aFaceAttr->context()->shape();
@@ -309,6 +311,7 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
     aFaceShape = aFaceSelection->context()->shape();
   }
   std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aFaceShape));
+  aFace = makeRectangularFace(aFace, aFace->getPlane());
 
   // Get axis.
   AttributeSelectionPtr anAxisSelection = selection(AXIS());
@@ -325,11 +328,7 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
   double anAngle = real(ANGLE())->value();
 
   GeomAlgoAPI_Rotation aRotationAlgo(aFace, anAxis, anAngle);
-
   std::shared_ptr<GeomAPI_Face> aRes(new GeomAPI_Face(aRotationAlgo.shape()));
-  std::shared_ptr<GeomAPI_Pln> aNewPln = aRes->getPlane();
-
-  aRes = makeRectangularFace(aRes, aNewPln);
 
   return aRes;
 }
