@@ -145,6 +145,13 @@ public:
     return ATTR_ID;
   }
 
+  /// Attribute name for perpendicular flag.
+  inline static const std::string& PERPENDICULAR()
+  {
+    static const std::string ATTR_ID("perpendicular");
+    return ATTR_ID;
+  }
+
   /// Attribute name for selected plane.
   inline static const std::string& PLANE()
   {
@@ -159,11 +166,11 @@ public:
     return ATTR_ID;
   }
 
-  /// Attribute name for reverse in distance from other case
-  inline static const std::string& DISTANCE_REVERSE()
+  /// Attribute name for reverse flag.
+  inline static const std::string& REVERSE()
   {
-    static const std::string ATTR_DISTANCE_REVERSE_ID("distance_reverse");
-    return ATTR_DISTANCE_REVERSE_ID;
+    static const std::string ATTR_ID("reverse");
+    return ATTR_ID;
   }
 
   /// Attribute name for coincident point.

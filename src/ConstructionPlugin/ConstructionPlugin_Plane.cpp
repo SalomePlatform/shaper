@@ -63,12 +63,13 @@ void ConstructionPlugin_Plane::initAttributes()
   // By line and point.
   data()->addAttribute(LINE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(POINT(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(PERPENDICULAR(), ModelAPI_AttributeBoolean::typeId());
 
   // By other plane.
   data()->addAttribute(CREATION_METHOD_BY_OTHER_PLANE_OPTION(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(PLANE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(DISTANCE(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(DISTANCE_REVERSE(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(REVERSE(), ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(COINCIDENT_POINT(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(AXIS(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(ANGLE(), ModelAPI_AttributeDouble::typeId());
@@ -207,9 +208,6 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByLineAndPoint()
     aLineShape = anEdgeSelection->context()->shape();
   }
   std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aLineShape));
-  std::shared_ptr<GeomAPI_Vertex> aV1, aV2;
-  GeomAlgoAPI_ShapeTools::findBounds(anEdge, aV1, aV2);
-
 
   // Get point.
   AttributeSelectionPtr aPointSelection = selection(POINT());
@@ -219,7 +217,22 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByLineAndPoint()
   }
   std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aPointShape));
 
-  GeomShapePtr aRes = faceByThreeVertices(aV1, aV2, aVertex);
+  // Get perpendicular flag.
+  bool anIsPerpendicular= boolean(PERPENDICULAR())->value();
+
+  GeomShapePtr aRes;
+  if(anIsPerpendicular) {
+    std::shared_ptr<GeomAPI_Lin> aLin = anEdge->line();
+    std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
+    std::shared_ptr<GeomAPI_Pln> aNewPln(new GeomAPI_Pln(aPnt, aLin->direction()));
+    int aSize = aLin->distance(aPnt);
+    aSize *= 2.0;
+    aRes = GeomAlgoAPI_FaceBuilder::squareFace(aNewPln, aSize);
+  } else {
+    std::shared_ptr<GeomAPI_Vertex> aV1, aV2;
+    GeomAlgoAPI_ShapeTools::findBounds(anEdge, aV1, aV2);
+    aRes = faceByThreeVertices(aV1, aV2, aVertex);
+  }
 
   return aRes;
 }

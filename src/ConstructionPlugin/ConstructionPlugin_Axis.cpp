@@ -33,7 +33,7 @@
 
 using namespace std;
 
-static const double defaultAxisSize = 50;
+static const double defaultAxisSize = 100;
 
 ConstructionPlugin_Axis::ConstructionPlugin_Axis()
 {
@@ -226,7 +226,7 @@ void ConstructionPlugin_Axis::createAxisByPlaneAndPoint()
     aPnt->translate(aPln->direction(), defaultAxisSize);
   }
 
-  std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aProjPnt, aPnt);
+  std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aPnt, aProjPnt);
 
   ResultConstructionPtr aConstr = document()->createConstruction(data());
   aConstr->setInfinite(true);

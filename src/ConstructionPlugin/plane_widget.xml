@@ -47,6 +47,10 @@
                       shape_types="vertex">
         <validator id="ConstructionPlugin_ValidatorPlaneLinePoint" parameters="line"/>
       </shape_selector>
+      <boolvalue id="perpendicular"
+           label="Perpendicular "
+           tooltip="Makes the plane perpendicular to the selected line."
+           default="false"/>
     </box>
     <box id="by_other_plane"
          title="By other plane"
@@ -68,10 +72,13 @@
                        label="Distance"
                        tooltip="Distance from selected face to plane."
                        icon="icons/Construction/distance_value.png"
-                       default="10"/>
-          <boolvalue id="distance_reverse"
+                       min="0"
+                       default="10">
+            <validator id="GeomValidators_Positive"/>
+          </doublevalue>
+          <boolvalue id="reverse"
                      label="Reverse"
-                     tooltip="Distance from plane."
+                     tooltip="Checked means on the other side of the selected plane."
                      default="false"/>
         </box>
         <box id="by_coincident_to_point"
