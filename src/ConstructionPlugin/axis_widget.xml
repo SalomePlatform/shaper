@@ -4,6 +4,11 @@
 
 <source>
   <toolbox id="CreationMethod">
+    <box id="AxisByDimensionsCase" title="By three dimensions" icon="icons/Construction/axis_dxyz_32x32.png">
+      <doublevalue id="DX" label="DX " tooltip="X dimension" default="0"/>
+      <doublevalue id="DY" label="DY " tooltip="Y dimension" default="0"/>
+      <doublevalue id="DZ" label="DZ " tooltip="Z dimension" default="10"/>
+    </box>
     <box id="AxisByPointsCase" title="By two points" icon="icons/Construction/by_two_points_32x32.png">
       <shape_selector id="FirstPoint"
         label="First point"
@@ -23,20 +28,6 @@
         <validator id="GeomValidators_DifferentShapes"/>
       </shape_selector>
     </box>
-    <box id="AxisByCylindricalFaceCase" title="As axis of cylindrical face" icon="icons/Construction/cylindrical_face_32x32.png">
-      <shape_selector id="CylindricalFace"
-        label="Main object" 
-        icon="icons/Construction/circle.png" 
-        tooltip="Select a cylindrical object"
-        shape_types="face">
-        <validator id="GeomValidators_Face" parameters="cylinder"/>
-      </shape_selector>
-    </box>
-    <box id="AxisByDimensionsCase" title="By three dimensions" icon="icons/Construction/axis_dxyz_32x32.png">
-      <doublevalue id="DX" label="DX " tooltip="X dimension" default="0"/>
-      <doublevalue id="DY" label="DY " tooltip="Y dimension" default="0"/>
-      <doublevalue id="DZ" label="DZ " tooltip="Z dimension" default="10"/>
-    </box>
     <box id="by_line" title="By line" icon="icons/Construction/axis_by_line_32x32.png">
       <shape_selector id="line"
                       label="Line"
@@ -44,6 +35,15 @@
                       icon="icons/Construction/edge.png"
                       shape_types="edge">
         <validator id="GeomValidators_ShapeType" parameters="line"/>
+      </shape_selector>
+    </box>
+    <box id="AxisByCylindricalFaceCase" title="As axis of cylindrical face" icon="icons/Construction/cylindrical_face_32x32.png">
+      <shape_selector id="CylindricalFace"
+        label="Main object" 
+        icon="icons/Construction/circle.png" 
+        tooltip="Select a cylindrical object"
+        shape_types="face">
+        <validator id="GeomValidators_Face" parameters="cylinder"/>
       </shape_selector>
     </box>
     <box id="by_plane_and_point" title="By plane and point" icon="icons/Construction/axis_by_plane_and_point_32x32.png">

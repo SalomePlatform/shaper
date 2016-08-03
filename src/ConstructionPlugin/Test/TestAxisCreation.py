@@ -8,6 +8,8 @@ from GeomAPI import *
 import math
 from ModelAPI import *
 
+import model
+
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
 
@@ -134,3 +136,55 @@ aSession.finishOperation()
 assert (len(anAxisFeature.results()) > 0)
 anAxisResult = modelAPI_ResultConstruction(anAxisFeature.firstResult())
 assert (anAxisResult is not None)
+
+# Create a sketch with line
+aSession.startOperation()
+anOrigin = GeomAPI_Pnt(0, 0, 0)
+aDirX = GeomAPI_Dir(1, 0, 0)
+aNorm = GeomAPI_Dir(0, 0, 1)
+aSketch = model.addSketch(aPart, GeomAPI_Ax3(anOrigin, aDirX, aNorm))
+aSketchLine = aSketch.addLine(0, 0, 100, 100)
+aSession.finishOperation()
+
+# Test an axis by line
+aSession.startOperation()
+anAxis = model.addAxis(aPart, aSketchLine.result()[0])
+aSession.finishOperation()
+assert (len(anAxis.result()) > 0)
+
+# Create plane
+aSession.startOperation()
+aPlane1 = model.addPlane(aPart, 1, 1, 1, 0)
+aSession.finishOperation()
+
+# Create a sketch with point
+aSession.startOperation()
+anOrigin = GeomAPI_Pnt(0, 0, 0)
+aDirX = GeomAPI_Dir(1, 0, 0)
+aNorm = GeomAPI_Dir(0, 0, 1)
+aSketch = model.addSketch(aPart, GeomAPI_Ax3(anOrigin, aDirX, aNorm))
+aSketchPoint = aSketch.addPoint(50, 50)
+aSession.finishOperation()
+
+# Test an axis by plane and point
+aSession.startOperation()
+anAxis = model.addAxis(aPart, aPlane1.result()[0], aSketchPoint.result()[0])
+aSession.finishOperation()
+assert (len(anAxis.result()) > 0)
+
+# Create plane
+aSession.startOperation()
+aPlane2 = model.addPlane(aPart, 0, 1, 1, 0)
+aSession.finishOperation()
+
+# Test an axis by two planes
+aSession.startOperation()
+anAxis = model.addAxis(aPart, aPlane1.result()[0], aPlane2.result()[0])
+aSession.finishOperation()
+assert (len(anAxis.result()) > 0)
+
+# Test an axis by two planes and offsets
+aSession.startOperation()
+anAxis = model.addAxis(aPart, aPlane1.result()[0], 50, False, aPlane2.result()[0], 100, True)
+aSession.finishOperation()
+assert (len(anAxis.result()) > 0)

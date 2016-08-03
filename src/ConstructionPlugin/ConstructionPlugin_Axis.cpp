@@ -291,13 +291,13 @@ void ConstructionPlugin_Axis::execute()
 {
   AttributeStringPtr aMethodTypeAttr = string(ConstructionPlugin_Axis::METHOD());
   std::string aMethodType = aMethodTypeAttr->value();
-  if (aMethodType == "AxisByPointsCase") {
+  if (aMethodType == CREATION_METHOD_BY_TWO_POINTS()) {
     createAxisByTwoPoints();
-  } else if (aMethodType == "AxisByCylindricalFaceCase") {
+  } else if (aMethodType == CREATION_METHOD_BY_CYLINDRICAL_FACE()) {
     createAxisByCylindricalFace();
-  } else if (aMethodType == "AxisByPointAndDirection") {
+  } else if (aMethodType == CREATION_METHOD_BY_POINT_AND_DIRECTION()) {
     createAxisByPointAndDirection();
-  } else if (aMethodType == "AxisByDimensionsCase") {
+  } else if (aMethodType == CREATION_METHOD_BY_DIMENSIONS()) {
     createAxisByDimensions();
   } else if(aMethodType == CREATION_METHOD_BY_LINE()) {
     createAxisByLine();

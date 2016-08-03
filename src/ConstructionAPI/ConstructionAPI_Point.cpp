@@ -11,11 +11,6 @@
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 
-#include <algorithm>
-
-/*static GeomAPI_Shape::ShapeType shapeTypeByStr(const std::string& theShapeTypeStr);
-static GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection);*/
-
 //==================================================================================================
 ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
@@ -169,64 +164,4 @@ PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
   // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Point::ID());
   return PointPtr(new ConstructionAPI_Point(aFeature, theObject1, theObject2));
-}
-
-//==================================================================================================
-GeomAPI_Shape::ShapeType shapeTypeByStr(const std::string& theShapeTypeStr)
-{
-  GeomAPI_Shape::ShapeType aShapeType = GeomAPI_Shape::SHAPE;
-
-  std::string aShapeTypeStr = theShapeTypeStr;
-  std::transform(aShapeTypeStr.begin(), aShapeTypeStr.end(), aShapeTypeStr.begin(), ::tolower);
-
-  if(theShapeTypeStr == "compound") {
-    aShapeType = GeomAPI_Shape::COMPOUND;
-  } else if(theShapeTypeStr == "compsolid") {
-    aShapeType = GeomAPI_Shape::COMPSOLID;
-  } else if(theShapeTypeStr == "solid") {
-    aShapeType = GeomAPI_Shape::SOLID;
-  } else if(theShapeTypeStr == "shell") {
-    aShapeType = GeomAPI_Shape::SHELL;
-  } else if(theShapeTypeStr == "face") {
-    aShapeType = GeomAPI_Shape::FACE;
-  } else if(theShapeTypeStr == "wire") {
-    aShapeType = GeomAPI_Shape::WIRE;
-  } else if(theShapeTypeStr == "edge") {
-    aShapeType = GeomAPI_Shape::EDGE;
-  } else if(theShapeTypeStr == "vertex") {
-    aShapeType = GeomAPI_Shape::VERTEX;
-  } else if(theShapeTypeStr == "shape") {
-    aShapeType = GeomAPI_Shape::SHAPE;
-  }
-
-  return aShapeType;
-}
-
-//==================================================================================================
-GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection)
-{
-  GeomAPI_Shape::ShapeType aShapeType = GeomAPI_Shape::SHAPE;
-
-  switch(theSelection.variantType()) {
-    case ModelHighAPI_Selection::VT_ResultSubShapePair: {
-      ResultSubShapePair aPair = theSelection.resultSubShapePair();
-      GeomShapePtr aShape = aPair.second;
-      if(!aShape.get()) {
-        aShape = aPair.first->shape();
-      }
-      if(!aShape.get()) {
-        return aShapeType;
-      }
-      aShapeType = aShape->shapeType();
-      break;
-    }
-    case ModelHighAPI_Selection::VT_TypeSubShapeNamePair: {
-      TypeSubShapeNamePair aPair = theSelection.typeSubShapeNamePair();
-      std::string aType = aPair.first;
-      aShapeType = shapeTypeByStr(aType);
-      break;
-    }
-  }
-
-  return aShapeType;
 }*/

@@ -43,6 +43,34 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
   }
 
   /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_TWO_POINTS()
+  {
+    static const std::string METHOD_ATTR("AxisByPointsCase");
+    return METHOD_ATTR;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_CYLINDRICAL_FACE()
+  {
+    static const std::string METHOD_ATTR("AxisByCylindricalFaceCase");
+    return METHOD_ATTR;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_POINT_AND_DIRECTION()
+  {
+    static const std::string METHOD_ATTR("AxisByPointAndDirection");
+    return METHOD_ATTR;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_DIMENSIONS()
+  {
+    static const std::string METHOD_ATTR("AxisByDimensionsCase");
+    return METHOD_ATTR;
+  }
+
+  /// Attribute name for creation method.
   inline static const std::string& CREATION_METHOD_BY_LINE()
   {
     static const std::string METHOD_ATTR("by_line");

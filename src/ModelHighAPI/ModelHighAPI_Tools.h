@@ -10,6 +10,8 @@
 //--------------------------------------------------------------------------------------
 #include "ModelHighAPI.h"
 
+#include <GeomAPI_Shape.h>
+
 #include <list>
 #include <memory>
 #include <string>
@@ -104,6 +106,12 @@ void fillAttribute(const std::string & theValue,
 MODELHIGHAPI_EXPORT
 void fillAttribute(const char * theValue,
                    const std::shared_ptr<ModelAPI_AttributeString> & theAttribute);
+
+MODELHIGHAPI_EXPORT
+GeomAPI_Shape::ShapeType shapeTypeByStr(const std::string& theShapeTypeStr);
+
+MODELHIGHAPI_EXPORT
+GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection);
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------

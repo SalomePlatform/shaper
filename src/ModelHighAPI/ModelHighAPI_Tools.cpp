@@ -33,6 +33,8 @@
 #include "ModelHighAPI_RefAttr.h"
 #include "ModelHighAPI_Selection.h"
 
+#include <algorithm>
+
 //--------------------------------------------------------------------------------------
 void fillAttribute(const std::shared_ptr<GeomAPI_Pnt2d> & theValue,
                    const std::shared_ptr<GeomDataAPI_Point2D> & theAttribute)
@@ -144,6 +146,66 @@ void fillAttribute(const char * theValue,
                    const std::shared_ptr<ModelAPI_AttributeString> & theAttribute)
 {
   theAttribute->setValue(theValue);
+}
+
+//==================================================================================================
+GeomAPI_Shape::ShapeType shapeTypeByStr(const std::string& theShapeTypeStr)
+{
+  GeomAPI_Shape::ShapeType aShapeType = GeomAPI_Shape::SHAPE;
+
+  std::string aShapeTypeStr = theShapeTypeStr;
+  std::transform(aShapeTypeStr.begin(), aShapeTypeStr.end(), aShapeTypeStr.begin(), ::tolower);
+
+  if(theShapeTypeStr == "compound") {
+    aShapeType = GeomAPI_Shape::COMPOUND;
+  } else if(theShapeTypeStr == "compsolid") {
+    aShapeType = GeomAPI_Shape::COMPSOLID;
+  } else if(theShapeTypeStr == "solid") {
+    aShapeType = GeomAPI_Shape::SOLID;
+  } else if(theShapeTypeStr == "shell") {
+    aShapeType = GeomAPI_Shape::SHELL;
+  } else if(theShapeTypeStr == "face") {
+    aShapeType = GeomAPI_Shape::FACE;
+  } else if(theShapeTypeStr == "wire") {
+    aShapeType = GeomAPI_Shape::WIRE;
+  } else if(theShapeTypeStr == "edge") {
+    aShapeType = GeomAPI_Shape::EDGE;
+  } else if(theShapeTypeStr == "vertex") {
+    aShapeType = GeomAPI_Shape::VERTEX;
+  } else if(theShapeTypeStr == "shape") {
+    aShapeType = GeomAPI_Shape::SHAPE;
+  }
+
+  return aShapeType;
+}
+
+//==================================================================================================
+GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection)
+{
+  GeomAPI_Shape::ShapeType aShapeType = GeomAPI_Shape::SHAPE;
+
+  switch(theSelection.variantType()) {
+    case ModelHighAPI_Selection::VT_ResultSubShapePair: {
+      ResultSubShapePair aPair = theSelection.resultSubShapePair();
+      GeomShapePtr aShape = aPair.second;
+      if(!aShape.get()) {
+        aShape = aPair.first->shape();
+      }
+      if(!aShape.get()) {
+        return aShapeType;
+      }
+      aShapeType = aShape->shapeType();
+      break;
+    }
+    case ModelHighAPI_Selection::VT_TypeSubShapeNamePair: {
+      TypeSubShapeNamePair aPair = theSelection.typeSubShapeNamePair();
+      std::string aType = aPair.first;
+      aShapeType = shapeTypeByStr(aType);
+      break;
+    }
+  }
+
+  return aShapeType;
 }
 
 //--------------------------------------------------------------------------------------
