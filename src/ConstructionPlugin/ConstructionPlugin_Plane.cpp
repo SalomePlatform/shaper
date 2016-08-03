@@ -103,6 +103,9 @@ void ConstructionPlugin_Plane::execute()
     }
   } else if(aCreationMethod == CREATION_METHOD_BY_TWO_PARALLEL_PLANES()) {
     aShape = createByTwoParallelPlanes();
+  } else {
+    setError("Error: Plane creation method \"" + aCreationMethod + "\" not supported.");
+    return;
   }
 
   if(!aShape.get()) {
