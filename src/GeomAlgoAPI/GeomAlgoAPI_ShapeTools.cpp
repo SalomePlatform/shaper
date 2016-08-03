@@ -419,33 +419,33 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::faceToInfinitePlane(const
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::fitPlaneToBox(const std::shared_ptr<GeomAPI_Shape> thePlane,
-                                                                     const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints)
+std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_ShapeTools::fitPlaneToBox(const std::shared_ptr<GeomAPI_Shape> thePlane,
+                                                                    const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints)
 {
-  std::shared_ptr<GeomAPI_Shape> aResultShape;
+  std::shared_ptr<GeomAPI_Face> aResultFace;
 
   if(!thePlane.get()) {
-    return aResultShape;
+    return aResultFace;
   }
 
   const TopoDS_Shape& aShape = thePlane->impl<TopoDS_Shape>();
   if(aShape.ShapeType() != TopAbs_FACE) {
-    return aResultShape;
+    return aResultFace;
   }
 
   TopoDS_Face aFace = TopoDS::Face(aShape);
   Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace);
   if(aSurf.IsNull()) {
-    return aResultShape;
+    return aResultFace;
   }
 
   GeomLib_IsPlanarSurface isPlanar(aSurf);
   if(!isPlanar.IsPlanar()) {
-    return aResultShape;
+    return aResultFace;
   }
 
   if(thePoints.size() != 8) {
-    return aResultShape;
+    return aResultFace;
   }
 
   const gp_Pln& aFacePln = isPlanar.Plan();
@@ -465,10 +465,10 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::fitPlaneToBox(const std::
     if(aPntV < VMin) VMin = aPntV;
     if(aPntV > VMax) VMax = aPntV;
   }
-  aResultShape.reset(new GeomAPI_Shape);
-  aResultShape->setImpl(new TopoDS_Shape(BRepLib_MakeFace(aFacePln, UMin, UMax, VMin, VMax).Face()));
+  aResultFace.reset(new GeomAPI_Face());
+  aResultFace->setImpl(new TopoDS_Face(BRepLib_MakeFace(aFacePln, UMin, UMax, VMin, VMax).Face()));
 
-  return aResultShape;
+  return aResultFace;
 }
 
 //==================================================================================================

@@ -43,7 +43,7 @@
   }
 }
 %typecheck(SWIG_TYPECHECK_POINTER) ModelHighAPI_Double, const ModelHighAPI_Double & {
-  $1 = (PyFloat_Check($input) || PyInt_Check($input) || PyLong_Check($input) || PyString_Check($input)) ? 1 : 0;
+  $1 = ((PyFloat_Check($input) || PyInt_Check($input) || PyLong_Check($input) || PyString_Check($input)) && !PyBool_Check($input)) ? 1 : 0;
 }
 
 %typemap(in) const ModelHighAPI_Integer & (ModelHighAPI_Integer temp) {
@@ -60,7 +60,7 @@
   }
 }
 %typecheck(SWIG_TYPECHECK_POINTER) ModelHighAPI_Integer, const ModelHighAPI_Integer & {
-  $1 = (PyInt_Check($input) || PyString_Check($input)) ? 1 : 0;
+  $1 = ((PyInt_Check($input) || PyString_Check($input)) && !PyBool_Check($input)) ? 1 : 0;
 }
 
 %typemap(in) const ModelHighAPI_RefAttr & (ModelHighAPI_RefAttr temp) {

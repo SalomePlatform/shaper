@@ -23,6 +23,7 @@
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
+#include <GeomAPI_Face.h>
 #include <GeomAPI_ShapeIterator.h>
 
 #include <sstream>

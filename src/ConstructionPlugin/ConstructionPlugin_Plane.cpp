@@ -14,6 +14,7 @@
 
 #include <GeomAPI_Ax1.h>
 #include <GeomAPI_Edge.h>
+#include <GeomAPI_Face.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Pnt.h>

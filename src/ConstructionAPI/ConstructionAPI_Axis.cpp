@@ -26,9 +26,9 @@ ConstructionAPI_Axis::ConstructionAPI_Axis(const std::shared_ptr<ModelAPI_Featur
     GeomAPI_Shape::ShapeType aType2 = getShapeType(theObject2);
     if(aType1 == GeomAPI_Shape::VERTEX && aType2 == GeomAPI_Shape::VERTEX) {
       setByPoints(theObject1, theObject2);
-    } else if (aType1 == GeomAPI_Shape::FACE && aType2 == GeomAPI_Shape::VERTEX) {
+    } else if(aType1 == GeomAPI_Shape::FACE && aType2 == GeomAPI_Shape::VERTEX) {
       setByPlaneAndPoint(theObject1, theObject2);
-    } else if (aType1 == GeomAPI_Shape::FACE && aType2 == GeomAPI_Shape::FACE) {
+    } else if(aType1 == GeomAPI_Shape::FACE && aType2 == GeomAPI_Shape::FACE) {
       setByTwoPlanes(theObject1, theObject2);
     }
   }

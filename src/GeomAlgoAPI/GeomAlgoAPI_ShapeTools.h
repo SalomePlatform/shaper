@@ -62,8 +62,8 @@ public:
   /// \return plane that fits to bounding box.
   /// \param[in] thePlane base plane.
   /// \param[in] thePoints bounding box points (shoud be eight).
-  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> fitPlaneToBox(const std::shared_ptr<GeomAPI_Shape> thePlane,
-                                                                         const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints);
+  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Face> fitPlaneToBox(const std::shared_ptr<GeomAPI_Shape> thePlane,
+                                                                        const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints);
 
   /// \brief Finds the start and end vertices of theShape. theShape can be of the following type:\n
   /// Vertex: theV1 and theV2 are the same and equal to theShape;\n
