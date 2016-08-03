@@ -1,5 +1,12 @@
 /* ModelHighAPI.i */
-%module ModelHighAPI
+%module(directors="1") ModelHighAPI
+%feature("director:except") {
+    if ($error != NULL) {
+      PyErr_Print();
+      std::cerr << std::endl;
+      throw Swig::DirectorMethodException();
+    }
+}
 
 %{
   #include "ModelHighAPI_swig.h"
@@ -23,6 +30,9 @@
 %include "std_list.i"
 %include "std_string.i"
 %include "std_shared_ptr.i"
+
+// directors
+%feature("director") ModelHighAPI_Dumper;
 
 // shared pointers
 %shared_ptr(ModelHighAPI_Interface)
@@ -180,6 +190,7 @@
 
 // all supported interfaces
 %include "ModelHighAPI_Double.h"
+%include "ModelHighAPI_Dumper.h"
 %include "ModelHighAPI_Integer.h"
 %include "ModelHighAPI_Interface.h"
 %include "ModelHighAPI_RefAttr.h"

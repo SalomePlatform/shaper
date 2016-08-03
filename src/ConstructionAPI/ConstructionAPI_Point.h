@@ -102,6 +102,10 @@ public:
   CONSTRUCTIONAPI_EXPORT
   void setByLineAndPlaneIntersection(const ModelHighAPI_Selection& theEdge,
                                      const ModelHighAPI_Selection& theFace);*/
+
+  /// Dump wrapped feature
+  CONSTRUCTIONAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Point object.

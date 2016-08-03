@@ -14,6 +14,8 @@
 #include <string>
 //--------------------------------------------------------------------------------------
 class GeomAPI_Ax3;
+class GeomAPI_Dir;
+class GeomAPI_Pnt;
 class ModelAPI_Document;
 //--------------------------------------------------------------------------------------
 /// Return the main document (the Partset) created or open from the Modeler.
@@ -34,6 +36,12 @@ std::shared_ptr<ModelAPI_Document> activeDocument();
  */
 MODELHIGHAPI_EXPORT
 std::shared_ptr<GeomAPI_Ax3> defaultPlane(const std::string & theName);
+
+/// Return name of coordinate plane ("XOY", "XOZ" or "YOZ") or empty string for other planes.
+MODELHIGHAPI_EXPORT
+std::string defaultPlane(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
+                         const std::shared_ptr<GeomAPI_Dir>& theNormal,
+                         const std::shared_ptr<GeomAPI_Dir>& theDirX);
 
 /** Start a data structure transaction.
  *

@@ -18,6 +18,7 @@
 class ModelAPI_Feature;
 class ModelAPI_Result;
 class ModelHighAPI_Selection;
+class ModelHighAPI_Dumper;
 //--------------------------------------------------------------------------------------
 /**\class ModelHighAPI_Interface
  * \ingroup CPPHighAPI
@@ -57,6 +58,10 @@ public:
   /// Throw exception to event loop
   MODELHIGHAPI_EXPORT
   void throwException(const std::string & theDescription);
+
+  /// Dump wrapped feature
+  MODELHIGHAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const {}
 
 protected:
   std::shared_ptr<ModelAPI_Feature> myFeature;

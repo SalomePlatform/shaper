@@ -9,6 +9,7 @@
 //--------------------------------------------------------------------------------------
 #include <GeomAPI_Pnt2d.h>
 //--------------------------------------------------------------------------------------
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
@@ -96,3 +97,20 @@ void SketchAPI_Point::setByExternalName(const std::string & theExternalName)
 }
 
 //--------------------------------------------------------------------------------------
+
+void SketchAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aSketchName = theDumper.parentName(aBase);
+
+  AttributeSelectionPtr anExternal = aBase->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+  if (anExternal->value()) {
+    // point is external
+    theDumper << aBase << " = " << aSketchName << ".addPoint(" << anExternal << ")" << std::endl;
+  } else {
+    // point given by coordinates
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aBase->attribute(SketchPlugin_Point::COORD_ID()));
+    theDumper << aBase << " = " << aSketchName << ".addPoint(" << aPoint << ")" << std::endl;
+  }
+}

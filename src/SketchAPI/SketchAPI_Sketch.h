@@ -333,6 +333,10 @@ public:
   SKETCHAPI_EXPORT
   std::list<ModelHighAPI_Selection> selectFace() const;
 
+  /// Dump wrapped feature
+  SKETCHAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
 protected:
   std::shared_ptr<ModelAPI_CompositeFeature> compositeFeature() const;
 

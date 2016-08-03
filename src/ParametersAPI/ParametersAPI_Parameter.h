@@ -43,6 +43,10 @@ public:
               comment, ParametersPlugin_Parameter::COMMENT_ID(), ModelAPI_AttributeString, /** Comment */
   )
 
+  /// Dump wrapped feature
+  PARAMETERSAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
 };
 
 //! Pointer on Parameter object

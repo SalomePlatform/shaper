@@ -36,6 +36,10 @@ public:
   /// Return document
   PARTSETAPI_EXPORT
   std::shared_ptr<ModelAPI_Document> document() const;
+
+  /// Dump wrapped feature
+  PARTSETAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 //! Pointer on Part object

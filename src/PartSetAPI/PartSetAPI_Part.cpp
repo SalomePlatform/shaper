@@ -8,6 +8,7 @@
 #include "PartSetAPI_Part.h"
 //--------------------------------------------------------------------------------------
 #include <ModelAPI_ResultPart.h>
+#include <ModelHighAPI_Dumper.h>
 //--------------------------------------------------------------------------------------
 #include <PartSetPlugin_Duplicate.h>
 #include <PartSetPlugin_Remove.h>
@@ -27,6 +28,14 @@ PartSetAPI_Part::~PartSetAPI_Part()
 std::shared_ptr<ModelAPI_Document> PartSetAPI_Part::document() const
 {
   return std::dynamic_pointer_cast<ModelAPI_ResultPart>(defaultResult())->partDoc();
+}
+
+void PartSetAPI_Part::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  theDumper << aBase << " = model.addPart(" << aDocName << ").document()" << std::endl;
 }
 
 //--------------------------------------------------------------------------------------

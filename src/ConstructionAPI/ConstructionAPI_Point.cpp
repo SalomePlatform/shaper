@@ -8,6 +8,7 @@
 
 #include <GeomAPI_Shape.h>
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 
@@ -132,6 +133,21 @@ void ConstructionAPI_Point::setByLineAndPlaneIntersection(const ModelHighAPI_Sel
 
   execute();
 }*/
+
+//==================================================================================================
+void ConstructionAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  // TODO: all types of points
+
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  AttributeDoublePtr anAttrX = aBase->real(ConstructionPlugin_Point::X());
+  AttributeDoublePtr anAttrY = aBase->real(ConstructionPlugin_Point::Y());
+  AttributeDoublePtr anAttrZ = aBase->real(ConstructionPlugin_Point::Z());
+  theDumper << aBase << " = model.addPoint(" << aDocName << ", "
+            << anAttrX << ", " << anAttrY << ", " << anAttrZ << ")" << std::endl;
+}
 
 //==================================================================================================
 PointPtr addPoint(const std::shared_ptr<ModelAPI_Document>& thePart,

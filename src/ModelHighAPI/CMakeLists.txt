@@ -5,6 +5,7 @@ INCLUDE(Common)
 SET(PROJECT_HEADERS
   ModelHighAPI.h
   ModelHighAPI_Double.h
+  ModelHighAPI_Dumper.h
   ModelHighAPI_Integer.h
   ModelHighAPI_Interface.h
   ModelHighAPI_Macro.h
@@ -17,6 +18,7 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_SOURCES
   ModelHighAPI_Double.cpp
+  ModelHighAPI_Dumper.cpp
   ModelHighAPI_Integer.cpp
   ModelHighAPI_Interface.cpp
   ModelHighAPI_RefAttr.cpp
@@ -34,7 +36,7 @@ SET(PROJECT_LIBRARIES
   ModelAPI
 )
 
-ADD_DEFINITIONS(-DMODELHIGHAPI_EXPORTS)
+ADD_DEFINITIONS(-DMODELHIGHAPI_EXPORTS -DWNT)
 ADD_LIBRARY(ModelHighAPI SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
 #TODO(spo): is it necessary?
 SET_TARGET_PROPERTIES(ModelHighAPI PROPERTIES LINKER_LANGUAGE CXX)
@@ -57,6 +59,8 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/GeomAPI
   ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
   ${PROJECT_SOURCE_DIR}/src/ModelAPI
+  ${PROJECT_SOURCE_DIR}/src/PartSetPlugin
+  ${CAS_INCLUDE_DIRS}
 )
 
 set(SWIG_MODULE_ModelHighAPI_EXTRA_DEPS

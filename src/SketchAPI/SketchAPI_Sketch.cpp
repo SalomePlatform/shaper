@@ -27,8 +27,10 @@
 //--------------------------------------------------------------------------------------
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_RefAttr.h>
 #include <ModelHighAPI_Selection.h>
+#include <ModelHighAPI_Services.h>
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 #include "SketchAPI_Arc.h"
@@ -572,3 +574,46 @@ std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setVertical(
 }
 
 //--------------------------------------------------------------------------------------
+
+void SketchAPI_Sketch::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  AttributeSelectionPtr anExternal = aBase->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+  if (anExternal->value()) {
+    FeaturePtr aPlnFeature = ModelAPI_Feature::feature(anExternal->context()->data()->owner());
+    const std::string& aPlaneName = theDumper.name(aPlnFeature);
+    theDumper << aBase << " = model.addSketch(" << aDocName << ", \"" << aPlaneName << "\")" << std::endl;
+  } else {
+    // Sketch is base on a plane.
+    std::shared_ptr<GeomAPI_Pnt> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+        aBase->attribute(SketchPlugin_Sketch::ORIGIN_ID()))->pnt();
+    std::shared_ptr<GeomAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        aBase->attribute(SketchPlugin_Sketch::NORM_ID()))->dir();
+    std::shared_ptr<GeomAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        aBase->attribute(SketchPlugin_Sketch::DIRX_ID()))->dir();
+
+    // Check the plane is coordinate plane
+    std::string aPlaneName = defaultPlane(anOrigin, aNormal, aDirX);
+    if (aPlaneName.empty()) {
+      // needs import additional module
+      theDumper.importModule("GeomAPI");
+      // dump plane parameters
+      const std::string& aSketchName = theDumper.name(aBase);
+      std::string anOriginName = aSketchName + "_origin";
+      std::string aNormalName  = aSketchName + "_norm";
+      std::string aDirXName    = aSketchName + "_dirx";
+      theDumper << anOriginName << " = " << anOrigin << std::endl
+                << aNormalName  << " = " << aNormal  << std::endl
+                << aDirXName    << " = " << aDirX    << std::endl;
+      // dump sketch based on arbitrary plane
+      theDumper << aBase << " = model.addSketch(" << aDocName << ", GeomAPI_Ax3("
+                << anOriginName << ", " << aDirXName << ", " << aNormalName << "))" << std::endl;
+    } else {
+      // dump sketch based on coordinate plane
+      theDumper << aBase << " = model.addSketch(" << aDocName
+                << ", model.defaultPlane(\"" << aPlaneName << "\"))" << std::endl;
+    }
+  }
+}

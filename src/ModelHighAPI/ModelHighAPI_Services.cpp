@@ -11,6 +11,8 @@
 #include <GeomAPI_Pnt.h>
 #include <ModelAPI_Session.h>
 
+#include <cmath>
+
 //--------------------------------------------------------------------------------------
 std::shared_ptr<ModelAPI_Document> moduleDocument()
 {
@@ -40,6 +42,32 @@ std::shared_ptr<GeomAPI_Ax3> defaultPlane( const std::string& theName )
   }
 
   return std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(o, x, n));
+}
+
+std::string defaultPlane(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
+                         const std::shared_ptr<GeomAPI_Dir>& theNormal,
+                         const std::shared_ptr<GeomAPI_Dir>& theDirX)
+{
+  static const double aTol = 1.e-10;
+
+  if (fabs(theOrigin->x()) > aTol || fabs(theOrigin->y()) > aTol || fabs(theOrigin->z()) > aTol)
+    return std::string();
+
+  // XOY or XOZ
+  if (fabs(theNormal->x()) < aTol && 
+      fabs(theDirX->x() - 1.0) < aTol && fabs(theDirX->y()) < aTol && fabs(theDirX->z()) < aTol) {
+    // XOY
+    if (fabs(theNormal->y()) < aTol && fabs(theNormal->z() - 1.0) < aTol)
+      return std::string("XOY");
+    else if (fabs(theNormal->y() + 1.0) < aTol && fabs(theNormal->z()) < aTol)
+      return std::string("XOZ");
+  }
+  // YOZ
+  else if (fabs(theNormal->x() - 1.0) < aTol && fabs(theNormal->y()) < aTol && fabs(theNormal->z()) < aTol &&
+           fabs(theDirX->x()) < aTol && fabs(theDirX->y() - 1.0) < aTol && fabs(theDirX->z()) < aTol)
+    return std::string("YOZ");
+
+  return std::string();
 }
 
 //--------------------------------------------------------------------------------------
