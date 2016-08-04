@@ -10,4 +10,5 @@ from FeaturesAPI import addPartition
 from FeaturesAPI import addExtrusion, addExtrusionCut, addExtrusionFuse
 from FeaturesAPI import addRevolution, addRevolutionCut, addRevolutionFuse
 
-from FeaturesAPI import addGroup
+from FeaturesAPI import addGroup, addRecover
+

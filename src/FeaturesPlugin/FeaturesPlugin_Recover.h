@@ -17,25 +17,40 @@
  */
 class FeaturesPlugin_Recover : public ModelAPI_Feature
 {
+  /// List of already registered unconcealed pairs of unconcealed result and feature that caused
+  /// concealment. If attributes of this feature were changed, this list helps to synchronise
+  /// the current state with validators.
+  std::set<std::shared_ptr<ModelAPI_Object> > myRegistered;
+  /// The last stored Base to unregister Unconcealed when even attributes are already erased.
+  FeaturePtr myCurrentBase;
+  /// previous state of persistent flag
+  bool myPersistent;
  public:
   /// Extrusion kind
   inline static const std::string& ID()
   {
-    static const std::string MY_GROUP_ID("Recover");
-    return MY_GROUP_ID;
+    static const std::string MY_RECOVER_ID("Recover");
+    return MY_RECOVER_ID;
   }
-  /// Attribute name of base shape.
-  inline static const std::string& BASE_SHAPE_ID()
+  /// Attribute name of base feature.
+  inline static const std::string& BASE_FEATURE()
   {
-    static const std::string MY_BASE_SHAPE_ID("base_shape");
-    return MY_BASE_SHAPE_ID;
+    static const std::string MY_BASE_FEATURE("base_feature");
+    return MY_BASE_FEATURE;
   }
 
-  /// Attribute name of base shape.
+  /// Attribute name of recovered results list.
   inline static const std::string& RECOVERED_ENTITIES()
   {
-    static const std::string MY_RECOVERED_ENTITIES_ID("recovered_entities");
+    static const std::string MY_RECOVERED_ENTITIES_ID("recovered");
     return MY_RECOVERED_ENTITIES_ID;
+  }
+
+  /// Attribute name of persistenc concealment flag.
+  inline static const std::string& PERSISTENT()
+  {
+    static const std::string MY_PERSISTENT_ID("persistent");
+    return MY_PERSISTENT_ID;
   }
 
   /// Returns the kind of a feature
@@ -54,6 +69,26 @@ class FeaturesPlugin_Recover : public ModelAPI_Feature
   /// Use plugin manager for features creation
   FeaturesPlugin_Recover();
 
+  /// Called on change of any argument-attribute of this object. Needed here for synchronization
+  /// of registered unconcealed.
+  virtual void attributeChanged(const std::string& theID);
+
+  /// Synchronises myRegistered before all attributes are erased
+  virtual void erase();
+
+  /// on unstability of feature, remove all unconcealment effect
+  virtual bool setStable(const bool theFlag);
+  /// on disable of feature, remove all unconcealment effect
+  virtual bool setDisabled(const bool theFlag);
+private:
+  /// Synchronises registration of unconcealed entities with the attributes values of this feature
+  void synchronizeRegistered();
+
+  /// Returns the base feature of this
+  FeaturePtr baseFeature();
+
+  /// erases all registered cashed values
+  void clearRegistered();
 };
 
 #endif

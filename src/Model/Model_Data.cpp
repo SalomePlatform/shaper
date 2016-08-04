@@ -455,7 +455,8 @@ void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID,
     // the second condition is for history upper than concealment causer, so the feature result may
     // be displayed and previewed; also for avoiding of quick show/hide on history
     // moving deep down
-    if (aRes && !theFeature->isDisabled()) {
+    if (aRes && !theFeature->isDisabled() && 
+        !ModelAPI_Session::get()->validators()->isUnconcealed(aRes, theFeature)) {
       aRes->setIsConcealed(true);
     }
   }
@@ -473,9 +474,11 @@ void Model_Data::updateConcealmentFlag()
           std::shared_ptr<ModelAPI_Result> aRes = 
             std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
           if (aRes.get()) {
-            aRes->setIsConcealed(true); // set concealed
+            if (!ModelAPI_Session::get()->validators()->isUnconcealed(aRes, aFeature)) {
+              aRes->setIsConcealed(true); // set concealed
+              return;
+            }
           }
-          return;
         }
       }
     }

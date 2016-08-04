@@ -13,6 +13,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Result.h>
 #include <Model_Data.h>
 
 #include <Events_InfoMessage.h>
@@ -313,6 +314,54 @@ bool Model_ValidatorsFactory::isConcealed(std::string theFeature, std::string th
   return aFind != myConcealed.end() && aFind->second.find(theAttribute) != aFind->second.end();
 }
 
+void Model_ValidatorsFactory::registerUnconcealment(std::shared_ptr<ModelAPI_Result> theUnconcealed,
+    std::shared_ptr<ModelAPI_Feature> theCanceledFeat)
+{
+  if (myUnconcealed.find(theUnconcealed) == myUnconcealed.end()) {
+    myUnconcealed[theUnconcealed] = std::list<std::shared_ptr<ModelAPI_Feature> >();
+  }
+  myUnconcealed[theUnconcealed].push_back(theCanceledFeat);
+  std::dynamic_pointer_cast<Model_Data>(theUnconcealed->data())->updateConcealmentFlag();
+}
+
+void Model_ValidatorsFactory::disableUnconcealment(std::shared_ptr<ModelAPI_Result> theUnconcealed,
+    std::shared_ptr<ModelAPI_Feature> theCanceledFeat)
+{
+  std::map<std::shared_ptr<ModelAPI_Result>, std::list<std::shared_ptr<ModelAPI_Feature> > >
+    ::iterator aResFound = myUnconcealed.find(theUnconcealed);
+  if (aResFound != myUnconcealed.end()) {
+    std::list<std::shared_ptr<ModelAPI_Feature> >::iterator anIter = aResFound->second.begin();
+    for(; anIter != aResFound->second.end(); anIter++) {
+      if (*anIter == theCanceledFeat) {
+        aResFound->second.erase(anIter);
+        std::dynamic_pointer_cast<Model_Data>(theUnconcealed->data())->updateConcealmentFlag();
+        break;
+      }
+    }
+  }
+}
+
+bool Model_ValidatorsFactory::isUnconcealed(std::shared_ptr<ModelAPI_Result> theUnconcealed,
+    std::shared_ptr<ModelAPI_Feature> theCanceledFeat)
+{
+  std::map<std::shared_ptr<ModelAPI_Result>, std::list<std::shared_ptr<ModelAPI_Feature> > >
+    ::iterator aResFound = myUnconcealed.find(theUnconcealed);
+  if (aResFound != myUnconcealed.end()) {
+    std::list<std::shared_ptr<ModelAPI_Feature> >::iterator aFeatIter = aResFound->second.begin();
+    for(; aFeatIter != aResFound->second.end(); aFeatIter++) {
+      if (aFeatIter->get()) {
+        if ((*aFeatIter)->isDisabled()) continue;
+        if (*aFeatIter == theCanceledFeat)
+          return true; // this is exactly canceled
+        if (theCanceledFeat->document()->isLater(*aFeatIter, theCanceledFeat))
+          return true; // if unconcealed feature (from the list) is later than concealed
+      } else
+        return true; // empty attribute means that everything is canceled
+    }
+  }
+  return false;
+}
+
 void Model_ValidatorsFactory::registerCase(std::string theFeature, std::string theAttribute,
                             const std::list<std::pair<std::string, std::string> >& theCases)
 {
@@ -331,7 +380,7 @@ void Model_ValidatorsFactory::registerCase(std::string theFeature, std::string t
     aFindAttrID = aFindFeature->second.find(theAttribute);
   }
   std::list<std::pair<std::string, std::string> >::const_iterator aCasesIt = theCases.begin(),
-                                                                        aCasesLast = theCases.end();
+                                                                       aCasesLast = theCases.end();
   std::map<std::string, std::set<std::string> > aFindCases = aFindAttrID->second;
   for (; aCasesIt != aCasesLast; aCasesIt++) {
     std::pair<std::string, std::string> aCasePair = *aCasesIt;

@@ -108,7 +108,67 @@
   }
 }
 
+%typemap(in) const ModelHighAPI_Reference & (ModelHighAPI_Reference temp) {
+  std::shared_ptr<ModelAPI_Object> * temp_object;
+  std::shared_ptr<ModelHighAPI_Interface> * temp_interface;
+  int newmem = 0;
+  if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_object, $descriptor(std::shared_ptr<ModelAPI_Object> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (!temp_object) {
+      PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Interface or ModelAPI_Object.");
+      return NULL;
+    }
+    temp = ModelHighAPI_Reference(*temp_object);
+    if (newmem & SWIG_CAST_NEW_MEMORY) {
+      delete temp_object;
+    }
+    $1 = &temp;
+  } else
+  if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_interface, $descriptor(std::shared_ptr<ModelHighAPI_Interface> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (!temp_interface) {
+      PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Interface or ModelAPI_Object.");
+      return NULL;
+    }
+    temp = ModelHighAPI_Reference(*temp_interface);
+    if (newmem & SWIG_CAST_NEW_MEMORY) {
+      delete temp_interface;
+    }
+    $1 = &temp;
+  } else
+  if ((SWIG_ConvertPtr($input, (void **)&$1, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
+  } else {
+    PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Interface or ModelAPI_Object.");
+    return NULL;
+  }
+}
+
+%typecheck(SWIG_TYPECHECK_POINTER) ModelHighAPI_Reference, const ModelHighAPI_Reference & {
+  std::shared_ptr<ModelAPI_Object> * temp_object;
+  std::shared_ptr<ModelHighAPI_Interface> * temp_interface;
+  int newmem = 0;
+  if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_object, $descriptor(std::shared_ptr<ModelAPI_Object> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (temp_object) {
+      $1 = 1;
+    } else {
+      $1 = 0;
+    }
+  } else
+  if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_interface, $descriptor(std::shared_ptr<ModelHighAPI_Interface> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (temp_interface) {
+      $1 = 1;
+    } else {
+      $1 = 0;
+    }
+  } else {
+    $1 = 0;
+  }
+}
+
 %typemap(out) const ModelHighAPI_Selection & {
+  $1_basetype * ptr = new $1_basetype(*$1);
+  $result = SWIG_NewPointerObj( (void*) ptr, $1_descriptor, 1 );
+}
+
+%typemap(out) const ModelHighAPI_Reference & {
   $1_basetype * ptr = new $1_basetype(*$1);
   $result = SWIG_NewPointerObj( (void*) ptr, $1_descriptor, 1 );
 }
@@ -116,12 +176,14 @@
 // std::list -> []
 %template(SelectionList) std::list<ModelHighAPI_Selection>;
 %template(RefAttrList) std::list<ModelHighAPI_RefAttr>;
+%template(RefList) std::list<ModelHighAPI_Reference>;
 
 // all supported interfaces
 %include "ModelHighAPI_Double.h"
 %include "ModelHighAPI_Integer.h"
 %include "ModelHighAPI_Interface.h"
 %include "ModelHighAPI_RefAttr.h"
+%include "ModelHighAPI_Reference.h"
 %include "ModelHighAPI_Selection.h"
 %include "ModelHighAPI_Services.h"
 %include "ModelHighAPI_Macro.h"

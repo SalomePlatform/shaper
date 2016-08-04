@@ -31,6 +31,7 @@
 #include "ModelHighAPI_Double.h"
 #include "ModelHighAPI_Integer.h"
 #include "ModelHighAPI_RefAttr.h"
+#include "ModelHighAPI_Reference.h"
 #include "ModelHighAPI_Selection.h"
 
 #include <algorithm>
@@ -105,6 +106,22 @@ void fillAttribute(const std::list<ModelHighAPI_RefAttr> & theValue,
 }
 
 //--------------------------------------------------------------------------------------
+void fillAttribute(const ModelHighAPI_Reference & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeReference> & theAttribute)
+{
+  theValue.fillAttribute(theAttribute);
+}
+
+//--------------------------------------------------------------------------------------
+void fillAttribute(const std::list<ModelHighAPI_Reference> & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeRefList> & theAttribute)
+{
+  theAttribute->clear();
+  for (auto it = theValue.begin(); it != theValue.end(); ++it)
+    it->appendToList(theAttribute);
+}
+
+//--------------------------------------------------------------------------------------
 void fillAttribute(const std::shared_ptr<ModelAPI_Object> & theValue,
                    const std::shared_ptr<ModelAPI_AttributeReference> & theAttribute)
 {
@@ -118,6 +135,15 @@ void fillAttribute(const std::list<std::shared_ptr<ModelAPI_Object> > & theValue
   theAttribute->clear();
   for (auto it = theValue.begin(); it != theValue.end(); ++it)
     theAttribute->append(*it);
+}
+
+MODELHIGHAPI_EXPORT
+void fillAttribute(const std::list<ModelHighAPI_Selection> & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeRefList> & theAttribute)
+{
+  theAttribute->clear();
+  for (auto it = theValue.begin(); it != theValue.end(); ++it)
+    theAttribute->append(it->resultSubShapePair().first); // use only context
 }
 
 //--------------------------------------------------------------------------------------

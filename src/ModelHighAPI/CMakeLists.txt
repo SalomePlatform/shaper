@@ -9,6 +9,7 @@ SET(PROJECT_HEADERS
   ModelHighAPI_Interface.h
   ModelHighAPI_Macro.h
   ModelHighAPI_RefAttr.h
+  ModelHighAPI_Reference.h
   ModelHighAPI_Selection.h
   ModelHighAPI_Services.h
   ModelHighAPI_Tools.h
@@ -19,6 +20,7 @@ SET(PROJECT_SOURCES
   ModelHighAPI_Integer.cpp
   ModelHighAPI_Interface.cpp
   ModelHighAPI_RefAttr.cpp
+  ModelHighAPI_Reference.cpp
   ModelHighAPI_Selection.cpp
   ModelHighAPI_Services.cpp
   ModelHighAPI_Tools.cpp
@@ -81,4 +83,5 @@ ADD_UNIT_TESTS(
   TestDouble.py
   TestInteger.py
   TestRefAttr.py
+  TestReference.py
 )

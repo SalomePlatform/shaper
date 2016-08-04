@@ -112,7 +112,7 @@ static bool hasCoincidentPoint(FeaturePtr theFeature1, FeaturePtr theFeature2)
 {
   FeaturePtr aCoincidenceFeature = SketchPlugin_ConstraintCoincidence::findCoincidenceFeature
                                                                   (theFeature1, theFeature2);
-  return aCoincidenceFeature.get();
+  return aCoincidenceFeature.get() != NULL;
 }
 
 bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute, 

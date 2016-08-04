@@ -37,6 +37,10 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   /// Stores the registered attributes that leads to the concealment of referenced objects in 
   /// data tree. Map from feature kind to set of attribute IDs.
   std::map<std::string, std::set<std::string> > myConcealed;
+  /// Stored the unconcealed results and features that caused the canceled concealment (Recover).
+  /// If the feature is empty, unconcealment is persistent.
+  std::map<std::shared_ptr<ModelAPI_Result>, std::list<std::shared_ptr<ModelAPI_Feature> > >
+    myUnconcealed;
   /// Stores the registered attributes must be checked only if the particular case is activated
   /// Map from feature kind to map of attribute IDs to pair 
   // (switchId (ID of the attribute) and case Ids (possible values of the switch attribute))
@@ -67,8 +71,8 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   MODEL_EXPORT virtual void validators(const std::string& theFeatureID,
                                        Validators& theResult) const;
   /// Provides a validator for the attribute, returns NULL if no validator
-  MODEL_EXPORT virtual void validators(const std::string& theFeatureID, const std::string& theAttrID,
-                                       Validators& theResult) const;
+  MODEL_EXPORT virtual void validators(const std::string& theFeatureID, 
+    const std::string& theAttrID, Validators& theResult) const;
 
   /// Returns registered validator by its Id
   MODEL_EXPORT virtual const ModelAPI_Validator* validator(const std::string& theID) const;
@@ -94,9 +98,18 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   /// Returns true that it was registered that attribute conceals the referenced result
   virtual bool isConcealed(std::string theFeature, std::string theAttribute);
 
-  /// register the case-attribute (\a myCases set definition)
-  //virtual void registerCase(std::string theFeature, std::string theAttribute,
-  //  std::string theSwitchId, std::string theCaseId);
+  /// Registers (by Recover feature) cancel of concealment of specific result by specific feature.
+  /// If theCanceledFeat is empty, the concealment is canceled for this result forever.
+  virtual void registerUnconcealment(std::shared_ptr<ModelAPI_Result> theUnconcealed,
+    std::shared_ptr<ModelAPI_Feature> theCanceledFeat);
+
+  /// Disables cancel of concealment of specific result by specific feature.
+  virtual void disableUnconcealment(std::shared_ptr<ModelAPI_Result> theUnconcealed,
+    std::shared_ptr<ModelAPI_Feature> theCanceledFeat);
+
+  /// Returns true if concealment is canceled.
+  virtual bool isUnconcealed(std::shared_ptr<ModelAPI_Result> theUnconcealed,
+    std::shared_ptr<ModelAPI_Feature> theCanceledFeat);
 
   /// register the case-attribute (\a myCases set definition)
   virtual void registerCase(std::string theFeature, std::string theAttribute,

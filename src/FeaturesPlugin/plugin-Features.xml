@@ -55,12 +55,10 @@
         icon="icons/Features/shape_group.png">
         <source path="group_widget.xml"/>
       </feature>
-    </group>
-    <group id="Recover">
       <feature id="Recover"
         title="Recover"
         tooltip="Visualize concealed objects"
-        icon="">
+        icon="icons/Features/recover.png">
         <source path="recover_widget.xml"/>
       </feature>
     </group>

@@ -1,12 +1,13 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <shape_selector id="base_shape"
-                  label="Shape:"
-                  tooltip="Select a feature of concealed objects."
+  <shape_selector id="base_feature"
+                  label="Feature:"
+                  tooltip="Select a feature that conceals results."
                   shape_types="objects"/>
-  <concealed_objects_view id="recovered_entities"
-                  tooltip="Concealed objects"
-                  base_shape_attribute="base_shape"
+  <concealed_objects_view id="recovered"
+                  tooltip="Concealed results to be recevered"
+                  base_shape_attribute="base_feature"
                   obligatory="0"/>
+  <boolvalue id="persistent" label="Persistent" default="false" tooltip="Makes unable to conceal result again" obligatory="0"/>
 </source>

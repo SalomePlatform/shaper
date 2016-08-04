@@ -74,6 +74,7 @@ class Model_Data : public ModelAPI_Data
   friend class Model_AttributeRefAttrList;
   friend class Model_AttributeSelection;
   friend class Model_AttributeSelectionList;
+  friend class Model_ValidatorsFactory;
 
  public:
   /// The simplest constructor. "setLabel" must be called just after to initialize correctly.

@@ -41,6 +41,7 @@ class ModelAPI_Object;
 class ModelHighAPI_Double;
 class ModelHighAPI_Integer;
 class ModelHighAPI_RefAttr;
+class ModelHighAPI_Reference;
 class ModelHighAPI_Selection;
 //--------------------------------------------------------------------------------------
 MODELHIGHAPI_EXPORT
@@ -85,11 +86,23 @@ void fillAttribute(const std::list<ModelHighAPI_RefAttr> & theValue,
                    const std::shared_ptr<ModelAPI_AttributeRefAttrList> & theAttribute);
 
 MODELHIGHAPI_EXPORT
+void fillAttribute(const ModelHighAPI_Reference & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeReference> & theAttribute);
+
+MODELHIGHAPI_EXPORT
+void fillAttribute(const std::list<ModelHighAPI_Reference> & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeRefList> & theAttribute);
+
+MODELHIGHAPI_EXPORT
 void fillAttribute(const std::shared_ptr<ModelAPI_Object> & theValue,
                    const std::shared_ptr<ModelAPI_AttributeReference> & theAttribute);
 
 MODELHIGHAPI_EXPORT
 void fillAttribute(const std::list<std::shared_ptr<ModelAPI_Object> > & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeRefList> & theAttribute);
+
+MODELHIGHAPI_EXPORT
+void fillAttribute(const std::list<ModelHighAPI_Selection> & theValue,
                    const std::shared_ptr<ModelAPI_AttributeRefList> & theAttribute);
 
 MODELHIGHAPI_EXPORT
