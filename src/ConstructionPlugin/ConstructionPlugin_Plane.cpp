@@ -265,7 +265,7 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByDistanceFromOth
 
     std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aShape));
 
-    std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_FaceBuilder::plane(aFace);
+    std::shared_ptr<GeomAPI_Pln> aPln = aFace->getPlane();
     std::shared_ptr<GeomAPI_Pnt> aOrig = aPln->location();
     std::shared_ptr<GeomAPI_Dir> aDir = aPln->direction();
 

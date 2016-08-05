@@ -217,7 +217,7 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
     if (aSelection) { // update arguments due to the selection value
       // update the sketch plane
       std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aSelection));
-      std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aFace);
+      std::shared_ptr<GeomAPI_Pln> aPlane = aFace->getPlane();
       if (aPlane) {
         double anA, aB, aC, aD;
         aPlane->coefficients(anA, aB, aC, aD);

@@ -17,7 +17,6 @@
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <GC_MakePlane.hxx>
 #include <Geom_Plane.hxx>
-#include <GeomLib_IsPlanarSurface.hxx>
 #include <gp_Pln.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Face.hxx>
@@ -122,38 +121,4 @@ std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::planarFaceByFaceAndVertex
   aFace.reset(new GeomAPI_Face());
   aFace->setImpl(new TopoDS_Face(aMakeFace.Face()));
   return aFace;
-}
-
-//==================================================================================================
-std::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_FaceBuilder::plane(const std::shared_ptr<GeomAPI_Face> theFace)
-{
-  std::shared_ptr<GeomAPI_Pln> aResult;
-  if (!theFace)
-    return aResult;  // bad shape
-  TopoDS_Shape aShape = theFace->impl<TopoDS_Shape>();
-  if (aShape.IsNull())
-    return aResult;  // null shape
-  if (aShape.ShapeType() != TopAbs_FACE)
-    return aResult;  // not face
-  TopoDS_Face aFace = TopoDS::Face(aShape);
-  if (aFace.IsNull())
-    return aResult;  // not face
-  Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace);
-  if (aSurf.IsNull())
-    return aResult;  // no surface
-  GeomLib_IsPlanarSurface isPlanar(aSurf);
-  if(!isPlanar.IsPlanar()) {
-    return aResult;
-  }
-  gp_Pln aPln = isPlanar.Plan();
-  double aA, aB, aC, aD;
-  aPln.Coefficients(aA, aB, aC, aD);
-  if (aFace.Orientation() == TopAbs_REVERSED) {
-    aA = -aA;
-    aB = -aB;
-    aC = -aC;
-    aD = -aD;
-  }
-  aResult = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
-  return aResult;
 }

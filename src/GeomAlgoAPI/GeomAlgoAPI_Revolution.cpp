@@ -7,6 +7,7 @@
 #include "GeomAlgoAPI_Revolution.h"
 
 #include <GeomAPI_Face.h>
+#include <GeomAPI_Pln.h>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAlgoAPI_DFLoader.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
@@ -236,8 +237,12 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     if(!isFromPlanar.IsPlanar() || !isToPlanar.IsPlanar()) {// non-planar shapes is not supported for revolution bounding
       return;
     }
-    gp_Pln aFromPln = isFromPlanar.Plan();
-    gp_Pln aToPln   = isToPlanar.Plan();
+
+    std::shared_ptr<GeomAPI_Face> aGeomFromFace(new GeomAPI_Face(theFromShape));
+    std::shared_ptr<GeomAPI_Face> aGeomToFace(new GeomAPI_Face(theToShape));
+
+    gp_Pln aFromPln = aGeomFromFace->getPlane()->impl<gp_Pln>();
+    gp_Pln aToPln   = aGeomToFace->getPlane()->impl<gp_Pln>();
 
     // Orienting bounding planes properly so that the center of mass of the base face stays
     // on the result shape after cut.
@@ -323,21 +328,23 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     aResult = aRevolBuilder->Shape();
 
     // Getting bounding face.
-    TopoDS_Face aBoundingFace;
     bool isFromFaceSet = false;
+    std::shared_ptr<GeomAPI_Face> aGeomBoundingFace;
     if(theFromShape) {
-      aBoundingFace = TopoDS::Face(theFromShape->impl<TopoDS_Shape>());
+      aGeomBoundingFace.reset(new GeomAPI_Face(theFromShape));
       isFromFaceSet = true;
     } else if(theToShape) {
-      aBoundingFace = TopoDS::Face(theToShape->impl<TopoDS_Shape>());
+      aGeomBoundingFace.reset(new GeomAPI_Face(theToShape));
     }
+    TopoDS_Face aBoundingFace = TopoDS::Face(aGeomBoundingFace->impl<TopoDS_Shape>());
 
     // Getting plane from bounding face.
     GeomLib_IsPlanarSurface isBoundingPlanar(BRep_Tool::Surface(aBoundingFace));
     if(!isBoundingPlanar.IsPlanar()) { // non-planar shapes is not supported for revolution bounding
       return;
     }
-    gp_Pln aBoundingPln = isBoundingPlanar.Plan();
+
+    gp_Pln aBoundingPln = aGeomBoundingFace->getPlane()->impl<gp_Pln>();
 
     // Orienting bounding plane properly so that the center of mass of the base face stays
     // on the result shape after cut.

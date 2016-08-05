@@ -258,7 +258,7 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   if (aGShape.get() != NULL) {
     // get plane parameters
     std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aGShape));
-    std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aFace);
+    std::shared_ptr<GeomAPI_Pln> aPlane = aFace->getPlane();
     std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
     gp_XYZ aXYZ = aDir->impl<gp_Dir>().XYZ();
     double aTwist = 0.0;
@@ -489,7 +489,7 @@ std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const Fea
 
   // get plane parameters
   std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aGShape));
-  std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aFace);
+  std::shared_ptr<GeomAPI_Pln> aPlane = aFace->getPlane();
   if (!aPlane.get())
     return std::shared_ptr<GeomAPI_Dir>();
 

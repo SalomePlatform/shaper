@@ -16,6 +16,7 @@
 #include <Geom_Surface.hxx>
 #include <Geom_CylindricalSurface.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
+#include <GeomLib_IsPlanarSurface.hxx>
 #include <IntTools_Context.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Face.hxx>
@@ -85,31 +86,31 @@ bool GeomAPI_Face::isCylindrical() const
 
 std::shared_ptr<GeomAPI_Pln> GeomAPI_Face::getPlane() const
 {
-  const TopoDS_Shape& aShape = const_cast<GeomAPI_Face*>(this)->impl<TopoDS_Shape>();
-  BRepAdaptor_Surface aSurfAdapt(TopoDS::Face(aShape));
-
-  if (aSurfAdapt.GetType() != GeomAbs_Plane)
-    return std::shared_ptr<GeomAPI_Pln>();
-
-  // Obtain central point
-  double aUMin, aUMax, aVMin, aVMax;
-  aUMin = aSurfAdapt.FirstUParameter();
-  aUMax = aSurfAdapt.LastUParameter();
-  aVMin = aSurfAdapt.FirstVParameter();
-  aVMax = aSurfAdapt.LastVParameter();
-  gp_Pnt aCentralPnt;
-  gp_Vec aDU, aDV;
-  aSurfAdapt.D1((aUMin+aUMax)*0.5, (aVMin+aVMax)*0.5, aCentralPnt, aDU, aDV);
-  std::shared_ptr<GeomAPI_Pnt> aCenter(
-      new GeomAPI_Pnt(aCentralPnt.X(), aCentralPnt.Y(), aCentralPnt.Z()));
-
-  // Obtain plane direction
-  gp_XYZ aNormalVec = aDU.XYZ().Crossed(aDV.XYZ());
-  if (aNormalVec.SquareModulus() < Precision::Confusion() * Precision::Confusion())
-    return std::shared_ptr<GeomAPI_Pln>();
-  std::shared_ptr<GeomAPI_Dir> aNormal(
-      new GeomAPI_Dir(aNormalVec.X(), aNormalVec.Y(), aNormalVec.Z()));
-
-  std::shared_ptr<GeomAPI_Pln> aResult(new GeomAPI_Pln(aCenter, aNormal));
+  std::shared_ptr<GeomAPI_Pln> aResult;
+  TopoDS_Shape aShape = this->impl<TopoDS_Shape>();
+  if (aShape.IsNull())
+    return aResult;  // null shape
+  if (aShape.ShapeType() != TopAbs_FACE)
+    return aResult;  // not face
+  TopoDS_Face aFace = TopoDS::Face(aShape);
+  if (aFace.IsNull())
+    return aResult;  // not face
+  Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace);
+  if (aSurf.IsNull())
+    return aResult;  // no surface
+  GeomLib_IsPlanarSurface isPlanar(aSurf);
+  if(!isPlanar.IsPlanar()) {
+    return aResult;
+  }
+  gp_Pln aPln = isPlanar.Plan();
+  double aA, aB, aC, aD;
+  aPln.Coefficients(aA, aB, aC, aD);
+  if (aFace.Orientation() == TopAbs_REVERSED) {
+    aA = -aA;
+    aB = -aB;
+    aC = -aC;
+    aD = -aD;
+  }
+  aResult = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
   return aResult;
 }
