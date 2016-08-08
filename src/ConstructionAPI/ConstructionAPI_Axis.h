@@ -137,6 +137,10 @@ public:
                       const ModelHighAPI_Selection& thePlane2,
                       const ModelHighAPI_Double& theOffset2,
                       const bool theReverseOffset2);
+
+  /// Dump wrapped feature
+  CONSTRUCTIONAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Axis object

@@ -367,7 +367,18 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeSelection>& theAttrSelect)
 {
-  myDumpBuffer << "\"" << theAttrSelect->namingName() << "\"";
+  GeomShapePtr aShape = theAttrSelect->value();
+  if(!aShape.get()) {
+    aShape = theAttrSelect->context()->shape();
+  }
+
+  if(!aShape.get()) {
+    return *this;
+  }
+
+  std::string aShapeTypeStr = aShape->shapeTypeStr();
+
+  myDumpBuffer << "model.selection(\"" << aShapeTypeStr << "\", \"" << theAttrSelect->namingName() << "\")";
   return *this;
 }
 

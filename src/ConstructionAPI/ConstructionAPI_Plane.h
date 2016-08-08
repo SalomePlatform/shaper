@@ -136,6 +136,9 @@ public:
                      const ModelHighAPI_Selection& theAxis,
                      const ModelHighAPI_Double& theAngle);
 
+  /// Dump wrapped feature
+  CONSTRUCTIONAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Plane object

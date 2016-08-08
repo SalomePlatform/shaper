@@ -6,6 +6,7 @@
 
 #include "ConstructionAPI_Plane.h"
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
@@ -188,6 +189,65 @@ void ConstructionAPI_Plane::setByRotation(const ModelHighAPI_Selection& thePlane
   fillAttribute(theAngle, myangle);
 
   execute();
+}
+
+//==================================================================================================
+void ConstructionAPI_Plane::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  theDumper << aBase << " = model.addPlane(" << aDocName;
+
+  std::string aCreationMethod = aBase->string(ConstructionPlugin_Plane::CREATION_METHOD())->value();
+
+  if(aCreationMethod == ConstructionPlugin_Plane::CREATION_METHOD_BY_GENERAL_EQUATION()) {
+    AttributeDoublePtr anAttrA = aBase->real(ConstructionPlugin_Plane::A());
+    AttributeDoublePtr anAttrB = aBase->real(ConstructionPlugin_Plane::B());
+    AttributeDoublePtr anAttrC = aBase->real(ConstructionPlugin_Plane::C());
+    AttributeDoublePtr anAttrD = aBase->real(ConstructionPlugin_Plane::D());
+
+    theDumper << ", " << anAttrA << ", " << anAttrB << ", " << anAttrC << ", " << anAttrD;
+  } else if(aCreationMethod == ConstructionPlugin_Plane::CREATION_METHOD_BY_THREE_POINTS()) {
+    AttributeSelectionPtr anAttrPnt1 = aBase->selection(ConstructionPlugin_Plane::POINT1());
+    AttributeSelectionPtr anAttrPnt2 = aBase->selection(ConstructionPlugin_Plane::POINT2());
+    AttributeSelectionPtr anAttrPnt3 = aBase->selection(ConstructionPlugin_Plane::POINT3());
+
+    theDumper << ", " << anAttrPnt1 << ", " << anAttrPnt2 << ", " << anAttrPnt3;
+  } else if(aCreationMethod == ConstructionPlugin_Plane::CREATION_METHOD_BY_LINE_AND_POINT()) {
+    AttributeSelectionPtr anAttrLine = aBase->selection(ConstructionPlugin_Plane::LINE());
+    AttributeSelectionPtr anAttrPoint = aBase->selection(ConstructionPlugin_Plane::POINT());
+    AttributeBooleanPtr anAttrPerpendicular = aBase->boolean(ConstructionPlugin_Plane::PERPENDICULAR());
+
+    theDumper << ", " << anAttrLine << ", " << anAttrPoint << ", " << anAttrPerpendicular;
+  } else if(aCreationMethod == ConstructionPlugin_Plane::CREATION_METHOD_BY_OTHER_PLANE()) {
+    AttributeSelectionPtr anAttrPlane = aBase->selection(ConstructionPlugin_Plane::PLANE());
+
+    std::string aCreationMethodOption =
+        aBase->string(ConstructionPlugin_Plane::CREATION_METHOD_BY_OTHER_PLANE_OPTION())->value();
+    if(aCreationMethodOption == ConstructionPlugin_Plane::CREATION_METHOD_BY_DISTANCE_FROM_OTHER()) {
+      AttributeDoublePtr anAttrDistance = aBase->real(ConstructionPlugin_Plane::DISTANCE());
+      AttributeBooleanPtr anAttrReverse = aBase->boolean(ConstructionPlugin_Plane::REVERSE());
+
+      theDumper << ", " << anAttrPlane << ", " << anAttrDistance << ", " << anAttrReverse;
+    } else if(aCreationMethodOption == ConstructionPlugin_Plane::CREATION_METHOD_BY_COINCIDENT_TO_POINT()) {
+      AttributeSelectionPtr anAttrPoint = aBase->selection(ConstructionPlugin_Plane::COINCIDENT_POINT());
+
+      theDumper << ", " << anAttrPlane << ", " << anAttrPoint;
+    } else if(aCreationMethodOption == ConstructionPlugin_Plane::CREATION_METHOD_BY_ROTATION()) {
+      AttributeSelectionPtr anAttrAxis = aBase->selection(ConstructionPlugin_Plane::AXIS());
+      AttributeDoublePtr anAttrAngle = aBase->real(ConstructionPlugin_Plane::ANGLE());
+
+      theDumper << ", " << anAttrPlane << ", " << anAttrAxis << ", " << anAttrAngle;
+    }
+  } else if(aCreationMethod == ConstructionPlugin_Plane::CREATION_METHOD_BY_TWO_PARALLEL_PLANES()) {
+    AttributeSelectionPtr anAttrPlane1 = aBase->selection(ConstructionPlugin_Plane::PLANE1());
+    AttributeSelectionPtr anAttrPlane2 = aBase->selection(ConstructionPlugin_Plane::PLANE2());
+
+    theDumper << ", " << anAttrPlane1 << ", " << anAttrPlane2;
+  }
+
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================

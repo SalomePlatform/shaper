@@ -175,12 +175,11 @@ void fillAttribute(const char * theValue,
 }
 
 //==================================================================================================
-GeomAPI_Shape::ShapeType shapeTypeByStr(const std::string& theShapeTypeStr)
+GeomAPI_Shape::ShapeType shapeTypeByStr(std::string theShapeTypeStr)
 {
   GeomAPI_Shape::ShapeType aShapeType = GeomAPI_Shape::SHAPE;
 
-  std::string aShapeTypeStr = theShapeTypeStr;
-  std::transform(aShapeTypeStr.begin(), aShapeTypeStr.end(), aShapeTypeStr.begin(), ::tolower);
+  std::transform(theShapeTypeStr.begin(), theShapeTypeStr.end(), theShapeTypeStr.begin(), ::tolower);
 
   if(theShapeTypeStr == "compound") {
     aShapeType = GeomAPI_Shape::COMPOUND;
