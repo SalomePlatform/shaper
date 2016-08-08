@@ -50,6 +50,10 @@ public:
   /// Set by external name
   SKETCHAPI_EXPORT
   void setByExternalLineName(const std::string & theExternalLineName);
+
+  /// Dump wrapped feature
+  SKETCHAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 //! Pointer on IntersectionPoint object

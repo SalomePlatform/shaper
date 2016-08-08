@@ -7,6 +7,8 @@
 //--------------------------------------------------------------------------------------
 #include "SketchAPI_Projection.h"
 //--------------------------------------------------------------------------------------
+#include <ModelHighAPI_Dumper.h>
+#include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 SketchAPI_Projection::SketchAPI_Projection(
@@ -26,6 +28,16 @@ SketchAPI_Projection::SketchAPI_Projection(
   }
 }
 
+SketchAPI_Projection::SketchAPI_Projection(
+    const std::shared_ptr<ModelAPI_Feature> & theFeature,
+    const std::string & theExternalName)
+: SketchAPI_SketchEntity(theFeature)
+{
+  if (initialize()) {
+    setByExternalName(theExternalName);
+  }
+}
+
 SketchAPI_Projection::~SketchAPI_Projection()
 {
 
@@ -39,4 +51,22 @@ void SketchAPI_Projection::setExternalFeature(const ModelHighAPI_Selection & the
   execute();
 }
 
+void SketchAPI_Projection::setByExternalName(const std::string& theExternalName)
+{
+  fillAttribute(ModelHighAPI_Selection("EDGE", theExternalName), external());
+
+  execute();
+}
+
 //--------------------------------------------------------------------------------------
+
+void SketchAPI_Projection::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aSketchName = theDumper.parentName(aBase);
+
+  AttributeSelectionPtr anExternal = externalFeature();
+  theDumper << aBase << " = " << aSketchName << ".addProjection(" << anExternal << ")" << std::endl;
+  // dump "auxiliary" flag if necessary
+  SketchAPI_SketchEntity::dump(theDumper);
+}

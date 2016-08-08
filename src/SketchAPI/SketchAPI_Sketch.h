@@ -209,6 +209,10 @@ public:
   std::shared_ptr<SketchAPI_Projection> addProjection(
       const ModelHighAPI_Selection & theExternalFeature);
 
+  /// Add projection
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Projection> addProjection(const std::string & theExternalName);
+
   /// Add mirror
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Mirror> addMirror(

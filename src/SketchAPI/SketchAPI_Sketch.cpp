@@ -360,6 +360,13 @@ std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
   return ProjectionPtr(new SketchAPI_Projection(aFeature, theExternalFeature));
 }
 
+std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
+    const std::string & theExternalName)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Projection::ID());
+  return ProjectionPtr(new SketchAPI_Projection(aFeature, theExternalName));
+}
+
 //--------------------------------------------------------------------------------------
 std::shared_ptr<SketchAPI_Mirror> SketchAPI_Sketch::addMirror(
     const ModelHighAPI_RefAttr & theMirrorLine,
