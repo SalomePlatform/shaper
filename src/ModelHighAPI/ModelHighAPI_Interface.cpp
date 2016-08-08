@@ -64,3 +64,8 @@ void ModelHighAPI_Interface::throwException(const std::string & theDescription)
 {
   Events_InfoMessage("ModelHighAPI_Interface", theDescription).send();
 }
+
+const std::string& ModelHighAPI_Interface::attributeGetter(const std::string& theAttrName)
+{
+  return myAttrGetter[theAttrName];
+}

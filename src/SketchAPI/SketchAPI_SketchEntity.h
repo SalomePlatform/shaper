@@ -37,6 +37,9 @@ public:
   SKETCHAPI_EXPORT
   void setAuxiliary(bool theAuxiliary);
 
+  /// Dump wrapped feature
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
 protected:
   std::shared_ptr<ModelAPI_AttributeBoolean> myAuxiliary;
 

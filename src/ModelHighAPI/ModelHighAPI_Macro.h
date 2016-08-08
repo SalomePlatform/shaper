@@ -30,6 +30,10 @@
 #define VAR_NAME(NAME) my##NAME
 
 //--------------------------------------------------------------------------------------
+#define TO_STRING_(NAME) #NAME
+#define TO_STRING(NAME) TO_STRING_(NAME)
+
+//--------------------------------------------------------------------------------------
 // Used in INTERFACE_N for create variable and getter
 #define DEFINE_ATTRIBUTE(NAME, TYPE, COMMENT) \
     COMMENT \
@@ -43,7 +47,8 @@
 #define SET_ATTRIBUTE(NAME, TYPE, ATT_NAME) \
   VAR_NAME(NAME) = std::dynamic_pointer_cast<TYPE>(feature()->attribute(ATT_NAME)); \
   if (!VAR_NAME(NAME)) \
-    return false;
+    return false; \
+  myAttrGetter[ATT_NAME] = TO_STRING(NAME);
 
 //--------------------------------------------------------------------------------------
 #define INTERFACE_COMMON(KIND) \

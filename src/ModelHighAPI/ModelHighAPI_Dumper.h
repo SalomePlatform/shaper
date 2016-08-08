@@ -25,6 +25,7 @@ class GeomDataAPI_Point2D;
 class ModelAPI_AttributeBoolean;
 class ModelAPI_AttributeDouble;
 class ModelAPI_AttributeInteger;
+class ModelAPI_AttributeRefAttr;
 class ModelAPI_AttributeSelection;
 class ModelAPI_AttributeString;
 class ModelAPI_CompositeFeature;
@@ -79,6 +80,10 @@ public:
 
   /// Dump given feature
   virtual void dumpFeature(const FeaturePtr& theFeature, const bool theForce = false) = 0;
+
+  /// Return name of getter for corresponding attribute
+  virtual std::string attributeGetter(const FeaturePtr& theFeature,
+                                      const std::string& theAttrName) const = 0;
 
   /// Save all dumps into specified file
   MODELHIGHAPI_EXPORT
@@ -143,6 +148,9 @@ public:
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const EntityPtr& theEntity);
 
+  /// Dump AttributeRefAttr
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeRefAttr>& theRefAttr);
   /// Dump AttributeSelection
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeSelection>& theAttrSelect);

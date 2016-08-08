@@ -137,6 +137,10 @@ public:
   /// Set third point.
   SKETCHAPI_EXPORT
   void setThirdPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+
+  /// Dump wrapped feature
+  SKETCHAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Circle object.

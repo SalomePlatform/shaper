@@ -109,8 +109,9 @@ void SketchAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << aBase << " = " << aSketchName << ".addPoint(" << anExternal << ")" << std::endl;
   } else {
     // point given by coordinates
-    std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aBase->attribute(SketchPlugin_Point::COORD_ID()));
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint = coordinates();
     theDumper << aBase << " = " << aSketchName << ".addPoint(" << aPoint << ")" << std::endl;
   }
+  // dump "auxiliary" flag if necessary
+  SketchAPI_SketchEntity::dump(theDumper);
 }

@@ -87,6 +87,10 @@ public:
   /// Set end point
   SKETCHAPI_EXPORT
   void setEndPoint(const std::shared_ptr<GeomAPI_Pnt2d> & thePoint);
+
+  /// Dump wrapped feature
+  SKETCHAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 //! Pointer on Line object

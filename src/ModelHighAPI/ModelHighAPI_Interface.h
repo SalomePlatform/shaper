@@ -11,6 +11,7 @@
 #include "ModelHighAPI.h"
 
 #include <list>
+#include <map>
 #include <memory>
 #include <string>
 #include <iostream>
@@ -59,12 +60,18 @@ public:
   MODELHIGHAPI_EXPORT
   void throwException(const std::string & theDescription);
 
+  /// Return name of getter for specified attribute
+  MODELHIGHAPI_EXPORT
+  const std::string& attributeGetter(const std::string& theAttrName);
+
   /// Dump wrapped feature
   MODELHIGHAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const {}
 
 protected:
   std::shared_ptr<ModelAPI_Feature> myFeature;
+
+  std::map<std::string, std::string> myAttrGetter; ///< names of attributes and their getters
 };
 
 //! Pointer on Interface object

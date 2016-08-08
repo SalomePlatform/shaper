@@ -17,6 +17,7 @@
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_CompositeFeature.h>
@@ -309,7 +310,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeBoolean>& theAttrBool)
 {
-  myDumpBuffer << theAttrBool->value();
+  myDumpBuffer << (theAttrBool->value() ? "True" : "False");
   return *this;
 }
 
@@ -347,6 +348,19 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const EntityPtr& theEntity)
   myDumpBuffer << name(theEntity);
   if (myNames[theEntity].second)
     myLastEntityWithName = theEntity;
+  return *this;
+}
+
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
+    const std::shared_ptr<ModelAPI_AttributeRefAttr>& theRefAttr)
+{
+  if (theRefAttr->isObject())
+    myDumpBuffer << name(theRefAttr->object());
+  else {
+    AttributePtr anAttr = theRefAttr->attr();
+    FeaturePtr anOwner = ModelAPI_Feature::feature(anAttr->owner());
+    myDumpBuffer << name(anOwner) << "." << attributeGetter(anOwner, anAttr->id()) << "()";
+  }
   return *this;
 }
 

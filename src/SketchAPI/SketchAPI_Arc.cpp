@@ -9,6 +9,7 @@
 #include <GeomAPI_Pnt2d.h>
 
 #include <ModelHighAPI_Double.h>
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 
@@ -231,4 +232,35 @@ void SketchAPI_Arc::setAngle(double theAngle)
   fillAttribute(ModelHighAPI_Double(theAngle), myangle);
 
   execute();
+}
+
+//==================================================================================================
+void SketchAPI_Arc::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aSketchName = theDumper.parentName(aBase);
+
+  AttributeSelectionPtr anExternal = aBase->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+  if (anExternal->value()) {
+    // arc is external
+    theDumper << aBase << " = " << aSketchName << ".addArc(" << anExternal << ")" << std::endl;
+  } else {
+    AttributeStringPtr aType = arcType();
+    if (aType->value() == SketchPlugin_Arc::ARC_TYPE_CENTER_START_END()) {
+      // arc given by center and start, end points
+      theDumper << aBase << " = " << aSketchName << ".addArc(" << center() << ", "
+                << startPoint() << ", " << endPoint() << ", " << inversed() << ")" << std::endl;
+    } else if (aType->value() == SketchPlugin_Arc::ARC_TYPE_THREE_POINTS()) {
+      // arc given by three points
+      theDumper << aBase << " = " << aSketchName << ".addArc(" << startPoint() << ", "
+                << endPoint() << ", " << passedPoint() << ")" << std::endl;
+    } else {
+      // tangent arc
+      AttributeRefAttrPtr aTangentPoint = tangentPoint();
+      theDumper << aBase << " = " << aSketchName << ".addArc("
+                << aTangentPoint << ", " << endPoint() << ", " << inversed() << ")" << std::endl;
+    }
+  }
+  // dump "auxiliary" flag if necessary
+  SketchAPI_SketchEntity::dump(theDumper);
 }

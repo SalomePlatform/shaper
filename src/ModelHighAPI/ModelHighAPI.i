@@ -118,6 +118,34 @@
   }
 }
 
+%typecheck(SWIG_TYPECHECK_POINTER) ModelHighAPI_RefAttr, const ModelHighAPI_RefAttr & {
+  std::shared_ptr<ModelAPI_Attribute> * temp_attribute;
+  std::shared_ptr<ModelAPI_Object> * temp_object;
+  std::shared_ptr<ModelHighAPI_Interface> * temp_interface;
+  int newmem = 0;
+  if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_attribute, $descriptor(std::shared_ptr<ModelAPI_Attribute> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (temp_attribute) {
+      $1 = 1;
+    } else {
+      $1 = 0;
+    }
+  } else if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_object, $descriptor(std::shared_ptr<ModelAPI_Object> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (temp_object) {
+      $1 = 1;
+    } else {
+      $1 = 0;
+    }
+  } else if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_interface, $descriptor(std::shared_ptr<ModelHighAPI_Interface> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (temp_interface) {
+      $1 = 1;
+    } else {
+      $1 = 0;
+    }
+  } else {
+    $1 = 0;
+  }
+}
+
 %typemap(in) const ModelHighAPI_Reference & (ModelHighAPI_Reference temp) {
   std::shared_ptr<ModelAPI_Object> * temp_object;
   std::shared_ptr<ModelHighAPI_Interface> * temp_interface;
