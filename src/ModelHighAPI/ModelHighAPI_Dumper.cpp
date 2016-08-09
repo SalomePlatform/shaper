@@ -19,6 +19,7 @@
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Document.h>
@@ -395,18 +396,57 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeSelection>& theAttrSelect)
 {
+  myDumpBuffer << "model.selection(";
+
+  if(!theAttrSelect->isInitialized()) {
+    myDumpBuffer << ")";
+    return *this;
+  }
+
   GeomShapePtr aShape = theAttrSelect->value();
   if(!aShape.get()) {
     aShape = theAttrSelect->context()->shape();
   }
 
   if(!aShape.get()) {
+    myDumpBuffer << ")";
     return *this;
   }
 
-  std::string aShapeTypeStr = aShape->shapeTypeStr();
+  myDumpBuffer << "\"" << aShape->shapeTypeStr() << "\", \"" << theAttrSelect->namingName() << "\")";
+  return *this;
+}
 
-  myDumpBuffer << "model.selection(\"" << aShapeTypeStr << "\", \"" << theAttrSelect->namingName() << "\")";
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
+    const std::shared_ptr<ModelAPI_AttributeSelectionList>& theAttrSelList)
+{
+  myDumpBuffer << "[";
+
+  GeomShapePtr aShape;
+  std::string aShapeTypeStr;
+
+  bool isAdded = false;
+
+  for(int anIndex = 0; anIndex < theAttrSelList->size(); ++anIndex) {
+    AttributeSelectionPtr anAttribute = theAttrSelList->value(anIndex);
+    aShape = anAttribute->value();
+    if(!aShape.get()) {
+      aShape = anAttribute->context()->shape();
+    }
+
+    if(!aShape.get()) {
+      continue;
+    }
+
+    if(isAdded) {
+      myDumpBuffer << ", ";
+    } else {
+      isAdded = true;
+    }
+    myDumpBuffer << "model.selection(\"" << aShape->shapeTypeStr() << "\", \"" << anAttribute->namingName() << "\")";
+  }
+
+  myDumpBuffer << "]";
   return *this;
 }
 
