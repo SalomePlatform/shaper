@@ -44,6 +44,7 @@ class DumpAssistant(ModelHighAPI.ModelHighAPI_Dumper):
                 self.myFeatures[aFeatureKind](theFeature).dump(self)
             else:
                 self.name(theFeature)
+                self.clearNotDumped()
         else:
             # Probably the feature is a constraint, try to dump it with SketchAPI_Constraint.
             # In case of theFeature is not a constraint, it will not be dumped.

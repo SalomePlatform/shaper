@@ -155,12 +155,15 @@ public:
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeSelection>& theAttrSelect);
 
+  /// Clear dump buffer
+  MODELHIGHAPI_EXPORT
+  void clear(bool bufferOnly = false);
+  /// clear list of not dumped entities
+  MODELHIGHAPI_EXPORT void clearNotDumped();
+
 protected:
   /// Dump "setName" command if last entity had user-defined name
   MODELHIGHAPI_EXPORT void dumpEntitySetName();
-
-  /// Clear dump buffer
-  void clear();
 
 private:
   ModelHighAPI_Dumper(const ModelHighAPI_Dumper&);
@@ -172,6 +175,9 @@ private:
   /// Iterate all features in composite feature and dump them into intermediate buffer
   bool process(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite);
 
+  /// Check the entity is already dumped
+  bool isDumped(const EntityPtr& theEntity) const;
+
 private:
   typedef std::map<EntityPtr, std::pair<std::string, bool> > EntityNameMap;
   typedef std::map<std::string, std::set<std::string> >      ModulesMap;
@@ -179,9 +185,14 @@ private:
   static ModelHighAPI_Dumper* mySelf;
 
   std::ostringstream  myDumpBuffer;         ///< intermediate buffer to store dumping data
+  std::ostringstream  myFullDump;           ///< full buffer of dumped data
+
   ModulesMap          myModules;            ///< modules and entities to be imported
   EntityNameMap       myNames;              ///< names of the entities
   EntityPtr           myLastEntityWithName; ///< not null, if last dumped entity had user defined name
+
+protected:
+  std::set<EntityPtr> myNotDumpedEntities;  ///< list of entities, used by other features but not dumped yet
 };
 
 #endif

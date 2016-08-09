@@ -54,10 +54,26 @@ ModelHighAPI_Dumper* ModelHighAPI_Dumper::getInstance()
   return mySelf;
 }
 
-void ModelHighAPI_Dumper::clear()
+void ModelHighAPI_Dumper::clear(bool bufferOnly)
 {
   myDumpBuffer = std::ostringstream();
   myDumpBuffer << std::setprecision(16);
+
+  clearNotDumped();
+
+  if (!bufferOnly) {
+    myFullDump = std::ostringstream();
+    myFullDump << std::setprecision(16);
+
+    myNames.clear();
+    myModules.clear();
+    myLastEntityWithName = EntityPtr();
+  }
+}
+
+void ModelHighAPI_Dumper::clearNotDumped()
+{
+  myNotDumpedEntities.clear();
 }
 
 const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity)
@@ -85,6 +101,7 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity)
   }
 
   myNames[theEntity] = std::pair<std::string, bool>(aName, isNameDefined);
+  myNotDumpedEntities.insert(theEntity);
   return myNames[theEntity].first;
 }
 
@@ -118,14 +135,11 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
 bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theDoc)
 {
   bool isOk = true;
-  CompositeFeaturePtr aLastComposite;
   // dump all features
   std::list<FeaturePtr> aFeatures = theDoc->allFeatures();
   std::list<FeaturePtr>::const_iterator aFeatIt = aFeatures.begin();
   for (; aFeatIt != aFeatures.end(); ++aFeatIt) {
-    // dump feature if and only if it is not a sub-feature of last composite feature
-    // (all subs of composite are dumped in special method)
-    if (!aLastComposite || !aLastComposite->isSub(*aFeatIt))
+    if (!isDumped(*aFeatIt))
       dumpFeature(*aFeatIt);
 
     // iteratively process composite features
@@ -144,10 +158,8 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
       myNames[aSubDoc] = myNames[*aFeatIt];
 
       isOk = process(aSubDoc) && isOk;
-    } else {
+    } else
       isOk = process(aCompFeat) && isOk;
-      aLastComposite = aCompFeat;
-    }
   }
   return isOk;
 }
@@ -158,7 +170,8 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
   int aNbSubs = theComposite->numberOfSubs();
   for (int anIndex = 0; anIndex < aNbSubs; ++anIndex) {
     FeaturePtr aFeature = theComposite->subFeature(anIndex);
-    dumpFeature(aFeature, true);
+    if (!isDumped(aFeature))
+      dumpFeature(aFeature, true);
   }
   // dump command to update model
   myDumpBuffer << "model.do()" << std::endl;
@@ -195,7 +208,7 @@ bool ModelHighAPI_Dumper::exportTo(const std::string& theFileName)
   aFile << "model.begin()" << std::endl;
 
   // dump collected data
-  aFile << myDumpBuffer.str();
+  aFile << myFullDump.str();
 
   // standard footer
   aFile << "model.end()" << std::endl;
@@ -226,6 +239,12 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
   myDumpBuffer << ".data().setName(\"" << aName << "\")" << std::endl;
 #endif
   myLastEntityWithName = EntityPtr();
+}
+
+bool ModelHighAPI_Dumper::isDumped(const EntityPtr& theEntity) const
+{
+  EntityNameMap::const_iterator aFound = myNames.find(theEntity);
+  return aFound != myNames.end();
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const char theChar)
@@ -355,6 +374,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const EntityPtr& theEntity)
   myDumpBuffer << name(theEntity);
   if (myNames[theEntity].second)
     myLastEntityWithName = theEntity;
+  myNotDumpedEntities.erase(theEntity);
   return *this;
 }
 
@@ -397,5 +417,19 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
 {
   theDumper.myDumpBuffer << theEndl;
   theDumper.dumpEntitySetName();
+
+  // store all not-dumped entities first
+  std::set<EntityPtr> aNotDumped = theDumper.myNotDumpedEntities;
+  std::string aBufCopy = theDumper.myDumpBuffer.str();
+  theDumper.clear(true);
+  std::set<EntityPtr>::const_iterator anIt = aNotDumped.begin();
+  for (; anIt != aNotDumped.end(); ++anIt) {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
+    theDumper.dumpFeature(aFeature, true);
+  }
+
+  // then store currently dumped string
+  theDumper.myFullDump << aBufCopy;
+
   return theDumper;
 }

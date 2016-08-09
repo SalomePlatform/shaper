@@ -46,6 +46,7 @@ void ExchangePlugin_Dump::dump(const std::string& theFileName)
   Config_ModuleReader::loadScript("model.dump");
 
   ModelHighAPI_Dumper* aDumper = ModelHighAPI_Dumper::getInstance();
+  aDumper->clear();
   DocumentPtr aDoc = ModelAPI_Session::get()->moduleDocument();
   if (!aDumper || !aDumper->process(aDoc, theFileName))
     setError("An error occured while dumping to " + theFileName);
