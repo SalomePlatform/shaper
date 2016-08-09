@@ -4,6 +4,7 @@
 import ModelHighAPI
 
 import ModelAPI
+import SketchAPI
 
 import sys
 import inspect
@@ -43,6 +44,10 @@ class DumpAssistant(ModelHighAPI.ModelHighAPI_Dumper):
                 self.myFeatures[aFeatureKind](theFeature).dump(self)
             else:
                 self.name(theFeature)
+        else:
+            # Probably the feature is a constraint, try to dump it with SketchAPI_Constraint.
+            # In case of theFeature is not a constraint, it will not be dumped.
+            self.myFeatures[SketchAPI.SketchAPI_Constraint.ID()](theFeature).dump(self)
 
     ## Return getter for specified attribute
     def attributeGetter(self, theFeature, theAttrName):

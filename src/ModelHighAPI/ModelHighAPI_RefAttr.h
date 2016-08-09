@@ -50,6 +50,10 @@ public:
   MODELHIGHAPI_EXPORT
   virtual void appendToList(const std::shared_ptr<ModelAPI_AttributeRefAttrList> & theAttribute) const;
 
+  /// Check the object is empty
+  MODELHIGHAPI_EXPORT
+  bool isEmpty() const;
+
 private:
   enum VariantType { VT_ATTRIBUTE, VT_OBJECT } myVariantType;
   std::shared_ptr<ModelAPI_Attribute> myAttribute;

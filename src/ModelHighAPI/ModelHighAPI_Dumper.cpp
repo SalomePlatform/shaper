@@ -118,11 +118,16 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
 bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theDoc)
 {
   bool isOk = true;
+  CompositeFeaturePtr aLastComposite;
   // dump all features
   std::list<FeaturePtr> aFeatures = theDoc->allFeatures();
   std::list<FeaturePtr>::const_iterator aFeatIt = aFeatures.begin();
   for (; aFeatIt != aFeatures.end(); ++aFeatIt) {
-    dumpFeature(*aFeatIt);
+    // dump feature if and only if it is not a sub-feature of last composite feature
+    // (all subs of composite are dumped in special method)
+    if (!aLastComposite || !aLastComposite->isSub(*aFeatIt))
+      dumpFeature(*aFeatIt);
+
     // iteratively process composite features
     CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aFeatIt);
     if (!aCompFeat)
@@ -139,8 +144,10 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
       myNames[aSubDoc] = myNames[*aFeatIt];
 
       isOk = process(aSubDoc) && isOk;
-    } else 
+    } else {
       isOk = process(aCompFeat) && isOk;
+      aLastComposite = aCompFeat;
+    }
   }
   return isOk;
 }
@@ -354,9 +361,10 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const EntityPtr& theEntity)
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeRefAttr>& theRefAttr)
 {
-  if (theRefAttr->isObject())
-    myDumpBuffer << name(theRefAttr->object());
-  else {
+  if (theRefAttr->isObject()) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theRefAttr->object());
+    myDumpBuffer << name(aFeature);
+  } else {
     AttributePtr anAttr = theRefAttr->attr();
     FeaturePtr anOwner = ModelAPI_Feature::feature(anAttr->owner());
     myDumpBuffer << name(anOwner) << "." << attributeGetter(anOwner, anAttr->id()) << "()";
