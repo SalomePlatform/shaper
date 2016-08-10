@@ -625,9 +625,7 @@ void SketchAPI_Sketch::dump(ModelHighAPI_Dumper& theDumper) const
 
   AttributeSelectionPtr anExternal = aBase->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
   if (anExternal->value()) {
-    FeaturePtr aPlnFeature = ModelAPI_Feature::feature(anExternal->context()->data()->owner());
-    const std::string& aPlaneName = theDumper.name(aPlnFeature);
-    theDumper << aBase << " = model.addSketch(" << aDocName << ", \"" << aPlaneName << "\")" << std::endl;
+    theDumper << aBase << " = model.addSketch(" << aDocName << ", " << anExternal << ")" << std::endl;
   } else {
     // Sketch is base on a plane.
     std::shared_ptr<GeomAPI_Pnt> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(

@@ -614,10 +614,25 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   std::string aContName = getContextName(theSubShapeName);
   if(aContName.empty()) return false;
   ResultPtr aCont = theDoc->findByName(aContName);
-  //if(!aCont.get() || aCont->shape()->isNull()) return false;
-  //TopoDS_Shape aContext  = aCont->shape()->impl<TopoDS_Shape>();
-  //TopAbs_ShapeEnum aContType = aContext.ShapeType();
-  //if(aType <= aContType) return false; // not applicable
+   // possible this is body where postfix is added to distinguish several shapes on the same label
+  int aSubShapeId = -1; // -1 means sub shape not found
+  if (!aCont.get() && aContName == theSubShapeName) {
+    size_t aPostIndex = aContName.rfind('_');
+    if (aPostIndex != std::string::npos) {
+      std::string aSubContName = aContName.substr(0, aPostIndex);
+      aCont = theDoc->findByName(aSubContName);
+      if (aCont.get()) {
+        try {
+          std::string aNum = aContName.substr(aPostIndex + 1);
+          aSubShapeId = std::stoi(aNum);
+        } catch (std::invalid_argument&) {
+          aSubShapeId = -1;
+        }
+        if (aSubShapeId > 0)
+          aContName = aSubContName;
+      }
+    }
+  }
 
 
   TopoDS_Shape aSelection;
@@ -657,13 +672,26 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   case TopAbs_WIRE:
   default: {//TopAbs_SHAPE
     /// case when the whole sketch is selected, so, selection type is compound, but there is no value
-    if (aCont.get() && aCont->shape().get() && 
-        aCont->shape()->impl<TopoDS_Shape>().ShapeType() == aType) {
-      theCont = aCont;
-      return true;
+    if (aCont.get() && aCont->shape().get()) {
+      if (aCont->shape()->impl<TopoDS_Shape>().ShapeType() == aType) {
+        theCont = aCont;
+        return true;
+      } else if (aSubShapeId > 0) { // try to find sub-shape by the index
+        TopExp_Explorer anExp(aCont->shape()->impl<TopoDS_Shape>(), aType);
+        for(; aSubShapeId > 0 && anExp.More(); aSubShapeId--) {
+          anExp.Next();
+        }
+        if (anExp.More()) {
+          std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected(new GeomAPI_Shape());
+          aShapeToBeSelected->setImpl(new TopoDS_Shape(anExp.Current()));
+          theShapeToBeSelected = aShapeToBeSelected;
+          theCont = aCont;
+          return true;
+        }
+      }
     }
     return false;
-  }
+    }
   }
   // another try to find edge or vertex by faces
   std::list<std::string> aListofNames;
@@ -692,8 +720,8 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   if (aN == 0) {
     size_t aConstrNamePos = theSubShapeName.find("/");
     bool isFullName = aConstrNamePos == std::string::npos;
-    std::string aContrName = 
-      isFullName ? theSubShapeName : theSubShapeName.substr(0, aConstrNamePos);
+    std::string aContrName = aContName;
+    //  isFullName ? theSubShapeName : theSubShapeName.substr(0, aConstrNamePos);
     ResultPtr aConstr = theDoc->findByName(aContrName);
     if (aConstr.get() && aConstr->groupName() == ModelAPI_ResultConstruction::group()) {
       theCont = aConstr;
