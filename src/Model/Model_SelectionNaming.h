@@ -53,6 +53,14 @@ public:
   /// Returns orientation of the edge in the context shape
   static int edgeOrientation(const TopoDS_Shape& theContext, TopoDS_Edge& theEdge);
 
+  /// Returns the name of sketch sub-element, shortened by exclusion of some symbols and with added
+  /// the vertex position (if needed)
+  /// \param theConstr result with name - basis for the name
+  /// \param theEdgeVertexPos position of the vertex on edge: 1 - first , 2 - second
+  /// \returns the generated name
+  static std::string shortName(std::shared_ptr<ModelAPI_ResultConstruction>& theConstr,
+    const int theEdgeVertexPos = 0);
+
 protected:
   /// Gets the stored name from the document
   std::string getShapeName(std::shared_ptr<Model_Document> theDoc, const TopoDS_Shape& theShape);

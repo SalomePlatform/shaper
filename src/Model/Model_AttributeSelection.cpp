@@ -642,6 +642,7 @@ void Model_AttributeSelection::selectBody(
 static void registerSubShape(TDF_Label theMainLabel, TopoDS_Shape theShape,
   const int theID, const FeaturePtr& theContextFeature, std::shared_ptr<Model_Document> theDoc,
   std::string theAdditionalName, std::map<int, int>& theOrientations,
+  std::map<int, std::string>& theSubNames, // name of sub-elements by ID to be exported instead of indexes
   Handle(TDataStd_IntPackedMap) theRefs = Handle(TDataStd_IntPackedMap)(),
   const int theOrientation = 0)
 {
@@ -652,29 +653,32 @@ static void registerSubShape(TDF_Label theMainLabel, TopoDS_Shape theShape,
   TNaming_Builder aBuilder(aLab);
   aBuilder.Generated(theShape);
   std::stringstream aName;
-  aName<<theContextFeature->name()<<"/";
-  if (!theAdditionalName.empty())
-    aName<<theAdditionalName<<"/";
-  if (theShape.ShapeType() == TopAbs_FACE) aName<<"Face";
-  else if (theShape.ShapeType() == TopAbs_WIRE) aName<<"Wire";
-  else if (theShape.ShapeType() == TopAbs_EDGE) aName<<"Edge";
-  else if (theShape.ShapeType() == TopAbs_VERTEX) aName<<"Vertex";
+  aName<<theContextFeature->name();
+  if (theShape.ShapeType() != TopAbs_COMPOUND) { // compound means the whole result for construction
+    aName<<"/";
+    if (!theAdditionalName.empty())
+      aName<<theAdditionalName<<"/";
+    if (theShape.ShapeType() == TopAbs_FACE) aName<<"Face";
+    else if (theShape.ShapeType() == TopAbs_WIRE) aName<<"Wire";
+    else if (theShape.ShapeType() == TopAbs_EDGE) aName<<"Edge";
+    else if (theShape.ShapeType() == TopAbs_VERTEX) aName<<"Vertex";
 
-  if (theRefs.IsNull()) {
-    aName<<theID;
-    if (theOrientation == 1)
-      aName<<"f";
-    else if (theOrientation == -1)
-      aName<<"r";
-  } else { // make a composite name from all sub-elements indexes: "1_2_3_4"
-    TColStd_MapIteratorOfPackedMapOfInteger aRef(theRefs->GetMap());
-    for(; aRef.More(); aRef.Next()) {
-      aName<<"-"<<aRef.Key();
-      if (theOrientations.find(aRef.Key()) != theOrientations.end()) {
-        if (theOrientations[aRef.Key()] == 1)
-          aName<<"f";
-        else if (theOrientations[aRef.Key()] == -1)
-          aName<<"r";
+    if (theRefs.IsNull()) {
+      aName<<theID;
+      if (theOrientation == 1)
+        aName<<"f";
+      else if (theOrientation == -1)
+        aName<<"r";
+    } else { // make a composite name from all sub-elements indexes: "1_2_3_4"
+      TColStd_MapIteratorOfPackedMapOfInteger aRef(theRefs->GetMap());
+      for(; aRef.More(); aRef.Next()) {
+        aName<<"-"<<theSubNames[aRef.Key()];
+        if (theOrientations.find(aRef.Key()) != theOrientations.end()) {
+          if (theOrientations[aRef.Key()] == 1)
+            aName<<"f";
+          else if (theOrientations[aRef.Key()] == -1)
+            aName<<"r";
+        }
       }
     }
   }
@@ -721,6 +725,7 @@ void Model_AttributeSelection::selectConstruction(
   // iterate and store the result ids of sub-elements and sub-elements to sub-labels
   Handle(TDataStd_IntPackedMap) aRefs = TDataStd_IntPackedMap::Set(aLab);
   std::map<int, int> anOrientations; //map from edges IDs to orientations of these edges in face
+  std::map<int, std::string> aSubNames; //map from edges IDs to names of edges
   aRefs->Clear();
   const int aSubNum = aComposite->numberOfSubs();
   for(int a = 0; a < aSubNum; a++) {
@@ -740,6 +745,7 @@ void Model_AttributeSelection::selectConstruction(
           gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aVertex));
           if (aPnt.IsEqual(aVertexPos, Precision::Confusion())) {
             aRefs->Add(aComposite->subFeatureId(a));
+            aSubNames[aComposite->subFeatureId(a)] = Model_SelectionNaming::shortName(aConstr);
           }
         } else { // get first or last vertex of the edge: last is stored with additional delta
           const TopoDS_Shape& anEdge = aConstr->shape()->impl<TopoDS_Shape>();
@@ -748,6 +754,8 @@ void Model_AttributeSelection::selectConstruction(
             gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aVExp.Current()));
             if (aPnt.IsEqual(aVertexPos, Precision::Confusion())) {
               aRefs->Add(aDelta + aComposite->subFeatureId(a));
+              aSubNames[aDelta + aComposite->subFeatureId(a)] =
+                Model_SelectionNaming::shortName(aConstr, aDelta / kSTART_VERTEX_DELTA);
               break;
             }
             aDelta += kSTART_VERTEX_DELTA;
@@ -763,6 +771,7 @@ void Model_AttributeSelection::selectConstruction(
             if (allCurves.Contains(aCurve)) {
               int anID = aComposite->subFeatureId(a);
               aRefs->Add(anID);
+              aSubNames[anID] = Model_SelectionNaming::shortName(aConstr);
               if (aShapeType != TopAbs_EDGE) { // face needs the sub-edges on sub-labels
                 // add edges to sub-label to support naming for edges selection
                 TopExp_Explorer anEdgeExp(aSubShape, TopAbs_EDGE);
@@ -775,7 +784,7 @@ void Model_AttributeSelection::selectConstruction(
                     anOrientations[anID] = anOrient;
                     registerSubShape(
                       selectionLabel(), anEdge, anID, aContextFeature, aMyDoc, "", anOrientations,
-                      Handle(TDataStd_IntPackedMap)(), anOrient);
+                      aSubNames, Handle(TDataStd_IntPackedMap)(), anOrient);
                   }
                 }
               } else { // put vertices of the selected edge to sub-labels
@@ -787,7 +796,8 @@ void Model_AttributeSelection::selectConstruction(
 
                   std::stringstream anAdditionalName; 
                   registerSubShape(
-                    selectionLabel(), aV, aTagIndex, aContextFeature, aMyDoc, "", anOrientations);
+                    selectionLabel(), aV, aTagIndex, aContextFeature, aMyDoc, "", anOrientations,
+                    aSubNames);
                 }
               }
             }
@@ -800,7 +810,7 @@ void Model_AttributeSelection::selectConstruction(
   TNaming_Builder aBuilder(selectionLabel());
   aBuilder.Generated(aSubShape);
     registerSubShape(
-      selectionLabel(), aSubShape, 0, aContextFeature, aMyDoc, "", anOrientations, aRefs); 
+      selectionLabel(), aSubShape, 0, aContextFeature, aMyDoc, "", anOrientations, aSubNames, aRefs); 
 }
 
 bool Model_AttributeSelection::selectPart(
