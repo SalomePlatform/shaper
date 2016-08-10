@@ -105,9 +105,12 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
 
   if (theID == SketchPlugin_Constraint::ENTITY_A() || 
       theID == SketchPlugin_Constraint::ENTITY_B()) {
-    std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
-        ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
-    if (!aValueAttr->isInitialized()) { // only if it is not initialized, try to compute the current value
+    AttributeDoublePtr aValueAttr = real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
+    AttributeDoublePtr aConstrValueAttr = real(SketchPlugin_Constraint::VALUE());
+    // only if one of attributes is not initialized, try to compute the current value
+    if (!aValueAttr->isInitialized() || !aConstrValueAttr->isInitialized()) {
+      if (aValueAttr->isInitialized() && !aConstrValueAttr->isInitialized()) // initialize base value of constraint
+        updateConstraintValueByAngleValue();
       double anAngle = calculateAngle();
       aValueAttr->setValue(anAngle);
       updateConstraintValueByAngleValue();

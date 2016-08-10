@@ -88,6 +88,11 @@ void fillAttribute(const ModelHighAPI_Integer & theValue,
 {
   theValue.fillAttribute(theAttribute);
 }
+void fillAttribute(int theValue,
+                   const std::shared_ptr<ModelAPI_AttributeInteger> & theAttribute)
+{
+  theAttribute->setValue(theValue);
+}
 
 //--------------------------------------------------------------------------------------
 void fillAttribute(const ModelHighAPI_RefAttr & theValue,

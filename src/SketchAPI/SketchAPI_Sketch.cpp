@@ -24,6 +24,7 @@
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
+#include <SketcherPrs_Tools.h>
 //--------------------------------------------------------------------------------------
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_ResultConstruction.h>
@@ -406,12 +407,47 @@ std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setAngle(
     const ModelHighAPI_RefAttr & theLine2,
     const ModelHighAPI_Double & theValue)
 {
-  // TODO(spo): is support of angle type necessary?
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
+  fillAttribute(SketcherPrs_Tools::ANGLE_DIRECT,
+      aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
   fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  aFeature->execute();
+  return aFeature;
+}
+
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setAngleComplementary(
+    const ModelHighAPI_RefAttr & theLine1,
+    const ModelHighAPI_RefAttr & theLine2,
+    const ModelHighAPI_Double & theValue)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
+  fillAttribute(SketcherPrs_Tools::ANGLE_COMPLEMENTARY,
+      aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
+  fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
+  fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+//  fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  aFeature->execute();
+  return aFeature;
+}
+
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setAngleBackward(
+    const ModelHighAPI_RefAttr & theLine1,
+    const ModelHighAPI_RefAttr & theLine2,
+    const ModelHighAPI_Double & theValue)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
+  fillAttribute(SketcherPrs_Tools::ANGLE_BACKWARD,
+      aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
+  fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
+  fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+//  fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
   aFeature->execute();
   return aFeature;
 }

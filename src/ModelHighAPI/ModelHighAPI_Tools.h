@@ -78,6 +78,10 @@ void fillAttribute(const ModelHighAPI_Integer & theValue,
                    const std::shared_ptr<ModelAPI_AttributeInteger> & theAttribute);
 
 MODELHIGHAPI_EXPORT
+void fillAttribute(int theValue,
+                   const std::shared_ptr<ModelAPI_AttributeInteger> & theAttribute);
+
+MODELHIGHAPI_EXPORT
 void fillAttribute(const ModelHighAPI_RefAttr & theValue,
                    const std::shared_ptr<ModelAPI_AttributeRefAttr> & theAttribute);
 

@@ -25,6 +25,8 @@
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
 
+#include <SketcherPrs_Tools.h>
+
 SketchAPI_Constraint::SketchAPI_Constraint(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
 : ModelHighAPI_Interface(theFeature)
@@ -110,6 +112,19 @@ static const std::string& constraintTypeToSetter(const std::string& theType)
   return DUMMY;
 }
 
+static std::string angleTypeToString(int theAngleType)
+{
+  switch (theAngleType) {
+  case SketcherPrs_Tools::ANGLE_COMPLEMENTARY:
+    return std::string("Complementary");
+  case SketcherPrs_Tools::ANGLE_BACKWARD:
+    return std::string("Backward");
+  default:
+    break;
+  }
+  return std::string();
+}
+
 void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
 {
   ConstraintPtr aConstraint = std::dynamic_pointer_cast<SketchPlugin_Constraint>(feature());
@@ -119,9 +134,14 @@ void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
   const std::string& aSetter = constraintTypeToSetter(aConstraint->getKind());
   if (aSetter.empty())
     return; // incorrect constraint type
+  bool isAngle = aConstraint->getKind() == SketchPlugin_ConstraintAngle::ID();
+  std::string aSetterSuffix;
+  if (isAngle)
+    aSetterSuffix = angleTypeToString(aConstraint->integer(
+                    SketchPlugin_ConstraintAngle::TYPE_ID())->value());
 
   const std::string& aSketchName = theDumper.parentName(aConstraint);
-  theDumper << aConstraint << " = " << aSketchName << "." << aSetter << "(";
+  theDumper << aConstraint << " = " << aSketchName << "." << aSetter << aSetterSuffix << "(";
 
   bool isFirstAttr = true;
   for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
@@ -132,7 +152,8 @@ void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
     }
   }
 
-  AttributeDoublePtr aValueAttr = aConstraint->real(SketchPlugin_Constraint::VALUE());
+  AttributeDoublePtr aValueAttr = aConstraint->real(
+      isAngle ? SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID() :SketchPlugin_Constraint::VALUE());
   if (aValueAttr && aValueAttr->isInitialized())
     theDumper << ", " << aValueAttr;
 

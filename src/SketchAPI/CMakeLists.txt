@@ -46,6 +46,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/ModelAPI
   ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
   ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
+  ${PROJECT_SOURCE_DIR}/src/SketcherPrs
 )
 
 # Plugin headers dependency

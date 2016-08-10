@@ -244,6 +244,20 @@ public:
       const ModelHighAPI_RefAttr & theLine2,
       const ModelHighAPI_Double & theValue);
 
+  /// Set complementary angle
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setAngleComplementary(
+      const ModelHighAPI_RefAttr & theLine1,
+      const ModelHighAPI_RefAttr & theLine2,
+      const ModelHighAPI_Double & theValue);
+
+  /// Set backward angle (= 360 - angle)
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setAngleBackward(
+      const ModelHighAPI_RefAttr & theLine1,
+      const ModelHighAPI_RefAttr & theLine2,
+      const ModelHighAPI_Double & theValue);
+
   /// Set coincident
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelAPI_Feature> setCoincident(
