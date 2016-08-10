@@ -373,19 +373,6 @@ TDF_LabelMap& Model_AttributeSelection::scope()
   return myScope;
 }
 
-/// produces theEdge orientation relatively to theContext face
-int edgeOrientation(const TopoDS_Shape& theContext, TopoDS_Edge& theEdge)
-{
-  if (theContext.ShapeType() != TopAbs_FACE)
-    return 0;
-  TopoDS_Face aContext = TopoDS::Face(theContext);
-  if (theEdge.Orientation() == TopAbs_FORWARD) 
-    return 1;
-  if (theEdge.Orientation() == TopAbs_REVERSED) 
-    return -1;
-  return 0; // unknown
-}
-
 /// Sets the invalid flag if flag is false, or removes it if "true"
 /// Returns theFlag
 static bool setInvalidIfFalse(TDF_Label& theLab, const bool theFlag) {
@@ -520,43 +507,7 @@ bool Model_AttributeSelection::update()
               }
             }
           }
-          int aBestFound = 0; // best number of found edges (not percentage: issue 1019)
-          int aBestOrient = 0; // for the equal "BestFound" additional parameter is orientation
-          for(int aFaceIndex = 0; aFaceIndex < aConstructionContext->facesNum(); aFaceIndex++) {
-            int aFound = 0, aNotFound = 0, aSameOrientation = 0;
-            TopoDS_Face aFace = 
-              TopoDS::Face(aConstructionContext->face(aFaceIndex)->impl<TopoDS_Shape>());
-            TopExp_Explorer anEdgesExp(aFace, TopAbs_EDGE);
-            TColStd_MapOfTransient alreadyProcessed; // to avoid counting edges with same curved (841)
-            for(; anEdgesExp.More(); anEdgesExp.Next()) {
-              TopoDS_Edge anEdge = TopoDS::Edge(anEdgesExp.Current());
-              if (!anEdge.IsNull()) {
-                Standard_Real aFirst, aLast;
-                Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-                if (alreadyProcessed.Contains(aCurve))
-                  continue;
-                alreadyProcessed.Add(aCurve);
-                if (allCurves.IsBound(aCurve)) {
-                  aFound++;
-                  int anOrient = allCurves.Find(aCurve);
-                  if (anOrient != 0) {  // extra comparision score is orientation
-                    if (edgeOrientation(aFace, anEdge) == anOrient)
-                      aSameOrientation++;
-                  }
-                } else {
-                  aNotFound++;
-                }
-              }
-            }
-            if (aFound + aNotFound != 0) {
-              if (aFound > aBestFound || 
-                  (aFound == aBestFound && aSameOrientation > aBestOrient)) {
-                aBestFound = aFound;
-                aBestOrient = aSameOrientation;
-                aNewSelected = aConstructionContext->face(aFaceIndex);
-              }
-            }
-          }
+          aNewSelected = Model_SelectionNaming::findAppropriateFace(aContext, allCurves);
         }
         if (aNewSelected) { // store this new selection
           if (aShapeType == TopAbs_WIRE) { // just get a wire from face to have wire
@@ -790,7 +741,7 @@ void Model_AttributeSelection::selectConstruction(
           if (aPnt.IsEqual(aVertexPos, Precision::Confusion())) {
             aRefs->Add(aComposite->subFeatureId(a));
           }
-        } else { // get first or last vertex of the edge: last is stored with negative sign
+        } else { // get first or last vertex of the edge: last is stored with additional delta
           const TopoDS_Shape& anEdge = aConstr->shape()->impl<TopoDS_Shape>();
           int aDelta = kSTART_VERTEX_DELTA;
           for(TopExp_Explorer aVExp(anEdge, TopAbs_VERTEX); aVExp.More(); aVExp.Next()) {
@@ -820,7 +771,7 @@ void Model_AttributeSelection::selectConstruction(
                   Standard_Real aFirst, aLast;
                   Handle(Geom_Curve) aFaceCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
                   if (aFaceCurve == aCurve) {
-                    int anOrient = edgeOrientation(aSubShape, anEdge);
+                    int anOrient = Model_SelectionNaming::edgeOrientation(aSubShape, anEdge);
                     anOrientations[anID] = anOrient;
                     registerSubShape(
                       selectionLabel(), anEdge, anID, aContextFeature, aMyDoc, "", anOrientations,

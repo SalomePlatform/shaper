@@ -12,6 +12,9 @@
 #include <Model_Document.h>
 #include <TDF_Label.hxx>
 #include <TopoDS_Shape.hxx>
+#include <NCollection_DataMap.hxx>
+#include <Geom_Curve.hxx>
+#include <TopoDS_Edge.hxx>
 
 /**\class Model_SelectionNaming
  * \ingroup DataModel
@@ -38,6 +41,17 @@ public:
   bool selectSubShape(const std::string& theType, const std::string& theSubShapeName,
     std::shared_ptr<Model_Document> theDoc, std::shared_ptr<GeomAPI_Shape>& theShapeToBeSelected,
     std::shared_ptr<ModelAPI_Result>& theCont);
+
+  /// Searches the face more appropriate to the given curves (with higher level of matched parameters)
+  /// \param theConstr construction result that contains one or several  faces
+  /// \param theCurves map from the face edges curves to orientation (-1 reversed, 0 unknown, 1 forward)
+  /// \returns faces fron this construction if found
+  static std::shared_ptr<GeomAPI_Shape> findAppropriateFace(
+    std::shared_ptr<ModelAPI_Result>& theConstr, 
+    NCollection_DataMap<Handle(Geom_Curve), int>& theCurves);
+
+  /// Returns orientation of the edge in the context shape
+  static int edgeOrientation(const TopoDS_Shape& theContext, TopoDS_Edge& theEdge);
 
 protected:
   /// Gets the stored name from the document
