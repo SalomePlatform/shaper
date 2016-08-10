@@ -112,7 +112,7 @@ public:
                            const ModelHighAPI_Selection& theFromObject,
                            const ModelHighAPI_Double& theFromOffset);
 
-    /// Dump wrapped feature
+  /// Dump wrapped feature
   FEATURESAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };

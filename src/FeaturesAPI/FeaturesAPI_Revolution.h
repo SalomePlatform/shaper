@@ -90,6 +90,10 @@ public:
                            const ModelHighAPI_Double& theToOffset,
                            const ModelHighAPI_Selection& theFromObject,
                            const ModelHighAPI_Double& theFromOffset);
+
+  /// Dump wrapped feature
+  FEATURESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Revolution object.

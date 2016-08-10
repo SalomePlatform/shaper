@@ -7,6 +7,7 @@
 #include "FeaturesAPI_Revolution.h"
 
 #include <ModelHighAPI_Double.h>
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
@@ -118,6 +119,36 @@ void FeaturesAPI_Revolution::setPlanesAndOffsets(const ModelHighAPI_Selection& t
   fillAttribute(theFromOffset, myfromOffset);
 
   execute();
+}
+
+//==================================================================================================
+void FeaturesAPI_Revolution::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  AttributeSelectionListPtr anObjects = aBase->selectionList(FeaturesPlugin_Revolution::BASE_OBJECTS_ID());
+  AttributeSelectionPtr anAxis = aBase->selection(FeaturesPlugin_Revolution::AXIS_OBJECT_ID());
+
+  theDumper << aBase << " = model.addRevolution(" << aDocName << ", " << anObjects << ", " << anAxis;
+
+  std::string aCreationMethod = aBase->string(FeaturesPlugin_Revolution::CREATION_METHOD())->value();
+
+  if(aCreationMethod == FeaturesPlugin_Revolution::CREATION_METHOD_BY_ANGLES()) {
+    AttributeDoublePtr anAttrToAngle = aBase->real(FeaturesPlugin_Revolution::TO_ANGLE_ID());
+    AttributeDoublePtr anAttrFromAngle = aBase->real(FeaturesPlugin_Revolution::FROM_ANGLE_ID());
+
+    theDumper << ", " << anAttrToAngle << ", " << anAttrFromAngle;
+  } else if(aCreationMethod == FeaturesPlugin_Revolution::CREATION_METHOD_BY_PLANES()) {
+    AttributeSelectionPtr anAttrToObject = aBase->selection(FeaturesPlugin_Revolution::TO_OBJECT_ID());
+    AttributeDoublePtr anAttrToOffset = aBase->real(FeaturesPlugin_Revolution::TO_OFFSET_ID());
+    AttributeSelectionPtr anAttrFromObject = aBase->selection(FeaturesPlugin_Revolution::FROM_OBJECT_ID());
+    AttributeDoublePtr anAttrFromOffset = aBase->real(FeaturesPlugin_Revolution::FROM_OFFSET_ID());
+
+    theDumper << ", " << anAttrToObject << ", " << anAttrToOffset << ", " << anAttrFromObject << ", " << anAttrFromOffset;
+  }
+
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================

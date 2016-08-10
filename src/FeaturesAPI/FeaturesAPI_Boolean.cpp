@@ -6,6 +6,7 @@
 
 #include "FeaturesAPI_Boolean.h"
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Integer.h>
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
@@ -61,6 +62,31 @@ void FeaturesAPI_Boolean::setToolObjects(const std::list<ModelHighAPI_Selection>
   fillAttribute(theToolObjects, mytoolObjects);
 
   execute();
+}
+
+//==================================================================================================
+void FeaturesAPI_Boolean::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+
+  FeaturesPlugin_Boolean::OperationType aType =
+      (FeaturesPlugin_Boolean::OperationType)aBase->integer(FeaturesPlugin_Boolean::TYPE_ID())->value();
+
+  theDumper << aBase << " = model.add";
+
+  switch(aType) {
+    case FeaturesPlugin_Boolean::BOOL_CUT:    theDumper << "Cut";    break;
+    case FeaturesPlugin_Boolean::BOOL_FUSE:   theDumper << "Fuse";   break;
+    case FeaturesPlugin_Boolean::BOOL_COMMON: theDumper << "Common"; break;
+    case FeaturesPlugin_Boolean::BOOL_FILL:   theDumper << "Fill";   break;
+    case FeaturesPlugin_Boolean::BOOL_SMASH:  theDumper << "Smash";  break;
+  }
+
+  const std::string& aDocName = theDumper.name(aBase->document());
+  AttributeSelectionListPtr anObjects = aBase->selectionList(FeaturesPlugin_Boolean::OBJECT_LIST_ID());
+  AttributeSelectionListPtr aTools = aBase->selectionList(FeaturesPlugin_Boolean::TOOL_LIST_ID());
+
+  theDumper << "(" << aDocName << ", " << anObjects << ", " << aTools << ")" << std::endl;
 }
 
 //==================================================================================================
