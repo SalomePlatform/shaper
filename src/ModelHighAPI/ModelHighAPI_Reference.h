@@ -16,6 +16,7 @@
 class ModelAPI_Attribute;
 class ModelAPI_AttributeReference;
 class ModelAPI_AttributeRefList;
+class ModelAPI_Feature;
 class ModelAPI_Object;
 class ModelHighAPI_Interface;
 //--------------------------------------------------------------------------------------
@@ -46,6 +47,10 @@ public:
   /// Append to list attribute
   MODELHIGHAPI_EXPORT
   virtual void appendToList(const std::shared_ptr<ModelAPI_AttributeRefList> & theAttribute) const;
+
+  /// Returns feature for this object.
+  MODELHIGHAPI_EXPORT
+  virtual std::shared_ptr<ModelAPI_Feature> feature() const;
 
 private:
   std::shared_ptr<ModelAPI_Object> myObject;

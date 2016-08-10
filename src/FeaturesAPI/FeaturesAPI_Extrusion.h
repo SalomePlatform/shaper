@@ -15,6 +15,7 @@
 #include <ModelHighAPI_Macro.h>
 
 class ModelHighAPI_Double;
+class ModelHighAPI_Reference;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Extrusion
@@ -77,7 +78,8 @@ public:
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_Extrusion();
 
-  INTERFACE_10(FeaturesPlugin_Extrusion::ID(),
+  INTERFACE_11(FeaturesPlugin_Extrusion::ID(),
+               sketch, FeaturesPlugin_Extrusion::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch object */,
                baseObjects, FeaturesPlugin_Extrusion::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */,
                creationMethod, FeaturesPlugin_Extrusion::CREATION_METHOD(), ModelAPI_AttributeString, /** Creation method */,
                toSize, FeaturesPlugin_Extrusion::TO_SIZE_ID(), ModelAPI_AttributeDouble, /** To size */,
@@ -88,6 +90,10 @@ public:
                fromOffset, FeaturesPlugin_Extrusion::FROM_OFFSET_ID(), ModelAPI_AttributeDouble, /** From offset */,
                direction, FeaturesPlugin_Extrusion::DIRECTION_OBJECT_ID(), ModelAPI_AttributeSelection, /** Direction */,
                sketchLauncher, FeaturesPlugin_Extrusion::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */)
+
+  /// Modify base attribute of the feature.
+  FEATURESAPI_EXPORT
+  void setNestedSketch(const ModelHighAPI_Reference& theSketch);
 
   /// Modify base attribute of the feature.
   FEATURESAPI_EXPORT
@@ -115,6 +121,9 @@ public:
   /// Dump wrapped feature
   FEATURESAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
+private:
+  void execIfBaseNotEmpty();
 };
 
 /// Pointer on Extrusion object.

@@ -44,3 +44,9 @@ void ModelHighAPI_Reference::appendToList(
 {
   theAttribute->append(myObject);
 }
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<ModelAPI_Feature> ModelHighAPI_Reference::feature() const
+{
+  return ModelAPI_Feature::feature(myObject);
+}
