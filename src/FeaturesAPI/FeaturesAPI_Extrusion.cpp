@@ -179,10 +179,13 @@ void FeaturesAPI_Extrusion::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
+  AttributeReferencePtr anAttrSketch = aBase->reference(FeaturesPlugin_CompositeSketch::SKETCH_ID());
   AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Extrusion::BASE_OBJECTS_ID());
   AttributeSelectionPtr anAttrDirection = aBase->selection(FeaturesPlugin_Extrusion::DIRECTION_OBJECT_ID());
 
-  theDumper << aBase << " = model.addExtrusion(" << aDocName << ", " << anAttrObjects << ", " << anAttrDirection;
+  theDumper << aBase << " = model.addExtrusion(" << aDocName << ", ";
+  anAttrSketch->isInitialized() ? theDumper << "[]" : theDumper << anAttrObjects;
+  theDumper << ", " << anAttrDirection;
 
   std::string aCreationMethod = aBase->string(FeaturesPlugin_Extrusion::CREATION_METHOD())->value();
 
@@ -202,7 +205,6 @@ void FeaturesAPI_Extrusion::dump(ModelHighAPI_Dumper& theDumper) const
 
   theDumper << ")" << std::endl;
 
-  AttributeReferencePtr anAttrSketch = aBase->reference(FeaturesPlugin_CompositeSketch::SKETCH_ID());
   if(anAttrSketch->isInitialized()) {
     theDumper << aBase << ".setNestedSketch(" << anAttrSketch << ")";
   }
