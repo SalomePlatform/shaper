@@ -22,10 +22,13 @@ class GeomDataAPI_Dir;
 class GeomDataAPI_Point;
 class GeomDataAPI_Point2D;
 
+class ModelAPI_Attribute;
 class ModelAPI_AttributeBoolean;
 class ModelAPI_AttributeDouble;
 class ModelAPI_AttributeInteger;
 class ModelAPI_AttributeRefAttr;
+class ModelAPI_AttributeRefAttrList;
+class ModelAPI_AttributeRefList;
 class ModelAPI_AttributeSelection;
 class ModelAPI_AttributeSelectionList;
 class ModelAPI_AttributeString;
@@ -33,6 +36,7 @@ class ModelAPI_CompositeFeature;
 class ModelAPI_Document;
 class ModelAPI_Entity;
 class ModelAPI_Feature;
+class ModelAPI_Object;
 
 typedef std::shared_ptr<ModelAPI_Entity>  EntityPtr;
 typedef std::shared_ptr<ModelAPI_Feature> FeaturePtr;
@@ -147,11 +151,26 @@ public:
   ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeString>& theAttrStr);
   /// Dump name of entity and remember to dump "setName" if the entity has user-defined name
   MODELHIGHAPI_EXPORT
-  ModelHighAPI_Dumper& operator<<(const EntityPtr& theEntity);
+  ModelHighAPI_Dumper& operator<<(const FeaturePtr& theEntity);
+
+  /// Dump Attribute
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_Attribute>& theAttr);
+  /// Dump Object
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_Object>& theObject);
 
   /// Dump AttributeRefAttr
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeRefAttr>& theRefAttr);
+  /// Dump AttributeRefAttrList as follows:
+  /// "[obj1, obj2, obj3, ...]"
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeRefAttrList>& theRefAttrList);
+  /// Dump AttributeRefList as follows:
+  /// "[obj1, obj2, obj3, ...]"
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeRefList>& theRefList);
   /// Dump AttributeSelection
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeSelection>& theAttrSelect);

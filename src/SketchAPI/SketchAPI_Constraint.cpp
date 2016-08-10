@@ -127,7 +127,8 @@ static std::string angleTypeToString(int theAngleType)
 
 void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
 {
-  ConstraintPtr aConstraint = std::dynamic_pointer_cast<SketchPlugin_Constraint>(feature());
+  FeaturePtr aBase = feature();
+  ConstraintPtr aConstraint = std::dynamic_pointer_cast<SketchPlugin_Constraint>(aBase);
   if (!aConstraint)
     return; // dump constraints only
 
@@ -141,7 +142,7 @@ void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
                     SketchPlugin_ConstraintAngle::TYPE_ID())->value());
 
   const std::string& aSketchName = theDumper.parentName(aConstraint);
-  theDumper << aConstraint << " = " << aSketchName << "." << aSetter << aSetterSuffix << "(";
+  theDumper << aBase << " = " << aSketchName << "." << aSetter << aSetterSuffix << "(";
 
   bool isFirstAttr = true;
   for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {

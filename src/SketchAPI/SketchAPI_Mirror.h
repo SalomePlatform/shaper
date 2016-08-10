@@ -14,7 +14,8 @@
 
 #include <SketchPlugin_ConstraintMirror.h>
 
-#include "SketchAPI_SketchEntity.h"
+#include <ModelHighAPI_Interface.h>
+#include <ModelHighAPI_Macro.h>
 //--------------------------------------------------------------------------------------
 class ModelAPI_Object;
 class ModelHighAPI_RefAttr;
@@ -23,7 +24,7 @@ class ModelHighAPI_RefAttr;
  * \ingroup CPPHighAPI
  * \brief Interface for Mirror feature
  */
-class SketchAPI_Mirror : public SketchAPI_SketchEntity
+class SketchAPI_Mirror : public ModelHighAPI_Interface
 {
 public:
   /// Constructor without values
@@ -45,6 +46,8 @@ public:
               mirroredObjects, SketchPlugin_ConstraintMirror::ENTITY_C(), ModelAPI_AttributeRefList, /** Mirrored objects */
   )
 
+  /// Dump wrapped feature
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 //! Pointer on Mirror object

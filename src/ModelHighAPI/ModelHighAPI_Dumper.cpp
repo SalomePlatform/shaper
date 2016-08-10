@@ -18,6 +18,8 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeRefAttrList.h>
+#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
@@ -29,6 +31,8 @@
 #include <ModelAPI_ResultPart.h>
 
 #include <PartSetPlugin_Part.h>
+
+#include <SketchPlugin_SketchEntity.h>
 
 #include <OSD_OpenFile.hxx>
 
@@ -171,8 +175,15 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
   int aNbSubs = theComposite->numberOfSubs();
   for (int anIndex = 0; anIndex < aNbSubs; ++anIndex) {
     FeaturePtr aFeature = theComposite->subFeature(anIndex);
-    if (!isDumped(aFeature))
-      dumpFeature(aFeature, true);
+    if (isDumped(aFeature))
+      continue;
+    bool isForce = true;
+    // check the feature is a sketch entity and a copy of another entity
+    std::shared_ptr<SketchPlugin_SketchEntity> aSketchEntity =
+        std::dynamic_pointer_cast<SketchPlugin_SketchEntity>(aFeature);
+    if (aSketchEntity && aSketchEntity->isCopy())
+      isForce = false;
+    dumpFeature(aFeature, isForce);
   }
   // dump command to update model
   myDumpBuffer << "model.do()" << std::endl;
@@ -239,6 +250,7 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
     myDumpBuffer << ".feature()";
   myDumpBuffer << ".data().setName(\"" << aName << "\")" << std::endl;
 #endif
+  myNames[myLastEntityWithName].second = false; // don't dump "setName" for the entity twice
   myLastEntityWithName = EntityPtr();
 }
 
@@ -370,7 +382,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
   return *this;
 }
 
-ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const EntityPtr& theEntity)
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity)
 {
   myDumpBuffer << name(theEntity);
   if (myNames[theEntity].second)
@@ -379,16 +391,85 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const EntityPtr& theEntity)
   return *this;
 }
 
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const ObjectPtr& theObject)
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  myDumpBuffer << name(aFeature);
+  return *this;
+}
+
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const AttributePtr& theAttr)
+{
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theAttr->owner());
+  myDumpBuffer << name(anOwner) << "." << attributeGetter(anOwner, theAttr->id()) << "()";
+  return *this;
+}
+
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeRefAttr>& theRefAttr)
 {
-  if (theRefAttr->isObject()) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(theRefAttr->object());
-    myDumpBuffer << name(aFeature);
+  if (theRefAttr->isObject())
+    *this << theRefAttr->object();
+  else
+    *this << theRefAttr->attr();
+  return *this;
+}
+
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
+    const std::shared_ptr<ModelAPI_AttributeRefAttrList>& theRefAttrList)
+{
+  myDumpBuffer << "[";
+  std::list<std::pair<ObjectPtr, AttributePtr> > aList = theRefAttrList->list();
+  bool isAdded = false;
+  std::list<std::pair<ObjectPtr, AttributePtr> >::const_iterator anIt = aList.begin();
+  for (; anIt != aList.end(); ++anIt) {
+    if (isAdded)
+      myDumpBuffer << ", ";
+    else
+      isAdded = true;
+    if (anIt->first)
+      *this << anIt->first;
+    else if (anIt->second)
+      * this << anIt->second;
+  }
+  myDumpBuffer << "]";
+  return *this;
+}
+
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
+    const std::shared_ptr<ModelAPI_AttributeRefList>& theRefList)
+{
+  static const int aThreshold = 2;
+  // if number of elements in the list if greater than a threshold,
+  // dump it in a separate line with specific name
+  std::string aDumped = myDumpBuffer.str();
+  if (aDumped.empty() || theRefList->size() <= aThreshold) {
+    myDumpBuffer << "[";
+    std::list<ObjectPtr> aList = theRefList->list();
+    bool isAdded = false;
+    std::list<ObjectPtr>::const_iterator anIt = aList.begin();
+    for (; anIt != aList.end(); ++anIt) {
+      if (isAdded)
+        myDumpBuffer << ", ";
+      else
+        isAdded = true;
+
+      *this << *anIt;
+    }
+    myDumpBuffer << "]";
   } else {
-    AttributePtr anAttr = theRefAttr->attr();
-    FeaturePtr anOwner = ModelAPI_Feature::feature(anAttr->owner());
-    myDumpBuffer << name(anOwner) << "." << attributeGetter(anOwner, anAttr->id()) << "()";
+    // clear buffer and store list "as is"
+    myDumpBuffer = std::ostringstream();
+    *this << theRefList;
+    // save buffer and clear it again
+    std::string aDumpedList = myDumpBuffer.str();
+    myDumpBuffer = std::ostringstream();
+    // obtain name of list
+    FeaturePtr anOwner = ModelAPI_Feature::feature(theRefList->owner());
+    std::string aListName = name(anOwner) + "_objects";
+    // store all previous data
+    myDumpBuffer << aListName << " = " << aDumpedList << std::endl
+                 << aDumped << aListName;
   }
   return *this;
 }
