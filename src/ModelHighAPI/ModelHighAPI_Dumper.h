@@ -39,8 +39,9 @@ class ModelAPI_Entity;
 class ModelAPI_Feature;
 class ModelAPI_Object;
 
-typedef std::shared_ptr<ModelAPI_Entity>  EntityPtr;
-typedef std::shared_ptr<ModelAPI_Feature> FeaturePtr;
+typedef std::shared_ptr<ModelAPI_Document> DocumentPtr;
+typedef std::shared_ptr<ModelAPI_Entity>   EntityPtr;
+typedef std::shared_ptr<ModelAPI_Feature>  FeaturePtr;
 
 /**\class ModelHighAPI_Dumper
  * \ingroup CPPHighAPI
@@ -211,6 +212,7 @@ private:
 private:
   typedef std::map<EntityPtr, std::pair<std::string, bool> > EntityNameMap;
   typedef std::map<std::string, std::set<std::string> >      ModulesMap;
+  typedef std::map<DocumentPtr, std::map<std::string, int> > NbFeaturesMap;
 
   static ModelHighAPI_Dumper* mySelf;
 
@@ -220,6 +222,8 @@ private:
   ModulesMap          myModules;            ///< modules and entities to be imported
   EntityNameMap       myNames;              ///< names of the entities
   EntityPtr           myLastEntityWithName; ///< not null, if last dumped entity had user defined name
+
+  NbFeaturesMap       myFeatureCount;       ///< number of features of each kind
 
 protected:
   std::set<EntityPtr> myNotDumpedEntities;  ///< list of entities, used by other features but not dumped yet

@@ -35,7 +35,7 @@ void PartSetAPI_Part::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  theDumper << aBase << " = model.addPart(" << aDocName << ").document()" << std::endl;
+  theDumper << aBase << " = model.addPart(" << aDocName << ")" << std::endl;
 }
 
 //--------------------------------------------------------------------------------------

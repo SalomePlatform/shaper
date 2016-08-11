@@ -37,10 +37,9 @@
 
 #include <OSD_OpenFile.hxx>
 
-#include <algorithm>
 #include <fstream>
 
-//#define DUMP_USER_DEFINED_NAMES
+#define DUMP_USER_DEFINED_NAMES
 
 ModelHighAPI_Dumper* ModelHighAPI_Dumper::mySelf = 0;
 
@@ -73,6 +72,7 @@ void ModelHighAPI_Dumper::clear(bool bufferOnly)
 
     myNames.clear();
     myModules.clear();
+    myFeatureCount.clear();
     myLastEntityWithName = EntityPtr();
   }
 }
@@ -90,23 +90,32 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity)
 
   // entity is not found, store it
   std::string aName;
-  bool isNameDefined = false;
+  bool isUserDefined = false;
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theEntity);
   if (aFeature) {
+    isUserDefined = true;
     aName = aFeature->name();
-    isNameDefined = !aName.empty();
+    const std::string& aKind = aFeature->getKind();
+    DocumentPtr aDoc = aFeature->document();
+    int& aNbFeatures = myFeatureCount[aDoc][aKind];
 
-    if (!isNameDefined) {
-      static long anIndex = 0;
-      // set default name: feature ID + index
-      std::ostringstream aConverter;
-      aConverter << aFeature->getKind() << "_" << ++anIndex;
-      aName = aConverter.str();
-      std::transform(aName.begin(), aName.end(), aName.begin(), ::tolower);
+    size_t anIndex = aName.find(aKind);
+    if (anIndex == 0 && aName[aKind.length()] == '_') { // name starts with "FeatureKind_"
+      std::string anIdStr = aName.substr(aKind.length() + 1, std::string::npos);
+      int anId = std::stoi(anIdStr);
+
+      // Check number of already registered objects of such kind. Index of current object
+      // should be greater than it to identify feature's name as automatically generated.
+      if (aNbFeatures < anId) {
+        isUserDefined = false;
+        aNbFeatures = anId - 1;
+      }
     }
+
+    aNbFeatures += 1;
   }
 
-  myNames[theEntity] = std::pair<std::string, bool>(aName, isNameDefined);
+  myNames[theEntity] = std::pair<std::string, bool>(aName, isUserDefined);
   myNotDumpedEntities.insert(theEntity);
   return myNames[theEntity].first;
 }
@@ -160,8 +169,13 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
       if (!aPartResult)
         continue;
       DocumentPtr aSubDoc = aPartResult->partDoc();
-      // set name of document equal to part name
-      myNames[aSubDoc] = myNames[*aFeatIt];
+      // set name of document
+      const std::string& aPartName = myNames[*aFeatIt].first;
+      std::string aDocName = aPartName + "_doc";
+      myNames[aSubDoc] = std::pair<std::string, bool>(aDocName, false);
+
+      // dump document in a single line
+      *this << aDocName << " = " << aPartName << ".document()" << std::endl;
 
       isOk = process(aSubDoc) && isOk;
     } else
