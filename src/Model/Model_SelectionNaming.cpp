@@ -35,10 +35,6 @@
 #include <BRepTools.hxx>
 #endif
 
-/// added to the index in the packed map to signalize that the vertex of edge is selected
-/// (multiplied by the index of the edge)
-static const int kSTART_VERTEX_DELTA = 1000000;
-
 Model_SelectionNaming::Model_SelectionNaming(TDF_Label theSelectionLab)
 {
   myLab = theSelectionLab;
@@ -524,9 +520,8 @@ bool parseSubIndices(CompositeFeaturePtr theComp, //< to iterate names
 /// produces theEdge orientation relatively to theContext face
 int Model_SelectionNaming::edgeOrientation(const TopoDS_Shape& theContext, TopoDS_Edge& theEdge)
 {
-  if (theContext.ShapeType() != TopAbs_FACE)
+  if (theContext.ShapeType() != TopAbs_FACE && theContext.ShapeType() != TopAbs_WIRE)
     return 0;
-  TopoDS_Face aContext = TopoDS::Face(theContext);
   if (theEdge.Orientation() == TopAbs_FORWARD) 
     return 1;
   if (theEdge.Orientation() == TopAbs_REVERSED) 
@@ -604,6 +599,9 @@ std::string Model_SelectionNaming::shortName(
   return aName;
 }
 
+#include <ModelAPI_Session.h>
+#include <ModelAPI_ResultPart.h>
+
 // type ::= COMP | COMS | SOLD | SHEL | FACE | WIRE | EDGE | VERT
 bool Model_SelectionNaming::selectSubShape(const std::string& theType, 
   const std::string& theSubShapeName, std::shared_ptr<Model_Document> theDoc,
@@ -611,16 +609,40 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
 {
   if(theSubShapeName.empty() || theType.empty()) return false;
   TopAbs_ShapeEnum aType = translateType(theType);
-  std::string aContName = getContextName(theSubShapeName);
+
+  // check that it was selected in another document
+  size_t aSlash = theSubShapeName.find("/");
+  std::string aSubShapeName = theSubShapeName;
+  std::shared_ptr<Model_Document> aDoc = theDoc;
+  if (aSlash != std::string::npos) {
+    std::string aDocName = theSubShapeName.substr(0, aSlash);
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+    if (aDocName == aRootDoc->kind()) {
+      aDoc = std::dynamic_pointer_cast<Model_Document>(aRootDoc);
+    } else {
+      for (int a = aRootDoc->size(ModelAPI_ResultPart::group()) - 1; a >= 0; a--) {
+        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(
+            aRootDoc->object(ModelAPI_ResultPart::group(), a));
+        if (aPart.get() && aPart->isActivated() && aPart->data()->name() == aDocName) {
+          aDoc = std::dynamic_pointer_cast<Model_Document>(aPart->partDoc());
+        }
+      }
+    }
+    if (aDoc != theDoc) { // so, the first word is the document name => reduce the string for the next manips
+      aSubShapeName = theSubShapeName.substr(aSlash + 1);
+    }
+  }
+
+  std::string aContName = getContextName(aSubShapeName);
   if(aContName.empty()) return false;
-  ResultPtr aCont = theDoc->findByName(aContName);
+  ResultPtr aCont = aDoc->findByName(aContName);
    // possible this is body where postfix is added to distinguish several shapes on the same label
   int aSubShapeId = -1; // -1 means sub shape not found
-  if (!aCont.get() && aContName == theSubShapeName) {
+  if (!aCont.get() && aContName == aSubShapeName) {
     size_t aPostIndex = aContName.rfind('_');
     if (aPostIndex != std::string::npos) {
       std::string aSubContName = aContName.substr(0, aPostIndex);
-      aCont = theDoc->findByName(aSubContName);
+      aCont = aDoc->findByName(aSubContName);
       if (aCont.get()) {
         try {
           std::string aNum = aContName.substr(aPostIndex + 1);
@@ -639,28 +661,29 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   switch (aType) 
   {
   case TopAbs_FACE:
+  case TopAbs_WIRE:
     {
-      aSelection = findFaceByName(theSubShapeName, theDoc);
+      aSelection = findFaceByName(aSubShapeName, aDoc);
     }
     break;
   case TopAbs_EDGE:
     {  
-      const TDF_Label& aLabel = theDoc->findNamingName(theSubShapeName);
+      const TDF_Label& aLabel = aDoc->findNamingName(aSubShapeName);
       if(!aLabel.IsNull()) {
         Handle(TNaming_NamedShape) aNS;
         if(aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-          aSelection = getShapeFromNS(theSubShapeName, aNS);
+          aSelection = getShapeFromNS(aSubShapeName, aNS);
         }
       }
     }
     break;
   case TopAbs_VERTEX:
     {
-      const TDF_Label& aLabel = theDoc->findNamingName(theSubShapeName);
+      const TDF_Label& aLabel = aDoc->findNamingName(aSubShapeName);
       if(!aLabel.IsNull()) {
         Handle(TNaming_NamedShape) aNS;
         if(aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-          aSelection = getShapeFromNS(theSubShapeName, aNS);
+          aSelection = getShapeFromNS(aSubShapeName, aNS);
         }
       }
     }
@@ -669,7 +692,6 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   case TopAbs_COMPSOLID:
   case TopAbs_SOLID:
   case TopAbs_SHELL:
-  case TopAbs_WIRE:
   default: {//TopAbs_SHAPE
     /// case when the whole sketch is selected, so, selection type is compound, but there is no value
     if (aCont.get() && aCont->shape().get()) {
@@ -695,13 +717,13 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   }
   // another try to find edge or vertex by faces
   std::list<std::string> aListofNames;
-  size_t aN = aSelection.IsNull() ? ParseName(theSubShapeName, aListofNames) : 0;
+  size_t aN = aSelection.IsNull() ? ParseName(aSubShapeName, aListofNames) : 0;
   if (aSelection.IsNull() && (aType == TopAbs_EDGE || aType == TopAbs_VERTEX)) {
     if(aN > 1 && (aN < 4 || (aType == TopAbs_EDGE && aN < 5))) { // 2 || 3 or 4 for EDGE
       TopTools_ListOfShape aList;
       std::list<std::string>::iterator it = aListofNames.begin();
       for(; it != aListofNames.end(); it++){
-        const TopoDS_Shape aFace = findFaceByName(*it, theDoc);
+        const TopoDS_Shape aFace = findFaceByName(*it, aDoc);
         if(!aFace.IsNull())
           aList.Append(aFace);		
       }
@@ -718,11 +740,10 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   // in case of construction, there is no registered names for all sub-elements,
   // even for the main element; so, trying to find them by name (without "&" intersections)
   if (aN == 0) {
-    size_t aConstrNamePos = theSubShapeName.find("/");
+    size_t aConstrNamePos = aSubShapeName.find("/");
     bool isFullName = aConstrNamePos == std::string::npos;
     std::string aContrName = aContName;
-    //  isFullName ? theSubShapeName : theSubShapeName.substr(0, aConstrNamePos);
-    ResultPtr aConstr = theDoc->findByName(aContrName);
+    ResultPtr aConstr = aDoc->findByName(aContrName);
     if (aConstr.get() && aConstr->groupName() == ModelAPI_ResultConstruction::group()) {
       theCont = aConstr;
       if (isFullName) {
@@ -731,12 +752,12 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
       }
       // for sketch sub-elements selected
       CompositeFeaturePtr aComposite = 
-        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theDoc->feature(aConstr));
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aDoc->feature(aConstr));
       if (aComposite.get()) {
         if (aType == TopAbs_VERTEX || aType == TopAbs_EDGE) {
           // collect all IDs in the name
           std::map<int, int> anIDs;
-          if (!parseSubIndices(aComposite, theSubShapeName, 
+          if (!parseSubIndices(aComposite, aSubShapeName, 
               aType == TopAbs_EDGE ? "Edge" : "Vertex", anIDs))
             return false;
 
@@ -775,9 +796,52 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
               }
             }
           }
-        } else if (aType == TopAbs_FACE) { // sketch faces is identified by format "Sketch_1/Face-2f-8f-11r"
+          // sketch faces is identified by format "Sketch_1/Face-2f-8f-11r"
+        } else if (aType == TopAbs_FACE || aType == TopAbs_WIRE) {
           std::map<int, int> anIDs;
-          if (!parseSubIndices(aComposite, theSubShapeName, "Face", anIDs, true))
+          if (!parseSubIndices(aComposite, aSubShapeName, 
+              aType == TopAbs_FACE ? "Face" : "Wire", anIDs, true))
+            return false;
+
+          NCollection_DataMap<Handle(Geom_Curve), int> allCurves; // curves and orientations of edges
+          const int aSubNum = aComposite->numberOfSubs();
+          for(int a = 0; a < aSubNum; a++) {
+            int aSubID = aComposite->subFeatureId(a);
+            if (anIDs.find(aSubID) != anIDs.end()) {
+              FeaturePtr aSub = aComposite->subFeature(a);
+              const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
+              std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes;
+              for(aRes = aResults.cbegin(); aRes != aResults.cend(); aRes++) {
+                ResultConstructionPtr aConstr = 
+                  std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
+                if (aConstr->shape() && aConstr->shape()->isEdge()) {
+                  const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
+                  TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
+                  if (!anEdge.IsNull()) {
+                    Standard_Real aFirst, aLast;
+                    Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+                    allCurves.Bind(aCurve, anIDs[aSubID] > 0 ? 1 : -1);
+                  }
+                }
+              }
+            }
+          }
+          std::shared_ptr<GeomAPI_Shape> aFoundFace = findAppropriateFace(aConstr, allCurves);
+          if (aFoundFace.get()) {
+            if (aType == TopAbs_WIRE) { // just get a wire from face to have wire
+              TopExp_Explorer aWireExp(aFoundFace->impl<TopoDS_Shape>(), TopAbs_WIRE);
+              if (aWireExp.More()) {
+                theShapeToBeSelected.reset(new GeomAPI_Shape);
+                theShapeToBeSelected->setImpl<TopoDS_Shape>(new TopoDS_Shape(aWireExp.Current()));
+              } else return false;
+            } else {
+              theShapeToBeSelected = aFoundFace;
+            }
+            return true;
+          }
+        } else if (aType == TopAbs_WIRE) { // sketch faces is identified by format "Sketch_1/Face-2f-8f-11r"
+          std::map<int, int> anIDs;
+          if (!parseSubIndices(aComposite, aSubShapeName, "Wire", anIDs))
             return false;
 
           NCollection_DataMap<Handle(Geom_Curve), int> allCurves; // curves and orientations of edges

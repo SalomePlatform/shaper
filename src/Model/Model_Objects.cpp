@@ -1103,9 +1103,10 @@ ResultPtr Model_Objects::findByName(const std::string theName)
     FeaturePtr& aFeature = anObjIter.ChangeValue();
     if (!aFeature.get() || aFeature->isDisabled()) // may be on close
       continue;
-    const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
-    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-    for (; aRIter != aResults.cend(); aRIter++) {
+    std::list<ResultPtr> allResults;
+    ModelAPI_Tools::allResults(aFeature, allResults);
+    std::list<ResultPtr>::iterator aRIter = allResults.begin();
+    for (; aRIter != allResults.cend(); aRIter++) {
       ResultPtr aRes = *aRIter;
       if (aRes.get() && aRes->data() && aRes->data()->isValid() && !aRes->isDisabled() &&
           aRes->data()->name() == theName) {

@@ -56,6 +56,8 @@
 #include <TopoDS_Iterator.hxx>
 #include <TNaming_Iterator.hxx>
 #include <BRep_Builder.hxx>
+#include <ModelAPI_Session.h>
+
 using namespace std;
 //#define DEB_NAMING 1
 #ifdef DEB_NAMING
@@ -653,6 +655,18 @@ static void registerSubShape(TDF_Label theMainLabel, TopoDS_Shape theShape,
   TNaming_Builder aBuilder(aLab);
   aBuilder.Generated(theShape);
   std::stringstream aName;
+  // add the part name if the selected object is located in other part
+  if (theDoc != theContextFeature->document()) {
+    if (theContextFeature->document() == ModelAPI_Session::get()->moduleDocument()) {
+      aName<<theContextFeature->document()->kind()<<"/";
+    } else {
+      ResultPtr aDocRes = ModelAPI_Tools::findPartResult(
+        ModelAPI_Session::get()->moduleDocument(), theContextFeature->document());
+      if (aDocRes.get()) {
+        aName<<aDocRes->data()->name()<<"/";
+      }
+    }
+  }
   aName<<theContextFeature->name();
   if (theShape.ShapeType() != TopAbs_COMPOUND) { // compound means the whole result for construction
     aName<<"/";
