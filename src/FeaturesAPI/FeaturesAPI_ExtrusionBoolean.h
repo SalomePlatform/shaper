@@ -221,10 +221,8 @@ ExtrusionCutPtr addExtrusionCut(const std::shared_ptr<ModelAPI_Document>& thePar
 class FeaturesAPI_ExtrusionFuse: public FeaturesAPI_ExtrusionBoolean
 {
 public:
-  FEATURESAPI_EXPORT
-  virtual std::string getID() {
-    return FeaturesPlugin_ExtrusionFuse::ID();
-  }
+  static std::string ID() { return FeaturesPlugin_ExtrusionFuse::ID(); }
+  virtual std::string getID() { return ID(); }
 
   /// Constructor without values.
   FEATURESAPI_EXPORT
