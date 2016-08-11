@@ -132,6 +132,16 @@ void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
   if (!aConstraint)
     return; // dump constraints only
 
+  // do not need to dump "Fixed" constraint for external object
+  if (aConstraint->getKind() == SketchPlugin_ConstraintRigid::ID()) {
+    AttributeRefAttrPtr aRefAttr = aConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
+    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(
+        ModelAPI_Feature::feature(aRefAttr->object()));
+    if (!aSketchFeature || aSketchFeature->isExternal())
+      return;
+  }
+
   const std::string& aSetter = constraintTypeToSetter(aConstraint->getKind());
   if (aSetter.empty())
     return; // incorrect constraint type
