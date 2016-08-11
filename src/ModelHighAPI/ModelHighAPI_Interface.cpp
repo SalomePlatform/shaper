@@ -57,6 +57,8 @@ std::list<ModelHighAPI_Selection> ModelHighAPI_Interface::result() const
 
 std::shared_ptr<ModelAPI_Result> ModelHighAPI_Interface::defaultResult() const
 {
+  const_cast<ModelHighAPI_Interface*>(this)->execute();
+
   return feature()->lastResult();
 }
 
