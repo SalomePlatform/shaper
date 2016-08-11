@@ -79,18 +79,18 @@ void SketchSolver_ConstraintMirror::process()
   BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
   std::list<ConstraintWrapperPtr> aMirConstrList;
 
-  std::vector<EntityWrapperPtr>::iterator aBIt = aBaseList.begin();
+  // update mirrored features to be in the current group
   std::vector<EntityWrapperPtr>::iterator aMIt = aMirrorList.begin();
-  for (; aBIt != aBaseList.end(); ++aBIt, ++aMIt) {
+  for (; aMIt != aMirrorList.end(); ++aMIt)
+    myStorage->update((*aMIt)->baseFeature(), myGroupID);
+
+  std::vector<EntityWrapperPtr>::iterator aBIt = aBaseList.begin();
+  for (aMIt = aMirrorList.begin(); aBIt != aBaseList.end(); ++aBIt, ++aMIt) {
     aNewConstraints = aBuilder->createConstraint(
         myBaseConstraint, myGroupID, mySketchID, aConstrType,
         0.0, *aBIt, *aMIt, aMirrorLine);
     aMirConstrList.insert(aMirConstrList.end(), aNewConstraints.begin(), aNewConstraints.end());
   }
-
-  // update mirrored features to be in the current group
-  for (aMIt = aMirrorList.begin(); aMIt != aMirrorList.end(); ++aMIt)
-    myStorage->update((*aMIt)->baseFeature(), myGroupID);
   myStorage->addConstraint(myBaseConstraint, aMirConstrList);
 
   adjustConstraint();

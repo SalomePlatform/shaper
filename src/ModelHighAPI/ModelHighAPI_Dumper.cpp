@@ -19,6 +19,7 @@
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefAttrList.h>
+#include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -185,8 +186,8 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
       isForce = false;
     dumpFeature(aFeature, isForce);
   }
-  // dump command to update model
-  myDumpBuffer << "model.do()" << std::endl;
+  // dump empty line for appearance
+  myDumpBuffer << std::endl;
   return true;
 }
 
@@ -275,6 +276,12 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const char* theString)
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const std::string& theString)
 {
   myDumpBuffer << theString;
+  return *this;
+}
+
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const bool theValue)
+{
+  myDumpBuffer << (theValue ? "True" : "False");
   return *this;
 }
 
@@ -437,6 +444,13 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
+    const std::shared_ptr<ModelAPI_AttributeReference>& theReference)
+{
+  *this << theReference->value();
+  return *this;
+}
+
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeRefList>& theRefList)
 {
   static const int aThreshold = 2;
@@ -547,6 +561,12 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
   for (; anIt != aNotDumped.end(); ++anIt) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
     theDumper.dumpFeature(aFeature, true);
+
+    // if the feature is composite, dump all its subs
+    CompositeFeaturePtr aCompFeat =
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+    if (aCompFeat)
+      theDumper.process(aCompFeat);
   }
 
   // then store currently dumped string

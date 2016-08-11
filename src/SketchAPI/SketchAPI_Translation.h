@@ -14,7 +14,8 @@
 
 #include <SketchPlugin_MultiTranslation.h>
 
-#include "SketchAPI_SketchEntity.h"
+#include <ModelHighAPI_Interface.h>
+#include <ModelHighAPI_Macro.h>
 //--------------------------------------------------------------------------------------
 class ModelAPI_Object;
 class ModelHighAPI_Integer;
@@ -24,7 +25,7 @@ class ModelHighAPI_RefAttr;
  * \ingroup CPPHighAPI
  * \brief Interface for Translation feature
  */
-class SketchAPI_Translation : public SketchAPI_SketchEntity
+class SketchAPI_Translation : public ModelHighAPI_Interface
 {
 public:
   /// Constructor without values
@@ -52,6 +53,8 @@ public:
               translatedObjects, SketchPlugin_MultiTranslation::ENTITY_B(), ModelAPI_AttributeRefList, /** Translationed objects */
   )
 
+  /// Dump wrapped feature
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 //! Pointer on Translation object

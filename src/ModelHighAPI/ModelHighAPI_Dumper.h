@@ -28,6 +28,7 @@ class ModelAPI_AttributeDouble;
 class ModelAPI_AttributeInteger;
 class ModelAPI_AttributeRefAttr;
 class ModelAPI_AttributeRefAttrList;
+class ModelAPI_AttributeReference;
 class ModelAPI_AttributeRefList;
 class ModelAPI_AttributeSelection;
 class ModelAPI_AttributeSelectionList;
@@ -103,6 +104,9 @@ public:
   /// Dump string
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const std::string& theString);
+  /// Dump boolean
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const bool theValue);
   /// Dump integer
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const int theValue);
@@ -177,6 +181,9 @@ public:
   /// Dump AttributeSelectionList
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeSelectionList>& theAttrSelList);
+  /// Dump AttributeReference
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeReference>& theReference);
 
   /// Clear dump buffer
   MODELHIGHAPI_EXPORT

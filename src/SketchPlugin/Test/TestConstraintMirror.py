@@ -28,7 +28,7 @@ def normalize(theDir):
     return [theDir[0] / aLen, theDir[1] / aLen]
 
 def checkMirror(theListInit, theListMirr, theMirrorLine):
-    TOL = 5.e-5
+    TOL = 6.e-5
     aListSize = theListInit.size()
     
     aLineStartPoint = geomDataAPI_Point2D(theMirrorLine.attribute("StartPoint"))

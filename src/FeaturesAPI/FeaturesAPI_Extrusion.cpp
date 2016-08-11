@@ -206,7 +206,7 @@ void FeaturesAPI_Extrusion::dump(ModelHighAPI_Dumper& theDumper) const
   theDumper << ")" << std::endl;
 
   if(anAttrSketch->isInitialized()) {
-    theDumper << aBase << ".setNestedSketch(" << anAttrSketch << ")";
+    theDumper << aBase << ".setNestedSketch(" << anAttrSketch << ")" << std::endl;
   }
 }
 
