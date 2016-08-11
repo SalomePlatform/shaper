@@ -210,6 +210,7 @@ void FeaturesAPI_Extrusion::dump(ModelHighAPI_Dumper& theDumper) const
   }
 }
 
+//==================================================================================================
 void FeaturesAPI_Extrusion::execIfBaseNotEmpty()
 {
   if(mybaseObjects->size() > 0) {

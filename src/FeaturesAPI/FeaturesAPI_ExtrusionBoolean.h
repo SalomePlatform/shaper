@@ -9,7 +9,6 @@
 
 #include "FeaturesAPI.h"
 
-#include <FeaturesPlugin_CompositeBoolean.h>
 #include <FeaturesPlugin_ExtrusionCut.h>
 #include <FeaturesPlugin_ExtrusionFuse.h>
 
@@ -17,6 +16,7 @@
 #include <ModelHighAPI_Macro.h>
 
 class ModelHighAPI_Double;
+class ModelHighAPI_Reference;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_ExtrusionBoolean
@@ -30,7 +30,7 @@ public:
   virtual ~FeaturesAPI_ExtrusionBoolean();
 
   INTERFACE_11("",
-               sketchLauncher, FeaturesPlugin_Extrusion::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */,
+               sketch, FeaturesPlugin_Extrusion::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */,
                baseObjects, FeaturesPlugin_Extrusion::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */,
                direction, FeaturesPlugin_Extrusion::DIRECTION_OBJECT_ID(), ModelAPI_AttributeSelection, /** Direction */,
                creationMethod, FeaturesPlugin_Extrusion::CREATION_METHOD(), ModelAPI_AttributeString, /** Creation method */,
@@ -41,6 +41,10 @@ public:
                fromObject, FeaturesPlugin_Extrusion::FROM_OBJECT_ID(), ModelAPI_AttributeSelection, /** From object */,
                fromOffset, FeaturesPlugin_Extrusion::FROM_OFFSET_ID(), ModelAPI_AttributeDouble, /** From offset */,
                booleanObjects, FeaturesPlugin_CompositeBoolean::OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Boolean objects */)
+
+  /// Modify base attribute of the feature.
+  FEATURESAPI_EXPORT
+  void setNestedSketch(const ModelHighAPI_Reference& theSketch);
 
   /// Modify base attribute of the feature.
   FEATURESAPI_EXPORT
@@ -69,19 +73,30 @@ public:
   FEATURESAPI_EXPORT
   void setBooleanObjects(const std::list<ModelHighAPI_Selection>& theBooleanObjects);
 
+  /// Dump wrapped feature
+  FEATURESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
 protected:
   /// Constructor without values.
   FEATURESAPI_EXPORT
   explicit FeaturesAPI_ExtrusionBoolean(const std::shared_ptr<ModelAPI_Feature>& theFeature);
+
+private:
+  void execIfBaseNotEmpty();
 };
 
 class FeaturesAPI_ExtrusionCut: public FeaturesAPI_ExtrusionBoolean
 {
 public:
-  FEATURESAPI_EXPORT
-  virtual std::string getID() {
-    return FeaturesPlugin_ExtrusionCut::ID();
-  }
+
+  static std::string ID() { return FeaturesPlugin_ExtrusionCut::ID(); }
+  virtual std::string getID() { return ID(); }
+
+  //FEATURESAPI_EXPORT
+  //virtual std::string getID() {
+  //  return FeaturesPlugin_ExtrusionCut::ID();
+  //}
 
   /// Constructor without values.
   FEATURESAPI_EXPORT

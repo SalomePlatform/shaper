@@ -7,6 +7,8 @@
 #include "FeaturesAPI_ExtrusionBoolean.h"
 
 #include <ModelHighAPI_Double.h>
+#include <ModelHighAPI_Dumper.h>
+#include <ModelHighAPI_Reference.h>
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
@@ -21,11 +23,23 @@ FeaturesAPI_ExtrusionBoolean::~FeaturesAPI_ExtrusionBoolean()
 }
 
 //==================================================================================================
+void FeaturesAPI_ExtrusionBoolean::setNestedSketch(const ModelHighAPI_Reference& theSketch)
+{
+  mysketch->setValue(theSketch.feature());
+  mybaseObjects->clear();
+  mybaseObjects->append(theSketch.feature()->firstResult(), GeomShapePtr());
+
+  execIfBaseNotEmpty();
+}
+
+//==================================================================================================
 void FeaturesAPI_ExtrusionBoolean::setBase(const std::list<ModelHighAPI_Selection>& theBaseObjects)
 {
+  mysketch->setValue(ObjectPtr());
+  mybaseObjects->clear();
   fillAttribute(theBaseObjects, mybaseObjects);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -33,7 +47,7 @@ void FeaturesAPI_ExtrusionBoolean::setDirection(const ModelHighAPI_Selection& th
 {
   fillAttribute(theDirection, mydirection);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -44,7 +58,7 @@ void FeaturesAPI_ExtrusionBoolean::setSizes(const ModelHighAPI_Double& theToSize
   fillAttribute(theToSize, mytoSize);
   fillAttribute(theFromSize, myfromSize);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -54,7 +68,7 @@ void FeaturesAPI_ExtrusionBoolean::setSize(const ModelHighAPI_Double& theSize)
   fillAttribute(theSize, mytoSize);
   fillAttribute(ModelHighAPI_Double(), myfromSize);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -69,7 +83,7 @@ void FeaturesAPI_ExtrusionBoolean::setPlanesAndOffsets(const ModelHighAPI_Select
   fillAttribute(theFromObject, myfromObject);
   fillAttribute(theFromOffset, myfromOffset);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -77,8 +91,61 @@ void FeaturesAPI_ExtrusionBoolean::setBooleanObjects(const std::list<ModelHighAP
 {
   fillAttribute(theBooleanObjects, mybooleanObjects);
 
-  execute();
+  execIfBaseNotEmpty();
 }
+
+//==================================================================================================
+void FeaturesAPI_ExtrusionBoolean::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  AttributeReferencePtr anAttrSketch = aBase->reference(FeaturesPlugin_CompositeSketch::SKETCH_ID());
+  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Extrusion::BASE_OBJECTS_ID());
+  AttributeSelectionPtr anAttrDirection = aBase->selection(FeaturesPlugin_Extrusion::DIRECTION_OBJECT_ID());
+
+  theDumper << aBase << " = model.addExtrusion";
+  if(aBase->getKind() == FeaturesPlugin_ExtrusionCut::ID()) {
+    theDumper << "Cut";
+  } else if(aBase->getKind() == FeaturesPlugin_ExtrusionFuse::ID()) {
+    theDumper << "Fuse";
+  }
+  theDumper << "(" << aDocName << ", ";
+  anAttrSketch->isInitialized() ? theDumper << "[]" : theDumper << anAttrObjects;
+  theDumper << ", " << anAttrDirection;
+
+  std::string aCreationMethod = aBase->string(FeaturesPlugin_Extrusion::CREATION_METHOD())->value();
+
+  if(aCreationMethod == FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES()) {
+    AttributeDoublePtr anAttrToSize = aBase->real(FeaturesPlugin_Extrusion::TO_SIZE_ID());
+    AttributeDoublePtr anAttrFromSize = aBase->real(FeaturesPlugin_Extrusion::FROM_SIZE_ID());
+
+    theDumper << ", " << anAttrToSize << ", " << anAttrFromSize;
+  } else if(aCreationMethod == FeaturesPlugin_Extrusion::CREATION_METHOD_BY_PLANES()) {
+    AttributeSelectionPtr anAttrToObject = aBase->selection(FeaturesPlugin_Extrusion::TO_OBJECT_ID());
+    AttributeDoublePtr anAttrToOffset = aBase->real(FeaturesPlugin_Extrusion::TO_OFFSET_ID());
+    AttributeSelectionPtr anAttrFromObject = aBase->selection(FeaturesPlugin_Extrusion::FROM_OBJECT_ID());
+    AttributeDoublePtr anAttrFromOffset = aBase->real(FeaturesPlugin_Extrusion::FROM_OFFSET_ID());
+
+    theDumper << ", " << anAttrToObject << ", " << anAttrToOffset << ", " << anAttrFromObject << ", " << anAttrFromOffset;
+  }
+
+  AttributeSelectionListPtr anAttrBoolObjects = aBase->selectionList(FeaturesPlugin_CompositeBoolean::OBJECTS_ID());
+  theDumper << ", " << anAttrBoolObjects << ")" << std::endl;
+
+  if(anAttrSketch->isInitialized()) {
+    theDumper << aBase << ".setNestedSketch(" << anAttrSketch << ")" << std::endl;
+  }
+}
+
+//==================================================================================================
+void FeaturesAPI_ExtrusionBoolean::execIfBaseNotEmpty()
+{
+  if(mybaseObjects->size() > 0) {
+    execute();
+  }
+}
+
 
 //==================================================================================================
 FeaturesAPI_ExtrusionCut::FeaturesAPI_ExtrusionCut(const std::shared_ptr<ModelAPI_Feature>& theFeature)
@@ -96,6 +163,7 @@ FeaturesAPI_ExtrusionCut::FeaturesAPI_ExtrusionCut(const std::shared_ptr<ModelAP
 {
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
+    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
     fillAttribute(theSize, mytoSize);
     fillAttribute(ModelHighAPI_Double(), myfromSize);
     setBooleanObjects(theBooleanObjects);
@@ -113,6 +181,7 @@ FeaturesAPI_ExtrusionCut::FeaturesAPI_ExtrusionCut(const std::shared_ptr<ModelAP
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theDirection, mydirection);
+    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
     fillAttribute(theSize, mytoSize);
     fillAttribute(ModelHighAPI_Double(), myfromSize);
     setBooleanObjects(theBooleanObjects);
@@ -129,6 +198,7 @@ FeaturesAPI_ExtrusionCut::FeaturesAPI_ExtrusionCut(const std::shared_ptr<ModelAP
 {
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
+    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
     fillAttribute(theToSize, mytoSize);
     fillAttribute(theFromSize, myfromSize);
     setBooleanObjects(theBooleanObjects);
@@ -147,6 +217,7 @@ FeaturesAPI_ExtrusionCut::FeaturesAPI_ExtrusionCut(const std::shared_ptr<ModelAP
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theDirection, mydirection);
+    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
     fillAttribute(theToSize, mytoSize);
     fillAttribute(theFromSize, myfromSize);
     setBooleanObjects(theBooleanObjects);
@@ -165,6 +236,7 @@ FeaturesAPI_ExtrusionCut::FeaturesAPI_ExtrusionCut(const std::shared_ptr<ModelAP
 {
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
+    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_PLANES(), mycreationMethod);
     fillAttribute(theToObject, mytoObject);
     fillAttribute(theToOffset, mytoOffset);
     fillAttribute(theFromObject, myfromObject);
@@ -187,6 +259,7 @@ FeaturesAPI_ExtrusionCut::FeaturesAPI_ExtrusionCut(const std::shared_ptr<ModelAP
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theDirection, mydirection);
+    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_PLANES(), mycreationMethod);
     fillAttribute(theToObject, mytoObject);
     fillAttribute(theToOffset, mytoOffset);
     fillAttribute(theFromObject, myfromObject);
@@ -301,6 +374,7 @@ FeaturesAPI_ExtrusionFuse::FeaturesAPI_ExtrusionFuse(const std::shared_ptr<Model
 {
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
+    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
     fillAttribute(theSize, mytoSize);
     fillAttribute(ModelHighAPI_Double(), myfromSize);
     setBooleanObjects(theBooleanObjects);
@@ -318,6 +392,7 @@ FeaturesAPI_ExtrusionFuse::FeaturesAPI_ExtrusionFuse(const std::shared_ptr<Model
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theDirection, mydirection);
+    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
     fillAttribute(theSize, mytoSize);
     fillAttribute(ModelHighAPI_Double(), myfromSize);
     setBooleanObjects(theBooleanObjects);
@@ -334,6 +409,7 @@ FeaturesAPI_ExtrusionFuse::FeaturesAPI_ExtrusionFuse(const std::shared_ptr<Model
 {
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
+    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
     fillAttribute(theToSize, mytoSize);
     fillAttribute(theFromSize, myfromSize);
     setBooleanObjects(theBooleanObjects);
@@ -352,6 +428,7 @@ FeaturesAPI_ExtrusionFuse::FeaturesAPI_ExtrusionFuse(const std::shared_ptr<Model
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theDirection, mydirection);
+    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
     fillAttribute(theToSize, mytoSize);
     fillAttribute(theFromSize, myfromSize);
     setBooleanObjects(theBooleanObjects);
@@ -370,6 +447,7 @@ FeaturesAPI_ExtrusionFuse::FeaturesAPI_ExtrusionFuse(const std::shared_ptr<Model
 {
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
+    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_PLANES(), mycreationMethod);
     fillAttribute(theToObject, mytoObject);
     fillAttribute(theToOffset, mytoOffset);
     fillAttribute(theFromObject, myfromObject);
@@ -392,6 +470,7 @@ FeaturesAPI_ExtrusionFuse::FeaturesAPI_ExtrusionFuse(const std::shared_ptr<Model
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theDirection, mydirection);
+    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_PLANES(), mycreationMethod);
     fillAttribute(theToObject, mytoObject);
     fillAttribute(theToOffset, mytoOffset);
     fillAttribute(theFromObject, myfromObject);
