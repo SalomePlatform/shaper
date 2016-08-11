@@ -72,6 +72,10 @@ public:
   MODELHIGHAPI_EXPORT
   virtual TypeSubShapeNamePair typeSubShapeNamePair() const;
 
+  /// \return shape type.
+  MODELHIGHAPI_EXPORT
+  virtual std::string shapeType() const;
+
 private:
   VariantType myVariantType;
   ResultSubShapePair myResultSubShapePair;

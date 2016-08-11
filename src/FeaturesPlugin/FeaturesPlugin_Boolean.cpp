@@ -39,13 +39,9 @@ void FeaturesPlugin_Boolean::initAttributes()
   AttributeSelectionListPtr aSelection = 
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
     FeaturesPlugin_Boolean::OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
-  // extrusion works with faces always
-  aSelection->setSelectionType("SOLID");
 
   aSelection = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
     FeaturesPlugin_Boolean::TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
-  // extrusion works with faces always
-  aSelection->setSelectionType("SOLID");
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), OBJECT_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TOOL_LIST_ID());

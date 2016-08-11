@@ -173,6 +173,13 @@ void fillAttribute(const std::list<ModelHighAPI_Selection> & theValue,
                    const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute)
 {
   theAttribute->clear();
+
+  if(!theValue.empty()) {
+    std::string aSelectionType;
+    const ModelHighAPI_Selection& aSelection = theValue.front();
+    theAttribute->setSelectionType(aSelection.shapeType());
+  }
+
   for (auto it = theValue.begin(); it != theValue.end(); ++it)
     it->appendToList(theAttribute);
 }

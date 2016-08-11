@@ -34,8 +34,6 @@ void FeaturesPlugin_Placement::initAttributes()
   AttributeSelectionListPtr aSelection = 
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
     OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
-  // extrusion works with faces always
-  aSelection->setSelectionType("SOLID");
 
   data()->addAttribute(START_SHAPE_ID(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(END_SHAPE_ID(), ModelAPI_AttributeSelection::typeId());
