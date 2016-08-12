@@ -18,6 +18,7 @@ class FeaturesFixture(unittest.TestCase):
 
     def tearDown(self):
         model.end()
+        assert(model.checkPythonDump())
         model.reset()
 
 #-----------------------------------------------------------------------------

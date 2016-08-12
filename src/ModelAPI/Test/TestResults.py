@@ -34,3 +34,5 @@ assert(aColors.value(2) == 250)
 
 aSession.finishOperation()
 
+import model
+assert(model.checkPythonDump())

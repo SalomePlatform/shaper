@@ -29,3 +29,6 @@ assert(aFeatureData.intArray("IntArray_1").size() == 5)
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

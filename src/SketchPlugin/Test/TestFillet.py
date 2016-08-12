@@ -276,3 +276,6 @@ checkFillet(aResObjects, FILLET_RADIUS2)
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

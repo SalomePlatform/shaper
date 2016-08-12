@@ -140,3 +140,6 @@ assert (anOriginCoord.x() == 0. and anOriginCoord.y() == 0.)
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

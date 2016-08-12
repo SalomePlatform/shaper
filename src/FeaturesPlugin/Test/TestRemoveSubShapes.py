@@ -72,3 +72,6 @@ aSession.finishOperation()
 assert (len(aRemoveSubShapesFeature.results()) > 0)
 anUnionResult = modelAPI_ResultCompSolid(modelAPI_ResultBody(aRemoveSubShapesFeature.firstResult()))
 assert (anUnionResult.numberOfSubs() == 2)
+
+import model
+assert(model.checkPythonDump())

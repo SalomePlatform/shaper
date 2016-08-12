@@ -22,3 +22,4 @@ mypart = model.addPart(mypartset).document()
 extension.addBoxScript( mypart, 10, 20, 30 )
 model.end()
 
+assert(model.checkPythonDump())

@@ -82,3 +82,6 @@ aSession.startOperation()
 aPlane = model.addPlane(aDocument, aCoincidentPlane.result()[0], aPlane.result()[0])
 aSession.finishOperation()
 assert (len(aPlane.result()) > 0)
+
+import model
+assert(model.checkPythonDump())

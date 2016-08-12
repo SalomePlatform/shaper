@@ -208,3 +208,6 @@ assert (math.fabs(aLine2Len - anExtLineLen) < 1.e-10)
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

@@ -22,6 +22,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeDoubleArray.h>
+#include <ModelAPI_Validator.h>
 
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
@@ -95,8 +96,8 @@ std::string ModelHighAPI_FeatureStore::compareData(std::shared_ptr<ModelAPI_Data
       return "original model had no attribute '" + aThisIter->first + "'";
     }
     if (theAttrs[aThisIter->first] != aThisIter->second) {
-      return "attribute '" + aThisIter->first + "' is different '" + 
-        theAttrs[aThisIter->first] + "' != '" + aThisIter->second;
+      return "attribute '" + aThisIter->first + "' is different (original != current) '" + 
+        theAttrs[aThisIter->first] + "' != '" + aThisIter->second + "'";
     }
   }
   // iterate back to find lack attribute in the current model
@@ -110,6 +111,11 @@ std::string ModelHighAPI_FeatureStore::compareData(std::shared_ptr<ModelAPI_Data
 }
 
 std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
+  static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+  FeaturePtr aFeatOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttr->owner());
+  if (aFeatOwner.get() && !aFactory->isCase(aFeatOwner, theAttr->id())) {
+    return "__notcase__";
+  }
   if (!theAttr->isInitialized()) {
     return "__notinitialized__";
   }

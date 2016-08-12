@@ -309,7 +309,7 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
         }
       }
       return "For document '" + theDocName + 
-        "' the number of features becomes smaller, there is no feature '" + aLostName + "'";
+        "' the number of features is decreased, there is no feature '" + aLostName + "'";
     }
   }
   return ""; // ok

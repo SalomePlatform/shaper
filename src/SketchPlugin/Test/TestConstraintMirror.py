@@ -201,3 +201,6 @@ checkMirror(aRefListB, aRefListC, aMirrorLine)
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

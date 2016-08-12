@@ -9,6 +9,7 @@ class ModelTestCase(unittest.TestCase):
 
     def tearDown(self):
         model.end()
+        assert(model.checkPythonDump())
 
     def test_add_sketch(self):
         plane = model.defaultPlane("XOY")

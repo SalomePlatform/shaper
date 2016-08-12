@@ -217,3 +217,6 @@ aSession.finishOperation()
 assert (len(aPlacementFt.results()) > 0)
 aPlacementResult = modelAPI_ResultBody(aPlacementFt.firstResult())
 assert (aPlacementResult is not None)
+
+import model
+assert(model.checkPythonDump())

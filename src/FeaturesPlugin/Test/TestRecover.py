@@ -64,3 +64,5 @@ recover.setIsPersistent(False)
 model.end()
 # only two booleans
 assert(mypart.size("Bodies") == 2)
+
+assert(model.checkPythonDump())

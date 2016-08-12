@@ -132,3 +132,5 @@ assert (len(aRotateFt.results()) > 0)
 aMoveResult = modelAPI_ResultBody(aRotateFt.firstResult())
 assert (aMoveResult is not None)
 
+import model
+assert(model.checkPythonDump())

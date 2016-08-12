@@ -43,3 +43,5 @@ aSession.startOperation()
 aBoolean = model.addFill(aDocument, [anExtrusion.result()[0]], [anExtrusion.result()[1]])
 assert (len(aBoolean.result()) > 0)
 aSession.finishOperation()
+
+assert(model.checkPythonDump())

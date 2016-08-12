@@ -23,6 +23,7 @@ from GeomDataAPI import *
 from ModelAPI import *
 import math
 import unittest
+import model
 
 __updated__ = "2015-04-27"
 
@@ -45,6 +46,7 @@ class TestParameterRename(unittest.TestCase):
         self.createFeature()
 
     def tearDown(self):
+        assert(model.checkPythonDump())
         self.aSession.closeAll()
 
     def createParameters(self):

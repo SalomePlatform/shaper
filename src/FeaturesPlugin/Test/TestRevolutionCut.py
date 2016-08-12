@@ -144,3 +144,6 @@ assert (aFactory.validate(anRevolutionCutFt))
 assert (len(anRevolutionCutFt.results()) > 0)
 aCurrentResult = modelAPI_ResultBody(anRevolutionCutFt.firstResult())
 assert (aCurrentResult is not None)
+
+import model
+assert(model.checkPythonDump())

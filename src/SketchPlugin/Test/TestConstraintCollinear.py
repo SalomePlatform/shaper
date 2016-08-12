@@ -100,3 +100,6 @@ checkCollinear(aSketchLineA, aSketchLineB)
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

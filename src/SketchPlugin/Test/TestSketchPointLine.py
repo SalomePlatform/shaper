@@ -100,3 +100,6 @@ aResultConstruction = modelAPI_ResultConstruction(aResult)
 aShape = aResultConstruction.shape()
 assert (aShape is not None)
 assert (not aShape.isNull())
+
+import model
+assert(model.checkPythonDump())

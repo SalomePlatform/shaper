@@ -188,3 +188,6 @@ aSession.startOperation()
 anAxis = model.addAxis(aPart, aPlane1.result()[0], 50, False, aPlane2.result()[0], 100, True)
 aSession.finishOperation()
 assert (len(anAxis.result()) > 0)
+
+#import model
+#assert(model.checkPythonDump())

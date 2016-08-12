@@ -73,3 +73,6 @@ aSession.finishOperation()
 assert (len(aUnionFeature.results()) > 0)
 anUnionResult = modelAPI_ResultCompSolid(modelAPI_ResultBody(aUnionFeature.firstResult()))
 assert (anUnionResult.numberOfSubs() == 0)
+
+import model
+assert(model.checkPythonDump())

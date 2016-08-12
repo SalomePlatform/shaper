@@ -126,3 +126,6 @@ aSession.finishOperation()
 
 # Test results
 assert (len(aSubShapesFeature.results()) > 0)
+
+import model
+assert(model.checkPythonDump())

@@ -67,3 +67,5 @@ model.begin()
 mybase.setValue(mylength, 100)
 mybox.setSize(20)
 model.end()
+
+assert(model.checkPythonDump())

@@ -77,3 +77,6 @@ aSession.finishOperation()
 
 # Test results
 assert (len(aShellFeature.results()) > 0)
+
+import model
+assert(model.checkPythonDump())

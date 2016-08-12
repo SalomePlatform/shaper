@@ -135,3 +135,6 @@ assert ((aLineCStartPoint.x(), aLineCStartPoint.y()) == (aLineBEndPoint.x(), aLi
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

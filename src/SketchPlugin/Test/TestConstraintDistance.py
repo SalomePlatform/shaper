@@ -179,3 +179,6 @@ assert (math.fabs(distancePointPoint(aLineAStartPoint, aLineAEndPoint) - PT_LINE
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

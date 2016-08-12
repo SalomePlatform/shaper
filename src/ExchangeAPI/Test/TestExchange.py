@@ -2,6 +2,7 @@ import unittest
 
 import ModelAPI
 import ExchangeAPI
+import model
 
 class ExchangeTestCase(unittest.TestCase):
 
@@ -10,6 +11,7 @@ class ExchangeTestCase(unittest.TestCase):
         self.doc = self.session.moduleDocument()
 
     def tearDown(self):
+        assert(model.checkPythonDump())
         self.session.closeAll()
 
     def test_addImport(self):

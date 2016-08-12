@@ -74,3 +74,6 @@ assert(aLineStartPoint.x() == aLineEndPoint.x())
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

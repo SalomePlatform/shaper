@@ -163,3 +163,6 @@ aSession.finishOperation()
 
 # Test results
 assert (len(aPipeFeature.results()) > 0)
+
+import model
+assert(model.checkPythonDump())

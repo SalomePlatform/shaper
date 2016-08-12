@@ -137,3 +137,6 @@ assert(math.fabs(aProjLineEnd.y() - aLineEnd.y()) < 1.e-10)
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

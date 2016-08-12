@@ -55,3 +55,6 @@ aSession.finishOperation()
 
 # Test results
 assert (len(aVertexFeature.results()) == aNumOfPoints)
+
+import model
+assert(model.checkPythonDump())
