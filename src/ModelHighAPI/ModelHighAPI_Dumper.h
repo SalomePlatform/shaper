@@ -203,9 +203,14 @@ private:
   /// Iterate all features in document and dump them into intermediate buffer
   bool process(const std::shared_ptr<ModelAPI_Document>& theDoc);
 
+  /// Dump composite feature and all it sub-features
+  bool process(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite, bool isForce = false);
+
   /// Iterate all features in composite feature and dump them into intermediate buffer
+  /// \param theComposite   [in] parent composite feature
+  /// \param theDumpModelDo [in] shows that command "model.do()" should be written at the end
   MODELHIGHAPI_EXPORT
-  bool process(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite);
+  bool processSubs(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite, bool theDumpModelDo = false);
 
   /// Check the entity is already dumped
   bool isDumped(const EntityPtr& theEntity) const;

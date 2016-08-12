@@ -39,6 +39,8 @@
 
 #define DUMP_USER_DEFINED_NAMES
 
+static int gCompositeStackDepth = 0;
+
 ModelHighAPI_Dumper* ModelHighAPI_Dumper::mySelf = 0;
 
 ModelHighAPI_Dumper::ModelHighAPI_Dumper()
@@ -152,47 +154,77 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
   std::list<FeaturePtr> aFeatures = theDoc->allFeatures();
   std::list<FeaturePtr>::const_iterator aFeatIt = aFeatures.begin();
   for (; aFeatIt != aFeatures.end(); ++aFeatIt) {
-    if (!isDumped(*aFeatIt))
-      dumpFeature(*aFeatIt);
-
-    // iteratively process composite features
     CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aFeatIt);
-    if (!aCompFeat)
-      continue;
-
-    // sub-part is processed independently, because it provides separate document
-    if ((*aFeatIt)->getKind() == PartSetPlugin_Part::ID()) {
-      ResultPartPtr aPartResult =
-          std::dynamic_pointer_cast<ModelAPI_ResultPart>((*aFeatIt)->lastResult());
-      if (!aPartResult)
-        continue;
-      DocumentPtr aSubDoc = aPartResult->partDoc();
-      // set name of document
-      const std::string& aPartName = myNames[*aFeatIt].first;
-      std::string aDocName = aPartName + "_doc";
-      myNames[aSubDoc] = std::pair<std::string, bool>(aDocName, false);
-
-      // dump document in a single line
-      *this << aDocName << " = " << aPartName << ".document()" << std::endl;
-
-      isOk = process(aSubDoc) && isOk;
-    } else
+    if (aCompFeat) // iteratively process composite features
       isOk = process(aCompFeat) && isOk;
+    else if (!isDumped(*aFeatIt)) // dump common feature 
+      dumpFeature(*aFeatIt);
   }
   return isOk;
 }
 
-bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite)
+bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite, bool isForce)
 {
+  // increase composite features stack
+  ++gCompositeStackDepth;
+  // dump composite itself
+  if (!isDumped(theComposite) || isForce)
+    dumpFeature(theComposite, isForce);
+
+  // sub-part is processed independently, because it provides separate document
+  if (theComposite->getKind() == PartSetPlugin_Part::ID()) {
+    // decrease composite features stack because we run into separate document
+    --gCompositeStackDepth;
+
+    ResultPartPtr aPartResult =
+        std::dynamic_pointer_cast<ModelAPI_ResultPart>(theComposite->lastResult());
+    if (!aPartResult)
+      return false;
+    DocumentPtr aSubDoc = aPartResult->partDoc();
+    // set name of document
+    const std::string& aPartName = myNames[theComposite].first;
+    std::string aDocName = aPartName + "_doc";
+    myNames[aSubDoc] = std::pair<std::string, bool>(aDocName, false);
+
+    // dump document in a separate line
+    *this << aDocName << " = " << aPartName << ".document()" << std::endl;
+    // dump features in the document
+    return process(aSubDoc);
+  }
+
+  // dump sub-features
+  bool isOk = processSubs(theComposite);
+  // decrease composite features stack
+  --gCompositeStackDepth;
+
+  return isOk;
+}
+
+bool ModelHighAPI_Dumper::processSubs(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite,
+                                      bool theDumpModelDo)
+{
+  bool isOk = true;
   // dump all sub-features;
   int aNbSubs = theComposite->numberOfSubs();
   for (int anIndex = 0; anIndex < aNbSubs; ++anIndex) {
     FeaturePtr aFeature = theComposite->subFeature(anIndex);
     if (isDumped(aFeature))
       continue;
-    dumpFeature(aFeature, true);
+
+    CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+    if (aCompFeat) // iteratively process composite features
+      isOk = process(aCompFeat) && isOk;
+    else
+      dumpFeature(aFeature, true);
   }
-  return true;
+
+  // It is necessary for the sketch to create its result when complete (command "model.do()").
+  // This option is set by flat theDumpModelDo.
+  // However, nested sketches are rebuilt by parent feature, so, they do not need
+  // explicit call of "model.do()". This will be controlled by the depth of the stack.
+  if (theDumpModelDo && gCompositeStackDepth <= 1)
+    *this << "model.do()" << std::endl;
+  return isOk;
 }
 
 bool ModelHighAPI_Dumper::exportTo(const std::string& theFileName)
@@ -563,14 +595,15 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
   theDumper.clear(true);
   std::set<EntityPtr>::const_iterator anIt = aNotDumped.begin();
   for (; anIt != aNotDumped.end(); ++anIt) {
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
-    theDumper.dumpFeature(aFeature, true);
-
-    // if the feature is composite, dump all its subs
+    // if the feature is composite, dump it with all subs
     CompositeFeaturePtr aCompFeat =
-        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*anIt);
     if (aCompFeat)
-      theDumper.process(aCompFeat);
+      theDumper.process(aCompFeat, true);
+    else {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
+      theDumper.dumpFeature(aFeature, true);
+    }
   }
 
   // avoid multiple empty lines
