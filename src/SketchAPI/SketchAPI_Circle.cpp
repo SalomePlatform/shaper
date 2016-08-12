@@ -240,6 +240,9 @@ void SketchAPI_Circle::setThirdPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePo
 //==================================================================================================
 void SketchAPI_Circle::dump(ModelHighAPI_Dumper& theDumper) const
 {
+  if (isCopy())
+    return; // no need to dump copied feature
+
   FeaturePtr aBase = feature();
   const std::string& aSketchName = theDumper.parentName(aBase);
 

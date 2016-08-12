@@ -130,6 +130,9 @@ void SketchAPI_Line::setEndPoint(const std::shared_ptr<GeomAPI_Pnt2d> & thePoint
 
 void SketchAPI_Line::dump(ModelHighAPI_Dumper& theDumper) const
 {
+  if (isCopy())
+    return; // no need to dump copied feature
+
   FeaturePtr aBase = feature();
   const std::string& aSketchName = theDumper.parentName(aBase);
 

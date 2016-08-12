@@ -204,6 +204,7 @@ private:
   bool process(const std::shared_ptr<ModelAPI_Document>& theDoc);
 
   /// Iterate all features in composite feature and dump them into intermediate buffer
+  MODELHIGHAPI_EXPORT
   bool process(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite);
 
   /// Check the entity is already dumped
@@ -227,6 +228,8 @@ private:
 
 protected:
   std::set<EntityPtr> myNotDumpedEntities;  ///< list of entities, used by other features but not dumped yet
+
+  friend class SketchAPI_Sketch;
 };
 
 #endif

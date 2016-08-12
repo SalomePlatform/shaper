@@ -657,4 +657,10 @@ void SketchAPI_Sketch::dump(ModelHighAPI_Dumper& theDumper) const
                 << ", model.defaultPlane(\"" << aPlaneName << "\"))" << std::endl;
     }
   }
+
+  // dump sketch's subfeatures
+  CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aBase);
+  theDumper.process(aCompFeat);
+  // necessary to be sure that the result of sketch was built
+  theDumper << "model.do()" << std::endl;
 }

@@ -237,6 +237,9 @@ void SketchAPI_Arc::setAngle(double theAngle)
 //==================================================================================================
 void SketchAPI_Arc::dump(ModelHighAPI_Dumper& theDumper) const
 {
+  if (isCopy())
+    return; // no need to dump copied feature
+
   FeaturePtr aBase = feature();
   const std::string& aSketchName = theDumper.parentName(aBase);
 

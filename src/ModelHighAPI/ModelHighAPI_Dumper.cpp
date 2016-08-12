@@ -33,8 +33,6 @@
 
 #include <PartSetPlugin_Part.h>
 
-#include <SketchPlugin_SketchEntity.h>
-
 #include <OSD_OpenFile.hxx>
 
 #include <fstream>
@@ -192,16 +190,8 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
     FeaturePtr aFeature = theComposite->subFeature(anIndex);
     if (isDumped(aFeature))
       continue;
-    bool isForce = true;
-    // check the feature is a sketch entity and a copy of another entity
-    std::shared_ptr<SketchPlugin_SketchEntity> aSketchEntity =
-        std::dynamic_pointer_cast<SketchPlugin_SketchEntity>(aFeature);
-    if (aSketchEntity && aSketchEntity->isCopy())
-      isForce = false;
-    dumpFeature(aFeature, isForce);
+    dumpFeature(aFeature, true);
   }
-  // dump empty line for appearance
-  myDumpBuffer << std::endl;
   return true;
 }
 
@@ -583,6 +573,10 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
       theDumper.process(aCompFeat);
   }
 
+  // avoid multiple empty lines
+  size_t anInd = std::string::npos;
+  while ((anInd = aBufCopy.find("\n\n\n")) != std::string::npos)
+    aBufCopy.erase(anInd, 1);
   // then store currently dumped string
   theDumper.myFullDump << aBufCopy;
 

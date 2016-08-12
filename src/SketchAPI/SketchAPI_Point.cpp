@@ -100,6 +100,9 @@ void SketchAPI_Point::setByExternalName(const std::string & theExternalName)
 
 void SketchAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
 {
+  if (isCopy())
+    return; // no need to dump copied feature
+
   FeaturePtr aBase = feature();
   const std::string& aSketchName = theDumper.parentName(aBase);
 
