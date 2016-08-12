@@ -6,6 +6,7 @@
 
 #include "FeaturesAPI_Partition.h"
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
@@ -37,6 +38,17 @@ void FeaturesAPI_Partition::setBase(const std::list<ModelHighAPI_Selection>& the
   fillAttribute(theBaseObjects, mybaseObjects);
 
   execute();
+}
+
+//==================================================================================================
+void FeaturesAPI_Partition::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Partition::BASE_OBJECTS_ID());
+
+  theDumper << aBase << " = model.addPartition(" << aDocName << ", " << anAttrObjects << ")" << std::endl;
 }
 
 //==================================================================================================
