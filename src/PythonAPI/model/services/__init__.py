@@ -8,3 +8,4 @@ from ModelHighAPI import apply as do
 from ModelHighAPI import undo, redo
 from ModelHighAPI import reset
 from ModelHighAPI import ModelHighAPI_Selection as selection
+from ModelHighAPI import checkPythonDump as checkPythonDump

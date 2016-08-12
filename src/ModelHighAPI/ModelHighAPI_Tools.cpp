@@ -6,6 +6,7 @@
 
 //--------------------------------------------------------------------------------------
 #include "ModelHighAPI_Tools.h"
+#include <ModelHighAPI_FeatureStore.h>
 //--------------------------------------------------------------------------------------
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Pnt.h>
@@ -27,6 +28,12 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeDoubleArray.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultPart.h>
+//--------------------------------------------------------------------------------------
+#include <Config_ModuleReader.h>
 //--------------------------------------------------------------------------------------
 #include "ModelHighAPI_Double.h"
 #include "ModelHighAPI_Integer.h"
@@ -34,7 +41,10 @@
 #include "ModelHighAPI_Reference.h"
 #include "ModelHighAPI_Selection.h"
 
+#include <Events_InfoMessage.h>
+
 #include <algorithm>
+#include <iostream>
 
 //--------------------------------------------------------------------------------------
 void fillAttribute(const std::shared_ptr<GeomAPI_Pnt2d> & theValue,
@@ -236,6 +246,117 @@ GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection
   }
 
   return aShapeType;
+}
+
+/// stores the features information, recoursively stores sub-documetns features
+std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
+  std::map<std::string, std::map<std::string, ModelHighAPI_FeatureStore> >& theStore,
+  const bool theCompare) // if false => store
+{
+  std::map<std::string, std::map<std::string, ModelHighAPI_FeatureStore> >::iterator aDocFind;
+  if (theCompare) {
+     aDocFind = theStore.find(theDocName);
+     if (aDocFind == theStore.end()) {
+       return "Document '" + theDocName + "' not found";
+     }
+  }
+  // store the model features information: iterate all features
+  int aFeaturesCount = 0; // stores the number of compared features for this document to compate
+  std::set<std::string> aProcessed; // processed features names (that are in the current document)
+  std::list<FeaturePtr> allFeatures = theDoc->allFeatures();
+  std::list<FeaturePtr>::iterator allIter = allFeatures.begin();
+  for(; allIter != allFeatures.end(); allIter++) {
+    FeaturePtr aFeat = *allIter;
+    if (theCompare) {
+      std::map<std::string, ModelHighAPI_FeatureStore>::iterator 
+        aFeatFind = aDocFind->second.find(aFeat->name());
+      if (aFeatFind == aDocFind->second.end()) {
+        return "Document '" + theDocName + "' feature '" + aFeat->name() + "' not found";
+      }
+      std::string anError = aFeatFind->second.compare(aFeat);
+      if (!anError.empty()) {
+        return anError;
+      }
+      aFeaturesCount++;
+      aProcessed.insert(aFeat->name());
+    } else {
+      theStore[theDocName][aFeat->name()] = ModelHighAPI_FeatureStore(aFeat);
+    }
+    // iterate all results of this feature
+    std::list<ResultPtr> allResults;
+    ModelAPI_Tools::allResults(aFeat, allResults);
+    std::list<ResultPtr>::iterator aRes = allResults.begin();
+    for(; aRes != allResults.end(); aRes++) {
+      if ((*aRes)->groupName() == ModelAPI_ResultPart::group()) { // recoursively store features of sub-documents
+        DocumentPtr aDoc = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRes)->partDoc();
+        if (aDoc.get()) {
+          std::string anError = storeFeatures((*aRes)->data()->name(), aDoc, theStore, theCompare);
+          if (!anError.empty())
+            return anError;
+        }
+      }
+    }
+  }
+  // checks the number of compared features
+  if (theCompare) {
+    if (aDocFind->second.size() != aFeaturesCount) {
+      // search for disappeared feature
+      std::string aLostName;
+      std::map<std::string, ModelHighAPI_FeatureStore>::iterator aLostIter;
+      for(aLostIter = aDocFind->second.begin(); aLostIter != aDocFind->second.end(); aLostIter++) {
+        if (aProcessed.find(aLostIter->first) == aProcessed.end()) {
+          aLostName = aLostIter->first;
+        }
+      }
+      return "For document '" + theDocName + 
+        "' the number of features becomes smaller, there is no feature '" + aLostName + "'";
+    }
+  }
+  return ""; // ok
+}
+
+//==================================================================================================
+bool checkPythonDump()
+{
+  SessionPtr aSession = ModelAPI_Session::get();
+  // dump all to the python file
+  aSession->startOperation("Check python dump");
+  FeaturePtr aDump = aSession->moduleDocument()->addFeature("Dump");
+  if (aDump.get()) {
+    aDump->string("file_path")->setValue("check_dump.py"); // to the current folder
+    aDump->string("file_format")->setValue("py"); // to the current folder
+    aDump->execute();
+  }
+  bool isProblem = !aDump.get() || !aDump->error().empty(); // after "finish" dump will be removed
+  aSession->finishOperation();
+  if (isProblem)
+    return false; // something is wrong during dump
+
+   // map from document name to feature name to feature data
+  std::map<std::string, std::map<std::string, ModelHighAPI_FeatureStore> > aStore;
+  std::string anError = storeFeatures(
+    aSession->moduleDocument()->kind(), aSession->moduleDocument(), aStore, false);
+  if (!anError.empty()) {
+    Events_InfoMessage anError("checkPythonDump", anError);
+    anError.send();
+    return false;
+  }
+  // close all before importation of the script
+  aSession->closeAll();
+  // execute the dumped
+  Config_ModuleReader::loadScript("check_dump");
+
+  // compare with the stored data
+  anError = storeFeatures(
+    aSession->moduleDocument()->kind(), aSession->moduleDocument(), aStore, true);
+  if (!anError.empty()) {
+    std::cout<<anError<<std::endl;
+    Events_InfoMessage anError("checkPythonDump", anError);
+    anError.send();
+    return false;
+  }
+
+  return true;
 }
 
 //--------------------------------------------------------------------------------------

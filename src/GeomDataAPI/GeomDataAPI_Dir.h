@@ -52,4 +52,7 @@ class GeomDataAPI_Dir : public ModelAPI_Attribute
   GEOMDATAAPI_EXPORT virtual ~GeomDataAPI_Dir();
 };
 
+//! Pointer on attribute object
+typedef std::shared_ptr<GeomDataAPI_Dir> AttributeDirPtr;
+
 #endif

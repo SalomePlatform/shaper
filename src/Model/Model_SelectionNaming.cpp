@@ -8,6 +8,10 @@
 #include "Model_Document.h"
 #include <ModelAPI_Feature.h>
 #include <Events_InfoMessage.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_ResultPart.h>
+#include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_CompositeFeature.h>
 
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS.hxx>
@@ -26,8 +30,6 @@
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Localizer.hxx>
 #include <TDataStd_Name.hxx>
-#include <ModelAPI_ResultConstruction.h>
-#include <ModelAPI_CompositeFeature.h>
 #include <TColStd_MapOfTransient.hxx>
 #include <algorithm>
 
@@ -39,7 +41,6 @@ Model_SelectionNaming::Model_SelectionNaming(TDF_Label theSelectionLab)
 {
   myLab = theSelectionLab;
 }
-
 
 std::string Model_SelectionNaming::getShapeName(
   std::shared_ptr<Model_Document> theDoc, const TopoDS_Shape& theShape)
@@ -53,13 +54,6 @@ std::string Model_SelectionNaming::getShapeName(
       aName = TCollection_AsciiString(anAttr->Get()).ToCString();
       if(!aName.empty()) {	    
         const TDF_Label& aLabel = theDoc->findNamingName(aName);
-        /* MPV: the same shape with the same name may be duplicated on different labels (selection of the same construction object)
-        if(!aLabel.IsEqual(aNS->Label())) {
-        //aName.erase(); //something is wrong, to be checked!!!
-        aName += "_SomethingWrong";
-        return aName;
-        }*/
-
         static const std::string aPostFix("_");
         TNaming_Iterator anItL(aNS);
         for(int i = 1; anItL.More(); anItL.Next(), i++) {
@@ -74,8 +68,6 @@ std::string Model_SelectionNaming::getShapeName(
   }
   return aName;
 }
-
-
 
 bool isTrivial (const TopTools_ListOfShape& theAncestors, TopTools_IndexedMapOfShape& theSMap)
 {
@@ -598,9 +590,6 @@ std::string Model_SelectionNaming::shortName(
   }
   return aName;
 }
-
-#include <ModelAPI_Session.h>
-#include <ModelAPI_ResultPart.h>
 
 // type ::= COMP | COMS | SOLD | SHEL | FACE | WIRE | EDGE | VERT
 bool Model_SelectionNaming::selectSubShape(const std::string& theType, 

@@ -14,6 +14,7 @@ SET(PROJECT_HEADERS
   ModelHighAPI_Selection.h
   ModelHighAPI_Services.h
   ModelHighAPI_Tools.h
+  ModelHighAPI_FeatureStore.h
 )
 
 SET(PROJECT_SOURCES
@@ -26,6 +27,7 @@ SET(PROJECT_SOURCES
   ModelHighAPI_Selection.cpp
   ModelHighAPI_Services.cpp
   ModelHighAPI_Tools.cpp
+  ModelHighAPI_FeatureStore.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -33,6 +35,7 @@ SET(PROJECT_LIBRARIES
   Events
   GeomAPI
   GeomDataAPI
+  GeomAlgoAPI
   ModelAPI
 )
 
@@ -58,6 +61,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/Config
   ${PROJECT_SOURCE_DIR}/src/Events
   ${PROJECT_SOURCE_DIR}/src/GeomAPI
+  ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
   ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
   ${PROJECT_SOURCE_DIR}/src/ModelAPI
   ${PROJECT_SOURCE_DIR}/src/PartSetPlugin

@@ -60,3 +60,5 @@ assert (len(aPoint.result()) > 0)
 # aPoint = model.addPoint(aDocument, aSketchLine1.result()[0], aPlane.result()[0])
 # aSession.finishOperation()
 # assert (len(aPoint.result()) > 0)
+
+assert(model.checkPythonDump())
