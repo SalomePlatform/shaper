@@ -6,6 +6,7 @@
 
 #include "FeaturesAPI_Placement.h"
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
@@ -77,6 +78,23 @@ void FeaturesAPI_Placement::setCentering(const bool theCentering)
   fillAttribute(theCentering, mycentering);
 
   execute();
+}
+
+//==================================================================================================
+void FeaturesAPI_Placement::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Placement::OBJECTS_LIST_ID());
+  AttributeSelectionPtr anAttrStartShape = aBase->selection(FeaturesPlugin_Placement::START_SHAPE_ID());
+  AttributeSelectionPtr anAttrEndShape = aBase->selection(FeaturesPlugin_Placement::END_SHAPE_ID());
+  AttributeBooleanPtr anAttrReverse = aBase->boolean(FeaturesPlugin_Placement::REVERSE_ID());
+  AttributeBooleanPtr anAttrCentering = aBase->boolean(FeaturesPlugin_Placement::CENTERING_ID());
+
+  theDumper << aBase << " = model.addPlacement(" << aDocName << ", "
+            << anAttrObjects << ", " << anAttrStartShape << ", " << anAttrEndShape << ", "
+            << anAttrReverse << ", " << anAttrCentering << ")" << std::endl;
 }
 
 //==================================================================================================
