@@ -8,6 +8,7 @@
 
 #include <ModelHighAPI_Double.h>
 #include <ModelHighAPI_Dumper.h>
+#include <ModelHighAPI_Reference.h>
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
@@ -70,11 +71,23 @@ FeaturesAPI_Revolution::~FeaturesAPI_Revolution()
 }
 
 //==================================================================================================
+void FeaturesAPI_Revolution::setNestedSketch(const ModelHighAPI_Reference& theSketch)
+{
+  mysketch->setValue(theSketch.feature());
+  mybaseObjects->clear();
+  mybaseObjects->append(theSketch.feature()->firstResult(), GeomShapePtr());
+
+  execIfBaseNotEmpty();
+}
+
+//==================================================================================================
 void FeaturesAPI_Revolution::setBase(const std::list<ModelHighAPI_Selection>& theBaseObjects)
 {
+  mysketch->setValue(ObjectPtr());
+  mybaseObjects->clear();
   fillAttribute(theBaseObjects, mybaseObjects);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -82,7 +95,7 @@ void FeaturesAPI_Revolution::setAxis(const ModelHighAPI_Selection& theAxis)
 {
   fillAttribute(theAxis, myaxis);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -93,7 +106,7 @@ void FeaturesAPI_Revolution::setAngles(const ModelHighAPI_Double& theToAngle,
   fillAttribute(theToAngle, mytoAngle);
   fillAttribute(theFromAngle, myfromAngle);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -103,7 +116,7 @@ void FeaturesAPI_Revolution::setAngle(const ModelHighAPI_Double& theAngle)
   fillAttribute(theAngle, mytoAngle);
   fillAttribute(ModelHighAPI_Double(), myfromAngle);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -118,7 +131,7 @@ void FeaturesAPI_Revolution::setPlanesAndOffsets(const ModelHighAPI_Selection& t
   fillAttribute(theFromObject, myfromObject);
   fillAttribute(theFromOffset, myfromOffset);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -127,10 +140,13 @@ void FeaturesAPI_Revolution::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  AttributeSelectionListPtr anObjects = aBase->selectionList(FeaturesPlugin_Revolution::BASE_OBJECTS_ID());
-  AttributeSelectionPtr anAxis = aBase->selection(FeaturesPlugin_Revolution::AXIS_OBJECT_ID());
+  AttributeReferencePtr anAttrSketch = aBase->reference(FeaturesPlugin_Revolution::SKETCH_ID());
+  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Revolution::BASE_OBJECTS_ID());
+  AttributeSelectionPtr anAttrAxis = aBase->selection(FeaturesPlugin_Revolution::AXIS_OBJECT_ID());
 
-  theDumper << aBase << " = model.addRevolution(" << aDocName << ", " << anObjects << ", " << anAxis;
+  theDumper << aBase << " = model.addRevolution(" << aDocName << ", ";
+  anAttrSketch->isInitialized() ? theDumper << "[]" : theDumper << anAttrObjects;
+  theDumper << ", " << anAttrAxis;
 
   std::string aCreationMethod = aBase->string(FeaturesPlugin_Revolution::CREATION_METHOD())->value();
 
@@ -149,6 +165,18 @@ void FeaturesAPI_Revolution::dump(ModelHighAPI_Dumper& theDumper) const
   }
 
   theDumper << ")" << std::endl;
+
+  if(anAttrSketch->isInitialized()) {
+    theDumper << aBase << ".setNestedSketch(" << anAttrSketch << ")" << std::endl;
+  }
+}
+
+//==================================================================================================
+void FeaturesAPI_Revolution::execIfBaseNotEmpty()
+{
+  if(mybaseObjects->size() > 0) {
+    execute();
+  }
 }
 
 //==================================================================================================
