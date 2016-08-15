@@ -76,11 +76,11 @@ Model_ExpressionDouble::Model_ExpressionDouble(TDF_Label& theLabel)
     : Model_Expression(theLabel)
 {
   if (!theLabel.FindAttribute(TDataStd_Real::GetID(), myReal)) {
-    myReal = TDataStd_Real::Set(theLabel, 0.);
     myIsInitialized = false;
     // MPV: temporarily to support the previously saved files (to check and resolve bugs), to be removed
     Handle(TDataStd_RealArray) anOldArray;
     if (theLabel.Father().FindAttribute(TDataStd_RealArray::GetID(), anOldArray) == Standard_True) {
+      myReal = TDataStd_Real::Set(theLabel, 0.);
       myReal->Set(anOldArray->Value(theLabel.Tag() - 1));
       myIsInitialized = true;
       Handle(TDataStd_ExtStringArray) anOldExp;
@@ -91,6 +91,7 @@ Model_ExpressionDouble::Model_ExpressionDouble(TDF_Label& theLabel)
       Handle(TDataStd_Real) anOldReal;
       if (theLabel.Father().FindAttribute(TDataStd_Real::GetID(), anOldReal)) {
         myIsInitialized = true;
+        myReal = TDataStd_Real::Set(theLabel, 0.);
         myReal->Set(anOldReal->Get());
         Handle(TDataStd_Name) aText;
         if (theLabel.Father().FindAttribute(TDataStd_Name::GetID(), aText)) {
@@ -104,27 +105,33 @@ Model_ExpressionDouble::Model_ExpressionDouble(TDF_Label& theLabel)
 
 void Model_ExpressionDouble::setValue(const double theValue)
 {
-  if (value() != theValue)
+  if (!myIsInitialized) {
+    myReal = TDataStd_Real::Set(myText->Label(), theValue);
+    myIsInitialized = true;
+  } else if (value() != theValue) {
     myReal->Set(theValue);
+  }
 }
 
 double Model_ExpressionDouble::value()
 {
-  return myReal->Get();
+  if (myIsInitialized)
+    return myReal->Get();
+  return -1.; // error
 }
 
 void Model_ExpressionDouble::setInvalid(const bool theFlag)
 {
   if (theFlag) {
-    TDataStd_UAttribute::Set(myReal->Label(), kInvalidGUID);
+    TDataStd_UAttribute::Set(myText->Label(), kInvalidGUID);
   } else {
-    myReal->Label().ForgetAttribute(kInvalidGUID);
+    myText->Label().ForgetAttribute(kInvalidGUID);
   }
 }
 
 bool Model_ExpressionDouble::isInvalid()
 {
-  return myReal->Label().IsAttribute(kInvalidGUID) == Standard_True;
+  return myText->Label().IsAttribute(kInvalidGUID) == Standard_True;
 }
 
 
@@ -132,7 +139,6 @@ Model_ExpressionInteger::Model_ExpressionInteger(TDF_Label& theLabel)
     : Model_Expression(theLabel)
 {
   if (!theLabel.FindAttribute(TDataStd_Integer::GetID(), myInteger)) {
-    myInteger = TDataStd_Integer::Set(theLabel, 0);
     myIsInitialized = false;
   } else
     myIsInitialized = true;
@@ -140,25 +146,31 @@ Model_ExpressionInteger::Model_ExpressionInteger(TDF_Label& theLabel)
 
 void Model_ExpressionInteger::setValue(const int theValue)
 {
-  if (value() != theValue)
+  if (!myIsInitialized) {
+    myInteger = TDataStd_Integer::Set(myText->Label(), theValue);
+    myIsInitialized = true;
+  } else if (value() != theValue) {
     myInteger->Set(theValue);
+  }
 }
 
 int Model_ExpressionInteger::value()
 {
-  return myInteger->Get();
+  if (myIsInitialized)
+    return myInteger->Get();
+  return -1; // error
 }
 
 void Model_ExpressionInteger::setInvalid(const bool theFlag)
 {
   if (theFlag) {
-    TDataStd_UAttribute::Set(myInteger->Label(), kInvalidGUID);
+    TDataStd_UAttribute::Set(myText->Label(), kInvalidGUID);
   } else {
-    myInteger->Label().ForgetAttribute(kInvalidGUID);
+    myText->Label().ForgetAttribute(kInvalidGUID);
   }
 }
 
 bool Model_ExpressionInteger::isInvalid()
 {
-  return myInteger->Label().IsAttribute(kInvalidGUID) == Standard_True;
+  return myText->Label().IsAttribute(kInvalidGUID) == Standard_True;
 }

@@ -10,6 +10,8 @@
 #include <GeomAPI_Ax3.h>
 #include <GeomAPI_Pnt.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Document.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <cmath>
 
@@ -68,6 +70,13 @@ std::string defaultPlane(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
     return std::string("YOZ");
 
   return std::string();
+}
+
+std::shared_ptr<ModelAPI_Result> standardPlane(const std::string & theName){
+  DocumentPtr aPartSet = ModelAPI_Session::get()->moduleDocument();
+  // searching for the construction element
+  return std::dynamic_pointer_cast<ModelAPI_Result>(
+    aPartSet->objectByName(ModelAPI_ResultConstruction::group(), theName));
 }
 
 //--------------------------------------------------------------------------------------

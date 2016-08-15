@@ -53,6 +53,10 @@ public:
   SKETCHAPI_EXPORT
   SketchAPI_Sketch(const std::shared_ptr<ModelAPI_Feature> & theFeature,
                    const ModelHighAPI_Selection & theExternal);
+  /// Constructor with values
+  SKETCHAPI_EXPORT
+  SketchAPI_Sketch(const std::shared_ptr<ModelAPI_Feature> & theFeature,
+                   std::shared_ptr<ModelAPI_Object> thePlaneObject);
   /// Destructor
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_Sketch();
@@ -74,6 +78,10 @@ public:
   /// Set external
   SKETCHAPI_EXPORT
   void setExternal(const ModelHighAPI_Selection & theExternal);
+
+  /// Set external
+  SKETCHAPI_EXPORT
+  void setExternal(std::shared_ptr<ModelAPI_Object> thePlaneObject);
 
   /// Add point
   SKETCHAPI_EXPORT
@@ -383,6 +391,13 @@ SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
 SKETCHAPI_EXPORT
 SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
                     const std::string & theExternalName);
+
+/**\ingroup CPPHighAPI
+ * \brief Create Sketch feature
+ */
+SKETCHAPI_EXPORT
+SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
+                    std::shared_ptr<ModelAPI_Object> thePlaneObject);
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------

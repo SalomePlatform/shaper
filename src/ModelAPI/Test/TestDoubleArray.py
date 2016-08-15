@@ -28,6 +28,3 @@ assert(math.fabs(aFeatureData.realArray("double_array").value(1) - 1.5) < 10 ** 
 #=========================================================================
 # End of test
 #=========================================================================
-
-import model
-assert(model.checkPythonDump())

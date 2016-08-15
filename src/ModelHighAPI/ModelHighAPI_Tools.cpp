@@ -43,6 +43,9 @@
 
 #include <Events_InfoMessage.h>
 
+// Have to be included before std headers
+#include <Python.h>
+
 #include <algorithm>
 #include <iostream>
 
@@ -351,7 +354,10 @@ bool checkPythonDump()
   // close all before importation of the script
   aSession->closeAll();
   // execute the dumped
-  Config_ModuleReader::loadScript("check_dump");
+  PyGILState_STATE gstate = PyGILState_Ensure(); /* acquire python thread */
+  PyObject* PyFileObject = PyFile_FromString("./check_dump.py", "r");
+  PyRun_SimpleFileEx(PyFile_AsFile(PyFileObject), "./check_dump.py", 1);
+  PyGILState_Release(gstate); /* release python thread */
 
   // compare with the stored data
   anError = storeFeatures(
