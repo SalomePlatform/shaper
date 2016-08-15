@@ -82,8 +82,10 @@ TypeSubShapeNamePair ModelHighAPI_Selection::typeSubShapeNamePair() const
 std::string ModelHighAPI_Selection::shapeType() const
 {
   switch(myVariantType) {
-    case VT_ResultSubShapePair: return myResultSubShapePair.second->shapeTypeStr();
-    case VT_TypeSubShapeNamePair: return myTypeSubShapeNamePair.first;
+  case VT_ResultSubShapePair: 
+    return myResultSubShapePair.second.get() ? myResultSubShapePair.second->shapeTypeStr() : 
+                                               myResultSubShapePair.first->shape()->shapeTypeStr();
+  case VT_TypeSubShapeNamePair: return myTypeSubShapeNamePair.first;
   }
 
   return "SHAPE";
