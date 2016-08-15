@@ -38,10 +38,12 @@ class ModelAPI_Document;
 class ModelAPI_Entity;
 class ModelAPI_Feature;
 class ModelAPI_Object;
+class ModelAPI_Result;
 
 typedef std::shared_ptr<ModelAPI_Document> DocumentPtr;
 typedef std::shared_ptr<ModelAPI_Entity>   EntityPtr;
 typedef std::shared_ptr<ModelAPI_Feature>  FeaturePtr;
+typedef std::shared_ptr<ModelAPI_Result> ResultPtr;
 
 /**\class ModelHighAPI_Dumper
  * \ingroup CPPHighAPI
@@ -157,6 +159,10 @@ public:
   /// Dump name of entity and remember to dump "setName" if the entity has user-defined name
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const FeaturePtr& theEntity);
+
+  /// Dump result
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const ResultPtr& theResult);
 
   /// Dump Attribute
   MODELHIGHAPI_EXPORT

@@ -6,6 +6,7 @@
 
 #include "FeaturesAPI_Recover.h"
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Reference.h>
 #include <ModelHighAPI_Tools.h>
 
@@ -52,6 +53,23 @@ void FeaturesAPI_Recover::setIsPersistent(bool thePersistent)
 {
   fillAttribute(thePersistent, myisPersistent);
   // do not need to execute because on attribute changed it does everything anyway
+}
+
+//==================================================================================================
+void FeaturesAPI_Recover::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  AttributeReferencePtr anAttrBaseFeature = aBase->reference(FeaturesPlugin_Recover::BASE_FEATURE());
+  AttributeRefListPtr anAttrRecoveredEntities = aBase->reflist(FeaturesPlugin_Recover::RECOVERED_ENTITIES());
+  AttributeBooleanPtr anAttrPersistent = aBase->boolean(FeaturesPlugin_Recover::PERSISTENT());
+
+  FeaturePtr aFeature = ModelAPI_Feature::feature(anAttrBaseFeature->value());
+
+  theDumper << aBase << " = model.addRecover(" << aDocName << ", "
+            << aFeature << ", " << anAttrRecoveredEntities << ", "
+            << anAttrPersistent << ")" << std::endl;
 }
 
 //=================================================================================================

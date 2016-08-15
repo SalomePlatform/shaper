@@ -434,10 +434,34 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity
   return *this;
 }
 
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const ResultPtr& theResult)
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theResult);
+  int anIndex = 0;
+  std::list<ResultPtr> aResults = aFeature->results();
+  for(std::list<ResultPtr>::const_iterator anIt = aResults.cbegin(); anIt != aResults.cend(); ++anIt, ++anIndex) {
+    if(theResult->isSame(*anIt)) {
+      break;
+    }
+  }
+  myDumpBuffer << name(aFeature) << ".result()[" << anIndex << "]";
+  return *this;
+}
+
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const ObjectPtr& theObject)
 {
-  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  myDumpBuffer << name(aFeature);
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+  if(aFeature.get()) {
+    myDumpBuffer << name(aFeature);
+    return *this;
+  }
+
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+  if(aResult.get()) {
+    *this << aResult;
+    return *this;
+  }
+
   return *this;
 }
 

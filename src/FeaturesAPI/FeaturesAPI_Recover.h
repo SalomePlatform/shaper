@@ -14,6 +14,7 @@
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
 
+class ModelHighAPI_Dumper;
 class ModelHighAPI_Reference;
 
 /// \class FeaturesAPI_Recover
@@ -54,6 +55,9 @@ public:
   FEATURESAPI_EXPORT
   void setIsPersistent(bool thePersistent);
 
+  /// Dump wrapped feature
+  FEATURESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Recover object.
