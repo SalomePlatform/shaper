@@ -14,6 +14,7 @@
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
 
+class ModelHighAPI_Dumper;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_RemoveSubShapes
@@ -46,6 +47,10 @@ public:
   /// Modify tools attribute of the feature.
   FEATURESAPI_EXPORT
   void setSubShapesToKeep(const std::list<ModelHighAPI_Selection>& theSubShapes);
+
+  /// Dump wrapped feature
+  FEATURESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on RemoveSubShapes object.
