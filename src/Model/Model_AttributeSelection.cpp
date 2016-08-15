@@ -148,7 +148,8 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
         aBuilder.Generated(theContext->shape()->impl<TopoDS_Shape>());
         std::shared_ptr<Model_Document> aMyDoc = 
           std::dynamic_pointer_cast<Model_Document>(owner()->document());
-        std::string aName = theContext->data()->name();
+        std::string aName = contextName(theContext);
+        // for selection in different document, add the document name
         aMyDoc->addNamingName(aSelLab, aName);
         TDataStd_Name::Set(aSelLab, aName.c_str());
       } else {  // for sketch the naming is needed in DS
@@ -417,7 +418,7 @@ bool Model_AttributeSelection::update()
       aBuilder.Generated(aContext->shape()->impl<TopoDS_Shape>());
       std::shared_ptr<Model_Document> aMyDoc = 
         std::dynamic_pointer_cast<Model_Document>(owner()->document());
-      std::string aName = aContext->data()->name();
+      std::string aName = contextName(aContext);
       aMyDoc->addNamingName(aSelLab, aName);
       TDataStd_Name::Set(aSelLab, aName.c_str());
     }
@@ -714,8 +715,9 @@ void Model_AttributeSelection::selectConstruction(
     // saving of context is enough: result construction contains exactly the needed shape
     TNaming_Builder aBuilder(selectionLabel());
     aBuilder.Generated(aSubShape);
-    aMyDoc->addNamingName(selectionLabel(), theContext->data()->name());
-    TDataStd_Name::Set(selectionLabel(), theContext->data()->name().c_str());
+    std::string aName = contextName(theContext);
+    aMyDoc->addNamingName(selectionLabel(), aName);
+    TDataStd_Name::Set(selectionLabel(), aName.c_str());
     return;
   }
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(owner()->data());
@@ -990,3 +992,20 @@ void Model_AttributeSelection::setId(int theID)
   setValue(aContext, aSelection);
 }
 
+std::string Model_AttributeSelection::contextName(const ResultPtr& theContext) const
+{
+  std::string aResult;
+  if (owner()->document() != theContext->document()) {
+    if (theContext->document() == ModelAPI_Session::get()->moduleDocument()) {
+      aResult = theContext->document()->kind() + "/";
+    } else {
+      ResultPtr aDocRes = ModelAPI_Tools::findPartResult(
+        ModelAPI_Session::get()->moduleDocument(), theContext->document());
+      if (aDocRes.get()) {
+        aResult = aDocRes->data()->name() + "/";
+      }
+    }
+  }
+  aResult += theContext->data()->name();
+  return aResult;
+}

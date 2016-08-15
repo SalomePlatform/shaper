@@ -12,6 +12,7 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_ResultBody.h>
 
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS.hxx>
@@ -627,20 +628,24 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   ResultPtr aCont = aDoc->findByName(aContName);
    // possible this is body where postfix is added to distinguish several shapes on the same label
   int aSubShapeId = -1; // -1 means sub shape not found
-  if (!aCont.get() && aContName == aSubShapeName) {
+  // for result body the name wihtout "_" has higher priority than with it: it is always added
+  if ((!aCont.get() || (aCont->groupName() == ModelAPI_ResultBody::group())) && 
+       aContName == aSubShapeName) {
     size_t aPostIndex = aContName.rfind('_');
     if (aPostIndex != std::string::npos) {
       std::string aSubContName = aContName.substr(0, aPostIndex);
-      aCont = aDoc->findByName(aSubContName);
-      if (aCont.get()) {
+      ResultPtr aSubCont = aDoc->findByName(aSubContName);
+      if (aSubCont.get()) {
         try {
           std::string aNum = aContName.substr(aPostIndex + 1);
           aSubShapeId = std::stoi(aNum);
         } catch (std::invalid_argument&) {
           aSubShapeId = -1;
         }
-        if (aSubShapeId > 0)
+        if (aSubShapeId > 0) {
           aContName = aSubContName;
+          aCont = aSubCont;
+        }
       }
     }
   }
