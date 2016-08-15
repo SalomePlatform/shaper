@@ -60,7 +60,7 @@ void FeaturesAPI_RemoveSubShapes::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeSelectionListPtr anAttrSubShapes = aBase->selectionList(FeaturesPlugin_RemoveSubShapes::SUBSHAPES_ID());
 
   theDumper << aBase << " = model.addRemoveSubShapes(" << aDocName << ", " << anAttrBaseShape << ")" << std::endl;
-  theDumper << aDocName << ".setSubShapesToKeep(" << anAttrSubShapes << ")" << std::endl;
+  theDumper << aBase << ".setSubShapesToKeep(" << anAttrSubShapes << ")" << std::endl;
 }
 
 //==================================================================================================
