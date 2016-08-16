@@ -6,6 +6,7 @@
 
 #include "BuildAPI_SubShapes.h"
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
@@ -47,6 +48,17 @@ void BuildAPI_SubShapes::setSubShapes(const std::list<ModelHighAPI_Selection>& t
   fillAttribute(theSubShapes, mysubShapes);
 
   execute();
+}
+
+//==================================================================================================
+void BuildAPI_SubShapes::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  std::string aPartName = theDumper.name(aBase->document());
+
+  theDumper << aBase << " = model.addSubShapes(" << aPartName << ", "
+            << aBase->selection(BuildPlugin_SubShapes::BASE_SHAPE_ID()) << ", "
+            << aBase->selectionList(BuildPlugin_SubShapes::SUBSHAPES_ID()) << ")" << std::endl;
 }
 
 //==================================================================================================

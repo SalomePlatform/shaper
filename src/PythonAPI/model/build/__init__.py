@@ -2,3 +2,4 @@
 """
 
 from BuildAPI import addVertex, addEdge, addFace, addShell
+from BuildAPI import addSubShapes

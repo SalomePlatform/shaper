@@ -47,6 +47,10 @@ public:
   /// Modify sub-shapes attribute of the feature.
   BUILDAPI_EXPORT
   void setSubShapes(const std::list<ModelHighAPI_Selection>& theSubShapes);
+
+  /// Dump wrapped feature
+  BUILDAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on SubShapes object.
