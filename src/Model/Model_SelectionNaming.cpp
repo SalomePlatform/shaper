@@ -741,7 +741,8 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
     if (aConstr.get() && aConstr->groupName() == ModelAPI_ResultConstruction::group()) {
       theCont = aConstr;
       if (isFullName) {
-        theShapeToBeSelected = aConstr->shape();
+        // For the full construction selection shape must be empty.
+        //theShapeToBeSelected = aConstr->shape();
         return true;
       }
       // for sketch sub-elements selected
