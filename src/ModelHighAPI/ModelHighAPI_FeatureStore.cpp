@@ -33,6 +33,8 @@
 #include <TopoDS_Shape.hxx>
 #include <TopExp_Explorer.hxx>
 
+#include <ios>
+
 ModelHighAPI_FeatureStore::ModelHighAPI_FeatureStore(FeaturePtr theFeature) {
   storeData(theFeature->data(), myAttrs);
   // iterate results to store
@@ -256,7 +258,7 @@ std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>&
   // output the main characteristics
   aResult<<"Volume: "<<setprecision(2)<<GeomAlgoAPI_ShapeTools::volume(theShape)<<std::endl;
   std::shared_ptr<GeomAPI_Pnt> aCenter = GeomAlgoAPI_ShapeTools::centreOfMass(theShape);
-  aResult<<"Center of mass: "
+  aResult<<"Center of mass: "<<std::fixed<<setprecision(7)
     <<aCenter->x()<<" "<<aCenter->y()<<" "<<aCenter->z()<<std::endl;
   return aResult.str();
 }
