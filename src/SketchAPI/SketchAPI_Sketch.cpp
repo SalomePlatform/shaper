@@ -679,9 +679,11 @@ void SketchAPI_Sketch::dump(ModelHighAPI_Dumper& theDumper) const
         std::string anOriginName = aSketchName + "_origin";
         std::string aNormalName  = aSketchName + "_norm";
         std::string aDirXName    = aSketchName + "_dirx";
-        theDumper << anOriginName << " = " << anOrigin << std::endl
-                  << aNormalName  << " = " << aNormal  << std::endl
-                  << aDirXName    << " = " << aDirX    << std::endl;
+        // use "\n" instead of std::endl to avoid automatic dumping sketch here
+        // and then dumplicate dumping it in the next line
+        theDumper << anOriginName << " = " << anOrigin << "\n"
+                  << aNormalName  << " = " << aNormal  << "\n"
+                  << aDirXName    << " = " << aDirX    << "\n";
         // dump sketch based on arbitrary plane
         theDumper << aBase << " = model.addSketch(" << aDocName << ", GeomAPI_Ax3("
                   << anOriginName << ", " << aDirXName << ", " << aNormalName << "))" << std::endl;
