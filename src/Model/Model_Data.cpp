@@ -638,15 +638,10 @@ void Model_Data::copyTo(std::shared_ptr<ModelAPI_Data> theTarget)
 {
   TDF_Label aTargetRoot = std::dynamic_pointer_cast<Model_Data>(theTarget)->label();
   copyAttrs(myLab, aTargetRoot);
-  // make initialized the initialized attributes
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aMyIter = myAttrs.begin();
-  for(; aMyIter != myAttrs.end(); aMyIter++) {
-    if (aMyIter->second->isInitialized()) {
-      AttributePtr aTargetAttr = theTarget->attribute(aMyIter->first);
-      if (aTargetAttr)
-        aTargetAttr->setInitialized();
-    }
-  }
+  // reinitialize Model_Attributes by TDF_Attributes set
+  std::shared_ptr<Model_Data> aTData = std::dynamic_pointer_cast<Model_Data>(theTarget);
+  aTData->myAttrs.clear();
+  theTarget->owner()->initAttributes(); // reinit feature attributes
 }
 
 bool Model_Data::isInHistory()
