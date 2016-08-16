@@ -7,6 +7,7 @@
 //--------------------------------------------------------------------------------------
 #include "ExchangeAPI_Import.h"
 //--------------------------------------------------------------------------------------
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 ExchangeAPI_Import::ExchangeAPI_Import(
@@ -36,6 +37,16 @@ void ExchangeAPI_Import::setFilePath(const std::string & theFilePath)
   fillAttribute(theFilePath, myfilePath);
 
   execute();
+}
+
+//--------------------------------------------------------------------------------------
+void ExchangeAPI_Import::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  std::string aPartName = theDumper.name(aBase->document());
+
+  theDumper << aBase << " = model.addImport(" << aPartName << ", "
+            << aBase->string(ExchangePlugin_ImportFeature::FILE_PATH_ID()) << ")" << std::endl;
 }
 
 //--------------------------------------------------------------------------------------

@@ -42,6 +42,10 @@ public:
   /// Set point values
   EXCHANGEAPI_EXPORT
   void setFilePath(const std::string & theFilePath);
+
+  /// Dump wrapped feature
+  EXCHANGEAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 //! Pointer on Import object
