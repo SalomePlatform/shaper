@@ -16,7 +16,6 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultBody.h>
-
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
 
@@ -33,18 +32,21 @@
 #include <TDF_ChildIDIterator.hxx>
 #include <TDF_LabelMapHasher.hxx>
 #include <TDF_Delta.hxx>
-#include <OSD_File.hxx>
-#include <OSD_Path.hxx>
 #include <TDF_AttributeDelta.hxx>
 #include <TDF_AttributeDeltaList.hxx>
 #include <TDF_ListIteratorOfAttributeDeltaList.hxx>
 #include <TDF_ListIteratorOfLabelList.hxx>
-#include <TopoDS_Shape.hxx>
+#include <TDF_LabelMap.hxx>
 #include <TNaming_SameShapeIterator.hxx>
 #include <TNaming_Iterator.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Tool.hxx>
+
 #include <TopExp_Explorer.hxx>
+#include <TopoDS_Shape.hxx>
+
+#include <OSD_File.hxx>
+#include <OSD_Path.hxx>
 
 #include <climits>
 #ifndef WIN32
@@ -366,7 +368,7 @@ void Model_Document::compactNested()
   }
 }
 
-/// Compares the content ofthe given attributes, returns true if equal.
+/// Compares the content of the given attributes, returns true if equal.
 /// This method is used to avoid empty transactions when only "current" is changed
 /// to some value and then comes back in this transaction, so, it compares only
 /// references and Boolean and Integer Arrays for the current moment.
@@ -575,8 +577,28 @@ static void modifiedLabels(const Handle(TDocStd_Document)& theDoc, TDF_LabelList
   }
   // add also label of the modified attributes
   const TDF_AttributeDeltaList& anAttrs = aDelta->AttributeDeltas();
+  TDF_LabelMap anExcludedInt; /// named shape evolution also modifies integer on this label: exclude it
   for (TDF_ListIteratorOfAttributeDeltaList anAttr(anAttrs); anAttr.More(); anAttr.Next()) {
-    theDelta.Append(anAttr.Value()->Label());
+    if (anAttr.Value()->Attribute()->ID() == TDataStd_BooleanArray::GetID()) {
+      continue; // Boolean array is used for feature auxiliary attributes only, feature args are not modified
+    }
+    if (anAttr.Value()->Attribute()->ID() == TNaming_NamedShape::GetID()) {
+      anExcludedInt.Add(anAttr.Value()->Label());
+      continue; // named shape evolution is changed in history update => skip them, they are not the features arguents
+    }
+    if (anAttr.Value()->Attribute()->ID() == TDataStd_Integer::GetID()) {
+      if (anExcludedInt.Contains(anAttr.Value()->Label()))
+        continue;
+    }
+      theDelta.Append(anAttr.Value()->Label());
+  }
+  TDF_ListIteratorOfLabelList aDeltaIter(theDelta);
+  for(; aDeltaIter.More(); aDeltaIter.Next()) {
+    if (anExcludedInt.Contains(aDeltaIter.Value())) {
+      theDelta.Remove(aDeltaIter);
+      if (!aDeltaIter.More())
+        break;
+    }
   }
 }
 
@@ -1025,9 +1047,10 @@ void Model_Document::setCurrentFeature(
     }
 
     if (anIter->setDisabled(aDisabledFlag)) {
-      // state of feature is changed => so feature become updated
       static Events_ID anUpdateEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
-      ModelAPI_EventCreator::get()->sendUpdated(anIter, anUpdateEvent);
+      // state of feature is changed => so inform that it must be updated if it has such state
+      if (!aDisabledFlag && anIter->data()->execState() == ModelAPI_StateMustBeUpdated)
+        ModelAPI_EventCreator::get()->sendUpdated(anIter, anUpdateEvent);
       // flush is in the end of this method
       ModelAPI_EventCreator::get()->sendUpdated(anIter, aRedispEvent /*, false*/);
       aWasChanged = true;
