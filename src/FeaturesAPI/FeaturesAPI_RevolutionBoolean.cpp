@@ -7,6 +7,8 @@
 #include "FeaturesAPI_RevolutionBoolean.h"
 
 #include <ModelHighAPI_Double.h>
+#include <ModelHighAPI_Dumper.h>
+#include <ModelHighAPI_Reference.h>
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
@@ -21,11 +23,23 @@ FeaturesAPI_RevolutionBoolean::~FeaturesAPI_RevolutionBoolean()
 }
 
 //==================================================================================================
+void FeaturesAPI_RevolutionBoolean::setNestedSketch(const ModelHighAPI_Reference& theSketch)
+{
+  mysketch->setValue(theSketch.feature());
+  mybaseObjects->clear();
+  mybaseObjects->append(theSketch.feature()->firstResult(), GeomShapePtr());
+
+  execIfBaseNotEmpty();
+}
+
+//==================================================================================================
 void FeaturesAPI_RevolutionBoolean::setBase(const std::list<ModelHighAPI_Selection>& theBaseObjects)
 {
+  mysketch->setValue(ObjectPtr());
+  mybaseObjects->clear();
   fillAttribute(theBaseObjects, mybaseObjects);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -33,7 +47,7 @@ void FeaturesAPI_RevolutionBoolean::setAxis(const ModelHighAPI_Selection& theAxi
 {
   fillAttribute(theAxis, myaxis);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -44,7 +58,7 @@ void FeaturesAPI_RevolutionBoolean::setAngles(const ModelHighAPI_Double& theToAn
   fillAttribute(theToAngle, mytoAngle);
   fillAttribute(theFromAngle, myfromAngle);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -54,7 +68,7 @@ void FeaturesAPI_RevolutionBoolean::setAngle(const ModelHighAPI_Double& theAngle
   fillAttribute(theAngle, mytoAngle);
   fillAttribute(ModelHighAPI_Double(), myfromAngle);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -69,7 +83,7 @@ void FeaturesAPI_RevolutionBoolean::setPlanesAndOffsets(const ModelHighAPI_Selec
   fillAttribute(theFromObject, myfromObject);
   fillAttribute(theFromOffset, myfromOffset);
 
-  execute();
+  execIfBaseNotEmpty();
 }
 
 //==================================================================================================
@@ -77,7 +91,59 @@ void FeaturesAPI_RevolutionBoolean::setBooleanObjects(const std::list<ModelHighA
 {
   fillAttribute(theBooleanObjects, mybooleanObjects);
 
-  execute();
+  execIfBaseNotEmpty();
+}
+
+//==================================================================================================
+void FeaturesAPI_RevolutionBoolean::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  AttributeReferencePtr anAttrSketch = aBase->reference(FeaturesPlugin_Revolution::SKETCH_ID());
+  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Revolution::BASE_OBJECTS_ID());
+  AttributeSelectionPtr anAttrAxis = aBase->selection(FeaturesPlugin_Revolution::AXIS_OBJECT_ID());
+
+  theDumper << aBase << " = model.addRevolution";
+  if(aBase->getKind() == FeaturesPlugin_RevolutionCut::ID()) {
+    theDumper << "Cut";
+  } else if(aBase->getKind() == FeaturesPlugin_RevolutionFuse::ID()) {
+    theDumper << "Fuse";
+  }
+  theDumper << "(" << aDocName << ", ";
+  anAttrSketch->isInitialized() ? theDumper << "[]" : theDumper << anAttrObjects;
+  theDumper << ", " << anAttrAxis;
+
+  std::string aCreationMethod = aBase->string(FeaturesPlugin_Revolution::CREATION_METHOD())->value();
+
+  if(aCreationMethod == FeaturesPlugin_Revolution::CREATION_METHOD_BY_ANGLES()) {
+    AttributeDoublePtr anAttrToAngle = aBase->real(FeaturesPlugin_Revolution::TO_ANGLE_ID());
+    AttributeDoublePtr anAttrFromAngle = aBase->real(FeaturesPlugin_Revolution::FROM_ANGLE_ID());
+
+    theDumper << ", " << anAttrToAngle << ", " << anAttrFromAngle;
+  } else if(aCreationMethod == FeaturesPlugin_Revolution::CREATION_METHOD_BY_PLANES()) {
+    AttributeSelectionPtr anAttrToObject = aBase->selection(FeaturesPlugin_Revolution::TO_OBJECT_ID());
+    AttributeDoublePtr anAttrToOffset = aBase->real(FeaturesPlugin_Revolution::TO_OFFSET_ID());
+    AttributeSelectionPtr anAttrFromObject = aBase->selection(FeaturesPlugin_Revolution::FROM_OBJECT_ID());
+    AttributeDoublePtr anAttrFromOffset = aBase->real(FeaturesPlugin_Revolution::FROM_OFFSET_ID());
+
+    theDumper << ", " << anAttrToObject << ", " << anAttrToOffset << ", " << anAttrFromObject << ", " << anAttrFromOffset;
+  }
+
+  AttributeSelectionListPtr anAttrBoolObjects = aBase->selectionList(FeaturesPlugin_CompositeBoolean::OBJECTS_ID());
+  theDumper << ", " << anAttrBoolObjects << ")" << std::endl;
+
+  if(anAttrSketch->isInitialized()) {
+    theDumper << aBase << ".setNestedSketch(" << anAttrSketch << ")" << std::endl;
+  }
+}
+
+//==================================================================================================
+void FeaturesAPI_RevolutionBoolean::execIfBaseNotEmpty()
+{
+  if(mybaseObjects->size() > 0) {
+    execute();
+  }
 }
 
 //==================================================================================================
@@ -98,6 +164,7 @@ FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(const std::shared_ptr<Model
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theAxis, myaxis);
+    fillAttribute(FeaturesPlugin_Revolution::CREATION_METHOD_BY_ANGLES(), mycreationMethod);
     fillAttribute(theSize, mytoAngle);
     fillAttribute(ModelHighAPI_Double(), myfromAngle);
     setBooleanObjects(theBooleanObjects);
@@ -116,6 +183,7 @@ FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(const std::shared_ptr<Model
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theAxis, myaxis);
+    fillAttribute(FeaturesPlugin_Revolution::CREATION_METHOD_BY_ANGLES(), mycreationMethod);
     fillAttribute(theToAngle, mytoAngle);
     fillAttribute(theFromAngle, myfromAngle);
     setBooleanObjects(theBooleanObjects);
@@ -136,6 +204,7 @@ FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(const std::shared_ptr<Model
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theAxis, myaxis);
+    fillAttribute(FeaturesPlugin_Revolution::CREATION_METHOD_BY_PLANES(), mycreationMethod);
     fillAttribute(theToObject, mytoObject);
     fillAttribute(theToOffset, mytoOffset);
     fillAttribute(theFromObject, myfromObject);
@@ -212,6 +281,7 @@ FeaturesAPI_RevolutionFuse::FeaturesAPI_RevolutionFuse(const std::shared_ptr<Mod
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theAxis, myaxis);
+    fillAttribute(FeaturesPlugin_Revolution::CREATION_METHOD_BY_ANGLES(), mycreationMethod);
     fillAttribute(theSize, mytoAngle);
     fillAttribute(ModelHighAPI_Double(), myfromAngle);
     setBooleanObjects(theBooleanObjects);
@@ -230,6 +300,7 @@ FeaturesAPI_RevolutionFuse::FeaturesAPI_RevolutionFuse(const std::shared_ptr<Mod
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theAxis, myaxis);
+    fillAttribute(FeaturesPlugin_Revolution::CREATION_METHOD_BY_ANGLES(), mycreationMethod);
     fillAttribute(theToAngle, mytoAngle);
     fillAttribute(theFromAngle, myfromAngle);
     setBooleanObjects(theBooleanObjects);
@@ -250,6 +321,7 @@ FeaturesAPI_RevolutionFuse::FeaturesAPI_RevolutionFuse(const std::shared_ptr<Mod
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theAxis, myaxis);
+    fillAttribute(FeaturesPlugin_Revolution::CREATION_METHOD_BY_PLANES(), mycreationMethod);
     fillAttribute(theToObject, mytoObject);
     fillAttribute(theToOffset, mytoOffset);
     fillAttribute(theFromObject, myfromObject);

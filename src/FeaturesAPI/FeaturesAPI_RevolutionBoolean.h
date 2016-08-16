@@ -17,6 +17,8 @@
 #include <ModelHighAPI_Macro.h>
 
 class ModelHighAPI_Double;
+class ModelHighAPI_Dumper;
+class ModelHighAPI_Reference;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_RevolutionBoolean
@@ -30,7 +32,7 @@ public:
   virtual ~FeaturesAPI_RevolutionBoolean();
 
   INTERFACE_11("",
-               sketchLauncher, FeaturesPlugin_Revolution::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */,
+               sketch, FeaturesPlugin_Revolution::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */,
                baseObjects, FeaturesPlugin_Revolution::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */,
                axis, FeaturesPlugin_Revolution::AXIS_OBJECT_ID(), ModelAPI_AttributeSelection, /** Axis */,
                creationMethod, FeaturesPlugin_Revolution::CREATION_METHOD(), ModelAPI_AttributeString, /** Creation method */,
@@ -41,6 +43,10 @@ public:
                fromObject, FeaturesPlugin_Revolution::FROM_OBJECT_ID(), ModelAPI_AttributeSelection, /** From object */,
                fromOffset, FeaturesPlugin_Revolution::FROM_OFFSET_ID(), ModelAPI_AttributeDouble, /** From offset */,
                booleanObjects, FeaturesPlugin_CompositeBoolean::OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Boolean objects */)
+
+  /// Modify base attribute of the feature.
+  FEATURESAPI_EXPORT
+  void setNestedSketch(const ModelHighAPI_Reference& theSketch);
 
   /// Modify base attribute of the feature.
   FEATURESAPI_EXPORT
@@ -69,19 +75,25 @@ public:
   FEATURESAPI_EXPORT
   void setBooleanObjects(const std::list<ModelHighAPI_Selection>& theBooleanObjects);
 
+  /// Dump wrapped feature
+  FEATURESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
 protected:
   /// Constructor without values.
   FEATURESAPI_EXPORT
   explicit FeaturesAPI_RevolutionBoolean(const std::shared_ptr<ModelAPI_Feature>& theFeature);
+
+private:
+  void execIfBaseNotEmpty();
 };
 
 class FeaturesAPI_RevolutionCut: public FeaturesAPI_RevolutionBoolean
 {
 public:
-  FEATURESAPI_EXPORT
-  virtual std::string getID() {
-    return FeaturesPlugin_RevolutionCut::ID();
-  }
+
+  static std::string ID() { return FeaturesPlugin_RevolutionCut::ID(); }
+  virtual std::string getID() { return ID(); }
 
   /// Constructor without values.
   FEATURESAPI_EXPORT
@@ -153,10 +165,9 @@ RevolutionCutPtr addRevolutionCut(const std::shared_ptr<ModelAPI_Document>& theP
 class FeaturesAPI_RevolutionFuse: public FeaturesAPI_RevolutionBoolean
 {
 public:
-  FEATURESAPI_EXPORT
-  virtual std::string getID() {
-    return FeaturesPlugin_RevolutionFuse::ID();
-  }
+
+  static std::string ID() { return FeaturesPlugin_RevolutionFuse::ID(); }
+  virtual std::string getID() { return ID(); }
 
   /// Constructor without values.
   FEATURESAPI_EXPORT
