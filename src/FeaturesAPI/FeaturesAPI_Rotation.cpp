@@ -6,6 +6,7 @@
 
 #include "FeaturesAPI_Rotation.h"
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
@@ -60,11 +61,25 @@ void FeaturesAPI_Rotation::setAngle(const ModelHighAPI_Double& theAngle)
 }
 
 //==================================================================================================
+void FeaturesAPI_Rotation::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Rotation::OBJECTS_LIST_ID());
+  AttributeSelectionPtr anAttrAxis = aBase->selection(FeaturesPlugin_Rotation::AXIS_OBJECT_ID());
+  AttributeDoublePtr anAttrAngle = aBase->real(FeaturesPlugin_Rotation::ANGLE_ID());
+
+  theDumper << aBase << " = model.addRotation(" << aDocName << ", "
+            << anAttrObjects << ", " << anAttrAxis << ", " << anAttrAngle << ")" << std::endl;
+}
+
+//==================================================================================================
 RotationPtr addRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const std::list<ModelHighAPI_Selection>& theMainObjects,
                         const ModelHighAPI_Selection& theAxisObject,
-                        const ModelHighAPI_Double& theDistance)
+                        const ModelHighAPI_Double& theAngle)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Rotation::ID());
-  return RotationPtr(new FeaturesAPI_Rotation(aFeature, theMainObjects, theAxisObject, theDistance));
+  return RotationPtr(new FeaturesAPI_Rotation(aFeature, theMainObjects, theAxisObject, theAngle));
 }

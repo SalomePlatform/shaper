@@ -15,6 +15,7 @@
 #include <ModelHighAPI_Macro.h>
 
 class ModelHighAPI_Double;
+class ModelHighAPI_Dumper;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Rotation
@@ -54,6 +55,10 @@ public:
   /// Set angle.
   FEATURESAPI_EXPORT
   void setAngle(const ModelHighAPI_Double& theAngle);
+
+  /// Dump wrapped feature
+  FEATURESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Rotation object.
@@ -65,6 +70,6 @@ FEATURESAPI_EXPORT
 RotationPtr addRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const std::list<ModelHighAPI_Selection>& theMainObjects,
                         const ModelHighAPI_Selection& theAxisObject,
-                        const ModelHighAPI_Double& theDistance);
+                        const ModelHighAPI_Double& theAngle);
 
 #endif // FeaturesAPI_Rotation_H_
