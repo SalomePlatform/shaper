@@ -6,6 +6,7 @@
 
 #include "BuildAPI_Face.h"
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
@@ -37,6 +38,16 @@ void BuildAPI_Face::setBase(const std::list<ModelHighAPI_Selection>& theBaseObje
   fillAttribute(theBaseObjects, mybaseObjects);
 
   execute();
+}
+
+//==================================================================================================
+void BuildAPI_Face::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  std::string aPartName = theDumper.name(aBase->document());
+
+  theDumper << aBase << " = model.addFace(" << aPartName << ", "
+            << aBase->selectionList(BuildPlugin_Face::BASE_OBJECTS_ID()) << ")" << std::endl;
 }
 
 //==================================================================================================

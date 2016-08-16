@@ -1,4 +1,4 @@
 """Package for Build plugin for the Parametric Geometry API of the Modeler.
 """
 
-from BuildAPI import addVertex, addEdge
+from BuildAPI import addVertex, addEdge, addFace
