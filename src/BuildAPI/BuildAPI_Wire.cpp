@@ -6,6 +6,7 @@
 
 #include "BuildAPI_Wire.h"
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
@@ -37,6 +38,16 @@ void BuildAPI_Wire::setBase(const std::list<ModelHighAPI_Selection>& theBaseObje
   fillAttribute(theBaseObjects, mybaseObjects);
 
   execute();
+}
+
+//==================================================================================================
+void BuildAPI_Wire::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  std::string aPartName = theDumper.name(aBase->document());
+
+  theDumper << aBase << " = model.addWire(" << aPartName << ", "
+            << aBase->selectionList(BuildPlugin_Wire::BASE_OBJECTS_ID()) << ")" << std::endl;
 }
 
 //==================================================================================================
