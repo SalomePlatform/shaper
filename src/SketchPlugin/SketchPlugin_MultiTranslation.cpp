@@ -274,29 +274,23 @@ void SketchPlugin_MultiTranslation::attributeChanged(const std::string& theID)
       int aNbCopies = integer(NUMBER_OF_OBJECTS_ID())->value()-1;
       if (aNbCopies <= 0)
         return;
+
+      DocumentPtr aDoc = document();
       // Clear list of objects
-      AttributeRefListPtr aRefListOfTranslated = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-          data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
+      AttributeRefListPtr aRefListOfTranslated = reflist(SketchPlugin_Constraint::ENTITY_B());
       std::list<ObjectPtr> aTargetList = aRefListOfTranslated->list();
       std::list<ObjectPtr>::iterator aTargetIter = aTargetList.begin();
       while (aTargetIter != aTargetList.end()) {
         aTargetIter++;
         for (int i = 0; i < aNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++) {
           aRefListOfTranslated->remove(*aTargetIter);
-          // remove the corresponding feature from the sketch
-          ResultConstructionPtr aRC =
-            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aTargetIter);
-          DocumentPtr aDoc = aRC ? aRC->document() : DocumentPtr();
-          FeaturePtr aFeature =  aDoc ? aDoc->feature(aRC) : FeaturePtr();
+          FeaturePtr aFeature = ModelAPI_Feature::feature(*aTargetIter);
           if (aFeature)
             aDoc->removeFeature(aFeature);
         }
       }
       aRefListOfTranslated->clear();
-      std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-        data()->attribute(SketchPlugin_Constraint::ENTITY_A()))->clear();
-      std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-        data()->attribute(SketchPlugin_Constraint::ENTITY_B()))->clear();
+      reflist(SketchPlugin_Constraint::ENTITY_A())->clear();
     }
   }
 }
