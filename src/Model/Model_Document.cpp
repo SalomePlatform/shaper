@@ -490,6 +490,11 @@ bool Model_Document::finishOperation()
   bool isNestedClosed = !myDoc->HasOpenCommand() && !myNestedNum.empty();
   static std::shared_ptr<Model_Session> aSession = 
     std::static_pointer_cast<Model_Session>(Model_Session::get());
+
+  // open transaction if nested is closed to fit inside all synchronizeBackRefs and flushed consequences
+  if (isNestedClosed) {
+    myDoc->OpenCommand();
+  }
   // do it before flashes to enable and recompute nesting features correctly
   if (myNestedNum.empty() || (isNestedClosed && myNestedNum.size() == 1)) {
     // if all nested operations are closed, make current the higher level objects (to perform 
@@ -509,6 +514,12 @@ bool Model_Document::finishOperation()
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+
+  if (isNestedClosed) {
+    if (myDoc->CommitCommand())
+      myTransactions.rbegin()->myOCAFNum++;
+  }
+  
   // this must be here just after everything is finished but before real transaction stop
   // to avoid messages about modifications outside of the transaction
   // and to rebuild everything after all updates and creates

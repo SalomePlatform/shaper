@@ -14,6 +14,7 @@
 #include <TDataStd_RealArray.hxx>
 #include <TDataStd_ExtStringArray.hxx>
 
+#include <limits>
 
 static Standard_GUID kInvalidGUID("caee5ce4-34b1-4b29-abcb-685287d18096");
 
@@ -117,7 +118,7 @@ double Model_ExpressionDouble::value()
 {
   if (myIsInitialized)
     return myReal->Get();
-  return -1.; // error
+  return std::numeric_limits<double>::max(); // error
 }
 
 void Model_ExpressionDouble::setInvalid(const bool theFlag)
@@ -158,7 +159,7 @@ int Model_ExpressionInteger::value()
 {
   if (myIsInitialized)
     return myInteger->Get();
-  return -1; // error
+  return std::numeric_limits<int>::max(); // error
 }
 
 void Model_ExpressionInteger::setInvalid(const bool theFlag)
