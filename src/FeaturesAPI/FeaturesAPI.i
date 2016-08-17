@@ -37,6 +37,7 @@
 %shared_ptr(FeaturesAPI_RevolutionFuse)
 %shared_ptr(FeaturesAPI_Rotation)
 %shared_ptr(FeaturesAPI_Translation)
+%shared_ptr(FeaturesAPI_Union)
 
 // all supported interfaces
 %include "FeaturesAPI_Boolean.h"
@@ -53,3 +54,4 @@
 %include "FeaturesAPI_RevolutionBoolean.h"
 %include "FeaturesAPI_Rotation.h"
 %include "FeaturesAPI_Translation.h"
+%include "FeaturesAPI_Union.h"
