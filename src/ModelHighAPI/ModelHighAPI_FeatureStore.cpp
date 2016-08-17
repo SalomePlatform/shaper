@@ -187,15 +187,22 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
   } else if (aType == ModelAPI_AttributeRefList::typeId()) {
     AttributeRefListPtr anAttr = 
       std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttr);
+    // for sketch sub-features the empty values may be skipped and order is not important
+    bool isSketchFeatures = anAttr->id() == "Features" && 
+      std::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->owner())->getKind() == "Sketch";
     std::list<ObjectPtr> aList = anAttr->list();
+    std::list<std::string> aResList; // list of resulting strings
     for(std::list<ObjectPtr>::iterator aL = aList.begin(); aL != aList.end(); aL++) {
-      if (aL != aList.begin())
-        aResult<<" ";
       if (aL->get()) {
-        aResult<<(*aL)->data()->name();
-      } else {
-        aResult<<"__empty__";
+        aResList.push_back((*aL)->data()->name());
+      } else if (!isSketchFeatures) {
+        aResList.push_back("__empty__");
       }
+    }
+    if (isSketchFeatures)
+      aResList.sort();
+    for(std::list<std::string>::iterator aR = aResList.begin(); aR != aResList.end(); aR++) {
+      aResult<<*aR<<" ";
     }
   } else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
     AttributeRefAttrListPtr anAttr = 

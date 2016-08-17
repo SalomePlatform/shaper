@@ -6,16 +6,10 @@
 
 #include "SketchPlugin_ConstraintSplit.h"
 
-//#include <GeomAPI_Circ2d.h>
-//#include <GeomAPI_Dir2d.h>
-//#include <GeomAPI_Lin2d.h>
 #include <GeomAPI_Pnt2d.h>
-//#include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
-//#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeString.h>
-//#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Tools.h>
 

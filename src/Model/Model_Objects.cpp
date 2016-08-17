@@ -663,6 +663,11 @@ void Model_Objects::synchronizeFeatures(
       aFeature = myFeatures.Find(aFeatureLabel);
       aKeptFeatures.insert(aFeature);
       if (anUpdatedMap.Contains(aFeatureLabel)) {
+        if (!theOpen) { // on abort/undo/redo reinitialize attributes is something is changed
+          std::shared_ptr<Model_Data> aD = std::dynamic_pointer_cast<Model_Data>(aFeature->data());
+          aD->myAttrs.clear();
+          aFeature->initAttributes();
+        }
         ModelAPI_EventCreator::get()->sendUpdated(aFeature, anUpdateEvent);
         if (aFeature->getKind() == "Parameter") { // if parameters are changed, update the results (issue 937)
           const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
