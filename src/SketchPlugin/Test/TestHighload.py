@@ -41,6 +41,7 @@ def createNAngle(theSketch, theN, theRadius, theEdgeLength=0):
         anEndPoint = geomDataAPI_Point2D(aSketchLine.attribute("EndPoint"))
         aStartPoint.setValue(begin[0], begin[1])
         anEndPoint.setValue(end[0], end[1])
+        aSketchLine.execute()
         allStartPoints.append(aStartPoint)
         allEndPoints.append(anEndPoint)
         allLines.append(aSketchLine)

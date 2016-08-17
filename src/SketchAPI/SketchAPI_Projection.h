@@ -40,7 +40,7 @@ public:
 
   INTERFACE_3(SketchPlugin_Projection::ID(),
               externalFeature, SketchPlugin_Projection::EXTERNAL_FEATURE_ID(), ModelAPI_AttributeSelection, /** External feature */,
-              projectedFeature, SketchPlugin_Projection::EXTERNAL_FEATURE_ID(), ModelAPI_AttributeRefAttr, /** Projected feature */,
+              projectedFeature, SketchPlugin_Projection::PROJECTED_FEATURE_ID(), ModelAPI_AttributeRefAttr, /** Projected feature */,
               external, SketchPlugin_Projection::EXTERNAL_ID(), ModelAPI_AttributeSelection, /** External */
   )
 

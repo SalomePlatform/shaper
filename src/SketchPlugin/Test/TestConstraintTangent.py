@@ -246,7 +246,7 @@ assert(anArc2CenterNew == anArc2CenterPrev)
 assert(anArc2StartPointNew == anArc2StartPointPrev)
 assert(anArc2EndPointNew == anArc2EndPointPrev)
 aSession.startOperation()
-aSketchFeature.removeFeature(aTangency)
+aDocument.removeFeature(aTangency)
 aSession.finishOperation()
 
 #=========================================================================

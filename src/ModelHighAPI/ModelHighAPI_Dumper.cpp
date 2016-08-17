@@ -105,10 +105,10 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity)
       int anId = std::stoi(anIdStr);
 
       // Check number of already registered objects of such kind. Index of current object
-      // should be greater than it to identify feature's name as automatically generated.
-      if (aNbFeatures < anId) {
+      // should be the same to identify feature's name as automatically generated.
+      if (aNbFeatures + 1 == anId) {
         isUserDefined = false;
-        aNbFeatures = anId - 1;
+        //aNbFeatures = anId - 1;
       }
     }
 

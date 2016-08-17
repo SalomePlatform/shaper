@@ -236,16 +236,12 @@ std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(
 std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(const ModelHighAPI_Selection & theExternal)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Line::ID());
-  LinePtr aLine(new SketchAPI_Line(aFeature, theExternal));
-  setFixed(InterfacePtr(aLine));
-  return aLine;
+  return LinePtr(new SketchAPI_Line(aFeature, theExternal));
 }
 std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(const std::string & theExternalName)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Line::ID());
-  LinePtr aLine(new SketchAPI_Line(aFeature, theExternalName));
-  setFixed(InterfacePtr(aLine));
-  return aLine;
+  return LinePtr(new SketchAPI_Line(aFeature, theExternalName));
 }
 
 //--------------------------------------------------------------------------------------

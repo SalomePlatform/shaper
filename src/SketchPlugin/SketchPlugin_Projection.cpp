@@ -187,6 +187,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     aCenterPnt->setValue(aCenterInSketch);
   }
 
+  aProjection->boolean(COPY_ID())->setValue(true);
   aProjection->execute();
   aRefAttr->setObject(aProjection);
 

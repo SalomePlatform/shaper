@@ -118,11 +118,22 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
   if (aFeatOwner.get() && !aFactory->isCase(aFeatOwner, theAttr->id())) {
     return "__notcase__";
   }
-  if (!theAttr->isInitialized()) {
-    return "__notinitialized__";
-  }
   std::string aType = theAttr->attributeType();
   std::ostringstream aResult;
+  if (!theAttr->isInitialized()) {
+    if (aType == ModelAPI_AttributeBoolean::typeId()) {
+      // special case for Boolean attribute (mean it false if not initialized)
+      aResult << false;
+      return aResult.str();
+    } else if (aType == ModelAPI_AttributeString::typeId()) {
+      // special case for attribute "SolverError"
+      if (theAttr->id() == "SolverError" && 
+          std::dynamic_pointer_cast<ModelAPI_Feature>(theAttr->owner())->getKind() == "Sketch")
+        return "";
+    }
+
+    return "__notinitialized__";
+  }
   if (aType == ModelAPI_AttributeDocRef::typeId()) {
     AttributeDocRefPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDocRef>(theAttr);
     DocumentPtr aDoc = ModelAPI_Session::get()->moduleDocument();
@@ -143,7 +154,7 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
   } else if (aType == ModelAPI_AttributeDouble::typeId()) {
     AttributeDoublePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttr);
     if (anAttr->text().empty())
-      aResult<<anAttr->value();
+      aResult<<std::fixed<<setprecision(7)<<anAttr->value();
     else
       aResult<<anAttr->text();
   } else if (aType == ModelAPI_AttributeBoolean::typeId()) {
