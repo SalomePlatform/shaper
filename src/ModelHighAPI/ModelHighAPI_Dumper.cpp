@@ -59,15 +59,20 @@ ModelHighAPI_Dumper* ModelHighAPI_Dumper::getInstance()
   return mySelf;
 }
 
+#define CLEAR_STREAM(theStream) { \
+    std::ostringstream anOther;   \
+    swap(theStream, anOther);     \
+  }
+
 void ModelHighAPI_Dumper::clear(bool bufferOnly)
 {
-  myDumpBuffer = std::ostringstream();
+  CLEAR_STREAM(myDumpBuffer);
   myDumpBuffer << std::setprecision(16);
 
   clearNotDumped();
 
   if (!bufferOnly) {
-    myFullDump = std::ostringstream();
+    CLEAR_STREAM(myFullDump);
     myFullDump << std::setprecision(16);
 
     myNames.clear();
@@ -82,7 +87,7 @@ void ModelHighAPI_Dumper::clearNotDumped()
   myNotDumpedEntities.clear();
 }
 
-const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity)
+const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity, bool theSaveNotDumped)
 {
   EntityNameMap::const_iterator aFound = myNames.find(theEntity);
   if (aFound != myNames.end())
@@ -116,7 +121,8 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity)
   }
 
   myNames[theEntity] = std::pair<std::string, bool>(aName, isUserDefined);
-  myNotDumpedEntities.insert(theEntity);
+  if (theSaveNotDumped)
+    myNotDumpedEntities.insert(theEntity);
   return myNames[theEntity].first;
 }
 
@@ -150,10 +156,13 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
 bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theDoc)
 {
   bool isOk = true;
-  // dump all features
   std::list<FeaturePtr> aFeatures = theDoc->allFeatures();
   std::list<FeaturePtr>::const_iterator aFeatIt = aFeatures.begin();
-  for (; aFeatIt != aFeatures.end(); ++aFeatIt) {
+  // firstly, dump all parameters
+  for (; aFeatIt != aFeatures.end(); ++ aFeatIt)
+    dumpParameter(*aFeatIt);
+  // dump all other features
+  for (aFeatIt = aFeatures.begin(); aFeatIt != aFeatures.end(); ++aFeatIt) {
     CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aFeatIt);
     if (aCompFeat) // iteratively process composite features
       isOk = process(aCompFeat) && isOk;
@@ -206,6 +215,9 @@ bool ModelHighAPI_Dumper::processSubs(const std::shared_ptr<ModelAPI_CompositeFe
   bool isOk = true;
   // dump all sub-features;
   int aNbSubs = theComposite->numberOfSubs();
+//////////////////////////////////////
+  std::list<ObjectPtr> aList = theComposite->reflist("Features")->list();
+//////////////////////////////////////
   for (int anIndex = 0; anIndex < aNbSubs; ++anIndex) {
     FeaturePtr aFeature = theComposite->subFeature(anIndex);
     if (isDumped(aFeature))
@@ -533,11 +545,11 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     myDumpBuffer << "]";
   } else {
     // clear buffer and store list "as is"
-    myDumpBuffer = std::ostringstream();
+    CLEAR_STREAM(myDumpBuffer);
     *this << theRefList;
     // save buffer and clear it again
     std::string aDumpedList = myDumpBuffer.str();
-    myDumpBuffer = std::ostringstream();
+    CLEAR_STREAM(myDumpBuffer);
     // obtain name of list
     FeaturePtr anOwner = ModelAPI_Feature::feature(theRefList->owner());
     std::string aListName = name(anOwner) + "_objects";

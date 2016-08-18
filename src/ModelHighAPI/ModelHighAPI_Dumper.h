@@ -9,6 +9,7 @@
 
 #include "ModelHighAPI.h"
 
+#include <list>
 #include <map>
 #include <memory>
 #include <set>
@@ -80,13 +81,18 @@ public:
                     const std::string& theObject = std::string());
 
   /// Returns name of specified entity
+  /// \param theEntity        [in] named entity
+  /// \param theSaveNotDumped [in] if \c true, the entity should be stored as not dumped (will be dumped automatically)
+  /// \return name of the entity
   MODELHIGHAPI_EXPORT
-  const std::string& name(const EntityPtr& theEntity);
+  const std::string& name(const EntityPtr& theEntity, bool theSaveNotDumped = true);
 
   /// Returns name of parent composite feature for specified entity
   MODELHIGHAPI_EXPORT
   const std::string& parentName(const FeaturePtr& theFeature);
 
+  /// Dump parameter feature only
+  virtual void dumpParameter(const FeaturePtr& theFeature) = 0;
   /// Dump given feature
   virtual void dumpFeature(const FeaturePtr& theFeature, const bool theForce = false) = 0;
 

@@ -34,6 +34,10 @@
 #include <TopExp_Explorer.hxx>
 
 #include <ios>
+#include <cmath>
+
+#define PRECISION 7
+#define TOLERANCE (1.e-7)
 
 ModelHighAPI_FeatureStore::ModelHighAPI_FeatureStore(FeaturePtr theFeature) {
   storeData(theFeature->data(), myAttrs);
@@ -112,6 +116,16 @@ std::string ModelHighAPI_FeatureStore::compareData(std::shared_ptr<ModelAPI_Data
   return "";
 }
 
+static void dumpArray(std::ostringstream& theOutput, const double theArray[], int theSize)
+{
+  for (int i = 0; i < theSize; ++i) {
+    if (i > 0)
+      theOutput << " ";
+    theOutput << std::fixed << setprecision(PRECISION)
+              << (fabs(theArray[i]) < TOLERANCE ? 0.0 : theArray[i]);
+  }
+}
+
 std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
   FeaturePtr aFeatOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttr->owner());
@@ -153,9 +167,10 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
       aResult<<anAttr->text();
   } else if (aType == ModelAPI_AttributeDouble::typeId()) {
     AttributeDoublePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttr);
-    if (anAttr->text().empty())
-      aResult<<std::fixed<<setprecision(7)<<anAttr->value();
-    else
+    if (anAttr->text().empty()) {
+      double aVal = anAttr->value();
+      dumpArray(aResult, &aVal, 1);
+    } else
       aResult<<anAttr->text();
   } else if (aType == ModelAPI_AttributeBoolean::typeId()) {
     AttributeBooleanPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(theAttr);
@@ -245,13 +260,16 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
       aResult<<anAttr->value(a)<<" ";
   } else if (aType == GeomDataAPI_Point::typeId()) {
     AttributePointPtr anAttr = std::dynamic_pointer_cast<GeomDataAPI_Point>(theAttr);
-    aResult<<anAttr->x()<<" "<<anAttr->y()<<" "<<anAttr->z();
+    double aValues[3] = {anAttr->x(), anAttr->y(), anAttr->z()};
+    dumpArray(aResult, aValues, 3);
   } else if (aType == GeomDataAPI_Dir::typeId()) {
     AttributeDirPtr anAttr = std::dynamic_pointer_cast<GeomDataAPI_Dir>(theAttr);
-    aResult<<anAttr->x()<<" "<<anAttr->y()<<" "<<anAttr->z();
+    double aValues[3] = {anAttr->x(), anAttr->y(), anAttr->z()};
+    dumpArray(aResult, aValues, 3);
   } else if (aType == GeomDataAPI_Point2D::typeId()) {
     AttributePoint2DPtr anAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttr);
-    aResult<<anAttr->x()<<" "<<anAttr->y()<<" ";
+    double aValues[2] = {anAttr->x(), anAttr->y()};
+    dumpArray(aResult, aValues, 2);
   } else {
     aResult<<"__unknownattribute__";
   }
@@ -276,7 +294,7 @@ std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>&
   // output the main characteristics
   aResult<<"Volume: "<<setprecision(2)<<GeomAlgoAPI_ShapeTools::volume(theShape)<<std::endl;
   std::shared_ptr<GeomAPI_Pnt> aCenter = GeomAlgoAPI_ShapeTools::centreOfMass(theShape);
-  aResult<<"Center of mass: "<<std::fixed<<setprecision(7)
+  aResult<<"Center of mass: "<<std::fixed<<setprecision(PRECISION)
     <<aCenter->x()<<" "<<aCenter->y()<<" "<<aCenter->z()<<std::endl;
   return aResult.str();
 }

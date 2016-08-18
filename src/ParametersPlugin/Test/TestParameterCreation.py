@@ -114,7 +114,7 @@ assert (aTmValue == round(2 * math.pi, 6))
 #=========================================================================
 # Use parameters to set radius of a circle :
 # 1. Create a circle (250., 250), r = 25.
-# 2. Set a 'cr1' as text value of radius attribute
+# 2. Create a radius constraint and set 'cr1' as text value of constraint
 #=========================================================================
 aSession.startOperation()
 aSketchCircle = aSketchFeature.addFeature("SketchCircle")
@@ -125,7 +125,12 @@ aRadiusAttr.setValue(25.)
 aSession.finishOperation()
 # Apply parameter
 aSession.startOperation()
-aRadiusAttr.setText("cr1")
+aRadiusConstraint = aSketchFeature.addFeature("SketchConstraintRadius")
+refattrA = aRadiusConstraint.refattr("ConstraintEntityA")
+refattrA.setObject(modelAPI_ResultConstruction(aSketchCircle.lastResult()))
+aRadiusConstrAttr = aRadiusConstraint.real("ConstraintValue")
+aRadiusConstrAttr.setText("cr1")
+aRadiusConstraint.execute()
 aSession.finishOperation()
 assert(aRadiusAttr.value() == 100.)
 #=========================================================================
