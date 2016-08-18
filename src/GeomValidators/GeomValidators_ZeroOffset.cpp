@@ -87,11 +87,11 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
   double aToSize = 0.0;
   double aFromSize = 0.0;
 
-  if(theFeature->real(*anIt)) {
+  if(theFeature->real(*anIt) && theFeature->real(*anIt)->isInitialized()) {
     aToSize = theFeature->real(*anIt)->value();
   }
   anIt++;
-  if(theFeature->real(*anIt)) {
+  if(theFeature->real(*anIt) && theFeature->real(*anIt)->isInitialized()) {
     aFromSize = theFeature->real(*anIt)->value();
   }
   anIt++;
@@ -109,7 +109,7 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
   std::shared_ptr<GeomAPI_Shape> aFromShape;
 
   std::shared_ptr<ModelAPI_AttributeSelection> anAttrSel = theFeature->selection(*anIt);
-  if(anAttrSel) {
+  if(anAttrSel && anAttrSel->isInitialized()) {
     aToShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anAttrSel->value());
     if(aToShape.get() == NULL && anAttrSel->context().get() != NULL) {
       aToShape =  anAttrSel->context()->shape();
@@ -118,13 +118,13 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
   anIt++;
 
   std::shared_ptr<ModelAPI_AttributeDouble> anAttrDouble = theFeature->real(*anIt);
-  if(anAttrDouble) {
+  if(anAttrDouble && anAttrDouble->isInitialized()) {
     aToSize = anAttrDouble->value();
   }
   anIt++;
 
   anAttrSel = theFeature->selection(*anIt);
-  if(anAttrSel) {
+  if(anAttrSel && anAttrSel->isInitialized()) {
     aFromShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anAttrSel->value());
     if(aFromShape.get() == NULL && anAttrSel->context().get() != NULL) {
       aFromShape = anAttrSel->context()->shape();
@@ -133,7 +133,7 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
   anIt++;
 
   anAttrDouble = theFeature->real(*anIt);
-  if(anAttrDouble) {
+  if(anAttrDouble && anAttrDouble->isInitialized()) {
     aFromSize = anAttrDouble->value();
   }
 
