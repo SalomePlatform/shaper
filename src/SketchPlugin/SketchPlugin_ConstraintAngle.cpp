@@ -255,7 +255,8 @@ bool SketchPlugin_ConstraintAngle::compute(const std::string& theAttributeId)
 
   std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = std::dynamic_pointer_cast<
                            GeomDataAPI_Point2D>(attribute(theAttributeId));
-  if (fabs(aFlyOutAttr->x()) >= tolerance || fabs(aFlyOutAttr->y()) >= tolerance)
+  if (aFlyOutAttr->isInitialized() &&
+      (fabs(aFlyOutAttr->x()) >= tolerance || fabs(aFlyOutAttr->y()) >= tolerance))
     return false;
 
   DataPtr aData = data();

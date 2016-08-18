@@ -27,7 +27,8 @@ To extend GeomValidators_Different validator with new attribute types:
 
 bool isEqual(const AttributePoint2DPtr& theLeft, const AttributePoint2DPtr& theRight)
 {
-  return theLeft->pnt()->distance(theRight->pnt()) < tolerance;
+  return theLeft->isInitialized() && theRight->isInitialized() &&
+    theLeft->pnt()->distance(theRight->pnt()) < tolerance;
 }
 
 bool isEqualAttributes(const AttributePtr& theLeft, const AttributePtr& theRight)

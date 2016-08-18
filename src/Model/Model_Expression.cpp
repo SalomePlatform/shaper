@@ -34,8 +34,10 @@ Model_Expression::Model_Expression(TDF_Label& theLabel)
 
 void Model_Expression::setText(const std::string& theValue)
 {
-  if (text() != theValue)
+  if (text() != theValue) {
     myText->Set(TCollection_ExtendedString(theValue.c_str()));
+    myIsInitialized = true; // the value will be set very soon
+  }
 
   setError(text().empty() ? "" : "Not a double value.");
 }

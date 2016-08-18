@@ -275,8 +275,8 @@ bool PartSet_WidgetPoint2D::restoreValueCustom()
   std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(attributeID()));
-  QString aTextX = QString::fromStdString(aPoint->textX());
-  QString aTextY = QString::fromStdString(aPoint->textY());
+  QString aTextX = QString::fromStdString(aPoint->isInitialized() ? aPoint->textX() : "0");
+  QString aTextY = QString::fromStdString(aPoint->isInitialized() ? aPoint->textY() : "0");
 
   bool isDouble = false;
   double aVal = 0;

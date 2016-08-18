@@ -246,7 +246,9 @@ double getFlyoutDistance(const ModelAPI_Feature* theConstraint)
   std::shared_ptr<GeomDataAPI_Point2D> aFlyoutPoint =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       const_cast<ModelAPI_Feature*>(theConstraint)->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-
+  // for not initialized values return zero distance to avoid Presentation crash
+  if (!aFlyoutPoint->isInitialized())
+    return 0;
   return aFlyoutPoint->y();
 }
 

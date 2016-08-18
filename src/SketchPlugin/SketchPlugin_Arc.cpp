@@ -486,11 +486,11 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
       double aNewAngle = aPassedParam >= aStartParam && aPassedParam <= aEndParam ?
         ((aEndParam - aStartParam) * 180.0 / PI) :
         ((aEndParam - aStartParam - 2.0 * PI) * 180.0 / PI);
-      if (fabs(aNewAngle - anAngleAttr->value()) > tolerance)
+      if (!anAngleAttr->isInitialized() || fabs(aNewAngle - anAngleAttr->value()) > tolerance)
         anAngleAttr->setValue(aNewAngle);
     } else {
       double aNewAngle = (aEndParam - aStartParam) * 180.0 / PI;
-      if (fabs(aNewAngle - anAngleAttr->value()) > tolerance)
+      if (!anAngleAttr->isInitialized() || fabs(aNewAngle - anAngleAttr->value()) > tolerance)
         anAngleAttr->setValue(aNewAngle);
     }
     // do not need to inform that other parameters were changed in this basis mode: these arguments

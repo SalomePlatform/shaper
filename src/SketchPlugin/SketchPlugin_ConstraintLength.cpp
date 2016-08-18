@@ -93,7 +93,8 @@ bool SketchPlugin_ConstraintLength::compute(const std::string& theAttributeId)
 
   std::shared_ptr<GeomAPI_Lin2d> aLine = 
     std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aStartPoint->pnt(), anEndPoint->pnt()));
-  if (fabs(aFlyOutAttr->x()) < tolerance && fabs(aFlyOutAttr->y()) < tolerance) {
+  if (!aFlyOutAttr->isInitialized() || 
+      (fabs(aFlyOutAttr->x()) < tolerance && fabs(aFlyOutAttr->y()) < tolerance)) {
     double aDist = aPoint1->distance(aPoint2)/5.;
     std::shared_ptr<GeomAPI_Pnt2d> aFPnt = aLine->shiftedLocation(aDist);
     aFlyOutAttr->setValue(aFPnt);
