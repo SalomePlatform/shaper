@@ -10,6 +10,8 @@
 #include <Events_InfoMessage.h>
 
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 #include "ModelHighAPI_Selection.h"
 //--------------------------------------------------------------------------------------
@@ -37,7 +39,12 @@ const std::string& ModelHighAPI_Interface::getKind() const
 
 void ModelHighAPI_Interface::execute()
 {
-  feature()->execute();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  FeaturePtr aFeature = feature();
+  if(aFactory->validate(aFeature)) {
+    aFeature->execute();
+  }
 }
 
 std::list<ModelHighAPI_Selection> ModelHighAPI_Interface::result() const

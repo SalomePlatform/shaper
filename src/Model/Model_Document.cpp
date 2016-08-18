@@ -1060,7 +1060,8 @@ void Model_Document::setCurrentFeature(
     if (anIter->setDisabled(aDisabledFlag)) {
       static Events_ID anUpdateEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
       // state of feature is changed => so inform that it must be updated if it has such state
-      if (!aDisabledFlag && anIter->data()->execState() == ModelAPI_StateMustBeUpdated)
+      if (!aDisabledFlag && 
+          (anIter->data()->execState() == ModelAPI_StateMustBeUpdated || anIter->data()->execState() == ModelAPI_StateInvalidArgument))
         ModelAPI_EventCreator::get()->sendUpdated(anIter, anUpdateEvent);
       // flush is in the end of this method
       ModelAPI_EventCreator::get()->sendUpdated(anIter, aRedispEvent /*, false*/);
