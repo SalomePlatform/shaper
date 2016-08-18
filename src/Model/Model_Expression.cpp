@@ -108,7 +108,7 @@ Model_ExpressionDouble::Model_ExpressionDouble(TDF_Label& theLabel)
 
 void Model_ExpressionDouble::setValue(const double theValue)
 {
-  if (!myIsInitialized) {
+  if (!myIsInitialized || myReal.IsNull()) {
     myReal = TDataStd_Real::Set(myText->Label(), theValue);
     myIsInitialized = true;
   } else if (value() != theValue) {
@@ -149,7 +149,7 @@ Model_ExpressionInteger::Model_ExpressionInteger(TDF_Label& theLabel)
 
 void Model_ExpressionInteger::setValue(const int theValue)
 {
-  if (!myIsInitialized) {
+  if (!myIsInitialized || myInteger.IsNull()) {
     myInteger = TDataStd_Integer::Set(myText->Label(), theValue);
     myIsInitialized = true;
   } else if (value() != theValue) {
