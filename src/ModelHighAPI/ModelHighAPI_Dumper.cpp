@@ -59,20 +59,15 @@ ModelHighAPI_Dumper* ModelHighAPI_Dumper::getInstance()
   return mySelf;
 }
 
-#define CLEAR_STREAM(theStream) { \
-    std::ostringstream anOther;   \
-    swap(theStream, anOther);     \
-  }
-
 void ModelHighAPI_Dumper::clear(bool bufferOnly)
 {
-  CLEAR_STREAM(myDumpBuffer);
+  myDumpBuffer.str("");
   myDumpBuffer << std::setprecision(16);
 
   clearNotDumped();
 
   if (!bufferOnly) {
-    CLEAR_STREAM(myFullDump);
+    myFullDump.str("");
     myFullDump << std::setprecision(16);
 
     myNames.clear();
@@ -545,11 +540,11 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     myDumpBuffer << "]";
   } else {
     // clear buffer and store list "as is"
-    CLEAR_STREAM(myDumpBuffer);
+    myDumpBuffer.str("");
     *this << theRefList;
     // save buffer and clear it again
     std::string aDumpedList = myDumpBuffer.str();
-    CLEAR_STREAM(myDumpBuffer);
+    myDumpBuffer.str("");
     // obtain name of list
     FeaturePtr anOwner = ModelAPI_Feature::feature(theRefList->owner());
     std::string aListName = name(anOwner) + "_objects";
