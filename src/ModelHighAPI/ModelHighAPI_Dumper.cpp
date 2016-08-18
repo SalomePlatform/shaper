@@ -210,9 +210,6 @@ bool ModelHighAPI_Dumper::processSubs(const std::shared_ptr<ModelAPI_CompositeFe
   bool isOk = true;
   // dump all sub-features;
   int aNbSubs = theComposite->numberOfSubs();
-//////////////////////////////////////
-  std::list<ObjectPtr> aList = theComposite->reflist("Features")->list();
-//////////////////////////////////////
   for (int anIndex = 0; anIndex < aNbSubs; ++anIndex) {
     FeaturePtr aFeature = theComposite->subFeature(anIndex);
     if (isDumped(aFeature))
