@@ -45,7 +45,7 @@
       PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_RefAttr, ModelHighAPI_Selection, ModelHighAPI_Interface, ModelAPI_Attribute or ModelAPI_Object.");
       return NULL;
     }
-    temp = ModelHighAPI_RefAttr(temp_selection->resultSubShapePair().first);
+    temp = ModelHighAPI_RefAttr(std::shared_ptr<ModelAPI_Object>(temp_selection->resultSubShapePair().first));
     if (newmem & SWIG_CAST_NEW_MEMORY) {
       delete temp_selection;
     }

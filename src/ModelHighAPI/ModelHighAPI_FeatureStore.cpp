@@ -87,7 +87,8 @@ void ModelHighAPI_FeatureStore::storeData(std::shared_ptr<ModelAPI_Data> theData
   }
   ResultPtr aShapeOwner = std::dynamic_pointer_cast<ModelAPI_Result>(theData->owner());
   if (aShapeOwner.get() && aShapeOwner->shape().get()) {
-    theAttrs["__shape__"] = dumpShape(aShapeOwner->shape());
+    std::shared_ptr<GeomAPI_Shape> aShape = aShapeOwner->shape();
+    theAttrs["__shape__"] = dumpShape(aShape);
   }
 }
 

@@ -12,6 +12,7 @@
 #include <map>
 #include <list>
 #include <string>
+#include <memory>
 
 class ModelAPI_Feature;
 class ModelAPI_Data;

@@ -347,8 +347,8 @@ bool checkPythonDump()
   std::string anError = storeFeatures(
     aSession->moduleDocument()->kind(), aSession->moduleDocument(), aStore, false);
   if (!anError.empty()) {
-    Events_InfoMessage anError("checkPythonDump", anError);
-    anError.send();
+    Events_InfoMessage anErrorMsg(std::string("checkPythonDump"), anError);
+    anErrorMsg.send();
     return false;
   }
   // close all before importation of the script
@@ -364,8 +364,8 @@ bool checkPythonDump()
     aSession->moduleDocument()->kind(), aSession->moduleDocument(), aStore, true);
   if (!anError.empty()) {
     std::cout<<anError<<std::endl;
-    Events_InfoMessage anError("checkPythonDump", anError);
-    anError.send();
+    Events_InfoMessage anErrorMsg(std::string("checkPythonDump"), anError);
+    anErrorMsg.send();
     return false;
   }
 

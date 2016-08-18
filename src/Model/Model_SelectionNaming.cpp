@@ -33,6 +33,7 @@
 #include <TDataStd_Name.hxx>
 #include <TColStd_MapOfTransient.hxx>
 #include <algorithm>
+#include <stdexcept>
 
 #ifdef DEB_NAMING
 #include <BRepTools.hxx>
@@ -488,17 +489,18 @@ bool parseSubIndices(CompositeFeaturePtr theComp, //< to iterate names
     } else {
       int anOrientation = 1; // default
       if (theOriented) { // here must be a symbol in the end of digit 'f' or 'r'
-        const char aSymbol = anID.back();
-        if (aSymbol == 'r') anOrientation = -1;
-        anID.pop_back();
+        std::string::iterator aSymbol = anID.end() - 1;
+        if (*aSymbol == 'r') anOrientation = -1;
+        anID.erase(aSymbol); // remove last symbol
       }
       // check start/end symbols
-      if (anID.back() == 's') {
+      std::string::iterator aBack = anID.end() - 1;
+      if (*aBack == 's') {
         anOrientation *= 2;
-        anID.pop_back();
-      } else if (anID.back() == 'e') {
+        anID.erase(aBack); // remove last symbol
+      } else if (*aBack == 'e') {
         anOrientation *= 3;
-        anID.pop_back();
+        anID.erase(aBack); // remove last symbol
       }
 
       if (aNames.find(anID) != aNames.end()) {
@@ -581,9 +583,12 @@ std::string Model_SelectionNaming::shortName(
   aName.erase(std::remove(aName.begin(), aName.end(), '&'), aName.end());
   // remove the last 's', 'e', 'f' and 'r' symbols: they are used as markers of start/end/forward/rewersed indicators
   static const std::string aSyms("sefr");
-  while(aSyms.find(aName.back()) != std::string::npos) {
-    aName.pop_back();
+  std::string::iterator aSuffix = aName.end() - 1;
+  while(aSyms.find(*aSuffix) != std::string::npos) {
+    --aSuffix;
   }
+  aName.erase(aSuffix + 1, aName.end());
+
   if (theEdgeVertexPos == 1) {
     aName += "s"; // start
   } else if (theEdgeVertexPos == 2) {
