@@ -18,7 +18,9 @@ class FeaturesFixture(unittest.TestCase):
 
     def tearDown(self):
         model.end()
-        assert(model.checkPythonDump())
+        # assert(model.checkPythonDump())
+        # This test checks creation of High API classes from low-level.
+        # It does not set any attributes, so features invalid, and dump also invalid.
         model.reset()
 
 #-----------------------------------------------------------------------------
@@ -73,7 +75,7 @@ class FeaturesTestCase(FeaturesFixture):
         FeaturesAPI.FeaturesAPI_Rotation(self.part.addFeature("Rotation"))
         FeaturesAPI.FeaturesAPI_Translation(self.part.addFeature("Translation"))
         FeaturesAPI.FeaturesAPI_Group(self.part.addFeature("Group"))
-        
+
         import PrimitivesAPI
         PrimitivesAPI.PrimitivesAPI_Box(self.part.addFeature("Box"))
 
