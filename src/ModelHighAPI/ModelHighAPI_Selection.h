@@ -76,6 +76,10 @@ public:
   MODELHIGHAPI_EXPORT
   virtual std::string shapeType() const;
 
+  /// \return Result if exists.
+  MODELHIGHAPI_EXPORT
+  virtual std::shared_ptr<ModelAPI_Result> result() const;
+
 private:
   VariantType myVariantType;
   ResultSubShapePair myResultSubShapePair;

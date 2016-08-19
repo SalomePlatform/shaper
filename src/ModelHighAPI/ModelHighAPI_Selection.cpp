@@ -90,3 +90,11 @@ std::string ModelHighAPI_Selection::shapeType() const
 
   return "SHAPE";
 }
+
+//==================================================================================================
+std::shared_ptr<ModelAPI_Result> ModelHighAPI_Selection::result() const
+{
+  if (myVariantType == VT_ResultSubShapePair)
+    return myResultSubShapePair.first;
+  return ResultPtr();
+}

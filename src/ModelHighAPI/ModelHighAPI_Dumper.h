@@ -14,6 +14,7 @@
 #include <memory>
 #include <set>
 #include <sstream>
+#include <stack>
 #include <string>
 
 class GeomAPI_Pnt;
@@ -44,7 +45,7 @@ class ModelAPI_Result;
 typedef std::shared_ptr<ModelAPI_Document> DocumentPtr;
 typedef std::shared_ptr<ModelAPI_Entity>   EntityPtr;
 typedef std::shared_ptr<ModelAPI_Feature>  FeaturePtr;
-typedef std::shared_ptr<ModelAPI_Result> ResultPtr;
+typedef std::shared_ptr<ModelAPI_Result>   ResultPtr;
 
 /**\class ModelHighAPI_Dumper
  * \ingroup CPPHighAPI
@@ -227,10 +228,24 @@ private:
   /// Check the entity is already dumped
   bool isDumped(const EntityPtr& theEntity) const;
 
+  /// Stores names of results for the given feature
+  void saveResultNames(const FeaturePtr& theFeature);
+
 private:
   typedef std::map<EntityPtr, std::pair<std::string, std::string> > EntityNameMap;
-  typedef std::map<std::string, std::set<std::string> >      ModulesMap;
-  typedef std::map<DocumentPtr, std::map<std::string, int> > NbFeaturesMap;
+  typedef std::map<std::string, std::set<std::string> >             ModulesMap;
+  typedef std::map<DocumentPtr, std::map<std::string, int> >        NbFeaturesMap;
+
+  struct LastDumpedEntity {
+    EntityPtr            myEntity; // last dumped entity
+    bool                 myUserName; // the entity hase user-defined name
+    std::list<ResultPtr> myResultsWithName; // results of this entity, which has user-defined names
+
+    LastDumpedEntity(EntityPtr theEntity, bool theUserName, const std::list<ResultPtr>& theResults)
+      : myEntity(theEntity), myUserName(theUserName), myResultsWithName(theResults)
+    {}
+  };
+  typedef std::stack<LastDumpedEntity>                              DumpStack;
 
   static ModelHighAPI_Dumper* mySelf;
 
@@ -239,7 +254,7 @@ private:
 
   ModulesMap          myModules;            ///< modules and entities to be imported
   EntityNameMap       myNames;              ///< names of the entities
-  EntityPtr           myLastEntityWithName; ///< not null, if last dumped entity had user defined name
+  DumpStack           myEntitiesStack;      ///< stack of dumped entities
 
   NbFeaturesMap       myFeatureCount;       ///< number of features of each kind
 

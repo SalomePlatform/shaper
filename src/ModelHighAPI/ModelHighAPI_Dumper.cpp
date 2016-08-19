@@ -71,7 +71,8 @@ void ModelHighAPI_Dumper::clear(bool bufferOnly)
     myNames.clear();
     myModules.clear();
     myFeatureCount.clear();
-    myLastEntityWithName = EntityPtr();
+    while (!myEntitiesStack.empty())
+      myEntitiesStack.pop();
   }
 }
 
@@ -99,7 +100,7 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity, bool th
 
     size_t anIndex = aName.find(aKind);
     if (anIndex == 0 && aName[aKind.length()] == '_') { // name starts with "FeatureKind_"
-      std::string anIdStr = aName.substr(aKind.length() + 1, std::string::npos);
+      std::string anIdStr = aName.substr(aKind.length() + 1);
       int anId = std::stoi(anIdStr);
 
       // Check number of already registered objects of such kind. Index of current object
@@ -119,6 +120,9 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity, bool th
         aFullIndex += aFound->second;
     }
     aDefaultName << aKind << "_" << aFullIndex;
+
+    // store names of results
+    saveResultNames(aFeature);
   }
 
   myNames[theEntity] = std::pair<std::string, std::string>(aDefaultName.str(), aName);
@@ -140,6 +144,30 @@ const std::string& ModelHighAPI_Dumper::parentName(const FeaturePtr& theEntity)
 
   static const std::string DUMMY;
   return DUMMY;
+}
+
+void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
+{
+  std::string aFeatureName = theFeature->name();
+  const std::list<ResultPtr>& aResults = theFeature->results();
+  std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
+  for (int i = 1; aResIt != aResults.end(); ++aResIt, ++i) {
+    bool isUserDefined = true;
+    std::string aResName = (*aResIt)->data()->name();
+    size_t anIndex = aResName.find(aFeatureName);
+    if (anIndex == 0) {
+      std::string aSuffix = aResName.substr(aFeatureName.length());
+      if (aSuffix.empty() && i == 1) // first result may not constain index in the name
+        isUserDefined = false;
+      else {
+        if (aSuffix[0] == '_' && std::stoi(aSuffix.substr(1)) == i)
+          isUserDefined = false;
+      }
+    }
+
+    myNames[*aResIt] = std::pair<std::string, std::string>(aResName,
+        isUserDefined ? aResName : std::string());
+  }
 }
 
 bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theDoc,
@@ -191,6 +219,8 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
     if (!aPartResult)
       return false;
     DocumentPtr aSubDoc = aPartResult->partDoc();
+    if (!aSubDoc)
+      return false;
     // set name of document
     const std::string& aPartName = myNames[theComposite].first;
     std::string aDocName = aPartName + "_doc";
@@ -228,12 +258,20 @@ bool ModelHighAPI_Dumper::processSubs(const std::shared_ptr<ModelAPI_CompositeFe
       dumpFeature(aFeature, true);
   }
 
+  bool isDumpSetName = !myEntitiesStack.empty() &&
+      myEntitiesStack.top().myEntity == EntityPtr(theComposite);
+  bool isForceModelDo = isDumpSetName &&
+      (myEntitiesStack.top().myUserName || !myEntitiesStack.top().myResultsWithName.empty());
   // It is necessary for the sketch to create its result when complete (command "model.do()").
   // This option is set by flat theDumpModelDo.
   // However, nested sketches are rebuilt by parent feature, so, they do not need
   // explicit call of "model.do()". This will be controlled by the depth of the stack.
-  if (theDumpModelDo && gCompositeStackDepth <= 1)
+  if (isForceModelDo || (theDumpModelDo && gCompositeStackDepth <= 1))
     *this << "model.do()" << std::endl;
+
+  // dump "setName" for composite feature
+  if (isDumpSetName)
+    dumpEntitySetName();
   return isOk;
 }
 
@@ -268,6 +306,7 @@ bool ModelHighAPI_Dumper::exportTo(const std::string& theFileName)
 
   // dump collected data
   aFile << myFullDump.str();
+  aFile << myDumpBuffer.str();
 
   // standard footer
   aFile << "model.end()" << std::endl;
@@ -286,14 +325,28 @@ void ModelHighAPI_Dumper::importModule(const std::string& theModuleName,
 
 void ModelHighAPI_Dumper::dumpEntitySetName()
 {
-  if (!myLastEntityWithName)
-    return;
+  const LastDumpedEntity& aLastDumped = myEntitiesStack.top();
 
-  std::pair<std::string, std::string> anEntityNames = myNames[myLastEntityWithName];
-  if (!anEntityNames.second.empty())
-    myDumpBuffer << anEntityNames.first << ".setName(\"" << anEntityNames.second << "\")" << std::endl;
-  anEntityNames.second.clear(); // don't dump "setName" for the entity twice
-  myLastEntityWithName = EntityPtr();
+  // dump "setName" for the entity
+  if (aLastDumped.myUserName) {
+    std::pair<std::string, std::string> anEntityNames = myNames[aLastDumped.myEntity];
+    if (!anEntityNames.second.empty())
+      myDumpBuffer << anEntityNames.first << ".setName(\"" << anEntityNames.second << "\")" << std::endl;
+    anEntityNames.second.clear(); // don't dump "setName" for the entity twice
+  }
+  // dump "setName" for results
+  std::list<ResultPtr>::const_iterator aResIt = aLastDumped.myResultsWithName.begin();
+  std::list<ResultPtr>::const_iterator aResEnd = aLastDumped.myResultsWithName.end();
+  for (; aResIt != aResEnd; ++aResIt) {
+    std::pair<std::string, std::string> anEntityNames = myNames[*aResIt];
+    if (!anEntityNames.second.empty()) {
+      *this << *aResIt;
+      myDumpBuffer << ".result().data().setName(\"" << anEntityNames.second << "\")" << std::endl;
+      anEntityNames.second.clear(); // don't dump "setName" for the entity twice
+    }
+  }
+
+  myEntitiesStack.pop();
 }
 
 bool ModelHighAPI_Dumper::isDumped(const EntityPtr& theEntity) const
@@ -433,8 +486,19 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity)
 {
   myDumpBuffer << name(theEntity);
-  if (!myNames[theEntity].second.empty())
-    myLastEntityWithName = theEntity;
+
+  bool isUserDefindName = !myNames[theEntity].second.empty();
+  // store results if they have user-defined names
+  std::list<ResultPtr> aResultsWithUserName;
+  const std::list<ResultPtr>& aResults = theEntity->results();
+  std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
+  for (; aResIt != aResults.end(); ++aResIt)
+    if (!myNames[*aResIt].second.empty())
+      aResultsWithUserName.push_back(*aResIt);
+  // store just dumped entity to stack
+  myEntitiesStack.push(LastDumpedEntity(theEntity, isUserDefindName, aResultsWithUserName));
+
+  // remove entity from the list of not dumped items
   myNotDumpedEntities.erase(theEntity);
   return *this;
 }
@@ -616,7 +680,16 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
                                 std::basic_ostream<char>& (*theEndl)(std::basic_ostream<char>&))
 {
   theDumper.myDumpBuffer << theEndl;
-  theDumper.dumpEntitySetName();
+
+  if (!theDumper.myEntitiesStack.empty()) {
+    // Name for composite feature is dumped when all sub-entities are dumped
+    // (see method ModelHighAPI_Dumper::processSubs).
+    const ModelHighAPI_Dumper::LastDumpedEntity& aLastDumped = theDumper.myEntitiesStack.top();
+    CompositeFeaturePtr aComposite =
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aLastDumped.myEntity);
+    if (!aComposite)
+      theDumper.dumpEntitySetName();
+  }
 
   // store all not-dumped entities first
   std::set<EntityPtr> aNotDumped = theDumper.myNotDumpedEntities;

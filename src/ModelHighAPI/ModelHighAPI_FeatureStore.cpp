@@ -268,6 +268,9 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
     double aValues[3] = {anAttr->x(), anAttr->y(), anAttr->z()};
     dumpArray(aResult, aValues, 3);
   } else if (aType == GeomDataAPI_Point2D::typeId()) {
+    // do not dump flyout point for constraints as it may be changed unexpectedly
+    if (theAttr->id() == "ConstraintFlyoutValuePnt")
+      return "";
     AttributePoint2DPtr anAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttr);
     double aValues[2] = {anAttr->x(), anAttr->y()};
     dumpArray(aResult, aValues, 2);
