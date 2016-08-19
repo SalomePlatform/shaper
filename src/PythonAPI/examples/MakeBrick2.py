@@ -32,6 +32,9 @@ mybase.setParallel(line[0], line[2])
 mybase.setParallel(line[1], line[3])
 mybase.setPerpendicular(line[0], line[3])
 
+mybase.setVertical(line[0])
+mybase.setFixed(line[0].startPoint())
+
 mywidth = mybase.setLength(line[0], 50)
 mylength = mybase.setDistance(line[0].startPoint(), line[2], 50)
 
@@ -39,6 +42,7 @@ mylength = mybase.setDistance(line[0].startPoint(), line[2], 50)
 # Creating the extrusion
 
 mybox = model.addExtrusion(mypart, mybase.selectFace(), 50)
+model.do()
 
 
 # Creating a cylinder on a face of the box
@@ -51,6 +55,7 @@ mystand = model.addSketch(mypart, thisface)
 circle = mystand.addCircle(0, 25, 5)
 mystand.setDistance(circle.center(), mystand.addLine(thisxmin), 10)
 mystand.setDistance(circle.center(), mystand.addLine(thiszmax), 10)
+model.do()
 
 myboss = model.addExtrusion(mypart, mystand.selectFace(), -5)
 
@@ -65,7 +70,8 @@ model.end()
 
 model.begin()
 mybase.setValue(mylength, 100)
-mybox.setSize(20)
+model.do()
+mybox.setSize(40)
 model.end()
 
 assert(model.checkPythonDump())
