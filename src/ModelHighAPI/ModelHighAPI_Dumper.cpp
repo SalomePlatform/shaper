@@ -285,11 +285,7 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
 
 #ifdef DUMP_USER_DEFINED_NAMES
   const std::string& aName = name(myLastEntityWithName);
-  myDumpBuffer << aName;
-  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(myLastEntityWithName);
-  if (aFeature)
-    myDumpBuffer << ".feature()";
-  myDumpBuffer << ".data().setName(\"" << aName << "\")" << std::endl;
+  myDumpBuffer << aName << ".setName(\"" << aName << "\")" << std::endl;
 #endif
   myNames[myLastEntityWithName].second = false; // don't dump "setName" for the entity twice
   myLastEntityWithName = EntityPtr();

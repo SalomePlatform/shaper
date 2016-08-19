@@ -47,6 +47,11 @@ void ModelHighAPI_Interface::execute()
   }
 }
 
+void ModelHighAPI_Interface::setName(const std::string& theName)
+{
+  feature()->data()->setName(theName);
+}
+
 std::list<ModelHighAPI_Selection> ModelHighAPI_Interface::result() const
 {
   // TODO(spo): should I use more common function for the whole model to prepare results?

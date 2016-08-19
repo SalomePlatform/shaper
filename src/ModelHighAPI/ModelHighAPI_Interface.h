@@ -47,6 +47,10 @@ public:
   MODELHIGHAPI_EXPORT
   void execute();
 
+  /// Shortcut for feature()->data()->setName()
+  MODELHIGHAPI_EXPORT
+  void setName(const std::string& theName);
+
   // TODO(spo): rename to selectAll()
   /// Return all objects of the feature
   MODELHIGHAPI_EXPORT
