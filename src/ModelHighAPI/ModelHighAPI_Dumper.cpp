@@ -81,7 +81,9 @@ void ModelHighAPI_Dumper::clearNotDumped()
   myNotDumpedEntities.clear();
 }
 
-const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity, bool theSaveNotDumped)
+const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
+                                             bool theSaveNotDumped,
+                                             bool theUseEntityName)
 {
   EntityNameMap::const_iterator aFound = myNames.find(theEntity);
   if (aFound != myNames.end())
@@ -112,14 +114,18 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity, bool th
     }
 
     // obtain default name for the feature
-    int aFullIndex = 0;
-    NbFeaturesMap::const_iterator aFIt = myFeatureCount.begin();
-    for (; aFIt != myFeatureCount.end(); ++aFIt) {
-      std::map<std::string, int>::const_iterator aFound = aFIt->second.find(aKind);
-      if (aFound != aFIt->second.end())
-        aFullIndex += aFound->second;
+    if (theUseEntityName)
+      aDefaultName << aName;
+    else {
+      int aFullIndex = 0;
+      NbFeaturesMap::const_iterator aFIt = myFeatureCount.begin();
+      for (; aFIt != myFeatureCount.end(); ++aFIt) {
+        std::map<std::string, int>::const_iterator aFound = aFIt->second.find(aKind);
+        if (aFound != aFIt->second.end())
+          aFullIndex += aFound->second;
+      }
+      aDefaultName << aKind << "_" << aFullIndex;
     }
-    aDefaultName << aKind << "_" << aFullIndex;
 
     // store names of results
     saveResultNames(aFeature);

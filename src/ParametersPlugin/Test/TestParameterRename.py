@@ -101,8 +101,10 @@ class TestParameterRename(unittest.TestCase):
         aStartPoint = geomDataAPI_Point2D(anOY.attribute("StartPoint"))
         anEndPoint = geomDataAPI_Point2D(anOY.attribute("EndPoint"))
         aStartPoint.setValue(0., 0.)
-        anEndPoint.SetValue(0., 100.)
-        anOY.selection("External").selectSubShape("EDGE", "OY")
+        anEndPoint.setValue(0., 100.)
+        anOYRes = modelAPI_Result(self.aDocument.objectByName("Construction", "OY"))
+        anOY.selection("External").setValue(anOYRes, anOYRes.shape())
+        anOY.execute()
         refattrB.setObject(modelAPI_ResultConstruction(anOY.firstResult()))
         valueX = aDistanceConstraint1.real("ConstraintValue")
         valueX.setText("x1 + 10.0")
@@ -116,8 +118,10 @@ class TestParameterRename(unittest.TestCase):
         aStartPoint = geomDataAPI_Point2D(anOX.attribute("StartPoint"))
         anEndPoint = geomDataAPI_Point2D(anOX.attribute("EndPoint"))
         aStartPoint.setValue(0., 0.)
-        anEndPoint.SetValue(100., 0.)
-        anOX.selection("External").selectSubShape("EDGE", "OX")
+        anEndPoint.setValue(100., 0.)
+        anOXRes = modelAPI_Result(self.aDocument.objectByName("Construction", "OX"))
+        anOX.selection("External").setValue(anOXRes, anOXRes.shape())
+        anOX.execute()
         refattrB.setObject(modelAPI_ResultConstruction(anOX.firstResult()))
         valueY = aDistanceConstraint2.real("ConstraintValue")
         valueY.setText("x1 + 20.0")
@@ -133,7 +137,7 @@ class TestParameterRename(unittest.TestCase):
 
         self.aCircleCenterX = valueX
         self.aCircleCenterY = valueY
-        sel.aCircleRadius = aRadiusConstraintAttr
+        self.aCircleRadius = aRadiusConstrAttr
 
         self.assertEqual(self.anCircleCentr.x(), 160.)
         self.assertEqual(self.anCircleCentr.y(), 170.)

@@ -84,9 +84,10 @@ public:
   /// Returns name of specified entity
   /// \param theEntity        [in] named entity
   /// \param theSaveNotDumped [in] if \c true, the entity should be stored as not dumped (will be dumped automatically)
+  /// \param theUseEntityName [in] if \c true, the entity name should be used "as is" without changing default name
   /// \return name of the entity
   MODELHIGHAPI_EXPORT
-  const std::string& name(const EntityPtr& theEntity, bool theSaveNotDumped = true);
+  const std::string& name(const EntityPtr& theEntity, bool theSaveNotDumped = true, bool theUseEntityName = false);
 
   /// Returns name of parent composite feature for specified entity
   MODELHIGHAPI_EXPORT

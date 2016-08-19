@@ -42,7 +42,7 @@ void ParametersAPI_Parameter::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
-  const std::string& aParamName = theDumper.name(aBase, false);
+  const std::string& aParamName = theDumper.name(aBase, false, true);
 
   AttributeStringPtr anExpr   = aBase->string(ParametersPlugin_Parameter::EXPRESSION_ID());
   AttributeStringPtr aComment = aBase->string(ParametersPlugin_Parameter::COMMENT_ID());
