@@ -228,7 +228,7 @@ private:
   bool isDumped(const EntityPtr& theEntity) const;
 
 private:
-  typedef std::map<EntityPtr, std::pair<std::string, bool> > EntityNameMap;
+  typedef std::map<EntityPtr, std::pair<std::string, std::string> > EntityNameMap;
   typedef std::map<std::string, std::set<std::string> >      ModulesMap;
   typedef std::map<DocumentPtr, std::map<std::string, int> > NbFeaturesMap;
 

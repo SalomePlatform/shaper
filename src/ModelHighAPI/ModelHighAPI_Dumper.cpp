@@ -37,8 +37,6 @@
 
 #include <fstream>
 
-#define DUMP_USER_DEFINED_NAMES
-
 static int gCompositeStackDepth = 0;
 
 ModelHighAPI_Dumper* ModelHighAPI_Dumper::mySelf = 0;
@@ -90,14 +88,14 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity, bool th
 
   // entity is not found, store it
   std::string aName;
-  bool isUserDefined = false;
+  std::ostringstream aDefaultName;
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theEntity);
   if (aFeature) {
-    isUserDefined = true;
     aName = aFeature->name();
     const std::string& aKind = aFeature->getKind();
     DocumentPtr aDoc = aFeature->document();
     int& aNbFeatures = myFeatureCount[aDoc][aKind];
+    aNbFeatures += 1;
 
     size_t anIndex = aName.find(aKind);
     if (anIndex == 0 && aName[aKind.length()] == '_') { // name starts with "FeatureKind_"
@@ -106,16 +104,24 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity, bool th
 
       // Check number of already registered objects of such kind. Index of current object
       // should be the same to identify feature's name as automatically generated.
-      if (aNbFeatures + 1 == anId) {
-        isUserDefined = false;
-        //aNbFeatures = anId - 1;
+      if (aNbFeatures == anId) {
+        // name is not user-defined
+        aName.clear();
       }
     }
 
-    aNbFeatures += 1;
+    // obtain default name for the feature
+    int aFullIndex = 0;
+    NbFeaturesMap::const_iterator aFIt = myFeatureCount.begin();
+    for (; aFIt != myFeatureCount.end(); ++aFIt) {
+      std::map<std::string, int>::const_iterator aFound = aFIt->second.find(aKind);
+      if (aFound != aFIt->second.end())
+        aFullIndex += aFound->second;
+    }
+    aDefaultName << aKind << "_" << aFullIndex;
   }
 
-  myNames[theEntity] = std::pair<std::string, bool>(aName, isUserDefined);
+  myNames[theEntity] = std::pair<std::string, std::string>(aDefaultName.str(), aName);
   if (theSaveNotDumped)
     myNotDumpedEntities.insert(theEntity);
   return myNames[theEntity].first;
@@ -141,7 +147,7 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
 {
   // dump top level document feature
   static const std::string aDocName("partSet");
-  myNames[theDoc] = std::pair<std::string, bool>(aDocName, false);
+  myNames[theDoc] = std::pair<std::string, std::string>(aDocName, std::string());
   *this << aDocName << " = model.moduleDocument()" << std::endl;
 
   // dump subfeatures and store result to file
@@ -188,7 +194,7 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
     // set name of document
     const std::string& aPartName = myNames[theComposite].first;
     std::string aDocName = aPartName + "_doc";
-    myNames[aSubDoc] = std::pair<std::string, bool>(aDocName, false);
+    myNames[aSubDoc] = std::pair<std::string, std::string>(aDocName, std::string());
 
     // dump document in a separate line
     *this << aDocName << " = " << aPartName << ".document()" << std::endl;
@@ -283,11 +289,10 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
   if (!myLastEntityWithName)
     return;
 
-#ifdef DUMP_USER_DEFINED_NAMES
-  const std::string& aName = name(myLastEntityWithName);
-  myDumpBuffer << aName << ".setName(\"" << aName << "\")" << std::endl;
-#endif
-  myNames[myLastEntityWithName].second = false; // don't dump "setName" for the entity twice
+  std::pair<std::string, std::string> anEntityNames = myNames[myLastEntityWithName];
+  if (!anEntityNames.second.empty())
+    myDumpBuffer << anEntityNames.first << ".setName(\"" << anEntityNames.second << "\")" << std::endl;
+  anEntityNames.second.clear(); // don't dump "setName" for the entity twice
   myLastEntityWithName = EntityPtr();
 }
 
@@ -428,7 +433,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity)
 {
   myDumpBuffer << name(theEntity);
-  if (myNames[theEntity].second)
+  if (!myNames[theEntity].second.empty())
     myLastEntityWithName = theEntity;
   myNotDumpedEntities.erase(theEntity);
   return *this;
