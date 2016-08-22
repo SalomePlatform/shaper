@@ -36,7 +36,7 @@
 #include <ios>
 #include <cmath>
 
-#define PRECISION 7
+#define PRECISION 6
 #define TOLERANCE (1.e-7)
 
 ModelHighAPI_FeatureStore::ModelHighAPI_FeatureStore(FeaturePtr theFeature) {
@@ -117,12 +117,12 @@ std::string ModelHighAPI_FeatureStore::compareData(std::shared_ptr<ModelAPI_Data
   return "";
 }
 
-static void dumpArray(std::ostringstream& theOutput, const double theArray[], int theSize)
+static void dumpArray(std::ostringstream& theOutput, const double theArray[], int theSize, int thePrecision = PRECISION)
 {
   for (int i = 0; i < theSize; ++i) {
     if (i > 0)
       theOutput << " ";
-    theOutput << std::fixed << setprecision(PRECISION)
+    theOutput << std::fixed << setprecision(thePrecision)
               << (fabs(theArray[i]) < TOLERANCE ? 0.0 : theArray[i]);
   }
 }
@@ -168,9 +168,14 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
       aResult<<anAttr->text();
   } else if (aType == ModelAPI_AttributeDouble::typeId()) {
     AttributeDoublePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttr);
+    int aPrecision = PRECISION;
+    // Special case - precision for the arc angle. It is calculated with tolerance 1e-4,
+    // so the value has only 4 correct digits
+    if (anAttr->id() == "ArcAngle")
+      aPrecision = 1;
     if (anAttr->text().empty()) {
       double aVal = anAttr->value();
-      dumpArray(aResult, &aVal, 1);
+      dumpArray(aResult, &aVal, 1, aPrecision);
     } else
       aResult<<anAttr->text();
   } else if (aType == ModelAPI_AttributeBoolean::typeId()) {
@@ -298,7 +303,9 @@ std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>&
   // output the main characteristics
   aResult<<"Volume: "<<setprecision(2)<<GeomAlgoAPI_ShapeTools::volume(theShape)<<std::endl;
   std::shared_ptr<GeomAPI_Pnt> aCenter = GeomAlgoAPI_ShapeTools::centreOfMass(theShape);
-  aResult<<"Center of mass: "<<std::fixed<<setprecision(PRECISION)
-    <<aCenter->x()<<" "<<aCenter->y()<<" "<<aCenter->z()<<std::endl;
+  aResult<<"Center of mass: ";
+  double aCenterVals[3] = {aCenter->x(), aCenter->y(), aCenter->z()};
+  dumpArray(aResult, aCenterVals, 3);
+  aResult<<std::endl;
   return aResult.str();
 }

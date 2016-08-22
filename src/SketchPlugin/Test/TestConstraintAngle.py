@@ -113,7 +113,7 @@ assert (angle(aSketchLineA, aSketchLineB) == ANGLE_DEGREE)
 #=========================================================================
 aSession.startOperation()
 aStartPoint = geomDataAPI_Point2D(aSketchLineA.attribute("StartPoint"))
-aStartPoint.setValue(0., 30.)
+aStartPoint.setValue(0., -30.)
 aConstraint.execute()
 aSession.finishOperation()
 assert (angle(aSketchLineA, aSketchLineB) == ANGLE_DEGREE)

@@ -856,7 +856,7 @@ ConstraintWrapperPtr createConstraintMiddlePoint(
   aConstrList.push_back(GCSConstraintPtr(new GCS::ConstraintPointOnLine(*aPoint, *aLine)));
   double aDist = lineLength(*aLine);
   std::shared_ptr<PlaneGCSSolver_ParameterWrapper> aDistance =
-      std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(createParameter(theGroupID, aDist));
+      std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(createParameter(theGroupID, aDist * 0.5));
   aConstrList.push_back(GCSConstraintPtr(
       new GCS::ConstraintP2PDistance(*aPoint, aLine->p1, aDistance->parameter())));
   aConstrList.push_back(GCSConstraintPtr(

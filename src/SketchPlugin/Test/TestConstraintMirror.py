@@ -202,5 +202,26 @@ checkMirror(aRefListB, aRefListC, aMirrorLine)
 # End of test
 #=========================================================================
 
+
+# make second line fixed
+aSession.startOperation()
+aFixed = aSketchFeature.addFeature("SketchConstraintRigid")
+aRefObjectA = aFixed.refattr("ConstraintEntityA")
+anObjectA = modelAPI_ResultConstruction(aSketchLine2.lastResult())
+assert (anObjectA is not None)
+aRefObjectA.setObject(anObjectA)
+aFixed.execute()
+aSession.finishOperation()
+# set mirror for first line to check dumping
+aSession.startOperation()
+aRefListInitial.clear()
+assert (aRefListB.size() == 0)
+assert (aRefListC.size() == 0)
+aRefListInitial.append(aSketchLine1.lastResult())
+aSession.finishOperation()
+assert (aRefListB.size() == 1)
+assert (aRefListC.size() == 1)
+checkMirror(aRefListB, aRefListC, aMirrorLine)
+
 import model
 assert(model.checkPythonDump())

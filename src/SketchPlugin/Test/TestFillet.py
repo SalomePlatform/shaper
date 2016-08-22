@@ -66,7 +66,7 @@ def createSketch2(theSketch):
     aStartPoint1 = geomDataAPI_Point2D(aSketchLine.attribute("StartPoint"))
     aEndPoint1   = geomDataAPI_Point2D(aSketchLine.attribute("EndPoint"))
     aStartPoint1.setValue(10., 10.)
-    aEndPoint1.setValue(30., 5.)
+    aEndPoint1.setValue(30., 15.)
     allFeatures.append(aSketchLine)
     # Arc
     aSketchArc = theSketch.addFeature("SketchArc")
@@ -219,6 +219,7 @@ checkFillet(aResObjects, FILLET_RADIUS1)
 # Change Fillet radius
 #=========================================================================
 aRadius.setValue(FILLET_RADIUS2)
+aFillet.execute()
 aSession.finishOperation()
 checkFillet(aResObjects, FILLET_RADIUS2)
 
@@ -271,6 +272,7 @@ checkFillet(aResObjects, FILLET_RADIUS1)
 # Change Fillet radius
 #=========================================================================
 aRadius.setValue(FILLET_RADIUS2)
+aFillet.execute()
 aSession.finishOperation()
 checkFillet(aResObjects, FILLET_RADIUS2)
 #=========================================================================
