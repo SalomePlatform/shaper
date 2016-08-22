@@ -127,14 +127,16 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
       }
       aDefaultName << aKind << "_" << aFullIndex;
     }
-
-    // store names of results
-    saveResultNames(aFeature);
   }
 
   myNames[theEntity] = std::pair<std::string, std::string>(aDefaultName.str(), aName);
   if (theSaveNotDumped)
     myNotDumpedEntities.insert(theEntity);
+
+  // store names of results
+  if (aFeature)
+    saveResultNames(aFeature);
+
   return myNames[theEntity].first;
 }
 
@@ -155,7 +157,7 @@ const std::string& ModelHighAPI_Dumper::parentName(const FeaturePtr& theEntity)
 
 void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
 {
-  std::string aFeatureName = theFeature->name();
+  const std::string& aFeatureName = myNames[theFeature].first;
   const std::list<ResultPtr>& aResults = theFeature->results();
   std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
   for (int i = 1; aResIt != aResults.end(); ++aResIt, ++i) {
