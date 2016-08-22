@@ -7,6 +7,7 @@
 //--------------------------------------------------------------------------------------
 #include "ModelHighAPI_Selection.h"
 
+#include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
 //--------------------------------------------------------------------------------------
@@ -92,9 +93,21 @@ std::string ModelHighAPI_Selection::shapeType() const
 }
 
 //==================================================================================================
-std::shared_ptr<ModelAPI_Result> ModelHighAPI_Selection::result() const
+void ModelHighAPI_Selection::setName(const std::string& theName)
 {
   if (myVariantType == VT_ResultSubShapePair)
-    return myResultSubShapePair.first;
-  return ResultPtr();
+    myResultSubShapePair.first->data()->setName(theName);
+}
+
+void ModelHighAPI_Selection::setColor(int theRed, int theGreen, int theBlue)
+{
+  if (myVariantType != VT_ResultSubShapePair)
+    return;
+
+  AttributeIntArrayPtr aColor =
+      myResultSubShapePair.first->data()->intArray(ModelAPI_Result::COLOR_ID());
+  aColor->setSize(3);
+  aColor->setValue(0, theRed);
+  aColor->setValue(1, theGreen);
+  aColor->setValue(2, theBlue);
 }

@@ -16,6 +16,7 @@
 
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefAttrList.h>
@@ -267,7 +268,7 @@ bool ModelHighAPI_Dumper::processSubs(const std::shared_ptr<ModelAPI_CompositeFe
   bool isDumpSetName = !myEntitiesStack.empty() &&
       myEntitiesStack.top().myEntity == EntityPtr(theComposite);
   bool isForceModelDo = isDumpSetName &&
-      (myEntitiesStack.top().myUserName || !myEntitiesStack.top().myResultsWithName.empty());
+      (myEntitiesStack.top().myUserName || !myEntitiesStack.top().myResults.empty());
   // It is necessary for the sketch to create its result when complete (command "model.do()").
   // This option is set by flat theDumpModelDo.
   // However, nested sketches are rebuilt by parent feature, so, they do not need
@@ -341,14 +342,24 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
     anEntityNames.second.clear(); // don't dump "setName" for the entity twice
   }
   // dump "setName" for results
-  std::list<ResultPtr>::const_iterator aResIt = aLastDumped.myResultsWithName.begin();
-  std::list<ResultPtr>::const_iterator aResEnd = aLastDumped.myResultsWithName.end();
+  std::list<ResultPtr>::const_iterator aResIt = aLastDumped.myResults.begin();
+  std::list<ResultPtr>::const_iterator aResEnd = aLastDumped.myResults.end();
   for (; aResIt != aResEnd; ++aResIt) {
+    // set result name
     std::pair<std::string, std::string> anEntityNames = myNames[*aResIt];
     if (!anEntityNames.second.empty()) {
       *this << *aResIt;
-      myDumpBuffer << ".result().data().setName(\"" << anEntityNames.second << "\")" << std::endl;
+      myDumpBuffer << ".setName(\"" << anEntityNames.second << "\")" << std::endl;
       anEntityNames.second.clear(); // don't dump "setName" for the entity twice
+    }
+    // set result color
+    if (!isDefaultColor(*aResIt)) {
+      AttributeIntArrayPtr aColor = (*aResIt)->data()->intArray(ModelAPI_Result::COLOR_ID());
+      if (aColor && aColor->isInitialized()) {
+        *this << *aResIt;
+        myDumpBuffer << ".setColor(" << aColor->value(0) << ", " << aColor->value(1)
+                     << ", " << aColor->value(2) << ")" << std::endl;
+      }
     }
   }
 
@@ -359,6 +370,22 @@ bool ModelHighAPI_Dumper::isDumped(const EntityPtr& theEntity) const
 {
   EntityNameMap::const_iterator aFound = myNames.find(theEntity);
   return aFound != myNames.end();
+}
+
+bool ModelHighAPI_Dumper::isDefaultColor(const ResultPtr& theResult) const
+{
+  AttributeIntArrayPtr aColor = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+  if (!aColor || !aColor->isInitialized())
+    return true;
+
+  std::string aSection, aName, aDefault;
+  theResult->colorConfigInfo(aSection, aName, aDefault);
+
+  // dump current color
+  std::ostringstream aColorInfo;
+  aColorInfo << aColor->value(0) << "," << aColor->value(1) << "," << aColor->value(2);
+
+  return aDefault == aColorInfo.str();
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const char theChar)
@@ -493,16 +520,16 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity
 {
   myDumpBuffer << name(theEntity);
 
-  bool isUserDefindName = !myNames[theEntity].second.empty();
-  // store results if they have user-defined names
-  std::list<ResultPtr> aResultsWithUserName;
+  bool isUserDefinedName = !myNames[theEntity].second.empty();
+  // store results if they have user-defined names or colors
+  std::list<ResultPtr> aResultsWithNameOrColor;
   const std::list<ResultPtr>& aResults = theEntity->results();
   std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
   for (; aResIt != aResults.end(); ++aResIt)
-    if (!myNames[*aResIt].second.empty())
-      aResultsWithUserName.push_back(*aResIt);
+    if (!myNames[*aResIt].second.empty() || !isDefaultColor(*aResIt))
+      aResultsWithNameOrColor.push_back(*aResIt);
   // store just dumped entity to stack
-  myEntitiesStack.push(LastDumpedEntity(theEntity, isUserDefindName, aResultsWithUserName));
+  myEntitiesStack.push(LastDumpedEntity(theEntity, isUserDefinedName, aResultsWithNameOrColor));
 
   // remove entity from the list of not dumped items
   myNotDumpedEntities.erase(theEntity);

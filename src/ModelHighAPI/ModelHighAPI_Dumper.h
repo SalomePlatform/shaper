@@ -232,18 +232,21 @@ private:
   /// Stores names of results for the given feature
   void saveResultNames(const FeaturePtr& theFeature);
 
+  /// Check the result feature has default color
+  bool isDefaultColor(const ResultPtr& theResult) const;
+
 private:
   typedef std::map<EntityPtr, std::pair<std::string, std::string> > EntityNameMap;
   typedef std::map<std::string, std::set<std::string> >             ModulesMap;
   typedef std::map<DocumentPtr, std::map<std::string, int> >        NbFeaturesMap;
 
   struct LastDumpedEntity {
-    EntityPtr            myEntity; // last dumped entity
-    bool                 myUserName; // the entity hase user-defined name
-    std::list<ResultPtr> myResultsWithName; // results of this entity, which has user-defined names
+    EntityPtr            myEntity;   ///< last dumped entity
+    bool                 myUserName; ///< the entity hase user-defined name
+    std::list<ResultPtr> myResults;  ///< results of this entity, which has user-defined names or specific colors
 
     LastDumpedEntity(EntityPtr theEntity, bool theUserName, const std::list<ResultPtr>& theResults)
-      : myEntity(theEntity), myUserName(theUserName), myResultsWithName(theResults)
+      : myEntity(theEntity), myUserName(theUserName), myResults(theResults)
     {}
   };
   typedef std::stack<LastDumpedEntity>                              DumpStack;

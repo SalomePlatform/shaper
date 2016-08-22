@@ -76,9 +76,13 @@ public:
   MODELHIGHAPI_EXPORT
   virtual std::string shapeType() const;
 
-  /// \return Result if exists.
+  /// Shortcut for result()->data()->setName()
   MODELHIGHAPI_EXPORT
-  virtual std::shared_ptr<ModelAPI_Result> result() const;
+  void setName(const std::string& theName);
+
+  /// Change result's color
+  MODELHIGHAPI_EXPORT
+  void setColor(int theRed, int theGreen, int theBlue);
 
 private:
   VariantType myVariantType;
