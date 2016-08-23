@@ -39,6 +39,11 @@ public:
   MODELHIGHAPI_EXPORT
   std::shared_ptr<ModelAPI_Feature> feature() const;
 
+  /// If feature is composite return intefrace for sub-feature by zero-based index,
+  /// or empty pointer if feature not composite or does not have sub-feature with such index.
+  MODELHIGHAPI_EXPORT
+  std::shared_ptr<ModelHighAPI_Interface> subFeature(const int theIndex) const;
+
   /// Shortcut for feature()->getKind()
   MODELHIGHAPI_EXPORT
   const std::string& getKind() const;

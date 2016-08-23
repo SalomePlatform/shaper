@@ -284,6 +284,28 @@ bool ModelHighAPI_Dumper::processSubs(const std::shared_ptr<ModelAPI_CompositeFe
   return isOk;
 }
 
+void ModelHighAPI_Dumper::dumpSubFeatureNameAndColor(const std::string theSubFeatureGet,
+                                                     const FeaturePtr& theSubFeature)
+{
+  name(theSubFeature, false);
+  myNames[theSubFeature] = std::pair<std::string, std::string>(theSubFeatureGet, theSubFeature->name());
+
+  // store results if they have user-defined names or colors
+  std::list<ResultPtr> aResultsWithNameOrColor;
+  const std::list<ResultPtr>& aResults = theSubFeature->results();
+  std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
+  for (; aResIt != aResults.end(); ++aResIt) {
+    std::string aResName = (*aResIt)->data()->name();
+    myNames[*aResIt] = std::pair<std::string, std::string>(aResName, aResName);
+    aResultsWithNameOrColor.push_back(*aResIt);
+  }
+
+  // store just dumped entity to stack
+  myEntitiesStack.push(LastDumpedEntity(theSubFeature, true, aResultsWithNameOrColor));
+
+  dumpEntitySetName();
+}
+
 bool ModelHighAPI_Dumper::exportTo(const std::string& theFileName)
 {
   std::ofstream aFile;

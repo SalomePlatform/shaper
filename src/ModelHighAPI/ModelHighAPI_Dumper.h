@@ -98,6 +98,14 @@ public:
   /// Dump given feature
   virtual void dumpFeature(const FeaturePtr& theFeature, const bool theForce = false) = 0;
 
+  /// Dump sub-feature name and color, without dumping feature creation.
+  /// Used for features which creates sub-features in their execute method.
+  /// \param theSubFeatureGet [in] method for getting sub-feature (e.g. "Feature_1.subFeature(0)")
+  /// \param theSubFeature    [in] sub-feature
+  MODELHIGHAPI_EXPORT
+  void dumpSubFeatureNameAndColor(const std::string theSubFeatureGet,
+                                  const FeaturePtr& theSubFeature);
+
   /// Return name of getter for corresponding attribute
   virtual std::string attributeGetter(const FeaturePtr& theFeature,
                                       const std::string& theAttrName) const = 0;

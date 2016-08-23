@@ -47,6 +47,17 @@ void ExchangeAPI_Import::dump(ModelHighAPI_Dumper& theDumper) const
 
   theDumper << aBase << " = model.addImport(" << aPartName << ", "
             << aBase->string(ExchangePlugin_ImportFeature::FILE_PATH_ID()) << ")" << std::endl;
+  // to make import have results
+  theDumper << "model.do()" << std::endl;
+
+  CompositeFeaturePtr aCompositeFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aBase);
+  if(aCompositeFeature.get()) {
+    int aNbOfSubs = aCompositeFeature->numberOfSubs();
+    for(int anIndex = 0; anIndex < aNbOfSubs; ++anIndex) {
+      std::string aSubFeatureGet = theDumper.name(aBase) + ".subFeature(" + std::to_string((long long)anIndex) + ")";
+      theDumper.dumpSubFeatureNameAndColor(aSubFeatureGet, aCompositeFeature->subFeature(anIndex));
+    }
+  }
 }
 
 //--------------------------------------------------------------------------------------

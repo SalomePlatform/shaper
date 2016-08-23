@@ -9,6 +9,8 @@
 //--------------------------------------------------------------------------------------
 #include <Events_InfoMessage.h>
 
+#include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_Events.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -32,6 +34,21 @@ std::shared_ptr<ModelAPI_Feature> ModelHighAPI_Interface::feature() const
   return myFeature;
 }
 
+std::shared_ptr<ModelHighAPI_Interface> ModelHighAPI_Interface::subFeature(const int theIndex) const
+{
+  CompositeFeaturePtr aCompositeFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+  if(!aCompositeFeature.get()) {
+    return InterfacePtr();
+  }
+
+  FeaturePtr aSubFeature = aCompositeFeature->subFeature(theIndex);
+  if(!aSubFeature.get()) {
+    return InterfacePtr();
+  }
+
+  return InterfacePtr(new ModelHighAPI_Interface(aSubFeature));
+}
+
 const std::string& ModelHighAPI_Interface::getKind() const
 {
   return feature()->getKind();
@@ -39,12 +56,18 @@ const std::string& ModelHighAPI_Interface::getKind() const
 
 void ModelHighAPI_Interface::execute()
 {
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  FeaturePtr aFeature = feature();
-  if(aFactory->validate(aFeature)) {
-    aFeature->execute();
-  }
+  //SessionPtr aMgr = ModelAPI_Session::get();
+  //ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  //FeaturePtr aFeature = feature();
+  //if(aFactory->validate(aFeature)) {
+  //  aFeature->execute();
+  //}
+
+  Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  //aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  //aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 }
 
 void ModelHighAPI_Interface::setName(const std::string& theName)
