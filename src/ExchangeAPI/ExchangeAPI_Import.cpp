@@ -10,6 +10,8 @@
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
+#include <algorithm>
+
 ExchangeAPI_Import::ExchangeAPI_Import(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
 : ModelHighAPI_Interface(theFeature)
@@ -45,8 +47,18 @@ void ExchangeAPI_Import::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   std::string aPartName = theDumper.name(aBase->document());
 
-  theDumper << aBase << " = model.addImport(" << aPartName << ", "
-            << aBase->string(ExchangePlugin_ImportFeature::FILE_PATH_ID()) << ")" << std::endl;
+  std::string aFilePath = aBase->string(ExchangePlugin_ImportFeature::FILE_PATH_ID())->value();
+  std::string aFrom = "\\";
+  std::string aTo = "\\\\";
+  for(std::size_t aPos = aFilePath.find(aFrom);
+      aPos != std::string::npos;
+      aPos = aFilePath.find(aFrom, aPos)) {
+    aFilePath.replace(aPos, aFrom.size(), aTo);
+    aPos += aTo.size();
+  }
+
+  theDumper << aBase << " = model.addImport(" << aPartName << ", \""
+            << aFilePath << "\")" << std::endl;
   // to make import have results
   theDumper << "model.do()" << std::endl;
 

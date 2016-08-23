@@ -90,10 +90,10 @@ def testExportXAO():
 
     aSession.startOperation()
     aGroup = model.addGroup(aPart, [])
-    aGroup.defaultResult().data().setName("")
     aGroup.groupList().setSelectionType("face")
     aGroup.groupList().append("Box_1_1/Shape1_1")
     aGroup.groupList().append("Box_1_1/Shape2_1")
+    aGroup.defaultResult().data().setName("")
 #     aGroupFeature = aSession.activeDocument().addFeature("Group")
 #     aGroupFeature.data().setName("")
 #     aSelectionListAttr = aGroupFeature.selectionList("group_list")
