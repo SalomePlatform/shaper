@@ -254,12 +254,14 @@ bool ModelHighAPI_Dumper::processSubs(const std::shared_ptr<ModelAPI_CompositeFe
 {
   bool isOk = true;
   // dump all sub-features;
+  bool isSubDumped = false;
   int aNbSubs = theComposite->numberOfSubs();
   for (int anIndex = 0; anIndex < aNbSubs; ++anIndex) {
     FeaturePtr aFeature = theComposite->subFeature(anIndex);
     if (isDumped(aFeature))
       continue;
 
+    isSubDumped = true;
     CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
     if (aCompFeat) // iteratively process composite features
       isOk = process(aCompFeat) && isOk;
@@ -269,7 +271,7 @@ bool ModelHighAPI_Dumper::processSubs(const std::shared_ptr<ModelAPI_CompositeFe
 
   bool isDumpSetName = !myEntitiesStack.empty() &&
       myEntitiesStack.top().myEntity == EntityPtr(theComposite);
-  bool isForceModelDo = isDumpSetName &&
+  bool isForceModelDo = isSubDumped && isDumpSetName &&
       (myEntitiesStack.top().myUserName || !myEntitiesStack.top().myResults.empty());
   // It is necessary for the sketch to create its result when complete (command "model.do()").
   // This option is set by flat theDumpModelDo.
