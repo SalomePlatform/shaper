@@ -50,7 +50,7 @@ void SketchSolver_ConstraintMirror::getAttributes(
     }
   }
 
-  if (theBaseEntities.size() > theMirrorEntities.size())
+  if (theBaseEntities.size() > theMirrorEntities.size() || aMirroredList.empty())
     myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
 }
 

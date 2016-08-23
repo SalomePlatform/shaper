@@ -33,7 +33,7 @@ SketchAPI_Rotation::SketchAPI_Rotation(
     fillAttribute(theNumberOfObjects, numberOfObjects());
     fillAttribute(theFullValue ? "FullAngle" : "SingleAngle", valueType());
 
-    execute();
+    execute(true);
   }
 }
 

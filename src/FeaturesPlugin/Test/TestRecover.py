@@ -15,10 +15,12 @@ mypart = model.addPart(mypartset).document()
 
 sk1 = model.addSketch(mypart, model.defaultPlane("XOY"))
 c1 = sk1.addCircle(0, 0, 100)
+model.do()
 bigcyl = model.addExtrusion(mypart, sk1.selectFace(), 100)
 
 sk2 = model.addSketch(mypart, model.defaultPlane("XOY"))
 c2 = sk2.addCircle(20, 30, 30)
+model.do()
 smallcyl = model.addExtrusion(mypart, sk2.selectFace(), 150)
 
 cut = model.addCut(mypart, bigcyl.result(), smallcyl.result())
@@ -48,6 +50,7 @@ recover = model.addRecover(mypart, cut, smallcyl.result(), True)
 assert(mypart.size("Bodies") == 2)
 sk3 = model.addSketch(mypart, model.defaultPlane("XOY"))
 c3 = sk3.addCircle(0, 0, 90)
+model.do()
 big2 = model.addExtrusion(mypart, sk3.selectFace(), 110)
 
 cut2 = model.addCut(mypart, big2.result(), smallcyl.result())

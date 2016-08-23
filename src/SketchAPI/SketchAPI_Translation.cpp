@@ -33,7 +33,7 @@ SketchAPI_Translation::SketchAPI_Translation(
     fillAttribute(theNumberOfObjects, numberOfObjects());
     fillAttribute(theFullValue ? "FullValue" : "SingleValue", valueType());
 
-    execute();
+    execute(true);
   }
 }
 
