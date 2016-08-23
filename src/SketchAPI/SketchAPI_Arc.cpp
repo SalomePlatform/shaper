@@ -244,7 +244,7 @@ void SketchAPI_Arc::dump(ModelHighAPI_Dumper& theDumper) const
   const std::string& aSketchName = theDumper.parentName(aBase);
 
   AttributeSelectionPtr anExternal = aBase->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
-  if (anExternal->value()) {
+  if (anExternal->context()) {
     // arc is external
     theDumper << aBase << " = " << aSketchName << ".addArc(" << anExternal << ")" << std::endl;
   } else {

@@ -247,7 +247,7 @@ void SketchAPI_Circle::dump(ModelHighAPI_Dumper& theDumper) const
   const std::string& aSketchName = theDumper.parentName(aBase);
 
   AttributeSelectionPtr anExternal = aBase->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
-  if (anExternal->value()) {
+  if (anExternal->context()) {
     // circle is external
     theDumper << aBase << " = " << aSketchName << ".addCircle(" << anExternal << ")" << std::endl;
   } else {

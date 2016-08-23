@@ -91,7 +91,7 @@ void SketchPlugin_Sketch::execute()
         aFeature->setSketch(this);
       // do not include the external edges into the result
       if (aFeature->data()->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID())) {
-        if (aFeature->data()->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->value())
+        if (aFeature->data()->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->context())
           continue;
       }
       // do not include the construction entities in the result
