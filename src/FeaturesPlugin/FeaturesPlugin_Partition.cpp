@@ -160,15 +160,16 @@ void FeaturesPlugin_Partition::storeResult(const ListOfShape& theObjects,
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfSubShapes = theMakeShape->mapOfSubShapes();
   int anIndex = 1;
   for(ListOfShape::const_iterator anIt = theObjects.cbegin(); anIt != theObjects.cend(); ++anIt) {
-    std::ostringstream aStream;
-    aStream << aModName << "_" << anIndex++;
+    std::string aModEdgeName = aModName + "_Edge_" + std::to_string((long long)anIndex);
+    std::string aModFaceName = aModName + "_Face_" + std::to_string((long long)anIndex++);
     aResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::EDGE,
-                                             aModTag, aStream.str(), *aMapOfSubShapes.get(), true);
+                                             aModTag, aModEdgeName, *aMapOfSubShapes.get(), true);
+    aModTag += 1000;
     aResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::FACE,
-                                             aModTag, aStream.str(), *aMapOfSubShapes.get(), true);
+                                             aModTag, aModFaceName, *aMapOfSubShapes.get(), true);
+    aModTag += 1000;
     aResultBody->loadDeletedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::EDGE, aDelTag);
     aResultBody->loadDeletedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::FACE, aDelTag);
-    aModTag += 10000;
   }
 
   setResult(aResultBody, theIndex);
