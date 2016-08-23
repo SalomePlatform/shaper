@@ -67,15 +67,19 @@ class BoxFeature(model.Feature):
 
         line = model.addPolygon(self.base, p1, p2, p3, p4)
 
-        self.base.setParallel(line[0], line[2])
-        self.base.setParallel(line[1], line[3])
-        self.base.setPerpendicular(line[0], line[3])
-
         # Setting the size of the base with default values
         # Width
         self.width = self.base.setLength(line[0], 50)  # Keeps the constraint for edition
         # Length
         self.length = self.base.setLength(line[3], 50)  # Keeps the constraint for edition
+
+        # Keeping the rectangle
+        self.base.setParallel(line[0], line[2])
+        self.base.setParallel(line[1], line[3])
+        self.base.setPerpendicular(line[0], line[3])
+
+        # execute sketch
+        model.do()
 
         # Creating the extrusion (the box) at default size
         # A box result

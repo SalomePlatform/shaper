@@ -20,10 +20,10 @@ mypart = model.addPart(mypartset).document()
 
 mybase = model.addSketch(mypart, model.defaultPlane("XOY"))
 
-l1 = mybase.addLine(0, 0, 0, 1)
-l2 = mybase.addLine(0, 1, 1, 1)
-l3 = mybase.addLine(1, 1, 1, 0)
-l4 = mybase.addLine(1, 0, 0, 0)
+l1 = mybase.addLine(0, 0, 0, 25)
+l2 = mybase.addLine(0, 25, 25, 25)
+l3 = mybase.addLine(25, 25, 25, 0)
+l4 = mybase.addLine(25, 0, 0, 0)
 
 mybase.setCoincident(l1.endPoint(), l2.startPoint())
 mybase.setCoincident(l2.endPoint(), l3.startPoint())
@@ -40,6 +40,7 @@ mybase.setFixed(l1.startPoint())
 
 mywidth = mybase.setLength(l1, 50)
 mylength = mybase.setDistance(l1.startPoint(), l3, 50)
+model.do()
 
 # Creating the extrusion
 
@@ -64,6 +65,7 @@ model.do()
 
 
 myboss = model.addExtrusion(mypart, mystand.selectFace(), -5)
+model.do()
 
 # Subtracting the cylinder to the box
 

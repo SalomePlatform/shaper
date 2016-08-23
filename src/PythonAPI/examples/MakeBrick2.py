@@ -22,9 +22,9 @@ mypart = model.addPart(mypartset).document()
 mybase = model.addSketch(mypart, model.defaultPlane("XOY"))
 
 p1 = geom.Pnt2d(0, 0)
-p2 = geom.Pnt2d(0, 1)
-p3 = geom.Pnt2d(1, 1)
-p4 = geom.Pnt2d(1, 0)
+p2 = geom.Pnt2d(0, 25)
+p3 = geom.Pnt2d(25, 25)
+p4 = geom.Pnt2d(25, 0)
 
 line = model.addPolygon(mybase, p1, p2, p3, p4)
 
@@ -37,7 +37,7 @@ mybase.setFixed(line[0].startPoint())
 
 mywidth = mybase.setLength(line[0], 50)
 mylength = mybase.setDistance(line[0].startPoint(), line[2], 50)
-
+model.do()
 
 # Creating the extrusion
 
@@ -58,7 +58,7 @@ mystand.setDistance(circle.center(), mystand.addLine(thiszmax), 10)
 model.do()
 
 myboss = model.addExtrusion(mypart, mystand.selectFace(), -5)
-
+model.do()
 
 # Subtracting the cylinder to the box
 
