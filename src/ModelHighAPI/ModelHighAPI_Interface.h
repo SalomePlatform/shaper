@@ -49,8 +49,9 @@ public:
   const std::string& getKind() const;
 
   /// Shortcut for feature()->execute()
+  /// \param isForce start execution of feature instead of sending events
   MODELHIGHAPI_EXPORT
-  void execute();
+  void execute(bool isForce = false);
 
   /// Shortcut for feature()->data()->setName()
   MODELHIGHAPI_EXPORT

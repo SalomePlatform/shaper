@@ -54,14 +54,15 @@ const std::string& ModelHighAPI_Interface::getKind() const
   return feature()->getKind();
 }
 
-void ModelHighAPI_Interface::execute()
+void ModelHighAPI_Interface::execute(bool isForce)
 {
-  //SessionPtr aMgr = ModelAPI_Session::get();
-  //ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  //FeaturePtr aFeature = feature();
-  //if(aFactory->validate(aFeature)) {
-  //  aFeature->execute();
-  //}
+  if (isForce) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+    FeaturePtr aFeature = feature();
+    if(aFactory->validate(aFeature))
+      aFeature->execute();
+  }
 
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));

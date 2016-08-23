@@ -83,7 +83,7 @@ void ConstructionAPI_Point::setByXYZ(const ModelHighAPI_Double& theX,
   fillAttribute(theY, myy);
   fillAttribute(theZ, myz);
 
-  execute();
+  execute(false);
 }
 
 /*//==================================================================================================

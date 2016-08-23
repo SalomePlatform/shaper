@@ -279,7 +279,7 @@ bool SketchSolver_Manager::changeWorkplane(CompositeFeaturePtr theSketch)
     }
     myGroups.push_back(aNewGroup);
   }
-  return aResult;
+  return aResult || isUpdated;
 }
 
 // ============================================================================

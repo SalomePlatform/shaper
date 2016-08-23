@@ -30,7 +30,7 @@ FeaturesAPI_Boolean::FeaturesAPI_Boolean(const std::shared_ptr<ModelAPI_Feature>
     fillAttribute(theMainObjects, mymainObjects);
     fillAttribute(theToolObjects, mytoolObjects);
 
-    execute();
+    execute(false);
   }
 }
 
