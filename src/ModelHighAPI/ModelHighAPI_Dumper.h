@@ -244,9 +244,21 @@ private:
   bool isDefaultColor(const ResultPtr& theResult) const;
 
 private:
-  typedef std::map<EntityPtr, std::pair<std::string, std::string> > EntityNameMap;
-  typedef std::map<std::string, std::set<std::string> >             ModulesMap;
-  typedef std::map<DocumentPtr, std::map<std::string, int> >        NbFeaturesMap;
+  struct EntityName {
+    std::string myCurrentName; ///< default name of current feature
+    std::string myUserName;    ///< user-defined name
+    bool        myIsDefault;   ///< \c true if the name is default
+
+    EntityName() {}
+
+    EntityName(const std::string& theCurName, const std::string& theUserName, bool theDefault)
+      : myCurrentName(theCurName), myUserName(theUserName), myIsDefault(theDefault)
+    {}
+  };
+
+  typedef std::map<EntityPtr, EntityName>                     EntityNameMap;
+  typedef std::map<std::string, std::set<std::string> >       ModulesMap;
+  typedef std::map<DocumentPtr, std::map<std::string, int> >  NbFeaturesMap;
 
   struct LastDumpedEntity {
     EntityPtr            myEntity;   ///< last dumped entity

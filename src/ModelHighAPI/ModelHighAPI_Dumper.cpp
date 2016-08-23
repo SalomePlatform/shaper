@@ -88,10 +88,11 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
 {
   EntityNameMap::const_iterator aFound = myNames.find(theEntity);
   if (aFound != myNames.end())
-    return aFound->second.first;
+    return aFound->second.myCurrentName;
 
   // entity is not found, store it
   std::string aName;
+  bool isDefaultName = false;
   std::ostringstream aDefaultName;
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theEntity);
   if (aFeature) {
@@ -111,6 +112,7 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
       if (aNbFeatures == anId) {
         // name is not user-defined
         aName.clear();
+        isDefaultName = true;
       }
     }
 
@@ -129,7 +131,7 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
     }
   }
 
-  myNames[theEntity] = std::pair<std::string, std::string>(aDefaultName.str(), aName);
+  myNames[theEntity] = EntityName(aDefaultName.str(), aName, isDefaultName);
   if (theSaveNotDumped)
     myNotDumpedEntities.insert(theEntity);
 
@@ -137,7 +139,7 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
   if (aFeature)
     saveResultNames(aFeature);
 
-  return myNames[theEntity].first;
+  return myNames[theEntity].myCurrentName;
 }
 
 const std::string& ModelHighAPI_Dumper::parentName(const FeaturePtr& theEntity)
@@ -157,7 +159,7 @@ const std::string& ModelHighAPI_Dumper::parentName(const FeaturePtr& theEntity)
 
 void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
 {
-  const std::string& aFeatureName = myNames[theFeature].first;
+  const std::string& aFeatureName = myNames[theFeature].myCurrentName;
   const std::list<ResultPtr>& aResults = theFeature->results();
   std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
   for (int i = 1; aResIt != aResults.end(); ++aResIt, ++i) {
@@ -174,8 +176,8 @@ void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
       }
     }
 
-    myNames[*aResIt] = std::pair<std::string, std::string>(aResName,
-        isUserDefined ? aResName : std::string());
+    myNames[*aResIt] = EntityName(aResName,
+        (isUserDefined ? aResName : std::string()), !isUserDefined);
   }
 }
 
@@ -184,7 +186,7 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
 {
   // dump top level document feature
   static const std::string aDocName("partSet");
-  myNames[theDoc] = std::pair<std::string, std::string>(aDocName, std::string());
+  myNames[theDoc] = EntityName(aDocName, std::string(), true);
   *this << aDocName << " = model.moduleDocument()" << std::endl;
 
   // dump subfeatures and store result to file
@@ -231,9 +233,9 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
     if (!aSubDoc)
       return false;
     // set name of document
-    const std::string& aPartName = myNames[theComposite].first;
+    const std::string& aPartName = myNames[theComposite].myCurrentName;
     std::string aDocName = aPartName + "_doc";
-    myNames[aSubDoc] = std::pair<std::string, std::string>(aDocName, std::string());
+    myNames[aSubDoc] = EntityName(aDocName, std::string(), true);
 
     // dump document in a separate line
     *this << aDocName << " = " << aPartName << ".document()" << std::endl;
@@ -290,7 +292,7 @@ void ModelHighAPI_Dumper::dumpSubFeatureNameAndColor(const std::string theSubFea
                                                      const FeaturePtr& theSubFeature)
 {
   name(theSubFeature, false);
-  myNames[theSubFeature] = std::pair<std::string, std::string>(theSubFeatureGet, theSubFeature->name());
+  myNames[theSubFeature] = EntityName(theSubFeatureGet, theSubFeature->name(), false);
 
   // store results if they have user-defined names or colors
   std::list<ResultPtr> aResultsWithNameOrColor;
@@ -298,7 +300,7 @@ void ModelHighAPI_Dumper::dumpSubFeatureNameAndColor(const std::string theSubFea
   std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
   for (; aResIt != aResults.end(); ++aResIt) {
     std::string aResName = (*aResIt)->data()->name();
-    myNames[*aResIt] = std::pair<std::string, std::string>(aResName, aResName);
+    myNames[*aResIt] = EntityName(aResName, aResName, false);
     aResultsWithNameOrColor.push_back(*aResIt);
   }
 
@@ -362,21 +364,26 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
 
   // dump "setName" for the entity
   if (aLastDumped.myUserName) {
-    std::pair<std::string, std::string> anEntityNames = myNames[aLastDumped.myEntity];
-    if (!anEntityNames.second.empty())
-      myDumpBuffer << anEntityNames.first << ".setName(\"" << anEntityNames.second << "\")" << std::endl;
-    anEntityNames.second.clear(); // don't dump "setName" for the entity twice
+    EntityName& anEntityNames = myNames[aLastDumped.myEntity];
+    if (!anEntityNames.myIsDefault)
+      myDumpBuffer << anEntityNames.myCurrentName << ".setName(\""
+                   << anEntityNames.myUserName << "\")" << std::endl;
+    // don't dump "setName" for the entity twice
+    anEntityNames.myUserName.clear();
+    anEntityNames.myIsDefault = true;
   }
   // dump "setName" for results
   std::list<ResultPtr>::const_iterator aResIt = aLastDumped.myResults.begin();
   std::list<ResultPtr>::const_iterator aResEnd = aLastDumped.myResults.end();
   for (; aResIt != aResEnd; ++aResIt) {
     // set result name
-    std::pair<std::string, std::string> anEntityNames = myNames[*aResIt];
-    if (!anEntityNames.second.empty()) {
+    EntityName& anEntityNames = myNames[*aResIt];
+    if (!anEntityNames.myIsDefault) {
       *this << *aResIt;
-      myDumpBuffer << ".setName(\"" << anEntityNames.second << "\")" << std::endl;
-      anEntityNames.second.clear(); // don't dump "setName" for the entity twice
+      myDumpBuffer << ".setName(\"" << anEntityNames.myUserName << "\")" << std::endl;
+      // don't dump "setName" for the entity twice
+      anEntityNames.myUserName.clear();
+      anEntityNames.myIsDefault = true;
     }
     // set result color
     if (!isDefaultColor(*aResIt)) {
@@ -546,13 +553,13 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity
 {
   myDumpBuffer << name(theEntity);
 
-  bool isUserDefinedName = !myNames[theEntity].second.empty();
+  bool isUserDefinedName = !myNames[theEntity].myIsDefault;
   // store results if they have user-defined names or colors
   std::list<ResultPtr> aResultsWithNameOrColor;
   const std::list<ResultPtr>& aResults = theEntity->results();
   std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
   for (; aResIt != aResults.end(); ++aResIt)
-    if (!myNames[*aResIt].second.empty() || !isDefaultColor(*aResIt))
+    if (!myNames[*aResIt].myIsDefault || !isDefaultColor(*aResIt))
       aResultsWithNameOrColor.push_back(*aResIt);
   // store just dumped entity to stack
   myEntitiesStack.push(LastDumpedEntity(theEntity, isUserDefinedName, aResultsWithNameOrColor));
