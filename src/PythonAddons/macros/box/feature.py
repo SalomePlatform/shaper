@@ -67,11 +67,14 @@ class BoxFeature(model.Feature):
 
         line = model.addPolygon(self.base, p1, p2, p3, p4)
 
+        self.base.setFixed(line[0].startPoint())
+        self.base.setVertical(line[0])
+
         # Setting the size of the base with default values
         # Width
-        self.width = self.base.setLength(line[0], 50)  # Keeps the constraint for edition
+        self.width = self.base.setLength(line[3], 50)  # Keeps the constraint for edition
         # Length
-        self.length = self.base.setLength(line[3], 50)  # Keeps the constraint for edition
+        self.length = self.base.setLength(line[0], 50)  # Keeps the constraint for edition
 
         # Keeping the rectangle
         self.base.setParallel(line[0], line[2])
