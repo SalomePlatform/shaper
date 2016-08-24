@@ -79,12 +79,14 @@ ObjectPtr Model_AttributeReference::value()
       }
     }
   } else { // internal ref
-    std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
-        owner()->document());
-    if (aDoc) {
-      TDF_Label aRefLab = myRef->Get();
-      if (!aRefLab.IsNull()) {  // it may happen with old document, issue #285
-        return aDoc->objects()->object(aRefLab);
+    if (owner().get()) {
+      std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
+          owner()->document());
+      if (aDoc) {
+        TDF_Label aRefLab = myRef->Get();
+        if (!aRefLab.IsNull()) {  // it may happen with old document, issue #285
+          return aDoc->objects()->object(aRefLab);
+        }
       }
     }
   }
@@ -117,8 +119,8 @@ void Model_AttributeReference::setObject(const std::shared_ptr<ModelAPI_Object>&
 {
   if (owner() != theObject) {
     ModelAPI_AttributeReference::setObject(theObject);
-    std::shared_ptr<Model_Document> aDoc =
-      std::dynamic_pointer_cast<Model_Document>(owner()->document());
+    //std::shared_ptr<Model_Document> aDoc =
+    //  std::dynamic_pointer_cast<Model_Document>(owner()->document());
   }
 }
 

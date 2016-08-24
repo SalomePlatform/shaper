@@ -162,4 +162,52 @@ namespace ModelGeomAlgo_Point2D {
     return isInside;
   }
 
+  std::string doubleToString(double theValue)
+  {
+    std::string aValueStr;
+    char aBuf[50];
+    int n = sprintf(aBuf, "%g", theValue);
+    aValueStr = std::string(aBuf);
+    return aValueStr;
+  }
+
+  std::string getPontAttributesInfo(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                    const std::set<std::shared_ptr<ModelAPI_Attribute> >& theAttributesOnly)
+  {
+    std::string anInfo;
+
+    std::list<AttributePtr> anAttrs = theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+    std::list<AttributePtr>::const_iterator anIt = anAttrs.begin(), aLast = anAttrs.end();
+
+    for(; anIt != aLast; anIt++) {
+      AttributePtr anAttribute = *anIt;
+      if (anAttribute.get() && (theAttributesOnly.empty() ||
+          theAttributesOnly.find(anAttribute) != theAttributesOnly.end())) {
+      if (!anInfo.empty()) {
+        anInfo.append(", ");
+        anInfo.append("\n");
+      }
+      anInfo.append("    " + getPointAttributeInfo(anAttribute));
+      }
+    }
+    return anInfo;
+  }
+
+  std::string getPointAttributeInfo(const std::shared_ptr<ModelAPI_Attribute>& theAttribute)
+  {
+    std::string anInfo;
+    std::string aValue = "not defined";
+    std::string aType = theAttribute->attributeType();
+    if (aType == GeomDataAPI_Point2D::typeId()) {
+      std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                                                                      theAttribute);
+      if (aPoint.get() && aPoint->isInitialized()) {
+        aValue = std::string("(" + doubleToString(aPoint->x()) + ", "+ doubleToString(aPoint->y()) + ")");
+      }
+    }
+    anInfo.append(theAttribute->id() + ": " + aValue);
+
+    return anInfo;
+  }
+
 } // namespace ModelGeomAlgo_Point2D

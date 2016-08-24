@@ -33,6 +33,8 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Events.h>
 
+#include <ModelGeomAlgo_Point2D.h>
+
 #include <TopoDS_Iterator.hxx>
 
 #include <GeomDataAPI_Point2D.h>
@@ -313,26 +315,11 @@ QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
                                                                                        .c_str());
     }
     if (isUseAttributesInfo) {
-      std::list<AttributePtr> anAttrs = aFeature->data()->attributes("");
-      std::list<AttributePtr>::const_iterator anIt = anAttrs.begin(), aLast = anAttrs.end();
-      QStringList aValues;
-      for(; anIt != aLast; anIt++) {
-        AttributePtr anAttr = *anIt;
-        QString aValue = "not defined";
-        std::string aType = anAttr->attributeType();
-        if (aType == GeomDataAPI_Point2D::typeId()) {
-          std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                                                                         anAttr);
-          if (aPoint.get())
-            aValue = QString("(%1, %2)").arg(aPoint->x()).arg(aPoint->y());
-        }
-        else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
-        }
-
-        aValues.push_back(QString("%1: %2").arg(anAttr->id().c_str()).arg(aValue).toStdString().c_str());
-      }
-      if (!aValues.empty())
-        aFeatureStr.append(QString(", attributes: %1").arg(aValues.join(", ").toStdString().c_str()));
+      std::set<std::shared_ptr<ModelAPI_Attribute> > anAttributes;
+      std::string aPointsInfo = ModelGeomAlgo_Point2D::getPontAttributesInfo(aFeature,
+                                                                             anAttributes).c_str();
+      if (!aPointsInfo.empty())
+        aFeatureStr.append(QString(", attributes: %1").arg(aPointsInfo.c_str()).toStdString().c_str());
     }
   }
 

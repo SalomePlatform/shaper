@@ -80,6 +80,21 @@ namespace ModelGeomAlgo_Point2D {
   MODELGEOMALGO_EXPORT bool isPointOnEdge(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                                           const std::shared_ptr<GeomAPI_Pnt>& thePoint,
                                           std::shared_ptr<GeomAPI_Pnt>& theProjectedPoint);
+
+  /// Return feature name, kind and point values united in a string info
+  /// \param theFeature an investigated feature
+  /// \param theAttributesOnly a container of necessary attributes, if empty, all
+  /// \return string value
+  MODELGEOMALGO_EXPORT std::string getPontAttributesInfo(
+                           const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                           const std::set<std::shared_ptr<ModelAPI_Attribute> >& theAttributesOnly);
+
+  /// Return point attribute string info
+  /// \param theAttribute an investigated attribute
+  /// \return string value
+  MODELGEOMALGO_EXPORT std::string getPointAttributeInfo(
+                                  const std::shared_ptr<ModelAPI_Attribute>& theAttribute);
+
 }
 
 #endif

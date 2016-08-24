@@ -106,31 +106,49 @@ private:
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature,
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToPoint);
 
-  /// Obtains those constraints of the feature that should be modified
-  /// \param theSplitFeature a result split feature
-  /// \param theBaseFeature a modified base feature
-  /// \param theAfterFeature an additional created feature if source segement contain three parts
-  /// \param theFeaturesToDelete [out] constrains that will be deleted after split
-  /// \param theTangentFeatures  [out] tangent feature to be connected to new feature
+  /// Move coincidence constraint from feature to point if it is found
   /// \param theCoincidenceToFeature [out] coincidence to feature to be connected to new feature
-  /// \param theCoincidenceToPoint [out] coincidence to point be connected to new feature
-  /*void setConstraints(const FeaturePtr& theSplitFeature,
-                      const FeaturePtr& theBaseFeature,
-                      const FeaturePtr& theAfterFeature,
-    const std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete,
-    const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theTangentFeatures,
-    const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature,
-    const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToPoint);*/
+  /// \param theFurtherCoincidences a list of points where coincidences will be build
+  void updateCoincidenceConstraintsToFeature(
+              const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature,
+              const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences,
+              const std::set<ResultPtr>& theFeatureResults);
 
   /// Make the base object is splitted by the point attributes
   /// \param theSplitFeature a result split feature
   /// \param theBeforeFeature a feature between start point and the 1st point of split feature
   /// \param theAfterFeature a feature between last point of split feature and the end point
   /// \param thePoints a list of points where coincidences will be build
+  /// \param theCreatedFeatures a container of created features
+  void splitLine(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
+                 std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,
+                 std::shared_ptr<ModelAPI_Feature>& theAfterFeature,
+                 std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
+                 std::set<std::shared_ptr<ModelAPI_Feature>>& theCreatedFeatures);
+
+  /// Make the base object is splitted by the point attributes
+  /// \param theSplitFeature a result split feature
+  /// \param theBeforeFeature a feature between start point and the 1st point of split feature
+  /// \param theAfterFeature a feature between last point of split feature and the end point
+  /// \param thePoints a list of points where coincidences will be build
+  /// \param theCreatedFeatures a container of created features
   void splitArc(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
                 std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,
                 std::shared_ptr<ModelAPI_Feature>& theAfterFeature,
-                std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints);
+                std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
+                std::set<std::shared_ptr<ModelAPI_Feature>>& theCreatedFeatures);
+
+  /// Make the base object is splitted by the point attributes
+  /// \param theSplitFeature a result split feature
+  /// \param theBeforeFeature a feature between start point and the 1st point of split feature
+  /// \param theAfterFeature a feature between last point of split feature and the end point
+  /// \param thePoints a list of points where coincidences will be build
+  /// \param theCreatedFeatures a container of created features
+  void splitCircle(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
+                   std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,
+                   std::shared_ptr<ModelAPI_Feature>& theAfterFeature,
+                   std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
+                   std::set<std::shared_ptr<ModelAPI_Feature>>& theCreatedFeatures);
 
   /// Correct the first and the second point to provide condition that the first is closer to
   /// the start point and the second point - to the last end of current segment. To rearrange
@@ -150,6 +168,14 @@ private:
   void fillAttribute(const AttributePtr& theModifiedAttribute,
                      const AttributePtr& theSourceAttribute);
 
+  /// Creates a line feature filled by center of base feature and given points
+  /// \param theBaseFeature another arc feature
+  /// \param theFirstAttribute an attribute with coordinates for the start point
+  /// \param theSecondAttribute an attribute with coordinates for the end point
+  FeaturePtr createLineFeature(const FeaturePtr& theBaseFeature,
+                               const AttributePtr& theFirstPointAttr,
+                               const AttributePtr& theSecondPointAttr);
+
   /// Creates an arc feature filled by center of base feature and given points
   /// \param theBaseFeature another arc feature
   /// \param theFirstAttribute an attribute with coordinates for the start point
@@ -162,7 +188,7 @@ private:
   /// \param theConstraintId a constraint index
   /// \param theFirstAttribute an attribute of further coincidence
   /// \param theSecondAttribute an attribute of further coincidence
-  void createConstraint(const std::string& theConstraintId,
+  std::shared_ptr<ModelAPI_Feature> createConstraint(const std::string& theConstraintId,
                         const std::shared_ptr<ModelAPI_Attribute>& theFirstAttribute,
                         const std::shared_ptr<ModelAPI_Attribute>& theSecondAttribute);
 
@@ -170,7 +196,7 @@ private:
   /// \param theConstraintId a constraint index
   /// \param theFirstAttribute an attribute of further coincidence
   /// \param theFirstAttribute an attribute of further coincidence
-  void createConstraintForObjects(const std::string& theConstraintId,
+  std::shared_ptr<ModelAPI_Feature> createConstraintForObjects(const std::string& theConstraintId,
                         const std::shared_ptr<ModelAPI_Object>& theFirstObject,
                         const std::shared_ptr<ModelAPI_Object>& theSecondObject);
 
@@ -179,6 +205,19 @@ private:
   /// \return result object
   std::shared_ptr<ModelAPI_Result> getFeatureResult(
                                     const std::shared_ptr<ModelAPI_Feature>& theFeature);
+
+  /// Returns attributes of the feature, used in edge build, for arc it is end and start points
+  /// \param theFeature a feature
+  /// \return container of attributes
+  std::set<std::shared_ptr<ModelAPI_Attribute> > getEdgeAttributes(
+                                    const std::shared_ptr<ModelAPI_Feature>& theFeature);
+
+  /// Return feature name, kind, point attribute values united in a string
+  /// \param theFeature an investigated feature
+  /// \return string value
+  std::string getFeatureInfo(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                             const bool isUseAttributesInfo = true);
+
 private:
   //std::set<AttributePtr> myNewPoints; ///< set of new points
   //std::map<AttributePtr, FilletFeatures> myPointFeaturesMap; ///< map of point and features for fillet
