@@ -301,7 +301,9 @@ std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>&
     aResult<<": "<<aCount<<std::endl;
   }
   // output the main characteristics
-  aResult<<"Volume: "<<setprecision(2)<<GeomAlgoAPI_ShapeTools::volume(theShape)<<std::endl;
+  if (GeomAlgoAPI_ShapeTools::volume(theShape) > 1.e-7) {
+    aResult<<"Volume: "<<std::fixed<<setprecision(3)<<GeomAlgoAPI_ShapeTools::volume(theShape)<<std::endl;
+  }
   std::shared_ptr<GeomAPI_Pnt> aCenter = GeomAlgoAPI_ShapeTools::centreOfMass(theShape);
   aResult<<"Center of mass: ";
   double aCenterVals[3] = {aCenter->x(), aCenter->y(), aCenter->z()};

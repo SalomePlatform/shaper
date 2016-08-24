@@ -235,6 +235,15 @@ void Model_BodyBuilder::storeModified(const std::shared_ptr<GeomAPI_Shape>& theO
           TDataStd_Name::Set(aSubBuilder.NamedShape()->Label(), aSolidName.c_str());
         }
       }
+    } else if(!aBuilder.NamedShape()->IsEmpty()) {
+      Handle(TDataStd_Name) anAttr;
+      if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
+        std::string aName (TCollection_AsciiString(anAttr->Get()).ToCString());
+        if(!aName.empty()) {
+          std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
+          aDoc->addNamingName(aBuilder.NamedShape()->Label(), aName);
+        }
+      }
     }
   }
 }
@@ -284,10 +293,9 @@ TNaming_Builder* Model_BodyBuilder::builder(const int theTag)
 
 void Model_BodyBuilder::buildName(const int theTag, const std::string& theName)
 {
-  std::string aName = data()->name() + "/" + theName; 
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
-  aDoc->addNamingName(builder(theTag)->NamedShape()->Label(), aName);
-  TDataStd_Name::Set(builder(theTag)->NamedShape()->Label(),aName.c_str());
+  //aDoc->addNamingName(builder(theTag)->NamedShape()->Label(), theName);
+  TDataStd_Name::Set(builder(theTag)->NamedShape()->Label(), theName.c_str());
 }
 void Model_BodyBuilder::generated(
   const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, const int theTag)
@@ -316,8 +324,8 @@ void Model_BodyBuilder::generated(const std::shared_ptr<GeomAPI_Shape>& theOldSh
       TDF_Label aChildLabel = aLabel.FindChild(aTag);
       TNaming_Builder aBuilder(aChildLabel);
       aBuilder.Generated(anOldShape, anExp.Current());
-      TCollection_AsciiString aChildName = TCollection_AsciiString((data()->name() + "/" + theName + "_").c_str()) + aTag;
-      aDoc->addNamingName(aChildLabel, aChildName.ToCString());
+      TCollection_AsciiString aChildName = TCollection_AsciiString((theName + "_").c_str()) + aTag;
+      //aDoc->addNamingName(aChildLabel, aChildName.ToCString());
       TDataStd_Name::Set(aChildLabel, aChildName.ToCString());
       aTag++;
     }
@@ -455,8 +463,8 @@ void Model_BodyBuilder::loadAndOrientGeneratedShapes (
           TDF_Label aChildLabel = aLabel.FindChild(aTag);
           TNaming_Builder aBuilder(aChildLabel);
           aBuilder.Generated(aRoot, anExp.Current());
-          TCollection_AsciiString aChildName = TCollection_AsciiString((data()->name() + "/" + theName + "_").c_str()) + aTag;
-          aDoc->addNamingName(aChildLabel, aChildName.ToCString());
+          TCollection_AsciiString aChildName = TCollection_AsciiString((theName + "_").c_str()) + aTag;
+          //aDoc->addNamingName(aChildLabel, aChildName.ToCString());
           TDataStd_Name::Set(aChildLabel, aChildName.ToCString());
           aTag++;
         }
@@ -711,23 +719,6 @@ void Model_BodyBuilder::loadDisconnectedEdges(
     }
   }
 
-  /*  TopTools_IndexedDataMapOfShapeListOfShape aDM;
-  TopExp::MapShapesAndAncestors(aShape, TopAbs_EDGE, TopAbs_FACE, aDM);
-  for(int i=1; i <= aDM.Extent(); i++) {
-  if(aDM.FindFromIndex(i).Extent() > 1) continue;
-  if (BRep_Tool::Degenerated(TopoDS::Edge(aDM.FindKey(i))))
-  continue;
-  builder(theTag)->Generated(aDM.FindKey(i));
-  TCollection_AsciiString aStr(theTag);
-  std::string aName = theName + aStr.ToCString();
-  buildName(theTag, aName);
-  #ifdef DEB_IMPORT
-  aName +=  + ".brep";
-  BRepTools::Write(aDM.FindKey(i), aName.c_str());
-  #endif
-  theTag++;
-  }
-  */
   TopTools_MapOfShape anEdgesToDelete;
   TopExp_Explorer anEx(aShape,TopAbs_EDGE); 
   std::string aName;

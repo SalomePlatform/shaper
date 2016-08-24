@@ -112,6 +112,10 @@ void Model_Data::setName(const std::string& theName)
   }
   if (mySendAttributeUpdated && isModified)
     ModelAPI_ObjectRenamedMessage::send(myObject, anOldName, theName, this);
+  if (isModified && myObject && myObject->document()) {
+    std::dynamic_pointer_cast<Model_Document>(myObject->document())->
+      changeNamingName(anOldName, theName);
+  }
 }
 
 AttributePtr Model_Data::addAttribute(const std::string& theID, const std::string theAttrType)

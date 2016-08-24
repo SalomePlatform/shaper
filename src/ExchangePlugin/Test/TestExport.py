@@ -98,8 +98,8 @@ def testExportXAO():
 #     aGroupFeature.data().setName("")
 #     aSelectionListAttr = aGroupFeature.selectionList("group_list")
 #     aSelectionListAttr.setSelectionType("face")
-#     aSelectionListAttr.append("Box_1_1/Shape1_1")
-#     aSelectionListAttr.append("Box_1_1/Shape2_1")
+#     aSelectionListAttr.append("Box_1_1/Shape1")
+#     aSelectionListAttr.append("Box_1_1/Shape2")
 #     aGroupFeature.execute()
     aSession.finishOperation()
 

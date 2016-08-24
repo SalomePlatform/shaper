@@ -176,10 +176,6 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   //myIsInitialized = true;
 
   owner()->data()->sendAttributeUpdated(this);
-
-  std::string aSelName = namingName();
-  if(!aSelName.empty())
-    TDataStd_Name::Set(selectionLabel(), aSelName.c_str()); //set name
 }
 
 std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
@@ -876,11 +872,6 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
   std::string aName("");
   if(!this->isInitialized())
     return !theDefaultName.empty() ? theDefaultName : aName;
-  Handle(TDataStd_Name) anAtt;
-  if(selectionLabel().FindAttribute(TDataStd_Name::GetID(), anAtt)) {
-    aName = TCollection_AsciiString(anAtt->Get()).ToCString();
-    return aName;
-  }
 
   std::shared_ptr<GeomAPI_Shape> aSubSh = value();
   ResultPtr aCont = context();

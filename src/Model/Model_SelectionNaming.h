@@ -63,7 +63,8 @@ public:
 
 protected:
   /// Gets the stored name from the document
-  std::string getShapeName(std::shared_ptr<Model_Document> theDoc, const TopoDS_Shape& theShape);
+  std::string getShapeName(std::shared_ptr<Model_Document> theDoc, const TopoDS_Shape& theShape,
+    const bool theAddContextName);
 };
 
 #endif

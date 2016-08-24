@@ -71,18 +71,12 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
       }
     }
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-
     // the viewer update should be unblocked in order to avoid the features blinking before they are
     // hidden
     aMsg = std::shared_ptr<Events_Message>(
                   new Events_Message(Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED)));
 
     Events_Loop::loop()->send(aMsg);
-
-  } else if (theMessage.get()) {
-    Events_InfoMessage("InitializationPlugin_Plugin",
-        "InitializationPlugin_Plugin::processEvent: unhandled message caught: %1")
-            .arg(theMessage->eventID().eventText()).send();
   }
 }
 

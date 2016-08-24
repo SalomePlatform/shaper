@@ -6,6 +6,7 @@
 
 #include "Model_SelectionNaming.h"
 #include "Model_Document.h"
+#include "Model_Objects.h"
 #include <ModelAPI_Feature.h>
 #include <Events_InfoMessage.h>
 #include <ModelAPI_Session.h>
@@ -45,7 +46,8 @@ Model_SelectionNaming::Model_SelectionNaming(TDF_Label theSelectionLab)
 }
 
 std::string Model_SelectionNaming::getShapeName(
-  std::shared_ptr<Model_Document> theDoc, const TopoDS_Shape& theShape)
+  std::shared_ptr<Model_Document> theDoc, const TopoDS_Shape& theShape,
+  const bool theAddContextName)
 {
   std::string aName;
   // check if the subShape is already in DF
@@ -54,8 +56,9 @@ std::string Model_SelectionNaming::getShapeName(
   if(!aNS.IsNull() && !aNS->IsEmpty()) { // in the document    
     if(aNS->Label().FindAttribute(TDataStd_Name::GetID(), anAttr)) {
       aName = TCollection_AsciiString(anAttr->Get()).ToCString();
-      if(!aName.empty()) {	    
-        const TDF_Label& aLabel = theDoc->findNamingName(aName);
+      // indexes are added to sub-shapes not primitives (primitives must not be located at the same label)
+      if(!aName.empty() && aNS->Evolution() != TNaming_PRIMITIVE && theAddContextName) {
+        const TDF_Label& aLabel = aNS->Label();//theDoc->findNamingName(aName);
         static const std::string aPostFix("_");
         TNaming_Iterator anItL(aNS);
         for(int i = 1; anItL.More(); anItL.Next(), i++) {
@@ -65,7 +68,18 @@ std::string Model_SelectionNaming::getShapeName(
             break;
           }
         }
-      }	
+      }
+      if (theAddContextName && aName.find("/") == std::string::npos) { // searching for the context object
+        for(TDF_Label anObjL = aNS->Label(); anObjL.Depth() > 4; anObjL = anObjL.Father()) {
+          int aDepth = anObjL.Depth();
+          if (aDepth == 5 || aDepth == 7) {
+            ObjectPtr anObj = theDoc->objects()->object(anObjL);
+            if (anObj) {
+              aName = anObj->data()->name() + "/" + aName;
+            }
+          }
+        }
+      }
     }
   }
   return aName;
@@ -113,9 +127,17 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
 #endif
   std::shared_ptr<Model_Document> aDoc = 
     std::dynamic_pointer_cast<Model_Document>(theContext->document());
+  if (theContext->groupName() == ModelAPI_ResultPart::group()) {
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(theContext);
+    int anIndex;
+    return aPart->data()->name() + "/" + aPart->nameInPart(theSubSh, anIndex);
+  }
+
+  // add the result name to the name of the shape (it was in BodyBuilder, but did not work on Result rename)
+  bool isNeedContextName = theContext->shape().get() && !theContext->shape()->isEqual(theSubSh);
 
   // check if the subShape is already in DF
-  aName = getShapeName(aDoc, aSubShape);
+  aName = getShapeName(aDoc, aSubShape, isNeedContextName);
   if(aName.empty() ) { // not in the document!
     TopAbs_ShapeEnum aType = aSubShape.ShapeType();
     switch (aType) {
@@ -162,7 +184,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
         // build name of the sub-shape Edge
         for(int i=1; i <= aSMap.Extent(); i++) {
           const TopoDS_Shape& aFace = aSMap.FindKey(i);
-          std::string aFaceName = getShapeName(aDoc, aFace);
+          std::string aFaceName = getShapeName(aDoc, aFace, isNeedContextName);
           if(i == 1)
             aName = aFaceName;
           else 
@@ -170,7 +192,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
         }
         TopTools_ListIteratorOfListOfShape itl(aListOfNbs);
         for (;itl.More();itl.Next()) {
-          std::string aFaceName = getShapeName(aDoc, itl.Value());
+          std::string aFaceName = getShapeName(aDoc, itl.Value(), isNeedContextName);
           aName += "&" + aFaceName;
         }		  
       }
@@ -219,7 +241,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
             TopTools_ListIteratorOfListOfShape itl(aListE);
             for (int i = 1;itl.More();itl.Next(),i++) {
               const TopoDS_Shape& anEdge = itl.Value();
-              std::string anEdgeName = getShapeName(aDoc, anEdge);
+              std::string anEdgeName = getShapeName(aDoc, anEdge, isNeedContextName);
               if (anEdgeName.empty()) { // edge is not in DS, trying by faces anyway
                 isByFaces = true;
                 aName.clear();
@@ -239,7 +261,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
           TopTools_ListIteratorOfListOfShape itl(aList);
           for (int i = 1;itl.More();itl.Next(),i++) {
             const TopoDS_Shape& aFace = itl.Value();
-            std::string aFaceName = getShapeName(aDoc, aFace);
+            std::string aFaceName = getShapeName(aDoc, aFace, isNeedContextName);
             if(i == 1)
               aName = aFaceName;
             else 
@@ -249,10 +271,8 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
       }
       break;
     }
-    // register name			
-    // aDoc->addNamingName(selectionLabel(), aName);
-    // the selected sub-shape will not be shared and as result it will not require registration
   }
+
   return aName;
 }
 
@@ -309,9 +329,13 @@ const TopoDS_Shape getShapeFromNS(
   if (n == std::string::npos) n = 0;
   std::string aSubString = theSubShapeName.substr(n + 1);
   n = aSubString.rfind('_');
-  if (n == std::string::npos) return aSelection;
-  aSubString = aSubString.substr(n+1);
-  int indx = atoi(aSubString.c_str());
+  int indx;
+  if (n == std::string::npos) {// for primitives this is a first 
+    indx = 1;
+  } else {
+    aSubString = aSubString.substr(n+1);
+    indx = atoi(aSubString.c_str());
+  }
 
   TNaming_Iterator anItL(theNS);
   for(int i = 1; anItL.More(); anItL.Next(), i++) {
@@ -326,18 +350,19 @@ const TopoDS_Shape findFaceByName(
   const std::string& theSubShapeName, std::shared_ptr<Model_Document> theDoc)
 {
   TopoDS_Shape aFace;
-  std::string::size_type n, nb = theSubShapeName.rfind('/');			
-  if (nb == std::string::npos) nb = 0;
-  std::string aSubString = theSubShapeName.substr(nb + 1);
-  n = aSubString.rfind('_');
-  if (n != std::string::npos) {
-    std::string aSubStr2 = aSubString.substr(0, n);
-    aSubString  = theSubShapeName.substr(0, nb + 1);
-    aSubString = aSubString + aSubStr2;	
-  } else
-    aSubString = theSubShapeName;
+  //std::string::size_type n, nb = theSubShapeName.rfind('/');			
+  //if (nb == std::string::npos) nb = 0;
+  //std::string aSubString = theSubShapeName.substr(nb + 1);
+  std::string aSubString = theSubShapeName;
 
-  const TDF_Label& aLabel = theDoc->findNamingName(aSubString);
+  TDF_Label aLabel = theDoc->findNamingName(aSubString);
+  if (aLabel.IsNull()) { // try to remove additional artificial suffix
+    std::string::size_type n = aSubString.rfind('_');
+    if (n != std::string::npos) {
+      aSubString = aSubString.substr(0, n);
+       aLabel = theDoc->findNamingName(aSubString);
+    }
+  }
   if(aLabel.IsNull()) return aFace;
   Handle(TNaming_NamedShape) aNS;
   if(aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
@@ -634,7 +659,7 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
    // possible this is body where postfix is added to distinguish several shapes on the same label
   int aSubShapeId = -1; // -1 means sub shape not found
   // for result body the name wihtout "_" has higher priority than with it: it is always added
-  if ((!aCont.get() || (aCont->groupName() == ModelAPI_ResultBody::group())) && 
+  if ((!aCont.get()/* || (aCont->groupName() == ModelAPI_ResultBody::group())*/) && 
        aContName == aSubShapeName) {
     size_t aPostIndex = aContName.rfind('_');
     if (aPostIndex != std::string::npos) {
@@ -699,7 +724,7 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
         return true;
       } else if (aSubShapeId > 0) { // try to find sub-shape by the index
         TopExp_Explorer anExp(aCont->shape()->impl<TopoDS_Shape>(), aType);
-        for(; aSubShapeId > 0 && anExp.More(); aSubShapeId--) {
+        for(; aSubShapeId > 1 && anExp.More(); aSubShapeId--) {
           anExp.Next();
         }
         if (anExp.More()) {

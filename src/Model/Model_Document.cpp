@@ -1169,12 +1169,38 @@ void Model_Document::addNamingName(const TDF_Label theLabel, std::string theName
   myNamingNames[theName] = theLabel;
 }
 
+void Model_Document::changeNamingName(const std::string theOldName, const std::string theNewName)
+{
+  std::map<std::string, TDF_Label>::iterator aFind = myNamingNames.find(theOldName);
+  if (aFind != myNamingNames.end()) {
+    myNamingNames[theNewName] = aFind->second;
+    myNamingNames.erase(theOldName);
+  }
+}
+
 TDF_Label Model_Document::findNamingName(std::string theName)
 {
   std::map<std::string, TDF_Label>::iterator aFind = myNamingNames.find(theName);
-  if (aFind == myNamingNames.end())
-    return TDF_Label(); // not found
-  return aFind->second;
+  if (aFind != myNamingNames.end()) {
+    return aFind->second;
+  }
+  // not found exact name, try to find by sub-components
+  std::string::size_type aSlash = theName.rfind('/');
+  if (aSlash != std::string::npos) {
+    std::string anObjName = theName.substr(0, aSlash);
+    aFind = myNamingNames.find(anObjName);
+    if (aFind != myNamingNames.end()) {
+      TCollection_ExtendedString aSubName(theName.substr(aSlash + 1).c_str());
+      // searching sub-labels with this name
+      TDF_ChildIDIterator aNamesIter(aFind->second, TDataStd_Name::GetID(), Standard_True);
+      for(; aNamesIter.More(); aNamesIter.Next()) {
+        Handle(TDataStd_Name) aName = Handle(TDataStd_Name)::DownCast(aNamesIter.Value());
+        if (aName->Get() == aSubName)
+          return aName->Label();
+      }
+    }
+  }
+  return TDF_Label(); // not found
 }
 
 ResultPtr Model_Document::findByName(const std::string theName)
