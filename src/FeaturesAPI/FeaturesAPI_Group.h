@@ -14,6 +14,7 @@
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
 
+class ModelHighAPI_Dumper;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Group
@@ -41,6 +42,10 @@ public:
   /// Set main objects.
   FEATURESAPI_EXPORT
   void setGroupList(const std::list<ModelHighAPI_Selection>& theGroupList);
+
+  /// Dump wrapped feature
+  FEATURESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Group object.

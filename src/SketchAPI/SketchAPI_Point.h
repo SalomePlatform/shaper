@@ -68,6 +68,10 @@ public:
   /// Set by external name
   SKETCHAPI_EXPORT
   void setByExternalName(const std::string & theExternalName);
+
+  /// Dump wrapped feature
+  SKETCHAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 //! Pointer on Point object

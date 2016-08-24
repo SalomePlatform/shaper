@@ -2,8 +2,10 @@
 """
 
 from ModelHighAPI import moduleDocument, activeDocument
-from ModelHighAPI import defaultPlane
+from ModelHighAPI import defaultPlane, standardPlane
 from ModelHighAPI import begin, end
 from ModelHighAPI import apply as do
 from ModelHighAPI import undo, redo
 from ModelHighAPI import reset
+from ModelHighAPI import ModelHighAPI_Selection as selection
+from ModelHighAPI import checkPythonDump as checkPythonDump

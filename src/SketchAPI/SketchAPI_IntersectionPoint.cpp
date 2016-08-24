@@ -9,6 +9,7 @@
 //--------------------------------------------------------------------------------------
 #include <GeomAPI_Pnt2d.h>
 //--------------------------------------------------------------------------------------
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
@@ -60,3 +61,14 @@ void SketchAPI_IntersectionPoint::setByExternalLineName(const std::string & theE
 }
 
 //--------------------------------------------------------------------------------------
+
+void SketchAPI_IntersectionPoint::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aSketchName = theDumper.parentName(aBase);
+
+  AttributeSelectionPtr aLine = externalLine();
+  theDumper << aBase << " = " << aSketchName << ".addIntersectionPoint(" << aLine << ")" << std::endl;
+  // dump "auxiliary" flag if necessary
+  SketchAPI_SketchEntity::dump(theDumper);
+}

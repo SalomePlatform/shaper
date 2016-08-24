@@ -13,7 +13,6 @@
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeDouble.h>
-#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttrList.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Events.h>

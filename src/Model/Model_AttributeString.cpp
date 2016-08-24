@@ -20,6 +20,8 @@ void Model_AttributeString::setValue(const std::string& theValue)
 {
   TCollection_ExtendedString aValue(theValue.c_str());
   if (!myIsInitialized || myString->Get() != aValue) {
+    if (myString.IsNull())
+      myString = TDataStd_Name::Set(myLab, TCollection_ExtendedString());
     myString->Set(aValue);
     owner()->data()->sendAttributeUpdated(this);
   }
@@ -27,15 +29,14 @@ void Model_AttributeString::setValue(const std::string& theValue)
 
 std::string Model_AttributeString::value()
 {
+  if (myString.IsNull())
+    return "";  // not initialized
   return TCollection_AsciiString(myString->Get()).ToCString();
 }
 
 Model_AttributeString::Model_AttributeString(TDF_Label& theLabel)
 {
+  myLab = theLabel;
   // check the attribute could be already presented in this doc (after load document)
   myIsInitialized = theLabel.FindAttribute(TDataStd_Name::GetID(), myString) == Standard_True;
-  if (!myIsInitialized) {
-    // create attribute: not initialized by value yet, just empty string
-    myString = TDataStd_Name::Set(theLabel, TCollection_ExtendedString());
-  }
 }

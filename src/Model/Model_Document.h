@@ -187,6 +187,8 @@ class Model_Document : public ModelAPI_Document
 
   //! Registers the name of the shape for the topological naming needs
   void addNamingName(const TDF_Label theLabel, std::string theName);
+  //! Updates the name of some object
+  void changeNamingName(std::string theOldName, const std::string theNewName);
   //! Returns the label, keeper of the name  for the topological naming needs
   TDF_Label findNamingName(std::string theName);
   //! Returns the result by name of the result (names of results must be unique, used for naming
@@ -283,6 +285,7 @@ class Model_Document : public ModelAPI_Document
   friend class Model_AttributeSelection;
   friend class Model_ResultPart;
   friend class Model_ResultCompSolid;
+  friend class Model_SelectionNaming;
   friend class DFBrowser;
 
  private:

@@ -59,6 +59,8 @@ std::shared_ptr<GeomAPI_Pnt2d> GeomData_Point2D::pnt()
 void GeomData_Point2D::setText(const std::string& theX,
                                const std::string& theY)
 {
+  if (!myIsInitialized && theX.empty() && theY.empty())
+    return; // empty strings are not good initializers
   if (!myIsInitialized || textX() != theX || textY() != theY) {
     myExpression[0]->setText(theX);
     myExpression[1]->setText(theY);

@@ -209,3 +209,6 @@ assert (aCircleCenter.x() == 0. and aCircleCenter.y() == 0.)
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

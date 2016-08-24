@@ -15,6 +15,7 @@
 #include <ModelHighAPI_Macro.h>
 
 class ModelHighAPI_Double;
+class ModelHighAPI_Reference;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Extrusion
@@ -78,16 +79,20 @@ public:
   virtual ~FeaturesAPI_Extrusion();
 
   INTERFACE_10(FeaturesPlugin_Extrusion::ID(),
+               sketch, FeaturesPlugin_Extrusion::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */,
                baseObjects, FeaturesPlugin_Extrusion::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */,
+               direction, FeaturesPlugin_Extrusion::DIRECTION_OBJECT_ID(), ModelAPI_AttributeSelection, /** Direction */,
                creationMethod, FeaturesPlugin_Extrusion::CREATION_METHOD(), ModelAPI_AttributeString, /** Creation method */,
                toSize, FeaturesPlugin_Extrusion::TO_SIZE_ID(), ModelAPI_AttributeDouble, /** To size */,
                fromSize, FeaturesPlugin_Extrusion::FROM_SIZE_ID(), ModelAPI_AttributeDouble, /** From size */,
                toObject, FeaturesPlugin_Extrusion::TO_OBJECT_ID(), ModelAPI_AttributeSelection, /** To object */,
                toOffset, FeaturesPlugin_Extrusion::TO_OFFSET_ID(), ModelAPI_AttributeDouble, /** To offset */,
                fromObject, FeaturesPlugin_Extrusion::FROM_OBJECT_ID(), ModelAPI_AttributeSelection, /** From object */,
-               fromOffset, FeaturesPlugin_Extrusion::FROM_OFFSET_ID(), ModelAPI_AttributeDouble, /** From offset */,
-               direction, FeaturesPlugin_Extrusion::DIRECTION_OBJECT_ID(), ModelAPI_AttributeSelection, /** Direction */,
-               sketchLauncher, FeaturesPlugin_Extrusion::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */)
+               fromOffset, FeaturesPlugin_Extrusion::FROM_OFFSET_ID(), ModelAPI_AttributeDouble, /** From offset */)
+
+  /// Modify base attribute of the feature.
+  FEATURESAPI_EXPORT
+  void setNestedSketch(const ModelHighAPI_Reference& theSketch);
 
   /// Modify base attribute of the feature.
   FEATURESAPI_EXPORT
@@ -111,6 +116,13 @@ public:
                            const ModelHighAPI_Double& theToOffset,
                            const ModelHighAPI_Selection& theFromObject,
                            const ModelHighAPI_Double& theFromOffset);
+
+  /// Dump wrapped feature
+  FEATURESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
+private:
+  void execIfBaseNotEmpty();
 };
 
 /// Pointer on Extrusion object.

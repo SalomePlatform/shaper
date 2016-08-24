@@ -22,7 +22,8 @@
 
 class Model_AttributeString : public ModelAPI_AttributeString
 {
-  Handle_TDataStd_Name myString;
+  Handle_TDataStd_Name myString; ///< container of the string value
+  TDF_Label myLab; ///< if attribute is not initialized, store label here
  public:
   /// Defines the std::string value
   MODEL_EXPORT virtual void setValue(const std::string& theValue);

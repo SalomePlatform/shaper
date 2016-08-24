@@ -32,3 +32,6 @@ aSession.redo()
 assert(aDoc.size("Construction") == 8)
 assert(aSession.canUndo())
 assert(not aSession.canRedo())
+
+import model
+assert(model.checkPythonDump())

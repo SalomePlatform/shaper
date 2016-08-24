@@ -24,5 +24,6 @@
   #include "FeaturesAPI_RevolutionBoolean.h"
   #include "FeaturesAPI_Rotation.h"
   #include "FeaturesAPI_Translation.h"
+  #include "FeaturesAPI_Union.h"
 
 #endif // FeaturesAPI_swig_H_

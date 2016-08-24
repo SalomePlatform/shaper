@@ -6,6 +6,7 @@
 
 #include "FeaturesAPI_Group.h"
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Integer.h>
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
@@ -39,6 +40,17 @@ void FeaturesAPI_Group::setGroupList(const std::list<ModelHighAPI_Selection>& th
   fillAttribute(theGroupList, mygroupList);
 
   execute();
+}
+
+//==================================================================================================
+void FeaturesAPI_Group::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  AttributeSelectionListPtr anAttrList = aBase->selectionList(FeaturesPlugin_Group::LIST_ID());
+
+  theDumper << aBase << " = model.addGroup(" << aDocName << ", " << anAttrList << ")" << std::endl;
 }
 
 //==================================================================================================

@@ -41,6 +41,10 @@ public:
   /// Modify base attribute of the feature.
   BUILDAPI_EXPORT
   void setBase(const std::list<ModelHighAPI_Selection>& theBaseObjects);
+
+  /// Dump wrapped feature
+  BUILDAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Shell object.

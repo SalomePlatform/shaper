@@ -5,7 +5,6 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
-#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_ResultConstruction.h>
 
 /// It is important.

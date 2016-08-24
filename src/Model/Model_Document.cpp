@@ -16,7 +16,6 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultBody.h>
-
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
 
@@ -33,18 +32,21 @@
 #include <TDF_ChildIDIterator.hxx>
 #include <TDF_LabelMapHasher.hxx>
 #include <TDF_Delta.hxx>
-#include <OSD_File.hxx>
-#include <OSD_Path.hxx>
 #include <TDF_AttributeDelta.hxx>
 #include <TDF_AttributeDeltaList.hxx>
 #include <TDF_ListIteratorOfAttributeDeltaList.hxx>
 #include <TDF_ListIteratorOfLabelList.hxx>
-#include <TopoDS_Shape.hxx>
+#include <TDF_LabelMap.hxx>
 #include <TNaming_SameShapeIterator.hxx>
 #include <TNaming_Iterator.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Tool.hxx>
+
 #include <TopExp_Explorer.hxx>
+#include <TopoDS_Shape.hxx>
+
+#include <OSD_File.hxx>
+#include <OSD_Path.hxx>
 
 #include <climits>
 #ifndef WIN32
@@ -366,7 +368,7 @@ void Model_Document::compactNested()
   }
 }
 
-/// Compares the content ofthe given attributes, returns true if equal.
+/// Compares the content of the given attributes, returns true if equal.
 /// This method is used to avoid empty transactions when only "current" is changed
 /// to some value and then comes back in this transaction, so, it compares only
 /// references and Boolean and Integer Arrays for the current moment.
@@ -488,6 +490,11 @@ bool Model_Document::finishOperation()
   bool isNestedClosed = !myDoc->HasOpenCommand() && !myNestedNum.empty();
   static std::shared_ptr<Model_Session> aSession = 
     std::static_pointer_cast<Model_Session>(Model_Session::get());
+
+  // open transaction if nested is closed to fit inside all synchronizeBackRefs and flushed consequences
+  if (isNestedClosed) {
+    myDoc->OpenCommand();
+  }
   // do it before flashes to enable and recompute nesting features correctly
   if (myNestedNum.empty() || (isNestedClosed && myNestedNum.size() == 1)) {
     // if all nested operations are closed, make current the higher level objects (to perform 
@@ -507,6 +514,12 @@ bool Model_Document::finishOperation()
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+
+  if (isNestedClosed) {
+    if (myDoc->CommitCommand())
+      myTransactions.rbegin()->myOCAFNum++;
+  }
+  
   // this must be here just after everything is finished but before real transaction stop
   // to avoid messages about modifications outside of the transaction
   // and to rebuild everything after all updates and creates
@@ -575,8 +588,28 @@ static void modifiedLabels(const Handle(TDocStd_Document)& theDoc, TDF_LabelList
   }
   // add also label of the modified attributes
   const TDF_AttributeDeltaList& anAttrs = aDelta->AttributeDeltas();
+  TDF_LabelMap anExcludedInt; /// named shape evolution also modifies integer on this label: exclude it
   for (TDF_ListIteratorOfAttributeDeltaList anAttr(anAttrs); anAttr.More(); anAttr.Next()) {
-    theDelta.Append(anAttr.Value()->Label());
+    if (anAttr.Value()->Attribute()->ID() == TDataStd_BooleanArray::GetID()) {
+      continue; // Boolean array is used for feature auxiliary attributes only, feature args are not modified
+    }
+    if (anAttr.Value()->Attribute()->ID() == TNaming_NamedShape::GetID()) {
+      anExcludedInt.Add(anAttr.Value()->Label());
+      continue; // named shape evolution is changed in history update => skip them, they are not the features arguents
+    }
+    if (anAttr.Value()->Attribute()->ID() == TDataStd_Integer::GetID()) {
+      if (anExcludedInt.Contains(anAttr.Value()->Label()))
+        continue;
+    }
+      theDelta.Append(anAttr.Value()->Label());
+  }
+  TDF_ListIteratorOfLabelList aDeltaIter(theDelta);
+  for(; aDeltaIter.More(); aDeltaIter.Next()) {
+    if (anExcludedInt.Contains(aDeltaIter.Value())) {
+      theDelta.Remove(aDeltaIter);
+      if (!aDeltaIter.More())
+        break;
+    }
   }
 }
 
@@ -1025,9 +1058,11 @@ void Model_Document::setCurrentFeature(
     }
 
     if (anIter->setDisabled(aDisabledFlag)) {
-      // state of feature is changed => so feature become updated
       static Events_ID anUpdateEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
-      ModelAPI_EventCreator::get()->sendUpdated(anIter, anUpdateEvent);
+      // state of feature is changed => so inform that it must be updated if it has such state
+      if (!aDisabledFlag && 
+          (anIter->data()->execState() == ModelAPI_StateMustBeUpdated || anIter->data()->execState() == ModelAPI_StateInvalidArgument))
+        ModelAPI_EventCreator::get()->sendUpdated(anIter, anUpdateEvent);
       // flush is in the end of this method
       ModelAPI_EventCreator::get()->sendUpdated(anIter, aRedispEvent /*, false*/);
       aWasChanged = true;
@@ -1134,12 +1169,38 @@ void Model_Document::addNamingName(const TDF_Label theLabel, std::string theName
   myNamingNames[theName] = theLabel;
 }
 
+void Model_Document::changeNamingName(const std::string theOldName, const std::string theNewName)
+{
+  std::map<std::string, TDF_Label>::iterator aFind = myNamingNames.find(theOldName);
+  if (aFind != myNamingNames.end()) {
+    myNamingNames[theNewName] = aFind->second;
+    myNamingNames.erase(theOldName);
+  }
+}
+
 TDF_Label Model_Document::findNamingName(std::string theName)
 {
   std::map<std::string, TDF_Label>::iterator aFind = myNamingNames.find(theName);
-  if (aFind == myNamingNames.end())
-    return TDF_Label(); // not found
-  return aFind->second;
+  if (aFind != myNamingNames.end()) {
+    return aFind->second;
+  }
+  // not found exact name, try to find by sub-components
+  std::string::size_type aSlash = theName.rfind('/');
+  if (aSlash != std::string::npos) {
+    std::string anObjName = theName.substr(0, aSlash);
+    aFind = myNamingNames.find(anObjName);
+    if (aFind != myNamingNames.end()) {
+      TCollection_ExtendedString aSubName(theName.substr(aSlash + 1).c_str());
+      // searching sub-labels with this name
+      TDF_ChildIDIterator aNamesIter(aFind->second, TDataStd_Name::GetID(), Standard_True);
+      for(; aNamesIter.More(); aNamesIter.Next()) {
+        Handle(TDataStd_Name) aName = Handle(TDataStd_Name)::DownCast(aNamesIter.Value());
+        if (aName->Get() == aSubName)
+          return aName->Label();
+      }
+    }
+  }
+  return TDF_Label(); // not found
 }
 
 ResultPtr Model_Document::findByName(const std::string theName)

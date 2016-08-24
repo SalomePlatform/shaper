@@ -23,6 +23,7 @@ from GeomDataAPI import *
 from ModelAPI import *
 import math
 import unittest
+import model
 
 __updated__ = "2015-04-27"
 
@@ -45,6 +46,7 @@ class TestParameterRename(unittest.TestCase):
         self.createFeature()
 
     def tearDown(self):
+        assert(model.checkPythonDump())
         self.aSession.closeAll()
 
     def createParameters(self):
@@ -79,12 +81,57 @@ class TestParameterRename(unittest.TestCase):
         aSketchCircle = aSketchFeature.addFeature("SketchCircle")
         anCircleCentr = geomDataAPI_Point2D(aSketchCircle.attribute("CircleCenter"))
         aRadiusAttr = aSketchCircle.real("CircleRadius")
-        anCircleCentr.setText("x1 + 10.0", "x1 + 20.0")
-        aRadiusAttr.setText("x1")
+        anCircleCentr.setValue(10., 20.)
+        aRadiusAttr.setValue(10.)
         self.aSession.finishOperation()
 
         self.anCircleCentr = anCircleCentr
         self.aRadiusAttr = aRadiusAttr
+
+        # constraints to fix circle position and radius
+        self.aSession.startOperation()
+        # fix X coordinate
+        aDistanceConstraint1 = aSketchFeature.addFeature("SketchConstraintDistance")
+        refattrA = aDistanceConstraint1.refattr("ConstraintEntityA")
+        refattrA.setAttr(anCircleCentr)
+        refattrB = aDistanceConstraint1.refattr("ConstraintEntityB")
+        anOY = aSketchFeature.addFeature("SketchLine")
+        aStartPoint = geomDataAPI_Point2D(anOY.attribute("StartPoint"))
+        anEndPoint = geomDataAPI_Point2D(anOY.attribute("EndPoint"))
+        aStartPoint.setValue(0., 0.)
+        anEndPoint.setValue(0., 100.)
+        anOYRes = modelAPI_Result(self.aDocument.objectByName("Construction", "OY"))
+        anOY.selection("External").setValue(anOYRes, anOYRes.shape())
+        anOY.execute()
+        refattrB.setObject(modelAPI_ResultConstruction(anOY.firstResult()))
+        value = aDistanceConstraint1.real("ConstraintValue")
+        value.setText("x1 + 10.0")
+        aDistanceConstraint1.execute();
+        # fix Y coordinate
+        aDistanceConstraint2 = aSketchFeature.addFeature("SketchConstraintDistance")
+        refattrA = aDistanceConstraint2.refattr("ConstraintEntityA")
+        refattrA.setAttr(anCircleCentr)
+        refattrB = aDistanceConstraint2.refattr("ConstraintEntityB")
+        anOX = aSketchFeature.addFeature("SketchLine")
+        aStartPoint = geomDataAPI_Point2D(anOX.attribute("StartPoint"))
+        anEndPoint = geomDataAPI_Point2D(anOX.attribute("EndPoint"))
+        aStartPoint.setValue(0., 0.)
+        anEndPoint.setValue(100., 0.)
+        anOXRes = modelAPI_Result(self.aDocument.objectByName("Construction", "OX"))
+        anOX.selection("External").setValue(anOXRes, anOXRes.shape())
+        anOX.execute()
+        refattrB.setObject(modelAPI_ResultConstruction(anOX.firstResult()))
+        value = aDistanceConstraint2.real("ConstraintValue")
+        value.setText("x1 + 20.0")
+        aDistanceConstraint2.execute();
+        # fix radius
+        aRadiusConstraint = aSketchFeature.addFeature("SketchConstraintRadius")
+        refattrA = aRadiusConstraint.refattr("ConstraintEntityA")
+        refattrA.setObject(modelAPI_ResultConstruction(aSketchCircle.lastResult()))
+        aRadiusConstrAttr = aRadiusConstraint.real("ConstraintValue")
+        aRadiusConstrAttr.setText("x1")
+        aRadiusConstraint.execute()
+        self.aSession.finishOperation()
 
         self.assertEqual(self.anCircleCentr.x(), 160.)
         self.assertEqual(self.anCircleCentr.y(), 170.)

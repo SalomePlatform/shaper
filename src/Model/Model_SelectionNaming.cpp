@@ -6,8 +6,14 @@
 
 #include "Model_SelectionNaming.h"
 #include "Model_Document.h"
+#include "Model_Objects.h"
 #include <ModelAPI_Feature.h>
 #include <Events_InfoMessage.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_ResultPart.h>
+#include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_ResultBody.h>
 
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS.hxx>
@@ -26,6 +32,9 @@
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Localizer.hxx>
 #include <TDataStd_Name.hxx>
+#include <TColStd_MapOfTransient.hxx>
+#include <algorithm>
+#include <stdexcept>
 
 #ifdef DEB_NAMING
 #include <BRepTools.hxx>
@@ -36,9 +45,9 @@ Model_SelectionNaming::Model_SelectionNaming(TDF_Label theSelectionLab)
   myLab = theSelectionLab;
 }
 
-
 std::string Model_SelectionNaming::getShapeName(
-  std::shared_ptr<Model_Document> theDoc, const TopoDS_Shape& theShape)
+  std::shared_ptr<Model_Document> theDoc, const TopoDS_Shape& theShape,
+  const bool theAddContextName)
 {
   std::string aName;
   // check if the subShape is already in DF
@@ -47,15 +56,9 @@ std::string Model_SelectionNaming::getShapeName(
   if(!aNS.IsNull() && !aNS->IsEmpty()) { // in the document    
     if(aNS->Label().FindAttribute(TDataStd_Name::GetID(), anAttr)) {
       aName = TCollection_AsciiString(anAttr->Get()).ToCString();
-      if(!aName.empty()) {	    
-        const TDF_Label& aLabel = theDoc->findNamingName(aName);
-        /* MPV: the same shape with the same name may be duplicated on different labels (selection of the same construction object)
-        if(!aLabel.IsEqual(aNS->Label())) {
-        //aName.erase(); //something is wrong, to be checked!!!
-        aName += "_SomethingWrong";
-        return aName;
-        }*/
-
+      // indexes are added to sub-shapes not primitives (primitives must not be located at the same label)
+      if(!aName.empty() && aNS->Evolution() != TNaming_PRIMITIVE && theAddContextName) {
+        const TDF_Label& aLabel = aNS->Label();//theDoc->findNamingName(aName);
         static const std::string aPostFix("_");
         TNaming_Iterator anItL(aNS);
         for(int i = 1; anItL.More(); anItL.Next(), i++) {
@@ -65,13 +68,22 @@ std::string Model_SelectionNaming::getShapeName(
             break;
           }
         }
-      }	
+      }
+      if (theAddContextName && aName.find("/") == std::string::npos) { // searching for the context object
+        for(TDF_Label anObjL = aNS->Label(); anObjL.Depth() > 4; anObjL = anObjL.Father()) {
+          int aDepth = anObjL.Depth();
+          if (aDepth == 5 || aDepth == 7) {
+            ObjectPtr anObj = theDoc->objects()->object(anObjL);
+            if (anObj) {
+              aName = anObj->data()->name() + "/" + aName;
+            }
+          }
+        }
+      }
     }
   }
   return aName;
 }
-
-
 
 bool isTrivial (const TopTools_ListOfShape& theAncestors, TopTools_IndexedMapOfShape& theSMap)
 {
@@ -115,9 +127,17 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
 #endif
   std::shared_ptr<Model_Document> aDoc = 
     std::dynamic_pointer_cast<Model_Document>(theContext->document());
+  if (theContext->groupName() == ModelAPI_ResultPart::group()) {
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(theContext);
+    int anIndex;
+    return aPart->data()->name() + "/" + aPart->nameInPart(theSubSh, anIndex);
+  }
+
+  // add the result name to the name of the shape (it was in BodyBuilder, but did not work on Result rename)
+  bool isNeedContextName = theContext->shape().get() && !theContext->shape()->isEqual(theSubSh);
 
   // check if the subShape is already in DF
-  aName = getShapeName(aDoc, aSubShape);
+  aName = getShapeName(aDoc, aSubShape, isNeedContextName);
   if(aName.empty() ) { // not in the document!
     TopAbs_ShapeEnum aType = aSubShape.ShapeType();
     switch (aType) {
@@ -126,7 +146,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
       break;
     case TopAbs_EDGE:
       {
-        // name structure: F1 | F2 [| F3 | F4], where F1 & F2 the faces which gives the Edge in trivial case
+        // name structure: F1 & F2 [& F3 & F4], where F1 & F2 the faces which gives the Edge in trivial case
         // if it is not atrivial case we use localization by neighbours. F3 & F4 - neighbour faces	
         if (BRep_Tool::Degenerated(TopoDS::Edge(aSubShape))) {
           aName = "Degenerated_Edge";
@@ -164,7 +184,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
         // build name of the sub-shape Edge
         for(int i=1; i <= aSMap.Extent(); i++) {
           const TopoDS_Shape& aFace = aSMap.FindKey(i);
-          std::string aFaceName = getShapeName(aDoc, aFace);
+          std::string aFaceName = getShapeName(aDoc, aFace, isNeedContextName);
           if(i == 1)
             aName = aFaceName;
           else 
@@ -172,7 +192,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
         }
         TopTools_ListIteratorOfListOfShape itl(aListOfNbs);
         for (;itl.More();itl.Next()) {
-          std::string aFaceName = getShapeName(aDoc, itl.Value());
+          std::string aFaceName = getShapeName(aDoc, itl.Value(), isNeedContextName);
           aName += "&" + aFaceName;
         }		  
       }
@@ -221,7 +241,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
             TopTools_ListIteratorOfListOfShape itl(aListE);
             for (int i = 1;itl.More();itl.Next(),i++) {
               const TopoDS_Shape& anEdge = itl.Value();
-              std::string anEdgeName = getShapeName(aDoc, anEdge);
+              std::string anEdgeName = getShapeName(aDoc, anEdge, isNeedContextName);
               if (anEdgeName.empty()) { // edge is not in DS, trying by faces anyway
                 isByFaces = true;
                 aName.clear();
@@ -241,7 +261,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
           TopTools_ListIteratorOfListOfShape itl(aList);
           for (int i = 1;itl.More();itl.Next(),i++) {
             const TopoDS_Shape& aFace = itl.Value();
-            std::string aFaceName = getShapeName(aDoc, aFace);
+            std::string aFaceName = getShapeName(aDoc, aFace, isNeedContextName);
             if(i == 1)
               aName = aFaceName;
             else 
@@ -251,10 +271,8 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
       }
       break;
     }
-    // register name			
-    // aDoc->addNamingName(selectionLabel(), aName);
-    // the selected sub-shape will not be shared and as result it will not require registration
   }
+
   return aName;
 }
 
@@ -311,9 +329,13 @@ const TopoDS_Shape getShapeFromNS(
   if (n == std::string::npos) n = 0;
   std::string aSubString = theSubShapeName.substr(n + 1);
   n = aSubString.rfind('_');
-  if (n == std::string::npos) return aSelection;
-  aSubString = aSubString.substr(n+1);
-  int indx = atoi(aSubString.c_str());
+  int indx;
+  if (n == std::string::npos) {// for primitives this is a first 
+    indx = 1;
+  } else {
+    aSubString = aSubString.substr(n+1);
+    indx = atoi(aSubString.c_str());
+  }
 
   TNaming_Iterator anItL(theNS);
   for(int i = 1; anItL.More(); anItL.Next(), i++) {
@@ -328,18 +350,19 @@ const TopoDS_Shape findFaceByName(
   const std::string& theSubShapeName, std::shared_ptr<Model_Document> theDoc)
 {
   TopoDS_Shape aFace;
-  std::string::size_type n, nb = theSubShapeName.rfind('/');			
-  if (nb == std::string::npos) nb = 0;
-  std::string aSubString = theSubShapeName.substr(nb + 1);
-  n = aSubString.rfind('_');
-  if (n != std::string::npos) {
-    std::string aSubStr2 = aSubString.substr(0, n);
-    aSubString  = theSubShapeName.substr(0, nb + 1);
-    aSubString = aSubString + aSubStr2;	
-  } else
-    aSubString = theSubShapeName;
+  //std::string::size_type n, nb = theSubShapeName.rfind('/');			
+  //if (nb == std::string::npos) nb = 0;
+  //std::string aSubString = theSubShapeName.substr(nb + 1);
+  std::string aSubString = theSubShapeName;
 
-  const TDF_Label& aLabel = theDoc->findNamingName(aSubString);
+  TDF_Label aLabel = theDoc->findNamingName(aSubString);
+  if (aLabel.IsNull()) { // try to remove additional artificial suffix
+    std::string::size_type n = aSubString.rfind('_');
+    if (n != std::string::npos) {
+      aSubString = aSubString.substr(0, n);
+       aLabel = theDoc->findNamingName(aSubString);
+    }
+  }
   if(aLabel.IsNull()) return aFace;
   Handle(TNaming_NamedShape) aNS;
   if(aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
@@ -450,8 +473,152 @@ std::string getContextName(const std::string& theSubShapeName)
 {
   std::string aName;
   std::string::size_type n = theSubShapeName.find('/');			
-  if (n == std::string::npos) return aName;
+  if (n == std::string::npos) return theSubShapeName;
   aName = theSubShapeName.substr(0, n);
+  return aName;
+}
+
+/// Parses naming name of sketch sub-elements: takes indices and orientation 
+/// (if theOriented = true) from this name. Map theIDs constains indices -> 
+/// orientations and start/end vertices: negative is reversed, 2 - start, 3 - end
+bool parseSubIndices(CompositeFeaturePtr theComp, //< to iterate names
+  const std::string& theName, const char* theShapeType, 
+  std::map<int, int>& theIDs, const bool theOriented = false)
+{
+  // collect all IDs in the name
+  std::map<std::string, int> aNames; // short name of sub -> ID of sub of theComp
+  const int aSubNum = theComp->numberOfSubs();
+  for(int a = 0; a < aSubNum; a++) {
+    FeaturePtr aSub = theComp->subFeature(a);
+    const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
+    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
+    // there may be many shapes (circle and center)
+    for(; aRes != aResults.cend(); aRes++) {
+      ResultConstructionPtr aConstr = 
+        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
+      if (aConstr.get()) {
+        aNames[Model_SelectionNaming::shortName(aConstr)] = theComp->subFeatureId(a);
+      }
+    }
+  }
+
+  size_t aPrevPos = theName.find("/") + 1, aLastNamePos;
+  bool isShape = false; // anyway the first world must be 'Vertex'
+  do {
+    aLastNamePos = theName.find('-', aPrevPos);
+    std::string anID = theName.substr(aPrevPos, aLastNamePos - aPrevPos);
+    if (!isShape) {
+      if (anID != theShapeType)
+        return false;
+      isShape = true;
+    } else {
+      int anOrientation = 1; // default
+      if (theOriented) { // here must be a symbol in the end of digit 'f' or 'r'
+        std::string::iterator aSymbol = anID.end() - 1;
+        if (*aSymbol == 'r') anOrientation = -1;
+        anID.erase(aSymbol); // remove last symbol
+      }
+      // check start/end symbols
+      std::string::iterator aBack = anID.end() - 1;
+      if (*aBack == 's') {
+        anOrientation *= 2;
+        anID.erase(aBack); // remove last symbol
+      } else if (*aBack == 'e') {
+        anOrientation *= 3;
+        anID.erase(aBack); // remove last symbol
+      }
+
+      if (aNames.find(anID) != aNames.end()) {
+        theIDs[aNames[anID]] = anOrientation;
+      }
+    }
+    aPrevPos = aLastNamePos + 1;
+  } while (aLastNamePos != std::string::npos);
+  return true;
+}
+
+/// produces theEdge orientation relatively to theContext face
+int Model_SelectionNaming::edgeOrientation(const TopoDS_Shape& theContext, TopoDS_Edge& theEdge)
+{
+  if (theContext.ShapeType() != TopAbs_FACE && theContext.ShapeType() != TopAbs_WIRE)
+    return 0;
+  if (theEdge.Orientation() == TopAbs_FORWARD) 
+    return 1;
+  if (theEdge.Orientation() == TopAbs_REVERSED) 
+    return -1;
+  return 0; // unknown
+}
+
+std::shared_ptr<GeomAPI_Shape> Model_SelectionNaming::findAppropriateFace(
+  std::shared_ptr<ModelAPI_Result>& theConstr, 
+  NCollection_DataMap<Handle(Geom_Curve), int>& theCurves)
+{
+  int aBestFound = 0; // best number of found edges (not percentage: issue 1019)
+  int aBestOrient = 0; // for the equal "BestFound" additional parameter is orientation
+  std::shared_ptr<GeomAPI_Shape> aResult;
+  ResultConstructionPtr aConstructionContext = 
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theConstr);
+  if (!aConstructionContext.get())
+    return aResult;
+  for(int aFaceIndex = 0; aFaceIndex < aConstructionContext->facesNum(); aFaceIndex++) {
+    int aFound = 0, aNotFound = 0, aSameOrientation = 0;
+    TopoDS_Face aFace = 
+      TopoDS::Face(aConstructionContext->face(aFaceIndex)->impl<TopoDS_Shape>());
+    TopExp_Explorer anEdgesExp(aFace, TopAbs_EDGE);
+    TColStd_MapOfTransient alreadyProcessed; // to avoid counting edges with same curved (841)
+    for(; anEdgesExp.More(); anEdgesExp.Next()) {
+      TopoDS_Edge anEdge = TopoDS::Edge(anEdgesExp.Current());
+      if (!anEdge.IsNull()) {
+        Standard_Real aFirst, aLast;
+        Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+        if (alreadyProcessed.Contains(aCurve))
+          continue;
+        alreadyProcessed.Add(aCurve);
+        if (theCurves.IsBound(aCurve)) {
+          aFound++;
+          int anOrient = theCurves.Find(aCurve);
+          if (anOrient != 0) {  // extra comparision score is orientation
+            if (edgeOrientation(aFace, anEdge) == anOrient)
+              aSameOrientation++;
+          }
+        } else {
+          aNotFound++;
+        }
+      }
+    }
+    if (aFound + aNotFound != 0) {
+      if (aFound > aBestFound || 
+        (aFound == aBestFound && aSameOrientation > aBestOrient)) {
+          aBestFound = aFound;
+          aBestOrient = aSameOrientation;
+          aResult = aConstructionContext->face(aFaceIndex);
+      }
+    }
+  }
+  return aResult;
+}
+
+std::string Model_SelectionNaming::shortName(
+  std::shared_ptr<ModelAPI_ResultConstruction>& theConstr, const int theEdgeVertexPos)
+{
+  std::string aName = theConstr->data()->name();
+  // remove "-", "/" and "&" command-symbols
+  aName.erase(std::remove(aName.begin(), aName.end(), '-'), aName.end());
+  aName.erase(std::remove(aName.begin(), aName.end(), '/'), aName.end());
+  aName.erase(std::remove(aName.begin(), aName.end(), '&'), aName.end());
+  // remove the last 's', 'e', 'f' and 'r' symbols: they are used as markers of start/end/forward/rewersed indicators
+  static const std::string aSyms("sefr");
+  std::string::iterator aSuffix = aName.end() - 1;
+  while(aSyms.find(*aSuffix) != std::string::npos) {
+    --aSuffix;
+  }
+  aName.erase(aSuffix + 1, aName.end());
+
+  if (theEdgeVertexPos == 1) {
+    aName += "s"; // start
+  } else if (theEdgeVertexPos == 2) {
+    aName += "e"; // end
+  }
   return aName;
 }
 
@@ -462,108 +629,277 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
 {
   if(theSubShapeName.empty() || theType.empty()) return false;
   TopAbs_ShapeEnum aType = translateType(theType);
-  std::string aContName = getContextName(theSubShapeName);
+
+  // check that it was selected in another document
+  size_t aSlash = theSubShapeName.find("/");
+  std::string aSubShapeName = theSubShapeName;
+  std::shared_ptr<Model_Document> aDoc = theDoc;
+  if (aSlash != std::string::npos) {
+    std::string aDocName = theSubShapeName.substr(0, aSlash);
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+    if (aDocName == aRootDoc->kind()) {
+      aDoc = std::dynamic_pointer_cast<Model_Document>(aRootDoc);
+    } else {
+      for (int a = aRootDoc->size(ModelAPI_ResultPart::group()) - 1; a >= 0; a--) {
+        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(
+            aRootDoc->object(ModelAPI_ResultPart::group(), a));
+        if (aPart.get() && aPart->isActivated() && aPart->data()->name() == aDocName) {
+          aDoc = std::dynamic_pointer_cast<Model_Document>(aPart->partDoc());
+        }
+      }
+    }
+    if (aDoc != theDoc) { // so, the first word is the document name => reduce the string for the next manips
+      aSubShapeName = theSubShapeName.substr(aSlash + 1);
+    }
+  }
+
+  std::string aContName = getContextName(aSubShapeName);
   if(aContName.empty()) return false;
-  ResultPtr aCont = theDoc->findByName(aContName);
-  if(!aCont.get() || aCont->shape()->isNull()) return false;
-  TopoDS_Shape aContext  = aCont->shape()->impl<TopoDS_Shape>();
-  TopAbs_ShapeEnum aContType = aContext.ShapeType();
-  if(aType <= aContType) return false; // not applicable
+  ResultPtr aCont = aDoc->findByName(aContName);
+   // possible this is body where postfix is added to distinguish several shapes on the same label
+  int aSubShapeId = -1; // -1 means sub shape not found
+  // for result body the name wihtout "_" has higher priority than with it: it is always added
+  if ((!aCont.get()/* || (aCont->groupName() == ModelAPI_ResultBody::group())*/) && 
+       aContName == aSubShapeName) {
+    size_t aPostIndex = aContName.rfind('_');
+    if (aPostIndex != std::string::npos) {
+      std::string aSubContName = aContName.substr(0, aPostIndex);
+      ResultPtr aSubCont = aDoc->findByName(aSubContName);
+      if (aSubCont.get()) {
+        try {
+          std::string aNum = aContName.substr(aPostIndex + 1);
+          aSubShapeId = std::stoi(aNum);
+        } catch (std::invalid_argument&) {
+          aSubShapeId = -1;
+        }
+        if (aSubShapeId > 0) {
+          aContName = aSubContName;
+          aCont = aSubCont;
+        }
+      }
+    }
+  }
 
 
   TopoDS_Shape aSelection;
   switch (aType) 
   {
-  case TopAbs_COMPOUND:
-    break;
-  case TopAbs_COMPSOLID:
-    break;
-  case TopAbs_SOLID:
-    break;
-  case TopAbs_SHELL:
-    break;
   case TopAbs_FACE:
-    {
-      const TopoDS_Shape aSelection = findFaceByName(theSubShapeName, theDoc);
-      if(!aSelection.IsNull()) {// Select it
-        std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected(new GeomAPI_Shape());
-        aShapeToBeSelected->setImpl(new TopoDS_Shape(aSelection));
-        theShapeToBeSelected = aShapeToBeSelected;
-        theCont = aCont;
-        return true;
-      }
-    }
-    break;
   case TopAbs_WIRE:
+    {
+      aSelection = findFaceByName(aSubShapeName, aDoc);
+    }
     break;
   case TopAbs_EDGE:
     {  
-      TopoDS_Shape aSelection;// = findFaceByName(theSubShapeName, aDoc);
-      const TDF_Label& aLabel = theDoc->findNamingName(theSubShapeName);
+      const TDF_Label& aLabel = aDoc->findNamingName(aSubShapeName);
       if(!aLabel.IsNull()) {
         Handle(TNaming_NamedShape) aNS;
         if(aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-          aSelection = getShapeFromNS(theSubShapeName, aNS);
+          aSelection = getShapeFromNS(aSubShapeName, aNS);
         }
-      }
-      if(aSelection.IsNull()) {
-        std::list<std::string> aListofNames;
-        size_t n = ParseName(theSubShapeName, aListofNames);
-        if(n > 1 && n < 5) {
-          TopTools_ListOfShape aList;
-          std::list<std::string>::iterator it =aListofNames.begin();
-          for(;it != aListofNames.end();it++){
-            const TopoDS_Shape aFace = findFaceByName(*it, theDoc);
-            aList.Append(aFace);		
-          }
-          aSelection = findCommonShape(TopAbs_EDGE, aList);
-        }
-      }
-      if(!aSelection.IsNull()) {// Select it
-        std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected(new GeomAPI_Shape());
-        aShapeToBeSelected->setImpl(new TopoDS_Shape(aSelection));
-        theShapeToBeSelected = aShapeToBeSelected;
-        theCont = aCont;
-        return true;
       }
     }
     break;
   case TopAbs_VERTEX:
     {
-      TopoDS_Shape aSelection;
-      const TDF_Label& aLabel = theDoc->findNamingName(theSubShapeName);
+      const TDF_Label& aLabel = aDoc->findNamingName(aSubShapeName);
       if(!aLabel.IsNull()) {
         Handle(TNaming_NamedShape) aNS;
         if(aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-          aSelection = getShapeFromNS(theSubShapeName, aNS);
+          aSelection = getShapeFromNS(aSubShapeName, aNS);
         }
-      }
-      if(aSelection.IsNull()) {
-        std::list<std::string> aListofNames;
-        size_t n = ParseName(theSubShapeName, aListofNames);
-        if(n > 1 && n < 4) { // 2 || 3
-          TopTools_ListOfShape aList;
-          std::list<std::string>::iterator it = aListofNames.begin();
-          for(; it != aListofNames.end(); it++){
-            const TopoDS_Shape aFace = findFaceByName(*it, theDoc);
-            if(!aFace.IsNull())
-              aList.Append(aFace);		
-          }
-          aSelection = findCommonShape(TopAbs_VERTEX, aList);
-        }
-      }
-      if(!aSelection.IsNull()) {// Select it
-        std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected(new GeomAPI_Shape());
-        aShapeToBeSelected->setImpl(new TopoDS_Shape(aSelection));
-        theShapeToBeSelected = aShapeToBeSelected;
-        theCont = aCont;
-        return true;
       }
     }
     break;
-  default: //TopAbs_SHAPE
+  case TopAbs_COMPOUND:
+  case TopAbs_COMPSOLID:
+  case TopAbs_SOLID:
+  case TopAbs_SHELL:
+  default: {//TopAbs_SHAPE
+    /// case when the whole sketch is selected, so, selection type is compound, but there is no value
+    if (aCont.get() && aCont->shape().get()) {
+      if (aCont->shape()->impl<TopoDS_Shape>().ShapeType() == aType) {
+        theCont = aCont;
+        return true;
+      } else if (aSubShapeId > 0) { // try to find sub-shape by the index
+        TopExp_Explorer anExp(aCont->shape()->impl<TopoDS_Shape>(), aType);
+        for(; aSubShapeId > 1 && anExp.More(); aSubShapeId--) {
+          anExp.Next();
+        }
+        if (anExp.More()) {
+          std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected(new GeomAPI_Shape());
+          aShapeToBeSelected->setImpl(new TopoDS_Shape(anExp.Current()));
+          theShapeToBeSelected = aShapeToBeSelected;
+          theCont = aCont;
+          return true;
+        }
+      }
+    }
     return false;
+    }
+  }
+  // another try to find edge or vertex by faces
+  std::list<std::string> aListofNames;
+  size_t aN = aSelection.IsNull() ? ParseName(aSubShapeName, aListofNames) : 0;
+  if (aSelection.IsNull() && (aType == TopAbs_EDGE || aType == TopAbs_VERTEX)) {
+    if(aN > 1 && (aN < 4 || (aType == TopAbs_EDGE && aN < 5))) { // 2 || 3 or 4 for EDGE
+      TopTools_ListOfShape aList;
+      std::list<std::string>::iterator it = aListofNames.begin();
+      for(; it != aListofNames.end(); it++){
+        const TopoDS_Shape aFace = findFaceByName(*it, aDoc);
+        if(!aFace.IsNull())
+          aList.Append(aFace);		
+      }
+      aSelection = findCommonShape(aType, aList);
+    }
+  }
+  if (!aSelection.IsNull()) {// Select it
+    std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected(new GeomAPI_Shape());
+    aShapeToBeSelected->setImpl(new TopoDS_Shape(aSelection));
+    theShapeToBeSelected = aShapeToBeSelected;
+    theCont = aCont;
+    return true;
+  }
+  // in case of construction, there is no registered names for all sub-elements,
+  // even for the main element; so, trying to find them by name (without "&" intersections)
+  if (aN == 0) {
+    size_t aConstrNamePos = aSubShapeName.find("/");
+    bool isFullName = aConstrNamePos == std::string::npos;
+    std::string aContrName = aContName;
+    ResultPtr aConstr = aDoc->findByName(aContrName);
+    if (aConstr.get() && aConstr->groupName() == ModelAPI_ResultConstruction::group()) {
+      theCont = aConstr;
+      if (isFullName) {
+        // For the full construction selection shape must be empty.
+        //theShapeToBeSelected = aConstr->shape();
+        return true;
+      }
+      // for sketch sub-elements selected
+      CompositeFeaturePtr aComposite = 
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aDoc->feature(aConstr));
+      if (aComposite.get()) {
+        if (aType == TopAbs_VERTEX || aType == TopAbs_EDGE) {
+          // collect all IDs in the name
+          std::map<int, int> anIDs;
+          if (!parseSubIndices(aComposite, aSubShapeName, 
+              aType == TopAbs_EDGE ? "Edge" : "Vertex", anIDs))
+            return false;
+
+          const int aSubNum = aComposite->numberOfSubs();
+          for(int a = 0; a < aSubNum; a++) {
+            int aCompID = aComposite->subFeatureId(a);
+            if (anIDs.find(aCompID) != anIDs.end()) { // found the vertex/edge shape
+              FeaturePtr aSub = aComposite->subFeature(a);
+              const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
+              std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIt = aResults.cbegin();
+              // there may be many shapes (circle and center)
+              for(; aRIt != aResults.cend(); aRIt++) {
+                ResultConstructionPtr aRes = 
+                  std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRIt);
+                if (aRes) {
+                  int anOrientation = abs(anIDs[aCompID]);
+                  TopoDS_Shape aShape = aRes->shape()->impl<TopoDS_Shape>();
+                  if (anOrientation == 1) {
+                    if (aType == aShape.ShapeType()) {
+                      theShapeToBeSelected = aRes->shape();
+                      return true;
+                    }
+                  } else { // take first or second vertex of the edge
+                    TopoDS_Shape aShape = aRes->shape()->impl<TopoDS_Shape>();
+                    TopExp_Explorer anExp(aShape, aType);
+                    for(; anExp.More() && anOrientation != 2; anOrientation--)
+                      anExp.Next();
+                    if (anExp.More()) {
+                      std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected(new GeomAPI_Shape());
+                      aShapeToBeSelected->setImpl(new TopoDS_Shape(anExp.Current()));
+                      theShapeToBeSelected = aShapeToBeSelected;
+                      return true;
+                    }
+                  }
+                }
+              }
+            }
+          }
+          // sketch faces is identified by format "Sketch_1/Face-2f-8f-11r"
+        } else if (aType == TopAbs_FACE || aType == TopAbs_WIRE) {
+          std::map<int, int> anIDs;
+          if (!parseSubIndices(aComposite, aSubShapeName, 
+              aType == TopAbs_FACE ? "Face" : "Wire", anIDs, true))
+            return false;
+
+          NCollection_DataMap<Handle(Geom_Curve), int> allCurves; // curves and orientations of edges
+          const int aSubNum = aComposite->numberOfSubs();
+          for(int a = 0; a < aSubNum; a++) {
+            int aSubID = aComposite->subFeatureId(a);
+            if (anIDs.find(aSubID) != anIDs.end()) {
+              FeaturePtr aSub = aComposite->subFeature(a);
+              const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
+              std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes;
+              for(aRes = aResults.cbegin(); aRes != aResults.cend(); aRes++) {
+                ResultConstructionPtr aConstr = 
+                  std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
+                if (aConstr->shape() && aConstr->shape()->isEdge()) {
+                  const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
+                  TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
+                  if (!anEdge.IsNull()) {
+                    Standard_Real aFirst, aLast;
+                    Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+                    allCurves.Bind(aCurve, anIDs[aSubID] > 0 ? 1 : -1);
+                  }
+                }
+              }
+            }
+          }
+          std::shared_ptr<GeomAPI_Shape> aFoundFace = findAppropriateFace(aConstr, allCurves);
+          if (aFoundFace.get()) {
+            if (aType == TopAbs_WIRE) { // just get a wire from face to have wire
+              TopExp_Explorer aWireExp(aFoundFace->impl<TopoDS_Shape>(), TopAbs_WIRE);
+              if (aWireExp.More()) {
+                theShapeToBeSelected.reset(new GeomAPI_Shape);
+                theShapeToBeSelected->setImpl<TopoDS_Shape>(new TopoDS_Shape(aWireExp.Current()));
+              } else return false;
+            } else {
+              theShapeToBeSelected = aFoundFace;
+            }
+            return true;
+          }
+        } else if (aType == TopAbs_WIRE) { // sketch faces is identified by format "Sketch_1/Face-2f-8f-11r"
+          std::map<int, int> anIDs;
+          if (!parseSubIndices(aComposite, aSubShapeName, "Wire", anIDs))
+            return false;
+
+          NCollection_DataMap<Handle(Geom_Curve), int> allCurves; // curves and orientations of edges
+          const int aSubNum = aComposite->numberOfSubs();
+          for(int a = 0; a < aSubNum; a++) {
+            int aSubID = aComposite->subFeatureId(a);
+            if (anIDs.find(aSubID) != anIDs.end()) {
+              FeaturePtr aSub = aComposite->subFeature(a);
+              const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
+              std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes;
+              for(aRes = aResults.cbegin(); aRes != aResults.cend(); aRes++) {
+                ResultConstructionPtr aConstr = 
+                  std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
+                if (aConstr->shape() && aConstr->shape()->isEdge()) {
+                  const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
+                  TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
+                  if (!anEdge.IsNull()) {
+                    Standard_Real aFirst, aLast;
+                    Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+                    allCurves.Bind(aCurve, anIDs[aSubID] > 0 ? 1 : -1);
+                  }
+                }
+              }
+            }
+          }
+          std::shared_ptr<GeomAPI_Shape> aFoundFace = findAppropriateFace(aConstr, allCurves);
+          if (aFoundFace.get()) {
+            theShapeToBeSelected = aFoundFace;
+            return true;
+          }
+        }
+      }
+    }
   }
   return false;
 }
-

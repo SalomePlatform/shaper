@@ -21,9 +21,13 @@ aSession = ModelAPI_Session.get()
 aPartSet = aSession.moduleDocument()
 aSession.startOperation()
 aSketchFeature = featureToCompositeFeature(aPartSet.addFeature("Sketch"))
+aXOYPlane = objectToResult(aPartSet.objectByName("Construction", "XOY"))
+aSketchFeature.selection("External").setValue(aXOYPlane, None)
 aFeatureData = aSketchFeature.data()
 anArray = aFeatureData.addAttribute("IntArray_1", "IntArray")
 aFeatureData.intArray("IntArray_1").setSize(5)
+aSession.finishOperation()
+
 assert(aFeatureData.intArray("IntArray_1").size() == 5)
 
 #=========================================================================

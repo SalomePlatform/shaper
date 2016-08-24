@@ -6,6 +6,7 @@ SET(PROJECT_HEADERS
   SketchAPI.h
   SketchAPI_Arc.h
   SketchAPI_Circle.h
+  SketchAPI_Constraint.h
   SketchAPI_IntersectionPoint.h
   SketchAPI_Line.h
   SketchAPI_Mirror.h
@@ -21,6 +22,7 @@ SET(PROJECT_HEADERS
 SET(PROJECT_SOURCES
   SketchAPI_Arc.cpp
   SketchAPI_Circle.cpp
+  SketchAPI_Constraint.cpp
   SketchAPI_IntersectionPoint.cpp
   SketchAPI_Line.cpp
   SketchAPI_Mirror.cpp
@@ -44,6 +46,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/ModelAPI
   ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
   ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
+  ${PROJECT_SOURCE_DIR}/src/SketcherPrs
 )
 
 # Plugin headers dependency

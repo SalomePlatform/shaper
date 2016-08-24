@@ -6,6 +6,7 @@
 
 #include "FeaturesAPI_Translation.h"
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
@@ -57,6 +58,20 @@ void FeaturesAPI_Translation::setDistance(const ModelHighAPI_Double& theDistance
   fillAttribute(theDistance, mydistance);
 
   execute();
+}
+
+//==================================================================================================
+void FeaturesAPI_Translation::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Translation::OBJECTS_LIST_ID());
+  AttributeSelectionPtr anAttrAxis = aBase->selection(FeaturesPlugin_Translation::AXIS_OBJECT_ID());
+  AttributeDoublePtr anAttrDistance = aBase->real(FeaturesPlugin_Translation::DISTANCE_ID());
+
+  theDumper << aBase << " = model.addTranslation(" << aDocName << ", "
+            << anAttrObjects << ", " << anAttrAxis << ", " << anAttrDistance << ")" << std::endl;
 }
 
 //==================================================================================================

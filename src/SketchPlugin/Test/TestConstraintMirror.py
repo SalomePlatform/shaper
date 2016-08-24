@@ -28,7 +28,7 @@ def normalize(theDir):
     return [theDir[0] / aLen, theDir[1] / aLen]
 
 def checkMirror(theListInit, theListMirr, theMirrorLine):
-    TOL = 5.e-5
+    TOL = 6.e-5
     aListSize = theListInit.size()
     
     aLineStartPoint = geomDataAPI_Point2D(theMirrorLine.attribute("StartPoint"))
@@ -201,3 +201,27 @@ checkMirror(aRefListB, aRefListC, aMirrorLine)
 #=========================================================================
 # End of test
 #=========================================================================
+
+
+# make second line fixed
+aSession.startOperation()
+aFixed = aSketchFeature.addFeature("SketchConstraintRigid")
+aRefObjectA = aFixed.refattr("ConstraintEntityA")
+anObjectA = modelAPI_ResultConstruction(aSketchLine2.lastResult())
+assert (anObjectA is not None)
+aRefObjectA.setObject(anObjectA)
+aFixed.execute()
+aSession.finishOperation()
+# set mirror for first line to check dumping
+aSession.startOperation()
+aRefListInitial.clear()
+assert (aRefListB.size() == 0)
+assert (aRefListC.size() == 0)
+aRefListInitial.append(aSketchLine1.lastResult())
+aSession.finishOperation()
+assert (aRefListB.size() == 1)
+assert (aRefListC.size() == 1)
+checkMirror(aRefListB, aRefListC, aMirrorLine)
+
+import model
+assert(model.checkPythonDump())

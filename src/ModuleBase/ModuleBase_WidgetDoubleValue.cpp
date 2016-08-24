@@ -155,7 +155,7 @@ bool ModuleBase_WidgetDoubleValue::restoreValueCustom()
   if (!aTextRepr.empty()) {
     ModuleBase_Tools::setSpinText(mySpinBox, QString::fromStdString(aTextRepr));
   } else {
-    ModuleBase_Tools::setSpinValue(mySpinBox, aRef->value());
+    ModuleBase_Tools::setSpinValue(mySpinBox, aRef->isInitialized() ? aRef->value() : 0);
   }
   return true;
 }

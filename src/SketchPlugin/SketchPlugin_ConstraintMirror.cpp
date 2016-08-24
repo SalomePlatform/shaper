@@ -234,18 +234,14 @@ void SketchPlugin_ConstraintMirror::attributeChanged(const std::string& theID)
   if (theID == MIRROR_LIST_ID()) {
     AttributeRefListPtr aMirrorObjectRefs = reflist(MIRROR_LIST_ID());
     if (aMirrorObjectRefs->size() == 0) {
+      DocumentPtr aDoc = document();
       // Clear list of objects
       AttributeRefListPtr aRefListOfMirrored = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
           data()->attribute(SketchPlugin_Constraint::ENTITY_C()));
       std::list<ObjectPtr> aTargetList = aRefListOfMirrored->list();
       std::list<ObjectPtr>::iterator aTargetIter = aTargetList.begin();
       for (; aTargetIter != aTargetList.end(); aTargetIter++) {
-        aRefListOfMirrored->remove(*aTargetIter);
-        // remove the corresponding feature from the sketch
-        ResultConstructionPtr aRC =
-            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aTargetIter);
-        DocumentPtr aDoc = aRC ? aRC->document() : DocumentPtr();
-        FeaturePtr aFeature =  aDoc ? aDoc->feature(aRC) : FeaturePtr();
+        FeaturePtr aFeature = ModelAPI_Feature::feature(*aTargetIter);
         if (aFeature)
           aDoc->removeFeature(aFeature);
       }

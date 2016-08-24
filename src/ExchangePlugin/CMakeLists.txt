@@ -6,6 +6,7 @@ INCLUDE(UnitTest)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/Config
                     ${PROJECT_SOURCE_DIR}/src/ModelAPI
+                    ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
                     ${PROJECT_SOURCE_DIR}/src/XAO
@@ -18,6 +19,7 @@ SET(PROJECT_HEADERS
     ExchangePlugin_ExportFeature.h
     ExchangePlugin_Validators.h
     ExchangePlugin_Tools.h
+    ExchangePlugin_Dump.h
 )
 
 SET(PROJECT_SOURCES
@@ -26,6 +28,7 @@ SET(PROJECT_SOURCES
     ExchangePlugin_ExportFeature.cpp
     ExchangePlugin_Validators.cpp
     ExchangePlugin_Tools.cpp
+    ExchangePlugin_Dump.cpp
 )
 
 SET(XML_RESOURCES
@@ -41,6 +44,7 @@ SET(PROJECT_LIBRARIES
     Events
     Config
     ModelAPI
+    ModelHighAPI
     GeomAPI
     GeomAlgoAPI
     XAO

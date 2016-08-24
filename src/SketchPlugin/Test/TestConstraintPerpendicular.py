@@ -121,3 +121,6 @@ assert (aLineBEndPointPrev   != (aLineBEndPoint.x(),   aLineBEndPoint.y()))
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

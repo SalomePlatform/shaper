@@ -210,3 +210,6 @@ checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

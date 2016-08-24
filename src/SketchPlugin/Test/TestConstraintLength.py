@@ -94,3 +94,6 @@ assert (math.fabs(aLineAEndPoint.x() - aLineAStartPoint.x() - 140) < 1.e-10)
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

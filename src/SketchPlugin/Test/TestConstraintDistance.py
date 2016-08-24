@@ -104,9 +104,13 @@ assert (aLineResult is not None)
 aConstraint.execute()
 refattrA.setAttr(aSketchPointCoords)
 refattrB.setAttr(aLineAStartPoint)
+aSession.finishOperation()
+# set flyout point then abort operation, after that check the Distance is correct
+aSession.startOperation()
 aFlyoutPoint = geomDataAPI_Point2D(aConstraint.attribute("ConstraintFlyoutValuePnt"))
 aFlyoutPoint.setValue(50.0, 100.0)
 aSession.finishOperation()
+aSession.abortOperation()
 assert (refattrA.isInitialized())
 assert (refattrB.isInitialized())
 assert (aDistance.isInitialized())
@@ -154,9 +158,13 @@ aLineResult = aSketchLine.firstResult()
 assert (aLineResult is not None)
 refattrA.setObject(aLineResult)
 refattrB.setAttr(aSketchPointCoords)
+aSession.finishOperation()
+# set flyout point then abort operation, after that check the Distance is correct
+aSession.startOperation()
 aFlyoutPoint = geomDataAPI_Point2D(aConstraint.attribute("ConstraintFlyoutValuePnt"))
 aFlyoutPoint.setValue(50.0, 100.0)
 aSession.finishOperation()
+aSession.abortOperation()
 assert (refattrA.isInitialized())
 assert (refattrB.isInitialized())
 assert (aDistance.isInitialized())
@@ -179,3 +187,6 @@ assert (math.fabs(distancePointPoint(aLineAStartPoint, aLineAEndPoint) - PT_LINE
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

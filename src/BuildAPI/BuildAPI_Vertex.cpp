@@ -6,6 +6,7 @@
 
 #include "BuildAPI_Vertex.h"
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
@@ -45,4 +46,14 @@ VertexPtr addVertex(const std::shared_ptr<ModelAPI_Document>& thePart,
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(BuildAPI_Vertex::ID());
   return VertexPtr(new BuildAPI_Vertex(aFeature, theBaseObjects));
+}
+
+//==================================================================================================
+void BuildAPI_Vertex::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  std::string aPartName = theDumper.name(aBase->document());
+
+  theDumper << aBase << " = model.addVertex(" << aPartName << ", "
+            << aBase->selectionList(BuildPlugin_Vertex::BASE_OBJECTS_ID()) << ")" << std::endl;
 }

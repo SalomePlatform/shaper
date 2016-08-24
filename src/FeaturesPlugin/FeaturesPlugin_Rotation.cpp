@@ -25,8 +25,6 @@ void FeaturesPlugin_Rotation::initAttributes()
   AttributeSelectionListPtr aSelection = 
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
     FeaturesPlugin_Rotation::OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
-  // revolution works with faces always
-  aSelection->setSelectionType("SOLID");
 
   data()->addAttribute(FeaturesPlugin_Rotation::AXIS_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(FeaturesPlugin_Rotation::ANGLE_ID(), ModelAPI_AttributeDouble::typeId());

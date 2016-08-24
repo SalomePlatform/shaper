@@ -117,3 +117,6 @@ assert (aFactory.validate(anExtrusionCutFt))
 assert (len(anExtrusionCutFt.results()) > 0)
 aCurrentResult = modelAPI_ResultBody(anExtrusionCutFt.firstResult())
 assert (aCurrentResult is not None)
+
+import model
+assert(model.checkPythonDump())

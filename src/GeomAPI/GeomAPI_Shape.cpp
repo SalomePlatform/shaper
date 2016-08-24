@@ -287,39 +287,39 @@ std::string GeomAPI_Shape::shapeTypeStr() const
 
   switch(aShapeType) {
     case COMPOUND: {
-      aShapeTypeStr = "Compound";
+      aShapeTypeStr = "COMPOUND";
       break;
     }
     case COMPSOLID: {
-      aShapeTypeStr = "CompSolid";
+      aShapeTypeStr = "COMPSOLID";
       break;
     }
     case SOLID: {
-      aShapeTypeStr = "Solid";
+      aShapeTypeStr = "SOLID";
       break;
     }
     case SHELL: {
-      aShapeTypeStr = "Shell";
+      aShapeTypeStr = "SHELL";
       break;
     }
     case FACE: {
-      aShapeTypeStr = "Face";
+      aShapeTypeStr = "FACE";
       break;
     }
     case WIRE: {
-      aShapeTypeStr = "Wire";
+      aShapeTypeStr = "WIRE";
       break;
     }
     case EDGE: {
-      aShapeTypeStr = "Edge";
+      aShapeTypeStr = "EDGE";
       break;
     }
     case VERTEX: {
-      aShapeTypeStr = "Vertex";
+      aShapeTypeStr = "VERTEX";
       break;
     }
     case SHAPE: {
-      aShapeTypeStr = "Shape";
+      aShapeTypeStr = "SHAPE";
       break;
     }
   }

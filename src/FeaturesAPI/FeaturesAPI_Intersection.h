@@ -14,6 +14,7 @@
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
 
+class ModelHighAPI_Dumper;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Intersection
@@ -47,6 +48,10 @@ public:
   /// Modify tools attribute of the feature.
   FEATURESAPI_EXPORT
   void setTools(const std::list<ModelHighAPI_Selection>& theTools);
+
+  /// Dump wrapped feature
+  FEATURESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Intersection object.

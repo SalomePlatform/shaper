@@ -5,6 +5,7 @@
 // Author:  Sergey BELASH
 
 #include <ExchangePlugin_Plugin.h>
+#include <ExchangePlugin_Dump.h>
 #include <ExchangePlugin_ImportFeature.h>
 #include <ExchangePlugin_ExportFeature.h>
 #include <ExchangePlugin_Validators.h>
@@ -40,6 +41,9 @@ FeaturePtr ExchangePlugin_Plugin::createFeature(string theFeatureID)
   } else
   if (theFeatureID == ExchangePlugin_ExportFeature::ID()) {
     return FeaturePtr(new ExchangePlugin_ExportFeature);
+  } else
+  if (theFeatureID == ExchangePlugin_Dump::ID()) {
+    return FeaturePtr(new ExchangePlugin_Dump);
   }
   // feature of such kind is not found
   return FeaturePtr();

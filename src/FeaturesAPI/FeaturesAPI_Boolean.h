@@ -54,6 +54,10 @@ public:
   /// Set tool objects.
   FEATURESAPI_EXPORT
   void setToolObjects(const std::list<ModelHighAPI_Selection>& theToolObjects);
+
+  /// Dump wrapped feature
+  FEATURESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Boolean object.

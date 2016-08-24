@@ -17,9 +17,17 @@ aSession = ModelAPI_Session.get()
 #=========================================================================
 aPartSet = aSession.moduleDocument()
 aSession.startOperation()
-aPlaneX = aPartSet.objectByName("Construction", "YOZ");
+aPlaneX = aPartSet.addFeature("Plane")
+aPlaneX.string("creation_method").setValue("by_general_equation")
+aPlaneX.real("A").setValue(1.)
+aPlaneX.real("B").setValue(0.)
+aPlaneX.real("C").setValue(0.)
+aPlaneX.real("D").setValue(0.)
 assert(aPlaneX)
-aColors = aPlaneX.data().intArray("Color")
+aSession.finishOperation()
+
+aSession.startOperation()
+aColors = aPlaneX.lastResult().data().intArray("Color")
 assert(aColors)
 # default colors, not filled array
 assert(aColors.size() == 0)
@@ -31,6 +39,7 @@ assert(aColors.size() == 3)
 assert(aColors.value(0) == 100)
 assert(aColors.value(1) == 200)
 assert(aColors.value(2) == 250)
-
 aSession.finishOperation()
 
+import model
+assert(model.checkPythonDump())

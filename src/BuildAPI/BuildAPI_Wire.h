@@ -45,6 +45,10 @@ public:
   /// Adds closed contour.
   BUILDAPI_EXPORT
   void addContour();
+
+  /// Dump wrapped feature
+  BUILDAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Wire object.

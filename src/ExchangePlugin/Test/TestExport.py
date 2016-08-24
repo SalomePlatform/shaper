@@ -90,16 +90,16 @@ def testExportXAO():
 
     aSession.startOperation()
     aGroup = model.addGroup(aPart, [])
-    aGroup.defaultResult().data().setName("")
     aGroup.groupList().setSelectionType("face")
     aGroup.groupList().append("Box_1_1/Shape1_1")
     aGroup.groupList().append("Box_1_1/Shape2_1")
+    aGroup.defaultResult().data().setName("")
 #     aGroupFeature = aSession.activeDocument().addFeature("Group")
 #     aGroupFeature.data().setName("")
 #     aSelectionListAttr = aGroupFeature.selectionList("group_list")
 #     aSelectionListAttr.setSelectionType("face")
-#     aSelectionListAttr.append("Box_1_1/Shape1_1")
-#     aSelectionListAttr.append("Box_1_1/Shape2_1")
+#     aSelectionListAttr.append("Box_1_1/Shape1")
+#     aSelectionListAttr.append("Box_1_1/Shape2")
 #     aGroupFeature.execute()
     aSession.finishOperation()
 
@@ -145,3 +145,5 @@ if __name__ == '__main__':
 #=========================================================================
 # End of test
 #=========================================================================
+
+assert(model.checkPythonDump())

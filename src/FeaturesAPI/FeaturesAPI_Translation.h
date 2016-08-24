@@ -15,6 +15,7 @@
 #include <ModelHighAPI_Macro.h>
 
 class ModelHighAPI_Double;
+class ModelHighAPI_Dumper;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Translation
@@ -54,6 +55,10 @@ public:
   /// Set distance.
   FEATURESAPI_EXPORT
   void setDistance(const ModelHighAPI_Double& theDistance);
+
+  /// Dump wrapped feature
+  FEATURESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Translation object.

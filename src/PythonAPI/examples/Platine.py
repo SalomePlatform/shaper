@@ -218,3 +218,5 @@ b4 = body_4()
 
 boolean = model.addFuse(part, boolean.result() + b4.result())
 model.end()
+
+assert(model.checkPythonDump())

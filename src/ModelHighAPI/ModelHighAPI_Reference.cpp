@@ -25,6 +25,11 @@ ModelHighAPI_Reference::ModelHighAPI_Reference(
     const std::shared_ptr<ModelHighAPI_Interface> & theValue)
 : myObject(std::shared_ptr<ModelAPI_Object>(theValue->defaultResult()))
 {
+  // the result is not constructed yet, forcibly do it
+  if (!myObject) {
+    theValue->execute(true);
+    myObject = std::shared_ptr<ModelAPI_Object>(theValue->defaultResult());
+  }
 }
 
 ModelHighAPI_Reference::~ModelHighAPI_Reference()
@@ -43,4 +48,10 @@ void ModelHighAPI_Reference::appendToList(
     const std::shared_ptr<ModelAPI_AttributeRefList> & theAttribute) const
 {
   theAttribute->append(myObject);
+}
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<ModelAPI_Feature> ModelHighAPI_Reference::feature() const
+{
+  return ModelAPI_Feature::feature(myObject);
 }

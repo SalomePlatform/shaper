@@ -25,7 +25,6 @@ class GeomDataAPI_Point;
 class GeomDataAPI_Point2D;
 //--------------------------------------------------------------------------------------
 class ModelAPI_AttributeBoolean;
-class ModelAPI_AttributeDocRef;
 class ModelAPI_AttributeDouble;
 class ModelAPI_AttributeIntArray;
 class ModelAPI_AttributeInteger;
@@ -78,6 +77,10 @@ void fillAttribute(const ModelHighAPI_Integer & theValue,
                    const std::shared_ptr<ModelAPI_AttributeInteger> & theAttribute);
 
 MODELHIGHAPI_EXPORT
+void fillAttribute(int theValue,
+                   const std::shared_ptr<ModelAPI_AttributeInteger> & theAttribute);
+
+MODELHIGHAPI_EXPORT
 void fillAttribute(const ModelHighAPI_RefAttr & theValue,
                    const std::shared_ptr<ModelAPI_AttributeRefAttr> & theAttribute);
 
@@ -121,10 +124,16 @@ void fillAttribute(const char * theValue,
                    const std::shared_ptr<ModelAPI_AttributeString> & theAttribute);
 
 MODELHIGHAPI_EXPORT
-GeomAPI_Shape::ShapeType shapeTypeByStr(const std::string& theShapeTypeStr);
+GeomAPI_Shape::ShapeType shapeTypeByStr(std::string theShapeTypeStr);
 
 MODELHIGHAPI_EXPORT
 GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection);
+
+/// Performs the high level API dump, then closes all and executes the script:
+/// model must be recreated fully, with all attributes
+/// \returns true if check is well done
+MODELHIGHAPI_EXPORT
+bool checkPythonDump();
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------

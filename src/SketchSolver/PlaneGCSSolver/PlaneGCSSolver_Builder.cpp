@@ -856,7 +856,7 @@ ConstraintWrapperPtr createConstraintMiddlePoint(
   aConstrList.push_back(GCSConstraintPtr(new GCS::ConstraintPointOnLine(*aPoint, *aLine)));
   double aDist = lineLength(*aLine);
   std::shared_ptr<PlaneGCSSolver_ParameterWrapper> aDistance =
-      std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(createParameter(theGroupID, aDist));
+      std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(createParameter(theGroupID, aDist * 0.5));
   aConstrList.push_back(GCSConstraintPtr(
       new GCS::ConstraintP2PDistance(*aPoint, aLine->p1, aDistance->parameter())));
   aConstrList.push_back(GCSConstraintPtr(
@@ -1204,5 +1204,12 @@ void adjustMirror(ConstraintWrapperPtr theConstraint)
 
   if (aPoints.size() == 2)
     makeMirrorPoints(aPoints[0], aPoints[1], aMirrorLine);
+
+  // update scales of constraints
+  std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aGCSConstraint = 
+      std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(theConstraint);
+  std::list<GCSConstraintPtr>::const_iterator aCIt = aGCSConstraint->constraints().begin();
+  for (; aCIt != aGCSConstraint->constraints().end(); ++aCIt)
+    (*aCIt)->rescale();
 }
 

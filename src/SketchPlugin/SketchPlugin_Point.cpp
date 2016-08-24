@@ -69,7 +69,13 @@ void SketchPlugin_Point::attributeChanged(const std::string& theID) {
   // the second condition for unability to move external point anywhere
   if (theID == EXTERNAL_ID() || isFixed()) {
     std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
-     // update arguments due to the selection value
+    if (!aSelection) {
+      // empty shape in selection shows that the shape is equal to context
+      ResultPtr anExtRes = selection(EXTERNAL_ID())->context();
+      if (anExtRes)
+        aSelection = anExtRes->shape();
+    }
+    // update arguments due to the selection value
     if (aSelection && !aSelection->isNull() && aSelection->isVertex()) {
       std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aSelection));
       std::shared_ptr<GeomDataAPI_Point2D> aCoordAttr = 

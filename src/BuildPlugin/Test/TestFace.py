@@ -62,3 +62,6 @@ aSession.finishOperation()
 
 # Test results
 assert (len(aFaceFeature.results()) > 0)
+
+import model
+assert(model.checkPythonDump())

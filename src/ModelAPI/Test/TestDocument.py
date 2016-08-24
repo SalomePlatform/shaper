@@ -88,3 +88,6 @@ aDoc2.addFeature("Remove")
 aSession.finishOperation()
 assert(aSession.moduleDocument().size("Parts") == 0)
 assert(aSession.activeDocument())
+
+import model
+assert(model.checkPythonDump())

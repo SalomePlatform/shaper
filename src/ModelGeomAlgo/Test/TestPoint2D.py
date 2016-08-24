@@ -15,3 +15,6 @@ from ModelGeomAlgo import *
 __updated__ = "2016-07-20"
 
 aSession = ModelAPI_Session.get()
+
+import model
+assert(model.checkPythonDump())

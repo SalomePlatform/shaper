@@ -15,6 +15,7 @@
 #include <ModelHighAPI_Macro.h>
 
 class ModelHighAPI_Double;
+class ModelHighAPI_Reference;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Revolution
@@ -57,6 +58,7 @@ public:
   virtual ~FeaturesAPI_Revolution();
 
   INTERFACE_10(FeaturesPlugin_Revolution::ID(),
+               sketch, FeaturesPlugin_Revolution::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */,
                baseObjects, FeaturesPlugin_Revolution::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */,
                axis, FeaturesPlugin_Revolution::AXIS_OBJECT_ID(), ModelAPI_AttributeSelection, /** Axis */,
                creationMethod, FeaturesPlugin_Revolution::CREATION_METHOD(), ModelAPI_AttributeString, /** Creation method */,
@@ -65,8 +67,11 @@ public:
                toObject, FeaturesPlugin_Revolution::TO_OBJECT_ID(), ModelAPI_AttributeSelection, /** To object */,
                toOffset, FeaturesPlugin_Revolution::TO_OFFSET_ID(), ModelAPI_AttributeDouble, /** To offset */,
                fromObject, FeaturesPlugin_Revolution::FROM_OBJECT_ID(), ModelAPI_AttributeSelection, /** From object */,
-               fromOffset, FeaturesPlugin_Revolution::FROM_OFFSET_ID(), ModelAPI_AttributeDouble, /** From offset */,
-               sketchLauncher, FeaturesPlugin_Revolution::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */)
+               fromOffset, FeaturesPlugin_Revolution::FROM_OFFSET_ID(), ModelAPI_AttributeDouble, /** From offset */)
+
+  /// Modify base attribute of the feature.
+  FEATURESAPI_EXPORT
+  void setNestedSketch(const ModelHighAPI_Reference& theSketch);
 
   /// Modify base attribute of the feature.
   FEATURESAPI_EXPORT
@@ -90,6 +95,13 @@ public:
                            const ModelHighAPI_Double& theToOffset,
                            const ModelHighAPI_Selection& theFromObject,
                            const ModelHighAPI_Double& theFromOffset);
+
+  /// Dump wrapped feature
+  FEATURESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
+private:
+  void execIfBaseNotEmpty();
 };
 
 /// Pointer on Revolution object.

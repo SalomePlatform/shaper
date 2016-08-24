@@ -20,3 +20,6 @@ aFeature1 = aDoc.object("Construction", 7)
 aFeature1Name = aFeature1.data().name()
 
 assert (aFeatureName == aFeature1Name)
+
+import model
+assert(model.checkPythonDump())

@@ -185,6 +185,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   static const Events_ID kPreviewBlockedEvent = aLoop->eventByName(EVENT_PREVIEW_BLOCKED);
   static const Events_ID kPreviewRequestedEvent = aLoop->eventByName(EVENT_PREVIEW_REQUESTED);
   static const Events_ID kReorderEvent = aLoop->eventByName(EVENT_ORDER_UPDATED);
+  static const Events_ID kRedisplayEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
 
 #ifdef DEB_UPDATE
   std::cout<<"****** Event "<<theMessage->eventID().eventText()<<std::endl;
@@ -212,8 +213,13 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     const std::set<ObjectPtr>& anObjs = aMsg->objects();
     std::set<ObjectPtr>::const_iterator anObjIter = anObjs.cbegin();
     for(; anObjIter != anObjs.cend(); anObjIter++) {
-      if (std::dynamic_pointer_cast<Model_Document>((*anObjIter)->document())->executeFeatures())
-        ModelAPI_EventCreator::get()->sendUpdated(*anObjIter, kUpdatedEvent);
+      if (std::dynamic_pointer_cast<Model_Document>((*anObjIter)->document())->executeFeatures()) {
+        if ((*anObjIter)->groupName() == ModelAPI_Feature::group()) { // results creation means enabling, not update
+          ModelAPI_EventCreator::get()->sendUpdated(*anObjIter, kUpdatedEvent);
+        } else {
+          ModelAPI_EventCreator::get()->sendUpdated(*anObjIter, kRedisplayEvent);
+        }
+      }
     }
     return;
   }
@@ -296,7 +302,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     // the redisplay signal should be flushed in order to erase the feature presentation in the viewer
     // if should be done after removeFeature() of document,
     // by this reason, upper processFeatures() do not perform this flush
-    Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    Events_Loop::loop()->flush(kRedisplayEvent);
 
     // in the end of transaction everything is updated, so clear the old objects
     myIsParamUpdated = false;

@@ -16,6 +16,7 @@ void exportToFile(const std::shared_ptr<ModelAPI_Document> & thePart,
 {
   // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ExchangePlugin_ExportFeature::ID());
+  fillAttribute("Regular", aFeature->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID()));
   fillAttribute(theFilePath, aFeature->string(ExchangePlugin_ExportFeature::FILE_PATH_ID()));
   fillAttribute(theSelectionList, aFeature->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID()));
   fillAttribute(theFileFormat, aFeature->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID()));
@@ -29,9 +30,11 @@ void exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
 {
   // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ExchangePlugin_ExportFeature::ID());
-  fillAttribute(theFilePath, aFeature->string(ExchangePlugin_ExportFeature::FILE_PATH_ID()));
+  fillAttribute("XAO", aFeature->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID()));
+  fillAttribute(theFilePath, aFeature->string(ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID()));
   fillAttribute(theAuthor, aFeature->string(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID()));
   fillAttribute(theGeometryName, aFeature->string(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID()));
+  fillAttribute("XAO", aFeature->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID()));
   aFeature->execute();
 }
 

@@ -7,11 +7,17 @@
 //--------------------------------------------------------------------------------------
 #include "ModelHighAPI_Selection.h"
 
+#include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
+ModelHighAPI_Selection::ModelHighAPI_Selection()
+: myVariantType(VT_Empty)
+{
+}
+
 ModelHighAPI_Selection::ModelHighAPI_Selection(const std::shared_ptr<ModelAPI_Result>& theContext,
                                                const std::shared_ptr<GeomAPI_Shape>& theSubShape)
 : myVariantType(VT_ResultSubShapePair)
@@ -35,6 +41,7 @@ void ModelHighAPI_Selection::fillAttribute(
     const std::shared_ptr<ModelAPI_AttributeSelection> & theAttribute) const
 {
   switch(myVariantType) {
+    case VT_Empty: return;
     case VT_ResultSubShapePair: theAttribute->setValue(myResultSubShapePair.first, myResultSubShapePair.second); return;
     case VT_TypeSubShapeNamePair: theAttribute->selectSubShape(myTypeSubShapeNamePair.first, myTypeSubShapeNamePair.second); return;
   }
@@ -45,6 +52,7 @@ void ModelHighAPI_Selection::appendToList(
     const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute) const
 {
   switch(myVariantType) {
+    case VT_Empty: return;
     case VT_ResultSubShapePair: theAttribute->append(myResultSubShapePair.first, myResultSubShapePair.second); return;
     case VT_TypeSubShapeNamePair:
       // Note: the reverse order (first - type, second - sub-shape name)
@@ -69,4 +77,37 @@ ResultSubShapePair ModelHighAPI_Selection::resultSubShapePair() const
 TypeSubShapeNamePair ModelHighAPI_Selection::typeSubShapeNamePair() const
 {
   return myTypeSubShapeNamePair;
+}
+
+//==================================================================================================
+std::string ModelHighAPI_Selection::shapeType() const
+{
+  switch(myVariantType) {
+  case VT_ResultSubShapePair: 
+    return myResultSubShapePair.second.get() ? myResultSubShapePair.second->shapeTypeStr() : 
+                                               myResultSubShapePair.first->shape()->shapeTypeStr();
+  case VT_TypeSubShapeNamePair: return myTypeSubShapeNamePair.first;
+  }
+
+  return "SHAPE";
+}
+
+//==================================================================================================
+void ModelHighAPI_Selection::setName(const std::string& theName)
+{
+  if (myVariantType == VT_ResultSubShapePair)
+    myResultSubShapePair.first->data()->setName(theName);
+}
+
+void ModelHighAPI_Selection::setColor(int theRed, int theGreen, int theBlue)
+{
+  if (myVariantType != VT_ResultSubShapePair)
+    return;
+
+  AttributeIntArrayPtr aColor =
+      myResultSubShapePair.first->data()->intArray(ModelAPI_Result::COLOR_ID());
+  aColor->setSize(3);
+  aColor->setValue(0, theRed);
+  aColor->setValue(1, theGreen);
+  aColor->setValue(2, theBlue);
 }

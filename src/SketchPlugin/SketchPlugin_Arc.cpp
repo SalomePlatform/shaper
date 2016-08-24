@@ -338,6 +338,12 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
   // the second condition for unability to move external segments anywhere
   if (theID == EXTERNAL_ID() || isFixed()) {
     std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
+    if (!aSelection) {
+      // empty shape in selection shows that the shape is equal to context
+      ResultPtr anExtRes = selection(EXTERNAL_ID())->context();
+      if (anExtRes)
+        aSelection = anExtRes->shape();
+    }
     // update arguments due to the selection value
     if (aSelection && !aSelection->isNull() && aSelection->isEdge()) {
       std::shared_ptr<GeomAPI_Edge> anEdge( new GeomAPI_Edge(aSelection));
@@ -486,11 +492,11 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
       double aNewAngle = aPassedParam >= aStartParam && aPassedParam <= aEndParam ?
         ((aEndParam - aStartParam) * 180.0 / PI) :
         ((aEndParam - aStartParam - 2.0 * PI) * 180.0 / PI);
-      if (fabs(aNewAngle - anAngleAttr->value()) > tolerance)
+      if (!anAngleAttr->isInitialized() || fabs(aNewAngle - anAngleAttr->value()) > tolerance)
         anAngleAttr->setValue(aNewAngle);
     } else {
       double aNewAngle = (aEndParam - aStartParam) * 180.0 / PI;
-      if (fabs(aNewAngle - anAngleAttr->value()) > tolerance)
+      if (!anAngleAttr->isInitialized() || fabs(aNewAngle - anAngleAttr->value()) > tolerance)
         anAngleAttr->setValue(aNewAngle);
     }
     // do not need to inform that other parameters were changed in this basis mode: these arguments

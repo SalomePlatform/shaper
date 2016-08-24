@@ -332,8 +332,7 @@ void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
         return;
 
       // Clear list of objects
-      AttributeRefListPtr aRefListOfRotated = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-          data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
+      AttributeRefListPtr aRefListOfRotated = reflist(SketchPlugin_Constraint::ENTITY_B());
       std::list<ObjectPtr> aTargetList = aRefListOfRotated->list();
       std::list<ObjectPtr>::iterator aTargetIter = aTargetList.begin();
       std::set<FeaturePtr> aFeaturesToBeRemoved;
@@ -342,10 +341,7 @@ void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
         for (int i = 0; i < aNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++) {
           aRefListOfRotated->remove(*aTargetIter);
           // remove the corresponding feature from the sketch
-          ResultConstructionPtr aRC =
-            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aTargetIter);
-          DocumentPtr aDoc = aRC ? aRC->document() : DocumentPtr();
-          FeaturePtr aFeature =  aDoc ? aDoc->feature(aRC) : FeaturePtr();
+          FeaturePtr aFeature = ModelAPI_Feature::feature(*aTargetIter);
           if (aFeature)
             aFeaturesToBeRemoved.insert(aFeature);
         }
@@ -353,10 +349,7 @@ void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
       ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved);
 
       aRefListOfRotated->clear();
-      std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-        data()->attribute(SketchPlugin_Constraint::ENTITY_A()))->clear();
-      std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-        data()->attribute(SketchPlugin_Constraint::ENTITY_B()))->clear();
+      reflist(SketchPlugin_Constraint::ENTITY_A())->clear();
     }
   }
 }

@@ -2,6 +2,7 @@ import unittest
 
 import ModelAPI
 import ConstructionAPI
+import model
 
 class AxisTestCase(unittest.TestCase):
 
@@ -14,6 +15,7 @@ class AxisTestCase(unittest.TestCase):
         self.session.finishOperation()
 
     def tearDown(self):
+        assert(model.checkPythonDump())
         self.session.closeAll()
 
     def test_ConstructorWithDimensions(self):

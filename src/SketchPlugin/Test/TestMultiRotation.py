@@ -219,3 +219,6 @@ checkRotation(aRotated, aNbCopies.value(), CENTER_X, CENTER_Y, ANGLE)
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

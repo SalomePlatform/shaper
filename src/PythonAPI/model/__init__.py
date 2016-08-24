@@ -13,6 +13,7 @@ from roots     import *
 
 # Built-in features
 
+from build import *
 from sketcher import *
 from connection import *
 from construction import *

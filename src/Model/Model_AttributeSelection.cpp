@@ -56,6 +56,8 @@
 #include <TopoDS_Iterator.hxx>
 #include <TNaming_Iterator.hxx>
 #include <BRep_Builder.hxx>
+#include <ModelAPI_Session.h>
+
 using namespace std;
 //#define DEB_NAMING 1
 #ifdef DEB_NAMING
@@ -146,7 +148,8 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
         aBuilder.Generated(theContext->shape()->impl<TopoDS_Shape>());
         std::shared_ptr<Model_Document> aMyDoc = 
           std::dynamic_pointer_cast<Model_Document>(owner()->document());
-        std::string aName = theContext->data()->name();
+        std::string aName = contextName(theContext);
+        // for selection in different document, add the document name
         aMyDoc->addNamingName(aSelLab, aName);
         TDataStd_Name::Set(aSelLab, aName.c_str());
       } else {  // for sketch the naming is needed in DS
@@ -173,10 +176,6 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   //myIsInitialized = true;
 
   owner()->data()->sendAttributeUpdated(this);
-
-  std::string aSelName = namingName();
-  if(!aSelName.empty())
-    TDataStd_Name::Set(selectionLabel(), aSelName.c_str()); //set name
 }
 
 std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
@@ -373,19 +372,6 @@ TDF_LabelMap& Model_AttributeSelection::scope()
   return myScope;
 }
 
-/// produces theEdge orientation relatively to theContext face
-int edgeOrientation(const TopoDS_Shape& theContext, TopoDS_Edge& theEdge)
-{
-  if (theContext.ShapeType() != TopAbs_FACE)
-    return 0;
-  TopoDS_Face aContext = TopoDS::Face(theContext);
-  if (theEdge.Orientation() == TopAbs_FORWARD) 
-    return 1;
-  if (theEdge.Orientation() == TopAbs_REVERSED) 
-    return -1;
-  return 0; // unknown
-}
-
 /// Sets the invalid flag if flag is false, or removes it if "true"
 /// Returns theFlag
 static bool setInvalidIfFalse(TDF_Label& theLab, const bool theFlag) {
@@ -428,7 +414,7 @@ bool Model_AttributeSelection::update()
       aBuilder.Generated(aContext->shape()->impl<TopoDS_Shape>());
       std::shared_ptr<Model_Document> aMyDoc = 
         std::dynamic_pointer_cast<Model_Document>(owner()->document());
-      std::string aName = aContext->data()->name();
+      std::string aName = contextName(aContext);
       aMyDoc->addNamingName(aSelLab, aName);
       TDataStd_Name::Set(aSelLab, aName.c_str());
     }
@@ -520,43 +506,7 @@ bool Model_AttributeSelection::update()
               }
             }
           }
-          int aBestFound = 0; // best number of found edges (not percentage: issue 1019)
-          int aBestOrient = 0; // for the equal "BestFound" additional parameter is orientation
-          for(int aFaceIndex = 0; aFaceIndex < aConstructionContext->facesNum(); aFaceIndex++) {
-            int aFound = 0, aNotFound = 0, aSameOrientation = 0;
-            TopoDS_Face aFace = 
-              TopoDS::Face(aConstructionContext->face(aFaceIndex)->impl<TopoDS_Shape>());
-            TopExp_Explorer anEdgesExp(aFace, TopAbs_EDGE);
-            TColStd_MapOfTransient alreadyProcessed; // to avoid counting edges with same curved (841)
-            for(; anEdgesExp.More(); anEdgesExp.Next()) {
-              TopoDS_Edge anEdge = TopoDS::Edge(anEdgesExp.Current());
-              if (!anEdge.IsNull()) {
-                Standard_Real aFirst, aLast;
-                Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-                if (alreadyProcessed.Contains(aCurve))
-                  continue;
-                alreadyProcessed.Add(aCurve);
-                if (allCurves.IsBound(aCurve)) {
-                  aFound++;
-                  int anOrient = allCurves.Find(aCurve);
-                  if (anOrient != 0) {  // extra comparision score is orientation
-                    if (edgeOrientation(aFace, anEdge) == anOrient)
-                      aSameOrientation++;
-                  }
-                } else {
-                  aNotFound++;
-                }
-              }
-            }
-            if (aFound + aNotFound != 0) {
-              if (aFound > aBestFound || 
-                  (aFound == aBestFound && aSameOrientation > aBestOrient)) {
-                aBestFound = aFound;
-                aBestOrient = aSameOrientation;
-                aNewSelected = aConstructionContext->face(aFaceIndex);
-              }
-            }
-          }
+          aNewSelected = Model_SelectionNaming::findAppropriateFace(aContext, allCurves);
         }
         if (aNewSelected) { // store this new selection
           if (aShapeType == TopAbs_WIRE) { // just get a wire from face to have wire
@@ -691,6 +641,7 @@ void Model_AttributeSelection::selectBody(
 static void registerSubShape(TDF_Label theMainLabel, TopoDS_Shape theShape,
   const int theID, const FeaturePtr& theContextFeature, std::shared_ptr<Model_Document> theDoc,
   std::string theAdditionalName, std::map<int, int>& theOrientations,
+  std::map<int, std::string>& theSubNames, // name of sub-elements by ID to be exported instead of indexes
   Handle(TDataStd_IntPackedMap) theRefs = Handle(TDataStd_IntPackedMap)(),
   const int theOrientation = 0)
 {
@@ -701,29 +652,44 @@ static void registerSubShape(TDF_Label theMainLabel, TopoDS_Shape theShape,
   TNaming_Builder aBuilder(aLab);
   aBuilder.Generated(theShape);
   std::stringstream aName;
-  aName<<theContextFeature->name()<<"/";
-  if (!theAdditionalName.empty())
-    aName<<theAdditionalName<<"/";
-  if (theShape.ShapeType() == TopAbs_FACE) aName<<"Face";
-  else if (theShape.ShapeType() == TopAbs_WIRE) aName<<"Wire";
-  else if (theShape.ShapeType() == TopAbs_EDGE) aName<<"Edge";
-  else if (theShape.ShapeType() == TopAbs_VERTEX) aName<<"Vertex";
+  // add the part name if the selected object is located in other part
+  if (theDoc != theContextFeature->document()) {
+    if (theContextFeature->document() == ModelAPI_Session::get()->moduleDocument()) {
+      aName<<theContextFeature->document()->kind()<<"/";
+    } else {
+      ResultPtr aDocRes = ModelAPI_Tools::findPartResult(
+        ModelAPI_Session::get()->moduleDocument(), theContextFeature->document());
+      if (aDocRes.get()) {
+        aName<<aDocRes->data()->name()<<"/";
+      }
+    }
+  }
+  aName<<theContextFeature->name();
+  if (theShape.ShapeType() != TopAbs_COMPOUND) { // compound means the whole result for construction
+    aName<<"/";
+    if (!theAdditionalName.empty())
+      aName<<theAdditionalName<<"/";
+    if (theShape.ShapeType() == TopAbs_FACE) aName<<"Face";
+    else if (theShape.ShapeType() == TopAbs_WIRE) aName<<"Wire";
+    else if (theShape.ShapeType() == TopAbs_EDGE) aName<<"Edge";
+    else if (theShape.ShapeType() == TopAbs_VERTEX) aName<<"Vertex";
 
-  if (theRefs.IsNull()) {
-    aName<<theID;
-    if (theOrientation == 1)
-      aName<<"f";
-    else if (theOrientation == -1)
-      aName<<"r";
-  } else { // make a composite name from all sub-elements indexes: "1_2_3_4"
-    TColStd_MapIteratorOfPackedMapOfInteger aRef(theRefs->GetMap());
-    for(; aRef.More(); aRef.Next()) {
-      aName<<"-"<<aRef.Key();
-      if (theOrientations.find(aRef.Key()) != theOrientations.end()) {
-        if (theOrientations[aRef.Key()] == 1)
-          aName<<"f";
-        else if (theOrientations[aRef.Key()] == -1)
-          aName<<"r";
+    if (theRefs.IsNull()) {
+      aName<<theID;
+      if (theOrientation == 1)
+        aName<<"f";
+      else if (theOrientation == -1)
+        aName<<"r";
+    } else { // make a composite name from all sub-elements indexes: "1_2_3_4"
+      TColStd_MapIteratorOfPackedMapOfInteger aRef(theRefs->GetMap());
+      for(; aRef.More(); aRef.Next()) {
+        aName<<"-"<<theSubNames[aRef.Key()];
+        if (theOrientations.find(aRef.Key()) != theOrientations.end()) {
+          if (theOrientations[aRef.Key()] == 1)
+            aName<<"f";
+          else if (theOrientations[aRef.Key()] == -1)
+            aName<<"r";
+        }
       }
     }
   }
@@ -745,8 +711,9 @@ void Model_AttributeSelection::selectConstruction(
     // saving of context is enough: result construction contains exactly the needed shape
     TNaming_Builder aBuilder(selectionLabel());
     aBuilder.Generated(aSubShape);
-    aMyDoc->addNamingName(selectionLabel(), theContext->data()->name());
-    TDataStd_Name::Set(selectionLabel(), theContext->data()->name().c_str());
+    std::string aName = contextName(theContext);
+    aMyDoc->addNamingName(selectionLabel(), aName);
+    TDataStd_Name::Set(selectionLabel(), aName.c_str());
     return;
   }
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(owner()->data());
@@ -770,6 +737,7 @@ void Model_AttributeSelection::selectConstruction(
   // iterate and store the result ids of sub-elements and sub-elements to sub-labels
   Handle(TDataStd_IntPackedMap) aRefs = TDataStd_IntPackedMap::Set(aLab);
   std::map<int, int> anOrientations; //map from edges IDs to orientations of these edges in face
+  std::map<int, std::string> aSubNames; //map from edges IDs to names of edges
   aRefs->Clear();
   const int aSubNum = aComposite->numberOfSubs();
   for(int a = 0; a < aSubNum; a++) {
@@ -789,14 +757,17 @@ void Model_AttributeSelection::selectConstruction(
           gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aVertex));
           if (aPnt.IsEqual(aVertexPos, Precision::Confusion())) {
             aRefs->Add(aComposite->subFeatureId(a));
+            aSubNames[aComposite->subFeatureId(a)] = Model_SelectionNaming::shortName(aConstr);
           }
-        } else { // get first or last vertex of the edge: last is stored with negative sign
+        } else { // get first or last vertex of the edge: last is stored with additional delta
           const TopoDS_Shape& anEdge = aConstr->shape()->impl<TopoDS_Shape>();
           int aDelta = kSTART_VERTEX_DELTA;
           for(TopExp_Explorer aVExp(anEdge, TopAbs_VERTEX); aVExp.More(); aVExp.Next()) {
             gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aVExp.Current()));
             if (aPnt.IsEqual(aVertexPos, Precision::Confusion())) {
               aRefs->Add(aDelta + aComposite->subFeatureId(a));
+              aSubNames[aDelta + aComposite->subFeatureId(a)] =
+                Model_SelectionNaming::shortName(aConstr, aDelta / kSTART_VERTEX_DELTA);
               break;
             }
             aDelta += kSTART_VERTEX_DELTA;
@@ -812,6 +783,7 @@ void Model_AttributeSelection::selectConstruction(
             if (allCurves.Contains(aCurve)) {
               int anID = aComposite->subFeatureId(a);
               aRefs->Add(anID);
+              aSubNames[anID] = Model_SelectionNaming::shortName(aConstr);
               if (aShapeType != TopAbs_EDGE) { // face needs the sub-edges on sub-labels
                 // add edges to sub-label to support naming for edges selection
                 TopExp_Explorer anEdgeExp(aSubShape, TopAbs_EDGE);
@@ -820,11 +792,11 @@ void Model_AttributeSelection::selectConstruction(
                   Standard_Real aFirst, aLast;
                   Handle(Geom_Curve) aFaceCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
                   if (aFaceCurve == aCurve) {
-                    int anOrient = edgeOrientation(aSubShape, anEdge);
+                    int anOrient = Model_SelectionNaming::edgeOrientation(aSubShape, anEdge);
                     anOrientations[anID] = anOrient;
                     registerSubShape(
                       selectionLabel(), anEdge, anID, aContextFeature, aMyDoc, "", anOrientations,
-                      Handle(TDataStd_IntPackedMap)(), anOrient);
+                      aSubNames, Handle(TDataStd_IntPackedMap)(), anOrient);
                   }
                 }
               } else { // put vertices of the selected edge to sub-labels
@@ -836,7 +808,8 @@ void Model_AttributeSelection::selectConstruction(
 
                   std::stringstream anAdditionalName; 
                   registerSubShape(
-                    selectionLabel(), aV, aTagIndex, aContextFeature, aMyDoc, "", anOrientations);
+                    selectionLabel(), aV, aTagIndex, aContextFeature, aMyDoc, "", anOrientations,
+                    aSubNames);
                 }
               }
             }
@@ -849,7 +822,7 @@ void Model_AttributeSelection::selectConstruction(
   TNaming_Builder aBuilder(selectionLabel());
   aBuilder.Generated(aSubShape);
     registerSubShape(
-      selectionLabel(), aSubShape, 0, aContextFeature, aMyDoc, "", anOrientations, aRefs); 
+      selectionLabel(), aSubShape, 0, aContextFeature, aMyDoc, "", anOrientations, aSubNames, aRefs); 
 }
 
 bool Model_AttributeSelection::selectPart(
@@ -899,11 +872,6 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
   std::string aName("");
   if(!this->isInitialized())
     return !theDefaultName.empty() ? theDefaultName : aName;
-  Handle(TDataStd_Name) anAtt;
-  if(selectionLabel().FindAttribute(TDataStd_Name::GetID(), anAtt)) {
-    aName = TCollection_AsciiString(anAtt->Get()).ToCString();
-    return aName;
-  }
 
   std::shared_ptr<GeomAPI_Shape> aSubSh = value();
   ResultPtr aCont = context();
@@ -1015,3 +983,20 @@ void Model_AttributeSelection::setId(int theID)
   setValue(aContext, aSelection);
 }
 
+std::string Model_AttributeSelection::contextName(const ResultPtr& theContext) const
+{
+  std::string aResult;
+  if (owner()->document() != theContext->document()) {
+    if (theContext->document() == ModelAPI_Session::get()->moduleDocument()) {
+      aResult = theContext->document()->kind() + "/";
+    } else {
+      ResultPtr aDocRes = ModelAPI_Tools::findPartResult(
+        ModelAPI_Session::get()->moduleDocument(), theContext->document());
+      if (aDocRes.get()) {
+        aResult = aDocRes->data()->name() + "/";
+      }
+    }
+  }
+  aResult += theContext->data()->name();
+  return aResult;
+}

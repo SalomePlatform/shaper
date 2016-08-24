@@ -9,6 +9,7 @@
 //--------------------------------------------------------------------------------------
 #include <GeomAPI_Pnt2d.h>
 //--------------------------------------------------------------------------------------
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
@@ -127,3 +128,23 @@ void SketchAPI_Line::setEndPoint(const std::shared_ptr<GeomAPI_Pnt2d> & thePoint
 
 //--------------------------------------------------------------------------------------
 
+void SketchAPI_Line::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  if (isCopy())
+    return; // no need to dump copied feature
+
+  FeaturePtr aBase = feature();
+  const std::string& aSketchName = theDumper.parentName(aBase);
+
+  AttributeSelectionPtr anExternal = aBase->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+  if (anExternal->context()) {
+    // line is external
+    theDumper << aBase << " = " << aSketchName << ".addLine(" << anExternal << ")" << std::endl;
+  } else {
+    // segment given by its points
+    theDumper << aBase << " = " << aSketchName << ".addLine("
+              << startPoint() << ", " << endPoint() << ")" << std::endl;
+  }
+  // dump "auxiliary" flag if necessary
+  SketchAPI_SketchEntity::dump(theDumper);
+}

@@ -2,6 +2,7 @@ import unittest
 
 import ModelAPI
 import ConstructionAPI
+import model
 
 class PointTestCase(unittest.TestCase):
 
@@ -10,10 +11,10 @@ class PointTestCase(unittest.TestCase):
         self.doc = self.session.moduleDocument()
         self.session.startOperation()
         self.feature = self.doc.addFeature("Point")
-        self.feature.execute()
-        self.session.finishOperation()
 
     def tearDown(self):
+        self.session.finishOperation()
+        assert(model.checkPythonDump())
         self.session.closeAll()
 
     def test_ConstructorWithValues(self):
@@ -24,9 +25,9 @@ class PointTestCase(unittest.TestCase):
 
     def test_setValue(self):
         point = ConstructionAPI.ConstructionAPI_Point(self.feature)
-        self.assertEqual(0, point.x().value())
-        self.assertEqual(0, point.y().value())
-        self.assertEqual(0, point.z().value())
+        assert(point.x().isInitialized() == False)
+        assert(point.y().isInitialized() == False)
+        assert(point.z().isInitialized() == False)
 
         point.setByXYZ(10, "20", "x + 30")
         self.assertEqual(10, point.x().value())

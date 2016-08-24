@@ -73,7 +73,7 @@ def testImportXAO():
     aSelectionList = aFeature1.selectionList("group_list")
     assert aSelectionList.selectionType() == "solid"
     assert aSelectionList.size() == 1
-    assert aSelectionList.value(0).namingName("") == "mygeom_1_1"
+    assert aSelectionList.value(0).namingName("") == "mygeom_1"
 
     aFeature2 = aCompositeFeature.subFeature(1, False)
     assert aFeature2.getKind() == "Group"
@@ -82,8 +82,9 @@ def testImportXAO():
     aSelectionList = aFeature2.selectionList("group_list") 
     assert aSelectionList.selectionType() == "face"
     assert aSelectionList.size() == 2
-    assert aSelectionList.value(0).namingName("") == "mygeom_1/Shape1_1"
-    assert aSelectionList.value(1).namingName("") == "mygeom_1/Shape2_1"
+    assert aSelectionList.value(0).namingName("") == "mygeom_1/Shape1"
+    print aSelectionList.value(1).namingName("")
+    assert aSelectionList.value(1).namingName("") == "mygeom_1/Shape2"
 
 if __name__ == '__main__':
 #=========================================================================
@@ -108,3 +109,6 @@ if __name__ == '__main__':
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

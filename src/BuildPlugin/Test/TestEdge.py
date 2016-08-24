@@ -54,3 +54,6 @@ aSession.finishOperation()
 
 # Test results
 assert (len(anEdgeFeature.results()) == aNumOfLines)
+
+import model
+assert(model.checkPythonDump())

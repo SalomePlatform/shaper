@@ -66,7 +66,7 @@ def createSketch2(theSketch):
     aStartPoint1 = geomDataAPI_Point2D(aSketchLine.attribute("StartPoint"))
     aEndPoint1   = geomDataAPI_Point2D(aSketchLine.attribute("EndPoint"))
     aStartPoint1.setValue(10., 10.)
-    aEndPoint1.setValue(30., 5.)
+    aEndPoint1.setValue(30., 15.)
     allFeatures.append(aSketchLine)
     # Arc
     aSketchArc = theSketch.addFeature("SketchArc")
@@ -103,13 +103,13 @@ def checkFillet(theObjects, theRadius):
 
     anArcPoints = []
     aPoint = geomDataAPI_Point2D(aFilletArc.attribute("ArcStartPoint"))
-    print "ArcStartPoint " + repr(aPoint.x()) + " " + repr(aPoint.y())
+    #print "ArcStartPoint " + repr(aPoint.x()) + " " + repr(aPoint.y())
     anArcPoints.append((aPoint.x(), aPoint.y()))
     aPoint = geomDataAPI_Point2D(aFilletArc.attribute("ArcEndPoint"))
-    print "ArcEndPoint " + repr(aPoint.x()) + " " + repr(aPoint.y())
+    #print "ArcEndPoint " + repr(aPoint.x()) + " " + repr(aPoint.y())
     anArcPoints.append((aPoint.x(), aPoint.y()))
     aPoint = geomDataAPI_Point2D(aFilletArc.attribute("ArcCenter"))
-    print "ArcCenter " + repr(aPoint.x()) + " " + repr(aPoint.y())
+    #print "ArcCenter " + repr(aPoint.x()) + " " + repr(aPoint.y())
     aCenterX = aPoint.x()
     aCenterY = aPoint.y()
     aFilletRadius = math.hypot(anArcPoints[0][0]-aCenterX, anArcPoints[0][1]-aCenterY)
@@ -120,9 +120,9 @@ def checkFillet(theObjects, theRadius):
 
         aLinePoints = []
         aLinePoints.append((aStartPoint.x(), aStartPoint.y()))
-        print "aLineStartPoint " + repr(aStartPoint.x()) + " " + repr(aStartPoint.y())
+        #print "aLineStartPoint " + repr(aStartPoint.x()) + " " + repr(aStartPoint.y())
         aLinePoints.append((aEndPoint.x(), aEndPoint.y()))
-        print "aLineEndPoint " + repr(aEndPoint.x()) + " " + repr(aEndPoint.y())
+        #print "aLineEndPoint " + repr(aEndPoint.x()) + " " + repr(aEndPoint.y())
 
         aLineDirX = aEndPoint.x() - aStartPoint.x()
         aLineDirY = aEndPoint.y() - aStartPoint.y()
@@ -145,10 +145,10 @@ def checkFillet(theObjects, theRadius):
 
             aBaseArcPoints = []
             aBaseArcPoints.append((aStartPoint.x(), aStartPoint.y()))
-            print "anArcStartPoint " + repr(aStartPoint.x()) + " " + repr(aStartPoint.y())
+            #print "anArcStartPoint " + repr(aStartPoint.x()) + " " + repr(aStartPoint.y())
             aBaseArcPoints.append((aEndPoint.x(), aEndPoint.y()))
-            print "anArcEndPoint " + repr(aEndPoint.x()) + " " + repr(aEndPoint.y())
-            print "anArcCenter " + repr(aCenterPoint.x()) + " " + repr(aCenterPoint.y())
+            #print "anArcEndPoint " + repr(aEndPoint.x()) + " " + repr(aEndPoint.y())
+            #print "anArcCenter " + repr(aCenterPoint.x()) + " " + repr(aCenterPoint.y())
 
             aRadius = math.hypot(aStartPoint.x()-aCenterPoint.x(), aStartPoint.y()-aCenterPoint.y())
             aDist = math.hypot(aCenterPoint.x() - aCenterX, aCenterPoint.y() - aCenterY)
@@ -219,6 +219,7 @@ checkFillet(aResObjects, FILLET_RADIUS1)
 # Change Fillet radius
 #=========================================================================
 aRadius.setValue(FILLET_RADIUS2)
+aFillet.execute()
 aSession.finishOperation()
 checkFillet(aResObjects, FILLET_RADIUS2)
 
@@ -271,8 +272,12 @@ checkFillet(aResObjects, FILLET_RADIUS1)
 # Change Fillet radius
 #=========================================================================
 aRadius.setValue(FILLET_RADIUS2)
+aFillet.execute()
 aSession.finishOperation()
 checkFillet(aResObjects, FILLET_RADIUS2)
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

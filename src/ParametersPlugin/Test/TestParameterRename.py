@@ -23,6 +23,7 @@ from GeomDataAPI import *
 from ModelAPI import *
 import math
 import unittest
+import model
 
 __updated__ = "2015-04-27"
 
@@ -47,6 +48,7 @@ class TestParameterRename(unittest.TestCase):
         self.createFeature()
 
     def tearDown(self):
+        assert(model.checkPythonDump())
         self.aSession.closeAll()
 
     def createParameters(self):
@@ -81,12 +83,61 @@ class TestParameterRename(unittest.TestCase):
         aSketchCircle = aSketchFeature.addFeature("SketchCircle")
         anCircleCentr = geomDataAPI_Point2D(aSketchCircle.attribute("CircleCenter"))
         aRadiusAttr = aSketchCircle.real("CircleRadius")
-        anCircleCentr.setText("x1 + 10.0", "x1 + 20.0")
-        aRadiusAttr.setText("x1")
+        anCircleCentr.setValue(10., 20.)
+        aRadiusAttr.setValue(10.)
         self.aSession.finishOperation()
 
         self.anCircleCentr = anCircleCentr
         self.aRadiusAttr = aRadiusAttr
+
+        # constraints to fix circle position and radius
+        self.aSession.startOperation()
+        # fix X coordinate
+        aDistanceConstraint1 = aSketchFeature.addFeature("SketchConstraintDistance")
+        refattrA = aDistanceConstraint1.refattr("ConstraintEntityA")
+        refattrA.setAttr(anCircleCentr)
+        refattrB = aDistanceConstraint1.refattr("ConstraintEntityB")
+        anOY = aSketchFeature.addFeature("SketchLine")
+        aStartPoint = geomDataAPI_Point2D(anOY.attribute("StartPoint"))
+        anEndPoint = geomDataAPI_Point2D(anOY.attribute("EndPoint"))
+        aStartPoint.setValue(0., 0.)
+        anEndPoint.setValue(0., 100.)
+        anOYRes = modelAPI_Result(self.aDocument.objectByName("Construction", "OY"))
+        anOY.selection("External").setValue(anOYRes, anOYRes.shape())
+        anOY.execute()
+        refattrB.setObject(modelAPI_ResultConstruction(anOY.firstResult()))
+        valueX = aDistanceConstraint1.real("ConstraintValue")
+        valueX.setText("x1 + 10.0")
+        aDistanceConstraint1.execute();
+        # fix Y coordinate
+        aDistanceConstraint2 = aSketchFeature.addFeature("SketchConstraintDistance")
+        refattrA = aDistanceConstraint2.refattr("ConstraintEntityA")
+        refattrA.setAttr(anCircleCentr)
+        refattrB = aDistanceConstraint2.refattr("ConstraintEntityB")
+        anOX = aSketchFeature.addFeature("SketchLine")
+        aStartPoint = geomDataAPI_Point2D(anOX.attribute("StartPoint"))
+        anEndPoint = geomDataAPI_Point2D(anOX.attribute("EndPoint"))
+        aStartPoint.setValue(0., 0.)
+        anEndPoint.setValue(100., 0.)
+        anOXRes = modelAPI_Result(self.aDocument.objectByName("Construction", "OX"))
+        anOX.selection("External").setValue(anOXRes, anOXRes.shape())
+        anOX.execute()
+        refattrB.setObject(modelAPI_ResultConstruction(anOX.firstResult()))
+        valueY = aDistanceConstraint2.real("ConstraintValue")
+        valueY.setText("x1 + 20.0")
+        aDistanceConstraint2.execute();
+        # fix radius
+        aRadiusConstraint = aSketchFeature.addFeature("SketchConstraintRadius")
+        refattrA = aRadiusConstraint.refattr("ConstraintEntityA")
+        refattrA.setObject(modelAPI_ResultConstruction(aSketchCircle.lastResult()))
+        aRadiusConstrAttr = aRadiusConstraint.real("ConstraintValue")
+        aRadiusConstrAttr.setText("x1")
+        aRadiusConstraint.execute()
+        self.aSession.finishOperation()
+
+        self.aCircleCenterX = valueX
+        self.aCircleCenterY = valueY
+        self.aCircleRadius = aRadiusConstrAttr
 
         self.assertEqual(self.anCircleCentr.x(), 160.)
         self.assertEqual(self.anCircleCentr.y(), 170.)
@@ -108,9 +159,13 @@ class TestParameterRename(unittest.TestCase):
         aParam = self.dtParams["x2"]
         self.assertEqual(aParam.string("expression").value(), "a1 + y1 + 100.0")
         # Check rename in the feature
-        self.assertEqual(self.anCircleCentr.textX(), "a1 + 10.0")
-        self.assertEqual(self.anCircleCentr.textY(), "a1 + 20.0")
-        self.assertEqual(self.aRadiusAttr.text(), "a1")
+        self.assertEqual(self.aCircleCenterX.text(), "a1 + 10.0")
+        self.assertEqual(self.aCircleCenterY.text(), "a1 + 20.0")
+        self.assertEqual(self.aCircleRadius.text(), "a1")
+        # Check values
+        self.assertEqual(self.anCircleCentr.x(), 160.)
+        self.assertEqual(self.anCircleCentr.y(), 170.)
+        self.assertEqual(self.aRadiusAttr.value(), 150.)
 
     def test_rename_not_unique(self):
         # Rename to not unique name
@@ -127,9 +182,13 @@ class TestParameterRename(unittest.TestCase):
         aParam = self.dtParams["x2"]
         self.assertEqual(aParam.string("expression").value(), "x1 + y1 + 100.0")
         # Check rename in the feature (Expected: not renamed)
-        self.assertEqual(self.anCircleCentr.textX(), "x1 + 10.0")
-        self.assertEqual(self.anCircleCentr.textY(), "x1 + 20.0")
-        self.assertEqual(self.aRadiusAttr.text(), "x1")
+        self.assertEqual(self.aCircleCenterX.text(), "x1 + 10.0")
+        self.assertEqual(self.aCircleCenterY.text(), "x1 + 20.0")
+        self.assertEqual(self.aCircleRadius.text(), "x1")
+        # Check values
+        self.assertEqual(self.anCircleCentr.x(), 160.)
+        self.assertEqual(self.anCircleCentr.y(), 170.)
+        self.assertEqual(self.aRadiusAttr.value(), 150.)
 
 if __name__ == '__main__':
     unittest.main()

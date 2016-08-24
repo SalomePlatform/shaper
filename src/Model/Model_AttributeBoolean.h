@@ -20,6 +20,7 @@
 class Model_AttributeBoolean : public ModelAPI_AttributeBoolean
 {
   Handle_TDataStd_Integer myBool;  ///< double is Real attribute
+  TDF_Label myLab; ///< if attribute is not initialized, store label here
  public:
   /// Defines the double value
   MODEL_EXPORT virtual void setValue(bool theValue);

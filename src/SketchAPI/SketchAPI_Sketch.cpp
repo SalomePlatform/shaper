@@ -24,11 +24,14 @@
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
+#include <SketcherPrs_Tools.h>
 //--------------------------------------------------------------------------------------
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_RefAttr.h>
 #include <ModelHighAPI_Selection.h>
+#include <ModelHighAPI_Services.h>
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 #include "SketchAPI_Arc.h"
@@ -69,6 +72,16 @@ SketchAPI_Sketch::SketchAPI_Sketch(
   }
 }
 
+SketchAPI_Sketch::SketchAPI_Sketch(
+    const std::shared_ptr<ModelAPI_Feature> & theFeature,
+    std::shared_ptr<ModelAPI_Object> thePlaneObject)
+: ModelHighAPI_Interface(theFeature)
+{
+  if (initialize()) {
+    setExternal(thePlaneObject);
+  }
+}
+
 SketchAPI_Sketch::~SketchAPI_Sketch()
 {
 
@@ -95,6 +108,13 @@ void SketchAPI_Sketch::setExternal(const ModelHighAPI_Selection & theExternal)
   fillAttribute(theExternal, myexternal);
 
   execute();
+}
+
+void SketchAPI_Sketch::setExternal(std::shared_ptr<ModelAPI_Object> thePlaneObject)
+{
+  ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(thePlaneObject);
+  ModelHighAPI_Selection aSel(aRes);
+  setExternal(aSel);
 }
 
 //--------------------------------------------------------------------------------------
@@ -154,6 +174,14 @@ SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
   return SketchPtr(new SketchAPI_Sketch(aFeature, ModelHighAPI_Selection("FACE", theExternalName)));
 }
 
+SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
+                    std::shared_ptr<ModelAPI_Object> thePlaneObject)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(SketchAPI_Sketch::ID());
+  return SketchPtr(new SketchAPI_Sketch(aFeature, thePlaneObject));
+}
+
+
 //--------------------------------------------------------------------------------------
 std::shared_ptr<SketchAPI_Point> SketchAPI_Sketch::addPoint(
     double theX, double theY)
@@ -208,16 +236,12 @@ std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(
 std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(const ModelHighAPI_Selection & theExternal)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Line::ID());
-  LinePtr aLine(new SketchAPI_Line(aFeature, theExternal));
-  setFixed(InterfacePtr(aLine));
-  return aLine;
+  return LinePtr(new SketchAPI_Line(aFeature, theExternal));
 }
 std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(const std::string & theExternalName)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Line::ID());
-  LinePtr aLine(new SketchAPI_Line(aFeature, theExternalName));
-  setFixed(InterfacePtr(aLine));
-  return aLine;
+  return LinePtr(new SketchAPI_Line(aFeature, theExternalName));
 }
 
 //--------------------------------------------------------------------------------------
@@ -358,6 +382,13 @@ std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
   return ProjectionPtr(new SketchAPI_Projection(aFeature, theExternalFeature));
 }
 
+std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
+    const std::string & theExternalName)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = compositeFeature()->addFeature(SketchPlugin_Projection::ID());
+  return ProjectionPtr(new SketchAPI_Projection(aFeature, theExternalName));
+}
+
 //--------------------------------------------------------------------------------------
 std::shared_ptr<SketchAPI_Mirror> SketchAPI_Sketch::addMirror(
     const ModelHighAPI_RefAttr & theMirrorLine,
@@ -397,12 +428,47 @@ std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setAngle(
     const ModelHighAPI_RefAttr & theLine2,
     const ModelHighAPI_Double & theValue)
 {
-  // TODO(spo): is support of angle type necessary?
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
+  fillAttribute(SketcherPrs_Tools::ANGLE_DIRECT,
+      aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
   fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  aFeature->execute();
+  return aFeature;
+}
+
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setAngleComplementary(
+    const ModelHighAPI_RefAttr & theLine1,
+    const ModelHighAPI_RefAttr & theLine2,
+    const ModelHighAPI_Double & theValue)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
+  fillAttribute(SketcherPrs_Tools::ANGLE_COMPLEMENTARY,
+      aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
+  fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
+  fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+//  fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  aFeature->execute();
+  return aFeature;
+}
+
+std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setAngleBackward(
+    const ModelHighAPI_RefAttr & theLine1,
+    const ModelHighAPI_RefAttr & theLine2,
+    const ModelHighAPI_Double & theValue)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
+  fillAttribute(SketcherPrs_Tools::ANGLE_BACKWARD,
+      aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
+  fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
+  fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+//  fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
   aFeature->execute();
   return aFeature;
 }
@@ -572,3 +638,60 @@ std::shared_ptr<ModelAPI_Feature> SketchAPI_Sketch::setVertical(
 }
 
 //--------------------------------------------------------------------------------------
+
+void SketchAPI_Sketch::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  AttributeSelectionPtr anExternal = aBase->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+  if (anExternal->value()) {
+    theDumper << aBase << " = model.addSketch(" << aDocName << ", " << anExternal << ")" << std::endl;
+  } else {
+    // Sketch is base on a plane.
+    std::shared_ptr<GeomAPI_Pnt> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+        aBase->attribute(SketchPlugin_Sketch::ORIGIN_ID()))->pnt();
+    std::shared_ptr<GeomAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        aBase->attribute(SketchPlugin_Sketch::NORM_ID()))->dir();
+    std::shared_ptr<GeomAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        aBase->attribute(SketchPlugin_Sketch::DIRX_ID()))->dir();
+
+    // Check the plane is coordinate plane
+    std::string aPlaneName = defaultPlane(anOrigin, aNormal, aDirX);
+    if (anExternal->context()) { // checking for selected planes
+      if (!aPlaneName.empty()) {
+        // dump sketch based on coordinate plane
+        theDumper << aBase << " = model.addSketch(" << aDocName
+                  << ", model.standardPlane(\"" << aPlaneName << "\"))" << std::endl;
+      } else { // some other plane
+        theDumper << aBase << " = model.addSketch(" << aDocName << ", " << anExternal<< ")" << std::endl;
+      }
+    } else {
+      if (aPlaneName.empty()) {
+        // needs import additional module
+        theDumper.importModule("GeomAPI");
+        // dump plane parameters
+        const std::string& aSketchName = theDumper.name(aBase);
+        std::string anOriginName = aSketchName + "_origin";
+        std::string aNormalName  = aSketchName + "_norm";
+        std::string aDirXName    = aSketchName + "_dirx";
+        // use "\n" instead of std::endl to avoid automatic dumping sketch here
+        // and then dumplicate dumping it in the next line
+        theDumper << anOriginName << " = " << anOrigin << "\n"
+                  << aNormalName  << " = " << aNormal  << "\n"
+                  << aDirXName    << " = " << aDirX    << "\n";
+        // dump sketch based on arbitrary plane
+        theDumper << aBase << " = model.addSketch(" << aDocName << ", GeomAPI_Ax3("
+                  << anOriginName << ", " << aDirXName << ", " << aNormalName << "))" << std::endl;
+      } else {
+        // dump sketch based on coordinate plane
+        theDumper << aBase << " = model.addSketch(" << aDocName
+                  << ", model.defaultPlane(\"" << aPlaneName << "\"))" << std::endl;
+      }
+    }
+  }
+
+  // dump sketch's subfeatures
+  CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aBase);
+  theDumper.processSubs(aCompFeat, true);
+}

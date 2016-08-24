@@ -245,3 +245,6 @@ assert (anExtrusionResult is not None)
 #=========================================================================
 # End of test
 #=========================================================================
+
+import model
+assert(model.checkPythonDump())

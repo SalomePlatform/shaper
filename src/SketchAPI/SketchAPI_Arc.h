@@ -150,6 +150,10 @@ public:
   /// Set angle.
   SKETCHAPI_EXPORT
   void setAngle(double theAngle);
+
+  /// Dump wrapped feature
+  SKETCHAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Arc object.

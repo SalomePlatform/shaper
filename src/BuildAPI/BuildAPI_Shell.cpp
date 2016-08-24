@@ -6,6 +6,7 @@
 
 #include "BuildAPI_Shell.h"
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
@@ -37,6 +38,16 @@ void BuildAPI_Shell::setBase(const std::list<ModelHighAPI_Selection>& theBaseObj
   fillAttribute(theBaseObjects, mybaseObjects);
 
   execute();
+}
+
+//==================================================================================================
+void BuildAPI_Shell::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  std::string aPartName = theDumper.name(aBase->document());
+
+  theDumper << aBase << " = model.addShell(" << aPartName << ", "
+    << aBase->selectionList(BuildPlugin_Shell::BASE_OBJECTS_ID()) << ")" << std::endl;
 }
 
 //==================================================================================================

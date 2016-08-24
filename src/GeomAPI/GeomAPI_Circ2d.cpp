@@ -39,7 +39,7 @@ static gp_Circ2d* newCirc2d(const double theCenterX, const double theCenterY,
   if (aCenter.IsEqual(aPoint, Precision::Confusion()))
     return NULL;
 
-  gp_Dir2d aDir(theCenterX - thePointX, theCenterY - thePointY);
+  gp_Dir2d aDir(thePointX - theCenterX, thePointY - theCenterY);
 
   return newCirc2d(theCenterX, theCenterY, aDir, aRadius);
 }

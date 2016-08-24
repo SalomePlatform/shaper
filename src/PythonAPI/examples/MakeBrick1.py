@@ -20,10 +20,10 @@ mypart = model.addPart(mypartset).document()
 
 mybase = model.addSketch(mypart, model.defaultPlane("XOY"))
 
-l1 = mybase.addLine(0, 0, 0, 1)
-l2 = mybase.addLine(0, 1, 1, 1)
-l3 = mybase.addLine(1, 1, 1, 0)
-l4 = mybase.addLine(1, 0, 0, 0)
+l1 = mybase.addLine(0, 0, 0, 25)
+l2 = mybase.addLine(0, 25, 25, 25)
+l3 = mybase.addLine(25, 25, 25, 0)
+l4 = mybase.addLine(25, 0, 0, 0)
 
 mybase.setCoincident(l1.endPoint(), l2.startPoint())
 mybase.setCoincident(l2.endPoint(), l3.startPoint())
@@ -35,29 +35,37 @@ mybase.setParallel(l2, l4)
 
 mybase.setPerpendicular(l1, l4)
 
+mybase.setVertical(l1)
+mybase.setFixed(l1.startPoint())
+
 mywidth = mybase.setLength(l1, 50)
 mylength = mybase.setDistance(l1.startPoint(), l3, 50)
+model.do()
 
 # Creating the extrusion
 
 mybox = model.addExtrusion(mypart, mybase.selectFace(), 50)
+model.do()
 
 # Creating a cylinder on a face of the box
 
 thisface = "Extrusion_1_1/Generated_Face_2"
-thisxmin = "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_2"
-thisxmax = "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/Generated_Face_1"
-thiszmin = "Sketch_1/Edge5_1"
+thisxmax = "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_2"
 thiszmax = "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/To_Face_1_1"
 
 mystand = model.addSketch(mypart, thisface)
 
 c1 = mystand.addCircle(0, 25, 5)
-mystand.setDistance(c1.center(), mystand.addLine(thisxmin), 10)
-mystand.setDistance(c1.center(), mystand.addLine(thiszmax), 10)
+l1 = mystand.addLine(thisxmax)
+l2 = mystand.addLine(thiszmax)
+model.do()
+mystand.setDistance(c1.center(), l1, 10)
+mystand.setDistance(c1.center(), l2, 10)
+model.do()
 
 
 myboss = model.addExtrusion(mypart, mystand.selectFace(), -5)
+model.do()
 
 # Subtracting the cylinder to the box
 
@@ -69,5 +77,8 @@ model.end()
 
 model.begin()
 mybase.setValue(mylength, 100)
+model.do()
 mybox.setSize(80)
 model.end()
+
+assert(model.checkPythonDump())

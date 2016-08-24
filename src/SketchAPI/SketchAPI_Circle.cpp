@@ -9,6 +9,7 @@
 #include <GeomAPI_Pnt2d.h>
 
 #include <ModelHighAPI_Double.h>
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 
@@ -234,4 +235,33 @@ void SketchAPI_Circle::setThirdPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePo
   fillAttribute(thePoint, mythirdPoint);
 
   execute();
+}
+
+//==================================================================================================
+void SketchAPI_Circle::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  if (isCopy())
+    return; // no need to dump copied feature
+
+  FeaturePtr aBase = feature();
+  const std::string& aSketchName = theDumper.parentName(aBase);
+
+  AttributeSelectionPtr anExternal = aBase->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+  if (anExternal->context()) {
+    // circle is external
+    theDumper << aBase << " = " << aSketchName << ".addCircle(" << anExternal << ")" << std::endl;
+  } else {
+    AttributeStringPtr aType = circleType();
+    if (aType->value() == SketchPlugin_Circle::CIRCLE_TYPE_CENTER_AND_RADIUS()) {
+      // circle given by center and radius
+      theDumper << aBase << " = " << aSketchName << ".addCircle("
+                << center() << ", " << radius() << ")" << std::endl;
+    } else {
+      // circle given by three points
+      theDumper << aBase << " = " << aSketchName << ".addCircle(" << firstPoint() << ", "
+                << secondPoint() << ", " << thirdPoint() << ")" << std::endl;
+    }
+  }
+  // dump "auxiliary" flag if necessary
+  SketchAPI_SketchEntity::dump(theDumper);
 }

@@ -14,6 +14,7 @@
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
 
+class ModelHighAPI_Dumper;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Placement
@@ -65,6 +66,10 @@ public:
   /// Set centering flag.
   FEATURESAPI_EXPORT
   void setCentering(const bool theCentering);
+
+  /// Dump wrapped feature
+  FEATURESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Placement object.

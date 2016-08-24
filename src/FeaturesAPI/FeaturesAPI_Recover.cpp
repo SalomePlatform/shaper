@@ -6,15 +6,18 @@
 
 #include "FeaturesAPI_Recover.h"
 
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Reference.h>
 #include <ModelHighAPI_Tools.h>
 
+//=================================================================================================
 FeaturesAPI_Recover::FeaturesAPI_Recover(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
 {
   initialize();
 }
 
+//=================================================================================================
 FeaturesAPI_Recover::FeaturesAPI_Recover(const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const ModelHighAPI_Reference& theBaseFeature,
   const std::list<ModelHighAPI_Selection>& theRecoveredList, const bool thePersistent)
@@ -27,27 +30,49 @@ FeaturesAPI_Recover::FeaturesAPI_Recover(const std::shared_ptr<ModelAPI_Feature>
   }
 }
 
+//=================================================================================================
 FeaturesAPI_Recover::~FeaturesAPI_Recover()
 {}
 
+//=================================================================================================
 void FeaturesAPI_Recover::setBaseFeature(const ModelHighAPI_Reference& theBaseFeature)
 {
   fillAttribute(theBaseFeature, mybaseFeature);
   // do not need to execute because on attribute changed it does everything anyway
 }
 
+//=================================================================================================
 void FeaturesAPI_Recover::setRecoveredList(const std::list<ModelHighAPI_Selection>& theRecoverList)
 {
   fillAttribute(theRecoverList, myrecoveredList);
   // do not need to execute because on attribute changed it does everything anyway
 }
 
+//=================================================================================================
 void FeaturesAPI_Recover::setIsPersistent(bool thePersistent)
 {
   fillAttribute(thePersistent, myisPersistent);
   // do not need to execute because on attribute changed it does everything anyway
 }
 
+//==================================================================================================
+void FeaturesAPI_Recover::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  AttributeReferencePtr anAttrBaseFeature = aBase->reference(FeaturesPlugin_Recover::BASE_FEATURE());
+  AttributeRefListPtr anAttrRecoveredEntities = aBase->reflist(FeaturesPlugin_Recover::RECOVERED_ENTITIES());
+  AttributeBooleanPtr anAttrPersistent = aBase->boolean(FeaturesPlugin_Recover::PERSISTENT());
+
+  FeaturePtr aFeature = ModelAPI_Feature::feature(anAttrBaseFeature->value());
+
+  theDumper << aBase << " = model.addRecover(" << aDocName << ", "
+            << aFeature << ", " << anAttrRecoveredEntities << ", "
+            << anAttrPersistent << ")" << std::endl;
+}
+
+//=================================================================================================
 RecoverPtr addRecover(const std::shared_ptr<ModelAPI_Document>& thePart,
   const ModelHighAPI_Reference& theBaseFeature,
   const std::list<ModelHighAPI_Selection>& theRecoveredList, const bool thePersistent)

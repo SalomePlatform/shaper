@@ -62,3 +62,9 @@ void ModelHighAPI_RefAttr::appendToList(
     case VT_OBJECT: theAttribute->append(myObject); return;
   }
 }
+
+//--------------------------------------------------------------------------------------
+bool ModelHighAPI_RefAttr::isEmpty() const
+{
+  return !(myAttribute && myObject);
+}

@@ -14,6 +14,7 @@
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
 
+class ModelHighAPI_Dumper;
 class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Pipe
@@ -81,6 +82,10 @@ public:
   void setByBasePathLocations(const std::list<ModelHighAPI_Selection>& theBaseObjects,
                               const ModelHighAPI_Selection& thePath,
                               const std::list<ModelHighAPI_Selection>& theLocations);
+
+  /// Dump wrapped feature
+  FEATURESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on Pipe object.

@@ -7,11 +7,12 @@
 //--------------------------------------------------------------------------------------
 #include "SketchAPI_Translation.h"
 //--------------------------------------------------------------------------------------
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 SketchAPI_Translation::SketchAPI_Translation(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
-: SketchAPI_SketchEntity(theFeature)
+: ModelHighAPI_Interface(theFeature)
 {
   initialize();
 }
@@ -23,17 +24,16 @@ SketchAPI_Translation::SketchAPI_Translation(
     const ModelHighAPI_RefAttr & thePoint2,
     const ModelHighAPI_Integer & theNumberOfObjects,
     bool theFullValue)
-: SketchAPI_SketchEntity(theFeature)
+: ModelHighAPI_Interface(theFeature)
 {
   if (initialize()) {
     fillAttribute(theObjects, translationList());
     fillAttribute(thePoint1, startPoint());
     fillAttribute(thePoint2, endPoint());
     fillAttribute(theNumberOfObjects, numberOfObjects());
-    if (theFullValue)
-      fillAttribute("SingleValue", valueType());
+    fillAttribute(theFullValue ? "FullValue" : "SingleValue", valueType());
 
-    execute();
+    execute(true);
   }
 }
 
@@ -43,3 +43,21 @@ SketchAPI_Translation::~SketchAPI_Translation()
 }
 
 //--------------------------------------------------------------------------------------
+
+void SketchAPI_Translation::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aSketchName = theDumper.parentName(aBase);
+
+  AttributeRefListPtr aTransObjects = translationList();
+  AttributeRefAttrPtr aStart = startPoint();
+  AttributeRefAttrPtr aEnd   = endPoint();
+  AttributeIntegerPtr aNbCopies = numberOfObjects();
+  bool isFullValue = valueType()->value() != "SingleValue";
+
+  theDumper << aBase << " = " << aSketchName << ".addTranslation("
+            << aTransObjects << ", " << aStart << ", " << aEnd << ", " << aNbCopies;
+  if (isFullValue)
+    theDumper << ", " << isFullValue;
+  theDumper << ")" << std::endl;
+}

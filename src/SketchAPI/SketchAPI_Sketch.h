@@ -53,6 +53,10 @@ public:
   SKETCHAPI_EXPORT
   SketchAPI_Sketch(const std::shared_ptr<ModelAPI_Feature> & theFeature,
                    const ModelHighAPI_Selection & theExternal);
+  /// Constructor with values
+  SKETCHAPI_EXPORT
+  SketchAPI_Sketch(const std::shared_ptr<ModelAPI_Feature> & theFeature,
+                   std::shared_ptr<ModelAPI_Object> thePlaneObject);
   /// Destructor
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_Sketch();
@@ -74,6 +78,10 @@ public:
   /// Set external
   SKETCHAPI_EXPORT
   void setExternal(const ModelHighAPI_Selection & theExternal);
+
+  /// Set external
+  SKETCHAPI_EXPORT
+  void setExternal(std::shared_ptr<ModelAPI_Object> thePlaneObject);
 
   /// Add point
   SKETCHAPI_EXPORT
@@ -209,6 +217,10 @@ public:
   std::shared_ptr<SketchAPI_Projection> addProjection(
       const ModelHighAPI_Selection & theExternalFeature);
 
+  /// Add projection
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Projection> addProjection(const std::string & theExternalName);
+
   /// Add mirror
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Mirror> addMirror(
@@ -236,6 +248,20 @@ public:
   /// Set angle
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelAPI_Feature> setAngle(
+      const ModelHighAPI_RefAttr & theLine1,
+      const ModelHighAPI_RefAttr & theLine2,
+      const ModelHighAPI_Double & theValue);
+
+  /// Set complementary angle
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setAngleComplementary(
+      const ModelHighAPI_RefAttr & theLine1,
+      const ModelHighAPI_RefAttr & theLine2,
+      const ModelHighAPI_Double & theValue);
+
+  /// Set backward angle (= 360 - angle)
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelAPI_Feature> setAngleBackward(
       const ModelHighAPI_RefAttr & theLine1,
       const ModelHighAPI_RefAttr & theLine2,
       const ModelHighAPI_Double & theValue);
@@ -333,6 +359,10 @@ public:
   SKETCHAPI_EXPORT
   std::list<ModelHighAPI_Selection> selectFace() const;
 
+  /// Dump wrapped feature
+  SKETCHAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
 protected:
   std::shared_ptr<ModelAPI_CompositeFeature> compositeFeature() const;
 
@@ -361,6 +391,13 @@ SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
 SKETCHAPI_EXPORT
 SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
                     const std::string & theExternalName);
+
+/**\ingroup CPPHighAPI
+ * \brief Create Sketch feature
+ */
+SKETCHAPI_EXPORT
+SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
+                    std::shared_ptr<ModelAPI_Object> thePlaneObject);
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------

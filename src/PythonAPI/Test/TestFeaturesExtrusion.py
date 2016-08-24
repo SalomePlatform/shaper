@@ -18,6 +18,7 @@ class FeaturesAddExtrusionFixture(unittest.TestCase):
 
     def tearDown(self):
         model.end()
+        assert(model.checkPythonDump())
         model.reset()
 
 
@@ -55,9 +56,9 @@ class FeaturesAddExtrusionTestCase(FeaturesAddExtrusionFixture):
         self.assertEqual(extrusion.toSize().value(), 10)
         self.assertEqual(extrusion.fromSize().value(), 0)
         self.assertEqual(extrusion.toObject().context(), None)
-        self.assertEqual(extrusion.toOffset().value(), 0)
+        self.assertEqual(extrusion.toOffset().isInitialized(), False)
         self.assertEqual(extrusion.fromObject().context(), None)
-        self.assertEqual(extrusion.fromOffset().value(), 0)
+        self.assertEqual(extrusion.fromOffset().isInitialized(), False)
 
     def test_add_extrusion_by_face_and_planes(self):
         # base
@@ -84,8 +85,8 @@ class FeaturesAddExtrusionTestCase(FeaturesAddExtrusionFixture):
                                        from_object, 20)
 
         self.assertEqual(extrusion.creationMethod().value(), "ByPlanesAndOffsets")
-        self.assertEqual(extrusion.toSize().value(), 0)
-        self.assertEqual(extrusion.fromSize().value(), 0)
+        self.assertEqual(extrusion.toSize().isInitialized(), False)
+        self.assertEqual(extrusion.fromSize().isInitialized(), False)
 #         self.assertEqual(extrusion.getToObject().context(),
 #                          to_sketch.result())
         self.assertEqual(extrusion.toOffset().value(), 15)
@@ -125,9 +126,9 @@ class FeaturesExtrusionTestCase(FeaturesExtrusionFixture):
         self.assertEqual(self.extrusion.toSize().value(), 15)
         self.assertEqual(self.extrusion.fromSize().value(), 20)
         self.assertEqual(self.extrusion.toObject().context(), None)
-        self.assertEqual(self.extrusion.toOffset().value(), 0)
+        self.assertEqual(self.extrusion.toOffset().isInitialized(), False)
         self.assertEqual(self.extrusion.fromObject().context(), None)
-        self.assertEqual(self.extrusion.fromOffset().value(), 0)
+        self.assertEqual(self.extrusion.fromOffset().isInitialized(), False)
 
     def test_extrusion_set_planes_and_offsets(self):
         # to
@@ -145,6 +146,9 @@ class FeaturesExtrusionTestCase(FeaturesExtrusionFixture):
 
         to_object = to_sketch.selectFace()[0]
         from_object = from_sketch.selectFace()[0]
+
+        self.part.moveFeature(self.extrusion.feature(), from_sketch.feature())
+
         self.extrusion.setPlanesAndOffsets(to_object, 15, from_object, 20)
 
 

@@ -7,6 +7,7 @@
 //--------------------------------------------------------------------------------------
 #include "ParametersAPI_Parameter.h"
 //--------------------------------------------------------------------------------------
+#include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 ParametersAPI_Parameter::ParametersAPI_Parameter(
@@ -26,7 +27,8 @@ ParametersAPI_Parameter::ParametersAPI_Parameter(
   if (initialize()) {
     fillAttribute(theName, name());
     fillAttribute(theExpression, expression());
-    fillAttribute(theComment, comment());
+    if (!theComment.empty())
+      fillAttribute(theComment, comment());
 
     execute();
   }
@@ -34,6 +36,21 @@ ParametersAPI_Parameter::ParametersAPI_Parameter(
 
 ParametersAPI_Parameter::~ParametersAPI_Parameter()
 {
+}
+
+void ParametersAPI_Parameter::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+  const std::string& aParamName = theDumper.name(aBase, false, true);
+
+  AttributeStringPtr anExpr   = aBase->string(ParametersPlugin_Parameter::EXPRESSION_ID());
+  AttributeStringPtr aComment = aBase->string(ParametersPlugin_Parameter::COMMENT_ID());
+
+  theDumper << "model.addParameter(" << aDocName << ", \"" << aParamName << "\", " << anExpr;
+  if (aComment->isInitialized() && !aComment->value().empty())
+    theDumper << ", " << aComment;
+  theDumper << ")" << std::endl;
 }
 
 //--------------------------------------------------------------------------------------

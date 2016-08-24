@@ -123,7 +123,13 @@ void SketchPlugin_Line::attributeChanged(const std::string& theID) {
   // to be removed after debug
   if ((theID == EXTERNAL_ID() || isFixed()) && !isCopy()) {
     std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
-     // update arguments due to the selection value
+    if (!aSelection) {
+      // empty shape in selection shows that the shape is equal to context
+      ResultPtr anExtRes = selection(EXTERNAL_ID())->context();
+      if (anExtRes)
+        aSelection = anExtRes->shape();
+    }
+    // update arguments due to the selection value
     if (aSelection && !aSelection->isNull() && aSelection->isEdge()) {
       std::shared_ptr<GeomAPI_Edge> anEdge( new GeomAPI_Edge(aSelection));
       std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
