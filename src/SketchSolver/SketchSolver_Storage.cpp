@@ -469,6 +469,27 @@ bool SketchSolver_Storage::removeEntity(AttributePtr theAttribute)
   return false;
 }
 
+// Merge groups containing given entities
+static void mergeGroups(std::list<std::set<EntityWrapperPtr> >& theGroups,
+    const EntityWrapperPtr& theEntity1, const EntityWrapperPtr& theEntity2)
+{
+  std::list<std::set<EntityWrapperPtr> >::iterator aFound1 = theGroups.end();
+  std::list<std::set<EntityWrapperPtr> >::iterator aFound2 = theGroups.end();
+  std::list<std::set<EntityWrapperPtr> >::iterator anIt = theGroups.begin();
+  for (; anIt != theGroups.end() && (aFound1 == theGroups.end() || aFound2 == theGroups.end());
+       ++anIt) {
+    if (anIt->find(theEntity1) != anIt->end())
+      aFound1 = anIt;
+    if (anIt->find(theEntity2) != anIt->end())
+      aFound2 = anIt;
+  }
+
+  if (aFound1 == aFound2 || aFound1 == theGroups.end() || aFound2 == theGroups.end())
+    return; // nothing to merge
+
+  aFound1->insert(aFound2->begin(), aFound2->end());
+  theGroups.erase(aFound2);
+}
 
 bool SketchSolver_Storage::removeCoincidence(ConstraintWrapperPtr theConstraint)
 {
@@ -488,80 +509,148 @@ bool SketchSolver_Storage::removeCoincidence(ConstraintWrapperPtr theConstraint)
   if (aPtPtIt == myCoincidentPoints.end())
     return true; // already removed
 
-  // Create new copies of coincident points
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-  std::list<EntityWrapperPtr> aNewPoints;
-  for (aPIt = aPoints.begin(); aPIt != aPoints.end(); ++aPIt)
-    aNewPoints.push_back(aBuilder->createAttribute(
-        (*aPIt)->baseAttribute(), myGroupID, mySketchID));
-
-  // Find all points fallen out of group of coincident points
-  std::map<EntityWrapperPtr, EntityWrapperPtr> aNotCoinc;
-  aNotCoinc[aPtPtIt->first] = EntityWrapperPtr();
+  // Removing of coincidence may split this group of coincident point to several groups.
+  // Find all of them and also the points which become alone.
+  std::list< std::set<EntityWrapperPtr> > aCoincGroups;
+  std::set<EntityWrapperPtr> aGroup;
+  aGroup.insert(aPtPtIt->first);
+  aCoincGroups.push_back(aGroup);
   std::set<EntityWrapperPtr>::const_iterator aTempIt = aPtPtIt->second.begin();
-  for (; aTempIt != aPtPtIt->second.end(); ++aTempIt)
-    aNotCoinc[*aTempIt] = EntityWrapperPtr();
-  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::iterator
-      aConstrIt = myConstraintMap.begin();
-  for (; aConstrIt != myConstraintMap.end(); ++aConstrIt)
-    if (aConstrIt->first->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
-      AttributeRefAttrPtr aRefAttr[2] = {
-          aConstrIt->first->refattr(SketchPlugin_Constraint::ENTITY_A()),
-          aConstrIt->first->refattr(SketchPlugin_Constraint::ENTITY_B())
-      };
-      AttributePtr anAttr[2];
-      if (aConstrIt->first->data()->isValid()) {
-        if (!aRefAttr[0] || !aRefAttr[1])
-          continue;
-
-        for (int i = 0; i < 2; ++i) {
-          if (aRefAttr[i]->isObject()) {
-            FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr[i]->object());
-            if (!aFeature || (aFeature->getKind() != SketchPlugin_Point::ID() &&
-                aFeature->getKind() != SketchPlugin_IntersectionPoint::ID()))
-              continue;
-            anAttr[i] = aFeature->attribute(SketchPlugin_Point::COORD_ID());
-          } else
-            anAttr[i] = aRefAttr[i]->attr();
-        }
-      } else {
-        // obtain attributes from the constraint wrapper
-        ConstraintWrapperPtr aWrapper = aConstrIt->second.front();
-        anAttr[0] = aWrapper->entities().front()->baseAttribute();
-        anAttr[1] = aWrapper->entities().back()->baseAttribute();
-      }
-      for (int i = 0; i < 2; ++i) {
-        std::map<AttributePtr, EntityWrapperPtr>::iterator
-            aFound = myAttributeMap.find(anAttr[i]);
-        if (aFound != myAttributeMap.end())
-          aNotCoinc.erase(aFound->second);
-      }
-    }
-  if (aNotCoinc.empty())
-    return false;
-  std::list<EntityWrapperPtr>::const_iterator aNewPIt;
-  for (aPIt = aPoints.begin(), aNewPIt = aNewPoints.begin();
-       aPIt != aPoints.end(); ++aPIt, ++aNewPIt) {
-    if (aNotCoinc.find(*aPIt) != aNotCoinc.end())
-      aNotCoinc[*aPIt] = *aNewPIt;
+  for (; aTempIt != aPtPtIt->second.end(); ++aTempIt) {
+    aGroup.clear();
+    aGroup.insert(*aTempIt);
+    aCoincGroups.push_back(aGroup);
   }
 
-  // Find all features and constraints uses coincident points
-  std::map<EntityWrapperPtr, EntityWrapperPtr>::iterator aNotCIt;
+  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::iterator
+      aConstrIt = myConstraintMap.begin();
+  for (; aConstrIt != myConstraintMap.end(); ++aConstrIt) {
+    if (aConstrIt->first->getKind() != SketchPlugin_ConstraintCoincidence::ID())
+      continue;
+
+    AttributeRefAttrPtr aRefAttr[2] = {
+        aConstrIt->first->refattr(SketchPlugin_Constraint::ENTITY_A()),
+        aConstrIt->first->refattr(SketchPlugin_Constraint::ENTITY_B())
+    };
+    AttributePtr anAttr[2];
+    if (aConstrIt->first->data()->isValid()) {
+      if (!aRefAttr[0] || !aRefAttr[1])
+        continue;
+
+      for (int i = 0; i < 2; ++i) {
+        if (aRefAttr[i]->isObject()) {
+          FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr[i]->object());
+          if (!aFeature || (aFeature->getKind() != SketchPlugin_Point::ID() &&
+              aFeature->getKind() != SketchPlugin_IntersectionPoint::ID()))
+            continue;
+          anAttr[i] = aFeature->attribute(SketchPlugin_Point::COORD_ID());
+        } else
+          anAttr[i] = aRefAttr[i]->attr();
+      }
+    } else {
+      // obtain attributes from the constraint wrapper
+      // if SketchPlugin_Constraint has invalid data (already removed)
+      ConstraintWrapperPtr aWrapper = aConstrIt->second.front();
+      anAttr[0] = aWrapper->entities().front()->baseAttribute();
+      anAttr[1] = aWrapper->entities().back()->baseAttribute();
+    }
+
+    EntityWrapperPtr anEntities[2];
+    for (int i = 0; i < 2; ++i) {
+      std::map<AttributePtr, EntityWrapperPtr>::iterator
+          aFound = myAttributeMap.find(anAttr[i]);
+      if (aFound != myAttributeMap.end())
+        anEntities[i] = aFound->second;
+    }
+    mergeGroups(aCoincGroups, anEntities[0], anEntities[1]);
+  }
+
+  // Collect alone points and build them new instances
+  std::list<EntityWrapperPtr> aShutOffList;
+  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
+  std::map<EntityWrapperPtr, EntityWrapperPtr> aNotCoinc;
+  std::list<std::set<EntityWrapperPtr> >::iterator aGroupIt = aCoincGroups.begin();
+  while (aGroupIt != aCoincGroups.end()) {
+    if (aGroupIt->size() == 1) {
+      EntityWrapperPtr aPoint = *aGroupIt->begin();
+      aShutOffList.push_back(aPoint);
+      aNotCoinc[aPoint] =
+          aBuilder->createAttribute(aPoint->baseAttribute(), myGroupID, mySketchID);
+      std::list<std::set<EntityWrapperPtr> >::iterator aRemoveIt = aGroupIt++;
+      aCoincGroups.erase(aRemoveIt);
+    } else // point is not alone
+      ++aGroupIt;
+  }
+
+  if (aNotCoinc.empty() && aCoincGroups.size() == 1)
+    return false;
+
+  // Find all features and constraints uses non-coincident points
+  replaceEntities(aNotCoinc);
+
+  // Remove not coincident points and points in separated groups
+  if (!aCoincGroups.empty()) {
+    aGroupIt = aCoincGroups.begin();
+    for (++aGroupIt; aGroupIt != aCoincGroups.end(); ++aGroupIt)
+      aShutOffList.insert(aShutOffList.end(), aGroupIt->begin(), aGroupIt->end());
+  }
+  std::list<EntityWrapperPtr>::iterator aNotCIt = aShutOffList.begin();
+  for (; aNotCIt != aShutOffList.end(); ++aNotCIt) {
+    if (aPtPtIt->second.size() <= 1) {
+      myCoincidentPoints.erase(aPtPtIt);
+      break;
+    }
+    if (aPtPtIt->first == *aNotCIt) {
+      std::set<EntityWrapperPtr> aSlaves = aPtPtIt->second;
+      EntityWrapperPtr aNewMaster = *aSlaves.begin();
+      aSlaves.erase(aSlaves.begin());
+      myCoincidentPoints.erase(aPtPtIt);
+      myCoincidentPoints[aNewMaster] = aSlaves;
+      aPtPtIt = myCoincidentPoints.find(aNewMaster);
+    } else
+      aPtPtIt->second.erase(*aNotCIt);
+  }
+
+  // Create additional groups of coincident points
+  aGroupIt = aCoincGroups.begin();
+  if (!aCoincGroups.empty())
+    ++aGroupIt;
+  for (; aGroupIt != aCoincGroups.end(); ++aGroupIt) {
+    aNotCoinc.clear();
+    std::set<EntityWrapperPtr>::iterator anEntIt = aGroupIt->begin();
+    for (; anEntIt != aGroupIt->end(); ++anEntIt) {
+      aNotCoinc[*anEntIt] =
+          aBuilder->createAttribute((*anEntIt)->baseAttribute(), myGroupID, mySketchID);
+    }
+    // replace points by newly created
+    replaceEntities(aNotCoinc);
+    // set new group of coincident points
+    EntityWrapperPtr aMasterEnt = aNotCoinc.begin()->second;
+    std::map<EntityWrapperPtr, EntityWrapperPtr>::iterator aNCIt = aNotCoinc.begin();
+    for (++aNCIt; aNCIt != aNotCoinc.end(); ++aNCIt)
+      addCoincidentPoints(aMasterEnt, aNCIt->second);
+  }
+
+  return true;
+}
+
+void SketchSolver_Storage::replaceEntities(const std::map<EntityWrapperPtr, EntityWrapperPtr>& theChange)
+{
   std::set<EntityWrapperPtr> anUpdFeatures;
+  std::map<EntityWrapperPtr, EntityWrapperPtr>::const_iterator aSubIt;
   std::map<FeaturePtr, EntityWrapperPtr>::iterator aFIt = myFeatureMap.begin();
   for (; aFIt != myFeatureMap.end(); ++aFIt) {
     if (!aFIt->second)
       continue; // avoid not completed arcs
-    for (aNotCIt = aNotCoinc.begin(); aNotCIt != aNotCoinc.end(); ++aNotCIt) {
-      if (!aNotCIt->second || !::isUsed(aFIt->first, aNotCIt->first->baseAttribute()))
+    for (aSubIt = theChange.begin(); aSubIt != theChange.end(); ++aSubIt) {
+      if (!aSubIt->second || !::isUsed(aFIt->first, aSubIt->first->baseAttribute()))
         continue;
       std::list<EntityWrapperPtr> aSubs = aFIt->second->subEntities();
       std::list<EntityWrapperPtr>::iterator aSIt = aSubs.begin();
       bool isUpd = false;
       for (; aSIt != aSubs.end(); ++aSIt)
-        if (*aSIt == aNotCIt->first) {
-          (*aSIt)->update(aNotCIt->second);
+        if (*aSIt == aSubIt->first) {
+          (*aSIt)->update(aSubIt->second);
           (*aSIt)->setGroup(aFIt->second->group());
           isUpd = true;
         }
@@ -575,24 +664,6 @@ bool SketchSolver_Storage::removeCoincidence(ConstraintWrapperPtr theConstraint)
   std::set<EntityWrapperPtr>::iterator anUpdIt = anUpdFeatures.begin();
   for (; anUpdIt != anUpdFeatures.end(); ++anUpdIt)
     update(EntityWrapperPtr(*anUpdIt));
-
-  // remove not coincident points
-  for (aNotCIt = aNotCoinc.begin(); aNotCIt != aNotCoinc.end(); ++aNotCIt) {
-    if (aPtPtIt->second.size() <= 1) {
-      myCoincidentPoints.erase(aPtPtIt);
-      break;
-    }
-    if (aPtPtIt->first == aNotCIt->first) {
-      std::set<EntityWrapperPtr> aSlaves = aPtPtIt->second;
-      EntityWrapperPtr aNewMaster = *aSlaves.begin();
-      aSlaves.erase(aSlaves.begin());
-      myCoincidentPoints.erase(aPtPtIt);
-      myCoincidentPoints[aNewMaster] = aSlaves;
-      aPtPtIt = myCoincidentPoints.find(aNewMaster);
-    } else
-      aPtPtIt->second.erase(aNotCIt->first);
-  }
-  return true;
 }
 
 bool SketchSolver_Storage::remove(ConstraintWrapperPtr theConstraint)

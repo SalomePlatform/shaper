@@ -32,6 +32,7 @@
 #include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_ConstraintRigid.h>
+#include <SketchPlugin_ConstraintSplit.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
 #include <SketchPlugin_MultiRotation.h>
@@ -709,14 +710,15 @@ std::list<FeaturePtr> SketchSolver_Group::selectApplicableFeatures(const std::se
   std::set<ObjectPtr>::const_iterator anObjIter = theObjects.begin();
   for (; anObjIter != theObjects.end(); ++anObjIter) {
     // Operate sketch itself and SketchPlugin features only.
-    // Also, the Fillet need to be skipped, because there are several separated constraints composing it.
+    // Also, the Fillet and Split need to be skipped, because there are several separated constraints composing it.
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
     if (!aFeature)
       continue;
     std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
         std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
     if ((aFeature->getKind() != SketchPlugin_Sketch::ID() && !aSketchFeature) ||
-        aFeature->getKind() == SketchPlugin_ConstraintFillet::ID())
+        aFeature->getKind() == SketchPlugin_ConstraintFillet::ID() ||
+        aFeature->getKind() == SketchPlugin_ConstraintSplit::ID())
       continue;
 
     // Find the place where to insert a feature

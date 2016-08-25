@@ -209,6 +209,9 @@ protected:
   /// \brief Find arcs without corresponding entity applicable for the solver and build them
   SKETCHSOLVER_EXPORT void processArcs();
 
+  /// \brief Replace entities by others
+  void replaceEntities(const std::map<EntityWrapperPtr, EntityWrapperPtr>& theChange);
+
 private:
   /// \brief Find the normal of the sketch
   EntityWrapperPtr getNormal() const;
