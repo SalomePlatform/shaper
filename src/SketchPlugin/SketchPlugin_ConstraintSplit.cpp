@@ -118,7 +118,24 @@ void SketchPlugin_ConstraintSplit::execute()
     }
   }
 
+  if (!aTangentFeatures.empty()) {
+    std::cout << std::endl;
+    std::cout << "Tangencies to base feature[" << aTangentFeatures.size() << "]: " << std::endl;
+    std::map<FeaturePtr, IdToPointPair>::const_iterator anIt = aTangentFeatures.begin(),
+                                                        aLast = aTangentFeatures.end();
+    for (int i = 1; anIt != aLast; anIt++, i++) {
+      FeaturePtr aFeature = (*anIt).first;
+      std::string anAttributeId = (*anIt).second.first;
+      std::shared_ptr<GeomDataAPI_Point2D> aPointAttr = (*anIt).second.second;
+
+      std::cout << i << "-" << getFeatureInfo(aFeature) << std::endl;
+      std::cout <<     " -Attribute to correct:" << anAttributeId << std::endl;
+      std::cout <<     " -Point attribute:" << ModelGeomAlgo_Point2D::getPointAttributeInfo(aPointAttr) << std::endl;
+    }
+  }
+
   if (!aCoincidenceToPoint.empty()) {
+    std::cout << std::endl;
     std::cout << "Coincidences to points on base feature[" << aCoincidenceToPoint.size() << "]: " << std::endl;
     std::map<FeaturePtr, IdToPointPair>::const_iterator anIt = aCoincidenceToPoint.begin(),
                                                         aLast = aCoincidenceToPoint.end();
@@ -192,9 +209,8 @@ void SketchPlugin_ConstraintSplit::execute()
   // coincidence to points
   updateCoincidenceConstraintsToFeature(aCoincidenceToPoint, aFurtherCoincidences,
                                         std::set<ResultPtr>());
-  // TODO
   // tangency
-  // TODO
+  updateTangentConstraintsToFeature(aTangentFeatures, aFurtherCoincidences);
 
   // delete constraints
 #ifdef DEBUG_SPLIT
@@ -312,7 +328,7 @@ void SketchPlugin_ConstraintSplit::getConstraints(std::set<FeaturePtr>& theFeatu
         if (aTangentPoint.get()) {
           FeaturePtr aFeature1 = ModelAPI_Feature::feature(aResult1);
           std::string anAttributeToBeModified = aFeature1 == aBaseFeature
-                       ? SketchPlugin_Constraint::ENTITY_B() : SketchPlugin_Constraint::ENTITY_A();
+                       ? SketchPlugin_Constraint::ENTITY_A() : SketchPlugin_Constraint::ENTITY_B();
           theTangentFeatures[aRefFeature] = std::make_pair(anAttributeToBeModified, aTangentPoint);
         }
         else
@@ -428,6 +444,43 @@ void SketchPlugin_ConstraintSplit::updateCoincidenceConstraintsToFeature(
     }
 #ifdef DEBUG_SPLIT
   std::cout << " -" << getFeatureInfo(aCoincFeature) << std::endl;
+#endif
+  }
+}
+
+void SketchPlugin_ConstraintSplit::updateTangentConstraintsToFeature(
+      const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theTangentFeatures,
+      const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences)
+{
+  if (theTangentFeatures.empty())
+    return;
+
+  std::map<FeaturePtr, IdToPointPair>::const_iterator aTIt = theTangentFeatures.begin(),
+                                                      aTLast = theTangentFeatures.end();
+#ifdef DEBUG_SPLIT
+  std::cout << std::endl;
+  std::cout << "Tangencies to feature(modified):"<< std::endl;
+#endif
+  for (; aTIt != aTLast; aTIt++) {
+    FeaturePtr aTangentFeature = aTIt->first;
+    std::string anAttributeId = aTIt->second.first;
+    AttributePoint2DPtr aTangentPoint = aTIt->second.second;
+    std::set<AttributePoint2DPtr>::const_iterator aFCIt = theFurtherCoincidences.begin(),
+                                                  aFCLast = theFurtherCoincidences.end();
+    std::shared_ptr<GeomAPI_Pnt2d> aCoincPnt = aTangentPoint->pnt();
+    AttributePoint2DPtr aFeaturePointAttribute;
+    /// here we rely on created coincidence between further coincidence point and tangent result
+    for (; aFCIt != aFCLast && !aFeaturePointAttribute.get(); aFCIt++) {
+      AttributePoint2DPtr aFCAttribute = *aFCIt;
+      if (aCoincPnt->isEqual(aFCAttribute->pnt()))
+        aFeaturePointAttribute = aFCAttribute;
+    }
+    if (aFeaturePointAttribute.get()) {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aFeaturePointAttribute->owner());
+      aTangentFeature->refattr(anAttributeId)->setObject(getFeatureResult(aFeature));
+    }
+#ifdef DEBUG_SPLIT
+  std::cout << " -" << getFeatureInfo(aTangentFeature) << std::endl;
 #endif
   }
 }
