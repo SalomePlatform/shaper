@@ -92,11 +92,10 @@ void SketchPlugin_ConstraintSplit::execute()
   std::cout << "SketchPlugin_ConstraintSplit::execute()" << std::endl;
   std::cout << std::endl;
 
-  std::cout << "SKETCH FEATURES (before split):" << std::endl;
   SketchPlugin_Sketch* aSketch = sketch();
+  std::cout << "SKETCH FEATURES (before split) [" << aSketch->numberOfSubs() << "]:" << std::endl;
   for (int i = 0, aNbSubs = aSketch->numberOfSubs(); i < aNbSubs; i++) {
     std::cout << getFeatureInfo(aSketch->subFeature(i), false) << std::endl;
-    std::cout << std::endl;
   }
 
   std::cout << std::endl;
@@ -215,10 +214,9 @@ void SketchPlugin_ConstraintSplit::execute()
   }
 
 #ifdef DEBUG_SPLIT
-  std::cout << "SKETCH FEATURES (after split):" << std::endl;
+  std::cout << "SKETCH FEATURES (after split) [" << aSketch->numberOfSubs() << "]:" << std::endl;
   for (int i = 0, aNbSubs = aSketch->numberOfSubs(); i < aNbSubs; i++) {
     std::cout << getFeatureInfo(aSketch->subFeature(i), false) << std::endl;
-    std::cout << std::endl;
   }
 #endif
 }
@@ -349,7 +347,7 @@ void SketchPlugin_ConstraintSplit::getConstraints(std::set<FeaturePtr>& theFeatu
           if (aCurAttribute.get()) {
             FeaturePtr aCurFeature = ModelAPI_Feature::feature(aCurAttribute->owner());
             if (aCurFeature.get() && aCurFeature == aBaseFeature) {
-              anAttribute = anAttrA->attr();
+              anAttribute = anAttrB->attr();
               anAttributeToBeModified = anAttrA->id();
             }
           }
@@ -359,7 +357,7 @@ void SketchPlugin_ConstraintSplit::getConstraints(std::set<FeaturePtr>& theFeatu
           if (aCurAttribute.get()) {
             FeaturePtr aCurFeature = ModelAPI_Feature::feature(aCurAttribute->owner());
             if (aCurFeature.get() && aCurFeature == aBaseFeature) {
-              anAttribute = anAttrB->attr();
+              anAttribute = anAttrA->attr();
               anAttributeToBeModified = anAttrB->id();
             }
           }
@@ -699,11 +697,11 @@ void SketchPlugin_ConstraintSplit::splitCircle(FeaturePtr& theSplitFeature,
   // additional constraints between split and base features
   aConstraintFeature = createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
                      theBaseFeatureModified->attribute(SketchPlugin_Arc::END_ID()),
-                     theSplitFeature->attribute(SketchPlugin_Arc::START_ID()));
+                     theSplitFeature->attribute(SketchPlugin_Arc::END_ID()));
   theCreatedFeatures.insert(aConstraintFeature);
   aConstraintFeature = createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
                      theBaseFeatureModified->attribute(SketchPlugin_Arc::START_ID()),
-                     theSplitFeature->attribute(SketchPlugin_Arc::END_ID()));
+                     theSplitFeature->attribute(SketchPlugin_Arc::START_ID()));
   theCreatedFeatures.insert(aConstraintFeature);
 
   aConstraintFeature = createConstraintForObjects(SketchPlugin_ConstraintTangent::ID(),
