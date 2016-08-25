@@ -57,7 +57,6 @@ void SketchAPI_SketchEntity::dump(ModelHighAPI_Dumper& theDumper) const
 bool SketchAPI_SketchEntity::isCopy() const
 {
   // check the feature is a copy of another entity
-  std::shared_ptr<SketchPlugin_SketchEntity> aSketchEntity =
-      std::dynamic_pointer_cast<SketchPlugin_SketchEntity>(feature());
-  return aSketchEntity && aSketchEntity->isCopy();
+  AttributeBooleanPtr isCopy = feature()->boolean(SketchPlugin_SketchEntity::COPY_ID());
+  return isCopy.get() && isCopy->value();
 }
