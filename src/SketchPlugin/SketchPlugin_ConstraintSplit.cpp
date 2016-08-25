@@ -1,7 +1,7 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 // File:    SketchPlugin_ConstraintSplit.cpp
-// Created: 17 Jul 2016
+// Created: 25 Aug 2016
 // Author:  Natalia ERMOLAEVA
 
 #include "SketchPlugin_ConstraintSplit.h"
@@ -35,7 +35,7 @@
 #include <ModelGeomAlgo_Point2D.h>
 #include <Events_Loop.h>
 
-#define DEBUG_SPLIT
+//#define DEBUG_SPLIT
 #ifdef DEBUG_SPLIT
 #include <iostream>
 #endif
@@ -149,9 +149,6 @@ void SketchPlugin_ConstraintSplit::execute()
       std::cout <<     " -Point attribute:" << ModelGeomAlgo_Point2D::getPointAttributeInfo(aPointAttr) << std::endl;
     }
   }
-#endif
-
-#ifdef DEBUG_SPLIT
   std::cout << std::endl;
   std::cout << "---- SPLIT ----" << std::endl;
   std::cout << std::endl;
@@ -799,13 +796,9 @@ FeaturePtr SketchPlugin_ConstraintSplit::createLineFeature(const FeaturePtr& the
     return aFeature;
 
   aFeature = aSketch->addFeature(SketchPlugin_Line::ID());
-  // update fillet arc: make the arc correct for sure, so, it is not needed to process the "attribute updated"
-  // by arc; moreover, it may cause cyclicity in hte mechanism of updater
-  aFeature->data()->blockSendAttributeUpdated(true);
 
   fillAttribute(aFeature->attribute(SketchPlugin_Line::START_ID()), theFirstPointAttr);
   fillAttribute(aFeature->attribute(SketchPlugin_Line::END_ID()), theSecondPointAttr);
-  aFeature->data()->blockSendAttributeUpdated(false);
   aFeature->execute(); // to obtain result
 
   return aFeature;
@@ -925,11 +918,9 @@ std::string SketchPlugin_ConstraintSplit::getFeatureInfo(
     return "none";
   }
 
-  //anInfo.append(theFeature->getKind().c_str());
-  if (theFeature->data()->isValid()) {
-    //anInfo.append(", name=");
+  if (theFeature->data()->isValid())
     anInfo.append(theFeature->data()->name().c_str());
-  }
+
   if (isUseAttributesInfo) {
     std::string aPointsInfo = ModelGeomAlgo_Point2D::getPontAttributesInfo(theFeature,
                                                              getEdgeAttributes(theFeature));

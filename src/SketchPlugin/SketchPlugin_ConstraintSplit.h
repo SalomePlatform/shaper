@@ -1,8 +1,8 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 // File:    SketchPlugin_ConstraintSplit.h
-// Created: 19 Mar 2015
-// Author:  Artem ZHIDKOV
+// Created: 25 Aug 2016
+// Author:  Natalia ERMOLAEVA
 
 #ifndef SketchPlugin_ConstraintSplit_H_
 #define SketchPlugin_ConstraintSplit_H_
@@ -19,24 +19,37 @@ typedef std::pair<std::string, std::shared_ptr<GeomDataAPI_Point2D> > IdToPointP
 
 /** \class SketchPlugin_ConstraintSplit
  *  \ingroup Plugins
- *  \brief Feature for creation of a new constraint filleting two objects which have coincident point
+ *  \brief Feature for creation of a new constraint splitting object. Entities for split:
+ * - Linear segment by point(s) on this line
+ * - Arc by point(s) on this arc
+ * - Circle by at least 2 split-points on this circle
+ *
+ * The following constraints will be applied after split to keep the divided segments geometry:
+ * - Coincident constraints for both parts of created segments in the point of splitting
+ * - For linear segments parallel, for circles – tangent constraint, for arc – tangent and equal
+ *   constraints. In case of three segments in result two couple of constraints are created
+ *    - parallel and equal constraints: the first is between 1st and middle entity, the second is
+ *      between 1st and 3rd.
+ *    - tangency constraints: the first between 1st and 2nd, the second between 2nd and 3rd.
+ * - Constraints assigned to the feature before split operation are assigned after using rules:
+ *    - Coincident constraints are assigned to the segment where they belong to. Segment of split
+ *      has only a coincidence to the neighbor segment. All constraints used in the splitting of
+ *      this segment are moved to point of neighbor segment. If constraint was initially built
+ *      to the point of splitting segment, it stays for this point.
+ *    - Geometrical and dimensional constraints are assigned to one of result segment, not the
+ *      selected for split. In case of 3 result segments, this will be the segment nearest to the
+ *      start point of arc/line.
+ *    - Replication constraint used split feature will be deleted in the same way as it is deleted
+ *      by any of entity delete in sketch which is used in this constraint.
  *
  *  This constraint has three attributes:
  *  SketchPlugin_Constraint::VALUE() contains reference object to be splitted
  *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B() for the points of split;
  *
- *  Also the constraint has attribute SketchPlugin_Constraint::ENTITY_C()
- *  which contains created list objects forming the fillet
  */
 class SketchPlugin_ConstraintSplit : public SketchPlugin_ConstraintBase
 {
  public:
-   /*struct FilletFeatures {
-    std::list<std::pair<FeaturePtr, bool>> baseEdgesState; ///< list of objects the fillet is based and its states
-    std::list<FeaturePtr> resultEdges; ///< list of result edges
-    std::list<FeaturePtr> resultConstraints; ///< list of constraints provided by the fillet
-   };*/
-
   /// Split constraint kind
   inline static const std::string& ID()
   {
@@ -55,9 +68,6 @@ class SketchPlugin_ConstraintSplit : public SketchPlugin_ConstraintBase
 
   /// \brief Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
-
-  /// Returns the AIS preview
-  //SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
   /// Reimplemented from ModelAPI_Feature::isMacro().
   /// \returns true
@@ -87,13 +97,6 @@ private:
   /// \param theAttribute an attribute
   /// \param geom point 2D or NULL
   std::shared_ptr<GeomDataAPI_Point2D> getPointOfRefAttr(const AttributePtr& theAttribute);
-
-  /// Creates a new feature in the base shape type with bounding points given in parameters
-  /// \param theStartPointAttr an attribute of the start point
-  /// \param theEndPointAttr an attribute of the end point
-  //std::shared_ptr<ModelAPI_Feature> createFeature(
-  //                                  const std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
-  //                                  const std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr);
 
   /// Obtains those constraints of the feature that should be modified. output maps contain
   /// point of coincidence and attribute id to be modified after split
@@ -225,14 +228,6 @@ private:
   /// \return string value
   std::string getFeatureInfo(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              const bool isUseAttributesInfo = true);
-
-private:
-  //std::set<AttributePtr> myNewPoints; ///< set of new points
-  //std::map<AttributePtr, FilletFeatures> myPointFeaturesMap; ///< map of point and features for fillet
-  //bool myListOfPointsChangedInCode; ///< flag to track that list of points changed in code
-  //bool myRadiusChangedByUser; ///< flag to track that radius changed by user
-  //bool myRadiusChangedInCode; ///< flag to track that radius changed in code
-  //bool myRadiusInitialized; /// < flag to track that radius initialized
 };
 
 #endif
