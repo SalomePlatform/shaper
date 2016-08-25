@@ -68,6 +68,9 @@ private:
   /// \brief Remove redundant tangent constraints and try to solve the system again
   SketchSolver_SolveStatus solveWithoutTangent();
 
+  /// \brief Check the entities under the tangent constraint are smoothly connected
+  bool isTangentTruth(int theTagID) const;
+
 private:
   GCS::VEC_pD                myParameters;     ///< list of unknowns
   std::set<GCS::Constraint*> myConstraints;    ///< list of constraints already processed by the system

@@ -7,6 +7,8 @@
 #include "PlaneGCSSolver_Solver.h"
 #include <Events_LongOp.h>
 
+#include <cmath>
+
 
 PlaneGCSSolver_Solver::~PlaneGCSSolver_Solver()
 {
@@ -79,10 +81,31 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
   // solve equations
   if (aResult == GCS::Success)
     aResult = (GCS::SolveStatus)myEquationSystem.solve(myParameters);
+
+  GCS::VEC_I aRedundantID;
+
+  // Workaround: the system with tangent constraint may fail if the tangent entities are connected smoothly.
+  // Investigate this situation and move constraints to redundant list
+  if (aResult == GCS::Failed && !myTangent.empty()) {
+    GCS::VEC_I aConflictingID;
+    myEquationSystem.getConflicting(aConflictingID);
+    GCS::VEC_I::iterator aCIt = aConflictingID.begin();
+    for (; aCIt != aConflictingID.end(); ++ aCIt) {
+      if (myTangent.find(*aCIt) == myTangent.end())
+        continue;
+      if (isTangentTruth(*aCIt))
+        aRedundantID.push_back(*aCIt);
+    }
+
+    if (!aRedundantID.empty())
+      aResult = GCS::Success; // check redundant constraints
+  }
+
+  // Additionally check redundant constraints
   if (aResult == GCS::Success || aResult == GCS::Converged) {
-    // additionally check redundant constraints
-    GCS::VEC_I aRedundantID;
-    myEquationSystem.getRedundant(aRedundantID);
+    GCS::VEC_I aRedundantLocal;
+    myEquationSystem.getRedundant(aRedundantLocal);
+    aRedundantID.insert(aRedundantID.end(), aRedundantLocal.begin(), aRedundantLocal.end());
     // Workaround: remove all constraints "Equal"
     if (!aRedundantID.empty()) {
       std::set<GCS::Constraint*>::const_iterator aCIt = myConstraints.begin();
@@ -145,6 +168,44 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solveWithoutTangent()
 
   myTangent.clear();
   return solve();
+}
+
+bool PlaneGCSSolver_Solver::isTangentTruth(int theTagID) const
+{
+  static const double aTol = 1e-7;
+  static const double aTol2 = aTol *aTol;
+
+  std::set<GCS::Constraint*>::const_iterator anIt = myConstraints.begin();
+  for (; anIt != myConstraints.end(); ++anIt) {
+    if ((*anIt)->getTag() != theTagID)
+      continue;
+    if ((*anIt)->getTypeId() == GCS::TangentCircumf) {
+      GCS::VEC_pD aParams = (*anIt)->params();
+      double dx = *(aParams[2]) - *(aParams[0]);
+      double dy = *(aParams[3]) - *(aParams[1]);
+      double aDist2 = dx * dx + dy * dy;
+      double aRadSum  = *(aParams[4]) + *(aParams[5]);
+      double aRadDiff = *(aParams[4]) - *(aParams[5]);
+      return fabs(aDist2 - aRadSum * aRadSum) <= aTol2 ||
+             fabs(aDist2 - aRadDiff * aRadDiff) <= aTol2;
+    }
+    if ((*anIt)->getTypeId() == GCS::P2LDistance) {
+      GCS::VEC_pD aParams = (*anIt)->params();
+      double aDist2 = *(aParams[6]) * *(aParams[6]);
+      // orthogonal line direction
+      double aDirX = *(aParams[5]) - *(aParams[3]);
+      double aDirY = *(aParams[2]) - *(aParams[4]);
+      double aLen2 = aDirX * aDirX + aDirY * aDirY;
+      // vector from line's start to point
+      double aVecX = *(aParams[0]) - *(aParams[2]);
+      double aVecY = *(aParams[1]) - *(aParams[3]);
+
+      double aDot = aVecX * aDirX + aVecY * aDirY;
+      return fabs(aDot * aDot - aDist2 * aLen2) <= aTol2 * aLen2;
+    }
+  }
+
+  return false;
 }
 
 void PlaneGCSSolver_Solver::undo()
