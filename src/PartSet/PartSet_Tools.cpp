@@ -917,6 +917,8 @@ AttributePtr PartSet_Tools::findAttributeBy2dPoint(ObjectPtr theObj,
         for (; anIt != aLast && !anAttribute; anIt++) {
           std::shared_ptr<GeomDataAPI_Point2D> aCurPoint = 
             std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
+          if (!aCurPoint->isInitialized())
+            continue;
 
           std::shared_ptr<GeomAPI_Pnt> aPnt = convertTo3D(aCurPoint->x(), aCurPoint->y(), theSketch);
           if (aPnt && (aPnt->distance(aValue) < Precision::Confusion())) {

@@ -224,12 +224,12 @@ void SketchSolver_Constraint::getAttributes(
       return;
     }
 
-    myStorage->update(*anIter/*, myGroupID*/);
-    EntityWrapperPtr anEntity = myStorage->entity(*anIter);
+    myStorage->update(aRefAttr/*, myGroupID*/);
+    EntityWrapperPtr anEntity = myStorage->entity(aRefAttr);
     if (!anEntity) {
       // Force creation of an entity
-      myStorage->update(*anIter, GID_UNKNOWN, true);
-      anEntity = myStorage->entity(*anIter);
+      myStorage->update(aRefAttr, GID_UNKNOWN, true);
+      anEntity = myStorage->entity(aRefAttr);
     }
     myAttributes.push_back(anEntity);
 

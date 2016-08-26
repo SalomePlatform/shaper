@@ -82,6 +82,7 @@ class SketchPlugin_Rectangle(model.Feature):
             for i in range (0, 3):
                 aLine = self.__sketch.addFeature("SketchLine")
                 aLinesList.append(aLine)
+            self.updateLines()
             aNbLines = aLinesList.size()
             # Create constraints to keep the rectangle
             for i in range (0, aNbLines):

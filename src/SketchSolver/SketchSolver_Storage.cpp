@@ -190,6 +190,8 @@ bool SketchSolver_Storage::update(FeaturePtr theFeature, const GroupID& theGroup
     std::list<AttributePtr> anAttrs = pointAttributes(theFeature);
     std::list<AttributePtr>::const_iterator anIt = anAttrs.begin();
     for (; anIt != anAttrs.end(); ++anIt) {
+      if (!(*anIt)->isInitialized())
+        return false;
       isUpdated = update(*anIt, theGroup, theForce) || isUpdated;
       aSubs.push_back(entity(*anIt));
     }
@@ -222,14 +224,20 @@ bool SketchSolver_Storage::update(FeaturePtr theFeature, const GroupID& theGroup
 
 bool SketchSolver_Storage::update(AttributePtr theAttribute, const GroupID& theGroup, bool theForce)
 {
+  if (!theAttribute->isInitialized())
+    return false;
+
   AttributePtr anAttribute = theAttribute;
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
   if (aRefAttr) {
     if (aRefAttr->isObject()) {
       FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
       return update(aFeature, theGroup, theForce);
-    } else
+    } else {
       anAttribute = aRefAttr->attr();
+      if (!anAttribute->isInitialized())
+        return false;
+    }
   }
 
   EntityWrapperPtr aRelated = entity(anAttribute);

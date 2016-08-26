@@ -272,21 +272,25 @@ void SketchPlugin_Arc::move(double theDeltaX, double theDeltaY)
   myEndUpdate = true;
   std::shared_ptr<GeomDataAPI_Point2D> aPoint2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(SketchPlugin_Arc::START_ID()));
-  aPoint2->move(theDeltaX, theDeltaY);
+  if (aPoint2->isInitialized())
+    aPoint2->move(theDeltaX, theDeltaY);
 
   std::shared_ptr<GeomDataAPI_Point2D> aPoint3 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(SketchPlugin_Arc::END_ID()));
-  aPoint3->move(theDeltaX, theDeltaY);
+  if (aPoint3->isInitialized())
+    aPoint3->move(theDeltaX, theDeltaY);
   myStartUpdate = false;
   myEndUpdate = false;
 
   std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(SketchPlugin_Arc::CENTER_ID()));
-  aPoint1->move(theDeltaX, theDeltaY);
+  if (aPoint1->isInitialized())
+    aPoint1->move(theDeltaX, theDeltaY);
 
   std::shared_ptr<GeomDataAPI_Point2D> aPassedPoint =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(PASSED_POINT_ID()));
-  aPassedPoint->move(theDeltaX, theDeltaY);
+  if (aPassedPoint->isInitialized())
+    aPassedPoint->move(theDeltaX, theDeltaY);
   aData->blockSendAttributeUpdated(false);
 }
 
