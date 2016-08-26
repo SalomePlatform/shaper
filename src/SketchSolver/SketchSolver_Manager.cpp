@@ -377,9 +377,31 @@ bool SketchSolver_Manager::moveEntity(std::shared_ptr<SketchPlugin_Feature> theF
   if (!isMoved && theFeature->getKind() == SketchPlugin_Arc::ID()) {
     // Workaround to move arc.
     // If the arc has not been constrained, we will push it into empty group and apply movement.
+    bool hasEmptyGroup = false;
     for (aGroupIt = myGroups.begin(); aGroupIt != myGroups.end(); aGroupIt++)
-      if ((*aGroupIt)->isEmpty())
+      if ((*aGroupIt)->isEmpty()) {
         isMoved = (*aGroupIt)->moveFeature(theFeature) || isMoved;
+        hasEmptyGroup = true;
+      }
+    // There is no empty group, create it explicitly
+    if (!hasEmptyGroup) {
+      // find sketch containing the arc
+      CompositeFeaturePtr aWP;
+      const std::set<AttributePtr>& aRefs = theFeature->data()->refsToMe();
+      std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin();
+      for (; aRefIt != aRefs.end(); ++aRefIt) {
+        FeaturePtr anOwner = ModelAPI_Feature::feature((*aRefIt)->owner());
+        if (anOwner && anOwner->getKind() == SketchPlugin_Sketch::ID()) {
+          aWP = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(anOwner);
+          break;
+        }
+      }
+      if (aWP) {
+        SketchSolver_Group* aGroup = new SketchSolver_Group(aWP);
+        isMoved = aGroup->moveFeature(theFeature) || isMoved;
+        myGroups.push_back(aGroup);
+      }
+    }
   }
   return isMoved;
 }

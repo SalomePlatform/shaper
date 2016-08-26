@@ -41,7 +41,7 @@
 
 const double tolerance = 1e-7;
 const double paramTolerance = 1.e-4;
-const double PI =3.141592653589793238463;
+const double PI = 3.141592653589793238463;
 
 namespace {
   static const std::string& POINT_ID(int theIndex)
@@ -68,7 +68,7 @@ SketchPlugin_Arc::SketchPlugin_Arc()
   myXEndBefore = 0;
   myYEndBefore = 0;
 
-  myParamBefore = 0;
+  myParamBefore = PI * 2.0;
 }
 
 void SketchPlugin_Arc::initDerivedClassAttributes()
