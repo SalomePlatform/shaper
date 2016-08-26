@@ -54,8 +54,6 @@ def vertical_body():
     # Create extrusion
     body = model.addExtrusion(part, sketch.selectFace(), "E")
 
-    model.do()
-
     return body
 
 def bottom_body():
@@ -97,10 +95,9 @@ def bottom_body():
     sketch.setCoincident(left_e.startPoint(), left.endPoint())
     sketch.setCoincident(left_e.endPoint(), left.startPoint())
 
-    model.do()  #!!!
-
     # Dimensions
-    sketch.setLength(v1, 16)
+    #sketch.setLength(v1, 16)
+    sketch.setLength(v2, 32)
     sketch.setLength(h2, 20)
     sketch.setLength(right, 16)
     sketch.setLength(top, "P")
@@ -162,8 +159,6 @@ def body_3():
     # Create extrusion
     body = model.addExtrusion(part, sketch.selectFace(), "-(L-22)")
 
-    model.do()  #!!!
-
     return body
 
 def body_4():
@@ -188,8 +183,6 @@ def body_4():
 
     # Create extrusion
     body = model.addExtrusion(part, sketch.selectFace(), "-12")
-
-    model.do()  #!!!
 
     return body
 
