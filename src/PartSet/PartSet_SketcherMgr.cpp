@@ -93,6 +93,7 @@
 
 //#define DEBUG_DO_NOT_BY_ENTER
 //#define DEBUG_SKETCHER_ENTITIES
+//#define DEBUG_SKETCH_ENTITIES_ON_MOVE
 
 //#define DEBUG_CURSOR
 
@@ -439,6 +440,18 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
 
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+#ifdef DEBUG_SKETCH_ENTITIES_ON_MOVE
+  CompositeFeaturePtr aSketch = activeSketch();
+  std::cout << "SKETCH FEATURES (before split) [" << aSketch->numberOfSubs() << "]:" << std::endl;
+  QStringList anInfo;
+  for (int i = 0, aNbSubs = aSketch->numberOfSubs(); i < aNbSubs; i++) {
+    //std::cout << getFeatureInfo(aSketch->subFeature(i), false) << std::endl;
+    anInfo.append(ModuleBase_Tools::objectInfo(aSketch->subFeature(i)));
+  }
+  QString anInfoStr = anInfo.join(";\t");
+  qDebug(QString("onFeatureUpdatedMsg: %1, %2").arg(anInfo.size()).arg(anInfoStr).toStdString().c_str());
+#endif
+
   if (myModule->sketchReentranceMgr()->processMouseMoved(theWnd, theEvent))
     return;
 
