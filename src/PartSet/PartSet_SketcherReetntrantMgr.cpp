@@ -145,11 +145,15 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* th
 
       FeaturePtr aCurrentFeature = aFOperation->feature();
       bool isLineFeature = false, isArcFeature = false;
-      if (aCurrentFeature->getKind() == SketchPlugin_Line::ID())
-        isLineFeature = anActiveWidget->attributeID() == SketchPlugin_Line::START_ID();
-      else if (isTangentArc(aFOperation, module()->sketchMgr()->activeSketch()))
-        isArcFeature = anActiveWidget->attributeID() == SketchPlugin_Arc::TANGENT_POINT_ID();
-
+      std::string anAttributeOnStart;
+      if (aCurrentFeature->getKind() == SketchPlugin_Line::ID()) {
+        anAttributeOnStart = SketchPlugin_Line::START_ID();
+        isLineFeature = anActiveWidget->attributeID() == anAttributeOnStart;
+      }
+      else if (isTangentArc(aFOperation, module()->sketchMgr()->activeSketch())) {
+        anAttributeOnStart = SketchPlugin_Arc::TANGENT_POINT_ID();
+        isArcFeature = anActiveWidget->attributeID() == anAttributeOnStart;
+      }
       bool aCanBeActivatedByMove = isLineFeature || isArcFeature;
       if (aCanBeActivatedByMove) {
         myPreviousFeature = aFOperation->feature();
@@ -159,7 +163,10 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* th
         anActiveWidget = module()->activeWidget();
         aCurrentFeature = anActiveWidget->feature();
         aProcessed = true;
-        aPanel->activateNextWidget(anActiveWidget);
+        if (anActiveWidget->attributeID() == anAttributeOnStart) {
+          // it was not deactivated by preselection processing
+          aPanel->activateNextWidget(anActiveWidget);
+        }
       } else {
         // processing mouse move in active widget of restarted operation
         ModuleBase_ModelWidget* anActiveWidget = module()->activeWidget();
