@@ -443,15 +443,23 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
       std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(theArc);
   std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anArcEnt->entity());
   // Distances from center till start and end points are equal to radius
-  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
-      anArc->center, anArc->start, anArc->rad)));
-  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
-      anArc->center, anArc->end, anArc->rad)));
+  GCSConstraintPtr aNew = GCSConstraintPtr(new GCS::ConstraintP2PDistance(
+      anArc->center, anArc->start, anArc->rad));
+//  aNew->setTag((int)(++myConstraintLastID));
+  anArcConstraints.push_back(aNew);
+  aNew = GCSConstraintPtr(new GCS::ConstraintP2PDistance(
+      anArc->center, anArc->end, anArc->rad));
+//  aNew->setTag((int)myConstraintLastID);
+  anArcConstraints.push_back(aNew);
   // Angles of start and end points should be equal to given angles
-  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PAngle(
-      anArc->center, anArc->start, anArc->startAngle)));
-  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PAngle(
-      anArc->center, anArc->end, anArc->endAngle)));
+  aNew = GCSConstraintPtr(new GCS::ConstraintP2PAngle(
+      anArc->center, anArc->start, anArc->startAngle));
+//  aNew->setTag((int)myConstraintLastID);
+  anArcConstraints.push_back(aNew);
+  aNew = GCSConstraintPtr(new GCS::ConstraintP2PAngle(
+      anArc->center, anArc->end, anArc->endAngle));
+//  aNew->setTag((int)myConstraintLastID);
+  anArcConstraints.push_back(aNew);
 
   myArcConstraintMap[theArc] = anArcConstraints;
 }
@@ -485,9 +493,11 @@ static void getParametersToMove(const EntityWrapperPtr& theEntity, std::set<doub
     // which will conflict with all parameters fixed:
     // 1. take center
     getParametersToMove(*aSIt++, theParamList);
-    // 2. take start point
-    getParametersToMove(*aSIt++, theParamList);
-    // 3. skip end point, radius and start angle, but take end angle parameter
+    // 2. skip start and end points
+    ++aSIt;
+    // 3. take radius, start angle and end angle parameters
+    getParametersToMove(*(++aSIt), theParamList);
+    getParametersToMove(*(++aSIt), theParamList);
     getParametersToMove(*(++aSIt), theParamList);
   } else {
     for (; aSIt != aSubs.end(); ++aSIt)
