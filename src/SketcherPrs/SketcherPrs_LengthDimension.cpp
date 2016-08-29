@@ -46,8 +46,6 @@ SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theCo
   myValue(0., false, "")
 {
   SetDimensionAspect(SketcherPrs_Tools::createDimensionAspect());
-  SetSelToleranceForText2d(SketcherPrs_Tools::getTextHeight());
-
   myStyleListener = new SketcherPrs_DimensionStyleListener();
 }
 
