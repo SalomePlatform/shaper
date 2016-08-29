@@ -15,7 +15,8 @@
       label="Select a sketch face"
       icon="icons/Features/sketch.png"
       tooltip="Select a sketch face"
-      type_choice="wires faces shells">
+      type_choice="wires faces shells"
+      concealment="true">
       <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="face,shell"/>
     </multi_selector>
     <shape_selector id="axis_object"

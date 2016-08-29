@@ -15,7 +15,8 @@
       label="Select a sketch face"
       icon="icons/Features/sketch.png"
       tooltip="Select a sketch face"
-      type_choice="vertices edges wires faces shells compounds">
+      type_choice="vertices edges wires faces shells compounds"
+      concealment="true">
       <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell,compound"/>
     </multi_selector>
     <shape_selector id="axis_object"
