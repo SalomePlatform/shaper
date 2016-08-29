@@ -8,12 +8,20 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Events.h>
-#include <ModelAPI_Expression.h>
+#include <Model_Expression.h>
 #include <ModelAPI_Object.h>
 
-Model_AttributeDouble::Model_AttributeDouble()
+Model_AttributeDouble::Model_AttributeDouble(TDF_Label& theLabel)
 {
-  myIsInitialized = false;
+  TDF_Label anExpressionLab = theLabel.FindChild(1);
+  myExpression.reset(new Model_ExpressionDouble(anExpressionLab));
+  myIsInitialized = myExpression->isInitialized();
+}
+
+void Model_AttributeDouble::reinit()
+{
+  myExpression->reinit();
+  myIsInitialized = myExpression->isInitialized();
 }
 
 void Model_AttributeDouble::setCalculatedValue(const double theValue)

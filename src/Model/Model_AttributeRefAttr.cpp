@@ -94,12 +94,18 @@ bool Model_AttributeRefAttr::isInitialized()
 
 Model_AttributeRefAttr::Model_AttributeRefAttr(TDF_Label& theLabel)
 {
-  myIsInitialized = theLabel.FindAttribute(TDataStd_Comment::GetID(), myID) == Standard_True;
+  myLab = theLabel;
+  reinit();
+}
+
+void Model_AttributeRefAttr::reinit()
+{
+  myIsInitialized = myLab.FindAttribute(TDataStd_Comment::GetID(), myID) == Standard_True;
   if (!myIsInitialized) {
     // create attribute: not initialized by value yet
-    myID = TDataStd_Comment::Set(theLabel, "");
-    myRef = TDF_Reference::Set(theLabel, theLabel);  // not initialized: reference to itself
+    myID = TDataStd_Comment::Set(myLab, "");
+    myRef = TDF_Reference::Set(myLab, myLab);  // not initialized: reference to itself
   } else {
-    theLabel.FindAttribute(TDF_Reference::GetID(), myRef);
+    myLab.FindAttribute(TDF_Reference::GetID(), myRef);
   }
 }

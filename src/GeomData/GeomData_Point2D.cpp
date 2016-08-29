@@ -20,6 +20,15 @@ GeomData_Point2D::GeomData_Point2D()
   myIsInitialized = false;
 }
 
+void GeomData_Point2D::reinit()
+{
+  myIsInitialized = true;
+  for (int aComponent = 0; aComponent < NUM_COMPONENTS; ++aComponent) {
+    myExpression[aComponent]->reinit();
+    myIsInitialized = myIsInitialized && myExpression[aComponent]->isInitialized();
+  }
+}
+
 void GeomData_Point2D::setCalculatedValue(const double theX, const double theY)
 {
   if (!myIsInitialized || x() != theX || y() != theY) {

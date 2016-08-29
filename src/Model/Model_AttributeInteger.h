@@ -57,7 +57,9 @@ class Model_AttributeInteger : public ModelAPI_AttributeInteger
 
  protected:
   /// Initializes attributes
-  Model_AttributeInteger();
+  Model_AttributeInteger(TDF_Label& theLabel);
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  virtual void reinit();
 
   friend class Model_Data;
 

@@ -71,6 +71,11 @@ int Model_AttributeIntArray::value(const int theIndex)
 Model_AttributeIntArray::Model_AttributeIntArray(TDF_Label& theLabel)
 {
   myLab = theLabel;
+  reinit();
+}
+
+void Model_AttributeIntArray::reinit()
+{
   // check the attribute could be already presented in this doc (after load document)
   myIsInitialized = 
     myLab.FindAttribute(TDataStd_IntegerArray::GetID(), myArray) == Standard_True;

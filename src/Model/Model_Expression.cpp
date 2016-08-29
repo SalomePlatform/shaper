@@ -75,35 +75,21 @@ std::set<std::string> Model_Expression::usedParameters() const
   return aResult;
 }
 
+///////////////// Model_ExpressionDouble /////////////
 Model_ExpressionDouble::Model_ExpressionDouble(TDF_Label& theLabel)
     : Model_Expression(theLabel)
 {
-  if (!theLabel.FindAttribute(TDataStd_Real::GetID(), myReal)) {
+  myLab = theLabel;
+  reinit();
+}
+
+void Model_ExpressionDouble::reinit()
+{
+  if (!myLab.FindAttribute(TDataStd_Real::GetID(), myReal)) {
     myIsInitialized = false;
-    // MPV: temporarily to support the previously saved files (to check and resolve bugs), to be removed
-    Handle(TDataStd_RealArray) anOldArray;
-    if (theLabel.Father().FindAttribute(TDataStd_RealArray::GetID(), anOldArray) == Standard_True) {
-      myReal = TDataStd_Real::Set(theLabel, 0.);
-      myReal->Set(anOldArray->Value(theLabel.Tag() - 1));
-      myIsInitialized = true;
-      Handle(TDataStd_ExtStringArray) anOldExp;
-      if (theLabel.Father().FindAttribute(TDataStd_ExtStringArray::GetID(), anOldExp) == Standard_True) {
-        myText->Set(anOldExp->Value(theLabel.Tag() - 1));
-      }
-    } else {
-      Handle(TDataStd_Real) anOldReal;
-      if (theLabel.Father().FindAttribute(TDataStd_Real::GetID(), anOldReal)) {
-        myIsInitialized = true;
-        myReal = TDataStd_Real::Set(theLabel, 0.);
-        myReal->Set(anOldReal->Get());
-        Handle(TDataStd_Name) aText;
-        if (theLabel.Father().FindAttribute(TDataStd_Name::GetID(), aText)) {
-          myText->Set(aText->Get());
-        }
-      }
-    }
-  } else
+  } else {
     myIsInitialized = true;
+  }
 }
 
 void Model_ExpressionDouble::setValue(const double theValue)
@@ -137,14 +123,21 @@ bool Model_ExpressionDouble::isInvalid()
   return myText->Label().IsAttribute(kInvalidGUID) == Standard_True;
 }
 
-
+///////////////// Model_ExpressionInteger /////////////
 Model_ExpressionInteger::Model_ExpressionInteger(TDF_Label& theLabel)
     : Model_Expression(theLabel)
 {
-  if (!theLabel.FindAttribute(TDataStd_Integer::GetID(), myInteger)) {
+  myLab = theLabel;
+  reinit();
+}
+
+void Model_ExpressionInteger::reinit()
+{
+  if (!myLab.FindAttribute(TDataStd_Integer::GetID(), myInteger)) {
     myIsInitialized = false;
-  } else
+  } else {
     myIsInitialized = true;
+  }
 }
 
 void Model_ExpressionInteger::setValue(const int theValue)

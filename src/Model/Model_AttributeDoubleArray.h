@@ -38,6 +38,8 @@ public:
 protected:
   /// Initializes attibutes
   Model_AttributeDoubleArray(TDF_Label& theLabel);
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  virtual void reinit();
 
 private:
   /// The OCCT array that keeps all values.

@@ -20,6 +20,15 @@ GeomData_Point::GeomData_Point()
   myIsInitialized = false;
 }
 
+void GeomData_Point::reinit()
+{
+  myIsInitialized = true;
+  for (int aComponent = 0; aComponent < NUM_COMPONENTS; ++aComponent) {
+    myExpression[aComponent]->reinit();
+    myIsInitialized = myIsInitialized && myExpression[aComponent]->isInitialized();
+  }
+}
+
 void GeomData_Point::setCalculatedValue(const double theX, const double theY, const double theZ)
 {
   if (!myIsInitialized || x() != theX || y() != theY || z() != theZ) {

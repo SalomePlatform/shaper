@@ -69,6 +69,8 @@ class GeomData_Point2D : public GeomDataAPI_Point2D
  protected:
   /// Initializes attributes
   GEOMDATA_EXPORT GeomData_Point2D();
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  virtual void reinit();
 
   friend class Model_Data;
 };

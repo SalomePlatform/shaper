@@ -20,6 +20,7 @@
 
 class Model_AttributeReference : public ModelAPI_AttributeReference
 {
+  TDF_Label myLab; ///< the main label of this attribute
   Handle_TDF_Reference myRef;  ///< references to the feature label
  public:
   /// Defines the object referenced from this attribute
@@ -39,6 +40,8 @@ class Model_AttributeReference : public ModelAPI_AttributeReference
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeReference(TDF_Label& theLabel);
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  virtual void reinit();
 
   friend class Model_Data;
   friend class Model_AttributeSelection;

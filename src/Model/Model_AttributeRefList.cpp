@@ -343,11 +343,17 @@ void Model_AttributeRefList::remove(const std::set<int>& theIndices)
 
 Model_AttributeRefList::Model_AttributeRefList(TDF_Label& theLabel)
 {
-  myIsInitialized = theLabel.FindAttribute(TDataStd_ReferenceList::GetID(), myRef) == Standard_True;
+  myLab = theLabel;
+  reinit();
+}
+
+void Model_AttributeRefList::reinit()
+{
+  myIsInitialized = myLab.FindAttribute(TDataStd_ReferenceList::GetID(), myRef) == Standard_True;
   if (!myIsInitialized) {
-    myRef = TDataStd_ReferenceList::Set(theLabel);
+    myRef = TDataStd_ReferenceList::Set(myLab);
   }
-  if (!theLabel.FindAttribute(TDataStd_ExtStringList::GetID(), myExtDocRef)) {
-    myExtDocRef = TDataStd_ExtStringList::Set(theLabel);
+  if (!myLab.FindAttribute(TDataStd_ExtStringList::GetID(), myExtDocRef)) {
+    myExtDocRef = TDataStd_ExtStringList::Set(myLab);
   }
 }

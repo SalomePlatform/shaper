@@ -8,12 +8,20 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Events.h>
-#include <ModelAPI_Expression.h>
+#include <Model_Expression.h>
 #include <ModelAPI_Object.h>
 
-Model_AttributeInteger::Model_AttributeInteger()
+Model_AttributeInteger::Model_AttributeInteger(TDF_Label& theLabel)
 {
-  myIsInitialized = false;
+  // to the same label to support the backward compatibility
+  myExpression.reset(new Model_ExpressionInteger(theLabel));
+  myIsInitialized = myExpression->isInitialized();
+}
+
+void Model_AttributeInteger::reinit()
+{
+  myExpression->reinit();
+  myIsInitialized = myExpression->isInitialized();
 }
 
 void Model_AttributeInteger::setCalculatedValue(const int theValue)

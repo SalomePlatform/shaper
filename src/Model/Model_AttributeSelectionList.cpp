@@ -288,15 +288,22 @@ bool Model_AttributeSelectionList::isInitialized()
 
 Model_AttributeSelectionList::Model_AttributeSelectionList(TDF_Label& theLabel)
 {
-  myIsInitialized = theLabel.FindAttribute(TDataStd_Integer::GetID(), mySize) == Standard_True;
+  myLab = theLabel;
+  reinit();
+}
+
+void Model_AttributeSelectionList::reinit()
+{
+  myIsInitialized = myLab.FindAttribute(TDataStd_Integer::GetID(), mySize) == Standard_True;
   if (!myIsInitialized) {
-    mySize = TDataStd_Integer::Set(theLabel, 0);
-    mySelectionType = TDataStd_Comment::Set(theLabel, "");
+    mySize = TDataStd_Integer::Set(myLab, 0);
+    mySelectionType = TDataStd_Comment::Set(myLab, "");
   } else { // recollect mySubs
-    theLabel.FindAttribute(TDataStd_Comment::GetID(), mySelectionType);
+    myLab.FindAttribute(TDataStd_Comment::GetID(), mySelectionType);
   }
   myIsCashed = false;
 }
+
 
 void Model_AttributeSelectionList::cashValues(const bool theEnabled)
 {

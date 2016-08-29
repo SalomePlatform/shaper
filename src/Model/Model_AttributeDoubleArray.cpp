@@ -71,6 +71,11 @@ double Model_AttributeDoubleArray::value(const int theIndex)
 Model_AttributeDoubleArray::Model_AttributeDoubleArray(TDF_Label& theLabel)
 {
   myLab = theLabel;
+  reinit();
+}
+
+void Model_AttributeDoubleArray::reinit()
+{
   // check the attribute could be already presented in this doc (after load document)
   myIsInitialized =
     myLab.FindAttribute(TDataStd_RealArray::GetID(), myArray) == Standard_True;

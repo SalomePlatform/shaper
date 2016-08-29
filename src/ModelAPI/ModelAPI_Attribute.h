@@ -79,7 +79,11 @@ class ModelAPI_Attribute
   /// Sets the ID of the attribute in Data (called from Data)
   MODELAPI_EXPORT virtual void setID(const std::string theID);
 
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  MODELAPI_EXPORT virtual void reinit();
+
   friend class Model_Data;
+  friend class Model_Objects;
 };
 
 //! Pointer on attribute object

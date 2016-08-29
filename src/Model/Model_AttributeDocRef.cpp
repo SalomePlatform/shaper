@@ -37,3 +37,8 @@ Model_AttributeDocRef::Model_AttributeDocRef(TDF_Label& theLabel)
     myID = TDataStd_Integer::Set(theLabel, aNewID);
   }
 }
+
+void Model_AttributeDocRef::reinit()
+{
+  // myLab is unknown, nevertheless, lose of attribute DocRef for live feature seems impossible
+}

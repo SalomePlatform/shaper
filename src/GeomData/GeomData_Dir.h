@@ -22,6 +22,7 @@ class GeomAPI_XYZ;
  */
 class GeomData_Dir : public GeomDataAPI_Dir
 {
+  TDF_Label myLab; ///< the main label of the attribute
   Handle_TDataStd_RealArray myCoords;  ///< X, Y and Z doubles as real array attribute [0; 2]
  public:
   /// Defines the double value
@@ -43,6 +44,8 @@ class GeomData_Dir : public GeomDataAPI_Dir
  protected:
   /// Initializes attributes
   GEOMDATA_EXPORT GeomData_Dir(TDF_Label& theLabel);
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  virtual void reinit();
 
   friend class Model_Data;
 };

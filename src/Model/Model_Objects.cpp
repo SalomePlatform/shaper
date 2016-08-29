@@ -664,9 +664,10 @@ void Model_Objects::synchronizeFeatures(
       aKeptFeatures.insert(aFeature);
       if (anUpdatedMap.Contains(aFeatureLabel)) {
         if (!theOpen) { // on abort/undo/redo reinitialize attributes is something is changed
-          std::shared_ptr<Model_Data> aD = std::dynamic_pointer_cast<Model_Data>(aFeature->data());
-          aD->myAttrs.clear();
-          aFeature->initAttributes();
+          std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = aFeature->data()->attributes("");
+          std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
+          for(; anAttr != anAttrs.end(); anAttr++)
+            (*anAttr)->reinit();
         }
         ModelAPI_EventCreator::get()->sendUpdated(aFeature, anUpdateEvent);
         if (aFeature->getKind() == "Parameter") { // if parameters are changed, update the results (issue 937)

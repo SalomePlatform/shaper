@@ -37,6 +37,11 @@ std::string Model_AttributeString::value()
 Model_AttributeString::Model_AttributeString(TDF_Label& theLabel)
 {
   myLab = theLabel;
+  reinit();
+}
+
+void Model_AttributeString::reinit()
+{
   // check the attribute could be already presented in this doc (after load document)
-  myIsInitialized = theLabel.FindAttribute(TDataStd_Name::GetID(), myString) == Standard_True;
+  myIsInitialized = myLab.FindAttribute(TDataStd_Name::GetID(), myString) == Standard_True;
 }

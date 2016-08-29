@@ -58,9 +58,15 @@ std::shared_ptr<GeomAPI_XYZ> GeomData_Dir::xyz()
 
 GeomData_Dir::GeomData_Dir(TDF_Label& theLabel)
 {
-  myIsInitialized = theLabel.FindAttribute(TDataStd_RealArray::GetID(), myCoords) == Standard_True;
+  myLab = theLabel;
+  reinit();
+}
+
+void GeomData_Dir::reinit()
+{
+  myIsInitialized = myLab.FindAttribute(TDataStd_RealArray::GetID(), myCoords) == Standard_True;
   if (!myIsInitialized) {
     // create attribute: not initialized by value yet, just zero
-    myCoords = TDataStd_RealArray::Set(theLabel, 0, 2);
+    myCoords = TDataStd_RealArray::Set(myLab, 0, 2);
   }
 }

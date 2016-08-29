@@ -11,6 +11,7 @@
 #include "ModelAPI_AttributeRefAttrList.h"
 #include "ModelAPI_Feature.h"
 
+#include <TDF_Label.hxx>
 #include <TDataStd_ReferenceList.hxx>
 #include <TDataStd_ExtStringList.hxx>
 
@@ -22,6 +23,7 @@
 
 class Model_AttributeRefAttrList : public ModelAPI_AttributeRefAttrList
 {
+  TDF_Label myLab; ///< the main label of this attribute
   Handle_TDataStd_ReferenceList myRef;  ///< references to the features labels
   Handle_TDataStd_ExtStringList myIDs;  ///< the referenced attributes IDs (empty for just object)
  public:
@@ -71,6 +73,8 @@ class Model_AttributeRefAttrList : public ModelAPI_AttributeRefAttrList
  protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeRefAttrList(TDF_Label& theLabel);
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  virtual void reinit();
 
   friend class Model_Data;
 };

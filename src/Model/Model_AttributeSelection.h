@@ -75,7 +75,8 @@ public:
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelection(TDF_Label& theLabel);
-    /// Performs the selection for the body result (TNaming Selection)
+
+  /// Performs the selection for the body result (TNaming Selection)
 
   /// Performs the selection for the body result (TNaming selection)
   virtual void selectBody(

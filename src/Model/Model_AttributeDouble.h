@@ -59,7 +59,9 @@ class Model_AttributeDouble : public ModelAPI_AttributeDouble
 
  protected:
   /// Initializes attributes
-  Model_AttributeDouble();
+  Model_AttributeDouble(TDF_Label& theLabel);
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  virtual void reinit();
 
   friend class Model_Data;
 };

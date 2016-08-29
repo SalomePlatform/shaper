@@ -23,6 +23,7 @@
 
 class Model_AttributeSelectionList : public ModelAPI_AttributeSelectionList
 {
+  TDF_Label myLab; ///< the main label of this attribute
   Handle(TDataStd_Integer) mySize;  ///< Contains size of this list
   /// Contains current type name (same as selection attribute)
   Handle(TDataStd_Comment) mySelectionType;
@@ -88,6 +89,8 @@ public:
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelectionList(TDF_Label& theLabel);
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  virtual void reinit();
 
   friend class Model_Data;
 };

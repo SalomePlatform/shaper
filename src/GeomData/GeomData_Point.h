@@ -74,6 +74,8 @@ class GeomData_Point : public GeomDataAPI_Point
  protected:
   /// Initializes attributes
   GEOMDATA_EXPORT GeomData_Point();
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  virtual void reinit();
 
   friend class Model_Data;
 };

@@ -22,6 +22,7 @@
 
 class Model_AttributeRefList : public ModelAPI_AttributeRefList
 {
+  TDF_Label myLab; ///< the main label of this attribute
   Handle_TDataStd_ReferenceList myRef;  ///< references to the features labels
   /// pairs of doc ID and entries if reference is to external object, appends some in this list if
   /// something in myRef is empty
@@ -73,6 +74,8 @@ class Model_AttributeRefList : public ModelAPI_AttributeRefList
  protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeRefList(TDF_Label& theLabel);
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  virtual void reinit();
   /// Returns the object by iterators (theExtIter is iterated if necessary)
   ObjectPtr iteratedObject(TDF_ListIteratorOfLabelList& theLIter,
     TDataStd_ListIteratorOfListOfExtendedString& theExtIter,

@@ -50,8 +50,7 @@ class Model_Expression : public virtual ModelAPI_Expression
   Handle_TDataStd_Name myText; ///< Text representation of the attribute (may differ for parameters)
   Handle_TDataStd_Comment myError; ///< Error of expression of the text attribute
   Handle_TDataStd_ExtStringList myUsedParameters; ///< Parameters used in expression
-
-  friend class Model_Data;
+  TDF_Label myLab; ///< if attribute is not initialized, store label here
 };
 
 
@@ -109,7 +108,10 @@ class Model_ExpressionDouble :
  protected:
   /// Initializes attributes
   Model_ExpressionDouble(TDF_Label& theLabel);
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  virtual void reinit();
 
+  friend class Model_AttributeDouble;
   friend class Model_Data;
 
  private:
@@ -171,8 +173,10 @@ class Model_ExpressionInteger :
  protected:
   /// Initializes attributes
   Model_ExpressionInteger(TDF_Label& theLabel);
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  virtual void reinit();
 
-  friend class Model_Data;
+  friend class Model_AttributeInteger;
 
  private:
   Handle_TDataStd_Integer myInteger;

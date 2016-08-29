@@ -47,6 +47,8 @@ class Model_AttributeIntArray : public ModelAPI_AttributeIntArray
  protected:
   /// Initializes attibutes
   Model_AttributeIntArray(TDF_Label& theLabel);
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  virtual void reinit();
 
   friend class Model_Data;
 };

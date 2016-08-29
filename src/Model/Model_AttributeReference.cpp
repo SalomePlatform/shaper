@@ -104,9 +104,15 @@ bool Model_AttributeReference::isInitialized()
 
 Model_AttributeReference::Model_AttributeReference(TDF_Label& theLabel)
 {
-  myIsInitialized = theLabel.FindAttribute(TDF_Reference::GetID(), myRef) == Standard_True;
+  myLab = theLabel;
+  reinit();
+}
+
+void Model_AttributeReference::reinit()
+{
+  myIsInitialized = myLab.FindAttribute(TDF_Reference::GetID(), myRef) == Standard_True;
   if (!myIsInitialized) {
-    myRef = TDF_Reference::Set(theLabel, theLabel);  // not initialized references to itself
+    myRef = TDF_Reference::Set(myLab, myLab);  // not initialized references to itself
   } else {
     if (owner()) {
       std::shared_ptr<Model_Document> aDoc =

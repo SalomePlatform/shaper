@@ -22,6 +22,7 @@
 class Model_AttributeRefAttr : public ModelAPI_AttributeRefAttr
 {
   Handle_TDF_Reference myRef;  ///< reference to the feature label
+  TDF_Label myLab; ///< the main label of this attribute
   ///< ID of the referenced attribute (empty if this is a reference to a feature)
   Handle_TDataStd_Comment myID;
  public:
@@ -46,6 +47,8 @@ class Model_AttributeRefAttr : public ModelAPI_AttributeRefAttr
  protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeRefAttr(TDF_Label& theLabel);
+  /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
+  virtual void reinit();
 
   friend class Model_Data;
 };

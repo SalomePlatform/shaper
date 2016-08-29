@@ -83,3 +83,5 @@ void ModelAPI_Attribute::setID(const std::string theID)
 {
   myID = theID;
 }
+
+void ModelAPI_Attribute::reinit() {}
