@@ -23,6 +23,7 @@ class ModelAPI_Object;
 class ModelHighAPI_Double;
 class ModelHighAPI_Integer;
 class ModelHighAPI_RefAttr;
+class ModelHighAPI_Reference;
 class ModelHighAPI_Selection;
 class SketchAPI_Arc;
 class SketchAPI_Circle;
@@ -245,113 +246,120 @@ public:
       const ModelHighAPI_Integer & theNumberOfObjects,
       bool theFullValue = false);
 
+  /// Add split
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelHighAPI_Interface> addSplit(
+      const ModelHighAPI_Reference& theFeature,
+      const ModelHighAPI_RefAttr& thePoint1,
+      const ModelHighAPI_RefAttr& thePoint2);
+
   /// Set angle
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setAngle(
+  std::shared_ptr<ModelHighAPI_Interface> setAngle(
       const ModelHighAPI_RefAttr & theLine1,
       const ModelHighAPI_RefAttr & theLine2,
       const ModelHighAPI_Double & theValue);
 
   /// Set complementary angle
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setAngleComplementary(
+  std::shared_ptr<ModelHighAPI_Interface> setAngleComplementary(
       const ModelHighAPI_RefAttr & theLine1,
       const ModelHighAPI_RefAttr & theLine2,
       const ModelHighAPI_Double & theValue);
 
   /// Set backward angle (= 360 - angle)
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setAngleBackward(
+  std::shared_ptr<ModelHighAPI_Interface> setAngleBackward(
       const ModelHighAPI_RefAttr & theLine1,
       const ModelHighAPI_RefAttr & theLine2,
       const ModelHighAPI_Double & theValue);
 
   /// Set coincident
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setCoincident(
+  std::shared_ptr<ModelHighAPI_Interface> setCoincident(
       const ModelHighAPI_RefAttr & thePoint1,
       const ModelHighAPI_RefAttr & thePoint2);
 
   /// Set collinear
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setCollinear(
+  std::shared_ptr<ModelHighAPI_Interface> setCollinear(
       const ModelHighAPI_RefAttr & theLine1,
       const ModelHighAPI_RefAttr & theLine2);
 
   /// Set distance
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setDistance(
+  std::shared_ptr<ModelHighAPI_Interface> setDistance(
       const ModelHighAPI_RefAttr & thePoint,
       const ModelHighAPI_RefAttr & thePointOrLine,
       const ModelHighAPI_Double & theValue);
 
   /// Set equal
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setEqual(
+  std::shared_ptr<ModelHighAPI_Interface> setEqual(
       const ModelHighAPI_RefAttr & theObject1,
       const ModelHighAPI_RefAttr & theObject2);
 
   /// Set fillet
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setFillet(
+  std::shared_ptr<ModelHighAPI_Interface> setFillet(
       const std::list<ModelHighAPI_RefAttr> & thePoints,
       const ModelHighAPI_Double & theRadius);
 
   /// Set fixed
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setFixed(
+  std::shared_ptr<ModelHighAPI_Interface> setFixed(
       const ModelHighAPI_RefAttr & theObject);
 
   /// Set horizontal
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setHorizontal(
+  std::shared_ptr<ModelHighAPI_Interface> setHorizontal(
       const ModelHighAPI_RefAttr & theLine);
 
   /// Set length
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setLength(
+  std::shared_ptr<ModelHighAPI_Interface> setLength(
       const ModelHighAPI_RefAttr & theLine,
       const ModelHighAPI_Double & theValue);
 
   /// Set middle
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setMiddlePoint(
+  std::shared_ptr<ModelHighAPI_Interface> setMiddlePoint(
       const ModelHighAPI_RefAttr & thePoint,
       const ModelHighAPI_RefAttr & theLine);
 
   /// Set parallel
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setParallel(
+  std::shared_ptr<ModelHighAPI_Interface> setParallel(
       const ModelHighAPI_RefAttr & theLine1,
       const ModelHighAPI_RefAttr & theLine2);
 
   /// Set perpendicular
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setPerpendicular(
+  std::shared_ptr<ModelHighAPI_Interface> setPerpendicular(
       const ModelHighAPI_RefAttr & theLine1,
       const ModelHighAPI_RefAttr & theLine2);
 
   /// Set radius
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setRadius(
+  std::shared_ptr<ModelHighAPI_Interface> setRadius(
       const ModelHighAPI_RefAttr & theCircleOrArc,
       const ModelHighAPI_Double & theValue);
 
   /// Set tangent
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setTangent(
+  std::shared_ptr<ModelHighAPI_Interface> setTangent(
       const ModelHighAPI_RefAttr & theLine,
       const ModelHighAPI_RefAttr & theCircle);
 
   /// Set vertical
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelAPI_Feature> setVertical(
+  std::shared_ptr<ModelHighAPI_Interface> setVertical(
       const ModelHighAPI_RefAttr & theLine);
 
   /// Set constraint value
   SKETCHAPI_EXPORT
   void setValue(
-      const std::shared_ptr<ModelAPI_Feature> & theConstraint,
+      const std::shared_ptr<ModelHighAPI_Interface> & theConstraint,
       const ModelHighAPI_Double & theValue);
 
   // TODO(spo): rename to selectFaces() or faces() (or add faces() -> list to SWIG)
