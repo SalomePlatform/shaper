@@ -208,26 +208,30 @@ AISObjectPtr SketchPlugin_Arc::getAISObject(AISObjectPtr thePrevious)
             std::shared_ptr<GeomAPI_Pnt> aStartPoint(aSketch->to3D(aStartAttr->x(), aStartAttr->y()));
             std::shared_ptr<GeomAPI_Pnt> aEndPoint = aStartPoint;
             if (aTypeAttr && aTypeAttr->isInitialized() &&
-                aTypeAttr->value() == ARC_TYPE_THREE_POINTS() && aEndAttr->isInitialized() &&
-                aEndAttr->pnt()->distance(aStartAttr->pnt()) > tolerance) {
-              aEndPoint = aSketch->to3D(aEndAttr->x(), aEndAttr->y());
-              std::shared_ptr<GeomDataAPI_Point2D> aPassedAttr = 
-                std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(PASSED_POINT_ID()));
-              if (!aPassedAttr->isInitialized()) { // calculate the appropriate center for the presentation
-                // check that center is bad for the current start and end and must be recomputed
-                std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(new GeomAPI_Circ2d(
-                  aCenterAttr->pnt(), aStartAttr->pnt()));
-                std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(aEndAttr->pnt());
-                if (!aProjection.get() || aEndAttr->pnt()->distance(aProjection) > tolerance) {
-                  std::shared_ptr<GeomAPI_XY> aDir = 
-                    aEndAttr->pnt()->xy()->decreased(aStartAttr->pnt()->xy())->multiplied(0.5);
-                  double x = aDir->x();
-                  double y = aDir->y();
-                  aDir->setX(x - y);
-                  aDir->setY(y + x);
-                  std::shared_ptr<GeomAPI_XY> aCenterXY = aStartAttr->pnt()->xy()->added(aDir);
-                  aCenter = aSketch->to3D(aCenterXY->x(), aCenterXY->y());
+                aTypeAttr->value() == ARC_TYPE_THREE_POINTS()) {
+              if (aEndAttr->isInitialized() && // 
+                  aEndAttr->pnt()->distance(aStartAttr->pnt()) > tolerance) {
+                aEndPoint = aSketch->to3D(aEndAttr->x(), aEndAttr->y());
+                std::shared_ptr<GeomDataAPI_Point2D> aPassedAttr = 
+                  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(PASSED_POINT_ID()));
+                if (!aPassedAttr->isInitialized()) { // calculate the appropriate center for the presentation
+                  // check that center is bad for the current start and end and must be recomputed
+                  std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(new GeomAPI_Circ2d(
+                    aCenterAttr->pnt(), aStartAttr->pnt()));
+                  std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(aEndAttr->pnt());
+                  if (!aProjection.get() || aEndAttr->pnt()->distance(aProjection) > tolerance) {
+                    std::shared_ptr<GeomAPI_XY> aDir = 
+                      aEndAttr->pnt()->xy()->decreased(aStartAttr->pnt()->xy())->multiplied(0.5);
+                    double x = aDir->x();
+                    double y = aDir->y();
+                    aDir->setX(x - y);
+                    aDir->setY(y + x);
+                    std::shared_ptr<GeomAPI_XY> aCenterXY = aStartAttr->pnt()->xy()->added(aDir);
+                    aCenter = aSketch->to3D(aCenterXY->x(), aCenterXY->y());
+                  }
                 }
+              } else { // issue #1695: don't display circle if initialized only start point
+                return AISObjectPtr();
               }
             }
             AttributeBooleanPtr isInversed =
