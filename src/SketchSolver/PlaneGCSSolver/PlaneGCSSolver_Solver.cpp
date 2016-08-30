@@ -22,14 +22,15 @@ void PlaneGCSSolver_Solver::clear()
   myParameters.clear();
 }
 
-void PlaneGCSSolver_Solver::addConstraint(GCSConstraintPtr theConstraint)
+void PlaneGCSSolver_Solver::addConstraint(GCSConstraintPtr theConstraint,
+    const SketchSolver_ConstraintType theType)
 {
   GCS::Constraint* aConstraint = theConstraint.get();
   if (myConstraints.find(aConstraint) != myConstraints.end())
     return; // constraint already exists, no need to add it again
 
   myEquationSystem.addConstraint(aConstraint);
-  myConstraints.insert(aConstraint);
+  myConstraints[aConstraint] = theType;
 }
 
 void PlaneGCSSolver_Solver::removeConstraint(GCSConstraintPtr theConstraint)
@@ -65,15 +66,15 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
   // if there is a constraint with all attributes constant, set fail status
   GCS::SET_pD aParameters;
   aParameters.insert(myParameters.begin(), myParameters.end());
-  std::set<GCS::Constraint*>::const_iterator aConstrIt = myConstraints.begin();
+  ConstraintMap::const_iterator aConstrIt = myConstraints.begin();
   for (; aConstrIt != myConstraints.end(); ++aConstrIt) {
-    GCS::VEC_pD aParams = (*aConstrIt)->params();
+    GCS::VEC_pD aParams = aConstrIt->first->params();
     GCS::VEC_pD::const_iterator aPIt = aParams.begin();
     for (; aPIt != aParams.end(); ++aPIt)
       if (aParameters.find(*aPIt) != aParameters.end())
         break;
-    if (aPIt == aParams.end() && (*aConstrIt)->getTag() > 0) {
-      myConflictingIDs.push_back((*aConstrIt)->getTag());
+    if (aPIt == aParams.end() && aConstrIt->first->getTag() > 0) {
+      myConflictingIDs.push_back(aConstrIt->first->getTag());
       myConfCollected = true;
       aResult = GCS::Failed;
     }
@@ -106,15 +107,15 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
     GCS::VEC_I aRedundantLocal;
     myEquationSystem.getRedundant(aRedundantLocal);
     aRedundantID.insert(aRedundantID.end(), aRedundantLocal.begin(), aRedundantLocal.end());
-    // Workaround: remove all constraints "Equal"
+    // Workaround: remove all point-point coincidences from list of redundant
     if (!aRedundantID.empty()) {
-      std::set<GCS::Constraint*>::const_iterator aCIt = myConstraints.begin();
+      ConstraintMap::const_iterator aCIt = myConstraints.begin();
       for (; aCIt != myConstraints.end(); ++aCIt) {
-        if ((*aCIt)->getTypeId() != GCS::Equal)
+        if (aCIt->second != CONSTRAINT_PT_PT_COINCIDENT)
           continue;
         GCS::VEC_I::iterator aRIt = aRedundantID.begin();
         for (; aRIt != aRedundantID.end(); ++aRIt)
-          if ((*aCIt)->getTag() == *aRIt) {
+          if (aCIt->first->getTag() == *aRIt) {
             aRedundantID.erase(aRIt);
             break;
           }
@@ -157,9 +158,9 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solveWithoutTangent()
       --aNbRemove;
     }
 
-  std::set<GCS::Constraint*>::const_iterator aConstrIt = myConstraints.begin();
+  ConstraintMap::const_iterator aConstrIt = myConstraints.begin();
   while (aConstrIt != myConstraints.end()) {
-    GCS::Constraint* aConstraint = *aConstrIt;
+    GCS::Constraint* aConstraint = aConstrIt->first;
     int anID = aConstraint->getTag();
     ++aConstrIt;
     if (aTangentToRemove.find(anID) != aTangentToRemove.end())
@@ -175,12 +176,12 @@ bool PlaneGCSSolver_Solver::isTangentTruth(int theTagID) const
   static const double aTol = 1e-7;
   static const double aTol2 = aTol *aTol;
 
-  std::set<GCS::Constraint*>::const_iterator anIt = myConstraints.begin();
+  ConstraintMap::const_iterator anIt = myConstraints.begin();
   for (; anIt != myConstraints.end(); ++anIt) {
-    if ((*anIt)->getTag() != theTagID)
+    if (anIt->first->getTag() != theTagID)
       continue;
-    if ((*anIt)->getTypeId() == GCS::TangentCircumf) {
-      GCS::VEC_pD aParams = (*anIt)->params();
+    if (anIt->first->getTypeId() == GCS::TangentCircumf) {
+      GCS::VEC_pD aParams = anIt->first->params();
       double dx = *(aParams[2]) - *(aParams[0]);
       double dy = *(aParams[3]) - *(aParams[1]);
       double aDist2 = dx * dx + dy * dy;
@@ -189,8 +190,8 @@ bool PlaneGCSSolver_Solver::isTangentTruth(int theTagID) const
       return fabs(aDist2 - aRadSum * aRadSum) <= aTol2 ||
              fabs(aDist2 - aRadDiff * aRadDiff) <= aTol2;
     }
-    if ((*anIt)->getTypeId() == GCS::P2LDistance) {
-      GCS::VEC_pD aParams = (*anIt)->params();
+    if (anIt->first->getTypeId() == GCS::P2LDistance) {
+      GCS::VEC_pD aParams = anIt->first->params();
       double aDist2 = *(aParams[6]) * *(aParams[6]);
       // orthogonal line direction
       double aDirX = *(aParams[5]) - *(aParams[3]);

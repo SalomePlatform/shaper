@@ -628,7 +628,7 @@ void PlaneGCSSolver_Storage::initializeSolver(SolverPtr theSolver)
       std::list<GCSConstraintPtr>::const_iterator anIt = aGCS->constraints().begin();
       for (; anIt != aGCS->constraints().end(); ++anIt)
         if (!isRedundant(*anIt, aGCS, aCoincidentPoints))
-          aSolver->addConstraint(*anIt);
+          aSolver->addConstraint(*anIt, aGCS->type());
     }
     // store IDs of tangent constraints to avoid incorrect report of redundant constraints
     if (aCIt->first && aCIt->first->getKind() == SketchPlugin_ConstraintTangent::ID())
@@ -641,7 +641,7 @@ void PlaneGCSSolver_Storage::initializeSolver(SolverPtr theSolver)
   for (; anArcIt != myArcConstraintMap.end(); ++anArcIt) {
     std::vector<GCSConstraintPtr>::const_iterator anIt = anArcIt->second.begin();
     for (; anIt != anArcIt->second.end(); ++anIt)
-      aSolver->addConstraint(*anIt);
+      aSolver->addConstraint(*anIt, CONSTRAINT_UNKNOWN);
   }
   // removed waste constraints
   std::list<GCSConstraintPtr>::const_iterator aRemIt = myRemovedConstraints.begin();

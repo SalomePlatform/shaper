@@ -8,6 +8,7 @@
 #define PlaneGCSSolver_Solver_H_
 
 #include <SketchSolver_ISolver.h>
+#include <SketchSolver_IConstraintWrapper.h>
 #include <PlaneGCSSolver_Defs.h>
 
 #include <GCS.h>
@@ -25,7 +26,8 @@ public:
   void clear();
 
   /// \brief Add constraint to the system of equations
-  void addConstraint(GCSConstraintPtr theConstraint);
+  void addConstraint(GCSConstraintPtr theConstraint,
+                     const SketchSolver_ConstraintType theType);
 
   /// \brief Remove constraint from the system of equations
   void removeConstraint(GCSConstraintPtr theConstraint);
@@ -72,14 +74,16 @@ private:
   bool isTangentTruth(int theTagID) const;
 
 private:
-  GCS::VEC_pD                myParameters;     ///< list of unknowns
-  std::set<GCS::Constraint*> myConstraints;    ///< list of constraints already processed by the system
-  GCS::System                myEquationSystem; ///< set of equations for solving in FreeGCS
+  typedef std::map<GCS::Constraint*, SketchSolver_ConstraintType> ConstraintMap;
 
-  GCS::VEC_I                 myConflictingIDs; ///< list of IDs of conflicting constraints
-  bool                       myConfCollected;  ///< specifies the conflicting constraints are already collected
+  GCS::VEC_pD   myParameters;     ///< list of unknowns
+  ConstraintMap myConstraints;    ///< list of constraints already processed by the system
+  GCS::System   myEquationSystem; ///< set of equations for solving in FreeGCS
 
-  GCS::SET_I                 myTangent;        ///< list of tangent IDs to check incorrect redundant constraints
+  GCS::VEC_I    myConflictingIDs; ///< list of IDs of conflicting constraints
+  bool          myConfCollected;  ///< specifies the conflicting constraints are already collected
+
+  GCS::SET_I    myTangent;        ///< list of tangent IDs to check incorrect redundant constraints
 };
 
 #endif
