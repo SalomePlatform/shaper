@@ -122,7 +122,11 @@ void SketchPlugin_ConstraintDistance::move(double theDeltaX, double theDeltaY)
   std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   myFlyoutUpdate = true;
-  aPoint->setValue(aPoint->x() + dX, aPoint->y() + dY);
+  if (aPoint->isInitialized()) {
+    aPoint->setValue(aPoint->x() + dX, aPoint->y() + dY);
+  } else {
+    aPoint->setValue(dX, dY);
+  }
   myFlyoutUpdate = false;
 }
 
