@@ -12,6 +12,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_Events.h>
 
 #include <cmath>
 
@@ -84,9 +85,12 @@ void begin()
 {
   ModelAPI_Session::get()->startOperation();
 }
+
 void end()
 {
   ModelAPI_Session::get()->finishOperation();
+  // to update data tree in the end of dumped script execution
+  ModelAPI_EventCreator::get()->sendReordered(FeaturePtr());
 }
 void apply()
 {

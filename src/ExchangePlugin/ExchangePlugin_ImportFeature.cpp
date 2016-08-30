@@ -187,6 +187,9 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
       aSelectionList->value(anElementIndex)->setId(aReferenceID);
     }
   }
+  // Top avoid problems in Object Browser update: issue #1647.
+  ModelAPI_EventCreator::get()->sendReordered(
+    std::dynamic_pointer_cast<ModelAPI_Feature>(aRefListOfGroups->owner()));
 
   } catch (XAO::XAO_Exception& e) {
     std::string anError = e.what();

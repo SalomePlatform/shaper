@@ -255,29 +255,33 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_ORDER_UPDATED)) {
     std::shared_ptr<ModelAPI_OrderUpdatedMessage> aUpdMsg =
         std::dynamic_pointer_cast<ModelAPI_OrderUpdatedMessage>(theMessage);
-    DocumentPtr aDoc = aUpdMsg->reordered()->document();
-    std::string aGroup = aUpdMsg->reordered()->group();
+    if (aUpdMsg->reordered().get()) {
+      DocumentPtr aDoc = aUpdMsg->reordered()->document();
+      std::string aGroup = aUpdMsg->reordered()->group();
 
-    QModelIndex aParent;
-    int aStartId = 0;
-    if (aDoc == aRootDoc) {
-      // Update a group under root
-      if (aGroup == myXMLReader->rootType()) // Update objects under root
-        aStartId = foldersCount();
-      else // Update objects in folder under root 
-        aParent = createIndex(folderId(aGroup), 0, -1);
+      QModelIndex aParent;
+      int aStartId = 0;
+      if (aDoc == aRootDoc) {
+        // Update a group under root
+        if (aGroup == myXMLReader->rootType()) // Update objects under root
+          aStartId = foldersCount();
+        else // Update objects in folder under root 
+          aParent = createIndex(folderId(aGroup), 0, -1);
+      } else {
+        // Update a sub-document
+        if (aGroup == myXMLReader->subType()) {
+          // Update sub-document root
+          aParent = findDocumentRootIndex(aDoc.get());
+          aStartId = foldersCount(aDoc.get());
+        } else 
+          // update folder in sub-document
+          aParent = createIndex(folderId(aGroup, aDoc.get()), 0, aDoc.get());
+      }
+      int aChildNb = rowCount(aParent);
+      rebuildBranch(aStartId, aChildNb - aStartId, aParent);
     } else {
-      // Update a sub-document
-      if (aGroup == myXMLReader->subType()) {
-        // Update sub-document root
-        aParent = findDocumentRootIndex(aDoc.get());
-        aStartId = foldersCount(aDoc.get());
-      } else 
-        // update folder in sub-document
-        aParent = createIndex(folderId(aGroup, aDoc.get()), 0, aDoc.get());
+      rebuildDataTree();
     }
-    int aChildNb = rowCount(aParent);
-    rebuildBranch(aStartId, aChildNb - aStartId, aParent);
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
     DocumentPtr aDoc = ModelAPI_Session::get()->activeDocument();
     if (aDoc != aRootDoc) {

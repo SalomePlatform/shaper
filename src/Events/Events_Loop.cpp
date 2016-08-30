@@ -62,8 +62,6 @@ void Events_Loop::send(const std::shared_ptr<Events_Message>& theMessage, bool i
     }
   }
 
-  // TODO: make it in thread and with usage of semaphores
-
   map<char*, map<void*, list<Events_Listener*> > >::iterator aFindID = myListeners.find(
       theMessage->eventID().eventText());
   if (aFindID != myListeners.end()) {

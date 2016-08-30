@@ -60,8 +60,12 @@ class Events_Loop
 
   //! Registers (or adds if such listener is already registered) a listener 
   //! that will be called on the event and from the defined sender
+  //! \param theListener the object that will listen (process) the event
+  //! \param theID listen for messages with this ID
+  //! \param theSender listen only for this sender (NULL - listen everybody)
+  //! \param theImmediate for listeners who can not wait (no groupping mechanism is used for it)
   EVENTS_EXPORT void registerListener(Events_Listener* theListener, const Events_ID theID,
-                                      void* theSender = 0, bool theImmediate = false);
+    void* theSender = 0, bool theImmediate = false);
 
   //! Remove the listener from internal maps if it was registered there
   //! \param theListener a listener

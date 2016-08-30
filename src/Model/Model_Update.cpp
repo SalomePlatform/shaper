@@ -310,7 +310,8 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   } else if (theMessage->eventID() == kReorderEvent) {
     std::shared_ptr<ModelAPI_OrderUpdatedMessage> aMsg = 
       std::dynamic_pointer_cast<ModelAPI_OrderUpdatedMessage>(theMessage);
-    addModified(aMsg->reordered(), aMsg->reordered()); // to update all attributes
+    if (aMsg->reordered().get())
+      addModified(aMsg->reordered(), aMsg->reordered()); // to update all attributes
   }
 }
 
