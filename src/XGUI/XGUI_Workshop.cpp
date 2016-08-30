@@ -751,6 +751,9 @@ void XGUI_Workshop::openDirectory(const QString& theDirectory)
   aSession->load(myCurrentDir.toLatin1().constData());
   myObjectBrowser->rebuildDataTree();
   updateCommandStatus();
+#ifndef HAVE_SALOME
+  myMainWindow->setCurrentDir(myCurrentDir, true);
+#endif
   QApplication::restoreOverrideCursor();
 }
 
