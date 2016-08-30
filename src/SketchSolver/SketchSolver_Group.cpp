@@ -430,14 +430,15 @@ bool SketchSolver_Group::resolveConstraints()
 
     aResolved = true;
   } else if (!isGroupEmpty) {
-    // Check there are constraints Fixed. If they exist, update parameters by stored values
+    // Check if the group contains only constraints Fixed, update parameters by stored values
+    aResolved = true;
     ConstraintConstraintMap::iterator aCIt = myConstraints.begin();
     for (; aCIt != myConstraints.end(); ++aCIt)
-      if (aCIt->first->getKind() == SketchPlugin_ConstraintRigid::ID()) {
-        aResolved = true;
+      if (aCIt->first->getKind() != SketchPlugin_ConstraintRigid::ID()) {
+        aResolved = false;
         break;
       }
-    if (aCIt != myConstraints.end())
+    if (aCIt == myConstraints.end())
       myStorage->refresh();
   }
   removeTemporaryConstraints();
