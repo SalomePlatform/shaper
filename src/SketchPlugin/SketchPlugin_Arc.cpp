@@ -365,6 +365,8 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
         double aStartAngle, aEndAngle;
         anEdge->getRange(aStartAngle, aEndAngle);
         data()->real(ANGLE_ID())->setValue(aEndAngle - aStartAngle);
+        myParamBefore = aEndAngle;
+        adjustPeriod(myParamBefore);
       }
     }
     return;
