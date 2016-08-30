@@ -733,10 +733,11 @@ void SketchSolver_Manager::degreesOfFreedom()
           aPoints.insert(aRefAttr->attr());
         } else {
           FeaturePtr anAttr = ModelAPI_Feature::feature(aRefAttr->object());
-          if (anAttr)
+          if (anAttr) {
             aDoF -= aDoFDelta[anAttr->getKind()];
-          std::list<AttributePtr> aPtAttrs = anAttr->data()->attributes(GeomDataAPI_Point2D::typeId());
-          aPoints.insert(aPtAttrs.begin(), aPtAttrs.end());
+            std::list<AttributePtr> aPtAttrs = anAttr->data()->attributes(GeomDataAPI_Point2D::typeId());
+            aPoints.insert(aPtAttrs.begin(), aPtAttrs.end());
+          }
         }
 
         // Check whether feature's points are already coincident with fixed points.
