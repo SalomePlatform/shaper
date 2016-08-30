@@ -170,5 +170,6 @@ void SketcherPrs_Radius::ComputeSelection(const Handle(SelectMgr_Selection)& aSe
     return; 
   }
   }
+  SetSelToleranceForText2d(SketcherPrs_Tools::getTextHeight());
   AIS_RadiusDimension::ComputeSelection(aSelection, aMode);
 }
