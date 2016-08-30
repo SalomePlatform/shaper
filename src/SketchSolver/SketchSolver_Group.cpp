@@ -621,6 +621,11 @@ void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
     }
   if (aCIter != myConstraints.end())
     myConstraints.erase(aCIter);
+  // empty group => clear storage
+  if (myConstraints.empty()) {
+    myStorage = StoragePtr();
+    updateWorkplane();
+  }
 }
 
 // ============================================================================
