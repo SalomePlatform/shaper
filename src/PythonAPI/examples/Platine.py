@@ -66,7 +66,7 @@ def bottom_body():
     geom_points = [geom.Pnt2d(*p) for p in points]
     left, top, v2, h2, v1, h1, right, bottom = model.addPolygon(sketch, *geom_points)
 
-    points = [(P - 20, 16 + 16 / 2), (P - 20, 16), (P - 20, 16 + 16)]
+    points = [(P - 20, 16 + 16 / 2), (P - 20, 16 + 16), (P - 20, 16)]
     points = [(p[0], -p[1]) for p in points]  # as we look to back of the face
     center, start, end = [geom.Pnt2d(*p) for p in points]
     arc = sketch.addArc(center, start, end, True)
