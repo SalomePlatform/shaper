@@ -35,7 +35,7 @@
 #include <ModelGeomAlgo_Point2D.h>
 #include <Events_Loop.h>
 
-//#define DEBUG_SPLIT
+#define DEBUG_SPLIT
 #ifdef DEBUG_SPLIT
 #include <iostream>
 #endif
@@ -86,6 +86,11 @@ void SketchPlugin_ConstraintSplit::execute()
   std::map<FeaturePtr, IdToPointPair> aCoincidenceToFeature;
   std::map<FeaturePtr, IdToPointPair> aCoincidenceToPoint;
   getConstraints(aFeaturesToDelete, aTangentFeatures, aCoincidenceToFeature, aCoincidenceToPoint);
+
+  std::map<AttributePtr, std::list<AttributePtr> > aBaseRefAttributes;
+  getRefAttributes(aBaseFeature, aBaseRefAttributes);
+
+  std::map<AttributePtr, AttributePtr> aBasePointModifiedAttributes;
 
 #ifdef DEBUG_SPLIT
   std::cout << std::endl;
@@ -149,6 +154,27 @@ void SketchPlugin_ConstraintSplit::execute()
       std::cout <<     " -Point attribute:" << ModelGeomAlgo_Point2D::getPointAttributeInfo(aPointAttr) << std::endl;
     }
   }
+  std::map<AttributePtr, std::list<AttributePtr> >::const_iterator aRefIt = aBaseRefAttributes.begin(),
+                                                                   aRefLast = aBaseRefAttributes.end();
+  std::cout << "References to bound point of feature [" << aBaseRefAttributes.size() << "]" <<std::endl;
+  for (; aRefIt != aRefLast; aRefIt++) {
+    AttributePtr aBaseAttr = aRefIt->first;
+    std::list<AttributePtr> aRefAttributes = aRefIt->second;
+    std::string aRefsInfo;
+    std::list<AttributePtr>::const_iterator aRefAttrIt = aRefAttributes.begin(),
+                                            aRefAttrLast = aRefAttributes.end();
+    for (; aRefAttrIt != aRefAttrLast; aRefAttrIt++) {
+      AttributePtr aRAttr = *aRefAttrIt;
+      aRefsInfo.append(aRAttr->id());
+      FeaturePtr aRFeature = ModelAPI_Feature::feature(aRAttr->owner());
+      aRefsInfo.append("(" + aRFeature->name() + ") ");
+    }
+
+    std::shared_ptr<GeomDataAPI_Point2D> aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aBaseAttr);
+    std::cout <<     " -Point attribute:" << aPointAttr->id().c_str()
+              << "[" << aRefAttributes.size() << "]" << aRefsInfo << std::endl;
+  }
+
   std::cout << std::endl;
   std::cout << "---- SPLIT ----" << std::endl;
   std::cout << std::endl;
@@ -388,6 +414,42 @@ void SketchPlugin_ConstraintSplit::getConstraints(std::set<FeaturePtr>& theFeatu
       }
       else
         theFeaturesToDelete.insert(aRefFeature); /// this case should not happen
+    }
+  }
+}
+
+void SketchPlugin_ConstraintSplit::getRefAttributes(const FeaturePtr& theFeature,
+                                                    std::map<AttributePtr, std::list<AttributePtr> >& theRefs)
+{
+  theRefs.clear();
+
+  std::list<AttributePtr> aPointAttributes = theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+  std::set<AttributePtr> aPointAttributesSet;
+
+  std::list<AttributePtr>::const_iterator aPIt = aPointAttributes.begin(), aPLast = aPointAttributes.end();
+  for (; aPIt != aPLast; aPIt++)
+    aPointAttributesSet.insert(*aPIt);
+
+  const std::set<AttributePtr>& aRefsAttributes = theFeature->data()->refsToMe();
+  std::set<AttributePtr>::const_iterator aIt;
+  for (aIt = aRefsAttributes.cbegin(); aIt != aRefsAttributes.cend(); ++aIt) {
+    AttributePtr anAttr = (*aIt);
+    FeaturePtr anAttrFeature = ModelAPI_Feature::feature(anAttr->owner());
+    if (anAttrFeature.get() != this &&
+        anAttr.get() && anAttr->attributeType() == ModelAPI_AttributeRefAttr::typeId()) {
+      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttr);
+      if (!aRefAttr->isObject()) {
+        AttributePtr anAttrInRef = aRefAttr->attr();
+        if (anAttrInRef.get() && aPointAttributesSet.find(anAttrInRef) != aPointAttributesSet.end()) {
+          if (theRefs.find(anAttrInRef) != theRefs.end())
+            theRefs[anAttrInRef].push_back(aRefAttr);
+          else {
+            std::list<AttributePtr> anAttrList;
+            anAttrList.push_back(aRefAttr);
+            theRefs[anAttrInRef] = anAttrList;
+          }
+        }
+      }
     }
   }
 }

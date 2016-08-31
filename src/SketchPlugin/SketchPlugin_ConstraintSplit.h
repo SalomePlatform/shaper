@@ -109,6 +109,9 @@ private:
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature,
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToPoint);
 
+  void getRefAttributes(const FeaturePtr& theFeature,
+                        std::map<AttributePtr, std::list<AttributePtr> >& theRefs);
+
   /// Move coincidence constraint from feature to point if it is found
   /// \param theCoincidenceToFeature coincidence to feature to be connected to new feature
   /// \param theFurtherCoincidences a list of points where coincidences will be build
