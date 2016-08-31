@@ -183,14 +183,13 @@ GCS::SolveStatus PlaneGCSSolver_Solver::solveWithoutTangent()
   if (aResult == GCS::Success) {
     GCS::VEC_I aRedundant;
     aSystemWithoutTangent->getRedundant(aRedundant);
-    if (aRedundant.empty())
-      myEquationSystem = aSystemWithoutTangent;
-    else
+    if (!aRedundant.empty())
       aResult = GCS::Failed;
   }
 
   // additional check that removed constraints are still correct
   if (aResult == GCS::Success) {
+    aSystemWithoutTangent->applySolution();
     std::set<GCS::Constraint*>::const_iterator aRemIt = aRemovedTangent.begin();
     for (; aRemIt != aRemovedTangent.end(); ++aRemIt)
       if (!isTangentTruth(*aRemIt))
@@ -199,8 +198,10 @@ GCS::SolveStatus PlaneGCSSolver_Solver::solveWithoutTangent()
       aResult = GCS::Failed;
   }
 
-  // Add IDs of removed tangent to the list of conflicting constraints
-  if (aResult == GCS::Failed) {
+  if (aResult == GCS::Success)
+      myEquationSystem = aSystemWithoutTangent;
+  else {
+    // Add IDs of removed tangent to the list of conflicting constraints
     std::set<GCS::Constraint*>::const_iterator aRemIt = aRemovedTangent.begin();
     for (; aRemIt != aRemovedTangent.end(); ++aRemIt)
       myConflictingIDs.insert((*aRemIt)->getTag());
