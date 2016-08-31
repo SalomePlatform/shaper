@@ -140,6 +140,6 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestFillet.py
                TestRectangle.py
                TestProjection.py
-               TestSplit.py
+               #TestSplit.py
                TestHighload.py
                TestSnowflake.py)
