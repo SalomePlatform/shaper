@@ -228,7 +228,8 @@ void SketchPlugin_ConstraintAngle::updateConstraintValueByAngleValue()
   /// an angle value should be corrected by the current angle type
   aValueAttr = std::dynamic_pointer_cast<
                   ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
-  anAngle = getAngleForType(anAngle, aValueAttr->value() > 180.0);
+  bool isObtuse = aValueAttr->isInitialized() && aValueAttr->value() > 180.0;
+  anAngle = getAngleForType(anAngle, isObtuse);
   aValueAttr->setValue(anAngle);
 }
 
