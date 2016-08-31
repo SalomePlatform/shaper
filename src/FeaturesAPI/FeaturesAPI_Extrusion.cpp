@@ -113,6 +113,9 @@ FeaturesAPI_Extrusion::~FeaturesAPI_Extrusion()
 void FeaturesAPI_Extrusion::setNestedSketch(const ModelHighAPI_Reference& theSketch)
 {
   mysketch->setValue(theSketch.feature());
+  // to inform that the history is updated due to the sketch moved under the composite feature
+  if (theSketch.feature().get())
+    theSketch.feature()->document()->updateHistory(ModelAPI_Feature::group());
   mybaseObjects->clear();
   mybaseObjects->append(theSketch.feature()->firstResult(), GeomShapePtr());
 

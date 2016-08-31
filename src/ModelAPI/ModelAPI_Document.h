@@ -168,14 +168,15 @@ public:
   virtual bool isLater(std::shared_ptr<ModelAPI_Feature> theLater, 
                        std::shared_ptr<ModelAPI_Feature> theCurrent) const = 0;
 
+  //! Internally makes document know that feature was removed or added in history after creation
+  MODELAPI_EXPORT virtual void updateHistory(const std::string theGroup) = 0;
+
 protected:
   //! Only for SWIG wrapping it is here
   MODELAPI_EXPORT ModelAPI_Document();
 
   //! Internally makes document know that feature was removed or added in history after creation
   MODELAPI_EXPORT virtual void updateHistory(const std::shared_ptr<ModelAPI_Object> theObject) = 0;
-  //! Internally makes document know that feature was removed or added in history after creation
-  MODELAPI_EXPORT virtual void updateHistory(const std::string theGroup) = 0;
 
   friend class ModelAPI_Object; // to add or remove from the history
   friend class ModelAPI_Result; // to add or remove from the history
