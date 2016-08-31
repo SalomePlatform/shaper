@@ -386,7 +386,7 @@ void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr the
   std::list<std::shared_ptr<ModelAPI_Attribute> > anAttiributes;
   for (; anIt != aLast; anIt++) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
-    if (!aFeature.get() || theFeature == aFeature)
+    if (!aFeature.get() || (theFeature == aFeature) || (aFeaturePoint->owner() == aFeature))
       continue;
     std::shared_ptr<GeomDataAPI_Point2D> aFPoint = PartSet_Tools::findFirstEqualPoint(aFeature,
                                                                                 aClickedPoint);
