@@ -407,13 +407,11 @@ bool SketchSolver_Group::resolveConstraints()
       if (!myConstraints.empty()) {
         // the error message should be changed before sending the message
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(SketchSolver_Error::CONSTRAINTS());
-        if (myPrevResult != aResult || myPrevResult == STATUS_UNKNOWN) {
+        if (myPrevResult != aResult || myPrevResult == STATUS_UNKNOWN || myPrevResult == STATUS_FAILED) {
           // Obtain list of conflicting constraints
           std::set<ObjectPtr> aConflicting = myStorage->getConflictingConstraints(mySketchSolver);
 
-          if (myConflictingConstraints.empty())
-            sendMessage(EVENT_SOLVER_FAILED, aConflicting);
-          else {
+          if (!myConflictingConstraints.empty()) {
             std::set<ObjectPtr>::iterator anIt = aConflicting.begin();
             for (; anIt != aConflicting.end(); ++anIt)
               myConflictingConstraints.erase(*anIt);
@@ -423,6 +421,8 @@ bool SketchSolver_Group::resolveConstraints()
             }
           }
           myConflictingConstraints = aConflicting;
+          if (!myConflictingConstraints.empty())
+            sendMessage(EVENT_SOLVER_FAILED, myConflictingConstraints);
           myPrevResult = aResult;
         }
       }
