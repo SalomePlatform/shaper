@@ -10,6 +10,12 @@
 #include <cmath>
 
 
+PlaneGCSSolver_Solver::PlaneGCSSolver_Solver()
+  : myEquationSystem(new GCS::System),
+  myConfCollected(false)
+{
+}
+
 PlaneGCSSolver_Solver::~PlaneGCSSolver_Solver()
 {
   clear();
@@ -17,7 +23,7 @@ PlaneGCSSolver_Solver::~PlaneGCSSolver_Solver()
 
 void PlaneGCSSolver_Solver::clear()
 {
-  myEquationSystem.clear();
+  myEquationSystem->clear();
   myConstraints.clear();
   myParameters.clear();
 }
@@ -29,7 +35,7 @@ void PlaneGCSSolver_Solver::addConstraint(GCSConstraintPtr theConstraint,
   if (myConstraints.find(aConstraint) != myConstraints.end())
     return; // constraint already exists, no need to add it again
 
-  myEquationSystem.addConstraint(aConstraint);
+  myEquationSystem->addConstraint(aConstraint);
   myConstraints[aConstraint] = theType;
 }
 
@@ -44,7 +50,7 @@ void PlaneGCSSolver_Solver::removeConstraint(GCS::Constraint* theConstraint)
   if (myConstraints.find(theConstraint) == myConstraints.end())
     return; // no constraint, no need to remove it
 
-  myEquationSystem.removeConstraint(theConstraint);
+  myEquationSystem->removeConstraint(theConstraint);
   myConstraints.erase(theConstraint);
 }
 
@@ -74,14 +80,14 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
       if (aParameters.find(*aPIt) != aParameters.end())
         break;
     if (aPIt == aParams.end() && aConstrIt->first->getTag() > 0) {
-      myConflictingIDs.push_back(aConstrIt->first->getTag());
+      myConflictingIDs.insert(aConstrIt->first->getTag());
       myConfCollected = true;
       aResult = GCS::Failed;
     }
   }
   // solve equations
   if (aResult == GCS::Success)
-    aResult = (GCS::SolveStatus)myEquationSystem.solve(myParameters);
+    aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters);
 
   GCS::VEC_I aRedundantID;
 
@@ -89,7 +95,7 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
   // Investigate this situation and move constraints to redundant list
   if (aResult == GCS::Failed && !myTangent.empty()) {
     GCS::VEC_I aConflictingID;
-    myEquationSystem.getConflicting(aConflictingID);
+    myEquationSystem->getConflicting(aConflictingID);
     GCS::VEC_I::iterator aCIt = aConflictingID.begin();
     for (; aCIt != aConflictingID.end(); ++ aCIt) {
       if (myTangent.find(*aCIt) == myTangent.end())
@@ -105,7 +111,7 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
   // Additionally check redundant constraints
   if (aResult == GCS::Success || aResult == GCS::Converged) {
     GCS::VEC_I aRedundantLocal;
-    myEquationSystem.getRedundant(aRedundantLocal);
+    myEquationSystem->getRedundant(aRedundantLocal);
     aRedundantID.insert(aRedundantID.end(), aRedundantLocal.begin(), aRedundantLocal.end());
     // Workaround: remove all point-point coincidences from list of redundant
     if (!aRedundantID.empty()) {
@@ -125,7 +131,7 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
     // Sometimes tangent constraints are fall to both conflicting and redundant constraints.
     // Need to check if there are redundant constraints without these tangencies.
     if (!aRedundantID.empty())
-      aResult = myTangent.empty() ? GCS::Failed : (GCS::SolveStatus)solveWithoutTangent();
+      aResult = myTangent.empty() ? GCS::Failed : solveWithoutTangent();
     else
       aResult = GCS::Success;
   }
@@ -133,7 +139,7 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
 
   SketchSolver_SolveStatus aStatus;
   if (aResult == GCS::Success) {
-    myEquationSystem.applySolution();
+    myEquationSystem->applySolution();
     aStatus = STATUS_OK;
   } else
     aStatus = STATUS_FAILED;
@@ -141,13 +147,15 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
   return aStatus;
 }
 
-SketchSolver_SolveStatus PlaneGCSSolver_Solver::solveWithoutTangent()
+GCS::SolveStatus PlaneGCSSolver_Solver::solveWithoutTangent()
 {
+  std::shared_ptr<GCS::System> aSystemWithoutTangent(new GCS::System);
+
   // Remove tangency which leads to redundant or conflicting constraints
   GCS::VEC_I aConflicting, aRedundant;
-  myEquationSystem.getRedundant(aRedundant);
+  myEquationSystem->getRedundant(aRedundant);
   size_t aNbRemove = myTangent.size(); // number of tangent constraints which can be removed
-  myEquationSystem.getConflicting(aConflicting);
+  myEquationSystem->getConflicting(aConflicting);
   aRedundant.insert(aRedundant.end(), aConflicting.begin(), aConflicting.end());
 
   GCS::SET_I aTangentToRemove;
@@ -158,87 +166,115 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solveWithoutTangent()
       --aNbRemove;
     }
 
+  std::set<GCS::Constraint*> aRemovedTangent;
   ConstraintMap::const_iterator aConstrIt = myConstraints.begin();
   while (aConstrIt != myConstraints.end()) {
     GCS::Constraint* aConstraint = aConstrIt->first;
     int anID = aConstraint->getTag();
     ++aConstrIt;
-    if (aTangentToRemove.find(anID) != aTangentToRemove.end())
-      removeConstraint(aConstraint);
+    if (aTangentToRemove.find(anID) == aTangentToRemove.end())
+      aSystemWithoutTangent->addConstraint(aConstraint);
+    else
+      aRemovedTangent.insert(aConstraint);
   }
 
   myTangent.clear();
-  return solve();
+  GCS::SolveStatus aResult = (GCS::SolveStatus)aSystemWithoutTangent->solve(myParameters);
+  if (aResult == GCS::Success) {
+    GCS::VEC_I aRedundant;
+    aSystemWithoutTangent->getRedundant(aRedundant);
+    if (aRedundant.empty())
+      myEquationSystem = aSystemWithoutTangent;
+    else
+      aResult = GCS::Failed;
+  }
+
+  // additional check that removed constraints are still correct
+  if (aResult == GCS::Success) {
+    std::set<GCS::Constraint*>::const_iterator aRemIt = aRemovedTangent.begin();
+    for (; aRemIt != aRemovedTangent.end(); ++aRemIt)
+      if (!isTangentTruth(*aRemIt))
+        break;
+    if (aRemIt != aRemovedTangent.end())
+      aResult = GCS::Failed;
+  }
+
+  // Add IDs of removed tangent to the list of conflicting constraints
+  if (aResult == GCS::Failed) {
+    std::set<GCS::Constraint*>::const_iterator aRemIt = aRemovedTangent.begin();
+    for (; aRemIt != aRemovedTangent.end(); ++aRemIt)
+      myConflictingIDs.insert((*aRemIt)->getTag());
+  }
+
+  return aResult;
+}
+
+bool PlaneGCSSolver_Solver::isTangentTruth(GCS::Constraint* theTangent) const
+{
+  static const double aTol = 1e-5;
+  static const double aTol2 = aTol *aTol;
+
+  if (theTangent->getTypeId() == GCS::TangentCircumf) {
+    GCS::VEC_pD aParams = theTangent->params();
+    double dx = *(aParams[2]) - *(aParams[0]);
+    double dy = *(aParams[3]) - *(aParams[1]);
+    double aDist2 = dx * dx + dy * dy;
+    double aRadSum  = *(aParams[4]) + *(aParams[5]);
+    double aRadDiff = *(aParams[4]) - *(aParams[5]);
+    return fabs(aDist2 - aRadSum * aRadSum) <= aTol2 * aDist2 ||
+           fabs(aDist2 - aRadDiff * aRadDiff) <= aTol2 * aDist2;
+  }
+  if (theTangent->getTypeId() == GCS::P2LDistance) {
+    GCS::VEC_pD aParams = theTangent->params();
+    double aDist2 = *(aParams[6]) * *(aParams[6]);
+    // orthogonal line direction
+    double aDirX = *(aParams[5]) - *(aParams[3]);
+    double aDirY = *(aParams[2]) - *(aParams[4]);
+    double aLen2 = aDirX * aDirX + aDirY * aDirY;
+    // vector from line's start to point
+    double aVecX = *(aParams[0]) - *(aParams[2]);
+    double aVecY = *(aParams[1]) - *(aParams[3]);
+
+    double aDot = aVecX * aDirX + aVecY * aDirY;
+    return fabs(aDot * aDot - aDist2 * aLen2) <= aTol2 * aLen2;
+  }
+  return false;
 }
 
 bool PlaneGCSSolver_Solver::isTangentTruth(int theTagID) const
 {
-  static const double aTol = 1e-7;
-  static const double aTol2 = aTol *aTol;
-
   ConstraintMap::const_iterator anIt = myConstraints.begin();
-  for (; anIt != myConstraints.end(); ++anIt) {
-    if (anIt->first->getTag() != theTagID)
-      continue;
-    if (anIt->first->getTypeId() == GCS::TangentCircumf) {
-      GCS::VEC_pD aParams = anIt->first->params();
-      double dx = *(aParams[2]) - *(aParams[0]);
-      double dy = *(aParams[3]) - *(aParams[1]);
-      double aDist2 = dx * dx + dy * dy;
-      double aRadSum  = *(aParams[4]) + *(aParams[5]);
-      double aRadDiff = *(aParams[4]) - *(aParams[5]);
-      return fabs(aDist2 - aRadSum * aRadSum) <= aTol2 ||
-             fabs(aDist2 - aRadDiff * aRadDiff) <= aTol2;
-    }
-    if (anIt->first->getTypeId() == GCS::P2LDistance) {
-      GCS::VEC_pD aParams = anIt->first->params();
-      double aDist2 = *(aParams[6]) * *(aParams[6]);
-      // orthogonal line direction
-      double aDirX = *(aParams[5]) - *(aParams[3]);
-      double aDirY = *(aParams[2]) - *(aParams[4]);
-      double aLen2 = aDirX * aDirX + aDirY * aDirY;
-      // vector from line's start to point
-      double aVecX = *(aParams[0]) - *(aParams[2]);
-      double aVecY = *(aParams[1]) - *(aParams[3]);
-
-      double aDot = aVecX * aDirX + aVecY * aDirY;
-      return fabs(aDot * aDot - aDist2 * aLen2) <= aTol2 * aLen2;
-    }
-  }
-
+  for (; anIt != myConstraints.end(); ++anIt)
+    if (anIt->first->getTag() == theTagID)
+      return isTangentTruth(anIt->first);
   return false;
 }
 
 void PlaneGCSSolver_Solver::undo()
 {
-  myEquationSystem.undoSolution();
+  myEquationSystem->undoSolution();
 }
 
 bool PlaneGCSSolver_Solver::isConflicting(const ConstraintID& theConstraint) const
 {
   if (!myConfCollected)
     const_cast<PlaneGCSSolver_Solver*>(this)->collectConflicting();
-
-  GCS::VEC_I::const_iterator anIt = myConflictingIDs.begin();
-  for (; anIt != myConflictingIDs.end(); ++anIt)
-    if (*anIt == (int)theConstraint)
-      return true;
-  return false;
+  return myConflictingIDs.find((int)theConstraint) != myConflictingIDs.end();
 }
 
 void PlaneGCSSolver_Solver::collectConflicting()
 {
   GCS::VEC_I aConflict;
-  myEquationSystem.getConflicting(myConflictingIDs);
-  myConflictingIDs.insert(myConflictingIDs.end(), aConflict.begin(), aConflict.end());
+  myEquationSystem->getConflicting(aConflict);
+  myConflictingIDs.insert(aConflict.begin(), aConflict.end());
 
-  myEquationSystem.getRedundant(aConflict);
-  myConflictingIDs.insert(myConflictingIDs.end(), aConflict.begin(), aConflict.end());
+  myEquationSystem->getRedundant(aConflict);
+  myConflictingIDs.insert(aConflict.begin(), aConflict.end());
 
   myConfCollected = true;
 }
 
 int PlaneGCSSolver_Solver::dof() const
 {
-  return const_cast<PlaneGCSSolver_Solver*>(this)->myEquationSystem.dofsNumber();
+  return const_cast<PlaneGCSSolver_Solver*>(this)->myEquationSystem->dofsNumber();
 }

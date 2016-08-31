@@ -19,7 +19,7 @@
 class PlaneGCSSolver_Solver : public SketchSolver_ISolver
 {
 public:
-  PlaneGCSSolver_Solver() {}
+  PlaneGCSSolver_Solver();
   ~PlaneGCSSolver_Solver();
 
   /// \brief Clear system of equations
@@ -68,22 +68,24 @@ private:
   void removeConstraint(GCS::Constraint* theConstraint);
 
   /// \brief Remove redundant tangent constraints and try to solve the system again
-  SketchSolver_SolveStatus solveWithoutTangent();
+  GCS::SolveStatus solveWithoutTangent();
 
   /// \brief Check the entities under the tangent constraint are smoothly connected
   bool isTangentTruth(int theTagID) const;
+  /// \brief Check the entities under the tangent constraint are smoothly connected
+  bool isTangentTruth(GCS::Constraint* theTangent) const;
 
 private:
   typedef std::map<GCS::Constraint*, SketchSolver_ConstraintType> ConstraintMap;
 
-  GCS::VEC_pD   myParameters;     ///< list of unknowns
-  ConstraintMap myConstraints;    ///< list of constraints already processed by the system
-  GCS::System   myEquationSystem; ///< set of equations for solving in FreeGCS
+  GCS::VEC_pD                  myParameters;     ///< list of unknowns
+  ConstraintMap                myConstraints;    ///< list of constraints already processed by the system
+  std::shared_ptr<GCS::System> myEquationSystem; ///< set of equations for solving in FreeGCS
 
-  GCS::VEC_I    myConflictingIDs; ///< list of IDs of conflicting constraints
-  bool          myConfCollected;  ///< specifies the conflicting constraints are already collected
+  GCS::SET_I                   myConflictingIDs; ///< list of IDs of conflicting constraints
+  bool                         myConfCollected;  ///< specifies the conflicting constraints are already collected
 
-  GCS::SET_I    myTangent;        ///< list of tangent IDs to check incorrect redundant constraints
+  GCS::SET_I                   myTangent;        ///< list of tangent IDs to check incorrect redundant constraints
 };
 
 #endif
