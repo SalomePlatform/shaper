@@ -106,8 +106,8 @@ private:
   /// \param theCoincidenceToPoint [out] coincidence to point be connected to new feature
   void getConstraints(std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete,
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theTangentFeatures,
-              std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature,
-              std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToPoint);
+              std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature/*,
+              std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToPoint*/);
 
   void getRefAttributes(const FeaturePtr& theFeature,
                         std::map<AttributePtr, std::list<AttributePtr> >& theRefs);
@@ -128,17 +128,27 @@ private:
               const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theTangentFeatures,
               const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences);
 
+  /// Move constraints from attribute of base feature to attribute after modification
+  /// \param theBaseRefAttributes container of references to the attributes of base feature
+  /// \param theModifiedAttributes container of attributes placed instead of base attributes
+  /// at the same place
+  void updateRefAttConstraints(
+                      const std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
+                      const std::set<std::pair<AttributePtr, AttributePtr> >& theModifiedAttributes);
+
   /// Make the base object is splitted by the point attributes
   /// \param theSplitFeature a result split feature
   /// \param theBeforeFeature a feature between start point and the 1st point of split feature
   /// \param theAfterFeature a feature between last point of split feature and the end point
   /// \param thePoints a list of points where coincidences will be build
   /// \param theCreatedFeatures a container of created features
+  /// \param theModifiedAttributes a container of attribute on base feature to attribute on new feature
   void splitLine(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
                  std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,
                  std::shared_ptr<ModelAPI_Feature>& theAfterFeature,
                  std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
-                 std::set<std::shared_ptr<ModelAPI_Feature>>& theCreatedFeatures);
+                 std::set<std::shared_ptr<ModelAPI_Feature>>& theCreatedFeatures,
+                 std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
 
   /// Make the base object is splitted by the point attributes
   /// \param theSplitFeature a result split feature
@@ -150,7 +160,8 @@ private:
                 std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,
                 std::shared_ptr<ModelAPI_Feature>& theAfterFeature,
                 std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
-                std::set<std::shared_ptr<ModelAPI_Feature>>& theCreatedFeatures);
+                std::set<std::shared_ptr<ModelAPI_Feature>>& theCreatedFeatures,
+                std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
 
   /// Make the base object is splitted by the point attributes
   /// \param theSplitFeature a result split feature
@@ -162,7 +173,8 @@ private:
                    std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,
                    std::shared_ptr<ModelAPI_Feature>& theAfterFeature,
                    std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
-                   std::set<std::shared_ptr<ModelAPI_Feature>>& theCreatedFeatures);
+                   std::set<std::shared_ptr<ModelAPI_Feature>>& theCreatedFeatures,
+                   std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
 
   /// Correct the first and the second point to provide condition that the first is closer to
   /// the start point and the second point - to the last end of current segment. To rearrange
