@@ -80,7 +80,7 @@ bool ModuleBase_WidgetConcealedObjects::restoreValueCustom()
         std::list<ObjectPtr>::const_iterator anOIt = anObjects.begin(), anOLast = anObjects.end();
         for (; anOIt != anOLast; anOIt++) {
           ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(*anOIt);
-          if (aResult->isConcealed()) {
+          if (aResult && aResult->isConcealed()) {
             int aRowId = myView->rowCount();
             addViewRow(aResult);
             myConcealedResults[aRowId] = aResult;
