@@ -983,6 +983,12 @@ FeaturePtr SketchPlugin_ConstraintSplit::createArcFeature(const FeaturePtr& theB
                 theBaseFeature->attribute(aCenterAttributeId));
   fillAttribute(aFeature->attribute(SketchPlugin_Arc::START_ID()), theFirstPointAttr);
   fillAttribute(aFeature->attribute(SketchPlugin_Arc::END_ID()), theSecondPointAttr);
+
+  /// fill referersed state of created arc as it is on the base arc
+  if (theBaseFeature->getKind() == SketchPlugin_Arc::ID()) {
+    bool aReversed = theBaseFeature->boolean(SketchPlugin_Arc::INVERSED_ID())->value();
+    aFeature->boolean(SketchPlugin_Arc::INVERSED_ID())->setValue(aReversed);
+  }
   aFeature->data()->blockSendAttributeUpdated(false);
   aFeature->execute(); // to obtain result
 
