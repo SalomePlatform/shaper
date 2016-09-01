@@ -49,7 +49,8 @@ protected:
   FeaturePtr myBaseFeature; ///< fixed feature (when it is set, myBaseConstraint should be NULL)
 
 private:
-  AttributeRefAttrPtr myFixedAttribute; ///< attribute of a fixed constraint (for correct remove)
+  AttributePtr myFixedAttribute; ///< possible attribute of a fixed constraint (for correct remove)
+  FeaturePtr   myFixedFeature;   ///< possible attribute of a fixed constraint (for correct remove)
 };
 
 #endif

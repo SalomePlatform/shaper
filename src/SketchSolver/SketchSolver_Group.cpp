@@ -625,6 +625,7 @@ void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
   // empty group => clear storage
   if (myConstraints.empty()) {
     myStorage = StoragePtr();
+    mySketchSolver = SolverPtr();
     updateWorkplane();
   }
 }
@@ -694,7 +695,7 @@ static double featureToVal(FeaturePtr theFeature)
       anID == SketchPlugin_ConstraintMirror::ID())
     return 6.0;
   if (anID == SketchPlugin_ConstraintRigid::ID())
-    return 7.0;
+    return 0.5;
   if (anID == SketchPlugin_MultiRotation::ID() ||
       anID == SketchPlugin_MultiTranslation::ID())
     return 8.0;

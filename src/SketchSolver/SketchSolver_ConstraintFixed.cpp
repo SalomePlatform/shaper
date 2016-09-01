@@ -20,8 +20,12 @@ SketchSolver_ConstraintFixed::SketchSolver_ConstraintFixed(ConstraintPtr theCons
 {
   myBaseConstraint = theConstraint;
   myType = CONSTRAINT_FIXED;
-  myFixedAttribute = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-      theConstraint->attribute(SketchPlugin_ConstraintRigid::ENTITY_A()));
+  AttributeRefAttrPtr anAttribute =
+      theConstraint->refattr(SketchPlugin_ConstraintRigid::ENTITY_A());
+  if (anAttribute->isObject())
+    myFixedFeature = ModelAPI_Feature::feature(anAttribute->object());
+  else
+    myFixedAttribute = anAttribute->attr();
 }
 
 SketchSolver_ConstraintFixed::SketchSolver_ConstraintFixed(FeaturePtr theFeature)
@@ -97,13 +101,11 @@ bool SketchSolver_ConstraintFixed::remove()
   cleanErrorMsg();
   // Move fixed entities back to the current group
   FeaturePtr aFeature = myBaseFeature;
-  if (myBaseConstraint && myFixedAttribute) {
-    if (myFixedAttribute->isObject())
-      aFeature = ModelAPI_Feature::feature(myFixedAttribute->object());
-    else {
-      if (myFixedAttribute->attr().get())
-        myStorage->update(AttributePtr(myFixedAttribute), myGroupID);
-    }
+  if (myBaseConstraint) {
+    if (myFixedFeature)
+      aFeature = myFixedFeature;
+    else if (myFixedAttribute)
+      myStorage->update(AttributePtr(myFixedAttribute), myGroupID);
   }
   if (aFeature)
     myStorage->update(aFeature, myGroupID);
