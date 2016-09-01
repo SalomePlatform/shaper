@@ -71,15 +71,20 @@ void ModuleBase_IModule::launchModal(const QString& theCmdId)
 
 void ModuleBase_IModule::launchOperation(const QString& theCmdId)
 {
+  /// selection should be obtained from workshop before ask if the operation can be started as
+  /// the canStartOperation method performs commit/abort of previous operation. Sometimes commit/abort
+  /// may cause selection clear(Sketch operation) as a result it will be lost and is not used for preselection.
+  ModuleBase_ISelection* aSelection = myWorkshop->selection();
+  QList<ModuleBase_ViewerPrsPtr> aPreSelected = aSelection->getSelected(ModuleBase_ISelection::AllControls);
+
   if (!myWorkshop->canStartOperation(theCmdId))
     return;
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                              (createOperation(theCmdId.toStdString()));
   if (aFOperation) {
-    ModuleBase_ISelection* aSelection = myWorkshop->selection();
-    // Initialise operation with preliminary selection
-    aFOperation->initSelection(aSelection, myWorkshop->viewer());
+    aFOperation->initSelection(aPreSelected);
+
     workshop()->processLaunchOperation(aFOperation);
   }
 }

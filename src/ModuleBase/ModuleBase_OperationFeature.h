@@ -93,10 +93,9 @@ Q_OBJECT
   virtual bool isDisplayedOnStart(ObjectPtr theObject);
 
   /// Initialisation of operation with preliminary selection
-  /// \param theSelection an instance of Selection class
-  /// \param theViewer a viewer to have the viewer the eye position
-  virtual void initSelection(ModuleBase_ISelection* theSelection,
-                             ModuleBase_IViewer* theViewer);
+  /// \param thePreSelected a container of selected presentations
+  virtual void initSelection(
+                  const QList<std::shared_ptr<ModuleBase_ViewerPrs>>& thePreSelected);
 
   /// Fill internal map by preselection
   /// \param theValues a list of preselection

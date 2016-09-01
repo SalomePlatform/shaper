@@ -458,8 +458,6 @@ void PartSet_SketcherReetntrantMgr::restartOperation()
     if (aFOperation) {
       myNoMoreWidgetsAttribute = "";
       myIsFlagsBlocked = true;
-      FeaturePtr aPrevFeature = aFOperation->feature();
-      aFOperation->commit();
       module()->launchOperation(aFOperation->id());
       myIsFlagsBlocked = false;
       resetFlags();

@@ -448,30 +448,30 @@ FeaturePtr ModuleBase_OperationFeature::previousCurrentFeature()
   return myPreviousCurrentFeature;
 }
 
-void ModuleBase_OperationFeature::initSelection(ModuleBase_ISelection* theSelection,
-                                         ModuleBase_IViewer* theViewer)
+void ModuleBase_OperationFeature::initSelection(const QList<ModuleBase_ViewerPrsPtr>& thePreSelected)
 {
-  QList<ModuleBase_ViewerPrsPtr> aPreSelected;
+  QObjectPtrList aCurrentFeatureResults;
+
   // Check that the selected result are not results of operation feature
   FeaturePtr aFeature = feature();
   if (aFeature) {
-    QList<ModuleBase_ViewerPrsPtr> aSelected = theSelection->getSelected(ModuleBase_ISelection::AllControls);
-
     std::list<ResultPtr> aResults;
     ModelAPI_Tools::allResults(aFeature, aResults);
-    QObjectPtrList aResList;
     std::list<ResultPtr>::const_iterator aIt;
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
-      aResList.append(*aIt);
-
-    foreach (ModuleBase_ViewerPrsPtr aPrs, aSelected) {
-      if ((!aResList.contains(aPrs->object())) && (aPrs->object() != aFeature))
+      aCurrentFeatureResults.append(*aIt);
+  }
+  
+  if (aCurrentFeatureResults.empty()) /// filtering of selection is not necessary
+    setPreselection(thePreSelected);
+  else { // create preselection list without results of current feature
+    QList<ModuleBase_ViewerPrsPtr> aPreSelected;
+    foreach (ModuleBase_ViewerPrsPtr aPrs, thePreSelected) {
+      if ((!aCurrentFeatureResults.contains(aPrs->object())) && (aPrs->object() != aFeature))
         aPreSelected.append(aPrs);
     }
-  } else
-    aPreSelected = theSelection->getSelected(ModuleBase_ISelection::AllControls);
-
-  setPreselection(aPreSelected);
+    setPreselection(aPreSelected);
+  }
 }
 
 void ModuleBase_OperationFeature::setPreselection(const QList<ModuleBase_ViewerPrsPtr>& theValues)
