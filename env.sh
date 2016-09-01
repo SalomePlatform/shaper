@@ -10,7 +10,9 @@ export AUT_DIR=$(pwd)
 # Path to env_*.sh files
 export TOOLS_DIR=$(pwd)
 
+export HOME_OLD=$HOME
 source /dn64/series7x/work/init.sh 2016-06-20
+export HOME=$HOME_OLD
 
 # Path to solvespace-2
 export SHAPER_PDIR=/dn48/newgeom/common/products
