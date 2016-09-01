@@ -75,8 +75,11 @@ void FeaturesAPI_Revolution::setNestedSketch(const ModelHighAPI_Reference& theSk
 {
   mysketch->setValue(theSketch.feature());
   // to inform that the history is updated due to the sketch moved under the composite feature
-  if (theSketch.feature().get())
+  if (theSketch.feature().get()) {
     theSketch.feature()->document()->updateHistory(ModelAPI_Feature::group());
+    if (theSketch.feature()->firstResult().get())
+      theSketch.feature()->firstResult()->setDisplayed(false);
+  }
   mybaseObjects->clear();
   mybaseObjects->append(theSketch.feature()->firstResult(), GeomShapePtr());
 
