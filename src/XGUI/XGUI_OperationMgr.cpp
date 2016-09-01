@@ -129,9 +129,12 @@ bool XGUI_OperationMgr::hasOperation(const QString& theId) const
 
 ModuleBase_Operation* XGUI_OperationMgr::findOperation(const QString& theId) const
 {
-  foreach(ModuleBase_Operation* aOp, myOperations) {
-    if (aOp->id() == theId)
-      return aOp;
+  QList<ModuleBase_Operation*>::const_iterator anIt = myOperations.end();
+  while (anIt != myOperations.begin()) {
+    --anIt;
+    ModuleBase_Operation* anOperation = *anIt;
+    if (anOperation->id() == theId)
+      return anOperation;
   }
   return 0;
 }

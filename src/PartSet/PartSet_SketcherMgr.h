@@ -91,25 +91,24 @@ public:
   /// \return the boolean result
   static bool isSketchOperation(ModuleBase_Operation* theOperation);
 
-  /// Returns true if the operation feature is a sub in the given sketch
+  /// Returns true if the operation feature belongs to list of granted features of Sketch
+  /// operation. An operation of a sketch should be started before.
   /// \param theOperation an operation
-  /// \param theSketch a sketch feature
   /// \return the boolean result
-  static bool isNestedSketchOperation(ModuleBase_Operation* theOperation,
-                                      const CompositeFeaturePtr& theSketch);
+  bool isNestedSketchOperation(ModuleBase_Operation* theOperation) const;
 
   /// Returns true if the operation is a create and nested sketch operationn
   /// \param theOperation a checked operation
   /// \param theSketch a sketch feature
   //// \return boolean value
-  static bool isNestedCreateOperation(ModuleBase_Operation* theOperation,
-                                      const CompositeFeaturePtr& theSketch);
+  bool isNestedCreateOperation(ModuleBase_Operation* theOperation,
+                                      const CompositeFeaturePtr& /*theSketch*/) const;
 
   /// Returns true if the operation is an edit nested feature one
   /// \param theOperation a checked operation
   //// \return boolean value
-  static bool isNestedEditOperation(ModuleBase_Operation* theOperation,
-                                    const CompositeFeaturePtr& theSketch);
+  bool isNestedEditOperation(ModuleBase_Operation* theOperation,
+                                    const CompositeFeaturePtr& /*theSketch*/) const;
 
   /// Returns whether the current operation is a sketch entity - line, point, arc or circle
   /// \param theId is an id of object

@@ -161,8 +161,8 @@ private:
                                       const bool isTemporary = false);
 
   /// Checks whethe the feature of the given operation has kind an arc and the arc type is tangent
-  static bool isTangentArc(ModuleBase_Operation* theOperation,
-                           const std::shared_ptr<ModelAPI_CompositeFeature>& theSketch);
+  bool isTangentArc(ModuleBase_Operation* theOperation,
+                    const std::shared_ptr<ModelAPI_CompositeFeature>& /*theSketch*/) const;
 
   /// Accept All action is enabled if an internal edit is started. It updates the state of the button
   void updateAcceptAllAction();

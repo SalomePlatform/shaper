@@ -112,8 +112,7 @@ bool PartSet_MenuMgr::addViewerMenu(const QMap<QString, QAction*>& theStdActions
 
   ModuleBase_Operation* anOperation = myModule->workshop()->currentOperation();
   if (!PartSet_SketcherMgr::isSketchOperation(anOperation) &&
-      !PartSet_SketcherMgr::isNestedSketchOperation(anOperation,
-                                                    myModule->sketchMgr()->activeSketch()))
+      !myModule->sketchMgr()->isNestedSketchOperation(anOperation))
     return false;
 
   myCoinsideLines.clear();
@@ -206,8 +205,7 @@ void PartSet_MenuMgr::updateViewerMenu(const QMap<QString, QAction*>& theStdActi
   ModuleBase_Operation* anOperation = myModule->workshop()->currentOperation();
 
   bool isActiveSketch = PartSet_SketcherMgr::isSketchOperation(anOperation) ||
-                        PartSet_SketcherMgr::isNestedSketchOperation(anOperation,
-                                                            myModule->sketchMgr()->activeSketch());
+                        myModule->sketchMgr()->isNestedSketchOperation(anOperation);
   if (isActiveSketch) {
     theStdActions["WIREFRAME_CMD"]->setEnabled(false);
     theStdActions["SHADING_CMD"]->setEnabled(false);
@@ -330,14 +328,14 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
 
   CompositeFeaturePtr aSketch = myModule->sketchMgr()->activeSketch();
   bool isActiveSketch = PartSet_SketcherMgr::isSketchOperation(anOperation) ||
-                        PartSet_SketcherMgr::isNestedSketchOperation(anOperation, aSketch);
+                        myModule->sketchMgr()->isNestedSketchOperation(anOperation);
   if (!isActiveSketch)
     return;
 
   QObjectPtrList anObjects;
   bool isUseTransaction = false;
   // 1. change auxiliary type of a created feature
-  if (PartSet_SketcherMgr::isNestedCreateOperation(anOperation, aSketch) &&
+  if (myModule->sketchMgr()->isNestedCreateOperation(anOperation, aSketch) &&
       PartSet_SketcherMgr::isEntity(anOperation->id().toStdString()) ) {
       ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                (anOperation);
@@ -396,13 +394,13 @@ bool PartSet_MenuMgr::canSetAuxiliary(bool& theValue) const
 
   CompositeFeaturePtr aSketch = myModule->sketchMgr()->activeSketch();
   bool isActiveSketch = PartSet_SketcherMgr::isSketchOperation(anOperation) ||
-                        PartSet_SketcherMgr::isNestedSketchOperation(anOperation, aSketch);
+                        myModule->sketchMgr()->isNestedSketchOperation(anOperation);
   if (!isActiveSketch)
     return anEnabled;
 
   QObjectPtrList anObjects;
   // 1. change auxiliary type of a created feature
-  if (PartSet_SketcherMgr::isNestedCreateOperation(anOperation, aSketch) &&
+  if (myModule->sketchMgr()->isNestedCreateOperation(anOperation, aSketch) &&
     PartSet_SketcherMgr::isEntity(anOperation->id().toStdString()) ) {
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(anOperation);
     if (aFOperation)
@@ -411,8 +409,7 @@ bool PartSet_MenuMgr::canSetAuxiliary(bool& theValue) const
   else {
     /// The operation should not be aborted here, because the method does not changed
     /// the auxilliary state, but checks the possibility to perform this
-    ///if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation,
-    //                                                  myModule->sketchMgr()->activeSketch()))
+    ///if (myModule->sketchMgr()->isNestedSketchOperation(anOperation))
     ///  anOperation->abort();
     // 2. change auxiliary type of selected sketch entities
     ModuleBase_ISelection* aSelection = myModule->workshop()->selection();

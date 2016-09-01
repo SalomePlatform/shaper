@@ -340,7 +340,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       return;
 
     bool isSketcher = isSketchOperation(aFOperation);
-    bool isSketchOpe = isNestedSketchOperation(aFOperation, activeSketch());
+    bool isSketchOpe = isNestedSketchOperation(aFOperation);
 
     // Avoid non-sketch operations
     if ((!isSketchOpe) && (!isSketcher))
@@ -419,7 +419,7 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
     return;
   ModuleBase_Operation* aOp = getCurrentOperation();
   if (aOp) {
-    if (isNestedSketchOperation(aOp, activeSketch())) {
+    if (isNestedSketchOperation(aOp)) {
       // Only for sketcher operations
       if (myIsDragging) {
         if (myDragDone) {
@@ -763,38 +763,43 @@ bool PartSet_SketcherMgr::isSketchOperation(ModuleBase_Operation* theOperation)
   return theOperation && theOperation->id().toStdString() == SketchPlugin_Sketch::ID();
 }
 
-bool PartSet_SketcherMgr::isNestedSketchOperation(ModuleBase_Operation* theOperation,
-                                                  const CompositeFeaturePtr& theSketch)
+bool PartSet_SketcherMgr::isNestedSketchOperation(ModuleBase_Operation* theOperation) const
 {
   bool aNestedSketch = false;
 
-  if (theOperation && theSketch.get()) {
+  FeaturePtr anActiveSketch = activeSketch();
+  if (anActiveSketch.get() && theOperation) {
+    ModuleBase_Operation* aSketchOperation = operationMgr()->findOperation(
+                                                              anActiveSketch->getKind().c_str());
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                                 (theOperation);
-    if (aFOperation) {
+                                                                                  (theOperation);
+    if (aSketchOperation && aFOperation) {
       FeaturePtr aFeature = aFOperation->feature();
-      aNestedSketch = theSketch->isSub(aFeature);
+      if (aFeature.get()) {
+        QStringList aGrantedOpIds = aSketchOperation->grantedOperationIds();
+        aNestedSketch = aGrantedOpIds.contains(aFeature->getKind().c_str());
+      }
     }
   }
   return aNestedSketch;
 }
 
 bool PartSet_SketcherMgr::isNestedCreateOperation(ModuleBase_Operation* theOperation,
-                                                  const CompositeFeaturePtr& theSketch)
+                                                  const CompositeFeaturePtr& theSketch) const
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                (theOperation);
   return aFOperation && !aFOperation->isEditOperation() &&
-         isNestedSketchOperation(aFOperation, theSketch);
+         isNestedSketchOperation(aFOperation);
 }
 
 bool PartSet_SketcherMgr::isNestedEditOperation(ModuleBase_Operation* theOperation,
-                                                const CompositeFeaturePtr& theSketch)
+                                                const CompositeFeaturePtr& theSketch) const
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                (theOperation);
   return aFOperation && aFOperation->isEditOperation() &&
-    isNestedSketchOperation(aFOperation, theSketch);
+    isNestedSketchOperation(aFOperation);
 }
 
 bool PartSet_SketcherMgr::isEntity(const std::string& theId)
@@ -1003,12 +1008,13 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
 {
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
-  if (canChangeCursor(theOperation)) {
+  // when sketch nested operation is stopped the cursor should be restored unconditionally
+  //if (canChangeCursor(theOperation)) {
     QApplication::restoreOverrideCursor();
 #ifdef DEBUG_CURSOR
     qDebug("stopNestedSketch() : None");
 #endif
-  }
+  //}
   /// improvement to deselect automatically all eventual selected objects, when
   // returning to the neutral point of the Sketcher
   // if the operation is restarted, the previous selection is used to initialize started operation
@@ -1044,7 +1050,7 @@ bool PartSet_SketcherMgr::operationActivatedByPreselection()
 {
   bool isOperationStopped = false;
   ModuleBase_Operation* anOperation = getCurrentOperation();
-  if(anOperation && PartSet_SketcherMgr::isNestedSketchOperation(anOperation, activeSketch())) {
+  if(anOperation && isNestedSketchOperation(anOperation)) {
     // Set final definitions if they are necessary
     //propertyPanelDefined(aOperation);
     /// Commit sketcher operations automatically
@@ -1524,7 +1530,7 @@ void PartSet_SketcherMgr::widgetStateChanged(int thePreviousState)
                                                                            (getCurrentOperation());
   if (aFOperation) {
     if (PartSet_SketcherMgr::isSketchOperation(aFOperation) ||
-        PartSet_SketcherMgr::isNestedSketchOperation(aFOperation, activeSketch()) &&
+        isNestedSketchOperation(aFOperation) &&
         thePreviousState == ModuleBase_ModelWidget::ModifiedInPP) {
       FeaturePtr aFeature = aFOperation->feature();
       visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
@@ -1537,7 +1543,7 @@ void PartSet_SketcherMgr::customizePresentation(const ObjectPtr& theObject)
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                            (getCurrentOperation());
   if (aFOperation && (PartSet_SketcherMgr::isSketchOperation(aFOperation) ||
-                      PartSet_SketcherMgr::isNestedSketchOperation(aFOperation, activeSketch())))
+                      isNestedSketchOperation(aFOperation)))
     SketcherPrs_Tools::sendExpressionShownEvent(myIsConstraintsShown[PartSet_Tools::Expressions]);
 
   // update entities selection priorities
