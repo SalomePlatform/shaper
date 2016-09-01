@@ -10,6 +10,7 @@
 #include "Model_Data.h"
 #include "Model_Document.h"
 #include "Model_SelectionNaming.h"
+#include <Model_Objects.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
@@ -911,6 +912,28 @@ void Model_AttributeSelection::selectSubShape(
   std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected;
   ResultPtr aCont;
   if (aSelNaming.selectSubShape(theType, theSubShapeName, aDoc, aShapeToBeSelected, aCont)) {
+    // try to find the last context to find the up to dat shape
+    if (aCont->shape().get() && !aCont->shape()->isNull() &&
+      aCont->groupName() == ModelAPI_ResultBody::group() && aDoc == owner()->document()) {
+      const TopoDS_Shape aConShape = aCont->shape()->impl<TopoDS_Shape>();
+      if (!aConShape.IsNull()) {
+        Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aConShape, selectionLabel());
+        if (!aNS.IsNull()) {
+          aNS = TNaming_Tool::CurrentNamedShape(aNS);
+          if (!aNS.IsNull()) {
+            TDF_Label aLab = aNS->Label();
+            while(aLab.Depth() != 7 && aLab.Depth() > 5)
+              aLab = aLab.Father();
+            ObjectPtr anObj = aDoc->objects()->object(aLab);
+            if (anObj.get()) {
+              ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+              if (aRes)
+                aCont = aRes;
+            }
+          }
+        }
+      }
+    }
     setValue(aCont, aShapeToBeSelected);
   }
 }
