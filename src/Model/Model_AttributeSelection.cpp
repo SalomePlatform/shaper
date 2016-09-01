@@ -877,7 +877,8 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
   ResultPtr aCont = context();
 
   Model_SelectionNaming aSelNaming(selectionLabel());
-  return aSelNaming.namingName(aCont, aSubSh, theDefaultName);
+  return aSelNaming.namingName(
+    aCont, aSubSh, theDefaultName, owner()->document() != aCont->document());
 }
 
 // type ::= COMP | COMS | SOLD | SHEL | FACE | WIRE | EDGE | VERT

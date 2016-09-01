@@ -30,7 +30,7 @@ public:
 
   /// Produces the string-name for the selected shape
   std::string namingName(ResultPtr& theContext, std::shared_ptr<GeomAPI_Shape> theSubSh,
-    const std::string& theDefaultName);
+    const std::string& theDefaultName, const bool theAnotherDoc);
   
   /// Makes a selection by the string-name
   /// \param theType string of the type of the shape

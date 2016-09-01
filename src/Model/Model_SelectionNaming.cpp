@@ -109,13 +109,28 @@ bool isTrivial (const TopTools_ListOfShape& theAncestors, TopTools_IndexedMapOfS
 }
 
 std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
-  std::shared_ptr<GeomAPI_Shape> theSubSh, const std::string& theDefaultName)
+  std::shared_ptr<GeomAPI_Shape> theSubSh, const std::string& theDefaultName,
+  const bool theAnotherDoc)
 {
   std::string aName("Undefined name");
   if(!theContext.get() || theContext->shape()->isNull()) 
     return !theDefaultName.empty() ? theDefaultName : aName;
+  
+  // if it is in result of another part
+  std::shared_ptr<Model_Document> aDoc = 
+    std::dynamic_pointer_cast<Model_Document>(theContext->document());
+  if (theContext->groupName() == ModelAPI_ResultPart::group()) {
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(theContext);
+    int anIndex;
+    return aPart->data()->name() + "/" + aPart->nameInPart(theSubSh, anIndex);
+  }
+
   if (!theSubSh.get() || theSubSh->isNull()) { // no subshape, so just the whole feature name
-    return theContext->data()->name();
+    // but if it is in another Part, add this part name
+    std::string aPartName;
+    if (theAnotherDoc)
+      aPartName = theContext->document()->kind() + "/"; // PartSet
+    return aPartName + theContext->data()->name();
   }
   TopoDS_Shape aSubShape = theSubSh->impl<TopoDS_Shape>();
   TopoDS_Shape aContext  = theContext->shape()->impl<TopoDS_Shape>();
@@ -125,13 +140,6 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
     BRepTools::Write(aContext, "Context.brep");
   }
 #endif
-  std::shared_ptr<Model_Document> aDoc = 
-    std::dynamic_pointer_cast<Model_Document>(theContext->document());
-  if (theContext->groupName() == ModelAPI_ResultPart::group()) {
-    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(theContext);
-    int anIndex;
-    return aPart->data()->name() + "/" + aPart->nameInPart(theSubSh, anIndex);
-  }
 
   // add the result name to the name of the shape (it was in BodyBuilder, but did not work on Result rename)
   bool isNeedContextName = theContext->shape().get() && !theContext->shape()->isEqual(theSubSh);
