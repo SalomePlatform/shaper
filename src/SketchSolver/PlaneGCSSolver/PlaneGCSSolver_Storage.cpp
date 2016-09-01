@@ -428,8 +428,8 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
     *aEndAngle += anAngle;
   }
 
-  // no need to constraint a copied arc
-  if (anArcFeature->isCopy())
+  // no need to constraint a fixed or a copied arc
+  if (theArc->group() == GID_OUTOFGROUP || anArcFeature->isCopy())
     return;
   // No need to add constraints if they are already exist
   std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >::const_iterator

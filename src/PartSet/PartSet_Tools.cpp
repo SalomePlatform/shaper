@@ -539,6 +539,8 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
           FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
           aFix->data()->refattr(SketchPlugin_Constraint::ENTITY_A())->
             setObject(aMyFeature->lastResult());
+          // we need to flush created signal in order to fixed constraint is processed by solver
+          Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
         //}
         return aMyFeature->lastResult();
       }
@@ -597,6 +599,8 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
           FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
           aFix->data()->refattr(SketchPlugin_Constraint::ENTITY_A())->
             setObject(aMyFeature->lastResult());
+          // we need to flush created signal in order to fixed constraint is processed by solver
+          Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
         //}
         return aMyFeature->lastResult();
       }
