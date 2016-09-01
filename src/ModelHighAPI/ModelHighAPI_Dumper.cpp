@@ -111,7 +111,6 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
       // should be the same to identify feature's name as automatically generated.
       if (aNbFeatures == anId) {
         // name is not user-defined
-        aName.clear();
         isDefaultName = true;
       }
     }
@@ -159,7 +158,15 @@ const std::string& ModelHighAPI_Dumper::parentName(const FeaturePtr& theEntity)
 
 void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
 {
-  const std::string& aFeatureName = myNames[theFeature].myCurrentName;
+  // Default name of the feature
+  const std::string& aKind = theFeature->getKind();
+  DocumentPtr aDoc = theFeature->document();
+  int aNbFeatures = myFeatureCount[aDoc][aKind];
+  std::ostringstream aNameStream;
+  aNameStream << aKind << "_" << aNbFeatures;
+  std::string aFeatureName = aNameStream.str();
+
+  // Save only names of results which is not correspond to default feature name
   const std::list<ResultPtr>& aResults = theFeature->results();
   std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
   for (int i = 1; aResIt != aResults.end(); ++aResIt, ++i) {
