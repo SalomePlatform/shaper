@@ -27,6 +27,7 @@
 
 #include <XGUI_PropertyPanel.h>
 #include <QToolButton>
+#include <QLineEdit>
 
 #include <QMessageBox>
 #include <QApplication>
@@ -665,6 +666,12 @@ bool XGUI_OperationMgr::onProcessEnter(QObject* theObject)
   return isAccepted;
 }
 
+bool editorControl(QObject* theObject)
+{
+  QLineEdit* aLineEdit = dynamic_cast<QLineEdit*>(theObject);
+  return aLineEdit;
+}
+
 bool XGUI_OperationMgr::onProcessDelete(QObject* theObject)
 {
   bool isAccepted = false;
@@ -708,6 +715,11 @@ bool XGUI_OperationMgr::onProcessDelete(QObject* theObject)
       // property panel child object is processed to process delete performed on Apply button of PP
       isToDeleteObject = true;
     }
+    else if (editorControl(theObject)) {
+      isToDeleteObject = false; /// Line Edit of Rename operation in ObjectBrowser
+      isAccepted = true;
+    }
+
     if (isToDeleteObject) {
       aWorkshop->deleteObjects();
       isAccepted = true;
