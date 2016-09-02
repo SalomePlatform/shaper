@@ -63,7 +63,7 @@ void ExchangePlugin_ExportFeature::initAttributes()
   data()->addAttribute(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID(), ModelAPI_AttributeString::typeId());
 
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
+  //ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::XAO_AUTHOR_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID());
