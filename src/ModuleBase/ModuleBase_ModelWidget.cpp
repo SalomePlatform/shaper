@@ -32,6 +32,7 @@
 //#define DEBUG_VALUE_STATE
 
 //#define DEBUG_WIDGET_INSTANCE
+//#define DEBUG_ENABLE_SKETCH_INPUT_FIELDS
 
 ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
                                                const Config_WidgetAPI* theData)
@@ -90,7 +91,11 @@ bool ModuleBase_ModelWidget::isValueEnabled() const
 {
   bool anEnabled = true;
   if (myIsValueEnabled == DefinedInPreferences) {
+#ifdef DEBUG_ENABLE_SKETCH_INPUT_FIELDS
+    bool aCanDisable = true;//Config_PropManager::boolean(SKETCH_TAB_NAME, "disable_input_fields", "true");
+#else
     bool aCanDisable = Config_PropManager::boolean(SKETCH_TAB_NAME, "disable_input_fields", "true");
+#endif
     if (aCanDisable)
       anEnabled = false;
   }
