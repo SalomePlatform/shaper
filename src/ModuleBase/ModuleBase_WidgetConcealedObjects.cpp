@@ -10,6 +10,8 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 #include <Config_WidgetAPI.h>
 
@@ -75,12 +77,19 @@ bool ModuleBase_WidgetConcealedObjects::restoreValueCustom()
       myBaseFeature->data()->referencesToObjects(aRefs);
       std::list<std::pair<std::string, std::list<ObjectPtr> > >::const_iterator
                                                       anIt = aRefs.begin(), aLast = aRefs.end();
+      std::set<ResultPtr> alreadyThere; // to avoid duplications
       for (; anIt != aLast; anIt++) {
+        if (!ModelAPI_Session::get()->validators()->
+              isConcealed(myBaseFeature->getKind(), anIt->first))
+          continue; // use only concealed attributes
         std::list<ObjectPtr> anObjects = (*anIt).second;
         std::list<ObjectPtr>::const_iterator anOIt = anObjects.begin(), anOLast = anObjects.end();
         for (; anOIt != anOLast; anOIt++) {
           ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(*anOIt);
           if (aResult && aResult->isConcealed()) {
+            if (alreadyThere.find(aResult) == alreadyThere.end()) // issue 1712, avoid duplicates
+              alreadyThere.insert(aResult);
+            else continue;
             int aRowId = myView->rowCount();
             addViewRow(aResult);
             myConcealedResults[aRowId] = aResult;
