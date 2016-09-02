@@ -45,10 +45,11 @@ public:
   /// Searches the face more appropriate to the given curves (with higher level of matched parameters)
   /// \param theConstr construction result that contains one or several  faces
   /// \param theCurves map from the face edges curves to orientation (-1 reversed, 0 unknown, 1 forward)
+  /// \param theIsWire for wire algorithm isquite the same, but if in face several wires, it returns the needed wire
   /// \returns faces fron this construction if found
   static std::shared_ptr<GeomAPI_Shape> findAppropriateFace(
     std::shared_ptr<ModelAPI_Result>& theConstr, 
-    NCollection_DataMap<Handle(Geom_Curve), int>& theCurves);
+    NCollection_DataMap<Handle(Geom_Curve), int>& theCurves, const bool theIsWire);
 
   /// Returns orientation of the edge in the context shape
   static int edgeOrientation(const TopoDS_Shape& theContext, TopoDS_Edge& theEdge);

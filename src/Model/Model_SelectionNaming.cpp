@@ -14,6 +14,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_ResultBody.h>
+#include <GeomAPI_Wire.h>
 
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS.hxx>
@@ -559,7 +560,7 @@ int Model_SelectionNaming::edgeOrientation(const TopoDS_Shape& theContext, TopoD
 
 std::shared_ptr<GeomAPI_Shape> Model_SelectionNaming::findAppropriateFace(
   std::shared_ptr<ModelAPI_Result>& theConstr, 
-  NCollection_DataMap<Handle(Geom_Curve), int>& theCurves)
+  NCollection_DataMap<Handle(Geom_Curve), int>& theCurves, const bool theIsWire)
 {
   int aBestFound = 0; // best number of found edges (not percentage: issue 1019)
   int aBestOrient = 0; // for the equal "BestFound" additional parameter is orientation
@@ -572,34 +573,51 @@ std::shared_ptr<GeomAPI_Shape> Model_SelectionNaming::findAppropriateFace(
     int aFound = 0, aNotFound = 0, aSameOrientation = 0;
     TopoDS_Face aFace = 
       TopoDS::Face(aConstructionContext->face(aFaceIndex)->impl<TopoDS_Shape>());
-    TopExp_Explorer anEdgesExp(aFace, TopAbs_EDGE);
-    TColStd_MapOfTransient alreadyProcessed; // to avoid counting edges with same curved (841)
-    for(; anEdgesExp.More(); anEdgesExp.Next()) {
-      TopoDS_Edge anEdge = TopoDS::Edge(anEdgesExp.Current());
-      if (!anEdge.IsNull()) {
-        Standard_Real aFirst, aLast;
-        Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-        if (alreadyProcessed.Contains(aCurve))
-          continue;
-        alreadyProcessed.Add(aCurve);
-        if (theCurves.IsBound(aCurve)) {
-          aFound++;
-          int anOrient = theCurves.Find(aCurve);
-          if (anOrient != 0) {  // extra comparision score is orientation
-            if (edgeOrientation(aFace, anEdge) == anOrient)
-              aSameOrientation++;
+    std::list<TopoDS_Shape> aFacesWires; // faces or wires to iterate
+    if (theIsWire) {
+      for(TopExp_Explorer aWires(aFace, TopAbs_WIRE); aWires.More(); aWires.Next()) {
+        aFacesWires.push_back(aWires.Current());
+      }
+    } else {
+      aFacesWires.push_back(aFace);
+    }
+    std::list<TopoDS_Shape>::iterator aFW = aFacesWires.begin();
+    for(; aFW != aFacesWires.end(); aFW++) {
+      TopExp_Explorer anEdgesExp(*aFW, TopAbs_EDGE);
+      TColStd_MapOfTransient alreadyProcessed; // to avoid counting edges with same curved (841)
+      for(; anEdgesExp.More(); anEdgesExp.Next()) {
+        TopoDS_Edge anEdge = TopoDS::Edge(anEdgesExp.Current());
+        if (!anEdge.IsNull()) {
+          Standard_Real aFirst, aLast;
+          Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+          if (alreadyProcessed.Contains(aCurve))
+            continue;
+          alreadyProcessed.Add(aCurve);
+          if (theCurves.IsBound(aCurve)) {
+            aFound++;
+            int anOrient = theCurves.Find(aCurve);
+            if (anOrient != 0) {  // extra comparision score is orientation
+              if (edgeOrientation(aFace, anEdge) == anOrient)
+                aSameOrientation++;
+            }
+          } else {
+            aNotFound++;
           }
-        } else {
-          aNotFound++;
         }
       }
-    }
-    if (aFound + aNotFound != 0) {
-      if (aFound > aBestFound || 
-        (aFound == aBestFound && aSameOrientation > aBestOrient)) {
-          aBestFound = aFound;
-          aBestOrient = aSameOrientation;
-          aResult = aConstructionContext->face(aFaceIndex);
+      if (aFound + aNotFound != 0) {
+        if (aFound > aBestFound || 
+          (aFound == aBestFound && aSameOrientation > aBestOrient)) {
+            aBestFound = aFound;
+            aBestOrient = aSameOrientation;
+            if (theIsWire) {
+              std::shared_ptr<GeomAPI_Wire> aWire(new GeomAPI_Wire);
+              aWire->setImpl(new TopoDS_Shape(*aFW));
+              aResult = aWire;
+            } else {
+              aResult = aConstructionContext->face(aFaceIndex);
+            }
+        }
       }
     }
   }
@@ -762,13 +780,6 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
       aSelection = findCommonShape(aType, aList);
     }
   }
-  if (!aSelection.IsNull()) {// Select it
-    std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected(new GeomAPI_Shape());
-    aShapeToBeSelected->setImpl(new TopoDS_Shape(aSelection));
-    theShapeToBeSelected = aShapeToBeSelected;
-    theCont = aCont;
-    return true;
-  }
   // in case of construction, there is no registered names for all sub-elements,
   // even for the main element; so, trying to find them by name (without "&" intersections)
   if (aN == 0) {
@@ -859,17 +870,10 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
               }
             }
           }
-          std::shared_ptr<GeomAPI_Shape> aFoundFace = findAppropriateFace(aConstr, allCurves);
-          if (aFoundFace.get()) {
-            if (aType == TopAbs_WIRE) { // just get a wire from face to have wire
-              TopExp_Explorer aWireExp(aFoundFace->impl<TopoDS_Shape>(), TopAbs_WIRE);
-              if (aWireExp.More()) {
-                theShapeToBeSelected.reset(new GeomAPI_Shape);
-                theShapeToBeSelected->setImpl<TopoDS_Shape>(new TopoDS_Shape(aWireExp.Current()));
-              } else return false;
-            } else {
-              theShapeToBeSelected = aFoundFace;
-            }
+          std::shared_ptr<GeomAPI_Shape> aFoundFW =
+            findAppropriateFace(aConstr, allCurves, aType == TopAbs_WIRE);
+          if (aFoundFW.get()) {
+            theShapeToBeSelected = aFoundFW;
             return true;
           }
         } else if (aType == TopAbs_WIRE) { // sketch faces is identified by format "Sketch_1/Face-2f-8f-11r"
@@ -900,14 +904,23 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
               }
             }
           }
-          std::shared_ptr<GeomAPI_Shape> aFoundFace = findAppropriateFace(aConstr, allCurves);
-          if (aFoundFace.get()) {
-            theShapeToBeSelected = aFoundFace;
+          std::shared_ptr<GeomAPI_Shape> aFoundFW = 
+            findAppropriateFace(aConstr, allCurves, aType == TopAbs_WIRE);
+          if (aFoundFW.get()) {
+            theShapeToBeSelected = aFoundFW;
             return true;
           }
         }
       }
     }
   }
+  if (!aSelection.IsNull()) {// Select it (must be after N=0 checking, since for simple constructions the shape must be null)
+    std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected(new GeomAPI_Shape());
+    aShapeToBeSelected->setImpl(new TopoDS_Shape(aSelection));
+    theShapeToBeSelected = aShapeToBeSelected;
+    theCont = aCont;
+    return true;
+  }
+
   return false;
 }

@@ -29,9 +29,6 @@ void FeaturesPlugin_Recover::initAttributes()
   data()->addAttribute(PERSISTENT(), ModelAPI_AttributeBoolean::typeId());
 
   myPersistent = boolean(PERSISTENT())->value();
-  // temporary modification for empty list
-  // ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), RECOVERED_ENTITIES());
-
   synchronizeRegistered();
 }
 

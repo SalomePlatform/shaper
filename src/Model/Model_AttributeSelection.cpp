@@ -507,16 +507,10 @@ bool Model_AttributeSelection::update()
               }
             }
           }
-          aNewSelected = Model_SelectionNaming::findAppropriateFace(aContext, allCurves);
+          aNewSelected = Model_SelectionNaming::findAppropriateFace(
+            aContext, allCurves, aShapeType == TopAbs_WIRE);
         }
         if (aNewSelected) { // store this new selection
-          if (aShapeType == TopAbs_WIRE) { // just get a wire from face to have wire
-            TopExp_Explorer aWireExp(aNewSelected->impl<TopoDS_Shape>(), TopAbs_WIRE);
-            if (aWireExp.More()) {
-              aNewSelected.reset(new GeomAPI_Shape);
-              aNewSelected->setImpl<TopoDS_Shape>(new TopoDS_Shape(aWireExp.Current()));
-            }
-          }
           selectConstruction(aContext, aNewSelected);
           setInvalidIfFalse(aSelLab, true);
           owner()->data()->sendAttributeUpdated(this);
