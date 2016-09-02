@@ -46,6 +46,10 @@ public:
               mirroredObjects, SketchPlugin_ConstraintMirror::ENTITY_C(), ModelAPI_AttributeRefList, /** Mirrored objects */
   )
 
+  /// List of mirrored objects
+  SKETCHAPI_EXPORT
+  std::list<std::shared_ptr<ModelHighAPI_Interface> > mirrored() const;
+
   /// Dump wrapped feature
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };

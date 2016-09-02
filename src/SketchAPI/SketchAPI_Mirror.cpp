@@ -6,6 +6,7 @@
 
 //--------------------------------------------------------------------------------------
 #include "SketchAPI_Mirror.h"
+#include <SketchAPI_SketchEntity.h>
 //--------------------------------------------------------------------------------------
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Selection.h>
@@ -37,6 +38,18 @@ SketchAPI_Mirror::~SketchAPI_Mirror()
 
 }
 
+std::list<std::shared_ptr<ModelHighAPI_Interface> > SketchAPI_Mirror::mirrored() const
+{
+  std::list<ObjectPtr> aList = mirroredObjects()->list();
+  std::list<FeaturePtr> anIntermediate;
+  std::list<ObjectPtr>::const_iterator anIt = aList.begin();
+  for (; anIt != aList.end(); ++anIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+    anIntermediate.push_back(aFeature);
+  }
+  return SketchAPI_SketchEntity::wrap(anIntermediate);
+}
+
 //--------------------------------------------------------------------------------------
 
 void SketchAPI_Mirror::dump(ModelHighAPI_Dumper& theDumper) const
@@ -48,4 +61,15 @@ void SketchAPI_Mirror::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeRefListPtr aMirrorObjects = mirrorList();
   theDumper << aBase << " = " << aSketchName << ".addMirror(" << aMirrorLine << ", "
             << aMirrorObjects << ")" << std::endl;
+
+  // Dump variables for a list of mirrored features
+  theDumper << "[";
+  std::list<std::shared_ptr<ModelHighAPI_Interface> > aList = mirrored();
+  std::list<std::shared_ptr<ModelHighAPI_Interface> >::const_iterator anIt = aList.begin();
+  for (; anIt != aList.end(); ++anIt) {
+    if (anIt != aList.begin())
+      theDumper << ", ";
+    theDumper << theDumper.name((*anIt)->feature(), false);
+  }
+  theDumper << "] = " << theDumper.name(aBase) << ".mirrored()" << std::endl;
 }

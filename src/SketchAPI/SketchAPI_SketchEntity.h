@@ -14,6 +14,8 @@
 
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
+
+class ModelAPI_Feature;
 //--------------------------------------------------------------------------------------
 /**\class SketchAPI_SketchEntity
  * \ingroup CPPHighAPI
@@ -39,6 +41,11 @@ public:
 
   /// Dump wrapped feature
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
+  /// Convert list of features to list of appropriate wrappers
+  SKETCHAPI_EXPORT
+  static std::list<std::shared_ptr<ModelHighAPI_Interface> >
+  wrap(const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures);
 
 protected:
   std::shared_ptr<ModelAPI_AttributeBoolean> myAuxiliary;

@@ -225,7 +225,7 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
   ++gCompositeStackDepth;
   // dump composite itself
   if (!isDumped(theComposite) || isForce)
-    dumpFeature(theComposite, isForce);
+    dumpFeature(FeaturePtr(theComposite), isForce);
 
   // sub-part is processed independently, because it provides separate document
   if (theComposite->getKind() == PartSetPlugin_Part::ID()) {
@@ -610,7 +610,19 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const ObjectPtr& theObject)
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const AttributePtr& theAttr)
 {
   FeaturePtr anOwner = ModelAPI_Feature::feature(theAttr->owner());
-  myDumpBuffer << name(anOwner) << "." << attributeGetter(anOwner, theAttr->id()) << "()";
+
+  std::string aWrapperPrefix, aWrapperSuffix;
+  // Check the attribute belongs to copied (in multi-translation or multi-rotation) feature.
+  // In this case we need to cast explicitly feature to appropriate type.
+  AttributeBooleanPtr isCopy = anOwner->boolean("Copy");
+  if (isCopy.get() && isCopy->value()) {
+    aWrapperPrefix = featureWrapper(anOwner) + "(";
+    aWrapperSuffix = ")";
+    importModule("SketchAPI");
+  }
+
+  myDumpBuffer << aWrapperPrefix << name(anOwner) << aWrapperSuffix
+               << "." << attributeGetter(anOwner, theAttr->id()) << "()";
   return *this;
 }
 

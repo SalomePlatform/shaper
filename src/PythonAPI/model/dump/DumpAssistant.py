@@ -29,10 +29,12 @@ class DumpAssistant(ModelHighAPI.ModelHighAPI_Dumper):
     ## Collect feature wrappers, which allow dumping (have method dump)
     def collectFeatures(self):
         self.myFeatures = {}
+        self.myWrapperNames = {}
         for aModule in sys.modules:
             for aName, anObj in inspect.getmembers(sys.modules[aModule], inspect.isclass):
                 if issubclass(anObj, ModelHighAPI.ModelHighAPI_Interface) and hasattr(anObj, "ID") and anObj.dump != ModelHighAPI.ModelHighAPI_Interface.dump:
                     self.myFeatures[anObj.ID()] = anObj
+                    self.myWrapperNames[anObj.ID()] = aName
 
     ## Create wrapper for a given feature and dump it
     def dumpFeature(self, theFeature, theForce):
@@ -61,6 +63,13 @@ class DumpAssistant(ModelHighAPI.ModelHighAPI_Dumper):
         aFeatureKind = theFeature.getKind()
         if aFeatureKind in self.myFeatures:
             return self.myFeatures[aFeatureKind](theFeature).attributeGetter(theAttrName)
+        return std_string()
+
+    ## Return name of wrapper feature
+    def featureWrapper(self, theFeature):
+        aFeatureKind = theFeature.getKind()
+        if aFeatureKind in self.myWrapperNames:
+            return self.myWrapperNames[aFeatureKind]
         return std_string()
 
 # Instance of dumper

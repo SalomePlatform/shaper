@@ -110,6 +110,9 @@ public:
   virtual std::string attributeGetter(const FeaturePtr& theFeature,
                                       const std::string& theAttrName) const = 0;
 
+  /// Return name of wrapper feature
+  virtual std::string featureWrapper(const FeaturePtr& theFeature) const = 0;
+
   /// Save all dumps into specified file
   MODELHIGHAPI_EXPORT
   bool exportTo(const std::string& theFileName);

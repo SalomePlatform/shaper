@@ -54,6 +54,10 @@ public:
               rotatedObjects, SketchPlugin_MultiRotation::ENTITY_B(), ModelAPI_AttributeRefList, /** Rotated objects */
   )
 
+  /// List of rotated objects
+  SKETCHAPI_EXPORT
+  std::list<std::shared_ptr<ModelHighAPI_Interface> > rotated() const;
+
   /// Dump wrapped feature
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };

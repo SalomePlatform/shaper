@@ -53,6 +53,10 @@ public:
               translatedObjects, SketchPlugin_MultiTranslation::ENTITY_B(), ModelAPI_AttributeRefList, /** Translationed objects */
   )
 
+  /// List of translated objects
+  SKETCHAPI_EXPORT
+  std::list<std::shared_ptr<ModelHighAPI_Interface> > translated() const;
+
   /// Dump wrapped feature
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };

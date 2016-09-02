@@ -4,11 +4,16 @@
 
 %{
   #include "SketchAPI_swig.h"
+  #include "ModelHighAPI_swig.h"
+
+  // fix for SWIG v2.0.4
+  #define SWIGPY_SLICE_ARG(obj) ((PySliceObject*)(obj))
 %}
 
 %include "doxyhelp.i"
 
 // import other modules
+%import "ModelAPI.i"
 %import "ModelHighAPI.i"
 
 // to avoid error on this
@@ -33,6 +38,63 @@
 %shared_ptr(SketchAPI_Rectangle)
 %shared_ptr(SketchAPI_Rotation)
 %shared_ptr(SketchAPI_Translation)
+
+// std::list -> []
+%template(InterfaceList) std::list<std::shared_ptr<ModelHighAPI_Interface> >;
+
+%typecheck(SWIG_TYPECHECK_POINTER) std::shared_ptr<ModelAPI_Feature>, const std::shared_ptr<ModelAPI_Feature> & {
+  std::shared_ptr<ModelAPI_Feature> * temp_feature;
+  std::shared_ptr<ModelHighAPI_Interface> * temp_interface;
+  int newmem = 0;
+  if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_feature, $descriptor(std::shared_ptr<ModelAPI_Feature> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (temp_feature) {
+      $1 = 1;
+    } else {
+      $1 = 0;
+    }
+  } else
+  if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_interface, $descriptor(std::shared_ptr<ModelHighAPI_Interface> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (temp_interface) {
+      $1 = 1;
+    } else {
+      $1 = 0;
+    }
+  } else
+    $1 = 0;
+}
+
+%typemap(in) const std::shared_ptr<ModelAPI_Feature> & (std::shared_ptr<ModelAPI_Feature> temp) {
+  std::shared_ptr<ModelAPI_Feature> * temp_feature;
+  std::shared_ptr<ModelHighAPI_Interface> * temp_interface;
+  int newmem = 0;
+  if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_feature, $descriptor(std::shared_ptr<ModelAPI_Feature> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (!temp_feature) {
+      PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Interface.");
+      return NULL;
+    }
+    temp = (*temp_feature);
+    if (newmem & SWIG_CAST_NEW_MEMORY) {
+      delete temp_feature;
+    }
+    $1 = &temp;
+  } else
+  if ((SWIG_ConvertPtrAndOwn($input, (void **)&temp_interface, $descriptor(std::shared_ptr<ModelHighAPI_Interface> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+    if (!temp_interface) {
+      PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Interface.");
+      return NULL;
+    }
+    temp = (*temp_interface)->feature();
+    if (newmem & SWIG_CAST_NEW_MEMORY) {
+      delete temp_interface;
+    }
+    $1 = &temp;
+  } else
+  if ((SWIG_ConvertPtr($input, (void **)&$1, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
+  } else {
+    PyErr_SetString(PyExc_ValueError, "argument must be ModelHighAPI_Interface.");
+    return NULL;
+  }
+}
 
 %typemap(in) const ModelHighAPI_RefAttr & (ModelHighAPI_RefAttr temp) {
   std::shared_ptr<ModelAPI_Attribute> * temp_attribute;
