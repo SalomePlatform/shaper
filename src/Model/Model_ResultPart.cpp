@@ -150,39 +150,41 @@ bool Model_ResultPart::setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
 std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
 {
   std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape);
-  if (myTrsf.get()) { // get shape of the base result and apply the transformation
-    ResultPtr anOrigResult = baseRef();
-    std::shared_ptr<GeomAPI_Shape> anOrigShape = anOrigResult->shape();
-    if (anOrigShape.get()) {
-      TopoDS_Shape aShape = anOrigShape->impl<TopoDS_Shape>();
-      if (!aShape.IsNull()) {
-        aShape.Move(*(myTrsf.get()));
-        aResult->setImpl(new TopoDS_Shape(aShape));
-      }
-    }
-    return aResult;
-  }
   if (myShape.IsNull()) { // shape is not produced yet, create it
-    DocumentPtr aDoc = Model_ResultPart::partDoc();
-    if (aDoc.get() && aDoc->isOpened()) {
-      const std::string& aBodyGroup = ModelAPI_ResultBody::group();
-      TopoDS_Compound aResultComp;
-      BRep_Builder aBuilder;
-      aBuilder.MakeCompound(aResultComp);
-      int aNumSubs = 0;
-      for(int a = aDoc->size(aBodyGroup) - 1; a >= 0; a--) {
-        ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(aDoc->object(aBodyGroup, a));
-        // "object" method filters out disabled and concealed anyway, so don't check
-        if (aBody.get() && aBody->shape().get()) {
-          TopoDS_Shape aShape = *(aBody->shape()->implPtr<TopoDS_Shape>());
-          if (!aShape.IsNull()) {
-            aBuilder.Add(aResultComp, aShape);
-            aNumSubs++;
-          }
+    if (myTrsf.get()) { // get shape of the base result and apply the transformation
+      ResultPtr anOrigResult = baseRef();
+      std::shared_ptr<GeomAPI_Shape> anOrigShape = anOrigResult->shape();
+      if (anOrigShape.get()) {
+        TopoDS_Shape aShape = anOrigShape->impl<TopoDS_Shape>();
+        if (!aShape.IsNull()) {
+          aShape.Move(*(myTrsf.get()));
+          myShape = aShape;
+          aResult->setImpl(new TopoDS_Shape(aShape));
         }
       }
-      if (aNumSubs) {
-        myShape = aResultComp;
+      return aResult;
+    } else {
+      DocumentPtr aDoc = Model_ResultPart::partDoc();
+      if (aDoc.get() && aDoc->isOpened()) {
+        const std::string& aBodyGroup = ModelAPI_ResultBody::group();
+        TopoDS_Compound aResultComp;
+        BRep_Builder aBuilder;
+        aBuilder.MakeCompound(aResultComp);
+        int aNumSubs = 0;
+        for(int a = aDoc->size(aBodyGroup) - 1; a >= 0; a--) {
+          ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(aDoc->object(aBodyGroup, a));
+          // "object" method filters out disabled and concealed anyway, so don't check
+          if (aBody.get() && aBody->shape().get()) {
+            TopoDS_Shape aShape = *(aBody->shape()->implPtr<TopoDS_Shape>());
+            if (!aShape.IsNull()) {
+              aBuilder.Add(aResultComp, aShape);
+              aNumSubs++;
+            }
+          }
+        }
+        if (aNumSubs) {
+          myShape = aResultComp;
+        }
       }
     }
   }
