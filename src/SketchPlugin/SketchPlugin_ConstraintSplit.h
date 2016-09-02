@@ -183,10 +183,24 @@ private:
   /// \param theEndPointAttr an end point of a segment
   /// \param theFirstPointAttr a start point of a segment
   /// \param theSecondPointAttr an end point of a segment
-  void arrangePoints(const std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
-                     const std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr,
-                     std::shared_ptr<GeomDataAPI_Point2D>& theFirstPointAttr,
-                     std::shared_ptr<GeomDataAPI_Point2D>& theSecondPointAttr);
+  void arrangePointsOnLine(const std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
+                           const std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr,
+                           std::shared_ptr<GeomDataAPI_Point2D>& theFirstPointAttr,
+                           std::shared_ptr<GeomDataAPI_Point2D>& theSecondPointAttr) const;
+
+  /// Correct the first and the second point to provide condition that the first is closer to
+  /// the start point and the second point - to the last end of current segment. To rearrange
+  /// them if this condition is not satisfied.
+  /// \param theArc an arc to be split
+  /// \param theStartPointAttr a start point of a segment
+  /// \param theEndPointAttr an end point of a segment
+  /// \param theFirstPointAttr a start point of a segment
+  /// \param theSecondPointAttr an end point of a segment
+  void arrangePointsOnArc(const FeaturePtr& theArc,
+                          const std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
+                          const std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr,
+                          std::shared_ptr<GeomDataAPI_Point2D>& theFirstPointAttr,
+                          std::shared_ptr<GeomDataAPI_Point2D>& theSecondPointAttr) const;
 
   /// Fill attribute by value of another attribute. It processes only Point 2D attributes.
   /// \param theModifiedAttribute an attribute of GeomDataAPI_Point2D on feature to be modified

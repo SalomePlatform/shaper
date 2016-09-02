@@ -6,7 +6,9 @@
 
 #include "SketchPlugin_ConstraintSplit.h"
 
+#include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeString.h>
@@ -35,10 +37,14 @@
 #include <ModelGeomAlgo_Point2D.h>
 #include <Events_Loop.h>
 
+#include <cmath>
+
 #define DEBUG_SPLIT
 #ifdef DEBUG_SPLIT
 #include <iostream>
 #endif
+
+static const double PI = 3.141592653589793238463;
 
 SketchPlugin_ConstraintSplit::SketchPlugin_ConstraintSplit()
 {
@@ -639,7 +645,7 @@ void SketchPlugin_ConstraintSplit::splitLine(FeaturePtr& theSplitFeature,
     return;
   }
 
-  arrangePoints(aStartPointAttrOfBase, anEndPointAttrOfBase, aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
+  arrangePointsOnLine(aStartPointAttrOfBase, anEndPointAttrOfBase, aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
 
   /// create a split feature
   theSplitFeature = createLineFeature(aBaseFeature, aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
@@ -755,7 +761,8 @@ void SketchPlugin_ConstraintSplit::splitArc(FeaturePtr& theSplitFeature,
     return;
   }
 
-  arrangePoints(aStartPointAttrOfBase, anEndPointAttrOfBase, aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
+  arrangePointsOnArc(aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase,
+                     aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
 
   /// split feature
   theSplitFeature = createArcFeature(aBaseFeature, aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
@@ -909,17 +916,53 @@ void SketchPlugin_ConstraintSplit::splitCircle(FeaturePtr& theSplitFeature,
   theCreatedFeatures.insert(aConstraintFeature);
 }
 
-void SketchPlugin_ConstraintSplit::arrangePoints(const AttributePoint2DPtr& theStartPointAttr,
-                                                 const AttributePoint2DPtr& theEndPointAttr,
-                                                 AttributePoint2DPtr& theFirstPointAttr,
-                                                 AttributePoint2DPtr& theLastPointAttr)
+void SketchPlugin_ConstraintSplit::arrangePointsOnLine(
+    const AttributePoint2DPtr& theStartPointAttr,
+    const AttributePoint2DPtr& theEndPointAttr,
+    AttributePoint2DPtr& theFirstPointAttr,
+    AttributePoint2DPtr& theLastPointAttr) const
 {
-  /// if first point is closer to last point, wrap first and last values
+  // if first point is closer to last point, swap first and last values
   if (theStartPointAttr->pnt()->distance(theFirstPointAttr->pnt()) >
       theStartPointAttr->pnt()->distance(theLastPointAttr->pnt())) {
     AttributePoint2DPtr aTmpPoint = theFirstPointAttr;
     theFirstPointAttr = theLastPointAttr;
     theLastPointAttr = aTmpPoint;
+  }
+}
+
+void SketchPlugin_ConstraintSplit::arrangePointsOnArc(
+    const FeaturePtr& theArc,
+    const std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
+    const std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr,
+    std::shared_ptr<GeomDataAPI_Point2D>& theFirstPointAttr,
+    std::shared_ptr<GeomDataAPI_Point2D>& theSecondPointAttr) const
+{
+  std::shared_ptr<GeomAPI_Pnt2d> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theArc->attribute(SketchPlugin_Arc::CENTER_ID()))->pnt();
+  bool isReversed = theArc->boolean(SketchPlugin_Arc::INVERSED_ID())->value();
+
+  // collect directions to each point
+  std::shared_ptr<GeomAPI_Dir2d> aStartDir(
+      new GeomAPI_Dir2d(theStartPointAttr->pnt()->xy()->decreased(aCenter->xy())));
+  std::shared_ptr<GeomAPI_Dir2d> aFirstPtDir(
+      new GeomAPI_Dir2d(theFirstPointAttr->pnt()->xy()->decreased(aCenter->xy())));
+  std::shared_ptr<GeomAPI_Dir2d> aSecondPtDir(
+      new GeomAPI_Dir2d(theSecondPointAttr->pnt()->xy()->decreased(aCenter->xy())));
+
+  // sort points by their angular values
+  double aFirstPtAngle = aStartDir->angle(aFirstPtDir);
+  double aSecondPtAngle = aStartDir->angle(aSecondPtDir);
+  double aPeriod = isReversed ? -2.0 * PI : 2.0 * PI;
+  if (isReversed == (aFirstPtAngle > 0.))
+    aFirstPtAngle += aPeriod;
+  if (isReversed == (aSecondPtAngle > 0.))
+    aSecondPtAngle += aPeriod;
+
+  if (fabs(aFirstPtAngle) > fabs(aSecondPtAngle)) {
+    AttributePoint2DPtr aTmpPoint = theFirstPointAttr;
+    theFirstPointAttr = theSecondPointAttr;
+    theSecondPointAttr = aTmpPoint;
   }
 }
 
