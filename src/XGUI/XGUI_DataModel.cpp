@@ -149,8 +149,10 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
               }
             }
           }
-        } else
+        } else {
           rebuildDataTree();
+          break;
+        }
       }
     }
     // Deleted object event ***********************
@@ -230,6 +232,9 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
               break;
             }
           }
+        } else {
+          rebuildDataTree();
+          break;
         }
       }
     }
