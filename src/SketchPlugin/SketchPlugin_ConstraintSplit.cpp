@@ -110,7 +110,7 @@ void SketchPlugin_ConstraintSplit::execute()
   }
 
   std::cout << std::endl;
-  std::cout << "IN PARAMETERS" << std::endl;
+  std::cout << "---- IN PARAMETERS ----" << std::endl;
   std::cout << "Base feature:" << getFeatureInfo(aBaseFeature) << std::endl;
   std::cout << std::endl;
 
@@ -162,7 +162,7 @@ void SketchPlugin_ConstraintSplit::execute()
   }*/
   std::map<AttributePtr, std::list<AttributePtr> >::const_iterator aRefIt = aBaseRefAttributes.begin(),
                                                                    aRefLast = aBaseRefAttributes.end();
-  std::cout << std::endl << "References to bound point of feature [" << aBaseRefAttributes.size() << "]" << std::endl;
+  std::cout << std::endl << "References to attributes of base feature [" << aBaseRefAttributes.size() << "]" << std::endl;
   for (; aRefIt != aRefLast; aRefIt++) {
     AttributePtr aBaseAttr = aRefIt->first;
     std::list<AttributePtr> aRefAttributes = aRefIt->second;
@@ -171,17 +171,15 @@ void SketchPlugin_ConstraintSplit::execute()
                                             aRefAttrLast = aRefAttributes.end();
     for (; aRefAttrIt != aRefAttrLast; aRefAttrIt++) {
       if (!aRefsInfo.empty())
-        aRefsInfo.append("\n");
+        aRefsInfo.append(",");
       AttributePtr aRAttr = *aRefAttrIt;
       aRefsInfo.append(aRAttr->id());
       FeaturePtr aRFeature = ModelAPI_Feature::feature(aRAttr->owner());
       aRefsInfo.append("(" + aRFeature->name() + ") ");
     }
     std::shared_ptr<GeomDataAPI_Point2D> aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aBaseAttr);
-    std::cout <<     " -Point attribute:" << aPointAttr->id().c_str()
-              << "[" << aRefAttributes.size() << "] " <<std::endl << aRefsInfo << std::endl;
+    std::cout << aPointAttr->id().c_str() << ": " << "[" << aRefAttributes.size() << "] " << aRefsInfo << std::endl;
   }
-
   std::cout << std::endl;
   std::cout << "---- SPLIT ----" << std::endl;
   std::cout << std::endl;
@@ -207,7 +205,7 @@ void SketchPlugin_ConstraintSplit::execute()
   }
 
 #ifdef DEBUG_SPLIT
-  std::cout << "OUT PARAMETERS" << std::endl;
+  std::cout << "---- OUT PARAMETERS ----" << std::endl;
   std::cout << "Base modified feature:" << getFeatureInfo(aBaseFeature) << std::endl;
   std::cout << "Split feature:" << getFeatureInfo(aSplitFeature) << std::endl;
   std::cout << "After feature:" << getFeatureInfo(anAfterFeature) << std::endl;
@@ -647,6 +645,14 @@ void SketchPlugin_ConstraintSplit::splitLine(FeaturePtr& theSplitFeature,
 
   arrangePointsOnLine(aStartPointAttrOfBase, anEndPointAttrOfBase, aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
 
+#ifdef DEBUG_SPLIT
+  std::cout << "Arranged points (to build split between 1st and 2nd points:" << std::endl;
+  std::cout << "Start point: " << ModelGeomAlgo_Point2D::getPointAttributeInfo(aStartPointAttrOfBase) << std::endl;
+  std::cout << "1st point:   " << ModelGeomAlgo_Point2D::getPointAttributeInfo(aFirstPointAttrOfSplit) << std::endl;
+  std::cout << "2nd point:   " << ModelGeomAlgo_Point2D::getPointAttributeInfo(aSecondPointAttrOfSplit) << std::endl;
+  std::cout << "End point:   " << ModelGeomAlgo_Point2D::getPointAttributeInfo(anEndPointAttrOfBase) << std::endl;
+#endif
+
   /// create a split feature
   theSplitFeature = createLineFeature(aBaseFeature, aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
   theCreatedFeatures.insert(theSplitFeature);
@@ -763,6 +769,13 @@ void SketchPlugin_ConstraintSplit::splitArc(FeaturePtr& theSplitFeature,
 
   arrangePointsOnArc(aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase,
                      aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
+#ifdef DEBUG_SPLIT
+  std::cout << "Arranged points (to build split between 1st and 2nd points:" << std::endl;
+  std::cout << "Start point: " << ModelGeomAlgo_Point2D::getPointAttributeInfo(aStartPointAttrOfBase) << std::endl;
+  std::cout << "1st point:   " << ModelGeomAlgo_Point2D::getPointAttributeInfo(aFirstPointAttrOfSplit) << std::endl;
+  std::cout << "2nd point:   " << ModelGeomAlgo_Point2D::getPointAttributeInfo(aSecondPointAttrOfSplit) << std::endl;
+  std::cout << "End point:   " << ModelGeomAlgo_Point2D::getPointAttributeInfo(anEndPointAttrOfBase) << std::endl;
+#endif
 
   /// split feature
   theSplitFeature = createArcFeature(aBaseFeature, aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
