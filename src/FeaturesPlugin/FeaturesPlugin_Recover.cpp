@@ -49,7 +49,7 @@ void FeaturesPlugin_Recover::synchronizeRegistered()
 {
   FeaturePtr aBase = baseFeature();
   bool aNewPersistent = boolean(PERSISTENT())->value();
-  if (aNewPersistent != myPersistent)
+  if (aNewPersistent != myPersistent || myCurrentBase != aBase)
     clearRegistered();
 
   std::set<ObjectPtr> aRecoveredInList;
