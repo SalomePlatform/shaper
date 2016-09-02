@@ -15,6 +15,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_Expression.h>
 
 ParametersPlugin_VariableValidator::ParametersPlugin_VariableValidator()
 {
@@ -40,29 +41,13 @@ bool ParametersPlugin_VariableValidator::isValid(const AttributePtr& theAttribut
     theError.arg(aStrAttr->id());
     return false;
   }
-  if (!isVariable(aStrAttr->value())) {
+  if (!ModelAPI_Expression::isVariable(aStrAttr->value())) {
     theError = "Incorrect variable name.";
     return false;
   } 
   if (!isUnique(theAttribute, aStrAttr->value())) {
     theError = "Variable name is not unique.";
     return false;
-  }
-  return true;
-}
-
-bool ParametersPlugin_VariableValidator::isVariable(const std::string& theString) const
-{
-  if (theString.empty())
-    return false;
-  std::string::const_iterator it = theString.begin();
-  if (!(isalpha(*it) || (*it) == '_') || it == theString.end())
-    return false;
-  it++;
-  for ( ; it != theString.end(); ++it ) {
-    if(!(isalnum(*it) || (*it) == '_')) {
-      return false;
-    }
   }
   return true;
 }

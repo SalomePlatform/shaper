@@ -53,6 +53,9 @@ class ModelAPI_Expression
   /// Returns the used parameters
   MODELAPI_EXPORT virtual std::set<std::string> usedParameters() const = 0;
 
+  /// Returns True if the given string can be defined as a name of an expression variable
+  MODELAPI_EXPORT static bool isVariable(const std::string& theString);
+
  protected:
   /// Objects are created for features automatically
   MODELAPI_EXPORT ModelAPI_Expression();

@@ -37,8 +37,6 @@ class ParametersPlugin_VariableValidator : public ModelAPI_AttributeValidator
                                                Events_InfoMessage& theError) const;
 
  protected:
-  /// Returns true if theString is a valid variable name.
-  PARAMETERSPLUGIN_EXPORT bool isVariable(const std::string& theString) const;
   /// Returns true if theString is unique parameter name in the document of theAttribute.
   PARAMETERSPLUGIN_EXPORT bool isUnique(const AttributePtr& theAttribute,
                                         const std::string& theString) const;

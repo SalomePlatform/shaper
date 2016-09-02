@@ -18,6 +18,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_Expression.h>
 
 #include <ModuleBase_Tools.h>
 
@@ -752,7 +753,9 @@ bool ParametersPlugin_WidgetParamsMgr::isValid()
   bool aIsValid = true;
   for(int i = 0; i < myParameters->childCount(); i++) {
     aItem = myParameters->child(i);
-    if ((aItem->text(Col_Name) == NoName) || (aItem->text(Col_Equation) == NoValue)) {
+    if ((aItem->text(Col_Name) == NoName) || 
+        (aItem->text(Col_Equation) == NoValue) ||
+        (!ModelAPI_Expression::isVariable(aItem->text(Col_Name).toStdString())) ) {
       aIsValid = false;
       break;
     }
