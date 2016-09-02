@@ -145,21 +145,6 @@ void SketchPlugin_Arc::execute()
     AttributeBooleanPtr isInversed =
         std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(attribute(INVERSED_ID()));
 
-    std::shared_ptr<GeomAPI_Dir> anXDir(new GeomAPI_Dir(aStartPoint->xyz()->decreased(aCenter->xyz())));
-    std::shared_ptr<GeomAPI_Ax2> anAx2(new GeomAPI_Ax2(aCenter, aNormal, anXDir));
-    std::shared_ptr<GeomAPI_Circ> aCirc(new GeomAPI_Circ(anAx2, aCenter->distance(aStartPoint)));
-    double aParameterNew = 0.0;
-    if(aCirc->parameter(aEndPoint, paramTolerance, aParameterNew)) {
-      if(0 <= myParamBefore && myParamBefore <= PI / 2.0
-        && PI * 1.5 <= aParameterNew && aParameterNew <= PI * 2.0) {
-          isInversed->setValue(true);
-      } else if(PI * 1.5 <= myParamBefore && myParamBefore <= PI * 2.0
-        && 0 <= aParameterNew && aParameterNew <= PI / 2.0) {
-          isInversed->setValue(false);
-      }
-    }
-    myParamBefore = aParameterNew;
-
     std::shared_ptr<GeomAPI_Shape> aCircleShape;
     if(!isInversed->value()) {
       aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStartPoint, aEndPoint, aNormal);
@@ -509,6 +494,19 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
       if (!anAngleAttr->isInitialized() || fabs(aNewAngle - anAngleAttr->value()) > tolerance)
         anAngleAttr->setValue(aNewAngle);
     }
+
+    // calculate arc aperture and change the Inversed flag if needed
+    AttributeBooleanPtr isInversed =
+        std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(attribute(INVERSED_ID()));
+    double aParameterNew = aEndParam - aStartParam;
+    if (0 <= myParamBefore && myParamBefore <= PI / 2.0 &&
+        PI * 1.5 <= aParameterNew && aParameterNew <= PI * 2.0)
+      isInversed->setValue(true);
+    else if (PI * 1.5 <= myParamBefore && myParamBefore <= PI * 2.0 &&
+             0 <= aParameterNew && aParameterNew <= PI / 2.0)
+      isInversed->setValue(false);
+    myParamBefore = aParameterNew;
+
     // do not need to inform that other parameters were changed in this basis mode: these arguments
     // change is enough
     data()->blockSendAttributeUpdated(false, false);
