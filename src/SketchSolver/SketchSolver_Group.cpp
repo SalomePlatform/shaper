@@ -392,7 +392,7 @@ bool SketchSolver_Group::resolveConstraints()
       myStorage->refresh();
       updateMultiConstraints(myConstraints);
       if (myStorage->isNeedToResolve()) // multi-constraints updated some parameters, need to store them
-        myStorage->refresh();
+        resolveConstraints();
 
       if (myPrevResult != STATUS_OK || myPrevResult == STATUS_UNKNOWN) {
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");

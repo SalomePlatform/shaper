@@ -132,9 +132,16 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
     for (; aSIt != aSubs.end(); ++aSIt) {
       if ((*aSIt)->type() != ENTITY_POINT)
         continue;
-      std::list<ParameterWrapperPtr> aParameters = (*aSIt)->parameters();
-      aXCoord = aParameters.front()->value();
-      aYCoord = aParameters.back()->value();
+      AttributePoint2DPtr aPoint =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>((*aSIt)->baseAttribute());
+      if (aPoint) {
+        aXCoord = aPoint->x();
+        aYCoord = aPoint->y();
+      } else {
+        std::list<ParameterWrapperPtr> aParameters = (*aSIt)->parameters();
+        aXCoord = aParameters.front()->value();
+        aYCoord = aParameters.back()->value();
+      }
       getRelative(aXCoord, aYCoord, aXCoord, aYCoord);
       aX.push_back(aXCoord);
       aY.push_back(aYCoord);
