@@ -195,7 +195,7 @@ GCS::SolveStatus PlaneGCSSolver_Solver::solveWithoutTangent()
       if (!isTangentTruth(*aRemIt))
         break;
     if (aRemIt != aRemovedTangent.end())
-      aResult = GCS::Failed;
+      aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters);
   }
 
   if (aResult == GCS::Success)
@@ -226,7 +226,7 @@ bool PlaneGCSSolver_Solver::isTangentTruth(GCS::Constraint* theTangent) const
            fabs(aDist2 - aRadDiff * aRadDiff) <= aTol2;
   }
   if (theTangent->getTypeId() == GCS::P2LDistance) {
-    static const double aTol2 = 1e-12;
+    static const double aTol2 = 1e-10;
     GCS::VEC_pD aParams = theTangent->params();
     double aDist2 = *(aParams[6]) * *(aParams[6]);
     // orthogonal line direction
