@@ -61,6 +61,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorUnionSelection);
   aFactory->registerValidator("FeaturesPlugin_ValidatorUnionArguments",
                               new FeaturesPlugin_ValidatorUnionArguments);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorConcealedResult",
+                              new FeaturesPlugin_ValidatorConcealedResult);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

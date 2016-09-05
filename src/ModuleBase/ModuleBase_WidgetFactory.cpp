@@ -15,6 +15,7 @@
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_WidgetSwitch.h>
 #include <ModuleBase_WidgetShapeSelector.h>
+#include <ModuleBase_WidgetFeatureSelector.h>
 #include <ModuleBase_WidgetDoubleValue.h>
 #include <ModuleBase_WidgetIntValue.h>
 #include <ModuleBase_WidgetBoolValue.h>
@@ -287,6 +288,8 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
     result = new ModuleBase_WidgetIntValue(theParent, myWidgetApi);
   } else if (theType == WDG_SHAPE_SELECTOR) {
     result = new ModuleBase_WidgetShapeSelector(theParent, myWorkshop, myWidgetApi);
+  } else if (theType == WDG_FEATURE_SELECTOR) {
+    result = new ModuleBase_WidgetFeatureSelector(theParent, myWorkshop, myWidgetApi);
   } else if (theType == WDG_BOOLVALUE) {
     result = new ModuleBase_WidgetBoolValue(theParent, myWidgetApi);
   //} else if (theType == WDG_DOUBLEVALUE_EDITOR) {

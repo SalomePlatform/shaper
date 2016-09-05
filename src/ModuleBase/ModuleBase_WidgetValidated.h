@@ -72,7 +72,7 @@ protected:
   /// Checks whether all active viewer filters validate the presentation
   /// \param thePrs a selected presentation in the view
   /// \return a boolean value
-  bool isValidInFilters(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
+  virtual bool isValidInFilters(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   /// Checks all attribute validators returns valid. It tries on the given selection
   /// to current attribute by setting the value inside and calling validators. After this,

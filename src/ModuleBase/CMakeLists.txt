@@ -49,6 +49,7 @@ SET(PROJECT_HEADERS
   ModuleBase_WidgetEditor.h
   ModuleBase_WidgetExprEditor.h
   ModuleBase_WidgetFactory.h
+  ModuleBase_WidgetFeatureSelector.h
   ModuleBase_WidgetFileSelector.h
   ModuleBase_WidgetIntValue.h
   ModuleBase_WidgetLabel.h
@@ -109,6 +110,7 @@ SET(PROJECT_SOURCES
   ModuleBase_WidgetEditor.cpp
   ModuleBase_WidgetExprEditor.cpp
   ModuleBase_WidgetFactory.cpp
+  ModuleBase_WidgetFeatureSelector.cpp
   ModuleBase_WidgetFileSelector.cpp
   ModuleBase_WidgetIntValue.cpp
   ModuleBase_WidgetLabel.cpp

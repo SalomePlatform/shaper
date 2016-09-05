@@ -12,6 +12,7 @@
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_AttributeDocRef.h>
+#include <ModelAPI_Validator.h>
 #include <list>
 #include <map>
 #include <iostream>
@@ -646,6 +647,33 @@ void findRefsToFeatures(const std::set<FeaturePtr>& theFeatures,
       if (theFeatures.find(aRefFeature) == theFeatures.end() && // it is not selected
           theFeaturesRefsTo.find(aRefFeature) == theFeaturesRefsTo.end()) // it is not added
         theFeaturesRefsTo.insert(aRefFeature);
+    }
+  }
+}
+
+void getConcealedResults(const FeaturePtr& theFeature,
+                         std::list<std::shared_ptr<ModelAPI_Result> >& theResults)
+{
+  SessionPtr aSession = ModelAPI_Session::get();
+
+  std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > > aRefs;
+  theFeature->data()->referencesToObjects(aRefs);
+  std::list<std::pair<std::string, std::list<ObjectPtr> > >::const_iterator
+                                                  anIt = aRefs.begin(), aLast = aRefs.end();
+  std::set<ResultPtr> alreadyThere; // to avoid duplications
+  for (; anIt != aLast; anIt++) {
+    if (!aSession->validators()->isConcealed(theFeature->getKind(), anIt->first))
+      continue; // use only concealed attributes
+    std::list<ObjectPtr> anObjects = (*anIt).second;
+    std::list<ObjectPtr>::const_iterator anOIt = anObjects.begin(), anOLast = anObjects.end();
+    for (; anOIt != anOLast; anOIt++) {
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(*anOIt);
+      if (aResult && aResult->isConcealed()) {
+        if (alreadyThere.find(aResult) == alreadyThere.end()) // issue 1712, avoid duplicates
+          alreadyThere.insert(aResult);
+        else continue;
+        theResults.push_back(aResult);
+      }
     }
   }
 }

@@ -32,6 +32,7 @@ const static char* WDG_BOOLVALUE = "boolvalue";
 const static char* WDG_STRINGVALUE = "stringvalue";
 const static char* WDG_MULTISELECTOR = "multi_selector";
 const static char* WDG_SHAPE_SELECTOR = "shape_selector";
+const static char* WDG_FEATURE_SELECTOR = "feature_selector";
 const static char* WDG_CONCEALED_OBJECTS_VIEW = "concealed_objects_view";
 const static char* WDG_CHOICE = "choice";
 const static char* WDG_DOUBLEVALUE_EDITOR = "doublevalue_editor";

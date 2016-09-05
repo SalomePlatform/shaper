@@ -15,9 +15,11 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeReference.h>
+#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomValidators_BodyShapes.h>
 #include <GeomValidators_FeatureKind.h>
@@ -781,4 +783,49 @@ bool FeaturesPlugin_ValidatorUnionArguments::isNotObligatory(std::string theFeat
                                                              std::string theAttribute)
 {
   return false;
+}
+
+bool FeaturesPlugin_ValidatorConcealedResult::isValid(const AttributePtr& theAttribute,
+                                            const std::list<std::string>& theArguments,
+                                            Events_InfoMessage& theError) const
+{
+  if (theAttribute->attributeType() != ModelAPI_AttributeReference::typeId()) {
+    theError = "Error: The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
+    return false;
+  }
+
+  AttributeReferencePtr aRefAttribute = std::dynamic_pointer_cast<ModelAPI_AttributeReference>
+                                                                               (theAttribute);
+  ObjectPtr aRefObject = aRefAttribute->value();
+  if (!aRefObject.get()) {
+    theError = "Error: Empty feature.";
+    return false;
+  }
+
+  FeaturePtr aRefFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aRefObject);
+  if (!aRefFeature.get()) {
+    theError = "Error: Empty feature.";
+    return false;
+  }
+  std::list<std::shared_ptr<ModelAPI_Result> > aResults;
+  ModelAPI_Tools::getConcealedResults(aRefFeature, aResults);
+
+  int aConcealedResults = aResults.size();
+  if (!aConcealedResults && !theArguments.empty()) {
+    // find if these results are touched by the feature in another attribute
+    std::list<std::string>::const_iterator anIt = theArguments.begin();
+    std::string aRecoveredList = *anIt;
+    if (!aRecoveredList.empty()) {
+      std::shared_ptr<ModelAPI_AttributeRefList> aParameterList =
+                                 theAttribute->owner()->data()->reflist(aRecoveredList);
+      if (aParameterList.get())
+        aConcealedResults = aParameterList->size();
+    }
+  }
+
+  if (aConcealedResults == 0)
+    theError = "Error: No concealed results.";
+
+  return theError.empty();
 }

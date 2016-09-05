@@ -155,6 +155,13 @@ MODELAPI_EXPORT void findAllReferences(const std::set<FeaturePtr>& theFeatures,
 MODELAPI_EXPORT void findRefsToFeatures(const std::set<FeaturePtr>& aFeatures,
                                         const std::map<FeaturePtr, std::set<FeaturePtr> >& aReferences,
                                         std::set<FeaturePtr>& aFeaturesRefsTo);
+
+/*! Finds referenced of the feature to objects and collects concealed results.
+* \param theFeatures a model feature
+* \param theResults container for concealed results. It has no duplications
+*/
+MODELAPI_EXPORT void getConcealedResults(const FeaturePtr& theFeature,
+                                         std::list<std::shared_ptr<ModelAPI_Result> >& theResults);
 }
 
 #endif
