@@ -19,8 +19,10 @@
 
 #include <BRepBuilderAPI_Transform.hxx>
 #include <BRepClass3d_SolidClassifier.hxx>
+#include <BRepGProp.hxx>
 #include <gp_Trsf.hxx>
 #include <gp_Quaternion.hxx>
+#include <GProp_GProps.hxx>
 #include <Precision.hxx>
 
 GeomAlgoAPI_Placement::GeomAlgoAPI_Placement(const std::shared_ptr<GeomAPI_Shape> theSourceSolid,
@@ -52,15 +54,20 @@ void GeomAlgoAPI_Placement::build(const std::shared_ptr<GeomAPI_Shape>& theSourc
   bool hasDirection[aNbObjects];
   std::shared_ptr<GeomAPI_Shape> aShapes[aNbObjects] = {theSourceShape, theDestShape};
 
+  GProp_GProps aProps;
+  static const double aPropEps = 1.e-4;
   for (int i = 0; i < aNbObjects; i++) {
     if (aShapes[i]->isFace()) {
       std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aShapes[i]));
       std::shared_ptr<GeomAPI_Pln> aPlane = aFace->getPlane();
       std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
-      std::shared_ptr<GeomAPI_Pnt> aLoc = aPlane->location();
-      aSrcDstPoints[i].SetCoord(aLoc->x(), aLoc->y(), aLoc->z());
       aSrcDstNormals[i].SetCoord(aDir->x(), aDir->y(), aDir->z());
-    } else if (aShapes[i]->isEdge()) {
+
+      BRepGProp::SurfaceProperties(aFace->impl<TopoDS_Face>(), aProps, aPropEps);
+      gp_Pnt aLoc = aProps.CentreOfMass();
+      aSrcDstPoints[i].SetCoord(aLoc.X(), aLoc.Y(), aLoc.Z());
+    }
+    else if (aShapes[i]->isEdge()) {
       std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aShapes[i]));
       std::shared_ptr<GeomAPI_Lin> aLine = anEdge->line();
       std::shared_ptr<GeomAPI_Dir> aDir = aLine->direction();
@@ -69,7 +76,8 @@ void GeomAlgoAPI_Placement::build(const std::shared_ptr<GeomAPI_Shape>& theSourc
       std::shared_ptr<GeomAPI_XYZ> aLoc = aFirstPnt->xyz()->added(aLastPnt->xyz())->multiplied(0.5);
       aSrcDstPoints[i].SetCoord(aLoc->x(), aLoc->y(), aLoc->z());
       aSrcDstDirections[i].SetCoord(aDir->x(), aDir->y(), aDir->z());
-    } else if (aShapes[i]->isVertex()) {
+    }
+    else if (aShapes[i]->isVertex()) {
       std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aShapes[i]));
       std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
       aSrcDstPoints[i].SetCoord(aPnt->x(), aPnt->y(), aPnt->z());
