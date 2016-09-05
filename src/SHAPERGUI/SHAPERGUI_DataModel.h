@@ -61,6 +61,9 @@ class SHAPERGUI_EXPORT SHAPERGUI_DataModel : public LightApp_DataModel
   /// \param theStudy a current study
   virtual void update(LightApp_DataObject* theObj = 0, LightApp_Study* theStudy = 0);
 
+  /// Redefinition of virtual method: include the module dump in the common SALOME dump
+  virtual bool dumpPython( const QString&, CAM_Study*, bool,  QStringList& );
+
 protected:
   /**
    * Removes the directory with content if it exists

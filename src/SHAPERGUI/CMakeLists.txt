@@ -53,6 +53,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/XGUI
                     ${PROJECT_SOURCE_DIR}/src/ModelAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
                     ${PROJECT_SOURCE_DIR}/src/Config
+					${PROJECT_SOURCE_DIR}/src/ExchangePlugin
 					${SALOME_GUI_INCLUDE}
 					${SALOME_KERNEL_INCLUDE}
                     ${CAS_INCLUDE_DIRS}

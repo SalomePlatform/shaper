@@ -6,6 +6,8 @@
 #include <XGUI_Workshop.h>
 
 #include <ModelAPI_Session.h>
+#include <ModelAPI_AttributeString.h>
+#include <ExchangePlugin_Dump.h>
 
 #include <LightApp_Study.h>
 #include <CAM_Application.h>
@@ -15,6 +17,10 @@
 
 #include <QFile>
 #include <QDir>
+#include <QTextStream>
+
+#define DUMP_NAME "shaper_dump.py"
+
 
 SHAPERGUI_DataModel::SHAPERGUI_DataModel(SHAPERGUI* theModule)
     : LightApp_DataModel(theModule), myStudyPath(""), myModule(theModule)
@@ -151,5 +157,67 @@ void SHAPERGUI_DataModel::initRootObject()
 void SHAPERGUI_DataModel::removeDirectory(const QString& theDirectoryName)
 {
   Qtx::rmDir(theDirectoryName);
+}
+
+bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy, 
+                                     bool isMultiFile,  QStringList& theListOfFiles)
+{
+  LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>(theStudy);
+  if (!aStudy)
+    return false;
+
+  std::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_Session::get()->activeDocument();
+  ModelAPI_Session::get()->startOperation(ExchangePlugin_Dump::ID());
+  FeaturePtr aFeature = aDoc->addFeature(ExchangePlugin_Dump::ID());
+  if (aFeature.get()) {
+    std::string aTmpDir = aStudy->GetTmpDir(thePath.toStdString().c_str(), isMultiFile);
+    std::string aFileName = aTmpDir + DUMP_NAME;
+
+    if (QFile::exists(aFileName.c_str())) {
+      QFile::remove(aFileName.c_str());
+    }
+
+    AttributeStringPtr aAttr = aFeature->string(ExchangePlugin_Dump::FILE_PATH_ID());
+    if (aAttr.get()) 
+      aAttr->setValue(aFileName);
+
+    aAttr = aFeature->string(ExchangePlugin_Dump::FILE_FORMAT_ID());
+    if (aAttr.get()) 
+      aAttr->setValue(".py");
+    ModelAPI_Session::get()->finishOperation();
+
+    if (QFile::exists(aFileName.c_str())) {
+      if (isMultiFile) { 
+        QFile aInFile(aFileName.c_str());
+        if (!aInFile.open(QIODevice::ReadOnly | QIODevice::Text))
+          return false;
+        QTextStream aText(&aInFile);
+        QString aTrace(aText.readAll());
+        aInFile.close();
+
+        QStringList aBuffer;
+        aBuffer.push_back(QString("def RebuildData( theStudy ):"));
+        QStringList aList(aTrace.split("\n"));
+        foreach(QString aStr, aList) {
+          QString s = "  " + aStr;
+          aBuffer.push_back(s);
+        }
+        aTrace = aBuffer.join("\n");
+
+        QFile aOutFile(aFileName.c_str());
+        if (!aOutFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+          return false;
+
+        QTextStream aOut(&aOutFile);
+        aOut << aTrace.toStdString().c_str() << "\n";
+        aOut.flush();
+        aOutFile.close();
+      }
+      theListOfFiles.append(aTmpDir.c_str());
+      theListOfFiles.append(DUMP_NAME);
+      return true;
+    }
+  }
+  return false;
 }
 
