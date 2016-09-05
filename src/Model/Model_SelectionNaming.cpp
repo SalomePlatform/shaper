@@ -335,15 +335,18 @@ const TopoDS_Shape getShapeFromNS(
 {
   TopoDS_Shape aSelection;
   std::string::size_type n = theSubShapeName.rfind('/');			
-  if (n == std::string::npos) n = 0;
+  if (n == std::string::npos) n = -1;
   std::string aSubString = theSubShapeName.substr(n + 1);
   n = aSubString.rfind('_');
-  int indx;
-  if (n == std::string::npos) {// for primitives this is a first 
-    indx = 1;
-  } else {
-    aSubString = aSubString.substr(n+1);
-    indx = atoi(aSubString.c_str());
+  int indx = 1;
+  if (n != std::string::npos) {// for primitives this is a first 
+    // if we have here the same name as theSubShapeName, there is no index in compound, it is whole
+    Handle(TDataStd_Name) aName;
+    if (!theNS->Label().FindAttribute(TDataStd_Name::GetID(), aName) ||
+        aName->Get() != theSubShapeName.c_str()) {
+      aSubString = aSubString.substr(n+1);
+      indx = atoi(aSubString.c_str());
+    }
   }
 
   TNaming_Iterator anItL(theNS);
