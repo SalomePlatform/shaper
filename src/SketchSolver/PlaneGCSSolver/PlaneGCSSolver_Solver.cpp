@@ -212,21 +212,21 @@ GCS::SolveStatus PlaneGCSSolver_Solver::solveWithoutTangent()
 
 bool PlaneGCSSolver_Solver::isTangentTruth(GCS::Constraint* theTangent) const
 {
-  static const double aTol = 1e-5;
-  double aTol2 = aTol *aTol;
-
   if (theTangent->getTypeId() == GCS::TangentCircumf) {
+    static const double aTol = 1e-4;
     GCS::VEC_pD aParams = theTangent->params();
     double dx = *(aParams[2]) - *(aParams[0]);
     double dy = *(aParams[3]) - *(aParams[1]);
     double aDist2 = dx * dx + dy * dy;
     double aRadSum  = *(aParams[4]) + *(aParams[5]);
     double aRadDiff = *(aParams[4]) - *(aParams[5]);
-    aTol2 *= aDist2 > 1.0 ? aDist2 : 1.0;
+    double aTol2 = aTol * aRadSum;
+    aTol2 *= aTol2;
     return fabs(aDist2 - aRadSum * aRadSum) <= aTol2 ||
            fabs(aDist2 - aRadDiff * aRadDiff) <= aTol2;
   }
   if (theTangent->getTypeId() == GCS::P2LDistance) {
+    static const double aTol2 = 1e-12;
     GCS::VEC_pD aParams = theTangent->params();
     double aDist2 = *(aParams[6]) * *(aParams[6]);
     // orthogonal line direction

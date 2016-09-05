@@ -381,7 +381,20 @@ void SketchPlugin_ConstraintSplit::getConstraints(std::set<FeaturePtr>& theFeatu
           FeaturePtr aCoincidenceFeature = SketchPlugin_ConstraintCoincidence::findCoincidenceFeature
                                                                     (ModelAPI_Feature::feature(aResult1),
                                                                      ModelAPI_Feature::feature(aResult2));
-          aTangentPoint = SketchPlugin_ConstraintCoincidence::getPoint(aCoincidenceFeature);
+          // get the point not lying on the splitting feature
+          for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
+            AttributeRefAttrPtr aRefAttr = aCoincidenceFeature->refattr(ATTRIBUTE(i));
+            if (!aRefAttr || aRefAttr->isObject())
+              continue;
+            AttributePoint2DPtr aPoint =
+                std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRefAttr->attr());
+            if (!aPoint)
+              continue;
+            if (aPoint->owner() != aBaseFeature) {
+              aTangentPoint = aPoint;
+              break;
+            }
+          }
         }
         if (aTangentPoint.get()) {
           FeaturePtr aFeature1 = ModelAPI_Feature::feature(aResult1);
@@ -767,6 +780,10 @@ void SketchPlugin_ConstraintSplit::splitArc(FeaturePtr& theSplitFeature,
     return;
   }
 
+  // manually change type of arc to avoid incorrect self-constrainting of the tangent arc
+  aBaseFeature->string(SketchPlugin_Arc::ARC_TYPE())->setValue(
+      SketchPlugin_Arc::ARC_TYPE_CENTER_START_END());
+
   arrangePointsOnArc(aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase,
                      aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
 #ifdef DEBUG_SPLIT
@@ -951,6 +968,8 @@ void SketchPlugin_ConstraintSplit::arrangePointsOnArc(
     std::shared_ptr<GeomDataAPI_Point2D>& theFirstPointAttr,
     std::shared_ptr<GeomDataAPI_Point2D>& theSecondPointAttr) const
 {
+  static const double anAngleTol = 1.e-12;
+
   std::shared_ptr<GeomAPI_Pnt2d> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       theArc->attribute(SketchPlugin_Arc::CENTER_ID()))->pnt();
   bool isReversed = theArc->boolean(SketchPlugin_Arc::INVERSED_ID())->value();
@@ -967,9 +986,9 @@ void SketchPlugin_ConstraintSplit::arrangePointsOnArc(
   double aFirstPtAngle = aStartDir->angle(aFirstPtDir);
   double aSecondPtAngle = aStartDir->angle(aSecondPtDir);
   double aPeriod = isReversed ? -2.0 * PI : 2.0 * PI;
-  if (isReversed == (aFirstPtAngle > 0.))
+  if (fabs(aFirstPtAngle) > anAngleTol && isReversed == (aFirstPtAngle > 0.))
     aFirstPtAngle += aPeriod;
-  if (isReversed == (aSecondPtAngle > 0.))
+  if (fabs(aSecondPtAngle) > anAngleTol && isReversed == (aSecondPtAngle > 0.))
     aSecondPtAngle += aPeriod;
 
   if (fabs(aFirstPtAngle) > fabs(aSecondPtAngle)) {
