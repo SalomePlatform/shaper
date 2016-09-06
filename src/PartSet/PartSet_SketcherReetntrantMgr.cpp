@@ -21,6 +21,7 @@
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_OperationDescription.h>
 #include "ModuleBase_ToolBox.h"
+#include "ModuleBase_ISelection.h"
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Line.h>
@@ -209,6 +210,13 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
       ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                            (myWorkshop->currentOperation());
       myPreviousFeature = aFOperation->feature();
+
+      /// selection should be obtained from workshop before ask if the operation can be started as
+      /// the canStartOperation method performs commit/abort of previous operation. Sometimes commit/abort
+      /// may cause selection clear(Sketch operation) as a result it will be lost and is not used for preselection.
+      ModuleBase_ISelection* aSelection = myWorkshop->selection();
+      QList<ModuleBase_ViewerPrsPtr> aPreSelected = aSelection->getSelected(ModuleBase_ISelection::AllControls);
+
       restartOperation();
       myPreviousFeature = FeaturePtr();
       aProcessed = true;
@@ -219,7 +227,11 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
       PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
       ModuleBase_ModelWidget* aFirstWidget = aPanel->findFirstAcceptingValueWidget();
       if (aPoint2DWdg && aPoint2DWdg == aFirstWidget) {
+        if (!aPreSelected.empty())
+          aPoint2DWdg->setPreSelection(aPreSelected.front());
         aPoint2DWdg->mouseReleased(theWnd, theEvent);
+        if (!aPreSelected.empty())
+          aPoint2DWdg->setPreSelection(ModuleBase_ViewerPrsPtr());
       }
       // unblock viewer update
       ModuleBase_Tools::blockUpdateViewer(false);

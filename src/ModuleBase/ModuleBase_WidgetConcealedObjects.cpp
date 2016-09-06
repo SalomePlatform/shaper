@@ -23,6 +23,8 @@
 #include <QHeaderView>
 #include <QToolButton>
 
+const int DEFAULT_NAME_COLUMN_WIDTH = 200;
+
 ModuleBase_WidgetConcealedObjects::ModuleBase_WidgetConcealedObjects(QWidget* theParent,
                                                      const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData)
@@ -124,6 +126,11 @@ void ModuleBase_WidgetConcealedObjects::addViewRow(const std::shared_ptr<ModelAP
 
   myView->setCellWidget(anId, 0, aVisibilityBtn);
   myView->setItem(anId, 1, new QTableWidgetItem(theResult->data()->name().c_str()));
+
+  if (anId == 1) {
+    myView->setColumnWidth(0, myView->verticalHeader()->defaultSectionSize());
+    myView->setColumnWidth(1, DEFAULT_NAME_COLUMN_WIDTH);
+  }
 }
 
 void ModuleBase_WidgetConcealedObjects::onItemToggled(bool theState)

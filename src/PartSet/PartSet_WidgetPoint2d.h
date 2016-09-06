@@ -109,6 +109,9 @@ Q_OBJECT
   /// \param theEvent a mouse event
   virtual void mouseReleased(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent);
 
+  /// Fill preselection used in mouseReleased
+  void setPreSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePreSelected);
+
 signals:
   /// Signal about selection of an existing vertex from an object
   void vertexSelected();
@@ -197,6 +200,8 @@ private:
   ModuleBase_ParamSpinBox* myXSpin;  ///< the spin box for the X coordinate
   ModuleBase_ParamSpinBox* myYSpin;  ///< the spin box for the Y coordinate
 
+  std::shared_ptr<ModuleBase_ViewerPrs> myPreSelected; ///< value used as selection in mouse release method
+  ///< it is important during restart operation
   CompositeFeaturePtr mySketch;
 
   bool myValueIsCashed; /// boolean state if the value is cashed during value state change

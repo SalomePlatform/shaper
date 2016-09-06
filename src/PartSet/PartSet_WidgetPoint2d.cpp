@@ -450,6 +450,9 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
 
   QList<ModuleBase_ViewerPrsPtr> aList = aSelection->getSelected(ModuleBase_ISelection::Viewer);
   ModuleBase_ViewerPrsPtr aFirstValue = aList.size() > 0 ? aList.first() : ModuleBase_ViewerPrsPtr();
+  if (!aFirstValue.get() && myPreSelected.get()) {
+    aFirstValue = myPreSelected;
+  }
   // if we have selection and use it
   if (aFirstValue.get() && isValidSelectionCustom(aFirstValue)) {
     GeomShapePtr aGeomShape = aFirstValue->shape();
@@ -585,6 +588,10 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
   }
 }
 
+void PartSet_WidgetPoint2D::setPreSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePreSelected)
+{
+  myPreSelected = thePreSelected;
+}
 
 void PartSet_WidgetPoint2D::mouseMoved(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent)
 {
