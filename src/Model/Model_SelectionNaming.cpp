@@ -668,6 +668,7 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   std::shared_ptr<Model_Document> aDoc = theDoc;
   if (aSlash != std::string::npos) {
     std::string aDocName = theSubShapeName.substr(0, aSlash);
+    ResultPartPtr aFoundPart;
     DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
     if (aDocName == aRootDoc->kind()) {
       aDoc = std::dynamic_pointer_cast<Model_Document>(aRootDoc);
@@ -677,11 +678,17 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
             aRootDoc->object(ModelAPI_ResultPart::group(), a));
         if (aPart.get() && aPart->isActivated() && aPart->data()->name() == aDocName) {
           aDoc = std::dynamic_pointer_cast<Model_Document>(aPart->partDoc());
+          aFoundPart = aPart;
+          break;
         }
       }
     }
     if (aDoc != theDoc) { // so, the first word is the document name => reduce the string for the next manips
       aSubShapeName = theSubShapeName.substr(aSlash + 1);
+      if (aSubShapeName.empty() && aFoundPart.get()) { // the whole Part result
+        theCont = aFoundPart;
+        return true;
+      }
     }
   }
 

@@ -70,4 +70,3 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
   }
   return true;
 }
-
