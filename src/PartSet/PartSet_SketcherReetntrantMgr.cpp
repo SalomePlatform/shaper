@@ -227,7 +227,7 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
       PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
       ModuleBase_ModelWidget* aFirstWidget = aPanel->findFirstAcceptingValueWidget();
       if (aPoint2DWdg && aPoint2DWdg == aFirstWidget) {
-        if (!aPreSelected.empty() && myPreviousFeature->getKind() == SketchPlugin_Point::ID())
+        if (!aPreSelected.empty())
           aPoint2DWdg->setPreSelection(aPreSelected.front());
         aPoint2DWdg->mouseReleased(theWnd, theEvent);
         if (!aPreSelected.empty())
@@ -560,7 +560,8 @@ bool PartSet_SketcherReetntrantMgr::copyReetntrantAttributes(const FeaturePtr& t
                                                              const bool isTemporary)
 {
   bool aChanged = false;
-  if (!theSourceFeature.get())
+  if (!theSourceFeature.get() || !theSourceFeature->data().get() ||
+      !theSourceFeature->data()->isValid())
     return aChanged;
 
   std::string aFeatureKind = theSourceFeature->getKind();
