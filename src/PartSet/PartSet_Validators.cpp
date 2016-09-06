@@ -320,7 +320,7 @@ bool PartSet_MiddlePointSelection::isValid(const ModuleBase_ISelection* theSelec
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0)
     return isEmptySelectionValid(theOperation);
   else
-    return shapesNbLines(theSelection) == 1 && shapesNbPoints(theSelection) == 1;
+    return shapesNbLines(theSelection) == 1 || shapesNbPoints(theSelection) == 1;
 }
 
 
