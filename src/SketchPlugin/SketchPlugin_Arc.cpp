@@ -145,6 +145,9 @@ void SketchPlugin_Arc::execute()
     AttributeBooleanPtr isInversed =
         std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(attribute(INVERSED_ID()));
 
+    // compute end parameter
+    aCircleForArc->parameter(anEndAttr->pnt(), paramTolerance, myParamBefore);
+
     std::shared_ptr<GeomAPI_Shape> aCircleShape;
     if(!isInversed->value()) {
       aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStartPoint, aEndPoint, aNormal);
