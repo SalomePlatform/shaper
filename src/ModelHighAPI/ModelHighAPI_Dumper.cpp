@@ -43,6 +43,8 @@
 
 #include <fstream>
 
+#define DEBUG_DEFLECTION
+
 static int gCompositeStackDepth = 0;
 
 ModelHighAPI_Dumper* ModelHighAPI_Dumper::mySelf = 0;
@@ -470,6 +472,11 @@ bool ModelHighAPI_Dumper::isDefaultDeflection(const ResultPtr& theResult) const
   else
     aDefault = Config_PropManager::real("Visualization", "body_deflection",
                                         ModelAPI_ResultBody::DEFAULT_DEFLECTION());
+
+#ifdef DEBUG_DEFLECTION
+  std::cout << "Current deflection: " << aCurrent << std::endl;
+  std::cout << "Default deflection: " << aDefault << std::endl;
+#endif
 
 
   return abs(aCurrent - aDefault) < 1.e-12;
