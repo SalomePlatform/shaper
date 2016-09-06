@@ -71,7 +71,7 @@ for index in range(Sketch_3_feature.numberOfSubs()):
 
 assert(idList.count(SketchArcId) == 2)
 assert(idList.count(SketchPointId) == 2)
-assert(idList.count(SketchConstraintCoincidenceId) == 2)
+assert(idList.count(SketchConstraintCoincidenceId) == 4)
 assert(idList.count(SketchConstraintTangentId) == 1)
 # Test end
 
@@ -100,8 +100,7 @@ assert(idList.count(SketchConstraintTangentId) == 1)
 
 # Test split on arc with two points
 Sketch_5 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
-#SketchArc_5_1 = Sketch_5.addArc(50, 50, 6.69872981078, 75, 93.30127018922, 75, True)
-SketchArc_5_1 = Sketch_5.addArc(50, 50, 0, 50, 93.30127018922, 75, True)
+SketchArc_5_1 = Sketch_5.addArc(50, 50, 93.30127018922, 75, 0, 50, False)
 Sketch_5.setFixed(SketchArc_5_1.startPoint())
 Sketch_5.setFixed(SketchArc_5_1.endPoint())
 Sketch_5.setRadius(SketchArc_5_1, 50)
@@ -127,4 +126,4 @@ assert(idList.count(SketchConstraintTangentId) == 2)
 
 model.end()
 
-#assert(model.checkPythonDump())
+assert(model.checkPythonDump())
