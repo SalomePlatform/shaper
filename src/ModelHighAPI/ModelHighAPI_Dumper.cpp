@@ -446,7 +446,7 @@ bool ModelHighAPI_Dumper::isDefaultColor(const ResultPtr& theResult) const
 bool ModelHighAPI_Dumper::isDefaultDeflection(const ResultPtr& theResult) const
 {
   AttributeDoublePtr aDeflectionAttr = theResult->data()->real(ModelAPI_Result::DEFLECTION_ID());
-  if(!aDeflectionAttr && !aDeflectionAttr->isInitialized()) {
+  if(!aDeflectionAttr || !aDeflectionAttr->isInitialized()) {
     return true;
   }
 
