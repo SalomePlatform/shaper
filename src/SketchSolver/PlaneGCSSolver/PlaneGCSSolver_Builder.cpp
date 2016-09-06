@@ -1213,3 +1213,21 @@ void adjustMirror(ConstraintWrapperPtr theConstraint)
     (*aCIt)->rescale();
 }
 
+bool PlaneGCSSolver_Builder::isArcArcTangencyInternal(
+    EntityWrapperPtr theArc1, EntityWrapperPtr theArc2) const
+{
+  std::shared_ptr<GCS::Circle> aCirc1 = std::dynamic_pointer_cast<GCS::Circle>(
+      GCS_ENTITY_WRAPPER(theArc1)->entity());
+  std::shared_ptr<GCS::Circle> aCirc2 = std::dynamic_pointer_cast<GCS::Circle>(
+      GCS_ENTITY_WRAPPER(theArc2)->entity());
+
+  if (!aCirc1 || !aCirc2)
+    return false;
+
+  double aDX = *(aCirc1->center.x) - *(aCirc2->center.x);
+  double aDY = *(aCirc1->center.y) - *(aCirc2->center.y);
+  double aDist = sqrt(aDX * aDX + aDY * aDY);
+
+  return (aDist < *(aCirc1->rad) || aDist < *(aCirc2->rad));
+}
+

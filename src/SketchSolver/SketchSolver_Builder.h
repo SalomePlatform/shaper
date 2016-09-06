@@ -113,6 +113,11 @@ public:
   /// \brief Convert entity to line
   /// \return empty pointer if the entity is not a line
   SKETCHSOLVER_EXPORT std::shared_ptr<GeomAPI_Lin2d> line(EntityWrapperPtr theEntity) const;
+
+  /// \brief Check if two connected arcs have centers
+  ///        in same direction relatively to connection point
+  SKETCHSOLVER_EXPORT virtual bool isArcArcTangencyInternal(EntityWrapperPtr theArc1, EntityWrapperPtr theArc2) const
+  { return false; }
 };
 
 typedef std::shared_ptr<SketchSolver_Builder> BuilderPtr;

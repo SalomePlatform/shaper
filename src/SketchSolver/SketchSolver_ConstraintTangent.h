@@ -19,7 +19,8 @@ class SketchSolver_ConstraintTangent : public SketchSolver_Constraint
 public:
   /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintTangent(ConstraintPtr theConstraint) :
-      SketchSolver_Constraint(theConstraint)
+      SketchSolver_Constraint(theConstraint),
+      isArcArcInternal(false)
   {}
 
 protected:
@@ -31,6 +32,9 @@ protected:
   /// \brief This method is used in derived objects to check consistency of constraint.
   ///        E.g. the distance between line and point may be signed.
   virtual void adjustConstraint();
+
+private:
+  bool isArcArcInternal;
 };
 
 #endif

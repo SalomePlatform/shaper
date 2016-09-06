@@ -220,7 +220,7 @@ static void updateMultiConstraints(ConstraintConstraintMap& theConstraints, Feat
          aType == CONSTRAINT_MULTI_TRANSLATION)
         && aCIt->second->isUsed(theFeature))
       std::dynamic_pointer_cast<SketchSolver_ConstraintMulti>(aCIt->second)->update(true);
-    else if ((aType == CONSTRAINT_TANGENT_CIRCLE_LINE ||
+    else if ((aType == CONSTRAINT_TANGENT_CIRCLE_LINE || aType == CONSTRAINT_TANGENT_ARC_ARC ||
               aType == CONSTRAINT_SYMMETRIC || aType == CONSTRAINT_ANGLE)
              && aCIt->second->isUsed(theFeature))
       aCIt->second->update();

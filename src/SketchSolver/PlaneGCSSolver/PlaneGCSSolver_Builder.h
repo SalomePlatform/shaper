@@ -109,6 +109,10 @@ public:
   /// \return Created wrapper for parameter
   ParameterWrapperPtr createParameter(const GroupID& theGroupID, double theValue = 0.0) const;
 
+  /// \brief Check if two connected arcs have centers
+  ///        in same direction relatively to connection point
+  virtual bool isArcArcTangencyInternal(EntityWrapperPtr theArc1, EntityWrapperPtr theArc2) const;
+
 private:
   /// \brief Create necessary constraints to make two object symmetric relatively a given line
   std::list<ConstraintWrapperPtr> createMirror(ConstraintPtr theConstraint,

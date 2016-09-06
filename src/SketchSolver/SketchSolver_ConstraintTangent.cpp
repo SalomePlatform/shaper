@@ -38,6 +38,14 @@ static bool hasSingleCoincidence(EntityWrapperPtr theEntity1, EntityWrapperPtr t
   return aNbCoinc == 1;
 }
 
+/// \brief Check if two connected arcs have centers
+///        in same direction relatively to connection point
+static bool isInternalTangency(EntityWrapperPtr theEntity1, EntityWrapperPtr theEntity2)
+{
+  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
+  return aBuilder->isArcArcTangencyInternal(theEntity1, theEntity2);
+}
+
 
 void SketchSolver_ConstraintTangent::getAttributes(
     double& theValue,
@@ -78,8 +86,10 @@ void SketchSolver_ConstraintTangent::getAttributes(
     else if (aNbCircles == 1)
       myType = CONSTRAINT_TANGENT_CIRCLE_LINE;
   }
-  else if (aNbArcs == 2)
+  else if (aNbArcs == 2) {
     myType = CONSTRAINT_TANGENT_ARC_ARC;
+    isArcArcInternal = isInternalTangency(theAttributes[2], theAttributes[3]);
+  }
   else {
     myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
     return;
@@ -98,24 +108,32 @@ void SketchSolver_ConstraintTangent::getAttributes(
 
 void SketchSolver_ConstraintTangent::adjustConstraint()
 {
-  if (myType != CONSTRAINT_TANGENT_CIRCLE_LINE)
-    return;
+  if (myType == CONSTRAINT_TANGENT_CIRCLE_LINE) {
+    ConstraintWrapperPtr aConstraint = myStorage->constraint(myBaseConstraint).front();
+    AttributePtr aCircleCenter = aConstraint->entities().front()->baseAttribute();
+    if (!aCircleCenter)
+      return;
+    FeaturePtr aCircle = ModelAPI_Feature::feature(aCircleCenter->owner());
+    AttributeDoublePtr aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+        aCircle->attribute(SketchPlugin_Circle::RADIUS_ID()));
 
-  ConstraintWrapperPtr aConstraint = myStorage->constraint(myBaseConstraint).front();
-  AttributePtr aCircleCenter = aConstraint->entities().front()->baseAttribute();
-  if (!aCircleCenter)
-    return;
-  FeaturePtr aCircle = ModelAPI_Feature::feature(aCircleCenter->owner());
-  AttributeDoublePtr aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      aCircle->attribute(SketchPlugin_Circle::RADIUS_ID()));
+    if (fabs(aRadius->value()) == fabs(aConstraint->value()))
+      return;
 
-  if (fabs(aRadius->value()) == fabs(aConstraint->value()))
-    return;
+    aConstraint->setValue(aRadius->value());
 
-  aConstraint->setValue(aRadius->value());
-
-  // Adjust the sign of constraint value
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-  aBuilder->adjustConstraint(aConstraint);
-  myStorage->addConstraint(myBaseConstraint, aConstraint);
+    // Adjust the sign of constraint value
+    BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
+    aBuilder->adjustConstraint(aConstraint);
+    myStorage->addConstraint(myBaseConstraint, aConstraint);
+  }
+  else if (myType == CONSTRAINT_TANGENT_ARC_ARC) {
+    ConstraintWrapperPtr aConstraint = myStorage->constraint(myBaseConstraint).front();
+    if (isArcArcInternal != isInternalTangency(
+        aConstraint->entities().front(), aConstraint->entities().back())) {
+      // fully rebuld constraint, because it is unable to access attributes of PlaneGCS constraint
+      remove();
+      process();
+    }
+  }
 }
