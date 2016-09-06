@@ -27,6 +27,7 @@
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Point.h>
 
 #include <XGUI_Workshop.h>
 #include <XGUI_ModuleConnector.h>
@@ -226,7 +227,7 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
       PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
       ModuleBase_ModelWidget* aFirstWidget = aPanel->findFirstAcceptingValueWidget();
       if (aPoint2DWdg && aPoint2DWdg == aFirstWidget) {
-        if (!aPreSelected.empty())
+        if (!aPreSelected.empty() && myPreviousFeature->getKind() == SketchPlugin_Point::ID())
           aPoint2DWdg->setPreSelection(aPreSelected.front());
         aPoint2DWdg->mouseReleased(theWnd, theEvent);
         if (!aPreSelected.empty())
