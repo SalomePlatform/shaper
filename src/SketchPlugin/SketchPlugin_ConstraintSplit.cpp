@@ -530,6 +530,7 @@ void SketchPlugin_ConstraintSplit::updateCoincidenceConstraintsToFeature(
         aFeaturePointAttribute = aFCAttribute;
     }
     if (aFeaturePointAttribute.get()) {
+      aCoincFeature->refattr(anAttributeId)->setObject(ResultPtr());
       aCoincFeature->refattr(anAttributeId)->setAttr(aFeaturePointAttribute);
     }
     else {
