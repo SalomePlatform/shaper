@@ -45,6 +45,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_BoxPoints.h
     GeomAlgoAPI_XAOExport.h
     GeomAlgoAPI_XAOImport.h
+    GeomAlgoAPI_Copy.h
 )
 
 SET(PROJECT_SOURCES
@@ -86,6 +87,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_BoxPoints.cpp
     GeomAlgoAPI_XAOExport.cpp
     GeomAlgoAPI_XAOImport.cpp
+    GeomAlgoAPI_Copy.cpp
 )
 
 SET(PROJECT_LIBRARIES

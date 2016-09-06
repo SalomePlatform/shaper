@@ -157,6 +157,11 @@ void GeomAlgoAPI_MakeShape::setShape(const std::shared_ptr<GeomAPI_Shape> theSha
     }
 
     const TopoDS_Shape& aTopoDSShape = myShape->impl<TopoDS_Shape>();
+    for(TopExp_Explorer anExp(aTopoDSShape,TopAbs_VERTEX); anExp.More(); anExp.Next()) {
+      std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+      aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
+      myMap->bind(aCurrentShape, aCurrentShape);
+    }
     for(TopExp_Explorer anExp(aTopoDSShape,TopAbs_EDGE); anExp.More(); anExp.Next()) {
       std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
       aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));

@@ -40,11 +40,12 @@
   #include "GeomAlgoAPI_Pipe.h"
   #include "GeomAlgoAPI_WireBuilder.h"
   #include "GeomAlgoAPI_Sewing.h"
-  #include "GeomAlgoAPI_ShapeBuilder.h"  
+  #include "GeomAlgoAPI_ShapeBuilder.h"
   #include "GeomAlgoAPI_Exception.h"
   #include "GeomAlgoAPI_ShapeAPI.h"
   #include "GeomAlgoAPI_Box.h"
   #include "GeomAlgoAPI_BoxPoints.h"
+  #include "GeomAlgoAPI_Copy.h"
 
   #include <memory>
   #include <string>
