@@ -483,10 +483,11 @@ bool ModelHighAPI_Dumper::isDefaultDeflection(const ResultPtr& theResult) const
 #ifdef DEBUG_DEFLECTION
   std::cout << "Current deflection: " << aCurrent << std::endl;
   std::cout << "Default deflection: " << aDefault << std::endl;
+  std::cout << "fabs(aCurrent - aDefault): " << fabs(aCurrent - aDefault) << std::endl;
 #endif
 
 
-  return abs(aCurrent - aDefault) < 1.e-12;
+  return fabs(aCurrent - aDefault) < 1.e-12;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const char theChar)
