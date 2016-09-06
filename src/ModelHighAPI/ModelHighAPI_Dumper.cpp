@@ -43,8 +43,6 @@
 
 #include <fstream>
 
-#define DEBUG_DEFLECTION
-
 static int gCompositeStackDepth = 0;
 
 ModelHighAPI_Dumper* ModelHighAPI_Dumper::mySelf = 0;
@@ -411,15 +409,8 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
     // set result deflection
     if (!isDefaultDeflection(*aResIt)) {
       AttributeDoublePtr aDeflectionAttr = (*aResIt)->data()->real(ModelAPI_Result::DEFLECTION_ID());
-      #ifdef DEBUG_DEFLECTION
-        std::cout << "aDeflectionAttr.get(): " << (aDeflectionAttr.get() == NULL ? "Empty" : "Not empty") << std::endl;
-        std::cout << "aDeflectionAttr->isInitialized(): " << aDeflectionAttr->isInitialized() << std::endl;
-      #endif
       if(aDeflectionAttr.get() && aDeflectionAttr->isInitialized()) {
         *this << *aResIt;
-        #ifdef DEBUG_DEFLECTION
-          std::cout << "Dump deflection" << std::endl;
-        #endif
         myDumpBuffer << ".setDeflection(" << aDeflectionAttr->value() << ")" << std::endl;
       }
     }
@@ -479,13 +470,6 @@ bool ModelHighAPI_Dumper::isDefaultDeflection(const ResultPtr& theResult) const
   else
     aDefault = Config_PropManager::real("Visualization", "body_deflection",
                                         ModelAPI_ResultBody::DEFAULT_DEFLECTION());
-
-#ifdef DEBUG_DEFLECTION
-  std::cout << "Current deflection: " << aCurrent << std::endl;
-  std::cout << "Default deflection: " << aDefault << std::endl;
-  std::cout << "fabs(aCurrent - aDefault): " << fabs(aCurrent - aDefault) << std::endl;
-#endif
-
 
   return fabs(aCurrent - aDefault) < 1.e-12;
 }
