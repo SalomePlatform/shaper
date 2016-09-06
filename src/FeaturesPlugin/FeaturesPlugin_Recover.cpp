@@ -59,9 +59,11 @@ void FeaturesPlugin_Recover::synchronizeRegistered()
       if (myRegistered.find(anObj) == myRegistered.end()) {
         // not found, so register a new
         ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
-        ModelAPI_Session::get()->validators()->registerUnconcealment(
-          aRes, aNewPersistent ? FeaturePtr() : aBase);
-        myRegistered.insert(anObj);
+        if (aRes.get()) { // this may be on first update after "open"
+          ModelAPI_Session::get()->validators()->registerUnconcealment(
+            aRes, aNewPersistent ? FeaturePtr() : aBase);
+          myRegistered.insert(anObj);
+        }
       }
     }
   }
