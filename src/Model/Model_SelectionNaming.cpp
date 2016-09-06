@@ -123,7 +123,10 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
   if (theContext->groupName() == ModelAPI_ResultPart::group()) {
     ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(theContext);
     int anIndex;
-    return aPart->data()->name() + "/" + aPart->nameInPart(theSubSh, anIndex);
+    if (theSubSh.get())
+      return aPart->data()->name() + "/" + aPart->nameInPart(theSubSh, anIndex);
+    else 
+      return aPart->data()->name();
   }
 
   if (!theSubSh.get() || theSubSh->isNull()) { // no subshape, so just the whole feature name

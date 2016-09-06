@@ -71,9 +71,19 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
   if (!theFeature->data()->isValid())
     return false; // delete an extrusion created on the sketch
 
-  if (theFeature->isPersistentResult()) {
-    if (!std::dynamic_pointer_cast<Model_Document>((theFeature)->document())->executeFeatures())
+  bool isNotExecuted = theFeature->isPersistentResult() &&
+    !std::dynamic_pointer_cast<Model_Document>((theFeature)->document())->executeFeatures();
+  if (isNotExecuted) {
+    if (!theReason.get()) // no reason => no construction reason
       return false;
+    if (myNotPersistentRefs.find(theFeature) == myNotPersistentRefs.end()) {
+      myNotPersistentRefs[theFeature].insert(theReason);
+    } else {
+      std::set<std::shared_ptr<ModelAPI_Feature> > aNewSet;
+      aNewSet.insert(theReason);
+      myNotPersistentRefs[theFeature] = aNewSet;
+    }
+    return false;
   }
 
   // update arguments for "apply button" state change
@@ -119,7 +129,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
       if (theReason.get())
         aNewSet.insert(theReason);
     }
-    myModified[theFeature] = aNewSet;
+      myModified[theFeature] = aNewSet;
 #ifdef DEB_UPDATE
     if (theReason.get())
       std::cout<<"*** Add modified "<<theFeature->name()<<" reason "<<theReason->name()<<std::endl;
@@ -505,6 +515,8 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
   // add this feature to the processed right now to be able remove it from this list on
   // update signal during this feature execution
   myModified.erase(theFeature);
+  if (myNotPersistentRefs.find(theFeature) != myNotPersistentRefs.end())
+    myNotPersistentRefs.erase(theFeature);
   if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated)
     theFeature->data()->execState(ModelAPI_StateDone);
 
@@ -728,18 +740,33 @@ bool Model_Update::isReason(std::shared_ptr<ModelAPI_Feature>& theFeature,
 {
   std::map<std::shared_ptr<ModelAPI_Feature>, std::set<std::shared_ptr<ModelAPI_Feature> > >
     ::iterator aReasonsIt = myModified.find(theFeature);
-  if (aReasonsIt == myModified.end())
-    return false; // this case only for not-previewed items update state, nothing is changed in args for it
-  if (aReasonsIt->second.find(theFeature) != aReasonsIt->second.end())
-    return true; // any is reason if it contains itself
-  FeaturePtr aReasFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(theReason);
-  if (!aReasFeat.get()) { // try to get feature of this result
-    ResultPtr aReasRes = std::dynamic_pointer_cast<ModelAPI_Result>(theReason);
-    if (aReasRes.get())
-      aReasFeat = theReason->document()->feature(aReasRes);
+  if (aReasonsIt != myModified.end()) {
+    if (aReasonsIt->second.find(theFeature) != aReasonsIt->second.end())
+      return true; // any is reason if it contains itself
+    FeaturePtr aReasFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(theReason);
+    if (!aReasFeat.get()) { // try to get feature of this result
+      ResultPtr aReasRes = std::dynamic_pointer_cast<ModelAPI_Result>(theReason);
+      if (aReasRes.get())
+        aReasFeat = theReason->document()->feature(aReasRes);
+    }
+    if (aReasonsIt->second.find(aReasFeat) != aReasonsIt->second.end())
+      return true;
   }
-  return aReasonsIt->second.find(aReasFeat) != aReasonsIt->second.end();
+  // another try: postponed modification by not-persistences
+  std::map<std::shared_ptr<ModelAPI_Feature>, std::set<std::shared_ptr<ModelAPI_Feature> > >
+    ::iterator aNotPersist = myNotPersistentRefs.find(theFeature);
+  if (aNotPersist != myNotPersistentRefs.end()) {
+    FeaturePtr aReasFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(theReason);
+    if (!aReasFeat.get()) { // try to get feature of this result
+      ResultPtr aReasRes = std::dynamic_pointer_cast<ModelAPI_Result>(theReason);
+      if (aReasRes.get())
+        aReasFeat = theReason->document()->feature(aReasRes);
+    }
+    if (aNotPersist->second.find(aReasFeat) != aNotPersist->second.end())
+      return true;
+  }
 
+  return false; // this case only for not-previewed items update state, nothing is changed in args for it
 }
 
 void Model_Update::executeFeature(FeaturePtr theFeature)

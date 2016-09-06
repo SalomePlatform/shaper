@@ -29,6 +29,10 @@ class Model_Update : public Events_Listener
   /// The second set is the objects that causes this object is modified
   std::map<std::shared_ptr<ModelAPI_Feature>, std::set<std::shared_ptr<ModelAPI_Feature> > >
     myModified;
+  /// Features which arguments were modified by not-persistent changes.
+  /// So, these referencing arguments must be updated due to these features info also before execution).
+  std::map<std::shared_ptr<ModelAPI_Feature>, std::set<std::shared_ptr<ModelAPI_Feature> > >
+    myNotPersistentRefs;
   /// features that must be additionally processed after execution of finish operation
   std::set<std::shared_ptr<ModelAPI_Feature> > myWaitForFinish;
   /// to know that some parameter was changed during this operation (to enable update expressions)
