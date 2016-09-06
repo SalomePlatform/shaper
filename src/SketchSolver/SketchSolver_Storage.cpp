@@ -25,6 +25,10 @@
 static bool isEqual(const std::list<ConstraintWrapperPtr>& theCVec1,
                     const std::list<ConstraintWrapperPtr>& theCVec2);
 
+/// \brief Convert result to feature or attribute
+static void resultToFeatureOrAttribute(const ObjectPtr& theResult,
+    FeaturePtr& theFeature, AttributePtr& theAttribute);
+
 
 void SketchSolver_Storage::addConstraint(ConstraintPtr        theConstraint,
                                          ConstraintWrapperPtr theSolverConstraint)
@@ -88,6 +92,8 @@ void SketchSolver_Storage::addConstraint(
 static std::list<AttributePtr> pointAttributes(FeaturePtr theFeature)
 {
   std::list<AttributePtr> aPoints;
+  if (!theFeature->data() || !theFeature->data()->isValid())
+    return aPoints;
   if (theFeature->getKind() == SketchPlugin_Arc::ID()) {
     aPoints.push_back(theFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
     aPoints.push_back(theFeature->attribute(SketchPlugin_Arc::START_ID()));
@@ -231,8 +237,10 @@ bool SketchSolver_Storage::update(AttributePtr theAttribute, const GroupID& theG
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
   if (aRefAttr) {
     if (aRefAttr->isObject()) {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
-      return update(aFeature, theGroup, theForce);
+      FeaturePtr aFeature;
+      resultToFeatureOrAttribute(aRefAttr->object(), aFeature, anAttribute);
+      if (aFeature)
+        return update(aFeature, theGroup, theForce);
     } else {
       anAttribute = aRefAttr->attr();
       if (!anAttribute->isInitialized())
@@ -311,8 +319,13 @@ const EntityWrapperPtr& SketchSolver_Storage::entity(const AttributePtr& theAttr
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
   if (aRefAttr) {
     if (aRefAttr->isObject()) {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
-      return entity(aFeature);
+      FeaturePtr aFeature;
+      AttributePtr anAttribute;
+      resultToFeatureOrAttribute(aRefAttr->object(), aFeature, anAttribute);
+      if (aFeature)
+        return entity(aFeature);
+      else
+        return entity(anAttribute);
     } else
       return entity(aRefAttr->attr());
   }
@@ -960,4 +973,25 @@ bool isEqual(const std::list<ConstraintWrapperPtr>& theCVec1,
       return false;
   }
   return true;
+}
+
+void resultToFeatureOrAttribute(const ObjectPtr& theResult,
+    FeaturePtr& theFeature, AttributePtr& theAttribute)
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theResult);
+  // if the feature has several results, we choose which one is referred
+  const std::list<ResultPtr>& aResults = aFeature->results();
+  if (aResults.size() > 1 && theResult != aFeature->lastResult()) {
+    // actually, the attribute refers to center of arc or circle, but not the edge, get correct attributes
+    std::string anAttrName;
+    if (aFeature->getKind() == SketchPlugin_Arc::ID())
+      anAttrName = SketchPlugin_Arc::CENTER_ID();
+    else if (aFeature->getKind() == SketchPlugin_Circle::ID())
+      anAttrName = SketchPlugin_Circle::CENTER_ID();
+    if (!anAttrName.empty()) {
+      theAttribute = aFeature->attribute(anAttrName);
+      aFeature = FeaturePtr();
+    }
+  }
+  theFeature = aFeature;
 }
