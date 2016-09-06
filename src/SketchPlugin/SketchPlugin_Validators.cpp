@@ -891,13 +891,16 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
   AttributeSelectionPtr aFeatureAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   std::shared_ptr<GeomAPI_Edge> anEdge;
-  if(aFeatureAttr && aFeatureAttr->value() && aFeatureAttr->value()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aFeatureAttr->value()));
-  } else if(aFeatureAttr->context() && aFeatureAttr->context()->shape() &&
-            aFeatureAttr->context()->shape()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aFeatureAttr->context()->shape()));
+  if (aFeatureAttr.get()) {
+    GeomShapePtr aVal = aFeatureAttr->value();
+    ResultPtr aRes = aFeatureAttr->context();
+    if(aFeatureAttr->value() && aFeatureAttr->value()->isEdge()) {
+      anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aFeatureAttr->value()));
+    } else if(aFeatureAttr->context() && aFeatureAttr->context()->shape() &&
+              aFeatureAttr->context()->shape()->isEdge()) {
+      anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aFeatureAttr->context()->shape()));
+    }
   }
-
   if (!anEdge) {
     theError = "The attribute %1 should be an edge";
     theError.arg(theAttribute->id());
