@@ -14,13 +14,21 @@
 
 #include <QString>
 
-PartSet_ExternalObjectsMgr::PartSet_ExternalObjectsMgr(const std::string& theExternal, const bool theDefaultValue)
-: myUseExternal(theDefaultValue)
+PartSet_ExternalObjectsMgr::PartSet_ExternalObjectsMgr(const std::string& theExternal,
+                                                       const std::string& theCanCreateExternal,
+                                                       const bool theDefaultValue)
+: myUseExternal(theDefaultValue), myCanCreateExternal(true)
 {
   QString aIsExternal(theExternal.c_str());
   if (!aIsExternal.isEmpty()) {
     QString aStr = aIsExternal.toUpper();
     myUseExternal = (aStr == "TRUE") || (aStr == "YES"); 
+  }
+
+  QString aCanCreateExternal(theCanCreateExternal.c_str());
+  if (!aCanCreateExternal.isEmpty()) {
+    QString aStr = aCanCreateExternal.toUpper();
+    myCanCreateExternal = (aStr == "TRUE") || (aStr == "YES"); 
   }
 }
 

@@ -931,8 +931,11 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
     std::shared_ptr<GeomAPI_Pnt> aLineLoc = aLine->location();
     double aDot = aNormal->dot(aLineDir);
     double aDist = aLineLoc->xyz()->decreased(anOrigin->xyz())->dot(aNormal->xyz());
-    return (fabs(aDot) >= tolerance && fabs(aDot) < 1.0 - tolerance) ||
+    bool aValid = (fabs(aDot) >= tolerance && fabs(aDot) < 1.0 - tolerance) ||
            (fabs(aDot) < tolerance && fabs(aDist) > tolerance);
+    if (!aValid)
+      theError = "Error: Edge is already in the sketch plane.";
+    return aValid;
   }
   else if (anEdge->isCircle() || anEdge->isArc()) {
     std::shared_ptr<GeomAPI_Circ> aCircle = anEdge->circle();
@@ -940,8 +943,13 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
     std::shared_ptr<GeomAPI_Pnt> aCircCenter = aCircle->center();
     double aDot = fabs(aNormal->dot(aCircNormal));
     double aDist = aCircCenter->xyz()->decreased(anOrigin->xyz())->dot(aNormal->xyz());
-    return fabs(aDot - 1.0) < tolerance * tolerance && fabs(aDist) > tolerance;
+    bool aValid = fabs(aDot - 1.0) < tolerance * tolerance && fabs(aDist) > tolerance;
+    if (!aValid)
+      theError.arg(anEdge->isCircle() ? "Error: Cirlce is already in the sketch plane."
+                                      : "Error: Arc is already in the sketch plane.");
+    return aValid;
   }
 
+  theError = "Error: Selected object is not line, circle or arc.";
   return false;
 }

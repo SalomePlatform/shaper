@@ -35,7 +35,8 @@ PartSet_WidgetMultiSelector::PartSet_WidgetMultiSelector(QWidget* theParent,
                                                          const Config_WidgetAPI* theData)
 : ModuleBase_WidgetMultiSelector(theParent, theWorkshop, theData)
 {
-  myExternalObjectMgr = new PartSet_ExternalObjectsMgr(theData->getProperty("use_external"), false);
+  myExternalObjectMgr = new PartSet_ExternalObjectsMgr(theData->getProperty("use_external"),
+                                        theData->getProperty("can_create_external"), false);
 }
 
 PartSet_WidgetMultiSelector::~PartSet_WidgetMultiSelector()
@@ -76,18 +77,26 @@ void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr
   // TODO: unite with the same functionality in PartSet_WidgetShapeSelector
   if (aSPFeature.get() == NULL) {
     ObjectPtr anExternalObject = ObjectPtr();
+    GeomShapePtr anExternalShape = GeomShapePtr();
     if (myExternalObjectMgr->useExternal()) {
-      GeomShapePtr aShape = theShape;
-      if (!aShape.get()) {
-        ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
-        if (aResult.get())
-          aShape = aResult->shape();
+      if (myExternalObjectMgr->canCreateExternal()) {
+        GeomShapePtr aShape = theShape;
+        if (!aShape.get()) {
+          ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+          if (aResult.get())
+            aShape = aResult->shape();
+        }
+        if (aShape.get() != NULL && !aShape->isNull())
+          anExternalObject = myExternalObjectMgr->externalObject(theObject, aShape, sketch(), myIsInValidate);
       }
-      if (aShape.get() != NULL && !aShape->isNull())
-        anExternalObject = myExternalObjectMgr->externalObject(theObject, aShape, sketch(), myIsInValidate);
+      else {
+        anExternalObject = theObject;
+        anExternalShape = theShape;
+      }
     }
     /// the object is null if the selected feature is "external"(not sketch entity feature of the
     /// current sketch) and it is not created by object manager
     theObject = anExternalObject;
+    theShape = anExternalShape;
   }
 }

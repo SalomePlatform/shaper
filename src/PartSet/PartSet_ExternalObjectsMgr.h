@@ -31,13 +31,20 @@ class PARTSET_EXPORT PartSet_ExternalObjectsMgr
  public:
   /// Constructor
   /// \param theExternal the external state
+  /// \param theCanCreateExternal the state if it can and should create external features
   /// \param theDefaultValue the default value for the external object using
-  PartSet_ExternalObjectsMgr(const std::string& theExternal, const bool theDefaultValue);
+  PartSet_ExternalObjectsMgr(const std::string& theExternal,
+                             const std::string& theCanCreateExternal,
+                             const bool theDefaultValue);
 
   virtual ~PartSet_ExternalObjectsMgr() {}
 
   /// Returns the state whether the external object is used
   bool useExternal() const { return myUseExternal; }
+
+  /// Returns if new external objects can be created
+  /// \return boolean value
+  bool canCreateExternal() { return myCanCreateExternal;}
 
   /// Checks validity of the given object
   /// \param theObject an object to check
@@ -84,6 +91,8 @@ protected:
 
   /// Boolean value about the neccessity of the external object use
   bool myUseExternal;
+  /// Boolean value about the necessity of a new external object creation
+  bool myCanCreateExternal;
 };
 
 #endif

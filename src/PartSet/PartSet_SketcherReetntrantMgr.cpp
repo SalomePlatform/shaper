@@ -86,7 +86,6 @@ void PartSet_SketcherReetntrantMgr::updateInternalEditActiveState()
       if (!anError.isEmpty()) {
         aFOperation->setEditOperation(false);
         //workshop()->operationMgr()->updateApplyOfOperations();
-        beforeStopInternalEdit();
         myIsInternalEditOperation = false;
         updateAcceptAllAction();
       }
