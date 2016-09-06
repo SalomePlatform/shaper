@@ -411,8 +411,15 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
     // set result deflection
     if (!isDefaultDeflection(*aResIt)) {
       AttributeDoublePtr aDeflectionAttr = (*aResIt)->data()->real(ModelAPI_Result::DEFLECTION_ID());
-      if(aDeflectionAttr && aDeflectionAttr->isInitialized()) {
+      #ifdef DEBUG_DEFLECTION
+        std::cout << "aDeflectionAttr.get(): " << (aDeflectionAttr.get() == NULL ? "Empty" : "Not empty") << std::endl;
+        std::cout << "aDeflectionAttr->isInitialized(): " << aDeflectionAttr->isInitialized() << std::endl;
+      #endif
+      if(aDeflectionAttr.get() && aDeflectionAttr->isInitialized()) {
         *this << *aResIt;
+        #ifdef DEBUG_DEFLECTION
+          std::cout << "Dump deflection" << std::endl;
+        #endif
         myDumpBuffer << ".setDeflection(" << aDeflectionAttr->value() << ")" << std::endl;
       }
     }
