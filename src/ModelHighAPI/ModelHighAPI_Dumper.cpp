@@ -7,8 +7,11 @@
 //--------------------------------------------------------------------------------------
 #include "ModelHighAPI_Dumper.h"
 
+#include <Config_PropManager.h>
+
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Dir.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
@@ -30,6 +33,8 @@
 #include <ModelAPI_Entity.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultPart.h>
 
 #include <PartSetPlugin_Part.h>
@@ -401,6 +406,14 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
                      << ", " << aColor->value(2) << ")" << std::endl;
       }
     }
+    // set result deflection
+    if (!isDefaultDeflection(*aResIt)) {
+      AttributeDoublePtr aDeflectionAttr = (*aResIt)->data()->real(ModelAPI_Result::DEFLECTION_ID());
+      if(aDeflectionAttr && aDeflectionAttr->isInitialized()) {
+        *this << *aResIt;
+        myDumpBuffer << ".setDeflection(" << aDeflectionAttr->value() << ")" << std::endl;
+      }
+    }
   }
 
   myEntitiesStack.pop();
@@ -426,6 +439,40 @@ bool ModelHighAPI_Dumper::isDefaultColor(const ResultPtr& theResult) const
   aColorInfo << aColor->value(0) << "," << aColor->value(1) << "," << aColor->value(2);
 
   return aDefault == aColorInfo.str();
+}
+
+bool ModelHighAPI_Dumper::isDefaultDeflection(const ResultPtr& theResult) const
+{
+  AttributeDoublePtr aDeflectionAttr = theResult->data()->real(ModelAPI_Result::DEFLECTION_ID());
+  if(!aDeflectionAttr && !aDeflectionAttr->isInitialized()) {
+    return true;
+  }
+
+  double aCurrent = aDeflectionAttr->value();
+  double aDefault = -1;
+
+  bool isConstruction = false;
+  std::string aResultGroup = theResult->groupName();
+  if (aResultGroup == ModelAPI_ResultConstruction::group())
+    isConstruction = true;
+  else if (aResultGroup == ModelAPI_ResultBody::group()) {
+    GeomShapePtr aGeomShape = theResult->shape();
+    if (aGeomShape.get()) {
+      // if the shape could not be exploded on faces, it contains only wires, edges, and vertices
+      // correction of deviation for them should not influence to the application performance
+      GeomAPI_ShapeExplorer anExp(aGeomShape, GeomAPI_Shape::FACE);
+      isConstruction = !anExp.more();
+    }
+  }
+  if (isConstruction)
+    aDefault = Config_PropManager::real("Visualization", "construction_deflection",
+                                        ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());
+  else
+    aDefault = Config_PropManager::real("Visualization", "body_deflection",
+                                        ModelAPI_ResultBody::DEFAULT_DEFLECTION());
+
+
+  return abs(aCurrent - aDefault) < 1.e-12;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const char theChar)
@@ -566,7 +613,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity
   const std::list<ResultPtr>& aResults = theEntity->results();
   std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
   for (; aResIt != aResults.end(); ++aResIt)
-    if (!myNames[*aResIt].myIsDefault || !isDefaultColor(*aResIt))
+    if (!myNames[*aResIt].myIsDefault || !isDefaultColor(*aResIt) || !isDefaultDeflection(*aResIt))
       aResultsWithNameOrColor.push_back(*aResIt);
   // store just dumped entity to stack
   myEntitiesStack.push(LastDumpedEntity(theEntity, isUserDefinedName, aResultsWithNameOrColor));

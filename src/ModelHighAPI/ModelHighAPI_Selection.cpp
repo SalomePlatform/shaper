@@ -7,6 +7,7 @@
 //--------------------------------------------------------------------------------------
 #include "ModelHighAPI_Selection.h"
 
+#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -110,4 +111,14 @@ void ModelHighAPI_Selection::setColor(int theRed, int theGreen, int theBlue)
   aColor->setValue(0, theRed);
   aColor->setValue(1, theGreen);
   aColor->setValue(2, theBlue);
+}
+
+void ModelHighAPI_Selection::setDeflection(double theValue)
+{
+  if (myVariantType != VT_ResultSubShapePair)
+    return;
+
+  AttributeDoublePtr aDeflectionAttr = myResultSubShapePair.first->data()->real(ModelAPI_Result::DEFLECTION_ID());
+
+  aDeflectionAttr->setValue(theValue);
 }

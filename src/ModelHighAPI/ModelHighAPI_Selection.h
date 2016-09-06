@@ -84,6 +84,10 @@ public:
   MODELHIGHAPI_EXPORT
   void setColor(int theRed, int theGreen, int theBlue);
 
+  /// Change result's deflection
+  MODELHIGHAPI_EXPORT
+  void setDeflection(double theValue);
+
 private:
   VariantType myVariantType;
   ResultSubShapePair myResultSubShapePair;
