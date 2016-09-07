@@ -25,6 +25,7 @@ XGUI_DeflectionDialog::XGUI_DeflectionDialog(QWidget* theParent)
   myDeflection = new ModuleBase_DoubleSpinBox(this);
   myDeflection->setDecimals(12);
   myDeflection->setRange(0, 1);
+  myDeflection->setSingleStep(0.001);
   aLay->addWidget(new QLabel("Deviation", this), 0, 0);
   aLay->addWidget(myDeflection, 0, 1);
 
