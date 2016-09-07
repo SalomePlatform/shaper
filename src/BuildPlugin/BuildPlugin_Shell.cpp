@@ -79,9 +79,16 @@ void BuildPlugin_Shell::execute()
         for(ListOfShape::const_iterator aHistoryIt = aHistory.cbegin();
             aHistoryIt != aHistory.cend();
             ++aHistoryIt) {
-          if(aShell->isSubShape(*aHistoryIt)) {
+          GeomShapePtr aHistoryShape = *aHistoryIt;
+          if(aMapOfShapes->isBound(aHistoryShape)) {
+            aHistoryShape = aMapOfShapes->find(aHistoryShape);
+          }
+          if(aShell->isSubShape(aHistoryShape)) {
             aResultBody->loadAndOrientModifiedShapes(&aSewingAlgo, aFace, GeomAPI_Shape::EDGE,
-                                                     1, "Modified", *aMapOfShapes.get());
+                                                     1, "Modified_Edge", *aMapOfShapes.get());
+            aResultBody->loadAndOrientModifiedShapes(&aSewingAlgo, aFace, GeomAPI_Shape::FACE,
+                                                     2, "Modified_Face", *aMapOfShapes.get());
+            break;
           }
         }
       }
