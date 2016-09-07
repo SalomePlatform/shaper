@@ -20,6 +20,7 @@
 #include <BRep_Tool.hxx>
 #include <TNaming_Builder.hxx>
 #include <TNaming_Iterator.hxx>
+#include <NCollection_List.hxx>
 
 using namespace std;
 
@@ -97,27 +98,38 @@ static void CopyNS(const Handle(TNaming_NamedShape)& theFrom,
   TDF_Label aLab = theTo->Label();
   TNaming_Builder B(aLab);
 
-  TNaming_Iterator It (theFrom);
-  for ( ;It.More() ; It.Next()) {
-    const TopoDS_Shape& OS     = It.OldShape();
-    const TopoDS_Shape& NS     = It.NewShape();
-    TNaming_Evolution   Status = It.Evolution();
+  // TNaming_Iterator iterates in reversed way than it was put in Builder, so, keep it in container
+  // and iterate from end to begin
+  NCollection_List<TopoDS_Shape> aOlds;
+  NCollection_List<TopoDS_Shape> aNews;
+  NCollection_List<TNaming_Evolution> aStatuses;
 
-    switch (Status) {
+  TNaming_Iterator anIt (theFrom);
+  for ( ;anIt.More() ; anIt.Next()) {
+    aOlds.Prepend(anIt.OldShape());
+    aNews.Prepend(anIt.NewShape());
+    aStatuses.Prepend(anIt.Evolution());
+  }
+
+  NCollection_List<TopoDS_Shape>::Iterator aOldIter(aOlds);
+  NCollection_List<TopoDS_Shape>::Iterator aNewIter(aNews);
+  NCollection_List<TNaming_Evolution>::Iterator aStatIter(aStatuses);
+  for(; aOldIter.More(); aOldIter.Next(), aNewIter.Next(), aStatIter.Next()) {
+    switch (aStatIter.Value()) {
     case TNaming_PRIMITIVE :
-      B.Generated(NS);
+      B.Generated(aNewIter.Value());
       break;
     case TNaming_GENERATED :
-      B.Generated(OS, NS);
+      B.Generated(aOldIter.Value(), aNewIter.Value());
       break;
     case TNaming_MODIFY : 
-      B.Modify(OS, NS);
+      B.Modify(aOldIter.Value(), aNewIter.Value());
       break;
     case TNaming_DELETE : 
-      B.Delete (OS);
+      B.Delete (aOldIter.Value());
       break;
     case TNaming_SELECTED :
-      B.Select(NS, OS);
+      B.Select(aNewIter.Value(), aOldIter.Value());
       break;
     default:
       break;

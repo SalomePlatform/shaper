@@ -66,9 +66,10 @@ static void evolutionToSelectionRec(TDF_Label theLab, const bool theFlag) {
     } else {
       TDataStd_Integer::Set(theLab, anEvolution);
     }
-
+    
     for(TNaming_Iterator anIter(aName); anIter.More(); anIter.Next()) {
-      aShapePairs.push_back(std::pair<TopoDS_Shape, TopoDS_Shape>
+      // iterator goes in reversed order relatively to the Builder, to, make the list reversed
+      aShapePairs.push_front(std::pair<TopoDS_Shape, TopoDS_Shape>
         (anIter.OldShape(), anIter.NewShape()));
     }
   }
@@ -464,7 +465,6 @@ void Model_BodyBuilder::loadAndOrientGeneratedShapes (
           TNaming_Builder aBuilder(aChildLabel);
           aBuilder.Generated(aRoot, anExp.Current());
           TCollection_AsciiString aChildName = TCollection_AsciiString((theName + "_").c_str()) + aTag;
-          //aDoc->addNamingName(aChildLabel, aChildName.ToCString());
           TDataStd_Name::Set(aChildLabel, aChildName.ToCString());
           aTag++;
         }

@@ -55,7 +55,6 @@
 #include <TDataStd_Name.hxx>
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS_Iterator.hxx>
-#include <TNaming_Iterator.hxx>
 #include <BRep_Builder.hxx>
 #include <ModelAPI_Session.h>
 

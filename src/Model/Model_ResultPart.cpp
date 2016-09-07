@@ -22,7 +22,6 @@
 
 #include <TNaming_Tool.hxx>
 #include <TNaming_NamedShape.hxx>
-#include <TNaming_Iterator.hxx>
 #include <TDataStd_Name.hxx>
 #include <TopoDS_Compound.hxx>
 #include <BRep_Builder.hxx>
