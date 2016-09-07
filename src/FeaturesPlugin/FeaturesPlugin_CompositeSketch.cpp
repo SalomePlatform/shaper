@@ -267,28 +267,26 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
                                                             int& theTag)
 {
   GeomAPI_Shape::ShapeType aBaseShapeType = theBaseShape->shapeType();
-  GeomAPI_Shape::ShapeType aShapeTypeToExplode;
+  GeomAPI_Shape::ShapeType aShapeTypeToExplode = GeomAPI_Shape::SHAPE;
   std::string aGenName = "Generated_";
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfSubShapes = theMakeShape->mapOfSubShapes();
   switch(aBaseShapeType) {
-    case GeomAPI_Shape::VERTEX: {
-      aShapeTypeToExplode = GeomAPI_Shape::VERTEX;
-      break;
-    }
     case GeomAPI_Shape::EDGE:
     case GeomAPI_Shape::WIRE: {
-      std::shared_ptr<GeomAPI_Vertex> aV1, aV2;
-      GeomAlgoAPI_ShapeTools::findBounds(theBaseShape, aV1, aV2);
-      ListOfShape aV1History, aV2History;
-      theMakeShape->generated(aV1, aV1History);
-      theMakeShape->generated(aV2, aV2History);
-      if(!aV1History.empty()) {
-        theResultBody->generated(aV1, aV1History.front(), aGenName + "Edge_1", theTag++);
-      }
-      if(!aV2History.empty()) {
-        theResultBody->generated(aV2, aV2History.front(), aGenName + "Edge_2", theTag++);
-      }
+      //std::shared_ptr<GeomAPI_Vertex> aV1, aV2;
+      //GeomAlgoAPI_ShapeTools::findBounds(theBaseShape, aV1, aV2);
+      //ListOfShape aV1History, aV2History;
+      //theMakeShape->generated(aV1, aV1History);
+      //theMakeShape->generated(aV2, aV2History);
+      //if(!aV1History.empty()) {
+      //  theResultBody->generated(aV1, aV1History.front(), aGenName + "Edge_1", theTag++);
+      //}
+      //if(!aV2History.empty()) {
+      //  theResultBody->generated(aV2, aV2History.front(), aGenName + "Edge_2", theTag++);
+      //}
+      aShapeTypeToExplode = GeomAPI_Shape::VERTEX;
+      break;
     }
     case GeomAPI_Shape::FACE:
     case GeomAPI_Shape::SHELL: {
