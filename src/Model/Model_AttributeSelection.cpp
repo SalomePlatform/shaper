@@ -18,6 +18,7 @@
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Tools.h>
 #include <GeomAPI_Shape.h>
+#include <ModelAPI_Session.h>
 #include <GeomAPI_PlanarEdges.h>
 #include <Events_InfoMessage.h>
 
@@ -56,7 +57,8 @@
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS_Iterator.hxx>
 #include <BRep_Builder.hxx>
-#include <ModelAPI_Session.h>
+#include <TNaming_SameShapeIterator.hxx>
+#include <TNaming_Iterator.hxx>
 
 using namespace std;
 //#define DEB_NAMING 1
@@ -596,7 +598,6 @@ bool Model_AttributeSelection::update()
   return setInvalidIfFalse(aSelLab, false); // unknown case
 }
 
-
 void Model_AttributeSelection::selectBody(
   const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
@@ -617,13 +618,65 @@ void Model_AttributeSelection::selectBody(
       return;
     }
   }
-  TopoDS_Shape aNewShape = theSubShape ? theSubShape->impl<TopoDS_Shape>() : aContext;
+
+  // with "recover" feature the selected context may be not up to date (issue 1710)
+  Handle(TNaming_NamedShape) aResult;
+  TDF_Label aSelLab = selectionLabel();
+  TopoDS_Shape aNewContext = aContext;
+  bool isUpdated = true;
+  while(!aNewContext.IsNull() && isUpdated) { // searching for the very last shape that was produced from this one
+    isUpdated = false;
+    if (!TNaming_Tool::HasLabel(aSelLab, aNewContext)) // to avoid crash of TNaming_SameShapeIterator if pure shape does not exists
+      break;
+    for(TNaming_SameShapeIterator anIter(aNewContext, aSelLab); anIter.More(); anIter.Next()) {
+      TDF_Label aNSLab = anIter.Label();
+      if (!scope().Contains(aNSLab))
+        continue;
+      Handle(TNaming_NamedShape) aNS;
+      if (aNSLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        for(TNaming_Iterator aShapesIter(aNS); aShapesIter.More(); aShapesIter.Next()) {
+          if (aShapesIter.Evolution() == TNaming_SELECTED)
+            continue; // don't use the selection evolution
+          if (!aShapesIter.OldShape().IsNull() && aShapesIter.OldShape().IsSame(aNewContext)) {
+             // found the original shape
+            aNewContext = aShapesIter.NewShape(); // go to the newer shape
+            isUpdated = true;
+            break;
+          }
+        }
+      }
+    }
+  }
+  if (aNewContext.IsNull()) { // a context is already deleted
+    setInvalidIfFalse(aSelLab, false);
+    Events_InfoMessage("Model_AttributeSelection", "Failed to select shape already deleted").send();
+    return;
+  }
+
+  TopoDS_Shape aNewSub = theSubShape ? theSubShape->impl<TopoDS_Shape>() : aContext;
+  if (!aNewSub.IsEqual(aContext)) { // searching for subshape in the new context
+    bool isFound = false;
+    TopExp_Explorer anExp(aNewContext, aNewSub.ShapeType());
+    for(; anExp.More(); anExp.Next()) {
+      if (anExp.Current().IsEqual(aNewSub)) {
+        isFound = true;
+        break;
+      }
+    }
+    if (!isFound) { // sub-shape is not found in the up-to-date instance of the context shape
+      setInvalidIfFalse(aSelLab, false);
+      Events_InfoMessage("Model_AttributeSelection", "Failed to select sub-shape already modified").send();
+      return;
+    }
+  }
+
+
   /// fix for issue 411: result modified shapes must not participate in this selection mechanism
   FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
   if (aFeatureOwner.get())
     aFeatureOwner->eraseResults();
   if (!aContext.IsNull()) {
-    aSel.Select(aNewShape, aContext); 
+    aSel.Select(aNewSub, aNewContext); 
   }
 }
 
