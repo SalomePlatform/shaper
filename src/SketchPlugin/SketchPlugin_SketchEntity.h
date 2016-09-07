@@ -104,7 +104,20 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
   virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                      std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
   {
-    //bool isCustomized = false;
+    /// Store previous color values of the presentation to check it after setting specific entity
+    /// color. Default color is set into presentation to have not modified isCustomized state
+    /// after default customize prs is completed.
+    std::vector<int> aPrevColor;
+    aPrevColor.resize(3);
+    thePrs->getColor(aPrevColor[0], aPrevColor[1], aPrevColor[2]);
+    {
+      std::string aSection, aName, aDefault;
+      theResult->colorConfigInfo(aSection, aName, aDefault);
+      std::vector<int> aColor;
+      aColor = Config_PropManager::color(aSection, aName, aDefault);
+      thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+    }
+
     bool isCustomized = theDefaultPrs.get() != NULL &&
                         theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
     int aShapeType = thePrs->getShapeType();
@@ -129,8 +142,11 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
       aColor = Config_PropManager::color("Visualization", "sketch_entity_color",
                                           SKETCH_ENTITY_COLOR);
     }
-    if (!aColor.empty())
-      isCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]) || isCustomized;
+    if (!aColor.empty()) {
+      thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+      for (int i = 0; i < 3 && !isCustomized; i++)
+        isCustomized = aColor[i] != aPrevColor[i];
+    }
 
     if (aShapeType == 6 || aShapeType == 0) { // if this is an edge or a compound
       if (isConstruction) {
