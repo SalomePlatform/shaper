@@ -59,12 +59,6 @@ MODELAPI_EXPORT bool findVariable(FeaturePtr theSearcher, const std::string& the
   const DocumentPtr& theDocument = DocumentPtr());
 
 /*!
- * Returns the values of the next random color. The values are in range [0, 255]
- * \param theValues a container of component of RGB value: red, green, blue
- */
-MODELAPI_EXPORT void findRandomColor(std::vector<int>& theValues);
-
-/*!
  * Searches for Part result that contains the reference to the given document.
  * The result must be presented in the tree.
  * \param theMain document that contains the searched feature
