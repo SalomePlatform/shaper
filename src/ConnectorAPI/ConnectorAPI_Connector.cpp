@@ -14,5 +14,4 @@ void exportToGEOM(const std::shared_ptr<ModelAPI_Document> & thePart)
 {
   // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature("ExportToGEOM");
-  aFeature->execute();
 }
