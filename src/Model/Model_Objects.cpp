@@ -721,7 +721,8 @@ void Model_Objects::synchronizeFeatures(
       FeaturePtr aFeature = myFeatures.Find(aFeatureLabel);
       if (std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature).get())
         aComposites.push_back(aFeature);
-      updateResults(aFeature);
+      else
+        updateResults(aFeature);
     }
   }
   std::list<FeaturePtr>::iterator aComposite = aComposites.begin();
