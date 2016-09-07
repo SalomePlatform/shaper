@@ -17,6 +17,7 @@
 
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_AttributeDouble.h>
 
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Arc.h>
@@ -25,6 +26,7 @@
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintTangent.h>
+#include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
@@ -86,12 +88,10 @@ void SketchPlugin_ConstraintSplit::execute()
   // Find feature constraints
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
   ResultPtr aBaseFeatureResult = getFeatureResult(aBaseFeature);
-
-  std::set<FeaturePtr> aFeaturesToDelete;
+  std::set<FeaturePtr> aFeaturesToDelete, aFeaturesToUpdate;
   std::map<FeaturePtr, IdToPointPair> aTangentFeatures;
   std::map<FeaturePtr, IdToPointPair> aCoincidenceToFeature;
-  //std::map<FeaturePtr, IdToPointPair> aCoincidenceToPoint;
-  getConstraints(aFeaturesToDelete, aTangentFeatures, aCoincidenceToFeature);//, aCoincidenceToPoint);
+  getConstraints(aFeaturesToDelete, aFeaturesToUpdate, aTangentFeatures, aCoincidenceToFeature);
 
   std::map<AttributePtr, std::list<AttributePtr> > aBaseRefAttributes;
   getRefAttributes(aBaseFeature, aBaseRefAttributes);
@@ -145,21 +145,6 @@ void SketchPlugin_ConstraintSplit::execute()
     }
   }
 
-  /*if (!aCoincidenceToPoint.empty()) {
-    std::cout << std::endl;
-    std::cout << "Coincidences to points on base feature[" << aCoincidenceToPoint.size() << "]: " << std::endl;
-    std::map<FeaturePtr, IdToPointPair>::const_iterator anIt = aCoincidenceToPoint.begin(),
-                                                        aLast = aCoincidenceToPoint.end();
-    for (int i = 1; anIt != aLast; anIt++, i++) {
-      FeaturePtr aFeature = (*anIt).first;
-      std::string anAttributeId = (*anIt).second.first;
-      std::shared_ptr<GeomDataAPI_Point2D> aPointAttr = (*anIt).second.second;
-
-      std::cout << i << "-" << getFeatureInfo(aFeature) << std::endl;
-      std::cout <<     " -Attribute to correct:" << anAttributeId << std::endl;
-      std::cout <<     " -Point attribute:" << ModelGeomAlgo_Point2D::getPointAttributeInfo(aPointAttr) << std::endl;
-    }
-  }*/
   std::map<AttributePtr, std::list<AttributePtr> >::const_iterator aRefIt = aBaseRefAttributes.begin(),
                                                                    aRefLast = aBaseRefAttributes.end();
   std::cout << std::endl << "References to attributes of base feature [" << aBaseRefAttributes.size() << "]" << std::endl;
@@ -262,9 +247,6 @@ void SketchPlugin_ConstraintSplit::execute()
   // coincidence to feature
   updateCoincidenceConstraintsToFeature(aCoincidenceToFeature, aFurtherCoincidences,
                                         aFeatureResults);
-  // coincidence to points
-  //updateCoincidenceConstraintsToFeature(aCoincidenceToPoint, aFurtherCoincidences,
-  //                                      std::set<ResultPtr>());
   // tangency
   updateTangentConstraintsToFeature(aTangentFeatures, aFurtherCoincidences);
 
@@ -281,6 +263,17 @@ void SketchPlugin_ConstraintSplit::execute()
   }
 #endif
   ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToDelete);
+
+#ifdef DEBUG_SPLIT
+  std::cout << "update features after split:" << std::endl;
+  std::set<FeaturePtr>::const_iterator anUIt = aFeaturesToUpdate.begin(),
+                                       anULast = aFeaturesToUpdate.end();
+  for (; anUIt != anULast; anUIt++) {
+    std::cout << getFeatureInfo(*anUIt, false) << std::endl;
+    std::cout << std::endl;
+  }
+#endif
+  updateFeaturesAfterSplit(aFeaturesToUpdate);
 
   // Send events to update the sub-features by the solver.
   if(isUpdateFlushed) {
@@ -344,9 +337,9 @@ void SketchPlugin_ConstraintSplit::getFeaturePoints(AttributePoint2DPtr& theStar
 }
 
 void SketchPlugin_ConstraintSplit::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete,
+                                      std::set<FeaturePtr>& theFeaturesToUpdate,
                                       std::map<FeaturePtr, IdToPointPair>& theTangentFeatures,
-                                      std::map<FeaturePtr, IdToPointPair>& theCoincidenceToFeature/*,
-                                      std::map<FeaturePtr, IdToPointPair>& theCoincidenceToPoint*/)
+                                      std::map<FeaturePtr, IdToPointPair>& theCoincidenceToFeature)
 {
   std::shared_ptr<ModelAPI_Data> aData = data();
 
@@ -369,6 +362,8 @@ void SketchPlugin_ConstraintSplit::getConstraints(std::set<FeaturePtr>& theFeatu
         aRefFeatureKind == SketchPlugin_MultiRotation::ID() ||
         aRefFeatureKind == SketchPlugin_MultiTranslation::ID())
       theFeaturesToDelete.insert(aRefFeature);
+    else if (aRefFeatureKind == SketchPlugin_ConstraintLength::ID())
+      theFeaturesToUpdate.insert(aRefFeature);
     else if (aRefFeatureKind == SketchPlugin_ConstraintTangent::ID()) {
       if (aBaseFeature->getKind() == SketchPlugin_Circle::ID()) /// TEMPORARY limitaion
         theFeaturesToDelete.insert(aRefFeature); /// until tangency between arc and line is implemented
@@ -456,9 +451,6 @@ void SketchPlugin_ConstraintSplit::getConstraints(std::set<FeaturePtr>& theFeatu
         if (isToFeature)
           theCoincidenceToFeature[aRefFeature] = std::make_pair(anAttributeToBeModified,
                                                                 aCoincidentPoint);
-        //else
-          //theCoincidenceToPoint[aRefFeature] = std::make_pair(anAttributeToBeModified,
-          //                                                    aCoincidentPoint);
       }
       else
         theFeaturesToDelete.insert(aRefFeature); /// this case should not happen
@@ -1101,6 +1093,28 @@ FeaturePtr SketchPlugin_ConstraintSplit::createConstraintForObjects(const std::s
   aRefAttr->setObject(theSecondObject);
 
   return aConstraint;
+}
+
+void SketchPlugin_ConstraintSplit::updateFeaturesAfterSplit(
+                                                   const std::set<FeaturePtr>& theFeaturesToUpdate)
+{
+  std::set<FeaturePtr>::const_iterator anIt = theFeaturesToUpdate.begin(),
+                                       aLast = theFeaturesToUpdate.end();
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aRefFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
+    std::string aRefFeatureKind = aRefFeature->getKind();
+    if (aRefFeatureKind == SketchPlugin_ConstraintLength::ID()) {
+      std::shared_ptr<SketchPlugin_ConstraintLength> aLenghtFeature =
+                              std::dynamic_pointer_cast<SketchPlugin_ConstraintLength>(*anIt);
+      if (aLenghtFeature.get()) {
+        std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
+            ModelAPI_AttributeDouble>(aLenghtFeature->attribute(SketchPlugin_Constraint::VALUE()));
+        double aValue;
+        if (aLenghtFeature->computeLenghtValue(aValue) && aValueAttr.get())
+          aValueAttr->setValue(aValue);
+      }
+    }
+  }
 }
 
 std::shared_ptr<ModelAPI_Result> SketchPlugin_ConstraintSplit::getFeatureResult(

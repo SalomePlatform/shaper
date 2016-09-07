@@ -34,6 +34,7 @@
 #include <XGUI_OperationMgr.h>
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_ErrorMgr.h>
+#include <XGUI_SelectionMgr.h>
 
 #include <QToolButton>
 
@@ -157,6 +158,11 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* th
       }
       bool aCanBeActivatedByMove = isLineFeature || isArcFeature;
       if (aCanBeActivatedByMove) {
+        /// before restarting of operation we need to clear selection, as it may take part in
+        /// new feature creation, e.g. tangent arc. But it is not necessary as it was processed
+        /// by mouse release when the operation was restarted.
+        workshop()->selector()->clearSelection();
+
         myPreviousFeature = aFOperation->feature();
         restartOperation();
         myPreviousFeature = FeaturePtr();

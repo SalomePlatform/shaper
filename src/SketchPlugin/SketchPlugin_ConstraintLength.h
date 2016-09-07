@@ -71,8 +71,13 @@ class SketchPlugin_ConstraintLength : public SketchPlugin_ConstraintBase
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintLength();
 
+  /// Computes distance between lenght point attributes
+  /// \param theValue [out] distance or 0 if one of point attributes is not initialized
+  /// \return boolean value if distance is computed
+  bool computeLenghtValue(double& theValue);
+
 private:
-  // retrns the points-base of length, returns false if it is not possible
+  /// retrns the points-base of length, returns false if it is not possible
   bool getPoints(
     std::shared_ptr<GeomAPI_Pnt>& thePoint1, std::shared_ptr<GeomAPI_Pnt>& thePoint2,
     std::shared_ptr<GeomDataAPI_Point2D>& theStartPoint,

@@ -101,10 +101,12 @@ private:
   /// Obtains those constraints of the feature that should be modified. output maps contain
   /// point of coincidence and attribute id to be modified after split
   /// \param theFeaturesToDelete [out] constrains that will be deleted after split
+  /// \param theFeaturesToUpdate [out] constrains that will be updated after split
   /// \param theTangentFeatures  [out] tangent feature to be connected to new feature
   /// \param theCoincidenceToFeature [out] coincidence to feature to be connected to new feature
   /// \param theCoincidenceToPoint [out] coincidence to point be connected to new feature
   void getConstraints(std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete,
+              std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToUpdate,
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theTangentFeatures,
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature/*,
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToPoint*/);
@@ -239,6 +241,10 @@ private:
   std::shared_ptr<ModelAPI_Feature> createConstraintForObjects(const std::string& theConstraintId,
                         const std::shared_ptr<ModelAPI_Object>& theFirstObject,
                         const std::shared_ptr<ModelAPI_Object>& theSecondObject);
+
+  /// Add feature coincidence constraint between given attributes
+  /// \param theFeaturesToUpdate a constraint index
+  void updateFeaturesAfterSplit(const std::set<FeaturePtr>& theFeaturesToUpdate);
 
   /// Result result of the feature to build constraint with. For arc, circle it is an edge result.
   /// \param theFeature a feature
