@@ -732,6 +732,9 @@ const QStringList& PartSet_SketcherMgr::constraintsIdList()
     aConstraintIds << SketchPlugin_ConstraintAngle::ID().c_str();
     aConstraintIds << SketchPlugin_ConstraintCollinear::ID().c_str();
     aConstraintIds << SketchPlugin_ConstraintMiddle::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintMirror::ID().c_str();
+    aConstraintIds << SketchPlugin_MultiTranslation::ID().c_str();
+    aConstraintIds << SketchPlugin_MultiRotation::ID().c_str();
   }
   return aConstraintIds;
 }
