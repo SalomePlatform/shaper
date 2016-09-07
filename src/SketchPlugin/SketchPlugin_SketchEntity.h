@@ -110,7 +110,7 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
     std::vector<int> aPrevColor;
     aPrevColor.resize(3);
     thePrs->getColor(aPrevColor[0], aPrevColor[1], aPrevColor[2]);
-    {
+    if (theResult.get()) {
       std::string aSection, aName, aDefault;
       theResult->colorConfigInfo(aSection, aName, aDefault);
       std::vector<int> aColor;
