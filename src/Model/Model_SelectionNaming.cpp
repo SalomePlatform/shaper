@@ -75,8 +75,13 @@ std::string Model_SelectionNaming::getShapeName(
           int aDepth = anObjL.Depth();
           if (aDepth == 5 || aDepth == 7) {
             ObjectPtr anObj = theDoc->objects()->object(anObjL);
-            if (anObj) {
-              aName = anObj->data()->name() + "/" + aName;
+            if (anObj.get()) {
+              ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+              if (aRes.get()) {
+                if (aRes && !aRes->shape()->impl<TopoDS_Shape>().IsEqual(theShape)) {
+                  aName = anObj->data()->name() + "/" + aName;
+                }
+              }
             }
           }
         }
