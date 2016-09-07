@@ -82,7 +82,7 @@ void FeaturesPlugin_Rotation::execute()
       ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
       ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
       aResultPart->setTrsf(*aContext, aTrsf);
-      setResult(aResultPart);
+      setResult(aResultPart, aResultIndex);
     } else {
       GeomAlgoAPI_Rotation aRotationAlgo(aBaseShape, anAxis, anAngle);
 
