@@ -29,7 +29,7 @@ SamplePanelPlugin_ModelWidget::SamplePanelPlugin_ModelWidget(QWidget* theParent,
   aLay->addWidget(myMainWidget);
 
   QGridLayout* aLayout = new QGridLayout(myMainWidget);
-  aLayout->addWidget(new QLabel("Values:"), 0, 0);
+  aLayout->addWidget(new QLabel(tr("Values:")), 0, 0);
 
   myComboBox = new QComboBox(myMainWidget);
   myComboBox->addItem("Value_1");

@@ -19,14 +19,14 @@
 XGUI_DeflectionDialog::XGUI_DeflectionDialog(QWidget* theParent)
   : QDialog(theParent)
 {
-  setWindowTitle("Deflection");
+  setWindowTitle(tr("Deflection"));
   QGridLayout* aLay = new QGridLayout(this);
 
   myDeflection = new ModuleBase_DoubleSpinBox(this);
   myDeflection->setDecimals(12);
   myDeflection->setRange(0, 1);
   myDeflection->setSingleStep(0.001);
-  aLay->addWidget(new QLabel("Deviation", this), 0, 0);
+  aLay->addWidget(new QLabel(tr("Deflection value"), this), 0, 0);
   aLay->addWidget(myDeflection, 0, 1);
 
   QDialogButtonBox* aButtons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,

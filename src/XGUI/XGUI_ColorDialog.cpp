@@ -19,7 +19,7 @@
 XGUI_ColorDialog::XGUI_ColorDialog(QWidget* theParent)
   : QDialog(theParent)
 {
-  setWindowTitle("Color");
+  setWindowTitle(tr("Color"));
   QGridLayout* aLay = new QGridLayout(this);
 
   QRadioButton* aRandomChoiceBtn = new QRadioButton(this);
@@ -37,7 +37,7 @@ XGUI_ColorDialog::XGUI_ColorDialog(QWidget* theParent)
   myColorButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   aLay->addWidget(myColorButton, 0, 1);
 
-  QLabel* aRandomLabel = new QLabel("Random", this);
+  QLabel* aRandomLabel = new QLabel(tr("Random"), this);
   aLay->addWidget(aRandomLabel, 1, 1);
 
   QDialogButtonBox* aButtons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
