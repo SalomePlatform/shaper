@@ -208,28 +208,12 @@ void PartSet_ResultSketchPrs::appendShapeSelection(const Handle(SelectMgr_Select
 
 void PartSet_ResultSketchPrs::setAuxiliaryPresentationStyle(const bool isAuxiliary)
 {
-  std::vector<int> aColor;
-  Standard_Real aWidth;
-  Standard_Integer aLineStyle;
- 
-  if (!isAuxiliary) {
-    aColor = Config_PropManager::color("Visualization", "result_construction_color",
-                                        ModelAPI_ResultConstruction::DEFAULT_COLOR());
-    aWidth = PartSet_Tools::getAISDefaultWidth();// default width value
-    aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
-  }
-  else {
-    aColor = Config_PropManager::color("Visualization", "result_construction_color",
-                                        ModelAPI_ResultConstruction::DEFAULT_COLOR());
-    aWidth = PartSet_Tools::getAISDefaultWidth();// default width value
-    aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY();
-  }
+  Standard_Integer aLineStyle = isAuxiliary? 
+    SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY() : 
+    SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
 
   Handle(Prs3d_Drawer) aDrawer = Attributes();
-  setColor(aDrawer, Quantity_Color(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255.,
-           Quantity_TOC_RGB));
 
-  setWidth(aDrawer, aWidth);
   // set line style
   Handle(Prs3d_LineAspect) aLineAspect;
 
