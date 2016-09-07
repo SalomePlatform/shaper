@@ -85,12 +85,15 @@ void BuildPlugin_Face::execute()
     GeomShapePtr aShape = *anIt;
     aResultBody->store(aShape);
 
+    int anEdgeIndex = 1;
+
     for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
       GeomShapePtr anEdgeInResult = anExp.current();
       for(ListOfShape::const_iterator anIt = anEdges.cbegin(); anIt != anEdges.cend(); ++anIt) {
         std::shared_ptr<GeomAPI_Edge> anEdgeInList(new GeomAPI_Edge(*anIt));
         if(anEdgeInList->isEqual(anEdgeInResult)) {
-          aResultBody->modified(anEdgeInList, anEdgeInResult, "Edge");
+          aResultBody->modified(anEdgeInList, anEdgeInResult, "Edge_" + std::to_string((long long)anEdgeIndex), anEdgeIndex);
+          ++anEdgeIndex;
           break;
         }
       }
