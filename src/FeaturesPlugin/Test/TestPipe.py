@@ -100,7 +100,7 @@ aSession.finishOperation()
 
 # Test results
 assert (len(aPipeFeature.results()) > 0)
-aSession.undo()
+# aSession.undo()
 
 # Create pipe with bi-normal
 aSession.startOperation()
@@ -117,7 +117,7 @@ aSession.finishOperation()
 
 # Test results
 assert (len(aPipeFeature.results()) > 0)
-aSession.undo()
+# aSession.undo()
 
 # Create pipe with locations
 # Create a sketch with circle for pipe profile

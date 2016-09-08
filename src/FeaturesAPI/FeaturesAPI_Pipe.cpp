@@ -23,8 +23,7 @@ FeaturesAPI_Pipe::FeaturesAPI_Pipe(const std::shared_ptr<ModelAPI_Feature>& theF
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    fillAttribute(theBaseObjects, mybaseObjects);
-    setPath(thePath);
+    setByBasePath(theBaseObjects, thePath);
   }
 }
 
