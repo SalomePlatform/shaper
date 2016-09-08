@@ -189,5 +189,5 @@ anAxis = model.addAxis(aPart, aPlane1.result()[0], 50, False, aPlane2.result()[0
 aSession.finishOperation()
 assert (len(anAxis.result()) > 0)
 
-#import model
-#assert(model.checkPythonDump())
+import model
+assert(model.checkPythonDump())

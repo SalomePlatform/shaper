@@ -66,6 +66,22 @@ public:
                        const ModelHighAPI_Double& theOffset2,
                        const bool theReverseOffset2);
 
+  /// Constructor with values
+  CONSTRUCTIONAPI_EXPORT
+  ConstructionAPI_Axis(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                       const ModelHighAPI_Selection& thePlane1,
+                       const ModelHighAPI_Selection& thePlane2,
+                       const ModelHighAPI_Double& theOffset2,
+                       const bool theReverseOffset2);
+
+  /// Constructor with values
+  CONSTRUCTIONAPI_EXPORT
+  ConstructionAPI_Axis(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                       const ModelHighAPI_Selection& thePlane1,
+                       const ModelHighAPI_Double& theOffset1,
+                       const bool theReverseOffset1,
+                       const ModelHighAPI_Selection& thePlane2);
+
   /// Destructor
   CONSTRUCTIONAPI_EXPORT
   virtual ~ConstructionAPI_Axis();
@@ -138,6 +154,20 @@ public:
                       const ModelHighAPI_Double& theOffset2,
                       const bool theReverseOffset2);
 
+  /// Set by two planes
+  CONSTRUCTIONAPI_EXPORT
+  void setByTwoPlanes(const ModelHighAPI_Selection& thePlane1,
+                      const ModelHighAPI_Selection& thePlane2,
+                      const ModelHighAPI_Double& theOffset2,
+                      const bool theReverseOffset2);
+
+  /// Set by two planes
+  CONSTRUCTIONAPI_EXPORT
+  void setByTwoPlanes(const ModelHighAPI_Selection& thePlane1,
+                      const ModelHighAPI_Double& theOffset1,
+                      const bool theReverseOffset1,
+                      const ModelHighAPI_Selection& thePlane2);
+
   /// Dump wrapped feature
   CONSTRUCTIONAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
@@ -186,5 +216,23 @@ AxisPtr addAxis(const std::shared_ptr<ModelAPI_Document>& thePart,
                 const ModelHighAPI_Selection& thePlane2,
                 const ModelHighAPI_Double& theOffset2,
                 const bool theReverseOffset2);
+
+/// \ingroup CPPHighAPI
+/// \brief Create Axis feature
+CONSTRUCTIONAPI_EXPORT
+AxisPtr addAxis(const std::shared_ptr<ModelAPI_Document>& thePart,
+                const ModelHighAPI_Selection& thePlane1,
+                const ModelHighAPI_Selection& thePlane2,
+                const ModelHighAPI_Double& theOffset2,
+                const bool theReverseOffset2);
+
+/// \ingroup CPPHighAPI
+/// \brief Create Axis feature
+CONSTRUCTIONAPI_EXPORT
+AxisPtr addAxis(const std::shared_ptr<ModelAPI_Document>& thePart,
+                const ModelHighAPI_Selection& thePlane1,
+                const ModelHighAPI_Double& theOffset1,
+                const bool theReverseOffset1,
+                const ModelHighAPI_Selection& thePlane2);
 
 #endif /* SRC_CONSTRUCTIONAPI_CONSTRUCTIONAPI_AXIS_H_ */

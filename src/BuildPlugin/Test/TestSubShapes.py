@@ -128,4 +128,22 @@ aSession.finishOperation()
 assert (len(aSubShapesFeature.results()) > 0)
 
 import model
+
+model.begin()
+partSet = model.moduleDocument()
+Part_1 = model.addPart(partSet)
+Part_1_doc = Part_1.document()
+Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
+SketchCircle_1 = Sketch_1.addCircle(-454.545454545455, 50.600343053173, 137.95899463189)
+SketchCircle_2 = Sketch_1.addCircle(-454.545454545455, 50.600343053173, 62.129572131303)
+SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchCircle_1.center(), SketchCircle_2.center())
+SketchPoint_1 = Sketch_1.addPoint(-490.566037735849, 50.600343053173)
+SketchPoint_2 = Sketch_1.addPoint(-423.670668953688, 50.600343053173)
+model.do()
+Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchCircle_1_2f")])
+Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchCircle_2_2r")])
+SubShapes_1 = model.addSubShapes(Part_1_doc, model.selection("FACE", "Face_1_1"), [model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1"), model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_2")])
+SubShapes_1.setBaseShape(model.selection("FACE", "Face_2_1"))
+model.end()
+
 assert(model.checkPythonDump())
