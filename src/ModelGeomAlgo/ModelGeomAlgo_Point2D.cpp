@@ -120,7 +120,7 @@ namespace ModelGeomAlgo_Point2D {
                             const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
                             const std::shared_ptr<GeomAPI_Dir>& theDirX,
                             const std::shared_ptr<GeomAPI_Dir>& theDirY,
-                            std::set<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
+                            std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
                             std::map<std::shared_ptr<GeomDataAPI_Point2D>,
                                      std::shared_ptr<GeomAPI_Pnt> >& theAttributeToPoint)
   {
@@ -132,7 +132,7 @@ namespace ModelGeomAlgo_Point2D {
       std::shared_ptr<GeomAPI_Pnt> aPoint = aPnt2d->to3D(theOrigin, theDirX, theDirY);
       std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
       if (isPointOnEdge(theBaseShape, aPoint, aProjectedPoint)) {
-        thePoints.insert(aProjectedPoint);
+        thePoints.push_back(aProjectedPoint);
         theAttributeToPoint[anAttribute] = aProjectedPoint;
       }
     }

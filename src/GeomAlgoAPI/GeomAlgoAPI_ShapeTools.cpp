@@ -672,8 +672,8 @@ bool GeomAlgoAPI_ShapeTools::isParallel(const std::shared_ptr<GeomAPI_Edge> theE
 
 //==================================================================================================
 void GeomAlgoAPI_ShapeTools::splitShape(const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
-                                        const std::set<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
-                                        std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes)
+                                          const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
+                                          std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes)
 {
   // General Fuse to split edge by vertices
   BOPAlgo_Builder aBOP;
@@ -685,7 +685,7 @@ void GeomAlgoAPI_ShapeTools::splitShape(const std::shared_ptr<GeomAPI_Shape>& th
     Standard_Real aFirst, aLast;
     Handle(Geom_Curve) aCurve = BRep_Tool::Curve(aBaseEdge, aFirst, aLast);
 
-    std::set<std::shared_ptr<GeomAPI_Pnt> >::const_iterator aPIt = thePoints.begin();
+    std::list<std::shared_ptr<GeomAPI_Pnt> >::const_iterator aPIt = thePoints.begin();
     gp_Pnt aPoint((*aPIt)->x(), (*aPIt)->y(), (*aPIt)->z());
 
     TopAbs_Orientation anOrientation = aBaseEdge.Orientation();
@@ -694,7 +694,7 @@ void GeomAlgoAPI_ShapeTools::splitShape(const std::shared_ptr<GeomAPI_Shape>& th
   }
   aBOP.AddArgument(aBaseEdge);
 
-  std::set<std::shared_ptr<GeomAPI_Pnt> >::const_iterator aPtIt = thePoints.begin();
+  std::list<std::shared_ptr<GeomAPI_Pnt> >::const_iterator aPtIt = thePoints.begin();
   for (; aPtIt != thePoints.end(); ++aPtIt) {
     std::shared_ptr<GeomAPI_Pnt> aPnt = *aPtIt;
     TopoDS_Vertex aV = BRepBuilderAPI_MakeVertex(gp_Pnt(aPnt->x(), aPnt->y(), aPnt->z()));
@@ -713,4 +713,35 @@ void GeomAlgoAPI_ShapeTools::splitShape(const std::shared_ptr<GeomAPI_Shape>& th
     anEdge->setImpl(new TopoDS_Shape(anIt.Value()));
     theShapes.insert(anEdge);
   }
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::findShape(
+                                  const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
+                                  const std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes)
+{
+  std::shared_ptr<GeomAPI_Shape> aResultShape;
+
+  if (thePoints.size() == 2) {
+    std::list<std::shared_ptr<GeomAPI_Pnt> >::const_iterator aPntIt = thePoints.begin();
+    std::shared_ptr<GeomAPI_Pnt> aFirstPoint = *aPntIt;
+    aPntIt++;
+    std::shared_ptr<GeomAPI_Pnt> aLastPoint = *aPntIt;
+
+    std::set<std::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = theShapes.begin(),
+                                                              aLast = theShapes.end();
+    for (; anIt != aLast; anIt++) {
+      GeomShapePtr aShape = *anIt;
+      std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aShape));
+      if (anEdge.get()) {
+        std::shared_ptr<GeomAPI_Pnt> anEdgeFirstPoint = anEdge->firstPoint();
+        std::shared_ptr<GeomAPI_Pnt> anEdgeLastPoint = anEdge->lastPoint();
+        if (anEdgeFirstPoint->isEqual(aFirstPoint) &&
+            anEdgeLastPoint->isEqual(aLastPoint))
+            aResultShape = aShape;
+      }
+    }
+  }
+
+  return aResultShape;
 }

@@ -10,6 +10,8 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomAlgoAPI_ShapeTools.h>
+
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeRefAttr.h>
@@ -311,6 +313,54 @@ void SketchPlugin_ConstraintSplit::execute()
 bool SketchPlugin_ConstraintSplit::isMacro() const
 {
   return true;
+}
+
+AISObjectPtr SketchPlugin_ConstraintSplit::getAISObject(AISObjectPtr thePrevious)
+{
+  AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                                           data()->attribute(SketchPlugin_Constraint::VALUE()));
+  FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
+
+  AttributePoint2DPtr aFirstPointAttrOfSplit = getPointOfRefAttr(
+                                        data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  AttributePoint2DPtr aSecondPointAttrOfSplit = getPointOfRefAttr(
+                                        data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
+
+  if (aBaseObjectAttr->isInitialized() && aBaseFeature.get() &&
+      aFirstPointAttrOfSplit->isInitialized() &&
+      aSecondPointAttrOfSplit->isInitialized()) {
+
+    ResultPtr aResult = getFeatureResult(aBaseFeature);
+    GeomShapePtr aBaseShape = aResult->shape();
+    std::list<std::shared_ptr<GeomAPI_Pnt> > aPoints;
+
+    std::shared_ptr<GeomAPI_Pnt2d> aStartPnt2d = aFirstPointAttrOfSplit->pnt();
+    std::shared_ptr<GeomAPI_Pnt> aStartPoint = sketch()->to3D(aStartPnt2d->x(), aStartPnt2d->y());
+    aPoints.push_back(aStartPoint);
+
+    std::shared_ptr<GeomAPI_Pnt2d> aSecondPnt2d = aSecondPointAttrOfSplit->pnt();
+    std::shared_ptr<GeomAPI_Pnt> aSecondPoint = sketch()->to3D(aSecondPnt2d->x(), aSecondPnt2d->y());
+    aPoints.push_back(aSecondPoint);
+
+    std::set<std::shared_ptr<GeomAPI_Shape> > aSplitShapes;
+
+    GeomAlgoAPI_ShapeTools::splitShape(aBaseShape, aPoints, aSplitShapes);
+    std::shared_ptr<GeomAPI_Shape> aShape = GeomAlgoAPI_ShapeTools::findShape(aPoints, aSplitShapes);
+
+    AISObjectPtr anAIS = thePrevious;
+    if (aShape) {
+      if (!anAIS)
+        anAIS = AISObjectPtr(new GeomAPI_AISObject);
+      anAIS->createShape(aShape);
+      anAIS->setWidth(5);
+      std::vector<int> aColor;
+      aColor = Config_PropManager::color("Visualization", "sketch_entity_color",
+                                          SKETCH_ENTITY_COLOR);
+     anAIS->setColor(aColor[0], aColor[1], aColor[2]);
+    }
+    return anAIS;
+  }
+  return AISObjectPtr();
 }
 
 std::shared_ptr<GeomDataAPI_Point2D> SketchPlugin_ConstraintSplit::getPointOfRefAttr(

@@ -85,6 +85,9 @@ class SketchPlugin_ConstraintSplit : public SketchPlugin_ConstraintBase
   //  return myPointFeaturesMap;
   //};
 
+  /// Returns the AIS preview
+  SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
+
 private:
   /// Returns geom point attribute of the feature bounds. It processes line or arc.
   /// For circle feature, the result attributes are null

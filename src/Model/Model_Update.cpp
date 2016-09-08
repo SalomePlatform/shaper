@@ -105,6 +105,14 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
     static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
     aFactory->validate(theFeature); // need to be validated to update the "Apply" state if not previewed
 
+    // to redisplay split's arguments presentation, even result is not computed
+    if (!theFeature->isPreviewNeeded()) {
+      static Events_Loop* aLoop = Events_Loop::loop();
+      static const Events_ID kRedisplayEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+      ModelAPI_EventCreator::get()->sendUpdated(theFeature, kRedisplayEvent);
+      aLoop->flush(kRedisplayEvent);
+    }
+
     if (!myIsPreviewBlocked)
       return true;
   }

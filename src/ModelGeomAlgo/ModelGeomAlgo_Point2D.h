@@ -69,7 +69,7 @@ namespace ModelGeomAlgo_Point2D {
                               const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
                               const std::shared_ptr<GeomAPI_Dir>& theDirX,
                               const std::shared_ptr<GeomAPI_Dir>& theDirY,
-                              std::set<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
+                              std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
                               std::map<std::shared_ptr<GeomDataAPI_Point2D>,
                                        std::shared_ptr<GeomAPI_Pnt> >& theAttributeToPoint);
 

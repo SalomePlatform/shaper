@@ -246,7 +246,7 @@ void PartSet_WidgetSubShapeSelector::fillObjectShapes(const ObjectPtr& theObject
     std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
         aData->attribute(SketchPlugin_Sketch::NORM_ID()));
     std::shared_ptr<GeomAPI_Dir> aY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
-    std::set<std::shared_ptr<GeomAPI_Pnt> > aPoints;
+    std::list<std::shared_ptr<GeomAPI_Pnt> > aPoints;
     ModelGeomAlgo_Point2D::getPointsInsideShape(aFeatureShape, aRefAttributes, aC->pnt(),
                                                 aX->dir(), aY, aPoints, aPointToAttributes);
 

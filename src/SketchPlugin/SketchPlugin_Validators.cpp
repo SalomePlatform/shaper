@@ -863,7 +863,7 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
         aData->attribute(SketchPlugin_Sketch::NORM_ID()));
     std::shared_ptr<GeomAPI_Dir> aDirY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
     
-    std::set<std::shared_ptr<GeomAPI_Pnt> > aPoints;
+    std::list<std::shared_ptr<GeomAPI_Pnt> > aPoints;
     std::map<std::shared_ptr<GeomDataAPI_Point2D>, std::shared_ptr<GeomAPI_Pnt> > aPointToAttributes;
     ModelGeomAlgo_Point2D::getPointsInsideShape(anAttrShape, aRefAttributes, aC->pnt(),
                                                 aX->dir(), aDirY, aPoints, aPointToAttributes);
