@@ -1,13 +1,13 @@
 """
       TestBoolean.py
       Unit test of FeaturesPlugin_Boolean class
-      
+
       class FeaturesPlugin_Boolean
         static const std::string MY_ID("Boolean");
         static const std::string MY_OBJECT_ID("main_object");
         static const std::string MY_TOOL_ID("tool_object");
         static const std::string MY_TYPE_ID("bool_type");
-        
+
         data()->addAttribute(FeaturesPlugin_Boolean::OBJECT_ID(), ModelAPI_AttributeReference::typeId());
         data()->addAttribute(FeaturesPlugin_Boolean::TOOL_ID(), ModelAPI_AttributeReference::typeId());
         data()->addAttribute(FeaturesPlugin_Boolean::TYPE_ID(), ModelAPI_AttributeInteger::typeId());
@@ -96,7 +96,7 @@ for eachSketchFeature in [aCircleSketchFeature, aTriangleSketchFeature]:
     anExtrusionFt.real("from_size").setValue(0)
     anExtrusionFt.real("to_size").setValue(50)
     anExtrusionFt.real("to_offset").setValue(0) #TODO: remove
-    anExtrusionFt.real("from_offset").setValue(0) #TODO: remove	
+    anExtrusionFt.real("from_offset").setValue(0) #TODO: remove
     anExtrusionFt.execute()
     extrudedObjects.append(modelAPI_ResultBody(anExtrusionFt.firstResult()))
 aSession.finishOperation()
@@ -120,4 +120,35 @@ assert (aBooleanResult is not None)
 #=========================================================================
 
 import model
+
+model.begin()
+partSet = model.moduleDocument()
+Part_1 = model.addPart(partSet)
+Part_1_doc = Part_1.document()
+Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
+SketchCircle_1 = Sketch_1.addCircle(-353.344768439108, 0.857632933105, 175.14200032067)
+model.do()
+Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
+SketchCircle_2 = Sketch_2.addCircle(-126.929674099485, -2.572898799314, 176.971885556791)
+model.do()
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f"), model.selection("FACE", "Sketch_2/Face-SketchCircle_2_2f")], model.selection(), 10, 0)
+Boolean_1 = model.addCommon(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], [model.selection("SOLID", "Extrusion_1_2")])
+model.end()
+assert(len(Boolean_1.result()) > 0)
+
+model.begin()
+partSet = model.moduleDocument()
+Part_1 = model.addPart(partSet)
+Part_1_doc = Part_1.document()
+Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
+SketchCircle_1 = Sketch_1.addCircle(-353.344768439108, 0.857632933105, 175.14200032067)
+model.do()
+Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
+SketchCircle_2 = Sketch_2.addCircle(-126.929674099485, -2.572898799314, 176.971885556791)
+model.do()
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f"), model.selection("FACE", "Sketch_2/Face-SketchCircle_2_2f")], model.selection(), 10, 0)
+Boolean_1 = model.addSmash(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], [model.selection("SOLID", "Extrusion_1_2")])
+model.end()
+assert(len(Boolean_1.result()) > 0)
+
 assert(model.checkPythonDump())
