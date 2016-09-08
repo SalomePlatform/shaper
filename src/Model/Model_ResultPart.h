@@ -79,6 +79,9 @@ protected:
   /// makes a result on a temporary feature (an action)
   Model_ResultPart();
 
+  /// returns sum of transformations of the whole sequence of transformation-parts
+  gp_Trsf sumTrsf();
+
   /// Returns true if document is activated (loaded into the memory)
   virtual bool isActivated();
 

@@ -283,6 +283,15 @@ bool Model_ResultPart::updateInPart(const int theIndex)
   return false; // something is wrong
 }
 
+gp_Trsf Model_ResultPart::sumTrsf() {
+  gp_Trsf aResult;
+  if (myTrsf) {
+    aResult = *myTrsf;
+    aResult = aResult * baseRef()->sumTrsf();
+  }
+  return aResult;
+}
+
 std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shapeInPart(
   const std::string& theName, const std::string& theType, int& theIndex)
 {
@@ -305,6 +314,11 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shapeInPart(
   aSelAttr->append(theName, theType);
   theIndex = aSelAttr->size();
   aResult = aSelAttr->value(theIndex - 1)->value();
+  if (myTrsf.get() && aResult.get() && !aResult->isNull()) {
+    gp_Trsf aSumTrsf = sumTrsf();
+    TopoDS_Shape anOrigMoved = aResult->impl<TopoDS_Shape>().Moved(aSumTrsf);
+    aResult->setImpl(new TopoDS_Shape(anOrigMoved));
+  }
   return aResult;
 }
 
@@ -317,6 +331,11 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::selectionValue(const int theInd
 
   AttributeSelectionListPtr aSelAttr = aDoc->selectionInPartFeature();
   aResult = aSelAttr->value(theIndex - 1)->value();
+  if (myTrsf.get() && aResult.get() && !aResult->isNull()) {
+    gp_Trsf aSumTrsf = sumTrsf();
+    TopoDS_Shape anOrigMoved = aResult->impl<TopoDS_Shape>().Moved(aSumTrsf);
+    aResult->setImpl(new TopoDS_Shape(anOrigMoved));
+  }
   return aResult;
 }
 
