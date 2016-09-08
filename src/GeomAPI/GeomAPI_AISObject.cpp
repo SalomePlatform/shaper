@@ -386,6 +386,10 @@ bool GeomAPI_AISObject::setDeflection(const double theDeflection)
       if (fabs(aCoefficient-theDeflection) > Precision::Confusion()) {
         isModified = true;
         anAISShape->SetOwnDeviationCoefficient(theDeflection);
+        // redisplay is necessary here to update presentation in all modes
+        // Standard True flag. Displayer uses Standard False flag. If it will be changed in
+        // displayer, redisplay here will not be necessary. But performance should be checked.
+        anAISShape->Redisplay(Standard_True);
       }
     }
   }
