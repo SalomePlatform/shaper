@@ -410,6 +410,10 @@ size_t ParseName(const std::string& theSubShapeName,   std::list<std::string>& t
 const TopoDS_Shape findCommonShape(
   const TopAbs_ShapeEnum theType, const TopTools_ListOfShape& theList)
 {
+  if(theList.IsEmpty()) {
+    return TopoDS_Shape();
+  }
+
   TopoDS_Shape aShape;
   std::vector<TopTools_MapOfShape> aVec;
   TopTools_MapOfShape aMap1, aMap2, aMap3, aMap4;
