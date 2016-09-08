@@ -412,6 +412,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
         // it should be postponed to exit from the selectionChanged processing
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
         ModelAPI_EventCreator::get()->sendUpdated(myFeature, anEvent);
+        Events_Loop::loop()->flush(anEvent);
         return;
       }
     }
