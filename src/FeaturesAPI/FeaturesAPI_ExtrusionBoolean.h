@@ -86,6 +86,9 @@ private:
   void execIfBaseNotEmpty();
 };
 
+/// \class FeaturesAPI_ExtrusionCut
+/// \ingroup CPPHighAPI
+/// \brief Interface for ExtrusionCut feature.
 class FeaturesAPI_ExtrusionCut: public FeaturesAPI_ExtrusionBoolean
 {
 public:
@@ -218,6 +221,9 @@ ExtrusionCutPtr addExtrusionCut(const std::shared_ptr<ModelAPI_Document>& thePar
                                 const ModelHighAPI_Double& theFromOffset,
                                 const std::list<ModelHighAPI_Selection>& theBooleanObjects);
 
+/// \class FeaturesAPI_ExtrusionFuse
+/// \ingroup CPPHighAPI
+/// \brief Interface for ExtrusionFuse feature.
 class FeaturesAPI_ExtrusionFuse: public FeaturesAPI_ExtrusionBoolean
 {
 public:

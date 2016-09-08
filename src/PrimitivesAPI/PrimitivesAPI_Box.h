@@ -17,7 +17,7 @@
 class ModelHighAPI_Double;
 class ModelHighAPI_Selection;
 
-/// \class PrimitivesPlugin_Box
+/// \class PrimitivesAPI_Box
 /// \ingroup CPPHighAPI
 /// \brief Interface for primitive Box feature.
 class PrimitivesAPI_Box: public ModelHighAPI_Interface

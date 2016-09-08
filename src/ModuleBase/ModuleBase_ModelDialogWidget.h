@@ -12,6 +12,9 @@
 
 class QDialogButtonBox;
 
+/// \class ModuleBase_ModelDialogWidget
+/// \ingroup GUI
+/// \brief Widget for dialog.
 class MODULEBASE_EXPORT ModuleBase_ModelDialogWidget : public ModuleBase_ModelWidget
 {
 Q_OBJECT

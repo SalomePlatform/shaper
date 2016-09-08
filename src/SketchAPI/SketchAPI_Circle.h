@@ -14,7 +14,7 @@
 
 class ModelHighAPI_Selection;
 
-/// \class FeaturesAPI_Boolean
+/// \class SketchAPI_Circle
 /// \ingroup CPPHighAPI
 /// \brief Interface for Circle feature.
 class SketchAPI_Circle: public SketchAPI_SketchEntity

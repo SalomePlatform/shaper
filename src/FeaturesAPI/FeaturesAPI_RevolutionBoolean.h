@@ -88,6 +88,9 @@ private:
   void execIfBaseNotEmpty();
 };
 
+/// \class FeaturesAPI_RevolutionCut
+/// \ingroup CPPHighAPI
+/// \brief Interface for RevolutionCut feature.
 class FeaturesAPI_RevolutionCut: public FeaturesAPI_RevolutionBoolean
 {
 public:
@@ -162,6 +165,9 @@ RevolutionCutPtr addRevolutionCut(const std::shared_ptr<ModelAPI_Document>& theP
                                   const ModelHighAPI_Double& theFromOffset,
                                   const std::list<ModelHighAPI_Selection>& theBooleanObjects);
 
+/// \class FeaturesAPI_RevolutionFuse
+/// \ingroup CPPHighAPI
+/// \brief Interface for RevolutionFuse feature.
 class FeaturesAPI_RevolutionFuse: public FeaturesAPI_RevolutionBoolean
 {
 public:

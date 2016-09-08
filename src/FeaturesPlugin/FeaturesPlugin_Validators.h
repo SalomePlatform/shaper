@@ -202,9 +202,9 @@ class FeaturesPlugin_ValidatorUnionArguments: public ModelAPI_FeatureValidator
   virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
-/// \class FeaturesPlugin_ValidatorUnionArguments
+/// \class FeaturesPlugin_ValidatorConcealedResult
 /// \ingroup Validators
-/// \brief Validator for the "Union" feature.
+/// \brief Validator for the "Recover" feature.
 class FeaturesPlugin_ValidatorConcealedResult: public ModelAPI_AttributeValidator
 {
  public:

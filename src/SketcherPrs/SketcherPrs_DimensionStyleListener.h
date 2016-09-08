@@ -18,6 +18,7 @@
 #include <string>
 
 /**
+* \class SketcherPrs_DimensionStyleListener
 * \ingroup GUI
 * A class for representation of linear dimension constraint.
 * It supports SketchPlugin_ConstraintLength and SketchPlugin_ConstraintDistance features.

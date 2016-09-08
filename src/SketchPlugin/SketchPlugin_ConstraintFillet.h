@@ -25,6 +25,7 @@
 class SketchPlugin_ConstraintFillet : public SketchPlugin_ConstraintBase
 {
  public:
+   /// \struct Struct to store base edges with states, result edges and constraints.
    struct FilletFeatures {
     std::list<std::pair<FeaturePtr, bool>> baseEdgesState; ///< list of objects the fillet is based and its states
     std::list<FeaturePtr> resultEdges; ///< list of result edges

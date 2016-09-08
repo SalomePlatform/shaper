@@ -14,6 +14,8 @@
 #include <gp_Pnt.hxx>
 #include <gp_XYZ.hxx>
 
+/// \struct ThreePoints
+/// \brief Used to store info about angle point and state.
 struct ThreePoints {
   gp_Pnt myCenter;
   gp_Pnt myFirst;

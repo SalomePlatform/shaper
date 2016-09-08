@@ -79,7 +79,7 @@ public:
   virtual void dump(ModelHighAPI_Dumper& theDumper) const {}
 
 protected:
-  std::shared_ptr<ModelAPI_Feature> myFeature;
+  std::shared_ptr<ModelAPI_Feature> myFeature; ///< feature of this interface
 
   std::map<std::string, std::string> myAttrGetter; ///< names of attributes and their getters
 };
