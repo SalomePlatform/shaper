@@ -26,14 +26,13 @@ XGUI_DeflectionDialog::XGUI_DeflectionDialog(QWidget* theParent)
   myDeflection->setDecimals(12);
   myDeflection->setRange(0, 1);
   myDeflection->setSingleStep(0.001);
-  aLay->addWidget(new QLabel(tr("Deflection value"), this), 0, 0);
-  aLay->addWidget(myDeflection, 0, 1);
+  aLay->addWidget(myDeflection, 0, 0);
 
   QDialogButtonBox* aButtons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                                                     Qt::Horizontal, this);
   connect(aButtons, SIGNAL(accepted()), this, SLOT(accept()));
   connect(aButtons, SIGNAL(rejected()), this, SLOT(reject()));
-  aLay->addWidget(aButtons, 1, 0, 1, 2);
+  aLay->addWidget(aButtons, 1, 0);
 }
 
 void XGUI_DeflectionDialog::setDeflection(const double& theValue)
