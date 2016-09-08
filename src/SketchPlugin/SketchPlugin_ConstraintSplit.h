@@ -111,8 +111,15 @@ private:
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature/*,
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToPoint*/);
 
+  /// Obtains references to feature point attributes and to feature,
+  /// e.g. for feature line: 1st container is <1st line point, list<entity_a in distance, entity_b in parallel> >
+  ///                                         <2nd line point, list<> >
+  ///      for feature circle 2nd container is <entity_a in Radius, entity_b in equal, ...>
+  /// \param theFeature an investigated feature
+  /// \param theRefs a container of list of referenced attributes
   void getRefAttributes(const FeaturePtr& theFeature,
-                        std::map<AttributePtr, std::list<AttributePtr> >& theRefs);
+                        std::map<AttributePtr, std::list<AttributePtr> >& theRefs,
+                        std::list<AttributePtr>& theRefsToFeature);
 
   /// Move coincidence constraint from feature to point if it is found
   /// \param theCoincidenceToFeature coincidence to feature to be connected to new feature
@@ -129,6 +136,13 @@ private:
   void updateTangentConstraintsToFeature(
               const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theTangentFeatures,
               const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences);
+
+
+  /// Move constraints from base feature to given feature
+  /// \param theFeature a base feature
+  /// \param theRefsToFeature list of attributes referenced to base feature
+  void updateRefFeatureConstraints(const std::shared_ptr<ModelAPI_Result>& theFeatureBaseResult,
+                                   const std::list<AttributePtr>& theRefsToFeature);
 
   /// Move constraints from attribute of base feature to attribute after modification
   /// \param theBaseRefAttributes container of references to the attributes of base feature

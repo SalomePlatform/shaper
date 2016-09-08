@@ -94,7 +94,8 @@ void SketchPlugin_ConstraintSplit::execute()
   getConstraints(aFeaturesToDelete, aFeaturesToUpdate, aTangentFeatures, aCoincidenceToFeature);
 
   std::map<AttributePtr, std::list<AttributePtr> > aBaseRefAttributes;
-  getRefAttributes(aBaseFeature, aBaseRefAttributes);
+  std::list<AttributePtr> aRefsToFeature;
+  getRefAttributes(aBaseFeature, aBaseRefAttributes, aRefsToFeature);
 
   std::map<AttributePtr, AttributePtr> aBasePointModifiedAttributes;
 
@@ -166,6 +167,22 @@ void SketchPlugin_ConstraintSplit::execute()
     std::cout << aPointAttr->id().c_str() << ": " << "[" << aRefAttributes.size() << "] " << aRefsInfo << std::endl;
   }
   std::cout << std::endl;
+  std::cout << std::endl << "References to base feature [" << aRefsToFeature.size() << "]" << std::endl;
+  std::list<AttributePtr>::const_iterator aRefAttrIt = aRefsToFeature.begin(),
+                                          aRefAttrLast = aRefsToFeature.end();
+  std::string aRefsInfo;
+  for (; aRefAttrIt != aRefAttrLast; aRefAttrIt++) {
+    if (!aRefsInfo.empty())
+      aRefsInfo.append(",");
+    AttributePtr aRAttr = *aRefAttrIt;
+    aRefsInfo.append(aRAttr->id());
+    FeaturePtr aRFeature = ModelAPI_Feature::feature(aRAttr->owner());
+    aRefsInfo.append("(" + aRFeature->name() + ") ");
+  }
+  std::cout << "[" << aRefsToFeature.size() << "] " << aRefsInfo << std::endl;
+
+
+  std::cout << std::endl;
   std::cout << "---- SPLIT ----" << std::endl;
   std::cout << std::endl;
 #endif
@@ -185,8 +202,11 @@ void SketchPlugin_ConstraintSplit::execute()
     FeaturePtr aCircleFeature = aBaseFeature;
     splitCircle(aSplitFeature, aBaseFeature, anAfterFeature, aFurtherCoincidences, aCreatedFeatures,
                 aModifiedAttributes);
+
+    updateRefFeatureConstraints(getFeatureResult(aBaseFeature), aRefsToFeature);
+
     aFeaturesToDelete.insert(aCircleFeature);
-    aBaseObjectAttr->setObject(ResultPtr()); // as circle is removed, temporary fill this attribute
+    aBaseObjectAttr->setObject(ResultPtr()); // as circle is removed, temporary fill this attribute*/
   }
 
 #ifdef DEBUG_SPLIT
@@ -459,7 +479,8 @@ void SketchPlugin_ConstraintSplit::getConstraints(std::set<FeaturePtr>& theFeatu
 }
 
 void SketchPlugin_ConstraintSplit::getRefAttributes(const FeaturePtr& theFeature,
-                                                    std::map<AttributePtr, std::list<AttributePtr> >& theRefs)
+                                                    std::map<AttributePtr, std::list<AttributePtr> >& theRefs,
+                                                    std::list<AttributePtr>& theRefsToFeature)
 {
   theRefs.clear();
 
@@ -470,7 +491,10 @@ void SketchPlugin_ConstraintSplit::getRefAttributes(const FeaturePtr& theFeature
   for (; aPIt != aPLast; aPIt++)
     aPointAttributesSet.insert(*aPIt);
 
-  const std::set<AttributePtr>& aRefsAttributes = theFeature->data()->refsToMe();
+  std::set<AttributePtr> aRefsAttributes = getFeatureResult(theFeature)->data()->refsToMe();
+  std::set<AttributePtr> aFRefsList = theFeature->data()->refsToMe();
+  aRefsAttributes.insert(aFRefsList.begin(), aFRefsList.end());
+
   std::set<AttributePtr>::const_iterator aIt;
   for (aIt = aRefsAttributes.cbegin(); aIt != aRefsAttributes.cend(); ++aIt) {
     AttributePtr anAttr = (*aIt);
@@ -478,7 +502,7 @@ void SketchPlugin_ConstraintSplit::getRefAttributes(const FeaturePtr& theFeature
     if (anAttrFeature.get() != this &&
         anAttr.get() && anAttr->attributeType() == ModelAPI_AttributeRefAttr::typeId()) {
       AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttr);
-      if (!aRefAttr->isObject()) {
+      if (!aRefAttr->isObject()) { /// find attributes referenced to feature point attributes
         AttributePtr anAttrInRef = aRefAttr->attr();
         if (anAttrInRef.get() && aPointAttributesSet.find(anAttrInRef) != aPointAttributesSet.end()) {
           if (theRefs.find(anAttrInRef) != theRefs.end())
@@ -489,6 +513,9 @@ void SketchPlugin_ConstraintSplit::getRefAttributes(const FeaturePtr& theFeature
             theRefs[anAttrInRef] = anAttrList;
           }
         }
+      }
+      else { /// find attributes referenced to feature itself
+        theRefsToFeature.push_back(anAttr);
       }
     }
   }
@@ -582,6 +609,18 @@ void SketchPlugin_ConstraintSplit::updateTangentConstraintsToFeature(
 #ifdef DEBUG_SPLIT
   std::cout << " -" << getFeatureInfo(aTangentFeature) << std::endl;
 #endif
+  }
+}
+
+void SketchPlugin_ConstraintSplit::updateRefFeatureConstraints(const ResultPtr& theFeatureBaseResult,
+                                                               const std::list<AttributePtr>& theRefsToFeature)
+{
+  std::list<AttributePtr>::const_iterator anIt = theRefsToFeature.begin(),
+                                          aLast = theRefsToFeature.end();
+  for (; anIt != aLast; anIt++) {
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anIt);
+    if (aRefAttr.get())
+      aRefAttr->setObject(theFeatureBaseResult);
   }
 }
 
