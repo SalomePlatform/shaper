@@ -20,10 +20,6 @@
 #include <GeomAlgoAPI_Placement.h>
 #include <GeomAlgoAPI_Transform.h>
 
-#define _MODIFIEDF_TAG 1
-#define _MODIFIEDE_TAG 2
-#define _MODIFIEDV_TAG 3
-#define _FACE 4
 FeaturesPlugin_Placement::FeaturesPlugin_Placement()
 {
 }
@@ -174,7 +170,7 @@ void FeaturesPlugin_Placement::execute()
 
       //LoadNamingDS
       std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-      LoadNamingDS(aTransformAlgo, aResultBody, aBaseShape);
+      loadNamingDS(aTransformAlgo, aResultBody, aBaseShape);
       setResult(aResultBody, aResultIndex);
     }
     aResultIndex++;
@@ -185,18 +181,35 @@ void FeaturesPlugin_Placement::execute()
 }
 
 //============================================================================
-void FeaturesPlugin_Placement::LoadNamingDS(GeomAlgoAPI_Transform& theTransformAlgo,
+void FeaturesPlugin_Placement::loadNamingDS(GeomAlgoAPI_Transform& theTransformAlgo,
                                             std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                            std::shared_ptr<GeomAPI_Shape> theSlaveObject)
+                                            std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {
   //load result
-  theResultBody->storeModified(theSlaveObject, theTransformAlgo.shape()); // the initial Slave, the resulting Slave
+  theResultBody->storeModified(theBaseShape, theTransformAlgo.shape());
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theTransformAlgo.mapOfSubShapes();
 
     // put modifed faces in DF
-  std::string aModName = "Modified";
-  theResultBody->loadAndOrientModifiedShapes(&theTransformAlgo,
-                                             theSlaveObject, _FACE,
-                                             _MODIFIEDF_TAG, aModName, *aSubShapes.get());
+  int aPlacedTag = 1;
+  std::string aPlacedName = "Placed";
+
+  switch(theBaseShape->shapeType()) {
+    case GeomAPI_Shape::COMPOUND:
+    case GeomAPI_Shape::COMPSOLID:
+    case GeomAPI_Shape::SOLID:
+    case GeomAPI_Shape::SHELL:
+      theResultBody->loadAndOrientModifiedShapes(&theTransformAlgo,
+                                                 theBaseShape, GeomAPI_Shape::FACE,
+                                                 aPlacedTag, aPlacedName + "_Face", *aSubShapes.get());
+    case GeomAPI_Shape::FACE:
+    case GeomAPI_Shape::WIRE:
+      theResultBody->loadAndOrientModifiedShapes(&theTransformAlgo,
+                                                 theBaseShape, GeomAPI_Shape::EDGE,
+                                                 ++aPlacedTag, aPlacedName + "_Edge", *aSubShapes.get());
+    case GeomAPI_Shape::EDGE:
+      theResultBody->loadAndOrientModifiedShapes(&theTransformAlgo,
+                                                 theBaseShape, GeomAPI_Shape::VERTEX,
+                                                 ++aPlacedTag, aPlacedName + "_Vertex", *aSubShapes.get());
+  }
 }

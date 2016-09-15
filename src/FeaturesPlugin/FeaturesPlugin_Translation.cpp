@@ -128,8 +128,23 @@ void FeaturesPlugin_Translation::loadNamingDS(GeomAlgoAPI_Translation& theTransl
 
   int aTranslatedTag = 1;
   std::string aTranslatedName = "Translated";
-  theResultBody->loadAndOrientModifiedShapes(&theTranslationAlgo,
-                                             theBaseShape, GeomAPI_Shape::FACE,
-                                             aTranslatedTag, aTranslatedName, *aSubShapes.get());
 
+  switch(theBaseShape->shapeType()) {
+    case GeomAPI_Shape::COMPOUND:
+    case GeomAPI_Shape::COMPSOLID:
+    case GeomAPI_Shape::SOLID:
+    case GeomAPI_Shape::SHELL:
+      theResultBody->loadAndOrientModifiedShapes(&theTranslationAlgo,
+                                                 theBaseShape, GeomAPI_Shape::FACE,
+                                                 aTranslatedTag, aTranslatedName + "_Face", *aSubShapes.get());
+    case GeomAPI_Shape::FACE:
+    case GeomAPI_Shape::WIRE:
+      theResultBody->loadAndOrientModifiedShapes(&theTranslationAlgo,
+                                                 theBaseShape, GeomAPI_Shape::EDGE,
+                                                 ++aTranslatedTag, aTranslatedName + "_Edge", *aSubShapes.get());
+    case GeomAPI_Shape::EDGE:
+      theResultBody->loadAndOrientModifiedShapes(&theTranslationAlgo,
+                                                 theBaseShape, GeomAPI_Shape::VERTEX,
+                                                 ++aTranslatedTag, aTranslatedName + "_Vertex", *aSubShapes.get());
+  }
 }

@@ -125,8 +125,23 @@ void FeaturesPlugin_Rotation::loadNamingDS(GeomAlgoAPI_Rotation& theRotaionAlgo,
 
   int aRotatedTag = 1;
   std::string aRotatedName = "Rotated";
-  theResultBody->loadAndOrientModifiedShapes(&theRotaionAlgo,
-                                             theBaseShape, GeomAPI_Shape::FACE,
-                                             aRotatedTag, aRotatedName, *aSubShapes.get());
 
+  switch(theBaseShape->shapeType()) {
+    case GeomAPI_Shape::COMPOUND:
+    case GeomAPI_Shape::COMPSOLID:
+    case GeomAPI_Shape::SOLID:
+    case GeomAPI_Shape::SHELL:
+      theResultBody->loadAndOrientModifiedShapes(&theRotaionAlgo,
+                                                 theBaseShape, GeomAPI_Shape::FACE,
+                                                 aRotatedTag, aRotatedName + "_Face", *aSubShapes.get());
+    case GeomAPI_Shape::FACE:
+    case GeomAPI_Shape::WIRE:
+      theResultBody->loadAndOrientModifiedShapes(&theRotaionAlgo,
+                                                 theBaseShape, GeomAPI_Shape::EDGE,
+                                                 ++aRotatedTag, aRotatedName + "_Edge", *aSubShapes.get());
+    case GeomAPI_Shape::EDGE:
+      theResultBody->loadAndOrientModifiedShapes(&theRotaionAlgo,
+                                                 theBaseShape, GeomAPI_Shape::VERTEX,
+                                                 ++aRotatedTag, aRotatedName + "_Vertex", *aSubShapes.get());
+  }
 }
