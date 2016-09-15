@@ -20,6 +20,7 @@
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Vertex.h>
+#include <GeomAPI_XYZ.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeIntArray.h>
@@ -358,19 +359,13 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByTwoParallelPlan
   std::shared_ptr<GeomAPI_Face> aFace2(new GeomAPI_Face(aFaceShape2));
   std::shared_ptr<GeomAPI_Pln> aPln2 = aFace2->getPlane();
 
-  double aDist = aPln1->distance(aPln2) / 2.0;
+  std::shared_ptr<GeomAPI_Pnt> anOrig1 = aPln1->location();
+  std::shared_ptr<GeomAPI_Pnt> aPntOnPln2 = aPln2->project(anOrig1);
 
-  std::shared_ptr<GeomAPI_Pnt> aOrig1 = aPln1->location();
-  std::shared_ptr<GeomAPI_Dir> aDir1 = aPln1->direction();
+  std::shared_ptr<GeomAPI_Pnt> aNewOrig(new GeomAPI_Pnt(anOrig1->xyz()->added(
+    aPntOnPln2->xyz())->multiplied(0.5)));
 
-  aOrig1->translate(aDir1, aDist);
-  std::shared_ptr<GeomAPI_Pln> aNewPln(new GeomAPI_Pln(aOrig1, aDir1));
-
-  if((aNewPln->distance(aPln2) - aDist) > 1.e-7) {
-    aDir1->reverse();
-    aOrig1->translate(aDir1, 2.0 * aDist);
-    aNewPln.reset(new GeomAPI_Pln(aOrig1, aDir1));
-  }
+  std::shared_ptr<GeomAPI_Pln> aNewPln(new GeomAPI_Pln(aNewOrig, aPln1->direction()));
 
   std::shared_ptr<GeomAPI_Face> aRes = makeRectangularFace(aFace1, aNewPln);
 
