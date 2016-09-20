@@ -24,9 +24,16 @@
 #include <GeomAlgoAPI_ShapeTools.h>
 
 #include <GeomAPI_Face.h>
+#include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
+#include <iostream>
 #include <sstream>
+
+static GeomShapePtr findBase(const GeomShapePtr theObjectShape,
+                             const GeomShapePtr theResultShape,
+                             const GeomAPI_Shape::ShapeType theShapeType,
+                             const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
 
 //=================================================================================================
 FeaturesPlugin_Partition::FeaturesPlugin_Partition()
@@ -126,14 +133,12 @@ void FeaturesPlugin_Partition::storeResult(const ListOfShape& theObjects,
   GeomShapePtr aBaseShape;
   for(ListOfShape::const_iterator anIt = theObjects.cbegin(); anIt != theObjects.cend(); ++anIt) {
     GeomShapePtr anObjectShape = *anIt;
-    ListOfShape aModifiedShapes;
-    theMakeShape->modified(anObjectShape, aModifiedShapes);
-    for(ListOfShape::const_iterator aModIt = aModifiedShapes.cbegin(); aModIt != aModifiedShapes.cend(); ++aModIt) {
-      GeomShapePtr aModShape = *aModIt;
-      if(theResultShape->isSubShape(aModShape)) {
-        aBaseShape = anObjectShape;
-        break;
-      }
+    aBaseShape = findBase(anObjectShape, theResultShape, GeomAPI_Shape::VERTEX, theMakeShape);
+    if(!aBaseShape.get()) {
+      aBaseShape = findBase(anObjectShape, theResultShape, GeomAPI_Shape::EDGE, theMakeShape);
+    }
+    if(!aBaseShape.get()) {
+      aBaseShape = findBase(anObjectShape, theResultShape, GeomAPI_Shape::FACE, theMakeShape);
     }
     if(aBaseShape.get()) {
       break;
@@ -160,17 +165,51 @@ void FeaturesPlugin_Partition::storeResult(const ListOfShape& theObjects,
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfSubShapes = theMakeShape->mapOfSubShapes();
   int anIndex = 1;
   for(ListOfShape::const_iterator anIt = theObjects.cbegin(); anIt != theObjects.cend(); ++anIt) {
+    GeomShapePtr aShape = *anIt;
     std::string aModEdgeName = aModName + "_Edge_" + std::to_string((long long)anIndex);
     std::string aModFaceName = aModName + "_Face_" + std::to_string((long long)anIndex++);
-    aResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::EDGE,
+    aResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), aShape, GeomAPI_Shape::EDGE,
                                              aModTag, aModEdgeName, *aMapOfSubShapes.get(), true);
-    aModTag += 1000;
-    aResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::FACE,
+    aModTag += 10000;
+    aResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), aShape, GeomAPI_Shape::FACE,
                                              aModTag, aModFaceName, *aMapOfSubShapes.get(), true);
-    aModTag += 1000;
-    aResultBody->loadDeletedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::EDGE, aDelTag);
-    aResultBody->loadDeletedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::FACE, aDelTag);
+    aModTag += 10000;
+    aResultBody->loadDeletedShapes(theMakeShape.get(), aShape, GeomAPI_Shape::EDGE, aDelTag);
+    aResultBody->loadDeletedShapes(theMakeShape.get(), aShape, GeomAPI_Shape::FACE, aDelTag);
   }
 
   setResult(aResultBody, theIndex);
+}
+
+
+//=================================================================================================
+GeomShapePtr findBase(const GeomShapePtr theObjectShape,
+                      const GeomShapePtr theResultShape,
+                      const GeomAPI_Shape::ShapeType theShapeType,
+                      const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
+{
+  GeomShapePtr aBaseShape;
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfSubShapes = theMakeShape->mapOfSubShapes();
+  for(GeomAPI_ShapeExplorer anObjectSubShapesExp(theObjectShape, theShapeType);
+      anObjectSubShapesExp.more();
+      anObjectSubShapesExp.next()) {
+    GeomShapePtr anObjectSubShape = anObjectSubShapesExp.current();
+    ListOfShape aModifiedShapes;
+    theMakeShape->modified(anObjectSubShape, aModifiedShapes);
+    for(ListOfShape::const_iterator aModIt = aModifiedShapes.cbegin(); aModIt != aModifiedShapes.cend(); ++aModIt) {
+      GeomShapePtr aModShape = *aModIt;
+      if(aMapOfSubShapes->isBound(aModShape)) {
+        aModShape = aMapOfSubShapes->find(aModShape);
+      }
+      if(theResultShape->isSubShape(aModShape)) {
+        aBaseShape = theObjectShape;
+        break;
+      }
+    }
+    if(aBaseShape.get()) {
+      break;
+    }
+  }
+
+  return aBaseShape;
 }
