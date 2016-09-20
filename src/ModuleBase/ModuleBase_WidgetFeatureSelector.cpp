@@ -184,6 +184,8 @@ void ModuleBase_WidgetFeatureSelector::updateSelectionName()
   if (anObject.get() != NULL) {
     std::string aName = anObject->data()->name();
     myTextLine->setText(QString::fromStdString(aName));
+  } else {
+    myTextLine->clear();
   }
 }
 
