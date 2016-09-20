@@ -52,6 +52,10 @@ public:
   SKETCHAPI_EXPORT
   void setByExternalName(const std::string & theExternalName);
 
+  /// Returns created feature
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelHighAPI_Interface> createdFeature() const;
+
   /// Dump wrapped feature
   SKETCHAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;

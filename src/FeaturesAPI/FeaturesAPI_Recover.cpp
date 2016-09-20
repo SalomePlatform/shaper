@@ -37,7 +37,8 @@ FeaturesAPI_Recover::~FeaturesAPI_Recover()
 //=================================================================================================
 void FeaturesAPI_Recover::setBaseFeature(const ModelHighAPI_Reference& theBaseFeature)
 {
-  fillAttribute(theBaseFeature, mybaseFeature);
+
+  fillAttribute(theBaseFeature.feature(), mybaseFeature);
   // do not need to execute because on attribute changed it does everything anyway
 }
 

@@ -59,6 +59,15 @@ void SketchAPI_Projection::setByExternalName(const std::string& theExternalName)
 }
 
 //--------------------------------------------------------------------------------------
+std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Projection::createdFeature() const
+{
+  AttributeRefAttrPtr aProjectedRefAttr = projectedFeature();
+  FeaturePtr aProjectedFeature = ModelAPI_Feature::feature(aProjectedRefAttr->object());
+
+  return std::shared_ptr<ModelHighAPI_Interface>(new ModelHighAPI_Interface(aProjectedFeature));
+}
+
+//--------------------------------------------------------------------------------------
 
 void SketchAPI_Projection::dump(ModelHighAPI_Dumper& theDumper) const
 {
@@ -69,4 +78,10 @@ void SketchAPI_Projection::dump(ModelHighAPI_Dumper& theDumper) const
   theDumper << aBase << " = " << aSketchName << ".addProjection(" << anExternal << ")" << std::endl;
   // dump "auxiliary" flag if necessary
   SketchAPI_SketchEntity::dump(theDumper);
+
+  // Dump created line feature
+  AttributeRefAttrPtr aProjectedRefAttr = projectedFeature();
+  FeaturePtr aProjectedFeature = ModelAPI_Feature::feature(aProjectedRefAttr->object());
+  std::string aProjectedName = theDumper.name(aProjectedFeature, false);
+  theDumper << aProjectedName << " = " << theDumper.name(aBase) << ".createdFeature()" << std::endl;
 }
