@@ -410,7 +410,7 @@ size_t ParseName(const std::string& theSubShapeName,   std::list<std::string>& t
 const TopoDS_Shape findCommonShape(
   const TopAbs_ShapeEnum theType, const TopTools_ListOfShape& theList)
 {
-  if(theList.IsEmpty()) {
+  if(theList.IsEmpty() || theList.Extent() == 1) {
     return TopoDS_Shape();
   }
 
