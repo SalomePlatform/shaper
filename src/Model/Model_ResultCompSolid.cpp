@@ -30,9 +30,10 @@ Model_ResultCompSolid::~Model_ResultCompSolid()
   updateSubs(std::shared_ptr<GeomAPI_Shape>()); // erase sub-results
 }
 
-void Model_ResultCompSolid::store(const std::shared_ptr<GeomAPI_Shape>& theShape)
+void Model_ResultCompSolid::store(const std::shared_ptr<GeomAPI_Shape>& theShape,
+                                  const bool theIsStoreSameShapes)
 {
-  ModelAPI_ResultCompSolid::store(theShape);
+  ModelAPI_ResultCompSolid::store(theShape, theIsStoreSameShapes);
   updateSubs(theShape);
 }
 

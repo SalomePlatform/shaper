@@ -32,7 +32,8 @@ public:
   MODEL_EXPORT virtual ~Model_ResultCompSolid();
 
   /// Stores the shape (called by the execution method). Creates sub-results for compsolid.
-  MODEL_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape);
+  MODEL_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape,
+                                  const bool theIsStoreSameShapes = true);
 
   /// Stores the generated shape.  Creates sub-results for compsolid.
   MODEL_EXPORT virtual void storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theFromShape,

@@ -324,39 +324,27 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(const
     aGroups.Append(aGroupedShapes);
   }
 
-  if(aGroups.Size() == 1) {
-    NCollection_List<TopoDS_Shape> aGroup = aGroups.First();
+  TopoDS_Compound aCompound;
+  BRep_Builder aBuilder;
+  aBuilder.MakeCompound(aCompound);
+  ListOfShape aCompSolids, aFreeSolids;
+  for(NCollection_Vector<NCollection_List<TopoDS_Shape>>::Iterator anIt(aGroups); anIt.More(); anIt.Next()) {
+    NCollection_List<TopoDS_Shape> aGroup = anIt.Value();
     GeomShapePtr aGeomShape(new GeomAPI_Shape());
-    aGeomShape->setImpl(new TopoDS_Shape(makeCompound(aGroup)));
-    ListOfShape aCompSolids, aFreeSolids;
-    aGeomShape = GeomAlgoAPI_ShapeTools::combineShapes(aGeomShape,
-                                                        GeomAPI_Shape::COMPSOLID,
-                                                        aCompSolids,
-                                                        aFreeSolids);
-    aResult = aGeomShape;
-  } else {
-    TopoDS_Compound aCompound;
-    BRep_Builder aBuilder;
-    aBuilder.MakeCompound(aCompound);
-    ListOfShape aCompSolids, aFreeSolids;
-    for(NCollection_Vector<NCollection_List<TopoDS_Shape>>::Iterator anIt(aGroups); anIt.More(); anIt.Next()) {
-      NCollection_List<TopoDS_Shape> aGroup = anIt.Value();
-      GeomShapePtr aGeomShape(new GeomAPI_Shape());
-      if(aGroup.Size() == 1) {
-        aGeomShape->setImpl(new TopoDS_Shape(aGroup.First()));
-      } else {
-        aGeomShape->setImpl(new TopoDS_Shape(makeCompound(aGroup)));
-        aGeomShape = GeomAlgoAPI_ShapeTools::combineShapes(aGeomShape,
-                                                           GeomAPI_Shape::COMPSOLID,
-                                                           aCompSolids,
-                                                           aFreeSolids);
-      }
-      aBuilder.Add(aCompound, aGeomShape->impl<TopoDS_Shape>());
+    if(aGroup.Size() == 1) {
+      aGeomShape->setImpl(new TopoDS_Shape(aGroup.First()));
+    } else {
+      aGeomShape->setImpl(new TopoDS_Shape(makeCompound(aGroup)));
+      aGeomShape = GeomAlgoAPI_ShapeTools::combineShapes(aGeomShape,
+                                                         GeomAPI_Shape::COMPSOLID,
+                                                         aCompSolids,
+                                                         aFreeSolids);
     }
+    aBuilder.Add(aCompound, aGeomShape->impl<TopoDS_Shape>());
+  }
 
-    if(!aCompound.IsNull()) {
-      aResult->setImpl(new TopoDS_Shape(aCompound));
-    }
+  if(!aCompound.IsNull()) {
+    aResult->setImpl(new TopoDS_Shape(aCompound));
   }
 
   return aResult;

@@ -22,6 +22,7 @@
 #include <GeomAlgoAPI_PaveFiller.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_ShapeIterator.h>
 
 #include <algorithm>
 #include <map>
@@ -140,11 +141,37 @@ void FeaturesPlugin_Boolean::execute()
         ListOfShape aListWithObject;
         aListWithObject.push_back(anObject);
         GeomAlgoAPI_MakeShape aBoolAlgo;
+        GeomShapePtr aResShape;
 
         switch(aType) {
-          case BOOL_CUT:    aBoolAlgo = GeomAlgoAPI_Boolean(aListWithObject, aTools, GeomAlgoAPI_Boolean::BOOL_CUT); break;
-          case BOOL_COMMON: aBoolAlgo = GeomAlgoAPI_Boolean(aListWithObject, aTools, GeomAlgoAPI_Boolean::BOOL_COMMON); break;
-          case BOOL_FILL:   aBoolAlgo = GeomAlgoAPI_Partition(aListWithObject, aTools); break;
+          case BOOL_CUT: {
+            aBoolAlgo = GeomAlgoAPI_Boolean(aListWithObject, aTools, GeomAlgoAPI_Boolean::BOOL_CUT);
+            aResShape = aBoolAlgo.shape();
+            break;
+          }
+          case BOOL_COMMON: {
+            aBoolAlgo = GeomAlgoAPI_Boolean(aListWithObject, aTools, GeomAlgoAPI_Boolean::BOOL_COMMON);
+            aResShape = aBoolAlgo.shape();
+            break;
+          }
+          case BOOL_FILL: {
+            aBoolAlgo = GeomAlgoAPI_Partition(aListWithObject, aTools);
+            aResShape = aBoolAlgo.shape();
+            if(aResShape->shapeType() == GeomAPI_Shape::COMPOUND) {
+              int aSubResultsNb = 0;
+              GeomAPI_ShapeIterator anIt(aResShape);
+              for(; anIt.more(); anIt.next()) {
+                ++aSubResultsNb;
+              }
+              if(aSubResultsNb == 1) {
+                anIt.init(aResShape);
+                if(anIt.more()) {
+                  aResShape = anIt.current();
+                }
+              }
+            }
+            break;
+          }
         }
 
         // Checking that the algorithm worked properly.
@@ -153,7 +180,7 @@ void FeaturesPlugin_Boolean::execute()
           setError(aFeatureError);
           return;
         }
-        if(aBoolAlgo.shape()->isNull()) {
+        if(aResShape->isNull()) {
           static const std::string aShapeError = "Error: Resulting shape is Null.";
           setError(aShapeError);
           return;
@@ -164,9 +191,9 @@ void FeaturesPlugin_Boolean::execute()
           return;
         }
 
-        if(GeomAlgoAPI_ShapeTools::volume(aBoolAlgo.shape()) > 1.e-27) {
+        if(GeomAlgoAPI_ShapeTools::volume(aResShape) > 1.e-27) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-          loadNamingDS(aResultBody, anObject, aTools, aBoolAlgo.shape(), aBoolAlgo, *aBoolAlgo.mapOfSubShapes().get());
+          loadNamingDS(aResultBody, anObject, aTools, aResShape, aBoolAlgo, *aBoolAlgo.mapOfSubShapes().get());
           setResult(aResultBody, aResultIndex);
           aResultIndex++;
         }
