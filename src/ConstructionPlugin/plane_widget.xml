@@ -74,7 +74,6 @@
                        icon="icons/Construction/distance_value.png"
                        min="0"
                        default="10">
-            <validator id="GeomValidators_Positive"/>
           </doublevalue>
           <boolvalue id="reverse"
                      label="Reverse"
