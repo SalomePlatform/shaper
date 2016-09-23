@@ -6,6 +6,9 @@
 
 #include "Events_InfoMessage.h"
 
+#ifdef WIN32
+#pragma warning(disable : 4996) // for sprintf
+#endif
 
 void Events_InfoMessage::addParameter(double theParam) 
 { 

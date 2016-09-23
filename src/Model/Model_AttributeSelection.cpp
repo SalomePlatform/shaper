@@ -436,9 +436,11 @@ bool Model_AttributeSelection::update()
   if (aContext->groupName() == ModelAPI_ResultBody::group()) {
     // body: just a named shape, use selection mechanism from OCCT
     TNaming_Selector aSelector(aSelLab);
+    TopoDS_Shape anOldShape = aSelector.NamedShape()->Get();
     bool aResult = aSelector.Solve(scope()) == Standard_True;
     aResult = setInvalidIfFalse(aSelLab, aResult); // must be before sending of updated attribute (1556)
-    owner()->data()->sendAttributeUpdated(this);
+    if (!anOldShape.IsEqual(aSelector.NamedShape()->Get())) // send updated if shape is changed
+      owner()->data()->sendAttributeUpdated(this);
     return aResult;
   } else if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {
     // construction: identification by the results indexes, recompute faces and

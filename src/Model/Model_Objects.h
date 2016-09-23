@@ -222,7 +222,6 @@ class Model_Objects
   friend class Model_AttributeReference;
   friend class Model_AttributeRefAttr;
   friend class Model_AttributeRefList;
-  friend class Model_AttributeRefList;
   friend class Model_SelectionNaming;
 };
 

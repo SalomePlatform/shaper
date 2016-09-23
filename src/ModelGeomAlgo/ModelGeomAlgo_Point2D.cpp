@@ -21,6 +21,10 @@
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Circ.h>
 
+#ifdef WIN32
+#pragma warning(disable : 4996) // for sprintf
+#endif
+
 namespace ModelGeomAlgo_Point2D {
   std::shared_ptr<GeomDataAPI_Point2D> getPointOfRefAttr(ModelAPI_Feature* theFeature,
                                                          const std::string& theAttribute,

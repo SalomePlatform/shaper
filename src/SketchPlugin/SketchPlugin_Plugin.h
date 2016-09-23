@@ -17,16 +17,18 @@
  * \ingroup Plugins
  * \brief Interface common for any plugin: allows to use plugin by the plugins manager.
  */
-class SKETCHPLUGIN_EXPORT SketchPlugin_Plugin : public ModelAPI_Plugin, public Events_Listener
+class SketchPlugin_Plugin : public ModelAPI_Plugin, public Events_Listener
 {
 public:
   /// Creates the feature object of this plugin by the feature string ID
-  virtual FeaturePtr createFeature(std::string theFeatureID);
+  SKETCHPLUGIN_EXPORT virtual FeaturePtr createFeature(std::string theFeatureID);
 
- public:
-  SketchPlugin_Plugin();
+  /// Constructor that registers features and other plugin elements.
+  SKETCHPLUGIN_EXPORT SketchPlugin_Plugin();
+
   //! Redefinition of Events_Listener method
-  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
+  SKETCHPLUGIN_EXPORT virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
+
 protected:
   //! Returns the state of the feature in the WorkBench: enabled or disabled for the moment.
   std::shared_ptr<ModelAPI_FeatureStateMessage> getFeaturesState(

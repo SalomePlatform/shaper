@@ -11,6 +11,10 @@
 #include <fstream>
 #include <ostream>
 
+#ifdef WIN32
+#pragma warning(disable : 4996) // for sprintf
+#endif
+
 /**
  * \class Config_TSReader
  * \ingroup Config

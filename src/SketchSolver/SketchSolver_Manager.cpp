@@ -79,12 +79,13 @@ SketchSolver_Manager::SketchSolver_Manager()
 
   // Register in event loop
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  Events_Loop::loop()->registerListener(this, anUpdateEvent);
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_MOVED));
 
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_FAILED));
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_REPAIRED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_SKETCH_PREPARED));
 }
 
 SketchSolver_Manager::~SketchSolver_Manager()
@@ -102,6 +103,11 @@ BuilderPtr SketchSolver_Manager::builder()
   return myBuilder;
 }
 
+bool SketchSolver_Manager::groupMessages()
+{
+  return true;
+}
+
 // ============================================================================
 //  Function: processEvent
 //  Purpose:  listen the event loop and process the message
@@ -109,7 +115,15 @@ BuilderPtr SketchSolver_Manager::builder()
 void SketchSolver_Manager::processEvent(
   const std::shared_ptr<Events_Message>& theMessage)
 {
+  static const Events_ID aSketchPreparedEvent = Events_Loop::eventByName(EVENT_SKETCH_PREPARED);
+  // sketch is prepared for resolve: all the needed events are collected and must be processed by the solver
+  if (theMessage->eventID() == aSketchPreparedEvent) {
+    flushGrouped(anUpdateEvent);
+    return;
+  }
+
   checkConflictingConstraints(theMessage);
+
   if (myIsComputed)
     return;
   myIsComputed = true;
@@ -118,7 +132,7 @@ void SketchSolver_Manager::processEvent(
   bool hasProperFeature = false;
 
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)
-      || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)
+      || theMessage->eventID() == anUpdateEvent
       || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
@@ -169,6 +183,9 @@ void SketchSolver_Manager::processEvent(
     // Features may be updated => now send events, but for all changed at once
     if (isUpdateFlushed)
       allowSendUpdate();
+
+    myIsComputed = false;
+
     // send update for movement in any case
     if (needToUpdate || isMovedEvt)
       Events_Loop::loop()->flush(anUpdateEvent);
@@ -215,11 +232,11 @@ void SketchSolver_Manager::processEvent(
       if (!aGroupsToResolve.empty())
         resolveConstraints(aGroupsToResolve);
     }
+    myIsComputed = false;
   }
 
   if (hasProperFeature)
     degreesOfFreedom();
-  myIsComputed = false;
 }
 
 void SketchSolver_Manager::checkConflictingConstraints(const std::shared_ptr<Events_Message>& theMessage)

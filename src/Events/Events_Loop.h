@@ -34,7 +34,7 @@ class Events_Loop
   /// map from event ID to listeners which must process message without waiting for flush
   std::map<char*, Events_Listener*> myImmediateListeners;
 
-  /// map from event ID to groupped messages (accumulated on flush)
+  /// map from event ID to groupped messages (accumulated for flush)
   std::map<char*, std::shared_ptr<Events_Message> > myGroups;
 
   ///< set of messages that are flushed right now, so they are not grouped
@@ -93,6 +93,13 @@ class Events_Loop
   EVENTS_EXPORT bool isFlushed(const Events_ID& theID);
   //! Sets the flag that the event is flished right now
   EVENTS_EXPORT void setFlushed(const Events_ID& theID, const bool theValue);
+
+private:
+  //! Calls "processEvent" for the given listeners.
+  //! If theFlushedNow for grouped listeners is stores message in listeners.
+  void sendProcessEvent(const std::shared_ptr<Events_Message>& theMessage,
+    std::list<Events_Listener*>& theListeners, const bool theFlushedNow);
+
 };
 
 #endif

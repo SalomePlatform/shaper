@@ -119,7 +119,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
   if (myModified.find(theFeature) != myModified.end()) {
     if (theReason.get()) {
 #ifdef DEB_UPDATE
-      std::cout<<"*** Add already modified "<<theFeature->name()<<" reason "<<theReason->name()<<std::endl;
+      //std::cout<<"*** Add already modified "<<theFeature->name()<<" reason "<<theReason->name()<<std::endl;
 #endif
       myModified[theFeature].insert(theReason);
     }
@@ -139,10 +139,11 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
     }
       myModified[theFeature] = aNewSet;
 #ifdef DEB_UPDATE
-    if (theReason.get())
-      std::cout<<"*** Add modified "<<theFeature->name()<<" reason "<<theReason->name()<<std::endl;
-    else 
-      std::cout<<"*** Add modified "<<theFeature->name()<<std::endl;
+    if (theReason.get()) {
+      //std::cout<<"*** Add modified "<<theFeature->name()<<" reason "<<theReason->name()<<std::endl;
+    } else {
+      //std::cout<<"*** Add modified "<<theFeature->name()<<std::endl;
+    }
 #endif
   } else { // will be updated during the finish of the operation, or when it becomes enabled
     if (theFeature->data()->execState() == ModelAPI_StateDone)
@@ -150,7 +151,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
     else 
       return true; // do not need iteration deeply if it is already marked as modified or so
 #ifdef DEB_UPDATE
-    std::cout<<"*** Set modified state "<<theFeature->name()<<std::endl;
+    //std::cout<<"*** Set modified state "<<theFeature->name()<<std::endl;
 #endif
   }
   // clear processed and fill modified recursively
@@ -460,6 +461,10 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
       }
     }
     updateArguments(theFeature);
+    // send event that sketch is prepared to be recomputed
+    static Events_ID& anID = Events_Loop::eventByName("SketchPrepared");
+    std::shared_ptr<Events_Message> aMsg(new Events_Message(anID, this));
+    Events_Loop::loop()->send(aMsg);
   }
 
   if (!aIsModified) { // no modification is needed

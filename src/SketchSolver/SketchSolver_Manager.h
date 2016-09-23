@@ -41,6 +41,12 @@ public:
    */
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
+  /**
+   * The solver needs all the updated objects are transfered in one group, not one by one.
+   * This iscreases performance and avoids problems in resolve of only part of the made updates.
+   */
+  virtual bool groupMessages();
+
   /// \brief Initialize builder for solver's data structure entities
   /// \param theBuilder [in]  solver's specific builder
   SKETCHSOLVER_EXPORT void setBuilder(BuilderPtr theBuilder);

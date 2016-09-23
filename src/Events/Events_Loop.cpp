@@ -39,13 +39,26 @@ Events_ID Events_Loop::eventByName(const char* theName)
   return Events_ID(aResult);
 }
 
+void Events_Loop::sendProcessEvent(const std::shared_ptr<Events_Message>& theMessage,
+  std::list<Events_Listener*>& theListeners, const bool theFlushedNow)
+{
+  for (list<Events_Listener*>::iterator aL = theListeners.begin(); aL != theListeners.end(); aL++) {
+    if (theFlushedNow && (*aL)->groupMessages()) {
+      (*aL)->groupWhileFlush(theMessage);
+    } else {
+      (*aL)->processEvent(theMessage);
+    }
+  }
+}
+
 void Events_Loop::send(const std::shared_ptr<Events_Message>& theMessage, bool isGroup)
 {
   if (myImmediateListeners.find(theMessage->eventID().eventText()) != myImmediateListeners.end()) {
     myImmediateListeners[theMessage->eventID().eventText()]->processEvent(theMessage);
   }
   // if it is grouped message, just accumulate it
-  if (isGroup && myFlushed.find(theMessage->eventID().myID) == myFlushed.end()) {
+  bool isFlushedNow = myFlushed.find(theMessage->eventID().myID) != myFlushed.end();
+  if (isGroup && !isFlushedNow) {
     std::shared_ptr<Events_MessageGroup> aGroup = 
       std::dynamic_pointer_cast<Events_MessageGroup>(theMessage);
     if (aGroup) {
@@ -61,23 +74,19 @@ void Events_Loop::send(const std::shared_ptr<Events_Message>& theMessage, bool i
       return;
     }
   }
-
+  // send
   map<char*, map<void*, list<Events_Listener*> > >::iterator aFindID = myListeners.find(
       theMessage->eventID().eventText());
   if (aFindID != myListeners.end()) {
     map<void*, list<Events_Listener*> >::iterator aFindSender = aFindID->second.find(
         theMessage->sender());
     if (aFindSender != aFindID->second.end()) {
-      list<Events_Listener*>& aListeners = aFindSender->second;
-      for (list<Events_Listener*>::iterator aL = aListeners.begin(); aL != aListeners.end(); aL++)
-        (*aL)->processEvent(theMessage);
+      sendProcessEvent(theMessage, aFindSender->second, isFlushedNow && isGroup);
     }
     if (theMessage->sender()) {  // also call for NULL senders registered
       aFindSender = aFindID->second.find(NULL);
       if (aFindSender != aFindID->second.end()) {
-        list<Events_Listener*>& aListeners = aFindSender->second;
-        for (list<Events_Listener*>::iterator aL = aListeners.begin(); aL != aListeners.end(); aL++)
-          (*aL)->processEvent(theMessage);
+        sendProcessEvent(theMessage, aFindSender->second, isFlushedNow && isGroup);
       }
     }
   }
@@ -173,11 +182,28 @@ void Events_Loop::flush(const Events_ID& theID)
     myGroups.erase(aMyGroup);
     send(aGroup, false);
 
-    if (!aWasFlushed)
+    if (!aWasFlushed) {
       // TODO: Stabilization fix. Check later.
       if(myFlushed.find(theID.myID) != myFlushed.end()) {
         myFlushed.erase(myFlushed.find(theID.myID));
+      } else {
+        bool aProblem = true;
       }
+    }
+    // send accumulated messages to "groupListeners"
+    map<char*, map<void*, list<Events_Listener*> > >::iterator aFindID = myListeners.find(
+      theID.eventText());
+    if (aFindID != myListeners.end()) {
+      map<void*, list<Events_Listener*> >::iterator aFindSender = aFindID->second.begin();
+      for(; aFindSender != aFindID->second.end(); aFindSender++) {
+        list<Events_Listener*>::iterator aListener = aFindSender->second.begin();
+        for(; aListener != aFindSender->second.end(); aListener++) {
+          if ((*aListener)->groupMessages()) {
+            (*aListener)->flushGrouped(theID);
+          }
+        }
+      }
+    }
   }
 }
 

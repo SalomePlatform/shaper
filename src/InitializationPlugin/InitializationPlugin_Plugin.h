@@ -15,16 +15,17 @@
  * It's aim is to fulfill the newly created documents with the "origin"
  * construction point (0,0,0) and base planes (x0y, z0y, x0z)
  */
-class INITIALIZATIONPLUGIN_EXPORT InitializationPlugin_Plugin : public Events_Listener
+class InitializationPlugin_Plugin : public Events_Listener
 {
  public:
   /// Creates plug-in and registers it in the Event Loop
-  InitializationPlugin_Plugin();
+  INITIALIZATIONPLUGIN_EXPORT InitializationPlugin_Plugin();
   /// Destructs the plugin
-  virtual ~InitializationPlugin_Plugin() {}
+  INITIALIZATIONPLUGIN_EXPORT virtual ~InitializationPlugin_Plugin() {}
   /// Process the ModelAPI_DocumentCreatedMessage to fulfill a document
   /// from the message with origin and planes
-  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
+  INITIALIZATIONPLUGIN_EXPORT virtual void processEvent(
+    const std::shared_ptr<Events_Message>& theMessage);
 
  protected:
   /// Creates a plane by given parameters A, B, C

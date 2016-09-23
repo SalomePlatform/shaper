@@ -811,7 +811,7 @@ bool FeaturesPlugin_ValidatorConcealedResult::isValid(const AttributePtr& theAtt
   std::list<std::shared_ptr<ModelAPI_Result> > aResults;
   ModelAPI_Tools::getConcealedResults(aRefFeature, aResults);
 
-  int aConcealedResults = aResults.size();
+  size_t aConcealedResults = aResults.size();
   if (!aConcealedResults && !theArguments.empty()) {
     // find if these results are touched by the feature in another attribute
     std::list<std::string>::const_iterator anIt = theArguments.begin();

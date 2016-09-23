@@ -63,6 +63,9 @@ static const char * EVENT_ORDER_UPDATED = "OrderUpdated";
 /// Event ID that informs that some object has changed the stability
 static const char * EVENT_STABILITY_CHANGED = "StabilityChanged";
 
+/// Event ID that the sketch is prepared and all grouped messages for the solver may be flushed
+static const char * EVENT_SKETCH_PREPARED = "SketchPrepared";
+
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class MODELAPI_EXPORT ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
 {
