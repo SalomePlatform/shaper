@@ -462,7 +462,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     }
     updateArguments(theFeature);
     // send event that sketch is prepared to be recomputed
-    static Events_ID& anID = Events_Loop::eventByName("SketchPrepared");
+    static Events_ID anID = Events_Loop::eventByName("SketchPrepared");
     std::shared_ptr<Events_Message> aMsg(new Events_Message(anID, this));
     Events_Loop::loop()->send(aMsg);
   }
