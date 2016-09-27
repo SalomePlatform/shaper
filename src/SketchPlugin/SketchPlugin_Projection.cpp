@@ -66,6 +66,10 @@ void SketchPlugin_Projection::execute()
 
     aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
   }
+
+  // is sketch plane is changed (issue 1791), attribute of projection is not changed, but
+  // projection must be fully recomputed
+  computeProjection(EXTERNAL_FEATURE_ID());
 }
 
 void SketchPlugin_Projection::move(double theDeltaX, double theDeltaY)
