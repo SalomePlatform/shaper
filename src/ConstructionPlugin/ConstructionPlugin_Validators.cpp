@@ -14,6 +14,7 @@
 #include <GeomAPI_Vertex.h>
 
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeBoolean.h>
 
 #include <Events_InfoMessage.h>
 
@@ -244,9 +245,13 @@ bool ConstructionPlugin_ValidatorPlaneLinePoint::isValid(
     return false;
   }
 
-  if(aLin->contains(aPnt)) {
-    theError = "Point lies on the line.";
-    return false;
+  // line should not contain point only for not-prependicular case
+  AttributeBooleanPtr aBoolAttr = aFeature->boolean(theArguments.back());
+  if (aBoolAttr.get() && !aBoolAttr->value()) {
+    if(aLin->contains(aPnt)) {
+      theError = "Point lies on the line.";
+      return false;
+    }
   }
 
   return true;

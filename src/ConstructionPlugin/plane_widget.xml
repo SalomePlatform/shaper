@@ -38,14 +38,14 @@
                       icon="icons/Construction/edge.png"
                       shape_types="edge">
         <validator id="GeomValidators_ShapeType" parameters="line"/>
-        <validator id="ConstructionPlugin_ValidatorPlaneLinePoint" parameters="point"/>
+        <validator id="ConstructionPlugin_ValidatorPlaneLinePoint" parameters="point,perpendicular"/>
       </shape_selector>
       <shape_selector id="point"
                       label="Point"
                       tooltip="Select point."
                       icon="icons/Construction/point.png"
                       shape_types="vertex">
-        <validator id="ConstructionPlugin_ValidatorPlaneLinePoint" parameters="line"/>
+        <validator id="ConstructionPlugin_ValidatorPlaneLinePoint" parameters="line,perpendicular"/>
       </shape_selector>
       <boolvalue id="perpendicular"
            label="Perpendicular "

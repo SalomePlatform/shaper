@@ -230,9 +230,11 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByLineAndPoint()
     std::shared_ptr<GeomAPI_Lin> aLin = anEdge->line();
     std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
     std::shared_ptr<GeomAPI_Pln> aNewPln(new GeomAPI_Pln(aPnt, aLin->direction()));
-    double aSize = aLin->distance(aPnt);
-    aSize *= 2.0;
-    aRes = GeomAlgoAPI_FaceBuilder::squareFace(aNewPln, aSize);
+    double aSize = aLin->distance(aPnt) * 2;
+    // point may belong to line, so for the face size use maximum distance between point and line
+    // and the line size (distance between the start and end point)
+    double aDistance = anEdge->firstPoint()->distance(anEdge->lastPoint());
+    aRes = GeomAlgoAPI_FaceBuilder::squareFace(aNewPln, aSize > aDistance ? aSize : aDistance);
   } else {
     std::shared_ptr<GeomAPI_Vertex> aV1, aV2;
     GeomAlgoAPI_ShapeTools::findBounds(anEdge, aV1, aV2);
