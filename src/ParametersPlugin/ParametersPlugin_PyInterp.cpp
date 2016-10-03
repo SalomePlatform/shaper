@@ -94,9 +94,9 @@ std::list<std::string> ParametersPlugin_PyInterp::compile(const std::string& the
   if(!PyTuple_Check(aCodeObj->co_names))
     return aResult;
 
-  int params_size = PyTuple_Size(aCodeObj->co_names);
+  size_t params_size = PyTuple_Size(aCodeObj->co_names);
   if (params_size > 0) {
-    for (int i = 0; i < params_size; i++) {
+    for (size_t i = 0; i < params_size; i++) {
       PyObject* aParamObj = PyTuple_GetItem(aCodeObj->co_names, i);
       PyObject* aParamObjStr = PyObject_Str(aParamObj);
       std::string aParamName(PyString_AsString(aParamObjStr));
@@ -126,12 +126,13 @@ void ParametersPlugin_PyInterp::clearLocalContext()
   PyDict_Clear(_local_context);
 }
 
-
 double ParametersPlugin_PyInterp::evaluate(const std::string& theExpression, std::string& theError)
 {
   PyLockWrapper lck; // Acquire GIL until the end of the method
-  PyCodeObject* anExprCode = (PyCodeObject *) Py_CompileString(theExpression.c_str(),
-                                                               "<string>", Py_eval_input);
+  PyCompilerFlags aFlags = {CO_FUTURE_DIVISION};
+  aFlags.cf_flags = CO_FUTURE_DIVISION;
+  PyCodeObject* anExprCode = (PyCodeObject *) Py_CompileStringFlags(theExpression.c_str(),
+                                "<string>", Py_eval_input, &aFlags);
   if(!anExprCode) {
     theError = errorMessage();
     Py_XDECREF(anExprCode);
