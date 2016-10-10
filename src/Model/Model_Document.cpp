@@ -222,9 +222,9 @@ bool Model_Document::save(
   Handle(Model_Application) anApp = Model_Application::getApplication();
   if (isRoot()) {
 #ifdef WIN32
-    CreateDirectory(theFileName, NULL);
+    CreateDirectory(theDirName, NULL);
 #else
-    mkdir(theFileName, 0x1ff);
+    mkdir(theDirName, 0x1ff);
 #endif
   }
   // filename in the dir is id of document inside of the given directory
