@@ -130,7 +130,8 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
   if (!aIsDisabled) {
     std::set<std::shared_ptr<ModelAPI_Feature> > aNewSet;
     if (theFeature->data()->execState() == ModelAPI_StateMustBeUpdated ||
-        theFeature->data()->execState() == ModelAPI_StateInvalidArgument) { // issue 1519
+        theFeature->data()->execState() == ModelAPI_StateInvalidArgument || // issue 1519
+        theFeature->data()->execState() == ModelAPI_StateExecFailed) {
       // do not forget that in this case all were the reasons
       aNewSet.insert(theFeature);
     } else {
@@ -146,7 +147,8 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
     }
 #endif
   } else { // will be updated during the finish of the operation, or when it becomes enabled
-    if (theFeature->data()->execState() == ModelAPI_StateDone)
+    if (theFeature->data()->execState() == ModelAPI_StateDone ||
+        theFeature->data()->execState() == ModelAPI_StateExecFailed) // fix issue 1819
       theFeature->data()->execState(ModelAPI_StateMustBeUpdated);
     else 
       return true; // do not need iteration deeply if it is already marked as modified or so
