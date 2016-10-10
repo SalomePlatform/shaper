@@ -56,9 +56,9 @@ def checkMirror(theListInit, theListMirr, theMirrorLine):
             aDir = normalize(aDir)
             aDot = aLineDir[0] * aDir[0] + aLineDir[1] * aDir[1]
             assert math.fabs(aDot) < TOL, "aDot = {0}".format(aDot)
-            aDirX = aLineEndPoint.x() - 0.5 * (aPointB.x() + aPointC.x())
-            aDirY = aLineEndPoint.y() - 0.5 * (aPointB.y() + aPointC.y())
-            aCross = aLineDir[0] * aDir[0] - aLineDir[1] * aDir[1]
+            aDir[0] = aLineEndPoint.x() - 0.5 * (aPointB.x() + aPointC.x())
+            aDir[1] = aLineEndPoint.y() - 0.5 * (aPointB.y() + aPointC.y())
+            aCross = aLineDir[0] * aDir[1] - aLineDir[1] * aDir[0]
             assert math.fabs(aCross) < TOL, "aCross = {0}".format(aCross)
 
 
@@ -136,7 +136,7 @@ aTangency = aSketchFeature.addFeature("SketchConstraintTangent")
 aRefObjectA = aTangency.refattr("ConstraintEntityA")
 aRefObjectB = aTangency.refattr("ConstraintEntityB")
 anObjectA = modelAPI_ResultConstruction(aSketchArc1.lastResult())
-anObjectB = modelAPI_ResultConstruction(aSketchLine1.firstResult())
+anObjectB = modelAPI_ResultConstruction(aSketchLine1.lastResult())
 assert (anObjectA is not None)
 assert (anObjectB is not None)
 aRefObjectA.setObject(anObjectA)

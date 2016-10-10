@@ -24,6 +24,7 @@
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
+#include <SketchPlugin_SketchEntity.h>
 
 #include <SketcherPrs_Tools.h>
 
@@ -128,42 +129,40 @@ static std::string angleTypeToString(int theAngleType)
 void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
-  ConstraintPtr aConstraint = std::dynamic_pointer_cast<SketchPlugin_Constraint>(aBase);
-  if (!aConstraint)
-    return; // dump constraints only
+  const std::string& aSetter = constraintTypeToSetter(aBase->getKind());
+  if (aSetter.empty())
+    return; // incorrect constraint type
 
   // do not need to dump "Fixed" constraint for external object
-  if (aConstraint->getKind() == SketchPlugin_ConstraintRigid::ID()) {
-    AttributeRefAttrPtr aRefAttr = aConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
-    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
-        std::dynamic_pointer_cast<SketchPlugin_Feature>(
-        ModelAPI_Feature::feature(aRefAttr->object()));
-    if (!aSketchFeature || aSketchFeature->isExternal())
+  if (aBase->getKind() == SketchPlugin_ConstraintRigid::ID()) {
+    AttributeRefAttrPtr aRefAttr = aBase->refattr(SketchPlugin_Constraint::ENTITY_A());
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
+    if (!aFeature)
+      return;
+    AttributeSelectionPtr aAttr = aFeature->data()->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+    if (aAttr && aAttr->context().get() != NULL && !aAttr->isInvalid())
       return;
   }
 
-  const std::string& aSetter = constraintTypeToSetter(aConstraint->getKind());
-  if (aSetter.empty())
-    return; // incorrect constraint type
-  bool isAngle = aConstraint->getKind() == SketchPlugin_ConstraintAngle::ID();
+  bool isAngle = aBase->getKind() == SketchPlugin_ConstraintAngle::ID();
   std::string aSetterSuffix;
   if (isAngle)
-    aSetterSuffix = angleTypeToString(aConstraint->integer(
+    aSetterSuffix = angleTypeToString(aBase->integer(
                     SketchPlugin_ConstraintAngle::TYPE_ID())->value());
 
-  const std::string& aSketchName = theDumper.parentName(aConstraint);
+  const std::string& aSketchName = theDumper.parentName(aBase);
   theDumper << aBase << " = " << aSketchName << "." << aSetter << aSetterSuffix << "(";
 
   bool isFirstAttr = true;
   for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
-    AttributeRefAttrPtr aRefAttr = aConstraint->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
+    AttributeRefAttrPtr aRefAttr = aBase->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
     if (aRefAttr && aRefAttr->isInitialized()) {
       theDumper << (isFirstAttr ? "" : ", ") << aRefAttr;
       isFirstAttr = false;
     }
   }
 
-  AttributeDoublePtr aValueAttr = aConstraint->real(
+  AttributeDoublePtr aValueAttr = aBase->real(
       isAngle ? SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID() :SketchPlugin_Constraint::VALUE());
   if (aValueAttr && aValueAttr->isInitialized())
     theDumper << ", " << aValueAttr;
