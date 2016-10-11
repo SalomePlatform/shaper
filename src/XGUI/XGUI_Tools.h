@@ -19,21 +19,19 @@ class ModuleBase_IWorkshop;
 
 /*!
  \ingroup GUI
+ \brief Commonly used methods in XGUI package and higher.
+ */
+namespace XGUI_Tools {
+
+/**
  \brief Return directory part of the file path.
 
  If the file path does not include directory part (the file is in the
  current directory), null string is returned.
 
  \param path file path
- \param abs if true (default) \a path parameter is treated as absolute file path
+ \param isAbs if true (default) \a path parameter is treated as absolute file path
  \return directory part of the file path
- */
-namespace XGUI_Tools {
-
-/**
-* Returns directory name from name of file
-* \param path a path to a file
-* \param isAbs is absolute or relative path
 */
 QString XGUI_EXPORT dir(const QString& path, bool isAbs = true);
 

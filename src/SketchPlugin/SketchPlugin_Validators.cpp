@@ -691,9 +691,9 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
       aFirstEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFirstFeature->attribute(anEndAttr))->pnt();
       aSecondStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aSecondFeature->attribute(aStartAttr))->pnt();
       aSecondEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aSecondFeature->attribute(anEndAttr))->pnt();
-      double aCheck1 = abs((aFirstEndPnt->x() - aFirstStartPnt->x()) * (aSecondStartPnt->y() - aFirstStartPnt->y()) -
+      double aCheck1 = fabs((aFirstEndPnt->x() - aFirstStartPnt->x()) * (aSecondStartPnt->y() - aFirstStartPnt->y()) -
         (aSecondStartPnt->x() - aFirstStartPnt->x()) * (aFirstEndPnt->y() - aFirstStartPnt->y()));
-      double aCheck2 = abs((aFirstEndPnt->x() - aFirstStartPnt->x()) * (aSecondEndPnt->y() - aFirstStartPnt->y()) -
+      double aCheck2 = fabs((aFirstEndPnt->x() - aFirstStartPnt->x()) * (aSecondEndPnt->y() - aFirstStartPnt->y()) -
         (aSecondEndPnt->x() - aFirstStartPnt->x()) * (aFirstEndPnt->y() - aFirstStartPnt->y()));
       if(aCheck1 < 1.e-7 && aCheck2 < 1.e-7) {
         return false;

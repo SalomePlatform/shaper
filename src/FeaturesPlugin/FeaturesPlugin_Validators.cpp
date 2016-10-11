@@ -413,7 +413,7 @@ bool FeaturesPlugin_ValidatorExtrusionDir::isValid(const std::shared_ptr<ModelAP
         std::shared_ptr<GeomAPI_Dir> aSketchDir = aPlanarEdges->norm();
         if(aDirEdge->isLine()) {
           std::shared_ptr<GeomAPI_Dir> aDir = aDirEdge->line()->direction();
-          isParallel = abs(aSketchDir->angle(aDir) - M_PI / 2.0) < 10e-7;
+          isParallel = fabs(aSketchDir->angle(aDir) - M_PI / 2.0) < 10e-7;
         } else {
           isParallel = false;
         }
