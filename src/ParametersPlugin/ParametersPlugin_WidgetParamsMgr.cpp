@@ -740,7 +740,7 @@ void ParametersPlugin_WidgetParamsMgr::enableButtons(bool theEnable)
     onSelectionChanged();
   else {
     myInsertBtn->setEnabled(theEnable);
-    myRemoveBtn->setEnabled(theEnable);
+    //myRemoveBtn->setEnabled(theEnable);
     myUpBtn->setEnabled(theEnable);
     myDownBtn->setEnabled(theEnable);
   }
