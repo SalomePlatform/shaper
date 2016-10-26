@@ -420,7 +420,7 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theId,
 
   aAction->setData(theId);
 
-  int aWBMenu = createMenu(theWBName, -1, -1, 50/*10-Window, 1000 - Help*/);
+  int aWBMenu = createMenu(theWBName, -1, -1, 30/*10-Window, 1000 - Help*/);
   int aItemId = createMenu(aId, aWBMenu);
   if (isAddSeparator)
     createMenu(separator(), aWBMenu);
@@ -456,7 +456,7 @@ QAction* SHAPERGUI::addFeatureOfNested(const QString& theWBName,
   anAction->setShortcut(theInfo.shortcut);
   anAction->setFont(theInfo.font);
 
-  int aWBMenu = createMenu(theWBName, -1, -1, 50);
+  int aWBMenu = createMenu(theWBName, -1, -1, 30);
   int aItemId = createMenu(anAction, aWBMenu);
   createMenu(separator(), aWBMenu); /// nested action is always separated of others
 
