@@ -369,9 +369,9 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
     // Init flyout point for radius rotation
     FeaturePtr aFeature = myCurrentSelection.begin().key();
 
+    get2dPoint(theWnd, theEvent, myCurrentPoint);
     if (isSketcher) {
       myIsDragging = true;
-      get2dPoint(theWnd, theEvent, myCurrentPoint);
       myDragDone = false;
 
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
@@ -382,7 +382,9 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       if (aFeature.get() != NULL) {
         std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
                   std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-      if (aSPFeature.get() && aSPFeature->getKind() == SketchPlugin_ConstraintRadius::ID()) {
+        if (aSPFeature.get() && 
+          (aSPFeature->getKind() == SketchPlugin_ConstraintRadius::ID() ||
+           aSPFeature->getKind() == SketchPlugin_ConstraintAngle::ID())) {
           DataPtr aData = aSPFeature->data();
           AttributePtr aAttr = aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
           std::shared_ptr<GeomDataAPI_Point2D> aFPAttr = 
@@ -395,7 +397,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       aFOperation->commit();
 
       myIsDragging = true;
-      get2dPoint(theWnd, theEvent, myCurrentPoint);
       myDragDone = false;
 
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
@@ -403,6 +404,19 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       // selected entities, e.g. selection of point(attribute on a line) should edit the point
       restoreSelection();
       launchEditing();
+      if (aFeature.get() != NULL) {
+        std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+                  std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+        if (aSPFeature.get() && 
+          (aSPFeature->getKind() == SketchPlugin_ConstraintRadius::ID() ||
+           aSPFeature->getKind() == SketchPlugin_ConstraintAngle::ID())) {
+          DataPtr aData = aSPFeature->data();
+          AttributePtr aAttr = aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
+          std::shared_ptr<GeomDataAPI_Point2D> aFPAttr = 
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aAttr);
+          aFPAttr->setValue(myCurrentPoint.myCurX, myCurrentPoint.myCurY);
+        }
+      }
       restoreSelection();
     }
   }
@@ -494,10 +508,10 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
 
     Handle(V3d_View) aView = theWnd->v3dView();
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
-    double aX, aY;
-    PartSet_Tools::convertTo2D(aPoint, myCurrentSketch, aView, aX, aY);
-    double dX =  aX - myCurrentPoint.myCurX;
-    double dY =  aY - myCurrentPoint.myCurY;
+    Point aMousePnt;
+    get2dPoint(theWnd, theEvent, aMousePnt);
+    double dX =  aMousePnt.myCurX - myCurrentPoint.myCurX;
+    double dY =  aMousePnt.myCurY - myCurrentPoint.myCurY;
 
     ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
@@ -565,7 +579,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     aDisplayer->updateViewer();
 
     myDragDone = true;
-    myCurrentPoint.setValue(aX, aY);
+    myCurrentPoint = aMousePnt;
   }
 }
 

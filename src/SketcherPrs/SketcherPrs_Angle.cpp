@@ -258,11 +258,12 @@ bool SketcherPrs_Angle::isAnglePlaneReversedToSketchPlane()
 
 double SketcherPrs_Angle::calculateDistanceToFlyoutPoint()
 {
-  gp_Dir aBisector((myFirstPoint.XYZ() + mySecondPoint.XYZ()) * 0.5 - myCenterPoint.XYZ());
-  //gp_Pnt aFlyPnt(aFlyoutPnt->x(), aFlyoutPnt->y(), aFlyoutPnt->z());
-  gp_XYZ aFlyDir = myFlyOutPoint.XYZ() - myCenterPoint.XYZ();
-  double aDistance = aFlyDir.Dot(aBisector.XYZ());
-  // make a positive distance in order to AIS angle presentation is not reversed
-  aDistance = fabs(aDistance);
-  return aDistance;
+  //gp_Dir aBisector = gp_Dir((myFirstPoint.XYZ() + mySecondPoint.XYZ()) * 0.5 - myCenterPoint.XYZ());
+  //gp_XYZ aFlyDir = myFlyOutPoint.XYZ() - myCenterPoint.XYZ();
+
+  //double aDistance = aFlyDir.Dot(aBisector.XYZ());
+  //// make a positive distance in order to AIS angle presentation is not reversed
+  //aDistance = fabs(aDistance);
+  //return aDistance;
+  return myFlyOutPoint.Distance(myCenterPoint);
 }
