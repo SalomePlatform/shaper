@@ -73,6 +73,8 @@ void SketchSolver_ConstraintMulti::update(bool isForce)
   AttributeRefListPtr anInitialRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
       myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
   AttributeIntegerPtr aNbObjects = myBaseConstraint->integer(nameNbObjects());
+  if (!anInitialRefList || !aNbObjects)
+    return; // the "Multi" constraint is in queue to remove
   bool isUpdated= anInitialRefList->size() != myNumberOfObjects || aNbObjects->value()-1 != myNumberOfCopies;
   if (!isUpdated) {
     // additional check that the features and their copies are changed
