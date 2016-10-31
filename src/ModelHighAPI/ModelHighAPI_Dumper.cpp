@@ -87,6 +87,18 @@ void ModelHighAPI_Dumper::clearNotDumped()
   myNotDumpedEntities.clear();
 }
 
+// Convert string to integer. If the string is not a number, return -1
+static int toInt(const std::string& theString)
+{
+  std::string::const_iterator aChar = theString.begin();
+  for (; aChar != theString.end(); ++aChar)
+    if (!std::isdigit(*aChar))
+      break;
+  if (aChar != theString.end())
+    return -1; // not a number
+  return std::stoi(theString);
+}
+
 const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
                                              bool theSaveNotDumped,
                                              bool theUseEntityName)
@@ -110,7 +122,7 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
     size_t anIndex = aName.find(aKind);
     if (anIndex == 0 && aName[aKind.length()] == '_') { // name starts with "FeatureKind_"
       std::string anIdStr = aName.substr(aKind.length() + 1);
-      int anId = std::stoi(anIdStr);
+      int anId = toInt(anIdStr);
 
       // Check number of already registered objects of such kind. Index of current object
       // should be the same to identify feature's name as automatically generated.
@@ -234,6 +246,10 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
 
   // sub-part is processed independently, because it provides separate document
   if (theComposite->getKind() == PartSetPlugin_Part::ID()) {
+    // dump name of the part if it is different from default
+    if (!myEntitiesStack.empty())
+      dumpEntitySetName();
+
     // decrease composite features stack because we run into separate document
     --gCompositeStackDepth;
 
