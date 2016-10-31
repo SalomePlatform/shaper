@@ -32,6 +32,12 @@ void SketchSolver_ConstraintMiddle::notifyCoincidenceChanged(
   for (int i = 0; i < 2 && isSameAttr; ++i) {
     AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
         myBaseConstraint->attribute(SketchPlugin_Constraint::ATTRIBUTE(i)));
+    if (!aRefAttr)
+    {
+      // It seems the Middle point constraint has been deleted, so keep it unchanged.
+      // It will be removed later.
+      return;
+    }
     if (aRefAttr->isObject()) {
       FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
       isSameAttr = (aFeature == aLine);
