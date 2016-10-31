@@ -303,16 +303,17 @@ bool ModelHighAPI_Dumper::processSubs(const std::shared_ptr<ModelAPI_CompositeFe
       myEntitiesStack.top().myEntity == EntityPtr(theComposite);
   bool isForceModelDo = isSubDumped && isDumpSetName &&
       (myEntitiesStack.top().myUserName || !myEntitiesStack.top().myResults.empty());
+
+  // dump "setName" for composite feature before "model.do()" command to apply the name too
+  if (isDumpSetName)
+    dumpEntitySetName();
+
   // It is necessary for the sketch to create its result when complete (command "model.do()").
   // This option is set by flat theDumpModelDo.
   // However, nested sketches are rebuilt by parent feature, so, they do not need
   // explicit call of "model.do()". This will be controlled by the depth of the stack.
   if (isForceModelDo || (theDumpModelDo && gCompositeStackDepth <= 1))
     *this << "model.do()" << std::endl;
-
-  // dump "setName" for composite feature
-  if (isDumpSetName)
-    dumpEntitySetName();
   return isOk;
 }
 
