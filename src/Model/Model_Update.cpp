@@ -8,6 +8,7 @@
 #include <Model_Document.h>
 #include <Model_Data.h>
 #include <Model_Objects.h>
+#include <Model_AttributeSelection.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -58,6 +59,8 @@ Model_Update::Model_Update()
   aLoop->registerListener(this, kPreviewRequestedEvent);
   static const Events_ID kReorderEvent = aLoop->eventByName(EVENT_ORDER_UPDATED);
   aLoop->registerListener(this, kReorderEvent);
+  static const Events_ID kUpdatedSel = aLoop->eventByName(EVENT_UPDATE_SELECTION);
+  aLoop->registerListener(this, kUpdatedSel);
 
   //  Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
   myIsParamUpdated = false;
@@ -207,6 +210,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   static const Events_ID kPreviewRequestedEvent = aLoop->eventByName(EVENT_PREVIEW_REQUESTED);
   static const Events_ID kReorderEvent = aLoop->eventByName(EVENT_ORDER_UPDATED);
   static const Events_ID kRedisplayEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const Events_ID kUpdatedSel = aLoop->eventByName(EVENT_UPDATE_SELECTION);
 
 #ifdef DEB_UPDATE
   std::cout<<"****** Event "<<theMessage->eventID().eventText()<<std::endl;
@@ -226,6 +230,11 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       myIsPreviewBlocked = true;
     }
     return;
+  }
+  if (theMessage->eventID() == kUpdatedSel) {
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    updateSelection(aMsg->objects());
   }
   // creation is added to "update" to avoid recomputation twice: on create and immediately after on update
   if (theMessage->eventID() == kCreatedEvent) {
@@ -859,6 +868,33 @@ void Model_Update::updateStability(void* theSender)
       static Events_Loop* aLoop = Events_Loop::loop();
       static Events_ID kEventCreated = aLoop->eventByName(EVENT_OBJECT_CREATED);
       aLoop->flush(kEventCreated);
+    }
+  }
+}
+
+void Model_Update::updateSelection(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects)
+{
+  std::set<std::shared_ptr<ModelAPI_Object> >::iterator anObj = theObjects.begin();
+  for(; anObj != theObjects.end(); anObj++) {
+    list<AttributePtr> aRefs = 
+      (*anObj)->data()->attributes(ModelAPI_AttributeSelection::typeId());
+    list<AttributePtr>::iterator aRefsIter = aRefs.begin();
+    for (; aRefsIter != aRefs.end(); aRefsIter++) {
+      std::shared_ptr<Model_AttributeSelection> aSel =
+        std::dynamic_pointer_cast<Model_AttributeSelection>(*aRefsIter);
+      aSel->updateInHistory();
+    }
+    // update the selection list attributes if any
+    aRefs = (*anObj)->data()->attributes(ModelAPI_AttributeSelectionList::typeId());
+    for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
+      std::shared_ptr<ModelAPI_AttributeSelectionList> aSel =
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);
+      for(int a = aSel->size() - 1; a >= 0; a--) {
+        std::shared_ptr<Model_AttributeSelection> aSelAttr =
+          std::dynamic_pointer_cast<Model_AttributeSelection>(aSel->value(a));
+        if (aSelAttr.get())
+          aSelAttr->updateInHistory();
+      }
     }
   }
 }

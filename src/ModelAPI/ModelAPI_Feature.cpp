@@ -188,6 +188,12 @@ bool ModelAPI_Feature::setDisabled(const bool theFlag)
       for(; aResIter != myResults.end(); aResIter++) {
         (*aResIter)->setDisabled(*aResIter, false);
       }
+      // update selection for the case something was updated higher in the history
+      // while this feature was disabled
+      static Events_Loop* aLoop = Events_Loop::loop();
+      static Events_ID kUpdatedSel = aLoop->eventByName(EVENT_UPDATE_SELECTION);
+      static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+      aECreator->sendUpdated(data()->owner(), kUpdatedSel, false);
     }
     return true;
   }

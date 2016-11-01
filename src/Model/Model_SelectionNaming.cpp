@@ -7,6 +7,7 @@
 #include "Model_SelectionNaming.h"
 #include "Model_Document.h"
 #include "Model_Objects.h"
+#include "Model_Data.h"
 #include <ModelAPI_Feature.h>
 #include <Events_InfoMessage.h>
 #include <ModelAPI_Session.h>
@@ -48,45 +49,45 @@ Model_SelectionNaming::Model_SelectionNaming(TDF_Label theSelectionLab)
 
 std::string Model_SelectionNaming::getShapeName(
   std::shared_ptr<Model_Document> theDoc, const TopoDS_Shape& theShape,
-  const bool theAddContextName)
+  ResultPtr& theContext, const bool theAnotherDoc, const bool theWholeContext)
 {
   std::string aName;
+  // add the result name to the name of the shape (it was in BodyBuilder, but did not work on Result rename)
+  bool isNeedContextName = theContext->shape().get() != NULL;// && !theContext->shape()->isEqual(theSubSh);
   // check if the subShape is already in DF
   Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(theShape, myLab);
   Handle(TDataStd_Name) anAttr;
   if(!aNS.IsNull() && !aNS->IsEmpty()) { // in the document    
     if(aNS->Label().FindAttribute(TDataStd_Name::GetID(), anAttr)) {
-      aName = TCollection_AsciiString(anAttr->Get()).ToCString();
-      // indexes are added to sub-shapes not primitives (primitives must not be located at the same label)
-      if(!aName.empty() && aNS->Evolution() != TNaming_PRIMITIVE && theAddContextName) {
-        const TDF_Label& aLabel = aNS->Label();//theDoc->findNamingName(aName);
-        static const std::string aPostFix("_");
-        TNaming_Iterator anItL(aNS);
-        for(int i = 1; anItL.More(); anItL.Next(), i++) {
-          if(anItL.NewShape() == theShape) {
-            aName += aPostFix;
-            aName += TCollection_AsciiString (i).ToCString();
-            break;
-          }
-        }
-      }
-      if (theAddContextName && aName.find("/") == std::string::npos) { // searching for the context object
-        for(TDF_Label anObjL = aNS->Label(); anObjL.Depth() > 4; anObjL = anObjL.Father()) {
-          int aDepth = anObjL.Depth();
-          if (aDepth == 5 || aDepth == 7) {
-            ObjectPtr anObj = theDoc->objects()->object(anObjL);
-            if (anObj.get()) {
-              ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
-              if (aRes.get()) {
-                if (aRes && !aRes->shape()->impl<TopoDS_Shape>().IsEqual(theShape)) {
-                  aName = anObj->data()->name() + "/" + aName;
-                }
-              }
+      std::shared_ptr<Model_Data> aData =
+        std::dynamic_pointer_cast<Model_Data>(theContext->data());
+      if (isNeedContextName && aData && aData->label().IsEqual(aNS->Label())) {
+        // do nothing because this context name will be added later in this method
+      } else {
+        aName = TCollection_AsciiString(anAttr->Get()).ToCString();
+        // indexes are added to sub-shapes not primitives (primitives must not be located at the same label)
+        if(!aName.empty() && aNS->Evolution() != TNaming_PRIMITIVE && isNeedContextName) {
+          const TDF_Label& aLabel = aNS->Label();//theDoc->findNamingName(aName);
+          static const std::string aPostFix("_");
+          TNaming_Iterator anItL(aNS);
+          for(int i = 1; anItL.More(); anItL.Next(), i++) {
+            if(anItL.NewShape() == theShape) {
+              aName += aPostFix;
+              aName += TCollection_AsciiString (i).ToCString();
+              break;
             }
           }
         }
       }
     }
+  }
+
+  // Name is empty and this is full context, it just add the whole context name that must be added
+  bool isEmptyName = aName.empty();
+  if (isNeedContextName && (!isEmptyName || theWholeContext)) {
+    aName = theContext->data()->name() + (isEmptyName ? "" : ("/" + aName));
+    if (theAnotherDoc)
+      aName = theContext->document()->kind() + "/" + aName; // PartSet
   }
   return aName;
 }
@@ -149,12 +150,9 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
     BRepTools::Write(aContext, "Context.brep");
   }
 #endif
+  aName = getShapeName(aDoc, aSubShape, theContext, theAnotherDoc, 
+    theContext->shape()->isEqual(theSubSh));
 
-  // add the result name to the name of the shape (it was in BodyBuilder, but did not work on Result rename)
-  bool isNeedContextName = theContext->shape().get() && !theContext->shape()->isEqual(theSubSh);
-
-  // check if the subShape is already in DF
-  aName = getShapeName(aDoc, aSubShape, isNeedContextName);
   if(aName.empty() ) { // not in the document!
     TopAbs_ShapeEnum aType = aSubShape.ShapeType();
     switch (aType) {
@@ -201,7 +199,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
         // build name of the sub-shape Edge
         for(int i=1; i <= aSMap.Extent(); i++) {
           const TopoDS_Shape& aFace = aSMap.FindKey(i);
-          std::string aFaceName = getShapeName(aDoc, aFace, isNeedContextName);
+          std::string aFaceName = getShapeName(aDoc, aFace, theContext, theAnotherDoc, false);
           if(i == 1)
             aName = aFaceName;
           else 
@@ -209,7 +207,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
         }
         TopTools_ListIteratorOfListOfShape itl(aListOfNbs);
         for (;itl.More();itl.Next()) {
-          std::string aFaceName = getShapeName(aDoc, itl.Value(), isNeedContextName);
+          std::string aFaceName = getShapeName(aDoc, itl.Value(), theContext, theAnotherDoc, false);
           aName += "&" + aFaceName;
         }		  
       }
@@ -258,7 +256,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
             TopTools_ListIteratorOfListOfShape itl(aListE);
             for (int i = 1;itl.More();itl.Next(),i++) {
               const TopoDS_Shape& anEdge = itl.Value();
-              std::string anEdgeName = getShapeName(aDoc, anEdge, isNeedContextName);
+              std::string anEdgeName = getShapeName(aDoc, anEdge, theContext, theAnotherDoc, false);
               if (anEdgeName.empty()) { // edge is not in DS, trying by faces anyway
                 isByFaces = true;
                 aName.clear();
@@ -278,7 +276,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
           TopTools_ListIteratorOfListOfShape itl(aList);
           for (int i = 1;itl.More();itl.Next(),i++) {
             const TopoDS_Shape& aFace = itl.Value();
-            std::string aFaceName = getShapeName(aDoc, aFace, isNeedContextName);
+            std::string aFaceName = getShapeName(aDoc, aFace, theContext, theAnotherDoc, false);
             if(i == 1)
               aName = aFaceName;
             else 
