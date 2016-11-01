@@ -89,6 +89,11 @@ protected:
   /// Returns true if theFeature modification was caused by theReason (may be feature of result of this feature)
   bool isReason(
     std::shared_ptr<ModelAPI_Feature>& theFeature, std::shared_ptr<ModelAPI_Object> theReason);
+
+  /// Updates a selection attributes for the features that possible were affected by creation
+  /// or reorder of features upper in the history line (issue #1757)
+  void updateSelection(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects);
+
 };
 
 #endif

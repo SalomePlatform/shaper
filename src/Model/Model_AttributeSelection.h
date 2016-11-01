@@ -71,6 +71,9 @@ public:
   /// Returns true if recomute of selection become impossible
   MODEL_EXPORT virtual bool isInvalid();
 
+  /// Updates the arguments of selection if something was affected by creation
+  /// or reorder of features upper in the history line (issue #1757)
+  MODEL_EXPORT virtual void updateInHistory();
 
 protected:
   /// Objects are created for features automatically

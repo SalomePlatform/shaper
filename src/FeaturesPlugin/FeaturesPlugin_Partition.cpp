@@ -71,7 +71,8 @@ void FeaturesPlugin_Partition::execute()
     return;
   }
 
-  std::list<std::shared_ptr<GeomAPI_Pnt> > aBoundingPoints = GeomAlgoAPI_ShapeTools::getBoundingBox(anObjects, 1.0);
+  std::list<std::shared_ptr<GeomAPI_Pnt> > aBoundingPoints =
+    GeomAlgoAPI_ShapeTools::getBoundingBox(anObjects, 1.0);
 
   // Resize planes.
   ListOfShape aTools;
@@ -108,14 +109,13 @@ void FeaturesPlugin_Partition::execute()
   GeomShapePtr aResultShape = aPartitionAlgo->shape();
 
   int aResultIndex = 0;
-  anObjects.insert(anObjects.end(), aPlanes.begin(), aPlanes.end());
   if(aResultShape->shapeType() == GeomAPI_Shape::COMPOUND) {
     for(GeomAPI_ShapeIterator anIt(aResultShape); anIt.more(); anIt.next()) {
-      storeResult(anObjects, anIt.current(), aMakeShapeList, aResultIndex);
+      storeResult(anObjects, aPlanes, anIt.current(), aMakeShapeList, aResultIndex);
       ++aResultIndex;
     }
   } else {
-    storeResult(anObjects, aResultShape, aMakeShapeList, aResultIndex);
+    storeResult(anObjects, aPlanes, aResultShape, aMakeShapeList, aResultIndex);
     ++aResultIndex;
   }
 
@@ -124,24 +124,29 @@ void FeaturesPlugin_Partition::execute()
 }
 
 //=================================================================================================
-void FeaturesPlugin_Partition::storeResult(const ListOfShape& theObjects,
-                                           const GeomShapePtr theResultShape,
-                                           const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
-                                           const int theIndex)
+void FeaturesPlugin_Partition::storeResult(
+  ListOfShape& theObjects, ListOfShape& thePlanes,
+  const GeomShapePtr theResultShape,
+  const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+  const int theIndex)
 {
-  // Find base.
+  // Find base. The most complicated is the real modified object (#1799 if box is partitioned by 
+  // two planes the box is the base, not planes, independently on the order in the list).
   GeomShapePtr aBaseShape;
   for(ListOfShape::const_iterator anIt = theObjects.cbegin(); anIt != theObjects.cend(); ++anIt) {
     GeomShapePtr anObjectShape = *anIt;
-    aBaseShape = findBase(anObjectShape, theResultShape, GeomAPI_Shape::VERTEX, theMakeShape);
-    if(!aBaseShape.get()) {
-      aBaseShape = findBase(anObjectShape, theResultShape, GeomAPI_Shape::EDGE, theMakeShape);
+    GeomShapePtr aCandidate =
+      findBase(anObjectShape, theResultShape, GeomAPI_Shape::VERTEX, theMakeShape);
+    if(!aCandidate.get()) {
+      aCandidate = findBase(anObjectShape, theResultShape, GeomAPI_Shape::EDGE, theMakeShape);
     }
-    if(!aBaseShape.get()) {
-      aBaseShape = findBase(anObjectShape, theResultShape, GeomAPI_Shape::FACE, theMakeShape);
-    }
-    if(aBaseShape.get()) {
-      break;
+    if (!aCandidate.get())
+      aCandidate = findBase(anObjectShape, theResultShape, GeomAPI_Shape::FACE, theMakeShape);
+
+    if(aCandidate.get()) {
+      if (!aBaseShape.get() || aBaseShape->shapeType() > aCandidate->shapeType()) {
+        aBaseShape = aCandidate;
+      }
     }
   }
 
@@ -163,6 +168,7 @@ void FeaturesPlugin_Partition::storeResult(const ListOfShape& theObjects,
   aResultBody->storeModified(aBaseShape, theResultShape, aSubTag);
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfSubShapes = theMakeShape->mapOfSubShapes();
+  theObjects.insert(theObjects.end(), thePlanes.begin(), thePlanes.end());
   int anIndex = 1;
   for(ListOfShape::const_iterator anIt = theObjects.cbegin(); anIt != theObjects.cend(); ++anIt) {
     GeomShapePtr aShape = *anIt;

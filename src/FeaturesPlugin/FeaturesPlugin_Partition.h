@@ -51,7 +51,8 @@ public:
 
 private:
   /// Stores result of generation.
-  void storeResult(const ListOfShape& theObjects,
+  void storeResult(ListOfShape& theObjects,
+                   ListOfShape& thePlanes,
                    const GeomShapePtr theResultShape,
                    const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
                    const int theIndex = 0);

@@ -263,6 +263,7 @@ std::shared_ptr<ModelAPI_AttributeSelection>
   // (if attribute is deleted and created, the abort updates attriute and makes the Attr invalid)
   std::shared_ptr<Model_AttributeSelection> aNewAttr = 
     std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aLabel));
+  aNewAttr->setID(id());
   if (owner()) {
     aNewAttr->setObject(owner());
   }

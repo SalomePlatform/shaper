@@ -316,8 +316,8 @@ void Model_Objects::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
   // update the feature and the history
   clearHistory(theMoved);
   // make sure all (selection) attributes of moved feature will be updated
-  static Events_ID EVENT_UPD = Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED);
-  ModelAPI_EventCreator::get()->sendUpdated(theMoved, EVENT_UPD);
+  static Events_ID kUpdateSelection = Events_Loop::loop()->eventByName(EVENT_UPDATE_SELECTION);
+  ModelAPI_EventCreator::get()->sendUpdated(theMoved, kUpdateSelection, false);
   ModelAPI_EventCreator::get()->sendReordered(theMoved);
 }
 
