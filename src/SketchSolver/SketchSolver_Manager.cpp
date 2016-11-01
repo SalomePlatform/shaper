@@ -579,6 +579,14 @@ static void collectPointsAndCopies(FeaturePtr theConstraint, std::list<std::set<
   }
 }
 
+
+// returns true if the feature is external
+static bool isExternal(const FeaturePtr& theFeature)
+{
+  AttributeSelectionPtr anAttr = theFeature->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+  return anAttr && anAttr->context() && !anAttr->isInvalid();
+}
+
 // ============================================================================
 //  Function: degreesOfFreedom
 //  Purpose:  calculate DoFs for each sketch
@@ -641,6 +649,9 @@ void SketchSolver_Manager::degreesOfFreedom()
     int aNbSubs = aSketch->numberOfSubs();
     for (int i = 0; i < aNbSubs; ++i) {
       FeaturePtr aFeature = aSketch->subFeature(i);
+      // do not change DoF for external feature
+      if (isExternal(aFeature))
+        continue;
       // check DoF delta for invariant types
       std::map<std::string, int>::const_iterator aFound = aDoFDelta.find(aFeature->getKind());
       if (aFound != aDoFDelta.end()) {
@@ -751,6 +762,8 @@ void SketchSolver_Manager::degreesOfFreedom()
         } else {
           FeaturePtr anAttr = ModelAPI_Feature::feature(aRefAttr->object());
           if (anAttr) {
+            if (isExternal(anAttr))
+              continue; // feature is already fixed since it is external
             aDoF -= aDoFDelta[anAttr->getKind()];
             std::list<AttributePtr> aPtAttrs = anAttr->data()->attributes(GeomDataAPI_Point2D::typeId());
             aPoints.insert(aPtAttrs.begin(), aPtAttrs.end());
