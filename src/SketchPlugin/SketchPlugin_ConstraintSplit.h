@@ -26,7 +26,7 @@ typedef std::pair<std::string, std::shared_ptr<GeomDataAPI_Point2D> > IdToPointP
  *
  * The following constraints will be applied after split to keep the divided segments geometry:
  * - Coincident constraints for both parts of created segments in the point of splitting
- * - For linear segments parallel, for circles – tangent constraint, for arc – tangent and equal
+ * - For linear segments parallel, for circles - tangent constraint, for arc - tangent and equal
  *   constraints. In case of three segments in result two couple of constraints are created
  *    - parallel and equal constraints: the first is between 1st and middle entity, the second is
  *      between 1st and 3rd.
