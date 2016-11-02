@@ -2072,7 +2072,6 @@ void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
 {
   FeaturePtr aFeature;
   QObjectPtrList aSelList = theObjects;
-  std::list<ResultPtr> aResList;
   bool aHasHidden = false;
   foreach(ObjectPtr aObj, theObjects) {
     aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
@@ -2080,7 +2079,7 @@ void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
       std::list<ResultPtr> aResults;
       ModelAPI_Tools::allResults(aFeature, aResults);
       std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
-      for(aIt = aResList.cbegin(); aIt != aResList.cend(); aIt++) {
+      for(aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
         aHasHidden |= (*aIt)->isConcealed();
         aSelList.append(*aIt);
       }
