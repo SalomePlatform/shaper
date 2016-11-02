@@ -249,8 +249,9 @@ void XGUI_WorkshopListener::
 
   XGUI_Workshop* aWorkshop = workshop();
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
-  bool aFirstVisualizedBody = false;
-
+  //bool aFirstVisualizedBody = false;
+  bool aDoFitAll = false;
+  int aNbOfShownObjects = workshop()->displayer()->objectsCount();
   bool aRedisplayed = false;
   //std::list<ObjectPtr> aHiddenObjects;
   for (aIt = anObjects.begin(); aIt != anObjects.end(); ++aIt) {
@@ -326,7 +327,9 @@ void XGUI_WorkshopListener::
           aWorkshop->deactivateActiveObject(aObj, false);
         }
       } else { // display object if the current operation has it
-        if (displayObject(aObj, aFirstVisualizedBody)) {
+        if (displayObject(aObj)) {
+          aDoFitAll = aDoFitAll || neededFitAll(aObj, aNbOfShownObjects);
+
           aRedisplayed = true;
           // Deactivate object of current operation from selection
           aWorkshop->deactivateActiveObject(aObj, false);
@@ -343,8 +346,8 @@ void XGUI_WorkshopListener::
   if (aRedisplayed || isCustomized) {
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION));
 
-    //VSV FitAll updated viewer by it self
-    if (aFirstVisualizedBody)
+    //VSV FitAll updated viewer by itself
+    if (aDoFitAll)
       myWorkshop->viewer()->fitAll();
     else 
       aDisplayer->updateViewer();
@@ -367,7 +370,8 @@ void XGUI_WorkshopListener::
     .arg(anObjects.size()).arg(anInfoStr).toStdString().c_str());
 #endif
 
-  bool aFirstVisualizedBody = false;
+  bool aDoFitAll = false;
+  int aNbOfShownObjects = workshop()->displayer()->objectsCount();
 
   //bool aHasPart = false;
   bool aDisplayed = false;
@@ -406,7 +410,9 @@ void XGUI_WorkshopListener::
       // with list of displayed objects
       if (myWorkshop->module()->canDisplayObject(anObject)) {
         anObject->setDisplayed(true);
-        aDisplayed = displayObject(*aIt, aFirstVisualizedBody);
+        aDisplayed = displayObject(anObject);
+        if (aDisplayed)
+          aDoFitAll = aDoFitAll || neededFitAll(anObject, aNbOfShownObjects);
       } else 
         anObject->setDisplayed(false);
     }
@@ -418,8 +424,8 @@ void XGUI_WorkshopListener::
   //  myObjectBrowser->processEvent(theMsg);
   if (aDisplayed) {
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION));
-    //VSV FitAll updated viewer by it self
-    if (aFirstVisualizedBody)
+    //VSV FitAll updated viewer by itself
+    if (aDoFitAll)
       myWorkshop->viewer()->fitAll();
     else
       workshop()->displayer()->updateViewer();
@@ -470,7 +476,7 @@ bool XGUI_WorkshopListener::event(QEvent * theEvent)
 }
 
 //**************************************************************
-bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj, bool& theFirstVisualizedBody)
+bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj)
 {
 #ifdef DEBUG_RESULT_COMPSOLID
   ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
@@ -491,18 +497,26 @@ bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj, bool& theFirstVisual
 
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
   int aNb = aDisplayer->objectsCount();
-  aDisplayed = aDisplayer->display(theObj, false);
+  return aDisplayer->display(theObj, false);
+}
 
-  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
-  if (aNb == 0 && aResult.get()) {
-    std::string aResultGroupName = aResult->groupName();
-    if (aResultGroupName == ModelAPI_ResultBody::group() ||
-        aResultGroupName == ModelAPI_ResultGroup::group()) {
-      std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
-      theFirstVisualizedBody = aShapePtr.get() != NULL;
+//**************************************************************
+bool XGUI_WorkshopListener::neededFitAll(ObjectPtr theObj, const int theNbOfShownObjects)
+{
+  bool aFirstVisualizedBody = false;
+
+  if (theNbOfShownObjects == 0) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
+    if (aResult.get()) {
+      std::string aResultGroupName = aResult->groupName();
+      if (aResultGroupName == ModelAPI_ResultBody::group() ||
+          aResultGroupName == ModelAPI_ResultGroup::group()) {
+        std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
+        aFirstVisualizedBody = aShapePtr.get() != NULL;
+      }
     }
   }
-  return aDisplayed;
+  return aFirstVisualizedBody;
 }
 
 bool XGUI_WorkshopListener::customizeCurrentObject(const std::set<ObjectPtr>& theObjects,
