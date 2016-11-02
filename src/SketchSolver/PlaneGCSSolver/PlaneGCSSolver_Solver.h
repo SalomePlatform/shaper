@@ -79,13 +79,18 @@ private:
   typedef std::map<GCS::Constraint*, SketchSolver_ConstraintType> ConstraintMap;
 
   GCS::VEC_pD                  myParameters;     ///< list of unknowns
-  ConstraintMap                myConstraints;    ///< list of constraints already processed by the system
+
+  /// list of constraints already processed by the system
+  ConstraintMap                myConstraints;    
   std::shared_ptr<GCS::System> myEquationSystem; ///< set of equations for solving in FreeGCS
 
   GCS::SET_I                   myConflictingIDs; ///< list of IDs of conflicting constraints
-  bool                         myConfCollected;  ///< specifies the conflicting constraints are already collected
 
-  GCS::SET_I                   myTangent;        ///< list of tangent IDs to check incorrect redundant constraints
+  /// specifies the conflicting constraints are already collected
+  bool                         myConfCollected;  
+
+  /// list of tangent IDs to check incorrect redundant constraints
+  GCS::SET_I                   myTangent;
 };
 
 #endif

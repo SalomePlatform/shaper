@@ -38,7 +38,9 @@ protected:
 
 private:
   double myPrevValue; ///< previous value of distance (for correct calculation of a distance sign)
-  bool myIsNegative;  ///< \c true, if the point if placed rightside of line direction (SLVS_C_PT_LINE_DISTANCE only)
+
+  /// \c true, if the point if placed rightside of line direction (SLVS_C_PT_LINE_DISTANCE only)
+  bool myIsNegative;  
 };
 
 #endif

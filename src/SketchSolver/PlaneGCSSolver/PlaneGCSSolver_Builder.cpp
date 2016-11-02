@@ -387,7 +387,8 @@ std::list<ConstraintWrapperPtr> PlaneGCSSolver_Builder::createMirror(
     aResult.insert(aResult.end(), aMrrList.begin(), aMrrList.end());
   }
   else if (theEntity1->type() == ENTITY_ARC) {
-    // Do not allow mirrored arc recalculate its position until coordinated of all points recalculated
+    // Do not allow mirrored arc recalculate its position until 
+    // coordinated of all points recalculated
     FeaturePtr aMirrArc = theEntity2->baseFeature();
     aMirrArc->data()->blockSendAttributeUpdated(true);
 
@@ -403,7 +404,8 @@ std::list<ConstraintWrapperPtr> PlaneGCSSolver_Builder::createMirror(
     aMrrList = createMirror(theConstraint, theGroupID, theSketchID, *anIt1, *anIt2, theMirrorLine);
     aResult.insert(aResult.end(), aMrrList.begin(), aMrrList.end());
 
-    // make symmetric last point of original arc and first point of mirrored arc without additional constraint
+    // make symmetric last point of original arc and first point of 
+    // mirrored arc without additional constraint
     ++anIt1;
     --anIt2;
     makeMirrorPoints(*anIt1, *anIt2, theMirrorLine);
@@ -620,7 +622,8 @@ std::shared_ptr<PlaneGCSSolver_ScalarWrapper> createScalar(
     const GroupID& theGroupID,
     AttributeDoublePtr theDoubleAttr)
 {
-  ParameterWrapperPtr aParam = createParameter(theGroupID, theDoubleAttr ? theDoubleAttr->value() : 0.0);
+  ParameterWrapperPtr aParam = 
+    createParameter(theGroupID, theDoubleAttr ? theDoubleAttr->value() : 0.0);
   return std::shared_ptr<PlaneGCSSolver_ScalarWrapper>(
       new PlaneGCSSolver_ScalarWrapper(theDoubleAttr, aParam));
 }
@@ -660,7 +663,8 @@ EntityWrapperPtr createLine(FeaturePtr theFeature,
   aLine->p2 = *(aEndEnt->point());
 
   aNewEntity = EntityWrapperPtr(new PlaneGCSSolver_EntityWrapper(theFeature, aLine));
-  aNewEntity->setGroup(theGroupID); // sub-entities should not change their groups, therefore they are added later
+  // sub-entities should not change their groups, therefore they are added later
+  aNewEntity->setGroup(theGroupID); 
   aNewEntity->setSubEntities(aSubs);
   return aNewEntity;
 }
@@ -697,7 +701,8 @@ EntityWrapperPtr createCircle(FeaturePtr theFeature,
   aCircle->rad = aRadiusEnt->scalar();
 
   aNewEntity = EntityWrapperPtr(new PlaneGCSSolver_EntityWrapper(theFeature, aCircle));
-  aNewEntity->setGroup(theGroupID); // sub-entities should not change their groups, therefore they are added later
+  // sub-entities should not change their groups, therefore they are added later
+  aNewEntity->setGroup(theGroupID); 
   aNewEntity->setSubEntities(aSubs);
   return aNewEntity;
 }
@@ -753,7 +758,8 @@ EntityWrapperPtr createArc(FeaturePtr theFeature,
   anArc->rad        = aRadius->scalar();
 
   aNewEntity = EntityWrapperPtr(new PlaneGCSSolver_EntityWrapper(theFeature, anArc));
-  aNewEntity->setGroup(theGroupID); // sub-entities should not change their groups, therefore they are added later
+  // sub-entities should not change their groups, therefore they are added later
+  aNewEntity->setGroup(theGroupID); 
   aNewEntity->setSubEntities(aSubs);
   return aNewEntity;
 }
@@ -807,7 +813,8 @@ ConstraintWrapperPtr createConstraintPointOnEntity(
     }
   case ENTITY_ARC:
   case ENTITY_CIRCLE: {
-    std::shared_ptr<GCS::Circle> aCirc = std::dynamic_pointer_cast<GCS::Circle>(theEntity->entity());
+    std::shared_ptr<GCS::Circle> aCirc = 
+      std::dynamic_pointer_cast<GCS::Circle>(theEntity->entity());
     aNewConstr = GCSConstraintPtr(
         new GCS::ConstraintP2PDistance(*(thePoint->point()), aCirc->center, aCirc->rad));
     break;
@@ -856,7 +863,8 @@ ConstraintWrapperPtr createConstraintMiddlePoint(
   aConstrList.push_back(GCSConstraintPtr(new GCS::ConstraintPointOnLine(*aPoint, *aLine)));
   double aDist = lineLength(*aLine);
   std::shared_ptr<PlaneGCSSolver_ParameterWrapper> aDistance =
-      std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(createParameter(theGroupID, aDist * 0.5));
+      std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(
+      createParameter(theGroupID, aDist * 0.5));
   aConstrList.push_back(GCSConstraintPtr(
       new GCS::ConstraintP2PDistance(*aPoint, aLine->p1, aDistance->parameter())));
   aConstrList.push_back(GCSConstraintPtr(
@@ -931,7 +939,8 @@ ConstraintWrapperPtr createConstraintRadius(
     std::shared_ptr<PlaneGCSSolver_ParameterWrapper> theValue,
     std::shared_ptr<PlaneGCSSolver_EntityWrapper> theEntity)
 {
-  std::shared_ptr<GCS::Circle> aCircle = std::dynamic_pointer_cast<GCS::Circle>(theEntity->entity());
+  std::shared_ptr<GCS::Circle> aCircle = 
+    std::dynamic_pointer_cast<GCS::Circle>(theEntity->entity());
   GCSConstraintPtr aNewConstr(new GCS::ConstraintEqual(aCircle->rad, theValue->parameter()));
 
   std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aResult(
@@ -1111,13 +1120,18 @@ ConstraintWrapperPtr createConstraintTangent(
 {
   GCSConstraintPtr aNewConstr;
   if (theType == CONSTRAINT_TANGENT_ARC_LINE || theType == CONSTRAINT_TANGENT_CIRCLE_LINE) {
-    std::shared_ptr<GCS::Circle> aCirc = std::dynamic_pointer_cast<GCS::Circle>(theEntity1->entity());
-    std::shared_ptr<GCS::Line> aLine = std::dynamic_pointer_cast<GCS::Line>(theEntity2->entity());
+    std::shared_ptr<GCS::Circle> aCirc = 
+      std::dynamic_pointer_cast<GCS::Circle>(theEntity1->entity());
+    std::shared_ptr<GCS::Line> aLine = 
+      std::dynamic_pointer_cast<GCS::Line>(theEntity2->entity());
 
-    aNewConstr = GCSConstraintPtr(new GCS::ConstraintP2LDistance(aCirc->center, *aLine, aCirc->rad));
+    aNewConstr = 
+      GCSConstraintPtr(new GCS::ConstraintP2LDistance(aCirc->center, *aLine, aCirc->rad));
   } else {
-    std::shared_ptr<GCS::Circle> aCirc1 = std::dynamic_pointer_cast<GCS::Circle>(theEntity1->entity());
-    std::shared_ptr<GCS::Circle> aCirc2 = std::dynamic_pointer_cast<GCS::Circle>(theEntity2->entity());
+    std::shared_ptr<GCS::Circle> aCirc1 = 
+      std::dynamic_pointer_cast<GCS::Circle>(theEntity1->entity());
+    std::shared_ptr<GCS::Circle> aCirc2 = 
+      std::dynamic_pointer_cast<GCS::Circle>(theEntity2->entity());
 
     double aDX = *(aCirc1->center.x) - *(aCirc2->center.x);
     double aDY = *(aCirc1->center.y) - *(aCirc2->center.y);
@@ -1160,9 +1174,11 @@ void makeMirrorPoints(EntityWrapperPtr theOriginal,
     (*aMIt)->setValue(aCoord[i]);
 
   // update corresponding attribute
-  AttributePtr anAttr = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theMirrored)->baseAttribute();
+  AttributePtr anAttr = 
+    std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theMirrored)->baseAttribute();
   if (anAttr) {
-    std::shared_ptr<GeomDataAPI_Point2D> aMirroredPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr);
+    std::shared_ptr<GeomDataAPI_Point2D> aMirroredPnt = 
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr);
     aMirroredPnt->setValue(aCoord[0], aCoord[1]);
   }
 }

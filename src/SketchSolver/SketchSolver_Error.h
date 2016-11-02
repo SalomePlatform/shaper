@@ -20,13 +20,15 @@ class SketchSolver_Error
   /// The value parameter for the constraint
   inline static const std::string& CONSTRAINTS()
   {
-    static const std::string MY_ERROR_VALUE("The constraint is conflicting with others. To fix this, you can either undo your operation or remove a conflicting constraint.");
+    static const std::string MY_ERROR_VALUE("The constraint is conflicting with others. \
+ To fix this, you can either undo your operation or remove a conflicting constraint.");
     return MY_ERROR_VALUE;
   }
   /// Constraints should use objects instead of features as attributes
   inline static const std::string& NEED_OBJECT_NOT_FEATURE()
   {
-    static const std::string MY_ERROR_VALUE("Constraint should be based on object instead of feature");
+    static const std::string 
+      MY_ERROR_VALUE("Constraint should be based on object instead of feature");
     return MY_ERROR_VALUE;
   }
   /// The entities need to have shared point, but they have not
@@ -65,10 +67,12 @@ class SketchSolver_Error
     static const std::string MY_ERROR_VALUE("Entity already fixed");
     return MY_ERROR_VALUE;
   }
-  /// Tangency constraint has been built with wrong attributes (for example, line and arc have two coincident points)
+  /// Tangency constraint has been built with wrong attributes 
+  /// (for example, line and arc have two coincident points)
   inline static const std::string& TANGENCY_FAILED()
   {
-    static const std::string MY_ERROR_VALUE("Unable to create tangency constraint on given attributes");
+    static const std::string 
+      MY_ERROR_VALUE("Unable to create tangency constraint on given attributes");
     return MY_ERROR_VALUE;
   }
   /// Crash in SolveSpace

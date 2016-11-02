@@ -21,7 +21,8 @@ public:
   SketchSolver_ConstraintFixedArcRadius(FeaturePtr theFeature);
 
   /// \brief Tries to remove constraint
-  /// \return \c false, if current constraint contains another SketchPlugin constraints (like for multiple coincidence)
+  /// \return \c false, if current constraint contains another SketchPlugin constraints 
+  /// (like for multiple coincidence)
   virtual bool remove();
 
 protected:

@@ -29,7 +29,8 @@ public:
   SketchSolver_ConstraintFixed(FeaturePtr theFeature);
 
   /// \brief Tries to remove constraint
-  /// \return \c false, if current constraint contains another SketchPlugin constraints (like for multiple coincidence)
+  /// \return \c false, if current constraint contains another 
+  /// SketchPlugin constraints (like for multiple coincidence)
   virtual bool remove();
 
 protected:
@@ -39,7 +40,8 @@ protected:
   /// \brief Generate list of attributes of constraint in order useful for constraints
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
   /// \param[out] theAttributes list of attributes to be filled
-  virtual void getAttributes(ParameterWrapperPtr& theValue, std::vector<EntityWrapperPtr>& theAttributes);
+  virtual void getAttributes(ParameterWrapperPtr& theValue, 
+                             std::vector<EntityWrapperPtr>& theAttributes);
 
   /// \brief Fixed feature basing on its type
   /// \param theFeature [in]  feature, converted to solver specific format

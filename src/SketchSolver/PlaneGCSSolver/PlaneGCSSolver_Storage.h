@@ -117,10 +117,12 @@ private:
   EntityID                         myEntityLastID;       ///< identifier of last added entity
   ConstraintID                     myConstraintLastID;   ///< identifier of last added constraint
 
+  /// additional constraints for correct processing of the arcs
   std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >
-                                   myArcConstraintMap;   ///< additional constraints for correct processing of the arcs
+                                   myArcConstraintMap;   
 
-  std::list<GCSConstraintPtr>      myRemovedConstraints; ///< list of removed constraints to notify solver
+  /// list of removed constraints to notify solver
+  std::list<GCSConstraintPtr>      myRemovedConstraints; 
 };
 
 #endif

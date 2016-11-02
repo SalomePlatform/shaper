@@ -138,7 +138,8 @@ void SketchSolver_Storage::addEntity(FeaturePtr       theFeature,
 void SketchSolver_Storage::addEntity(AttributePtr     theAttribute,
                                      EntityWrapperPtr theSolverEntity)
 {
-  std::map<AttributePtr, EntityWrapperPtr>::const_iterator aFound = myAttributeMap.find(theAttribute);
+  std::map<AttributePtr, EntityWrapperPtr>::const_iterator aFound = 
+    myAttributeMap.find(theAttribute);
   if (aFound == myAttributeMap.end() || !aFound->second ||
      (theSolverEntity && !aFound->second->isEqual(theSolverEntity)))
     setNeedToResolve(true); // the entity is new or modified
@@ -186,8 +187,9 @@ bool SketchSolver_Storage::update(FeaturePtr theFeature, const GroupID& theGroup
     std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
         std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
     bool isCopy = isCopyInMulti(aSketchFeature, myConstraintMap);
+    // the feature is a copy in "Multi" constraint and does not used in other constraints
     if (!theForce && isCopy && myFeatureMap.find(theFeature) == myFeatureMap.end())
-      return false; // the feature is a copy in "Multi" constraint and does not used in other constraints
+      return false;
 
     std::list<EntityWrapperPtr> aSubs;
     // Reserve the feature in the map of features (do not want to add several copies of it)
@@ -271,7 +273,8 @@ bool SketchSolver_Storage::update(AttributePtr theAttribute, const GroupID& theG
     // Check attribute of external features
     std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
         std::dynamic_pointer_cast<SketchPlugin_Feature>(anAttribute->owner());
-    if (aSketchFeature && (aSketchFeature->isExternal() || isCopyInMulti(aSketchFeature, myConstraintMap)))
+    if (aSketchFeature && (aSketchFeature->isExternal() || 
+        isCopyInMulti(aSketchFeature, myConstraintMap)))
       aGroup = GID_OUTOFGROUP;
     aRelated = aBuilder->createAttribute(anAttribute, aGroup);
     if (!aRelated)
@@ -655,7 +658,8 @@ bool SketchSolver_Storage::removeCoincidence(ConstraintWrapperPtr theConstraint)
   return true;
 }
 
-void SketchSolver_Storage::replaceEntities(const std::map<EntityWrapperPtr, EntityWrapperPtr>& theChange)
+void SketchSolver_Storage::replaceEntities(const std::map<EntityWrapperPtr, 
+                                           EntityWrapperPtr>& theChange)
 {
   std::set<EntityWrapperPtr> anUpdFeatures;
   std::map<EntityWrapperPtr, EntityWrapperPtr>::const_iterator aSubIt;
@@ -696,7 +700,8 @@ bool SketchSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
     if (aBaseFeature)
       isFullyRemoved = SketchSolver_Storage::removeEntity(aBaseFeature) && isFullyRemoved;
     else
-      isFullyRemoved = SketchSolver_Storage::removeEntity((*anIt)->baseAttribute()) && isFullyRemoved;
+      isFullyRemoved = 
+        SketchSolver_Storage::removeEntity((*anIt)->baseAttribute()) && isFullyRemoved;
   }
   return isFullyRemoved;
 }
@@ -812,7 +817,8 @@ bool SketchSolver_Storage::isFixed(EntityWrapperPtr theEntity) const
           return true;
     }
 
-  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator aCIt = myConstraintMap.begin();
+  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator aCIt = 
+    myConstraintMap.begin();
   std::list<ConstraintWrapperPtr>::const_iterator aCWIt;
   for (; aCIt != myConstraintMap.end(); ++aCIt) {
     if (aCIt->second.empty())
@@ -982,7 +988,8 @@ void resultToFeatureOrAttribute(const ObjectPtr& theResult,
   // if the feature has several results, we choose which one is referred
   const std::list<ResultPtr>& aResults = aFeature->results();
   if (aResults.size() > 1 && theResult != aFeature->lastResult()) {
-    // actually, the attribute refers to center of arc or circle, but not the edge, get correct attributes
+    // actually, the attribute refers to center of arc or circle, 
+    // but not the edge, get correct attributes
     std::string anAttrName;
     if (aFeature->getKind() == SketchPlugin_Arc::ID())
       anAttrName = SketchPlugin_Arc::CENTER_ID();

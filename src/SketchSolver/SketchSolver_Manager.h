@@ -91,9 +91,11 @@ protected:
 
   /** \brief Goes through the list of groups and solve the constraints
    *  \param[in] theGroups  list of groups to be resolved (if empty list, all groups are resolved)
-   *  \return \c true, if groups are resolved, and features should be updated (send the Update event)
+   *  \return \c true, if groups are resolved, and features should be updated 
+   *  (send the Update event)
    */
-  bool resolveConstraints(const std::list<SketchSolver_Group*>& theGroups = std::list<SketchSolver_Group*>());
+  bool resolveConstraints(const std::list<SketchSolver_Group*>& theGroups = 
+    std::list<SketchSolver_Group*>());
 
 private:
   /** \brief Searches list of groups which interact with specified feature

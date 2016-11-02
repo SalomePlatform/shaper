@@ -29,7 +29,8 @@ public:
   {}
 
   /// \brief Tries to remove constraint
-  /// \return \c false, if current constraint contains another SketchPlugin constraints (like for multiple coincidence)
+  /// \return \c false, if current constraint contains another SketchPlugin 
+  /// constraints (like for multiple coincidence)
   virtual bool remove();
 
 protected:
@@ -38,8 +39,10 @@ protected:
 
   /// \brief Generate list of attributes of constraint in order useful for SolveSpace constraints
   /// \param[out] theValue        numerical characteristic of constraint (e.g. distance)
-  /// \param[out] theAttributes   list of attributes to be filled (list of moved entities or attributes)
-  virtual void getAttributes(ParameterWrapperPtr& theValue, std::vector<EntityWrapperPtr>& theAttributes);
+  /// \param[out] theAttributes   list of attributes to be filled 
+  /// (list of moved entities or attributes)
+  virtual void getAttributes(ParameterWrapperPtr& theValue, 
+                             std::vector<EntityWrapperPtr>& theAttributes);
 
 private:
   std::vector<EntityWrapperPtr> myMovedEntities; ///< list of entities that are moved

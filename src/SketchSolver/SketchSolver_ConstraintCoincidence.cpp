@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #include <SketchSolver_ConstraintCoincidence.h>
 #include <SketchSolver_Error.h>
 #include <SketchSolver_Manager.h>

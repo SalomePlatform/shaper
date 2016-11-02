@@ -19,7 +19,8 @@ typedef std::list< std::set<ConstraintWrapperPtr> >             SameConstraintMa
 
 /** \class   SolveSpaceSolver_Storage
  *  \ingroup Plugins
- *  \brief   Contains all necessary data in SolveSpace format to solve a single group of constraints
+ *  \brief   Contains all necessary data in SolveSpace format to solve a single 
+ *  group of constraints
  */
 class SolveSpaceSolver_Storage : public SketchSolver_Storage
 {
@@ -158,7 +159,8 @@ private:
   ///
   ///        These constraints may be different and become the same after the substitution
   ///        of point coincidence.
-  void addSameConstraints(ConstraintWrapperPtr theConstraint1, ConstraintWrapperPtr theConstraint2);
+  void addSameConstraints(ConstraintWrapperPtr theConstraint1, 
+                          ConstraintWrapperPtr theConstraint2);
 
   /// \brief Search constraint equal to the given in terms of SolveSpace notation
   bool findSameConstraint(ConstraintWrapperPtr theConstraint);
@@ -166,12 +168,21 @@ private:
 private:
   Slvs_hEntity myWorkplaneID; ///< identifier of workplane
 
-  Slvs_hParam myParamMaxID; ///< current parameter index (may differs with the number of parameters)
-  std::vector<Slvs_Param> myParameters; ///< list of parameters used in the current group of constraints (sorted by the identifier)
+  /// current parameter index (may differs with the number of parameters)
+  Slvs_hParam myParamMaxID; 
+
+  /// list of parameters used in the current group of constraints (sorted by the identifier)
+  std::vector<Slvs_Param> myParameters; 
   Slvs_hEntity myEntityMaxID; ///< current entity index (may differs with the number of entities)
-  std::vector<Slvs_Entity> myEntities; ///< list of entities used in the current group of constraints (sorted by the identifier)
-  Slvs_hConstraint myConstrMaxID; ///< current constraint index (may differs with the number of constraints)
-  std::vector<Slvs_Constraint> myConstraints; ///< list of constraints used in the current group (sorted by the identifier)
+
+  /// list of entities used in the current group of constraints (sorted by the identifier)
+  std::vector<Slvs_Entity> myEntities; 
+
+  /// current constraint index (may differs with the number of constraints)
+  Slvs_hConstraint myConstrMaxID; 
+
+  /// list of constraints used in the current group (sorted by the identifier)
+  std::vector<Slvs_Constraint> myConstraints; 
 
   bool myDuplicatedConstraint; ///< shows the storage has same constraint twice
 

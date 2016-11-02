@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #include <SketchSolver_ConstraintMulti.h>
 #include <SketchSolver_Error.h>
 #include <SketchSolver_Manager.h>
@@ -35,7 +37,8 @@ void SketchSolver_ConstraintMulti::getEntities(std::list<EntityWrapperPtr>& theE
   FeaturePtr aFeature;
   std::list<ObjectPtr> anObjectList = aRefList->list();
   std::list<ObjectPtr>::iterator anObjIt = anObjectList.begin();
-  if ((myNumberOfCopies + 1) * myNumberOfObjects != aRefList->size()) // execute for the feature is not called yet
+  // execute for the feature is not called yet
+  if ((myNumberOfCopies + 1) * myNumberOfObjects != aRefList->size()) 
     myNumberOfCopies = aRefList->size() / myNumberOfObjects - 1;
 
   while (anObjIt != anObjectList.end()) {
@@ -43,7 +46,8 @@ void SketchSolver_ConstraintMulti::getEntities(std::list<EntityWrapperPtr>& theE
     if (!aFeature)
       continue;
 
-    if (!myStorage->update(aFeature)) // the entity is not created, so it is a copy in "multi" constraint, force its creation
+    // the entity is not created, so it is a copy in "multi" constraint, force its creation
+    if (!myStorage->update(aFeature)) 
       myStorage->update(aFeature, myGroupID, true);
     theEntities.push_back(myStorage->entity(aFeature));
     myFeatures.insert(aFeature);
@@ -75,7 +79,8 @@ void SketchSolver_ConstraintMulti::update(bool isForce)
   AttributeIntegerPtr aNbObjects = myBaseConstraint->integer(nameNbObjects());
   if (!anInitialRefList || !aNbObjects)
     return; // the "Multi" constraint is in queue to remove
-  bool isUpdated= anInitialRefList->size() != myNumberOfObjects || aNbObjects->value()-1 != myNumberOfCopies;
+  bool isUpdated = 
+    anInitialRefList->size() != myNumberOfObjects || aNbObjects->value()-1 != myNumberOfCopies;
   if (!isUpdated) {
     // additional check that the features and their copies are changed
     AttributeRefListPtr aRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(

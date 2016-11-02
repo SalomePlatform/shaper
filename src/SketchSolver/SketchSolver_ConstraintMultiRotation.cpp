@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #include <SketchSolver_ConstraintMultiRotation.h>
 #include <SketchSolver_Error.h>
 #include <SketchSolver_Manager.h>
@@ -55,7 +57,8 @@ void SketchSolver_ConstraintMultiRotation::process()
   for (; anEntIt != aBaseEntities.end(); ++anEntIt) {
     std::list<ConstraintWrapperPtr> aNewConstraints =
         aBuilder->createConstraint(myBaseConstraint, myGroupID, mySketchID, myType,
-        myAngle, isFullValue, aRotationCenter, EntityWrapperPtr(), std::list<EntityWrapperPtr>(1, *anEntIt));
+        myAngle, isFullValue, aRotationCenter, EntityWrapperPtr(), 
+        std::list<EntityWrapperPtr>(1, *anEntIt));
     aRotConstraints.insert(aRotConstraints.end(), aNewConstraints.begin(), aNewConstraints.end());
   }
   myStorage->addConstraint(myBaseConstraint, aRotConstraints);

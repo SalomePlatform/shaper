@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #include <SketchSolver_ConstraintMovement.h>
 #include <SketchSolver_Error.h>
 #include <SketchSolver_Manager.h>
@@ -49,7 +51,8 @@ static std::list<EntityWrapperPtr> movedEntities(
   for (; anOldIt != anOldSubs.end() && aNewIt != aNewSubs.end(); ++anOldIt, ++aNewIt) {
     std::list<EntityWrapperPtr> aMovedSubs = movedEntities(
         *anOldIt, theOldStorage, *aNewIt, theNewStorage);
-    if ((*anOldIt)->type() == ENTITY_POINT && // check only the points to be moved (because arcs in PlaneGCS have scalar subs too)
+    // check only the points to be moved (because arcs in PlaneGCS have scalar subs too)
+    if ((*anOldIt)->type() == ENTITY_POINT && 
        (aMovedSubs.size() != 1 || aMovedSubs.front() != *anOldIt))
       isFullyMoved = false;
     aMoved.insert(aMoved.end(), aMovedSubs.begin(), aMovedSubs.end());

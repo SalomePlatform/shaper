@@ -61,7 +61,8 @@ SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theCons
         ResultConstructionPtr aRC =
             std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aRefAttr->object());
         if (!aRC)
-          Events_InfoMessage("SketchSolver_Builder", SketchSolver_Error::NEED_OBJECT_NOT_FEATURE(), this).send();
+          Events_InfoMessage("SketchSolver_Builder", 
+                             SketchSolver_Error::NEED_OBJECT_NOT_FEATURE(), this).send();
       }
       continue;
     }
@@ -73,7 +74,8 @@ SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theCons
         ResultConstructionPtr aRC =
             std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aListIter);
         if (*aListIter && !aRC)
-          Events_InfoMessage("SketchSolver_Builder", SketchSolver_Error::NEED_OBJECT_NOT_FEATURE(), this).send();
+          Events_InfoMessage("SketchSolver_Builder", 
+            SketchSolver_Error::NEED_OBJECT_NOT_FEATURE(), this).send();
       }
     }
   }

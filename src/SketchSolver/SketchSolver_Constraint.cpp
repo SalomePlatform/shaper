@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #include <SketchSolver_Constraint.h>
 #include <SketchSolver_Group.h>
 #include <SketchSolver_Error.h>
@@ -256,7 +258,8 @@ bool SketchSolver_Constraint::isUsed(FeaturePtr theFeature) const
     if ((*aCIt)->isUsed(theFeature))
       return true;
 
-  std::list<AttributePtr> anAttrList = theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+  std::list<AttributePtr> anAttrList = 
+    theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
   std::list<AttributePtr>::const_iterator anAttrIt = anAttrList.begin();
   for (; anAttrIt != anAttrList.end(); ++ anAttrIt)
     if (isUsed(*anAttrIt))

@@ -22,7 +22,8 @@ public:
   virtual ~SketchSolver_ConstraintMiddle() {}
 
   /// \brief Notify constraint, that coincidence appears or removed
-  virtual void notifyCoincidenceChanged(EntityWrapperPtr theCoincAttr1, EntityWrapperPtr theCoincAttr2);
+  virtual void notifyCoincidenceChanged(EntityWrapperPtr theCoincAttr1, 
+                                        EntityWrapperPtr theCoincAttr2);
 };
 
 #endif

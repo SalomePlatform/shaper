@@ -390,9 +390,11 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
   std::list<EntityWrapperPtr>::const_iterator aSubIt = aSubs.begin();
   while ((*aSubIt)->type() == ENTITY_POINT) // search scalar entities
     ++aSubIt;
-  double* aStartAngle = std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(*aSubIt++)->scalar();
-  double* aEndAngle   = std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(*aSubIt++)->scalar();
-  double* aRadius     = std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(*aSubIt)->scalar();
+  double* aStartAngle = 
+    std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(*aSubIt++)->scalar();
+  double* aEndAngle =
+    std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(*aSubIt++)->scalar();
+  double* aRadius = std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(*aSubIt)->scalar();
 
   std::shared_ptr<SketchPlugin_Feature> anArcFeature =
       std::dynamic_pointer_cast<SketchPlugin_Feature>(theArc->baseFeature());
@@ -573,7 +575,8 @@ bool PlaneGCSSolver_Storage::isRedundant(
 
     std::list<std::set<double*> >::iterator aCoincIt, aFound1, aFound2;
     aFound1 = aFound2 = theCoincidentPoints.end();
-    for (aCoincIt = theCoincidentPoints.begin(); aCoincIt != theCoincidentPoints.end(); ++aCoincIt) {
+    for (aCoincIt = theCoincidentPoints.begin(); 
+         aCoincIt != theCoincidentPoints.end(); ++aCoincIt) {
       if (aFound1 == theCoincidentPoints.end() && aCoincIt->find(aParams[0]) != aCoincIt->end())
         aFound1 = aCoincIt;
       if (aFound2 == theCoincidentPoints.end() && aCoincIt->find(aParams[1]) != aCoincIt->end())
@@ -773,8 +776,10 @@ EntityWrapperPtr PlaneGCSSolver_Storage::calculateMiddlePoint(
       theX = anArcPoint[0][0] + anArcPoint[2][0];
       theY = anArcPoint[0][1] + anArcPoint[2][1];
     } else {
-      std::shared_ptr<GeomAPI_Dir2d> aStartDir(new GeomAPI_Dir2d(anArcPoint[1][0], anArcPoint[1][1]));
-      std::shared_ptr<GeomAPI_Dir2d> aEndDir(new GeomAPI_Dir2d(anArcPoint[2][0], anArcPoint[2][1]));
+      std::shared_ptr<GeomAPI_Dir2d> 
+        aStartDir(new GeomAPI_Dir2d(anArcPoint[1][0], anArcPoint[1][1]));
+      std::shared_ptr<GeomAPI_Dir2d> 
+        aEndDir(new GeomAPI_Dir2d(anArcPoint[2][0], anArcPoint[2][1]));
       double anAngle = aStartDir->angle(aEndDir);
       if (anAngle < 0)
         anAngle += 2.0 * PI;
@@ -795,8 +800,10 @@ EntityWrapperPtr PlaneGCSSolver_Storage::calculateMiddlePoint(
   aParameters.push_back(aBuilder->createParameter(myGroupID, aMidPoint->y()));
   // Create entity (parameters are not filled)
   GCSPointPtr aPnt(new GCS::Point);
-  aPnt->x = std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(aParameters.front())->parameter();
-  aPnt->y = std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(aParameters.back())->parameter();
+  aPnt->x = 
+    std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(aParameters.front())->parameter();
+  aPnt->y = 
+    std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(aParameters.back())->parameter();
 
   EntityWrapperPtr aResult(new PlaneGCSSolver_PointWrapper(AttributePtr(), aPnt));
   aResult->setGroup(myGroupID);

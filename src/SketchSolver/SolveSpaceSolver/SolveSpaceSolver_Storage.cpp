@@ -36,7 +36,8 @@ static bool IsNotEqual(const Slvs_Param& theParam1, const Slvs_Param& theParam2)
 /// \brief Compare two entities to be different
 static bool IsNotEqual(const Slvs_Entity& theEntity1, const Slvs_Entity& theEntity2);
 /// \brief Compare two constraints to be different
-static bool IsNotEqual(const Slvs_Constraint& theConstraint1, const Slvs_Constraint& theConstraint2);
+static bool IsNotEqual(const Slvs_Constraint& theConstraint1, 
+                       const Slvs_Constraint& theConstraint2);
 
 
 SolveSpaceSolver_Storage::SolveSpaceSolver_Storage(const GroupID& theGroup)
@@ -210,7 +211,8 @@ bool SolveSpaceSolver_Storage::update(ParameterWrapperPtr theParameter)
     return false;
   Slvs_Param aParamToUpd = aParameter->parameter();
   if (aParamToUpd.group == SLVS_G_UNKNOWN)
-    aParamToUpd.group = aParameter->isParametric() ? (Slvs_hGroup)GID_OUTOFGROUP : (Slvs_hGroup)myGroupID;
+    aParamToUpd.group = aParameter->isParametric() ? (Slvs_hGroup)GID_OUTOFGROUP : 
+                                                     (Slvs_hGroup)myGroupID;
   Slvs_hParam anID = updateParameter(aParamToUpd);
   if (aParam.h == SLVS_E_UNKNOWN) // new parameter
     aParameter->changeParameter() = getParameter(anID);
@@ -557,8 +559,10 @@ EntityWrapperPtr SolveSpaceSolver_Storage::calculateMiddlePoint(
       theX = anArcPoint[0][0] + anArcPoint[2][0];
       theY = anArcPoint[0][1] + anArcPoint[2][1];
     } else {
-      std::shared_ptr<GeomAPI_Dir2d> aStartDir(new GeomAPI_Dir2d(anArcPoint[1][0], anArcPoint[1][1]));
-      std::shared_ptr<GeomAPI_Dir2d> aEndDir(new GeomAPI_Dir2d(anArcPoint[2][0], anArcPoint[2][1]));
+      std::shared_ptr<GeomAPI_Dir2d> 
+        aStartDir(new GeomAPI_Dir2d(anArcPoint[1][0], anArcPoint[1][1]));
+      std::shared_ptr<GeomAPI_Dir2d> 
+        aEndDir(new GeomAPI_Dir2d(anArcPoint[2][0], anArcPoint[2][1]));
       double anAngle = aStartDir->angle(aEndDir);
       if (anAngle < 0)
         anAngle += 2.0 * PI;
@@ -821,7 +825,8 @@ Slvs_hConstraint SolveSpaceSolver_Storage::updateConstraint(const Slvs_Constrain
       Slvs_Entity aNewLine2 = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, (Slvs_hGroup)myGroupID,
           myWorkplaneID, aLine.point[1], aConstraint.ptA);
       aNewLine2.h = addEntity(aNewLine2);
-      aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, (Slvs_hGroup)myGroupID, SLVS_C_EQUAL_LENGTH_LINES,
+      aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, (Slvs_hGroup)myGroupID, 
+          SLVS_C_EQUAL_LENGTH_LINES,
           myWorkplaneID, 0.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aNewLine1.h, aNewLine2.h);
     }
   }
@@ -856,7 +861,8 @@ bool SolveSpaceSolver_Storage::removeConstraint(const Slvs_hConstraint& theConst
   return true;
 }
 
-const Slvs_Constraint& SolveSpaceSolver_Storage::getConstraint(const Slvs_hConstraint& theConstraintID) const
+const Slvs_Constraint& SolveSpaceSolver_Storage::
+  getConstraint(const Slvs_hConstraint& theConstraintID) const
 {
   int aPos = Search(theConstraintID, myConstraints);
   if (aPos >= 0 && aPos < (int)myConstraints.size())

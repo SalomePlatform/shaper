@@ -40,7 +40,8 @@ public:
   /// \param theGroupID    [in]  group the constraint belongs to
   /// \param theSketchID   [in]  sketch the constraint belongs to
   /// \param theType       [in]  type of constraint
-  /// \param theValue      [in]  numeric characteristic of constraint (e.g. distance or radius) if applicable
+  /// \param theValue      [in]  numeric characteristic of constraint 
+  ///                            (e.g. distance or radius) if applicable
   /// \param theEntity1    [in]  first attribute of constraint
   /// \param theEntity2    [in]  second attribute of constraint
   /// \param theEntity3    [in]  third attribute of constraint
@@ -64,8 +65,10 @@ public:
   /// \param theGroupID    [in]  group the constraint belongs to
   /// \param theSketchID   [in]  sketch the constraint belongs to
   /// \param theType       [in]  type of constraint
-  /// \param theValue      [in]  numeric characteristic of constraint (angle for multi-rotation) if applicable
-  /// \param theFullValue  [in]  indicates theValue shows full translation delta/rotation angle or delta/angle between neighbor entities
+  /// \param theValue      [in]  numeric characteristic of constraint (angle for multi-rotation) 
+  ///                            if applicable
+  /// \param theFullValue  [in]  indicates theValue shows full translation delta/rotation 
+  ///                            angle or delta/angle between neighbor entities
   /// \param thePoint1     [in]  center for multi-rotation or start point for multi-translation
   /// \param thePoint2     [in]  end point for multi-translation (empty for multi-rotation)
   /// \param theTrsfEnt    [in]  list of transformed entities

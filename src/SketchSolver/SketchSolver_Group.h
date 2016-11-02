@@ -104,7 +104,8 @@ class SketchSolver_Group
   }
 
   /** \brief Update parameters of workplane. Should be called when Update event is coming.
-   *  \return \c true if workplane updated successfully, \c false if workplane parameters are not consistent
+   *  \return \c true if workplane updated successfully, 
+   *  \c false if workplane parameters are not consistent
    */
   bool updateWorkplane();
 
@@ -118,7 +119,8 @@ class SketchSolver_Group
    */
   void mergeGroups(const SketchSolver_Group& theGroup);
 
-  /** \brief Cut from the group several subgroups, which are not connected to the current one by any constraint
+  /** \brief Cut from the group several subgroups, which are not connected to 
+   * the current one by any constraint
    *  \param[out] theCuts enlarge this list by newly created groups
    */
   void splitGroup(std::list<SketchSolver_Group*>& theCuts);
@@ -166,13 +168,16 @@ private:
   CompositeFeaturePtr mySketch; ///< Sketch is equivalent to workplane
   ConstraintConstraintMap myConstraints; ///< List of constraints
   std::set<SolverConstraintPtr> myTempConstraints; ///< List of temporary constraints
-  std::map<AttributePtr, SolverConstraintPtr> myParametricConstraints; ///< List of parametric constraints
+
+  /// List of parametric constraints
+  std::map<AttributePtr, SolverConstraintPtr> myParametricConstraints; 
 
   StoragePtr myStorage; ///< Container for the set of SolveSpace constraints and their entities
 
   SolverPtr mySketchSolver;  ///< Solver for set of equations obtained by constraints
 
-  SketchSolver_SolveStatus myPrevResult; ///< Result of previous solution of the set of constraints
+  /// Result of previous solution of the set of constraints
+  SketchSolver_SolveStatus myPrevResult; 
   std::set<ObjectPtr>      myConflictingConstraints; ///< List of conflicting constraints
 };
 

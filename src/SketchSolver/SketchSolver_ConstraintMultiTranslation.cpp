@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #include <SketchSolver_ConstraintMultiTranslation.h>
 #include <SketchSolver_Error.h>
 #include <SketchSolver_Manager.h>
@@ -60,7 +62,8 @@ void SketchSolver_ConstraintMultiTranslation::process()
     std::list<ConstraintWrapperPtr> aNewConstraints =
         aBuilder->createConstraint(myBaseConstraint, myGroupID, mySketchID, myType,
         0.0, aFullValue, aStartPoint, aEndPoint, std::list<EntityWrapperPtr>(1, *anEntIt));
-    aTransConstraints.insert(aTransConstraints.end(), aNewConstraints.begin(), aNewConstraints.end());
+    aTransConstraints.insert(aTransConstraints.end(), 
+                             aNewConstraints.begin(), aNewConstraints.end());
   }
 
   myStorage->addConstraint(myBaseConstraint, aTransConstraints);
@@ -111,7 +114,8 @@ void SketchSolver_ConstraintMultiTranslation::updateLocal()
                                                   aSLast = aConstraintEntities.end();
       EntityWrapperPtr aStartEntity = *aSIt++;
       if (aStartPointChanged) {
-        AttributePtr aStartPointAttr = aData->attribute(SketchPlugin_MultiTranslation::START_POINT_ID());
+        AttributePtr aStartPointAttr = 
+          aData->attribute(SketchPlugin_MultiTranslation::START_POINT_ID());
         myStorage->update(aStartPointAttr);
         aStartEntity = myStorage->entity(aStartPointAttr);
       }
@@ -119,7 +123,8 @@ void SketchSolver_ConstraintMultiTranslation::updateLocal()
 
       EntityWrapperPtr anEndEntity = *aSIt++;
       if (anEndPointChanged) {
-        AttributePtr anEndPointAttr = aData->attribute(SketchPlugin_MultiTranslation::END_POINT_ID());
+        AttributePtr anEndPointAttr = 
+          aData->attribute(SketchPlugin_MultiTranslation::END_POINT_ID());
         myStorage->update(anEndPointAttr);
         anEndEntity = myStorage->entity(anEndPointAttr);
       }

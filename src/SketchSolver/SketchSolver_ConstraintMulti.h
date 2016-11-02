@@ -34,7 +34,8 @@ public:
   void update(bool isForce);
 
   /// \brief Tries to remove constraint
-  /// \return \c false, if current constraint contains another SketchPlugin constraints (like for multiple coincidence)
+  /// \return \c false, if current constraint contains another SketchPlugin 
+  /// constraints (like for multiple coincidence)
   virtual bool remove();
 
   /// \brief Check the feature is a source or a copy of Multi-constraint
@@ -80,7 +81,8 @@ protected:
 
   bool myAdjusted; ///< the constraint is already adjusted (to not do it several times)
 
-  std::set<FeaturePtr> myFeatures; ///< list of features and their copies to find whether some of them are disappeared
+  /// list of features and their copies to find whether some of them are disappeared
+  std::set<FeaturePtr> myFeatures; 
 };
 
 #endif

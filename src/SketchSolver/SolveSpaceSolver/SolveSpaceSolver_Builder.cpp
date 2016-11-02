@@ -141,8 +141,9 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createConstraint(
     if (!anOriginal[i])
       continue;
     aSlvsEntities[i] = (Slvs_hEntity)anOriginal[i]->id();
+    // entity is not added into a storage, constraint can not be created
     if (aSlvsEntities[i] == SLVS_E_UNKNOWN)
-      return std::list<ConstraintWrapperPtr>(); // entity is not added into a storage, constraint can not be created
+      return std::list<ConstraintWrapperPtr>(); 
     aConstrAttrList.push_back(anOriginal[i]);
   }
 
@@ -256,7 +257,8 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createMirror(
     aResult.insert(aResult.end(), aMrrList.begin(), aMrrList.end());
   }
   else if (theEntity1->type() == ENTITY_ARC) {
-    // Do not allow mirrored arc recalculate its position until coordinated of all points recalculated
+    // Do not allow mirrored arc recalculate its position until 
+    // coordinated of all points recalculated
     FeaturePtr aMirrArc = theEntity2->baseFeature();
     aMirrArc->data()->blockSendAttributeUpdated(true);
 
@@ -276,7 +278,8 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createMirror(
     anIt1 = aBaseArcPoints.begin();
     anIt2 = aMirrorArcPoints.begin();
     for (; anIt1 != aBaseArcPoints.end(); ++anIt1, ++anIt2) {
-      aMrrList = createMirror(theConstraint, theGroupID, theSketchID, *anIt1, *anIt2, theMirrorLine);
+      aMrrList = 
+        createMirror(theConstraint, theGroupID, theSketchID, *anIt1, *anIt2, theMirrorLine);
       aResult.insert(aResult.end(), aMrrList.begin(), aMrrList.end());
     }
     // Restore event sending
@@ -337,7 +340,8 @@ EntityWrapperPtr SolveSpaceSolver_Builder::createFeature(
     AttributePtr aPoint = theFeature->attribute(SketchPlugin_Point::COORD_ID());
     if (!aPoint->isInitialized())
       return aDummy;
-    EntityWrapperPtr aSub = theAttributes.empty() ? createAttribute(aPoint, theGroupID, theSketchID) :
+    EntityWrapperPtr aSub = theAttributes.empty() ? 
+                            createAttribute(aPoint, theGroupID, theSketchID) :
                             theAttributes.front();
     if (!aSub)
       return aDummy;
@@ -388,8 +392,10 @@ EntityWrapperPtr SolveSpaceSolver_Builder::createAttribute(
     std::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
     if (aPoint2D) {
-      aParameters.push_back(createParameter(theGroupID, aPoint2D->x(), !aPoint2D->textX().empty()));
-      aParameters.push_back(createParameter(theGroupID, aPoint2D->y(), !aPoint2D->textY().empty()));
+      aParameters.push_back(createParameter(theGroupID, aPoint2D->x(), 
+                            !aPoint2D->textX().empty()));
+      aParameters.push_back(createParameter(theGroupID, aPoint2D->y(), 
+                            !aPoint2D->textY().empty()));
       // Create entity (parameters are not filled)
       anEntity = Slvs_MakePoint2d(SLVS_E_UNKNOWN, (Slvs_hGroup)theGroupID,
           (Slvs_hEntity)theSketchID, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
@@ -398,7 +404,8 @@ EntityWrapperPtr SolveSpaceSolver_Builder::createAttribute(
       AttributeDoublePtr aScalar =
           std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
       if (aScalar) {
-        aParameters.push_back(createParameter(theGroupID, aScalar->value(), !aScalar->text().empty()));
+        aParameters.push_back(createParameter(theGroupID, aScalar->value(), 
+                              !aScalar->text().empty()));
         // Create entity (parameter is not filled)
         anEntity = Slvs_MakeDistance(SLVS_E_UNKNOWN, (Slvs_hGroup)theGroupID,
           (Slvs_hEntity)theSketchID, SLVS_E_UNKNOWN);
@@ -693,7 +700,8 @@ void adjustAngle(ConstraintWrapperPtr theConstraint)
     aConstraint->baseConstraint()->boolean(
         SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID())->value()
   };
-  std::shared_ptr<GeomAPI_Angle2d> anAngle(new GeomAPI_Angle2d(aLine[0], isReversed[0], aLine[1], isReversed[1]));
+  std::shared_ptr<GeomAPI_Angle2d> 
+    anAngle(new GeomAPI_Angle2d(aLine[0], isReversed[0], aLine[1], isReversed[1]));
   std::shared_ptr<GeomAPI_Pnt2d> aCenter = anAngle->center();
 
   Slvs_Constraint& aSlvsConstraint = aConstraint->changeConstraint();
@@ -738,9 +746,11 @@ void makeMirrorPoints(EntityWrapperPtr theOriginal,
     (*aMIt)->setValue(aCoord[i]);
 
   // update corresponding attribute
-  AttributePtr anAttr = std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(theMirrored)->baseAttribute();
+  AttributePtr anAttr = 
+    std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(theMirrored)->baseAttribute();
   if (anAttr) {
-    std::shared_ptr<GeomDataAPI_Point2D> aMirroredPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr);
+    std::shared_ptr<GeomDataAPI_Point2D> aMirroredPnt = 
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr);
     aMirroredPnt->setValue(aCoord[0], aCoord[1]);
   }
 }

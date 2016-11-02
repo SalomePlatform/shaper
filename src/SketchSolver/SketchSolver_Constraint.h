@@ -47,7 +47,8 @@ public:
   SKETCHSOLVER_EXPORT virtual void update();
 
   /// \brief Tries to remove constraint
-  /// \return \c false, if current constraint contains another SketchPlugin constraints (like for multiple coincidence)
+  /// \return \c false, if current constraint contains another SketchPlugin constraints 
+  /// (like for multiple coincidence)
   SKETCHSOLVER_EXPORT virtual bool remove();
 
   /// \brief Obtain a type of SketchPlugin constraint
@@ -67,8 +68,8 @@ public:
   virtual bool isUsed(AttributePtr theAttribute) const;
 
   /// \brief Notify constraint, that coincidence appears or removed
-  virtual void notifyCoincidenceChanged(EntityWrapperPtr theCoincAttr1, EntityWrapperPtr theCoincAttr2)
-  { /* implement in derived class */ }
+  virtual void notifyCoincidenceChanged(EntityWrapperPtr theCoincAttr1, 
+    EntityWrapperPtr theCoincAttr2) { /* implement in derived class */ }
 
   /// \brief Shows error message
   const std::string& error() const
@@ -96,7 +97,9 @@ protected:
   GroupID       myGroupID;  ///< identifier of the group, the constraint belongs to
   EntityID      mySketchID; ///< identifier of the sketch, the constraint belongs to
   ConstraintPtr myBaseConstraint; ///< base SketchPlugin constraint
-  StoragePtr    myStorage; ///< storage, which contains all information about entities and constraints
+
+  /// storage, which contains all information about entities and constraints
+  StoragePtr    myStorage; 
   SketchSolver_ConstraintType myType; ///< type of constraint
   std::list<EntityWrapperPtr> myAttributes; ///< attributes of constraint
 
