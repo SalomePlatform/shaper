@@ -71,7 +71,8 @@ AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevi
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this, sketch()->coordinatePlane(),
+  AISObjectPtr anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this, 
+                                                                      sketch()->coordinatePlane(),
                                                                       thePrevious);
   return anAIS;
 }
@@ -170,7 +171,8 @@ void SketchPlugin_ConstraintDistance::attributeChanged(const std::string& theID)
   {
     std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
         ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
-    if (!aValueAttr->isInitialized()) { // only if it is not initialized, try to compute the current value
+    if (!aValueAttr->isInitialized()) { 
+      // only if it is not initialized, try to compute the current value
       double aDistance = calculateCurrentDistance();
       if (aDistance > 0) { // set as value the length of updated references
         aValueAttr->setValue(aDistance);
@@ -179,7 +181,8 @@ void SketchPlugin_ConstraintDistance::attributeChanged(const std::string& theID)
   } else if (theID == SketchPlugin_Constraint::FLYOUT_VALUE_PNT() && !myFlyoutUpdate) {
     myFlyoutUpdate = true;
     // Recalculate flyout point in local coordinates of the distance constraint:
-    // the X coordinate is a length of projection of the flyout point on the line binding two distanced points
+    // the X coordinate is a length of projection of the flyout point on the 
+    //                  line binding two distanced points
     //                  or a line of projection of the distanced point onto the distanced segment
     // the Y coordinate is a distance from the flyout point to the line
     std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =

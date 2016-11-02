@@ -58,7 +58,8 @@ void SketchPlugin_IntersectionPoint::computePoint()
   std::shared_ptr<GeomAPI_Edge> anEdge;
   if(aLineAttr && aLineAttr->value() && aLineAttr->value()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->value()));
-  } else if(aLineAttr->context() && aLineAttr->context()->shape() && aLineAttr->context()->shape()->isEdge()) {
+  } else if(aLineAttr->context() && aLineAttr->context()->shape() && 
+            aLineAttr->context()->shape()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->context()->shape()));
   }
   if(!anEdge.get())

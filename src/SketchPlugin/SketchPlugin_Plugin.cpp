@@ -91,16 +91,20 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
   
-  Config_PropManager::registerProp("Visualization", "sketch_entity_color", "Sketch entity color",
+  Config_PropManager::registerProp("Visualization", "sketch_entity_color", 
+                                   "Sketch entity color",
                                    Config_Prop::Color, SKETCH_ENTITY_COLOR);
 
-  Config_PropManager::registerProp("Visualization", "sketch_external_color", "Sketch external entity color",
+  Config_PropManager::registerProp("Visualization", "sketch_external_color", 
+                                   "Sketch external entity color",
                                    Config_Prop::Color, SKETCH_EXTERNAL_COLOR);
 
-  Config_PropManager::registerProp("Visualization", "sketch_auxiliary_color", "Sketch auxiliary entity color",
+  Config_PropManager::registerProp("Visualization", "sketch_auxiliary_color", 
+                                   "Sketch auxiliary entity color",
                                    Config_Prop::Color, SKETCH_AUXILIARY_COLOR);
 
-  Config_PropManager::registerProp("Visualization", "sketch_dimension_color", "Sketch dimension color",
+  Config_PropManager::registerProp("Visualization", "sketch_dimension_color", 
+                                   "Sketch dimension color",
                                    Config_Prop::Color, SKETCH_DIMENSION_COLOR);
 
   Config_PropManager::registerProp("Visualization", "sketch_overconstraint_color",
@@ -202,7 +206,8 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
     std::shared_ptr<ModelAPI_Data> aData = aSketchFeature->data();
     if (aData) {
       std::shared_ptr<GeomDataAPI_Dir> aNormal =
-        std::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SketchPlugin_Sketch::NORM_ID()));
+        std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        aData->attribute(SketchPlugin_Sketch::NORM_ID()));
       // it is important to check whether the normal attribute is initialized
       // because it is possible that normal values are filled when the plane is checked on validity
       aHasSketchPlane = aNormal && aNormal->isInitialized() &&

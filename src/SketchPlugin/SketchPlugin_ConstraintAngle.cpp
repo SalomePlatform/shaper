@@ -42,11 +42,15 @@ void SketchPlugin_ConstraintAngle::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::typeId());
 
-  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(SketchPlugin_ConstraintAngle::TYPE_ID(), ModelAPI_AttributeInteger::typeId());
+  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID(), 
+                       ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(SketchPlugin_ConstraintAngle::TYPE_ID(), 
+                       ModelAPI_AttributeInteger::typeId());
 
-  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID(), ModelAPI_AttributeBoolean::typeId());
-  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID(), 
+                       ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID(), 
+                       ModelAPI_AttributeBoolean::typeId());
 }
 
 void SketchPlugin_ConstraintAngle::colorConfigInfo(std::string& theSection, std::string& theName,
@@ -61,8 +65,10 @@ void SketchPlugin_ConstraintAngle::execute()
 {
   std::shared_ptr<ModelAPI_Data> aData = data();
 
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttrA = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttrB = aData->refattr(SketchPlugin_Constraint::ENTITY_B());
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttrA = 
+    aData->refattr(SketchPlugin_Constraint::ENTITY_A());
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttrB = 
+    aData->refattr(SketchPlugin_Constraint::ENTITY_B());
   if (!anAttrA->isInitialized() || !anAttrB->isInitialized())
     return;
 
@@ -74,7 +80,8 @@ void SketchPlugin_ConstraintAngle::execute()
     anAttrValue->setValue(anAngle);
     updateConstraintValueByAngleValue();
   }
-  // the value should to be computed here, not in the getAISObject in order to change the model value
+  // the value should to be computed here, not in the 
+  // getAISObject in order to change the model value
   // inside the object transaction. This is important for creating a constraint by preselection.
   // The display of the presentation in this case happens after the transaction commit
   std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = std::dynamic_pointer_cast<
@@ -109,7 +116,8 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
     AttributeDoublePtr aConstrValueAttr = real(SketchPlugin_Constraint::VALUE());
     // only if one of attributes is not initialized, try to compute the current value
     if (!aValueAttr->isInitialized() || !aConstrValueAttr->isInitialized()) {
-      if (aValueAttr->isInitialized() && !aConstrValueAttr->isInitialized()) // initialize base value of constraint
+      if (aValueAttr->isInitialized() && !aConstrValueAttr->isInitialized()) 
+        // initialize base value of constraint
         updateConstraintValueByAngleValue();
       double anAngle = calculateAngle();
       aValueAttr->setValue(anAngle);
@@ -119,12 +127,15 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
     // Recalculate flyout point in local coordinates
     // coordinates are calculated according to the center of shapes intersection
     std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
 
     std::shared_ptr<ModelAPI_Data> aData = data();
     std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
-    FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
-    FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+    FeaturePtr aLineA = 
+      SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
+    FeaturePtr aLineB = 
+      SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
 
     // Intersection of lines
     std::shared_ptr<GeomAPI_Pnt2d> anInter = intersect(aLineA, aLineB);
@@ -174,7 +185,8 @@ double SketchPlugin_ConstraintAngle::calculateAngle()
     bool isReversed1 = boolean(ANGLE_REVERSED_FIRST_LINE_ID())->value();
     std::shared_ptr<GeomAPI_Lin2d> aLine2(new GeomAPI_Lin2d(aStartB->pnt(), aEndB->pnt()));
     bool isReversed2 = boolean(ANGLE_REVERSED_SECOND_LINE_ID())->value();
-    anAng = std::shared_ptr<GeomAPI_Angle2d>(new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
+    anAng = std::shared_ptr<GeomAPI_Angle2d>(
+      new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
   }
   double anAngle = anAng->angleDegree();
   std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<

@@ -123,7 +123,8 @@ AISObjectPtr SketchPlugin_Circle::getAISObject(AISObjectPtr thePrevious)
         if (aCircleShape && aRadius != 0) {
           std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
           // make a visible point
-          std::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::vertex(aCenter);
+          std::shared_ptr<GeomAPI_Shape> aCenterPointShape = 
+            GeomAlgoAPI_PointBuilder::vertex(aCenter);
           aShapes.push_back(aCenterPointShape);
           aShapes.push_back(aCircleShape);
 

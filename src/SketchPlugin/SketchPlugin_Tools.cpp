@@ -64,7 +64,7 @@ void clearExpressions(FeaturePtr theFeature)
 std::shared_ptr<GeomAPI_Pnt2d> getCoincidencePoint(const FeaturePtr theStartCoin)
 {
   std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(theStartCoin.get(), 
-                                                                    SketchPlugin_Constraint::ENTITY_A());
+                                                          SketchPlugin_Constraint::ENTITY_A());
   if (aPnt.get() == NULL)
     aPnt = SketcherPrs_Tools::getPoint(theStartCoin.get(), SketchPlugin_Constraint::ENTITY_B());
   return aPnt;

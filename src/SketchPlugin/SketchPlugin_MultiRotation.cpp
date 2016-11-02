@@ -45,8 +45,10 @@ void SketchPlugin_MultiRotation::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(ROTATION_LIST_ID(), ModelAPI_AttributeRefList::typeId());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_A());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_B());
+  ModelAPI_Session::get()->validators()->
+    registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_A());
+  ModelAPI_Session::get()->validators()->
+    registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_B());
 }
 
 void SketchPlugin_MultiRotation::execute()
@@ -112,7 +114,8 @@ void SketchPlugin_MultiRotation::execute()
     if (!(*aUsedIter)) {
       aRefListOfShapes->remove(*anInitIter);
       aRefListOfRotated->remove(*aTargetIter++);
-      for (int i = 0; i < aCurrentNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++) {
+      for (int i = 0; i < aCurrentNbCopies && aTargetIter != aTargetList.end(); 
+           i++, aTargetIter++) {
         aRefListOfRotated->remove(*aTargetIter);
         // remove the corresponding feature from the sketch
         ResultConstructionPtr aRC =
@@ -195,7 +198,7 @@ void SketchPlugin_MultiRotation::execute()
 ////    while (aTargetIter != aTargetList.end()) {
 ////      ObjectPtr anInitialObject = *aTargetIter++;
 ////      for (int i = 0; i < aNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++)
-////        rotateFeature(anInitialObject, *aTargetIter, aCenter->x(), aCenter->y(), anAngle * (i + 1));
+//// rotateFeature(anInitialObject, *aTargetIter, aCenter->x(), aCenter->y(), anAngle * (i + 1));
 ////    }
 ////  }
 
@@ -237,7 +240,8 @@ void SketchPlugin_MultiRotation::erase()
         if(aRes.get()) {
           FeaturePtr aFeature = aRes->document()->feature(aRes);
           if(aFeature.get()) {
-            AttributeBooleanPtr aBooleanAttr = aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID());
+            AttributeBooleanPtr aBooleanAttr = 
+              aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID());
             if(aBooleanAttr.get()) {
               if (ModelAPI_Session::get()->isOperation()) // if this is not undo or redo
                 aBooleanAttr->setValue(false);
@@ -260,7 +264,8 @@ ObjectPtr SketchPlugin_MultiRotation::copyFeature(ObjectPtr theObject)
   if (!aFeature || !aResult)
     return ObjectPtr();
 
-  FeaturePtr aNewFeature = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(aFeature, sketch(), true);
+  FeaturePtr aNewFeature = 
+    SketchPlugin_Sketch::addUniqueNamedCopiedFeature(aFeature, sketch(), true);
   aNewFeature->execute();
 
   static Events_ID aRedisplayEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);

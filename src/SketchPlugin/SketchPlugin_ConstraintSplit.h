@@ -115,8 +115,9 @@ private:
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToPoint*/);
 
   /// Obtains references to feature point attributes and to feature,
-  /// e.g. for feature line: 1st container is <1st line point, list<entity_a in distance, entity_b in parallel> >
-  ///                                         <2nd line point, list<> >
+  /// e.g. for feature line: 1st container is 
+  ///             <1st line point, list<entity_a in distance, entity_b in parallel> >
+  ///             <2nd line point, list<> >
   ///      for feature circle 2nd container is <entity_a in Radius, entity_b in equal, ...>
   /// \param theFeature an investigated feature
   /// \param theRefs a container of list of referenced attributes
@@ -129,9 +130,9 @@ private:
   /// \param theFurtherCoincidences a list of points where coincidences will be build
   /// \paramv theFeatureResults created results after split where constaint might be connected
   void updateCoincidenceConstraintsToFeature(
-              const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature,
-              const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences,
-              const std::set<ResultPtr>& theFeatureResults);
+      const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature,
+      const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences,
+      const std::set<ResultPtr>& theFeatureResults);
 
   /// Move tangency constraint to the nearest split feature that has a coincidence to the tangent
   /// \param theTangentFeatures tangencies to feature to be connected to nearest feature
@@ -152,8 +153,8 @@ private:
   /// \param theModifiedAttributes container of attributes placed instead of base attributes
   /// at the same place
   void updateRefAttConstraints(
-                      const std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
-                      const std::set<std::pair<AttributePtr, AttributePtr> >& theModifiedAttributes);
+               const std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
+               const std::set<std::pair<AttributePtr, AttributePtr> >& theModifiedAttributes);
 
   /// Make the base object is splitted by the point attributes
   /// \param theSplitFeature a result split feature
@@ -161,7 +162,8 @@ private:
   /// \param theAfterFeature a feature between last point of split feature and the end point
   /// \param thePoints a list of points where coincidences will be build
   /// \param theCreatedFeatures a container of created features
-  /// \param theModifiedAttributes a container of attribute on base feature to attribute on new feature
+  /// \param theModifiedAttributes a container of attribute on base 
+  /// feature to attribute on new feature
   void splitLine(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
                  std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,
                  std::shared_ptr<ModelAPI_Feature>& theAfterFeature,

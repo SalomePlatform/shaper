@@ -73,7 +73,8 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribut
     ObjectPtr anObject = aRefAttr->object();
 
     const ModelAPI_AttributeValidator* aShapeValidator = 
-      dynamic_cast<const ModelAPI_AttributeValidator*>(aFactory->validator("GeomValidators_ShapeType"));
+      dynamic_cast<const ModelAPI_AttributeValidator*>(
+      aFactory->validator("GeomValidators_ShapeType"));
     std::list<std::string> anArguments;
     anArguments.push_back("circle");
     Events_InfoMessage aCircleError;
@@ -173,8 +174,10 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
-  FeaturePtr anAttributeFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
-  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  FeaturePtr anAttributeFeature = 
+    std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeRefAttrPtr aRefAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
 
   bool isObject = aRefAttr->isObject();
   ObjectPtr anObject = aRefAttr->object();
@@ -390,7 +393,8 @@ bool SketchPlugin_CoincidenceAttrValidator::isValid(const AttributePtr& theAttri
     return false;
   }
 
-  AttributeRefAttrPtr aRefAttrB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  AttributeRefAttrPtr aRefAttrB = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
 
   // first attribute is a point, it may coincide with any object
   if (!aRefAttrA->isObject())
@@ -473,9 +477,10 @@ bool SketchPlugin_CopyValidator::isValid(const AttributePtr& theAttribute,
   return true;
 }
 
-bool SketchPlugin_SolverErrorValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                                const std::list<std::string>& theArguments,
-                                                Events_InfoMessage& theError) const
+bool SketchPlugin_SolverErrorValidator::isValid(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<std::string>& theArguments,
+  Events_InfoMessage& theError) const
 {
   AttributeStringPtr aAttributeString = theFeature->string(SketchPlugin_Sketch::SOLVER_ERROR());
 
@@ -487,14 +492,17 @@ bool SketchPlugin_SolverErrorValidator::isValid(const std::shared_ptr<ModelAPI_F
   return true;
 }
 
-bool SketchPlugin_SolverErrorValidator::isNotObligatory(std::string theFeature, std::string theAttribute)
+bool SketchPlugin_SolverErrorValidator::isNotObligatory(std::string theFeature, 
+                                                        std::string theAttribute)
 {
   return true;
 }
 
-static bool hasSameTangentFeature(const std::set<AttributePtr>& theRefsList, const FeaturePtr theFeature)
+static bool hasSameTangentFeature(const std::set<AttributePtr>& theRefsList, 
+                                  const FeaturePtr theFeature)
 {
-  for(std::set<AttributePtr>::const_iterator anIt = theRefsList.cbegin(); anIt != theRefsList.cend(); ++anIt) {
+  for(std::set<AttributePtr>::const_iterator 
+      anIt = theRefsList.cbegin(); anIt != theRefsList.cend(); ++anIt) {
     std::shared_ptr<ModelAPI_Attribute> aAttr = (*anIt);
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
     if (aFeature->getKind() == SketchPlugin_ConstraintTangent::ID()) {
@@ -535,16 +543,20 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
                                                  const std::list<std::string>& theArguments,
                                                  Events_InfoMessage& theError) const
 {
-  std::shared_ptr<SketchPlugin_ConstraintFillet> aFilletFeature = std::dynamic_pointer_cast<SketchPlugin_ConstraintFillet>(theAttribute->owner());
-  AttributeRefAttrListPtr aPointsRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(theAttribute);
+  std::shared_ptr<SketchPlugin_ConstraintFillet> aFilletFeature = 
+    std::dynamic_pointer_cast<SketchPlugin_ConstraintFillet>(theAttribute->owner());
+  AttributeRefAttrListPtr aPointsRefList = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(theAttribute);
   if(aPointsRefList->size() == 0) {
     theError = "Error: List of points is empty.";
     return false;
   }
 
-  std::map<AttributePtr, SketchPlugin_ConstraintFillet::FilletFeatures> aPointsFeaturesMap = aFilletFeature->pointsFeaturesMap();
+  std::map<AttributePtr, SketchPlugin_ConstraintFillet::FilletFeatures> aPointsFeaturesMap = 
+    aFilletFeature->pointsFeaturesMap();
   std::set<AttributePtr> aSetOfPointsOnResultEdges;
-  for(std::map<AttributePtr, SketchPlugin_ConstraintFillet::FilletFeatures>::iterator aPointsIter = aPointsFeaturesMap.begin();
+  for(std::map<AttributePtr, SketchPlugin_ConstraintFillet::FilletFeatures>::iterator 
+      aPointsIter = aPointsFeaturesMap.begin();
       aPointsIter != aPointsFeaturesMap.end();
       ++aPointsIter) {
     const SketchPlugin_ConstraintFillet::FilletFeatures& aFeatures = aPointsIter->second;
@@ -564,12 +576,14 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
   }
 
   std::list<std::pair<ObjectPtr, AttributePtr>> aPointsList = aPointsRefList->list();
-  for(std::list<std::pair<ObjectPtr, AttributePtr>>::const_iterator aPointsIt = aPointsList.cbegin(); aPointsIt != aPointsList.cend(); aPointsIt++) {
+  for(std::list<std::pair<ObjectPtr, AttributePtr>>::const_iterator 
+      aPointsIt = aPointsList.cbegin(); aPointsIt != aPointsList.cend(); aPointsIt++) {
     ObjectPtr anObject = (*aPointsIt).first;
     AttributePtr aPointAttribute = (*aPointsIt).second;
     if (!aPointAttribute.get())
         return false;
-    std::shared_ptr<GeomAPI_Pnt2d> aSelectedPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPointAttribute)->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> aSelectedPnt = 
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPointAttribute)->pnt();
 
     // If we alredy have some result then:
     // - if it is the same point all ok, just skip it
@@ -588,7 +602,8 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
     // Obtain constraint coincidence for the fillet point.
     const std::set<AttributePtr>& aRefsList = aPointAttribute->owner()->data()->refsToMe();
     FeaturePtr aConstraintCoincidence;
-    for(std::set<AttributePtr>::const_iterator anIt = aRefsList.cbegin(); anIt != aRefsList.cend(); ++anIt) {
+    for(std::set<AttributePtr>::const_iterator anIt = aRefsList.cbegin(); 
+        anIt != aRefsList.cend(); ++anIt) {
       std::shared_ptr<ModelAPI_Attribute> aAttr = (*anIt);
       FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
       if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
@@ -629,14 +644,16 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
 
     // Remove points from set of coincides.
     std::set<FeaturePtr> aNewSetOfCoincides;
-    for(std::set<FeaturePtr>::iterator anIt = aCoinsides.begin(); anIt != aCoinsides.end(); ++anIt) {
+    for(std::set<FeaturePtr>::iterator anIt = aCoinsides.begin(); 
+        anIt != aCoinsides.end(); ++anIt) {
       if((*anIt)->getKind() != SketchPlugin_Line::ID() &&
          (*anIt)->getKind() != SketchPlugin_Arc::ID()) {
            continue;
       }
       if((*anIt)->getKind() == SketchPlugin_Arc::ID()) {
         AttributePtr anArcCenter = (*anIt)->attribute(SketchPlugin_Arc::CENTER_ID());
-        std::shared_ptr<GeomAPI_Pnt2d> anArcCenterPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anArcCenter)->pnt();
+        std::shared_ptr<GeomAPI_Pnt2d> anArcCenterPnt = 
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anArcCenter)->pnt();
         double aDistSelectedArcCenter = aSelectedPnt->distance(anArcCenterPnt);
         if(aDistSelectedArcCenter < tolerance) {
           continue;
@@ -649,7 +666,8 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
     // If we still have more than two coincides remove auxilary entities from set of coincides.
     if(aCoinsides.size() > 2) {
       aNewSetOfCoincides.clear();
-      for(std::set<FeaturePtr>::iterator anIt = aCoinsides.begin(); anIt != aCoinsides.end(); ++anIt) {
+      for(std::set<FeaturePtr>::iterator anIt = aCoinsides.begin(); 
+          anIt != aCoinsides.end(); ++anIt) {
         if(!(*anIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value()) {
           aNewSetOfCoincides.insert(*anIt);
         }
@@ -673,7 +691,8 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
     }
 
     std::list<ResultPtr> aFirstResults = aFirstFeature->results();
-    for(std::list<ResultPtr>::iterator aResIt = aFirstResults.begin(); aResIt != aFirstResults.end(); ++aResIt) {
+    for(std::list<ResultPtr>::iterator aResIt = aFirstResults.begin(); 
+        aResIt != aFirstResults.end(); ++aResIt) {
       ResultPtr aRes = *aResIt;
       const std::set<AttributePtr>& aResRefsList = aRes->data()->refsToMe();
       if(hasSameTangentFeature(aResRefsList, aSecondFeature)) {
@@ -683,17 +702,29 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
     }
 
     // Check that lines not collinear
-    if(aFirstFeature->getKind() == SketchPlugin_Line::ID() && aSecondFeature->getKind() == SketchPlugin_Line::ID()) {
+    if(aFirstFeature->getKind() == SketchPlugin_Line::ID() && 
+        aSecondFeature->getKind() == SketchPlugin_Line::ID()) {
       std::string aStartAttr = SketchPlugin_Line::START_ID();
       std::string anEndAttr = SketchPlugin_Line::END_ID();
       std::shared_ptr<GeomAPI_Pnt2d> aFirstStartPnt, aFirstEndPnt, aSecondStartPnt, aSecondEndPnt;
-      aFirstStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFirstFeature->attribute(aStartAttr))->pnt();
-      aFirstEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFirstFeature->attribute(anEndAttr))->pnt();
-      aSecondStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aSecondFeature->attribute(aStartAttr))->pnt();
-      aSecondEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aSecondFeature->attribute(anEndAttr))->pnt();
-      double aCheck1 = fabs((aFirstEndPnt->x() - aFirstStartPnt->x()) * (aSecondStartPnt->y() - aFirstStartPnt->y()) -
+      aFirstStartPnt = 
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aFirstFeature->attribute(aStartAttr))->pnt();
+      aFirstEndPnt = 
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFirstFeature->attribute(anEndAttr))->pnt();
+      aSecondStartPnt =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aSecondFeature->attribute(aStartAttr))->pnt();
+      aSecondEndPnt = 
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aSecondFeature->attribute(anEndAttr))->pnt();
+      double aCheck1 = 
+        fabs((aFirstEndPnt->x() - aFirstStartPnt->x()) * 
+        (aSecondStartPnt->y() - aFirstStartPnt->y()) -
         (aSecondStartPnt->x() - aFirstStartPnt->x()) * (aFirstEndPnt->y() - aFirstStartPnt->y()));
-      double aCheck2 = fabs((aFirstEndPnt->x() - aFirstStartPnt->x()) * (aSecondEndPnt->y() - aFirstStartPnt->y()) -
+      double aCheck2 = 
+        fabs((aFirstEndPnt->x() - aFirstStartPnt->x()) * 
+        (aSecondEndPnt->y() - aFirstStartPnt->y()) -
         (aSecondEndPnt->x() - aFirstStartPnt->x()) * (aFirstEndPnt->y() - aFirstStartPnt->y()));
       if(aCheck1 < 1.e-7 && aCheck2 < 1.e-7) {
         return false;
@@ -719,7 +750,8 @@ bool SketchPlugin_MiddlePointAttrValidator::isValid(const AttributePtr& theAttri
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
-  FeaturePtr anAttributeFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  FeaturePtr anAttributeFeature = 
+    std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
   AttributeRefAttrPtr anOtherAttr = anAttributeFeature->data()->refattr(aParamA);
 
@@ -820,11 +852,12 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
     return false;
   }
   AttributeSelectionPtr aLineAttr =
-                              std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+                       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   std::shared_ptr<GeomAPI_Edge> anEdge;
   if(aLineAttr && aLineAttr->value() && aLineAttr->value()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->value()));
-  } else if(aLineAttr->context() && aLineAttr->context()->shape() && aLineAttr->context()->shape()->isEdge()) {
+  } else if(aLineAttr->context() && 
+            aLineAttr->context()->shape() && aLineAttr->context()->shape()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->context()->shape()));
   }
 
@@ -889,8 +922,9 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
 
     // coincidences to the feature
     std::set<std::shared_ptr<GeomDataAPI_Point2D> > aRefAttributes;
-    ModelGeomAlgo_Point2D::getPointsOfReference(anAttrFeature, SketchPlugin_ConstraintCoincidence::ID(),
-                         aRefAttributes, SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
+    ModelGeomAlgo_Point2D::getPointsOfReference(anAttrFeature, 
+                        SketchPlugin_ConstraintCoincidence::ID(),
+                        aRefAttributes, SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
 
     GeomShapePtr anAttrShape = *anEdgeShapes.begin();
     std::shared_ptr<SketchPlugin_Feature> aSFeature =
@@ -907,7 +941,8 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
     std::shared_ptr<GeomAPI_Dir> aDirY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
     
     std::list<std::shared_ptr<GeomAPI_Pnt> > aPoints;
-    std::map<std::shared_ptr<GeomDataAPI_Point2D>, std::shared_ptr<GeomAPI_Pnt> > aPointToAttributes;
+    std::map<std::shared_ptr<GeomDataAPI_Point2D>, std::shared_ptr<GeomAPI_Pnt> > 
+      aPointToAttributes;
     ModelGeomAlgo_Point2D::getPointsInsideShape(anAttrShape, aRefAttributes, aC->pnt(),
                                                 aX->dir(), aDirY, aPoints, aPointToAttributes);
 

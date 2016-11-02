@@ -40,13 +40,14 @@ bool SketchPlugin_ExternalValidator::isValid(const AttributePtr& theAttribute,
 bool SketchPlugin_ExternalValidator::isExternalAttribute(const AttributePtr& theAttribute) const
 {
   bool isExternal = false;
-  AttributeRefAttrPtr anAttribute = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  AttributeRefAttrPtr anAttribute = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
 
   if (anAttribute.get() != NULL) {
     FeaturePtr anArgumentFeature = ModelAPI_Feature::feature(anAttribute->object());
     if (anArgumentFeature.get() != NULL) {
       std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
-                                    std::dynamic_pointer_cast<SketchPlugin_Feature>(anArgumentFeature);
+                        std::dynamic_pointer_cast<SketchPlugin_Feature>(anArgumentFeature);
       if (aSketchFeature.get() != NULL) {
         isExternal = aSketchFeature->isExternal();
       }

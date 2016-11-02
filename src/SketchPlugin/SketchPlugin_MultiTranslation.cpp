@@ -39,8 +39,10 @@ void SketchPlugin_MultiTranslation::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(TRANSLATION_LIST_ID(), ModelAPI_AttributeRefList::typeId());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_A());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_B());
+  ModelAPI_Session::get()->validators()->
+    registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_A());
+  ModelAPI_Session::get()->validators()->
+    registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_B());
 }
 
 void SketchPlugin_MultiTranslation::execute()
@@ -69,7 +71,8 @@ void SketchPlugin_MultiTranslation::execute()
   if (!aStart || !aEnd)
     return;
 
-  std::shared_ptr<GeomAPI_XY> aShiftVec(new GeomAPI_XY(aEnd->x() - aStart->x(), aEnd->y() - aStart->y()));
+  std::shared_ptr<GeomAPI_XY> 
+    aShiftVec(new GeomAPI_XY(aEnd->x() - aStart->x(), aEnd->y() - aStart->y()));
 
   // Wait all objects being created, then send update events
   static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
@@ -110,7 +113,8 @@ void SketchPlugin_MultiTranslation::execute()
     if (!(*aUsedIter)) {
       aRefListOfShapes->remove(*anInitIter);
       aRefListOfTranslated->remove(*aTargetIter++);
-      for (int i = 0; i < aCurrentNbCopies && aTargetIter != aTargetList.end(); i++, aTargetIter++) {
+      for (int i = 0; i < aCurrentNbCopies && aTargetIter != aTargetList.end(); 
+           i++, aTargetIter++) {
         aRefListOfTranslated->remove(*aTargetIter);
         // remove the corresponding feature from the sketch
         ResultConstructionPtr aRC =
@@ -222,7 +226,8 @@ void SketchPlugin_MultiTranslation::erase()
         if(aRes.get()) {
           FeaturePtr aFeature = aRes->document()->feature(aRes);
           if(aFeature.get()) {
-            AttributeBooleanPtr aBooleanAttr = aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID());
+            AttributeBooleanPtr aBooleanAttr = 
+              aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID());
             if(aBooleanAttr.get()) {
               if (ModelAPI_Session::get()->isOperation()) // if this is not undo or redo
                 aBooleanAttr->setValue(false);
@@ -245,7 +250,8 @@ ObjectPtr SketchPlugin_MultiTranslation::copyFeature(ObjectPtr theObject)
   if (!aFeature || !aResult)
     return ObjectPtr();
 
-  FeaturePtr aNewFeature = SketchPlugin_Sketch::addUniqueNamedCopiedFeature(aFeature, sketch(), true);
+  FeaturePtr aNewFeature = 
+    SketchPlugin_Sketch::addUniqueNamedCopiedFeature(aFeature, sketch(), true);
 
   aNewFeature->execute();
   static Events_ID aRedisplayEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);

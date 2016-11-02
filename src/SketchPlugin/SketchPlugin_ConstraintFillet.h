@@ -13,10 +13,12 @@
 
 /** \class SketchPlugin_ConstraintFillet
  *  \ingroup Plugins
- *  \brief Feature for creation of a new constraint filleting two objects which have coincident point
+ *  \brief Feature for creation of a new constraint filleting two objects which have 
+ *  coincident point
  *
  *  This constraint has three attributes:
- *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B() for the filleting objects;
+ *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B() 
+ *  for the filleting objects;
  *  SketchPlugin_Constraint::VALUE() contains radius of filleting circular arc
  *
  *  Also the constraint has attribute SketchPlugin_Constraint::ENTITY_C()
@@ -27,9 +29,10 @@ class SketchPlugin_ConstraintFillet : public SketchPlugin_ConstraintBase
  public:
    /// \struct Struct to store base edges with states, result edges and constraints.
    struct FilletFeatures {
-    std::list<std::pair<FeaturePtr, bool>> baseEdgesState; ///< list of objects the fillet is based and its states
-    std::list<FeaturePtr> resultEdges; ///< list of result edges
-    std::list<FeaturePtr> resultConstraints; ///< list of constraints provided by the fillet
+     /// list of objects the fillet is based and its states
+     std::list<std::pair<FeaturePtr, bool>> baseEdgesState; 
+     std::list<FeaturePtr> resultEdges; ///< list of result edges
+     std::list<FeaturePtr> resultConstraints; ///< list of constraints provided by the fillet
    };
 
   /// Fillet constraint kind
@@ -76,7 +79,9 @@ private:
 
 private:
   std::set<AttributePtr> myNewPoints; ///< set of new points
-  std::map<AttributePtr, FilletFeatures> myPointFeaturesMap; ///< map of point and features for fillet
+
+  /// map of point and features for fillet
+  std::map<AttributePtr, FilletFeatures> myPointFeaturesMap; 
   bool myListOfPointsChangedInCode; ///< flag to track that list of points changed in code
   bool myRadiusChangedByUser; ///< flag to track that radius changed by user
   bool myRadiusChangedInCode; ///< flag to track that radius changed in code

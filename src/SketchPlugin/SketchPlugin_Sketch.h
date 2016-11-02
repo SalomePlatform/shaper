@@ -28,7 +28,7 @@
  * \ingroup Plugins
  * \brief Feature for creation of the new part in PartSet.
  */
-class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICustomPrs//, public GeomAPI_IPresentable
+class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICustomPrs
 {
  public:
   /// Sketch feature kind

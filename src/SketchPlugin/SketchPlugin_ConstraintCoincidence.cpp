@@ -89,10 +89,10 @@ AttributePoint2DPtr SketchPlugin_ConstraintCoincidence::getPoint(const FeaturePt
 {
   AttributePoint2DPtr aPoint = ModelGeomAlgo_Point2D::getPointOfRefAttr(theFeature.get(),
                                                          SketchPlugin_Constraint::ENTITY_A(),
-                                                         SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
+                                 SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
   if (!aPoint.get())
     aPoint = ModelGeomAlgo_Point2D::getPointOfRefAttr(theFeature.get(),
                                                       SketchPlugin_Constraint::ENTITY_B(),
-                                                      SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
+                                 SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
   return aPoint;
 }

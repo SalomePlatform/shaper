@@ -75,7 +75,8 @@ void SketchPlugin_ConstraintRadius::execute()
     //  aValueAttr->setValue(aRadius);
     //}
 
-    // the value should to be computed here, not in the getAISObject in order to change the model value
+    // the value should to be computed here,
+    // not in the getAISObject in order to change the model value
     // inside the object transaction. This is important for creating a constraint by preselection.
     // The display of the presentation in this case happens after the transaction commit
     std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = std::dynamic_pointer_cast<
@@ -100,7 +101,8 @@ bool SketchPlugin_ConstraintRadius::compute(const std::string& theAttributeId)
       GeomDataAPI_Point2D>(data()->attribute(theAttributeId));
   // Prepare a circle
   if (aCyrcFeature->getKind() == SketchPlugin_Circle::ID()) { // circle
-    std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aCyrcFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
     double aShift = aRadius * 1.1;
     std::shared_ptr<GeomAPI_Pnt2d> aPnt = aCenterAttr->pnt();
@@ -174,7 +176,8 @@ void SketchPlugin_ConstraintRadius::attributeChanged(const std::string& theID) {
   if (theID == SketchPlugin_Constraint::ENTITY_A()) {
     std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
         ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
-    if (!aValueAttr->isInitialized()) { // only if it is not initialized, try to compute the current value
+    if (!aValueAttr->isInitialized()) { 
+      // only if it is not initialized, try to compute the current value
       std::shared_ptr<ModelAPI_Feature> aCyrcFeature;
       double aRadius = circleRadius(aCyrcFeature);
       if (aRadius > 0) { // set as value the radius of updated reference to another circle

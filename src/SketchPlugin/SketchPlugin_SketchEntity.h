@@ -27,7 +27,8 @@
 
 /**\class SketchPlugin_SketchEntity
  * \ingroup Plugins
- * \brief Sketch Entity for creation of the new feature in PartSet. This is an abstract class to give
+ * \brief Sketch Entity for creation of the new feature in PartSet. 
+ * This is an abstract class to give
  * an interface to create the entity features such as line, circle, arc and point.
  */
 class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_ICustomPrs
@@ -121,7 +122,8 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
     bool isCustomized = theDefaultPrs.get() != NULL &&
                         theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
     int aShapeType = thePrs->getShapeType();
-    // a compound is processed like the edge because the arc feature uses the compound for presentable AIS
+    // a compound is processed like the edge because the 
+    // arc feature uses the compound for presentable AIS
     if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/ && aShapeType != 0/*compound*/)
       return false;
 

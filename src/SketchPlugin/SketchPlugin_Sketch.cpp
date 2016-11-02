@@ -52,7 +52,8 @@ void SketchPlugin_Sketch::initAttributes()
   data()->addAttribute(SketchPlugin_Sketch::NORM_ID(), GeomDataAPI_Dir::typeId());
   data()->addAttribute(SketchPlugin_Sketch::FEATURES_ID(), ModelAPI_AttributeRefList::typeId());
   // the selected face, base for the sketcher plane, not obligatory
-  data()->addAttribute(SketchPlugin_SketchEntity::EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(SketchPlugin_SketchEntity::EXTERNAL_ID(), 
+    ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(
     getKind(), SketchPlugin_SketchEntity::EXTERNAL_ID());
   data()->addAttribute(SketchPlugin_Sketch::SOLVER_ERROR(), ModelAPI_AttributeString::typeId());
@@ -148,7 +149,8 @@ void SketchPlugin_Sketch::removeFeature(std::shared_ptr<ModelAPI_Feature> theFea
   if (!data()->isValid()) // sketch is already removed (case on undo of sketch), sync is not needed
     return;
   AttributeRefListPtr aList = reflist(SketchPlugin_Sketch::FEATURES_ID());
-  // if the object is last, remove it from the list (needed to skip empty transaction on edit of sketch feature)
+  // if the object is last, remove it from the list 
+  // (needed to skip empty transaction on edit of sketch feature)
   if (aList->object(aList->size(true) - 1, true) == theFeature) {
     aList->remove(theFeature);
   } else {
@@ -229,7 +231,8 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
         aCoords = aCoords->multiplied(-aD * aCoords->distance(aZero));
         std::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
         // X axis is preferable to be dirX on the sketch
-        static const double tol = 0.1; // here can not be very small value to avoid very close to X normal axis (issue 595)
+        // here can not be very small value to avoid very close to X normal axis (issue 595)
+        static const double tol = 0.1; 
         bool isX = fabs(anA) - 1.0 < tol && fabs(aB) < tol && fabs(aC) < tol;
         std::shared_ptr<GeomAPI_Dir> aTempDir(
           isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));

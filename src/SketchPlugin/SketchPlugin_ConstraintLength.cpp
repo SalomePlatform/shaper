@@ -68,10 +68,12 @@ void SketchPlugin_ConstraintLength::execute()
     //  aValueAttr->setValue(aLenght);
     //}
 
-    // the value should to be computed here, not in the getAISObject in order to change the model value
+    // the value should to be computed here, not in the getAISObject 
+    // in order to change the model value
     // inside the object transaction. This is important for creating a constraint by preselection.
     // The display of the presentation in this case happens after the transaction commit
-    AttributePtr aFlyOutAttribute = data()->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
+    AttributePtr aFlyOutAttribute = 
+      data()->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
     if (!aFlyOutAttribute->isInitialized()) {
       compute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
     }
@@ -145,8 +147,8 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this, sketch()->coordinatePlane(),
-                                                                      thePrevious);
+  AISObjectPtr anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this, 
+    sketch()->coordinatePlane(), thePrevious);
   return anAIS;
 }
 
@@ -186,7 +188,8 @@ void SketchPlugin_ConstraintLength::attributeChanged(const std::string& theID) {
   {
     std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeDouble>(attribute(SketchPlugin_Constraint::VALUE()));
-    if (!aValueAttr->isInitialized()) { // only if it is not initialized, try to compute the current value
+    if (!aValueAttr->isInitialized()) {
+      // only if it is not initialized, try to compute the current value
       double aLength;
       if (computeLenghtValue(aLength))
         aValueAttr->setValue(aLength);

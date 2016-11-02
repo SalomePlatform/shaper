@@ -19,7 +19,8 @@
 class SketchPlugin_ExternalValidator : public ModelAPI_AttributeValidator
 {
 public:
-  /// returns true if the feature of attribute do not contain external features in the given attribute and
+  /// returns true if the feature of attribute do not contain external features 
+  /// in the given attribute and
   /// among attributes listed in the arguments
   /// \param theAttribute an attribute to check
   /// \param theArguments a filter parameters
