@@ -132,15 +132,16 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
   // for one feature
   Handle(StdSelect_BRepOwner) aBRO = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
   if( !aBRO.IsNull() && aBRO->HasShape() ) {
-    // the located method is called in the context to obtain the shape by the SelectedShape() method,
-    // so the shape is located by the same rules
+    // the located method is called in the context to obtain the shape by the SelectedShape()
+    // method, so the shape is located by the same rules
     TopoDS_Shape aShape = aBRO->Shape().Located (aBRO->Location() * aBRO->Shape().Location());
 #ifndef DEBUG_DELIVERY
     if (aShape.IsNull())
       aShape = findAxisShape(anIO);
 #endif
     if (!aShape.IsNull()) {
-      std::shared_ptr<GeomAPI_Shape> aGeomShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+      std::shared_ptr<GeomAPI_Shape> aGeomShape = 
+        std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
       aGeomShape->setImpl(new TopoDS_Shape(aShape));
       thePrs->setShape(aGeomShape);
     }
@@ -247,13 +248,14 @@ QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getHighlighted() const
       aPrs->setInteractive(anIO);
 
       ObjectPtr aResult = aDisplayer->getObject(anIO);
-      // we should not check the appearance of this feature because there can be some selected shapes
-      // for one feature
+      // we should not check the appearance of this feature because there can be some selected
+      // shapes for one feature
       aPrs->setObject(aResult);
       if (aContext->HasOpenedContext()) {
         TopoDS_Shape aShape = aContext->DetectedShape();
         if (!aShape.IsNull()) {
-          std::shared_ptr<GeomAPI_Shape> aGeomShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+          std::shared_ptr<GeomAPI_Shape> aGeomShape = 
+            std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
           aGeomShape->setImpl(new TopoDS_Shape(aShape));
           aPrs->setShape(aGeomShape);
         }

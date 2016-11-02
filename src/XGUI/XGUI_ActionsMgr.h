@@ -84,7 +84,8 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
   /// Return an action by the given id, if it was registered in the manager
   QAction* action(const QString& theId);
 
-  /// Return info (icon, text, etc) about the action by the given id, if it was registered in the manager
+  /// Return info (icon, text, etc) about the action by the given id, 
+  /// if it was registered in the manager
   ActionInfo actionInfoById(const QString& theId);
 
  private:

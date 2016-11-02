@@ -217,7 +217,8 @@ void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
   // sketch multi rotation -> single/full point)
   // it is important to check the widget visibility to do not check of the next widget visible
   // state if the current is not shown. (example: sketch circle re-entrant operation after mouse
-  // release in the viewer, next, radius, widget should be activated but the first is not visualized)
+  // release in the viewer, next, radius, 
+  // widget should be activated but the first is not visualized)
   bool isVisible = theWidget->isVisible();
   activateNextWidget(theWidget, isVisible);
 }
@@ -322,7 +323,8 @@ void findDirectChildren(QWidget* theParent, QList<QWidget*>& theWidgets, const b
       if (aWidget)
         aWidgetTypes.append(aWidget->objectName());
     }
-    QString anInfo = QString("theWidgets[%1]: %2").arg(theWidgets.count()).arg(aWidgetTypes.join(","));
+    QString anInfo = QString("theWidgets[%1]: %2")
+      .arg(theWidgets.count()).arg(aWidgetTypes.join(","));
     qDebug(anInfo.toStdString().c_str());
   }
 #endif

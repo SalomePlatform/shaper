@@ -36,7 +36,8 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
 
   /// Returns a list of viewer selected presentations
   /// \return list of presentations
-  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getSelected(const SelectionPlace& thePlace = Browser) const;
+  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> 
+    getSelected(const SelectionPlace& thePlace = Browser) const;
 
   /// Fills the viewer presentation parameters by the parameters from the owner
   /// \param thePrs a container for selection

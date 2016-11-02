@@ -17,8 +17,8 @@ class QtxColorButton;
 /**
 * \ingroup GUI
 * A class of dialog to chose a color. The color can be set in two ways: use a random value or
-* a certain color. There is a radio button to provide this choice. The color button is visualized to
-* select a certain color.
+* a certain color. There is a radio button to provide this choice. The color button is 
+* visualized to select a certain color.
 */ 
 class XGUI_ColorDialog : public QDialog
 {
@@ -38,12 +38,15 @@ public:
   /// \param theValue an RGB components value
   void setColor(const std::vector<int>& theValue);
 
-  /// Returns a container with the current color value. These are tree int values for RGB definition.
-  /// These value is depend on the random choice and eighter a next random color or a certain color.
+  /// Returns a container with the current color value. 
+  /// These are tree int values for RGB definition.
+  /// These value is depend on the random choice and eighter 
+  /// a next random color or a certain color.
   /// \return a vector of values
   std::vector<int> getColor() const;
 
-  /// Returns a container with the current color value. These are tree int values for RGB definition.
+  /// Returns a container with the current color value. 
+  /// These are tree int values for RGB definition.
   /// It returns the next random color.
   /// \return a vector of values
   std::vector<int> getRandomColor() const;

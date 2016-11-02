@@ -40,7 +40,8 @@ class XGUI_TreeViewItemDelegate: public QStyledItemDelegate
 public:
   /// Constructor
   /// \param theParent a parent of the delegate
-  XGUI_TreeViewItemDelegate(XGUI_DataTree* theParent):QStyledItemDelegate(theParent), myTreedView(theParent) {}
+  XGUI_TreeViewItemDelegate(XGUI_DataTree* theParent):QStyledItemDelegate(theParent),
+    myTreedView(theParent) {}
 
   /// Set data for item editor (name of the item)
   /// \param editor a widget of editor
@@ -105,8 +106,8 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
 {
   static int aEntrance = 0;
   if (aEntrance == 0) {
-    // We have to check number of enter and exit of this function because it can be called recursively by Qt
-    // in order to avoid double modifying of a data
+    // We have to check number of enter and exit of this function because it can be called
+    // recursively by Qt in order to avoid double modifying of a data
     aEntrance = 1;
     QLineEdit* aEditor = dynamic_cast<QLineEdit*>(theEditor);
     if (aEditor) {
@@ -204,7 +205,8 @@ void XGUI_TreeViewStyle::drawPrimitive(PrimitiveElement theElement,
                                        QPainter* thePainter, const QWidget* theWidget) const
 {
   if ((theElement == QStyle::PE_PanelItemViewRow) || (theElement == QStyle::PE_PanelItemViewItem)) {
-    const QStyleOptionViewItemV4* aOptions = qstyleoption_cast<const QStyleOptionViewItemV4 *>(theOption);
+    const QStyleOptionViewItemV4* aOptions = 
+      qstyleoption_cast<const QStyleOptionViewItemV4 *>(theOption);
     if (myIndex.isValid() && ((myIndex.flags() & Qt::ItemIsSelectable) == 0)) {
       QStyle::State aState = aOptions->state;
       if ((aState & QStyle::State_MouseOver) != 0)
@@ -241,7 +243,8 @@ void XGUI_ActiveDocLbl::setTreeView(QTreeView* theView)
   QColor aHighlightText = aPalet.highlightedText().color();
 
   myPreSelectionStyle = "QLabel {background-color: ";
-  myPreSelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 white, stop:1 " + aHighlight.lighter(170).name() + ");"; 
+  myPreSelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 white, stop:1 " + 
+    aHighlight.lighter(170).name() + ");";
   myPreSelectionStyle += "border: 1px solid lightblue; border-radius: 2px }";
 
   QString aName = aPalet.color(QPalette::Base).name();

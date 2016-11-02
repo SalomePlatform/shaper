@@ -26,7 +26,8 @@ class Config_DataModelReader;
  * - Non Valid Index - root index
  * - An index with internal Id == -1 is a folder of root document
  * - An index which contains internal pointer as ModelAPI_Object its the object
- * - An index which contains internal pointer as ModelAPI_Document is a folder which belongs to this document
+ * - An index which contains internal pointer as ModelAPI_Document is 
+ *   a folder which belongs to this document
  */
 class XGUI_EXPORT XGUI_DataModel : public QAbstractItemModel, public Events_Listener
 {
@@ -80,7 +81,8 @@ public:
   /// \param theParent a parent model index
   virtual int columnCount(const QModelIndex& theParent = QModelIndex()) const;
 
-  /// Returns the index of the item in the model specified by the given row, column and parent index.
+  /// Returns the index of the item in the model specified by the given row, 
+  /// column and parent index.
   /// \param theRow a row
   /// \param theColumn a column
   /// \param theParent a parent model index
@@ -132,15 +134,17 @@ private:
   /// \param theDoc the document object
   QModelIndex findDocumentRootIndex(const ModelAPI_Document* theDoc) const;
 
-  /// Returns number of folders in document. Considered folders which has to be shown only if they are not empty.
-  /// \param theDoc document which has to be checked. If 0 then Root document will be considered 
+  /// Returns number of folders in document. 
+  /// Considered folders which has to be shown only if they are not empty.
+  /// \param theDoc document which has to be checked. If 0 then Root document will be considered
   int foldersCount(ModelAPI_Document* theDoc = 0) const;
 
   /// Retrurns indexes of folders which can not be shown because they are empty
   /// \param theDoc document which has to be checked. If 0 then Root document will be considered 
   QIntList missedFolderIndexes(ModelAPI_Document* theDoc = 0) const;
 
-  /// Returns Id (row) of a folder taking into consideration folders which can not be shown non empty
+  /// Returns Id (row) of a folder taking into consideration 
+  /// folders which can not be shown non empty
   /// \param theType Type of the folder
   /// \param theDoc a document which contains this folder
   int folderId(std::string theType, ModelAPI_Document* theDoc = 0);

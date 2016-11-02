@@ -439,7 +439,8 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
         {
           if (aObj->groupName() == ModelAPI_ResultParameter::group()) {
             ModelAPI_ResultParameter* aParam = dynamic_cast<ModelAPI_ResultParameter*>(aObj);
-            AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
+            AttributeDoublePtr aValueAttribute = 
+              aParam->data()->real(ModelAPI_ResultParameter::VALUE());
             QString aVal = QString::number(aValueAttribute->value());
             QString aTitle = QString(aObj->data()->name().c_str());
             return aTitle + " = " + aVal;
@@ -599,11 +600,13 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
           }
         } else {
           // Check for composite object
-          ModelAPI_CompositeFeature* aCompFeature = dynamic_cast<ModelAPI_CompositeFeature*>(aParentObj);
+          ModelAPI_CompositeFeature* aCompFeature = 
+            dynamic_cast<ModelAPI_CompositeFeature*>(aParentObj);
           if (aCompFeature) {
             aIndex = objectIndex(aCompFeature->subFeature(theRow));
           } else {
-            ModelAPI_ResultCompSolid* aCompRes = dynamic_cast<ModelAPI_ResultCompSolid*>(aParentObj);
+            ModelAPI_ResultCompSolid* aCompRes = 
+              dynamic_cast<ModelAPI_ResultCompSolid*>(aParentObj);
             if (aCompRes) 
               aIndex = objectIndex(aCompRes->subResult(theRow));
           }

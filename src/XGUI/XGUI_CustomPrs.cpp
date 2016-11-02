@@ -45,7 +45,8 @@ void getColor(const ResultPtr& theResult, std::vector<int>& theColor)
 {
   theColor.clear();
   // get color from the attribute of the result
-  if (theResult.get() != NULL && theResult->data()->attribute(ModelAPI_Result::COLOR_ID()).get() != NULL) {
+  if (theResult.get() != NULL && 
+      theResult->data()->attribute(ModelAPI_Result::COLOR_ID()).get() != NULL) {
     AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
     if (aColorAttr.get() && aColorAttr->size()) {
       theColor.push_back(aColorAttr->value(0));
@@ -136,7 +137,8 @@ bool XGUI_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr the
     SessionPtr aMgr = ModelAPI_Session::get();
     if (aMgr->activeDocument() != theResult->document()) {
       QColor aQColor(aColor[0], aColor[1], aColor[2]);
-      QColor aNewColor = QColor::fromHsvF(aQColor.hueF(), aQColor.saturationF()/3., aQColor.valueF());
+      QColor aNewColor = 
+        QColor::fromHsvF(aQColor.hueF(), aQColor.saturationF()/3., aQColor.valueF());
       aColor[0] = aNewColor.red();
       aColor[1] = aNewColor.green();
       aColor[2] = aNewColor.blue();

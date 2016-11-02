@@ -98,8 +98,8 @@
 //#define DEBUG_CURSOR
 
 /// Fills attribute and result lists by the selected owner. In case if the attribute is found,
-/// by the owner shape, it is put to the list. Otherwise if type of owner shape is edge, put the function
-/// result as is to the list of results.
+/// by the owner shape, it is put to the list. Otherwise if type of owner shape is edge, 
+/// put the function result as is to the list of results.
 /// \param theOwner a viewer selected owner
 /// \param theFeature a feature, where the attribute is searched
 /// \param theSketch a current sketch
@@ -287,7 +287,7 @@ void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
     myModule->sketchReentranceMgr()->updateInternalEditActiveState();
     return;
   }
-  // it is necessary to restore current selection in order to restore it after the values are modified
+  // it is necessary to restore current selection in order to restore it after values are modified
   restoreSelection();
   myCurrentSelection.clear();
 
@@ -485,7 +485,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
       // the feature is to be erased here, but it is correct to call canDisplayObject because
       // there can be additional check (e.g. editor widget in distance constraint)
       ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                                               (getCurrentOperation());
+                                                 (getCurrentOperation());
       if (aFOperation) {
         FeaturePtr aFeature = aFOperation->feature();
         visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
@@ -495,7 +495,8 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
   //myClickedPoint.clear();
 
   if (myIsDragging) {
-    // 1. the current selection is saved in the mouse press method in order to restore it after moving
+    // 1. the current selection is saved in the mouse press method in order to restore it after
+    //    moving
     // 2. the enable selection in the viewer should be temporary switched off in order to ignore
     // mouse press signal in the viewer(it call Select for AIS context and the dragged objects are
     // deselected). This flag should be restored in the slot, processed the mouse release signal.
@@ -1172,11 +1173,13 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
       #ifndef DEBUG_DO_NOT_BY_ENTER
       if (isNestedCreateOperation(getCurrentOperation(), activeSketch())) {
         ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
-        ModuleBase_WidgetEditor* anEditorWdg = anActiveWidget ? dynamic_cast<ModuleBase_WidgetEditor*>(anActiveWidget) : 0;
-        // the active widget editor should not influence here. The presentation should be visible always
-        // when this widget is active.
+        ModuleBase_WidgetEditor* anEditorWdg = 
+          anActiveWidget ? dynamic_cast<ModuleBase_WidgetEditor*>(anActiveWidget) : 0;
+        // the active widget editor should not influence here. The presentation should be visible
+        // always when this widget is active.
         if (!anEditorWdg && !myIsPopupMenuActive) {
-          // during a nested create operation, the feature is redisplayed only if the mouse over view
+          // during a nested create operation, the feature is redisplayed only 
+          // if the mouse over view
           // of there was a value modified in the property panel after the mouse left the view
           aCanDisplay = canDisplayCurrentCreatedFeature();
         }
@@ -1489,13 +1492,15 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
     SelectMgr_IndexedMapOfOwner aSelectedOwners;  
     aConnector->workshop()->selector()->selection()->entityOwners(anAISIO, aSelectedOwners);
     for  ( Standard_Integer i = 1, n = aSelectedOwners.Extent(); i <= n; i++ ) {
-      Handle(StdSelect_BRepOwner) anOwner = Handle(StdSelect_BRepOwner)::DownCast(aSelectedOwners(i));
+      Handle(StdSelect_BRepOwner) anOwner = 
+        Handle(StdSelect_BRepOwner)::DownCast(aSelectedOwners(i));
       if ( anOwner.IsNull() || !anOwner->HasShape() )
         continue;
       const TopoDS_Shape& aShape = anOwner->Shape();
       TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
       if (aShapeType == TopAbs_VERTEX) {
-        AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(theFeature, aShape, theSketch);
+        AttributePtr aPntAttr = 
+          PartSet_Tools::findAttributeBy2dPoint(theFeature, aShape, theSketch);
         if (aPntAttr.get() != NULL &&
             aSelectedAttributes.find(aPntAttr) != aSelectedAttributes.end()) {
           theOwnersToSelect.Add(anOwner);
@@ -1511,7 +1516,8 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
   }
 }
 
-void PartSet_SketcherMgr::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect)
+void PartSet_SketcherMgr::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, 
+                                                 const bool isToConnect)
 {
   if (isToConnect) {
     connect(theWidget, SIGNAL(beforeValuesChanged()),
@@ -1637,7 +1643,8 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
   // 1. it is necessary to save current selection in order to restore it after the features moving
   myCurrentSelection.clear();
 
-  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = aStoredPrs.begin(), aLast = aStoredPrs.end();
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = aStoredPrs.begin(), 
+                                                aLast = aStoredPrs.end();
 
   CompositeFeaturePtr aSketch = activeSketch();
   for (; anIt != aLast; anIt++) {
@@ -1657,7 +1664,8 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
     std::set<AttributePtr> aSelectedAttributes;
     std::set<ResultPtr> aSelectedResults;
     if (myCurrentSelection.find(aFeature) != myCurrentSelection.end()) {
-      std::pair<std::set<AttributePtr>, std::set<ResultPtr> > aPair = myCurrentSelection.find(aFeature).value();
+      std::pair<std::set<AttributePtr>, std::set<ResultPtr> > aPair = 
+        myCurrentSelection.find(aFeature).value();
       aSelectedAttributes = aPair.first;
       aSelectedResults = aPair.second;
     }
@@ -1769,7 +1777,8 @@ void PartSet_SketcherMgr::updateSelectionPriority(ObjectPtr theObject,
       // 3. External objects (violet color)
       // 4. Auxiliary segments (dotted)
       // StdSelect_BRepSelectionTool::Load uses priority calculating:
-      // Standard_Integer aPriority = (thePriority == -1) ? GetStandardPriority (theShape, theType) : thePriority;
+      // Standard_Integer aPriority = 
+      // (thePriority == -1) ? GetStandardPriority (theShape, theType) : thePriority;
       // Priority of Vertex is 8, edge(segment) is 7.
       // It might be not corrected as provides the condition above.
       bool isExternal = aSPFeature->isExternal();

@@ -43,7 +43,8 @@ XGUI_MenuMgr::XGUI_MenuMgr(XGUI_Workshop* theWorkshop)
 void XGUI_MenuMgr::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   //A message to start feature creation received.
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(Config_FeatureMessage::GUI_EVENT())) {
+  if (theMessage->eventID() == 
+      Events_Loop::loop()->eventByName(Config_FeatureMessage::GUI_EVENT())) {
     std::shared_ptr<Config_FeatureMessage> aFeatureMsg =
        std::dynamic_pointer_cast<Config_FeatureMessage>(theMessage);
     if (!aFeatureMsg->isInternal()) {
@@ -129,7 +130,8 @@ std::shared_ptr<XGUI_MenuWorkbench> XGUI_MenuMgr::findWorkbench(const std::strin
       aResultWorkbench = aWorkbench;
   }
   if (!aResultWorkbench) {
-    aResultWorkbench = std::shared_ptr<XGUI_MenuWorkbench>(new XGUI_MenuWorkbench(theWorkbenchName));
+    aResultWorkbench = 
+      std::shared_ptr<XGUI_MenuWorkbench>(new XGUI_MenuWorkbench(theWorkbenchName));
     myWorkbenches.push_back(aResultWorkbench);
   }
   return aResultWorkbench;
@@ -150,9 +152,10 @@ void XGUI_MenuMgr::createFeatureActions()
     for (; aGIt != aGLast; aGIt++) {
       const std::shared_ptr<XGUI_MenuGroup> aGroup = *aGIt;
       std::string aGName = aGroup->getName();
-      const std::list<std::shared_ptr<Config_FeatureMessage> >& aFeaturesInfo = aGroup->featuresInfo();
-      std::list<std::shared_ptr<Config_FeatureMessage> >::const_iterator aFIt = aFeaturesInfo.begin(),
-                                                                               aFLast = aFeaturesInfo.end();
+      const std::list<std::shared_ptr<Config_FeatureMessage> >& aFeaturesInfo = 
+        aGroup->featuresInfo();
+      std::list<std::shared_ptr<Config_FeatureMessage> >::const_iterator aFIt = 
+        aFeaturesInfo.begin(), aFLast = aFeaturesInfo.end();
       int aFSize = aFeaturesInfo.size();
       for(int i = 0; aFIt != aFLast; aFIt++, i++) {
         std::shared_ptr<Config_FeatureMessage> aMessage = *aFIt;

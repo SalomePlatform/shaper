@@ -283,11 +283,14 @@ Q_OBJECT
   /// Has to be called in order to display objects with visibility status = true
   void synchronizeViewer();
 
-  /// Has to be called in order to display objects from a cpecifed group with visibility status = true
+  /// Has to be called in order to display objects from a specifed group
+  /// with visibility status = true
   /// \param theDoc the document for objects synchronisation
   /// \param theGroup the group name
   /// \param theUpdateViewer update viewer flag
-  void synchronizeGroupInViewer(const DocumentPtr& theDoc, const std::string& theGroup, bool theUpdateViewer);
+  void synchronizeGroupInViewer(const DocumentPtr& theDoc, 
+                                const std::string& theGroup, 
+                                bool theUpdateViewer);
 
   /// Update the property panel content by the XML description of the operation and set the panel
   /// into the operation

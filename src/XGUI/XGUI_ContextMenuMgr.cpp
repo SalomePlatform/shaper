@@ -340,7 +340,8 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
 
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  QList<ModuleBase_ViewerPrsPtr> aPrsList = aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
+  QList<ModuleBase_ViewerPrsPtr> aPrsList = 
+    aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
   if (aPrsList.size() > 0) {
     bool isVisible = false;
     bool isShading = false;
@@ -352,7 +353,8 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
       if (aRes && aRes->isDisplayed()) {
         isVisible = true;
         canBeShaded = myWorkshop->displayer()->canBeShaded(aObject);
-        isShading = (myWorkshop->displayer()->displayMode(aObject) == XGUI_Displayer::Shading);      
+        isShading = 
+          (myWorkshop->displayer()->displayMode(aObject) == XGUI_Displayer::Shading);
         break;
       }
     }
@@ -564,7 +566,8 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
 void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
 {
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
-  QList<ModuleBase_ViewerPrsPtr> aPrsList = aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
+  QList<ModuleBase_ViewerPrsPtr> aPrsList = 
+    aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
   int aSelected = aPrsList.size();
   QActionsList aActions;
 

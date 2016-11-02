@@ -159,7 +159,8 @@ void XGUI_ActionsMgr::updateOnViewSelection()
       ModelAPI_ValidatorsFactory::Validators::iterator aValidatorIt = aValidators.begin();
       for (; aValidatorIt != aValidators.end(); ++aValidatorIt) {
         const ModuleBase_SelectionValidator* aSelValidator =
-            dynamic_cast<const ModuleBase_SelectionValidator*>(aFactory->validator(aValidatorIt->first));
+            dynamic_cast<const ModuleBase_SelectionValidator*>
+            (aFactory->validator(aValidatorIt->first));
         if (aSelValidator)
           setActionEnabled(aId, aSelValidator->isValid(aSelection, theOperation));
       }
@@ -251,7 +252,8 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId)
       }
       break;
       case Preview: {
-        aResult = ModuleBase_Tools::createAction(QIcon(), tr("See preview"), aParent, 0, 0, "Compute preview");
+        aResult = ModuleBase_Tools::createAction(QIcon(), tr("See preview"), 
+                                                 aParent, 0, 0, "Compute preview");
         aResult->setStatusTip(aResult->toolTip());
       }
       break;
@@ -313,7 +315,8 @@ void XGUI_ActionsMgr::setNestedCommandsEnabled(bool theEnabled, const QString& t
 
 void XGUI_ActionsMgr::setNestedStackEnabled(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_OperationFeature* anOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  ModuleBase_OperationFeature* anOperation = 
+    dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if(!anOperation || !anOperation->feature())
     return;
   FeaturePtr aFeature = anOperation->feature();
@@ -327,7 +330,8 @@ void XGUI_ActionsMgr::setNestedStackEnabled(ModuleBase_Operation* theOperation)
 QStringList XGUI_ActionsMgr::allNestedCommands(ModuleBase_Operation* theOperation)
 {
   QStringList aFeatures;
-  ModuleBase_OperationFeature* anOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  ModuleBase_OperationFeature* anOperation = 
+    dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if(!anOperation || !anOperation->feature())
     return aFeatures;
   FeaturePtr aFeature = anOperation->feature();

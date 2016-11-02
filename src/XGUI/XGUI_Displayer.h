@@ -68,9 +68,10 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \return true if the object visibility state is changed
   bool display(ObjectPtr theObject, bool theUpdateViewer = true);
 
-  /// Display the given AIS object. This object is not added to the displayer internal map of objects
-  /// So, it can not be obtained from displayer. This is just a wrap method of OCC display in order
-  /// to perform the display with correct flags.
+  /// Display the given AIS object. 
+  /// This object is not added to the displayer internal map of objects
+  /// So, it can not be obtained from displayer. This is just a wrap method of OCC display in
+  /// order to perform the display with correct flags.
   /// \param theAIS AIOS object to display
   /// \param toActivateInSelectionModes boolean value whether the presentation should be
   /// activated in the current selection modes
@@ -93,7 +94,8 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// empty, select it, otherwise select the result.
   /// \param theValues a list of presentation to be selected
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  void setSelected(const  QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues, bool theUpdateViewer = true);
+  void setSelected(const  QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues, 
+                   bool theUpdateViewer = true);
 
   /// Unselect all objects
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
@@ -142,7 +144,8 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Sets a flag to the displayer whether the internal viewer can be updated by 
   /// the updateViewer method call. If it is not enabled, this method do nothing.
   /// This state maintain recurse, if the update is blocked twice or three times, the
-  /// viewer will not be updated until it is unblocked necessary times(twice or three in the example).
+  /// viewer will not be updated until it is unblocked necessary times
+  /// (twice or three in the example).
   /// \param isEnabled a boolean value
   bool enableUpdateViewer(const bool isEnabled);
 
@@ -159,7 +162,8 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   void activateAIS(const Handle(AIS_InteractiveObject)& theIO, const int theMode,
                    const bool theUpdateViewer) const;
 
-  /// Activate interactive context. It is necessary to call ClearOutdatedSelection after deactivation
+  /// Activate interactive context. It is necessary to call ClearOutdatedSelection 
+  /// after deactivation
   /// \param theIO an interactive object
   /// \param theMode a mode to deactivate. When theMode=-1 then all modes will be deactivated
   void deactivateAIS(const Handle(AIS_InteractiveObject)& theIO, const int theMode = -1) const;
@@ -336,13 +340,12 @@ private:
   /// in OCCT but improved for performance. The modification is to iterates by a list
   /// of owners in the context only once.
   /// \param theContext a viewer context. It has opened local context
-  /// \param theShapesToBeSelected a map of shapes. Owner's shape is searched in the map and the owner
-  /// is selected if it is found there. Only first owner is processed(according to OCCT logic)
+  /// \param theShapesToBeSelected a map of shapes. Owner's shape is searched in the map and the
+  /// owner is selected if it is found there. 
+  /// Only first owner is processed(according to OCCT logic)
   static void AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) theContext,
           const NCollection_DataMap<TopoDS_Shape,
                           NCollection_Map<Handle(AIS_InteractiveObject)>>& theShapesToBeSelected);
-
-                                        //const NCollection_Map<TopoDS_Shape>& theShapesToBeSelected);
 
  protected:
    /// Reference to workshop
@@ -351,7 +354,8 @@ private:
   /// A container for selection filters
   Handle(SelectMgr_AndFilter) myAndFilter;
 
-  /// A default custom presentation, which is used if the displayed feature is not a custom presentation
+  /// A default custom presentation, which is used if the displayed feature is not
+  /// a custom presentation
   GeomCustomPrsPtr myCustomPrs;
 
   /// Definition of a type of map which defines correspondance between objects and presentations

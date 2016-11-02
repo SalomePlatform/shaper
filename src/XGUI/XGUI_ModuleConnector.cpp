@@ -135,7 +135,8 @@ void XGUI_ModuleConnector::processLaunchOperation(ModuleBase_Operation* theOpera
   XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
 
   if (anOperationMgr->startOperation(theOperation)) {
-    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    ModuleBase_OperationFeature* aFOperation = 
+      dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
     if (aFOperation) {
       workshop()->propertyPanel()->updateContentWidget(aFOperation->feature());
       workshop()->propertyPanel()->createContentPanel(aFOperation->feature());

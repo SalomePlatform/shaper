@@ -9,7 +9,8 @@
 
 #include "XGUI_QtEvents.h"
 
-QEvent::Type PostponeMessageQtEvent::PostponeMessageQtEventType = QEvent::Type(QEvent::registerEventType());
+QEvent::Type PostponeMessageQtEvent::PostponeMessageQtEventType = 
+  QEvent::Type(QEvent::registerEventType());
 
 
 std::shared_ptr<Events_Message> PostponeMessageQtEvent::postponedMessage()

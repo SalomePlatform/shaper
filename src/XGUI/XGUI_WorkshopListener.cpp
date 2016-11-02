@@ -138,7 +138,8 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
   } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION)) {
     ModuleBase_ModelWidget* aWidget = workshop()->propertyPanel()->activeWidget();
     if (aWidget) {
-      ModuleBase_WidgetSelector* aWidgetSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aWidget);
+      ModuleBase_WidgetSelector* aWidgetSelector =
+        dynamic_cast<ModuleBase_WidgetSelector*>(aWidget);
       if (aWidgetSelector)
         myWorkshop->setSelected(aWidgetSelector->getAttributeSelection());
     }
@@ -176,7 +177,8 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     aDisplayer->enableUpdateViewer(true);
   } else {
     //Show error dialog if error message received.
-    std::shared_ptr<Events_InfoMessage> anIngfoMsg = std::dynamic_pointer_cast<Events_InfoMessage>(theMessage);
+    std::shared_ptr<Events_InfoMessage> anIngfoMsg = 
+      std::dynamic_pointer_cast<Events_InfoMessage>(theMessage);
     if (anIngfoMsg) {
       emit errorOccurred(anIngfoMsg);
     }
@@ -202,7 +204,8 @@ void XGUI_WorkshopListener::onFeatureUpdatedMsg(
     anInfo.append(ModuleBase_Tools::objectInfo((*aIt)));
   }
   QString anInfoStr = anInfo.join(";\t");
-  qDebug(QString("onFeatureUpdatedMsg: %1, %2").arg(anObjects.size()).arg(anInfoStr).toStdString().c_str());
+  qDebug(QString("onFeatureUpdatedMsg: %1, %2")
+    .arg(anObjects.size()).arg(anInfoStr).toStdString().c_str());
 #endif
   std::set<ObjectPtr> aFeatures = theMsg->objects();
   XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
@@ -228,7 +231,8 @@ void XGUI_WorkshopListener::onFeatureUpdatedMsg(
 }
 
 //******************************************************
-void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
+void XGUI_WorkshopListener::
+  onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
   std::set<ObjectPtr> anObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
@@ -239,7 +243,8 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
     anInfo.append(ModuleBase_Tools::objectInfo((*aIt)));
   }
   QString anInfoStr = anInfo.join(";\t");
-  qDebug(QString("onFeatureRedisplayMsg: %1, %2").arg(anObjects.size()).arg(anInfoStr).toStdString().c_str());
+  qDebug(QString("onFeatureRedisplayMsg: %1, %2")
+    .arg(anObjects.size()).arg(anInfoStr).toStdString().c_str());
 #endif
 
   XGUI_Workshop* aWorkshop = workshop();
@@ -269,7 +274,8 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
     if (aRes.get()) {
       ResultCompSolidPtr aCompSolidRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
       if (aCompSolidRes.get()) {
-          qDebug(QString("COMPSOLID, numberOfSubs = %1").arg(aCompSolidRes->numberOfSubs()).toStdString().c_str());
+          qDebug(QString("COMPSOLID, numberOfSubs = %1")
+            .arg(aCompSolidRes->numberOfSubs()).toStdString().c_str());
       }
       if (ModelAPI_Tools::compSolidOwner(aRes))
         qDebug("COMPSOLID sub-object");
@@ -287,16 +293,16 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
       }
     #endif
     if (aHide) {
-      //we should provide objects which are hidden in the viewer, e.g. sketch always should visualizes
-      // all sub-features, if some features are to be hidden, sould be proposed may be to removed #1223
-      //aHiddenObjects.push_back(aObj);
+      //we should provide objects which are hidden in the viewer, e.g. sketch always should
+      // visualizes all sub-features, if some features are to be hidden, sould be proposed may 
+      // be to removed #1223 
+      // aHiddenObjects.push_back(aObj);
       aRedisplayed = aDisplayer->erase(aObj, false) || aRedisplayed;
       #ifdef DEBUG_FEATURE_REDISPLAY
         // Redisplay the visible object or the object of the current operation
         bool isVisibleObject = aDisplayer->isVisible(aObj);
 
         QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
-        //qDebug(QString("visible=%1 : erase  = %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
       #endif
     }
     else {
@@ -304,7 +310,6 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
       bool isVisibleObject = aDisplayer->isVisible(aObj);
       #ifdef DEBUG_FEATURE_REDISPLAY
         QString anObjInfo = ModuleBase_Tools::objectInfo((aObj));
-        //qDebug(QString("visible=%1 : display= %2").arg(isVisibleObject).arg(anObjInfo).toStdString().c_str());
       #endif
 
       if (isVisibleObject)  { // redisplay visible object
@@ -347,7 +352,8 @@ void XGUI_WorkshopListener::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI
 }
 
 //******************************************************
-void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
+void XGUI_WorkshopListener::
+  onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
   std::set<ObjectPtr> anObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
@@ -357,7 +363,8 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
     anInfo.append(ModuleBase_Tools::objectInfo((*aIt)));
   }
   QString anInfoStr = anInfo.join(";\t");
-  qDebug(QString("onFeatureCreatedMsg: %1, %2").arg(anObjects.size()).arg(anInfoStr).toStdString().c_str());
+  qDebug(QString("onFeatureCreatedMsg: %1, %2")
+    .arg(anObjects.size()).arg(anInfoStr).toStdString().c_str());
 #endif
 
   bool aFirstVisualizedBody = false;
@@ -372,7 +379,8 @@ void XGUI_WorkshopListener::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_O
     if (aRes.get()) {
       ResultCompSolidPtr aCompSolidRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aRes);
       if (aCompSolidRes.get()) {
-          qDebug(QString("COMPSOLID, numberOfSubs = %1").arg(aCompSolidRes->numberOfSubs()).toStdString().c_str());
+          qDebug(QString("COMPSOLID, numberOfSubs = %1")
+            .arg(aCompSolidRes->numberOfSubs()).toStdString().c_str());
       }
       if (ModelAPI_Tools::compSolidOwner(aRes))
         qDebug("COMPSOLID sub-object");
@@ -433,7 +441,8 @@ void XGUI_WorkshopListener::onFeatureEmptyPresentationMsg(
     anInfo.append(ModuleBase_Tools::objectInfo((*aIt)));
   }
   QString anInfoStr = anInfo.join(";\t");
-  qDebug(QString("onFeatureEmptyPresentationMsg: %1, %2").arg(anObjects.size()).arg(anInfoStr).toStdString().c_str());
+  qDebug(QString("onFeatureEmptyPresentationMsg: %1, %2")
+    .arg(anObjects.size()).arg(anInfoStr).toStdString().c_str());
 #endif
 
   XGUI_Workshop* aWorkshop = workshop();

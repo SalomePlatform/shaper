@@ -68,15 +68,16 @@ protected:
   /// Displaus object and fit all viewer if the object is first (update viewer will not be called)
   /// Asks the module whether the object can be displayed
   /// \param theObj an object
-  /// \param theFirstVisualizedBody an output state whether there are not object displayed in the view
-  /// and the displayed object is a body
+  /// \param theFirstVisualizedBody an output state whether there are not object displayed in the
+  /// view and the displayed object is a body
   /// \return true if the object is displayed
   bool displayObject(ObjectPtr theObj, bool& theFirstVisualizedBody);
 
   /// Calls the module method of cusomize object for the feature of the current operation
   /// Perform cusomize if the force redisplay flag is true or the list of objects contains the
   /// current operation feature
-  /// \param theObjects a list of objects to find current operation feature if forced redisplay is false
+  /// \param theObjects a list of objects to find current operation feature 
+  ///                   if forced redisplay is false
   /// \param theForceRedisplay a flag to customize object even always
   /// \return true if the object is modified
   bool customizeCurrentObject(const std::set<ObjectPtr>& theObjects, bool theForceRedisplay);

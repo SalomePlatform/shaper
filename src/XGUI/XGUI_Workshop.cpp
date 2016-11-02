@@ -203,16 +203,22 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
                                    Config_Prop::Color, ModelAPI_ResultBody::DEFAULT_COLOR());
   Config_PropManager::registerProp("Visualization", "result_group_color", "Group color",
                                    Config_Prop::Color, ModelAPI_ResultGroup::DEFAULT_COLOR());
-  Config_PropManager::registerProp("Visualization", "result_construction_color", "Construction color",
-                                   Config_Prop::Color, ModelAPI_ResultConstruction::DEFAULT_COLOR());
+  Config_PropManager::registerProp("Visualization", "result_construction_color", 
+                                   "Construction color",
+                                   Config_Prop::Color, 
+                                   ModelAPI_ResultConstruction::DEFAULT_COLOR());
   Config_PropManager::registerProp("Visualization", "result_part_color", "Part color",
                                    Config_Prop::Color, ModelAPI_ResultPart::DEFAULT_COLOR());
 
-  Config_PropManager::registerProp("Visualization", "body_deflection", "Body deflection coefficient",
-                                   Config_Prop::Double, ModelAPI_ResultBody::DEFAULT_DEFLECTION());//"0.001");
+  Config_PropManager::registerProp("Visualization", "body_deflection", 
+                                   "Body deflection coefficient",
+                                   Config_Prop::Double, 
+                                   ModelAPI_ResultBody::DEFAULT_DEFLECTION());//"0.001");
 
-  Config_PropManager::registerProp("Visualization", "construction_deflection", "Construction deflection coefficient",
-                                   Config_Prop::Double, ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());//"0.0001");
+  Config_PropManager::registerProp("Visualization", "construction_deflection", 
+                                   "Construction deflection coefficient",
+                                   Config_Prop::Double, 
+                                   ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());//"0.0001");
 
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "face-selection", true))
     myViewerSelMode.append(TopAbs_FACE);
@@ -320,7 +326,8 @@ void XGUI_Workshop::initMenu()
   QAction* aAction = salomeConnector()->addDesktopCommand("UNDO_CMD", tr("Undo"),
                                                         tr("Undo last command"),
                                                         QIcon(":pictures/undo.png"),
-                                                        QKeySequence::Undo, false, "MEN_DESK_EDIT");
+                                                        QKeySequence::Undo, false, 
+                                                        "MEN_DESK_EDIT");
   QString aToolBarTitle = tr( "INF_DESK_TOOLBAR_STANDARD" );
   salomeConnector()->addActionInToolbar( aAction,aToolBarTitle  );
 
@@ -336,7 +343,8 @@ void XGUI_Workshop::initMenu()
   addHistoryMenu(aAction, SIGNAL(updateRedoHistory(const QList<ActionInfo>&)), SLOT(onRedo(int)));
 
   salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
-  //aAction = salomeConnector()->addDesktopCommand("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
+  //aAction = salomeConnector()->addDesktopCommand("REBUILD_CMD", tr("Rebuild"), 
+  //                                            tr("Rebuild data objects"),
   //                                            QIcon(":pictures/rebuild.png"), QKeySequence(),
   //                                            false, "MEN_DESK_EDIT");
   //salomeConnector()->addActionInToolbar( aAction, aToolBarTitle );
@@ -344,12 +352,14 @@ void XGUI_Workshop::initMenu()
   //connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRebuild()));
   //salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
 
-  aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export native..."), tr("Export the current document into a native file"),
+  aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export native..."), 
+                                             tr("Export the current document into a native file"),
                                               QIcon(), QKeySequence(),
                                               false, "MEN_DESK_FILE");
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onSaveAs()));
 
-  aAction = salomeConnector()->addDesktopCommand("OPEN_CMD", tr("Import native..."), tr("Import native file"),
+  aAction = salomeConnector()->addDesktopCommand("OPEN_CMD", tr("Import native..."), 
+                                              tr("Import native file"),
                                               QIcon(), QKeySequence(),
                                               false, "MEN_DESK_FILE");
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onOpen()));
@@ -496,7 +506,8 @@ bool XGUI_Workshop::isFeatureOfNested(const FeaturePtr& theFeature)
 
 void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  ModuleBase_OperationFeature* aFOperation = 
+    dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (!aFOperation)
     return;
 
@@ -518,7 +529,8 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
     if (!aWidget->attributeID().empty() && !aFeature->attribute(aWidget->attributeID()).get()) {
       std::string anErrorMsg = "The feature '%1' has no attribute '%2' used by widget '%3'.";
       Events_InfoMessage("XGUI_Workshop", anErrorMsg)
-        .arg(aFeatureKind).arg(aWidget->attributeID()).arg(aWidget->metaObject()->className()).send();
+        .arg(aFeatureKind).arg(aWidget->attributeID())
+        .arg(aWidget->metaObject()->className()).send();
       myPropertyPanel->cleanContent();
       return;
     }
@@ -538,7 +550,8 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
 
   // update visible state of Preview button
 #ifdef HAVE_SALOME
-  bool anIsAutoPreview = mySalomeConnector->featureInfo(aFeatureKind.c_str())->isAutoPreview();
+  bool anIsAutoPreview = 
+    mySalomeConnector->featureInfo(aFeatureKind.c_str())->isAutoPreview();
 #else
   AppElements_MainMenu* aMenuBar = mainWindow()->menuObject();
   AppElements_Command* aCommand = aMenuBar->feature(aFeatureKind.c_str());
@@ -561,8 +574,9 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
   myPropertyPanel->setWindowTitle(theOperation->getDescription()->description());
 #else
   std::string aFeatureName = aFeature->name();
-  myPropertyPanel->setWindowTitle(QString("%1: %2").arg(theOperation->getDescription()->description())
-                                                  .arg(aFeatureName.c_str()));
+  myPropertyPanel->setWindowTitle(QString("%1: %2")
+    .arg(theOperation->getDescription()->description())
+    .arg(aFeatureName.c_str()));
 #endif
 
   myErrorMgr->setPropertyPanel(myPropertyPanel);
@@ -656,7 +670,8 @@ void XGUI_Workshop::onOperationAborted(ModuleBase_Operation* theOperation)
 
 void XGUI_Workshop::setGrantedFeatures(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  ModuleBase_OperationFeature* aFOperation =
+    dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (!aFOperation)
     return;
 
@@ -865,7 +880,8 @@ bool XGUI_Workshop::onSaveAs()
   if (aDir.exists() && !aDir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).isEmpty()) {
     int answer = QMessageBox::question(
         desktop(),
-        //: Title of the dialog which asks user if he wants to save study in existing non-empty folder
+        // Title of the dialog which asks user if he wants to save study 
+        // in existing non-empty folder
         tr("Save"),
         tr("The directory already contains some files, save anyway?"),
         QMessageBox::Save | QMessageBox::Cancel);
@@ -909,8 +925,8 @@ void XGUI_Workshop::onRedo(int theTimes)
 {
   // the viewer update should be blocked in order to avoid the features blinking. For the created
   // feature a results are created, the flush of the created signal caused the viewer redisplay for
-  // each created result. After a redisplay signal is flushed. So, the viewer update is blocked until
-  // redo of all possible objects happens
+  // each created result. After a redisplay signal is flushed. So, the viewer update is blocked
+  // until redo of all possible objects happens
   bool isUpdateEnabled = myDisplayer->enableUpdateViewer(false);
 
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
@@ -1130,7 +1146,9 @@ void XGUI_Workshop::updateHistory()
 QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
 {
   QDockWidget* aObjDock = new QDockWidget(theParent);
-  aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
+  aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | 
+                            Qt::RightDockWidgetArea | 
+                            Qt::BottomDockWidgetArea);
   aObjDock->setWindowTitle(tr("Object browser"));
   aObjDock->setStyleSheet(
       "::title { position: relative; padding-left: 5px; text-align: left center }");
@@ -1155,7 +1173,9 @@ void XGUI_Workshop::createDockWidgets()
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
   myPropertyPanel = new XGUI_PropertyPanel(aDesktop, myOperationMgr);
   myPropertyPanel->setupActions(myActionsMgr);
-  myPropertyPanel->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
+  myPropertyPanel->setAllowedAreas(Qt::LeftDockWidgetArea | 
+                                   Qt::RightDockWidgetArea | 
+                                   Qt::BottomDockWidgetArea);
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanel);
   hidePropertyPanel();  ///<! Invisible by default
   hideObjectBrowser();
@@ -1408,13 +1428,14 @@ void XGUI_Workshop::cleanHistory()
     anInfo.append(aFeature->name().c_str());
   }
   QString anInfoStr = anInfo.join(";\t");
-  qDebug(QString("cleanHistory for: [%1] - %2").arg(aFeatures.size()).arg(anInfoStr).toStdString().c_str());
+  qDebug(QString("cleanHistory for: [%1] - %2").
+    arg(aFeatures.size()).arg(anInfoStr).toStdString().c_str());
 #endif
 
   std::map<FeaturePtr, std::set<FeaturePtr> > aReferences;
   ModelAPI_Tools::findAllReferences(aFeatures, aReferences, true, false);
-  // find for each object whether all reference values are in the map as key, that means that there is
-  // no other reference in the model to this object, so it might be removed by cleaning history
+  // find for each object whether all reference values are in the map as key, that means that there
+  // is no other reference in the model to this object, so it might be removed by cleaning history
   // sk_1(ext_1, vertex_1) + (sk_3, bool_1) - cann't be deleted, dependency to bool_1
   // ext_1(bool_1, sk_3)  - cann't be deleted, dependency to bool_1
   // vertex_1()
@@ -1428,7 +1449,8 @@ void XGUI_Workshop::cleanHistory()
   for (; aMainIt != aMainLast; aMainIt++) {
     FeaturePtr aMainListFeature = aMainIt->first;
     std::set<FeaturePtr> aMainRefList = aMainIt->second;
-    std::set<FeaturePtr>::const_iterator aRefIt = aMainRefList.begin(), aRefLast = aMainRefList.end();
+    std::set<FeaturePtr>::const_iterator aRefIt = aMainRefList.begin(), 
+                                                  aRefLast = aMainRefList.end();
     bool aFeatureOutOfTheList = false;
     for (; aRefIt != aRefLast && !aFeatureOutOfTheList; aRefIt++) {
       FeaturePtr aRefFeature = *aRefIt;
@@ -1444,7 +1466,8 @@ void XGUI_Workshop::cleanHistory()
     FeaturePtr aFeature = *aFIt;
     anInfo.append(aFeature->name().c_str());
   }
-  qDebug(QString("unused objects: [%1] - %2").arg(anInfo.size()).arg(anInfo.join(";\t")).toStdString().c_str());
+  qDebug(QString("unused objects: [%1] - %2").
+    arg(anInfo.size()).arg(anInfo.join(";\t")).toStdString().c_str());
 #endif
 
   // warn about the references remove, break the delete operation if the user chose it
@@ -1465,14 +1488,15 @@ void XGUI_Workshop::cleanHistory()
     aMessageBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
     aMessageBox.setDefaultButton(QMessageBox::No);
 
-    QString aText = QString(tr("Unused features are the following: %1.\nThese features will be deleted.\nWould you like to continue?")
-                   .arg(anUnusedNames));
+    QString aText = QString(tr("Unused features are the following: \
+%1.\nThese features will be deleted.\nWould you like to continue?").arg(anUnusedNames));
     aMessageBox.setText(aText);
     if (aMessageBox.exec() == QMessageBox::No)
       return;
 
     // 1. start operation
-    aDescription += "by deleting of " + aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
+    aDescription += "by deleting of " + 
+      aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
     ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
     operationMgr()->startOperation(anOpAction);
 
@@ -1610,15 +1634,18 @@ std::list<FeaturePtr> toCurrentFeatures(const ObjectPtr& theObject)
   DocumentPtr aDocument = theObject->document();
   std::list<FeaturePtr> anAllFeatures = allFeatures(aDocument);
   // find the object iterator
-  std::list<FeaturePtr>::iterator aObjectIt = std::find(anAllFeatures.begin(), anAllFeatures.end(), theObject);
+  std::list<FeaturePtr>::iterator aObjectIt = 
+    std::find(anAllFeatures.begin(), anAllFeatures.end(), theObject);
   if (aObjectIt == anAllFeatures.end())
     return aResult;
   // find the current feature iterator
-  std::list<FeaturePtr>::iterator aCurrentIt = std::find(anAllFeatures.begin(), anAllFeatures.end(), aDocument->currentFeature(true));
+  std::list<FeaturePtr>::iterator aCurrentIt = 
+    std::find(anAllFeatures.begin(), anAllFeatures.end(), aDocument->currentFeature(true));
   if (aCurrentIt == anAllFeatures.end())
     return aResult;
   // check the right order
-  if (std::distance(aObjectIt, anAllFeatures.end()) <= std::distance(aCurrentIt, anAllFeatures.end()))
+  if (std::distance(aObjectIt, anAllFeatures.end()) <= 
+      std::distance(aCurrentIt, anAllFeatures.end()))
     return aResult;
   // exclude the object
   std::advance(aObjectIt, 1);
@@ -1774,10 +1801,12 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {
-      ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+      ResultCompSolidPtr aCompsolidResult = 
+        std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
       if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
         for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
-          setColor(aCompsolidResult->subResult(i), !isRandomColor ? aColorResult : aDlg->getRandomColor());
+          setColor(aCompsolidResult->subResult(i), !isRandomColor ? aColorResult : 
+                                                                    aDlg->getRandomColor());
         }
       }
       setColor(aResult, !isRandomColor ? aColorResult : aDlg->getRandomColor());
@@ -1860,7 +1889,8 @@ void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {
-      ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+      ResultCompSolidPtr aCompsolidResult = 
+        std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
       if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
         for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
           setDeflection(aCompsolidResult->subResult(i), aDeflection);

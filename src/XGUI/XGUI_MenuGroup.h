@@ -42,7 +42,9 @@ class XGUI_EXPORT XGUI_MenuGroup
 
 private:
   std::string myName; /// a name of the workbench
-  std::list<std::shared_ptr<Config_FeatureMessage> > myFeatureInfo; /// container of existing features
+
+  /// container of existing features
+  std::list<std::shared_ptr<Config_FeatureMessage> > myFeatureInfo;
 };
 
 #endif /* XGUI_MENUGROUP_H_ */
