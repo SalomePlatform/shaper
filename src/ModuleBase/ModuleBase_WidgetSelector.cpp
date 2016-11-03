@@ -19,6 +19,8 @@
 
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeSelectionList.h>
 
 #include <TopoDS_Iterator.hxx>
 
@@ -204,7 +206,20 @@ void ModuleBase_WidgetSelector::deactivate()
   ModuleBase_ModelWidget::deactivate();
   disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
   activateSelectionAndFilters(false);
-  ModuleBase_ModelWidget::deactivate();
+
+  /// clear temporary cash
+  AttributePtr anAttribute = attribute();
+  std::string aType = anAttribute->attributeType();
+  if (anAttribute->attributeType() == ModelAPI_AttributeSelection::typeId()) {
+    AttributeSelectionPtr aSelectAttr =
+                             std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(anAttribute);
+    aSelectAttr->removeTemporaryValues();
+  }
+  else if (anAttribute->attributeType() == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectAttr =
+                             std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
+    aSelectAttr->removeTemporaryValues();
+  }
 }
 
 //********************************************************************

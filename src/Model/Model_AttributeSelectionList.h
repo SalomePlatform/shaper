@@ -45,6 +45,9 @@ public:
   /// The type of shape is taken from the current selection type if the given is empty
   MODEL_EXPORT virtual void append(const std::string theNamingName, const std::string& theType="");
 
+  /// Reset temporary stored values
+  virtual void removeTemporaryValues();
+
   /// Removes the last element in the list
   MODEL_EXPORT virtual void removeLast();
 

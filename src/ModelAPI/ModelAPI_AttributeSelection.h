@@ -27,6 +27,9 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily = false) = 0;
 
+  /// Reset temporary stored values
+  virtual void removeTemporaryValues() = 0;
+
   /// Returns the selected subshape
   virtual std::shared_ptr<GeomAPI_Shape> value() = 0;
 

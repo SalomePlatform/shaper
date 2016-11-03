@@ -32,6 +32,9 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// The type of shape is taken from the current selection type if the given is empty
   virtual void append(const std::string theNamingName, const std::string& theType = "") = 0;
 
+  /// Reset temporary stored values
+  virtual void removeTemporaryValues() = 0;
+
   /// Removes the last element in the list
   virtual void removeLast() = 0;
 

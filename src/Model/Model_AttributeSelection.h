@@ -35,6 +35,9 @@ public:
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily = false);
 
+  /// Reset temporary stored values
+  virtual void removeTemporaryValues();
+
   /// Returns the selected subshape
   MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> value();
 

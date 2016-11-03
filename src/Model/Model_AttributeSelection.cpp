@@ -181,6 +181,14 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   owner()->data()->sendAttributeUpdated(this);
 }
 
+void Model_AttributeSelection::removeTemporaryValues()
+{
+  if (myTmpContext.get() || myTmpSubShape.get()) {
+    myTmpContext.reset();
+    myTmpSubShape.reset();
+  }
+}
+
 std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
 {
   GeomShapePtr aResult;

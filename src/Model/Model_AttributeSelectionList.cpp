@@ -75,6 +75,13 @@ void Model_AttributeSelectionList::append(
   owner()->data()->sendAttributeUpdated(this);
 }
 
+void Model_AttributeSelectionList::removeTemporaryValues()
+{
+  if (myTmpAttr.get()) {
+    myTmpAttr.reset();
+  }
+}
+
 void Model_AttributeSelectionList::removeLast() 
 {
   int anOldSize = mySize->Get();
