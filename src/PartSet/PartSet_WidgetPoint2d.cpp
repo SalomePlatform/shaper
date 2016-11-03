@@ -449,7 +449,8 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
   Handle(V3d_View) aView = theWindow->v3dView();
 
   QList<ModuleBase_ViewerPrsPtr> aList = aSelection->getSelected(ModuleBase_ISelection::Viewer);
-  ModuleBase_ViewerPrsPtr aFirstValue = aList.size() > 0 ? aList.first() : ModuleBase_ViewerPrsPtr();
+  ModuleBase_ViewerPrsPtr aFirstValue = 
+    aList.size() > 0 ? aList.first() : ModuleBase_ViewerPrsPtr();
   if (!aFirstValue.get() && myPreSelected.get()) {
     aFirstValue = myPreSelected;
   }
@@ -485,7 +486,8 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
           bool anOrphanPoint = aShape.ShapeType() == TopAbs_VERTEX ||
                                isOrphanPoint(aSelectedFeature, mySketch, aX, aY);
           if (anExternal) {
-            anOrphanPoint = true; // we should not stop reentrant operation on external objects because
+            // we should not stop reentrant operation on external objects because
+            anOrphanPoint = true; 
             // they are not participate in the contour creation excepting external vertices
             if (aShape.ShapeType() == TopAbs_VERTEX) {
               FeaturePtr aFixedFeature = ModelAPI_Feature::feature(aFixedObject);
@@ -494,10 +496,12 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
               }
             }
             else {
-              // point is taken from mouse event and set in attribute. It should be done before setting
-              // coinident constraint to the external line. If a point is created, it should be in the mouse
-              // clicked point
-              gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
+              // point is taken from mouse event and set in attribute. 
+              // It should be done before setting
+              // coinident constraint to the external line. If a point is created, it should be 
+              // in the mouse clicked point
+              gp_Pnt aPoint =
+                PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
               double aX, anY;
               PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, anY);
               setPoint(aX, anY);
@@ -505,8 +509,8 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
           }
           if (aFixedObject.get())
             setConstraintWith(aFixedObject);
-          // fignal updated should be flushed in order to visualize possible created external objects
-          // e.g. selection of trihedron axis when input end arc point
+          // fignal updated should be flushed in order to visualize possible created 
+          // external objects e.g. selection of trihedron axis when input end arc point
           updateObject(feature());
 
           if (!anOrphanPoint)
@@ -536,8 +540,8 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
         }
         else if (aShape.ShapeType() == TopAbs_EDGE) {
           // point is taken from mouse event and set in attribute. It should be done before setting
-          // coinident constraint to the external line. If a point is created, it should be in the mouse
-          // clicked point
+          // coinident constraint to the external line. If a point is created, it should be in 
+          // the mouse clicked point
           gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
           PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, aY);
           setPoint(aX, aY);
@@ -588,7 +592,8 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
   }
 }
 
-void PartSet_WidgetPoint2D::setPreSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePreSelected)
+void PartSet_WidgetPoint2D::setPreSelection(
+  const std::shared_ptr<ModuleBase_ViewerPrs>& thePreSelected)
 {
   myPreSelected = thePreSelected;
 }

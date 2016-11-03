@@ -20,7 +20,8 @@ void SamplePanelPlugin_ModelWidgetCreator::widgetTypes(std::set<std::string>& th
   theTypes = myModelWidgetTypes;
 }
 
-ModuleBase_ModelWidget* SamplePanelPlugin_ModelWidgetCreator::createWidgetByType(const std::string& theType,
+ModuleBase_ModelWidget* SamplePanelPlugin_ModelWidgetCreator::createWidgetByType(
+                                                            const std::string& theType,
                                                             QWidget* theParent,
                                                             Config_WidgetAPI* theWidgetApi,
                                                             ModuleBase_IWorkshop* /*theWorkshop*/)

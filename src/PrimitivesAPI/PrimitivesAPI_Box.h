@@ -47,11 +47,16 @@ public:
   INTERFACE_6(PrimitivesPlugin_Box::ID(), 
              creationMethod, PrimitivesPlugin_Box::CREATION_METHOD(),
              ModelAPI_AttributeString, /** Creation method */,
-             dx, PrimitivesPlugin_Box::DX_ID(), ModelAPI_AttributeDouble, /** Dimension in X */,
-             dy, PrimitivesPlugin_Box::DY_ID(), ModelAPI_AttributeDouble, /** Dimension in Y */,
-             dz, PrimitivesPlugin_Box::DZ_ID(), ModelAPI_AttributeDouble, /** Dimension in Z */,
-             firstPoint, PrimitivesPlugin_Box::POINT_FIRST_ID(), ModelAPI_AttributeSelection, /** First point */,
-             secondPoint, PrimitivesPlugin_Box::POINT_SECOND_ID(), ModelAPI_AttributeSelection, /** Second point */)
+             dx, PrimitivesPlugin_Box::DX_ID(),
+             ModelAPI_AttributeDouble, /** Dimension in X */,
+             dy, PrimitivesPlugin_Box::DY_ID(),
+             ModelAPI_AttributeDouble, /** Dimension in Y */,
+             dz, PrimitivesPlugin_Box::DZ_ID(),
+             ModelAPI_AttributeDouble, /** Dimension in Z */,
+             firstPoint, PrimitivesPlugin_Box::POINT_FIRST_ID(), 
+             ModelAPI_AttributeSelection, /** First point */,
+             secondPoint, PrimitivesPlugin_Box::POINT_SECOND_ID(), 
+             ModelAPI_AttributeSelection, /** Second point */)
   
   /// Set dimensions
   PRIMITIVESAPI_EXPORT

@@ -25,7 +25,8 @@ SamplePanelPlugin_Plugin::SamplePanelPlugin_Plugin()
   aWidgetCreatorFactory->registerCreator(
           std::shared_ptr<SamplePanelPlugin_WidgetCreator>(new SamplePanelPlugin_WidgetCreator()));
   aWidgetCreatorFactory->registerCreator(
-   std::shared_ptr<SamplePanelPlugin_ModelWidgetCreator>(new SamplePanelPlugin_ModelWidgetCreator()));
+   std::shared_ptr<SamplePanelPlugin_ModelWidgetCreator>(
+   new SamplePanelPlugin_ModelWidgetCreator()));
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

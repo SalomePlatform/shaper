@@ -30,8 +30,10 @@ void PrimitivesPlugin_Box::initAttributes()
   data()->addAttribute(PrimitivesPlugin_Box::DY_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(PrimitivesPlugin_Box::DZ_ID(), ModelAPI_AttributeDouble::typeId());
 
-  data()->addAttribute(PrimitivesPlugin_Box::POINT_FIRST_ID(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(PrimitivesPlugin_Box::POINT_SECOND_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(PrimitivesPlugin_Box::POINT_FIRST_ID(), 
+                       ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(PrimitivesPlugin_Box::POINT_SECOND_ID(),
+                       ModelAPI_AttributeSelection::typeId());
 }
 
 //=================================================================================================
@@ -56,7 +58,8 @@ void PrimitivesPlugin_Box::createBoxByDimensions()
 
   std::shared_ptr<GeomAlgoAPI_Box> aBoxAlgo(new GeomAlgoAPI_Box(aDx,aDy,aDz));
   
-  // These checks should be made to the GUI for the feature but the corresponding validator does not exist yet.
+  // These checks should be made to the GUI for the feature but 
+  // the corresponding validator does not exist yet.
   if (!aBoxAlgo->check()) {
     // The error is not displayed in a popup window. It must be in the status bar.
     setError(aBoxAlgo->getError(), false);
@@ -100,11 +103,13 @@ void PrimitivesPlugin_Box::createBoxByTwoPoints()
     if (aShape1 && aShape2){
       std::shared_ptr<GeomAPI_Pnt> aFirstPoint = GeomAlgoAPI_PointBuilder::point(aShape1);
       std::shared_ptr<GeomAPI_Pnt> aSecondPoint = GeomAlgoAPI_PointBuilder::point(aShape2);
-      aBoxAlgo = std::shared_ptr<GeomAlgoAPI_BoxPoints>(new GeomAlgoAPI_BoxPoints(aFirstPoint,aSecondPoint));
+      aBoxAlgo = std::shared_ptr<GeomAlgoAPI_BoxPoints>(
+                                  new GeomAlgoAPI_BoxPoints(aFirstPoint,aSecondPoint));
     }
   }
   
-  // These checks should be made to the GUI for the feature but the corresponding validator does not exist yet.
+  // These checks should be made to the GUI for the feature but 
+  // the corresponding validator does not exist yet.
   if (!aBoxAlgo->check()) {
     // The error is not displayed in a popup window. It must be in the message console.
     setError(aBoxAlgo->getError(), false);
@@ -144,8 +149,10 @@ void PrimitivesPlugin_Box::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Box> theBoxA
   
   // Insert to faces
   int num = 1;
-  std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces = theBoxAlgo->getCreatedFaces();
-  for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator it=listOfFaces.begin(); it!=listOfFaces.end(); ++it) {
+  std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces = 
+    theBoxAlgo->getCreatedFaces();
+  for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator 
+       it=listOfFaces.begin(); it!=listOfFaces.end(); ++it) {
     std::shared_ptr<GeomAPI_Shape> aFace = (*it).second;
     theResultBox->generated(aFace, (*it).first, num++);
   }

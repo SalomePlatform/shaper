@@ -33,8 +33,8 @@ void PartSetPlugin_Remove::execute()
       aRoot->refsToFeature(aFeature, aRefFeatures);
       if (aRefFeatures.empty()) {
         aRoot->removeFeature(aFeature);
-        // the redisplay signal should be flushed in order to erase the feature presentation in the viewer
-        // after removeFeature from the document
+        // the redisplay signal should be flushed in order to erase the feature presentation 
+        // in the viewer after removeFeature from the document
         Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
       }
     }

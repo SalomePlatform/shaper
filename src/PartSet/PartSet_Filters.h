@@ -26,7 +26,8 @@ public:
 
   /// Returns True if selected presentation can be selected
   /// \param theOwner an owner of the persentation
-  Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
+  Standard_EXPORT virtual Standard_Boolean 
+    IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
   DEFINE_STANDARD_RTTI(PartSet_GlobalFilter)
 };
@@ -49,7 +50,8 @@ public:
 
   /// Returns True if the given owner is acceptable for selection
   /// \param theOwner the selected owner
-  Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
+  Standard_EXPORT virtual Standard_Boolean 
+    IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
   DEFINE_STANDARD_RTTI(PartSet_CirclePointFilter)
 
