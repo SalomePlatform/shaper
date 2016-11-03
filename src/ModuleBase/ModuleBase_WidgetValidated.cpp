@@ -143,8 +143,9 @@ bool ModuleBase_WidgetValidated::isValidSelection(const ModuleBase_ViewerPrsPtr&
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::isValidSelectionForAttribute(const ModuleBase_ViewerPrsPtr& theValue,
-                                                              const AttributePtr& theAttribute)
+bool ModuleBase_WidgetValidated::isValidSelectionForAttribute(
+                                            const ModuleBase_ViewerPrsPtr& theValue,
+                                            const AttributePtr& theAttribute)
 {
   bool aValid = false;
 
@@ -248,7 +249,8 @@ void ModuleBase_WidgetValidated::blockAttribute(const AttributePtr& theAttribute
 }
 
 //********************************************************************
-void ModuleBase_WidgetValidated::storeValidState(const ModuleBase_ViewerPrsPtr& theValue, const bool theValid)
+void ModuleBase_WidgetValidated::storeValidState(const ModuleBase_ViewerPrsPtr& theValue, 
+                                                 const bool theValid)
 {
   GeomShapePtr aShape = theValue.get() ? theValue->shape() : GeomShapePtr();
   if (aShape.get()) {
@@ -286,13 +288,15 @@ void ModuleBase_WidgetValidated::storeValidState(const ModuleBase_ViewerPrsPtr& 
     }
   }
   #ifdef DEBUG_VALID_STATE
-    qDebug(QString("storeValidState: myValidPrs.size() = %1, myInvalidPrs.size() = %2").arg(myValidPrs.count())
+    qDebug(QString("storeValidState: myValidPrs.size() = %1, myInvalidPrs.size() = %2")
+                   .arg(myValidPrs.count())
                    .arg(myInvalidPrs.count()).toStdString().c_str());
   #endif
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::getValidState(const ModuleBase_ViewerPrsPtr& theValue, bool& theValid)
+bool ModuleBase_WidgetValidated::getValidState(const ModuleBase_ViewerPrsPtr& theValue, 
+                                               bool& theValid)
 {
   if (!theValue.get())
     return false;
@@ -378,7 +382,8 @@ void ModuleBase_WidgetValidated::filterCompSolids(QList<ModuleBase_ViewerPrsPtr>
   for (; anIt != aLast; anIt++) {
     const ModuleBase_ViewerPrsPtr& aViewerPrs = *anIt;
     ObjectPtr anObject = aViewerPrs->object();
-    ResultCompSolidPtr aResultCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anObject);
+    ResultCompSolidPtr aResultCompSolid = 
+      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anObject);
     if(aResultCompSolid.get()) {
       aCompSolids.insert(aResultCompSolid);
     }

@@ -126,8 +126,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Creates custom widgets for property panel
   /// \param theType a type of widget
   /// \param theParent the parent object
-  /// \param theWidgetApi the widget configuration. The attribute of the model widget is obtained from
-  virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
+  /// \param theWidgetApi the widget configuration. 
+  ///                     The attribute of the model widget is obtained from
+  virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType, 
+                                                     QWidget* theParent,
                                                      Config_WidgetAPI* theWidgetApi)
   {
     return 0;
@@ -143,7 +145,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// It is called as on clearing of property panel as on filling with new widgets
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation) {}
 
-  /// Have an opportunity to create widgets for the current operation instead of standard creation in workshop
+  /// Have an opportunity to create widgets for the current operation 
+  /// instead of standard creation in workshop
   /// \param theOperation a started operation
   /// \param theWidgets a list of created widgets
   /// \return boolean result, false by default
@@ -204,7 +207,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Return true if the custom presentation is activated
   /// \param theFlag a flag of level of customization, which means that only part of sub-elements
   /// \return boolean value
-  virtual bool isCustomPrsActivated(const ModuleBase_CustomizeFlag& theFlag) const { return false; };
+  virtual bool isCustomPrsActivated(const ModuleBase_CustomizeFlag& theFlag) const 
+  { return false; };
 
   /// Activate custom presentation for the object. Default realization is empty.
   /// \param theFeature a feature instance
@@ -221,7 +225,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
                                    const bool theUpdateViewer) {}
 
   /// Modifies the given presentation in the custom way.
-  virtual bool customisePresentation(std::shared_ptr<ModelAPI_Result> theResult, AISObjectPtr thePrs,
+  virtual bool customisePresentation(std::shared_ptr<ModelAPI_Result> theResult, 
+                                     AISObjectPtr thePrs,
                                      GeomCustomPrsPtr theCustomPrs) { return false; };
 
   /// Update the object presentable properties such as color, lines width and other

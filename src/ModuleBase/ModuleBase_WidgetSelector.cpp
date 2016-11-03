@@ -80,7 +80,8 @@ void ModuleBase_WidgetSelector::updateOnSelectionChanged(const bool theDone)
 QIntList ModuleBase_WidgetSelector::getShapeTypes() const
 {
   QIntList aShapeTypes = shapeTypes();
-  if (/*aShapeTypes.contains(TopAbs_SOLID) ||*/ // this type should be mentioned in XML, poor selection otherwise
+  // this type should be mentioned in XML, poor selection otherwise
+  if (/*aShapeTypes.contains(TopAbs_SOLID) ||*/ 
       aShapeTypes.contains(ModuleBase_ResultPrs::Sel_Result/*TopAbs_SHAPE*/)) {
     // it should be selectable for both, "solids" and "objects" types
     aShapeTypes.append(TopAbs_COMPSOLID);
@@ -197,7 +198,8 @@ bool ModuleBase_WidgetSelector::setSelectionCustom(const ModuleBase_ViewerPrsPtr
   getGeomSelection(thePrs, anObject, aShape);
 
   // the last flag is to be depending on hasObject is called before. To be corrected later
-  return ModuleBase_Tools::setObject(attribute(), anObject, aShape, myWorkshop, myIsInValidate, true);
+  return ModuleBase_Tools::setObject(attribute(), anObject, aShape, 
+                                     myWorkshop, myIsInValidate, true);
 }
 
 //********************************************************************
@@ -217,7 +219,7 @@ void ModuleBase_WidgetSelector::deactivate()
   }
   else if (anAttribute->attributeType() == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectAttr =
-                             std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
+                      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
     aSelectAttr->removeTemporaryValues();
   }
 }

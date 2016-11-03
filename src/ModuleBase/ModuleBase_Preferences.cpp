@@ -210,7 +210,8 @@ private:
 //**********************************************************
 //**********************************************************
 //**********************************************************
-ModuleBase_PreferencesDlg::ModuleBase_PreferencesDlg(SUIT_ResourceMgr* theResurces, QWidget* theParent)
+ModuleBase_PreferencesDlg::ModuleBase_PreferencesDlg(SUIT_ResourceMgr* theResurces, 
+  QWidget* theParent)
     : QDialog(theParent),
       myIsChanged(false)
 {
@@ -319,7 +320,8 @@ void ModuleBase_PreferencesDlg::createMenuPage(int thePageId)
   myPreferences->setItemProperty("columns", 1, aSizeGroup);
 
   int aRowsNb = myPreferences->addItem(tr("Number of rows"), aSizeGroup,
-                                       SUIT_PreferenceMgr::IntSpin, ModuleBase_Preferences::MENU_SECTION,
+                                       SUIT_PreferenceMgr::IntSpin, 
+                                       ModuleBase_Preferences::MENU_SECTION,
                                        "rows_number");
   myPreferences->setItemProperty("min", 1, aRowsNb);
   myPreferences->setItemProperty("max", 6, aRowsNb);

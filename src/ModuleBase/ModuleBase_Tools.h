@@ -293,7 +293,8 @@ bool MODULEBASE_EXPORT hasModuleDocumentFeature(const std::set<FeaturePtr>& theF
 /// \param theReferencesToDelete an out set for references features to be removed
 /// \return true if in message box answer is Yes
 bool MODULEBASE_EXPORT askToDelete(const std::set<FeaturePtr> aFeatures,
-                                   const std::map<FeaturePtr, std::set<FeaturePtr> >& theReferences,
+                                   const std::map<FeaturePtr, 
+                                   std::set<FeaturePtr> >& theReferences,
                                    QWidget* theParent,
                                    std::set<FeaturePtr>& theReferencesToDelete,
                                    const std::string& thePrefixInfo = "");
@@ -303,7 +304,8 @@ bool MODULEBASE_EXPORT askToDelete(const std::set<FeaturePtr> aFeatures,
 /// of this parameter is to be removed
 /// \param theObjects a list of objects
 /// \param theFeatures an out conteiner of features
-void MODULEBASE_EXPORT convertToFeatures(const QObjectPtrList& theObjects, std::set<FeaturePtr>& theFeatures);
+void MODULEBASE_EXPORT convertToFeatures(const QObjectPtrList& theObjects, 
+                                         std::set<FeaturePtr>& theFeatures);
 
 
 /// Returns translation from the given data.

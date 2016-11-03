@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 #ifndef ModuleBase_ParamIntSpinBox_H
 #define ModuleBase_ParamIntSpinBox_H

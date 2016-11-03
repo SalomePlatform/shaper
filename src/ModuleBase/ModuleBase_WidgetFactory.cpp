@@ -121,7 +121,8 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage, bool a
             ModuleBase_PageBase* aPage = new ModuleBase_PageWidget(aWidget);
             createWidget(aPage);
             if (aWdgType == WDG_SWITCH || aWdgType == WDG_TOOLBOX) {
-              ModuleBase_PagedContainer* aContainer = qobject_cast<ModuleBase_PagedContainer*>(aWidget);
+              ModuleBase_PagedContainer* aContainer = 
+                qobject_cast<ModuleBase_PagedContainer*>(aWidget);
 
               QString anIconPath = qs( myWidgetApi->getProperty( CONTAINER_PAGE_ICON ) );
               QPixmap anIcon = ModuleBase_IconFactory::loadPixmap( anIconPath );
@@ -179,7 +180,8 @@ void ModuleBase_WidgetFactory::getAttributeTitle(const std::string& theAttribute
   if (aFound) {
     theTitle = QString::fromStdString(myWidgetApi->widgetLabel()).toStdString().c_str();
     if (theTitle.empty())
-      theTitle = QString::fromStdString(myWidgetApi->getProperty(CONTAINER_PAGE_NAME)).toStdString().c_str();
+      theTitle = 
+      QString::fromStdString(myWidgetApi->getProperty(CONTAINER_PAGE_NAME)).toStdString().c_str();
   }
 }
 

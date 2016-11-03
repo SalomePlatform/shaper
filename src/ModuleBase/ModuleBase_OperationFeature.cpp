@@ -206,16 +206,18 @@ bool ModuleBase_OperationFeature::hasObject(ObjectPtr theObj) const
     }
 #ifdef DEBUG_DO_NOT_ACTIVATE_SUB_FEATURE
     if (aFeature->isMacro()) {
-      // macro feature may refers to sub-features, which also should be deactivated when the operation
+      // macro feature may refers to sub-features, 
+      // which also should be deactivated when the operation
       // is active, e.g. rectangle'lines.
       FeaturePtr anObjectFeature = ModelAPI_Feature::feature(theObj);
       std::list<AttributePtr> anAttributes = aFeature->data()->attributes(
                                               ModelAPI_AttributeRefList::typeId());
-      std::list<AttributePtr>::const_iterator anIt = anAttributes.begin(), aLast = anAttributes.end();
+      std::list<AttributePtr>::const_iterator 
+        anIt = anAttributes.begin(), aLast = anAttributes.end();
       bool aFoundObject = false;
       for (; anIt != aLast && !aFoundObject; anIt++) {
         std::shared_ptr<ModelAPI_AttributeRefList> aCurSelList =
-                                         std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anIt);
+                               std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anIt);
         for (int i = 0, aNb = aCurSelList->size(); i < aNb && !aFoundObject; i++) {
           ObjectPtr anObject = aCurSelList->object(i);
           FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
@@ -448,7 +450,8 @@ FeaturePtr ModuleBase_OperationFeature::previousCurrentFeature()
   return myPreviousCurrentFeature;
 }
 
-void ModuleBase_OperationFeature::initSelection(const QList<ModuleBase_ViewerPrsPtr>& thePreSelected)
+void ModuleBase_OperationFeature::initSelection(
+  const QList<ModuleBase_ViewerPrsPtr>& thePreSelected)
 {
   QObjectPtrList aCurrentFeatureResults;
 

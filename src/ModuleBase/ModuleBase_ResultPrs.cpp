@@ -69,9 +69,10 @@ void ModuleBase_ResultPrs::setAdditionalSelectionPriority(const int thePriority)
   myAdditionalSelectionPriority = thePriority;
 }
 
-void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-                                   const Handle(Prs3d_Presentation)& thePresentation, 
-                                   const Standard_Integer theMode)
+void ModuleBase_ResultPrs::Compute(
+          const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+          const Handle(Prs3d_Presentation)& thePresentation, 
+          const Standard_Integer theMode)
 {
   std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(myResult);
   bool aReadyToDisplay = aShapePtr.get();
@@ -85,7 +86,8 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
 
   if (!aReadyToDisplay) {
-    Events_InfoMessage("ModuleBase_ResultPrs", "An empty AIS presentation: ModuleBase_ResultPrs").send();
+    Events_InfoMessage("ModuleBase_ResultPrs", 
+                       "An empty AIS presentation: ModuleBase_ResultPrs").send();
     static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
     ModelAPI_EventCreator::get()->sendUpdated(myResult, anEvent);
   }
@@ -121,7 +123,8 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
         TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
         int aPriority = StdSelect_BRepSelectionTool::GetStandardPriority(aShape, TopAbs_COMPSOLID);
         /// It is important to have priority for the shape of comp solid result less than priority
-        /// for the presentation shape which is a sub-result. Reason is to select the sub-objects before: #1592
+        /// for the presentation shape which is a sub-result. 
+        /// Reason is to select the sub-objects before: #1592
         aPriority = aPriority - 1;
         double aDeflection = Prs3d::GetDeflection(aShape, myDrawer);
 
@@ -131,7 +134,8 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
 
         for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
           Handle(SelectMgr_EntityOwner) anOwner =
-            Handle(SelectMgr_EntityOwner)::DownCast(aSelection->Sensitive()->BaseSensitive()->OwnerId());
+            Handle(SelectMgr_EntityOwner)
+            ::DownCast(aSelection->Sensitive()->BaseSensitive()->OwnerId());
           anOwner->Set(this);
         }
         return;
@@ -143,7 +147,8 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
 
   if (myAdditionalSelectionPriority > 0) {
     for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
-      Handle(SelectBasics_EntityOwner) aBasicsOwner = aSelection->Sensitive()->BaseSensitive()->OwnerId();
+      Handle(SelectBasics_EntityOwner) aBasicsOwner = 
+        aSelection->Sensitive()->BaseSensitive()->OwnerId();
       if (!aBasicsOwner.IsNull())
         aBasicsOwner->Set(aBasicsOwner->Priority() + myAdditionalSelectionPriority);
     }

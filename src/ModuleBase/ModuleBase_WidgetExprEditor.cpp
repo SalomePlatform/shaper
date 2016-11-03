@@ -194,7 +194,8 @@ void ExpressionEditor::paintEvent( QPaintEvent* theEvent )
     QPen anOldpen = aPainter.pen();
     aPainter.setPen( aColor );
     lineRect.adjust(minLB, 0, 0, 0);
-    QString elidedText = aFontMetrics.elidedText( myPlaceHolderText, Qt::ElideRight, lineRect.width() );
+    QString elidedText = 
+      aFontMetrics.elidedText( myPlaceHolderText, Qt::ElideRight, lineRect.width() );
     aPainter.drawText( lineRect, va, elidedText );
     aPainter.setPen( anOldpen );
   }

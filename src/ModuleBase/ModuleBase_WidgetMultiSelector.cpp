@@ -121,7 +121,8 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   QLabel* aListLabel = new QLabel(!aLabelText.empty() ? aLabelText.c_str()
                                                       : tr("Selected objects:"), this);
   aMainLay->addWidget(aListLabel, 1, 0);
-  // if the xml definition contains one type, an information label should be shown near to the latest
+  // if the xml definition contains one type, an information label 
+  // should be shown near to the latest
   if (aShapeTypes.size() <= 1) {
     QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
     if (!aLabelIcon.isEmpty()) {
@@ -280,7 +281,7 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>
 
   if (isDone) // may be the feature's result is not displayed, but attributes should be
     myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeArguments,
-                                          true);/// hope that something is redisplayed by object updated
+                             true);/// hope that something is redisplayed by object updated
 
   return isDone;
 }
@@ -362,7 +363,7 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
 
     // may be the feature's result is not displayed, but attributes should be
     myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeArguments,
-                                          true); /// hope that something is redisplayed by object updated
+                              true); /// hope that something is redisplayed by object updated
   }
 
   // Restore selection
@@ -592,7 +593,7 @@ void ModuleBase_WidgetMultiSelector::getSelectedAttributeIndices(std::set<int>& 
 }
 
 void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<int> theAttributeIds,
-                                                      QList<ModuleBase_ViewerPrsPtr>& theValues) const
+                                                   QList<ModuleBase_ViewerPrsPtr>& theValues) const
 {
   if(myFeature.get() == NULL)
     return;
@@ -684,7 +685,8 @@ bool ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
   }
   else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
     std::set<AttributePtr> anAttributes;
-    QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
+    QList<ModuleBase_ViewerPrsPtr>::const_iterator 
+      anIt = theValues.begin(), aLast = theValues.end();
     ObjectPtr anObject;
     GeomShapePtr aShape;
     for (; anIt != aLast; anIt++) {

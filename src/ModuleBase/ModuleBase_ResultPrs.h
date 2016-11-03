@@ -71,20 +71,22 @@ public:
   Standard_EXPORT ModuleBase_ResultPrs(ResultPtr theResult);
 
   //! Method which draws selected owners ( for fast presentation draw )
-  Standard_EXPORT virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
+  Standard_EXPORT virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM,
                                                const SelectMgr_SequenceOfOwner& theOwners);
   
   //! Method which hilight an owner belonging to
   //! this selectable object  ( for fast presentation draw )
-  Standard_EXPORT virtual void HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM, 
-                                                     const Quantity_NameOfColor theColor, const Handle(SelectMgr_EntityOwner)& theOwner);
+  Standard_EXPORT virtual void HilightOwnerWithColor(
+    const Handle(PrsMgr_PresentationManager3d)& thePM,
+    const Quantity_NameOfColor theColor, const Handle(SelectMgr_EntityOwner)& theOwner);
 
   /// Returns result object
   Standard_EXPORT ResultPtr getResult() const { return myResult; }
 
   /// Returns selection priorities that will be added to created selection owner
   /// \return integer value
-  Standard_EXPORT int getAdditionalSelectionPriority() const { return myAdditionalSelectionPriority; }
+  Standard_EXPORT int getAdditionalSelectionPriority() const 
+  { return myAdditionalSelectionPriority; }
 
   /// Appends a special priority for the mode of selection
   /// \param theSelectionMode a mode of selection, used in ComputeSelection
@@ -94,7 +96,8 @@ public:
   DEFINE_STANDARD_RTTI(ModuleBase_ResultPrs)
 protected:
   /// Redefinition of virtual function
-  Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+  Standard_EXPORT virtual void Compute(
+    const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
     const Handle(Prs3d_Presentation)& thePresentation, const Standard_Integer theMode = 0);
 
   /// Redefinition of virtual function
@@ -113,7 +116,9 @@ private:
 
   /// Original shape of the result object
   TopoDS_Shape myOriginalShape;
-  /// selection priority that will be added to the standard selection priority of the selection entity
+
+  /// selection priority that will be added to the standard 
+  /// selection priority of the selection entity
   int myAdditionalSelectionPriority;
 };
 

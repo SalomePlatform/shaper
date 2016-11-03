@@ -148,12 +148,13 @@ protected:
   /// \param theAttributeIds indices in attribute list to be returned
   /// \param theValues the result presentations, filled with object and shape of an attribute item
   void convertIndicesToViewerSelection(std::set<int> theAttributeIds,
-                                       QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues) const;
+                            QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues) const;
 
   /// Iterates throgh the model attribute list and remove elements which do not present in the list
   /// \param theValues the wrapped selection values
   /// \return true if at least one object is removed
-  virtual bool removeUnusedAttributeObjects(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
+  virtual bool removeUnusedAttributeObjects(
+    QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
   /// Converts viewer presentation selection list to objects and shapes map
   /// \param theValues the wrapped selection values

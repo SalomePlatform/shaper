@@ -19,7 +19,8 @@ void ModuleBase_FilterFactory::registerFilter(const std::string& theID,
                                               ModuleBase_Filter* theFilter)
 {
   if (myIDs.find(theID) != myIDs.end()) {
-    Events_InfoMessage("ModuleBase_FilterFactory", "Filter %1 is already registered").arg(theID).send();
+    Events_InfoMessage("ModuleBase_FilterFactory", 
+      "Filter %1 is already registered").arg(theID).send();
   } else {
     myIDs[theID] = theFilter;
   }

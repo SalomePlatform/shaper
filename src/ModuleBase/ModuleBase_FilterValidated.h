@@ -32,12 +32,15 @@ public:
       SelectMgr_Filter(), myWorkshop(theWorkshop) {}
 
   /**
-   * Returns true if the owner is computed from decomposition(it is global selection, not the sub-shapes)
-   * of if the selected result is a construction and the result feature is composite and has sub-elements.
+   * Returns true if the owner is computed from decomposition
+   * (it is global selection, not the sub-shapes)
+   * of if the selected result is a construction and the result 
+   * feature is composite and has sub-elements.
    * \param theOwner the result of selection
    * \return whether the owner is selectable in the viewer
   */
-  Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
+  Standard_EXPORT virtual 
+    Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
   DEFINE_STANDARD_RTTI(ModuleBase_FilterValidated)
 

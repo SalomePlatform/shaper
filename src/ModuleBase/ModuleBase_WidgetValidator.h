@@ -52,7 +52,8 @@ private:
   //! Clear all validated cash in the widget
   void clearValidatedCash();
 
-  /// Gets the validity state of the presentation in an internal map. Returns true if the valid state of value is stored
+  /// Gets the validity state of the presentation in an internal map. 
+  /// Returns true if the valid state of value is stored
   /// \param theValue a viewer presentation
   /// \param theValid a valid state
   bool getValidState(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue, bool& theValid);
@@ -67,8 +68,11 @@ protected:
   ModuleBase_ModelWidget* myModelWidget; ///< the current widget to be validated
   ModuleBase_IWorkshop* myWorkshop; ///< the active workshop
 
-  QList<std::shared_ptr<ModuleBase_ViewerPrs>> myValidPrs; ///< cash of valid selection presentations
-  QList<std::shared_ptr<ModuleBase_ViewerPrs>> myInvalidPrs; ///< cash of invalid selection presentations
+  /// cash of valid selection presentations
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> myValidPrs; 
+  
+  /// cash of invalid selection presentations
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> myInvalidPrs; 
 };
 
 #endif /* ModuleBase_WidgetValidator_H_ */

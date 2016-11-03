@@ -37,10 +37,11 @@ class ModuleBase_ISelection
 
   /// Returns a list of viewer selected presentations
   /// \return list of presentations
-  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getSelected(const SelectionPlace& thePlace = Browser) const = 0;
+  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> 
+    getSelected(const SelectionPlace& thePlace = Browser) const = 0;
 
-  /// The values are appended to the first parameter list if the first list does not contain an item
-  /// with the same object
+  /// The values are appended to the first parameter list if the first list does not contain 
+  /// an item with the same object
   /// \param theValues a list of new values
   /// \param theValuesTo a list, that will be changed
   static void appendSelected(const QList<std::shared_ptr<ModuleBase_ViewerPrs>> theValues,
@@ -94,7 +95,8 @@ class ModuleBase_ISelection
   //! Return the IO from the viewer presentation.
   //! \param thePrs a selected object
   //! \return an interactive object
-  virtual MODULEBASE_EXPORT Handle(AIS_InteractiveObject) getIO(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs) = 0;
+  virtual MODULEBASE_EXPORT 
+    Handle(AIS_InteractiveObject) getIO(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs) = 0;
 
   //! Wraps the object list into the viewer prs list
   //! \param theObjects a list of objects
@@ -105,7 +107,7 @@ class ModuleBase_ISelection
   /// Removes selection items where owners have equal vertices. The first
   /// owner with the qual vertex stays in the list.
   static MODULEBASE_EXPORT void filterSelectionOnEqualPoints
-                                              (QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theSelected);
+                                      (QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theSelected);
 private:
   /// Find vertex shape build by a Brep owner of the presentation if it exists
   /// \param thePrs a viewer presentation

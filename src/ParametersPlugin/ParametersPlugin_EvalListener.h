@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 /*
  * ParametersPlugin_EvalListener.h
  *
@@ -30,7 +31,8 @@ class ParametersPlugin_EvalListener : public Events_Listener
   PARAMETERSPLUGIN_EXPORT virtual ~ParametersPlugin_EvalListener();
 
   /// Reimplemented from Events_Listener::processEvent().
-  PARAMETERSPLUGIN_EXPORT virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
+  PARAMETERSPLUGIN_EXPORT 
+    virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
  protected:
   /// Evaluates theExpression and returns its value.

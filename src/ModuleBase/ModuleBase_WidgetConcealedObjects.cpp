@@ -113,7 +113,8 @@ QList<QWidget*> ModuleBase_WidgetConcealedObjects::getControls() const
   return result;
 }
 
-void ModuleBase_WidgetConcealedObjects::addViewRow(const std::shared_ptr<ModelAPI_Result>& theResult)
+void ModuleBase_WidgetConcealedObjects::addViewRow(
+                                const std::shared_ptr<ModelAPI_Result>& theResult)
 {
   int anId = myView->rowCount();
   myView->setRowCount(anId+1);

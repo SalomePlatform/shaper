@@ -14,7 +14,8 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
 
-ModuleBase_IPropertyPanel::ModuleBase_IPropertyPanel(QWidget* theParent) : QDockWidget(theParent), myIsEditing(false)
+ModuleBase_IPropertyPanel::ModuleBase_IPropertyPanel(QWidget* theParent)
+ : QDockWidget(theParent), myIsEditing(false)
 {
 
 }
@@ -25,7 +26,7 @@ ModuleBase_ModelWidget* ModuleBase_IPropertyPanel::findFirstAcceptingValueWidget
 }
 
 ModuleBase_ModelWidget* ModuleBase_IPropertyPanel::findFirstAcceptingValueWidget(
-                                                              const QList<ModuleBase_ModelWidget*>& theWidgets)
+                                        const QList<ModuleBase_ModelWidget*>& theWidgets)
 {
   ModuleBase_ModelWidget* aFirstWidget = 0;
 

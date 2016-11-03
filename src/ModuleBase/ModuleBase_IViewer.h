@@ -101,7 +101,8 @@ Q_OBJECT
   /// Remember a scale factor for the view object
   /// \param theView a view object
   /// \param theVal a scale factor
-  void SetScale(const Handle(V3d_View)& theView, const double theVal) { myWindowScale[theView] = theVal; }
+  void SetScale(const Handle(V3d_View)& theView, const double theVal) 
+  { myWindowScale[theView] = theVal; }
 
   /// Method returns True if the viewer can process editing objects 
   /// by mouse drugging. If this is impossible thet it has to return False.

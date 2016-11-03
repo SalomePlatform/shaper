@@ -37,7 +37,8 @@ IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ShapeDocumentFilter, SelectMgr_Filter);
 
 
 //TODO (VSV): Check bug in OCCT: Filter result is ignored (bug25340)
-Standard_Boolean ModuleBase_ShapeDocumentFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
+Standard_Boolean ModuleBase_ShapeDocumentFilter::IsOk(
+                                            const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   bool aValid = true;
 
@@ -75,7 +76,8 @@ Standard_Boolean ModuleBase_ShapeDocumentFilter::IsOk(const Handle(SelectMgr_Ent
 IMPLEMENT_STANDARD_HANDLE(ModuleBase_ShapeInPlaneFilter, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ShapeInPlaneFilter, SelectMgr_Filter);
 
-Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
+Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(
+                                        const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   bool aValid = true;
 

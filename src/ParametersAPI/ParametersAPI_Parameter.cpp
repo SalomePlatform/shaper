@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 // Name   : ParametersAPI_Parameter.cpp
 // Purpose: 
 //

@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 /*
  * ModuleBase_WidgetToolbox.cpp
  *
@@ -18,7 +19,8 @@
 #include <QVBoxLayout>
 #include <QIcon>
 
-ModuleBase_WidgetToolbox::ModuleBase_WidgetToolbox(QWidget* theParent, const Config_WidgetAPI* theData)
+ModuleBase_WidgetToolbox::ModuleBase_WidgetToolbox(QWidget* theParent, 
+                                                   const Config_WidgetAPI* theData)
 : ModuleBase_PagedContainer(theParent, theData)
 {
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);

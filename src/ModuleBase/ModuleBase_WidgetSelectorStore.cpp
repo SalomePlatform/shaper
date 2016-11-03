@@ -46,7 +46,8 @@ void ModuleBase_WidgetSelectorStore::storeAttributeValue(const AttributePtr& the
     myShape = ModuleBase_Tools::getShape(theAttribute, theWorkshop);
     myRefAttribute = AttributePtr();
     myIsObject = false;
-    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+    AttributeRefAttrPtr aRefAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
     if (aRefAttr) {
       myIsObject = aRefAttr->isObject();
       myRefAttribute = aRefAttr->attr();
@@ -86,7 +87,8 @@ void ModuleBase_WidgetSelectorStore::restoreAttributeValue(const AttributePtr& t
   }
   else {
     ModuleBase_Tools::setObject(theAttribute, myObject, myShape, theWorkshop, true, true);
-    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+    AttributeRefAttrPtr aRefAttr = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
     if (aRefAttr) {
       if (!myIsObject)
         aRefAttr->setAttr(myRefAttribute);

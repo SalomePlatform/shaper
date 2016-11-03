@@ -19,7 +19,8 @@ std::shared_ptr<ModuleBase_WidgetCreatorFactory> MY_WIDGET_CREATOR_FACTORY;
 std::shared_ptr<ModuleBase_WidgetCreatorFactory> ModuleBase_WidgetCreatorFactory::get()
 {
   if (!MY_WIDGET_CREATOR_FACTORY) {
-    MY_WIDGET_CREATOR_FACTORY =  std::shared_ptr<ModuleBase_WidgetCreatorFactory>(new ModuleBase_WidgetCreatorFactory());
+    MY_WIDGET_CREATOR_FACTORY =  
+      std::shared_ptr<ModuleBase_WidgetCreatorFactory>(new ModuleBase_WidgetCreatorFactory());
   }
   return MY_WIDGET_CREATOR_FACTORY;
 }
@@ -44,7 +45,8 @@ void ModuleBase_WidgetCreatorFactory::registerCreator(const WidgetCreatorPtr& th
       myPanelToCreator[aKey] = theCreator;
     else {
       Events_InfoMessage("ModuleBase_WidgetCreatorFactory", 
-        "The %1 panel XML definition has been already used by another widget creator").arg(aKey).send();
+        "The %1 panel XML definition has been already used by another widget creator")
+        .arg(aKey).send();
     }
   }
 
@@ -57,7 +59,8 @@ void ModuleBase_WidgetCreatorFactory::registerCreator(const WidgetCreatorPtr& th
       myCreators[aKey] = theCreator;
     else {
       Events_InfoMessage("ModuleBase_WidgetCreatorFactory",
-        "The %1 widget XML definition has been already used by another widget creator").arg(aKey).send();
+        "The %1 widget XML definition has been already used by another widget creator")
+        .arg(aKey).send();
     }
   }
 
@@ -70,7 +73,8 @@ void ModuleBase_WidgetCreatorFactory::registerCreator(const WidgetCreatorPtr& th
       myPageToCreator[aKey] = theCreator;
     else {
       Events_InfoMessage("ModuleBase_WidgetCreatorFactory",
-        "The %1 page XML definition has been already used by another widget creator").arg(aKey).send();
+        "The %1 page XML definition has been already used by another widget creator")
+        .arg(aKey).send();
     }
   }
 }

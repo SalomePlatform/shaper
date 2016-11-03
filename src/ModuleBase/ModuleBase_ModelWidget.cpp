@@ -94,7 +94,8 @@ bool ModuleBase_ModelWidget::isValueEnabled() const
 #ifdef DEBUG_ENABLE_SKETCH_INPUT_FIELDS
     bool aCanDisable = false;
 #else
-    bool aCanDisable = true;//Config_PropManager::boolean(SKETCH_TAB_NAME, "disable_input_fields", "true");
+    //Config_PropManager::boolean(SKETCH_TAB_NAME, "disable_input_fields", "true");
+    bool aCanDisable = true;
 #endif
     if (aCanDisable)
       anEnabled = false;

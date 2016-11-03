@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 /*
  * ParametersPlugin_EvalListener.cpp
  *
@@ -138,7 +139,8 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
     bool isValid = anError.empty();
     if (isValid)
       anAttribute->setCalculatedValue(aValue);
-    anAttribute->setUsedParameters(isValid ? toSet(myInterp->compile(anAttribute->text())) : std::set<std::string>());
+    anAttribute->setUsedParameters(isValid ? 
+      toSet(myInterp->compile(anAttribute->text())) : std::set<std::string>());
     anAttribute->setExpressionInvalid(!isValid);
     anAttribute->setExpressionError(anAttribute->text().empty() ? "" : anError);
   } else
@@ -150,7 +152,8 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
     bool isValid = anError.empty();
     if (isValid)
       anAttribute->setCalculatedValue(aValue);
-    anAttribute->setUsedParameters(isValid ? toSet(myInterp->compile(anAttribute->text())) : std::set<std::string>());
+    anAttribute->setUsedParameters(isValid ? 
+      toSet(myInterp->compile(anAttribute->text())) : std::set<std::string>());
     anAttribute->setExpressionInvalid(!isValid);
     anAttribute->setExpressionError(anAttribute->text().empty() ? "" : anError);
   } else
@@ -172,7 +175,8 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
       double aValue = evaluate(aParamFeature, aText[i], anError);
       bool isValid = anError.empty();
       if (isValid) aCalculatedValue[i] = aValue;
-      anAttribute->setUsedParameters(i, isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
+      anAttribute->setUsedParameters(i, 
+        isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
       anAttribute->setExpressionInvalid(i, !isValid);
       anAttribute->setExpressionError(i, aText[i].empty() ? "" : anError);
     }
@@ -196,7 +200,8 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
       double aValue = evaluate(aParamFeature, aText[i], anError);
       bool isValid = anError.empty();
       if (isValid) aCalculatedValue[i] = aValue;
-      anAttribute->setUsedParameters(i, isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
+      anAttribute->setUsedParameters(i, 
+        isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
       anAttribute->setExpressionInvalid(i, !isValid);
       anAttribute->setExpressionError(i, aText[i].empty() ? "" : anError);
     }
@@ -313,9 +318,10 @@ void ParametersPlugin_EvalListener::renameInAttribute(
   }
 }
 
-void ParametersPlugin_EvalListener::renameInDependents(std::shared_ptr<ModelAPI_ResultParameter> theResultParameter,
-                                                       const std::string& theOldName,
-                                                       const std::string& theNewName)
+void ParametersPlugin_EvalListener::renameInDependents(
+              std::shared_ptr<ModelAPI_ResultParameter> theResultParameter,
+              const std::string& theOldName,
+              const std::string& theNewName)
 {
   std::set<std::shared_ptr<ModelAPI_Attribute> > anAttributes =
       theResultParameter->data()->refsToMe();
@@ -397,8 +403,11 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
 
   // try to update the parameter feature according the new name
   setParameterName(aResultParameter, aMessage->newName());
-  // TODO(spo): replace with ModelAPI_Session::get()->validators()->validate(aParameter, ParametersPlugin_Parameter::VARIABLE_ID())
-  // when ModelAPI_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& theFeature, const std::string& theAttribute) const
+  // TODO(spo): replace with 
+  // ModelAPI_Session::get()->validators()->validate(aParameter, 
+  //                                                 ParametersPlugin_Parameter::VARIABLE_ID())
+  // when ModelAPI_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  //                                           const std::string& theAttribute) const
   // is ready
   if (!isValidAttribute(aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID()))) {
     setParameterName(aResultParameter, aMessage->oldName());

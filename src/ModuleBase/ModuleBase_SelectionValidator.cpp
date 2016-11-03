@@ -8,7 +8,8 @@
 #include <ModuleBase_SelectionValidator.h>
 
 
-bool ModuleBase_SelectionValidator::isValid(const ModuleBase_ISelection* theSelection, ModuleBase_Operation* theOperation) const
+bool ModuleBase_SelectionValidator::isValid(const ModuleBase_ISelection* theSelection,
+                                            ModuleBase_Operation* theOperation) const
 {
   return true;
 }

@@ -123,7 +123,8 @@ QWidget* ParametersPlugin_ItemDelegate::createEditor(QWidget* parent,
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-void ParametersPlugin_TreeWidget::closeEditor(QWidget* theEditor, QAbstractItemDelegate::EndEditHint theHint)
+void ParametersPlugin_TreeWidget::closeEditor(QWidget* theEditor, 
+                                              QAbstractItemDelegate::EndEditHint theHint)
 {
   if (theHint == QAbstractItemDelegate::EditNextItem) {
     QModelIndex aCurrent = currentIndex();
@@ -158,7 +159,8 @@ void ParametersPlugin_TreeWidget::closeEditor(QWidget* theEditor, QAbstractItemD
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theParent, const Config_WidgetAPI* theData)
+ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theParent, 
+  const Config_WidgetAPI* theData)
   : ModuleBase_ModelDialogWidget(theParent, theData)
 {
   QVBoxLayout* aLayout = new QVBoxLayout(this);
@@ -338,12 +340,14 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
             QStringList aValNames;
             aValNames << aReferenced->data()->name().c_str();
 
-            AttributeDoublePtr aDouble = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aAttr);
+            AttributeDoublePtr aDouble =
+              std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aAttr);
             if (aDouble.get()) {
               aValNames << aDouble->text().c_str();
               aValNames << QString::number(aDouble->value());
             } else {
-              AttributeIntegerPtr aInt = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aAttr);
+              AttributeIntegerPtr aInt =
+                std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aAttr);
               if (aInt.get()) {
                 aValNames << aInt->text().c_str();
                 aValNames << QString::number(aInt->value());
@@ -382,7 +386,8 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
     } else
       aValues << aExpr.c_str();
 
-    std::string aErr = aParameter->data()->string(ParametersPlugin_Parameter::EXPRESSION_ERROR_ID())->value();
+    std::string aErr =
+      aParameter->data()->string(ParametersPlugin_Parameter::EXPRESSION_ERROR_ID())->value();
     if (aErr.empty()) {
       AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
       aValues << QString::number(aValueAttribute->value());
@@ -433,7 +438,8 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
     break;
   case Col_Equation:
     {
-      AttributeStringPtr aStringAttr = aFeature->string(ParametersPlugin_Parameter::EXPRESSION_ID());
+      AttributeStringPtr aStringAttr = 
+        aFeature->string(ParametersPlugin_Parameter::EXPRESSION_ID());
       if (!aText.isEmpty()) {
         if (aText != aStringAttr->value().c_str()) {
           aStringAttr->setValue(aText.toStdString());

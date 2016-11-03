@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 /*
  * ModuleBase_PagedContainer.cpp
  *
@@ -17,7 +18,8 @@
 #include <QVBoxLayout>
 
 
-ModuleBase_PagedContainer::ModuleBase_PagedContainer(QWidget* theParent, const Config_WidgetAPI* theData)
+ModuleBase_PagedContainer::ModuleBase_PagedContainer(QWidget* theParent, 
+                                                     const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData),
   myIsFocusOnCurrentPage(false)
 {

@@ -23,7 +23,8 @@ class QKeyEvent;
 
 /**\class ModuleBase_ModelWidget
  * \ingroup GUI
- * \brief An abstract custom widget class. This class realization is assumed to create some controls.
+ * \brief An abstract custom widget class. This class realization is assumed 
+ * to create some controls.
  * The controls values modification should send signal about values change.
  *
  * Common interface for widgets in the property panel.
@@ -42,7 +43,8 @@ Q_OBJECT
 
    enum EnableState { On,  /// the widget value is always enabled
                       Off, /// the widget value is always disabled
-                      DefinedInPreferences }; /// the widget value enable state is defined in preferences
+                      /// the widget value enable state is defined in preferences
+                      DefinedInPreferences }; 
 
   /// Constructor
   /// \param theParent the parent object
@@ -75,12 +77,14 @@ Q_OBJECT
   /// \return the boolean result
   bool isInternal() const { return myIsInternal; }
 
-  /// Returns true, if the obligatory value of the widget is not defined in the XML or has true value
+  /// Returns true, if the obligatory value of the widget is 
+  /// not defined in the XML or has true value
   /// \return the boolean result
   bool isObligatory() const { return myIsObligatory; }
 
-  /// Returns true, if the widget value is enabled and might be modified manualy. It returns false if
-  /// the application preferences allow having disabled value and the internal state tells to disable
+  /// Returns true, if the widget value is enabled and might be modified manualy. 
+  /// It returns false if the application preferences allow having disabled value 
+  /// and the internal state tells to disable
   /// \return the boolean result
   virtual bool isValueEnabled() const;
 
@@ -129,12 +133,14 @@ Q_OBJECT
   /// Checks if the selection presentation is valid in widget 
   /// \param theValue a selected presentation in the view
   /// \return a boolean value
-  virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue) { return true; }
+  virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue)
+  { return true; }
 
   /// Returns widget validator, by default it is NULL. To be created in a child if necessary
   ModuleBase_WidgetValidator* widgetValidator() { return myWidgetValidator; }
 
-  /// Restore value from attribute data to the widget's control. Emits signals before and after store
+  /// Restore value from attribute data to the widget's control. 
+  /// Emits signals before and after store
   /// \return True in success
   bool restoreValue();
 
@@ -142,7 +148,8 @@ Q_OBJECT
   /// \return True in success
   bool storeValue();
 
-  /// Set focus to the first control of the current widget. The focus policy of the control is checked.
+  /// Set focus to the first control of the current widget. 
+  /// The focus policy of the control is checked.
   /// If the widget has the NonFocus focus policy, it is skipped.
   /// \return the state whether the widget can accept the focus
   virtual bool focusTo();
