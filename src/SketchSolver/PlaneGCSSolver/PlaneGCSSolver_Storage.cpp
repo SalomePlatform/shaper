@@ -116,6 +116,7 @@ bool PlaneGCSSolver_Storage::update(ConstraintWrapperPtr theConstraint)
 /// \brief Update coordinates of the point or scalar using its base attribute
 static bool updateValues(EntityWrapperPtr& theEntity)
 {
+  const double aTol = 1000. * tolerance;
   bool isUpdated = false;
   AttributePtr anAttr = theEntity->baseAttribute();
   const std::list<ParameterWrapperPtr> aParams = theEntity->parameters();
@@ -135,7 +136,7 @@ static bool updateValues(EntityWrapperPtr& theEntity)
 
   std::list<ParameterWrapperPtr>::const_iterator anIt = aParams.begin();
   for (int i = 0; anIt != aParams.end(); ++anIt, ++i)
-    if (fabs((*anIt)->value() - aCoord[i]) > tolerance) {
+    if (fabs((*anIt)->value() - aCoord[i]) > aTol) {
       (*anIt)->setValue(aCoord[i]);
       isUpdated = true;
     }
@@ -657,6 +658,16 @@ void PlaneGCSSolver_Storage::initializeSolver(SolverPtr theSolver)
   aSolver->setParameters(myParameters);
 }
 
+// indicates attribute containing in the external feature
+bool isExternalAttribute(const AttributePtr& theAttribute)
+{
+  if (!theAttribute)
+    return false;
+  std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(theAttribute->owner());
+  return aSketchFeature.get() && aSketchFeature->isExternal();
+}
+
 void PlaneGCSSolver_Storage::refresh(bool theFixedOnly) const
 {
   //blockEvents(true);
@@ -667,13 +678,7 @@ void PlaneGCSSolver_Storage::refresh(bool theFixedOnly) const
   for (; anIt != myAttributeMap.end(); ++anIt) {
     // the external feature always should keep the up to date values, so, 
     // refresh from the solver is never needed
-    bool isExternal = false;
-    if (anIt->first.get()) {
-      std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
-        std::dynamic_pointer_cast<SketchPlugin_Feature>(anIt->first->owner());
-      if (aSketchFeature.get() && aSketchFeature->isExternal())
-        isExternal = true;
-    }
+    bool isExternal = isExternalAttribute(anIt->first);
 
     // update parameter wrappers and obtain values of attributes
     aParams = anIt->second->parameters();
@@ -695,24 +700,27 @@ void PlaneGCSSolver_Storage::refresh(bool theFixedOnly) const
     if (aPoint2D) {
       if ((isUpd[0] && fabs(aPoint2D->x() - aCoords[0]) > tolerance) ||
           (isUpd[1] && fabs(aPoint2D->y() - aCoords[1]) > tolerance) || isExternal) {
-        if (!isUpd[0] || isExternal) aCoords[0] = aPoint2D->x();
-        if (!isUpd[1] || isExternal) aCoords[1] = aPoint2D->y();
-        aPoint2D->setValue(aCoords[0], aCoords[1]);
         // Find points coincident with this one (probably not in GID_OUTOFGROUP)
         CoincidentPointsMap::const_iterator aCoincIt = myCoincidentPoints.begin();
         for (; aCoincIt != myCoincidentPoints.end(); ++aCoincIt)
           if (aCoincIt->first == anIt->second ||
               aCoincIt->second.find(anIt->second) != aCoincIt->second.end())
             break;
+        // get coordinates of "master"-point
+        std::shared_ptr<GeomDataAPI_Point2D> aMaster = aCoincIt != myCoincidentPoints.end() ?
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aCoincIt->first->baseAttribute()) :
+            aPoint2D;
+        if (!isUpd[0] || isExternal) aCoords[0] = aMaster->x();
+        if (!isUpd[1] || isExternal) aCoords[1] = aMaster->y();
+        if (!isExternal)
+          aPoint2D->setValue(aCoords[0], aCoords[1]);
         if (aCoincIt != myCoincidentPoints.end()) {
-          aPoint2D = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-              aCoincIt->first->baseAttribute());
-          if (aPoint2D)
-            aPoint2D->setValue(aCoords[0], aCoords[1]);
+          if (aMaster && !isExternalAttribute(aMaster))
+            aMaster->setValue(aCoords[0], aCoords[1]);
           std::set<EntityWrapperPtr>::const_iterator aSlaveIt = aCoincIt->second.begin();
           for (; aSlaveIt != aCoincIt->second.end(); ++aSlaveIt) {
             aPoint2D = std::dynamic_pointer_cast<GeomDataAPI_Point2D>((*aSlaveIt)->baseAttribute());
-            if (aPoint2D)
+            if (aPoint2D && !isExternalAttribute(aPoint2D))
               aPoint2D->setValue(aCoords[0], aCoords[1]);
           }
         }
