@@ -627,7 +627,8 @@ ResultPtr PartSet_Tools::findExternalEdge(CompositeFeaturePtr theSketch, std::sh
     FeaturePtr aFeature = theSketch->subFeature(i);
     std::shared_ptr<SketchPlugin_Feature> aSketchFea = 
       std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    if (aSketchFea) {
+    // not displayed result of feature projection should not be returned as external edge
+    if (aSketchFea && aSketchFea->canBeDisplayed()) {
       if (aSketchFea->isExternal()) {
         std::list<ResultPtr> aResults = aSketchFea->results();
         std::list<ResultPtr>::const_iterator aIt;
