@@ -66,13 +66,20 @@ public:
   virtual ~SketchAPI_Circle();
 
   INTERFACE_7(SketchPlugin_Circle::ID(),
-              circleType, SketchPlugin_Circle::CIRCLE_TYPE(), ModelAPI_AttributeString, /** Circle type */,
-              center, SketchPlugin_Circle::CENTER_ID(), GeomDataAPI_Point2D, /** Center point */,
-              radius, SketchPlugin_Circle::RADIUS_ID(), ModelAPI_AttributeDouble, /** Radius */,
-              firstPoint, SketchPlugin_Circle::FIRST_POINT_ID(), GeomDataAPI_Point2D, /** First point */,
-              secondPoint, SketchPlugin_Circle::SECOND_POINT_ID(), GeomDataAPI_Point2D, /** Second point */,
-              thirdPoint, SketchPlugin_Circle::THIRD_POINT_ID(), GeomDataAPI_Point2D, /** Third point */,
-              external, SketchPlugin_Circle::EXTERNAL_ID(), ModelAPI_AttributeSelection, /** External */)
+              circleType, SketchPlugin_Circle::CIRCLE_TYPE(),
+              ModelAPI_AttributeString, /** Circle type */,
+              center, SketchPlugin_Circle::CENTER_ID(),
+              GeomDataAPI_Point2D, /** Center point */,
+              radius, SketchPlugin_Circle::RADIUS_ID(),
+              ModelAPI_AttributeDouble, /** Radius */,
+              firstPoint, SketchPlugin_Circle::FIRST_POINT_ID(),
+              GeomDataAPI_Point2D, /** First point */,
+              secondPoint, SketchPlugin_Circle::SECOND_POINT_ID(),
+              GeomDataAPI_Point2D, /** Second point */,
+              thirdPoint, SketchPlugin_Circle::THIRD_POINT_ID(),
+              GeomDataAPI_Point2D, /** Third point */,
+              external, SketchPlugin_Circle::EXTERNAL_ID(),
+              ModelAPI_AttributeSelection, /** External */)
 
   /// Set by center and radius.
   SKETCHAPI_EXPORT

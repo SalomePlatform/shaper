@@ -38,8 +38,10 @@ bool SketcherPrs_Tangent::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
 {
   bool aReadyToDisplay = false;
 
-  ObjectPtr aObj1 = SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
-  ObjectPtr aObj2 = SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_B());
+  ObjectPtr aObj1 = 
+    SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
+  ObjectPtr aObj2 = 
+    SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_B());
 
   aReadyToDisplay = SketcherPrs_Tools::getShape(aObj1).get() != NULL &&
                     SketcherPrs_Tools::getShape(aObj2).get() != NULL;
@@ -52,8 +54,10 @@ bool SketcherPrs_Tangent::updateIfReadyToDisplay(double theStep) const
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
 
-  ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
-  ObjectPtr aObj2 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
+  ObjectPtr aObj1 = 
+    SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  ObjectPtr aObj2 = 
+    SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
 
   // Compute points coordinates
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
@@ -64,11 +68,13 @@ bool SketcherPrs_Tangent::updateIfReadyToDisplay(double theStep) const
   return true;
 }
 
-void SketcherPrs_Tangent::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const
+void SketcherPrs_Tangent::drawLines(const Handle(Prs3d_Presentation)& thePrs, 
+                                    Quantity_Color theColor) const
 {
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
 
-  Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
+  Handle(Graphic3d_AspectLine3d) aLineAspect = 
+    new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
   aGroup->SetPrimitivesAspect(aLineAspect);
 
   ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());

@@ -90,8 +90,10 @@ bool SketcherPrs_Angle::readyToDisplay(ModelAPI_Feature* theConstraint,
   if (!anAttr2->isInitialized())
     return aReadyToDisplay;
 
-  FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
-  FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+  FeaturePtr aLineA = 
+    SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
+  FeaturePtr aLineB = 
+    SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
 
   if (!aLineA.get() || !aLineB.get())
     return aReadyToDisplay;
@@ -106,16 +108,22 @@ bool SketcherPrs_Angle::readyToDisplay(ModelAPI_Feature* theConstraint,
       aLineB->attribute(SketchPlugin_Line::END_ID()));
 
   std::shared_ptr<GeomAPI_Angle2d> anAng;
-  if (!aData->attribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID())->isInitialized() ||
-      !aData->attribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID())->isInitialized())
+  bool isFirstPnt = aData->attribute(
+    SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID())->isInitialized();
+  bool isSecondPnt = aData->attribute(
+    SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID())->isInitialized();
+  if (!isFirstPnt || !isSecondPnt)
     anAng = std::shared_ptr<GeomAPI_Angle2d>(new GeomAPI_Angle2d(
         aStartA->pnt(), aEndA->pnt(), aStartB->pnt(), aEndB->pnt()));
   else {
     std::shared_ptr<GeomAPI_Lin2d> aLine1(new GeomAPI_Lin2d(aStartA->pnt(), aEndA->pnt()));
-    bool isReversed1 = aData->boolean(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID())->value();
+    bool isReversed1 = 
+      aData->boolean(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID())->value();
     std::shared_ptr<GeomAPI_Lin2d> aLine2(new GeomAPI_Lin2d(aStartB->pnt(), aEndB->pnt()));
-    bool isReversed2 = aData->boolean(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID())->value();
-    anAng = std::shared_ptr<GeomAPI_Angle2d>(new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
+    bool isReversed2 = 
+      aData->boolean(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID())->value();
+    anAng = std::shared_ptr<GeomAPI_Angle2d>(
+      new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
   }
 
   gp_Pnt2d aFirstPoint = anAng->firstPoint()->impl<gp_Pnt2d>();
@@ -139,20 +147,23 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
                                 const Standard_Integer theMode)
 {
   gp_Pnt aFirstPoint, aSecondPoint, aCenterPoint;
-  bool aReadyToDisplay = readyToDisplay(myConstraint, mySketcherPlane, aFirstPoint, aSecondPoint, aCenterPoint);
+  bool aReadyToDisplay = readyToDisplay(myConstraint, mySketcherPlane, 
+                                        aFirstPoint, aSecondPoint, aCenterPoint);
   if (aReadyToDisplay) {
     myFirstPoint = aFirstPoint;
     mySecondPoint = aSecondPoint;
     myCenterPoint = aCenterPoint;
 
     DataPtr aData = myConstraint->data();
-    AttributeDoublePtr anAttributeValue = aData->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
+    AttributeDoublePtr anAttributeValue = 
+      aData->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
     myValue.init(anAttributeValue);
 
     std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
                                 std::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                 (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-    std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = mySketcherPlane->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
+    std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = 
+      mySketcherPlane->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
     myFlyOutPoint = aFlyoutPnt->impl<gp_Pnt>();
   }
 
@@ -258,12 +269,5 @@ bool SketcherPrs_Angle::isAnglePlaneReversedToSketchPlane()
 
 double SketcherPrs_Angle::calculateDistanceToFlyoutPoint()
 {
-  //gp_Dir aBisector = gp_Dir((myFirstPoint.XYZ() + mySecondPoint.XYZ()) * 0.5 - myCenterPoint.XYZ());
-  //gp_XYZ aFlyDir = myFlyOutPoint.XYZ() - myCenterPoint.XYZ();
-
-  //double aDistance = aFlyDir.Dot(aBisector.XYZ());
-  //// make a positive distance in order to AIS angle presentation is not reversed
-  //aDistance = fabs(aDistance);
-  //return aDistance;
   return myFlyOutPoint.Distance(myCenterPoint);
 }

@@ -140,7 +140,8 @@ public:
       if (aDataType == GL_NONE) {
         continue;
       } else if (anAttrib.Id == Graphic3d_TOA_POS) {
-        OpenGl_VertexBuffer::bindAttribute (theGlCtx, Graphic3d_TOA_POS, aNbComp, aDataType, Stride, anOffset);
+        OpenGl_VertexBuffer::bindAttribute(theGlCtx, Graphic3d_TOA_POS, aNbComp,
+                                           aDataType, Stride, anOffset);
         break;
       }
 
@@ -165,7 +166,8 @@ public:
       if (aDataType == GL_NONE)
         continue;
 
-      OpenGl_VertexBuffer::bindAttribute (theGlCtx, anAttrib.Id, aNbComp, aDataType, Stride, anOffset);
+      OpenGl_VertexBuffer::bindAttribute(theGlCtx, anAttrib.Id, aNbComp, 
+                                         aDataType, Stride, anOffset);
       anOffset += Graphic3d_Attribute::Stride (anAttrib.DataType);
     }
   }
@@ -233,7 +235,9 @@ OpenGl_Element* SymbolPrsCallBack(const CALL_DEF_USERDRAW * theUserDraw)
 {
   Handle(SketcherPrs_SymbolPrs) anIObj = (SketcherPrs_SymbolPrs*)theUserDraw->Data;
   if (anIObj.IsNull()) {
-    std::cout << "VUserDrawCallback error: null object passed, the custom scene element will not be rendered" << std::endl;
+    std::cout << 
+      "VUserDrawCallback error: null object passed, the custom scene element will not be rendered"
+      << std::endl;
   }
   return new SketcherPrs_Element(anIObj);
 }
@@ -311,7 +315,8 @@ void SketcherPrs_SymbolPrs::prepareAspect()
   }
 }
 
-void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup, std::string theAttrName) const
+void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup, 
+                                    std::string theAttrName) const
 {
   ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, theAttrName);
   std::shared_ptr<GeomAPI_Shape> aLine = SketcherPrs_Tools::getShape(aObj);
@@ -329,7 +334,7 @@ void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup, std
   theGroup->AddPrimitiveArray(aLines);
 }
 
-void SketcherPrs_SymbolPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
+void SketcherPrs_SymbolPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM,
                                            const SelectMgr_SequenceOfOwner& theOwners)
 {
 
@@ -342,9 +347,10 @@ void SketcherPrs_SymbolPrs::HilightSelected(const Handle(PrsMgr_PresentationMana
   thePM->Highlight(this);
 }
 
-void SketcherPrs_SymbolPrs::HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM, 
-                                                 const Quantity_NameOfColor theColor, 
-                                                 const Handle(SelectMgr_EntityOwner)& theOwner)
+void SketcherPrs_SymbolPrs::HilightOwnerWithColor(
+  const Handle(PrsMgr_PresentationManager3d)& thePM, 
+  const Quantity_NameOfColor theColor, 
+  const Handle(SelectMgr_EntityOwner)& theOwner)
 {
   thePM->Color(this, theColor);
 
@@ -356,15 +362,17 @@ void SketcherPrs_SymbolPrs::HilightOwnerWithColor(const Handle(PrsMgr_Presentati
     thePM->AddToImmediateList(aHilightPrs);
 }
 
-void SketcherPrs_SymbolPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-                                   const Handle(Prs3d_Presentation)& thePresentation, 
-                                   const Standard_Integer theMode)
+void SketcherPrs_SymbolPrs::Compute(
+  const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+  const Handle(Prs3d_Presentation)& thePresentation, 
+  const Standard_Integer theMode)
 {
   // Create an icon
   prepareAspect();
 
   Handle(AIS_InteractiveContext) aCtx = GetContext();
-  Handle(OpenGl_GraphicDriver) aDriver = Handle(OpenGl_GraphicDriver)::DownCast(aCtx->CurrentViewer()->Driver());
+  Handle(OpenGl_GraphicDriver) aDriver = 
+    Handle(OpenGl_GraphicDriver)::DownCast(aCtx->CurrentViewer()->Driver());
   if (!aDriver.IsNull()) {
     // register the custom element factory function
     aDriver->UserDrawCallback() = SymbolPrsCallBack;
@@ -430,8 +438,8 @@ void SketcherPrs_SymbolPrs::SetConflictingConstraint(const bool& theConflicting,
   if (theConflicting)
   {
     if (!myAspect.IsNull())
-      myAspect->SetColor (Quantity_Color (theColor[0] / 255., theColor[1] / 255., theColor[2] / 255.,
-                          Quantity_TOC_RGB));
+      myAspect->SetColor (Quantity_Color (theColor[0] / 255., theColor[1] / 255., 
+                          theColor[2] / 255., Quantity_TOC_RGB));
     myIsConflicting = true;
   }
   else
@@ -447,7 +455,8 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
   // this method is a combination of OCCT OpenGL functions. The main purpose is to have
   // equal distance from the source object to symbol indpendently of zoom.
   // It is base on OCCT 6.9.1 and might need changes when using later OCCT versions.
-  // The specific SHAPER modifications are marked by ShaperModification:start/end, other is OCCT code
+  // The specific SHAPER modifications are marked by ShaperModification:start/end, 
+  // other is OCCT code
 
   // do not update presentation for invalid or already removed objects: the presentation
   // should be removed soon
@@ -472,7 +481,8 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
   }
 
   // Update drawing attributes
-  if (!myVboAttribs->init(aCtx, 0, aAttribs->NbElements, aAttribs->Data(), GL_NONE, aAttribs->Stride)) {
+  if (!myVboAttribs->init(aCtx, 0, aAttribs->NbElements, 
+                          aAttribs->Data(), GL_NONE, aAttribs->Stride)) {
     myVboAttribs->Release (aCtx.operator->());
     myVboAttribs.Nullify();
     return;
@@ -484,14 +494,17 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
       
   if (!aSpriteNorm.IsNull() && !aSpriteNorm->IsDisplayList()) {
     // ShaperModification:start : filling the presentation with color if there is a conflict
-    const bool toHilight = (theWorkspace->NamedStatus & OPENGL_NS_HIGHLIGHT) != 0 || myIsConflicting;
+    const bool toHilight = 
+      (theWorkspace->NamedStatus & OPENGL_NS_HIGHLIGHT) != 0 || myIsConflicting;
     // ShaperModification:end
 
-    const Handle(OpenGl_PointSprite)& aSprite = (toHilight && anAspectMarker->SpriteHighlightRes(aCtx)->IsValid())
-                                              ? anAspectMarker->SpriteHighlightRes(aCtx)
+    const Handle(OpenGl_PointSprite)& aSprite = 
+      (toHilight && anAspectMarker->SpriteHighlightRes(aCtx)->IsValid())? 
+                                              anAspectMarker->SpriteHighlightRes(aCtx)
                                               : aSpriteNorm;
     theWorkspace->EnableTexture (aSprite);
-    aCtx->ShaderManager()->BindProgram(anAspectMarker, aSprite, Standard_False, Standard_False, anAspectMarker->ShaderProgramRes(aCtx));
+    aCtx->ShaderManager()->BindProgram(anAspectMarker, aSprite, Standard_False, 
+                                       Standard_False, anAspectMarker->ShaderProgramRes(aCtx));
     const TEL_COLOUR* aLineColor  =  &anAspectMarker->Color();
     if (theWorkspace->NamedStatus & OPENGL_NS_HIGHLIGHT)
       aLineColor = theWorkspace->HighlightColor;
@@ -553,11 +566,13 @@ void SketcherPrs_SymbolPrs::drawShape(const std::shared_ptr<GeomAPI_Shape>& theS
       std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(theShape));
     if (aCurve->isLine()) {
       // The shape is line
-      GeomAdaptor_Curve aCurv(aCurve->impl<Handle(Geom_Curve)>(), aCurve->startParam(), aCurve->endParam());
+      GeomAdaptor_Curve 
+        aCurv(aCurve->impl<Handle(Geom_Curve)>(), aCurve->startParam(), aCurve->endParam());
       StdPrs_Curve::Add(thePrs, aCurv, myDrawer);
     } else {
       // The shape is circle or arc
-      GeomAdaptor_Curve aAdaptor(aCurve->impl<Handle(Geom_Curve)>(), aCurve->startParam(), aCurve->endParam());
+      GeomAdaptor_Curve 
+        aAdaptor(aCurve->impl<Handle(Geom_Curve)>(), aCurve->startParam(), aCurve->endParam());
       StdPrs_DeflectionCurve::Add(thePrs,aAdaptor,myDrawer);
     }
   } else if (theShape->isVertex()) {
@@ -570,8 +585,9 @@ void SketcherPrs_SymbolPrs::drawShape(const std::shared_ptr<GeomAPI_Shape>& theS
   }
 }
 
-void SketcherPrs_SymbolPrs::drawListOfShapes(const std::shared_ptr<ModelAPI_AttributeRefList>& theListAttr, 
-                                             const Handle(Prs3d_Presentation)& thePrs) const
+void SketcherPrs_SymbolPrs::drawListOfShapes(
+  const std::shared_ptr<ModelAPI_AttributeRefList>& theListAttr, 
+  const Handle(Prs3d_Presentation)& thePrs) const
 {
   int aNb = theListAttr->size();
   if (aNb == 0)

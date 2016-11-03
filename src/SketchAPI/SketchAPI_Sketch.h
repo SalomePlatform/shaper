@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_Sketch.h
 // Purpose: 
 //
@@ -63,13 +64,20 @@ public:
   virtual ~SketchAPI_Sketch();
 
   INTERFACE_7(SketchPlugin_Sketch::ID(),
-              origin, SketchPlugin_Sketch::ORIGIN_ID(), GeomDataAPI_Point, /** Origin point */,
-              dirX, SketchPlugin_Sketch::DIRX_ID(), GeomDataAPI_Dir, /** Direction of X */,
-              normal, SketchPlugin_Sketch::NORM_ID(), GeomDataAPI_Dir, /** Normal */,
-              features, SketchPlugin_Sketch::FEATURES_ID(), ModelAPI_AttributeRefList, /** Features */,
-              external, SketchPlugin_SketchEntity::EXTERNAL_ID(), ModelAPI_AttributeSelection, /** External */,
-              solverError, SketchPlugin_Sketch::SOLVER_ERROR(), ModelAPI_AttributeString, /** Solver error */,
-              solverDOF, SketchPlugin_Sketch::SOLVER_DOF(), ModelAPI_AttributeString, /** Solver DOF */
+              origin, SketchPlugin_Sketch::ORIGIN_ID(),
+              GeomDataAPI_Point, /** Origin point */,
+              dirX, SketchPlugin_Sketch::DIRX_ID(),
+              GeomDataAPI_Dir, /** Direction of X */,
+              normal, SketchPlugin_Sketch::NORM_ID(),
+              GeomDataAPI_Dir, /** Normal */,
+              features, SketchPlugin_Sketch::FEATURES_ID(), 
+              ModelAPI_AttributeRefList, /** Features */,
+              external, SketchPlugin_SketchEntity::EXTERNAL_ID(), 
+              ModelAPI_AttributeSelection, /** External */,
+              solverError, SketchPlugin_Sketch::SOLVER_ERROR(),
+              ModelAPI_AttributeString, /** Solver error */,
+              solverDOF, SketchPlugin_Sketch::SOLVER_DOF(),
+              ModelAPI_AttributeString, /** Solver DOF */
   )
 
   /// Set plane
@@ -101,10 +109,12 @@ public:
 
   /// Add intersection point
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_IntersectionPoint> addIntersectionPoint(const ModelHighAPI_Selection & theExternal);
+  std::shared_ptr<SketchAPI_IntersectionPoint> 
+    addIntersectionPoint(const ModelHighAPI_Selection & theExternal);
   /// Add point
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_IntersectionPoint> addIntersectionPoint(const std::string & theExternalName);
+  std::shared_ptr<SketchAPI_IntersectionPoint> 
+    addIntersectionPoint(const std::string & theExternalName);
 
   /// Add line
   SKETCHAPI_EXPORT

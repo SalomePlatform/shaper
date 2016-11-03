@@ -15,14 +15,14 @@
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_SensitivePoint, Select3D_SensitiveEntity);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_SensitivePoint, Select3D_SensitiveEntity);
 
-SketcherPrs_SensitivePoint::SketcherPrs_SensitivePoint(const Handle(SelectBasics_EntityOwner)& anOwner,
-                                                       int theId)
+SketcherPrs_SensitivePoint::SketcherPrs_SensitivePoint(
+  const Handle(SelectBasics_EntityOwner)& anOwner, int theId)
 :Select3D_SensitiveEntity(anOwner), myId(theId)
 {
   SetSensitivityFactor(12);
 }
 
-Standard_Boolean SketcherPrs_SensitivePoint::Matches (SelectBasics_SelectingVolumeManager& theMgr,
+Standard_Boolean SketcherPrs_SensitivePoint::Matches(SelectBasics_SelectingVolumeManager& theMgr,
                                                    SelectBasics_PickResult& thePickResult)
 {
   Standard_Real aDepth      = RealLast();

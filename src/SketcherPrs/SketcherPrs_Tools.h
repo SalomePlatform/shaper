@@ -25,7 +25,8 @@ class Handle_Prs3d_DimensionAspect;
 
 //#define MyTextHeight 20
 
-/// Message that style of visualization of parameter is changed. It will be shown as expression or value
+/// Message that style of visualization of parameter is changed.
+/// It will be shown as expression or value
 class SketcherPrs_ParameterStyleMessage : public Events_Message
 {
 public:
@@ -131,8 +132,8 @@ namespace SketcherPrs_Tools {
   /// \param theAttribute an attribute name
   /// \param thePlane a projection plane (sketcher plane)
   SKETCHERPRS_EXPORT std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
-                                                       const std::string& theAttribute,
-                                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+                                               const std::string& theAttribute,
+                                               const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
   /// Returns value of dimension arrows size
   SKETCHERPRS_EXPORT double getArrowSize();

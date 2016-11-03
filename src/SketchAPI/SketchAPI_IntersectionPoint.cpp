@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_IntersectionPoint.cpp
 // Purpose: 
 //
@@ -68,7 +69,8 @@ void SketchAPI_IntersectionPoint::dump(ModelHighAPI_Dumper& theDumper) const
   const std::string& aSketchName = theDumper.parentName(aBase);
 
   AttributeSelectionPtr aLine = externalLine();
-  theDumper << aBase << " = " << aSketchName << ".addIntersectionPoint(" << aLine << ")" << std::endl;
+  theDumper << aBase << " = " << 
+    aSketchName << ".addIntersectionPoint(" << aLine << ")" << std::endl;
   // dump "auxiliary" flag if necessary
   SketchAPI_SketchEntity::dump(theDumper);
 }

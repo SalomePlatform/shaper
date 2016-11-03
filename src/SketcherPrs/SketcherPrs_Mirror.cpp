@@ -33,17 +33,20 @@ bool SketcherPrs_Mirror::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   bool aReadyToDisplay = false;
 
   // Get axis of mirror
-  ObjectPtr aAxisObj = SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
+  ObjectPtr aAxisObj = 
+    SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
   if (SketcherPrs_Tools::getShape(aAxisObj).get() == NULL)
     return aReadyToDisplay;
 
   std::shared_ptr<ModelAPI_Data> aData = theConstraint->data();
   // Get source objects
-  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = aData->reflist(SketchPlugin_Constraint::ENTITY_B());
+  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = 
+    aData->reflist(SketchPlugin_Constraint::ENTITY_B());
   if (anAttrB.get() == NULL)
     return aReadyToDisplay;
   // Get mirrored objects
-  std::shared_ptr<ModelAPI_AttributeRefList> anAttrC = aData->reflist(SketchPlugin_Constraint::ENTITY_C());
+  std::shared_ptr<ModelAPI_AttributeRefList> anAttrC = 
+    aData->reflist(SketchPlugin_Constraint::ENTITY_C());
   if (anAttrC.get() == NULL)
     return aReadyToDisplay;
 
@@ -63,13 +66,16 @@ bool SketcherPrs_Mirror::updateIfReadyToDisplay(double theStep) const
     return false;
 
   // Get axis of mirror
-  ObjectPtr aAxisObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  ObjectPtr aAxisObj = 
+    SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
 
   std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
   // Get source objects
-  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = aData->reflist(SketchPlugin_Constraint::ENTITY_B());
+  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = 
+    aData->reflist(SketchPlugin_Constraint::ENTITY_B());
   // Get mirrored objects
-  std::shared_ptr<ModelAPI_AttributeRefList> anAttrC = aData->reflist(SketchPlugin_Constraint::ENTITY_C());
+  std::shared_ptr<ModelAPI_AttributeRefList> anAttrC = 
+    aData->reflist(SketchPlugin_Constraint::ENTITY_C());
 
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   int aNb = anAttrB->size();
@@ -98,13 +104,16 @@ bool SketcherPrs_Mirror::updateIfReadyToDisplay(double theStep) const
 }
 
 
-void SketcherPrs_Mirror::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const
+void SketcherPrs_Mirror::drawLines(const Handle(Prs3d_Presentation)& thePrs, 
+  Quantity_Color theColor) const
 {
   std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
-  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = aData->reflist(SketchPlugin_Constraint::ENTITY_B());
+  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = 
+    aData->reflist(SketchPlugin_Constraint::ENTITY_B());
   if (anAttrB.get() == NULL)
     return;
-  std::shared_ptr<ModelAPI_AttributeRefList> anAttrC = aData->reflist(SketchPlugin_Constraint::ENTITY_C());
+  std::shared_ptr<ModelAPI_AttributeRefList> anAttrC = 
+    aData->reflist(SketchPlugin_Constraint::ENTITY_C());
   if (anAttrC.get() == NULL)
     return;
 

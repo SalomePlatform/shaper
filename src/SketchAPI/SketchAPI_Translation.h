@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_Translation.h
 // Purpose: 
 //
@@ -44,13 +45,20 @@ public:
   virtual ~SketchAPI_Translation();
 
   INTERFACE_7(SketchPlugin_MultiTranslation::ID(),
-              translationList, SketchPlugin_MultiTranslation::TRANSLATION_LIST_ID(), ModelAPI_AttributeRefList, /** Translation list */,
-              startPoint, SketchPlugin_MultiTranslation::START_POINT_ID(), ModelAPI_AttributeRefAttr, /** Start point */,
-              endPoint, SketchPlugin_MultiTranslation::END_POINT_ID(), ModelAPI_AttributeRefAttr, /** Start point */,
-              numberOfObjects, SketchPlugin_MultiTranslation::NUMBER_OF_OBJECTS_ID(), ModelAPI_AttributeInteger, /** Number of objects */,
-              valueType, SketchPlugin_MultiTranslation::VALUE_TYPE(), ModelAPI_AttributeString, /** Value type */,
-              referenceObjects, SketchPlugin_MultiTranslation::ENTITY_A(), ModelAPI_AttributeRefList, /** Reference objects */,
-              translatedObjects, SketchPlugin_MultiTranslation::ENTITY_B(), ModelAPI_AttributeRefList, /** Translationed objects */
+              translationList, SketchPlugin_MultiTranslation::TRANSLATION_LIST_ID(),
+              ModelAPI_AttributeRefList, /** Translation list */,
+              startPoint, SketchPlugin_MultiTranslation::START_POINT_ID(),
+              ModelAPI_AttributeRefAttr, /** Start point */,
+              endPoint, SketchPlugin_MultiTranslation::END_POINT_ID(),
+              ModelAPI_AttributeRefAttr, /** Start point */,
+              numberOfObjects, SketchPlugin_MultiTranslation::NUMBER_OF_OBJECTS_ID(),
+              ModelAPI_AttributeInteger, /** Number of objects */,
+              valueType, SketchPlugin_MultiTranslation::VALUE_TYPE(),
+              ModelAPI_AttributeString, /** Value type */,
+              referenceObjects, SketchPlugin_MultiTranslation::ENTITY_A(),
+              ModelAPI_AttributeRefList, /** Reference objects */,
+              translatedObjects, SketchPlugin_MultiTranslation::ENTITY_B(),
+              ModelAPI_AttributeRefList, /** Translationed objects */
   )
 
   /// List of translated objects

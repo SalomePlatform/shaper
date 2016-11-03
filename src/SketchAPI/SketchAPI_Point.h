@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_Point.h
 // Purpose: 
 //
@@ -49,8 +50,10 @@ public:
   virtual ~SketchAPI_Point();
 
   INTERFACE_2(SketchPlugin_Point::ID(),
-              coordinates, SketchPlugin_Point::COORD_ID(), GeomDataAPI_Point2D, /** Point coordinates */,
-              external, SketchPlugin_Point::EXTERNAL_ID(), ModelAPI_AttributeSelection, /** External */
+              coordinates, SketchPlugin_Point::COORD_ID(),
+              GeomDataAPI_Point2D, /** Point coordinates */,
+              external, SketchPlugin_Point::EXTERNAL_ID(),
+              ModelAPI_AttributeSelection, /** External */
   )
 
   /// Set by coordinates

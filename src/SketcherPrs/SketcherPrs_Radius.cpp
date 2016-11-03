@@ -104,7 +104,8 @@ bool SketcherPrs_Radius::readyToDisplay(ModelAPI_Feature* theConstraint,
   std::shared_ptr<GeomAPI_Dir> aNormal = thePlane->normal();
 
   GeomAPI_Circ aCircle(aCenter, aNormal, aRadius);
-  std::shared_ptr<GeomAPI_Pnt> anAnchor = SketcherPrs_Tools::getAnchorPoint(theConstraint, thePlane);
+  std::shared_ptr<GeomAPI_Pnt> anAnchor = 
+    SketcherPrs_Tools::getAnchorPoint(theConstraint, thePlane);
 
   theCircle = aCircle.impl<gp_Circ>();
   theAnchorPoint = anAnchor->impl<gp_Pnt>();
@@ -114,9 +115,10 @@ bool SketcherPrs_Radius::readyToDisplay(ModelAPI_Feature* theConstraint,
   return aReadyToDisplay;
 }
 
-void SketcherPrs_Radius::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-                                 const Handle(Prs3d_Presentation)& thePresentation, 
-                                 const Standard_Integer theMode)
+void SketcherPrs_Radius::Compute(
+  const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+  const Handle(Prs3d_Presentation)& thePresentation, 
+  const Standard_Integer theMode)
 {
   gp_Circ aCircle;
   gp_Pnt anAnchorPoint;

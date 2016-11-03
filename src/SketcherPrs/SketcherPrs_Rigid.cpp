@@ -49,7 +49,8 @@ bool SketcherPrs_Rigid::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   bool aReadyToDisplay = false;
 
   std::shared_ptr<ModelAPI_Data> aData = theConstraint->data();
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+    aData->refattr(SketchPlugin_Constraint::ENTITY_A());
   AttributePtr aRefAttr = anAttr->attr();
   if (anAttr->isObject()) {
     // The constraint attached to an object
@@ -59,7 +60,7 @@ bool SketcherPrs_Rigid::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   } else {
     // The constraint attached to a point
     std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(theConstraint,
-                                                                 SketchPlugin_Constraint::ENTITY_A());
+                                                   SketchPlugin_Constraint::ENTITY_A());
     aReadyToDisplay = aPnt.get() != NULL;
   }
   return aReadyToDisplay;
@@ -71,7 +72,8 @@ bool SketcherPrs_Rigid::updateIfReadyToDisplay(double theStep) const
     return false;
 
   std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+    aData->refattr(SketchPlugin_Constraint::ENTITY_A());
   AttributePtr aRefAttr = anAttr->attr();
   if (anAttr->isObject()) {
     // The constraint attached to an object
@@ -91,7 +93,8 @@ bool SketcherPrs_Rigid::updateIfReadyToDisplay(double theStep) const
 }
 
 
-void SketcherPrs_Rigid::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const
+void SketcherPrs_Rigid::drawLines(const Handle(Prs3d_Presentation)& thePrs, 
+                                  Quantity_Color theColor) const
 {
   ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
@@ -114,7 +117,8 @@ void SketcherPrs_Rigid::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quan
     return;
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
-  Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
+  Handle(Graphic3d_AspectLine3d) aLineAspect = 
+    new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
   aGroup->SetPrimitivesAspect(aLineAspect);
 
   Handle(Prs3d_PointAspect) aPntAspect = new Prs3d_PointAspect(Aspect_TOM_PLUS, theColor, 1);

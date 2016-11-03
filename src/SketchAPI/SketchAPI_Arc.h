@@ -86,16 +86,26 @@ public:
   virtual ~SketchAPI_Arc();
 
   INTERFACE_10(SketchPlugin_Arc::ID(),
-               arcType, SketchPlugin_Arc::ARC_TYPE(), ModelAPI_AttributeString, /** Arc type */,
-               center, SketchPlugin_Arc::CENTER_ID(), GeomDataAPI_Point2D, /** Center point */,
-               startPoint, SketchPlugin_Arc::START_ID(), GeomDataAPI_Point2D, /** Start point */,
-               endPoint, SketchPlugin_Arc::END_ID(), GeomDataAPI_Point2D, /** End point */,
-               inversed, SketchPlugin_Arc::INVERSED_ID(), ModelAPI_AttributeBoolean, /** Inversed flag */,
-               passedPoint, SketchPlugin_Arc::PASSED_POINT_ID(), GeomDataAPI_Point2D, /** Passed point */,
-               tangentPoint, SketchPlugin_Arc::TANGENT_POINT_ID(), ModelAPI_AttributeRefAttr, /** Tangent point */,
-               radius, SketchPlugin_Arc::RADIUS_ID(), ModelAPI_AttributeDouble, /** Radius */,
-               angle, SketchPlugin_Arc::ANGLE_ID(), ModelAPI_AttributeDouble, /** Angle */,
-               external, SketchPlugin_Arc::EXTERNAL_ID(), ModelAPI_AttributeSelection, /** External */)
+               arcType, SketchPlugin_Arc::ARC_TYPE(),
+               ModelAPI_AttributeString, /** Arc type */,
+               center, SketchPlugin_Arc::CENTER_ID(),
+               GeomDataAPI_Point2D, /** Center point */,
+               startPoint, SketchPlugin_Arc::START_ID(),
+               GeomDataAPI_Point2D, /** Start point */,
+               endPoint, SketchPlugin_Arc::END_ID(),
+               GeomDataAPI_Point2D, /** End point */,
+               inversed, SketchPlugin_Arc::INVERSED_ID(),
+               ModelAPI_AttributeBoolean, /** Inversed flag */,
+               passedPoint, SketchPlugin_Arc::PASSED_POINT_ID(),
+               GeomDataAPI_Point2D, /** Passed point */,
+               tangentPoint, SketchPlugin_Arc::TANGENT_POINT_ID(),
+               ModelAPI_AttributeRefAttr, /** Tangent point */,
+               radius, SketchPlugin_Arc::RADIUS_ID(),
+               ModelAPI_AttributeDouble, /** Radius */,
+               angle, SketchPlugin_Arc::ANGLE_ID(),
+               ModelAPI_AttributeDouble, /** Angle */,
+               external, SketchPlugin_Arc::EXTERNAL_ID(),
+               ModelAPI_AttributeSelection, /** External */)
 
   /// Set by center and start, end point.
   SKETCHAPI_EXPORT

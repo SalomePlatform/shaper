@@ -51,7 +51,8 @@ SketcherPrs_DimensionStyleListener::~SketcherPrs_DimensionStyleListener()
   aLoop->removeListener(this);
 }
 
-void SketcherPrs_DimensionStyleListener::processEvent(const std::shared_ptr<Events_Message>& theMessage)
+void SketcherPrs_DimensionStyleListener::processEvent(
+  const std::shared_ptr<Events_Message>& theMessage)
 {
   const Events_ID kParameterStyleEvent = SketcherPrs_ParameterStyleMessage::eventId();
   if (theMessage->eventID() == kParameterStyleEvent) {
@@ -90,7 +91,8 @@ void SketcherPrs_DimensionStyleListener::updateDimensions(AIS_Dimension* theDime
       aCustomValue = theTextValue.c_str();
     else {
       // format value string using "sprintf"
-      TCollection_AsciiString aFormatStr = theDimension->Attributes()->DimensionAspect()->ValueStringFormat();
+      TCollection_AsciiString aFormatStr = 
+        theDimension->Attributes()->DimensionAspect()->ValueStringFormat();
       char aFmtBuffer[256];
       sprintf (aFmtBuffer, aFormatStr.ToCString(), theDoubleValue);
       aCustomValue = TCollection_ExtendedString (aFmtBuffer);
@@ -100,7 +102,8 @@ void SketcherPrs_DimensionStyleListener::updateDimensions(AIS_Dimension* theDime
   }
   else {
     // format value string using "sprintf"
-    TCollection_AsciiString aFormatStr = theDimension->Attributes()->DimensionAspect()->ValueStringFormat();
+    TCollection_AsciiString aFormatStr =
+      theDimension->Attributes()->DimensionAspect()->ValueStringFormat();
     char aFmtBuffer[256];
     sprintf (aFmtBuffer, aFormatStr.ToCString(), theDoubleValue);
     aCustomValue = TCollection_ExtendedString (aFmtBuffer);

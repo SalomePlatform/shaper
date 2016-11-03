@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_SketchEntity.cpp
 // Purpose: 
 //
@@ -87,7 +88,8 @@ SketchAPI_SketchEntity::wrap(const std::list<std::shared_ptr<ModelAPI_Feature> >
     else if ((*anIt)->getKind() == SketchPlugin_Point::ID())
       aResult.push_back(std::shared_ptr<ModelHighAPI_Interface>(new SketchAPI_Point(*anIt)));
     else if ((*anIt)->getKind() == SketchPlugin_IntersectionPoint::ID())
-      aResult.push_back(std::shared_ptr<ModelHighAPI_Interface>(new SketchAPI_IntersectionPoint(*anIt)));
+      aResult.push_back(std::shared_ptr<ModelHighAPI_Interface>(
+                                                    new SketchAPI_IntersectionPoint(*anIt)));
   }
   return aResult;
 }

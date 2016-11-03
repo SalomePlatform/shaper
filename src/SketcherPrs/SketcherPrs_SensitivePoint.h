@@ -24,7 +24,8 @@ public:
   //! Constructs a sensitive point object defined by the
   //! \param OwnerId an Id of the Owner.
   //! \param theId and Id of its point
-  Standard_EXPORT SketcherPrs_SensitivePoint(const Handle(SelectBasics_EntityOwner)& OwnerId, int theId);
+  Standard_EXPORT SketcherPrs_SensitivePoint(const Handle(SelectBasics_EntityOwner)& OwnerId,
+                                             int theId);
   
   /// Returns number of sub-elements
   Standard_EXPORT virtual Standard_Integer NbSubElements() Standard_OVERRIDE;
@@ -35,8 +36,8 @@ public:
   //! Checks whether the point overlaps current selecting volume
   //! \param theMgr selection manager
   //! \param thePickResult returns pick result
-  Standard_EXPORT virtual Standard_Boolean Matches (SelectBasics_SelectingVolumeManager& theMgr,
-                                                    SelectBasics_PickResult& thePickResult) Standard_OVERRIDE;
+  Standard_EXPORT virtual Standard_Boolean Matches(SelectBasics_SelectingVolumeManager& theMgr,
+                                     SelectBasics_PickResult& thePickResult) Standard_OVERRIDE;
 
   //! Returns the point used at the time of construction.
   Standard_EXPORT gp_Pnt Point() const;

@@ -69,7 +69,8 @@ ObjectPtr getResult(ModelAPI_Feature* theFeature, const std::string& theAttrName
 std::shared_ptr<GeomAPI_Shape> getShape(ObjectPtr theObject)
 {
   ResultConstructionPtr aRes = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theObject);
-  if (aRes.get() != NULL && aRes->data()->isValid()) {/// essential check as it is called in openGl thread
+  if (aRes.get() != NULL && aRes->data()->isValid()) {
+    /// essential check as it is called in openGl thread
     return aRes->shape();
   }
   return std::shared_ptr<GeomAPI_Shape>();
@@ -245,7 +246,8 @@ double getFlyoutDistance(const ModelAPI_Feature* theConstraint)
 {
   std::shared_ptr<GeomDataAPI_Point2D> aFlyoutPoint =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      const_cast<ModelAPI_Feature*>(theConstraint)->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+      const_cast<ModelAPI_Feature*>(
+      theConstraint)->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   // for not initialized values return zero distance to avoid Presentation crash
   if (!aFlyoutPoint->isInitialized())
     return 0;
@@ -308,7 +310,8 @@ Handle(Prs3d_DimensionAspect) createDimensionAspect()
   return anAspect;
 }
 
-void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect, double theDimValue, double theTextSize)
+void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect, 
+                  double theDimValue, double theTextSize)
 {
   double anArrowLength = theDimAspect->ArrowAspect()->Length();
    // This is not realy correct way to get viewer scale.
@@ -317,7 +320,8 @@ void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect, double theDimValue
   if(theTextSize > ((theDimValue - 3 * SketcherPrs_Tools::getArrowSize()) * aViewerScale)) {
     theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Left);
     theDimAspect->SetArrowOrientation(Prs3d_DAO_External);
-    theDimAspect->SetExtensionSize((theTextSize / aViewerScale + SketcherPrs_Tools::getArrowSize()) / 2.0);
+    theDimAspect->SetExtensionSize(
+      (theTextSize / aViewerScale + SketcherPrs_Tools::getArrowSize()) / 2.0);
   } else {
     theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Center);
     theDimAspect->SetArrowOrientation(Prs3d_DAO_Internal);
@@ -329,7 +333,8 @@ void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect, double theDimValue
 
 void sendEmptyPresentationError(ModelAPI_Feature* theFeature, const std::string theError)
 {
-  Events_InfoMessage("SketcherPrs_Tools", "An empty AIS presentation: SketcherPrs_LengthDimension").send();
+  Events_InfoMessage("SketcherPrs_Tools", 
+    "An empty AIS presentation: SketcherPrs_LengthDimension").send();
   static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
   std::shared_ptr<ModelAPI_Object> aConstraintPtr(theFeature);
   ModelAPI_EventCreator::get()->sendUpdated(aConstraintPtr, anEvent);

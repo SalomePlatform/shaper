@@ -64,7 +64,8 @@ AISObjectPtr SketcherPrs_Factory::horisontalConstraint(ModelAPI_Feature* theCons
       anAISObj = thePrevious;
     else {
       anAISObj = AISObjectPtr(new GeomAPI_AISObject());
-      Handle(SketcherPrs_HVDirection) aPrs = new SketcherPrs_HVDirection(theConstraint, thePlane, true); 
+      Handle(SketcherPrs_HVDirection) aPrs = 
+        new SketcherPrs_HVDirection(theConstraint, thePlane, true);
       anAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs));
     }
   }
@@ -81,7 +82,8 @@ AISObjectPtr SketcherPrs_Factory::verticalConstraint(ModelAPI_Feature* theConstr
       anAISObj = thePrevious;
     else {
       anAISObj = AISObjectPtr(new GeomAPI_AISObject());
-      Handle(SketcherPrs_HVDirection) aPrs = new SketcherPrs_HVDirection(theConstraint, thePlane, false); 
+      Handle(SketcherPrs_HVDirection) aPrs = 
+        new SketcherPrs_HVDirection(theConstraint, thePlane, false);
       anAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs));
     }
   }
@@ -98,7 +100,8 @@ AISObjectPtr SketcherPrs_Factory::translateConstraint(ModelAPI_Feature* theConst
       anAISObj = thePrevious;
     else {
       anAISObj = AISObjectPtr(new GeomAPI_AISObject());
-      Handle(SketcherPrs_Transformation) aPrs = new SketcherPrs_Transformation(theConstraint, thePlane, true); 
+      Handle(SketcherPrs_Transformation) aPrs = 
+        new SketcherPrs_Transformation(theConstraint, thePlane, true); 
       anAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs));
     }
   }
@@ -115,7 +118,8 @@ AISObjectPtr SketcherPrs_Factory::rotateConstraint(ModelAPI_Feature* theConstrai
       anAISObj = thePrevious;
     else {
       anAISObj = AISObjectPtr(new GeomAPI_AISObject());
-      Handle(SketcherPrs_Transformation) aPrs = new SketcherPrs_Transformation(theConstraint, thePlane, false); 
+      Handle(SketcherPrs_Transformation) aPrs = 
+        new SketcherPrs_Transformation(theConstraint, thePlane, false); 
       anAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs));
     }
   }

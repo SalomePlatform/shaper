@@ -59,7 +59,8 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
   gp_Pnt aP; // Central point
   gp_Vec aVec1; // main vector
   if (aShape->isEdge()) {
-    std::shared_ptr<GeomAPI_Curve> aCurve = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShape));
+    std::shared_ptr<GeomAPI_Curve> aCurve = 
+      std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShape));
     std::shared_ptr<GeomAPI_Pnt> aPnt1; // Start point of main vector
     std::shared_ptr<GeomAPI_Pnt> aPnt2; // End point of main vector
     if (aCurve->isLine()) {
@@ -86,7 +87,8 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
     aVec1 = gp_Vec(aPnt1->impl<gp_Pnt>(), aPnt2->impl<gp_Pnt>());
   } else {
     // This is a point
-    std::shared_ptr<GeomAPI_Vertex> aVertex = std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex(aShape));
+    std::shared_ptr<GeomAPI_Vertex> aVertex = 
+      std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex(aShape));
     std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
     aP = aPnt->impl<gp_Pnt>();
 

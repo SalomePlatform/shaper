@@ -13,14 +13,14 @@
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 
-//==================================================================================================
+//================================================================================================
 SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature> & theFeature)
 : SketchAPI_SketchEntity(theFeature)
 {
   initialize();
 }
 
-//==================================================================================================
+//================================================================================================
 SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              double theCenterX, double theCenterY,
                              double theStartX, double theStartY,
@@ -29,11 +29,12 @@ SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature
 : SketchAPI_SketchEntity(theFeature)
 {
   if(initialize()) {
-    setByCenterStartEnd(theCenterX, theCenterY, theStartX, theStartY, theEndX, theEndY, theInversed);
+    setByCenterStartEnd(theCenterX, theCenterY, theStartX, 
+                        theStartY, theEndX, theEndY, theInversed);
   }
 }
 
-//==================================================================================================
+//================================================================================================
 SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
                              const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
@@ -46,7 +47,7 @@ SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature
   }
 }
 
-//==================================================================================================
+//================================================================================================
 SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              double theStartX, double theStartY,
                              double theEndX, double theEndY,
@@ -58,7 +59,7 @@ SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature
   }
 }
 
-//==================================================================================================
+//===============================================================================================
 SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
                              const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
@@ -70,7 +71,7 @@ SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature
   }
 }
 
-//==================================================================================================
+//================================================================================================
 SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              const ModelHighAPI_RefAttr& theTangentPoint,
                              double theEndX, double theEndY,
@@ -82,7 +83,7 @@ SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature
   }
 }
 
-//==================================================================================================
+//================================================================================================
 SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              const ModelHighAPI_RefAttr& theTangentPoint,
                              const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
@@ -94,7 +95,7 @@ SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature
   }
 }
 
-//==================================================================================================
+//================================================================================================
 SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              const ModelHighAPI_Selection& theExternal)
 : SketchAPI_SketchEntity(theFeature)
@@ -104,7 +105,7 @@ SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature
   }
 }
 
-//==================================================================================================
+//================================================================================================
 SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              const std::string& theExternalName)
 : SketchAPI_SketchEntity(theFeature)
@@ -114,13 +115,13 @@ SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature
   }
 }
 
-//==================================================================================================
+//================================================================================================
 SketchAPI_Arc::~SketchAPI_Arc()
 {
 
 }
 
-//==================================================================================================
+//================================================================================================
 void SketchAPI_Arc::setByCenterStartEnd(double theCenterX, double theCenterY,
                                         double theStartX, double theStartY,
                                         double theEndX, double theEndY,
@@ -135,7 +136,7 @@ void SketchAPI_Arc::setByCenterStartEnd(double theCenterX, double theCenterY,
   execute();
 }
 
-//==================================================================================================
+//================================================================================================
 void SketchAPI_Arc::setByCenterStartEnd(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
                                         const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
                                         const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
@@ -150,7 +151,7 @@ void SketchAPI_Arc::setByCenterStartEnd(const std::shared_ptr<GeomAPI_Pnt2d>& th
   execute();
 }
 
-//==================================================================================================
+//================================================================================================
 void SketchAPI_Arc::setByStartEndPassed(double theStartX, double theStartY,
                                         double theEndX, double theEndY,
                                         double thePassedX, double thePassedY)
@@ -163,7 +164,7 @@ void SketchAPI_Arc::setByStartEndPassed(double theStartX, double theStartY,
   execute();
 }
 
-//==================================================================================================
+//================================================================================================
 void SketchAPI_Arc::setByStartEndPassed(const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
                                         const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
                                         const std::shared_ptr<GeomAPI_Pnt2d>& thePassed)
@@ -176,7 +177,7 @@ void SketchAPI_Arc::setByStartEndPassed(const std::shared_ptr<GeomAPI_Pnt2d>& th
   execute();
 }
 
-//==================================================================================================
+//================================================================================================
 void SketchAPI_Arc::setByTangent(const ModelHighAPI_RefAttr& theTangentPoint,
                                  double theEndX, double theEndY,
                                  bool theInversed)
@@ -189,7 +190,7 @@ void SketchAPI_Arc::setByTangent(const ModelHighAPI_RefAttr& theTangentPoint,
   execute();
 }
 
-//==================================================================================================
+//================================================================================================
 void SketchAPI_Arc::setByTangent(const ModelHighAPI_RefAttr& theTangentPoint,
                                  const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
                                  bool theInversed)
@@ -202,7 +203,7 @@ void SketchAPI_Arc::setByTangent(const ModelHighAPI_RefAttr& theTangentPoint,
   execute();
 }
 
-//==================================================================================================
+//================================================================================================
 void SketchAPI_Arc::setByExternal(const ModelHighAPI_Selection & theExternal)
 {
   fillAttribute(theExternal, external());
@@ -210,7 +211,7 @@ void SketchAPI_Arc::setByExternal(const ModelHighAPI_Selection & theExternal)
   execute();
 }
 
-//==================================================================================================
+//===============================================================================================
 void SketchAPI_Arc::setByExternalName(const std::string & theExternalName)
 {
   fillAttribute(ModelHighAPI_Selection("EDGE", theExternalName), external());
@@ -218,7 +219,7 @@ void SketchAPI_Arc::setByExternalName(const std::string & theExternalName)
   execute();
 }
 
-//==================================================================================================
+//===============================================================================================
 void SketchAPI_Arc::setRadius(double theRadius)
 {
   fillAttribute(ModelHighAPI_Double(theRadius), myradius);
@@ -226,7 +227,7 @@ void SketchAPI_Arc::setRadius(double theRadius)
   execute();
 }
 
-//==================================================================================================
+//================================================================================================
 void SketchAPI_Arc::setAngle(double theAngle)
 {
   fillAttribute(ModelHighAPI_Double(theAngle), myangle);
@@ -234,7 +235,7 @@ void SketchAPI_Arc::setAngle(double theAngle)
   execute();
 }
 
-//==================================================================================================
+//================================================================================================
 void SketchAPI_Arc::dump(ModelHighAPI_Dumper& theDumper) const
 {
   if (isCopy())

@@ -45,13 +45,15 @@ public:
   virtual ~SketcherPrs_SymbolPrs();
 
   //! Method which draws selected owners ( for fast presentation draw )
-  Standard_EXPORT virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
+  Standard_EXPORT virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM,
                                                const SelectMgr_SequenceOfOwner& theOwners);
   
   //! Method which hilight an owner belonging to
   //! this selectable object  ( for fast presentation draw )
-  Standard_EXPORT virtual void HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM, 
-                                                     const Quantity_NameOfColor theColor, const Handle(SelectMgr_EntityOwner)& theOwner);
+  Standard_EXPORT virtual void HilightOwnerWithColor(
+    const Handle(PrsMgr_PresentationManager3d)& thePM,
+    const Quantity_NameOfColor theColor, 
+    const Handle(SelectMgr_EntityOwner)& theOwner);
 
   /// Returns sketcher plane
   Standard_EXPORT std::shared_ptr<GeomAPI_Ax3> plane() const { return myPlane; }
@@ -63,11 +65,12 @@ public:
   const Handle(Graphic3d_ArrayOfPoints)& pointsArray() const { return myPntArray; }
 
   /// Set state of the presentation, in case of conflicting state, the icon of the presentation is
-  /// visualized in error color. The state is stored in an internal field, so should be changed when
-  /// constraint become not conflicting
+  /// visualized in error color. The state is stored in an internal field, so should be changed
+  /// when constraint become not conflicting
   /// \param theConflicting a state
   /// \param theColor a color for conflicting object
-  Standard_EXPORT void SetConflictingConstraint(const bool& theConflicting, const std::vector<int>& theColor);
+  Standard_EXPORT void SetConflictingConstraint(const bool& theConflicting, 
+                                                const std::vector<int>& theColor);
 
   /// Render of the presentation
   /// \param theWorkspace is OpenGl workspace
@@ -85,7 +88,8 @@ public:
 
 protected:
   /// Redefinition of virtual function
-  Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+  Standard_EXPORT virtual void Compute(
+    const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
     const Handle(Prs3d_Presentation)& thePresentation, const Standard_Integer theMode = 0);
 
   /// Redefinition of virtual function

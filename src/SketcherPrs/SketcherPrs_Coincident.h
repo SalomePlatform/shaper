@@ -39,11 +39,13 @@ public:
   Standard_EXPORT virtual void SetColor(const Quantity_NameOfColor aColor);
 
   /// Set state of the presentation, in case of conflicting state, the icon of the presentation is
-  /// visualized in error color. The state is stored in an internal field, so should be changed when
+  /// visualized in error color. 
+  /// The state is stored in an internal field, so should be changed when
   /// constraint become not conflicting
   /// \param theConflicting a state
   /// \param theColor a color for conflicting object
-  Standard_EXPORT void SetConflictingConstraint(const bool& theConflicting, const std::vector<int>& theColor);
+  Standard_EXPORT void SetConflictingConstraint(const bool& theConflicting, 
+                                                const std::vector<int>& theColor);
 
   /// Returns true if the constraint feature arguments are correcly filled to build AIS presentation
   /// \param theConstraint a constraint feature
@@ -55,7 +57,8 @@ public:
   DEFINE_STANDARD_RTTI(SketcherPrs_Coincident)
 protected:
   /// Redefinition of virtual function
-  Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+  Standard_EXPORT virtual void Compute(
+    const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
     const Handle(Prs3d_Presentation)& thePresentation, const Standard_Integer theMode = 0);
 
   /// Redefinition of virtual function

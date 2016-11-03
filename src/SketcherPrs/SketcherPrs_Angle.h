@@ -36,7 +36,8 @@ public:
 
   DEFINE_STANDARD_RTTI(SketcherPrs_Angle)
 
-  /// Returns true if the constraint feature arguments are correcly filled to build AIS presentation
+  /// Returns true if the constraint feature arguments are correcly filled 
+  /// to build AIS presentation
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
   /// \return boolean result value
@@ -44,7 +45,8 @@ public:
                                const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 protected:
   /// Redefinition of virtual function
-  Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+  Standard_EXPORT virtual void Compute(
+    const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
     const Handle(Prs3d_Presentation)& thePresentation, const Standard_Integer theMode = 0);
 
   /// Redefinition of virtual function

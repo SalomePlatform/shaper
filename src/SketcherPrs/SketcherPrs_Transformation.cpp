@@ -42,7 +42,8 @@ bool SketcherPrs_Transformation::IsReadyToDisplay(ModelAPI_Feature* theConstrain
 
   std::shared_ptr<ModelAPI_Data> aData = theConstraint->data();
   // Get transformated objects list
-  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = aData->reflist(SketchPlugin_Constraint::ENTITY_B());
+  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = 
+    aData->reflist(SketchPlugin_Constraint::ENTITY_B());
   if (anAttrB.get() == NULL)
     return aReadyToDisplay;
 
@@ -58,11 +59,13 @@ bool SketcherPrs_Transformation::IsReadyToDisplay(ModelAPI_Feature* theConstrain
     AttributePoint2DPtr aEnd = GeomDataAPI_Point2D::getPoint2D(aData,
                                             SketchPlugin_MultiTranslation::END_POINT_ID());
 
-    aReadyToDisplay = aStart.get() && aEnd.get() && aStart->isInitialized() && aEnd->isInitialized();
+    aReadyToDisplay = 
+      aStart.get() && aEnd.get() && aStart->isInitialized() && aEnd->isInitialized();
   }
   else if (theConstraint->getKind() == SketchPlugin_MultiRotation::ID()) {
     // if it is rotation
-    AttributePoint2DPtr aCenter = GeomDataAPI_Point2D::getPoint2D(aData, SketchPlugin_MultiRotation::CENTER_ID());
+    AttributePoint2DPtr aCenter = 
+      GeomDataAPI_Point2D::getPoint2D(aData, SketchPlugin_MultiRotation::CENTER_ID());
     aReadyToDisplay = aCenter.get() && aCenter->isInitialized();
   }
 #endif
@@ -76,7 +79,8 @@ bool SketcherPrs_Transformation::updateIfReadyToDisplay(double theStep) const
 
   std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
   // Get transformated objects list
-  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = aData->reflist(SketchPlugin_Constraint::ENTITY_B());
+  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB =
+    aData->reflist(SketchPlugin_Constraint::ENTITY_B());
 
   int aNbB = anAttrB->size();
   if (aNbB == 0)
@@ -105,17 +109,16 @@ bool SketcherPrs_Transformation::updateIfReadyToDisplay(double theStep) const
   return true;
 }
 
-void SketcherPrs_Transformation::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const
+void SketcherPrs_Transformation::drawLines(const Handle(Prs3d_Presentation)& thePrs, 
+                                           Quantity_Color theColor) const
 {
   std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
-  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = aData->reflist(SketchPlugin_Constraint::ENTITY_B());
+  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = 
+    aData->reflist(SketchPlugin_Constraint::ENTITY_B());
   if (anAttrB.get() == NULL)
     return;
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
-
-  //Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
-  //aGroup->SetPrimitivesAspect(aLineAspect);
 
   // drawListOfShapes uses myDrawer for attributes definition
   Handle(Prs3d_LineAspect) aLnAspect = new Prs3d_LineAspect(theColor, Aspect_TOL_SOLID, 1);
@@ -142,7 +145,8 @@ void SketcherPrs_Transformation::drawLines(const Handle(Prs3d_Presentation)& the
     }
   } else if (myConstraint->getKind() == SketchPlugin_MultiRotation::ID()) {
     // if it is rotation
-    AttributePoint2DPtr aCenter = GeomDataAPI_Point2D::getPoint2D(aData, SketchPlugin_MultiRotation::CENTER_ID());
+    AttributePoint2DPtr aCenter =
+      GeomDataAPI_Point2D::getPoint2D(aData, SketchPlugin_MultiRotation::CENTER_ID());
     if (aCenter.get() && aCenter->isInitialized()) {
       // Show center of rotation
       std::shared_ptr<GeomAPI_Pnt> aPnt = myPlane->to3D(aCenter->x(), aCenter->y());

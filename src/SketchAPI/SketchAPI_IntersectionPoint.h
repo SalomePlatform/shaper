@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_IntersectionPoint.h
 // Purpose: 
 //
@@ -39,8 +40,10 @@ public:
   virtual ~SketchAPI_IntersectionPoint();
 
   INTERFACE_2(SketchPlugin_IntersectionPoint::ID(),
-              coordinates, SketchPlugin_IntersectionPoint::COORD_ID(), GeomDataAPI_Point2D, /** IntersectionPoint coordinates */,
-              externalLine, SketchPlugin_IntersectionPoint::EXTERNAL_LINE_ID(), ModelAPI_AttributeSelection, /** External line */
+              coordinates, SketchPlugin_IntersectionPoint::COORD_ID(), 
+              GeomDataAPI_Point2D, /** IntersectionPoint coordinates */,
+              externalLine, SketchPlugin_IntersectionPoint::EXTERNAL_LINE_ID(), 
+              ModelAPI_AttributeSelection, /** External line */
   )
 
   /// Set by external

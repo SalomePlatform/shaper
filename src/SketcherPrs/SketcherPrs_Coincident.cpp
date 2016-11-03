@@ -66,9 +66,10 @@ bool SketcherPrs_Coincident::readyToDisplay(ModelAPI_Feature* theConstraint,
 }
 
 
-void SketcherPrs_Coincident::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-                                   const Handle(Prs3d_Presentation)& thePresentation, 
-                                   const Standard_Integer theMode)
+void SketcherPrs_Coincident::Compute(
+  const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+  const Handle(Prs3d_Presentation)& thePresentation, 
+  const Standard_Integer theMode)
 {
   gp_Pnt aPoint;
   bool aReadyToDisplay = readyToDisplay(myConstraint, mySketcherPlane, aPoint);

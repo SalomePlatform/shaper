@@ -35,7 +35,7 @@ IMPLEMENT_STANDARD_HANDLE(SketcherPrs_LengthDimension, AIS_LengthDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_LengthDimension, AIS_LengthDimension);
 
 SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theConstraint,
-                                                         const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+                                              const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 : AIS_LengthDimension(MyDefStart, MyDefEnd, MyDefPln),
   myConstraint(theConstraint),
   mySketcherPlane(thePlane),
@@ -61,9 +61,10 @@ bool SketcherPrs_LengthDimension::IsReadyToDisplay(ModelAPI_Feature* theConstrai
   return readyToDisplay(theConstraint, thePlane, aPnt1, aPnt2);
 }
 
-void SketcherPrs_LengthDimension::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-                                          const Handle(Prs3d_Presentation)& thePresentation, 
-                                          const Standard_Integer theMode)
+void SketcherPrs_LengthDimension::Compute(
+  const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+  const Handle(Prs3d_Presentation)& thePresentation, 
+  const Standard_Integer theMode)
 {
   gp_Pnt aPnt1, aPnt2;
   bool aReadyToDisplay = readyToDisplay(myConstraint, mySketcherPlane, aPnt1, aPnt2);

@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_Line.h
 // Purpose: 
 //
@@ -50,9 +51,12 @@ public:
   virtual ~SketchAPI_Line();
 
   INTERFACE_3(SketchPlugin_Line::ID(),
-              startPoint, SketchPlugin_Line::START_ID(), GeomDataAPI_Point2D, /** Start point */,
-              endPoint, SketchPlugin_Line::END_ID(), GeomDataAPI_Point2D, /** End point */,
-              external, SketchPlugin_Line::EXTERNAL_ID(), ModelAPI_AttributeSelection, /** External */
+              startPoint, SketchPlugin_Line::START_ID(), 
+              GeomDataAPI_Point2D, /** Start point */,
+              endPoint, SketchPlugin_Line::END_ID(),
+              GeomDataAPI_Point2D, /** End point */,
+              external, SketchPlugin_Line::EXTERNAL_ID(),
+              ModelAPI_AttributeSelection, /** External */
   )
 
   /// Set by coordinates

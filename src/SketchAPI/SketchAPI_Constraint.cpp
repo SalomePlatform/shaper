@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_Constraint.cpp
 // Purpose: 
 //
@@ -139,7 +140,8 @@ void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
     FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
     if (!aFeature)
       return;
-    AttributeSelectionPtr aAttr = aFeature->data()->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+    AttributeSelectionPtr aAttr = 
+      aFeature->data()->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
     if (aAttr && aAttr->context().get() != NULL && !aAttr->isInvalid())
       return;
   }

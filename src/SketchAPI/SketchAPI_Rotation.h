@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_Rotation.h
 // Purpose: 
 //
@@ -45,13 +46,20 @@ public:
   virtual ~SketchAPI_Rotation();
 
   INTERFACE_7(SketchPlugin_MultiRotation::ID(),
-              rotationList, SketchPlugin_MultiRotation::ROTATION_LIST_ID(), ModelAPI_AttributeRefList, /** Rotation list */,
-              center, SketchPlugin_MultiRotation::CENTER_ID(), ModelAPI_AttributeRefAttr, /** Center */,
-              angle, SketchPlugin_MultiRotation::ANGLE_ID(), ModelAPI_AttributeDouble, /** Angle */,
-              numberOfObjects, SketchPlugin_MultiRotation::NUMBER_OF_OBJECTS_ID(), ModelAPI_AttributeInteger, /** Number of objects */,
-              valueType, SketchPlugin_MultiRotation::ANGLE_TYPE(), ModelAPI_AttributeString, /** Value type */,
-              referenceObjects, SketchPlugin_MultiRotation::ENTITY_A(), ModelAPI_AttributeRefList, /** Reference objects */,
-              rotatedObjects, SketchPlugin_MultiRotation::ENTITY_B(), ModelAPI_AttributeRefList, /** Rotated objects */
+              rotationList, SketchPlugin_MultiRotation::ROTATION_LIST_ID(),
+              ModelAPI_AttributeRefList, /** Rotation list */,
+              center, SketchPlugin_MultiRotation::CENTER_ID(),
+              ModelAPI_AttributeRefAttr, /** Center */,
+              angle, SketchPlugin_MultiRotation::ANGLE_ID(),
+              ModelAPI_AttributeDouble, /** Angle */,
+              numberOfObjects, SketchPlugin_MultiRotation::NUMBER_OF_OBJECTS_ID(),
+              ModelAPI_AttributeInteger, /** Number of objects */,
+              valueType, SketchPlugin_MultiRotation::ANGLE_TYPE(), 
+              ModelAPI_AttributeString, /** Value type */,
+              referenceObjects, SketchPlugin_MultiRotation::ENTITY_A(), 
+              ModelAPI_AttributeRefList, /** Reference objects */,
+              rotatedObjects, SketchPlugin_MultiRotation::ENTITY_B(), 
+              ModelAPI_AttributeRefList, /** Rotated objects */
   )
 
   /// List of rotated objects

@@ -30,8 +30,10 @@ bool SketcherPrs_Middle::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
 {
   bool aReadyToDisplay = false;
 
-  ObjectPtr aObj1 = SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
-  ObjectPtr aObj2 = SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_B());
+  ObjectPtr aObj1 = 
+    SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
+  ObjectPtr aObj2 = 
+    SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_B());
 
   // one object is a feature Line, other object is a point result. We check shape of point result
   aReadyToDisplay = aObj1.get() && aObj2.get() &&
@@ -48,15 +50,18 @@ bool SketcherPrs_Middle::updateIfReadyToDisplay(double theStep) const
   ObjectPtr aPointObject;
 
   // find a line result to set middle symbol near it
-  AttributePtr anAttribute = SketcherPrs_Tools::getAttribute(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  AttributePtr anAttribute = 
+    SketcherPrs_Tools::getAttribute(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   if (!anAttribute.get()) {
-    ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+    ObjectPtr aObj = 
+      SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
     std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getShape(aObj);
     if (aShape.get() && aShape->isEdge())
       aPointObject = aObj;
   }
   if (!aPointObject.get()) {
-    ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
+    ObjectPtr aObj = 
+      SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
     std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getShape(aObj);
     if (aShape.get() && aShape->isEdge())
       aPointObject = aObj;
@@ -72,15 +77,18 @@ bool SketcherPrs_Middle::updateIfReadyToDisplay(double theStep) const
   return true;
 }
 
-void SketcherPrs_Middle::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const
+void SketcherPrs_Middle::drawLines(const Handle(Prs3d_Presentation)& thePrs, 
+                                   Quantity_Color theColor) const
 {
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
 
-  Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
+  Handle(Graphic3d_AspectLine3d) aLineAspect = 
+    new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
   aGroup->SetPrimitivesAspect(aLineAspect);
 
   // Draw objects
-  ObjectPtr aObject = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  ObjectPtr aObject = 
+    SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   drawLine(thePrs, theColor, aObject);
 
   aObject = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
