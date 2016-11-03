@@ -218,10 +218,13 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
       myPreviousFeature = aFOperation->feature();
 
       /// selection should be obtained from workshop before ask if the operation can be started as
-      /// the canStartOperation method performs commit/abort of previous operation. Sometimes commit/abort
-      /// may cause selection clear(Sketch operation) as a result it will be lost and is not used for preselection.
+      /// the canStartOperation method performs commit/abort of previous operation.
+      /// Sometimes commit/abort
+      /// may cause selection clear(Sketch operation) as a result 
+      /// it will be lost and is not used for preselection.
       ModuleBase_ISelection* aSelection = myWorkshop->selection();
-      QList<ModuleBase_ViewerPrsPtr> aPreSelected = aSelection->getSelected(ModuleBase_ISelection::AllControls);
+      QList<ModuleBase_ViewerPrsPtr> aPreSelected = 
+        aSelection->getSelected(ModuleBase_ISelection::AllControls);
 
       restartOperation();
       myPreviousFeature = FeaturePtr();
@@ -230,7 +233,8 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
       // fill the first widget by the mouse event point
       // if the active widget is not the first, it means that the restarted operation is filled by
       // the current preselection.
-      PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
+      PartSet_WidgetPoint2D* aPoint2DWdg = 
+        dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
       ModuleBase_ModelWidget* aFirstWidget = aPanel->findFirstAcceptingValueWidget();
       if (aPoint2DWdg && aPoint2DWdg == aFirstWidget) {
         if (!aPreSelected.empty())
@@ -440,9 +444,11 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
             if (aPreviousAttributeWidget == aPanel->activeWidget()) {
               aPanel->activateWidget(NULL, false);
             }
-            // if there is no the next widget to be automatically activated, the Ok button in property
+            // if there is no the next widget to be automatically activated,
+            // the Ok button in property
             // panel should accept the focus(example is parallel constraint on sketch lines)
-            QToolButton* anOkBtn = dynamic_cast<XGUI_PropertyPanel*>(aPanel)->findButton(PROP_PANEL_OK);
+            QToolButton* anOkBtn = 
+              dynamic_cast<XGUI_PropertyPanel*>(aPanel)->findButton(PROP_PANEL_OK);
             if (anOkBtn)
               anOkBtn->setFocus(Qt::TabFocusReason);
           }
@@ -537,7 +543,8 @@ void PartSet_SketcherReetntrantMgr::createInternalFeature()
 void PartSet_SketcherReetntrantMgr::deleteInternalFeature()
 {
   if (myInternalActiveWidget) {
-    ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(myInternalActiveWidget);
+    ModuleBase_WidgetSelector* aWSelector = 
+      dynamic_cast<ModuleBase_WidgetSelector*>(myInternalActiveWidget);
     if (aWSelector)
       aWSelector->activateSelectionAndFilters(false);
     myInternalActiveWidget = 0;

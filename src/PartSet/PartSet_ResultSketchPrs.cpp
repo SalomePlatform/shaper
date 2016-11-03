@@ -66,9 +66,10 @@ PartSet_ResultSketchPrs::PartSet_ResultSketchPrs(ResultPtr theResult)
   ModuleBase_Tools::setPointBallHighlighting(this);
 }
 
-void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-                                      const Handle(Prs3d_Presentation)& thePresentation, 
-                                      const Standard_Integer theMode)
+void PartSet_ResultSketchPrs::Compute(
+                      const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+                      const Handle(Prs3d_Presentation)& thePresentation, 
+                      const Standard_Integer theMode)
 {
   thePresentation->Clear();
 
@@ -102,7 +103,8 @@ void PartSet_ResultSketchPrs::Compute(const Handle(PrsMgr_PresentationManager3d)
   }
 
   if (!aReadyToDisplay) {
-    Events_InfoMessage("PartSet_ResultSketchPrs", "An empty AIS presentation: PartSet_ResultSketchPrs").send();
+    Events_InfoMessage("PartSet_ResultSketchPrs", 
+                       "An empty AIS presentation: PartSet_ResultSketchPrs").send();
     static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
     ModelAPI_EventCreator::get()->sendUpdated(myResult, anEvent);
   }
@@ -114,7 +116,8 @@ void debugInfo(const TopoDS_Shape& theShape, const TopAbs_ShapeEnum theType)
   TopTools_IndexedMapOfShape aSubShapes;
   TopExp::MapShapes (theShape, theType, aSubShapes);
 
-  Standard_Boolean isComesFromDecomposition = !((aSubShapes.Extent() == 1) && (theShape == aSubShapes (1)));
+  Standard_Boolean 
+    isComesFromDecomposition = !((aSubShapes.Extent() == 1) && (theShape == aSubShapes (1)));
   int anExtent = aSubShapes.Extent();
   for (Standard_Integer aShIndex = 1; aShIndex <= aSubShapes.Extent(); ++aShIndex)
   {

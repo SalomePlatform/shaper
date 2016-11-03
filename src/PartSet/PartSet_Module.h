@@ -51,7 +51,8 @@ Q_OBJECT
 enum RestartingMode {
   RM_None, /// the operation should not be restarted
   RM_Forbided, /// the operation should not be restarted after there is no active widget
-  RM_LastFeatureUsed, /// the operation is restarted and use the previous feature for own initialization
+  RM_LastFeatureUsed, /// the operation is restarted and use the previous feature 
+                      /// for own initialization
   RM_EmptyFeatureUsed /// the operation is restarted and does not use the previous feature
 };
 
@@ -84,7 +85,8 @@ public:
   /// Call back forlast tuning of property panel before operation performance
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation);
 
-  /// If there is found selected attribute, widgets are created and contains only a widget for the attribute
+  /// If there is found selected attribute, widgets are created and contains 
+  /// only a widget for the attribute
   /// It is important for Property Panel filling by sketch point attribute
   /// \param theOperation a started operation
   /// \param theWidgets a list of created widgets

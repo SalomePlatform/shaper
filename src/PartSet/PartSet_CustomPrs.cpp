@@ -149,8 +149,9 @@ bool PartSet_CustomPrs::displayPresentation(
   return isModified;
 }
 
-bool PartSet_CustomPrs::erasePresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
-                                          const bool theUpdateViewer)
+bool PartSet_CustomPrs::erasePresentation(
+                          const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                          const bool theUpdateViewer)
 {
   bool isErased = false;
   XGUI_Workshop* aWorkshop = workshop();
@@ -159,7 +160,8 @@ bool PartSet_CustomPrs::erasePresentation(const ModuleBase_IModule::ModuleBase_C
   return isErased;
 }
 
-void PartSet_CustomPrs::clearPresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag)
+void PartSet_CustomPrs::clearPresentation(
+  const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag)
 {
   AISObjectPtr aPresentation = getPresentation(theFlag, false);
   if (aPresentation.get()) {
@@ -218,7 +220,8 @@ void PartSet_CustomPrs::processEvent(const std::shared_ptr<Events_Message>& theM
     myPresentationIsEmpty = true; /// store state to analize it after display/erase is finished
 }
 
-void PartSet_CustomPrs::initPresentation(const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag)
+void PartSet_CustomPrs::initPresentation(
+  const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag)
 {
   AISObjectPtr anOperationPrs = AISObjectPtr(new GeomAPI_AISObject());
   Handle(PartSet_OperationPrs) anAISPrs = new PartSet_OperationPrs(myWorkshop);

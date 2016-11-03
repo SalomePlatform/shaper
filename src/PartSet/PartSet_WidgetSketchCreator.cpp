@@ -265,7 +265,8 @@ bool PartSet_WidgetSketchCreator::setSelection(QList<ModuleBase_ViewerPrsPtr>& t
   bool aDone = false;
   if (!startSketchOperation(theValues)) {
     myIsCustomAttribute = true;
-    QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
+    QList<ModuleBase_ViewerPrsPtr>::const_iterator 
+      anIt = theValues.begin(), aLast = theValues.end();
     bool aProcessed = false;
     for (; anIt != aLast; anIt++) {
       ModuleBase_ViewerPrsPtr aValue = *anIt;
@@ -278,7 +279,8 @@ bool PartSet_WidgetSketchCreator::setSelection(QList<ModuleBase_ViewerPrsPtr>& t
       emit valuesChanged();
       updateObject(myFeature);
       setVisibleSelectionControl(false);
-      // manually deactivation because the widget was not activated as has no focus acceptin controls
+      // manually deactivation because the widget was 
+      // not activated as has no focus acceptin controls
       deactivate();
       emit focusOutWidget(this);
     }
@@ -298,7 +300,8 @@ void PartSet_WidgetSketchCreator::updateOnSelectionChanged(const bool theDone)
 {
 }
 
-bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_ViewerPrsPtr>& theValues)
+bool PartSet_WidgetSketchCreator::startSketchOperation(
+                              const QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
   bool aSketchStarted = false;
 
@@ -313,7 +316,8 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(const QList<ModuleBase_Vi
   /// sketch should not started by object(face) selected as global. If Local face is selected,
   /// sketch is started
   if (aResult.get() && aValue->shape().get() && aResult->shape()->isEqual(aValue->shape())) {
-    ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aResult);
+    ResultConstructionPtr aConstruction = 
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aResult);
     if (!aConstruction.get() || !aConstruction->isInfinite())
       return aSketchStarted;
   }
@@ -350,7 +354,8 @@ bool PartSet_WidgetSketchCreator::focusTo()
     return true;
   }
   else
-    connect(myModule, SIGNAL(resumed(ModuleBase_Operation*)), SLOT(onResumed(ModuleBase_Operation*)));
+    connect(myModule, SIGNAL(resumed(ModuleBase_Operation*)), 
+            SLOT(onResumed(ModuleBase_Operation*)));
 
   return true;
 }
@@ -489,14 +494,16 @@ bool PartSet_WidgetSketchCreator::validateSelectionList() const
     XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myModule->workshop());
     // TODO(spo): translate
     QMessageBox::question(aWorkshop->desktop(), tr("Apply current feature"),
-                  tr("Sketch is invalid and will be deleted.\nError: %1").arg(anError.messageString().c_str()),
+                  tr("Sketch is invalid and will be deleted.\nError: %1")
+                  .arg(anError.messageString().c_str()),
                   QMessageBox::Ok);
   }
   return isValidPComposite;
 }
 
-void PartSet_WidgetSketchCreator::setSketchObjectToList(const CompositeFeaturePtr& theCompositeFeature,
-                                                        const AttributePtr& theAttribute)
+void PartSet_WidgetSketchCreator::setSketchObjectToList(
+                            const CompositeFeaturePtr& theCompositeFeature,
+                            const AttributePtr& theAttribute)
 {
   if (!theCompositeFeature.get() || theCompositeFeature->numberOfSubs() != 1)
     return;
@@ -513,7 +520,8 @@ void PartSet_WidgetSketchCreator::setSketchObjectToList(const CompositeFeaturePt
   }
 
   ResultPtr aSketchRes = aSketchFeature->results().front();
-  ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSketchRes);
+  ResultConstructionPtr aConstruction = 
+    std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSketchRes);
   if(!aConstruction.get()) {
     return;
   }

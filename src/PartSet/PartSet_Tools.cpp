@@ -175,7 +175,8 @@ std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::convertTo2D(FeaturePtr theSketch,
 }
 
 
-std::shared_ptr<GeomAPI_Pnt> PartSet_Tools::convertTo3D(const double theX, const double theY, FeaturePtr theSketch)
+std::shared_ptr<GeomAPI_Pnt> PartSet_Tools::convertTo3D(const double theX, const double theY,
+                                                        FeaturePtr theSketch)
 {
   std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
 
@@ -326,8 +327,9 @@ std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findFirstEqualPointInArgumen
   return aFeaturePoint;
 }
 
-std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findFirstEqualPoint(const FeaturePtr& theFeature,
-                                                      const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findFirstEqualPoint(
+                                              const FeaturePtr& theFeature,
+                                              const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {
   std::shared_ptr<GeomDataAPI_Point2D> aFPoint;
 
@@ -475,9 +477,11 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
 
         std::shared_ptr<ModelAPI_Data> aData = aMyFeature->data();
         std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = 
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::START_ID()));
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aData->attribute(SketchPlugin_Line::START_ID()));
         std::shared_ptr<GeomDataAPI_Point2D> aPoint2 = 
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::END_ID()));
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aData->attribute(SketchPlugin_Line::END_ID()));
 
         aPoint1->setValue(aPnt2d1);
         aPoint2->setValue(aPnt2d2);
@@ -518,7 +522,8 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
 
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
       // selection shape has no result owner => the trihedron axis
-      // TODO: make reference to the real axes when they are implemented in the initialization plugin
+      // TODO: make reference to the real axes when 
+      // they are implemented in the initialization plugin
       if (!aRes.get()) {
         ObjectPtr aPointObj = ModelAPI_Session::get()->moduleDocument()->objectByName(
           ModelAPI_ResultConstruction::group(), "Origin");
@@ -558,7 +563,8 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
         (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
 
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-      // if there is no object, it means that this is the origin point: search it in the module document
+      // if there is no object, 
+      // it means that this is the origin point: search it in the module document
       if (!aRes.get()) {
         ObjectPtr aPointObj = ModelAPI_Session::get()->moduleDocument()->objectByName(
           ModelAPI_ResultConstruction::group(), "Origin");
@@ -579,7 +585,8 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
 
         std::shared_ptr<GeomAPI_Pnt2d> aPnt2d = convertTo2D(theSketch, aPnt);
         std::shared_ptr<GeomDataAPI_Point2D> aPoint = 
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Point::COORD_ID()));
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aData->attribute(SketchPlugin_Point::COORD_ID()));
         aPoint->setValue(aPnt2d);
         if ((aPnt->x() < Precision::Confusion()) && 
             (aPnt->y() < Precision::Confusion()) &&
@@ -621,7 +628,8 @@ bool PartSet_Tools::isContainPresentation(const QList<ModuleBase_ViewerPrsPtr>& 
   return false;
 }
 
-ResultPtr PartSet_Tools::findExternalEdge(CompositeFeaturePtr theSketch, std::shared_ptr<GeomAPI_Edge> theEdge)
+ResultPtr PartSet_Tools::findExternalEdge(CompositeFeaturePtr theSketch, 
+                                          std::shared_ptr<GeomAPI_Edge> theEdge)
 {
   for (int i = 0; i < theSketch->numberOfSubs(); i++) {
     FeaturePtr aFeature = theSketch->subFeature(i);
@@ -650,7 +658,8 @@ ResultPtr PartSet_Tools::findExternalEdge(CompositeFeaturePtr theSketch, std::sh
 }
 
 
-ResultPtr PartSet_Tools::findExternalVertex(CompositeFeaturePtr theSketch, std::shared_ptr<GeomAPI_Vertex> theVert)
+ResultPtr PartSet_Tools::findExternalVertex(CompositeFeaturePtr theSketch, 
+                                            std::shared_ptr<GeomAPI_Vertex> theVert)
 {
   for (int i = 0; i < theSketch->numberOfSubs(); i++) {
     FeaturePtr aFeature = theSketch->subFeature(i);
@@ -746,8 +755,9 @@ GeomShapePtr PartSet_Tools::findShapeBy2DPoint(const AttributePtr& theAttribute,
   return aShape;
 }
 
-std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::getPoint(std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                                       const std::string& theAttribute)
+std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::getPoint(
+                                                  std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                                  const std::string& theAttribute)
 {
   std::shared_ptr<GeomDataAPI_Point2D> aPointAttr = ModelGeomAlgo_Point2D::getPointOfRefAttr(
                                           theFeature.get(), theAttribute, SketchPlugin_Point::ID(),
@@ -757,7 +767,8 @@ std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::getPoint(std::shared_ptr<ModelAPI_
   return std::shared_ptr<GeomAPI_Pnt2d>();
 }
 
-FeaturePtr findFirstCoincidenceByData(const DataPtr& theData, std::shared_ptr<GeomAPI_Pnt2d> thePoint)
+FeaturePtr findFirstCoincidenceByData(const DataPtr& theData, 
+                                      std::shared_ptr<GeomAPI_Pnt2d> thePoint)
 {
   FeaturePtr aCoincident;
 
@@ -895,7 +906,7 @@ void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>&
 std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::getCoincedencePoint(FeaturePtr theStartCoin)
 {
   std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(theStartCoin.get(), 
-                                                                    SketchPlugin_Constraint::ENTITY_A());
+                                                        SketchPlugin_Constraint::ENTITY_A());
   if (aPnt.get() == NULL)
     aPnt = SketcherPrs_Tools::getPoint(theStartCoin.get(), SketchPlugin_Constraint::ENTITY_B());
   return aPnt;
@@ -927,7 +938,8 @@ AttributePtr PartSet_Tools::findAttributeBy2dPoint(ObjectPtr theObj,
           if (!aCurPoint->isInitialized())
             continue;
 
-          std::shared_ptr<GeomAPI_Pnt> aPnt = convertTo3D(aCurPoint->x(), aCurPoint->y(), theSketch);
+          std::shared_ptr<GeomAPI_Pnt> aPnt = 
+            convertTo3D(aCurPoint->x(), aCurPoint->y(), theSketch);
           if (aPnt && (aPnt->distance(aValue) < Precision::Confusion())) {
             anAttribute = aCurPoint;
             break;

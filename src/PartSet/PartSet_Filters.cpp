@@ -42,8 +42,8 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
       ObjectPtr aObj = myWorkshop->findPresentedObject(aAISObj);
       if (aObj) {
         ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-        // result of parts belongs to PartSet document and can be selected only when PartSet is active
-        // in order to do not select the result of the active part.
+        // result of parts belongs to PartSet document and can be selected only when PartSet
+        //  is active in order to do not select the result of the active part.
         if (aResult.get() && aResult->groupName() == ModelAPI_ResultPart::group()) {
           SessionPtr aMgr = ModelAPI_Session::get();
           aValid = aMgr->activeDocument() == aMgr->moduleDocument();
@@ -69,7 +69,8 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
 IMPLEMENT_STANDARD_HANDLE(PartSet_CirclePointFilter, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_CirclePointFilter, SelectMgr_Filter);
 
-Standard_Boolean PartSet_CirclePointFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
+Standard_Boolean 
+  PartSet_CirclePointFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();
   if(!anOperation) {
@@ -90,7 +91,8 @@ Standard_Boolean PartSet_CirclePointFilter::IsOk(const Handle(SelectMgr_EntityOw
     return Standard_True;
   }
 
-  Handle(ModuleBase_ResultPrs) aResultPrs = Handle(ModuleBase_ResultPrs)::DownCast(theOwner->Selectable());
+  Handle(ModuleBase_ResultPrs) aResultPrs = 
+    Handle(ModuleBase_ResultPrs)::DownCast(theOwner->Selectable());
   if(aResultPrs.IsNull()) {
     return Standard_True;
   }

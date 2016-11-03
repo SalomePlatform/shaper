@@ -200,8 +200,10 @@ private:
   ModuleBase_ParamSpinBox* myXSpin;  ///< the spin box for the X coordinate
   ModuleBase_ParamSpinBox* myYSpin;  ///< the spin box for the Y coordinate
 
-  std::shared_ptr<ModuleBase_ViewerPrs> myPreSelected; ///< value used as selection in mouse release method
-  ///< it is important during restart operation
+   /// value used as selection in mouse release method
+  std::shared_ptr<ModuleBase_ViewerPrs> myPreSelected;
+
+  /// it is important during restart operation
   CompositeFeaturePtr mySketch;
 
   bool myValueIsCashed; /// boolean state if the value is cashed during value state change

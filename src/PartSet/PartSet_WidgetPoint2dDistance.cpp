@@ -85,13 +85,15 @@ void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
   }
 }
 
-double PartSet_WidgetPoint2dDistance::computeValue(const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPnt,
-                                                   const std::shared_ptr<GeomAPI_Pnt2d>& theCurrentPnt)
+double PartSet_WidgetPoint2dDistance::computeValue(
+                              const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPnt,
+                              const std::shared_ptr<GeomAPI_Pnt2d>& theCurrentPnt)
 {
   return theCurrentPnt->distance(theFirstPnt);
 }
 
-void PartSet_WidgetPoint2dDistance::mouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
+void PartSet_WidgetPoint2dDistance::mouseReleased(ModuleBase_IViewWindow* theWnd,
+                                                  QMouseEvent* theEvent)
 {
   // the contex menu release by the right button should not be processed by this widget
   if (theEvent->button() != Qt::LeftButton)
@@ -113,7 +115,8 @@ void PartSet_WidgetPoint2dDistance::mouseReleased(ModuleBase_IViewWindow* theWnd
     emit focusOutWidget(this);
 }
 
-void PartSet_WidgetPoint2dDistance::mouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
+void PartSet_WidgetPoint2dDistance::mouseMoved(ModuleBase_IViewWindow* theWnd, 
+                                               QMouseEvent* theEvent)
 {
   if (isEditingMode())
     return;

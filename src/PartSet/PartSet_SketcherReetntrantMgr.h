@@ -29,7 +29,8 @@ class PartSet_Module;
 /// ('internal' edit operation), with the ability to simultaneously create the next entity
 /// of same type (re-entrance of the operation).
 /// OK valids the current edition and exits from the operation (no re-entrance).
-/// Cancel removes (undo) the entity currently edited and exits from the operation (no re-entrance).
+/// Cancel removes (undo) the entity currently edited and 
+/// exits from the operation (no re-entrance).
 class PARTSET_EXPORT PartSet_SketcherReetntrantMgr : public QObject
 {
 Q_OBJECT
@@ -38,7 +39,8 @@ Q_OBJECT
 enum RestartingMode {
   RM_None, /// the operation should not be restarted
   RM_Forbided, /// the operation should not be restarted after there is no active widget
-  RM_LastFeatureUsed, /// the operation is restarted and use the previous feature for own initialization
+  RM_LastFeatureUsed, /// the operation is restarted and use 
+                      /// the previous feature for own initialization
   RM_EmptyFeatureUsed /// the operation is restarted and does not use the previous feature
 };
 
@@ -164,7 +166,8 @@ private:
   bool isTangentArc(ModuleBase_Operation* theOperation,
                     const std::shared_ptr<ModelAPI_CompositeFeature>& /*theSketch*/) const;
 
-  /// Accept All action is enabled if an internal edit is started. It updates the state of the button
+  /// Accept All action is enabled if an internal edit is started. 
+  /// It updates the state of the button
   void updateAcceptAllAction();
 
   /// Returns the workshop

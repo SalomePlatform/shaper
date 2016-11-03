@@ -213,7 +213,8 @@ public:
   bool isObjectOfSketch(const ObjectPtr& theObject) const;
 
   /// Saves the current selection in the viewer into an internal container
-  /// It obtains the selected attributes. The highlighted objects can be processes as the selected ones
+  /// It obtains the selected attributes. 
+  /// The highlighted objects can be processes as the selected ones
   /// \param theHighlightedOnly a boolean flag
   void storeSelection(const bool theHighlightedOnly = false);
 
@@ -284,7 +285,8 @@ private slots:
   void onLeaveViewPort();
   /// Listens to the value changed signal and display the current operation feature
   void onBeforeValuesChangedInPropertyPanel();
-  /// Listens to the signal about the modification of the values have been done in the property panel
+  /// Listens to the signal about the modification of the values 
+  /// have been done in the property panel
   void onAfterValuesChangedInPropertyPanel();
 
   void onMousePressed(ModuleBase_IViewWindow*, QMouseEvent*);
@@ -347,7 +349,8 @@ private:
 
   /// Erase or display the feature of the current operation. If the mouse over the active view or
   /// a current value is changed by property panel, the feature is displayed otherwise it is hidden
-  /// \param theOperation an operation which feature is to be displayed, it is nested create operation
+  /// \param theOperation an operation which feature is to be displayed, 
+  ///                     it is nested create operation
   /// \param isToDisplay a flag about the display or erase the feature
   void visualizeFeature(const FeaturePtr& theFeature, const bool isEditOperation,
                         const bool isToDisplay, const bool isFlushRedisplay = true);
@@ -369,7 +372,8 @@ private:
   bool myIsDragging;
   bool myDragDone;
   bool myIsMouseOverWindow; /// the state that the mouse over the view
-  bool myIsMouseOverViewProcessed; /// the state whether the over view state is processed by mouseMove method
+  /// the state whether the over view state is processed by mouseMove method
+  bool myIsMouseOverViewProcessed; 
   bool myIsPopupMenuActive; /// the state of the popup menu is shown
   Point myCurrentPoint;
   //Point myClickedPoint;

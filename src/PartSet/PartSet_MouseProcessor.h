@@ -22,19 +22,23 @@ public:
   /// Processing the mouse move event in the viewer
   /// \param theWindow a view window
   /// \param theEvent a mouse event
-  PARTSET_EXPORT virtual void mouseMoved(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent) {}
+  PARTSET_EXPORT virtual void mouseMoved(ModuleBase_IViewWindow* theWindow,
+                                         QMouseEvent* theEvent) {}
   /// Processing the mouse press event in the viewer
   /// \param theWindow a view window
   /// \param theEvent a mouse event
-  PARTSET_EXPORT virtual void mousePressed(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent) {}
+  PARTSET_EXPORT virtual void mousePressed(ModuleBase_IViewWindow* theWindow,
+                                           QMouseEvent* theEvent) {}
   /// Processing the mouse release event in the viewer
   /// \param theWindow a view window
   /// \param theEvent a mouse event
-  PARTSET_EXPORT virtual void mouseReleased(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent) {}
+  PARTSET_EXPORT virtual void mouseReleased(ModuleBase_IViewWindow* theWindow, 
+                                            QMouseEvent* theEvent) {}
   /// Processing the mouse double click event in the viewer
   /// \param theWindow a view window
   /// \param theEvent a mouse event
-  PARTSET_EXPORT virtual void mouseDoubleClick(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent) {}
+  PARTSET_EXPORT virtual void mouseDoubleClick(ModuleBase_IViewWindow* theWindow, 
+                                               QMouseEvent* theEvent) {}
 };
 
 #endif

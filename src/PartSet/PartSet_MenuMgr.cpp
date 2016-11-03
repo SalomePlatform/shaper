@@ -374,7 +374,8 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
           std::string anAttribute = SketchPlugin_SketchEntity::AUXILIARY_ID();
 
           std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr = 
-            std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aSketchFeature->data()->attribute(anAttribute));
+            std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
+            aSketchFeature->data()->attribute(anAttribute));
           if (anAuxiliaryAttr)
             anAuxiliaryAttr->setValue(isChecked);
         }
@@ -402,7 +403,8 @@ bool PartSet_MenuMgr::canSetAuxiliary(bool& theValue) const
   // 1. change auxiliary type of a created feature
   if (myModule->sketchMgr()->isNestedCreateOperation(anOperation, aSketch) &&
     PartSet_SketcherMgr::isEntity(anOperation->id().toStdString()) ) {
-    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(anOperation);
+    ModuleBase_OperationFeature* aFOperation =
+      dynamic_cast<ModuleBase_OperationFeature*>(anOperation);
     if (aFOperation)
       anObjects.append(aFOperation->feature());
   }
@@ -429,7 +431,8 @@ bool PartSet_MenuMgr::canSetAuxiliary(bool& theValue) const
           std::string anAttribute = SketchPlugin_SketchEntity::AUXILIARY_ID();
 
           std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr = 
-            std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aSketchFeature->data()->attribute(anAttribute));
+            std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
+            aSketchFeature->data()->attribute(anAttribute));
           if (anAuxiliaryAttr)
             isNotAuxiliaryFound = !anAuxiliaryAttr->value();
         }

@@ -78,13 +78,15 @@ public:
   /// \param theSketch the sketch feature
   /// \param thePnt the 3D point in the viewer
   /// \returns the converted point object
-  static std::shared_ptr<GeomAPI_Pnt2d> convertTo2D(FeaturePtr theSketch, const std::shared_ptr<GeomAPI_Pnt>& thePnt);
+  static std::shared_ptr<GeomAPI_Pnt2d> convertTo2D(FeaturePtr theSketch, 
+                                                    const std::shared_ptr<GeomAPI_Pnt>& thePnt);
 
   /// \brief Converts the 2D projected coodinates on the sketch plane to the 3D point.
   /// \param theX the X coordinate
   /// \param theY the Y coordinate
   /// \param theSketch the sketch feature
-  static std::shared_ptr<GeomAPI_Pnt> convertTo3D(const double theX, const double theY, FeaturePtr theSketch);
+  static std::shared_ptr<GeomAPI_Pnt> convertTo3D(const double theX, const double theY, 
+                                                  FeaturePtr theSketch);
 
   /// Returns pointer to the root document.
   static std::shared_ptr<ModelAPI_Document> document();
@@ -205,7 +207,8 @@ public:
   /// \param theView a 3D view
   /// \param theX the output horizontal coordinate of the point
   /// \param theY the output vertical coordinate of the point
-  static bool hasVertexShape(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs, FeaturePtr theSketch,
+  static bool hasVertexShape(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs, 
+                             FeaturePtr theSketch,
                              Handle_V3d_View theView, double& theX, double& theY);
 
 

@@ -183,7 +183,8 @@ bool PartSet_WidgetSubShapeSelector::setSelection(
 
       /// find the points in coincident features
       PntToAttributesMap aRefAttributes = myCashedReferences[aBaseObject];
-      PntToAttributesMap::const_iterator aRIt = aRefAttributes.begin(), aRLast = aRefAttributes.end();
+      PntToAttributesMap::const_iterator 
+        aRIt = aRefAttributes.begin(), aRLast = aRefAttributes.end();
       for (; aRIt != aRLast; aRIt++) {
         std::shared_ptr<GeomDataAPI_Point2D> anAttribute = aRIt->first;
         std::shared_ptr<GeomAPI_Pnt> aPoint = aRIt->second;

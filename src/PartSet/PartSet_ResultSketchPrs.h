@@ -32,7 +32,8 @@ public:
   DEFINE_STANDARD_RTTI(PartSet_ResultSketchPrs)
 protected:
   /// Redefinition of virtual function
-  Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+  Standard_EXPORT virtual void Compute(
+    const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
     const Handle(Prs3d_Presentation)& thePresentation, const Standard_Integer theMode = 0);
 
   /// Redefinition of virtual function
@@ -45,7 +46,8 @@ private:
   /// \param theShape a shape
   /// \param theTypeOfSelection type of selection: VERTEX, EDGE, WIRE
   void appendShapeSelection(const Handle(SelectMgr_Selection)& theSelection,
-                            const TopoDS_Shape& theShape, const TopAbs_ShapeEnum& theTypeOfSelection);
+                            const TopoDS_Shape& theShape, 
+                            const TopAbs_ShapeEnum& theTypeOfSelection);
 
   /// Sets color/line style/width of the presentation depending on the parameter state
   /// \param isAuxiliary a boolean value if the properties are for auxiliary objects

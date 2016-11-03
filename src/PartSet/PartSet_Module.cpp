@@ -164,9 +164,6 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Config_PropManager::registerProp("Visualization", "operation_highlight_color",
                           "Multi selector item color in operation", Config_Prop::Color,
                           PartSet_CustomPrs::OPERATION_HIGHLIGHT_COLOR());
-
-  //Config_PropManager::registerProp(SKETCH_TAB_NAME, "disable_input_fields", "Disable input fields",
-  //                        Config_Prop::Boolean, "true");
 }
 
 PartSet_Module::~PartSet_Module()
@@ -247,11 +244,12 @@ void PartSet_Module::registerProperties()
                                    PLANE_SIZE);
   Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_thickness", "Thickness",
                                    Config_Prop::Integer, SKETCH_WIDTH);
-  Config_PropManager::registerProp(SKETCH_TAB_NAME, "rotate_to_plane", "Rotate to plane when selected",
-    Config_Prop::Boolean, "false");
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "rotate_to_plane", 
+    "Rotate to plane when selected", Config_Prop::Boolean, "false");
 }
 
-void PartSet_Module::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, const bool isToConnect)
+void PartSet_Module::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, 
+                                            const bool isToConnect)
 {
   mySketchMgr->connectToPropertyPanel(theWidget, isToConnect);
 }
@@ -265,7 +263,8 @@ void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation)
   /// Restart sketcher operations automatically
   if (!mySketchReentrantMgr->operationCommitted(theOperation)) {
 
-    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+    ModuleBase_OperationFeature* aFOperation = 
+      dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
     if (aFOperation && !aFOperation->isEditOperation()) {
       // the selection is cleared after commit the create operation
       // in order to do not use the same selected objects in the restarted operation
@@ -306,15 +305,17 @@ void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
     bool isOperationCommitted = false;
     if (!aFOperation->isEditOperation()) {
       std::string aGreedAttributeId = ModuleBase_Tools::findGreedAttribute(workshop(), aFeature);
-      // if there is a greed attribute, automatic commit by preselection for this feature is prohibited
+      // if there is a greed attribute, automatic commit by preselection 
+      // for this feature is prohibited
       aFilledWidget = aFOperation->activateByPreselection(aGreedAttributeId);
       if (currentOperation() != aFOperation)
         isOperationCommitted = true;
       else {
         if (aGreedAttributeId.empty()) {
           // a signal should be emitted before the next widget activation
-          // because, the activation of the next widget will give a focus to the widget. As a result
-          // the value of the widget is initialized. And commit may happens until the value is entered.
+          // because, the activation of the next widget will give a focus to the widget. 
+          // As a result the value of the widget is initialized. 
+          // And commit may happens until the value is entered.
           if (aFilledWidget) {
             if (mySketchReentrantMgr->canBeCommittedByPreselection())
               isOperationCommitted = mySketchMgr->operationActivatedByPreselection();
@@ -375,7 +376,8 @@ void PartSet_Module::updateSketcherOnStart(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::updatePresentationsOnStart(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  ModuleBase_OperationFeature* aFOperation =
+    dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (aFOperation) {
     myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeArguments, true);
     myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeResults, true);
@@ -386,7 +388,8 @@ void PartSet_Module::operationResumed(ModuleBase_Operation* theOperation)
 {
   ModuleBase_IModule::operationResumed(theOperation);
 
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  ModuleBase_OperationFeature* aFOperation = 
+    dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (aFOperation) {
     myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeArguments, true);
     myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeResults, true);
@@ -412,8 +415,8 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
     aDisplayer->updateViewer();
   }
 
-  QMap<PartSet_Tools::ConstraintVisibleState, bool>::const_iterator anIt = myHasConstraintShown.begin(),
-                                                                    aLast = myHasConstraintShown.end();
+  QMap<PartSet_Tools::ConstraintVisibleState, bool>::const_iterator 
+    anIt = myHasConstraintShown.begin(), aLast = myHasConstraintShown.end();
   for (; anIt != aLast; anIt++) {
     mySketchMgr->updateBySketchParameters(anIt.key(), anIt.value());
   }
@@ -492,7 +495,8 @@ bool PartSet_Module::canActivateSelection(const ObjectPtr& theObject) const
   if (isSketchOp || isNestedOp) {
     // in active sketch operation it is possible to activate operation object in selection
     // in the edit operation, e.g. points of the line can be moved when the line is edited
-    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(anOperation);
+    ModuleBase_OperationFeature* aFOperation = 
+      dynamic_cast<ModuleBase_OperationFeature*>(anOperation);
     aCanActivate = aCanActivate || (aFOperation && aFOperation->isEditOperation());
   }
   return aCanActivate;
@@ -586,7 +590,8 @@ void PartSet_Module::clearViewer()
 
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  ModuleBase_OperationFeature* aFOperation =
+    dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (!aFOperation)
     return;
 
@@ -601,7 +606,8 @@ bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
 {
   bool aProcessed = false;
 
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
+  ModuleBase_OperationFeature* aFOperation = 
+    dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   XGUI_Workshop* aWorkshop = getWorkshop();
   XGUI_PropertyPanel* aPropertyPanel = aWorkshop->propertyPanel();
   if (mySketchMgr->activeSketch().get() && aFOperation && aPropertyPanel) {
@@ -615,11 +621,12 @@ bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
       FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
       FeaturePtr anOpFeature = aFOperation->feature();
       GeomShapePtr aShape = aSelectedPrs->shape();
-      // click on the digit of dimension constrain comes here with an empty shape, so we need the check
+      // click on the digit of dimension constrain comes here 
+      // with an empty shape, so we need the check
       if (aFeature == anOpFeature && aShape.get() && !aShape->isNull()) {
         const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
         AttributePtr anAttribute = PartSet_Tools::findAttributeBy2dPoint(anObject, aTDShape,
-                                                                         mySketchMgr->activeSketch());
+                                                               mySketchMgr->activeSketch());
         if (anAttribute.get()) {
           QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
           ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), workshop());
@@ -813,8 +820,10 @@ bool PartSet_Module::deleteObjects()
     anOpMgr->startOperation(anOpAction);
 
     // WORKAROUND, should be done to avoid viewer highlight update after deletetion of objects
-    // the problem is in AIS Dimensions recompute if a line and the dim are removed, line is the first
-    // it causes the AIS recompute, where the base line is null, the result is empty AIS in the viewer
+    // the problem is in AIS Dimensions recompute 
+    // if a line and the dim are removed, line is the first
+    // it causes the AIS recompute, where the base line is null, 
+    // the result is empty AIS in the viewer
     XGUI_Tools::workshop(myWorkshop)->selector()->clearSelection();
 
     // 4. delete features
@@ -978,7 +987,8 @@ bool PartSet_Module::isCustomPrsActivated(const ModuleBase_CustomizeFlag& theFla
   return myCustomPrs->isActive(theFlag);
 }
 
-void PartSet_Module::activateCustomPrs(const FeaturePtr& theFeature, const ModuleBase_CustomizeFlag& theFlag,
+void PartSet_Module::activateCustomPrs(const FeaturePtr& theFeature, 
+                                       const ModuleBase_CustomizeFlag& theFlag,
                                        const bool theUpdateViewer)
 {
   myCustomPrs->activate(theFeature, theFlag, theUpdateViewer);
@@ -1292,7 +1302,8 @@ void PartSet_Module::onViewCreated(ModuleBase_IViewWindow*)
   if (aOperation) {
     ModuleBase_ModelWidget* anActiveWidget = activeWidget();
     if (anActiveWidget) {
-      ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(anActiveWidget);
+      ModuleBase_WidgetSelector* aWSelector = 
+        dynamic_cast<ModuleBase_WidgetSelector*>(anActiveWidget);
       if (aWSelector)
         aWSelector->activateSelectionAndFilters(true);
     }

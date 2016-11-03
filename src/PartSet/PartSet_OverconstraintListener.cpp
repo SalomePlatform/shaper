@@ -63,9 +63,11 @@ void PartSet_OverconstraintListener::processEvent(
 
   QString aCurrentInfoStr = getObjectsInfo(myConflictingObjects);
 
-  qDebug(QString("PartSet_OverconstraintListener::processEvent: %1,\nobjects count = %2:%3\ncurrent objects count = %4:%5")
-                .arg(isRepaired ? "REPAIRED" : "FAILED")
-                .arg(aCount).arg(anInfoStr).arg(myConflictingObjects.size()).arg(aCurrentInfoStr).toStdString().c_str());
+  QString aMsg("PartSet_OverconstraintListener::processEvent: %1,\nobjects  \
+ count = %2:%3\ncurrent objects count = %4:%5");
+  qDebug(aMsg.arg(isRepaired ? "REPAIRED" : "FAILED")
+             .arg(aCount).arg(anInfoStr).arg(myConflictingObjects.size())
+             .arg(aCurrentInfoStr).toStdString().c_str());
 #endif
 
   if (theMessage->eventID() == Events_Loop::eventByName(EVENT_SOLVER_FAILED)) {
@@ -102,14 +104,15 @@ void PartSet_OverconstraintListener::processEvent(
 }
 
 bool PartSet_OverconstraintListener::appendConflictingObjects(
-                                                  const std::set<ObjectPtr>& theConflictingObjects)
+                                               const std::set<ObjectPtr>& theConflictingObjects)
 {
   std::set<ObjectPtr> aModifiedObjects;
   std::vector<int> aColor;
   getConflictingColor(aColor);
 
   // set error state for new objects and append them in the internal map of objects
-  std::set<ObjectPtr>::const_iterator anIt = theConflictingObjects.begin(), aLast = theConflictingObjects.end();
+  std::set<ObjectPtr>::const_iterator 
+    anIt = theConflictingObjects.begin(), aLast = theConflictingObjects.end();
   for (; anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
     if (myConflictingObjects.find(anObject) == myConflictingObjects.end()) { // it is not found
@@ -125,12 +128,13 @@ bool PartSet_OverconstraintListener::appendConflictingObjects(
 }
 
 bool PartSet_OverconstraintListener::repairConflictingObjects(
-                                                  const std::set<ObjectPtr>& theConflictingObjects)
+                                              const std::set<ObjectPtr>& theConflictingObjects)
 {
   std::set<ObjectPtr> aModifiedObjects;
   // erase error state of absent current objects in the parameter list
   std::set<ObjectPtr>::const_iterator anIt, aLast;
-  for (anIt = theConflictingObjects.begin(), aLast = theConflictingObjects.end() ; anIt != aLast; anIt++) {
+  for (anIt = theConflictingObjects.begin(), aLast = theConflictingObjects.end(); 
+       anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
     if (theConflictingObjects.find(anObject) != theConflictingObjects.end()) { // it is found
       myConflictingObjects.erase(anObject);

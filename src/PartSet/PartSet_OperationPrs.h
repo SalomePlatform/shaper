@@ -139,11 +139,14 @@ private:
           NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)>& theShapeToPrsMap);
 
 private:
-  NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)> myShapeToPrsMap; /// list of visualized shapes
+  /// list of visualized shapes
+  NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)> myShapeToPrsMap;
 
   ModuleBase_IWorkshop* myWorkshop; /// current workshop
   Quantity_Color myShapeColor; /// color of feature depended shapes
-  bool myUseAISWidth; /// flag if the width of a shape object should be used for the shape visualization
+
+  /// flag if the width of a shape object should be used for the shape visualization
+  bool myUseAISWidth;
 
   friend class PartSet_CustomPrs;
 };

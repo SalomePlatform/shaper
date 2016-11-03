@@ -96,7 +96,8 @@ void PartSet_ExternalObjectsMgr::removeExternalObject(const ObjectPtr& theObject
     if (aFeature.get() != NULL) {
       QObjectPtrList anObjects;
       anObjects.append(aFeature);
-      // the external feature should be removed with all references, composite sketch feature will be ignored
+      // the external feature should be removed with all references, 
+      // composite sketch feature will be ignored
       workshop(theWorkshop)->deleteFeatures(anObjects);
     }
   }

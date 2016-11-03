@@ -97,7 +97,8 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   myViewInverted = new QCheckBox(tr("Reversed"), aViewBox);
   aViewLayout->addWidget(myViewInverted);
 
-  QPushButton* aSetViewBtn = new QPushButton(QIcon(":icons/plane_view.png"), tr("Set plane view"), aViewBox);
+  QPushButton* aSetViewBtn = 
+    new QPushButton(QIcon(":icons/plane_view.png"), tr("Set plane view"), aViewBox);
   connect(aSetViewBtn, SIGNAL(clicked(bool)), this, SLOT(onSetPlaneView()));
   aViewLayout->addWidget(aSetViewBtn);
 
@@ -209,8 +210,9 @@ void PartSet_WidgetSketchLabel::blockAttribute(const AttributePtr& theAttribute,
   }
 }
 
-bool PartSet_WidgetSketchLabel::setSelectionInternal(const QList<ModuleBase_ViewerPrsPtr>& theValues,
-                                                     const bool theToValidate)
+bool PartSet_WidgetSketchLabel::setSelectionInternal(
+                                          const QList<ModuleBase_ViewerPrsPtr>& theValues,
+                                          const bool theToValidate)
 {
   bool aDone = false;
   if (theValues.empty()) {

@@ -87,7 +87,8 @@ void PartSet_WidgetMultiSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr
             aShape = aResult->shape();
         }
         if (aShape.get() != NULL && !aShape->isNull())
-          anExternalObject = myExternalObjectMgr->externalObject(theObject, aShape, sketch(), myIsInValidate);
+          anExternalObject = 
+            myExternalObjectMgr->externalObject(theObject, aShape, sketch(), myIsInValidate);
       }
       else {
         anExternalObject = theObject;

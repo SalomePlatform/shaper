@@ -29,7 +29,8 @@ bool PartSet_WidgetFileSelector::restoreValueCustom()
 
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(ExchangePlugin_ExportFeature::FILE_PATH_ID());
-  mySelectedFilter = formatToFilter(shortFormatToFullFormat(QString::fromStdString(aStringAttr->value())));
+  mySelectedFilter = 
+    formatToFilter(shortFormatToFullFormat(QString::fromStdString(aStringAttr->value())));
 
   return ModuleBase_WidgetFileSelector::restoreValueCustom();
 }

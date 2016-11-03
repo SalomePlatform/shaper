@@ -100,7 +100,8 @@ QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
 
 void PartSet_IconFactory::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(Config_FeatureMessage::GUI_EVENT())) {
+  if (theMessage->eventID() == 
+      Events_Loop::loop()->eventByName(Config_FeatureMessage::GUI_EVENT())) {
     std::shared_ptr<Config_FeatureMessage> aFeatureMsg =
        std::dynamic_pointer_cast<Config_FeatureMessage>(theMessage);
     if (!aFeatureMsg->isInternal()) {
