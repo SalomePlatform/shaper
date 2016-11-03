@@ -502,6 +502,8 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
       if (anEdge->isArc()) {
         // Create arc
         aMyFeature = theSketch->addFeature(SketchPlugin_Arc::ID());
+        if (theShape.Orientation() == TopAbs_REVERSED)
+          aMyFeature->boolean(SketchPlugin_Arc::INVERSED_ID())->setValue(true);
       }
       else {
         // Create circle
