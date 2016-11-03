@@ -250,6 +250,9 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
       if (!aCurrentWidget->isObligatory())
         continue; // not obligatory widgets are not activated automatically
 
+      if (!aCurrentWidget->canAcceptFocus())
+        continue; // do not set focus if it can not be accepted, case: optional choice
+
       if (aCurrentWidget->focusTo()) {
         return;
       }
