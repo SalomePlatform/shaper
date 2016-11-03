@@ -10,6 +10,7 @@
 #include <ModelAPI_ResultBody.h>
 
 #include <GeomAPI_Edge.h>
+#include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_ShapeExplorer.h>
 
@@ -43,20 +44,38 @@ void BuildPlugin_Face::execute()
 
   // Collect base shapes.
   ListOfShape anEdges;
+  std::list< std::shared_ptr<GeomAPI_Dir> > aListOfNormals;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
     GeomShapePtr aShape = aSelection->value();
+    GeomShapePtr aContext = aSelection->context()->shape();
     if(!aShape.get()) {
-      aShape = aSelection->context()->shape();
+      aShape = aContext;
     }
     for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
       GeomShapePtr anEdge = anExp.current();
       anEdges.push_back(anEdge);
     }
+
+    // check whether the context is a sketch, in this case store its normal for further needs
+    std::shared_ptr<GeomAPI_PlanarEdges> aSketch =
+        std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aContext);
+    if (aSketch)
+      aListOfNormals.push_back(aSketch->norm());
   }
 
   // Get plane.
   std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(anEdges);
+  std::shared_ptr<GeomAPI_Dir> aNormal = aPln->direction();
+  bool isReverse = !aListOfNormals.empty();
+  std::list< std::shared_ptr<GeomAPI_Dir> >::const_iterator aNormIt = aListOfNormals.begin();
+  for (; aNormIt != aListOfNormals.end() && isReverse; ++aNormIt)
+    if ((*aNormIt)->dot(aNormal) > 1.e-7)
+      isReverse = false;
+  if (isReverse) {
+    aNormal->reverse();
+    aPln = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aPln->location(), aNormal));
+  }
 
   // Get faces.
   ListOfShape aFaces;
