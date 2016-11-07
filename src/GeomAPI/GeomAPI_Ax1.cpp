@@ -60,7 +60,9 @@ void GeomAPI_Ax1::reverse()
 std::shared_ptr<GeomAPI_Ax1> GeomAPI_Ax1::reversed()
 {
   gp_Ax1 anAxis = MY_AX1->Reversed();
-  std::shared_ptr<GeomAPI_Pnt> aPnt(new GeomAPI_Pnt(anAxis.Location().X(), anAxis.Location().Y(), anAxis.Location().Z()));
-  std::shared_ptr<GeomAPI_Dir> aDir(new GeomAPI_Dir(anAxis.Direction().X(), anAxis.Direction().Y(), anAxis.Direction().Z()));
+  std::shared_ptr<GeomAPI_Pnt> aPnt(
+    new GeomAPI_Pnt(anAxis.Location().X(), anAxis.Location().Y(), anAxis.Location().Z()));
+  std::shared_ptr<GeomAPI_Dir> aDir(
+    new GeomAPI_Dir(anAxis.Direction().X(), anAxis.Direction().Y(), anAxis.Direction().Z()));
   return std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(aPnt, aDir));
 }

@@ -23,7 +23,8 @@ class GeomDataAPI_Point : public ModelAPI_Attribute
 {
  public:
   /// Defines the double value
-  GEOMDATAAPI_EXPORT virtual void setValue(const double theX, const double theY, const double theZ) = 0;
+  GEOMDATAAPI_EXPORT virtual 
+    void setValue(const double theX, const double theY, const double theZ) = 0;
   /// Defines the point
   GEOMDATAAPI_EXPORT virtual void setValue(const std::shared_ptr<GeomAPI_Pnt>& thePoint) = 0;
 
@@ -37,7 +38,8 @@ class GeomDataAPI_Point : public ModelAPI_Attribute
   GEOMDATAAPI_EXPORT virtual std::shared_ptr<GeomAPI_Pnt> pnt() = 0;
 
   /// Defines the calculated double value
-  GEOMDATAAPI_EXPORT virtual void setCalculatedValue(const double theX, const double theY, const double theZ) = 0;
+  GEOMDATAAPI_EXPORT virtual 
+    void setCalculatedValue(const double theX, const double theY, const double theZ) = 0;
   
   /// Defines the text values
   GEOMDATAAPI_EXPORT virtual void setText(const std::string& theX,
@@ -64,7 +66,8 @@ class GeomDataAPI_Point : public ModelAPI_Attribute
   GEOMDATAAPI_EXPORT virtual bool expressionInvalid(int theComponent) = 0;
 
   /// Allows to set expression (text) error (by the parameters listener)
-  GEOMDATAAPI_EXPORT virtual void setExpressionError(int theComponent, const std::string& theError) = 0;
+  GEOMDATAAPI_EXPORT virtual 
+    void setExpressionError(int theComponent, const std::string& theError) = 0;
 
   /// Returns an expression error
   GEOMDATAAPI_EXPORT virtual std::string expressionError(int theComponent) = 0;

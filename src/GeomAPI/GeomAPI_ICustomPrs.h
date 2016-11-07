@@ -26,7 +26,8 @@ public:
   GEOMAPI_EXPORT virtual ~GeomAPI_ICustomPrs();
 
   /// Modifies the given presentation in the custom way.
-  virtual bool customisePresentation(std::shared_ptr<ModelAPI_Result> theResult, AISObjectPtr thePrs,
+  virtual bool customisePresentation(std::shared_ptr<ModelAPI_Result> theResult, 
+                                     AISObjectPtr thePrs,
                                      std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs) = 0;
 };
 

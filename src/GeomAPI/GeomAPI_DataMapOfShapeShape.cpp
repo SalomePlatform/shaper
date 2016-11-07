@@ -25,11 +25,13 @@ int GeomAPI_DataMapOfShapeShape::size()
   return implPtr<TopTools_DataMapOfShapeShape>()->Extent();
 }
 
-bool GeomAPI_DataMapOfShapeShape::bind (std::shared_ptr<GeomAPI_Shape> theKey, std::shared_ptr<GeomAPI_Shape> theItem)
+bool GeomAPI_DataMapOfShapeShape::bind(std::shared_ptr<GeomAPI_Shape> theKey, 
+                                       std::shared_ptr<GeomAPI_Shape> theItem)
 {
   bool flag(false);
-  if(implPtr<TopTools_DataMapOfShapeShape>()->Bind(theKey->impl<TopoDS_Shape>(), theItem->impl<TopoDS_Shape>()))
-  flag = true;
+  if (implPtr<TopTools_DataMapOfShapeShape>()->Bind(theKey->impl<TopoDS_Shape>(), 
+                                                    theItem->impl<TopoDS_Shape>()))
+    flag = true;
   return flag;
 }
 
@@ -42,7 +44,8 @@ void GeomAPI_DataMapOfShapeShape::merge(const GeomAPI_DataMapOfShapeShape& theDa
   }
 }
 
-void GeomAPI_DataMapOfShapeShape::merge(const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theDataMap)
+void GeomAPI_DataMapOfShapeShape::
+  merge(const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theDataMap)
 {
   if(theDataMap.get()) {
     merge(*theDataMap.get());
@@ -57,10 +60,12 @@ bool GeomAPI_DataMapOfShapeShape::isBound (std::shared_ptr<GeomAPI_Shape> theKey
   return flag;
 }
 
-const std::shared_ptr<GeomAPI_Shape> GeomAPI_DataMapOfShapeShape::find(std::shared_ptr<GeomAPI_Shape> theKey)
+const std::shared_ptr<GeomAPI_Shape> 
+  GeomAPI_DataMapOfShapeShape::find(std::shared_ptr<GeomAPI_Shape> theKey)
 {
   std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());  
-  aShape->setImpl(new TopoDS_Shape(impl<TopTools_DataMapOfShapeShape>().Find(theKey->impl<TopoDS_Shape>())));
+  aShape->setImpl(
+    new TopoDS_Shape(impl<TopTools_DataMapOfShapeShape>().Find(theKey->impl<TopoDS_Shape>())));
   return aShape;
 }  
 

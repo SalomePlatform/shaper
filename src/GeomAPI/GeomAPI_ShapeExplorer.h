@@ -49,11 +49,13 @@ public:
   GEOMAPI_EXPORT
   bool more() const;
 
-  /// Moves to the next Shape in the exploration or do nothing if there are no more shapes to explore.
+  /// Moves to the next Shape in the exploration or do nothing
+  /// if there are no more shapes to explore.
   GEOMAPI_EXPORT
   void next();
 
-  /// \return the current shape in the exploration or empty pointer if this explorer has no more shapes to explore.
+  /// \return the current shape in the exploration or empty pointer
+  /// if this explorer has no more shapes to explore.
   GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Shape> current();
 

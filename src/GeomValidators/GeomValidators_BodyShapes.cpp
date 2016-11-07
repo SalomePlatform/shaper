@@ -26,7 +26,8 @@ bool GeomValidators_BodyShapes::isValid(const AttributePtr& theAttribute,
       return false;
     }
 
-    ResultConstructionPtr aResultConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    ResultConstructionPtr aResultConstruction =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
     if(aResultConstruction.get()) {
       theError = "Error: Result construction selected.";
       return false;

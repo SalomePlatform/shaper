@@ -53,7 +53,8 @@ class GeomAPI_Lin2d : public GeomAPI_Interface
   GEOMAPI_EXPORT 
   const std::shared_ptr<GeomAPI_Pnt2d> project(
       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint) const;
-  /// Computes the cross product of the line direction and a vector from the line start point to the point
+  /// Computes the cross product of the line direction and a vector 
+  /// from the line start point to the point
   GEOMAPI_EXPORT 
   bool isRight(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint) const;
 

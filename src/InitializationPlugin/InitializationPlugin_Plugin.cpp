@@ -97,7 +97,8 @@ FeaturePtr InitializationPlugin_Plugin::createPlane(DocumentPtr theDoc, double t
   } else if (theZ) {
     aPlane->data()->setName("XOY");
   }
-  aPlane->setInHistory(aPlane, false);  // don't show automatically created feature in the features history
+    // don't show automatically created feature in the features history
+  aPlane->setInHistory(aPlane, false);
 
   // the plane should be executed in order to build the feature result immediatelly
   // the results are to be hidden in the plugin
@@ -119,7 +120,8 @@ FeaturePtr InitializationPlugin_Plugin::createPoint(DocumentPtr theDoc, const st
   aPoint->real("y")->setValue(theY);
   aPoint->real("z")->setValue(theZ);
   aPoint->data()->setName(theName);
-  aPoint->setInHistory(aPoint, false);  // don't show automatically created feature in the features history
+  // don't show automatically created feature in the features history
+  aPoint->setInHistory(aPoint, false);
 
   // the point should be executed in order to build the feature result immediatelly
   // the results are to be hidden in the plugin
@@ -150,7 +152,8 @@ FeaturePtr InitializationPlugin_Plugin::createAxis(DocumentPtr theDoc, FeaturePt
   } else if (theZ != 0) {
     aAxis->data()->setName("OZ");
   }
-  aAxis->setInHistory(aAxis, false);  // don't show automatically created feature in the features history
+   // don't show automatically created feature in the features history
+  aAxis->setInHistory(aAxis, false); 
   aAxis->execute();
   aAxis->data()->execState(ModelAPI_StateDone);
   aAxis->firstResult()->data()->execState(ModelAPI_StateDone);

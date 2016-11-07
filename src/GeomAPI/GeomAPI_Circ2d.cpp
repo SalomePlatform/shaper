@@ -157,7 +157,8 @@ const bool GeomAPI_Circ2d::parameter(const std::shared_ptr<GeomAPI_Pnt2d> thePoi
                                    double& theParameter) const
 {
   Handle(Geom2d_Circle) aCurve = new Geom2d_Circle(*MY_CIRC2D);
-  return GeomLib_Tool::Parameter(aCurve, thePoint->impl<gp_Pnt2d>(), theTolerance, theParameter) == Standard_True;
+  return GeomLib_Tool::Parameter(aCurve, thePoint->impl<gp_Pnt2d>(),
+                                 theTolerance, theParameter) == Standard_True;
 }
 
 //=================================================================================================

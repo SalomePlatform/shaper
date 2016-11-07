@@ -56,7 +56,8 @@ void GeomAPI_Pln::coefficients(double& theA, double& theB, double& theC, double&
   impl<gp_Pln>().Coefficients(theA, theB, theC, theD);
 }
 
-bool GeomAPI_Pln::isCoincident(const std::shared_ptr<GeomAPI_Pln> thePlane, const double theTolerance)
+bool GeomAPI_Pln::isCoincident(const std::shared_ptr<GeomAPI_Pln> thePlane, 
+                               const double theTolerance)
 {
   if(!thePlane.get()) {
     return false;
@@ -64,7 +65,8 @@ bool GeomAPI_Pln::isCoincident(const std::shared_ptr<GeomAPI_Pln> thePlane, cons
 
   const gp_Pln& aMyPln = impl<gp_Pln>();
   const gp_Pln& anOtherPln = thePlane->impl<gp_Pln>();
-  return (aMyPln.Contains(anOtherPln.Location(), theTolerance) && aMyPln.Axis().IsParallel(anOtherPln.Axis(), theTolerance));
+  return (aMyPln.Contains(anOtherPln.Location(), theTolerance) && 
+    aMyPln.Axis().IsParallel(anOtherPln.Axis(), theTolerance));
 }
 
 bool GeomAPI_Pln::isParallel(const std::shared_ptr<GeomAPI_Lin> theLine)
@@ -79,7 +81,8 @@ bool GeomAPI_Pln::isParallel(const std::shared_ptr<GeomAPI_Lin> theLine)
   return Abs(aDot) < Precision::SquareConfusion();
 }
 
-std::shared_ptr<GeomAPI_Pnt> GeomAPI_Pln::intersect(const std::shared_ptr<GeomAPI_Lin>& theLine) const
+std::shared_ptr<GeomAPI_Pnt> 
+  GeomAPI_Pln::intersect(const std::shared_ptr<GeomAPI_Lin>& theLine) const
 {
   std::shared_ptr<GeomAPI_XYZ> aLineDir = theLine->direction()->xyz();
   std::shared_ptr<GeomAPI_XYZ> aLineLoc = theLine->location()->xyz();
@@ -92,10 +95,12 @@ std::shared_ptr<GeomAPI_Pnt> GeomAPI_Pln::intersect(const std::shared_ptr<GeomAP
     return std::shared_ptr<GeomAPI_Pnt>();
 
   double aParam = aNormal->dot(aLocation->decreased(aLineLoc)) / aDot;
-  return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aLineLoc->added(aLineDir->multiplied(aParam))));
+  return std::shared_ptr<GeomAPI_Pnt>(
+    new GeomAPI_Pnt(aLineLoc->added(aLineDir->multiplied(aParam))));
 }
 
-std::shared_ptr<GeomAPI_Pnt> GeomAPI_Pln::project(const std::shared_ptr<GeomAPI_Pnt>& thePoint) const
+std::shared_ptr<GeomAPI_Pnt> 
+  GeomAPI_Pln::project(const std::shared_ptr<GeomAPI_Pnt>& thePoint) const
 {
   std::shared_ptr<GeomAPI_XYZ> aNormal = direction()->xyz();
   std::shared_ptr<GeomAPI_XYZ> aLocation = location()->xyz();
@@ -123,7 +128,8 @@ void GeomAPI_Pln::translate(const std::shared_ptr<GeomAPI_Dir> theDir, double th
   implPtr<gp_Pln>()->Translate(aVec);
 }
 
-std::shared_ptr<GeomAPI_Lin> GeomAPI_Pln::intersect(const std::shared_ptr<GeomAPI_Pln> thePlane) const
+std::shared_ptr<GeomAPI_Lin>
+  GeomAPI_Pln::intersect(const std::shared_ptr<GeomAPI_Pln> thePlane) const
 {
   std::shared_ptr<GeomAPI_Lin> aRes;
 

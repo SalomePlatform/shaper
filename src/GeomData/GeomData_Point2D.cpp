@@ -114,7 +114,8 @@ std::string GeomData_Point2D::expressionError(int theComponent)
   return myExpression[theComponent]->error();
 }
 
-void GeomData_Point2D::setUsedParameters(int theComponent, const std::set<std::string>& theUsedParameters)
+void GeomData_Point2D::setUsedParameters(int theComponent, 
+                                         const std::set<std::string>& theUsedParameters)
 {
   assert(theComponent >= 0 && theComponent < NUM_COMPONENTS);
   myExpression[theComponent]->setUsedParameters(theUsedParameters);

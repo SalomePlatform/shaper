@@ -17,7 +17,8 @@ bool GeomValidators_MinObjectsSelected::isValid(const std::shared_ptr<ModelAPI_F
                                                 Events_InfoMessage& theError) const
 {
   if(theArguments.size() != 2) {
-    theError = "Error: Wrong number of arguments (expected 2): selection list id and min number of objects";
+    theError = 
+      "Error: Wrong number of arguments (expected 2): selection list id and min number of objects";
     return false;
   }
 
@@ -41,8 +42,9 @@ bool GeomValidators_MinObjectsSelected::isValid(const std::shared_ptr<ModelAPI_F
   return true;
 }
 
-//=================================================================================================
-bool GeomValidators_MinObjectsSelected::isNotObligatory(std::string theFeature, std::string theAttribute)
+//================================================================================================
+bool GeomValidators_MinObjectsSelected::isNotObligatory(std::string theFeature, 
+                                                        std::string theAttribute)
 {
   return false;
 }

@@ -28,7 +28,8 @@ public:
                                              const std::list<std::string>& theArguments,
                                              Events_InfoMessage& theError) const;
 
-  GEOMVALIDATORS_EXPORT virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
+  GEOMVALIDATORS_EXPORT virtual 
+    bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
 #endif

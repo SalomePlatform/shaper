@@ -69,7 +69,8 @@ bool GeomValidators_Different::isValid(const std::shared_ptr<ModelAPI_Feature>& 
   }
 
   // Search differences inside each attribute list
-  std::map<std::string, std::list<AttributePtr> >::const_iterator anAttributesMapIt = anAttributesMap.begin();
+  std::map<std::string, std::list<AttributePtr> >::const_iterator 
+    anAttributesMapIt = anAttributesMap.begin();
   for (; anAttributesMapIt != anAttributesMap.end(); ++anAttributesMapIt) {
     const std::list<AttributePtr>& anAttributes = anAttributesMapIt->second;
     // for the list of attributes check that all elements are unique
@@ -81,7 +82,8 @@ bool GeomValidators_Different::isValid(const std::shared_ptr<ModelAPI_Feature>& 
         std::list<AttributePtr>::const_iterator aFindIt =
             std::find_if(aNextIt, anAttributes.end(), IsEqual(*anAttributeIt));
         if (aFindIt != anAttributes.end()) {
-          theError = "Attributes " + (*anAttributeIt)->id() + " and " + (*aFindIt)->id() + " are equal." ;
+          theError = "Attributes " + (*anAttributeIt)->id() + " and " + 
+            (*aFindIt)->id() + " are equal." ;
           return false;
         }
         ++anAttributeIt;

@@ -59,7 +59,8 @@ class GeomDataAPI_Point2D : public ModelAPI_Attribute
   GEOMDATAAPI_EXPORT virtual bool expressionInvalid(int theComponent) = 0;
 
   /// Allows to set expression (text) error (by the parameters listener)
-  GEOMDATAAPI_EXPORT virtual void setExpressionError(int theComponent, const std::string& theError) = 0;
+  GEOMDATAAPI_EXPORT virtual 
+    void setExpressionError(int theComponent, const std::string& theError) = 0;
 
   /// Returns an expression error
   GEOMDATAAPI_EXPORT virtual std::string expressionError(int theComponent) = 0;

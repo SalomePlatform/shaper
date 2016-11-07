@@ -54,10 +54,12 @@ class GeomAPI_Lin : public GeomAPI_Interface
   const std::shared_ptr<GeomAPI_Pnt> project(
       const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
 
-  /// \return true if this line contains thePoint, that is, if the distance between thePoint and this line
+  /// \return true if this line contains thePoint, that is, 
+  /// if the distance between thePoint and this line
   ///         is less than or equal to theLinearTolerance.
   GEOMAPI_EXPORT
-  bool contains(const std::shared_ptr<GeomAPI_Pnt> thePoint, const double theLinearTolerance = 1.e-7) const;
+  bool contains(const std::shared_ptr<GeomAPI_Pnt> thePoint,
+                const double theLinearTolerance = 1.e-7) const;
 
   /// \return true if lines are parallel.
   GEOMAPI_EXPORT

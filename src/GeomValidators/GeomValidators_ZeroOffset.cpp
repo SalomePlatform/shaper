@@ -43,11 +43,13 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
   ListOfShape aFacesList;
   if(theFeature->selection(*anIt)) {
     AttributeSelectionPtr aFaceSelection = theFeature->selection(*anIt);
-    ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aFaceSelection->context());
+    ResultConstructionPtr aConstruction = 
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aFaceSelection->context());
     if(aConstruction.get()) {
       int aSketchFacesNum = aConstruction->facesNum();
       for(int aFaceIndex = 0; aFaceIndex < aSketchFacesNum; aFaceIndex++) {
-        std::shared_ptr<GeomAPI_Shape> aFace = std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
+        std::shared_ptr<GeomAPI_Shape> aFace = 
+          std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
         if(aFace->isFace() && aFace->isPlanar()) {
           aFacesList.push_back(aFace);
         }
@@ -68,7 +70,8 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
         if(!aContextShape.get()) {
           break;
         }
-        ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+        ResultConstructionPtr aConstruction = 
+          std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
         if(!aConstruction.get()) {
           break;
         }
@@ -175,7 +178,8 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
     }
     std::shared_ptr<GeomAPI_Pln> aPln = aFace->getPlane();
     if(aPln.get()) {
-      for(ListOfShape::const_iterator anIter = aFacesList.cbegin(); anIter != aFacesList.cend(); anIter++) {
+      for(ListOfShape::const_iterator 
+          anIter = aFacesList.cbegin(); anIter != aFacesList.cend(); anIter++) {
         std::shared_ptr<GeomAPI_Shape> aSketchShape = *anIter;
         std::shared_ptr<GeomAPI_Face> aSketchFace(new GeomAPI_Face(aSketchShape));
         std::shared_ptr<GeomAPI_Pln>  aSketchPln = aSketchFace->getPlane();

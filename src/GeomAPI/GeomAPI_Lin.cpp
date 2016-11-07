@@ -105,7 +105,8 @@ const std::shared_ptr<GeomAPI_Pnt> GeomAPI_Lin::project(
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aResult.X(), aResult.Y(), aResult.Z()));
 }
 
-bool GeomAPI_Lin::contains(const std::shared_ptr<GeomAPI_Pnt> thePoint, const double theLinearTolerance) const
+bool GeomAPI_Lin::contains(const std::shared_ptr<GeomAPI_Pnt> thePoint,
+                           const double theLinearTolerance) const
 {
   if(!thePoint.get()) {
     return false;
@@ -116,7 +117,8 @@ bool GeomAPI_Lin::contains(const std::shared_ptr<GeomAPI_Pnt> thePoint, const do
 
 bool GeomAPI_Lin::isParallel(const std::shared_ptr<GeomAPI_Lin> theLin) const
 {
-  return MY_LIN->Direction().IsParallel(theLin->impl<gp_Lin>().Direction(), Precision::Confusion()) == Standard_True;
+  return MY_LIN->Direction().IsParallel(theLin->impl<gp_Lin>().Direction(), 
+                                        Precision::Confusion()) == Standard_True;
 }
 
 bool GeomAPI_Lin::isCoplanar(const std::shared_ptr<GeomAPI_Lin> theLin) const

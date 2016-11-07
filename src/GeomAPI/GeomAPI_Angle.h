@@ -47,7 +47,8 @@ public:
   GEOMAPI_EXPORT double angleRadian();
 
   /// Returns \c true if the line is reversed during angle calculation.
-  /// If theIndex = 0, the result corresponds to the first line, if theIndex = 1, the to the second line
+  /// If theIndex = 0, the result corresponds to the first line,
+  /// if theIndex = 1, the to the second line
   GEOMAPI_EXPORT bool isReversed(int theIndex);
 };
 

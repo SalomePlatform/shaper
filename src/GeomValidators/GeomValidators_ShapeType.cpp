@@ -22,7 +22,8 @@
 typedef std::map<std::string, GeomValidators_ShapeType::TypeOfShape> EdgeTypes;
 
 static EdgeTypes MyShapeTypes;
-GeomValidators_ShapeType::TypeOfShape GeomValidators_ShapeType::shapeType(const std::string& theType)
+GeomValidators_ShapeType::TypeOfShape 
+  GeomValidators_ShapeType::shapeType(const std::string& theType)
 {
   if (MyShapeTypes.size() == 0) {
     MyShapeTypes["empty"]     = Empty;
@@ -51,8 +52,8 @@ std::string getShapeTypeDescription(const GeomValidators_ShapeType::TypeOfShape&
   std::string aValue = "";
 
   if (MyShapeTypes.size() != 0) {
-    std::map<std::string, GeomValidators_ShapeType::TypeOfShape>::const_iterator anIt = MyShapeTypes.begin(),
-                                                                                 aLast = MyShapeTypes.end();
+    std::map<std::string, GeomValidators_ShapeType::TypeOfShape>::const_iterator 
+      anIt = MyShapeTypes.begin(), aLast = MyShapeTypes.end();
     for (; anIt != aLast; anIt++) {
       if (anIt->second == theType)
         aValue = anIt->first;
@@ -90,7 +91,8 @@ bool GeomValidators_ShapeType::isValid(const AttributePtr& theAttribute,
       if (!aTypes.empty())
         aTypes += ", ";
     }
-    theError = "It does not contain element with acceptable shape type. The type should be one of the next: %1";
+    theError = "It does not contain element with acceptable shape type. \
+ The type should be one of the next: %1";
     theError.arg(aTypes);
   }
 
@@ -105,7 +107,8 @@ bool GeomValidators_ShapeType::isValidAttribute(const AttributePtr& theAttribute
 
   std::string anAttributeType = theAttribute->attributeType();
   if (anAttributeType == ModelAPI_AttributeSelection::typeId()) {
-    AttributeSelectionPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+    AttributeSelectionPtr anAttr = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
     GeomShapePtr aShape = anAttr->value();
     if (aShape.get())
       aValid = isValidShape(aShape, theShapeType, theError);
@@ -175,7 +178,8 @@ bool GeomValidators_ShapeType::isValidObject(const ObjectPtr& theObject,
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
     if( theShapeType==Plane )
     {
-      ResultConstructionPtr aResultConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theObject);
+      ResultConstructionPtr aResultConstruction = 
+        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theObject);
       FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
       const std::string& aKind = aFeature->getKind();
       return aResult.get() != NULL && aKind == "Plane";

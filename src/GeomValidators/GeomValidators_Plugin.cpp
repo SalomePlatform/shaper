@@ -29,18 +29,24 @@ GeomValidators_Plugin::GeomValidators_Plugin()
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
   aFactory->registerValidator("GeomValidators_BodyShapes", new GeomValidators_BodyShapes);
-  aFactory->registerValidator("GeomValidators_BooleanArguments", new GeomValidators_BooleanArguments);
-  aFactory->registerValidator("GeomValidators_ConstructionComposite", new GeomValidators_ConstructionComposite);
+  aFactory->registerValidator("GeomValidators_BooleanArguments",
+                              new GeomValidators_BooleanArguments);
+  aFactory->registerValidator("GeomValidators_ConstructionComposite",
+                              new GeomValidators_ConstructionComposite);
   aFactory->registerValidator("GeomValidators_Different", new GeomValidators_Different);
-  aFactory->registerValidator("GeomValidators_DifferentShapes", new GeomValidators_DifferentShapes);
+  aFactory->registerValidator("GeomValidators_DifferentShapes",
+                              new GeomValidators_DifferentShapes);
   aFactory->registerValidator("GeomValidators_Face", new GeomValidators_Face);
   aFactory->registerValidator("GeomValidators_Finite", new GeomValidators_Finite);
-  aFactory->registerValidator("GeomValidators_PartitionArguments", new GeomValidators_PartitionArguments);
+  aFactory->registerValidator("GeomValidators_PartitionArguments",
+                              new GeomValidators_PartitionArguments);
   aFactory->registerValidator("GeomValidators_ShapeType", new GeomValidators_ShapeType);
   aFactory->registerValidator("GeomValidators_ZeroOffset", new GeomValidators_ZeroOffset);
-  aFactory->registerValidator("GeomValidators_IntersectionSelection", new GeomValidators_IntersectionSelection);
+  aFactory->registerValidator("GeomValidators_IntersectionSelection", 
+                              new GeomValidators_IntersectionSelection);
   aFactory->registerValidator("GeomValidators_FeatureKind", new GeomValidators_FeatureKind);
-  aFactory->registerValidator("GeomValidators_MinObjectsSelected", new GeomValidators_MinObjectsSelected);
+  aFactory->registerValidator("GeomValidators_MinObjectsSelected", 
+                              new GeomValidators_MinObjectsSelected);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

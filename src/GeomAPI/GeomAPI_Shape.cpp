@@ -117,7 +117,8 @@ bool GeomAPI_Shape::isConnectedTopology() const
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
   if (aShape.IsNull() || aShape.ShapeType() != TopAbs_COMPOUND)
     return false;
-  NCollection_List<TopoDS_Shape> aNotConnected; // list of simple elements that are not detected in connection to others
+  // list of simple elements that are not detected in connection to others
+  NCollection_List<TopoDS_Shape> aNotConnected; 
   addSimpleToList(aShape, aNotConnected);
   if (aNotConnected.IsEmpty()) // an empty compound
     return false;
@@ -140,7 +141,8 @@ bool GeomAPI_Shape::isConnectedTopology() const
       bool aConnected =  false;
       NCollection_List<TopoDS_Shape>::Iterator aNewIter(aNewConnected);
       for(; !aConnected && aNewIter.More(); aNewIter.Next()) {
-        // checking topological connecion of aNotIter and aNewIter (if shapes are connected, vertices are connected for sure)
+        // checking topological connecion of aNotIter and aNewIter 
+        // (if shapes are connected, vertices are connected for sure)
         TopExp_Explorer anExp2(aNewIter.Value(), TopAbs_VERTEX);
         for(; !aConnected && anExp2.More(); anExp2.Next()) {
           NCollection_List<TopoDS_Shape>::Iterator aNotIter(aNotVertices);
@@ -207,7 +209,8 @@ bool GeomAPI_Shape::isPlanar() const
     Handle(Standard_Type) aType = aSurface->DynamicType();
 
     if(aType == STANDARD_TYPE(Geom_RectangularTrimmedSurface)) {
-      Handle(Geom_RectangularTrimmedSurface) aTrimSurface = Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurface);
+      Handle(Geom_RectangularTrimmedSurface) aTrimSurface =
+        Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurface);
       aType = aTrimSurface->BasisSurface()->DynamicType();
     }
     return (aType == STANDARD_TYPE(Geom_Plane)) == Standard_True;
