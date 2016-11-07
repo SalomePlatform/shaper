@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #ifndef GeomAlgoAPI_Exception_H_
 #define GeomAlgoAPI_Exception_H_
 

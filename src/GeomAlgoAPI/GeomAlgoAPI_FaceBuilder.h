@@ -43,13 +43,15 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_FaceBuilder
                                                   const double theWidth, const double theHeight);
 
   /// Creates a planar face by three vertices.
-  static std::shared_ptr<GeomAPI_Face> planarFaceByThreeVertices(const std::shared_ptr<GeomAPI_Vertex> theVertex1,
-                                                                 const std::shared_ptr<GeomAPI_Vertex> theVertex2,
-                                                                 const std::shared_ptr<GeomAPI_Vertex> theVertex3);
+  static std::shared_ptr<GeomAPI_Face> planarFaceByThreeVertices(
+                        const std::shared_ptr<GeomAPI_Vertex> theVertex1,
+                        const std::shared_ptr<GeomAPI_Vertex> theVertex2,
+                        const std::shared_ptr<GeomAPI_Vertex> theVertex3);
 
   /// Creates a planar face parallel to theFace and passing through theVertex.
-  static std::shared_ptr<GeomAPI_Face> planarFaceByFaceAndVertex(const std::shared_ptr<GeomAPI_Face> theFace,
-                                                                 const std::shared_ptr<GeomAPI_Vertex> theVertex);
+  static std::shared_ptr<GeomAPI_Face> planarFaceByFaceAndVertex(
+                        const std::shared_ptr<GeomAPI_Face> theFace,
+                        const std::shared_ptr<GeomAPI_Vertex> theVertex);
 };
 
 #endif

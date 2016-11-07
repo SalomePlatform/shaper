@@ -22,9 +22,10 @@
 #include <TopoDS_Face.hxx>
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::squareFace(const std::shared_ptr<GeomAPI_Pnt> theCenter,
-                                                                  const std::shared_ptr<GeomAPI_Dir> theNormal,
-                                                                  const double theSize)
+std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::squareFace(
+  const std::shared_ptr<GeomAPI_Pnt> theCenter,
+  const std::shared_ptr<GeomAPI_Dir> theNormal,
+  const double theSize)
 {
   const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
   const gp_Dir& aDir = theNormal->impl<gp_Dir>();
@@ -38,8 +39,9 @@ std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::squareFace(const std::sha
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::squareFace(const std::shared_ptr<GeomAPI_Pln> thePlane,
-                                                                  const double theSize)
+std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::squareFace(
+  const std::shared_ptr<GeomAPI_Pln> thePlane,
+  const double theSize)
 {
   // half of the size in each direction from the center
   BRepBuilderAPI_MakeFace aFaceBuilder(thePlane->impl<gp_Pln>(),
@@ -52,8 +54,9 @@ std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::squareFace(const std::sha
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::planarFace(const std::shared_ptr<GeomAPI_Pnt> theCenter,
-                                                                  const std::shared_ptr<GeomAPI_Dir> theNormal)
+std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::planarFace(
+  const std::shared_ptr<GeomAPI_Pnt> theCenter,
+  const std::shared_ptr<GeomAPI_Dir> theNormal)
 {
   const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
   const gp_Dir& aDir = theNormal->impl<gp_Dir>();
@@ -65,9 +68,10 @@ std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::planarFace(const std::sha
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::planarFace(const std::shared_ptr<GeomAPI_Pln> thePlane,
-                                                                  const double theX, const double theY,
-                                                                  const double theWidth, const double theHeight)
+std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::planarFace(
+  const std::shared_ptr<GeomAPI_Pln> thePlane,
+  const double theX, const double theY,
+  const double theWidth, const double theHeight)
 {
   double aA, aB, aC, aD;
   thePlane->coefficients(aA, aB, aC, aD);

@@ -41,7 +41,8 @@ void GeomAlgoAPI_MakeShapeList::init(const ListOfMakeShape& theMakeShapeList)
 }
 
 //=================================================================================================
-void GeomAlgoAPI_MakeShapeList::appendAlgo(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
+void GeomAlgoAPI_MakeShapeList::appendAlgo(
+  const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
 {
   myListOfMakeShape.push_back(theMakeShape);
   if(!myMap.get()) {
@@ -78,7 +79,8 @@ void GeomAlgoAPI_MakeShapeList::modified(const std::shared_ptr<GeomAPI_Shape> th
 
 bool GeomAlgoAPI_MakeShapeList::isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
-  for(ListOfMakeShape::iterator aBuilderIt = myListOfMakeShape.begin(); aBuilderIt != myListOfMakeShape.end(); aBuilderIt++) {
+  for(ListOfMakeShape::iterator aBuilderIt = myListOfMakeShape.begin(); 
+      aBuilderIt != myListOfMakeShape.end(); aBuilderIt++) {
     std::shared_ptr<GeomAlgoAPI_MakeShape> aMakeShape = *aBuilderIt;
     if(aMakeShape->isDeleted(theShape)) {
       return true;
@@ -103,16 +105,19 @@ void GeomAlgoAPI_MakeShapeList::result(const std::shared_ptr<GeomAPI_Shape> theS
   aResultShapesMap.Add(theShape->impl<TopoDS_Shape>());
   aResultShapesList.Append(theShape->impl<TopoDS_Shape>());
 
-  for(ListOfMakeShape::iterator aBuilderIt = myListOfMakeShape.begin(); aBuilderIt != myListOfMakeShape.end(); aBuilderIt++) {
+  for(ListOfMakeShape::iterator aBuilderIt = myListOfMakeShape.begin(); 
+      aBuilderIt != myListOfMakeShape.end(); aBuilderIt++) {
     std::shared_ptr<GeomAlgoAPI_MakeShape> aMakeShape = *aBuilderIt;
     NCollection_Map<TopoDS_Shape> aTempShapes;
     bool hasResults = false;
-    for(NCollection_Map<TopoDS_Shape>::Iterator aShapeIt(anAlgoShapes); aShapeIt.More(); aShapeIt.Next()) {
+    for(NCollection_Map<TopoDS_Shape>::Iterator
+        aShapeIt(anAlgoShapes); aShapeIt.More(); aShapeIt.Next()) {
       std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
       aShape->setImpl(new TopoDS_Shape(aShapeIt.Value()));
       ListOfShape aGeneratedShapes;
       aMakeShape->generated(aShape, aGeneratedShapes);
-      for(ListOfShape::const_iterator anIt = aGeneratedShapes.cbegin(); anIt != aGeneratedShapes.cend(); anIt++) {
+      for(ListOfShape::const_iterator
+          anIt = aGeneratedShapes.cbegin(); anIt != aGeneratedShapes.cend(); anIt++) {
         const TopoDS_Shape& anItShape = (*anIt)->impl<TopoDS_Shape>();
         aTempShapes.Add(anItShape);
         if(aResultShapesMap.Add(anItShape) == Standard_True) {
@@ -122,7 +127,8 @@ void GeomAlgoAPI_MakeShapeList::result(const std::shared_ptr<GeomAPI_Shape> theS
       }
       ListOfShape aModifiedShapes;
       aMakeShape->modified(aShape, aModifiedShapes);
-      for(ListOfShape::const_iterator anIt = aModifiedShapes.cbegin(); anIt != aModifiedShapes.cend(); anIt++) {
+      for(ListOfShape::const_iterator 
+          anIt = aModifiedShapes.cbegin(); anIt != aModifiedShapes.cend(); anIt++) {
         const TopoDS_Shape& anItShape = (*anIt)->impl<TopoDS_Shape>();
         aTempShapes.Add(anItShape);
         if(aResultShapesMap.Add(anItShape) == Standard_True) {
@@ -133,7 +139,8 @@ void GeomAlgoAPI_MakeShapeList::result(const std::shared_ptr<GeomAPI_Shape> theS
       if(hasResults) {
         const TopoDS_Shape& aTopoDSShape = aShapeIt.Value();
         if(aResultShapesMap.Remove(aTopoDSShape) == Standard_True) {
-          for(NCollection_List<TopoDS_Shape>::Iterator aResIt(aResultShapesList); aResIt.More(); aResIt.Next()) {
+          for(NCollection_List<TopoDS_Shape>::Iterator 
+              aResIt(aResultShapesList); aResIt.More(); aResIt.Next()) {
             if(aTopoDSShape.IsEqual(aResIt.Value())) {
               aResultShapesList.Remove(aResIt);
               break;
@@ -145,7 +152,8 @@ void GeomAlgoAPI_MakeShapeList::result(const std::shared_ptr<GeomAPI_Shape> theS
     anAlgoShapes.Unite(aTempShapes);
   }
 
-  for(NCollection_List<TopoDS_Shape>::Iterator aShapeIt(aResultShapesList); aShapeIt.More(); aShapeIt.Next()) {
+  for(NCollection_List<TopoDS_Shape>::Iterator 
+      aShapeIt(aResultShapesList); aShapeIt.More(); aShapeIt.Next()) {
     std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
     aShape->setImpl(new TopoDS_Shape(aShapeIt.Value()));
     theHistory.push_back(aShape);

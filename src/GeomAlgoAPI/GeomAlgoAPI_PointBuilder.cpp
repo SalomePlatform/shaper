@@ -26,7 +26,8 @@
 #include <TopoDS_Vertex.hxx>
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertex(const std::shared_ptr<GeomAPI_Pnt> thePoint)
+std::shared_ptr<GeomAPI_Vertex> 
+  GeomAlgoAPI_PointBuilder::vertex(const std::shared_ptr<GeomAPI_Pnt> thePoint)
 {
   const gp_Pnt& aPnt = thePoint->impl<gp_Pnt>();
   BRepBuilderAPI_MakeVertex aMaker(aPnt);
@@ -50,7 +51,8 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertex(const double th
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Pnt> GeomAlgoAPI_PointBuilder::point(const std::shared_ptr<GeomAPI_Shape> theVertex)
+std::shared_ptr<GeomAPI_Pnt> 
+  GeomAlgoAPI_PointBuilder::point(const std::shared_ptr<GeomAPI_Shape> theVertex)
 {
   TopoDS_Shape aShape = theVertex->impl<TopoDS_Shape>();
   if ((!aShape.IsNull()) && (aShape.ShapeType() == TopAbs_VERTEX)) {
@@ -63,10 +65,11 @@ std::shared_ptr<GeomAPI_Pnt> GeomAlgoAPI_PointBuilder::point(const std::shared_p
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexOnEdge(const std::shared_ptr<GeomAPI_Edge> theEdge,
-                                                                       const double theValue,
-                                                                       const bool theIsPercent,
-                                                                       const bool theIsReverse)
+std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexOnEdge(
+                                            const std::shared_ptr<GeomAPI_Edge> theEdge,
+                                            const double theValue,
+                                            const bool theIsPercent,
+                                            const bool theIsReverse)
 {
   std::shared_ptr<GeomAPI_Vertex> aVertex;
 

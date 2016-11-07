@@ -16,9 +16,10 @@
 
 namespace GeomAlgoAPI_ShapeAPI
 {
-  //=========================================================================================================
-  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeBox(const double theDx, const double theDy, 
-                                                                const double theDz) throw (GeomAlgoAPI_Exception)
+  //=======================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeBox(
+    const double theDx, const double theDy,
+    const double theDz) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Box aBoxAlgo(theDx,theDy,theDz);
     
@@ -37,9 +38,10 @@ namespace GeomAlgoAPI_ShapeAPI
     return aBoxAlgo.shape();
   }
   
-  //=========================================================================================================
-  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeBox(std::shared_ptr<GeomAPI_Pnt> theFirstPoint,
-                                                                std::shared_ptr<GeomAPI_Pnt> theSecondPoint) throw (GeomAlgoAPI_Exception)
+  //======================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeBox(
+    std::shared_ptr<GeomAPI_Pnt> theFirstPoint,
+    std::shared_ptr<GeomAPI_Pnt> theSecondPoint) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_BoxPoints aBoxAlgo(theFirstPoint, theSecondPoint);
     

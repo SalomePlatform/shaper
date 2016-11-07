@@ -14,14 +14,16 @@
 
 /// \class GeomAlgoAPI_PaveFiller
 /// \ingroup DataAlgo
-/// \brief Finds the common parts from the list of shapes and breaks it to shapes with shared subshapes.
+/// \brief Finds the common parts from the list of shapes and 
+///  breaks it to shapes with shared subshapes.
 class GeomAlgoAPI_PaveFiller : public GeomAlgoAPI_MakeShape
 {
 public:
   /// \brief Constructor.
   /// \param[in] theListOfShape list of shape which should be splitted.
   /// \param[in] theIsMakeCompSolids if true gather shapes with shared faces to compsolids.
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_PaveFiller(const ListOfShape& theListOfShape, const bool theIsMakeCompSolids = false);
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_PaveFiller(const ListOfShape& theListOfShape, 
+                                            const bool theIsMakeCompSolids = false);
 
 private:
   /// Builds resulting shape.

@@ -117,10 +117,12 @@ void GeomAlgoAPI_Placement::build(const std::shared_ptr<GeomAPI_Shape>& theSourc
       if (hasDirection[0] || hasDirection[1]) { // plane - line
         int anInd = hasDirection[0] ? 0 : 1;
         gp_Vec aVec = aSrcDstNormals[1 - anInd].Crossed(aSrcDstDirections[anInd]);
-        if (aVec.SquareMagnitude() < Precision::SquareConfusion()) { // normal and direction are collinear
+        if (aVec.SquareMagnitude() < Precision::SquareConfusion()) {
+          // normal and direction are collinear
           aVec = aSrcDstNormals[1 - anInd].Crossed(
             gp_Vec(aSrcDstPoints[1 - anInd], aSrcDstPoints[anInd]));
-          if (aVec.SquareMagnitude() < Precision::SquareConfusion()) { // normal and points direction are collinear
+          if (aVec.SquareMagnitude() < Precision::SquareConfusion()) {
+            // normal and points direction are collinear
             if (Abs(aSrcDstNormals[1 - anInd].Y()) >= Precision::Confusion() || 
               Abs(aSrcDstNormals[1 - anInd].Z()) >= Precision::Confusion())
               aVec = gp::DX();
@@ -196,7 +198,6 @@ void GeomAlgoAPI_Placement::build(const std::shared_ptr<GeomAPI_Shape>& theSourc
   if (theSimpleTransform) { // just add transformation
     TopLoc_Location aDelta(aTrsf);
     // store the accumulated information about the result and this delta
-    //myTrsf = std::shared_ptr<GeomAPI_Trsf>(new GeomAPI_Trsf(new gp_Trsf(aTrsf * aSourceShape.Location().Transformation())));
     myTrsf.reset(new GeomAPI_Trsf(new gp_Trsf(aTrsf)));
     TopoDS_Shape aResult = aSourceShape.Moved(aDelta);
     std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());

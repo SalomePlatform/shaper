@@ -147,7 +147,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(const std::shared_ptr<GeomAPI_Pnt>& 
                                             const std::shared_ptr<GeomAPI_Dir>& theDirX,
                                             const std::shared_ptr<GeomAPI_Dir>& theNorm,
                                             const std::shared_ptr<GeomAPI_Shape>& theWire,
-                                            std::list<std::shared_ptr<GeomAPI_Shape> >& theResultFaces)
+                                std::list<std::shared_ptr<GeomAPI_Shape> >& theResultFaces)
 {
   std::shared_ptr<GeomAPI_PlanarEdges> aWire = 
     std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(theWire);

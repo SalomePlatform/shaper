@@ -183,7 +183,8 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
                              const ListOfShape& theLocations,
                              const GeomShapePtr thePathShape)
 {
-  if(theBaseShapes.empty() || (!theLocations.empty() && theLocations.size() != theBaseShapes.size())) {
+  if(theBaseShapes.empty() || 
+     (!theLocations.empty() && theLocations.size() != theBaseShapes.size())) {
     return;
   }
 

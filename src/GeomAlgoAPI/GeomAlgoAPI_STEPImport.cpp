@@ -122,7 +122,6 @@ std::shared_ptr<GeomAPI_Shape> STEPImport(const std::string& theFileName,
         Standard_Integer nbs = aReader.NbShapes();
         if (!ok || nbs == 0)
         {
-          // THROW_SALOME_CORBA_EXCEPTION("Exception catched in GEOM_Gen_i::ImportStep", SALOME::BAD_PARAM);
           continue; // skip empty root
         }
         /* For a single entity */
@@ -149,7 +148,6 @@ std::shared_ptr<GeomAPI_Shape> STEPImport(const std::string& theFileName,
         for (Standard_Integer i = 1; i <= nbs; i++) {
           TopoDS_Shape aShape = aReader.Shape(i);
           if (aShape.IsNull()) {
-            // THROW_SALOME_CORBA_EXCEPTION("Null shape in GEOM_Gen_i::ImportStep", SALOME::BAD_PARAM) ;
             //return aResShape;
             continue;
           }

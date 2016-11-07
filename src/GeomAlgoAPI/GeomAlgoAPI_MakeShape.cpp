@@ -240,7 +240,8 @@ bool GeomAlgoAPI_MakeShape::checkValid(std::string theMessage){
   }
   
   if (aNbVolumes != 1) {
-    myError = theMessage + " :: connexity error, the resulting shape is made of several separate solids."; 
+    myError = theMessage +
+      " :: connexity error, the resulting shape is made of several separate solids.";
     return false;
   }
   

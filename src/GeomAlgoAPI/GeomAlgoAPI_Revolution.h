@@ -39,9 +39,11 @@ public:
   /// \brief Creates revolution for the given shape.
   /// \param[in] theBaseShape face for revolution.
   /// \param[in] theAxis axis for revolution.
-  /// \param[in] theToShape to bounding shape. Can be empty. In this case offset will be applied to the basis.
+  /// \param[in] theToShape to bounding shape. Can be empty. 
+  ///                       In this case offset will be applied to the basis.
   /// \param[in] theToAngle to angle.
-  /// \param[in] theFromShape from bounding shape. Can be empty. In this case offset will be applied to the basis.
+  /// \param[in] theFromShape from bounding shape. Can be empty. 
+  ///                       In this case offset will be applied to the basis.
   /// \param[in] theFromAngle from angle.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Revolution(const GeomShapePtr                 theBaseShape,
                                             const std::shared_ptr<GeomAPI_Ax1> theAxis,

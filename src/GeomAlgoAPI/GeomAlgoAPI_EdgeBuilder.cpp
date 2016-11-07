@@ -36,7 +36,7 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
   aRes->setImpl(new TopoDS_Shape(anEdge));
   return aRes;
 }
-std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(                                                            
+std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
     double theDX, double theDY, double theDZ)
 {
   

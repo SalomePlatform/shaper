@@ -65,7 +65,8 @@ void GeomAlgoAPI_ShapeBuilder::removeInternal(const std::shared_ptr<GeomAPI_Shap
   GeomAPI_Shape::ShapeType aBaseShapeType = theShape->shapeType();
   if(aBaseShapeType == GeomAPI_Shape::WIRE) {
     aResultShape = theShape->emptyCopied();
-    std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMakeShapeCustom(new GeomAlgoAPI_MakeShapeCustom());
+    std::shared_ptr<GeomAlgoAPI_MakeShapeCustom>
+      aMakeShapeCustom(new GeomAlgoAPI_MakeShapeCustom());
     for(GeomAPI_ShapeIterator anIter(theShape); anIter.more(); anIter.next()) {
       GeomShapePtr aSubShape = anIter.current();
       GeomShapePtr aSubShapeCopy = aSubShape->emptyCopied();
@@ -82,7 +83,8 @@ void GeomAlgoAPI_ShapeBuilder::removeInternal(const std::shared_ptr<GeomAPI_Shap
   } else if(aBaseShapeType == GeomAPI_Shape::FACE) {
     const TopoDS_Shape& aBaseShape = theShape->impl<TopoDS_Shape>();
     BRepBuilderAPI_Copy* aCopyBuilder = new BRepBuilderAPI_Copy(aBaseShape);
-    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aCopyBuilder)));
+    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(
+      new GeomAlgoAPI_MakeShape(aCopyBuilder)));
     if(!aCopyBuilder->IsDone()) {
       return;
     }
@@ -126,7 +128,8 @@ void GeomAlgoAPI_ShapeBuilder::addInternal(const std::shared_ptr<GeomAPI_Shape> 
   // Copy sub-shapes from list to new shape.
   BRep_Builder aBuilder;
   std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMakeShapeCustom(new GeomAlgoAPI_MakeShapeCustom());
-  for(ListOfShape::const_iterator anIt = theShapesToAdd.cbegin(); anIt != theShapesToAdd.cend(); ++anIt) {
+  for(ListOfShape::const_iterator 
+      anIt = theShapesToAdd.cbegin(); anIt != theShapesToAdd.cend(); ++anIt) {
     TopoDS_Shape aShapeToAdd = (*anIt)->impl<TopoDS_Shape>();
     TopoDS_Shape aModShapeToAdd = aShapeToAdd;
     aModShapeToAdd.Orientation(TopAbs_INTERNAL);
@@ -157,7 +160,8 @@ void GeomAlgoAPI_ShapeBuilder::addInternal(const std::shared_ptr<GeomAPI_Shape> 
     if(aBaseShapeType == TopAbs_WIRE) {
       if(aShapeToAddType == TopAbs_VERTEX) {
         // Find on which edge vertex is lie and add to this edge.
-        for(TopExp_Explorer aResultExp(aResultShape, TopAbs_EDGE); aResultExp.More(); aResultExp.Next()) {
+        for(TopExp_Explorer 
+            aResultExp(aResultShape, TopAbs_EDGE); aResultExp.More(); aResultExp.Next()) {
           TopoDS_Shape anEdge = aResultExp.Current();
           BRepExtrema_DistShapeShape aDist(anEdge, aShapeToAdd);
           aDist.Perform();

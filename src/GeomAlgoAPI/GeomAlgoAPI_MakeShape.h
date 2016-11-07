@@ -37,7 +37,8 @@ public:
   /// \brief Constructor by builder and builder type.
   /// \param[in] theBuilder pointer to the builder.
   /// \param[in] theBuilderType builder type.
-  template<class T> explicit GeomAlgoAPI_MakeShape(T* theBuilder, const BuilderType theBuilderType = OCCT_BRepBuilderAPI_MakeShape)
+  template<class T> explicit GeomAlgoAPI_MakeShape(T* theBuilder, 
+    const BuilderType theBuilderType = OCCT_BRepBuilderAPI_MakeShape)
   : GeomAPI_Interface(theBuilder),
     myBuilderType(theBuilderType)
   {
@@ -47,7 +48,8 @@ public:
   /// \brief Initializes internals.
   /// \param[in] theBuilder pointer to the builder.
   /// \param[in] theBuilderType builder type.
-  template<class T> void initialize(T* theBuilder, const BuilderType theBuilderType = OCCT_BRepBuilderAPI_MakeShape)
+  template<class T> void initialize(T* theBuilder, 
+    const BuilderType theBuilderType = OCCT_BRepBuilderAPI_MakeShape)
   {
     setImpl(theBuilder);
     myBuilderType = theBuilderType;
@@ -89,7 +91,8 @@ public:
   GEOMALGOAPI_EXPORT virtual bool check() { return true; };
 
   ///  \return the list of created faces.
-  GEOMALGOAPI_EXPORT std::map< std::string, std::shared_ptr<GeomAPI_Shape> > getCreatedFaces() {return myCreatedFaces;}
+  GEOMALGOAPI_EXPORT std::map< std::string, std::shared_ptr<GeomAPI_Shape> > getCreatedFaces()
+  {return myCreatedFaces;}
 
   /// \return the error.
   GEOMALGOAPI_EXPORT std::string getError() { return myError; }
@@ -114,9 +117,12 @@ protected:
   void setShape(const std::shared_ptr<GeomAPI_Shape> theShape);
 
 protected:
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap; ///< Data map to keep correct orientation of sub-shapes.
-  std::string myError; /// Error occurred during the execution of an algorithm.
-  std::map< std::string, std::shared_ptr<GeomAPI_Shape> > myCreatedFaces; /// Map of created faces with their name for naming.
+   /// Data map to keep correct orientation of sub-shapes.
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> myMap;
+  /// Error occurred during the execution of an algorithm.
+  std::string myError;
+  /// Map of created faces with their name for naming.
+  std::map< std::string, std::shared_ptr<GeomAPI_Shape> > myCreatedFaces; 
   
 private:
   /// \brief Initializes internals.

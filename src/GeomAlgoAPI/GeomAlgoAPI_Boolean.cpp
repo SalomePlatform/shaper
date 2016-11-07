@@ -32,14 +32,16 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
 
   // Getting objects.
   TopTools_ListOfShape anObjects;
-  for(ListOfShape::const_iterator anObjectsIt = theObjects.begin(); anObjectsIt != theObjects.end(); anObjectsIt++)
+  for(ListOfShape::const_iterator 
+    anObjectsIt = theObjects.begin(); anObjectsIt != theObjects.end(); anObjectsIt++)
   {
     anObjects.Append((*anObjectsIt)->impl<TopoDS_Shape>());
   }
 
   // Getting tools.
   TopTools_ListOfShape aTools;
-  for(ListOfShape::const_iterator aToolsIt = theTools.begin(); aToolsIt != theTools.end(); aToolsIt++)
+  for(ListOfShape::const_iterator 
+    aToolsIt = theTools.begin(); aToolsIt != theTools.end(); aToolsIt++)
   {
     aTools.Append((*aToolsIt)->impl<TopoDS_Shape>());
   }

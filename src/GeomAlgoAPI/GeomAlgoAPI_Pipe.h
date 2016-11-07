@@ -15,7 +15,8 @@
 
 /// \class GeomAlgoAPI_Pipe
 /// \ingroup DataAlgo
-/// \brief Allows to create extrusion of objects along a path. It produces the following results from objects:\n
+/// \brief Allows to create extrusion of objects along a path. 
+/// It produces the following results from objects:\n
 /// Vertex -> Edge\n
 /// Edge -> Face\n
 /// Wire -> Shell\n

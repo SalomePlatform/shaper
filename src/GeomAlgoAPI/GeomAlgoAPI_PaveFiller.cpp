@@ -15,18 +15,21 @@
 #include <TopoDS_Iterator.hxx>
 
 //=================================================================================================
-GeomAlgoAPI_PaveFiller::GeomAlgoAPI_PaveFiller(const ListOfShape& theListOfShape, const bool theIsMakeCompSolids)
+GeomAlgoAPI_PaveFiller::GeomAlgoAPI_PaveFiller(const ListOfShape& theListOfShape, 
+                                               const bool theIsMakeCompSolids)
 {
   build(theListOfShape, theIsMakeCompSolids);
 }
 
 
 //=================================================================================================
-void GeomAlgoAPI_PaveFiller::build(const ListOfShape& theListOfShape, const bool theIsMakeCompSolids)
+void GeomAlgoAPI_PaveFiller::build(const ListOfShape& theListOfShape,
+                                   const bool theIsMakeCompSolids)
 {
   BOPAlgo_PaveFiller aPaveFiller;
   BOPCol_ListOfShape aListOfShape;
-  for(ListOfShape::const_iterator anIt = theListOfShape.cbegin(); anIt != theListOfShape.cend(); anIt++) {
+  for(ListOfShape::const_iterator 
+    anIt = theListOfShape.cbegin(); anIt != theListOfShape.cend(); anIt++) {
     const TopoDS_Shape& aShape = (*anIt)->impl<TopoDS_Shape>();
     if(aShape.ShapeType() == TopAbs_COMPOUND) {
       for(TopoDS_Iterator anIter(aShape); anIter.More(); anIter.Next()) {

@@ -57,7 +57,8 @@ GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
                                      const double       theToSize,
                                      const double       theFromSize)
 {
-  build(theBaseShape, std::shared_ptr<GeomAPI_Dir>(), GeomShapePtr(), theToSize, GeomShapePtr(), theFromSize);
+  build(theBaseShape, std::shared_ptr<GeomAPI_Dir>(), GeomShapePtr(),
+    theToSize, GeomShapePtr(), theFromSize);
 }
 
 //==================================================================================================
@@ -76,7 +77,8 @@ GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
                                      const GeomShapePtr theFromShape,
                                      const double       theFromSize)
 {
-  build(theBaseShape, std::shared_ptr<GeomAPI_Dir>(), theToShape, theToSize, theFromShape, theFromSize);
+  build(theBaseShape, std::shared_ptr<GeomAPI_Dir>(), theToShape, 
+        theToSize, theFromShape, theFromSize);
 }
 
 //==================================================================================================
@@ -99,7 +101,8 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
                               const double                       theFromSize)
 {
   if(!theBaseShape.get() ||
-    (((!theFromShape.get() && !theToShape.get()) || (theFromShape.get() && theToShape.get() && theFromShape->isEqual(theToShape)))
+    (((!theFromShape.get() && !theToShape.get()) || 
+    (theFromShape.get() && theToShape.get() && theFromShape->isEqual(theToShape)))
     && (theFromSize == -theToSize))) {
     return;
   }
@@ -187,22 +190,26 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     // Moving base shape.
     gp_Trsf aTrsf;
     aTrsf.SetTranslation(aDirVec * -theFromSize);
-    BRepBuilderAPI_Transform* aTransformBuilder = new BRepBuilderAPI_Transform(aBaseShape, aTrsf);
+    BRepBuilderAPI_Transform* aTransformBuilder = 
+      new BRepBuilderAPI_Transform(aBaseShape, aTrsf);
     if(!aTransformBuilder) {
       return;
     }
-    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aTransformBuilder)));
+    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(
+      new GeomAlgoAPI_MakeShape(aTransformBuilder)));
     if(!aTransformBuilder->IsDone()) {
       return;
     }
     TopoDS_Shape aMovedBase = aTransformBuilder->Shape();
 
     // Making prism.
-    BRepPrimAPI_MakePrism* aPrismBuilder = new BRepPrimAPI_MakePrism(aMovedBase, aDirVec * (theFromSize + theToSize));
+    BRepPrimAPI_MakePrism* aPrismBuilder = 
+      new BRepPrimAPI_MakePrism(aMovedBase, aDirVec * (theFromSize + theToSize));
     if(!aPrismBuilder) {
       return;
     }
-    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aPrismBuilder)));
+    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(
+      new GeomAlgoAPI_MakeShape(aPrismBuilder)));
     if(!aPrismBuilder->IsDone()) {
       return;
     }
@@ -230,12 +237,14 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
 
     bool aSign = aFromLoc->xyz()->dot(aBaseDir->xyz()) > aToLoc->xyz()->dot(aBaseDir->xyz());
 
-    std::shared_ptr<GeomAPI_Pnt> aFromPnt(new GeomAPI_Pnt(aFromLoc->xyz()->added(aBaseDir->xyz()->multiplied(
-                                                          aSign ? theFromSize : -theFromSize))));
+    std::shared_ptr<GeomAPI_Pnt> aFromPnt(
+      new GeomAPI_Pnt(aFromLoc->xyz()->added(aBaseDir->xyz()->multiplied(
+                      aSign ? theFromSize : -theFromSize))));
     aBoundingFromShape = GeomAlgoAPI_FaceBuilder::planarFace(aFromPnt, aFromDir);
 
-    std::shared_ptr<GeomAPI_Pnt> aToPnt(new GeomAPI_Pnt(aToLoc->xyz()->added(aBaseDir->xyz()->multiplied(
-                                                        aSign ? -theToSize : theToSize))));
+    std::shared_ptr<GeomAPI_Pnt> aToPnt(
+      new GeomAPI_Pnt(aToLoc->xyz()->added(aBaseDir->xyz()->multiplied(
+                      aSign ? -theToSize : theToSize))));
     aBoundingToShape = GeomAlgoAPI_FaceBuilder::planarFace(aToPnt, aToDir);
 
     // Getting bounding box for base shape.
@@ -286,18 +295,21 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     if(!aTransformBuilder) {
       return;
     }
-    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aTransformBuilder)));
+    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(
+      new GeomAlgoAPI_MakeShape(aTransformBuilder)));
     if(!aTransformBuilder->IsDone()) {
       return;
     }
     TopoDS_Shape aMovedBase = aTransformBuilder->Shape();
 
     // Making prism.
-    BRepPrimAPI_MakePrism* aPrismBuilder = new BRepPrimAPI_MakePrism(aMovedBase, aDirVec * 2 * aPrismLength);
+    BRepPrimAPI_MakePrism* aPrismBuilder = 
+      new BRepPrimAPI_MakePrism(aMovedBase, aDirVec * 2 * aPrismLength);
     if(!aPrismBuilder) {
       return;
     }
-    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aPrismBuilder)));
+    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(
+      new GeomAlgoAPI_MakeShape(aPrismBuilder)));
     if(!aPrismBuilder->IsDone()) {
       return;
     }
@@ -358,7 +370,8 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     if(!aToCutBuilder->IsDone()) {
       return;
     }
-    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aToCutBuilder)));
+    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(
+      new GeomAlgoAPI_MakeShape(aToCutBuilder)));
     aResult = aToCutBuilder->Shape();
     if(aResult.ShapeType() == TopAbs_COMPOUND) {
       aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
@@ -378,7 +391,8 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     if(!aFromCutBuilder->IsDone()) {
       return;
     }
-    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(new GeomAlgoAPI_MakeShape(aFromCutBuilder)));
+    this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(
+      new GeomAlgoAPI_MakeShape(aFromCutBuilder)));
     aResult = aFromCutBuilder->Shape();
     TopoDS_Iterator aCheckIt(aResult);
     if(!aCheckIt.More()) {
@@ -457,11 +471,13 @@ void storeGenerationHistory(GeomAlgoAPI_Prism* thePrismAlgo,
     if(theType == TopAbs_VERTEX) {
       gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
       IntTools_Context anIntTools;
-      if(anIntTools.IsValidPointForFace(aPnt, theToFace, Precision::Confusion()) == Standard_True) {
+      if(anIntTools.IsValidPointForFace(aPnt, 
+          theToFace, Precision::Confusion()) == Standard_True) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
         thePrismAlgo->addToShape(aGeomSh);
       }
-      if(anIntTools.IsValidPointForFace(aPnt, theFromFace, Precision::Confusion()) == Standard_True) {
+      if(anIntTools.IsValidPointForFace(aPnt, 
+          theFromFace, Precision::Confusion()) == Standard_True) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
         thePrismAlgo->addFromShape(aGeomSh);
       }

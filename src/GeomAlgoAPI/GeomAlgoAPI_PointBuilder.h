@@ -33,7 +33,8 @@ public:
   /// \brief Creates vertex by edge and distance on it.
   /// \param[in] theEdge edge.
   /// \param[in] theValue distance value.
-  /// \param[in] theIsPercent if true theValue will be treated as a percentage of theEdge total length.
+  /// \param[in] theIsPercent if true theValue will be treated 
+  ///                         as a percentage of theEdge total length.
   /// \param[in] theIsReverse if true the distance will be measured from the edge end point.
   /// \return created vertex.
   static std::shared_ptr<GeomAPI_Vertex> vertexOnEdge(const std::shared_ptr<GeomAPI_Edge> theEdge,
@@ -45,22 +46,25 @@ public:
   /// \param[in] theVertex vertex to project.
   /// \param[in] thePlane face for projection. Should be planar.
   /// \return created vertex.
-  static std::shared_ptr<GeomAPI_Vertex> vertexByProjection(const std::shared_ptr<GeomAPI_Vertex> theVertex,
-                                                            const std::shared_ptr<GeomAPI_Face> thePlane);
+  static std::shared_ptr<GeomAPI_Vertex>
+    vertexByProjection(const std::shared_ptr<GeomAPI_Vertex> theVertex,
+                       const std::shared_ptr<GeomAPI_Face> thePlane);
 
   /// \brief Creates vertex by intersection two coplanar lines.
   /// \param[in] theEdge1 first linear edge.
   /// \param[in] theEdge2 second linear edge.
   /// \return created vertex.
-  static std::shared_ptr<GeomAPI_Vertex> vertexByIntersection(const std::shared_ptr<GeomAPI_Edge> theEdge1,
-                                                              const std::shared_ptr<GeomAPI_Edge> theEdge2);
+  static std::shared_ptr<GeomAPI_Vertex>
+    vertexByIntersection(const std::shared_ptr<GeomAPI_Edge> theEdge1,
+                         const std::shared_ptr<GeomAPI_Edge> theEdge2);
 
   /// \brief Creates vertex by intersection line and plane.
   /// \param[in] theEdge linear edge.
   /// \param[in] theFace planar face.
   /// \return created vertex.
-  static std::shared_ptr<GeomAPI_Vertex> vertexByIntersection(const std::shared_ptr<GeomAPI_Edge> theEdge,
-                                                              const std::shared_ptr<GeomAPI_Face> theFace);
+  static std::shared_ptr<GeomAPI_Vertex> 
+    vertexByIntersection(const std::shared_ptr<GeomAPI_Edge> theEdge,
+                         const std::shared_ptr<GeomAPI_Face> theFace);
 
   /// Return point by shape vertex
   static std::shared_ptr<GeomAPI_Pnt> point(const std::shared_ptr<GeomAPI_Shape> theVertex);
