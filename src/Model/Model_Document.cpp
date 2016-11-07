@@ -47,6 +47,8 @@
 
 #include <OSD_File.hxx>
 #include <OSD_Path.hxx>
+#include <CDF_Session.hxx>
+#include <CDF_Directory.hxx>
 
 #include <climits>
 #ifndef WIN32
@@ -72,6 +74,9 @@ Model_Document::Model_Document(const int theID, const std::string theKind)
     : myID(theID), myKind(theKind), myIsActive(false),
       myDoc(new TDocStd_Document("BinOcaf"))  // binary OCAF format
 {
+#ifdef OCAFBROWSER
+  CDF_Session::CurrentSession()->Directory()->Add(myDoc);
+#endif
   myObjs = new Model_Objects(myDoc->Main());
   myDoc->SetUndoLimit(UNDO_LIMIT);  
   myTransactionSave = 0;
