@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : ModelHighAPI_Selection.h
 // Purpose: 
 //
@@ -19,7 +20,8 @@ class ModelAPI_AttributeSelection;
 class ModelAPI_AttributeSelectionList;
 class ModelAPI_Result;
 //--------------------------------------------------------------------------------------
-typedef std::pair<std::shared_ptr<ModelAPI_Result>, std::shared_ptr<GeomAPI_Shape> > ResultSubShapePair;
+typedef std::pair<std::shared_ptr<ModelAPI_Result>, std::shared_ptr<GeomAPI_Shape> > 
+  ResultSubShapePair;
 typedef std::pair<std::string, std::string> TypeSubShapeNamePair;
 //--------------------------------------------------------------------------------------
 /**\class ModelHighAPI_Selection
@@ -43,7 +45,8 @@ public:
   /// Constructor for result and sub-shape
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Selection(const std::shared_ptr<ModelAPI_Result>& theContext,
-                         const std::shared_ptr<GeomAPI_Shape>& theSubShape = std::shared_ptr<GeomAPI_Shape>());
+                         const std::shared_ptr<GeomAPI_Shape>& theSubShape = 
+                         std::shared_ptr<GeomAPI_Shape>());
   /// Constructor for sub-shape by the textual Name
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Selection(const std::string& theType,
@@ -53,12 +56,12 @@ public:
   virtual ~ModelHighAPI_Selection();
 
   /// Fill attribute values
-  MODELHIGHAPI_EXPORT
-  virtual void fillAttribute(const std::shared_ptr<ModelAPI_AttributeSelection> & theAttribute) const;
+  MODELHIGHAPI_EXPORT virtual 
+    void fillAttribute(const std::shared_ptr<ModelAPI_AttributeSelection> & theAttribute) const;
 
   /// Append to list attribute
-  MODELHIGHAPI_EXPORT
-  virtual void appendToList(const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute) const;
+  MODELHIGHAPI_EXPORT virtual 
+    void appendToList(const std::shared_ptr<ModelAPI_AttributeSelectionList> & theAttribute) const;
 
   /// \return variant type.
   MODELHIGHAPI_EXPORT

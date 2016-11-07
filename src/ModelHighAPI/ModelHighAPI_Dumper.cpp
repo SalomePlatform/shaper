@@ -236,7 +236,8 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
   return isOk;
 }
 
-bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite, bool isForce)
+bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite, 
+                                  bool isForce)
 {
   // increase composite features stack
   ++gCompositeStackDepth;
@@ -279,8 +280,9 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
   return isOk;
 }
 
-bool ModelHighAPI_Dumper::processSubs(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite,
-                                      bool theDumpModelDo)
+bool ModelHighAPI_Dumper::processSubs(
+  const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite,
+  bool theDumpModelDo)
 {
   bool isOk = true;
   // dump all sub-features;
@@ -424,7 +426,8 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
     }
     // set result deflection
     if (!isDefaultDeflection(*aResIt)) {
-      AttributeDoublePtr aDeflectionAttr = (*aResIt)->data()->real(ModelAPI_Result::DEFLECTION_ID());
+      AttributeDoublePtr aDeflectionAttr = 
+        (*aResIt)->data()->real(ModelAPI_Result::DEFLECTION_ID());
       if(aDeflectionAttr.get() && aDeflectionAttr->isInitialized()) {
         *this << *aResIt;
         myDumpBuffer << ".setDeflection(" << aDeflectionAttr->value() << ")" << std::endl;
@@ -643,7 +646,8 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const ResultPtr& theResult)
   FeaturePtr aFeature = ModelAPI_Feature::feature(theResult);
   int anIndex = 0;
   std::list<ResultPtr> aResults = aFeature->results();
-  for(std::list<ResultPtr>::const_iterator anIt = aResults.cbegin(); anIt != aResults.cend(); ++anIt, ++anIndex) {
+  for(std::list<ResultPtr>::const_iterator 
+      anIt = aResults.cbegin(); anIt != aResults.cend(); ++anIt, ++anIndex) {
     if(theResult->isSame(*anIt)) {
       break;
     }
@@ -784,7 +788,8 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     return *this;
   }
 
-  myDumpBuffer << "\"" << aShape->shapeTypeStr() << "\", \"" << theAttrSelect->namingName() << "\")";
+  myDumpBuffer << "\"" << aShape->shapeTypeStr() << "\", \"" << 
+    theAttrSelect->namingName() << "\")";
   return *this;
 }
 
@@ -814,7 +819,8 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     } else {
       isAdded = true;
     }
-    myDumpBuffer << "model.selection(\"" << aShape->shapeTypeStr() << "\", \"" << anAttribute->namingName() << "\")";
+    myDumpBuffer << "model.selection(\"" << 
+      aShape->shapeTypeStr() << "\", \"" << anAttribute->namingName() << "\")";
   }
 
   myDumpBuffer << "]";

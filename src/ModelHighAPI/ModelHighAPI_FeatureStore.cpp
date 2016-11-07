@@ -79,7 +79,8 @@ std::string ModelHighAPI_FeatureStore::compare(FeaturePtr theFeature) {
 void ModelHighAPI_FeatureStore::storeData(std::shared_ptr<ModelAPI_Data> theData, 
   std::map<std::string, std::string>& theAttrs)
 {
-  theAttrs["__name__"] = theData->name(); // store name to keep also this information and output if needed
+  // store name to keep also this information and output if needed
+  theAttrs["__name__"] = theData->name(); 
   std::list<std::shared_ptr<ModelAPI_Attribute> > allAttrs = theData->attributes("");
   std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = allAttrs.begin();
   for(; anAttr != allAttrs.end(); anAttr++) {
@@ -117,7 +118,8 @@ std::string ModelHighAPI_FeatureStore::compareData(std::shared_ptr<ModelAPI_Data
   return "";
 }
 
-static void dumpArray(std::ostringstream& theOutput, const double theArray[], int theSize, int thePrecision = PRECISION)
+static void dumpArray(std::ostringstream& theOutput, const double theArray[], 
+                      int theSize, int thePrecision = PRECISION)
 {
   for (int i = 0; i < theSize; ++i) {
     if (i > 0)
@@ -302,7 +304,8 @@ std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>&
   }
   // output the main characteristics
   if (GeomAlgoAPI_ShapeTools::volume(theShape) > 1.e-7) {
-    aResult<<"Volume: "<<std::fixed<<setprecision(3)<<GeomAlgoAPI_ShapeTools::volume(theShape)<<std::endl;
+    aResult<<"Volume: "<<
+      std::fixed<<setprecision(3)<<GeomAlgoAPI_ShapeTools::volume(theShape)<<std::endl;
   }
   std::shared_ptr<GeomAPI_Pnt> aCenter = GeomAlgoAPI_ShapeTools::centreOfMass(theShape);
   aResult<<"Center of mass: ";

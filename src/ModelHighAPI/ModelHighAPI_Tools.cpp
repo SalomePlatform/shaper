@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : ModelHighAPI_Tools.cpp
 // Purpose: 
 //
@@ -204,7 +205,8 @@ GeomAPI_Shape::ShapeType shapeTypeByStr(std::string theShapeTypeStr)
 {
   GeomAPI_Shape::ShapeType aShapeType = GeomAPI_Shape::SHAPE;
 
-  std::transform(theShapeTypeStr.begin(), theShapeTypeStr.end(), theShapeTypeStr.begin(), ::tolower);
+  std::transform(theShapeTypeStr.begin(), theShapeTypeStr.end(), 
+                 theShapeTypeStr.begin(), ::tolower);
 
   if(theShapeTypeStr == "compound") {
     aShapeType = GeomAPI_Shape::COMPOUND;
@@ -297,7 +299,8 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
     ModelAPI_Tools::allResults(aFeat, allResults);
     std::list<ResultPtr>::iterator aRes = allResults.begin();
     for(; aRes != allResults.end(); aRes++) {
-      if ((*aRes)->groupName() == ModelAPI_ResultPart::group()) { // recoursively store features of sub-documents
+      // recoursively store features of sub-documents
+      if ((*aRes)->groupName() == ModelAPI_ResultPart::group()) { 
         DocumentPtr aDoc = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRes)->partDoc();
         if (aDoc.get()) {
           std::string anError = storeFeatures((*aRes)->data()->name(), aDoc, theStore, theCompare);

@@ -82,7 +82,8 @@ MODULEBASE_EXPORT QPixmap composite(const QString& theAdditionalIcon, const QStr
 /// Generates the pixmap lighter than the resources pixmap. 
 /// Pixmap \a theIcon is lighted according to the given value.
 /// If the lighter value is greater than 100, this functions returns a lighter pixmap.
-/// Setting lighter value to 150 returns a color that is 50% brighter. If the factor is less than 100,
+/// Setting lighter value to 150 returns a color that is 50% brighter. 
+/// If the factor is less than 100,
 /// the return pixmap is darker. If the factor is 0 or negative, the return pixmap is unspecified.
 
 /// \param resource text of the pixmap
@@ -133,7 +134,8 @@ MODULEBASE_EXPORT QAction* createAction(const QIcon& theIcon, const QString& the
 /// \param theObj an object
 /// \param isUseAttributesInfo a flag whether the attribute values information is used
 /// \return a string
-MODULEBASE_EXPORT QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo = false);
+MODULEBASE_EXPORT QString objectInfo(const ObjectPtr& theObj, 
+                                     const bool isUseAttributesInfo = false);
 
 /// Converts the AIS context information in a string information.
 /// \param theContext a viewer context

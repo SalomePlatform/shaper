@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : ModelHighAPI_Macro.h
 // Purpose:
 //
@@ -43,7 +44,8 @@
   public:
 
 //--------------------------------------------------------------------------------------
-// Used in INTERFACE_N inside START_INIT/END_INIT for set variable with attribute received from feature
+// Used in INTERFACE_N inside START_INIT/END_INIT for 
+// set variable with attribute received from feature
 #define SET_ATTRIBUTE(NAME, TYPE, ATT_NAME) \
   VAR_NAME(NAME) = std::dynamic_pointer_cast<TYPE>(feature()->attribute(ATT_NAME)); \
   if (!VAR_NAME(NAME)) \

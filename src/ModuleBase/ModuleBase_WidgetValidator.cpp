@@ -63,7 +63,8 @@ void ModuleBase_WidgetValidator::clearValidatedCash()
   myInvalidPrs.clear();
 }
 
-bool ModuleBase_WidgetValidator::getValidState(const ModuleBase_ViewerPrsPtr& theValue, bool& theValid)
+bool ModuleBase_WidgetValidator::getValidState(const ModuleBase_ViewerPrsPtr& theValue, 
+                                               bool& theValid)
 {
   bool aValidPrs = myValidPrs.contains(theValue);
   bool anInvalidPrs = myInvalidPrs.contains(theValue);
@@ -77,7 +78,8 @@ bool ModuleBase_WidgetValidator::getValidState(const ModuleBase_ViewerPrsPtr& th
 }
 
 //********************************************************************
-void ModuleBase_WidgetValidator::storeValidState(const ModuleBase_ViewerPrsPtr& theValue, const bool theValid)
+void ModuleBase_WidgetValidator::storeValidState(const ModuleBase_ViewerPrsPtr& theValue, 
+                                                 const bool theValid)
 {
   bool aValidPrs = myInvalidPrs.contains(theValue);
   bool anInvalidPrs = myInvalidPrs.contains(theValue);
@@ -97,7 +99,8 @@ void ModuleBase_WidgetValidator::storeValidState(const ModuleBase_ViewerPrsPtr& 
     //  myValidPrs.removeOne(theValue);
   }
 #ifdef DEBUG_VALID_STATE
-  qDebug(QString("storeValidState: myValidPrs.size() = %1, myInvalidPrs.size() = %2").arg(myValidPrs.count())
+  qDebug(QString("storeValidState: myValidPrs.size() = %1, myInvalidPrs.size() = %2")
+                 .arg(myValidPrs.count())
                  .arg(myInvalidPrs.count()).toStdString().c_str());
 #endif
 }

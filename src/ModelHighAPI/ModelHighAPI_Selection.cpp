@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : ModelHighAPI_Selection.cpp
 // Purpose: 
 //
@@ -43,8 +44,12 @@ void ModelHighAPI_Selection::fillAttribute(
 {
   switch(myVariantType) {
     case VT_Empty: return;
-    case VT_ResultSubShapePair: theAttribute->setValue(myResultSubShapePair.first, myResultSubShapePair.second); return;
-    case VT_TypeSubShapeNamePair: theAttribute->selectSubShape(myTypeSubShapeNamePair.first, myTypeSubShapeNamePair.second); return;
+    case VT_ResultSubShapePair: 
+      theAttribute->setValue(myResultSubShapePair.first, myResultSubShapePair.second); 
+      return;
+    case VT_TypeSubShapeNamePair: 
+      theAttribute->selectSubShape(myTypeSubShapeNamePair.first, myTypeSubShapeNamePair.second);
+      return;
   }
 }
 
@@ -54,7 +59,9 @@ void ModelHighAPI_Selection::appendToList(
 {
   switch(myVariantType) {
     case VT_Empty: return;
-    case VT_ResultSubShapePair: theAttribute->append(myResultSubShapePair.first, myResultSubShapePair.second); return;
+    case VT_ResultSubShapePair: 
+      theAttribute->append(myResultSubShapePair.first, myResultSubShapePair.second); 
+      return;
     case VT_TypeSubShapeNamePair:
       // Note: the reverse order (first - type, second - sub-shape name)
       theAttribute->append(myTypeSubShapeNamePair.second, myTypeSubShapeNamePair.first);
@@ -118,7 +125,8 @@ void ModelHighAPI_Selection::setDeflection(double theValue)
   if (myVariantType != VT_ResultSubShapePair)
     return;
 
-  AttributeDoublePtr aDeflectionAttr = myResultSubShapePair.first->data()->real(ModelAPI_Result::DEFLECTION_ID());
+  AttributeDoublePtr aDeflectionAttr = 
+    myResultSubShapePair.first->data()->real(ModelAPI_Result::DEFLECTION_ID());
 
   aDeflectionAttr->setValue(theValue);
 }

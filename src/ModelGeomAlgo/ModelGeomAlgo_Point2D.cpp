@@ -27,9 +27,9 @@
 
 namespace ModelGeomAlgo_Point2D {
   std::shared_ptr<GeomDataAPI_Point2D> getPointOfRefAttr(ModelAPI_Feature* theFeature,
-                                                         const std::string& theAttribute,
-                                                         const std::string& theObjectFeatureKind,
-                                                         const std::string& theObjectFeatureAttribute)
+                                                  const std::string& theAttribute,
+                                                  const std::string& theObjectFeatureKind,
+                                                  const std::string& theObjectFeatureAttribute)
   {
     std::shared_ptr<GeomDataAPI_Point2D> aPointAttr;
 
@@ -176,7 +176,7 @@ namespace ModelGeomAlgo_Point2D {
   }
 
   std::string getPontAttributesInfo(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                    const std::set<std::shared_ptr<ModelAPI_Attribute> >& theAttributesOnly)
+                           const std::set<std::shared_ptr<ModelAPI_Attribute> >& theAttributesOnly)
   {
     std::string anInfo;
 
@@ -203,10 +203,11 @@ namespace ModelGeomAlgo_Point2D {
     std::string aValue = "not defined";
     std::string aType = theAttribute->attributeType();
     if (aType == GeomDataAPI_Point2D::typeId()) {
-      std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                                                                      theAttribute);
+      std::shared_ptr<GeomDataAPI_Point2D> aPoint = 
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
       if (aPoint.get() && aPoint->isInitialized()) {
-        aValue = std::string("(" + doubleToString(aPoint->x()) + ", "+ doubleToString(aPoint->y()) + ")");
+        aValue = std::string("(" + doubleToString(aPoint->x()) + ", "+ 
+                             doubleToString(aPoint->y()) + ")");
       }
     }
     anInfo.append(theAttribute->id() + ": " + aValue);

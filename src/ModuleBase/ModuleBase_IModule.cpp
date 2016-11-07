@@ -72,10 +72,12 @@ void ModuleBase_IModule::launchModal(const QString& theCmdId)
 void ModuleBase_IModule::launchOperation(const QString& theCmdId)
 {
   /// selection should be obtained from workshop before ask if the operation can be started as
-  /// the canStartOperation method performs commit/abort of previous operation. Sometimes commit/abort
-  /// may cause selection clear(Sketch operation) as a result it will be lost and is not used for preselection.
+  /// the canStartOperation method performs commit/abort of previous operation. 
+  /// Sometimes commit/abort may cause selection clear(Sketch operation) as a result
+  /// it will be lost and is not used for preselection.
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
-  QList<ModuleBase_ViewerPrsPtr> aPreSelected = aSelection->getSelected(ModuleBase_ISelection::AllControls);
+  QList<ModuleBase_ViewerPrsPtr> aPreSelected = 
+    aSelection->getSelected(ModuleBase_ISelection::AllControls);
 
   if (!myWorkshop->canStartOperation(theCmdId))
     return;
@@ -118,8 +120,8 @@ ModuleBase_Operation* ModuleBase_IModule::getNewOperation(const std::string& the
 }
 
 bool ModuleBase_IModule::customizeObject(ObjectPtr theObject,
-                                         const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
-                                         const bool theUpdateViewer)
+                              const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
+                              const bool theUpdateViewer)
 {
   return false;
 }

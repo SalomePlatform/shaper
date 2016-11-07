@@ -20,7 +20,8 @@
 IMPLEMENT_STANDARD_HANDLE(ModuleBase_FilterValidated, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_FilterValidated, SelectMgr_Filter);
 
-Standard_Boolean ModuleBase_FilterValidated::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
+Standard_Boolean ModuleBase_FilterValidated::
+  IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   bool aValid = true;
   ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();

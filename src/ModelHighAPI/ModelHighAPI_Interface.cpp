@@ -1,3 +1,4 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : ModelHighAPI_Interface.cpp
 // Purpose: 
 //
@@ -17,7 +18,8 @@
 
 #include "ModelHighAPI_Selection.h"
 //--------------------------------------------------------------------------------------
-ModelHighAPI_Interface::ModelHighAPI_Interface(const std::shared_ptr<ModelAPI_Feature> & theFeature)
+ModelHighAPI_Interface::ModelHighAPI_Interface(
+  const std::shared_ptr<ModelAPI_Feature> & theFeature)
 : myFeature(theFeature)
 {
 
@@ -36,7 +38,8 @@ std::shared_ptr<ModelAPI_Feature> ModelHighAPI_Interface::feature() const
 
 std::shared_ptr<ModelHighAPI_Interface> ModelHighAPI_Interface::subFeature(const int theIndex) const
 {
-  CompositeFeaturePtr aCompositeFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+  CompositeFeaturePtr aCompositeFeature =
+    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
   if(!aCompositeFeature.get()) {
     return InterfacePtr();
   }
