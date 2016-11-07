@@ -27,7 +27,8 @@
 #include <BRep_Builder.hxx>
 #include <TopExp_Explorer.hxx>
 
-#define baseRef() std::dynamic_pointer_cast<Model_ResultPart>(data()->reference(BASE_REF_ID())->value())
+#define baseRef() \
+  std::dynamic_pointer_cast<Model_ResultPart>(data()->reference(BASE_REF_ID())->value())
 
 void Model_ResultPart::initAttributes()
 {
@@ -68,7 +69,8 @@ void Model_ResultPart::activate()
   // activation may cause changes in current features in document, so it must be in transaction
   bool isNewTransaction = false;
   SessionPtr aMgr = ModelAPI_Session::get();
-  if (!aMgr->isOperation()) { // open transaction even document is not created to set current docs in setActiveDocument
+  if (!aMgr->isOperation()) { 
+    // open transaction even document is not created to set current docs in setActiveDocument
     aMgr->startOperation("Activation");
     isNewTransaction = true;
   }
@@ -242,7 +244,8 @@ std::string Model_ResultPart::nameInPart(const std::shared_ptr<GeomAPI_Shape>& t
   if (!aDoc.get()) // the part document is not presented for the moment
     return "";
   TDF_Label anAccessLabel = aDoc->generalLabel();
-  // make the selection attribute anyway: otherwise just by name it is not stable to search the result
+  // make the selection attribute anyway: 
+  // otherwise just by name it is not stable to search the result
   std::string aName;
   // for this the context result is needed
   ResultPtr aContext;

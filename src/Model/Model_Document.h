@@ -52,7 +52,8 @@ class Model_Document : public ModelAPI_Document
     const char* theDirName, const char* theFileName, std::list<std::string>& theResults);
 
   //! Removes document data
-  //! \param theForever if it is false, document is just hiden (to keep possibility make it back on Undo/Redo)
+  //! \param theForever if it is false, document is just hiden 
+  //!                   (to keep possibility make it back on Undo/Redo)
   MODEL_EXPORT virtual void close(const bool theForever = false);
 
   //! Starts a new operation (opens a tansaction)
@@ -272,7 +273,8 @@ class Model_Document : public ModelAPI_Document
   //! Returns true if this document is currently active
   virtual bool isActive() const;
 
-  //! Returns the selection attribute that is used for calculation of selection externally from the document
+  //! Returns the selection attribute that is used 
+  //! for calculation of selection externally from the document
   std::shared_ptr<ModelAPI_AttributeSelectionList> selectionInPartFeature();
 
   friend class Model_Application;

@@ -54,7 +54,8 @@ class ModelAPI_Attribute
   /// \return the previous block value
   MODELAPI_EXPORT bool blockSetInitialized(const bool theBlock);
 
-  /// Set this attribute is argument for result (change of this attribute requires update of result).
+  /// Set this attribute is argument for result 
+  /// (change of this attribute requires update of result).
   /// By default it is true.
   MODELAPI_EXPORT void setIsArgument(const bool theFlag);
 

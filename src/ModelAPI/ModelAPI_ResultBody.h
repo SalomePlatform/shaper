@@ -61,7 +61,8 @@ public:
 
   /// \brief Stores the shape (called by the execution method).
   /// param[in] theShape shape to store.
-  /// param[in] theIsStoreSameShapes if false stores reference to the same shape if it is already in document.
+  /// param[in] theIsStoreSameShapes if false stores reference to the same shape 
+  ///                                if it is already in document.
   MODELAPI_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape,
                                      const bool theIsStoreSameShapes = true);
 
@@ -111,7 +112,8 @@ public:
   /// load and orient modified shapes
   MODELAPI_EXPORT virtual void loadAndOrientModifiedShapes (GeomAlgoAPI_MakeShape* theMS,
     std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
-    const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes, const bool theIsStoreSeparate = false);
+    const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes, 
+    const bool theIsStoreSeparate = false);
   /// load and orient generated shapes
   MODELAPI_EXPORT virtual void loadAndOrientGeneratedShapes (GeomAlgoAPI_MakeShape* theMS,
     std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape,

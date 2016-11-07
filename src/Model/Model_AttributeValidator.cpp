@@ -44,7 +44,8 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
     std::string anErrorMessage;
     for (int i = 0; i < 3; ++i) {
       if (!anAttribue->expressionError(i).empty())
-        anErrorMessage.append("\n").append(aComponent[i]).append(": ").append(anAttribue->expressionError(i));
+        anErrorMessage.append("\n").append(aComponent[i])
+          .append(": ").append(anAttribue->expressionError(i));
     }
     if (!anErrorMessage.empty()) {
       theError = "Expression error: %1";
@@ -60,7 +61,8 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
     std::string anErrorMessage;
     for (int i = 0; i < 2; ++i) {
       if (!anAttribue->expressionError(i).empty())
-        anErrorMessage.append("\n").append(aComponent[i]).append(": ").append(anAttribue->expressionError(i));
+        anErrorMessage.append("\n").append(aComponent[i])
+          .append(": ").append(anAttribue->expressionError(i));
     }
     if (!anErrorMessage.empty()) {
       theError = "Expression error: %1";

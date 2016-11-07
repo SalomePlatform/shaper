@@ -180,7 +180,8 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
     anAttr->setObject(myObject);
     anAttr->setID(theID);
   } else {
-    Events_InfoMessage("Model_Data", "Can not create unknown type of attribute %1").arg(theAttrType).send();
+    Events_InfoMessage("Model_Data", 
+      "Can not create unknown type of attribute %1").arg(theAttrType).send();
   }
   return aResult;
 }
@@ -293,9 +294,11 @@ void Model_Data::blockSendAttributeUpdated(const bool theBlock, const bool theSe
 {
   if (mySendAttributeUpdated == theBlock) {
     mySendAttributeUpdated = !theBlock;
-    if (mySendAttributeUpdated && !myWasChangedButBlocked.empty()) { // so, now it is ok to send the update signal
+    if (mySendAttributeUpdated && !myWasChangedButBlocked.empty()) {
+      // so, now it is ok to send the update signal
       if (theSendMessage) {
-        // make a copy to avoid iteration on modified list (may be cleared by attribute changed call)
+        // make a copy to avoid iteration on modified list 
+        // (may be cleared by attribute changed call)
         std::list<ModelAPI_Attribute*> aWasChangedButBlocked = myWasChangedButBlocked;
         myWasChangedButBlocked.clear();
         std::list<ModelAPI_Attribute*>::iterator aChangedIter = aWasChangedButBlocked.begin();
@@ -318,7 +321,8 @@ void Model_Data::erase()
       // remove in order to clear back references in other objects
       std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
       referencesToObjects(aRefs);
-      std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator anAttrIter = aRefs.begin();
+      std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator 
+        anAttrIter = aRefs.begin();
       for(; anAttrIter != aRefs.end(); anAttrIter++) {
         std::list<ObjectPtr>::iterator aReferenced = anAttrIter->second.begin();
         for(; aReferenced != anAttrIter->second.end(); aReferenced++) {
@@ -518,7 +522,8 @@ std::list<ResultParameterPtr> findVariables(const std::set<std::string>& thePara
     const std::string& aName = *aParamIt;
     double aValue;
     ResultParameterPtr aParam;
-    // theSearcher is not needed here: in expressions of features the parameters history is not needed
+    // theSearcher is not needed here: in expressions 
+    // of features the parameters history is not needed
     if (ModelAPI_Tools::findVariable(FeaturePtr(), aName, aValue, aParam))
       aResult.push_back(aParam);
   }

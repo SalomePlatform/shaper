@@ -97,13 +97,15 @@ void Model_ValidatorsFactory::validators(const std::string& theFeatureID,
   addDefaultValidators(theValidators);
 }
 
-void Model_ValidatorsFactory::validators(const std::string& theFeatureID, const std::string& theAttrID,
+void Model_ValidatorsFactory::validators(const std::string& theFeatureID, 
+                                         const std::string& theAttrID,
                                          Validators& theValidators) const
 {
   std::map<std::string, std::map<std::string, AttrValidators> >::const_iterator aFeatureIt = 
       myAttrs.find(theFeatureID);
   if (aFeatureIt != myAttrs.cend()) {
-    std::map<std::string, AttrValidators>::const_iterator anAttrIt = aFeatureIt->second.find(theAttrID);
+    std::map<std::string, AttrValidators>::const_iterator anAttrIt =
+      aFeatureIt->second.find(theAttrID);
     if (anAttrIt != aFeatureIt->second.end()) {
       AttrValidators::const_iterator aValidatorsIt = anAttrIt->second.cbegin();
       for (; aValidatorsIt != anAttrIt->second.cend(); aValidatorsIt++) {
@@ -271,7 +273,8 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Attribute>
   return true;
 }
 
-void Model_ValidatorsFactory::registerNotObligatory(std::string theFeature, std::string theAttribute)
+void Model_ValidatorsFactory::registerNotObligatory(std::string theFeature, 
+                                                    std::string theAttribute)
 {
   const static std::string kDefaultId = "Model_FeatureValidator";
   std::map<std::string, ModelAPI_Validator*>::const_iterator it = myIDs.find(kDefaultId);

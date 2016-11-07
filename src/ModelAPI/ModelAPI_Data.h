@@ -152,7 +152,8 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual const std::set<std::shared_ptr<ModelAPI_Attribute> >& refsToMe() = 0;
 
   /// returns all references by attributes of this data
-  /// \param theRefs returned list of pairs: id of referenced attribute and list of referenced objects
+  /// \param theRefs returned list of pairs: id of referenced attribute and 
+  ///                list of referenced objects
   virtual void referencesToObjects(
     std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > >& theRefs) =0;
 

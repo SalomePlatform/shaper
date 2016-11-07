@@ -39,7 +39,8 @@ static const char * EVENT_PLUGIN_LOADED = "PluginLoaded";
 /// The active document becomes another one
 static const char * EVENT_DOCUMENT_CHANGED = "CurrentDocumentChanged";
 
-/// Event ID that order of objects in group is changed, so, tree must be fully rectreated (movement of feature)
+/// Event ID that order of objects in group is changed, 
+/// so, tree must be fully rectreated (movement of feature)
 static const char * EVENT_ORDER_UPDATED = "OrderUpdated";
 /// Event ID that the sketch is prepared and all grouped messages for the solver may be flushed
 static const char * EVENT_UPDATE_SELECTION = "UpdateSelection";
@@ -306,7 +307,8 @@ class ModelAPI_ReplaceParameterMessage : public Events_Message
                                    const void* theSender);
 
   /// Creates an empty message
-  MODELAPI_EXPORT ModelAPI_ReplaceParameterMessage(const Events_ID theID, const void* theSender = 0);
+  MODELAPI_EXPORT
+    ModelAPI_ReplaceParameterMessage(const Events_ID theID, const void* theSender = 0);
   /// The virtual destructor
   MODELAPI_EXPORT virtual ~ModelAPI_ReplaceParameterMessage();
 

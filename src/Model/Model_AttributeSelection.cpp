@@ -193,7 +193,8 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
 {
   GeomShapePtr aResult;
   if (myTmpContext.get() || myTmpSubShape.get()) {
-    ResultConstructionPtr aResulConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myTmpContext);
+    ResultConstructionPtr aResulConstruction =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myTmpContext);
     if(aResulConstruction.get()) {
       // it is just reference to construction.
       return myTmpSubShape;
@@ -212,7 +213,8 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
         return aResult; // empty result
       return aContext->shape();
     }
-    if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { // it is just reference to construction, nothing is in value
+    if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) {
+      // it is just reference to construction, nothing is in value
         return aResult; // empty result
     }
     if (aSelLab.IsAttribute(kPART_REF_ID)) {
@@ -270,7 +272,8 @@ bool Model_AttributeSelection::isInitialized()
         ResultPtr aContext = context();
         return aContext.get() != NULL;
       }
-      if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { // it is just reference to construction, nothing is in value
+      if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { 
+        // it is just reference to construction, nothing is in value
           return true;
       }
 
@@ -359,7 +362,8 @@ TDF_LabelMap& Model_AttributeSelection::scope()
       }
       if (isGroup) aMePassed = false;
       bool isInScope = !aMePassed;
-      if (!isInScope && aComposite.get()) { // try to add sub-elements of composite if this is composite
+      if (!isInScope && aComposite.get()) { 
+        // try to add sub-elements of composite if this is composite
         if (aComposite->isSub(*aFIter))
           isInScope = true;
       }
@@ -403,7 +407,8 @@ bool Model_AttributeSelection::update()
   if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
     return setInvalidIfFalse(aSelLab, aContext->shape() && !aContext->shape()->isNull());
   }
-  if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { // it is just reference to construction, not sub-shape
+  if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { 
+    // it is just reference to construction, not sub-shape
     // if there is a sketch, the sketch-naming must be updated
     ResultConstructionPtr aConstruction = 
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
@@ -450,7 +455,8 @@ bool Model_AttributeSelection::update()
       anOldShape = aSelector.NamedShape()->Get();
     }
     bool aResult = aSelector.Solve(scope()) == Standard_True;
-    aResult = setInvalidIfFalse(aSelLab, aResult); // must be before sending of updated attribute (1556)
+    // must be before sending of updated attribute (1556)
+    aResult = setInvalidIfFalse(aSelLab, aResult);
     TopoDS_Shape aNewShape;
     if (!aSelector.NamedShape().IsNull()) {
       aNewShape = aSelector.NamedShape()->Get();
@@ -488,7 +494,8 @@ bool Model_AttributeSelection::update()
         return setInvalidIfFalse(aSelLab, false);
       }
 
-      if (aShapeType == TopAbs_FACE || aShapeType == TopAbs_WIRE) { // compound is for the whole sketch selection
+      if (aShapeType == TopAbs_FACE || aShapeType == TopAbs_WIRE) { 
+        // compound is for the whole sketch selection
         // If this is a wire with plane defined then it is a sketch-like object
         if (!aConstructionContext->facesNum()) // no faces, update can not work correctly
           return setInvalidIfFalse(aSelLab, false);
@@ -498,7 +505,8 @@ bool Model_AttributeSelection::update()
           aNewSelected = aConstructionContext->face(0);
         } else { // searching for most looks-like initial face by the indexes
           // prepare edges of the current result for the fast searching
-          NCollection_DataMap<Handle(Geom_Curve), int> allCurves; // curves and orientations of edges
+          // curves and orientations of edges
+          NCollection_DataMap<Handle(Geom_Curve), int> allCurves; 
           const int aSubNum = aComposite->numberOfSubs();
           for(int a = 0; a < aSubNum; a++) {
             int aSubID = aComposite->subFeatureId(a);
@@ -535,7 +543,9 @@ bool Model_AttributeSelection::update()
           setInvalidIfFalse(aSelLab, true);
           owner()->data()->sendAttributeUpdated(this);
           return true;
-        } else { // if the selection is not found, put the empty shape: it's better to have disappeared shape, than the old, the lost one
+        } else { 
+          // if the selection is not found, put the empty shape: 
+          // it's better to have disappeared shape, than the old, the lost one
           TNaming_Builder anEmptyBuilder(selectionLabel());
           return setInvalidIfFalse(aSelLab, false);
         }
@@ -643,9 +653,11 @@ void Model_AttributeSelection::selectBody(
   TDF_Label aSelLab = selectionLabel();
   TopoDS_Shape aNewContext = aContext;
   bool isUpdated = true;
-  while(!aNewContext.IsNull() && isUpdated) { // searching for the very last shape that was produced from this one
+  while(!aNewContext.IsNull() && isUpdated) {
+    // searching for the very last shape that was produced from this one
     isUpdated = false;
-    if (!TNaming_Tool::HasLabel(aSelLab, aNewContext)) // to avoid crash of TNaming_SameShapeIterator if pure shape does not exists
+    if (!TNaming_Tool::HasLabel(aSelLab, aNewContext)) 
+      // to avoid crash of TNaming_SameShapeIterator if pure shape does not exists
       break;
     for(TNaming_SameShapeIterator anIter(aNewContext, aSelLab); anIter.More(); anIter.Next()) {
       TDF_Label aNSLab = anIter.Label();
@@ -684,7 +696,8 @@ void Model_AttributeSelection::selectBody(
     }
     if (!isFound) { // sub-shape is not found in the up-to-date instance of the context shape
       setInvalidIfFalse(aSelLab, false);
-      Events_InfoMessage("Model_AttributeSelection", "Failed to select sub-shape already modified").send();
+      Events_InfoMessage("Model_AttributeSelection", 
+        "Failed to select sub-shape already modified").send();
       return;
     }
   }
@@ -707,7 +720,8 @@ void Model_AttributeSelection::selectBody(
 static void registerSubShape(TDF_Label theMainLabel, TopoDS_Shape theShape,
   const int theID, const FeaturePtr& theContextFeature, std::shared_ptr<Model_Document> theDoc,
   std::map<int, int>& theOrientations,
-  std::map<int, std::string>& theSubNames, // name of sub-elements by ID to be exported instead of indexes
+  // name of sub-elements by ID to be exported instead of indexes
+  std::map<int, std::string>& theSubNames, 
   Handle(TDataStd_IntPackedMap) theRefs = Handle(TDataStd_IntPackedMap)(),
   const int theOrientation = 0)
 {
@@ -887,7 +901,8 @@ bool Model_AttributeSelection::selectPart(
     return true; // postponed naming
   if (theUpdate) {
     Handle(TDataStd_Integer) anIndex;
-    if (selectionLabel().FindAttribute(TDataStd_Integer::GetID(), anIndex)) { // by internal selection
+    if (selectionLabel().FindAttribute(TDataStd_Integer::GetID(), anIndex)) { 
+      // by internal selection
       if (anIndex->Get() > 0) {
         // update the selection by index
         return aPart->updateInPart(anIndex->Get());
@@ -1118,7 +1133,8 @@ void Model_AttributeSelection::updateInHistory()
         break;
       if (aModifierFeat == aThisFeature || aDoc->objects()->isLater(aModifierFeat, aThisFeature))
         continue; // the modifier feature is later than this, so, should not be used
-      if (aCurrentModifierFeat == aModifierFeat || aDoc->objects()->isLater(aCurrentModifierFeat, aModifierFeat))
+      if (aCurrentModifierFeat == aModifierFeat || 
+        aDoc->objects()->isLater(aCurrentModifierFeat, aModifierFeat))
         continue; // the current modifier is later than the found, so, useless
       Handle(TNaming_NamedShape) aNewNS;
       aModifIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNewNS);

@@ -87,7 +87,8 @@ class Model_Objects
   //! Returns the number of features in the group
   int size(const std::string& theGroupID);
 
-  ///! Returns all (and disabled) results of the given type. Not fast method (iterates all features).
+  //! Returns all (and disabled) results of the given type. 
+  //! Not fast method (iterates all features).
   void allResults(const std::string& theGroupID, std::list<ResultPtr>& theResults);
 
   //! Returns the number of all features: in the history or not
@@ -157,13 +158,15 @@ class Model_Objects
   //! Initializes the data fields of the feature
   void initData(ObjectPtr theObj, TDF_Label theLab, const int theTag);
 
-  //! Allows to store the result in the data tree of the document (attaches 'data' of result to tree)
+  //! Allows to store the result in the data tree of the document 
+  //! (attaches 'data' of result to tree)
   void storeResult(std::shared_ptr<ModelAPI_Data> theFeatureData,
                    std::shared_ptr<ModelAPI_Result> theResult,
                    const int theResultIndex = 0);
 
   //! returns the label of result by index; creates this label if it was not created before
-  TDF_Label resultLabel(const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theResultIndex);
+  TDF_Label resultLabel(const std::shared_ptr<ModelAPI_Data>& theFeatureData,
+                        const int theResultIndex);
 
   //! Updates the results list of the feature basing on the current data tree
   void updateResults(FeaturePtr theFeature);

@@ -66,7 +66,8 @@ static const int UNDO_LIMIT = 1000;  // number of possible undo operations (big 
 static const int TAG_GENERAL = 1;  // general properties tag
 
 // general sub-labels
-static const int TAG_CURRENT_FEATURE = 1; ///< where the reference to the current feature label is located (or no attribute if null feature)
+/// where the reference to the current feature label is located (or no attribute if null feature)
+static const int TAG_CURRENT_FEATURE = 1;
 static const int TAG_CURRENT_TRANSACTION = 2; ///< integer, index of the transaction
 static const int TAG_SELECTION_FEATURE = 3; ///< integer, tag of the selection feature label
 
@@ -145,10 +146,12 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
             "Can not open document: already opened and modified").send();
         break;
       case PCDM_RS_NoDriver:
-        Events_InfoMessage("Model_Document", "Can not open document: driver library is not found").send();
+        Events_InfoMessage("Model_Document", 
+                           "Can not open document: driver library is not found").send();
         break;
       case PCDM_RS_UnknownFileDriver:
-        Events_InfoMessage("Model_Document", "Can not open document: unknown driver for opening").send();
+        Events_InfoMessage("Model_Document", 
+                           "Can not open document: unknown driver for opening").send();
         break;
       case PCDM_RS_OpenError:
         Events_InfoMessage("Model_Document", "Can not open document: file open error").send();
@@ -169,7 +172,8 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
         Events_InfoMessage("Model_Document", "Can not open document: invalid object").send();
         break;
       case PCDM_RS_UnrecognizedFileFormat:
-        Events_InfoMessage("Model_Document", "Can not open document: unrecognized file format").send();
+        Events_InfoMessage("Model_Document", 
+                           "Can not open document: unrecognized file format").send();
         break;
       case PCDM_RS_MakeFailure:
         Events_InfoMessage("Model_Document", "Can not open document: make failure").send();
@@ -247,7 +251,8 @@ bool Model_Document::save(
   if (!isDone) {
     switch (aStatus) {
       case PCDM_SS_DriverFailure:
-        Events_InfoMessage("Model_Document", "Can not save document: save driver-library failure").send();
+        Events_InfoMessage("Model_Document", 
+                           "Can not save document: save driver-library failure").send();
         break;
       case PCDM_SS_WriteFailure:
         Events_InfoMessage("Model_Document", "Can not save document: file writing failure").send();
@@ -338,7 +343,8 @@ void Model_Document::startOperation()
 {
   incrementTransactionID(); // outside of transaction in order to avoid empty transactions keeping
   if (myDoc->HasOpenCommand()) {  // start of nested command
-    if (myDoc->CommitCommand()) { // commit the current: it will contain all nested after compactification
+    if (myDoc->CommitCommand()) { 
+      // commit the current: it will contain all nested after compactification
       myTransactions.rbegin()->myOCAFNum++; // if has open command, the list is not empty
     }
     myNestedNum.push_back(0); // start of nested operation with zero transactions inside yet
@@ -480,8 +486,9 @@ static bool isEmptyTransaction(const Handle(TDocStd_Document)& theDoc) {
           if (isEqualContent(anADelta->Attribute(), aCurrentAttr)) {
             continue; // attribute is not changed actually
           }
-        } else if (Standard_GUID::IsEqual(anADelta->Attribute()->ID(), TDataStd_AsciiString::GetID())) {
-          continue; // error message is disappeared
+        } else 
+          if (Standard_GUID::IsEqual(anADelta->Attribute()->ID(), TDataStd_AsciiString::GetID())) {
+            continue; // error message is disappeared
         }
       }
     }
@@ -496,7 +503,8 @@ bool Model_Document::finishOperation()
   static std::shared_ptr<Model_Session> aSession = 
     std::static_pointer_cast<Model_Session>(Model_Session::get());
 
-  // open transaction if nested is closed to fit inside all synchronizeBackRefs and flushed consequences
+  // open transaction if nested is closed to fit inside 
+  // all synchronizeBackRefs and flushed consequences
   if (isNestedClosed) {
     myDoc->OpenCommand();
   }
@@ -547,7 +555,8 @@ bool Model_Document::finishOperation()
       aResult = true;
 
   // transaction may be empty if this document was created during this transaction (create part)
-  if (!myTransactions.empty() && myDoc->CommitCommand()) { // if commit is successfull, just increment counters
+  if (!myTransactions.empty() && myDoc->CommitCommand()) { 
+    // if commit is successfull, just increment counters
     if (isEmptyTransaction(myDoc)) { // erase this transaction
       myDoc->Undo();
       myDoc->ClearRedos();
@@ -593,14 +602,18 @@ static void modifiedLabels(const Handle(TDocStd_Document)& theDoc, TDF_LabelList
   }
   // add also label of the modified attributes
   const TDF_AttributeDeltaList& anAttrs = aDelta->AttributeDeltas();
-  TDF_LabelMap anExcludedInt; /// named shape evolution also modifies integer on this label: exclude it
+  /// named shape evolution also modifies integer on this label: exclude it
+  TDF_LabelMap anExcludedInt; 
   for (TDF_ListIteratorOfAttributeDeltaList anAttr(anAttrs); anAttr.More(); anAttr.Next()) {
     if (anAttr.Value()->Attribute()->ID() == TDataStd_BooleanArray::GetID()) {
-      continue; // Boolean array is used for feature auxiliary attributes only, feature args are not modified
+      // Boolean array is used for feature auxiliary attributes only, feature args are not modified
+      continue; 
     }
     if (anAttr.Value()->Attribute()->ID() == TNaming_NamedShape::GetID()) {
       anExcludedInt.Add(anAttr.Value()->Label());
-      continue; // named shape evolution is changed in history update => skip them, they are not the features arguents
+      // named shape evolution is changed in history update => skip them, 
+      // they are not the features arguents
+      continue; 
     }
     if (anAttr.Value()->Attribute()->ID() == TDataStd_Integer::GetID()) {
       if (anExcludedInt.Contains(anAttr.Value()->Label()))
@@ -680,7 +693,8 @@ bool Model_Document::canUndo()
   // issue 406 : if transaction is opened, but nothing to undo behind, can not undo
   int aCurrentNum = isOperation() ? 1 : 0;
   if (myDoc->GetAvailableUndos() > 0 && 
-      (myNestedNum.empty() || *myNestedNum.rbegin() - aCurrentNum > 0) && // there is something to undo in nested
+      // there is something to undo in nested
+      (myNestedNum.empty() || *myNestedNum.rbegin() - aCurrentNum > 0) && 
       myTransactions.size() - aCurrentNum > 0 /* for omitting the first useless transaction */)
     return true;
   // check other subs contains operation that can be undoed
@@ -887,8 +901,10 @@ void Model_Document::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
   if (aCurrentUp) {
     setCurrentFeatureUp();
   }
-  // if user adds after high-level feature with nested, add it after all nested (otherwise the nested will be disabled)
-  CompositeFeaturePtr aCompositeAfter = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theAfterThis);
+  // if user adds after high-level feature with nested, 
+  // add it after all nested (otherwise the nested will be disabled)
+  CompositeFeaturePtr aCompositeAfter = 
+    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theAfterThis);
   if (aCompositeAfter.get()) {
     FeaturePtr aSub = aCompositeAfter;
     do {
@@ -1007,7 +1023,8 @@ void Model_Document::setCurrentFeature(
     }
   }
 
-  if (theVisible && !theCurrent.get()) { // needed to avoid disabling of PartSet initial constructions
+  if (theVisible && !theCurrent.get()) { 
+    // needed to avoid disabling of PartSet initial constructions
     FeaturePtr aNext = 
       theCurrent.get() ? myObjs->nextFeature(theCurrent) : myObjs->firstFeature();
     for (; aNext.get(); aNext = myObjs->nextFeature(theCurrent)) {
@@ -1035,7 +1052,8 @@ void Model_Document::setCurrentFeature(
   } else { // remove reference for the null feature
     aRefLab.ForgetAttribute(TDF_Reference::GetID());
   }
-  // make all features after this feature disabled in reversed order (to remove results without deps)
+  // make all features after this feature disabled in reversed order
+  // (to remove results without deps)
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
 
   bool aPassed = false; // flag that the current object is already passed in cycle
@@ -1050,15 +1068,18 @@ void Model_Document::setCurrentFeature(
     if (aMain.get()) {
       if (isSub(aMain, anIter)) // sub-elements of not-disabled feature are not disabled
         aDisabledFlag = false;
-      else if (anOwners.find(anIter) != anOwners.end()) // disable the higher-level feature is the nested is the current
+      else if (anOwners.find(anIter) != anOwners.end()) 
+        // disable the higher-level feature is the nested is the current
         aDisabledFlag = true;
     }
 
-    if (anIter->getKind() == "Parameter") {// parameters are always out of the history of features, but not parameters
+    if (anIter->getKind() == "Parameter") {
+      // parameters are always out of the history of features, but not parameters
       // due to the issue 1491 all parameters are kept enabled any time
       //if (!isCurrentParameter)
         aDisabledFlag = false;
-    } else if (isCurrentParameter) { // if paramater is active, all other features become enabled (issue 1307)
+    } else if (isCurrentParameter) { 
+      // if paramater is active, all other features become enabled (issue 1307)
       aDisabledFlag = false;
     }
 
@@ -1066,7 +1087,8 @@ void Model_Document::setCurrentFeature(
       static Events_ID anUpdateEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
       // state of feature is changed => so inform that it must be updated if it has such state
       if (!aDisabledFlag && 
-          (anIter->data()->execState() == ModelAPI_StateMustBeUpdated || anIter->data()->execState() == ModelAPI_StateInvalidArgument))
+          (anIter->data()->execState() == ModelAPI_StateMustBeUpdated || 
+           anIter->data()->execState() == ModelAPI_StateInvalidArgument))
         ModelAPI_EventCreator::get()->sendUpdated(anIter, anUpdateEvent);
       // flush is in the end of this method
       ModelAPI_EventCreator::get()->sendUpdated(anIter, aRedispEvent /*, false*/);
@@ -1102,7 +1124,8 @@ void Model_Document::setCurrentFeatureUp()
     // make the higher level composite as current (sketch becomes disabled if line is enabled)
     if (aPrev.get()) {
       FeaturePtr aComp = ModelAPI_Tools::compositeOwner(aPrev);
-      // without cycle (issue 1555): otherwise extrusion fuse will be enabled and displayed whaen inside sketch
+      // without cycle (issue 1555): otherwise extrusion fuse 
+      // will be enabled and displayed whaen inside sketch
       if (aComp.get()) 
           aPrev = aComp;
     }
@@ -1374,20 +1397,23 @@ static Handle(TNaming_NamedShape) searchForOriginalShape(TopoDS_Shape theShape, 
   while(!theShape.IsNull()) { // searching for the very initial shape that produces this one
     TopoDS_Shape aShape = theShape;
     theShape.Nullify();
-    if (!TNaming_Tool::HasLabel(aMain, aShape)) // to avoid crash of TNaming_SameShapeIterator if pure shape does not exists
+    // to avoid crash of TNaming_SameShapeIterator if pure shape does not exists
+    if (!TNaming_Tool::HasLabel(aMain, aShape))
       break;
     for(TNaming_SameShapeIterator anIter(aShape, aMain); anIter.More(); anIter.Next()) {
       TDF_Label aNSLab = anIter.Label();
       Handle(TNaming_NamedShape) aNS;
       if (aNSLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
         for(TNaming_Iterator aShapesIter(aNS); aShapesIter.More(); aShapesIter.Next()) {
-          if (aShapesIter.Evolution() == TNaming_SELECTED || aShapesIter.Evolution() == TNaming_DELETE)
+          if (aShapesIter.Evolution() == TNaming_SELECTED || 
+              aShapesIter.Evolution() == TNaming_DELETE)
             continue; // don't use the selection evolution
           if (aShapesIter.NewShape().IsSame(aShape)) { // found the original shape
             aResult = aNS;
             if (aResult->Evolution() == TNaming_MODIFY)
               theShape = aShapesIter.OldShape();
-            if (!theShape.IsNull()) // otherwise may me searching for another item of this shape with longer history
+            // otherwise may me searching for another item of this shape with longer history
+            if (!theShape.IsNull()) 
               break;
           }
         }
@@ -1445,7 +1471,8 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::producedByFeature(
         aCandidatInThis = aNS;
         if (aCandidatInThis->Evolution() == TNaming_MODIFY)
           anOldShape = aShapesIter.OldShape();
-        if (!anOldShape.IsNull()) // otherwise may me searching for another item of this shape with longer history
+        // otherwise may me searching for another item of this shape with longer history
+        if (!anOldShape.IsNull()) 
           break;
       }
       // check that the shape contains aShape as sub-shape to fill container
@@ -1469,7 +1496,8 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::producedByFeature(
     }
   }
   if (aCandidatInThis.IsNull()) {
-    // to fix 1512: searching for original shape of this shape if modification of it is not in this result
+    // to fix 1512: searching for original shape of this shape 
+    // if modification of it is not in this result
     aCandidatInThis = searchForOriginalShape(aShape, myDoc->Main());
     if (aCandidatInThis.IsNull()) {
       if (aCandidatContainer.IsNull())

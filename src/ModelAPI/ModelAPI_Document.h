@@ -42,7 +42,8 @@ public:
   virtual const std::string& kind() const = 0;
 
   //! Removes document data
-  //! \param theForever if it is false, document is just hiden (to keep possibility make it back on Undo/Redo)
+  //! \param theForever if it is false, document is just hiden
+  //!                   (to keep possibility make it back on Undo/Redo)
   virtual void close(const bool theForever = false) = 0;
 
   //! Adds to the document the new feature of the given feature id

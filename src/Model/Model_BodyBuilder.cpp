@@ -143,7 +143,8 @@ void Model_BodyBuilder::store(const std::shared_ptr<GeomAPI_Shape>& theShape,
       if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
         std::string aName (TCollection_AsciiString(anAttr->Get()).ToCString());
         if(!aName.empty()) {
-          std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
+          std::shared_ptr<Model_Document> aDoc =
+            std::dynamic_pointer_cast<Model_Document>(document());
           aDoc->addNamingName(aBuilder.NamedShape()->Label(), aName);
         }
       }
@@ -176,7 +177,8 @@ void Model_BodyBuilder::storeGenerated(const std::shared_ptr<GeomAPI_Shape>& the
       if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
         std::string aName (TCollection_AsciiString(anAttr->Get()).ToCString());
         if(!aName.empty()) {
-          std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
+          std::shared_ptr<Model_Document> aDoc =
+            std::dynamic_pointer_cast<Model_Document>(document());
           aDoc->addNamingName(aBuilder.NamedShape()->Label(), aName);
         }
       }
@@ -203,7 +205,8 @@ void Model_BodyBuilder::storeModified(const std::shared_ptr<GeomAPI_Shape>& theO
     if (aShapeNew.IsNull())
       return;  // null shape inside
     aBuilder.Modify(aShapeOld, aShapeNew);
-    if (theDecomposeSolidsTag && aShapeNew.ShapeType() == TopAbs_COMPOUND) { // make sub elements as subs
+    if (theDecomposeSolidsTag && aShapeNew.ShapeType() == TopAbs_COMPOUND) { 
+      // make sub elements as subs
 
       // register name if it is possible
       TCollection_AsciiString aName;
@@ -227,9 +230,11 @@ void Model_BodyBuilder::storeModified(const std::shared_ptr<GeomAPI_Shape>& theO
         if(!aName.IsEmpty()) {
           TCollection_AsciiString aShapeType = aShape.ShapeType() == TopAbs_EDGE ? "_Edge_" :
                                                aShape.ShapeType() == TopAbs_FACE ? "_Face_" :
-                                               aShape.ShapeType() == TopAbs_SOLID ? "_Solid_" : "_Shape_";
+                                               aShape.ShapeType() == TopAbs_SOLID ? "_Solid_" : 
+                                               "_Shape_";
           std::string aSolidName = 
-            (aName + aShapeType + TCollection_AsciiString(aTag - theDecomposeSolidsTag)).ToCString(); 
+            (aName + aShapeType + TCollection_AsciiString(aTag - theDecomposeSolidsTag))
+            .ToCString();
           std::shared_ptr<Model_Document> aDoc = 
             std::dynamic_pointer_cast<Model_Document>(document());
           aDoc->addNamingName(aSubBuilder.NamedShape()->Label(), aSolidName);
@@ -241,7 +246,8 @@ void Model_BodyBuilder::storeModified(const std::shared_ptr<GeomAPI_Shape>& theO
       if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
         std::string aName (TCollection_AsciiString(anAttr->Get()).ToCString());
         if(!aName.empty()) {
-          std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
+          std::shared_ptr<Model_Document> aDoc = 
+            std::dynamic_pointer_cast<Model_Document>(document());
           aDoc->addNamingName(aBuilder.NamedShape()->Label(), aName);
         }
       }
@@ -395,7 +401,8 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
     theMS->modified(aRShape, aList);
-    std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aList.begin(), aLast = aList.end();
+    std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator
+      anIt = aList.begin(), aLast = aList.end();
     for (; anIt != aLast; anIt++) {
       TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>();
       if (theSubShapes.isBound(*anIt)) {
@@ -442,7 +449,8 @@ void Model_BodyBuilder::loadAndOrientGeneratedShapes (
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
     theMS->generated(aRShape, aList);
-    std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aList.begin(), aLast = aList.end();
+    std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator 
+      anIt = aList.begin(), aLast = aList.end();
     for (; anIt != aLast; anIt++) {
       TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>();
       if (theSubShapes.isBound(*anIt)) {
@@ -456,15 +464,18 @@ void Model_BodyBuilder::loadAndOrientGeneratedShapes (
       }
       TopAbs_ShapeEnum aGenShapeType = aNewShape.ShapeType();
       if(aGenShapeType == TopAbs_WIRE || aGenShapeType == TopAbs_SHELL) {
-        TopAbs_ShapeEnum anExplodeShapeType = aGenShapeType == TopAbs_WIRE ? TopAbs_EDGE : TopAbs_FACE;
+        TopAbs_ShapeEnum anExplodeShapeType = 
+          aGenShapeType == TopAbs_WIRE ? TopAbs_EDGE : TopAbs_FACE;
         const TDF_Label aLabel = builder(theTag)->NamedShape()->Label();
         int aTag = 1;
-        std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
+        std::shared_ptr<Model_Document> aDoc = 
+          std::dynamic_pointer_cast<Model_Document>(document());
         for(TopExp_Explorer anExp(aNewShape, anExplodeShapeType); anExp.More(); anExp.Next()) {
           TDF_Label aChildLabel = aLabel.FindChild(aTag);
           TNaming_Builder aBuilder(aChildLabel);
           aBuilder.Generated(aRoot, anExp.Current());
-          TCollection_AsciiString aChildName = TCollection_AsciiString((theName + "_").c_str()) + aTag;
+          TCollection_AsciiString aChildName = 
+            TCollection_AsciiString((theName + "_").c_str()) + aTag;
           TDataStd_Name::Set(aChildLabel, aChildName.ToCString());
           aTag++;
         }
@@ -766,7 +777,8 @@ void Model_BodyBuilder::loadDisconnectedEdges(
   }  
 }
 
-void Model_BodyBuilder::loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName, int&  theTag)
+void Model_BodyBuilder::loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape,
+                                                 const std::string& theName, int&  theTag)
 {
   if(theShape->isNull()) return;
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();  

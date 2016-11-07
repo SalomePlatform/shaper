@@ -30,7 +30,8 @@ class Model_Update : public Events_Listener
   std::map<std::shared_ptr<ModelAPI_Feature>, std::set<std::shared_ptr<ModelAPI_Feature> > >
     myModified;
   /// Features which arguments were modified by not-persistent changes.
-  /// So, these referencing arguments must be updated due to these features info also before execution).
+  /// So, these referencing arguments must be updated 
+  /// due to these features info also before execution).
   std::map<std::shared_ptr<ModelAPI_Feature>, std::set<std::shared_ptr<ModelAPI_Feature> > >
     myNotPersistentRefs;
   /// features that must be additionally processed after execution of finish operation
@@ -45,7 +46,8 @@ class Model_Update : public Events_Listener
   std::set<std::shared_ptr<ModelAPI_Feature> > myProcessOnFinish;
   /// to avoid infinitive cycling: feature -> count of the processing periods during this update
   std::map<std::shared_ptr<ModelAPI_Feature>, int > myProcessed;
-  /// if preview in hte property panel is blocked and any update is postponed until the end of operation
+  /// if preview in hte property panel is blocked and 
+  /// any update is postponed until the end of operation
   bool myIsPreviewBlocked;
 
  public:
@@ -86,7 +88,8 @@ protected:
   /// Updates the properties of object because of stability state changes
   void updateStability(void* theSender);
 
-  /// Returns true if theFeature modification was caused by theReason (may be feature of result of this feature)
+  /// Returns true if theFeature modification was caused by theReason 
+  /// (may be feature of result of this feature)
   bool isReason(
     std::shared_ptr<ModelAPI_Feature>& theFeature, std::shared_ptr<ModelAPI_Object> theReason);
 

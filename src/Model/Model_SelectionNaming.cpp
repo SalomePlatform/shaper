@@ -52,8 +52,10 @@ std::string Model_SelectionNaming::getShapeName(
   ResultPtr& theContext, const bool theAnotherDoc, const bool theWholeContext)
 {
   std::string aName;
-  // add the result name to the name of the shape (it was in BodyBuilder, but did not work on Result rename)
-  bool isNeedContextName = theContext->shape().get() != NULL;// && !theContext->shape()->isEqual(theSubSh);
+  // add the result name to the name of the shape 
+  // (it was in BodyBuilder, but did not work on Result rename)
+  bool isNeedContextName = theContext->shape().get() != NULL;
+  // && !theContext->shape()->isEqual(theSubSh);
   // check if the subShape is already in DF
   Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(theShape, myLab);
   Handle(TDataStd_Name) anAttr;
@@ -65,7 +67,8 @@ std::string Model_SelectionNaming::getShapeName(
         // do nothing because this context name will be added later in this method
       } else {
         aName = TCollection_AsciiString(anAttr->Get()).ToCString();
-        // indexes are added to sub-shapes not primitives (primitives must not be located at the same label)
+        // indexes are added to sub-shapes not primitives 
+        // (primitives must not be located at the same label)
         if(!aName.empty() && aNS->Evolution() != TNaming_PRIMITIVE && isNeedContextName) {
           const TDF_Label& aLabel = aNS->Label();//theDoc->findNamingName(aName);
           static const std::string aPostFix("_");
@@ -161,7 +164,8 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
       break;
     case TopAbs_EDGE:
       {
-        // name structure: F1 & F2 [& F3 & F4], where F1 & F2 the faces which gives the Edge in trivial case
+        // name structure: F1 & F2 [& F3 & F4],
+        // where F1 & F2 the faces which gives the Edge in trivial case
         // if it is not atrivial case we use localization by neighbours. F3 & F4 - neighbour faces	
         if (BRep_Tool::Degenerated(TopoDS::Edge(aSubShape))) {
           aName = "Degenerated_Edge";
@@ -216,7 +220,8 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
     case TopAbs_VERTEX:
       // name structure (Monifold Topology): 
       // 1) F1 | F2 | F3 - intersection of 3 faces defines a vertex - trivial case.
-      // 2) F1 | F2 | F3 [|F4 [|Fn]] - redundant definition, but it should be kept as is to obtain safe recomputation
+      // 2) F1 | F2 | F3 [|F4 [|Fn]] - redundant definition, 
+      //                               but it should be kept as is to obtain safe recomputation
       // 2) F1 | F2      - intersection of 2 faces definses a vertex - applicable for case
       //                   when 1 faces is cylindrical, conical, spherical or revolution and etc.
       // 3) E1 | E2 | E3 - intersection of 3 edges defines a vertex - when we have case of a shell
@@ -332,7 +337,8 @@ TopAbs_ShapeEnum translateType (const std::string& theType)
   }
   if (aShapeTypes.find(theType) != aShapeTypes.end())
     return aShapeTypes[theType];
-  Events_InfoMessage("Model_SelectionNaming", "Shape type defined in XML is not implemented!").send();
+  Events_InfoMessage("Model_SelectionNaming", 
+    "Shape type defined in XML is not implemented!").send();
   return TopAbs_SHAPE;
 }
 
@@ -645,7 +651,8 @@ std::string Model_SelectionNaming::shortName(
   aName.erase(std::remove(aName.begin(), aName.end(), '-'), aName.end());
   aName.erase(std::remove(aName.begin(), aName.end(), '/'), aName.end());
   aName.erase(std::remove(aName.begin(), aName.end(), '&'), aName.end());
-  // remove the last 's', 'e', 'f' and 'r' symbols: they are used as markers of start/end/forward/rewersed indicators
+  // remove the last 's', 'e', 'f' and 'r' symbols:
+  // they are used as markers of start/end/forward/rewersed indicators
   static const std::string aSyms("sefr");
   std::string::iterator aSuffix = aName.end() - 1;
   while(aSyms.find(*aSuffix) != std::string::npos) {
@@ -690,7 +697,8 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
         }
       }
     }
-    if (aDoc != theDoc) { // so, the first word is the document name => reduce the string for the next manips
+    if (aDoc != theDoc) { 
+      // so, the first word is the document name => reduce the string for the next manips
       aSubShapeName = theSubShapeName.substr(aSlash + 1);
       if (aSubShapeName.empty() && aFoundPart.get()) { // the whole Part result
         theCont = aFoundPart;
@@ -763,7 +771,8 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   case TopAbs_SOLID:
   case TopAbs_SHELL:
   default: {//TopAbs_SHAPE
-    /// case when the whole sketch is selected, so, selection type is compound, but there is no value
+    /// case when the whole sketch is selected, so, 
+    /// selection type is compound, but there is no value
     if (aCont.get() && aCont->shape().get()) {
       if (aCont->shape()->impl<TopoDS_Shape>().ShapeType() == aType) {
         theCont = aCont;
@@ -867,7 +876,8 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
               aType == TopAbs_FACE ? "Face" : "Wire", anIDs, true))
             return false;
 
-          NCollection_DataMap<Handle(Geom_Curve), int> allCurves; // curves and orientations of edges
+          // curves and orientations of edges
+          NCollection_DataMap<Handle(Geom_Curve), int> allCurves; 
           const int aSubNum = aComposite->numberOfSubs();
           for(int a = 0; a < aSubNum; a++) {
             int aSubID = aComposite->subFeatureId(a);
@@ -896,12 +906,14 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
             theShapeToBeSelected = aFoundFW;
             return true;
           }
-        } else if (aType == TopAbs_WIRE) { // sketch faces is identified by format "Sketch_1/Face-2f-8f-11r"
+        } else if (aType == TopAbs_WIRE) { 
+          // sketch faces is identified by format "Sketch_1/Face-2f-8f-11r"
           std::map<int, int> anIDs;
           if (!parseSubIndices(aComposite, aSubShapeName, "Wire", anIDs))
             return false;
 
-          NCollection_DataMap<Handle(Geom_Curve), int> allCurves; // curves and orientations of edges
+           // curves and orientations of edges
+          NCollection_DataMap<Handle(Geom_Curve), int> allCurves;
           const int aSubNum = aComposite->numberOfSubs();
           for(int a = 0; a < aSubNum; a++) {
             int aSubID = aComposite->subFeatureId(a);
@@ -934,7 +946,9 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
       }
     }
   }
-  if (!aSelection.IsNull()) {// Select it (must be after N=0 checking, since for simple constructions the shape must be null)
+  if (!aSelection.IsNull()) {
+    // Select it (must be after N=0 checking, 
+    // since for simple constructions the shape must be null)
     std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected(new GeomAPI_Shape());
     aShapeToBeSelected->setImpl(new TopoDS_Shape(aSelection));
     theShapeToBeSelected = aShapeToBeSelected;

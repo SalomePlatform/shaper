@@ -23,7 +23,8 @@ class Model_ResultConstruction : public ModelAPI_ResultConstruction
   std::shared_ptr<ModelAPI_Feature> myOwner;  ///< owner of this result
   std::shared_ptr<GeomAPI_Shape> myShape;  ///< shape of this result created "on the fly"
   bool myFacesUpToDate; ///< is true if faces in myuFaces are computed and up to date
-  std::vector<std::shared_ptr<GeomAPI_Face> > myFaces; ///< stores the up to date faces if they exist
+  /// stores the up to date faces if they exist
+  std::vector<std::shared_ptr<GeomAPI_Face> > myFaces;
   bool myIsInHistory;
   bool myIsInfinite;
  public:

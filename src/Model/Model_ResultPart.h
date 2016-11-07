@@ -21,11 +21,14 @@
  */
 class Model_ResultPart : public ModelAPI_ResultPart
 {
-  TopoDS_Shape myShape; ///< shape of this part created from bodies (updated only of Part deactivation)
-  std::shared_ptr<gp_Trsf> myTrsf; ///< if it is just copy of original shape, keep just transformation
+  /// shape of this part created from bodies (updated only of Part deactivation)
+  TopoDS_Shape myShape; 
+  /// if it is just copy of original shape, keep just transformation
+  std::shared_ptr<gp_Trsf> myTrsf; 
  public:
 
-  /// the reference to the base result document, may be null if this is the root, others make sequence of references
+  /// the reference to the base result document, may be null if this is the root,
+  /// others make sequence of references
   inline static const std::string& BASE_REF_ID()
   {
     static const std::string MY_BASE_REF("BaseReference");

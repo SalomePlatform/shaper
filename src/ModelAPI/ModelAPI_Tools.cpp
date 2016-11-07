@@ -159,7 +159,8 @@ std::string getFeatureError(const FeaturePtr& theFeature)
   return anError;
 }
 
-ObjectPtr objectByName(const DocumentPtr& theDocument, const std::string& theGroup, const std::string& theName)
+ObjectPtr objectByName(const DocumentPtr& theDocument, const std::string& theGroup, 
+                       const std::string& theName)
 {
   for (int anIndex = 0; anIndex < theDocument->size(theGroup); ++anIndex) {
     ObjectPtr anObject = theDocument->object(theGroup, anIndex);
@@ -185,8 +186,8 @@ bool findVariable(const DocumentPtr& theDocument, FeaturePtr theSearcher,
   return true;
 }
 
-bool findVariable(FeaturePtr theSearcher, const std::string& theName, double& outValue, ResultParameterPtr& theParam,
-                  const DocumentPtr& theDocument)
+bool findVariable(FeaturePtr theSearcher, const std::string& theName, double& outValue, 
+                  ResultParameterPtr& theParam, const DocumentPtr& theDocument)
 {
   SessionPtr aSession = ModelAPI_Session::get();
   std::list<DocumentPtr> aDocList;
@@ -204,7 +205,9 @@ bool findVariable(FeaturePtr theSearcher, const std::string& theName, double& ou
 
 ResultPtr findPartResult(const DocumentPtr& theMain, const DocumentPtr& theSub)
 {
-  if (theMain != theSub) { // to optimize and avoid of crash on partset document close (don't touch the sub-document structure)
+  // to optimize and avoid of crash on partset document close 
+  // (don't touch the sub-document structure)
+  if (theMain != theSub) { 
     for (int a = theMain->size(ModelAPI_ResultPart::group()) - 1; a >= 0; a--) {
       ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(
           theMain->object(ModelAPI_ResultPart::group(), a));
@@ -218,7 +221,9 @@ ResultPtr findPartResult(const DocumentPtr& theMain, const DocumentPtr& theSub)
 
 FeaturePtr findPartFeature(const DocumentPtr& theMain, const DocumentPtr& theSub)
 {
-  if (theMain != theSub) { // to optimize and avoid of crash on partset document close (don't touch the sub-document structure)
+  // to optimize and avoid of crash on partset document close 
+  // (don't touch the sub-document structure)
+  if (theMain != theSub) {
     for (int a = theMain->size(ModelAPI_Feature::group()) - 1; a >= 0; a--) {
       FeaturePtr aPartFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(
           theMain->object(ModelAPI_Feature::group(), a));
@@ -364,7 +369,8 @@ bool removeFeatures(const std::set<FeaturePtr>& theFeatures,
     }
   }
   if (isDone && theFlushRedisplay) {
-    // the redisplay signal should be flushed in order to erase the feature presentation in the viewer
+    // the redisplay signal should be flushed in order to erase 
+    // the feature presentation in the viewer
     // if should be done after removeFeature() of document
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
   }
@@ -412,7 +418,8 @@ void addRefsToFeature(const FeaturePtr& theFeature,
 #endif
     if (theReferences.find(aRefFeature) == theReferences.end())
       theReferences.insert(aRefFeature);
-    addRefsToFeature(aRefFeature, theReferencesMap, theProcessedReferences, theRecLevel, theReferences);
+    addRefsToFeature(aRefFeature, theReferencesMap, theProcessedReferences, 
+                     theRecLevel, theReferences);
   }
 }
 
@@ -445,7 +452,8 @@ void findReferences(const std::set<FeaturePtr>& theFeatures,
                                              aLast = aSelRefFeatures.end();
         for (; anIt != aLast; anIt++) {
           FeaturePtr aCFeature = *anIt;
-          CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCFeature);
+          CompositeFeaturePtr aComposite = 
+            std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCFeature);
           if (aComposite.get() && aComposite->isSub(aFeature))
             continue; /// composite of the current feature should be skipped
           aFilteredFeatures.insert(aCFeature);
@@ -454,7 +462,8 @@ void findReferences(const std::set<FeaturePtr>& theFeatures,
       }
       if (theUseRecursion) {
 #ifdef DEBUG_CYCLING_1550
-        findReferences(aSelRefFeatures, theReferences, theUseComposite, theUseRecursion, theRecLevel);
+        findReferences(aSelRefFeatures, theReferences, theUseComposite, 
+                       theUseRecursion, theRecLevel);
 #else
         findReferences(theReferences[aFeature], theReferences, theUseComposite, theUseRecursion,
                        theRecLevel);
@@ -518,7 +527,8 @@ void findAllReferences(const std::set<FeaturePtr>& theFeatures,
       std::cout << " Ref: " << getFeatureInfo(aFeature) << std::endl;
 #endif
       aRecLevel++;
-      addRefsToFeature(aFeature, aMainList, theReferences, aRecLevel, aResultRefList/*aMainRefList*/);
+      addRefsToFeature(aFeature, aMainList, theReferences, 
+                       aRecLevel, aResultRefList/*aMainRefList*/);
     }
     theReferences[aMainListFeature] = aResultRefList;
   }
@@ -545,7 +555,8 @@ void findRefsToFeatures(const std::set<FeaturePtr>& theFeatures,
     std::set<FeaturePtr>::const_iterator aRefIt = aRefList.begin(), aRefLast = aRefList.end();
     for (; aRefIt != aRefLast; aRefIt++) {
       FeaturePtr aRefFeature = *aRefIt;
-      CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aRefFeature);
+      CompositeFeaturePtr aComposite = 
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aRefFeature);
       if (aComposite.get() && aComposite->isSub(aFeature))
         continue; /// composite of the current feature should not be removed
 

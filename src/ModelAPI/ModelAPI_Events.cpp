@@ -229,7 +229,8 @@ void ModelAPI_ReplaceParameterMessage::setObject(ObjectPtr theObject)
 
 
 // =====   ModelAPI_SolverFailedMessage   =====
-ModelAPI_SolverFailedMessage::ModelAPI_SolverFailedMessage(const Events_ID theID, const void* theSender)
+ModelAPI_SolverFailedMessage::ModelAPI_SolverFailedMessage(const Events_ID theID, 
+                                                           const void* theSender)
   : Events_Message(theID, theSender),
     myDOF(-1)
 {

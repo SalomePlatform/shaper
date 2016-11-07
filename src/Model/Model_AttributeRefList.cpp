@@ -129,7 +129,8 @@ int Model_AttributeRefList::size(const bool theWithEmpty) const
 
 bool Model_AttributeRefList::isInitialized()
 {
-  if (size(false) == 0) { // empty list is not initialized list: sketch will be not valid after add/undo
+  if (size(false) == 0) {
+    // empty list is not initialized list: sketch will be not valid after add/undo
     return false;
   }
   return ModelAPI_AttributeRefList::isInitialized();

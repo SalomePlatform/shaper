@@ -48,7 +48,8 @@ class ModelAPI_Expression
   MODELAPI_EXPORT virtual std::string error() = 0;
 
   /// Defines the used parameters (by the parameters listener)
-  MODELAPI_EXPORT virtual void setUsedParameters(const std::set<std::string>& theUsedParameters) = 0;
+  MODELAPI_EXPORT virtual 
+    void setUsedParameters(const std::set<std::string>& theUsedParameters) = 0;
 
   /// Returns the used parameters
   MODELAPI_EXPORT virtual std::set<std::string> usedParameters() const = 0;

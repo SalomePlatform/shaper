@@ -42,10 +42,13 @@ public:
     std::shared_ptr<Model_Document> theDoc, std::shared_ptr<GeomAPI_Shape>& theShapeToBeSelected,
     std::shared_ptr<ModelAPI_Result>& theCont);
 
-  /// Searches the face more appropriate to the given curves (with higher level of matched parameters)
+  /// Searches the face more appropriate to the given curves 
+  /// (with higher level of matched parameters)
   /// \param theConstr construction result that contains one or several  faces
-  /// \param theCurves map from the face edges curves to orientation (-1 reversed, 0 unknown, 1 forward)
-  /// \param theIsWire for wire algorithm isquite the same, but if in face several wires, it returns the needed wire
+  /// \param theCurves map from the face edges curves to orientation 
+  ///                  (-1 reversed, 0 unknown, 1 forward)
+  /// \param theIsWire for wire algorithm isquite the same, 
+  ///                  but if in face several wires, it returns the needed wire
   /// \returns faces fron this construction if found
   static std::shared_ptr<GeomAPI_Shape> findAppropriateFace(
     std::shared_ptr<ModelAPI_Result>& theConstr, 

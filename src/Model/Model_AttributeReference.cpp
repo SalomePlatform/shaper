@@ -72,7 +72,8 @@ ObjectPtr Model_AttributeReference::value()
       if (myRef->Label().FindAttribute(TDataStd_AsciiString::GetID(), anEntry)) {
         std::shared_ptr<Model_Document> aDR = std::dynamic_pointer_cast<Model_Document>(aRefDoc);
         TDF_Label aRefLab;
-        TDF_Tool::Label(aDR->objects()->featuresLabel().Data(), anEntry->Get().ToCString(), aRefLab);
+        TDF_Tool::Label(aDR->objects()->featuresLabel().Data(), 
+          anEntry->Get().ToCString(), aRefLab);
         if (!aRefLab.IsNull()) {
           return aDR->objects()->object(aRefLab);
         }

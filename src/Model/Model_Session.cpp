@@ -175,10 +175,12 @@ FeaturePtr Model_Session::createFeature(string theFeatureID, Model_Document* the
       }
       return aCreated;
     } else {
-      Events_InfoMessage("Model_Session","Can not load plugin '%1'").arg(myCurrentPluginName).send();
+      Events_InfoMessage("Model_Session",
+        "Can not load plugin '%1'").arg(myCurrentPluginName).send();
     }
   } else {
-    Events_InfoMessage("Model_Session","Feature '%1' not found in any plugin").arg(theFeatureID).send();
+    Events_InfoMessage("Model_Session",
+      "Feature '%1' not found in any plugin").arg(theFeatureID).send();
   }
 
   return FeaturePtr();  // return nothing
@@ -189,7 +191,8 @@ std::shared_ptr<ModelAPI_Document> Model_Session::moduleDocument()
   Handle(Model_Application) anApp = Model_Application::getApplication();
   bool aFirstCall = !anApp->hasRoot();
   if (aFirstCall) {
-    // to be sure that plugins are loaded, even before the first "createFeature" call (in unit tests)
+    // to be sure that plugins are loaded, 
+    // even before the first "createFeature" call (in unit tests)
     LoadPluginsInfo();
     // creation of the root document is always outside of the transaction, so, avoid checking it
     setCheckTransactions(false);
@@ -396,7 +399,8 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
     }
   } else {  // create/update/delete
     if (myCheckTransactions && !isOperation())
-      Events_InfoMessage("Model_Session", "Modification of data structure outside of the transaction").send();
+      Events_InfoMessage("Model_Session",
+        "Modification of data structure outside of the transaction").send();
     // if part is deleted, make the root as the current document (on undo of Parts creations)
     static const Events_ID kDeletedEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
     if (theMessage->eventID() == kDeletedEvent) {

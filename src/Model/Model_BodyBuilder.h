@@ -55,17 +55,19 @@ public:
   MODEL_EXPORT virtual void generated(const std::shared_ptr<GeomAPI_Shape>& theNewShape, 
     const std::string& theName, const int theTag = 1);
 
-  /// Records the shape newShape which was generated from the shape oldShape during a topological 
+  /// Records the shape newShape which was generated from the shape oldShape during a topological
   /// construction. As an example, consider the case of a face generated from an edge in 
   /// construction of a prism.
   MODEL_EXPORT virtual void generated(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
-    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, const int theTag = 1);
+    const std::shared_ptr<GeomAPI_Shape>& theNewShape, 
+    const std::string& theName, const int theTag = 1);
 
 
   /// Records the shape newShape which is a modification of the shape oldShape.
   /// As an example, consider the case of a face split or merged in a Boolean operation.
   MODEL_EXPORT virtual void modified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
-    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, const int theTag = 1);
+    const std::shared_ptr<GeomAPI_Shape>& theNewShape, 
+    const std::string& theName, const int theTag = 1);
 
   /// Records the shape oldShape which was deleted from the current label.
   /// As an example, consider the case of a face removed by a Boolean operation.
@@ -96,13 +98,16 @@ public:
                                                GeomAPI_DataMapOfShapeShape& theSubShapes);
   
   /// Loads shapes of the first level (to be used during shape import)
-  MODEL_EXPORT virtual void loadFirstLevel(std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName, int&  theTag);
+  MODEL_EXPORT virtual void loadFirstLevel(std::shared_ptr<GeomAPI_Shape> theShape,
+                                           const std::string& theName, int&  theTag);
   
   /// Loads disconnected edges
-  MODEL_EXPORT virtual void loadDisconnectedEdges(std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName, int&  theTag);
+  MODEL_EXPORT virtual void loadDisconnectedEdges(std::shared_ptr<GeomAPI_Shape> theShape,
+                                                  const std::string& theName, int&  theTag);
 
   /// Loads disconnected vetexes
-  MODEL_EXPORT virtual void loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName, int&  theTag);
+  MODEL_EXPORT virtual void loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape, 
+                                                     const std::string& theName, int&  theTag);
 
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_BodyBuilder();
@@ -127,7 +132,8 @@ protected:
 
 private:
   /// Loads shapes of the next level (to be used during shape import)
-  void loadNextLevels(std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName, int&  theTag);
+  void loadNextLevels(std::shared_ptr<GeomAPI_Shape> theShape, 
+                      const std::string& theName, int&  theTag);
 
   /// builds name for the shape kept at the specified tag 
   void buildName(const int theTag, const std::string& theName);

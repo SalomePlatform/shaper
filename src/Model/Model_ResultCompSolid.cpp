@@ -79,7 +79,8 @@ void Model_ResultCompSolid::colorConfigInfo(std::string& theSection, std::string
   theDefault = DEFAULT_COLOR();
 }
 
-bool Model_ResultCompSolid::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, const bool theFlag)
+bool Model_ResultCompSolid::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, 
+                                        const bool theFlag)
 {
   bool aChanged = ModelAPI_ResultBody::setDisabled(theThis, theFlag);
   if (aChanged) { // state is changed, so modifications are needed

@@ -59,7 +59,8 @@ std::shared_ptr<ModelAPI_Session> ModelAPI_Session::get()
   return MY_MANAGER;
 }
 
-const ModelAPI_EventCreator* MY_API_CREATOR = 0;  ///< instance of the events creator, one pre application
+/// instance of the events creator, one pre application
+const ModelAPI_EventCreator* MY_API_CREATOR = 0;  
 
 const ModelAPI_EventCreator* ModelAPI_EventCreator::get()
 {

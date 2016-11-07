@@ -147,8 +147,8 @@ MODELAPI_EXPORT void findAllReferences(const std::set<FeaturePtr>& theFeatures,
 * \param theFeaturesRefsTo an out list of referenced features
 */
 MODELAPI_EXPORT void findRefsToFeatures(const std::set<FeaturePtr>& aFeatures,
-                                        const std::map<FeaturePtr, std::set<FeaturePtr> >& aReferences,
-                                        std::set<FeaturePtr>& aFeaturesRefsTo);
+                                const std::map<FeaturePtr, std::set<FeaturePtr> >& aReferences,
+                                std::set<FeaturePtr>& aFeaturesRefsTo);
 
 /*! Finds referenced of the feature to objects and collects concealed results.
 * \param theFeatures a model feature

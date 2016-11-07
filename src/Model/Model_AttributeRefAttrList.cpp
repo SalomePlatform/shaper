@@ -90,7 +90,8 @@ void Model_AttributeRefAttrList::remove(AttributePtr theAttr)
   TDF_ListIteratorOfLabelList aRefIter(aRefList);
   TDataStd_ListIteratorOfListOfExtendedString anIDIter(anIDList);
   for (; aRefIter.More(); aRefIter.Next(), anIDIter.Next()) {
-    if (aOneisDeleted || anIDIter.Value() != theAttr->id().c_str() ||  // append now only not removed
+    if (aOneisDeleted || anIDIter.Value() != theAttr->id().c_str() ||  
+        // append now only not removed
         aRefIter.Value() != aTheObjLab || // append now only not removed
         (aTheObjLab.IsNull() && aDoc->objects()->object(aRefIter.Value()) != NULL)) {
       myRef->Append(aRefIter.Value());

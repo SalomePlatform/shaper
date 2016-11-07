@@ -30,7 +30,9 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   std::map<std::string, ModelAPI_Plugin*> myPluginObjs;  ///< instances of the already plugins
   std::string myCurrentPluginName;  ///< name of the plugin that must be loaded currently
   std::shared_ptr<ModelAPI_Document> myCurrentDoc;  ///< current working document
-  bool myCheckTransactions;  ///< if true, generates error if document is updated outside of transaction
+  
+  /// if true, generates error if document is updated outside of transaction
+  bool myCheckTransactions; 
   bool myOperationAttachedToNext; ///< the current operation must be committed twice, with nested
  public:
 
@@ -50,7 +52,8 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
 
   //! Starts a new operation (opens a transaction)
   //! \param theId string-identifier of the started transaction
-  //! \param theAttachedToNested if it is true, it means that this transaction is attached to the nested 
+  //! \param theAttachedToNested if it is true, 
+  //!                            it means that this transaction is attached to the nested 
   //!          where it is located and will be committed on the next commit with the nested
   MODEL_EXPORT virtual void startOperation(
     const std::string& theId = "", const bool theAttachedToNested = false);

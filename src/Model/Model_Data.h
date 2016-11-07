@@ -89,7 +89,8 @@ class Model_Data : public ModelAPI_Data
   /// Returns the attribute that contains real value with double precision
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID);
   /// Returns the attribute that contains double values array
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeDoubleArray> realArray(const std::string& theID);
+  MODEL_EXPORT virtual
+    std::shared_ptr<ModelAPI_AttributeDoubleArray> realArray(const std::string& theID);
   /// Returns the attribute that contains integer value
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeInteger>
     integer(const std::string& theID);
@@ -160,7 +161,8 @@ class Model_Data : public ModelAPI_Data
   MODEL_EXPORT virtual void sendAttributeUpdated(ModelAPI_Attribute* theAttr);
   /// Blocks sending "attribute updated" if theBlock is true
   /// \param theBlock allows switching on/off the blocking state
-  /// \param theSendMessage if false, it does not send the update message even if something is changed
+  /// \param theSendMessage if false, it does not send the update message
+  ///            even if something is changed
   ///            (normally is it used in attributeChanged because this message will be sent anyway)
   MODEL_EXPORT virtual void blockSendAttributeUpdated(
     const bool theBlock, const bool theSendMessage = true);
@@ -199,7 +201,8 @@ class Model_Data : public ModelAPI_Data
   MODEL_EXPORT virtual const std::set<AttributePtr>& refsToMe() {return myRefsToMe;}
 
   /// returns all references by attributes of this data
-  /// \param theRefs returned list of pairs: id of referenced attribute and list of referenced objects
+  /// \param theRefs returned list of pairs: 
+  ///                id of referenced attribute and list of referenced objects
   MODEL_EXPORT virtual void referencesToObjects(
     std::list<std::pair<std::string, std::list<ObjectPtr> > >& theRefs);
 
