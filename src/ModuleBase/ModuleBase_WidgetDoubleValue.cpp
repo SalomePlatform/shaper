@@ -91,7 +91,8 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
   myLabel->setToolTip(aTTip);
 
   aControlLay->addRow(myLabel, mySpinBox);
-  connect(mySpinBox, SIGNAL(valueChanged(const QString&)), this, SIGNAL(valuesModified()));
+  // we should listen textChanged signal as valueChanged do not send when text is modified
+  connect(mySpinBox, SIGNAL(textChanged(const QString&)), this, SIGNAL(valuesModified()));
   mySpinBox->setValueEnabled(isValueEnabled());
 }
 

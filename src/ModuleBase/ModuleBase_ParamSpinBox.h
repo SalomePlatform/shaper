@@ -76,6 +76,9 @@ protected:
   /// \param outValue an output value of the variable
   bool findVariable(const QString& theName, double& outValue) const;
 
+signals:
+  void textChanged(const QString& theText);
+
  protected:
   virtual void showEvent(QShowEvent*);
 
