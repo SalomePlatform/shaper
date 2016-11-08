@@ -532,13 +532,9 @@ void SketchPlugin_ConstraintSplit::getConstraints(std::set<FeaturePtr>& theFeatu
         if (anAttribute.get())
           aCoincidentPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttribute);
       }
-      if (aCoincidentPoint.get()) {
-        if (isToFeature)
-          theCoincidenceToFeature[aRefFeature] = std::make_pair(anAttributeToBeModified,
-                                                                aCoincidentPoint);
-      }
-      else
-        theFeaturesToDelete.insert(aRefFeature); /// this case should not happen
+      if (aCoincidentPoint.get() && isToFeature)
+        theCoincidenceToFeature[aRefFeature] = std::make_pair(anAttributeToBeModified,
+                                                              aCoincidentPoint);
     }
   }
 }
