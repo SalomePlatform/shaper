@@ -9,14 +9,14 @@
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 
-//==================================================================================================
+//================================================================================================
 FeaturesAPI_Union::FeaturesAPI_Union(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
 {
   initialize();
 }
 
-//==================================================================================================
+//================================================================================================
 FeaturesAPI_Union::FeaturesAPI_Union(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                      const std::list<ModelHighAPI_Selection>& theBaseObjects)
 : ModelHighAPI_Interface(theFeature)
@@ -26,7 +26,7 @@ FeaturesAPI_Union::FeaturesAPI_Union(const std::shared_ptr<ModelAPI_Feature>& th
   }
 }
 
-//==================================================================================================
+//================================================================================================
 FeaturesAPI_Union::~FeaturesAPI_Union()
 {
 
@@ -46,9 +46,11 @@ void FeaturesAPI_Union::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Union::BASE_OBJECTS_ID());
+  AttributeSelectionListPtr anAttrObjects =
+    aBase->selectionList(FeaturesPlugin_Union::BASE_OBJECTS_ID());
 
-  theDumper << aBase << " = model.addUnion(" << aDocName << ", " << anAttrObjects << ")" << std::endl;
+  theDumper << aBase << " = model.addUnion(" << aDocName << 
+    ", " << anAttrObjects << ")" << std::endl;
 }
 
 //==================================================================================================

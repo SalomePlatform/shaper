@@ -41,11 +41,16 @@ public:
   virtual ~FeaturesAPI_Placement();
 
   INTERFACE_5(FeaturesPlugin_Placement::ID(),
-              objects, FeaturesPlugin_Placement::OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList, /** Main objects */,
-              startShape, FeaturesPlugin_Placement::START_SHAPE_ID(), ModelAPI_AttributeSelection, /** Start shape */,
-              endShape, FeaturesPlugin_Placement::END_SHAPE_ID(), ModelAPI_AttributeSelection, /** End shape */,
-              reverseDirection, FeaturesPlugin_Placement::REVERSE_ID(), ModelAPI_AttributeBoolean, /** Reverse direction flag */,
-              centering, FeaturesPlugin_Placement::CENTERING_ID(), ModelAPI_AttributeBoolean, /** Centering flag */)
+              objects, FeaturesPlugin_Placement::OBJECTS_LIST_ID(), 
+              ModelAPI_AttributeSelectionList, /** Main objects */,
+              startShape, FeaturesPlugin_Placement::START_SHAPE_ID(),
+              ModelAPI_AttributeSelection, /** Start shape */,
+              endShape, FeaturesPlugin_Placement::END_SHAPE_ID(), 
+              ModelAPI_AttributeSelection, /** End shape */,
+              reverseDirection, FeaturesPlugin_Placement::REVERSE_ID(),
+              ModelAPI_AttributeBoolean, /** Reverse direction flag */,
+              centering, FeaturesPlugin_Placement::CENTERING_ID(),
+              ModelAPI_AttributeBoolean, /** Centering flag */)
 
   /// Set objects.
   FEATURESAPI_EXPORT

@@ -23,9 +23,10 @@ bool FeaturesPlugin_RevolutionBoolean::makeGeneration(ListOfShape& theBaseShapes
 
 //=================================================================================================
 void FeaturesPlugin_RevolutionBoolean::storeGenerationHistory(ResultBodyPtr theResultBody,
-                                                             const GeomShapePtr theBaseShape,
-                                                             const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
-                                                             int& theTag)
+                                      const GeomShapePtr theBaseShape,
+                                      const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+                                      int& theTag)
 {
-  FeaturesPlugin_Revolution::storeGenerationHistory(theResultBody, theBaseShape, theMakeShape, theTag);
+  FeaturesPlugin_Revolution::storeGenerationHistory(theResultBody, theBaseShape,
+                                                    theMakeShape, theTag);
 }

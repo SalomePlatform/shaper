@@ -86,8 +86,10 @@ void FeaturesAPI_Placement::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Placement::OBJECTS_LIST_ID());
-  AttributeSelectionPtr anAttrStartShape = aBase->selection(FeaturesPlugin_Placement::START_SHAPE_ID());
+  AttributeSelectionListPtr anAttrObjects =
+    aBase->selectionList(FeaturesPlugin_Placement::OBJECTS_LIST_ID());
+  AttributeSelectionPtr anAttrStartShape =
+    aBase->selection(FeaturesPlugin_Placement::START_SHAPE_ID());
   AttributeSelectionPtr anAttrEndShape = aBase->selection(FeaturesPlugin_Placement::END_SHAPE_ID());
   AttributeBooleanPtr anAttrReverse = aBase->boolean(FeaturesPlugin_Placement::REVERSE_ID());
   AttributeBooleanPtr anAttrCentering = aBase->boolean(FeaturesPlugin_Placement::CENTERING_ID());

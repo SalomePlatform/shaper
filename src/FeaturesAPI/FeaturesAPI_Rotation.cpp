@@ -66,7 +66,8 @@ void FeaturesAPI_Rotation::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Rotation::OBJECTS_LIST_ID());
+  AttributeSelectionListPtr anAttrObjects =
+    aBase->selectionList(FeaturesPlugin_Rotation::OBJECTS_LIST_ID());
   AttributeSelectionPtr anAttrAxis = aBase->selection(FeaturesPlugin_Rotation::AXIS_OBJECT_ID());
   AttributeDoublePtr anAttrAngle = aBase->real(FeaturesPlugin_Rotation::ANGLE_ID());
 

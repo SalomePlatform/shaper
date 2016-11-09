@@ -13,7 +13,8 @@
 /// \class FeaturesPlugin_RevolutionBoolean
 /// \ingroup Plugins
 /// \brief Interface for the composite revolution feature.
-class FeaturesPlugin_RevolutionBoolean : public FeaturesPlugin_Revolution, public FeaturesPlugin_CompositeBoolean
+class FeaturesPlugin_RevolutionBoolean : public FeaturesPlugin_Revolution, 
+                                         public FeaturesPlugin_CompositeBoolean
 {
 public:
   /// Request for initialization of data model of the feature: adding all attributes.

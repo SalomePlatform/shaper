@@ -63,7 +63,8 @@ void FeaturesPlugin_Extrusion::execute()
   int aResultIndex = 0;
   ListOfShape::const_iterator aBaseIt = aBaseShapesList.cbegin();
   ListOfMakeShape::const_iterator anAlgoIt = aMakeShapesList.cbegin();
-  for(; aBaseIt != aBaseShapesList.cend() && anAlgoIt != aMakeShapesList.cend(); ++aBaseIt, ++anAlgoIt) {
+  for(; aBaseIt != aBaseShapesList.cend() && anAlgoIt != aMakeShapesList.cend();
+        ++aBaseIt, ++anAlgoIt) {
     storeResult(*aBaseIt, *anAlgoIt, aResultIndex++);
   }
 
@@ -130,7 +131,8 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
   }
 
   // Generating result for each base shape.
-  for(ListOfShape::const_iterator anIter = theBaseShapes.cbegin(); anIter != theBaseShapes.cend(); anIter++) {
+  for(ListOfShape::const_iterator
+      anIter = theBaseShapes.cbegin(); anIter != theBaseShapes.cend(); anIter++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anIter;
 
     std::shared_ptr<GeomAlgoAPI_Prism> aPrismAlgo(new GeomAlgoAPI_Prism(aBaseShape, aDir,

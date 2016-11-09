@@ -18,7 +18,7 @@ FeaturesAPI_Partition::FeaturesAPI_Partition(const std::shared_ptr<ModelAPI_Feat
 
 //==================================================================================================
 FeaturesAPI_Partition::FeaturesAPI_Partition(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                             const std::list<ModelHighAPI_Selection>& theBaseObjects)
+                                          const std::list<ModelHighAPI_Selection>& theBaseObjects)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
@@ -46,9 +46,11 @@ void FeaturesAPI_Partition::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Partition::BASE_OBJECTS_ID());
+  AttributeSelectionListPtr anAttrObjects =
+    aBase->selectionList(FeaturesPlugin_Partition::BASE_OBJECTS_ID());
 
-  theDumper << aBase << " = model.addPartition(" << aDocName << ", " << anAttrObjects << ")" << std::endl;
+  theDumper << aBase << " = model.addPartition(" << aDocName <<
+    ", " << anAttrObjects << ")" << std::endl;
 }
 
 //==================================================================================================

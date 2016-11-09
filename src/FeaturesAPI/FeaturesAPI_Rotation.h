@@ -40,9 +40,12 @@ public:
   virtual ~FeaturesAPI_Rotation();
 
   INTERFACE_3(FeaturesPlugin_Rotation::ID(),
-              mainObjects, FeaturesPlugin_Rotation::OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList, /** Main objects */,
-              axisObject, FeaturesPlugin_Rotation::AXIS_OBJECT_ID(), ModelAPI_AttributeSelection, /** Axis object */,
-              angle, FeaturesPlugin_Rotation::ANGLE_ID(), ModelAPI_AttributeDouble, /** Angle */)
+              mainObjects, FeaturesPlugin_Rotation::OBJECTS_LIST_ID(),
+              ModelAPI_AttributeSelectionList, /** Main objects */,
+              axisObject, FeaturesPlugin_Rotation::AXIS_OBJECT_ID(),
+              ModelAPI_AttributeSelection, /** Axis object */,
+              angle, FeaturesPlugin_Rotation::ANGLE_ID(),
+              ModelAPI_AttributeDouble, /** Angle */)
 
   /// Set main objects.
   FEATURESAPI_EXPORT

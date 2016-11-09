@@ -79,16 +79,26 @@ public:
   virtual ~FeaturesAPI_Extrusion();
 
   INTERFACE_10(FeaturesPlugin_Extrusion::ID(),
-               sketch, FeaturesPlugin_Extrusion::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */,
-               baseObjects, FeaturesPlugin_Extrusion::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */,
-               direction, FeaturesPlugin_Extrusion::DIRECTION_OBJECT_ID(), ModelAPI_AttributeSelection, /** Direction */,
-               creationMethod, FeaturesPlugin_Extrusion::CREATION_METHOD(), ModelAPI_AttributeString, /** Creation method */,
-               toSize, FeaturesPlugin_Extrusion::TO_SIZE_ID(), ModelAPI_AttributeDouble, /** To size */,
-               fromSize, FeaturesPlugin_Extrusion::FROM_SIZE_ID(), ModelAPI_AttributeDouble, /** From size */,
-               toObject, FeaturesPlugin_Extrusion::TO_OBJECT_ID(), ModelAPI_AttributeSelection, /** To object */,
-               toOffset, FeaturesPlugin_Extrusion::TO_OFFSET_ID(), ModelAPI_AttributeDouble, /** To offset */,
-               fromObject, FeaturesPlugin_Extrusion::FROM_OBJECT_ID(), ModelAPI_AttributeSelection, /** From object */,
-               fromOffset, FeaturesPlugin_Extrusion::FROM_OFFSET_ID(), ModelAPI_AttributeDouble, /** From offset */)
+               sketch, FeaturesPlugin_Extrusion::SKETCH_ID(),
+               ModelAPI_AttributeReference, /** Sketch launcher */,
+               baseObjects, FeaturesPlugin_Extrusion::BASE_OBJECTS_ID(),
+               ModelAPI_AttributeSelectionList, /** Base objects */,
+               direction, FeaturesPlugin_Extrusion::DIRECTION_OBJECT_ID(),
+               ModelAPI_AttributeSelection, /** Direction */,
+               creationMethod, FeaturesPlugin_Extrusion::CREATION_METHOD(),
+               ModelAPI_AttributeString, /** Creation method */,
+               toSize, FeaturesPlugin_Extrusion::TO_SIZE_ID(),
+               ModelAPI_AttributeDouble, /** To size */,
+               fromSize, FeaturesPlugin_Extrusion::FROM_SIZE_ID(),
+               ModelAPI_AttributeDouble, /** From size */,
+               toObject, FeaturesPlugin_Extrusion::TO_OBJECT_ID(),
+               ModelAPI_AttributeSelection, /** To object */,
+               toOffset, FeaturesPlugin_Extrusion::TO_OFFSET_ID(),
+               ModelAPI_AttributeDouble, /** To offset */,
+               fromObject, FeaturesPlugin_Extrusion::FROM_OBJECT_ID(),
+               ModelAPI_AttributeSelection, /** From object */,
+               fromOffset, FeaturesPlugin_Extrusion::FROM_OFFSET_ID(),
+               ModelAPI_AttributeDouble, /** From offset */)
 
   /// Modify base attribute of the feature.
   FEATURESAPI_EXPORT
@@ -104,13 +114,15 @@ public:
 
   /// Modify CreationMethod, to_size, from_size attributes of the feature.
   FEATURESAPI_EXPORT
-  void setSizes(const ModelHighAPI_Double& theToSize, const ModelHighAPI_Double& theFromSize);
+  void setSizes(const ModelHighAPI_Double& theToSize, 
+                const ModelHighAPI_Double& theFromSize);
 
   /// Modify creation_method, to_size, from_size attributes of the feature.
   FEATURESAPI_EXPORT
   void setSize(const ModelHighAPI_Double& theSize);
 
-  /// Modify creation_method, to_object, to_offset, from_object, from_offset attributes of the feature.
+  /// Modify creation_method, to_object, to_offset,
+  /// from_object, from_offset attributes of the feature.
   FEATURESAPI_EXPORT
   void setPlanesAndOffsets(const ModelHighAPI_Selection& theToObject,
                            const ModelHighAPI_Double& theToOffset,

@@ -23,9 +23,10 @@ bool FeaturesPlugin_ExtrusionBoolean::makeGeneration(ListOfShape& theBaseShapes,
 
 //=================================================================================================
 void FeaturesPlugin_ExtrusionBoolean::storeGenerationHistory(ResultBodyPtr theResultBody,
-                                                             const GeomShapePtr theBaseShape,
-                                                             const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
-                                                             int& theTag)
+                                        const GeomShapePtr theBaseShape,
+                                        const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+                                        int& theTag)
 {
-  FeaturesPlugin_Extrusion::storeGenerationHistory(theResultBody, theBaseShape, theMakeShape, theTag);
+  FeaturesPlugin_Extrusion::storeGenerationHistory(theResultBody, theBaseShape, 
+                                                   theMakeShape, theTag);
 }

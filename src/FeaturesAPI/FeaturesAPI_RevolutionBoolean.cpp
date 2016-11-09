@@ -12,7 +12,8 @@
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
-FeaturesAPI_RevolutionBoolean::FeaturesAPI_RevolutionBoolean(const std::shared_ptr<ModelAPI_Feature>& theFeature)
+FeaturesAPI_RevolutionBoolean::FeaturesAPI_RevolutionBoolean(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
 {
 }
@@ -84,7 +85,7 @@ void FeaturesAPI_RevolutionBoolean::setAngle(const ModelHighAPI_Double& theAngle
 //==================================================================================================
 void FeaturesAPI_RevolutionBoolean::setPlanesAndOffsets(const ModelHighAPI_Selection& theToObject,
                                                         const ModelHighAPI_Double& theToOffset,
-                                                        const ModelHighAPI_Selection& theFromObject,
+                                                      const ModelHighAPI_Selection& theFromObject,
                                                         const ModelHighAPI_Double& theFromOffset)
 {
   fillAttribute(FeaturesPlugin_Revolution::CREATION_METHOD_BY_PLANES(), mycreationMethod);
@@ -97,7 +98,8 @@ void FeaturesAPI_RevolutionBoolean::setPlanesAndOffsets(const ModelHighAPI_Selec
 }
 
 //==================================================================================================
-void FeaturesAPI_RevolutionBoolean::setBooleanObjects(const std::list<ModelHighAPI_Selection>& theBooleanObjects)
+void FeaturesAPI_RevolutionBoolean::setBooleanObjects(
+  const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 {
   fillAttribute(theBooleanObjects, mybooleanObjects);
 
@@ -110,9 +112,12 @@ void FeaturesAPI_RevolutionBoolean::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  AttributeReferencePtr anAttrSketch = aBase->reference(FeaturesPlugin_Revolution::SKETCH_ID());
-  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Revolution::BASE_OBJECTS_ID());
-  AttributeSelectionPtr anAttrAxis = aBase->selection(FeaturesPlugin_Revolution::AXIS_OBJECT_ID());
+  AttributeReferencePtr anAttrSketch =
+    aBase->reference(FeaturesPlugin_Revolution::SKETCH_ID());
+  AttributeSelectionListPtr anAttrObjects =
+    aBase->selectionList(FeaturesPlugin_Revolution::BASE_OBJECTS_ID());
+  AttributeSelectionPtr anAttrAxis =
+    aBase->selection(FeaturesPlugin_Revolution::AXIS_OBJECT_ID());
 
   theDumper << aBase << " = model.addRevolution";
   if(aBase->getKind() == FeaturesPlugin_RevolutionCut::ID()) {
@@ -124,7 +129,8 @@ void FeaturesAPI_RevolutionBoolean::dump(ModelHighAPI_Dumper& theDumper) const
   anAttrSketch->isInitialized() ? theDumper << "[]" : theDumper << anAttrObjects;
   theDumper << ", " << anAttrAxis;
 
-  std::string aCreationMethod = aBase->string(FeaturesPlugin_Revolution::CREATION_METHOD())->value();
+  std::string aCreationMethod = 
+    aBase->string(FeaturesPlugin_Revolution::CREATION_METHOD())->value();
 
   if(aCreationMethod == FeaturesPlugin_Revolution::CREATION_METHOD_BY_ANGLES()) {
     AttributeDoublePtr anAttrToAngle = aBase->real(FeaturesPlugin_Revolution::TO_ANGLE_ID());
@@ -132,15 +138,21 @@ void FeaturesAPI_RevolutionBoolean::dump(ModelHighAPI_Dumper& theDumper) const
 
     theDumper << ", " << anAttrToAngle << ", " << anAttrFromAngle;
   } else if(aCreationMethod == FeaturesPlugin_Revolution::CREATION_METHOD_BY_PLANES()) {
-    AttributeSelectionPtr anAttrToObject = aBase->selection(FeaturesPlugin_Revolution::TO_OBJECT_ID());
-    AttributeDoublePtr anAttrToOffset = aBase->real(FeaturesPlugin_Revolution::TO_OFFSET_ID());
-    AttributeSelectionPtr anAttrFromObject = aBase->selection(FeaturesPlugin_Revolution::FROM_OBJECT_ID());
-    AttributeDoublePtr anAttrFromOffset = aBase->real(FeaturesPlugin_Revolution::FROM_OFFSET_ID());
+    AttributeSelectionPtr anAttrToObject =
+      aBase->selection(FeaturesPlugin_Revolution::TO_OBJECT_ID());
+    AttributeDoublePtr anAttrToOffset =
+      aBase->real(FeaturesPlugin_Revolution::TO_OFFSET_ID());
+    AttributeSelectionPtr anAttrFromObject = 
+      aBase->selection(FeaturesPlugin_Revolution::FROM_OBJECT_ID());
+    AttributeDoublePtr anAttrFromOffset = 
+      aBase->real(FeaturesPlugin_Revolution::FROM_OFFSET_ID());
 
-    theDumper << ", " << anAttrToObject << ", " << anAttrToOffset << ", " << anAttrFromObject << ", " << anAttrFromOffset;
+    theDumper << ", " << anAttrToObject << ", " << anAttrToOffset << 
+      ", " << anAttrFromObject << ", " << anAttrFromOffset;
   }
 
-  AttributeSelectionListPtr anAttrBoolObjects = aBase->selectionList(FeaturesPlugin_CompositeBoolean::OBJECTS_ID());
+  AttributeSelectionListPtr anAttrBoolObjects =
+    aBase->selectionList(FeaturesPlugin_CompositeBoolean::OBJECTS_ID());
   theDumper << ", " << anAttrBoolObjects << ")" << std::endl;
 
   if(anAttrSketch->isInitialized()) {
@@ -157,18 +169,20 @@ void FeaturesAPI_RevolutionBoolean::execIfBaseNotEmpty()
 }
 
 //==================================================================================================
-FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(const std::shared_ptr<ModelAPI_Feature>& theFeature)
+FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : FeaturesAPI_RevolutionBoolean(theFeature)
 {
   initialize();
 }
 
 //==================================================================================================
-FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                                     const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                                                     const ModelHighAPI_Selection& theAxis,
-                                                     const ModelHighAPI_Double& theSize,
-                                                     const std::list<ModelHighAPI_Selection>& theBooleanObjects)
+FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+  const ModelHighAPI_Selection& theAxis,
+  const ModelHighAPI_Double& theSize,
+  const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 : FeaturesAPI_RevolutionBoolean(theFeature)
 {
   if(initialize()) {
@@ -182,12 +196,13 @@ FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(const std::shared_ptr<Model
 }
 
 //==================================================================================================
-FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                                     const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                                                     const ModelHighAPI_Selection& theAxis,
-                                                     const ModelHighAPI_Double& theToAngle,
-                                                     const ModelHighAPI_Double& theFromAngle,
-                                                     const std::list<ModelHighAPI_Selection>& theBooleanObjects)
+FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+  const ModelHighAPI_Selection& theAxis,
+  const ModelHighAPI_Double& theToAngle,
+  const ModelHighAPI_Double& theFromAngle,
+  const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 : FeaturesAPI_RevolutionBoolean(theFeature)
 {
   if(initialize()) {
@@ -201,14 +216,15 @@ FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(const std::shared_ptr<Model
 }
 
 //==================================================================================================
-FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                                     const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                                                     const ModelHighAPI_Selection& theAxis,
-                                                     const ModelHighAPI_Selection& theToObject,
-                                                     const ModelHighAPI_Double& theToOffset,
-                                                     const ModelHighAPI_Selection& theFromObject,
-                                                     const ModelHighAPI_Double& theFromOffset,
-                                                     const std::list<ModelHighAPI_Selection>& theBooleanObjects)
+FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+  const ModelHighAPI_Selection& theAxis,
+  const ModelHighAPI_Selection& theToObject,
+  const ModelHighAPI_Double& theToOffset,
+  const ModelHighAPI_Selection& theFromObject,
+  const ModelHighAPI_Double& theFromOffset,
+  const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 : FeaturesAPI_RevolutionBoolean(theFeature)
 {
   if(initialize()) {
@@ -230,8 +246,10 @@ RevolutionCutPtr addRevolutionCut(const std::shared_ptr<ModelAPI_Document>& theP
                                   const ModelHighAPI_Double& theSize,
                                   const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesPlugin_RevolutionCut::ID());
-  return RevolutionCutPtr(new FeaturesAPI_RevolutionCut(aFeature, theBaseObjects, theAxis, theSize, theBooleanObjects));
+  std::shared_ptr<ModelAPI_Feature> aFeature = 
+    thePart->addFeature(FeaturesPlugin_RevolutionCut::ID());
+  return RevolutionCutPtr(new FeaturesAPI_RevolutionCut(aFeature, theBaseObjects, 
+                                                        theAxis, theSize, theBooleanObjects));
 }
 
 //==================================================================================================
@@ -242,7 +260,8 @@ RevolutionCutPtr addRevolutionCut(const std::shared_ptr<ModelAPI_Document>& theP
                                   const ModelHighAPI_Double& theFromAngle,
                                   const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesPlugin_RevolutionCut::ID());
+  std::shared_ptr<ModelAPI_Feature> aFeature = 
+    thePart->addFeature(FeaturesPlugin_RevolutionCut::ID());
   return RevolutionCutPtr(new FeaturesAPI_RevolutionCut(aFeature,
                                                       theBaseObjects,
                                                       theAxis,
@@ -261,7 +280,8 @@ RevolutionCutPtr addRevolutionCut(const std::shared_ptr<ModelAPI_Document>& theP
                                   const ModelHighAPI_Double& theFromOffset,
                                   const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesPlugin_RevolutionCut::ID());
+  std::shared_ptr<ModelAPI_Feature> aFeature = 
+    thePart->addFeature(FeaturesPlugin_RevolutionCut::ID());
   return RevolutionCutPtr(new FeaturesAPI_RevolutionCut(aFeature,
                                                       theBaseObjects,
                                                       theAxis,
@@ -274,18 +294,20 @@ RevolutionCutPtr addRevolutionCut(const std::shared_ptr<ModelAPI_Document>& theP
 
 
 //==================================================================================================
-FeaturesAPI_RevolutionFuse::FeaturesAPI_RevolutionFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature)
+FeaturesAPI_RevolutionFuse::FeaturesAPI_RevolutionFuse(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : FeaturesAPI_RevolutionBoolean(theFeature)
 {
   initialize();
 }
 
 //==================================================================================================
-FeaturesAPI_RevolutionFuse::FeaturesAPI_RevolutionFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                                       const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                                                       const ModelHighAPI_Selection& theAxis,
-                                                       const ModelHighAPI_Double& theSize,
-                                                       const std::list<ModelHighAPI_Selection>& theBooleanObjects)
+FeaturesAPI_RevolutionFuse::FeaturesAPI_RevolutionFuse(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+  const ModelHighAPI_Selection& theAxis,
+  const ModelHighAPI_Double& theSize,
+  const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 : FeaturesAPI_RevolutionBoolean(theFeature)
 {
   if(initialize()) {
@@ -299,12 +321,13 @@ FeaturesAPI_RevolutionFuse::FeaturesAPI_RevolutionFuse(const std::shared_ptr<Mod
 }
 
 //==================================================================================================
-FeaturesAPI_RevolutionFuse::FeaturesAPI_RevolutionFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                                       const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                                                       const ModelHighAPI_Selection& theAxis,
-                                                       const ModelHighAPI_Double& theToAngle,
-                                                       const ModelHighAPI_Double& theFromAngle,
-                                                       const std::list<ModelHighAPI_Selection>& theBooleanObjects)
+FeaturesAPI_RevolutionFuse::FeaturesAPI_RevolutionFuse(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+  const ModelHighAPI_Selection& theAxis,
+  const ModelHighAPI_Double& theToAngle,
+  const ModelHighAPI_Double& theFromAngle,
+  const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 : FeaturesAPI_RevolutionBoolean(theFeature)
 {
   if(initialize()) {
@@ -318,14 +341,15 @@ FeaturesAPI_RevolutionFuse::FeaturesAPI_RevolutionFuse(const std::shared_ptr<Mod
 }
 
 //==================================================================================================
-FeaturesAPI_RevolutionFuse::FeaturesAPI_RevolutionFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                                       const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                                                       const ModelHighAPI_Selection& theAxis,
-                                                       const ModelHighAPI_Selection& theToObject,
-                                                       const ModelHighAPI_Double& theToOffset,
-                                                       const ModelHighAPI_Selection& theFromObject,
-                                                       const ModelHighAPI_Double& theFromOffset,
-                                                       const std::list<ModelHighAPI_Selection>& theBooleanObjects)
+FeaturesAPI_RevolutionFuse::FeaturesAPI_RevolutionFuse(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+  const ModelHighAPI_Selection& theAxis,
+  const ModelHighAPI_Selection& theToObject,
+  const ModelHighAPI_Double& theToOffset,
+  const ModelHighAPI_Selection& theFromObject,
+  const ModelHighAPI_Double& theFromOffset,
+  const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 : FeaturesAPI_RevolutionBoolean(theFeature)
 {
   if(initialize()) {
@@ -347,8 +371,10 @@ RevolutionFusePtr addRevolutionFuse(const std::shared_ptr<ModelAPI_Document>& th
                                     const ModelHighAPI_Double& theSize,
                                     const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesPlugin_RevolutionFuse::ID());
-  return RevolutionFusePtr(new FeaturesAPI_RevolutionFuse(aFeature, theBaseObjects, theAxis, theSize, theBooleanObjects));
+  std::shared_ptr<ModelAPI_Feature> aFeature = 
+    thePart->addFeature(FeaturesPlugin_RevolutionFuse::ID());
+  return RevolutionFusePtr(new FeaturesAPI_RevolutionFuse(aFeature, theBaseObjects, 
+                                                          theAxis, theSize, theBooleanObjects));
 }
 
 //==================================================================================================
@@ -359,7 +385,8 @@ RevolutionFusePtr addRevolutionFuse(const std::shared_ptr<ModelAPI_Document>& th
                                     const ModelHighAPI_Double& theFromAngle,
                                     const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesPlugin_RevolutionFuse::ID());
+  std::shared_ptr<ModelAPI_Feature> aFeature = 
+    thePart->addFeature(FeaturesPlugin_RevolutionFuse::ID());
   return RevolutionFusePtr(new FeaturesAPI_RevolutionFuse(aFeature,
                                                         theBaseObjects,
                                                         theAxis,
@@ -378,7 +405,8 @@ RevolutionFusePtr addRevolutionFuse(const std::shared_ptr<ModelAPI_Document>& th
                                     const ModelHighAPI_Double& theFromOffset,
                                     const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesPlugin_RevolutionFuse::ID());
+  std::shared_ptr<ModelAPI_Feature> aFeature = 
+    thePart->addFeature(FeaturesPlugin_RevolutionFuse::ID());
   return RevolutionFusePtr(new FeaturesAPI_RevolutionFuse(aFeature,
                                                         theBaseObjects,
                                                         theAxis,

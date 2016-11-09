@@ -10,17 +10,19 @@
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
-FeaturesAPI_Translation::FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature>& theFeature)
+FeaturesAPI_Translation::FeaturesAPI_Translation(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
 {
   initialize();
 }
 
 //==================================================================================================
-FeaturesAPI_Translation::FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                                 const std::list<ModelHighAPI_Selection>& theMainObjects,
-                                                 const ModelHighAPI_Selection& theAxisObject,
-                                                 const ModelHighAPI_Double& theDistance)
+FeaturesAPI_Translation::FeaturesAPI_Translation(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<ModelHighAPI_Selection>& theMainObjects,
+  const ModelHighAPI_Selection& theAxisObject,
+  const ModelHighAPI_Double& theDistance)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
@@ -37,7 +39,8 @@ FeaturesAPI_Translation::~FeaturesAPI_Translation()
 }
 
 //==================================================================================================
-void FeaturesAPI_Translation::setMainObjects(const std::list<ModelHighAPI_Selection>& theMainObjects)
+void FeaturesAPI_Translation::setMainObjects(
+  const std::list<ModelHighAPI_Selection>& theMainObjects)
 {
   fillAttribute(theMainObjects, mymainObjects);
 
@@ -66,8 +69,10 @@ void FeaturesAPI_Translation::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Translation::OBJECTS_LIST_ID());
-  AttributeSelectionPtr anAttrAxis = aBase->selection(FeaturesPlugin_Translation::AXIS_OBJECT_ID());
+  AttributeSelectionListPtr anAttrObjects =
+    aBase->selectionList(FeaturesPlugin_Translation::OBJECTS_LIST_ID());
+  AttributeSelectionPtr anAttrAxis =
+    aBase->selection(FeaturesPlugin_Translation::AXIS_OBJECT_ID());
   AttributeDoublePtr anAttrDistance = aBase->real(FeaturesPlugin_Translation::DISTANCE_ID());
 
   theDumper << aBase << " = model.addTranslation(" << aDocName << ", "
@@ -81,5 +86,6 @@ TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
                               const ModelHighAPI_Double& theDistance)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Translation::ID());
-  return TranslationPtr(new FeaturesAPI_Translation(aFeature, theMainObjects, theAxisObject, theDistance));
+  return TranslationPtr(new FeaturesAPI_Translation(aFeature, theMainObjects, 
+                                                    theAxisObject, theDistance));
 }

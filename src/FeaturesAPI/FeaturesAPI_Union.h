@@ -37,7 +37,8 @@ public:
   virtual ~FeaturesAPI_Union();
 
   INTERFACE_1(FeaturesPlugin_Union::ID(),
-              baseObjects, FeaturesPlugin_Union::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */)
+              baseObjects, FeaturesPlugin_Union::BASE_OBJECTS_ID(),
+              ModelAPI_AttributeSelectionList, /** Base objects */)
 
   /// Modify base attribute of the feature.
   FEATURESAPI_EXPORT

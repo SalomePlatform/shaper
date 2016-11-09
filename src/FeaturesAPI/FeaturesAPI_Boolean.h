@@ -39,9 +39,12 @@ public:
   virtual ~FeaturesAPI_Boolean();
 
   INTERFACE_3(FeaturesPlugin_Boolean::ID(),
-              boolType, FeaturesPlugin_Boolean::TYPE_ID(), ModelAPI_AttributeInteger, /** Operation type */,
-              mainObjects, FeaturesPlugin_Boolean::OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList, /** Main objects */,
-              toolObjects, FeaturesPlugin_Boolean::TOOL_LIST_ID(), ModelAPI_AttributeSelectionList, /** Tool objects*/)
+              boolType, FeaturesPlugin_Boolean::TYPE_ID(),
+              ModelAPI_AttributeInteger, /** Operation type */,
+              mainObjects, FeaturesPlugin_Boolean::OBJECT_LIST_ID(),
+              ModelAPI_AttributeSelectionList, /** Main objects */,
+              toolObjects, FeaturesPlugin_Boolean::TOOL_LIST_ID(),
+              ModelAPI_AttributeSelectionList, /** Tool objects*/)
 
   /// Set operation type.
   FEATURESAPI_EXPORT

@@ -69,7 +69,8 @@ int FeaturesPlugin_CompositeSketch::numberOfSubs(bool forTree) const
 }
 
 //=================================================================================================
-std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_CompositeSketch::subFeature(const int theIndex, bool forTree)
+std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_CompositeSketch::subFeature(const int theIndex, 
+                                                                             bool forTree)
 {
   if(theIndex == 0) {
     return std::dynamic_pointer_cast<ModelAPI_Feature>(data()->reference(SKETCH_ID())->value());
@@ -148,7 +149,8 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
       }
       ResultConstructionPtr aConstruction =
         std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseObjectSelection->context());
-      if(aConstruction.get() && !aBaseShape->isEqual(aConstruction->shape()) && aST == GeomAPI_Shape::WIRE) {
+      if(aConstruction.get() && !aBaseShape->isEqual(aConstruction->shape()) && 
+          aST == GeomAPI_Shape::WIRE) {
         // It is a wire on the sketch, store it to make face later.
         aSketchWiresMap[aConstruction].push_back(aBaseShape);
         continue;
@@ -170,7 +172,8 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
         aBaseShape = aConstruction->shape();
         if(aBaseShape.get() && !aBaseShape->isNull()) {
           GeomAPI_Shape::ShapeType aST = aBaseShape->shapeType();
-          if(aST != GeomAPI_Shape::VERTEX && aST != GeomAPI_Shape::EDGE && aST != GeomAPI_Shape::WIRE &&
+          if(aST != GeomAPI_Shape::VERTEX && aST != GeomAPI_Shape::EDGE && 
+             aST != GeomAPI_Shape::WIRE &&
              aST != GeomAPI_Shape::FACE && aST != GeomAPI_Shape::SHELL) {
             setError("Error: Selected shapes has unsupported type.");
             return;
@@ -210,16 +213,19 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
     ListOfShape aShells;
     ListOfShape aFreeFaces;
     GeomShapePtr aFacesCompound = GeomAlgoAPI_CompoundBuilder::compound(aBaseFacesList);
-    GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL, aShells, aFreeFaces);
+    GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL, 
+                                          aShells, aFreeFaces);
     theBaseShapesList.insert(theBaseShapesList.end(), aFreeFaces.begin(), aFreeFaces.end());
     theBaseShapesList.insert(theBaseShapesList.end(), aShells.begin(), aShells.end());
   } else {
-    theBaseShapesList.insert(theBaseShapesList.end(), aBaseFacesList.begin(), aBaseFacesList.end());
+    theBaseShapesList.insert(theBaseShapesList.end(), aBaseFacesList.begin(),
+                             aBaseFacesList.end());
   }
 }
 
 //=================================================================================================
-bool FeaturesPlugin_CompositeSketch::isMakeShapeValid(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
+bool FeaturesPlugin_CompositeSketch::isMakeShapeValid(
+  const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
 {
   // Check that algo is done.
   if(!theMakeShape->isDone()) {
@@ -244,8 +250,8 @@ bool FeaturesPlugin_CompositeSketch::isMakeShapeValid(const std::shared_ptr<Geom
 
 //=================================================================================================
 void FeaturesPlugin_CompositeSketch::storeResult(const GeomShapePtr theBaseShape,
-                                                 const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
-                                                 const int theIndex)
+                                        const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+                                        const int theIndex)
 {
   // Create result body.
   ResultBodyPtr aResultBody = document()->createBody(data(), theIndex);
@@ -262,9 +268,9 @@ void FeaturesPlugin_CompositeSketch::storeResult(const GeomShapePtr theBaseShape
 
 //=================================================================================================
 void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theResultBody,
-                                                            const GeomShapePtr theBaseShape,
-                                                            const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
-                                                            int& theTag)
+                                        const GeomShapePtr theBaseShape,
+                                        const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+                                        int& theTag)
 {
   GeomAPI_Shape::ShapeType aBaseShapeType = theBaseShape->shapeType();
   GeomAPI_Shape::ShapeType aShapeTypeToExplode = GeomAPI_Shape::SHAPE;
@@ -298,32 +304,41 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
     }
   }
 
-  if(aShapeTypeToExplode == GeomAPI_Shape::VERTEX || aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
-    theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape, GeomAPI_Shape::VERTEX,
-                                                theTag++, aGenName + "Edge", *aMapOfSubShapes.get());
+  if(aShapeTypeToExplode == GeomAPI_Shape::VERTEX || 
+      aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
+    theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape, 
+                                                GeomAPI_Shape::VERTEX,
+                                                theTag++, aGenName + "Edge", 
+                                                *aMapOfSubShapes.get());
   }
-  if(aShapeTypeToExplode == GeomAPI_Shape::EDGE || aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
-    theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape, GeomAPI_Shape::EDGE,
-                                                theTag++, aGenName + "Face", *aMapOfSubShapes.get());
+  if(aShapeTypeToExplode == GeomAPI_Shape::EDGE || 
+      aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
+    theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), 
+                                                theBaseShape, GeomAPI_Shape::EDGE,
+                                                theTag++, aGenName + "Face",
+                                                *aMapOfSubShapes.get());
   }
 
-  std::shared_ptr<GeomAlgoAPI_MakeSweep> aMakeSweep = std::dynamic_pointer_cast<GeomAlgoAPI_MakeSweep>(theMakeShape);
+  std::shared_ptr<GeomAlgoAPI_MakeSweep> aMakeSweep = 
+    std::dynamic_pointer_cast<GeomAlgoAPI_MakeSweep>(theMakeShape);
   if(aMakeSweep.get()) {
     // Store from shapes.
-    storeShapes(theResultBody, aBaseShapeType, aMapOfSubShapes, aMakeSweep->fromShapes(), "From_", theTag);
+    storeShapes(theResultBody, aBaseShapeType, aMapOfSubShapes, 
+                aMakeSweep->fromShapes(), "From_", theTag);
 
     // Store to shapes.
-    storeShapes(theResultBody, aBaseShapeType, aMapOfSubShapes, aMakeSweep->toShapes(), "To_", theTag);
+    storeShapes(theResultBody, aBaseShapeType, aMapOfSubShapes, 
+                aMakeSweep->toShapes(), "To_", theTag);
   }
 }
 
 //=================================================================================================
 void FeaturesPlugin_CompositeSketch::storeShapes(ResultBodyPtr theResultBody,
-                                                 const GeomAPI_Shape::ShapeType theBaseShapeType,
-                                                 const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
-                                                 const ListOfShape& theShapes,
-                                                 const std::string theName,
-                                                 int& theTag)
+                              const GeomAPI_Shape::ShapeType theBaseShapeType,
+                              const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
+                              const ListOfShape& theShapes,
+                              const std::string theName,
+                              int& theTag)
 {
   GeomAPI_Shape::ShapeType aShapeTypeToExplore = GeomAPI_Shape::FACE;
   std::string aShapeTypeStr = "Face";

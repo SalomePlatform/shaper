@@ -36,7 +36,8 @@ void FeaturesPlugin_CompositeBoolean::executeCompositeBoolean()
 
   // Getting tools.
   ListOfShape aTools;
-  for(ListOfMakeShape::const_iterator anIt = aGenMakeShapes.cbegin(); anIt != aGenMakeShapes.cend(); ++anIt) {
+  for(ListOfMakeShape::const_iterator 
+      anIt = aGenMakeShapes.cbegin(); anIt != aGenMakeShapes.cend(); ++anIt) {
     aTools.push_back((*anIt)->shape());
   }
 
@@ -132,13 +133,14 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
       }
 
       // For solids cut each object with all tools.
-      for(ListOfShape::const_iterator anIt = anObjects.cbegin(); anIt != anObjects.cend(); ++anIt) {
+      for(ListOfShape::const_iterator 
+          anIt = anObjects.cbegin(); anIt != anObjects.cend(); ++anIt) {
         GeomShapePtr anObject = *anIt;
         ListOfShape aListWithObject;
         aListWithObject.push_back(anObject);
         std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(new GeomAlgoAPI_Boolean(aListWithObject,
-                                                                               theTools,
-                                                                               GeomAlgoAPI_Boolean::BOOL_CUT));
+                                                                theTools,
+                                                                GeomAlgoAPI_Boolean::BOOL_CUT));
 
         // Checking that the algorithm worked properly.
         if(!aBoolAlgo->isDone() || aBoolAlgo->shape()->isNull() || !aBoolAlgo->isValid()) {
@@ -160,7 +162,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
 
         // Collecting solids from compsolids which will not be modified in boolean operation.
         ListOfShape aShapesToAdd;
-        for(GeomAPI_ShapeExplorer anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
+        for(GeomAPI_ShapeExplorer 
+            anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
           GeomShapePtr aSolidInCompSolid = anExp.current();
           ListOfShape::const_iterator aUsedShapesIt = aUsedShapes.cbegin();
           for(; aUsedShapesIt != aUsedShapes.cend(); ++aUsedShapesIt) {
@@ -174,8 +177,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         }
 
         std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(new GeomAlgoAPI_Boolean(aUsedShapes,
-                                                                               theTools,
-                                                                               GeomAlgoAPI_Boolean::BOOL_CUT));
+                                                                  theTools,
+                                                                  GeomAlgoAPI_Boolean::BOOL_CUT));
 
         // Checking that the algorithm worked properly.
         if(!aBoolAlgo->isDone() || aBoolAlgo->shape()->isNull() || !aBoolAlgo->isValid()) {
@@ -188,7 +191,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
 
         // Add result to not used solids from compsolid.
         aShapesToAdd.push_back(aBoolAlgo->shape());
-        std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
+        std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
+          new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
         if(!aFillerAlgo->isDone() || aFillerAlgo->shape()->isNull() || !aFillerAlgo->isValid()) {
           myFeature->setError("Error: PaveFiller algorithm failed.");
           return false;
@@ -220,7 +224,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         }
       }
 
-      if((anObjects.size() + aTools.size() + aCompSolidsObjects.size() + anEdgesAndFaces.size()) < 2) {
+      if((anObjects.size() + aTools.size() + 
+          aCompSolidsObjects.size() + anEdgesAndFaces.size()) < 2) {
         myFeature->setError("Error: Not enough objects for boolean operation.");
         return false;
       }
@@ -230,7 +235,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
       aSolidsToFuse.insert(aSolidsToFuse.end(), anObjects.begin(), anObjects.end());
       aSolidsToFuse.insert(aSolidsToFuse.end(), aTools.begin(), aTools.end());
 
-      // Collecting solids from compsolids which will not be modified in boolean operation and will be added to result.
+      // Collecting solids from compsolids which will not be 
+      // modified in boolean operation and will be added to result.
       ListOfShape aShapesToAdd;
       for(std::map<GeomShapePtr, ListOfShape>::iterator anIt = aCompSolidsObjects.begin();
           anIt != aCompSolidsObjects.end(); anIt++) {
@@ -239,7 +245,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         aSolidsToFuse.insert(aSolidsToFuse.end(), aUsedShapes.begin(), aUsedShapes.end());
 
         // Collect solids from compsolid which will not be modified in boolean operation.
-        for(GeomAPI_ShapeExplorer anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
+        for(GeomAPI_ShapeExplorer 
+            anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
           GeomShapePtr aSolidInCompSolid = anExp.current();
           ListOfShape::iterator anIt = aUsedShapes.begin();
           for(; anIt != aUsedShapes.end(); anIt++) {
@@ -262,8 +269,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
       std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
       if(!anEdgesAndFaces.empty() && !aCutTools.empty()) {
         std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(new GeomAlgoAPI_Boolean(anEdgesAndFaces,
-                                                                              aCutTools,
-                                                                              GeomAlgoAPI_Boolean::BOOL_CUT));
+                                                              aCutTools,
+                                                              GeomAlgoAPI_Boolean::BOOL_CUT));
         if(aCutAlgo->isDone() && !aCutAlgo->shape()->isNull() && aCutAlgo->isValid()) {
           anEdgesAndFaces.clear();
           anEdgesAndFaces.push_back(aCutAlgo->shape());
@@ -274,8 +281,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
       // If we have compsolids then cut with not used solids all others.
       if(!aShapesToAdd.empty()) {
         std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(new GeomAlgoAPI_Boolean(aSolidsToFuse,
-                                                                              aShapesToAdd,
-                                                                              GeomAlgoAPI_Boolean::BOOL_CUT));
+                                                              aShapesToAdd,
+                                                              GeomAlgoAPI_Boolean::BOOL_CUT));
         if(aCutAlgo->isDone() && GeomAlgoAPI_ShapeTools::volume(aCutAlgo->shape()) > 1.e-27) {
           aSolidsToFuse.clear();
           aSolidsToFuse.push_back(aCutAlgo->shape());
@@ -294,8 +301,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         aTools = aSolidsToFuse;
 
         std::shared_ptr<GeomAlgoAPI_Boolean> aFuseAlgo(new GeomAlgoAPI_Boolean(anObjects,
-                                                                               aTools,
-                                                                               GeomAlgoAPI_Boolean::BOOL_FUSE));
+                                                          aTools,
+                                                          GeomAlgoAPI_Boolean::BOOL_FUSE));
 
         // Checking that the algorithm worked properly.
         if(!aFuseAlgo->isDone() || aFuseAlgo->shape()->isNull() || !aFuseAlgo->isValid()) {
@@ -314,7 +321,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
           aShapesToAdd.push_back(aFusedShape);
         }
 
-        std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
+        std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
+          new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
         if(!aFillerAlgo->isDone() || aFillerAlgo->shape()->isNull() || !aFillerAlgo->isValid()) {
           myFeature->setError("Error: PaveFiller algorithm failed.");
           return false;
@@ -364,8 +372,9 @@ void FeaturesPlugin_CompositeBoolean::storeModificationHistory(ResultBodyPtr the
       aTag = aModTag;
       aName = aModName;
     }
-    theResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), *anIt, (*anIt)->shapeType() == GeomAPI_Shape::EDGE ?
-                                               GeomAPI_Shape::EDGE : GeomAPI_Shape::FACE, aTag, aName, *aMap.get());
+    theResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), *anIt, 
+      (*anIt)->shapeType() == GeomAPI_Shape::EDGE ?
+      GeomAPI_Shape::EDGE : GeomAPI_Shape::FACE, aTag, aName, *aMap.get());
     theResultBody->loadDeletedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::FACE, aDelTag);
   }
 }

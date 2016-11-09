@@ -18,7 +18,8 @@ class GeomAlgoAPI_MakeShape;
 /// \class FeaturesPlugin_Intersection
 /// \ingroup Plugins
 /// \brief Intersection feature takes a list of shapes as objects and list of shapes as tools.
-/// The types of objects and tools may be different: whole objects, compsoilds, solids, shells, faces or edges.
+/// The types of objects and tools may be different: 
+/// whole objects, compsoilds, solids, shells, faces or edges.
 /// The result is less than the minimal dimension from pair of intersection:
 /// for two solids or two faces it is wire, for the edge and face it is vertex, etc.
 class FeaturesPlugin_Intersection : public ModelAPI_Feature

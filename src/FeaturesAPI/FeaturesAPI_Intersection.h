@@ -38,8 +38,10 @@ public:
   virtual ~FeaturesAPI_Intersection();
 
   INTERFACE_2(FeaturesPlugin_Intersection::ID(),
-              objects, FeaturesPlugin_Intersection::OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList, /** Objects */,
-              tools, FeaturesPlugin_Intersection::TOOL_LIST_ID(), ModelAPI_AttributeSelectionList, /** Tools */)
+              objects, FeaturesPlugin_Intersection::OBJECT_LIST_ID(),
+              ModelAPI_AttributeSelectionList, /** Objects */,
+              tools, FeaturesPlugin_Intersection::TOOL_LIST_ID(),
+              ModelAPI_AttributeSelectionList, /** Tools */)
 
   /// Modify objects attribute of the feature.
   FEATURESAPI_EXPORT

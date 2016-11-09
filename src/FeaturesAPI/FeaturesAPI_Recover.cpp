@@ -62,8 +62,10 @@ void FeaturesAPI_Recover::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  AttributeReferencePtr anAttrBaseFeature = aBase->reference(FeaturesPlugin_Recover::BASE_FEATURE());
-  AttributeRefListPtr anAttrRecoveredEntities = aBase->reflist(FeaturesPlugin_Recover::RECOVERED_ENTITIES());
+  AttributeReferencePtr anAttrBaseFeature =
+    aBase->reference(FeaturesPlugin_Recover::BASE_FEATURE());
+  AttributeRefListPtr anAttrRecoveredEntities =
+    aBase->reflist(FeaturesPlugin_Recover::RECOVERED_ENTITIES());
   AttributeBooleanPtr anAttrPersistent = aBase->boolean(FeaturesPlugin_Recover::PERSISTENT());
 
   FeaturePtr aFeature = ModelAPI_Feature::feature(anAttrBaseFeature->value());

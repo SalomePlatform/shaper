@@ -85,9 +85,10 @@ void FeaturesAPI_Pipe::setByBasePath(const std::list<ModelHighAPI_Selection>& th
 }
 
 //==================================================================================================
-void FeaturesAPI_Pipe::setByBasePathBiNormal(const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                                             const ModelHighAPI_Selection& thePath,
-                                             const ModelHighAPI_Selection& theBiNoramal)
+void FeaturesAPI_Pipe::setByBasePathBiNormal(
+  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+  const ModelHighAPI_Selection& thePath,
+  const ModelHighAPI_Selection& theBiNoramal)
 {
   fillAttribute(FeaturesPlugin_Pipe::CREATION_METHOD_BINORMAL(), mycreationMethod);
   fillAttribute(theBaseObjects, mybaseObjects);
@@ -98,9 +99,10 @@ void FeaturesAPI_Pipe::setByBasePathBiNormal(const std::list<ModelHighAPI_Select
 }
 
 //==================================================================================================
-void FeaturesAPI_Pipe::setByBasePathLocations(const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                                              const ModelHighAPI_Selection& thePath,
-                                              const std::list<ModelHighAPI_Selection>& theLocations)
+void FeaturesAPI_Pipe::setByBasePathLocations(
+  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+  const ModelHighAPI_Selection& thePath,
+  const std::list<ModelHighAPI_Selection>& theLocations)
 {
   fillAttribute(FeaturesPlugin_Pipe::CREATION_METHOD_LOCATIONS(), mycreationMethod);
   fillAttribute(theBaseObjects, mybaseObjects);
@@ -116,7 +118,8 @@ void FeaturesAPI_Pipe::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Pipe::BASE_OBJECTS_ID());
+  AttributeSelectionListPtr anAttrObjects = 
+    aBase->selectionList(FeaturesPlugin_Pipe::BASE_OBJECTS_ID());
   AttributeSelectionPtr anAttrPath = aBase->selection(FeaturesPlugin_Pipe::PATH_OBJECT_ID());
 
   theDumper << aBase << " = model.addPipe(" << aDocName << ", "
@@ -131,7 +134,8 @@ void FeaturesAPI_Pipe::dump(ModelHighAPI_Dumper& theDumper) const
 
     theDumper << ", " << anAttrBiNormal;
   } else if(aCreationMethod == FeaturesPlugin_Pipe::CREATION_METHOD_LOCATIONS()) {
-    AttributeSelectionListPtr anAttrLocations = aBase->selectionList(FeaturesPlugin_Pipe::LOCATIONS_ID());
+    AttributeSelectionListPtr anAttrLocations =
+      aBase->selectionList(FeaturesPlugin_Pipe::LOCATIONS_ID());
 
     theDumper << ", " << anAttrLocations;
   }

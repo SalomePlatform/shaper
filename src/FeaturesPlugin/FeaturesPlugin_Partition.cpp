@@ -87,7 +87,8 @@ void FeaturesPlugin_Partition::execute()
   }
 
   // Create single result.
-  std::shared_ptr<GeomAlgoAPI_Partition> aPartitionAlgo(new GeomAlgoAPI_Partition(anObjects, aTools));
+  std::shared_ptr<GeomAlgoAPI_Partition> aPartitionAlgo(
+    new GeomAlgoAPI_Partition(anObjects, aTools));
 
   // Checking that the algorithm worked properly.
   if (!aPartitionAlgo->isDone()) {
@@ -161,7 +162,8 @@ void FeaturesPlugin_Partition::storeResult(
   }
 
   const int aDelTag = 1;
-  const int aSubTag = 2; /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
+  /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
+  const int aSubTag = 2; 
   int aModTag = aSubTag + 10000;
   const std::string aModName = "Modified";
 
@@ -202,7 +204,8 @@ GeomShapePtr findBase(const GeomShapePtr theObjectShape,
     GeomShapePtr anObjectSubShape = anObjectSubShapesExp.current();
     ListOfShape aModifiedShapes;
     theMakeShape->modified(anObjectSubShape, aModifiedShapes);
-    for(ListOfShape::const_iterator aModIt = aModifiedShapes.cbegin(); aModIt != aModifiedShapes.cend(); ++aModIt) {
+    for(ListOfShape::const_iterator 
+        aModIt = aModifiedShapes.cbegin(); aModIt != aModifiedShapes.cend(); ++aModIt) {
       GeomShapePtr aModShape = *aModIt;
       if(aMapOfSubShapes->isBound(aModShape)) {
         aModShape = aMapOfSubShapes->find(aModShape);

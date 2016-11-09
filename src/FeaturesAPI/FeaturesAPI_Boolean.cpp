@@ -70,7 +70,8 @@ void FeaturesAPI_Boolean::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
 
   FeaturesPlugin_Boolean::OperationType aType =
-      (FeaturesPlugin_Boolean::OperationType)aBase->integer(FeaturesPlugin_Boolean::TYPE_ID())->value();
+      (FeaturesPlugin_Boolean::OperationType)aBase->integer(
+      FeaturesPlugin_Boolean::TYPE_ID())->value();
 
   theDumper << aBase << " = model.add";
 
@@ -83,7 +84,8 @@ void FeaturesAPI_Boolean::dump(ModelHighAPI_Dumper& theDumper) const
   }
 
   const std::string& aDocName = theDumper.name(aBase->document());
-  AttributeSelectionListPtr anObjects = aBase->selectionList(FeaturesPlugin_Boolean::OBJECT_LIST_ID());
+  AttributeSelectionListPtr anObjects = 
+    aBase->selectionList(FeaturesPlugin_Boolean::OBJECT_LIST_ID());
   AttributeSelectionListPtr aTools = aBase->selectionList(FeaturesPlugin_Boolean::TOOL_LIST_ID());
 
   theDumper << "(" << aDocName << ", " << anObjects << ", " << aTools << ")" << std::endl;

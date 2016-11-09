@@ -19,10 +19,11 @@ FeaturesAPI_Revolution::FeaturesAPI_Revolution(const std::shared_ptr<ModelAPI_Fe
 }
 
 //==================================================================================================
-FeaturesAPI_Revolution::FeaturesAPI_Revolution(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                               const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                                               const ModelHighAPI_Selection& theAxis,
-                                               const ModelHighAPI_Double& theAngle)
+FeaturesAPI_Revolution::FeaturesAPI_Revolution(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+  const ModelHighAPI_Selection& theAxis,
+  const ModelHighAPI_Double& theAngle)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
@@ -33,11 +34,12 @@ FeaturesAPI_Revolution::FeaturesAPI_Revolution(const std::shared_ptr<ModelAPI_Fe
 }
 
 //==================================================================================================
-FeaturesAPI_Revolution::FeaturesAPI_Revolution(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                               const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                                               const ModelHighAPI_Selection& theAxis,
-                                               const ModelHighAPI_Double& theToAngle,
-                                               const ModelHighAPI_Double& theFromAngle)
+FeaturesAPI_Revolution::FeaturesAPI_Revolution(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+  const ModelHighAPI_Selection& theAxis,
+  const ModelHighAPI_Double& theToAngle,
+  const ModelHighAPI_Double& theFromAngle)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
@@ -48,13 +50,14 @@ FeaturesAPI_Revolution::FeaturesAPI_Revolution(const std::shared_ptr<ModelAPI_Fe
 }
 
 //==================================================================================================
-FeaturesAPI_Revolution::FeaturesAPI_Revolution(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                               const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                                               const ModelHighAPI_Selection& theAxis,
-                                               const ModelHighAPI_Selection& theToObject,
-                                               const ModelHighAPI_Double& theToOffset,
-                                               const ModelHighAPI_Selection& theFromObject,
-                                               const ModelHighAPI_Double& theFromOffset)
+FeaturesAPI_Revolution::FeaturesAPI_Revolution(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+  const ModelHighAPI_Selection& theAxis,
+  const ModelHighAPI_Selection& theToObject,
+  const ModelHighAPI_Double& theToOffset,
+  const ModelHighAPI_Selection& theFromObject,
+  const ModelHighAPI_Double& theFromOffset)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
@@ -151,14 +154,16 @@ void FeaturesAPI_Revolution::dump(ModelHighAPI_Dumper& theDumper) const
   const std::string& aDocName = theDumper.name(aBase->document());
 
   AttributeReferencePtr anAttrSketch = aBase->reference(FeaturesPlugin_Revolution::SKETCH_ID());
-  AttributeSelectionListPtr anAttrObjects = aBase->selectionList(FeaturesPlugin_Revolution::BASE_OBJECTS_ID());
+  AttributeSelectionListPtr anAttrObjects =
+    aBase->selectionList(FeaturesPlugin_Revolution::BASE_OBJECTS_ID());
   AttributeSelectionPtr anAttrAxis = aBase->selection(FeaturesPlugin_Revolution::AXIS_OBJECT_ID());
 
   theDumper << aBase << " = model.addRevolution(" << aDocName << ", ";
   anAttrSketch->isInitialized() ? theDumper << "[]" : theDumper << anAttrObjects;
   theDumper << ", " << anAttrAxis;
 
-  std::string aCreationMethod = aBase->string(FeaturesPlugin_Revolution::CREATION_METHOD())->value();
+  std::string aCreationMethod = 
+    aBase->string(FeaturesPlugin_Revolution::CREATION_METHOD())->value();
 
   if(aCreationMethod == FeaturesPlugin_Revolution::CREATION_METHOD_BY_ANGLES()) {
     AttributeDoublePtr anAttrToAngle = aBase->real(FeaturesPlugin_Revolution::TO_ANGLE_ID());
@@ -166,12 +171,15 @@ void FeaturesAPI_Revolution::dump(ModelHighAPI_Dumper& theDumper) const
 
     theDumper << ", " << anAttrToAngle << ", " << anAttrFromAngle;
   } else if(aCreationMethod == FeaturesPlugin_Revolution::CREATION_METHOD_BY_PLANES()) {
-    AttributeSelectionPtr anAttrToObject = aBase->selection(FeaturesPlugin_Revolution::TO_OBJECT_ID());
+    AttributeSelectionPtr anAttrToObject =
+      aBase->selection(FeaturesPlugin_Revolution::TO_OBJECT_ID());
     AttributeDoublePtr anAttrToOffset = aBase->real(FeaturesPlugin_Revolution::TO_OFFSET_ID());
-    AttributeSelectionPtr anAttrFromObject = aBase->selection(FeaturesPlugin_Revolution::FROM_OBJECT_ID());
+    AttributeSelectionPtr anAttrFromObject =
+      aBase->selection(FeaturesPlugin_Revolution::FROM_OBJECT_ID());
     AttributeDoublePtr anAttrFromOffset = aBase->real(FeaturesPlugin_Revolution::FROM_OFFSET_ID());
 
-    theDumper << ", " << anAttrToObject << ", " << anAttrToOffset << ", " << anAttrFromObject << ", " << anAttrFromOffset;
+    theDumper << ", " << anAttrToObject << ", " << anAttrToOffset << 
+      ", " << anAttrFromObject << ", " << anAttrFromOffset;
   }
 
   theDumper << ")" << std::endl;

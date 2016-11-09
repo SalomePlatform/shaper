@@ -40,7 +40,8 @@ public:
   FEATURESPLUGIN_EXPORT virtual int numberOfSubs(bool forTree = false) const;
 
   /// \return the sub-feature by zero-base index.
-  FEATURESPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex, bool forTree = false);
+  FEATURESPLUGIN_EXPORT virtual 
+    std::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex, bool forTree = false);
 
   /// \return the sub-feature unique identifier in this composite feature by zero-base index.
   FEATURESPLUGIN_EXPORT virtual int subFeatureId(const int theIndex) const;

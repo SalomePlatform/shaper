@@ -61,7 +61,8 @@ void FeaturesPlugin_Revolution::execute()
   int aResultIndex = 0;
   ListOfShape::const_iterator aBaseIt = aBaseShapesList.cbegin();
   ListOfMakeShape::const_iterator anAlgoIt = aMakeShapesList.cbegin();
-  for(; aBaseIt != aBaseShapesList.cend() && anAlgoIt != aMakeShapesList.cend(); ++aBaseIt, ++anAlgoIt) {
+  for(; aBaseIt != aBaseShapesList.cend() && anAlgoIt != aMakeShapesList.cend(); 
+        ++aBaseIt, ++anAlgoIt) {
     storeResult(*aBaseIt, *anAlgoIt, aResultIndex++);
   }
 
@@ -133,12 +134,14 @@ bool FeaturesPlugin_Revolution::makeRevolutions(ListOfShape& theBaseShapes,
   }
 
   // Generating result for each base shape.
-  for(ListOfShape::const_iterator anIter = theBaseShapes.cbegin(); anIter != theBaseShapes.cend(); anIter++) {
+  for(ListOfShape::const_iterator 
+      anIter = theBaseShapes.cbegin(); anIter != theBaseShapes.cend(); anIter++) {
     GeomShapePtr aBaseShape = *anIter;
 
-    std::shared_ptr<GeomAlgoAPI_Revolution> aRevolAlgo(new GeomAlgoAPI_Revolution(aBaseShape, anAxis,
-                                                                                  aToShape, aToAngle,
-                                                                                  aFromShape, aFromAngle));
+    std::shared_ptr<GeomAlgoAPI_Revolution> aRevolAlgo(new GeomAlgoAPI_Revolution(
+                                                       aBaseShape, anAxis,
+                                                       aToShape, aToAngle,
+                                                       aFromShape, aFromAngle));
     if(!isMakeShapeValid(aRevolAlgo)) {
       return false;
     }

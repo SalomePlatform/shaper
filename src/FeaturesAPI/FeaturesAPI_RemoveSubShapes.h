@@ -37,8 +37,10 @@ public:
   virtual ~FeaturesAPI_RemoveSubShapes();
 
   INTERFACE_2(FeaturesPlugin_RemoveSubShapes::ID(),
-              base, FeaturesPlugin_RemoveSubShapes::BASE_SHAPE_ID(), ModelAPI_AttributeSelection, /** Base */,
-              subshapes, FeaturesPlugin_RemoveSubShapes::SUBSHAPES_ID(), ModelAPI_AttributeSelectionList, /** Subshapes */)
+              base, FeaturesPlugin_RemoveSubShapes::BASE_SHAPE_ID(), 
+              ModelAPI_AttributeSelection, /** Base */,
+              subshapes, FeaturesPlugin_RemoveSubShapes::SUBSHAPES_ID(), 
+              ModelAPI_AttributeSelectionList, /** Subshapes */)
 
   /// Modify objects attribute of the feature.
   FEATURESAPI_EXPORT

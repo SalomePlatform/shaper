@@ -32,17 +32,28 @@ public:
   virtual ~FeaturesAPI_RevolutionBoolean();
 
   INTERFACE_11("",
-               sketch, FeaturesPlugin_Revolution::SKETCH_ID(), ModelAPI_AttributeReference, /** Sketch launcher */,
-               baseObjects, FeaturesPlugin_Revolution::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */,
-               axis, FeaturesPlugin_Revolution::AXIS_OBJECT_ID(), ModelAPI_AttributeSelection, /** Axis */,
-               creationMethod, FeaturesPlugin_Revolution::CREATION_METHOD(), ModelAPI_AttributeString, /** Creation method */,
-               toAngle, FeaturesPlugin_Revolution::TO_ANGLE_ID(), ModelAPI_AttributeDouble, /** To angle */,
-               fromAngle, FeaturesPlugin_Revolution::FROM_ANGLE_ID(), ModelAPI_AttributeDouble, /** From angle */,
-               toObject, FeaturesPlugin_Revolution::TO_OBJECT_ID(), ModelAPI_AttributeSelection, /** To object */,
-               toOffset, FeaturesPlugin_Revolution::TO_OFFSET_ID(), ModelAPI_AttributeDouble, /** To offset */,
-               fromObject, FeaturesPlugin_Revolution::FROM_OBJECT_ID(), ModelAPI_AttributeSelection, /** From object */,
-               fromOffset, FeaturesPlugin_Revolution::FROM_OFFSET_ID(), ModelAPI_AttributeDouble, /** From offset */,
-               booleanObjects, FeaturesPlugin_CompositeBoolean::OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Boolean objects */)
+               sketch, FeaturesPlugin_Revolution::SKETCH_ID(),
+               ModelAPI_AttributeReference, /** Sketch launcher */,
+               baseObjects, FeaturesPlugin_Revolution::BASE_OBJECTS_ID(),
+               ModelAPI_AttributeSelectionList, /** Base objects */,
+               axis, FeaturesPlugin_Revolution::AXIS_OBJECT_ID(),
+               ModelAPI_AttributeSelection, /** Axis */,
+               creationMethod, FeaturesPlugin_Revolution::CREATION_METHOD(),
+               ModelAPI_AttributeString, /** Creation method */,
+               toAngle, FeaturesPlugin_Revolution::TO_ANGLE_ID(),
+               ModelAPI_AttributeDouble, /** To angle */,
+               fromAngle, FeaturesPlugin_Revolution::FROM_ANGLE_ID(),
+               ModelAPI_AttributeDouble, /** From angle */,
+               toObject, FeaturesPlugin_Revolution::TO_OBJECT_ID(),
+               ModelAPI_AttributeSelection, /** To object */,
+               toOffset, FeaturesPlugin_Revolution::TO_OFFSET_ID(),
+               ModelAPI_AttributeDouble, /** To offset */,
+               fromObject, FeaturesPlugin_Revolution::FROM_OBJECT_ID(),
+               ModelAPI_AttributeSelection, /** From object */,
+               fromOffset, FeaturesPlugin_Revolution::FROM_OFFSET_ID(),
+               ModelAPI_AttributeDouble, /** From offset */,
+               booleanObjects, FeaturesPlugin_CompositeBoolean::OBJECTS_ID(),
+               ModelAPI_AttributeSelectionList, /** Boolean objects */)
 
   /// Modify base attribute of the feature.
   FEATURESAPI_EXPORT
@@ -64,7 +75,8 @@ public:
   FEATURESAPI_EXPORT
   void setAngle(const ModelHighAPI_Double& theAngle);
 
-  /// Modify creation_method, to_object, to_offset, from_object, from_offset attributes of the feature.
+  /// Modify creation_method, to_object, to_offset, from_object, 
+  /// from_offset attributes of the feature.
   FEATURESAPI_EXPORT
   void setPlanesAndOffsets(const ModelHighAPI_Selection& theToObject,
                            const ModelHighAPI_Double& theToOffset,

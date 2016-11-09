@@ -52,11 +52,16 @@ public:
   virtual ~FeaturesAPI_Pipe();
 
   INTERFACE_5(FeaturesPlugin_Pipe::ID(),
-              baseObjects, FeaturesPlugin_Pipe::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */,
-              path, FeaturesPlugin_Pipe::PATH_OBJECT_ID(), ModelAPI_AttributeSelection, /** Path */,
-              creationMethod, FeaturesPlugin_Pipe::CREATION_METHOD(), ModelAPI_AttributeString, /** Creation method */,
-              biNormal, FeaturesPlugin_Pipe::BINORMAL_ID(), ModelAPI_AttributeSelection, /** Bi-Normal */,
-              locations, FeaturesPlugin_Pipe::LOCATIONS_ID(), ModelAPI_AttributeSelectionList, /** Locations */)
+              baseObjects, FeaturesPlugin_Pipe::BASE_OBJECTS_ID(),
+              ModelAPI_AttributeSelectionList, /** Base objects */,
+              path, FeaturesPlugin_Pipe::PATH_OBJECT_ID(),
+              ModelAPI_AttributeSelection, /** Path */,
+              creationMethod, FeaturesPlugin_Pipe::CREATION_METHOD(),
+              ModelAPI_AttributeString, /** Creation method */,
+              biNormal, FeaturesPlugin_Pipe::BINORMAL_ID(),
+              ModelAPI_AttributeSelection, /** Bi-Normal */,
+              locations, FeaturesPlugin_Pipe::LOCATIONS_ID(),
+              ModelAPI_AttributeSelectionList, /** Locations */)
 
   /// Modify base attribute of the feature.
   FEATURESAPI_EXPORT

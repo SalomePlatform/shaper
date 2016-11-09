@@ -40,9 +40,12 @@ public:
   virtual ~FeaturesAPI_Translation();
 
   INTERFACE_3(FeaturesPlugin_Translation::ID(),
-              mainObjects, FeaturesPlugin_Translation::OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList, /** Main objects */,
-              axisObject, FeaturesPlugin_Translation::AXIS_OBJECT_ID(), ModelAPI_AttributeSelection, /** Axis object */,
-              distance, FeaturesPlugin_Translation::DISTANCE_ID(), ModelAPI_AttributeDouble, /** Distance */)
+              mainObjects, FeaturesPlugin_Translation::OBJECTS_LIST_ID(),
+              ModelAPI_AttributeSelectionList, /** Main objects */,
+              axisObject, FeaturesPlugin_Translation::AXIS_OBJECT_ID(),
+              ModelAPI_AttributeSelection, /** Axis object */,
+              distance, FeaturesPlugin_Translation::DISTANCE_ID(),
+              ModelAPI_AttributeDouble, /** Distance */)
 
   /// Set main objects.
   FEATURESAPI_EXPORT

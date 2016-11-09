@@ -45,7 +45,8 @@ void FeaturesPlugin_RemoveSubShapes::attributeChanged(const std::string& theID)
     aSubShapesAttrList->clear();
 
     ResultPtr aContext = aShapeAttrSelection->context();
-    ResultCompSolidPtr aResultCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aContext);
+    ResultCompSolidPtr aResultCompSolid = 
+      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aContext);
     if(!aResultCompSolid.get()) {
       return;
     }

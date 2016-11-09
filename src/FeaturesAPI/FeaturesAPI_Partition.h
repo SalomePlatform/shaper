@@ -37,7 +37,8 @@ public:
   virtual ~FeaturesAPI_Partition();
 
   INTERFACE_1(FeaturesPlugin_Partition::ID(),
-              baseObjects, FeaturesPlugin_Partition::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */)
+              baseObjects, FeaturesPlugin_Partition::BASE_OBJECTS_ID(),
+              ModelAPI_AttributeSelectionList, /** Base objects */)
 
   /// Modify base attribute of the feature.
   FEATURESAPI_EXPORT

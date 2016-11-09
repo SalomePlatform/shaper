@@ -26,7 +26,8 @@ void FeaturesPlugin_Rotation::initAttributes()
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
     FeaturesPlugin_Rotation::OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
 
-  data()->addAttribute(FeaturesPlugin_Rotation::AXIS_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(FeaturesPlugin_Rotation::AXIS_OBJECT_ID(), 
+                       ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(FeaturesPlugin_Rotation::ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
 }
 
@@ -36,12 +37,14 @@ void FeaturesPlugin_Rotation::execute()
   // Getting objects.
   ListOfShape anObjects;
   std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList = selectionList(FeaturesPlugin_Rotation::OBJECTS_LIST_ID());
+  AttributeSelectionListPtr anObjectsSelList = 
+    selectionList(FeaturesPlugin_Rotation::OBJECTS_LIST_ID());
   if (anObjectsSelList->size() == 0) {
     return;
   }
   for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr = anObjectsSelList->value(anObjectsIndex);
+    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr = 
+      anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
     if(!anObject.get()) {
       return;
@@ -53,7 +56,8 @@ void FeaturesPlugin_Rotation::execute()
   //Getting axis.
   std::shared_ptr<GeomAPI_Ax1> anAxis;
   std::shared_ptr<GeomAPI_Edge> anEdge;
-  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Rotation::AXIS_OBJECT_ID());
+  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef =
+    selection(FeaturesPlugin_Rotation::AXIS_OBJECT_ID());
   if(anObjRef && anObjRef->value() && anObjRef->value()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->value()));
   } else if (anObjRef && !anObjRef->value() && anObjRef->context() && 
@@ -61,7 +65,8 @@ void FeaturesPlugin_Rotation::execute()
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->context()->shape()));
   }
   if(anEdge) {
-    anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(), anEdge->line()->direction()));
+    anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(), 
+                                                          anEdge->line()->direction()));
   }
 
   // Getting angle.
@@ -132,16 +137,16 @@ void FeaturesPlugin_Rotation::loadNamingDS(GeomAlgoAPI_Rotation& theRotaionAlgo,
     case GeomAPI_Shape::SOLID:
     case GeomAPI_Shape::SHELL:
       theResultBody->loadAndOrientModifiedShapes(&theRotaionAlgo,
-                                                 theBaseShape, GeomAPI_Shape::FACE,
-                                                 aRotatedTag, aRotatedName + "_Face", *aSubShapes.get());
+                                    theBaseShape, GeomAPI_Shape::FACE,
+                                    aRotatedTag, aRotatedName + "_Face", *aSubShapes.get());
     case GeomAPI_Shape::FACE:
     case GeomAPI_Shape::WIRE:
       theResultBody->loadAndOrientModifiedShapes(&theRotaionAlgo,
-                                                 theBaseShape, GeomAPI_Shape::EDGE,
-                                                 ++aRotatedTag, aRotatedName + "_Edge", *aSubShapes.get());
+                                  theBaseShape, GeomAPI_Shape::EDGE,
+                                  ++aRotatedTag, aRotatedName + "_Edge", *aSubShapes.get());
     case GeomAPI_Shape::EDGE:
       theResultBody->loadAndOrientModifiedShapes(&theRotaionAlgo,
-                                                 theBaseShape, GeomAPI_Shape::VERTEX,
-                                                 ++aRotatedTag, aRotatedName + "_Vertex", *aSubShapes.get());
+                                theBaseShape, GeomAPI_Shape::VERTEX,
+                                ++aRotatedTag, aRotatedName + "_Vertex", *aSubShapes.get());
   }
 }
