@@ -52,7 +52,7 @@ public:
   void setMessageString(const std::string& theMsg) { myMessage = theMsg; } 
 
   /// Returns message
-  std::string messageString() const { return myMessage; }
+  EVENTS_EXPORT std::string messageString() const;
 
   Events_InfoMessage& operator=(const std::string& theMsg) {
     setMessageString(theMsg);
