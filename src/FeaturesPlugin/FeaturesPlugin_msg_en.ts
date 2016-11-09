@@ -25,10 +25,6 @@
       <translation>Validator "FeaturesPlugin_ValidatorExtrusionDir" should be used with 2 parameters for extrusion.</translation>
     </message>
     <message>
-      <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Base objects list contains vertex or edge, so attribute \"%1\" can not be used with default value. Select direction for extrusion.</source>
-      <translation>Base objects list contains vertex or edge, so attribute "%1" can not be used with default value. Select direction for extrusion.</translation>
-    </message>
-    <message>
       <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Direction is parallel to one of the selected face or face on selected shell.</source>
       <translation>Direction is parallel to one of the selected face or face on selected shell.</translation>
     </message>
@@ -245,6 +241,10 @@
       <source>GeomValidators_ZeroOffset: FromSize = -ToSize and bounding planes are coincident.</source>
       <translation>FromSize = -ToSize and bounding planes are coincident.</translation>
     </message>
+    <message>
+      <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Base objects list contains vertex or edge, so attribute "direction_object" can not be used with default value. Select direction for extrusion.</source>
+      <translation>Base objects list contains vertex or edge, so default direction cannot be used. Select direction for extrusion.</translation>
+    </message>
   </context>
   
   <context>
@@ -273,10 +273,6 @@
     <message>
       <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Validator should be used with 2 parameters for extrusion.</source>
       <translation>Validator "FeaturesPlugin_ValidatorExtrusionDir" should be used with 2 parameters for extrusion.</translation>
-    </message>
-    <message>
-      <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Base objects list contains vertex or edge, so attribute \"%1\" can not be used with default value. Select direction for extrusion.</source>
-      <translation>Base objects list contains vertex or edge, so attribute "%1" can not be used with default value. Select direction for extrusion.</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Direction is parallel to one of the selected face or face on selected shell.</source>
@@ -1035,10 +1031,6 @@
     <message>
       <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Validator should be used with 2 parameters for extrusion.</source>
       <translation>Validator "FeaturesPlugin_ValidatorExtrusionDir" should be used with 2 parameters for extrusion.</translation>
-    </message>
-    <message>
-      <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Base objects list contains vertex or edge, so attribute \"%1\" can not be used with default value. Select direction for extrusion.</source>
-      <translation>Base objects list contains vertex or edge, so attribute "%1" can not be used with default value. Select direction for extrusion.</translation>
     </message>
     <message>
       <source>FeaturesPlugin_ValidatorExtrusionDir: Error: Direction is parallel to one of the selected face or face on selected shell.</source>
