@@ -979,7 +979,7 @@ void Model_AttributeSelection::selectSubShape(
   std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected;
   ResultPtr aCont;
   if (aSelNaming.selectSubShape(theType, theSubShapeName, aDoc, aShapeToBeSelected, aCont)) {
-    // try to find the last context to find the up to dat shape
+    // try to find the last context to find the up to date shape
     if (aCont->shape().get() && !aCont->shape()->isNull() &&
       aCont->groupName() == ModelAPI_ResultBody::group() && aDoc == owner()->document()) {
       const TopoDS_Shape aConShape = aCont->shape()->impl<TopoDS_Shape>();

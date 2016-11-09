@@ -81,6 +81,26 @@ std::string Model_SelectionNaming::getShapeName(
             }
           }
         }
+        // if a shape is under another context, use this name, not theContext
+        std::shared_ptr<Model_Data> aContextData =
+          std::dynamic_pointer_cast<Model_Data>(theContext->data());
+        // for constructions the naming is in arguments and has no evolution, so, apply this only
+        // for bodies
+        if (isNeedContextName && theContext->groupName() == ModelAPI_ResultBody::group() &&
+            !aNS->Label().IsDescendant(aContextData->label())) {
+          isNeedContextName = false;
+          TDF_Label aNSDataLab = aNS->Label();
+          while(aNSDataLab.Depth() != 7 && aNSDataLab.Depth() > 5)
+            aNSDataLab = aNSDataLab.Father();
+          ObjectPtr aNewContext = theDoc->objects()->object(aNSDataLab);
+          if (!aNewContext.get() && aNSDataLab.Depth() == 7) {
+            aNSDataLab = aNSDataLab.Father().Father();
+            aNewContext = theDoc->objects()->object(aNSDataLab);
+          }
+          if (aNewContext.get()) {
+            aName = aNewContext->data()->name() + "/" + aName;
+          }
+        }
       }
     }
   }
