@@ -32,8 +32,10 @@ class Config_PropManager
    * \param theDefValue - default and initial value of the property
    * Returns True if the property succesfully registered
    */
-  CONFIG_EXPORT static Config_Prop* registerProp(const std::string& theSection, const std::string& theName,
-    const std::string& theTitle, Config_Prop::PropType theType, const std::string& theDefValue = "");
+  CONFIG_EXPORT static Config_Prop* registerProp(const std::string& theSection,
+    const std::string& theName,
+    const std::string& theTitle, Config_Prop::PropType theType,
+    const std::string& theDefValue = "");
   //! Finds property in the given section by the given name, if property not found returns NULL
   CONFIG_EXPORT static Config_Prop* findProp(
     const std::string& theSection, const std::string& theName);

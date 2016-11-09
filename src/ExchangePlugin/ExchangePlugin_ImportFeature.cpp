@@ -52,8 +52,11 @@ ExchangePlugin_ImportFeature::~ExchangePlugin_ImportFeature()
  */
 void ExchangePlugin_ImportFeature::initAttributes()
 {
-  data()->addAttribute(ExchangePlugin_ImportFeature::FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
-  AttributePtr aFeaturesAttribute = data()->addAttribute(ExchangePlugin_ImportFeature::FEATURES_ID(), ModelAPI_AttributeRefList::typeId());
+  data()->addAttribute(ExchangePlugin_ImportFeature::FILE_PATH_ID(), 
+                       ModelAPI_AttributeString::typeId());
+  AttributePtr aFeaturesAttribute = 
+    data()->addAttribute(ExchangePlugin_ImportFeature::FEATURES_ID(), 
+                         ModelAPI_AttributeRefList::typeId());
   aFeaturesAttribute->setIsArgument(false);
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(

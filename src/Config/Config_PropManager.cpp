@@ -13,8 +13,10 @@ bool stringToBoolean(const std::string& theInt);
 
 Config_Properties Config_PropManager::myProps;
 
-Config_Prop* Config_PropManager::registerProp(const std::string& theSection, const std::string& theName,
-                                              const std::string& theTitle, Config_Prop::PropType theType,
+Config_Prop* Config_PropManager::registerProp(const std::string& theSection, 
+                                              const std::string& theName,
+                                              const std::string& theTitle,
+                                              Config_Prop::PropType theType,
                                               const std::string& theDefaultValue)
 {
   Config_Prop* aProp = findProp(theSection, theName);

@@ -36,7 +36,8 @@ class Config_ModuleReader : public Config_XMLReader
   CONFIG_EXPORT Config_ModuleReader(const char* theEventGenerated = 0);
   /// Destructor
   CONFIG_EXPORT virtual ~Config_ModuleReader();
-  /// Returns map that describes which file contains a feature (the feature is key, the file is value)
+  /// Returns map that describes which file contains a feature
+  /// (the feature is key, the file is value)
   CONFIG_EXPORT const std::map<std::string, std::string>& featuresInFiles() const;
   /// Returns list of module's xml files
   CONFIG_EXPORT const std::set<std::string>& modulePluginFiles() const;
@@ -69,13 +70,15 @@ class Config_ModuleReader : public Config_XMLReader
   std::string addPlugin(const std::string& aPluginLibrary,
                         const std::string& aPluginScript,
                         const std::string& aPluginConf);
-  /// Save feature in myFeaturesInFiles. Generates an error if the feature name is already registered.
+  /// Save feature in myFeaturesInFiles. 
+  /// Generates an error if the feature name is already registered.
   void addFeature(const std::string& theFeatureName, const std::string& thePluginConfig);
 
  private:
   std::map<std::string, std::string> myFeaturesInFiles; ///< a feature name is key, a file is value
   std::set<std::string> myPluginFiles; ///< a feature name is key, a file is value
-  static std::map<std::string, PluginType> myPluginTypes; ///< a plugin name is key, a plugin type is value
+  /// a plugin name is key, a plugin type is value
+  static std::map<std::string, PluginType> myPluginTypes;
   static std::set<std::string> myDependencyModules; ///< set of loaded modules
   const char* myEventGenerated; ///< gives ability to send Feature_Messages to various listeners
 };

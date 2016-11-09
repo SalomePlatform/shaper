@@ -37,7 +37,8 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
   ModelAPI_Session::get()->registerPlugin(this);
 
   // register construction properties
-  Config_PropManager::registerProp("Visualization", "construction_plane_color", "Construction plane color",
+  Config_PropManager::registerProp("Visualization", "construction_plane_color",
+                                   "Construction plane color",
                                    Config_Prop::Color, ConstructionPlugin_Plane::DEFAULT_COLOR());
 }
 

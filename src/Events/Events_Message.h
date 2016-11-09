@@ -21,7 +21,8 @@
  */
 class EVENTS_EXPORT Events_ID
 {
-  char* myID;  ///< pointer to the text-identifier of the event, unique pointer for all events of such type
+  /// pointer to the text-identifier of the event, unique pointer for all events of such type
+  char* myID;  
 
   Events_ID(char* theID)
   {

@@ -72,7 +72,8 @@ void Config_ModuleReader::addFeature(const std::string& theFeatureName,
   if (myFeaturesInFiles.count(theFeatureName)) {
     std::string anErrorMsg = "Can not register feature '%1' in plugin '%2'."
       " There is a feature with the same ID.";
-    Events_InfoMessage("Config_ModuleReader", anErrorMsg).arg(theFeatureName).arg(thePluginConfig).send();
+    Events_InfoMessage("Config_ModuleReader", anErrorMsg)
+      .arg(theFeatureName).arg(thePluginConfig).send();
     return;
   }
 

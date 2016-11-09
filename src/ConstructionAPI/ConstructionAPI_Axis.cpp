@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 CEA/DEN, EDF R&D
+
 // Name   : ConstructionAPI_Axis.cpp
 // Purpose: 
 //
@@ -86,7 +88,8 @@ ConstructionAPI_Axis::ConstructionAPI_Axis(const std::shared_ptr<ModelAPI_Featur
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setByTwoPlanes(thePlane1, theOffset1, theReverseOffset1, thePlane2, theOffset2, theReverseOffset2);
+    setByTwoPlanes(thePlane1, theOffset1, theReverseOffset1, 
+                   thePlane2, theOffset2, theReverseOffset2);
   }
 }
 
@@ -147,7 +150,8 @@ void ConstructionAPI_Axis::setByPointAndDirection(const ModelHighAPI_Selection& 
                                                   const ModelHighAPI_Double& theY,
                                                   const ModelHighAPI_Double& theZ)
 {
-  fillAttribute(ConstructionPlugin_Axis::CREATION_METHOD_BY_POINT_AND_DIRECTION(), creationMethod());
+  fillAttribute(ConstructionPlugin_Axis::CREATION_METHOD_BY_POINT_AND_DIRECTION(), 
+                creationMethod());
   fillAttribute(thePoint, firstPoint());
   fillAttribute(theX, xDirection());
   fillAttribute(theY, yDirection());
@@ -274,8 +278,10 @@ void ConstructionAPI_Axis::dump(ModelHighAPI_Dumper& theDumper) const
 
     theDumper << ", " << anAttrDX << ", " << anAttrDY << ", " << anAttrDZ;
   } else if(aCreationMethod == ConstructionPlugin_Axis::CREATION_METHOD_BY_TWO_POINTS()) {
-    AttributeSelectionPtr anAttrFirstPnt = aBase->selection(ConstructionPlugin_Axis::POINT_FIRST());
-    AttributeSelectionPtr anAttrSecondPnt = aBase->selection(ConstructionPlugin_Axis::POINT_SECOND());
+    AttributeSelectionPtr anAttrFirstPnt =
+      aBase->selection(ConstructionPlugin_Axis::POINT_FIRST());
+    AttributeSelectionPtr anAttrSecondPnt =
+      aBase->selection(ConstructionPlugin_Axis::POINT_SECOND());
 
     theDumper << ", " << anAttrFirstPnt << ", " << anAttrSecondPnt;
   } else if(aCreationMethod == ConstructionPlugin_Axis::CREATION_METHOD_BY_LINE()) {
@@ -283,7 +289,8 @@ void ConstructionAPI_Axis::dump(ModelHighAPI_Dumper& theDumper) const
 
     theDumper << ", " << anAttrLine;
   } else if(aCreationMethod == ConstructionPlugin_Axis::CREATION_METHOD_BY_CYLINDRICAL_FACE()) {
-    AttributeSelectionPtr anAttrFace = aBase->selection(ConstructionPlugin_Axis::CYLINDRICAL_FACE());
+    AttributeSelectionPtr anAttrFace =
+      aBase->selection(ConstructionPlugin_Axis::CYLINDRICAL_FACE());
 
     theDumper << ", " << anAttrFace;
   } else if(aCreationMethod == ConstructionPlugin_Axis::CREATION_METHOD_BY_PLANE_AND_POINT()) {
@@ -299,7 +306,8 @@ void ConstructionAPI_Axis::dump(ModelHighAPI_Dumper& theDumper) const
     if(aBase->string(ConstructionPlugin_Axis::USE_OFFSET1())->isInitialized()
       && !aBase->string(ConstructionPlugin_Axis::USE_OFFSET1())->value().empty()) {
       AttributeDoublePtr anAttrOffset1 = aBase->real(ConstructionPlugin_Axis::OFFSET1());
-      AttributeBooleanPtr anAttrReverseOffset1 = aBase->boolean(ConstructionPlugin_Axis::REVERSE_OFFSET1());
+      AttributeBooleanPtr anAttrReverseOffset1 =
+        aBase->boolean(ConstructionPlugin_Axis::REVERSE_OFFSET1());
       theDumper << ", " << anAttrOffset1 << ", " << anAttrReverseOffset1;
     }
 
@@ -307,7 +315,8 @@ void ConstructionAPI_Axis::dump(ModelHighAPI_Dumper& theDumper) const
     if(aBase->string(ConstructionPlugin_Axis::USE_OFFSET2())->isInitialized()
       && !aBase->string(ConstructionPlugin_Axis::USE_OFFSET2())->value().empty()) {
       AttributeDoublePtr anAttrOffset2 = aBase->real(ConstructionPlugin_Axis::OFFSET2());
-      AttributeBooleanPtr anAttrReverseOffset2 = aBase->boolean(ConstructionPlugin_Axis::REVERSE_OFFSET2());
+      AttributeBooleanPtr anAttrReverseOffset2 =
+        aBase->boolean(ConstructionPlugin_Axis::REVERSE_OFFSET2());
       theDumper << ", " << anAttrOffset2 << ", " << anAttrReverseOffset2;
     }
   } else if(aCreationMethod == ConstructionPlugin_Axis::CREATION_METHOD_BY_POINT_AND_DIRECTION()) {

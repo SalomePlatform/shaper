@@ -1,5 +1,7 @@
 // Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
+// Copyright (C) 2014-2016 CEA/DEN, EDF R&D
+
 // Name   : ConstructionAPI_Axis.h
 // Purpose: 
 //
@@ -87,27 +89,48 @@ public:
   virtual ~ConstructionAPI_Axis();
 
   INTERFACE_21(ConstructionPlugin_Axis::ID(),
-               creationMethod, ConstructionPlugin_Axis::METHOD(), ModelAPI_AttributeString, /** Creation method */,
-               firstPoint, ConstructionPlugin_Axis::POINT_FIRST(), ModelAPI_AttributeSelection, /** First point */,
-               secondPoint, ConstructionPlugin_Axis::POINT_SECOND(), ModelAPI_AttributeSelection, /** Second point */,
-               cylindricalFace, ConstructionPlugin_Axis::CYLINDRICAL_FACE(), ModelAPI_AttributeSelection, /** Cylindrical face */,
-               xDirection, ConstructionPlugin_Axis::X_DIRECTION(), ModelAPI_AttributeDouble, /** X direction */,
-               yDirection, ConstructionPlugin_Axis::Y_DIRECTION(), ModelAPI_AttributeDouble, /** Y direction */,
-               zDirection, ConstructionPlugin_Axis::Z_DIRECTION(), ModelAPI_AttributeDouble, /** Z direction */,
-               xDimension, ConstructionPlugin_Axis::DX(), ModelAPI_AttributeDouble, /** X dimension */,
-               yDimension, ConstructionPlugin_Axis::DY(), ModelAPI_AttributeDouble, /** Y dimension */,
-               zDimension, ConstructionPlugin_Axis::DZ(), ModelAPI_AttributeDouble, /** Z dimension */,
-               line, ConstructionPlugin_Axis::LINE(), ModelAPI_AttributeSelection, /** Line */,
-               plane, ConstructionPlugin_Axis::PLANE(), ModelAPI_AttributeSelection, /** Plane */,
-               point, ConstructionPlugin_Axis::POINT(), ModelAPI_AttributeSelection, /** Point */,
-               plane1, ConstructionPlugin_Axis::PLANE1(), ModelAPI_AttributeSelection, /** Plane 1 */,
-               useOffset1, ConstructionPlugin_Axis::USE_OFFSET1(), ModelAPI_AttributeString, /** Use offset 1 */,
-               offset1, ConstructionPlugin_Axis::OFFSET1(), ModelAPI_AttributeDouble, /** Offset 1 */,
-               reverseOffset1, ConstructionPlugin_Axis::REVERSE_OFFSET1(), ModelAPI_AttributeBoolean, /** Reverse offset 1 */,
-               plane2, ConstructionPlugin_Axis::PLANE2(), ModelAPI_AttributeSelection, /** Plane 2 */,
-               useOffset2, ConstructionPlugin_Axis::USE_OFFSET2(), ModelAPI_AttributeString, /** Use offset 2 */,
-               offset2, ConstructionPlugin_Axis::OFFSET2(), ModelAPI_AttributeDouble, /** Offset 2 */,
-               reverseOffset2, ConstructionPlugin_Axis::REVERSE_OFFSET2(), ModelAPI_AttributeBoolean, /** Reverse offset 2 */)
+               creationMethod, ConstructionPlugin_Axis::METHOD(),
+               ModelAPI_AttributeString, /** Creation method */,
+               firstPoint, ConstructionPlugin_Axis::POINT_FIRST(),
+               ModelAPI_AttributeSelection, /** First point */,
+               secondPoint, ConstructionPlugin_Axis::POINT_SECOND(),
+               ModelAPI_AttributeSelection, /** Second point */,
+               cylindricalFace, ConstructionPlugin_Axis::CYLINDRICAL_FACE(),
+               ModelAPI_AttributeSelection, /** Cylindrical face */,
+               xDirection, ConstructionPlugin_Axis::X_DIRECTION(),
+               ModelAPI_AttributeDouble, /** X direction */,
+               yDirection, ConstructionPlugin_Axis::Y_DIRECTION(),
+               ModelAPI_AttributeDouble, /** Y direction */,
+               zDirection, ConstructionPlugin_Axis::Z_DIRECTION(),
+               ModelAPI_AttributeDouble, /** Z direction */,
+               xDimension, ConstructionPlugin_Axis::DX(),
+               ModelAPI_AttributeDouble, /** X dimension */,
+               yDimension, ConstructionPlugin_Axis::DY(),
+               ModelAPI_AttributeDouble, /** Y dimension */,
+               zDimension, ConstructionPlugin_Axis::DZ(),
+               ModelAPI_AttributeDouble, /** Z dimension */,
+               line, ConstructionPlugin_Axis::LINE(),
+               ModelAPI_AttributeSelection, /** Line */,
+               plane, ConstructionPlugin_Axis::PLANE(),
+               ModelAPI_AttributeSelection, /** Plane */,
+               point, ConstructionPlugin_Axis::POINT(),
+               ModelAPI_AttributeSelection, /** Point */,
+               plane1, ConstructionPlugin_Axis::PLANE1(),
+               ModelAPI_AttributeSelection, /** Plane 1 */,
+               useOffset1, ConstructionPlugin_Axis::USE_OFFSET1(),
+               ModelAPI_AttributeString, /** Use offset 1 */,
+               offset1, ConstructionPlugin_Axis::OFFSET1(),
+               ModelAPI_AttributeDouble, /** Offset 1 */,
+               reverseOffset1, ConstructionPlugin_Axis::REVERSE_OFFSET1(),
+               ModelAPI_AttributeBoolean, /** Reverse offset 1 */,
+               plane2, ConstructionPlugin_Axis::PLANE2(),
+               ModelAPI_AttributeSelection, /** Plane 2 */,
+               useOffset2, ConstructionPlugin_Axis::USE_OFFSET2(),
+               ModelAPI_AttributeString, /** Use offset 2 */,
+               offset2, ConstructionPlugin_Axis::OFFSET2(),
+               ModelAPI_AttributeDouble, /** Offset 2 */,
+               reverseOffset2, ConstructionPlugin_Axis::REVERSE_OFFSET2(),
+               ModelAPI_AttributeBoolean, /** Reverse offset 2 */)
 
   /// Set points
   CONSTRUCTIONAPI_EXPORT

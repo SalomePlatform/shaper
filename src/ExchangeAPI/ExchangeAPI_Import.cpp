@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // Name   : ExchangeAPI_Import.cpp
 // Purpose: 
 //
@@ -62,11 +64,13 @@ void ExchangeAPI_Import::dump(ModelHighAPI_Dumper& theDumper) const
   // to make import have results
   theDumper << "model.do()" << std::endl;
 
-  CompositeFeaturePtr aCompositeFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aBase);
+  CompositeFeaturePtr aCompositeFeature = 
+    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aBase);
   if(aCompositeFeature.get()) {
     int aNbOfSubs = aCompositeFeature->numberOfSubs();
     for(int anIndex = 0; anIndex < aNbOfSubs; ++anIndex) {
-      std::string aSubFeatureGet = theDumper.name(aBase) + ".subFeature(" + std::to_string((long long)anIndex) + ")";
+      std::string aSubFeatureGet = 
+        theDumper.name(aBase) + ".subFeature(" + std::to_string((long long)anIndex) + ")";
       theDumper.dumpSubFeatureNameAndColor(aSubFeatureGet, aCompositeFeature->subFeature(anIndex));
     }
   }

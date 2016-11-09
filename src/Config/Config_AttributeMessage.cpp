@@ -61,7 +61,8 @@ const std::list<std::pair<std::string, std::string> >& Config_AttributeMessage::
   return myCases;
 }
 
-void Config_AttributeMessage::setCases(const std::list<std::pair<std::string, std::string> >& theCases)
+void Config_AttributeMessage::setCases(const std::list<std::pair<std::string,
+                                       std::string> >& theCases)
 {
   myCases = theCases;
 }

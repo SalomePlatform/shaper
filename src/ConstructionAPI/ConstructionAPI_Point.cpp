@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 CEA/DEN, EDF R&D
+
 // Name   : ConstructionAPI_Point.cpp
 // Purpose: 
 //

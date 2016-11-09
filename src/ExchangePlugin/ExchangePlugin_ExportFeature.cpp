@@ -55,18 +55,27 @@ ExchangePlugin_ExportFeature::~ExchangePlugin_ExportFeature()
  */
 void ExchangePlugin_ExportFeature::initAttributes()
 {
-  data()->addAttribute(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(ExchangePlugin_ExportFeature::FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(ExchangePlugin_ExportFeature::FILE_FORMAT_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(ExchangePlugin_ExportFeature::SELECTION_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
-  data()->addAttribute(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID(),
+    ModelAPI_AttributeString::typeId());
+  data()->addAttribute(ExchangePlugin_ExportFeature::FILE_PATH_ID(),
+    ModelAPI_AttributeString::typeId());
+  data()->addAttribute(ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID(),
+    ModelAPI_AttributeString::typeId());
+  data()->addAttribute(ExchangePlugin_ExportFeature::FILE_FORMAT_ID(),
+    ModelAPI_AttributeString::typeId());
+  data()->addAttribute(ExchangePlugin_ExportFeature::SELECTION_LIST_ID(),
+    ModelAPI_AttributeSelectionList::typeId());
+  data()->addAttribute(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID(),
+    ModelAPI_AttributeString::typeId());
+  data()->addAttribute(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID(),
+    ModelAPI_AttributeString::typeId());
 
-  //ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::XAO_AUTHOR_ID());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
+    ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
+    ExchangePlugin_ExportFeature::XAO_AUTHOR_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
+    ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID());
 }
 
 void ExchangePlugin_ExportFeature::attributeChanged(const std::string& theID)
@@ -227,7 +236,8 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       // complex conversion of reference id to element index
       int aReferenceID = aSelection->Id();
       std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
-      int anElementID = aXao.getGeometry()->getElementIndexByReference(aGroupDimension, aReferenceString);
+      int anElementID = 
+        aXao.getGeometry()->getElementIndexByReference(aGroupDimension, aReferenceString);
 
       aXaoGroup->add(anElementID);
     }

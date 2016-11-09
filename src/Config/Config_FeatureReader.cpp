@@ -51,7 +51,8 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
   Events_ID aMenuItemEvent = Events_Loop::eventByName(myEventGenerated);
   if (isNode(theNode, NODE_FEATURE, NULL)) {
     storeAttribute(theNode, _ID);
-    std::shared_ptr<Config_FeatureMessage> aMessage(new Config_FeatureMessage(aMenuItemEvent, this));
+    std::shared_ptr<Config_FeatureMessage> 
+      aMessage(new Config_FeatureMessage(aMenuItemEvent, this));
     fillFeature(theNode, aMessage);
     myFeatures.push_back(getProperty(theNode, _ID));
     //If a feature has xml definition for it's widget:
@@ -64,7 +65,8 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
   } else if (myIsProcessWidgets) {
     // widgets, like shape_selector or containers, like toolbox
     if (isAttributeNode(theNode)) {
-      std::shared_ptr<Config_AttributeMessage> aMessage(new Config_AttributeMessage(aMenuItemEvent, this));
+      std::shared_ptr<Config_AttributeMessage>
+        aMessage(new Config_AttributeMessage(aMenuItemEvent, this));
       aMessage->setFeatureId(restoreAttribute(NODE_FEATURE, _ID));
       std::string anAttributeID = getProperty(theNode, _ID);
       if (!anAttributeID.empty()) {
@@ -73,7 +75,8 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
         aMessage->setConcealment(getBooleanAttribute(theNode, ATTR_CONCEALMENT, false));
 
         std::list<std::pair<std::string, std::string> > aCases;
-        xmlNodePtr aCaseNode = hasParentRecursive(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, WDG_OPTIONALBOX, NULL);
+        xmlNodePtr aCaseNode =
+          hasParentRecursive(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, WDG_OPTIONALBOX, NULL);
         while(aCaseNode) {
           std::string aCaseNodeID = getProperty(aCaseNode, _ID);
           std::string aSwitchNodeID = "";
@@ -86,14 +89,16 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
             aSwitchNode = hasParentRecursive(aCaseNode, WDG_TOOLBOX, NULL);
           }
           if (!xmlStrcmp(aName, (const xmlChar *) WDG_OPTIONALBOX)) {
-            /// the box is optional, attribute is in case if the optional attribute value is not empty
+            /// the box is optional, attribute is in case 
+            /// if the optional attribute value is not empty
             aSwitchNode = aCaseNode;
           }
           if (aSwitchNode)
             aSwitchNodeID = getProperty(aSwitchNode, _ID);
 
           aCases.push_back(std::make_pair(aSwitchNodeID, aCaseNodeID));
-          aCaseNode = hasParentRecursive(aSwitchNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, WDG_OPTIONALBOX, NULL);
+          aCaseNode = hasParentRecursive(aSwitchNode, WDG_SWITCH_CASE, 
+                                         WDG_TOOLBOX_BOX, WDG_OPTIONALBOX, NULL);
         }
         aMessage->setCases(aCases);
         Events_Loop::loop()->send(aMessage);
@@ -135,7 +140,8 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   outFeatureMessage->setId(getProperty(theFeatureNode, _ID));
   outFeatureMessage->setPluginLibrary(myLibraryName);
   outFeatureMessage->setNestedFeatures(getProperty(theFeatureNode, FEATURE_NESTED));
-  outFeatureMessage->setActionsWhenNested(getNormalizedProperty(theFeatureNode, FEATURE_WHEN_NESTED));
+  outFeatureMessage->setActionsWhenNested(getNormalizedProperty(theFeatureNode,
+                                          FEATURE_WHEN_NESTED));
   outFeatureMessage->setModal(getBooleanAttribute(theFeatureNode, FEATURE_MODAL, false));
 
   bool isInternal = getBooleanAttribute(theFeatureNode, ATTR_INTERNAL, false);

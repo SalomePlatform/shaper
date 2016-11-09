@@ -29,7 +29,8 @@ void Config_DataModelReader::processNode(xmlNodePtr theNode)
     std::string aName = getProperty(theNode, FOLDER_NAME);
     std::string aGroupType = getProperty(theNode, GROUP_TYPE);
     if (aName.empty() || aGroupType.empty())
-      Events_InfoMessage("Config_DataModelReader", "Reading dataModel.xml: wrong folder definition.").send();
+      Events_InfoMessage("Config_DataModelReader",
+        "Reading dataModel.xml: wrong folder definition.").send();
    
     std::string aIcon = getProperty(theNode, NODE_ICON);
     std::string aEmpty = getProperty(theNode, SHOW_EMPTY);

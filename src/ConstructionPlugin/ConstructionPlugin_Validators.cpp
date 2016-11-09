@@ -29,7 +29,8 @@ bool ConstructionPlugin_ValidatorPointLines::isValid(const AttributePtr& theAttr
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
 
-  AttributeSelectionPtr aLineAttribute1 = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  AttributeSelectionPtr aLineAttribute1 = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   AttributeSelectionPtr aLineAttribute2 = aFeature->selection(theArguments.front());
 
   GeomShapePtr aLineShape1 = aLineAttribute1->value();
@@ -86,7 +87,8 @@ bool ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel::isValid(
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
 
-  AttributeSelectionPtr anAttribute1 = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  AttributeSelectionPtr anAttribute1 = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   AttributeSelectionPtr anAttribute2 = aFeature->selection(theArguments.front());
 
   std::shared_ptr<GeomAPI_Lin> aLin;
@@ -133,12 +135,13 @@ bool ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel::isValid(
 
 //==================================================================================================
 bool ConstructionPlugin_ValidatorPlaneThreePoints::isValid(const AttributePtr& theAttribute,
-                                                           const std::list<std::string>& theArguments,
-                                                           Events_InfoMessage& theError) const
+                                                        const std::list<std::string>& theArguments,
+                                                        Events_InfoMessage& theError) const
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
 
-  AttributeSelectionPtr aPointAttribute1 = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  AttributeSelectionPtr aPointAttribute1 =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   AttributeSelectionPtr aPointAttribute2 = aFeature->selection(theArguments.front());
   AttributeSelectionPtr aPointAttribute3 = aFeature->selection(theArguments.back());
 
@@ -208,7 +211,8 @@ bool ConstructionPlugin_ValidatorPlaneLinePoint::isValid(
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
 
-  AttributeSelectionPtr anAttribute1 = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  AttributeSelectionPtr anAttribute1 = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   AttributeSelectionPtr anAttribute2 = aFeature->selection(theArguments.front());
 
   std::shared_ptr<GeomAPI_Lin> aLin;
@@ -265,7 +269,8 @@ bool ConstructionPlugin_ValidatorPlaneTwoParallelPlanes::isValid(
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
 
-  AttributeSelectionPtr anAttribute1 = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  AttributeSelectionPtr anAttribute1 =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   AttributeSelectionPtr anAttribute2 = aFeature->selection(theArguments.front());
 
   std::shared_ptr<GeomAPI_Pln> aPln1;
@@ -317,7 +322,8 @@ bool ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes::isValid(
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
 
-  AttributeSelectionPtr anAttribute1 = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  AttributeSelectionPtr anAttribute1 = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   AttributeSelectionPtr anAttribute2 = aFeature->selection(theArguments.front());
 
   std::shared_ptr<GeomAPI_Pln> aPln1;

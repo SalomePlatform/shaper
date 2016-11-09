@@ -86,7 +86,7 @@ void ConstructionPlugin_Point::execute()
 //==================================================================================================
 bool ConstructionPlugin_Point::customisePresentation(ResultPtr theResult,
                                                      AISObjectPtr thePrs,
-                                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
+                                                std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
 {
   bool isCustomized = theDefaultPrs.get() != NULL &&
                       theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);

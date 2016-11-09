@@ -171,7 +171,8 @@ void ConstructionPlugin_Axis::createAxisByDimensions()
   double aDY = data()->real(DY())->value();
   double aDZ = data()->real(DZ())->value();
 
-  if (fabs(aDX) < MINIMAL_LENGTH()  && fabs(aDY) < MINIMAL_LENGTH() && fabs(aDZ) < MINIMAL_LENGTH()){
+  if (fabs(aDX) < MINIMAL_LENGTH()  && fabs(aDY) < MINIMAL_LENGTH() && 
+      fabs(aDZ) < MINIMAL_LENGTH()) {
     setError("Axis builder with dimensions  :: all dimensions are null", false);
     return ;
   }

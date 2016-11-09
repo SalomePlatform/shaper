@@ -24,7 +24,8 @@ public:
 
   /// Constructor
   /// \param theSender a pointer on sender object
-  explicit Events_InfoMessage(const void* theSender = 0):Events_Message(Events_Loop::eventByName("InfoMessage"), theSender) {}
+  explicit Events_InfoMessage(const void* theSender = 0):
+    Events_Message(Events_Loop::eventByName("InfoMessage"), theSender) {}
 
   /// Constructor
   /// \param theSender a pointer on sender object

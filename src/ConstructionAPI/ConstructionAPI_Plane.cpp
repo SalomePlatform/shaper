@@ -1,3 +1,5 @@
+// Copyright (C) 2014-2016 CEA/DEN, EDF R&D
+
 // Name   : ConstructionAPI_Plane.cpp
 // Purpose: 
 //
@@ -106,7 +108,8 @@ void ConstructionAPI_Plane::setByFaceAndDistance(const ModelHighAPI_Selection& t
 {
   fillAttribute(ConstructionPlugin_Plane::CREATION_METHOD_BY_OTHER_PLANE(), mycreationMethod);
   fillAttribute(theFace, myplane);
-  fillAttribute(ConstructionPlugin_Plane::CREATION_METHOD_BY_DISTANCE_FROM_OTHER(), mycreationMethodByOtherPlane);
+  fillAttribute(ConstructionPlugin_Plane::CREATION_METHOD_BY_DISTANCE_FROM_OTHER(),
+                mycreationMethodByOtherPlane);
   fillAttribute(theDistance, mydistance);
   fillAttribute(theIsReverse, myreverse);
 
@@ -158,7 +161,8 @@ void ConstructionAPI_Plane::setByLineAndPoint(const ModelHighAPI_Selection& theL
 void ConstructionAPI_Plane::setByTwoParallelPlanes(const ModelHighAPI_Selection& thePlane1,
                                                    const ModelHighAPI_Selection& thePlane2)
 {
-  fillAttribute(ConstructionPlugin_Plane::CREATION_METHOD_BY_TWO_PARALLEL_PLANES(), mycreationMethod);
+  fillAttribute(ConstructionPlugin_Plane::CREATION_METHOD_BY_TWO_PARALLEL_PLANES(), 
+                mycreationMethod);
   fillAttribute(thePlane1, myplane1);
   fillAttribute(thePlane2, myplane2);
 
@@ -171,7 +175,8 @@ void ConstructionAPI_Plane::setByCoincidentToPoint(const ModelHighAPI_Selection&
 {
   fillAttribute(ConstructionPlugin_Plane::CREATION_METHOD_BY_OTHER_PLANE(), mycreationMethod);
   fillAttribute(thePlane, myplane);
-  fillAttribute(ConstructionPlugin_Plane::CREATION_METHOD_BY_COINCIDENT_TO_POINT(), mycreationMethodByOtherPlane);
+  fillAttribute(ConstructionPlugin_Plane::CREATION_METHOD_BY_COINCIDENT_TO_POINT(), 
+                mycreationMethodByOtherPlane);
   fillAttribute(thePoint, mycoincidentPoint);
 
   execute();
@@ -184,7 +189,8 @@ void ConstructionAPI_Plane::setByRotation(const ModelHighAPI_Selection& thePlane
 {
   fillAttribute(ConstructionPlugin_Plane::CREATION_METHOD_BY_OTHER_PLANE(), mycreationMethod);
   fillAttribute(thePlane, myplane);
-  fillAttribute(ConstructionPlugin_Plane::CREATION_METHOD_BY_ROTATION(), mycreationMethodByOtherPlane);
+  fillAttribute(ConstructionPlugin_Plane::CREATION_METHOD_BY_ROTATION(), 
+                mycreationMethodByOtherPlane);
   fillAttribute(theAxis, myaxis);
   fillAttribute(theAngle, myangle);
 
@@ -199,7 +205,8 @@ void ConstructionAPI_Plane::dump(ModelHighAPI_Dumper& theDumper) const
 
   theDumper << aBase << " = model.addPlane(" << aDocName;
 
-  std::string aCreationMethod = aBase->string(ConstructionPlugin_Plane::CREATION_METHOD())->value();
+  std::string aCreationMethod =
+    aBase->string(ConstructionPlugin_Plane::CREATION_METHOD())->value();
 
   if(aCreationMethod == ConstructionPlugin_Plane::CREATION_METHOD_BY_GENERAL_EQUATION()) {
     AttributeDoublePtr anAttrA = aBase->real(ConstructionPlugin_Plane::A());
@@ -217,7 +224,8 @@ void ConstructionAPI_Plane::dump(ModelHighAPI_Dumper& theDumper) const
   } else if(aCreationMethod == ConstructionPlugin_Plane::CREATION_METHOD_BY_LINE_AND_POINT()) {
     AttributeSelectionPtr anAttrLine = aBase->selection(ConstructionPlugin_Plane::LINE());
     AttributeSelectionPtr anAttrPoint = aBase->selection(ConstructionPlugin_Plane::POINT());
-    AttributeBooleanPtr anAttrPerpendicular = aBase->boolean(ConstructionPlugin_Plane::PERPENDICULAR());
+    AttributeBooleanPtr anAttrPerpendicular =
+      aBase->boolean(ConstructionPlugin_Plane::PERPENDICULAR());
 
     theDumper << ", " << anAttrLine << ", " << anAttrPoint << ", " << anAttrPerpendicular;
   } else if(aCreationMethod == ConstructionPlugin_Plane::CREATION_METHOD_BY_OTHER_PLANE()) {
@@ -225,13 +233,16 @@ void ConstructionAPI_Plane::dump(ModelHighAPI_Dumper& theDumper) const
 
     std::string aCreationMethodOption =
         aBase->string(ConstructionPlugin_Plane::CREATION_METHOD_BY_OTHER_PLANE_OPTION())->value();
-    if(aCreationMethodOption == ConstructionPlugin_Plane::CREATION_METHOD_BY_DISTANCE_FROM_OTHER()) {
+    if(aCreationMethodOption ==
+       ConstructionPlugin_Plane::CREATION_METHOD_BY_DISTANCE_FROM_OTHER()) {
       AttributeDoublePtr anAttrDistance = aBase->real(ConstructionPlugin_Plane::DISTANCE());
       AttributeBooleanPtr anAttrReverse = aBase->boolean(ConstructionPlugin_Plane::REVERSE());
 
       theDumper << ", " << anAttrPlane << ", " << anAttrDistance << ", " << anAttrReverse;
-    } else if(aCreationMethodOption == ConstructionPlugin_Plane::CREATION_METHOD_BY_COINCIDENT_TO_POINT()) {
-      AttributeSelectionPtr anAttrPoint = aBase->selection(ConstructionPlugin_Plane::COINCIDENT_POINT());
+    } else if(aCreationMethodOption == 
+              ConstructionPlugin_Plane::CREATION_METHOD_BY_COINCIDENT_TO_POINT()) {
+      AttributeSelectionPtr anAttrPoint = 
+        aBase->selection(ConstructionPlugin_Plane::COINCIDENT_POINT());
 
       theDumper << ", " << anAttrPlane << ", " << anAttrPoint;
     } else if(aCreationMethodOption == ConstructionPlugin_Plane::CREATION_METHOD_BY_ROTATION()) {
@@ -240,7 +251,8 @@ void ConstructionAPI_Plane::dump(ModelHighAPI_Dumper& theDumper) const
 
       theDumper << ", " << anAttrPlane << ", " << anAttrAxis << ", " << anAttrAngle;
     }
-  } else if(aCreationMethod == ConstructionPlugin_Plane::CREATION_METHOD_BY_TWO_PARALLEL_PLANES()) {
+  } else if(aCreationMethod == 
+            ConstructionPlugin_Plane::CREATION_METHOD_BY_TWO_PARALLEL_PLANES()) {
     AttributeSelectionPtr anAttrPlane1 = aBase->selection(ConstructionPlugin_Plane::PLANE1());
     AttributeSelectionPtr anAttrPlane2 = aBase->selection(ConstructionPlugin_Plane::PLANE2());
 
