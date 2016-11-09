@@ -167,7 +167,7 @@ void Model_Application::removeUselessDocuments(
 int Model_Application::generateDocumentId()
 {
   int aResult = int(myDocs.size());
-  for(; myDocs.find(aResult) != myDocs.end(); aResult++); // count until the result id is unique
+  for(; myDocs.find(aResult) != myDocs.end(); aResult++) {} // count until the result id is unique
   return aResult;
 }
 
