@@ -122,12 +122,14 @@ bool BuildPlugin_Wire::addContour()
 
     // Check that it is edge on sketch.
     ResultPtr aContext = aSelection->context();
-    ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    ResultConstructionPtr aConstruction =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
     if(!aConstruction.get()) {
       continue;
     }
     GeomShapePtr aContextShape = aConstruction->shape();
-    std::shared_ptr<GeomAPI_PlanarEdges> aPlanarEdges = std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aContextShape);
+    std::shared_ptr<GeomAPI_PlanarEdges> aPlanarEdges = 
+      std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aContextShape);
     if(!aPlanarEdges.get()) {
       continue;
     }
@@ -149,15 +151,18 @@ bool BuildPlugin_Wire::addContour()
     AttributeSelectionPtr aSelection = *aListIt;
     std::shared_ptr<GeomAPI_Edge> anEdgeInList(new GeomAPI_Edge(aSelection->value()));
 
-    ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSelection->context());
+    ResultConstructionPtr aConstruction = 
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSelection->context());
 
     // Iterate on wires and add wire with this edge.
     std::shared_ptr<GeomAPI_Shape> aFoundWire;
     for(int anIndex = 0; anIndex < aConstruction->facesNum(); ++anIndex) {
       std::shared_ptr<GeomAPI_Face> aFace = aConstruction->face(anIndex);
-      for(GeomAPI_ShapeExplorer aWireExp(aFace, GeomAPI_Shape::WIRE); aWireExp.more(); aWireExp.next()) {
+      for(GeomAPI_ShapeExplorer 
+          aWireExp(aFace, GeomAPI_Shape::WIRE); aWireExp.more(); aWireExp.next()) {
         GeomShapePtr aWireOnFace = aWireExp.current();
-        for(GeomAPI_ShapeExplorer anExp(aWireOnFace, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
+        for(GeomAPI_ShapeExplorer 
+            anExp(aWireOnFace, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
           std::shared_ptr<GeomAPI_Edge> anEdgeOnFace(new GeomAPI_Edge(anExp.current()));
           if(anEdgeInList->isEqual(anEdgeOnFace)) {
             aFoundWire = aWireOnFace;
@@ -172,7 +177,8 @@ bool BuildPlugin_Wire::addContour()
 
     // If wire with the same edge found. Add all other edges to list.
     if(aFoundWire.get()) {
-      for(GeomAPI_ShapeExplorer anExp(aFoundWire, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
+      for(GeomAPI_ShapeExplorer 
+          anExp(aFoundWire, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
         std::shared_ptr<GeomAPI_Edge> anEdgeOnFace(new GeomAPI_Edge(anExp.current()));
         ListOfShape::const_iterator anEdgesIt = anAddedEdges.cbegin();
         for(; anEdgesIt != anAddedEdges.cend(); ++anEdgesIt) {

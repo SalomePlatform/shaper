@@ -36,7 +36,8 @@ public:
   virtual ~BuildAPI_Wire();
 
   INTERFACE_1(BuildPlugin_Wire::ID(),
-              baseObjects, BuildPlugin_Wire::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */)
+              baseObjects, BuildPlugin_Wire::BASE_OBJECTS_ID(),
+              ModelAPI_AttributeSelectionList, /** Base objects */)
 
   /// Modify base attribute of the feature.
   BUILDAPI_EXPORT

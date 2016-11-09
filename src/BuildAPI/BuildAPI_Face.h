@@ -36,7 +36,8 @@ public:
   virtual ~BuildAPI_Face();
 
   INTERFACE_1(BuildPlugin_Face::ID(),
-              baseObjects, BuildPlugin_Face::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */)
+              baseObjects, BuildPlugin_Face::BASE_OBJECTS_ID(), 
+              ModelAPI_AttributeSelectionList, /** Base objects */)
 
   /// Modify base attribute of the feature.
   BUILDAPI_EXPORT

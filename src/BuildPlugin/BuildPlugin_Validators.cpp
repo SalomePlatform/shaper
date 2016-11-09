@@ -32,7 +32,8 @@ bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute
 {
   // Get base objects list.
   if(theAttribute->attributeType() != ModelAPI_AttributeSelectionList::typeId()) {
-    std::string aMsg = "Error: BuildPlugin_ValidatorBaseForBuild does not support attribute type '%1'\nOnly '%2' is supported.";
+    std::string aMsg = "Error: BuildPlugin_ValidatorBaseForBuild does "
+                       "not support attribute type '%1'\nOnly '%2' is supported.";
     Events_InfoMessage("BuildPlugin_Validators", aMsg).
       arg(theAttribute->attributeType()).arg(ModelAPI_AttributeSelectionList::typeId()).send();
     return false;
@@ -78,14 +79,16 @@ bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute
     }
 
     // Check that it is shape on sketch.
-    ResultConstructionPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    ResultConstructionPtr aConstruction = 
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
     if(aConstruction.get()) {
       if(aConstruction->isInfinite()) {
         theError = "Inifinte objects not acceptable.";
         return false;
       }
 
-      std::shared_ptr<GeomAPI_PlanarEdges> anEdges = std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aContextShape);
+      std::shared_ptr<GeomAPI_PlanarEdges> anEdges = 
+        std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aContextShape);
       if(anEdges.get()) {
         if(aShape->isEqual(aContextShape)) {
           // It is whole sketch.
@@ -113,7 +116,8 @@ bool BuildPlugin_ValidatorBaseForWire::isValid(const std::shared_ptr<ModelAPI_Fe
 {
   // Get attribute.
   if(theArguments.size() != 1) {
-    std::string aMsg = "Error: BuildPlugin_ValidatorBaseForWire should be used only with 1 parameter (ID of base objects list).";
+    std::string aMsg = "Error: BuildPlugin_ValidatorBaseForWire should be used only "
+                       "with 1 parameter (ID of base objects list).";
     Events_InfoMessage("BuildPlugin_Validators", aMsg).send();
     return false;
   }
@@ -147,7 +151,8 @@ bool BuildPlugin_ValidatorBaseForWire::isValid(const std::shared_ptr<ModelAPI_Fe
 }
 
 //=================================================================================================
-bool BuildPlugin_ValidatorBaseForWire::isNotObligatory(std::string theFeature, std::string theAttribute)
+bool BuildPlugin_ValidatorBaseForWire::isNotObligatory(std::string theFeature,
+                                                       std::string theAttribute)
 {
   return false;
 }
@@ -195,7 +200,8 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
     GeomShapePtr aSectedEdges = aPaveFiller.shape();
 
     int anEdgesNum = 0;
-    for(GeomAPI_ShapeExplorer anExp(aSectedEdges, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
+    for(GeomAPI_ShapeExplorer 
+        anExp(aSectedEdges, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
       anEdgesNum++;
     }
     if(anEdgesNum != anEdges.size()) {
@@ -213,7 +219,8 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
 
   // Check that selected objects have closed contours.
   ListOfShape aFaces;
-  GeomAlgoAPI_SketchBuilder::createFaces(aPln->location(), aPln->xDirection(), aPln->direction(), anEdges, aFaces);
+  GeomAlgoAPI_SketchBuilder::createFaces(aPln->location(), aPln->xDirection(), 
+                                         aPln->direction(), anEdges, aFaces);
   if(aFaces.empty()) {
     theError = "Selected objects does not have closed contours.";
     return false;
@@ -223,7 +230,8 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
 }
 
 //=================================================================================================
-bool BuildPlugin_ValidatorBaseForFace::isNotObligatory(std::string theFeature, std::string theAttribute)
+bool BuildPlugin_ValidatorBaseForFace::isNotObligatory(std::string theFeature, 
+                                                       std::string theAttribute)
 {
   return false;
 }
@@ -242,7 +250,8 @@ bool BuildPlugin_ValidatorSubShapesSelection::isValid(const AttributePtr& theAtt
 
   // Get base objects list.
   if(theAttribute->attributeType() != ModelAPI_AttributeSelectionList::typeId()) {
-    std::string aMsg = "Error: BuildPlugin_ValidatorSubShapesSelection does not support attribute type \""
+    std::string aMsg = 
+      "Error: BuildPlugin_ValidatorSubShapesSelection does not support attribute type \""
       "%1\"\n Only \"%2\" supported.";
     Events_InfoMessage("BuildPlugin_Validators", aMsg).
       arg(theAttribute->attributeType()).arg(ModelAPI_AttributeSelectionList::typeId()).send();

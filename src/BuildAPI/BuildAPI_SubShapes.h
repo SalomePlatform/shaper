@@ -37,8 +37,10 @@ public:
   virtual ~BuildAPI_SubShapes();
 
   INTERFACE_2(BuildPlugin_SubShapes::ID(),
-              baseShape, BuildPlugin_SubShapes::BASE_SHAPE_ID(), ModelAPI_AttributeSelection, /** Base shape */,
-              subShapes, BuildPlugin_SubShapes::SUBSHAPES_ID(), ModelAPI_AttributeSelectionList, /** Sub-shapes */)
+              baseShape, BuildPlugin_SubShapes::BASE_SHAPE_ID(),
+              ModelAPI_AttributeSelection, /** Base shape */,
+              subShapes, BuildPlugin_SubShapes::SUBSHAPES_ID(),
+              ModelAPI_AttributeSelectionList, /** Sub-shapes */)
 
   /// Modify base attribute of the feature.
   BUILDAPI_EXPORT

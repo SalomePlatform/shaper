@@ -36,7 +36,8 @@ public:
   virtual ~BuildAPI_Edge();
 
   INTERFACE_1(BuildPlugin_Edge::ID(),
-              baseObjects, BuildPlugin_Edge::BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList, /** Base objects */)
+              baseObjects, BuildPlugin_Edge::BASE_OBJECTS_ID(),
+              ModelAPI_AttributeSelectionList, /** Base objects */)
 
   /// Modify base attribute of the feature.
   BUILDAPI_EXPORT

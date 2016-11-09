@@ -79,7 +79,8 @@ void BuildPlugin_Face::execute()
 
   // Get faces.
   ListOfShape aFaces;
-  GeomAlgoAPI_SketchBuilder::createFaces(aPln->location(), aPln->xDirection(), aPln->direction(), anEdges, aFaces);
+  GeomAlgoAPI_SketchBuilder::createFaces(aPln->location(), aPln->xDirection(),
+                                         aPln->direction(), anEdges, aFaces);
 
   // Get wires from faces.
   ListOfShape aWires;
@@ -111,7 +112,8 @@ void BuildPlugin_Face::execute()
       for(ListOfShape::const_iterator anIt = anEdges.cbegin(); anIt != anEdges.cend(); ++anIt) {
         std::shared_ptr<GeomAPI_Edge> anEdgeInList(new GeomAPI_Edge(*anIt));
         if(anEdgeInList->isEqual(anEdgeInResult)) {
-          aResultBody->modified(anEdgeInList, anEdgeInResult, "Edge_" + std::to_string((long long)anEdgeIndex), anEdgeIndex);
+          aResultBody->modified(anEdgeInList, anEdgeInResult,
+                                "Edge_" + std::to_string((long long)anEdgeIndex), anEdgeIndex);
           ++anEdgeIndex;
           break;
         }

@@ -72,7 +72,8 @@ void BuildPlugin_Shell::execute()
     ResultBodyPtr aResultBody = document()->createBody(data(), anIndex);
     aResultBody->store(aShell);
     for(ListOfShape::const_iterator anIt = aShapes.cbegin(); anIt != aShapes.cend(); ++anIt) {
-      for(GeomAPI_ShapeExplorer aFaceExp(*anIt, GeomAPI_Shape::FACE); aFaceExp.more(); aFaceExp.next()) {
+      for(GeomAPI_ShapeExplorer 
+          aFaceExp(*anIt, GeomAPI_Shape::FACE); aFaceExp.more(); aFaceExp.next()) {
         GeomShapePtr aFace = aFaceExp.current();
         ListOfShape aHistory;
         aSewingAlgo.modified(aFace, aHistory);
