@@ -74,7 +74,7 @@ std::string Model_SelectionNaming::getShapeName(
           static const std::string aPostFix("_");
           TNaming_Iterator anItL(aNS);
           for(int i = 1; anItL.More(); anItL.Next(), i++) {
-            if(anItL.NewShape() == theShape) {
+            if(anItL.NewShape().IsSame(theShape)) { // in #1766 IsEqual produced no index of the face
               aName += aPostFix;
               aName += TCollection_AsciiString (i).ToCString();
               break;
