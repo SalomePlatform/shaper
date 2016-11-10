@@ -68,7 +68,8 @@ public:
   /// Constructor
   /// \param theMgr preferences manager of SALOME
   /// \param theModName name of the module
-  SHAPERGUI_PrefMgr(LightApp_Preferences* theMgr, const QString& theModName):myMgr(theMgr), myModName(theModName) {}
+  SHAPERGUI_PrefMgr(LightApp_Preferences* theMgr, const QString& theModName):
+    myMgr(theMgr), myModName(theModName) {}
 
   virtual int addPreference(const QString& theLbl, int pId, 
                             SUIT_PreferenceMgr::PrefItemType theType,
@@ -146,7 +147,8 @@ void SHAPERGUI::connectToStudy(CAM_Study* theStudy)
 {
   // if there are created viewer managers, we should try to create viewer
   // selector and initialize viewer with it. It sets interactive contect to the 
-  // proxy viewer. If study is opened, CAM application calls this method before the open() of data model
+  // proxy viewer. If study is opened, CAM application calls this method before the open()
+  // of data model
   // the SHAPER data model is specific and during open(load) redisplay signals are flushed, so
   // we need to connect to the viewer before it. Here, it seems the most appropriate place for this
   // according to SALOME architecture.
@@ -354,7 +356,8 @@ SHAPERGUI_OCCSelector* SHAPERGUI::createSelector(SUIT_ViewManager* theMgr)
 {
   if (theMgr->getType() == OCCViewer_Viewer::Type()) {
     OCCViewer_Viewer* aViewer = static_cast<OCCViewer_Viewer*>(theMgr->getViewModel());
-    SHAPERGUI_OCCSelector* aSelector = new SHAPERGUI_OCCSelector(aViewer, getApp()->selectionMgr());
+    SHAPERGUI_OCCSelector* aSelector = new SHAPERGUI_OCCSelector(aViewer,
+                                                                 getApp()->selectionMgr());
     LightApp_SelectionMgr* aMgr = getApp()->selectionMgr();
     QList<SUIT_Selector*> aList;
     aMgr->selectors(aList);
@@ -380,7 +383,8 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const ActionInfo& theIn
   return addFeature(theWBName,
                     theInfo.id,
                     theInfo.text,
-                    theInfo.text, //Issue #650: in the SALOME mode the tooltip should be same as text
+                    //Issue #650: in the SALOME mode the tooltip should be same as text
+                    theInfo.text, 
                     theInfo.icon,
                     theInfo.shortcut,
                     theInfo.checkable,
@@ -612,7 +616,8 @@ void SHAPERGUI::preferencesChanged(const QString& theSection, const QString& the
 {
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
   QString aVal = aResMgr->stringValue(theSection, theParam);
-  Config_Prop* aProp = Config_PropManager::findProp(theSection.toStdString(), theParam.toStdString());
+  Config_Prop* aProp = Config_PropManager::findProp(theSection.toStdString(),
+                                                    theParam.toStdString());
   std::string aValue = aVal.toStdString();
   if (aValue.empty()) {
     aValue = aProp->defaultValue();

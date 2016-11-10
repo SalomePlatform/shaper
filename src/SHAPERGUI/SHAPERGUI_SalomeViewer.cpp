@@ -254,7 +254,8 @@ void SHAPERGUI_SalomeViewer::onViewCreated(SUIT_ViewWindow* theView)
   }
   reconnectActions(aWnd, true);
 
-  myWindowScale.insert (aView->getViewPort()->getView(), aView->getViewPort()->getView()->Camera()->Scale());
+  myWindowScale.insert(aView->getViewPort()->getView(), 
+                       aView->getViewPort()->getView()->Camera()->Scale());
 
   emit viewCreated(myView);
 
@@ -351,7 +352,8 @@ void SHAPERGUI_SalomeViewer::fitAll()
 }
 
 //**********************************************
-void SHAPERGUI_SalomeViewer::setViewProjection(double theX, double theY, double theZ, double theTwist)
+void SHAPERGUI_SalomeViewer::setViewProjection(double theX, double theY, 
+                                               double theZ, double theTwist)
 {
   if (!mySelector) 
     return;
@@ -453,7 +455,8 @@ void SHAPERGUI_SalomeViewer::activateViewer(bool toActivate)
     foreach (SUIT_ViewWindow* aView, aViews) {
       OCCViewer_ViewFrame* aOCCView = dynamic_cast<OCCViewer_ViewFrame*>(aView);
       OCCViewer_ViewWindow* aWnd = aOCCView->getView(OCCViewer_ViewFrame::MAIN_VIEW);
-      disconnect((OCCViewer_ViewWindow*)aWnd, SIGNAL(vpTransformationFinished(OCCViewer_ViewWindow::OperationType)),
+      disconnect((OCCViewer_ViewWindow*)aWnd, 
+                 SIGNAL(vpTransformationFinished(OCCViewer_ViewWindow::OperationType)),
         this, SLOT(onViewTransformed(OCCViewer_ViewWindow::OperationType)));
       reconnectActions(aWnd, false);
     }

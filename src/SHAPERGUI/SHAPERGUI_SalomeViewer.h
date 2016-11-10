@@ -168,7 +168,8 @@ Q_OBJECT
   void onSelectionChanged();
   void onViewTransformed(OCCViewer_ViewWindow::OperationType);
 
-  /// Emit signal about trihedron visiblity change because SALOME sets the trihedron visible by this signal.
+  /// Emit signal about trihedron visiblity change because SALOME sets 
+  /// the trihedron visible by this signal.
   /// It is necessary to activate the viewer trihedron in the current selection mode
   void onViewPortMapped();
 
