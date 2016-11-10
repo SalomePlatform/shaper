@@ -91,8 +91,8 @@ bool GeomValidators_ShapeType::isValid(const AttributePtr& theAttribute,
       if (!aTypes.empty())
         aTypes += ", ";
     }
-    theError = "It does not contain element with acceptable shape type. \
- The type should be one of the next: %1";
+    theError = "It does not contain element with acceptable shape type. "
+               "The type should be one of the next: %1";
     theError.arg(aTypes);
   }
 

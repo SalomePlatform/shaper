@@ -392,8 +392,8 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
   std::string aNotActivatedNames;
   if (!ModelAPI_Tools::allDocumentsActivated(aNotActivatedNames)) {
     QMessageBox::StandardButton aRes = QMessageBox::warning(0, QObject::tr("Warning"),
-               QObject::tr("Selected objects can be used in Part documents which are not loaded: \
-%1. Whould you like to continue?").arg(aNotActivatedNames.c_str()),
+               QObject::tr("Selected objects can be used in Part documents which are not loaded: "
+                           "%1. Whould you like to continue?").arg(aNotActivatedNames.c_str()),
                QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
     if (aRes != QMessageBox::Yes) {
       setParameterName(aResultParameter, aMessage->oldName());

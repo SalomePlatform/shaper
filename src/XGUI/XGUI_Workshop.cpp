@@ -1488,8 +1488,9 @@ void XGUI_Workshop::cleanHistory()
     aMessageBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
     aMessageBox.setDefaultButton(QMessageBox::No);
 
-    QString aText = QString(tr("Unused features are the following: \
-%1.\nThese features will be deleted.\nWould you like to continue?").arg(anUnusedNames));
+    const char* aKeyStr = "Unused features are the following: "
+                          "%1.\nThese features will be deleted.\nWould you like to continue?";
+    QString aText = QString(tr(aKeyStr).arg(anUnusedNames));
     aMessageBox.setText(aText);
     if (aMessageBox.exec() == QMessageBox::No)
       return;

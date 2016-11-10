@@ -187,8 +187,8 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
         // Whole sketch selected.
         if(aSelectedSketchesFromObjects.find(aResultConstruction) !=
             aSelectedSketchesFromObjects.cend()) {
-          theError = "Error: Object from this sketch is already selected. \
- Sketch is not allowed for selection.";
+          theError = "Error: Object from this sketch is already selected. "
+                     "Sketch is not allowed for selection.";
           return false;
         }
 
@@ -196,8 +196,8 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
       } else {
         // Object from sketch selected.
         if(aSelectedSketches.find(aResultConstruction) != aSelectedSketches.cend()) {
-          theError = "Error: Whole sketch with this object is already selected. \
- Don't allow to select this object.";
+          theError = "Error: Whole sketch with this object is already selected. "
+                     "Don't allow to select this object.";
           return false;
         }
 
@@ -299,9 +299,9 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     // Check that object is a shape with allowed type.
     GeomValidators_ShapeType aShapeTypeValidator;
     if(!aShapeTypeValidator.isValid(anAttr, theArguments, theError)) {
-      theError = "Error: Selected shape has unacceptable type. Acceptable types are: faces or \
- wires on sketch, whole sketch(if it has at least one face), \
- and whole objects with shape types: %1";
+      theError = "Error: Selected shape has unacceptable type. Acceptable types are: faces or "
+                 "wires on sketch, whole sketch(if it has at least one face), "
+                 "and whole objects with shape types: %1";
       std::string anArgumentString;
       for(auto anIt = theArguments.cbegin(); anIt != theArguments.cend(); ++anIt) {
         if (!anArgumentString.empty())
@@ -401,8 +401,8 @@ bool FeaturesPlugin_ValidatorExtrusionDir::isValid(
   if(!aDirShape.get()) {
     // Check that dir can be empty.
     if(!isShapesCanBeEmpty(aCheckAttribute, theError)) {
-      theError = "Error: Base objects list contains vertex or edge, so attribute \"%1\" \
- can not be used with default value. Select direction for extrusion.";
+      theError = "Error: Base objects list contains vertex or edge, so attribute \"%1\" "
+                 "can not be used with default value. Select direction for extrusion.";
       theError.arg(*anArgsIt);
       return false;
     } else {

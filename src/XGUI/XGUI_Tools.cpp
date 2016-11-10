@@ -114,9 +114,10 @@ bool canRemoveOrRename(QWidget* theParent, const std::set<FeaturePtr>& theFeatur
   if (!ModelAPI_Tools::allDocumentsActivated(aNotActivatedNames)) {
     bool aFoundPartSetObject = ModuleBase_Tools::hasModuleDocumentFeature(theFeatures);
     if (aFoundPartSetObject) {
+      const char* aKeyStr = "Selected objects can be used in Part documents which are not loaded: "
+                            "%1. Whould you like to continue?";
       QMessageBox::StandardButton aRes = QMessageBox::warning(theParent, QObject::tr("Warning"),
-               QObject::tr("Selected objects can be used in Part documents which are not loaded: \
-%1. Whould you like to continue?").arg(aNotActivatedNames.c_str()),
+               QObject::tr(aKeyStr).arg(aNotActivatedNames.c_str()),
                QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
       aResult = aRes == QMessageBox::Yes;
     }
@@ -132,9 +133,9 @@ bool canRename(const ObjectPtr& theObject, const QString& theName)
     ResultParameterPtr aParam;
     if (ModelAPI_Tools::findVariable(theObject->document(), 
           FeaturePtr(), qPrintable(theName), aValue, aParam)) {
-      QString aErrMsg(QObject::tr("Selected parameter can not be renamed to: %1. \
- There is a parameter with the same name. Its value is: %2.")
-         .arg(qPrintable(theName)).arg(aValue));
+      const char* aKeyStr = "Selected parameter can not be renamed to: %1. "
+                            "There is a parameter with the same name. Its value is: %2.";
+      QString aErrMsg(QObject::tr(aKeyStr).arg(qPrintable(theName)).arg(aValue));
       // We can not use here a dialog box for message - 
       // it will crash editing process in ObjectBrowser
       Events_InfoMessage("XGUI_Tools", aErrMsg.toStdString()).send();

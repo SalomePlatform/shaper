@@ -63,8 +63,8 @@ void PartSet_OverconstraintListener::processEvent(
 
   QString aCurrentInfoStr = getObjectsInfo(myConflictingObjects);
 
-  QString aMsg("PartSet_OverconstraintListener::processEvent: %1,\nobjects  \
- count = %2:%3\ncurrent objects count = %4:%5");
+  QString aMsg("PartSet_OverconstraintListener::processEvent: %1,\nobjects "
+               "count = %2:%3\ncurrent objects count = %4:%5");
   qDebug(aMsg.arg(isRepaired ? "REPAIRED" : "FAILED")
              .arg(aCount).arg(anInfoStr).arg(myConflictingObjects.size())
              .arg(aCurrentInfoStr).toStdString().c_str());

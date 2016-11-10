@@ -48,8 +48,8 @@ bool FeaturesPlugin_ValidatorTransform::isValid(const AttributePtr& theAttribute
   if (!aValid) {
     std::string aResultGroupName = isPartSetDocument ? ModelAPI_ResultPart::group()
                                                      : ModelAPI_ResultBody::group();
-    theError = "Objects from the %1 group can be selected in the %2 document, \
- but an objects from the %3 group is selected.";
+    theError = "Objects from the %1 group can be selected in the %2 document, "
+               "but an objects from the %3 group is selected.";
     theError.arg(aResultGroupName).arg(aDocument->kind()).arg(anErrorGroupName);
   }
   return aValid;

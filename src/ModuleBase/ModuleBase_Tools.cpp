@@ -1151,14 +1151,14 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
   if (!aNotActivatedDocWrn.isEmpty())
     aText += aNotActivatedDocWrn;
   if (!anOtherFeatureNames.empty()) {
-    const char* aMsg = "Features are used in the following features: %1.\nThese \
- features will be deleted.\n";
+    const char* aMsg = "Features are used in the following features: %1.\nThese "
+                       "features will be deleted.\n";
     aText += QString(QObject::tr(aMsg))
                      .arg(anOtherFeatureNames.join(aSep));
   }
   if (!aParamFeatureNames.empty()) {
-    const char* aMsg = "Parameters are used in the following features: %1.\nThese features will \
- be deleted.\nOr parameters could be replaced by their values.\n";
+    const char* aMsg = "Parameters are used in the following features: %1.\nThese features will "
+                       "be deleted.\nOr parameters could be replaced by their values.\n";
     aText += QString(QObject::tr(aMsg))
                      .arg(aParamFeatureNames.join(aSep));
     QPushButton *aReplaceButton = 
