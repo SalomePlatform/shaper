@@ -21,8 +21,8 @@ class ModelAPI_ExpressionDouble;
 class GeomData_Point : public GeomDataAPI_Point
 {
   enum { NUM_COMPONENTS = 3 };
-  /// Expressions for X, Y and Z 
-  std::shared_ptr<ModelAPI_ExpressionDouble> myExpression[NUM_COMPONENTS]; 
+  /// Expressions for X, Y and Z
+  std::shared_ptr<ModelAPI_ExpressionDouble> myExpression[NUM_COMPONENTS];
  public:
   /// Defines the double value
   GEOMDATA_EXPORT virtual void setValue(const double theX, const double theY, const double theZ);
@@ -39,7 +39,7 @@ class GeomData_Point : public GeomDataAPI_Point
   GEOMDATA_EXPORT virtual std::shared_ptr<GeomAPI_Pnt> pnt();
 
   /// Defines the calculated double value
-  GEOMDATA_EXPORT virtual 
+  GEOMDATA_EXPORT virtual
     void setCalculatedValue(const double theX, const double theY, const double theZ);
 
   /// Defines the text values
@@ -67,7 +67,7 @@ class GeomData_Point : public GeomDataAPI_Point
   GEOMDATA_EXPORT virtual std::string expressionError(int theComponent);
 
   /// Defines the used parameters
-  GEOMDATA_EXPORT virtual void setUsedParameters(int theComponent, 
+  GEOMDATA_EXPORT virtual void setUsedParameters(int theComponent,
     const std::set<std::string>& theUsedParameters);
 
   /// Returns the used parameters

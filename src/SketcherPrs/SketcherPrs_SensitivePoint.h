@@ -20,13 +20,13 @@ DEFINE_STANDARD_HANDLE(SketcherPrs_SensitivePoint, Select3D_SensitiveEntity)
 */
 class SketcherPrs_SensitivePoint : public Select3D_SensitiveEntity
 {
-public: 
+public:
   //! Constructs a sensitive point object defined by the
   //! \param OwnerId an Id of the Owner.
   //! \param theId and Id of its point
   Standard_EXPORT SketcherPrs_SensitivePoint(const Handle(SelectBasics_EntityOwner)& OwnerId,
                                              int theId);
-  
+
   /// Returns number of sub-elements
   Standard_EXPORT virtual Standard_Integer NbSubElements() Standard_OVERRIDE;
 
@@ -55,7 +55,7 @@ public:
 
   DEFINE_STANDARD_RTTI(SketcherPrs_SensitivePoint)
 
-private: 
+private:
   int myId;
 };
 

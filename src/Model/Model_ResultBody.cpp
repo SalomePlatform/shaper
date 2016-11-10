@@ -63,7 +63,7 @@ bool Model_ResultBody::isConcealed()
     if (aResult) { // hidden unit must be redisplayed (hidden)
       ModelAPI_EventCreator::get()->sendDeleted(document(), this->groupName());
       // redisplay for the viewer (it must be disappeared also)
-      static Events_ID EVENT_DISP = 
+      static Events_ID EVENT_DISP =
         Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
       ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), EVENT_DISP);
     } else { // was not concealed become concealed => delete event

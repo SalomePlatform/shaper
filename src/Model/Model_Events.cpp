@@ -63,7 +63,7 @@ std::shared_ptr<Events_MessageGroup> Model_ObjectUpdatedMessage::newEmpty()
 
 void Model_ObjectUpdatedMessage::Join(const std::shared_ptr<Events_MessageGroup>& theJoined)
 {
-  std::shared_ptr<Model_ObjectUpdatedMessage> aJoined = 
+  std::shared_ptr<Model_ObjectUpdatedMessage> aJoined =
     std::dynamic_pointer_cast<Model_ObjectUpdatedMessage>(theJoined);
   std::set<ObjectPtr>::iterator aFIter = aJoined->myObjects.begin();
   for (; aFIter != aJoined->myObjects.end(); aFIter++) {
@@ -94,7 +94,7 @@ const Events_ID Model_ObjectDeletedMessage::messageId()
 
 void Model_ObjectDeletedMessage::Join(const std::shared_ptr<Events_MessageGroup>& theJoined)
 {
-  std::shared_ptr<Model_ObjectDeletedMessage> aJoined = 
+  std::shared_ptr<Model_ObjectDeletedMessage> aJoined =
     std::dynamic_pointer_cast<Model_ObjectDeletedMessage>(theJoined);
   std::set<std::string>::iterator aGIter = aJoined->myGroups.begin();
   for (; aGIter != aJoined->myGroups.end(); aGIter++) {

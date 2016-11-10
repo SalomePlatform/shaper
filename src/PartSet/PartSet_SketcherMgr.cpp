@@ -98,7 +98,7 @@
 //#define DEBUG_CURSOR
 
 /// Fills attribute and result lists by the selected owner. In case if the attribute is found,
-/// by the owner shape, it is put to the list. Otherwise if type of owner shape is edge, 
+/// by the owner shape, it is put to the list. Otherwise if type of owner shape is edge,
 /// put the function result as is to the list of results.
 /// \param theOwner a viewer selected owner
 /// \param theFeature a feature, where the attribute is searched
@@ -291,7 +291,7 @@ void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
   restoreSelection();
   myCurrentSelection.clear();
 
-  // 3. the flag to disable the update viewer should be set in order to avoid blinking in the 
+  // 3. the flag to disable the update viewer should be set in order to avoid blinking in the
   // viewer happens by deselect/select the modified objects. The flag should be restored after
   // the selection processing. The update viewer should be also called.
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
@@ -380,14 +380,14 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       restoreSelection();
       launchEditing();
       if (aFeature.get() != NULL) {
-        std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+        std::shared_ptr<SketchPlugin_Feature> aSPFeature =
                   std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-        if (aSPFeature.get() && 
+        if (aSPFeature.get() &&
           (aSPFeature->getKind() == SketchPlugin_ConstraintRadius::ID() ||
            aSPFeature->getKind() == SketchPlugin_ConstraintAngle::ID())) {
           DataPtr aData = aSPFeature->data();
           AttributePtr aAttr = aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
-          std::shared_ptr<GeomDataAPI_Point2D> aFPAttr = 
+          std::shared_ptr<GeomDataAPI_Point2D> aFPAttr =
             std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aAttr);
           aFPAttr->setValue(myCurrentPoint.myCurX, myCurrentPoint.myCurY);
         }
@@ -405,14 +405,14 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       restoreSelection();
       launchEditing();
       if (aFeature.get() != NULL) {
-        std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+        std::shared_ptr<SketchPlugin_Feature> aSPFeature =
                   std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-        if (aSPFeature.get() && 
+        if (aSPFeature.get() &&
           (aSPFeature->getKind() == SketchPlugin_ConstraintRadius::ID() ||
            aSPFeature->getKind() == SketchPlugin_ConstraintAngle::ID())) {
           DataPtr aData = aSPFeature->data();
           AttributePtr aAttr = aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
-          std::shared_ptr<GeomDataAPI_Point2D> aFPAttr = 
+          std::shared_ptr<GeomDataAPI_Point2D> aFPAttr =
             std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aAttr);
           aFPAttr->setValue(myCurrentPoint.myCurX, myCurrentPoint.myCurY);
         }
@@ -517,7 +517,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
     XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
-    // 3. the flag to disable the update viewer should be set in order to avoid blinking in the 
+    // 3. the flag to disable the update viewer should be set in order to avoid blinking in the
     // viewer happens by deselect/select the modified objects. The flag should be restored after
     // the selection processing. The update viewer should be also called.
     bool isEnableUpdateViewer = aDisplayer->enableUpdateViewer(false);
@@ -543,7 +543,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
           std::string aAttrId = anAttr->id();
           DataPtr aData = aFeature->data();
           if (aData->isValid()) {
-            std::shared_ptr<GeomDataAPI_Point2D> aPoint = 
+            std::shared_ptr<GeomDataAPI_Point2D> aPoint =
               std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(aAttrId));
             if (aPoint.get() != NULL) {
               bool isImmutable = aPoint->setImmutable(true);
@@ -664,7 +664,7 @@ void PartSet_SketcherMgr::onAfterContextMenu()
   myIsPopupMenuActive = false;
 }
 
-void PartSet_SketcherMgr::get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent, 
+void PartSet_SketcherMgr::get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent,
                                      Point& thePoint)
 {
   Handle(V3d_View) aView = theWnd->v3dView();
@@ -678,7 +678,7 @@ void PartSet_SketcherMgr::launchEditing()
 {
   if (!myCurrentSelection.empty()) {
     FeaturePtr aFeature = myCurrentSelection.begin().key();
-    std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+    std::shared_ptr<SketchPlugin_Feature> aSPFeature =
               std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
     if (aSPFeature && (!aSPFeature->isExternal())) {
       myModule->editFeature(aSPFeature);
@@ -926,7 +926,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 
   myModule->workshop()->viewer()->addSelectionFilter(myCirclePointFilter);
 
-  if (myPlaneFilter.IsNull()) 
+  if (myPlaneFilter.IsNull())
     myPlaneFilter = new ModuleBase_ShapeInPlaneFilter();
 
   myModule->workshop()->viewer()->addSelectionFilter(myPlaneFilter);
@@ -997,7 +997,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     }
     if (!aFOperation->isDisplayedOnStart(myCurrentSketch))
       myCurrentSketch->setDisplayed(true);
-    
+
     myCurrentSketch = CompositeFeaturePtr();
 
     myModule->workshop()->viewer()->removeSelectionFilter(myCirclePointFilter);
@@ -1119,7 +1119,7 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
   bool aHasActiveSketch = activeSketch().get() != NULL;
   if (aHasActiveSketch) {
     // 1. the sketch feature should not be displayed during the sketch active operation
-    // it is hidden by a sketch operation start and shown by a sketch stop, just the sketch 
+    // it is hidden by a sketch operation start and shown by a sketch stop, just the sketch
     // nested features can be visualized
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     if (aFeature.get() != NULL && aFeature == activeSketch()) {
@@ -1173,12 +1173,12 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
       #ifndef DEBUG_DO_NOT_BY_ENTER
       if (isNestedCreateOperation(getCurrentOperation(), activeSketch())) {
         ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
-        ModuleBase_WidgetEditor* anEditorWdg = 
+        ModuleBase_WidgetEditor* anEditorWdg =
           anActiveWidget ? dynamic_cast<ModuleBase_WidgetEditor*>(anActiveWidget) : 0;
         // the active widget editor should not influence here. The presentation should be visible
         // always when this widget is active.
         if (!anEditorWdg && !myIsPopupMenuActive) {
-          // during a nested create operation, the feature is redisplayed only 
+          // during a nested create operation, the feature is redisplayed only
           // if the mouse over view
           // of there was a value modified in the property panel after the mouse left the view
           aCanDisplay = canDisplayCurrentCreatedFeature();
@@ -1364,7 +1364,7 @@ bool PartSet_SketcherMgr::isObjectOfSketch(const ObjectPtr& theObject) const
 
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
 {
-  if (myPlaneFilter.IsNull()) 
+  if (myPlaneFilter.IsNull())
    myPlaneFilter = new ModuleBase_ShapeInPlaneFilter();
 
   myPlaneFilter->setPlane(thePln);
@@ -1486,20 +1486,20 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
     ResultPtr aResult = *aIt;
     AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
     if (aAISObj.get() == NULL)
-      continue; 
+      continue;
     Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
 
-    SelectMgr_IndexedMapOfOwner aSelectedOwners;  
+    SelectMgr_IndexedMapOfOwner aSelectedOwners;
     aConnector->workshop()->selector()->selection()->entityOwners(anAISIO, aSelectedOwners);
     for  ( Standard_Integer i = 1, n = aSelectedOwners.Extent(); i <= n; i++ ) {
-      Handle(StdSelect_BRepOwner) anOwner = 
+      Handle(StdSelect_BRepOwner) anOwner =
         Handle(StdSelect_BRepOwner)::DownCast(aSelectedOwners(i));
       if ( anOwner.IsNull() || !anOwner->HasShape() )
         continue;
       const TopoDS_Shape& aShape = anOwner->Shape();
       TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
       if (aShapeType == TopAbs_VERTEX) {
-        AttributePtr aPntAttr = 
+        AttributePtr aPntAttr =
           PartSet_Tools::findAttributeBy2dPoint(theFeature, aShape, theSketch);
         if (aPntAttr.get() != NULL &&
             aSelectedAttributes.find(aPntAttr) != aSelectedAttributes.end()) {
@@ -1516,7 +1516,7 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
   }
 }
 
-void PartSet_SketcherMgr::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, 
+void PartSet_SketcherMgr::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget,
                                                  const bool isToConnect)
 {
   if (isToConnect) {
@@ -1643,7 +1643,7 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
   // 1. it is necessary to save current selection in order to restore it after the features moving
   myCurrentSelection.clear();
 
-  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = aStoredPrs.begin(), 
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = aStoredPrs.begin(),
                                                 aLast = aStoredPrs.end();
 
   CompositeFeaturePtr aSketch = activeSketch();
@@ -1664,7 +1664,7 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
     std::set<AttributePtr> aSelectedAttributes;
     std::set<ResultPtr> aSelectedResults;
     if (myCurrentSelection.find(aFeature) != myCurrentSelection.end()) {
-      std::pair<std::set<AttributePtr>, std::set<ResultPtr> > aPair = 
+      std::pair<std::set<AttributePtr>, std::set<ResultPtr> > aPair =
         myCurrentSelection.find(aFeature).value();
       aSelectedAttributes = aPair.first;
       aSelectedResults = aPair.second;
@@ -1777,7 +1777,7 @@ void PartSet_SketcherMgr::updateSelectionPriority(ObjectPtr theObject,
       // 3. External objects (violet color)
       // 4. Auxiliary segments (dotted)
       // StdSelect_BRepSelectionTool::Load uses priority calculating:
-      // Standard_Integer aPriority = 
+      // Standard_Integer aPriority =
       // (thePriority == -1) ? GetStandardPriority (theShape, theType) : thePriority;
       // Priority of Vertex is 8, edge(segment) is 7.
       // It might be not corrected as provides the condition above.

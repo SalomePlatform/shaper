@@ -159,7 +159,7 @@ private:
   ///
   ///        These constraints may be different and become the same after the substitution
   ///        of point coincidence.
-  void addSameConstraints(ConstraintWrapperPtr theConstraint1, 
+  void addSameConstraints(ConstraintWrapperPtr theConstraint1,
                           ConstraintWrapperPtr theConstraint2);
 
   /// \brief Search constraint equal to the given in terms of SolveSpace notation
@@ -169,20 +169,20 @@ private:
   Slvs_hEntity myWorkplaneID; ///< identifier of workplane
 
   /// current parameter index (may differs with the number of parameters)
-  Slvs_hParam myParamMaxID; 
+  Slvs_hParam myParamMaxID;
 
   /// list of parameters used in the current group of constraints (sorted by the identifier)
-  std::vector<Slvs_Param> myParameters; 
+  std::vector<Slvs_Param> myParameters;
   Slvs_hEntity myEntityMaxID; ///< current entity index (may differs with the number of entities)
 
   /// list of entities used in the current group of constraints (sorted by the identifier)
-  std::vector<Slvs_Entity> myEntities; 
+  std::vector<Slvs_Entity> myEntities;
 
   /// current constraint index (may differs with the number of constraints)
-  Slvs_hConstraint myConstrMaxID; 
+  Slvs_hConstraint myConstrMaxID;
 
   /// list of constraints used in the current group (sorted by the identifier)
-  std::vector<Slvs_Constraint> myConstraints; 
+  std::vector<Slvs_Constraint> myConstraints;
 
   bool myDuplicatedConstraint; ///< shows the storage has same constraint twice
 

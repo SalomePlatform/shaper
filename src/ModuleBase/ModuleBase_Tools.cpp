@@ -221,7 +221,7 @@ QPixmap lighter(const QString& theIcon, const int theLighterValue)
 
 void setSpinText(ModuleBase_ParamSpinBox* theSpin, const QString& theText)
 {
-  if (theSpin->text() == theText) 
+  if (theSpin->text() == theText)
     return;
   // In order to avoid extra text setting because it will
   // reset cursor position in control
@@ -445,7 +445,7 @@ QString activeOwners(Handle(AIS_InteractiveContext)& theContext, const bool theS
     aPtrStr << "[" << anOwner.Access() << "]";
     anInfo += aPtrStr.str().c_str();
 
-    Handle(AIS_InteractiveObject) aAISObj = 
+    Handle(AIS_InteractiveObject) aAISObj =
           Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
     if (!aAISObj.IsNull()) {
       std::ostringstream aPtrStr;
@@ -469,7 +469,7 @@ QString activeOwners(Handle(AIS_InteractiveContext)& theContext, const bool theS
   return aValue;
 }
 
-QString selectedOwners(Handle(AIS_InteractiveContext)& theContext, 
+QString selectedOwners(Handle(AIS_InteractiveContext)& theContext,
                               const bool theShapeInfoOnly = true)
 {
   QStringList anObjects;
@@ -564,7 +564,7 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
     hasResult |= (aResult.get() != NULL);
     hasFeature |= (aFeature.get() != NULL);
     hasParameter |= (aConstruction.get() != NULL);
-    if (hasFeature) 
+    if (hasFeature)
       hasCompositeOwner |= (ModelAPI_Tools::compositeOwner(aFeature) != NULL);
     if (hasFeature && hasResult  && hasParameter && hasCompositeOwner)
       break;
@@ -651,7 +651,7 @@ ObjectPtr getObject(const AttributePtr& theAttribute)
       anObject = anAttr->context();
   }
   if (anAttrType == ModelAPI_AttributeReference::typeId()) {
-    AttributeReferencePtr anAttr = 
+    AttributeReferencePtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
     if (anAttr.get() != NULL)
       anObject = anAttr->value();
@@ -709,7 +709,7 @@ void getParameters(QStringList& theParameters)
   }
 }
 
-std::string findGreedAttribute(ModuleBase_IWorkshop* theWorkshop, 
+std::string findGreedAttribute(ModuleBase_IWorkshop* theWorkshop,
                                const FeaturePtr& theFeature)
 {
   std::string anAttributeId;
@@ -735,7 +735,7 @@ bool hasObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
 
   std::string aType = theAttribute->attributeType();
   if (aType == ModelAPI_AttributeReference::typeId()) {
-    AttributeReferencePtr aRef = 
+    AttributeReferencePtr aRef =
       std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
     ObjectPtr aObject = aRef->value();
     aHasObject = aObject && aObject->isSame(theObject);
@@ -743,7 +743,7 @@ bool hasObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
     //  aRef->setValue(theObject);
     //}
   } else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
-    AttributeRefAttrPtr aRefAttr = 
+    AttributeRefAttrPtr aRefAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
 
     AttributePtr anAttribute = theWorkshop->module()->findAttribute(theObject, theShape);
@@ -772,14 +772,14 @@ bool hasObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
     aHasObject = aSelectionListAttr->isInList(aResult, theShape, theTemporarily);
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
-    AttributeRefListPtr aRefListAttr = 
+    AttributeRefListPtr aRefListAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttribute);
     aHasObject = aRefListAttr->isInList(theObject);
     //if (!theCheckIfAttributeHasObject || !aRefListAttr->isInList(theObject))
     //  aRefListAttr->append(theObject);
   }
   else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
-    AttributeRefAttrListPtr aRefAttrListAttr = 
+    AttributeRefAttrListPtr aRefAttrListAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(theAttribute);
     AttributePtr anAttribute = theWorkshop->module()->findAttribute(theObject, theShape);
 
@@ -807,14 +807,14 @@ bool setObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
   bool isDone = true;
   std::string aType = theAttribute->attributeType();
   if (aType == ModelAPI_AttributeReference::typeId()) {
-    AttributeReferencePtr aRef = 
+    AttributeReferencePtr aRef =
       std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
     ObjectPtr aObject = aRef->value();
     if (!(aObject && aObject->isSame(theObject))) {
       aRef->setValue(theObject);
     }
   } else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
-    AttributeRefAttrPtr aRefAttr = 
+    AttributeRefAttrPtr aRefAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
 
     AttributePtr anAttribute = theWorkshop->module()->findAttribute(theObject, theShape);
@@ -838,12 +838,12 @@ bool setObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
     AttributeSelectionListPtr aSelectionListAttr =
                          std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-    if (!theCheckIfAttributeHasObject || 
+    if (!theCheckIfAttributeHasObject ||
         !aSelectionListAttr->isInList(aResult, theShape, theTemporarily))
       aSelectionListAttr->append(aResult, theShape, theTemporarily);
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
-    AttributeRefListPtr aRefListAttr = 
+    AttributeRefListPtr aRefListAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttribute);
     if (!theCheckIfAttributeHasObject || !aRefListAttr->isInList(theObject)) {
       if (theObject.get())
@@ -853,7 +853,7 @@ bool setObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
     }
   }
   else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
-    AttributeRefAttrListPtr aRefAttrListAttr = 
+    AttributeRefAttrListPtr aRefAttrListAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(theAttribute);
     AttributePtr anAttribute = theWorkshop->module()->findAttribute(theObject, theShape);
 
@@ -882,7 +882,7 @@ GeomShapePtr getShape(const AttributePtr& theAttribute, ModuleBase_IWorkshop* th
   std::string aType = theAttribute->attributeType();
   if (aType == ModelAPI_AttributeReference::typeId()) {
   } else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
-    AttributeRefAttrPtr aRefAttr = 
+    AttributeRefAttrPtr aRefAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
     if (aRefAttr.get() && !aRefAttr->isObject()) {
       AttributePtr anAttribute = aRefAttr->attr();
@@ -966,7 +966,7 @@ QString wrapTextByWords(const QString& theValue, QWidget* theWidget,
 }
 
 //**************************************************************
-void refsToFeatureInFeatureDocument(const ObjectPtr& theObject, 
+void refsToFeatureInFeatureDocument(const ObjectPtr& theObject,
                                     std::set<FeaturePtr>& theRefFeatures)
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
@@ -1067,11 +1067,11 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
   std::string aNotActivatedNames;
   if (!ModelAPI_Tools::allDocumentsActivated(aNotActivatedNames)) {
     if (ModuleBase_Tools::hasModuleDocumentFeature(theFeatures))
-      aNotActivatedDocWrn = 
+      aNotActivatedDocWrn =
         QObject::tr("Selected objects can be used in Part documents which are not loaded:%1.\n")
                             .arg(aNotActivatedNames.c_str());
   }
-  
+
   std::set<FeaturePtr> aFeaturesRefsTo;
   std::set<FeaturePtr> aFeaturesRefsToParameter;
   std::set<FeaturePtr> aParameterFeatures;
@@ -1161,7 +1161,7 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
                        "be deleted.\nOr parameters could be replaced by their values.\n";
     aText += QString(QObject::tr(aMsg))
                      .arg(aParamFeatureNames.join(aSep));
-    QPushButton *aReplaceButton = 
+    QPushButton *aReplaceButton =
       aMessageBox.addButton(QObject::tr("Replace"), QMessageBox::ActionRole);
   }
 
@@ -1179,7 +1179,7 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
         ModelAPI_ReplaceParameterMessage::send(aObj, 0);
     }
     else
-      theReferencesToDelete.insert(aFeaturesRefsToParameterOnly.begin(), 
+      theReferencesToDelete.insert(aFeaturesRefsToParameterOnly.begin(),
                                    aFeaturesRefsToParameterOnly.end());
   }
   return true;
@@ -1233,7 +1233,7 @@ void setPointBallHighlighting(AIS_Shape* theAIS)
     aPixMap = new Image_AlienPixMap();
     if(!aPixMap->Load(aFile.c_str())) {
       // The icon for constraint is not found
-      static const std::string aMsg = 
+      static const std::string aMsg =
         "Error: Point market not found by path: \"" + aFile + "\". Falling back.";
       //Events_InfoMessage("ModuleBase_Tools::setPointBallHighlighting", aMsg).send();
     }

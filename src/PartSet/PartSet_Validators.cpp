@@ -85,19 +85,19 @@ std::shared_ptr<GeomAPI_Pln> sketcherPlane(ModuleBase_Operation* theOperation)
     ModuleBase_OperationFeature* aFeatureOp =
       dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
     if (aFeatureOp) {
-      CompositeFeaturePtr aFeature = 
+      CompositeFeaturePtr aFeature =
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeatureOp->feature());
       if (aFeature && (aFeature->getKind() == SketchPlugin_Sketch::ID()))
         return PartSet_Tools::sketchPlane(aFeature);
     }
   }
-  return aEmptyPln; 
+  return aEmptyPln;
 }
 
 
 bool isEmptySelectionValid(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_OperationFeature* aFeatureOp = 
+  ModuleBase_OperationFeature* aFeatureOp =
     dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   // during the create operation empty selection is always valid
   if (!aFeatureOp->isEditOperation()) {
@@ -108,7 +108,7 @@ bool isEmptySelectionValid(ModuleBase_Operation* theOperation)
       std::shared_ptr<GeomAPI_Pln> aPlane = sketcherPlane(theOperation);
       if (aPlane.get())
         return true;
-      else 
+      else
         return false;
     }
     else
@@ -167,7 +167,7 @@ bool PartSet_RadiusSelection::isValid(const ModuleBase_ISelection* theSelection,
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    QList<ModuleBase_ViewerPrsPtr> aList = 
+    QList<ModuleBase_ViewerPrsPtr> aList =
       theSelection->getSelected(ModuleBase_ISelection::Viewer);
     int aCount = 0;
     foreach (ModuleBase_ViewerPrsPtr aPrs, aList) {
@@ -194,7 +194,7 @@ bool PartSet_RigidSelection::isValid(const ModuleBase_ISelection* theSelection,
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
     return isEmptySelectionValid(theOperation);
   } else {
-    QList<ModuleBase_ViewerPrsPtr> aList = 
+    QList<ModuleBase_ViewerPrsPtr> aList =
       theSelection->getSelected(ModuleBase_ISelection::Viewer);
     return (aList.count() == 1);
   }
@@ -285,7 +285,7 @@ bool PartSet_AngleSelection::isValid(const ModuleBase_ISelection* theSelection,
   }
 }
 
-bool PartSet_EqualSelection::isValid(const ModuleBase_ISelection* theSelection, 
+bool PartSet_EqualSelection::isValid(const ModuleBase_ISelection* theSelection,
                                      ModuleBase_Operation* theOperation) const
 {
   if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
@@ -374,20 +374,20 @@ std::string PartSet_DifferentObjectsValidator::errorMessage(
   return anError;
 }
 
-bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute, 
+bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute,
                                                 const std::list<std::string>& theArguments,
                                                 Events_InfoMessage& theError) const
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
 
-  // the type of validated attributes should be equal, attributes with 
+  // the type of validated attributes should be equal, attributes with
   // different types are not validated
   // Check RefAttr attributes
   std::string anAttrType = theAttribute->attributeType();
   std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs;
 
   if (anAttrType == ModelAPI_AttributeRefAttr::typeId()) {
-    AttributeRefAttrPtr anAttr = 
+    AttributeRefAttrPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
     bool isObject = anAttr->isObject();
     ObjectPtr anObject = anAttr->object();
@@ -422,7 +422,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
     }
   }
   else if (anAttrType == ModelAPI_AttributeSelection::typeId()) {
-    AttributeSelectionPtr anAttr = 
+    AttributeSelectionPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
     ResultPtr aContext = anAttr->context();
     GeomShapePtr aShape = anAttr->value();
@@ -448,7 +448,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
     }
   }
   else if (anAttrType == ModelAPI_AttributeReference::typeId()) {
-    AttributeReferencePtr anAttr = 
+    AttributeReferencePtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
     ObjectPtr anObject = anAttr->value();
     // Check selection attributes
@@ -471,14 +471,14 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
     }
   }
   else if(anAttrType == ModelAPI_AttributeSelectionList::typeId()) {
-    std::shared_ptr<ModelAPI_AttributeSelectionList> aCurSelList = 
+    std::shared_ptr<ModelAPI_AttributeSelectionList> aCurSelList =
             std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
     anAttrs = aFeature->data()->attributes(ModelAPI_AttributeSelectionList::typeId());
     if(anAttrs.size() > 0) {
       std::list<std::shared_ptr<ModelAPI_Attribute>>::iterator anAttrItr = anAttrs.begin();
       for(; anAttrItr != anAttrs.end(); anAttrItr++){
         if ((*anAttrItr).get() && (*anAttrItr)->id() != theAttribute->id()){
-          std::shared_ptr<ModelAPI_AttributeSelectionList> aRefSelList = 
+          std::shared_ptr<ModelAPI_AttributeSelectionList> aRefSelList =
             std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*anAttrItr);
           for(int i = 0; i < aCurSelList->size(); i++) {
             std::shared_ptr<ModelAPI_AttributeSelection> aCurSel = aCurSelList->value(i);
@@ -491,7 +491,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
             for(int j = 0; j < aRefSelList->size(); j++) {
               std::shared_ptr<ModelAPI_AttributeSelection> aRefSel = aRefSelList->value(j);
               ResultPtr aRefSelContext = aRefSel->context();
-              ResultCompSolidPtr aRefSelCompSolidPtr = 
+              ResultCompSolidPtr aRefSelCompSolidPtr =
                 ModelAPI_Tools::compSolidOwner(aRefSelContext);
               std::shared_ptr<GeomAPI_Shape> aRefSelCompSolid;
               if(aRefSelCompSolidPtr.get()) {
@@ -549,7 +549,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
   return true;
 }
 
-bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute, 
+bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute,
                                      const std::list<std::string>& theArguments,
                                      Events_InfoMessage& theError) const
 {

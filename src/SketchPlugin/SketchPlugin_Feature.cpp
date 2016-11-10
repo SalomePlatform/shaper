@@ -29,7 +29,7 @@ SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
     const std::set<AttributePtr>& aBackRefs = data()->refsToMe();
     std::set<AttributePtr>::const_iterator aBackRef = aBackRefs.begin();
     for(; aBackRef != aBackRefs.end(); aBackRef++) {
-      std::shared_ptr<SketchPlugin_Sketch> aSketch = 
+      std::shared_ptr<SketchPlugin_Sketch> aSketch =
         std::dynamic_pointer_cast<SketchPlugin_Sketch>((*aBackRef)->owner());
       if (aSketch) {
         mySketch = aSketch.get();

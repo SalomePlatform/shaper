@@ -33,33 +33,33 @@ bool GeomAlgoAPI_BoxPoints::check()
 void GeomAlgoAPI_BoxPoints::build()
 {
   myCreatedFaces.clear();
-  
+
   const gp_Pnt& aFirstPoint = myFirstPoint->impl<gp_Pnt>();
   const gp_Pnt& aSecondPoint = mySecondPoint->impl<gp_Pnt>();
 
   // Construct the box
   BRepPrimAPI_MakeBox *aBoxMaker = new  BRepPrimAPI_MakeBox(aFirstPoint, aSecondPoint);
   aBoxMaker->Build();
-  
+
   // Test the algorithm
   if(!aBoxMaker->IsDone()) {
     myError = "Box builder with two points  :: algorithm failed.";
     return;
   }
-    
+
   TopoDS_Shape aResult = aBoxMaker->Shape();
-  
+
   std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
   aShape->setImpl(new TopoDS_Shape(aResult));
   setShape(aShape);
-  
+
   // Tests on the shape
   if (!aShape.get() || aShape->isNull()) {
     myError = "Box builder with two points  :: resulting shape is null.";
     return;
   }
-  
+
   setImpl(aBoxMaker);
-  
+
   setDone(true);
 }

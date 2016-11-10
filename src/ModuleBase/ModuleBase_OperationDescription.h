@@ -62,13 +62,13 @@ class MODULEBASE_EXPORT ModuleBase_OperationDescription
  private:
   //!< Next fields could be extracted into a subclass;
    /// the operation identifier
-  QString myOperationId;  
+  QString myOperationId;
 
   /// the short description of the opertaion
-  QString myDescription;  
+  QString myDescription;
 
   /// the xml definition
-  QString myXmlRepresentation;  
+  QString myXmlRepresentation;
 };
 
 #endif //ModuleBase_OperationDescription_H

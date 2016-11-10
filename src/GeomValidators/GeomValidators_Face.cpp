@@ -27,7 +27,7 @@ GeomAbs_SurfaceType faceType(const std::string& theType)
   std::string aType = std::string(theType.c_str());
   if (MyFaceTypes.find(aType) != MyFaceTypes.end())
     return MyFaceTypes[aType];
-  
+
   Events_InfoMessage("GeomValidators_Face", "Face type defined in XML is not implemented!").send();
   return GeomAbs_Plane;
 }

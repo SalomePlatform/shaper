@@ -110,7 +110,7 @@ void ModuleBase_WidgetFeatureSelector::activateCustom()
 {
   connect(myWorkshop, SIGNAL(selectionChanged()), this,
           SLOT(onSelectionChanged()), Qt::UniqueConnection);
-  
+
   activateFilters(true);
 
   QIntList aShapeTypes;
@@ -126,7 +126,7 @@ void ModuleBase_WidgetFeatureSelector::activateCustom()
 //********************************************************************
 bool ModuleBase_WidgetFeatureSelector::storeValueCustom()
 {
-  // the value is stored on the selection changed signal processing 
+  // the value is stored on the selection changed signal processing
   return true;
 }
 
@@ -218,7 +218,7 @@ void ModuleBase_WidgetFeatureSelector::onSelectionChanged()
 //********************************************************************
 void ModuleBase_WidgetFeatureSelector::updateOnSelectionChanged(const bool theDone)
 {
-  // "false" flag should be used here, it connects to the #26658 OCC bug, when the user click in 
+  // "false" flag should be used here, it connects to the #26658 OCC bug, when the user click in
   // the same place repeatedly without mouse moved. In the case validation by filters is not
   // perfromed, so an invalid object is selected. E.g. distance constraint, selection of a point.
   // the 3rd click in the same point allow using this point.

@@ -28,12 +28,12 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Transformation, SketcherPrs_SymbolPrs);
 
 static Handle(Image_AlienPixMap) MyPixMap;
 
-SketcherPrs_Transformation::SketcherPrs_Transformation(ModelAPI_Feature* theConstraint, 
+SketcherPrs_Transformation::SketcherPrs_Transformation(ModelAPI_Feature* theConstraint,
                                            const std::shared_ptr<GeomAPI_Ax3>& thePlane,
-                                           bool isTranslation) 
+                                           bool isTranslation)
  : SketcherPrs_SymbolPrs(theConstraint, thePlane), myIsTranslation(isTranslation)
 {
-}  
+}
 
 bool SketcherPrs_Transformation::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
                                                   const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
@@ -42,7 +42,7 @@ bool SketcherPrs_Transformation::IsReadyToDisplay(ModelAPI_Feature* theConstrain
 
   std::shared_ptr<ModelAPI_Data> aData = theConstraint->data();
   // Get transformated objects list
-  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = 
+  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB =
     aData->reflist(SketchPlugin_Constraint::ENTITY_B());
   if (anAttrB.get() == NULL)
     return aReadyToDisplay;
@@ -59,12 +59,12 @@ bool SketcherPrs_Transformation::IsReadyToDisplay(ModelAPI_Feature* theConstrain
     AttributePoint2DPtr aEnd = GeomDataAPI_Point2D::getPoint2D(aData,
                                             SketchPlugin_MultiTranslation::END_POINT_ID());
 
-    aReadyToDisplay = 
+    aReadyToDisplay =
       aStart.get() && aEnd.get() && aStart->isInitialized() && aEnd->isInitialized();
   }
   else if (theConstraint->getKind() == SketchPlugin_MultiRotation::ID()) {
     // if it is rotation
-    AttributePoint2DPtr aCenter = 
+    AttributePoint2DPtr aCenter =
       GeomDataAPI_Point2D::getPoint2D(aData, SketchPlugin_MultiRotation::CENTER_ID());
     aReadyToDisplay = aCenter.get() && aCenter->isInitialized();
   }
@@ -72,7 +72,7 @@ bool SketcherPrs_Transformation::IsReadyToDisplay(ModelAPI_Feature* theConstrain
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_Transformation::updateIfReadyToDisplay(double theStep) const 
+bool SketcherPrs_Transformation::updateIfReadyToDisplay(double theStep) const
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
@@ -104,16 +104,16 @@ bool SketcherPrs_Transformation::updateIfReadyToDisplay(double theStep) const
       continue;
     aP1 = aMgr->getPosition(aObj, this, theStep);
     myPntArray->SetVertice(i + 1, aP1);
-  }  
+  }
 
   return true;
 }
 
-void SketcherPrs_Transformation::drawLines(const Handle(Prs3d_Presentation)& thePrs, 
+void SketcherPrs_Transformation::drawLines(const Handle(Prs3d_Presentation)& thePrs,
                                            Quantity_Color theColor) const
 {
   std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
-  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB = 
+  std::shared_ptr<ModelAPI_AttributeRefList> anAttrB =
     aData->reflist(SketchPlugin_Constraint::ENTITY_B());
   if (anAttrB.get() == NULL)
     return;

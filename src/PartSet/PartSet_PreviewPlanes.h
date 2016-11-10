@@ -60,8 +60,8 @@ private:
    /// \param theOrigin an origin of the plane
    /// \param theNorm a normal vector of the plane
    /// \param theRGB a color of plane presentation [r, g, b] array
-  AISObjectPtr createPreviewPlane(std::shared_ptr<GeomAPI_Pnt> theOrigin, 
-                                  std::shared_ptr<GeomAPI_Dir> theNorm, 
+  AISObjectPtr createPreviewPlane(std::shared_ptr<GeomAPI_Pnt> theOrigin,
+                                  std::shared_ptr<GeomAPI_Dir> theNorm,
                                   const int theRGB[3]);
 
 private:

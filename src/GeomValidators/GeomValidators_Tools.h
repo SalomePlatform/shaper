@@ -17,7 +17,7 @@
 namespace GeomValidators_Tools
 {
   // Returns the object from the attribute
-  /// \param theObj an object 
+  /// \param theObj an object
   GEOMVALIDATORS_EXPORT ObjectPtr getObject(const AttributePtr& theAttribute);
 
 };

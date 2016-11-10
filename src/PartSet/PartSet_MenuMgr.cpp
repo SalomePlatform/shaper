@@ -178,7 +178,7 @@ bool PartSet_MenuMgr::addViewerMenu(const QMap<QString, QAction*>& theStdActions
             connect(aSubMenu, SIGNAL(hovered(QAction*)), SLOT(onLineHighlighted(QAction*)));
             connect(aSubMenu, SIGNAL(aboutToHide()), SLOT(onDetachMenuHide()));
             connect(aSubMenu, SIGNAL(triggered(QAction*)), SLOT(onLineDetach(QAction*)));
-          } 
+          }
         }
       }
     }
@@ -246,7 +246,7 @@ QColor PartSet_MenuMgr::setLineColor(int theId, const QColor theColor, bool theU
 }
 
 
-void addRefCoincidentFeatures(const std::set<AttributePtr>& theRefList, 
+void addRefCoincidentFeatures(const std::set<AttributePtr>& theRefList,
   std::shared_ptr<GeomAPI_Pnt2d>& theRefPnt,
   QObjectPtrList& theOutList)
 {
@@ -254,14 +254,14 @@ void addRefCoincidentFeatures(const std::set<AttributePtr>& theRefList,
   for (aIt = theRefList.cbegin(); aIt != theRefList.cend(); ++aIt) {
     std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
     FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
-    if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) { 
+    if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
       std::shared_ptr<GeomAPI_Pnt2d> aPnt = PartSet_Tools::getCoincedencePoint(aConstrFeature);
       if (aPnt.get() == NULL)
         return;
       gp_Pnt aP = aPnt->impl<gp_Pnt>();
       if (theRefPnt->isEqual(aPnt) && (!theOutList.contains(aConstrFeature))) {
         theOutList.append(aConstrFeature);
-      } 
+      }
     }
   }
 }
@@ -273,7 +273,7 @@ void PartSet_MenuMgr::onLineDetach(QAction* theAction)
   std::shared_ptr<GeomAPI_Pnt2d> aOrig = PartSet_Tools::getCoincedencePoint(mySelectedFeature);
   if (!aOrig.get())
     return;
-  
+
   const std::set<AttributePtr>& aRefsList = aLine->data()->refsToMe();
 
   QObjectPtrList aToDelFeatures;
@@ -304,7 +304,7 @@ void PartSet_MenuMgr::onLineDetach(QAction* theAction)
 
     anOpMgr->startOperation(anOpAction);
     aWorkshop->deleteFeatures(aToDelFeatures);
-    
+
     anOpMgr->commitOperation();
   }
   myCoinsideLines.clear();
@@ -321,7 +321,7 @@ void PartSet_MenuMgr::onDetachMenuHide()
   myPrevId = -1;
 }
 
-  
+
 void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
 {
   ModuleBase_Operation* anOperation = myModule->workshop()->currentOperation();
@@ -373,7 +373,7 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
         if (aSketchFeature.get() != NULL) {
           std::string anAttribute = SketchPlugin_SketchEntity::AUXILIARY_ID();
 
-          std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr = 
+          std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr =
             std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
             aSketchFeature->data()->attribute(anAttribute));
           if (anAuxiliaryAttr)
@@ -430,7 +430,7 @@ bool PartSet_MenuMgr::canSetAuxiliary(bool& theValue) const
         if (aSketchFeature.get() != NULL) {
           std::string anAttribute = SketchPlugin_SketchEntity::AUXILIARY_ID();
 
-          std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr = 
+          std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr =
             std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
             aSketchFeature->data()->attribute(anAttribute));
           if (anAuxiliaryAttr)
@@ -496,7 +496,7 @@ void PartSet_MenuMgr::onEdit(bool)
   QObjectPtrList aObjects = myModule->workshop()->selection()->selectedObjects();
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObjects.first());
   if (aFeature == NULL) {
-    ResultParameterPtr aParam = 
+    ResultParameterPtr aParam =
       std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aObjects.first());
     if (aParam.get() != NULL) {
       aFeature = ModelAPI_Feature::feature(aParam);

@@ -48,7 +48,7 @@ class ModelAPI_AttributeInteger : public ModelAPI_Attribute
   MODELAPI_EXPORT virtual std::string expressionError() = 0;
 
   /// Defines the used parameters
-  MODELAPI_EXPORT virtual 
+  MODELAPI_EXPORT virtual
     void setUsedParameters(const std::set<std::string>& theUsedParameters) = 0;
 
   /// Returns the used parameters

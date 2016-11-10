@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_Line.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 07/06/16 - Sergey POKHODENKO - Creation of the file
@@ -51,7 +51,7 @@ public:
   virtual ~SketchAPI_Line();
 
   INTERFACE_3(SketchPlugin_Line::ID(),
-              startPoint, SketchPlugin_Line::START_ID(), 
+              startPoint, SketchPlugin_Line::START_ID(),
               GeomDataAPI_Point2D, /** Start point */,
               endPoint, SketchPlugin_Line::END_ID(),
               GeomDataAPI_Point2D, /** End point */,

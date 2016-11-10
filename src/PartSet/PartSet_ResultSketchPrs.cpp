@@ -54,7 +54,7 @@ PartSet_ResultSketchPrs::PartSet_ResultSketchPrs(ResultPtr theResult)
   TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
   Set(aShape);
   Handle(Prs3d_Drawer) aDrawer = Attributes();
-  if (aDrawer->HasOwnPointAspect()) 
+  if (aDrawer->HasOwnPointAspect())
     aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
   else
     aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_PLUS, Quantity_NOC_YELLOW, 1.));
@@ -68,7 +68,7 @@ PartSet_ResultSketchPrs::PartSet_ResultSketchPrs(ResultPtr theResult)
 
 void PartSet_ResultSketchPrs::Compute(
                       const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-                      const Handle(Prs3d_Presentation)& thePresentation, 
+                      const Handle(Prs3d_Presentation)& thePresentation,
                       const Standard_Integer theMode)
 {
   thePresentation->Clear();
@@ -103,7 +103,7 @@ void PartSet_ResultSketchPrs::Compute(
   }
 
   if (!aReadyToDisplay) {
-    Events_InfoMessage("PartSet_ResultSketchPrs", 
+    Events_InfoMessage("PartSet_ResultSketchPrs",
                        "An empty AIS presentation: PartSet_ResultSketchPrs").send();
     static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
     ModelAPI_EventCreator::get()->sendUpdated(myResult, anEvent);
@@ -116,7 +116,7 @@ void debugInfo(const TopoDS_Shape& theShape, const TopAbs_ShapeEnum theType)
   TopTools_IndexedMapOfShape aSubShapes;
   TopExp::MapShapes (theShape, theType, aSubShapes);
 
-  Standard_Boolean 
+  Standard_Boolean
     isComesFromDecomposition = !((aSubShapes.Extent() == 1) && (theShape == aSubShapes (1)));
   int anExtent = aSubShapes.Extent();
   for (Standard_Integer aShIndex = 1; aShIndex <= aSubShapes.Extent(); ++aShIndex)
@@ -155,7 +155,7 @@ void PartSet_ResultSketchPrs::ComputeSelection(const Handle(SelectMgr_Selection)
     TopoDS_Compound aComp;
     aBuilder.MakeCompound(aComp);
     aBuilder.Add(aComp, myOriginalShape);
-    
+
     for(NCollection_List<TopoDS_Shape>::Iterator anIt(mySketchFaceList); anIt.More(); anIt.Next()) {
       const TopoDS_Shape& aFace = anIt.Value();
       aBuilder.Add(aComp, aFace);
@@ -211,8 +211,8 @@ void PartSet_ResultSketchPrs::appendShapeSelection(const Handle(SelectMgr_Select
 
 void PartSet_ResultSketchPrs::setAuxiliaryPresentationStyle(const bool isAuxiliary)
 {
-  Standard_Integer aLineStyle = isAuxiliary? 
-    SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY() : 
+  Standard_Integer aLineStyle = isAuxiliary?
+    SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY() :
     SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
 
   Handle(Prs3d_Drawer) aDrawer = Attributes();
@@ -247,7 +247,7 @@ void PartSet_ResultSketchPrs::fillShapes(TopoDS_Shape& theResultShape,
     return;
 
   theFaceList.Clear();
-  ResultConstructionPtr aConstruction = 
+  ResultConstructionPtr aConstruction =
     std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myResult);
   if (aConstruction.get()) {
     int aFacesNum = aConstruction->facesNum();

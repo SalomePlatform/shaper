@@ -3,7 +3,7 @@
 // Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
 // Name   : ConstructionAPI_Axis.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 15/06/16 - Sergey POKHODENKO - Creation of the file

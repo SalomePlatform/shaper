@@ -70,7 +70,7 @@ void Config_ValidatorReader::processValidator(xmlNodePtr theNode)
 {
   Events_ID aValidatoEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
   Events_Loop* aEvLoop = Events_Loop::loop();
-  std::shared_ptr<Config_ValidatorMessage> 
+  std::shared_ptr<Config_ValidatorMessage>
     aMessage(new Config_ValidatorMessage(aValidatoEvent, this));
   std::string aValidatorId;
   std::list<std::string> aParameters;

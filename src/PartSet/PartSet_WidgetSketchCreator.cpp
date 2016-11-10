@@ -54,7 +54,7 @@
 
 #define DEBUG_UNDO_INVALID_SKETCH
 
-PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent, 
+PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
                                                          PartSet_Module* theModule,
                                                          const Config_WidgetAPI* theData)
 : ModuleBase_WidgetSelector(theParent, theModule->workshop(), theData),
@@ -265,7 +265,7 @@ bool PartSet_WidgetSketchCreator::setSelection(QList<ModuleBase_ViewerPrsPtr>& t
   bool aDone = false;
   if (!startSketchOperation(theValues)) {
     myIsCustomAttribute = true;
-    QList<ModuleBase_ViewerPrsPtr>::const_iterator 
+    QList<ModuleBase_ViewerPrsPtr>::const_iterator
       anIt = theValues.begin(), aLast = theValues.end();
     bool aProcessed = false;
     for (; anIt != aLast; anIt++) {
@@ -279,7 +279,7 @@ bool PartSet_WidgetSketchCreator::setSelection(QList<ModuleBase_ViewerPrsPtr>& t
       emit valuesChanged();
       updateObject(myFeature);
       setVisibleSelectionControl(false);
-      // manually deactivation because the widget was 
+      // manually deactivation because the widget was
       // not activated as has no focus acceptin controls
       deactivate();
       emit focusOutWidget(this);
@@ -316,7 +316,7 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(
   /// sketch should not started by object(face) selected as global. If Local face is selected,
   /// sketch is started
   if (aResult.get() && aValue->shape().get() && aResult->shape()->isEqual(aValue->shape())) {
-    ResultConstructionPtr aConstruction = 
+    ResultConstructionPtr aConstruction =
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aResult);
     if (!aConstruction.get() || !aConstruction->isInfinite())
       return aSketchStarted;
@@ -329,7 +329,7 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(
   myPreviewPlanes->erasePreviewPlanes(myWorkshop);
 
   // Launch Sketch operation
-  CompositeFeaturePtr aCompFeature = 
+  CompositeFeaturePtr aCompFeature =
     std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
 
   // start edit operation for the sketch
@@ -354,7 +354,7 @@ bool PartSet_WidgetSketchCreator::focusTo()
     return true;
   }
   else
-    connect(myModule, SIGNAL(resumed(ModuleBase_Operation*)), 
+    connect(myModule, SIGNAL(resumed(ModuleBase_Operation*)),
             SLOT(onResumed(ModuleBase_Operation*)));
 
   return true;
@@ -386,7 +386,7 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
 
   // Validate the created sketch. If it is valid, it is set into the composite feature selection
   // list, otherwise it is removed
-  CompositeFeaturePtr aCompFeature = 
+  CompositeFeaturePtr aCompFeature =
     std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
   AttributeSelectionListPtr anAttrList = myFeature->data()->selectionList(myAttributeListID);
   if (aCompFeature->numberOfSubs() > 0) {
@@ -405,7 +405,7 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
       aMgr->startOperation("Delete invalid Sketch feature", false);
 
       // delete invalid sketch
-      CompositeFeaturePtr aSketchFeature = 
+      CompositeFeaturePtr aSketchFeature =
               std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCompFeature->subFeature(0));
       QObjectPtrList anObjects;
       anObjects.append(aSketchFeature);
@@ -445,7 +445,7 @@ void PartSet_WidgetSketchCreator::onResumed(ModuleBase_Operation* theOp)
     }
 
     // Hide sketcher result
-    CompositeFeaturePtr aSketchFeature = 
+    CompositeFeaturePtr aSketchFeature =
       std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aCompFeature->subFeature(0));
     std::list<ResultPtr> aResults = aSketchFeature->results();
     std::list<ResultPtr>::const_iterator aIt;
@@ -520,7 +520,7 @@ void PartSet_WidgetSketchCreator::setSketchObjectToList(
   }
 
   ResultPtr aSketchRes = aSketchFeature->results().front();
-  ResultConstructionPtr aConstruction = 
+  ResultConstructionPtr aConstruction =
     std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSketchRes);
   if(!aConstruction.get()) {
     return;

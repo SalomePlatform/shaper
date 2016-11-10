@@ -1,7 +1,7 @@
 // Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
 // Name   : ConstructionAPI_Point.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 29/03/16 - Sergey POKHODENKO - Creation of the file
@@ -121,4 +121,4 @@ PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Selection& theObject1,
                   const ModelHighAPI_Selection& theObject2);*/
 
-#endif /* SRC_CONSTRUCTIONAPI_CONSTRUCTIONAPI_POINT_H_ */ 
+#endif /* SRC_CONSTRUCTIONAPI_CONSTRUCTIONAPI_POINT_H_ */

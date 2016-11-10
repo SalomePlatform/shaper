@@ -30,7 +30,7 @@ double SolveSpaceSolver_ParameterWrapper::value() const
 
 bool SolveSpaceSolver_ParameterWrapper::isEqual(const ParameterWrapperPtr& theOther)
 {
-  std::shared_ptr<SolveSpaceSolver_ParameterWrapper> anOtherParam = 
+  std::shared_ptr<SolveSpaceSolver_ParameterWrapper> anOtherParam =
       std::dynamic_pointer_cast<SolveSpaceSolver_ParameterWrapper>(theOther);
   return anOtherParam && fabs(value() - anOtherParam->value()) < tolerance;
 }

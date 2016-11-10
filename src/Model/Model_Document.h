@@ -52,7 +52,7 @@ class Model_Document : public ModelAPI_Document
     const char* theDirName, const char* theFileName, std::list<std::string>& theResults);
 
   //! Removes document data
-  //! \param theForever if it is false, document is just hiden 
+  //! \param theForever if it is false, document is just hiden
   //!                   (to keep possibility make it back on Undo/Redo)
   MODEL_EXPORT virtual void close(const bool theForever = false);
 
@@ -61,7 +61,7 @@ class Model_Document : public ModelAPI_Document
   //! Finishes the previously started operation (closes the transaction)
   //! \returns true if transaction in this document is not empty and really was performed
   MODEL_EXPORT virtual bool finishOperation();
-  //! Aborts the operation 
+  //! Aborts the operation
   MODEL_EXPORT virtual void abortOperation();
   //! Returns true if operation has been started, but not yet finished or aborted
   MODEL_EXPORT virtual bool isOperation() const;
@@ -150,7 +150,7 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> internalFeature(const int theIndex);
   //! Performs synchronization of transactions with the module document:
   //! If some document is not active (by undo of activation) but in memory,
-  //! on activation the transactions must be synchronised because all redos performed 
+  //! on activation the transactions must be synchronised because all redos performed
   //! wihtout this participation
   MODEL_EXPORT virtual void synchronizeTransactions();
 
@@ -273,7 +273,7 @@ class Model_Document : public ModelAPI_Document
   //! Returns true if this document is currently active
   virtual bool isActive() const;
 
-  //! Returns the selection attribute that is used 
+  //! Returns the selection attribute that is used
   //! for calculation of selection externally from the document
   std::shared_ptr<ModelAPI_AttributeSelectionList> selectionInPartFeature();
 

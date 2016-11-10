@@ -32,8 +32,8 @@
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Coincident, AIS_InteractiveObject);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Coincident, AIS_InteractiveObject);
 
-SketcherPrs_Coincident::SketcherPrs_Coincident(ModelAPI_Feature* theConstraint, 
-                                               const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
+SketcherPrs_Coincident::SketcherPrs_Coincident(ModelAPI_Feature* theConstraint,
+                                               const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 : AIS_InteractiveObject(), myConstraint(theConstraint), mySketcherPlane(thePlane),
   myPoint(gp_Pnt(0.0, 0.0, 0.0)), myIsConflicting(false)
 {
@@ -68,7 +68,7 @@ bool SketcherPrs_Coincident::readyToDisplay(ModelAPI_Feature* theConstraint,
 
 void SketcherPrs_Coincident::Compute(
   const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-  const Handle(Prs3d_Presentation)& thePresentation, 
+  const Handle(Prs3d_Presentation)& thePresentation,
   const Standard_Integer theMode)
 {
   gp_Pnt aPoint;

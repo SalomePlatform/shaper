@@ -63,7 +63,7 @@ double GeomAPI_Dir::angle(const std::shared_ptr<GeomAPI_Dir>& theArg) const
   return MY_DIR->Angle(theArg->impl<gp_Dir>());
 }
 
-bool GeomAPI_Dir::isParallel(const std::shared_ptr<GeomAPI_Dir> theDir, 
+bool GeomAPI_Dir::isParallel(const std::shared_ptr<GeomAPI_Dir> theDir,
                              const double theTolerance) const
 {
   return MY_DIR->IsParallel(theDir->impl<gp_Dir>(), theTolerance) == Standard_True;

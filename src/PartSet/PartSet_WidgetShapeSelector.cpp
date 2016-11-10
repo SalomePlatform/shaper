@@ -75,9 +75,9 @@ void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr
   ModuleBase_WidgetShapeSelector::getGeomSelection(thePrs, theObject, theShape);
 
   FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(theObject);
-  std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+  std::shared_ptr<SketchPlugin_Feature> aSPFeature =
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
-  // there is no a sketch feature is selected, but the shape exists, 
+  // there is no a sketch feature is selected, but the shape exists,
   // try to create an exernal object
   // TODO: unite with the same functionality in PartSet_WidgetShapeSelector
   if (aSPFeature.get() == NULL) {
@@ -92,7 +92,7 @@ void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr
             aShape = aResult->shape();
         }
         if (aShape.get() != NULL && !aShape->isNull())
-          anExternalObject = 
+          anExternalObject =
             myExternalObjectMgr->externalObject(theObject, aShape, sketch(), myIsInValidate);
       }
       else { /// use objects of found selection

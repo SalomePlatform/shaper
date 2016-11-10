@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_Sketch.cpp
-// Purpose: 
+// Purpose:
 //
 // History:
 // 07/06/16 - Sergey POKHODENKO - Creation of the file
@@ -190,27 +190,27 @@ SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
 std::shared_ptr<SketchAPI_Point> SketchAPI_Sketch::addPoint(
     double theX, double theY)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Point::ID());
   return PointPtr(new SketchAPI_Point(aFeature, theX, theY));
 }
 std::shared_ptr<SketchAPI_Point> SketchAPI_Sketch::addPoint(
     const std::shared_ptr<GeomAPI_Pnt2d> & thePoint)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Point::ID());
   return PointPtr(new SketchAPI_Point(aFeature, thePoint));
 }
-std::shared_ptr<SketchAPI_Point> 
+std::shared_ptr<SketchAPI_Point>
   SketchAPI_Sketch::addPoint(const ModelHighAPI_Selection & theExternal)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Point::ID());
   return PointPtr(new SketchAPI_Point(aFeature, theExternal));
 }
 std::shared_ptr<SketchAPI_Point> SketchAPI_Sketch::addPoint(const std::string & theExternalName)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Point::ID());
   return PointPtr(new SketchAPI_Point(aFeature, theExternalName));
 }
@@ -219,23 +219,23 @@ std::shared_ptr<SketchAPI_Point> SketchAPI_Sketch::addPoint(const std::string & 
 std::shared_ptr<SketchAPI_IntersectionPoint> SketchAPI_Sketch::addIntersectionPoint(
     const ModelHighAPI_Selection & theExternal)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_IntersectionPoint::ID());
   return IntersectionPointPtr(new SketchAPI_IntersectionPoint(aFeature, theExternal));
 }
 std::shared_ptr<SketchAPI_IntersectionPoint> SketchAPI_Sketch::addIntersectionPoint(
     const std::string & theExternalName)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_IntersectionPoint::ID());
   return IntersectionPointPtr(new SketchAPI_IntersectionPoint(aFeature, theExternalName));
 }
 
 //--------------------------------------------------------------------------------------
-std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(double theX1, double theY1, 
+std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(double theX1, double theY1,
                                                           double theX2, double theY2)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Line::ID());
   return LinePtr(new SketchAPI_Line(aFeature, theX1, theY1, theX2, theY2));
 }
@@ -243,29 +243,29 @@ std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(
     const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
     const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Line::ID());
   return LinePtr(new SketchAPI_Line(aFeature, theStartPoint, theEndPoint));
 }
-std::shared_ptr<SketchAPI_Line> 
+std::shared_ptr<SketchAPI_Line>
   SketchAPI_Sketch::addLine(const ModelHighAPI_Selection & theExternal)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Line::ID());
   return LinePtr(new SketchAPI_Line(aFeature, theExternal));
 }
 std::shared_ptr<SketchAPI_Line> SketchAPI_Sketch::addLine(const std::string & theExternalName)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Line::ID());
   return LinePtr(new SketchAPI_Line(aFeature, theExternalName));
 }
 
 //--------------------------------------------------------------------------------------
-std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangle(double theX1, double theY1, 
+std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangle(double theX1, double theY1,
                                                                     double theX2, double theY2)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchAPI_Rectangle::ID());
   return RectanglePtr(new SketchAPI_Rectangle(aFeature, theX1, theY1, theX2, theY2));
 }
@@ -273,7 +273,7 @@ std::shared_ptr<SketchAPI_Rectangle> SketchAPI_Sketch::addRectangle(
     const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
     const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchAPI_Rectangle::ID());
   return RectanglePtr(new SketchAPI_Rectangle(aFeature, theStartPoint, theEndPoint));
 }
@@ -283,7 +283,7 @@ std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(double theCenterX,
                                                               double theCenterY,
                                                               double theRadius)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Circle::ID());
   return CirclePtr(new SketchAPI_Circle(aFeature, theCenterX, theCenterY, theRadius));
 }
@@ -292,7 +292,7 @@ std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(
                                     const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
                                     double theRadius)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Circle::ID());
   return CirclePtr(new SketchAPI_Circle(aFeature, theCenter, theRadius));
 }
@@ -301,7 +301,7 @@ std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(double theX1, doub
                                                               double theX2, double theY2,
                                                               double theX3, double theY3)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Circle::ID());
   return CirclePtr(new SketchAPI_Circle(aFeature, theX1, theY1, theX2, theY2, theX3, theY3));
 }
@@ -311,15 +311,15 @@ std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(
                                                 const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
                                                 const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Circle::ID());
   return CirclePtr(new SketchAPI_Circle(aFeature, thePoint1, thePoint2, thePoint3));
 }
 
-std::shared_ptr<SketchAPI_Circle> 
+std::shared_ptr<SketchAPI_Circle>
   SketchAPI_Sketch::addCircle(const ModelHighAPI_Selection & theExternal)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Circle::ID());
   return CirclePtr(new SketchAPI_Circle(aFeature, theExternal));
 }
@@ -327,7 +327,7 @@ std::shared_ptr<SketchAPI_Circle>
 std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(const std::string & theExternalName)
 {
   // TODO(spo): Add constraint SketchConstraintRigid like in PythonAPI. Is it necessary?
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Circle::ID());
   return CirclePtr(new SketchAPI_Circle(aFeature, theExternalName));
 }
@@ -338,7 +338,7 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(double theCenterX, doubl
                                                         double theEndX, double theEndY,
                                                         bool theInversed)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
   return ArcPtr(new SketchAPI_Arc(aFeature,
                                   theCenterX, theCenterY,
@@ -353,7 +353,7 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(
                                               const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
                                               bool theInversed)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
   return ArcPtr(new SketchAPI_Arc(aFeature, theCenter, theStart, theEnd, theInversed));
 }
@@ -362,7 +362,7 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(double theStartX, double
                                                         double theEndX, double theEndY,
                                                         double thePassedX, double thePassedY)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
   return ArcPtr(new SketchAPI_Arc(aFeature,
                                   theStartX, theStartY,
@@ -375,7 +375,7 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(
                                                 const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
                                                 const std::shared_ptr<GeomAPI_Pnt2d>& thePassed)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
   return ArcPtr(new SketchAPI_Arc(aFeature, theStart, theEnd, thePassed));
 }
@@ -385,7 +385,7 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(
                                                 double theEndX, double theEndY,
                                                 bool theInversed)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
   return ArcPtr(new SketchAPI_Arc(aFeature, theTangentPoint, theEndX, theEndY, theInversed));
 }
@@ -395,14 +395,14 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(
                                               const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
                                               bool theInversed)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
   return ArcPtr(new SketchAPI_Arc(aFeature, theTangentPoint, theEnd, theInversed));
 }
 
 std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const ModelHighAPI_Selection & theExternal)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
   return ArcPtr(new SketchAPI_Arc(aFeature, theExternal));
 }
@@ -410,7 +410,7 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const ModelHighAPI_Selec
 std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const std::string & theExternalName)
 {
   // TODO(spo): Add constraint SketchConstraintRigid like in PythonAPI. Is it necessary?
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
   return ArcPtr(new SketchAPI_Arc(aFeature, theExternalName));
 }
@@ -419,7 +419,7 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const std::string & theE
 std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
     const ModelHighAPI_Selection & theExternalFeature)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Projection::ID());
   return ProjectionPtr(new SketchAPI_Projection(aFeature, theExternalFeature));
 }
@@ -427,7 +427,7 @@ std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
 std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
     const std::string & theExternalName)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Projection::ID());
   return ProjectionPtr(new SketchAPI_Projection(aFeature, theExternalName));
 }
@@ -437,7 +437,7 @@ std::shared_ptr<SketchAPI_Mirror> SketchAPI_Sketch::addMirror(
     const ModelHighAPI_RefAttr & theMirrorLine,
     const std::list<std::shared_ptr<ModelAPI_Object> > & theObjects)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_ConstraintMirror::ID());
   return MirrorPtr(new SketchAPI_Mirror(aFeature, theMirrorLine, theObjects));
 }
@@ -450,9 +450,9 @@ std::shared_ptr<SketchAPI_Translation> SketchAPI_Sketch::addTranslation(
     const ModelHighAPI_Integer & theNumberOfObjects,
     bool theFullValue)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_MultiTranslation::ID());
-  return TranslationPtr(new SketchAPI_Translation(aFeature, theObjects, thePoint1, 
+  return TranslationPtr(new SketchAPI_Translation(aFeature, theObjects, thePoint1,
                                                   thePoint2, theNumberOfObjects, theFullValue));
 }
 
@@ -464,10 +464,10 @@ std::shared_ptr<SketchAPI_Rotation> SketchAPI_Sketch::addRotation(
     const ModelHighAPI_Integer & theNumberOfObjects,
     bool theFullValue)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_MultiRotation::ID());
   return RotationPtr(
-    new SketchAPI_Rotation(aFeature, theObjects, theCenter, 
+    new SketchAPI_Rotation(aFeature, theObjects, theCenter,
                            theAngle, theNumberOfObjects, theFullValue));
 }
 
@@ -477,7 +477,7 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::addSplit(
                                                     const ModelHighAPI_RefAttr& thePoint1,
                                                     const ModelHighAPI_RefAttr& thePoint2)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_ConstraintSplit::ID());
   fillAttribute(theFeature, aFeature->reference(SketchPlugin_Constraint::VALUE()));
   fillAttribute(thePoint1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
@@ -729,7 +729,7 @@ void SketchAPI_Sketch::dump(ModelHighAPI_Dumper& theDumper) const
         theDumper << aBase << " = model.addSketch(" << aDocName
                   << ", model.standardPlane(\"" << aPlaneName << "\"))" << std::endl;
       } else { // some other plane
-        theDumper << aBase << " = model.addSketch(" << aDocName << 
+        theDumper << aBase << " = model.addSketch(" << aDocName <<
           ", " << anExternal<< ")" << std::endl;
       }
     } else {

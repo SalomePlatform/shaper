@@ -60,7 +60,7 @@ class GeomData_Point2D : public GeomDataAPI_Point2D
   GEOMDATA_EXPORT virtual std::string expressionError(int theComponent);
 
   /// Defines the used parameters
-  GEOMDATA_EXPORT virtual void setUsedParameters(int theComponent, 
+  GEOMDATA_EXPORT virtual void setUsedParameters(int theComponent,
     const std::set<std::string>& theUsedParameters);
 
   /// Returns the used parameters

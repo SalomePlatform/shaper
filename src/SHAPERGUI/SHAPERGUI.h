@@ -41,7 +41,7 @@ Q_OBJECT
   /// \brief Definition of module standard windows
   virtual void windows(QMap<int, int>& theWndMap) const;
 
-  /// \brief Definition of module viewer 
+  /// \brief Definition of module viewer
   virtual void viewManagers(QStringList& theList) const;
 
   /// \brief The method is called on selection changed event
@@ -112,16 +112,16 @@ Q_OBJECT
   //! Returns list of defined actions (just by SHAPER module)
   virtual QList<QAction*> commandList() const;
 
-  /// Redefinition of virtual function. 
+  /// Redefinition of virtual function.
   /// \param theClient name of pop-up client
   /// \param theMenu popup menu instance
   /// \param theTitle menu title.
   virtual void contextMenuPopup(const QString& theClient, QMenu* theMenu, QString& theTitle);
 
-  /// Redefinition of virtual function for preferences creation. 
+  /// Redefinition of virtual function for preferences creation.
   virtual void createPreferences();
 
-  /// Redefinition of virtual function for preferences changed event. 
+  /// Redefinition of virtual function for preferences changed event.
   virtual void preferencesChanged(const QString& theSection, const QString& theParam);
 
   //! Shows the given text in status bar as a permanent text
@@ -207,10 +207,10 @@ Q_OBJECT
   // the next parameters should be restored after this module deactivation
 
   /// The application value of the preferences parameter
-  bool myIsStorePositions; 
+  bool myIsStorePositions;
 
   /// The application value
-  bool myIsEditEnabled;    
+  bool myIsEditEnabled;
 
   /// Popup manager
   QtxPopupMgr* myPopupMgr;

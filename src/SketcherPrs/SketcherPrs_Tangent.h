@@ -24,7 +24,7 @@ public:
   /// Constructor
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
-  Standard_EXPORT SketcherPrs_Tangent(ModelAPI_Feature* theConstraint, 
+  Standard_EXPORT SketcherPrs_Tangent(ModelAPI_Feature* theConstraint,
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
   DEFINE_STANDARD_RTTI(SketcherPrs_Tangent)

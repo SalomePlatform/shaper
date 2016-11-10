@@ -62,28 +62,28 @@ bool GeomAPI_PlanarEdges::isEdge() const {
   return false;
 }
 
-std::shared_ptr<GeomAPI_Pnt> GeomAPI_PlanarEdges::origin() const 
+std::shared_ptr<GeomAPI_Pnt> GeomAPI_PlanarEdges::origin() const
 {
   if (hasPlane())
     return myPlane->origin();
   return std::shared_ptr<GeomAPI_Pnt>();
 }
 
-std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::dirX() const 
+std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::dirX() const
 {
   if (hasPlane())
     return myPlane->dirX();
   return std::shared_ptr<GeomAPI_Dir>();
 }
 
-std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::dirY() const 
+std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::dirY() const
 {
   if (hasPlane())
     return myPlane->dirY();
   return std::shared_ptr<GeomAPI_Dir>();
 }
 
-std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::norm() const 
+std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::norm() const
 {
   if (hasPlane())
     return myPlane->normal();

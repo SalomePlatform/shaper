@@ -53,7 +53,7 @@ void Model_ResultConstruction::setIsInHistory(const bool isInHistory)
 int Model_ResultConstruction::facesNum()
 {
   if (!myFacesUpToDate) {
-    std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = 
+    std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr =
       std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(myShape);
     if (aWirePtr.get()) {
       std::list<std::shared_ptr<GeomAPI_Shape> > aFaces;

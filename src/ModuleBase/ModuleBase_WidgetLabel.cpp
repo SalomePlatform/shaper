@@ -61,8 +61,8 @@ bool ModuleBase_WidgetLabel::restoreValueCustom()
   return true;
 }
 
-bool ModuleBase_WidgetLabel::focusTo() 
-{ 
+bool ModuleBase_WidgetLabel::focusTo()
+{
   restoreValue();
-  return false; 
+  return false;
 }

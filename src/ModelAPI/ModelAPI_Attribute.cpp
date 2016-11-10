@@ -37,7 +37,7 @@ void ModelAPI_Attribute::setInitialized()
 bool ModelAPI_Attribute::blockSetInitialized(const bool theBlock)
 {
   bool aBlocked = mySetInitializedBlocked;
-  
+
   mySetInitializedBlocked = theBlock;
 
   return aBlocked;

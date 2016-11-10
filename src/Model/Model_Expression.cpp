@@ -42,7 +42,7 @@ void Model_Expression::setText(const std::string& theValue)
   setError(text().empty() ? "" : "Not a double value.");
 }
 
-std::string Model_Expression::text() const 
+std::string Model_Expression::text() const
 {
   return TCollection_AsciiString(myText->Get()).ToCString();
 }

@@ -81,13 +81,13 @@ private:
   GCS::VEC_pD                  myParameters;     ///< list of unknowns
 
   /// list of constraints already processed by the system
-  ConstraintMap                myConstraints;    
+  ConstraintMap                myConstraints;
   std::shared_ptr<GCS::System> myEquationSystem; ///< set of equations for solving in FreeGCS
 
   GCS::SET_I                   myConflictingIDs; ///< list of IDs of conflicting constraints
 
   /// specifies the conflicting constraints are already collected
-  bool                         myConfCollected;  
+  bool                         myConfCollected;
 
   /// list of tangent IDs to check incorrect redundant constraints
   GCS::SET_I                   myTangent;

@@ -38,14 +38,14 @@ public:
   /// \param theValue an RGB components value
   void setColor(const std::vector<int>& theValue);
 
-  /// Returns a container with the current color value. 
+  /// Returns a container with the current color value.
   /// These are tree int values for RGB definition.
-  /// These value is depend on the random choice and eighter 
+  /// These value is depend on the random choice and eighter
   /// a next random color or a certain color.
   /// \return a vector of values
   std::vector<int> getColor() const;
 
-  /// Returns a container with the current color value. 
+  /// Returns a container with the current color value.
   /// These are tree int values for RGB definition.
   /// It returns the next random color.
   /// \return a vector of values

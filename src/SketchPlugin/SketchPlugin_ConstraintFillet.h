@@ -30,7 +30,7 @@ class SketchPlugin_ConstraintFillet : public SketchPlugin_ConstraintBase
    /// \struct Struct to store base edges with states, result edges and constraints.
    struct FilletFeatures {
      /// list of objects the fillet is based and its states
-     std::list<std::pair<FeaturePtr, bool>> baseEdgesState; 
+     std::list<std::pair<FeaturePtr, bool>> baseEdgesState;
      std::list<FeaturePtr> resultEdges; ///< list of result edges
      std::list<FeaturePtr> resultConstraints; ///< list of constraints provided by the fillet
    };
@@ -81,7 +81,7 @@ private:
   std::set<AttributePtr> myNewPoints; ///< set of new points
 
   /// map of point and features for fillet
-  std::map<AttributePtr, FilletFeatures> myPointFeaturesMap; 
+  std::map<AttributePtr, FilletFeatures> myPointFeaturesMap;
   bool myListOfPointsChangedInCode; ///< flag to track that list of points changed in code
   bool myRadiusChangedByUser; ///< flag to track that radius changed by user
   bool myRadiusChangedInCode; ///< flag to track that radius changed in code

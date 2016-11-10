@@ -37,7 +37,7 @@ public:
   /// \brief Constructor by builder and builder type.
   /// \param[in] theBuilder pointer to the builder.
   /// \param[in] theBuilderType builder type.
-  template<class T> explicit GeomAlgoAPI_MakeShape(T* theBuilder, 
+  template<class T> explicit GeomAlgoAPI_MakeShape(T* theBuilder,
     const BuilderType theBuilderType = OCCT_BRepBuilderAPI_MakeShape)
   : GeomAPI_Interface(theBuilder),
     myBuilderType(theBuilderType)
@@ -48,7 +48,7 @@ public:
   /// \brief Initializes internals.
   /// \param[in] theBuilder pointer to the builder.
   /// \param[in] theBuilderType builder type.
-  template<class T> void initialize(T* theBuilder, 
+  template<class T> void initialize(T* theBuilder,
     const BuilderType theBuilderType = OCCT_BRepBuilderAPI_MakeShape)
   {
     setImpl(theBuilder);
@@ -122,8 +122,8 @@ protected:
   /// Error occurred during the execution of an algorithm.
   std::string myError;
   /// Map of created faces with their name for naming.
-  std::map< std::string, std::shared_ptr<GeomAPI_Shape> > myCreatedFaces; 
-  
+  std::map< std::string, std::shared_ptr<GeomAPI_Shape> > myCreatedFaces;
+
 private:
   /// \brief Initializes internals.
   void initialize();

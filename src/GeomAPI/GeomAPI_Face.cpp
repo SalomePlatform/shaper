@@ -77,7 +77,7 @@ bool GeomAPI_Face::isCylindrical() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Face*>(this)->impl<TopoDS_Shape>();
   Handle(Geom_Surface) aSurf = BRep_Tool::Surface(TopoDS::Face(aShape));
-  Handle(Geom_RectangularTrimmedSurface) aTrimmed = 
+  Handle(Geom_RectangularTrimmedSurface) aTrimmed =
     Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurf);
   if (!aTrimmed.IsNull())
     aSurf = aTrimmed->BasisSurface();

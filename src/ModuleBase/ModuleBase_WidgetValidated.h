@@ -137,7 +137,7 @@ private:
   bool isValidAttribute(const AttributePtr& theAttribute) const;
 
 protected:
-  /// Gets the validity state of the presentation in an internal map. 
+  /// Gets the validity state of the presentation in an internal map.
   /// Returns true if the valid state of value is stored
   /// \param theValue a viewer presentation
   /// \param theValid a valid state
@@ -168,10 +168,10 @@ private:
   ObjectPtr myPresentedObject; /// back up of the filtered object
 #ifdef LIST_OF_VALID_PRS
   /// cash of valid selection presentations
-  QList<std::shared_ptr<ModuleBase_ViewerPrs>> myValidPrs; 
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> myValidPrs;
 
   /// cash of invalid selection presentations
-  QList<std::shared_ptr<ModuleBase_ViewerPrs>> myInvalidPrs; 
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> myInvalidPrs;
 #else
   // assume that one presentation selection presentation corresponds only one shape
   NCollection_DataMap<TopoDS_Shape, std::shared_ptr<ModuleBase_ViewerPrs> > myValidPrs;

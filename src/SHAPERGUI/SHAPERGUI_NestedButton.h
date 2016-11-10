@@ -42,7 +42,7 @@ class SHAPERGUI_NestedButton : public QWidgetAction
   /// Creates the button representation
   /// \param theParent a parent widget
   virtual QWidget * createWidget(QWidget * theParent);
-  
+
   virtual bool event(QEvent* theEvent);
 
  private:

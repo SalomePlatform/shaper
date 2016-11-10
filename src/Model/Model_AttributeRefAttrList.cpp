@@ -28,7 +28,7 @@ void Model_AttributeRefAttrList::append(ObjectPtr theObject)
 
 void Model_AttributeRefAttrList::append(AttributePtr theAttr)
 {
-  std::shared_ptr<Model_Data> aData = 
+  std::shared_ptr<Model_Data> aData =
     std::dynamic_pointer_cast<Model_Data>(theAttr->owner()->data());
   myRef->Append(aData->label().Father());  // store label of the object
   myIDs->Append(theAttr->id().c_str()); // store the ID of the referenced attribute
@@ -45,7 +45,7 @@ void Model_AttributeRefAttrList::remove(ObjectPtr theObject)
   if (theObject.get() != NULL) {
     aTheObjLab = std::dynamic_pointer_cast<Model_Data>(theObject->data())->label().Father();
   }
-  std::shared_ptr<Model_Document> aDoc = 
+  std::shared_ptr<Model_Document> aDoc =
     std::dynamic_pointer_cast<Model_Document>(owner()->document());
   // remove from the both lists by clearing the list and then appending one by one
   // TODO: in OCCT 7.0 there are methods for removing by index, seems will be more optimal
@@ -78,7 +78,7 @@ void Model_AttributeRefAttrList::remove(AttributePtr theAttr)
   if (theAttr->owner().get() != NULL) {
     aTheObjLab = std::dynamic_pointer_cast<Model_Data>(theAttr->owner()->data())->label().Father();
   }
-  std::shared_ptr<Model_Document> aDoc = 
+  std::shared_ptr<Model_Document> aDoc =
     std::dynamic_pointer_cast<Model_Document>(owner()->document());
   // remove from the both lists by clearing the list and then appending one by one
   // TODO: in OCCT 7.0 there are methods for removing by index, seems will be more optimal
@@ -90,7 +90,7 @@ void Model_AttributeRefAttrList::remove(AttributePtr theAttr)
   TDF_ListIteratorOfLabelList aRefIter(aRefList);
   TDataStd_ListIteratorOfListOfExtendedString anIDIter(anIDList);
   for (; aRefIter.More(); aRefIter.Next(), anIDIter.Next()) {
-    if (aOneisDeleted || anIDIter.Value() != theAttr->id().c_str() ||  
+    if (aOneisDeleted || anIDIter.Value() != theAttr->id().c_str() ||
         // append now only not removed
         aRefIter.Value() != aTheObjLab || // append now only not removed
         (aTheObjLab.IsNull() && aDoc->objects()->object(aRefIter.Value()) != NULL)) {
@@ -145,7 +145,7 @@ std::list<std::pair<ObjectPtr, AttributePtr> > Model_AttributeRefAttrList::list(
       ObjectPtr anObj;
       if (!aLIter.Value().IsNull()) {
         anObj = aDoc->objects()->object(aLIter.Value());
-        aResult.push_back(std::pair<ObjectPtr, AttributePtr>(anObj, 
+        aResult.push_back(std::pair<ObjectPtr, AttributePtr>(anObj,
           anObj->data()->attribute(TCollection_AsciiString(anIDIter.Value()).ToCString())));
       } else {
         aResult.push_back(std::pair<ObjectPtr, AttributePtr>(ObjectPtr(), AttributePtr()));
@@ -190,7 +190,7 @@ bool Model_AttributeRefAttrList::isInList(const AttributePtr& theAttr)
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
       owner()->document());
   if (aDoc) {
-    std::shared_ptr<Model_Data> aData = 
+    std::shared_ptr<Model_Data> aData =
       std::dynamic_pointer_cast<Model_Data>(theAttr->owner()->data());
     if (aData.get() && aData->isValid()) {
       TDF_Label anObjLab = aData->label().Father();

@@ -121,7 +121,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   QLabel* aListLabel = new QLabel(!aLabelText.empty() ? aLabelText.c_str()
                                                       : tr("Selected objects:"), this);
   aMainLay->addWidget(aListLabel, 1, 0);
-  // if the xml definition contains one type, an information label 
+  // if the xml definition contains one type, an information label
   // should be shown near to the latest
   if (aShapeTypes.size() <= 1) {
     QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
@@ -188,8 +188,8 @@ void ModuleBase_WidgetMultiSelector::deactivate()
 //********************************************************************
 bool ModuleBase_WidgetMultiSelector::storeValueCustom()
 {
-  // the value is stored on the selection changed signal processing 
-  // A rare case when plugin was not loaded. 
+  // the value is stored on the selection changed signal processing
+  // A rare case when plugin was not loaded.
   if (!myFeature)
     return false;
 
@@ -205,7 +205,7 @@ bool ModuleBase_WidgetMultiSelector::storeValueCustom()
 //********************************************************************
 bool ModuleBase_WidgetMultiSelector::restoreValueCustom()
 {
-  // A rare case when plugin was not loaded. 
+  // A rare case when plugin was not loaded.
   if (!myFeature)
     return false;
 
@@ -423,7 +423,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
 
 void ModuleBase_WidgetMultiSelector::updateFocus()
 {
-  // Set focus to List control in order to make possible 
+  // Set focus to List control in order to make possible
   // to use Tab key for transfer the focus to next widgets
   myListControl->setCurrentRow(myListControl->model()->rowCount() - 1);
   ModuleBase_Tools::setFocus(myListControl,
@@ -454,7 +454,7 @@ QIntList ModuleBase_WidgetMultiSelector::shapeTypes() const
 void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const int theShapeType)
 {
   QString aShapeTypeName;
-  
+
   for (int idx = 0; idx < myTypeCombo->count(); ++idx) {
     aShapeTypeName = myTypeCombo->itemText(idx);
     int aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);
@@ -576,7 +576,7 @@ void ModuleBase_WidgetMultiSelector::onListSelection()
   QList<QListWidgetItem*> aItems = myListControl->selectedItems();
   myCopyAction->setEnabled(!aItems.isEmpty());
   myDeleteAction->setEnabled(!aItems.isEmpty());
-  
+
   myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeHighlightedObjects,
                                         true);
 }
@@ -685,7 +685,7 @@ bool ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
   }
   else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
     std::set<AttributePtr> anAttributes;
-    QList<ModuleBase_ViewerPrsPtr>::const_iterator 
+    QList<ModuleBase_ViewerPrsPtr>::const_iterator
       anIt = theValues.begin(), aLast = theValues.end();
     ObjectPtr anObject;
     GeomShapePtr aShape;

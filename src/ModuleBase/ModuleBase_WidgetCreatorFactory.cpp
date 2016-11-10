@@ -19,7 +19,7 @@ std::shared_ptr<ModuleBase_WidgetCreatorFactory> MY_WIDGET_CREATOR_FACTORY;
 std::shared_ptr<ModuleBase_WidgetCreatorFactory> ModuleBase_WidgetCreatorFactory::get()
 {
   if (!MY_WIDGET_CREATOR_FACTORY) {
-    MY_WIDGET_CREATOR_FACTORY =  
+    MY_WIDGET_CREATOR_FACTORY =
       std::shared_ptr<ModuleBase_WidgetCreatorFactory>(new ModuleBase_WidgetCreatorFactory());
   }
   return MY_WIDGET_CREATOR_FACTORY;
@@ -44,7 +44,7 @@ void ModuleBase_WidgetCreatorFactory::registerCreator(const WidgetCreatorPtr& th
     if (!myPanelToCreator.contains(aKey))
       myPanelToCreator[aKey] = theCreator;
     else {
-      Events_InfoMessage("ModuleBase_WidgetCreatorFactory", 
+      Events_InfoMessage("ModuleBase_WidgetCreatorFactory",
         "The %1 panel XML definition has been already used by another widget creator")
         .arg(aKey).send();
     }

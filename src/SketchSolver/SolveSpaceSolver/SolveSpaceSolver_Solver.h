@@ -9,7 +9,7 @@
 
 #include <SketchSolver_ISolver.h>
 
-// Need to be defined before including SolveSpace to avoid additional 
+// Need to be defined before including SolveSpace to avoid additional
 // dependences on Windows platform
 #if defined(WIN32) && !defined(HAVE_C99_INTEGER_TYPES)
 typedef unsigned int UINT32;

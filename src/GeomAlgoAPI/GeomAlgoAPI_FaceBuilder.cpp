@@ -78,7 +78,7 @@ std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::planarFace(
   gp_Pln aPlane(aA, aB, aC, aD);
 
   // half of the size in each direction from the center
-  BRepBuilderAPI_MakeFace aFaceBuilder(aPlane, theX, theX + theWidth, 
+  BRepBuilderAPI_MakeFace aFaceBuilder(aPlane, theX, theX + theWidth,
                                        theY, theY + theHeight);
   std::shared_ptr<GeomAPI_Face> aRes(new GeomAPI_Face());
   aRes->setImpl(new TopoDS_Face(aFaceBuilder.Face()));

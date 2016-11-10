@@ -71,7 +71,7 @@ public:
   SHAPERGUI_PrefMgr(LightApp_Preferences* theMgr, const QString& theModName):
     myMgr(theMgr), myModName(theModName) {}
 
-  virtual int addPreference(const QString& theLbl, int pId, 
+  virtual int addPreference(const QString& theLbl, int pId,
                             SUIT_PreferenceMgr::PrefItemType theType,
                             const QString& theSection, const QString& theName )
   {
@@ -146,7 +146,7 @@ void SHAPERGUI::viewManagers(QStringList& theList) const
 void SHAPERGUI::connectToStudy(CAM_Study* theStudy)
 {
   // if there are created viewer managers, we should try to create viewer
-  // selector and initialize viewer with it. It sets interactive contect to the 
+  // selector and initialize viewer with it. It sets interactive contect to the
   // proxy viewer. If study is opened, CAM application calls this method before the open()
   // of data model
   // the SHAPER data model is specific and during open(load) redisplay signals are flushed, so
@@ -190,7 +190,7 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
         mySelector = createSelector(OCCViewManagers.first());
       }
     }
-    // it should be pefromed after the selector creation in order to have AISContext 
+    // it should be pefromed after the selector creation in order to have AISContext
     myWorkshop->activateModule();
     //action(myEraseAll)->setEnabled(false);
 
@@ -384,7 +384,7 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const ActionInfo& theIn
                     theInfo.id,
                     theInfo.text,
                     //Issue #650: in the SALOME mode the tooltip should be same as text
-                    theInfo.text, 
+                    theInfo.text,
                     theInfo.icon,
                     theInfo.shortcut,
                     theInfo.checkable,
@@ -592,16 +592,16 @@ void SHAPERGUI::createPreferences()
   // Create other parameters group in viewer tab
   int otherGroup = pref->addItem(tr("Default selection"), viewTab);
   pref->setItemProperty("columns", 3, otherGroup);
-  pref->addItem(tr("Faces"), otherGroup, 
+  pref->addItem(tr("Faces"), otherGroup,
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "face-selection");
-  pref->addItem(tr("Edges"), otherGroup, 
+  pref->addItem(tr("Edges"), otherGroup,
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "edge-selection");
-  pref->addItem(tr("Vertices"), otherGroup, 
+  pref->addItem(tr("Vertices"), otherGroup,
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "vertex-selection");
-  
+
   int sensitivityGroup = pref->addItem(tr("Selection sensitivity"), viewTab);
   pref->setItemProperty("columns", 2, sensitivityGroup);
   pref->addItem(tr("Vertex"), sensitivityGroup, SUIT_PreferenceMgr::Double,

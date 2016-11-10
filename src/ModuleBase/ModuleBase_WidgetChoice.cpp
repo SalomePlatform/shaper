@@ -22,7 +22,7 @@
 #include <QToolButton>
 
 
-ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent, 
+ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
                                                  const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData), myCombo(0), myButtons(0)
 {
@@ -49,7 +49,7 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
     std::string aWgtDir = theData->getProperty("buttons_dir");
     if (aWgtDir == "horizontal")
       aBtnLayout = new QHBoxLayout(aGroupBox);
-    else 
+    else
       aBtnLayout = new QVBoxLayout(aGroupBox);
     ModuleBase_Tools::adjustMargins(aBtnLayout);
 
@@ -66,7 +66,7 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
         QPixmap aIcon = ModuleBase_IconFactory::loadPixmap(aIconList.at(aId));
         aBtn->setIcon(aIcon);
         aBtn->setIconSize(aIcon.size());
-        
+
         aBtnLayout->addWidget(aBtn);
         myButtons->addButton(aBtn, aId++);
       }
@@ -94,7 +94,7 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
 
     myCombo = new QComboBox(this);
     aLayout->addWidget(myCombo, 1);
- 
+
     myCombo->addItems(aList);
 
     connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentIndexChanged(int)));
@@ -104,7 +104,7 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
 ModuleBase_WidgetChoice::~ModuleBase_WidgetChoice()
 {
 }
-  
+
 bool ModuleBase_WidgetChoice::storeValueCustom()
 {
   DataPtr aData = myFeature->data();

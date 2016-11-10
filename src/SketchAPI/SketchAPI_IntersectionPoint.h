@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_IntersectionPoint.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 16/06/16 - Sergey POKHODENKO - Creation of the file
@@ -40,9 +40,9 @@ public:
   virtual ~SketchAPI_IntersectionPoint();
 
   INTERFACE_2(SketchPlugin_IntersectionPoint::ID(),
-              coordinates, SketchPlugin_IntersectionPoint::COORD_ID(), 
+              coordinates, SketchPlugin_IntersectionPoint::COORD_ID(),
               GeomDataAPI_Point2D, /** IntersectionPoint coordinates */,
-              externalLine, SketchPlugin_IntersectionPoint::EXTERNAL_LINE_ID(), 
+              externalLine, SketchPlugin_IntersectionPoint::EXTERNAL_LINE_ID(),
               ModelAPI_AttributeSelection, /** External line */
   )
 

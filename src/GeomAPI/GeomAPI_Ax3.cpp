@@ -26,8 +26,8 @@ GeomAPI_Ax3::GeomAPI_Ax3()
 GeomAPI_Ax3::GeomAPI_Ax3(std::shared_ptr<GeomAPI_Pnt> theOrigin,
                          std::shared_ptr<GeomAPI_Dir> theDirX,
                          std::shared_ptr<GeomAPI_Dir> theNorm)
-: GeomAPI_Interface(new gp_Ax3(theOrigin->impl<gp_Pnt>(), 
-                               theNorm->impl<gp_Dir>(), 
+: GeomAPI_Interface(new gp_Ax3(theOrigin->impl<gp_Pnt>(),
+                               theNorm->impl<gp_Dir>(),
                                theDirX->impl<gp_Dir>()))
  {
  }

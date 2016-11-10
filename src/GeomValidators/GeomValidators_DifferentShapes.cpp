@@ -16,7 +16,7 @@ bool GeomValidators_DifferentShapes::isValid(const AttributePtr& theAttribute,
                                       Events_InfoMessage& theError) const
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
-  AttributeSelectionPtr aSelectionAttribute = 
+  AttributeSelectionPtr aSelectionAttribute =
                      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   GeomShapePtr aShape = aSelectionAttribute->value();
   if (!aShape.get()) {
@@ -27,7 +27,7 @@ bool GeomValidators_DifferentShapes::isValid(const AttributePtr& theAttribute,
 
   std::string aCurrentAttributeId = theAttribute->id();
   // get all feature attributes
-  std::list<AttributePtr> anAttrs = 
+  std::list<AttributePtr> anAttrs =
       aFeature->data()->attributes(ModelAPI_AttributeSelection::typeId());
   if (anAttrs.size() > 0 && aShape.get() != NULL) {
     std::list<AttributePtr>::iterator anAttr = anAttrs.begin();
@@ -35,7 +35,7 @@ bool GeomValidators_DifferentShapes::isValid(const AttributePtr& theAttribute,
       AttributePtr anAttribute = *anAttr;
       // take into concideration only other attributes
       if (anAttribute.get() != NULL && anAttribute->id() != aCurrentAttributeId) {
-        aSelectionAttribute = 
+        aSelectionAttribute =
           std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(anAttribute);
         // the shape of the attribute should be not the same
         if (aSelectionAttribute.get() != NULL) {

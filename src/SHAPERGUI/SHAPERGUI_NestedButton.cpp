@@ -105,5 +105,5 @@ void SHAPERGUI_NestedButton::actionStateChanged()
   } else {
     QString s = "false";
   }
-  
+
 }

@@ -220,10 +220,10 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
       /// selection should be obtained from workshop before ask if the operation can be started as
       /// the canStartOperation method performs commit/abort of previous operation.
       /// Sometimes commit/abort
-      /// may cause selection clear(Sketch operation) as a result 
+      /// may cause selection clear(Sketch operation) as a result
       /// it will be lost and is not used for preselection.
       ModuleBase_ISelection* aSelection = myWorkshop->selection();
-      QList<ModuleBase_ViewerPrsPtr> aPreSelected = 
+      QList<ModuleBase_ViewerPrsPtr> aPreSelected =
         aSelection->getSelected(ModuleBase_ISelection::AllControls);
 
       restartOperation();
@@ -233,7 +233,7 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
       // fill the first widget by the mouse event point
       // if the active widget is not the first, it means that the restarted operation is filled by
       // the current preselection.
-      PartSet_WidgetPoint2D* aPoint2DWdg = 
+      PartSet_WidgetPoint2D* aPoint2DWdg =
         dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
       ModuleBase_ModelWidget* aFirstWidget = aPanel->findFirstAcceptingValueWidget();
       if (aPoint2DWdg && aPoint2DWdg == aFirstWidget) {
@@ -273,7 +273,7 @@ void PartSet_SketcherReetntrantMgr::onNoMoreWidgets(const std::string& thePrevio
   if (!isActiveMgr())
     return;
 
-  // we should avoid processing of the signal about no more widgets attributes and 
+  // we should avoid processing of the signal about no more widgets attributes and
   // do this after the restart operaion is finished if it was called
   // onNoMoreWidgets depends on myIsFlagsBlocked and fill myNoMoreWidgetsAttribute
   // if it should be called after restart
@@ -447,7 +447,7 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
             // if there is no the next widget to be automatically activated,
             // the Ok button in property
             // panel should accept the focus(example is parallel constraint on sketch lines)
-            QToolButton* anOkBtn = 
+            QToolButton* anOkBtn =
               dynamic_cast<XGUI_PropertyPanel*>(aPanel)->findButton(PROP_PANEL_OK);
             if (anOkBtn)
               anOkBtn->setFocus(Qt::TabFocusReason);
@@ -485,7 +485,7 @@ void PartSet_SketcherReetntrantMgr::restartOperation()
       module()->launchOperation(aFOperation->id());
       myIsFlagsBlocked = false;
       resetFlags();
-      // we should avoid processing of the signal about no more widgets attributes and 
+      // we should avoid processing of the signal about no more widgets attributes and
       // do this after the restart operaion is finished if it was called
       // onNoMoreWidgets depends on myIsFlagsBlocked and fill myNoMoreWidgetsAttribute
       // if it should be called after restart
@@ -543,7 +543,7 @@ void PartSet_SketcherReetntrantMgr::createInternalFeature()
 void PartSet_SketcherReetntrantMgr::deleteInternalFeature()
 {
   if (myInternalActiveWidget) {
-    ModuleBase_WidgetSelector* aWSelector = 
+    ModuleBase_WidgetSelector* aWSelector =
       dynamic_cast<ModuleBase_WidgetSelector*>(myInternalActiveWidget);
     if (aWSelector)
       aWSelector->activateSelectionAndFilters(false);
@@ -614,7 +614,7 @@ bool PartSet_SketcherReetntrantMgr::copyReetntrantAttributes(const FeaturePtr& t
     if (anArcType == SketchPlugin_Arc::ARC_TYPE_TANGENT()) {
       // get the last point of the previuos arc feature(geom point 2d)
       std::shared_ptr<ModelAPI_Data> aSData = theSourceFeature->data();
-      std::shared_ptr<GeomDataAPI_Point2D> aSPointAttr = 
+      std::shared_ptr<GeomDataAPI_Point2D> aSPointAttr =
                                       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                                       aSData->attribute(SketchPlugin_Arc::END_ID()));
       // get point attribute on the current feature
@@ -622,7 +622,7 @@ bool PartSet_SketcherReetntrantMgr::copyReetntrantAttributes(const FeaturePtr& t
                                                     SketchPlugin_Arc::TANGENT_POINT_ID());
       aTangentPointAttr->setAttr(aSPointAttr);
 
-      std::shared_ptr<GeomDataAPI_Point2D> aNPointAttr = 
+      std::shared_ptr<GeomDataAPI_Point2D> aNPointAttr =
                                     std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                                     theNewFeature->data()->attribute(SketchPlugin_Arc::END_ID()));
       aNPointAttr->setValue(aSPointAttr->x(), aSPointAttr->y());

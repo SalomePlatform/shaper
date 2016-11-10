@@ -17,7 +17,7 @@ static SketcherPrs_PositionMgr* MyPosMgr = NULL;
 // The class is implemented as a singlton
 SketcherPrs_PositionMgr* SketcherPrs_PositionMgr::get()
 {
-  if (MyPosMgr == NULL) 
+  if (MyPosMgr == NULL)
     MyPosMgr = new SketcherPrs_PositionMgr();
   return MyPosMgr;
 }
@@ -27,7 +27,7 @@ SketcherPrs_PositionMgr::SketcherPrs_PositionMgr()
 }
 
 
-int SketcherPrs_PositionMgr::getPositionIndex(ObjectPtr theLine, 
+int SketcherPrs_PositionMgr::getPositionIndex(ObjectPtr theLine,
                                               const SketcherPrs_SymbolPrs* thePrs)
 {
   if (myShapes.count(theLine) == 1) {
@@ -51,7 +51,7 @@ int SketcherPrs_PositionMgr::getPositionIndex(ObjectPtr theLine,
   }
 }
 
-gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape, 
+gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
                                             const SketcherPrs_SymbolPrs* thePrs,
                                             double theStep)
 {
@@ -59,12 +59,12 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
   gp_Pnt aP; // Central point
   gp_Vec aVec1; // main vector
   if (aShape->isEdge()) {
-    std::shared_ptr<GeomAPI_Curve> aCurve = 
+    std::shared_ptr<GeomAPI_Curve> aCurve =
       std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShape));
     std::shared_ptr<GeomAPI_Pnt> aPnt1; // Start point of main vector
     std::shared_ptr<GeomAPI_Pnt> aPnt2; // End point of main vector
     if (aCurve->isLine()) {
-      std::shared_ptr<GeomAPI_Edge> aEdge = 
+      std::shared_ptr<GeomAPI_Edge> aEdge =
         std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aShape));
 
       aPnt1 = aEdge->firstPoint();
@@ -87,7 +87,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
     aVec1 = gp_Vec(aPnt1->impl<gp_Pnt>(), aPnt2->impl<gp_Pnt>());
   } else {
     // This is a point
-    std::shared_ptr<GeomAPI_Vertex> aVertex = 
+    std::shared_ptr<GeomAPI_Vertex> aVertex =
       std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex(aShape));
     std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
     aP = aPnt->impl<gp_Pnt>();
@@ -107,7 +107,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
     // Even position
     aP.Translate(aShift);
     if (aPos > 0) {
-      if (aPos % 4 == 0) 
+      if (aPos % 4 == 0)
         aM = aPos / 4;
       else
         aM = -(aPos + 2) / 4;
@@ -116,7 +116,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
     // Odd position
     aP.Translate(-aShift);
     if (aPos > 1) {
-      if ((aPos - 1) % 4 == 0) 
+      if ((aPos - 1) % 4 == 0)
         aM = (aPos - 1) / 4;
       else
         aM = -(aPos + 1) / 4;

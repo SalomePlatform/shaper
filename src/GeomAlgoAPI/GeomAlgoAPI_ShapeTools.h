@@ -30,11 +30,11 @@ public:
   /// \return the total volume of the solids of the current shape or 0.0 if it can be computed.
   GEOMALGOAPI_EXPORT static double volume(const std::shared_ptr<GeomAPI_Shape> theShape);
 
-  /// \return the centre of mass of the current face. 
+  /// \return the centre of mass of the current face.
   /// The coordinates returned for the center of mass
-  /// are expressed in the absolute Cartesian coordinate system. 
+  /// are expressed in the absolute Cartesian coordinate system.
   /// (This function works only for surfaces).
-  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Pnt> 
+  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Pnt>
     centreOfMass(const std::shared_ptr<GeomAPI_Shape> theShape);
 
   /// \brief Combines faces with common edges to shells, or solids to compsolids.
@@ -51,19 +51,19 @@ public:
   /// \brief Groups shapes with shared topology to compounds.
   /// \param[in] theCompound compound of shapes.
   /// \return compound of compounds with shared topology.
-  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> 
+  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape>
     groupSharedTopology(const std::shared_ptr<GeomAPI_Shape> theCompound);
 
   /// \brief Calculates bounding box for theShapes
   /// \return list of eight points.
   /// \param[in] theShapes list of shapes.
   /// \param[in] theEnlarge enlarges bounding box size.
-  GEOMALGOAPI_EXPORT static 
-    std::list<std::shared_ptr<GeomAPI_Pnt> > getBoundingBox(const ListOfShape& theShapes, 
+  GEOMALGOAPI_EXPORT static
+    std::list<std::shared_ptr<GeomAPI_Pnt> > getBoundingBox(const ListOfShape& theShapes,
                                                             const double theEnlarge = 0.0);
 
   /// \return infinite plane received from theFace plane.
-  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> 
+  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape>
     faceToInfinitePlane(const std::shared_ptr<GeomAPI_Shape> theFace);
 
   /// \brief Enlarges or reduces plane to fit bounding box.
@@ -109,7 +109,7 @@ public:
   GEOMALGOAPI_EXPORT static bool isShapeValid(const std::shared_ptr<GeomAPI_Shape> theShape);
 
   /// \return outer wire for face. If theShape has different type returns empty pointer.
-  GEOMALGOAPI_EXPORT static 
+  GEOMALGOAPI_EXPORT static
     std::shared_ptr<GeomAPI_Shape> getFaceOuterWire(const std::shared_ptr<GeomAPI_Shape> theFace);
 
   /// \return true if edge is parallel to face.

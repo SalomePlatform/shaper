@@ -119,7 +119,7 @@ protected:
                    std::shared_ptr<GeomAPI_Pnt> > PntToAttributesMap;
   std::map<ObjectPtr, PntToAttributesMap> myCashedReferences;
 
-  /// Pointer to a sketch 
+  /// Pointer to a sketch
   CompositeFeaturePtr mySketch;
 };
 

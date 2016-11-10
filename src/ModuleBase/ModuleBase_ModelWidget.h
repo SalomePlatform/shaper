@@ -44,7 +44,7 @@ Q_OBJECT
    enum EnableState { On,  /// the widget value is always enabled
                       Off, /// the widget value is always disabled
                       /// the widget value enable state is defined in preferences
-                      DefinedInPreferences }; 
+                      DefinedInPreferences };
 
   /// Constructor
   /// \param theParent the parent object
@@ -77,13 +77,13 @@ Q_OBJECT
   /// \return the boolean result
   bool isInternal() const { return myIsInternal; }
 
-  /// Returns true, if the obligatory value of the widget is 
+  /// Returns true, if the obligatory value of the widget is
   /// not defined in the XML or has true value
   /// \return the boolean result
   bool isObligatory() const { return myIsObligatory; }
 
-  /// Returns true, if the widget value is enabled and might be modified manualy. 
-  /// It returns false if the application preferences allow having disabled value 
+  /// Returns true, if the widget value is enabled and might be modified manualy.
+  /// It returns false if the application preferences allow having disabled value
   /// and the internal state tells to disable
   /// \return the boolean result
   virtual bool isValueEnabled() const;
@@ -130,7 +130,7 @@ Q_OBJECT
   /// \param theValues a list of presentations
   virtual void getHighlighted(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues) {};
 
-  /// Checks if the selection presentation is valid in widget 
+  /// Checks if the selection presentation is valid in widget
   /// \param theValue a selected presentation in the view
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue)
@@ -139,7 +139,7 @@ Q_OBJECT
   /// Returns widget validator, by default it is NULL. To be created in a child if necessary
   ModuleBase_WidgetValidator* widgetValidator() { return myWidgetValidator; }
 
-  /// Restore value from attribute data to the widget's control. 
+  /// Restore value from attribute data to the widget's control.
   /// Emits signals before and after store
   /// \return True in success
   bool restoreValue();
@@ -148,7 +148,7 @@ Q_OBJECT
   /// \return True in success
   bool storeValue();
 
-  /// Set focus to the first control of the current widget. 
+  /// Set focus to the first control of the current widget.
   /// The focus policy of the control is checked.
   /// If the widget has the NonFocus focus policy, it is skipped.
   /// \return the state whether the widget can accept the focus
@@ -320,7 +320,7 @@ protected slots:
   FeaturePtr myFeature;
 
   /// Flag which shows that current operation is in editing mode
-  bool myIsEditing; 
+  bool myIsEditing;
 
   /// Flag which shows whether current widget is obligatory
   /// The non-obligatory widgets should not accept the focus in the property panel
@@ -336,7 +336,7 @@ private:
   /// Value should be computed on execute, like radius for circle's constraint (can not be zero)
   bool myIsComputedDefault;
 
-  /// the default value, which is defined in the XML for this attribute    
+  /// the default value, which is defined in the XML for this attribute
   std::string myDefaultValue;
 
   /// an XML internal state

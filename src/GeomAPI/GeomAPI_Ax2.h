@@ -18,7 +18,7 @@ class GeomAPI_Ax2 : public GeomAPI_Interface
 {
 public:
   /// Default constructor.
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   GeomAPI_Ax2();
 
   /** \brief Constructor.
@@ -26,7 +26,7 @@ public:
    *  \param[in] theN direction of axis.
    *  \param[in] theVX x direction of axis.
    */
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   GeomAPI_Ax2(std::shared_ptr<GeomAPI_Pnt> theOrigin,
               std::shared_ptr<GeomAPI_Dir> theN,
               std::shared_ptr<GeomAPI_Dir> theVX);
@@ -35,24 +35,24 @@ public:
    *  \param[in] theOrigin point of origin.
    *  \param[in] theDir direction of axis.
    */
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   GeomAPI_Ax2(std::shared_ptr<GeomAPI_Pnt> theOrigin,
               std::shared_ptr<GeomAPI_Dir> theDir);
 
   /// Sets origin point.
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   void setOrigin(const std::shared_ptr<GeomAPI_Pnt>& theOrigin);
 
   /// \return the plane origin point.
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt> origin() const;
 
   /// Sets direction vector.
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   void setDir(const std::shared_ptr<GeomAPI_Dir>& theDir);
 
   /// \return direction vector.
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Dir> dir() const;
 };
 

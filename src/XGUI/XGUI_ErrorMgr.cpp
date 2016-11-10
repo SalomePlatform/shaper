@@ -96,7 +96,7 @@ void XGUI_ErrorMgr::updateAcceptAllAction(const FeaturePtr& theFeature)
 
   QString anError = "";
   /// to allow the module have the button always enabled
-  bool isActionStateEnabled = 
+  bool isActionStateEnabled =
     myWorkshop->module()->isActionEnableStateFixed(XGUI_ActionsMgr::AcceptAll);
   if (!isActionStateEnabled) {
     anError = myWorkshop->module()->getFeatureError(theFeature);

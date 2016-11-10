@@ -131,7 +131,7 @@ void FeaturesPlugin_Partition::storeResult(
   const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
   const int theIndex)
 {
-  // Find base. The most complicated is the real modified object (#1799 if box is partitioned by 
+  // Find base. The most complicated is the real modified object (#1799 if box is partitioned by
   // two planes the box is the base, not planes, independently on the order in the list).
   GeomShapePtr aBaseShape;
   for(ListOfShape::const_iterator anIt = theObjects.cbegin(); anIt != theObjects.cend(); ++anIt) {
@@ -163,7 +163,7 @@ void FeaturesPlugin_Partition::storeResult(
 
   const int aDelTag = 1;
   /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
-  const int aSubTag = 2; 
+  const int aSubTag = 2;
   int aModTag = aSubTag + 10000;
   const std::string aModName = "Modified";
 
@@ -204,7 +204,7 @@ GeomShapePtr findBase(const GeomShapePtr theObjectShape,
     GeomShapePtr anObjectSubShape = anObjectSubShapesExp.current();
     ListOfShape aModifiedShapes;
     theMakeShape->modified(anObjectSubShape, aModifiedShapes);
-    for(ListOfShape::const_iterator 
+    for(ListOfShape::const_iterator
         aModIt = aModifiedShapes.cbegin(); aModIt != aModifiedShapes.cend(); ++aModIt) {
       GeomShapePtr aModShape = *aModIt;
       if(aMapOfSubShapes->isBound(aModShape)) {

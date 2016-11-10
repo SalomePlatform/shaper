@@ -70,7 +70,7 @@ protected:
   /// A reference to external objects manager
   PartSet_ExternalObjectsMgr* myExternalObjectMgr;
 
-  /// Pointer to a sketch 
+  /// Pointer to a sketch
   CompositeFeaturePtr mySketch;
 
   bool myUseSketchPlane; ///< state whether the sketch plane filter should be switched on

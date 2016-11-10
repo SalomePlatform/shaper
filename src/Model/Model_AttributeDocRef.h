@@ -20,7 +20,7 @@
 class Model_AttributeDocRef : public ModelAPI_AttributeDocRef
 {
   /// persistent and unique identifier of the document in the application
-  Handle(TDataStd_Integer) myID; 
+  Handle(TDataStd_Integer) myID;
  public:
 
   /// Defines the document referenced from this attribute

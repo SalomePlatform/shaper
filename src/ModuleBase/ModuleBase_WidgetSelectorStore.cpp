@@ -61,7 +61,7 @@ void ModuleBase_WidgetSelectorStore::restoreAttributeValue(const AttributePtr& t
 {
   std::string aType = theAttribute->attributeType();
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
-    AttributeSelectionListPtr aSelectionListAttr = 
+    AttributeSelectionListPtr aSelectionListAttr =
                    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
     aSelectionListAttr->setSelectionType(mySelectionType);
     // restore selection in the attribute. Indeed there is only one stored object
@@ -70,7 +70,7 @@ void ModuleBase_WidgetSelectorStore::restoreAttributeValue(const AttributePtr& t
       aSelectionListAttr->removeLast();
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
-    AttributeRefListPtr aRefListAttr = 
+    AttributeRefListPtr aRefListAttr =
                          std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttribute);
     // restore objects in the attribute. Indeed there is only one stored object
     int aCountAppened = aRefListAttr->size() - mySelectionCount;
@@ -87,7 +87,7 @@ void ModuleBase_WidgetSelectorStore::restoreAttributeValue(const AttributePtr& t
   }
   else {
     ModuleBase_Tools::setObject(theAttribute, myObject, myShape, theWorkshop, true, true);
-    AttributeRefAttrPtr aRefAttr = 
+    AttributeRefAttrPtr aRefAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
     if (aRefAttr) {
       if (!myIsObject)

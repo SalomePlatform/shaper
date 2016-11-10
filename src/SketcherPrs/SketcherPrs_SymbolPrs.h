@@ -39,20 +39,20 @@ public:
   /// Constructor
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
-  Standard_EXPORT SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint, 
+  Standard_EXPORT SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint,
                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
-  
+
   virtual ~SketcherPrs_SymbolPrs();
 
   //! Method which draws selected owners ( for fast presentation draw )
   Standard_EXPORT virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM,
                                                const SelectMgr_SequenceOfOwner& theOwners);
-  
+
   //! Method which hilight an owner belonging to
   //! this selectable object  ( for fast presentation draw )
   Standard_EXPORT virtual void HilightOwnerWithColor(
     const Handle(PrsMgr_PresentationManager3d)& thePM,
-    const Quantity_NameOfColor theColor, 
+    const Quantity_NameOfColor theColor,
     const Handle(SelectMgr_EntityOwner)& theOwner);
 
   /// Returns sketcher plane
@@ -69,7 +69,7 @@ public:
   /// when constraint become not conflicting
   /// \param theConflicting a state
   /// \param theColor a color for conflicting object
-  Standard_EXPORT void SetConflictingConstraint(const bool& theConflicting, 
+  Standard_EXPORT void SetConflictingConstraint(const bool& theConflicting,
                                                 const std::vector<int>& theColor);
 
   /// Render of the presentation
@@ -125,13 +125,13 @@ protected:
   /// Draw a shape into the given presentation scene
   /// \param theShape the shape to draw
   /// \param thePrs the presentation scene
-  void drawShape(const std::shared_ptr<GeomAPI_Shape>& theShape, 
+  void drawShape(const std::shared_ptr<GeomAPI_Shape>& theShape,
     const Handle(Prs3d_Presentation)& thePrs) const;
 
   /// Draw a list of shapes stored in a RefListAttribute
   /// \param theListAttr the attribute of reference3s list
   /// \param thePrs the presentation scene
-  void drawListOfShapes(const std::shared_ptr<ModelAPI_AttributeRefList>& theListAttr, 
+  void drawListOfShapes(const std::shared_ptr<ModelAPI_AttributeRefList>& theListAttr,
                         const Handle(Prs3d_Presentation)& thePrs) const;
 
 protected:
@@ -150,7 +150,7 @@ protected:
   /// An owner object of the presentation
   Handle(SelectMgr_EntityOwner) myOwner;
 
-private: 
+private:
   /// Static map to collect constraints icons {IconName : IconPixMap}
   static std::map<const char*, Handle(Image_AlienPixMap)> myIconsMap;
 

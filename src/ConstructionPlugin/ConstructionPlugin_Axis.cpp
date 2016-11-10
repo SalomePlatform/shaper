@@ -4,7 +4,7 @@
 // Created:     12 Dec 2014
 // Author:      Vitaly Smetannikov
 
-// Modified by CEA (delegation to Alyotech) : 29 Mar 2016 
+// Modified by CEA (delegation to Alyotech) : 29 Mar 2016
 
 #include "ConstructionPlugin_Axis.h"
 
@@ -43,7 +43,7 @@ void ConstructionPlugin_Axis::initAttributes()
 {
   data()->addAttribute(ConstructionPlugin_Axis::METHOD(),
                        ModelAPI_AttributeString::typeId());
-  
+
   // Attributes needed to build the axis using the "two points" method
   data()->addAttribute(ConstructionPlugin_Axis::POINT_FIRST(),
                        ModelAPI_AttributeSelection::typeId());
@@ -59,11 +59,11 @@ void ConstructionPlugin_Axis::initAttributes()
                        ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(ConstructionPlugin_Axis::Z_DIRECTION(),
                        ModelAPI_AttributeDouble::typeId());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), 
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
       ConstructionPlugin_Axis::X_DIRECTION());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), 
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
       ConstructionPlugin_Axis::Y_DIRECTION());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), 
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
       ConstructionPlugin_Axis::Z_DIRECTION());
 
   //Attributes needed to build the axis using the "three dimensions" method
@@ -125,13 +125,13 @@ void ConstructionPlugin_Axis::createAxisByPointAndDirection()
   AttributeDoublePtr aXAttr = data()->real(ConstructionPlugin_Axis::X_DIRECTION());
   AttributeDoublePtr aYAttr = data()->real(ConstructionPlugin_Axis::Y_DIRECTION());
   AttributeDoublePtr aZAttr = data()->real(ConstructionPlugin_Axis::Z_DIRECTION());
-  if ((aRef1.get() != NULL) && (aXAttr.get() != NULL) && 
+  if ((aRef1.get() != NULL) && (aXAttr.get() != NULL) &&
       (aYAttr.get() != NULL) && (aZAttr.get() != NULL)) {
     GeomShapePtr aShape1 = aRef1->value();
     if (!aShape1.get())
       aShape1 = aRef1->context()->shape();
 
-    std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aXAttr->value(), 
+    std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aXAttr->value(),
                                                                aYAttr->value(),
                                                                aZAttr->value()));
     if (aShape1->isVertex() && (!aShape1->isEqual(aVertex))) {
@@ -171,7 +171,7 @@ void ConstructionPlugin_Axis::createAxisByDimensions()
   double aDY = data()->real(DY())->value();
   double aDZ = data()->real(DZ())->value();
 
-  if (fabs(aDX) < MINIMAL_LENGTH()  && fabs(aDY) < MINIMAL_LENGTH() && 
+  if (fabs(aDX) < MINIMAL_LENGTH()  && fabs(aDY) < MINIMAL_LENGTH() &&
       fabs(aDZ) < MINIMAL_LENGTH()) {
     setError("Axis builder with dimensions  :: all dimensions are null", false);
     return ;
@@ -182,7 +182,7 @@ void ConstructionPlugin_Axis::createAxisByDimensions()
   ResultConstructionPtr aConstr = document()->createConstruction(data());
   aConstr->setInfinite(true);
   aConstr->setShape(anEdge);
-  setResult(aConstr);    
+  setResult(aConstr);
 }
 
 void ConstructionPlugin_Axis::createAxisByLine()

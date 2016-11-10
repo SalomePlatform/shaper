@@ -38,9 +38,9 @@ class XGUI_EXPORT XGUI_SalomeConnector
   //! \param isAddSeparator boolean flag about adding separator after the action
   //! returns created action
   virtual QAction* addFeature(const QString& theWBName, const QString& theId,
-                              const QString& theTitle, const QString& theTip, 
+                              const QString& theTitle, const QString& theTip,
                               const QIcon& theIcon,
-                              const QKeySequence& theKeys, bool isCheckable, 
+                              const QKeySequence& theKeys, bool isCheckable,
                               const bool isAddSeparator,
                               const QString& theStatusTip) = 0;
 

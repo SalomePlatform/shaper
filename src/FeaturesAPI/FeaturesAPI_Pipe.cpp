@@ -118,7 +118,7 @@ void FeaturesAPI_Pipe::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  AttributeSelectionListPtr anAttrObjects = 
+  AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Pipe::BASE_OBJECTS_ID());
   AttributeSelectionPtr anAttrPath = aBase->selection(FeaturesPlugin_Pipe::PATH_OBJECT_ID());
 

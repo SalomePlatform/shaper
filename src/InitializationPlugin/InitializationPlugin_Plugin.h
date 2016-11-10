@@ -40,7 +40,7 @@ class InitializationPlugin_Plugin : public Events_Listener
   /// \param theX - X coordinate
   /// \param theY - Y coordinate
   /// \param theZ - Z coordinate
-  FeaturePtr createPoint(DocumentPtr theDoc, const std::string& theName, 
+  FeaturePtr createPoint(DocumentPtr theDoc, const std::string& theName,
                          double theX, double theY, double theZ);
 
   /// Creates an axis which is started from origin point
@@ -49,7 +49,7 @@ class InitializationPlugin_Plugin : public Events_Listener
   /// \param theX - X of direction point
   /// \param theY - Y of direction point
   /// \param theZ - Z of direction point
-  FeaturePtr createAxis(DocumentPtr theDoc, FeaturePtr theOrigin, 
+  FeaturePtr createAxis(DocumentPtr theDoc, FeaturePtr theOrigin,
                         double theX, double theY, double theZ);
 };
 

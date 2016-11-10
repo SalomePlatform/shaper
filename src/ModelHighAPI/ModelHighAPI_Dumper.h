@@ -76,7 +76,7 @@ public:
 
   /// Add module to list of imported modules
   /// \param theModuleName  name of the module to be imported
-  /// \param theObject      name of the entity to be imported 
+  /// \param theObject      name of the entity to be imported
   ///                       from the module (if empty, while module will be imported)
   MODELHIGHAPI_EXPORT
   void importModule(const std::string& theModuleName,
@@ -84,13 +84,13 @@ public:
 
   /// Returns name of specified entity
   /// \param theEntity        [in] named entity
-  /// \param theSaveNotDumped [in] 
+  /// \param theSaveNotDumped [in]
   ///    if \c true, the entity should be stored as not dumped (will be dumped automatically)
-  /// \param theUseEntityName [in] 
+  /// \param theUseEntityName [in]
   ///    if \c true, the entity name should be used "as is" without changing default name
   /// \return name of the entity
   MODELHIGHAPI_EXPORT
-  const std::string& name(const EntityPtr& theEntity, bool theSaveNotDumped = true, 
+  const std::string& name(const EntityPtr& theEntity, bool theSaveNotDumped = true,
                           bool theUseEntityName = false);
 
   /// Returns name of parent composite feature for specified entity
@@ -188,31 +188,31 @@ public:
   ModelHighAPI_Dumper& operator<<(const ResultPtr& theResult);
 
   /// Dump Attribute
-  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper& 
+  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper&
     operator<<(const std::shared_ptr<ModelAPI_Attribute>& theAttr);
   /// Dump Object
-  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper& 
+  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper&
     operator<<(const std::shared_ptr<ModelAPI_Object>& theObject);
 
   /// Dump AttributeRefAttr
-  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper& 
+  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper&
     operator<<(const std::shared_ptr<ModelAPI_AttributeRefAttr>& theRefAttr);
   /// Dump AttributeRefAttrList as follows:
   /// "[obj1, obj2, obj3, ...]"
-  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper& 
+  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper&
     operator<<(const std::shared_ptr<ModelAPI_AttributeRefAttrList>& theRefAttrList);
   /// Dump AttributeRefList as follows:
   /// "[obj1, obj2, obj3, ...]"
-  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper& 
+  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper&
     operator<<(const std::shared_ptr<ModelAPI_AttributeRefList>& theRefList);
   /// Dump AttributeSelection
-  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper& 
+  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper&
     operator<<(const std::shared_ptr<ModelAPI_AttributeSelection>& theAttrSelect);
   /// Dump AttributeSelectionList
-  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper& 
+  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper&
     operator<<(const std::shared_ptr<ModelAPI_AttributeSelectionList>& theAttrSelList);
   /// Dump AttributeReference
-  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper& 
+  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper&
   operator<<(const std::shared_ptr<ModelAPI_AttributeReference>& theReference);
 
   /// Clear dump buffer
@@ -233,14 +233,14 @@ private:
   bool process(const std::shared_ptr<ModelAPI_Document>& theDoc);
 
   /// Dump composite feature and all it sub-features
-  bool process(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite, 
+  bool process(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite,
                bool isForce = false);
 
   /// Iterate all features in composite feature and dump them into intermediate buffer
   /// \param theComposite   [in] parent composite feature
   /// \param theDumpModelDo [in] shows that command "model.do()" should be written at the end
   MODELHIGHAPI_EXPORT
-  bool processSubs(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite, 
+  bool processSubs(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite,
                    bool theDumpModelDo = false);
 
   /// Check the entity is already dumped
@@ -276,9 +276,9 @@ private:
     EntityPtr            myEntity;   ///< last dumped entity
     bool                 myUserName; ///< the entity hase user-defined name
     /// results of this entity, which has user-defined names or specific colors
-    std::list<ResultPtr> myResults;  
+    std::list<ResultPtr> myResults;
 
-    LastDumpedEntity(EntityPtr theEntity, bool theUserName, 
+    LastDumpedEntity(EntityPtr theEntity, bool theUserName,
       const std::list<ResultPtr>& theResults)
       : myEntity(theEntity), myUserName(theUserName), myResults(theResults)
     {}
@@ -298,7 +298,7 @@ private:
 
 protected:
    /// list of entities, used by other features but not dumped yet
-  std::set<EntityPtr> myNotDumpedEntities; 
+  std::set<EntityPtr> myNotDumpedEntities;
 
   friend class SketchAPI_Sketch;
 };

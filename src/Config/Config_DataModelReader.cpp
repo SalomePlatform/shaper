@@ -31,7 +31,7 @@ void Config_DataModelReader::processNode(xmlNodePtr theNode)
     if (aName.empty() || aGroupType.empty())
       Events_InfoMessage("Config_DataModelReader",
         "Reading dataModel.xml: wrong folder definition.").send();
-   
+
     std::string aIcon = getProperty(theNode, NODE_ICON);
     std::string aEmpty = getProperty(theNode, SHOW_EMPTY);
     std::string aFeatures = getProperty(theNode, FOLDER_FEATURES);
@@ -91,7 +91,7 @@ int Config_DataModelReader::subFolderId(std::string theType) const
   return -1;
 }
 
-std::string getFolderFeatures(const std::string& theFolderName, 
+std::string getFolderFeatures(const std::string& theFolderName,
                     const std::vector<std::string>& theNames,
                     const std::vector<std::string>& theFeatures)
 {

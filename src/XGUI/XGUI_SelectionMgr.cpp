@@ -65,7 +65,7 @@ void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& the
       aContext->AddOrRemoveSelected(anOwner, isUpdateViewer);
     }
   }
-  ModuleBase_Tools::selectionInfo(aContext, 
+  ModuleBase_Tools::selectionInfo(aContext,
                                   "XGUI_SelectionMgr::setSelectedOwners -- AddOrRemoveSelected");
 }
 
@@ -145,7 +145,7 @@ void XGUI_SelectionMgr::onViewerSelection()
   FeaturePtr aFeature;
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull()) {
-    QList<ModuleBase_ViewerPrsPtr> aPresentations = 
+    QList<ModuleBase_ViewerPrsPtr> aPresentations =
       selection()->getSelected(ModuleBase_ISelection::Viewer);
     foreach(ModuleBase_ViewerPrsPtr aPrs, aPresentations) {
       if (aPrs->object().get()) {
@@ -187,7 +187,7 @@ void XGUI_SelectionMgr::clearSelection()
   bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
   myWorkshop->objectBrowser()->setObjectsSelected(aFeatures);
   myWorkshop->objectBrowser()->blockSignals(aBlocked);
-  
+
   QList<ModuleBase_ViewerPrsPtr> aSelectedPrs =
              myWorkshop->selector()->selection()->getSelected(ModuleBase_ISelection::Browser);
 

@@ -8,11 +8,11 @@
 #ifndef Model_Application_H_
 #define Model_Application_H_
 
-#include <Model_Document.h> 
+#include <Model_Document.h>
 #include <TDocStd_Application.hxx>
 #include <map>
 
-// Define handle class 
+// Define handle class
 DEFINE_STANDARD_HANDLE(Model_Application, TDocStd_Application)
 
 /**\class Model_Application
@@ -32,7 +32,7 @@ public:
   /// \param Model_Application is the class name that is covered by the OCCT Handle
   DEFINE_STANDARD_RTTI(Model_Application);
 
-  //! Retuns the application: one per process    
+  //! Retuns the application: one per process
   MODEL_EXPORT static Handle_Model_Application getApplication();
   //! Returns the document by the identifier
   //! \returns false of document is not yet created/not loaded
@@ -79,7 +79,7 @@ public:
   //! \param theFormats sequence of allowed formats for input/output
   virtual void Formats(TColStd_SequenceOfExtendedString& theFormats);
   //! Constructor
-  //! Use method GetInstance() method to obtain 
+  //! Use method GetInstance() method to obtain
   //! the static instance of the object (or derive your own application)
   Model_Application();
 

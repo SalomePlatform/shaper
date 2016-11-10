@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : ModelHighAPI_Double.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 29/03/16 - Sergey POKHODENKO - Creation of the file
@@ -48,4 +48,4 @@ private:
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
-#endif /* SRC_MODELHIGHAPI_MODELHIGHAPI_DOUBLE_H_ */ 
+#endif /* SRC_MODELHIGHAPI_MODELHIGHAPI_DOUBLE_H_ */

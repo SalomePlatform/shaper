@@ -64,12 +64,12 @@ ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePr
   // VSR 01/07/2010: Disable thousands separator for spin box
   // (to avoid inconsistency of double-2-string and string-2-double conversion)
   QLocale loc;
-  loc.setNumberOptions(loc.numberOptions() | 
-                       QLocale::OmitGroupSeparator | 
+  loc.setNumberOptions(loc.numberOptions() |
+                       QLocale::OmitGroupSeparator |
                        QLocale::RejectGroupSeparator);
   setLocale(loc);
 
-  // MPV 15/09/2014: this must be set before setDecimals; 
+  // MPV 15/09/2014: this must be set before setDecimals;
   // otherwise in release mode setDecimals may crash
   myPrecision = thePrecision;
 
@@ -293,8 +293,8 @@ QValidator::State ModuleBase_DoubleSpinBox::validate(QString& str, int& pos) con
   if (overhead == 0)
     state = v.validate(str, pos);
   else {
-    if ((uint)(str.length()) >= overhead && 
-         str.startsWith(pref) && 
+    if ((uint)(str.length()) >= overhead &&
+         str.startsWith(pref) &&
          str.right(suff.length()) == suff) {
       QString core = str.mid(pref.length(), str.length() - overhead);
       int corePos = pos - pref.length();
@@ -364,7 +364,7 @@ bool ModuleBase_DoubleSpinBox::enableKeyPressEvent(const bool& theEnable)
 void ModuleBase_DoubleSpinBox::setValueEnabled(const bool& theEnable)
 {
   setReadOnly(!theEnable);
-  
+
   QPalette aPal = palette();
   aPal.setColor(QPalette::All, QPalette::Base,
                 theEnable? myEnabledBaseColor : aPal.color(QPalette::Disabled, QPalette::Base));

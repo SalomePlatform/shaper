@@ -146,7 +146,7 @@ protected slots:
 
    /// Create a viewer page in dialog box
    void createViewerPage(int thePageId);
-   
+
    /// Create menu properties page in the dialog box
    void createMenuPage(int thePageId);
 

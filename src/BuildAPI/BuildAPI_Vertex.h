@@ -36,7 +36,7 @@ public:
   virtual ~BuildAPI_Vertex();
 
   INTERFACE_1(BuildPlugin_Vertex::ID(),
-              baseObjects, BuildPlugin_Vertex::BASE_OBJECTS_ID(), 
+              baseObjects, BuildPlugin_Vertex::BASE_OBJECTS_ID(),
               ModelAPI_AttributeSelectionList, /** Base objects */)
 
   /// Modify base attribute of the feature.

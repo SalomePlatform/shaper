@@ -128,7 +128,7 @@ void GeomAlgoAPI_ShapeBuilder::addInternal(const std::shared_ptr<GeomAPI_Shape> 
   // Copy sub-shapes from list to new shape.
   BRep_Builder aBuilder;
   std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMakeShapeCustom(new GeomAlgoAPI_MakeShapeCustom());
-  for(ListOfShape::const_iterator 
+  for(ListOfShape::const_iterator
       anIt = theShapesToAdd.cbegin(); anIt != theShapesToAdd.cend(); ++anIt) {
     TopoDS_Shape aShapeToAdd = (*anIt)->impl<TopoDS_Shape>();
     TopoDS_Shape aModShapeToAdd = aShapeToAdd;
@@ -160,7 +160,7 @@ void GeomAlgoAPI_ShapeBuilder::addInternal(const std::shared_ptr<GeomAPI_Shape> 
     if(aBaseShapeType == TopAbs_WIRE) {
       if(aShapeToAddType == TopAbs_VERTEX) {
         // Find on which edge vertex is lie and add to this edge.
-        for(TopExp_Explorer 
+        for(TopExp_Explorer
             aResultExp(aResultShape, TopAbs_EDGE); aResultExp.More(); aResultExp.Next()) {
           TopoDS_Shape anEdge = aResultExp.Current();
           BRepExtrema_DistShapeShape aDist(anEdge, aShapeToAdd);

@@ -114,7 +114,7 @@ public:
 
   /// Modify CreationMethod, to_size, from_size attributes of the feature.
   FEATURESAPI_EXPORT
-  void setSizes(const ModelHighAPI_Double& theToSize, 
+  void setSizes(const ModelHighAPI_Double& theToSize,
                 const ModelHighAPI_Double& theFromSize);
 
   /// Modify creation_method, to_size, from_size attributes of the feature.

@@ -92,7 +92,7 @@ void ParametersPlugin_EvalListener::processEvent(
   } else if (theMessage->eventID() == kReplaceParameterEvent) {
     processReplaceParameterEvent(theMessage);
   } else {
-    Events_InfoMessage("ParametersPlugin_EvalListener", 
+    Events_InfoMessage("ParametersPlugin_EvalListener",
       "ParametersPlugin python interpreter, unhandled message caught: ")
       .arg(theMessage->eventID().eventText()).send();
   }
@@ -111,7 +111,7 @@ double ParametersPlugin_EvalListener::evaluate(FeaturePtr theParameter,
     // If variable does not exist python interpreter will generate an error. It is OK.
     // But due to the issue 1479 it should not check the history position of parameters relatively
     // to feature that contains expression
-    if (!ModelAPI_Tools::findVariable(/*theParameter*/ FeaturePtr(), 
+    if (!ModelAPI_Tools::findVariable(/*theParameter*/ FeaturePtr(),
       *it, aValue, aParamRes, theParameter->document()))
       continue;
 
@@ -129,7 +129,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
   std::shared_ptr<ModelAPI_AttributeEvalMessage> aMessage =
       std::dynamic_pointer_cast<ModelAPI_AttributeEvalMessage>(theMessage);
 
-  FeaturePtr aParamFeature = 
+  FeaturePtr aParamFeature =
     std::dynamic_pointer_cast<ModelAPI_Feature>(aMessage->attribute()->owner());
   if (aMessage->attribute()->attributeType() == ModelAPI_AttributeInteger::typeId()) {
     AttributeIntegerPtr anAttribute =
@@ -139,7 +139,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
     bool isValid = anError.empty();
     if (isValid)
       anAttribute->setCalculatedValue(aValue);
-    anAttribute->setUsedParameters(isValid ? 
+    anAttribute->setUsedParameters(isValid ?
       toSet(myInterp->compile(anAttribute->text())) : std::set<std::string>());
     anAttribute->setExpressionInvalid(!isValid);
     anAttribute->setExpressionError(anAttribute->text().empty() ? "" : anError);
@@ -152,7 +152,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
     bool isValid = anError.empty();
     if (isValid)
       anAttribute->setCalculatedValue(aValue);
-    anAttribute->setUsedParameters(isValid ? 
+    anAttribute->setUsedParameters(isValid ?
       toSet(myInterp->compile(anAttribute->text())) : std::set<std::string>());
     anAttribute->setExpressionInvalid(!isValid);
     anAttribute->setExpressionError(anAttribute->text().empty() ? "" : anError);
@@ -175,7 +175,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
       double aValue = evaluate(aParamFeature, aText[i], anError);
       bool isValid = anError.empty();
       if (isValid) aCalculatedValue[i] = aValue;
-      anAttribute->setUsedParameters(i, 
+      anAttribute->setUsedParameters(i,
         isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
       anAttribute->setExpressionInvalid(i, !isValid);
       anAttribute->setExpressionError(i, aText[i].empty() ? "" : anError);
@@ -200,7 +200,7 @@ void ParametersPlugin_EvalListener::processEvaluationEvent(
       double aValue = evaluate(aParamFeature, aText[i], anError);
       bool isValid = anError.empty();
       if (isValid) aCalculatedValue[i] = aValue;
-      anAttribute->setUsedParameters(i, 
+      anAttribute->setUsedParameters(i,
         isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
       anAttribute->setExpressionInvalid(i, !isValid);
       anAttribute->setExpressionError(i, aText[i].empty() ? "" : anError);
@@ -260,7 +260,7 @@ void ParametersPlugin_EvalListener::renameInParameter(
   anExpressionString = renameInPythonExpression(anExpressionString,
                                                 theOldName,
                                                 theNewName);
-  // Issue #588. No need for reevaluating expression. 
+  // Issue #588. No need for reevaluating expression.
   // Moreover, current history may not contain necessary parameters.
   anExpressionAttribute->owner()->data()->blockSendAttributeUpdated(true);
   anExpressionAttribute->setValue(anExpressionString);
@@ -355,7 +355,7 @@ void setParameterName(ResultParameterPtr theResultParameter, const std::string& 
   theResultParameter->data()->setName(theName);
   theResultParameter->data()->blockSendAttributeUpdated(false, false);
 
-  std::shared_ptr<ParametersPlugin_Parameter> aParameter = 
+  std::shared_ptr<ParametersPlugin_Parameter> aParameter =
       std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
           ModelAPI_Feature::feature(theResultParameter));
 
@@ -379,7 +379,7 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
   // check if the renamed object is a result parameter
   ResultParameterPtr aResultParameter =
       std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aMessage->object());
-  if (!aResultParameter.get()) 
+  if (!aResultParameter.get())
     return;
 
   // get parameter feature for the result
@@ -403,8 +403,8 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
 
   // try to update the parameter feature according the new name
   setParameterName(aResultParameter, aMessage->newName());
-  // TODO(spo): replace with 
-  // ModelAPI_Session::get()->validators()->validate(aParameter, 
+  // TODO(spo): replace with
+  // ModelAPI_Session::get()->validators()->validate(aParameter,
   //                                                 ParametersPlugin_Parameter::VARIABLE_ID())
   // when ModelAPI_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& theFeature,
   //                                           const std::string& theAttribute) const

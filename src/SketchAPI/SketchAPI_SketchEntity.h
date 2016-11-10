@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_SketchEntity.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 07/06/16 - Sergey POKHODENKO - Creation of the file

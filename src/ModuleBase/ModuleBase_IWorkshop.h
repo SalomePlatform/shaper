@@ -69,7 +69,7 @@ Q_OBJECT
 
   //! Returns the factory of selection filters : the only one instance per application
   ModuleBase_FilterFactory* selectionFilters() const;
-  
+
   //! Returns currently active operation
   virtual ModuleBase_Operation* currentOperation() const = 0;
 
@@ -102,7 +102,7 @@ Q_OBJECT
   //! \param theAIS a presentation
   virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const = 0;
 
-  //! Select features clearing previous selection. 
+  //! Select features clearing previous selection.
   //! If the list is empty then selection will be cleared
   //! \param theValues a list of presentations
   virtual void setSelected(const QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues) = 0;

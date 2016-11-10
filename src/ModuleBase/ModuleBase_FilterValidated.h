@@ -39,7 +39,7 @@ public:
    * \param theOwner the result of selection
    * \return whether the owner is selectable in the viewer
   */
-  Standard_EXPORT virtual 
+  Standard_EXPORT virtual
     Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
   DEFINE_STANDARD_RTTI(ModuleBase_FilterValidated)

@@ -29,7 +29,7 @@ public:
                                              Events_InfoMessage& theError) const;
 
   /// \return true if the attribute in feature is not obligatory for the feature execution.
-  GEOMVALIDATORS_EXPORT virtual 
+  GEOMVALIDATORS_EXPORT virtual
     bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 

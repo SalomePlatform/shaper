@@ -34,7 +34,7 @@ public:
   void update(bool isForce);
 
   /// \brief Tries to remove constraint
-  /// \return \c false, if current constraint contains another SketchPlugin 
+  /// \return \c false, if current constraint contains another SketchPlugin
   /// constraints (like for multiple coincidence)
   virtual bool remove();
 
@@ -65,7 +65,7 @@ protected:
 
   /// \brief Returns name of NUMBER_OF_COPIES parameter for corresponding feature
   virtual const std::string& nameNbObjects() = 0;
-  
+
 protected:
   /// \brief Convert absolute coordinates to relative coordinates
   virtual void getRelative(double theAbsX, double theAbsY, double& theRelX, double& theRelY) = 0;
@@ -82,7 +82,7 @@ protected:
   bool myAdjusted; ///< the constraint is already adjusted (to not do it several times)
 
   /// list of features and their copies to find whether some of them are disappeared
-  std::set<FeaturePtr> myFeatures; 
+  std::set<FeaturePtr> myFeatures;
 };
 
 #endif

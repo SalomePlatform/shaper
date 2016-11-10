@@ -16,9 +16,9 @@ void SketchPlugin_SketchEntity::initAttributes()
 
   initDerivedClassAttributes();
 
-  AttributePtr anAttr = data()->addAttribute(SketchPlugin_SketchEntity::COPY_ID(), 
+  AttributePtr anAttr = data()->addAttribute(SketchPlugin_SketchEntity::COPY_ID(),
                                              ModelAPI_AttributeBoolean::typeId());
   anAttr->setIsArgument(false);
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), 
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
     SketchPlugin_SketchEntity::COPY_ID());
 }

@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : ModelHighAPI_Selection.cpp
-// Purpose: 
+// Purpose:
 //
 // History:
 // 06/06/16 - Sergey POKHODENKO - Creation of the file
@@ -44,10 +44,10 @@ void ModelHighAPI_Selection::fillAttribute(
 {
   switch(myVariantType) {
     case VT_Empty: return;
-    case VT_ResultSubShapePair: 
-      theAttribute->setValue(myResultSubShapePair.first, myResultSubShapePair.second); 
+    case VT_ResultSubShapePair:
+      theAttribute->setValue(myResultSubShapePair.first, myResultSubShapePair.second);
       return;
-    case VT_TypeSubShapeNamePair: 
+    case VT_TypeSubShapeNamePair:
       theAttribute->selectSubShape(myTypeSubShapeNamePair.first, myTypeSubShapeNamePair.second);
       return;
   }
@@ -59,8 +59,8 @@ void ModelHighAPI_Selection::appendToList(
 {
   switch(myVariantType) {
     case VT_Empty: return;
-    case VT_ResultSubShapePair: 
-      theAttribute->append(myResultSubShapePair.first, myResultSubShapePair.second); 
+    case VT_ResultSubShapePair:
+      theAttribute->append(myResultSubShapePair.first, myResultSubShapePair.second);
       return;
     case VT_TypeSubShapeNamePair:
       // Note: the reverse order (first - type, second - sub-shape name)
@@ -91,8 +91,8 @@ TypeSubShapeNamePair ModelHighAPI_Selection::typeSubShapeNamePair() const
 std::string ModelHighAPI_Selection::shapeType() const
 {
   switch(myVariantType) {
-  case VT_ResultSubShapePair: 
-    return myResultSubShapePair.second.get() ? myResultSubShapePair.second->shapeTypeStr() : 
+  case VT_ResultSubShapePair:
+    return myResultSubShapePair.second.get() ? myResultSubShapePair.second->shapeTypeStr() :
                                                myResultSubShapePair.first->shape()->shapeTypeStr();
   case VT_TypeSubShapeNamePair: return myTypeSubShapeNamePair.first;
   }
@@ -125,7 +125,7 @@ void ModelHighAPI_Selection::setDeflection(double theValue)
   if (myVariantType != VT_ResultSubShapePair)
     return;
 
-  AttributeDoublePtr aDeflectionAttr = 
+  AttributeDoublePtr aDeflectionAttr =
     myResultSubShapePair.first->data()->real(ModelAPI_Result::DEFLECTION_ID());
 
   aDeflectionAttr->setValue(theValue);

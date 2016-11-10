@@ -118,7 +118,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
             if (aFolderId != -1) {
               insertRow(aRow, createIndex(aFolderId, 0, -1));
             }
-          } 
+          }
         }
       } else {
         // Object created in sub-document
@@ -270,7 +270,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         // Update a group under root
         if (aGroup == myXMLReader->rootType()) // Update objects under root
           aStartId = foldersCount();
-        else // Update objects in folder under root 
+        else // Update objects in folder under root
           aParent = createIndex(folderId(aGroup), 0, -1);
       } else {
         // Update a sub-document
@@ -278,7 +278,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           // Update sub-document root
           aParent = findDocumentRootIndex(aDoc.get());
           aStartId = foldersCount(aDoc.get());
-        } else 
+        } else
           // update folder in sub-document
           aParent = createIndex(folderId(aGroup, aDoc.get()), 0, aDoc.get());
       }
@@ -293,11 +293,11 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get());
       if (aDocRoot.isValid())
         emit dataChanged(aDocRoot, aDocRoot);
-      else 
+      else
         // We have got a new document
         rebuildDataTree();
     }
-  } 
+  }
 }
 
 //******************************************************
@@ -361,15 +361,15 @@ QModelIndex XGUI_DataModel::objectIndex(const ObjectPtr theObject) const
     }
     if (aRow == -1)
       return QModelIndex();
-    else 
+    else
       return createIndex(aRow, 0, theObject.get());
   }
   SessionPtr aSession = ModelAPI_Session::get();
   DocumentPtr aRootDoc = aSession->moduleDocument();
-  if (aDoc == aRootDoc && myXMLReader->rootType() == aType) { 
+  if (aDoc == aRootDoc && myXMLReader->rootType() == aType) {
     // The object from root document
     aRow += foldersCount();
-  } else if (myXMLReader->subType() == aType) { 
+  } else if (myXMLReader->subType() == aType) {
     // The object from sub document
     aRow += foldersCount(aDoc.get());
   }
@@ -394,7 +394,7 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
   if (aParentId == -1) { // root folders
     switch (theRole) {
       case Qt::DisplayRole:
-        return QString(myXMLReader->rootFolderName(theIndexRow).c_str()) + 
+        return QString(myXMLReader->rootFolderName(theIndexRow).c_str()) +
           QString(" (%1)").arg(rowCount(theIndex));
       case Qt::DecorationRole:
         return QIcon(myXMLReader->rootFolderIcon(theIndexRow).c_str());
@@ -422,12 +422,12 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
     if (aSubDoc) { // this is a folder of sub document
       QIntList aMissedIdx = missedFolderIndexes(aSubDoc);
       int aRow = theIndexRow;
-      while (aMissedIdx.contains(aRow)) 
+      while (aMissedIdx.contains(aRow))
         aRow++;
 
       switch (theRole) {
         case Qt::DisplayRole:
-          return QString(myXMLReader->subFolderName(aRow).c_str()) + 
+          return QString(myXMLReader->subFolderName(aRow).c_str()) +
             QString(" (%1)").arg(rowCount(theIndex));
         case Qt::DecorationRole:
           return QIcon(myXMLReader->subFolderIcon(aRow).c_str());
@@ -439,7 +439,7 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
         {
           if (aObj->groupName() == ModelAPI_ResultParameter::group()) {
             ModelAPI_ResultParameter* aParam = dynamic_cast<ModelAPI_ResultParameter*>(aObj);
-            AttributeDoublePtr aValueAttribute = 
+            AttributeDoublePtr aValueAttribute =
               aParam->data()->real(ModelAPI_ResultParameter::VALUE());
             QString aVal = QString::number(aValueAttribute->value());
             QString aTitle = QString(aObj->data()->name().c_str());
@@ -488,7 +488,7 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
   }
 
   int aId = theParent.internalId();
-  if (aId == -1) { 
+  if (aId == -1) {
     // this is a folder under root
     int aParentPos = theParent.row();
     std::string aType = myXMLReader->rootFolderType(aParentPos);
@@ -496,11 +496,11 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
   } else {
     // It is an object which could have children
     ModelAPI_Document* aDoc = getSubDocument(theParent.internalPointer());
-    if (aDoc) { 
+    if (aDoc) {
       // a folder of sub-document
       QIntList aMissedIdx = missedFolderIndexes(aDoc);
       int aRow = theParent.row();
-      while (aMissedIdx.contains(aRow)) 
+      while (aMissedIdx.contains(aRow))
         aRow++;
       std::string aType = myXMLReader->subFolderType(aRow);
       return aDoc->size(aType);
@@ -522,10 +522,10 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
       } else {
         // Check for composite object
         ModelAPI_CompositeFeature* aCompFeature = dynamic_cast<ModelAPI_CompositeFeature*>(aObj);
-        if (aCompFeature) 
+        if (aCompFeature)
           return aCompFeature->numberOfSubs(true);
         ModelAPI_ResultCompSolid* aCompRes = dynamic_cast<ModelAPI_ResultCompSolid*>(aObj);
-        if (aCompRes) 
+        if (aCompRes)
           return aCompRes->numberOfSubs(true);
       }
     }
@@ -571,7 +571,7 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
     } else {
       // It is an object which could have children
       ModelAPI_Document* aDoc = getSubDocument(theParent.internalPointer());
-      if (aDoc) { 
+      if (aDoc) {
         // It is a folder of sub-document
         int aParentRow = aParentPos;
         QIntList aMissedIdx = missedFolderIndexes(aDoc);
@@ -600,14 +600,14 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
           }
         } else {
           // Check for composite object
-          ModelAPI_CompositeFeature* aCompFeature = 
+          ModelAPI_CompositeFeature* aCompFeature =
             dynamic_cast<ModelAPI_CompositeFeature*>(aParentObj);
           if (aCompFeature) {
             aIndex = objectIndex(aCompFeature->subFeature(theRow));
           } else {
-            ModelAPI_ResultCompSolid* aCompRes = 
+            ModelAPI_ResultCompSolid* aCompRes =
               dynamic_cast<ModelAPI_ResultCompSolid*>(aParentObj);
-            if (aCompRes) 
+            if (aCompRes)
               aIndex = objectIndex(aCompRes->subResult(theRow));
           }
         }
@@ -632,7 +632,7 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
   int aId = theIndex.internalId();
   if (aId != -1) { // The object is not a root folder
     ModelAPI_Document* aDoc = getSubDocument(theIndex.internalPointer());
-    if (aDoc) { 
+    if (aDoc) {
       // It is a folder of sub-document
       return findDocumentRootIndex(aDoc);
     }
@@ -682,7 +682,7 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
         return createIndex(aFolderId, 0, aSubDoc.get());
       }
     }
-  } 
+  }
   return QModelIndex();
 }
 
@@ -736,13 +736,13 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
 
   if (aObj) {
     // An object
-    if (aObj->isDisabled()) 
+    if (aObj->isDisabled())
       return theIndex.column() == 1? Qt::ItemIsSelectable : aNullFlag;
 
     if (aSession->moduleDocument() != aObj->document())
       if (aActiveDoc != aObj->document())
         return theIndex.column() == 1? Qt::ItemIsSelectable : aNullFlag;
-    
+
     bool isCompositeSub = false;
     // An object which is sub-object of a composite object can not be accessible in column 1
     if (theIndex.column() == 1) {
@@ -750,13 +750,13 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObjPtr);
       if (aFeature.get()) {
         CompositeFeaturePtr aCompFea = ModelAPI_Tools::compositeOwner(aFeature);
-        if (aCompFea.get()) 
+        if (aCompFea.get())
           isCompositeSub = true;
       } else {
         ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObjPtr);
         if (aResult.get()) {
           ResultCompSolidPtr aCompRes = ModelAPI_Tools::compSolidOwner(aResult);
-          if (aCompRes.get()) 
+          if (aCompRes.get())
             isCompositeSub = true;
         }
       }
@@ -826,7 +826,7 @@ QModelIndex XGUI_DataModel::documentRootIndex(DocumentPtr theDoc) const
   DocumentPtr aRootDoc = aSession->moduleDocument();
   if (theDoc == aRootDoc)
     return QModelIndex();
-  else 
+  else
     return findDocumentRootIndex(theDoc.get());
 }
 
@@ -914,7 +914,7 @@ QModelIndex XGUI_DataModel::lastHistoryIndex() const
   } else {
     if (aCurDoc == aSession->moduleDocument())
       return createIndex(foldersCount() - 1, 1, -1);
-    else 
+    else
       return createIndex(foldersCount(aCurDoc.get()) - 1, 1, aCurDoc.get());
   }
 }

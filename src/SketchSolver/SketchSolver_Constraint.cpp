@@ -258,7 +258,7 @@ bool SketchSolver_Constraint::isUsed(FeaturePtr theFeature) const
     if ((*aCIt)->isUsed(theFeature))
       return true;
 
-  std::list<AttributePtr> anAttrList = 
+  std::list<AttributePtr> anAttrList =
     theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
   std::list<AttributePtr>::const_iterator anAttrIt = anAttrList.begin();
   for (; anAttrIt != anAttrList.end(); ++ anAttrIt)

@@ -33,12 +33,12 @@
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Rigid, SketcherPrs_SymbolPrs);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Rigid, SketcherPrs_SymbolPrs);
 
-static Handle(Image_AlienPixMap) MyPixMap; 
+static Handle(Image_AlienPixMap) MyPixMap;
 
 
 
-SketcherPrs_Rigid::SketcherPrs_Rigid(ModelAPI_Feature* theConstraint, 
-                                           const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
+SketcherPrs_Rigid::SketcherPrs_Rigid(ModelAPI_Feature* theConstraint,
+                                           const std::shared_ptr<GeomAPI_Ax3>& thePlane)
  : SketcherPrs_SymbolPrs(theConstraint, thePlane)
 {
 }
@@ -49,7 +49,7 @@ bool SketcherPrs_Rigid::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   bool aReadyToDisplay = false;
 
   std::shared_ptr<ModelAPI_Data> aData = theConstraint->data();
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr =
     aData->refattr(SketchPlugin_Constraint::ENTITY_A());
   AttributePtr aRefAttr = anAttr->attr();
   if (anAttr->isObject()) {
@@ -66,13 +66,13 @@ bool SketcherPrs_Rigid::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_Rigid::updateIfReadyToDisplay(double theStep) const 
+bool SketcherPrs_Rigid::updateIfReadyToDisplay(double theStep) const
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
 
   std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr =
     aData->refattr(SketchPlugin_Constraint::ENTITY_A());
   AttributePtr aRefAttr = anAttr->attr();
   if (anAttr->isObject()) {
@@ -93,7 +93,7 @@ bool SketcherPrs_Rigid::updateIfReadyToDisplay(double theStep) const
 }
 
 
-void SketcherPrs_Rigid::drawLines(const Handle(Prs3d_Presentation)& thePrs, 
+void SketcherPrs_Rigid::drawLines(const Handle(Prs3d_Presentation)& thePrs,
                                   Quantity_Color theColor) const
 {
   ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
@@ -117,7 +117,7 @@ void SketcherPrs_Rigid::drawLines(const Handle(Prs3d_Presentation)& thePrs,
     return;
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
-  Handle(Graphic3d_AspectLine3d) aLineAspect = 
+  Handle(Graphic3d_AspectLine3d) aLineAspect =
     new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
   aGroup->SetPrimitivesAspect(aLineAspect);
 

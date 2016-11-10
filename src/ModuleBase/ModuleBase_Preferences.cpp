@@ -189,7 +189,7 @@ public:
   /// \param theMgr a preferences manager
   ModuleBase_PrefMgr(ModuleBase_PreferencesMgr* theMgr):myMgr(theMgr) {}
 
-  virtual int addPreference(const QString& theLbl, int pId, 
+  virtual int addPreference(const QString& theLbl, int pId,
                             SUIT_PreferenceMgr::PrefItemType theType,
                             const QString& theSection, const QString& theName )
   {
@@ -210,7 +210,7 @@ private:
 //**********************************************************
 //**********************************************************
 //**********************************************************
-ModuleBase_PreferencesDlg::ModuleBase_PreferencesDlg(SUIT_ResourceMgr* theResurces, 
+ModuleBase_PreferencesDlg::ModuleBase_PreferencesDlg(SUIT_ResourceMgr* theResurces,
   QWidget* theParent)
     : QDialog(theParent),
       myIsChanged(false)
@@ -294,13 +294,13 @@ void ModuleBase_PreferencesDlg::createViewerPage(int thePageId)
   // Create other parameters group in viewer tab
   int selectionGroup = myPreferences->addItem(tr("Default selection"), viewTab);
   myPreferences->setItemProperty("columns", 3, selectionGroup);
-  myPreferences->addItem(tr("Faces"), selectionGroup, 
+  myPreferences->addItem(tr("Faces"), selectionGroup,
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "face-selection");
-  myPreferences->addItem(tr("Edges"), selectionGroup, 
+  myPreferences->addItem(tr("Edges"), selectionGroup,
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "edge-selection");
-  myPreferences->addItem(tr("Vertices"), selectionGroup, 
+  myPreferences->addItem(tr("Vertices"), selectionGroup,
                          SUIT_PreferenceMgr::Bool,
                          ModuleBase_Preferences::VIEWER_SECTION, "vertex-selection");
 
@@ -320,7 +320,7 @@ void ModuleBase_PreferencesDlg::createMenuPage(int thePageId)
   myPreferences->setItemProperty("columns", 1, aSizeGroup);
 
   int aRowsNb = myPreferences->addItem(tr("Number of rows"), aSizeGroup,
-                                       SUIT_PreferenceMgr::IntSpin, 
+                                       SUIT_PreferenceMgr::IntSpin,
                                        ModuleBase_Preferences::MENU_SECTION,
                                        "rows_number");
   myPreferences->setItemProperty("min", 1, aRowsNb);

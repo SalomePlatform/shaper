@@ -139,7 +139,7 @@ protected:
   std::string validatorType(const QString& theType) const;
 
 protected:
-  /// Returns attribute indices selected in the widget selection list 
+  /// Returns attribute indices selected in the widget selection list
   /// \param theIndices a list of indices
   void getSelectedAttributeIndices(std::set<int>& theIndices);
 

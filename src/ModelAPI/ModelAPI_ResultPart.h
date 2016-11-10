@@ -52,7 +52,7 @@ class ModelAPI_ResultPart : public ModelAPI_Result
   /// Returns the part-document of this result
   virtual std::shared_ptr<ModelAPI_Document> partDoc() = 0;
 
-  /// Returns the original part result: for transfomration features results this is 
+  /// Returns the original part result: for transfomration features results this is
   /// the original Part feature result
   virtual std::shared_ptr<ModelAPI_ResultPart> original() = 0;
 
@@ -69,7 +69,7 @@ class ModelAPI_ResultPart : public ModelAPI_Result
   virtual bool updateInPart(const int theIndex) = 0;
 
   /// Applies the additional transformation of the part
-  virtual void setTrsf(std::shared_ptr<ModelAPI_Result> theThis, 
+  virtual void setTrsf(std::shared_ptr<ModelAPI_Result> theThis,
     const std::shared_ptr<GeomAPI_Trsf>& theTransformation) = 0;
 
   /// Returns the shape by the name in the part

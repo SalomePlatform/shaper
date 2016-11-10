@@ -41,11 +41,11 @@ public:
 
 private:
   /// stores the information about all attributes of data in map
-  void storeData(std::shared_ptr<ModelAPI_Data> theData, 
+  void storeData(std::shared_ptr<ModelAPI_Data> theData,
                  std::map<std::string, std::string>& theAttrs);
   /// compares the information about all attributes of data with map
   /// returns not empty string with error if something is different
-  std::string compareData(std::shared_ptr<ModelAPI_Data> theData, 
+  std::string compareData(std::shared_ptr<ModelAPI_Data> theData,
                  std::map<std::string, std::string>& theAttrs);
   /// dumps the attribute content to the string
   std::string dumpAttr(const AttributePtr& theAttr);

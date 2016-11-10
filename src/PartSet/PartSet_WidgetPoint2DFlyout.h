@@ -30,7 +30,7 @@ public:
   /// Destructor
   virtual ~PartSet_WidgetPoint2DFlyout() {};
 
-  /// Checks if the selection presentation is valid in widget 
+  /// Checks if the selection presentation is valid in widget
   /// \param theValue a selected presentation in the view
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);

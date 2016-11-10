@@ -24,7 +24,7 @@
 
 class Model_AttributeIntArray : public ModelAPI_AttributeIntArray
 {
-  /// The OCCT array that keeps all values. 
+  /// The OCCT array that keeps all values.
   Handle_TDataStd_IntegerArray myArray;
   /// Stores the label as a field to set array if size is not null (null array is buggy in OCAF)
   TDF_Label myLab;

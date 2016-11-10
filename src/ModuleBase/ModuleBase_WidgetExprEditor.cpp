@@ -194,7 +194,7 @@ void ExpressionEditor::paintEvent( QPaintEvent* theEvent )
     QPen anOldpen = aPainter.pen();
     aPainter.setPen( aColor );
     lineRect.adjust(minLB, 0, 0, 0);
-    QString elidedText = 
+    QString elidedText =
       aFontMetrics.elidedText( myPlaceHolderText, Qt::ElideRight, lineRect.width() );
     aPainter.drawText( lineRect, va, elidedText );
     aPainter.setPen( anOldpen );
@@ -251,7 +251,7 @@ void ModuleBase_WidgetExprEditor::initializeValueByActivate()
 
 bool ModuleBase_WidgetExprEditor::storeValueCustom()
 {
-  // A rare case when plugin was not loaded. 
+  // A rare case when plugin was not loaded.
   if(!myFeature)
     return false;
   DataPtr aData = myFeature->data();
@@ -284,7 +284,7 @@ bool ModuleBase_WidgetExprEditor::storeValueCustom()
 
 bool ModuleBase_WidgetExprEditor::restoreValueCustom()
 {
-  // A rare case when plugin was not loaded. 
+  // A rare case when plugin was not loaded.
   if(!myFeature)
     return false;
   DataPtr aData = myFeature->data();

@@ -1,7 +1,7 @@
 // Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
 // Name   : ConstructionAPI_Plane.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 27/05/16 - Sergey POKHODENKO - Creation of the file

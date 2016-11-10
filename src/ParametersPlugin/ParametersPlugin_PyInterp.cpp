@@ -43,7 +43,7 @@ ParametersPlugin_PyInterp::positions(const std::string& theExpression,
   PyObject* aBuiltinModule = PyImport_AddModule("__builtin__");
   PyDict_SetItemString(aContext, "__builtins__", aBuiltinModule);
 
-  // extend aContext with variables 
+  // extend aContext with variables
   PyDict_SetItemString(aContext, "expression", PyString_FromString(theExpression.c_str()));
   PyDict_SetItemString(aContext, "name", PyString_FromString(theName.c_str()));
   PyDict_SetItemString(aContext, "positions", Py_BuildValue("[]"));
@@ -82,7 +82,7 @@ std::list<std::string> ParametersPlugin_PyInterp::compile(const std::string& the
   }
 
   PyObject *aCodePyObj =
-    PyObject_CallMethod(aCodeopModule, (char*)"compile_command", (char*)"(s)", 
+    PyObject_CallMethod(aCodeopModule, (char*)"compile_command", (char*)"(s)",
                         theExpression.c_str());
 
   if(!aCodePyObj || aCodePyObj == Py_None || !PyCode_Check(aCodePyObj)) {
@@ -160,7 +160,7 @@ double ParametersPlugin_PyInterp::evaluate(const std::string& theExpression, std
   } catch (const std::invalid_argument&) {
     theError = "Unable to eval " + anEvalStr;
   }
-  
+
   return result;
 }
 

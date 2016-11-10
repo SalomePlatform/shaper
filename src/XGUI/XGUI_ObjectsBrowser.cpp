@@ -84,7 +84,7 @@ XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
 
   setItemDelegateForColumn(0, new XGUI_TreeViewItemDelegate(this));
 
-  connect(this, SIGNAL(doubleClicked(const QModelIndex&)), 
+  connect(this, SIGNAL(doubleClicked(const QModelIndex&)),
     SLOT(onDoubleClick(const QModelIndex&)));
 }
 
@@ -127,7 +127,7 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
   aEntrance = 0;
 }
 
-void XGUI_DataTree::clear() 
+void XGUI_DataTree::clear()
 {
   dataModel()->clear();
   reset();
@@ -157,7 +157,7 @@ void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
   ObjectPtr aObj = aModel->object(theIndex);
 
   DocumentPtr aDoc = aMgr->activeDocument();
-  
+
   std::string aOpName = tr("History change").toStdString();
   if (aObj.get()) {
     if (aObj->document() != aDoc)
@@ -200,12 +200,12 @@ void XGUI_DataTree::drawRow(QPainter* thePainter,
 //********************************************************************
 //********************************************************************
 //********************************************************************
-void XGUI_TreeViewStyle::drawPrimitive(PrimitiveElement theElement, 
+void XGUI_TreeViewStyle::drawPrimitive(PrimitiveElement theElement,
                                        const QStyleOption* theOption,
                                        QPainter* thePainter, const QWidget* theWidget) const
 {
   if ((theElement == QStyle::PE_PanelItemViewRow) || (theElement == QStyle::PE_PanelItemViewItem)) {
-    const QStyleOptionViewItemV4* aOptions = 
+    const QStyleOptionViewItemV4* aOptions =
       qstyleoption_cast<const QStyleOptionViewItemV4 *>(theOption);
     if (myIndex.isValid() && ((myIndex.flags() & Qt::ItemIsSelectable) == 0)) {
       QStyle::State aState = aOptions->state;
@@ -225,9 +225,9 @@ void XGUI_TreeViewStyle::drawPrimitive(PrimitiveElement theElement,
 //********************************************************************
 //********************************************************************
 XGUI_ActiveDocLbl::XGUI_ActiveDocLbl(const QString& theText, QWidget* theParent )
-  : QLabel(theText, theParent), 
-  myPreSelectionStyle(""), 
-  myNeutralStyle(""), 
+  : QLabel(theText, theParent),
+  myPreSelectionStyle(""),
+  myNeutralStyle(""),
   mySelectionStyle(""),
   myIsSelected(false)
 {
@@ -243,7 +243,7 @@ void XGUI_ActiveDocLbl::setTreeView(QTreeView* theView)
   QColor aHighlightText = aPalet.highlightedText().color();
 
   myPreSelectionStyle = "QLabel {background-color: ";
-  myPreSelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 white, stop:1 " + 
+  myPreSelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 white, stop:1 " +
     aHighlight.lighter(170).name() + ");";
   myPreSelectionStyle += "border: 1px solid lightblue; border-radius: 2px }";
 
@@ -254,7 +254,7 @@ void XGUI_ActiveDocLbl::setTreeView(QTreeView* theView)
 #if (!defined HAVE_SALOME) && (defined WIN32)
   mySelectionStyle = "QLabel {background-color: ";
   mySelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(236, 245, 255)";
-  mySelectionStyle += ", stop:1 rgb(208, 229, 255));"; 
+  mySelectionStyle += ", stop:1 rgb(208, 229, 255));";
   mySelectionStyle += "border: 1px solid rgb(132, 172, 221); border-radius: 2px }";
 #else
   mySelectionStyle = "QLabel {background-color: " + aHighlight.name();
@@ -297,7 +297,7 @@ void XGUI_ActiveDocLbl::mouseReleaseEvent( QMouseEvent* e)
   MYClearing = true;
   myIsSelected = true;
   setStyleSheet(mySelectionStyle);
-  // We can not block signals because on 
+  // We can not block signals because on
   // clear selection the View state will not be updated
   myTreeView->clearSelection();
   QLabel::mouseReleaseEvent(e);
@@ -335,7 +335,7 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   aLbl->setPixmap(QPixmap(":pictures/assembly.png"));
   aLbl->setMargin(2);
   // Do not paint background of the label (in order to show icon)
-  aLbl->setAutoFillBackground(false); 
+  aLbl->setAutoFillBackground(false);
 
   aLabelLay->addWidget(aLbl);
 
@@ -376,8 +376,8 @@ XGUI_ObjectsBrowser::~XGUI_ObjectsBrowser()
 }
 
 void XGUI_ObjectsBrowser::setXMLReader(Config_DataModelReader* theReader)
-{ 
-  myDocModel->setXMLReader(theReader); 
+{
+  myDocModel->setXMLReader(theReader);
   myTreeView->setModel(myDocModel);
 
   // It has to be done after setting of model
@@ -495,9 +495,9 @@ void XGUI_ObjectsBrowser::setObjectsSelected(const QObjectPtrList& theObjects)
 }
 
 //***************************************************
-void XGUI_ObjectsBrowser::clearContent()  
-{ 
-  myTreeView->clear(); 
+void XGUI_ObjectsBrowser::clearContent()
+{
+  myTreeView->clear();
 }
 
 void XGUI_ObjectsBrowser::onSelectionChanged(const QItemSelection& theSelected,

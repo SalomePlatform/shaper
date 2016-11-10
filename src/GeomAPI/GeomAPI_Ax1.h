@@ -18,39 +18,39 @@ class GeomAPI_Ax1 : public GeomAPI_Interface
 {
 public:
   /// Default constructor.
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   GeomAPI_Ax1();
 
   /** \brief Constructor.
    *  \param[in] theOrigin point of origin.
    *  \param[in] theDir direction of axis.
    */
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   GeomAPI_Ax1(std::shared_ptr<GeomAPI_Pnt> theOrigin,
               std::shared_ptr<GeomAPI_Dir> theDir);
 
   /// Sets origin point.
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   void setOrigin(const std::shared_ptr<GeomAPI_Pnt>& theOrigin);
 
   /// \return the plane origin point.
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt> origin() const;
 
   /// Sets direction vector.
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   void setDir(const std::shared_ptr<GeomAPI_Dir>& theDir);
 
   /// \return direction vector.
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Dir> dir() const;
 
   /// Reverses the unit vector of this axis and assigns the result to this axis.
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   void reverse();
 
   /// \return reversed unit vector of this axis.
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Ax1> reversed();
 };
 

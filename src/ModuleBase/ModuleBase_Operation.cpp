@@ -153,9 +153,9 @@ void ModuleBase_Operation::onValueStateChanged(int thePreviousState)
   }
 }
 
-void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp) 
-{ 
-  myPropertyPanel = theProp; 
+void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp)
+{
+  myPropertyPanel = theProp;
 }
 
 bool ModuleBase_Operation::isGranted(QString theId) const

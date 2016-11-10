@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_Rotation.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 16/06/16 - Sergey POKHODENKO - Creation of the file
@@ -54,11 +54,11 @@ public:
               ModelAPI_AttributeDouble, /** Angle */,
               numberOfObjects, SketchPlugin_MultiRotation::NUMBER_OF_OBJECTS_ID(),
               ModelAPI_AttributeInteger, /** Number of objects */,
-              valueType, SketchPlugin_MultiRotation::ANGLE_TYPE(), 
+              valueType, SketchPlugin_MultiRotation::ANGLE_TYPE(),
               ModelAPI_AttributeString, /** Value type */,
-              referenceObjects, SketchPlugin_MultiRotation::ENTITY_A(), 
+              referenceObjects, SketchPlugin_MultiRotation::ENTITY_A(),
               ModelAPI_AttributeRefList, /** Reference objects */,
-              rotatedObjects, SketchPlugin_MultiRotation::ENTITY_B(), 
+              rotatedObjects, SketchPlugin_MultiRotation::ENTITY_B(),
               ModelAPI_AttributeRefList, /** Rotated objects */
   )
 

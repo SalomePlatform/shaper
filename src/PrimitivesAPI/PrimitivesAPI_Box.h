@@ -26,25 +26,25 @@ public:
   /// Constructor without values.
   PRIMITIVESAPI_EXPORT
   explicit PrimitivesAPI_Box(const std::shared_ptr<ModelAPI_Feature>& theFeature);
-  
+
   /// Constructor with values.
   PRIMITIVESAPI_EXPORT
   explicit PrimitivesAPI_Box(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              const ModelHighAPI_Double& theDx,
                              const ModelHighAPI_Double& theDy,
                              const ModelHighAPI_Double& theDz);
-  
+
   /// Constructor with values.
   PRIMITIVESAPI_EXPORT
   explicit PrimitivesAPI_Box(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              const ModelHighAPI_Selection& theFirstPoint,
                              const ModelHighAPI_Selection& theSecondPoint);
-  
+
   /// Destructor.
   PRIMITIVESAPI_EXPORT
   virtual ~PrimitivesAPI_Box();
-  
-  INTERFACE_6(PrimitivesPlugin_Box::ID(), 
+
+  INTERFACE_6(PrimitivesPlugin_Box::ID(),
              creationMethod, PrimitivesPlugin_Box::CREATION_METHOD(),
              ModelAPI_AttributeString, /** Creation method */,
              dx, PrimitivesPlugin_Box::DX_ID(),
@@ -53,17 +53,17 @@ public:
              ModelAPI_AttributeDouble, /** Dimension in Y */,
              dz, PrimitivesPlugin_Box::DZ_ID(),
              ModelAPI_AttributeDouble, /** Dimension in Z */,
-             firstPoint, PrimitivesPlugin_Box::POINT_FIRST_ID(), 
+             firstPoint, PrimitivesPlugin_Box::POINT_FIRST_ID(),
              ModelAPI_AttributeSelection, /** First point */,
-             secondPoint, PrimitivesPlugin_Box::POINT_SECOND_ID(), 
+             secondPoint, PrimitivesPlugin_Box::POINT_SECOND_ID(),
              ModelAPI_AttributeSelection, /** Second point */)
-  
+
   /// Set dimensions
   PRIMITIVESAPI_EXPORT
   void setDimensions(const ModelHighAPI_Double& theDx,
                      const ModelHighAPI_Double& theDy,
                      const ModelHighAPI_Double& theDz);
-  
+
   /// Set points
   PRIMITIVESAPI_EXPORT
   void setPoints(const ModelHighAPI_Selection& theFirstPoint,

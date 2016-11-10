@@ -21,44 +21,44 @@ class GeomAPI_Dir : public GeomAPI_Interface
 {
  public:
   /// Creation of direction by coordinates
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   GeomAPI_Dir(const double theX, const double theY, const double theZ);
   /// Creation of direction by coordinates
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   GeomAPI_Dir(const std::shared_ptr<GeomAPI_XYZ>& theCoords);
 
   /// returns X coordinate
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   double x() const;
   /// returns Y coordinate
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   double y() const;
   /// returns Z coordinate
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   double z() const;
 
   /// returns coordinates of the direction
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   const std::shared_ptr<GeomAPI_XYZ> xyz();
 
   /// inverses the direction
   GEOMAPI_EXPORT void reverse();
 
   /// result is a scalar product of directions
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   double dot(const std::shared_ptr<GeomAPI_Dir>& theArg) const;
   /// result is a cross product of two directions
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   const std::shared_ptr<GeomAPI_XYZ> cross(const std::shared_ptr<GeomAPI_Dir>& theArg) const;
 
   /// calculates angle between two directions
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   double angle(const std::shared_ptr<GeomAPI_Dir>& theArg) const;
 
-  /// \return true if the angle between this unit vector and 
+  /// \return true if the angle between this unit vector and
   /// theDir unit vector is equal to 0 or to Pi.
-  GEOMAPI_EXPORT 
-  bool isParallel(const std::shared_ptr<GeomAPI_Dir> theDir, 
+  GEOMAPI_EXPORT
+  bool isParallel(const std::shared_ptr<GeomAPI_Dir> theDir,
                   const double theTolerance = 1.e-7) const;
 
 

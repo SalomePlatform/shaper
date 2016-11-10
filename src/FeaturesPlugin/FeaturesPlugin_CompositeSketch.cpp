@@ -69,7 +69,7 @@ int FeaturesPlugin_CompositeSketch::numberOfSubs(bool forTree) const
 }
 
 //=================================================================================================
-std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_CompositeSketch::subFeature(const int theIndex, 
+std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_CompositeSketch::subFeature(const int theIndex,
                                                                              bool forTree)
 {
   if(theIndex == 0) {
@@ -149,7 +149,7 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
       }
       ResultConstructionPtr aConstruction =
         std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseObjectSelection->context());
-      if(aConstruction.get() && !aBaseShape->isEqual(aConstruction->shape()) && 
+      if(aConstruction.get() && !aBaseShape->isEqual(aConstruction->shape()) &&
           aST == GeomAPI_Shape::WIRE) {
         // It is a wire on the sketch, store it to make face later.
         aSketchWiresMap[aConstruction].push_back(aBaseShape);
@@ -172,7 +172,7 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
         aBaseShape = aConstruction->shape();
         if(aBaseShape.get() && !aBaseShape->isNull()) {
           GeomAPI_Shape::ShapeType aST = aBaseShape->shapeType();
-          if(aST != GeomAPI_Shape::VERTEX && aST != GeomAPI_Shape::EDGE && 
+          if(aST != GeomAPI_Shape::VERTEX && aST != GeomAPI_Shape::EDGE &&
              aST != GeomAPI_Shape::WIRE &&
              aST != GeomAPI_Shape::FACE && aST != GeomAPI_Shape::SHELL) {
             setError("Error: Selected shapes has unsupported type.");
@@ -213,7 +213,7 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
     ListOfShape aShells;
     ListOfShape aFreeFaces;
     GeomShapePtr aFacesCompound = GeomAlgoAPI_CompoundBuilder::compound(aBaseFacesList);
-    GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL, 
+    GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL,
                                           aShells, aFreeFaces);
     theBaseShapesList.insert(theBaseShapesList.end(), aFreeFaces.begin(), aFreeFaces.end());
     theBaseShapesList.insert(theBaseShapesList.end(), aShells.begin(), aShells.end());
@@ -304,30 +304,30 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
     }
   }
 
-  if(aShapeTypeToExplode == GeomAPI_Shape::VERTEX || 
+  if(aShapeTypeToExplode == GeomAPI_Shape::VERTEX ||
       aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
-    theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape, 
+    theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape,
                                                 GeomAPI_Shape::VERTEX,
-                                                theTag++, aGenName + "Edge", 
+                                                theTag++, aGenName + "Edge",
                                                 *aMapOfSubShapes.get());
   }
-  if(aShapeTypeToExplode == GeomAPI_Shape::EDGE || 
+  if(aShapeTypeToExplode == GeomAPI_Shape::EDGE ||
       aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
-    theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), 
+    theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(),
                                                 theBaseShape, GeomAPI_Shape::EDGE,
                                                 theTag++, aGenName + "Face",
                                                 *aMapOfSubShapes.get());
   }
 
-  std::shared_ptr<GeomAlgoAPI_MakeSweep> aMakeSweep = 
+  std::shared_ptr<GeomAlgoAPI_MakeSweep> aMakeSweep =
     std::dynamic_pointer_cast<GeomAlgoAPI_MakeSweep>(theMakeShape);
   if(aMakeSweep.get()) {
     // Store from shapes.
-    storeShapes(theResultBody, aBaseShapeType, aMapOfSubShapes, 
+    storeShapes(theResultBody, aBaseShapeType, aMapOfSubShapes,
                 aMakeSweep->fromShapes(), "From_", theTag);
 
     // Store to shapes.
-    storeShapes(theResultBody, aBaseShapeType, aMapOfSubShapes, 
+    storeShapes(theResultBody, aBaseShapeType, aMapOfSubShapes,
                 aMakeSweep->toShapes(), "To_", theTag);
   }
 }

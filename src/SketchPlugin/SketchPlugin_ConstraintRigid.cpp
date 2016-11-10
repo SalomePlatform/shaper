@@ -42,9 +42,9 @@ AISObjectPtr SketchPlugin_ConstraintRigid::getAISObject(AISObjectPtr thePrevious
   ObjectPtr aObj = anAttr->object();
   if (aObj.get() != NULL) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-    std::shared_ptr<SketchPlugin_Feature> aSkFea = 
+    std::shared_ptr<SketchPlugin_Feature> aSkFea =
       std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    if (!aSkFea->isExternal()) 
+    if (!aSkFea->isExternal())
       isValidRigid = true;
   }
 

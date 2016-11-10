@@ -70,7 +70,7 @@ protected:
   /// Manager of external objects
   PartSet_ExternalObjectsMgr* myExternalObjectMgr;
 
-  /// Pointer to a sketch 
+  /// Pointer to a sketch
   CompositeFeaturePtr mySketch;
 };
 

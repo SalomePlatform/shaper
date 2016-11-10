@@ -50,7 +50,7 @@ Q_OBJECT
   /// Destructor
   virtual ~PartSet_WidgetPoint2D();
 
-  /// Checks if the selection presentation is valid in widget 
+  /// Checks if the selection presentation is valid in widget
   /// \param theValue a selected presentation in the view
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
@@ -152,7 +152,7 @@ protected:
 
   /// Compute the feature default value and fill the controls with it
   /// or store the control value to the feature
-  /// The widget is not initialize the attribute value in order to avoid the 
+  /// The widget is not initialize the attribute value in order to avoid the
   /// incorrect visualization in Sketch. E.g. by a line creation, the line should not
   /// be visualized immediatelly when the end point widget is activated.
   virtual void initializeValueByActivate();
@@ -163,7 +163,7 @@ protected:
    /// \param theShape a vertex shape
    /// \param theX an output value of X coordinate
    /// \param theY an output value of Y coordinate
-   bool getPoint2d(const Handle(V3d_View)& theView, const TopoDS_Shape& theShape, 
+   bool getPoint2d(const Handle(V3d_View)& theView, const TopoDS_Shape& theShape,
                    double& theX, double& theY) const;
 
    /// Create a coincidence constraint between the attribute and the parameter object

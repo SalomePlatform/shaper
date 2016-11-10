@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 // Name   : ParametersAPI_Parameter.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 16/06/16 - Sergey POKHODENKO - Creation of the file
@@ -39,7 +39,7 @@ public:
   virtual ~ParametersAPI_Parameter();
 
   INTERFACE_3(ParametersPlugin_Parameter::ID(),
-              name, ParametersPlugin_Parameter::VARIABLE_ID(), 
+              name, ParametersPlugin_Parameter::VARIABLE_ID(),
               ModelAPI_AttributeString, /** Name */,
               expression, ParametersPlugin_Parameter::EXPRESSION_ID(),
               ModelAPI_AttributeString, /** Expression */,

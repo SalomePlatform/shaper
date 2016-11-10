@@ -89,7 +89,7 @@ void ConstructionPlugin_Plane::execute()
   GeomShapePtr aShape;
 
   std::string aCreationMethod = string(CREATION_METHOD())->value();
-  if(aCreationMethod == CREATION_METHOD_BY_GENERAL_EQUATION() || 
+  if(aCreationMethod == CREATION_METHOD_BY_GENERAL_EQUATION() ||
       aCreationMethod == "PlaneByGeneralEquation") {
     aShape = createByGeneralEquation();
   } else if(aCreationMethod == CREATION_METHOD_BY_THREE_POINTS()) {
@@ -129,7 +129,7 @@ bool ConstructionPlugin_Plane::customisePresentation(ResultPtr theResult, AISObj
 {
   std::vector<int> aColor;
   // get color from the attribute of the result
-  if (theResult.get() != NULL && 
+  if (theResult.get() != NULL &&
       theResult->data()->attribute(ModelAPI_Result::COLOR_ID()).get() != NULL) {
     AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
     if (aColorAttr.get() && aColorAttr->size()) {
@@ -165,7 +165,7 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByGeneralEquation
       anAttrC->isInitialized() && anAttrD->isInitialized() ) {
     double aA = anAttrA->value(), aB = anAttrB->value(),
            aC = anAttrC->value(), aD = anAttrD->value();
-    std::shared_ptr<GeomAPI_Pln> aPlane = 
+    std::shared_ptr<GeomAPI_Pln> aPlane =
       std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
     std::string kDefaultPlaneSize = "200";
     double aSize = Config_PropManager::integer(SKETCH_TAB_NAME, "planes_size", kDefaultPlaneSize);
@@ -332,7 +332,7 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
   }
   std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(anAxisShape));
 
-  std::shared_ptr<GeomAPI_Ax1> anAxis = 
+  std::shared_ptr<GeomAPI_Ax1> anAxis =
     std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(),
                                                  anEdge->line()->direction()));
 
@@ -391,7 +391,7 @@ GeomShapePtr faceByThreeVertices(const std::shared_ptr<GeomAPI_Vertex> theV1,
   anObjects.push_back(theV1);
   anObjects.push_back(theV2);
   anObjects.push_back(theV3);
-  std::list<std::shared_ptr<GeomAPI_Pnt> > aBoundingPoints = 
+  std::list<std::shared_ptr<GeomAPI_Pnt> > aBoundingPoints =
     GeomAlgoAPI_ShapeTools::getBoundingBox(anObjects, 1.0);
   GeomShapePtr aRes = GeomAlgoAPI_ShapeTools::fitPlaneToBox(aFace, aBoundingPoints);
 
@@ -431,7 +431,7 @@ std::shared_ptr<GeomAPI_Face> makeRectangularFace(const std::shared_ptr<GeomAPI_
   double aWgap = (aMaxX2d - aMinX2d) * 0.1;
   double aHgap = (aMaxY2d - aMinY2d) * 0.1;
   std::shared_ptr<GeomAPI_Face> aResFace = GeomAlgoAPI_FaceBuilder::planarFace(thePln,
-    aMinX2d - aWgap, aMinY2d - aHgap, aMaxX2d - aMinX2d + 2. * aWgap, 
+    aMinX2d - aWgap, aMinY2d - aHgap, aMaxX2d - aMinX2d + 2. * aWgap,
     aMaxY2d - aMinY2d + 2. * aHgap);
 
   return aResFace;

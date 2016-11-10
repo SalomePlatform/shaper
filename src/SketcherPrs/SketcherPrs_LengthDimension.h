@@ -32,7 +32,7 @@ public:
   /// Constructor
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
-  Standard_EXPORT SketcherPrs_LengthDimension(ModelAPI_Feature* theConstraint, 
+  Standard_EXPORT SketcherPrs_LengthDimension(ModelAPI_Feature* theConstraint,
                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
   /// Destructor
@@ -40,7 +40,7 @@ public:
 
   DEFINE_STANDARD_RTTI(SketcherPrs_LengthDimension)
 
-  /// Returns true if the constraint feature arguments are correcly filled 
+  /// Returns true if the constraint feature arguments are correcly filled
   /// to build AIS presentation
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
@@ -51,7 +51,7 @@ protected:
   /// Redefinition of virtual function
   Standard_EXPORT virtual void Compute(
     const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-    const Handle(Prs3d_Presentation)& thePresentation, 
+    const Handle(Prs3d_Presentation)& thePresentation,
     const Standard_Integer theMode = 0);
 
   /// Redefinition of virtual function
@@ -74,7 +74,7 @@ private:
   /// Listener to update dimension visualization style
   SketcherPrs_DimensionStyleListener* myStyleListener;
 
-  /// container of values obtained from the constraint, which are necessary 
+  /// container of values obtained from the constraint, which are necessary
   /// to fill the presentation
   gp_Pnt myFirstPoint; ///< the dimension first point for measured geometry
   gp_Pnt mySecondPoint; ///< the dimension first point for measured geometry
@@ -82,7 +82,7 @@ private:
   double myDistance; ///< the flyout distance
 
   /// the structure filled by constraint
-  SketcherPrs_DimensionStyleListener::DimensionValue myValue; 
+  SketcherPrs_DimensionStyleListener::DimensionValue myValue;
 };
 
 #endif

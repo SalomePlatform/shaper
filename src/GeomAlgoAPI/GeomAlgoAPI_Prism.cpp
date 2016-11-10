@@ -77,7 +77,7 @@ GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
                                      const GeomShapePtr theFromShape,
                                      const double       theFromSize)
 {
-  build(theBaseShape, std::shared_ptr<GeomAPI_Dir>(), theToShape, 
+  build(theBaseShape, std::shared_ptr<GeomAPI_Dir>(), theToShape,
         theToSize, theFromShape, theFromSize);
 }
 
@@ -101,7 +101,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
                               const double                       theFromSize)
 {
   if(!theBaseShape.get() ||
-    (((!theFromShape.get() && !theToShape.get()) || 
+    (((!theFromShape.get() && !theToShape.get()) ||
     (theFromShape.get() && theToShape.get() && theFromShape->isEqual(theToShape)))
     && (theFromSize == -theToSize))) {
     return;
@@ -190,7 +190,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     // Moving base shape.
     gp_Trsf aTrsf;
     aTrsf.SetTranslation(aDirVec * -theFromSize);
-    BRepBuilderAPI_Transform* aTransformBuilder = 
+    BRepBuilderAPI_Transform* aTransformBuilder =
       new BRepBuilderAPI_Transform(aBaseShape, aTrsf);
     if(!aTransformBuilder) {
       return;
@@ -203,7 +203,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     TopoDS_Shape aMovedBase = aTransformBuilder->Shape();
 
     // Making prism.
-    BRepPrimAPI_MakePrism* aPrismBuilder = 
+    BRepPrimAPI_MakePrism* aPrismBuilder =
       new BRepPrimAPI_MakePrism(aMovedBase, aDirVec * (theFromSize + theToSize));
     if(!aPrismBuilder) {
       return;
@@ -303,7 +303,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     TopoDS_Shape aMovedBase = aTransformBuilder->Shape();
 
     // Making prism.
-    BRepPrimAPI_MakePrism* aPrismBuilder = 
+    BRepPrimAPI_MakePrism* aPrismBuilder =
       new BRepPrimAPI_MakePrism(aMovedBase, aDirVec * 2 * aPrismLength);
     if(!aPrismBuilder) {
       return;
@@ -471,12 +471,12 @@ void storeGenerationHistory(GeomAlgoAPI_Prism* thePrismAlgo,
     if(theType == TopAbs_VERTEX) {
       gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
       IntTools_Context anIntTools;
-      if(anIntTools.IsValidPointForFace(aPnt, 
+      if(anIntTools.IsValidPointForFace(aPnt,
           theToFace, Precision::Confusion()) == Standard_True) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
         thePrismAlgo->addToShape(aGeomSh);
       }
-      if(anIntTools.IsValidPointForFace(aPnt, 
+      if(anIntTools.IsValidPointForFace(aPnt,
           theFromFace, Precision::Confusion()) == Standard_True) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
         thePrismAlgo->addFromShape(aGeomSh);

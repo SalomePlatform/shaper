@@ -119,10 +119,10 @@ private:
 
   /// additional constraints for correct processing of the arcs
   std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >
-                                   myArcConstraintMap;   
+                                   myArcConstraintMap;
 
   /// list of removed constraints to notify solver
-  std::list<GCSConstraintPtr>      myRemovedConstraints; 
+  std::list<GCSConstraintPtr>      myRemovedConstraints;
 };
 
 #endif

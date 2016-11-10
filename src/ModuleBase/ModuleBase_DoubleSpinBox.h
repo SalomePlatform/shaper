@@ -57,7 +57,7 @@ Q_OBJECT
   bool enableKeyPressEvent(const bool& theEnable);
 
   /// Imitation of disable control value. If theEnable is false, the control becomes
-  /// read only and base color is disabled. 
+  /// read only and base color is disabled.
   void setValueEnabled(const bool& theEnable);
 
 signals:

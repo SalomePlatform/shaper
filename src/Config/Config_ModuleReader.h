@@ -42,7 +42,7 @@ class Config_ModuleReader : public Config_XMLReader
   /// Returns list of module's xml files
   CONFIG_EXPORT const std::set<std::string>& modulePluginFiles() const;
   /// Returns module name: an xml attribute from the root of the plugins.xml:
-  /// e.g \code <plugins module="PartSet"> \endcode 
+  /// e.g \code <plugins module="PartSet"> \endcode
   CONFIG_EXPORT std::string getModuleName();
   /// Detects type of the given plugin and loads it using loadLibrary or loadScript.
   CONFIG_EXPORT static void loadPlugin(const std::string& thePluginName);
@@ -70,7 +70,7 @@ class Config_ModuleReader : public Config_XMLReader
   std::string addPlugin(const std::string& aPluginLibrary,
                         const std::string& aPluginScript,
                         const std::string& aPluginConf);
-  /// Save feature in myFeaturesInFiles. 
+  /// Save feature in myFeaturesInFiles.
   /// Generates an error if the feature name is already registered.
   void addFeature(const std::string& theFeatureName, const std::string& thePluginConfig);
 

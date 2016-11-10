@@ -91,7 +91,7 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
 
   GCS::VEC_I aRedundantID;
 
-  // Workaround: the system with tangent constraint 
+  // Workaround: the system with tangent constraint
   // may fail if the tangent entities are connected smoothly.
   // Investigate this situation and move constraints to redundant list
   if (aResult == GCS::Failed && !myTangent.empty()) {
@@ -128,7 +128,7 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
           }
       }
     }
-    // The system with tangent constraints may show redundant constraints 
+    // The system with tangent constraints may show redundant constraints
     // if the entities are coupled smoothly.
     // Sometimes tangent constraints are fall to both conflicting and redundant constraints.
     // Need to check if there are redundant constraints without these tangencies.

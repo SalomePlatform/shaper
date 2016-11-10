@@ -218,7 +218,7 @@ void XGUI_ContextMenuMgr::onContextMenuRequest(QContextMenuEvent* theEvent)
   }
 }
 
-void XGUI_ContextMenuMgr::updateObjectBrowserMenu() 
+void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
 {
   foreach(QAction* aAction, myActions)
     aAction->setEnabled(false);
@@ -340,7 +340,7 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
 
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  QList<ModuleBase_ViewerPrsPtr> aPrsList = 
+  QList<ModuleBase_ViewerPrsPtr> aPrsList =
     aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
   if (aPrsList.size() > 0) {
     bool isVisible = false;
@@ -353,7 +353,7 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
       if (aRes && aRes->isDisplayed()) {
         isVisible = true;
         canBeShaded = myWorkshop->displayer()->canBeShaded(aObject);
-        isShading = 
+        isShading =
           (myWorkshop->displayer()->displayMode(aObject) == XGUI_Displayer::Shading);
         break;
       }
@@ -394,10 +394,10 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
   } else {
     foreach(int aMode, aModes) {
       switch (aMode) {
-      case TopAbs_VERTEX: 
+      case TopAbs_VERTEX:
         action("SELECT_VERTEX_CMD")->setChecked(true);
         break;
-      case TopAbs_EDGE: 
+      case TopAbs_EDGE:
         action("SELECT_EDGE_CMD")->setChecked(true);
         break;
       case TopAbs_FACE:
@@ -407,7 +407,7 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
         action("SELECT_RESULT_CMD")->setChecked(true);
       }
     }
-  } 
+  }
 
   ModuleBase_IModule* aModule = myWorkshop->module();
   if (aModule)
@@ -566,7 +566,7 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
 void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
 {
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
-  QList<ModuleBase_ViewerPrsPtr> aPrsList = 
+  QList<ModuleBase_ViewerPrsPtr> aPrsList =
     aSelMgr->selection()->getSelected(ModuleBase_ISelection::Viewer);
   int aSelected = aPrsList.size();
   QActionsList aActions;
@@ -658,7 +658,7 @@ void XGUI_ContextMenuMgr::onRename()
 {
   QObjectPtrList anObjects = myWorkshop->selector()->selection()->selectedObjects();
   if (!myWorkshop->abortAllOperations())
-    return; 
+    return;
   // restore selection in case if dialog box was shown
   myWorkshop->objectBrowser()->setObjectsSelected(anObjects);
   myWorkshop->objectBrowser()->onEditItem();
@@ -686,18 +686,18 @@ void XGUI_ContextMenuMgr::addFeatures(QMenu* theMenu) const
         return;
       if ((!aIsRoot) && (aIdx.internalPointer() != aActiveDoc.get()))
         return;
-      
+
       // Get name of the selected index
       aName = aIdx.data().toString();
       aLen = aName.indexOf('(');
       if (aLen != -1) {
         aName = aName.left(--aLen);
       }
-      std::string aFeaturesStr = aIsRoot? 
+      std::string aFeaturesStr = aIsRoot?
         aDataModelXML->rootFolderFeatures(aName.toStdString()) :
         aDataModelXML->subFolderFeatures(aName.toStdString());
         if (aFeaturesStr.length() > 0) {
-          QStringList aFeturesList = 
+          QStringList aFeturesList =
             QString(aFeaturesStr.c_str()).split(",", QString::SkipEmptyParts);
           foreach(QString aFea, aFeturesList) {
             QAction* aAction = aActionMgr->action(aFea);

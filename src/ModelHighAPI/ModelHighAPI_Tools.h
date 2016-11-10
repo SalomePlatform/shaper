@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : ModelHighAPI_Tools.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 07/06/16 - Sergey POKHODENKO - Creation of the file
@@ -138,4 +138,4 @@ bool checkPythonDump();
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
-#endif /* SRC_MODELHIGHAPI_MODELHIGHAPI_TOOLS_H_ */ 
+#endif /* SRC_MODELHIGHAPI_MODELHIGHAPI_TOOLS_H_ */

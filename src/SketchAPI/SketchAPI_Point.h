@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_Point.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 15/06/16 - Sergey POKHODENKO - Creation of the file

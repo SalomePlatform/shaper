@@ -78,7 +78,7 @@ void SketchPlugin_Point::attributeChanged(const std::string& theID) {
     // update arguments due to the selection value
     if (aSelection && !aSelection->isNull() && aSelection->isVertex()) {
       std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aSelection));
-      std::shared_ptr<GeomDataAPI_Point2D> aCoordAttr = 
+      std::shared_ptr<GeomDataAPI_Point2D> aCoordAttr =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(COORD_ID()));
       aCoordAttr->setValue(sketch()->to2D(aVertex->point()));
     }

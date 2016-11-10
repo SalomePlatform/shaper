@@ -71,7 +71,7 @@ void SketchPlugin_MultiTranslation::execute()
   if (!aStart || !aEnd)
     return;
 
-  std::shared_ptr<GeomAPI_XY> 
+  std::shared_ptr<GeomAPI_XY>
     aShiftVec(new GeomAPI_XY(aEnd->x() - aStart->x(), aEnd->y() - aStart->y()));
 
   // Wait all objects being created, then send update events
@@ -113,7 +113,7 @@ void SketchPlugin_MultiTranslation::execute()
     if (!(*aUsedIter)) {
       aRefListOfShapes->remove(*anInitIter);
       aRefListOfTranslated->remove(*aTargetIter++);
-      for (int i = 0; i < aCurrentNbCopies && aTargetIter != aTargetList.end(); 
+      for (int i = 0; i < aCurrentNbCopies && aTargetIter != aTargetList.end();
            i++, aTargetIter++) {
         aRefListOfTranslated->remove(*aTargetIter);
         // remove the corresponding feature from the sketch
@@ -226,7 +226,7 @@ void SketchPlugin_MultiTranslation::erase()
         if(aRes.get()) {
           FeaturePtr aFeature = aRes->document()->feature(aRes);
           if(aFeature.get()) {
-            AttributeBooleanPtr aBooleanAttr = 
+            AttributeBooleanPtr aBooleanAttr =
               aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID());
             if(aBooleanAttr.get()) {
               if (ModelAPI_Session::get()->isOperation()) // if this is not undo or redo
@@ -250,7 +250,7 @@ ObjectPtr SketchPlugin_MultiTranslation::copyFeature(ObjectPtr theObject)
   if (!aFeature || !aResult)
     return ObjectPtr();
 
-  FeaturePtr aNewFeature = 
+  FeaturePtr aNewFeature =
     SketchPlugin_Sketch::addUniqueNamedCopiedFeature(aFeature, sketch(), true);
 
   aNewFeature->execute();

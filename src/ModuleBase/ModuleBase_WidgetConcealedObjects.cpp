@@ -89,7 +89,7 @@ bool ModuleBase_WidgetConcealedObjects::restoreValueCustom()
       }
     }
   }
-  
+
   DataPtr aData = myFeature->data();
   AttributeRefListPtr anAttributeList = aData->reflist(attributeID());
   int aSize = anAttributeList->size();

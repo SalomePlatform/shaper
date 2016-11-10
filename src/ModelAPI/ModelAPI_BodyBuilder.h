@@ -49,27 +49,27 @@ public:
   /// Records the subshape newShape which was generated during a topological construction.
   /// As an example, consider the case of a face generated in construction of a box.
   virtual void generated(
-    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, 
+    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName,
     const int theTag = 1) = 0;
 
   /// Records the shape newShape which was generated from the shape oldShape during a topological
-  /// construction. As an example, consider the case of a face generated from an edge in 
+  /// construction. As an example, consider the case of a face generated from an edge in
   /// construction of a prism.
   virtual void generated(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
-    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, 
+    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName,
     const int theTag = 1) = 0;
 
   /// Records the shape newShape which is a modification of the shape oldShape.
   /// As an example, consider the case of a face split or merged in a Boolean operation.
   virtual void modified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
-    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, 
+    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName,
     const int theTag = 1) = 0;
 
   /// Records the shape oldShape which was deleted from the current label.
   /// As an example, consider the case of a face removed by a Boolean operation.
   virtual void deleted(
     const std::shared_ptr<GeomAPI_Shape>& theOldShape, const int theTag = 1) = 0;
-  
+
   /// load deleted shapes
   virtual void loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
                                                std::shared_ptr<GeomAPI_Shape>  theShapeIn,
@@ -94,18 +94,18 @@ public:
                                                GeomAPI_DataMapOfShapeShape& theSubShapes) = 0;
 
   /// load shapes of the first level (to be used during shape import)
-  virtual void loadFirstLevel(std::shared_ptr<GeomAPI_Shape> theShape, 
+  virtual void loadFirstLevel(std::shared_ptr<GeomAPI_Shape> theShape,
                               const std::string& theName, int&  theTag) = 0;
-  
+
   /// load disconnected edges
-  virtual void loadDisconnectedEdges(std::shared_ptr<GeomAPI_Shape> theShape, 
+  virtual void loadDisconnectedEdges(std::shared_ptr<GeomAPI_Shape> theShape,
                                      const std::string& theName, int&  theTag) = 0;
 
   /// load disconnected vetexes
-  virtual void loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape, 
+  virtual void loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape,
                                         const std::string& theName,int&  theTag) = 0;
 
-  /// Converts evolution of sub-shapes stored in naming structure to selection 
+  /// Converts evolution of sub-shapes stored in naming structure to selection
   /// (theFlag = true) and back (theFlag = false)
   virtual void evolutionToSelection(const bool theFlag) = 0;
 

@@ -31,7 +31,7 @@ public:
   /// Produces the string-name for the selected shape
   std::string namingName(ResultPtr& theContext, std::shared_ptr<GeomAPI_Shape> theSubSh,
     const std::string& theDefaultName, const bool theAnotherDoc);
-  
+
   /// Makes a selection by the string-name
   /// \param theType string of the type of the shape
   /// \param theSubShapeName string-identifier of the selected shape
@@ -42,16 +42,16 @@ public:
     std::shared_ptr<Model_Document> theDoc, std::shared_ptr<GeomAPI_Shape>& theShapeToBeSelected,
     std::shared_ptr<ModelAPI_Result>& theCont);
 
-  /// Searches the face more appropriate to the given curves 
+  /// Searches the face more appropriate to the given curves
   /// (with higher level of matched parameters)
   /// \param theConstr construction result that contains one or several  faces
-  /// \param theCurves map from the face edges curves to orientation 
+  /// \param theCurves map from the face edges curves to orientation
   ///                  (-1 reversed, 0 unknown, 1 forward)
-  /// \param theIsWire for wire algorithm isquite the same, 
+  /// \param theIsWire for wire algorithm isquite the same,
   ///                  but if in face several wires, it returns the needed wire
   /// \returns faces fron this construction if found
   static std::shared_ptr<GeomAPI_Shape> findAppropriateFace(
-    std::shared_ptr<ModelAPI_Result>& theConstr, 
+    std::shared_ptr<ModelAPI_Result>& theConstr,
     NCollection_DataMap<Handle(Geom_Curve), int>& theCurves, const bool theIsWire);
 
   /// Returns orientation of the edge in the context shape

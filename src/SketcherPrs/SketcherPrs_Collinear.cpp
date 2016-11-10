@@ -19,14 +19,14 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Collinear, SketcherPrs_SymbolPrs);
 
 static Handle(Image_AlienPixMap) MyPixMap;
 
-SketcherPrs_Collinear::SketcherPrs_Collinear(ModelAPI_Feature* theConstraint, 
-                                     const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
+SketcherPrs_Collinear::SketcherPrs_Collinear(ModelAPI_Feature* theConstraint,
+                                     const std::shared_ptr<GeomAPI_Ax3>& thePlane)
  : SketcherPrs_SymbolPrs(theConstraint, thePlane)
 {
   myPntArray = new Graphic3d_ArrayOfPoints(2);
   myPntArray->AddVertex(0., 0., 0.);
   myPntArray->AddVertex(0., 0., 0.);
-}  
+}
 
 bool SketcherPrs_Collinear::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
                                          const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
@@ -35,7 +35,7 @@ bool SketcherPrs_Collinear::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
 
   ObjectPtr aObj1 =
     SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
-  ObjectPtr aObj2 = 
+  ObjectPtr aObj2 =
     SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_B());
 
   aReadyToDisplay = SketcherPrs_Tools::getShape(aObj1).get() != NULL &&
@@ -49,9 +49,9 @@ bool SketcherPrs_Collinear::updateIfReadyToDisplay(double theStep) const
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
 
-  ObjectPtr aObj1 = 
+  ObjectPtr aObj1 =
     SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
-  ObjectPtr aObj2 = 
+  ObjectPtr aObj2 =
     SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
 
   // Set points of the presentation
@@ -63,12 +63,12 @@ bool SketcherPrs_Collinear::updateIfReadyToDisplay(double theStep) const
   return true;
 }
 
-void SketcherPrs_Collinear::drawLines(const Handle(Prs3d_Presentation)& thePrs, 
+void SketcherPrs_Collinear::drawLines(const Handle(Prs3d_Presentation)& thePrs,
                                       Quantity_Color theColor) const
 {
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
 
-  Handle(Graphic3d_AspectLine3d) aLineAspect = 
+  Handle(Graphic3d_AspectLine3d) aLineAspect =
     new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
   aGroup->SetPrimitivesAspect(aLineAspect);
 

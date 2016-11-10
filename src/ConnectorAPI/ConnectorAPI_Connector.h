@@ -1,7 +1,7 @@
 // Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
 // Name   : ConnectorAPI_Connector.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 16/06/16 - Sergey POKHODENKO - Creation of the file

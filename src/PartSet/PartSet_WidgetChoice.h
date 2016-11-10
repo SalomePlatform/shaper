@@ -22,7 +22,7 @@ Q_OBJECT
   /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
-  PartSet_WidgetChoice(QWidget* theParent, const Config_WidgetAPI* theData) 
+  PartSet_WidgetChoice(QWidget* theParent, const Config_WidgetAPI* theData)
     : ModuleBase_WidgetChoice(theParent, theData) {}
 };
 

@@ -143,7 +143,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   bool aCloc = aResMgr->booleanValue("language", "locale", true);
   if (aCloc)
     QLocale::setDefault( QLocale::c() );
-  else 
+  else
     QLocale::setDefault( QLocale::system() );
 #endif
   QString aPath = Config_XMLReader::pluginConfigFile().c_str();
@@ -183,9 +183,9 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
           SLOT(onOperationResumed(ModuleBase_Operation*)));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           SLOT(onOperationStopped(ModuleBase_Operation*)));
-  connect(myOperationMgr, SIGNAL(operationCommitted(ModuleBase_Operation*)), 
+  connect(myOperationMgr, SIGNAL(operationCommitted(ModuleBase_Operation*)),
           SLOT(onOperationCommitted(ModuleBase_Operation*)));
-  connect(myOperationMgr, SIGNAL(operationAborted(ModuleBase_Operation*)), 
+  connect(myOperationMgr, SIGNAL(operationAborted(ModuleBase_Operation*)),
           SLOT(onOperationAborted(ModuleBase_Operation*)));
 
 #ifndef HAVE_SALOME
@@ -203,21 +203,21 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
                                    Config_Prop::Color, ModelAPI_ResultBody::DEFAULT_COLOR());
   Config_PropManager::registerProp("Visualization", "result_group_color", "Group color",
                                    Config_Prop::Color, ModelAPI_ResultGroup::DEFAULT_COLOR());
-  Config_PropManager::registerProp("Visualization", "result_construction_color", 
+  Config_PropManager::registerProp("Visualization", "result_construction_color",
                                    "Construction color",
-                                   Config_Prop::Color, 
+                                   Config_Prop::Color,
                                    ModelAPI_ResultConstruction::DEFAULT_COLOR());
   Config_PropManager::registerProp("Visualization", "result_part_color", "Part color",
                                    Config_Prop::Color, ModelAPI_ResultPart::DEFAULT_COLOR());
 
-  Config_PropManager::registerProp("Visualization", "body_deflection", 
+  Config_PropManager::registerProp("Visualization", "body_deflection",
                                    "Body deflection coefficient",
-                                   Config_Prop::Double, 
+                                   Config_Prop::Double,
                                    ModelAPI_ResultBody::DEFAULT_DEFLECTION());//"0.001");
 
-  Config_PropManager::registerProp("Visualization", "construction_deflection", 
+  Config_PropManager::registerProp("Visualization", "construction_deflection",
                                    "Construction deflection coefficient",
-                                   Config_Prop::Double, 
+                                   Config_Prop::Double,
                                    ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());//"0.0001");
 
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "face-selection", true))
@@ -269,7 +269,7 @@ void XGUI_Workshop::startApplication()
   myMainWindow->show();
   updateCommandStatus();
 #endif
-  
+
   onNew();
 
   myViewerProxy->connectViewProxy();
@@ -326,7 +326,7 @@ void XGUI_Workshop::initMenu()
   QAction* aAction = salomeConnector()->addDesktopCommand("UNDO_CMD", tr("Undo"),
                                                         tr("Undo last command"),
                                                         QIcon(":pictures/undo.png"),
-                                                        QKeySequence::Undo, false, 
+                                                        QKeySequence::Undo, false,
                                                         "MEN_DESK_EDIT");
   QString aToolBarTitle = tr( "INF_DESK_TOOLBAR_STANDARD" );
   salomeConnector()->addActionInToolbar( aAction,aToolBarTitle  );
@@ -343,7 +343,7 @@ void XGUI_Workshop::initMenu()
   addHistoryMenu(aAction, SIGNAL(updateRedoHistory(const QList<ActionInfo>&)), SLOT(onRedo(int)));
 
   salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
-  //aAction = salomeConnector()->addDesktopCommand("REBUILD_CMD", tr("Rebuild"), 
+  //aAction = salomeConnector()->addDesktopCommand("REBUILD_CMD", tr("Rebuild"),
   //                                            tr("Rebuild data objects"),
   //                                            QIcon(":pictures/rebuild.png"), QKeySequence(),
   //                                            false, "MEN_DESK_EDIT");
@@ -352,13 +352,13 @@ void XGUI_Workshop::initMenu()
   //connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRebuild()));
   //salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
 
-  aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export native..."), 
+  aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export native..."),
                                              tr("Export the current document into a native file"),
                                               QIcon(), QKeySequence(),
                                               false, "MEN_DESK_FILE");
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onSaveAs()));
 
-  aAction = salomeConnector()->addDesktopCommand("OPEN_CMD", tr("Import native..."), 
+  aAction = salomeConnector()->addDesktopCommand("OPEN_CMD", tr("Import native..."),
                                               tr("Import native file"),
                                               QIcon(), QKeySequence(),
                                               false, "MEN_DESK_FILE");
@@ -495,7 +495,7 @@ bool XGUI_Workshop::isFeatureOfNested(const FeaturePtr& theFeature)
     XGUI_SalomeConnector* aSalomeConnector = salomeConnector();
     if (aSalomeConnector->isFeatureOfNested(actionsMgr()->action(aFeatureKind.c_str())))
       aHasNested = true;
-#else 
+#else
     AppElements_MainMenu* aMenuBar = mainWindow()->menuObject();
     AppElements_Command* aCommand = aMenuBar->feature(aFeatureKind.c_str());
     if (aCommand && aCommand->button()->additionalButtonWidget())
@@ -506,7 +506,7 @@ bool XGUI_Workshop::isFeatureOfNested(const FeaturePtr& theFeature)
 
 void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_OperationFeature* aFOperation = 
+  ModuleBase_OperationFeature* aFOperation =
     dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (!aFOperation)
     return;
@@ -550,7 +550,7 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
 
   // update visible state of Preview button
 #ifdef HAVE_SALOME
-  bool anIsAutoPreview = 
+  bool anIsAutoPreview =
     mySalomeConnector->featureInfo(aFeatureKind.c_str())->isAutoPreview();
 #else
   AppElements_MainMenu* aMenuBar = mainWindow()->menuObject();
@@ -880,7 +880,7 @@ bool XGUI_Workshop::onSaveAs()
   if (aDir.exists() && !aDir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).isEmpty()) {
     int answer = QMessageBox::question(
         desktop(),
-        // Title of the dialog which asks user if he wants to save study 
+        // Title of the dialog which asks user if he wants to save study
         // in existing non-empty folder
         tr("Save"),
         tr("The directory already contains some files, save anyway?"),
@@ -1146,8 +1146,8 @@ void XGUI_Workshop::updateHistory()
 QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
 {
   QDockWidget* aObjDock = new QDockWidget(theParent);
-  aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | 
-                            Qt::RightDockWidgetArea | 
+  aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea |
+                            Qt::RightDockWidgetArea |
                             Qt::BottomDockWidgetArea);
   aObjDock->setWindowTitle(tr("Object browser"));
   aObjDock->setStyleSheet(
@@ -1173,8 +1173,8 @@ void XGUI_Workshop::createDockWidgets()
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
   myPropertyPanel = new XGUI_PropertyPanel(aDesktop, myOperationMgr);
   myPropertyPanel->setupActions(myActionsMgr);
-  myPropertyPanel->setAllowedAreas(Qt::LeftDockWidgetArea | 
-                                   Qt::RightDockWidgetArea | 
+  myPropertyPanel->setAllowedAreas(Qt::LeftDockWidgetArea |
+                                   Qt::RightDockWidgetArea |
                                    Qt::BottomDockWidgetArea);
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanel);
   hidePropertyPanel();  ///<! Invisible by default
@@ -1449,7 +1449,7 @@ void XGUI_Workshop::cleanHistory()
   for (; aMainIt != aMainLast; aMainIt++) {
     FeaturePtr aMainListFeature = aMainIt->first;
     std::set<FeaturePtr> aMainRefList = aMainIt->second;
-    std::set<FeaturePtr>::const_iterator aRefIt = aMainRefList.begin(), 
+    std::set<FeaturePtr>::const_iterator aRefIt = aMainRefList.begin(),
                                                   aRefLast = aMainRefList.end();
     bool aFeatureOutOfTheList = false;
     for (; aRefIt != aRefLast && !aFeatureOutOfTheList; aRefIt++) {
@@ -1496,7 +1496,7 @@ void XGUI_Workshop::cleanHistory()
       return;
 
     // 1. start operation
-    aDescription += "by deleting of " + 
+    aDescription += "by deleting of " +
       aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
     ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
     operationMgr()->startOperation(anOpAction);
@@ -1635,17 +1635,17 @@ std::list<FeaturePtr> toCurrentFeatures(const ObjectPtr& theObject)
   DocumentPtr aDocument = theObject->document();
   std::list<FeaturePtr> anAllFeatures = allFeatures(aDocument);
   // find the object iterator
-  std::list<FeaturePtr>::iterator aObjectIt = 
+  std::list<FeaturePtr>::iterator aObjectIt =
     std::find(anAllFeatures.begin(), anAllFeatures.end(), theObject);
   if (aObjectIt == anAllFeatures.end())
     return aResult;
   // find the current feature iterator
-  std::list<FeaturePtr>::iterator aCurrentIt = 
+  std::list<FeaturePtr>::iterator aCurrentIt =
     std::find(anAllFeatures.begin(), anAllFeatures.end(), aDocument->currentFeature(true));
   if (aCurrentIt == anAllFeatures.end())
     return aResult;
   // check the right order
-  if (std::distance(aObjectIt, anAllFeatures.end()) <= 
+  if (std::distance(aObjectIt, anAllFeatures.end()) <=
       std::distance(aCurrentIt, anAllFeatures.end()))
     return aResult;
   // exclude the object
@@ -1677,14 +1677,14 @@ bool XGUI_Workshop::canMoveFeature()
   QObjectPtrList::const_iterator anIt = aObjects.begin(), aLast = aObjects.end();
   for (; anIt != aLast && aCanMove; anIt++) {
     ObjectPtr aObject = *anIt;
-    // 1. Get features placed between selected and current in the document 
+    // 1. Get features placed between selected and current in the document
     std::list<FeaturePtr> aFeaturesBetween = toCurrentFeatures(aObject);
     // if aFeaturesBetween is empty it means wrong order or aObject is the current feature
     if (aFeaturesBetween.empty())
       aCanMove = false;
     else {
       std::set<FeaturePtr> aPlacedFeatures(aFeaturesBetween.begin(), aFeaturesBetween.end());
-      // 2. Get all reference features to the selected object in the document 
+      // 2. Get all reference features to the selected object in the document
       std::set<FeaturePtr> aRefFeatures;
       ModuleBase_Tools::refsToFeatureInFeatureDocument(aObject, aRefFeatures);
 
@@ -1756,7 +1756,7 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 
   AttributeIntArrayPtr aColorAttr;
   // 1. find the current color of the object. This is a color of AIS presentation
-  // The objects are iterated until a first valid color is found 
+  // The objects are iterated until a first valid color is found
   std::vector<int> aColor;
   foreach(ObjectPtr anObject, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
@@ -1781,7 +1781,7 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
     return;
 
   if (!abortAllOperations())
-  return; 
+  return;
   // 2. show the dialog to change the value
   XGUI_ColorDialog* aDlg = new XGUI_ColorDialog(desktop());
   aDlg->setColor(aColor);
@@ -1802,11 +1802,11 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {
-      ResultCompSolidPtr aCompsolidResult = 
+      ResultCompSolidPtr aCompsolidResult =
         std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
       if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
         for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
-          setColor(aCompsolidResult->subResult(i), !isRandomColor ? aColorResult : 
+          setColor(aCompsolidResult->subResult(i), !isRandomColor ? aColorResult :
                                                                     aDlg->getRandomColor());
         }
       }
@@ -1847,7 +1847,7 @@ void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
 {
   AttributeDoublePtr aDoubleAttr;
   // 1. find the current color of the object. This is a color of AIS presentation
-  // The objects are iterated until a first valid color is found 
+  // The objects are iterated until a first valid color is found
   double aDeflection = -1;
   foreach(ObjectPtr anObject, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
@@ -1871,7 +1871,7 @@ void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
     return;
 
   if (!abortAllOperations())
-  return; 
+  return;
   // 2. show the dialog to change the value
   XGUI_DeflectionDialog* aDlg = new XGUI_DeflectionDialog(desktop());
   aDlg->setDeflection(aDeflection);
@@ -1890,7 +1890,7 @@ void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {
-      ResultCompSolidPtr aCompsolidResult = 
+      ResultCompSolidPtr aCompsolidResult =
         std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
       if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
         for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
@@ -1975,7 +1975,7 @@ void XGUI_Workshop::displayDocumentResults(DocumentPtr theDoc)
 //**************************************************************
 void XGUI_Workshop::displayGroupResults(DocumentPtr theDoc, std::string theGroup)
 {
-  for (int i = 0; i < theDoc->size(theGroup); i++) 
+  for (int i = 0; i < theDoc->size(theGroup); i++)
     theDoc->object(theGroup, i)->setDisplayed(true);
     //displayObject(theDoc->object(theGroup, i));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
@@ -2078,8 +2078,8 @@ void XGUI_Workshop::synchronizeViewer()
   synchronizeGroupInViewer(aDoc, ModelAPI_ResultGroup::group(), false);
 }
 
-void XGUI_Workshop::synchronizeGroupInViewer(const DocumentPtr& theDoc, 
-                                             const std::string& theGroup, 
+void XGUI_Workshop::synchronizeGroupInViewer(const DocumentPtr& theDoc,
+                                             const std::string& theGroup,
                                              bool theUpdateViewer)
 {
   ObjectPtr aObj;
@@ -2122,8 +2122,8 @@ void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
     objectBrowser()->setObjectsSelected(aSelList);
     objectBrowser()->blockSignals(aBlocked);
   }
-  if (aHasHidden) 
-    QMessageBox::information(desktop(), tr("Find results"), 
+  if (aHasHidden)
+    QMessageBox::information(desktop(), tr("Find results"),
                              tr("Results not found"), QMessageBox::Ok);
 }
 

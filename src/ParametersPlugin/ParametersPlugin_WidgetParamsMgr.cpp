@@ -55,23 +55,23 @@ class ParametersPlugin_ItemDelegate : public QStyledItemDelegate
 public:
   /// Constructor
   /// \param thaParent a parent
-  ParametersPlugin_ItemDelegate(QObject* thaParent) : 
+  ParametersPlugin_ItemDelegate(QObject* thaParent) :
       QStyledItemDelegate(thaParent) {}
 
   /// Redefinition of virtual method
   /// \param painter a painter object
   /// \param option the item options
   /// \param index the current index
-  virtual void paint(QPainter* painter, 
-    const QStyleOptionViewItem& option, 
+  virtual void paint(QPainter* painter,
+    const QStyleOptionViewItem& option,
     const QModelIndex& index ) const;
-  
+
   /// Redefinition of virtual method
   /// \param parent a parent widget
   /// \param option the item options
   /// \param index the current index
-  virtual QWidget* createEditor(QWidget* parent, 
-                                const QStyleOptionViewItem& option, 
+  virtual QWidget* createEditor(QWidget* parent,
+                                const QStyleOptionViewItem& option,
                                 const QModelIndex& index) const;
 
   /// Returns True if the given index is editable item
@@ -96,8 +96,8 @@ bool ParametersPlugin_ItemDelegate::isEditable(const QModelIndex& theIndex) cons
   return true;
 }
 
-void ParametersPlugin_ItemDelegate::paint(QPainter* painter, 
-                                          const QStyleOptionViewItem& option, 
+void ParametersPlugin_ItemDelegate::paint(QPainter* painter,
+                                          const QStyleOptionViewItem& option,
                                           const QModelIndex& index ) const
 {
   QBrush aBrush = painter->brush();
@@ -114,8 +114,8 @@ void ParametersPlugin_ItemDelegate::paint(QPainter* painter,
   painter->setBrush(aBrush);
 }
 
-QWidget* ParametersPlugin_ItemDelegate::createEditor(QWidget* parent, 
-                                                     const QStyleOptionViewItem& option, 
+QWidget* ParametersPlugin_ItemDelegate::createEditor(QWidget* parent,
+                                                     const QStyleOptionViewItem& option,
                                                      const QModelIndex& index) const
 {
   myEditingIdx = index;
@@ -123,7 +123,7 @@ QWidget* ParametersPlugin_ItemDelegate::createEditor(QWidget* parent,
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-void ParametersPlugin_TreeWidget::closeEditor(QWidget* theEditor, 
+void ParametersPlugin_TreeWidget::closeEditor(QWidget* theEditor,
                                               QAbstractItemDelegate::EndEditHint theHint)
 {
   if (theHint == QAbstractItemDelegate::EditNextItem) {
@@ -159,7 +159,7 @@ void ParametersPlugin_TreeWidget::closeEditor(QWidget* theEditor,
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theParent, 
+ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theParent,
   const Config_WidgetAPI* theData)
   : ModuleBase_ModelDialogWidget(theParent, theData)
 {
@@ -183,7 +183,7 @@ ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theP
   connect(myTable, SIGNAL(itemSelectionChanged()), SLOT(onSelectionChanged()));
 
   myDelegate = new ParametersPlugin_ItemDelegate(myTable);
-  connect(myDelegate, SIGNAL(closeEditor(QWidget*, QAbstractItemDelegate::EndEditHint)), 
+  connect(myDelegate, SIGNAL(closeEditor(QWidget*, QAbstractItemDelegate::EndEditHint)),
           SLOT(onCloseEditor(QWidget*, QAbstractItemDelegate::EndEditHint)));
 
   myTable->setItemDelegate(myDelegate);
@@ -246,7 +246,7 @@ void ParametersPlugin_WidgetParamsMgr::selectItemScroll(QTreeWidgetItem* aItem)
   QModelIndex aParent = myTable->model()->index(0, 0);
   int aChildIdx = myParameters->indexOfChild(aItem);
   QModelIndex aIndex = myTable->model()->index(aChildIdx, Col_Name, aParent);
-  myTable->selectionModel()->select(aIndex, 
+  myTable->selectionModel()->select(aIndex,
     QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
   myTable->scrollToItem(aItem);
 }
@@ -409,7 +409,7 @@ void ParametersPlugin_WidgetParamsMgr::onDoubleClick(const QModelIndex& theIndex
   }
 }
 
-void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor, 
+void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
                                                      QAbstractItemDelegate::EndEditHint theHint)
 {
   FeaturePtr aFeature = myParametersList.at(myDelegate->editIndex().row());
@@ -433,12 +433,12 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
         }
         aStringAttr->setValue(aText.toStdString());
         isModified = true;
-      } 
+      }
     }
     break;
   case Col_Equation:
     {
-      AttributeStringPtr aStringAttr = 
+      AttributeStringPtr aStringAttr =
         aFeature->string(ParametersPlugin_Parameter::EXPRESSION_ID());
       if (!aText.isEmpty()) {
         if (aText != aStringAttr->value().c_str()) {
@@ -468,19 +468,19 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
   if (aColumn != Col_Comment)
     updateParametersPart();
   updateFeaturesPart();
-          
+
   onSelectionChanged();
 }
 
-void ParametersPlugin_WidgetParamsMgr::updateItem(QTreeWidgetItem* theItem, 
+void ParametersPlugin_WidgetParamsMgr::updateItem(QTreeWidgetItem* theItem,
                                                   const QList<QStringList>& theFeaturesList)
 {
   if (theFeaturesList.count() != theItem->childCount()) {
     if (theItem->childCount()  < theFeaturesList.count()) {
-      while (theItem->childCount() != theFeaturesList.count()) 
+      while (theItem->childCount() != theFeaturesList.count())
         theItem->addChild(createNewItem(theItem));
     } else {
-      while (theItem->childCount() != theFeaturesList.count()) 
+      while (theItem->childCount() != theFeaturesList.count())
         theItem->removeChild(theItem->child(theItem->childCount() - 1));
     }
   }
@@ -521,7 +521,7 @@ QTreeWidgetItem* ParametersPlugin_WidgetParamsMgr::createNewItem(QTreeWidgetItem
   QTreeWidgetItem* aItem = new QTreeWidgetItem(aValues);
   if (theParent == myParameters)
     aItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
-  else 
+  else
     aItem->setFlags(Qt::NoItemFlags);
   return aItem;
 }
@@ -534,7 +534,7 @@ void ParametersPlugin_WidgetParamsMgr::onAdd()
     return;
 
   myParametersList.append(aFeature);
-  updateParametersPart();    
+  updateParametersPart();
 
   QTreeWidgetItem* aItem = myParameters->child(myParameters->childCount() - 1);
 
@@ -742,7 +742,7 @@ void ParametersPlugin_WidgetParamsMgr::onSelectionChanged()
 void ParametersPlugin_WidgetParamsMgr::enableButtons(bool theEnable)
 {
   myAddBtn->setEnabled(theEnable);
-  if (theEnable) 
+  if (theEnable)
     onSelectionChanged();
   else {
     myInsertBtn->setEnabled(theEnable);
@@ -759,7 +759,7 @@ bool ParametersPlugin_WidgetParamsMgr::isValid()
   bool aIsValid = true;
   for(int i = 0; i < myParameters->childCount(); i++) {
     aItem = myParameters->child(i);
-    if ((aItem->text(Col_Name) == NoName) || 
+    if ((aItem->text(Col_Name) == NoName) ||
         (aItem->text(Col_Equation) == NoValue) ||
         (!ModelAPI_Expression::isVariable(aItem->text(Col_Name).toStdString())) ) {
       aIsValid = false;

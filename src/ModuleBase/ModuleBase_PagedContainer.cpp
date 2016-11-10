@@ -18,7 +18,7 @@
 #include <QVBoxLayout>
 
 
-ModuleBase_PagedContainer::ModuleBase_PagedContainer(QWidget* theParent, 
+ModuleBase_PagedContainer::ModuleBase_PagedContainer(QWidget* theParent,
                                                      const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData),
   myIsFocusOnCurrentPage(false)

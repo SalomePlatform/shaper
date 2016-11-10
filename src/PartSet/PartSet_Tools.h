@@ -78,14 +78,14 @@ public:
   /// \param theSketch the sketch feature
   /// \param thePnt the 3D point in the viewer
   /// \returns the converted point object
-  static std::shared_ptr<GeomAPI_Pnt2d> convertTo2D(FeaturePtr theSketch, 
+  static std::shared_ptr<GeomAPI_Pnt2d> convertTo2D(FeaturePtr theSketch,
                                                     const std::shared_ptr<GeomAPI_Pnt>& thePnt);
 
   /// \brief Converts the 2D projected coodinates on the sketch plane to the 3D point.
   /// \param theX the X coordinate
   /// \param theY the Y coordinate
   /// \param theSketch the sketch feature
-  static std::shared_ptr<GeomAPI_Pnt> convertTo3D(const double theX, const double theY, 
+  static std::shared_ptr<GeomAPI_Pnt> convertTo3D(const double theX, const double theY,
                                                   FeaturePtr theSketch);
 
   /// Returns pointer to the root document.
@@ -135,7 +135,7 @@ public:
   static std::shared_ptr<GeomDataAPI_Point2D> findFirstEqualPoint(const FeaturePtr& theFeature,
                                        const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
-  /// Creates constrains of the current 
+  /// Creates constrains of the current
   /// \param theSketch a sketch feature
   /// \param theFeature a source feature
   /// \param theAttribute a name of the requried attribute attribute
@@ -164,7 +164,7 @@ public:
   /// \return result of found feature or NULL
   static std::shared_ptr<ModelAPI_Result> findFixedObjectByExternal(
                                              const TopoDS_Shape& theShape,
-                                             const ObjectPtr& theObject, 
+                                             const ObjectPtr& theObject,
                                              CompositeFeaturePtr theSketch);
 
   /// Creates a line (arc or circle) by given edge
@@ -175,8 +175,8 @@ public:
   /// \param theTemporary the created external object is temporary, execute is not performed for it
   /// \return result of created feature
   static std::shared_ptr<ModelAPI_Result> createFixedObjectByExternal(
-                                               const TopoDS_Shape& theShape, 
-                                               const ObjectPtr& theObject, 
+                                               const TopoDS_Shape& theShape,
+                                               const ObjectPtr& theObject,
                                                CompositeFeaturePtr theSketch,
                                                const bool theTemporary = false);
 
@@ -207,7 +207,7 @@ public:
   /// \param theView a 3D view
   /// \param theX the output horizontal coordinate of the point
   /// \param theY the output vertical coordinate of the point
-  static bool hasVertexShape(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs, 
+  static bool hasVertexShape(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
                              FeaturePtr theSketch,
                              Handle_V3d_View theView, double& theX, double& theY);
 

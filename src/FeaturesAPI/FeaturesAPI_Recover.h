@@ -39,9 +39,9 @@ public:
   virtual ~FeaturesAPI_Recover();
 
   INTERFACE_3(FeaturesPlugin_Recover::ID(),
-              baseFeature, FeaturesPlugin_Recover::BASE_FEATURE(), 
+              baseFeature, FeaturesPlugin_Recover::BASE_FEATURE(),
               ModelAPI_AttributeReference, /** Concealed feature */,
-              recoveredList, FeaturesPlugin_Recover::RECOVERED_ENTITIES(), 
+              recoveredList, FeaturesPlugin_Recover::RECOVERED_ENTITIES(),
               ModelAPI_AttributeRefList, /** Recover list*/,
               isPersistent, FeaturesPlugin_Recover::PERSISTENT(),
               ModelAPI_AttributeBoolean, /** Is persistent flag */)

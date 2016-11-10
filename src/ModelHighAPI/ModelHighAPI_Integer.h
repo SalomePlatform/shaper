@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : ModelHighAPI_Integer.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 29/03/16 - Sergey POKHODENKO - Creation of the file

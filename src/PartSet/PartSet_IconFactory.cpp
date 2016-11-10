@@ -19,7 +19,7 @@ QMap<QString, QString> PartSet_IconFactory::myIcons;
 
 PartSet_IconFactory::PartSet_IconFactory():ModuleBase_IconFactory()
 {
-  Events_Loop::loop()->registerListener(this, 
+  Events_Loop::loop()->registerListener(this,
     Events_Loop::eventByName(Config_FeatureMessage::GUI_EVENT()));
 }
 
@@ -60,9 +60,9 @@ QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
                                              anIconString);
       }
       break;
-      default: break;  
+      default: break;
     }
-  } 
+  }
 
   if (theObj->data() && theObj->data()->execState() == ModelAPI_StateMustBeUpdated)
     return QIcon(":pictures/constr_object_modified.png");
@@ -100,7 +100,7 @@ QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
 
 void PartSet_IconFactory::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
-  if (theMessage->eventID() == 
+  if (theMessage->eventID() ==
       Events_Loop::loop()->eventByName(Config_FeatureMessage::GUI_EVENT())) {
     std::shared_ptr<Config_FeatureMessage> aFeatureMsg =
        std::dynamic_pointer_cast<Config_FeatureMessage>(theMessage);

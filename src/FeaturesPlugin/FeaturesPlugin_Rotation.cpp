@@ -22,11 +22,11 @@ FeaturesPlugin_Rotation::FeaturesPlugin_Rotation()
 //=================================================================================================
 void FeaturesPlugin_Rotation::initAttributes()
 {
-  AttributeSelectionListPtr aSelection = 
+  AttributeSelectionListPtr aSelection =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
     FeaturesPlugin_Rotation::OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
 
-  data()->addAttribute(FeaturesPlugin_Rotation::AXIS_OBJECT_ID(), 
+  data()->addAttribute(FeaturesPlugin_Rotation::AXIS_OBJECT_ID(),
                        ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(FeaturesPlugin_Rotation::ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
 }
@@ -37,13 +37,13 @@ void FeaturesPlugin_Rotation::execute()
   // Getting objects.
   ListOfShape anObjects;
   std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList = 
+  AttributeSelectionListPtr anObjectsSelList =
     selectionList(FeaturesPlugin_Rotation::OBJECTS_LIST_ID());
   if (anObjectsSelList->size() == 0) {
     return;
   }
   for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr = 
+    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
       anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
     if(!anObject.get()) {
@@ -60,12 +60,12 @@ void FeaturesPlugin_Rotation::execute()
     selection(FeaturesPlugin_Rotation::AXIS_OBJECT_ID());
   if(anObjRef && anObjRef->value() && anObjRef->value()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->value()));
-  } else if (anObjRef && !anObjRef->value() && anObjRef->context() && 
+  } else if (anObjRef && !anObjRef->value() && anObjRef->context() &&
              anObjRef->context()->shape() && anObjRef->context()->shape()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->context()->shape()));
   }
   if(anEdge) {
-    anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(), 
+    anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(),
                                                           anEdge->line()->direction()));
   }
 
@@ -75,7 +75,7 @@ void FeaturesPlugin_Rotation::execute()
   // Rotating each object.
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
-  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end(); 
+  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
     bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();

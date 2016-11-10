@@ -1,7 +1,7 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 // Name   : ExchangeAPI_Import.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 07/06/16 - Sergey POKHODENKO - Creation of the file
@@ -38,7 +38,7 @@ public:
   virtual ~ExchangeAPI_Import();
 
   INTERFACE_1(ExchangePlugin_ImportFeature::ID(),
-              filePath, ExchangePlugin_ImportFeature::FILE_PATH_ID(), 
+              filePath, ExchangePlugin_ImportFeature::FILE_PATH_ID(),
               ModelAPI_AttributeString, /** File path */
   )
 

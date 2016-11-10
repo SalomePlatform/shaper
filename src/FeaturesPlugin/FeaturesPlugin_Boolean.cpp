@@ -37,7 +37,7 @@ void FeaturesPlugin_Boolean::initAttributes()
 {
   data()->addAttribute(FeaturesPlugin_Boolean::TYPE_ID(), ModelAPI_AttributeInteger::typeId());
 
-  AttributeSelectionListPtr aSelection = 
+  AttributeSelectionListPtr aSelection =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
     FeaturesPlugin_Boolean::OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
 
@@ -76,7 +76,7 @@ void FeaturesPlugin_Boolean::execute()
   std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape> aCompSolidsObjects;
 
   // Getting objects.
-  AttributeSelectionListPtr anObjectsSelList = 
+  AttributeSelectionListPtr anObjectsSelList =
     selectionList(FeaturesPlugin_Boolean::OBJECT_LIST_ID());
   for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
     AttributeSelectionPtr anObjectAttr = anObjectsSelList->value(anObjectsIndex);
@@ -88,7 +88,7 @@ void FeaturesPlugin_Boolean::execute()
     ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
     if(aResCompSolidPtr.get()) {
       std::shared_ptr<GeomAPI_Shape> aContextShape = aResCompSolidPtr->shape();
-      std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator 
+      std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator
         anIt = aCompSolidsObjects.begin();
       for(; anIt != aCompSolidsObjects.end(); anIt++) {
         if(anIt->first->isEqual(aContextShape)) {
@@ -138,7 +138,7 @@ void FeaturesPlugin_Boolean::execute()
       }
 
       // For solids cut each object with all tools.
-      for(ListOfShape::iterator 
+      for(ListOfShape::iterator
           anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end(); anObjectsIt++) {
         std::shared_ptr<GeomAPI_Shape> anObject = *anObjectsIt;
         ListOfShape aListWithObject;
@@ -148,13 +148,13 @@ void FeaturesPlugin_Boolean::execute()
 
         switch(aType) {
           case BOOL_CUT: {
-            aBoolAlgo = 
+            aBoolAlgo =
               GeomAlgoAPI_Boolean(aListWithObject, aTools, GeomAlgoAPI_Boolean::BOOL_CUT);
             aResShape = aBoolAlgo.shape();
             break;
           }
           case BOOL_COMMON: {
-            aBoolAlgo = 
+            aBoolAlgo =
               GeomAlgoAPI_Boolean(aListWithObject, aTools, GeomAlgoAPI_Boolean::BOOL_COMMON);
             aResShape = aBoolAlgo.shape();
             break;
@@ -199,7 +199,7 @@ void FeaturesPlugin_Boolean::execute()
         if(GeomAlgoAPI_ShapeTools::volume(aResShape) > 1.e-27) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody =
             document()->createBody(data(), aResultIndex);
-          loadNamingDS(aResultBody, anObject, aTools, aResShape, 
+          loadNamingDS(aResultBody, anObject, aTools, aResShape,
                        aBoolAlgo, *aBoolAlgo.mapOfSubShapes().get());
           setResult(aResultBody, aResultIndex);
           aResultIndex++;
@@ -207,7 +207,7 @@ void FeaturesPlugin_Boolean::execute()
       }
 
       // Compsolids handling
-      for(std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator 
+      for(std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator
           anIt = aCompSolidsObjects.begin();
           anIt != aCompSolidsObjects.end(); anIt++) {
         std::shared_ptr<GeomAPI_Shape> aCompSolid = anIt->first;
@@ -215,7 +215,7 @@ void FeaturesPlugin_Boolean::execute()
 
         // Collecting solids from compsolids which will not be modified in boolean operation.
         ListOfShape aNotUsedSolids;
-        for(GeomAPI_ShapeExplorer 
+        for(GeomAPI_ShapeExplorer
             anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
           std::shared_ptr<GeomAPI_Shape> aSolidInCompSolid = anExp.current();
           ListOfShape::iterator anIt = aUsedInOperationSolids.begin();
@@ -287,9 +287,9 @@ void FeaturesPlugin_Boolean::execute()
         aMapOfShapes.merge(aFillerAlgo->mapOfSubShapes());
 
         if(GeomAlgoAPI_ShapeTools::volume(aFillerAlgo->shape()) > 1.e-27) {
-          std::shared_ptr<ModelAPI_ResultBody> aResultBody = 
+          std::shared_ptr<ModelAPI_ResultBody> aResultBody =
             document()->createBody(data(), aResultIndex);
-          loadNamingDS(aResultBody, aCompSolid, aTools, 
+          loadNamingDS(aResultBody, aCompSolid, aTools,
                        aFillerAlgo->shape(), aMakeShapeList, aMapOfShapes);
           setResult(aResultBody, aResultIndex);
           aResultIndex++;
@@ -298,7 +298,7 @@ void FeaturesPlugin_Boolean::execute()
       break;
     }
     case BOOL_FUSE: {
-      if((anObjects.size() + aTools.size() + 
+      if((anObjects.size() + aTools.size() +
           aCompSolidsObjects.size() + anEdgesAndFaces.size()) < 2) {
         std::string aFeatureError = "Error: Not enough objects for boolean operation.";
         setError(aFeatureError);
@@ -310,19 +310,19 @@ void FeaturesPlugin_Boolean::execute()
       aSolidsToFuse.insert(aSolidsToFuse.end(), anObjects.begin(), anObjects.end());
       aSolidsToFuse.insert(aSolidsToFuse.end(), aTools.begin(), aTools.end());
 
-      // Collecting solids from compsolids which will not be modified 
+      // Collecting solids from compsolids which will not be modified
       // in boolean operation and will be added to result.
       ListOfShape aShapesToAdd;
-      for(std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator 
+      for(std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator
           anIt = aCompSolidsObjects.begin();
           anIt != aCompSolidsObjects.end(); anIt++) {
         std::shared_ptr<GeomAPI_Shape> aCompSolid = anIt->first;
         ListOfShape& aUsedInOperationSolids = anIt->second;
-        aSolidsToFuse.insert(aSolidsToFuse.end(), aUsedInOperationSolids.begin(), 
+        aSolidsToFuse.insert(aSolidsToFuse.end(), aUsedInOperationSolids.begin(),
                              aUsedInOperationSolids.end());
 
         // Collect solids from compsolid which will not be modified in boolean operation.
-        for(GeomAPI_ShapeExplorer 
+        for(GeomAPI_ShapeExplorer
             anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
           std::shared_ptr<GeomAPI_Shape> aSolidInCompSolid = anExp.current();
           ListOfShape::iterator anIt = aUsedInOperationSolids.begin();
@@ -353,13 +353,13 @@ void FeaturesPlugin_Boolean::execute()
           aMapOfShapes.merge(aCutAlgo->mapOfSubShapes());
         }
       }
-      anOriginalShapes.insert(anOriginalShapes.end(), anEdgesAndFaces.begin(), 
+      anOriginalShapes.insert(anOriginalShapes.end(), anEdgesAndFaces.begin(),
                               anEdgesAndFaces.end());
 
       // If we have compsolids then cut with not used solids all others.
       if(!aShapesToAdd.empty()) {
         aSolidsToFuse.clear();
-        for(ListOfShape::iterator 
+        for(ListOfShape::iterator
             anIt = anOriginalShapes.begin(); anIt != anOriginalShapes.end(); anIt++) {
           ListOfShape aOneObjectList;
           aOneObjectList.push_back(*anIt);
@@ -449,9 +449,9 @@ void FeaturesPlugin_Boolean::execute()
 
       std::shared_ptr<GeomAPI_Shape> aBackShape = anOriginalShapes.back();
       anOriginalShapes.pop_back();
-      std::shared_ptr<ModelAPI_ResultBody> aResultBody = 
+      std::shared_ptr<ModelAPI_ResultBody> aResultBody =
         document()->createBody(data(), aResultIndex);
-      loadNamingDS(aResultBody, aBackShape, anOriginalShapes, 
+      loadNamingDS(aResultBody, aBackShape, anOriginalShapes,
                    aShape, aMakeShapeList, aMapOfShapes);
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
@@ -476,17 +476,17 @@ void FeaturesPlugin_Boolean::execute()
       // Collecting solids from compsolids which will not be modified in
       // boolean operation and will be added to result.
       ListOfShape aShapesToAdd;
-      for(std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator 
+      for(std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator
         anIt = aCompSolidsObjects.begin();
         anIt != aCompSolidsObjects.end(); anIt++) {
         std::shared_ptr<GeomAPI_Shape> aCompSolid = anIt->first;
         ListOfShape& aUsedInOperationSolids = anIt->second;
         anOriginalShapes.push_back(aCompSolid);
-        aShapesToSmash.insert(aShapesToSmash.end(), aUsedInOperationSolids.begin(), 
+        aShapesToSmash.insert(aShapesToSmash.end(), aUsedInOperationSolids.begin(),
                               aUsedInOperationSolids.end());
 
         // Collect solids from compsolid which will not be modified in boolean operation.
-        for(GeomAPI_ShapeExplorer 
+        for(GeomAPI_ShapeExplorer
             anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
           std::shared_ptr<GeomAPI_Shape> aSolidInCompSolid = anExp.current();
           ListOfShape::iterator anIt = aUsedInOperationSolids.begin();
@@ -582,9 +582,9 @@ void FeaturesPlugin_Boolean::execute()
 
       std::shared_ptr<GeomAPI_Shape> aFrontShape = anOriginalShapes.front();
       anOriginalShapes.pop_front();
-      std::shared_ptr<ModelAPI_ResultBody> aResultBody = 
+      std::shared_ptr<ModelAPI_ResultBody> aResultBody =
         document()->createBody(data(), aResultIndex);
-      loadNamingDS(aResultBody, aFrontShape, anOriginalShapes, 
+      loadNamingDS(aResultBody, aFrontShape, anOriginalShapes,
         aShape, aMakeShapeList, aMapOfShapes);
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
@@ -616,7 +616,7 @@ void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
     const int aModifyTag = 1;
     const int aDeletedTag = 2;
     /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
-    const int aSubsolidsTag = 3; 
+    const int aSubsolidsTag = 3;
     const int anEdgesAndFacesTag = 10000;
 
     theResultBody->storeModified(theBaseShape, theResultShape, aSubsolidsTag);
@@ -627,12 +627,12 @@ void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
 
     theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE,
                                                aModifyTag, aModName, theMapOfShapes);
-    theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape, 
+    theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape,
                                      GeomAPI_Shape::FACE, aDeletedTag);
 
     int aTag;
     std::string aName;
-    for(ListOfShape::const_iterator 
+    for(ListOfShape::const_iterator
         anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
       if((*anIter)->shapeType() == GeomAPI_Shape::EDGE) {
         aTag = anEdgesAndFacesTag;
@@ -645,7 +645,7 @@ void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
         aTag = aModifyTag;
         aName = aModName;
       }
-      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, 
+      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter,
         aName == aModEName ? GeomAPI_Shape::EDGE : GeomAPI_Shape::FACE,
         aTag, aName, theMapOfShapes);
       theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE, aDeletedTag);

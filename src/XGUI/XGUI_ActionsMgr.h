@@ -84,7 +84,7 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
   /// Return an action by the given id, if it was registered in the manager
   QAction* action(const QString& theId);
 
-  /// Return info (icon, text, etc) about the action by the given id, 
+  /// Return info (icon, text, etc) about the action by the given id,
   /// if it was registered in the manager
   ActionInfo actionInfoById(const QString& theId);
 
@@ -100,23 +100,23 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
 
   //! Updates actions according to current selection in the viewer
   void updateOnViewSelection();
-  
+
   //! Sets all actions to enabled state.
   void setAllEnabled();
-  
+
   //! Sets all nested actions to isEnabled state for the command with given ID.
   //! If ID is empty - all nested actions will be affected.
   void setNestedCommandsEnabled(bool isEnabled, const QString& theParent = QString());
-  
+
   //! Sets to enabled state all siblings of the given operation and it's parents recursively
   void setNestedStackEnabled(ModuleBase_Operation* theOperation);
-  
+
   //! Sets the action with theId to theChecked state.
   void setActionChecked(const QString& theId, const bool theChecked);
-  
+
   //! Sets the action with theId to theEnabled state.
   void setActionEnabled(const QString& theId, const bool theEnabled);
-  
+
   //! Updates actions according to their "document" tag
   void updateByDocumentKind();
 

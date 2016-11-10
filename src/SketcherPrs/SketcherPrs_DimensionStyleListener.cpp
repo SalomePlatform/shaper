@@ -91,7 +91,7 @@ void SketcherPrs_DimensionStyleListener::updateDimensions(AIS_Dimension* theDime
       aCustomValue = theTextValue.c_str();
     else {
       // format value string using "sprintf"
-      TCollection_AsciiString aFormatStr = 
+      TCollection_AsciiString aFormatStr =
         theDimension->Attributes()->DimensionAspect()->ValueStringFormat();
       char aFmtBuffer[256];
       sprintf (aFmtBuffer, aFormatStr.ToCString(), theDoubleValue);

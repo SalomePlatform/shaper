@@ -132,8 +132,8 @@ std::string Config_Translator::translate(const std::string& theContext,
 
 
 std::string Config_Translator::codec(const std::string& theContext)
-{ 
-  return (myCodecs.count(theContext) > 0)? myCodecs[theContext] : "UTF-8"; 
+{
+  return (myCodecs.count(theContext) > 0)? myCodecs[theContext] : "UTF-8";
 }
 
 

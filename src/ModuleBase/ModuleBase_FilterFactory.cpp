@@ -19,7 +19,7 @@ void ModuleBase_FilterFactory::registerFilter(const std::string& theID,
                                               ModuleBase_Filter* theFilter)
 {
   if (myIDs.find(theID) != myIDs.end()) {
-    Events_InfoMessage("ModuleBase_FilterFactory", 
+    Events_InfoMessage("ModuleBase_FilterFactory",
       "Filter %1 is already registered").arg(theID).send();
   } else {
     myIDs[theID] = theFilter;
@@ -54,7 +54,7 @@ void ModuleBase_FilterFactory::filters(const std::string& theFeatureID,
 {
   SelectMgr_ListOfFilter aFilters;
 
-  std::map<std::string, std::map<std::string, AttrFilters> >::const_iterator aFeature = 
+  std::map<std::string, std::map<std::string, AttrFilters> >::const_iterator aFeature =
     myAttrs.find(theFeatureID);
   if (aFeature != myAttrs.cend()) {
     std::map<std::string, AttrFilters>::const_iterator anAttr = aFeature->second.find(theAttrID);

@@ -31,7 +31,7 @@ class XGUI_EXPORT XGUI_WorkshopListener : public QObject, public Events_Listener
   Q_OBJECT
 public:
   /// Constructor. Used only if the workshop is launched in Salome environment
-  /// \param theWorkshop a reference to workshop. 
+  /// \param theWorkshop a reference to workshop.
    XGUI_WorkshopListener(ModuleBase_IWorkshop* theWorkshop);
   virtual ~XGUI_WorkshopListener();
 
@@ -83,7 +83,7 @@ protected:
   /// Calls the module method of cusomize object for the feature of the current operation
   /// Perform cusomize if the force redisplay flag is true or the list of objects contains the
   /// current operation feature
-  /// \param theObjects a list of objects to find current operation feature 
+  /// \param theObjects a list of objects to find current operation feature
   ///                   if forced redisplay is false
   /// \param theForceRedisplay a flag to customize object even always
   /// \return true if the object is modified

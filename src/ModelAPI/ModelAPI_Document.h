@@ -49,7 +49,7 @@ public:
   //! Adds to the document the new feature of the given feature id
   //! \param theID creates feature and puts it in the document (if it is not action)
   //! \param theMakeCurrent to make current this new feature in this document
-  virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID, 
+  virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID,
     const bool theMakeCurrent = true) = 0;
 
   //! Return a list of features, which refers to the feature
@@ -65,7 +65,7 @@ public:
   virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature) = 0;
 
   //! Moves the feature to make it after the given one in the history.
-  virtual void moveFeature(std::shared_ptr<ModelAPI_Feature> theMoved, 
+  virtual void moveFeature(std::shared_ptr<ModelAPI_Feature> theMoved,
                            std::shared_ptr<ModelAPI_Feature> theAfterThis) = 0;
 
   ///! Returns the id of the document
@@ -114,7 +114,7 @@ public:
   virtual std::shared_ptr<ModelAPI_Feature> internalFeature(const int theIndex) = 0;
   //! Performs synchronization of transactions with the module document:
   //! If some document is not active (by undo of activation) but in memory,
-  //! on activation the transactions must be synchronised because all redos performed 
+  //! on activation the transactions must be synchronised because all redos performed
   //! wihtout this participation
   virtual void synchronizeTransactions() = 0;
 
@@ -166,7 +166,7 @@ public:
     const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
 
   /// Returns true if theLater is in history of features creation later than theCurrent
-  virtual bool isLater(std::shared_ptr<ModelAPI_Feature> theLater, 
+  virtual bool isLater(std::shared_ptr<ModelAPI_Feature> theLater,
                        std::shared_ptr<ModelAPI_Feature> theCurrent) const = 0;
 
   //! Internally makes document know that feature was removed or added in history after creation

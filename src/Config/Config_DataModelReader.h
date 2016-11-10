@@ -35,7 +35,7 @@ class Config_DataModelReader : public Config_XMLReader
   /// Returns name of type of tree items in root
   CONFIG_EXPORT std::string rootType() const { return myRootTypes; }
 
-  /// Returns number of folders under root 
+  /// Returns number of folders under root
   CONFIG_EXPORT size_t rootFoldersNumber() const { return myRootFolderNames.size(); }
 
   /// Returns name of the folder by its Id
@@ -67,7 +67,7 @@ class Config_DataModelReader : public Config_XMLReader
   /// Returns name of type of tree items in sub document
   CONFIG_EXPORT std::string subType() const { return mySubTypes; }
 
-  /// Returns number of folders under sub document 
+  /// Returns number of folders under sub document
   CONFIG_EXPORT size_t subFoldersNumber() const { return mySubFolderNames.size(); }
 
   /// Returns name of the folder by its Id

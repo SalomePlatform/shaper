@@ -23,7 +23,7 @@ ModuleBase_IErrorMgr::~ModuleBase_IErrorMgr()
 
 void ModuleBase_IErrorMgr::setPropertyPanel(ModuleBase_IPropertyPanel* theProp)
 {
-  myPropertyPanel = theProp; 
+  myPropertyPanel = theProp;
 
   if (myPropertyPanel) {
     foreach(const ModuleBase_ModelWidget* aWgt, myPropertyPanel->modelWidgets()) {

@@ -22,11 +22,11 @@ bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& th
                                      const std::list<std::string>& theArguments,
                                      Events_InfoMessage& theError) const
 {
-  static Model_ValidatorsFactory* aValidators = 
+  static Model_ValidatorsFactory* aValidators =
     static_cast<Model_ValidatorsFactory*>(ModelAPI_Session::get()->validators());
 
   std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  // "Action" features has no data, but still valid. e.g "Remove Part"  
+  // "Action" features has no data, but still valid. e.g "Remove Part"
   if (!aData->isValid()) {
     if (!theFeature->isAction())
       theError = "There is no data.";
@@ -40,7 +40,7 @@ bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& th
     if (!aValidators->isCase(theFeature, anAttr->id()))
       continue; // this attribute is not participated in the current case
     if (!anAttr->isInitialized()) { // attribute is not initialized
-      std::map<std::string, std::set<std::string> >::const_iterator aFeatureFind = 
+      std::map<std::string, std::set<std::string> >::const_iterator aFeatureFind =
         myNotObligatory.find(theFeature->getKind());
       if (aFeatureFind == myNotObligatory.end() || // and it is obligatory for filling
           aFeatureFind->second.find(*it) == aFeatureFind->second.end()) {

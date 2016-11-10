@@ -14,7 +14,7 @@
 
 namespace SketchPlugin_Tools {
 
-/// Clears text expressions for all attributes of the feature 
+/// Clears text expressions for all attributes of the feature
 void clearExpressions(FeaturePtr theFeature);
 
 /// \return coincidence point

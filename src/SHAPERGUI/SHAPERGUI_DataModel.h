@@ -76,7 +76,7 @@ protected:
   QString myStudyPath;
 
   /// a path to the temporary directory, created by opening a document file
-  QString myTmpDirectory; 
+  QString myTmpDirectory;
 
   /// it should be created because the files reading is postponed in the module. The directory
   // should be removed after the model document is closed.

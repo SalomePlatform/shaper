@@ -37,7 +37,7 @@ void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects,
 
   // Getting objects.
   TopTools_ListOfShape anObjects;
-  for (ListOfShape::const_iterator 
+  for (ListOfShape::const_iterator
     anObjectsIt = theObjects.begin(); anObjectsIt != theObjects.end(); anObjectsIt++) {
     const TopoDS_Shape& aShape = (*anObjectsIt)->impl<TopoDS_Shape>();
     if(!aShape.IsNull()) {
@@ -48,7 +48,7 @@ void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects,
 
   // Getting tools.
   TopTools_ListOfShape aTools;
-  for (ListOfShape::const_iterator 
+  for (ListOfShape::const_iterator
     aToolsIt = theTools.begin(); aToolsIt != theTools.end(); aToolsIt++) {
     const TopoDS_Shape& aShape = (*aToolsIt)->impl<TopoDS_Shape>();
     if(!aShape.IsNull()) {

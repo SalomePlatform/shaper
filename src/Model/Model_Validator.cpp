@@ -35,7 +35,7 @@ void Model_ValidatorsFactory::assignValidator(const std::string& theID,
     myFeatures[theFeatureID] = AttrValidators();
   }
   if (myFeatures[theFeatureID].find(theID) != myFeatures[theFeatureID].end()) {
-    //Events_Error::send(std::string("Validator ") + theID + 
+    //Events_Error::send(std::string("Validator ") + theID +
     //  " for feature " + theFeatureID + "is already registered");
   } else {
     myFeatures[theFeatureID][theID] = std::list<std::string>();
@@ -51,7 +51,7 @@ void Model_ValidatorsFactory::assignValidator(const std::string& theID,
   }
 
   if (myFeatures[theFeatureID].find(theID) != myFeatures[theFeatureID].end()) {
-    //Events_Error::send(std::string("Validator ") + theID + 
+    //Events_Error::send(std::string("Validator ") + theID +
     //  " for feature " + theFeatureID + "is already registered");
   } else {
     myFeatures[theFeatureID][theID] = theArguments;
@@ -81,7 +81,7 @@ void Model_ValidatorsFactory::assignValidator(const std::string& theID,
 void Model_ValidatorsFactory::validators(const std::string& theFeatureID,
                                          Validators& theValidators) const
 {
-  std::map<std::string, AttrValidators>::const_iterator aFeatureIt = 
+  std::map<std::string, AttrValidators>::const_iterator aFeatureIt =
       myFeatures.find(theFeatureID);
   if (aFeatureIt != myFeatures.cend()) {
     AttrValidators::const_iterator aValidatorsIt = aFeatureIt->second.cbegin();
@@ -97,11 +97,11 @@ void Model_ValidatorsFactory::validators(const std::string& theFeatureID,
   addDefaultValidators(theValidators);
 }
 
-void Model_ValidatorsFactory::validators(const std::string& theFeatureID, 
+void Model_ValidatorsFactory::validators(const std::string& theFeatureID,
                                          const std::string& theAttrID,
                                          Validators& theValidators) const
 {
-  std::map<std::string, std::map<std::string, AttrValidators> >::const_iterator aFeatureIt = 
+  std::map<std::string, std::map<std::string, AttrValidators> >::const_iterator aFeatureIt =
       myAttrs.find(theFeatureID);
   if (aFeatureIt != myAttrs.cend()) {
     std::map<std::string, AttrValidators>::const_iterator anAttrIt =
@@ -177,7 +177,7 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
       //  Events_Error::send(std::string("Validator ") + aValidatorID + " was not registered");
       //  continue;
       //}
-      const ModelAPI_FeatureValidator* aFValidator = 
+      const ModelAPI_FeatureValidator* aFValidator =
         dynamic_cast<const ModelAPI_FeatureValidator*>(validator(aValidatorID));
       if (aFValidator) {
         Events_InfoMessage anError;
@@ -197,7 +197,7 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
   //std::map<std::string, ModelAPI_Validator*>::const_iterator aDefaultVal = myIDs.find(kDefaultId);
   //if(aDefaultVal != myIDs.end()) {
   //  static const std::list<std::string> anEmptyArgList;
-  //  const ModelAPI_FeatureValidator* aFValidator = 
+  //  const ModelAPI_FeatureValidator* aFValidator =
   //    dynamic_cast<const ModelAPI_FeatureValidator*>(aDefaultVal->second);
   //  if (aFValidator) {
   //    std::string anError;
@@ -220,7 +220,7 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
   std::list<std::string> aLtAttributes = aData->attributesIDs(kAllTypes);
   std::list<std::string>::const_iterator anAttrIt = aLtAttributes.cbegin();
   for (; anAttrIt != aLtAttributes.cend(); anAttrIt++) {
-    const std::string& anAttributeID = *anAttrIt; 
+    const std::string& anAttributeID = *anAttrIt;
     AttributePtr anAttribute = theFeature->data()->attribute(anAttributeID);
 
     std::string aValidatorID;
@@ -232,7 +232,7 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
       theFeature->setError(anError.messageString(), false);
       theFeature->data()->execState(ModelAPI_StateInvalidArgument);
       return false;
-    } 
+    }
   }
 
   return true;
@@ -267,13 +267,13 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Attribute>
     if (!anAttrValidator->isValid(theAttribute, anArguments, theError)) {
       theValidator = aValidatorID;
       return false;
-    } 
+    }
   }
 
   return true;
 }
 
-void Model_ValidatorsFactory::registerNotObligatory(std::string theFeature, 
+void Model_ValidatorsFactory::registerNotObligatory(std::string theFeature,
                                                     std::string theAttribute)
 {
   const static std::string kDefaultId = "Model_FeatureValidator";

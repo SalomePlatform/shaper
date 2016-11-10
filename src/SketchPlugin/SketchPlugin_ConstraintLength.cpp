@@ -68,11 +68,11 @@ void SketchPlugin_ConstraintLength::execute()
     //  aValueAttr->setValue(aLenght);
     //}
 
-    // the value should to be computed here, not in the getAISObject 
+    // the value should to be computed here, not in the getAISObject
     // in order to change the model value
     // inside the object transaction. This is important for creating a constraint by preselection.
     // The display of the presentation in this case happens after the transaction commit
-    AttributePtr aFlyOutAttribute = 
+    AttributePtr aFlyOutAttribute =
       data()->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
     if (!aFlyOutAttribute->isInitialized()) {
       compute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
@@ -93,9 +93,9 @@ bool SketchPlugin_ConstraintLength::compute(const std::string& theAttributeId)
   std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(data()->attribute(theAttributeId));
 
-  std::shared_ptr<GeomAPI_Lin2d> aLine = 
+  std::shared_ptr<GeomAPI_Lin2d> aLine =
     std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aStartPoint->pnt(), anEndPoint->pnt()));
-  if (!aFlyOutAttr->isInitialized() || 
+  if (!aFlyOutAttr->isInitialized() ||
       (fabs(aFlyOutAttr->x()) < tolerance && fabs(aFlyOutAttr->y()) < tolerance)) {
     double aDist = aPoint1->distance(aPoint2)/5.;
     std::shared_ptr<GeomAPI_Pnt2d> aFPnt = aLine->shiftedLocation(aDist);
@@ -147,7 +147,7 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this, 
+  AISObjectPtr anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this,
     sketch()->coordinatePlane(), thePrevious);
   return anAIS;
 }
@@ -184,7 +184,7 @@ void SketchPlugin_ConstraintLength::move(double theDeltaX, double theDeltaY)
 }
 
 void SketchPlugin_ConstraintLength::attributeChanged(const std::string& theID) {
-  if (theID == SketchPlugin_Constraint::ENTITY_A()) 
+  if (theID == SketchPlugin_Constraint::ENTITY_A())
   {
     std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeDouble>(attribute(SketchPlugin_Constraint::VALUE()));

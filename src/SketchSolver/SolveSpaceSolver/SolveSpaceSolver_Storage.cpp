@@ -36,7 +36,7 @@ static bool IsNotEqual(const Slvs_Param& theParam1, const Slvs_Param& theParam2)
 /// \brief Compare two entities to be different
 static bool IsNotEqual(const Slvs_Entity& theEntity1, const Slvs_Entity& theEntity2);
 /// \brief Compare two constraints to be different
-static bool IsNotEqual(const Slvs_Constraint& theConstraint1, 
+static bool IsNotEqual(const Slvs_Constraint& theConstraint1,
                        const Slvs_Constraint& theConstraint2);
 
 
@@ -123,7 +123,7 @@ bool SolveSpaceSolver_Storage::update(ConstraintWrapperPtr theConstraint)
 bool SolveSpaceSolver_Storage::update(EntityWrapperPtr theEntity)
 {
   bool isUpdated = false;
-  std::shared_ptr<SolveSpaceSolver_EntityWrapper> anEntity = 
+  std::shared_ptr<SolveSpaceSolver_EntityWrapper> anEntity =
       std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(theEntity);
   Slvs_Entity aSlvsEnt = getEntity((Slvs_hEntity)anEntity->id());
   if (aSlvsEnt.h == SLVS_E_UNKNOWN)
@@ -204,14 +204,14 @@ bool SolveSpaceSolver_Storage::update(EntityWrapperPtr theEntity)
 
 bool SolveSpaceSolver_Storage::update(ParameterWrapperPtr theParameter)
 {
-  std::shared_ptr<SolveSpaceSolver_ParameterWrapper> aParameter = 
+  std::shared_ptr<SolveSpaceSolver_ParameterWrapper> aParameter =
       std::dynamic_pointer_cast<SolveSpaceSolver_ParameterWrapper>(theParameter);
   const Slvs_Param& aParam = getParameter((Slvs_hParam)aParameter->id());
   if (aParam.h != SLVS_E_UNKNOWN && fabs(aParam.val - aParameter->value()) < tolerance)
     return false;
   Slvs_Param aParamToUpd = aParameter->parameter();
   if (aParamToUpd.group == SLVS_G_UNKNOWN)
-    aParamToUpd.group = aParameter->isParametric() ? (Slvs_hGroup)GID_OUTOFGROUP : 
+    aParamToUpd.group = aParameter->isParametric() ? (Slvs_hGroup)GID_OUTOFGROUP :
                                                      (Slvs_hGroup)myGroupID;
   Slvs_hParam anID = updateParameter(aParamToUpd);
   if (aParam.h == SLVS_E_UNKNOWN) // new parameter
@@ -331,9 +331,9 @@ void SolveSpaceSolver_Storage::addCoincidentPoints(
     if (theMaster->id() != theSlave->id())
       removeEntity((Slvs_hEntity)theSlave->id());
 
-    std::shared_ptr<SolveSpaceSolver_EntityWrapper> aPointMaster = 
+    std::shared_ptr<SolveSpaceSolver_EntityWrapper> aPointMaster =
         std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(theMaster);
-    std::shared_ptr<SolveSpaceSolver_EntityWrapper> aPointSlave = 
+    std::shared_ptr<SolveSpaceSolver_EntityWrapper> aPointSlave =
         std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(theSlave);
     aPointSlave->changeEntity() = aPointMaster->entity();
     aPointSlave->setParameters(aPointMaster->parameters());
@@ -449,7 +449,7 @@ void SolveSpaceSolver_Storage::replaceInConstraints(
               addSameConstraints(*aCIt2, aWrapper);
               break;
             }
-      } else 
+      } else
         aConstr.h = updateConstraint(aConstr);
       aWrapper->changeConstraint() = aConstr;
 
@@ -559,9 +559,9 @@ EntityWrapperPtr SolveSpaceSolver_Storage::calculateMiddlePoint(
       theX = anArcPoint[0][0] + anArcPoint[2][0];
       theY = anArcPoint[0][1] + anArcPoint[2][1];
     } else {
-      std::shared_ptr<GeomAPI_Dir2d> 
+      std::shared_ptr<GeomAPI_Dir2d>
         aStartDir(new GeomAPI_Dir2d(anArcPoint[1][0], anArcPoint[1][1]));
-      std::shared_ptr<GeomAPI_Dir2d> 
+      std::shared_ptr<GeomAPI_Dir2d>
         aEndDir(new GeomAPI_Dir2d(anArcPoint[2][0], anArcPoint[2][1]));
       double anAngle = aStartDir->angle(aEndDir);
       if (anAngle < 0)
@@ -825,7 +825,7 @@ Slvs_hConstraint SolveSpaceSolver_Storage::updateConstraint(const Slvs_Constrain
       Slvs_Entity aNewLine2 = Slvs_MakeLineSegment(SLVS_E_UNKNOWN, (Slvs_hGroup)myGroupID,
           myWorkplaneID, aLine.point[1], aConstraint.ptA);
       aNewLine2.h = addEntity(aNewLine2);
-      aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, (Slvs_hGroup)myGroupID, 
+      aConstraint = Slvs_MakeConstraint(SLVS_E_UNKNOWN, (Slvs_hGroup)myGroupID,
           SLVS_C_EQUAL_LENGTH_LINES,
           myWorkplaneID, 0.0, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aNewLine1.h, aNewLine2.h);
     }
@@ -959,7 +959,7 @@ bool SolveSpaceSolver_Storage::remove(EntityWrapperPtr theEntity)
     }
   }
 
-  std::shared_ptr<SolveSpaceSolver_EntityWrapper> anEntity = 
+  std::shared_ptr<SolveSpaceSolver_EntityWrapper> anEntity =
         std::dynamic_pointer_cast<SolveSpaceSolver_EntityWrapper>(theEntity);
   bool isFullyRemoved = isCoincide ? true : removeEntity((Slvs_hEntity)anEntity->id());
   return (SketchSolver_Storage::remove(theEntity) || isCoincide) && isFullyRemoved;
@@ -981,10 +981,10 @@ void SolveSpaceSolver_Storage::refresh(bool theFixedOnly) const
   for (; anIt != myAttributeMap.end(); ++anIt) {
     if (!anIt->second)
       continue;
-    // the external feature always should keep the up to date values, so, 
+    // the external feature always should keep the up to date values, so,
     // refresh from the solver is never needed
     if (anIt->first.get()) {
-      std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+      std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
         std::dynamic_pointer_cast<SketchPlugin_Feature>(anIt->first->owner());
       if (aSketchFeature.get() && aSketchFeature->isExternal())
         continue;
@@ -1001,7 +1001,7 @@ void SolveSpaceSolver_Storage::refresh(bool theFixedOnly) const
     bool isUpd[3] = {false};
     int i = 0;
     for (aParIt = aParams.begin(); i < 3 && aParIt != aParams.end(); ++aParIt, ++i) {
-      std::shared_ptr<SolveSpaceSolver_ParameterWrapper> aWrapper = 
+      std::shared_ptr<SolveSpaceSolver_ParameterWrapper> aWrapper =
           std::dynamic_pointer_cast<SolveSpaceSolver_ParameterWrapper>(*aParIt);
       if (!theFixedOnly || aWrapper->group() == GID_OUTOFGROUP || aWrapper->isParametric()) {
         aWrapper->changeParameter().val = getParameter((Slvs_hParam)aWrapper->id()).val;
@@ -1022,7 +1022,7 @@ void SolveSpaceSolver_Storage::refresh(bool theFixedOnly) const
         aPoint2D->setValue(aCoords[0], aCoords[1]);
         // Find points coincident with this one (probably not in GID_OUTOFGROUP)
         std::map<AttributePtr, EntityWrapperPtr>::const_iterator aLocIt;
-        if (theFixedOnly) 
+        if (theFixedOnly)
           aLocIt = myAttributeMap.begin();
         else {
           aLocIt = anIt;
@@ -1031,7 +1031,7 @@ void SolveSpaceSolver_Storage::refresh(bool theFixedOnly) const
         for (; aLocIt != myAttributeMap.end(); ++aLocIt) {
           if (!aLocIt->second)
             continue;
-          std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+          std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
             std::dynamic_pointer_cast<SketchPlugin_Feature>(aLocIt->first->owner());
           if (aSketchFeature && aSketchFeature->isExternal())
             continue;
@@ -1106,7 +1106,7 @@ void SolveSpaceSolver_Storage::adjustArc(const Slvs_Entity& theArc)
     if (i > 0) {
       anArcPoints[i][0] -= anArcPoints[0][0];
       anArcPoints[i][1] -= anArcPoints[0][1];
-      aDist[i] = sqrt(anArcPoints[i][0] * anArcPoints[i][0] + 
+      aDist[i] = sqrt(anArcPoints[i][0] * anArcPoints[i][0] +
                       anArcPoints[i][1] * anArcPoints[i][1]);
     }
   }

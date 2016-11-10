@@ -9,7 +9,7 @@ void SketchSolver_ConstraintLength::getAttributes(
     std::vector<EntityWrapperPtr>& theAttributes)
 {
   SketchSolver_Constraint::getAttributes(theValue, theAttributes);
-  if (!myErrorMsg.empty() || !theAttributes[2] || 
+  if (!myErrorMsg.empty() || !theAttributes[2] ||
       theAttributes[2]->type() != ENTITY_LINE) {
     theAttributes.clear();
     return;

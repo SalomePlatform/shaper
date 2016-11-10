@@ -33,7 +33,7 @@ class GeomAPI_DataMapOfShapeShape : public GeomAPI_Interface
 
   /// Adds \a theKey to me with \a theItem. Returns True if the Key  was not already in the map.
   GEOMAPI_EXPORT
-  bool bind (const std::shared_ptr<GeomAPI_Shape> theKey, 
+  bool bind (const std::shared_ptr<GeomAPI_Shape> theKey,
              const std::shared_ptr<GeomAPI_Shape> theItem);
 
   /// Merges two maps.

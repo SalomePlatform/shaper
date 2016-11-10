@@ -34,7 +34,7 @@
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Angle, AIS_AngleDimension);
 
-SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint, 
+SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint,
                                      const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 : AIS_AngleDimension(gp_Pnt(0,0,0), gp_Pnt(1,0,0), gp_Pnt(0,1,0)), myConstraint(theConstraint),
   mySketcherPlane(thePlane),
@@ -48,7 +48,7 @@ SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint,
   myAspect->MakeUnitsDisplayed(false);
   myAspect->TextAspect()->SetHeight(SketcherPrs_Tools::getDefaultTextHeight());
   myAspect->ArrowAspect()->SetLength(SketcherPrs_Tools::getArrowSize());
-  
+
   SetDimensionAspect(myAspect);
 
   myStyleListener = new SketcherPrs_DimensionStyleListener();
@@ -76,7 +76,7 @@ bool SketcherPrs_Angle::readyToDisplay(ModelAPI_Feature* theConstraint,
   DataPtr aData = theConstraint->data();
 
   // Flyout point
-  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>
     (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   if (!aFlyoutAttr->isInitialized())
@@ -90,9 +90,9 @@ bool SketcherPrs_Angle::readyToDisplay(ModelAPI_Feature* theConstraint,
   if (!anAttr2->isInitialized())
     return aReadyToDisplay;
 
-  FeaturePtr aLineA = 
+  FeaturePtr aLineA =
     SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
-  FeaturePtr aLineB = 
+  FeaturePtr aLineB =
     SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
 
   if (!aLineA.get() || !aLineB.get())
@@ -117,10 +117,10 @@ bool SketcherPrs_Angle::readyToDisplay(ModelAPI_Feature* theConstraint,
         aStartA->pnt(), aEndA->pnt(), aStartB->pnt(), aEndB->pnt()));
   else {
     std::shared_ptr<GeomAPI_Lin2d> aLine1(new GeomAPI_Lin2d(aStartA->pnt(), aEndA->pnt()));
-    bool isReversed1 = 
+    bool isReversed1 =
       aData->boolean(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID())->value();
     std::shared_ptr<GeomAPI_Lin2d> aLine2(new GeomAPI_Lin2d(aStartB->pnt(), aEndB->pnt()));
-    bool isReversed2 = 
+    bool isReversed2 =
       aData->boolean(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID())->value();
     anAng = std::shared_ptr<GeomAPI_Angle2d>(
       new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
@@ -143,11 +143,11 @@ bool SketcherPrs_Angle::readyToDisplay(ModelAPI_Feature* theConstraint,
 
 
 void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-                                const Handle(Prs3d_Presentation)& thePresentation, 
+                                const Handle(Prs3d_Presentation)& thePresentation,
                                 const Standard_Integer theMode)
 {
   gp_Pnt aFirstPoint, aSecondPoint, aCenterPoint;
-  bool aReadyToDisplay = readyToDisplay(myConstraint, mySketcherPlane, 
+  bool aReadyToDisplay = readyToDisplay(myConstraint, mySketcherPlane,
                                         aFirstPoint, aSecondPoint, aCenterPoint);
   if (aReadyToDisplay) {
     myFirstPoint = aFirstPoint;
@@ -155,14 +155,14 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
     myCenterPoint = aCenterPoint;
 
     DataPtr aData = myConstraint->data();
-    AttributeDoublePtr anAttributeValue = 
+    AttributeDoublePtr anAttributeValue =
       aData->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
     myValue.init(anAttributeValue);
 
-    std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
+    std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =
                                 std::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                 (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-    std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = 
+    std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt =
       mySketcherPlane->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
     myFlyOutPoint = aFlyoutPnt->impl<gp_Pnt>();
   }
@@ -247,7 +247,7 @@ void SketcherPrs_Angle::ComputeSelection(const Handle(SelectMgr_Selection)& aSel
   default: {
     // there are own selection modes, so the others should be ignored
     // otherwise, the text selection appears in the viewer
-    return; 
+    return;
   }
   }
   SetSelToleranceForText2d(SketcherPrs_Tools::getTextHeight());

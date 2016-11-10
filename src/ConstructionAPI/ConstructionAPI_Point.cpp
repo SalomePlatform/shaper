@@ -1,7 +1,7 @@
 // Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
 // Name   : ConstructionAPI_Point.cpp
-// Purpose: 
+// Purpose:
 //
 // History:
 // 29/03/16 - Sergey POKHODENKO - Creation of the file

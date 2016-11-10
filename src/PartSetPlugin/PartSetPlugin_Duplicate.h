@@ -17,7 +17,7 @@
 class PartSetPlugin_Duplicate : public ModelAPI_Feature
 {
  public:
- 
+
   /// Duplicate kind
   inline static const std::string& ID()
   {

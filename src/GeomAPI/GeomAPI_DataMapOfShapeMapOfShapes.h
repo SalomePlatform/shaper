@@ -22,7 +22,7 @@ public:
 
   /// \brief Binds list of shapes to the key shape.
   /// \param[in] theKey key shape.
-  /// \param[in] theItems list of shapes. 
+  /// \param[in] theItems list of shapes.
   ///                     If shapes have duplications in list only one will be stored.
   /// \returns true if items bound successfully.
   GEOMAPI_EXPORT bool bind(const std::shared_ptr<GeomAPI_Shape> theKey,

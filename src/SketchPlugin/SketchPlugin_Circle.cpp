@@ -73,7 +73,7 @@ void SketchPlugin_Circle::execute()
     // compute a circle point in 3D view
     std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
         GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
-    AttributeDoublePtr aRadiusAttr = 
+    AttributeDoublePtr aRadiusAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(RADIUS_ID()));
     if (aCenterAttr->isInitialized() && aRadiusAttr->isInitialized()) {
       std::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
@@ -107,7 +107,7 @@ AISObjectPtr SketchPlugin_Circle::getAISObject(AISObjectPtr thePrevious)
     // compute a circle point in 3D view
     std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
         GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
-    AttributeDoublePtr aRadiusAttr = 
+    AttributeDoublePtr aRadiusAttr =
         std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(attribute(RADIUS_ID()));
     if (aCenterAttr->isInitialized() && aRadiusAttr->isInitialized()) {
         std::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
@@ -123,7 +123,7 @@ AISObjectPtr SketchPlugin_Circle::getAISObject(AISObjectPtr thePrevious)
         if (aCircleShape && aRadius != 0) {
           std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
           // make a visible point
-          std::shared_ptr<GeomAPI_Shape> aCenterPointShape = 
+          std::shared_ptr<GeomAPI_Shape> aCenterPointShape =
             GeomAlgoAPI_PointBuilder::vertex(aCenter);
           aShapes.push_back(aCenterPointShape);
           aShapes.push_back(aCircleShape);
@@ -143,7 +143,7 @@ AISObjectPtr SketchPlugin_Circle::getAISObject(AISObjectPtr thePrevious)
 
 bool SketchPlugin_Circle::isFeatureValid()
 {
-  std::shared_ptr<GeomDataAPI_Point2D> aCenter = 
+  std::shared_ptr<GeomDataAPI_Point2D> aCenter =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_ID()));
   bool aValid = aCenter->isInitialized();
 
@@ -204,7 +204,7 @@ void SketchPlugin_Circle::attributeChanged(const std::string& theID) {
     if (aSelection && !aSelection->isNull() && aSelection->isEdge()) {
       std::shared_ptr<GeomAPI_Edge> anEdge( new GeomAPI_Edge(aSelection));
       std::shared_ptr<GeomAPI_Circ> aCirc = anEdge->circle();
-      std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
+      std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_ID()));
       aCenterAttr->setValue(sketch()->to2D(aCirc->center()));
       real(RADIUS_ID())->setValue(aCirc->radius());
@@ -233,7 +233,7 @@ void SketchPlugin_Circle::attributeChanged(const std::string& theID) {
 
     std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
         GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
-    AttributeDoublePtr aRadiusAttr = 
+    AttributeDoublePtr aRadiusAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(RADIUS_ID()));
 
     if (aNbInitialized == 1)
@@ -272,7 +272,7 @@ void SketchPlugin_Circle::adjustThreePoints()
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_ID()));
   if (!aCenterAttr->isInitialized())
     return;
-  AttributeDoublePtr aRadiusAttr = 
+  AttributeDoublePtr aRadiusAttr =
     std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(attribute(RADIUS_ID()));
   if (!aRadiusAttr->isInitialized())
     return;

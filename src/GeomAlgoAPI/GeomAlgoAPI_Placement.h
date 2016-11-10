@@ -25,10 +25,10 @@ public:
   /// \param[in] theDestSolid    invariant shape
   /// \param[in] theSourceShape  a shape on the solid to be made coincident with destination object
   /// \param[in] theDestShape    destination object
-  /// \param[in] theIsReverse    indicates that the solid materials should be on the same side 
+  /// \param[in] theIsReverse    indicates that the solid materials should be on the same side
   ///                            against the destination plane
   /// \param[in] theIsCentering  indicates the planes should be centered
-  /// \param[in] theSimpleTransform makes just transformation of shape 
+  /// \param[in] theSimpleTransform makes just transformation of shape
   ///                               without changing of topology or geometry
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Placement(const std::shared_ptr<GeomAPI_Shape> theSourceSolid,
                                            const std::shared_ptr<GeomAPI_Shape> theDestSolid,

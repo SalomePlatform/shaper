@@ -236,7 +236,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       // complex conversion of reference id to element index
       int aReferenceID = aSelection->Id();
       std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
-      int anElementID = 
+      int anElementID =
         aXao.getGeometry()->getElementIndexByReference(aGroupDimension, aReferenceString);
 
       aXaoGroup->add(anElementID);

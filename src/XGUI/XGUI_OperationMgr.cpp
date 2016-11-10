@@ -150,7 +150,7 @@ QStringList XGUI_OperationMgr::operationList() const
 {
   QStringList result;
   foreach(ModuleBase_Operation* eachOperation, myOperations) {
-    ModuleBase_OperationFeature* aFOperation = 
+    ModuleBase_OperationFeature* aFOperation =
       dynamic_cast<ModuleBase_OperationFeature*>(eachOperation);
     if (aFOperation) {
       FeaturePtr aFeature = aFOperation->feature();
@@ -250,7 +250,7 @@ bool XGUI_OperationMgr::commitAllOperations()
                                                                             (anOperation);
     if (aFOperation) {
       FeaturePtr aFeature = aFOperation->feature();
-      CompositeFeaturePtr aComposite = 
+      CompositeFeaturePtr aComposite =
           std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
       isCompositeCommitted = aComposite.get();
       if (isCompositeCommitted)
@@ -280,7 +280,7 @@ void XGUI_OperationMgr::updateApplyOfOperations(ModuleBase_Operation* theOperati
 {
   XGUI_ErrorMgr* anErrorMgr = XGUI_Tools::workshop(myWorkshop)->errorMgr();
   if (theOperation) {
-    ModuleBase_OperationFeature* aFOperation = 
+    ModuleBase_OperationFeature* aFOperation =
       dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
     if (aFOperation)
       anErrorMgr->updateAcceptAllAction(aFOperation->feature());
@@ -374,7 +374,7 @@ bool XGUI_OperationMgr::canStartOperation(const QString& theId)
       }
       else if (canStopOperation(aCurrentOp)) {
         // the started operation is granted in the parrent operation,
-        // e.g. current - Line in Sketch, started Circle 
+        // e.g. current - Line in Sketch, started Circle
         stopOperation(aCurrentOp);
       } else {
         aCanStart = false;
@@ -434,7 +434,7 @@ void XGUI_OperationMgr::onBeforeOperationStarted()
     return;
 
   /// Set current feature and remeber old current feature
-  ModuleBase_OperationFeature* aFOperation = 
+  ModuleBase_OperationFeature* aFOperation =
     dynamic_cast<ModuleBase_OperationFeature*>(aCurrentOperation);
   if (aFOperation) {
     SessionPtr aMgr = ModelAPI_Session::get();
@@ -446,7 +446,7 @@ void XGUI_OperationMgr::onBeforeOperationStarted()
     // When sketch entity operation started, the sketch should be cashed here as the current.
     // Otherwise(the flag is true), the ExtrusionCut is cashed, when commit happens, the sketch
     // is disabled, sketch entity is disabled as extrusion cut is created earliest then sketch.
-    // As a result the sketch disappears from the viewer. 
+    // As a result the sketch disappears from the viewer.
     // However after commit it is displayed back.
     aFOperation->setPreviousCurrentFeature(aDoc->currentFeature(false));
 
@@ -466,8 +466,8 @@ void XGUI_OperationMgr::onBeforeOperationStarted()
     if (aFOperation->isEditOperation()) {// it should be performed by the feature edit only
       // in create operation, the current feature is changed by addFeature()
       aDoc->setCurrentFeature(aFOperation->feature(), false);
-      // this is the only place where flushes must be called after setCurrentFeature for the 
-      // current moment: after this the opertion is not finished, so, the ObjectBrowser 
+      // this is the only place where flushes must be called after setCurrentFeature for the
+      // current moment: after this the opertion is not finished, so, the ObjectBrowser
       // state may be corrupted (issue #1457)
       static Events_Loop* aLoop = Events_Loop::loop();
       static Events_ID aCreateEvent = aLoop->eventByName(EVENT_OBJECT_CREATED);
@@ -512,7 +512,7 @@ void XGUI_OperationMgr::onBeforeOperationCommitted()
     return;
 
   /// Restore the previous current feature
-  ModuleBase_OperationFeature* aFOperation = 
+  ModuleBase_OperationFeature* aFOperation =
     dynamic_cast<ModuleBase_OperationFeature*>(aCurrentOperation);
   if (aFOperation) {
 #ifdef DEBUG_CURRENT_FEATURE
@@ -532,9 +532,9 @@ void XGUI_OperationMgr::onBeforeOperationCommitted()
       setCurrentFeature(aFOperation->previousCurrentFeature());
     }
     else { // create operation
-      // the Top created feature should stays the current. In nested operations, 
+      // the Top created feature should stays the current. In nested operations,
       // like Line in the Sketch or
-      // Sketch in ExtrusionCut, a previous feature should be restored on commit. 
+      // Sketch in ExtrusionCut, a previous feature should be restored on commit.
       // It is performed here
       // in order to perform it in the current transaction without opening a new one.
       if (myOperations.front() != aFOperation)
@@ -654,7 +654,7 @@ bool XGUI_OperationMgr::onProcessEnter(QObject* theObject)
   bool isAborted = false;
   if (!anActiveWgt) {
     QWidget* aFocusWidget = aPanel->focusWidget();
-    QToolButton* aCancelBtn = 
+    QToolButton* aCancelBtn =
       dynamic_cast<XGUI_PropertyPanel*>(aPanel)->findButton(PROP_PANEL_CANCEL);
     if (aFocusWidget && aCancelBtn && aFocusWidget == aCancelBtn) {
       abortOperation(aOperation);
@@ -665,15 +665,15 @@ bool XGUI_OperationMgr::onProcessEnter(QObject* theObject)
   if (!isAborted) {
     isAccepted = anActiveWgt && anActiveWgt->processEnter();
     if (!isAccepted) {
-      isAccepted = 
+      isAccepted =
         myWorkshop->module()->processEnter(anActiveWgt ? anActiveWgt->attributeID() : "");
       if (!isAccepted) {
         /// functionality is similar to Apply click
-        ModuleBase_OperationFeature* aFOperation = 
+        ModuleBase_OperationFeature* aFOperation =
           dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
-        if (!aFOperation || 
+        if (!aFOperation ||
             myWorkshop->module()->getFeatureError(aFOperation->feature()).isEmpty()) {
-          // key released is emitted to apply the current value to the model 
+          // key released is emitted to apply the current value to the model
           // if it was modified in PP
           emit keyEnterReleased();
           commitOperation();

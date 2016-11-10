@@ -36,7 +36,7 @@ public:
   * \param theName - name of the resource
   * Returns Id of the ctreated item
   */
-  virtual int addPreference(const QString& theLbl, int pId, 
+  virtual int addPreference(const QString& theLbl, int pId,
                             SUIT_PreferenceMgr::PrefItemType theType,
                             const QString& theSection, const QString& theName ) = 0;
 

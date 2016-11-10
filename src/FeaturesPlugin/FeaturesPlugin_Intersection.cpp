@@ -24,9 +24,9 @@ FeaturesPlugin_Intersection::FeaturesPlugin_Intersection()
 //=================================================================================================
 void FeaturesPlugin_Intersection::initAttributes()
 {
-  data()->addAttribute(FeaturesPlugin_Intersection::OBJECT_LIST_ID(), 
+  data()->addAttribute(FeaturesPlugin_Intersection::OBJECT_LIST_ID(),
                        ModelAPI_AttributeSelectionList::typeId());
-  data()->addAttribute(FeaturesPlugin_Intersection::TOOL_LIST_ID(), 
+  data()->addAttribute(FeaturesPlugin_Intersection::TOOL_LIST_ID(),
                        ModelAPI_AttributeSelectionList::typeId());
 }
 
@@ -36,10 +36,10 @@ void FeaturesPlugin_Intersection::execute()
   ListOfShape anObjects, aTools;
 
   // Getting objects.
-  AttributeSelectionListPtr anObjectsSelList = 
+  AttributeSelectionListPtr anObjectsSelList =
     selectionList(FeaturesPlugin_Intersection::OBJECT_LIST_ID());
   for (int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr = 
+    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
       anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
     if (!anObject.get()) {
@@ -49,7 +49,7 @@ void FeaturesPlugin_Intersection::execute()
   }
 
   // Getting tools.
-  AttributeSelectionListPtr aToolsSelList = 
+  AttributeSelectionListPtr aToolsSelList =
     selectionList(FeaturesPlugin_Intersection::TOOL_LIST_ID());
   for (int aToolsIndex = 0; aToolsIndex < aToolsSelList->size(); aToolsIndex++) {
     std::shared_ptr<ModelAPI_AttributeSelection> aToolAttr = aToolsSelList->value(aToolsIndex);
@@ -68,7 +68,7 @@ void FeaturesPlugin_Intersection::execute()
   int aResultIndex = 0;
 
   // Create result for each object.
-  for (ListOfShape::iterator 
+  for (ListOfShape::iterator
        anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end(); anObjectsIt++) {
     std::shared_ptr<GeomAPI_Shape> anObject = *anObjectsIt;
     ListOfShape aListWithObject; aListWithObject.push_back(anObject);
@@ -112,7 +112,7 @@ void FeaturesPlugin_Intersection::loadNamingDS(std::shared_ptr<ModelAPI_ResultBo
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfShapes = theMakeShape.mapOfSubShapes();
   const int aDeletedTag = 1;
   /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
-  const int aSubsolidsTag = 2; 
+  const int aSubsolidsTag = 2;
   const int aModifyTag = 100000;
   int aModifyToolsTag = 200000;
   std::ostringstream aStream;

@@ -104,7 +104,7 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
                                    const double                        theFromAngle)
 {
   if(!theBaseShape || !theAxis ||
-    (((!theFromShape && !theToShape) || 
+    (((!theFromShape && !theToShape) ||
     (theFromShape && theToShape && theFromShape->isEqual(theToShape)))
     && (theFromAngle == -theToAngle))) {
     return;
@@ -220,7 +220,7 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     }
   } else if(theFromShape && theToShape) { // Case 2: When both bounding planes were set.
     // Making revolution to the 360 angle.
-    BRepPrimAPI_MakeRevol* aRevolBuilder = 
+    BRepPrimAPI_MakeRevol* aRevolBuilder =
       new BRepPrimAPI_MakeRevol(aBaseShape, anAxis, 2 * M_PI, Standard_True);
     if(!aRevolBuilder) {
       return;
@@ -262,10 +262,10 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     // Rotating bounding planes to the specified angle.
     gp_Trsf aFromTrsf;
     gp_Trsf aToTrsf;
-    double aFromRotAngle = 
-      ((aFromPln.Axis().Direction() * aBasePlane->Axis().Direction()) > 0) ? -theFromAngle : 
+    double aFromRotAngle =
+      ((aFromPln.Axis().Direction() * aBasePlane->Axis().Direction()) > 0) ? -theFromAngle :
                                                                               theFromAngle;
-    double aToRotAngle = 
+    double aToRotAngle =
       ((aToPln.Axis().Direction() * aBasePlane->Axis().Direction()) > 0) ? -theToAngle :
                                                                             theToAngle;
     aFromTrsf.SetRotation(anAxis,aFromRotAngle / 180.0 * M_PI);
@@ -317,7 +317,7 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
       aResult = aGeomShape->impl<TopoDS_Shape>();
     }
 
-    // If after cut we got more than one solids then take closest 
+    // If after cut we got more than one solids then take closest
     // to the center of mass of the base face.
     aResult = findClosest(aResult, aBaseCentre);
 
@@ -330,7 +330,7 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
     }
   } else { //Case 3: When only one bounding plane was set.
     // Making revolution to the 360 angle.
-    BRepPrimAPI_MakeRevol* aRevolBuilder = 
+    BRepPrimAPI_MakeRevol* aRevolBuilder =
       new BRepPrimAPI_MakeRevol(aBaseShape, anAxis, 2 * M_PI, Standard_True);
     if(!aRevolBuilder) {
       return;
@@ -485,18 +485,18 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
       aResult = aGeomShape->impl<TopoDS_Shape>();
     }
 
-    // If after cut we got more than one solids then take 
+    // If after cut we got more than one solids then take
     // closest to the center of mass of the base face.
     aResult = findClosest(aResult, aBaseCentre);
 
     // Setting naming.
     if(aShapeTypeToExp == TopAbs_COMPOUND) {
-      storeGenerationHistory(this, aResult, TopAbs_EDGE, 
+      storeGenerationHistory(this, aResult, TopAbs_EDGE,
         aRotatedBoundingFace, aModifiedBaseShape, isFromFaceSet);
-      storeGenerationHistory(this, aResult, TopAbs_FACE, 
+      storeGenerationHistory(this, aResult, TopAbs_FACE,
         aRotatedBoundingFace, aModifiedBaseShape, isFromFaceSet);
     } else {
-      storeGenerationHistory(this, aResult, aShapeTypeToExp, 
+      storeGenerationHistory(this, aResult, aShapeTypeToExp,
         aRotatedBoundingFace, aModifiedBaseShape, isFromFaceSet);
     }
   }
@@ -669,16 +669,16 @@ void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
     if(theType == TopAbs_VERTEX) {
       gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
       IntTools_Context anIntTools;
-      if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(theRotatedBoundingFace), 
+      if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(theRotatedBoundingFace),
           Precision::Confusion()) == Standard_True) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
-        theIsFromFaceSet ? theRevolutionAlgo->addFromShape(aGeomSh) : 
+        theIsFromFaceSet ? theRevolutionAlgo->addFromShape(aGeomSh) :
                            theRevolutionAlgo->addToShape(aGeomSh);
       }
       if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(theModifiedBaseShape),
          Precision::Confusion()) == Standard_True) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
-        theIsFromFaceSet ? theRevolutionAlgo->addToShape(aGeomSh) : 
+        theIsFromFaceSet ? theRevolutionAlgo->addToShape(aGeomSh) :
                            theRevolutionAlgo->addFromShape(aGeomSh);
       }
     } else if(theType == TopAbs_EDGE) {
@@ -687,29 +687,29 @@ void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
       anEdgeCheck.Perform();
       if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
-        theIsFromFaceSet ? theRevolutionAlgo->addFromShape(aGeomSh) : 
+        theIsFromFaceSet ? theRevolutionAlgo->addFromShape(aGeomSh) :
                            theRevolutionAlgo->addToShape(aGeomSh);
       }
       anEdgeCheck.Init(anEdge, TopoDS::Face(theModifiedBaseShape));
       anEdgeCheck.Perform();
       if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
-        theIsFromFaceSet ? theRevolutionAlgo->addToShape(aGeomSh) : 
+        theIsFromFaceSet ? theRevolutionAlgo->addToShape(aGeomSh) :
                            theRevolutionAlgo->addFromShape(aGeomSh);
       }
     } else {
       Handle(Geom_Surface) aFaceSurface = BRep_Tool::Surface(TopoDS::Face(aShape));
-      Handle(Geom_Surface) aBoundingSurface = 
+      Handle(Geom_Surface) aBoundingSurface =
         BRep_Tool::Surface(TopoDS::Face(theRotatedBoundingFace));
       Handle(Geom_Surface) aBaseSurface = BRep_Tool::Surface(TopoDS::Face(theModifiedBaseShape));
       if(aFaceSurface == aBoundingSurface) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
-        theIsFromFaceSet ? theRevolutionAlgo->addFromShape(aGeomSh) : 
+        theIsFromFaceSet ? theRevolutionAlgo->addFromShape(aGeomSh) :
                            theRevolutionAlgo->addToShape(aGeomSh);
       }
       if(aFaceSurface == aBaseSurface) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
-        theIsFromFaceSet ? theRevolutionAlgo->addToShape(aGeomSh) : 
+        theIsFromFaceSet ? theRevolutionAlgo->addToShape(aGeomSh) :
                            theRevolutionAlgo->addFromShape(aGeomSh);
       }
     }

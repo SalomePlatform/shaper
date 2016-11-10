@@ -28,7 +28,7 @@
 #include <math.h>
 
 #ifndef INT_MAX
-#define INT_MAX   2147483647 
+#define INT_MAX   2147483647
 #endif
 
 #ifdef _DEBUG

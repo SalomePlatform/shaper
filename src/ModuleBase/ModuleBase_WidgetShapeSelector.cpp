@@ -103,7 +103,7 @@ ModuleBase_WidgetShapeSelector::~ModuleBase_WidgetShapeSelector()
 //********************************************************************
 bool ModuleBase_WidgetShapeSelector::storeValueCustom()
 {
-  // the value is stored on the selection changed signal processing 
+  // the value is stored on the selection changed signal processing
   return true;
 }
 

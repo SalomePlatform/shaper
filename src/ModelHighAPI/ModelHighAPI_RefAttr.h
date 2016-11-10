@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : ModelHighAPI_RefAttr.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 08/06/16 - Sergey POKHODENKO - Creation of the file
@@ -44,11 +44,11 @@ public:
   virtual ~ModelHighAPI_RefAttr();
 
   /// Fill attribute values
-  MODELHIGHAPI_EXPORT virtual 
+  MODELHIGHAPI_EXPORT virtual
     void fillAttribute(const std::shared_ptr<ModelAPI_AttributeRefAttr> & theAttribute) const;
 
   /// Append to list attribute
-  MODELHIGHAPI_EXPORT virtual 
+  MODELHIGHAPI_EXPORT virtual
     void appendToList(const std::shared_ptr<ModelAPI_AttributeRefAttrList> & theAttribute) const;
 
   /// Check the object is empty

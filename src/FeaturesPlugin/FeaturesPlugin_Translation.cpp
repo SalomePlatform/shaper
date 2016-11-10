@@ -24,7 +24,7 @@ FeaturesPlugin_Translation::FeaturesPlugin_Translation()
 //=================================================================================================
 void FeaturesPlugin_Translation::initAttributes()
 {
-  AttributeSelectionListPtr aSelection = 
+  AttributeSelectionListPtr aSelection =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
     FeaturesPlugin_Translation::OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
 
@@ -40,13 +40,13 @@ void FeaturesPlugin_Translation::execute()
   // Getting objects.
   ListOfShape anObjects;
   std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList = 
+  AttributeSelectionListPtr anObjectsSelList =
     selectionList(FeaturesPlugin_Translation::OBJECTS_LIST_ID());
   if (anObjectsSelList->size() == 0) {
     return;
   }
   for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr = 
+    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
       anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
     if(!anObject.get()) { // may be for not-activated parts
@@ -60,16 +60,16 @@ void FeaturesPlugin_Translation::execute()
   //Getting axis.
   std::shared_ptr<GeomAPI_Ax1> anAxis;
   std::shared_ptr<GeomAPI_Edge> anEdge;
-  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = 
+  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef =
     selection(FeaturesPlugin_Translation::AXIS_OBJECT_ID());
   if(anObjRef && anObjRef->value() && anObjRef->value()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->value()));
-  } else if (anObjRef && !anObjRef->value() && anObjRef->context() && 
+  } else if (anObjRef && !anObjRef->value() && anObjRef->context() &&
              anObjRef->context()->shape() && anObjRef->context()->shape()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->context()->shape()));
   }
   if(anEdge) {
-    anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(), 
+    anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(),
                                                           anEdge->line()->direction()));
   }
 

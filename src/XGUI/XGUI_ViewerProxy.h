@@ -90,7 +90,7 @@ Q_OBJECT
   /// Update current viewer
   virtual void update();
 
-  /// Method returns True if the viewer can process editing objects 
+  /// Method returns True if the viewer can process editing objects
   /// by mouse drugging. If this is impossible thet it has to return False.
   virtual bool canDragByMouse() const;
 

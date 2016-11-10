@@ -38,7 +38,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetCreatorFactory
   /// Destructor
   virtual ~ModuleBase_WidgetCreatorFactory();
 
-  /// The creator is added to the internal container 
+  /// The creator is added to the internal container
   /// to be used when the createWidgetByType is called
   /// \param theCreator a new widget creator
   void registerCreator(const WidgetCreatorPtr& theCreator);
@@ -64,7 +64,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetCreatorFactory
   /// Create page by its type
   /// \param theType a type
   /// \param theParent a parent widget
-  /// \param theWidgetApi the widget configuration. 
+  /// \param theWidgetApi the widget configuration.
   ///                     The attribute of the model widget is obtained from XML
   /// \return a created page or null
   ModuleBase_PageBase* createPageByType(const std::string& theType,
@@ -74,7 +74,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetCreatorFactory
   /// Create widget by its type
   /// \param theType a type
   /// \param theParent a parent widget
-  /// \param theWidgetApi the widget configuration. 
+  /// \param theWidgetApi the widget configuration.
   ///                     The attribute of the model widget is obtained from XML
   /// \param theWorkshop a workshop object instance
   /// \return a created widget or null

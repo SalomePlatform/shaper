@@ -9,7 +9,7 @@
 #include <Events_Loop.h>
 
 void Events_Listener::groupWhileFlush(const std::shared_ptr<Events_Message>& theMessage) {
-  std::shared_ptr<Events_MessageGroup> aGroup = 
+  std::shared_ptr<Events_MessageGroup> aGroup =
     std::dynamic_pointer_cast<Events_MessageGroup>(theMessage);
   if (aGroup) {
     std::map<char*, std::shared_ptr<Events_Message> >::iterator aMyGroup = myGroups.find(

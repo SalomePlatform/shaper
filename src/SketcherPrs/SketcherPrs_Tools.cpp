@@ -88,13 +88,13 @@ std::shared_ptr<GeomAPI_Pnt2d> getPoint(ModelAPI_Feature* theFeature,
 }
 
 //*************************************************************************************
-/// Find an attribute of the given object which corresponds to a vetrex 
+/// Find an attribute of the given object which corresponds to a vetrex
 /// defined by a shape
 /// \param theObject an object
 /// \param theShape a vertex
 /// \param thePlane a projection plane (sketcher plane)
-std::shared_ptr<GeomDataAPI_Point2D> findGeomPoint(ObjectPtr theObject, 
-                                    const TopoDS_Shape& theShape, 
+std::shared_ptr<GeomDataAPI_Point2D> findGeomPoint(ObjectPtr theObject,
+                                    const TopoDS_Shape& theShape,
                                     const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 {
   std::shared_ptr<GeomDataAPI_Point2D> aGeomPoint;
@@ -109,12 +109,12 @@ std::shared_ptr<GeomDataAPI_Point2D> findGeomPoint(ObjectPtr theObject,
             new GeomAPI_Pnt(aShapePoint.X(), aShapePoint.Y(), aShapePoint.Z()));
 
         // find the given point in the feature attributes
-        std::list<AttributePtr> anObjectAttiributes = 
+        std::list<AttributePtr> anObjectAttiributes =
           anObjectFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
-        std::list<AttributePtr>::const_iterator anIt = anObjectAttiributes.begin(), 
+        std::list<AttributePtr>::const_iterator anIt = anObjectAttiributes.begin(),
                                                 aLast = anObjectAttiributes.end();
         for (; anIt != aLast && !aGeomPoint; anIt++) {
-          std::shared_ptr<GeomDataAPI_Point2D> anAttributePoint = 
+          std::shared_ptr<GeomDataAPI_Point2D> anAttributePoint =
             std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
 
           std::shared_ptr<GeomAPI_Pnt> anAttributePnt = thePlane->to3D(anAttributePoint->x(),
@@ -181,7 +181,7 @@ FeaturePtr getFeatureLine(DataPtr theData,
   if (!theData.get() || !theData->isValid()) /// essential check as it is called in openGl thread)
     return aLine;
 
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr =
     std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theData->attribute(theAttribute));
   if (anAttr) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(anAttr->object());
@@ -271,7 +271,7 @@ std::shared_ptr<GeomAPI_Pnt> getAnchorPoint(const ModelAPI_Feature* theConstrain
   } else if (aFeature->getKind() == SketchPlugin_Circle::ID()) { // circle
     aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aFeature->attribute(SketchPlugin_Circle::CENTER_ID()))->pnt();
-  } else 
+  } else
     return std::shared_ptr<GeomAPI_Pnt>();
 
   std::shared_ptr<GeomAPI_Pnt2d> anOrigin(new GeomAPI_Pnt2d(0.0, 0.0));
@@ -310,7 +310,7 @@ Handle(Prs3d_DimensionAspect) createDimensionAspect()
   return anAspect;
 }
 
-void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect, 
+void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
                   double theDimValue, double theTextSize)
 {
   double anArrowLength = theDimAspect->ArrowAspect()->Length();
@@ -333,7 +333,7 @@ void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
 
 void sendEmptyPresentationError(ModelAPI_Feature* theFeature, const std::string theError)
 {
-  Events_InfoMessage("SketcherPrs_Tools", 
+  Events_InfoMessage("SketcherPrs_Tools",
     "An empty AIS presentation: SketcherPrs_LengthDimension").send();
   static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
   std::shared_ptr<ModelAPI_Object> aConstraintPtr(theFeature);

@@ -25,7 +25,7 @@
  */
 class Model_ResultBody : public ModelAPI_ResultBody
 {
-  /// builders that tores the naming history: one per label to allow store several shapes to one 
+  /// builders that tores the naming history: one per label to allow store several shapes to one
   /// label; index in vector corresponds to the label tag
   //std::vector<TNaming_Builder*> myBuilders;
 

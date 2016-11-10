@@ -52,7 +52,7 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
   Set(aShape);
   Handle(Prs3d_Drawer) aDrawer = Attributes();
-  if (aDrawer->HasOwnPointAspect()) 
+  if (aDrawer->HasOwnPointAspect())
     aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
   else
     aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_PLUS, Quantity_NOC_YELLOW, 1.));
@@ -71,7 +71,7 @@ void ModuleBase_ResultPrs::setAdditionalSelectionPriority(const int thePriority)
 
 void ModuleBase_ResultPrs::Compute(
           const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-          const Handle(Prs3d_Presentation)& thePresentation, 
+          const Handle(Prs3d_Presentation)& thePresentation,
           const Standard_Integer theMode)
 {
   std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(myResult);
@@ -86,7 +86,7 @@ void ModuleBase_ResultPrs::Compute(
   AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
 
   if (!aReadyToDisplay) {
-    Events_InfoMessage("ModuleBase_ResultPrs", 
+    Events_InfoMessage("ModuleBase_ResultPrs",
                        "An empty AIS presentation: ModuleBase_ResultPrs").send();
     static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
     ModelAPI_EventCreator::get()->sendUpdated(myResult, anEvent);
@@ -123,13 +123,13 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
         TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
         int aPriority = StdSelect_BRepSelectionTool::GetStandardPriority(aShape, TopAbs_COMPSOLID);
         /// It is important to have priority for the shape of comp solid result less than priority
-        /// for the presentation shape which is a sub-result. 
+        /// for the presentation shape which is a sub-result.
         /// Reason is to select the sub-objects before: #1592
         aPriority = aPriority - 1;
         double aDeflection = Prs3d::GetDeflection(aShape, myDrawer);
 
         Handle(ModuleBase_BRepOwner) aOwner = new ModuleBase_BRepOwner(aShape, aPriority);
-        StdSelect_BRepSelectionTool::ComputeSensitive(aShape, aOwner, aSelection, 
+        StdSelect_BRepSelectionTool::ComputeSensitive(aShape, aOwner, aSelection,
           aDeflection, myDrawer->HLRAngle(), 9, 500);
 
         for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
@@ -142,12 +142,12 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
       }
     }
     //AIS_Shape::ComputeSelection(aSelection, 0);
-  } 
+  }
   AIS_Shape::ComputeSelection(aSelection, aMode);
 
   if (myAdditionalSelectionPriority > 0) {
     for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
-      Handle(SelectBasics_EntityOwner) aBasicsOwner = 
+      Handle(SelectBasics_EntityOwner) aBasicsOwner =
         aSelection->Sensitive()->BaseSensitive()->OwnerId();
       if (!aBasicsOwner.IsNull())
         aBasicsOwner->Set(aBasicsOwner->Priority() + myAdditionalSelectionPriority);
@@ -174,7 +174,7 @@ void ModuleBase_ResultPrs::appendWiresSelection(const Handle(SelectMgr_Selection
   }
 }
 
-void ModuleBase_ResultPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
+void ModuleBase_ResultPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM,
                                            const SelectMgr_SequenceOfOwner& theOwners)
 {
   Handle(SelectMgr_EntityOwner) anOwner;
@@ -198,9 +198,9 @@ void ModuleBase_ResultPrs::HilightSelected(const Handle(PrsMgr_PresentationManag
     }
   }
 }
-  
-void ModuleBase_ResultPrs::HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM, 
-                                                 const Quantity_NameOfColor theColor, 
+
+void ModuleBase_ResultPrs::HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM,
+                                                 const Quantity_NameOfColor theColor,
                                                  const Handle(SelectMgr_EntityOwner)& theOwner)
 {
   Handle(StdSelect_BRepOwner) aOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);

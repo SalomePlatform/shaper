@@ -97,7 +97,7 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   myViewInverted = new QCheckBox(tr("Reversed"), aViewBox);
   aViewLayout->addWidget(myViewInverted);
 
-  QPushButton* aSetViewBtn = 
+  QPushButton* aSetViewBtn =
     new QPushButton(QIcon(":icons/plane_view.png"), tr("Set plane view"), aViewBox);
   connect(aSetViewBtn, SIGNAL(clicked(bool)), this, SLOT(onSetPlaneView()));
   aViewLayout->addWidget(aSetViewBtn);
@@ -285,7 +285,7 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   //myLabel->setText("");
   //myLabel->setToolTip("");
   XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
-  disconnect(aWorkshop->selector(), SIGNAL(selectionChanged()), 
+  disconnect(aWorkshop->selector(), SIGNAL(selectionChanged()),
               this, SLOT(onSelectionChanged()));
   // 4. deactivate face selection filter
   activateFilters(false);
@@ -388,7 +388,7 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const FeaturePtr& the
 
   if (thePrs->object() && (theFeature != thePrs->object())) {
     DataPtr aData = theFeature->data();
-    AttributeSelectionPtr aSelAttr = 
+    AttributeSelectionPtr aSelAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
       (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
     if (aSelAttr) {

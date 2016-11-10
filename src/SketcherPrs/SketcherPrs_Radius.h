@@ -28,7 +28,7 @@ public:
   /// Constructor
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
-  Standard_EXPORT SketcherPrs_Radius(ModelAPI_Feature* theConstraint, 
+  Standard_EXPORT SketcherPrs_Radius(ModelAPI_Feature* theConstraint,
                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
   /// Destructor
@@ -36,7 +36,7 @@ public:
 
   DEFINE_STANDARD_RTTI(SketcherPrs_Radius)
 
-  /// Returns true if the constraint feature arguments are correcly filled 
+  /// Returns true if the constraint feature arguments are correcly filled
   /// to build AIS presentation
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch

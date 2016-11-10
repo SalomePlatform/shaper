@@ -20,7 +20,7 @@ ModuleBase_OperationAction::~ModuleBase_OperationAction()
 
 bool ModuleBase_OperationAction::commit()
 {
-  // the action is supposed to perform a single modification, 
+  // the action is supposed to perform a single modification,
   // so the operation returns modified state
   setIsModified(true);
 

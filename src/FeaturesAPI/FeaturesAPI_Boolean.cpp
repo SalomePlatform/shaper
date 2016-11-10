@@ -84,7 +84,7 @@ void FeaturesAPI_Boolean::dump(ModelHighAPI_Dumper& theDumper) const
   }
 
   const std::string& aDocName = theDumper.name(aBase->document());
-  AttributeSelectionListPtr anObjects = 
+  AttributeSelectionListPtr anObjects =
     aBase->selectionList(FeaturesPlugin_Boolean::OBJECT_LIST_ID());
   AttributeSelectionListPtr aTools = aBase->selectionList(FeaturesPlugin_Boolean::TOOL_LIST_ID());
 

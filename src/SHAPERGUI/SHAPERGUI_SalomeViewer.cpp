@@ -133,13 +133,13 @@ void SHAPERGUI_SalomeViewer::setSelector(SHAPERGUI_OCCSelector* theSel)
   // TODO: Provide ModuleBase_IViewWindow interface
   connect(aMgr, SIGNAL(lastViewClosed(SUIT_ViewManager*)), this, SIGNAL(lastViewClosed()));
 
-  connect(aMgr, SIGNAL(tryCloseView(SUIT_ViewWindow*)), 
+  connect(aMgr, SIGNAL(tryCloseView(SUIT_ViewWindow*)),
           this, SLOT(onTryCloseView(SUIT_ViewWindow*)));
-  connect(aMgr, SIGNAL(deleteView(SUIT_ViewWindow*)), 
+  connect(aMgr, SIGNAL(deleteView(SUIT_ViewWindow*)),
           this, SLOT(onDeleteView(SUIT_ViewWindow*)));
-  connect(aMgr, SIGNAL(viewCreated(SUIT_ViewWindow*)), 
+  connect(aMgr, SIGNAL(viewCreated(SUIT_ViewWindow*)),
           this, SLOT(onViewCreated(SUIT_ViewWindow*)));
-  connect(aMgr, SIGNAL(activated(SUIT_ViewManager*)), 
+  connect(aMgr, SIGNAL(activated(SUIT_ViewManager*)),
           this, SLOT(onActivated(SUIT_ViewManager*)));
 
   connect(aMgr, SIGNAL(mousePress(SUIT_ViewWindow*, QMouseEvent*)), this,
@@ -254,7 +254,7 @@ void SHAPERGUI_SalomeViewer::onViewCreated(SUIT_ViewWindow* theView)
   }
   reconnectActions(aWnd, true);
 
-  myWindowScale.insert(aView->getViewPort()->getView(), 
+  myWindowScale.insert(aView->getViewPort()->getView(),
                        aView->getViewPort()->getView()->Camera()->Scale());
 
   emit viewCreated(myView);
@@ -352,10 +352,10 @@ void SHAPERGUI_SalomeViewer::fitAll()
 }
 
 //**********************************************
-void SHAPERGUI_SalomeViewer::setViewProjection(double theX, double theY, 
+void SHAPERGUI_SalomeViewer::setViewProjection(double theX, double theY,
                                                double theZ, double theTwist)
 {
-  if (!mySelector) 
+  if (!mySelector)
     return;
 
   SUIT_ViewManager* aMgr = mySelector->viewer()->getViewManager();
@@ -455,7 +455,7 @@ void SHAPERGUI_SalomeViewer::activateViewer(bool toActivate)
     foreach (SUIT_ViewWindow* aView, aViews) {
       OCCViewer_ViewFrame* aOCCView = dynamic_cast<OCCViewer_ViewFrame*>(aView);
       OCCViewer_ViewWindow* aWnd = aOCCView->getView(OCCViewer_ViewFrame::MAIN_VIEW);
-      disconnect((OCCViewer_ViewWindow*)aWnd, 
+      disconnect((OCCViewer_ViewWindow*)aWnd,
                  SIGNAL(vpTransformationFinished(OCCViewer_ViewWindow::OperationType)),
         this, SLOT(onViewTransformed(OCCViewer_ViewWindow::OperationType)));
       reconnectActions(aWnd, false);

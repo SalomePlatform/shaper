@@ -90,9 +90,9 @@ double SketchPlugin_Line::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& 
   double aDelta = 0;
 
   std::shared_ptr<ModelAPI_Data> aData = data();
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = 
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint2 = 
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(END_ID()));
 
   GeomAPI_Lin2d aLin2d(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y());
@@ -132,10 +132,10 @@ void SketchPlugin_Line::attributeChanged(const std::string& theID) {
     // update arguments due to the selection value
     if (aSelection && !aSelection->isNull() && aSelection->isEdge()) {
       std::shared_ptr<GeomAPI_Edge> anEdge( new GeomAPI_Edge(aSelection));
-      std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
+      std::shared_ptr<GeomDataAPI_Point2D> aStartAttr =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_ID()));
       aStartAttr->setValue(sketch()->to2D(anEdge->firstPoint()));
-      std::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
+      std::shared_ptr<GeomDataAPI_Point2D> anEndAttr =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(END_ID()));
       anEndAttr->setValue(sketch()->to2D(anEdge->lastPoint()));
       updateLenghtValue();

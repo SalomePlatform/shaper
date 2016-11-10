@@ -36,7 +36,7 @@ bool GeomValidators_FeatureKind::isValid(const AttributePtr& theAttribute,
 
   std::string anAttributeType = theAttribute->attributeType();
   if (anAttributeType == ModelAPI_AttributeSelectionList::typeId()) {
-    AttributeSelectionListPtr aSelectionListAttr = 
+    AttributeSelectionListPtr aSelectionListAttr =
                       std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
     // all context objects should be sketch entities
     for (int i = 0, aSize = aSelectionListAttr->size(); i < aSize && isSketchEntities; i++) {
@@ -60,7 +60,7 @@ bool GeomValidators_FeatureKind::isValid(const AttributePtr& theAttribute,
     }
   }
   if (anAttributeType == ModelAPI_AttributeSelection::typeId()) {
-    AttributeSelectionPtr aSelectAttr = 
+    AttributeSelectionPtr aSelectAttr =
                       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
     ObjectPtr anObject = aSelectAttr->context();
     // a context of the selection attribute is a feature result. It can be a case when the result
@@ -93,7 +93,7 @@ bool GeomValidators_FeatureKind::isValid(const AttributePtr& theAttribute,
     }
   }
   if (anAttributeType == ModelAPI_AttributeRefAttr::typeId()) {
-    std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
+    std::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
                      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
     isSketchEntities = false;
     if (aRef->isObject()) {
@@ -106,7 +106,7 @@ bool GeomValidators_FeatureKind::isValid(const AttributePtr& theAttribute,
     }
   }
   if (anAttributeType == ModelAPI_AttributeReference::typeId()) {
-    AttributeReferencePtr aRefAttr = 
+    AttributeReferencePtr aRefAttr =
                       std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
     ObjectPtr anObject = aRefAttr->value();
     // a context of the selection attribute is a feature result. It can be a case when the result

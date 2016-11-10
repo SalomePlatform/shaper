@@ -34,7 +34,7 @@ ParametersPlugin_Plugin::ParametersPlugin_Plugin()
   aFactory->registerValidator("Parameters_ExpressionValidator",
                               new ParametersPlugin_ExpressionValidator);
 
-  myEvalListener = 
+  myEvalListener =
     std::shared_ptr<ParametersPlugin_EvalListener>(new ParametersPlugin_EvalListener());
 }
 

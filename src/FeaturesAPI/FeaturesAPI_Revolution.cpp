@@ -162,7 +162,7 @@ void FeaturesAPI_Revolution::dump(ModelHighAPI_Dumper& theDumper) const
   anAttrSketch->isInitialized() ? theDumper << "[]" : theDumper << anAttrObjects;
   theDumper << ", " << anAttrAxis;
 
-  std::string aCreationMethod = 
+  std::string aCreationMethod =
     aBase->string(FeaturesPlugin_Revolution::CREATION_METHOD())->value();
 
   if(aCreationMethod == FeaturesPlugin_Revolution::CREATION_METHOD_BY_ANGLES()) {
@@ -178,7 +178,7 @@ void FeaturesAPI_Revolution::dump(ModelHighAPI_Dumper& theDumper) const
       aBase->selection(FeaturesPlugin_Revolution::FROM_OBJECT_ID());
     AttributeDoublePtr anAttrFromOffset = aBase->real(FeaturesPlugin_Revolution::FROM_OFFSET_ID());
 
-    theDumper << ", " << anAttrToObject << ", " << anAttrToOffset << 
+    theDumper << ", " << anAttrToObject << ", " << anAttrToOffset <<
       ", " << anAttrFromObject << ", " << anAttrFromOffset;
   }
 

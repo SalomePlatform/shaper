@@ -21,11 +21,11 @@
 #include <QPushButton>
 
 
-ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QString& theId, 
-                                     const std::string& theDescription) : 
-                                     QDialog(theParent->desktop()), 
-                                     myId(theId), 
-                                     myDescription(theDescription), 
+ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QString& theId,
+                                     const std::string& theDescription) :
+                                     QDialog(theParent->desktop()),
+                                     myId(theId),
+                                     myDescription(theDescription),
                                      myWorkshop(theParent),
                                      myActiveWidget(0)
 {

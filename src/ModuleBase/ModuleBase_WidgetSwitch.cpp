@@ -18,7 +18,7 @@
 #include <QStackedLayout>
 #include <QVBoxLayout>
 
-ModuleBase_WidgetSwitch::ModuleBase_WidgetSwitch(QWidget* theParent, 
+ModuleBase_WidgetSwitch::ModuleBase_WidgetSwitch(QWidget* theParent,
   const Config_WidgetAPI* theData)
 : ModuleBase_PagedContainer(theParent, theData)
 {

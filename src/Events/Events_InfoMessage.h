@@ -29,12 +29,12 @@ public:
 
   /// Constructor
   /// \param theSender a pointer on sender object
-  Events_InfoMessage(const std::string& theContext, 
+  Events_InfoMessage(const std::string& theContext,
     const std::string& theMsg, const void* theSender = 0):
   Events_Message(Events_Loop::eventByName("InfoMessage"), theSender),
     myContext(theContext), myMessage(theMsg) {}
 
-  /// default destructor   
+  /// default destructor
   virtual ~Events_InfoMessage() {}
 
   /// Identifier of this event (one for all errors)
@@ -42,7 +42,7 @@ public:
 
   /// Set a context string
   /// \param theContext a context string
-  void  setContext(const std::string& theContext) { myContext = theContext; } 
+  void  setContext(const std::string& theContext) { myContext = theContext; }
 
 
   /// Returns context string
@@ -50,7 +50,7 @@ public:
 
   /// Set message string for translation
   /// \param theMsg the string of message
-  void setMessageString(const std::string& theMsg) { myMessage = theMsg; } 
+  void setMessageString(const std::string& theMsg) { myMessage = theMsg; }
 
   /// Returns message
   EVENTS_EXPORT std::string messageString() const;
@@ -66,9 +66,9 @@ public:
 
   /// Add parameter for message string of string type
   /// \param theParam the parameter
-  void addParameter(const std::string& theParam) 
-  { 
-    myParameters.push_back(theParam); 
+  void addParameter(const std::string& theParam)
+  {
+    myParameters.push_back(theParam);
   }
 
   /// Add parameter for message string of double type

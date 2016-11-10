@@ -119,12 +119,12 @@ void PartSet_PreviewPlanes::showPreviewPlanes(ModuleBase_IWorkshop* theWorkshop)
   myPreviewDisplayed = true;
 }
 
-AISObjectPtr PartSet_PreviewPlanes::createPreviewPlane(std::shared_ptr<GeomAPI_Pnt> theOrigin, 
-                                                       std::shared_ptr<GeomAPI_Dir> theNorm, 
+AISObjectPtr PartSet_PreviewPlanes::createPreviewPlane(std::shared_ptr<GeomAPI_Pnt> theOrigin,
+                                                       std::shared_ptr<GeomAPI_Dir> theNorm,
                                                        const int theRGB[3])
 {
   double aSize = Config_PropManager::integer(SKETCH_TAB_NAME, "planes_size", PLANE_SIZE);
-  std::shared_ptr<GeomAPI_Shape> aFace = 
+  std::shared_ptr<GeomAPI_Shape> aFace =
     GeomAlgoAPI_FaceBuilder::squareFace(theOrigin, theNorm, aSize);
   AISObjectPtr aAIS = AISObjectPtr(new GeomAPI_AISObject());
   aAIS->createShape(aFace);

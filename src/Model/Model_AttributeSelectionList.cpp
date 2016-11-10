@@ -43,7 +43,7 @@ void Model_AttributeSelectionList::append(
   int aNewTag = mySize->Get() + 1;
   TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);
 
-  std::shared_ptr<Model_AttributeSelection> aNewAttr = 
+  std::shared_ptr<Model_AttributeSelection> aNewAttr =
     std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aNewLab));
   if (owner()) {
     aNewAttr->setObject(owner());
@@ -53,7 +53,7 @@ void Model_AttributeSelectionList::append(
   aNewAttr->setValue(theContext, theSubShape, theTemporarily);
   if (theTemporarily)
     myTmpAttr = aNewAttr;
-  else 
+  else
     myTmpAttr.reset();
   owner()->data()->sendAttributeUpdated(this);
 }
@@ -64,7 +64,7 @@ void Model_AttributeSelectionList::append(
   int aNewTag = mySize->Get() + 1;
   TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);
 
-  std::shared_ptr<Model_AttributeSelection> aNewAttr = 
+  std::shared_ptr<Model_AttributeSelection> aNewAttr =
     std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aNewLab));
   if (owner()) {
     aNewAttr->setObject(owner());
@@ -82,13 +82,13 @@ void Model_AttributeSelectionList::removeTemporaryValues()
   }
 }
 
-void Model_AttributeSelectionList::removeLast() 
+void Model_AttributeSelectionList::removeLast()
 {
   int anOldSize = mySize->Get();
   if (anOldSize != 0) {
     mySize->Set(anOldSize - 1);
     TDF_Label aLab = mySize->Label().FindChild(anOldSize);
-    std::shared_ptr<Model_AttributeSelection> aOldAttr = 
+    std::shared_ptr<Model_AttributeSelection> aOldAttr =
       std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aLab));
     aOldAttr->setObject(owner());
     REMOVE_BACK_REF(aOldAttr->context());
@@ -98,10 +98,10 @@ void Model_AttributeSelectionList::removeLast()
   }
 }
 
-// copies named shapes: we need the implementation of this 
+// copies named shapes: we need the implementation of this
 static void CopyNS(const Handle(TNaming_NamedShape)& theFrom,
   const Handle(TDF_Attribute)& theTo)
-{ 
+{
   TDF_Label aLab = theTo->Label();
   TNaming_Builder B(aLab);
 
@@ -129,10 +129,10 @@ static void CopyNS(const Handle(TNaming_NamedShape)& theFrom,
     case TNaming_GENERATED :
       B.Generated(aOldIter.Value(), aNewIter.Value());
       break;
-    case TNaming_MODIFY : 
+    case TNaming_MODIFY :
       B.Modify(aOldIter.Value(), aNewIter.Value());
       break;
-    case TNaming_DELETE : 
+    case TNaming_DELETE :
       B.Delete (aOldIter.Value());
       break;
     case TNaming_SELECTED :
@@ -158,7 +158,7 @@ static void copyAttrs(TDF_Label theSource, TDF_Label theDestination) {
     Handle(TNaming_NamedShape) aNS = Handle(TNaming_NamedShape)::DownCast(anAttrIter.Value());
     if (aNS.IsNull()) {
       // no relocation, empty map
-      Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(); 
+      Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable();
       anAttrIter.Value()->Paste(aTargetAttr, aRelocTable);
     } else {
       CopyNS(aNS, aTargetAttr);
@@ -187,7 +187,7 @@ void Model_AttributeSelectionList::remove(const std::set<int>& theIndices)
       }
     } else { // this is removed, so remove everything from this label
       TDF_Label aLab = mySize->Label().FindChild(aCurrent + 1);
-      std::shared_ptr<Model_AttributeSelection> aOldAttr = 
+      std::shared_ptr<Model_AttributeSelection> aOldAttr =
         std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aLab));
       aOldAttr->setObject(owner());
       REMOVE_BACK_REF(aOldAttr->context());
@@ -259,7 +259,7 @@ void Model_AttributeSelectionList::setSelectionType(const std::string& theType)
   mySelectionType->Set(theType.c_str());
 }
 
-std::shared_ptr<ModelAPI_AttributeSelection> 
+std::shared_ptr<ModelAPI_AttributeSelection>
   Model_AttributeSelectionList::value(const int theIndex)
 {
   if (myTmpAttr.get() && theIndex == size() - 1) {
@@ -269,7 +269,7 @@ std::shared_ptr<ModelAPI_AttributeSelection>
   // create a new attribute each time, by demand
   // supporting of old attributes is too slow (synch each time) and buggy on redo
   // (if attribute is deleted and created, the abort updates attriute and makes the Attr invalid)
-  std::shared_ptr<Model_AttributeSelection> aNewAttr = 
+  std::shared_ptr<Model_AttributeSelection> aNewAttr =
     std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aLabel));
   aNewAttr->setID(id());
   if (owner()) {
@@ -286,7 +286,7 @@ void Model_AttributeSelectionList::clear()
     TDF_ChildIterator aSubIter(mySize->Label());
     for(; aSubIter.More(); aSubIter.Next()) {
       TDF_Label aLab = aSubIter.Value();
-      std::shared_ptr<Model_AttributeSelection> aNewAttr = 
+      std::shared_ptr<Model_AttributeSelection> aNewAttr =
         std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aLab));
       if (owner()) {
         aNewAttr->setObject(owner());

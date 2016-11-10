@@ -117,7 +117,7 @@ void XGUI_ModuleConnector::setSelected(const QList<ModuleBase_ViewerPrsPtr>& the
     myWorkshop->selector()->clearSelection();
   } else {
     aDisp->setSelected(theValues);
-  }    
+  }
 }
 
 void XGUI_ModuleConnector::setStatusBarMessage(const QString& theMessage)
@@ -135,7 +135,7 @@ void XGUI_ModuleConnector::processLaunchOperation(ModuleBase_Operation* theOpera
   XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
 
   if (anOperationMgr->startOperation(theOperation)) {
-    ModuleBase_OperationFeature* aFOperation = 
+    ModuleBase_OperationFeature* aFOperation =
       dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
     if (aFOperation) {
       workshop()->propertyPanel()->updateContentWidget(aFOperation->feature());
@@ -168,9 +168,9 @@ void XGUI_ModuleConnector::updateCommandStatus()
   myWorkshop->updateCommandStatus();
 }
 
-QMainWindow* XGUI_ModuleConnector::desktop() const 
-{ 
-  return myWorkshop->desktop(); 
+QMainWindow* XGUI_ModuleConnector::desktop() const
+{
+  return myWorkshop->desktop();
 }
 
 
@@ -178,8 +178,8 @@ std::shared_ptr<Config_FeatureMessage> XGUI_ModuleConnector::featureInfo(const Q
 {
 #ifdef HAVE_SALOME
   return myWorkshop->salomeConnector()->featureInfo(theId);
-#else 
-  AppElements_Command* aAction = 
+#else
+  AppElements_Command* aAction =
     dynamic_cast<AppElements_Command*>(myWorkshop->actionsMgr()->action(theId));
   if (aAction)
     return aAction->featureMessage();

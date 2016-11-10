@@ -59,7 +59,7 @@ void Events_Loop::send(const std::shared_ptr<Events_Message>& theMessage, bool i
   // if it is grouped message, just accumulate it
   bool isFlushedNow = myFlushed.find(theMessage->eventID().myID) != myFlushed.end();
   if (isGroup && !isFlushedNow) {
-    std::shared_ptr<Events_MessageGroup> aGroup = 
+    std::shared_ptr<Events_MessageGroup> aGroup =
       std::dynamic_pointer_cast<Events_MessageGroup>(theMessage);
     if (aGroup) {
       std::map<char*, std::shared_ptr<Events_Message> >::iterator aMyGroup = myGroups.find(

@@ -34,7 +34,7 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   std::map<std::string, AttrValidators> myFeatures;
   /// validators IDs and arguments by feature and attribute IDs
   std::map<std::string, std::map<std::string, AttrValidators> > myAttrs;
-  /// Stores the registered attributes that leads to the concealment of referenced objects in 
+  /// Stores the registered attributes that leads to the concealment of referenced objects in
   /// data tree. Map from feature kind to set of attribute IDs.
   std::map<std::string, std::set<std::string> > myConcealed;
   /// Stored the unconcealed results and features that caused the canceled concealment (Recover).
@@ -42,7 +42,7 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   std::map<std::shared_ptr<ModelAPI_Result>, std::list<std::shared_ptr<ModelAPI_Feature> > >
     myUnconcealed;
   /// Stores the registered attributes must be checked only if the particular case is activated
-  /// Map from feature kind to map of attribute IDs to pair 
+  /// Map from feature kind to map of attribute IDs to pair
   // (switchId (ID of the attribute) and case Ids (possible values of the switch attribute))
   std::map<std::string, std::map<std::string,
           std::map<std::string, std::set<std::string> > > > myCases;
@@ -71,7 +71,7 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   MODEL_EXPORT virtual void validators(const std::string& theFeatureID,
                                        Validators& theResult) const;
   /// Provides a validator for the attribute, returns NULL if no validator
-  MODEL_EXPORT virtual void validators(const std::string& theFeatureID, 
+  MODEL_EXPORT virtual void validators(const std::string& theFeatureID,
     const std::string& theAttrID, Validators& theResult) const;
 
   /// Returns registered validator by its Id

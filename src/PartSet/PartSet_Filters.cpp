@@ -33,7 +33,7 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
     if (ModuleBase_ShapeDocumentFilter::IsOk(theOwner)) {
       std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
       if (theOwner->HasSelectable()) {
-        Handle(AIS_InteractiveObject) aAisObj = 
+        Handle(AIS_InteractiveObject) aAisObj =
           Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
         if (!aAisObj.IsNull()) {
           aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aAisObj));
@@ -52,7 +52,7 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
           FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
           if (aFeature) {
             aValid = aFeature->getKind() != "Group";
-          } else 
+          } else
             aValid = Standard_True;
         }
       } else
@@ -69,7 +69,7 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
 IMPLEMENT_STANDARD_HANDLE(PartSet_CirclePointFilter, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_CirclePointFilter, SelectMgr_Filter);
 
-Standard_Boolean 
+Standard_Boolean
   PartSet_CirclePointFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   ModuleBase_Operation* anOperation = myWorkshop->module()->currentOperation();
@@ -91,7 +91,7 @@ Standard_Boolean
     return Standard_True;
   }
 
-  Handle(ModuleBase_ResultPrs) aResultPrs = 
+  Handle(ModuleBase_ResultPrs) aResultPrs =
     Handle(ModuleBase_ResultPrs)::DownCast(theOwner->Selectable());
   if(aResultPrs.IsNull()) {
     return Standard_True;

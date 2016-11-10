@@ -31,7 +31,7 @@ void SketchPlugin_ConstraintMirror::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_C(), ModelAPI_AttributeRefList::typeId());
-  data()->addAttribute(SketchPlugin_ConstraintMirror::MIRROR_LIST_ID(), 
+  data()->addAttribute(SketchPlugin_ConstraintMirror::MIRROR_LIST_ID(),
                        ModelAPI_AttributeRefList::typeId());
   ModelAPI_Session::get()->validators()->
     registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_B());
@@ -136,7 +136,7 @@ void SketchPlugin_ConstraintMirror::execute()
       if (aMirrorIter != aMirroredList.end())
         break; // the lists are inconsistent
       // There is no mirrored object yet, create it
-      FeaturePtr aNewFeature = 
+      FeaturePtr aNewFeature =
         SketchPlugin_Sketch::addUniqueNamedCopiedFeature(aFeatureIn, sketch(), true);
       aNewFeature->execute();
       ModelAPI_EventCreator::get()->sendUpdated(aNewFeature, aRedisplayEvent);
@@ -211,14 +211,14 @@ void SketchPlugin_ConstraintMirror::erase()
     static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
 
     std::list<ObjectPtr> aTargetList = aRefListOfMirrored->list();
-    for(std::list<ObjectPtr>::const_iterator aTargetIt = 
+    for(std::list<ObjectPtr>::const_iterator aTargetIt =
         aTargetList.cbegin(); aTargetIt != aTargetList.cend(); aTargetIt++) {
       if((*aTargetIt).get()) {
         ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(*aTargetIt);
         if(aRes.get()) {
           FeaturePtr aFeature = aRes->document()->feature(aRes);
           if(aFeature.get()) {
-            AttributeBooleanPtr aBooleanAttr = 
+            AttributeBooleanPtr aBooleanAttr =
               aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID());
             if(aBooleanAttr.get()) {
               if (ModelAPI_Session::get()->isOperation()) // if this is not undo or redo

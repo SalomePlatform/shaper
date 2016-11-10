@@ -70,7 +70,7 @@ MODULEBASE_EXPORT void setShadowEffect(QWidget* theWidget, const bool isSetEffec
 /// \ingroup GUI
 /// Methods to modify a resource pixmap
 
-/// Create composite pixmap. 
+/// Create composite pixmap.
 /// Pixmap \a theAdditionalIcon is drawn over pixmap \a dest with coordinates
 /// specified relatively to the upper left corner of \a theIcon.
 
@@ -79,10 +79,10 @@ MODULEBASE_EXPORT void setShadowEffect(QWidget* theWidget, const bool isSetEffec
 /// \return resulting pixmap
 MODULEBASE_EXPORT QPixmap composite(const QString& theAdditionalIcon, const QString& theIcon);
 
-/// Generates the pixmap lighter than the resources pixmap. 
+/// Generates the pixmap lighter than the resources pixmap.
 /// Pixmap \a theIcon is lighted according to the given value.
 /// If the lighter value is greater than 100, this functions returns a lighter pixmap.
-/// Setting lighter value to 150 returns a color that is 50% brighter. 
+/// Setting lighter value to 150 returns a color that is 50% brighter.
 /// If the factor is less than 100,
 /// the return pixmap is darker. If the factor is 0 or negative, the return pixmap is unspecified.
 
@@ -134,7 +134,7 @@ MODULEBASE_EXPORT QAction* createAction(const QIcon& theIcon, const QString& the
 /// \param theObj an object
 /// \param isUseAttributesInfo a flag whether the attribute values information is used
 /// \return a string
-MODULEBASE_EXPORT QString objectInfo(const ObjectPtr& theObj, 
+MODULEBASE_EXPORT QString objectInfo(const ObjectPtr& theObj,
                                      const bool isUseAttributesInfo = false);
 
 /// Converts the AIS context information in a string information.
@@ -172,7 +172,7 @@ MODULEBASE_EXPORT void checkObjects(const QObjectPtrList& theObjects, bool& hasR
 
 /// Sets the default coeffient into the driver calculated accordingly the shape type.
 /// It provides 1.e-4 for a shape withe Edge shape type
-/// \param theShape a shape to define the deviation coeffient, 
+/// \param theShape a shape to define the deviation coeffient,
 /// \param theDrawer a drawer
 MODULEBASE_EXPORT void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
                                                       const Handle(Prs3d_Drawer)& theDrawer);
@@ -295,7 +295,7 @@ bool MODULEBASE_EXPORT hasModuleDocumentFeature(const std::set<FeaturePtr>& theF
 /// \param theReferencesToDelete an out set for references features to be removed
 /// \return true if in message box answer is Yes
 bool MODULEBASE_EXPORT askToDelete(const std::set<FeaturePtr> aFeatures,
-                                   const std::map<FeaturePtr, 
+                                   const std::map<FeaturePtr,
                                    std::set<FeaturePtr> >& theReferences,
                                    QWidget* theParent,
                                    std::set<FeaturePtr>& theReferencesToDelete,
@@ -306,12 +306,12 @@ bool MODULEBASE_EXPORT askToDelete(const std::set<FeaturePtr> aFeatures,
 /// of this parameter is to be removed
 /// \param theObjects a list of objects
 /// \param theFeatures an out conteiner of features
-void MODULEBASE_EXPORT convertToFeatures(const QObjectPtrList& theObjects, 
+void MODULEBASE_EXPORT convertToFeatures(const QObjectPtrList& theObjects,
                                          std::set<FeaturePtr>& theFeatures);
 
 
 /// Returns translation from the given data.
-/// If translation is not exists then it returns a string 
+/// If translation is not exists then it returns a string
 /// from the info data without translation
 /// \param theContext context of the message (Feature Id)
 /// \param theMessage a message which dave to be translated

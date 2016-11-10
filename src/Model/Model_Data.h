@@ -101,7 +101,7 @@ class Model_Data : public ModelAPI_Data
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeSelection>
     selection(const std::string& theID);
   /// Returns the attribute that contains selection to a shape
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeSelectionList> 
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeSelectionList>
     selectionList(const std::string& theID);
   /// Returns the attribute that contains reference to an attribute of a feature
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeRefAttr>
@@ -153,7 +153,7 @@ class Model_Data : public ModelAPI_Data
   /// \param theID identifier of the attribute that can be referenced by this ID later
   /// \param theAttrType type of the created attribute (received from the type method)
   /// \returns the just created attribute
-  MODEL_EXPORT virtual AttributePtr 
+  MODEL_EXPORT virtual AttributePtr
     addAttribute(const std::string& theID, const std::string theAttrType);
 
   /// Useful method for "set" methods of the attributes: sends an UPDATE event and
@@ -201,7 +201,7 @@ class Model_Data : public ModelAPI_Data
   MODEL_EXPORT virtual const std::set<AttributePtr>& refsToMe() {return myRefsToMe;}
 
   /// returns all references by attributes of this data
-  /// \param theRefs returned list of pairs: 
+  /// \param theRefs returned list of pairs:
   ///                id of referenced attribute and list of referenced objects
   MODEL_EXPORT virtual void referencesToObjects(
     std::list<std::pair<std::string, std::list<ObjectPtr> > >& theRefs);
@@ -253,7 +253,7 @@ private:
   /// \param theFeature feature referenced to this
   /// \param theAttrID identifier of the attribute that is references from theFeature to this
   /// \param theApplyConcealment applies consealment flag changes
-  void addBackReference(FeaturePtr theFeature, std::string theAttrID, 
+  void addBackReference(FeaturePtr theFeature, std::string theAttrID,
     const bool theApplyConcealment = true);
 
   /// Makes the concealment flag up to date for this object-owner.

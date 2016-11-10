@@ -55,7 +55,7 @@ bool SolveSpaceSolver_ConstraintWrapper::isUsed(AttributePtr theAttribute) const
 
 bool SolveSpaceSolver_ConstraintWrapper::isEqual(const ConstraintWrapperPtr& theOther)
 {
-  const Slvs_Constraint anOtherConstraint = 
+  const Slvs_Constraint anOtherConstraint =
     std::dynamic_pointer_cast<SolveSpaceSolver_ConstraintWrapper>(theOther)->constraint();
   if (mySlvsConstraint.type != anOtherConstraint.type)
     return false;

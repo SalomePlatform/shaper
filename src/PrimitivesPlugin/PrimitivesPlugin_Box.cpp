@@ -30,7 +30,7 @@ void PrimitivesPlugin_Box::initAttributes()
   data()->addAttribute(PrimitivesPlugin_Box::DY_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(PrimitivesPlugin_Box::DZ_ID(), ModelAPI_AttributeDouble::typeId());
 
-  data()->addAttribute(PrimitivesPlugin_Box::POINT_FIRST_ID(), 
+  data()->addAttribute(PrimitivesPlugin_Box::POINT_FIRST_ID(),
                        ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(PrimitivesPlugin_Box::POINT_SECOND_ID(),
                        ModelAPI_AttributeSelection::typeId());
@@ -41,11 +41,11 @@ void PrimitivesPlugin_Box::execute()
 {
   AttributeStringPtr aMethodTypeAttr = string(PrimitivesPlugin_Box::CREATION_METHOD());
   std::string aMethodType = aMethodTypeAttr->value();
-  
-  if (aMethodType == CREATION_METHOD_BY_DIMENSIONS()) 
+
+  if (aMethodType == CREATION_METHOD_BY_DIMENSIONS())
     createBoxByDimensions();
-  
-  if (aMethodType == CREATION_METHOD_BY_TWO_POINTS()) 
+
+  if (aMethodType == CREATION_METHOD_BY_TWO_POINTS())
     createBoxByTwoPoints();
 }
 
@@ -57,16 +57,16 @@ void PrimitivesPlugin_Box::createBoxByDimensions()
   double aDz = real(PrimitivesPlugin_Box::DZ_ID())->value();
 
   std::shared_ptr<GeomAlgoAPI_Box> aBoxAlgo(new GeomAlgoAPI_Box(aDx,aDy,aDz));
-  
-  // These checks should be made to the GUI for the feature but 
+
+  // These checks should be made to the GUI for the feature but
   // the corresponding validator does not exist yet.
   if (!aBoxAlgo->check()) {
     // The error is not displayed in a popup window. It must be in the status bar.
     setError(aBoxAlgo->getError(), false);
     return;
   }
-  
-  // Build the box 
+
+  // Build the box
   aBoxAlgo->build();
 
   // Check if the creation of the box
@@ -78,21 +78,21 @@ void PrimitivesPlugin_Box::createBoxByDimensions()
     setError(aBoxAlgo->getError());
     return;
   }
-  
+
   int aResultIndex = 0;
-  ResultBodyPtr aResultBox = document()->createBody(data(), aResultIndex); 
+  ResultBodyPtr aResultBox = document()->createBody(data(), aResultIndex);
   loadNamingDS(aBoxAlgo, aResultBox);
   setResult(aResultBox, aResultIndex);
 }
 
 //=================================================================================================
-void PrimitivesPlugin_Box::createBoxByTwoPoints() 
+void PrimitivesPlugin_Box::createBoxByTwoPoints()
 {
   AttributeSelectionPtr aRef1 = data()->selection(PrimitivesPlugin_Box::POINT_FIRST_ID());
   AttributeSelectionPtr aRef2 = data()->selection(PrimitivesPlugin_Box::POINT_SECOND_ID());
-  
+
   std::shared_ptr<GeomAlgoAPI_BoxPoints> aBoxAlgo;
-  
+
   if ((aRef1.get() != NULL) && (aRef2.get() != NULL)) {
     GeomShapePtr aShape1 = aRef1->value();
     if (!aShape1.get()) //If we can't get the points directly, try getting them from the context
@@ -107,16 +107,16 @@ void PrimitivesPlugin_Box::createBoxByTwoPoints()
                                   new GeomAlgoAPI_BoxPoints(aFirstPoint,aSecondPoint));
     }
   }
-  
-  // These checks should be made to the GUI for the feature but 
+
+  // These checks should be made to the GUI for the feature but
   // the corresponding validator does not exist yet.
   if (!aBoxAlgo->check()) {
     // The error is not displayed in a popup window. It must be in the message console.
     setError(aBoxAlgo->getError(), false);
     return;
   }
-  
-  // Build the box 
+
+  // Build the box
   aBoxAlgo->build();
 
   // Check if the creation of the box
@@ -130,9 +130,9 @@ void PrimitivesPlugin_Box::createBoxByTwoPoints()
     setError(aBoxAlgo->getError(), false);
     return;
   }
-  
+
   int aResultIndex = 0;
-  ResultBodyPtr aResultBox = document()->createBody(data(), aResultIndex); 
+  ResultBodyPtr aResultBox = document()->createBody(data(), aResultIndex);
   loadNamingDS(aBoxAlgo, aResultBox);
   setResult(aResultBox, aResultIndex);
 }
@@ -143,15 +143,15 @@ void PrimitivesPlugin_Box::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Box> theBoxA
 {
   // Load the result
   theResultBox->store(theBoxAlgo->shape());
-  
+
   // Prepare the naming
   theBoxAlgo->prepareNamingFaces();
-  
+
   // Insert to faces
   int num = 1;
-  std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces = 
+  std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces =
     theBoxAlgo->getCreatedFaces();
-  for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator 
+  for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator
        it=listOfFaces.begin(); it!=listOfFaces.end(); ++it) {
     std::shared_ptr<GeomAPI_Shape> aFace = (*it).second;
     theResultBox->generated(aFace, (*it).first, num++);

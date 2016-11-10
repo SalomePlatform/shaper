@@ -12,7 +12,7 @@
 
 /// \class GeomAPI_ShapeIterator
 /// \ingroup DataModel
-/// \brief Iterates on the underlying shape underlying a given GeomAPI_Shape object, 
+/// \brief Iterates on the underlying shape underlying a given GeomAPI_Shape object,
 ///        providing access
 ///        to its component sub-shapes. Each component shape is returned as a GeomAPI_Shape with
 ///        an orientation, and a compound of the original values and the relative values.

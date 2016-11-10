@@ -27,7 +27,7 @@ FeaturesPlugin_Placement::FeaturesPlugin_Placement()
 void FeaturesPlugin_Placement::initAttributes()
 {
 
-  AttributeSelectionListPtr aSelection = 
+  AttributeSelectionListPtr aSelection =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
     OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
 
@@ -47,7 +47,7 @@ void FeaturesPlugin_Placement::execute()
     return;
   }
   for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr = 
+    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
       anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
     if(!anObject.get()) { // may be for not-activated parts
@@ -144,7 +144,7 @@ void FeaturesPlugin_Placement::execute()
       anObjectsIt++, aContext++) {
 
     // for part results just set transformation
-    if ((*aContext)->groupName() == ModelAPI_ResultPart::group()) { 
+    if ((*aContext)->groupName() == ModelAPI_ResultPart::group()) {
       ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
       ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
       aResultPart->setTrsf(aContextRes, aTrsf);
@@ -171,7 +171,7 @@ void FeaturesPlugin_Placement::execute()
       }
 
       //LoadNamingDS
-      std::shared_ptr<ModelAPI_ResultBody> aResultBody = 
+      std::shared_ptr<ModelAPI_ResultBody> aResultBody =
         document()->createBody(data(), aResultIndex);
       loadNamingDS(aTransformAlgo, aResultBody, aBaseShape);
       setResult(aResultBody, aResultIndex);

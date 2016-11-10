@@ -67,7 +67,7 @@ ModuleBase_WidgetFileSelector::~ModuleBase_WidgetFileSelector()
 
 bool ModuleBase_WidgetFileSelector::storeValueCustom()
 {
-  // A rare case when plugin was not loaded. 
+  // A rare case when plugin was not loaded.
   if (!myFeature)
     return false;
   DataPtr aData = myFeature->data();
@@ -80,7 +80,7 @@ bool ModuleBase_WidgetFileSelector::storeValueCustom()
 
 bool ModuleBase_WidgetFileSelector::restoreValueCustom()
 {
-  // A rare case when plugin was not loaded. 
+  // A rare case when plugin was not loaded.
   if (!myFeature)
     return false;
   DataPtr aData = myFeature->data();

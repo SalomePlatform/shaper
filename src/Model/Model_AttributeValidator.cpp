@@ -14,8 +14,8 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
 
-bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute, 
-                                       const std::list<std::string>& theArguments, 
+bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
+                                       const std::list<std::string>& theArguments,
                                        Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() == ModelAPI_AttributeInteger::typeId()) {
@@ -28,7 +28,7 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
     }
   } else
   if (theAttribute->attributeType() == ModelAPI_AttributeDouble::typeId()) {
-    AttributeDoublePtr anAttribue = 
+    AttributeDoublePtr anAttribue =
         std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
     if (!anAttribue->expressionError().empty()) {
       theError = "Expression error: %1";
@@ -37,7 +37,7 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
     }
   } else
   if (theAttribute->attributeType() == GeomDataAPI_Point::typeId()) {
-    AttributePointPtr anAttribue = 
+    AttributePointPtr anAttribue =
         std::dynamic_pointer_cast<GeomDataAPI_Point>(theAttribute);
 
     const char* aComponent[] = {"X", "Y", "Z"};
@@ -54,7 +54,7 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
     }
   } else
   if (theAttribute->attributeType() == GeomDataAPI_Point2D::typeId()) {
-    AttributePoint2DPtr anAttribue = 
+    AttributePoint2DPtr anAttribue =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
 
     const char* aComponent[] = {"X", "Y"};

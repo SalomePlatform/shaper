@@ -33,7 +33,7 @@ bool isEqual(const AttributePoint2DPtr& theLeft, const AttributePoint2DPtr& theR
 
 bool isEqualAttributes(const AttributePtr& theLeft, const AttributePtr& theRight)
 {
-  if (theLeft->attributeType() == GeomDataAPI_Point2D::typeId() && 
+  if (theLeft->attributeType() == GeomDataAPI_Point2D::typeId() &&
       theRight->attributeType() == GeomDataAPI_Point2D::typeId())
     return isEqual(std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theLeft),
                    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theRight));
@@ -60,8 +60,8 @@ bool GeomValidators_Different::isValid(const std::shared_ptr<ModelAPI_Feature>& 
                                        Events_InfoMessage& theError) const
 {
   std::map<std::string, std::list<AttributePtr> > anAttributesMap;
-  // For all attributes referred by theArguments 
-  // sort it using attributeType() and store into anAttributesMap 
+  // For all attributes referred by theArguments
+  // sort it using attributeType() and store into anAttributesMap
   std::list<std::string>::const_iterator anArgumentIt = theArguments.begin();
   for (; anArgumentIt != theArguments.end(); ++anArgumentIt) {
     AttributePtr anAttribute = theFeature->attribute(*anArgumentIt);
@@ -69,7 +69,7 @@ bool GeomValidators_Different::isValid(const std::shared_ptr<ModelAPI_Feature>& 
   }
 
   // Search differences inside each attribute list
-  std::map<std::string, std::list<AttributePtr> >::const_iterator 
+  std::map<std::string, std::list<AttributePtr> >::const_iterator
     anAttributesMapIt = anAttributesMap.begin();
   for (; anAttributesMapIt != anAttributesMap.end(); ++anAttributesMapIt) {
     const std::list<AttributePtr>& anAttributes = anAttributesMapIt->second;
@@ -82,12 +82,12 @@ bool GeomValidators_Different::isValid(const std::shared_ptr<ModelAPI_Feature>& 
         std::list<AttributePtr>::const_iterator aFindIt =
             std::find_if(aNextIt, anAttributes.end(), IsEqual(*anAttributeIt));
         if (aFindIt != anAttributes.end()) {
-          theError = "Attributes " + (*anAttributeIt)->id() + " and " + 
+          theError = "Attributes " + (*anAttributeIt)->id() + " and " +
             (*aFindIt)->id() + " are equal." ;
           return false;
         }
         ++anAttributeIt;
-        ++aNextIt; 
+        ++aNextIt;
       }
     }
   }

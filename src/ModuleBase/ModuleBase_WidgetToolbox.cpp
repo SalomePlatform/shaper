@@ -19,7 +19,7 @@
 #include <QVBoxLayout>
 #include <QIcon>
 
-ModuleBase_WidgetToolbox::ModuleBase_WidgetToolbox(QWidget* theParent, 
+ModuleBase_WidgetToolbox::ModuleBase_WidgetToolbox(QWidget* theParent,
                                                    const Config_WidgetAPI* theData)
 : ModuleBase_PagedContainer(theParent, theData)
 {

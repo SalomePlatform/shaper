@@ -16,7 +16,7 @@
 class PlaneGCSSolver_EntityWrapper : public SketchSolver_IEntityWrapper
 {
 public:
-  PlaneGCSSolver_EntityWrapper(const FeaturePtr theFeature, 
+  PlaneGCSSolver_EntityWrapper(const FeaturePtr theFeature,
                                const GCSCurvePtr theEntity = GCSCurvePtr());
 
   /// \brief Return PlaneGCS geometric entity

@@ -21,7 +21,7 @@ bool GeomValidators_IntersectionSelection::isValid(const AttributePtr& theAttrib
     return false;
   }
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
-  AttributeSelectionListPtr anAttrSelectionList = 
+  AttributeSelectionListPtr anAttrSelectionList =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
   for(int anIndex = 0; anIndex < anAttrSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr anAttrSelection = anAttrSelectionList->value(anIndex);

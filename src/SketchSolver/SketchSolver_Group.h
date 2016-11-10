@@ -170,14 +170,14 @@ private:
   std::set<SolverConstraintPtr> myTempConstraints; ///< List of temporary constraints
 
   /// List of parametric constraints
-  std::map<AttributePtr, SolverConstraintPtr> myParametricConstraints; 
+  std::map<AttributePtr, SolverConstraintPtr> myParametricConstraints;
 
   StoragePtr myStorage; ///< Container for the set of SolveSpace constraints and their entities
 
   SolverPtr mySketchSolver;  ///< Solver for set of equations obtained by constraints
 
   /// Result of previous solution of the set of constraints
-  SketchSolver_SolveStatus myPrevResult; 
+  SketchSolver_SolveStatus myPrevResult;
   std::set<ObjectPtr>      myConflictingConstraints; ///< List of conflicting constraints
 };
 

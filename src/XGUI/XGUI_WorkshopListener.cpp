@@ -159,7 +159,7 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     }
   }
   else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_SELFILTER_LOADED)) {
-    std::shared_ptr<Config_SelectionFilterMessage> aMsg = 
+    std::shared_ptr<Config_SelectionFilterMessage> aMsg =
       std::dynamic_pointer_cast<Config_SelectionFilterMessage>(theMessage);
     if (aMsg) {
       ModuleBase_FilterFactory* aFactory = myWorkshop->selectionFilters();
@@ -177,7 +177,7 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     aDisplayer->enableUpdateViewer(true);
   } else {
     //Show error dialog if error message received.
-    std::shared_ptr<Events_InfoMessage> anIngfoMsg = 
+    std::shared_ptr<Events_InfoMessage> anIngfoMsg =
       std::dynamic_pointer_cast<Events_InfoMessage>(theMessage);
     if (anIngfoMsg) {
       emit errorOccurred(anIngfoMsg);
@@ -258,7 +258,7 @@ void XGUI_WorkshopListener::
     ObjectPtr aObj = (*aIt);
 
     // Hide the object if it is invalid or concealed one
-    bool aHide = !aObj->data() || !aObj->data()->isValid() || 
+    bool aHide = !aObj->data() || !aObj->data()->isValid() ||
       aObj->isDisabled() || (!aObj->isDisplayed());
     if (!aHide) { // check that this is not hidden result
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
@@ -295,8 +295,8 @@ void XGUI_WorkshopListener::
     #endif
     if (aHide) {
       //we should provide objects which are hidden in the viewer, e.g. sketch always should
-      // visualizes all sub-features, if some features are to be hidden, sould be proposed may 
-      // be to removed #1223 
+      // visualizes all sub-features, if some features are to be hidden, sould be proposed may
+      // be to removed #1223
       // aHiddenObjects.push_back(aObj);
       aRedisplayed = aDisplayer->erase(aObj, false) || aRedisplayed;
       #ifdef DEBUG_FEATURE_REDISPLAY
@@ -349,7 +349,7 @@ void XGUI_WorkshopListener::
     //VSV FitAll updated viewer by itself
     if (aDoFitAll)
       myWorkshop->viewer()->fitAll();
-    else 
+    else
       aDisplayer->updateViewer();
   }
 }
@@ -393,7 +393,7 @@ void XGUI_WorkshopListener::
     // the validity of the data should be checked here in order to avoid display of the objects,
     // which were created, then deleted, but flush for the creation event happens after that
     // we should not display disabled objects
-    bool aHide = !anObject->data()->isValid() || 
+    bool aHide = !anObject->data()->isValid() ||
                  anObject->isDisabled() ||
                  !anObject->isDisplayed();
     if (!aHide) { // check that this is not hidden result
@@ -406,14 +406,14 @@ void XGUI_WorkshopListener::
         aHide = !aRes->shape().get() || aRes->shape()->isNull();
     }
     if (!aHide) {
-      // setDisplayed has to be called in order to synchronize internal state of the object 
+      // setDisplayed has to be called in order to synchronize internal state of the object
       // with list of displayed objects
       if (myWorkshop->module()->canDisplayObject(anObject)) {
         anObject->setDisplayed(true);
         aDisplayed = displayObject(anObject);
         if (aDisplayed)
           aDoFitAll = aDoFitAll || neededFitAll(anObject, aNbOfShownObjects);
-      } else 
+      } else
         anObject->setDisplayed(false);
     }
   }

@@ -7,7 +7,7 @@
 #ifndef ModelAPI_Data_H_
 #define ModelAPI_Data_H_
 
-#ifdef _WINDOWS // to avoid too long decorated name warning 
+#ifdef _WINDOWS // to avoid too long decorated name warning
 #pragma warning( disable : 4503 )
 #endif
 
@@ -75,7 +75,7 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// Returns the attribute that contains selection to a shape
   virtual std::shared_ptr<ModelAPI_AttributeSelection> selection(const std::string& theID) = 0;
   /// Returns the attribute that contains selection to a shape
-  virtual std::shared_ptr<ModelAPI_AttributeSelectionList> 
+  virtual std::shared_ptr<ModelAPI_AttributeSelectionList>
     selectionList(const std::string& theID) = 0;
   /// Returns the attribute that contains reference to an attribute of a feature
   virtual std::shared_ptr<ModelAPI_AttributeRefAttr> refattr(const std::string& theID) = 0;
@@ -152,7 +152,7 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual const std::set<std::shared_ptr<ModelAPI_Attribute> >& refsToMe() = 0;
 
   /// returns all references by attributes of this data
-  /// \param theRefs returned list of pairs: id of referenced attribute and 
+  /// \param theRefs returned list of pairs: id of referenced attribute and
   ///                list of referenced objects
   virtual void referencesToObjects(
     std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > >& theRefs) =0;

@@ -126,7 +126,7 @@ void Model_Objects::addFeature(FeaturePtr theFeature, const FeaturePtr theAfterT
     // in initData it creates new features, appeared later than this
     TDF_Label aPrevFeateureLab;
     if (theAfterThis.get()) { // searching for the previous feature label
-      std::shared_ptr<Model_Data> aPrevData = 
+      std::shared_ptr<Model_Data> aPrevData =
         std::dynamic_pointer_cast<Model_Data>(theAfterThis->data());
       if (aPrevData.get()) {
         aPrevFeateureLab = aPrevData->label().Father();
@@ -161,7 +161,7 @@ void Model_Objects::addFeature(FeaturePtr theFeature, const FeaturePtr theAfterT
 /// Appends to the array of references a new referenced label.
 /// If theIndex is not -1, removes element at this index, not theReferenced.
 /// \returns the index of removed element
-static int RemoveFromRefArray(TDF_Label theArrayLab, TDF_Label theReferenced, 
+static int RemoveFromRefArray(TDF_Label theArrayLab, TDF_Label theReferenced,
   const int theIndex = -1)
 {
   int aResult = -1;  // no returned
@@ -200,7 +200,7 @@ void Model_Objects::refsToFeature(FeaturePtr theFeature,
   std::list<ResultPtr>::const_iterator aResIter = aResults.cbegin();
   for (; aResIter != aResults.cend(); aResIter++) {
     ResultPtr aResult = (*aResIter);
-    std::shared_ptr<Model_Data> aData = 
+    std::shared_ptr<Model_Data> aData =
         std::dynamic_pointer_cast<Model_Data>(aResult->data());
     if (aData.get() != NULL) {
       const std::set<AttributePtr>& aRefs = aData->refsToMe();
@@ -213,7 +213,7 @@ void Model_Objects::refsToFeature(FeaturePtr theFeature,
     }
   }
   // the dependencies can be in the feature itself
-  std::shared_ptr<Model_Data> aData = 
+  std::shared_ptr<Model_Data> aData =
       std::dynamic_pointer_cast<Model_Data>(theFeature->data());
   if (aData.get() && !aData->refsToMe().empty()) {
     const std::set<AttributePtr>& aRefs = aData->refsToMe();
@@ -226,7 +226,7 @@ void Model_Objects::refsToFeature(FeaturePtr theFeature,
   }
 
   if (!theRefs.empty() && isSendError) {
-    Events_InfoMessage("Model_Objects", 
+    Events_InfoMessage("Model_Objects",
       "Feature '%1' is used and can not be deleted").arg(theFeature->data()->name()).send();
   }
 }
@@ -240,7 +240,7 @@ void Model_Objects::removeFeature(FeaturePtr theFeature)
     refsToFeature(theFeature, aRefs, false);
     std::set<std::shared_ptr<ModelAPI_Feature> >::iterator aRefIter = aRefs.begin();
     for(; aRefIter != aRefs.end(); aRefIter++) {
-      std::shared_ptr<ModelAPI_CompositeFeature> aComposite = 
+      std::shared_ptr<ModelAPI_CompositeFeature> aComposite =
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aRefIter);
       if (aComposite.get() && aComposite->isSub(theFeature)) {
         aComposite->removeFeature(theFeature);
@@ -275,12 +275,12 @@ void Model_Objects::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
   Handle(TDataStd_ReferenceArray) aRefs;
   if (!aFeaturesLab.FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs))
     return;
-  TDF_Label anAfterLab, aMovedLab = 
+  TDF_Label anAfterLab, aMovedLab =
     std::dynamic_pointer_cast<Model_Data>(theMoved->data())->label().Father();
   if (theAfterThis.get())
     anAfterLab = std::dynamic_pointer_cast<Model_Data>(theAfterThis->data())->label().Father();
 
-  Handle(TDataStd_HLabelArray1) aNewArray = 
+  Handle(TDataStd_HLabelArray1) aNewArray =
     new TDataStd_HLabelArray1(aRefs->Lower(), aRefs->Upper());
   int aPassedMovedFrom = 0; // the prev feature location is found and passed
   int aPassedMovedTo = 0; // the feature is added and this location is passed
@@ -332,7 +332,7 @@ void Model_Objects::clearHistory(ObjectPtr theObj)
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
       std::string aResultGroup = featureResultGroup(aFeature);
       if (!aResultGroup.empty()) {
-        std::map<std::string, std::vector<ObjectPtr> >::iterator aHIter = 
+        std::map<std::string, std::vector<ObjectPtr> >::iterator aHIter =
           myHistory.find(aResultGroup);
         if (aHIter != myHistory.end())
           myHistory.erase(aHIter); // erase from map => this means that it is not synchronized
@@ -353,7 +353,7 @@ void Model_Objects::createHistory(const std::string& theGroupID)
       for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) {
         FeaturePtr aFeature = feature(aRefs->Value(a));
         if (aFeature.get()) {
-          // if feature is in sub-component, remove it from history: 
+          // if feature is in sub-component, remove it from history:
           // it is in sub-tree of sub-component
           bool isSub = ModelAPI_Tools::compositeOwner(aFeature).get() != NULL;
           if (isFeature) { // here may be also disabled features
@@ -365,7 +365,7 @@ void Model_Objects::createHistory(const std::string& theGroupID)
             if (!isSub || theGroupID != ModelAPI_ResultConstruction::group()) {
               // do not use reference to the list here since results can be changed by "isConcealed"
               const std::list<std::shared_ptr<ModelAPI_Result> > aResults = aFeature->results();
-              std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator 
+              std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator
                 aRIter = aResults.begin();
               for (; aRIter != aResults.cend(); aRIter++) {
                 ResultPtr aRes = *aRIter;
@@ -476,7 +476,7 @@ std::shared_ptr<ModelAPI_Object> Model_Objects::objectByName(
         if (aRIter->get() && (*aRIter)->groupName() == theGroupID) {
           if ((*aRIter)->data()->name() == theName)
             return *aRIter;
-          ResultCompSolidPtr aCompRes = 
+          ResultCompSolidPtr aCompRes =
             std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
           if (aCompRes.get()) {
             int aNumSubs = aCompRes->numberOfSubs();
@@ -610,7 +610,7 @@ std::shared_ptr<ModelAPI_Feature> Model_Objects::featureById(const int theId)
 }
 
 void Model_Objects::synchronizeFeatures(
-  const TDF_LabelList& theUpdated, const bool theUpdateReferences, 
+  const TDF_LabelList& theUpdated, const bool theUpdateReferences,
   const bool theOpen, const bool theFlush)
 {
   Model_Document* anOwner = std::dynamic_pointer_cast<Model_Document>(myDoc).get();
@@ -648,7 +648,7 @@ void Model_Objects::synchronizeFeatures(
       aFeature = std::dynamic_pointer_cast<Model_Session>(ModelAPI_Session::get())->createFeature(
         TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
         .ToCString(), anOwner);
-      if (!aFeature.get()) {  
+      if (!aFeature.get()) {
         // somethig is wrong, most probably, the opened document has invalid structure
         Events_InfoMessage("Model_Objects", "Invalid type of object in the document").send();
         aLabIter.Value()->Label().ForgetAllAttributes();
@@ -668,7 +668,7 @@ void Model_Objects::synchronizeFeatures(
       aKeptFeatures.insert(aFeature);
       if (anUpdatedMap.Contains(aFeatureLabel)) {
         if (!theOpen) { // on abort/undo/redo reinitialize attributes is something is changed
-          std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
+          std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs =
             aFeature->data()->attributes("");
           std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
           for(; anAttr != anAttrs.end(); anAttr++)
@@ -706,7 +706,7 @@ void Model_Objects::synchronizeFeatures(
         updateHistory(aFeature);
         aFeature->erase();
 
-        // unbind after the "erase" call: on abort sketch 
+        // unbind after the "erase" call: on abort sketch
         // is removes sub-objects that corrupts aFIter
         myFeatures.UnBind(aFIter.Key());
         // reinitialize iterator because unbind may corrupt the previous order in the map
@@ -718,9 +718,9 @@ void Model_Objects::synchronizeFeatures(
   if (theUpdateReferences) {
     synchronizeBackRefs();
   }
-  // update results of the features (after features created because 
+  // update results of the features (after features created because
   // they may be connected, like sketch and sub elements)
-  // After synchronisation of back references because sketch 
+  // After synchronisation of back references because sketch
   // must be set in sub-elements before "execute" by updateResults
   std::list<FeaturePtr> aComposites; // composites must be updated after their subs (issue 360)
   TDF_ChildIDIterator aLabIter2(featuresLabel(), TDataStd_Comment::GetID());
@@ -739,7 +739,7 @@ void Model_Objects::synchronizeFeatures(
     updateResults(*aComposite);
   }
 
-  // the synchronize should be done after updateResults 
+  // the synchronize should be done after updateResults
   // in order to correct back references of updated results
   if (theUpdateReferences) {
     synchronizeBackRefs();
@@ -756,7 +756,7 @@ void Model_Objects::synchronizeFeatures(
   if (theFlush) {
     aLoop->flush(aDeleteEvent);
     // delete should be emitted before create to reacts to aborted feature
-    aLoop->flush(aCreateEvent); 
+    aLoop->flush(aCreateEvent);
     aLoop->flush(anUpdateEvent);
     aLoop->flush(aCreateEvent); // after update of features, there could be results created
     aLoop->flush(aDeleteEvent); // or deleted
@@ -769,7 +769,7 @@ void Model_Objects::synchronizeFeatures(
 
 /// synchronises back references for the given object basing on the collected data
 void Model_Objects::synchronizeBackRefsForObject(const std::set<AttributePtr>& theNewRefs,
-  ObjectPtr theObject) 
+  ObjectPtr theObject)
 {
   if (!theObject.get() || !theObject->data()->isValid())
     return; // invalid
@@ -786,9 +786,9 @@ void Model_Objects::synchronizeBackRefsForObject(const std::set<AttributePtr>& t
     std::set<AttributePtr>::iterator aCurrentIter = aData->refsToMe().begin();
     while(aCurrentIter != aData->refsToMe().end()) {
       if (theNewRefs.find(*aCurrentIter) == theNewRefs.end()) {
-        // for external references from other documents this system 
+        // for external references from other documents this system
         // is not working: refs are collected from
-        // different Model_Objects, so before remove check this 
+        // different Model_Objects, so before remove check this
         // external object exists and still referenced
         bool aLeaveIt = false;
         if ((*aCurrentIter)->owner().get() && (*aCurrentIter)->owner()->document() != myDoc &&
@@ -883,7 +883,7 @@ void Model_Objects::synchronizeBackRefs()
       (*aRIter)->isConcealed();
     }
   }
-  // the rest all refs means that feature references to the external document feature: 
+  // the rest all refs means that feature references to the external document feature:
   // process also them
   std::map<ObjectPtr, std::set<AttributePtr> >::iterator anExtIter = allRefs.begin();
   for(; anExtIter != allRefs.end(); anExtIter++) {
@@ -892,9 +892,9 @@ void Model_Objects::synchronizeBackRefs()
 }
 
 TDF_Label Model_Objects::resultLabel(
-  const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theResultIndex) 
+  const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theResultIndex)
 {
-  const std::shared_ptr<Model_Data>& aData = 
+  const std::shared_ptr<Model_Data>& aData =
     std::dynamic_pointer_cast<Model_Data>(theFeatureData);
   return aData->label().Father().FindChild(TAG_FEATURE_RESULTS).FindChild(theResultIndex + 1);
 }
@@ -906,11 +906,11 @@ void Model_Objects::storeResult(std::shared_ptr<ModelAPI_Data> theFeatureData,
   theResult->init();
   theResult->setDoc(myDoc);
   initData(theResult, resultLabel(theFeatureData, theResultIndex), TAG_FEATURE_ARGUMENTS);
-  if (theResult->data()->name().empty()) {  
+  if (theResult->data()->name().empty()) {
     // if was not initialized, generate event and set a name
     std::stringstream aNewName;
     aNewName<<theFeatureData->name();
-    // if there are several results (issue #899: any number of result), 
+    // if there are several results (issue #899: any number of result),
     // add unique prefix starting from second
     if (theResultIndex > 0 || theResult->groupName() == ModelAPI_ResultBody::group())
       aNewName<<"_"<<theResultIndex + 1;
@@ -939,7 +939,7 @@ std::shared_ptr<ModelAPI_ResultBody> Model_Objects::createBody(
     const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
   TDF_Label aLab = resultLabel(theFeatureData, theIndex);
-  // for feature create compsolid, but for result sub create body: 
+  // for feature create compsolid, but for result sub create body:
   // only one level of recursion is supported now
   ResultPtr aResultOwner = std::dynamic_pointer_cast<ModelAPI_Result>(theFeatureData->owner());
   ObjectPtr anOldObject;
@@ -1067,7 +1067,7 @@ void Model_Objects::updateResults(FeaturePtr theFeature)
     ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(*aResIter);
     if (aBody.get()) {
       std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(aBody->data());
-      if (!aData.get() || !aData->isValid() || (!aBody->isDisabled() && aData->isDeleted())) { 
+      if (!aData.get() || !aData->isValid() || (!aBody->isDisabled() && aData->isDeleted())) {
         // found a disappeared result => remove it
         theFeature->eraseResultFromList(aBody);
         // start iterate from beginning because iterator is corrupted by removing
@@ -1091,15 +1091,15 @@ void Model_Objects::updateResults(FeaturePtr theFeature)
       TDF_Label anArgLab = aLabIter.Value();
       Handle(TDataStd_Comment) aGroup;
       if (anArgLab.FindAttribute(TDataStd_Comment::GetID(), aGroup)) {
-        if (aGroup->Get() == ModelAPI_ResultBody::group().c_str() || 
+        if (aGroup->Get() == ModelAPI_ResultBody::group().c_str() ||
             aGroup->Get() == ModelAPI_ResultCompSolid::group().c_str()) {
           aNewBody = createBody(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultPart::group().c_str()) {
-          std::shared_ptr<ModelAPI_ResultPart> aNewP = createPart(theFeature->data(), aResIndex); 
+          std::shared_ptr<ModelAPI_ResultPart> aNewP = createPart(theFeature->data(), aResIndex);
           theFeature->setResult(aNewP, aResIndex);
           if (!aNewP->partDoc().get())
             // create the part result: it is better to restore the previous result if it is possible
-            theFeature->execute(); 
+            theFeature->execute();
           break;
         } else if (aGroup->Get() == ModelAPI_ResultConstruction::group().c_str()) {
           theFeature->execute(); // construction shapes are needed for sketch solver

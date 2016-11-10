@@ -56,7 +56,7 @@ void GeomAPI_Pln::coefficients(double& theA, double& theB, double& theC, double&
   impl<gp_Pln>().Coefficients(theA, theB, theC, theD);
 }
 
-bool GeomAPI_Pln::isCoincident(const std::shared_ptr<GeomAPI_Pln> thePlane, 
+bool GeomAPI_Pln::isCoincident(const std::shared_ptr<GeomAPI_Pln> thePlane,
                                const double theTolerance)
 {
   if(!thePlane.get()) {
@@ -65,7 +65,7 @@ bool GeomAPI_Pln::isCoincident(const std::shared_ptr<GeomAPI_Pln> thePlane,
 
   const gp_Pln& aMyPln = impl<gp_Pln>();
   const gp_Pln& anOtherPln = thePlane->impl<gp_Pln>();
-  return (aMyPln.Contains(anOtherPln.Location(), theTolerance) && 
+  return (aMyPln.Contains(anOtherPln.Location(), theTolerance) &&
     aMyPln.Axis().IsParallel(anOtherPln.Axis(), theTolerance));
 }
 
@@ -81,7 +81,7 @@ bool GeomAPI_Pln::isParallel(const std::shared_ptr<GeomAPI_Lin> theLine)
   return Abs(aDot) < Precision::SquareConfusion();
 }
 
-std::shared_ptr<GeomAPI_Pnt> 
+std::shared_ptr<GeomAPI_Pnt>
   GeomAPI_Pln::intersect(const std::shared_ptr<GeomAPI_Lin>& theLine) const
 {
   std::shared_ptr<GeomAPI_XYZ> aLineDir = theLine->direction()->xyz();
@@ -99,7 +99,7 @@ std::shared_ptr<GeomAPI_Pnt>
     new GeomAPI_Pnt(aLineLoc->added(aLineDir->multiplied(aParam))));
 }
 
-std::shared_ptr<GeomAPI_Pnt> 
+std::shared_ptr<GeomAPI_Pnt>
   GeomAPI_Pln::project(const std::shared_ptr<GeomAPI_Pnt>& thePoint) const
 {
   std::shared_ptr<GeomAPI_XYZ> aNormal = direction()->xyz();
@@ -107,7 +107,7 @@ std::shared_ptr<GeomAPI_Pnt>
 
   std::shared_ptr<GeomAPI_XYZ> aVec = thePoint->xyz()->decreased(aLocation);
   double aDot = aNormal->dot(aVec);
-  std::shared_ptr<GeomAPI_XYZ> aProjection = 
+  std::shared_ptr<GeomAPI_XYZ> aProjection =
       aLocation->added(aVec->decreased(aNormal->multiplied(aDot)));
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aProjection));
 }

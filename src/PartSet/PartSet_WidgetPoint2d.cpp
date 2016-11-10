@@ -62,7 +62,7 @@ const double MaxCoordinate = 1e12;
 
 static QStringList MyFeaturesForCoincedence;
 
-PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent, 
+PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
                                              ModuleBase_IWorkshop* theWorkshop,
                                              const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData), myWorkshop(theWorkshop),
@@ -131,7 +131,7 @@ bool PartSet_WidgetPoint2D::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr
   bool aValid = true;
 
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
-  if (aModule->sketchReentranceMgr()->isInternalEditActive()) 
+  if (aModule->sketchReentranceMgr()->isInternalEditActive())
     return true; /// when internal edit is started a new feature is created. I has not results, AIS
 
   /// the selection is not possible if the current feature has no presentation for the current
@@ -381,8 +381,8 @@ void PartSet_WidgetPoint2D::deactivate()
   myWorkshop->deactivateSubShapesSelection();
 }
 
-bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView, 
-                                       const TopoDS_Shape& theShape, 
+bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView,
+                                       const TopoDS_Shape& theShape,
                                        double& theX, double& theY) const
 {
   if (!theShape.IsNull()) {
@@ -449,7 +449,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
   Handle(V3d_View) aView = theWindow->v3dView();
 
   QList<ModuleBase_ViewerPrsPtr> aList = aSelection->getSelected(ModuleBase_ISelection::Viewer);
-  ModuleBase_ViewerPrsPtr aFirstValue = 
+  ModuleBase_ViewerPrsPtr aFirstValue =
     aList.size() > 0 ? aList.first() : ModuleBase_ViewerPrsPtr();
   if (!aFirstValue.get() && myPreSelected.get()) {
     aFirstValue = myPreSelected;
@@ -487,7 +487,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
                                isOrphanPoint(aSelectedFeature, mySketch, aX, aY);
           if (anExternal) {
             // we should not stop reentrant operation on external objects because
-            anOrphanPoint = true; 
+            anOrphanPoint = true;
             // they are not participate in the contour creation excepting external vertices
             if (aShape.ShapeType() == TopAbs_VERTEX) {
               FeaturePtr aFixedFeature = ModelAPI_Feature::feature(aFixedObject);
@@ -496,9 +496,9 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
               }
             }
             else {
-              // point is taken from mouse event and set in attribute. 
+              // point is taken from mouse event and set in attribute.
               // It should be done before setting
-              // coinident constraint to the external line. If a point is created, it should be 
+              // coinident constraint to the external line. If a point is created, it should be
               // in the mouse clicked point
               gp_Pnt aPoint =
                 PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
@@ -509,7 +509,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
           }
           if (aFixedObject.get())
             setConstraintWith(aFixedObject);
-          // fignal updated should be flushed in order to visualize possible created 
+          // fignal updated should be flushed in order to visualize possible created
           // external objects e.g. selection of trihedron axis when input end arc point
           updateObject(feature());
 
@@ -540,7 +540,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
         }
         else if (aShape.ShapeType() == TopAbs_EDGE) {
           // point is taken from mouse event and set in attribute. It should be done before setting
-          // coinident constraint to the external line. If a point is created, it should be in 
+          // coinident constraint to the external line. If a point is created, it should be in
           // the mouse clicked point
           gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
           PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, aY);
@@ -549,7 +549,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
           setValueState(Stored); // in case of edge selection, Apply state should also be updated
           isAuxiliaryFeature = PartSet_Tools::isAuxiliarySketchEntity(aObject);
         }
-        // it is important to perform updateObject() in order to the current value is 
+        // it is important to perform updateObject() in order to the current value is
         // processed by Sketch Solver. Test case: line is created from a previous point
         // to some distance, but in the area of the highlighting of the point. Constraint
         // coincidence is created, after the solver is performed, the distance between the
@@ -580,7 +580,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
     //aIgnore.append(feature());
 
     //double aTolerance = aView->Convert(7);
-    //std::shared_ptr<GeomDataAPI_Point2D> aAttrPnt = 
+    //std::shared_ptr<GeomDataAPI_Point2D> aAttrPnt =
     //  PartSet_Tools::findAttributePoint(mySketch, aX, anY, aTolerance, aIgnore);
     //if (aAttrPnt.get() != NULL) {
     //  aFeaturePoint->setValue(aAttrPnt->pnt());
@@ -611,7 +611,7 @@ void PartSet_WidgetPoint2D::mouseMoved(ModuleBase_IViewWindow* theWindow, QMouse
   PartSet_Tools::convertTo2D(aPoint, mySketch, theWindow->v3dView(), aX, anY);
   if (myState != ModifiedInViewer)
     storeCurentValue();
-  // we need to block the value state change 
+  // we need to block the value state change
   bool isBlocked = blockValueState(true);
   setPoint(aX, anY);
   blockValueState(isBlocked);
@@ -639,7 +639,7 @@ bool PartSet_WidgetPoint2D::isFeatureContainsPoint(const FeaturePtr& theFeature,
 
   AttributePtr aWidgetAttribute = myFeature->attribute(attributeID());
 
-  std::shared_ptr<GeomAPI_Pnt2d> aPnt2d = 
+  std::shared_ptr<GeomAPI_Pnt2d> aPnt2d =
                                     std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
   std::list<AttributePtr> anAttributes =
                                 myFeature->data()->attributes(GeomDataAPI_Point2D::typeId());

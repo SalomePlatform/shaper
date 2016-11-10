@@ -60,7 +60,7 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
 //********************************************************************
 void ModuleBase_WidgetSelector::updateOnSelectionChanged(const bool theDone)
 {
-  // "false" flag should be used here, it connects to the #26658 OCC bug, when the user click in 
+  // "false" flag should be used here, it connects to the #26658 OCC bug, when the user click in
   // the same place repeatedly without mouse moved. In the case validation by filters is not
   // perfromed, so an invalid object is selected. E.g. distance constraint, selection of a point.
   // the 3rd click in the same point allow using this point.
@@ -81,7 +81,7 @@ QIntList ModuleBase_WidgetSelector::getShapeTypes() const
 {
   QIntList aShapeTypes = shapeTypes();
   // this type should be mentioned in XML, poor selection otherwise
-  if (/*aShapeTypes.contains(TopAbs_SOLID) ||*/ 
+  if (/*aShapeTypes.contains(TopAbs_SOLID) ||*/
       aShapeTypes.contains(ModuleBase_ResultPrs::Sel_Result/*TopAbs_SHAPE*/)) {
     // it should be selectable for both, "solids" and "objects" types
     aShapeTypes.append(TopAbs_COMPSOLID);
@@ -165,7 +165,7 @@ void ModuleBase_WidgetSelector::activateCustom()
 {
   connect(myWorkshop, SIGNAL(selectionChanged()), this,
           SLOT(onSelectionChanged()), Qt::UniqueConnection);
-  
+
   activateSelectionAndFilters(true);
 
   // Restore selection in the viewer by the attribute selection list
@@ -198,7 +198,7 @@ bool ModuleBase_WidgetSelector::setSelectionCustom(const ModuleBase_ViewerPrsPtr
   getGeomSelection(thePrs, anObject, aShape);
 
   // the last flag is to be depending on hasObject is called before. To be corrected later
-  return ModuleBase_Tools::setObject(attribute(), anObject, aShape, 
+  return ModuleBase_Tools::setObject(attribute(), anObject, aShape,
                                      myWorkshop, myIsInValidate, true);
 }
 

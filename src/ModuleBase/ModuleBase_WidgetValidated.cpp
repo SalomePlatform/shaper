@@ -249,7 +249,7 @@ void ModuleBase_WidgetValidated::blockAttribute(const AttributePtr& theAttribute
 }
 
 //********************************************************************
-void ModuleBase_WidgetValidated::storeValidState(const ModuleBase_ViewerPrsPtr& theValue, 
+void ModuleBase_WidgetValidated::storeValidState(const ModuleBase_ViewerPrsPtr& theValue,
                                                  const bool theValid)
 {
   GeomShapePtr aShape = theValue.get() ? theValue->shape() : GeomShapePtr();
@@ -295,7 +295,7 @@ void ModuleBase_WidgetValidated::storeValidState(const ModuleBase_ViewerPrsPtr& 
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::getValidState(const ModuleBase_ViewerPrsPtr& theValue, 
+bool ModuleBase_WidgetValidated::getValidState(const ModuleBase_ViewerPrsPtr& theValue,
                                                bool& theValid)
 {
   if (!theValue.get())
@@ -382,7 +382,7 @@ void ModuleBase_WidgetValidated::filterCompSolids(QList<ModuleBase_ViewerPrsPtr>
   for (; anIt != aLast; anIt++) {
     const ModuleBase_ViewerPrsPtr& aViewerPrs = *anIt;
     ObjectPtr anObject = aViewerPrs->object();
-    ResultCompSolidPtr aResultCompSolid = 
+    ResultCompSolidPtr aResultCompSolid =
       std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anObject);
     if(aResultCompSolid.get()) {
       aCompSolids.insert(aResultCompSolid);

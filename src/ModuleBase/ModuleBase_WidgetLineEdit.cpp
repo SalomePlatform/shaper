@@ -108,7 +108,7 @@ ModuleBase_WidgetLineEdit::~ModuleBase_WidgetLineEdit()
 
 bool ModuleBase_WidgetLineEdit::storeValueCustom()
 {
-  // A rare case when plugin was not loaded. 
+  // A rare case when plugin was not loaded.
   if(!myFeature)
     return false;
   DataPtr aData = myFeature->data();
@@ -121,7 +121,7 @@ bool ModuleBase_WidgetLineEdit::storeValueCustom()
 
 bool ModuleBase_WidgetLineEdit::restoreValueCustom()
 {
-  // A rare case when plugin was not loaded. 
+  // A rare case when plugin was not loaded.
   if(!myFeature)
     return false;
   DataPtr aData = myFeature->data();

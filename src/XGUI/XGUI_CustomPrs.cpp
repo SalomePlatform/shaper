@@ -45,7 +45,7 @@ void getColor(const ResultPtr& theResult, std::vector<int>& theColor)
 {
   theColor.clear();
   // get color from the attribute of the result
-  if (theResult.get() != NULL && 
+  if (theResult.get() != NULL &&
       theResult->data()->attribute(ModelAPI_Result::COLOR_ID()).get() != NULL) {
     AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
     if (aColorAttr.get() && aColorAttr->size()) {
@@ -72,7 +72,7 @@ void XGUI_CustomPrs::getDefaultColor(ObjectPtr theObject, const bool isEmptyColo
     // all AIS objects, where the color is not set, are in black.
     // The color should be defined in XML or set in the attribute
     theColor = Config_PropManager::color("Visualization", "object_default_color", "#000000");
-    Events_InfoMessage("XGUI_CustomPrs", 
+    Events_InfoMessage("XGUI_CustomPrs",
       "A default color is not defined in the preferences for this kind of result").send();
   }
 }
@@ -137,7 +137,7 @@ bool XGUI_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr the
     SessionPtr aMgr = ModelAPI_Session::get();
     if (aMgr->activeDocument() != theResult->document()) {
       QColor aQColor(aColor[0], aColor[1], aColor[2]);
-      QColor aNewColor = 
+      QColor aNewColor =
         QColor::fromHsvF(aQColor.hueF(), aQColor.saturationF()/3., aQColor.valueF());
       aColor[0] = aNewColor.red();
       aColor[1] = aNewColor.green();

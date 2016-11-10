@@ -115,7 +115,7 @@ void FeaturesAPI_ExtrusionBoolean::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeReferencePtr anAttrSketch = aBase->reference(FeaturesPlugin_Extrusion::SKETCH_ID());
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Extrusion::BASE_OBJECTS_ID());
-  AttributeSelectionPtr anAttrDirection = 
+  AttributeSelectionPtr anAttrDirection =
     aBase->selection(FeaturesPlugin_Extrusion::DIRECTION_OBJECT_ID());
 
   theDumper << aBase << " = model.addExtrusion";
@@ -137,10 +137,10 @@ void FeaturesAPI_ExtrusionBoolean::dump(ModelHighAPI_Dumper& theDumper) const
 
     theDumper << ", " << anAttrToSize << ", " << anAttrFromSize;
   } else if(aCreationMethod == FeaturesPlugin_Extrusion::CREATION_METHOD_BY_PLANES()) {
-    AttributeSelectionPtr anAttrToObject = 
+    AttributeSelectionPtr anAttrToObject =
       aBase->selection(FeaturesPlugin_Extrusion::TO_OBJECT_ID());
     AttributeDoublePtr anAttrToOffset = aBase->real(FeaturesPlugin_Extrusion::TO_OFFSET_ID());
-    AttributeSelectionPtr anAttrFromObject = 
+    AttributeSelectionPtr anAttrFromObject =
       aBase->selection(FeaturesPlugin_Extrusion::FROM_OBJECT_ID());
     AttributeDoublePtr anAttrFromOffset = aBase->real(FeaturesPlugin_Extrusion::FROM_OFFSET_ID());
 
@@ -148,7 +148,7 @@ void FeaturesAPI_ExtrusionBoolean::dump(ModelHighAPI_Dumper& theDumper) const
       ", " << anAttrFromObject << ", " << anAttrFromOffset;
   }
 
-  AttributeSelectionListPtr anAttrBoolObjects = 
+  AttributeSelectionListPtr anAttrBoolObjects =
     aBase->selectionList(FeaturesPlugin_CompositeBoolean::OBJECTS_ID());
   theDumper << ", " << anAttrBoolObjects << ")" << std::endl;
 
@@ -302,7 +302,7 @@ ExtrusionCutPtr addExtrusionCut(const std::shared_ptr<ModelAPI_Document>& thePar
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(FeaturesPlugin_ExtrusionCut::ID());
-  return ExtrusionCutPtr(new FeaturesAPI_ExtrusionCut(aFeature, theBaseObjects, 
+  return ExtrusionCutPtr(new FeaturesAPI_ExtrusionCut(aFeature, theBaseObjects,
                                                       theSize, theBooleanObjects));
 }
 
@@ -313,7 +313,7 @@ ExtrusionCutPtr addExtrusionCut(const std::shared_ptr<ModelAPI_Document>& thePar
                                 const ModelHighAPI_Double& theSize,
                                 const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(FeaturesPlugin_ExtrusionCut::ID());
   return ExtrusionCutPtr(new FeaturesAPI_ExtrusionCut(aFeature, theBaseObjects, theDirection,
                                                       theSize, theBooleanObjects));
@@ -328,7 +328,7 @@ ExtrusionCutPtr addExtrusionCut(const std::shared_ptr<ModelAPI_Document>& thePar
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(FeaturesPlugin_ExtrusionCut::ID());
-  return ExtrusionCutPtr(new FeaturesAPI_ExtrusionCut(aFeature, theBaseObjects, 
+  return ExtrusionCutPtr(new FeaturesAPI_ExtrusionCut(aFeature, theBaseObjects,
                                                       theToSize, theFromSize, theBooleanObjects));
 }
 
@@ -529,7 +529,7 @@ ExtrusionFusePtr addExtrusionFuse(const std::shared_ptr<ModelAPI_Document>& theP
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(FeaturesPlugin_ExtrusionFuse::ID());
-  return ExtrusionFusePtr(new FeaturesAPI_ExtrusionFuse(aFeature, theBaseObjects, 
+  return ExtrusionFusePtr(new FeaturesAPI_ExtrusionFuse(aFeature, theBaseObjects,
                                                         theSize, theBooleanObjects));
 }
 
@@ -542,7 +542,7 @@ ExtrusionFusePtr addExtrusionFuse(const std::shared_ptr<ModelAPI_Document>& theP
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(FeaturesPlugin_ExtrusionFuse::ID());
-  return ExtrusionFusePtr(new FeaturesAPI_ExtrusionFuse(aFeature, theBaseObjects, 
+  return ExtrusionFusePtr(new FeaturesAPI_ExtrusionFuse(aFeature, theBaseObjects,
                                                         theDirection, theSize, theBooleanObjects));
 }
 
@@ -553,9 +553,9 @@ ExtrusionFusePtr addExtrusionFuse(const std::shared_ptr<ModelAPI_Document>& theP
                                   const ModelHighAPI_Double& theFromSize,
                                   const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(FeaturesPlugin_ExtrusionFuse::ID());
-  return ExtrusionFusePtr(new FeaturesAPI_ExtrusionFuse(aFeature, theBaseObjects, 
+  return ExtrusionFusePtr(new FeaturesAPI_ExtrusionFuse(aFeature, theBaseObjects,
                                                         theToSize, theFromSize, theBooleanObjects));
 }
 
@@ -607,7 +607,7 @@ ExtrusionFusePtr addExtrusionFuse(const std::shared_ptr<ModelAPI_Document>& theP
                                   const ModelHighAPI_Double& theFromOffset,
                                   const std::list<ModelHighAPI_Selection>& theBooleanObjects)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = 
+  std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(FeaturesPlugin_ExtrusionFuse::ID());
   return ExtrusionFusePtr(new FeaturesAPI_ExtrusionFuse(aFeature,
                                                         theBaseObjects,

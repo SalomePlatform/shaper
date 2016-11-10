@@ -75,7 +75,7 @@ public:
   FEATURESAPI_EXPORT
   void setAngle(const ModelHighAPI_Double& theAngle);
 
-  /// Modify creation_method, to_object, to_offset, from_object, 
+  /// Modify creation_method, to_object, to_offset, from_object,
   /// from_offset attributes of the feature.
   FEATURESAPI_EXPORT
   void setPlanesAndOffsets(const ModelHighAPI_Selection& theToObject,

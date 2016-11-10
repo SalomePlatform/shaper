@@ -36,7 +36,7 @@ void FeaturesPlugin_CompositeBoolean::executeCompositeBoolean()
 
   // Getting tools.
   ListOfShape aTools;
-  for(ListOfMakeShape::const_iterator 
+  for(ListOfMakeShape::const_iterator
       anIt = aGenMakeShapes.cbegin(); anIt != aGenMakeShapes.cend(); ++anIt) {
     aTools.push_back((*anIt)->shape());
   }
@@ -133,7 +133,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
       }
 
       // For solids cut each object with all tools.
-      for(ListOfShape::const_iterator 
+      for(ListOfShape::const_iterator
           anIt = anObjects.cbegin(); anIt != anObjects.cend(); ++anIt) {
         GeomShapePtr anObject = *anIt;
         ListOfShape aListWithObject;
@@ -162,7 +162,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
 
         // Collecting solids from compsolids which will not be modified in boolean operation.
         ListOfShape aShapesToAdd;
-        for(GeomAPI_ShapeExplorer 
+        for(GeomAPI_ShapeExplorer
             anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
           GeomShapePtr aSolidInCompSolid = anExp.current();
           ListOfShape::const_iterator aUsedShapesIt = aUsedShapes.cbegin();
@@ -224,7 +224,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         }
       }
 
-      if((anObjects.size() + aTools.size() + 
+      if((anObjects.size() + aTools.size() +
           aCompSolidsObjects.size() + anEdgesAndFaces.size()) < 2) {
         myFeature->setError("Error: Not enough objects for boolean operation.");
         return false;
@@ -235,7 +235,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
       aSolidsToFuse.insert(aSolidsToFuse.end(), anObjects.begin(), anObjects.end());
       aSolidsToFuse.insert(aSolidsToFuse.end(), aTools.begin(), aTools.end());
 
-      // Collecting solids from compsolids which will not be 
+      // Collecting solids from compsolids which will not be
       // modified in boolean operation and will be added to result.
       ListOfShape aShapesToAdd;
       for(std::map<GeomShapePtr, ListOfShape>::iterator anIt = aCompSolidsObjects.begin();
@@ -245,7 +245,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         aSolidsToFuse.insert(aSolidsToFuse.end(), aUsedShapes.begin(), aUsedShapes.end());
 
         // Collect solids from compsolid which will not be modified in boolean operation.
-        for(GeomAPI_ShapeExplorer 
+        for(GeomAPI_ShapeExplorer
             anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
           GeomShapePtr aSolidInCompSolid = anExp.current();
           ListOfShape::iterator anIt = aUsedShapes.begin();
@@ -372,7 +372,7 @@ void FeaturesPlugin_CompositeBoolean::storeModificationHistory(ResultBodyPtr the
       aTag = aModTag;
       aName = aModName;
     }
-    theResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), *anIt, 
+    theResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), *anIt,
       (*anIt)->shapeType() == GeomAPI_Shape::EDGE ?
       GeomAPI_Shape::EDGE : GeomAPI_Shape::FACE, aTag, aName, *aMap.get());
     theResultBody->loadDeletedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::FACE, aDelTag);

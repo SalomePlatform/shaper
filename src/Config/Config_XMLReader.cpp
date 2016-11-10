@@ -36,7 +36,7 @@
 Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
     : myXmlDoc(NULL)
 {
-  std::string prefix = ""; 
+  std::string prefix = "";
   Config_Prop* aProp = Config_PropManager::findProp("Plugins", "default_path");
   if (aProp)
     prefix = aProp->value();
@@ -51,7 +51,7 @@ Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
 
   myDocumentPath = prefix + FSEP + theXmlFileName;
   std::ifstream aTestFile(myDocumentPath);
-  if (!aTestFile) 
+  if (!aTestFile)
     Events_InfoMessage("Config_XMLReader", "Unable to open %1").arg(myDocumentPath).send();
   aTestFile.close();
 }
@@ -201,6 +201,6 @@ bool Config_XMLReader::cleanupAttribute(const char* theNodeName, const char* the
 }
 
 const char* Config_XMLReader::encoding() const
-{ 
-  return (const char*) myXmlDoc->encoding; 
+{
+  return (const char*) myXmlDoc->encoding;
 }

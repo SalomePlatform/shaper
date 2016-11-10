@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_Constraint.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 08/08/16 - Artem ZHIDKOV - Creation of the file

@@ -42,14 +42,14 @@ void SketchPlugin_ConstraintAngle::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::typeId());
 
-  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID(), 
+  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID(),
                        ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(SketchPlugin_ConstraintAngle::TYPE_ID(), 
+  data()->addAttribute(SketchPlugin_ConstraintAngle::TYPE_ID(),
                        ModelAPI_AttributeInteger::typeId());
 
-  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID(), 
+  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID(),
                        ModelAPI_AttributeBoolean::typeId());
-  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID(), 
+  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID(),
                        ModelAPI_AttributeBoolean::typeId());
 }
 
@@ -65,9 +65,9 @@ void SketchPlugin_ConstraintAngle::execute()
 {
   std::shared_ptr<ModelAPI_Data> aData = data();
 
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttrA = 
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttrA =
     aData->refattr(SketchPlugin_Constraint::ENTITY_A());
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttrB = 
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttrB =
     aData->refattr(SketchPlugin_Constraint::ENTITY_B());
   if (!anAttrA->isInitialized() || !anAttrB->isInitialized())
     return;
@@ -80,7 +80,7 @@ void SketchPlugin_ConstraintAngle::execute()
     anAttrValue->setValue(anAngle);
     updateConstraintValueByAngleValue();
   }
-  // the value should to be computed here, not in the 
+  // the value should to be computed here, not in the
   // getAISObject in order to change the model value
   // inside the object transaction. This is important for creating a constraint by preselection.
   // The display of the presentation in this case happens after the transaction commit
@@ -110,13 +110,13 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
   if (!aLineA || !aLineB)
     return;
 
-  if (theID == SketchPlugin_Constraint::ENTITY_A() || 
+  if (theID == SketchPlugin_Constraint::ENTITY_A() ||
       theID == SketchPlugin_Constraint::ENTITY_B()) {
     AttributeDoublePtr aValueAttr = real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
     AttributeDoublePtr aConstrValueAttr = real(SketchPlugin_Constraint::VALUE());
     // only if one of attributes is not initialized, try to compute the current value
     if (!aValueAttr->isInitialized() || !aConstrValueAttr->isInitialized()) {
-      if (aValueAttr->isInitialized() && !aConstrValueAttr->isInitialized()) 
+      if (aValueAttr->isInitialized() && !aConstrValueAttr->isInitialized())
         // initialize base value of constraint
         updateConstraintValueByAngleValue();
       double anAngle = calculateAngle();
@@ -132,9 +132,9 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
 
     std::shared_ptr<ModelAPI_Data> aData = data();
     std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
-    FeaturePtr aLineA = 
+    FeaturePtr aLineA =
       SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
-    FeaturePtr aLineB = 
+    FeaturePtr aLineB =
       SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
 
     // Intersection of lines
@@ -217,7 +217,7 @@ double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle, bool isPre
         anAngle = theAngle - 180.0;
       else
         anAngle = 180.0 - theAngle;
-      
+
       if (anAngle < 0.0)
         anAngle += 360.0;
     }

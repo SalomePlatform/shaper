@@ -39,7 +39,7 @@ static const char * EVENT_PLUGIN_LOADED = "PluginLoaded";
 /// The active document becomes another one
 static const char * EVENT_DOCUMENT_CHANGED = "CurrentDocumentChanged";
 
-/// Event ID that order of objects in group is changed, 
+/// Event ID that order of objects in group is changed,
 /// so, tree must be fully rectreated (movement of feature)
 static const char * EVENT_ORDER_UPDATED = "OrderUpdated";
 /// Event ID that the sketch is prepared and all grouped messages for the solver may be flushed
@@ -125,7 +125,7 @@ public:
 class MODELAPI_EXPORT ModelAPI_OrderUpdatedMessage : public Events_Message
 {
 protected:
-  /// Creates a message: 
+  /// Creates a message:
   ModelAPI_OrderUpdatedMessage(const Events_ID theID, const void* theSender = 0);
   /// The virtual destructor
   virtual ~ModelAPI_OrderUpdatedMessage();

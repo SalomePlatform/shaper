@@ -60,9 +60,9 @@ void FeaturesAPI_Intersection::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  AttributeSelectionListPtr anAttrObjects = 
+  AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Intersection::OBJECT_LIST_ID());
-  AttributeSelectionListPtr anAttrTools = 
+  AttributeSelectionListPtr anAttrTools =
     aBase->selectionList(FeaturesPlugin_Intersection::TOOL_LIST_ID());
 
   theDumper << aBase << " = model.addIntersection(" << aDocName << ", "

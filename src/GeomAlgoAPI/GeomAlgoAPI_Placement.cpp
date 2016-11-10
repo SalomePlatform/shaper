@@ -123,7 +123,7 @@ void GeomAlgoAPI_Placement::build(const std::shared_ptr<GeomAPI_Shape>& theSourc
             gp_Vec(aSrcDstPoints[1 - anInd], aSrcDstPoints[anInd]));
           if (aVec.SquareMagnitude() < Precision::SquareConfusion()) {
             // normal and points direction are collinear
-            if (Abs(aSrcDstNormals[1 - anInd].Y()) >= Precision::Confusion() || 
+            if (Abs(aSrcDstNormals[1 - anInd].Y()) >= Precision::Confusion() ||
               Abs(aSrcDstNormals[1 - anInd].Z()) >= Precision::Confusion())
               aVec = gp::DX();
             else
@@ -163,7 +163,7 @@ void GeomAlgoAPI_Placement::build(const std::shared_ptr<GeomAPI_Shape>& theSourc
         gp_Vec aVec(aSrcDstPoints[anInd], aSrcDstPoints[1 - anInd]);
         aVec.Cross(aSrcDstDirections[anInd]);
         if (aVec.SquareMagnitude() < Precision::SquareConfusion()) { // point is on line
-          if (Abs(aSrcDstDirections[1 - anInd].Y()) >= Precision::Confusion() || 
+          if (Abs(aSrcDstDirections[1 - anInd].Y()) >= Precision::Confusion() ||
             Abs(aSrcDstDirections[1 - anInd].Z()) >= Precision::Confusion())
             aVec = gp::DX();
           else

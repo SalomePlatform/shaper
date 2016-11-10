@@ -39,7 +39,7 @@ public:
 
   /// Add menu items for viewer into the actions map
   /// \param theStdActions a map of standard actions
-  /// \param theParent a parent widget for the 
+  /// \param theParent a parent widget for the
   /// \param theMenuActions map of action/menu for the desirable index in the viewer menu
   /// \return true if items are added and there is no necessity to provide standard menu
   bool addViewerMenu(const QMap<QString, QAction*>& theStdActions,
@@ -48,7 +48,7 @@ public:
 
   /// Update state of pop-up menu items in viewer
   /// \param theStdActions - a map of standard actions
-  void updateViewerMenu(const QMap<QString, QAction*>& theStdActions); 
+  void updateViewerMenu(const QMap<QString, QAction*>& theStdActions);
 
   /// Activates a PartSet document
   void activatePartSet() const;
@@ -94,7 +94,7 @@ private:
   /// \param theValue the current auxiliary value
   /// \return the boolean result
   bool canSetAuxiliary(bool& theValue) const;
-  
+
   /// Changes the sketcher entity construction argument value
   /// \param isChecked if true, the feature is a construction
   void setAuxiliary(const bool isChecked);
@@ -119,7 +119,7 @@ private:
   PartSet_Module* myModule;
 
   /// the popup menu actions
-  QMap<QString, QAction*> myActions; 
+  QMap<QString, QAction*> myActions;
 
   /// List of lines coincided in a one point
   mutable QList<FeaturePtr> myCoinsideLines;
@@ -130,7 +130,7 @@ private:
   /// Id of menu item in Detach menu previously selected
   int myPrevId;
 
-  /// Original color of highlighted line 
+  /// Original color of highlighted line
   QColor myColor;
 };
 

@@ -46,14 +46,14 @@ class MODELAPI_EXPORT ModelAPI_Session
 
   //! Starts a new operation (opens a transaction)
   //! \param theId of operation for history (optional)
-  //! \param theAttachedToNested if it is true, 
-  //!          it means that this transaction is attached to the nested 
+  //! \param theAttachedToNested if it is true,
+  //!          it means that this transaction is attached to the nested
   //!          where it is located and will be committed on the next commit with the nested
   virtual void startOperation(
     const std::string& theId = "", const bool theAttachedToNested = false) = 0;
   //! Finishes the previously started operation (closes the transaction)
   virtual void finishOperation() = 0;
-  //! Aborts the operation 
+  //! Aborts the operation
   virtual void abortOperation() = 0;
   //! Returns true if operation has been started, but not yet finished or aborted
   virtual bool isOperation() = 0;
@@ -74,7 +74,7 @@ class MODELAPI_EXPORT ModelAPI_Session
   virtual std::list<std::string> redoList() = 0;
 
   /// Registers the plugin that creates features.
-  /// It is obligatory for each plugin to call this function on loading to be found by 
+  /// It is obligatory for each plugin to call this function on loading to be found by
   /// the plugin manager on call of the feature)
   virtual void registerPlugin(ModelAPI_Plugin* thePlugin) = 0;
 

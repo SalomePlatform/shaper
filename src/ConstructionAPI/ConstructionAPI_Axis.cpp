@@ -1,7 +1,7 @@
 // Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
 // Name   : ConstructionAPI_Axis.cpp
-// Purpose: 
+// Purpose:
 //
 // History:
 // 15/06/16 - Sergey POKHODENKO - Creation of the file
@@ -88,7 +88,7 @@ ConstructionAPI_Axis::ConstructionAPI_Axis(const std::shared_ptr<ModelAPI_Featur
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setByTwoPlanes(thePlane1, theOffset1, theReverseOffset1, 
+    setByTwoPlanes(thePlane1, theOffset1, theReverseOffset1,
                    thePlane2, theOffset2, theReverseOffset2);
   }
 }
@@ -150,7 +150,7 @@ void ConstructionAPI_Axis::setByPointAndDirection(const ModelHighAPI_Selection& 
                                                   const ModelHighAPI_Double& theY,
                                                   const ModelHighAPI_Double& theZ)
 {
-  fillAttribute(ConstructionPlugin_Axis::CREATION_METHOD_BY_POINT_AND_DIRECTION(), 
+  fillAttribute(ConstructionPlugin_Axis::CREATION_METHOD_BY_POINT_AND_DIRECTION(),
                 creationMethod());
   fillAttribute(thePoint, firstPoint());
   fillAttribute(theX, xDirection());

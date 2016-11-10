@@ -22,7 +22,7 @@ bool FeaturesPlugin_ValidatorTransform::isValid(const AttributePtr& theAttribute
     return false;
   }
 
-  std::shared_ptr<ModelAPI_AttributeSelectionList> aCurSelList = 
+  std::shared_ptr<ModelAPI_AttributeSelectionList> aCurSelList =
                            std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
 
   DocumentPtr aDocument = theAttribute->owner()->document();

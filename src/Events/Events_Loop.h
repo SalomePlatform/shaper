@@ -58,7 +58,7 @@ class Events_Loop
   //! \param isGroup is true for grouping messages if possible
   EVENTS_EXPORT void send(const std::shared_ptr<Events_Message>& theMessage, bool isGroup = true);
 
-  //! Registers (or adds if such listener is already registered) a listener 
+  //! Registers (or adds if such listener is already registered) a listener
   //! that will be called on the event and from the defined sender
   //! \param theListener the object that will listen (process) the event
   //! \param theID listen for messages with this ID
@@ -77,12 +77,12 @@ class Events_Loop
   //! Removes messages with the given ID: they are not needed anymore (UPDATE on close)
   EVENTS_EXPORT void eraseMessages(const Events_ID& theID);
 
-  //! Allows to disable flushes: needed in synchronization of document mechanism 
+  //! Allows to disable flushes: needed in synchronization of document mechanism
   //! (to synchronize all and only then flush create, update, etc in correct order)
   //! \param theActivate a state about flushe is active. If false, the flush is disabled
   //! \return the previous active flush state
   EVENTS_EXPORT bool activateFlushes(const bool theActivate);
-  
+
   //! Clears all collected messages
   EVENTS_EXPORT void clear(const Events_ID& theID);
 

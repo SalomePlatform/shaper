@@ -46,7 +46,7 @@ class Config_FeatureReader : public Config_XMLReader
   virtual bool processChildren(xmlNodePtr aNode);
 
   /// Fills feature message
-  void fillFeature(xmlNodePtr theRoot, 
+  void fillFeature(xmlNodePtr theRoot,
                    const std::shared_ptr<Config_FeatureMessage>& outFeatureMessage);
 
  private:

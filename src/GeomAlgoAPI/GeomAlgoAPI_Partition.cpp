@@ -47,14 +47,14 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
   this->setBuilderType(OCCT_BOPAlgo_Builder);
 
   // Getting objects.
-  for (ListOfShape::const_iterator 
+  for (ListOfShape::const_iterator
        anObjectsIt = theObjects.begin(); anObjectsIt != theObjects.end(); anObjectsIt++) {
     const TopoDS_Shape& aShape = (*anObjectsIt)->impl<TopoDS_Shape>();
     anOperation->AddArgument(aShape);
   }
 
   // Getting tools.
-  for (ListOfShape::const_iterator 
+  for (ListOfShape::const_iterator
        aToolsIt = theTools.begin(); aToolsIt != theTools.end(); aToolsIt++) {
     const TopoDS_Shape& aShape = (*aToolsIt)->impl<TopoDS_Shape>();
     anOperation->AddTool(aShape);

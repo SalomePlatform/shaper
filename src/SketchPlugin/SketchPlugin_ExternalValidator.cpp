@@ -40,7 +40,7 @@ bool SketchPlugin_ExternalValidator::isValid(const AttributePtr& theAttribute,
 bool SketchPlugin_ExternalValidator::isExternalAttribute(const AttributePtr& theAttribute) const
 {
   bool isExternal = false;
-  AttributeRefAttrPtr anAttribute = 
+  AttributeRefAttrPtr anAttribute =
     std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
 
   if (anAttribute.get() != NULL) {

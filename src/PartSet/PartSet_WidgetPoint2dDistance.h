@@ -50,7 +50,7 @@ Q_OBJECT
 
   virtual ~PartSet_WidgetPoint2dDistance();
 
-  /// Checks if the selection presentation is valid in widget 
+  /// Checks if the selection presentation is valid in widget
   /// \param theValue a selected presentation in the view
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
@@ -86,7 +86,7 @@ protected:
   /// \return true if the widget current value is reset
   virtual bool resetCustom();
 
-  /// Set the second point which defines a value in the widget as 
+  /// Set the second point which defines a value in the widget as
   /// a distance with a first point defined by feature
   void setPoint(FeaturePtr theFeature, const std::shared_ptr<GeomAPI_Pnt2d>& thePnt);
 
@@ -100,7 +100,7 @@ protected:
 protected:
   /// A reference to workshop
   ModuleBase_IWorkshop* myWorkshop;
-  
+
   /// A name of the first point
   std::string myFirstPntName;
 

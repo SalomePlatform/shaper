@@ -57,7 +57,7 @@ void SketchSolver_ConstraintMultiRotation::process()
   for (; anEntIt != aBaseEntities.end(); ++anEntIt) {
     std::list<ConstraintWrapperPtr> aNewConstraints =
         aBuilder->createConstraint(myBaseConstraint, myGroupID, mySketchID, myType,
-        myAngle, isFullValue, aRotationCenter, EntityWrapperPtr(), 
+        myAngle, isFullValue, aRotationCenter, EntityWrapperPtr(),
         std::list<EntityWrapperPtr>(1, *anEntIt));
     aRotConstraints.insert(aRotConstraints.end(), aNewConstraints.begin(), aNewConstraints.end());
   }

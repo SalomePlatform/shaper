@@ -66,13 +66,13 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Restores the current selection
   virtual void restoreSelection() {};
 
-  /// Reads description of features from XML file 
+  /// Reads description of features from XML file
   virtual void createFeatures();
 
   /// Called on creation of menu item in desktop
   virtual void actionCreated(QAction*);
 
-  /// Launching of a edit operation on the feature 
+  /// Launching of a edit operation on the feature
   /// \param theFeature feature for editing
   virtual void editFeature(FeaturePtr theFeature);
 
@@ -126,9 +126,9 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Creates custom widgets for property panel
   /// \param theType a type of widget
   /// \param theParent the parent object
-  /// \param theWidgetApi the widget configuration. 
+  /// \param theWidgetApi the widget configuration.
   ///                     The attribute of the model widget is obtained from
-  virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType, 
+  virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType,
                                                      QWidget* theParent,
                                                      Config_WidgetAPI* theWidgetApi)
   {
@@ -145,7 +145,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// It is called as on clearing of property panel as on filling with new widgets
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation) {}
 
-  /// Have an opportunity to create widgets for the current operation 
+  /// Have an opportunity to create widgets for the current operation
   /// instead of standard creation in workshop
   /// \param theOperation a started operation
   /// \param theWidgets a list of created widgets
@@ -207,7 +207,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Return true if the custom presentation is activated
   /// \param theFlag a flag of level of customization, which means that only part of sub-elements
   /// \return boolean value
-  virtual bool isCustomPrsActivated(const ModuleBase_CustomizeFlag& theFlag) const 
+  virtual bool isCustomPrsActivated(const ModuleBase_CustomizeFlag& theFlag) const
   { return false; };
 
   /// Activate custom presentation for the object. Default realization is empty.
@@ -225,7 +225,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
                                    const bool theUpdateViewer) {}
 
   /// Modifies the given presentation in the custom way.
-  virtual bool customisePresentation(std::shared_ptr<ModelAPI_Result> theResult, 
+  virtual bool customisePresentation(std::shared_ptr<ModelAPI_Result> theResult,
                                      AISObjectPtr thePrs,
                                      GeomCustomPrsPtr theCustomPrs) { return false; };
 

@@ -130,7 +130,7 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   if (theContext->groupName() == ModelAPI_ResultBody::group()) {
     // do not select the whole shape for body:it is already must be in the data framework
     // equal and null selected objects mean the same: object is equal to context,
-    if (theContext->shape().get() && 
+    if (theContext->shape().get() &&
         (theContext->shape()->isEqual(theSubShape) || !theSubShape.get())) {
       aSelLab.ForgetAllAttributes(true);
       TDataStd_UAttribute::Set(aSelLab, kSIMPLE_REF_ID);
@@ -142,14 +142,14 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
       // to sub, so the whole result is selected
       aSelLab.ForgetAllAttributes(true);
       TDataStd_UAttribute::Set(aSelLab, kCONSTUCTION_SIMPLE_REF_ID);
-      ResultConstructionPtr aConstruction = 
+      ResultConstructionPtr aConstruction =
         std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theContext);
       if (aConstruction->isInfinite()) {
         // For correct naming selection, put the shape into the naming structure.
         // It seems sub-shapes are not needed: only this shape is (and can be ) selected.
         TNaming_Builder aBuilder(aSelLab);
         aBuilder.Generated(theContext->shape()->impl<TopoDS_Shape>());
-        std::shared_ptr<Model_Document> aMyDoc = 
+        std::shared_ptr<Model_Document> aMyDoc =
           std::dynamic_pointer_cast<Model_Document>(owner()->document());
         //std::string aName = contextName(theContext);
         // for selection in different document, add the document name
@@ -209,7 +209,7 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
   if (myRef.isInitialized()) {
     if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
       ResultPtr aContext = context();
-      if (!aContext.get()) 
+      if (!aContext.get())
         return aResult; // empty result
       return aContext->shape();
     }
@@ -247,7 +247,7 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
       aResult = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
       aResult->setImpl(new TopoDS_Shape(aSelShape));
     } else { // for simple construction element: just shape of this construction element
-      ResultConstructionPtr aConstr = 
+      ResultConstructionPtr aConstr =
         std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(context());
       if (aConstr) {
         return aConstr->shape();
@@ -272,7 +272,7 @@ bool Model_AttributeSelection::isInitialized()
         ResultPtr aContext = context();
         return aContext.get() != NULL;
       }
-      if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { 
+      if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) {
         // it is just reference to construction, nothing is in value
           return true;
       }
@@ -281,7 +281,7 @@ bool Model_AttributeSelection::isInitialized()
       if (selectionLabel().FindAttribute(TNaming_NamedShape::GetID(), aSelection)) {
         return !aSelection->Get().IsNull();
       } else { // for simple construction element: just shape of this construction element
-        ResultConstructionPtr aConstr = 
+        ResultConstructionPtr aConstr =
           std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(context());
         if (aConstr.get()) {
           return aConstr->shape().get() != NULL;
@@ -343,7 +343,7 @@ TDF_LabelMap& Model_AttributeSelection::scope()
     std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures = aMyDoc->allFeatures();
     std::list<std::shared_ptr<ModelAPI_Feature> >::iterator aFIter = allFeatures.begin();
     bool aMePassed = false;
-    CompositeFeaturePtr aComposite = 
+    CompositeFeaturePtr aComposite =
       std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(owner());
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
     CompositeFeaturePtr aCompositeOwner, aCompositeOwnerOwner;
@@ -362,7 +362,7 @@ TDF_LabelMap& Model_AttributeSelection::scope()
       }
       if (isGroup) aMePassed = false;
       bool isInScope = !aMePassed;
-      if (!isInScope && aComposite.get()) { 
+      if (!isInScope && aComposite.get()) {
         // try to add sub-elements of composite if this is composite
         if (aComposite->isSub(*aFIter))
           isInScope = true;
@@ -402,15 +402,15 @@ bool Model_AttributeSelection::update()
 {
   TDF_Label aSelLab = selectionLabel();
   ResultPtr aContext = context();
-  if (!aContext.get()) 
+  if (!aContext.get())
     return setInvalidIfFalse(aSelLab, false);
   if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
     return setInvalidIfFalse(aSelLab, aContext->shape() && !aContext->shape()->isNull());
   }
-  if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) { 
+  if (aSelLab.IsAttribute(kCONSTUCTION_SIMPLE_REF_ID)) {
     // it is just reference to construction, not sub-shape
     // if there is a sketch, the sketch-naming must be updated
-    ResultConstructionPtr aConstruction = 
+    ResultConstructionPtr aConstruction =
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
     if (!aConstruction->isInfinite()) {
       BRep_Builder aCompoundBuilder;
@@ -428,7 +428,7 @@ bool Model_AttributeSelection::update()
       // It seems sub-shapes are not needed: only this shape is (and can be ) selected.
       TNaming_Builder aBuilder(aSelLab);
       aBuilder.Generated(aContext->shape()->impl<TopoDS_Shape>());
-      std::shared_ptr<Model_Document> aMyDoc = 
+      std::shared_ptr<Model_Document> aMyDoc =
         std::dynamic_pointer_cast<Model_Document>(owner()->document());
       //std::string aName = contextName(aContext);
       //aMyDoc->addNamingName(aSelLab, aName);
@@ -468,11 +468,11 @@ bool Model_AttributeSelection::update()
   } else if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {
     // construction: identification by the results indexes, recompute faces and
     // take the face that more close by the indexes
-    ResultConstructionPtr aConstructionContext = 
+    ResultConstructionPtr aConstructionContext =
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
     FeaturePtr aContextFeature = aContext->document()->feature(aContext);
     // sketch sub-element
-    if (aConstructionContext && 
+    if (aConstructionContext &&
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContextFeature).get())
     {
       TDF_Label aLab = myRef.myRef->Label();
@@ -485,16 +485,16 @@ bool Model_AttributeSelection::update()
       // selected indexes will be needed in each "if"
       Handle(TDataStd_IntPackedMap) aSubIds;
       std::shared_ptr<GeomAPI_Shape> aNewSelected;
-      bool aNoIndexes = 
+      bool aNoIndexes =
         !aLab.FindAttribute(TDataStd_IntPackedMap::GetID(), aSubIds) || aSubIds->Extent() == 0;
       // for now working only with composite features
-      CompositeFeaturePtr aComposite = 
+      CompositeFeaturePtr aComposite =
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContextFeature);
       if (!aComposite.get() || aComposite->numberOfSubs() == 0) {
         return setInvalidIfFalse(aSelLab, false);
       }
 
-      if (aShapeType == TopAbs_FACE || aShapeType == TopAbs_WIRE) { 
+      if (aShapeType == TopAbs_FACE || aShapeType == TopAbs_WIRE) {
         // compound is for the whole sketch selection
         // If this is a wire with plane defined then it is a sketch-like object
         if (!aConstructionContext->facesNum()) // no faces, update can not work correctly
@@ -506,7 +506,7 @@ bool Model_AttributeSelection::update()
         } else { // searching for most looks-like initial face by the indexes
           // prepare edges of the current result for the fast searching
           // curves and orientations of edges
-          NCollection_DataMap<Handle(Geom_Curve), int> allCurves; 
+          NCollection_DataMap<Handle(Geom_Curve), int> allCurves;
           const int aSubNum = aComposite->numberOfSubs();
           for(int a = 0; a < aSubNum; a++) {
             int aSubID = aComposite->subFeatureId(a);
@@ -515,7 +515,7 @@ bool Model_AttributeSelection::update()
               const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
               std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes;
               for(aRes = aResults.cbegin(); aRes != aResults.cend(); aRes++) {
-                ResultConstructionPtr aConstr = 
+                ResultConstructionPtr aConstr =
                   std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
                 if (aConstr->shape() && aConstr->shape()->isEdge()) {
                   const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
@@ -543,8 +543,8 @@ bool Model_AttributeSelection::update()
           setInvalidIfFalse(aSelLab, true);
           owner()->data()->sendAttributeUpdated(this);
           return true;
-        } else { 
-          // if the selection is not found, put the empty shape: 
+        } else {
+          // if the selection is not found, put the empty shape:
           // it's better to have disappeared shape, than the old, the lost one
           TNaming_Builder anEmptyBuilder(selectionLabel());
           return setInvalidIfFalse(aSelLab, false);
@@ -560,7 +560,7 @@ bool Model_AttributeSelection::update()
             std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter =
               aFeature->results().cbegin();
             for(;aResIter != aFeature->results().cend(); aResIter++) {
-              ResultConstructionPtr aRes = 
+              ResultConstructionPtr aRes =
                 std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aResIter);
               if (aRes && aRes->shape() && aRes->shape()->isEdge()) { // found!
                 selectConstruction(aContext, aRes->shape());
@@ -589,7 +589,7 @@ bool Model_AttributeSelection::update()
               std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter =
                 aFeature->results().cbegin();
               for(;aResIter != aFeature->results().cend(); aResIter++) {
-                ResultConstructionPtr aRes = 
+                ResultConstructionPtr aRes =
                   std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aResIter);
                 if (aRes && aRes->shape()) {
                   if (aRes->shape()->isVertex() && aVertexNum == 0) { // found!
@@ -638,7 +638,7 @@ void Model_AttributeSelection::selectBody(
   if (aBody) {
     aContext = aBody->shape()->impl<TopoDS_Shape>();
   } else {
-    ResultPtr aResult = 
+    ResultPtr aResult =
       std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
     if (aResult) {
       aContext = aResult->shape()->impl<TopoDS_Shape>();
@@ -656,7 +656,7 @@ void Model_AttributeSelection::selectBody(
   while(!aNewContext.IsNull() && isUpdated) {
     // searching for the very last shape that was produced from this one
     isUpdated = false;
-    if (!TNaming_Tool::HasLabel(aSelLab, aNewContext)) 
+    if (!TNaming_Tool::HasLabel(aSelLab, aNewContext))
       // to avoid crash of TNaming_SameShapeIterator if pure shape does not exists
       break;
     for(TNaming_SameShapeIterator anIter(aNewContext, aSelLab); anIter.More(); anIter.Next()) {
@@ -696,7 +696,7 @@ void Model_AttributeSelection::selectBody(
     }
     if (!isFound) { // sub-shape is not found in the up-to-date instance of the context shape
       setInvalidIfFalse(aSelLab, false);
-      Events_InfoMessage("Model_AttributeSelection", 
+      Events_InfoMessage("Model_AttributeSelection",
         "Failed to select sub-shape already modified").send();
       return;
     }
@@ -708,20 +708,20 @@ void Model_AttributeSelection::selectBody(
   if (aFeatureOwner.get())
     aFeatureOwner->eraseResults();
   if (!aContext.IsNull()) {
-    aSel.Select(aNewSub, aNewContext); 
+    aSel.Select(aNewSub, aNewContext);
   }
 }
 
 /// registers the name of the shape in the label (theID == 0) of sub label (theID is a tag)
-/// if theID is zero, 
+/// if theID is zero,
 /// theOrientation is additional information about the positioning of edge relatively to face
-///    it is stored in the integer attribute of the edge sub-label: 
+///    it is stored in the integer attribute of the edge sub-label:
 ///    -1 is out, 1 is in, 0 is not needed
 static void registerSubShape(TDF_Label theMainLabel, TopoDS_Shape theShape,
   const int theID, const FeaturePtr& theContextFeature, std::shared_ptr<Model_Document> theDoc,
   std::map<int, int>& theOrientations,
   // name of sub-elements by ID to be exported instead of indexes
-  std::map<int, std::string>& theSubNames, 
+  std::map<int, std::string>& theSubNames,
   Handle(TDataStd_IntPackedMap) theRefs = Handle(TDataStd_IntPackedMap)(),
   const int theOrientation = 0)
 {
@@ -768,10 +768,10 @@ static void registerSubShape(TDF_Label theMainLabel, TopoDS_Shape theShape,
 void Model_AttributeSelection::selectConstruction(
   const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
-  std::shared_ptr<Model_Document> aMyDoc = 
+  std::shared_ptr<Model_Document> aMyDoc =
     std::dynamic_pointer_cast<Model_Document>(owner()->document());
   FeaturePtr aContextFeature = theContext->document()->feature(theContext);
-  CompositeFeaturePtr aComposite = 
+  CompositeFeaturePtr aComposite =
     std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContextFeature);
   const TopoDS_Shape& aSubShape = theSubShape->impl<TopoDS_Shape>();
   if (!aComposite || aComposite->numberOfSubs() == 0) {
@@ -793,7 +793,7 @@ void Model_AttributeSelection::selectConstruction(
   TColStd_MapOfTransient allCurves;
   if (aShapeType == TopAbs_VERTEX) { // compare positions
     aVertexPos = BRep_Tool::Pnt(TopoDS::Vertex(aSubShape));
-  } else { 
+  } else {
     for(TopExp_Explorer anEdgeExp(aSubShape, TopAbs_EDGE); anEdgeExp.More(); anEdgeExp.Next()) {
       TopoDS_Edge anEdge = TopoDS::Edge(anEdgeExp.Current());
       Standard_Real aFirst, aLast;
@@ -813,7 +813,7 @@ void Model_AttributeSelection::selectConstruction(
     std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
     // there may be many shapes (circle and center): register if at least one is in selection
     for(; aRes != aResults.cend(); aRes++) {
-      ResultConstructionPtr aConstr = 
+      ResultConstructionPtr aConstr =
         std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
       if (!aConstr->shape()) {
         continue;
@@ -873,7 +873,7 @@ void Model_AttributeSelection::selectConstruction(
                 for(; anEdgeExp.More(); anEdgeExp.Next(), aTagIndex += kSTART_VERTEX_DELTA) {
                   TopoDS_Vertex aV = TopoDS::Vertex(anEdgeExp.Current());
 
-                  std::stringstream anAdditionalName; 
+                  std::stringstream anAdditionalName;
                   registerSubShape(
                     selectionLabel(), aV, aTagIndex, aContextFeature, aMyDoc, anOrientations,
                     aSubNames);
@@ -889,7 +889,7 @@ void Model_AttributeSelection::selectConstruction(
   TNaming_Builder aBuilder(selectionLabel());
   aBuilder.Generated(aSubShape);
     registerSubShape(
-      selectionLabel(), aSubShape, 0, aContextFeature, aMyDoc, anOrientations, aSubNames, aRefs); 
+      selectionLabel(), aSubShape, 0, aContextFeature, aMyDoc, anOrientations, aSubNames, aRefs);
 }
 
 bool Model_AttributeSelection::selectPart(
@@ -901,7 +901,7 @@ bool Model_AttributeSelection::selectPart(
     return true; // postponed naming
   if (theUpdate) {
     Handle(TDataStd_Integer) anIndex;
-    if (selectionLabel().FindAttribute(TDataStd_Integer::GetID(), anIndex)) { 
+    if (selectionLabel().FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
       // by internal selection
       if (anIndex->Get() > 0) {
         // update the selection by index
@@ -974,7 +974,7 @@ void Model_AttributeSelection::selectSubShape(
   }
 
   Model_SelectionNaming aSelNaming(selectionLabel());
-  std::shared_ptr<Model_Document> aDoc = 
+  std::shared_ptr<Model_Document> aDoc =
     std::dynamic_pointer_cast<Model_Document>(owner()->document());
   std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected;
   ResultPtr aCont;
@@ -1105,7 +1105,7 @@ void Model_AttributeSelection::updateInHistory()
   Handle(TNaming_NamedShape) aContNS;
   if (!aContLab.FindAttribute(TNaming_NamedShape::GetID(), aContNS))
     return;
-  std::shared_ptr<Model_Document> aDoc = 
+  std::shared_ptr<Model_Document> aDoc =
     std::dynamic_pointer_cast<Model_Document>(aContext->document());
   FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
   FeaturePtr aCurrentModifierFeat = aDoc->feature(aContext);
@@ -1133,7 +1133,7 @@ void Model_AttributeSelection::updateInHistory()
         break;
       if (aModifierFeat == aThisFeature || aDoc->objects()->isLater(aModifierFeat, aThisFeature))
         continue; // the modifier feature is later than this, so, should not be used
-      if (aCurrentModifierFeat == aModifierFeat || 
+      if (aCurrentModifierFeat == aModifierFeat ||
         aDoc->objects()->isLater(aCurrentModifierFeat, aModifierFeat))
         continue; // the current modifier is later than the found, so, useless
       Handle(TNaming_NamedShape) aNewNS;

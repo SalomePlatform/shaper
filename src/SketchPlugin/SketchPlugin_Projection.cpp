@@ -94,7 +94,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
   std::shared_ptr<GeomAPI_Edge> anEdge;
   if (aExtFeature && aExtFeature->value() && aExtFeature->value()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aExtFeature->value()));
-  } else if (aExtFeature->context() && aExtFeature->context()->shape() && 
+  } else if (aExtFeature->context() && aExtFeature->context()->shape() &&
              aExtFeature->context()->shape()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aExtFeature->context()->shape()));
   }
@@ -162,7 +162,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
       aProjection = sketch()->addFeature(SketchPlugin_Circle::ID());
 
     // update attributes of projection
-    std::shared_ptr<GeomDataAPI_Point2D> aCenterPnt = 
+    std::shared_ptr<GeomDataAPI_Point2D> aCenterPnt =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aProjection->attribute(SketchPlugin_Circle::CENTER_ID()));
     aCenterPnt->setValue(aCenterInSketch);
@@ -182,13 +182,13 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
       aProjection = sketch()->addFeature(SketchPlugin_Arc::ID());
 
     // update attributes of projection
-    std::shared_ptr<GeomDataAPI_Point2D> aCenterPnt = 
+    std::shared_ptr<GeomDataAPI_Point2D> aCenterPnt =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aProjection->attribute(SketchPlugin_Arc::CENTER_ID()));
-    std::shared_ptr<GeomDataAPI_Point2D> aStartPnt = 
+    std::shared_ptr<GeomDataAPI_Point2D> aStartPnt =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aProjection->attribute(SketchPlugin_Arc::START_ID()));
-    std::shared_ptr<GeomDataAPI_Point2D> aEndPnt = 
+    std::shared_ptr<GeomDataAPI_Point2D> aEndPnt =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aProjection->attribute(SketchPlugin_Arc::END_ID()));
     aStartPnt->setValue(aFirstInSketch);

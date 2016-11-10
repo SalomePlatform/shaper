@@ -203,10 +203,10 @@ namespace ModelGeomAlgo_Point2D {
     std::string aValue = "not defined";
     std::string aType = theAttribute->attributeType();
     if (aType == GeomDataAPI_Point2D::typeId()) {
-      std::shared_ptr<GeomDataAPI_Point2D> aPoint = 
+      std::shared_ptr<GeomDataAPI_Point2D> aPoint =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
       if (aPoint.get() && aPoint->isInitialized()) {
-        aValue = std::string("(" + doubleToString(aPoint->x()) + ", "+ 
+        aValue = std::string("(" + doubleToString(aPoint->x()) + ", "+
                              doubleToString(aPoint->y()) + ")");
       }
     }

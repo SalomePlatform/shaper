@@ -115,7 +115,7 @@ private:
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToPoint*/);
 
   /// Obtains references to feature point attributes and to feature,
-  /// e.g. for feature line: 1st container is 
+  /// e.g. for feature line: 1st container is
   ///             <1st line point, list<entity_a in distance, entity_b in parallel> >
   ///             <2nd line point, list<> >
   ///      for feature circle 2nd container is <entity_a in Radius, entity_b in equal, ...>
@@ -162,7 +162,7 @@ private:
   /// \param theAfterFeature a feature between last point of split feature and the end point
   /// \param thePoints a list of points where coincidences will be build
   /// \param theCreatedFeatures a container of created features
-  /// \param theModifiedAttributes a container of attribute on base 
+  /// \param theModifiedAttributes a container of attribute on base
   /// feature to attribute on new feature
   void splitLine(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
                  std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,

@@ -191,7 +191,7 @@ std::shared_ptr<ModelAPI_Document> Model_Session::moduleDocument()
   Handle(Model_Application) anApp = Model_Application::getApplication();
   bool aFirstCall = !anApp->hasRoot();
   if (aFirstCall) {
-    // to be sure that plugins are loaded, 
+    // to be sure that plugins are loaded,
     // even before the first "createFeature" call (in unit tests)
     LoadPluginsInfo();
     // creation of the root document is always outside of the transaction, so, avoid checking it
@@ -343,7 +343,7 @@ Model_Session::Model_Session()
   ModelAPI_Session::setSession(std::shared_ptr<ModelAPI_Session>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
-  static const Events_ID kFeatureEvent = 
+  static const Events_ID kFeatureEvent =
     Events_Loop::eventByName(Config_FeatureMessage::MODEL_EVENT());
   aLoop->registerListener(this, kFeatureEvent);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED), 0, true);
@@ -354,11 +354,11 @@ Model_Session::Model_Session()
 
 void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
-  static const Events_ID kFeatureEvent = 
+  static const Events_ID kFeatureEvent =
     Events_Loop::eventByName(Config_FeatureMessage::MODEL_EVENT());
   static const Events_ID kValidatorEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
   if (theMessage->eventID() == kFeatureEvent) {
-    const std::shared_ptr<Config_FeatureMessage> aMsg = 
+    const std::shared_ptr<Config_FeatureMessage> aMsg =
       std::dynamic_pointer_cast<Config_FeatureMessage>(theMessage);
     if (aMsg) {
 
@@ -368,7 +368,7 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
           aMsg->pluginLibrary(), aMsg->documentKind());
       }
     } else {
-      const std::shared_ptr<Config_AttributeMessage> aMsgAttr = 
+      const std::shared_ptr<Config_AttributeMessage> aMsgAttr =
         std::dynamic_pointer_cast<Config_AttributeMessage>(theMessage);
       if (aMsgAttr) {
 
@@ -387,7 +387,7 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
     // plugins information was started to load, so, it will be loaded
     myPluginsInfoLoaded = true;
   } else if (theMessage->eventID() == kValidatorEvent) {
-    std::shared_ptr<Config_ValidatorMessage> aMsg = 
+    std::shared_ptr<Config_ValidatorMessage> aMsg =
       std::dynamic_pointer_cast<Config_ValidatorMessage>(theMessage);
     if (aMsg) {
       if (aMsg->attributeId().empty()) {  // feature validator
@@ -406,7 +406,7 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
     if (theMessage->eventID() == kDeletedEvent) {
       std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleted =
         std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
-      if (aDeleted && 
+      if (aDeleted &&
           aDeleted->groups().find(ModelAPI_ResultPart::group()) != aDeleted->groups().end())
       {
          // check that the current feature of the session is still the active Part (even disabled)

@@ -44,7 +44,7 @@
   public:
 
 //--------------------------------------------------------------------------------------
-// Used in INTERFACE_N inside START_INIT/END_INIT for 
+// Used in INTERFACE_N inside START_INIT/END_INIT for
 // set variable with attribute received from feature
 #define SET_ATTRIBUTE(NAME, TYPE, ATT_NAME) \
   VAR_NAME(NAME) = std::dynamic_pointer_cast<TYPE>(feature()->attribute(ATT_NAME)); \

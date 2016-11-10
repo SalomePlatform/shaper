@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : ModelHighAPI_Services.cpp
-// Purpose: 
+// Purpose:
 //
 // History:
 // 17/06/16 - Sergey POKHODENKO - Creation of the file
@@ -58,7 +58,7 @@ std::string defaultPlane(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
     return std::string();
 
   // XOY or XOZ
-  if (fabs(theNormal->x()) < aTol && 
+  if (fabs(theNormal->x()) < aTol &&
       fabs(theDirX->x() - 1.0) < aTol && fabs(theDirX->y()) < aTol && fabs(theDirX->z()) < aTol) {
     // XOY
     if (fabs(theNormal->y()) < aTol && fabs(theNormal->z() - 1.0) < aTol)
@@ -67,9 +67,9 @@ std::string defaultPlane(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
       return std::string("XOZ");
   }
   // YOZ
-  else if (fabs(theNormal->x() - 1.0) < aTol && 
+  else if (fabs(theNormal->x() - 1.0) < aTol &&
            fabs(theNormal->y()) < aTol && fabs(theNormal->z()) < aTol &&
-           fabs(theDirX->x()) < aTol && fabs(theDirX->y() - 1.0) < aTol && 
+           fabs(theDirX->x()) < aTol && fabs(theDirX->y() - 1.0) < aTol &&
            fabs(theDirX->z()) < aTol)
     return std::string("YOZ");
 

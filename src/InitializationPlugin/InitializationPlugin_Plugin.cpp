@@ -153,7 +153,7 @@ FeaturePtr InitializationPlugin_Plugin::createAxis(DocumentPtr theDoc, FeaturePt
     aAxis->data()->setName("OZ");
   }
    // don't show automatically created feature in the features history
-  aAxis->setInHistory(aAxis, false); 
+  aAxis->setInHistory(aAxis, false);
   aAxis->execute();
   aAxis->data()->execState(ModelAPI_StateDone);
   aAxis->firstResult()->data()->execState(ModelAPI_StateDone);

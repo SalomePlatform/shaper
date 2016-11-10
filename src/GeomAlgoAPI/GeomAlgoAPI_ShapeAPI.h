@@ -27,9 +27,9 @@ public:
   /// \param theDy The dimension on Y
   /// \param theDz The dimension on Z
   /// \return a shape
-  static std::shared_ptr<GeomAPI_Shape> makeBox(const double theDx, const double theDy, 
+  static std::shared_ptr<GeomAPI_Shape> makeBox(const double theDx, const double theDy,
                                                 const double theDz) throw (GeomAlgoAPI_Exception);
-  
+
   /// Creates a box using the two points that defined a diagonal.
   /// \param theFirstPoint One extermity of the diagonal
   /// \param theSecondPoint The other extremity of the diagonal

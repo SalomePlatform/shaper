@@ -27,24 +27,24 @@ public:
   /// Constructor
   /// \param theConstraint a constraint object
   /// \param thePlane plane of a sketch
-  Standard_EXPORT SketcherPrs_Coincident(ModelAPI_Feature* theConstraint, 
+  Standard_EXPORT SketcherPrs_Coincident(ModelAPI_Feature* theConstraint,
                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
   /// Defines color for the presentation
   /// \param aColor a color object
   Standard_EXPORT virtual void SetColor(const Quantity_Color& aColor);
-  
+
   /// Defines color for the presentation
   /// \param aColor a color name
   Standard_EXPORT virtual void SetColor(const Quantity_NameOfColor aColor);
 
   /// Set state of the presentation, in case of conflicting state, the icon of the presentation is
-  /// visualized in error color. 
+  /// visualized in error color.
   /// The state is stored in an internal field, so should be changed when
   /// constraint become not conflicting
   /// \param theConflicting a state
   /// \param theColor a color for conflicting object
-  Standard_EXPORT void SetConflictingConstraint(const bool& theConflicting, 
+  Standard_EXPORT void SetConflictingConstraint(const bool& theConflicting,
                                                 const std::vector<int>& theColor);
 
   /// Returns true if the constraint feature arguments are correcly filled to build AIS presentation

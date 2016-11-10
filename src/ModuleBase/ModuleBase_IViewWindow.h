@@ -20,7 +20,7 @@ public:
   ModuleBase_IViewWindow();
   /// Virtual destructor
   virtual ~ModuleBase_IViewWindow();
-  
+
   /// Returns OCCT object which contains 3d view object
   virtual Handle(V3d_View) v3dView() const = 0;
 

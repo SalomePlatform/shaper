@@ -111,7 +111,7 @@ bool PartSet_OverconstraintListener::appendConflictingObjects(
   getConflictingColor(aColor);
 
   // set error state for new objects and append them in the internal map of objects
-  std::set<ObjectPtr>::const_iterator 
+  std::set<ObjectPtr>::const_iterator
     anIt = theConflictingObjects.begin(), aLast = theConflictingObjects.end();
   for (; anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
@@ -133,7 +133,7 @@ bool PartSet_OverconstraintListener::repairConflictingObjects(
   std::set<ObjectPtr> aModifiedObjects;
   // erase error state of absent current objects in the parameter list
   std::set<ObjectPtr>::const_iterator anIt, aLast;
-  for (anIt = theConflictingObjects.begin(), aLast = theConflictingObjects.end(); 
+  for (anIt = theConflictingObjects.begin(), aLast = theConflictingObjects.end();
        anIt != aLast; anIt++) {
     ObjectPtr anObject = *anIt;
     if (theConflictingObjects.find(anObject) != theConflictingObjects.end()) { // it is found

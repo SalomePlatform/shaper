@@ -63,7 +63,7 @@ void ModuleBase_WidgetValidator::clearValidatedCash()
   myInvalidPrs.clear();
 }
 
-bool ModuleBase_WidgetValidator::getValidState(const ModuleBase_ViewerPrsPtr& theValue, 
+bool ModuleBase_WidgetValidator::getValidState(const ModuleBase_ViewerPrsPtr& theValue,
                                                bool& theValid)
 {
   bool aValidPrs = myValidPrs.contains(theValue);
@@ -78,7 +78,7 @@ bool ModuleBase_WidgetValidator::getValidState(const ModuleBase_ViewerPrsPtr& th
 }
 
 //********************************************************************
-void ModuleBase_WidgetValidator::storeValidState(const ModuleBase_ViewerPrsPtr& theValue, 
+void ModuleBase_WidgetValidator::storeValidState(const ModuleBase_ViewerPrsPtr& theValue,
                                                  const bool theValid)
 {
   bool aValidPrs = myInvalidPrs.contains(theValue);

@@ -27,7 +27,7 @@ public:
   /// \param theParent a workshop object instance
   /// \param theId an Id of a feature
   /// \param theDescription an XML description of the feature
-  ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QString& theId, 
+  ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QString& theId,
                     const std::string& theDescription);
 
   /// Redefinition of virtual method

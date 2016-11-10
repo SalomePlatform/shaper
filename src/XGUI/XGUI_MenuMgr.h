@@ -63,7 +63,7 @@ private:
   XGUI_Workshop* myWorkshop; ///< the current workshop
 
   /// container of existing workbenchs
-  std::list< std::shared_ptr<XGUI_MenuWorkbench> > myWorkbenches; 
+  std::list< std::shared_ptr<XGUI_MenuWorkbench> > myWorkbenches;
 };
 
 #endif /* XGUI_MENUMGR_H_ */

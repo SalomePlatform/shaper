@@ -19,7 +19,7 @@ class GeomAlgoAPI_WireBuilder
  public:
    /// \brief Creates a wire from edges and wires.
    /// \param[in] theShapes list of shapes. Only edges and wires allowed.
-   /// The edges are not to be consecutive. 
+   /// The edges are not to be consecutive.
    /// But they are to be all connected geometrically or topologically.
    /// \return wire created from theShapes. Empty in case of error or bad input.
    GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> wire(const ListOfShape& theShapes);

@@ -184,7 +184,7 @@ AISObjectPtr PartSet_CustomPrs::getPresentation(
   AISObjectPtr anOperationPrs;
   if (myPresentations.contains(theFlag))
     anOperationPrs = myPresentations[theFlag];
-  
+
   if (!anOperationPrs.get() && theToCreate) {
     initPresentation(theFlag);
     anOperationPrs = myPresentations[theFlag];
@@ -203,7 +203,7 @@ bool PartSet_CustomPrs::redisplay(const ObjectPtr& theObject,
   bool aRedisplayed = false;
   if (myIsActive[theFlag])
     aRedisplayed = displayPresentation(theFlag, theUpdateViewer);
-  
+
   return aRedisplayed;
 }
 

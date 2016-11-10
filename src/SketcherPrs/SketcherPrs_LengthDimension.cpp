@@ -63,7 +63,7 @@ bool SketcherPrs_LengthDimension::IsReadyToDisplay(ModelAPI_Feature* theConstrai
 
 void SketcherPrs_LengthDimension::Compute(
   const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-  const Handle(Prs3d_Presentation)& thePresentation, 
+  const Handle(Prs3d_Presentation)& thePresentation,
   const Standard_Integer theMode)
 {
   gp_Pnt aPnt1, aPnt2;
@@ -106,7 +106,7 @@ bool SketcherPrs_LengthDimension::readyToDisplay(ModelAPI_Feature* theConstraint
   DataPtr aData = theConstraint->data();
   if (theConstraint->getKind() == SketchPlugin_ConstraintLength::ID()) {
     // The constraint is length
-    std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+    std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
       (aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
     if (!anAttr)
@@ -118,10 +118,10 @@ bool SketcherPrs_LengthDimension::readyToDisplay(ModelAPI_Feature* theConstraint
 
     // Get geometry of the object
     DataPtr aLineData = aFeature->data();
-    std::shared_ptr<GeomDataAPI_Point2D> aStartPoint = 
+    std::shared_ptr<GeomDataAPI_Point2D> aStartPoint =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>
       (aLineData->attribute(SketchPlugin_Line::START_ID()));
-    std::shared_ptr<GeomDataAPI_Point2D> aEndPoint = 
+    std::shared_ptr<GeomDataAPI_Point2D> aEndPoint =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>
       (aLineData->attribute(SketchPlugin_Line::END_ID()));
     thePnt1 = thePlane->to3D(aStartPoint->x(), aStartPoint->y())->impl<gp_Pnt>();

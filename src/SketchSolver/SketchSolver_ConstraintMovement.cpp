@@ -52,7 +52,7 @@ static std::list<EntityWrapperPtr> movedEntities(
     std::list<EntityWrapperPtr> aMovedSubs = movedEntities(
         *anOldIt, theOldStorage, *aNewIt, theNewStorage);
     // check only the points to be moved (because arcs in PlaneGCS have scalar subs too)
-    if ((*anOldIt)->type() == ENTITY_POINT && 
+    if ((*anOldIt)->type() == ENTITY_POINT &&
        (aMovedSubs.size() != 1 || aMovedSubs.front() != *anOldIt))
       isFullyMoved = false;
     aMoved.insert(aMoved.end(), aMovedSubs.begin(), aMovedSubs.end());

@@ -39,14 +39,14 @@ class PrimitivesPlugin_Box : public ModelAPI_Feature
     static const std::string MY_CREATION_METHOD_ID("CreationMethod");
     return MY_CREATION_METHOD_ID;
   }
-  
+
   /// Attribute name for creation method
   inline static const std::string& CREATION_METHOD_BY_DIMENSIONS()
   {
     static const std::string MY_CREATION_METHOD_ID("BoxByDimensions");
     return MY_CREATION_METHOD_ID;
   }
-  
+
   /// Attribute name for creation method
   inline static const std::string& CREATION_METHOD_BY_TWO_POINTS()
   {
@@ -101,7 +101,7 @@ class PrimitivesPlugin_Box : public ModelAPI_Feature
 
   /// Request for initialization of data model of the feature: adding all attributes
   PRIMITIVESPLUGIN_EXPORT virtual void initAttributes();
-  
+
   /// Use plugin manager for features creation
   PrimitivesPlugin_Box();
 
@@ -112,7 +112,7 @@ class PrimitivesPlugin_Box : public ModelAPI_Feature
 
   ///Perform the creation of the box using two points defining a diagonal
   void createBoxByTwoPoints();
-  
+
   ///Perform the creation of the box using three cordinates
   void createBoxByDimensions();
 

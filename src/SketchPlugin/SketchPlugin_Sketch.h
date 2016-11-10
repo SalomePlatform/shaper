@@ -113,7 +113,7 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
 
     return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
   }
-  
+
   /// Returns the point projected into the sketch plane
   /// \param thePnt a source 3d point
   std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& thePnt) const
@@ -186,7 +186,7 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
   SKETCHPLUGIN_EXPORT virtual int numberOfSubs(bool forTree = false) const;
 
   /// Returns the sub-feature by zero-base index
-  SKETCHPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Feature> 
+  SKETCHPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Feature>
     subFeature(const int theIndex, bool forTree = false);
 
   /// Returns the sub-feature unique identifier in this composite feature by index
@@ -213,7 +213,7 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
   static void createPoint2DResult(ModelAPI_Feature* theFeature,
                                   SketchPlugin_Sketch* theSketch,
                                   const std::string& theAttributeID, const int theIndex);
-  
+
   /// Add new feature and fill the data of the feature by the data of the parameter feature.
   /// The name of the created feature stays unique.
   /// \param theFeature a source feature
@@ -236,9 +236,9 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
     // apply the color of the result to the presentation
     if (theDefaultPrs.get())
       isCustomized = theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
-    // set the sketch presentation bold    
+    // set the sketch presentation bold
     isCustomized = thePrs->setWidth(2) || isCustomized;
-  
+
     return isCustomized;
   }
 

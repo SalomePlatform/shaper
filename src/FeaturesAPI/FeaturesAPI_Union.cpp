@@ -49,7 +49,7 @@ void FeaturesAPI_Union::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Union::BASE_OBJECTS_ID());
 
-  theDumper << aBase << " = model.addUnion(" << aDocName << 
+  theDumper << aBase << " = model.addUnion(" << aDocName <<
     ", " << anAttrObjects << ")" << std::endl;
 }
 

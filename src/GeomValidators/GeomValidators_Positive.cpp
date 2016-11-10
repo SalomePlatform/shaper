@@ -26,7 +26,7 @@ GeomValidators_Positive::GeomValidators_Positive()
   aFactory->registerValidator("GeomValidators_Positive", this);
 }
 
-bool GeomValidators_Positive::isValid(const AttributePtr& theAttribute, 
+bool GeomValidators_Positive::isValid(const AttributePtr& theAttribute,
                                       const std::list<std::string>& theArguments,
                                       Events_InfoMessage& theError) const
 {

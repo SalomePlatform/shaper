@@ -27,7 +27,7 @@ public:
   static SketcherPrs_PositionMgr* get();
 
   /// Returns position of symbol for the given presentation
-  /// \param theLine constrained object 
+  /// \param theLine constrained object
   /// \param thePrs a presentation of constraint
   /// \param theStep step between symbols
   gp_Pnt getPosition(ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs, double theStep = 20);
@@ -41,7 +41,7 @@ private:
   SketcherPrs_PositionMgr();
 
   /// Returns position index of the given constraint
-  /// \param theLine constrained object 
+  /// \param theLine constrained object
   /// \param thePrs a presentation of constraint
   int getPositionIndex(ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs);
 
@@ -51,7 +51,7 @@ private:
   /// The map which contains position of presentation
   PositionsMap myIndexes;
 
-  /// The map contains position index 
+  /// The map contains position index
   std::map<ObjectPtr, PositionsMap> myShapes;
 };
 

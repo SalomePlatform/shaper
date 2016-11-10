@@ -238,13 +238,13 @@ bool GeomAlgoAPI_MakeShape::checkValid(std::string theMessage){
   for(TopExp_Explorer anExp(aTopoDSShape,TopAbs_SOLID); anExp.More(); anExp.Next()) {
     aNbVolumes ++;
   }
-  
+
   if (aNbVolumes != 1) {
     myError = theMessage +
       " :: connexity error, the resulting shape is made of several separate solids.";
     return false;
   }
-  
+
   return true ;
 }
-  
+

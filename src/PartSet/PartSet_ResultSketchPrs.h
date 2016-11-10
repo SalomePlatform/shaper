@@ -46,7 +46,7 @@ private:
   /// \param theShape a shape
   /// \param theTypeOfSelection type of selection: VERTEX, EDGE, WIRE
   void appendShapeSelection(const Handle(SelectMgr_Selection)& theSelection,
-                            const TopoDS_Shape& theShape, 
+                            const TopoDS_Shape& theShape,
                             const TopAbs_ShapeEnum& theTypeOfSelection);
 
   /// Sets color/line style/width of the presentation depending on the parameter state

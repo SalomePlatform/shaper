@@ -41,7 +41,7 @@ public:
   virtual ~ModelHighAPI_Reference();
 
   /// Fill attribute values
-  MODELHIGHAPI_EXPORT virtual 
+  MODELHIGHAPI_EXPORT virtual
     void fillAttribute(const std::shared_ptr<ModelAPI_AttributeReference> & theAttribute) const;
 
   /// Append to list attribute

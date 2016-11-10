@@ -33,17 +33,17 @@ void clearExpressions(AttributePoint2DPtr theAttribute)
 void clearExpressions(AttributePtr theAttribute)
 {
   // Double
-  AttributeDoublePtr anAttributeDouble = 
+  AttributeDoublePtr anAttributeDouble =
       std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
   if (anAttributeDouble.get())
     clearExpressions(anAttributeDouble);
   // Point
-  AttributePointPtr anAttributePoint = 
+  AttributePointPtr anAttributePoint =
       std::dynamic_pointer_cast<GeomDataAPI_Point>(theAttribute);
   if (anAttributePoint.get())
     clearExpressions(anAttributePoint);
   // Point2D
-  AttributePoint2DPtr anAttributePoint2D = 
+  AttributePoint2DPtr anAttributePoint2D =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
   if (anAttributePoint2D.get())
     clearExpressions(anAttributePoint2D);
@@ -54,7 +54,7 @@ void clearExpressions(FeaturePtr theFeature)
   if (!theFeature.get())
     return;
 
-  std::list<AttributePtr> anAttributes = theFeature->data()->attributes(std::string());  
+  std::list<AttributePtr> anAttributes = theFeature->data()->attributes(std::string());
   std::list<AttributePtr>::iterator anAttributeIt = anAttributes.begin();
   for (; anAttributeIt != anAttributes.end(); ++anAttributeIt) {
     clearExpressions(*anAttributeIt);
@@ -63,7 +63,7 @@ void clearExpressions(FeaturePtr theFeature)
 
 std::shared_ptr<GeomAPI_Pnt2d> getCoincidencePoint(const FeaturePtr theStartCoin)
 {
-  std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(theStartCoin.get(), 
+  std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(theStartCoin.get(),
                                                           SketchPlugin_Constraint::ENTITY_A());
   if (aPnt.get() == NULL)
     aPnt = SketcherPrs_Tools::getPoint(theStartCoin.get(), SketchPlugin_Constraint::ENTITY_B());

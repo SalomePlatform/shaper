@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : ModelHighAPI_Interface.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 17/05/16 - Sergey POKHODENKO - Creation of the file

@@ -116,7 +116,7 @@ void SketchSolver_Manager::processEvent(
   const std::shared_ptr<Events_Message>& theMessage)
 {
   static const Events_ID aSketchPreparedEvent = Events_Loop::eventByName(EVENT_SKETCH_PREPARED);
-  // sketch is prepared for resolve: all the needed events 
+  // sketch is prepared for resolve: all the needed events
   // are collected and must be processed by the solver
   if (theMessage->eventID() == aSketchPreparedEvent) {
     flushGrouped(anUpdateEvent);
@@ -146,7 +146,7 @@ void SketchSolver_Manager::processEvent(
     if (isMovedEvt) {
       std::set<ObjectPtr>::iterator aFeatIter;
       for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
-        std::shared_ptr<SketchPlugin_Feature> aSFeature = 
+        std::shared_ptr<SketchPlugin_Feature> aSFeature =
             std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
         if (aSFeature && moveEntity(aSFeature)) {
           // Want to avoid recalculation of DoF too frequently.
@@ -154,23 +154,23 @@ void SketchSolver_Manager::processEvent(
           hasProperFeature = true;
         }
       }
-      if (!hasProperFeature) 
+      if (!hasProperFeature)
         // in this iteration it will compute nothing, so, no problem with recursion
         // it is important that solver flushes signal updated after processing move signal as there
         // is optimization that relies on this update, might be found by key "optimization"
         myIsComputed = false;
     } else {
-      std::list<FeaturePtr> aSketchFeatures = 
+      std::list<FeaturePtr> aSketchFeatures =
         SketchSolver_Group::selectApplicableFeatures(aFeatures);
       std::list<FeaturePtr>::iterator aFeatIter = aSketchFeatures.begin();
       for (; aFeatIter != aSketchFeatures.end(); ++aFeatIter) {
         if ((*aFeatIter)->getKind() == SketchPlugin_Sketch::ID()) {
-          std::shared_ptr<ModelAPI_CompositeFeature> aSketch = 
+          std::shared_ptr<ModelAPI_CompositeFeature> aSketch =
               std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aFeatIter);
           hasProperFeature = changeWorkplane(aSketch) || hasProperFeature;
           continue;
         }
-        std::shared_ptr<SketchPlugin_Feature> aFeature = 
+        std::shared_ptr<SketchPlugin_Feature> aFeature =
             std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
         if (!aFeature)
           continue;
@@ -198,7 +198,7 @@ void SketchSolver_Manager::processEvent(
       std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
     const std::set<std::string>& aFeatureGroups = aDeleteMsg->groups();
 
-    // Find SketchPlugin_Sketch::ID() in groups. 
+    // Find SketchPlugin_Sketch::ID() in groups.
     // The constraint groups should be updated when an object removed from Sketch
     std::set<std::string>::const_iterator aFGrIter;
     for (aFGrIter = aFeatureGroups.begin(); aFGrIter != aFeatureGroups.end(); aFGrIter++)
@@ -218,7 +218,7 @@ void SketchSolver_Manager::processEvent(
           myGroups.erase(aRemoveIt);
           continue;
         }
-        if (!(*aGroupIter)->isConsistent()) {  
+        if (!(*aGroupIter)->isConsistent()) {
           // some constraints were removed, try to split the group
           (*aGroupIter)->splitGroup(aSeparatedGroups);
           if (!(*aGroupIter)->getWorkplane()->string(
@@ -318,7 +318,7 @@ bool SketchSolver_Manager::changeFeature(std::shared_ptr<SketchPlugin_Feature> t
   std::set<GroupID> aGroups;
   findGroups(theFeature, aGroups);
 
-  std::shared_ptr<SketchPlugin_Constraint> aConstraint = 
+  std::shared_ptr<SketchPlugin_Constraint> aConstraint =
       std::dynamic_pointer_cast<SketchPlugin_Constraint>(theFeature);
 
   // Process the groups list
@@ -346,7 +346,7 @@ bool SketchSolver_Manager::changeFeature(std::shared_ptr<SketchPlugin_Feature> t
           return (*aGroupIter)->updateFeature(theFeature);
         return (*aGroupIter)->changeConstraint(aConstraint);
       }
-  } else if (aGroups.size() > 1) {  
+  } else if (aGroups.size() > 1) {
     // Several groups applicable for this feature => need to merge them
     std::set<GroupID>::const_iterator aGroupsIter = aGroups.begin();
 
@@ -497,7 +497,7 @@ std::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_Manager
 bool SketchSolver_Manager::resolveConstraints(const std::list<SketchSolver_Group*>& theGroups)
 {
   bool needToUpdate = false;
-  const std::list<SketchSolver_Group*>& aGroupsToResolve = theGroups.empty() ? 
+  const std::list<SketchSolver_Group*>& aGroupsToResolve = theGroups.empty() ?
                                                            myGroups : theGroups;
   std::list<SketchSolver_Group*>::const_iterator aGroupIter = aGroupsToResolve.begin();
   for (; aGroupIter != aGroupsToResolve.end(); aGroupIter++)
@@ -508,7 +508,7 @@ bool SketchSolver_Manager::resolveConstraints(const std::list<SketchSolver_Group
 
 
 // Obtain points and their copies for Mirror, Multi-Rotation and Multi-Translation constraints
-static void collectPointsAndCopies(FeaturePtr theConstraint, 
+static void collectPointsAndCopies(FeaturePtr theConstraint,
                                    std::list<std::set<AttributePtr> >& thePoints)
 {
   typedef std::list<std::string> strlist;
@@ -721,7 +721,7 @@ void SketchSolver_Manager::degreesOfFreedom()
         } else {
           aDoF -= 1;
           if (aCoincPoint[0] && aCoincLine) {
-            // if the point is already coincident to a line 
+            // if the point is already coincident to a line
             // (by middle point constraint), do not decrease DoF
             std::map<AttributePtr, std::set<FeaturePtr> >::iterator
                 aPtFound = aPointOnLine.find(aCoincPoint[0]);
@@ -776,7 +776,7 @@ void SketchSolver_Manager::degreesOfFreedom()
             if (isExternal(anAttr))
               continue; // feature is already fixed since it is external
             aDoF -= aDoFDelta[anAttr->getKind()];
-            std::list<AttributePtr> aPtAttrs = 
+            std::list<AttributePtr> aPtAttrs =
               anAttr->data()->attributes(GeomDataAPI_Point2D::typeId());
             aPoints.insert(aPtAttrs.begin(), aPtAttrs.end());
           }
@@ -823,10 +823,10 @@ void SketchSolver_Manager::degreesOfFreedom()
           anAttrName = SketchPlugin_Constraint::ENTITY_B();
         else {
           if (aFeature->getKind() == SketchPlugin_MultiRotation::ID())
-            aNbCopies = 
+            aNbCopies =
             aFeature->integer(SketchPlugin_MultiRotation::NUMBER_OF_OBJECTS_ID())->value() - 1;
           else if (aFeature->getKind() == SketchPlugin_MultiTranslation::ID())
-            aNbCopies = 
+            aNbCopies =
             aFeature->integer(SketchPlugin_MultiTranslation::NUMBER_OF_OBJECTS_ID())->value() - 1;
           anAttrName = SketchPlugin_Constraint::ENTITY_A();
         }

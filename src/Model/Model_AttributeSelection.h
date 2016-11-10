@@ -54,7 +54,7 @@ public:
   /// Returns a textual string of the selection
   /// \param theDefaultValue a name, which is returned if the naming name can not be obtained
   MODEL_EXPORT virtual std::string namingName(const std::string& theDefaultValue = "");
-  
+
   /// Returns an Id of the selection
   /// NOTE: This method has been added for temporary export of groups towards old GEOM
   /// It should then be removed when a direct use of objects from SHAPER
@@ -66,7 +66,7 @@ public:
   MODEL_EXPORT virtual void setId(int theID);
 
   /// Selects (i.e. creates Naming data structure) of sub-shape specifed by textual name
-  MODEL_EXPORT virtual void selectSubShape(const std::string& theType, 
+  MODEL_EXPORT virtual void selectSubShape(const std::string& theType,
                                            const std::string& theSubShapeName);
 
   /// Returns true if attribute was  initialized by some value

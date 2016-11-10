@@ -42,7 +42,7 @@ public:
   /// \param theObject an object to be checked
   /// \return boolean result
   bool isConflictingObject(const ObjectPtr& theObject);
-  
+
   /// Returns values of conflicting color
   /// \param theColor the output container to be filled in [red, green, blue] values
   void getConflictingColor(std::vector<int>& theColor);

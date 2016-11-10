@@ -26,7 +26,7 @@
 #include <TopoDS_Vertex.hxx>
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Vertex> 
+std::shared_ptr<GeomAPI_Vertex>
   GeomAlgoAPI_PointBuilder::vertex(const std::shared_ptr<GeomAPI_Pnt> thePoint)
 {
   const gp_Pnt& aPnt = thePoint->impl<gp_Pnt>();
@@ -51,7 +51,7 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertex(const double th
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Pnt> 
+std::shared_ptr<GeomAPI_Pnt>
   GeomAlgoAPI_PointBuilder::point(const std::shared_ptr<GeomAPI_Shape> theVertex)
 {
   TopoDS_Shape aShape = theVertex->impl<TopoDS_Shape>();

@@ -175,7 +175,7 @@ bool GeomAPI_Edge::isEqual(const std::shared_ptr<GeomAPI_Shape> theEdge) const
   gp_Pnt aInPnt1 = aInAdaptor.Value(aInStart);
   gp_Pnt aInPnt2 = aInAdaptor.Value(aInEnd);
 
-  if ((!aMyPnt1.IsEqual(aInPnt1, Precision::Confusion())) || 
+  if ((!aMyPnt1.IsEqual(aInPnt1, Precision::Confusion())) ||
     (!aMyPnt2.IsEqual(aInPnt2, Precision::Confusion())))
     return false;
 

@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : ModelHighAPI_RefAttr.cpp
-// Purpose: 
+// Purpose:
 //
 // History:
 // 08/06/16 - Sergey POKHODENKO - Creation of the file

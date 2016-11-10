@@ -21,7 +21,7 @@ void ParametersPlugin_WidgetCreator::widgetTypes(std::set<std::string>& theTypes
 }
 
 
-ModuleBase_ModelWidget* 
+ModuleBase_ModelWidget*
   ParametersPlugin_WidgetCreator::createWidgetByType(const std::string& theType,
                                                      QWidget* theParent,
                                                      Config_WidgetAPI* theWidgetApi,

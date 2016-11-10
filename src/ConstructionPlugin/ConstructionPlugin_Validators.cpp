@@ -29,7 +29,7 @@ bool ConstructionPlugin_ValidatorPointLines::isValid(const AttributePtr& theAttr
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
 
-  AttributeSelectionPtr aLineAttribute1 = 
+  AttributeSelectionPtr aLineAttribute1 =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   AttributeSelectionPtr aLineAttribute2 = aFeature->selection(theArguments.front());
 
@@ -87,7 +87,7 @@ bool ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel::isValid(
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
 
-  AttributeSelectionPtr anAttribute1 = 
+  AttributeSelectionPtr anAttribute1 =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   AttributeSelectionPtr anAttribute2 = aFeature->selection(theArguments.front());
 
@@ -211,7 +211,7 @@ bool ConstructionPlugin_ValidatorPlaneLinePoint::isValid(
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
 
-  AttributeSelectionPtr anAttribute1 = 
+  AttributeSelectionPtr anAttribute1 =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   AttributeSelectionPtr anAttribute2 = aFeature->selection(theArguments.front());
 
@@ -322,7 +322,7 @@ bool ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes::isValid(
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
 
-  AttributeSelectionPtr anAttribute1 = 
+  AttributeSelectionPtr anAttribute1 =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   AttributeSelectionPtr anAttribute2 = aFeature->selection(theArguments.front());
 

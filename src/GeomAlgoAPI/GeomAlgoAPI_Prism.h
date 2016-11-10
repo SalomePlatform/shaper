@@ -34,7 +34,7 @@ public:
 
   /// \brief Creates extrusion for the given shape along the normal for this shape.
   /// \param[in] theBaseShape vertex, edge, wire, face or shell.
-  /// \param[in] theDirection direction of extrusion. 
+  /// \param[in] theDirection direction of extrusion.
   ///                         Can be empty if theBaseShape is planar wire or face.
   /// \param[in] theToSize offset for "to" plane.
   /// \param[in] theFromSize offset for "from" plane.
@@ -45,10 +45,10 @@ public:
 
   /// \brief Creates extrusion for the given shape along the normal for this shape.
   /// \param[in] theBaseShape planar face or wire to be extruded.
-  /// \param[in] theToShape top bounding shape. Can be empty. 
+  /// \param[in] theToShape top bounding shape. Can be empty.
   ///                       In this case offset will be applied to the basis.
   /// \param[in] theToSize offset for "to" plane.
-  /// \param[in] theFromShape bottom bounding shape. Can be empty. 
+  /// \param[in] theFromShape bottom bounding shape. Can be empty.
   ///                         In this case offset will be applied to the basis.
   /// \param[in] theFromSize offset for "from" plane.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
@@ -59,7 +59,7 @@ public:
 
   /// \brief Creates extrusion for the given shape along the normal for this shape.
   /// \param[in] theBaseShape planar face or wire to be extruded.
-  /// \param[in] theDirection direction of extrusion. 
+  /// \param[in] theDirection direction of extrusion.
   ///                         Can be empty if theBaseShape is planar wire or face.
   /// \param[in] theToShape top bounding shape. Can be empty.
   ///                       In this case offset will be applied to the basis.

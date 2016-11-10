@@ -13,7 +13,7 @@
  * \ingroup DataAlgo
  * \brief Defines several static methods useful for Data Framework filling
  */
-class GEOMALGOAPI_EXPORT GeomAlgoAPI_DFLoader 
+class GEOMALGOAPI_EXPORT GeomAlgoAPI_DFLoader
 {
  public:
   /// Refine result

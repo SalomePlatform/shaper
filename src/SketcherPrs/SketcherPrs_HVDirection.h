@@ -25,7 +25,7 @@ public:
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
   /// \param isHorisontal a flag horizontal or vertical presentation
-  Standard_EXPORT SketcherPrs_HVDirection(ModelAPI_Feature* theConstraint, 
+  Standard_EXPORT SketcherPrs_HVDirection(ModelAPI_Feature* theConstraint,
                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane,
                                          bool isHorisontal);
 

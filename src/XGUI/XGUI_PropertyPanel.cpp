@@ -43,7 +43,7 @@
 //#define DEBUG_TAB_WIDGETS
 
 XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* theMgr)
-    : ModuleBase_IPropertyPanel(theParent), 
+    : ModuleBase_IPropertyPanel(theParent),
     myActiveWidget(NULL),
     myPreselectionWidget(NULL),
     myPanelPage(NULL),
@@ -217,7 +217,7 @@ void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
   // sketch multi rotation -> single/full point)
   // it is important to check the widget visibility to do not check of the next widget visible
   // state if the current is not shown. (example: sketch circle re-entrant operation after mouse
-  // release in the viewer, next, radius, 
+  // release in the viewer, next, radius,
   // widget should be activated but the first is not visualized)
   bool isVisible = theWidget->isVisible();
   activateNextWidget(theWidget, isVisible);
@@ -511,7 +511,7 @@ void XGUI_PropertyPanel::closeEvent(QCloseEvent* theEvent)
         theEvent->ignore();
       else
         theEvent->accept();
-    } else 
+    } else
       theEvent->ignore();
   } else
     ModuleBase_IPropertyPanel::closeEvent(theEvent);

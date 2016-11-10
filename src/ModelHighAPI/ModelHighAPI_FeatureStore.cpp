@@ -64,7 +64,7 @@ std::string ModelHighAPI_FeatureStore::compare(FeaturePtr theFeature) {
   for(; aRes != allResults.end() && aResIter != myRes.end(); aRes++, aResIter++) {
     anError = compareData((*aRes)->data(), *aResIter);
     if (!anError.empty())
-      return "Results of feature '" + theFeature->name() + "' '" + (*aRes)->data()->name() + 
+      return "Results of feature '" + theFeature->name() + "' '" + (*aRes)->data()->name() +
       "' differ:" + anError;
   }
   if (aRes != allResults.end()) {
@@ -76,11 +76,11 @@ std::string ModelHighAPI_FeatureStore::compare(FeaturePtr theFeature) {
   return ""; // ok
 }
 
-void ModelHighAPI_FeatureStore::storeData(std::shared_ptr<ModelAPI_Data> theData, 
+void ModelHighAPI_FeatureStore::storeData(std::shared_ptr<ModelAPI_Data> theData,
   std::map<std::string, std::string>& theAttrs)
 {
   // store name to keep also this information and output if needed
-  theAttrs["__name__"] = theData->name(); 
+  theAttrs["__name__"] = theData->name();
   std::list<std::shared_ptr<ModelAPI_Attribute> > allAttrs = theData->attributes("");
   std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = allAttrs.begin();
   for(; anAttr != allAttrs.end(); anAttr++) {
@@ -93,7 +93,7 @@ void ModelHighAPI_FeatureStore::storeData(std::shared_ptr<ModelAPI_Data> theData
   }
 }
 
-std::string ModelHighAPI_FeatureStore::compareData(std::shared_ptr<ModelAPI_Data> theData, 
+std::string ModelHighAPI_FeatureStore::compareData(std::shared_ptr<ModelAPI_Data> theData,
   std::map<std::string, std::string>& theAttrs)
 {
   std::map<std::string, std::string> aThis;
@@ -104,7 +104,7 @@ std::string ModelHighAPI_FeatureStore::compareData(std::shared_ptr<ModelAPI_Data
       return "original model had no attribute '" + aThisIter->first + "'";
     }
     if (theAttrs[aThisIter->first] != aThisIter->second) {
-      return "attribute '" + aThisIter->first + "' is different (original != current) '" + 
+      return "attribute '" + aThisIter->first + "' is different (original != current) '" +
         theAttrs[aThisIter->first] + "' != '" + aThisIter->second + "'";
     }
   }
@@ -118,7 +118,7 @@ std::string ModelHighAPI_FeatureStore::compareData(std::shared_ptr<ModelAPI_Data
   return "";
 }
 
-static void dumpArray(std::ostringstream& theOutput, const double theArray[], 
+static void dumpArray(std::ostringstream& theOutput, const double theArray[],
                       int theSize, int thePrecision = PRECISION)
 {
   for (int i = 0; i < theSize; ++i) {
@@ -144,7 +144,7 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
       return aResult.str();
     } else if (aType == ModelAPI_AttributeString::typeId()) {
       // special case for attribute "SolverError"
-      if (theAttr->id() == "SolverError" && 
+      if (theAttr->id() == "SolverError" &&
           std::dynamic_pointer_cast<ModelAPI_Feature>(theAttr->owner())->getKind() == "Sketch")
         return "";
     }
@@ -195,11 +195,11 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
       aResult<<"__empty__";
     }
   } else if (aType == ModelAPI_AttributeSelection::typeId()) {
-    AttributeSelectionPtr anAttr = 
+    AttributeSelectionPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttr);
     aResult<<anAttr->namingName();
   } else if (aType == ModelAPI_AttributeSelectionList::typeId()) {
-    AttributeSelectionListPtr anAttr = 
+    AttributeSelectionListPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttr);
     for(int a = 0; a < anAttr->size(); a++) {
       if (a != 0)
@@ -207,7 +207,7 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
       aResult<<anAttr->value(a)->namingName();
     }
   } else if (aType == ModelAPI_AttributeRefAttr::typeId()) {
-    AttributeRefAttrPtr anAttr = 
+    AttributeRefAttrPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttr);
     ObjectPtr anObj = anAttr->isObject() ? anAttr->object() : anAttr->attr()->owner();
     if (anObj.get()) {
@@ -219,10 +219,10 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
       aResult<<"__empty__";
     }
   } else if (aType == ModelAPI_AttributeRefList::typeId()) {
-    AttributeRefListPtr anAttr = 
+    AttributeRefListPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttr);
     // for sketch sub-features the empty values may be skipped and order is not important
-    bool isSketchFeatures = anAttr->id() == "Features" && 
+    bool isSketchFeatures = anAttr->id() == "Features" &&
       std::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->owner())->getKind() == "Sketch";
     std::list<ObjectPtr> aList = anAttr->list();
     std::list<std::string> aResList; // list of resulting strings
@@ -239,7 +239,7 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
       aResult<<*aR<<" ";
     }
   } else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
-    AttributeRefAttrListPtr anAttr = 
+    AttributeRefAttrListPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefAttrList>(theAttr);
     std::list<std::pair<ObjectPtr, AttributePtr> > aList = anAttr->list();
     std::list<std::pair<ObjectPtr, AttributePtr> >::iterator aL = aList.begin();
@@ -257,12 +257,12 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
       }
     }
   } else if (aType == ModelAPI_AttributeIntArray::typeId()) {
-    AttributeIntArrayPtr anAttr = 
+    AttributeIntArrayPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeIntArray>(theAttr);
     for(int a = 0; a < anAttr->size(); a++)
       aResult<<anAttr->value(a)<<" ";
   } else if (aType == ModelAPI_AttributeDoubleArray::typeId()) {
-    AttributeDoubleArrayPtr anAttr = 
+    AttributeDoubleArrayPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(theAttr);
     for(int a = 0; a < anAttr->size(); a++)
       aResult<<anAttr->value(a)<<" ";

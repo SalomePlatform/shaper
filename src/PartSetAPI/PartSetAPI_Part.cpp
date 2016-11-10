@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : PartSetAPI_Part.cpp
-// Purpose: 
+// Purpose:
 //
 // History:
 // 16/06/16 - Sergey POKHODENKO - Creation of the file

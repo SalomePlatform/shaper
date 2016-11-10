@@ -141,7 +141,7 @@ Q_OBJECT
   /// Update current viewer
   virtual void update();
 
-  /// Method returns True if the viewer can process editing objects 
+  /// Method returns True if the viewer can process editing objects
   /// by mouse drugging. If this is impossible thet it has to return False.
   virtual bool canDragByMouse() const;
 
@@ -168,7 +168,7 @@ Q_OBJECT
   void onSelectionChanged();
   void onViewTransformed(OCCViewer_ViewWindow::OperationType);
 
-  /// Emit signal about trihedron visiblity change because SALOME sets 
+  /// Emit signal about trihedron visiblity change because SALOME sets
   /// the trihedron visible by this signal.
   /// It is necessary to activate the viewer trihedron in the current selection mode
   void onViewPortMapped();

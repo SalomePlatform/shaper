@@ -128,7 +128,7 @@ private:
   /// Enable or disable buttons for parameters managemnt
   void enableButtons(bool theEnable);
 
-  QList<QStringList> featuresItems(const QList<FeaturePtr>& theFeatures, 
+  QList<QStringList> featuresItems(const QList<FeaturePtr>& theFeatures,
                                    QList<FeaturePtr>& theFeatureList) const;
   QList<QStringList> parametersItems(const QList<FeaturePtr>& theFeatures) const;
 

@@ -79,7 +79,7 @@ void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
   AttributeDoublePtr aReal = aData->real(attributeID());
   if (aReal && (aReal->value() != aValue)) {
     aReal->setValue(aValue);
-    
+
     ModuleBase_Tools::setSpinValue(mySpinBox, aValue);
     storeValue();
   }
@@ -115,7 +115,7 @@ void PartSet_WidgetPoint2dDistance::mouseReleased(ModuleBase_IViewWindow* theWnd
     emit focusOutWidget(this);
 }
 
-void PartSet_WidgetPoint2dDistance::mouseMoved(ModuleBase_IViewWindow* theWnd, 
+void PartSet_WidgetPoint2dDistance::mouseMoved(ModuleBase_IViewWindow* theWnd,
                                                QMouseEvent* theEvent)
 {
   if (isEditingMode())

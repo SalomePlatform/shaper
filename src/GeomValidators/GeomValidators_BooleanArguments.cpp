@@ -54,7 +54,7 @@ bool GeomValidators_BooleanArguments::isValid(const std::shared_ptr<ModelAPI_Fea
 }
 
 //=================================================================================================
-bool GeomValidators_BooleanArguments::isNotObligatory(std::string theFeature, 
+bool GeomValidators_BooleanArguments::isNotObligatory(std::string theFeature,
                                                       std::string theAttribute)
 {
   if(theAttribute == "main_objects" || theAttribute == "tool_objects") {

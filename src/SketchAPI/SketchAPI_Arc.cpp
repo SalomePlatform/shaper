@@ -29,7 +29,7 @@ SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature>& theFeature
 : SketchAPI_SketchEntity(theFeature)
 {
   if(initialize()) {
-    setByCenterStartEnd(theCenterX, theCenterY, theStartX, 
+    setByCenterStartEnd(theCenterX, theCenterY, theStartX,
                         theStartY, theEndX, theEndY, theInversed);
   }
 }

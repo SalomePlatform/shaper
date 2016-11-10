@@ -34,7 +34,7 @@ Standard_Boolean PartSet_FilterInfinite::IsOk(const Handle(SelectMgr_EntityOwner
   ResultPtr aResult = myWorkshop->selection()->getResult(aPrs);
   // to filter infinite construction results
   if (aResult.get() && aResult->groupName() == ModelAPI_ResultConstruction::group()) {
-    ResultConstructionPtr aConstruction = 
+    ResultConstructionPtr aConstruction =
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aResult);
     if (aConstruction.get() && aConstruction->isInfinite()) {
       Handle(StdSelect_BRepOwner) aBRepOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
@@ -48,9 +48,9 @@ Standard_Boolean PartSet_FilterInfinite::IsOk(const Handle(SelectMgr_EntityOwner
           TopoDS_Shape aResultTopoShape = aResultShape->impl<TopoDS_Shape>();
           aResultShapeType = aResultTopoShape.ShapeType();
         }
-        // for infinite object, the selection is possible only 
+        // for infinite object, the selection is possible only
         // for shapes of owners, which are coincide
-        // to the shape of corresponded AIS object. 
+        // to the shape of corresponded AIS object.
         // In other words, for axis, only edge can be selected
         // (vertices are not selectable), for planes,
         // only faces can be selected (not edges or vertices)

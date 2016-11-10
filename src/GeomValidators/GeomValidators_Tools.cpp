@@ -19,19 +19,19 @@ namespace GeomValidators_Tools {
     ObjectPtr anObject;
     std::string anAttrType = theAttribute->attributeType();
     if (anAttrType == ModelAPI_AttributeRefAttr::typeId()) {
-      AttributeRefAttrPtr anAttr = 
+      AttributeRefAttrPtr anAttr =
         std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
       if (anAttr != NULL && anAttr->isObject())
         anObject = anAttr->object();
     }
     if (anAttrType == ModelAPI_AttributeSelection::typeId()) {
-      AttributeSelectionPtr anAttr = 
+      AttributeSelectionPtr anAttr =
         std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
       if (anAttr != NULL)
         anObject = anAttr->context();
     }
     if (anAttrType == ModelAPI_AttributeReference::typeId()) {
-      AttributeReferencePtr anAttr = 
+      AttributeReferencePtr anAttr =
         std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
       if (anAttr.get() != NULL)
         anObject = anAttr->value();

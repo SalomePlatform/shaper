@@ -42,13 +42,13 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   Q_OBJECT
  public:
    /// \enum DisplayMode display mode
-   enum DisplayMode { 
+   enum DisplayMode {
      /// Mode is not defined
-     NoMode = -1, 
+     NoMode = -1,
      /// Wireframe display mode
-     Wireframe, 
+     Wireframe,
      /// Shading display mode
-     Shading      
+     Shading
    };
 
   /// Constructor
@@ -68,7 +68,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \return true if the object visibility state is changed
   bool display(ObjectPtr theObject, bool theUpdateViewer = true);
 
-  /// Display the given AIS object. 
+  /// Display the given AIS object.
   /// This object is not added to the displayer internal map of objects
   /// So, it can not be obtained from displayer. This is just a wrap method of OCC display in
   /// order to perform the display with correct flags.
@@ -94,7 +94,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// empty, select it, otherwise select the result.
   /// \param theValues a list of presentation to be selected
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  void setSelected(const  QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues, 
+  void setSelected(const  QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
                    bool theUpdateViewer = true);
 
   /// Unselect all objects
@@ -141,7 +141,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Remove all selection filters
   void removeFilters();
 
-  /// Sets a flag to the displayer whether the internal viewer can be updated by 
+  /// Sets a flag to the displayer whether the internal viewer can be updated by
   /// the updateViewer method call. If it is not enabled, this method do nothing.
   /// This state maintain recurse, if the update is blocked twice or three times, the
   /// viewer will not be updated until it is unblocked necessary times
@@ -162,7 +162,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   void activateAIS(const Handle(AIS_InteractiveObject)& theIO, const int theMode,
                    const bool theUpdateViewer) const;
 
-  /// Activate interactive context. It is necessary to call ClearOutdatedSelection 
+  /// Activate interactive context. It is necessary to call ClearOutdatedSelection
   /// after deactivation
   /// \param theIO an interactive object
   /// \param theMode a mode to deactivate. When theMode=-1 then all modes will be deactivated
@@ -231,7 +231,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   bool canBeShaded(ObjectPtr theObject) const;
 
   /// Set color on presentation of an object if it is displayed
-  /// \param theObject an object 
+  /// \param theObject an object
   /// \param theColor a color which has to be set
   /// \param theUpdateViewer update viewer flag
   /// \return previously defined color on the object
@@ -239,7 +239,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
 
   /// Returns Trihedron object if it is displayed
   Handle(AIS_InteractiveObject) getTrihedron() const;
-  
+
   /// Set trihedron active (used in selection) or non active
   void activateTrihedron(bool theIsActive);
 
@@ -341,7 +341,7 @@ private:
   /// of owners in the context only once.
   /// \param theContext a viewer context. It has opened local context
   /// \param theShapesToBeSelected a map of shapes. Owner's shape is searched in the map and the
-  /// owner is selected if it is found there. 
+  /// owner is selected if it is found there.
   /// Only first owner is processed(according to OCCT logic)
   static void AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) theContext,
           const NCollection_DataMap<TopoDS_Shape,

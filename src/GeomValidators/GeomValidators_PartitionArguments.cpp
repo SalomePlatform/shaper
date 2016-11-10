@@ -43,7 +43,7 @@ bool GeomValidators_PartitionArguments::isValid(const std::shared_ptr<ModelAPI_F
     isCombine = anAttrBool->value();
   }
 
-  if((anObjectsNb > 0 && aToolsNb > 0) || 
+  if((anObjectsNb > 0 && aToolsNb > 0) ||
      (isCombine && anObjectsNb != 0 && (anObjectsNb + aToolsNb > 1))) {
     return true;
   }
@@ -53,7 +53,7 @@ bool GeomValidators_PartitionArguments::isValid(const std::shared_ptr<ModelAPI_F
 }
 
 //=================================================================================================
-bool GeomValidators_PartitionArguments::isNotObligatory(std::string theFeature, 
+bool GeomValidators_PartitionArguments::isNotObligatory(std::string theFeature,
                                                         std::string theAttribute)
 {
   if(theAttribute == "tool_objects") {

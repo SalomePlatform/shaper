@@ -24,32 +24,32 @@ class GeomAPI_Pln : public GeomAPI_Interface
 {
  public:
   /// Creation of plane by the axis placement
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   GeomAPI_Pln(const std::shared_ptr<GeomAPI_Ax3>& theAxis);
 
   /// Creation of plane by the point and normal
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   GeomAPI_Pln(const std::shared_ptr<GeomAPI_Pnt>& thePoint,
               const std::shared_ptr<GeomAPI_Dir>& theNormal);
 
   /// Creation of plane by coefficients (Ax+By+Cz+D=0)
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   GeomAPI_Pln(const double theA, const double theB, const double theC, const double theD);
 
   /// Returns a point of this plane
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt> location() const;
 
   /// Returns a plane normal
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Dir> direction() const;
 
   /// Returns a plane x direction
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Dir> xDirection() const;
 
   /// Returns the plane coefficients (Ax+By+Cz+D=0)
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   void coefficients(double& theA, double& theB, double& theC, double& theD);
 
   /// Returns true if planes are coincident.

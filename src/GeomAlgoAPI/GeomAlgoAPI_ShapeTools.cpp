@@ -146,7 +146,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
   // Get all shapes with common subshapes and free shapes.
   NCollection_Map<TopoDS_Shape> aFreeShapes;
   NCollection_Vector<NCollection_Map<TopoDS_Shape>> aShapesWithCommonSubshapes;
-  for(BOPCol_IndexedDataMapOfShapeListOfShape::Iterator 
+  for(BOPCol_IndexedDataMapOfShapeListOfShape::Iterator
       anIter(aMapSA); anIter.More(); anIter.Next()) {
     const TopoDS_Shape& aShape = anIter.Key();
     BOPCol_ListOfShape& aListOfShape = anIter.ChangeValue();
@@ -169,10 +169,10 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
       aFreeShapes.Remove(aF);
       aFreeShapes.Remove(aL);
       aListOfShape.Clear();
-      for(NCollection_List<TopoDS_Shape>::Iterator 
+      for(NCollection_List<TopoDS_Shape>::Iterator
           aTempIter(aTempList); aTempIter.More(); aTempIter.Next()) {
         const TopoDS_Shape& aTempShape = aTempIter.Value();
-        for(BOPCol_IndexedDataMapOfShapeListOfShape::Iterator 
+        for(BOPCol_IndexedDataMapOfShapeListOfShape::Iterator
             anIter(aMapSA); anIter.More(); anIter.Next()) {
           BOPCol_ListOfShape& aTempListOfShape = anIter.ChangeValue();
           if(aTempListOfShape.IsEmpty()) {
@@ -203,24 +203,24 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
   }
 
   // Combine shapes with common subshapes.
-  for(NCollection_Vector<NCollection_Map<TopoDS_Shape>>::Iterator 
+  for(NCollection_Vector<NCollection_Map<TopoDS_Shape>>::Iterator
       anIter(aShapesWithCommonSubshapes); anIter.More(); anIter.Next()) {
     TopoDS_Shell aShell;
     TopoDS_CompSolid aCSolid;
     TopoDS_Builder aBuilder;
-    theType == 
+    theType ==
       GeomAPI_Shape::COMPSOLID ? aBuilder.MakeCompSolid(aCSolid) : aBuilder.MakeShell(aShell);
     NCollection_Map<TopoDS_Shape>& aShapesMap = anIter.ChangeValue();
     for(TopExp_Explorer anExp(aShapesComp, aTA); anExp.More(); anExp.Next()) {
       const TopoDS_Shape& aShape = anExp.Current();
       if(aShapesMap.Contains(aShape)) {
-        theType == 
+        theType ==
           GeomAPI_Shape::COMPSOLID ? aBuilder.Add(aCSolid, aShape) : aBuilder.Add(aShell, aShape);
         aShapesMap.Remove(aShape);
       }
     }
     std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
-    TopoDS_Shape* aSh = theType == GeomAPI_Shape::COMPSOLID ? new TopoDS_Shape(aCSolid) : 
+    TopoDS_Shape* aSh = theType == GeomAPI_Shape::COMPSOLID ? new TopoDS_Shape(aCSolid) :
                                                               new TopoDS_Shape(aShell);
     aGeomShape->setImpl<TopoDS_Shape>(aSh);
     theCombinedShapes.push_back(aGeomShape);
@@ -244,11 +244,11 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
     TopoDS_Compound aResultComp;
     TopoDS_Builder aBuilder;
     aBuilder.MakeCompound(aResultComp);
-    for(ListOfShape::const_iterator anIter = theCombinedShapes.cbegin(); 
+    for(ListOfShape::const_iterator anIter = theCombinedShapes.cbegin();
         anIter != theCombinedShapes.cend(); anIter++) {
       aBuilder.Add(aResultComp, (*anIter)->impl<TopoDS_Shape>());
     }
-    for(ListOfShape::const_iterator anIter = theFreeShapes.cbegin(); 
+    for(ListOfShape::const_iterator anIter = theFreeShapes.cbegin();
         anIter != theFreeShapes.cend(); anIter++) {
       aBuilder.Add(aResultComp, (*anIter)->impl<TopoDS_Shape>());
     }
@@ -259,7 +259,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
 }
 
 //==================================================================================================
-static void addSimpleShapeToList(const TopoDS_Shape& theShape, 
+static void addSimpleShapeToList(const TopoDS_Shape& theShape,
                                  NCollection_List<TopoDS_Shape>& theList)
 {
   if(theShape.IsNull()) {
@@ -309,17 +309,17 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
     NCollection_List<TopoDS_Shape> aGroupedShapes;
     aGroupedShapes.Append(anUngroupedShapes.First());
     anUngroupedShapes.RemoveFirst();
-    for(NCollection_List<TopoDS_Shape>::Iterator aGroupIt(aGroupedShapes); 
+    for(NCollection_List<TopoDS_Shape>::Iterator aGroupIt(aGroupedShapes);
         aGroupIt.More(); aGroupIt.Next()) {
       const TopoDS_Shape& aGroupShape = aGroupIt.Value();
-      for(NCollection_List<TopoDS_Shape>::Iterator anUngroupedIt(anUngroupedShapes); 
+      for(NCollection_List<TopoDS_Shape>::Iterator anUngroupedIt(anUngroupedShapes);
           anUngroupedIt.More(); anUngroupedIt.Next()) {
         const TopoDS_Shape& anUngroupedShape = anUngroupedIt.Value();
         bool isFound = false;
-        for(TopExp_Explorer aGroupShapeExp(aGroupShape, TopAbs_VERTEX); 
+        for(TopExp_Explorer aGroupShapeExp(aGroupShape, TopAbs_VERTEX);
             aGroupShapeExp.More(); aGroupShapeExp.Next()) {
           const TopoDS_Shape& aVertex1 = aGroupShapeExp.Current();
-          for(TopExp_Explorer anUngroupedShapeExp(anUngroupedShape, TopAbs_VERTEX); 
+          for(TopExp_Explorer anUngroupedShapeExp(anUngroupedShape, TopAbs_VERTEX);
               anUngroupedShapeExp.More(); anUngroupedShapeExp.Next()) {
             const TopoDS_Shape& aVertex2 = anUngroupedShapeExp.Current();
             if(aVertex1.IsSame(aVertex2)) {
@@ -345,7 +345,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
   BRep_Builder aBuilder;
   aBuilder.MakeCompound(aCompound);
   ListOfShape aCompSolids, aFreeSolids;
-  for(NCollection_Vector<NCollection_List<TopoDS_Shape>>::Iterator 
+  for(NCollection_Vector<NCollection_List<TopoDS_Shape>>::Iterator
       anIt(aGroups); anIt.More(); anIt.Next()) {
     NCollection_List<TopoDS_Shape> aGroup = anIt.Value();
     GeomShapePtr aGeomShape(new GeomAPI_Shape());
@@ -376,7 +376,7 @@ std::list<std::shared_ptr<GeomAPI_Pnt> >
   Bnd_Box aBndBox;
 
   // Getting box.
-  for (ListOfShape::const_iterator 
+  for (ListOfShape::const_iterator
     anObjectsIt = theShapes.begin(); anObjectsIt != theShapes.end(); anObjectsIt++) {
     const TopoDS_Shape& aShape = (*anObjectsIt)->impl<TopoDS_Shape>();
     BRepBndLib::Add(aShape, aBndBox);
@@ -405,7 +405,7 @@ std::list<std::shared_ptr<GeomAPI_Pnt> >
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Shape> 
+std::shared_ptr<GeomAPI_Shape>
   GeomAlgoAPI_ShapeTools::faceToInfinitePlane(const std::shared_ptr<GeomAPI_Shape> theFace)
 {
   if (!theFace.get())
@@ -463,7 +463,7 @@ std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_ShapeTools::fitPlaneToBox(
   IntAna_Quadric aQuadric(aFacePln);
   Standard_Real UMin, UMax, VMin, VMax;
   UMin = UMax = VMin = VMax = 0;
-  for (std::list<std::shared_ptr<GeomAPI_Pnt> >::const_iterator 
+  for (std::list<std::shared_ptr<GeomAPI_Pnt> >::const_iterator
        aPointsIt = thePoints.begin(); aPointsIt != thePoints.end(); aPointsIt++) {
     const gp_Pnt& aPnt = (*aPointsIt)->impl<gp_Pnt>();
     gp_Lin aLin(aPnt, aFacePln.Axis().Direction());
@@ -620,7 +620,7 @@ bool GeomAlgoAPI_ShapeTools::isSubShapeInsideShape(
       // No intersections found. Edge is inside or outside face. Check it.
       BRepAdaptor_Curve aCurveAdaptor(anEdge);
       gp_Pnt aPointToCheck =
-        aCurveAdaptor.Value((aCurveAdaptor.FirstParameter() + 
+        aCurveAdaptor.Value((aCurveAdaptor.FirstParameter() +
                               aCurveAdaptor.LastParameter()) / 2.0);
       Handle(Geom_Surface) aSurface = BRep_Tool::Surface(aFace);
       ShapeAnalysis_Surface aSAS(aSurface);
@@ -652,7 +652,7 @@ bool GeomAlgoAPI_ShapeTools::isShapeValid(const std::shared_ptr<GeomAPI_Shape> t
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Shape> 
+std::shared_ptr<GeomAPI_Shape>
   GeomAlgoAPI_ShapeTools::getFaceOuterWire(const std::shared_ptr<GeomAPI_Shape> theFace)
 {
   GeomShapePtr anOuterWire;
@@ -719,7 +719,7 @@ void GeomAlgoAPI_ShapeTools::splitShape(const std::shared_ptr<GeomAPI_Shape>& th
   aBOP.Perform();
   if (aBOP.ErrorStatus())
     return;
-  
+
   // Collect splits
   const TopTools_ListOfShape& aSplits = aBOP.Modified(aBaseEdge);
   TopTools_ListIteratorOfListOfShape anIt(aSplits);

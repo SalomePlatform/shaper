@@ -55,7 +55,7 @@ bool isAttributeNode(xmlNodePtr theNode)
   if(!isElementNode(theNode))
     return false;
   // it's parent is "feature" or "source" or page ("case" or "box")
-  if(!hasParent(theNode, NODE_FEATURE, NODE_SOURCE, 
+  if(!hasParent(theNode, NODE_FEATURE, NODE_SOURCE,
                          WDG_GROUP, WDG_OPTIONALBOX,
                          WDG_TOOLBOX_BOX, WDG_SWITCH_CASE, NULL))
     return false;
@@ -233,7 +233,7 @@ std::string getProperty(xmlNodePtr theNode, const char* thePropName)
   xmlFree(aPropChars);
 
   std::string::iterator new_end = std::unique(result.begin(), result.end(), BothAreSpaces);
-  result.erase(new_end, result.end()); 
+  result.erase(new_end, result.end());
 
   return result;
 }

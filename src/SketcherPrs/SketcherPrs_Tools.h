@@ -62,14 +62,14 @@ namespace SketcherPrs_Tools {
   /// Enumeration with modes for activation of selection custom presentations
   enum SelectionModes {
     /// Start of enumeration
-    Sel_Mode_First = 100, 
-  
+    Sel_Mode_First = 100,
+
     /// Selection mode for all constraints exclude dimensions
     Sel_Constraint,
-  
+
     /// Selection mode for whole dimension
     Sel_Dimension_All,
-  
+
     /// Selection mode for line of dimension
     Sel_Dimension_Line,
 

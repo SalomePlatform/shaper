@@ -124,7 +124,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
 {
   thePrs->setOwner(theOwner);
 
-  Handle(AIS_InteractiveObject) anIO = 
+  Handle(AIS_InteractiveObject) anIO =
                            Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
   thePrs->setInteractive(anIO);
 
@@ -140,7 +140,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
       aShape = findAxisShape(anIO);
 #endif
     if (!aShape.IsNull()) {
-      std::shared_ptr<GeomAPI_Shape> aGeomShape = 
+      std::shared_ptr<GeomAPI_Shape> aGeomShape =
         std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
       aGeomShape->setImpl(new TopoDS_Shape(aShape));
       thePrs->setShape(aGeomShape);
@@ -157,7 +157,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
       gp_Lin aLine = aAxis->Component()->Lin();
       gp_Dir aDir = aLine.Direction();
       std::string aAxName;
-      if (aDir.X() == 1.) 
+      if (aDir.X() == 1.)
         aAxName = "OX";
       else if (aDir.Y() == 1.)
         aAxName = "OY";
@@ -199,7 +199,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
     }
 #endif
   }
-     
+
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   ObjectPtr aFeature = aDisplayer->getObject(anIO);
 
@@ -254,7 +254,7 @@ QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getHighlighted() const
       if (aContext->HasOpenedContext()) {
         TopoDS_Shape aShape = aContext->DetectedShape();
         if (!aShape.IsNull()) {
-          std::shared_ptr<GeomAPI_Shape> aGeomShape = 
+          std::shared_ptr<GeomAPI_Shape> aGeomShape =
             std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
           aGeomShape->setImpl(new TopoDS_Shape(aShape));
           aPrs->setShape(aGeomShape);
@@ -317,7 +317,7 @@ ObjectPtr XGUI_Selection::getSelectableObject(const Handle(SelectMgr_EntityOwner
 
   Handle(SelectMgr_EntityOwner) aEO = theOwner;
   if (!aEO.IsNull()) {
-    Handle(AIS_InteractiveObject) anObj = 
+    Handle(AIS_InteractiveObject) anObj =
       Handle(AIS_InteractiveObject)::DownCast(aEO->Selectable());
     anObject = myWorkshop->displayer()->getObject(anObj);
   }
@@ -377,7 +377,7 @@ TopoDS_Shape XGUI_Selection::findAxisShape(Handle(AIS_InteractiveObject) theIO) 
     Handle(Prs3d_DatumAspect) DA = aAxis->Attributes()->DatumAspect();
     Handle(Geom_TrimmedCurve) aTLine = new Geom_TrimmedCurve(aLine, 0, DA->FirstAxisLength());
 
-    BRep_Builder aBuilder;      
+    BRep_Builder aBuilder;
     TopoDS_Edge aEdge;
     aBuilder.MakeEdge(aEdge, aTLine, Precision::Confusion());
     if (!aEdge.IsNull())

@@ -19,6 +19,6 @@ GeomAlgoAPI_Exception::~GeomAlgoAPI_Exception() throw()
 
 //=================================================================================================
 const char* GeomAlgoAPI_Exception::what() const throw()
-{ 
+{
   return myMessageError.c_str();
 }

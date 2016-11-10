@@ -48,7 +48,7 @@ protected:
 
 protected:
   /// current instance of the OCC selection filter
-  Handle(SelectMgr_Filter) myFilter; 
+  Handle(SelectMgr_Filter) myFilter;
 };
 
 #endif //ModuleBase_Filter

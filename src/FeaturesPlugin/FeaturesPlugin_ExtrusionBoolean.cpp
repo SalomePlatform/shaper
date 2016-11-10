@@ -27,6 +27,6 @@ void FeaturesPlugin_ExtrusionBoolean::storeGenerationHistory(ResultBodyPtr theRe
                                         const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
                                         int& theTag)
 {
-  FeaturesPlugin_Extrusion::storeGenerationHistory(theResultBody, theBaseShape, 
+  FeaturesPlugin_Extrusion::storeGenerationHistory(theResultBody, theBaseShape,
                                                    theMakeShape, theTag);
 }

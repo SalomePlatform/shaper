@@ -14,7 +14,7 @@
 
 /// \class GeomAlgoAPI_Sewing
 /// \ingroup DataAlgo
-/// \brief Allows creation of connected topology (shells) 
+/// \brief Allows creation of connected topology (shells)
 ///        from a set of separate topological elements (faces).
 class GeomAlgoAPI_Sewing : public GeomAlgoAPI_MakeShape
 {

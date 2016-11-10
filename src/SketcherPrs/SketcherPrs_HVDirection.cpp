@@ -19,9 +19,9 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_HVDirection, SketcherPrs_SymbolPrs);
 
 static Handle(Image_AlienPixMap) MyPixMap;
 
-SketcherPrs_HVDirection::SketcherPrs_HVDirection(ModelAPI_Feature* theConstraint, 
+SketcherPrs_HVDirection::SketcherPrs_HVDirection(ModelAPI_Feature* theConstraint,
                                            const std::shared_ptr<GeomAPI_Ax3>& thePlane,
-                                           bool isHorisontal) 
+                                           bool isHorisontal)
  : SketcherPrs_SymbolPrs(theConstraint, thePlane), myIsHorisontal(isHorisontal)
 {
 }
@@ -30,14 +30,14 @@ bool SketcherPrs_HVDirection::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
                                                const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
 {
   bool aReadyToDisplay = false;
-  ObjectPtr aObj = 
+  ObjectPtr aObj =
     SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
 
   aReadyToDisplay = SketcherPrs_Tools::getShape(aObj).get() != NULL;
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_HVDirection::updateIfReadyToDisplay(double theStep) const 
+bool SketcherPrs_HVDirection::updateIfReadyToDisplay(double theStep) const
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
@@ -50,13 +50,13 @@ bool SketcherPrs_HVDirection::updateIfReadyToDisplay(double theStep) const
   return true;
 }
 
-void SketcherPrs_HVDirection::drawLines(const Handle(Prs3d_Presentation)& thePrs, 
+void SketcherPrs_HVDirection::drawLines(const Handle(Prs3d_Presentation)& thePrs,
                                         Quantity_Color theColor) const
 {
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
 
   // Draw constrained object
-  Handle(Graphic3d_AspectLine3d) aLineAspect = 
+  Handle(Graphic3d_AspectLine3d) aLineAspect =
     new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
   aGroup->SetPrimitivesAspect(aLineAspect);
 

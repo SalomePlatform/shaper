@@ -85,7 +85,7 @@ void appendValues(std::vector<int>& theRGB, const int theRed, const int theGreen
 
 bool containsValues(std::map<int, std::vector<int> >& theColorMap, std::vector<int>& theValues)
 {
-  std::map<int, std::vector<int> >::const_iterator anIt = theColorMap.begin(), 
+  std::map<int, std::vector<int> >::const_iterator anIt = theColorMap.begin(),
                                                    aLast = theColorMap.end();
   bool isFound = false;
   for (; anIt != aLast && !isFound; anIt++) {

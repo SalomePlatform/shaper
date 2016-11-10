@@ -22,13 +22,13 @@ PartSet_ExternalObjectsMgr::PartSet_ExternalObjectsMgr(const std::string& theExt
   QString aIsExternal(theExternal.c_str());
   if (!aIsExternal.isEmpty()) {
     QString aStr = aIsExternal.toUpper();
-    myUseExternal = (aStr == "TRUE") || (aStr == "YES"); 
+    myUseExternal = (aStr == "TRUE") || (aStr == "YES");
   }
 
   QString aCanCreateExternal(theCanCreateExternal.c_str());
   if (!aCanCreateExternal.isEmpty()) {
     QString aStr = aCanCreateExternal.toUpper();
-    myCanCreateExternal = (aStr == "TRUE") || (aStr == "YES"); 
+    myCanCreateExternal = (aStr == "TRUE") || (aStr == "YES");
   }
 }
 
@@ -37,7 +37,7 @@ bool PartSet_ExternalObjectsMgr::isValidObject(const ObjectPtr& theObject)
   bool aValid = true;
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
   // Do check using of external feature
-  std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+  std::shared_ptr<SketchPlugin_Feature> aSPFeature =
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
 
   // Do check that we can use external feature
@@ -96,7 +96,7 @@ void PartSet_ExternalObjectsMgr::removeExternalObject(const ObjectPtr& theObject
     if (aFeature.get() != NULL) {
       QObjectPtrList anObjects;
       anObjects.append(aFeature);
-      // the external feature should be removed with all references, 
+      // the external feature should be removed with all references,
       // composite sketch feature will be ignored
       workshop(theWorkshop)->deleteFeatures(anObjects);
     }

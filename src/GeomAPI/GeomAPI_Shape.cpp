@@ -118,7 +118,7 @@ bool GeomAPI_Shape::isConnectedTopology() const
   if (aShape.IsNull() || aShape.ShapeType() != TopAbs_COMPOUND)
     return false;
   // list of simple elements that are not detected in connection to others
-  NCollection_List<TopoDS_Shape> aNotConnected; 
+  NCollection_List<TopoDS_Shape> aNotConnected;
   addSimpleToList(aShape, aNotConnected);
   if (aNotConnected.IsEmpty()) // an empty compound
     return false;
@@ -141,7 +141,7 @@ bool GeomAPI_Shape::isConnectedTopology() const
       bool aConnected =  false;
       NCollection_List<TopoDS_Shape>::Iterator aNewIter(aNewConnected);
       for(; !aConnected && aNewIter.More(); aNewIter.Next()) {
-        // checking topological connecion of aNotIter and aNewIter 
+        // checking topological connecion of aNotIter and aNewIter
         // (if shapes are connected, vertices are connected for sure)
         TopExp_Explorer anExp2(aNewIter.Value(), TopAbs_VERTEX);
         for(; !aConnected && anExp2.More(); anExp2.Next()) {

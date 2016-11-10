@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : ModelHighAPI_Tools.cpp
-// Purpose: 
+// Purpose:
 //
 // History:
 // 07/06/16 - Sergey POKHODENKO - Creation of the file
@@ -205,7 +205,7 @@ GeomAPI_Shape::ShapeType shapeTypeByStr(std::string theShapeTypeStr)
 {
   GeomAPI_Shape::ShapeType aShapeType = GeomAPI_Shape::SHAPE;
 
-  std::transform(theShapeTypeStr.begin(), theShapeTypeStr.end(), 
+  std::transform(theShapeTypeStr.begin(), theShapeTypeStr.end(),
                  theShapeTypeStr.begin(), ::tolower);
 
   if(theShapeTypeStr == "compound") {
@@ -280,7 +280,7 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
   for(; allIter != allFeatures.end(); allIter++) {
     FeaturePtr aFeat = *allIter;
     if (theCompare) {
-      std::map<std::string, ModelHighAPI_FeatureStore>::iterator 
+      std::map<std::string, ModelHighAPI_FeatureStore>::iterator
         aFeatFind = aDocFind->second.find(aFeat->name());
       if (aFeatFind == aDocFind->second.end()) {
         return "Document '" + theDocName + "' feature '" + aFeat->name() + "' not found";
@@ -300,7 +300,7 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
     std::list<ResultPtr>::iterator aRes = allResults.begin();
     for(; aRes != allResults.end(); aRes++) {
       // recoursively store features of sub-documents
-      if ((*aRes)->groupName() == ModelAPI_ResultPart::group()) { 
+      if ((*aRes)->groupName() == ModelAPI_ResultPart::group()) {
         DocumentPtr aDoc = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRes)->partDoc();
         if (aDoc.get()) {
           std::string anError = storeFeatures((*aRes)->data()->name(), aDoc, theStore, theCompare);
@@ -321,7 +321,7 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
           aLostName = aLostIter->first;
         }
       }
-      return "For document '" + theDocName + 
+      return "For document '" + theDocName +
         "' the number of features is decreased, there is no feature '" + aLostName + "'";
     }
   }

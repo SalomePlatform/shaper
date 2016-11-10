@@ -117,7 +117,7 @@ bool GeomAPI_Lin::contains(const std::shared_ptr<GeomAPI_Pnt> thePoint,
 
 bool GeomAPI_Lin::isParallel(const std::shared_ptr<GeomAPI_Lin> theLin) const
 {
-  return MY_LIN->Direction().IsParallel(theLin->impl<gp_Lin>().Direction(), 
+  return MY_LIN->Direction().IsParallel(theLin->impl<gp_Lin>().Direction(),
                                         Precision::Confusion()) == Standard_True;
 }
 

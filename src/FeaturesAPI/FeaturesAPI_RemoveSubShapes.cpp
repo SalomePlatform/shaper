@@ -59,7 +59,7 @@ void FeaturesAPI_RemoveSubShapes::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  AttributeSelectionPtr anAttrBaseShape = 
+  AttributeSelectionPtr anAttrBaseShape =
     aBase->selection(FeaturesPlugin_RemoveSubShapes::BASE_SHAPE_ID());
   AttributeSelectionListPtr anAttrSubShapes =
     aBase->selectionList(FeaturesPlugin_RemoveSubShapes::SUBSHAPES_ID());

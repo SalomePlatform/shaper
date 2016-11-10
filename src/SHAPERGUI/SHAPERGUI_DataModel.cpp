@@ -159,7 +159,7 @@ void SHAPERGUI_DataModel::removeDirectory(const QString& theDirectoryName)
   Qtx::rmDir(theDirectoryName);
 }
 
-bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy, 
+bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy,
                                      bool isMultiFile,  QStringList& theListOfFiles)
 {
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>(theStudy);
@@ -178,16 +178,16 @@ bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy
     }
 
     AttributeStringPtr aAttr = aFeature->string(ExchangePlugin_Dump::FILE_PATH_ID());
-    if (aAttr.get()) 
+    if (aAttr.get())
       aAttr->setValue(aFileName);
 
     aAttr = aFeature->string(ExchangePlugin_Dump::FILE_FORMAT_ID());
-    if (aAttr.get()) 
+    if (aAttr.get())
       aAttr->setValue(".py");
     ModelAPI_Session::get()->finishOperation();
 
     if (QFile::exists(aFileName.c_str())) {
-      if (isMultiFile) { 
+      if (isMultiFile) {
         QFile aInFile(aFileName.c_str());
         if (!aInFile.open(QIODevice::ReadOnly | QIODevice::Text))
           return false;

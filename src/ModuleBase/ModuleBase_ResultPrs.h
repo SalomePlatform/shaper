@@ -31,8 +31,8 @@ public:
   /// \param aShape an owner shape
   /// \param aPriority drawig priority
   /// \param ComesFromDecomposition decomposition flag
-  ModuleBase_BRepOwner(const TopoDS_Shape& aShape, 
-    const Standard_Integer aPriority = 0, 
+  ModuleBase_BRepOwner(const TopoDS_Shape& aShape,
+    const Standard_Integer aPriority = 0,
     const Standard_Boolean ComesFromDecomposition = Standard_False)
     : StdSelect_BRepOwner(aShape, aPriority, ComesFromDecomposition) {}
 
@@ -40,7 +40,7 @@ public:
   /// \param aPM a presentations manager
   /// \param aCol a color
   /// \param aMode a drawing mode
-  virtual void HilightWithColor (const Handle(PrsMgr_PresentationManager3d)& aPM, 
+  virtual void HilightWithColor (const Handle(PrsMgr_PresentationManager3d)& aPM,
     const Quantity_NameOfColor aCol, const Standard_Integer aMode = 0)
   {  Selectable()->HilightOwnerWithColor(aPM, aCol, this); }
 
@@ -73,7 +73,7 @@ public:
   //! Method which draws selected owners ( for fast presentation draw )
   Standard_EXPORT virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM,
                                                const SelectMgr_SequenceOfOwner& theOwners);
-  
+
   //! Method which hilight an owner belonging to
   //! this selectable object  ( for fast presentation draw )
   Standard_EXPORT virtual void HilightOwnerWithColor(
@@ -85,7 +85,7 @@ public:
 
   /// Returns selection priorities that will be added to created selection owner
   /// \return integer value
-  Standard_EXPORT int getAdditionalSelectionPriority() const 
+  Standard_EXPORT int getAdditionalSelectionPriority() const
   { return myAdditionalSelectionPriority; }
 
   /// Appends a special priority for the mode of selection
@@ -117,7 +117,7 @@ private:
   /// Original shape of the result object
   TopoDS_Shape myOriginalShape;
 
-  /// selection priority that will be added to the standard 
+  /// selection priority that will be added to the standard
   /// selection priority of the selection entity
   int myAdditionalSelectionPriority;
 };

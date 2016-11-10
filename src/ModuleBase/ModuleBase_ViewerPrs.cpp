@@ -8,9 +8,9 @@
 
 #include <ModuleBase_ResultPrs.h>
 
-ModuleBase_ViewerPrs::ModuleBase_ViewerPrs(ObjectPtr theResult, 
-                                           const GeomShapePtr& theShape, 
-                                           Handle_SelectMgr_EntityOwner theOwner) 
+ModuleBase_ViewerPrs::ModuleBase_ViewerPrs(ObjectPtr theResult,
+                                           const GeomShapePtr& theShape,
+                                           Handle_SelectMgr_EntityOwner theOwner)
 : myResult(theResult),
   myShape(theShape),
   myOwner(theOwner)
@@ -52,7 +52,7 @@ bool ModuleBase_ViewerPrs::isEqual(ModuleBase_ViewerPrs* thePrs) const
     // and set in the sub-solid AIS. ViewerPrs of these fictive owners are accepted as equal
     // as they use the same shape and result(of compsolid)
     Handle(StdSelect_BRepOwner) aCSolidOwner1 = Handle(StdSelect_BRepOwner)::DownCast(myOwner);
-    Handle(StdSelect_BRepOwner) aCSolidOwner2 = 
+    Handle(StdSelect_BRepOwner) aCSolidOwner2 =
       Handle(StdSelect_BRepOwner)::DownCast(thePrs->owner());
     isEqualIO = !aCSolidOwner1.IsNull() && !aCSolidOwner2.IsNull();
     if (!aCSolidOwner1.IsNull() && !aCSolidOwner2.IsNull())
@@ -94,7 +94,7 @@ bool ModuleBase_ViewerPrs::operator==(const ModuleBase_ViewerPrs& thePrs)
     // and set in the sub-solid AIS. ViewerPrs of these fictive owners are accepted as equal
     // as they use the same shape and result(of compsolid)
     Handle(StdSelect_BRepOwner) aCSolidOwner1 = Handle(StdSelect_BRepOwner)::DownCast(myOwner);
-    Handle(StdSelect_BRepOwner) aCSolidOwner2 = 
+    Handle(StdSelect_BRepOwner) aCSolidOwner2 =
       Handle(StdSelect_BRepOwner)::DownCast(thePrs.owner());
     isEqualIO = !aCSolidOwner1.IsNull() && !aCSolidOwner2.IsNull();
     if (!aCSolidOwner1.IsNull() && !aCSolidOwner1.IsNull())

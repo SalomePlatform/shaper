@@ -71,7 +71,7 @@ public:
   virtual QVariant headerData(int theSection, Qt::Orientation theOrient, int theRole =
                                   Qt::DisplayRole) const;
 
-  /// Returns the number of rows under the given parent. When the parent is valid it means that 
+  /// Returns the number of rows under the given parent. When the parent is valid it means that
   /// rowCount is returning the number of children of parent.
   /// \param theParent a parent model index
   virtual int rowCount(const QModelIndex& theParent = QModelIndex()) const;
@@ -81,7 +81,7 @@ public:
   /// \param theParent a parent model index
   virtual int columnCount(const QModelIndex& theParent = QModelIndex()) const;
 
-  /// Returns the index of the item in the model specified by the given row, 
+  /// Returns the index of the item in the model specified by the given row,
   /// column and parent index.
   /// \param theRow a row
   /// \param theColumn a column
@@ -89,7 +89,7 @@ public:
   virtual QModelIndex index(int theRow, int theColumn, const QModelIndex &theParent =
                                 QModelIndex()) const;
 
-  /// Returns the parent of the model item with the given index. 
+  /// Returns the parent of the model item with the given index.
   /// If the item has no parent, an invalid QModelIndex is returned.
   /// \param theIndex a model index
   virtual QModelIndex parent(const QModelIndex& theIndex) const;
@@ -98,7 +98,7 @@ public:
   /// \param theParent a parent model index
   virtual bool hasChildren(const QModelIndex& theParent = QModelIndex()) const;
 
-  /// Inserts count rows into the model before the given row. 
+  /// Inserts count rows into the model before the given row.
   /// Items in the new row will be children of the item represented by the parent model index.
   /// \param theRow a start row
   /// \param theCount a nember of rows to insert
@@ -134,16 +134,16 @@ private:
   /// \param theDoc the document object
   QModelIndex findDocumentRootIndex(const ModelAPI_Document* theDoc) const;
 
-  /// Returns number of folders in document. 
+  /// Returns number of folders in document.
   /// Considered folders which has to be shown only if they are not empty.
   /// \param theDoc document which has to be checked. If 0 then Root document will be considered
   int foldersCount(ModelAPI_Document* theDoc = 0) const;
 
   /// Retrurns indexes of folders which can not be shown because they are empty
-  /// \param theDoc document which has to be checked. If 0 then Root document will be considered 
+  /// \param theDoc document which has to be checked. If 0 then Root document will be considered
   QIntList missedFolderIndexes(ModelAPI_Document* theDoc = 0) const;
 
-  /// Returns Id (row) of a folder taking into consideration 
+  /// Returns Id (row) of a folder taking into consideration
   /// folders which can not be shown non empty
   /// \param theType Type of the folder
   /// \param theDoc a document which contains this folder

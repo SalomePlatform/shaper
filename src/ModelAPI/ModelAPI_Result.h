@@ -26,7 +26,7 @@ class ModelAPI_Result : public ModelAPI_Object
  public:
 
   /// Reference to the color of the result.
-  /// The integer array is used. It contains tree values for red green and blue values. 
+  /// The integer array is used. It contains tree values for red green and blue values.
   /// The values are in [0, 255] range
   inline static const std::string& COLOR_ID()
   {
@@ -49,7 +49,7 @@ class ModelAPI_Result : public ModelAPI_Object
   MODELAPI_EXPORT virtual void setIsConcealed(const bool theValue);
 
   /// Enables/disables the result. The disabled result does not participate in any calculation
-  /// and visualization: like it was removed. But it keeps the general parameters: colors, 
+  /// and visualization: like it was removed. But it keeps the general parameters: colors,
   /// visibility, etc.
   /// \param theThis pointer to this object, needed to generate all events if it is necessary
   /// \param theFlag makes disabled if it is true

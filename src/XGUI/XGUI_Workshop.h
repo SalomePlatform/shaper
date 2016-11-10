@@ -58,7 +58,7 @@ class XGUI_EXPORT XGUI_Workshop : public QObject
 Q_OBJECT
  public:
   /// Constructor
-  /// \param theConnector a Salome connector object. 
+  /// \param theConnector a Salome connector object.
   /// Used only if the workshop is launched in Salome environment
   XGUI_Workshop(XGUI_SalomeConnector* theConnector = 0);
   virtual ~XGUI_Workshop();
@@ -176,7 +176,7 @@ Q_OBJECT
   void deleteObjects();
 
   //! Searches for selected features unused in other (not selected) features. If one or several
-  //! selected features are found, a warning message proposes to delete them. It contains 
+  //! selected features are found, a warning message proposes to delete them. It contains
   //! the list of features to be deleted.
   void cleanHistory();
 
@@ -288,8 +288,8 @@ Q_OBJECT
   /// \param theDoc the document for objects synchronisation
   /// \param theGroup the group name
   /// \param theUpdateViewer update viewer flag
-  void synchronizeGroupInViewer(const DocumentPtr& theDoc, 
-                                const std::string& theGroup, 
+  void synchronizeGroupInViewer(const DocumentPtr& theDoc,
+                                const std::string& theGroup,
                                 bool theUpdateViewer);
 
   /// Update the property panel content by the XML description of the operation and set the panel
@@ -312,7 +312,7 @@ Q_OBJECT
   /// features found in the given list
   void highlightFeature(const QObjectPtrList& theObjects);
 
-  /// Returns Data Model XML reader which contains information about 
+  /// Returns Data Model XML reader which contains information about
   /// Data structure configuration
   const Config_DataModelReader* dataModelXMLReader() const { return myDataModelXMLReader; }
 

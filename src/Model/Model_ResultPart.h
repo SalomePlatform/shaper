@@ -22,9 +22,9 @@
 class Model_ResultPart : public ModelAPI_ResultPart
 {
   /// shape of this part created from bodies (updated only of Part deactivation)
-  TopoDS_Shape myShape; 
+  TopoDS_Shape myShape;
   /// if it is just copy of original shape, keep just transformation
-  std::shared_ptr<gp_Trsf> myTrsf; 
+  std::shared_ptr<gp_Trsf> myTrsf;
  public:
 
   /// the reference to the base result document, may be null if this is the root,
@@ -39,7 +39,7 @@ class Model_ResultPart : public ModelAPI_ResultPart
   /// Returns the part-document of this result
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> partDoc();
 
-  /// Returns the original part result: for transfomration features results this is 
+  /// Returns the original part result: for transfomration features results this is
   /// the original Part feature result
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultPart> original();
 
@@ -68,7 +68,7 @@ class Model_ResultPart : public ModelAPI_ResultPart
   /// Updates the shape-result of the part (called on Part feature execution)
   MODEL_EXPORT virtual void updateShape();
   /// Applies the additional transformation of the part
-  MODEL_EXPORT virtual void setTrsf(std::shared_ptr<ModelAPI_Result> theThis, 
+  MODEL_EXPORT virtual void setTrsf(std::shared_ptr<ModelAPI_Result> theThis,
     const std::shared_ptr<GeomAPI_Trsf>& theTransformation);
 
   /// Returns the parameters of color definition in the resources config manager

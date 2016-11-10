@@ -66,7 +66,7 @@ class GeomAPI_PlanarEdges : public GeomAPI_Shape
                                const std::shared_ptr<GeomAPI_Dir>& theNorm);
 
   /// Returns whether the shapes are equal
-  GEOMAPI_EXPORT 
+  GEOMAPI_EXPORT
   virtual bool isEqual(const std::shared_ptr<GeomAPI_Shape> theShape) const;
 
 private:

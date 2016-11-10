@@ -12,7 +12,7 @@
 
 /// \class BuildPlugin_ValidatorBaseForBuild
 /// \ingroup Validators
-/// \brief A validator for selection base shapes for build features. 
+/// \brief A validator for selection base shapes for build features.
 /// Allows to select shapes on sketch and
 /// whole objects with allowed type.
 class BuildPlugin_ValidatorBaseForBuild: public ModelAPI_AttributeValidator

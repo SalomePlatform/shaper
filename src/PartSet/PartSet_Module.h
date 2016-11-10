@@ -51,7 +51,7 @@ Q_OBJECT
 enum RestartingMode {
   RM_None, /// the operation should not be restarted
   RM_Forbided, /// the operation should not be restarted after there is no active widget
-  RM_LastFeatureUsed, /// the operation is restarted and use the previous feature 
+  RM_LastFeatureUsed, /// the operation is restarted and use the previous feature
                       /// for own initialization
   RM_EmptyFeatureUsed /// the operation is restarted and does not use the previous feature
 };
@@ -85,7 +85,7 @@ public:
   /// Call back forlast tuning of property panel before operation performance
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation);
 
-  /// If there is found selected attribute, widgets are created and contains 
+  /// If there is found selected attribute, widgets are created and contains
   /// only a widget for the attribute
   /// It is important for Property Panel filling by sketch point attribute
   /// \param theOperation a started operation
@@ -94,7 +94,7 @@ public:
   virtual bool createWidgets(ModuleBase_Operation* theOperation,
                              QList<ModuleBase_ModelWidget*>& theWidgets) const;
 
-  /// Launching of a edit operation on the feature 
+  /// Launching of a edit operation on the feature
   /// \param theFeature feature for editing
   virtual void editFeature(FeaturePtr theFeature);
 
@@ -286,7 +286,7 @@ public:
 
   /// Update state of pop-up menu items in viewer
   /// \param theStdActions - a map of standard actions
-  virtual void updateViewerMenu(const QMap<QString, QAction*>& theStdActions); 
+  virtual void updateViewerMenu(const QMap<QString, QAction*>& theStdActions);
 
   /// Returns true if the action should be always enabled
   /// \param theActionId an action index: Accept or Accept All

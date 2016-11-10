@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_Sketch.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 07/06/16 - Sergey POKHODENKO - Creation of the file
@@ -70,9 +70,9 @@ public:
               GeomDataAPI_Dir, /** Direction of X */,
               normal, SketchPlugin_Sketch::NORM_ID(),
               GeomDataAPI_Dir, /** Normal */,
-              features, SketchPlugin_Sketch::FEATURES_ID(), 
+              features, SketchPlugin_Sketch::FEATURES_ID(),
               ModelAPI_AttributeRefList, /** Features */,
-              external, SketchPlugin_SketchEntity::EXTERNAL_ID(), 
+              external, SketchPlugin_SketchEntity::EXTERNAL_ID(),
               ModelAPI_AttributeSelection, /** External */,
               solverError, SketchPlugin_Sketch::SOLVER_ERROR(),
               ModelAPI_AttributeString, /** Solver error */,
@@ -109,11 +109,11 @@ public:
 
   /// Add intersection point
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_IntersectionPoint> 
+  std::shared_ptr<SketchAPI_IntersectionPoint>
     addIntersectionPoint(const ModelHighAPI_Selection & theExternal);
   /// Add point
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_IntersectionPoint> 
+  std::shared_ptr<SketchAPI_IntersectionPoint>
     addIntersectionPoint(const std::string & theExternalName);
 
   /// Add line

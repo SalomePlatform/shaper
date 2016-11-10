@@ -64,7 +64,7 @@ Q_OBJECT
   void setGrantedOperationIds(const QStringList& theList);
 
   /// Must return true if this operation can be launched as nested for any current operation
-  /// and it is not necessary to check this operation on validity. By default 
+  /// and it is not necessary to check this operation on validity. By default
   /// the operation is not granted.
   /// The method has to be redefined for granted operations.
   virtual bool isGranted(QString theId) const;

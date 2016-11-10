@@ -43,7 +43,7 @@ class ModuleBase_WidgetSelectorStore
 
 private:
   /// backup parameters of the model attribute. The class processes three types of attribute:
-  /// Reference, RefAttr and Selection. 
+  /// Reference, RefAttr and Selection.
   /// Depending on the attribute type, only the attribute parameter
   /// values are reserved in the backup
   /// An attribute object

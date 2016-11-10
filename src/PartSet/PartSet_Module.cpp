@@ -244,17 +244,17 @@ void PartSet_Module::registerProperties()
                                    PLANE_SIZE);
   Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_thickness", "Thickness",
                                    Config_Prop::Integer, SKETCH_WIDTH);
-  Config_PropManager::registerProp(SKETCH_TAB_NAME, "rotate_to_plane", 
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "rotate_to_plane",
     "Rotate to plane when selected", Config_Prop::Boolean, "false");
 }
 
-void PartSet_Module::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget, 
+void PartSet_Module::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget,
                                             const bool isToConnect)
 {
   mySketchMgr->connectToPropertyPanel(theWidget, isToConnect);
 }
 
-void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation) 
+void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation)
 {
   if (sketchMgr()->isNestedSketchOperation(theOperation)) {
     mySketchMgr->commitNestedSketch(theOperation);
@@ -263,7 +263,7 @@ void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation)
   /// Restart sketcher operations automatically
   if (!mySketchReentrantMgr->operationCommitted(theOperation)) {
 
-    ModuleBase_OperationFeature* aFOperation = 
+    ModuleBase_OperationFeature* aFOperation =
       dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
     if (aFOperation && !aFOperation->isEditOperation()) {
       // the selection is cleared after commit the create operation
@@ -305,7 +305,7 @@ void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
     bool isOperationCommitted = false;
     if (!aFOperation->isEditOperation()) {
       std::string aGreedAttributeId = ModuleBase_Tools::findGreedAttribute(workshop(), aFeature);
-      // if there is a greed attribute, automatic commit by preselection 
+      // if there is a greed attribute, automatic commit by preselection
       // for this feature is prohibited
       aFilledWidget = aFOperation->activateByPreselection(aGreedAttributeId);
       if (currentOperation() != aFOperation)
@@ -313,8 +313,8 @@ void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
       else {
         if (aGreedAttributeId.empty()) {
           // a signal should be emitted before the next widget activation
-          // because, the activation of the next widget will give a focus to the widget. 
-          // As a result the value of the widget is initialized. 
+          // because, the activation of the next widget will give a focus to the widget.
+          // As a result the value of the widget is initialized.
           // And commit may happens until the value is entered.
           if (aFilledWidget) {
             if (mySketchReentrantMgr->canBeCommittedByPreselection())
@@ -388,7 +388,7 @@ void PartSet_Module::operationResumed(ModuleBase_Operation* theOperation)
 {
   ModuleBase_IModule::operationResumed(theOperation);
 
-  ModuleBase_OperationFeature* aFOperation = 
+  ModuleBase_OperationFeature* aFOperation =
     dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (aFOperation) {
     myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeArguments, true);
@@ -415,7 +415,7 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
     aDisplayer->updateViewer();
   }
 
-  QMap<PartSet_Tools::ConstraintVisibleState, bool>::const_iterator 
+  QMap<PartSet_Tools::ConstraintVisibleState, bool>::const_iterator
     anIt = myHasConstraintShown.begin(), aLast = myHasConstraintShown.end();
   for (; anIt != aLast; anIt++) {
     mySketchMgr->updateBySketchParameters(anIt.key(), anIt.value());
@@ -495,7 +495,7 @@ bool PartSet_Module::canActivateSelection(const ObjectPtr& theObject) const
   if (isSketchOp || isNestedOp) {
     // in active sketch operation it is possible to activate operation object in selection
     // in the edit operation, e.g. points of the line can be moved when the line is edited
-    ModuleBase_OperationFeature* aFOperation = 
+    ModuleBase_OperationFeature* aFOperation =
       dynamic_cast<ModuleBase_OperationFeature*>(anOperation);
     aCanActivate = aCanActivate || (aFOperation && aFOperation->isEditOperation());
   }
@@ -606,7 +606,7 @@ bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
 {
   bool aProcessed = false;
 
-  ModuleBase_OperationFeature* aFOperation = 
+  ModuleBase_OperationFeature* aFOperation =
     dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   XGUI_Workshop* aWorkshop = getWorkshop();
   XGUI_PropertyPanel* aPropertyPanel = aWorkshop->propertyPanel();
@@ -621,7 +621,7 @@ bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
       FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
       FeaturePtr anOpFeature = aFOperation->feature();
       GeomShapePtr aShape = aSelectedPrs->shape();
-      // click on the digit of dimension constrain comes here 
+      // click on the digit of dimension constrain comes here
       // with an empty shape, so we need the check
       if (aFeature == anOpFeature && aShape.get() && !aShape->isNull()) {
         const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
@@ -669,14 +669,14 @@ void PartSet_Module::onSelectionChanged()
       if (aFeature) {
         std::string aId = aFeature->getKind();
         if ((aId == SketchPlugin_ConstraintRadius::ID()) ||
-            (aId == SketchPlugin_ConstraintLength::ID()) || 
+            (aId == SketchPlugin_ConstraintLength::ID()) ||
             (aId == SketchPlugin_ConstraintDistance::ID()) ||
             (aId == SketchPlugin_ConstraintAngle::ID())) {
           editFeature(aFeature);
         }
       }
     }
-  } 
+  }
 }
 
 void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent)
@@ -820,9 +820,9 @@ bool PartSet_Module::deleteObjects()
     anOpMgr->startOperation(anOpAction);
 
     // WORKAROUND, should be done to avoid viewer highlight update after deletetion of objects
-    // the problem is in AIS Dimensions recompute 
+    // the problem is in AIS Dimensions recompute
     // if a line and the dim are removed, line is the first
-    // it causes the AIS recompute, where the base line is null, 
+    // it causes the AIS recompute, where the base line is null,
     // the result is empty AIS in the viewer
     XGUI_Tools::workshop(myWorkshop)->selector()->clearSelection();
 
@@ -883,7 +883,7 @@ void PartSet_Module::launchOperation(const QString& theCmdId)
 
 void PartSet_Module::storeConstraintsState(const std::string& theFeatureKind)
 {
-  if (myWorkshop->currentOperation() && 
+  if (myWorkshop->currentOperation() &&
       myWorkshop->currentOperation()->id().toStdString() == SketchPlugin_Sketch::ID()) {
     const QMap<PartSet_Tools::ConstraintVisibleState, bool>& aShownStates =
                                                   mySketchMgr->showConstraintStates();
@@ -903,7 +903,7 @@ void PartSet_Module::updateConstraintsState(const std::string& theFeatureKind)
   }
 }
 
-void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS) 
+void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS)
 {
   Handle(AIS_InteractiveObject) anAIS = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAIS.IsNull()) {
@@ -946,8 +946,8 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
   Handle(V3d_Viewer) aV3dViewer = aContext->CurrentViewer();
   Handle(V3d_View) aView;
   double aScale = 0;
-  for (aV3dViewer->InitDefinedViews(); 
-       aV3dViewer->MoreDefinedViews(); 
+  for (aV3dViewer->InitDefinedViews();
+       aV3dViewer->MoreDefinedViews();
        aV3dViewer->NextDefinedViews()) {
     Handle(V3d_View) aV = aV3dViewer->DefinedView();
     double aS = aV->Scale();
@@ -987,7 +987,7 @@ bool PartSet_Module::isCustomPrsActivated(const ModuleBase_CustomizeFlag& theFla
   return myCustomPrs->isActive(theFlag);
 }
 
-void PartSet_Module::activateCustomPrs(const FeaturePtr& theFeature, 
+void PartSet_Module::activateCustomPrs(const FeaturePtr& theFeature,
                                        const ModuleBase_CustomizeFlag& theFlag,
                                        const bool theUpdateViewer)
 {
@@ -1071,13 +1071,13 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
   if (aOB) {
     QLabel* aLabel = aOB->activeDocLabel();
     aLabel->installEventFilter(myMenuMgr);
-    connect(aLabel, SIGNAL(customContextMenuRequested(const QPoint&)), 
+    connect(aLabel, SIGNAL(customContextMenuRequested(const QPoint&)),
           SLOT(onActiveDocPopup(const QPoint&)));
     //QPalette aPalet = aLabel->palette();
     //aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
     //aLabel->setPalette(aPalet);
     aOB->treeView()->setExpandsOnDoubleClick(false);
-    connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)), 
+    connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)),
       SLOT(onTreeViewDoubleClick(const QModelIndex&)));
   }
 }
@@ -1115,7 +1115,7 @@ ObjectPtr PartSet_Module::findPresentedObject(const AISObjectPtr& theAIS) const
       // if there is an active widget, find the presented object in it
       if (!anActiveWidget)
         anActiveWidget = aPanel->preselectionWidget();
-    
+
       ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
                                                                              (anActiveWidget);
       if (aWidgetValidated)
@@ -1130,7 +1130,7 @@ bool PartSet_Module::canBeShaded(Handle(AIS_InteractiveObject) theAIS) const
   bool aCanBeShaged = true;
 
   Handle(PartSet_ResultSketchPrs) aPrs = Handle(PartSet_ResultSketchPrs)::DownCast(theAIS);
-  if (!aPrs.IsNull()) 
+  if (!aPrs.IsNull())
     aCanBeShaged = false;
 
   return aCanBeShaged;
@@ -1155,7 +1155,7 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
     if (aObject) {
       ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
-      bool isPart = aPart.get() || 
+      bool isPart = aPart.get() ||
         (aFeature.get() && (aFeature->getKind() == PartSetPlugin_Part::ID()));
       if (isPart) {
         DocumentPtr aPartDoc;
@@ -1164,7 +1164,7 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
         }
         if (aPart.get()) // this may be null is Part feature is disabled
           aPartDoc = aPart->partDoc();
-          
+
         theMenu->addAction(aActivatePartAction);
         aActivatePartAction->setEnabled((aMgr->activeDocument() != aPartDoc));
 
@@ -1196,11 +1196,11 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     // Do not change activation of parts if an operation active
     static QStringList aAllowActivationList;
     if (aAllowActivationList.isEmpty())
-      aAllowActivationList << 
-      QString(PartSetPlugin_Part::ID().c_str()) << 
+      aAllowActivationList <<
+      QString(PartSetPlugin_Part::ID().c_str()) <<
       QString(PartSetPlugin_Duplicate::ID().c_str()) <<
       QString(PartSetPlugin_Remove::ID().c_str());
-    if (myWorkshop->currentOperation() && 
+    if (myWorkshop->currentOperation() &&
       (!aAllowActivationList.contains(myWorkshop->currentOperation()->id())))
       return;
     XGUI_Workshop* aWorkshop = getWorkshop();
@@ -1226,7 +1226,7 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     bool aHidden;
     foreach(ObjectPtr aObj, aObjects) {
       //TODO: replace by redisplay event.
-      aHidden = !aObj->data() || !aObj->data()->isValid() || 
+      aHidden = !aObj->data() || !aObj->data()->isValid() ||
         aObj->isDisabled() || (!aObj->isDisplayed());
       if (!aHidden)
         aDisplayer->redisplay(aObj, false);
@@ -1302,7 +1302,7 @@ void PartSet_Module::onViewCreated(ModuleBase_IViewWindow*)
   if (aOperation) {
     ModuleBase_ModelWidget* anActiveWidget = activeWidget();
     if (anActiveWidget) {
-      ModuleBase_WidgetSelector* aWSelector = 
+      ModuleBase_WidgetSelector* aWSelector =
         dynamic_cast<ModuleBase_WidgetSelector*>(anActiveWidget);
       if (aWSelector)
         aWSelector->activateSelectionAndFilters(true);
@@ -1358,7 +1358,7 @@ AttributePtr PartSet_Module::findAttribute(const ObjectPtr& theObject,
 
   if (aGeomShape.get()) {
     TopoDS_Shape aTDSShape = aGeomShape->impl<TopoDS_Shape>();
-    return PartSet_Tools::findAttributeBy2dPoint(theObject, aTDSShape, 
+    return PartSet_Tools::findAttributeBy2dPoint(theObject, aTDSShape,
                                                  mySketchMgr->activeSketch());
   }
   return anAttribute;

@@ -42,10 +42,10 @@ GeomValidators_Plugin::GeomValidators_Plugin()
                               new GeomValidators_PartitionArguments);
   aFactory->registerValidator("GeomValidators_ShapeType", new GeomValidators_ShapeType);
   aFactory->registerValidator("GeomValidators_ZeroOffset", new GeomValidators_ZeroOffset);
-  aFactory->registerValidator("GeomValidators_IntersectionSelection", 
+  aFactory->registerValidator("GeomValidators_IntersectionSelection",
                               new GeomValidators_IntersectionSelection);
   aFactory->registerValidator("GeomValidators_FeatureKind", new GeomValidators_FeatureKind);
-  aFactory->registerValidator("GeomValidators_MinObjectsSelected", 
+  aFactory->registerValidator("GeomValidators_MinObjectsSelected",
                               new GeomValidators_MinObjectsSelected);
 
   // register this plugin

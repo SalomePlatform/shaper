@@ -20,23 +20,23 @@ bool GeomValidators_Finite::isValid(const AttributePtr& theAttribute,
   const std::string anAttributeType = theAttribute->attributeType();
 
   if(anAttributeType == ModelAPI_AttributeSelection::typeId()) {
-    AttributeSelectionPtr aSelectionAttr = 
+    AttributeSelectionPtr aSelectionAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
     ResultPtr aResult = aSelectionAttr->context();
-    ResultConstructionPtr aConstruction = 
+    ResultConstructionPtr aConstruction =
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aResult);
     if (aConstruction.get() && aConstruction->isInfinite()) {
       aValid = false;
       theError = "Infinite result is selected.";
     }
   } else if(anAttributeType == ModelAPI_AttributeSelectionList::typeId()) {
-    AttributeSelectionListPtr aSelectionListAttr = 
+    AttributeSelectionListPtr aSelectionListAttr =
                       std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
     for (int i = 0, aSize = aSelectionListAttr->size(); i < aSize; i++) {
       AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);
       ResultPtr aResult = aSelectAttr->context();
       if (aResult.get() && aResult->groupName() == ModelAPI_ResultConstruction::group()) {
-        ResultConstructionPtr aConstruction = 
+        ResultConstructionPtr aConstruction =
           std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aResult);
         if (aConstruction.get() && aConstruction->isInfinite()) {
           aValid = false;

@@ -108,13 +108,13 @@ void XGUI_ActionsMgr::updateCommandsStatus()
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                          (myOperationMgr->currentOperation());
   if (aFOperation) {
-    anActiveFeature = aFOperation->feature();  
+    anActiveFeature = aFOperation->feature();
     QStringList aNested = allNestedCommands(aFOperation);
     foreach(QString aAction, myActions.keys()) {
       if (!aNested.contains(aAction))
         setActionEnabled(aAction, false);
     }
-  } else 
+  } else
     setNestedCommandsEnabled(false);
 
   updateByPlugins(anActiveFeature);
@@ -252,7 +252,7 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId)
       }
       break;
       case Preview: {
-        aResult = ModuleBase_Tools::createAction(QIcon(), tr("See preview"), 
+        aResult = ModuleBase_Tools::createAction(QIcon(), tr("See preview"),
                                                  aParent, 0, 0, "Compute preview");
         aResult->setStatusTip(aResult->toolTip());
       }
@@ -315,7 +315,7 @@ void XGUI_ActionsMgr::setNestedCommandsEnabled(bool theEnabled, const QString& t
 
 void XGUI_ActionsMgr::setNestedStackEnabled(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_OperationFeature* anOperation = 
+  ModuleBase_OperationFeature* anOperation =
     dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if(!anOperation || !anOperation->feature())
     return;
@@ -330,7 +330,7 @@ void XGUI_ActionsMgr::setNestedStackEnabled(ModuleBase_Operation* theOperation)
 QStringList XGUI_ActionsMgr::allNestedCommands(ModuleBase_Operation* theOperation)
 {
   QStringList aFeatures;
-  ModuleBase_OperationFeature* anOperation = 
+  ModuleBase_OperationFeature* anOperation =
     dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if(!anOperation || !anOperation->feature())
     return aFeatures;

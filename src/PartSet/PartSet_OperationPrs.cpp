@@ -91,7 +91,7 @@ void PartSet_OperationPrs::useAISWidth()
 
 void PartSet_OperationPrs::Compute(
             const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-            const Handle(Prs3d_Presentation)& thePresentation, 
+            const Handle(Prs3d_Presentation)& thePresentation,
             const Standard_Integer theMode)
 {
 #ifdef DEBUG_OPERATION_PRS
@@ -108,7 +108,7 @@ void PartSet_OperationPrs::Compute(
   BRep_Builder aBuilder;
   TopoDS_Compound aComp;
   aBuilder.MakeCompound(aComp);
-  for(NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)>::Iterator 
+  for(NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)>::Iterator
       anIter(myShapeToPrsMap); anIter.More(); anIter.Next()) {
     const TopoDS_Shape& aShape = anIter.Key();
     aBuilder.Add(aComp, aShape);
@@ -132,7 +132,7 @@ void PartSet_OperationPrs::Compute(
   }
   Set(aComp);
   if (!aReadyToDisplay) {
-    Events_InfoMessage("PartSet_OperationPrs", 
+    Events_InfoMessage("PartSet_OperationPrs",
       "An empty AIS presentation: PartSet_OperationPrs").send();
     std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
                 new Events_Message(Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION)));
@@ -171,7 +171,7 @@ void PartSet_OperationPrs::addValue(const ObjectPtr& theObject, const GeomShapeP
   if (theObject.get()) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
     if (aResult.get()) {
-      ResultCompSolidPtr aCompsolidResult = 
+      ResultCompSolidPtr aCompsolidResult =
         std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theObject);
       if (aCompsolidResult.get()) {
         if (aCompsolidResult->numberOfSubs() > 0) {
@@ -189,7 +189,7 @@ void PartSet_OperationPrs::addValue(const ObjectPtr& theObject, const GeomShapeP
       else {
         FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
         if (aFeature.get()) {
-          AttributeBooleanPtr aCopyAttr = 
+          AttributeBooleanPtr aCopyAttr =
             aFeature->data()->boolean(SketchPlugin_SketchEntity::COPY_ID());
           if (aCopyAttr.get()) {
             bool isCopy = aCopyAttr->value();
@@ -260,7 +260,7 @@ void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,
     std::string anAttrType = anAttribute->attributeType();
 
     if (anAttrType == ModelAPI_AttributeSelectionList::typeId()) {
-      std::shared_ptr<ModelAPI_AttributeSelectionList> aCurSelList = 
+      std::shared_ptr<ModelAPI_AttributeSelectionList> aCurSelList =
               std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
       for(int i = 0; i < aCurSelList->size(); i++) {
         std::shared_ptr<ModelAPI_AttributeSelection> aSelAttribute = aCurSelList->value(i);
@@ -294,7 +294,7 @@ void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,
       ObjectPtr anObject;
       GeomShapePtr aShape;
       if (anAttrType == ModelAPI_AttributeRefAttr::typeId()) {
-        AttributeRefAttrPtr anAttr = 
+        AttributeRefAttrPtr anAttr =
           std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
         if (anAttr->isObject()) {
           anObject = anAttr->object();
@@ -310,13 +310,13 @@ void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,
         }
       }
       if (anAttrType == ModelAPI_AttributeSelection::typeId()) {
-        AttributeSelectionPtr anAttr = 
+        AttributeSelectionPtr anAttr =
           std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(anAttribute);
         anObject = anAttr->context();
         aShape = anAttr->value();
       }
       if (anAttrType == ModelAPI_AttributeReference::typeId()) {
-        AttributeReferencePtr anAttr = 
+        AttributeReferencePtr anAttr =
           std::dynamic_pointer_cast<ModelAPI_AttributeReference>(anAttribute);
         anObject = anAttr->value();
       }
@@ -350,7 +350,7 @@ void PartSet_OperationPrs::getResultShapes(const FeaturePtr& theFeature,
 }
 
 void PartSet_OperationPrs::getHighlightedShapes(ModuleBase_IWorkshop* theWorkshop,
-                                                QMap<ObjectPtr, 
+                                                QMap<ObjectPtr,
                                                 QList<GeomShapePtr> >& theObjectShapes)
 {
   theObjectShapes.clear();
@@ -393,7 +393,7 @@ bool PartSet_OperationPrs::isSelectionAttribute(const AttributePtr& theAttribute
 void PartSet_OperationPrs::fillShapeList(
                             const QMap<ObjectPtr, QList<GeomShapePtr> >& theFeatureShapes,
                             ModuleBase_IWorkshop* theWorkshop,
-                            NCollection_DataMap<TopoDS_Shape, 
+                            NCollection_DataMap<TopoDS_Shape,
                             Handle(AIS_InteractiveObject)>& theShapeToPrsMap)
 {
   theShapeToPrsMap.Clear();

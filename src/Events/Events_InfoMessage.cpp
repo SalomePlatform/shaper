@@ -10,26 +10,26 @@
 #pragma warning(disable : 4996) // for sprintf
 #endif
 
-void Events_InfoMessage::addParameter(double theParam) 
-{ 
+void Events_InfoMessage::addParameter(double theParam)
+{
   char aBuf[50];
   int n = sprintf(aBuf, "%g", theParam);
   std::string aStr(aBuf);
-  myParameters.push_back(aStr); 
+  myParameters.push_back(aStr);
 }
 
-void Events_InfoMessage::addParameter(int theParam) 
-{ 
+void Events_InfoMessage::addParameter(int theParam)
+{
   char aBuf[50];
   int n = sprintf(aBuf, "%d", theParam);
   std::string aStr(aBuf);
-  myParameters.push_back(aStr); 
+  myParameters.push_back(aStr);
 }
 
-void Events_InfoMessage::send() 
-{ 
+void Events_InfoMessage::send()
+{
   std::shared_ptr<Events_Message> aMsg(new Events_InfoMessage(*this));
-  Events_Loop::loop()->send(aMsg); 
+  Events_Loop::loop()->send(aMsg);
 }
 
 
@@ -54,7 +54,7 @@ std::string insertParameters(const std::string& theString, const std::list<std::
   return aResult;
 }
 
-std::string Events_InfoMessage::messageString() const 
-{ 
-  return insertParameters(myMessage, myParameters); 
+std::string Events_InfoMessage::messageString() const
+{
+  return insertParameters(myMessage, myParameters);
 }

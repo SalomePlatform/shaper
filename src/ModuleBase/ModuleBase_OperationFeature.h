@@ -114,7 +114,7 @@ Q_OBJECT
   virtual ModuleBase_ModelWidget* activateByPreselection(const std::string& theGreedAttributeId);
 
   /// If the operation works with feature which is sub-feature of another one
-  /// then this variable has to be initialised by parent feature 
+  /// then this variable has to be initialised by parent feature
   /// before operation feature creating
   void setParentFeature(CompositeFeaturePtr theParent);
 
@@ -175,11 +175,11 @@ Q_OBJECT
   /// Editing feature flag
   bool myIsEditing;
 
-  /// List of pre-selected object 
+  /// List of pre-selected object
   QList<std::shared_ptr<ModuleBase_ViewerPrs>> myPreSelection;
 
   /// If the operation works with feature which is sub-feature of another one
-  /// then this variable has to be initialised by parent feature 
+  /// then this variable has to be initialised by parent feature
   /// before operation feature creating
   CompositeFeaturePtr myParentFeature;
 

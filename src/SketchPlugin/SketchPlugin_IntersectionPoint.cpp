@@ -58,7 +58,7 @@ void SketchPlugin_IntersectionPoint::computePoint()
   std::shared_ptr<GeomAPI_Edge> anEdge;
   if(aLineAttr && aLineAttr->value() && aLineAttr->value()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->value()));
-  } else if(aLineAttr->context() && aLineAttr->context()->shape() && 
+  } else if(aLineAttr->context() && aLineAttr->context()->shape() &&
             aLineAttr->context()->shape()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->context()->shape()));
   }
@@ -72,7 +72,7 @@ void SketchPlugin_IntersectionPoint::computePoint()
   if (!anIntersection)
     return;
 
-  std::shared_ptr<GeomDataAPI_Point2D> aCoordAttr = 
+  std::shared_ptr<GeomDataAPI_Point2D> aCoordAttr =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(COORD_ID()));
   aCoordAttr->setValue(sketch()->to2D(anIntersection));
 }

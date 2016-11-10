@@ -37,10 +37,10 @@ class ModuleBase_ISelection
 
   /// Returns a list of viewer selected presentations
   /// \return list of presentations
-  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> 
+  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>>
     getSelected(const SelectionPlace& thePlace = Browser) const = 0;
 
-  /// The values are appended to the first parameter list if the first list does not contain 
+  /// The values are appended to the first parameter list if the first list does not contain
   /// an item with the same object
   /// \param theValues a list of new values
   /// \param theValuesTo a list, that will be changed
@@ -95,7 +95,7 @@ class ModuleBase_ISelection
   //! Return the IO from the viewer presentation.
   //! \param thePrs a selected object
   //! \return an interactive object
-  virtual MODULEBASE_EXPORT 
+  virtual MODULEBASE_EXPORT
     Handle(AIS_InteractiveObject) getIO(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs) = 0;
 
   //! Wraps the object list into the viewer prs list

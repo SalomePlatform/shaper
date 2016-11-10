@@ -83,9 +83,9 @@ void Model_Data::setLabel(TDF_Label theLab)
     Standard_Boolean aFlag2 = myFlags->Upper() >= 2 ? myFlags->Value(2) : Standard_True;
     Handle(TColStd_HArray1OfByte) aNewArray = new TColStd_HArray1OfByte(0, 2);
     myFlags->SetInternalArray(aNewArray);
-    myFlags->SetValue(0, aFlag0); 
-    myFlags->SetValue(1, aFlag1); 
-    myFlags->SetValue(2, aFlag2); 
+    myFlags->SetValue(0, aFlag0);
+    myFlags->SetValue(1, aFlag1);
+    myFlags->SetValue(2, aFlag2);
   }
 }
 
@@ -180,7 +180,7 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
     anAttr->setObject(myObject);
     anAttr->setID(theID);
   } else {
-    Events_InfoMessage("Model_Data", 
+    Events_InfoMessage("Model_Data",
       "Can not create unknown type of attribute %1").arg(theAttrType).send();
   }
   return aResult;
@@ -222,7 +222,7 @@ std::shared_ptr<ModelAPI_Attribute> Model_Data::attribute(const std::string& the
 
 const std::string& Model_Data::id(const std::shared_ptr<ModelAPI_Attribute>& theAttr)
 {
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr =
     myAttrs.begin();
   for (; anAttr != myAttrs.end(); anAttr++) {
     if (anAttr->second == theAttr)
@@ -249,7 +249,7 @@ bool Model_Data::isValid()
 std::list<std::shared_ptr<ModelAPI_Attribute> > Model_Data::attributes(const std::string& theType)
 {
   std::list<std::shared_ptr<ModelAPI_Attribute> > aResult;
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter =
     myAttrs.begin();
   for (; anAttrsIter != myAttrs.end(); anAttrsIter++) {
     if (theType.empty() || anAttrsIter->second->attributeType() == theType) {
@@ -259,10 +259,10 @@ std::list<std::shared_ptr<ModelAPI_Attribute> > Model_Data::attributes(const std
   return aResult;
 }
 
-std::list<std::string> Model_Data::attributesIDs(const std::string& theType) 
+std::list<std::string> Model_Data::attributesIDs(const std::string& theType)
 {
   std::list<std::string> aResult;
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter =
     myAttrs.begin();
   for (; anAttrsIter != myAttrs.end(); anAttrsIter++) {
     if (theType.empty() || anAttrsIter->second->attributeType() == theType) {
@@ -297,7 +297,7 @@ void Model_Data::blockSendAttributeUpdated(const bool theBlock, const bool theSe
     if (mySendAttributeUpdated && !myWasChangedButBlocked.empty()) {
       // so, now it is ok to send the update signal
       if (theSendMessage) {
-        // make a copy to avoid iteration on modified list 
+        // make a copy to avoid iteration on modified list
         // (may be cleared by attribute changed call)
         std::list<ModelAPI_Attribute*> aWasChangedButBlocked = myWasChangedButBlocked;
         myWasChangedButBlocked.clear();
@@ -321,13 +321,13 @@ void Model_Data::erase()
       // remove in order to clear back references in other objects
       std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
       referencesToObjects(aRefs);
-      std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator 
+      std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator
         anAttrIter = aRefs.begin();
       for(; anAttrIter != aRefs.end(); anAttrIter++) {
         std::list<ObjectPtr>::iterator aReferenced = anAttrIter->second.begin();
         for(; aReferenced != anAttrIter->second.end(); aReferenced++) {
           if (aReferenced->get() && (*aReferenced)->data()->isValid()) {
-            std::shared_ptr<Model_Data> aData = 
+            std::shared_ptr<Model_Data> aData =
               std::dynamic_pointer_cast<Model_Data>((*aReferenced)->data());
             aData->removeBackReference(myAttrs[anAttrIter->first]);
           }
@@ -412,7 +412,7 @@ int Model_Data::featureId() const
 void Model_Data::eraseBackReferences()
 {
   myRefsToMe.clear();
-  std::shared_ptr<ModelAPI_Result> aRes = 
+  std::shared_ptr<ModelAPI_Result> aRes =
     std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
   if (aRes)
     aRes->setIsConcealed(false);
@@ -439,7 +439,7 @@ void Model_Data::removeBackReference(AttributePtr theAttr)
   }
 }
 
-void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID, 
+void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID,
    const bool theApplyConcealment)
 {
   // it is possible to add the same attribute twice: may be last time the owner was not Stable...
@@ -447,14 +447,14 @@ void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID,
   if (myRefsToMe.find(anAttribute) == myRefsToMe.end())
     myRefsToMe.insert(theFeature->data()->attribute(theAttrID));
 
-  if (theApplyConcealment &&  theFeature->isStable() && 
+  if (theApplyConcealment &&  theFeature->isStable() &&
       ModelAPI_Session::get()->validators()->isConcealed(theFeature->getKind(), theAttrID)) {
-    std::shared_ptr<ModelAPI_Result> aRes = 
+    std::shared_ptr<ModelAPI_Result> aRes =
       std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
     // the second condition is for history upper than concealment causer, so the feature result may
     // be displayed and previewed; also for avoiding of quick show/hide on history
     // moving deep down
-    if (aRes && !theFeature->isDisabled() && 
+    if (aRes && !theFeature->isDisabled() &&
         !ModelAPI_Session::get()->validators()->isUnconcealed(aRes, theFeature)) {
       aRes->setIsConcealed(true);
     }
@@ -470,7 +470,7 @@ void Model_Data::updateConcealmentFlag()
       if (aFeature.get() && !aFeature->isDisabled() && aFeature->isStable()) {
         if (ModelAPI_Session::get()->validators()->isConcealed(
               aFeature->getKind(), (*aRefsIter)->id())) {
-          std::shared_ptr<ModelAPI_Result> aRes = 
+          std::shared_ptr<ModelAPI_Result> aRes =
             std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
           if (aRes.get()) {
             if (!ModelAPI_Session::get()->validators()->isUnconcealed(aRes, aFeature)) {
@@ -482,14 +482,14 @@ void Model_Data::updateConcealmentFlag()
       }
     }
   }
-  std::shared_ptr<ModelAPI_Result> aRes = 
+  std::shared_ptr<ModelAPI_Result> aRes =
     std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
   if (aRes.get()) {
     aRes->setIsConcealed(false);
   }
 }
 
-std::set<std::string> set_union(const std::set<std::string>& theLeft, 
+std::set<std::string> set_union(const std::set<std::string>& theLeft,
                                 const std::set<std::string>& theRight)
 {
   std::set<std::string> aResult;
@@ -522,7 +522,7 @@ std::list<ResultParameterPtr> findVariables(const std::set<std::string>& thePara
     const std::string& aName = *aParamIt;
     double aValue;
     ResultParameterPtr aParam;
-    // theSearcher is not needed here: in expressions 
+    // theSearcher is not needed here: in expressions
     // of features the parameters history is not needed
     if (ModelAPI_Tools::findVariable(FeaturePtr(), aName, aValue, aParam))
       aResult.push_back(aParam);
@@ -533,7 +533,7 @@ std::list<ResultParameterPtr> findVariables(const std::set<std::string>& thePara
 void Model_Data::referencesToObjects(
   std::list<std::pair<std::string, std::list<ObjectPtr> > >& theRefs)
 {
-  static Model_ValidatorsFactory* aValidators = 
+  static Model_ValidatorsFactory* aValidators =
     static_cast<Model_ValidatorsFactory*>(ModelAPI_Session::get()->validators());
   FeaturePtr aMyFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(myObject);
 

@@ -8,7 +8,7 @@
 #define PrimitivesAPI_swig_H_
 
   #include <ModelHighAPI_swig.h>
-  
+
   #include "PrimitivesAPI_Box.h"
 
 

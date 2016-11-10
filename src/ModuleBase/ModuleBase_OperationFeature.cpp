@@ -206,13 +206,13 @@ bool ModuleBase_OperationFeature::hasObject(ObjectPtr theObj) const
     }
 #ifdef DEBUG_DO_NOT_ACTIVATE_SUB_FEATURE
     if (aFeature->isMacro()) {
-      // macro feature may refers to sub-features, 
+      // macro feature may refers to sub-features,
       // which also should be deactivated when the operation
       // is active, e.g. rectangle'lines.
       FeaturePtr anObjectFeature = ModelAPI_Feature::feature(theObj);
       std::list<AttributePtr> anAttributes = aFeature->data()->attributes(
                                               ModelAPI_AttributeRefList::typeId());
-      std::list<AttributePtr>::const_iterator 
+      std::list<AttributePtr>::const_iterator
         anIt = anAttributes.begin(), aLast = anAttributes.end();
       bool aFoundObject = false;
       for (; anIt != aLast && !aFoundObject; anIt++) {
@@ -464,7 +464,7 @@ void ModuleBase_OperationFeature::initSelection(
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
       aCurrentFeatureResults.append(*aIt);
   }
-  
+
   if (aCurrentFeatureResults.empty()) /// filtering of selection is not necessary
     setPreselection(thePreSelected);
   else { // create preselection list without results of current feature
@@ -488,7 +488,7 @@ void ModuleBase_OperationFeature::clearPreselection()
   myPreSelection.clear();
 }
 
-void ModuleBase_OperationFeature::setPropertyPanel(ModuleBase_IPropertyPanel* theProp) 
+void ModuleBase_OperationFeature::setPropertyPanel(ModuleBase_IPropertyPanel* theProp)
 {
   ModuleBase_Operation::setPropertyPanel(theProp);
 
@@ -505,7 +505,7 @@ void ModuleBase_OperationFeature::setPropertyPanel(ModuleBase_IPropertyPanel* th
   }
 
   // Do not activate widgets by default if the current operation is editing operation
-  // Because we don't know which widget is going to be edited. 
+  // Because we don't know which widget is going to be edited.
   if (!isEditOperation()) {
     // 4. activate the first obligatory widget
     theProp->activateNextWidget(NULL);

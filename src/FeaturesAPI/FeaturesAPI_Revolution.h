@@ -58,7 +58,7 @@ public:
   virtual ~FeaturesAPI_Revolution();
 
   INTERFACE_10(FeaturesPlugin_Revolution::ID(),
-               sketch, FeaturesPlugin_Revolution::SKETCH_ID(), 
+               sketch, FeaturesPlugin_Revolution::SKETCH_ID(),
                ModelAPI_AttributeReference, /** Sketch launcher */,
                baseObjects, FeaturesPlugin_Revolution::BASE_OBJECTS_ID(),
                ModelAPI_AttributeSelectionList, /** Base objects */,
@@ -93,14 +93,14 @@ public:
 
   /// Modify CreationMethod, to_angle, from_angle attributes of the feature.
   FEATURESAPI_EXPORT
-  void setAngles(const ModelHighAPI_Double& theToAngle, 
+  void setAngles(const ModelHighAPI_Double& theToAngle,
                  const ModelHighAPI_Double& theFromAngle);
 
   /// Modify CreationMethod, to_angle, from_angle attributes of the feature.
   FEATURESAPI_EXPORT
   void setAngle(const ModelHighAPI_Double& theAngle);
 
-  /// Modify CreationMethod, to_object, to_offset, 
+  /// Modify CreationMethod, to_object, to_offset,
   /// from_object, from_offset attributes of the feature.
   FEATURESAPI_EXPORT
   void setPlanesAndOffsets(const ModelHighAPI_Selection& theToObject,

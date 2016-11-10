@@ -32,13 +32,13 @@ class ModuleBase_ShapeDocumentFilter: public SelectMgr_Filter
 public:
   /// Constructor
   /// \param theWorkshop instance of workshop interface
-  Standard_EXPORT 
+  Standard_EXPORT
     ModuleBase_ShapeDocumentFilter(ModuleBase_IWorkshop* theWorkshop): SelectMgr_Filter(),
     myWorkshop(theWorkshop) {}
 
   /// Returns True if the given owner is acceptable for selection
   /// \param theOwner the selected owner
-  Standard_EXPORT virtual 
+  Standard_EXPORT virtual
     Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
   DEFINE_STANDARD_RTTI(ModuleBase_ShapeDocumentFilter)
@@ -70,7 +70,7 @@ public:
 
   /// Returns True if the given owner is acceptable for selection
   /// \param theOwner the selected owner
-  Standard_EXPORT virtual 
+  Standard_EXPORT virtual
     Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
   DEFINE_STANDARD_RTTI(ModuleBase_ShapeInPlaneFilter)

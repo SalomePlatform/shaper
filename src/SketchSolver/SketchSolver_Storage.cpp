@@ -138,7 +138,7 @@ void SketchSolver_Storage::addEntity(FeaturePtr       theFeature,
 void SketchSolver_Storage::addEntity(AttributePtr     theAttribute,
                                      EntityWrapperPtr theSolverEntity)
 {
-  std::map<AttributePtr, EntityWrapperPtr>::const_iterator aFound = 
+  std::map<AttributePtr, EntityWrapperPtr>::const_iterator aFound =
     myAttributeMap.find(theAttribute);
   if (aFound == myAttributeMap.end() || !aFound->second ||
      (theSolverEntity && !aFound->second->isEqual(theSolverEntity)))
@@ -184,7 +184,7 @@ bool SketchSolver_Storage::update(FeaturePtr theFeature, const GroupID& theGroup
   bool isUpdated = false;
   EntityWrapperPtr aRelated = entity(theFeature);
   if (!aRelated) { // Feature is not exist, create it
-    std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
         std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
     bool isCopy = isCopyInMulti(aSketchFeature, myConstraintMap);
     // the feature is a copy in "Multi" constraint and does not used in other constraints
@@ -258,8 +258,8 @@ bool SketchSolver_Storage::update(AttributePtr theAttribute, const GroupID& theG
       if (aFeature->getKind() == SketchPlugin_Arc::ID() &&
           myFeatureMap.find(aFeature) == myFeatureMap.end()) {
         // Additional checking that all attributes are initialized
-        if (aFeature->attribute(SketchPlugin_Arc::CENTER_ID())->isInitialized() && 
-            aFeature->attribute(SketchPlugin_Arc::START_ID())->isInitialized() && 
+        if (aFeature->attribute(SketchPlugin_Arc::CENTER_ID())->isInitialized() &&
+            aFeature->attribute(SketchPlugin_Arc::START_ID())->isInitialized() &&
             aFeature->attribute(SketchPlugin_Arc::END_ID())->isInitialized()) {
           return SketchSolver_Storage::update(aFeature, theGroup, theForce);
         } else {
@@ -271,9 +271,9 @@ bool SketchSolver_Storage::update(AttributePtr theAttribute, const GroupID& theG
     BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
     GroupID aGroup = theGroup != GID_UNKNOWN ? theGroup : myGroupID;
     // Check attribute of external features
-    std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
         std::dynamic_pointer_cast<SketchPlugin_Feature>(anAttribute->owner());
-    if (aSketchFeature && (aSketchFeature->isExternal() || 
+    if (aSketchFeature && (aSketchFeature->isExternal() ||
         isCopyInMulti(aSketchFeature, myConstraintMap)))
       aGroup = GID_OUTOFGROUP;
     aRelated = aBuilder->createAttribute(anAttribute, aGroup);
@@ -658,7 +658,7 @@ bool SketchSolver_Storage::removeCoincidence(ConstraintWrapperPtr theConstraint)
   return true;
 }
 
-void SketchSolver_Storage::replaceEntities(const std::map<EntityWrapperPtr, 
+void SketchSolver_Storage::replaceEntities(const std::map<EntityWrapperPtr,
                                            EntityWrapperPtr>& theChange)
 {
   std::set<EntityWrapperPtr> anUpdFeatures;
@@ -700,7 +700,7 @@ bool SketchSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
     if (aBaseFeature)
       isFullyRemoved = SketchSolver_Storage::removeEntity(aBaseFeature) && isFullyRemoved;
     else
-      isFullyRemoved = 
+      isFullyRemoved =
         SketchSolver_Storage::removeEntity((*anIt)->baseAttribute()) && isFullyRemoved;
   }
   return isFullyRemoved;
@@ -758,7 +758,7 @@ bool SketchSolver_Storage::isInteract(const AttributePtr& theAttribute) const
   if (!theAttribute)
     return false;
 
-  AttributeRefListPtr aRefList = 
+  AttributeRefListPtr aRefList =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttribute);
   if (aRefList) {
     std::list<ObjectPtr> anObjects = aRefList->list();
@@ -817,7 +817,7 @@ bool SketchSolver_Storage::isFixed(EntityWrapperPtr theEntity) const
           return true;
     }
 
-  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator aCIt = 
+  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator aCIt =
     myConstraintMap.begin();
   std::list<ConstraintWrapperPtr>::const_iterator aCWIt;
   for (; aCIt != myConstraintMap.end(); ++aCIt) {
@@ -900,8 +900,8 @@ void SketchSolver_Storage::processArcs()
   for (; aFIt != myFeatureMap.end(); ++aFIt)
     if (!aFIt->second && aFIt->first->getKind() == SketchPlugin_Arc::ID()) {
       // Additional checking the attributes are initialized
-      if (aFIt->first->attribute(SketchPlugin_Arc::CENTER_ID())->isInitialized() && 
-          aFIt->first->attribute(SketchPlugin_Arc::START_ID())->isInitialized() && 
+      if (aFIt->first->attribute(SketchPlugin_Arc::CENTER_ID())->isInitialized() &&
+          aFIt->first->attribute(SketchPlugin_Arc::START_ID())->isInitialized() &&
           aFIt->first->attribute(SketchPlugin_Arc::END_ID())->isInitialized())
         update(aFIt->first);
       else
@@ -988,7 +988,7 @@ void resultToFeatureOrAttribute(const ObjectPtr& theResult,
   // if the feature has several results, we choose which one is referred
   const std::list<ResultPtr>& aResults = aFeature->results();
   if (aResults.size() > 1 && theResult != aFeature->lastResult()) {
-    // actually, the attribute refers to center of arc or circle, 
+    // actually, the attribute refers to center of arc or circle,
     // but not the edge, get correct attributes
     std::string anAttrName;
     if (aFeature->getKind() == SketchPlugin_Arc::ID())

@@ -44,7 +44,7 @@ GeomAPI_AISObject::GeomAPI_AISObject()
 GeomAPI_AISObject::~GeomAPI_AISObject()
 {
   if (!empty()) {
-    // This is necessary for correct deletion of Handle entity. 
+    // This is necessary for correct deletion of Handle entity.
     // Without this Handle does not decremented counter to 0
     Handle(AIS_InteractiveObject) *anAIS = implPtr<Handle(AIS_InteractiveObject)>();
     anAIS->Nullify();
@@ -75,7 +75,7 @@ void GeomAPI_AISObject::createShape(std::shared_ptr<GeomAPI_Shape> theShape)
     // Set default point as a '+' symbol
     Handle(AIS_Shape) aShape = new AIS_Shape(aTDS);
     Handle(Prs3d_Drawer) aDrawer = aShape->Attributes();
-    if (aDrawer->HasOwnPointAspect()) 
+    if (aDrawer->HasOwnPointAspect())
       aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
     else
       aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_PLUS, Quantity_NOC_YELLOW, 1.));
@@ -181,7 +181,7 @@ void GeomAPI_AISObject::createRadius(std::shared_ptr<GeomAPI_Circ> theCircle,
   // TODO: a bug in AIS_RadiusDimension:
   // The anchor point can't be myCirc.Location() - an exception is raised.
   // But we need exactly this case...
-  // We want to show a radius dimension starting from the circle centre and 
+  // We want to show a radius dimension starting from the circle centre and
   // ending at the user-defined point.
   // Also, if anchor point coincides with myP2, the radius dimension is not displayed at all.
   std::shared_ptr<GeomAPI_Pnt> anAnchor = theCircle->project(theFlyoutPoint);

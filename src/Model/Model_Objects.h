@@ -36,7 +36,7 @@ class Model_Objects
  public:
   //! Registers the fieature in the data structure
   //! \param theFeature feature that must be added to the data structure
-  //! \param theAfterThis the feature will be added after this feature; 
+  //! \param theAfterThis the feature will be added after this feature;
   //!        if it is null, the added feature will be the first
   void addFeature(FeaturePtr theFeature, const FeaturePtr theAfterThis);
 
@@ -87,7 +87,7 @@ class Model_Objects
   //! Returns the number of features in the group
   int size(const std::string& theGroupID);
 
-  //! Returns all (and disabled) results of the given type. 
+  //! Returns all (and disabled) results of the given type.
   //! Not fast method (iterates all features).
   void allResults(const std::string& theGroupID, std::list<ResultPtr>& theResults);
 
@@ -138,7 +138,7 @@ class Model_Objects
   //! Returns (creates if needed) the features label
   TDF_Label featuresLabel() const;
 
-  //! Initializes feature with a unique name in this group (unique name is generated as 
+  //! Initializes feature with a unique name in this group (unique name is generated as
   //! feature type + "_" + index
   void setUniqueName(FeaturePtr theFeature);
 
@@ -158,7 +158,7 @@ class Model_Objects
   //! Initializes the data fields of the feature
   void initData(ObjectPtr theObj, TDF_Label theLab, const int theTag);
 
-  //! Allows to store the result in the data tree of the document 
+  //! Allows to store the result in the data tree of the document
   //! (attaches 'data' of result to tree)
   void storeResult(std::shared_ptr<ModelAPI_Data> theFeatureData,
                    std::shared_ptr<ModelAPI_Result> theResult,
@@ -194,7 +194,7 @@ class Model_Objects
   /// Returns true if theLater is in history of features creation later than theCurrent
   bool isLater(FeaturePtr theLater, FeaturePtr theCurrent) const;
 
-  /// Returns the result group identifier of the given feature (for this at least one result must 
+  /// Returns the result group identifier of the given feature (for this at least one result must
   /// be created before)
   std::string featureResultGroup(FeaturePtr theFeature);
 

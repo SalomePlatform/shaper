@@ -45,7 +45,7 @@ bool ParametersPlugin_VariableValidator::isValid(const AttributePtr& theAttribut
   if (!ModelAPI_Expression::isVariable(aStrAttr->value())) {
     theError = "Incorrect variable name.";
     return false;
-  } 
+  }
   if (!isUnique(theAttribute, aStrAttr->value())) {
     theError = "Variable name is not unique.";
     return false;

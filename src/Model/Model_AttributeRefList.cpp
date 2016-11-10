@@ -137,7 +137,7 @@ bool Model_AttributeRefList::isInitialized()
 }
 
 ObjectPtr Model_AttributeRefList::iteratedObject(TDF_ListIteratorOfLabelList& theLIter,
-    TDataStd_ListIteratorOfListOfExtendedString& theExtIter, 
+    TDataStd_ListIteratorOfListOfExtendedString& theExtIter,
     std::shared_ptr<Model_Document> theDoc) const
 {
   ObjectPtr anObj;
@@ -224,7 +224,7 @@ bool Model_AttributeRefList::isInList(const ObjectPtr& theObj)
 
 ObjectPtr Model_AttributeRefList::object(const int theIndex, const bool theWithEmpty) const
 {
-  std::shared_ptr<Model_Document> aDoc = 
+  std::shared_ptr<Model_Document> aDoc =
     std::dynamic_pointer_cast<Model_Document>(owner()->document());
   if (aDoc) {
     int anIndex = -1;
@@ -254,7 +254,7 @@ void Model_AttributeRefList::substitute(const ObjectPtr& theCurrent, const Objec
       TDF_Label aCurrentLab = aData->label().Father();
       TDF_Label aNewLab;
       if (theNew.get() && theNew->data()->isValid()) { // the new may be null
-        std::shared_ptr<Model_Data> aNewData = 
+        std::shared_ptr<Model_Data> aNewData =
           std::dynamic_pointer_cast<Model_Data>(theNew->data());
         aNewLab = aNewData->label().Father();
       } else {
@@ -280,7 +280,7 @@ void Model_AttributeRefList::exchange(const ObjectPtr& theObject1, const ObjectP
     if (aData1.get() && aData1->isValid()) {
       TDF_Label aLab1 = aData1->label().Father();
       if (theObject2.get() && theObject2->data()->isValid()) { // the new may be null
-        std::shared_ptr<Model_Data> aData2 = 
+        std::shared_ptr<Model_Data> aData2 =
           std::dynamic_pointer_cast<Model_Data>(theObject2->data());
         if (aData2.get() && aData2->isValid()) {
           TDF_Label aLab2 = aData2->label().Father();

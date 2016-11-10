@@ -86,6 +86,6 @@ TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
                               const ModelHighAPI_Double& theDistance)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Translation::ID());
-  return TranslationPtr(new FeaturesAPI_Translation(aFeature, theMainObjects, 
+  return TranslationPtr(new FeaturesAPI_Translation(aFeature, theMainObjects,
                                                     theAxisObject, theDistance));
 }

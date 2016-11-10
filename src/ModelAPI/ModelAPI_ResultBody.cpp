@@ -86,7 +86,7 @@ void ModelAPI_ResultBody::generated(const std::shared_ptr<GeomAPI_Shape>& theNew
 }
 
 void ModelAPI_ResultBody::generated(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
-    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, 
+    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName,
     const int theTag)
 {
   myBuilder->generated(theOldShape, theNewShape, theName, theTag);
@@ -105,7 +105,7 @@ void ModelAPI_ResultBody::deleted(
 {
   myBuilder->deleted(theOldShape, theTag);
 }
-  
+
 void ModelAPI_ResultBody::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
                                   std::shared_ptr<GeomAPI_Shape>  theShapeIn,
                                   const int  theKindOfShape,
@@ -116,7 +116,7 @@ void ModelAPI_ResultBody::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
 
 void ModelAPI_ResultBody::loadAndOrientModifiedShapes (GeomAlgoAPI_MakeShape* theMS,
     std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
-    const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes, 
+    const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes,
     const bool theIsStoreSeparate)
 {
   myBuilder->loadAndOrientModifiedShapes(
@@ -131,7 +131,7 @@ void ModelAPI_ResultBody::loadAndOrientGeneratedShapes (GeomAlgoAPI_MakeShape* t
     theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes);
 }
 
-void ModelAPI_ResultBody::loadFirstLevel(std::shared_ptr<GeomAPI_Shape> theShape, 
+void ModelAPI_ResultBody::loadFirstLevel(std::shared_ptr<GeomAPI_Shape> theShape,
     const std::string& theName, int&  theTag)
 {
   myBuilder->loadFirstLevel(theShape, theName, theTag);

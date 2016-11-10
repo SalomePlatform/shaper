@@ -78,7 +78,7 @@ void FeaturesPlugin_Pipe::execute()
       GeomAPI_Shape::ShapeType aST = aBaseShape->shapeType();
       ResultConstructionPtr aConstruction =
         std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseObjectSelection->context());
-      if(aConstruction.get() && !aBaseShape->isEqual(aConstruction->shape()) && 
+      if(aConstruction.get() && !aBaseShape->isEqual(aConstruction->shape()) &&
           aST == GeomAPI_Shape::WIRE) {
         // It is a wire on the sketch, store it to make face later.
         aSketchWiresMap[aConstruction].push_back(aBaseShape);
@@ -89,7 +89,7 @@ void FeaturesPlugin_Pipe::execute()
       }
     } else {
       // This may be the whole sketch result selected, check and get faces.
-      ResultConstructionPtr aConstruction = 
+      ResultConstructionPtr aConstruction =
         std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseObjectSelection->context());
       if(!aConstruction.get()) {
         setError("Error: One of selected sketches does not have results.");
@@ -105,7 +105,7 @@ void FeaturesPlugin_Pipe::execute()
         }
       } else {
         for(int aFaceIndex = 0; aFaceIndex < aFacesNum; aFaceIndex++) {
-          std::shared_ptr<GeomAPI_Shape> aBaseFace = 
+          std::shared_ptr<GeomAPI_Shape> aBaseFace =
             std::dynamic_pointer_cast<GeomAPI_Shape>(aConstruction->face(aFaceIndex));
           if(!aBaseFace.get() || aBaseFace->isNull()) {
             setError("Error: One of the faces on selected sketch is Null.");
@@ -135,9 +135,9 @@ void FeaturesPlugin_Pipe::execute()
   if(aCreationMethod == CREATION_METHOD_SIMPLE()) {
     ListOfShape aShells;
     ListOfShape aFreeFaces;
-    std::shared_ptr<GeomAPI_Shape> aFacesCompound = 
+    std::shared_ptr<GeomAPI_Shape> aFacesCompound =
       GeomAlgoAPI_CompoundBuilder::compound(aBaseFacesList);
-    GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL, 
+    GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL,
                                           aShells, aFreeFaces);
     aBaseShapesList.insert(aBaseShapesList.end(), aFreeFaces.begin(), aFreeFaces.end());
     aBaseShapesList.insert(aBaseShapesList.end(), aShells.begin(), aShells.end());
@@ -151,7 +151,7 @@ void FeaturesPlugin_Pipe::execute()
     setError("Error: Path selection is empty.");
     return;
   }
-  std::shared_ptr<GeomAPI_Shape> aPathShape = 
+  std::shared_ptr<GeomAPI_Shape> aPathShape =
     std::dynamic_pointer_cast<GeomAPI_Shape>(aPathSelection->value());
   if(!aPathShape.get()) {
     // Probaply it is a construction.
@@ -210,7 +210,7 @@ void FeaturesPlugin_Pipe::execute()
 
   // Generating result for each object.
   int aResultIndex = 0;
-  if(aCreationMethod == CREATION_METHOD_SIMPLE() || 
+  if(aCreationMethod == CREATION_METHOD_SIMPLE() ||
       aCreationMethod == CREATION_METHOD_BINORMAL()) {
     for(ListOfShape::const_iterator
         anIter = aBaseShapesList.cbegin(); anIter != aBaseShapesList.cend(); anIter++) {
@@ -317,23 +317,23 @@ void FeaturesPlugin_Pipe::storeResult(const std::shared_ptr<GeomAPI_Shape> theBa
     }
   }
 
-  if(aShapeTypeToExplode == GeomAPI_Shape::VERTEX || 
+  if(aShapeTypeToExplode == GeomAPI_Shape::VERTEX ||
       aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
     aResultBody->loadAndOrientGeneratedShapes(&thePipeAlgo, theBaseShape, GeomAPI_Shape::VERTEX,
                                            aGenTag++, aGenName + "Edge", *aMapOfSubShapes.get());
   }
-  if(aShapeTypeToExplode == GeomAPI_Shape::EDGE || 
+  if(aShapeTypeToExplode == GeomAPI_Shape::EDGE ||
       aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
     aResultBody->loadAndOrientGeneratedShapes(&thePipeAlgo, theBaseShape, GeomAPI_Shape::EDGE,
                                            aGenTag++, aGenName + "Face", *aMapOfSubShapes.get());
   }
 
-  aResultBody->loadAndOrientGeneratedShapes(&thePipeAlgo, theBaseShape, aShapeTypeToExplode, 
+  aResultBody->loadAndOrientGeneratedShapes(&thePipeAlgo, theBaseShape, aShapeTypeToExplode,
                                             aGenTag++, aGenName, *aMapOfSubShapes.get());
 
   // Store from shapes.
   int aFromTag = aGenTag;
-  storeShapes(aResultBody, aBaseShapeType, aMapOfSubShapes, 
+  storeShapes(aResultBody, aBaseShapeType, aMapOfSubShapes,
               thePipeAlgo.fromShapes(), "From_", aFromTag);
 
   // Store to shapes.
@@ -358,7 +358,7 @@ void FeaturesPlugin_Pipe::storeResult(const ListOfShape& theBaseShapes,
   int aGenTag = 1;
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfSubShapes = thePipeAlgo.mapOfSubShapes();
 
-  for(ListOfShape::const_iterator 
+  for(ListOfShape::const_iterator
       anIter = theBaseShapes.cbegin(); anIter != theBaseShapes.cend(); anIter++) {
     GeomShapePtr aBaseShape = *anIter;
     GeomAPI_Shape::ShapeType aBaseShapeType = aBaseShape->shapeType();
@@ -398,7 +398,7 @@ void FeaturesPlugin_Pipe::storeResult(const ListOfShape& theBaseShapes,
 
   // Store to shapes.
   int aToTag = aFromTag;
-  storeShapes(aResultBody, theBaseShapes.back()->shapeType(), 
+  storeShapes(aResultBody, theBaseShapes.back()->shapeType(),
               aMapOfSubShapes, thePipeAlgo.toShapes(), "To", aToTag);
 
 

@@ -77,6 +77,6 @@ Model_AttributeIntArray::Model_AttributeIntArray(TDF_Label& theLabel)
 void Model_AttributeIntArray::reinit()
 {
   // check the attribute could be already presented in this doc (after load document)
-  myIsInitialized = 
+  myIsInitialized =
     myLab.FindAttribute(TDataStd_IntegerArray::GetID(), myArray) == Standard_True;
 }

@@ -26,7 +26,7 @@
 #include <cfloat>
 
 #ifndef DBL_MAX
-#define DBL_MAX 1.7976931348623158e+308 
+#define DBL_MAX 1.7976931348623158e+308
 #endif
 #ifdef _DEBUG
 #include <iostream>

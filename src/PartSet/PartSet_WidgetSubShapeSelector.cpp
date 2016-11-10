@@ -167,10 +167,10 @@ bool PartSet_WidgetSubShapeSelector::setSelection(
       FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObject);
       std::list<AttributePtr> a2DPointAttributes = aBaseFeature->data()->attributes(
                                                         GeomDataAPI_Point2D::typeId());
-      std::list<AttributePtr>::const_iterator anIt = a2DPointAttributes.begin(), 
+      std::list<AttributePtr>::const_iterator anIt = a2DPointAttributes.begin(),
                                               aLast = a2DPointAttributes.end();
       for (; anIt != aLast; anIt++) {
-        std::shared_ptr<GeomDataAPI_Point2D> anAttributePoint = 
+        std::shared_ptr<GeomDataAPI_Point2D> anAttributePoint =
                                       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
         std::shared_ptr<GeomAPI_Pnt2d> aPoint2D = anAttributePoint->pnt();
         std::shared_ptr<GeomAPI_Pnt> aPoint3D = PartSet_Tools::convertTo3D(aPoint2D->x(),
@@ -183,7 +183,7 @@ bool PartSet_WidgetSubShapeSelector::setSelection(
 
       /// find the points in coincident features
       PntToAttributesMap aRefAttributes = myCashedReferences[aBaseObject];
-      PntToAttributesMap::const_iterator 
+      PntToAttributesMap::const_iterator
         aRIt = aRefAttributes.begin(), aRLast = aRefAttributes.end();
       for (; aRIt != aRLast; aRIt++) {
         std::shared_ptr<GeomDataAPI_Point2D> anAttribute = aRIt->first;

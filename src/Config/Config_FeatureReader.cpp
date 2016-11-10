@@ -51,7 +51,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
   Events_ID aMenuItemEvent = Events_Loop::eventByName(myEventGenerated);
   if (isNode(theNode, NODE_FEATURE, NULL)) {
     storeAttribute(theNode, _ID);
-    std::shared_ptr<Config_FeatureMessage> 
+    std::shared_ptr<Config_FeatureMessage>
       aMessage(new Config_FeatureMessage(aMenuItemEvent, this));
     fillFeature(theNode, aMessage);
     myFeatures.push_back(getProperty(theNode, _ID));
@@ -89,7 +89,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
             aSwitchNode = hasParentRecursive(aCaseNode, WDG_TOOLBOX, NULL);
           }
           if (!xmlStrcmp(aName, (const xmlChar *) WDG_OPTIONALBOX)) {
-            /// the box is optional, attribute is in case 
+            /// the box is optional, attribute is in case
             /// if the optional attribute value is not empty
             aSwitchNode = aCaseNode;
           }
@@ -97,7 +97,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
             aSwitchNodeID = getProperty(aSwitchNode, _ID);
 
           aCases.push_back(std::make_pair(aSwitchNodeID, aCaseNodeID));
-          aCaseNode = hasParentRecursive(aSwitchNode, WDG_SWITCH_CASE, 
+          aCaseNode = hasParentRecursive(aSwitchNode, WDG_SWITCH_CASE,
                                          WDG_TOOLBOX_BOX, WDG_OPTIONALBOX, NULL);
         }
         aMessage->setCases(aCases);
@@ -126,7 +126,7 @@ bool Config_FeatureReader::processChildren(xmlNodePtr theNode)
 {
   bool result = isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NULL);
   if(!result && myIsProcessWidgets) {
-    result = isNode(theNode, NODE_FEATURE, 
+    result = isNode(theNode, NODE_FEATURE,
                              WDG_GROUP, WDG_OPTIONALBOX,
                              WDG_TOOLBOX, WDG_TOOLBOX_BOX,
                              WDG_SWITCH, WDG_SWITCH_CASE, NULL);
@@ -150,7 +150,7 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
     //Internal feature has no visual representation.
     return;
   }
-  
+
   outFeatureMessage->setText(getProperty(theFeatureNode, FEATURE_TEXT));
   outFeatureMessage->setTooltip(getProperty(theFeatureNode, FEATURE_TOOLTIP));
   outFeatureMessage->setIcon(getProperty(theFeatureNode, FEATURE_ICON));

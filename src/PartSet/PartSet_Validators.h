@@ -23,7 +23,7 @@
 class PartSet_DistanceSelection : public ModuleBase_SelectionValidator
 {
 public:
-  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, 
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection,
                                       ModuleBase_Operation* theOperation) const;
 };
 
@@ -32,7 +32,7 @@ public:
 class PartSet_LengthSelection : public ModuleBase_SelectionValidator
 {
 public:
-  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, 
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection,
                                       ModuleBase_Operation* theOperation) const;
 };
 
@@ -41,7 +41,7 @@ public:
 class PartSet_PerpendicularSelection : public ModuleBase_SelectionValidator
 {
 public:
-  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection, 
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection,
                                       ModuleBase_Operation* theOperation) const;
 };
 
@@ -172,7 +172,7 @@ class PartSet_DifferentObjectsValidator : public ModelAPI_AttributeValidator
 private:
   //! Returns error message for the error type
   //! \param theType a type of error
-  //! \param thEqualObjectInfo an 
+  //! \param thEqualObjectInfo an
   std::string errorMessage(const PartSet_DifferentObjectsValidator::ErrorType& theType,
                            const std::string& thEqualObject, const std::string& theFirstAttribute,
                            const std::string& theSecondAttribute) const;

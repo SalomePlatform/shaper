@@ -39,7 +39,7 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
 std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
     double theDX, double theDY, double theDZ)
 {
-  
+
   const gp_Pnt& aStart = gp_Pnt(0, 0, 0);
   const gp_Pnt& anEnd = gp_Pnt(theDX, theDY, theDZ);
 
@@ -68,7 +68,7 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::cylinderAxis(
   Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace, aLoc);
   if (aSurf.IsNull())
     return aResult;
-  Handle(Geom_RectangularTrimmedSurface) aTrimmed = 
+  Handle(Geom_RectangularTrimmedSurface) aTrimmed =
     Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurf);
   if (!aTrimmed.IsNull())
     aSurf = aTrimmed->BasisSurface();
@@ -86,7 +86,7 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::cylinderAxis(
   for(int aX = 0; aX < 2; aX++) {
     for(int aY = 0; aY < 2; aY++) {
       for(int aZ = 0; aZ < 2; aZ++) {
-        gp_XYZ aBoxVertex(aX == 0 ? aBoxMin.X() : aBoxMax.X(), 
+        gp_XYZ aBoxVertex(aX == 0 ? aBoxMin.X() : aBoxMax.X(),
           aY == 0 ? aBoxMin.Y() : aBoxMax.Y(), aZ == 0 ? aBoxMin.Z() : aBoxMax.Z());
         gp_XYZ aVec(aBoxVertex - anAxis.Location().XYZ());
         double aProjParam = aVec.Dot(anAxis.Direction().XYZ());
@@ -117,7 +117,7 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::cylinderAxis(
   gp_Pnt anEnd(anAxis.Location().XYZ() - anAxis.Direction().XYZ() * 100.);
   anEnd.Transform(aLoc.Transformation());
   */
-  
+
   BRepBuilderAPI_MakeEdge anEdgeBuilder(aStart, anEnd);
   std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
   TopoDS_Edge anEdge = anEdgeBuilder.Edge();

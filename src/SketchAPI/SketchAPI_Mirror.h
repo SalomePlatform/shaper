@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 // Name   : SketchAPI_Mirror.h
-// Purpose: 
+// Purpose:
 //
 // History:
 // 16/06/16 - Sergey POKHODENKO - Creation of the file
@@ -41,13 +41,13 @@ public:
   virtual ~SketchAPI_Mirror();
 
   INTERFACE_4(SketchPlugin_ConstraintMirror::ID(),
-              mirrorLine, SketchPlugin_ConstraintMirror::ENTITY_A(), 
+              mirrorLine, SketchPlugin_ConstraintMirror::ENTITY_A(),
               ModelAPI_AttributeRefAttr, /** Mirror line */,
-              mirrorList, SketchPlugin_ConstraintMirror::MIRROR_LIST_ID(), 
+              mirrorList, SketchPlugin_ConstraintMirror::MIRROR_LIST_ID(),
               ModelAPI_AttributeRefList, /** Mirror list */,
-              referenceObjects, SketchPlugin_ConstraintMirror::ENTITY_B(), 
+              referenceObjects, SketchPlugin_ConstraintMirror::ENTITY_B(),
               ModelAPI_AttributeRefList, /** Reference objects */,
-              mirroredObjects, SketchPlugin_ConstraintMirror::ENTITY_C(), 
+              mirroredObjects, SketchPlugin_ConstraintMirror::ENTITY_C(),
               ModelAPI_AttributeRefList, /** Mirrored objects */
   )
 

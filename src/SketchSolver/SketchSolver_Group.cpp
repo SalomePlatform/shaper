@@ -389,12 +389,12 @@ bool SketchSolver_Group::resolveConstraints()
       return false;
     }
     // solution succeeded, store results into correspondent attributes
-    if (aResult == STATUS_OK || aResult == STATUS_EMPTYSET) {  
+    if (aResult == STATUS_OK || aResult == STATUS_EMPTYSET) {
       myStorage->setNeedToResolve(false);
       myStorage->refresh();
       updateMultiConstraints(myConstraints);
       // multi-constraints updated some parameters, need to store them
-      if (myStorage->isNeedToResolve()) 
+      if (myStorage->isNeedToResolve())
         resolveConstraints();
 
       if (myPrevResult != STATUS_OK || myPrevResult == STATUS_UNKNOWN) {
@@ -411,8 +411,8 @@ bool SketchSolver_Group::resolveConstraints()
         // the error message should be changed before sending the message
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())
           ->setValue(SketchSolver_Error::CONSTRAINTS());
-        if (myPrevResult != aResult || 
-            myPrevResult == STATUS_UNKNOWN || 
+        if (myPrevResult != aResult ||
+            myPrevResult == STATUS_UNKNOWN ||
             myPrevResult == STATUS_FAILED) {
           // Obtain list of conflicting constraints
           std::set<ObjectPtr> aConflicting = myStorage->getConflictingConstraints(mySketchSolver);
@@ -489,7 +489,7 @@ void SketchSolver_Group::splitGroup(std::list<SketchSolver_Group*>& theCuts)
   // New storage will be used in trimmed way to store the list of constraint interacted together.
   StoragePtr aNewStorage = SketchSolver_Manager::instance()->builder()->createStorage(getId());
   // empty vector to avoid creation of solver's constraints
-  std::list<ConstraintWrapperPtr> aDummyVec; 
+  std::list<ConstraintWrapperPtr> aDummyVec;
 
   // Obtain constraints, which should be separated
   std::list<ConstraintPtr> anUnusedConstraints;
@@ -501,7 +501,7 @@ void SketchSolver_Group::splitGroup(std::list<SketchSolver_Group*>& theCuts)
       anUnusedConstraints.push_back(aCIter->first);
   }
 
-  // Check the unused constraints once again, 
+  // Check the unused constraints once again,
   // because they may become interacted with new storage since adding constraints
   std::list<ConstraintPtr>::iterator aUnuseIt = anUnusedConstraints.begin();
   while (aUnuseIt != anUnusedConstraints.end()) {
@@ -684,7 +684,7 @@ static double featureToVal(FeaturePtr theFeature)
         aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
     if (anAttrA && anAttrB && (anAttrA->isObject() || anAttrB->isObject()))
       // point-on-line and point-on-circle should go before points coincidence constraint
-      return 2.0; 
+      return 2.0;
     return 2.5;
   }
   if (anID == SketchPlugin_ConstraintDistance::ID() ||
@@ -727,12 +727,12 @@ std::list<FeaturePtr> SketchSolver_Group::
   std::set<ObjectPtr>::const_iterator anObjIter = theObjects.begin();
   for (; anObjIter != theObjects.end(); ++anObjIter) {
     // Operate sketch itself and SketchPlugin features only.
-    // Also, the Fillet and Split need to be skipped, 
+    // Also, the Fillet and Split need to be skipped,
     // because there are several separated constraints composing it.
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
     if (!aFeature)
       continue;
-    std::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
         std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
     if ((aFeature->getKind() != SketchPlugin_Sketch::ID() && !aSketchFeature) ||
         aFeature->getKind() == SketchPlugin_ConstraintFillet::ID() ||

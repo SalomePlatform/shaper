@@ -94,7 +94,7 @@ protected:
    *  \return \c true, if groups are resolved, and features should be updated 
    *  (send the Update event)
    */
-  bool resolveConstraints(const std::list<SketchSolver_Group*>& theGroups = 
+  bool resolveConstraints(const std::list<SketchSolver_Group*>& theGroups =
     std::list<SketchSolver_Group*>());
 
 private:

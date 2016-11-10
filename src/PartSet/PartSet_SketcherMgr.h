@@ -204,7 +204,7 @@ public:
   /// \param theOperation an operation
   bool canChangeCursor(ModuleBase_Operation* theOperation) const;
 
-  /// Returns state of constraints showing flag 
+  /// Returns state of constraints showing flag
   const QMap<PartSet_Tools::ConstraintVisibleState, bool>& showConstraintStates();
 
   /// Returns true if the object is a current sketch sub feature of a result of the feature
@@ -213,7 +213,7 @@ public:
   bool isObjectOfSketch(const ObjectPtr& theObject) const;
 
   /// Saves the current selection in the viewer into an internal container
-  /// It obtains the selected attributes. 
+  /// It obtains the selected attributes.
   /// The highlighted objects can be processes as the selected ones
   /// \param theHighlightedOnly a boolean flag
   void storeSelection(const bool theHighlightedOnly = false);
@@ -285,7 +285,7 @@ private slots:
   void onLeaveViewPort();
   /// Listens to the value changed signal and display the current operation feature
   void onBeforeValuesChangedInPropertyPanel();
-  /// Listens to the signal about the modification of the values 
+  /// Listens to the signal about the modification of the values
   /// have been done in the property panel
   void onAfterValuesChangedInPropertyPanel();
 
@@ -303,9 +303,9 @@ private:
   /// Launches the operation from current highlighting
   void launchEditing();
 
-  /// Converts mouse position to 2d coordinates. 
+  /// Converts mouse position to 2d coordinates.
   /// Member myCurrentSketch has to be correctly defined
-  void get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent, 
+  void get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent,
                   Point& thePoint);
 
   /// Show distance value editor if it is a distance operation and all attribute references
@@ -318,7 +318,7 @@ private:
   typedef QMap<FeaturePtr, std::pair<std::set<AttributePtr>, std::set<ResultPtr> > >
                                                                        FeatureToSelectionMap;
 
-  /// Applyes the current selection to the object in the workshop viewer 
+  /// Applyes the current selection to the object in the workshop viewer
   /// It includes the selection in all modes of activation, even local context - vertexes, edges
   /// It gets all results of the feature, find an AIS object in the viewer and takes all BRep
   /// selection owners. If the owner is vertex, the corresponded attribute is seached in
@@ -337,7 +337,7 @@ private:
                                   SelectMgr_IndexedMapOfOwner& anOwnersToSelect);
 
   /// Returns true if the created feature is visible
-  /// \param 
+  /// \param
   bool isVisibleCreatedFeature() const;
 
   /// Returns a current operation
@@ -349,7 +349,7 @@ private:
 
   /// Erase or display the feature of the current operation. If the mouse over the active view or
   /// a current value is changed by property panel, the feature is displayed otherwise it is hidden
-  /// \param theOperation an operation which feature is to be displayed, 
+  /// \param theOperation an operation which feature is to be displayed,
   ///                     it is nested create operation
   /// \param isToDisplay a flag about the display or erase the feature
   void visualizeFeature(const FeaturePtr& theFeature, const bool isEditOperation,
@@ -373,7 +373,7 @@ private:
   bool myDragDone;
   bool myIsMouseOverWindow; /// the state that the mouse over the view
   /// the state whether the over view state is processed by mouseMove method
-  bool myIsMouseOverViewProcessed; 
+  bool myIsMouseOverViewProcessed;
   bool myIsPopupMenuActive; /// the state of the popup menu is shown
   Point myCurrentPoint;
   //Point myClickedPoint;

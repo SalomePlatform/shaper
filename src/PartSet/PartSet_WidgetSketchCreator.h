@@ -42,7 +42,7 @@ public:
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
-  /// Set focus to the first control of the current widget. 
+  /// Set focus to the first control of the current widget.
   /// The focus policy of the control is checked.
   /// If the widget has the NonFocus focus policy, it is skipped.
   /// \return the state whether the widget can accept the focus

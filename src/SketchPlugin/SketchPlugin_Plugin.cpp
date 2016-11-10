@@ -58,7 +58,7 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("SketchPlugin_DistanceAttr",
-                              new SketchPlugin_DistanceAttrValidator);  
+                              new SketchPlugin_DistanceAttrValidator);
   aFactory->registerValidator("SketchPlugin_ExternalValidator",
                               new SketchPlugin_ExternalValidator);
   aFactory->registerValidator("SketchPlugin_TangentAttr",
@@ -90,20 +90,20 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
-  
-  Config_PropManager::registerProp("Visualization", "sketch_entity_color", 
+
+  Config_PropManager::registerProp("Visualization", "sketch_entity_color",
                                    "Sketch entity color",
                                    Config_Prop::Color, SKETCH_ENTITY_COLOR);
 
-  Config_PropManager::registerProp("Visualization", "sketch_external_color", 
+  Config_PropManager::registerProp("Visualization", "sketch_external_color",
                                    "Sketch external entity color",
                                    Config_Prop::Color, SKETCH_EXTERNAL_COLOR);
 
-  Config_PropManager::registerProp("Visualization", "sketch_auxiliary_color", 
+  Config_PropManager::registerProp("Visualization", "sketch_auxiliary_color",
                                    "Sketch auxiliary entity color",
                                    Config_Prop::Color, SKETCH_AUXILIARY_COLOR);
 
-  Config_PropManager::registerProp("Visualization", "sketch_dimension_color", 
+  Config_PropManager::registerProp("Visualization", "sketch_dimension_color",
                                    "Sketch dimension color",
                                    Config_Prop::Color, SKETCH_DIMENSION_COLOR);
 

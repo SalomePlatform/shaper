@@ -62,7 +62,7 @@ public:
   /// \param theGroup   [in]  id of the group where the feature should be placed
   /// \param theForce   [in]  forced feature creation
   /// \return \c true if the feature has been created or updated
-  SKETCHSOLVER_EXPORT bool update(FeaturePtr theFeature, 
+  SKETCHSOLVER_EXPORT bool update(FeaturePtr theFeature,
                                   const GroupID& theGroup = GID_UNKNOWN, bool theForce = false);
 
   /// \brief Convert attribute to the form applicable for specific solver and map it
@@ -70,7 +70,7 @@ public:
   /// \param theGroup     [in]  id of the group where the feature should be placed
   /// \param theForce     [in]  forced feature creation
   /// \return \c true if the attribute has been created or updated
-  SKETCHSOLVER_EXPORT bool update(AttributePtr theAttribute, 
+  SKETCHSOLVER_EXPORT bool update(AttributePtr theAttribute,
                                   const GroupID& theGroup = GID_UNKNOWN, bool theForce = false);
 
   /// \brief Returns constraint related to corresponding constraint
@@ -169,7 +169,7 @@ protected:
     void addEntity(FeaturePtr       theFeature,
                    EntityWrapperPtr theSolverEntity);
 
-  /// \brief Change mapping attribute of a feature and the entity 
+  /// \brief Change mapping attribute of a feature and the entity
   /// applicable for corresponding solver.
   /// \param theAttribute    [in]  original attribute
   /// \param theSolverEntity [in]  solver's entity, created outside
@@ -235,7 +235,7 @@ protected:
   std::map<AttributePtr, EntityWrapperPtr>                  myAttributeMap;
 
   /// lists of coincident points (first is a master point, second is a set of slaves)
-  CoincidentPointsMap myCoincidentPoints; 
+  CoincidentPointsMap myCoincidentPoints;
 
   // to be able to update entities from constraints
   friend class SketchSolver_ConstraintDistance;

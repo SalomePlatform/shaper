@@ -33,7 +33,7 @@ public:
   /// \brief Creates vertex by edge and distance on it.
   /// \param[in] theEdge edge.
   /// \param[in] theValue distance value.
-  /// \param[in] theIsPercent if true theValue will be treated 
+  /// \param[in] theIsPercent if true theValue will be treated
   ///                         as a percentage of theEdge total length.
   /// \param[in] theIsReverse if true the distance will be measured from the edge end point.
   /// \return created vertex.
@@ -62,7 +62,7 @@ public:
   /// \param[in] theEdge linear edge.
   /// \param[in] theFace planar face.
   /// \return created vertex.
-  static std::shared_ptr<GeomAPI_Vertex> 
+  static std::shared_ptr<GeomAPI_Vertex>
     vertexByIntersection(const std::shared_ptr<GeomAPI_Edge> theEdge,
                          const std::shared_ptr<GeomAPI_Face> theFace);
 

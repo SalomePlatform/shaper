@@ -79,13 +79,13 @@ void Model_ResultCompSolid::colorConfigInfo(std::string& theSection, std::string
   theDefault = DEFAULT_COLOR();
 }
 
-bool Model_ResultCompSolid::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, 
+bool Model_ResultCompSolid::setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
                                         const bool theFlag)
 {
   bool aChanged = ModelAPI_ResultBody::setDisabled(theThis, theFlag);
   if (aChanged) { // state is changed, so modifications are needed
     myBuilder->evolutionToSelection(theFlag);
-    updateSubs(shape()); // to set disabled/enabled 
+    updateSubs(shape()); // to set disabled/enabled
   }
   return aChanged;
 }
@@ -113,7 +113,7 @@ bool Model_ResultCompSolid::isConcealed()
         if (aResult) { // hidden unit must be redisplayed (hidden)
           ModelAPI_EventCreator::get()->sendDeleted(document(), (*aSubIter)->groupName());
           // redisplay for the viewer (it must be disappeared also)
-          static Events_ID EVENT_DISP = 
+          static Events_ID EVENT_DISP =
             Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
           ModelAPI_EventCreator::get()->sendUpdated(*aSubIter, EVENT_DISP);
         } else { // was not concealed become concealed => delete event
@@ -135,7 +135,7 @@ void Model_ResultCompSolid::setIsConcealed(const bool theValue)
         if (theValue) { // hidden unit must be redisplayed (hidden)
           ModelAPI_EventCreator::get()->sendDeleted(document(), (*aSubIter)->groupName());
           // redisplay for the viewer (it must be disappeared also)
-          static Events_ID EVENT_DISP = 
+          static Events_ID EVENT_DISP =
             Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
           ModelAPI_EventCreator::get()->sendUpdated(*aSubIter, EVENT_DISP);
         } else { // was not concealed become concealed => delete event

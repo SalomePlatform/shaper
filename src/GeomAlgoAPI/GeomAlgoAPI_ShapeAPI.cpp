@@ -22,13 +22,13 @@ namespace GeomAlgoAPI_ShapeAPI
     const double theDz) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Box aBoxAlgo(theDx,theDy,theDz);
-    
+
     if (!aBoxAlgo.check()) {
       throw GeomAlgoAPI_Exception(aBoxAlgo.getError());
     }
-    
+
     aBoxAlgo.build();
-    
+
     if(!aBoxAlgo.isDone()) {
       throw GeomAlgoAPI_Exception(aBoxAlgo.getError());
     }
@@ -37,20 +37,20 @@ namespace GeomAlgoAPI_ShapeAPI
     }
     return aBoxAlgo.shape();
   }
-  
+
   //======================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeBox(
     std::shared_ptr<GeomAPI_Pnt> theFirstPoint,
     std::shared_ptr<GeomAPI_Pnt> theSecondPoint) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_BoxPoints aBoxAlgo(theFirstPoint, theSecondPoint);
-    
+
     if (!aBoxAlgo.check()) {
       throw GeomAlgoAPI_Exception(aBoxAlgo.getError());
     }
-    
+
     aBoxAlgo.build();
-    
+
     if(!aBoxAlgo.isDone()) {
       throw GeomAlgoAPI_Exception(aBoxAlgo.getError());
     }
