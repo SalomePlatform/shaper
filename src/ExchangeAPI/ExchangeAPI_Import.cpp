@@ -81,7 +81,6 @@ ImportPtr addImport(
     const std::shared_ptr<ModelAPI_Document> & thePart,
     const std::string & theFilePath)
 {
-  // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ExchangeAPI_Import::ID());
   return ImportPtr(new ExchangeAPI_Import(aFeature, theFilePath));
 }

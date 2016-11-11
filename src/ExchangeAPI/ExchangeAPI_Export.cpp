@@ -16,7 +16,6 @@ void exportToFile(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const std::list<ModelHighAPI_Selection> & theSelectionList,
                   const std::string & theFileFormat)
 {
-  // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(ExchangePlugin_ExportFeature::ID());
   fillAttribute("Regular", aFeature->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID()));
@@ -32,7 +31,6 @@ void exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
                  const std::string & theAuthor,
                  const std::string & theGeometryName)
 {
-  // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(ExchangePlugin_ExportFeature::ID());
   fillAttribute("XAO", aFeature->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID()));

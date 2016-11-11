@@ -81,7 +81,6 @@ void ModelHighAPI_Interface::setName(const std::string& theName)
 
 std::list<ModelHighAPI_Selection> ModelHighAPI_Interface::result() const
 {
-  // TODO(spo): should I use more common function for the whole model to prepare results?
   const_cast<ModelHighAPI_Interface*>(this)->execute();
 
   std::list<ModelHighAPI_Selection> aSelectionList;

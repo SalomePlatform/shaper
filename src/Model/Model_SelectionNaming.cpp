@@ -252,15 +252,20 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
       {
         TopTools_IndexedDataMapOfShapeListOfShape aMap;
         TopExp::MapShapesAndAncestors(aContext, TopAbs_VERTEX, TopAbs_FACE, aMap);
-        const TopTools_ListOfShape& aList2  = aMap.FindFromKey(aSubShape);
         TopTools_ListOfShape aList;
         TopTools_MapOfShape aFMap;
-        // fix is below
-        TopTools_ListIteratorOfListOfShape itl2(aList2);
-        for (int i = 1;itl2.More();itl2.Next(),i++) {
-          if(aFMap.Add(itl2.Value()))
-            aList.Append(itl2.Value());
-        }
+        // simetimes when group is moved in history, naming may be badly updated, so
+        // avoid crash in FindFromKey (issue 1842)
+        if (aMap.Contains(aSubShape)) {
+          const TopTools_ListOfShape& aList2  = aMap.FindFromKey(aSubShape);
+          // fix is below
+          TopTools_ListIteratorOfListOfShape itl2(aList2);
+          for (int i = 1;itl2.More();itl2.Next(),i++) {
+            if(aFMap.Add(itl2.Value()))
+              aList.Append(itl2.Value());
+          }
+        } else
+          break;
         int n = aList.Extent();
         bool isByFaces = n >= 3;
         if(!isByFaces) { // open topology case or Compound case => via edges

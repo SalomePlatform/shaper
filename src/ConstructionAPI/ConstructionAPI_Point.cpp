@@ -157,7 +157,6 @@ PointPtr addPoint(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Double& theY,
                   const ModelHighAPI_Double& theZ)
 {
-  // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Point::ID());
   return PointPtr(new ConstructionAPI_Point(aFeature, theX, theY, theZ));
 }

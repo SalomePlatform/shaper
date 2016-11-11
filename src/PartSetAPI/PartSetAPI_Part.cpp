@@ -42,7 +42,6 @@ void PartSetAPI_Part::dump(ModelHighAPI_Dumper& theDumper) const
 //--------------------------------------------------------------------------------------
 PartPtr addPart(const std::shared_ptr<ModelAPI_Document> & thePart)
 {
-  // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(PartSetAPI_Part::ID());
   aFeature->execute();
   return PartPtr(new PartSetAPI_Part(aFeature));
@@ -50,7 +49,6 @@ PartPtr addPart(const std::shared_ptr<ModelAPI_Document> & thePart)
 
 PartPtr duplicatePart(const std::shared_ptr<ModelAPI_Document> & thePart)
 {
-  // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(PartSetPlugin_Duplicate::ID());
   aFeature->execute();
   return PartPtr(new PartSetAPI_Part(aFeature));
@@ -58,7 +56,6 @@ PartPtr duplicatePart(const std::shared_ptr<ModelAPI_Document> & thePart)
 
 void removePart(const std::shared_ptr<ModelAPI_Document> & thePart)
 {
-  // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(PartSetPlugin_Remove::ID());
   aFeature->execute();
 }

@@ -60,7 +60,6 @@ ParameterPtr addParameter(const std::shared_ptr<ModelAPI_Document> & thePart,
                           const std::string & theExpression,
                           const std::string & theComment)
 {
-  // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ParametersAPI_Parameter::ID());
   return ParameterPtr(new ParametersAPI_Parameter(aFeature, theName, theExpression, theComment));
 }

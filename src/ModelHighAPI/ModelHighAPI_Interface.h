@@ -58,7 +58,6 @@ public:
   MODELHIGHAPI_EXPORT
   void setName(const std::string& theName);
 
-  // TODO(spo): rename to selectAll()
   /// Return all objects of the feature
   MODELHIGHAPI_EXPORT
   virtual std::list<ModelHighAPI_Selection> result() const;

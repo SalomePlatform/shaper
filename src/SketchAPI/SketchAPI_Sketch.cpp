@@ -124,8 +124,6 @@ void SketchAPI_Sketch::setValue(
     const std::shared_ptr<ModelHighAPI_Interface> & theConstraint,
     const ModelHighAPI_Double & theValue)
 {
-  // TODO(spo): check somehow that the feature is a constraint or eliminate
-  // crash if the feature have no real attribute VALUE
   fillAttribute(theValue, theConstraint->feature()->real(SketchPlugin_Constraint::VALUE()));
 
 //  theConstraint->execute();
@@ -156,7 +154,6 @@ std::list<ModelHighAPI_Selection> SketchAPI_Sketch::selectFace() const
 SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
                     const std::shared_ptr<GeomAPI_Ax3> & thePlane)
 {
-  // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(SketchAPI_Sketch::ID());
   return SketchPtr(new SketchAPI_Sketch(aFeature, thePlane));
 }
@@ -164,7 +161,6 @@ SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
 SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
                     const ModelHighAPI_Selection & theExternal)
 {
-  // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(SketchAPI_Sketch::ID());
   return SketchPtr(new SketchAPI_Sketch(aFeature, theExternal));
 }
@@ -172,7 +168,6 @@ SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
 SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
                     const std::string & theExternalName)
 {
-  // TODO(spo): check that thePart is not empty
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(SketchAPI_Sketch::ID());
   return SketchPtr(
     new SketchAPI_Sketch(aFeature, ModelHighAPI_Selection("FACE", theExternalName)));
