@@ -17,8 +17,6 @@
 
 #include <memory>
 
-using namespace std;
-
 // the only created instance of this plugin
 static ExchangePlugin_Plugin* MY_EXCHANGE_INSTANCE = new ExchangePlugin_Plugin();
 
@@ -34,7 +32,7 @@ ExchangePlugin_Plugin::ExchangePlugin_Plugin()
                               new ExchangePlugin_ExportFormatValidator);
 }
 
-FeaturePtr ExchangePlugin_Plugin::createFeature(string theFeatureID)
+FeaturePtr ExchangePlugin_Plugin::createFeature(std::string theFeatureID)
 {
   if (theFeatureID == ExchangePlugin_ImportFeature::ID()) {
     return FeaturePtr(new ExchangePlugin_ImportFeature);

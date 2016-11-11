@@ -14,8 +14,6 @@
 #include <iostream>
 #endif
 
-using namespace std;
-
 // the only created instance of this plugin
 static PartSetPlugin_Plugin* MY_PARTSET_INSTANCE = new PartSetPlugin_Plugin();
 
@@ -25,7 +23,7 @@ PartSetPlugin_Plugin::PartSetPlugin_Plugin()
   ModelAPI_Session::get()->registerPlugin(this);
 }
 
-FeaturePtr PartSetPlugin_Plugin::createFeature(string theFeatureID)
+FeaturePtr PartSetPlugin_Plugin::createFeature(std::string theFeatureID)
 {
   if (theFeatureID == PartSetPlugin_Part::ID()) {
     return FeaturePtr(new PartSetPlugin_Part);

@@ -13,7 +13,6 @@
   #include "FeaturesAPI_Boolean.h"
   #include "FeaturesAPI_Extrusion.h"
   #include "FeaturesAPI_ExtrusionBoolean.h"
-  #include "FeaturesAPI_Group.h"
   #include "FeaturesAPI_Intersection.h"
   #include "FeaturesAPI_Partition.h"
   #include "FeaturesAPI_Pipe.h"

@@ -16,8 +16,6 @@
 #include <TDataStd_AsciiString.hxx>
 #include <TDF_Tool.hxx>
 
-using namespace std;
-
 void Model_AttributeReference::setValue(ObjectPtr theObject)
 {
   // now allow to deselect in this attribute: extrusion from/to

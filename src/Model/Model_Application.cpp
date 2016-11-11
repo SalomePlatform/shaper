@@ -19,8 +19,6 @@ static bool FirstCall = true;
 IMPLEMENT_STANDARD_HANDLE(Model_Application, TDocStd_Application)
 IMPLEMENT_STANDARD_RTTIEXT(Model_Application, TDocStd_Application)
 
-using namespace std;
-
 static Handle_Model_Application TheApplication = new Model_Application;
 
 //=======================================================================

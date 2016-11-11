@@ -12,8 +12,6 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Events.h>
 
-using namespace std;
-
 PartSetPlugin_Part::PartSetPlugin_Part()
 {
 }

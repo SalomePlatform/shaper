@@ -7,7 +7,6 @@ SET(PROJECT_HEADERS
   FeaturesAPI_Boolean.h
   FeaturesAPI_Extrusion.h
   FeaturesAPI_ExtrusionBoolean.h
-  FeaturesAPI_Group.h
   FeaturesAPI_Intersection.h
   FeaturesAPI_Partition.h
   FeaturesAPI_Pipe.h
@@ -25,7 +24,6 @@ SET(PROJECT_SOURCES
   FeaturesAPI_Boolean.cpp
   FeaturesAPI_Extrusion.cpp
   FeaturesAPI_ExtrusionBoolean.cpp
-  FeaturesAPI_Group.cpp
   FeaturesAPI_Intersection.cpp
   FeaturesAPI_Partition.cpp
   FeaturesAPI_Pipe.cpp
@@ -58,8 +56,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/FeaturesPlugin
 )
 
-#TODO(spo): is ${CAS_DEFINITIONS} necessary?
-ADD_DEFINITIONS(-DFEATURESAPI_EXPORTS ${CAS_DEFINITIONS})
+ADD_DEFINITIONS(-DFEATURESAPI_EXPORTS)
 ADD_LIBRARY(FeaturesAPI SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
 TARGET_LINK_LIBRARIES(FeaturesAPI ${PROJECT_LIBRARIES})
 
@@ -70,7 +67,6 @@ INCLUDE(PythonAPI)
 SET_SOURCE_FILES_PROPERTIES(FeaturesAPI.i PROPERTIES CPLUSPLUS ON)
 SET_SOURCE_FILES_PROPERTIES(FeaturesAPI.i PROPERTIES SWIG_DEFINITIONS "-shadow")
 
-#TODO(spo): is ModelAPI necessary or it could be received by INTERFACE_ (may require modern CMake)?
 SET(SWIG_LINK_LIBRARIES
   FeaturesAPI
   ModelHighAPI
@@ -94,11 +90,3 @@ ENDIF(WIN32)
 INSTALL(TARGETS _FeaturesAPI DESTINATION ${SHAPER_INSTALL_SWIG})
 INSTALL(TARGETS FeaturesAPI DESTINATION ${SHAPER_INSTALL_BIN})
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/FeaturesAPI.py DESTINATION ${SHAPER_INSTALL_SWIG})
-
-# Tests
-INCLUDE(UnitTest)
-
-ADD_UNIT_TESTS(
-)
-
-# ADD_SUBDIRECTORY (Test)

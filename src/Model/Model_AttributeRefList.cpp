@@ -13,8 +13,6 @@
 #include <TDF_Tool.hxx>
 #include <TDataStd_ListIteratorOfListOfExtendedString.hxx>
 
-using namespace std;
-
 void Model_AttributeRefList::append(ObjectPtr theObject)
 {
   if (owner()->document() == theObject->document()) {
@@ -163,7 +161,7 @@ ObjectPtr Model_AttributeRefList::iteratedObject(TDF_ListIteratorOfLabelList& th
   return anObj;
 }
 
-list<ObjectPtr> Model_AttributeRefList::list()
+std::list<ObjectPtr> Model_AttributeRefList::list()
 {
   std::list<ObjectPtr> aResult;
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(

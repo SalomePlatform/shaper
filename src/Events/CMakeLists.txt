@@ -12,7 +12,7 @@ SET(PROJECT_HEADERS
     Events_Listener.h
     Events_Loop.h
     Events_LongOp.h
-	Events_InfoMessage.h
+    Events_InfoMessage.h
 )
 
 SET(PROJECT_SOURCES
@@ -21,7 +21,7 @@ SET(PROJECT_SOURCES
     Events_Listener.cpp
     Events_Loop.cpp
     Events_LongOp.cpp
-	Events_InfoMessage.cpp
+    Events_InfoMessage.cpp
 )
 
 ADD_DEFINITIONS(-DEVENTS_EXPORTS)

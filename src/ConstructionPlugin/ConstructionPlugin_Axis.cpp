@@ -31,8 +31,6 @@
 #include <iostream>
 #endif
 
-using namespace std;
-
 static const double defaultAxisSize = 100;
 
 ConstructionPlugin_Axis::ConstructionPlugin_Axis()

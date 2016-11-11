@@ -11,8 +11,6 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 
-using namespace std;
-
 // the only created instance of this plugin
 static ConstructionPlugin_Plugin* MY_CONSTRUCTION_INSTANCE = new ConstructionPlugin_Plugin();
 
@@ -42,7 +40,7 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
                                    Config_Prop::Color, ConstructionPlugin_Plane::DEFAULT_COLOR());
 }
 
-FeaturePtr ConstructionPlugin_Plugin::createFeature(string theFeatureID)
+FeaturePtr ConstructionPlugin_Plugin::createFeature(std::string theFeatureID)
 {
   if (theFeatureID == ConstructionPlugin_Point::ID()) {
     return FeaturePtr(new ConstructionPlugin_Point);

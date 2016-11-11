@@ -12,8 +12,6 @@
 #include <TDF_ListIteratorOfLabelList.hxx>
 #include <TDataStd_ListIteratorOfListOfExtendedString.hxx>
 
-using namespace std;
-
 void Model_AttributeRefAttrList::append(ObjectPtr theObject)
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theObject->data());

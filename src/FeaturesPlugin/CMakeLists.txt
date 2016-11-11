@@ -12,7 +12,6 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Rotation.h
     FeaturesPlugin_Translation.h
     FeaturesPlugin_Boolean.h
-    FeaturesPlugin_Group.h
     FeaturesPlugin_Intersection.h
     FeaturesPlugin_Partition.h
     FeaturesPlugin_Pipe.h
@@ -39,7 +38,6 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Rotation.cpp
     FeaturesPlugin_Translation.cpp
     FeaturesPlugin_Boolean.cpp
-    FeaturesPlugin_Group.cpp
     FeaturesPlugin_Intersection.cpp
     FeaturesPlugin_Partition.cpp
     FeaturesPlugin_Pipe.cpp
@@ -69,7 +67,6 @@ SET(XML_RESOURCES
   rotation_widget.xml
   translation_widget.xml
   boolean_widget.xml
-  group_widget.xml
   recover_widget.xml
   partition_widget.xml
   placement_widget.xml
@@ -128,7 +125,6 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanFill.py
                TestMultiBoolean.py
                TestSerialBoolean.py
-               TestGroup.py
                TestIntersection.py
                TestUnion.py
                TestRemoveSubShapes.py

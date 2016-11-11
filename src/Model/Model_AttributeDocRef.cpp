@@ -9,8 +9,6 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 
-using namespace std;
-
 void Model_AttributeDocRef::setValue(std::shared_ptr<ModelAPI_Document> theDoc)
 {
   if (myID->Get() != theDoc->id()) {

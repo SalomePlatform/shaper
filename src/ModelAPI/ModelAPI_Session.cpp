@@ -37,8 +37,6 @@
 #include <dlfcn.h>
 #endif
 
-using namespace std;
-
 #ifdef _DEBUG
 #include <iostream>
 #endif

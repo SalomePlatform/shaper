@@ -31,8 +31,6 @@
 #include <Events_InfoMessage.h>
 #include <Config_PropManager.h>
 
-using namespace std;
-
 Model_Update MY_UPDATER_INSTANCE;  /// the only one instance initialized on load of the library
 //#define DEB_UPDATE
 
@@ -719,9 +717,9 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
     }
   }
   // update the selection attributes if any
-  list<AttributePtr> aRefs =
+  std::list<AttributePtr> aRefs =
     theFeature->data()->attributes(ModelAPI_AttributeSelection::typeId());
-  list<AttributePtr>::iterator aRefsIter = aRefs.begin();
+  std::list<AttributePtr>::iterator aRefsIter = aRefs.begin();
   for (; aRefsIter != aRefs.end(); aRefsIter++) {
     std::shared_ptr<ModelAPI_AttributeSelection> aSel =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
@@ -900,9 +898,9 @@ void Model_Update::updateSelection(const std::set<std::shared_ptr<ModelAPI_Objec
 {
   std::set<std::shared_ptr<ModelAPI_Object> >::iterator anObj = theObjects.begin();
   for(; anObj != theObjects.end(); anObj++) {
-    list<AttributePtr> aRefs =
+    std::list<AttributePtr> aRefs =
       (*anObj)->data()->attributes(ModelAPI_AttributeSelection::typeId());
-    list<AttributePtr>::iterator aRefsIter = aRefs.begin();
+    std::list<AttributePtr>::iterator aRefsIter = aRefs.begin();
     for (; aRefsIter != aRefs.end(); aRefsIter++) {
       std::shared_ptr<Model_AttributeSelection> aSel =
         std::dynamic_pointer_cast<Model_AttributeSelection>(*aRefsIter);

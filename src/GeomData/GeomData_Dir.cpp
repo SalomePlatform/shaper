@@ -11,8 +11,6 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 
-using namespace std;
-
 void GeomData_Dir::setValue(const double theX, const double theY, const double theZ)
 {
   if (!myIsInitialized || myCoords->Value(0) != theX || myCoords->Value(1) != theY

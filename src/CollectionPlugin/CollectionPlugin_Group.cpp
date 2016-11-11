@@ -1,10 +1,10 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
-// File:        FeaturesPlugin_Group.cpp
+// File:        CollectionPlugin_Group.cpp
 // Created:     08 Oct 2014
 // Author:      Sergey BELASH
 
-#include "FeaturesPlugin_Group.h"
+#include "CollectionPlugin_Group.h"
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -13,20 +13,17 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_ResultGroup.h>
 
-
-using namespace std;
-
-FeaturesPlugin_Group::FeaturesPlugin_Group()
+CollectionPlugin_Group::CollectionPlugin_Group()
 {
 }
 
-void FeaturesPlugin_Group::initAttributes()
+void CollectionPlugin_Group::initAttributes()
 {
-  //data()->addAttribute(FeaturesPlugin_Group::NAME_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(FeaturesPlugin_Group::LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
+  //data()->addAttribute(CollectionPlugin_Group::NAME_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(CollectionPlugin_Group::LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 }
 
-void FeaturesPlugin_Group::execute()
+void CollectionPlugin_Group::execute()
 {
   if (results().empty() || firstResult()->isDisabled()) { // just create result if not exists
     ResultPtr aGroup = document()->createGroup(data());

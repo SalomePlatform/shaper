@@ -15,8 +15,6 @@
 
 #include <IntAna_QuadQuadGeo.hxx>
 
-using namespace std;
-
 GeomAPI_Pln::GeomAPI_Pln(const std::shared_ptr<GeomAPI_Ax3>& theAxis)
 : GeomAPI_Interface(new gp_Ax3(theAxis->impl<gp_Ax3>()))
 {

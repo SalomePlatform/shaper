@@ -39,8 +39,6 @@
 #include <math.h>
 #include <vector>
 
-using namespace std;
-
 SketchPlugin_Sketch::SketchPlugin_Sketch()
 {
 }

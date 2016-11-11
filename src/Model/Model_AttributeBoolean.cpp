@@ -8,8 +8,6 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 
-using namespace std;
-
 void Model_AttributeBoolean::setValue(bool theValue)
 {
   Standard_Boolean aValue = theValue ? Standard_True : Standard_False;

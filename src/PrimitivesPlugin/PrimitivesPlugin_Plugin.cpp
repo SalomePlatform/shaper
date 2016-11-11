@@ -7,16 +7,11 @@
 #include <PrimitivesPlugin_Plugin.h>
 
 #include <PrimitivesPlugin_Box.h>
-
 #include <ModelAPI_Session.h>
 
 #include <string>
-
 #include <memory>
-
 #include <iostream>
-
-using namespace std;
 
 // the only created instance of this plugin
 static PrimitivesPlugin_Plugin* MY_PRIMITIVES_INSTANCE = new PrimitivesPlugin_Plugin();
@@ -27,7 +22,7 @@ PrimitivesPlugin_Plugin::PrimitivesPlugin_Plugin()
   ModelAPI_Session::get()->registerPlugin(this);
 }
 
-FeaturePtr PrimitivesPlugin_Plugin::createFeature(string theFeatureID)
+FeaturePtr PrimitivesPlugin_Plugin::createFeature(std::string theFeatureID)
 {
   if (theFeatureID == PrimitivesPlugin_Box::ID()) {
     return FeaturePtr(new PrimitivesPlugin_Box);

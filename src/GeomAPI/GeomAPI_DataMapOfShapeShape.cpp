@@ -9,8 +9,6 @@
 #include <TopTools_DataMapOfShapeShape.hxx>
 #include <TopTools_DataMapIteratorOfDataMapOfShapeShape.hxx>
 #include <TopoDS_Shape.hxx>
-using namespace std;
-
 
 GeomAPI_DataMapOfShapeShape::GeomAPI_DataMapOfShapeShape()
 : GeomAPI_Interface(new TopTools_DataMapOfShapeShape){}

@@ -21,8 +21,6 @@
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomDataAPI_Point2D.h>
 
-using namespace std;
-
 SketchPlugin_Line::SketchPlugin_Line()
     : SketchPlugin_SketchEntity()
 {}

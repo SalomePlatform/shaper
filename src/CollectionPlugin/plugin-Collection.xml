@@ -1,0 +1,14 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<plugin>
+  <workbench id="Features" document="Part">
+    <group id="Collections">
+      <feature id="Group"
+        title="Group"
+        tooltip="Create named collection of geometry entities"
+        icon="icons/Collection/shape_group.png">
+        <source path="group_widget.xml"/>
+      </feature>
+    </group>
+  </workbench>
+</plugin>

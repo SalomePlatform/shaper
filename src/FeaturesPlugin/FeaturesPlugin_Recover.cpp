@@ -16,8 +16,6 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Tools.h>
 
-using namespace std;
-
 FeaturesPlugin_Recover::FeaturesPlugin_Recover()
 {
 }

@@ -26,31 +26,6 @@ ENDIF()
 # It could be called only once
 FIND_PACKAGE(LibXml2 REQUIRED)
 
-IF(UNIX)
-  IF(CMAKE_COMPILER_IS_GNUCC)
-    #C++11 is not supported on some platforms, disable it
-    MESSAGE(STATUS "Setting -std=c++0x flag for the gcc...")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-
-    #Supporting test coverage checks (gcov) in the DEBUG mode
-    IF(USE_TEST_COVERAGE)
-      INCLUDE(CodeCoverage)
-      MESSAGE(STATUS "Setting flags for gcov support the gcc...")
-      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
-      SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
-      SET(CMAKE_SHARED_LINKER_FLAGS "-lgcov")
-
-      SETUP_TARGET_FOR_COVERAGE(test_coverage  # Name for custom target.
-                                ctest          # Name of the test driver executable that runs the tests.
-                                coverage)      # Name of output directory.
-    ENDIF(USE_TEST_COVERAGE)
-
-    #SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -E")
-    MESSAGE(STATUS "gcc flags are: " ${CMAKE_CXX_FLAGS})
-    MESSAGE(STATUS "linker flags are: " ${CMAKE_SHARED_LINKER_FLAGS})
-  ENDIF(CMAKE_COMPILER_IS_GNUCC)
-ENDIF(UNIX)
-
 IF(${HAVE_SALOME})
     SET(SHAPER_INSTALL_ADDONS bin/salome CACHE INTERNAL "" FORCE)
     SET(SHAPER_INSTALL_BIN lib/salome CACHE INTERNAL "" FORCE)
@@ -63,6 +38,8 @@ IF(${HAVE_SALOME})
     SET(SHAPER_INSTALL_XML_RESOURCES share/salome/resources/shaper CACHE INTERNAL "" FORCE)
     SET(SHAPER_INSTALL_GUI_DOC share/doc/salome/gui/SHAPER CACHE INTERNAL "" FORCE)
     SET(SHAPER_INSTALL_TUI_DOC share/doc/salome/tui/SHAPER CACHE INTERNAL "" FORCE)
+    # without SALOME there is another kind of documentation, separated one
+    ADD_SUBDIRECTORY (doc)
 ELSE(${HAVE_SALOME})
     SET(SHAPER_INSTALL_ADDONS addons CACHE INTERNAL "" FORCE)
     SET(SHAPER_INSTALL_BIN bin CACHE INTERNAL "" FORCE)
@@ -77,9 +54,6 @@ ELSE(${HAVE_SALOME})
     SET(SHAPER_INSTALL_TUI_DOC doc CACHE INTERNAL "" FORCE)
 ENDIF(${HAVE_SALOME})
 
-#IF(CMAKE_BUILD_TYPE MATCHES Release)
-ADD_SUBDIRECTORY (doc)
-#ENDIF(CMAKE_BUILD_TYPE MATCHES Release)
 ADD_SUBDIRECTORY (src/Config)
 ADD_SUBDIRECTORY (src/Events)
 ADD_SUBDIRECTORY (src/Model)
@@ -96,6 +70,7 @@ ADD_SUBDIRECTORY (src/ConstructionPlugin)
 ADD_SUBDIRECTORY (src/BuildPlugin)
 ADD_SUBDIRECTORY (src/PrimitivesPlugin)
 ADD_SUBDIRECTORY (src/FeaturesPlugin)
+ADD_SUBDIRECTORY (src/CollectionPlugin)
 ADD_SUBDIRECTORY (src/SamplePanelPlugin)
 ADD_SUBDIRECTORY (src/SketcherPrs)
 ADD_SUBDIRECTORY (src/SketchPlugin)
@@ -117,6 +92,7 @@ ADD_SUBDIRECTORY (src/ConnectorAPI)
 ADD_SUBDIRECTORY (src/ConstructionAPI)
 ADD_SUBDIRECTORY (src/ExchangeAPI)
 ADD_SUBDIRECTORY (src/FeaturesAPI)
+ADD_SUBDIRECTORY (src/CollectionAPI)
 ADD_SUBDIRECTORY (src/ParametersAPI)
 ADD_SUBDIRECTORY (src/PartSetAPI)
 ADD_SUBDIRECTORY (src/PrimitivesAPI)

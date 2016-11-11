@@ -22,8 +22,6 @@
 #include <TNaming_Iterator.hxx>
 #include <NCollection_List.hxx>
 
-using namespace std;
-
 void Model_AttributeSelectionList::append(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily)

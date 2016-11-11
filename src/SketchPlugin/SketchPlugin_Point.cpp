@@ -18,8 +18,6 @@
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAlgoAPI_PointBuilder.h>
 
-using namespace std;
-
 SketchPlugin_Point::SketchPlugin_Point()
     : SketchPlugin_SketchEntity()
 {

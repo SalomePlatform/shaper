@@ -10,8 +10,6 @@
 #include <string>
 #include <cstring>
 
-using namespace std;
-
 Events_Loop* Events_Loop::loop()
 {
   // initialized on initialization of the application
@@ -22,10 +20,10 @@ Events_Loop* Events_Loop::loop()
 Events_ID Events_Loop::eventByName(const char* theName)
 {
   ///! All events created in this session, uniquely identified by the text and char pointer
-  static map<string, char*> CREATED_EVENTS;
+  static std::map<std::string, char*> CREATED_EVENTS;
   char* aResult;
-  string aName(theName);
-  map<string, char*>::iterator aFound = CREATED_EVENTS.find(aName);
+  std::string aName(theName);
+  std::map<std::string, char*>::iterator aFound = CREATED_EVENTS.find(aName);
   if (aFound == CREATED_EVENTS.end()) {  //not created yet
 #ifdef WIN32
     aResult = _strdup(theName);  // copy to make unique internal pointer
@@ -42,7 +40,8 @@ Events_ID Events_Loop::eventByName(const char* theName)
 void Events_Loop::sendProcessEvent(const std::shared_ptr<Events_Message>& theMessage,
   std::list<Events_Listener*>& theListeners, const bool theFlushedNow)
 {
-  for (list<Events_Listener*>::iterator aL = theListeners.begin(); aL != theListeners.end(); aL++) {
+  std::list<Events_Listener*>::iterator aL = theListeners.begin();
+  for (; aL != theListeners.end(); aL++) {
     if (theFlushedNow && (*aL)->groupMessages()) {
       (*aL)->groupWhileFlush(theMessage);
     } else {
@@ -75,10 +74,10 @@ void Events_Loop::send(const std::shared_ptr<Events_Message>& theMessage, bool i
     }
   }
   // send
-  map<char*, map<void*, list<Events_Listener*> > >::iterator aFindID = myListeners.find(
-      theMessage->eventID().eventText());
+  std::map<char*, std::map<void*, std::list<Events_Listener*> > >::iterator aFindID = 
+    myListeners.find(theMessage->eventID().eventText());
   if (aFindID != myListeners.end()) {
-    map<void*, list<Events_Listener*> >::iterator aFindSender = aFindID->second.find(
+    std::map<void*, std::list<Events_Listener*> >::iterator aFindSender = aFindID->second.find(
         theMessage->sender());
     if (aFindSender != aFindID->second.end()) {
       sendProcessEvent(theMessage, aFindSender->second, isFlushedNow && isGroup);
@@ -99,21 +98,22 @@ void Events_Loop::registerListener(Events_Listener* theListener, const Events_ID
     myImmediateListeners[theID.eventText()] = theListener;
     return;
   }
-  map<char*, map<void*, list<Events_Listener*> > >::iterator aFindID = myListeners.find(
-      theID.eventText());
+  std::map<char*, std::map<void*, std::list<Events_Listener*> > >::iterator aFindID = 
+    myListeners.find(theID.eventText());
   if (aFindID == myListeners.end()) {  // create container associated with ID
-    myListeners[theID.eventText()] = map<void*, list<Events_Listener*> >();
+    myListeners[theID.eventText()] = std::map<void*, std::list<Events_Listener*> >();
     aFindID = myListeners.find(theID.eventText());
   }
 
-  map<void*, list<Events_Listener*> >::iterator aFindSender = aFindID->second.find(theSender);
+  std::map<void*, std::list<Events_Listener*> >::iterator aFindSender = 
+    aFindID->second.find(theSender);
   if (aFindSender == aFindID->second.end()) {  // create container associated with sender
-    aFindID->second[theSender] = list<Events_Listener*>();
+    aFindID->second[theSender] = std::list<Events_Listener*>();
     aFindSender = aFindID->second.find(theSender);
   }
   // check that listener was not registered wit hsuch parameters before
-  list<Events_Listener*>& aListeners = aFindSender->second;
-  for (list<Events_Listener*>::iterator aL = aListeners.begin(); aL != aListeners.end(); aL++)
+  std::list<Events_Listener*>& aListeners = aFindSender->second;
+  for (std::list<Events_Listener*>::iterator aL = aListeners.begin(); aL != aListeners.end(); aL++)
     if (*aL == theListener)
       return;  // avoid duplicates
 
@@ -191,12 +191,13 @@ void Events_Loop::flush(const Events_ID& theID)
       }
     }
     // send accumulated messages to "groupListeners"
-    map<char*, map<void*, list<Events_Listener*> > >::iterator aFindID = myListeners.find(
-      theID.eventText());
+    std::map<char*, std::map<void*, std::list<Events_Listener*> > >::iterator aFindID = 
+      myListeners.find(theID.eventText());
     if (aFindID != myListeners.end()) {
-      map<void*, list<Events_Listener*> >::iterator aFindSender = aFindID->second.begin();
+      std::map<void*, std::list<Events_Listener*> >::iterator aFindSender =
+        aFindID->second.begin();
       for(; aFindSender != aFindID->second.end(); aFindSender++) {
-        list<Events_Listener*>::iterator aListener = aFindSender->second.begin();
+        std::list<Events_Listener*>::iterator aListener = aFindSender->second.begin();
         for(; aListener != aFindSender->second.end(); aListener++) {
           if ((*aListener)->groupMessages()) {
             (*aListener)->flushGrouped(theID);

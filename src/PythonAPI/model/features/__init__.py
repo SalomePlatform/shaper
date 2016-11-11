@@ -7,4 +7,4 @@ from FeaturesAPI import addRevolution, addRevolutionCut, addRevolutionFuse
 from FeaturesAPI import addPipe
 from FeaturesAPI import addCut, addFuse, addCommon, addSmash, addFill
 from FeaturesAPI import addIntersection, addPartition, addUnion, addRemoveSubShapes
-from FeaturesAPI import addGroup, addRecover
+from FeaturesAPI import addRecover

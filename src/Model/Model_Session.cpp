@@ -29,8 +29,6 @@
 #include <TDF_RelocationTable.hxx>
 #include <TDF_ClosureTool.hxx>
 
-using namespace std;
-
 static Model_Session* myImpl = new Model_Session();
 
 // t oredirect all calls to the root document
@@ -144,7 +142,7 @@ std::list<std::string> Model_Session::redoList()
   return ROOT_DOC->redoList();
 }
 
-FeaturePtr Model_Session::createFeature(string theFeatureID, Model_Document* theDocOwner)
+FeaturePtr Model_Session::createFeature(std::string theFeatureID, Model_Document* theDocOwner)
 {
   if (this != myImpl) {
     return myImpl->createFeature(theFeatureID, theDocOwner);
@@ -292,10 +290,10 @@ void Model_Session::setActiveDocument(
 
 std::list<std::shared_ptr<ModelAPI_Document> > Model_Session::allOpenedDocuments()
 {
-  list<std::shared_ptr<ModelAPI_Document> > aResult;
+  std::list<std::shared_ptr<ModelAPI_Document> > aResult;
   aResult.push_back(moduleDocument());
   // add subs recursively
-  list<std::shared_ptr<ModelAPI_Document> >::iterator aDoc = aResult.begin();
+  std::list<std::shared_ptr<ModelAPI_Document> >::iterator aDoc = aResult.begin();
   for(; aDoc != aResult.end(); aDoc++) {
     DocumentPtr anAPIDoc = *aDoc;
     std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(anAPIDoc);

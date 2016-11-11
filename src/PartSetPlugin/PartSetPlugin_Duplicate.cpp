@@ -13,8 +13,6 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Session.h>
 
-using namespace std;
-
 void PartSetPlugin_Duplicate::execute()
 {
   std::shared_ptr<ModelAPI_Session> aPManager = ModelAPI_Session::get();

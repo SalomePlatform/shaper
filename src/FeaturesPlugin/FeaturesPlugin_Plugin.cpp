@@ -6,7 +6,6 @@
 #include <FeaturesPlugin_Extrusion.h>
 #include <FeaturesPlugin_ExtrusionCut.h>
 #include <FeaturesPlugin_ExtrusionFuse.h>
-#include <FeaturesPlugin_Group.h>
 #include <FeaturesPlugin_Intersection.h>
 #include <FeaturesPlugin_Translation.h>
 #include <FeaturesPlugin_Partition.h>
@@ -27,8 +26,6 @@
 #include <string>
 
 #include <memory>
-
-using namespace std;
 
 // the only created instance of this plugin
 static FeaturesPlugin_Plugin* MY_FEATURES_INSTANCE = new FeaturesPlugin_Plugin();
@@ -68,7 +65,7 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
   ModelAPI_Session::get()->registerPlugin(this);
 }
 
-FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
+FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
 {
   if (theFeatureID == FeaturesPlugin_Extrusion::ID()) {
     return FeaturePtr(new FeaturesPlugin_Extrusion);
@@ -80,8 +77,6 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_Translation);
   } else if (theFeatureID == FeaturesPlugin_Boolean::ID()) {
     return FeaturePtr(new FeaturesPlugin_Boolean);
-  } else if (theFeatureID == FeaturesPlugin_Group::ID()) {
-    return FeaturePtr(new FeaturesPlugin_Group);
   } else if (theFeatureID == FeaturesPlugin_Intersection::ID()) {
     return FeaturePtr(new FeaturesPlugin_Intersection);
   } else if (theFeatureID == FeaturesPlugin_Partition::ID()) {

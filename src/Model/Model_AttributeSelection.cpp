@@ -61,7 +61,6 @@
 #include <TopoDS_Iterator.hxx>
 #include <BRep_Builder.hxx>
 
-using namespace std;
 //#define DEB_NAMING 1
 #ifdef DEB_NAMING
 #include <BRepTools.hxx>
@@ -230,8 +229,8 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
           if (selectionLabel().FindAttribute(TDataStd_Name::GetID(), aName)) {
             std::string aSubShapeName(TCollection_AsciiString(aName->Get()).ToCString());
             std::size_t aPartEnd = aSubShapeName.find('/');
-            if (aPartEnd != string::npos && aPartEnd != aSubShapeName.rfind('/')) {
-              string aNameInPart = aSubShapeName.substr(aPartEnd + 1);
+            if (aPartEnd != std::string::npos && aPartEnd != aSubShapeName.rfind('/')) {
+              std::string aNameInPart = aSubShapeName.substr(aPartEnd + 1);
               int anIndex;
               std::string aType; // to reuse already existing selection the type is not needed
               return aPart->shapeInPart(aNameInPart, aType, anIndex);
@@ -957,12 +956,12 @@ void Model_AttributeSelection::selectSubShape(
 
   // check this is Part-name: 2 delimiters in the name
   std::size_t aPartEnd = theSubShapeName.find('/');
-  if (aPartEnd != string::npos && aPartEnd != theSubShapeName.rfind('/')) {
+  if (aPartEnd != std::string::npos && aPartEnd != theSubShapeName.rfind('/')) {
     std::string aPartName = theSubShapeName.substr(0, aPartEnd);
     ObjectPtr aFound = owner()->document()->objectByName(ModelAPI_ResultPart::group(), aPartName);
     if (aFound.get()) { // found such part, so asking it for the name
       ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFound);
-      string aNameInPart = theSubShapeName.substr(aPartEnd + 1);
+      std::string aNameInPart = theSubShapeName.substr(aPartEnd + 1);
       int anIndex;
       std::shared_ptr<GeomAPI_Shape> aSelected = aPart->shapeInPart(aNameInPart, theType, anIndex);
       if (aSelected.get()) {

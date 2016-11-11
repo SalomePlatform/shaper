@@ -48,8 +48,6 @@
 
 //#define SET_PLANES_COLOR_IN_PREFERENCES
 
-using namespace std;
-
 // the only created instance of this plugin
 static SketchPlugin_Plugin* MY_SKETCH_INSTANCE = new SketchPlugin_Plugin();
 
@@ -122,7 +120,7 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
 #endif
 }
 
-FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
+FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
 {
   if (theFeatureID == SketchPlugin_Sketch::ID()) {
     return FeaturePtr(new SketchPlugin_Sketch);
