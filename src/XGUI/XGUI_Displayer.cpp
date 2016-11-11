@@ -936,7 +936,7 @@ void XGUI_Displayer::activateAIS(const Handle(AIS_InteractiveObject)& theIO,
       if (theMode == getSelectionMode(TopAbs_VERTEX))
         aPrecision = ModuleBase_Preferences::resourceMgr()->doubleValue("Viewer",
                                                                     "point-selection-sensitivity",
-                                                                        20);
+                                                                        12);
       else if ((theMode == getSelectionMode(TopAbs_EDGE)) ||
                (theMode == getSelectionMode(TopAbs_WIRE)))
         aPrecision = theIO->Width() +
