@@ -53,6 +53,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point.h>
@@ -1073,12 +1074,12 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
     aLabel->installEventFilter(myMenuMgr);
     connect(aLabel, SIGNAL(customContextMenuRequested(const QPoint&)),
           SLOT(onActiveDocPopup(const QPoint&)));
-    //QPalette aPalet = aLabel->palette();
-    //aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
-    //aLabel->setPalette(aPalet);
     aOB->treeView()->setExpandsOnDoubleClick(false);
     connect(aOB->treeView(), SIGNAL(doubleClicked(const QModelIndex&)),
       SLOT(onTreeViewDoubleClick(const QModelIndex&)));
+
+    Events_Loop* aLoop = Events_Loop::loop();
+    aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   }
 }
 
@@ -1190,6 +1191,16 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
   }
 }
 
+#define EXPAND_PARENT(OBJ) \
+QModelIndex aObjIndex = aDataModel->objectIndex(OBJ); \
+if (aObjIndex.isValid()) { \
+  QModelIndex aParent = aObjIndex.parent(); \
+  int aCount = aDataModel->rowCount(aParent); \
+  if (aCount == 1) \
+    aTreeView->setExpanded(aParent, true); \
+}
+
+
 void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
@@ -1232,6 +1243,37 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
         aDisplayer->redisplay(aObj, false);
     }
     aDisplayer->updateViewer();
+  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::set<ObjectPtr> aObjects = aUpdMsg->objects();
+
+    ObjectPtr aConstrObj;
+    ObjectPtr aResultObj;
+    std::set<ObjectPtr>::const_iterator aIt;
+    std::string aObjType;
+    for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
+      ObjectPtr aObject = (*aIt);
+      if ((!aResultObj.get()) && aObject->groupName() == ModelAPI_ResultBody::group())
+        aResultObj = aObject;
+      if ((!aConstrObj.get()) && aObject->groupName() == ModelAPI_ResultConstruction::group())
+        aConstrObj = aObject;
+      if (aResultObj.get() && aConstrObj.get())
+        break;
+    }
+
+    if (aResultObj.get() || aConstrObj.get()) {
+      XGUI_Workshop* aWorkshop = getWorkshop();
+      XGUI_DataTree* aTreeView = aWorkshop->objectBrowser()->treeView();
+      XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
+
+      if (aResultObj.get()) {
+        EXPAND_PARENT(aResultObj)
+      }
+      if (aConstrObj.get()) {
+        EXPAND_PARENT(aConstrObj)
+      }
+    }
   }
 }
 
