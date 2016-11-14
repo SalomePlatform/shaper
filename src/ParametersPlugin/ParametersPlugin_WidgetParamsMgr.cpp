@@ -102,7 +102,8 @@ void ParametersPlugin_ItemDelegate::paint(QPainter* painter,
 {
   QBrush aBrush = painter->brush();
   QPen aPen = painter->pen();
-//  if (!isEditable(index))
+  //if (!isEditable(index))
+  //  painter->setBrush(Qt::lightGray);
   if (!index.parent().isValid())
     painter->setBrush(Qt::lightGray);
 
@@ -168,7 +169,7 @@ ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theP
   myTable = new ParametersPlugin_TreeWidget(this);
   myTable->setColumnCount(4);
   QStringList aHeaders;
-  aHeaders << tr("Name") << tr("Equation") << tr("Result") << tr("Comment");
+  aHeaders << tr("Name") << tr("Expression") << tr("Result") << tr("Comment");
   myTable->setHeaderLabels(aHeaders);
   myTable->setColumnWidth(Col_Name, 200);
   myTable->setColumnWidth(Col_Equation, 100);
@@ -519,9 +520,10 @@ QTreeWidgetItem* ParametersPlugin_WidgetParamsMgr::createNewItem(QTreeWidgetItem
   aValues << NoValue;
 
   QTreeWidgetItem* aItem = new QTreeWidgetItem(aValues);
-  if (theParent == myParameters)
+  if (theParent == myParameters) {
     aItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
-  else
+    aItem->setForeground(2, Qt::darkGray);
+  } else
     aItem->setFlags(Qt::NoItemFlags);
   return aItem;
 }
