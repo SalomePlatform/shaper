@@ -677,7 +677,7 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
         return findDocumentRootIndex(aSubDoc.get());
       else {
         // return first level of folder index
-        int aFolderId = myXMLReader->subFolderId(aType);
+        int aFolderId = folderId(aType, aSubDoc.get());
         // Items in a one row must have the same parent
         return createIndex(aFolderId, 0, aSubDoc.get());
       }
@@ -920,7 +920,7 @@ QModelIndex XGUI_DataModel::lastHistoryIndex() const
 }
 
 //******************************************************
-int XGUI_DataModel::folderId(std::string theType, ModelAPI_Document* theDoc)
+int XGUI_DataModel::folderId(std::string theType, ModelAPI_Document* theDoc) const
 {
   SessionPtr aSession = ModelAPI_Session::get();
   ModelAPI_Document* aDoc = theDoc;

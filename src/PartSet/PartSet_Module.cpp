@@ -1236,7 +1236,6 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     QObjectPtrList aObjects = aDisplayer->displayedObjects();
     bool aHidden;
     foreach(ObjectPtr aObj, aObjects) {
-      //TODO: replace by redisplay event.
       aHidden = !aObj->data() || !aObj->data()->isValid() ||
         aObj->isDisabled() || (!aObj->isDisplayed());
       if (!aHidden)
@@ -1251,12 +1250,14 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     ObjectPtr aConstrObj;
     ObjectPtr aResultObj;
     std::set<ObjectPtr>::const_iterator aIt;
-    std::string aObjType;
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
     for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
       ObjectPtr aObject = (*aIt);
-      if ((!aResultObj.get()) && aObject->groupName() == ModelAPI_ResultBody::group())
+      if ((!aResultObj.get()) && (aObject->groupName() == ModelAPI_ResultBody::group())
+          && (aObject->document() != aRootDoc))
         aResultObj = aObject;
-      if ((!aConstrObj.get()) && aObject->groupName() == ModelAPI_ResultConstruction::group())
+      if ((!aConstrObj.get()) && (aObject->groupName() == ModelAPI_ResultConstruction::group())
+          && (aObject->document() != aRootDoc))
         aConstrObj = aObject;
       if (aResultObj.get() && aConstrObj.get())
         break;

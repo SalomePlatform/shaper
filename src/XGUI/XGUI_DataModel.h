@@ -147,7 +147,7 @@ private:
   /// folders which can not be shown non empty
   /// \param theType Type of the folder
   /// \param theDoc a document which contains this folder
-  int folderId(std::string theType, ModelAPI_Document* theDoc = 0);
+  int folderId(std::string theType, ModelAPI_Document* theDoc = 0) const;
 
   /// Removes a row from branch of tree
   /// \param theStart - start row to update indexes
