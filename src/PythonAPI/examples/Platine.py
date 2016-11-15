@@ -190,12 +190,12 @@ def body_4():
 b1 = vertical_body()
 b2 = bottom_body()
 
-boolean = model.addFuse(part, b1.result() + b2.result())
+boolean = model.addFuse(part, b1.results() + b2.results())
 model.do()
 
 b3 = body_3()
 
-boolean = model.addFuse(part, boolean.result() + b3.result())
+boolean = model.addFuse(part, boolean.results() + b3.results())
 model.do()
 
 # START DEBUG PURPOSES
@@ -209,7 +209,7 @@ model.do()
 # END DEBUG PURPOSES
 b4 = body_4()
 
-boolean = model.addFuse(part, boolean.result() + b4.result())
+boolean = model.addFuse(part, boolean.results() + b4.results())
 model.end()
 
 assert(model.checkPythonDump())

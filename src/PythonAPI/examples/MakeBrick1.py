@@ -69,7 +69,7 @@ model.do()
 
 # Subtracting the cylinder to the box
 
-model.addCut(mypart, mybox.result(), myboss.result())
+model.addCut(mypart, mybox.results(), myboss.results())
 model.end()
 
 

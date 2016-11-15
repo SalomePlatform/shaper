@@ -20,7 +20,7 @@ aSession.finishOperation()
 aSession.startOperation()
 aPoint = model.addPoint(aDocument, 50, 50, 50)
 aSession.finishOperation()
-assert (len(aPoint.result()) > 0)
+assert (len(aPoint.results()) > 0)
 
 # # Create a sketch with lines
 # aSession.startOperation()

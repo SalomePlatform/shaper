@@ -652,7 +652,13 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const ResultPtr& theResult)
       break;
     }
   }
-  myDumpBuffer << name(aFeature) << ".result()[" << anIndex << "]";
+
+  myDumpBuffer << name(aFeature);
+  if(anIndex == 0) {
+    myDumpBuffer << ".result()";
+  } else {
+    myDumpBuffer << ".results()[" << anIndex << "]";
+  }
   return *this;
 }
 

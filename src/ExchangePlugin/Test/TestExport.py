@@ -46,7 +46,7 @@ def testExport(theType, theFormat, theFile, theVolume, theDelta):
     removeFile(theFile)
     # Export a part
     aSession.startOperation("Export part")
-    model.exportToFile(aPart, theFile, anImport.result(), theFormat)
+    model.exportToFile(aPart, theFile, anImport.results(), theFormat)
 #     anExportFeature = aPart.addFeature("Export")
 #     anExportFeature.string("file_format").setValue(theFormat)
 #     anExportFeature.string("file_path").setValue(theFile)
@@ -77,7 +77,7 @@ def testExportXAO():
 
     # Create groups
     aSession.startOperation()
-    aGroup = model.addGroup(aPart, anImport.result())
+    aGroup = model.addGroup(aPart, anImport.results())
     aGroup.defaultResult().data().setName("boite_1")
     aGroup.groupList().setSelectionType("solid")
 #     aGroupFeature = aSession.activeDocument().addFeature("Group")

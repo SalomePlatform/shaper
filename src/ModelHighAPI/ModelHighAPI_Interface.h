@@ -58,9 +58,13 @@ public:
   MODELHIGHAPI_EXPORT
   void setName(const std::string& theName);
 
+  /// Return firts object of the feature
+  MODELHIGHAPI_EXPORT
+  virtual ModelHighAPI_Selection result() const;
+
   /// Return all objects of the feature
   MODELHIGHAPI_EXPORT
-  virtual std::list<ModelHighAPI_Selection> result() const;
+  virtual std::list<ModelHighAPI_Selection> results() const;
 
   /// Return default result. Default implementation feature()->lastResult()
   MODELHIGHAPI_EXPORT

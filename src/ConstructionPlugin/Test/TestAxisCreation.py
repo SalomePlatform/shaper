@@ -148,9 +148,9 @@ aSession.finishOperation()
 
 # Test an axis by line
 aSession.startOperation()
-anAxis = model.addAxis(aPart, aSketchLine.result()[0])
+anAxis = model.addAxis(aPart, aSketchLine.result())
 aSession.finishOperation()
-assert (len(anAxis.result()) > 0)
+assert (len(anAxis.results()) > 0)
 
 # Create plane
 aSession.startOperation()
@@ -168,9 +168,9 @@ aSession.finishOperation()
 
 # Test an axis by plane and point
 aSession.startOperation()
-anAxis = model.addAxis(aPart, aPlane1.result()[0], aSketchPoint.result()[0])
+anAxis = model.addAxis(aPart, aPlane1.result(), aSketchPoint.result())
 aSession.finishOperation()
-assert (len(anAxis.result()) > 0)
+assert (len(anAxis.results()) > 0)
 
 # Create plane
 aSession.startOperation()
@@ -179,15 +179,15 @@ aSession.finishOperation()
 
 # Test an axis by two planes
 aSession.startOperation()
-anAxis = model.addAxis(aPart, aPlane1.result()[0], aPlane2.result()[0])
+anAxis = model.addAxis(aPart, aPlane1.result(), aPlane2.result())
 aSession.finishOperation()
-assert (len(anAxis.result()) > 0)
+assert (len(anAxis.results()) > 0)
 
 # Test an axis by two planes and offsets
 aSession.startOperation()
-anAxis = model.addAxis(aPart, aPlane1.result()[0], 50, False, aPlane2.result()[0], 100, True)
+anAxis = model.addAxis(aPart, aPlane1.result(), 50, False, aPlane2.result(), 100, True)
 aSession.finishOperation()
-assert (len(anAxis.result()) > 0)
+assert (len(anAxis.results()) > 0)
 
 import model
 assert(model.checkPythonDump())

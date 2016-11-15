@@ -23,14 +23,14 @@ c2 = sk2.addCircle(20, 30, 30)
 model.do()
 smallcyl = model.addExtrusion(mypart, sk2.selectFace(), 150)
 
-cut = model.addCut(mypart, bigcyl.result(), smallcyl.result())
+cut = model.addCut(mypart, bigcyl.results(), smallcyl.results())
 
 model.do()
 
 # check bodies number is 1: only Boolean result
 assert(mypart.size("Bodies") == 1)
 
-model.addRecover(mypart, cut, smallcyl.result())
+model.addRecover(mypart, cut, smallcyl.results())
 
 model.end()
 
@@ -46,14 +46,14 @@ assert(mypart.size("Bodies") == 1)
 # check persistent flag of recover: never concealed
 model.begin()
 
-recover = model.addRecover(mypart, cut, smallcyl.result(), True)
+recover = model.addRecover(mypart, cut, smallcyl.results(), True)
 assert(mypart.size("Bodies") == 2)
 sk3 = model.addSketch(mypart, model.defaultPlane("XOY"))
 c3 = sk3.addCircle(0, 0, 90)
 model.do()
 big2 = model.addExtrusion(mypart, sk3.selectFace(), 110)
 
-cut2 = model.addCut(mypart, big2.result(), smallcyl.result())
+cut2 = model.addCut(mypart, big2.results(), smallcyl.results())
 
 model.end()
 

@@ -35,13 +35,13 @@ aSession.finishOperation()
 
 # Make extrusion on circle (cylinder) and triangle (prism)
 aSession.startOperation()
-anExtrusion = model.addExtrusion(aDocument, aCircleSketch.result() + aTriangleSketch.result(), 100)
+anExtrusion = model.addExtrusion(aDocument, aCircleSketch.results() + aTriangleSketch.results(), 100)
 aSession.finishOperation()
 
 # Fill prism with cylinder
 aSession.startOperation()
-aBoolean = model.addFill(aDocument, [anExtrusion.result()[0]], [anExtrusion.result()[1]])
-assert (len(aBoolean.result()) > 0)
+aBoolean = model.addFill(aDocument, [anExtrusion.results()[0]], [anExtrusion.results()[1]])
+assert (len(aBoolean.results()) > 0)
 aSession.finishOperation()
 
 assert(model.checkPythonDump())

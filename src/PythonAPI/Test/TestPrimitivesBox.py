@@ -33,7 +33,7 @@ class PrimitivesAddBoxTestCase(PrimitivesAddBox):
     def test_add_box_by_two_points(self):
         point1 = model.addPoint(self.part,0,0,0).result()
         point2 = model.addPoint(self.part,10,10,10).result()
-        box = model.addBox(self.part, point1[0], point2[0])
+        box = model.addBox(self.part, point1, point2)
         model.do()
         self.assertEqual(box.creationMethod().value(),"BoxByTwoPoints")
         self.assertEqual(box.firstPoint().context().shape().isVertex(),True)
