@@ -21,6 +21,8 @@ SET(PROJECT_HEADERS
     ModelAPI_AttributeSelection.h
     ModelAPI_AttributeSelectionList.h
     ModelAPI_AttributeString.h
+    ModelAPI_AttributeStringArray.h
+    ModelAPI_AttributeTables.h
     ModelAPI_AttributeValidator.h
     ModelAPI_BodyBuilder.h
     ModelAPI_CompositeFeature.h
@@ -60,6 +62,8 @@ SET(PROJECT_SOURCES
     ModelAPI_AttributeSelection.cpp
     ModelAPI_AttributeSelectionList.cpp
     ModelAPI_AttributeString.cpp
+    ModelAPI_AttributeStringArray.cpp
+    ModelAPI_AttributeTables.cpp
     ModelAPI_BodyBuilder.cpp
     ModelAPI_CompositeFeature.cpp
     ModelAPI_Data.cpp

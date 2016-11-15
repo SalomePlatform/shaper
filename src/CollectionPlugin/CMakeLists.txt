@@ -7,11 +7,13 @@ SET(PROJECT_HEADERS
     CollectionPlugin.h
     CollectionPlugin_Plugin.h
     CollectionPlugin_Group.h
+    CollectionPlugin_Field.h
 )
 
 SET(PROJECT_SOURCES
     CollectionPlugin_Plugin.cpp
     CollectionPlugin_Group.cpp
+    CollectionPlugin_Field.cpp
 )
 
 SET(XML_RESOURCES

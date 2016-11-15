@@ -41,7 +41,7 @@ class CollectionPlugin_Group : public ModelAPI_Feature
     return MY_KIND;
   }
 
-  /// Creates a new part document if needed
+  /// Creates a new group result if needed
   COLLECTIONPLUGIN_EXPORT virtual void execute();
 
   /// Request for initialization of data model of the feature: adding all attributes

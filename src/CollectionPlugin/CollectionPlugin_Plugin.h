@@ -1,8 +1,8 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 // File:        CollectionPlugin_Plugin.hxx
-// Created:     07 July 2014
-// Author:      Vitaly SMETANNIKOV
+// Created:     14 Nov 2016
+// Author:      Mikhail PONIKAROV
 
 #ifndef CollectionPlugin_Plugin_H_
 #define CollectionPlugin_Plugin_H_

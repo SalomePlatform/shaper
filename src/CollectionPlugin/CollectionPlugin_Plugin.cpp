@@ -3,6 +3,7 @@
 #include <CollectionPlugin_Plugin.h>
 
 #include <CollectionPlugin_Group.h>
+#include <CollectionPlugin_Field.h>
 #include <ModelAPI_Session.h>
 
 #include <string>
@@ -22,7 +23,10 @@ FeaturePtr CollectionPlugin_Plugin::createFeature(std::string theFeatureID)
 {
   if (theFeatureID == CollectionPlugin_Group::ID()) {
     return FeaturePtr(new CollectionPlugin_Group);
+  }else if (theFeatureID == CollectionPlugin_Field::ID()) {
+    return FeaturePtr(new CollectionPlugin_Field);
   }
+
 
   // feature of such kind is not found
   return FeaturePtr();

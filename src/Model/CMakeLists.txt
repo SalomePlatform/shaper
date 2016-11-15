@@ -19,9 +19,11 @@ SET(PROJECT_HEADERS
     Model_AttributeBoolean.h
     Model_AttributeIntArray.h
     Model_AttributeString.h
+    Model_AttributeStringArray.h
     Model_AttributeInteger.h
     Model_AttributeSelection.h
     Model_AttributeSelectionList.h
+    Model_AttributeTables.h
     Model_BodyBuilder.h
     Model_Events.h
     Model_Expression.h
@@ -54,9 +56,11 @@ SET(PROJECT_SOURCES
     Model_AttributeBoolean.cpp
     Model_AttributeIntArray.cpp
     Model_AttributeString.cpp
+    Model_AttributeStringArray.cpp
     Model_AttributeInteger.cpp
     Model_AttributeSelection.cpp
     Model_AttributeSelectionList.cpp
+    Model_AttributeTables.cpp
     Model_BodyBuilder.cpp
     Model_Events.cpp
     Model_Expression.cpp

@@ -49,6 +49,7 @@
 %shared_ptr(ModelAPI_AttributeInteger)
 %shared_ptr(ModelAPI_AttributeIntArray)
 %shared_ptr(ModelAPI_AttributeString)
+%shared_ptr(ModelAPI_AttributeStringArray)
 %shared_ptr(ModelAPI_AttributeReference)
 %shared_ptr(ModelAPI_AttributeRefAttr)
 %shared_ptr(ModelAPI_AttributeRefList)
@@ -56,6 +57,7 @@
 %shared_ptr(ModelAPI_AttributeBoolean)
 %shared_ptr(ModelAPI_AttributeSelection)
 %shared_ptr(ModelAPI_AttributeSelectionList)
+%shared_ptr(ModelAPI_AttributeTables)
 %shared_ptr(ModelAPI_Validator)
 %shared_ptr(ModelAPI_AttributeValidator)
 %shared_ptr(ModelAPI_FeatureValidator)
@@ -83,6 +85,7 @@
 %include "ModelAPI_AttributeInteger.h"
 %include "ModelAPI_AttributeIntArray.h"
 %include "ModelAPI_AttributeString.h"
+%include "ModelAPI_AttributeStringArray.h"
 %include "ModelAPI_AttributeReference.h"
 %include "ModelAPI_AttributeRefAttr.h"
 %include "ModelAPI_AttributeBoolean.h"
@@ -90,6 +93,7 @@
 %include "ModelAPI_AttributeSelectionList.h"
 %include "ModelAPI_AttributeRefList.h"
 %include "ModelAPI_AttributeRefAttrList.h"
+%include "ModelAPI_AttributeTables.h"
 %include "ModelAPI_Validator.h"
 %include "ModelAPI_AttributeValidator.h"
 %include "ModelAPI_FeatureValidator.h"
@@ -132,6 +136,7 @@ template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr
 %template(modelAPI_AttributeInteger)       shared_ptr_cast<ModelAPI_AttributeInteger, ModelAPI_Attribute>;
 %template(modelAPI_AttributeIntArray)      shared_ptr_cast<ModelAPI_AttributeIntArray, ModelAPI_Attribute>;
 %template(modelAPI_AttributeString)        shared_ptr_cast<ModelAPI_AttributeString, ModelAPI_Attribute>;
+%template(modelAPI_AttributeStringArray)   shared_ptr_cast<ModelAPI_AttributeStringArray, ModelAPI_Attribute>;
 %template(modelAPI_AttributeReference)     shared_ptr_cast<ModelAPI_AttributeReference, ModelAPI_Attribute>;
 %template(modelAPI_AttributeRefAttr)       shared_ptr_cast<ModelAPI_AttributeRefAttr, ModelAPI_Attribute>;
 %template(modelAPI_AttributeBoolean)       shared_ptr_cast<ModelAPI_AttributeBoolean, ModelAPI_Attribute>;
@@ -139,3 +144,4 @@ template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr
 %template(modelAPI_AttributeSelectionList) shared_ptr_cast<ModelAPI_AttributeSelectionList, ModelAPI_Attribute>;
 %template(modelAPI_AttributeRefList)       shared_ptr_cast<ModelAPI_AttributeRefList, ModelAPI_Attribute>;
 %template(modelAPI_AttributeRefAttrList)   shared_ptr_cast<ModelAPI_AttributeRefAttrList, ModelAPI_Attribute>;
+%template(modelAPI_AttributeTables)        shared_ptr_cast<ModelAPI_AttributeTables, ModelAPI_Attribute>;

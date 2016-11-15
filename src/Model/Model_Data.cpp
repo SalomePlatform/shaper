@@ -15,9 +15,11 @@
 #include <Model_AttributeRefAttrList.h>
 #include <Model_AttributeBoolean.h>
 #include <Model_AttributeString.h>
+#include <Model_AttributeStringArray.h>
 #include <Model_AttributeSelection.h>
 #include <Model_AttributeSelectionList.h>
 #include <Model_AttributeIntArray.h>
+#include <Model_AttributeTables.h>
 #include <Model_Events.h>
 #include <Model_Expression.h>
 #include <ModelAPI_Feature.h>
@@ -133,6 +135,8 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
     anAttr = new Model_AttributeBoolean(anAttrLab);
   } else if (theAttrType == Model_AttributeString::typeId()) {
     anAttr = new Model_AttributeString(anAttrLab);
+  } else if (theAttrType == Model_AttributeStringArray::typeId()) {
+    anAttr = new Model_AttributeStringArray(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeReference::typeId()) {
     anAttr = new Model_AttributeReference(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeSelection::typeId()) {
@@ -149,6 +153,8 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
     anAttr = new Model_AttributeIntArray(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeDoubleArray::typeId()) {
     anAttr = new Model_AttributeDoubleArray(anAttrLab);
+  } else if (theAttrType == ModelAPI_AttributeTables::typeId()) {
+    anAttr = new Model_AttributeTables(anAttrLab);
   }
   // create also GeomData attributes here because only here the OCAF structure is known
   else if (theAttrType == GeomData_Point::typeId()) {
@@ -203,6 +209,7 @@ GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeDouble, real);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeInteger, integer);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeBoolean, boolean);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeString, string);
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeStringArray, stringArray);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeReference, reference);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeSelection, selection);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeSelectionList, selectionList);
@@ -211,6 +218,7 @@ GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeRefList, reflist);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeRefAttrList, refattrlist);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeIntArray, intArray);
 GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeDoubleArray, realArray);
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeTables, tables);
 
 std::shared_ptr<ModelAPI_Attribute> Model_Data::attribute(const std::string& theID)
 {

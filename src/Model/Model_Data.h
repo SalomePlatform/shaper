@@ -18,6 +18,7 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttrList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeStringArray.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Feature.h>
@@ -122,6 +123,12 @@ class Model_Data : public ModelAPI_Data
   /// Returns the attribute that contains integer values array
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeIntArray>
     intArray(const std::string& theID);
+  /// Returns the attribute that contains string values array
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeStringArray>
+    stringArray(const std::string& theID);
+  /// Returns the attribute that contains string values array
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeTables>
+    tables(const std::string& theID);
 
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute
