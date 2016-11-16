@@ -14,6 +14,7 @@
 #include <Model_ResultBody.h>
 #include <Model_ResultCompSolid.h>
 #include <Model_ResultGroup.h>
+#include <Model_ResultField.h>
 #include <Model_ResultParameter.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
@@ -1008,6 +1009,23 @@ std::shared_ptr<ModelAPI_ResultGroup> Model_Objects::createGroup(
   return aResult;
 }
 
+std::shared_ptr<ModelAPI_ResultField> Model_Objects::createField(
+    const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
+{
+  TDF_Label aLab = resultLabel(theFeatureData, theIndex);
+  TDataStd_Comment::Set(aLab, ModelAPI_ResultField::group().c_str());
+  ObjectPtr anOldObject = object(aLab);
+  std::shared_ptr<ModelAPI_ResultField> aResult;
+  if (anOldObject.get()) {
+    aResult = std::dynamic_pointer_cast<ModelAPI_ResultField>(anOldObject);
+  }
+  if (!aResult.get()) {
+    aResult = std::shared_ptr<ModelAPI_ResultField>(new Model_ResultField(theFeatureData));
+    storeResult(theFeatureData, aResult, theIndex);
+  }
+  return aResult;
+}
+
 std::shared_ptr<ModelAPI_ResultParameter> Model_Objects::createParameter(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
@@ -1106,6 +1124,8 @@ void Model_Objects::updateResults(FeaturePtr theFeature)
           break;
         } else if (aGroup->Get() == ModelAPI_ResultGroup::group().c_str()) {
           aNewBody = createGroup(theFeature->data(), aResIndex);
+        } else if (aGroup->Get() == ModelAPI_ResultField::group().c_str()) {
+          aNewBody = createField(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultParameter::group().c_str()) {
           theFeature->attributeChanged("expression"); // just produce a value
           break;

@@ -1170,6 +1170,12 @@ std::shared_ptr<ModelAPI_ResultGroup> Model_Document::createGroup(
   return myObjs->createGroup(theFeatureData, theIndex);
 }
 
+std::shared_ptr<ModelAPI_ResultField> Model_Document::createField(
+    const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
+{
+  return myObjs->createField(theFeatureData, theIndex);
+}
+
 std::shared_ptr<ModelAPI_ResultParameter> Model_Document::createParameter(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {

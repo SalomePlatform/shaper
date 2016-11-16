@@ -116,6 +116,9 @@ class Model_Objects
   /// Creates a group result
   std::shared_ptr<ModelAPI_ResultGroup> createGroup(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
+  /// Creates a field result
+  std::shared_ptr<ModelAPI_ResultField> createField(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a parameter result
   std::shared_ptr<ModelAPI_ResultParameter> createParameter(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);

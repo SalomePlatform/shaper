@@ -13,6 +13,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeTables.h>
+#include <ModelAPI_ResultField.h>
 
 CollectionPlugin_Field::CollectionPlugin_Field()
 {
@@ -32,7 +33,7 @@ void CollectionPlugin_Field::initAttributes()
 void CollectionPlugin_Field::execute()
 {
   if (results().empty() || firstResult()->isDisabled()) { // just create result if not exists
-    //ResultPtr aField = document()->createField(data());
-    //setResult(aField);
+    ResultPtr aField = document()->createField(data());
+    setResult(aField);
   }
 }

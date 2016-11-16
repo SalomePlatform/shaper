@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
   ModelHighAPI_RefAttr.h
   ModelHighAPI_Reference.h
   ModelHighAPI_Selection.h
+  ModelHighAPI_ComponentValue.h
   ModelHighAPI_Services.h
   ModelHighAPI_Tools.h
   ModelHighAPI_FeatureStore.h
@@ -25,6 +26,7 @@ SET(PROJECT_SOURCES
   ModelHighAPI_RefAttr.cpp
   ModelHighAPI_Reference.cpp
   ModelHighAPI_Selection.cpp
+  ModelHighAPI_ComponentValue.cpp
   ModelHighAPI_Services.cpp
   ModelHighAPI_Tools.cpp
   ModelHighAPI_FeatureStore.cpp

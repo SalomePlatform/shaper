@@ -38,6 +38,7 @@ SET(PROJECT_HEADERS
     ModelAPI_ResultBody.h
     ModelAPI_ResultCompSolid.h
     ModelAPI_ResultConstruction.h
+    ModelAPI_ResultField.h
     ModelAPI_ResultGroup.h
     ModelAPI_ResultParameter.h
     ModelAPI_ResultPart.h
@@ -78,6 +79,7 @@ SET(PROJECT_SOURCES
     ModelAPI_ResultBody.cpp
     ModelAPI_ResultCompSolid.cpp
     ModelAPI_ResultConstruction.cpp
+    ModelAPI_ResultField.cpp
     ModelAPI_ResultGroup.cpp
     ModelAPI_ResultPart.cpp
     ModelAPI_ResultParameter.cpp

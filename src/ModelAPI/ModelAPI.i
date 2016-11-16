@@ -66,6 +66,7 @@
 %shared_ptr(ModelAPI_ResultBody)
 %shared_ptr(ModelAPI_ResultPart)
 %shared_ptr(ModelAPI_ResultGroup)
+%shared_ptr(ModelAPI_ResultField)
 %shared_ptr(ModelAPI_ResultParameter)
 %shared_ptr(ModelAPI_ResultCompSolid)
 
@@ -102,6 +103,7 @@
 %include "ModelAPI_ResultBody.h"
 %include "ModelAPI_ResultPart.h"
 %include "ModelAPI_ResultGroup.h"
+%include "ModelAPI_ResultField.h"
 %include "ModelAPI_ResultParameter.h"
 %include "ModelAPI_Tools.h"
 %include "ModelAPI_ResultCompSolid.h"
@@ -127,6 +129,7 @@ template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr
 %template(modelAPI_ResultPart) shared_ptr_cast<ModelAPI_ResultPart, ModelAPI_Result>;
 %template(modelAPI_ResultParameter) shared_ptr_cast<ModelAPI_ResultParameter, ModelAPI_Result>;
 %template(modelAPI_ResultGroup) shared_ptr_cast<ModelAPI_ResultPart, ModelAPI_ResultGroup>;
+%template(modelAPI_ResultField) shared_ptr_cast<ModelAPI_ResultPart, ModelAPI_ResultField>;
 %template(modelAPI_ResultCompSolid) shared_ptr_cast<ModelAPI_ResultCompSolid, ModelAPI_ResultBody>;
 
 // Attribute casts

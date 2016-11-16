@@ -10,6 +10,7 @@
 
 //--------------------------------------------------------------------------------------
 #include "ModelHighAPI.h"
+#include <ModelAPI_AttributeTables.h>
 
 #include <GeomAPI_Shape.h>
 
@@ -36,6 +37,7 @@ class ModelAPI_AttributeRefList;
 class ModelAPI_AttributeSelection;
 class ModelAPI_AttributeSelectionList;
 class ModelAPI_AttributeString;
+class ModelAPI_AttributeStringArray;
 class ModelAPI_Object;
 //--------------------------------------------------------------------------------------
 class ModelHighAPI_Double;
@@ -125,10 +127,24 @@ void fillAttribute(const char * theValue,
                    const std::shared_ptr<ModelAPI_AttributeString> & theAttribute);
 
 MODELHIGHAPI_EXPORT
+void fillAttribute(const std::list<std::string> & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeStringArray> & theAttribute);
+
+MODELHIGHAPI_EXPORT
+void fillAttribute(const std::list<ModelHighAPI_Integer> & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeIntArray> & theAttribute);
+
+MODELHIGHAPI_EXPORT
 GeomAPI_Shape::ShapeType shapeTypeByStr(std::string theShapeTypeStr);
 
 MODELHIGHAPI_EXPORT
 GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection);
+
+MODELHIGHAPI_EXPORT 
+ModelAPI_AttributeTables::ValueType valueTypeByStr(const std::string& theValueTypeStr);
+
+MODELHIGHAPI_EXPORT 
+std::string strByValueType(const ModelAPI_AttributeTables::ValueType theType);
 
 /// Performs the high level API dump, then closes all and executes the script:
 /// model must be recreated fully, with all attributes
