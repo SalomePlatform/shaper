@@ -9,6 +9,13 @@
         icon="icons/Collection/shape_group.png">
         <source path="group_widget.xml"/>
       </feature>
+      
+      <feature id="Field"
+        title="Field"
+        tooltip="Create create fields for selected shapes"
+        icon="icons/Collection/field.png">
+        <field-panel/>
+      </feature>      
     </group>
   </workbench>
 </plugin>
