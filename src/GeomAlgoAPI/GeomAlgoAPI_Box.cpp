@@ -26,7 +26,7 @@ GeomAlgoAPI_Box::GeomAlgoAPI_Box(const double theDx, const double theDy, const d
 //=================================================================================================
 GeomAlgoAPI_Box::GeomAlgoAPI_Box(std::shared_ptr<GeomAPI_Pnt> theFirstPoint,
                                  std::shared_ptr<GeomAPI_Pnt> theSecondPoint)
-:GeomAlgoAPI_Box()
+:
 {
   myFirstPoint = theFirstPoint;
   mySecondPoint = theSecondPoint;
