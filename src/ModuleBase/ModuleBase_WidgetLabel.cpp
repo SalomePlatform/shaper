@@ -1,13 +1,16 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+// Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
 // File:        ModuleBase_WidgetLabel.cpp
 // Created:     03 Dec 2014
 // Author:      Vitaly SMETANNIKOV
 
+// Modified by Clarisse Genrault (CEA) : 17 Nov 2016
+
 #include "ModuleBase_WidgetLabel.h"
 
 #include <Config_WidgetAPI.h>
 #include <Config_Keywords.h>
+#include <ModuleBase_IconFactory.h>
 #include <ModuleBase_Tools.h>
 
 #include <ModelAPI_AttributeString.h>
@@ -21,10 +24,16 @@ ModuleBase_WidgetLabel::ModuleBase_WidgetLabel(QWidget* theParent,
 : ModuleBase_ModelWidget(theParent, theData)
 {
   QString aText = QString::fromStdString(theData->getProperty("title"));
+  QString aLabelIcon = QString::fromStdString(theData->getProperty("icon"));
   myLabel = new QLabel(aText, theParent);
+  if (!aLabelIcon.isEmpty()) {
+    myLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
+    myLabel->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
+  } else {
+    myLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+  }
   myLabel->setWordWrap(true);
   myLabel->setIndent(5);
-  myLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
   myLabel->setContentsMargins(0,0,0,4);
 
   QVBoxLayout* aLayout = new QVBoxLayout(this);
