@@ -16,6 +16,8 @@
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
 
+#include <FeaturesPlugin_Tools.h>
+
 //=================================================================================================
 FeaturesPlugin_Translation::FeaturesPlugin_Translation()
 {
@@ -130,27 +132,9 @@ void FeaturesPlugin_Translation::loadNamingDS(GeomAlgoAPI_Translation& theTransl
   // Store result.
   theResultBody->storeModified(theBaseShape, theTranslationAlgo.shape());
 
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theTranslationAlgo.mapOfSubShapes();
-
   int aTranslatedTag = 1;
   std::string aTranslatedName = "Translated";
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theTranslationAlgo.mapOfSubShapes();
 
-  switch(theBaseShape->shapeType()) {
-    case GeomAPI_Shape::COMPOUND:
-    case GeomAPI_Shape::COMPSOLID:
-    case GeomAPI_Shape::SOLID:
-    case GeomAPI_Shape::SHELL:
-      theResultBody->loadAndOrientModifiedShapes(&theTranslationAlgo,
-                                theBaseShape, GeomAPI_Shape::FACE,
-                                aTranslatedTag, aTranslatedName + "_Face", *aSubShapes.get());
-    case GeomAPI_Shape::FACE:
-    case GeomAPI_Shape::WIRE:
-      theResultBody->loadAndOrientModifiedShapes(&theTranslationAlgo,
-                                theBaseShape, GeomAPI_Shape::EDGE,
-                                ++aTranslatedTag, aTranslatedName + "_Edge", *aSubShapes.get());
-    case GeomAPI_Shape::EDGE:
-      theResultBody->loadAndOrientModifiedShapes(&theTranslationAlgo,
-                              theBaseShape, GeomAPI_Shape::VERTEX,
-                              ++aTranslatedTag, aTranslatedName + "_Vertex", *aSubShapes.get());
-  }
+  FeaturesPlugin_Tools::storeModifiedShapes(theTranslationAlgo, theResultBody, theBaseShape, aTranslatedTag, aTranslatedName, *aSubShapes.get());
 }

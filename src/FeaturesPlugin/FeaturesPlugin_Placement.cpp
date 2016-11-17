@@ -20,6 +20,8 @@
 #include <GeomAlgoAPI_Placement.h>
 #include <GeomAlgoAPI_Transform.h>
 
+#include <FeaturesPlugin_Tools.h>
+
 FeaturesPlugin_Placement::FeaturesPlugin_Placement()
 {
 }
@@ -191,28 +193,9 @@ void FeaturesPlugin_Placement::loadNamingDS(GeomAlgoAPI_Transform& theTransformA
   //load result
   theResultBody->storeModified(theBaseShape, theTransformAlgo.shape());
 
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theTransformAlgo.mapOfSubShapes();
-
-    // put modifed faces in DF
   int aPlacedTag = 1;
   std::string aPlacedName = "Placed";
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theTransformAlgo.mapOfSubShapes();
 
-  switch(theBaseShape->shapeType()) {
-    case GeomAPI_Shape::COMPOUND:
-    case GeomAPI_Shape::COMPSOLID:
-    case GeomAPI_Shape::SOLID:
-    case GeomAPI_Shape::SHELL:
-      theResultBody->loadAndOrientModifiedShapes(&theTransformAlgo,
-                                                theBaseShape, GeomAPI_Shape::FACE,
-                                        aPlacedTag, aPlacedName + "_Face", *aSubShapes.get());
-    case GeomAPI_Shape::FACE:
-    case GeomAPI_Shape::WIRE:
-      theResultBody->loadAndOrientModifiedShapes(&theTransformAlgo,
-                                                 theBaseShape, GeomAPI_Shape::EDGE,
-                                        ++aPlacedTag, aPlacedName + "_Edge", *aSubShapes.get());
-    case GeomAPI_Shape::EDGE:
-      theResultBody->loadAndOrientModifiedShapes(&theTransformAlgo,
-                                                 theBaseShape, GeomAPI_Shape::VERTEX,
-                                        ++aPlacedTag, aPlacedName + "_Vertex", *aSubShapes.get());
-  }
+  FeaturesPlugin_Tools::storeModifiedShapes(theTransformAlgo, theResultBody, theBaseShape, aPlacedTag, aPlacedName, *aSubShapes.get());
 }
