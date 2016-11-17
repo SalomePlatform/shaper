@@ -67,10 +67,22 @@ public:
   /// Set stamps identifiers
   COLLECTIONAPI_EXPORT
   void setStamps(const std::list<ModelHighAPI_Integer>& theStamps);
-  /// Sets the values of specific step
+  /// Sets the double values of specific step
   COLLECTIONAPI_EXPORT
   void addStep(const ModelHighAPI_Integer& theStepNum, const ModelHighAPI_Integer& theStamp,
-    const std::list<std::list<ModelHighAPI_ComponentValue> >& theComponents);
+    const std::list<std::list<double> >& theComponents);
+  /// Sets the integer values of specific step
+  COLLECTIONAPI_EXPORT
+  void addStep(const ModelHighAPI_Integer& theStepNum, const ModelHighAPI_Integer& theStamp,
+    const std::list<std::list<int> >& theComponents);
+  /// Sets the string values of specific step
+  COLLECTIONAPI_EXPORT
+  void addStep(const ModelHighAPI_Integer& theStepNum, const ModelHighAPI_Integer& theStamp,
+    const std::list<std::list<std::string> >& theComponents);
+  /// Sets the boolean values of specific step
+  COLLECTIONAPI_EXPORT
+  void addStep(const ModelHighAPI_Integer& theStepNum, const ModelHighAPI_Integer& theStamp,
+    const std::list<std::list<bool> >& theComponents);
 
   /// Dump wrapped feature
   COLLECTIONAPI_EXPORT
@@ -85,7 +97,7 @@ typedef std::shared_ptr<CollectionAPI_Field> FieldPtr;
 COLLECTIONAPI_EXPORT
 FieldPtr addField(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Integer& theStepsNum,
-                  std::string& theComponentType,
+                  const std::string& theComponentType,
                   const int theComponentsNum,
                   const std::list<std::string>& theComponentNames,
                   const std::list<ModelHighAPI_Selection>& theSelectionList);

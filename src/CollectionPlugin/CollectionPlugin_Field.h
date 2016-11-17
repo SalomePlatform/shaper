@@ -29,7 +29,7 @@
 class CollectionPlugin_Field : public ModelAPI_Feature
 {
  public:
-  /// Extrusion kind
+  /// Feature kind
   inline static const std::string& ID()
   {
     static const std::string MY_FIELD_ID("Field");

@@ -10,7 +10,6 @@
 #include <ModelHighAPI_Integer.h>
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
-#include <ModelHighAPI_ComponentValue.h>
 #include <ModelAPI_AttributeTables.h>
 #include <ModelAPI_AttributeStringArray.h>
 
@@ -53,6 +52,7 @@ void CollectionAPI_Field::setComponentsNames(const std::list<std::string>& theNa
 void CollectionAPI_Field::setValuesType(const std::string& theType)
 {
   fillAttribute(int(valueTypeByStr(theType)), myvaluesType);
+  myvalues->setType(valueTypeByStr(theType));
   execute();
 }
 
@@ -60,6 +60,7 @@ void CollectionAPI_Field::setValuesType(const std::string& theType)
 void CollectionAPI_Field::setStepsNum(const ModelHighAPI_Integer& theSteps)
 {
   fillAttribute(theSteps, mystepsNum);
+  mystamps->setSize(theSteps.intValue());
   execute();
 }
 
@@ -71,27 +72,35 @@ void CollectionAPI_Field::setStamps(const std::list<ModelHighAPI_Integer>& theSt
 }
 
 //=================================================================================================
-void CollectionAPI_Field::addStep(const ModelHighAPI_Integer& theStepNum,
-  const ModelHighAPI_Integer& theStamp,
-  const std::list<std::list<ModelHighAPI_ComponentValue> >& theComponents)
-{
-  // set the table size to be sure the values are up to date
-  myvalues->setSize(myselection->size() + 1 /* with defaults */,
-    mycomponentsNum->value(), mystepsNum->value());
-
-  // set values one by one
-  int aRowIndex = 0;
-  std::list<std::list<ModelHighAPI_ComponentValue> >::const_iterator 
-    aRowsIter = theComponents.begin();
-  for(; aRowsIter != theComponents.end(); aRowsIter++, aRowIndex++) {
-    int aColIndex = 0;
-    std::list<ModelHighAPI_ComponentValue>::const_iterator aColIter = aRowsIter->begin();
-    for(; aColIter != aRowsIter->end(); aColIter++, aColIndex++) {
-      aColIter->fill(myvalues, theStepNum.intValue(), aColIndex, aRowIndex);
-    }
-  }
-  execute();
+#define addStepImplementation(type, fieldType, type2, fieldType2, type3, fieldType3) \
+void CollectionAPI_Field::addStep(const ModelHighAPI_Integer& theStepNum, \
+  const ModelHighAPI_Integer& theStamp, \
+  const std::list<std::list<type> >& theComponents) \
+{ \
+  myvalues->setSize(myselection->size() + 1, \
+    mycomponentsNum->value(), mystepsNum->value()); \
+  mystamps->setValue(theStepNum.intValue(), theStamp.intValue()); \
+  int aRowIndex = 0; \
+  std::list<std::list<type> >::const_iterator \
+    aRowsIter = theComponents.begin(); \
+  for(; aRowsIter != theComponents.end(); aRowsIter++, aRowIndex++) { \
+    int aColIndex = 0; \
+    std::list<type>::const_iterator aColIter = aRowsIter->begin(); \
+    for(; aColIter != aRowsIter->end(); aColIter++, aColIndex++) { \
+      ModelAPI_AttributeTables::Value aVal; \
+      aVal.fieldType = *aColIter; \
+      aVal.fieldType2 = type2(*aColIter); \
+      aVal.fieldType3 = type3(*aColIter); \
+      myvalues->setValue(aVal, aRowIndex, aColIndex, theStepNum.intValue()); \
+    } \
+  } \
+  execute(); \
 }
+
+addStepImplementation(double, myDouble, int, myInt, bool, myBool);
+addStepImplementation(int, myInt, double, myDouble, bool, myBool);
+addStepImplementation(bool, myBool, int, myInt, double, myDouble);
+addStepImplementation(std::string, myStr, std::string, myStr, std::string, myStr);
 
 //=================================================================================================
 void CollectionAPI_Field::dump(ModelHighAPI_Dumper& theDumper) const
@@ -99,8 +108,8 @@ void CollectionAPI_Field::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  theDumper<<aBase<<" = model.addField("<<aDocName<<", "<<mystepsNum<<", "
-    <<strByValueType(ModelAPI_AttributeTables::ValueType(myvaluesType->value()))<<", "
+  theDumper<<aBase<<" = model.addField("<<aDocName<<", "<<mystepsNum->value()<<", \""
+    <<strByValueType(ModelAPI_AttributeTables::ValueType(myvaluesType->value()))<<"\", "
     <<mycomponentsNum->value()<<", ";
   theDumper<<mycomponentsNames<<", ";
   theDumper<<myselection<<")"<<std::endl;
@@ -114,7 +123,7 @@ void CollectionAPI_Field::dump(ModelHighAPI_Dumper& theDumper) const
       for(int aCol = 0; aCol < myvalues->columns(); aCol++) {
         if (aCol != 0)
           theDumper<<", ";
-        switch(myvalues->type()) {
+        switch(myvaluesType->value()) {
         case ModelAPI_AttributeTables::BOOLEAN:
           theDumper<<myvalues->value(aRow, aCol, aStep).myBool;
           break;
@@ -125,20 +134,20 @@ void CollectionAPI_Field::dump(ModelHighAPI_Dumper& theDumper) const
           theDumper<<myvalues->value(aRow, aCol, aStep).myDouble;
           break;
         case ModelAPI_AttributeTables::STRING:
-          theDumper<<myvalues->value(aRow, aCol, aStep).myStr;
+          theDumper<<'"'<<myvalues->value(aRow, aCol, aStep).myStr<<'"';
           break;
         }
       }
       theDumper<<"]";
     }
-    theDumper<<")"<<std::endl;
+    theDumper<<"])"<<std::endl;
   }
 }
 
 //=================================================================================================
 FieldPtr addField(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Integer& theStepsNum,
-                  std::string& theComponentType,
+                  const std::string& theComponentType,
                   const int theComponentsNum,
                   const std::list<std::string>& theComponentNames,
                   const std::list<ModelHighAPI_Selection>& theSelectionList)

@@ -175,6 +175,11 @@ class ModelAPI_Feature : public ModelAPI_Object
   {
     return data()->integer(theID);
   }
+  /// Returns the integer array attribute by the identifier
+  inline std::shared_ptr<ModelAPI_AttributeIntArray> intArray(const std::string& theID)
+  {
+    return data()->intArray(theID);
+  }
   /// Returns the reference attribute by the identifier
   inline std::shared_ptr<ModelAPI_AttributeRefAttr> refattr(const std::string& theID)
   {
@@ -204,6 +209,16 @@ class ModelAPI_Feature : public ModelAPI_Object
   inline std::shared_ptr<ModelAPI_AttributeString> string(const std::string& theID)
   {
     return data()->string(theID);
+  }
+  /// Returns the string array attribute by the identifier
+  inline std::shared_ptr<ModelAPI_AttributeStringArray> stringArray(const std::string& theID)
+  {
+    return data()->stringArray(theID);
+  }
+  /// Returns the tables attribute by the identifier
+  inline std::shared_ptr<ModelAPI_AttributeTables> tables(const std::string& theID)
+  {
+    return data()->tables(theID);
   }
   /// Returns the attribute by the identifier
   inline std::shared_ptr<ModelAPI_Attribute> attribute(const std::string& theID)

@@ -62,4 +62,5 @@ INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
 ADD_UNIT_TESTS(
                TestGroup.py
+               TestField.py
 )

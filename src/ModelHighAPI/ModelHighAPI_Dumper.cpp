@@ -839,10 +839,10 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 {
   myDumpBuffer<<"[";
   for(int anIndex = 0; anIndex < theArray->size(); ++anIndex) {
-
-    myDumpBuffer<<"\""<<theArray->value(anIndex)<<"\"";
     if (anIndex != 0)
       myDumpBuffer<<", ";
+
+    myDumpBuffer<<"\""<<theArray->value(anIndex)<<"\"";
   }
 
   myDumpBuffer<<"]";
