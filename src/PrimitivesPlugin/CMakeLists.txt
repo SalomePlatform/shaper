@@ -1,8 +1,8 @@
-# Copyright (C) 2015-2016 CEA/DEN, EDF R&D
+# Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
 # File:        CMakeLists.txt
 # Created:     07 Apr 2016
-# Author:      CEA (delegation to Alyotech)
+# Author:      Clarisse genrault (CEA)
 
 INCLUDE(UnitTest)
 
@@ -44,7 +44,6 @@ INSTALL(TARGETS PrimitivesPlugin DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
 INSTALL(FILES ${XML_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Primitives)
 
-ADD_UNIT_TESTS(UnitTestBox.py
-               APIDirectTestBox.py
+ADD_UNIT_TESTS(TestBox.py
 )
 

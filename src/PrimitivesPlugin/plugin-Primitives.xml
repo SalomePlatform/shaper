@@ -1,6 +1,5 @@
 <!-- Copyright (C) 2014-2016 CEA/DEN, EDF R&D -->
-
-<!--  Modified by CEA (delegation to Alyotech) : 29 Mar 2016 -->
+<!-- Created by Clarisse Genrault (CEA) : 10 Mar 2016 -->
 
 <plugin> 
   <workbench id="Primitives" document="Part">

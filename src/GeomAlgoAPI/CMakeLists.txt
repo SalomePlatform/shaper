@@ -4,6 +4,7 @@ FIND_PACKAGE(SWIG REQUIRED)
 
 INCLUDE(${SWIG_USE_FILE})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+INCLUDE(UnitTest)
 
 SET(PROJECT_HEADERS
     GeomAlgoAPI.h
@@ -42,7 +43,6 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_ShapeAPI.h
     GeomAlgoAPI_Exception.h
     GeomAlgoAPI_Box.h
-    GeomAlgoAPI_BoxPoints.h
     GeomAlgoAPI_XAOExport.h
     GeomAlgoAPI_XAOImport.h
     GeomAlgoAPI_Copy.h
@@ -84,7 +84,6 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_ShapeAPI.cpp
     GeomAlgoAPI_Exception.cpp
     GeomAlgoAPI_Box.cpp
-    GeomAlgoAPI_BoxPoints.cpp
     GeomAlgoAPI_XAOExport.cpp
     GeomAlgoAPI_XAOImport.cpp
     GeomAlgoAPI_Copy.cpp
@@ -151,3 +150,7 @@ ENDIF(WIN32)
 INSTALL(TARGETS _GeomAlgoAPI DESTINATION ${SHAPER_INSTALL_SWIG})
 INSTALL(TARGETS GeomAlgoAPI DESTINATION ${SHAPER_INSTALL_BIN})
 INSTALL(FILES ${SWIG_SCRIPTS} DESTINATION ${SHAPER_INSTALL_SWIG})
+
+ADD_UNIT_TESTS(TestAPI_Box.py
+)
+

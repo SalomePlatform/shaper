@@ -91,7 +91,7 @@ void PrimitivesPlugin_Box::createBoxByTwoPoints()
   AttributeSelectionPtr aRef1 = data()->selection(PrimitivesPlugin_Box::POINT_FIRST_ID());
   AttributeSelectionPtr aRef2 = data()->selection(PrimitivesPlugin_Box::POINT_SECOND_ID());
 
-  std::shared_ptr<GeomAlgoAPI_BoxPoints> aBoxAlgo;
+  std::shared_ptr<GeomAlgoAPI_Box> aBoxAlgo;
 
   if ((aRef1.get() != NULL) && (aRef2.get() != NULL)) {
     GeomShapePtr aShape1 = aRef1->value();
@@ -103,8 +103,7 @@ void PrimitivesPlugin_Box::createBoxByTwoPoints()
     if (aShape1 && aShape2){
       std::shared_ptr<GeomAPI_Pnt> aFirstPoint = GeomAlgoAPI_PointBuilder::point(aShape1);
       std::shared_ptr<GeomAPI_Pnt> aSecondPoint = GeomAlgoAPI_PointBuilder::point(aShape2);
-      aBoxAlgo = std::shared_ptr<GeomAlgoAPI_BoxPoints>(
-                                  new GeomAlgoAPI_BoxPoints(aFirstPoint,aSecondPoint));
+      aBoxAlgo = std::shared_ptr<GeomAlgoAPI_Box>(new GeomAlgoAPI_Box(aFirstPoint,aSecondPoint));
     }
   }
 

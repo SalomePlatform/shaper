@@ -10,7 +10,6 @@
 #include <PrimitivesPlugin.h>
 #include <ModelAPI_Feature.h>
 #include <GeomAlgoAPI_Box.h>
-#include <GeomAlgoAPI_BoxPoints.h>
 
 class GeomAPI_Shape;
 class ModelAPI_ResultBody;
