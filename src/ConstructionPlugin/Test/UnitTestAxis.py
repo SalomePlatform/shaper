@@ -2,7 +2,7 @@
 
 # File:        UnitTestAxis.py
 # Created:     30 Mar 2016
-# Author:      CEA (delegation to Alyotech)
+# Author:      Clarisse Genrault (CEA)
 
 """
     UnitTestAxis.py

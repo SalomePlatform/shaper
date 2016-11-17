@@ -4,7 +4,7 @@
 // Created:     12 Dec 2014
 // Author:      Vitaly Smetannikov
 
-// Modified by CEA (delegation to Alyotech) : 29 Mar 2016
+// Modified by Clarisse Genrault (CEA) : 29 Mar 2016
 
 #include "ConstructionPlugin_Axis.h"
 
