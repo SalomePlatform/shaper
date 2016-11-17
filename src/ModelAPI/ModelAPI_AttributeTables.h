@@ -55,13 +55,13 @@ public:
   /// Defines the tyoe of values in the table. If it differs from the current, erases the content.
   MODELAPI_EXPORT virtual void setType(ValueType theType) = 0;
   /// Defines the tyoe of values in the table. If it differs from the current, erases the content.
-  MODELAPI_EXPORT virtual const ValueType& type(ValueType) const = 0;
+  MODELAPI_EXPORT virtual const ValueType& type() const = 0;
   /// Defines the value by the index in the tables set (indexes are zero-based).
   MODELAPI_EXPORT virtual void setValue(
-    const Value theValue, const int theRow, const int theColumn, const int theTable = 1) = 0;
+    const Value theValue, const int theRow, const int theColumn, const int theTable = 0) = 0;
   /// Returns the value by the index (indexes are zero-based).
   MODELAPI_EXPORT virtual Value value(
-    const int theRow, const int theColumn, const int theTable = 1) = 0;
+    const int theRow, const int theColumn, const int theTable = 0) = 0;
 
   /// Returns the type of this class of attributes
   MODELAPI_EXPORT static std::string typeId()

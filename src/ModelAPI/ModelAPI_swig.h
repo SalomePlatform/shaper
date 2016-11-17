@@ -43,6 +43,7 @@
   #include "ModelAPI_ResultPart.h"
   #include "ModelAPI_ResultParameter.h"
   #include "ModelAPI_ResultGroup.h"
+  #include "ModelAPI_ResultField.h"
   #include "ModelAPI_Tools.h"
   #include "ModelAPI_ResultCompSolid.h"
 

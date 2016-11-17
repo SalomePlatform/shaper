@@ -2,18 +2,23 @@
 
 INCLUDE(Common)
 INCLUDE(UnitTest)
+SET(CMAKE_AUTOMOC ON)
 
 SET(PROJECT_HEADERS
     CollectionPlugin.h
     CollectionPlugin_Plugin.h
     CollectionPlugin_Group.h
     CollectionPlugin_Field.h
+	CollectionPlugin_WidgetCreator.h
+	CollectionPlugin_WidgetField.h
 )
 
 SET(PROJECT_SOURCES
     CollectionPlugin_Plugin.cpp
     CollectionPlugin_Group.cpp
     CollectionPlugin_Field.cpp
+	CollectionPlugin_WidgetCreator.cpp
+	CollectionPlugin_WidgetField.cpp
 )
 
 SET(XML_RESOURCES
@@ -34,6 +39,7 @@ INCLUDE_DIRECTORIES(
   ../GeomAlgoAPI
   ../GeomValidators
   ../Events
+  ../ModuleBase
 )
 
 SET(PROJECT_LIBRARIES
@@ -42,6 +48,7 @@ SET(PROJECT_LIBRARIES
     GeomAPI
     GeomAlgoAPI
     GeomValidators
+    ModuleBase
 )
 
 ADD_DEFINITIONS(-DCOLLECTIONPLUGIN_EXPORTS)

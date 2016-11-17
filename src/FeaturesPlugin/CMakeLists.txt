@@ -28,6 +28,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_ValidatorTransform.h
     FeaturesPlugin_Validators.h
     FeaturesPlugin_RemoveSubShapes.h
+    FeaturesPlugin_Tools.h
 )
 
 SET(PROJECT_SOURCES
@@ -54,6 +55,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_ValidatorTransform.cpp
     FeaturesPlugin_Validators.cpp
     FeaturesPlugin_RemoveSubShapes.cpp
+    FeaturesPlugin_Tools.cpp
 )
 
 SET(XML_RESOURCES

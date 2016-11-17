@@ -33,6 +33,7 @@ SET(PROJECT_HEADERS
     Model_ResultCompSolid.h
     Model_ResultConstruction.h
     Model_ResultPart.h
+    Model_ResultField.h
     Model_ResultGroup.h
     Model_ResultParameter.h
     Model_FeatureValidator.h
@@ -70,6 +71,7 @@ SET(PROJECT_SOURCES
     Model_ResultCompSolid.cpp
     Model_ResultConstruction.cpp
     Model_ResultPart.cpp
+    Model_ResultField.cpp
     Model_ResultGroup.cpp
     Model_ResultParameter.cpp
     Model_FeatureValidator.cpp

@@ -163,7 +163,7 @@ void Model_AttributeTables::setType(ModelAPI_AttributeTables::ValueType theType)
   }
 }
 
-const ModelAPI_AttributeTables::ValueType& Model_AttributeTables::type(ValueType) const
+const ModelAPI_AttributeTables::ValueType& Model_AttributeTables::type() const
 {
   return myType;
 }

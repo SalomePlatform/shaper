@@ -29,6 +29,7 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeStringArray.h>
 #include <ModelAPI_AttributeDoubleArray.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
@@ -194,10 +195,34 @@ void fillAttribute(const std::string & theValue,
 {
   theAttribute->setValue(theValue);
 }
+
+//--------------------------------------------------------------------------------------
 void fillAttribute(const char * theValue,
                    const std::shared_ptr<ModelAPI_AttributeString> & theAttribute)
 {
   theAttribute->setValue(theValue);
+}
+
+//--------------------------------------------------------------------------------------
+void fillAttribute(const std::list<std::string> & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeStringArray> & theAttribute)
+{
+  theAttribute->setSize(int(theValue.size()));
+
+  int anIndex = 0;
+  for (auto it = theValue.begin(); it != theValue.end(); ++it, ++anIndex)
+    theAttribute->setValue(anIndex, *it); 
+}
+
+//--------------------------------------------------------------------------------------
+void fillAttribute(const std::list<ModelHighAPI_Integer> & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeIntArray> & theAttribute)
+{
+  theAttribute->setSize(int(theValue.size()));
+
+  int anIndex = 0;
+  for (auto it = theValue.begin(); it != theValue.end(); ++it, ++anIndex)
+    theAttribute->setValue(anIndex, it->intValue()); // use only values, no text support in array
 }
 
 //==================================================================================================
@@ -258,6 +283,32 @@ GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection
   }
 
   return aShapeType;
+}
+
+//--------------------------------------------------------------------------------------
+ModelAPI_AttributeTables::ValueType valueTypeByStr(const std::string& theValueTypeStr)
+{
+  std::string aType = theValueTypeStr;
+  std::transform(aType.begin(), aType.end(), aType.begin(), ::tolower);
+  if (aType == "boolean")
+    return ModelAPI_AttributeTables::BOOLEAN;
+  else if (aType == "integer")
+    return ModelAPI_AttributeTables::INTEGER;
+  else if (aType == "string")
+    return ModelAPI_AttributeTables::STRING;
+  return ModelAPI_AttributeTables::DOUBLE; // default
+}
+
+//--------------------------------------------------------------------------------------
+std::string strByValueType(const ModelAPI_AttributeTables::ValueType theType)
+{
+  switch(theType) {
+  case ModelAPI_AttributeTables::BOOLEAN: return "BOOLEAN";
+  case ModelAPI_AttributeTables::INTEGER: return "INTEGER";
+  case ModelAPI_AttributeTables::DOUBLE: return "DOUBLE";
+  case ModelAPI_AttributeTables::STRING: return "STRING";
+  }
+  return ""; // bad case
 }
 
 /// stores the features information, recoursively stores sub-documetns features

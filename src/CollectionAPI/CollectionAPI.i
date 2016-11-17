@@ -10,6 +10,7 @@
 
   #include "CollectionAPI.h"
   #include "CollectionAPI_Group.h"
+  #include "CollectionAPI_Field.h"
 
 #endif // CollectionAPI_swig_H_
 %}
@@ -28,6 +29,8 @@
 
 // shared pointers
 %shared_ptr(CollectionAPI_Group)
+%shared_ptr(CollectionAPI_Field)
 
 // all supported interfaces
 %include "CollectionAPI_Group.h"
+%include "CollectionAPI_Field.h"

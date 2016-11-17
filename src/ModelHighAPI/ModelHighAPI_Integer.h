@@ -25,7 +25,7 @@ class ModelHighAPI_Integer
 public:
   /// Constructor for int
   MODELHIGHAPI_EXPORT
-  ModelHighAPI_Integer(int theValue = 0.);
+  ModelHighAPI_Integer(int theValue = 0);
   /// Constructor for std::string
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Integer(const std::string & theValue);
@@ -39,6 +39,9 @@ public:
   /// Fill attribute values
   MODELHIGHAPI_EXPORT
   virtual void fillAttribute(const std::shared_ptr<ModelAPI_AttributeInteger> & theAttribute) const;
+
+  /// Returns a value (must be used only for attributes which support no text)
+  MODELHIGHAPI_EXPORT virtual int intValue() const;
 
 private:
   enum VariantType { VT_INT, VT_STRING } myVariantType;

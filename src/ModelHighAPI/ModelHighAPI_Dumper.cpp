@@ -28,6 +28,7 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeStringArray.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Entity.h>
@@ -833,8 +834,22 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
   return *this;
 }
 
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
+  const std::shared_ptr<ModelAPI_AttributeStringArray>& theArray)
+{
+  myDumpBuffer<<"[";
+  for(int anIndex = 0; anIndex < theArray->size(); ++anIndex) {
+
+    myDumpBuffer<<"\""<<theArray->value(anIndex)<<"\"";
+    if (anIndex != 0)
+      myDumpBuffer<<", ";
+  }
+
+  myDumpBuffer<<"]";
+  return *this;
+}
+
 /// Dump std::endl
-MODELHIGHAPI_EXPORT
 ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
                                 std::basic_ostream<char>& (*theEndl)(std::basic_ostream<char>&))
 {

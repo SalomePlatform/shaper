@@ -174,6 +174,9 @@ class Model_Document : public ModelAPI_Document
   /// Creates a group result
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultGroup> createGroup(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
+  /// Creates a field result
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultField> createField(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a parameter result
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultParameter> createParameter(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);

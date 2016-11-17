@@ -35,6 +35,7 @@ class ModelAPI_AttributeRefList;
 class ModelAPI_AttributeSelection;
 class ModelAPI_AttributeSelectionList;
 class ModelAPI_AttributeString;
+class ModelAPI_AttributeStringArray;
 class ModelAPI_CompositeFeature;
 class ModelAPI_Document;
 class ModelAPI_Entity;
@@ -214,6 +215,9 @@ public:
   /// Dump AttributeReference
   MODELHIGHAPI_EXPORT ModelHighAPI_Dumper&
   operator<<(const std::shared_ptr<ModelAPI_AttributeReference>& theReference);
+  /// Dump AttributeStringArray
+  MODELHIGHAPI_EXPORT ModelHighAPI_Dumper&
+    operator<<(const std::shared_ptr<ModelAPI_AttributeStringArray>& theArray);
 
   /// Clear dump buffer
   MODELHIGHAPI_EXPORT

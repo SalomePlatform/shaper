@@ -43,3 +43,9 @@ void ModelHighAPI_Integer::fillAttribute(
     case VT_STRING: theAttribute->setText(myString); return;
   }
 }
+
+int ModelHighAPI_Integer::intValue() const
+{
+  // needed for array of integer, which supports no text
+  return myInt;
+}

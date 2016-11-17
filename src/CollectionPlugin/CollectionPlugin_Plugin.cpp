@@ -6,6 +6,10 @@
 #include <CollectionPlugin_Field.h>
 #include <ModelAPI_Session.h>
 
+#include <ModuleBase_WidgetCreatorFactory.h>
+
+#include "CollectionPlugin_WidgetCreator.h"
+
 #include <string>
 #include <memory>
 
@@ -14,6 +18,10 @@ static CollectionPlugin_Plugin* MY_COLLECTION_INSTANCE = new CollectionPlugin_Pl
 
 CollectionPlugin_Plugin::CollectionPlugin_Plugin()
 {
+  WidgetCreatorFactoryPtr aWidgetCreatorFactory = ModuleBase_WidgetCreatorFactory::get();
+  aWidgetCreatorFactory->registerCreator(
+   std::shared_ptr<CollectionPlugin_WidgetCreator>(new CollectionPlugin_WidgetCreator()));
+
   SessionPtr aMgr = ModelAPI_Session::get();
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

@@ -44,7 +44,7 @@ public:
   /// Defines the tyoe of values in the table. If it differs from the current, erases the content.
   MODEL_EXPORT virtual void setType(ValueType theType);
   /// Defines the tyoe of values in the table. If it differs from the current, erases the content.
-  MODEL_EXPORT virtual const ValueType& type(ValueType) const;
+  MODEL_EXPORT virtual const ValueType& type() const;
   /// Defines the value by the index in the tables set (indexes are zero-based).
   MODEL_EXPORT virtual void setValue(
     const Value theValue, const int theRow, const int theColumn, const int theTable = 0);
