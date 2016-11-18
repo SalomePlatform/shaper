@@ -197,5 +197,7 @@ void FeaturesPlugin_Placement::loadNamingDS(GeomAlgoAPI_Transform& theTransformA
   std::string aPlacedName = "Placed";
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theTransformAlgo.mapOfSubShapes();
 
-  FeaturesPlugin_Tools::storeModifiedShapes(theTransformAlgo, theResultBody, theBaseShape, aPlacedTag, aPlacedName, *aSubShapes.get());
+  FeaturesPlugin_Tools::storeModifiedShapes(theTransformAlgo, theResultBody, 
+                                            theBaseShape, aPlacedTag, aPlacedName, 
+                                            *aSubShapes.get());
 }
