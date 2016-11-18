@@ -35,13 +35,6 @@ void CollectionAPI_Field::setSelection(const std::list<ModelHighAPI_Selection>& 
 }
 
 //=================================================================================================
-void CollectionAPI_Field::setComponentsNum(const ModelHighAPI_Integer& theNum)
-{
-  fillAttribute(theNum, mycomponentsNum);
-  execute();
-}
-
-//=================================================================================================
 void CollectionAPI_Field::setComponentsNames(const std::list<std::string>& theNames)
 {
   fillAttribute(theNames, mycomponentsNames);
@@ -78,7 +71,7 @@ void CollectionAPI_Field::addStep(const ModelHighAPI_Integer& theStepNum, \
   const std::list<std::list<type> >& theComponents) \
 { \
   myvalues->setSize(myselection->size() + 1, \
-    mycomponentsNum->value(), mystepsNum->value()); \
+    mycomponentsNames->size(), mystepsNum->value()); \
   mystamps->setValue(theStepNum.intValue(), theStamp.intValue()); \
   int aRowIndex = 0; \
   std::list<std::list<type> >::const_iterator \
@@ -110,7 +103,7 @@ void CollectionAPI_Field::dump(ModelHighAPI_Dumper& theDumper) const
 
   theDumper<<aBase<<" = model.addField("<<aDocName<<", "<<mystepsNum->value()<<", \""
     <<strByValueType(ModelAPI_AttributeTables::ValueType(myvaluesType->value()))<<"\", "
-    <<mycomponentsNum->value()<<", ";
+    <<mycomponentsNames->size()<<", ";
   theDumper<<mycomponentsNames<<", ";
   theDumper<<myselection<<")"<<std::endl;
   // set values step by step
@@ -156,7 +149,6 @@ FieldPtr addField(const std::shared_ptr<ModelAPI_Document>& thePart,
   std::shared_ptr<CollectionAPI_Field> aField(new CollectionAPI_Field(aFeature));
   aField->setStepsNum(theStepsNum);
   aField->setValuesType(theComponentType);
-  aField->setComponentsNum(theComponentsNum);
   aField->setComponentsNames(theComponentNames);
   aField->setSelection(theSelectionList);
 

@@ -81,9 +81,8 @@ aSelectionListAttr.setSelectionType("vertex")
 aSelectionListAttr.append("Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_1&Extrusion_1_1/To_Face_1_1")
 aSelectionListAttr.append("Extrusion_1_1/Generated_Face_2&Extrusion_1_1/Generated_Face_1&Extrusion_1_1/To_Face_1_1")
 aSelectionListAttr.append("Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_2&Extrusion_1_1/From_Face_1_1")
-aField.integer("components_nb").setValue(2) # two components
 aComponentNames = aField.stringArray("components_names")
-aComponentNames.setSize(2)
+aComponentNames.setSize(2) # two components
 aComponentNames.setValue(0, "temperatue")
 aComponentNames.setValue(1, "porosity")
 aField.integer("type").setValue(2) # double
@@ -111,9 +110,8 @@ aField = aSession.activeDocument().addFeature("Field")
 aSelectionListAttr = aField.selectionList("selected")
 aSelectionListAttr.setSelectionType("face")
 aSelectionListAttr.append("Extrusion_1_1/Generated_Face_3")
-aField.integer("components_nb").setValue(1) # one component
 aComponentNames = aField.stringArray("components_names")
-aComponentNames.setSize(1)
+aComponentNames.setSize(1) # one component
 aComponentNames.setValue(0, "description")
 aField.integer("type").setValue(3) # string
 aField.integer("steps_nb").setValue(2) # two steps
@@ -140,9 +138,8 @@ aField = aSession.activeDocument().addFeature("Field")
 aSelectionListAttr = aField.selectionList("selected")
 aSelectionListAttr.setSelectionType("face")
 aSelectionListAttr.append("Extrusion_1_1/Generated_Face_3")
-aField.integer("components_nb").setValue(1) # one component
 aComponentNames = aField.stringArray("components_names")
-aComponentNames.setSize(1)
+aComponentNames.setSize(1) # one component
 aComponentNames.setValue(0, "description")
 aField.integer("type").setValue(1) # integer
 aField.integer("steps_nb").setValue(1) # one step
@@ -167,9 +164,8 @@ aField = aSession.activeDocument().addFeature("Field")
 aSelectionListAttr = aField.selectionList("selected")
 aSelectionListAttr.setSelectionType("face")
 aSelectionListAttr.append("Extrusion_1_1/Generated_Face_3")
-aField.integer("components_nb").setValue(1) # one component
 aComponentNames = aField.stringArray("components_names")
-aComponentNames.setSize(1)
+aComponentNames.setSize(1) # one component
 aComponentNames.setValue(0, "description")
 aField.integer("type").setValue(0) # boolean
 aField.integer("steps_nb").setValue(1) # one step
