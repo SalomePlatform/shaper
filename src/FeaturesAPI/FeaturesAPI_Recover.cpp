@@ -38,14 +38,14 @@ void FeaturesAPI_Recover::setBaseFeature(const ModelHighAPI_Reference& theBaseFe
 {
 
   fillAttribute(theBaseFeature.feature(), mybaseFeature);
-  // do not need to execute because on attribute changed it does everything anyway
+  execute();
 }
 
 //=================================================================================================
 void FeaturesAPI_Recover::setRecoveredList(const std::list<ModelHighAPI_Selection>& theRecoverList)
 {
   fillAttribute(theRecoverList, myrecoveredList);
-  // do not need to execute because on attribute changed it does everything anyway
+  execute();
 }
 
 //==================================================================================================
