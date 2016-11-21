@@ -109,25 +109,55 @@ std::string Config_Translator::translate(const Events_InfoMessage& theInfo)
 {
   std::string aContext = theInfo.context();
   std::string aMessage = theInfo.messageString();
-  return translate(aContext, aMessage);
+  std::list<std::string> aParameters = theInfo.parameters();
+  return translate(aContext, aMessage, aParameters);
+}
+
+std::string insertParameters(const std::string& theString, const std::list<std::string>& theParams)
+{
+  std::string aResult = theString;
+  std::list<std::string>::const_iterator aIt;
+  int i;
+  char aBuf[20];
+  std::string aParam;
+  for (i=1, aIt = theParams.cbegin(); aIt != theParams.cend(); aIt++, i++) {
+    aParam = (*aIt);
+    sprintf(aBuf, "%d", i);
+    std::string aCode = std::string("%") + std::string(aBuf);
+    size_t aPos = aResult.find(aCode);
+    if (aPos != std::string::npos) {
+      std::string aFirst = aResult.substr(0, aPos);
+      std::string aLast = aResult.substr(aPos + aCode.length(), std::string::npos);
+      aResult = aFirst + aParam + aLast;
+    }
+  }
+  return aResult;
 }
 
 std::string Config_Translator::translate(const std::string& theContext,
-                                         const std::string& theMessage)
+                                         const std::string& theMessage, 
+                                         const std::list<std::string>& theParams)
 {
   if (myTranslator.count(theContext) > 0) {
     if (myTranslator[theContext].count(theMessage) > 0) {
       std::string aTranslation = myTranslator[theContext][theMessage];
+      if (theParams.size() > 0) {
+        aTranslation = insertParameters(aTranslation, theParams);
+      }
       if (aTranslation.size() > 0)
         return aTranslation;
     }
+  }
+  std::string aMsg = theMessage;
+  if (theParams.size() > 0) {
+    aMsg = insertParameters(aMsg, theParams);
   }
 #ifdef _DEBUG
 #ifdef MISSED_TRANSLATION
   myMissed[theContext][theMessage] = "";
 #endif
 #endif
-  return theMessage;
+  return aMsg;
 }
 
 
