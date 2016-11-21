@@ -33,11 +33,9 @@ public:
   COLLECTIONAPI_EXPORT
   virtual ~CollectionAPI_Field();
 
-  INTERFACE_7(CollectionPlugin_Field::ID(),
+  INTERFACE_6(CollectionPlugin_Field::ID(),
     selection, CollectionPlugin_Field::SELECTED_ID(),
     ModelAPI_AttributeSelectionList, /** Field selection list*/,
-    componentsNum, CollectionPlugin_Field::COMPONENTS_NB_ID(),
-    ModelAPI_AttributeInteger, /** Number of components integer */,
     componentsNames, CollectionPlugin_Field::COMPONENTS_NAMES_ID(),
     ModelAPI_AttributeStringArray, /** Names of components list of strings */,
     valuesType, CollectionPlugin_Field::VALUES_TYPE_ID(),
@@ -52,9 +50,6 @@ public:
   /// Set selected objects.
   COLLECTIONAPI_EXPORT
   void setSelection(const std::list<ModelHighAPI_Selection>& theFieldList);
-  /// Set number of components
-  COLLECTIONAPI_EXPORT
-  void setComponentsNum(const ModelHighAPI_Integer& theNum);
   /// Set names of components
   COLLECTIONAPI_EXPORT
   void setComponentsNames(const std::list<std::string>& theNames);
@@ -67,10 +62,22 @@ public:
   /// Set stamps identifiers
   COLLECTIONAPI_EXPORT
   void setStamps(const std::list<ModelHighAPI_Integer>& theStamps);
-  /// Sets the values of specific step
+  /// Sets the double values of specific step
   COLLECTIONAPI_EXPORT
   void addStep(const ModelHighAPI_Integer& theStepNum, const ModelHighAPI_Integer& theStamp,
-    const std::list<std::list<ModelHighAPI_ComponentValue> >& theComponents);
+    const std::list<std::list<double> >& theComponents);
+  /// Sets the integer values of specific step
+  COLLECTIONAPI_EXPORT
+  void addStep(const ModelHighAPI_Integer& theStepNum, const ModelHighAPI_Integer& theStamp,
+    const std::list<std::list<int> >& theComponents);
+  /// Sets the string values of specific step
+  COLLECTIONAPI_EXPORT
+  void addStep(const ModelHighAPI_Integer& theStepNum, const ModelHighAPI_Integer& theStamp,
+    const std::list<std::list<std::string> >& theComponents);
+  /// Sets the boolean values of specific step
+  COLLECTIONAPI_EXPORT
+  void addStep(const ModelHighAPI_Integer& theStepNum, const ModelHighAPI_Integer& theStamp,
+    const std::list<std::list<bool> >& theComponents);
 
   /// Dump wrapped feature
   COLLECTIONAPI_EXPORT
@@ -85,7 +92,7 @@ typedef std::shared_ptr<CollectionAPI_Field> FieldPtr;
 COLLECTIONAPI_EXPORT
 FieldPtr addField(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Integer& theStepsNum,
-                  std::string& theComponentType,
+                  const std::string& theComponentType,
                   const int theComponentsNum,
                   const std::list<std::string>& theComponentNames,
                   const std::list<ModelHighAPI_Selection>& theSelectionList);

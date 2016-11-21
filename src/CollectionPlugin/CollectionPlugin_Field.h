@@ -29,7 +29,7 @@
 class CollectionPlugin_Field : public ModelAPI_Feature
 {
  public:
-  /// Extrusion kind
+  /// Feature kind
   inline static const std::string& ID()
   {
     static const std::string MY_FIELD_ID("Field");
@@ -40,12 +40,6 @@ class CollectionPlugin_Field : public ModelAPI_Feature
   {
     static const std::string MY_SELECTED_ID("selected");
     return MY_SELECTED_ID;
-  }
-  /// attribute name of components number
-  inline static const std::string& COMPONENTS_NB_ID()
-  {
-    static const std::string MY_COMPONENTS_NB_ID("components_nb");
-    return MY_COMPONENTS_NB_ID;
   }
   /// attribute name of componenets titles array
   inline static const std::string& COMPONENTS_NAMES_ID()

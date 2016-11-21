@@ -21,7 +21,9 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeStringArray.h>
 #include <ModelAPI_AttributeDoubleArray.h>
+#include <ModelAPI_AttributeTables.h>
 #include <ModelAPI_Validator.h>
 
 #include <GeomDataAPI_Dir.h>
@@ -266,6 +268,35 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
       std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(theAttr);
     for(int a = 0; a < anAttr->size(); a++)
       aResult<<anAttr->value(a)<<" ";
+  } else if (aType == ModelAPI_AttributeStringArray::typeId()) {
+    AttributeStringArrayPtr anAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeStringArray>(theAttr);
+    for(int a = 0; a < anAttr->size(); a++)
+      aResult<<"'"<<anAttr->value(a)<<"'"<<" ";
+  } else if (aType == ModelAPI_AttributeTables::typeId()) {
+    AttributeTablesPtr anAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeTables>(theAttr);
+    aResult<<anAttr->tables()<<"x"<<anAttr->rows()<<"x"<<anAttr->columns()<<" ";
+    for(int aTab = 0; aTab < anAttr->tables(); aTab++) {
+      for(int aRow = 0; aRow < anAttr->rows(); aRow++) {
+        for( int aCol = 0; aCol < anAttr->columns(); aCol++) {
+          switch(anAttr->type()) {
+          case ModelAPI_AttributeTables::BOOLEAN:
+            aResult<<anAttr->value(aRow, aCol, aTab).myBool<<" ";
+            break;
+          case ModelAPI_AttributeTables::INTEGER:
+            aResult<<anAttr->value(aRow, aCol, aTab).myInt<<" ";
+            break;
+          case ModelAPI_AttributeTables::DOUBLE:
+            aResult<<anAttr->value(aRow, aCol, aTab).myDouble<<" ";
+            break;
+          case ModelAPI_AttributeTables::STRING:
+            aResult<<"'"<<anAttr->value(aRow, aCol, aTab).myStr.c_str()<<"' ";
+            break;
+          }
+        }
+      }
+    }
   } else if (aType == GeomDataAPI_Point::typeId()) {
     AttributePointPtr anAttr = std::dynamic_pointer_cast<GeomDataAPI_Point>(theAttr);
     double aValues[3] = {anAttr->x(), anAttr->y(), anAttr->z()};

@@ -216,6 +216,7 @@
 %template(RefAttrList) std::list<ModelHighAPI_RefAttr>;
 %template(RefList) std::list<ModelHighAPI_Reference>;
 
+
 // fix compilarion error: ‘res*’ was not declared in this scope
 %typemap(freearg) const std::list<ModelHighAPI_RefAttr> & {}
 %typemap(freearg) const std::list<std::shared_ptr<ModelAPI_Object> > & {}
@@ -319,7 +320,6 @@
 %include "ModelHighAPI_RefAttr.h"
 %include "ModelHighAPI_Reference.h"
 %include "ModelHighAPI_Selection.h"
-%include "ModelHighAPI_ComponentValue.h"
 %include "ModelHighAPI_Services.h"
 %include "ModelHighAPI_Macro.h"
 %include "ModelHighAPI_Tools.h"

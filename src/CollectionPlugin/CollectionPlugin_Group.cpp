@@ -19,8 +19,8 @@ CollectionPlugin_Group::CollectionPlugin_Group()
 
 void CollectionPlugin_Group::initAttributes()
 {
-  //data()->addAttribute(CollectionPlugin_Group::NAME_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(CollectionPlugin_Group::LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
+  data()->addAttribute(CollectionPlugin_Group::LIST_ID(), 
+                       ModelAPI_AttributeSelectionList::typeId());
 }
 
 void CollectionPlugin_Group::execute()

@@ -24,14 +24,14 @@ ModuleBase_ModelWidget* CollectionPlugin_WidgetCreator::createWidgetByType(
                                                      const std::string& theType,
                                                      QWidget* theParent,
                                                      Config_WidgetAPI* theWidgetApi,
-                                                     ModuleBase_IWorkshop* /*theWorkshop*/)
+                                                     ModuleBase_IWorkshop* theWorkshop)
 {
   ModuleBase_ModelWidget* aWidget = 0;
   if (myPanelTypes.find(theType) == myPanelTypes.end())
     return aWidget;
 
   if (theType == "field-panel") {     
-    aWidget = new CollectionPlugin_WidgetField(theParent, theWidgetApi);
+    aWidget = new CollectionPlugin_WidgetField(theParent, theWorkshop, theWidgetApi);
   }
 
   return aWidget;
