@@ -37,7 +37,7 @@ public:
   /// \return a shape
   static std::shared_ptr<GeomAPI_Shape> makeBox(std::shared_ptr<GeomAPI_Pnt> theFirstPoint,
                      std::shared_ptr<GeomAPI_Pnt> theSecondPoint) throw (GeomAlgoAPI_Exception);
-                                                   
+
   /// Performs a translation from an axis and a distance.
   /// \param theSourceShape Shape to be moved.
   /// \param theAxis Movement axis.
@@ -47,7 +47,7 @@ public:
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      std::shared_ptr<GeomAPI_Ax1>   theAxis,
                      const double theDistance) throw (GeomAlgoAPI_Exception);
-                                                   
+
   /// Performs a translation from dimensions.
   /// \param theSourceShape Shape to be moved.
   /// \param theDx Movement dimension on X.

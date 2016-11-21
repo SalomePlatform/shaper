@@ -33,7 +33,7 @@ class GeomAPI_Trsf : public GeomAPI_Interface
    */
   GEOMAPI_EXPORT void setTranslation(const std::shared_ptr<GeomAPI_Ax1> theAxis,
                                      const double theDistance);
-  
+
   /** \brief Sets a translation transformation using three coordinates.
    *  \param[in] theDx x coordinate of the translation vector
    *  \param[in] theDy y coordinate of the translation vector

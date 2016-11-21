@@ -76,19 +76,17 @@ void PrimitivesAPI_Box::dump(ModelHighAPI_Dumper& theDumper) const
   theDumper << aBase << " = model.addBox(" << aDocName;
 
   std::string aCreationMethod = aBase->string(PrimitivesPlugin_Box::CREATION_METHOD())->value();
-  
+
   if(aCreationMethod == PrimitivesPlugin_Box::CREATION_METHOD_BY_DIMENSIONS()) {
     AttributeDoublePtr anAttrDx = aBase->real(PrimitivesPlugin_Box::DX_ID());
     AttributeDoublePtr anAttrDy = aBase->real(PrimitivesPlugin_Box::DY_ID());
     AttributeDoublePtr anAttrDz = aBase->real(PrimitivesPlugin_Box::DZ_ID());
-    
     theDumper << ", " << anAttrDx << ", " << anAttrDy << ", " << anAttrDz;
   } else if (aCreationMethod == PrimitivesPlugin_Box::CREATION_METHOD_BY_TWO_POINTS()) {
     AttributeSelectionPtr anAttrFirstPnt =
       aBase->selection(PrimitivesPlugin_Box::POINT_FIRST_ID());
     AttributeSelectionPtr anAttrSecondPnt =
       aBase->selection(PrimitivesPlugin_Box::POINT_SECOND_ID());
-
     theDumper << ", " << anAttrFirstPnt << ", " << anAttrSecondPnt;
   }
 

@@ -90,14 +90,14 @@ void FeaturesAPI_Translation::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
-  
+
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Translation::OBJECTS_LIST_ID());
   theDumper << aBase << " = model.addTranslation(" << aDocName << ", " << anAttrObjects;
-  
+
   std::string aCreationMethod =
     aBase->string(FeaturesPlugin_Translation::CREATION_METHOD())->value();
-  
+
   if(aCreationMethod == FeaturesPlugin_Translation::CREATION_METHOD_BY_DISTANCE()) {
     AttributeSelectionPtr anAttrAxis =
       aBase->selection(FeaturesPlugin_Translation::AXIS_OBJECT_ID());

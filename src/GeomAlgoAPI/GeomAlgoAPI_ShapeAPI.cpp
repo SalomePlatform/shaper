@@ -59,7 +59,7 @@ namespace GeomAlgoAPI_ShapeAPI
     }
     return aBoxAlgo.shape();
   }
-  
+
   //=========================================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeTranslation(
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
@@ -67,13 +67,13 @@ namespace GeomAlgoAPI_ShapeAPI
     const double theDistance) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Translation aTranslationAlgo(theSourceShape, theAxis, theDistance);
-    
+
     if (!aTranslationAlgo.check()) {
       throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
     }
-    
+
     aTranslationAlgo.build();
-    
+
     if(!aTranslationAlgo.isDone()) {
       throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
     }
@@ -82,7 +82,7 @@ namespace GeomAlgoAPI_ShapeAPI
     }
     return aTranslationAlgo.shape();
   }
-  
+
   //=========================================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeTranslation(
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
@@ -91,13 +91,13 @@ namespace GeomAlgoAPI_ShapeAPI
     const double theDz) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Translation aTranslationAlgo(theSourceShape, theDx, theDy, theDz);
-    
+
     if (!aTranslationAlgo.check()) {
       throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
     }
-    
+
     aTranslationAlgo.build();
-    
+
     if(!aTranslationAlgo.isDone()) {
       throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
     }

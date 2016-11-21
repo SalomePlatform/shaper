@@ -27,7 +27,7 @@ public:
     BY_DIM,      ///< Translation by dimensions in X, Y and Z
     BY_POINTS    ///< Translation by two points
   };
-  
+
   /// \brief Creates an object which is obtained from current object by moving it along the axis.
   /// \param[in] theSourceShape  a shape to be moved.
   /// \param[in] theAxis         movement axis.
@@ -35,8 +35,8 @@ public:
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Translation(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                              std::shared_ptr<GeomAPI_Ax1>   theAxis,
                                              double                         theDistance);
-  
-  /// \brief Creates an object which is obtained from current object by moving it along a vector 
+
+  /// \brief Creates an object which is obtained from current object by moving it along a vector
   ///        defined by its dimensions in X, Y and Z.
   /// \param[in] theSourceShape  the shape to be moved.
   /// \param[in] theDX           the movement dimension in X.
@@ -46,10 +46,10 @@ public:
                                              double                         theDx,
                                              double                         theDy,
                                              double                         theDz);
-  
+
   /// Checks if data for the translation execution is OK.
   GEOMALGOAPI_EXPORT bool check();
-  
+
   /// Execute the translation.
   GEOMALGOAPI_EXPORT void build();
 

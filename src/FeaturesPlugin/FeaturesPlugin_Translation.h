@@ -69,21 +69,21 @@ class FeaturesPlugin_Translation : public ModelAPI_Feature
     static const std::string MY_DISTANCE_ID("distance");
     return MY_DISTANCE_ID;
   }
-  
+
   /// Attribute name of dimension in X.
   inline static const std::string& DX_ID()
   {
     static const std::string MY_DX_ID("dx");
     return MY_DX_ID;
   }
-  
+
   /// Attribute name of dimension in Y.
   inline static const std::string& DY_ID()
   {
     static const std::string MY_DY_ID("dy");
     return MY_DY_ID;
   }
-  
+
   /// Attribute name of dimension in Z.
   inline static const std::string& DZ_ID()
   {
@@ -110,10 +110,10 @@ class FeaturesPlugin_Translation : public ModelAPI_Feature
 private:
   ///Perform the translation using an axis and a distance.
   void performTranslationByAxisAndDistance();
-  
+
   ///Perform the translation using three dimensions X, Y and Z
   void performTranslationByDimensions();
-  
+
   void loadNamingDS(GeomAlgoAPI_Translation& theTranslationAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theBaseShape);

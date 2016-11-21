@@ -30,7 +30,7 @@ FeaturesPlugin_Translation::FeaturesPlugin_Translation()
 void FeaturesPlugin_Translation::initAttributes()
 {
   data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
-  
+
   AttributeSelectionListPtr aSelection =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
     FeaturesPlugin_Translation::OBJECTS_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
@@ -39,12 +39,12 @@ void FeaturesPlugin_Translation::initAttributes()
                        ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(FeaturesPlugin_Translation::DISTANCE_ID(),
                        ModelAPI_AttributeDouble::typeId());
-  
-  data()->addAttribute(FeaturesPlugin_Translation::DX_ID(), 
+
+  data()->addAttribute(FeaturesPlugin_Translation::DX_ID(),
                        ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(FeaturesPlugin_Translation::DY_ID(), 
+  data()->addAttribute(FeaturesPlugin_Translation::DY_ID(),
                        ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(FeaturesPlugin_Translation::DZ_ID(), 
+  data()->addAttribute(FeaturesPlugin_Translation::DZ_ID(),
                        ModelAPI_AttributeDouble::typeId());
 }
 
@@ -53,11 +53,11 @@ void FeaturesPlugin_Translation::execute()
 {
   AttributeStringPtr aMethodTypeAttr = string(FeaturesPlugin_Translation::CREATION_METHOD());
   std::string aMethodType = aMethodTypeAttr->value();
-  
+
   if (aMethodType == CREATION_METHOD_BY_DISTANCE()) {
     performTranslationByAxisAndDistance();
   }
-  
+
   if (aMethodType == CREATION_METHOD_BY_DIMENSIONS()) {
     performTranslationByDimensions();
   }
@@ -83,14 +83,14 @@ void FeaturesPlugin_Translation::performTranslationByAxisAndDistance()
     anObjects.push_back(anObject);
     aContextes.push_back(anObjectAttr->context());
   }
-  
+
   //Getting axis.
   std::shared_ptr<GeomAPI_Ax1> anAxis;
   std::shared_ptr<GeomAPI_Edge> anEdge;
   std::shared_ptr<ModelAPI_AttributeSelection> anObjRef = selection(FeaturesPlugin_Translation::AXIS_OBJECT_ID());
   if(anObjRef && anObjRef->value() && anObjRef->value()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->value()));
-  } else if (anObjRef && !anObjRef->value() && anObjRef->context() && 
+  } else if (anObjRef && !anObjRef->value() && anObjRef->context() &&
              anObjRef->context()->shape() && anObjRef->context()->shape()->isEdge()) {
     anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->context()->shape()));
   }
@@ -100,7 +100,7 @@ void FeaturesPlugin_Translation::performTranslationByAxisAndDistance()
 
   // Getting distance.
   double aDistance = real(FeaturesPlugin_Translation::DISTANCE_ID())->value();
-  
+
   // Moving each object.
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
@@ -119,12 +119,12 @@ void FeaturesPlugin_Translation::performTranslationByAxisAndDistance()
       setResult(aResultPart, aResultIndex);
     } else {
       GeomAlgoAPI_Translation aTranslationAlgo(aBaseShape, anAxis, aDistance);
-      
+
       if (!aTranslationAlgo.check()) {
         setError(aTranslationAlgo.getError());
         return;
       }
-      
+
       aTranslationAlgo.build();
 
       // Checking that the algorithm worked properly.
@@ -175,12 +175,12 @@ void FeaturesPlugin_Translation::performTranslationByDimensions()
     anObjects.push_back(anObject);
     aContextes.push_back(anObjectAttr->context());
   }
-  
+
   // Getting dimensions in X, in Y and in Z
   double aDX = real(FeaturesPlugin_Translation::DX_ID())->value();
   double aDY = real(FeaturesPlugin_Translation::DY_ID())->value();
   double aDZ = real(FeaturesPlugin_Translation::DZ_ID())->value();
-  
+
   // Moving each object.
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
@@ -199,12 +199,12 @@ void FeaturesPlugin_Translation::performTranslationByDimensions()
       setResult(aResultPart, aResultIndex);
     } else {
       GeomAlgoAPI_Translation aTranslationAlgo(aBaseShape, aDX, aDY, aDZ);
-      
+
       if (!aTranslationAlgo.check()) {
         setError(aTranslationAlgo.getError());
         return;
       }
-      
+
       aTranslationAlgo.build();
 
       // Checking that the algorithm worked properly.
@@ -247,7 +247,7 @@ void FeaturesPlugin_Translation::loadNamingDS(GeomAlgoAPI_Translation& theTransl
   std::string aTranslatedName = "Translated";
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theTranslationAlgo.mapOfSubShapes();
 
-  FeaturesPlugin_Tools::storeModifiedShapes(theTranslationAlgo, theResultBody, 
+  FeaturesPlugin_Tools::storeModifiedShapes(theTranslationAlgo, theResultBody,
                                             theBaseShape, aTranslatedTag, aTranslatedName,
                                             *aSubShapes.get());
 }

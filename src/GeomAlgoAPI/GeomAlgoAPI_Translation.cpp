@@ -53,8 +53,8 @@ bool GeomAlgoAPI_Translation::check()
       return true;
     }
     case BY_DIM: {
-      if ((fabs(myDx) < Precision::Confusion()) && 
-          (fabs(myDy) < Precision::Confusion()) && 
+      if ((fabs(myDx) < Precision::Confusion()) &&
+          (fabs(myDy) < Precision::Confusion()) &&
           (fabs(myDz) < Precision::Confusion())) {
         myError = "Translation builder :: Dx, Dy and Dz are null.";
         return false;
@@ -76,7 +76,7 @@ bool GeomAlgoAPI_Translation::check()
 void GeomAlgoAPI_Translation::build()
 {
   gp_Trsf* aTrsf = new gp_Trsf();
-  
+
   switch (myMethodType) {
     case BY_DISTANCE: {
       const gp_Ax1& anAxis = myAxis->impl<gp_Ax1>();
@@ -99,7 +99,7 @@ void GeomAlgoAPI_Translation::build()
     myError = "Translation builder :: source shape does not contain any actual shape.";
     return;
   }
-  
+
   // Transform the shape while copying it.
   BRepBuilderAPI_Transform* aBuilder = new BRepBuilderAPI_Transform(aSourceShape, *aTrsf, true);
   if(!aBuilder) {

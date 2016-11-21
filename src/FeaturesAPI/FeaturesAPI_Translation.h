@@ -56,11 +56,11 @@ public:
               ModelAPI_AttributeSelection, /** Axis object */,
               distance, FeaturesPlugin_Translation::DISTANCE_ID(),
               ModelAPI_AttributeDouble, /** Distance */,
-              dx, FeaturesPlugin_Translation::DX_ID(), 
+              dx, FeaturesPlugin_Translation::DX_ID(),
               ModelAPI_AttributeDouble, /** Dimension in X */,
-              dy, FeaturesPlugin_Translation::DY_ID(), 
+              dy, FeaturesPlugin_Translation::DY_ID(),
               ModelAPI_AttributeDouble, /** Dimension in Y */,
-              dz, FeaturesPlugin_Translation::DZ_ID(), 
+              dz, FeaturesPlugin_Translation::DZ_ID(),
               ModelAPI_AttributeDouble, /** Dimension in Z */
              )
 
@@ -72,7 +72,7 @@ public:
   FEATURESAPI_EXPORT
   void setAxisAndDistance(const ModelHighAPI_Selection& theAxisObject,
                           const ModelHighAPI_Double& theDistance);
-  
+
   /// Modify CreationMethod, dx, dy, dz attributes of the feature.
   FEATURESAPI_EXPORT
   void setDimensions(const ModelHighAPI_Double& theDx,
