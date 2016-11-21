@@ -46,13 +46,6 @@ class FeaturesPlugin_Recover : public ModelAPI_Feature
     return MY_RECOVERED_ENTITIES_ID;
   }
 
-  /// Attribute name of persistenc concealment flag.
-  inline static const std::string& PERSISTENT()
-  {
-    static const std::string MY_PERSISTENT_ID("persistent");
-    return MY_PERSISTENT_ID;
-  }
-
   /// Returns the kind of a feature
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
   {
@@ -69,26 +62,6 @@ class FeaturesPlugin_Recover : public ModelAPI_Feature
   /// Use plugin manager for features creation
   FeaturesPlugin_Recover();
 
-  /// Called on change of any argument-attribute of this object. Needed here for synchronization
-  /// of registered unconcealed.
-  virtual void attributeChanged(const std::string& theID);
-
-  /// Synchronises myRegistered before all attributes are erased
-  virtual void erase();
-
-  /// on unstability of feature, remove all unconcealment effect
-  virtual bool setStable(const bool theFlag);
-  /// on disable of feature, remove all unconcealment effect
-  virtual bool setDisabled(const bool theFlag);
-private:
-  /// Synchronises registration of unconcealed entities with the attributes values of this feature
-  void synchronizeRegistered();
-
-  /// Returns the base feature of this
-  FeaturePtr baseFeature();
-
-  /// erases all registered cashed values
-  void clearRegistered();
 };
 
 #endif
