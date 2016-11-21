@@ -131,5 +131,4 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestUnion.py
                TestRemoveSubShapes.py
                TestPipe.py
-               TestRecover.py
-               APIParam_Translation.py)
+               TestRecover.py)

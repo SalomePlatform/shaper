@@ -45,7 +45,6 @@ bool GeomAlgoAPI_Translation::check()
         myError = "Translation builder :: axis is invalid.";
         return false;
       }
-      // TODO : verification de la distance
       if (!mySourceShape) {
         myError = "Translation builder :: source shape is invalid.";
         return false;
@@ -53,12 +52,6 @@ bool GeomAlgoAPI_Translation::check()
       return true;
     }
     case BY_DIM: {
-      if ((fabs(myDx) < Precision::Confusion()) &&
-          (fabs(myDy) < Precision::Confusion()) &&
-          (fabs(myDz) < Precision::Confusion())) {
-        myError = "Translation builder :: Dx, Dy and Dz are null.";
-        return false;
-      }
       if (!mySourceShape) {
         myError = "Translation builder :: source shape is invalid.";
         return false;

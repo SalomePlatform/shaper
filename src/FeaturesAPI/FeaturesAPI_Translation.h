@@ -30,15 +30,15 @@ public:
 
   /// Constructor with values.
   FEATURESAPI_EXPORT
-  FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                          const std::list<ModelHighAPI_Selection>& theMainObjects,
-                          const ModelHighAPI_Selection& theAxisObject,
-                          const ModelHighAPI_Double& theDistance);
+  explicit FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                   const std::list<ModelHighAPI_Selection>& theMainObjects,
+                                   const ModelHighAPI_Selection& theAxisObject,
+                                   const ModelHighAPI_Double& theDistance);
 
   /// Constructor with values.
   FEATURESAPI_EXPORT
-  FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                          const std::list<ModelHighAPI_Selection>& theMainObjects,
+  explicit FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                   const std::list<ModelHighAPI_Selection>& theMainObjects,
                           const ModelHighAPI_Double& theDx,
                           const ModelHighAPI_Double& theDy,
                           const ModelHighAPI_Double& theDz);

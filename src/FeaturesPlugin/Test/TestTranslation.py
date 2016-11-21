@@ -133,5 +133,5 @@ assert (len(aMoveFt.results()) > 0)
 aMoveResult = modelAPI_ResultBody(aMoveFt.firstResult())
 assert (aMoveResult is not None)
 
-#import model
-#assert(model.checkPythonDump())
+import model
+assert(model.checkPythonDump())
