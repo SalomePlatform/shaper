@@ -68,6 +68,10 @@ public:
   PRIMITIVESAPI_EXPORT
   void setPoints(const ModelHighAPI_Selection& theFirstPoint,
                  const ModelHighAPI_Selection& theSecondPoint);
+
+  /// Dump wrapped feature
+  PRIMITIVESAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on primitive Box object
