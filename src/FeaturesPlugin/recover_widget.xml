@@ -9,5 +9,4 @@
   <concealed_objects_view id="recovered"
                   tooltip="Concealed results to be recevered"
                   base_shape_attribute="base_feature"/>
-  <boolvalue id="persistent" label="Persistent" default="false" tooltip="Makes unable to conceal result again" obligatory="0"/>
 </source>

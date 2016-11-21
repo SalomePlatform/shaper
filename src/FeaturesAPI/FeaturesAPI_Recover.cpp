@@ -26,7 +26,6 @@ FeaturesAPI_Recover::FeaturesAPI_Recover(const std::shared_ptr<ModelAPI_Feature>
   if(initialize()) {
     setBaseFeature(theBaseFeature);
     setRecoveredList(theRecoveredList);
-    setIsPersistent(thePersistent);
   }
 }
 
@@ -49,13 +48,6 @@ void FeaturesAPI_Recover::setRecoveredList(const std::list<ModelHighAPI_Selectio
   // do not need to execute because on attribute changed it does everything anyway
 }
 
-//=================================================================================================
-void FeaturesAPI_Recover::setIsPersistent(bool thePersistent)
-{
-  fillAttribute(thePersistent, myisPersistent);
-  // do not need to execute because on attribute changed it does everything anyway
-}
-
 //==================================================================================================
 void FeaturesAPI_Recover::dump(ModelHighAPI_Dumper& theDumper) const
 {
@@ -66,13 +58,11 @@ void FeaturesAPI_Recover::dump(ModelHighAPI_Dumper& theDumper) const
     aBase->reference(FeaturesPlugin_Recover::BASE_FEATURE());
   AttributeRefListPtr anAttrRecoveredEntities =
     aBase->reflist(FeaturesPlugin_Recover::RECOVERED_ENTITIES());
-  AttributeBooleanPtr anAttrPersistent = aBase->boolean(FeaturesPlugin_Recover::PERSISTENT());
 
   FeaturePtr aFeature = ModelAPI_Feature::feature(anAttrBaseFeature->value());
 
   theDumper << aBase << " = model.addRecover(" << aDocName << ", "
-            << aFeature << ", " << anAttrRecoveredEntities << ", "
-            << anAttrPersistent << ")" << std::endl;
+            << aFeature << ", " << anAttrRecoveredEntities << ")" << std::endl;
 }
 
 //=================================================================================================

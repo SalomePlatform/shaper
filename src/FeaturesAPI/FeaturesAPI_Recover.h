@@ -38,13 +38,11 @@ public:
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_Recover();
 
-  INTERFACE_3(FeaturesPlugin_Recover::ID(),
+  INTERFACE_2(FeaturesPlugin_Recover::ID(),
               baseFeature, FeaturesPlugin_Recover::BASE_FEATURE(),
               ModelAPI_AttributeReference, /** Concealed feature */,
               recoveredList, FeaturesPlugin_Recover::RECOVERED_ENTITIES(),
-              ModelAPI_AttributeRefList, /** Recover list*/,
-              isPersistent, FeaturesPlugin_Recover::PERSISTENT(),
-              ModelAPI_AttributeBoolean, /** Is persistent flag */)
+              ModelAPI_AttributeRefList, /** Recover list*/)
 
   /// Set base feature.
   FEATURESAPI_EXPORT
@@ -53,10 +51,6 @@ public:
   /// Set recovered list of the base feature
   FEATURESAPI_EXPORT
   void setRecoveredList(const std::list<ModelHighAPI_Selection>& theRecoverList);
-
-  /// Set auxiliary
-  FEATURESAPI_EXPORT
-  void setIsPersistent(bool thePersistent);
 
   /// Dump wrapped feature
   FEATURESAPI_EXPORT

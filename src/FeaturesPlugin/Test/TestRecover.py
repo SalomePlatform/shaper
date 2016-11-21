@@ -45,9 +45,12 @@ assert(mypart.size("Bodies") == 1)
 
 # check persistent flag of recover: never concealed
 model.begin()
+recover = model.addRecover(mypart, cut, smallcyl.results())
+model.end()
 
-recover = model.addRecover(mypart, cut, smallcyl.results(), True)
 assert(mypart.size("Bodies") == 2)
+
+model.begin()
 sk3 = model.addSketch(mypart, model.defaultPlane("XOY"))
 c3 = sk3.addCircle(0, 0, 90)
 model.do()
@@ -59,13 +62,5 @@ model.end()
 
 # two booleans and small cylinder
 assert(mypart.size("Bodies") == 3)
-
-
-# make the flag as not-persistent => cylinder must be disappeared
-model.begin()
-recover.setIsPersistent(False)
-model.end()
-# only two booleans
-assert(mypart.size("Bodies") == 2)
 
 assert(model.checkPythonDump())
