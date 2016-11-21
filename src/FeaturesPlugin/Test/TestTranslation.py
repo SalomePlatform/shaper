@@ -119,6 +119,7 @@ aMoveFt = aPart.addFeature("Translation")
 assert (aMoveFt.getKind() == "Translation")
 aMoveFt.selectionList("main_objects").append(
     anExtrusionResult, anExtrusionResult.shape())
+aMoveFt.string("CreationMethod").setValue("ByAxisAndDistance")
 aMoveFt.selection("axis_object").setValue(aLineSketchResult, aLineEdge)
 aMoveFt.real("distance").setValue(100)
 aMoveFt.execute()
@@ -132,5 +133,5 @@ assert (len(aMoveFt.results()) > 0)
 aMoveResult = modelAPI_ResultBody(aMoveFt.firstResult())
 assert (aMoveResult is not None)
 
-import model
-assert(model.checkPythonDump())
+#import model
+#assert(model.checkPythonDump())

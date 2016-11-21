@@ -1,8 +1,10 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+// Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
 // File:        GeomAPI_Trsf.cpp
 // Created:     13 Jul 2015
 // Author:      Mikhail PONIKAROV
+//
+// Modified by Clarisse Genrault (CEA) : 17 Nov 2016
 
 #include<GeomAPI_Trsf.h>
 
@@ -30,6 +32,12 @@ void GeomAPI_Trsf::setTranslation(const std::shared_ptr<GeomAPI_Ax1> theAxis,
                                   const double theDistance)
 {
   MY_TRSF->SetTranslation(gp_Vec(theAxis->impl<gp_Ax1>().Direction()) * theDistance);
+}
+
+//=================================================================================================
+void GeomAPI_Trsf::setTranslation(const double theDx, const double theDy, const double theDz)
+{
+  MY_TRSF->SetTranslation(gp_Vec(theDx, theDy, theDz));
 }
 
 //=================================================================================================

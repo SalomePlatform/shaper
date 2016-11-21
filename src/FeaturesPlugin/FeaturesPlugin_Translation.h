@@ -1,8 +1,10 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+// Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
 // File:        FeaturesPlugin_Translation.h
 // Created:     8 June 2015
 // Author:      Dmitry Bobylev
+//
+// Modified by Clarisse Genrault (CEA) : 17 Nov 2016
 
 #ifndef FeaturesPlugin_Translation_H_
 #define FeaturesPlugin_Translation_H_
@@ -26,6 +28,27 @@ class FeaturesPlugin_Translation : public ModelAPI_Feature
     return MY_TRANSLATION_ID;
   }
 
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD()
+  {
+    static const std::string MY_CREATION_METHOD_ID("CreationMethod");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method "ByAxisAndDistance".
+  inline static const std::string& CREATION_METHOD_BY_DISTANCE()
+  {
+    static const std::string MY_CREATION_METHOD_ID("ByAxisAndDistance");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method "ByDimensions".
+  inline static const std::string& CREATION_METHOD_BY_DIMENSIONS()
+  {
+    static const std::string MY_CREATION_METHOD_ID("ByDimensions");
+    return MY_CREATION_METHOD_ID;
+  }
+
   /// Attribute name of referenced objects.
   inline static const std::string& OBJECTS_LIST_ID()
   {
@@ -46,6 +69,27 @@ class FeaturesPlugin_Translation : public ModelAPI_Feature
     static const std::string MY_DISTANCE_ID("distance");
     return MY_DISTANCE_ID;
   }
+  
+  /// Attribute name of dimension in X.
+  inline static const std::string& DX_ID()
+  {
+    static const std::string MY_DX_ID("dx");
+    return MY_DX_ID;
+  }
+  
+  /// Attribute name of dimension in Y.
+  inline static const std::string& DY_ID()
+  {
+    static const std::string MY_DY_ID("dy");
+    return MY_DY_ID;
+  }
+  
+  /// Attribute name of dimension in Z.
+  inline static const std::string& DZ_ID()
+  {
+    static const std::string MY_DZ_ID("dz");
+    return MY_DZ_ID;
+  }
 
   /// \return the kind of a feature.
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
@@ -64,6 +108,12 @@ class FeaturesPlugin_Translation : public ModelAPI_Feature
   FeaturesPlugin_Translation();
 
 private:
+  ///Perform the translation using an axis and a distance.
+  void performTranslationByAxisAndDistance();
+  
+  ///Perform the translation using three dimensions X, Y and Z
+  void performTranslationByDimensions();
+  
   void loadNamingDS(GeomAlgoAPI_Translation& theTranslationAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theBaseShape);

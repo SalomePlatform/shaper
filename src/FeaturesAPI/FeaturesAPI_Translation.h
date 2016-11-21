@@ -35,29 +35,49 @@ public:
                           const ModelHighAPI_Selection& theAxisObject,
                           const ModelHighAPI_Double& theDistance);
 
+  /// Constructor with values.
+  FEATURESAPI_EXPORT
+  FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                          const std::list<ModelHighAPI_Selection>& theMainObjects,
+                          const ModelHighAPI_Double& theDx,
+                          const ModelHighAPI_Double& theDy,
+                          const ModelHighAPI_Double& theDz);
+
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_Translation();
 
-  INTERFACE_3(FeaturesPlugin_Translation::ID(),
+  INTERFACE_7(FeaturesPlugin_Translation::ID(),
+              creationMethod, FeaturesPlugin_Translation::CREATION_METHOD(),
+              ModelAPI_AttributeString, /** Creation method */,
               mainObjects, FeaturesPlugin_Translation::OBJECTS_LIST_ID(),
               ModelAPI_AttributeSelectionList, /** Main objects */,
               axisObject, FeaturesPlugin_Translation::AXIS_OBJECT_ID(),
               ModelAPI_AttributeSelection, /** Axis object */,
               distance, FeaturesPlugin_Translation::DISTANCE_ID(),
-              ModelAPI_AttributeDouble, /** Distance */)
+              ModelAPI_AttributeDouble, /** Distance */,
+              dx, FeaturesPlugin_Translation::DX_ID(), 
+              ModelAPI_AttributeDouble, /** Dimension in X */,
+              dy, FeaturesPlugin_Translation::DY_ID(), 
+              ModelAPI_AttributeDouble, /** Dimension in Y */,
+              dz, FeaturesPlugin_Translation::DZ_ID(), 
+              ModelAPI_AttributeDouble, /** Dimension in Z */
+             )
 
   /// Set main objects.
   FEATURESAPI_EXPORT
   void setMainObjects(const std::list<ModelHighAPI_Selection>& theMainObjects);
 
-  /// Set axis object.
+  /// Modify CreationMethod, axis_object, distance attributes of the feature.
   FEATURESAPI_EXPORT
-  void setAxisObject(const ModelHighAPI_Selection& theAxisObject);
-
-  /// Set distance.
+  void setAxisAndDistance(const ModelHighAPI_Selection& theAxisObject,
+                          const ModelHighAPI_Double& theDistance);
+  
+  /// Modify CreationMethod, dx, dy, dz attributes of the feature.
   FEATURESAPI_EXPORT
-  void setDistance(const ModelHighAPI_Double& theDistance);
+  void setDimensions(const ModelHighAPI_Double& theDx,
+                     const ModelHighAPI_Double& theDy,
+                     const ModelHighAPI_Double& theDz);
 
   /// Dump wrapped feature
   FEATURESAPI_EXPORT
@@ -74,5 +94,14 @@ TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
                               const std::list<ModelHighAPI_Selection>& theMainObjects,
                               const ModelHighAPI_Selection& theAxisObject,
                               const ModelHighAPI_Double& theDistance);
+
+/// \ingroup CPPHighAPI
+/// \brief Create Translation feature.
+FEATURESAPI_EXPORT
+TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
+                              const std::list<ModelHighAPI_Selection>& theMainObjects,
+                              const ModelHighAPI_Double& theDx,
+                              const ModelHighAPI_Double& theDy,
+                              const ModelHighAPI_Double& theDz);
 
 #endif // FeaturesAPI_Translation_H_

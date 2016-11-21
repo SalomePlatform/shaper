@@ -27,8 +27,22 @@ FeaturesAPI_Translation::FeaturesAPI_Translation(
 {
   if(initialize()) {
     fillAttribute(theMainObjects, mymainObjects);
-    fillAttribute(theAxisObject, myaxisObject);
-    setDistance(theDistance);
+    setAxisAndDistance(theAxisObject, theDistance);
+  }
+}
+
+//==================================================================================================
+FeaturesAPI_Translation::FeaturesAPI_Translation(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<ModelHighAPI_Selection>& theMainObjects,
+  const ModelHighAPI_Double& theDx,
+  const ModelHighAPI_Double& theDy,
+  const ModelHighAPI_Double& theDz)
+: ModelHighAPI_Interface(theFeature)
+{
+  if(initialize()) {
+    fillAttribute(theMainObjects, mymainObjects);
+    setDimensions(theDx, theDy, theDz);
   }
 }
 
@@ -48,17 +62,25 @@ void FeaturesAPI_Translation::setMainObjects(
 }
 
 //==================================================================================================
-void FeaturesAPI_Translation::setAxisObject(const ModelHighAPI_Selection& theAxisObject)
+void FeaturesAPI_Translation::setAxisAndDistance(const ModelHighAPI_Selection& theAxisObject,
+                                                 const ModelHighAPI_Double& theDistance)
 {
+  fillAttribute(FeaturesPlugin_Translation::CREATION_METHOD_BY_DISTANCE(), mycreationMethod);
   fillAttribute(theAxisObject, myaxisObject);
+  fillAttribute(theDistance, mydistance);
 
   execute();
 }
 
 //==================================================================================================
-void FeaturesAPI_Translation::setDistance(const ModelHighAPI_Double& theDistance)
+void FeaturesAPI_Translation::setDimensions(const ModelHighAPI_Double& theDx,
+                                            const ModelHighAPI_Double& theDy,
+                                            const ModelHighAPI_Double& theDz)
 {
-  fillAttribute(theDistance, mydistance);
+  fillAttribute(FeaturesPlugin_Translation::CREATION_METHOD_BY_DIMENSIONS(), mycreationMethod);
+  fillAttribute(theDx, mydx);
+  fillAttribute(theDy, mydy);
+  fillAttribute(theDz, mydz);
 
   execute();
 }
@@ -68,15 +90,28 @@ void FeaturesAPI_Translation::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
-
+  
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Translation::OBJECTS_LIST_ID());
-  AttributeSelectionPtr anAttrAxis =
-    aBase->selection(FeaturesPlugin_Translation::AXIS_OBJECT_ID());
-  AttributeDoublePtr anAttrDistance = aBase->real(FeaturesPlugin_Translation::DISTANCE_ID());
+  theDumper << aBase << " = model.addTranslation(" << aDocName << ", " << anAttrObjects;
+  
+  std::string aCreationMethod =
+    aBase->string(FeaturesPlugin_Translation::CREATION_METHOD())->value();
+  
+  if(aCreationMethod == FeaturesPlugin_Translation::CREATION_METHOD_BY_DISTANCE()) {
+    AttributeSelectionPtr anAttrAxis =
+      aBase->selection(FeaturesPlugin_Translation::AXIS_OBJECT_ID());
+    AttributeDoublePtr anAttrDistance =
+      aBase->real(FeaturesPlugin_Translation::DISTANCE_ID());
+    theDumper << ", " << anAttrAxis << ", " << anAttrDistance;
+  } else if (aCreationMethod == FeaturesPlugin_Translation::CREATION_METHOD_BY_DIMENSIONS()) {
+    AttributeDoublePtr anAttrDx = aBase->real(FeaturesPlugin_Translation::DX_ID());
+    AttributeDoublePtr anAttrDy = aBase->real(FeaturesPlugin_Translation::DY_ID());
+    AttributeDoublePtr anAttrDz = aBase->real(FeaturesPlugin_Translation::DZ_ID());
+    theDumper << ", " << anAttrDx << ", " << anAttrDy << ", " << anAttrDz;
+  }
 
-  theDumper << aBase << " = model.addTranslation(" << aDocName << ", "
-            << anAttrObjects << ", " << anAttrAxis << ", " << anAttrDistance << ")" << std::endl;
+   theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
@@ -88,4 +123,15 @@ TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Translation::ID());
   return TranslationPtr(new FeaturesAPI_Translation(aFeature, theMainObjects,
                                                     theAxisObject, theDistance));
+}
+
+//==================================================================================================
+TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
+                              const std::list<ModelHighAPI_Selection>& theMainObjects,
+                              const ModelHighAPI_Double& theDx,
+                              const ModelHighAPI_Double& theDy,
+                              const ModelHighAPI_Double& theDz)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Translation::ID());
+  return TranslationPtr(new FeaturesAPI_Translation(aFeature, theMainObjects, theDx, theDy, theDz));
 }

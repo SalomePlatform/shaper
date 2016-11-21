@@ -1,28 +1,66 @@
-<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
+<!-- Copyright (C) 2014-2016 CEA/DEN, EDF R&D -->
+<!-- Modified by Clarisse Genrault (CEA) : 17 Nov 2016 -->
 <source>
-  <multi_selector id="main_objects"
-    label="Main objects"
-    icon="icons/Features/cut_shape.png"
-    tooltip="Select solid objects"
-    type_choice="objects"
-    concealment="true">
-    <validator id="FeaturesPlugin_ValidatorTransform"/>
-  </multi_selector>
-  <shape_selector id="axis_object"
-                  icon="icons/Features/axis.png"
-                  label="Axis"
-                  tooltip="Select an edge for axis"
-                  shape_types="edge"
-                  default="">
-    <validator id="GeomValidators_ShapeType" parameters="line"/>
-  </shape_selector>
-  <doublevalue
-    id="distance"
-    label="Distance"
-    step="1.0"
-    default="0"
-    icon="icons/Features/dimension_v.png"
-    tooltip="Distance">
-  </doublevalue>
+  <toolbox id="CreationMethod">
+    <box id="ByAxisAndDistance"
+         title="By an axis and a distance"
+         icon="icons/Features/translation_vector_32x32.png">
+      <multi_selector id="main_objects"
+                      label="Main objects"
+                      icon=""
+                      tooltip="Select solid objects"
+                      type_choice="objects"
+                      concealment="true">
+        <validator id="FeaturesPlugin_ValidatorTransform"/>
+      </multi_selector>
+      <shape_selector id="axis_object"
+                      icon="icons/Features/axis.png"
+                      label="Axis"
+                      tooltip="Select an edge for axis"
+                      shape_types="edge"
+                      default="">
+        <validator id="GeomValidators_ShapeType" parameters="line"/>
+      </shape_selector>
+      <doublevalue id="distance"
+                   label="Distance"
+                   step="1.0"
+                   default="0"
+                   icon="icons/Features/dimension_v.png"
+                   tooltip="Distance">
+      </doublevalue>
+    </box>
+    <box id="ByDimensions"
+         title="By dimensions in X, in X and in Z"
+         icon="icons/Features/translation_dxyz_32x32.png">
+      <multi_selector id="main_objects"
+                      label="Main objects"
+                      icon=""
+                      tooltip="Select solid objects"
+                      type_choice="objects"
+                      concealment="true">
+        <validator id="FeaturesPlugin_ValidatorTransform"/>
+      </multi_selector>
+      <doublevalue id="dx"
+                   label="DX"
+                   step="1.0"
+                   default="10"
+                   icon=""
+                   tooltip="Dimension in X">
+      </doublevalue>
+      <doublevalue id="dy"
+                   label="DY"
+                   step="1.0"
+                   default="0"
+                   icon=""
+                   tooltip="Dimension in Y">
+      </doublevalue>
+      <doublevalue id="dz"
+                   label="DZ"
+                   step="1.0"
+                   default="0"
+                   icon=""
+                   tooltip="Dimension in Z">
+      </doublevalue>
+    </box>
+ </toolbox>
 </source>

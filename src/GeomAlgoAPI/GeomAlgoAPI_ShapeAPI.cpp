@@ -6,6 +6,7 @@
 
 #include "GeomAlgoAPI_ShapeAPI.h"
 #include <GeomAlgoAPI_Box.h>
+#include <GeomAlgoAPI_Translation.h>
 
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Edge.h>
@@ -57,5 +58,52 @@ namespace GeomAlgoAPI_ShapeAPI
       throw GeomAlgoAPI_Exception(aBoxAlgo.getError());
     }
     return aBoxAlgo.shape();
+  }
+  
+  //=========================================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeTranslation(
+    std::shared_ptr<GeomAPI_Shape> theSourceShape,
+    std::shared_ptr<GeomAPI_Ax1>   theAxis,
+    const double theDistance) throw (GeomAlgoAPI_Exception)
+  {
+    GeomAlgoAPI_Translation aTranslationAlgo(theSourceShape, theAxis, theDistance);
+    
+    if (!aTranslationAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
+    }
+    
+    aTranslationAlgo.build();
+    
+    if(!aTranslationAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
+    }
+    if (!aTranslationAlgo.checkValid("Translation builder with axis and distance")) {
+      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
+    }
+    return aTranslationAlgo.shape();
+  }
+  
+  //=========================================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeTranslation(
+    std::shared_ptr<GeomAPI_Shape> theSourceShape,
+    const double theDx,
+    const double theDy,
+    const double theDz) throw (GeomAlgoAPI_Exception)
+  {
+    GeomAlgoAPI_Translation aTranslationAlgo(theSourceShape, theDx, theDy, theDz);
+    
+    if (!aTranslationAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
+    }
+    
+    aTranslationAlgo.build();
+    
+    if(!aTranslationAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
+    }
+    if (!aTranslationAlgo.checkValid("Translation builder with dimensions")) {
+      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
+    }
+    return aTranslationAlgo.shape();
   }
 }

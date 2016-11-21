@@ -1,8 +1,10 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+// Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
 // File:        GeomAPI_XYZ.hxx
 // Created:     13 July 2015
 // Author:      Mikhail PONIKAROV
+//
+// Modified by Clarisse Genrault (CEA) : 17 Nov 2016
 
 #ifndef GeomAPI_Trsf_H_
 #define GeomAPI_Trsf_H_
@@ -31,6 +33,15 @@ class GeomAPI_Trsf : public GeomAPI_Interface
    */
   GEOMAPI_EXPORT void setTranslation(const std::shared_ptr<GeomAPI_Ax1> theAxis,
                                      const double theDistance);
+  
+  /** \brief Sets a translation transformation using three coordinates.
+   *  \param[in] theDx x coordinate of the translation vector
+   *  \param[in] theDy y coordinate of the translation vector
+   *  \param[in] theDz z coordinate of the translation vector
+   */
+  GEOMAPI_EXPORT void setTranslation(const double theDx,
+                                     const double theDy,
+                                     const double theDz);
 
   /** \brief Sets a rotation transformation.
    *  \param[in] theAxis  rotation axis.

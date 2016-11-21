@@ -7,9 +7,10 @@
 #ifndef GEOMALGOAPI_SHAPEAPI_H
 #define GEOMALGOAPI_SHAPEAPI_H
 
-#include <GeomAPI_Shape.h>
-#include <GeomAPI_Pnt.h>
+#include <GeomAPI_Ax1.h>
 #include <GeomAPI_Edge.h>
+#include <GeomAPI_Pnt.h>
+#include <GeomAPI_Shape.h>
 
 #include <GeomAlgoAPI_Exception.h>
 
@@ -36,6 +37,28 @@ public:
   /// \return a shape
   static std::shared_ptr<GeomAPI_Shape> makeBox(std::shared_ptr<GeomAPI_Pnt> theFirstPoint,
                      std::shared_ptr<GeomAPI_Pnt> theSecondPoint) throw (GeomAlgoAPI_Exception);
+                                                   
+  /// Performs a translation from an axis and a distance.
+  /// \param theSourceShape Shape to be moved.
+  /// \param theAxis Movement axis.
+  /// \param theDistance Movement distance.
+  /// \return a shape
+  static std::shared_ptr<GeomAPI_Shape> makeTranslation(
+                     std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                     std::shared_ptr<GeomAPI_Ax1>   theAxis,
+                     const double theDistance) throw (GeomAlgoAPI_Exception);
+                                                   
+  /// Performs a translation from dimensions.
+  /// \param theSourceShape Shape to be moved.
+  /// \param theDx Movement dimension on X.
+  /// \param theDy Movement dimension on Y.
+  /// \param theDz Movement dimension on Z.
+  /// \return a shape
+  static std::shared_ptr<GeomAPI_Shape> makeTranslation(
+                     std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                     const double theDx,
+                     const double theDy,
+                     const double theDz) throw (GeomAlgoAPI_Exception);
 };
 }
 #endif
