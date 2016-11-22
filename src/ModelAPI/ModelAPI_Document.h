@@ -176,6 +176,14 @@ public:
   //! Internally makes document know that feature was removed or added in history after creation
   MODELAPI_EXPORT virtual void updateHistory(const std::string theGroup) = 0;
 
+  /// Stores in the document boolean flags: states of the nodes in the object browser.
+  /// Normally is called outside of the transaction, just before "save".
+  MODELAPI_EXPORT void storeNodesState(const std::list<bool>& theStates);
+
+  /// Returns the stored nodes states. Normally it is calles just after "open".
+  /// Appends the values to theStates list.
+  MODELAPI_EXPORT void restoreNodesState(std::list<bool>& theStates) const;
+
 protected:
   //! Only for SWIG wrapping it is here
   MODELAPI_EXPORT ModelAPI_Document();

@@ -280,6 +280,14 @@ class Model_Document : public ModelAPI_Document
   //! for calculation of selection externally from the document
   std::shared_ptr<ModelAPI_AttributeSelectionList> selectionInPartFeature();
 
+  /// Stores in the document boolean flags: states of the nodes in the object browser.
+  /// Normally is called outside of the transaction, just before "save".
+  void storeNodesState(const std::list<bool>& theStates);
+
+  /// Returns the stored nodes states. Normally it is calles just after "open".
+  /// Appends the values to theStates list.
+  void restoreNodesState(std::list<bool>& theStates) const;
+
   friend class Model_Application;
   friend class Model_Session;
   friend class Model_Update;
