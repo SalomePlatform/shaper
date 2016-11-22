@@ -178,11 +178,11 @@ public:
 
   /// Stores in the document boolean flags: states of the nodes in the object browser.
   /// Normally is called outside of the transaction, just before "save".
-  MODELAPI_EXPORT void storeNodesState(const std::list<bool>& theStates);
+  MODELAPI_EXPORT virtual void storeNodesState(const std::list<bool>& theStates) = 0;
 
   /// Returns the stored nodes states. Normally it is calles just after "open".
   /// Appends the values to theStates list.
-  MODELAPI_EXPORT void restoreNodesState(std::list<bool>& theStates) const;
+  MODELAPI_EXPORT virtual void restoreNodesState(std::list<bool>& theStates) const = 0;
 
 protected:
   //! Only for SWIG wrapping it is here
