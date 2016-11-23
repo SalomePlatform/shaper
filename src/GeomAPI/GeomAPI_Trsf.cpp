@@ -41,6 +41,13 @@ void GeomAPI_Trsf::setTranslation(const double theDx, const double theDy, const 
 }
 
 //=================================================================================================
+void GeomAPI_Trsf::setTranslation(const std::shared_ptr<GeomAPI_Pnt> theStartPoint,
+                                  const std::shared_ptr<GeomAPI_Pnt> theEndPoint)
+{
+  MY_TRSF->SetTranslation(theStartPoint->impl<gp_Pnt>(), theEndPoint->impl<gp_Pnt>());
+}
+
+//=================================================================================================
 void GeomAPI_Trsf::setRotation(const std::shared_ptr<GeomAPI_Ax1> theAxis,
                                const double theAngle)
 {
