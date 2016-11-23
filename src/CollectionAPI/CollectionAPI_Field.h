@@ -33,15 +33,11 @@ public:
   COLLECTIONAPI_EXPORT
   virtual ~CollectionAPI_Field();
 
-  INTERFACE_6(CollectionPlugin_Field::ID(),
+  INTERFACE_4(CollectionPlugin_Field::ID(),
     selection, CollectionPlugin_Field::SELECTED_ID(),
     ModelAPI_AttributeSelectionList, /** Field selection list*/,
     componentsNames, CollectionPlugin_Field::COMPONENTS_NAMES_ID(),
     ModelAPI_AttributeStringArray, /** Names of components list of strings */,
-    valuesType, CollectionPlugin_Field::VALUES_TYPE_ID(),
-    ModelAPI_AttributeInteger, /** Type of the values enumeration */,
-    stepsNum, CollectionPlugin_Field::STEPS_NB_ID(),
-    ModelAPI_AttributeInteger, /** Number of steps integer */,
     stamps, CollectionPlugin_Field::STAMPS_ID(),
     ModelAPI_AttributeIntArray, /** Identifiers of stamps */,
     values, CollectionPlugin_Field::VALUES_ID(), ModelAPI_AttributeTables /** Table of values */,
@@ -82,6 +78,11 @@ public:
   /// Dump wrapped feature
   COLLECTIONAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
+  /// Returns the internal values tables
+  COLLECTIONAPI_EXPORT
+  std::shared_ptr<ModelAPI_AttributeTables> tableValues();
+
 };
 
 /// Pointer on Field object.

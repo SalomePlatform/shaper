@@ -66,8 +66,8 @@ anExtrusionFt.selectionList("base").append(aSketchResult, aSketchFaces[0])
 anExtrusionFt.string("CreationMethod").setValue("BySizes")
 anExtrusionFt.real("to_size").setValue(50)
 anExtrusionFt.real("from_size").setValue(50)
-anExtrusionFt.real("to_offset").setValue(0) #TODO: remove
-anExtrusionFt.real("from_offset").setValue(0) #TODO: remove
+anExtrusionFt.real("to_offset").setValue(0)
+anExtrusionFt.real("from_offset").setValue(0)
 anExtrusionFt.execute()
 aSession.finishOperation()
 anExtrusionBody = modelAPI_ResultBody(anExtrusionFt.firstResult())
@@ -85,13 +85,11 @@ aComponentNames = aField.stringArray("components_names")
 aComponentNames.setSize(2) # two components
 aComponentNames.setValue(0, "temperatue")
 aComponentNames.setValue(1, "porosity")
-aField.integer("type").setValue(2) # double
-aField.integer("steps_nb").setValue(1) # one step
 aStamps = aField.intArray("stamps")
-aStamps.setSize(1)
+aStamps.setSize(1) # one step
 aStamps.setValue(0, 10)
 aTables = aField.tables("values")
-aTables.setType(2)
+aTables.setType(2) # double
 aTables.setSize(1 + 3, 2, 1) # default row + number of selected, number of compoents, number of steps (tables)
 aTables.setValue(20, 0, 0, 0) # value, index of selection, index of component, index of step
 aTables.setValue(35, 1, 0, 0)
@@ -113,14 +111,12 @@ aSelectionListAttr.append("Extrusion_1_1/Generated_Face_3")
 aComponentNames = aField.stringArray("components_names")
 aComponentNames.setSize(1) # one component
 aComponentNames.setValue(0, "description")
-aField.integer("type").setValue(3) # string
-aField.integer("steps_nb").setValue(2) # two steps
 aStamps = aField.intArray("stamps")
-aStamps.setSize(2)
+aStamps.setSize(2) # two steps
 aStamps.setValue(0, 1)
 aStamps.setValue(1, 3)
 aTables = aField.tables("values")
-aTables.setType(3)
+aTables.setType(3) # string
 aTables.setSize(1 + 1, 1, 2) # default row + number of selected, number of compoents, number of steps (tables)
 aTables.setValue("-default-", 0, 0, 0) # value, index of selection, index of component, index of step
 aTables.setValue("-default-", 0, 0, 1)
@@ -141,13 +137,11 @@ aSelectionListAttr.append("Extrusion_1_1/Generated_Face_3")
 aComponentNames = aField.stringArray("components_names")
 aComponentNames.setSize(1) # one component
 aComponentNames.setValue(0, "description")
-aField.integer("type").setValue(1) # integer
-aField.integer("steps_nb").setValue(1) # one step
 aStamps = aField.intArray("stamps")
-aStamps.setSize(1)
+aStamps.setSize(1) # one step
 aStamps.setValue(0, 0)
 aTables = aField.tables("values")
-aTables.setType(1)
+aTables.setType(1) # integer
 aTables.setSize(1 + 1, 1, 1) # default row + number of selected, number of compoents, number of steps (tables)
 aTables.setValue(0, 0, 0, 0) # value, index of selection, index of component, index of step
 aTables.setValue(2, 1, 0, 0)
@@ -167,13 +161,11 @@ aSelectionListAttr.append("Extrusion_1_1/Generated_Face_3")
 aComponentNames = aField.stringArray("components_names")
 aComponentNames.setSize(1) # one component
 aComponentNames.setValue(0, "description")
-aField.integer("type").setValue(0) # boolean
-aField.integer("steps_nb").setValue(1) # one step
 aStamps = aField.intArray("stamps")
-aStamps.setSize(1)
+aStamps.setSize(1) # one step
 aStamps.setValue(0, 0)
 aTables = aField.tables("values")
-aTables.setType(0)
+aTables.setType(0) # boolean
 aTables.setSize(1 + 1, 1, 1) # default row + number of selected, number of compoents, number of steps (tables)
 aTables.setValue(True, 0, 0, 0) # value, index of selection, index of component, index of step
 aTables.setValue(False, 1, 0, 0)
