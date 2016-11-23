@@ -13,7 +13,6 @@
 #include <memory>
 
 class GeomAPI_Ax1;
-class GeomAPI_Pnt;
 
 /**\class GeomAPI_Trsf
  * \ingroup DataModel
@@ -43,13 +42,6 @@ class GeomAPI_Trsf : public GeomAPI_Interface
   GEOMAPI_EXPORT void setTranslation(const double theDx,
                                      const double theDy,
                                      const double theDz);
-
-  /** \brief Sets a translation transformation using two points.
-   *  \param[in] theStartPoint  Start point of the translation vector.
-   *  \param[in] theEndPoint    End point of the translation vector.
-   */
-  GEOMAPI_EXPORT void setTranslation(const std::shared_ptr<GeomAPI_Pnt> theStartPoint,
-                                     const std::shared_ptr<GeomAPI_Pnt> theEndPoint);
 
   /** \brief Sets a rotation transformation.
    *  \param[in] theAxis  rotation axis.

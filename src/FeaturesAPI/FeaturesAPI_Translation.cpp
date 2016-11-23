@@ -47,20 +47,6 @@ FeaturesAPI_Translation::FeaturesAPI_Translation(
 }
 
 //==================================================================================================
-FeaturesAPI_Translation::FeaturesAPI_Translation(
-  const std::shared_ptr<ModelAPI_Feature>& theFeature,
-  const std::list<ModelHighAPI_Selection>& theMainObjects,
-  const ModelHighAPI_Selection& theStartPoint,
-  const ModelHighAPI_Selection& theEndPoint)
-: ModelHighAPI_Interface(theFeature)
-{
-  if(initialize()) {
-    fillAttribute(theMainObjects, mymainObjects);
-    setPoints(theStartPoint, theEndPoint);
-  }
-}
-
-//==================================================================================================
 FeaturesAPI_Translation::~FeaturesAPI_Translation()
 {
 
@@ -100,17 +86,6 @@ void FeaturesAPI_Translation::setDimensions(const ModelHighAPI_Double& theDx,
 }
 
 //==================================================================================================
-void FeaturesAPI_Translation::setPoints(const ModelHighAPI_Selection& theStartPoint,
-                                        const ModelHighAPI_Selection& theEndPoint)
-{
-  fillAttribute(FeaturesPlugin_Translation::CREATION_METHOD_BY_TWO_POINTS(), mycreationMethod);
-  fillAttribute(theStartPoint, mystartPoint);
-  fillAttribute(theEndPoint, myendPoint);
-
-  execute();
-}
-
-//==================================================================================================
 void FeaturesAPI_Translation::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
@@ -134,12 +109,6 @@ void FeaturesAPI_Translation::dump(ModelHighAPI_Dumper& theDumper) const
     AttributeDoublePtr anAttrDy = aBase->real(FeaturesPlugin_Translation::DY_ID());
     AttributeDoublePtr anAttrDz = aBase->real(FeaturesPlugin_Translation::DZ_ID());
     theDumper << ", " << anAttrDx << ", " << anAttrDy << ", " << anAttrDz;
-  } else if (aCreationMethod == FeaturesPlugin_Translation::CREATION_METHOD_BY_TWO_POINTS()) {
-    AttributeSelectionPtr anAttrStartPoint =
-      aBase->selection(FeaturesPlugin_Translation::START_POINT_ID());
-    AttributeSelectionPtr anAttrEndPoint =
-      aBase->selection(FeaturesPlugin_Translation::END_POINT_ID());
-    theDumper << ", " << anAttrStartPoint << ", " << anAttrEndPoint;
   }
 
    theDumper << ")" << std::endl;
@@ -165,15 +134,4 @@ TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Translation::ID());
   return TranslationPtr(new FeaturesAPI_Translation(aFeature, theMainObjects, theDx, theDy, theDz));
-}
-
-//==================================================================================================
-TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                              const std::list<ModelHighAPI_Selection>& theMainObjects,
-                              const ModelHighAPI_Selection& theStartPoint,
-                              const ModelHighAPI_Selection& theEndPoint)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Translation::ID());
-  return TranslationPtr(new FeaturesAPI_Translation(aFeature, theMainObjects,
-                                                    theStartPoint, theEndPoint));
 }

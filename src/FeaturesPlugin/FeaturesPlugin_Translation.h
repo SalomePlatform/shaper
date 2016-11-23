@@ -49,13 +49,6 @@ class FeaturesPlugin_Translation : public ModelAPI_Feature
     return MY_CREATION_METHOD_ID;
   }
 
-  /// Attribute name for creation method "ByTwoPoints".
-  inline static const std::string& CREATION_METHOD_BY_TWO_POINTS()
-  {
-    static const std::string MY_CREATION_METHOD_ID("ByTwoPoints");
-    return MY_CREATION_METHOD_ID;
-  }
-
   /// Attribute name of referenced objects.
   inline static const std::string& OBJECTS_LIST_ID()
   {
@@ -98,20 +91,6 @@ class FeaturesPlugin_Translation : public ModelAPI_Feature
     return MY_DZ_ID;
   }
 
-  /// Attribute name of start point.
-  inline static const std::string& START_POINT_ID()
-  {
-    static const std::string MY_START_POINT_ID("start_point");
-    return MY_START_POINT_ID;
-  }
-
-  /// Attribute name of end point.
-  inline static const std::string& END_POINT_ID()
-  {
-    static const std::string MY_END_POINT_ID("end_point");
-    return MY_END_POINT_ID;
-  }
-
   /// \return the kind of a feature.
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
   {
@@ -134,9 +113,6 @@ private:
 
   ///Perform the translation using three dimensions X, Y and Z
   void performTranslationByDimensions();
-
-  ///Perform the translation usind two points
-  void performTranslationByTwoPoints();
 
   void loadNamingDS(GeomAlgoAPI_Translation& theTranslationAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,

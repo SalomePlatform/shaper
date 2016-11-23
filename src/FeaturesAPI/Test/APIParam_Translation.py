@@ -33,11 +33,3 @@ aSession.startOperation()
 aTranslation2 = model.addTranslation(aDocument, [model.selection("SOLID", "Box_1_1")], 10, 10, 10).result()
 aSession.finishOperation()
 assert (aTranslation2 is not None)
-
-# Perform a translation by two points
-aSession.startOperation()
-aPoint1 = model.addPoint(aDocument, 0, 0, 0).result()
-aPoint2 = model.addPoint(aDocument, 10, 10, 0).result()
-aTranslation3 = model.addTranslation(aDocument, [model.selection("SOLID", "Box_1_1")], aPoint1, aPoint2).result()
-aSession.finishOperation()
-assert (aTranslation2 is not None)

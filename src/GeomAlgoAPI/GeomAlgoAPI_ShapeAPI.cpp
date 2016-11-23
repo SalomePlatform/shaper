@@ -106,27 +106,4 @@ namespace GeomAlgoAPI_ShapeAPI
     }
     return aTranslationAlgo.shape();
   }
-
-  //=========================================================================================================
-  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeTranslation(
-    std::shared_ptr<GeomAPI_Shape> theSourceShape,
-    std::shared_ptr<GeomAPI_Pnt>   theStartPoint,
-    std::shared_ptr<GeomAPI_Pnt>   theEndPoint) throw (GeomAlgoAPI_Exception)
-  {
-    GeomAlgoAPI_Translation aTranslationAlgo(theSourceShape, theStartPoint, theEndPoint);
-
-    if (!aTranslationAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
-    }
-
-    aTranslationAlgo.build();
-
-    if(!aTranslationAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
-    }
-    if (!aTranslationAlgo.checkValid("Translation builder with two points")) {
-      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
-    }
-    return aTranslationAlgo.shape();
-  }
 }

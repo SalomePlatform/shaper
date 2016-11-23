@@ -47,15 +47,6 @@ public:
                                              double                         theDy,
                                              double                         theDz);
 
-  /// \brief Creates an object which is obtained from current object by moving it along a vector
-  ///        defined by two points.
-  /// \param[in] theSourceShape  the shape to be moved.
-  /// \param[in] theStartPoint   the movement start point.
-  /// \param[in] theEndPoint     the movement end point.
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Translation(std::shared_ptr<GeomAPI_Shape> theSourceShape,
-                                             std::shared_ptr<GeomAPI_Pnt>   theStartPoint,
-                                             std::shared_ptr<GeomAPI_Pnt>   theEndPoint);
-
   /// Checks if data for the translation execution is OK.
   GEOMALGOAPI_EXPORT bool check();
 
@@ -70,8 +61,6 @@ private:
   double myDx; /// Movement dimension on X.
   double myDy; /// Movement dimension on Y.
   double myDz; /// Movement dimension on Z.
-  std::shared_ptr<GeomAPI_Pnt> myStartPoint; /// Movement start point.
-  std::shared_ptr<GeomAPI_Pnt> myEndPoint; /// Movement end point.
 };
 
 #endif

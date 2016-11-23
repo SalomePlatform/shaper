@@ -33,12 +33,3 @@ try :
  
 except myExcept, ec:
   print ec.what()
-
-# Perfom a translation with two points.
-try :
-  pnt1 = pnt(10.,0.,0.)
-  pnt2 = pnt(10.,15.,0.)
-  translation3 = shaperpy.makeTranslation(box,pnt1,pnt2)
- 
-except myExcept, ec:
-  print ec.what()

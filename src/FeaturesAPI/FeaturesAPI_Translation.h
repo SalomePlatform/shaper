@@ -39,22 +39,15 @@ public:
   FEATURESAPI_EXPORT
   explicit FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                    const std::list<ModelHighAPI_Selection>& theMainObjects,
-                                   const ModelHighAPI_Double& theDx,
-                                   const ModelHighAPI_Double& theDy,
-                                   const ModelHighAPI_Double& theDz);
-
-  /// Constructor with values.
-  FEATURESAPI_EXPORT
-  explicit FeaturesAPI_Translation(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                   const std::list<ModelHighAPI_Selection>& theMainObjects,
-                                   const ModelHighAPI_Selection& theStartPoint,
-                                   const ModelHighAPI_Selection& theEndPoint);
+                          const ModelHighAPI_Double& theDx,
+                          const ModelHighAPI_Double& theDy,
+                          const ModelHighAPI_Double& theDz);
 
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_Translation();
 
-  INTERFACE_9(FeaturesPlugin_Translation::ID(),
+  INTERFACE_7(FeaturesPlugin_Translation::ID(),
               creationMethod, FeaturesPlugin_Translation::CREATION_METHOD(),
               ModelAPI_AttributeString, /** Creation method */,
               mainObjects, FeaturesPlugin_Translation::OBJECTS_LIST_ID(),
@@ -68,11 +61,7 @@ public:
               dy, FeaturesPlugin_Translation::DY_ID(),
               ModelAPI_AttributeDouble, /** Dimension in Y */,
               dz, FeaturesPlugin_Translation::DZ_ID(),
-              ModelAPI_AttributeDouble, /** Dimension in Z */,
-              startPoint, FeaturesPlugin_Translation::START_POINT_ID(),
-              ModelAPI_AttributeSelection, /** Start point object */,
-              endPoint, FeaturesPlugin_Translation::END_POINT_ID(),
-              ModelAPI_AttributeSelection, /** End point object */
+              ModelAPI_AttributeDouble, /** Dimension in Z */
              )
 
   /// Set main objects.
@@ -89,11 +78,6 @@ public:
   void setDimensions(const ModelHighAPI_Double& theDx,
                      const ModelHighAPI_Double& theDy,
                      const ModelHighAPI_Double& theDz);
-
-  /// Modify CreationMethod, start_point, end_point attributes of the feature.
-  FEATURESAPI_EXPORT
-  void setPoints(const ModelHighAPI_Selection& theStartPoint,
-                 const ModelHighAPI_Selection& theEndPoint);
 
   /// Dump wrapped feature
   FEATURESAPI_EXPORT
@@ -119,13 +103,5 @@ TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
                               const ModelHighAPI_Double& theDx,
                               const ModelHighAPI_Double& theDy,
                               const ModelHighAPI_Double& theDz);
-
-/// \ingroup CPPHighAPI
-/// \brief Create Translation feature.
-FEATURESAPI_EXPORT
-TranslationPtr addTranslation(const std::shared_ptr<ModelAPI_Document>& thePart,
-                              const std::list<ModelHighAPI_Selection>& theMainObjects,
-                              const ModelHighAPI_Selection& theStartPoint,
-                              const ModelHighAPI_Selection& theEndPoint);
 
 #endif // FeaturesAPI_Translation_H_
