@@ -211,6 +211,8 @@ void ModuleBase_WidgetSelector::deactivate()
 
   /// clear temporary cash
   AttributePtr anAttribute = attribute();
+  if (!anAttribute.get())
+    return;
   std::string aType = anAttribute->attributeType();
   if (anAttribute->attributeType() == ModelAPI_AttributeSelection::typeId()) {
     AttributeSelectionPtr aSelectAttr =

@@ -13,6 +13,7 @@
 
 #include <ModuleBase_WidgetSelector.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModelAPI_AttributeTables.h>
 
 #include <QList>
 #include <QStringList>
@@ -26,6 +27,8 @@ class QSlider;
 class QTableWidget;
 class QStackedWidget;
 class QPushButton;
+class QTableWidgetItem;
+class QLineEdit;
 
 /*!
  * \ingroup GUI
@@ -63,6 +66,8 @@ protected:
   /// \return a list of shapes
   virtual QIntList shapeTypes() const;
 
+  virtual bool eventFilter(QObject* theObbject, QEvent* theEvent);
+
 
 protected slots:
   /// Slot which is called on selection event
@@ -79,11 +84,27 @@ private slots:
 
   void onFieldTypeChanged(int theIdx);
 
+  void onTableEdited(int theRow, int theCol);
+
+  void onShapeTypeChanged(int theType);
+
 private:
   void clearData();
 
   void appendStepControls();
   void removeStepControls();
+
+  void updateHeaders(QTableWidget* theDataTbl) const;
+
+  int getSelectionType(const std::string& theStr) const;
+
+  std::string getSelectionType(int theType) const;
+
+  QTableWidgetItem* createDefaultItem() const;
+
+  QTableWidgetItem* createValueItem(ModelAPI_AttributeTables::Value& theVal) const;
+
+  ModelAPI_AttributeTables::Value getValue(QString theStrVal) const;
 
   /// Types of shapes selection
   QComboBox* myShapeTypeCombo;
@@ -111,9 +132,10 @@ private:
 
   QStringList myCompNamesList;
 
-  QList<ModuleBase_ViewerPrsPtr> mySelection;
-
   QPushButton* myRemoveBtn;
+
+  QLineEdit* myHeaderEditor;
+  int myEditIndex;
 };
 
 #endif

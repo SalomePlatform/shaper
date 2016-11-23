@@ -155,7 +155,7 @@ void Model_AttributeTables::setType(ModelAPI_AttributeTables::ValueType theType)
       myType = theType;
       int aTables = myTables;
       myTables = 0; // to let setSize know that there is no old array 
-      setSize(myRows, myCols, myTables);
+      setSize(myRows, myCols, aTables);
     } else {
       myType = theType;
       owner()->data()->sendAttributeUpdated(this);
