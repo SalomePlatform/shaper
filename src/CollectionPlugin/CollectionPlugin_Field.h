@@ -47,18 +47,6 @@ class CollectionPlugin_Field : public ModelAPI_Feature
     static const std::string MY_COMPONENTS_NAMES_ID("components_names");
     return MY_COMPONENTS_NAMES_ID;
   }
-  /// attribute name of values types integer identifier
-  inline static const std::string& VALUES_TYPE_ID()
-  {
-    static const std::string MY_VALUES_TYPE_ID("type");
-    return MY_VALUES_TYPE_ID;
-  }
-  /// attribute name of number of steps
-  inline static const std::string& STEPS_NB_ID()
-  {
-    static const std::string MY_STEPS_NB_ID("steps_nb");
-    return MY_STEPS_NB_ID;
-  }
   /// attribute name of stamps integer array
   inline static const std::string& STAMPS_ID()
   {

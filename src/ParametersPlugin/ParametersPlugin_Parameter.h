@@ -12,8 +12,6 @@
 
 #include <memory>
 
-class ParametersPlugin_PyInterp;
-
 /**
  * \class ParametersPlugin_Parameter
  * \ingroup Plugins
@@ -94,9 +92,6 @@ class ParametersPlugin_Parameter : public ModelAPI_Feature
   void updateName();
   /// Updates expression of the parameter
   bool updateExpression();
-
- private:
-  std::shared_ptr<ParametersPlugin_PyInterp> myInterp;
 };
 
 #endif

@@ -97,17 +97,13 @@ std::list<std::string> ModelAPI_FeatureStateMessage::features() const
 }
 
 
-ModelAPI_DocumentCreatedMessage::ModelAPI_DocumentCreatedMessage(const Events_ID theID,
-                                                                 const void* theSender)
+ModelAPI_DocumentCreatedMessage::ModelAPI_DocumentCreatedMessage(
+  const Events_ID theID, const void* theSender)
 : Events_Message(theID, theSender)
-{
-
-}
+{}
 
 ModelAPI_DocumentCreatedMessage::~ModelAPI_DocumentCreatedMessage()
-{
-
-}
+{}
 
 DocumentPtr ModelAPI_DocumentCreatedMessage::document() const
 {
@@ -119,27 +115,109 @@ void ModelAPI_DocumentCreatedMessage::setDocument(DocumentPtr theDocument)
   myDocument = theDocument;
 }
 
-ModelAPI_AttributeEvalMessage::ModelAPI_AttributeEvalMessage(const Events_ID theID,
-                                                                         const void* theSender)
+ModelAPI_AttributeEvalMessage::ModelAPI_AttributeEvalMessage(
+  const Events_ID theID, const void* theSender)
 : Events_Message(theID, theSender)
-{
-
-}
+{}
 
 ModelAPI_AttributeEvalMessage::~ModelAPI_AttributeEvalMessage()
-{
-
-}
+{}
 
 AttributePtr ModelAPI_AttributeEvalMessage::attribute() const
 {
   return myAttribute;
 }
 
-void ModelAPI_AttributeEvalMessage::setAttribute(AttributePtr theDocument)
+void ModelAPI_AttributeEvalMessage::setAttribute(AttributePtr theAttribute)
 {
-  myAttribute = theDocument;
+  myAttribute = theAttribute;
 }
+
+ModelAPI_ParameterEvalMessage::ModelAPI_ParameterEvalMessage(
+  const Events_ID theID, const void* theSender)
+  : Events_Message(theID, theSender), myIsProcessed(false)
+{}
+
+ModelAPI_ParameterEvalMessage::~ModelAPI_ParameterEvalMessage()
+{}
+
+FeaturePtr ModelAPI_ParameterEvalMessage::parameter() const
+{
+  return myParam;
+}
+
+void ModelAPI_ParameterEvalMessage::setParameter(FeaturePtr theParam)
+{
+  myParam = theParam;
+}
+
+void ModelAPI_ParameterEvalMessage::setResults(
+    const std::list<std::shared_ptr<ModelAPI_ResultParameter> >& theParamsList,
+    const double theResult, const std::string& theError)
+{
+  myParamsList = theParamsList;
+  myResult = theResult;
+  myError = theError;
+  myIsProcessed = true;
+}
+
+bool ModelAPI_ParameterEvalMessage::isProcessed()
+{
+  return myIsProcessed;
+}
+
+const std::list<std::shared_ptr<ModelAPI_ResultParameter> >& 
+  ModelAPI_ParameterEvalMessage::params() const 
+{
+  return myParamsList;
+}
+
+const double& ModelAPI_ParameterEvalMessage::result() const
+{
+  return myResult;
+}
+
+const std::string& ModelAPI_ParameterEvalMessage::error() const
+{
+  return myError;
+}
+
+ModelAPI_ComputePositionsMessage::ModelAPI_ComputePositionsMessage(
+  const Events_ID theID, const void* theSender)
+  : Events_Message(theID, theSender)
+{}
+
+ModelAPI_ComputePositionsMessage::~ModelAPI_ComputePositionsMessage()
+{}
+
+const std::string& ModelAPI_ComputePositionsMessage::expression() const
+{
+  return myExpression;
+}
+
+const std::string& ModelAPI_ComputePositionsMessage::parameter() const
+{
+  return myParamName;
+}
+
+void ModelAPI_ComputePositionsMessage::set(
+  const std::string& theExpression, const std::string& theParameter)
+{
+  myExpression = theExpression;
+  myParamName = theParameter;
+}
+
+void ModelAPI_ComputePositionsMessage::setPositions(
+  const std::list<std::pair<int, int> >& thePositions)
+{
+  myPositions = thePositions;
+}
+
+const std::list<std::pair<int, int> >& ModelAPI_ComputePositionsMessage::positions() const
+{
+  return myPositions;
+}
+
 
 ModelAPI_ObjectRenamedMessage::ModelAPI_ObjectRenamedMessage(const Events_ID theID,
                                                              const void* theSender)

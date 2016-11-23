@@ -10,7 +10,6 @@
 
 #include <ParametersPlugin_EvalListener.h>
 #include <ParametersPlugin_Parameter.h>
-#include <ParametersPlugin_PyInterp.h>
 
 #include <Events_InfoMessage.h>
 
@@ -59,16 +58,12 @@ ParametersPlugin_EvalListener::ParametersPlugin_EvalListener()
   Events_Loop* aLoop = Events_Loop::loop();
 
   Events_ID anEvents_IDs[] = {
-      ModelAPI_AttributeEvalMessage::eventId(),
       ModelAPI_ObjectRenamedMessage::eventId(),
       ModelAPI_ReplaceParameterMessage::eventId()
   };
 
   for (int i = 0; i < sizeof(anEvents_IDs)/sizeof(anEvents_IDs[0]); ++i)
     aLoop->registerListener(this, anEvents_IDs[i], NULL, true);
-
-  myInterp = std::shared_ptr<ParametersPlugin_PyInterp>(new ParametersPlugin_PyInterp());
-  myInterp->initialize();
 }
 
 ParametersPlugin_EvalListener::~ParametersPlugin_EvalListener()
@@ -81,132 +76,13 @@ void ParametersPlugin_EvalListener::processEvent(
   if (!theMessage.get())
     return;
 
-  const Events_ID kEvaluationEvent = ModelAPI_AttributeEvalMessage::eventId();
   const Events_ID kObjectRenamedEvent = ModelAPI_ObjectRenamedMessage::eventId();
   const Events_ID kReplaceParameterEvent = ModelAPI_ReplaceParameterMessage::eventId();
 
-  if (theMessage->eventID() == kEvaluationEvent) {
-    processEvaluationEvent(theMessage);
-  } else if (theMessage->eventID() == kObjectRenamedEvent) {
+  if (theMessage->eventID() == kObjectRenamedEvent) {
     processObjectRenamedEvent(theMessage);
   } else if (theMessage->eventID() == kReplaceParameterEvent) {
     processReplaceParameterEvent(theMessage);
-  } else {
-    Events_InfoMessage("ParametersPlugin_EvalListener",
-      "ParametersPlugin python interpreter, unhandled message caught: ")
-      .arg(theMessage->eventID().eventText()).send();
-  }
-}
-
-double ParametersPlugin_EvalListener::evaluate(FeaturePtr theParameter,
-  const std::string& theExpression, std::string& theError)
-{
-  std::list<std::string> anExprParams = myInterp->compile(theExpression);
-  // find expression's params in the model
-  std::list<std::string> aContext;
-  std::list<std::string>::iterator it = anExprParams.begin();
-  for ( ; it != anExprParams.end(); it++) {
-    double aValue;
-    ResultParameterPtr aParamRes;
-    // If variable does not exist python interpreter will generate an error. It is OK.
-    // But due to the issue 1479 it should not check the history position of parameters relatively
-    // to feature that contains expression
-    if (!ModelAPI_Tools::findVariable(/*theParameter*/ FeaturePtr(),
-      *it, aValue, aParamRes, theParameter->document()))
-      continue;
-
-    aContext.push_back(*it + "=" + toStdString(aValue));
-  }
-  myInterp->extendLocalContext(aContext);
-  double result = myInterp->evaluate(theExpression, theError);
-  myInterp->clearLocalContext();
-  return result;
-}
-
-void ParametersPlugin_EvalListener::processEvaluationEvent(
-    const std::shared_ptr<Events_Message>& theMessage)
-{
-  std::shared_ptr<ModelAPI_AttributeEvalMessage> aMessage =
-      std::dynamic_pointer_cast<ModelAPI_AttributeEvalMessage>(theMessage);
-
-  FeaturePtr aParamFeature =
-    std::dynamic_pointer_cast<ModelAPI_Feature>(aMessage->attribute()->owner());
-  if (aMessage->attribute()->attributeType() == ModelAPI_AttributeInteger::typeId()) {
-    AttributeIntegerPtr anAttribute =
-        std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aMessage->attribute());
-    std::string anError;
-    int aValue = (int)evaluate(aParamFeature, anAttribute->text(), anError);
-    bool isValid = anError.empty();
-    if (isValid)
-      anAttribute->setCalculatedValue(aValue);
-    anAttribute->setUsedParameters(isValid ?
-      toSet(myInterp->compile(anAttribute->text())) : std::set<std::string>());
-    anAttribute->setExpressionInvalid(!isValid);
-    anAttribute->setExpressionError(anAttribute->text().empty() ? "" : anError);
-  } else
-  if (aMessage->attribute()->attributeType() == ModelAPI_AttributeDouble::typeId()) {
-    AttributeDoublePtr anAttribute =
-        std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aMessage->attribute());
-    std::string anError;
-    double aValue = evaluate(aParamFeature, anAttribute->text(), anError);
-    bool isValid = anError.empty();
-    if (isValid)
-      anAttribute->setCalculatedValue(aValue);
-    anAttribute->setUsedParameters(isValid ?
-      toSet(myInterp->compile(anAttribute->text())) : std::set<std::string>());
-    anAttribute->setExpressionInvalid(!isValid);
-    anAttribute->setExpressionError(anAttribute->text().empty() ? "" : anError);
-  } else
-  if (aMessage->attribute()->attributeType() == GeomDataAPI_Point::typeId()) {
-    AttributePointPtr anAttribute =
-        std::dynamic_pointer_cast<GeomDataAPI_Point>(aMessage->attribute());
-    std::string aText[] = {
-      anAttribute->textX(),
-      anAttribute->textY(),
-      anAttribute->textZ()
-    };
-    double aCalculatedValue[] = {
-      anAttribute->x(),
-      anAttribute->y(),
-      anAttribute->z()
-    };
-    for (int i = 0; i < 3; ++i) {
-      std::string anError;
-      double aValue = evaluate(aParamFeature, aText[i], anError);
-      bool isValid = anError.empty();
-      if (isValid) aCalculatedValue[i] = aValue;
-      anAttribute->setUsedParameters(i,
-        isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
-      anAttribute->setExpressionInvalid(i, !isValid);
-      anAttribute->setExpressionError(i, aText[i].empty() ? "" : anError);
-    }
-    anAttribute->setCalculatedValue(aCalculatedValue[0],
-                                    aCalculatedValue[1],
-                                    aCalculatedValue[2]);
-  } else
-  if (aMessage->attribute()->attributeType() == GeomDataAPI_Point2D::typeId()) {
-    AttributePoint2DPtr anAttribute =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aMessage->attribute());
-    std::string aText[] = {
-      anAttribute->textX(),
-      anAttribute->textY()
-    };
-    double aCalculatedValue[] = {
-      anAttribute->x(),
-      anAttribute->y()
-    };
-    for (int i = 0; i < 2; ++i) {
-      std::string anError;
-      double aValue = evaluate(aParamFeature, aText[i], anError);
-      bool isValid = anError.empty();
-      if (isValid) aCalculatedValue[i] = aValue;
-      anAttribute->setUsedParameters(i,
-        isValid ? toSet(myInterp->compile(aText[i])) : std::set<std::string>());
-      anAttribute->setExpressionInvalid(i, !isValid);
-      anAttribute->setExpressionError(i, aText[i].empty() ? "" : anError);
-    }
-    anAttribute->setCalculatedValue(aCalculatedValue[0],
-                                    aCalculatedValue[1]);
   }
 }
 
@@ -217,8 +93,10 @@ std::string ParametersPlugin_EvalListener::renameInPythonExpression(
 {
   std::string anExpressionString = theExpression;
 
-  std::list<std::pair<int, int> > aPositions =
-      myInterp->positions(anExpressionString, theOldName);
+  // ask interpreter to compute the positions in the expression
+  std::shared_ptr<ModelAPI_ComputePositionsMessage> aMsg = 
+    ModelAPI_ComputePositionsMessage::send(theExpression, theOldName, this);
+  const std::list<std::pair<int, int> >& aPositions = aMsg->positions();
 
   if (aPositions.empty())
     return anExpressionString;

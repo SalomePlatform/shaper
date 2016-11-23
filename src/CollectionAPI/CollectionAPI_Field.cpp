@@ -44,7 +44,6 @@ void CollectionAPI_Field::setComponentsNames(const std::list<std::string>& theNa
 //=================================================================================================
 void CollectionAPI_Field::setValuesType(const std::string& theType)
 {
-  fillAttribute(int(valueTypeByStr(theType)), myvaluesType);
   myvalues->setType(valueTypeByStr(theType));
   execute();
 }
@@ -52,7 +51,6 @@ void CollectionAPI_Field::setValuesType(const std::string& theType)
 //=================================================================================================
 void CollectionAPI_Field::setStepsNum(const ModelHighAPI_Integer& theSteps)
 {
-  fillAttribute(theSteps, mystepsNum);
   mystamps->setSize(theSteps.intValue());
   execute();
 }
@@ -70,8 +68,6 @@ void CollectionAPI_Field::addStep(const ModelHighAPI_Integer& theStepNum, \
   const ModelHighAPI_Integer& theStamp, \
   const std::list<std::list<type> >& theComponents) \
 { \
-  myvalues->setSize(myselection->size() + 1, \
-    mycomponentsNames->size(), mystepsNum->value()); \
   mystamps->setValue(theStepNum.intValue(), theStamp.intValue()); \
   int aRowIndex = 0; \
   std::list<std::list<type> >::const_iterator \
@@ -101,9 +97,8 @@ void CollectionAPI_Field::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
-  theDumper<<aBase<<" = model.addField("<<aDocName<<", "<<mystepsNum->value()<<", \""
-    <<strByValueType(ModelAPI_AttributeTables::ValueType(myvaluesType->value()))<<"\", "
-    <<mycomponentsNames->size()<<", ";
+  theDumper<<aBase<<" = model.addField("<<aDocName<<", "<<myvalues->tables()<<", \""
+    <<strByValueType(myvalues->type())<<"\", "<<mycomponentsNames->size()<<", ";
   theDumper<<mycomponentsNames<<", ";
   theDumper<<myselection<<")"<<std::endl;
   // set values step by step
@@ -116,7 +111,7 @@ void CollectionAPI_Field::dump(ModelHighAPI_Dumper& theDumper) const
       for(int aCol = 0; aCol < myvalues->columns(); aCol++) {
         if (aCol != 0)
           theDumper<<", ";
-        switch(myvaluesType->value()) {
+        switch(myvalues->type()) {
         case ModelAPI_AttributeTables::BOOLEAN:
           theDumper<<myvalues->value(aRow, aCol, aStep).myBool;
           break;
@@ -137,6 +132,11 @@ void CollectionAPI_Field::dump(ModelHighAPI_Dumper& theDumper) const
   }
 }
 
+std::shared_ptr<ModelAPI_AttributeTables> CollectionAPI_Field::tableValues()
+{
+  return myvalues;
+}
+
 //=================================================================================================
 FieldPtr addField(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const ModelHighAPI_Integer& theStepsNum,
@@ -151,6 +151,8 @@ FieldPtr addField(const std::shared_ptr<ModelAPI_Document>& thePart,
   aField->setValuesType(theComponentType);
   aField->setComponentsNames(theComponentNames);
   aField->setSelection(theSelectionList);
+  aField->tableValues()->setSize(
+    int(theSelectionList.size() + 1), theComponentsNum, theStepsNum.intValue());
 
   return aField;
 }

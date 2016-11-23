@@ -67,9 +67,10 @@ static const int TAG_GENERAL = 1;  // general properties tag
 
 // general sub-labels
 /// where the reference to the current feature label is located (or no attribute if null feature)
-static const int TAG_CURRENT_FEATURE = 1;
+static const int TAG_CURRENT_FEATURE = 1; ///< reference to the current feature
 static const int TAG_CURRENT_TRANSACTION = 2; ///< integer, index of the transaction
 static const int TAG_SELECTION_FEATURE = 3; ///< integer, tag of the selection feature label
+static const int TAG_NODES_STATE = 4; ///< array, tag of the Object Browser nodes states
 
 Model_Document::Model_Document(const int theID, const std::string theKind)
     : myID(theID), myKind(theKind), myIsActive(false),
@@ -1537,4 +1538,30 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::producedByFeature(
 bool Model_Document::isLater(FeaturePtr theLater, FeaturePtr theCurrent) const
 {
   return myObjs->isLater(theLater, theCurrent);
+}
+
+void Model_Document::storeNodesState(const std::list<bool>& theStates)
+{
+  TDF_Label aLab = generalLabel().FindChild(TAG_NODES_STATE);
+  aLab.ForgetAllAttributes();
+  if (!theStates.empty()) {
+    Handle(TDataStd_BooleanArray) anArray =
+      TDataStd_BooleanArray::Set(aLab, 0, int(theStates.size()) - 1);
+    std::list<bool>::const_iterator aState = theStates.begin();
+    for(int anIndex = 0; aState != theStates.end(); aState++, anIndex++) {
+      anArray->SetValue(anIndex, *aState);
+    }
+  }
+}
+
+void Model_Document::restoreNodesState(std::list<bool>& theStates) const
+{
+  TDF_Label aLab = generalLabel().FindChild(TAG_NODES_STATE);
+  Handle(TDataStd_BooleanArray) anArray;
+  if (aLab.FindAttribute(TDataStd_BooleanArray::GetID(), anArray)) {
+    int anUpper = anArray->Upper();
+    for(int anIndex = 0; anIndex <= anUpper; anIndex++) {
+      theStates.push_back(anArray->Value(anIndex) == Standard_True);
+    }
+  }
 }

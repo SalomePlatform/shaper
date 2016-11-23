@@ -17,7 +17,6 @@ class ModelAPI_Document;
 class ModelAPI_Feature;
 class ModelAPI_ResultParameter;
 class ParametersPlugin_Parameter;
-class ParametersPlugin_PyInterp;
 
 /**
  * \class ParametersPlugin_EvalListener
@@ -35,12 +34,6 @@ class ParametersPlugin_EvalListener : public Events_Listener
     virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
  protected:
-  /// Evaluates theExpression and returns its value.
-   double evaluate(std::shared_ptr<ModelAPI_Feature> theParameter,
-                  const std::string& theExpression, std::string& theError);
-
-  /// Processes Evaluation event.
-  void processEvaluationEvent(const std::shared_ptr<Events_Message>& theMessage);
   /// Processes ObjectRenamed event.
   void processObjectRenamedEvent(const std::shared_ptr<Events_Message>& theMessage);
   /// Processes ReplaceParameter event.
@@ -62,9 +55,6 @@ class ParametersPlugin_EvalListener : public Events_Listener
   void renameInDependents(std::shared_ptr<ModelAPI_ResultParameter> theResultParameter,
                           const std::string& theOldName,
                           const std::string& theNewName);
-
- private:
-  std::shared_ptr<ParametersPlugin_PyInterp> myInterp;
 };
 
 #endif /* SRC_PARAMETERSPLUGIN_PARAMETERSPLUGIN_EVALLISTENER_H_ */

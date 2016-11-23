@@ -23,8 +23,6 @@ void CollectionPlugin_Field::initAttributes()
 {
   data()->addAttribute(SELECTED_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(COMPONENTS_NAMES_ID(), ModelAPI_AttributeStringArray::typeId());
-  data()->addAttribute(VALUES_TYPE_ID(), ModelAPI_AttributeInteger::typeId());
-  data()->addAttribute(STEPS_NB_ID(), ModelAPI_AttributeInteger::typeId());
   data()->addAttribute(STAMPS_ID(), ModelAPI_AttributeIntArray::typeId());
   data()->addAttribute(VALUES_ID(), ModelAPI_AttributeTables::typeId());
 }

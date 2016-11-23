@@ -4,10 +4,11 @@
 #define INITIALIZATIONPLUGIN_PLUGIN_H_
 
 #include <InitializationPlugin.h>
-
 #include <ModelAPI_Feature.h>
 
 #include <Events_Loop.h>
+
+class InitializationPlugin_EvalListener;
 
 /**\class InitializationPlugin_Plugin
  * \ingroup Plugins
@@ -51,6 +52,9 @@ class InitializationPlugin_Plugin : public Events_Listener
   /// \param theZ - Z of direction point
   FeaturePtr createAxis(DocumentPtr theDoc, FeaturePtr theOrigin,
                         double theX, double theY, double theZ);
+
+ private:
+  std::shared_ptr<InitializationPlugin_EvalListener> myEvalListener;
 };
 
 #endif
