@@ -607,6 +607,9 @@ void CollectionPlugin_WidgetField::onNbCompChanged(int theVal)
       myCompNamesList.removeLast();
   }
 
+  AttributeTablesPtr aTablesAttr = myFeature->data()->tables(CollectionPlugin_Field::VALUES_ID());
+  aTablesAttr->setSize(aNbRows, myCompNamesList.size(), myDataTblList.size());
+
   foreach(QTableWidget* aDataTbl, myDataTblList) {
     aDataTbl->setColumnCount(theVal + 1);
     updateHeaders(aDataTbl);
@@ -677,27 +680,7 @@ void CollectionPlugin_WidgetField::onSelectionChanged()
   AttributeSelectionListPtr aSelList = 
     myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());
   aSelList->clear();
-
-  switch (myShapeTypeCombo->currentIndex()) {
-  case 0: //"Vertices"
-    aSelList->setSelectionType("vertex");
-    break;
-  case 1: // "Edges"
-    aSelList->setSelectionType("edge");
-    break;
-  case 2: // "Faces"
-    aSelList->setSelectionType("face");
-    break;
-  case 3: // "Solids"
-    aSelList->setSelectionType("solid");
-    break;
-  case 4: // "Results"
-    aSelList->setSelectionType("object");
-    break;
-  case 5: // "Parts"
-    // TODO: Selection mode for Parts
-    break;
-  }
+  aSelList->setSelectionType(getSelectionType(myShapeTypeCombo->currentIndex()));
 
   ResultPtr aResult;
   GeomShapePtr aShape;
@@ -772,6 +755,7 @@ void CollectionPlugin_WidgetField::onFieldTypeChanged(int theIdx)
   }
 }
 
+//**********************************************************************************
 void CollectionPlugin_WidgetField::onTableEdited(int theRow, int theCol)
 {
   // Do not store here column of names
@@ -792,8 +776,11 @@ void CollectionPlugin_WidgetField::onTableEdited(int theRow, int theCol)
     emit valuesChanged();
 }
 
+//**********************************************************************************
 void CollectionPlugin_WidgetField::onShapeTypeChanged(int theType)
 {
+  activateSelectionAndFilters(true);
+
   AttributeSelectionListPtr aSelList = 
     myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());
   if (!aSelList->isInitialized())
