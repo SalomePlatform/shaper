@@ -37,6 +37,17 @@ GeomAlgoAPI_Translation::GeomAlgoAPI_Translation(std::shared_ptr<GeomAPI_Shape> 
 }
 
 //=================================================================================================
+GeomAlgoAPI_Translation::GeomAlgoAPI_Translation(std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                                                 std::shared_ptr<GeomAPI_Pnt>   theStartPoint,
+                                                 std::shared_ptr<GeomAPI_Pnt>   theEndPoint)
+{
+  myMethodType = BY_POINTS;
+  mySourceShape = theSourceShape;
+  myStartPoint = theStartPoint;
+  myEndPoint = theEndPoint;
+}
+
+//=================================================================================================
 bool GeomAlgoAPI_Translation::check()
 {
   switch (myMethodType) {
@@ -52,6 +63,21 @@ bool GeomAlgoAPI_Translation::check()
       return true;
     }
     case BY_DIM: {
+      if (!mySourceShape) {
+        myError = "Translation builder :: source shape is invalid.";
+        return false;
+      }
+      return true;
+    }
+    case BY_POINTS: {
+      if (!myStartPoint) {
+        myError = "Translation builder :: start point is invalid.";
+        return false;
+      }
+      if (!myEndPoint) {
+        myError = "Translation builder :: start point is invalid.";
+        return false;
+      }
       if (!mySourceShape) {
         myError = "Translation builder :: source shape is invalid.";
         return false;
@@ -78,6 +104,12 @@ void GeomAlgoAPI_Translation::build()
     }
     case BY_DIM: {
       aTrsf->SetTranslation(gp_Vec(myDx, myDy, myDz));
+      break;
+    }
+    case BY_POINTS: {
+      const gp_Pnt& aStartPoint = myStartPoint->impl<gp_Pnt>();
+      const gp_Pnt& aEndPoint = myEndPoint->impl<gp_Pnt>();
+      aTrsf->SetTranslation(aStartPoint, aEndPoint);
       break;
     }
     default: {
