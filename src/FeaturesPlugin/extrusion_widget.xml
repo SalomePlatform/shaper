@@ -10,6 +10,21 @@
                    shape_types="vertices edges wires faces shells solids compsolids compounds">
     <validator id="FeaturesPlugin_ValidatorCompositeLauncher" parameters="base,Sketch"/>
   </sketch_launcher>
+  <multi_selector id="base"
+                  label="Base objects:"
+                  tooltip="Select a base objects"
+                  type_choice="vertices edges wires faces shells compounds"
+                  concealment="true">
+    <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell,compound"/>
+  </multi_selector>
+  <shape_selector id="direction_object"
+                  icon="icons/Features/axis.png"
+                  label="Direction"
+                  tooltip="Select an edge for direction"
+                  shape_types="edge"
+                  default="&lt;base normal&gt;">
+    <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
+  </shape_selector>
   <toolbox id="CreationMethod">
     <box id="BySizes"
          title="By sizes"
@@ -68,21 +83,6 @@
       </groupbox>
     </box>
   </toolbox>
-  <multi_selector id="base"
-                  label="Base objects:"
-                  tooltip="Select a base objects"
-                  type_choice="vertices edges wires faces shells compounds"
-                  concealment="true">
-    <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="vertex,edge,wire,face,shell,compound"/>
-  </multi_selector>
-  <shape_selector id="direction_object"
-                  icon="icons/Features/axis.png"
-                  label="Direction"
-                  tooltip="Select an edge for direction"
-                  shape_types="edge"
-                  default="&lt;base normal&gt;">
-    <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
-  </shape_selector>
   <validator id="GeomValidators_ZeroOffset" parameters="CreationMethod,BySizes,base,to_size,from_size,to_object,to_offset,from_object,from_offset"/>
   <validator id="FeaturesPlugin_ValidatorExtrusionDir" parameters="base,direction_object"/>
 </source>
