@@ -7,7 +7,6 @@
 #include <pyconfig.h>
 
 #include "ParametersPlugin_Parameter.h"
-#include <ParametersPlugin_PyInterp.h>
 
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultParameter.h>
@@ -16,14 +15,13 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Events.h>
 
 #include <string>
 #include <sstream>
 
 ParametersPlugin_Parameter::ParametersPlugin_Parameter()
 {
-  myInterp = std::shared_ptr<ParametersPlugin_PyInterp>(new ParametersPlugin_PyInterp());
-  myInterp->initialize();
 }
 
 ParametersPlugin_Parameter::~ParametersPlugin_Parameter()
@@ -97,63 +95,38 @@ void ParametersPlugin_Parameter::execute()
 
 double ParametersPlugin_Parameter::evaluate(const std::string& theExpression, std::string& theError)
 {
-  std::list<std::string> anExprParams = myInterp->compile(theExpression);
-  // find expression's params in the model
-  std::list<std::string> aContext;
-  std::list<std::string>::iterator it = anExprParams.begin();
-  std::list<ResultParameterPtr> aParamsList;
-  for ( ; it != anExprParams.end(); it++) {
-    std::string& aVariableName = *it;
+  FeaturePtr aMyPtr = std::dynamic_pointer_cast<ModelAPI_Feature>(data()->owner());
+  std::shared_ptr<ModelAPI_ParameterEvalMessage> aProcessMessage =
+    ModelAPI_ParameterEvalMessage::send(aMyPtr, this);
 
-    // Parameter with the same name should be searched in the parent document.
-    // For the PartSet assume that the parameter is absent.
-    // Currently there is no way to get parent document, so we get PartSet for all.
-    DocumentPtr aDocument = document();
-    if (data()->name() == aVariableName) {
-      if (aDocument == ModelAPI_Session::get()->moduleDocument())
-        continue;
-      aDocument = ModelAPI_Session::get()->moduleDocument();
+  double aResult = 0;
+  if (aProcessMessage->isProcessed()) {
+    const std::list<ResultParameterPtr>& aParamsList = aProcessMessage->params();
+    aResult = aProcessMessage->result();
+    theError = aProcessMessage->error();
+    // compare the list of parameters to store if changed
+    AttributeRefListPtr aParams = reflist(ARGUMENTS_ID());
+    bool aDifferent = aParams->size() != aParamsList.size();
+    if (!aDifferent) {
+      std::list<ResultParameterPtr>::const_iterator aNewIter = aParamsList.begin();
+      std::list<ObjectPtr> anOldList = aParams->list();
+      std::list<ObjectPtr>::const_iterator anOldIter = anOldList.begin();
+      for(; !aDifferent && aNewIter != aParamsList.end(); aNewIter++, anOldIter++) {
+        if (*aNewIter != *anOldIter)
+          aDifferent = true;
+      }
     }
-
-    double aValue;
-    ResultParameterPtr aParamRes;
-    if (!ModelAPI_Tools::findVariable(std::dynamic_pointer_cast<ModelAPI_Feature>(data()->owner()),
-      aVariableName, aValue, aParamRes, aDocument)) continue;
-    aParamsList.push_back(aParamRes);
-
-    std::ostringstream sstream;
-    sstream << aValue;
-    std::string aParamValue = sstream.str();
-    size_t aPos = aParamValue.find(".");
-    std::string aPnt = "";
-    if (aPos == std::string::npos)
-      aPnt = ".";
-    aContext.push_back(*it + "=" + aParamValue + aPnt);
-  }
-  // compare the list of parameters to store if changed
-  AttributeRefListPtr aParams = reflist(ARGUMENTS_ID());
-  bool aDifferent = aParams->size() != aParamsList.size();
-  if (!aDifferent) {
-    std::list<ResultParameterPtr>::iterator aNewIter = aParamsList.begin();
-    std::list<ObjectPtr> anOldList = aParams->list();
-    std::list<ObjectPtr>::iterator anOldIter = anOldList.begin();
-    for(; !aDifferent && aNewIter != aParamsList.end(); aNewIter++, anOldIter++) {
-      if (*aNewIter != *anOldIter)
-        aDifferent = true;
+    if (aDifferent) {
+      aParams->clear();
+      std::list<ResultParameterPtr>::const_iterator aNewIter = aParamsList.begin();
+      for(; aNewIter != aParamsList.end(); aNewIter++) {
+        aParams->append(*aNewIter);
+      }
     }
+  } else { // error: python interpreter is not active
+    theError = "Python interpreter is not available";
   }
-  if (aDifferent) {
-    aParams->clear();
-    std::list<ResultParameterPtr>::iterator aNewIter = aParamsList.begin();
-    for(; aNewIter != aParamsList.end(); aNewIter++) {
-      aParams->append(*aNewIter);
-    }
-  }
-
-  myInterp->extendLocalContext(aContext);
-  double result = myInterp->evaluate(theExpression, theError);
-  myInterp->clearLocalContext();
-  return result;
+  return aResult;
 }
 
 bool ParametersPlugin_Parameter::isPreviewNeeded() const

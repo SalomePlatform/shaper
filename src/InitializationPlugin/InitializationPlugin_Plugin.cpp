@@ -2,6 +2,7 @@
 
 #include <InitializationPlugin_Plugin.h>
 
+#include <InitializationPlugin_EvalListener.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeBoolean.h>
@@ -25,6 +26,9 @@ InitializationPlugin_Plugin::InitializationPlugin_Plugin()
   Events_Loop* aLoop = Events_Loop::loop();
   const Events_ID kDocCreatedEvent = ModelAPI_DocumentCreatedMessage::eventId();
   aLoop->registerListener(this, kDocCreatedEvent, NULL, true);
+
+  myEvalListener =
+    std::shared_ptr<InitializationPlugin_EvalListener>(new InitializationPlugin_EvalListener());
 }
 
 void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Message>& theMessage)

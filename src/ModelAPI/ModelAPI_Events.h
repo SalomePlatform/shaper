@@ -21,6 +21,7 @@
 
 
 class ModelAPI_Document;
+class ModelAPI_ResultParameter;
 
 /// Event ID that feature is created (comes with ModelAPI_ObjectUpdatedMessage)
 static const char * EVENT_OBJECT_CREATED = "ObjectCreated";
@@ -245,6 +246,109 @@ class ModelAPI_AttributeEvalMessage : public Events_Message
   MODELAPI_EXPORT AttributePtr attribute() const;
   /// Sets an attribute to the message
   MODELAPI_EXPORT void setAttribute(AttributePtr theAttribute);
+};
+
+/// Message that parameter feature expression should be evaluated: value and error producing
+class ModelAPI_ParameterEvalMessage : public Events_Message
+{
+  FeaturePtr myParam; ///< parameters that should be evaluated
+  bool myIsProcessed; ///< true if results were set
+  /// result of processing, list of parameters in expression found
+  std::list<std::shared_ptr<ModelAPI_ResultParameter> > myParamsList;
+  double myResult; ///< result of processing, the computed value of the expression
+  std::string myError; ///< error of processing, empty if there is no error
+
+ public:
+  /// Static. Returns EventID of the message.
+  MODELAPI_EXPORT static Events_ID& eventId()
+  {
+    static const char * MY_PARAMETER_EVALUATION_EVENT_ID("ParameterEvaluationRequest");
+    static Events_ID anId = Events_Loop::eventByName(MY_PARAMETER_EVALUATION_EVENT_ID);
+    return anId;
+  }
+
+  /// Useful method that creates and sends the event.
+  /// Returns the message, processed, with the resulting fields filled.
+  MODELAPI_EXPORT static std::shared_ptr<ModelAPI_ParameterEvalMessage>
+    send(FeaturePtr theParameter, const void* theSender)
+  {
+    std::shared_ptr<ModelAPI_ParameterEvalMessage> aMessage =
+      std::shared_ptr<ModelAPI_ParameterEvalMessage>(
+      new ModelAPI_ParameterEvalMessage(eventId(), theSender));
+    aMessage->setParameter(theParameter);
+    Events_Loop::loop()->send(aMessage);
+    return aMessage;
+  }
+
+  /// Creates an empty message
+  MODELAPI_EXPORT ModelAPI_ParameterEvalMessage(const Events_ID theID, const void* theSender = 0);
+  /// The virtual destructor
+  MODELAPI_EXPORT virtual ~ModelAPI_ParameterEvalMessage();
+
+  /// Returns a parameter stored in the message
+  MODELAPI_EXPORT FeaturePtr parameter() const;
+  /// Sets a parameter to the message
+  MODELAPI_EXPORT void setParameter(FeaturePtr theParam);
+  /// Sets the results of processing
+  MODELAPI_EXPORT void setResults(
+    const std::list<std::shared_ptr<ModelAPI_ResultParameter> >& theParamsList,
+    const double theResult, const std::string& theError);
+  /// Returns true if the expression is processed
+  MODELAPI_EXPORT bool isProcessed();
+  /// Returns the results of processing: list of parameters found in the expression
+  MODELAPI_EXPORT const std::list<std::shared_ptr<ModelAPI_ResultParameter> >& params() const;
+  /// Returns the expression result
+  MODELAPI_EXPORT const double& result() const;
+  /// Returns the interpreter error (empty if no error)
+  MODELAPI_EXPORT const std::string& error() const;
+};
+
+
+/// Message to ask compute the positions of parameters in the expression
+class ModelAPI_ComputePositionsMessage : public Events_Message
+{
+  std::string myExpression; ///< the expression string
+  std::string myParamName; ///< name of the parameter to be searched
+  std::list<std::pair<int, int> > myPositions; ///< computation result: start-end position indices
+
+public:
+  /// Static. Returns EventID of the message.
+  MODELAPI_EXPORT static Events_ID& eventId()
+  {
+    static const char * MY_COMPUTE_POSITIOND_EVENT_ID("ComputePositionsRequest");
+    static Events_ID anId = Events_Loop::eventByName(MY_COMPUTE_POSITIOND_EVENT_ID);
+    return anId;
+  }
+
+  /// Useful method that creates and sends the AttributeEvalMessage event
+  /// Returns the message, processed, with the resulting fields filled
+  MODELAPI_EXPORT static std::shared_ptr<ModelAPI_ComputePositionsMessage>
+    send(const std::string& theExpression, const std::string& theParameter, const void* theSender)
+  {
+    std::shared_ptr<ModelAPI_ComputePositionsMessage> aMessage =
+      std::shared_ptr<ModelAPI_ComputePositionsMessage>(
+      new ModelAPI_ComputePositionsMessage(eventId(), theSender));
+    aMessage->set(theExpression, theParameter);
+    Events_Loop::loop()->send(aMessage);
+    return aMessage;
+  }
+
+  /// Creates an empty message
+  MODELAPI_EXPORT ModelAPI_ComputePositionsMessage(
+    const Events_ID theID, const void* theSender = 0);
+  /// The virtual destructor
+  MODELAPI_EXPORT virtual ~ModelAPI_ComputePositionsMessage();
+
+  /// Returns an expression stored in the message
+  MODELAPI_EXPORT const std::string& expression() const;
+  /// Returns a parameter name stored in the message
+  MODELAPI_EXPORT const std::string& parameter() const;
+  /// Sets an expression and parameter needed for computation
+  MODELAPI_EXPORT void set(const std::string& theExpression, const std::string& theParameter);
+  /// Sets the results of processing
+  MODELAPI_EXPORT void setPositions(const std::list<std::pair<int, int> >& thePositions);
+  /// Returns the results of processing: position start and end indices
+  MODELAPI_EXPORT const std::list<std::pair<int, int> >& positions() const;
 };
 
 /// Message that the object is renamed
