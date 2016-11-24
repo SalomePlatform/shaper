@@ -701,13 +701,22 @@ void Model_AttributeSelection::selectBody(
     }
   }
 
-
   /// fix for issue 411: result modified shapes must not participate in this selection mechanism
-  FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-  if (aFeatureOwner.get())
-    aFeatureOwner->eraseResults();
   if (!aContext.IsNull()) {
+    FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+    bool aEraseResults = false;
+    if (aFeatureOwner.get()) {
+      aEraseResults = !aFeatureOwner->results().empty();
+      if (aEraseResults) // erase results without flash deleted and redisplay: do it after Select
+        aFeatureOwner->removeResults(0, false);
+    }
     aSel.Select(aNewSub, aNewContext);
+ 
+    if (aEraseResults) { // flash after Select : in Groups it makes selection with shift working
+      static Events_Loop* aLoop = Events_Loop::loop();
+      static const Events_ID kDeletedEvent = aLoop->eventByName(EVENT_OBJECT_DELETED);
+      aLoop->flush(kDeletedEvent);
+    }
   }
 }
 
