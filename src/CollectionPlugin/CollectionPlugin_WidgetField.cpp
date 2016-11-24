@@ -33,6 +33,7 @@
 #include <QEvent>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <QApplication>
 
 const char* MYFirstCol = "Shape";
 const char* MYTrue = "True";
@@ -41,7 +42,8 @@ const char* MYFalse = "False";
 class DataTableItemDelegate : public QStyledItemDelegate
 {
 public:
-  DataTableItemDelegate(ModelAPI_AttributeTables::ValueType theType) : QStyledItemDelegate() { myType = theType; }
+  DataTableItemDelegate(ModelAPI_AttributeTables::ValueType theType) : 
+      QStyledItemDelegate() { myType = theType; }
 
   virtual QWidget* createEditor(QWidget* theParent, 
                                 const QStyleOptionViewItem & theOption, 
@@ -50,6 +52,9 @@ public:
   ModelAPI_AttributeTables::ValueType dataType() const { return myType; }
 
   void setDataType(ModelAPI_AttributeTables::ValueType theType) { myType = theType; }
+   
+signals:
+  void startEditing();
 
 private:
   ModelAPI_AttributeTables::ValueType myType;
@@ -98,6 +103,7 @@ QWidget* DataTableItemDelegate::createEditor(QWidget* theParent,
 }
 
 
+
 //**********************************************************************************
 //**********************************************************************************
 //**********************************************************************************
@@ -105,7 +111,8 @@ CollectionPlugin_WidgetField::
   CollectionPlugin_WidgetField(QWidget* theParent, 
                                ModuleBase_IWorkshop* theWorkshop, 
                                const Config_WidgetAPI* theData):
-ModuleBase_WidgetSelector(theParent, theWorkshop, theData), myHeaderEditor(0)
+ModuleBase_WidgetSelector(theParent, theWorkshop, theData), myHeaderEditor(0),
+  myIsEditing(false)
 {
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);
 
@@ -194,8 +201,10 @@ ModuleBase_WidgetSelector(theParent, theWorkshop, theData), myHeaderEditor(0)
   connect(aAddBtn, SIGNAL(clicked(bool)), SLOT(onAddStep()));
   connect(myRemoveBtn, SIGNAL(clicked(bool)), SLOT(onRemoveStep()));
   connect(myStepSlider, SIGNAL(valueChanged(int)), SLOT(onStepMove(int)));
+  connect(myStepSlider, SIGNAL(rangeChanged(int, int)), SLOT(onRangeChanged(int, int)));
   connect(myFieldTypeCombo, SIGNAL(currentIndexChanged(int)), SLOT(onFieldTypeChanged(int)));
   connect(myShapeTypeCombo, SIGNAL(currentIndexChanged(int)), SLOT(onShapeTypeChanged(int)));
+  connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), SLOT(onFocusChanged(QWidget*, QWidget*)));
 }
 
 //**********************************************************************************
@@ -250,6 +259,14 @@ void CollectionPlugin_WidgetField::appendStepControls()
 }
 
 //**********************************************************************************
+void CollectionPlugin_WidgetField::deactivate()
+{
+  ModuleBase_WidgetSelector::deactivate();
+  storeValueCustom();
+}
+
+
+//**********************************************************************************
 bool CollectionPlugin_WidgetField::eventFilter(QObject* theObject, QEvent* theEvent)
 {
   QObject* aObject = 0;
@@ -298,11 +315,11 @@ bool CollectionPlugin_WidgetField::eventFilter(QObject* theObject, QEvent* theEv
       }
     }
   } else if ((theObject == myHeaderEditor) && (theEvent->type() == QEvent::FocusOut)) {
-    QHeaderView* aHeader = 
-      static_cast<QHeaderView*>(myHeaderEditor->parentWidget()->parentWidget());
+    //QHeaderView* aHeader = 
+    //  static_cast<QHeaderView*>(myHeaderEditor->parentWidget()->parentWidget());
     QString aNewTitle = myHeaderEditor->text();
     //save item text
-    aHeader->model()->setHeaderData(myEditIndex, aHeader->orientation(), aNewTitle);
+    //aHeader->model()->setHeaderData(myEditIndex, aHeader->orientation(), aNewTitle);
     myCompNamesList.replace(myEditIndex - 1, aNewTitle);
     myHeaderEditor->deleteLater(); //safely delete editor
     myHeaderEditor = 0;
@@ -310,6 +327,9 @@ bool CollectionPlugin_WidgetField::eventFilter(QObject* theObject, QEvent* theEv
     AttributeStringArrayPtr aStringsAttr =
       myFeature->data()->stringArray(CollectionPlugin_Field::COMPONENTS_NAMES_ID());
     aStringsAttr->setValue(myEditIndex - 1, aNewTitle.toStdString());
+    foreach(QTableWidget* aTable, myDataTblList) {
+      updateHeaders(aTable);
+    }
   }
   return ModuleBase_WidgetSelector::eventFilter(theObject, theEvent);
 }
@@ -429,6 +449,7 @@ bool CollectionPlugin_WidgetField::storeValueCustom()
 //**********************************************************************************
 bool CollectionPlugin_WidgetField::restoreValueCustom()
 {
+  bool isBlocked;
   DataPtr aData = myFeature->data();
 
   AttributeSelectionListPtr aSelList = aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
@@ -448,7 +469,9 @@ bool CollectionPlugin_WidgetField::restoreValueCustom()
   for (int i = 0; i < aStringsAttr->size(); i++) {
     myCompNamesList.append(aStringsAttr->value(i).c_str());
   }
+  isBlocked = myNbComponentsSpn->blockSignals(true);
   myNbComponentsSpn->setValue(myCompNamesList.size());
+  myNbComponentsSpn->blockSignals(isBlocked);
 
   AttributeTablesPtr aTablesAttr = aData->tables(CollectionPlugin_Field::VALUES_ID());
   // Get number of steps
@@ -480,7 +503,7 @@ bool CollectionPlugin_WidgetField::restoreValueCustom()
   for (int i = 0; i < aNbSteps; i++) {
     myStampSpnList.at(i)->setValue(aStampsAttr->value(i));
     QTableWidget* aTable = myDataTblList.at(i);
-    bool isBlocked = aTable->blockSignals(true);
+    isBlocked = aTable->blockSignals(true);
     aTable->setRowCount(aRows);
     for (int j = 0; j < aCols + 1; j++) {
       for (int k = 0; k < aRows; k++) {
@@ -635,6 +658,42 @@ void CollectionPlugin_WidgetField::onAddStep()
   appendStepControls();
   myStepSlider->setValue(aMax);
   myRemoveBtn->setEnabled(aMax > 1);
+
+  AttributeTablesPtr aTablesAttr = myFeature->data()->tables(CollectionPlugin_Field::VALUES_ID());
+  aTablesAttr->setSize(aTablesAttr->rows(), aTablesAttr->columns(), myDataTblList.size());
+
+
+  AttributeSelectionListPtr aSelList = 
+    myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());
+  if (!aSelList->isInitialized())
+    return;
+  int aSelNb = aSelList->size();
+  if (aSelNb == 0)
+    return;
+
+  int aColumns = myNbComponentsSpn->value() + 1;
+  int aRows = aSelNb + 1;
+  QTableWidget* aTable = myDataTblList.last();
+  aTable->setRowCount(aRows);
+  QTableWidgetItem* aItem = 0;
+  for(int i = 0; i < aColumns; i++) {
+    if (i == 0) {
+      for(int j = 1; j < aRows; j++) {
+        aItem = new QTableWidgetItem();
+        AttributeSelectionPtr aAttr = aSelList->value(j - 1);
+        aItem->setText(aAttr->namingName().c_str());
+        aItem->setToolTip(aAttr->namingName().c_str());
+        aTable->setItem(j, i, aItem);
+      }
+    } else {
+      QString aDefVal = aTable->item(0, i)->text();
+      for(int j = 1; j < aRows; j++) {
+        aItem = new QTableWidgetItem();
+        aItem->setText(aDefVal);
+        aTable->setItem(j, i, aItem);
+      }
+    }
+  }
 }
 
 //**********************************************************************************
@@ -646,6 +705,9 @@ void CollectionPlugin_WidgetField::onRemoveStep()
   removeStepControls();
   myStepSlider->setMaximum(aMax);
   myRemoveBtn->setEnabled(aMax > 1);
+
+  AttributeTablesPtr aTablesAttr = myFeature->data()->tables(CollectionPlugin_Field::VALUES_ID());
+  aTablesAttr->setSize(aTablesAttr->rows(), aTablesAttr->columns(), myDataTblList.size());
 }
 
 //**********************************************************************************
@@ -667,16 +729,20 @@ void CollectionPlugin_WidgetField::onStepMove(int theStep)
 bool CollectionPlugin_WidgetField::
   isValidSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs)
 {
-  return true;
+  return (myShapeTypeCombo->currentIndex() == 5)? false : true;
 }
 
 //**********************************************************************************
 void CollectionPlugin_WidgetField::onSelectionChanged()
 {
+  // Ignore selection for Parts mode
+  if (myShapeTypeCombo->currentIndex() == 5)
+    return;
+
   QList<ModuleBase_ViewerPrsPtr> aSelected = 
     myWorkshop->selection()->getSelected(ModuleBase_ISelection::AllControls);
 
-  clearData();
+  //clearData();
   AttributeSelectionListPtr aSelList = 
     myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());
   aSelList->clear();
@@ -697,24 +763,39 @@ void CollectionPlugin_WidgetField::onSelectionChanged()
   }
   int aColumns = myDataTblList.first()->columnCount();
   int aRows = myDataTblList.first()->rowCount();
+  int aNewRows = aNbData + 1;
   AttributeTablesPtr aTablesAttr = myFeature->data()->tables(CollectionPlugin_Field::VALUES_ID());
-  aTablesAttr->setSize(aRows + aNbData, aColumns - 1, myDataTblList.size());
+  aTablesAttr->setSize(aNewRows, aColumns - 1, myDataTblList.size());
 
   QTableWidgetItem* aItem = 0;
   foreach(QTableWidget* aTable, myDataTblList) {
-    aTable->setRowCount(aRows + aNbData);
-    for(int i = 0; i < aColumns; i++) {
-      QString aDefVal = aTable->item(0, i)->text();
-      for(int j = 1; j < aRows + aNbData; j++) {
-        aItem = new QTableWidgetItem();
+    aTable->setRowCount(aNewRows);
+    if (aNewRows > aRows) { 
+      // Add new data
+      for(int i = 0; i < aColumns; i++) {
         if (i == 0) {
-          AttributeSelectionPtr aAttr = aSelList->value(j - 1);
-          aItem->setText(aAttr->namingName().c_str());
-          aItem->setToolTip(aAttr->namingName().c_str());
+          for(int j = 1; j < aNewRows; j++) {
+            aItem = new QTableWidgetItem();
+            AttributeSelectionPtr aAttr = aSelList->value(j - 1);
+            aItem->setText(aAttr->namingName().c_str());
+            aItem->setToolTip(aAttr->namingName().c_str());
+            aTable->setItem(j, i, aItem);
+          }
         } else {
-          aItem->setText(aDefVal);
+          QString aDefVal = aTable->item(0, i)->text();
+          for(int j = aRows; j < aNewRows; j++) {
+            aItem = new QTableWidgetItem();
+            aItem->setText(aDefVal);
+            aTable->setItem(j, i, aItem);
+          }
         }
-        aTable->setItem(j, i, aItem);
+      }
+    } else {
+      // Update only selection name
+      for(int j = 1; j < aNewRows - 1; j++) {
+        AttributeSelectionPtr aAttr = aSelList->value(j);
+        aTable->item(j, 0)->setText(aAttr->namingName().c_str());
+        aTable->item(j, 0)->setToolTip(aAttr->namingName().c_str());
       }
     }
   }
@@ -779,7 +860,7 @@ void CollectionPlugin_WidgetField::onTableEdited(int theRow, int theCol)
 //**********************************************************************************
 void CollectionPlugin_WidgetField::onShapeTypeChanged(int theType)
 {
-  activateSelectionAndFilters(true);
+  activateSelectionAndFilters(theType == 5? false:true);
 
   AttributeSelectionListPtr aSelList = 
     myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());
@@ -794,4 +875,29 @@ void CollectionPlugin_WidgetField::onShapeTypeChanged(int theType)
   aSelList->clear();
   AttributeTablesPtr aTablesAttr = myFeature->data()->tables(CollectionPlugin_Field::VALUES_ID());
   aTablesAttr->setSize(1, myNbComponentsSpn->value(), myDataTblList.size());
+  emit valuesChanged();
 }
+
+//**********************************************************************************
+bool CollectionPlugin_WidgetField::processEnter()
+{
+  if (myIsEditing) {
+    myIsEditing = false;
+    return true;
+  }
+  return false;
+}
+
+//**********************************************************************************
+void CollectionPlugin_WidgetField::onFocusChanged(QWidget* theOld, QWidget* theNew)
+{
+  if (theNew && (!myIsEditing))
+    myIsEditing = dynamic_cast<QLineEdit*>(theNew);
+}
+
+//**********************************************************************************
+void CollectionPlugin_WidgetField::onRangeChanged(int theMin, int theMax)
+{
+  myMaxLbl->setText(QString::number(theMax));
+}
+

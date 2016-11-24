@@ -53,6 +53,11 @@ public:
   /// \return a boolean value
   virtual bool isValidSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
 
+  /// Returns true if the event is processed.
+  virtual bool processEnter();
+
+  /// The methiod called when widget is deactivated
+  virtual void deactivate();
 
 protected:
   /// Saves the internal parameters to the given feature
@@ -87,6 +92,10 @@ private slots:
   void onTableEdited(int theRow, int theCol);
 
   void onShapeTypeChanged(int theType);
+
+  void onFocusChanged(QWidget* theOld, QWidget* theNew);
+
+  void onRangeChanged(int theMin, int theMax);
 
 private:
   void clearData();
@@ -136,6 +145,8 @@ private:
 
   QLineEdit* myHeaderEditor;
   int myEditIndex;
+
+  bool myIsEditing;
 };
 
 #endif
