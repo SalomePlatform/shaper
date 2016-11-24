@@ -698,7 +698,16 @@ void XGUI_Workshop::saveDocument(const QString& theName, std::list<std::string>&
 {
   QApplication::restoreOverrideCursor();
   SessionPtr aMgr = ModelAPI_Session::get();
+
+  std::list<DocumentPtr> aDocList = aMgr->allOpenedDocuments();
+  std::list<DocumentPtr>::const_iterator aIt;
+  for (aIt = aDocList.cbegin(); aIt != aDocList.cend(); aIt++) {
+    std::list<bool> aState = myObjectBrowser->getStateForDoc(*aIt);
+    (*aIt)->storeNodesState(aState);
+  }
+
   aMgr->save(theName.toLatin1().constData(), theFileNames);
+
   QApplication::restoreOverrideCursor();
 }
 
@@ -765,6 +774,13 @@ void XGUI_Workshop::openDirectory(const QString& theDirectory)
   aSession->closeAll();
   aSession->load(myCurrentDir.toLatin1().constData());
   myObjectBrowser->rebuildDataTree();
+
+  // Open first level of data tree
+  DocumentPtr aRootDoc = aSession->moduleDocument();
+  std::list<bool> aStates;
+  aRootDoc->restoreNodesState(aStates);
+  myObjectBrowser->setStateForDoc(aRootDoc, aStates);
+
   updateCommandStatus();
 #ifndef HAVE_SALOME
   myMainWindow->setCurrentDir(myCurrentDir, true);

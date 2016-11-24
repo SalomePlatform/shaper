@@ -536,3 +536,34 @@ void XGUI_ObjectsBrowser::onAfterModelReset()
     myTreeView->setExpanded(aIndex, true);
   }
 }
+
+std::list<bool> XGUI_ObjectsBrowser::getStateForDoc(DocumentPtr theDoc) const
+{
+  std::list<bool> aStates;
+  XGUI_DataModel* aModel = dataModel();
+  QModelIndex aRootIdx = aModel->documentRootIndex(theDoc);
+  int aNbChild = aModel->rowCount(aRootIdx);
+  for (int i = 0; i < aNbChild; i++) {
+    QModelIndex aIdx = aModel->index(i, 0, aRootIdx);
+    aStates.push_back(myTreeView->isExpanded(aIdx));
+  }
+  return aStates;
+}
+
+void XGUI_ObjectsBrowser::setStateForDoc(DocumentPtr theDoc, const std::list<bool>& theStates)
+{
+  if (theStates.size() == 0)
+    return;
+  XGUI_DataModel* aModel = dataModel();
+  QModelIndex aRootIdx = aModel->documentRootIndex(theDoc);
+  int aNbChild = aModel->rowCount(aRootIdx);
+
+  std::list<bool>::const_iterator aIt;
+  int i = 0;
+  for (aIt = theStates.cbegin(); aIt != theStates.cend(); aIt++, i++) {
+    if (i >= aNbChild )
+      break;
+    QModelIndex aIdx = aModel->index(i, 0, aRootIdx);
+    myTreeView->setExpanded(aIdx, (*aIt));
+  }
+}

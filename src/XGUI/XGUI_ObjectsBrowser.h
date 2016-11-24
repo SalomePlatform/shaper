@@ -185,6 +185,16 @@ Q_OBJECT
   /// \param theReader the reader object
   void setXMLReader(Config_DataModelReader* theReader);
 
+  /// Returns list of folders opened state for the given document
+  /// \param theDoc the document
+  /// \return list of booleans with state expanded or not
+  std::list<bool> getStateForDoc(DocumentPtr theDoc) const;
+
+  /// Set folders opened state for the given document
+  /// \param theDoc the document
+  /// \param theStates list of booleans with state expanded or not
+  void setStateForDoc(DocumentPtr theDoc, const std::list<bool>& theStates);
+
 public slots:
   //! Called on Edit command request
   void onEditItem();
