@@ -462,9 +462,6 @@ bool CollectionPlugin_WidgetField::restoreValueCustom()
   AttributeStringArrayPtr aStringsAttr =
   aData->stringArray(CollectionPlugin_Field::COMPONENTS_NAMES_ID());
 
-  if (!aStringsAttr->isInitialized())
-    return true;
-
   myCompNamesList.clear();
   for (int i = 0; i < aStringsAttr->size(); i++) {
     myCompNamesList.append(aStringsAttr->value(i).c_str());
@@ -744,7 +741,6 @@ void CollectionPlugin_WidgetField::onSelectionChanged()
   AttributeSelectionListPtr aSelList = 
     myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());
   aSelList->clear();
-  aSelList->setSelectionType(getSelectionType(myShapeTypeCombo->currentIndex()));
 
   ResultPtr aResult;
   GeomShapePtr aShape;
@@ -862,11 +858,11 @@ void CollectionPlugin_WidgetField::onShapeTypeChanged(int theType)
 
   AttributeSelectionListPtr aSelList = 
     myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());
-  if (!aSelList->isInitialized())
-    return;
+
   std::string aTypeName = getSelectionType(theType);
   if (aTypeName == aSelList->selectionType())
     return;
+  aSelList->setSelectionType(aTypeName);
 
   //Clear old selection
   clearData();
