@@ -737,9 +737,9 @@ void CollectionPlugin_WidgetField::onSelectionChanged()
   QList<ModuleBase_ViewerPrsPtr> aSelected = 
     myWorkshop->selection()->getSelected(ModuleBase_ISelection::AllControls);
 
-  //clearData();
   AttributeSelectionListPtr aSelList = 
     myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());
+  aSelList->setSelectionType(getSelectionType(myShapeTypeCombo->currentIndex()));
   aSelList->clear();
 
   ResultPtr aResult;
