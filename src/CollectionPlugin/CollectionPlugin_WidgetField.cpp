@@ -657,7 +657,6 @@ void CollectionPlugin_WidgetField::onAddStep()
   myMaxLbl->setText(QString::number(aMax));
   appendStepControls();
   myStepSlider->setValue(aMax);
-  myRemoveBtn->setEnabled(aMax > 1);
 
   AttributeTablesPtr aTablesAttr = myFeature->data()->tables(CollectionPlugin_Field::VALUES_ID());
   aTablesAttr->setSize(aTablesAttr->rows(), aTablesAttr->columns(), myDataTblList.size());
@@ -704,7 +703,6 @@ void CollectionPlugin_WidgetField::onRemoveStep()
   myMaxLbl->setText(QString::number(aMax));
   removeStepControls();
   myStepSlider->setMaximum(aMax);
-  myRemoveBtn->setEnabled(aMax > 1);
 
   AttributeTablesPtr aTablesAttr = myFeature->data()->tables(CollectionPlugin_Field::VALUES_ID());
   aTablesAttr->setSize(aTablesAttr->rows(), aTablesAttr->columns(), myDataTblList.size());
@@ -899,5 +897,6 @@ void CollectionPlugin_WidgetField::onFocusChanged(QWidget* theOld, QWidget* theN
 void CollectionPlugin_WidgetField::onRangeChanged(int theMin, int theMax)
 {
   myMaxLbl->setText(QString::number(theMax));
+  myRemoveBtn->setEnabled(theMax > 1);
 }
 

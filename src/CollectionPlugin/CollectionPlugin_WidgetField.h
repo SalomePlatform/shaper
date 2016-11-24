@@ -71,7 +71,10 @@ protected:
   /// \return a list of shapes
   virtual QIntList shapeTypes() const;
 
-  virtual bool eventFilter(QObject* theObbject, QEvent* theEvent);
+  /// Redefinition of virtual function
+  /// \param theObject an object for the event
+  /// \param theEvent an event
+  virtual bool eventFilter(QObject* theObject, QEvent* theEvent);
 
 
 protected slots:
@@ -79,40 +82,74 @@ protected slots:
   virtual void onSelectionChanged();
 
 private slots:
+  /// Slot called on number of component changed
+  /// \param theVal - a new components number
   void onNbCompChanged(int theVal);
 
+  /// Slot called on add a step
   void onAddStep();
 
+  /// Slot called on remove a step
   void onRemoveStep();
 
+  /// Slot called on a navigation between steps
+  /// \param theStep - a current step
   void onStepMove(int theStep);
 
+  /// Slot called on a navigation between steps
+  /// \param theIdx - a current step
   void onFieldTypeChanged(int theIdx);
 
+  /// Slot called on editing of a table cell
+  /// \param theRow a row of the cell
+  /// \param theCol a column of the cell
   void onTableEdited(int theRow, int theCol);
 
+  /// Slot called on selection mode changed
+  /// \param theType a new choice
   void onShapeTypeChanged(int theType);
 
+  /// Slot called on widget focus changed
+  /// \param theOld a widget wgich lost focus
+  /// \param theNew a widget which get focus
   void onFocusChanged(QWidget* theOld, QWidget* theNew);
 
+  /// Slot called on a slider navigation changed
+  /// \param theMin - a minimal value
+  /// \param theMax a maximal value
   void onRangeChanged(int theMin, int theMax);
 
 private:
+  /// Clear existing tables
   void clearData();
 
+  /// Append controls for management of a new step
   void appendStepControls();
+
+  /// Remove current step controls
   void removeStepControls();
 
+  /// Update header of a table
+  /// \param theDataTbl a table widget
   void updateHeaders(QTableWidget* theDataTbl) const;
 
+  /// Return Item Id of myShapeTypeCombo by selection mode
+  /// \param theStr a selection mode
   int getSelectionType(const std::string& theStr) const;
 
+  /// Return selection mode by Item Id of myShapeTypeCombo
+  /// \param theType an item id
   std::string getSelectionType(int theType) const;
 
+  /// Create default table item
   QTableWidgetItem* createDefaultItem() const;
 
+  /// Create a table item from the given value
+  /// \param theVal a value for the item
   QTableWidgetItem* createValueItem(ModelAPI_AttributeTables::Value& theVal) const;
 
+  /// Return a value from the string
+  /// \param theStrVal a string
   ModelAPI_AttributeTables::Value getValue(QString theStrVal) const;
 
   /// Types of shapes selection
@@ -133,19 +170,28 @@ private:
   /// Stamp value
   QList<QSpinBox*> myStampSpnList;
 
+  /// List of created tables
   QList<QTableWidget*> myDataTblList;
 
+  /// Max value Label for the slider
   QLabel* myMaxLbl;
 
+  /// A container for step controls
   QStackedWidget* myStepWgt;
 
+  /// A list for component names
   QStringList myCompNamesList;
 
+  /// Remove button
   QPushButton* myRemoveBtn;
 
+  /// Editor for table header
   QLineEdit* myHeaderEditor;
+
+  /// Index of header section under editing
   int myEditIndex;
 
+  /// Stae of a table editing
   bool myIsEditing;
 };
 
