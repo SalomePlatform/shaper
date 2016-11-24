@@ -9,6 +9,22 @@
 
 #include <cmath>
 
+// remove indices of all point-point coincidences from the vector
+static void removePtPtCoincidences(const ConstraintMap& theConstraints, GCS::VEC_I& theVecToClear)
+{
+  ConstraintMap::const_iterator aCIt = theConstraints.begin();
+  for (; aCIt != theConstraints.end(); ++aCIt) {
+    if (aCIt->second != CONSTRAINT_PT_PT_COINCIDENT)
+      continue;
+    GCS::VEC_I::iterator aRIt = theVecToClear.begin();
+    for (; aRIt != theVecToClear.end(); ++aRIt)
+      if (aCIt->first->getTag() == *aRIt) {
+        theVecToClear.erase(aRIt);
+        break;
+      }
+  }
+}
+
 
 PlaneGCSSolver_Solver::PlaneGCSSolver_Solver()
   : myEquationSystem(new GCS::System),
@@ -115,19 +131,8 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
     myEquationSystem->getRedundant(aRedundantLocal);
     aRedundantID.insert(aRedundantID.end(), aRedundantLocal.begin(), aRedundantLocal.end());
     // Workaround: remove all point-point coincidences from list of redundant
-    if (!aRedundantID.empty()) {
-      ConstraintMap::const_iterator aCIt = myConstraints.begin();
-      for (; aCIt != myConstraints.end(); ++aCIt) {
-        if (aCIt->second != CONSTRAINT_PT_PT_COINCIDENT)
-          continue;
-        GCS::VEC_I::iterator aRIt = aRedundantID.begin();
-        for (; aRIt != aRedundantID.end(); ++aRIt)
-          if (aCIt->first->getTag() == *aRIt) {
-            aRedundantID.erase(aRIt);
-            break;
-          }
-      }
-    }
+    if (!aRedundantID.empty())
+      removePtPtCoincidences(myConstraints, aRedundantID);
     // The system with tangent constraints may show redundant constraints
     // if the entities are coupled smoothly.
     // Sometimes tangent constraints are fall to both conflicting and redundant constraints.
@@ -185,8 +190,11 @@ GCS::SolveStatus PlaneGCSSolver_Solver::solveWithoutTangent()
   if (aResult == GCS::Success) {
     GCS::VEC_I aRedundant;
     aSystemWithoutTangent->getRedundant(aRedundant);
-    if (!aRedundant.empty())
-      aResult = GCS::Failed;
+    if (!aRedundant.empty()) {
+      removePtPtCoincidences(myConstraints, aRedundant);
+      if (!aRedundant.empty())
+        aResult = GCS::Failed;
+    }
   }
 
   // additional check that removed constraints are still correct
@@ -196,8 +204,13 @@ GCS::SolveStatus PlaneGCSSolver_Solver::solveWithoutTangent()
     for (; aRemIt != aRemovedTangent.end(); ++aRemIt)
       if (!isTangentTruth(*aRemIt))
         break;
-    if (aRemIt != aRemovedTangent.end())
+    if (aRemIt != aRemovedTangent.end()) {
       aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters);
+      if (aResult != GCS::Failed) {
+        aSystemWithoutTangent = myEquationSystem;
+        aResult = GCS::Success;
+      }
+    }
   }
 
   if (aResult == GCS::Success)
