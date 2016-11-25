@@ -504,7 +504,9 @@ bool CollectionPlugin_WidgetField::restoreValueCustom()
   //myStepWgt->setCurrentIndex(myStepSlider->value() - 1);
 
   // Get Type of the field values
+  isBlocked = myFieldTypeCombo->blockSignals(true);
   myFieldTypeCombo->setCurrentIndex(aTablesAttr->type());
+  myFieldTypeCombo->blockSignals(isBlocked);
 
   AttributeIntArrayPtr aStampsAttr = aData->intArray(CollectionPlugin_Field::STAMPS_ID());
   // Fill data table
