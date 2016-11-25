@@ -8,6 +8,7 @@
 #define EXCHANGEPLUGIN_TOOLS_H_
 
 #include <ExchangePlugin.h>
+#include <ModelAPI_AttributeTables.h>
 
 #include <list>
 #include <string>
@@ -28,6 +29,10 @@ public:
   /// Converts string representation of XAO dimension to selection type.
   static std::string xaoDimension2selectionType(const std::string& theDimension);
 
+  /// Converts representation of values type to XAO type.
+  static std::string valuesType2xaoType(const ModelAPI_AttributeTables::ValueType& theType);
+  /// Converts representation of values type to XAO type.
+  static ModelAPI_AttributeTables::ValueType xaoType2valuesType(std::string theType);
 };
 
 #endif /* EXCHANGEPLUGIN_TOOLS_H_ */
