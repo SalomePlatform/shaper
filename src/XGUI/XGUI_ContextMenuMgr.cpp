@@ -28,6 +28,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultField.h>
 
 #include <Config_DataModelReader.h>
 
@@ -471,6 +472,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   myObjBrowserMenus[ModelAPI_ResultBody::group()] = aList;
   // Group menu
   myObjBrowserMenus[ModelAPI_ResultGroup::group()] = aList;
+  myObjBrowserMenus[ModelAPI_ResultField::group()] = aList;
   // Result part menu
   myObjBrowserMenus[ModelAPI_ResultPart::group()] = aList;
   //-------------------------------------
@@ -519,6 +521,7 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   myViewerMenu[ModelAPI_ResultBody::group()] = aList;
   // Group menu
   myViewerMenu[ModelAPI_ResultGroup::group()] = aList;
+  myViewerMenu[ModelAPI_ResultField::group()] = aList;
   //-------------------------------------
 }
 

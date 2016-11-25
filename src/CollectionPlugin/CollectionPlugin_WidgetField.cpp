@@ -468,9 +468,9 @@ bool CollectionPlugin_WidgetField::restoreValueCustom()
   DataPtr aData = myFeature->data();
 
   AttributeSelectionListPtr aSelList = aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
-  if (!aSelList->isInitialized())
-    return false;
   std::string aTypeStr = aSelList->selectionType();
+  if (aTypeStr == "")
+    return false; // The attribute is not initialized
   myShapeTypeCombo->setCurrentIndex(getSelectionType(aTypeStr));
 
   // Get number of components
