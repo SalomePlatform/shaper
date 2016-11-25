@@ -11,6 +11,10 @@
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ISelection.h>
 
+#include <XGUI_Tools.h>
+#include <XGUI_Workshop.h>
+#include <XGUI_PropertyPanel.h>
+
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeStringArray.h>
 #include <ModelAPI_AttributeInteger.h>
@@ -112,7 +116,7 @@ CollectionPlugin_WidgetField::
                                ModuleBase_IWorkshop* theWorkshop, 
                                const Config_WidgetAPI* theData):
 ModuleBase_WidgetSelector(theParent, theWorkshop, theData), myHeaderEditor(0),
-  myIsEditing(false)
+  myIsEditing(false), myActivation(false)
 {
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);
 
@@ -223,6 +227,7 @@ void CollectionPlugin_WidgetField::appendStepControls()
 
   // Data table
   QTableWidget* aDataTbl = new QTableWidget(1, myCompNamesList.count() + 1, aWidget);
+  aDataTbl->installEventFilter(this);
   DataTableItemDelegate* aDelegate = 0;
   if (myDataTblList.isEmpty())
     aDelegate = new DataTableItemDelegate(
@@ -330,6 +335,16 @@ bool CollectionPlugin_WidgetField::eventFilter(QObject* theObject, QEvent* theEv
     foreach(QTableWidget* aTable, myDataTblList) {
       updateHeaders(aTable);
     }
+  } else if (theEvent->type() == QEvent::FocusIn) {
+    QTableWidget* aTable = dynamic_cast<QTableWidget*>(theObject);
+    if (aTable) {
+      XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
+      XGUI_PropertyPanel* aPanel = aWorkshop->propertyPanel();
+      if (aPanel->activeWidget() != this) {
+        myActivation = true;
+        aPanel->activateWidget(this, false);
+      }
+    }
   }
   return ModuleBase_WidgetSelector::eventFilter(theObject, theEvent);
 }
@@ -397,9 +412,9 @@ QList<QWidget*> CollectionPlugin_WidgetField::getControls() const
 {
   QList<QWidget*> aControls;
   // this control will accept focus and will be highlighted in the Property Panel
-  aControls.push_back(myStepWgt);
-  //aControls.push_back(myFieldTypeCombo);
-  //aControls.push_back(myNbComponentsSpn);
+  aControls.push_back(myShapeTypeCombo);
+  aControls.push_back(myFieldTypeCombo);
+  aControls.push_back(myNbComponentsSpn);
   return aControls;
 }
 
@@ -730,6 +745,10 @@ bool CollectionPlugin_WidgetField::
 //**********************************************************************************
 void CollectionPlugin_WidgetField::onSelectionChanged()
 {
+  if (myActivation) {
+    myActivation = false;
+    return;
+  }
   // Ignore selection for Parts mode
   if (myShapeTypeCombo->currentIndex() == 5)
     return;

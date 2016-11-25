@@ -193,6 +193,8 @@ private:
 
   /// Stae of a table editing
   bool myIsEditing;
+
+  bool myActivation;
 };
 
 #endif

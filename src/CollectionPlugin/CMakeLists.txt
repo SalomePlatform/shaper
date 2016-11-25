@@ -41,6 +41,7 @@ INCLUDE_DIRECTORIES(
   ../Events
   ../ModuleBase
   ../Config
+  ../XGUI
   ${CAS_INCLUDE_DIRS}
 )
 
@@ -51,6 +52,7 @@ SET(PROJECT_LIBRARIES
     GeomAlgoAPI
     GeomValidators
     ModuleBase
+	XGUI
 )
 
 ADD_DEFINITIONS(-DCOLLECTIONPLUGIN_EXPORTS ${CAS_DEFINITIONS})
