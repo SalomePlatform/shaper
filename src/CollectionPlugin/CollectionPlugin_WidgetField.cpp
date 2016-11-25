@@ -397,7 +397,7 @@ QList<QWidget*> CollectionPlugin_WidgetField::getControls() const
 {
   QList<QWidget*> aControls;
   // this control will accept focus and will be highlighted in the Property Panel
-  aControls.push_back(myShapeTypeCombo);
+  aControls.push_back(myStepWgt);
   //aControls.push_back(myFieldTypeCombo);
   //aControls.push_back(myNbComponentsSpn);
   return aControls;
