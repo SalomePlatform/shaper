@@ -76,7 +76,7 @@ Model_Document::Model_Document(const int theID, const std::string theKind)
     : myID(theID), myKind(theKind), myIsActive(false),
       myDoc(new TDocStd_Document("BinOcaf"))  // binary OCAF format
 {
-#ifdef OCAFBROWSER
+#ifdef DFBROWSER
   CDF_Session::CurrentSession()->Directory()->Add(myDoc);
 #endif
   myObjs = new Model_Objects(myDoc->Main());

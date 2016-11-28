@@ -12,6 +12,8 @@ INCLUDE(FindPython)
 INCLUDE(FindSalome)
 INCLUDE(FindCAS)
 INCLUDE(FindSUIT)
+INCLUDE(FindDFBrowser)
+INCLUDE(FindVInspector)
 
 # Find LibXml2
 IF(DEFINED ENV{LIBXML2_ROOT_DIR})
