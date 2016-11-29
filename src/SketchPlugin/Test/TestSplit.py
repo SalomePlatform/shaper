@@ -29,7 +29,7 @@ for index in range(Sketch_1_feature.numberOfSubs()):
 
 assert(idList.count(SketchLineId) == 2)
 assert(idList.count(SketchPointId) == 1)
-assert(idList.count(SketchConstraintCoincidenceId) == 2)
+assert(idList.count(SketchConstraintCoincidenceId) == 3)
 assert(idList.count(SketchConstraintParallelId) == 1)
 # Test end
 
@@ -50,7 +50,7 @@ for index in range(Sketch_2_feature.numberOfSubs()):
 
 assert(idList.count(SketchLineId) == 3)
 assert(idList.count(SketchPointId) == 2)
-assert(idList.count(SketchConstraintCoincidenceId) == 4)
+assert(idList.count(SketchConstraintCoincidenceId) == 6)
 assert(idList.count(SketchConstraintParallelId) == 2)
 # Test end
 
@@ -71,7 +71,7 @@ for index in range(Sketch_3_feature.numberOfSubs()):
 
 assert(idList.count(SketchArcId) == 2)
 assert(idList.count(SketchPointId) == 2)
-assert(idList.count(SketchConstraintCoincidenceId) == 4)
+assert(idList.count(SketchConstraintCoincidenceId) == 6)
 assert(idList.count(SketchConstraintTangentId) == 1)
 # Test end
 
@@ -93,7 +93,7 @@ for index in range(Sketch_4_feature.numberOfSubs()):
 
 assert(idList.count(SketchArcId) == 2)
 assert(idList.count(SketchPointId) == 1)
-assert(idList.count(SketchConstraintCoincidenceId) == 2)
+assert(idList.count(SketchConstraintCoincidenceId) == 3)
 assert(idList.count(SketchConstraintEqualId) == 1)
 assert(idList.count(SketchConstraintTangentId) == 1)
 # Test end
@@ -119,7 +119,7 @@ for index in range(Sketch_5_feature.numberOfSubs()):
 
 assert(idList.count(SketchArcId) == 3)
 assert(idList.count(SketchPointId) == 0)
-assert(idList.count(SketchConstraintCoincidenceId) == 4)
+assert(idList.count(SketchConstraintCoincidenceId) == 6)
 assert(idList.count(SketchConstraintEqualId) == 2)
 assert(idList.count(SketchConstraintTangentId) == 2)
 # Test end
