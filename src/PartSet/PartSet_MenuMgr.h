@@ -8,6 +8,7 @@
 #define PartSet_MenuMgr_H
 
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_ResultPart.h>
 
 #include <QObject>
 #include <QMap>
@@ -55,6 +56,9 @@ public:
 
   /// Returns list of granted operation indices
   virtual void grantedOperationIds(ModuleBase_Operation* theOperation, QStringList& theIds) const;
+
+  /// Activates a Part document
+  void activatePart(ResultPartPtr thePart) const;
 
 public slots:
   /// Processes the context menu action click

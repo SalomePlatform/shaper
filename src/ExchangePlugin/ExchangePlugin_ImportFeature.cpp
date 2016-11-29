@@ -23,6 +23,9 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeStringArray.h>
+#include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_AttributeTables.h>
 #include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -35,6 +38,8 @@
 
 #include <XAO_Xao.hxx>
 #include <XAO_Group.hxx>
+#include <XAO_Field.hxx>
+#include <XAO_Step.hxx>
 
 #include <ExchangePlugin_Tools.h>
 
@@ -147,11 +152,11 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
   ResultBodyPtr aResultBody = createResultBody(aGeomShape);
   setResult(aResultBody);
 
-  // Process groups
+  // Process groups/fields
   std::shared_ptr<ModelAPI_AttributeRefList> aRefListOfGroups =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(data()->attribute(FEATURES_ID()));
 
-  // Remove previous groups stored in RefList
+  // Remove previous groups/fields stored in RefList
   std::list<ObjectPtr> anGroupList = aRefListOfGroups->list();
   std::list<ObjectPtr>::iterator anGroupIt = anGroupList.begin();
   for (; anGroupIt != anGroupList.end(); ++anGroupIt) {
@@ -174,9 +179,9 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
     AttributeSelectionListPtr aSelectionList = aGroupFeature->selectionList("group_list");
 
     // conversion of dimension
-    XAO::Dimension aGroupDimension = aXaoGroup->getDimension();
     std::string aDimensionString = XAO::XaoUtils::dimensionToString(aXaoGroup->getDimension());
-    std::string aSelectionType = ExchangePlugin_Tools::xaoDimension2selectionType(aDimensionString);
+    std::string aSelectionType =
+      ExchangePlugin_Tools::xaoDimension2selectionType(aDimensionString);
 
     aSelectionList->setSelectionType(aSelectionType);
     for (int anElementIndex = 0; anElementIndex < aXaoGroup->count(); ++anElementIndex) {
@@ -188,6 +193,69 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
       int aReferenceID = XAO::XaoUtils::stringToInt(aReferenceString);
 
       aSelectionList->value(anElementIndex)->setId(aReferenceID);
+    }
+  }
+  // Create new fields
+  for (int aFieldIndex = 0; aFieldIndex < aXao.countFields(); ++aFieldIndex) {
+    XAO::Field* aXaoField = aXao.getField(aFieldIndex);
+
+    std::shared_ptr<ModelAPI_Feature> aFieldFeature = addFeature("Field");
+
+    // group name
+    if (!aXaoField->getName().empty())
+      aFieldFeature->data()->setName(aXaoField->getName());
+
+    // fill selection
+    AttributeSelectionListPtr aSelectionList = aFieldFeature->selectionList("selected");
+
+    // conversion of dimension
+    std::string aDimensionString = XAO::XaoUtils::dimensionToString(aXaoField->getDimension());
+    std::string aSelectionType =
+      ExchangePlugin_Tools::xaoDimension2selectionType(aDimensionString);
+    aSelectionList->setSelectionType(aSelectionType);
+    // conversion of type
+    XAO::Type aFieldType = aXaoField->getType();
+    std::string aTypeString = XAO::XaoUtils::fieldTypeToString(aFieldType);
+    ModelAPI_AttributeTables::ValueType aType =
+      ExchangePlugin_Tools::xaoType2valuesType(aTypeString);
+    // set components names
+    AttributeStringArrayPtr aComponents = aFieldFeature->stringArray("components_names");
+    aComponents->setSize(aXaoField->countComponents());
+    for(int aComp = 0; aComp < aXaoField->countComponents(); aComp++) {
+      aComponents->setValue(aComp, aXaoField->getComponentName(aComp));
+    }
+
+    AttributeIntArrayPtr aStamps = aFieldFeature->intArray("stamps");
+    aStamps->setSize(aXaoField->countSteps());
+    std::shared_ptr<ModelAPI_AttributeTables> aTables = aFieldFeature->tables("values");
+    aTables->setSize(
+      aXaoField->countElements() + 1, aXaoField->countComponents(), aXaoField->countSteps());
+    aTables->setType(aType);
+    // iterate steps
+    XAO::stepIterator aStepIter = aXaoField->begin();
+    for(int aStepIndex = 0; aStepIter != aXaoField->end(); aStepIter++, aStepIndex++) {
+      aStamps->setValue(aStepIndex, (*aStepIter)->getStamp());
+      for(int aRow = 1; aRow <= aXaoField->countElements(); aRow++) {
+        for(int aCol = 0; aCol < aXaoField->countComponents(); aCol++) {
+          ModelAPI_AttributeTables::Value aVal;
+          std::string aValStr = (*aStepIter)->getStringValue(aRow - 1, aCol);
+          switch(aType) {
+          case ModelAPI_AttributeTables::BOOLEAN:
+            aVal.myBool = aValStr == "True";
+            break;
+          case ModelAPI_AttributeTables::INTEGER:
+            aVal.myInt = atoi(aValStr.c_str());
+            break;
+          case ModelAPI_AttributeTables::DOUBLE:
+            aVal.myDouble = atof(aValStr.c_str());
+            break;
+          case ModelAPI_AttributeTables::STRING:
+            aVal.myStr = aValStr;
+            break;
+          }
+          aTables->setValue(aVal, aRow, aCol, aStepIndex);
+        }
+      }
     }
   }
   // Top avoid problems in Object Browser update: issue #1647.

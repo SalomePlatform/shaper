@@ -115,6 +115,9 @@ class MODELAPI_EXPORT ModelAPI_Session
   /// Returns the global identifier of the current transaction (needed for the update algo)
   virtual int transactionID() = 0;
 
+  /// Load plugin by its name
+  virtual void forceLoadPlugin(const std::string& thePluginName) = 0;
+
  protected:
   /// Sets the session interface implementation (once per application launch)
   static void setSession(std::shared_ptr<ModelAPI_Session> theManager);

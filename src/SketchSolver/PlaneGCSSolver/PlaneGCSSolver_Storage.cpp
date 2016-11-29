@@ -672,6 +672,8 @@ void PlaneGCSSolver_Storage::refresh(bool theFixedOnly) const
 {
   //blockEvents(true);
 
+  const double aTol = 1000. * tolerance; // tolerance to prevent frequent updates
+
   std::map<AttributePtr, EntityWrapperPtr>::const_iterator anIt = myAttributeMap.begin();
   std::list<ParameterWrapperPtr> aParams;
   std::list<ParameterWrapperPtr>::const_iterator aParIt;
@@ -698,8 +700,8 @@ void PlaneGCSSolver_Storage::refresh(bool theFixedOnly) const
     std::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anIt->first);
     if (aPoint2D) {
-      if ((isUpd[0] && fabs(aPoint2D->x() - aCoords[0]) > tolerance) ||
-          (isUpd[1] && fabs(aPoint2D->y() - aCoords[1]) > tolerance) || isExternal) {
+      if ((isUpd[0] && fabs(aPoint2D->x() - aCoords[0]) > aTol) ||
+          (isUpd[1] && fabs(aPoint2D->y() - aCoords[1]) > aTol) || isExternal) {
         // Find points coincident with this one (probably not in GID_OUTOFGROUP)
         CoincidentPointsMap::const_iterator aCoincIt = myCoincidentPoints.begin();
         for (; aCoincIt != myCoincidentPoints.end(); ++aCoincIt)
@@ -729,7 +731,7 @@ void PlaneGCSSolver_Storage::refresh(bool theFixedOnly) const
     }
     AttributeDoublePtr aScalar = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anIt->first);
     if (aScalar && !isExternal) {
-      if (isUpd[0] && fabs(aScalar->value() - aCoords[0]) > tolerance)
+      if (isUpd[0] && fabs(aScalar->value() - aCoords[0]) > aTol)
         aScalar->setValue(aCoords[0]);
       continue;
     }

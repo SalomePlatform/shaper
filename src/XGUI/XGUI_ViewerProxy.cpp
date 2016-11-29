@@ -12,6 +12,14 @@
   #include <AppElements_Viewer.h>
 #endif
 
+#ifdef VINSPECTOR
+#include <VInspectorAPI_PluginMgr.h>
+#include <VInspectorAPI_Communicator.h>
+
+static bool FirstCall = true;
+
+#endif
+
 #include <ModuleBase_IViewWindow.h>
 
 #include <QEvent>
@@ -35,11 +43,22 @@ void XGUI_ViewerProxy::connectViewProxy()
 
 Handle(AIS_InteractiveContext) XGUI_ViewerProxy::AISContext() const
 {
+  Handle(AIS_InteractiveContext) aContext;
 #ifdef HAVE_SALOME
-  return myWorkshop->salomeConnector()->viewer()->AISContext();
+  aContext = myWorkshop->salomeConnector()->viewer()->AISContext();
 #else
-  return myWorkshop->mainWindow()->viewer()->AISContext();
+  aContext = myWorkshop->mainWindow()->viewer()->AISContext();
 #endif
+
+#ifdef VINSPECTOR
+  if (FirstCall) {
+    VInspectorAPI_PluginMgr::activateVInspector("VInspector.dll", aContext);
+    FirstCall = false;
+  }
+#endif
+
+
+  return aContext;
 }
 
 Handle(AIS_Trihedron) XGUI_ViewerProxy::trihedron() const

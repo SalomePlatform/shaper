@@ -19,6 +19,8 @@
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
 
+#include <GeomAlgoAPI_PointBuilder.h>
+
 #include <FeaturesPlugin_Tools.h>
 
 //=================================================================================================
@@ -46,6 +48,11 @@ void FeaturesPlugin_Translation::initAttributes()
                        ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(FeaturesPlugin_Translation::DZ_ID(),
                        ModelAPI_AttributeDouble::typeId());
+
+  data()->addAttribute(FeaturesPlugin_Translation::START_POINT_ID(),
+                       ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(FeaturesPlugin_Translation::END_POINT_ID(),
+                       ModelAPI_AttributeSelection::typeId());
 }
 
 //=================================================================================================
@@ -60,6 +67,10 @@ void FeaturesPlugin_Translation::execute()
 
   if (aMethodType == CREATION_METHOD_BY_DIMENSIONS()) {
     performTranslationByDimensions();
+  }
+
+  if (aMethodType == CREATION_METHOD_BY_TWO_POINTS()) {
+    performTranslationByTwoPoints();
   }
 }
 
@@ -205,6 +216,101 @@ void FeaturesPlugin_Translation::performTranslationByDimensions()
       setResult(aResultPart, aResultIndex);
     } else {
       GeomAlgoAPI_Translation aTranslationAlgo(aBaseShape, aDX, aDY, aDZ);
+
+      if (!aTranslationAlgo.check()) {
+        setError(aTranslationAlgo.getError());
+        return;
+      }
+
+      aTranslationAlgo.build();
+
+      // Checking that the algorithm worked properly.
+      if(!aTranslationAlgo.isDone()) {
+        static const std::string aFeatureError = "Error: Translation algorithm failed.";
+        setError(aFeatureError);
+        break;
+      }
+      if(aTranslationAlgo.shape()->isNull()) {
+        static const std::string aShapeError = "Error: Resulting shape is Null.";
+        setError(aShapeError);
+        break;
+      }
+      if(!aTranslationAlgo.isValid()) {
+        std::string aFeatureError = "Error: Resulting shape is not valid.";
+        setError(aFeatureError);
+        break;
+      }
+
+      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+      loadNamingDS(aTranslationAlgo, aResultBody, aBaseShape);
+      setResult(aResultBody, aResultIndex);
+    }
+    aResultIndex++;
+  }
+
+  // Remove the rest results if there were produced in the previous pass.
+  removeResults(aResultIndex);
+}
+
+//=================================================================================================
+void FeaturesPlugin_Translation::performTranslationByTwoPoints()
+{
+  // Getting objects.
+  ListOfShape anObjects;
+  std::list<ResultPtr> aContextes;
+  AttributeSelectionListPtr anObjectsSelList =
+    selectionList(FeaturesPlugin_Translation::OBJECTS_LIST_ID());
+  if (anObjectsSelList->size() == 0) {
+    return;
+  }
+  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
+    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
+      anObjectsSelList->value(anObjectsIndex);
+    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
+    if(!anObject.get()) { // may be for not-activated parts
+      eraseResults();
+      return;
+    }
+    anObjects.push_back(anObject);
+    aContextes.push_back(anObjectAttr->context());
+  }
+
+  // Getting the start point and the end point
+  AttributeSelectionPtr aRef1 = data()->selection(FeaturesPlugin_Translation::START_POINT_ID());
+  AttributeSelectionPtr aRef2 = data()->selection(FeaturesPlugin_Translation::END_POINT_ID());
+  std::shared_ptr<GeomAPI_Pnt> aFirstPoint;
+  std::shared_ptr<GeomAPI_Pnt> aSecondPoint;
+  if ((aRef1.get() != NULL) && (aRef2.get() != NULL)) {
+    GeomShapePtr aShape1 = aRef1->value();
+    if (!aShape1.get()) //If we can't get the points directly, try getting them from the context
+      aShape1 = aRef1->context()->shape();
+    GeomShapePtr aShape2 = aRef2->value();
+    if (!aShape2.get())
+      aShape2 = aRef2->context()->shape();
+    if (aShape1 && aShape2) {
+      aFirstPoint = GeomAlgoAPI_PointBuilder::point(aShape1);
+      aSecondPoint = GeomAlgoAPI_PointBuilder::point(aShape2);
+    }
+  }
+
+  // Moving each object.
+  int aResultIndex = 0;
+  std::list<ResultPtr>::iterator aContext = aContextes.begin();
+  for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
+        anObjectsIt++, aContext++) {
+    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
+    bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
+
+    // Setting result.
+    if (isPart) {
+      std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
+      aTrsf->setTranslation(aFirstPoint, aSecondPoint);
+      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
+      ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
+      aResultPart->setTrsf(*aContext, aTrsf);
+      setResult(aResultPart, aResultIndex);
+    } else {
+      GeomAlgoAPI_Translation aTranslationAlgo(aBaseShape, aFirstPoint, aSecondPoint);
 
       if (!aTranslationAlgo.check()) {
         setError(aTranslationAlgo.getError());

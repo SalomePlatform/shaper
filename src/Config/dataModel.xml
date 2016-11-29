@@ -10,7 +10,8 @@
         <folder name="Parameters" group_type="Parameters" icon=":pictures/params_folder.png"
                 folder_features="ParametersMgr"/>
         <folder name="Constructions" group_type="Construction" icon=":pictures/constr_folder.png"/>
-        <folder name="Groups" group_type="Groups" icon=":pictures/constr_folder.png" show_empty="false"/>
         <folder name="Results" group_type="Bodies" icon=":pictures/constr_folder.png"/>
+        <folder name="Fields" group_type="Fields" icon=":pictures/constr_folder.png" show_empty="false"/>
+        <folder name="Groups" group_type="Groups" icon=":pictures/constr_folder.png" show_empty="false"/>
     </sub_document>
 </data_model>

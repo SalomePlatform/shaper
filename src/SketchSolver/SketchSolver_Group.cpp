@@ -477,6 +477,11 @@ void SketchSolver_Group::mergeGroups(const SketchSolver_Group& theGroup)
       continue;
     changeConstraint(aConstr);
   }
+
+  // merge previous states of groups => use the worst state,
+  // so the group after rebuilt may discard error messages if exist
+  if (theGroup.myPrevResult > myPrevResult)
+    myPrevResult = theGroup.myPrevResult;
 }
 
 // ============================================================================

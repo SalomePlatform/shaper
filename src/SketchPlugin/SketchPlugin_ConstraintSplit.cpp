@@ -48,6 +48,8 @@
 #include <iostream>
 #endif
 
+#define CIRCLE_FEATURE_DELETE_WITHOUT_REFERENCES
+
 static const double PI = 3.141592653589793238463;
 
 SketchPlugin_ConstraintSplit::SketchPlugin_ConstraintSplit()
@@ -93,6 +95,10 @@ void SketchPlugin_ConstraintSplit::execute()
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
   ResultPtr aBaseFeatureResult = getFeatureResult(aBaseFeature);
   std::set<FeaturePtr> aFeaturesToDelete, aFeaturesToUpdate;
+  #ifdef CIRCLE_FEATURE_DELETE_WITHOUT_REFERENCES
+  FeaturePtr aCircleFeatureToDelete;
+  #endif
+
   std::map<FeaturePtr, IdToPointPair> aTangentFeatures;
   std::map<FeaturePtr, IdToPointPair> aCoincidenceToFeature;
   getConstraints(aFeaturesToDelete, aFeaturesToUpdate, aTangentFeatures, aCoincidenceToFeature);
@@ -216,7 +222,12 @@ void SketchPlugin_ConstraintSplit::execute()
 
     updateRefFeatureConstraints(getFeatureResult(aBaseFeature), aRefsToFeature);
 
+    AttributePtr aCenterAttr = aCircleFeature->attribute(SketchPlugin_Circle::CENTER_ID());
+#ifdef CIRCLE_FEATURE_DELETE_WITHOUT_REFERENCES
+    aCircleFeatureToDelete = aCircleFeature;
+#else
     aFeaturesToDelete.insert(aCircleFeature);
+#endif
     // as circle is removed, temporary fill this attribute*/
     aBaseObjectAttr->setObject(ResultPtr());
   }
@@ -278,7 +289,7 @@ void SketchPlugin_ConstraintSplit::execute()
 
   // coincidence to feature
   updateCoincidenceConstraintsToFeature(aCoincidenceToFeature, aFurtherCoincidences,
-                                        aFeatureResults);
+                                        aFeatureResults, aSplitFeature);
   // tangency
   updateTangentConstraintsToFeature(aTangentFeatures, aFurtherCoincidences);
 
@@ -295,6 +306,11 @@ void SketchPlugin_ConstraintSplit::execute()
   }
 #endif
   ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToDelete);
+#ifdef CIRCLE_FEATURE_DELETE_WITHOUT_REFERENCES
+  std::set<FeaturePtr> aCircleFeatures;
+  aCircleFeatures.insert(aCircleFeatureToDelete);
+  ModelAPI_Tools::removeFeatures(aCircleFeatures, false);
+#endif
 
 #ifdef DEBUG_SPLIT
   std::cout << "update features after split:" << std::endl;
@@ -392,16 +408,11 @@ std::shared_ptr<GeomDataAPI_Point2D> SketchPlugin_ConstraintSplit::getPointOfRef
   return aPointAttribute;
 }
 
-void SketchPlugin_ConstraintSplit::getFeaturePoints(AttributePoint2DPtr& theStartPointAttr,
+void SketchPlugin_ConstraintSplit::getFeaturePoints(const FeaturePtr& theFeature,
+                                                    AttributePoint2DPtr& theStartPointAttr,
                                                     AttributePoint2DPtr& theEndPointAttr)
 {
-  AttributePoint2DPtr aPointAttribute;
-
-  AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                                           data()->attribute(SketchPlugin_Constraint::VALUE()));
-  FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
-
-  std::string aFeatureKind = aBaseFeature->getKind();
+  std::string aFeatureKind = theFeature->getKind();
   std::string aStartAttributeName, anEndAttributeName;
   if (aFeatureKind == SketchPlugin_Line::ID()) {
     aStartAttributeName = SketchPlugin_Line::START_ID();
@@ -413,9 +424,9 @@ void SketchPlugin_ConstraintSplit::getFeaturePoints(AttributePoint2DPtr& theStar
   }
   if (!aStartAttributeName.empty() && !anEndAttributeName.empty()) {
     theStartPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                         aBaseFeature->attribute(aStartAttributeName));
+                                         theFeature->attribute(aStartAttributeName));
     theEndPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                         aBaseFeature->attribute(anEndAttributeName));
+                                         theFeature->attribute(anEndAttributeName));
   }
 }
 
@@ -588,10 +599,20 @@ void SketchPlugin_ConstraintSplit::getRefAttributes(const FeaturePtr& theFeature
 void SketchPlugin_ConstraintSplit::updateCoincidenceConstraintsToFeature(
       const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature,
       const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences,
-      const std::set<ResultPtr>& theFeatureResults)
+      const std::set<ResultPtr>& theFeatureResults,
+      const FeaturePtr& theSplitFeature)
 {
   if (theCoincidenceToFeature.empty())
     return;
+
+  // we should build coincidence constraints to end of the split feature
+  std::set<std::shared_ptr<GeomDataAPI_Point2D> > aNewCoincidencesToSplitFeature;
+  AttributePoint2DPtr aStartPointAttr, anEndPointAttr;
+  getFeaturePoints(theSplitFeature, aStartPointAttr, anEndPointAttr);
+  if (theFurtherCoincidences.find(aStartPointAttr) == theFurtherCoincidences.end())
+    aNewCoincidencesToSplitFeature.insert(aStartPointAttr);
+  if (theFurtherCoincidences.find(anEndPointAttr) == theFurtherCoincidences.end())
+    aNewCoincidencesToSplitFeature.insert(anEndPointAttr);
 
   std::map<FeaturePtr, IdToPointPair>::const_iterator aCIt = theCoincidenceToFeature.begin(),
                                                             aCLast = theCoincidenceToFeature.end();
@@ -615,6 +636,19 @@ void SketchPlugin_ConstraintSplit::updateCoincidenceConstraintsToFeature(
     if (aFeaturePointAttribute.get()) {
       aCoincFeature->refattr(anAttributeId)->setObject(ResultPtr());
       aCoincFeature->refattr(anAttributeId)->setAttr(aFeaturePointAttribute);
+      // create new coincidences to split feature points
+      std::set<AttributePoint2DPtr>::const_iterator aSFIt = aNewCoincidencesToSplitFeature.begin(),
+                                                    aSFLast = aNewCoincidencesToSplitFeature.end();
+      for (; aSFIt != aSFLast; aSFIt++) {
+        AttributePoint2DPtr aSFAttribute = *aSFIt;
+        if (aCoincPnt->isEqual(aSFAttribute->pnt())) {
+          std::string aSecondAttribute = SketchPlugin_Constraint::ENTITY_A();
+          if (anAttributeId == SketchPlugin_Constraint::ENTITY_A())
+            aSecondAttribute = SketchPlugin_Constraint::ENTITY_B();
+          createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
+                           aSFAttribute, aCoincFeature->refattr(aSecondAttribute)->attr());
+        }
+      }
     }
     else {
       /// find feature by shape intersected the point
@@ -751,7 +785,8 @@ void SketchPlugin_ConstraintSplit::splitLine(FeaturePtr& theSplitFeature,
   AttributePoint2DPtr aSecondPointAttrOfSplit =
     getPointOfRefAttr(data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
   AttributePoint2DPtr aStartPointAttrOfBase, anEndPointAttrOfBase;
-  getFeaturePoints(aStartPointAttrOfBase, anEndPointAttrOfBase);
+
+  getFeaturePoints(aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase);
   if (!aStartPointAttrOfBase.get() && !anEndPointAttrOfBase.get()) {
     setError("Error: Feature has no start and end points.");
     return;
@@ -884,7 +919,7 @@ void SketchPlugin_ConstraintSplit::splitArc(FeaturePtr& theSplitFeature,
   AttributePoint2DPtr aSecondPointAttrOfSplit =
     getPointOfRefAttr(data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
   AttributePoint2DPtr aStartPointAttrOfBase, anEndPointAttrOfBase;
-  getFeaturePoints(aStartPointAttrOfBase, anEndPointAttrOfBase);
+  getFeaturePoints(aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase);
   if (!aStartPointAttrOfBase.get() && !anEndPointAttrOfBase.get()) {
     setError("Error: Feature has no start and end points.");
     return;

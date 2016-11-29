@@ -59,6 +59,16 @@ public:
                      const double theDx,
                      const double theDy,
                      const double theDz) throw (GeomAlgoAPI_Exception);
+
+  /// Performs a translation from two points.
+  /// \param theSourceShape Shape to be moved.
+  /// \param theStartPoint Movement start point.
+  /// \param theEndPoint Movement end point.
+  /// \return a shape
+  static std::shared_ptr<GeomAPI_Shape> makeTranslation(
+                     std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                     std::shared_ptr<GeomAPI_Pnt>   theStartPoint,
+                     std::shared_ptr<GeomAPI_Pnt>   theEndPoint) throw (GeomAlgoAPI_Exception);
 };
 }
 #endif

@@ -62,5 +62,36 @@
                    tooltip="Dimension in Z">
       </doublevalue>
     </box>
+    <box id="ByTwoPoints"
+         title="By two points"
+         icon="icons/Features/translation_2pt_32x32.png">
+      <multi_selector id="main_objects"
+                      label="Main objects"
+                      icon=""
+                      tooltip="Select solid objects"
+                      type_choice="objects"
+                      concealment="true">
+        <validator id="FeaturesPlugin_ValidatorTransform"/>
+      </multi_selector>
+      <shape_selector id="start_point"
+                      icon=""
+                      label="Start point"
+                      tooltip="Select the start point to define the axis"
+                      shape_types="vertex"
+                      default="">
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        <validator id="GeomValidators_ConstructionComposite"/>
+      </shape_selector>
+      <shape_selector id="end_point"
+                      icon=""
+                      label="End point"
+                      tooltip="Select the end point to define the axis"
+                      shape_types="vertex"
+                      default="">
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        <validator id="GeomValidators_ConstructionComposite"/>
+        <validator id="GeomValidators_DifferentShapes"/>
+      </shape_selector>
+    </box>
  </toolbox>
 </source>

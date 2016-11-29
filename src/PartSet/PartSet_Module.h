@@ -324,6 +324,9 @@ public:
   /// \return theAttribute
   virtual AttributePtr findAttribute(const ObjectPtr& theObject, const GeomShapePtr& theGeomShape);
 
+  /// Returns the workshop
+  XGUI_Workshop* getWorkshop() const;
+
 public slots:
   /// Redefines the parent method in order to customize the next case:
   /// If the sketch nested operation is active and the presentation is not visualized in the viewer,
@@ -403,9 +406,6 @@ protected:
  private:
   //! Delete features
   virtual bool deleteObjects();
-
-  /// Returns the workshop
-  XGUI_Workshop* getWorkshop() const;
 
   void setDefaultConstraintShown();
 

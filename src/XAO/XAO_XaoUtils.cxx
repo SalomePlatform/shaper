@@ -107,7 +107,7 @@ throw(XAO_Exception)
         return XAO::FACE;
     if (dimension == "solid")
         return XAO::SOLID;
-    if (dimension == "whole")
+    if (dimension == "part")
         return XAO::WHOLE;
 
     throw XAO_Exception(MsgBuilder() << "Bad dimension: " << dimension);

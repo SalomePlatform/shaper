@@ -1,22 +1,22 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 /*
- * ParametersPlugin_PyInterp.cpp
+ * InitializationPlugin_PyInterp.cpp
  *
  *  Created on: Apr 2, 2015
  *      Author: sbh
  */
 
-#include <ParametersPlugin_PyInterp.h>
+#include <InitializationPlugin_PyInterp.h>
 
 #include <string>
 #include <stdexcept>
 
-ParametersPlugin_PyInterp::ParametersPlugin_PyInterp()
+InitializationPlugin_PyInterp::InitializationPlugin_PyInterp()
 : PyInterp_Interp()
 {
 }
 
-ParametersPlugin_PyInterp::~ParametersPlugin_PyInterp()
+InitializationPlugin_PyInterp::~InitializationPlugin_PyInterp()
 {
 }
 
@@ -31,7 +31,7 @@ const char* aSearchCode =
   "FindName(name).visit(ast.parse(expression))";
 
 std::list<std::pair<int, int> >
-ParametersPlugin_PyInterp::positions(const std::string& theExpression,
+InitializationPlugin_PyInterp::positions(const std::string& theExpression,
                                      const std::string& theName)
 {
   PyLockWrapper lck; // Acquire GIL until the end of the method
@@ -71,7 +71,7 @@ ParametersPlugin_PyInterp::positions(const std::string& theExpression,
 }
 
 
-std::list<std::string> ParametersPlugin_PyInterp::compile(const std::string& theExpression)
+std::list<std::string> InitializationPlugin_PyInterp::compile(const std::string& theExpression)
 {
   PyLockWrapper lck; // Acquire GIL until the end of the method
   std::list<std::string> aResult;
@@ -110,7 +110,7 @@ std::list<std::string> ParametersPlugin_PyInterp::compile(const std::string& the
   return aResult;
 }
 
-void ParametersPlugin_PyInterp::extendLocalContext(const std::list<std::string>& theParameters)
+void InitializationPlugin_PyInterp::extendLocalContext(const std::list<std::string>& theParameters)
 {
   PyLockWrapper lck; // Acquire GIL until the end of the method
   if (theParameters.empty())
@@ -122,13 +122,13 @@ void ParametersPlugin_PyInterp::extendLocalContext(const std::list<std::string>&
   }
 }
 
-void ParametersPlugin_PyInterp::clearLocalContext()
+void InitializationPlugin_PyInterp::clearLocalContext()
 {
   PyLockWrapper lck;
   PyDict_Clear(_local_context);
 }
 
-double ParametersPlugin_PyInterp::evaluate(const std::string& theExpression, std::string& theError)
+double InitializationPlugin_PyInterp::evaluate(const std::string& theExpression, std::string& theError)
 {
   PyLockWrapper lck; // Acquire GIL until the end of the method
   PyCompilerFlags aFlags = {CO_FUTURE_DIVISION};
@@ -164,7 +164,7 @@ double ParametersPlugin_PyInterp::evaluate(const std::string& theExpression, std
   return result;
 }
 
-std::string ParametersPlugin_PyInterp::errorMessage()
+std::string InitializationPlugin_PyInterp::errorMessage()
 {
   std::string aPyError;
   if (PyErr_Occurred()) {
@@ -181,7 +181,7 @@ std::string ParametersPlugin_PyInterp::errorMessage()
   return aPyError;
 }
 
-bool ParametersPlugin_PyInterp::initContext()
+bool InitializationPlugin_PyInterp::initContext()
 {
   PyObject *m = PyImport_AddModule("__main__");  // interpreter main module (module context)
   if(!m){
@@ -196,7 +196,7 @@ bool ParametersPlugin_PyInterp::initContext()
   return PyRun_SimpleString("from math import *") == 0;
 }
 
-void ParametersPlugin_PyInterp::closeContext()
+void InitializationPlugin_PyInterp::closeContext()
 {
   Py_XDECREF(_local_context);
   PyInterp_Interp::closeContext();

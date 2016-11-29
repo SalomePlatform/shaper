@@ -8,12 +8,13 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
-#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeStringArray.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeTables.h>
 #include <ModelAPI_ResultField.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 CollectionPlugin_Field::CollectionPlugin_Field()
 {
@@ -22,9 +23,10 @@ CollectionPlugin_Field::CollectionPlugin_Field()
 void CollectionPlugin_Field::initAttributes()
 {
   data()->addAttribute(SELECTED_ID(), ModelAPI_AttributeSelectionList::typeId());
+  // for the whole part result it is not obligatory
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SELECTED_ID());
+
   data()->addAttribute(COMPONENTS_NAMES_ID(), ModelAPI_AttributeStringArray::typeId());
-  data()->addAttribute(VALUES_TYPE_ID(), ModelAPI_AttributeInteger::typeId());
-  data()->addAttribute(STEPS_NB_ID(), ModelAPI_AttributeInteger::typeId());
   data()->addAttribute(STAMPS_ID(), ModelAPI_AttributeIntArray::typeId());
   data()->addAttribute(VALUES_ID(), ModelAPI_AttributeTables::typeId());
 }

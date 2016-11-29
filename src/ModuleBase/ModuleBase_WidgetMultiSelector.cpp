@@ -394,11 +394,8 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
   activateSelectionAndFilters(true);
-  QList<ModuleBase_ViewerPrsPtr> anEmptyList;
-  // This method will call Selection changed event which will call onSelectionChanged
-  // To clear mySelection, myListControl and storeValue()
-  // So, we don't need to call it
-  myWorkshop->setSelected(anEmptyList);
+
+  clearSelection();
 }
 
 //********************************************************************
@@ -546,6 +543,21 @@ std::string ModuleBase_WidgetMultiSelector::validatorType(const QString& theType
     aType = "solid";
 
   return aType;
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::clearSelection()
+{
+  bool isClearInNeutralPoint = myIsNeutralPointClear;
+  myIsNeutralPointClear = true;
+
+  QList<ModuleBase_ViewerPrsPtr> anEmptyList;
+  // This method will call Selection changed event which will call onSelectionChanged
+  // To clear mySelection, myListControl and storeValue()
+  // So, we don't need to call it
+  myWorkshop->setSelected(anEmptyList);
+
+  myIsNeutralPointClear = isClearInNeutralPoint;
 }
 
 //********************************************************************

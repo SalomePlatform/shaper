@@ -1308,7 +1308,7 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
     if (aPart->partDoc() == aMgr->activeDocument()) {
       myMenuMgr->activatePartSet();
     } else {
-      aPart->activate();
+      myMenuMgr->activatePart(aPart);
     }
   }
 }
