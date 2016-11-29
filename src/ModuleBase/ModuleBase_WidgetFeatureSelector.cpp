@@ -59,14 +59,14 @@ ModuleBase_WidgetFeatureSelector::ModuleBase_WidgetFeatureSelector(QWidget* theP
   QFormLayout* aLayout = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aLayout);
 
-  QString aLabelText = QString::fromStdString(theData->widgetLabel());
+  QString aLabelText = translate(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   myLabel = new QLabel(aLabelText, this);
   if (!aLabelIcon.isEmpty())
     myLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
 
 
-  QString aToolTip = QString::fromStdString(theData->widgetTooltip());
+  QString aToolTip = translate(theData->widgetTooltip());
   myTextLine = new QLineEdit(this);
   QString anObjName = QString::fromStdString(attributeID());
   myTextLine->setObjectName(anObjName);

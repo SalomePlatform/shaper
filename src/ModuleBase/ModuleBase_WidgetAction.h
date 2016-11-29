@@ -36,6 +36,11 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
+  /// \return Context for translation
+  virtual std::string context() const {
+    return myFeature->getKind() + ":" + myActionID;
+  }
+
 protected:
   /// Do nothing
   /// \return True in success

@@ -15,7 +15,7 @@
 
 
 /// The definition provides collection and writing of missed translations
-//#define MISSED_TRANSLATION
+#define MISSED_TRANSLATION
 
 /**
  * \class Config_Translator
@@ -64,6 +64,12 @@ public:
   * \param theContext the context
   */ 
   static CONFIG_EXPORT std::string codec(const std::string& theContext);
+
+  /**
+  * Returns codec for the context
+  * \param theInfo the info
+  */ 
+  static CONFIG_EXPORT std::string codec(const Events_InfoMessage& theInfo);
 
 #ifdef _DEBUG
 #ifdef MISSED_TRANSLATION

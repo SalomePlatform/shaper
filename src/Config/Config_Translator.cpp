@@ -135,7 +135,7 @@ std::string insertParameters(const std::string& theString, const std::list<std::
 }
 
 std::string Config_Translator::translate(const std::string& theContext,
-                                         const std::string& theMessage, 
+                                         const std::string& theMessage,
                                          const std::list<std::string>& theParams)
 {
   if (myTranslator.count(theContext) > 0) {
@@ -166,6 +166,10 @@ std::string Config_Translator::codec(const std::string& theContext)
   return (myCodecs.count(theContext) > 0)? myCodecs[theContext] : "UTF-8";
 }
 
+std::string Config_Translator::codec(const Events_InfoMessage& theInfo)
+{
+  return codec(theInfo.context());
+}
 
 #ifdef _DEBUG
 #ifdef MISSED_TRANSLATION

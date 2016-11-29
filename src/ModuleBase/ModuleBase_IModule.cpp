@@ -103,9 +103,8 @@ bool ModuleBase_IModule::canBeShaded(Handle(AIS_InteractiveObject) theAIS) const
 
 QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
 {
+  // Error already translated.
   std::string aMsg = ModelAPI_Tools::getFeatureError(theFeature);
-  ModuleBase_Tools::translate(theFeature->getKind(), aMsg);
-
   return aMsg.c_str();
 }
 

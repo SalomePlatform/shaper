@@ -1212,15 +1212,34 @@ void convertToFeatures(const QObjectPtrList& theObjects, std::set<FeaturePtr>& t
   }
 }
 
-void translate(const std::string& theContext, std::string& theMessage)
+QString translate(const Events_InfoMessage& theMessage)
 {
+  QString aMessage;
+
+  if (!theMessage.empty()) {
+    std::string aStr = Config_Translator::translate(theMessage);
+    if (!aStr.empty()) {
+      std::string aCodec = Config_Translator::codec(theMessage);
+      aMessage = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aStr.c_str());
+    }
+  }
+
+  return aMessage;
+}
+
+QString translate(const std::string& theContext, const std::string& theMessage)
+{
+  QString aMessage;
+
   if (!theMessage.empty()) {
     std::string aStr = Config_Translator::translate(theContext, theMessage);
     if (!aStr.empty()) {
       std::string aCodec = Config_Translator::codec(theContext);
-      theMessage = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aStr.c_str()).toStdString();
+      aMessage = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aStr.c_str());
     }
   }
+
+  return aMessage;
 }
 
 void setPointBallHighlighting(AIS_Shape* theAIS)

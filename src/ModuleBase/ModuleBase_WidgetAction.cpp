@@ -18,18 +18,18 @@
 
 ModuleBase_WidgetAction::ModuleBase_WidgetAction(QWidget* theParent,
                                                  const Config_WidgetAPI* theData)
-: ModuleBase_ModelWidget(theParent, theData)
+: ModuleBase_ModelWidget(theParent, theData),
+  myActionID(attributeID())
 {
+  setAttributeID(""); // To prevent errors. Action not stored as attribtue in feature.
   QHBoxLayout* aControlLay = new QHBoxLayout(this);
   ModuleBase_Tools::adjustMargins(aControlLay);
 
-  myActionID = attributeID();
-  setAttributeID("");
-
   myButton = new QToolButton(this);
-  QString aText = QString::fromStdString(theData->widgetLabel());
-  QString aToolTip = ModuleBase_Tools::wrapTextByWords(
-              QString::fromStdString(theData->widgetTooltip()), myButton, DEFAULT_TOOL_TIP_WIDTH);
+  QString aText = translate(theData->widgetLabel());
+  QString aToolTip = ModuleBase_Tools::wrapTextByWords(translate(theData->widgetTooltip()),
+                                                       myButton,
+                                                       DEFAULT_TOOL_TIP_WIDTH);
 
   myButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   aControlLay->addWidget(myButton);

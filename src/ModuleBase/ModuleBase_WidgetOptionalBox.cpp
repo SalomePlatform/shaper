@@ -131,11 +131,11 @@ void ModuleBase_WidgetOptionalBox::createControl(const OptionType& theType)
   if (theType == GroupBox && !myGroupBox) {
     // group box: more than one model widget is inside
     myGroupBox = new QGroupBox(this);
-    myGroupBox->setTitle(QString::fromStdString(myGroupTitle));
+    myGroupBox->setTitle(translate(myGroupTitle));
     myGroupBox->setVisible(false);
     myGroupBox->setCheckable(true);
     myGroupBox->setChecked(getDefaultValue() == "true");
-    myGroupBox->setToolTip(QString::fromStdString(myToolTip));
+    myGroupBox->setToolTip(translate(myToolTip));
 
     myGroupBoxLayout = new QGridLayout(myGroupBox);
     ModuleBase_Tools::zeroMargins(myGroupBoxLayout);

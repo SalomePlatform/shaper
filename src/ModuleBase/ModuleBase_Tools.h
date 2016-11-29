@@ -38,6 +38,8 @@ class ModuleBase_IWorkshop;
 
 class GeomAPI_Shape;
 
+class Events_InfoMessage;
+
 namespace ModuleBase_Tools {
 
 /// Methods to adjust margins and spacings.
@@ -319,10 +321,15 @@ void MODULEBASE_EXPORT convertToFeatures(const QObjectPtrList& theObjects,
 /// Returns translation from the given data.
 /// If translation is not exists then it returns a string
 /// from the info data without translation
+/// \param theMessage a message which dave to be translated
+QString MODULEBASE_EXPORT translate(const Events_InfoMessage& theMessage);
+
+/// Returns translation from the given data.
+/// If translation is not exists then it returns a string
+/// from the info data without translation
 /// \param theContext context of the message (Feature Id)
 /// \param theMessage a message which dave to be translated
-/// \param theParams a list of parameters (can be empty)
-void MODULEBASE_EXPORT translate(const std::string& theContext, std::string& theMessage);
+QString MODULEBASE_EXPORT translate(const std::string& theContext, const std::string& theMessage);
 
 /// Set Highlighting of points as a Ball shape
 /// \param theAIS - the presentation

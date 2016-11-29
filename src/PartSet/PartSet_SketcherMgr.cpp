@@ -699,17 +699,16 @@ bool PartSet_SketcherMgr::sketchSolverError()
 
 QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
 {
-  std::string anError = "";
+  QString anError;
   if (!theFeature.get() || !theFeature->data()->isValid())
-    return anError.c_str();
+    return anError;
 
   CompositeFeaturePtr aSketch = activeSketch();
   if (aSketch.get() && aSketch == theFeature) {
-    AttributeStringPtr aAttributeString = aSketch->string(SketchPlugin_Sketch::SOLVER_ERROR());
-    anError = aAttributeString->value();
-    ModuleBase_Tools::translate(aSketch->getKind(), anError);
+    std::string aSolverError = aSketch->string(SketchPlugin_Sketch::SOLVER_ERROR())->value();
+    anError = ModuleBase_Tools::translate(aSketch->getKind(), aSolverError);
   }
-  return anError.c_str();
+  return anError;
 }
 
 void PartSet_SketcherMgr::clearClickedFlags()

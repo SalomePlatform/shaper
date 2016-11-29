@@ -29,13 +29,17 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
   QHBoxLayout* aLayout = new QHBoxLayout(this);
   ModuleBase_Tools::adjustMargins(aLayout);
 
-  QString aLabelText = QString::fromStdString(theData->widgetLabel());
+  QString aLabelText = translate(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   std::string aTypes = theData->getProperty("string_list");
-  QStringList aList = QString(aTypes.c_str()).split(' ');
+  QStringList aList;
+
+  foreach(QString aType, QString(aTypes.c_str()).split(' ')) {
+    aList.append(translate(aType.toStdString()));
+  }
 
   if (theData->getBooleanAttribute("use_in_title", false))
-    myButtonTitles = QString(aTypes.c_str()).split(" ");
+    myButtonTitles = aList;
 
   // Widget type can be combobox or radiobuttons
   std::string aWgtType = theData->getProperty("widget_type");
@@ -164,7 +168,7 @@ QString ModuleBase_WidgetChoice::getPropertyPanelTitle(int theIndex)
 {
   QString aTitle;
   if (myButtonTitles.length() > theIndex)
-    aTitle = tr(myButtonTitles[theIndex].toStdString().c_str());
+    aTitle = myButtonTitles[theIndex];
   return aTitle;
 }
 

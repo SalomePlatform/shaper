@@ -47,6 +47,8 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
   qDebug("ModuleBase_ModelWidget::ModuleBase_ModelWidget");
 #endif
 
+  myFeatureId = theData->featureId();
+
   myIsInternal = theData->getBooleanAttribute(ATTR_INTERNAL, false);
 
   myDefaultValue = theData->getProperty(ATTR_DEFAULT);
@@ -111,22 +113,23 @@ void ModuleBase_ModelWidget::processValueState()
     storeValue();
 }
 
-QString ModuleBase_ModelWidget::getValueStateError() const
+Events_InfoMessage ModuleBase_ModelWidget::getValueStateError() const
 {
-  QString anError = "";
+  Events_InfoMessage aMessage;
 
   ModuleBase_ModelWidget::ValueState aState = getValueState();
   if (aState != ModuleBase_ModelWidget::Stored) {
     AttributePtr anAttr = feature()->attribute(attributeID());
     if (anAttr.get()) {
-      QString anAttributeName = anAttr->id().c_str();
+      const std::string& anAttributeName = anAttr->id();
       switch (aState) {
         case ModuleBase_ModelWidget::ModifiedInViewer:
-          anError = "Attribute \"" + anAttributeName +
-                    "\" is locked by modification value in the viewer.";
+          aMessage = "Attribute \"%1\" is locked by modification value in the viewer.";
+          aMessage.addParameter(anAttributeName);
           break;
         case ModuleBase_ModelWidget::Reset:
-          anError = "Attribute \"" + anAttributeName + "\" is not initialized.";
+          aMessage = "Attribute \"%1\" is not initialized.";
+          aMessage.addParameter(anAttributeName);
           break;
         case ModuleBase_ModelWidget::ModifiedInPP: // Apply should be enabled in this mode
         default:
@@ -134,7 +137,7 @@ QString ModuleBase_ModelWidget::getValueStateError() const
       }
     }
   }
-  return anError;
+  return aMessage;
 }
 
 QString ModuleBase_ModelWidget::getError(const bool theValueStateChecked) const
@@ -144,6 +147,7 @@ QString ModuleBase_ModelWidget::getError(const bool theValueStateChecked) const
   if (!feature().get())
     return anError;
 
+  std::string aFeatureID = feature()->getKind();
   std::string anAttributeID = attributeID();
   AttributePtr anAttribute = feature()->attribute(anAttributeID);
   if (!anAttribute.get())
@@ -155,35 +159,23 @@ QString ModuleBase_ModelWidget::getError(const bool theValueStateChecked) const
   static ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
   if (!aValidators->validate(anAttribute, aValidatorID, anErrorMsg)) {
     if (anErrorMsg.empty())
-      anErrorMsg = "unknown error.";
-    anErrorMsg = anAttributeID + " - " + aValidatorID + ": " + anErrorMsg.messageString();
+      anErrorMsg = "Unknown error.";
+
+    if (anErrorMsg.context().empty()) {
+      anErrorMsg.setContext(aFeatureID + ":" + anAttributeID + ":" + aValidatorID);
+    }
+  }
+
+  if (anErrorMsg.empty() && theValueStateChecked) {
+    anErrorMsg = getValueStateError();
   }
 
   if (!anErrorMsg.empty()) {
-    std::string aStr = Config_Translator::translate(anErrorMsg);
-    std::string aCodec = Config_Translator::codec(anErrorMsg.context());
-    anError = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aStr.c_str());
+    anError = ModuleBase_Tools::translate(anErrorMsg);
   }
 
-  if (anError.isEmpty() && theValueStateChecked)
-    anError = getValueStateError();
-
-  anError = translateString(anError);
   return anError;
 }
-
-
-QString ModuleBase_ModelWidget::translateString(const QString& theMsg) const
-{
-  if (!theMsg.isEmpty()) {
-    std::string aContext = feature()->getKind();
-    std::string aStr = Config_Translator::translate(aContext, theMsg.toStdString().c_str());
-    std::string aCodec = Config_Translator::codec(aContext);
-    return QTextCodec::codecForName(aCodec.c_str())->toUnicode(aStr.c_str());
-  }
-  return theMsg;
-}
-
 
 void ModuleBase_ModelWidget::enableFocusProcessing()
 {
@@ -450,4 +442,9 @@ void ModuleBase_ModelWidget::onWidgetValuesChanged()
 void ModuleBase_ModelWidget::onWidgetValuesModified()
 {
   setValueState(ModifiedInPP);
+}
+
+QString ModuleBase_ModelWidget::translate(const std::string& theStr) const
+{
+  return ModuleBase_Tools::translate(context(), theStr);
 }

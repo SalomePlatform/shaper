@@ -8,6 +8,7 @@
 
 #include <ModuleBase_ActionInfo.h>
 #include <ModuleBase_IconFactory.h>
+#include <ModuleBase_Tools.h>
 
 ModuleBase_ActionInfo::ModuleBase_ActionInfo()
 {
@@ -57,8 +58,8 @@ void ModuleBase_ActionInfo::initFrom(std::shared_ptr<Config_FeatureMessage> theM
   if (!iconFile.isEmpty()) {
     icon = ModuleBase_IconFactory::loadIcon(iconFile);
   }
-  text = QString::fromStdString(theMessage->text());
-  toolTip = QString::fromStdString(theMessage->tooltip());
+  text = ModuleBase_Tools::translate(theMessage->id(), theMessage->text());
+  toolTip = ModuleBase_Tools::translate(theMessage->id(), theMessage->tooltip());
   QString aShortcutStr = QString::fromStdString(theMessage->keysequence());
   if (!aShortcutStr.isEmpty()) {
     shortcut = QKeySequence(aShortcutStr);

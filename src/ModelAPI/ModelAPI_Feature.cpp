@@ -11,6 +11,16 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Session.h>
 #include <Events_Loop.h>
+#include <Config_Translator.h>
+
+void ModelAPI_Feature::setError(const std::string& theError,
+                                bool isSend,
+                                bool isTranslate)
+{
+  std::string anError = isTranslate ? Config_Translator::translate(getKind(), theError)
+                                    : theError;
+  data()->setError(anError, isSend);
+}
 
 const std::list<std::shared_ptr<ModelAPI_Result> >& ModelAPI_Feature::results()
 {

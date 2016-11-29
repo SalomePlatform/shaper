@@ -45,6 +45,8 @@ class CONFIG_EXPORT Config_WidgetAPI
   //! Page is container widget with combo box control to switch between pages
   bool isPagedWidget() const;
 
+  //! Returns id of current feature
+  std::string featureId() const;
   //! Returns id of current widget
   std::string widgetId() const;
   //! Returns icon of current widget
@@ -78,6 +80,7 @@ class CONFIG_EXPORT Config_WidgetAPI
  private:
   xmlDocPtr myDoc; //!< Pointer to the root of widget's xml definition
   xmlNodePtr myCurrentNode; //!< Pointer to the current node in the widget's xml definition
+  std::string myFeatureId;
 
   friend class ModuleBase_WidgetFactory;
 };
