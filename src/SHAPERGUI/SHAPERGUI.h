@@ -165,6 +165,9 @@ Q_OBJECT
   /// Set preferences to default
   void onDefaultPreferences();
 
+  /// Hide object browser if it was created during loading script
+  void onScriptLoaded();
+
   /// Obtains the current application and updates its actions
   void onUpdateCommandStatus();
 

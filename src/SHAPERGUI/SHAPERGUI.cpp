@@ -29,6 +29,7 @@
 #include <SUIT_Desktop.h>
 #include <SUIT_ViewManager.h>
 #include <SUIT_ResourceMgr.h>
+#include <SUIT_DataBrowser.h>
 
 #include <QtxPopupMgr.h>
 #include <QtxActionMenuMgr.h>
@@ -247,6 +248,10 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   }
   myProxyViewer->activateViewer(true);
+
+  // Postrrocessing for LoadScriptId to remove created(if it was created) SALOME Object Browser
+  connect(getApp()->action(LightApp_Application::UserID+1), SIGNAL(triggered(bool)),
+          this, SLOT(onScriptLoaded()));
   return isDone;
 }
 
@@ -290,6 +295,10 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
   aResMgr->setValue("Study", "store_positions", myIsStorePositions);
   getApp()->setEditEnabled(myIsEditEnabled);
+
+  // Postrrocessing for LoadScriptId to remove created(if it was created) SALOME Object Browser
+  disconnect(getApp()->action(LightApp_Application::UserID+1), SIGNAL(triggered(bool)),
+             this, SLOT(onScriptLoaded()));
 
   return LightApp_Module::deactivateModule(theStudy);
 }
@@ -343,6 +352,19 @@ void SHAPERGUI::onDefaultPreferences()
   ModuleBase_Preferences::resetConfigPropPreferences(preferences());
 
   myWorkshop->displayer()->redisplayObjects();
+}
+
+//******************************************************
+void SHAPERGUI::onScriptLoaded()
+{
+  // this slot is called after processing of the LoadScriptId action of SalomeApp Application
+  // Each dumped script contains updateObjBrowser() that creates a new instance of Object
+  // Browser. When SHAPER module is active, this browser should not be used. It might be removed
+  // as hidden by means of updateWindows() of SalomeApp_Application or to remove
+  // it manually (because this method of application is protected)
+  SUIT_DataBrowser* aBrowser = getApp()->objectBrowser();
+  if (aBrowser)
+    delete aBrowser;
 }
 
 //******************************************************
