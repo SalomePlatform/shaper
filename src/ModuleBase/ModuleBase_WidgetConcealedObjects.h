@@ -18,7 +18,6 @@ class ModelAPI_Object;
 
 class QWidget;
 class QTableWidget;
-class QToolButton;
 
 /**
 * \ingroup GUI
@@ -58,11 +57,6 @@ private slots:
   /// Processes the display button click in the view.
   /// \param theState a new state
   void onItemToggled(bool theState);
-
-private:
-  /// Updates icon of button
-  /// \param theButton a button of the table
-  void updateItemIcon(QToolButton* theButton);
 
 private:
   std::string myBaseShapeAttribute; ///< attribute of the base object
