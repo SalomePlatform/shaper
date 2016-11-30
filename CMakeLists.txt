@@ -115,3 +115,9 @@ configure_file("${CMAKE_SOURCE_DIR}/CMakeCommon/cmake_uninstall.cmake.in"
 add_custom_target(uninstall
                   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif (CMAKE_GENERATOR MATCHES "NMake Makefiles")
+
+# Add special Git hooks
+if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+  configure_file("${CMAKE_SOURCE_DIR}/GitHooks/pre-commit.in"
+                 "${CMAKE_SOURCE_DIR}/.git/hooks/pre-commit")
+endif()
