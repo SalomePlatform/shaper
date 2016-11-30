@@ -37,8 +37,7 @@ public:
   /// Returns green color
   static const std::string OPERATION_RESULT_COLOR() { return "0,225, 0"; }
   /// Returns color between white and color of highlight
-  /// highlight color is equal Quantity_Color(0.5,1,1) or QColor(122, 255,255) // 188
-  static const std::string OPERATION_HIGHLIGHT_COLOR() { return "188, 255, 255"; }
+  static const std::string OPERATION_HIGHLIGHT_COLOR() { return "128, 0, 0"; }
 
 public:
   /// Constructor
