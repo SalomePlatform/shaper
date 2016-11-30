@@ -43,7 +43,7 @@ class ModelAPI_ResultConstruction : public ModelAPI_Result
   /// default deflection for a result construction
   inline static const std::string DEFAULT_DEFLECTION()
   {
-    return "0.0001";
+    return "0.00001";
   }
 
   /// Sets the result

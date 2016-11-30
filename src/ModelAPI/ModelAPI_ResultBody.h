@@ -47,7 +47,7 @@ public:
   /// default deflection for a result body
   inline static const std::string DEFAULT_DEFLECTION()
   {
-    return "0.001";
+    return "0.0001";
   }
 
   /// Iternal enumeration for storage the information of connected topology flag

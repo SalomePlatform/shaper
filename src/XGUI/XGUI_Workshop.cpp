@@ -213,12 +213,12 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   Config_PropManager::registerProp("Visualization", "body_deflection",
                                    "Body deflection coefficient",
                                    Config_Prop::Double,
-                                   ModelAPI_ResultBody::DEFAULT_DEFLECTION());//"0.001");
+                                   ModelAPI_ResultBody::DEFAULT_DEFLECTION());
 
   Config_PropManager::registerProp("Visualization", "construction_deflection",
                                    "Construction deflection coefficient",
                                    Config_Prop::Double,
-                                   ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());//"0.0001");
+                                   ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());
 
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "face-selection", true))
     myViewerSelMode.append(TopAbs_FACE);
