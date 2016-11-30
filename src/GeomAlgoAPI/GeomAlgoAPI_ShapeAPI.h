@@ -69,6 +69,23 @@ public:
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      std::shared_ptr<GeomAPI_Pnt>   theStartPoint,
                      std::shared_ptr<GeomAPI_Pnt>   theEndPoint) throw (GeomAlgoAPI_Exception);
+
+  /// Creates a cone segment using standard GDML parameters
+  /// \param theRMin1 Inner radius at base of cone
+  /// \param theRMax1 Outer radius at base of cone
+  /// \param theRMin2 Inner radius at top of cone
+  /// \param theRMax2 Outer radius at top of cone
+  /// \param theZ Height of cone segment
+  /// \param theStartPhi Start angle of the segment
+  /// \param theDeltaPhi Angle of the segment
+  static std::shared_ptr<GeomAPI_Shape> makeConeSegment(
+                     const double theRMin1,
+                     const double theRMax1,
+                     const double theRMin2,
+                     const double theRMax2,
+                     const double theZ,
+                     const double theStartPhi,
+                     const double theDeltaPhi) throw (GeomAlgoAPI_Exception);
 };
 }
 #endif

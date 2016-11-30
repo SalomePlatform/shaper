@@ -4,8 +4,8 @@
 // Created:     17 Mar 2016
 // Author:      Clarisse Genrault (CEA)
 
-#ifndef GeomAlgoAPI_Box_H_
-#define GeomAlgoAPI_Box_H_
+#ifndef GEOMALGOAPI_BOX_H_
+#define GEOMALGOAPI_BOX_H_
 
 #include <GeomAPI_Pnt.h>
 #include <GeomAlgoAPI_MakeShape.h>
@@ -61,4 +61,4 @@ class GeomAlgoAPI_Box : public GeomAlgoAPI_MakeShape
 };
 
 
-#endif
+#endif // GEOMALGOAPI_BOX_H_

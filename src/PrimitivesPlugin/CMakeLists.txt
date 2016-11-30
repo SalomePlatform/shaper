@@ -4,8 +4,6 @@
 # Created:     07 Apr 2016
 # Author:      Clarisse genrault (CEA)
 
-INCLUDE(UnitTest)
-
 SET(PROJECT_HEADERS
     PrimitivesPlugin.h
     PrimitivesPlugin_Plugin.h
@@ -44,6 +42,4 @@ INSTALL(TARGETS PrimitivesPlugin DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
 INSTALL(FILES ${XML_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Primitives)
 
-ADD_UNIT_TESTS(TestBox.py
-)
 

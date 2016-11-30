@@ -34,6 +34,7 @@
 %shared_ptr(GeomAlgoAPI_Translation)
 %shared_ptr(GeomAlgoAPI_Transform)
 %shared_ptr(GeomAlgoAPI_Box)
+%shared_ptr(GeomAlgoAPI_ConeSegment)
 %shared_ptr(GeomAlgoAPI_Copy)
 
 // all supported interfaces

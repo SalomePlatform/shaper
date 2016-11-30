@@ -1,8 +1,9 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File: 		GeomAlgoAPI_swig.h
+// File:    GeomAlgoAPI_swig.h
 // Created: Dec 15, 2015
 // Author:  Sergey POKHODENKO
+// Modified by Clarisse Genrault (CEA) : 24 Nov 2016
 
 #ifndef SRC_GEOMALGOAPI_GEOMALGOAPI_SWIG_H_
 #define SRC_GEOMALGOAPI_GEOMALGOAPI_SWIG_H_
@@ -44,6 +45,7 @@
   #include "GeomAlgoAPI_Exception.h"
   #include "GeomAlgoAPI_ShapeAPI.h"
   #include "GeomAlgoAPI_Box.h"
+  #include "GeomAlgoAPI_ConeSegment.h"
   #include "GeomAlgoAPI_Copy.h"
 
   #include <memory>

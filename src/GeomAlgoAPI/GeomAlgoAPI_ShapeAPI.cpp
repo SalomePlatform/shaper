@@ -5,14 +5,16 @@
 // Author:      Clarisse Genrault (CEA)
 
 #include "GeomAlgoAPI_ShapeAPI.h"
+
 #include <GeomAlgoAPI_Box.h>
+#include <GeomAlgoAPI_ConeSegment.h>
+#include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_Translation.h>
 
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Edge.h>
-#include <GeomAlgoAPI_EdgeBuilder.h>
 
-#include <iostream>
+//#include <iostream>
 
 namespace GeomAlgoAPI_ShapeAPI
 {
@@ -128,5 +130,30 @@ namespace GeomAlgoAPI_ShapeAPI
       throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
     }
     return aTranslationAlgo.shape();
+  }
+
+  //=========================================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeConeSegment(
+    const double theRMin1, const double theRMax1,
+    const double theRMin2, const double theRMax2,
+    const double theZ,
+    const double theStartPhi, const double theDeltaPhi) throw (GeomAlgoAPI_Exception)
+  {
+    GeomAlgoAPI_ConeSegment aConeSegmentAlgo(theRMin1, theRMax1, theRMin2, theRMax2,
+                                             theZ, theStartPhi, theDeltaPhi);
+
+    if (!aConeSegmentAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aConeSegmentAlgo.getError());
+    }
+
+    aConeSegmentAlgo.build();
+
+    if(!aConeSegmentAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aConeSegmentAlgo.getError());
+    }
+    if (!aConeSegmentAlgo.checkValid("Cone Segment builder")) {
+      throw GeomAlgoAPI_Exception(aConeSegmentAlgo.getError());
+    }
+    return aConeSegmentAlgo.shape();
   }
 }

@@ -46,6 +46,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_XAOExport.h
     GeomAlgoAPI_XAOImport.h
     GeomAlgoAPI_Copy.h
+    GeomAlgoAPI_ConeSegment.h
 )
 
 SET(PROJECT_SOURCES
@@ -87,6 +88,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_XAOExport.cpp
     GeomAlgoAPI_XAOImport.cpp
     GeomAlgoAPI_Copy.cpp
+    GeomAlgoAPI_ConeSegment.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -152,5 +154,6 @@ INSTALL(TARGETS GeomAlgoAPI DESTINATION ${SHAPER_INSTALL_BIN})
 INSTALL(FILES ${SWIG_SCRIPTS} DESTINATION ${SHAPER_INSTALL_SWIG})
 
 ADD_UNIT_TESTS(TestAPI_Box.py
+               TestAPI_GDMLConeSegment.py
                TestAPI_Translation.py)
 
