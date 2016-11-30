@@ -74,7 +74,7 @@ void Events_Loop::send(const std::shared_ptr<Events_Message>& theMessage, bool i
     }
   }
   // send
-  std::map<char*, std::map<void*, std::list<Events_Listener*> > >::iterator aFindID = 
+  std::map<char*, std::map<void*, std::list<Events_Listener*> > >::iterator aFindID =
     myListeners.find(theMessage->eventID().eventText());
   if (aFindID != myListeners.end()) {
     std::map<void*, std::list<Events_Listener*> >::iterator aFindSender = aFindID->second.find(
@@ -98,14 +98,14 @@ void Events_Loop::registerListener(Events_Listener* theListener, const Events_ID
     myImmediateListeners[theID.eventText()] = theListener;
     return;
   }
-  std::map<char*, std::map<void*, std::list<Events_Listener*> > >::iterator aFindID = 
+  std::map<char*, std::map<void*, std::list<Events_Listener*> > >::iterator aFindID =
     myListeners.find(theID.eventText());
   if (aFindID == myListeners.end()) {  // create container associated with ID
     myListeners[theID.eventText()] = std::map<void*, std::list<Events_Listener*> >();
     aFindID = myListeners.find(theID.eventText());
   }
 
-  std::map<void*, std::list<Events_Listener*> >::iterator aFindSender = 
+  std::map<void*, std::list<Events_Listener*> >::iterator aFindSender =
     aFindID->second.find(theSender);
   if (aFindSender == aFindID->second.end()) {  // create container associated with sender
     aFindID->second[theSender] = std::list<Events_Listener*>();
@@ -191,7 +191,7 @@ void Events_Loop::flush(const Events_ID& theID)
       }
     }
     // send accumulated messages to "groupListeners"
-    std::map<char*, std::map<void*, std::list<Events_Listener*> > >::iterator aFindID = 
+    std::map<char*, std::map<void*, std::list<Events_Listener*> > >::iterator aFindID =
       myListeners.find(theID.eventText());
     if (aFindID != myListeners.end()) {
       std::map<void*, std::list<Events_Listener*> >::iterator aFindSender =

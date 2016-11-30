@@ -229,7 +229,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 
     // conversion of dimension
     std::string aSelectionType = aSelectionList->selectionType();
-    std::string aDimensionString = 
+    std::string aDimensionString =
       ExchangePlugin_Tools::selectionType2xaoDimension(aSelectionType);
     XAO::Dimension aGroupDimension = XAO::XaoUtils::stringToDimension(aDimensionString);
 
@@ -263,7 +263,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 
     // conversion of dimension
     std::string aSelectionType = aSelectionList->selectionType();
-    std::string aDimensionString = 
+    std::string aDimensionString =
       ExchangePlugin_Tools::selectionType2xaoDimension(aSelectionType);
     XAO::Dimension aFieldDimension = XAO::XaoUtils::stringToDimension(aDimensionString);
     bool isWholePart = aSelectionType == "part";

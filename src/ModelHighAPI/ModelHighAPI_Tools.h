@@ -140,10 +140,10 @@ GeomAPI_Shape::ShapeType shapeTypeByStr(std::string theShapeTypeStr);
 MODELHIGHAPI_EXPORT
 GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection);
 
-MODELHIGHAPI_EXPORT 
+MODELHIGHAPI_EXPORT
 ModelAPI_AttributeTables::ValueType valueTypeByStr(const std::string& theValueTypeStr);
 
-MODELHIGHAPI_EXPORT 
+MODELHIGHAPI_EXPORT
 std::string strByValueType(const ModelAPI_AttributeTables::ValueType theType);
 
 /// Performs the high level API dump, then closes all and executes the script:

@@ -45,7 +45,7 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultField::shape()
         for(int a = 0; a < aResults; a++) {
           ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(
             document()->object(ModelAPI_ResultBody::group(), a));
-          if (!aBody.get()) 
+          if (!aBody.get())
             continue;
           // check that only results that were created before this field are used
           FeaturePtr aResultFeature = document()->feature(aBody);

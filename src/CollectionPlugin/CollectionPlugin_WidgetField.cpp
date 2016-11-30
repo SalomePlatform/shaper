@@ -46,17 +46,17 @@ const char* MYFalse = "False";
 class DataTableItemDelegate : public QStyledItemDelegate
 {
 public:
-  DataTableItemDelegate(ModelAPI_AttributeTables::ValueType theType) : 
+  DataTableItemDelegate(ModelAPI_AttributeTables::ValueType theType) :
       QStyledItemDelegate() { myType = theType; }
 
-  virtual QWidget* createEditor(QWidget* theParent, 
-                                const QStyleOptionViewItem & theOption, 
+  virtual QWidget* createEditor(QWidget* theParent,
+                                const QStyleOptionViewItem & theOption,
                                 const QModelIndex& theIndex) const;
 
   ModelAPI_AttributeTables::ValueType dataType() const { return myType; }
 
   void setDataType(ModelAPI_AttributeTables::ValueType theType) { myType = theType; }
-   
+
 signals:
   void startEditing();
 
@@ -64,8 +64,8 @@ private:
   ModelAPI_AttributeTables::ValueType myType;
 };
 
-QWidget* DataTableItemDelegate::createEditor(QWidget* theParent, 
-                                             const QStyleOptionViewItem & theOption, 
+QWidget* DataTableItemDelegate::createEditor(QWidget* theParent,
+                                             const QStyleOptionViewItem & theOption,
                                              const QModelIndex& theIndex ) const
 {
   if ((theIndex.column() == 0) && (theIndex.row() > 0)) {
@@ -77,8 +77,8 @@ QWidget* DataTableItemDelegate::createEditor(QWidget* theParent,
     QLineEdit* aLineEdt = 0;
     switch (myType) {
     case ModelAPI_AttributeTables::DOUBLE:
-      aLineEdt = dynamic_cast<QLineEdit*>(QStyledItemDelegate::createEditor(theParent, 
-                                                                            theOption, 
+      aLineEdt = dynamic_cast<QLineEdit*>(QStyledItemDelegate::createEditor(theParent,
+                                                                            theOption,
                                                                             theIndex));
       if (aLineEdt) {
         aLineEdt->setValidator(new QDoubleValidator(aLineEdt));
@@ -86,15 +86,15 @@ QWidget* DataTableItemDelegate::createEditor(QWidget* theParent,
       }
       break;
     case ModelAPI_AttributeTables::INTEGER:
-      aLineEdt = dynamic_cast<QLineEdit*>(QStyledItemDelegate::createEditor(theParent, 
-                                                                            theOption, 
+      aLineEdt = dynamic_cast<QLineEdit*>(QStyledItemDelegate::createEditor(theParent,
+                                                                            theOption,
                                                                             theIndex));
       if (aLineEdt) {
         aLineEdt->setValidator(new QIntValidator(aLineEdt));
         return aLineEdt;
       }
       break;
-    case ModelAPI_AttributeTables::BOOLEAN: 
+    case ModelAPI_AttributeTables::BOOLEAN:
       {
         QComboBox* aBox = new QComboBox(theParent);
         aBox->addItem(MYFalse);
@@ -112,8 +112,8 @@ QWidget* DataTableItemDelegate::createEditor(QWidget* theParent,
 //**********************************************************************************
 //**********************************************************************************
 CollectionPlugin_WidgetField::
-  CollectionPlugin_WidgetField(QWidget* theParent, 
-                               ModuleBase_IWorkshop* theWorkshop, 
+  CollectionPlugin_WidgetField(QWidget* theParent,
+                               ModuleBase_IWorkshop* theWorkshop,
                                const Config_WidgetAPI* theData):
 ModuleBase_WidgetSelector(theParent, theWorkshop, theData), myHeaderEditor(0),
   myIsEditing(false), myActivation(false)
@@ -129,7 +129,7 @@ ModuleBase_WidgetSelector(theParent, theWorkshop, theData), myHeaderEditor(0),
   // Type of shapes
   myShapeTypeCombo = new QComboBox(aTypesWgt);
   QStringList aShapeTypes;
-  aShapeTypes << tr("Vertices") << tr("Edges") << tr("Faces") 
+  aShapeTypes << tr("Vertices") << tr("Edges") << tr("Faces")
     << tr("Solids") << tr("Objects") << tr("Parts");
   myShapeTypeCombo->addItems(aShapeTypes);
   aTypesLayout->addRow(tr("Type of shapes"), myShapeTypeCombo);
@@ -137,7 +137,7 @@ ModuleBase_WidgetSelector(theParent, theWorkshop, theData), myHeaderEditor(0),
   // Type of field
   myFieldTypeCombo = new QComboBox(aTypesWgt);
   QStringList aFieldTypes;
-  aFieldTypes << tr("Boolean") << tr("Integer") << tr("Double") 
+  aFieldTypes << tr("Boolean") << tr("Integer") << tr("Double")
     << tr("String");
   myFieldTypeCombo->addItems(aFieldTypes);
   myFieldTypeCombo->setCurrentIndex(2);
@@ -320,7 +320,7 @@ bool CollectionPlugin_WidgetField::eventFilter(QObject* theObject, QEvent* theEv
       }
     }
   } else if ((theObject == myHeaderEditor) && (theEvent->type() == QEvent::FocusOut)) {
-    //QHeaderView* aHeader = 
+    //QHeaderView* aHeader =
     //  static_cast<QHeaderView*>(myHeaderEditor->parentWidget()->parentWidget());
     QString aNewTitle = myHeaderEditor->text();
     //save item text
@@ -358,7 +358,7 @@ QTableWidgetItem* CollectionPlugin_WidgetField::createDefaultItem() const
   case ModelAPI_AttributeTables::INTEGER:
     aItem->setText("0");
     break;
-  case ModelAPI_AttributeTables::BOOLEAN: 
+  case ModelAPI_AttributeTables::BOOLEAN:
     aItem->setText(MYFalse);
     break;
   }
@@ -377,10 +377,10 @@ QTableWidgetItem* CollectionPlugin_WidgetField::
   case ModelAPI_AttributeTables::INTEGER:
     aItem->setText(QString::number(theVal.myInt));
     break;
-  case ModelAPI_AttributeTables::BOOLEAN: 
+  case ModelAPI_AttributeTables::BOOLEAN:
     aItem->setText(theVal.myBool? MYTrue : MYFalse);
     break;
-  case ModelAPI_AttributeTables::STRING: 
+  case ModelAPI_AttributeTables::STRING:
     aItem->setText(theVal.myStr.c_str());
   }
   return aItem;
@@ -443,7 +443,7 @@ bool CollectionPlugin_WidgetField::storeValueCustom()
   QTableWidget* aTable = myDataTblList.first();
   int aRows = aTable->rowCount();
   // first column contains selected names which should not be stored
-  int aColumns = aTable->columnCount() - 1; 
+  int aColumns = aTable->columnCount() - 1;
 
   aTablesAttr->setSize(aRows, aColumns, aNbSteps);
   aTablesAttr->setType((ModelAPI_AttributeTables::ValueType)aFldType);
@@ -676,7 +676,7 @@ void CollectionPlugin_WidgetField::onAddStep()
   aTablesAttr->setSize(aTablesAttr->rows(), aTablesAttr->columns(), myDataTblList.size());
 
 
-  AttributeSelectionListPtr aSelList = 
+  AttributeSelectionListPtr aSelList =
     myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());
   if (!aSelList->isInitialized())
     return;
@@ -755,10 +755,10 @@ void CollectionPlugin_WidgetField::onSelectionChanged()
   if (myShapeTypeCombo->currentIndex() == 5)
     return;
 
-  QList<ModuleBase_ViewerPrsPtr> aSelected = 
+  QList<ModuleBase_ViewerPrsPtr> aSelected =
     myWorkshop->selection()->getSelected(ModuleBase_ISelection::AllControls);
 
-  AttributeSelectionListPtr aSelList = 
+  AttributeSelectionListPtr aSelList =
     myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());
   aSelList->setSelectionType(getSelectionType(myShapeTypeCombo->currentIndex()));
   aSelList->clear();
@@ -785,7 +785,7 @@ void CollectionPlugin_WidgetField::onSelectionChanged()
   QTableWidgetItem* aItem = 0;
   foreach(QTableWidget* aTable, myDataTblList) {
     aTable->setRowCount(aNewRows);
-    if (aNewRows > aRows) { 
+    if (aNewRows > aRows) {
       // Add new data
       for(int i = 0; i < aColumns; i++) {
         if (i == 0) {
@@ -839,7 +839,7 @@ void CollectionPlugin_WidgetField::onFieldTypeChanged(int theIdx)
                     aTable->item(j, i)->setText("0");
               }
               break;
-            case ModelAPI_AttributeTables::BOOLEAN: 
+            case ModelAPI_AttributeTables::BOOLEAN:
               aTable->item(j, i)->setText(MYFalse);
               break;
             }
@@ -877,7 +877,7 @@ void CollectionPlugin_WidgetField::onShapeTypeChanged(int theType)
 {
   activateSelectionAndFilters(theType == 5? false:true);
 
-  AttributeSelectionListPtr aSelList = 
+  AttributeSelectionListPtr aSelList =
     myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());
 
   std::string aTypeName = getSelectionType(theType);

@@ -38,8 +38,8 @@ class CollectionPlugin_WidgetField : public ModuleBase_WidgetSelector
 {
  Q_OBJECT
 public:
-  CollectionPlugin_WidgetField(QWidget* theParent, 
-                               ModuleBase_IWorkshop* theWorkshop, 
+  CollectionPlugin_WidgetField(QWidget* theParent,
+                               ModuleBase_IWorkshop* theWorkshop,
                                const Config_WidgetAPI* theData);
 
   virtual ~CollectionPlugin_WidgetField() {}
