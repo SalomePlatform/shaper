@@ -1,0 +1,66 @@
+<!-- Copyright (C) 2015-2016 CEA/DEN, EDF R&D -->
+
+<!-- File:        conesegment_widget.xml -->
+<!-- Created:     07 Apr 2016 -->
+<!-- Author:      CEA (delegation to Alyotech) -->
+
+<source>
+  <groupbox title="Base face">
+    <doublevalue
+      id="rmin1"
+      label="rmin1"
+      step="1.0"
+      default="7.0"
+      tooltip="Enter the lower face inner radius">
+    </doublevalue>
+    <doublevalue
+      id="rmax1"
+      label="rmax1"
+      step="1.0"
+      default="11.0"
+      tooltip="Enter the lower face outer radius">
+    </doublevalue>
+  </groupbox>
+  <groupbox title="Top face">
+    <doublevalue
+      id="rmin2"
+      label="rmin2"
+      step="1.0"
+      default="5.0"
+      tooltip="Enter the higher face inner radius">
+    </doublevalue>
+    <doublevalue
+      id="rmax2"
+      label="rmax2"
+      step="1.0"
+      default="8.0"
+      tooltip="Enter the higher face outer radius">
+    </doublevalue>
+  </groupbox>
+  <groupbox title="Crop">
+    <doublevalue
+      id="z"
+      label="z"
+      step="1.0"
+      default="12.0"
+      tooltip="Enter the height">
+      <validator id="GeomValidators_Positive"/>
+    </doublevalue>
+    <doublevalue
+      id="startphi"
+      label="startphi"
+      step="15.0"
+      default="0."
+      tooltip="Enter the starting angle">
+    </doublevalue>
+    <doublevalue
+      id="deltaphi"
+      label="deltaphi"
+      step="15.0"
+      default="270."
+      tooltip="Enter the revolution angle">
+      <validator id="GeomValidators_Positive"/>
+    </doublevalue>
+  </groupbox>
+  <label title="" icon="icons/GDML/gui_cone_segment.png"/>
+</source>

@@ -1,0 +1,15 @@
+<!-- Copyright (C) 2014-2016 CEA/DEN, EDF R&D -->
+
+<!-- File:        plugin-GDML.xml -->
+<!-- Created:     23 Nov 2016 -->
+<!-- Author:      Clarisse Genrault (CEA) -->
+
+<plugin> 
+  <workbench id="GDML" document="Part">
+    <group id="GDML">
+      <feature id="ConeSegment" title="Cone Segment" tooltip="Create a Cone Segment" icon="icons/GDML/cone_segment.png">
+        <source path="conesegment_widget.xml"/>
+      </feature>
+    </group>
+  </workbench>
+</plugin>

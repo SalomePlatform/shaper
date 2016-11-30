@@ -1,0 +1,57 @@
+# Copyright (C) 2014-2016 CEA/DEN, EDF R&D
+
+# File:        CMakeLists.txt
+# Created:     23 Nov 2016
+# Author:      Clarisse Genrault (CEA)
+
+INCLUDE(Common)
+INCLUDE(UnitTest)
+
+SET(CMAKE_AUTOMOC ON)
+
+SET(PROJECT_HEADERS
+    GDMLPlugin.h
+    GDMLPlugin_Plugin.h
+    GDMLPlugin_ConeSegment.h
+)
+
+SET(PROJECT_SOURCES
+    GDMLPlugin_Plugin.cpp
+    GDMLPlugin_ConeSegment.cpp
+)
+
+SET(XML_RESOURCES
+  plugin-GDML.xml
+  conesegment_widget.xml
+)
+
+INCLUDE_DIRECTORIES(
+  ../ModelAPI
+  ../GeomAPI
+  ../GeomAlgoAPI
+  ../Events
+  ../Config
+  ../ModuleBase
+  ${CAS_INCLUDE_DIRS}
+)
+
+SET(PROJECT_LIBRARIES
+    Events
+    Config
+    ModelAPI 
+    GeomAPI 
+    GeomAlgoAPI
+    ModuleBase
+    ${QT_LIBRARIES}
+)
+
+ADD_DEFINITIONS(-DGDMLPLUGIN_EXPORTS)
+ADD_LIBRARY(GDMLPlugin MODULE ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES})
+TARGET_LINK_LIBRARIES(GDMLPlugin ${PROJECT_LIBRARIES})
+
+INSTALL(TARGETS GDMLPlugin DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
+INSTALL(FILES ${XML_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
+INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/GDML)
+
+ADD_UNIT_TESTS()
+
