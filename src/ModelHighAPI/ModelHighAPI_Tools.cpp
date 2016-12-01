@@ -211,7 +211,7 @@ void fillAttribute(const std::list<std::string> & theValue,
 
   int anIndex = 0;
   for (auto it = theValue.begin(); it != theValue.end(); ++it, ++anIndex)
-    theAttribute->setValue(anIndex, *it); 
+    theAttribute->setValue(anIndex, *it);
 }
 
 //--------------------------------------------------------------------------------------

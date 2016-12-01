@@ -711,7 +711,7 @@ void Model_AttributeSelection::selectBody(
         aFeatureOwner->removeResults(0, false);
     }
     aSel.Select(aNewSub, aNewContext);
- 
+
     if (aEraseResults) { // flash after Select : in Groups it makes selection with shift working
       static Events_Loop* aLoop = Events_Loop::loop();
       static const Events_ID kDeletedEvent = aLoop->eventByName(EVENT_OBJECT_DELETED);

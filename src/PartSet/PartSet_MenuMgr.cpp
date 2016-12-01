@@ -490,7 +490,7 @@ void PartSet_MenuMgr::activatePartSet() const
   SessionPtr aMgr = ModelAPI_Session::get();
   bool isNewTransaction = !aMgr->isOperation();
   // activation may cause changes in current features in document, so it must be in transaction
-  if (isNewTransaction) 
+  if (isNewTransaction)
     aMgr->startOperation("Activation");
   aMgr->setActiveDocument(aMgr->moduleDocument());
   if (isNewTransaction) aMgr->finishOperation();

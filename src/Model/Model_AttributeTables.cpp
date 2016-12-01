@@ -64,10 +64,10 @@ void Model_AttributeTables::setSize(const int theRows, const int theColumns, con
         (myType == ModelAPI_AttributeTables::BOOLEAN) ?
         new TColStd_HArray1OfByte(0, aNewSize - 1) : Handle(TColStd_HArray1OfByte)();
       Handle(TColStd_HArray1OfInteger) anOldInt, aNewInt =
-        (myType == ModelAPI_AttributeTables::INTEGER) ? 
+        (myType == ModelAPI_AttributeTables::INTEGER) ?
         new TColStd_HArray1OfInteger(0, aNewSize - 1) : Handle(TColStd_HArray1OfInteger)();
       Handle(TColStd_HArray1OfExtendedString) anOldStr, aNewStr =
-        (myType == ModelAPI_AttributeTables::STRING) ? 
+        (myType == ModelAPI_AttributeTables::STRING) ?
         new TColStd_HArray1OfExtendedString(0, aNewSize - 1) :
         Handle(TColStd_HArray1OfExtendedString)();
       if (aSize != 0) { // copy the previous values into new positions, otherwise default values
@@ -154,7 +154,7 @@ void Model_AttributeTables::setType(ModelAPI_AttributeTables::ValueType theType)
       myLab.ForgetAttribute(MY_ARRAY_ID(theType));
       myType = theType;
       int aTables = myTables;
-      myTables = 0; // to let setSize know that there is no old array 
+      myTables = 0; // to let setSize know that there is no old array
       setSize(myRows, myCols, aTables);
     } else {
       myType = theType;

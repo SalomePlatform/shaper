@@ -30,7 +30,7 @@ ModuleBase_ModelWidget* CollectionPlugin_WidgetCreator::createWidgetByType(
   if (myPanelTypes.find(theType) == myPanelTypes.end())
     return aWidget;
 
-  if (theType == "field-panel") {     
+  if (theType == "field-panel") {
     aWidget = new CollectionPlugin_WidgetField(theParent, theWorkshop, theWidgetApi);
   }
 

@@ -94,7 +94,7 @@ std::string ParametersPlugin_EvalListener::renameInPythonExpression(
   std::string anExpressionString = theExpression;
 
   // ask interpreter to compute the positions in the expression
-  std::shared_ptr<ModelAPI_ComputePositionsMessage> aMsg = 
+  std::shared_ptr<ModelAPI_ComputePositionsMessage> aMsg =
     ModelAPI_ComputePositionsMessage::send(theExpression, theOldName, this);
   const std::list<std::pair<int, int> >& aPositions = aMsg->positions();
 

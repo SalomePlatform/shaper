@@ -166,8 +166,8 @@ bool ModelAPI_ParameterEvalMessage::isProcessed()
   return myIsProcessed;
 }
 
-const std::list<std::shared_ptr<ModelAPI_ResultParameter> >& 
-  ModelAPI_ParameterEvalMessage::params() const 
+const std::list<std::shared_ptr<ModelAPI_ResultParameter> >&
+  ModelAPI_ParameterEvalMessage::params() const
 {
   return myParamsList;
 }

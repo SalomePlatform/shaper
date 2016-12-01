@@ -2,7 +2,7 @@
 
 # This script uses:
 #
-# SHAPER_PDIR - path of PRODUCTS for SHAPER (SolveSpace, lcov)
+# SHAPER_PDIR - path of PRODUCTS for SHAPER (SolveSpace, lcov, cpplint)
 # SHAPER_ROOT_DIR - path of SHAPER installation
 
 for path in SHAPER_PDIR SHAPER_ROOT_DIR; do
@@ -34,6 +34,11 @@ export BOOST_ROOT_DIR=${SHAPER_PDIR}/boost-1.52.0
 #------ lcov ------
 export LCOV_ROOT_DIR=${SHAPER_PDIR}/lcov-1.11
 export PATH=${LCOV_ROOT_DIR}/bin:${PATH}
+##
+
+#------ cpplint ------
+export CPPLINT_ROOT_DIR=${SHAPER_PDIR}/cpplint-1.3.0
+export PATH=${CPPLINT_ROOT_DIR}:${PATH}
 ##
 
 #------ OCCT ------
