@@ -5,14 +5,16 @@
   <context>
     <name>Parameter</name>
     <message>
-      <source>Model_FeatureValidator: Attribute "variable" is not initialized.</source>
+      <source>Attribute "variable" is not initialized.</source>
       <translation>Set the variable name</translation>
     </message>
+  </context>
+  <context>
+    <name>Parameter:Model_FeatureValidator</name>
     <message>
-      <source>Model_FeatureValidator: Attribute "expression" is not initialized.</source>
+      <source>Attribute "expression" is not initialized.</source>
       <translation>Set the expression</translation>
     </message>
   </context>
-
 
 </TS>

@@ -15,7 +15,7 @@
 
 
 /// The definition provides collection and writing of missed translations
-#define MISSED_TRANSLATION
+//#define MISSED_TRANSLATION
 
 /**
  * \class Config_Translator
