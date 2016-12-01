@@ -36,7 +36,10 @@ protected:
   /// \return True in success
   virtual bool storeValueCustom();
 
-private:
+  //! Switch On/Off highlighting of the widget
+  virtual void setHighlighted(bool isHighlighted) {}
+
+protected:
   ModuleBase_LabelValue* myLabel;  ///< A label control
 };
 

@@ -28,7 +28,8 @@ public:
   /// \param theIcon a icon value
   ModuleBase_LabelValue(QWidget* theParent, const QString& theText,
                         const QString& theToolTip = "",
-                        const QString& theIcon = "");
+                        const QString& theIcon = "",
+                        int thePrecision = -12);
 
   virtual ~ModuleBase_LabelValue();
 
@@ -45,6 +46,7 @@ protected:
   QLabel* myLabelValue; ///< A label value control
 
   double myValue; ///< A cashed value to avoid a string conversion
+  int myPrecision; ///< Precision value
 };
 
 #endif

@@ -284,40 +284,11 @@ bool PartSet_WidgetPoint2D::restoreValueCustom()
   std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(attributeID()));
-  QString aTextX = QString::fromStdString(aPoint->isInitialized() ? aPoint->textX() : "0");
-  QString aTextY = QString::fromStdString(aPoint->isInitialized() ? aPoint->textY() : "0");
+  double aValueX = aPoint->isInitialized() ? aPoint->x() : 0.;
+  double aValueY = aPoint->isInitialized() ? aPoint->y() : 0.;
+  myXSpin->setValue(aValueX);
+  myYSpin->setValue(aValueY);
 
-  bool isDouble = false;
-  double aVal = 0;
-  if (aTextX.isEmpty()) {
-    myXSpin->setValue(aPoint->x());
-    //ModuleBase_Tools::setSpinValue(myXSpin, aPoint->x());
-  } else {
-    aVal = aTextX.toDouble(&isDouble);
-    myXSpin->setValue(aVal);
-    /*if (isDouble)
-      ModuleBase_Tools::setSpinValue(myXSpin, aVal);
-    else
-      ModuleBase_Tools::setSpinText(myXSpin, aTextX);*/
-  }
-  if (aTextY.isEmpty()) {
-    myYSpin->setValue(aPoint->y());
-    //ModuleBase_Tools::setSpinValue(myYSpin, aPoint->y());
-  } else {
-    aVal = aTextY.toDouble(&isDouble);
-    myYSpin->setValue(aVal);
-    //if (isDouble)
-    //  ModuleBase_Tools::setSpinValue(myYSpin, aVal);
-    //else
-    //  ModuleBase_Tools::setSpinText(myYSpin, aTextY);
-  }
-  //if (aTextX.empty() || aTextY.empty()) {
-  //  ModuleBase_Tools::setSpinValue(myXSpin, aPoint->x());
-  //  ModuleBase_Tools::setSpinValue(myYSpin, aPoint->y());
-  //} else {
-  //  ModuleBase_Tools::setSpinText(myXSpin, QString::fromStdString(aTextX));
-  //  ModuleBase_Tools::setSpinText(myYSpin, QString::fromStdString(aTextY));
-  //}
   return true;
 }
 

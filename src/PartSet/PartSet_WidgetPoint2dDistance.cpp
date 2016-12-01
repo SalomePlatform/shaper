@@ -17,6 +17,7 @@
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_WidgetValidator.h>
+#include <ModuleBase_LabelValue.h>
 
 #include <GeomAPI_Pnt2d.h>
 #include <Config_WidgetAPI.h>
@@ -30,7 +31,7 @@
 PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
                                                              ModuleBase_IWorkshop* theWorkshop,
                                                              const Config_WidgetAPI* theData)
-: ModuleBase_WidgetDoubleValue(theParent, theData), myWorkshop(theWorkshop),
+: ModuleBase_WidgetLabelValue(theParent, theData), myWorkshop(theWorkshop),
   myValueIsCashed(false), myIsFeatureVisibleInCash(true), myValueInCash(0)
 {
   myFirstPntName = theData->getProperty("first_point");
@@ -50,7 +51,7 @@ bool PartSet_WidgetPoint2dDistance::isValidSelectionCustom(
 bool PartSet_WidgetPoint2dDistance::resetCustom()
 {
   bool aDone = false;
-  if (!isUseReset() || isComputedDefault() || mySpinBox->hasVariable()) {
+  if (!isUseReset() || isComputedDefault() /*|| mySpinBox->hasVariable()*/) {
     aDone = false;
   }
   else {
@@ -60,8 +61,15 @@ bool PartSet_WidgetPoint2dDistance::resetCustom()
       aDone = restoreCurentValue();
       emit objectUpdated();
     }
-    else
-      aDone = ModuleBase_WidgetDoubleValue::resetCustom();
+    else {
+      bool isOk;
+      double aDefValue = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
+      // it is important to block the spin box control in order to do not through out the
+      // locking of the validating state.
+      myLabel->setValue(isOk ? aDefValue : 0.0);
+      storeValue();
+      aDone = true;
+    }
   }
   return aDone;
 }
@@ -80,7 +88,7 @@ void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
   if (aReal && (aReal->value() != aValue)) {
     aReal->setValue(aValue);
 
-    ModuleBase_Tools::setSpinValue(mySpinBox, aValue);
+    myLabel->setValue(aValue);
     storeValue();
   }
 }
@@ -99,8 +107,8 @@ void PartSet_WidgetPoint2dDistance::mouseReleased(ModuleBase_IViewWindow* theWnd
   if (theEvent->button() != Qt::LeftButton)
     return;
 
-  if (mySpinBox->hasVariable())
-    return;
+  //if (mySpinBox->hasVariable())
+  //  return;
 
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
 
@@ -121,8 +129,8 @@ void PartSet_WidgetPoint2dDistance::mouseMoved(ModuleBase_IViewWindow* theWnd,
   if (isEditingMode())
     return;
 
-  if (mySpinBox->hasVariable())
-    return;
+  //if (mySpinBox->hasVariable())
+  //  return;
 
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
 
@@ -142,13 +150,13 @@ void PartSet_WidgetPoint2dDistance::mouseMoved(ModuleBase_IViewWindow* theWnd,
 void PartSet_WidgetPoint2dDistance::storeCurentValue()
 {
   // do not use cash if a variable is used
-  if (mySpinBox->hasVariable())
-    return;
+  //if (mySpinBox->hasVariable())
+  //  return;
 
   myValueIsCashed = true;
   myIsFeatureVisibleInCash = XGUI_Displayer::isVisible(
                        XGUI_Tools::workshop(myWorkshop)->displayer(), myFeature);
-  myValueInCash = mySpinBox->value();
+  myValueInCash = myLabel->value();
 }
 
 bool PartSet_WidgetPoint2dDistance::restoreCurentValue()
@@ -160,7 +168,7 @@ bool PartSet_WidgetPoint2dDistance::restoreCurentValue()
 
   myValueIsCashed = false;
   myIsFeatureVisibleInCash = true;
-  ModuleBase_Tools::setSpinValue(mySpinBox, myValueInCash);
+  myLabel->setValue(myValueInCash);
 
   // store value to the model
   storeValueCustom();
@@ -176,10 +184,26 @@ bool PartSet_WidgetPoint2dDistance::restoreCurentValue()
 
 bool PartSet_WidgetPoint2dDistance::processEnter()
 {
+  return false;
+  /*
   bool isModified = getValueState() == ModifiedInPP;
   if (isModified) {
     emit valuesChanged();
-    mySpinBox->selectAll();
+    //mySpinBox->selectAll();
   }
-  return isModified;
+  return isModified;*/
+}
+
+bool PartSet_WidgetPoint2dDistance::storeValueCustom()
+{
+  std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
+  if (!aData) // can be on abort of sketcher element
+    return false;
+  AttributeDoublePtr anAttribute = myFeature->data()->real(attributeID());
+  anAttribute->setValue(myLabel->value());
+
+  // after movement the solver will call the update event: optimization
+  updateObject(myFeature);
+
+  return true;
 }

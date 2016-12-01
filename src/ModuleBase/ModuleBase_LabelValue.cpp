@@ -9,10 +9,12 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLocale>
 
 ModuleBase_LabelValue::ModuleBase_LabelValue(QWidget* theParent, const QString& theText,
-                                             const QString& theToolTip, const QString& theIcon)
-: QWidget(theParent)
+                                             const QString& theToolTip, const QString& theIcon,
+                                             int thePrecision)
+: QWidget(theParent), myPrecision(thePrecision), myValue(0)
 {
   QHBoxLayout* aLayout = new QHBoxLayout(this);
   aLayout->setContentsMargins(2, 0, 0, 0);
@@ -29,6 +31,14 @@ ModuleBase_LabelValue::ModuleBase_LabelValue(QWidget* theParent, const QString& 
   myLabelValue = new QLabel("", this);
   aLayout->addWidget(myLabelValue, 1);
 
+  // VSR 01/07/2010: Disable thousands separator for spin box
+  // (to avoid inconsistency of double-2-string and string-2-double conversion)
+  QLocale loc;
+  loc.setNumberOptions(loc.numberOptions() |
+                       QLocale::OmitGroupSeparator |
+                       QLocale::RejectGroupSeparator);
+  setLocale(loc);
+
   aLayout->addStretch(1);
 }
 
@@ -39,6 +49,8 @@ ModuleBase_LabelValue::~ModuleBase_LabelValue()
 void ModuleBase_LabelValue::setValue(const double theValue)
 {
   myValue = theValue;
-  myLabelValue->setText(QString::number(theValue));
+
+  QString aStrValue = locale().toString(theValue, myPrecision >= 0 ? 'f' : 'g', qAbs(myPrecision));
+  myLabelValue->setText(aStrValue);
   myLabelValue->setToolTip(QString::number(theValue));
 }

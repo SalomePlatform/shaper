@@ -28,6 +28,12 @@ ModuleBase_WidgetLabelValue::ModuleBase_WidgetLabelValue(QWidget* theParent,
   QString aToolTip = QString::fromStdString(theData->widgetTooltip());
 
   myLabel = new ModuleBase_LabelValue(theParent, aText, aToolTip, aLabelIcon);
+  bool isOk;
+  double aDefVal = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
+  if (isOk) {
+    myLabel->setValue(aDefVal);
+  }
+
   aLayout->addWidget(myLabel);
 }
 
@@ -37,7 +43,9 @@ ModuleBase_WidgetLabelValue::~ModuleBase_WidgetLabelValue()
 
 QList<QWidget*> ModuleBase_WidgetLabelValue::getControls() const
 {
-  return QList<QWidget*>();
+  QList<QWidget*> aControls;
+  aControls.append(myLabel);
+  return aControls;
 }
 
 bool ModuleBase_WidgetLabelValue::restoreValueCustom()
