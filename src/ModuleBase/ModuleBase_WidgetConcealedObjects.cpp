@@ -55,7 +55,8 @@ bool ModuleBase_WidgetConcealedObjects::storeValueCustom()
   anAttributeList->clear();
   int aSize1 = anAttributeList->size(false);
   for (int i = 0, aSize = myView->rowCount(); i < aSize; i++) {
-    QCheckBox* aButton = dynamic_cast<QCheckBox*>(myView->cellWidget(i, 0)->findChild<QCheckBox*>());
+    QCheckBox* aButton =
+        dynamic_cast<QCheckBox*>(myView->cellWidget(i, 0)->findChild<QCheckBox*>());
     if (aButton->isChecked())
       anAttributeList->append(myConcealedResults[i]);
   }
@@ -96,7 +97,8 @@ bool ModuleBase_WidgetConcealedObjects::restoreValueCustom()
   int aSize = anAttributeList->size();
   for (int i = 0, aSize = myView->rowCount(); i < aSize; i++) {
     ResultPtr aResult = myConcealedResults[i];
-    QCheckBox* aButton = dynamic_cast<QCheckBox*>(myView->cellWidget(i, 0)->findChild<QCheckBox*>());
+    QCheckBox* aButton =
+        dynamic_cast<QCheckBox*>(myView->cellWidget(i, 0)->findChild<QCheckBox*>());
     bool isChecked = anAttributeList->isInList(aResult);
 
     bool aBlocked = aButton->blockSignals(true);
