@@ -176,7 +176,8 @@ bool PartSet_WidgetPoint2D::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr
 bool PartSet_WidgetPoint2D::resetCustom()
 {
   bool aDone = false;
-  if (!isUseReset() || isComputedDefault() /*|| myXSpin->hasVariable() || myYSpin->hasVariable()*/) {
+  if (!isUseReset() || isComputedDefault()
+      /*|| myXSpin->hasVariable() || myYSpin->hasVariable()*/) {
     aDone = false;
   }
   else {
