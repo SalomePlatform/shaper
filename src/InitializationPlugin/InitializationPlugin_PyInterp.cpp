@@ -128,7 +128,8 @@ void InitializationPlugin_PyInterp::clearLocalContext()
   PyDict_Clear(_local_context);
 }
 
-double InitializationPlugin_PyInterp::evaluate(const std::string& theExpression, std::string& theError)
+double InitializationPlugin_PyInterp::evaluate(const std::string& theExpression,
+                                               std::string& theError)
 {
   PyLockWrapper lck; // Acquire GIL until the end of the method
   PyCompilerFlags aFlags = {CO_FUTURE_DIVISION};
