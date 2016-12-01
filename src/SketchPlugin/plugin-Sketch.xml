@@ -31,7 +31,7 @@
                                  enable_value="enable_by_preferences"/>
         <sketch-2dpoint_selector id="EndPoint" accept_expressions="0" title="End point" tooltip="End point coordinates"
                                  enable_value="enable_by_preferences"/>
-        <doublevalue id="LineLength" accept_expressions="0" label="Length:" default="computed" icon="icons/Sketch/distance_value.png"
+        <labelvalue id="LineLength" accept_expressions="0" label="Length:" default="computed" icon="icons/Sketch/distance_value.png"
                      tooltip="Line length" obligatory="0" enable_value="false"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
         <validator id="GeomValidators_Different" parameters="StartPoint,EndPoint"/>
@@ -99,14 +99,13 @@
                                      enable_value="enable_by_preferences"/>
           </box>
         </toolbox>
-        <doublevalue id="ArcRadius" accept_expressions="0" label="Radius:" default="computed" icon="icons/Sketch/radius.png"
+        <labelvalue id="ArcRadius" accept_expressions="0" label="Radius:" default="computed" icon="icons/Sketch/radius.png"
                      tooltip="Set radius" obligatory="0" enable_value="enable_by_preferences">
           <validator id="GeomValidators_Positive"/>
-        </doublevalue>
-        <doublevalue id="ArcAngle" label="Angle:" icon="icons/Sketch/angle.png" tooltip="Set angle" default="90" use_reset="false" obligatory="0"
+        </labelvalue>
+        <labelvalue id="ArcAngle" label="Angle:" icon="icons/Sketch/angle.png" tooltip="Set angle" default="90" use_reset="false" obligatory="0"
                      enable_value="enable_by_preferences"/>
-        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"
-                   enable_value="enable_by_preferences"/>
+        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
 
       <!--  SketchConstraintFillet  -->
@@ -123,10 +122,10 @@
             clear_in_neutral_point="false">
           <validator id="SketchPlugin_FilletVertexValidator"/>
         </sketch_multi_selector>
-        <doublevalue label="Radius" tooltip="Fillet arc radius" id="ConstraintValue" accept_expressions="0" min="0" use_reset="false"
+        <labelvalue label="Radius" tooltip="Fillet arc radius" id="ConstraintValue" accept_expressions="0" min="0" use_reset="false"
                      enable_value="enable_by_preferences">
           <validator id="GeomValidators_Positive"/>
-        </doublevalue>
+        </labelvalue>
         <validator id="PartSet_FilletSelection"/>
       </feature>
       <!--  SketchConstraintSplit  -->

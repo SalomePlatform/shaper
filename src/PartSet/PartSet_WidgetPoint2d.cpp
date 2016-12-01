@@ -20,6 +20,7 @@
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_WidgetValidator.h>
+#include <ModuleBase_LabelValue.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -90,33 +91,34 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
   aGroupLay->setColumnStretch(1, 1);
   {
     QLabel* aLabel = new QLabel(myGroupBox);
-    aLabel->setText(tr("X "));
-    aGroupLay->addWidget(aLabel, 0, 0);
 
-    myXSpin = new ModuleBase_ParamSpinBox(myGroupBox);
-    myXSpin->setAcceptVariables(aAcceptVariables);
-    myXSpin->setMinimum(-DBL_MAX);
-    myXSpin->setMaximum(DBL_MAX);
-    myXSpin->setToolTip(tr("X"));
+    myXSpin = new ModuleBase_LabelValue(myGroupBox, tr("X"));
+    //ModuleBase_ParamSpinBox(myGroupBox);
+    //myXSpin->setAcceptVariables(aAcceptVariables);
+    //myXSpin->setMinimum(-DBL_MAX);
+    //myXSpin->setMaximum(DBL_MAX);
+    //myXSpin->setToolTip(tr("X"));
     aGroupLay->addWidget(myXSpin, 0, 1);
 
-    connect(myXSpin, SIGNAL(textChanged(const QString&)), this, SIGNAL(valuesModified()));
-    myXSpin->setValueEnabled(isValueEnabled());
+    //connect(myXSpin, SIGNAL(textChanged(const QString&)), this, SIGNAL(valuesModified()));
+    //myXSpin->setValueEnabled(isValueEnabled());
   }
   {
-    QLabel* aLabel = new QLabel(myGroupBox);
-    aLabel->setText(tr("Y "));
-    aGroupLay->addWidget(aLabel, 1, 0);
+    //QLabel* aLabel = new QLabel(myGroupBox);
+    //aLabel->setText(tr("Y "));
+    //aGroupLay->addWidget(aLabel, 1, 0);
 
-    myYSpin = new ModuleBase_ParamSpinBox(myGroupBox);
-    myYSpin->setAcceptVariables(aAcceptVariables);
-    myYSpin->setMinimum(-DBL_MAX);
-    myYSpin->setMaximum(DBL_MAX);
-    myYSpin->setToolTip(tr("Y"));
+    myYSpin = new ModuleBase_LabelValue(myGroupBox, tr("Y"));
+    //ModuleBase_ParamSpinBox(myGroupBox);
+    //myYSpin = new ModuleBase_ParamSpinBox(myGroupBox);
+    //myYSpin->setAcceptVariables(aAcceptVariables);
+    //myYSpin->setMinimum(-DBL_MAX);
+    //myYSpin->setMaximum(DBL_MAX);
+    //myYSpin->setToolTip(tr("Y"));
     aGroupLay->addWidget(myYSpin, 1, 1);
 
-    connect(myYSpin, SIGNAL(textChanged(const QString&)), this, SIGNAL(valuesModified()));
-    myYSpin->setValueEnabled(isValueEnabled());
+    //connect(myYSpin, SIGNAL(textChanged(const QString&)), this, SIGNAL(valuesModified()));
+    //myYSpin->setValueEnabled(isValueEnabled());
   }
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
@@ -174,7 +176,7 @@ bool PartSet_WidgetPoint2D::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr
 bool PartSet_WidgetPoint2D::resetCustom()
 {
   bool aDone = false;
-  if (!isUseReset() || isComputedDefault() || myXSpin->hasVariable() || myYSpin->hasVariable()) {
+  if (!isUseReset() || isComputedDefault() /*|| myXSpin->hasVariable() || myYSpin->hasVariable()*/) {
     aDone = false;
   }
   else {
@@ -189,8 +191,11 @@ bool PartSet_WidgetPoint2D::resetCustom()
       double aDefValue = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
       // it is important to block the spin box control in order to do not through out the
       // locking of the validating state.
-      ModuleBase_Tools::setSpinValue(myXSpin, isOk ? aDefValue : 0.0);
-      ModuleBase_Tools::setSpinValue(myYSpin, isOk ? aDefValue : 0.0);
+      myXSpin->setValue(isOk ? aDefValue : 0.0);
+      myYSpin->setValue(isOk ? aDefValue : 0.0);
+
+      //ModuleBase_Tools::setSpinValue(myXSpin, isOk ? aDefValue : 0.0);
+      //ModuleBase_Tools::setSpinValue(myYSpin, isOk ? aDefValue : 0.0);
       storeValueCustom();
       aDone = true;
     }
@@ -225,7 +230,7 @@ bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrsPtr>& theValu
 
 void PartSet_WidgetPoint2D::selectContent()
 {
-  myXSpin->selectAll();
+ // myXSpin->selectAll();
 }
 
 bool PartSet_WidgetPoint2D::setPoint(double theX, double theY)
@@ -235,8 +240,11 @@ bool PartSet_WidgetPoint2D::setPoint(double theX, double theY)
   if (fabs(theY) >= MaxCoordinate)
     return false;
 
-  ModuleBase_Tools::setSpinValue(myXSpin, theX);
-  ModuleBase_Tools::setSpinValue(myYSpin, theY);
+  myXSpin->setValue(theX);
+  myYSpin->setValue(theY);
+
+  //ModuleBase_Tools::setSpinValue(myXSpin, theX);
+  //ModuleBase_Tools::setSpinValue(myYSpin, theY);
 
   storeValue();
   return true;
@@ -256,10 +264,11 @@ bool PartSet_WidgetPoint2D::storeValueCustom()
 
   // if text is not empty then setValue will be ignored
   // so we should set the text at first
-  aPoint->setText(myXSpin->hasVariable() ? myXSpin->text().toStdString() : "",
-                  myYSpin->hasVariable() ? myYSpin->text().toStdString() : "");
-  aPoint->setValue(!myXSpin->hasVariable() ? myXSpin->value() : aPoint->x(),
-                   !myYSpin->hasVariable() ? myYSpin->value() : aPoint->y());
+  //aPoint->setText(myXSpin->hasVariable() ? myXSpin->text().toStdString() : "",
+  //                myYSpin->hasVariable() ? myYSpin->text().toStdString() : "");
+  //aPoint->setValue(!myXSpin->hasVariable() ? myXSpin->value() : aPoint->x(),
+  //                 !myYSpin->hasVariable() ? myYSpin->value() : aPoint->y());
+  aPoint->setValue(myXSpin->value(), myYSpin->value());
 
   // after movement the solver will call the update event: optimization
   moveObject(myFeature);
@@ -280,22 +289,26 @@ bool PartSet_WidgetPoint2D::restoreValueCustom()
   bool isDouble = false;
   double aVal = 0;
   if (aTextX.isEmpty()) {
-    ModuleBase_Tools::setSpinValue(myXSpin, aPoint->x());
+    myXSpin->setValue(aPoint->x());
+    //ModuleBase_Tools::setSpinValue(myXSpin, aPoint->x());
   } else {
     aVal = aTextX.toDouble(&isDouble);
-    if (isDouble)
+    myXSpin->setValue(aVal);
+    /*if (isDouble)
       ModuleBase_Tools::setSpinValue(myXSpin, aVal);
     else
-      ModuleBase_Tools::setSpinText(myXSpin, aTextX);
+      ModuleBase_Tools::setSpinText(myXSpin, aTextX);*/
   }
   if (aTextY.isEmpty()) {
-    ModuleBase_Tools::setSpinValue(myYSpin, aPoint->y());
+    myYSpin->setValue(aPoint->y());
+    //ModuleBase_Tools::setSpinValue(myYSpin, aPoint->y());
   } else {
     aVal = aTextY.toDouble(&isDouble);
-    if (isDouble)
-      ModuleBase_Tools::setSpinValue(myYSpin, aVal);
-    else
-      ModuleBase_Tools::setSpinText(myYSpin, aTextY);
+    myYSpin->setValue(aVal);
+    //if (isDouble)
+    //  ModuleBase_Tools::setSpinValue(myYSpin, aVal);
+    //else
+    //  ModuleBase_Tools::setSpinText(myYSpin, aTextY);
   }
   //if (aTextX.empty() || aTextY.empty()) {
   //  ModuleBase_Tools::setSpinValue(myXSpin, aPoint->x());
@@ -310,8 +323,8 @@ bool PartSet_WidgetPoint2D::restoreValueCustom()
 void PartSet_WidgetPoint2D::storeCurentValue()
 {
   // do not use cash if a variable is used
-  if (myXSpin->hasVariable() || myYSpin->hasVariable())
-    return;
+  //if (myXSpin->hasVariable() || myYSpin->hasVariable())
+  //  return;
 
   myValueIsCashed = true;
   myIsFeatureVisibleInCash = XGUI_Displayer::isVisible(
@@ -329,8 +342,10 @@ bool PartSet_WidgetPoint2D::restoreCurentValue()
 
   myValueIsCashed = false;
   myIsFeatureVisibleInCash = true;
-  ModuleBase_Tools::setSpinValue(myXSpin, myXValueInCash);
-  ModuleBase_Tools::setSpinValue(myYSpin, myYValueInCash);
+  myXSpin->setValue(myXValueInCash);
+  myYSpin->setValue(myYValueInCash);
+  //ModuleBase_Tools::setSpinValue(myXSpin, myXValueInCash);
+  //ModuleBase_Tools::setSpinValue(myYSpin, myYValueInCash);
 
   // store value to the model
   storeValueCustom();
@@ -365,6 +380,10 @@ void PartSet_WidgetPoint2D::activateCustom()
     if (aFeature.get() && aFeature->getKind() == SketchPlugin_Point::ID())
       storeValue();
   }
+}
+
+void PartSet_WidgetPoint2D::setHighlighted(bool isHighlighted)
+{
 }
 
 void PartSet_WidgetPoint2D::deactivate()
@@ -667,7 +686,8 @@ void PartSet_WidgetPoint2D::initializeValueByActivate()
 
 bool PartSet_WidgetPoint2D::processEnter()
 {
-  bool isModified = getValueState() == ModifiedInPP;
+  return false;
+  /*bool isModified = getValueState() == ModifiedInPP;
   if (isModified) {
     bool isXModified = myXSpin->hasFocus();
     emit valuesChanged();
@@ -676,7 +696,7 @@ bool PartSet_WidgetPoint2D::processEnter()
     else
       myYSpin->selectAll();
   }
-  return isModified;
+  return isModified;*/
 }
 
 bool PartSet_WidgetPoint2D::useSelectedShapes() const

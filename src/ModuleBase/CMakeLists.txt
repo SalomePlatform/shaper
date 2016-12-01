@@ -22,6 +22,7 @@ SET(PROJECT_HEADERS
   ModuleBase_IViewer.h
   ModuleBase_IWidgetCreator.h
   ModuleBase_IWorkshop.h
+  ModuleBase_LabelValue.h
   ModuleBase_ModelWidget.h
   ModuleBase_Operation.h
   ModuleBase_OperationAction.h
@@ -53,6 +54,7 @@ SET(PROJECT_HEADERS
   ModuleBase_WidgetFileSelector.h
   ModuleBase_WidgetIntValue.h
   ModuleBase_WidgetLabel.h
+  ModuleBase_WidgetLabelValue.h
   ModuleBase_WidgetLineEdit.h
   ModuleBase_WidgetMultiSelector.h
   ModuleBase_WidgetOptionalBox.h
@@ -84,6 +86,7 @@ SET(PROJECT_SOURCES
   ModuleBase_IViewer.cpp
   ModuleBase_IWidgetCreator.cpp
   ModuleBase_IWorkshop.cpp
+  ModuleBase_LabelValue.cpp
   ModuleBase_ModelWidget.cpp
   ModuleBase_Operation.cpp
   ModuleBase_OperationAction.cpp
@@ -114,6 +117,7 @@ SET(PROJECT_SOURCES
   ModuleBase_WidgetFileSelector.cpp
   ModuleBase_WidgetIntValue.cpp
   ModuleBase_WidgetLabel.cpp
+  ModuleBase_WidgetLabelValue.cpp
   ModuleBase_WidgetLineEdit.cpp
   ModuleBase_WidgetMultiSelector.cpp
   ModuleBase_WidgetOptionalBox.cpp

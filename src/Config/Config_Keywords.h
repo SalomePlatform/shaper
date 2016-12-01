@@ -27,6 +27,7 @@ const static char* PROPERTY_PANEL_ID = "property_panel_id";
 // Widgets
 const static char* WDG_INFO = "label";
 const static char* WDG_DOUBLEVALUE = "doublevalue";
+const static char* WDG_DOUBLEVALUELABEL = "labelvalue";
 const static char* WDG_INTEGERVALUE = "integervalue";
 const static char* WDG_BOOLVALUE = "boolvalue";
 const static char* WDG_STRINGVALUE = "stringvalue";

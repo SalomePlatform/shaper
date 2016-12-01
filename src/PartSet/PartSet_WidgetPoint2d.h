@@ -22,6 +22,7 @@ class ModelAPI_Feature;
 class ModuleBase_IWorkshop;
 class ModuleBase_ParamSpinBox;
 class ModuleBase_IViewWindow;
+class ModuleBase_LabelValue;
 class GeomAPI_Pnt2d;
 class ModuleBase_IWorkshop;
 
@@ -138,6 +139,9 @@ protected:
   /// The methiod called when widget is activated
   virtual void activateCustom();
 
+  //! Switch On/Off highlighting of the widget
+  virtual void setHighlighted(bool isHighlighted);
+
   /// Returns true if the feature contains Point2D attribute with the same coordinates
   /// The attribute of the widget is not processed.
   /// \param theFeature a feature
@@ -197,8 +201,10 @@ protected:
 private:
 
   QGroupBox* myGroupBox;  ///< the parent group box for all intenal widgets
-  ModuleBase_ParamSpinBox* myXSpin;  ///< the spin box for the X coordinate
-  ModuleBase_ParamSpinBox* myYSpin;  ///< the spin box for the Y coordinate
+  //ModuleBase_ParamSpinBox* myXSpin;  ///< the spin box for the X coordinate
+  //ModuleBase_ParamSpinBox* myYSpin;  ///< the spin box for the Y coordinate
+  ModuleBase_LabelValue* myXSpin; ///< the label for the X coordinate
+  ModuleBase_LabelValue* myYSpin; ///< the label for the Y coordinate
 
    /// value used as selection in mouse release method
   std::shared_ptr<ModuleBase_ViewerPrs> myPreSelected;
