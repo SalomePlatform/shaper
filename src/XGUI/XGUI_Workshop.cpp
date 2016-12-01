@@ -24,6 +24,7 @@
 #include <XGUI_CustomPrs.h>
 #include <XGUI_HistoryMenu.h>
 #include <XGUI_QtEvents.h>
+#include <XGUI_DataModel.h>
 
 #ifndef HAVE_SALOME
 #include <AppElements_Button.h>
@@ -2028,6 +2029,10 @@ void XGUI_Workshop::closeDocument()
   objectBrowser()->clearContent();
 
   module()->closeDocument();
+
+  // data model need not process the document's signals about objects modifications as
+  // the document is closed
+  objectBrowser()->dataModel()->stopEventsProcessing();
 
   SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->closeAll();

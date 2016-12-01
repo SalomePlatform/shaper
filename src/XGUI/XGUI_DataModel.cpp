@@ -62,7 +62,8 @@ ModelAPI_Document* getSubDocument(void* theObj)
 
 
 // Constructor *************************************************
-XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParent)
+XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParent),
+  myIsEventsProcessingStopped(false)
 {
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
@@ -79,6 +80,8 @@ XGUI_DataModel::~XGUI_DataModel()
 //******************************************************
 void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
+  if (myIsEventsProcessingStopped)
+    return;
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   std::string aRootType = myXMLReader->rootType();
   std::string aSubType = myXMLReader->subType();
