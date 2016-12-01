@@ -117,7 +117,15 @@ add_custom_target(uninstall
 endif (CMAKE_GENERATOR MATCHES "NMake Makefiles")
 
 # Add special Git hooks
-if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
-  configure_file("${CMAKE_SOURCE_DIR}/GitHooks/pre-commit.in"
-                 "${CMAKE_SOURCE_DIR}/.git/hooks/pre-commit")
+if((EXISTS "${CMAKE_SOURCE_DIR}/.git") AND (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git"))
+  if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/.git")
+    set(GIT_SUBMODULE_PATH ".git")
+  else()
+    file(READ "${CMAKE_CURRENT_SOURCE_DIR}/.git" GIT_SUBMODULE_PATH)
+    string(REGEX REPLACE "gitdir: " "" GIT_SUBMODULE_PATH "${GIT_SUBMODULE_PATH}")
+    string(REGEX REPLACE "\n" "" GIT_SUBMODULE_PATH "${GIT_SUBMODULE_PATH}")
+  endif()
+
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/GitHooks/pre-commit.in"
+                 "${CMAKE_CURRENT_SOURCE_DIR}/${GIT_SUBMODULE_PATH}/hooks/pre-commit")
 endif()
