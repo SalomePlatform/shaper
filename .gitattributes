@@ -8,6 +8,7 @@
 *.cpp       eol=lf
 *.cxx       eol=lf
 *.hxx       eol=lf
+*.i         eol=lf
 *.cls       eol=lf
 *.sty       eol=lf
 *.tex       eol=lf
