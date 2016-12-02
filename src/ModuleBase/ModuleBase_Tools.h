@@ -22,6 +22,7 @@
 
 #include <QIcon>
 #include <QPixmap>
+#include <QLocale>
 
 #include <map>
 
@@ -253,6 +254,11 @@ MODULEBASE_EXPORT void blockUpdateViewer(const bool theValue);
 /// \param theMaxLineInPixels a maximum line width in pixels
 MODULEBASE_EXPORT QString wrapTextByWords(const QString& theValue, QWidget* theWidget,
                                              int theMaxLineInPixels = 150);
+
+/// Generates a locale to disable thousands separator for spin box
+/// (to avoid inconsistency of double-2-string and string-2-double conversion)
+/// \return locale
+MODULEBASE_EXPORT QLocale doubleLocale();
 
 /// Returns a container of referenced feature to the current object in the object document.
 /// \param theObject an object, which will be casted to a feature type

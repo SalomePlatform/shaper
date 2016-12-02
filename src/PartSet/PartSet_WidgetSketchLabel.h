@@ -27,6 +27,7 @@ class XGUI_OperationMgr;
 class XGUI_Workshop;
 class QCheckBox;
 class QStackedWidget;
+class QLineEdit;
 
 /**
 * \ingroup Modules
@@ -182,7 +183,9 @@ private:
 
   QMap<PartSet_Tools::ConstraintVisibleState, QCheckBox*> myShowConstraints;
 
+  QWidget* mySizeOfViewWidget;
   QStackedWidget* myStackWidget;
+  QLineEdit* mySizeOfView;
 };
 
 #endif

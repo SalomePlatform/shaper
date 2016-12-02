@@ -6,6 +6,7 @@
 
 #include <ModuleBase_LabelValue.h>
 #include <ModuleBase_IconFactory.h>
+#include <ModuleBase_Tools.h>
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -31,14 +32,7 @@ ModuleBase_LabelValue::ModuleBase_LabelValue(QWidget* theParent, const QString& 
   myLabelValue = new QLabel("", this);
   aLayout->addWidget(myLabelValue, 1);
 
-  // VSR 01/07/2010: Disable thousands separator for spin box
-  // (to avoid inconsistency of double-2-string and string-2-double conversion)
-  QLocale loc;
-  loc.setNumberOptions(loc.numberOptions() |
-                       QLocale::OmitGroupSeparator |
-                       QLocale::RejectGroupSeparator);
-  setLocale(loc);
-
+  setLocale(ModuleBase_Tools::doubleLocale());
   aLayout->addStretch(1);
 }
 
@@ -52,5 +46,5 @@ void ModuleBase_LabelValue::setValue(const double theValue)
 
   QString aStrValue = locale().toString(theValue, myPrecision >= 0 ? 'f' : 'g', qAbs(myPrecision));
   myLabelValue->setText(aStrValue);
-  myLabelValue->setToolTip(QString::number(theValue));
+  myLabelValue->setToolTip(aStrValue);
 }

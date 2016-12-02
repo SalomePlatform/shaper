@@ -966,6 +966,18 @@ QString wrapTextByWords(const QString& theValue, QWidget* theWidget,
 }
 
 //**************************************************************
+QLocale doubleLocale()
+{
+  // VSR 01/07/2010: Disable thousands separator for spin box
+  // (to avoid inconsistency of double-2-string and string-2-double conversion)
+  QLocale aLocale;
+  aLocale.setNumberOptions(aLocale.numberOptions() |
+                           QLocale::OmitGroupSeparator |
+                           QLocale::RejectGroupSeparator);
+  return aLocale;
+}
+
+//**************************************************************
 void refsToFeatureInFeatureDocument(const ObjectPtr& theObject,
                                     std::set<FeaturePtr>& theRefFeatures)
 {

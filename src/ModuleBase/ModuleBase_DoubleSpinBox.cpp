@@ -4,6 +4,7 @@
 // Author:    Sergey TELKOV
 //
 #include "ModuleBase_DoubleSpinBox.h"
+#include "ModuleBase_Tools.h"
 
 #include <QLineEdit>
 #include <QDoubleValidator>
@@ -61,13 +62,7 @@ ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePr
       myCleared(false),
       myIsEmitKeyPressEvent(false)
 {
-  // VSR 01/07/2010: Disable thousands separator for spin box
-  // (to avoid inconsistency of double-2-string and string-2-double conversion)
-  QLocale loc;
-  loc.setNumberOptions(loc.numberOptions() |
-                       QLocale::OmitGroupSeparator |
-                       QLocale::RejectGroupSeparator);
-  setLocale(loc);
+  setLocale(ModuleBase_Tools::doubleLocale());
 
   // MPV 15/09/2014: this must be set before setDecimals;
   // otherwise in release mode setDecimals may crash

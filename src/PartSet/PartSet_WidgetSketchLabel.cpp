@@ -44,6 +44,7 @@
 #include <gp_Dir.hxx>
 #include <AIS_Shape.hxx>
 #include <AIS_DimensionSelectionMode.hxx>
+#include <Bnd_Box.hxx>
 
 #include <Config_WidgetAPI.h>
 #include <Config_PropManager.h>
@@ -51,11 +52,17 @@
 #include <QLabel>
 #include <QApplication>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QPushButton>
 #include <QStackedWidget>
+#include <QLineEdit>
+#include <QDoubleValidator>
 
+#ifndef DBL_MAX
+#define DBL_MAX 1.7976931348623158e+308
+#endif
 
 PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
                         ModuleBase_IWorkshop* theWorkshop,
@@ -73,6 +80,18 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   // Define label for plane selection
   QWidget* aFirstWgt = new QWidget(this);
 
+  // Size of the View control
+  mySizeOfViewWidget = new QWidget(aFirstWgt);
+  QHBoxLayout* aSizeLayout = new QHBoxLayout(mySizeOfViewWidget);
+  aSizeLayout->addWidget(new QLabel("Size of the view", aFirstWgt));
+  mySizeOfView = new QLineEdit(aFirstWgt);
+
+  QDoubleValidator* aValidator = new QDoubleValidator(0, DBL_MAX, 12, mySizeOfView);
+  aValidator->setLocale(ModuleBase_Tools::doubleLocale());
+  aValidator->setNotation(QDoubleValidator::StandardNotation);
+  mySizeOfView->setValidator(aValidator);
+  aSizeLayout->addWidget(mySizeOfView);
+
   QString aText = QString::fromStdString(theData->getProperty("title"));
   QLabel* aLabel = new QLabel(aText, aFirstWgt);
   aLabel->setWordWrap(true);
@@ -82,6 +101,7 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
 
   aLayout = new QVBoxLayout(aFirstWgt);
   ModuleBase_Tools::zeroMargins(aLayout);
+  aLayout->addWidget(mySizeOfViewWidget);
   aLayout->addWidget(aLabel);
 
   myStackWidget->addWidget(aFirstWgt);
@@ -279,6 +299,20 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
       if (aModule)
         aModule->onViewTransformed();
     }
+    QString aSizeOfViewStr = mySizeOfView->text();
+    if (!aSizeOfViewStr.isEmpty()) {
+      bool isOk;
+      double aSizeOfView = aSizeOfViewStr.toDouble(&isOk);
+      if (isOk && aSizeOfView > 0) {
+        Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
+        if (!aView3d.IsNull()) {
+          Bnd_Box aBndBox;
+          double aHalfSize = aSizeOfView/2.0;
+          aBndBox.Update(-aHalfSize, -aHalfSize, -aHalfSize, aHalfSize, aHalfSize, aHalfSize);
+          aView3d->FitAll(aBndBox, 0.01, false);
+        }
+      }
+    }
   }
   // 3. Clear text in the label
   myStackWidget->setCurrentIndex(1);
@@ -436,7 +470,11 @@ void PartSet_WidgetSketchLabel::activateCustom()
   if (!aBodyIsVisualized) {
     // We have to select a plane before any operation
     myPreviewPlanes->showPreviewPlanes(myWorkshop);
+    mySizeOfViewWidget->setVisible(true);
   }
+  else
+    mySizeOfViewWidget->setVisible(false);
+
   activateSelection(true);
 
   //myLabel->setText(myText);
