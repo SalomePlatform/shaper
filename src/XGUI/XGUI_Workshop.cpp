@@ -2032,10 +2032,12 @@ void XGUI_Workshop::closeDocument()
 
   // data model need not process the document's signals about objects modifications as
   // the document is closed
-  objectBrowser()->dataModel()->stopEventsProcessing();
+  bool isBlocked = objectBrowser()->dataModel()->blockEventsProcessing(true);
 
   SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->closeAll();
+
+  objectBrowser()->dataModel()->blockEventsProcessing(isBlocked);
 }
 
 void XGUI_Workshop::addHistoryMenu(QObject* theObject, const char* theSignal, const char* theSlot)

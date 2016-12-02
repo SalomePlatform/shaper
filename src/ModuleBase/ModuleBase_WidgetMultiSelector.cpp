@@ -395,7 +395,40 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
   activateSelectionAndFilters(true);
 
-  clearSelection();
+  if (!myFeature)
+    return;
+  /// store the selected type
+  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  std::string aType = anAttribute->attributeType();
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
+    aSelectionListAttr->setSelectionType(myTypeCombo->currentText().toStdString());
+  }
+
+  // clear attribute values
+  DataPtr aData = myFeature->data();
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
+    aSelectionListAttr->clear();
+  }
+  else if (aType == ModelAPI_AttributeRefList::typeId()) {
+    AttributeRefListPtr aRefListAttr = aData->reflist(attributeID());
+    aRefListAttr->clear();
+  }
+  else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
+    AttributeRefAttrListPtr aRefAttrListAttr = aData->refattrlist(attributeID());
+    aRefAttrListAttr->clear();
+  }
+
+  // update object is necessary to flush update signal. It leads to objects references map update
+  // and the operation presentation will not contain deleted items visualized as parameters of
+  // the feature.
+  updateObject(myFeature);
+  restoreValue();
+  myWorkshop->setSelected(getAttributeSelection());
+  // may be the feature's result is not displayed, but attributes should be
+  myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeArguments,
+                            true); /// hope that something is redisplayed by object updated
 }
 
 //********************************************************************

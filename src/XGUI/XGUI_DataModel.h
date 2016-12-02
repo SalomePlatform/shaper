@@ -126,7 +126,7 @@ public:
   void setXMLReader(Config_DataModelReader* theReader) { myXMLReader = theReader; }
 
   /// Do not processing anymore events of model loop
-  void stopEventsProcessing() { myIsEventsProcessingStopped = true; }
+  bool blockEventsProcessing(const bool theState);
 
 signals:
   /// Signal about tree had been rebuilt
@@ -165,7 +165,7 @@ private:
 
   Config_DataModelReader* myXMLReader;
 
-  bool myIsEventsProcessingStopped;
+  bool myIsEventsProcessingBlocked;
 };
 
 #endif

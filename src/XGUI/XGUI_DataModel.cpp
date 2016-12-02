@@ -63,7 +63,7 @@ ModelAPI_Document* getSubDocument(void* theObj)
 
 // Constructor *************************************************
 XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParent),
-  myIsEventsProcessingStopped(false)
+  myIsEventsProcessingBlocked(false)
 {
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
@@ -80,7 +80,7 @@ XGUI_DataModel::~XGUI_DataModel()
 //******************************************************
 void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
-  if (myIsEventsProcessingStopped)
+  if (myIsEventsProcessingBlocked)
     return;
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   std::string aRootType = myXMLReader->rootType();
@@ -962,4 +962,12 @@ void XGUI_DataModel::rebuildBranch(int theRow, int theCount, const QModelIndex& 
     removeRows(theRow, theCount, theParent);
     insertRows(theRow, theCount, theParent);
   }
+}
+
+//******************************************************
+bool XGUI_DataModel::blockEventsProcessing(const bool theState)
+{
+  bool aPreviousState = myIsEventsProcessingBlocked;
+  myIsEventsProcessingBlocked = theState;
+  return aPreviousState;
 }
