@@ -47,6 +47,11 @@ public:
   /// \return boolean value
   bool isPreviewDisplayed() const { return myPreviewDisplayed; }
 
+  /// Returns true if the shape is one of the preview shapes
+  /// \param theShape a shape to be checked
+  /// \return boolean value
+  bool isPreviewShape(std::shared_ptr<GeomAPI_Shape> theShape);
+
   /// Erase preview planes
   /// \param theWorkshop the application workshop
   void erasePreviewPlanes(ModuleBase_IWorkshop* theWorkshop);

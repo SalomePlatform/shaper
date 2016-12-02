@@ -47,6 +47,7 @@
 
 #include <QLabel>
 #include <QLineEdit>
+#include <QDoubleValidator>
 //#include <QFormLayout>
 #include <QVBoxLayout>
 #include <QMessageBox>
@@ -71,8 +72,22 @@ PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
   QString aLabelText = QString::fromStdString(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
 
+  // Size of the View control
+  mySizeOfViewWidget = new QWidget(this);
+  QHBoxLayout* aSizeLayout = new QHBoxLayout(mySizeOfViewWidget);
+  aSizeLayout->addWidget(new QLabel("Size of the view", mySizeOfViewWidget));
+  mySizeOfView = new QLineEdit(mySizeOfViewWidget);
+
+  QDoubleValidator* aValidator = new QDoubleValidator(0, DBL_MAX, 12, mySizeOfView);
+  aValidator->setLocale(ModuleBase_Tools::doubleLocale());
+  aValidator->setNotation(QDoubleValidator::StandardNotation);
+  mySizeOfView->setValidator(aValidator);
+  aSizeLayout->addWidget(mySizeOfView);
+
   myLabel = new QLabel(aLabelText, this);
   myLabel->setWordWrap(true);
+
+  aLayout->addWidget(mySizeOfViewWidget);
   aLayout->addWidget(myLabel);
   aLayout->addStretch(1);
 
@@ -201,7 +216,12 @@ void PartSet_WidgetSketchCreator::setVisibleSelectionControl(const bool theSelec
     if (!aBodyIsVisualized && !aSketchIsVisualized) {
       // We have to select a plane before any operation
       myPreviewPlanes->showPreviewPlanes(myWorkshop);
+      mySizeOfViewWidget->setVisible(true);
     }
+    else {
+      mySizeOfViewWidget->setVisible(false);
+    }
+
   } else {
     bool aHidePreview = myPreviewPlanes->isPreviewDisplayed();
     myPreviewPlanes->erasePreviewPlanes(myWorkshop);
@@ -322,7 +342,24 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(
       return aSketchStarted;
   }
   aSketchStarted = true;
-
+  // Set View size if a plane is selected
+  if (myPreviewPlanes->isPreviewDisplayed() &&
+      myPreviewPlanes->isPreviewShape(aValue->shape())) {
+    QString aSizeOfViewStr = mySizeOfView->text();
+    if (!aSizeOfViewStr.isEmpty()) {
+      bool isOk;
+      double aSizeOfView = aSizeOfViewStr.toDouble(&isOk);
+      if (isOk && aSizeOfView > 0) {
+        Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
+        if (!aView3d.IsNull()) {
+          Bnd_Box aBndBox;
+          double aHalfSize = aSizeOfView/2.0;
+          aBndBox.Update(-aHalfSize, -aHalfSize, -aHalfSize, aHalfSize, aHalfSize, aHalfSize);
+          aView3d->FitAll(aBndBox, 0.01, false);
+        }
+      }
+    }
+  }
   // manually deactivation because the widget was not activated as has no focus acceptin controls
   deactivate();
   bool aHidePreview = myPreviewPlanes->isPreviewDisplayed();

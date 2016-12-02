@@ -83,8 +83,8 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   // Size of the View control
   mySizeOfViewWidget = new QWidget(aFirstWgt);
   QHBoxLayout* aSizeLayout = new QHBoxLayout(mySizeOfViewWidget);
-  aSizeLayout->addWidget(new QLabel("Size of the view", aFirstWgt));
-  mySizeOfView = new QLineEdit(aFirstWgt);
+  aSizeLayout->addWidget(new QLabel("Size of the view", mySizeOfViewWidget));
+  mySizeOfView = new QLineEdit(mySizeOfViewWidget);
 
   QDoubleValidator* aValidator = new QDoubleValidator(0, DBL_MAX, 12, mySizeOfView);
   aValidator->setLocale(ModuleBase_Tools::doubleLocale());
@@ -103,6 +103,7 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   ModuleBase_Tools::zeroMargins(aLayout);
   aLayout->addWidget(mySizeOfViewWidget);
   aLayout->addWidget(aLabel);
+  aLayout->addStretch(1);
 
   myStackWidget->addWidget(aFirstWgt);
 

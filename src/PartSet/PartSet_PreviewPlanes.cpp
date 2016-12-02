@@ -73,6 +73,13 @@ bool PartSet_PreviewPlanes::hasVisualizedSketch(ModuleBase_IWorkshop* theWorksho
   return aSketchIsVisualized;
 }
 
+bool PartSet_PreviewPlanes::isPreviewShape(std::shared_ptr<GeomAPI_Shape> theShape)
+{
+  return (myYZPlane->getShape()->isEqual(theShape) ||
+          myXZPlane->getShape()->isEqual(theShape) ||
+          myXYPlane->getShape()->isEqual(theShape));
+}
+
 void PartSet_PreviewPlanes::erasePreviewPlanes(ModuleBase_IWorkshop* theWorkshop)
 {
   if (myPreviewDisplayed) {

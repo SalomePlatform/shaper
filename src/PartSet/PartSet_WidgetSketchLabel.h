@@ -183,9 +183,9 @@ private:
 
   QMap<PartSet_Tools::ConstraintVisibleState, QCheckBox*> myShowConstraints;
 
-  QWidget* mySizeOfViewWidget;
+  QWidget* mySizeOfViewWidget; ///< Size of view widget, visualized if preview planes are shown
+  QLineEdit* mySizeOfView; ///< Value of square of size of View
   QStackedWidget* myStackWidget;
-  QLineEdit* mySizeOfView;
 };
 
 #endif
