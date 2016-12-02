@@ -46,7 +46,7 @@ SketchAPI_Translation::~SketchAPI_Translation()
 
 }
 
-std::list<std::shared_ptr<ModelHighAPI_Interface> > SketchAPI_Translation::translated() const
+std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Translation::translated() const
 {
   std::list<ObjectPtr> aList = translatedObjects()->list();
   // remove all initial features
@@ -82,12 +82,32 @@ void SketchAPI_Translation::dump(ModelHighAPI_Dumper& theDumper) const
 
   // Dump variables for a list of translated features
   theDumper << "[";
-  std::list<std::shared_ptr<ModelHighAPI_Interface> > aList = translated();
-  std::list<std::shared_ptr<ModelHighAPI_Interface> >::const_iterator anIt = aList.begin();
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > aList = translated();
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> >::const_iterator anIt = aList.begin();
   for (; anIt != aList.end(); ++anIt) {
     if (anIt != aList.begin())
       theDumper << ", ";
     theDumper << theDumper.name((*anIt)->feature(), false);
   }
   theDumper << "] = " << theDumper.name(aBase) << ".translated()" << std::endl;
+
+  // Set necessary "auxiliary" flag for translated features
+  // (flag is set if it differs to base entity)
+  std::list<ObjectPtr> aTransList = aTransObjects->list();
+  std::list<ObjectPtr>::const_iterator aTrIt = aTransList.begin();
+  anIt = aList.begin();
+  for (; aTrIt != aTransList.end(); ++aTrIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*aTrIt);
+    if (!aFeature)
+      continue;
+    bool aBaseAux = aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
+
+    for (int i = 1; i < aNbCopies->value(); ++i, ++anIt) {
+      aFeature = (*anIt)->feature();
+      bool aFeatAux = aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
+      if (aFeatAux != aBaseAux)
+        theDumper << theDumper.name((*anIt)->feature(), false)
+                  << ".setAuxiliary(" << aFeatAux << ")" <<std::endl;
+    }
+  }
 }

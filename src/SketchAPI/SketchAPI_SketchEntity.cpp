@@ -73,22 +73,22 @@ bool SketchAPI_SketchEntity::isCopy() const
   return isCopy.get() && isCopy->value();
 }
 
-std::list<std::shared_ptr<ModelHighAPI_Interface> >
+std::list<std::shared_ptr<SketchAPI_SketchEntity> >
 SketchAPI_SketchEntity::wrap(const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures)
 {
-  std::list<std::shared_ptr<ModelHighAPI_Interface> > aResult;
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > aResult;
   std::list<std::shared_ptr<ModelAPI_Feature> >::const_iterator anIt = theFeatures.begin();
   for (; anIt != theFeatures.end(); ++anIt) {
     if ((*anIt)->getKind() == SketchPlugin_Line::ID())
-      aResult.push_back(std::shared_ptr<ModelHighAPI_Interface>(new SketchAPI_Line(*anIt)));
+      aResult.push_back(std::shared_ptr<SketchAPI_SketchEntity>(new SketchAPI_Line(*anIt)));
     else if ((*anIt)->getKind() == SketchPlugin_Arc::ID())
-      aResult.push_back(std::shared_ptr<ModelHighAPI_Interface>(new SketchAPI_Arc(*anIt)));
+      aResult.push_back(std::shared_ptr<SketchAPI_SketchEntity>(new SketchAPI_Arc(*anIt)));
     else if ((*anIt)->getKind() == SketchPlugin_Circle::ID())
-      aResult.push_back(std::shared_ptr<ModelHighAPI_Interface>(new SketchAPI_Circle(*anIt)));
+      aResult.push_back(std::shared_ptr<SketchAPI_SketchEntity>(new SketchAPI_Circle(*anIt)));
     else if ((*anIt)->getKind() == SketchPlugin_Point::ID())
-      aResult.push_back(std::shared_ptr<ModelHighAPI_Interface>(new SketchAPI_Point(*anIt)));
+      aResult.push_back(std::shared_ptr<SketchAPI_SketchEntity>(new SketchAPI_Point(*anIt)));
     else if ((*anIt)->getKind() == SketchPlugin_IntersectionPoint::ID())
-      aResult.push_back(std::shared_ptr<ModelHighAPI_Interface>(
+      aResult.push_back(std::shared_ptr<SketchAPI_SketchEntity>(
                                                     new SketchAPI_IntersectionPoint(*anIt)));
   }
   return aResult;
