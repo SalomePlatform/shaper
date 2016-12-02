@@ -55,7 +55,7 @@ public:
   * \param theParams a list of parameters (can be empty)
   */
   static CONFIG_EXPORT std::string translate(const std::string& theContext,
-    const std::string& theMessage, 
+    const std::string& theMessage,
     const std::list<std::string>& theParams = std::list<std::string>());
 
 
