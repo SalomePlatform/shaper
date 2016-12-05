@@ -155,7 +155,8 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
 
   std::string aText = Config_Translator::translate(anId, getProperty(theFeatureNode, FEATURE_TEXT));
   outFeatureMessage->setText(aText);
-  std::string aToolTip = Config_Translator::translate(anId, getProperty(theFeatureNode, FEATURE_TOOLTIP));
+  std::string aToolTip = Config_Translator::translate(anId,
+                                                      getProperty(theFeatureNode, FEATURE_TOOLTIP));
   outFeatureMessage->setTooltip(aToolTip);
   outFeatureMessage->setIcon(getProperty(theFeatureNode, FEATURE_ICON));
   outFeatureMessage->setKeysequence(getProperty(theFeatureNode, FEATURE_KEYSEQUENCE));
