@@ -19,6 +19,7 @@
 #include <GeomAlgoAPI_XAOImport.h>
 
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -213,6 +214,30 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
     std::string aSelectionType =
       ExchangePlugin_Tools::xaoDimension2selectionType(aDimensionString);
     aSelectionList->setSelectionType(aSelectionType);
+    // limitation: now in XAO fields are related to everything, so, iterate all sub-shapes to fill
+    int aCountSelected = aXaoField->countElements();
+    int aResults = document()->size(ModelAPI_ResultBody::group());
+    for(int a = 0; a < aResults && aCountSelected; a++) {
+      ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(
+        document()->object(ModelAPI_ResultBody::group(), a));
+      if (!aBody.get())
+        continue;
+      // check that only results that were created before this field are used
+      FeaturePtr aResultFeature = document()->feature(aBody);
+      if (!aResultFeature.get())
+        continue;
+      GeomShapePtr aShape = aBody->shape();
+      if (!aShape.get() || aShape->isNull())
+        continue;
+      GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::shapeTypeByStr(aSelectionType));
+      for(; anExp.more(); anExp.next()) {
+        aSelectionList->append(aBody, anExp.current());
+        aCountSelected--;
+        if (aCountSelected == 0)
+          break;
+      }
+    }
+
     // conversion of type
     XAO::Type aFieldType = aXaoField->getType();
     std::string aTypeString = XAO::XaoUtils::fieldTypeToString(aFieldType);

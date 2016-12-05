@@ -64,7 +64,8 @@ def testImportXAO():
     assert modelAPI_ResultBody(anImportFeature.firstResult())
     assert anImportFeature.firstResult().data().name() == "mygeom_1"
     aCompositeFeature = featureToCompositeFeature(anImportFeature)
-    assert aCompositeFeature.numberOfSubs(False) == 2
+    # Two groups and one field
+    assert aCompositeFeature.numberOfSubs(False) == 3
 
     aFeature1 = aCompositeFeature.subFeature(0, False)
     assert aFeature1.getKind() == "Group"
@@ -86,6 +87,16 @@ def testImportXAO():
     print aSelectionList.value(1).namingName("")
     assert aSelectionList.value(1).namingName("") == "mygeom_1/Shape2"
 
+    aFeature3 = aCompositeFeature.subFeature(2, False)
+    assert aFeature3.getKind() == "Field"
+    assert aFeature3.name() == "color"
+    assert aFeature3.intArray("stamps").size() == 2
+    assert aFeature3.tables("values").rows() == 2
+    assert aFeature3.tables("values").columns() == 3
+    assert aFeature3.tables("values").tables() == 2
+    assert aFeature3.tables("values").type() == 1 # integer
+    assert aFeature3.selectionList("selected").size() == 1
+
 if __name__ == '__main__':
 #=========================================================================
 # Create a shape imported from BREP
@@ -105,7 +116,7 @@ if __name__ == '__main__':
 #=========================================================================
 # Create a shape imported from XAO
 #=========================================================================
-    #testImportXAO()
+    testImportXAO()
 #=========================================================================
 # End of test
 #=========================================================================
