@@ -369,6 +369,7 @@ private:
   PartSet_Module* myModule;
 
   bool myPreviousDrawModeEnabled; // the previous selection enabled state in the viewer
+  bool myIsEditLaunching;
   bool myIsDragging;
   bool myDragDone;
   bool myIsMouseOverWindow; /// the state that the mouse over the view

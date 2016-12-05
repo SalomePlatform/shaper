@@ -413,6 +413,28 @@ void XGUI_WorkshopListener::
         aDisplayed = displayObject(anObject);
         if (aDisplayed)
           aDoFitAll = aDoFitAll || neededFitAll(anObject, aNbOfShownObjects);
+
+        // workaround for #1750: sub results should be sent here to be displayed
+        FeaturePtr anObjectFeature = ModelAPI_Feature::feature(anObject);
+        if (anObjectFeature.get() && anObjectFeature->getKind() == "Partition") {
+          XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
+          if (anOperationMgr->hasOperation()) {
+            ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                (anOperationMgr->currentOperation());
+            if (aFOperation && aFOperation->isEditOperation() && aFOperation->id() == "Remove_SubShapes") {
+              ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anObject);
+              if (aCompsolidResult.get() != NULL) { // display all sub results
+                for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
+                  ObjectPtr aSubObject = aCompsolidResult->subResult(i);
+                  aSubObject->setDisplayed(true);
+                  aDisplayed = displayObject(aSubObject);
+                  if (aDisplayed)
+                    aDoFitAll = aDoFitAll || neededFitAll(aSubObject, aNbOfShownObjects);
+                }
+              }
+            }
+          }
+        }
       } else
         anObject->setDisplayed(false);
     }

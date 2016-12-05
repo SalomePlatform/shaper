@@ -133,8 +133,8 @@ void getAttributesOrResults(const Handle(SelectMgr_EntityOwner)& theOwner,
 }
 
 PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
-  : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false),
-    myIsMouseOverWindow(false),
+  : QObject(theModule), myModule(theModule), myIsEditLaunching(false), myIsDragging(false),
+    myDragDone(false), myIsMouseOverWindow(false),
     myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
     myIsPopupMenuActive(false)
 {
@@ -394,6 +394,8 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       }
     } else if (isSketchOpe && isEditing) {
       // If selected another object commit current result
+      bool aPrevLaunchingState = myIsEditLaunching;
+      myIsEditLaunching = true;
       aFOperation->commit();
 
       myIsDragging = true;
@@ -404,6 +406,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       // selected entities, e.g. selection of point(attribute on a line) should edit the point
       restoreSelection();
       launchEditing();
+      myIsEditLaunching = aPrevLaunchingState;
       if (aFeature.get() != NULL) {
         std::shared_ptr<SketchPlugin_Feature> aSPFeature =
                   std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
@@ -1034,7 +1037,19 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
   //}
   /// improvement to deselect automatically all eventual selected objects, when
   // returning to the neutral point of the Sketcher
-  workshop()->selector()->clearSelection();
+  bool isClearSelectionPossible = true;
+  if (myIsEditLaunching) {
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                          (theOperation);
+    if (aFOperation) {
+      FeaturePtr aFeature = aFOperation->feature();
+      if (aFeature.get() && PartSet_SketcherMgr::isEntity(aFeature->getKind())) {
+        isClearSelectionPossible = false;
+      }
+    }
+  }
+  if (isClearSelectionPossible)
+    workshop()->selector()->clearSelection();
 }
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
