@@ -625,6 +625,13 @@ bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
       // click on the digit of dimension constrain comes here
       // with an empty shape, so we need the check
       if (aFeature == anOpFeature && aShape.get() && !aShape->isNull()) {
+        // if feature has only one result and shape of result is equal to selected shape
+        // this attribute is not processed. It is a case of Sketch Point.
+        if (aFeature->results().size() == 1) {
+          ResultPtr aResult = aFeature->results().front();
+          if (aResult.get() && aResult->shape()->isEqual(aShape))
+            return aProcessed;
+        }
         const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
         AttributePtr anAttribute = PartSet_Tools::findAttributeBy2dPoint(anObject, aTDShape,
                                                                mySketchMgr->activeSketch());

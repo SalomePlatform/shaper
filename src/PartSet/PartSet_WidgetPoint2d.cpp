@@ -446,7 +446,8 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
     aFirstValue = myPreSelected;
   }
   // if we have selection and use it
-  if (aFirstValue.get() && isValidSelectionCustom(aFirstValue)) {
+  if (aFirstValue.get() && isValidSelectionCustom(aFirstValue) &&
+      aFirstValue->shape().get()) { /// Trihedron Axis may be selected, but shape is empty
     GeomShapePtr aGeomShape = aFirstValue->shape();
     TopoDS_Shape aShape = aGeomShape->impl<TopoDS_Shape>();
     ObjectPtr aObject = aFirstValue->object();
