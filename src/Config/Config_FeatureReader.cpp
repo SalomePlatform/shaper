@@ -12,6 +12,7 @@
 #include <Config_FeatureMessage.h>
 #include <Config_AttributeMessage.h>
 #include <Config_FeatureReader.h>
+#include <Config_Translator.h>
 #include <Events_Message.h>
 #include <Events_Loop.h>
 
@@ -137,7 +138,8 @@ bool Config_FeatureReader::processChildren(xmlNodePtr theNode)
 void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   const std::shared_ptr<Config_FeatureMessage>& outFeatureMessage)
 {
-  outFeatureMessage->setId(getProperty(theFeatureNode, _ID));
+  std::string anId = getProperty(theFeatureNode, _ID);
+  outFeatureMessage->setId(anId);
   outFeatureMessage->setPluginLibrary(myLibraryName);
   outFeatureMessage->setNestedFeatures(getProperty(theFeatureNode, FEATURE_NESTED));
   outFeatureMessage->setActionsWhenNested(getNormalizedProperty(theFeatureNode,
@@ -151,8 +153,10 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
     return;
   }
 
-  outFeatureMessage->setText(getProperty(theFeatureNode, FEATURE_TEXT));
-  outFeatureMessage->setTooltip(getProperty(theFeatureNode, FEATURE_TOOLTIP));
+  std::string aText = Config_Translator::translate(anId, getProperty(theFeatureNode, FEATURE_TEXT));
+  outFeatureMessage->setText(aText);
+  std::string aToolTip = Config_Translator::translate(anId, getProperty(theFeatureNode, FEATURE_TOOLTIP));
+  outFeatureMessage->setTooltip(aToolTip);
   outFeatureMessage->setIcon(getProperty(theFeatureNode, FEATURE_ICON));
   outFeatureMessage->setKeysequence(getProperty(theFeatureNode, FEATURE_KEYSEQUENCE));
   outFeatureMessage->setGroupId(restoreAttribute(NODE_GROUP, _ID));

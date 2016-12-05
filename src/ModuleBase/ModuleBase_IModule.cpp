@@ -105,7 +105,7 @@ QString ModuleBase_IModule::getFeatureError(const FeaturePtr& theFeature)
 {
   // Error already translated.
   std::string aMsg = ModelAPI_Tools::getFeatureError(theFeature);
-  return aMsg.c_str();
+  return QString::fromUtf8(aMsg.c_str());
 }
 
 void ModuleBase_IModule::grantedOperationIds(ModuleBase_Operation* theOperation,

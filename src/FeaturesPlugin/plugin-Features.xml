@@ -30,7 +30,7 @@
       </feature>
     </group>
     <group id="Boolean">
-      <feature id="Boolean" title="Boolean" tooltip="Perform boolean operations with solids" icon="icons/Features/cut.png"
+      <feature id="Boolean" title="Boolean" tooltip="Perform boolean operations with objects" icon="icons/Features/cut.png"
                auto_preview="false">
           <source path="boolean_widget.xml"/>
       </feature>

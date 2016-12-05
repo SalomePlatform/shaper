@@ -58,8 +58,8 @@ void ModuleBase_ActionInfo::initFrom(std::shared_ptr<Config_FeatureMessage> theM
   if (!iconFile.isEmpty()) {
     icon = ModuleBase_IconFactory::loadIcon(iconFile);
   }
-  text = ModuleBase_Tools::translate(theMessage->id(), theMessage->text());
-  toolTip = ModuleBase_Tools::translate(theMessage->id(), theMessage->tooltip());
+  text = QString::fromUtf8(theMessage->text().c_str());
+  toolTip = QString::fromUtf8(theMessage->tooltip().c_str());
   QString aShortcutStr = QString::fromStdString(theMessage->keysequence());
   if (!aShortcutStr.isEmpty()) {
     shortcut = QKeySequence(aShortcutStr);

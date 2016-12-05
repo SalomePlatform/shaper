@@ -2636,150 +2636,143 @@
     </message>
   </context>
   <context>
-    <name>Boolean:GeomValidators_BooleanArguments</name>
+    <name>Boolean</name>
     <message>
-      <source>Not enough arguments</source>
-      <translation>Not enough arguments for the operation</translation>
+      <source>Boolean</source>
+      <translation>Boolean</translation>
+    </message>
+    <message>
+      <source>Boolean operations with objects</source>
+      <translation>Boolean operations with objects</translation>
+    </message>
+  </context>
+  <context>
+    <name>Boolean:bool_type</name>
+    <message>
+      <source>Operation type</source>
+      <translation>Operation type</translation>
+    </message>
+    <message>
+      <source>Type of boolean operation</source>
+      <translation>Type of boolean operation</translation>
+    </message>
+    <message>
+      <source>Cut</source>
+      <translation>Cut</translation>
+    </message>
+    <message>
+      <source>Fuse</source>
+      <translation>Fuse</translation>
+    </message>
+    <message>
+      <source>Common</source>
+      <translation>Common</translation>
+    </message>
+    <message>
+      <source>Fill</source>
+      <translation>Fill</translation>
+    </message>
+    <message>
+      <source>Smash</source>
+      <translation>Smash</translation>
+    </message>
+  </context>
+  <context>
+    <name>Boolean:main_objects</name>
+    <message>
+      <source>Main objects</source>
+      <translation>Main objects</translation>
+    </message>
+    <message>
+      <source>Select objects</source>
+      <translation>Select objects</translation>
+    </message>
+  </context>
+  <context>
+    <name>Boolean:main_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
+    <message>
+      <source>Error: Empty attribute selection.</source>
+      <translation>Select objects.</translation>
+    </message>
+    <message>
+      <source>Error: Empty selection context.</source>
+      <translation>Selected object invalid.</translation>
+    </message>
+    <message>
+      <source>Error: Result construction not allowed for selection.</source>
+      <translation>Result construction not allowed for selection.</translation>
+    </message>
+    <message>
+      <source>Error: Empty shape.</source>
+      <translation>Selected object invalid.</translation>
+    </message>
+    <message>
+      <source>Error: Local selection not allowed.</source>
+      <translation>Local selection not allowed.</translation>
+    </message>
+    <message>
+      <source>Error: Selected shape has the wrong type.</source>
+      <translation>Selected shape has the wrong type.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Boolean:tool_objects</name>
+    <message>
+      <source>Tool objects</source>
+      <translation>Tool objects</translation>
+    </message>
+    <message>
+      <source>Select tools</source>
+      <translation>Select tools</translation>
+    </message>
+  </context>
+  <context>
+    <name>Boolean:tool_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
+    <message>
+      <source>Error: Empty attribute selection.</source>
+      <translation>Select tools.</translation>
+    </message>
+    <message>
+      <source>Error: Empty selection context.</source>
+      <translation>Selected tool invalid.</translation>
+    </message>
+    <message>
+      <source>Error: Result construction not allowed for selection.</source>
+      <translation>Result construction not allowed for selection.</translation>
+    </message>
+    <message>
+      <source>Error: Empty shape.</source>
+      <translation>Selected tool invalid.</translation>
+    </message>
+    <message>
+      <source>Error: Local selection not allowed.</source>
+      <translation>Local selection not allowed.</translation>
+    </message>
+    <message>
+      <source>Error: Selected shape has the wrong type.</source>
+      <translation>Selected shape has the wrong type.</translation>
     </message>
   </context>
   <context>
     <name>Boolean:GeomValidators_BooleanArguments</name>
     <message>
-      <source>Wrong number of arguments (expected 3).</source>
-      <translation>Wrong number of validator "GeomValidators_BooleanArguments" arguments (expected 3).</translation>
+      <source>Not enough arguments</source>
+      <translation>Not enough arguments.</translation>
     </message>
   </context>
   <context>
     <name>Boolean:Model_FeatureValidator</name>
     <message>
       <source>Attribute "bool_type" is not initialized.</source>
-      <translation></translation>
+      <translation>Select operation type.</translation>
     </message>
-  </context>
-  <context>
-    <name>Boolean:Model_FeatureValidator</name>
     <message>
       <source>Attribute "main_objects" is not initialized.</source>
-      <translation>Objects not selected.</translation>
+      <translation>Select objects.</translation>
     </message>
-  </context>
-  <context>
-    <name>Boolean:Model_FeatureValidator</name>
     <message>
       <source>Attribute "tool_objects" is not initialized.</source>
-      <translation>Tools not selected.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:main_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: This validator can only work with selection list attributes in \"Boolean\" feature.</source>
-      <translation></translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:main_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: Empty attribute selection.</source>
-      <translation>Objects not selected.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:main_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: Empty selection context.</source>
-      <translation></translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:main_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: Result construction not allowed for selection.</source>
-      <translation>Result construction not allowed for selection.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:main_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: Empty shape.</source>
-      <translation></translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:main_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: Local selection not allowed.</source>
-      <translation>Local selection not allowed.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:main_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: Selected shape has the wrong type.</source>
-      <translation>Selected shape has the wrong type.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:main_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: Selected shape has the wrong type.</source>
-      <translation>Selected shape has the wrong type.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:tool_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: This validator can only work with selection list attributes in \"Boolean\" feature.</source>
-      <translation></translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:tool_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: Empty attribute selection.</source>
-      <translation>Tools not selected.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:tool_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: Empty selection context.</source>
-      <translation></translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:tool_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: Result construction not allowed for selection.</source>
-      <translation>Result construction not allowed for selection.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:tool_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: Empty shape.</source>
-      <translation></translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:tool_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: Local selection not allowed.</source>
-      <translation>Local selection not allowed.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:tool_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: Selected shape has the wrong type.</source>
-      <translation>Selected shape has the wrong type.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Boolean:tool_objects:FeaturesPlugin_ValidatorBooleanSelection</name>
-    <message>
-      <source>Error: Selected shape has the wrong type.</source>
-      <translation>Selected shape has the wrong type.</translation>
+      <translation>Select tools.</translation>
     </message>
   </context>
   <context>

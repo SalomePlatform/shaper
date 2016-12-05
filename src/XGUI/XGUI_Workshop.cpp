@@ -137,10 +137,10 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   // Has to be defined first in order to get errors and messages from other components
   myEventsListener = new XGUI_WorkshopListener(aWorkshop);
 
+  SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
 #ifndef HAVE_SALOME
   myMainWindow = new AppElements_MainWindow();
 
-  SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
   bool aCloc = aResMgr->booleanValue("language", "locale", true);
   if (aCloc)
     QLocale::setDefault( QLocale::c() );
@@ -151,11 +151,20 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   QDir aDir(aPath);
 
   // Load translations
-  QStringList aFilters;
-  aFilters << "*_en.ts";
-  QStringList aTsFiles = aDir.entryList(aFilters, QDir::Files);
-  foreach(QString aFileName, aTsFiles) {
-    Config_Translator::load(aFileName.toStdString());
+  QStringList aLangs;
+  aLangs << "*_en.ts"; // load by default eng translations
+  QString aCurrLang = aResMgr->stringValue("language", "language", "en");
+  if(aCurrLang != "en") {
+    aLangs << "*_" + aCurrLang + ".ts"; // then replace with translated files
+  }
+
+  foreach(QString aLang, aLangs) {
+    QStringList aFilters;
+    aFilters << aLang;
+    QStringList aTsFiles = aDir.entryList(aFilters, QDir::Files);
+    foreach(QString aFileName, aTsFiles) {
+      Config_Translator::load(aFileName.toStdString());
+    }
   }
 
   myDataModelXMLReader = new Config_DataModelReader();
