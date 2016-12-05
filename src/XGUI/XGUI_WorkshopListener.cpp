@@ -423,7 +423,7 @@ void XGUI_WorkshopListener::
                                                             (anOperationMgr->currentOperation());
             if (aFOperation && aFOperation->isEditOperation() &&
                 aFOperation->id() == "Remove_SubShapes") {
-              ResultCompSolidPtr aCompsolidResult = 
+              ResultCompSolidPtr aCompsolidResult =
                                    std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anObject);
               if (aCompsolidResult.get() != NULL) { // display all sub results
                 for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
