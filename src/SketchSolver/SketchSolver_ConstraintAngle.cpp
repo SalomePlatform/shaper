@@ -8,6 +8,10 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
 
+#include <ModelAPI_AttributeInteger.h>
+
+#include <SketchPlugin_ConstraintAngle.h>
+
 #include <cmath>
 
 void SketchSolver_ConstraintAngle::getAttributes(
@@ -16,6 +20,7 @@ void SketchSolver_ConstraintAngle::getAttributes(
   SketchSolver_Constraint::getAttributes(theValue, theAttributes);
 
   myAngle = theValue;
+  myType = myBaseConstraint->integer(SketchPlugin_ConstraintAngle::TYPE_ID())->value();
 }
 
 
@@ -30,4 +35,10 @@ void SketchSolver_ConstraintAngle::adjustConstraint()
   myAngle = aConstraint->value();
   aBuilder->adjustConstraint(aConstraint);
   myStorage->addConstraint(myBaseConstraint, aConstraint);
+
+  int aType = myBaseConstraint->integer(SketchPlugin_ConstraintAngle::TYPE_ID())->value();
+  if (aType != myType) {
+    myType = aType;
+    myStorage->setNeedToResolve(true);
+  }
 }

@@ -149,9 +149,9 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
     myFlyoutUpdate = false;
   }
   else if (theID == SketchPlugin_ConstraintAngle::TYPE_ID()) {
-    std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
-      ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
     double anAngle = calculateAngle();
+    std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
+      ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_ConstraintAngle::VALUE()));
     aValueAttr->setValue(anAngle);
   }
   else if (theID == SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()) {
@@ -190,11 +190,14 @@ double SketchPlugin_ConstraintAngle::calculateAngle()
   }
   double anAngle = anAng->angleDegree();
   std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
-      ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_ConstraintAngle::VALUE()));
+      ModelAPI_AttributeDouble>(data()->attribute(VALUE()));
+  std::shared_ptr<ModelAPI_AttributeDouble> anAngleValueAttr = std::dynamic_pointer_cast<
+      ModelAPI_AttributeDouble>(data()->attribute(ANGLE_VALUE_ID()));
   if (!aValueAttr->isInitialized())
     aValueAttr->setValue(anAngle);
   /// an angle value should be corrected by the current angle type
-  anAngle = getAngleForType(anAngle);
+  anAngle = getAngleForType(anAngleValueAttr->text().empty() ?
+                            anAngle : anAngleValueAttr->value());
   boolean(ANGLE_REVERSED_FIRST_LINE_ID())->setValue(anAng->isReversed(0));
   boolean(ANGLE_REVERSED_SECOND_LINE_ID())->setValue(anAng->isReversed(1));
   return anAngle;
