@@ -346,7 +346,7 @@
     <!--  SketchConstraintLength  -->      
       <feature id="SketchConstraintLength" title="Length" tooltip="Set fixed length of a line segment" icon="icons/Sketch/length.png">
         <label title="Select a line on which to calculate length" tooltip="Select a line on which to calculate length"/>
-        <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select an line" shape_types="edge" >
+        <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select a line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
         </shape_selector>
         <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt" default="computed" internal="1" obligatory="0"/>
@@ -358,12 +358,12 @@
 
       <!--  SketchConstraintAngle  -->
       <feature id="SketchConstraintAngle" title="Angle" tooltip="Set fixed angle between two line segments" icon="icons/Sketch/angle_constr.png">
-        <sketch_shape_selector id="ConstraintEntityA" label="Line 1" tooltip="Select an line" shape_types="edge" >
+        <sketch_shape_selector id="ConstraintEntityA" label="Line 1" tooltip="Select a line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
         </sketch_shape_selector>
-        <sketch_shape_selector id="ConstraintEntityB" label="Line 2" tooltip="Select an line" shape_types="edge" >
+        <sketch_shape_selector id="ConstraintEntityB" label="Line 2" tooltip="Select a line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
@@ -453,7 +453,7 @@
         tooltip="Create constraint defining two perpendicular lines" 
         icon="icons/Sketch/perpendicular.png">
         <sketch_shape_selector id="ConstraintEntityA" 
-            label="First line" tooltip="Select an line" 
+            label="First line" tooltip="Select a line" 
             shape_types="edge">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
@@ -461,7 +461,7 @@
         </sketch_shape_selector>
         
         <sketch_shape_selector id="ConstraintEntityB" 
-            label="Second line" tooltip="Select an line" 
+            label="Second line" tooltip="Select a line" 
             shape_types="edge">
             <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
