@@ -420,9 +420,11 @@ void XGUI_WorkshopListener::
           XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
           if (anOperationMgr->hasOperation()) {
             ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                                (anOperationMgr->currentOperation());
-            if (aFOperation && aFOperation->isEditOperation() && aFOperation->id() == "Remove_SubShapes") {
-              ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anObject);
+                                                            (anOperationMgr->currentOperation());
+            if (aFOperation && aFOperation->isEditOperation() &&
+                aFOperation->id() == "Remove_SubShapes") {
+              ResultCompSolidPtr aCompsolidResult = 
+                                   std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anObject);
               if (aCompsolidResult.get() != NULL) { // display all sub results
                 for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
                   ObjectPtr aSubObject = aCompsolidResult->subResult(i);
