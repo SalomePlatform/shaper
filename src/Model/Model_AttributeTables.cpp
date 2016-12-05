@@ -225,6 +225,26 @@ ModelAPI_AttributeTables::Value Model_AttributeTables::value(
   return aResult;
 }
 
+std::string Model_AttributeTables::valueStr(
+    const int theRow, const int theColumn, const int theTable)
+{
+  std::ostringstream aStr;
+  switch(myType) {
+  case ModelAPI_AttributeTables::DOUBLE:
+    aStr<<value(theRow, theColumn, theTable).myDouble;
+    break;
+  case ModelAPI_AttributeTables::BOOLEAN:
+    aStr<<(value(theRow, theColumn, theTable).myBool ? "True" :"False");
+    break;
+  case ModelAPI_AttributeTables::INTEGER:
+    aStr<<value(theRow, theColumn, theTable).myInt;
+    break;
+  case ModelAPI_AttributeTables::STRING:
+    aStr<<value(theRow, theColumn, theTable).myStr;
+    break;
+  }
+  return aStr.str();
+}
 
 //==================================================================================================
 Model_AttributeTables::Model_AttributeTables(TDF_Label& theLabel)

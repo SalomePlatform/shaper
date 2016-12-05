@@ -63,6 +63,10 @@ public:
   MODELAPI_EXPORT virtual Value value(
     const int theRow, const int theColumn, const int theTable = 0) = 0;
 
+  /// Returns the value in the format of string (usefull for the python connection)
+  MODELAPI_EXPORT virtual std::string valueStr(
+    const int theRow, const int theColumn, const int theTable = 0) = 0;
+
   /// Returns the type of this class of attributes
   MODELAPI_EXPORT static std::string typeId()
   {

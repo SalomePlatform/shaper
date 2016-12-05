@@ -52,6 +52,10 @@ public:
   MODEL_EXPORT virtual Value value(
     const int theRow, const int theColumn, const int theTable = 0);
 
+  /// Returns the value in the format of string (usefull for the python connection)
+  MODEL_EXPORT virtual std::string valueStr(
+    const int theRow, const int theColumn, const int theTable = 0);
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeTables(TDF_Label& theLabel);
