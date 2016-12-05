@@ -191,7 +191,7 @@
         </sketch_shape_selector>
         <sketch_multi_selector id="ConstraintMirrorList"
             label="Segments:"
-            tooltip="Select list of mirroring objects"
+            tooltip="Select list of objects to be mirrored"
             type_choice="Edges"
             use_external="true"
             greed ="true">
@@ -206,7 +206,7 @@
         tooltip="Multiple translation">
         <sketch_multi_selector id="MultiTranslationList"
             label="Segments:"
-            tooltip="Select list of translating objects"
+            tooltip="Select list of objects to be translated"
             type_choice="Edges"
             use_external="true"
             greed ="true">
@@ -269,7 +269,7 @@
         tooltip="Multiple rotation">
         <sketch_multi_selector id="MultiRotationList"
             label="Segments:"
-            tooltip="Select list of rotating objects"
+            tooltip="Select list of objects to be rotated"
             type_choice="Edges"
             use_external="true"
             greed ="true">
