@@ -235,7 +235,7 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
       if (anError.context().empty()) {
         anError.setContext(theFeature->getKind() + ":" + anAttributeID + ":" + aValidatorID);
       }
-      theFeature->setError(anError.messageString(), false, false);
+      theFeature->setError(Config_Translator::translate(anError), false, false);
       theFeature->data()->execState(ModelAPI_StateInvalidArgument);
       return false;
     }
