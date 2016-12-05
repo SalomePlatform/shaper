@@ -103,7 +103,7 @@ void FeaturesPlugin_RemoveSubShapes::execute()
     if(!aBaseShape.get()) {
       return;
     }
-    GeomShapePtr aResultShape = aBaseShape->emptyCopied();
+    aResultShape = aBaseShape->emptyCopied();
 
     // Copy sub-shapes from list to new shape.
     for(int anIndex = 0; anIndex < aSubsNb; ++anIndex) {
