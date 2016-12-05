@@ -395,7 +395,11 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
     } else if (isSketchOpe && isEditing) {
       // If selected another object commit current result
       bool aPrevLaunchingState = myIsEditLaunching;
-      myIsEditLaunching = true;
+      /// store editing state for Edit operation in order to do not clear highlight by restart
+      /// of edit operation.
+      /// Internal edit should not be stored as editing operation as the result will be a
+      /// creation operation, where previous selection should not be used(and will be cleared)
+      myIsEditLaunching = !myModule->sketchReentranceMgr()->isInternalEditActive();
       aFOperation->commit();
 
       myIsDragging = true;
