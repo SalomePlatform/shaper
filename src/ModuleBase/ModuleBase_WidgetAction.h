@@ -38,7 +38,13 @@ Q_OBJECT
 
   /// \return Context for translation
   virtual std::string context() const {
-    return myFeature->getKind() + ":" + myActionID;
+    std::string aContext = myFeatureId;
+    if(!aContext.empty() && !myActionID.empty()) {
+      aContext += ":";
+    }
+    aContext += myActionID;
+
+    return aContext;
   }
 
 protected:
