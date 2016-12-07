@@ -468,12 +468,16 @@ void SHAPERGUI_SalomeViewer::Zfitall()
   if (!mySelector || !mySelector->viewer())
     return;
   SUIT_ViewManager* aMgr = mySelector->viewer()->getViewManager();
-  OCCViewer_ViewFrame* aView = dynamic_cast<OCCViewer_ViewFrame*>(aMgr->getActiveView());
-  if (aView) {
-    OCCViewer_ViewWindow* aWnd = aView->getView(OCCViewer_ViewFrame::MAIN_VIEW);
-    Handle(V3d_View) aView3d = aWnd->getViewPort()->getView();
-    aView3d->ZFitAll();
-    if (aView3d->Depth() < 0.1)
-      aView3d->DepthFitAll();
+  /// WORKAROUND for issue #1798. SUIT_ViewManager::closeAllViews() should nullify myActiveView
+  /// As a result, we need to check views count in manager
+  if (aMgr->getViews().size() > 0) {
+    OCCViewer_ViewFrame* aView = dynamic_cast<OCCViewer_ViewFrame*>(aMgr->getActiveView());
+    if (aView) {
+      OCCViewer_ViewWindow* aWnd = aView->getView(OCCViewer_ViewFrame::MAIN_VIEW);
+      Handle(V3d_View) aView3d = aWnd->getViewPort()->getView();
+      aView3d->ZFitAll();
+      if (aView3d->Depth() < 0.1)
+        aView3d->DepthFitAll();
+    }
   }
 }
