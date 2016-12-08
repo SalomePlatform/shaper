@@ -135,9 +135,11 @@ bool BuildPlugin_ValidatorBaseForWire::isValid(const std::shared_ptr<ModelAPI_Fe
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
     GeomShapePtr aShape = aSelection->value();
     if(!aShape.get()) {
-      aShape = aSelection->context()->shape();
+      if (aSelection->context().get())
+        aShape = aSelection->context()->shape();
     }
-    aListOfShapes.push_back(aShape);
+    if (aShape.get())
+      aListOfShapes.push_back(aShape);
   }
 
   // Create wire.
