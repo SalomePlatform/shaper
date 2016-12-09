@@ -781,19 +781,51 @@ void XGUI_Displayer::deactivateTrihedron(const bool theUpdateViewer) const
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aTrihedron.IsNull() && aContext->IsDisplayed(aTrihedron)) {
     Handle(AIS_Trihedron) aTrie = Handle(AIS_Trihedron)::DownCast(aTrihedron);
-    deactivateObject(aContext, aTrie, myContextCallBack);
+    deactivateObject(aContext, aTrie
+    #ifdef VINSPECTOR
+      , myContextCallBack
+    #endif
+      );
 
     /// #1136 hidden axis are selected in sketch
     /// workaround for Cascade: there is a crash in AIS_LocalContext::ClearOutdatedSelection
     /// for Position AIS object in SelectionModes.
-    deactivateObject(aContext, aTrie->XAxis(), myContextCallBack);
-    deactivateObject(aContext, aTrie->YAxis(), myContextCallBack);
-    deactivateObject(aContext, aTrie->Axis(), myContextCallBack);
-    deactivateObject(aContext, aTrie->Position(), myContextCallBack);
+    deactivateObject(aContext, aTrie->XAxis()
+    #ifdef VINSPECTOR
+      , myContextCallBack
+    #endif
+    );
+    deactivateObject(aContext, aTrie->YAxis()
+    #ifdef VINSPECTOR
+      , myContextCallBack
+    #endif
+    );
+    deactivateObject(aContext, aTrie->Axis()
+    #ifdef VINSPECTOR
+      , myContextCallBack
+    #endif
+    );
+    deactivateObject(aContext, aTrie->Position()
+    #ifdef VINSPECTOR
+      , myContextCallBack
+    #endif
+    );
 
-    deactivateObject(aContext, aTrie->XYPlane(), myContextCallBack);
-    deactivateObject(aContext, aTrie->XZPlane(), myContextCallBack);
-    deactivateObject(aContext, aTrie->YZPlane(), myContextCallBack);
+    deactivateObject(aContext, aTrie->XYPlane()
+    #ifdef VINSPECTOR
+      , myContextCallBack
+    #endif
+    );
+    deactivateObject(aContext, aTrie->XZPlane()
+    #ifdef VINSPECTOR
+      , myContextCallBack
+    #endif
+    );
+    deactivateObject(aContext, aTrie->YZPlane()
+    #ifdef VINSPECTOR
+      , myContextCallBack
+    #endif
+    );
 
     if (theUpdateViewer)
       updateViewer();
