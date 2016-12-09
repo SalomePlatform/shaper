@@ -48,8 +48,6 @@
 #include <iostream>
 #endif
 
-#define CIRCLE_FEATURE_DELETE_WITHOUT_REFERENCES
-
 static const double PI = 3.141592653589793238463;
 
 SketchPlugin_ConstraintSplit::SketchPlugin_ConstraintSplit()
@@ -95,9 +93,6 @@ void SketchPlugin_ConstraintSplit::execute()
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
   ResultPtr aBaseFeatureResult = getFeatureResult(aBaseFeature);
   std::set<FeaturePtr> aFeaturesToDelete, aFeaturesToUpdate;
-  #ifdef CIRCLE_FEATURE_DELETE_WITHOUT_REFERENCES
-  FeaturePtr aCircleFeatureToDelete;
-  #endif
 
   std::map<FeaturePtr, IdToPointPair> aTangentFeatures;
   std::map<FeaturePtr, IdToPointPair> aCoincidenceToFeature;
@@ -223,11 +218,7 @@ void SketchPlugin_ConstraintSplit::execute()
     updateRefFeatureConstraints(getFeatureResult(aBaseFeature), aRefsToFeature);
 
     AttributePtr aCenterAttr = aCircleFeature->attribute(SketchPlugin_Circle::CENTER_ID());
-#ifdef CIRCLE_FEATURE_DELETE_WITHOUT_REFERENCES
-    aCircleFeatureToDelete = aCircleFeature;
-#else
     aFeaturesToDelete.insert(aCircleFeature);
-#endif
     // as circle is removed, temporary fill this attribute*/
     aBaseObjectAttr->setObject(ResultPtr());
   }
@@ -306,11 +297,6 @@ void SketchPlugin_ConstraintSplit::execute()
   }
 #endif
   ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToDelete);
-#ifdef CIRCLE_FEATURE_DELETE_WITHOUT_REFERENCES
-  std::set<FeaturePtr> aCircleFeatures;
-  aCircleFeatures.insert(aCircleFeatureToDelete);
-  ModelAPI_Tools::removeFeatures(aCircleFeatures, false);
-#endif
 
 #ifdef DEBUG_SPLIT
   std::cout << "update features after split:" << std::endl;
