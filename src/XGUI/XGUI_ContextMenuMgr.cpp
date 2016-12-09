@@ -45,7 +45,6 @@
 #include <QMainWindow>
 #include <QModelIndex>
 
-
 XGUI_ContextMenuMgr::XGUI_ContextMenuMgr(XGUI_Workshop* theParent)
     : QObject(theParent),
       myWorkshop(theParent),
@@ -151,6 +150,15 @@ void XGUI_ContextMenuMgr::createActions()
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/find_result.png"),
                                            tr("Select parent feature"), aDesktop);
   addAction("SHOW_FEATURE_CMD", aAction);
+
+#ifdef VINSPECTOR
+  aAction = ModuleBase_Tools::createAction(QIcon(), tr("Debug Visualization"), aDesktop);
+  addAction("VINSPECTOR_VIEW", aAction);
+#endif
+#ifdef DFBROWSER
+  aAction = ModuleBase_Tools::createAction(QIcon(), tr("DFBrowser"), aDesktop);
+  addAction("DFBROWSER_VIEW", aAction);
+#endif
 
   buildObjBrowserMenu();
   buildViewerMenu();
@@ -328,6 +336,16 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
 
   if (myWorkshop->canChangeDeflection())
     action("DEFLECTION_CMD")->setEnabled(true);
+
+  #ifdef _DEBUG
+    #ifdef VINSPECTOR
+      action("VINSPECTOR_VIEW")->setEnabled(true);
+    #endif
+    #ifdef DFBROWSER
+      action("DFBROWSER_VIEW")->setEnabled(true);
+    #endif
+  #endif
+
 
   ModuleBase_IModule* aModule = myWorkshop->module();
   if (aModule)
@@ -558,6 +576,16 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
       aActions.append(action("CLEAN_HISTORY_CMD"));
       aActions.append(action("DELETE_CMD"));
   }
+#ifdef _DEBUG
+  if (aSelected == 0) {
+    #ifdef VINSPECTOR
+    aActions.append(action("VINSPECTOR_VIEW"));
+    #endif
+    #ifdef DFBROWSER
+    aActions.append(action("DFBROWSER_VIEW"));
+    #endif
+  }
+#endif
   theMenu->addActions(aActions);
   addFeatures(theMenu);
 

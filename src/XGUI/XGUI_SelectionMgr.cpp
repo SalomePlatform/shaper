@@ -26,6 +26,10 @@
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
+#ifdef VINSPECTOR
+#include <VInspectorAPI_CallBack.h>
+#endif
+
 XGUI_SelectionMgr::XGUI_SelectionMgr(XGUI_Workshop* theParent)
     : QObject(theParent),
       myWorkshop(theParent)
@@ -63,6 +67,10 @@ void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& the
         continue;
 
       aContext->AddOrRemoveSelected(anOwner, isUpdateViewer);
+      #ifdef VINSPECTOR
+      if (myWorkshop->displayer()->getCallBack())
+        myWorkshop->displayer()->getCallBack()->AddOrRemoveSelected(anOwner);
+      #endif
     }
   }
   ModuleBase_Tools::selectionInfo(aContext,

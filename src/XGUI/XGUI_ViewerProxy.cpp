@@ -12,14 +12,6 @@
   #include <AppElements_Viewer.h>
 #endif
 
-#ifdef VINSPECTOR
-#include <VInspectorAPI_PluginMgr.h>
-#include <VInspectorAPI_Communicator.h>
-
-static bool FirstCall = true;
-
-#endif
-
 #include <ModuleBase_IViewWindow.h>
 
 #include <QEvent>
@@ -49,15 +41,6 @@ Handle(AIS_InteractiveContext) XGUI_ViewerProxy::AISContext() const
 #else
   aContext = myWorkshop->mainWindow()->viewer()->AISContext();
 #endif
-
-#ifdef VINSPECTOR
-  if (FirstCall) {
-    VInspectorAPI_PluginMgr::activateVInspector("VInspector.dll", aContext);
-    FirstCall = false;
-  }
-#endif
-
-
   return aContext;
 }
 

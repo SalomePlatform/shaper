@@ -9,12 +9,6 @@
 
 #include <ModelAPI_Events.h>
 
-#ifdef DFBROWSER
-#include <DFBrowserAPI_Communicator.hxx>
-
-static bool FirstCall = true;
-#endif
-
 IMPLEMENT_STANDARD_HANDLE(Model_Application, TDocStd_Application)
 IMPLEMENT_STANDARD_RTTIEXT(Model_Application, TDocStd_Application)
 
@@ -23,14 +17,6 @@ static Handle_Model_Application TheApplication = new Model_Application;
 //=======================================================================
 Handle(Model_Application) Model_Application::getApplication()
 {
-#ifdef DFBROWSER
-  if (FirstCall) {
-    DFBrowserAPI_Communicator* aCommunicator =
-                   DFBrowserAPI_Communicator::loadPluginLibrary("DFBrowser.dll");
-    aCommunicator->setApplication(TheApplication);
-    FirstCall = false;
-  }
-#endif
   return TheApplication;
 }
 

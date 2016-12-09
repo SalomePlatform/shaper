@@ -103,6 +103,18 @@
 
 #include <iterator>
 
+#ifdef VINSPECTOR
+#include <VInspectorAPI_PluginMgr.h>
+#include <VInspectorAPI_Communicator.h>
+static bool VInspector_FirstCall = true;
+#endif
+
+#ifdef DFBROWSER
+#include <CDF_Session.hxx>
+#include <DFBrowserAPI_Communicator.hxx>
+static bool DFBrowser_FirstCall = true;
+#endif
+
 #ifdef _DEBUG
 #include <QDebug>
 #include <iostream>
@@ -1337,6 +1349,33 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   } else if (theId == "SHOW_FEATURE_CMD") {
     highlightFeature(aObjects);
   }
+#ifdef VINSPECTOR
+  else if (theId == "VINSPECTOR_VIEW") {
+    if (VInspector_FirstCall) {
+      VInspectorAPI_Communicator* aCommunicator = VInspectorAPI_PluginMgr::activateVInspector(
+                                        "VInspector.dll", viewer()->AISContext());
+      displayer()->setCallBack(aCommunicator->getCallBack());
+      #ifndef HAVE_SALOME
+      AppElements_Viewer* aViewer = mainWindow()->viewer();
+      if (aViewer)
+        aViewer->setCallBack(aCommunicator->getCallBack());
+      #endif
+      VInspector_FirstCall = false;
+    }
+  }
+#endif
+#ifdef DFBROWSER
+  else if (theId == "DFBROWSER_VIEW") {
+    if (DFBrowser_FirstCall) {
+      Handle(CDF_Application) anApplication = CDF_Session::CurrentSession()->CurrentApplication();
+
+      DFBrowserAPI_Communicator* aCommunicator =
+                     DFBrowserAPI_Communicator::loadPluginLibrary("DFBrowser.dll");
+      aCommunicator->setApplication(anApplication);
+      DFBrowser_FirstCall = false;
+    }
+  }
+#endif
 }
 
 //**************************************************************

@@ -33,6 +33,10 @@ class ModuleBase_ViewerPrs;
 class ModelAPI_Feature;
 class XGUI_Workshop;
 
+#ifdef VINSPECTOR
+class VInspectorAPI_CallBack;
+#endif
+
 /**\class XGUI_Displayer
  * \ingroup GUI
  * \brief Displayer. Provides mechanizm of display/erase of objects in the viewer
@@ -254,7 +258,13 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Selection modes will be returned according to TopAbs_ShapeEnum
   QIntList activeSelectionModes() const;
 
+#ifdef VINSPECTOR
+  /// Sets callback to debug display
+  /// \param theCallBack a callback instance
+  void setCallBack(VInspectorAPI_CallBack* theCallBack);
 
+  VInspectorAPI_CallBack* getCallBack() const;
+#endif
   /// Converts shape type (TopAbs_ShapeEnum) to selection mode
   /// \param theShapeType a shape type from TopAbs_ShapeEnum
   static int getSelectionMode(int theShapeType);
@@ -350,7 +360,9 @@ private:
  protected:
    /// Reference to workshop
   XGUI_Workshop* myWorkshop;
-
+#ifdef VINSPECTOR
+  VInspectorAPI_CallBack* myContextCallBack; ///< callback to debug display
+#endif
   /// A container for selection filters
   Handle(SelectMgr_AndFilter) myAndFilter;
 
