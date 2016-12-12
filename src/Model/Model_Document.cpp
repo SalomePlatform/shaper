@@ -404,7 +404,8 @@ static bool isEqualContent(Handle(TDF_Attribute) theAttr1, Handle(TDF_Attribute)
     if (anArr1->Lower() == anArr2->Lower() && anArr1->Upper() == anArr2->Upper()) {
       for(int a = anArr1->Lower(); a <= anArr1->Upper(); a++) {
         if (a == 1 && // second is for display
-          anArr2->Label().Tag() == 1 && (anArr2->Label().Depth() == 4 || anArr2->Label().Depth() == 6))
+            anArr2->Label().Tag() == 1 && (anArr2->Label().Depth() == 4 ||
+            anArr2->Label().Depth() == 6))
           continue;
         if (anArr1->Value(a) != anArr2->Value(a))
           return false;
