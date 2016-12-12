@@ -155,8 +155,8 @@ static void copyAttrs(TDF_Label theSource, TDF_Label theDestination) {
     // for named shape copy exact shapes (in NamedShape Paste method the CopyTool is used)
     Handle(TNaming_NamedShape) aNS = Handle(TNaming_NamedShape)::DownCast(anAttrIter.Value());
     if (aNS.IsNull()) {
-      // no relocation, empty map
-      Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable();
+      // no special relocation, empty map, but self-relocation is on: copy references w/o changes
+      Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(Standard_True);
       anAttrIter.Value()->Paste(aTargetAttr, aRelocTable);
     } else {
       CopyNS(aNS, aTargetAttr);

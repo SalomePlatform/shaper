@@ -43,6 +43,7 @@
 #include <XAO_Group.hxx>
 #include <XAO_Field.hxx>
 #include <XAO_Xao.hxx>
+#include <XAO_Geometry.hxx>
 
 #include <ExchangePlugin_Tools.h>
 
@@ -175,6 +176,27 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   }
 }
 
+/// Returns XAO string by the value from the table
+static std::string valToString(const ModelAPI_AttributeTables::Value& theVal,
+  const ModelAPI_AttributeTables::ValueType& theType) {
+  std::ostringstream aStr; // the resulting string value
+  switch(theType) {
+  case ModelAPI_AttributeTables::BOOLEAN:
+    aStr<<(theVal.myBool ? "true" : "false");
+    break;
+  case ModelAPI_AttributeTables::INTEGER:
+    aStr<<theVal.myInt;
+    break;
+  case ModelAPI_AttributeTables::DOUBLE:
+    aStr<<theVal.myDouble;
+    break;
+  case ModelAPI_AttributeTables::STRING:
+    aStr<<theVal.myStr;
+    break;
+  }
+  return aStr.str();
+}
+
 void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 {
   try {
@@ -289,6 +311,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       aStep->setStamp(aStampIndex);
       int aNumElements = isWholePart ? aXaoField->countElements() : aTables->rows();
       int aNumComps = aTables->columns();
+      std::set<int> aFilledIDs; // to fill the rest by defaults
       // omit default values first row
       for(int aRow = isWholePart ? 0 : 1; aRow < aNumElements; aRow++) {
         for(int aCol = 0; aCol < aNumComps; aCol++) {
@@ -300,37 +323,33 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
             // complex conversion of reference id to element index
             int aReferenceID = aSelection->Id();
             std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
-            int anElementID =
+            anElementID =
               aXao.getGeometry()->getElementIndexByReference(aFieldDimension, aReferenceString);
           }
 
           ModelAPI_AttributeTables::Value aVal = aTables->value(
             isWholePart ? 0 : aRow, aCol, aStepIndex);
-          std::ostringstream aStr; // string value
-          switch(aTables->type()) {
-          case ModelAPI_AttributeTables::BOOLEAN:
-            aStr<<(aVal.myBool ? "True" : "False");
-            break;
-          case ModelAPI_AttributeTables::INTEGER:
-            aStr<<aVal.myInt;
-            break;
-          case ModelAPI_AttributeTables::DOUBLE:
-            aStr<<aVal.myDouble;
-            break;
-          case ModelAPI_AttributeTables::STRING:
-            aStr<<aVal.myStr;
-            break;
-          }
-          std::string aStrVal = aStr.str();
+          std::string aStrVal = valToString(aVal, aTables->type());
           aStep->setStringValue(isWholePart ? aRow : anElementID, aCol, aStrVal);
+          aFilledIDs.insert(anElementID);
+        }
+      }
+      if (!isWholePart) { // fill the rest values by default ones
+        XAO::GeometricElementList::iterator allElem = aXao.getGeometry()->begin(aFieldDimension);
+        for(; allElem != aXao.getGeometry()->end(aFieldDimension); allElem++) {
+          if (aFilledIDs.find(allElem->first) != aFilledIDs.end())
+            continue;
+          for(int aCol = 0; aCol < aNumComps; aCol++) {
+            ModelAPI_AttributeTables::Value aVal = aTables->value(0, aCol, aStepIndex); // default
+            std::string aStrVal = valToString(aVal, aTables->type());
+            aStep->setStringValue(allElem->first, aCol, aStrVal);
+          }
         }
       }
     }
   }
 
-
   // exporting
-
   XAOExport(theFileName, &aXao, anError);
 
   if (!anError.empty()) {

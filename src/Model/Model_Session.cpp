@@ -324,7 +324,7 @@ std::shared_ptr<ModelAPI_Document> Model_Session::copy(
   Handle(TDF_DataSet) aDS = new TDF_DataSet;
   aDS->AddLabel(aSourceRoot);
   TDF_ClosureTool::Closure(aDS);
-  Handle(TDF_RelocationTable) aRT = new TDF_RelocationTable;
+  Handle(TDF_RelocationTable) aRT = new TDF_RelocationTable(Standard_True);
   aRT->SetRelocation(aSourceRoot, aTargetRoot);
   TDF_CopyTool::Copy(aDS, aRT);
 

@@ -151,7 +151,7 @@ void Model_AttributeTables::setType(ModelAPI_AttributeTables::ValueType theType)
     // remove the old attr
     int aSize = myRows * myCols * myTables;
     if (aSize != 0) {
-      myLab.ForgetAttribute(MY_ARRAY_ID(theType));
+      myLab.ForgetAttribute(MY_ARRAY_ID(myType));
       myType = theType;
       int aTables = myTables;
       myTables = 0; // to let setSize know that there is no old array

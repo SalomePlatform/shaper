@@ -216,10 +216,9 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
     aSelectionList->setSelectionType(aSelectionType);
     // limitation: now in XAO fields are related to everything, so, iterate all sub-shapes to fill
     int aCountSelected = aXaoField->countElements();
-    int aResults = document()->size(ModelAPI_ResultBody::group());
-    for(int a = 0; a < aResults && aCountSelected; a++) {
-      ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(
-        document()->object(ModelAPI_ResultBody::group(), a));
+    std::list<ResultPtr>::const_iterator aResIter = results().begin();
+    for(; aResIter != results().end() && aCountSelected; aResIter++) {
+      ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aResIter);
       if (!aBody.get())
         continue;
       // check that only results that were created before this field are used
@@ -266,7 +265,7 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
           std::string aValStr = (*aStepIter)->getStringValue(aRow - 1, aCol);
           switch(aType) {
           case ModelAPI_AttributeTables::BOOLEAN:
-            aVal.myBool = aValStr == "True";
+            aVal.myBool = aValStr == "true";
             break;
           case ModelAPI_AttributeTables::INTEGER:
             aVal.myInt = atoi(aValStr.c_str());
@@ -281,6 +280,38 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
           aTables->setValue(aVal, aRow, aCol, aStepIndex);
         }
       }
+    }
+    // remove everything with zero-values: zeroes are treated as defaults
+    std::set<int> aRowsToRemove;
+    for(int aRow = 1; aRow < aTables->rows(); aRow++) {
+      bool isZero = true;
+      for(int aCol = 0; aCol < aTables->columns() && isZero; aCol++) {
+        for(int aStepIndex = 0; aStepIndex != aTables->tables() && isZero; aStepIndex++) {
+          if (aTables->valueStr(aRow, aCol, aStepIndex) != aTables->valueStr(0, aCol, aStepIndex))
+            isZero = false;
+        }
+      }
+      if (isZero)
+        aRowsToRemove.insert(aRow - 1); // -1 to make prepared for remove from SelectionList
+    }
+    if (!aRowsToRemove.empty()) { // move usefull rows on bottom to the up of the tables
+      // number of rows passed during going through: the current rows will
+      // be moved up for this value
+      int aRemovedPassed = 0;
+      for(int aRow = 1; aRow < aTables->rows(); aRow++) {
+        if (aRowsToRemove.find(aRow - 1) != aRowsToRemove.end()) {
+          aRemovedPassed++;
+        } else if (aRemovedPassed != 0) { // copy the line up
+          for(int aCol = 0; aCol < aTables->columns(); aCol++) {
+            for(int aTable = 0; aTable != aTables->tables(); aTable++) {
+              aTables->setValue(
+                aTables->value(aRow, aCol, aTable), aRow - aRemovedPassed, aCol, aTable);
+            }
+          }
+        }
+      }
+      aTables->setSize(aTables->rows() - aRemovedPassed, aTables->columns(), aTables->tables());
+      aSelectionList->remove(aRowsToRemove); // remove also selected elements
     }
   }
   // Top avoid problems in Object Browser update: issue #1647.
