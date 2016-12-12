@@ -266,6 +266,7 @@ QAction* createAction(const QIcon& theIcon, const QString& theText,
   return anAction;
 }
 
+#ifdef _DEBUG
 QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
 {
   QString aFeatureStr = "feature";
@@ -309,6 +310,7 @@ QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
 
   return aFeatureStr;
 }
+#endif
 
 typedef QMap<QString, int> ShapeTypes;
 static ShapeTypes myShapeTypes;

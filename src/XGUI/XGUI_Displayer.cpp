@@ -1419,6 +1419,7 @@ void XGUI_Displayer::appendResultObject(ObjectPtr theObject, AISObjectPtr theAIS
 #endif
 }
 
+#ifdef _DEBUG
 std::string XGUI_Displayer::getResult2AISObjectMapInfo() const
 {
   QStringList aContent;
@@ -1434,6 +1435,7 @@ std::string XGUI_Displayer::getResult2AISObjectMapInfo() const
   return QString("myResult2AISObjectMap: size = %1\n%2\n").arg(myResult2AISObjectMap.size()).
                                             arg(aContent.join("\n")).toStdString().c_str();
 }
+#endif
 
 void XGUI_Displayer::getPresentations(const ObjectPtr& theObject,
                                   NCollection_Map<Handle(AIS_InteractiveObject)>& thePresentations)

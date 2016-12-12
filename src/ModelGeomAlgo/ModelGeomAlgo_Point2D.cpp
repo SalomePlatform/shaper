@@ -175,6 +175,7 @@ namespace ModelGeomAlgo_Point2D {
     return aValueStr;
   }
 
+#ifdef _DEBUG
   std::string getPontAttributesInfo(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                            const std::set<std::shared_ptr<ModelAPI_Attribute> >& theAttributesOnly)
   {
@@ -214,5 +215,5 @@ namespace ModelGeomAlgo_Point2D {
 
     return anInfo;
   }
-
+#endif
 } // namespace ModelGeomAlgo_Point2D

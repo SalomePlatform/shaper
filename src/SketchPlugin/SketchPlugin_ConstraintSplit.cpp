@@ -1304,7 +1304,7 @@ std::set<std::shared_ptr<ModelAPI_Attribute> > SketchPlugin_ConstraintSplit::get
   return anAttributes;
 }
 
-
+#ifdef _DEBUG
 std::string SketchPlugin_ConstraintSplit::getFeatureInfo(
                                                const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                const bool isUseAttributesInfo)
@@ -1365,4 +1365,4 @@ std::string SketchPlugin_ConstraintSplit::getFeatureInfo(
   }
   return anInfo;
 }
-
+#endif

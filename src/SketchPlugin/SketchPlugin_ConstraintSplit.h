@@ -282,11 +282,13 @@ private:
   std::set<std::shared_ptr<ModelAPI_Attribute> > getEdgeAttributes(
                                     const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
+#ifdef _DEBUG
   /// Return feature name, kind, point attribute values united in a string
   /// \param theFeature an investigated feature
   /// \return string value
   std::string getFeatureInfo(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              const bool isUseAttributesInfo = true);
+#endif
 };
 
 #endif

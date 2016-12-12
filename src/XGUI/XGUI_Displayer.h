@@ -335,9 +335,11 @@ private:
   /// \param theAIS AIOS object to display
   void appendResultObject(ObjectPtr theObject, AISObjectPtr theAIS);
 
+#ifdef _DEBUG
   /// Returns an information about alredy displayed objects
   /// \return a string representation
   std::string getResult2AISObjectMapInfo() const;
+#endif
 
   /// Returns container of visible presentations for the object. For a feature object,
   /// the feature results are processed also. The presentations map is not cleared inside.

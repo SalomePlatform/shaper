@@ -82,6 +82,7 @@ namespace ModelGeomAlgo_Point2D {
                                           const std::shared_ptr<GeomAPI_Pnt>& thePoint,
                                           std::shared_ptr<GeomAPI_Pnt>& theProjectedPoint);
 
+#ifdef _DEBUG
   /// Return feature name, kind and point values united in a string info
   /// \param theFeature an investigated feature
   /// \param theAttributesOnly a container of necessary attributes, if empty, all
@@ -96,6 +97,7 @@ namespace ModelGeomAlgo_Point2D {
   MODELGEOMALGO_EXPORT std::string getPointAttributeInfo(
                                   const std::shared_ptr<ModelAPI_Attribute>& theAttribute);
 
+#endif
 }
 
 #endif

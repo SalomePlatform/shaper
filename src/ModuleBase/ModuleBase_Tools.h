@@ -133,14 +133,14 @@ MODULEBASE_EXPORT QAction* createAction(const QIcon& theIcon, const QString& the
                                         const QString& theToolTip = QString(),
                                         const QString& theStatusTip = QString());
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 /// Converts the object to the feature or a result and generate information string
 /// \param theObj an object
 /// \param isUseAttributesInfo a flag whether the attribute values information is used
 /// \return a string
 MODULEBASE_EXPORT QString objectInfo(const ObjectPtr& theObj,
                                      const bool isUseAttributesInfo = false);
-//#endif
+#endif
 
 /// Converts string value (name of shape type) to shape enum value
 /// \param theType - string with shape type name
