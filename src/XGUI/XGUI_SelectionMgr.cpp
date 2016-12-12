@@ -73,8 +73,6 @@ void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& the
       #endif
     }
   }
-  ModuleBase_Tools::selectionInfo(aContext,
-                                  "XGUI_SelectionMgr::setSelectedOwners -- AddOrRemoveSelected");
 }
 
 //**************************************************************

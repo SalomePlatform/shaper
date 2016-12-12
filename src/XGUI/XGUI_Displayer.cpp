@@ -288,7 +288,6 @@ bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
       #ifdef VINSPECTOR
       if (myContextCallBack) myContextCallBack->Remove(anAIS);
       #endif
-      ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::erase -- Remove");
       aErased = true;
     }
   }
@@ -379,7 +378,6 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       #ifdef VINSPECTOR
       if (myContextCallBack) myContextCallBack->Redisplay(aAISIO);
       #endif
-      ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::redisplay -- Redisplay");
 
       if (aNeedToRestoreSelection)
         myWorkshop->module()->restoreSelection();
@@ -428,8 +426,6 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject, const bool theUpdateViewer)
     #ifdef VINSPECTOR
     if (myContextCallBack) myContextCallBack->ClearOutdatedSelection(anAIS);
     #endif
-    ModuleBase_Tools::selectionInfo(aContext,
-      "XGUI_Displayer::deactivate -- ClearOutdatedSelection");
     if (theUpdateViewer)
       updateViewer();
   }
@@ -707,8 +703,6 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValue
       }
     }
   }
-  ModuleBase_Tools::selectionInfo(aContext,
-    "XGUI_Displayer::setSelected -- AddOrRemoveSelected/UnhilightCurrents(no local context)");
   if (theUpdateViewer)
     updateViewer();
 }
@@ -746,7 +740,6 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
     if (theUpdateViewer)
       updateViewer();
   }
-  ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::eraseAll -- Remove");
   myResult2AISObjectMap.clear();
 #ifdef DEBUG_DISPLAY
   qDebug("eraseAll");
@@ -767,7 +760,6 @@ void deactivateObject(Handle(AIS_InteractiveContext) theContext,
     #ifdef VINSPECTOR
     if (theCallBack) theCallBack->Deactivate(theObject);
     #endif
-    ModuleBase_Tools::selectionInfo(theContext, "XGUI_Displayer::deactivateObject -- Deactivate");
     //if (theClear) {
       //theObject->ClearSelected();
       //  theContext->LocalContext()->ClearOutdatedSelection(theObject, true);
@@ -1023,7 +1015,6 @@ void XGUI_Displayer::activateAIS(const Handle(AIS_InteractiveObject)& theIO,
                                                               "edge-selection-sensitivity", 2);
       aContext->SetSelectionSensitivity(theIO, theMode, aPrecision);
     }
-    ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::activateAIS -- Activate");
 
 #ifdef DEBUG_ACTIVATE_AIS
     ObjectPtr anObject = getObject(theIO);
@@ -1053,7 +1044,6 @@ void XGUI_Displayer::deactivateAIS(const Handle(AIS_InteractiveObject)& theIO,
       if (myContextCallBack) myContextCallBack->Deactivate(theIO, theMode);
       #endif
     }
-    ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::deactivateAIS -- Deactivate");
 
 #ifdef DEBUG_DEACTIVATE_AIS
     ObjectPtr anObject = getObject(theIO);
@@ -1135,7 +1125,6 @@ bool XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer)
       #ifdef VINSPECTOR
       if (myContextCallBack) myContextCallBack->Remove(anAISIO);
       #endif
-      ModuleBase_Tools::selectionInfo(aContext, "XGUI_Displayer::eraseAIS -- Remove");
       aErased = true;
     }
   }
@@ -1341,8 +1330,6 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
     #ifdef VINSPECTOR
     if (myContextCallBack) myContextCallBack->ClearOutdatedSelection(theIO);
     #endif
-    ModuleBase_Tools::selectionInfo(aContext,
-            "XGUI_Displayer::activate -- ClearSelected/ClearOutdatedSelection");
     // For performance issues
     //if (theUpdateViewer)
     //  updateViewer();

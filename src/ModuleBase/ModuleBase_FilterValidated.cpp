@@ -29,8 +29,6 @@ Standard_Boolean ModuleBase_FilterValidated::
     ModuleBase_IViewer* aViewer = myWorkshop->viewer();
     Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
 
-    ModuleBase_Tools::selectionInfo(aContext, "ModuleBase_FilterValidated::IsOk");
-
     ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
     ModuleBase_ModelWidget* aCurrentWidget = aPanel->preselectionWidget();
     if (!aCurrentWidget)
