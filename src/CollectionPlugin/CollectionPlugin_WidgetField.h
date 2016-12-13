@@ -51,7 +51,7 @@ public:
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view
   /// \return a boolean value
-  virtual bool isValidSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
+  virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
 
   /// Returns true if the event is processed.
   virtual bool processEnter();

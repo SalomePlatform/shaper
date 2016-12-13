@@ -793,7 +793,7 @@ void CollectionPlugin_WidgetField::onStepMove(int theStep)
 
 //**********************************************************************************
 bool CollectionPlugin_WidgetField::
-  isValidSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs)
+  isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs)
 {
   return (myShapeTypeCombo->currentIndex() == 5)? false : true;
 }
@@ -812,8 +812,7 @@ void CollectionPlugin_WidgetField::onSelectionChanged()
   if (myShapeTypeCombo->currentIndex() == 5)
     return;
 
-  QList<ModuleBase_ViewerPrsPtr> aSelected =
-    myWorkshop->selection()->getSelected(ModuleBase_ISelection::AllControls);
+  QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
 
   AttributeSelectionListPtr aSelList =
     myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());

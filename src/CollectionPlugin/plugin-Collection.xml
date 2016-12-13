@@ -14,7 +14,9 @@
         title="Field"
         tooltip="Create create fields for selected shapes"
         icon="icons/Collection/field.png">
-        <field-panel/>
+        <field-panel id="selected">
+          <validator id="GeomValidators_BodyShapes"/>
+        </field-panel>
       </feature>      
     </group>
   </workbench>
