@@ -590,17 +590,19 @@ bool CollectionPlugin_WidgetField::restoreValueCustom()
 //**********************************************************************************
 int CollectionPlugin_WidgetField::getSelectionType(const std::string& theStr) const
 {
-  if (theStr == "vertex")
+  QString aType(theStr.c_str());
+  aType = aType.toLower();
+  if (aType == "vertex")
     return 0;
-  else if (theStr == "edge")
+  else if (aType == "edge")
     return 1;
-  else if (theStr == "face")
+  else if (aType == "face")
     return 2;
-  else if (theStr == "solid")
+  else if (aType == "solid")
     return 3;
-  else if (theStr == "object")
+  else if (aType == "object")
     return 4;
-  else if (theStr == "part")
+  else if (aType == "part")
     return 5;
   return -1;
 }

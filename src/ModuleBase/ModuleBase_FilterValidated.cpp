@@ -30,20 +30,22 @@ Standard_Boolean ModuleBase_FilterValidated::
     Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
 
     ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
-    ModuleBase_ModelWidget* aCurrentWidget = aPanel->preselectionWidget();
-    if (!aCurrentWidget)
-      aCurrentWidget = myWorkshop->module()->activeWidget();
-    if (aCurrentWidget) {
-      ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
-      myWorkshop->selection()->fillPresentation(aPrs, theOwner);
-      ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
-                                                                             (aCurrentWidget);
-      if (aWidgetValidated)
-        aValid = !aWidgetValidated || aWidgetValidated->isValidSelection(aPrs);
-      else{
-        ModuleBase_WidgetValidator* aWidgetValidator = aCurrentWidget->widgetValidator();
-        if (aWidgetValidator)
-          aValid = aWidgetValidator->isValidSelection(aPrs);
+    if (aPanel) {
+      ModuleBase_ModelWidget* aCurrentWidget = aPanel->preselectionWidget();
+      if (!aCurrentWidget)
+        aCurrentWidget = myWorkshop->module()->activeWidget();
+      if (aCurrentWidget) {
+        ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
+        myWorkshop->selection()->fillPresentation(aPrs, theOwner);
+        ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
+                                                                               (aCurrentWidget);
+        if (aWidgetValidated)
+          aValid = !aWidgetValidated || aWidgetValidated->isValidSelection(aPrs);
+        else{
+          ModuleBase_WidgetValidator* aWidgetValidator = aCurrentWidget->widgetValidator();
+          if (aWidgetValidator)
+            aValid = aWidgetValidator->isValidSelection(aPrs);
+        }
       }
     }
   }
