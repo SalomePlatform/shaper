@@ -372,6 +372,9 @@ QTableWidgetItem* CollectionPlugin_WidgetField::createDefaultItem() const
   case ModelAPI_AttributeTables::BOOLEAN:
     aItem->setText(MYFalse);
     break;
+  case ModelAPI_AttributeTables::STRING:
+    aItem->setText("");
+    break;
   }
   return aItem;
 }
@@ -891,6 +894,9 @@ void CollectionPlugin_WidgetField::onFieldTypeChanged(int theIdx)
               break;
             case ModelAPI_AttributeTables::BOOLEAN:
               aTable->item(j, i)->setText(MYFalse);
+              break;
+            case ModelAPI_AttributeTables::STRING:
+              aTable->item(j, i)->setText("");
               break;
             }
           }
