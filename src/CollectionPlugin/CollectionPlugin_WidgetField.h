@@ -76,6 +76,7 @@ protected:
   /// \param theEvent an event
   virtual bool eventFilter(QObject* theObject, QEvent* theEvent);
 
+  //virtual void showEvent(QShowEvent* theEvent);
 
 protected slots:
   /// Slot which is called on selection event
@@ -196,7 +197,7 @@ private:
   int myEditIndex;
 
   /// Stae of a table editing
-  bool myIsEditing;
+  bool myIsTabEdit;
 
   bool myActivation;
 };
