@@ -116,7 +116,7 @@ CollectionPlugin_WidgetField::
                                ModuleBase_IWorkshop* theWorkshop,
                                const Config_WidgetAPI* theData):
 ModuleBase_WidgetSelector(theParent, theWorkshop, theData), myHeaderEditor(0),
-  myIsEditing(false), myActivation(false)
+  myIsTabEdit(false), myActivation(false)
 {
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);
 
@@ -284,6 +284,13 @@ void CollectionPlugin_WidgetField::deactivate()
   storeValueCustom();
 }
 
+//**********************************************************************************
+//void CollectionPlugin_WidgetField::showEvent(QShowEvent* theEvent)
+//{
+//  myShapeTypeCombo->setEnabled(!isEditingMode());
+//  myFieldTypeCombo->setEnabled(!isEditingMode());
+//  myNbComponentsSpn->setEnabled(!isEditingMode());
+//}
 
 //**********************************************************************************
 bool CollectionPlugin_WidgetField::eventFilter(QObject* theObject, QEvent* theEvent)
@@ -794,6 +801,9 @@ bool CollectionPlugin_WidgetField::
 //**********************************************************************************
 void CollectionPlugin_WidgetField::onSelectionChanged()
 {
+  //if (isEditingMode())
+  //  return;
+
   if (myActivation) {
     myActivation = false;
     return;
@@ -952,8 +962,8 @@ void CollectionPlugin_WidgetField::onShapeTypeChanged(int theType)
 //**********************************************************************************
 bool CollectionPlugin_WidgetField::processEnter()
 {
-  if (myIsEditing) {
-    myIsEditing = false;
+  if (myIsTabEdit) {
+    myIsTabEdit = false;
     return true;
   }
   return false;
@@ -962,8 +972,8 @@ bool CollectionPlugin_WidgetField::processEnter()
 //**********************************************************************************
 void CollectionPlugin_WidgetField::onFocusChanged(QWidget* theOld, QWidget* theNew)
 {
-  if (theNew && (!myIsEditing))
-    myIsEditing = dynamic_cast<QLineEdit*>(theNew);
+  if (theNew && (!myIsTabEdit))
+    myIsTabEdit = dynamic_cast<QLineEdit*>(theNew);
 }
 
 //**********************************************************************************
