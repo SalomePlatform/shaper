@@ -119,6 +119,8 @@ private slots:
   /// \param theMax a maximal value
   void onRangeChanged(int theMin, int theMax);
 
+  void onColumnResize(int theIndex, int theOld, int theNew);
+
 private:
   /// Clear existing tables
   void clearData();
@@ -147,6 +149,8 @@ private:
   /// Create a table item from the given value
   /// \param theVal a value for the item
   QTableWidgetItem* createValueItem(ModelAPI_AttributeTables::Value& theVal) const;
+
+  QString getValueText(ModelAPI_AttributeTables::Value& theVal) const;
 
   /// Return a value from the string
   /// \param theStrVal a string
