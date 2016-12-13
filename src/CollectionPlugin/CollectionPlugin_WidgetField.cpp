@@ -248,7 +248,7 @@ void CollectionPlugin_WidgetField::appendStepControls()
   aDataTbl->setRowHeight(0, 25);
   aDataTbl->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
-  connect(aDataTbl->horizontalHeader(), SIGNAL(sectionResized(int, int, int)), 
+  connect(aDataTbl->horizontalHeader(), SIGNAL(sectionResized(int, int, int)),
           SLOT(onColumnResize(int, int, int)));
 
   updateHeaders(aDataTbl);
@@ -732,7 +732,7 @@ void CollectionPlugin_WidgetField::onAddStep()
       for(int j = 1; j < aRows; j++) {
         aItem = aTable->item(j, i);
         if (!aItem) {
-          aItem = new QTableWidgetItem();       
+          aItem = new QTableWidgetItem();
           aTable->setItem(j, i, aItem);
         }
         AttributeSelectionPtr aAttr = aSelList->value(j - 1);
