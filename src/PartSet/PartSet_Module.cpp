@@ -1292,7 +1292,8 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
     return;
   SessionPtr aMgr = ModelAPI_Session::get();
   if (!theIndex.isValid()) {
-    aMgr->setActiveDocument(aMgr->moduleDocument());
+    // It seems that this code is obsolete
+    //aMgr->setActiveDocument(aMgr->moduleDocument());
     return;
   }
   if (theIndex.column() != 0) // Use only first column
