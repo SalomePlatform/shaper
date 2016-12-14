@@ -44,14 +44,16 @@ bool ExchangePlugin_FormatValidator::isValid(const AttributePtr& theAttribute,
                                              Events_InfoMessage& theError) const
 {
   if (!theAttribute->isInitialized()) {
-    theError = "Is not initialized.";
+    theError = "%1 is not initialized.";
+    theError.arg(theAttribute->id());
     return false;
   }
 
   const AttributeStringPtr aStrAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
   if (!aStrAttr) {
-    theError = "Is not a string attribute.";
+    theError = "%1 is not a string attribute.";
+    theError.arg(theAttribute->id());
     return false;
   }
 

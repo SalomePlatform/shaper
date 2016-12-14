@@ -80,4 +80,15 @@
       <translation>Set the XAO file geometry name</translation>
     </message>
   </context>
+  <context>
+    <name>Export:ExchangePlugin_ExportFormat</name>
+    <message>
+      <source>%1 is not initialized.</source>
+      <translation>Attribute %1 is not initialized.</translation>
+    </message>
+    <message>
+      <source>%1 is not a string attribute.</source>
+      <translation>Attribute %1 is not a string.</translation>
+    </message>
+  </context>
 </TS>
