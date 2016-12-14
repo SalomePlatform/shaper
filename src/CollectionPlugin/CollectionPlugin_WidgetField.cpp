@@ -10,10 +10,7 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ISelection.h>
-
-#include <XGUI_Tools.h>
-#include <XGUI_Workshop.h>
-#include <XGUI_PropertyPanel.h>
+#include <ModuleBase_IPropertyPanel.h>
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeStringArray.h>
@@ -356,8 +353,7 @@ bool CollectionPlugin_WidgetField::eventFilter(QObject* theObject, QEvent* theEv
   } else if (theEvent->type() == QEvent::FocusIn) {
     QTableWidget* aTable = dynamic_cast<QTableWidget*>(theObject);
     if (aTable) {
-      XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
-      XGUI_PropertyPanel* aPanel = aWorkshop->propertyPanel();
+      ModuleBase_IPropertyPanel* aPanel = myWorkshop->propertyPanel();
       if (aPanel->activeWidget() != this) {
         myActivation = true;
         aPanel->activateWidget(this, false);
