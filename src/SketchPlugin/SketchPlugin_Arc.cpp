@@ -442,14 +442,12 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
     std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(new GeomAPI_Circ2d(aCenter, aStart));
 
     data()->blockSendAttributeUpdated(true);
-    if (theID == END_ID() && isStable()) {
-      // The arc is under construction, so its end point projected
-      // on the circle formed by center and start points
-      std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEnd);
-      if (aProjection && anEnd->distance(aProjection) > tolerance) {
-        anEndAttr->setValue(aProjection);
-        anEnd = aProjection;
-      }
+    // The Arc end point is projected
+    // on the circle formed by center and start points
+    std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEnd);
+    if (aProjection && anEnd->distance(aProjection) > tolerance) {
+      anEndAttr->setValue(aProjection);
+      anEnd = aProjection;
     }
     // update all other attributes due to the base attributes values
     if (aTypeAttr->value() == ARC_TYPE_THREE_POINTS()) {
@@ -518,7 +516,7 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
     AttributeBooleanPtr isInversed =
         std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(attribute(INVERSED_ID()));
     double aParameterNew = aEndParam - aStartParam;
-    if (0 <= myParamBefore && myParamBefore <= PI / 2.0 &&
+    if (((0 <= myParamBefore && myParamBefore <= PI / 2.0) || myParamBefore == PI * 2.0) &&
         PI * 1.5 <= aParameterNew && aParameterNew <= PI * 2.0)
       isInversed->setValue(true);
     else if (PI * 1.5 <= myParamBefore && myParamBefore <= PI * 2.0 &&
