@@ -62,8 +62,8 @@ ModelAPI_Document* getSubDocument(void* theObj)
 
 
 // Constructor *************************************************
-XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParent),
-  myIsEventsProcessingBlocked(false)
+XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParent)//,
+  //myIsEventsProcessingBlocked(false)
 {
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
@@ -80,8 +80,8 @@ XGUI_DataModel::~XGUI_DataModel()
 //******************************************************
 void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
-  if (myIsEventsProcessingBlocked)
-    return;
+  //if (myIsEventsProcessingBlocked)
+  //  return;
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   std::string aRootType = myXMLReader->rootType();
   std::string aSubType = myXMLReader->subType();
@@ -427,13 +427,14 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
       int aRow = theIndexRow;
       while (aMissedIdx.contains(aRow))
         aRow++;
-
-      switch (theRole) {
-        case Qt::DisplayRole:
-          return QString(myXMLReader->subFolderName(aRow).c_str()) +
-            QString(" (%1)").arg(rowCount(theIndex));
-        case Qt::DecorationRole:
-          return QIcon(myXMLReader->subFolderIcon(aRow).c_str());
+      if (aRow < myXMLReader->subFoldersNumber()) {
+        switch (theRole) {
+          case Qt::DisplayRole:
+            return QString(myXMLReader->subFolderName(aRow).c_str()) +
+              QString(" (%1)").arg(rowCount(theIndex));
+          case Qt::DecorationRole:
+            return QIcon(myXMLReader->subFolderIcon(aRow).c_str());
+        }
       }
     } else {
       ModelAPI_Object* aObj = (ModelAPI_Object*)theIndex.internalPointer();
@@ -505,8 +506,10 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
       int aRow = theParent.row();
       while (aMissedIdx.contains(aRow))
         aRow++;
-      std::string aType = myXMLReader->subFolderType(aRow);
-      return aDoc->size(aType);
+      if (aRow < myXMLReader->subFoldersNumber()) {
+        std::string aType = myXMLReader->subFolderType(aRow);
+        return aDoc->size(aType);
+      }
     } else {
       ModelAPI_Object* aObj = (ModelAPI_Object*)theParent.internalPointer();
       // Check for Part feature
@@ -580,10 +583,12 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
         QIntList aMissedIdx = missedFolderIndexes(aDoc);
         while (aMissedIdx.contains(aParentRow))
           aParentRow++;
-        std::string aType = myXMLReader->subFolderType(aParentRow);
-        if (theRow < aDoc->size(aType)) {
-          ObjectPtr aObj = aDoc->object(aType, theRow);
-          aIndex = objectIndex(aObj);
+        if (aParentRow < myXMLReader->subFoldersNumber()) {
+          std::string aType = myXMLReader->subFolderType(aParentRow);
+          if (theRow < aDoc->size(aType)) {
+            ObjectPtr aObj = aDoc->object(aType, theRow);
+            aIndex = objectIndex(aObj);
+          }
         }
       } else {
         ModelAPI_Object* aParentObj = (ModelAPI_Object*)theParent.internalPointer();
@@ -965,9 +970,9 @@ void XGUI_DataModel::rebuildBranch(int theRow, int theCount, const QModelIndex& 
 }
 
 //******************************************************
-bool XGUI_DataModel::blockEventsProcessing(const bool theState)
-{
-  bool aPreviousState = myIsEventsProcessingBlocked;
-  myIsEventsProcessingBlocked = theState;
-  return aPreviousState;
-}
+//bool XGUI_DataModel::blockEventsProcessing(const bool theState)
+//{
+//  bool aPreviousState = myIsEventsProcessingBlocked;
+//  myIsEventsProcessingBlocked = theState;
+//  return aPreviousState;
+//}
