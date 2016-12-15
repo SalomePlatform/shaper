@@ -144,7 +144,7 @@ void SHAPERGUI::viewManagers(QStringList& theList) const
 }
 
 //******************************************************
-// We can not create selector in this method because it can be called when 
+// We can not create selector in this method because it can be called when
 // SHAPER module is not active. Take into account that creation of our selector
 // leads to switching OFF all other selectors
 //void SHAPERGUI::connectToStudy(CAM_Study* theStudy)
@@ -154,7 +154,8 @@ void SHAPERGUI::viewManagers(QStringList& theList) const
 //  // proxy viewer. If study is opened, CAM application calls this method before the open()
 //  // of data model
 //  // the SHAPER data model is specific and during open(load) redisplay signals are flushed, so
-//  // we need to connect to the viewer before it. Here, it seems the most appropriate place for this
+//  // we need to connect to the viewer before it. Here, 
+//  // it seems the most appropriate place for this
 //  // according to SALOME architecture.
 //  if (!mySelector) {
 //    ViewManagerList OCCViewManagers;
