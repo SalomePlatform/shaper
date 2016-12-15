@@ -422,7 +422,8 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
           }
         }
         if (!aFound) { // if not, the part was removed, so activate the module document
-          setActiveDocument(moduleDocument());
+          if (myCurrentDoc.get())
+            setActiveDocument(moduleDocument());
         }
       }
     }
