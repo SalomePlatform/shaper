@@ -2,7 +2,6 @@
 
 INCLUDE(Common)
 INCLUDE(UnitTest)
-SET(CMAKE_AUTOMOC ON)
 
 SET(PROJECT_HEADERS
     CollectionPlugin.h
@@ -52,7 +51,7 @@ SET(PROJECT_LIBRARIES
     GeomAlgoAPI
     GeomValidators
     ModuleBase
-	XGUI
+    XGUI
 )
 
 ADD_DEFINITIONS(-DCOLLECTIONPLUGIN_EXPORTS ${CAS_DEFINITIONS})

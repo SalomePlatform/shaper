@@ -29,7 +29,6 @@
 #include <Select3D_SensitivePoint.hxx>
 
 
-IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Coincident, AIS_InteractiveObject);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Coincident, AIS_InteractiveObject);
 
 SketcherPrs_Coincident::SketcherPrs_Coincident(ModelAPI_Feature* theConstraint,

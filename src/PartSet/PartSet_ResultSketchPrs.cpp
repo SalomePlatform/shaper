@@ -28,7 +28,7 @@
 #include <Prs3d_PointAspect.hxx>
 #include <TopoDS_Builder.hxx>
 #include <SelectMgr_SelectionManager.hxx>
-#include <StdPrs_WFDeflectionShape.hxx>
+#include <StdPrs_WFShape.hxx>
 #include <StdSelect_BRepSelectionTool.hxx>
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Prs3d_LineAspect.hxx>
@@ -43,7 +43,6 @@
 
 //*******************************************************************************************
 
-IMPLEMENT_STANDARD_HANDLE(PartSet_ResultSketchPrs, ViewerData_AISShape);
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_ResultSketchPrs, ViewerData_AISShape);
 
 PartSet_ResultSketchPrs::PartSet_ResultSketchPrs(ResultPtr theResult)
@@ -99,7 +98,7 @@ void PartSet_ResultSketchPrs::Compute(
     setAuxiliaryPresentationStyle(true);
 
     Handle(Prs3d_Drawer) aDrawer = Attributes();
-    StdPrs_WFDeflectionShape::Add(thePresentation, myAuxiliaryCompound, aDrawer);
+    StdPrs_WFShape::Add(thePresentation, myAuxiliaryCompound, aDrawer);
   }
 
   if (!aReadyToDisplay) {

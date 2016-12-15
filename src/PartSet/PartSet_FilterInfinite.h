@@ -31,7 +31,7 @@ public:
   Standard_EXPORT virtual Standard_Boolean
     IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
-  DEFINE_STANDARD_RTTI(PartSet_FilterInfinite)
+  DEFINE_STANDARD_RTTIEXT(PartSet_FilterInfinite, SelectMgr_Filter)
 
 protected:
   /// Reference to workshop

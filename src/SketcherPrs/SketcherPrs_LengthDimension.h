@@ -38,7 +38,7 @@ public:
   /// Destructor
   Standard_EXPORT ~SketcherPrs_LengthDimension();
 
-  DEFINE_STANDARD_RTTI(SketcherPrs_LengthDimension)
+  DEFINE_STANDARD_RTTIEXT(SketcherPrs_LengthDimension, AIS_LengthDimension)
 
   /// Returns true if the constraint feature arguments are correcly filled
   /// to build AIS presentation

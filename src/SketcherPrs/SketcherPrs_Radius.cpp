@@ -23,7 +23,6 @@
 
 static const gp_Circ MyDefCirc(gp_Ax2(gp_Pnt(0,0,0), gp_Dir(0,0,1)), 1);
 
-IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Radius, AIS_RadiusDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Radius, AIS_RadiusDimension);
 
 SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint,
@@ -33,7 +32,8 @@ SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint,
   myAnchorPoint(gp_Pnt(0, 0, 2)),
   myValue(1, false, "")
 {
-  SetDimensionAspect(SketcherPrs_Tools::createDimensionAspect());
+  // PORTING_TO_SALOME_8
+  // SetDimensionAspect(SketcherPrs_Tools::createDimensionAspect());
   myStyleListener = new SketcherPrs_DimensionStyleListener();
 }
 
@@ -138,7 +138,8 @@ void SketcherPrs_Radius::Compute(
   // Update variable aspect parameters (depending on viewer scale)
   double aTextSize = 0.0;
   GetValueString(aTextSize);
-  SketcherPrs_Tools::updateArrows(DimensionAspect(), GetValue(), aTextSize);
+  // PORTING_TO_SALOME_8
+  //SketcherPrs_Tools::updateArrows(DimensionAspect(), GetValue(), aTextSize);
 
 
   AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);

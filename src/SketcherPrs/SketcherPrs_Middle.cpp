@@ -14,7 +14,6 @@
 #include <Prs3d_Root.hxx>
 
 
-IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Middle, SketcherPrs_SymbolPrs);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Middle, SketcherPrs_SymbolPrs);
 
 static Handle(Image_AlienPixMap) MyPixMap;

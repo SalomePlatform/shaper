@@ -28,7 +28,7 @@
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Vertex.hxx>
 
-#include <Prs3d_DimensionAspect.hxx>
+//#include <Prs3d_DimensionAspect.hxx>
 
 #include <BRep_Tool.hxx>
 #include <Precision.hxx>
@@ -297,7 +297,7 @@ void sendExpressionShownEvent(const bool& theState)
   Events_Loop::loop()->flush(anId);
 }
 
-Handle(Prs3d_DimensionAspect) createDimensionAspect()
+/*Handle(Prs3d_DimensionAspect) createDimensionAspect()
 {
   Handle(Prs3d_DimensionAspect) anAspect = new Prs3d_DimensionAspect();
   anAspect->MakeArrows3d(false);
@@ -329,7 +329,7 @@ void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
   theDimAspect->SetArrowTailSize(theDimAspect->ArrowAspect()->Length());
   // The value of vertical aligment is sometimes changed
   theDimAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
-}
+}*/
 
 void sendEmptyPresentationError(ModelAPI_Feature* theFeature, const std::string theError)
 {

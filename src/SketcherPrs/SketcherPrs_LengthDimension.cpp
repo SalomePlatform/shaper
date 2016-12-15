@@ -31,7 +31,6 @@ static const gp_Pnt MyDefStart(0,0,0);
 static const gp_Pnt MyDefEnd(1,0,0);
 static const gp_Pln MyDefPln(gp_Pnt(0,0,0), gp_Dir(0,0,1));
 
-IMPLEMENT_STANDARD_HANDLE(SketcherPrs_LengthDimension, AIS_LengthDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_LengthDimension, AIS_LengthDimension);
 
 SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theConstraint,
@@ -45,7 +44,8 @@ SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theCo
   myDistance(1),
   myValue(0., false, "")
 {
-  SetDimensionAspect(SketcherPrs_Tools::createDimensionAspect());
+  // PORTING_TO_SALOME_8
+  // SetDimensionAspect(SketcherPrs_Tools::createDimensionAspect());
   myStyleListener = new SketcherPrs_DimensionStyleListener();
 }
 
@@ -87,7 +87,9 @@ void SketcherPrs_LengthDimension::Compute(
   // Update variable aspect parameters (depending on viewer scale)
   double aTextSize = 0.0;
   GetValueString(aTextSize);
-  SketcherPrs_Tools::updateArrows(DimensionAspect(), GetValue(), aTextSize);
+
+  // PORTING_TO_SALOME_8
+  //SketcherPrs_Tools::updateArrows(DimensionAspect(), GetValue(), aTextSize);
 
   // Update text visualization: parameter value or parameter text
   myStyleListener->updateDimensions(this, myValue);

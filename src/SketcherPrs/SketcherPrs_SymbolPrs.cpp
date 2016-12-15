@@ -230,7 +230,8 @@ private:
 
 
 //**************************************************************
-//! Definition of call back
+// PORTING_TO_SALOME_8
+/*//! Definition of call back
 OpenGl_Element* SymbolPrsCallBack(const CALL_DEF_USERDRAW * theUserDraw)
 {
   Handle(SketcherPrs_SymbolPrs) anIObj = (SketcherPrs_SymbolPrs*)theUserDraw->Data;
@@ -240,11 +241,10 @@ OpenGl_Element* SymbolPrsCallBack(const CALL_DEF_USERDRAW * theUserDraw)
       << std::endl;
   }
   return new SketcherPrs_Element(anIObj);
-}
+}*/
 
 
 //*****************************************************************************
-IMPLEMENT_STANDARD_HANDLE(SketcherPrs_SymbolPrs, AIS_InteractiveObject);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_SymbolPrs, AIS_InteractiveObject);
 
 
@@ -344,7 +344,8 @@ void SketcherPrs_SymbolPrs::HilightSelected(const Handle(PrsMgr_PresentationMana
 
   aSelectionPrs->SetDisplayPriority(9);
   aSelectionPrs->Display();
-  thePM->Highlight(this);
+  // PORTING_TO_SALOME_8
+  //thePM->Highlight(this);
 }
 
 void SketcherPrs_SymbolPrs::HilightOwnerWithColor(
@@ -352,6 +353,8 @@ void SketcherPrs_SymbolPrs::HilightOwnerWithColor(
   const Quantity_NameOfColor theColor,
   const Handle(SelectMgr_EntityOwner)& theOwner)
 {
+  // PORTING_TO_SALOME_8
+  /*
   thePM->Color(this, theColor);
 
   Handle( Prs3d_Presentation ) aHilightPrs = GetHilightPresentation( thePM );
@@ -360,6 +363,7 @@ void SketcherPrs_SymbolPrs::HilightOwnerWithColor(
 
   if (thePM->IsImmediateModeOn())
     thePM->AddToImmediateList(aHilightPrs);
+  */
 }
 
 void SketcherPrs_SymbolPrs::Compute(
@@ -375,7 +379,8 @@ void SketcherPrs_SymbolPrs::Compute(
     Handle(OpenGl_GraphicDriver)::DownCast(aCtx->CurrentViewer()->Driver());
   if (!aDriver.IsNull()) {
     // register the custom element factory function
-    aDriver->UserDrawCallback() = SymbolPrsCallBack;
+    // PORTING_TO_SALOME_8
+    //aDriver->UserDrawCallback() = SymbolPrsCallBack;
   }
 
   // Update points with default shift value
@@ -409,7 +414,8 @@ void SketcherPrs_SymbolPrs::Compute(
   }
 
   // Pint the group with custom procedure (see Render)
-  aGroup->UserDraw(this, true);
+  // PORTING_TO_SALOME_8
+  //aGroup->UserDraw(this, true);
 
   // Disable frustum culling for this object by marking it as mutable
   aGroup->Structure()->SetMutable(true);
@@ -452,6 +458,8 @@ void SketcherPrs_SymbolPrs::SetConflictingConstraint(const bool& theConflicting,
 
 void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace) const
 {
+  // PORTING_TO_SALOME_8
+  /*
   // this method is a combination of OCCT OpenGL functions. The main purpose is to have
   // equal distance from the source object to symbol indpendently of zoom.
   // It is base on OCCT 6.9.1 and might need changes when using later OCCT versions.
@@ -543,6 +551,7 @@ void SketcherPrs_SymbolPrs::Render(const Handle(OpenGl_Workspace)& theWorkspace)
     GetContext()->MainSelector()->RebuildSensitivesTree (this);
     GetContext()->MainSelector()->RebuildObjectsTree (false);
   }
+*/
 }
 
 

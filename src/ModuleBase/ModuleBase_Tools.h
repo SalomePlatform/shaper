@@ -26,8 +26,6 @@
 
 #include <map>
 
-class Handle_AIS_InteractiveContext;
-
 class QWidget;
 class QLayout;
 class QDoubleSpinBox;

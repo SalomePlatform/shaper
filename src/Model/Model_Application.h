@@ -30,7 +30,7 @@ public:
   // CASCADE RTTI
   /// Definition of "Handles" usage
   /// \param Model_Application is the class name that is covered by the OCCT Handle
-  DEFINE_STANDARD_RTTI(Model_Application);
+  DEFINE_STANDARD_RTTIEXT(Model_Application, TDocStd_Application)
 
   //! Retuns the application: one per process
   MODEL_EXPORT static Handle_Model_Application getApplication();

@@ -29,7 +29,7 @@ public:
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
 
-  DEFINE_STANDARD_RTTI(SketcherPrs_Rigid)
+  DEFINE_STANDARD_RTTIEXT(SketcherPrs_Rigid, SketcherPrs_SymbolPrs)
 
   /// Returns true if the constraint feature arguments are correcly filled to build AIS presentation
   /// \param theConstraint a constraint feature

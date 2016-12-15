@@ -42,8 +42,7 @@ public:
   Standard_EXPORT virtual
     Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
-  DEFINE_STANDARD_RTTI(ModuleBase_FilterValidated)
-
+  DEFINE_STANDARD_RTTIEXT(ModuleBase_FilterValidated, SelectMgr_Filter)
 protected:
   /// Instance of workshop interface
   ModuleBase_IWorkshop* myWorkshop;

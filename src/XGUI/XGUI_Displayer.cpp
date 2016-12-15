@@ -200,7 +200,7 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
           else {
             Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(anAISPrs);
             if (!aShapePrs.IsNull())
-              ModuleBase_Tools::setPointBallHighlighting((AIS_Shape*) aShapePrs.Access());
+              ModuleBase_Tools::setPointBallHighlighting((AIS_Shape*) aShapePrs.get());
           }
           anAIS->setImpl(new Handle(AIS_InteractiveObject)(anAISPrs));
           //anAIS->createShape(aShapePtr);
@@ -1230,14 +1230,14 @@ bool XGUI_Displayer::hasSelectionFilter(const Handle(SelectMgr_Filter)& theFilte
   const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
   SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
   for (; aIt.More() && !aFilterFound; aIt.Next()) {
-    if (theFilter.Access() == aIt.Value().Access())
+    if (theFilter.get() == aIt.Value().get())
       aFilterFound = true;
   }
   Handle(SelectMgr_CompositionFilter) aCompositeFilter = GetFilter();
   if (!aCompositeFilter.IsNull()) {
     const SelectMgr_ListOfFilter& aStoredFilters = aCompositeFilter->StoredFilters();
     for (aIt.Initialize(aStoredFilters); aIt.More() && !aFilterFound; aIt.Next()) {
-      if (theFilter.Access() == aIt.Value().Access())
+      if (theFilter.get() == aIt.Value().get())
         aFilterFound = true;
     }
   }
@@ -1545,6 +1545,8 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
                            const NCollection_DataMap<TopoDS_Shape,
                            NCollection_Map<Handle(AIS_InteractiveObject)>>& theShapesToBeSelected)
 {
+  /*
+  // PORTING_TO_SALOME_8
   Handle(AIS_LocalContext) aLContext = theContext->LocalContext();
   TCollection_AsciiString aSelectionName = aLContext->SelectionName();
   aLContext->UnhilightPicked(Standard_False);
@@ -1562,9 +1564,9 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
   QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
   for (; anOwnersIt.More(); anOwnersIt.Next()) {
     anOwner = Handle(SelectMgr_EntityOwner)::DownCast (anOwnersIt.Value());
-    if (aSelectedIds.contains((long)anOwner.Access()))
+    if (aSelectedIds.contains((long)anOwner.get()))
       continue;
-    aSelectedIds.append((long)anOwner.Access());
+    aSelectedIds.append((long)anOwner.get());
 
     Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast(anOwner);
     if (!BROwnr.IsNull() && BROwnr->HasShape()) {
@@ -1582,4 +1584,5 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
     }
   }
   aLContext->HilightPicked(Standard_False);
+*/
 }

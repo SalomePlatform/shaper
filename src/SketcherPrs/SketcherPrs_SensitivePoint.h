@@ -53,7 +53,7 @@ public:
   /// Clear sub-elements
   Standard_EXPORT virtual void Clear() Standard_OVERRIDE;
 
-  DEFINE_STANDARD_RTTI(SketcherPrs_SensitivePoint)
+  DEFINE_STANDARD_RTTIEXT(SketcherPrs_SensitivePoint, Select3D_SensitiveEntity)
 
 private:
   int myId;

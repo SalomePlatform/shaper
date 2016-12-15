@@ -11,7 +11,6 @@
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_IWorkshop.h>
 
-class Handle_AIS_InteractiveContext;
 class XGUI_Workshop;
 class XGUI_Displayer;
 

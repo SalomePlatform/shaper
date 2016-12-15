@@ -28,7 +28,7 @@ public:
   Standard_EXPORT SketcherPrs_Perpendicular(ModelAPI_Feature* theConstraint,
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
-  DEFINE_STANDARD_RTTI(SketcherPrs_Perpendicular)
+  DEFINE_STANDARD_RTTIEXT(SketcherPrs_Perpendicular, SketcherPrs_SymbolPrs)
 
   /// Returns true if the constraint feature arguments are correcly filled to build AIS presentation
   /// \param theConstraint a constraint feature

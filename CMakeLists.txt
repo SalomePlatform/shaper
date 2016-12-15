@@ -1,13 +1,21 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.10)
 
 PROJECT (SHAPER)
+# Ensure a proper linker behavior:
+CMAKE_POLICY(SET CMP0003 NEW)
+IF(WIN32)
+  CMAKE_POLICY(SET CMP0020 OLD) # disable automatic linking to qtmain.lib 
+ENDIF(WIN32)
+
 SET (SHAPER_Version 2.6.0)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeCommon" ${CMAKE_MODULE_PATH})
 
+INCLUDE(SalomeMacros)
+
 INCLUDE(FindEclipse)
 INCLUDE(Common)
-INCLUDE(FindQt)
+INCLUDE(FindSalomeQt5)
 INCLUDE(FindPython)
 INCLUDE(FindSalome)
 INCLUDE(FindCAS)

@@ -54,7 +54,7 @@ public:
   static bool IsReadyToDisplay(ModelAPI_Feature* theConstraint,
                                const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
-  DEFINE_STANDARD_RTTI(SketcherPrs_Coincident)
+  DEFINE_STANDARD_RTTIEXT(SketcherPrs_Coincident, AIS_InteractiveObject)
 protected:
   /// Redefinition of virtual function
   Standard_EXPORT virtual void Compute(

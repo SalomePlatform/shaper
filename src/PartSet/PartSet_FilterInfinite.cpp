@@ -17,7 +17,6 @@
 #include <TopoDS_Shape.hxx>
 #include <StdSelect_BRepOwner.hxx>
 
-IMPLEMENT_STANDARD_HANDLE(PartSet_FilterInfinite, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_FilterInfinite, SelectMgr_Filter);
 
 PartSet_FilterInfinite::PartSet_FilterInfinite(ModuleBase_IWorkshop* theWorkshop)

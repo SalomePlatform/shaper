@@ -17,7 +17,6 @@
 #include <Config_PropManager.h>
 
 class SketchPlugin_Sketch;
-class Handle_AIS_InteractiveObject;
 
 /**\class SketchPlugin_Feature
  * \ingroup Plugins

@@ -86,9 +86,9 @@ void XGUI_Selection::getSelectedInViewer(QList<ModuleBase_ViewerPrsPtr>& thePres
       ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
       Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
 
-      if (aSelectedIds.contains((long)anOwner.Access()))
+      if (aSelectedIds.contains((long)anOwner.get()))
         continue;
-      aSelectedIds.append((long)anOwner.Access());
+      aSelectedIds.append((long)anOwner.get());
 
       fillPresentation(aPrs, anOwner);
 
@@ -234,9 +234,9 @@ QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getHighlighted() const
   for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
     Handle(SelectMgr_EntityOwner) anOwner = aContext->DetectedOwner();
     if (!anOwner.IsNull()) {
-      if (aSelectedIds.contains((long)anOwner.Access()))
+      if (aSelectedIds.contains((long)anOwner.get()))
         continue;
-      aSelectedIds.append((long)anOwner.Access());
+      aSelectedIds.append((long)anOwner.get());
 
       ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
       fillPresentation(aPrs, anOwner);

@@ -19,7 +19,6 @@
 #include <StdSelect_BRepOwner.hxx>
 
 
-IMPLEMENT_STANDARD_HANDLE(PartSet_GlobalFilter, ModuleBase_ShapeDocumentFilter);
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_GlobalFilter, ModuleBase_ShapeDocumentFilter);
 
 Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
@@ -66,7 +65,6 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
   return aValid;
 }
 
-IMPLEMENT_STANDARD_HANDLE(PartSet_CirclePointFilter, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_CirclePointFilter, SelectMgr_Filter);
 
 Standard_Boolean

@@ -213,10 +213,10 @@ void XGUI_TreeViewStyle::drawPrimitive(PrimitiveElement theElement,
         aState &= ~QStyle::State_MouseOver;
       QStyleOptionViewItemV4* aOpt = (QStyleOptionViewItemV4*) aOptions;
       aOpt->state = aState;
-      QWindowsVistaStyle::drawPrimitive(theElement, aOpt, thePainter, theWidget);
+      QCommonStyle/*QWindowsVistaStyle*/::drawPrimitive(theElement, aOpt, thePainter, theWidget);
     }
   }
-  QWindowsVistaStyle::drawPrimitive(theElement, theOption, thePainter, theWidget);
+  QCommonStyle/*QWindowsVistaStyle*/::drawPrimitive(theElement, theOption, thePainter, theWidget);
 }
 #endif
 

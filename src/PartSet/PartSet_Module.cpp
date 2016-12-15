@@ -91,12 +91,13 @@
 #include <Config_PropManager.h>
 #include <Config_Keywords.h>
 
+#include <AIS_Dimension.hxx>
+#include <AIS_InteractiveObject.hxx>
 #include <StdSelect_TypeOfFace.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
 #include <BRep_Tool.hxx>
-#include <AIS_Dimension.hxx>
 
 #include <QObject>
 #include <QMouseEvent>

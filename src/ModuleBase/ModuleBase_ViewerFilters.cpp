@@ -32,7 +32,6 @@
 #include <Geom_Curve.hxx>
 #include <gp_Pln.hxx>
 
-IMPLEMENT_STANDARD_HANDLE(ModuleBase_ShapeDocumentFilter, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ShapeDocumentFilter, SelectMgr_Filter);
 
 
@@ -73,7 +72,6 @@ Standard_Boolean ModuleBase_ShapeDocumentFilter::IsOk(
   return aValid;
 }
 
-IMPLEMENT_STANDARD_HANDLE(ModuleBase_ShapeInPlaneFilter, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ShapeInPlaneFilter, SelectMgr_Filter);
 
 Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(

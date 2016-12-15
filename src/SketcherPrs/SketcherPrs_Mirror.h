@@ -25,7 +25,7 @@ public:
   /// \param thePlane a coordinate plane of current sketch
   Standard_EXPORT SketcherPrs_Mirror(ModelAPI_Feature* theConstraint,
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane);
-  DEFINE_STANDARD_RTTI(SketcherPrs_Mirror)
+  DEFINE_STANDARD_RTTIEXT(SketcherPrs_Mirror, SketcherPrs_SymbolPrs)
 
   /// Returns true if the constraint feature arguments are correcly filled to build AIS presentation
   /// \param theConstraint a constraint feature

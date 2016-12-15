@@ -84,7 +84,7 @@ public:
   /// \param theBndBox the common bounding box to update
   Standard_EXPORT virtual void BoundingBox (Bnd_Box& theBndBox) Standard_OVERRIDE;
 
-  DEFINE_STANDARD_RTTI(SketcherPrs_SymbolPrs)
+  DEFINE_STANDARD_RTTIEXT(SketcherPrs_SymbolPrs, AIS_InteractiveObject)
 
 protected:
   /// Redefinition of virtual function

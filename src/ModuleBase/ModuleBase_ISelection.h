@@ -22,7 +22,7 @@
 #include <QList>
 
 class ModuleBase_ViewerPrs;
-class Handle_SelectMgr_EntityOwner;
+class SelectMgr_EntityOwner;
 
 /**
 * \ingroup GUI
@@ -55,7 +55,7 @@ class ModuleBase_ISelection
   /// \param thePrs a container for selection
   /// \param theOwner a selection owner
   virtual void fillPresentation(std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
-                                const Handle_SelectMgr_EntityOwner& theOwner) const = 0;
+                                const Handle(SelectMgr_EntityOwner)& theOwner) const = 0;
 
   /**
    * Returns list of features currently selected in object browser
@@ -78,7 +78,7 @@ class ModuleBase_ISelection
   virtual void selectedAISObjects(AIS_ListOfInteractive& theList) const = 0;
 
   //! Returns list of currently selected QModelIndexes
-  virtual ObjectPtr getSelectableObject(const Handle_SelectMgr_EntityOwner& theOwner) const = 0;
+  virtual ObjectPtr getSelectableObject(const Handle(SelectMgr_EntityOwner)& theOwner) const = 0;
 
   //! Return the shape from the viewer presentation.
   //! If the shape is equal to the shape of selected object, it returns an empty shape

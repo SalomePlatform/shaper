@@ -42,9 +42,12 @@ public:
   /// \param aMode a drawing mode
   virtual void HilightWithColor (const Handle(PrsMgr_PresentationManager3d)& aPM,
     const Quantity_NameOfColor aCol, const Standard_Integer aMode = 0)
-  {  Selectable()->HilightOwnerWithColor(aPM, aCol, this); }
+  {
+    //PORTING_TO_SALOME_8
+    //Selectable()->HilightOwnerWithColor(aPM, aCol, this);
+  }
 
-  DEFINE_STANDARD_RTTI(ModuleBase_BRepOwner)
+  DEFINE_STANDARD_RTTIEXT(ModuleBase_BRepOwner, StdSelect_BRepOwner)
 };
 
 
@@ -93,7 +96,7 @@ public:
   /// \param thePriority a new priority value
   Standard_EXPORT void setAdditionalSelectionPriority(const int thePriority);
 
-  DEFINE_STANDARD_RTTI(ModuleBase_ResultPrs)
+  DEFINE_STANDARD_RTTIEXT(ModuleBase_ResultPrs, ViewerData_AISShape)
 protected:
   /// Redefinition of virtual function
   Standard_EXPORT virtual void Compute(

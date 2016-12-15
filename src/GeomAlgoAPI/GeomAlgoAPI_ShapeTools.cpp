@@ -30,7 +30,7 @@
 #include <BRepTools.hxx>
 #include <BRepTopAdaptor_FClass2d.hxx>
 #include <Geom2d_Curve.hxx>
-#include <Handle_Geom2d_Curve.hxx>
+#include <Geom2d_Curve.hxx>
 #include <BRepLib_CheckCurveOnSurface.hxx>
 #include <BRep_Tool.hxx>
 #include <Geom_Plane.hxx>

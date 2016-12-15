@@ -37,6 +37,7 @@
 #include <TDF_ListIteratorOfAttributeDeltaList.hxx>
 #include <TDF_ListIteratorOfLabelList.hxx>
 #include <TDF_LabelMap.hxx>
+#include <TDF_DeltaOnAddition.hxx>
 #include <TNaming_SameShapeIterator.hxx>
 #include <TNaming_Iterator.hxx>
 #include <TNaming_NamedShape.hxx>

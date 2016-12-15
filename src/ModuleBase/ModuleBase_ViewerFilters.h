@@ -41,7 +41,7 @@ public:
   Standard_EXPORT virtual
     Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
-  DEFINE_STANDARD_RTTI(ModuleBase_ShapeDocumentFilter)
+  DEFINE_STANDARD_RTTIEXT(ModuleBase_ShapeDocumentFilter, SelectMgr_Filter)
 
 protected:
   /// Reference to workshop
@@ -73,7 +73,7 @@ public:
   Standard_EXPORT virtual
     Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
-  DEFINE_STANDARD_RTTI(ModuleBase_ShapeInPlaneFilter)
+  DEFINE_STANDARD_RTTIEXT(ModuleBase_ShapeInPlaneFilter, SelectMgr_Filter)
 private:
   /// Working plane
   std::shared_ptr<GeomAPI_Pln> myPlane;

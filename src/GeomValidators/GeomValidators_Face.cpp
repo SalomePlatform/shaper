@@ -12,9 +12,6 @@
 
 #include <Events_InfoMessage.h>
 
-#include <QString>
-#include <QMap>
-
 typedef std::map<std::string, GeomAbs_SurfaceType> FaceTypes;
 static FaceTypes MyFaceTypes;
 

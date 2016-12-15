@@ -9,7 +9,6 @@
 
 #include <ModelAPI_Events.h>
 
-IMPLEMENT_STANDARD_HANDLE(Model_Application, TDocStd_Application)
 IMPLEMENT_STANDARD_RTTIEXT(Model_Application, TDocStd_Application)
 
 static Handle_Model_Application TheApplication = new Model_Application;

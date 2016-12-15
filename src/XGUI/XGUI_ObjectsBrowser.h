@@ -63,16 +63,18 @@ private:
 
 
 #if (!defined HAVE_SALOME) && (defined WIN32)
-#include <QWindowsVistaStyle>
-/**
+// PORTING_TO_SALOME_8
+//#include <QWindowsVistaStyle>
+#include <QCommonStyle>
+  /**
 * \ingroup GUI
 * Implementation of XGUI_DataTree custom style
 */
-class XGUI_TreeViewStyle : public QWindowsVistaStyle
+class XGUI_TreeViewStyle : public QCommonStyle // PORTING_TO_SALOME_8 QWindowsVistaStyle
 {
   Q_OBJECT
 public:
-  XGUI_TreeViewStyle() : QWindowsVistaStyle() {}
+  XGUI_TreeViewStyle() : QCommonStyle/*QWindowsVistaStyle*/() {}
 
   void drawPrimitive(PrimitiveElement theElement, const QStyleOption* theOption,
                      QPainter* thePainter, const QWidget* theWidget = 0) const;
