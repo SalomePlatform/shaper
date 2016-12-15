@@ -22,7 +22,9 @@
 
 #ifdef WIN32
 #ifdef HAVE_SALOME
-#include <QWindowsStyle>
+// PORTING_TO_SALOME_8
+//#include <QWindowsStyle>
+#include <QCommonStyle>
 #endif
 #endif
 
@@ -70,7 +72,7 @@ XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
 {
 #ifdef WIN32
 #ifdef HAVE_SALOME
-  setStyle(new QWindowsStyle());
+  setStyle(new QCommonStyle());
 #else
   myStyle = new XGUI_TreeViewStyle();
   setStyle(myStyle);

@@ -400,7 +400,7 @@ bool SHAPERGUI_SalomeViewer::hasSelectionFilter(const Handle(SelectMgr_Filter)& 
     const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
     SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
     for (; aIt.More() && !aFoundFilter; aIt.Next()) {
-      aFoundFilter = theFilter.Access() == aIt.Value().Access();
+      aFoundFilter = theFilter.get() == aIt.Value().get();
     }
   }
   return aFoundFilter;
