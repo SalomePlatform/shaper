@@ -144,24 +144,27 @@ void SHAPERGUI::viewManagers(QStringList& theList) const
 }
 
 //******************************************************
-void SHAPERGUI::connectToStudy(CAM_Study* theStudy)
-{
-  // if there are created viewer managers, we should try to create viewer
-  // selector and initialize viewer with it. It sets interactive contect to the
-  // proxy viewer. If study is opened, CAM application calls this method before the open()
-  // of data model
-  // the SHAPER data model is specific and during open(load) redisplay signals are flushed, so
-  // we need to connect to the viewer before it. Here, it seems the most appropriate place for this
-  // according to SALOME architecture.
-  if (!mySelector) {
-    ViewManagerList OCCViewManagers;
-    application()->viewManagers(OCCViewer_Viewer::Type(), OCCViewManagers);
-    if (OCCViewManagers.size() > 0) {
-      mySelector = createSelector(OCCViewManagers.first());
-    }
-  }
-  LightApp_Module::connectToStudy(theStudy);
-}
+// We can not create selector in this method because it can be called when 
+// SHAPER module is not active. Take into account that creation of our selector
+// leads to switching OFF all other selectors
+//void SHAPERGUI::connectToStudy(CAM_Study* theStudy)
+//{
+//  // if there are created viewer managers, we should try to create viewer
+//  // selector and initialize viewer with it. It sets interactive contect to the
+//  // proxy viewer. If study is opened, CAM application calls this method before the open()
+//  // of data model
+//  // the SHAPER data model is specific and during open(load) redisplay signals are flushed, so
+//  // we need to connect to the viewer before it. Here, it seems the most appropriate place for this
+//  // according to SALOME architecture.
+//  if (!mySelector) {
+//    ViewManagerList OCCViewManagers;
+//    application()->viewManagers(OCCViewer_Viewer::Type(), OCCViewManagers);
+//    if (OCCViewManagers.size() > 0) {
+//      mySelector = createSelector(OCCViewManagers.first());
+//    }
+//  }
+//  LightApp_Module::connectToStudy(theStudy);
+//}
 
 //******************************************************
 bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
