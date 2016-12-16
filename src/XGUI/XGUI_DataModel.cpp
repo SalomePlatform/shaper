@@ -119,7 +119,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           } else {
             int aFolderId = myXMLReader->rootFolderId(aObjType);
             if (aFolderId != -1) {
-              insertRow(aRow, createIndex(aFolderId, 0, -1));
+              insertRow(aRow, createIndex(aFolderId, 0, Q_NULLPTR));
             }
           }
         }
@@ -190,7 +190,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           // Process root sub-folder
           int aFolderId = myXMLReader->rootFolderId(aGroup);
           if (aFolderId != -1) {
-            QModelIndex aFolderIndex = createIndex(aFolderId, 0, -1);
+            QModelIndex aFolderIndex = createIndex(aFolderId, 0, Q_NULLPTR);
             removeRow(aRow, aFolderIndex);
             //rebuildBranch(0, aRow);
           }
@@ -274,7 +274,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         if (aGroup == myXMLReader->rootType()) // Update objects under root
           aStartId = foldersCount();
         else // Update objects in folder under root
-          aParent = createIndex(folderId(aGroup), 0, -1);
+          aParent = createIndex(folderId(aGroup), 0, Q_NULLPTR);
       } else {
         // Update a sub-document
         if (aGroup == myXMLReader->subType()) {
@@ -320,7 +320,7 @@ void XGUI_DataModel::rebuildDataTree()
 //******************************************************
 ObjectPtr XGUI_DataModel::object(const QModelIndex& theIndex) const
 {
-  if (theIndex.internalId() < 0) // this is a folder
+  if (theIndex.internalId() == 0) // this is a folder
     return ObjectPtr();
   ModelAPI_Object* aObj = (ModelAPI_Object*)theIndex.internalPointer();
   if (getSubDocument(aObj)) // the selected index is a folder of sub-document
@@ -393,8 +393,8 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
   if (theIndex.column() == 1)
     return QVariant();
 
-  int aParentId = theIndex.internalId();
-  if (aParentId == -1) { // root folders
+  quintptr aParentId = theIndex.internalId();
+  if (aParentId == 0) { // root folders
     switch (theRole) {
       case Qt::DisplayRole:
         return QString(myXMLReader->rootFolderName(theIndexRow).c_str()) +
@@ -491,8 +491,8 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
     return aNbFolders + aNbItems;
   }
 
-  int aId = theParent.internalId();
-  if (aId == -1) {
+  quintptr aId = theParent.internalId();
+  if (aId == 0) {
     // this is a folder under root
     int aParentPos = theParent.row();
     std::string aType = myXMLReader->rootFolderType(aParentPos);
@@ -556,7 +556,7 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
 
   if (!theParent.isValid()) {
     if (theRow < aNbFolders) // Return first level folder index
-      return createIndex(theRow, theColumn, -1);
+      return createIndex(theRow, theColumn, Q_NULLPTR);
     else { // return object under root index
       std::string aType = myXMLReader->rootType();
       int aObjId = theRow - aNbFolders;
@@ -566,9 +566,9 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
       }
     }
   } else {
-    int aId = theParent.internalId();
+    quintptr aId = theParent.internalId();
     int aParentPos = theParent.row();
-    if (aId == -1) { // return object index inside of first level of folders
+    if (aId == 0) { // return object index inside of first level of folders
       std::string aType = myXMLReader->rootFolderType(aParentPos);
       if (theRow < aRootDoc->size(aType)) {
         ObjectPtr aObj = aRootDoc->object(aType, theRow);
@@ -637,8 +637,8 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
   if (theIndex == MYLastDeleted)
     return QModelIndex();
 
-  int aId = theIndex.internalId();
-  if (aId != -1) { // The object is not a root folder
+  quintptr aId = theIndex.internalId();
+  if (aId != 0) { // The object is not a root folder
     ModelAPI_Document* aDoc = getSubDocument(theIndex.internalPointer());
     if (aDoc) {
       // It is a folder of sub-document
@@ -678,7 +678,7 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
         // return first level of folder index
         int aFolderId = myXMLReader->rootFolderId(aType);
         // Items in a one row must have the same parent
-        return createIndex(aFolderId, 0, -1);
+        return createIndex(aFolderId, 0, Q_NULLPTR);
       }
     } else {
       if (aType == myXMLReader->subType())
@@ -720,7 +720,7 @@ bool XGUI_DataModel::removeRows(int theRow, int theCount, const QModelIndex& the
 //******************************************************
 Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
 {
-  qint64 aIt = theIndex.internalId();
+  quintptr aIt = theIndex.internalId();
   ModelAPI_Object* aObj = 0;
   ModelAPI_Document* aDoc = 0;
   SessionPtr aSession = ModelAPI_Session::get();
@@ -731,7 +731,7 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
   Qt::ItemFlags aEditingFlag = Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
 
 
-  if (aIt == -1) {
+  if (aIt == 0) {
     // Folders under root
     DocumentPtr aRootDoc = aSession->moduleDocument();
     if (aRootDoc != aActiveDoc)
