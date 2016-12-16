@@ -27,6 +27,47 @@
 #include <AIS_DisplaySpecialSymbol.hxx>
 
 
+/// Creates an aspect to be shown in length/radius dimension presentations
+/// \return an instance of aspect
+Handle(Prs3d_DimensionAspect) createDimensionAspect()
+{
+  Handle(Prs3d_DimensionAspect) anAspect = new Prs3d_DimensionAspect();
+  anAspect->MakeArrows3d(false);
+  anAspect->MakeText3d(false);
+  anAspect->MakeTextShaded(false);
+  anAspect->MakeUnitsDisplayed(false);
+  anAspect->TextAspect()->SetHeight(SketcherPrs_Tools::getDefaultTextHeight());
+  anAspect->ArrowAspect()->SetLength(SketcherPrs_Tools::getArrowSize());
+
+  return anAspect;
+}
+
+/// Update variable aspect parameters (depending on viewer scale)
+/// \param theDimAspect an aspect to be changed
+/// \param theDimValue an arrow value
+/// \param theTextSize an arrow value
+void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
+                  double theDimValue, double theTextSize)
+{
+  double anArrowLength = theDimAspect->ArrowAspect()->Length();
+   // This is not realy correct way to get viewer scale.
+  double aViewerScale = (double) SketcherPrs_Tools::getDefaultArrowSize() / anArrowLength;
+
+  if(theTextSize > ((theDimValue - 3 * SketcherPrs_Tools::getArrowSize()) * aViewerScale)) {
+    theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Left);
+    theDimAspect->SetArrowOrientation(Prs3d_DAO_External);
+    theDimAspect->SetExtensionSize(
+      (theTextSize / aViewerScale + SketcherPrs_Tools::getArrowSize()) / 2.0);
+  } else {
+    theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Center);
+    theDimAspect->SetArrowOrientation(Prs3d_DAO_Internal);
+  }
+  theDimAspect->SetArrowTailSize(theDimAspect->ArrowAspect()->Length());
+  // The value of vertical aligment is sometimes changed
+  theDimAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
+}
+
+
 static const gp_Pnt MyDefStart(0,0,0);
 static const gp_Pnt MyDefEnd(1,0,0);
 static const gp_Pln MyDefPln(gp_Pnt(0,0,0), gp_Dir(0,0,1));
@@ -44,8 +85,7 @@ SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theCo
   myDistance(1),
   myValue(0., false, "")
 {
-  // PORTING_TO_SALOME_8
-  // SetDimensionAspect(SketcherPrs_Tools::createDimensionAspect());
+  SetDimensionAspect(createDimensionAspect());
   myStyleListener = new SketcherPrs_DimensionStyleListener();
 }
 
@@ -88,8 +128,7 @@ void SketcherPrs_LengthDimension::Compute(
   double aTextSize = 0.0;
   GetValueString(aTextSize);
 
-  // PORTING_TO_SALOME_8
-  //SketcherPrs_Tools::updateArrows(DimensionAspect(), GetValue(), aTextSize);
+  updateArrows(DimensionAspect(), GetValue(), aTextSize);
 
   // Update text visualization: parameter value or parameter text
   myStyleListener->updateDimensions(this, myValue);

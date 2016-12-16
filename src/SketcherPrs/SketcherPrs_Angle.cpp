@@ -5,8 +5,8 @@
 // Author:      Vitaly SMETANNIKOV
 
 #include "SketcherPrs_Angle.h"
-#include "SketcherPrs_Tools.h"
 #include "SketcherPrs_DimensionStyleListener.h"
+#include "SketcherPrs_Tools.h"
 
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_Constraint.h>
@@ -180,8 +180,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
       SetMeasuredGeometry(myFirstPoint, myCenterPoint, mySecondPoint);
 #ifndef COMPILATION_CORRECTION
       bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
-      SetType(!isReversedPlanes ? AIS_TypeOfAngle::AIS_TOA_Exterior
-                                : AIS_TypeOfAngle::AIS_TOA_Interior);
+      SetType(!isReversedPlanes ? AIS_TOA_Exterior : AIS_TOA_Interior);
 #endif
     }
     break;
@@ -192,19 +191,18 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
                           gp_Vec(myCenterPoint, myFirstPoint).Normalized() * (-anEdge1Length));
       SetMeasuredGeometry(aFirstPoint, myCenterPoint, mySecondPoint);
 #ifndef COMPILATION_CORRECTION
-      SetType(AIS_TypeOfAngle::AIS_TOA_Interior);
+      SetType(AIS_TOA_Interior);
 #endif
     }
     break;
     case SketcherPrs_Tools::ANGLE_BACKWARD: {
 #ifndef COMPILATION_CORRECTION
-      SetArrowsVisibility(AIS_TypeOfAngleArrowVisibility::AIS_TOAV_Second);
+      SetArrowsVisibility(AIS_TOAV_Second);
 #endif
       SetMeasuredGeometry(myFirstPoint, myCenterPoint, mySecondPoint);
       bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
 #ifndef COMPILATION_CORRECTION
-      SetType(isReversedPlanes ? AIS_TypeOfAngle::AIS_TOA_Exterior
-                               : AIS_TypeOfAngle::AIS_TOA_Interior);
+      SetType(isReversedPlanes ? AIS_TOA_Exterior : AIS_TOA_Interior);
 #endif
     }
     break;

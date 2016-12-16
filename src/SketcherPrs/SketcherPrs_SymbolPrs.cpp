@@ -231,8 +231,8 @@ private:
 
 //**************************************************************
 // PORTING_TO_SALOME_8
-/*//! Definition of call back
-OpenGl_Element* SymbolPrsCallBack(const CALL_DEF_USERDRAW * theUserDraw)
+//! Definition of call back
+/*OpenGl_Element* SymbolPrsCallBack(const CALL_DEF_USERDRAW * theUserDraw)
 {
   Handle(SketcherPrs_SymbolPrs) anIObj = (SketcherPrs_SymbolPrs*)theUserDraw->Data;
   if (anIObj.IsNull()) {
