@@ -389,8 +389,11 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
   // Calculate additional parameters necessary for PlaneGCS
   const std::list<EntityWrapperPtr>& aSubs = theArc->subEntities();
   std::list<EntityWrapperPtr>::const_iterator aSubIt = aSubs.begin();
-  while ((*aSubIt)->type() == ENTITY_POINT) // search scalar entities
+  bool isFixed[3] = {false, false, false};
+  for (int i = 0; (*aSubIt)->type() == ENTITY_POINT; ++i) { // search scalar entities
+    isFixed[i] = (*aSubIt)->group() == GID_OUTOFGROUP;
     ++aSubIt;
+  }
   double* aStartAngle =
     std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(*aSubIt++)->scalar();
   double* aEndAngle =
@@ -411,7 +414,10 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
   std::shared_ptr<GeomAPI_Pnt2d> aStartPnt  = aStartAttr->pnt();
   std::shared_ptr<GeomAPI_Pnt2d> aEndPnt    = aEndAttr->pnt();
 
-  *aRadius = aCenterPnt->distance(aStartPnt);
+  if (isFixed[2] && !isFixed[1])
+    *aRadius = aCenterPnt->distance(aEndPnt);
+  else
+    *aRadius = aCenterPnt->distance(aStartPnt);
   if (!anArcFeature->lastResult())
     return;
   static std::shared_ptr<GeomAPI_Dir2d> OX(new GeomAPI_Dir2d(1.0, 0.0));
@@ -428,8 +434,8 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
   // No need to add constraints if they are already exist
   std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >::const_iterator
       aFound = myArcConstraintMap.find(theArc);
-  if (aFound != myArcConstraintMap.end())
-    return;
+//  if (aFound != myArcConstraintMap.end())
+//    return;
 
   // Prepare additional constraints to produce the arc
   std::vector<GCSConstraintPtr> anArcConstraints;

@@ -131,3 +131,42 @@ for aCenterCoords in range(-20, 20):
   anArcCentr.setValue(aCenterCoords, aCenterCoords/2) # move center
   aSession.finishOperation()
   assert aSketchArc.boolean("InversedArc").value() == anInversed
+#=========================================================================
+# Test that movement of start point of arc does not change central point
+#=========================================================================
+TOL = 1.e-5
+x = anArcCentr.x()
+y = anArcCentr.y()
+sx = anArcStartPoint.x()
+sy = anArcStartPoint.y()
+for aDelta in range(0, 20):
+  aSession.startOperation()
+  anArcStartPoint.setValue(sx, sy+aDelta) # move start point
+  aSession.finishOperation()
+  assert math.fabs(anArcCentr.x() - x) < TOL
+  assert math.fabs(anArcCentr.y() - y) < TOL
+for aDelta in range(20, -1, -1):
+  aSession.startOperation()
+  anArcStartPoint.setValue(sx, sy+aDelta) # move start point
+  aSession.finishOperation()
+  assert math.fabs(anArcCentr.x() - x) < TOL
+  assert math.fabs(anArcCentr.y() - y) < TOL
+#=========================================================================
+# Test that movement of end point of arc does not change central point
+#=========================================================================
+x = anArcCentr.x()
+y = anArcCentr.y()
+sx = anArcEndPoint.x()
+sy = anArcEndPoint.y()
+for aDelta in range(0, 20):
+  aSession.startOperation()
+  anArcEndPoint.setValue(sx+aDelta, sy) # move end point
+  aSession.finishOperation()
+  assert math.fabs(anArcCentr.x() - x) < TOL
+  assert math.fabs(anArcCentr.y() - y) < TOL
+for aDelta in range(20, -1, -1):
+  aSession.startOperation()
+  anArcEndPoint.setValue(sx+aDelta, sy) # move end point
+  aSession.finishOperation()
+  assert math.fabs(anArcCentr.x() - x) < TOL
+  assert math.fabs(anArcCentr.y() - y) < TOL
