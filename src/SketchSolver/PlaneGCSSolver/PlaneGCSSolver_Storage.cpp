@@ -414,22 +414,13 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
   *aRadius = aCenterPnt->distance(aStartPnt);
   if (!anArcFeature->lastResult())
     return;
-  std::shared_ptr<GeomAPI_Edge> anArcEdge =
-      std::dynamic_pointer_cast<GeomAPI_Edge>(anArcFeature->lastResult()->shape());
-  if (!anArcEdge)
-    return;
-  anArcEdge->getRange(*aStartAngle, *aEndAngle);
-  // verify the range is correct and not shifted to an angle
-  std::shared_ptr<GeomAPI_Dir2d> aDir(new GeomAPI_Dir2d(cos(*aStartAngle), sin(*aStartAngle)));
-  std::shared_ptr<GeomAPI_Pnt2d> aCalcStartPnt(
-      new GeomAPI_Pnt2d(aCenterPnt->xy()->added(aDir->xy()->multiplied(*aRadius))));
-  if (aCalcStartPnt->distance(aStartPnt) > tolerance) {
-    std::shared_ptr<GeomAPI_Dir2d> aDirToStart(
-        new GeomAPI_Dir2d(aStartPnt->xy()->decreased(aCenterPnt->xy())));
-    double anAngle = aDir->angle(aDirToStart);
-    *aStartAngle += anAngle;
-    *aEndAngle += anAngle;
-  }
+  static std::shared_ptr<GeomAPI_Dir2d> OX(new GeomAPI_Dir2d(1.0, 0.0));
+  std::shared_ptr<GeomAPI_Dir2d> aDir(new GeomAPI_Dir2d(
+      aStartPnt->xy()->decreased(aCenterPnt->xy())));
+  *aStartAngle = OX->angle(aDir);
+  aDir = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(
+      aEndPnt->xy()->decreased(aCenterPnt->xy())));
+  *aEndAngle = OX->angle(aDir);
 
   // no need to constraint a fixed or a copied arc
   if (theArc->group() == GID_OUTOFGROUP || anArcFeature->isCopy())
