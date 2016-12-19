@@ -25,6 +25,7 @@
 *.ts        eol=lf
 *.qml       eol=lf
 *.qrc       eol=lf
+*.py        eol=lf
 *.bat       eol=crlf
 *.cmd       eol=crlf
 *.dll       binary
