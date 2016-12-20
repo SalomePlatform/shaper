@@ -29,7 +29,7 @@ class OpenGl_Context;
 
 DEFINE_STANDARD_HANDLE(SketcherPrs_SymbolPrs, AIS_InteractiveObject)
 
-class SketcherPrs_Element;
+class SketcherPrs_SymbolArray;
 /**
 * \ingroup GUI
 * A base class of constraint presentation which is represented by an icon
@@ -153,7 +153,7 @@ private:
   Handle(Image_AlienPixMap) myErrorIcon;
   Handle(Graphic3d_MarkerImage) myErrorImage;
 
-  friend class SketcherPrs_Element;
+  friend class SketcherPrs_SymbolArray;
 };
 
 #endif

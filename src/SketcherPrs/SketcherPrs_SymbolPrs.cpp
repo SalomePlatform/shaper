@@ -33,12 +33,7 @@
 #include <OpenGl_GraphicDriver.hxx>
 #include <OpenGl_Context.hxx>
 #include <OpenGl_View.hxx>
-#include <OpenGl_PointSprite.hxx>
-//#include <OpenGl_VertexBuffer.hxx>
-#include <OpenGl_VertexBufferCompat.hxx>
-//#include <OpenGl_ShaderManager.hxx>
 #include <OpenGl_Group.hxx>
-#include <OpenGl_ShaderManager.hxx>
 
 #ifdef WIN32
 # define FSEP "\\"
@@ -52,10 +47,10 @@ static const double MyDist = 0.02;
 
 //**************************************************************
 //! Redefinition of OpenGl_Element
-class SketcherPrs_Element: public OpenGl_PrimitiveArray
+class SketcherPrs_SymbolArray: public OpenGl_PrimitiveArray
 {
 public:
-  SketcherPrs_Element(const OpenGl_GraphicDriver* theDriver, 
+  SketcherPrs_SymbolArray(const OpenGl_GraphicDriver* theDriver, 
     const Handle(SketcherPrs_SymbolPrs)& theObj) 
     :OpenGl_PrimitiveArray(theDriver, theObj->myPntArray->Type(), theObj->myPntArray->Indices(), 
     theObj->myPntArray->Attributes(), theObj->myPntArray->Bounds()), myObj(theObj) {}
@@ -173,6 +168,8 @@ void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup,
 
   std::shared_ptr<GeomAPI_Pnt> aPnt1 = aEdge->firstPoint();
   std::shared_ptr<GeomAPI_Pnt> aPnt2 = aEdge->lastPoint();
+  gp_Pnt aP1 = aPnt1->impl<gp_Pnt>();
+  gp_Pnt aP2 = aPnt2->impl<gp_Pnt>();
 
   // Draw line by two points
   Handle(Graphic3d_ArrayOfSegments) aLines = new Graphic3d_ArrayOfSegments(2, 1);
@@ -183,32 +180,30 @@ void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup,
 
 //*********************************************************************************
 void SketcherPrs_SymbolPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM,
-                                           const SelectMgr_SequenceOfOwner& theOwners)
+                                            const SelectMgr_SequenceOfOwner& theOwners)
 {
 
   Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( thePM );
   aSelectionPrs->Clear();
-  drawLines(aSelectionPrs, Quantity_NOC_WHITE);
+  drawLines(aSelectionPrs, GetContext()->SelectionStyle()->Color());
 
   aSelectionPrs->SetDisplayPriority(9);
   aSelectionPrs->Display();
-  // PORTING_TO_SALOME_8
-  //thePM->Highlight(this);
+  thePM->Color(this, GetContext()->SelectionStyle());
 }
 
 //*********************************************************************************
 void SketcherPrs_SymbolPrs::HilightOwnerWithColor(
-  const Handle(PrsMgr_PresentationManager3d)& thePM,
-  const Handle(Graphic3d_HighlightStyle)& theStyle,
-  const Handle(SelectMgr_EntityOwner)& theOwner)
+                                  const Handle(PrsMgr_PresentationManager3d)& thePM,
+                                  const Handle(Graphic3d_HighlightStyle)& theStyle,
+                                  const Handle(SelectMgr_EntityOwner)& theOwner)
 {
-  // PORTING_TO_SALOME_8
-  
   thePM->Color(this, theStyle);
 
   Handle( Prs3d_Presentation ) aHilightPrs = GetHilightPresentation( thePM );
   aHilightPrs->Clear();
   drawLines(aHilightPrs, theStyle->Color());
+  aHilightPrs->SetZLayer (Graphic3d_ZLayerId_Topmost);
 
   if (thePM->IsImmediateModeOn())
     thePM->AddToImmediateList(aHilightPrs);
@@ -216,9 +211,9 @@ void SketcherPrs_SymbolPrs::HilightOwnerWithColor(
 
 //*********************************************************************************
 void SketcherPrs_SymbolPrs::Compute(
-  const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
-  const Handle(Prs3d_Presentation)& thePresentation,
-  const Standard_Integer theMode)
+                const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+                const Handle(Prs3d_Presentation)& thePresentation,
+                const Standard_Integer theMode)
 {
   // Create an icon
   prepareAspect();
@@ -260,8 +255,8 @@ void SketcherPrs_SymbolPrs::Compute(
   }
 
   // Pint the group with custom procedure (see Render)
-  SketcherPrs_Element* aElem = 
-    new SketcherPrs_Element((OpenGl_GraphicDriver*)aDriver->This(), this);
+  SketcherPrs_SymbolArray* aElem = 
+    new SketcherPrs_SymbolArray((OpenGl_GraphicDriver*)aDriver->This(), this);
   aGroup->AddElement(aElem);
 
   // Disable frustum culling for this object by marking it as mutable
@@ -334,8 +329,8 @@ void SketcherPrs_SymbolPrs::drawShape(const std::shared_ptr<GeomAPI_Shape>& theS
 
 //*********************************************************************************
 void SketcherPrs_SymbolPrs::drawListOfShapes(
-  const std::shared_ptr<ModelAPI_AttributeRefList>& theListAttr,
-  const Handle(Prs3d_Presentation)& thePrs) const
+                      const std::shared_ptr<ModelAPI_AttributeRefList>& theListAttr,
+                      const Handle(Prs3d_Presentation)& thePrs) const
 {
   int aNb = theListAttr->size();
   if (aNb == 0)
@@ -351,7 +346,7 @@ void SketcherPrs_SymbolPrs::drawListOfShapes(
 }
 
 //*********************************************************************************
-void SketcherPrs_SymbolPrs::BoundingBox (Bnd_Box& theBndBox)
+void SketcherPrs_SymbolPrs::BoundingBox(Bnd_Box& theBndBox)
 {
   Select3D_BndBox3d aTmpBox;
   for (Select3D_EntitySequenceIter aPntIter (mySPoints); aPntIter.More(); aPntIter.Next()) {
