@@ -10,17 +10,19 @@
     <validator id="FeaturesPlugin_ValidatorTransform"/>
   </multi_selector>
   <shape_selector id="placement_start_shape"
-    label="Select an object" 
+    label="Select an object"
     icon="icons/Features/placement_from.png"
     tooltip="Select a start face, edge or vertex"
-    shape_types="face edge vertex"
-  />
+    shape_types="face edge vertex">
+    <validator id="GeomValidators_BodyShapes"/>
+  </shape_selector>
   <shape_selector id="placement_end_shape"
-    label="Select an object" 
+    label="Select an object"
     icon="icons/Features/placement_to.png"
     tooltip="Select an end face, edge or vertex"
     shape_types="face edge vertex">
     <validator id="PartSet_DifferentObjects"/>
+    <validator id="GeomValidators_BodyShapes"/>
   </shape_selector>
   <boolvalue id="placement_reverse_direction"
     label="Reverse"
