@@ -48,8 +48,9 @@ class TestParameterRename(unittest.TestCase):
         self.createFeature()
 
     def tearDown(self):
-        assert(model.checkPythonDump())
-        self.aSession.closeAll()
+        #assert(model.checkPythonDump())
+        #self.aSession.closeAll()
+        pass
 
     def createParameters(self):
         ltNames = ["x1", "y1", "x2"]
@@ -170,14 +171,14 @@ class TestParameterRename(unittest.TestCase):
     def test_rename_not_unique(self):
         # Rename to not unique name
         aParam = self.dtParams["x1"]
+        aParamX1 = aParam
         aResultAttr = modelAPI_ResultParameter(aParam.firstResult())
-        self.aSession.startOperation()
+        self.aSession.startOperation() # don't finish operation until feature is valid (real case)
         aResultAttr.data().setName("y1")
-        self.aSession.finishOperation()
-        # Check rename in the parameter (Expected: not renamed) 
-        self.assertEqual(aParam.name(), "x1")
-        self.assertEqual(aParam.string("variable").value(), "x1")
-        self.assertEqual(aResultAttr.data().name(), "x1")
+        # Check rename in the parameter (Expected: renamed, but invalid)
+        self.assertEqual(aParam.name(), "y1")
+        validators = ModelAPI_Session.get().validators()
+        self.assertEqual(validators.validate(aParamX1), False)
         # Check rename in references (Expected: not renamed)
         aParam = self.dtParams["x2"]
         self.assertEqual(aParam.string("expression").value(), "x1 + y1 + 100.0")
@@ -190,8 +191,27 @@ class TestParameterRename(unittest.TestCase):
         self.assertEqual(self.anCircleCentr.y(), 170.)
         self.assertEqual(self.aRadiusAttr.value(), 150.)
 
+        # rename to the correct one, but new
+        aResultAttr.data().setName("xx1")
+        self.aSession.finishOperation() # feature becomes valid
+        # Check rename in the parameter (Expected: renamed)
+        self.assertEqual(validators.validate(aParamX1), True)
+        self.assertEqual(aParamX1.name(), "xx1")
+        self.assertEqual(aParamX1.error(), "")
+        # Check rename in references (Expected: renamed)
+        aParam = self.dtParams["x2"]
+        self.assertEqual(aParam.string("expression").value(), "xx1 + y1 + 100.0")
+        # Check rename in the feature (Expected: renamed)
+        self.assertEqual(self.aCircleCenterX.text(), "xx1 + 10.0")
+        self.assertEqual(self.aCircleCenterY.text(), "xx1 + 20.0")
+        self.assertEqual(self.aCircleRadius.text(), "xx1")
+        # Check values
+        self.assertEqual(self.anCircleCentr.x(), 160.)
+        self.assertEqual(self.anCircleCentr.y(), 170.)
+        self.assertEqual(self.aRadiusAttr.value(), 150.)
+
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(exit=False)
 #=========================================================================
 # End of test
 #=========================================================================

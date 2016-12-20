@@ -25,6 +25,9 @@ class ParametersPlugin_Parameter;
  */
 class ParametersPlugin_EvalListener : public Events_Listener
 {
+  /// map of old names, that were valid for perameres, but now parameter name is changed to invalid
+  /// stored not shared pointers to features to avoid memory keeping on the feature delete
+  std::map<ParametersPlugin_Parameter*, std::string> myOldNames;
  public:
   PARAMETERSPLUGIN_EXPORT ParametersPlugin_EvalListener();
   PARAMETERSPLUGIN_EXPORT virtual ~ParametersPlugin_EvalListener();

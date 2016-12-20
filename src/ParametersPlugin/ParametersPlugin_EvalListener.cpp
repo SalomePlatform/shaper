@@ -202,21 +202,21 @@ void ParametersPlugin_EvalListener::renameInDependents(
               const std::string& theNewName)
 {
   std::set<std::shared_ptr<ModelAPI_Attribute> > anAttributes =
-      theResultParameter->data()->refsToMe();
+    theResultParameter->data()->refsToMe();
   std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anAttributeIt =
-      anAttributes.cbegin();
+    anAttributes.cbegin();
   for (; anAttributeIt != anAttributes.cend(); ++anAttributeIt) {
     const AttributePtr& anAttribute = *anAttributeIt;
     if (anAttribute->attributeType() == ModelAPI_AttributeRefList::typeId()) {
       std::shared_ptr<ParametersPlugin_Parameter> aParameter =
-          std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
-              anAttribute->owner());
+        std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
+        anAttribute->owner());
       if (aParameter.get())
         // Rename
         renameInParameter(aParameter, theOldName, theNewName);
     } else
-        // Rename
-        renameInAttribute(anAttribute, theOldName, theNewName);
+      // Rename
+      renameInAttribute(anAttribute, theOldName, theNewName);
   }
 }
 
@@ -281,18 +281,21 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
 
   // try to update the parameter feature according the new name
   setParameterName(aResultParameter, aMessage->newName());
-  // TODO(spo): replace with
-  // ModelAPI_Session::get()->validators()->validate(aParameter,
-  //                                                 ParametersPlugin_Parameter::VARIABLE_ID())
-  // when ModelAPI_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-  //                                           const std::string& theAttribute) const
-  // is ready
   if (!isValidAttribute(aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID()))) {
-    setParameterName(aResultParameter, aMessage->oldName());
+    //setParameterName(aResultParameter, aMessage->oldName());
+    if (myOldNames.find(aParameter.get()) == myOldNames.end())
+      myOldNames[aParameter.get()] = aMessage->oldName();
     return;
   }
 
-  renameInDependents(aResultParameter, aMessage->oldName(), aMessage->newName());
+  std::string anOldName = aMessage->oldName();
+  if (myOldNames.find(aParameter.get()) != myOldNames.end()) {
+    anOldName = myOldNames[aParameter.get()];
+    myOldNames.erase(aParameter.get());
+    aParameter->execute(); // to enable result because of previously incorrect name
+  }
+
+  renameInDependents(aResultParameter, anOldName, aMessage->newName());
 }
 
 void ParametersPlugin_EvalListener::processReplaceParameterEvent(
