@@ -41,8 +41,6 @@ IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ResultPrs, ViewerData_AISShape);
 
 
 
-
-
 ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   : ViewerData_AISShape(TopoDS_Shape()), myResult(theResult), myAdditionalSelectionPriority(0)
 {
@@ -181,8 +179,7 @@ void ModuleBase_ResultPrs::HilightSelected(const Handle(PrsMgr_PresentationManag
     anOwner = theOwners.Value(i);
     aCompOwner = Handle(ModuleBase_BRepOwner)::DownCast(anOwner);
     if (aCompOwner.IsNull()) {
-      // PORTING_TO_SALOME_8
-      //anOwner->Hilight(thePM);
+      thePM->Color(anOwner->Selectable(), GetContext()->SelectionStyle());
     }
     else {
       TopoDS_Shape aShape = aCompOwner->Shape();
@@ -192,36 +189,32 @@ void ModuleBase_ResultPrs::HilightSelected(const Handle(PrsMgr_PresentationManag
       StdPrs_WFShape::Add(aSelectionPrs, aShape, myDrawer);
 
       aSelectionPrs->SetDisplayPriority(9);
-      // PORTING_TO_SALOME_8
-      //aSelectionPrs->Highlight(Aspect_TOHM_COLOR, aSelectionPrs->HighlightColor());
+      aSelectionPrs->Highlight(GetContext()->SelectionStyle());
       aSelectionPrs->Display();
-      // PORTING_TO_SALOME_8
-      //thePM->Highlight(this);
+      thePM->Color(this, GetContext()->SelectionStyle());
     }
   }
 }
 
 void ModuleBase_ResultPrs::HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM,
-                                                 const Quantity_NameOfColor theColor,
+                                                 const Handle(Graphic3d_HighlightStyle)& theStyle,
                                                  const Handle(SelectMgr_EntityOwner)& theOwner)
 {
-  // PORTING_TO_SALOME_8
-  /*
   Handle(StdSelect_BRepOwner) aOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
   if (aOwner.IsNull())
     return;
 
   TopoDS_Shape aShape = aOwner->Shape();
   if (!aShape.IsNull()) {
-    thePM->Color(this, theColor);
+    thePM->Color(this, theStyle);
 
     Handle( Prs3d_Presentation ) aHilightPrs = GetHilightPresentation( thePM );
     aHilightPrs->Clear();
 
     StdPrs_WFShape::Add(aHilightPrs, aShape, myDrawer);
-    aHilightPrs->Highlight(Aspect_TOHM_COLOR, theColor);
+    aHilightPrs->Highlight(theStyle);
 
     if (thePM->IsImmediateModeOn())
       thePM->AddToImmediateList(aHilightPrs);
-  }*/
+  }
 }
