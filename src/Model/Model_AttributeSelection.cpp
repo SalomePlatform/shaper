@@ -491,7 +491,7 @@ bool Model_AttributeSelection::update()
     }
     return aResult;
   }
-  
+
   if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {
     // construction: identification by the results indexes, recompute faces and
     // take the face that more close by the indexes
