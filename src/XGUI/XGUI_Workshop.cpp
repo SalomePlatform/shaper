@@ -905,9 +905,7 @@ bool XGUI_Workshop::onSaveAs()
   QFileDialog dialog(desktop());
   dialog.setWindowTitle(tr("Select directory to save files..."));
   dialog.setFileMode(QFileDialog::Directory);
-  // PORTING_TO_SALOME_8
-  dialog.selectNameFilter(tr("Directories (*)"));
-  //dialog.setFilter(tr("Directories (*)");
+  dialog.setFilter(QDir::AllDirs);
   dialog.setOptions(QFileDialog::HideNameFilterDetails | QFileDialog::ShowDirsOnly);
   dialog.setViewMode(QFileDialog::Detail);
 

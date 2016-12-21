@@ -62,29 +62,6 @@ private:
 };
 
 
-//#if (!defined HAVE_SALOME) && (defined WIN32)
-//#include <QCommonStyle>
-//  /**
-//* \ingroup GUI
-//* Implementation of XGUI_DataTree custom style
-//*/
-//class XGUI_TreeViewStyle : public QCommonStyle // PORTING_TO_SALOME_8 QWindowsVistaStyle
-//{
-//  Q_OBJECT
-//public:
-//  XGUI_TreeViewStyle() : QCommonStyle/*QWindowsVistaStyle*/() {}
-//
-//  void drawPrimitive(PrimitiveElement theElement, const QStyleOption* theOption,
-//                     QPainter* thePainter, const QWidget* theWidget = 0) const;
-//
-//  void setIndex(const QModelIndex& theIndex) { myIndex = theIndex; }
-//  QModelIndex index() const { return myIndex; }
-//
-//private:
-//  QModelIndex myIndex;
-//};
-//#endif
-
 /**
 * \ingroup GUI
 * Implementation of Data Tree object for Object Browser
@@ -123,14 +100,6 @@ public slots:
 
    /// Redefinition of virtual method
   virtual void resizeEvent(QResizeEvent* theEvent);
-
-//#if (!defined HAVE_SALOME) && (defined WIN32)
-//  virtual void drawRow(QPainter* thePainter,
-//                        const QStyleOptionViewItem& theOptions,
-//                        const QModelIndex& theIndex) const;
-//private:
-//  XGUI_TreeViewStyle* myStyle;
-//#endif
 };
 
 /**\class XGUI_ObjectsBrowser

@@ -20,14 +20,6 @@
 #include <QStyledItemDelegate>
 #include <QMessageBox>
 
-#ifdef WIN32
-#ifdef HAVE_SALOME
-// PORTING_TO_SALOME_8
-//#include <QWindowsStyle>
-#include <QCommonStyle>
-#endif
-#endif
-
 
 /// Width of second column (minimum acceptable = 27)
 #define SECOND_COL_WIDTH 30
@@ -70,15 +62,6 @@ private:
 XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
     : QTreeView(theParent)
 {
-//#ifdef WIN32
-//#ifdef HAVE_SALOME
-//  setStyle(new QCommonStyle());
-//#else
-//  myStyle = new XGUI_TreeViewStyle();
-//  setStyle(myStyle);
-//#endif
-//#endif
-
   setHeaderHidden(true);
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -140,7 +123,7 @@ void XGUI_DataTree::resizeEvent(QResizeEvent* theEvent)
   QTreeView::resizeEvent(theEvent);
   QSize aSize = theEvent->size();
   if (aSize.isValid()) {
-    setColumnWidth(0, aSize.width() - SECOND_COL_WIDTH - 6);
+    setColumnWidth(0, aSize.width() - SECOND_COL_WIDTH - 7);
     setColumnWidth(1, SECOND_COL_WIDTH);
   }
 }
@@ -188,39 +171,6 @@ void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
     update(aModel->index(i, 1, aParent));
   }
 }
-
-//#if (!defined HAVE_SALOME) && (defined WIN32)
-//void XGUI_DataTree::drawRow(QPainter* thePainter,
-//                            const QStyleOptionViewItem& theOptions,
-//                            const QModelIndex& theIndex) const
-//{
-//  QStyleOptionViewItemV4 aOptions = theOptions;
-//  myStyle->setIndex(theIndex);
-//  QTreeView::drawRow(thePainter, aOptions, theIndex);
-//}
-//
-////********************************************************************
-////********************************************************************
-////********************************************************************
-//void XGUI_TreeViewStyle::drawPrimitive(PrimitiveElement theElement,
-//                                       const QStyleOption* theOption,
-//                                       QPainter* thePainter, const QWidget* theWidget) const
-//{
-//  if ((theElement == QStyle::PE_PanelItemViewRow) || (theElement == QStyle::PE_PanelItemViewItem)) {
-//    const QStyleOptionViewItemV4* aOptions =
-//      qstyleoption_cast<const QStyleOptionViewItemV4 *>(theOption);
-//    if (myIndex.isValid() && ((myIndex.flags() & Qt::ItemIsSelectable) == 0)) {
-//      QStyle::State aState = aOptions->state;
-//      if ((aState & QStyle::State_MouseOver) != 0)
-//        aState &= ~QStyle::State_MouseOver;
-//      QStyleOptionViewItemV4* aOpt = (QStyleOptionViewItemV4*) aOptions;
-//      aOpt->state = aState;
-//      QCommonStyle::drawPrimitive(theElement, aOpt, thePainter, theWidget);
-//    }
-//  }
-//  QCommonStyle::drawPrimitive(theElement, theOption, thePainter, theWidget);
-//}
-//#endif
 
 
 //********************************************************************
