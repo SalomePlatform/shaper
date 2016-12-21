@@ -12,11 +12,12 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <TDF_LabelMap.hxx>
 
+class Model_AttributeSelectionList;
+
 /**\class Model_AttributeSelection
  * \ingroup DataModel
  * \brief Attribute that contains reference to the sub-shape of some result, the selected shape.
  */
-
 class Model_AttributeSelection : public ModelAPI_AttributeSelection
 {
   Model_AttributeReference myRef;  ///< The reference functionality reusage
@@ -25,6 +26,8 @@ class Model_AttributeSelection : public ModelAPI_AttributeSelection
   ResultPtr myTmpContext;
   /// temporarily storages to avoid keeping in the data structure if not needed
   std::shared_ptr<GeomAPI_Shape> myTmpSubShape;
+  /// Reference to the partent attribute, if any (to split selection compounds in issue 1799)
+  Model_AttributeSelectionList* myParent;
 public:
   /// Defines the result and its selected sub-shape
   /// \param theContext object where the sub-shape was selected
@@ -114,6 +117,9 @@ protected:
 
   /// Returns the name by context. Adds the part name if the context is located in other document
   std::string contextName(const ResultPtr& theContext) const;
+
+  /// Sets the parent attribute
+  void setParent(Model_AttributeSelectionList* theParent);
 
   friend class Model_Data;
   friend class Model_AttributeSelectionList;

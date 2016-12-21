@@ -45,6 +45,7 @@ void Model_AttributeSelectionList::append(
     std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aNewLab));
   if (owner()) {
     aNewAttr->setObject(owner());
+    aNewAttr->setParent(this);
   }
   aNewAttr->setID(id());
   mySize->Set(aNewTag);
@@ -66,6 +67,7 @@ void Model_AttributeSelectionList::append(
     std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aNewLab));
   if (owner()) {
     aNewAttr->setObject(owner());
+    aNewAttr->setParent(this);
   }
   aNewAttr->setID(id());
   mySize->Set(aNewTag);
@@ -272,6 +274,7 @@ std::shared_ptr<ModelAPI_AttributeSelection>
   aNewAttr->setID(id());
   if (owner()) {
     aNewAttr->setObject(owner());
+    aNewAttr->setParent(this);
   }
   return aNewAttr;
 }
@@ -288,6 +291,7 @@ void Model_AttributeSelectionList::clear()
         std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aLab));
       if (owner()) {
         aNewAttr->setObject(owner());
+        aNewAttr->setParent(this);
       }
       REMOVE_BACK_REF(aNewAttr->context());
 
