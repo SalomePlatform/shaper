@@ -203,7 +203,7 @@ void SketcherPrs_SymbolPrs::HilightOwnerWithColor(
   Handle( Prs3d_Presentation ) aHilightPrs = GetHilightPresentation( thePM );
   aHilightPrs->Clear();
   drawLines(aHilightPrs, theStyle->Color());
-  aHilightPrs->SetZLayer (Graphic3d_ZLayerId_Topmost);
+  aHilightPrs->SetZLayer(Graphic3d_ZLayerId_Topmost);
 
   if (thePM->IsImmediateModeOn())
     thePM->AddToImmediateList(aHilightPrs);

@@ -231,7 +231,8 @@ void PartSet_ResultSketchPrs::setAuxiliaryPresentationStyle(const bool isAuxilia
   Standard_Real aCurrentWidth = aLineAspect->Aspect()->Width();
   bool isChangedLineType = aType != aPrevLineType;
   if (isChangedLineType) {
-    aLineAspect->SetTypeOfLine(aType);
+    Handle(Prs3d_LineAspect) aAspect = new Prs3d_LineAspect(aCurrentColor, aType, aCurrentWidth);
+    aDrawer->SetLineAspect(aAspect);
   }
 }
 
