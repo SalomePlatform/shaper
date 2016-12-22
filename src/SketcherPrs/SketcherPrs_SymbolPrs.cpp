@@ -50,9 +50,9 @@ static const double MyDist = 0.02;
 class SketcherPrs_SymbolArray: public OpenGl_PrimitiveArray
 {
 public:
-  SketcherPrs_SymbolArray(const OpenGl_GraphicDriver* theDriver, 
-    const Handle(SketcherPrs_SymbolPrs)& theObj) 
-    :OpenGl_PrimitiveArray(theDriver, theObj->myPntArray->Type(), theObj->myPntArray->Indices(), 
+  SketcherPrs_SymbolArray(const OpenGl_GraphicDriver* theDriver,
+    const Handle(SketcherPrs_SymbolPrs)& theObj)
+    :OpenGl_PrimitiveArray(theDriver, theObj->myPntArray->Type(), theObj->myPntArray->Indices(),
     theObj->myPntArray->Attributes(), theObj->myPntArray->Bounds()), myObj(theObj) {}
 
   virtual void Render(const Handle(OpenGl_Workspace)& theWorkspace) const
@@ -221,7 +221,7 @@ void SketcherPrs_SymbolPrs::Compute(
   Handle(AIS_InteractiveContext) aCtx = GetContext();
   Handle(OpenGl_GraphicDriver) aDriver =
     Handle(OpenGl_GraphicDriver)::DownCast(aCtx->CurrentViewer()->Driver());
-  if (aDriver.IsNull()) 
+  if (aDriver.IsNull())
     return;
 
   // Update points with default shift value
@@ -255,7 +255,7 @@ void SketcherPrs_SymbolPrs::Compute(
   }
 
   // Pint the group with custom procedure (see Render)
-  SketcherPrs_SymbolArray* aElem = 
+  SketcherPrs_SymbolArray* aElem =
     new SketcherPrs_SymbolArray((OpenGl_GraphicDriver*)aDriver->This(), this);
   aGroup->AddElement(aElem);
 
