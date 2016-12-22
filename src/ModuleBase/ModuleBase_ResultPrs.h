@@ -38,13 +38,12 @@ public:
 
   /// Highlight the presentation with the given color
   /// \param aPM a presentations manager
-  /// \param aCol a color
+  /// \param theStyle a style of presentation
   /// \param aMode a drawing mode
   virtual void HilightWithColor (const Handle(PrsMgr_PresentationManager3d)& aPM,
-    const Quantity_NameOfColor aCol, const Standard_Integer aMode = 0)
+    const Handle(Graphic3d_HighlightStyle)& theStyle, const Standard_Integer aMode = 0)
   {
-    //PORTING_TO_SALOME_8
-    //Selectable()->HilightOwnerWithColor(aPM, aCol, this);
+    Selectable()->HilightOwnerWithColor(aPM, theStyle, this);
   }
 
   DEFINE_STANDARD_RTTIEXT(ModuleBase_BRepOwner, StdSelect_BRepOwner)

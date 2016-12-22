@@ -226,15 +226,13 @@ void PartSet_ResultSketchPrs::setAuxiliaryPresentationStyle(const bool isAuxilia
   if (aDrawer->HasOwnWireAspect()) {
     aLineAspect = aDrawer->WireAspect();
   }
-  Quantity_Color aCurrentColor;
-  Aspect_TypeOfLine aPrevLineType;
-  Standard_Real aCurrentWidth;
-  // PORTING_TO_SALOME_8
-  /*aLineAspect->Aspect()->Values(aCurrentColor, aPrevLineType, aCurrentWidth);
+  Quantity_Color aCurrentColor = aLineAspect->Aspect()->Color();
+  Aspect_TypeOfLine aPrevLineType = aLineAspect->Aspect()->Type();
+  Standard_Real aCurrentWidth = aLineAspect->Aspect()->Width();
   bool isChangedLineType = aType != aPrevLineType;
   if (isChangedLineType) {
     aLineAspect->SetTypeOfLine(aType);
-  }*/
+  }
 }
 
 void PartSet_ResultSketchPrs::fillShapes(TopoDS_Shape& theResultShape,
