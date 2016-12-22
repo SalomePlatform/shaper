@@ -75,15 +75,10 @@ void SketcherPrs_Coincident::Compute(
   if (aReadyToDisplay)
     myPoint = aPoint;
 
-  // Get point of the presentation
-  static Handle(Graphic3d_AspectMarker3d) aPtA;
-  if (aPtA.IsNull()) {
-    aPtA = new Graphic3d_AspectMarker3d ();
-  }
   // Create the presentation as a combination of standard point markers
-
   bool aValid = !myIsConflicting;
   // The external yellow contour
+  Handle(Graphic3d_AspectMarker3d) aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(Aspect_TOM_RING3);
   aPtA->SetScale(2.);
   aPtA->SetColor(aValid ? Quantity_NOC_YELLOW : myConflictingColor);
@@ -95,6 +90,7 @@ void SketcherPrs_Coincident::Compute(
   aGroup->AddPrimitiveArray (aPntArray);
 
   // Make a black mid ring
+  aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(Aspect_TOM_RING1);
   aPtA->SetScale(1.);
   aPtA->SetColor(aValid ? Quantity_NOC_BLACK : myConflictingColor);
@@ -102,8 +98,10 @@ void SketcherPrs_Coincident::Compute(
   aGroup->AddPrimitiveArray (aPntArray);
 
   // Make an internal ring
+  aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(Aspect_TOM_POINT);
   aPtA->SetScale(5.);
+  aPtA->SetColor(aValid ? Quantity_NOC_BLACK : myConflictingColor);
   aGroup->SetPrimitivesAspect(aPtA);
   aGroup->AddPrimitiveArray (aPntArray);
 
