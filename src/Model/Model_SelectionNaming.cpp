@@ -381,7 +381,7 @@ const TopoDS_Shape getShapeFromNS(
     // if we have here the same name as theSubShapeName, there is no index in compound, it is whole
     Handle(TDataStd_Name) aName;
     if (!theNS->Label().FindAttribute(TDataStd_Name::GetID(), aName) ||
-        aName->Get() != theSubShapeName.c_str()) {
+        aName->Get() != aSubString.c_str()) {
       aSubString = aSubString.substr(n+1);
       indx = atoi(aSubString.c_str());
     }
