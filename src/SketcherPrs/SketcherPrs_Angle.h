@@ -34,7 +34,7 @@ public:
   /// Destructor
   Standard_EXPORT ~SketcherPrs_Angle();
 
-  DEFINE_STANDARD_RTTI(SketcherPrs_Angle)
+  DEFINE_STANDARD_RTTIEXT(SketcherPrs_Angle, AIS_AngleDimension)
 
   /// Returns true if the constraint feature arguments are correcly filled
   /// to build AIS presentation

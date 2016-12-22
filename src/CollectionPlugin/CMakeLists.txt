@@ -2,23 +2,29 @@
 
 INCLUDE(Common)
 INCLUDE(UnitTest)
-SET(CMAKE_AUTOMOC ON)
+INCLUDE(UseQtExt)
+
+# additional include directories
+INCLUDE_DIRECTORIES(${QT_INCLUDES})
+
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 SET(PROJECT_HEADERS
     CollectionPlugin.h
     CollectionPlugin_Plugin.h
     CollectionPlugin_Group.h
     CollectionPlugin_Field.h
-	CollectionPlugin_WidgetCreator.h
-	CollectionPlugin_WidgetField.h
+    CollectionPlugin_WidgetCreator.h
+    CollectionPlugin_WidgetField.h
 )
 
 SET(PROJECT_SOURCES
     CollectionPlugin_Plugin.cpp
     CollectionPlugin_Group.cpp
     CollectionPlugin_Field.cpp
-	CollectionPlugin_WidgetCreator.cpp
-	CollectionPlugin_WidgetField.cpp
+    CollectionPlugin_WidgetCreator.cpp
+    CollectionPlugin_WidgetField.cpp
 )
 
 SET(XML_RESOURCES
@@ -30,6 +36,12 @@ SET(TEXT_RESOURCES
     CollectionPlugin_msg_en.ts
 )
 
+# sources / moc wrappings
+QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_HEADERS})
+
+#QT5_ADD_TRANSLATION(QM_RESOURCES ${TEXT_RESOURCES})
+
+SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC} ${PROJECT_COMPILED_RESOURCES} ${QM_RESOURCES})
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
 
 
@@ -54,7 +66,12 @@ SET(PROJECT_LIBRARIES
 )
 
 ADD_DEFINITIONS(-DCOLLECTIONPLUGIN_EXPORTS ${CAS_DEFINITIONS})
-ADD_LIBRARY(CollectionPlugin MODULE ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES} ${TEXT_RESOURCES})
+ADD_LIBRARY(CollectionPlugin MODULE
+            ${PROJECT_SOURCES}
+            ${PROJECT_HEADERS}
+            ${XML_RESOURCES}
+            ${TEXT_RESOURCES}
+            ${PROJECT_AUTOMOC})
 TARGET_LINK_LIBRARIES(CollectionPlugin ${PROJECT_LIBRARIES})
 
 INSTALL(TARGETS CollectionPlugin DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})

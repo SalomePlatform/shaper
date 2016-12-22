@@ -23,7 +23,6 @@
 
 
 
-IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Transformation, SketcherPrs_SymbolPrs);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Transformation, SketcherPrs_SymbolPrs);
 
 static Handle(Image_AlienPixMap) MyPixMap;

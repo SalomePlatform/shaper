@@ -239,7 +239,7 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
       bool aFound = false;
       for (aLIt.Initialize(aList); aLIt.More(); aLIt.Next()) {
         anAISIO = aLIt.Value();
-        if (anAISIO.Access() == aAIS.Access()) {
+        if (anAISIO.get() == aAIS.get()) {
           aFound = true;
           break;
         }
@@ -442,7 +442,7 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theId,
   myActionsList.append(theId);
   SUIT_Desktop* aDesk = application()->desktop();
   int aKeys = 0;
-  for (unsigned int i = 0; i < theKeys.count(); i++)
+  for (int i = 0; i < theKeys.count(); i++)
     aKeys += theKeys[i];
   QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk,
                                   isCheckable);
@@ -510,7 +510,7 @@ QAction* SHAPERGUI::addDesktopCommand(const QString& theId, const QString& theTi
   myActionsList.append(theId);
   SUIT_Desktop* aDesk = application()->desktop();
   int aKeys = 0;
-  for (unsigned int i = 0; i < theKeys.count(); i++)
+  for (int i = 0; i < theKeys.count(); i++)
     aKeys += theKeys[i];
   QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk,
                                   isCheckable);

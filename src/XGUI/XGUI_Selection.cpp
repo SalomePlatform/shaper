@@ -80,15 +80,15 @@ Handle(AIS_InteractiveObject) XGUI_Selection::getIO(const ModuleBase_ViewerPrsPt
 void XGUI_Selection::getSelectedInViewer(QList<ModuleBase_ViewerPrsPtr>& thePresentations) const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (!aContext.IsNull() && aContext->HasOpenedContext()) {
+  if (!aContext.IsNull()) {
     QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
     for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
       ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
       Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
 
-      if (aSelectedIds.contains((long)anOwner.Access()))
+      if (aSelectedIds.contains((long)anOwner.get()))
         continue;
-      aSelectedIds.append((long)anOwner.Access());
+      aSelectedIds.append((long)anOwner.get());
 
       fillPresentation(aPrs, anOwner);
 
@@ -234,9 +234,9 @@ QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getHighlighted() const
   for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
     Handle(SelectMgr_EntityOwner) anOwner = aContext->DetectedOwner();
     if (!anOwner.IsNull()) {
-      if (aSelectedIds.contains((long)anOwner.Access()))
+      if (aSelectedIds.contains((long)anOwner.get()))
         continue;
-      aSelectedIds.append((long)anOwner.Access());
+      aSelectedIds.append((long)anOwner.get());
 
       ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
       fillPresentation(aPrs, anOwner);
@@ -251,14 +251,12 @@ QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getHighlighted() const
       // we should not check the appearance of this feature because there can be some selected
       // shapes for one feature
       aPrs->setObject(aResult);
-      if (aContext->HasOpenedContext()) {
-        TopoDS_Shape aShape = aContext->DetectedShape();
-        if (!aShape.IsNull()) {
-          std::shared_ptr<GeomAPI_Shape> aGeomShape =
-            std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-          aGeomShape->setImpl(new TopoDS_Shape(aShape));
-          aPrs->setShape(aGeomShape);
-        }
+      TopoDS_Shape aShape = aContext->DetectedShape();
+      if (!aShape.IsNull()) {
+        std::shared_ptr<GeomAPI_Shape> aGeomShape =
+          std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+        aGeomShape->setImpl(new TopoDS_Shape(aShape));
+        aPrs->setShape(aGeomShape);
       }
       aPresentations.push_back(aPrs);
     }

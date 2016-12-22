@@ -29,7 +29,6 @@ class ModuleBase_ISelection;
 class ModuleBase_WidgetSelectorStore;
 class ModelAPI_Validator;
 class Config_WidgetAPI;
-class Handle_SelectMgr_EntityOwner;
 
 //#define LIST_OF_VALID_PRS
 

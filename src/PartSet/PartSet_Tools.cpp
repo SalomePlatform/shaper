@@ -721,7 +721,7 @@ ResultPtr PartSet_Tools::findExternalVertex(CompositeFeaturePtr theSketch,
 
 
 bool PartSet_Tools::hasVertexShape(const ModuleBase_ViewerPrsPtr& thePrs, FeaturePtr theSketch,
-                                   Handle_V3d_View theView, double& theX, double& theY)
+                                   Handle(V3d_View) theView, double& theX, double& theY)
 {
   bool aHasVertex = false;
 

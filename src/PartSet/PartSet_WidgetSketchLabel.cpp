@@ -326,8 +326,6 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   activateFilters(false);
 
   // 5. Clear selection mode and define sketching mode
-  //XGUI_Displayer* aDisp = aWorkshop->displayer();
-  //aDisp->closeLocalContexts();
   emit planeSelected(plane());
   // after the plane is selected in the sketch, the sketch selection should be activated
   // it can not be performed in the sketch label widget because, we don't need to switch off

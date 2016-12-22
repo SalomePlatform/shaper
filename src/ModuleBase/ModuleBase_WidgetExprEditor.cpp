@@ -31,6 +31,8 @@
 #include <QScrollBar>
 #include <QFontMetrics>
 #include <QPainter>
+#include <QStyle>
+#include <QAbstractItemView>
 
 #include <memory>
 #include <string>

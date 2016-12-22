@@ -29,7 +29,7 @@ class ModuleBase_ViewerPrs
   /// \param theOwner a selection owner
   MODULEBASE_EXPORT ModuleBase_ViewerPrs(ObjectPtr theResult = ObjectPtr(),
                                          const GeomShapePtr& theShape = GeomShapePtr(),
-                                         Handle_SelectMgr_EntityOwner theOwner = NULL);
+                                         Handle(SelectMgr_EntityOwner) theOwner = NULL);
 
   /// Destructor
   MODULEBASE_EXPORT virtual ~ModuleBase_ViewerPrs();

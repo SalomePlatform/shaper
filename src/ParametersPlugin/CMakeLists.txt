@@ -1,6 +1,12 @@
 INCLUDE(Common)
 INCLUDE(UnitTest)
-SET(CMAKE_AUTOMOC ON)
+INCLUDE(UseQtExt)
+
+# additional include directories
+INCLUDE_DIRECTORIES(${QT_INCLUDES})
+
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 SET(PROJECT_HEADERS
     ParametersPlugin.h
@@ -57,15 +63,24 @@ SET(TEXT_RESOURCES
 # 					   OPTIONS -extensions cpp -no-recursive
 # 					   )
 
-SET(PROJECT_AUTOMOC
-    ${CMAKE_CURRENT_BINARY_DIR}/ParametersPlugin_automoc.cpp
-)
+#SET(PROJECT_AUTOMOC
+#    ${CMAKE_CURRENT_BINARY_DIR}/ParametersPlugin_automoc.cpp
+#)
+# sources / moc wrappings
+QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_HEADERS})
 
 
 SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC} ${QM_RESOURCES})
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
 
-ADD_LIBRARY(ParametersPlugin MODULE ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES} ${TEXT_RESOURCES} ${QM_RESOURCES})
+ADD_LIBRARY(ParametersPlugin MODULE
+            ${PROJECT_SOURCES}
+            ${PROJECT_HEADERS}
+            ${XML_RESOURCES}
+            ${TEXT_RESOURCES}
+            ${QM_RESOURCES}
+            ${PROJECT_AUTOMOC}
+)
 
 
 TARGET_LINK_LIBRARIES(ParametersPlugin ${PROJECT_LIBRARIES})

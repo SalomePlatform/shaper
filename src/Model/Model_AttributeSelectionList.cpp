@@ -13,6 +13,7 @@
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDF_RelocationTable.hxx>
+#include <TDF_DeltaOnAddition.hxx>
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
@@ -20,6 +21,7 @@
 #include <BRep_Tool.hxx>
 #include <TNaming_Builder.hxx>
 #include <TNaming_Iterator.hxx>
+#include <TNaming_NamedShape.hxx>
 #include <NCollection_List.hxx>
 
 void Model_AttributeSelectionList::append(

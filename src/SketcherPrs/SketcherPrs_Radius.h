@@ -34,7 +34,7 @@ public:
   /// Destructor
   Standard_EXPORT ~SketcherPrs_Radius();
 
-  DEFINE_STANDARD_RTTI(SketcherPrs_Radius)
+  DEFINE_STANDARD_RTTIEXT(SketcherPrs_Radius, AIS_RadiusDimension)
 
   /// Returns true if the constraint feature arguments are correcly filled
   /// to build AIS presentation

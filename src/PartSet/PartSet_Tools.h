@@ -24,7 +24,7 @@
 
 #include <memory>
 
-class Handle_V3d_View;
+class V3d_View;
 class ModuleBase_ViewerPrs;
 class ModuleBase_IWorkshop;
 class GeomDataAPI_Point2D;
@@ -62,7 +62,7 @@ public:
   /// Converts the 2D screen point to the 3D point on the view according to the point of view
   /// \param thePoint a screen point
   /// \param theView a 3D view
-  static gp_Pnt convertClickToPoint(QPoint thePoint, Handle_V3d_View theView);
+  static gp_Pnt convertClickToPoint(QPoint thePoint, Handle(V3d_View) theView);
 
   /// \brief Converts the 3D point to the projected coodinates on the sketch plane.
   /// \param thePoint the 3D point in the viewer
@@ -216,7 +216,7 @@ public:
   /// \param theY the output vertical coordinate of the point
   static bool hasVertexShape(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
                              FeaturePtr theSketch,
-                             Handle_V3d_View theView, double& theX, double& theY);
+                             Handle(V3d_View) theView, double& theX, double& theY);
 
 
   /**

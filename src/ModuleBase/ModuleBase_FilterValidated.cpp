@@ -17,7 +17,6 @@
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_Tools.h>
 
-IMPLEMENT_STANDARD_HANDLE(ModuleBase_FilterValidated, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_FilterValidated, SelectMgr_Filter);
 
 Standard_Boolean ModuleBase_FilterValidated::

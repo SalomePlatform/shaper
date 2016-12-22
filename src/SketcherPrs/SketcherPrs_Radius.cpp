@@ -21,9 +21,20 @@
 
 #include <gp_Circ.hxx>
 
+/// Creates an aspect to be shown in length/radius dimension presentations
+/// \return an instance of aspect
+extern Handle(Prs3d_DimensionAspect) createDimensionAspect();
+
+/// Update variable aspect parameters (depending on viewer scale)
+/// \param theDimAspect an aspect to be changed
+/// \param theDimValue an arrow value
+/// \param theTextSize an arrow value
+extern void updateArrows(Handle_Prs3d_DimensionAspect theDimAspect,
+                         double theDimValue, double theTextSize);
+
+
 static const gp_Circ MyDefCirc(gp_Ax2(gp_Pnt(0,0,0), gp_Dir(0,0,1)), 1);
 
-IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Radius, AIS_RadiusDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Radius, AIS_RadiusDimension);
 
 SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint,
@@ -33,7 +44,7 @@ SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint,
   myAnchorPoint(gp_Pnt(0, 0, 2)),
   myValue(1, false, "")
 {
-  SetDimensionAspect(SketcherPrs_Tools::createDimensionAspect());
+  SetDimensionAspect(createDimensionAspect());
   myStyleListener = new SketcherPrs_DimensionStyleListener();
 }
 
@@ -138,7 +149,7 @@ void SketcherPrs_Radius::Compute(
   // Update variable aspect parameters (depending on viewer scale)
   double aTextSize = 0.0;
   GetValueString(aTextSize);
-  SketcherPrs_Tools::updateArrows(DimensionAspect(), GetValue(), aTextSize);
+  updateArrows(DimensionAspect(), GetValue(), aTextSize);
 
 
   AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);

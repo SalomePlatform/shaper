@@ -36,7 +36,7 @@
 
 #include <GeomAPI_IPresentable.h>
 
-#include <StdPrs_WFDeflectionShape.hxx>
+#include <StdPrs_WFShape.hxx>
 
 #include <QList>
 
@@ -56,7 +56,6 @@
 #include <SketchPlugin_SketchEntity.h>
 #endif
 
-IMPLEMENT_STANDARD_HANDLE(PartSet_OperationPrs, ViewerData_AISShape);
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_OperationPrs, ViewerData_AISShape);
 
 PartSet_OperationPrs::PartSet_OperationPrs(ModuleBase_IWorkshop* theWorkshop)
@@ -128,7 +127,7 @@ void PartSet_OperationPrs::Compute(
         setWidth(aDrawer, aWidth);
       }
     }
-    StdPrs_WFDeflectionShape::Add(thePresentation, aShape, aDrawer);
+    StdPrs_WFShape::Add(thePresentation, aShape, aDrawer);
   }
   Set(aComp);
   if (!aReadyToDisplay) {

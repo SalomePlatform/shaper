@@ -21,7 +21,6 @@
 
 class GeomDataAPI_Point2D;
 class AIS_Dimension;
-class Handle_Prs3d_DimensionAspect;
 
 //#define MyTextHeight 20
 
@@ -168,17 +167,6 @@ namespace SketcherPrs_Tools {
   /// Sends event to redisplay all sub-features of composite feature
   /// \param theState a new state
   SKETCHERPRS_EXPORT void sendExpressionShownEvent(const bool& theState);
-
-  /// Creates an aspect to be shown in length/radius dimension presentations
-  /// \return an instance of aspect
-  SKETCHERPRS_EXPORT Handle_Prs3d_DimensionAspect createDimensionAspect();
-
-  /// Update variable aspect parameters (depending on viewer scale)
-  /// \param theDimAspect an aspect to be changed
-  /// \param theDimValue an arrow value
-  /// \param theTextSize an arrow value
-  SKETCHERPRS_EXPORT void updateArrows(Handle_Prs3d_DimensionAspect theDimAspect,
-                                       double theDimValue, double theTextSize);
 
   /// Throws an exception(in debug mode) and sends a signal about necessity to hide the object
   /// \param theFeature a feature where AIS presentation is empty

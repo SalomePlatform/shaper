@@ -29,7 +29,7 @@ public:
   Standard_EXPORT virtual Standard_Boolean
     IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
-  DEFINE_STANDARD_RTTI(PartSet_GlobalFilter)
+  DEFINE_STANDARD_RTTIEXT(PartSet_GlobalFilter, ModuleBase_ShapeDocumentFilter)
 };
 
 
@@ -53,7 +53,7 @@ public:
   Standard_EXPORT virtual Standard_Boolean
     IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
-  DEFINE_STANDARD_RTTI(PartSet_CirclePointFilter)
+  DEFINE_STANDARD_RTTIEXT(PartSet_CirclePointFilter, SelectMgr_Filter)
 
 private:
 
