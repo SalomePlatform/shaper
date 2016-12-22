@@ -34,6 +34,7 @@ class ModelAPI_Feature;
 class XGUI_Workshop;
 
 #ifdef VINSPECTOR
+class VInspectorAPI_Communicator;
 class VInspectorAPI_CallBack;
 #endif
 
@@ -259,9 +260,9 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   QIntList activeSelectionModes() const;
 
 #ifdef VINSPECTOR
-  /// Sets callback to debug display
-  /// \param theCallBack a callback instance
-  void setCallBack(VInspectorAPI_CallBack* theCallBack);
+  void setVInspectorVisible(const bool theVisible);
+
+  void setCommunicator(VInspectorAPI_Communicator* theCommunicator);
 
   VInspectorAPI_CallBack* getCallBack() const;
 #endif
@@ -360,7 +361,7 @@ private:
    /// Reference to workshop
   XGUI_Workshop* myWorkshop;
 #ifdef VINSPECTOR
-  VInspectorAPI_CallBack* myContextCallBack; ///< callback to debug display
+  VInspectorAPI_Communicator* myCommunicator; ///< callback to debug display, show/hide it
 #endif
   /// A container for selection filters
   Handle(SelectMgr_AndFilter) myAndFilter;
