@@ -2072,7 +2072,7 @@ void XGUI_Workshop::closeDocument()
     anOperation->abort();
     anOperation = operationMgr()->currentOperation();
   }
-  myDisplayer->closeLocalContexts();
+  //myDisplayer->closeLocalContexts();
   myDisplayer->eraseAll();
   objectBrowser()->clearContent();
 

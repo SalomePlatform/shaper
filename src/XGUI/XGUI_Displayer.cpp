@@ -35,7 +35,6 @@
 #include <SUIT_ResourceMgr.h>
 
 #include <AIS_InteractiveContext.hxx>
-#include <AIS_LocalContext.hxx>
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 #include <AIS_DimensionSelectionMode.hxx>
@@ -80,31 +79,15 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;
 //#define DEBUG_SELECTION_FILTERS
 
 //#define DEBUG_COMPOSILID_DISPLAY
-// Workaround for bug #25637
 
 //#define DEBUG_OCCT_SHAPE_SELECTION
 
-//#define WORKAROUND_UNTIL_27523_IS_FIXED
+//#define DEBUG_OCCT_26172
 
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
 {
   // Get from null point
   theAIS->DisplayedObjects(theList, true);
-  if (theAIS->HasOpenedContext()) {
-    // get from local context
-    const Handle(AIS_LocalContext)& aLC = theAIS->LocalContext();
-    TColStd_MapOfTransient aMap;
-    int NbDisp = aLC->DisplayedObjects(aMap);
-    TColStd_MapIteratorOfMapOfTransient aIt(aMap);
-
-    Handle(AIS_InteractiveObject) curIO;
-    Handle(Standard_Transient) Tr;
-    for(; aIt.More(); aIt.Next()){
-      Tr = aIt.Key();
-      curIO = *((Handle(AIS_InteractiveObject)*) &Tr);
-      theList.Append(curIO);
-    }
-  }
 }
 
 QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QString(", "))
@@ -119,7 +102,8 @@ QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QS
 
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
   : myWorkshop(theWorkshop), myNeedUpdate(false),
-  myIsTrihedronActive(true), myViewerBlockedRecursiveCount(0)
+  myIsTrihedronActive(true), myViewerBlockedRecursiveCount(0),
+  myIsFirstAISContextUse(true)
 {
   #ifdef VINSPECTOR
   myContextCallBack = 0;
@@ -363,17 +347,7 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       if (aNeedToRestoreSelection)
         myWorkshop->module()->storeSelection();
 
-#ifdef WORKAROUND_UNTIL_27523_IS_FIXED
-      if (!myActiveSelectionModes.contains(0))
-        aContext->Activate(aAISIO, 0);
-#endif
-
       aContext->Redisplay(aAISIO, false);
-
-#ifdef WORKAROUND_UNTIL_27523_IS_FIXED
-      if (!myActiveSelectionModes.contains(0))
-        aContext->Deactivate(aAISIO, 0);
-#endif
 
       #ifdef VINSPECTOR
       if (myContextCallBack) myContextCallBack->Redisplay(aAISIO);
@@ -421,11 +395,6 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject, const bool theUpdateViewer)
     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
 
     deactivateAIS(anAIS);
-    // the selection from the previous activation modes should be cleared manually (#26172)
-    aContext->LocalContext()->ClearOutdatedSelection(anAIS, true);
-    #ifdef VINSPECTOR
-    if (myContextCallBack) myContextCallBack->ClearOutdatedSelection(anAIS);
-    #endif
     if (theUpdateViewer)
       updateViewer();
   }
@@ -576,7 +545,7 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrL
   myActiveSelectionModes = aNewModes;
   Handle(AIS_InteractiveContext) aContext = AISContext();
   // Open local context if there is no one
-  if (aContext.IsNull() || !aContext->HasOpenedContext())
+  if (aContext.IsNull())
     return;
 
   //aContext->UseDisplayedObjects();
@@ -637,72 +606,58 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValue
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
     return;
-  if (aContext->HasOpenedContext()) {
-    aContext->UnhilightSelected(false);
-    aContext->ClearSelected(false);
-    #ifdef VINSPECTOR
-    if (myContextCallBack) myContextCallBack->ClearSelected();
-    #endif
-    NCollection_DataMap<TopoDS_Shape, NCollection_Map<Handle(AIS_InteractiveObject)>>
-      aShapesToBeSelected;
+  aContext->UnhilightSelected(false);
+  aContext->ClearSelected(false);
+  #ifdef VINSPECTOR
+  if (myContextCallBack) myContextCallBack->ClearSelected();
+  #endif
+  NCollection_DataMap<TopoDS_Shape, NCollection_Map<Handle(AIS_InteractiveObject)>>
+    aShapesToBeSelected;
 
-    foreach (ModuleBase_ViewerPrsPtr aPrs, theValues) {
-      const GeomShapePtr& aGeomShape = aPrs->shape();
-      if (aGeomShape.get() && !aGeomShape->isNull()) {
-        const TopoDS_Shape& aShape = aGeomShape->impl<TopoDS_Shape>();
+  foreach (ModuleBase_ViewerPrsPtr aPrs, theValues) {
+    const GeomShapePtr& aGeomShape = aPrs->shape();
+    if (aGeomShape.get() && !aGeomShape->isNull()) {
+      const TopoDS_Shape& aShape = aGeomShape->impl<TopoDS_Shape>();
 #ifdef DEBUG_OCCT_SHAPE_SELECTION
-        // problem 1: performance
-        // problem 2: IO is not specified, so the first found owner is selected, as a result
-        // it might belong to another result
-        aContext->AddOrRemoveSelected(aShape, false);
-        #ifdef VINSPECTOR
-        if (myContextCallBack) myContextCallBack->AddOrRemoveSelected(aShape);
-        #endif
+      // problem 1: performance
+      // problem 2: IO is not specified, so the first found owner is selected, as a result
+      // it might belong to another result
+      aContext->AddOrRemoveSelected(aShape, false);
+      #ifdef VINSPECTOR
+      if (myContextCallBack) myContextCallBack->AddOrRemoveSelected(aShape);
+      #endif
 #else
-        NCollection_Map<Handle(AIS_InteractiveObject)> aPresentations;
-        if (aShapesToBeSelected.IsBound(aShape))
-          aPresentations = aShapesToBeSelected.Find(aShape);
-        ObjectPtr anObject = aPrs->object();
-        getPresentations(anObject, aPresentations);
+      NCollection_Map<Handle(AIS_InteractiveObject)> aPresentations;
+      if (aShapesToBeSelected.IsBound(aShape))
+        aPresentations = aShapesToBeSelected.Find(aShape);
+      ObjectPtr anObject = aPrs->object();
+      getPresentations(anObject, aPresentations);
 
-        aShapesToBeSelected.Bind(aShape, aPresentations);
+      aShapesToBeSelected.Bind(aShape, aPresentations);
 #endif
-      } else {
-        ObjectPtr anObject = aPrs->object();
-        ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-        if (aResult.get() && isVisible(aResult)) {
-          AISObjectPtr anObj = myResult2AISObjectMap[aResult];
-          Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
-          if (!anAIS.IsNull()) {
-            // The methods are replaced in order to provide multi-selection, e.g. restore selection
-            // by activating multi selector widget. It also gives an advantage that the multi
-            // selection in OB gives multi-selection in the viewer
-            //aContext->SetSelected(anAIS, false);
-            // The selection in the context was cleared, so the method sets the objects are selected
-            aContext->AddOrRemoveSelected(anAIS, false);
-            #ifdef VINSPECTOR
-            if (myContextCallBack) myContextCallBack->AddOrRemoveSelected(anAIS);
-            #endif
-          }
-        }
-      }
-    }
-    if (!aShapesToBeSelected.IsEmpty())
-      XGUI_Displayer::AddOrRemoveSelectedShapes(aContext, aShapesToBeSelected);
-  } else { // it seems the next code is obsolete as the context is always opened in SHAPER
-    aContext->UnhilightCurrents(false);
-    aContext->ClearCurrents(false);
-    foreach (ModuleBase_ViewerPrsPtr aPrs, theValues) {
+    } else {
       ObjectPtr anObject = aPrs->object();
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
       if (aResult.get() && isVisible(aResult)) {
         AISObjectPtr anObj = myResult2AISObjectMap[aResult];
         Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
-        if (!anAIS.IsNull())
-          aContext->SetCurrentObject(anAIS, false);
+        if (!anAIS.IsNull()) {
+          // The methods are replaced in order to provide multi-selection, e.g. restore selection
+          // by activating multi selector widget. It also gives an advantage that the multi
+          // selection in OB gives multi-selection in the viewer
+          //aContext->SetSelected(anAIS, false);
+          // The selection in the context was cleared, so the method sets the objects are selected
+          aContext->AddOrRemoveSelected(anAIS, false);
+          #ifdef VINSPECTOR
+          if (myContextCallBack) myContextCallBack->AddOrRemoveSelected(anAIS);
+          #endif
+        }
       }
     }
   }
+  if (!aShapesToBeSelected.IsEmpty())
+    XGUI_Displayer::AddOrRemoveSelectedShapes(aContext, aShapesToBeSelected);
+
   if (theUpdateViewer)
     updateViewer();
 }
@@ -749,21 +704,17 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
 }
 
 void deactivateObject(Handle(AIS_InteractiveContext) theContext,
-                      Handle(AIS_InteractiveObject) theObject,
+                      Handle(AIS_InteractiveObject) theObject
 #ifdef VINSPECTOR
-                      VInspectorAPI_CallBack* theCallBack,
+                      , VInspectorAPI_CallBack* theCallBack
 #endif
-                      const bool theClear = true)
+                      )
 {
   if (!theObject.IsNull()) {
     theContext->Deactivate(theObject);
     #ifdef VINSPECTOR
     if (theCallBack) theCallBack->Deactivate(theObject);
     #endif
-    //if (theClear) {
-      //theObject->ClearSelected();
-      //  theContext->LocalContext()->ClearOutdatedSelection(theObject, true);
-    //}
   }
 }
 
@@ -780,8 +731,6 @@ void XGUI_Displayer::deactivateTrihedron(const bool theUpdateViewer) const
       );
 
     /// #1136 hidden axis are selected in sketch
-    /// workaround for Cascade: there is a crash in AIS_LocalContext::ClearOutdatedSelection
-    /// for Position AIS object in SelectionModes.
     deactivateObject(aContext, aTrie->XAxis()
     #ifdef VINSPECTOR
       , myContextCallBack
@@ -829,7 +778,7 @@ Handle(AIS_InteractiveObject) XGUI_Displayer::getTrihedron() const
   return myWorkshop->viewer()->trihedron();
 }
 
-void XGUI_Displayer::openLocalContext()
+/*void XGUI_Displayer::openLocalContext()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   // Open local context if there is no one
@@ -864,9 +813,9 @@ void XGUI_Displayer::openLocalContext()
     //  aContext->SetSelected(aIt2.Value(), false);
     //}
   }
-}
+}*/
 
-void XGUI_Displayer::closeLocalContexts(const bool theUpdateViewer)
+/*void XGUI_Displayer::closeLocalContexts(const bool theUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull() && aContext->HasOpenedContext()) {
@@ -894,7 +843,7 @@ void XGUI_Displayer::closeLocalContexts(const bool theUpdateViewer)
         aContext->Display(aAISIO, false);
         aContext->SetDisplayMode(aAISIO, Shading, false);
       }
-    }*/
+    }*+/
 
     // Append the filters from the local selection in the global selection context
     SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
@@ -914,7 +863,7 @@ void XGUI_Displayer::closeLocalContexts(const bool theUpdateViewer)
     //    aContext->SetCurrentObject(aIt2.Value(), false);
     //}
   }
-}
+}*/
 
 AISObjectPtr XGUI_Displayer::getAISObject(ObjectPtr theObject) const
 {
@@ -1057,8 +1006,10 @@ void XGUI_Displayer::deactivateAIS(const Handle(AIS_InteractiveObject)& theIO,
 Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (!aContext.IsNull() && !aContext->HasOpenedContext()) {
-    aContext->OpenLocalContext();
+  if (!aContext.IsNull() && myIsFirstAISContextUse/*&& !aContext->HasOpenedContext()*/) {
+    XGUI_Displayer* aDisplayer = (XGUI_Displayer*)this;
+    aDisplayer->myIsFirstAISContextUse = false;
+    //aContext->OpenLocalContext();
     if (!isTrihedronActive())
       deactivateTrihedron(true);
     aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
@@ -1098,13 +1049,11 @@ bool XGUI_Displayer::displayAIS(AISObjectPtr theAIS, const bool toActivateInSele
     if (myContextCallBack) myContextCallBack->Load(anAISIO);
     #endif
     if (toActivateInSelectionModes) {
-      if (aContext->HasOpenedContext()) {
-        if (myActiveSelectionModes.size() == 0)
-          activateAIS(anAISIO, 0, theUpdateViewer);
-        else {
-          foreach(int aMode, myActiveSelectionModes) {
-            activateAIS(anAISIO, aMode, theUpdateViewer);
-          }
+      if (myActiveSelectionModes.size() == 0)
+        activateAIS(anAISIO, 0, theUpdateViewer);
+      else {
+        foreach(int aMode, myActiveSelectionModes) {
+          activateAIS(anAISIO, aMode, theUpdateViewer);
         }
       }
     }
@@ -1321,15 +1270,13 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
     }
   }
   if (isDeactivated) {
+#ifdef DEBUG_OCCT_26172
     // the selection from the previous activation modes should be cleared manually (#26172)
     theIO->ClearSelected();
     #ifdef VINSPECTOR
     if (myContextCallBack) myContextCallBack->ClearSelected(theIO);
     #endif
-    aContext->LocalContext()->ClearOutdatedSelection(theIO, true);
-    #ifdef VINSPECTOR
-    if (myContextCallBack) myContextCallBack->ClearOutdatedSelection(theIO);
-    #endif
+#endif
     // For performance issues
     //if (theUpdateViewer)
     //  updateViewer();
@@ -1507,8 +1454,6 @@ void XGUI_Displayer::displayTrihedron(bool theToDisplay) const
       activate(aTrihedron, myActiveSelectionModes, false);
   } else {
     deactivateTrihedron(false);
-    //aContext->LocalContext()->ClearOutdatedSelection(aTrihedron, true);
-    // the selection from the previous activation modes should be cleared manually (#26172)
 
     aContext->Erase(aTrihedron);
     #ifdef VINSPECTOR
@@ -1545,14 +1490,8 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
                            const NCollection_DataMap<TopoDS_Shape,
                            NCollection_Map<Handle(AIS_InteractiveObject)>>& theShapesToBeSelected)
 {
-  /*
-  // PORTING_TO_SALOME_8
-  Handle(AIS_LocalContext) aLContext = theContext->LocalContext();
-  TCollection_AsciiString aSelectionName = aLContext->SelectionName();
-  aLContext->UnhilightPicked(Standard_False);
-
   NCollection_List<Handle(SelectBasics_EntityOwner)> anActiveOwners;
-  aLContext->MainSelector()->ActiveOwners(anActiveOwners);
+  theContext->MainSelector()->ActiveOwners(anActiveOwners);
   NCollection_List<Handle(SelectBasics_EntityOwner)>::Iterator anOwnersIt (anActiveOwners);
   Handle(SelectMgr_EntityOwner) anOwner;
 
@@ -1577,12 +1516,10 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
         NCollection_Map<Handle(AIS_InteractiveObject)> aPresentations =
                                     theShapesToBeSelected.Find(aShape);
         if (aPresentations.Contains(anOwnerPresentation)) {
-          AIS_Selection::Selection(aSelectionName.ToCString())->Select(anOwner);
+          theContext->AddOrRemoveSelected(anOwner);
           anOwner->SetSelected (Standard_True);
         }
       }
     }
   }
-  aLContext->HilightPicked(Standard_False);
-*/
 }
