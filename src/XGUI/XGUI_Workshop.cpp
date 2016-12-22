@@ -103,12 +103,6 @@
 
 #include <iterator>
 
-#ifdef VINSPECTOR
-#include <VInspectorAPI_PluginMgr.h>
-#include <VInspectorAPI_Communicator.h>
-static bool VInspector_FirstCall = true;
-#endif
-
 #ifdef DFBROWSER
 #include <CDF_Session.hxx>
 #include <DFBrowserAPI_Communicator.hxx>
@@ -1351,17 +1345,7 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   }
 #ifdef VINSPECTOR
   else if (theId == "VINSPECTOR_VIEW") {
-    if (VInspector_FirstCall) {
-      VInspectorAPI_Communicator* aCommunicator = VInspectorAPI_PluginMgr::activateVInspector(
-                                        "VInspector.dll", viewer()->AISContext());
-      displayer()->setCallBack(aCommunicator->getCallBack());
-      #ifndef HAVE_SALOME
-      AppElements_Viewer* aViewer = mainWindow()->viewer();
-      if (aViewer)
-        aViewer->setCallBack(aCommunicator->getCallBack());
-      #endif
-      VInspector_FirstCall = false;
-    }
+    displayer()->setVInspectorVisible(true);
   }
 #endif
 #ifdef DFBROWSER

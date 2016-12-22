@@ -15,6 +15,13 @@
 #include <AppElements_Viewer.h>
 #endif
 
+#ifdef VINSPECTOR
+#include <VInspectorAPI_PluginMgr.h>
+#include <VInspectorAPI_Communicator.h>
+#include <AppElements_MainWindow.h>
+static bool VInspector_FirstCall = true;
+#endif
+
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
@@ -106,7 +113,7 @@ XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
   myIsFirstAISContextUse(true)
 {
   #ifdef VINSPECTOR
-  myContextCallBack = 0;
+  myCommunicator = 0;
   #endif
   myCustomPrs = std::shared_ptr<GeomAPI_ICustomPrs>(new XGUI_CustomPrs(theWorkshop));
 }
@@ -240,7 +247,7 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     anAISIO->SetDisplayMode(aDispMode);
     aContext->Display(anAISIO, aDispMode, 0, false, true, AIS_DS_Displayed);
     #ifdef VINSPECTOR
-    if (myContextCallBack) myContextCallBack->Display(anAISIO);
+    if (getCallBack()) getCallBack()->Display(anAISIO);
     #endif
     aDisplayed = true;
 
@@ -270,7 +277,7 @@ bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
       emit beforeObjectErase(theObject, anObject);
       aContext->Remove(anAIS, false/*update viewer*/);
       #ifdef VINSPECTOR
-      if (myContextCallBack) myContextCallBack->Remove(anAIS);
+      if (getCallBack()) getCallBack()->Remove(anAIS);
       #endif
       aErased = true;
     }
@@ -350,7 +357,7 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       aContext->Redisplay(aAISIO, false);
 
       #ifdef VINSPECTOR
-      if (myContextCallBack) myContextCallBack->Redisplay(aAISIO);
+      if (getCallBack()) getCallBack()->Redisplay(aAISIO);
       #endif
 
       if (aNeedToRestoreSelection)
@@ -593,7 +600,7 @@ bool XGUI_Displayer::isActive(ObjectPtr theObject) const
   TColStd_ListOfInteger aModes;
   aContext->ActivatedModes(anAIS, aModes);
   #ifdef VINSPECTOR
-  if (myContextCallBack) myContextCallBack->ActivatedModes(anAIS, aModes);
+  if (getCallBack()) getCallBack()->ActivatedModes(anAIS, aModes);
   #endif
 
   return aModes.Extent() > 0;
@@ -609,7 +616,7 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValue
   aContext->UnhilightSelected(false);
   aContext->ClearSelected(false);
   #ifdef VINSPECTOR
-  if (myContextCallBack) myContextCallBack->ClearSelected();
+  if (getCallBack()) getCallBack()->ClearSelected();
   #endif
   NCollection_DataMap<TopoDS_Shape, NCollection_Map<Handle(AIS_InteractiveObject)>>
     aShapesToBeSelected;
@@ -624,7 +631,7 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValue
       // it might belong to another result
       aContext->AddOrRemoveSelected(aShape, false);
       #ifdef VINSPECTOR
-      if (myContextCallBack) myContextCallBack->AddOrRemoveSelected(aShape);
+      if (getCallBack()) getCallBack()->AddOrRemoveSelected(aShape);
       #endif
 #else
       NCollection_Map<Handle(AIS_InteractiveObject)> aPresentations;
@@ -649,7 +656,7 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValue
           // The selection in the context was cleared, so the method sets the objects are selected
           aContext->AddOrRemoveSelected(anAIS, false);
           #ifdef VINSPECTOR
-          if (myContextCallBack) myContextCallBack->AddOrRemoveSelected(anAIS);
+          if (getCallBack()) getCallBack()->AddOrRemoveSelected(anAIS);
           #endif
         }
       }
@@ -669,7 +676,7 @@ void XGUI_Displayer::clearSelected(const bool theUpdateViewer)
     aContext->UnhilightCurrents(false);
     aContext->ClearSelected(theUpdateViewer);
     #ifdef VINSPECTOR
-    if (myContextCallBack) myContextCallBack->ClearSelected();
+    if (getCallBack()) getCallBack()->ClearSelected();
     #endif
   }
 }
@@ -687,7 +694,7 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
         emit beforeObjectErase(aObj, aAISObj);
         aContext->Remove(anIO, false/*update viewer*/);
         #ifdef VINSPECTOR
-        if (myContextCallBack) myContextCallBack->Remove(anIO);
+        if (getCallBack()) getCallBack()->Remove(anIO);
         #endif
         aErased = true;
       }
@@ -726,45 +733,45 @@ void XGUI_Displayer::deactivateTrihedron(const bool theUpdateViewer) const
     Handle(AIS_Trihedron) aTrie = Handle(AIS_Trihedron)::DownCast(aTrihedron);
     deactivateObject(aContext, aTrie
     #ifdef VINSPECTOR
-      , myContextCallBack
+      , getCallBack()
     #endif
       );
 
     /// #1136 hidden axis are selected in sketch
     deactivateObject(aContext, aTrie->XAxis()
     #ifdef VINSPECTOR
-      , myContextCallBack
+      , getCallBack()
     #endif
     );
     deactivateObject(aContext, aTrie->YAxis()
     #ifdef VINSPECTOR
-      , myContextCallBack
+      , getCallBack()
     #endif
     );
     deactivateObject(aContext, aTrie->Axis()
     #ifdef VINSPECTOR
-      , myContextCallBack
+      , getCallBack()
     #endif
     );
     deactivateObject(aContext, aTrie->Position()
     #ifdef VINSPECTOR
-      , myContextCallBack
+      , getCallBack()
     #endif
     );
 
     deactivateObject(aContext, aTrie->XYPlane()
     #ifdef VINSPECTOR
-      , myContextCallBack
+      , getCallBack()
     #endif
     );
     deactivateObject(aContext, aTrie->XZPlane()
     #ifdef VINSPECTOR
-      , myContextCallBack
+      , getCallBack()
     #endif
     );
     deactivateObject(aContext, aTrie->YZPlane()
     #ifdef VINSPECTOR
-      , myContextCallBack
+      , getCallBack()
     #endif
     );
 
@@ -947,7 +954,7 @@ void XGUI_Displayer::activateAIS(const Handle(AIS_InteractiveObject)& theIO,
     } else
       aContext->Activate(theIO, theMode, false);
     #ifdef VINSPECTOR
-    if (myContextCallBack) myContextCallBack->Activate(theIO, theMode);
+    if (getCallBack()) getCallBack()->Activate(theIO, theMode);
     #endif
 
     // the fix from VPA for more suitable selection of sketcher lines
@@ -984,13 +991,13 @@ void XGUI_Displayer::deactivateAIS(const Handle(AIS_InteractiveObject)& theIO,
     if (theMode == -1) {
       aContext->Deactivate(theIO);
       #ifdef VINSPECTOR
-      if (myContextCallBack) myContextCallBack->Deactivate(theIO);
+      if (getCallBack()) getCallBack()->Deactivate(theIO);
       #endif
     }
     else {
       aContext->Deactivate(theIO, theMode);
       #ifdef VINSPECTOR
-      if (myContextCallBack) myContextCallBack->Deactivate(theIO, theMode);
+      if (getCallBack()) getCallBack()->Deactivate(theIO, theMode);
       #endif
     }
 
@@ -1007,6 +1014,20 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull() && myIsFirstAISContextUse/*&& !aContext->HasOpenedContext()*/) {
+#ifdef VINSPECTOR
+    if (VInspector_FirstCall) {
+      XGUI_Displayer* aDisplayer = (XGUI_Displayer*)this;
+      VInspectorAPI_Communicator* aCommunicator = VInspectorAPI_PluginMgr::activateVInspector(
+                                        "VInspector.dll", aContext);
+      aDisplayer->setCommunicator(aCommunicator);
+      #ifndef HAVE_SALOME
+      AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+      if (aViewer)
+        aViewer->setCallBack(aCommunicator->getCallBack());
+      #endif
+      VInspector_FirstCall = false;
+    }
+#endif
     XGUI_Displayer* aDisplayer = (XGUI_Displayer*)this;
     aDisplayer->myIsFirstAISContextUse = false;
     //aContext->OpenLocalContext();
@@ -1037,16 +1058,16 @@ bool XGUI_Displayer::displayAIS(AISObjectPtr theAIS, const bool toActivateInSele
   if (!aContext.IsNull() && !anAISIO.IsNull()) {
     aContext->Display(anAISIO, 0/*wireframe*/, 0, false/*update viewer*/, true, AIS_DS_Displayed);
     #ifdef VINSPECTOR
-    if (myContextCallBack) myContextCallBack->Display(anAISIO);
+    if (getCallBack()) getCallBack()->Display(anAISIO);
     #endif
     aDisplayed = true;
     aContext->Deactivate(anAISIO);
     #ifdef VINSPECTOR
-    if (myContextCallBack) myContextCallBack->Deactivate(anAISIO);
+    if (getCallBack()) getCallBack()->Deactivate(anAISIO);
     #endif
     aContext->Load(anAISIO);
     #ifdef VINSPECTOR
-    if (myContextCallBack) myContextCallBack->Load(anAISIO);
+    if (getCallBack()) getCallBack()->Load(anAISIO);
     #endif
     if (toActivateInSelectionModes) {
       if (myActiveSelectionModes.size() == 0)
@@ -1072,7 +1093,7 @@ bool XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer)
     if (!anAISIO.IsNull() && aContext->IsDisplayed(anAISIO)) {
       aContext->Remove(anAISIO, false/*update viewer*/);
       #ifdef VINSPECTOR
-      if (myContextCallBack) myContextCallBack->Remove(anAISIO);
+      if (getCallBack()) getCallBack()->Remove(anAISIO);
       #endif
       aErased = true;
     }
@@ -1253,13 +1274,15 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   TColStd_ListOfInteger aTColModes;
   aContext->ActivatedModes(theIO, aTColModes);
   #ifdef VINSPECTOR
-  if (myContextCallBack) myContextCallBack->ActivatedModes(theIO, aTColModes);
+  if (getCallBack()) getCallBack()->ActivatedModes(theIO, aTColModes);
   #endif
   TColStd_ListIteratorOfListOfInteger itr( aTColModes );
   QIntList aModesActivatedForIO;
   bool isDeactivated = false;
+  bool aHasValidMode = false;
   for (; itr.More(); itr.Next() ) {
     Standard_Integer aMode = itr.Value();
+    aHasValidMode = aHasValidMode || aMode != -1;
     int aShapeMode = (aMode > 8)? aMode : AIS_Shape::SelectionType(aMode);
     if (!theModes.contains(aMode)) {
       deactivateAIS(theIO, aMode);
@@ -1274,7 +1297,7 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
     // the selection from the previous activation modes should be cleared manually (#26172)
     theIO->ClearSelected();
     #ifdef VINSPECTOR
-    if (myContextCallBack) myContextCallBack->ClearSelected(theIO);
+    if (getCallBack()) getCallBack()->ClearSelected(theIO);
     #endif
 #endif
     // For performance issues
@@ -1284,10 +1307,10 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   }
 
   // loading the interactive object allowing the decomposition
-  if (aTColModes.IsEmpty()) {
+  if (aTColModes.IsEmpty() || !aHasValidMode) {
     aContext->Load(theIO, -1, true);
     #ifdef VINSPECTOR
-    if (myContextCallBack) myContextCallBack->Load(theIO);
+    if (getCallBack()) getCallBack()->Load(theIO);
     #endif
   }
 
@@ -1445,7 +1468,7 @@ void XGUI_Displayer::displayTrihedron(bool theToDisplay) const
                         Standard_False /* allow decomposition */,
                         AIS_DS_Displayed /* xdisplay status */);
     #ifdef VINSPECTOR
-    if (myContextCallBack) myContextCallBack->Display(aTrihedron);
+    if (getCallBack()) getCallBack()->Display(aTrihedron);
     #endif
 
     if (!isTrihedronActive())
@@ -1457,7 +1480,7 @@ void XGUI_Displayer::displayTrihedron(bool theToDisplay) const
 
     aContext->Erase(aTrihedron);
     #ifdef VINSPECTOR
-    if (myContextCallBack) myContextCallBack->Remove(aTrihedron);
+    if (getCallBack()) getCallBack()->Remove(aTrihedron);
     #endif
   }
 
@@ -1475,14 +1498,20 @@ QIntList XGUI_Displayer::activeSelectionModes() const
 }
 
 #ifdef VINSPECTOR
-void XGUI_Displayer::setCallBack(VInspectorAPI_CallBack* theCallBack)
+void XGUI_Displayer::setCommunicator(VInspectorAPI_Communicator* theCommunicator)
 {
-  myContextCallBack = theCallBack;
+  myCommunicator = theCommunicator;
+}
+
+void XGUI_Displayer::setVInspectorVisible(const bool theVisible)
+{
+  if (myCommunicator)
+    myCommunicator->setVisible(true);
 }
 
 VInspectorAPI_CallBack* XGUI_Displayer::getCallBack() const
 {
-  return myContextCallBack;
+  return myCommunicator ? myCommunicator->getCallBack() : NULL;
 }
 #endif
 
