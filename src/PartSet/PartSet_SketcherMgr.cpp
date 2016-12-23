@@ -1718,12 +1718,12 @@ void PartSet_SketcherMgr::restoreSelection()
   FeatureToSelectionMap::const_iterator aSIt = myCurrentSelection.begin(),
                                         aSLast = myCurrentSelection.end();
   SelectMgr_IndexedMapOfOwner anOwnersToSelect;
+  anOwnersToSelect.Clear();
   for (; aSIt != aSLast; aSIt++) {
-    anOwnersToSelect.Clear();
     getSelectionOwners(aSIt.key(), myCurrentSketch, aWorkshop, myCurrentSelection,
                         anOwnersToSelect);
-    aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
   }
+  aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
 }
 
 void PartSet_SketcherMgr::onShowConstraintsToggle(int theType, bool theState)

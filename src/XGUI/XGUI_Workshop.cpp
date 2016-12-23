@@ -105,6 +105,7 @@
 
 #ifdef DFBROWSER
 #include <CDF_Session.hxx>
+#include <CDF_Application.hxx>
 #include <DFBrowserAPI_Communicator.hxx>
 static bool DFBrowser_FirstCall = true;
 #endif
@@ -1352,7 +1353,6 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   else if (theId == "DFBROWSER_VIEW") {
     if (DFBrowser_FirstCall) {
       Handle(CDF_Application) anApplication = CDF_Session::CurrentSession()->CurrentApplication();
-
       DFBrowserAPI_Communicator* aCommunicator =
                      DFBrowserAPI_Communicator::loadPluginLibrary("DFBrowser.dll");
       aCommunicator->setApplication(anApplication);
