@@ -3,7 +3,7 @@
 # 4 times more faces.
 # The biggest part of the code is python dump of the updated_for_1799.hdf file from this issue.
 
-import model
+from salome.shaper import model
 from ModelAPI import *
 
 model.begin()
