@@ -119,7 +119,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           } else {
             int aFolderId = myXMLReader->rootFolderId(aObjType);
             if (aFolderId != -1) {
-              insertRow(aRow, createIndex(aFolderId, 0, Q_NULLPTR));
+              insertRow(aRow, createIndex(aFolderId, 0, (void*)Q_NULLPTR));
             }
           }
         }
@@ -190,7 +190,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           // Process root sub-folder
           int aFolderId = myXMLReader->rootFolderId(aGroup);
           if (aFolderId != -1) {
-            QModelIndex aFolderIndex = createIndex(aFolderId, 0, Q_NULLPTR);
+            QModelIndex aFolderIndex = createIndex(aFolderId, 0, (void*)Q_NULLPTR);
             removeRow(aRow, aFolderIndex);
             //rebuildBranch(0, aRow);
           }
@@ -274,7 +274,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         if (aGroup == myXMLReader->rootType()) // Update objects under root
           aStartId = foldersCount();
         else // Update objects in folder under root
-          aParent = createIndex(folderId(aGroup), 0, Q_NULLPTR);
+          aParent = createIndex(folderId(aGroup), 0, (void*)Q_NULLPTR);
       } else {
         // Update a sub-document
         if (aGroup == myXMLReader->subType()) {
@@ -556,7 +556,7 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
 
   if (!theParent.isValid()) {
     if (theRow < aNbFolders) // Return first level folder index
-      return createIndex(theRow, theColumn, Q_NULLPTR);
+      return createIndex(theRow, theColumn, (void*)Q_NULLPTR);
     else { // return object under root index
       std::string aType = myXMLReader->rootType();
       int aObjId = theRow - aNbFolders;
@@ -678,7 +678,7 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
         // return first level of folder index
         int aFolderId = myXMLReader->rootFolderId(aType);
         // Items in a one row must have the same parent
-        return createIndex(aFolderId, 0, Q_NULLPTR);
+        return createIndex(aFolderId, 0, (void*)Q_NULLPTR);
       }
     } else {
       if (aType == myXMLReader->subType())
