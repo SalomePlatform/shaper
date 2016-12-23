@@ -1,7 +1,7 @@
 import unittest
 
-import model
-import geom
+from salome.shaper import model
+from salome.shaper import geom
 
 from TestSketcher import SketcherTestCase
 

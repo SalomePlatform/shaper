@@ -174,5 +174,5 @@ aSession.finishOperation()
 aFieldResult = aField.firstResult()
 assert(aFieldResult)
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

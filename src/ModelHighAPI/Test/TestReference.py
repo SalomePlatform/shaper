@@ -2,7 +2,7 @@ import unittest
 
 import ModelAPI
 import ModelHighAPI
-import model
+from salome.shaper import model
 
 class FeaturesFixture(unittest.TestCase):
 

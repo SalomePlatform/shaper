@@ -12,7 +12,7 @@ from ModelAPI import *
 
 from TestImport import testImport
 
-import model
+from salome.shaper import model
 
 __updated__ = "2015-05-22"
 

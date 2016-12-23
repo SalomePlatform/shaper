@@ -1,5 +1,5 @@
 import unittest
-import model
+from salome.shaper import model
 from TestSketcher import SketcherTestCase
 from ModelAPI import *
 from GeomDataAPI import geomDataAPI_Point2D

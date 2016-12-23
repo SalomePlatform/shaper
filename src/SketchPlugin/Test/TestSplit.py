@@ -1,4 +1,4 @@
-import model
+from salome.shaper import model
 
 from ModelAPI import *
 

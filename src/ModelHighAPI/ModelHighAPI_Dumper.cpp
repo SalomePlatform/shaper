@@ -367,7 +367,7 @@ bool ModelHighAPI_Dumper::exportTo(const std::string& theFileName)
   if (!myModules.empty())
     aFile << std::endl;
 
-  aFile << "import model" << std::endl << std::endl;
+  aFile << "from salome.shaper import model" << std::endl << std::endl;
   aFile << "model.begin()" << std::endl;
 
   // dump collected data

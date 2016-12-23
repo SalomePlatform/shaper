@@ -43,7 +43,7 @@ void ExchangePlugin_Dump::execute()
 void ExchangePlugin_Dump::dump(const std::string& theFileName)
 {
   // load DumpAssistant from Python side
-  Config_ModuleReader::loadScript("model.dump");
+  Config_ModuleReader::loadScript("salome.shaper.model.dump");
 
   ModelHighAPI_Dumper* aDumper = ModelHighAPI_Dumper::getInstance();
   aDumper->clear();

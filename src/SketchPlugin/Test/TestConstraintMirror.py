@@ -223,5 +223,5 @@ assert (aRefListB.size() == 1)
 assert (aRefListC.size() == 1)
 checkMirror(aRefListB, aRefListC, aMirrorLine)
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

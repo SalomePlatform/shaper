@@ -1,5 +1,5 @@
 import unittest
-import model
+from salome.shaper import model
 
 class ModelTestCase(unittest.TestCase):
     def setUp(self):

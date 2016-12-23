@@ -150,5 +150,5 @@ assert(aFuse.firstResult().shape().isConnectedTopology() == False)
 # End of test
 #=========================================================================
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

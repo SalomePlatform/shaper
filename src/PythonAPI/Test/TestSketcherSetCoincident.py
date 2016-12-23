@@ -1,5 +1,5 @@
 import unittest
-import model
+from salome.shaper import model
 from TestSketcher import SketcherTestCase
 
 class SketcherSetCoincident(SketcherTestCase):

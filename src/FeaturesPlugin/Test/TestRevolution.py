@@ -207,5 +207,5 @@ assert (len(aRevolFt.results()) > 0)
 aRevolResult = modelAPI_ResultBody(aRevolFt.firstResult())
 assert (aRevolResult is not None)
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

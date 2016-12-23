@@ -149,5 +149,5 @@ assert (angle(aSketchLineA, aSketchLineB) == NEW_ANGLE_DEGREE)
 # End of test
 #=========================================================================
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

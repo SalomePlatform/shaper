@@ -89,5 +89,5 @@ aSession.finishOperation()
 assert(aSession.moduleDocument().size("Parts") == 0)
 assert(aSession.activeDocument())
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

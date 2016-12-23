@@ -127,7 +127,7 @@ aSession.finishOperation()
 # Test results
 assert (len(aSubShapesFeature.results()) > 0)
 
-import model
+from salome.shaper import model
 
 model.begin()
 partSet = model.moduleDocument()

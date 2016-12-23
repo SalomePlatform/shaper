@@ -130,5 +130,5 @@ assert (len(aPartitionFt.results()) > 0)
 aPartitionResult = modelAPI_ResultBody(aPartitionFt.firstResult())
 assert (aPartitionResult is not None)
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

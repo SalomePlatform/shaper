@@ -8,7 +8,7 @@ from GeomAPI import *
 import math
 from ModelAPI import *
 
-import model
+from salome.shaper import model
 
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
@@ -189,5 +189,4 @@ anAxis = model.addAxis(aPart, aPlane1.result(), 50, False, aPlane2.result(), 100
 aSession.finishOperation()
 assert (len(anAxis.results()) > 0)
 
-import model
 assert(model.checkPythonDump())

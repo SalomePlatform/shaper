@@ -1,6 +1,6 @@
 import unittest
 
-import examples.Platine
+import salome.shaper.examples.Platine
 
 if __name__ == "__main__":
     unittest.main()

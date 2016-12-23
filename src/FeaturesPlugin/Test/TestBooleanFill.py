@@ -4,7 +4,7 @@ Test case for Boolean Fill feature. Written on High API.
 from ModelAPI import *
 from GeomAPI import *
 
-import model
+from salome.shaper import model
 
 # Get session
 aSession = ModelAPI_Session.get()

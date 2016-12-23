@@ -95,5 +95,5 @@ aShape = aResultConstruction.shape()
 assert (aShape is not None)
 assert (not aShape.isNull())
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

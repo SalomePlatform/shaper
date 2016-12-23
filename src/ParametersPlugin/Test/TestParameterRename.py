@@ -23,7 +23,7 @@ from GeomDataAPI import *
 from ModelAPI import *
 import math
 import unittest
-import model
+from salome.shaper import model
 
 __updated__ = "2015-04-27"
 

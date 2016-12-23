@@ -75,5 +75,5 @@ assert(aLineStartPoint.x() == aLineEndPoint.x())
 # End of test
 #=========================================================================
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

@@ -1,7 +1,7 @@
 # Created a Part Remove/Duplicate API functionality since from low level and python dump it is not
 # tested: feature history infor is not stored.
 
-import model
+from salome.shaper import model
 
 # prepare axis created by PartSet and Part points
 model.begin()

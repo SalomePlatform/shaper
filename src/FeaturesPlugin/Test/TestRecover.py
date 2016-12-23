@@ -1,7 +1,7 @@
 # Test made with high level API
 # -----------------------------
 
-import model
+from salome.shaper import model
 
 # Initialisation
 

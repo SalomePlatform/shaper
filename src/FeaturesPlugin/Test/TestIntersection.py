@@ -147,5 +147,5 @@ assert (len(anIntersectionFt.results()) > 0)
 anItersectionResult = modelAPI_ResultBody(anIntersectionFt.firstResult())
 assert (anItersectionResult is not None)
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

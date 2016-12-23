@@ -4,7 +4,7 @@ Author: Artem ZHIDKOV
 Copyright (C) 2016-20xx CEA/DEN, EDF R&D
 """
 
-import model
+from salome.shaper import model
 import ModelAPI
 import GeomDataAPI
 
