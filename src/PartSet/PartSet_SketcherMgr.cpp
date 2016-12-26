@@ -266,6 +266,8 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
 }
 
+/*
+//Temporary commented as we do not modify values in property panel
 void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
 {
   if (!isNestedEditOperation(getCurrentOperation(), myModule->sketchMgr()->activeSketch()) ||
@@ -299,9 +301,8 @@ void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
   aDisplayer->enableUpdateViewer(myPreviousUpdateViewerEnabled);
   aDisplayer->updateViewer();
-
-
 }
+*/
 
 void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
@@ -375,9 +376,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       myDragDone = false;
 
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
-      // selection should be restored before edit operation start to process the
-      // selected entities, e.g. selection of point(attribute on a line) should edit the point
-      restoreSelection();
       launchEditing();
       if (aFeature.get() != NULL) {
         std::shared_ptr<SketchPlugin_Feature> aSPFeature =
@@ -406,9 +404,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       myDragDone = false;
 
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
-      // selection should be restored before edit operation start to process the
-      // selected entities, e.g. selection of point(attribute on a line) should edit the point
-      restoreSelection();
       launchEditing();
       myIsEditLaunching = aPrevLaunchingState;
       if (aFeature.get() != NULL) {
@@ -424,7 +419,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
           aFPAttr->setValue(myCurrentPoint.myCurX, myCurrentPoint.myCurY);
         }
       }
-      restoreSelection();
     }
   }
 }
@@ -1537,6 +1531,7 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
 void PartSet_SketcherMgr::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget,
                                                  const bool isToConnect)
 {
+  /*Temporary commented as we do not modify values in property panel
   if (isToConnect) {
     connect(theWidget, SIGNAL(beforeValuesChanged()),
             this, SLOT(onBeforeValuesChangedInPropertyPanel()));
@@ -1548,7 +1543,7 @@ void PartSet_SketcherMgr::connectToPropertyPanel(ModuleBase_ModelWidget* theWidg
                 this, SLOT(onBeforeValuesChangedInPropertyPanel()));
     disconnect(theWidget, SIGNAL(afterValuesChanged()),
                 this, SLOT(onAfterValuesChangedInPropertyPanel()));
-  }
+  }*/
 }
 
 void PartSet_SketcherMgr::widgetStateChanged(int thePreviousState)

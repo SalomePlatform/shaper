@@ -56,9 +56,6 @@ void XGUI_SelectionMgr::connectViewers()
 void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& theSelectedOwners,
                                           bool isUpdateViewer)
 {
-  SelectMgr_IndexedMapOfOwner aSelectedOwners;
-  selection()->selectedOwners(aSelectedOwners);
-
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull()) {
     /// previous selection should be cleared, else there will be decomposition of selections:
@@ -67,8 +64,6 @@ void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& the
 
     for  (Standard_Integer i = 1, n = theSelectedOwners.Extent(); i <= n; i++)  {
       Handle(SelectMgr_EntityOwner) anOwner = theSelectedOwners(i);
-      if (aSelectedOwners.FindIndex(anOwner) > 0)
-        continue;
 
       aContext->AddOrRemoveSelected(anOwner, isUpdateViewer);
       #ifdef VINSPECTOR

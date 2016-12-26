@@ -284,10 +284,10 @@ private slots:
   /// a nested sketch feature, it hides the feature in the viewer
   void onLeaveViewPort();
   /// Listens to the value changed signal and display the current operation feature
-  void onBeforeValuesChangedInPropertyPanel();
+  //void onBeforeValuesChangedInPropertyPanel();
   /// Listens to the signal about the modification of the values
   /// have been done in the property panel
-  void onAfterValuesChangedInPropertyPanel();
+  //void onAfterValuesChangedInPropertyPanel();
 
   void onMousePressed(ModuleBase_IViewWindow*, QMouseEvent*);
   void onMouseReleased(ModuleBase_IViewWindow*, QMouseEvent*);
