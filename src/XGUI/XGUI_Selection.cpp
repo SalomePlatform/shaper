@@ -123,7 +123,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
                                       const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   thePrs->setOwner(theOwner);
-
+  Handle(SelectMgr_SelectableObject) aSelectable = theOwner->Selectable();
   Handle(AIS_InteractiveObject) anIO =
                            Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
   thePrs->setInteractive(anIO);
@@ -233,6 +233,13 @@ QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getHighlighted() const
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
     Handle(SelectMgr_EntityOwner) anOwner = aContext->DetectedOwner();
+    try {
+      // It is checking of existence of presentation object
+      // BUG of OCCT
+      Handle(AIS_InteractiveObject) aTest = aContext->DetectedInteractive();
+    } catch (...) {
+      continue;
+    }
     if (!anOwner.IsNull()) {
       if (aSelectedIds.contains((long)anOwner.get()))
         continue;
