@@ -5,10 +5,11 @@
 SET(KERNEL_ROOT_DIR $ENV{KERNEL_ROOT_DIR} CACHE PATH "Path to the Salome KERNEL directory")
 SET(GUI_ROOT_DIR $ENV{GUI_ROOT_DIR} CACHE PATH "Path to the Salome GUI directory")
 SET(HAVE_SALOME NO)
+MESSAGE("-- Checking SALOME at " ${GUI_ROOT_DIR})
 IF(EXISTS ${GUI_ROOT_DIR})
 	MESSAGE("-- SALOME found at " ${GUI_ROOT_DIR})
 	SET(HAVE_SALOME YES)
-  
+
   	FIND_LIBRARY(caf caf ${GUI_ROOT_DIR}/lib/salome)
 	FIND_LIBRARY(CAM CAM ${GUI_ROOT_DIR}/lib/salome)
 	FIND_LIBRARY(CASCatch CASCatch ${GUI_ROOT_DIR}/lib/salome)
