@@ -40,10 +40,10 @@ if "%BOOST_ROOT_DIR%" == "" (
   )
 )
 
-cd %SALOME_ROOT_DIR%\WORK
+cd /d %SALOME_ROOT_DIR%\WORK
 call set_env.bat %1
 call "%PDIR%\env_compile.bat"
-cd %ROOT_DIR%
+cd /d %ROOT_DIR%
 
 @REM -------------------------
 @REM Python

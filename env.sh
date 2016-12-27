@@ -11,7 +11,7 @@ export AUT_DIR=$(pwd)
 export TOOLS_DIR=$(pwd)
 
 export HOME_OLD=$HOME
-source /dn64/series8x/work/init.sh 2016-12-22
+source /dn64/series8x/work/init.sh 2016-12-26
 export HOME=$HOME_OLD
 
 # Path to solvespace-2

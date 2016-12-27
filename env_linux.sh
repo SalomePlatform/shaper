@@ -52,5 +52,5 @@ export PATH=${CASROOT}:${PATH}
 
 #------ SHAPER ------
 export PATH=${SHAPER_ROOT_DIR}/bin/salome:${PATH}
-export PYTHONPATH=${SHAPER_ROOT_DIR}/bin/salome:${PYTHONPATH}
+export PYTHONPATH=${SHAPER_ROOT_DIR}/bin/salome:${SHAPER_ROOT_DIR}/lib/python2.7/site-packages/salome:${PYTHONPATH}
 export LD_LIBRARY_PATH=${SHAPER_ROOT_DIR}/lib/salome:${LD_LIBRARY_PATH}
