@@ -624,18 +624,21 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity)
 {
+  bool isFound = myNames.find(theEntity) != myNames.end();
   myDumpBuffer << name(theEntity);
 
-  bool isUserDefinedName = !myNames[theEntity].myIsDefault;
-  // store results if they have user-defined names or colors
-  std::list<ResultPtr> aResultsWithNameOrColor;
-  const std::list<ResultPtr>& aResults = theEntity->results();
-  std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
-  for (; aResIt != aResults.end(); ++aResIt)
-    if (!myNames[*aResIt].myIsDefault || !isDefaultColor(*aResIt) || !isDefaultDeflection(*aResIt))
-      aResultsWithNameOrColor.push_back(*aResIt);
-  // store just dumped entity to stack
-  myEntitiesStack.push(LastDumpedEntity(theEntity, isUserDefinedName, aResultsWithNameOrColor));
+  if (!isFound) {
+    bool isUserDefinedName = !myNames[theEntity].myIsDefault;
+    // store results if they have user-defined names or colors
+    std::list<ResultPtr> aResultsWithNameOrColor;
+    const std::list<ResultPtr>& aResults = theEntity->results();
+    std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
+    for (; aResIt != aResults.end(); ++aResIt)
+      if (!myNames[*aResIt].myIsDefault || !isDefaultColor(*aResIt) || !isDefaultDeflection(*aResIt))
+        aResultsWithNameOrColor.push_back(*aResIt);
+    // store just dumped entity to stack
+    myEntitiesStack.push(LastDumpedEntity(theEntity, isUserDefinedName, aResultsWithNameOrColor));
+  }
 
   // remove entity from the list of not dumped items
   myNotDumpedEntities.erase(theEntity);
