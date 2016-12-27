@@ -1,11 +1,5 @@
 #!/bin/bash
 
-function isDOSFile
-{
-  local FILENAME="$1"
-  file "$FILENAME" | grep -q "CRLF line terminators"
-}
-
 if git rev-parse --verify HEAD >/dev/null 2>&1
 then
   against=HEAD
@@ -44,21 +38,5 @@ EOF
   exit 1
 fi
 
-FOUND=0
 # If there are whitespace errors, print the offending file names and fail.
-if [ "$(exec git diff-index --check --cached $against -- )" != "" ]
-then
-  FOUND=1
-fi
-
-# Find files with DOS line endings
-for FILE in $(exec git diff --name-only --cached $against -- | sed '/^[+-]/d' | sed -r 's/:[0-9]+:.*//' | uniq) ; do
-  isDOSFile "$FILE"
-  if (( $? == 0 ))
-  then
-    echo "ERROR: \"$FILE\" has DOS line endings" >&2
-    FOUND=1
-  fi
-done
-
-exit $FOUND
+exec git diff-index --check --cached $against --
