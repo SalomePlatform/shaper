@@ -25,7 +25,7 @@ public:
   class Model_FieldStep : public ModelAPI_ResultField::ModelAPI_FieldStep
   {
   public:
-    Model_FieldStep(ModelAPI_ResultField* theParent, int theId) 
+    Model_FieldStep(ModelAPI_ResultField* theParent, int theId)
       : myParent(theParent), myId(theId) {};
 
     virtual ModelAPI_ResultField* field() const { return myParent; }

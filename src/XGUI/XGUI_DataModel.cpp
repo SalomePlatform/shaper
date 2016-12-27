@@ -256,7 +256,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
         if (aFeature.get() && aFeature->firstResult().get()
           && (aFeature->firstResult()->groupName() == ModelAPI_ResultField::group())) {
-            ResultFieldPtr aResult = 
+            ResultFieldPtr aResult =
               std::dynamic_pointer_cast<ModelAPI_ResultField>(aFeature->firstResult());
             QModelIndex aIndex = objectIndex(aResult);
             removeRows(0, aResult->stepsSize(), aIndex);
@@ -333,7 +333,7 @@ ObjectPtr XGUI_DataModel::object(const QModelIndex& theIndex) const
 {
   if (theIndex.internalId() == 0) // this is a folder
     return ObjectPtr();
-  ModelAPI_Object* aObj = 
+  ModelAPI_Object* aObj =
     dynamic_cast<ModelAPI_Object*>((ModelAPI_Entity*)theIndex.internalPointer());
   if (!aObj)
     return ObjectPtr();
@@ -451,7 +451,7 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
         }
       }
     } else {
-      ModelAPI_Object* aObj = 
+      ModelAPI_Object* aObj =
         dynamic_cast<ModelAPI_Object*>((ModelAPI_Entity*)theIndex.internalPointer());
       if (aObj) {
         switch (theRole) {
@@ -482,7 +482,7 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
         switch (theRole) {
         case Qt::DisplayRole:
           {
-            ModelAPI_ResultField::ModelAPI_FieldStep* aStep = 
+            ModelAPI_ResultField::ModelAPI_FieldStep* aStep =
               dynamic_cast<ModelAPI_ResultField::ModelAPI_FieldStep*>
               ((ModelAPI_Entity*)theIndex.internalPointer());
             if (aStep) {
@@ -626,7 +626,7 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
           }
         }
       } else {
-        ModelAPI_Object* aParentObj = 
+        ModelAPI_Object* aParentObj =
           dynamic_cast<ModelAPI_Object*>((ModelAPI_Entity*)theParent.internalPointer());
 
         // Check for Part feature
@@ -691,7 +691,7 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
     ObjectPtr aObj = object(theIndex);
     if (!aObj.get()) {
       // It can b e a step of a field
-      ModelAPI_ResultField::ModelAPI_FieldStep* aStep = 
+      ModelAPI_ResultField::ModelAPI_FieldStep* aStep =
         dynamic_cast<ModelAPI_ResultField::ModelAPI_FieldStep*>
         ((ModelAPI_Entity*)theIndex.internalPointer());
       if (aStep) {
