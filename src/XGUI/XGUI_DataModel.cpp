@@ -542,7 +542,7 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
         return aDoc->size(aType);
       }
     } else {
-      ModelAPI_Object* aObj = 
+      ModelAPI_Object* aObj =
         dynamic_cast<ModelAPI_Object*>((ModelAPI_Entity*)theParent.internalPointer());
       // Check for Part feature
       ResultPartPtr aPartRes = getPartResult(aObj);
