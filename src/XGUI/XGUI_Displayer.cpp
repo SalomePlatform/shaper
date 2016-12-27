@@ -1309,6 +1309,14 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   // loading the interactive object allowing the decomposition
   if (aTColModes.IsEmpty() || !aHasValidMode) {
     aContext->Load(theIO, -1, true);
+    Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(theIO);
+    if (!aTrihedron.IsNull()) {
+      // Workaround for Trihedron. It should be loaded using the next Load method to
+      // add this object to myGlobal map of selection manager
+      // it is important to activate trihedron in two selection modes: edges and vertices
+      aContext->SelectionManager()->Load(theIO);
+    }
+
     #ifdef VINSPECTOR
     if (getCallBack()) getCallBack()->Load(theIO);
     #endif
