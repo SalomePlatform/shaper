@@ -87,7 +87,7 @@ void SketchAPI_Rotation::dump(ModelHighAPI_Dumper& theDumper) const
   for (; anIt != aList.end(); ++anIt) {
     if (anIt != aList.begin())
       theDumper << ", ";
-    theDumper << theDumper.name((*anIt)->feature(), false);
+    theDumper << (*anIt)->feature();
   }
   theDumper << "] = " << theDumper.name(aBase) << ".rotated()" << std::endl;
 
