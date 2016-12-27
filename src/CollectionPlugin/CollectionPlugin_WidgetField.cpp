@@ -759,6 +759,7 @@ void CollectionPlugin_WidgetField::onAddStep()
       }
     }
   }
+  emit valuesChanged();
 }
 
 //**********************************************************************************
@@ -770,8 +771,9 @@ void CollectionPlugin_WidgetField::onRemoveStep()
   removeStepControls();
   myStepSlider->setMaximum(aMax);
 
-  AttributeTablesPtr aTablesAttr = myFeature->data()->tables(CollectionPlugin_Field::VALUES_ID());
-  aTablesAttr->setSize(aTablesAttr->rows(), aTablesAttr->columns(), myDataTblList.size());
+  //AttributeTablesPtr aTablesAttr = myFeature->data()->tables(CollectionPlugin_Field::VALUES_ID());
+  //aTablesAttr->setSize(aTablesAttr->rows(), aTablesAttr->columns(), myDataTblList.size());
+  emit valuesChanged();
 }
 
 //**********************************************************************************

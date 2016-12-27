@@ -16,6 +16,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultField.h>
 #include <ModelAPI_Tools.h>
 
 #include <Config_FeatureMessage.h>
@@ -35,6 +36,7 @@
 
 #define SELECTABLE_COLOR QColor(80, 80, 80)
 #define DISABLED_COLOR QColor(200, 200, 200)
+
 
 ResultPartPtr getPartResult(ModelAPI_Object* theObj)
 {
@@ -251,9 +253,18 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
       ObjectPtr aObject = (*aIt);
       if (aObject->data()->isValid()) {
-        QModelIndex aIndex = objectIndex(aObject);
-        if (aIndex.isValid()) {
-          emit dataChanged(aIndex, aIndex);
+        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+        if (aFeature.get() && aFeature->firstResult().get()
+          && (aFeature->firstResult()->groupName() == ModelAPI_ResultField::group())) {
+            ResultFieldPtr aResult = 
+              std::dynamic_pointer_cast<ModelAPI_ResultField>(aFeature->firstResult());
+            QModelIndex aIndex = objectIndex(aResult);
+            removeRows(0, aResult->stepsSize(), aIndex);
+        } else {
+          QModelIndex aIndex = objectIndex(aObject);
+          if (aIndex.isValid()) {
+            emit dataChanged(aIndex, aIndex);
+          }
         }
       } else {
         rebuildDataTree();
@@ -322,7 +333,10 @@ ObjectPtr XGUI_DataModel::object(const QModelIndex& theIndex) const
 {
   if (theIndex.internalId() == 0) // this is a folder
     return ObjectPtr();
-  ModelAPI_Object* aObj = (ModelAPI_Object*)theIndex.internalPointer();
+  ModelAPI_Object* aObj = 
+    dynamic_cast<ModelAPI_Object*>((ModelAPI_Entity*)theIndex.internalPointer());
+  if (!aObj)
+    return ObjectPtr();
   if (getSubDocument(aObj)) // the selected index is a folder of sub-document
     return ObjectPtr();
 
@@ -437,30 +451,47 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
         }
       }
     } else {
-      ModelAPI_Object* aObj = (ModelAPI_Object*)theIndex.internalPointer();
-      switch (theRole) {
-      case Qt::DisplayRole:
-        {
-          if (aObj->groupName() == ModelAPI_ResultParameter::group()) {
-            ModelAPI_ResultParameter* aParam = dynamic_cast<ModelAPI_ResultParameter*>(aObj);
-            AttributeDoublePtr aValueAttribute =
-              aParam->data()->real(ModelAPI_ResultParameter::VALUE());
-            QString aVal = QString::number(aValueAttribute->value());
-            QString aTitle = QString(aObj->data()->name().c_str());
-            return aTitle + " = " + aVal;
+      ModelAPI_Object* aObj = 
+        dynamic_cast<ModelAPI_Object*>((ModelAPI_Entity*)theIndex.internalPointer());
+      if (aObj) {
+        switch (theRole) {
+        case Qt::DisplayRole:
+          {
+            if (aObj->groupName() == ModelAPI_ResultParameter::group()) {
+              ModelAPI_ResultParameter* aParam = dynamic_cast<ModelAPI_ResultParameter*>(aObj);
+              AttributeDoublePtr aValueAttribute =
+                aParam->data()->real(ModelAPI_ResultParameter::VALUE());
+              QString aVal = QString::number(aValueAttribute->value());
+              QString aTitle = QString(aObj->data()->name().c_str());
+              return aTitle + " = " + aVal;
+            }
+            QString aSuffix;
+            if (aObj->groupName() == myXMLReader->subType()) {
+              ResultPartPtr aPartRes = getPartResult(aObj);
+              if (aPartRes.get()) {
+                if (aPartRes->partDoc().get() == NULL)
+                  aSuffix = " (Not loaded)";
+              }
+            }
+            return aObj->data()->name().c_str() + aSuffix;
           }
-          QString aSuffix;
-          if (aObj->groupName() == myXMLReader->subType()) {
-            ResultPartPtr aPartRes = getPartResult(aObj);
-            if (aPartRes.get()) {
-              if (aPartRes->partDoc().get() == NULL)
-                aSuffix = " (Not loaded)";
+        case Qt::DecorationRole:
+          return ModuleBase_IconFactory::get()->getIcon(object(theIndex));
+        }
+      } else {
+        switch (theRole) {
+        case Qt::DisplayRole:
+          {
+            ModelAPI_ResultField::ModelAPI_FieldStep* aStep = 
+              dynamic_cast<ModelAPI_ResultField::ModelAPI_FieldStep*>
+              ((ModelAPI_Entity*)theIndex.internalPointer());
+            if (aStep) {
+              return "Step " + QString::number(aStep->id()) + " " +
+                aStep->field()->textLine(aStep->id()).c_str();
             }
           }
-          return aObj->data()->name().c_str() + aSuffix;
+          break;
         }
-      case Qt::DecorationRole:
-        return ModuleBase_IconFactory::get()->getIcon(object(theIndex));
       }
     }
   }
@@ -511,7 +542,8 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
         return aDoc->size(aType);
       }
     } else {
-      ModelAPI_Object* aObj = (ModelAPI_Object*)theParent.internalPointer();
+      ModelAPI_Object* aObj = 
+        dynamic_cast<ModelAPI_Object*>((ModelAPI_Entity*)theParent.internalPointer());
       // Check for Part feature
       ResultPartPtr aPartRes = getPartResult(aObj);
       if (aPartRes.get()) {
@@ -533,6 +565,9 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
         ModelAPI_ResultCompSolid* aCompRes = dynamic_cast<ModelAPI_ResultCompSolid*>(aObj);
         if (aCompRes)
           return aCompRes->numberOfSubs(true);
+        ModelAPI_ResultField* aFieldRes = dynamic_cast<ModelAPI_ResultField*>(aObj);
+        if (aFieldRes)
+          return aFieldRes->stepsSize();
       }
     }
   }
@@ -591,7 +626,8 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
           }
         }
       } else {
-        ModelAPI_Object* aParentObj = (ModelAPI_Object*)theParent.internalPointer();
+        ModelAPI_Object* aParentObj = 
+          dynamic_cast<ModelAPI_Object*>((ModelAPI_Entity*)theParent.internalPointer());
 
         // Check for Part feature
         ResultPartPtr aPartRes = getPartResult(aParentObj);
@@ -617,6 +653,13 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
               dynamic_cast<ModelAPI_ResultCompSolid*>(aParentObj);
             if (aCompRes)
               aIndex = objectIndex(aCompRes->subResult(theRow));
+            else {
+              ModelAPI_ResultField* aFieldRes =
+                dynamic_cast<ModelAPI_ResultField*>(aParentObj);
+              if (aFieldRes) {
+                aIndex = createIndex(theRow, 0, aFieldRes->step(theRow));
+              }
+            }
           }
         }
       }
@@ -637,6 +680,7 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
   if (theIndex == MYLastDeleted)
     return QModelIndex();
 
+  SessionPtr aSession = ModelAPI_Session::get();
   quintptr aId = theIndex.internalId();
   if (aId != 0) { // The object is not a root folder
     ModelAPI_Document* aDoc = getSubDocument(theIndex.internalPointer());
@@ -646,6 +690,20 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
     }
     ObjectPtr aObj = object(theIndex);
     if (!aObj.get()) {
+      // It can b e a step of a field
+      ModelAPI_ResultField::ModelAPI_FieldStep* aStep = 
+        dynamic_cast<ModelAPI_ResultField::ModelAPI_FieldStep*>
+        ((ModelAPI_Entity*)theIndex.internalPointer());
+      if (aStep) {
+        ModelAPI_ResultField* aField = aStep->field();
+        DocumentPtr aDoc = aSession->activeDocument();
+        ObjectPtr aFld;
+        for(int i = 0; i < aDoc->size(ModelAPI_ResultField::group()); i++) {
+          aFld = aDoc->object(ModelAPI_ResultField::group(), i);
+          if (aFld.get() == aField)
+            return objectIndex(aFld);
+        }
+      }
       // To avoid additional request about index which was already deleted
       // If deleted it causes a crash on delete object from Part
       MYLastDeleted = theIndex;
@@ -668,7 +726,6 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
     }
     // Use as ordinary object
     std::string aType = aObj->groupName();
-    SessionPtr aSession = ModelAPI_Session::get();
     DocumentPtr aRootDoc = aSession->moduleDocument();
     DocumentPtr aSubDoc = aObj->document();
     if (aSubDoc == aRootDoc) {
@@ -739,7 +796,7 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
   } else {
     aDoc = getSubDocument(theIndex.internalPointer());
     if (!aDoc)
-      aObj = (ModelAPI_Object*) theIndex.internalPointer();
+      aObj = dynamic_cast<ModelAPI_Object*>((ModelAPI_Entity*)theIndex.internalPointer());
   }
 
   if (aObj) {

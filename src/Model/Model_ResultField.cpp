@@ -5,10 +5,12 @@
 // Author:      Mikhail PONIKAROV
 
 #include <Model_ResultField.h>
-#include <ModelAPI_AttributeSelectionList.h>
 #include <Model_Document.h>
+
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_AttributeSelectionList.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
 
@@ -17,6 +19,14 @@
 Model_ResultField::Model_ResultField(std::shared_ptr<ModelAPI_Data> theOwnerData)
 {
   myOwnerData = theOwnerData;
+}
+
+Model_ResultField::~Model_ResultField()
+{
+  while(mySteps.size() > 0) {
+    delete mySteps.back();
+    mySteps.pop_back();
+  }
 }
 
 void Model_ResultField::colorConfigInfo(std::string& theSection, std::string& theName,
@@ -70,6 +80,57 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultField::shape()
         aResult = GeomAlgoAPI_CompoundBuilder::compound(aSubs);
       }
     }
+    updateSteps();
   }
   return aResult;
+}
+
+void Model_ResultField::updateSteps()
+{
+  // Update Array of steps
+  int aNbSteps = stepsSize();
+  if (mySteps.size() != aNbSteps) {
+    while(mySteps.size() > aNbSteps) {
+      delete mySteps.back();
+      mySteps.pop_back();
+    }
+    while(mySteps.size() < aNbSteps) {
+      mySteps.push_back(new Model_ResultField::Model_FieldStep(this, mySteps.size()));
+    }
+  }
+}
+
+int Model_ResultField::stepsSize() const
+{
+  if (myOwnerData) {
+    AttributeIntArrayPtr aArray = myOwnerData->intArray("stamps");
+    if (aArray.get()) {
+      return aArray->size();
+    }
+  }
+  return 0;
+}
+
+std::string Model_ResultField::textLine(int theLine) const
+{
+  if (myOwnerData) {
+    AttributeIntArrayPtr aArray = myOwnerData->intArray("stamps");
+    if (aArray.get()) {
+      if (theLine < aArray->size()) {
+        std::ostringstream aStream;
+        aStream << aArray->value(theLine);
+        return aStream.str();
+      }
+    }
+  }
+  return "";
+}
+
+
+ModelAPI_ResultField::ModelAPI_FieldStep* Model_ResultField::step(int theId) const
+{
+  if (theId < mySteps.size()) {
+    return mySteps[theId];
+  }
+  return NULL;
 }

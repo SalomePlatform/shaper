@@ -21,6 +21,15 @@
 class ModelAPI_ResultField : public ModelAPI_Result
 {
 public:
+
+  class ModelAPI_FieldStep : public ModelAPI_Entity
+  {
+  public:
+    virtual ModelAPI_ResultField* field() const = 0;
+
+    virtual int id() const = 0;
+  };
+
   MODELAPI_EXPORT virtual ~ModelAPI_ResultField();
   /// Returns the group identifier of this result
   MODELAPI_EXPORT virtual std::string groupName();
@@ -39,9 +48,20 @@ public:
     return RESULT_GROUP_COLOR;
   }
 
+  /// Returns number of steps
+  virtual int stepsSize() const = 0;
+
+  /// Returns a text line by its number
+  /// \param theLine a number of line
+  virtual std::string textLine(int theLine) const = 0;
+
+  /// Returns step object
+  /// \param theId an id of the object
+  virtual ModelAPI_FieldStep* step(int theId) const = 0;
 };
 
 //! Pointer on feature object
 typedef std::shared_ptr<ModelAPI_ResultField> ResultFieldPtr;
+typedef std::shared_ptr<ModelAPI_ResultField::ModelAPI_FieldStep> FieldStepPtr;
 
 #endif
