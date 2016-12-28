@@ -263,8 +263,10 @@ void CollectionPlugin_WidgetField::appendStepControls()
   }
 
   if (aColWidth.length() > 0) {
-    for (int i = 0; i < aDataTbl->columnCount(); i++)
+    for (int i = 0; i < aDataTbl->columnCount(); i++) {
+      if (i < aColWidth.size())
       aDataTbl->setColumnWidth(i, aColWidth.at(i));
+    }
   }
   aStepLayout->addWidget(aDataTbl, 1, 0, 1, 2);
   connect(aDataTbl, SIGNAL(cellChanged(int, int)), SLOT(onTableEdited(int, int)));
@@ -548,6 +550,8 @@ bool CollectionPlugin_WidgetField::restoreValueCustom()
     QTableWidget* aTable = myDataTblList.at(i);
     isBlocked = aTable->blockSignals(true);
     aTable->setRowCount(aRows);
+    aTable->setColumnCount(aCols + 1);
+    updateHeaders(aTable);
     for (int j = 0; j < aCols + 1; j++) {
       for (int k = 0; k < aRows; k++) {
         aItem = aTable->item(k, j);
@@ -575,8 +579,10 @@ bool CollectionPlugin_WidgetField::restoreValueCustom()
       }
     }
     // Restore columns width
-    for (int i = 0; i < aTable->columnCount(); i++)
-      aTable->setColumnWidth(i, aColWidth.at(i));
+    for (int i = 0; i < aTable->columnCount(); i++) {
+      if (i < aColWidth.size())
+        aTable->setColumnWidth(i, aColWidth.at(i));
+    }
 
     aTable->blockSignals(isBlocked);
   }
