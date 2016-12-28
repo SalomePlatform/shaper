@@ -91,8 +91,6 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;
 
 //#define DEBUG_OCCT_SHAPE_SELECTION
 
-//#define DEBUG_OCCT_26172
-
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
 {
   // Get from null point
@@ -107,6 +105,29 @@ QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QS
     anInfo.append(QString::number(*anIt));
   }
   return anInfo.join(theSeparator);
+}
+
+void deselectPresentation(const Handle(AIS_InteractiveObject) theObject,
+                          const Handle(AIS_InteractiveContext)& theContext)
+{
+  NCollection_List<Handle(SelectBasics_EntityOwner)> aResultOwners;
+
+  for (theContext->InitSelected(); theContext->MoreSelected(); theContext->NextSelected()) {
+    Handle(SelectMgr_EntityOwner) anOwner = theContext->SelectedOwner();
+    if (anOwner.IsNull()) // TODO: check why it is possible
+      continue;
+    if (anOwner->Selectable() == theObject && anOwner->IsSelected())
+      aResultOwners.Append(anOwner);
+
+    aResultOwners.Append(anOwner);
+  }
+  NCollection_List<Handle(SelectBasics_EntityOwner)>::Iterator anOwnersIt (aResultOwners);
+  Handle(SelectMgr_EntityOwner) anOwner;
+  for (; anOwnersIt.More(); anOwnersIt.Next()) {
+    anOwner = Handle(SelectMgr_EntityOwner)::DownCast(anOwnersIt.Value());
+    if (!anOwner.IsNull())
+      theContext->AddOrRemoveSelected(anOwner, false);
+  }
 }
 
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
@@ -356,6 +377,7 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       if (aNeedToRestoreSelection)
         myWorkshop->module()->storeSelection();
 
+      deselectPresentation(aAISIO, aContext);
       aContext->Redisplay(aAISIO, false);
 
       #ifdef VINSPECTOR
@@ -1295,13 +1317,6 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
     }
   }
   if (isDeactivated) {
-#ifdef DEBUG_OCCT_26172
-    // the selection from the previous activation modes should be cleared manually (#26172)
-    theIO->ClearSelected();
-    #ifdef VINSPECTOR
-    if (getCallBack()) getCallBack()->ClearSelected(theIO);
-    #endif
-#endif
     // For performance issues
     //if (theUpdateViewer)
     //  updateViewer();
