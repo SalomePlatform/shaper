@@ -233,6 +233,8 @@ void PartSet_ResultSketchPrs::setAuxiliaryPresentationStyle(const bool isAuxilia
   if (isChangedLineType) {
     Handle(Prs3d_LineAspect) aAspect = new Prs3d_LineAspect(aCurrentColor, aType, aCurrentWidth);
     aDrawer->SetLineAspect(aAspect);
+    aDrawer->SetWireAspect(aAspect);
+    SetAttributes(aDrawer);
   }
 }
 
