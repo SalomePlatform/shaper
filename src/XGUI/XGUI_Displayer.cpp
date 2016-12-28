@@ -18,7 +18,9 @@
 #ifdef VINSPECTOR
 #include <VInspectorAPI_PluginMgr.h>
 #include <VInspectorAPI_Communicator.h>
+#ifndef HAVE_SALOME
 #include <AppElements_MainWindow.h>
+#endif
 static bool VInspector_FirstCall = true;
 #endif
 
