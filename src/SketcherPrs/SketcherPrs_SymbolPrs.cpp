@@ -64,10 +64,13 @@ public:
       // Update points coordinate taking the viewer scale into account
       myObj->updateIfReadyToDisplay(MyDist * aScale);
       if (myIsVboInit) {
-        const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();
-        Handle(Graphic3d_Buffer) aAttr = myObj->myPntArray->Attributes();
-        myVboAttribs->init(aCtx, 0, aAttr->NbElements,
-                           aAttr->Data(), GL_NONE, aAttr->Stride);
+        if (myVboAttribs) {
+          const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();
+          Handle(Graphic3d_Buffer) aAttr = myObj->myPntArray->Attributes();
+          myVboAttribs->init(aCtx, 0, aAttr->NbElements,
+                             aAttr->Data(), GL_NONE, aAttr->Stride);
+        } else
+          myIsVboInit = false;
       } else {
         myAttribs = myObj->myPntArray->Attributes();
         myIndices = myObj->myPntArray->Indices();
