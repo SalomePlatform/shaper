@@ -634,10 +634,12 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity
     const std::list<ResultPtr>& aResults = theEntity->results();
     std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
     for (; aResIt != aResults.end(); ++aResIt)
-      if (!myNames[*aResIt].myIsDefault || !isDefaultColor(*aResIt) || !isDefaultDeflection(*aResIt))
+      if (!myNames[*aResIt].myIsDefault || !isDefaultColor(*aResIt) ||
+          !isDefaultDeflection(*aResIt))
         aResultsWithNameOrColor.push_back(*aResIt);
     // store just dumped entity to stack
-    myEntitiesStack.push(LastDumpedEntity(theEntity, isUserDefinedName, aResultsWithNameOrColor));
+    myEntitiesStack.push(
+        LastDumpedEntity(theEntity, isUserDefinedName, aResultsWithNameOrColor));
   }
 
   // remove entity from the list of not dumped items
