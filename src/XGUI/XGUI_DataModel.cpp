@@ -486,7 +486,7 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
               dynamic_cast<ModelAPI_ResultField::ModelAPI_FieldStep*>
               ((ModelAPI_Entity*)theIndex.internalPointer());
             if (aStep) {
-              return "Step " + QString::number(aStep->id()) + " " +
+              return "Step " + QString::number(aStep->id() + 1) + " " +
                 aStep->field()->textLine(aStep->id()).c_str();
             }
           }
