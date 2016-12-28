@@ -29,7 +29,6 @@
 #include <QHeaderView>
 #include <QStackedWidget>
 #include <QValidator>
-#include <QStyledItemDelegate>
 #include <QLineEdit>
 #include <QEvent>
 #include <QMouseEvent>
@@ -39,27 +38,6 @@
 const char* MYFirstCol = "Shape";
 const char* MYTrue = "True";
 const char* MYFalse = "False";
-
-class DataTableItemDelegate : public QStyledItemDelegate
-{
-public:
-  DataTableItemDelegate(ModelAPI_AttributeTables::ValueType theType) :
-      QStyledItemDelegate() { myType = theType; }
-
-  virtual QWidget* createEditor(QWidget* theParent,
-                                const QStyleOptionViewItem & theOption,
-                                const QModelIndex& theIndex) const;
-
-  ModelAPI_AttributeTables::ValueType dataType() const { return myType; }
-
-  void setDataType(ModelAPI_AttributeTables::ValueType theType) { myType = theType; }
-
-signals:
-  void startEditing();
-
-private:
-  ModelAPI_AttributeTables::ValueType myType;
-};
 
 QWidget* DataTableItemDelegate::createEditor(QWidget* theParent,
                                              const QStyleOptionViewItem & theOption,
@@ -181,6 +159,11 @@ ModuleBase_WidgetSelector(theParent, theWorkshop, theData), myHeaderEditor(0),
   myCompNamesList << "Comp 1";
   myStepWgt = new QStackedWidget(aStepFrame);
   aStepLayout->addWidget(myStepWgt, 2, 0, 1, 2);
+
+  myDelegate =
+    new DataTableItemDelegate((ModelAPI_AttributeTables::ValueType)
+    myFieldTypeCombo->currentIndex());
+
   appendStepControls();
 
   // Buttons below
@@ -225,12 +208,7 @@ void CollectionPlugin_WidgetField::appendStepControls()
   // Data table
   QTableWidget* aDataTbl = new QTableWidget(1, myCompNamesList.count() + 1, aWidget);
   aDataTbl->installEventFilter(this);
-  DataTableItemDelegate* aDelegate = 0;
-  if (myDataTblList.isEmpty())
-    aDelegate = new DataTableItemDelegate(
-      (ModelAPI_AttributeTables::ValueType) myFieldTypeCombo->currentIndex());
-  else
-    aDelegate = dynamic_cast<DataTableItemDelegate*>(myDataTblList.first()->itemDelegate());
+  aDataTbl->setItemDelegate(myDelegate);
 
   QIntList aColWidth;
   if (!myDataTblList.isEmpty()) {
@@ -238,7 +216,6 @@ void CollectionPlugin_WidgetField::appendStepControls()
     for (int i = 0; i < aFirstTable->columnCount(); i++)
       aColWidth.append(aFirstTable->columnWidth(i));
   }
-  aDataTbl->setItemDelegate(aDelegate);
   myDataTblList.append(aDataTbl);
 
   aDataTbl->verticalHeader()->hide();
@@ -271,7 +248,6 @@ void CollectionPlugin_WidgetField::appendStepControls()
   aStepLayout->addWidget(aDataTbl, 1, 0, 1, 2);
   connect(aDataTbl, SIGNAL(cellChanged(int, int)), SLOT(onTableEdited(int, int)));
 
-  QAbstractItemDelegate* aDel = aDataTbl->itemDelegate();
   myStepWgt->addWidget(aWidget);
   aDataTbl->horizontalHeader()->viewport()->installEventFilter(this);
 }
@@ -532,6 +508,7 @@ bool CollectionPlugin_WidgetField::restoreValueCustom()
   isBlocked = myFieldTypeCombo->blockSignals(true);
   myFieldTypeCombo->setCurrentIndex(aTablesAttr->type());
   myFieldTypeCombo->blockSignals(isBlocked);
+  myDelegate->setDataType(aTablesAttr->type());
 
   AttributeIntArrayPtr aStampsAttr = aData->intArray(CollectionPlugin_Field::STAMPS_ID());
   // Fill data table
@@ -888,37 +865,33 @@ void CollectionPlugin_WidgetField::onSelectionChanged()
 //**********************************************************************************
 void CollectionPlugin_WidgetField::onFieldTypeChanged(int theIdx)
 {
-  DataTableItemDelegate* aDelegate = 0;
-  aDelegate = dynamic_cast<DataTableItemDelegate*>(myDataTblList.first()->itemDelegate());
-  if (aDelegate) {
-    ModelAPI_AttributeTables::ValueType aOldType = aDelegate->dataType();
-    if (aOldType != theIdx) {
-      aDelegate->setDataType((ModelAPI_AttributeTables::ValueType)theIdx);
-      int aColumns = myDataTblList.first()->columnCount();
-      int aRows = myDataTblList.first()->rowCount();
-      foreach(QTableWidget* aTable, myDataTblList) {
-        for(int i = 1; i < aColumns; i++) {
-          for(int j = 0; j < aRows; j++) {
-            switch (theIdx) {
-            case ModelAPI_AttributeTables::DOUBLE:
-            case ModelAPI_AttributeTables::INTEGER:
-              if ((aOldType == ModelAPI_AttributeTables::BOOLEAN) ||
-                  (aOldType == ModelAPI_AttributeTables::STRING)) {
-                    aTable->item(j, i)->setText("0");
-              }
-              break;
-            case ModelAPI_AttributeTables::BOOLEAN:
-              aTable->item(j, i)->setText(MYFalse);
-              break;
-            case ModelAPI_AttributeTables::STRING:
-              aTable->item(j, i)->setText("");
-              break;
+  ModelAPI_AttributeTables::ValueType aOldType = myDelegate->dataType();
+  if (aOldType != theIdx) {
+    myDelegate->setDataType((ModelAPI_AttributeTables::ValueType)theIdx);
+    int aColumns = myDataTblList.first()->columnCount();
+    int aRows = myDataTblList.first()->rowCount();
+    foreach(QTableWidget* aTable, myDataTblList) {
+      for(int i = 1; i < aColumns; i++) {
+        for(int j = 0; j < aRows; j++) {
+          switch (theIdx) {
+          case ModelAPI_AttributeTables::DOUBLE:
+          case ModelAPI_AttributeTables::INTEGER:
+            if ((aOldType == ModelAPI_AttributeTables::BOOLEAN) ||
+                (aOldType == ModelAPI_AttributeTables::STRING)) {
+                  aTable->item(j, i)->setText("0");
             }
+            break;
+          case ModelAPI_AttributeTables::BOOLEAN:
+            aTable->item(j, i)->setText(MYFalse);
+            break;
+          case ModelAPI_AttributeTables::STRING:
+            aTable->item(j, i)->setText("");
+            break;
           }
         }
       }
-      emit valuesChanged();
     }
+    emit valuesChanged();
   }
 }
 

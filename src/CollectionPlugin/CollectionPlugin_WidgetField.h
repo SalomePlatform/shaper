@@ -17,6 +17,7 @@
 
 #include <QList>
 #include <QStringList>
+#include <QStyledItemDelegate>
 
 
 class QWidget;
@@ -29,6 +30,28 @@ class QStackedWidget;
 class QPushButton;
 class QTableWidgetItem;
 class QLineEdit;
+
+
+class DataTableItemDelegate : public QStyledItemDelegate
+{
+ Q_OBJECT
+public:
+  DataTableItemDelegate(ModelAPI_AttributeTables::ValueType theType) :
+      QStyledItemDelegate() { myType = theType; }
+
+  virtual QWidget* createEditor(QWidget* theParent,
+                                const QStyleOptionViewItem & theOption,
+                                const QModelIndex& theIndex) const;
+
+  ModelAPI_AttributeTables::ValueType dataType() const { return myType; }
+
+  void setDataType(ModelAPI_AttributeTables::ValueType theType) { myType = theType; }
+
+private:
+  ModelAPI_AttributeTables::ValueType myType;
+};
+
+
 
 /*!
  * \ingroup GUI
@@ -200,6 +223,8 @@ private:
   bool myIsTabEdit;
 
   bool myActivation;
+
+  DataTableItemDelegate* myDelegate;
 };
 
 #endif
