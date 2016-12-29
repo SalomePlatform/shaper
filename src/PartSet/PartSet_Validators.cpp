@@ -343,6 +343,39 @@ bool PartSet_MiddlePointSelection::isValid(const ModuleBase_ISelection* theSelec
     return shapesNbLines(theSelection) == 1 || shapesNbPoints(theSelection) == 1;
 }
 
+bool PartSet_MultyTranslationSelection::isValid(const ModuleBase_ISelection* theSelection,
+                                     ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    return isEmptySelectionValid(theOperation);
+  } else {
+    int aCount = shapesNbLines(theSelection);
+    return aCount > 0;
+  }
+}
+
+bool PartSet_SplitSelection::isValid(const ModuleBase_ISelection* theSelection,
+                                     ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    return isEmptySelectionValid(theOperation);
+  } else {
+    int aCount = shapesNbLines(theSelection);
+    return aCount > 0;
+  }
+}
+
+bool PartSet_ProjectionSelection::isValid(const ModuleBase_ISelection* theSelection,
+                                     ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    return isEmptySelectionValid(theOperation);
+  } else {
+    int aCount = shapesNbLines(theSelection);
+    return aCount > 0;
+  }
+}
+
 
 std::string PartSet_DifferentObjectsValidator::errorMessage(
                          const PartSet_DifferentObjectsValidator::ErrorType& theType,
@@ -613,4 +646,3 @@ bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute,
   theError = "There is no a common coincident point.";
   return false;
 }
-

@@ -231,6 +231,10 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_MiddlePointSelection", new PartSet_MiddlePointSelection);
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_CoincidentAttr", new PartSet_CoincidentAttr);
+  aFactory->registerValidator("PartSet_MultyTranslationSelection",
+    new PartSet_MultyTranslationSelection);
+  aFactory->registerValidator("PartSet_SplitSelection", new PartSet_SplitSelection);
+  aFactory->registerValidator("PartSet_ProjectionSelection", new PartSet_ProjectionSelection);
 }
 
 void PartSet_Module::registerFilters()
