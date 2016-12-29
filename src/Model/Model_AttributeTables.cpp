@@ -60,9 +60,11 @@ void Model_AttributeTables::setSize(const int theRows, const int theColumns, con
       Handle(TColStd_HArray1OfReal) anOldDouble, aNewDouble =
         (myType == ModelAPI_AttributeTables::DOUBLE) ?
         new TColStd_HArray1OfReal(0, aNewSize - 1) : Handle(TColStd_HArray1OfReal)();
-      Handle(TColStd_HArray1OfByte) anOldBool, aNewBool =
-        (myType == ModelAPI_AttributeTables::BOOLEAN) ?
-        new TColStd_HArray1OfByte(0, aNewSize - 1) : Handle(TColStd_HArray1OfByte)();
+      bool* anOldBool = 0; // an not work with internal arrays because of different indexing
+      Handle(TColStd_HArray1OfByte) aNewBool = (myType == ModelAPI_AttributeTables::BOOLEAN) ?
+        // internal array for boolean has 8 times lower size
+        new TColStd_HArray1OfByte(0, (aNewSize - 1)>>3) : Handle(TColStd_HArray1OfByte)();
+      Handle(TDataStd_BooleanArray) aBoolArray; // an existing array
       Handle(TColStd_HArray1OfInteger) anOldInt, aNewInt =
         (myType == ModelAPI_AttributeTables::INTEGER) ?
         new TColStd_HArray1OfInteger(0, aNewSize - 1) : Handle(TColStd_HArray1OfInteger)();
@@ -77,9 +79,14 @@ void Model_AttributeTables::setSize(const int theRows, const int theColumns, con
         case ModelAPI_AttributeTables::DOUBLE:
           anOldDouble = Handle(TDataStd_RealArray)::DownCast(anArray)->Array();
           break;
-        case ModelAPI_AttributeTables::BOOLEAN:
-          anOldBool = Handle(TDataStd_BooleanArray)::DownCast(anArray)->InternalArray();
+        case ModelAPI_AttributeTables::BOOLEAN: {
+          anOldBool = new bool[aSize];
+          aBoolArray = Handle(TDataStd_BooleanArray)::DownCast(anArray);
+          for(int a = 0; a < aSize; a++)
+            anOldBool[a] = aBoolArray->Value(a);
+          aBoolArray->SetInternalArray(aNewBool);
           break;
+        }
         case ModelAPI_AttributeTables::INTEGER:
           anOldInt = Handle(TDataStd_IntegerArray)::DownCast(anArray)->Array();
           break;
@@ -87,6 +94,8 @@ void Model_AttributeTables::setSize(const int theRows, const int theColumns, con
           anOldStr = Handle(TDataStd_ExtStringArray)::DownCast(anArray)->Array();
           break;
         }
+      } else if (myType == ModelAPI_AttributeTables::BOOLEAN) {
+        aBoolArray = TDataStd_BooleanArray::Set(myLab, 0, aNewSize - 1);
       }
       for(int aTable = 0; aTable < theTables; aTable++) {
         for(int aColumn = 0; aColumn < theColumns; aColumn++) {
@@ -101,7 +110,7 @@ void Model_AttributeTables::setSize(const int theRows, const int theColumns, con
               break;
             }
             case ModelAPI_AttributeTables::BOOLEAN: {
-              aNewBool->SetValue(anIndex, aRestore ? anOldBool->Value(anOldIndex) : Standard_False);
+              aBoolArray->SetValue(anIndex, aRestore ? anOldBool[anOldIndex] : Standard_False);
               break;
             }
             case ModelAPI_AttributeTables::INTEGER: {
@@ -121,8 +130,7 @@ void Model_AttributeTables::setSize(const int theRows, const int theColumns, con
       case ModelAPI_AttributeTables::DOUBLE:
         TDataStd_RealArray::Set(myLab, 0, aNewSize - 1)->ChangeArray(aNewDouble);
         break;
-      case ModelAPI_AttributeTables::BOOLEAN:
-        TDataStd_BooleanArray::Set(myLab, 0, aNewSize - 1)->SetInternalArray(aNewBool);
+      case ModelAPI_AttributeTables::BOOLEAN: // nothing to do: array was set in "else" of restore
         break;
       case ModelAPI_AttributeTables::INTEGER:
         TDataStd_IntegerArray::Set(myLab, 0, aNewSize - 1)->ChangeArray(aNewInt);
