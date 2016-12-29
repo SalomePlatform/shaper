@@ -54,7 +54,8 @@ void ExchangePlugin_Dump::dump(const std::string& theFileName)
   for(std::list<FeaturePtr>::const_iterator aFeatIt = aFeatures.begin();
       aFeatIt != aFeatures.end();
       ++aFeatIt) {
-    ResultPartPtr aResultPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>((*aFeatIt)->firstResult());
+    ResultPartPtr aResultPart =
+      std::dynamic_pointer_cast<ModelAPI_ResultPart>((*aFeatIt)->firstResult());
     if(aResultPart.get()) {
       if(!aResultPart->isActivated()) {
         setError("Error: Not all parts are loaded. Can not dump.");
