@@ -969,3 +969,24 @@ void CollectionPlugin_WidgetField::onColumnResize(int theIndex, int theOld, int 
       aTable->setColumnWidth(theIndex, theNew);
   }
 }
+
+//**********************************************************************************
+QList<std::shared_ptr<ModuleBase_ViewerPrs>>
+  CollectionPlugin_WidgetField::getAttributeSelection() const
+{
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> aList;
+  if(myFeature) {
+    DataPtr aData = myFeature->data();
+    AttributeSelectionListPtr aSelList =
+      aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
+    AttributeSelectionPtr aAttr;
+    ObjectPtr anObject;
+    for (int i = 0; i < aSelList->size(); i++) {
+      aAttr = aSelList->value(i);
+      ModuleBase_ViewerPrsPtr
+        aPrs(new ModuleBase_ViewerPrs(aAttr->context(), aAttr->value(), NULL));
+      aList.append(aPrs);
+    }
+  }
+  return aList;
+}

@@ -101,6 +101,11 @@ protected:
 
   //virtual void showEvent(QShowEvent* theEvent);
 
+  /// Return the attribute values wrapped in a list of viewer presentations
+  /// \return a list of viewer presentations, which contains an attribute result and
+  /// a shape. If the attribute do not uses the shape, it is empty
+  virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getAttributeSelection() const;
+
 protected slots:
   /// Slot which is called on selection event
   virtual void onSelectionChanged();
