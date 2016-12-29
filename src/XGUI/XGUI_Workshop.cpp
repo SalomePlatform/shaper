@@ -86,6 +86,10 @@
 
 #include <SUIT_ResourceMgr.h>
 
+#include <AIS_Trihedron.hxx>
+#include <AIS_Point.hxx>
+#include <AIS_Axis.hxx>
+
 #include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -329,6 +333,23 @@ void XGUI_Workshop::deactivateModule()
   XGUI_Displayer* aDisplayer = displayer();
   QObjectPtrList aDisplayed = aDisplayer->displayedObjects();
   aDisplayer->deactivateObjects(aDisplayed, true);
+  Handle(AIS_InteractiveContext) aContext = viewer()->AISContext();
+  Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(aDisplayer->getTrihedron());
+  /// deactivate trihedron in selection modes
+  TColStd_ListOfInteger aTColModes;
+  aContext->ActivatedModes(aTrihedron, aTColModes);
+  TColStd_ListIteratorOfListOfInteger itr( aTColModes );
+  for (; itr.More(); itr.Next() ) {
+    Standard_Integer aMode = itr.Value();
+    aContext->Deactivate(aTrihedron, aMode);
+  }
+  /// Trihedron problem: objects stayed in the viewer, should be removed manually
+  /// otherwise in SALOME happens crash by HideAll in the viewer
+  aContext->Remove(aTrihedron->Position(), true);
+  aContext->Remove(aTrihedron->Axis(), true);
+  aContext->Remove(aTrihedron->XAxis(), true);
+  aContext->Remove(aTrihedron->YAxis(), true);
+
 
   myOperationMgr->deactivate();
 }
