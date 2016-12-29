@@ -77,6 +77,7 @@ XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParen
 
 XGUI_DataModel::~XGUI_DataModel()
 {
+  clear();
 }
 
 //******************************************************
@@ -317,7 +318,8 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
 //******************************************************
 void XGUI_DataModel::clear()
 {
-
+  beginResetModel();
+  endResetModel();
 }
 
 //******************************************************

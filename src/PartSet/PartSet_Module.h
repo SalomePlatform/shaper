@@ -424,7 +424,7 @@ private:
   /// backup of the visible state to restore them by operation stop
   QMap<PartSet_Tools::ConstraintVisibleState, bool> myHasConstraintShown;
 
-  QModelIndex aActivePartIndex;
+  QModelIndex myActivePartIndex;
 };
 
 #endif

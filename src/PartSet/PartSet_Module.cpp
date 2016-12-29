@@ -578,6 +578,7 @@ bool PartSet_Module::isSketchNeutralPointActivated() const
 
 void PartSet_Module::closeDocument()
 {
+  myActivePartIndex = QModelIndex();
   clearViewer();
 }
 
@@ -1229,12 +1230,12 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
 
     SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aActiveDoc = aMgr->activeDocument();
-    if (aActivePartIndex.isValid())
-      aTreeView->setExpanded(aActivePartIndex, false);
+    if (myActivePartIndex.isValid())
+      aTreeView->setExpanded(myActivePartIndex, false);
     XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
-    aActivePartIndex = aDataModel->documentRootIndex(aActiveDoc);
-    if (aActivePartIndex.isValid())
-      aTreeView->setExpanded(aActivePartIndex, true);
+    myActivePartIndex = aDataModel->documentRootIndex(aActiveDoc);
+    if (myActivePartIndex.isValid())
+      aTreeView->setExpanded(myActivePartIndex, true);
 
     aLabel->setPalette(aPalet);
     aWorkshop->updateCommandStatus();
