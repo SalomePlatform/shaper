@@ -9,6 +9,7 @@
 
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_IModule.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_IPropertyPanel.h>
 
@@ -782,21 +783,25 @@ bool CollectionPlugin_WidgetField::
 }
 
 //**********************************************************************************
-void CollectionPlugin_WidgetField::onSelectionChanged()
+bool CollectionPlugin_WidgetField::
+  setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues, const bool theToValidate)
 {
-  //if (isEditingMode())
-  //  return;
-
   if (myActivation) {
     myActivation = false;
-    return;
+    return false;
   }
   // Ignore selection for Parts mode
   if (myShapeTypeCombo->currentIndex() == 5)
-    return;
+    return false;
 
-  QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
-
+  QList<ModuleBase_ViewerPrsPtr> aSelected;
+  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt;
+  for (anIt = theValues.begin(); anIt != theValues.end(); anIt++) {
+    ModuleBase_ViewerPrsPtr aValue = *anIt;
+    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aValue->object());
+    if (theToValidate && aRes.get() && acceptSubShape(aValue->shape(), aRes))
+      aSelected.append(aValue);
+  }
   AttributeSelectionListPtr aSelList =
     myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());
   aSelList->setSelectionType(getSelectionType(myShapeTypeCombo->currentIndex()));
@@ -859,7 +864,7 @@ void CollectionPlugin_WidgetField::onSelectionChanged()
       }
     }
   }
-  emit valuesChanged();
+  return true;
 }
 
 //**********************************************************************************

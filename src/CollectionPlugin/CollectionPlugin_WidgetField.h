@@ -82,6 +82,13 @@ public:
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// \param theValues the wrapped selection values
+  /// \param theToValidate a validation of the values flag
+  virtual bool setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
+                            const bool theToValidate);
+
 protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
@@ -105,10 +112,6 @@ protected:
   /// \return a list of viewer presentations, which contains an attribute result and
   /// a shape. If the attribute do not uses the shape, it is empty
   virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getAttributeSelection() const;
-
-protected slots:
-  /// Slot which is called on selection event
-  virtual void onSelectionChanged();
 
 private slots:
   /// Slot called on number of component changed
