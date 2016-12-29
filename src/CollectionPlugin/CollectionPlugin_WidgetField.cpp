@@ -876,10 +876,7 @@ void CollectionPlugin_WidgetField::onFieldTypeChanged(int theIdx)
           switch (theIdx) {
           case ModelAPI_AttributeTables::DOUBLE:
           case ModelAPI_AttributeTables::INTEGER:
-            if ((aOldType == ModelAPI_AttributeTables::BOOLEAN) ||
-                (aOldType == ModelAPI_AttributeTables::STRING)) {
-                  aTable->item(j, i)->setText("0");
-            }
+            aTable->item(j, i)->setText("0");
             break;
           case ModelAPI_AttributeTables::BOOLEAN:
             aTable->item(j, i)->setText(MYFalse);
