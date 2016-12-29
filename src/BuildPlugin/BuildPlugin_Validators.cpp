@@ -192,6 +192,11 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
     }
   }
 
+  if(anEdges.empty()) {
+    theError = "Objects not selected.";
+    return false;
+  }
+
   // Check that edges does not have intersections.
   if(anEdges.size() > 1) {
     GeomAlgoAPI_PaveFiller aPaveFiller(anEdges, false);
@@ -215,7 +220,7 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
   // Check that they are planar.
   std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(anEdges);
   if(!aPln.get()) {
-    theError = "Selected objects are not planar.";
+    theError = "Selected object(s) should belong to only one plane.";
     return false;
   }
 
@@ -224,7 +229,7 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
   GeomAlgoAPI_SketchBuilder::createFaces(aPln->location(), aPln->xDirection(),
                                          aPln->direction(), anEdges, aFaces);
   if(aFaces.empty()) {
-    theError = "Selected objects does not have closed contours.";
+    theError = "Selected objects do not generate closed contour.";
     return false;
   }
 

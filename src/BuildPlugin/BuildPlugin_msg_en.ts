@@ -64,33 +64,25 @@
       <source>Empty attribute \"%1\".</source>
       <translation>Objects not selected.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:BuildPlugin_ValidatorBaseForFace</name>
+    <message>
+      <source>Objects not selected.</source>
+      <translation>Objects not selected.</translation>
+    </message>
     <message>
       <source>Error while checking if edges intersects.</source>
       <translation>Error while checking if edges intersects.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:BuildPlugin_ValidatorBaseForFace</name>
     <message>
       <source>Selected objects have intersections.</source>
       <translation>Selected objects have intersections.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:BuildPlugin_ValidatorBaseForFace</name>
     <message>
-      <source>Selected objects are not planar.</source>
-      <translation>Selected objects are not planar.</translation>
+      <source>Selected object(s) should belong to only one plane.</source>
+      <translation>Selected object(s) should belong to only one plane.</translation>
     </message>
-  </context>
-  <context>
-    <name>Face:BuildPlugin_ValidatorBaseForFace</name>
     <message>
-      <source>Selected objects does not have closed contours.</source>
-      <translation>Selected objects does not have closed contours.</translation>
+      <source>Selected objects do not generate closed contour.</source>
+      <translation>Selected objects do not generate closed contour.</translation>
     </message>
   </context>
   <context>
