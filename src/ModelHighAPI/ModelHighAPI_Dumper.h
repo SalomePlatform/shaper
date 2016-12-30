@@ -269,7 +269,10 @@ private:
     EntityName() {}
 
     EntityName(const std::string& theCurName, const std::string& theUserName, bool theDefault)
-      : myCurrentName(theCurName), myUserName(theUserName), myIsDefault(theDefault), myIsDumped(false)
+      : myCurrentName(theCurName),
+        myUserName(theUserName),
+        myIsDefault(theDefault),
+        myIsDumped(false)
     {}
   };
 
