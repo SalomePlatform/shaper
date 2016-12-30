@@ -298,6 +298,7 @@ void SketchPlugin_ConstraintSplit::execute()
   }
 #endif
   ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToDelete);
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 
 #ifdef DEBUG_SPLIT
   std::cout << "update features after split:" << std::endl;
