@@ -32,6 +32,7 @@
 #include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
+#include <SketchPlugin_ConstraintMiddle.h>
 
 #include <ModelAPI_Events.h>
 #include <SketchPlugin_Line.h>
@@ -440,7 +441,8 @@ void SketchPlugin_ConstraintSplit::getConstraints(std::set<FeaturePtr>& theFeatu
     std::string aRefFeatureKind = aRefFeature->getKind();
     if (aRefFeatureKind == SketchPlugin_ConstraintMirror::ID() ||
         aRefFeatureKind == SketchPlugin_MultiRotation::ID() ||
-        aRefFeatureKind == SketchPlugin_MultiTranslation::ID())
+        aRefFeatureKind == SketchPlugin_MultiTranslation::ID() ||
+        aRefFeatureKind == SketchPlugin_ConstraintMiddle::ID())
       theFeaturesToDelete.insert(aRefFeature);
     else if (aRefFeatureKind == SketchPlugin_ConstraintLength::ID())
       theFeaturesToUpdate.insert(aRefFeature);
