@@ -340,7 +340,6 @@ void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
         }
       }
     } if (!isOperationCommitted) {
-      workshop()->updateCommandStatus();
       aWorkshop->connectToPropertyPanel(true);
       updateSketcherOnStart(aFOperation);
       updatePresentationsOnStart(aFOperation);
@@ -361,6 +360,10 @@ void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
         XGUI_Displayer* aDisplayer = aWorkshop->displayer();
         aDisplayer->updateViewer();
       }
+      /// state of command actions should be updated after displayed objects modification because
+      /// deactivation(for example) of objects may influence on selection in the viewer
+      /// State of command actions may depend on selection in the viewer(e.g. Sketch)
+      workshop()->updateCommandStatus();
     }
     if (aPostonedWidgetActivation) {
       // if the widget is an empty in the chain of activated widgets, the current operation
