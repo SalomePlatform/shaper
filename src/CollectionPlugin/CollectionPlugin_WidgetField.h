@@ -46,9 +46,6 @@ public:
 
   void setDataType(ModelAPI_AttributeTables::ValueType theType) { myType = theType; }
 
-//protected:
-//  bool eventFilter(QObject* theObj, QEvent* theEvent);
-
 private slots:
   void onEditItem(const QString& theText);
 
