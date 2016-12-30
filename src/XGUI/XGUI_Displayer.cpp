@@ -91,6 +91,8 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;
 
 //#define DEBUG_OCCT_SHAPE_SELECTION
 
+#define CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
+
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
 {
   // Get from null point
@@ -118,8 +120,6 @@ void deselectPresentation(const Handle(AIS_InteractiveObject) theObject,
       continue;
     if (anOwner->Selectable() == theObject && anOwner->IsSelected())
       aResultOwners.Append(anOwner);
-
-    aResultOwners.Append(anOwner);
   }
   NCollection_List<Handle(SelectBasics_EntityOwner)>::Iterator anOwnersIt (aResultOwners);
   Handle(SelectMgr_EntityOwner) anOwner;
@@ -377,7 +377,9 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       if (aNeedToRestoreSelection)
         myWorkshop->module()->storeSelection();
 
+#ifdef CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
       deselectPresentation(aAISIO, aContext);
+#endif
       aContext->Redisplay(aAISIO, false);
 
       #ifdef VINSPECTOR
@@ -426,6 +428,10 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject, const bool theUpdateViewer)
     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
 
     deactivateAIS(anAIS);
+    // the selection from the previous activation modes should be cleared manually (#26172)
+#ifndef CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
+    deselectPresentation(anAIS, aContext);
+#endif
     if (theUpdateViewer)
       updateViewer();
   }
@@ -1317,6 +1323,14 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
     }
   }
   if (isDeactivated) {
+    // the selection from the previous activation modes should be cleared manually (#26172)
+    //theIO->ClearSelected();
+    //#ifdef VINSPECTOR
+    //if (getCallBack()) getCallBack()->ClearSelected(theIO);
+    //#endif
+#ifndef CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
+    deselectPresentation(theIO, aContext);
+#endif
     // For performance issues
     //if (theUpdateViewer)
     //  updateViewer();
