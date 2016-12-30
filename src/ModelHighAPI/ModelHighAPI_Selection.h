@@ -91,6 +91,10 @@ public:
   MODELHIGHAPI_EXPORT
   void setDeflection(double theValue);
 
+  /// Return sub-result for ResultCompSolid
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Selection subResult(int theIndex);
+
 private:
   VariantType myVariantType;
   ResultSubShapePair myResultSubShapePair;

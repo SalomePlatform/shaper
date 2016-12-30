@@ -12,6 +12,7 @@
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_ResultCompSolid.h>
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -129,4 +130,18 @@ void ModelHighAPI_Selection::setDeflection(double theValue)
     myResultSubShapePair.first->data()->real(ModelAPI_Result::DEFLECTION_ID());
 
   aDeflectionAttr->setValue(theValue);
+}
+
+ModelHighAPI_Selection ModelHighAPI_Selection::subResult(int theIndex)
+{
+  if (myVariantType != VT_ResultSubShapePair)
+    return ModelHighAPI_Selection();
+
+  ResultCompSolidPtr aCompSolid =
+      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(myResultSubShapePair.first);
+  if (!aCompSolid)
+    return ModelHighAPI_Selection();
+
+  ResultBodyPtr aResult = aCompSolid->subResult(theIndex);
+  return ModelHighAPI_Selection(aResult, aResult->shape());
 }

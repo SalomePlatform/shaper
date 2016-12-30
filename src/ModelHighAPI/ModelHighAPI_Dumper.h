@@ -264,11 +264,12 @@ private:
     std::string myCurrentName; ///< default name of current feature
     std::string myUserName;    ///< user-defined name
     bool        myIsDefault;   ///< \c true if the name is default
+    bool        myIsDumped;    ///< shows that the names of the feature are already stored
 
     EntityName() {}
 
     EntityName(const std::string& theCurName, const std::string& theUserName, bool theDefault)
-      : myCurrentName(theCurName), myUserName(theUserName), myIsDefault(theDefault)
+      : myCurrentName(theCurName), myUserName(theUserName), myIsDefault(theDefault), myIsDumped(false)
     {}
   };
 
