@@ -89,20 +89,21 @@ QWidget* DataTableItemDelegate::createEditor(QWidget* theParent,
       aEditor = QStyledItemDelegate::createEditor(theParent, theOption, theIndex);
     }
   }
-  QObject* aThat = (QObject*) this;
-  aEditor->installEventFilter(aThat);
+  if (myType == ModelAPI_AttributeTables::BOOLEAN)
+    connect(aEditor, SIGNAL(currentTextChanged(const QString&)),
+      SLOT(onEditItem(const QString&)));
+  else
+    connect(aEditor, SIGNAL(textEdited(const QString&)),
+      SLOT(onEditItem(const QString&)));
   return aEditor;
 }
 
-//bool DataTableItemDelegate::eventFilter(QObject* theObj, QEvent* theEvent)
-//{
-//  qDebug("### Type = %i", theEvent->type());
-//  if (theEvent->type() == QEvent::Close) {
-//    QWidget* aWgt = dynamic_cast<QWidget*>(theObj);
-//    commitData(aWgt);
-//  }
-//  return QStyledItemDelegate::eventFilter(theObj, theEvent);
-//}
+void DataTableItemDelegate::onEditItem(const QString& theText)
+{
+  QWidget* aWgt = dynamic_cast<QWidget*>(sender());
+  commitData(aWgt);
+}
+
 
 
 //**********************************************************************************

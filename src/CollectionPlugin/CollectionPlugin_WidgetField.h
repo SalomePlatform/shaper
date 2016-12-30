@@ -49,6 +49,9 @@ public:
 //protected:
 //  bool eventFilter(QObject* theObj, QEvent* theEvent);
 
+private slots:
+  void onEditItem(const QString& theText);
+
 private:
   ModelAPI_AttributeTables::ValueType myType;
 };
