@@ -109,7 +109,7 @@ Q_OBJECT
   virtual bool canDragByMouse() const { return true; }
 
   /// Fit all along Z (perpendicular to display)
-  virtual void Zfitall() = 0;
+  //virtual void Zfitall() = 0;
 
 signals:
   /// Signal emited when last view window is closed

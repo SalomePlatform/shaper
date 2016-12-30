@@ -373,18 +373,18 @@ bool XGUI_ViewerProxy::canDragByMouse() const
 
 
 //***************************************
-void XGUI_ViewerProxy::Zfitall()
-{
-#ifdef HAVE_SALOME
-  myWorkshop->salomeConnector()->viewer()->Zfitall();
-#else
-  AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-  AppElements_ViewWindow* aView = aViewer->activeViewWindow();
-  if (aView) {
-    Handle(V3d_View) aView3d = aView->v3dView();
-    aView3d->ZFitAll();
-    if (aView3d->Depth() < 0.1)
-      aView3d->DepthFitAll();
-  }
-#endif
-}
+//void XGUI_ViewerProxy::Zfitall()
+//{
+//#ifdef HAVE_SALOME
+//  myWorkshop->salomeConnector()->viewer()->Zfitall();
+//#else
+//  AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+//  AppElements_ViewWindow* aView = aViewer->activeViewWindow();
+//  if (aView) {
+//    Handle(V3d_View) aView3d = aView->v3dView();
+//    aView3d->ZFitAll();
+//    if (aView3d->Depth() < 0.1)
+//      aView3d->DepthFitAll();
+//  }
+//#endif
+//}
