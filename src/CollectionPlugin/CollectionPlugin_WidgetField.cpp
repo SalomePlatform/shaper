@@ -84,11 +84,13 @@ QWidget* DataTableItemDelegate::createEditor(QWidget* theParent,
         aBox->addItem(MYTrue);
         aEditor = aBox;
       }
+      break;
+    default:
+      aEditor = QStyledItemDelegate::createEditor(theParent, theOption, theIndex);
     }
   }
-  aEditor = QStyledItemDelegate::createEditor(theParent, theOption, theIndex);
-  //QObject* aThat = (QObject*) this;
-  //aEditor->installEventFilter(aThat);
+  QObject* aThat = (QObject*) this;
+  aEditor->installEventFilter(aThat);
   return aEditor;
 }
 
