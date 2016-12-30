@@ -40,15 +40,22 @@ const char* MYFirstCol = "Shape";
 const char* MYTrue = "True";
 const char* MYFalse = "False";
 
+DataTableItemDelegate::DataTableItemDelegate(ModelAPI_AttributeTables::ValueType theType)
+  : QStyledItemDelegate(), myType(theType)
+{
+}
+
+
 QWidget* DataTableItemDelegate::createEditor(QWidget* theParent,
                                              const QStyleOptionViewItem & theOption,
                                              const QModelIndex& theIndex ) const
 {
+  QWidget* aEditor = 0;
   if ((theIndex.column() == 0) && (theIndex.row() > 0)) {
     QWidget* aWgt = QStyledItemDelegate::createEditor(theParent, theOption, theIndex);
     QLineEdit* aEdt = static_cast<QLineEdit*>(aWgt);
     aEdt->setReadOnly(true);
-    return aEdt;
+    aEditor = aEdt;
   } else {
     QLineEdit* aLineEdt = 0;
     switch (myType) {
@@ -58,7 +65,7 @@ QWidget* DataTableItemDelegate::createEditor(QWidget* theParent,
                                                                             theIndex));
       if (aLineEdt) {
         aLineEdt->setValidator(new QDoubleValidator(aLineEdt));
-        return aLineEdt;
+        aEditor = aLineEdt;
       }
       break;
     case ModelAPI_AttributeTables::INTEGER:
@@ -67,7 +74,7 @@ QWidget* DataTableItemDelegate::createEditor(QWidget* theParent,
                                                                             theIndex));
       if (aLineEdt) {
         aLineEdt->setValidator(new QIntValidator(aLineEdt));
-        return aLineEdt;
+        aEditor = aLineEdt;
       }
       break;
     case ModelAPI_AttributeTables::BOOLEAN:
@@ -75,13 +82,25 @@ QWidget* DataTableItemDelegate::createEditor(QWidget* theParent,
         QComboBox* aBox = new QComboBox(theParent);
         aBox->addItem(MYFalse);
         aBox->addItem(MYTrue);
-        return aBox;
+        aEditor = aBox;
       }
     }
   }
-  return QStyledItemDelegate::createEditor(theParent, theOption, theIndex);
+  aEditor = QStyledItemDelegate::createEditor(theParent, theOption, theIndex);
+  //QObject* aThat = (QObject*) this;
+  //aEditor->installEventFilter(aThat);
+  return aEditor;
 }
 
+//bool DataTableItemDelegate::eventFilter(QObject* theObj, QEvent* theEvent)
+//{
+//  qDebug("### Type = %i", theEvent->type());
+//  if (theEvent->type() == QEvent::Close) {
+//    QWidget* aWgt = dynamic_cast<QWidget*>(theObj);
+//    commitData(aWgt);
+//  }
+//  return QStyledItemDelegate::eventFilter(theObj, theEvent);
+//}
 
 
 //**********************************************************************************
@@ -413,9 +432,14 @@ QList<QWidget*> CollectionPlugin_WidgetField::getControls() const
 {
   QList<QWidget*> aControls;
   // this control will accept focus and will be highlighted in the Property Panel
-  aControls.push_back(myShapeTypeCombo);
-  aControls.push_back(myFieldTypeCombo);
-  aControls.push_back(myNbComponentsSpn);
+  aControls.append(myShapeTypeCombo);
+  aControls.append(myFieldTypeCombo);
+  aControls.append(myNbComponentsSpn);
+  if (myStampSpnList.size() > 0)
+    aControls.append(myStampSpnList.first());
+  if (myDataTblList.size() > 0)
+    aControls.append(myDataTblList.first());
+
   return aControls;
 }
 
@@ -944,6 +968,16 @@ bool CollectionPlugin_WidgetField::processEnter()
 {
   if (myIsTabEdit) {
     myIsTabEdit = false;
+    return true;
+  }
+  QWidget* aCurrWgt = qApp->focusWidget();
+  int aCurWgtId = myStepWgt->currentIndex();
+  if ((aCurrWgt == myShapeTypeCombo) ||
+      (aCurrWgt == myFieldTypeCombo) ||
+      (aCurrWgt == myNbComponentsSpn) ||
+      (aCurrWgt == myStampSpnList[aCurWgtId]) ||
+      (aCurrWgt == myDataTblList[aCurWgtId])) {
+    setFocus();
     return true;
   }
   return false;

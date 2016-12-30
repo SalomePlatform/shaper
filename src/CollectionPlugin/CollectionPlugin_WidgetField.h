@@ -36,8 +36,7 @@ class DataTableItemDelegate : public QStyledItemDelegate
 {
  Q_OBJECT
 public:
-  DataTableItemDelegate(ModelAPI_AttributeTables::ValueType theType) :
-      QStyledItemDelegate() { myType = theType; }
+  DataTableItemDelegate(ModelAPI_AttributeTables::ValueType theType);
 
   virtual QWidget* createEditor(QWidget* theParent,
                                 const QStyleOptionViewItem & theOption,
@@ -46,6 +45,9 @@ public:
   ModelAPI_AttributeTables::ValueType dataType() const { return myType; }
 
   void setDataType(ModelAPI_AttributeTables::ValueType theType) { myType = theType; }
+
+//protected:
+//  bool eventFilter(QObject* theObj, QEvent* theEvent);
 
 private:
   ModelAPI_AttributeTables::ValueType myType;
