@@ -1,4 +1,4 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+// Copyright (C) 2014-2016 CEA/DEN, EDF R&D
 
 // File:        GeomAlgoAPI_Translation.h
 // Created:     8 June 2015

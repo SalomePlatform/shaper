@@ -123,7 +123,7 @@ void FeaturesAPI_Translation::dump(ModelHighAPI_Dumper& theDumper) const
   std::string aCreationMethod =
     aBase->string(FeaturesPlugin_Translation::CREATION_METHOD())->value();
 
-  if(aCreationMethod == FeaturesPlugin_Translation::CREATION_METHOD_BY_DISTANCE()) {
+  if (aCreationMethod == FeaturesPlugin_Translation::CREATION_METHOD_BY_DISTANCE()) {
     AttributeSelectionPtr anAttrAxis =
       aBase->selection(FeaturesPlugin_Translation::AXIS_OBJECT_ID());
     AttributeDoublePtr anAttrDistance =

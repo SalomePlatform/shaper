@@ -31,7 +31,8 @@ FeaturesPlugin_Translation::FeaturesPlugin_Translation()
 //=================================================================================================
 void FeaturesPlugin_Translation::initAttributes()
 {
-  data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(FeaturesPlugin_Translation::CREATION_METHOD(),
+                       ModelAPI_AttributeString::typeId());
 
   AttributeSelectionListPtr aSelection =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
