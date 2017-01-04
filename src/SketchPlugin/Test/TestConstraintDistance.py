@@ -186,5 +186,5 @@ assert (math.fabs(distancePointPoint(aLineAStartPoint, aLineAEndPoint) - PT_LINE
 # End of test
 #=========================================================================
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

@@ -7,7 +7,7 @@
 
 """
 
-import model
+from salome.shaper import model
 
 #=========================================================================
 # Initialize a part

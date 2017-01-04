@@ -78,5 +78,5 @@ aSession.finishOperation()
 # Test results
 assert (len(aShellFeature.results()) > 0)
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

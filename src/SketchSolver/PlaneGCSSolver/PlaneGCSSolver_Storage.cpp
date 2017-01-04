@@ -389,8 +389,11 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
   // Calculate additional parameters necessary for PlaneGCS
   const std::list<EntityWrapperPtr>& aSubs = theArc->subEntities();
   std::list<EntityWrapperPtr>::const_iterator aSubIt = aSubs.begin();
-  while ((*aSubIt)->type() == ENTITY_POINT) // search scalar entities
+  bool isFixed[3] = {false, false, false};
+  for (int i = 0; (*aSubIt)->type() == ENTITY_POINT; ++i) { // search scalar entities
+    isFixed[i] = (*aSubIt)->group() == GID_OUTOFGROUP;
     ++aSubIt;
+  }
   double* aStartAngle =
     std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(*aSubIt++)->scalar();
   double* aEndAngle =
@@ -411,25 +414,19 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
   std::shared_ptr<GeomAPI_Pnt2d> aStartPnt  = aStartAttr->pnt();
   std::shared_ptr<GeomAPI_Pnt2d> aEndPnt    = aEndAttr->pnt();
 
-  *aRadius = aCenterPnt->distance(aStartPnt);
+  if (isFixed[2] && !isFixed[1])
+    *aRadius = aCenterPnt->distance(aEndPnt);
+  else
+    *aRadius = aCenterPnt->distance(aStartPnt);
   if (!anArcFeature->lastResult())
     return;
-  std::shared_ptr<GeomAPI_Edge> anArcEdge =
-      std::dynamic_pointer_cast<GeomAPI_Edge>(anArcFeature->lastResult()->shape());
-  if (!anArcEdge)
-    return;
-  anArcEdge->getRange(*aStartAngle, *aEndAngle);
-  // verify the range is correct and not shifted to an angle
-  std::shared_ptr<GeomAPI_Dir2d> aDir(new GeomAPI_Dir2d(cos(*aStartAngle), sin(*aStartAngle)));
-  std::shared_ptr<GeomAPI_Pnt2d> aCalcStartPnt(
-      new GeomAPI_Pnt2d(aCenterPnt->xy()->added(aDir->xy()->multiplied(*aRadius))));
-  if (aCalcStartPnt->distance(aStartPnt) > tolerance) {
-    std::shared_ptr<GeomAPI_Dir2d> aDirToStart(
-        new GeomAPI_Dir2d(aStartPnt->xy()->decreased(aCenterPnt->xy())));
-    double anAngle = aDir->angle(aDirToStart);
-    *aStartAngle += anAngle;
-    *aEndAngle += anAngle;
-  }
+  static std::shared_ptr<GeomAPI_Dir2d> OX(new GeomAPI_Dir2d(1.0, 0.0));
+  std::shared_ptr<GeomAPI_Dir2d> aDir(new GeomAPI_Dir2d(
+      aStartPnt->xy()->decreased(aCenterPnt->xy())));
+  *aStartAngle = OX->angle(aDir);
+  aDir = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(
+      aEndPnt->xy()->decreased(aCenterPnt->xy())));
+  *aEndAngle = OX->angle(aDir);
 
   // no need to constraint a fixed or a copied arc
   if (theArc->group() == GID_OUTOFGROUP || anArcFeature->isCopy())
@@ -437,8 +434,8 @@ void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
   // No need to add constraints if they are already exist
   std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >::const_iterator
       aFound = myArcConstraintMap.find(theArc);
-  if (aFound != myArcConstraintMap.end())
-    return;
+//  if (aFound != myArcConstraintMap.end())
+//    return;
 
   // Prepare additional constraints to produce the arc
   std::vector<GCSConstraintPtr> anArcConstraints;
@@ -672,6 +669,8 @@ void PlaneGCSSolver_Storage::refresh(bool theFixedOnly) const
 {
   //blockEvents(true);
 
+  const double aTol = 1000. * tolerance; // tolerance to prevent frequent updates
+
   std::map<AttributePtr, EntityWrapperPtr>::const_iterator anIt = myAttributeMap.begin();
   std::list<ParameterWrapperPtr> aParams;
   std::list<ParameterWrapperPtr>::const_iterator aParIt;
@@ -698,8 +697,8 @@ void PlaneGCSSolver_Storage::refresh(bool theFixedOnly) const
     std::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anIt->first);
     if (aPoint2D) {
-      if ((isUpd[0] && fabs(aPoint2D->x() - aCoords[0]) > tolerance) ||
-          (isUpd[1] && fabs(aPoint2D->y() - aCoords[1]) > tolerance) || isExternal) {
+      if ((isUpd[0] && fabs(aPoint2D->x() - aCoords[0]) > aTol) ||
+          (isUpd[1] && fabs(aPoint2D->y() - aCoords[1]) > aTol) || isExternal) {
         // Find points coincident with this one (probably not in GID_OUTOFGROUP)
         CoincidentPointsMap::const_iterator aCoincIt = myCoincidentPoints.begin();
         for (; aCoincIt != myCoincidentPoints.end(); ++aCoincIt)
@@ -729,7 +728,7 @@ void PlaneGCSSolver_Storage::refresh(bool theFixedOnly) const
     }
     AttributeDoublePtr aScalar = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anIt->first);
     if (aScalar && !isExternal) {
-      if (isUpd[0] && fabs(aScalar->value() - aCoords[0]) > tolerance)
+      if (isUpd[0] && fabs(aScalar->value() - aCoords[0]) > aTol)
         aScalar->setValue(aCoords[0]);
       continue;
     }

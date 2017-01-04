@@ -24,6 +24,7 @@
 #include <XGUI_CustomPrs.h>
 #include <XGUI_HistoryMenu.h>
 #include <XGUI_QtEvents.h>
+#include <XGUI_DataModel.h>
 
 #ifndef HAVE_SALOME
 #include <AppElements_Button.h>
@@ -85,6 +86,10 @@
 
 #include <SUIT_ResourceMgr.h>
 
+#include <AIS_Trihedron.hxx>
+#include <AIS_Point.hxx>
+#include <AIS_Axis.hxx>
+
 #include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -101,6 +106,13 @@
 #include <QDesktopWidget>
 
 #include <iterator>
+
+#ifdef DFBROWSER
+#include <CDF_Session.hxx>
+#include <CDF_Application.hxx>
+#include <DFBrowserAPI_Communicator.hxx>
+static bool DFBrowser_FirstCall = true;
+#endif
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -136,10 +148,10 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   // Has to be defined first in order to get errors and messages from other components
   myEventsListener = new XGUI_WorkshopListener(aWorkshop);
 
+  SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
 #ifndef HAVE_SALOME
   myMainWindow = new AppElements_MainWindow();
 
-  SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
   bool aCloc = aResMgr->booleanValue("language", "locale", true);
   if (aCloc)
     QLocale::setDefault( QLocale::c() );
@@ -150,11 +162,20 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   QDir aDir(aPath);
 
   // Load translations
-  QStringList aFilters;
-  aFilters << "*_en.ts";
-  QStringList aTsFiles = aDir.entryList(aFilters, QDir::Files);
-  foreach(QString aFileName, aTsFiles) {
-    Config_Translator::load(aFileName.toStdString());
+  QStringList aLangs;
+  aLangs << "*_en.ts"; // load by default eng translations
+  QString aCurrLang = aResMgr->stringValue("language", "language", "en");
+  if(aCurrLang != "en") {
+    aLangs << "*_" + aCurrLang + ".ts"; // then replace with translated files
+  }
+
+  foreach(QString aLang, aLangs) {
+    QStringList aFilters;
+    aFilters << aLang;
+    QStringList aTsFiles = aDir.entryList(aFilters, QDir::Files);
+    foreach(QString aFileName, aTsFiles) {
+      Config_Translator::load(aFileName.toStdString());
+    }
   }
 
   myDataModelXMLReader = new Config_DataModelReader();
@@ -213,12 +234,12 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   Config_PropManager::registerProp("Visualization", "body_deflection",
                                    "Body deflection coefficient",
                                    Config_Prop::Double,
-                                   ModelAPI_ResultBody::DEFAULT_DEFLECTION());//"0.001");
+                                   ModelAPI_ResultBody::DEFAULT_DEFLECTION());
 
   Config_PropManager::registerProp("Visualization", "construction_deflection",
                                    "Construction deflection coefficient",
                                    Config_Prop::Double,
-                                   ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());//"0.0001");
+                                   ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());
 
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "face-selection", true))
     myViewerSelMode.append(TopAbs_FACE);
@@ -312,6 +333,23 @@ void XGUI_Workshop::deactivateModule()
   XGUI_Displayer* aDisplayer = displayer();
   QObjectPtrList aDisplayed = aDisplayer->displayedObjects();
   aDisplayer->deactivateObjects(aDisplayed, true);
+  Handle(AIS_InteractiveContext) aContext = viewer()->AISContext();
+  Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(aDisplayer->getTrihedron());
+  /// deactivate trihedron in selection modes
+  TColStd_ListOfInteger aTColModes;
+  aContext->ActivatedModes(aTrihedron, aTColModes);
+  TColStd_ListIteratorOfListOfInteger itr( aTColModes );
+  for (; itr.More(); itr.Next() ) {
+    Standard_Integer aMode = itr.Value();
+    aContext->Deactivate(aTrihedron, aMode);
+  }
+  /// Trihedron problem: objects stayed in the viewer, should be removed manually
+  /// otherwise in SALOME happens crash by HideAll in the viewer
+  aContext->Remove(aTrihedron->Position(), true);
+  aContext->Remove(aTrihedron->Axis(), true);
+  aContext->Remove(aTrihedron->XAxis(), true);
+  aContext->Remove(aTrihedron->YAxis(), true);
+
 
   myOperationMgr->deactivate();
 }
@@ -698,7 +736,16 @@ void XGUI_Workshop::saveDocument(const QString& theName, std::list<std::string>&
 {
   QApplication::restoreOverrideCursor();
   SessionPtr aMgr = ModelAPI_Session::get();
+
+  std::list<DocumentPtr> aDocList = aMgr->allOpenedDocuments();
+  std::list<DocumentPtr>::const_iterator aIt;
+  for (aIt = aDocList.cbegin(); aIt != aDocList.cend(); aIt++) {
+    std::list<bool> aState = myObjectBrowser->getStateForDoc(*aIt);
+    (*aIt)->storeNodesState(aState);
+  }
+
   aMgr->save(theName.toLatin1().constData(), theFileNames);
+
   QApplication::restoreOverrideCursor();
 }
 
@@ -765,6 +812,13 @@ void XGUI_Workshop::openDirectory(const QString& theDirectory)
   aSession->closeAll();
   aSession->load(myCurrentDir.toLatin1().constData());
   myObjectBrowser->rebuildDataTree();
+
+  // Open first level of data tree
+  DocumentPtr aRootDoc = aSession->moduleDocument();
+  std::list<bool> aStates;
+  aRootDoc->restoreNodesState(aStates);
+  myObjectBrowser->setStateForDoc(aRootDoc, aStates);
+
   updateCommandStatus();
 #ifndef HAVE_SALOME
   myMainWindow->setCurrentDir(myCurrentDir, true);
@@ -867,7 +921,7 @@ bool XGUI_Workshop::onSaveAs()
   QFileDialog dialog(desktop());
   dialog.setWindowTitle(tr("Select directory to save files..."));
   dialog.setFileMode(QFileDialog::Directory);
-  dialog.setFilter(tr("Directories (*)"));
+  dialog.setFilter(QDir::AllDirs);
   dialog.setOptions(QFileDialog::HideNameFilterDetails | QFileDialog::ShowDirsOnly);
   dialog.setViewMode(QFileDialog::Detail);
 
@@ -1311,6 +1365,22 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   } else if (theId == "SHOW_FEATURE_CMD") {
     highlightFeature(aObjects);
   }
+#ifdef VINSPECTOR
+  else if (theId == "VINSPECTOR_VIEW") {
+    displayer()->setVInspectorVisible(true);
+  }
+#endif
+#ifdef DFBROWSER
+  else if (theId == "DFBROWSER_VIEW") {
+    if (DFBrowser_FirstCall) {
+      Handle(CDF_Application) anApplication = CDF_Session::CurrentSession()->CurrentApplication();
+      DFBrowserAPI_Communicator* aCommunicator =
+                     DFBrowserAPI_Communicator::loadPluginLibrary("DFBrowser.dll");
+      aCommunicator->setApplication(anApplication);
+      DFBrowser_FirstCall = false;
+    }
+  }
+#endif
 }
 
 //**************************************************************
@@ -2007,14 +2077,20 @@ void XGUI_Workshop::closeDocument()
     anOperation->abort();
     anOperation = operationMgr()->currentOperation();
   }
-  myDisplayer->closeLocalContexts();
+  //myDisplayer->closeLocalContexts();
   myDisplayer->eraseAll();
   objectBrowser()->clearContent();
 
   module()->closeDocument();
 
+  // data model need not process the document's signals about objects modifications as
+  // the document is closed
+  //bool isBlocked = objectBrowser()->dataModel()->blockEventsProcessing(true);
+
   SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->closeAll();
+
+  //objectBrowser()->dataModel()->blockEventsProcessing(isBlocked);
 }
 
 void XGUI_Workshop::addHistoryMenu(QObject* theObject, const char* theSignal, const char* theSlot)

@@ -31,7 +31,7 @@ bool ModuleBase_ViewerPrs::isEqual(ModuleBase_ViewerPrs* thePrs) const
                        (myShape.get() && myShape->isEqual(thePrs->shape()));
   bool isEqualIO = (myInteractive == thePrs->interactive()) == Standard_True;
 
-  bool isEqualOwner = (myOwner.Access() == thePrs->owner().Access());
+  bool isEqualOwner = myOwner.get() == thePrs->owner().get();
   if (isEqualResult && isEqualShape && isEqualIO &&
       !isEqualOwner) { /// owners are different
     // as we might loading object with the same shape in different modes like
@@ -73,7 +73,7 @@ bool ModuleBase_ViewerPrs::operator==(const ModuleBase_ViewerPrs& thePrs)
                        (myShape.get() && myShape->isEqual(thePrs.shape()));
   bool isEqualIO = (myInteractive == thePrs.interactive()) == Standard_True;
 
-  bool isEqualOwner = (myOwner.Access() == thePrs.owner().Access());
+  bool isEqualOwner = myOwner.get() == thePrs.owner().get();
   if (isEqualResult && isEqualShape && isEqualIO &&
       !isEqualOwner) { /// owners are different
     // as we might loading object with the same shape in different modes like

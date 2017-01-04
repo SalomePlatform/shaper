@@ -1,7 +1,12 @@
 ## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
+INCLUDE(UseQtExt)
 
-SET(CMAKE_AUTOMOC ON)
+# additional include directories
+INCLUDE_DIRECTORIES(${QT_INCLUDES})
+
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 SET(PROJECT_HEADERS
 	SHAPER_SHAPERGUI.h
@@ -12,9 +17,8 @@ SET(PROJECT_HEADERS
 	SHAPERGUI_NestedButton.h
 )
 
-SET(PROJECT_AUTOMOC
-    ${CMAKE_CURRENT_BINARY_DIR}/SHAPERGUI_automoc.cpp
-)
+# sources / moc wrappings
+QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_HEADERS})
 
 SET(PROJECT_SOURCES
 	SHAPERGUI.cpp
@@ -33,35 +37,40 @@ SET(PROJECT_RESOURCES
 SET(PROJECT_LIBRARIES
     Events
     Config
-	XGUI
-	ModuleBase
-	${QT_LIBRARIES}
-	${suit}
-	${std}
-	${LightApp}
-	${CAM}
-	${OCCViewer}
-	${qtx}
-	${CAS_SHAPE}
+    XGUI
+    ModuleBase
+    ${QT_LIBRARIES}
+    ${suit}
+    ${std}
+    ${LightApp}
+    ${CAM}
+    ${OCCViewer}
+    ${qtx}
+    ${CAS_SHAPE}
 )
 
 ADD_DEFINITIONS( -DSHAPERGUI_EXPORTS ${CAS_DEFINITIONS} )
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/XGUI
-					${PROJECT_SOURCE_DIR}/src/Events
-					${PROJECT_SOURCE_DIR}/src/ModuleBase
+                    ${PROJECT_SOURCE_DIR}/src/Events
+                    ${PROJECT_SOURCE_DIR}/src/ModuleBase
                     ${PROJECT_SOURCE_DIR}/src/ModelAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
                     ${PROJECT_SOURCE_DIR}/src/Config
-					${PROJECT_SOURCE_DIR}/src/ExchangePlugin
-					${SALOME_GUI_INCLUDE}
-					${SALOME_KERNEL_INCLUDE}
+                    ${PROJECT_SOURCE_DIR}/src/ExchangePlugin
+                    ${SALOME_GUI_INCLUDE}
+                    ${SALOME_KERNEL_INCLUDE}
                     ${CAS_INCLUDE_DIRS}
 )
+
+IF(${HAVE_SALOME})
+  INCLUDE_DIRECTORIES(${SALOME_KERNEL_INCLUDE})
+ENDIF(${HAVE_SALOME})
 
 ADD_LIBRARY(SHAPER SHARED
 	${PROJECT_SOURCES}
 	${PROJECT_HEADERS}
+	${PROJECT_AUTOMOC}
 )
 
 ADD_DEPENDENCIES(SHAPER XGUI)

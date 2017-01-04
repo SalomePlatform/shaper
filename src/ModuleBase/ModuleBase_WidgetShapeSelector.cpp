@@ -16,6 +16,7 @@
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_IconFactory.h>
 
+#include <Config_Translator.h>
 #include <Config_WidgetAPI.h>
 #include <Events_Loop.h>
 #include <Events_Message.h>
@@ -73,14 +74,14 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
   QFormLayout* aLayout = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aLayout);
 
-  QString aLabelText = QString::fromStdString(theData->widgetLabel());
+  QString aLabelText = translate(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   myLabel = new QLabel(aLabelText, this);
   if (!aLabelIcon.isEmpty())
     myLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
 
 
-  QString aToolTip = QString::fromStdString(theData->widgetTooltip());
+  QString aToolTip = translate(theData->widgetTooltip());
   myTextLine = new QLineEdit(this);
   QString anObjName = QString::fromStdString(attributeID());
   myTextLine->setObjectName(anObjName);

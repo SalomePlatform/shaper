@@ -145,5 +145,5 @@ assert (len(anRevolutionCutFt.results()) > 0)
 aCurrentResult = modelAPI_ResultBody(anRevolutionCutFt.firstResult())
 assert (aCurrentResult is not None)
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

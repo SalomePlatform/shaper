@@ -46,9 +46,6 @@ class ModelAPI_ResultPart : public ModelAPI_Result
     return RESULT_BODY_COLOR;
   }
 
-  // Part result can not be cencealed, even by the movement features
-  MODELAPI_EXPORT virtual bool isConcealed();
-
   /// Returns the part-document of this result
   virtual std::shared_ptr<ModelAPI_Document> partDoc() = 0;
 

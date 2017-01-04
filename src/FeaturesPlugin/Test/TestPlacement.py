@@ -218,5 +218,5 @@ assert (len(aPlacementFt.results()) > 0)
 aPlacementResult = modelAPI_ResultBody(aPlacementFt.firstResult())
 assert (aPlacementResult is not None)
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

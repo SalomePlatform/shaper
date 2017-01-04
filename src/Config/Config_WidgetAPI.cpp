@@ -20,6 +20,7 @@ Config_WidgetAPI::Config_WidgetAPI(std::string theRawXml)
 {
   myDoc = xmlParseDoc(BAD_CAST theRawXml.c_str());
   myCurrentNode = xmlDocGetRootElement(myDoc);
+  myFeatureId = getProperty(_ID);
 }
 
 Config_WidgetAPI::~Config_WidgetAPI()
@@ -99,6 +100,11 @@ std::string Config_WidgetAPI::getProperty(const char* thePropName) const
 bool Config_WidgetAPI::getBooleanAttribute(const char* theAttributeName, bool theDefault) const
 {
   return ::getBooleanAttribute(myCurrentNode, theAttributeName, theDefault);
+}
+
+std::string Config_WidgetAPI::featureId() const
+{
+  return myFeatureId;
 }
 
 std::string Config_WidgetAPI::widgetId() const

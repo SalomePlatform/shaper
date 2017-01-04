@@ -1,4 +1,4 @@
-// Copyright (C) 2013-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2013-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -140,7 +140,7 @@ namespace XAO
          * Gets the number of the steps.
          * @return the number of steps.
          */
-        const int countSteps() const { return int(m_steps.size()); }
+        const int countSteps() const { return m_steps.size(); }
 
         /**
          * Gets the name of a component.

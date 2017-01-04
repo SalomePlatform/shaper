@@ -2,70 +2,114 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en_US">
 <context>
-  <name>Box</name>
+  <name>Box:Model_FeatureValidator</name>
   <message>
-    <source>Model_FeatureValidator: Attribute "height" is not initialized.</source>
+    <source>Attribute "height" is not initialized.</source>
     <translation>Height of the box is not defined.</translation>
   </message>
-
+</context>
+<context>
+  <name>Box:height:GeomValidators_Positive</name>
   <message>
-    <source>height - GeomValidators_Positive: Double is not initialized.</source>
+    <source>Double is not initialized.</source>
     <translation>Height of the box is not defined.</translation>
   </message>
+</context>
+<context>
+  <name>Box:height:GeomValidators_Positive</name>
   <message>
-    <source>height - GeomValidators_Positive: Double is not positive.</source>
+    <source>Double is not positive.</source>
     <translation>Height of the box is too small.</translation>
   </message>
+</context>
+<context>
+  <name>Box:height:GeomValidators_Positive</name>
   <message>
-    <source>height - GeomValidators_Positive: Integer is not initialized.</source>
+    <source>Integer is not initialized.</source>
     <translation>Height of the box is not defined.</translation>
   </message>
+</context>
+<context>
+  <name>Box:height:GeomValidators_Positive</name>
   <message>
-    <source>height - GeomValidators_Positive: Integer is not positive.</source>
+    <source>Integer is not positive.</source>
     <translation>Height of the box is too small.</translation>
   </message>
+</context>
+<context>
+  <name>Box:Model_FeatureValidator</name>
   <message>
-    <source>Model_FeatureValidator: Attribute "width" is not initialized.</source>
+    <source>Attribute "width" is not initialized.</source>
     <translation>Set the box width</translation>
   </message>
+</context>
+<context>
+  <name>Box:Model_FeatureValidator</name>
   <message>
-    <source>Model_FeatureValidator: Attribute "length" is not initialized.</source>
+    <source>Attribute "length" is not initialized.</source>
     <translation>Set the box length</translation>
   </message>
+</context>
+<context>
+  <name>Box:Model_FeatureValidator</name>
   <message>
-    <source>Model_FeatureValidator: Attribute "height" is not initialized.</source>
+    <source>Attribute "height" is not initialized.</source>
     <translation>Set the box height</translation>
   </message>
+</context>
+<context>
+  <name>Box:width:GeomValidators_Positive</name>
   <message>
-    <source>width - GeomValidators_Positive: Double is not initialized.</source>
+    <source>Double is not initialized.</source>
     <translation>Set the box width</translation>
   </message>
+</context>
+<context>
+  <name>Box:width:GeomValidators_Positive</name>
   <message>
-    <source>width - GeomValidators_Positive: Double is not positive.</source>
+    <source>Double is not positive.</source>
     <translation>The box width must be positive</translation>
   </message>
+</context>
+<context>
+  <name>Box:width:GeomValidators_Positive</name>
   <message>
-    <source>width - GeomValidators_Positive: Integer is not initialized.</source>
+    <source>Integer is not initialized.</source>
     <translation></translation>
   </message>
+</context>
+<context>
+  <name>Box:width:GeomValidators_Positive</name>
   <message>
-    <source>width - GeomValidators_Positive: Integer is not positive.</source>
+    <source>Integer is not positive.</source>
     <translation></translation>
   </message>
+</context>
+<context>
+  <name>Box:length:GeomValidators_Positive</name>
   <message>
-    <source>length - GeomValidators_Positive: Double is not initialized.</source>
+    <source>Double is not initialized.</source>
     <translation>Set the box length</translation>
   </message>
+</context>
+<context>
+  <name>Box:length:GeomValidators_Positive</name>
   <message>
-    <source>length - GeomValidators_Positive: Double is not positive.</source>
+    <source>Double is not positive.</source>
     <translation>The box width must be positive</translation>
   </message>
+</context>
+<context>
+  <name>Box:length:GeomValidators_Positive</name>
   <message>
-    <source>length - GeomValidators_Positive: Integer is not initialized.</source>
+    <source>Integer is not initialized.</source>
     <translation></translation>
   </message>
+</context>
+<context>
+  <name>Box:length:GeomValidators_Positive</name>
   <message>
-    <source>length - GeomValidators_Positive: Integer is not positive.</source>
+    <source>Integer is not positive.</source>
     <translation></translation>
   </message>
 </context>

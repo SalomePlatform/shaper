@@ -32,29 +32,31 @@ struct _xmlDoc;
  * \ingroup Config
  * \brief Provides low-level API for WidgetFactory for reading xml definitions of widgets
  */
-class CONFIG_EXPORT Config_WidgetAPI
+class Config_WidgetAPI
 {
  public:
-  virtual ~Config_WidgetAPI();
+  CONFIG_EXPORT virtual ~Config_WidgetAPI();
 
   //! Returns name of widget's node (attribute)
-  std::string widgetType() const;
+  CONFIG_EXPORT std::string widgetType() const;
   //! Returns true if widget has container type, which means it able to contain other widgets
-  bool isGroupBoxWidget() const;
+  CONFIG_EXPORT bool isGroupBoxWidget() const;
   //! Returns true if widget has page type;
   //! Page is container widget with combo box control to switch between pages
-  bool isPagedWidget() const;
+  CONFIG_EXPORT bool isPagedWidget() const;
 
+  //! Returns id of current feature
+  CONFIG_EXPORT std::string featureId() const;
   //! Returns id of current widget
-  std::string widgetId() const;
+  CONFIG_EXPORT std::string widgetId() const;
   //! Returns icon of current widget
-  std::string widgetIcon() const;
+  CONFIG_EXPORT std::string widgetIcon() const;
   //! Returns text for label of current widget
-  std::string widgetLabel() const;
+  CONFIG_EXPORT std::string widgetLabel() const;
   //! Returns text for tooltip of current widget
-  std::string widgetTooltip() const;
+  CONFIG_EXPORT std::string widgetTooltip() const;
   //! Returns a custom property of current widget
-  std::string getProperty(const char* thePropName) const;
+  CONFIG_EXPORT std::string getProperty(const char* thePropName) const;
 
   /*! Checks if the XML representation of widget has given attribute,
    *  if yes - returns it's bool value, if no, or if the value can not
@@ -63,21 +65,22 @@ class CONFIG_EXPORT Config_WidgetAPI
    *  \param theDefault default value on bad data
    *  \return the boolean result
    */
-  bool getBooleanAttribute(const char* theAttributeName, bool theDefault) const;
+  CONFIG_EXPORT bool getBooleanAttribute(const char* theAttributeName, bool theDefault) const;
 
  protected:
   /// These fields are accessible for ModuleBase_WidgetFactory only
-  Config_WidgetAPI(std::string theRawXml);
+  CONFIG_EXPORT Config_WidgetAPI(std::string theRawXml);
   //! Pass to the next (sibling) node of widget's xml definition. If impossible, returns false
-  bool toNextWidget();
+  CONFIG_EXPORT bool toNextWidget();
   //! Pass into the child node of widget's xml definition. If impossible, returns false
-  bool toChildWidget();
+  CONFIG_EXPORT bool toChildWidget();
   //! Pass into the parent node of widget's xml definition. If impossible, returns false
-  bool toParentWidget();
+  CONFIG_EXPORT bool toParentWidget();
 
  private:
   xmlDocPtr myDoc; //!< Pointer to the root of widget's xml definition
   xmlNodePtr myCurrentNode; //!< Pointer to the current node in the widget's xml definition
+  std::string myFeatureId;
 
   friend class ModuleBase_WidgetFactory;
 };

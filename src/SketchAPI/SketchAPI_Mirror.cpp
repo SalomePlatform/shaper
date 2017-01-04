@@ -39,7 +39,7 @@ SketchAPI_Mirror::~SketchAPI_Mirror()
 
 }
 
-std::list<std::shared_ptr<ModelHighAPI_Interface> > SketchAPI_Mirror::mirrored() const
+std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Mirror::mirrored() const
 {
   std::list<ObjectPtr> aList = mirroredObjects()->list();
   std::list<FeaturePtr> anIntermediate;
@@ -65,12 +65,29 @@ void SketchAPI_Mirror::dump(ModelHighAPI_Dumper& theDumper) const
 
   // Dump variables for a list of mirrored features
   theDumper << "[";
-  std::list<std::shared_ptr<ModelHighAPI_Interface> > aList = mirrored();
-  std::list<std::shared_ptr<ModelHighAPI_Interface> >::const_iterator anIt = aList.begin();
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > aList = mirrored();
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> >::const_iterator anIt = aList.begin();
   for (; anIt != aList.end(); ++anIt) {
     if (anIt != aList.begin())
       theDumper << ", ";
-    theDumper << theDumper.name((*anIt)->feature(), false);
+    theDumper << (*anIt)->feature();
   }
   theDumper << "] = " << theDumper.name(aBase) << ".mirrored()" << std::endl;
+
+  // Set necessary "auxiliary" flag for mirrored features
+  // (flag is set if it differs to base entity)
+  std::list<ObjectPtr> aMirList = aMirrorObjects->list();
+  std::list<ObjectPtr>::const_iterator aMIt = aMirList.begin();
+  for (anIt = aList.begin(); aMIt != aMirList.end(); ++aMIt, ++anIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*aMIt);
+    if (!aFeature)
+      continue;
+    bool aBaseAux = aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
+
+    aFeature = (*anIt)->feature();
+    bool aFeatAux = aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
+    if (aFeatAux != aBaseAux)
+      theDumper << theDumper.name((*anIt)->feature(), false)
+                << ".setAuxiliary(" << aFeatAux << ")" <<std::endl;
+  }
 }

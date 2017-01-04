@@ -2,7 +2,7 @@ import unittest
 
 import ModelAPI
 import ConstructionAPI
-import model
+from salome.shaper import model
 
 class AxisTestCase(unittest.TestCase):
 

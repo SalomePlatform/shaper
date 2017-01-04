@@ -20,7 +20,7 @@
 #include <SelectMgr_IndexedMapOfOwner.hxx>
 
 class XGUI_Workshop;
-class Handle_SelectMgr_EntityOwner;
+class SelectMgr_EntityOwner;
 class ModuleBase_ViewerPrs;
 
 /**
@@ -43,7 +43,7 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   /// \param thePrs a container for selection
   /// \param theOwner a selection owner
   virtual void fillPresentation(std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
-                                const Handle_SelectMgr_EntityOwner& theOwner) const;
+                                const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
   /// Returns a list of viewer highlited presentations
   /// \return list of presentations

@@ -34,7 +34,7 @@ ModuleBase_WidgetFileSelector::ModuleBase_WidgetFileSelector(QWidget* theParent,
                                                              const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData)
 {
-  myTitle = QString::fromStdString(theData->getProperty("title"));
+  myTitle = translate(theData->getProperty("title"));
   myType = (theData->getProperty("type") == "save") ? WFS_SAVE : WFS_OPEN;
   myDefaultPath = QString::fromStdString(theData->getProperty("path"));
 

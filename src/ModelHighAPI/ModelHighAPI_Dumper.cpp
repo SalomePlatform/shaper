@@ -35,6 +35,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultPart.h>
 
@@ -203,6 +204,30 @@ void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
 
     myNames[*aResIt] = EntityName(aResName,
         (isUserDefined ? aResName : std::string()), !isUserDefined);
+
+    // check names of sub-results for CompSolid
+    ResultCompSolidPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aResIt);
+    if (aCompSolid) {
+      int aNbSubs = aCompSolid->numberOfSubs();
+      for (int j = 0; j < aNbSubs; ++j) {
+        isUserDefined = true;
+        ResultPtr aSub = aCompSolid->subResult(j);
+        std::string aSubName = aSub->data()->name();
+        size_t anIndex = aSubName.find(aResName);
+        if (anIndex == 0) {
+          std::string aSuffix = aSubName.substr(aResName.length());
+          if (aSuffix.empty() && aNbSubs == 1) // first result may not constain index in the name
+            isUserDefined = false;
+          else {
+            if (aSuffix[0] == '_' && std::stoi(aSuffix.substr(1)) == j + 1)
+              isUserDefined = false;
+          }
+        }
+
+        myNames[aSub] = EntityName(aSubName,
+            (isUserDefined ? aSubName : std::string()), !isUserDefined);
+      }
+    }
   }
 }
 
@@ -367,7 +392,7 @@ bool ModelHighAPI_Dumper::exportTo(const std::string& theFileName)
   if (!myModules.empty())
     aFile << std::endl;
 
-  aFile << "import model" << std::endl << std::endl;
+  aFile << "from salome.shaper import model" << std::endl << std::endl;
   aFile << "model.begin()" << std::endl;
 
   // dump collected data
@@ -436,6 +461,7 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
     }
   }
 
+  myNames[aLastDumped.myEntity].myIsDumped = true;
   myEntitiesStack.pop();
 }
 
@@ -626,16 +652,34 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity
 {
   myDumpBuffer << name(theEntity);
 
-  bool isUserDefinedName = !myNames[theEntity].myIsDefault;
-  // store results if they have user-defined names or colors
-  std::list<ResultPtr> aResultsWithNameOrColor;
-  const std::list<ResultPtr>& aResults = theEntity->results();
-  std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
-  for (; aResIt != aResults.end(); ++aResIt)
-    if (!myNames[*aResIt].myIsDefault || !isDefaultColor(*aResIt) || !isDefaultDeflection(*aResIt))
-      aResultsWithNameOrColor.push_back(*aResIt);
-  // store just dumped entity to stack
-  myEntitiesStack.push(LastDumpedEntity(theEntity, isUserDefinedName, aResultsWithNameOrColor));
+  if (!myNames[theEntity].myIsDumped) {
+    bool isUserDefinedName = !myNames[theEntity].myIsDefault;
+    // store results if they have user-defined names or colors
+    std::list<ResultPtr> aResultsWithNameOrColor;
+    const std::list<ResultPtr>& aResults = theEntity->results();
+    std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
+    for (; aResIt != aResults.end(); ++aResIt) {
+      if (!myNames[*aResIt].myIsDefault || !isDefaultColor(*aResIt) ||
+          !isDefaultDeflection(*aResIt))
+        aResultsWithNameOrColor.push_back(*aResIt);
+
+      ResultCompSolidPtr aCompSolid =
+          std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aResIt);
+      if (aCompSolid) {
+        int aNbSubs = aCompSolid->numberOfSubs();
+        for (int i = 0; i < aNbSubs; ++i) {
+          ResultPtr aCurRes = aCompSolid->subResult(i);
+          if (!myNames[aCurRes].myIsDefault || !isDefaultColor(aCurRes) ||
+              !isDefaultDeflection(aCurRes))
+            aResultsWithNameOrColor.push_back(aCurRes);
+        }
+      }
+    }
+    // store just dumped entity to stack
+    if (myEntitiesStack.empty() || myEntitiesStack.top().myEntity != theEntity)
+      myEntitiesStack.push(
+          LastDumpedEntity(theEntity, isUserDefinedName, aResultsWithNameOrColor));
+  }
 
   // remove entity from the list of not dumped items
   myNotDumpedEntities.erase(theEntity);
@@ -646,11 +690,23 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const ResultPtr& theResult)
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theResult);
   int anIndex = 0;
+  int aSubIndex = -1;
   std::list<ResultPtr> aResults = aFeature->results();
   for(std::list<ResultPtr>::const_iterator
       anIt = aResults.cbegin(); anIt != aResults.cend(); ++anIt, ++anIndex) {
     if(theResult->isSame(*anIt)) {
       break;
+    }
+
+    ResultCompSolidPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*anIt);
+    if (aCompSolid) {
+      int aNbSubs = aCompSolid->numberOfSubs();
+      for (aSubIndex = 0; aSubIndex < aNbSubs; ++aSubIndex)
+        if (theResult->isSame(aCompSolid->subResult(aSubIndex)))
+          break;
+      if (aSubIndex < aNbSubs)
+        break;
+      aSubIndex = -1;
     }
   }
 
@@ -659,6 +715,9 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const ResultPtr& theResult)
     myDumpBuffer << ".result()";
   } else {
     myDumpBuffer << ".results()[" << anIndex << "]";
+  }
+  if (aSubIndex >= 0) {
+    myDumpBuffer << ".subResult(" << aSubIndex << ")";
   }
   return *this;
 }

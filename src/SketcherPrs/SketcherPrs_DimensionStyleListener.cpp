@@ -5,6 +5,7 @@
 // Author:      Natalia ERMOLAEVA
 
 #include "SketcherPrs_DimensionStyleListener.h"
+#include <Prs3d_DimensionAspect.hxx>
 #include "SketcherPrs_Tools.h"
 
 #include <Events_Loop.h>

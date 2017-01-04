@@ -26,6 +26,10 @@
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
+#ifdef VINSPECTOR
+#include <VInspectorAPI_CallBack.h>
+#endif
+
 XGUI_SelectionMgr::XGUI_SelectionMgr(XGUI_Workshop* theParent)
     : QObject(theParent),
       myWorkshop(theParent)
@@ -52,48 +56,22 @@ void XGUI_SelectionMgr::connectViewers()
 void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& theSelectedOwners,
                                           bool isUpdateViewer)
 {
-  SelectMgr_IndexedMapOfOwner aSelectedOwners;
-  selection()->selectedOwners(aSelectedOwners);
-
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull()) {
+    /// previous selection should be cleared, else there will be decomposition of selections:
+    /// as AddOrRemoveSelected inverts current selection
+    aContext->ClearSelected(false);
+
     for  (Standard_Integer i = 1, n = theSelectedOwners.Extent(); i <= n; i++)  {
       Handle(SelectMgr_EntityOwner) anOwner = theSelectedOwners(i);
-      if (aSelectedOwners.FindIndex(anOwner) > 0)
-        continue;
 
       aContext->AddOrRemoveSelected(anOwner, isUpdateViewer);
+      #ifdef VINSPECTOR
+      if (myWorkshop->displayer()->getCallBack())
+        myWorkshop->displayer()->getCallBack()->AddOrRemoveSelected(anOwner);
+      #endif
     }
   }
-  ModuleBase_Tools::selectionInfo(aContext,
-                                  "XGUI_SelectionMgr::setSelectedOwners -- AddOrRemoveSelected");
-}
-
-//**************************************************************
-void XGUI_SelectionMgr::updateSelectedOwners(bool isUpdateViewer)
-{
-  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (aContext.IsNull())
-    return;
-
-  const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
-
-  SelectMgr_IndexedMapOfOwner anOwnersToDeselect;
-
-  SelectMgr_ListIteratorOfListOfFilter anIt(aFilters);
-  for (; anIt.More(); anIt.Next()) {
-    Handle(SelectMgr_Filter) aFilter = anIt.Value();
-    for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
-      Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
-      if (!aFilter->IsOk(anOwner))
-        anOwnersToDeselect.Add(aContext->SelectedOwner());
-    }
-  }
-
-  setSelectedOwners(anOwnersToDeselect, false);
-
-  if (isUpdateViewer)
-    aContext->UpdateCurrentViewer();
 }
 
 //**************************************************************

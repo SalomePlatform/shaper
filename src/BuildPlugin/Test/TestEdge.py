@@ -55,5 +55,5 @@ aSession.finishOperation()
 # Test results
 assert (len(anEdgeFeature.results()) == aNumOfLines)
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

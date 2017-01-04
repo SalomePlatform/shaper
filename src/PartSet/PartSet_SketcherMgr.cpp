@@ -133,8 +133,8 @@ void getAttributesOrResults(const Handle(SelectMgr_EntityOwner)& theOwner,
 }
 
 PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
-  : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false),
-    myIsMouseOverWindow(false),
+  : QObject(theModule), myModule(theModule), myIsEditLaunching(false), myIsDragging(false),
+    myDragDone(false), myIsMouseOverWindow(false),
     myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
     myIsPopupMenuActive(false)
 {
@@ -266,6 +266,8 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
 }
 
+/*
+//Temporary commented as we do not modify values in property panel
 void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
 {
   if (!isNestedEditOperation(getCurrentOperation(), myModule->sketchMgr()->activeSketch()) ||
@@ -299,9 +301,8 @@ void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
   aDisplayer->enableUpdateViewer(myPreviousUpdateViewerEnabled);
   aDisplayer->updateViewer();
-
-
 }
+*/
 
 void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
@@ -375,9 +376,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       myDragDone = false;
 
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
-      // selection should be restored before edit operation start to process the
-      // selected entities, e.g. selection of point(attribute on a line) should edit the point
-      restoreSelection();
       launchEditing();
       if (aFeature.get() != NULL) {
         std::shared_ptr<SketchPlugin_Feature> aSPFeature =
@@ -394,16 +392,20 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       }
     } else if (isSketchOpe && isEditing) {
       // If selected another object commit current result
+      bool aPrevLaunchingState = myIsEditLaunching;
+      /// store editing state for Edit operation in order to do not clear highlight by restart
+      /// of edit operation.
+      /// Internal edit should not be stored as editing operation as the result will be a
+      /// creation operation, where previous selection should not be used(and will be cleared)
+      myIsEditLaunching = !myModule->sketchReentranceMgr()->isInternalEditActive();
       aFOperation->commit();
 
       myIsDragging = true;
       myDragDone = false;
 
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
-      // selection should be restored before edit operation start to process the
-      // selected entities, e.g. selection of point(attribute on a line) should edit the point
-      restoreSelection();
       launchEditing();
+      myIsEditLaunching = aPrevLaunchingState;
       if (aFeature.get() != NULL) {
         std::shared_ptr<SketchPlugin_Feature> aSPFeature =
                   std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
@@ -417,7 +419,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
           aFPAttr->setValue(myCurrentPoint.myCurX, myCurrentPoint.myCurY);
         }
       }
-      restoreSelection();
     }
   }
 }
@@ -699,17 +700,16 @@ bool PartSet_SketcherMgr::sketchSolverError()
 
 QString PartSet_SketcherMgr::getFeatureError(const FeaturePtr& theFeature)
 {
-  std::string anError = "";
+  QString anError;
   if (!theFeature.get() || !theFeature->data()->isValid())
-    return anError.c_str();
+    return anError;
 
   CompositeFeaturePtr aSketch = activeSketch();
   if (aSketch.get() && aSketch == theFeature) {
-    AttributeStringPtr aAttributeString = aSketch->string(SketchPlugin_Sketch::SOLVER_ERROR());
-    anError = aAttributeString->value();
-    ModuleBase_Tools::translate(aSketch->getKind(), anError);
+    std::string aSolverError = aSketch->string(SketchPlugin_Sketch::SOLVER_ERROR())->value();
+    anError = ModuleBase_Tools::translate(aSketch->getKind(), aSolverError);
   }
-  return anError.c_str();
+  return anError;
 }
 
 void PartSet_SketcherMgr::clearClickedFlags()
@@ -1035,7 +1035,19 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
   //}
   /// improvement to deselect automatically all eventual selected objects, when
   // returning to the neutral point of the Sketcher
-  workshop()->selector()->clearSelection();
+  bool isClearSelectionPossible = true;
+  if (myIsEditLaunching) {
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                                          (theOperation);
+    if (aFOperation) {
+      FeaturePtr aFeature = aFOperation->feature();
+      if (aFeature.get() && PartSet_SketcherMgr::isEntity(aFeature->getKind())) {
+        isClearSelectionPossible = false;
+      }
+    }
+  }
+  if (isClearSelectionPossible)
+    workshop()->selector()->clearSelection();
 }
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
@@ -1519,6 +1531,7 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
 void PartSet_SketcherMgr::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget,
                                                  const bool isToConnect)
 {
+  /*Temporary commented as we do not modify values in property panel
   if (isToConnect) {
     connect(theWidget, SIGNAL(beforeValuesChanged()),
             this, SLOT(onBeforeValuesChangedInPropertyPanel()));
@@ -1530,7 +1543,7 @@ void PartSet_SketcherMgr::connectToPropertyPanel(ModuleBase_ModelWidget* theWidg
                 this, SLOT(onBeforeValuesChangedInPropertyPanel()));
     disconnect(theWidget, SIGNAL(afterValuesChanged()),
                 this, SLOT(onAfterValuesChangedInPropertyPanel()));
-  }
+  }*/
 }
 
 void PartSet_SketcherMgr::widgetStateChanged(int thePreviousState)
@@ -1700,12 +1713,12 @@ void PartSet_SketcherMgr::restoreSelection()
   FeatureToSelectionMap::const_iterator aSIt = myCurrentSelection.begin(),
                                         aSLast = myCurrentSelection.end();
   SelectMgr_IndexedMapOfOwner anOwnersToSelect;
+  anOwnersToSelect.Clear();
   for (; aSIt != aSLast; aSIt++) {
-    anOwnersToSelect.Clear();
     getSelectionOwners(aSIt.key(), myCurrentSketch, aWorkshop, myCurrentSelection,
                         anOwnersToSelect);
-    aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
   }
+  aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
 }
 
 void PartSet_SketcherMgr::onShowConstraintsToggle(int theType, bool theState)

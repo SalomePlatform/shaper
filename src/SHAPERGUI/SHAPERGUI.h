@@ -143,7 +143,7 @@ Q_OBJECT
   /// \brief The method is redefined to connect to the study viewer before the data
   /// model is filled by opened file. This file open will flush redisplay signals for,
   /// objects which should be visualized
-  virtual void connectToStudy(CAM_Study* theStudy);
+  //virtual void connectToStudy(CAM_Study* theStudy);
 
    /// \brief The method is called on the module activation
    /// \param theStudy current study
@@ -164,6 +164,9 @@ Q_OBJECT
 
   /// Set preferences to default
   void onDefaultPreferences();
+
+  /// Hide object browser if it was created during loading script
+  void onScriptLoaded();
 
   /// Obtains the current application and updates its actions
   void onUpdateCommandStatus();

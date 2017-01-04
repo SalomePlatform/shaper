@@ -30,7 +30,7 @@
 #include <BRepTools.hxx>
 #include <BRepTopAdaptor_FClass2d.hxx>
 #include <Geom2d_Curve.hxx>
-#include <Handle_Geom2d_Curve.hxx>
+#include <Geom2d_Curve.hxx>
 #include <BRepLib_CheckCurveOnSurface.hxx>
 #include <BRep_Tool.hxx>
 #include <Geom_Plane.hxx>
@@ -301,7 +301,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
   }
 
   TopoDS_Shape anInShape = aResult->impl<TopoDS_Shape>();
-  NCollection_List<TopoDS_Shape> anUngroupedShapes;
+  NCollection_List<TopoDS_Shape> anUngroupedShapes, aStillUngroupedShapes;
   addSimpleShapeToList(anInShape, anUngroupedShapes);
 
   NCollection_Vector<NCollection_List<TopoDS_Shape>> aGroups;
@@ -311,31 +311,39 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
     anUngroupedShapes.RemoveFirst();
     for(NCollection_List<TopoDS_Shape>::Iterator aGroupIt(aGroupedShapes);
         aGroupIt.More(); aGroupIt.Next()) {
-      const TopoDS_Shape& aGroupShape = aGroupIt.Value();
-      for(NCollection_List<TopoDS_Shape>::Iterator anUngroupedIt(anUngroupedShapes);
-          anUngroupedIt.More(); anUngroupedIt.Next()) {
-        const TopoDS_Shape& anUngroupedShape = anUngroupedIt.Value();
-        bool isFound = false;
-        for(TopExp_Explorer aGroupShapeExp(aGroupShape, TopAbs_VERTEX);
-            aGroupShapeExp.More(); aGroupShapeExp.Next()) {
-          const TopoDS_Shape& aVertex1 = aGroupShapeExp.Current();
-          for(TopExp_Explorer anUngroupedShapeExp(anUngroupedShape, TopAbs_VERTEX);
-              anUngroupedShapeExp.More(); anUngroupedShapeExp.Next()) {
-            const TopoDS_Shape& aVertex2 = anUngroupedShapeExp.Current();
+      const TopoDS_Shape& aGroupedShape = aGroupIt.Value();
+      for(TopExp_Explorer aGroupShapeExp(aGroupedShape, TopAbs_VERTEX);
+          aGroupShapeExp.More();
+          aGroupShapeExp.Next()) {
+        // Find all shapes which have same vertex.
+        aStillUngroupedShapes.Clear();
+        const TopoDS_Shape& aVertex1 = aGroupShapeExp.Current();
+        for(NCollection_List<TopoDS_Shape>::Iterator anUngroupedIt(anUngroupedShapes);
+            anUngroupedIt.More();
+            anUngroupedIt.Next()) {
+          const TopoDS_Shape& anUngroupedShape = anUngroupedIt.Value();
+          bool isAdded = false;
+          for(TopExp_Explorer anUgroupedShapeExp(anUngroupedShape, TopAbs_VERTEX);
+              anUgroupedShapeExp.More();
+              anUgroupedShapeExp.Next()) {
+            const TopoDS_Shape& aVertex2 = anUgroupedShapeExp.Current();
             if(aVertex1.IsSame(aVertex2)) {
               aGroupedShapes.Append(anUngroupedShape);
-              anUngroupedShapes.Remove(anUngroupedIt);
-              isFound = true;
+              isAdded = true;
               break;
             }
           }
-          if(isFound) {
-            break;
+          if(!isAdded) {
+            aStillUngroupedShapes.Append(anUngroupedShape);
           }
         }
-        if(!anUngroupedIt.More()) {
+        anUngroupedShapes = aStillUngroupedShapes;
+        if(anUngroupedShapes.IsEmpty()) {
           break;
         }
+      }
+      if(anUngroupedShapes.IsEmpty()) {
+        break;
       }
     }
     aGroups.Append(aGroupedShapes);

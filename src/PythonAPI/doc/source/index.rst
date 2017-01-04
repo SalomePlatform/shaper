@@ -19,7 +19,7 @@ with the parametric API will typically begin with a code like below:
 
 .. doctest:: 
 
-   >>> import model
+   >>> from salome.shaper import model
    >>> model.begin()
    >>> partset = model.moduleDocument()
    >>> part = model.addPart(partset).document()

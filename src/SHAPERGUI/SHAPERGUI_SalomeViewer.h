@@ -150,7 +150,7 @@ Q_OBJECT
   void activateViewer(bool toActivate);
 
   // Fit all along Z (perpendicular to display)
-  virtual void Zfitall();
+  //virtual void Zfitall();
 
  private slots:
   void onMousePress(SUIT_ViewWindow*, QMouseEvent*);

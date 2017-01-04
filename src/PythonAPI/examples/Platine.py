@@ -2,8 +2,8 @@
 # Author: Sergey POKHODENKO
 # -----------------------------
 
-import geom
-import model
+from salome.shaper import geom
+from salome.shaper import model
 
 # START DEBUG PURPOSES
 # Should be removed

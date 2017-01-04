@@ -138,6 +138,9 @@ protected:
   /// For example, the "Edges" is converted to "edge"
   std::string validatorType(const QString& theType) const;
 
+  /// Clear selection in the viewer. The content of the widget is cleared also
+  void clearSelection();
+
 protected:
   /// Returns attribute indices selected in the widget selection list
   /// \param theIndices a list of indices

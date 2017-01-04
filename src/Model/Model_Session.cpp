@@ -324,7 +324,7 @@ std::shared_ptr<ModelAPI_Document> Model_Session::copy(
   Handle(TDF_DataSet) aDS = new TDF_DataSet;
   aDS->AddLabel(aSourceRoot);
   TDF_ClosureTool::Closure(aDS);
-  Handle(TDF_RelocationTable) aRT = new TDF_RelocationTable;
+  Handle(TDF_RelocationTable) aRT = new TDF_RelocationTable(Standard_True);
   aRT->SetRelocation(aSourceRoot, aTargetRoot);
   TDF_CopyTool::Copy(aDS, aRT);
 
@@ -422,7 +422,8 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
           }
         }
         if (!aFound) { // if not, the part was removed, so activate the module document
-          setActiveDocument(moduleDocument());
+          if (myCurrentDoc.get())
+            setActiveDocument(moduleDocument());
         }
       }
     }
@@ -471,4 +472,23 @@ ModelAPI_ValidatorsFactory* Model_Session::validators()
 int Model_Session::transactionID()
 {
   return ROOT_DOC->transactionID();
+}
+
+void Model_Session::forceLoadPlugin(const std::string& thePluginName)
+{
+  // load all information about plugins, features and attributes
+  LoadPluginsInfo();
+
+  // store name of current plugin for further restoring,
+  // because forceLoadPlugin may be called while loading another plugin
+  std::string aCurrentPluginName = myCurrentPluginName;
+
+  myCurrentPluginName = thePluginName;
+  if (myPluginObjs.find(myCurrentPluginName) == myPluginObjs.end()) {
+    // load plugin library if not yet done
+    Config_ModuleReader::loadPlugin(myCurrentPluginName);
+  }
+
+  // restore current plugin
+  myCurrentPluginName = aCurrentPluginName;
 }

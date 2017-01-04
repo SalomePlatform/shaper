@@ -1,7 +1,13 @@
 ## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 INCLUDE(Common)
-SET(CMAKE_AUTOMOC ON)
+INCLUDE(UseQtExt)
+
+# additional include directories
+INCLUDE_DIRECTORIES(${QT_INCLUDES})
+
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 SET(PROJECT_HEADERS
     SamplePanelPlugin.h
@@ -33,9 +39,18 @@ SET(PROJECT_LIBRARIES
 SET(XML_RESOURCES
   plugin-SamplePanel.xml
 )
+# sources / moc wrappings
+QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_HEADERS})
+
+SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC})
 
 ADD_DEFINITIONS(-DSAMPLEPANELPLUGIN_EXPORTS -DWNT)
-ADD_LIBRARY(SamplePanelPlugin MODULE ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES})
+ADD_LIBRARY(SamplePanelPlugin MODULE
+            ${PROJECT_SOURCES}
+            ${PROJECT_HEADERS}
+            ${XML_RESOURCES}
+            ${PROJECT_AUTOMOC})
+
 TARGET_LINK_LIBRARIES(SamplePanelPlugin ${PROJECT_LIBRARIES})
 
 INCLUDE_DIRECTORIES(

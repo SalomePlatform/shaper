@@ -2,7 +2,7 @@ import unittest
 
 import ModelAPI
 import ExchangeAPI
-import model
+from salome.shaper import model
 
 class ExchangeTestCase(unittest.TestCase):
 

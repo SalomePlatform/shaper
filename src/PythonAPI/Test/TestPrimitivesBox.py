@@ -2,7 +2,7 @@ import unittest
 
 import ModelAPI
 
-import model
+from salome.shaper import model
 
 class PrimitivesAddBox(unittest.TestCase):
 

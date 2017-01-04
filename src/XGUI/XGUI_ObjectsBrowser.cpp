@@ -20,12 +20,6 @@
 #include <QStyledItemDelegate>
 #include <QMessageBox>
 
-#ifdef WIN32
-#ifdef HAVE_SALOME
-#include <QWindowsStyle>
-#endif
-#endif
-
 
 /// Width of second column (minimum acceptable = 27)
 #define SECOND_COL_WIDTH 30
@@ -68,15 +62,6 @@ private:
 XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
     : QTreeView(theParent)
 {
-#ifdef WIN32
-#ifdef HAVE_SALOME
-  setStyle(new QWindowsStyle());
-#else
-  myStyle = new XGUI_TreeViewStyle();
-  setStyle(myStyle);
-#endif
-#endif
-
   setHeaderHidden(true);
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -138,7 +123,7 @@ void XGUI_DataTree::resizeEvent(QResizeEvent* theEvent)
   QTreeView::resizeEvent(theEvent);
   QSize aSize = theEvent->size();
   if (aSize.isValid()) {
-    setColumnWidth(0, aSize.width() - SECOND_COL_WIDTH - 6);
+    setColumnWidth(0, aSize.width() - SECOND_COL_WIDTH - 7);
     setColumnWidth(1, SECOND_COL_WIDTH);
   }
 }
@@ -167,10 +152,10 @@ void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
     aMgr->finishOperation();
   } else {
     // Ignore clicks on folders outside current document
-    if ((theIndex.internalId() == -1) && (aDoc != aMgr->moduleDocument()))
+    if ((theIndex.internalId() == 0) && (aDoc != aMgr->moduleDocument()))
       // Clicked folder under root but active document is another
       return;
-    if ((theIndex.internalId() != -1) && (aDoc.get() != theIndex.internalPointer()))
+    if ((theIndex.internalId() != 0) && (aDoc.get() != theIndex.internalPointer()))
       // Cliced not on active document folder
       return;
 
@@ -186,39 +171,6 @@ void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
     update(aModel->index(i, 1, aParent));
   }
 }
-
-#if (!defined HAVE_SALOME) && (defined WIN32)
-void XGUI_DataTree::drawRow(QPainter* thePainter,
-                            const QStyleOptionViewItem& theOptions,
-                            const QModelIndex& theIndex) const
-{
-  QStyleOptionViewItemV4 aOptions = theOptions;
-  myStyle->setIndex(theIndex);
-  QTreeView::drawRow(thePainter, aOptions, theIndex);
-}
-
-//********************************************************************
-//********************************************************************
-//********************************************************************
-void XGUI_TreeViewStyle::drawPrimitive(PrimitiveElement theElement,
-                                       const QStyleOption* theOption,
-                                       QPainter* thePainter, const QWidget* theWidget) const
-{
-  if ((theElement == QStyle::PE_PanelItemViewRow) || (theElement == QStyle::PE_PanelItemViewItem)) {
-    const QStyleOptionViewItemV4* aOptions =
-      qstyleoption_cast<const QStyleOptionViewItemV4 *>(theOption);
-    if (myIndex.isValid() && ((myIndex.flags() & Qt::ItemIsSelectable) == 0)) {
-      QStyle::State aState = aOptions->state;
-      if ((aState & QStyle::State_MouseOver) != 0)
-        aState &= ~QStyle::State_MouseOver;
-      QStyleOptionViewItemV4* aOpt = (QStyleOptionViewItemV4*) aOptions;
-      aOpt->state = aState;
-      QWindowsVistaStyle::drawPrimitive(theElement, aOpt, thePainter, theWidget);
-    }
-  }
-  QWindowsVistaStyle::drawPrimitive(theElement, theOption, thePainter, theWidget);
-}
-#endif
 
 
 //********************************************************************
@@ -243,9 +195,10 @@ void XGUI_ActiveDocLbl::setTreeView(QTreeView* theView)
   QColor aHighlightText = aPalet.highlightedText().color();
 
   myPreSelectionStyle = "QLabel {background-color: ";
-  myPreSelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 white, stop:1 " +
-    aHighlight.lighter(170).name() + ");";
-  myPreSelectionStyle += "border: 1px solid lightblue; border-radius: 2px }";
+  myPreSelectionStyle += aHighlight.lighter(170).name() + "}";
+  //myPreSelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 white, stop:1 " +
+  //  aHighlight.lighter(170).name() + ");";
+  //myPreSelectionStyle += "border: 1px solid lightblue; border-radius: 2px }";
 
   QString aName = aPalet.color(QPalette::Base).name();
   myNeutralStyle = "QLabel { border: 1px solid " + aName + " }";
@@ -253,9 +206,11 @@ void XGUI_ActiveDocLbl::setTreeView(QTreeView* theView)
 
 #if (!defined HAVE_SALOME) && (defined WIN32)
   mySelectionStyle = "QLabel {background-color: ";
-  mySelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(236, 245, 255)";
-  mySelectionStyle += ", stop:1 rgb(208, 229, 255));";
-  mySelectionStyle += "border: 1px solid rgb(132, 172, 221); border-radius: 2px }";
+  mySelectionStyle += "rgb(205, 232, 255); ";
+  //mySelectionStyle += "qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(236, 245, 255)";
+  //mySelectionStyle += ", stop:1 rgb(208, 229, 255));";
+  //mySelectionStyle += "border: 1px solid rgb(132, 172, 221); border-radius: 2px }";
+  mySelectionStyle += "border: 1px solid rgb(153, 209, 255) }";
 #else
   mySelectionStyle = "QLabel {background-color: " + aHighlight.name();
   mySelectionStyle += "; color : " + aHighlightText.name() + "}";
@@ -534,5 +489,36 @@ void XGUI_ObjectsBrowser::onAfterModelReset()
 {
   foreach(QModelIndex aIndex, myExpandedItems) {
     myTreeView->setExpanded(aIndex, true);
+  }
+}
+
+std::list<bool> XGUI_ObjectsBrowser::getStateForDoc(DocumentPtr theDoc) const
+{
+  std::list<bool> aStates;
+  XGUI_DataModel* aModel = dataModel();
+  QModelIndex aRootIdx = aModel->documentRootIndex(theDoc);
+  int aNbChild = aModel->rowCount(aRootIdx);
+  for (int i = 0; i < aNbChild; i++) {
+    QModelIndex aIdx = aModel->index(i, 0, aRootIdx);
+    aStates.push_back(myTreeView->isExpanded(aIdx));
+  }
+  return aStates;
+}
+
+void XGUI_ObjectsBrowser::setStateForDoc(DocumentPtr theDoc, const std::list<bool>& theStates)
+{
+  if (theStates.size() == 0)
+    return;
+  XGUI_DataModel* aModel = dataModel();
+  QModelIndex aRootIdx = aModel->documentRootIndex(theDoc);
+  int aNbChild = aModel->rowCount(aRootIdx);
+
+  std::list<bool>::const_iterator aIt;
+  int i = 0;
+  for (aIt = theStates.cbegin(); aIt != theStates.cend(); aIt++, i++) {
+    if (i >= aNbChild )
+      break;
+    QModelIndex aIdx = aModel->index(i, 0, aRootIdx);
+    myTreeView->setExpanded(aIdx, (*aIt));
   }
 }

@@ -31,7 +31,7 @@
                                  enable_value="enable_by_preferences"/>
         <sketch-2dpoint_selector id="EndPoint" accept_expressions="0" title="End point" tooltip="End point coordinates"
                                  enable_value="enable_by_preferences"/>
-        <doublevalue id="LineLength" accept_expressions="0" label="Length:" default="computed" icon="icons/Sketch/distance_value.png"
+        <labelvalue id="LineLength" accept_expressions="0" label="Length:" default="computed" icon="icons/Sketch/distance_value.png"
                      tooltip="Line length" obligatory="0" enable_value="false"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
         <validator id="GeomValidators_Different" parameters="StartPoint,EndPoint"/>
@@ -99,14 +99,13 @@
                                      enable_value="enable_by_preferences"/>
           </box>
         </toolbox>
-        <doublevalue id="ArcRadius" accept_expressions="0" label="Radius:" default="computed" icon="icons/Sketch/radius.png"
+        <labelvalue id="ArcRadius" accept_expressions="0" label="Radius:" default="computed" icon="icons/Sketch/radius.png"
                      tooltip="Set radius" obligatory="0" enable_value="enable_by_preferences">
           <validator id="GeomValidators_Positive"/>
-        </doublevalue>
-        <doublevalue id="ArcAngle" label="Angle:" icon="icons/Sketch/angle.png" tooltip="Set angle" default="90" use_reset="false" obligatory="0"
+        </labelvalue>
+        <labelvalue id="ArcAngle" label="Angle:" icon="icons/Sketch/angle.png" tooltip="Set angle" default="90" use_reset="false" obligatory="0"
                      enable_value="enable_by_preferences"/>
-        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"
-                   enable_value="enable_by_preferences"/>
+        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
 
       <!--  SketchConstraintFillet  -->
@@ -123,10 +122,10 @@
             clear_in_neutral_point="false">
           <validator id="SketchPlugin_FilletVertexValidator"/>
         </sketch_multi_selector>
-        <doublevalue label="Radius" tooltip="Fillet arc radius" id="ConstraintValue" accept_expressions="0" min="0" use_reset="false"
+        <labelvalue label="Radius" tooltip="Fillet arc radius" id="ConstraintValue" accept_expressions="0" min="0" use_reset="false"
                      enable_value="enable_by_preferences">
           <validator id="GeomValidators_Positive"/>
-        </doublevalue>
+        </labelvalue>
         <validator id="PartSet_FilletSelection"/>
       </feature>
       <!--  SketchConstraintSplit  -->
@@ -139,6 +138,7 @@
             use_external="false">
           <validator id="SketchPlugin_SplitValidator"/>
         </sketch_sub_shape_selector>
+        <validator id="PartSet_SplitSelection"/>
       </feature>
     </group>
 
@@ -177,6 +177,7 @@
               use_sketch_plane="false">
           <validator id="SketchPlugin_ProjectionValidator"/>
         </sketch_shape_selector>
+        <validator id="PartSet_ProjectionSelection"/>
       </feature>
     </group>
 
@@ -192,12 +193,13 @@
         </sketch_shape_selector>
         <sketch_multi_selector id="ConstraintMirrorList"
             label="Segments:"
-            tooltip="Select list of mirroring objects"
+            tooltip="Select list of objects to be mirrored"
             type_choice="Edges"
             use_external="true"
             greed ="true">
           <validator id="SketchPlugin_MirrorAttr" />
         </sketch_multi_selector>
+        <validator id="PartSet_MultyTranslationSelection" />
       </feature>
 
       <!--  SketchMultiTranslation  -->
@@ -207,7 +209,7 @@
         tooltip="Multiple translation">
         <sketch_multi_selector id="MultiTranslationList"
             label="Segments:"
-            tooltip="Select list of translating objects"
+            tooltip="Select list of objects to be translated"
             type_choice="Edges"
             use_external="true"
             greed ="true">
@@ -261,6 +263,7 @@
             default="2" min="2" use_reset="false">
           <validator id="GeomValidators_Positive"/>
         </integervalue>
+        <validator id="PartSet_MultyTranslationSelection" />
       </feature>
 
       <!--  SketchMultiRotation  -->
@@ -270,7 +273,7 @@
         tooltip="Multiple rotation">
         <sketch_multi_selector id="MultiRotationList"
             label="Segments:"
-            tooltip="Select list of rotating objects"
+            tooltip="Select list of objects to be rotated"
             type_choice="Edges"
             use_external="true"
             greed ="true">
@@ -305,6 +308,7 @@
             default="2" min="2" use_reset="false">
           <validator id="GeomValidators_Positive"/>
         </integervalue>
+        <validator id="PartSet_MultyTranslationSelection" />
       </feature>
     </group>
 
@@ -347,7 +351,7 @@
     <!--  SketchConstraintLength  -->      
       <feature id="SketchConstraintLength" title="Length" tooltip="Set fixed length of a line segment" icon="icons/Sketch/length.png">
         <label title="Select a line on which to calculate length" tooltip="Select a line on which to calculate length"/>
-        <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select an line" shape_types="edge" >
+        <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select a line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
         </shape_selector>
         <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt" default="computed" internal="1" obligatory="0"/>
@@ -359,12 +363,12 @@
 
       <!--  SketchConstraintAngle  -->
       <feature id="SketchConstraintAngle" title="Angle" tooltip="Set fixed angle between two line segments" icon="icons/Sketch/angle_constr.png">
-        <sketch_shape_selector id="ConstraintEntityA" label="Line 1" tooltip="Select an line" shape_types="edge" >
+        <sketch_shape_selector id="ConstraintEntityA" label="Line 1" tooltip="Select a line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
         </sketch_shape_selector>
-        <sketch_shape_selector id="ConstraintEntityB" label="Line 2" tooltip="Select an line" shape_types="edge" >
+        <sketch_shape_selector id="ConstraintEntityB" label="Line 2" tooltip="Select a line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
@@ -454,7 +458,7 @@
         tooltip="Create constraint defining two perpendicular lines" 
         icon="icons/Sketch/perpendicular.png">
         <sketch_shape_selector id="ConstraintEntityA" 
-            label="First line" tooltip="Select an line" 
+            label="First line" tooltip="Select a line" 
             shape_types="edge">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
@@ -462,7 +466,7 @@
         </sketch_shape_selector>
         
         <sketch_shape_selector id="ConstraintEntityB" 
-            label="Second line" tooltip="Select an line" 
+            label="Second line" tooltip="Select a line" 
             shape_types="edge">
             <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>

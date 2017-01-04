@@ -16,6 +16,7 @@
 #include <memory>
 
 class Config_WidgetAPI;
+class Events_InfoMessage;
 class ModuleBase_IWorkshop;
 class ModuleBase_ViewerPrs;
 class ModuleBase_WidgetValidator;
@@ -101,7 +102,7 @@ Q_OBJECT
 
   /// Returns an attribute error according to the value state
   /// It exists in all cases excepring the "Store" case
-  QString getValueStateError() const;
+  Events_InfoMessage getValueStateError() const;
 
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return false; }
@@ -195,6 +196,18 @@ Q_OBJECT
     return myFeature;
   }
 
+  /// \return Context for translation
+  virtual std::string context() const {
+
+    std::string aContext = myFeatureId;
+    if(!aContext.empty() && !myAttributeID.empty()) {
+      aContext += ":";
+    }
+    aContext += myAttributeID;
+
+    return aContext;
+  }
+
   /// Set feature which is processing by active operation
   /// \param theFeature a feature object
   /// \param theToStoreValue a value about necessity to store the widget value to the feature
@@ -221,6 +234,9 @@ Q_OBJECT
   /// Sends Move event for the given object
   /// \param theObj is object for moving
   static void moveObject(ObjectPtr theObj);
+
+  /// Translate passed string with widget context()
+  virtual QString translate(const std::string& theStr) const;
 
 signals:
   /// The signal about widget values are to be changed
@@ -300,8 +316,6 @@ protected:
   /// The method called when widget is activated
   virtual void activateCustom() {};
 
-  QString translateString(const QString& theMsg) const;
-
 protected slots:
   /// Processing of values changed in model widget by store the current value to the feature
   void onWidgetValuesChanged();
@@ -318,6 +332,9 @@ protected slots:
 
   /// A feature which is processing by active operation
   FeaturePtr myFeature;
+
+  /// A feature ID
+  std::string myFeatureId;
 
   /// Flag which shows that current operation is in editing mode
   bool myIsEditing;

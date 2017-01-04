@@ -1,7 +1,15 @@
 ## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 INCLUDE(Common)
-SET(CMAKE_AUTOMOC ON)
+INCLUDE(UseQtExt)
+
+# --- options ---
+
+# additional include directories
+INCLUDE_DIRECTORIES(${QT_INCLUDES})
+
+# additional preprocessor / compiler flags
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 SET(PROJECT_HEADERS
   ModuleBase.h
@@ -22,6 +30,7 @@ SET(PROJECT_HEADERS
   ModuleBase_IViewer.h
   ModuleBase_IWidgetCreator.h
   ModuleBase_IWorkshop.h
+  ModuleBase_LabelValue.h
   ModuleBase_ModelWidget.h
   ModuleBase_Operation.h
   ModuleBase_OperationAction.h
@@ -53,6 +62,7 @@ SET(PROJECT_HEADERS
   ModuleBase_WidgetFileSelector.h
   ModuleBase_WidgetIntValue.h
   ModuleBase_WidgetLabel.h
+  ModuleBase_WidgetLabelValue.h
   ModuleBase_WidgetLineEdit.h
   ModuleBase_WidgetMultiSelector.h
   ModuleBase_WidgetOptionalBox.h
@@ -84,6 +94,7 @@ SET(PROJECT_SOURCES
   ModuleBase_IViewer.cpp
   ModuleBase_IWidgetCreator.cpp
   ModuleBase_IWorkshop.cpp
+  ModuleBase_LabelValue.cpp
   ModuleBase_ModelWidget.cpp
   ModuleBase_Operation.cpp
   ModuleBase_OperationAction.cpp
@@ -114,6 +125,7 @@ SET(PROJECT_SOURCES
   ModuleBase_WidgetFileSelector.cpp
   ModuleBase_WidgetIntValue.cpp
   ModuleBase_WidgetLabel.cpp
+  ModuleBase_WidgetLabelValue.cpp
   ModuleBase_WidgetLineEdit.cpp
   ModuleBase_WidgetMultiSelector.cpp
   ModuleBase_WidgetOptionalBox.cpp
@@ -146,11 +158,9 @@ SET(PROJECT_LIBRARIES
 	${ViewerData}
 )
 
-SET(PROJECT_AUTOMOC
-    ${CMAKE_CURRENT_BINARY_DIR}/ModuleBase_automoc.cpp
-)
+# sources / moc wrappings
+QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_HEADERS})
 
-#QT5_ADD_RESOURCES(PROJECT_COMPILED_RESOURCES ${PROJECT_RESOURCES})
 #QT5_ADD_TRANSLATION(QM_RESOURCES ${TEXT_RESOURCES})
 
 SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC} ${PROJECT_COMPILED_RESOURCES} ${QM_RESOURCES})
@@ -168,8 +178,12 @@ INCLUDE_DIRECTORIES(
     ${SUIT_INCLUDE}
 )
 
+IF(${HAVE_SALOME})
+  INCLUDE_DIRECTORIES(${SALOME_KERNEL_INCLUDE})
+ENDIF(${HAVE_SALOME})
+
 ADD_DEFINITIONS(-DMODULEBASE_EXPORTS ${CAS_DEFINITIONS})
-ADD_LIBRARY(ModuleBase SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
+ADD_LIBRARY(ModuleBase SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${PROJECT_AUTOMOC})
 TARGET_LINK_LIBRARIES(ModuleBase GeomAPI ${PROJECT_LIBRARIES})
 
 INSTALL(TARGETS ModuleBase DESTINATION ${SHAPER_INSTALL_BIN})

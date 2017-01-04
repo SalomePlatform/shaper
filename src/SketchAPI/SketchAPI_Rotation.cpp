@@ -46,7 +46,7 @@ SketchAPI_Rotation::~SketchAPI_Rotation()
 
 }
 
-std::list<std::shared_ptr<ModelHighAPI_Interface> > SketchAPI_Rotation::rotated() const
+std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Rotation::rotated() const
 {
   std::list<ObjectPtr> aList = rotatedObjects()->list();
   // remove all initial features
@@ -82,12 +82,32 @@ void SketchAPI_Rotation::dump(ModelHighAPI_Dumper& theDumper) const
 
   // Dump variables for a list of rotated features
   theDumper << "[";
-  std::list<std::shared_ptr<ModelHighAPI_Interface> > aList = rotated();
-  std::list<std::shared_ptr<ModelHighAPI_Interface> >::const_iterator anIt = aList.begin();
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > aList = rotated();
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> >::const_iterator anIt = aList.begin();
   for (; anIt != aList.end(); ++anIt) {
     if (anIt != aList.begin())
       theDumper << ", ";
-    theDumper << theDumper.name((*anIt)->feature(), false);
+    theDumper << (*anIt)->feature();
   }
   theDumper << "] = " << theDumper.name(aBase) << ".rotated()" << std::endl;
+
+  // Set necessary "auxiliary" flag for rotated features
+  // (flag is set if it differs to base entity)
+  std::list<ObjectPtr> aRotList = aRotObjects->list();
+  std::list<ObjectPtr>::const_iterator aRIt = aRotList.begin();
+  anIt = aList.begin();
+  for (; aRIt != aRotList.end(); ++aRIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*aRIt);
+    if (!aFeature)
+      continue;
+    bool aBaseAux = aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
+
+    for (int i = 1; i < aNbCopies->value(); ++i, ++anIt) {
+      aFeature = (*anIt)->feature();
+      bool aFeatAux = aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
+      if (aFeatAux != aBaseAux)
+        theDumper << theDumper.name((*anIt)->feature(), false)
+                  << ".setAuxiliary(" << aFeatAux << ")" <<std::endl;
+    }
+  }
 }

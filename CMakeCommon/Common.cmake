@@ -31,6 +31,8 @@ IF(UNIX)
       SETUP_TARGET_FOR_COVERAGE(test_coverage  # Name for custom target.
                                 ctest          # Name of the test driver executable that runs the tests.
                                 coverage)      # Name of output directory.
+
+      SET(USE_TEST_COVERAGE False)
     ENDIF(USE_TEST_COVERAGE)
 
     #SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -E")

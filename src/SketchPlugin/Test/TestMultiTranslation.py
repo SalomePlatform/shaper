@@ -211,5 +211,5 @@ checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
 # End of test
 #=========================================================================
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

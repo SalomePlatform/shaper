@@ -9,14 +9,6 @@
 
 #include <ModelAPI_Events.h>
 
-#ifdef OCAFBROWSER
-#include <DFBrowserAPI_PluginMgr.h>
-#include <DFBrowserAPI_Communicator.h>
-
-static bool FirstCall = true;
-#endif
-
-IMPLEMENT_STANDARD_HANDLE(Model_Application, TDocStd_Application)
 IMPLEMENT_STANDARD_RTTIEXT(Model_Application, TDocStd_Application)
 
 static Handle_Model_Application TheApplication = new Model_Application;
@@ -24,12 +16,6 @@ static Handle_Model_Application TheApplication = new Model_Application;
 //=======================================================================
 Handle(Model_Application) Model_Application::getApplication()
 {
-#ifdef OCAFBROWSER
-    if (FirstCall) {
-      DFBrowserAPI_PluginMgr::activateBrowser("OCAFBrowser.dll", TheApplication);
-      FirstCall = false;
-    }
-#endif
   return TheApplication;
 }
 

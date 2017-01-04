@@ -155,6 +155,78 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
           self.geompy.UnionIDs(aGroup,Ids)
           self.geompy.addToStudyInFather(self.brep, aGroup, theGroupName)
 
+    ## Exports all fields
+    def exportFields(self):
+        # iterate all features to find fields
+        aFeaturesNum = self.Part.size("Features")
+        fieldIndex = 0
+        for anIndex in range(0, aFeaturesNum):
+            aFeature = self.Part.object("Features", anIndex)
+            aSelectionList = aFeature.data().selectionList("selected")
+            # if a field has been found
+            if aSelectionList:
+                aFeature = ModelAPI.objectToFeature(aFeature)
+                if aFeature.firstResult() is not None:
+                  aName = aFeature.firstResult().data().name()
+                fieldIndex = fieldIndex + 1
+                self.createFieldFromFeature(aFeature, aName)
+
+    ## Returns a type of the shape type in the old GEOM representation
+    def selectionDim(self, theSelectionType):
+        if theSelectionType == "vertex":
+            return 0
+        if theSelectionType == "edge":
+            return 1
+        if theSelectionType == "face":
+            return 2
+        if theSelectionType == "solid":
+            return 3
+        return -1
+
+    ## Creates a field by the field feature and the name
+    #  @param theField: the field feature
+    #  @param theFieldName: name of the field to create
+    def createFieldFromFeature(self, theField, theFieldName):
+        # iterate on all selected entities of the field
+        # and get the corresponding ID
+        aTables = theField.tables("values")
+        aSelection = theField.selectionList("selected")
+
+        # set component names
+        aComps = theField.stringArray("components_names")
+        aCompNames = []
+        aCompNum = aComps.size()
+        for aCompIndex in range(0, aCompNum):
+          aCompNames.append(aComps.value(aCompIndex))
+
+        #if len(Ids) <> 0:
+        aDim = self.selectionDim(aSelection.selectionType())
+        aResField = self.geompy.CreateField(self.brep, theFieldName, aTables.type(), aDim, aCompNames)
+        #self.geompy.UnionIDs(theField,Ids)
+        self.geompy.addToStudyInFather(self.brep, aResField, theFieldName)
+
+        # set steps
+        aStepsNum = aTables.tables()
+        for aStepIndex in range(0, aStepsNum):
+          aStamp = theField.intArray("stamps").value(aStepIndex)
+          aValues = []
+          aRows = aTables.rows()
+          aCols = aTables.columns()
+          for aRow in range(1, aRows): # no defaults
+            for aCol in range(0, aCols):
+              aVal = aTables.valueStr(aRow, aCol, aStepIndex)
+              if aTables.type() == 0: # bool
+                if aVal == "True":
+                  aVal = True
+                else:
+                  aVal = False
+              elif aTables.type() == 1: # int
+                aVal = int(aVal)
+              elif aTables.type() == 2: # double
+                aVal = float(aVal)
+              aValues.append(aVal)
+          aResField.addStep(aStepIndex + 1, aStamp, aValues)
+
     ## Exports all shapes and groups into the GEOM module.
     def execute(self):
         aSession = ModelAPI.ModelAPI_Session.get()
@@ -169,4 +241,5 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
         # Export bodies and groups
         self.exportBodies()
         self.exportGroups()
+        self.exportFields()
         pass

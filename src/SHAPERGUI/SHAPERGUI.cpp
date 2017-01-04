@@ -29,6 +29,7 @@
 #include <SUIT_Desktop.h>
 #include <SUIT_ViewManager.h>
 #include <SUIT_ResourceMgr.h>
+#include <SUIT_DataBrowser.h>
 
 #include <QtxPopupMgr.h>
 #include <QtxActionMenuMgr.h>
@@ -143,24 +144,28 @@ void SHAPERGUI::viewManagers(QStringList& theList) const
 }
 
 //******************************************************
-void SHAPERGUI::connectToStudy(CAM_Study* theStudy)
-{
-  // if there are created viewer managers, we should try to create viewer
-  // selector and initialize viewer with it. It sets interactive contect to the
-  // proxy viewer. If study is opened, CAM application calls this method before the open()
-  // of data model
-  // the SHAPER data model is specific and during open(load) redisplay signals are flushed, so
-  // we need to connect to the viewer before it. Here, it seems the most appropriate place for this
-  // according to SALOME architecture.
-  if (!mySelector) {
-    ViewManagerList OCCViewManagers;
-    application()->viewManagers(OCCViewer_Viewer::Type(), OCCViewManagers);
-    if (OCCViewManagers.size() > 0) {
-      mySelector = createSelector(OCCViewManagers.first());
-    }
-  }
-  LightApp_Module::connectToStudy(theStudy);
-}
+// We can not create selector in this method because it can be called when
+// SHAPER module is not active. Take into account that creation of our selector
+// leads to switching OFF all other selectors
+//void SHAPERGUI::connectToStudy(CAM_Study* theStudy)
+//{
+//  // if there are created viewer managers, we should try to create viewer
+//  // selector and initialize viewer with it. It sets interactive contect to the
+//  // proxy viewer. If study is opened, CAM application calls this method before the open()
+//  // of data model
+//  // the SHAPER data model is specific and during open(load) redisplay signals are flushed, so
+//  // we need to connect to the viewer before it. Here,
+//  // it seems the most appropriate place for this
+//  // according to SALOME architecture.
+//  if (!mySelector) {
+//    ViewManagerList OCCViewManagers;
+//    application()->viewManagers(OCCViewer_Viewer::Type(), OCCViewManagers);
+//    if (OCCViewManagers.size() > 0) {
+//      mySelector = createSelector(OCCViewManagers.first());
+//    }
+//  }
+//  LightApp_Module::connectToStudy(theStudy);
+//}
 
 //******************************************************
 bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
@@ -234,7 +239,7 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
       bool aFound = false;
       for (aLIt.Initialize(aList); aLIt.More(); aLIt.Next()) {
         anAISIO = aLIt.Value();
-        if (anAISIO.Access() == aAIS.Access()) {
+        if (anAISIO.get() == aAIS.get()) {
           aFound = true;
           break;
         }
@@ -247,6 +252,10 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   }
   myProxyViewer->activateViewer(true);
+
+  // Postrrocessing for LoadScriptId to remove created(if it was created) SALOME Object Browser
+  connect(getApp()->action(LightApp_Application::UserID+1), SIGNAL(triggered(bool)),
+          this, SLOT(onScriptLoaded()));
   return isDone;
 }
 
@@ -290,6 +299,10 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
   aResMgr->setValue("Study", "store_positions", myIsStorePositions);
   getApp()->setEditEnabled(myIsEditEnabled);
+
+  // Postrrocessing for LoadScriptId to remove created(if it was created) SALOME Object Browser
+  disconnect(getApp()->action(LightApp_Application::UserID+1), SIGNAL(triggered(bool)),
+             this, SLOT(onScriptLoaded()));
 
   return LightApp_Module::deactivateModule(theStudy);
 }
@@ -343,6 +356,19 @@ void SHAPERGUI::onDefaultPreferences()
   ModuleBase_Preferences::resetConfigPropPreferences(preferences());
 
   myWorkshop->displayer()->redisplayObjects();
+}
+
+//******************************************************
+void SHAPERGUI::onScriptLoaded()
+{
+  // this slot is called after processing of the LoadScriptId action of SalomeApp Application
+  // Each dumped script contains updateObjBrowser() that creates a new instance of Object
+  // Browser. When SHAPER module is active, this browser should not be used. It might be removed
+  // as hidden by means of updateWindows() of SalomeApp_Application or to remove
+  // it manually (because this method of application is protected)
+  SUIT_DataBrowser* aBrowser = getApp()->objectBrowser();
+  if (aBrowser)
+    delete aBrowser;
 }
 
 //******************************************************
@@ -416,7 +442,7 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theId,
   myActionsList.append(theId);
   SUIT_Desktop* aDesk = application()->desktop();
   int aKeys = 0;
-  for (unsigned int i = 0; i < theKeys.count(); i++)
+  for (int i = 0; i < theKeys.count(); i++)
     aKeys += theKeys[i];
   QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk,
                                   isCheckable);
@@ -484,7 +510,7 @@ QAction* SHAPERGUI::addDesktopCommand(const QString& theId, const QString& theTi
   myActionsList.append(theId);
   SUIT_Desktop* aDesk = application()->desktop();
   int aKeys = 0;
-  for (unsigned int i = 0; i < theKeys.count(); i++)
+  for (int i = 0; i < theKeys.count(); i++)
     aKeys += theKeys[i];
   QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk,
                                   isCheckable);

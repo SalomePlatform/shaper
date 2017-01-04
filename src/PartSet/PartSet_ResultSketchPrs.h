@@ -29,7 +29,7 @@ public:
   /// \param theResult a result object
   Standard_EXPORT PartSet_ResultSketchPrs(ResultPtr theResult);
 
-  DEFINE_STANDARD_RTTI(PartSet_ResultSketchPrs)
+  DEFINE_STANDARD_RTTIEXT(PartSet_ResultSketchPrs, ViewerData_AISShape)
 protected:
   /// Redefinition of virtual function
   Standard_EXPORT virtual void Compute(

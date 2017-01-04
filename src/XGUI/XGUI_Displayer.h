@@ -33,6 +33,11 @@ class ModuleBase_ViewerPrs;
 class ModelAPI_Feature;
 class XGUI_Workshop;
 
+#ifdef VINSPECTOR
+class VInspectorAPI_Communicator;
+class VInspectorAPI_CallBack;
+#endif
+
 /**\class XGUI_Displayer
  * \ingroup GUI
  * \brief Displayer. Provides mechanizm of display/erase of objects in the viewer
@@ -121,7 +126,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
 
   /// Deactivates selection of sub-shapes
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  void closeLocalContexts(const bool theUpdateViewer = true);
+  //void closeLocalContexts(const bool theUpdateViewer = true);
 
   /// Remove default selection filters of the module from the current viewer
   void deactivateSelectionFilters();
@@ -254,7 +259,13 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Selection modes will be returned according to TopAbs_ShapeEnum
   QIntList activeSelectionModes() const;
 
+#ifdef VINSPECTOR
+  void setVInspectorVisible(const bool theVisible);
 
+  void setCommunicator(VInspectorAPI_Communicator* theCommunicator);
+
+  VInspectorAPI_CallBack* getCallBack() const;
+#endif
   /// Converts shape type (TopAbs_ShapeEnum) to selection mode
   /// \param theShapeType a shape type from TopAbs_ShapeEnum
   static int getSelectionMode(int theShapeType);
@@ -310,9 +321,6 @@ private:
   /// \param theUpdateViewer an update viewer flag
   void deactivateTrihedron(const bool theUpdateViewer) const;
 
-  /// Opens local context. Does nothing if it is already opened.
-  void openLocalContext();
-
   /// Update the object presentable properties such as color, lines width and other
   /// If the object is result with the color attribute value set, it is used,
   /// otherwise the customize is applyed to the object's feature if it is a custom prs
@@ -325,9 +333,11 @@ private:
   /// \param theAIS AIOS object to display
   void appendResultObject(ObjectPtr theObject, AISObjectPtr theAIS);
 
+#ifdef _DEBUG
   /// Returns an information about alredy displayed objects
   /// \return a string representation
   std::string getResult2AISObjectMapInfo() const;
+#endif
 
   /// Returns container of visible presentations for the object. For a feature object,
   /// the feature results are processed also. The presentations map is not cleared inside.
@@ -350,7 +360,9 @@ private:
  protected:
    /// Reference to workshop
   XGUI_Workshop* myWorkshop;
-
+#ifdef VINSPECTOR
+  VInspectorAPI_Communicator* myCommunicator; ///< callback to debug display, show/hide it
+#endif
   /// A container for selection filters
   Handle(SelectMgr_AndFilter) myAndFilter;
 
@@ -369,6 +381,9 @@ private:
 
   /// Number of blocking of the viewer update. The viewer is updated only if it equals zero
   int myViewerBlockedRecursiveCount;
+
+  /// Flag: first asking of AIS context: trihedron activation
+  bool myIsFirstAISContextUse;
 
   /// Flag: use trihedgon for selection or not
   bool myIsTrihedronActive;

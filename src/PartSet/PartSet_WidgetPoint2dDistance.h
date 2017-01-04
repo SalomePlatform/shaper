@@ -10,7 +10,7 @@
 #include "PartSet.h"
 #include "PartSet_MouseProcessor.h"
 
-#include <ModuleBase_WidgetDoubleValue.h>
+#include <ModuleBase_WidgetLabelValue.h>
 
 #include <ModelAPI_CompositeFeature.h>
 
@@ -36,7 +36,7 @@ class QMouseEvent;
 * </point2ddistance>
 * \endcode
 */ 
-class PARTSET_EXPORT PartSet_WidgetPoint2dDistance : public ModuleBase_WidgetDoubleValue,
+class PARTSET_EXPORT PartSet_WidgetPoint2dDistance : public ModuleBase_WidgetLabelValue,
                                                      public PartSet_MouseProcessor
 {
 Q_OBJECT
@@ -96,6 +96,10 @@ protected:
   /// \return a double value
   virtual double computeValue(const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPnt,
                               const std::shared_ptr<GeomAPI_Pnt2d>& theCurrentPnt);
+
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValueCustom();
 
 protected:
   /// A reference to workshop

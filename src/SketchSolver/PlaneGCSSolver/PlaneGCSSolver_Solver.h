@@ -13,6 +13,8 @@
 
 #include <GCS.h>
 
+typedef std::map<GCS::Constraint*, SketchSolver_ConstraintType> ConstraintMap;
+
 /**
  * The main class that performs the high-level operations for connection to the PlaneGCS.
  */
@@ -76,8 +78,6 @@ private:
   bool isTangentTruth(GCS::Constraint* theTangent) const;
 
 private:
-  typedef std::map<GCS::Constraint*, SketchSolver_ConstraintType> ConstraintMap;
-
   GCS::VEC_pD                  myParameters;     ///< list of unknowns
 
   /// list of constraints already processed by the system

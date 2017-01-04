@@ -56,5 +56,5 @@ aSession.finishOperation()
 # Test results
 assert (len(aVertexFeature.results()) == aNumOfPoints)
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

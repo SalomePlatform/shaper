@@ -629,7 +629,8 @@ static void copyAttrs(TDF_Label theSource, TDF_Label theDestination) {
 	    aTargetAttr = anAttrIter.Value()->NewEmpty();
       theDestination.AddAttribute(aTargetAttr);
     }
-    Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(); // no relocation, empty map
+    // no special relocation, empty map, but self-relocation is on: copy references w/o changes
+    Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(Standard_True);
     anAttrIter.Value()->Paste(aTargetAttr, aRelocTable);
   }
   // copy the sub-labels content

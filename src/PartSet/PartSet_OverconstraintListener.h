@@ -69,10 +69,12 @@ private:
   /// Returns workshop
   XGUI_Workshop* workshop() const;
 
+#ifdef _DEBUG
   /// Unite objects in one string information
   /// \param theObjects a list of objects
   /// \return a string info
   static QString getObjectsInfo(const std::set<ObjectPtr>& theObjects);
+#endif
 
 private:
   std::set<ObjectPtr> myConflictingObjects;

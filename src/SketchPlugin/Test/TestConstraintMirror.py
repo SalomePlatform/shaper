@@ -161,8 +161,8 @@ aMirror = aSketchFeature.addFeature("SketchConstraintMirror")
 aRefObjectA = aMirror.refattr("ConstraintEntityA")
 aRefObjectA.setObject(modelAPI_ResultConstruction(aMirrorLine.firstResult()))
 aRefListInitial = aMirror.reflist("ConstraintMirrorList")
-aRefListInitial.append(aSketchArc1.lastResult())
 aRefListInitial.append(aSketchLine1.lastResult())
+aRefListInitial.append(aSketchArc1.lastResult())
 aRefListInitial.append(aSketchLine2.lastResult())
 aMirror.execute()
 aSession.finishOperation()
@@ -223,5 +223,5 @@ assert (aRefListB.size() == 1)
 assert (aRefListC.size() == 1)
 checkMirror(aRefListB, aRefListC, aMirrorLine)
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

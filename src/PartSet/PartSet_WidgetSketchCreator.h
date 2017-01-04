@@ -12,6 +12,7 @@
 #include <ModuleBase_WidgetSelector.h>
 
 class QLabel;
+class QLineEdit;
 class PartSet_Module;
 class ModuleBase_Operation;
 class ModuleBase_IWorkshop;
@@ -152,6 +153,8 @@ private:
   /// to store selection and check validation
   bool myIsCustomAttribute;
 
+  QWidget* mySizeOfViewWidget;///< Size of view widget, visualized if preview planes are shown
+  QLineEdit* mySizeOfView; ///< Value of square of size of View
   /// Label of the widget
   QLabel* myLabel;
 

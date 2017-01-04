@@ -33,6 +33,7 @@ protected:
 
 private:
   double myAngle;
+  int    myType;
 };
 
 #endif

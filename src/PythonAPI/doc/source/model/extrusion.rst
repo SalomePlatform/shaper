@@ -3,7 +3,7 @@ Extrusion
 
 .. testsetup::
 
-   import model
+   from salome.shaper import model
    model.begin()
    partset = model.moduleDocument()
    part = model.addPart(partset).document()

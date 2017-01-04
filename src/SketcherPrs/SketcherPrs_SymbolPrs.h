@@ -29,6 +29,7 @@ class OpenGl_Context;
 
 DEFINE_STANDARD_HANDLE(SketcherPrs_SymbolPrs, AIS_InteractiveObject)
 
+class SketcherPrs_SymbolArray;
 /**
 * \ingroup GUI
 * A base class of constraint presentation which is represented by an icon
@@ -52,7 +53,7 @@ public:
   //! this selectable object  ( for fast presentation draw )
   Standard_EXPORT virtual void HilightOwnerWithColor(
     const Handle(PrsMgr_PresentationManager3d)& thePM,
-    const Quantity_NameOfColor theColor,
+    const Handle(Graphic3d_HighlightStyle)& theStyle,
     const Handle(SelectMgr_EntityOwner)& theOwner);
 
   /// Returns sketcher plane
@@ -72,19 +73,11 @@ public:
   Standard_EXPORT void SetConflictingConstraint(const bool& theConflicting,
                                                 const std::vector<int>& theColor);
 
-  /// Render of the presentation
-  /// \param theWorkspace is OpenGl workspace
-  void Render(const Handle(OpenGl_Workspace)& theWorkspace) const;
-
-  /// Release used OpenGl resources
-  /// \param theContext is an OpenGL context
-  void Release (OpenGl_Context* theContext);
-
   /// Add a bounding box of the presentation to common bounding box
   /// \param theBndBox the common bounding box to update
   Standard_EXPORT virtual void BoundingBox (Bnd_Box& theBndBox) Standard_OVERRIDE;
 
-  DEFINE_STANDARD_RTTI(SketcherPrs_SymbolPrs)
+  DEFINE_STANDARD_RTTIEXT(SketcherPrs_SymbolPrs, AIS_InteractiveObject)
 
 protected:
   /// Redefinition of virtual function
@@ -154,13 +147,13 @@ private:
   /// Static map to collect constraints icons {IconName : IconPixMap}
   static std::map<const char*, Handle(Image_AlienPixMap)> myIconsMap;
 
-  mutable Handle(OpenGl_VertexBuffer) myVboAttribs;
-
   Select3D_EntitySequence mySPoints;
 
   bool myIsConflicting; /// state if the presentation is visualized in error state
   Handle(Image_AlienPixMap) myErrorIcon;
   Handle(Graphic3d_MarkerImage) myErrorImage;
+
+  friend class SketcherPrs_SymbolArray;
 };
 
 #endif

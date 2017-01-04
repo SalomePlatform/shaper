@@ -23,7 +23,7 @@ ModuleBase_WidgetLabel::ModuleBase_WidgetLabel(QWidget* theParent,
                                                const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData)
 {
-  QString aText = QString::fromStdString(theData->getProperty("title"));
+  QString aText = translate(theData->getProperty("title"));
   QString aLabelIcon = QString::fromStdString(theData->getProperty("icon"));
   myLabel = new QLabel(aText, theParent);
   if (!aLabelIcon.isEmpty()) {
@@ -64,8 +64,8 @@ bool ModuleBase_WidgetLabel::restoreValueCustom()
     if (aStrAttr.get()) {
       aMsg = aStrAttr->value();
     }
-    ModuleBase_Tools::translate(myFeature->getKind(), aMsg);
-    myLabel->setText(aMsg.c_str());
+    QString aText = ModuleBase_Tools::translate(myFeature->getKind(), aMsg);
+    myLabel->setText(aText);
   }
   return true;
 }

@@ -324,6 +324,9 @@ public:
   /// \return theAttribute
   virtual AttributePtr findAttribute(const ObjectPtr& theObject, const GeomShapePtr& theGeomShape);
 
+  /// Returns the workshop
+  XGUI_Workshop* getWorkshop() const;
+
 public slots:
   /// Redefines the parent method in order to customize the next case:
   /// If the sketch nested operation is active and the presentation is not visualized in the viewer,
@@ -404,9 +407,6 @@ protected:
   //! Delete features
   virtual bool deleteObjects();
 
-  /// Returns the workshop
-  XGUI_Workshop* getWorkshop() const;
-
   void setDefaultConstraintShown();
 
 private:
@@ -424,7 +424,7 @@ private:
   /// backup of the visible state to restore them by operation stop
   QMap<PartSet_Tools::ConstraintVisibleState, bool> myHasConstraintShown;
 
-  QModelIndex aActivePartIndex;
+  QModelIndex myActivePartIndex;
 };
 
 #endif

@@ -35,11 +35,13 @@ void XGUI_ViewerProxy::connectViewProxy()
 
 Handle(AIS_InteractiveContext) XGUI_ViewerProxy::AISContext() const
 {
+  Handle(AIS_InteractiveContext) aContext;
 #ifdef HAVE_SALOME
-  return myWorkshop->salomeConnector()->viewer()->AISContext();
+  aContext = myWorkshop->salomeConnector()->viewer()->AISContext();
 #else
-  return myWorkshop->mainWindow()->viewer()->AISContext();
+  aContext = myWorkshop->mainWindow()->viewer()->AISContext();
 #endif
+  return aContext;
 }
 
 Handle(AIS_Trihedron) XGUI_ViewerProxy::trihedron() const
@@ -371,18 +373,18 @@ bool XGUI_ViewerProxy::canDragByMouse() const
 
 
 //***************************************
-void XGUI_ViewerProxy::Zfitall()
-{
-#ifdef HAVE_SALOME
-  myWorkshop->salomeConnector()->viewer()->Zfitall();
-#else
-  AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-  AppElements_ViewWindow* aView = aViewer->activeViewWindow();
-  if (aView) {
-    Handle(V3d_View) aView3d = aView->v3dView();
-    aView3d->ZFitAll();
-    if (aView3d->Depth() < 0.1)
-      aView3d->DepthFitAll();
-  }
-#endif
-}
+//void XGUI_ViewerProxy::Zfitall()
+//{
+//#ifdef HAVE_SALOME
+//  myWorkshop->salomeConnector()->viewer()->Zfitall();
+//#else
+//  AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+//  AppElements_ViewWindow* aView = aViewer->activeViewWindow();
+//  if (aView) {
+//    Handle(V3d_View) aView3d = aView->v3dView();
+//    aView3d->ZFitAll();
+//    if (aView3d->Depth() < 0.1)
+//      aView3d->DepthFitAll();
+//  }
+//#endif
+//}

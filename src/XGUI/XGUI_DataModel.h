@@ -125,6 +125,9 @@ public:
   /// Initialises XML data model reader. It must be initialised before DataModel using.
   void setXMLReader(Config_DataModelReader* theReader) { myXMLReader = theReader; }
 
+  /// Do not processing anymore events of model loop
+  //bool blockEventsProcessing(const bool theState);
+
 signals:
   /// Signal about tree had been rebuilt
   void treeRebuilt();
@@ -161,6 +164,8 @@ private:
   QStringList listOfShowNotEmptyFolders(bool fromRoot = true) const;
 
   Config_DataModelReader* myXMLReader;
+
+  //bool myIsEventsProcessingBlocked;
 };
 
 #endif

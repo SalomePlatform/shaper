@@ -18,7 +18,6 @@
 #include <StdPrs_DeflectionCurve.hxx>
 
 
-IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Tangent, SketcherPrs_SymbolPrs);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Tangent, SketcherPrs_SymbolPrs);
 
 static Handle(Image_AlienPixMap) MyPixMap;

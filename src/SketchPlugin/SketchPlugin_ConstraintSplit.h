@@ -91,9 +91,11 @@ class SketchPlugin_ConstraintSplit : public SketchPlugin_ConstraintBase
 private:
   /// Returns geom point attribute of the feature bounds. It processes line or arc.
   /// For circle feature, the result attributes are null
+  /// \param theFeature a source feature
   /// \param theStartPointAttr an out attribute to start point
   /// \param theStartPointAttr an out attribute to end point
-  void getFeaturePoints(std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
+  void getFeaturePoints(const FeaturePtr& theFeature,
+                        std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
                         std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr);
 
   /// Returns cast of attribute to geometrical point if the attribute is a ref attr attribute
@@ -128,11 +130,14 @@ private:
   /// Move coincidence constraint from feature to point if it is found
   /// \param theCoincidenceToFeature coincidence to feature to be connected to new feature
   /// \param theFurtherCoincidences a list of points where coincidences will be build
-  /// \paramv theFeatureResults created results after split where constaint might be connected
+  /// \param theFeatureResults created results after split where constaint might be connected
+  /// \param theSplitFeature feature created by split, new coincidences to points should be created
+  /// if theCoincidenceToFeature contains equal points
   void updateCoincidenceConstraintsToFeature(
       const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature,
       const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences,
-      const std::set<ResultPtr>& theFeatureResults);
+      const std::set<ResultPtr>& theFeatureResults,
+      const FeaturePtr& theSplitFeature);
 
   /// Move tangency constraint to the nearest split feature that has a coincidence to the tangent
   /// \param theTangentFeatures tangencies to feature to be connected to nearest feature
@@ -277,11 +282,13 @@ private:
   std::set<std::shared_ptr<ModelAPI_Attribute> > getEdgeAttributes(
                                     const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
+#ifdef _DEBUG
   /// Return feature name, kind, point attribute values united in a string
   /// \param theFeature an investigated feature
   /// \return string value
   std::string getFeatureInfo(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              const bool isUseAttributesInfo = true);
+#endif
 };
 
 #endif

@@ -81,7 +81,7 @@ ModuleBase_WidgetLineEdit::ModuleBase_WidgetLineEdit(QWidget* theParent,
 {
   QFormLayout* aMainLay = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
-  QString aLabelText = QString::fromStdString(theData->widgetLabel());
+  QString aLabelText = translate(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   QLabel* aLabel = new QLabel(aLabelText, this);
   if (!aLabelIcon.isEmpty())

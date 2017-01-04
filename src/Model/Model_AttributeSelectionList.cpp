@@ -13,6 +13,7 @@
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDF_RelocationTable.hxx>
+#include <TDF_DeltaOnAddition.hxx>
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
@@ -20,6 +21,7 @@
 #include <BRep_Tool.hxx>
 #include <TNaming_Builder.hxx>
 #include <TNaming_Iterator.hxx>
+#include <TNaming_NamedShape.hxx>
 #include <NCollection_List.hxx>
 
 void Model_AttributeSelectionList::append(
@@ -45,6 +47,7 @@ void Model_AttributeSelectionList::append(
     std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aNewLab));
   if (owner()) {
     aNewAttr->setObject(owner());
+    aNewAttr->setParent(this);
   }
   aNewAttr->setID(id());
   mySize->Set(aNewTag);
@@ -66,6 +69,7 @@ void Model_AttributeSelectionList::append(
     std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aNewLab));
   if (owner()) {
     aNewAttr->setObject(owner());
+    aNewAttr->setParent(this);
   }
   aNewAttr->setID(id());
   mySize->Set(aNewTag);
@@ -155,8 +159,8 @@ static void copyAttrs(TDF_Label theSource, TDF_Label theDestination) {
     // for named shape copy exact shapes (in NamedShape Paste method the CopyTool is used)
     Handle(TNaming_NamedShape) aNS = Handle(TNaming_NamedShape)::DownCast(anAttrIter.Value());
     if (aNS.IsNull()) {
-      // no relocation, empty map
-      Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable();
+      // no special relocation, empty map, but self-relocation is on: copy references w/o changes
+      Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(Standard_True);
       anAttrIter.Value()->Paste(aTargetAttr, aRelocTable);
     } else {
       CopyNS(aNS, aTargetAttr);
@@ -272,6 +276,7 @@ std::shared_ptr<ModelAPI_AttributeSelection>
   aNewAttr->setID(id());
   if (owner()) {
     aNewAttr->setObject(owner());
+    aNewAttr->setParent(this);
   }
   return aNewAttr;
 }
@@ -288,6 +293,7 @@ void Model_AttributeSelectionList::clear()
         std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aLab));
       if (owner()) {
         aNewAttr->setObject(owner());
+        aNewAttr->setParent(this);
       }
       REMOVE_BACK_REF(aNewAttr->context());
 

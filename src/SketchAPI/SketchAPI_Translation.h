@@ -10,6 +10,7 @@
 
 //--------------------------------------------------------------------------------------
 #include "SketchAPI.h"
+#include "SketchAPI_SketchEntity.h"
 
 #include <list>
 
@@ -63,7 +64,7 @@ public:
 
   /// List of translated objects
   SKETCHAPI_EXPORT
-  std::list<std::shared_ptr<ModelHighAPI_Interface> > translated() const;
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > translated() const;
 
   /// Dump wrapped feature
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;

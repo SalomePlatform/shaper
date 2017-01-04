@@ -118,5 +118,5 @@ assert (len(anExtrusionFuseFt.results()) > 0)
 aCurrentResult = modelAPI_ResultBody(anExtrusionFuseFt.firstResult())
 assert (aCurrentResult is not None)
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

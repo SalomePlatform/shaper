@@ -18,7 +18,7 @@
 ///
 /// The type of values can be changed. But all the values in the tables must have the same one
 /// type. The currently allowed types now are: Boolean, Integer, Double, String.
-/// By default there is only one table, but it may be increased/decreased by adding/removing 
+/// By default there is only one table, but it may be increased/decreased by adding/removing
 /// tables one by one.
 /// The number of rows and columns are equal in all tables. If table, row or column is added,
 /// the previous values are kept unchanged. New cells are filled by zero, false or empty strings.
@@ -61,6 +61,10 @@ public:
     const Value theValue, const int theRow, const int theColumn, const int theTable = 0) = 0;
   /// Returns the value by the index (indexes are zero-based).
   MODELAPI_EXPORT virtual Value value(
+    const int theRow, const int theColumn, const int theTable = 0) = 0;
+
+  /// Returns the value in the format of string (usefull for the python connection)
+  MODELAPI_EXPORT virtual std::string valueStr(
     const int theRow, const int theColumn, const int theTable = 0) = 0;
 
   /// Returns the type of this class of attributes

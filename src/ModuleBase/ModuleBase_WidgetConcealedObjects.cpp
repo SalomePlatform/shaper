@@ -21,7 +21,8 @@
 #include <QWidget>
 #include <QTableWidget>
 #include <QHeaderView>
-#include <QToolButton>
+#include <QCheckBox>
+#include <QVBoxLayout>
 
 const int DEFAULT_NAME_COLUMN_WIDTH = 200;
 
@@ -54,7 +55,8 @@ bool ModuleBase_WidgetConcealedObjects::storeValueCustom()
   anAttributeList->clear();
   int aSize1 = anAttributeList->size(false);
   for (int i = 0, aSize = myView->rowCount(); i < aSize; i++) {
-    QToolButton* aButton = dynamic_cast<QToolButton*>(myView->cellWidget(i, 0));;
+    QCheckBox* aButton =
+        dynamic_cast<QCheckBox*>(myView->cellWidget(i, 0)->findChild<QCheckBox*>());
     if (aButton->isChecked())
       anAttributeList->append(myConcealedResults[i]);
   }
@@ -95,12 +97,12 @@ bool ModuleBase_WidgetConcealedObjects::restoreValueCustom()
   int aSize = anAttributeList->size();
   for (int i = 0, aSize = myView->rowCount(); i < aSize; i++) {
     ResultPtr aResult = myConcealedResults[i];
-    QToolButton* aButton = dynamic_cast<QToolButton*>(myView->cellWidget(i, 0));
+    QCheckBox* aButton =
+        dynamic_cast<QCheckBox*>(myView->cellWidget(i, 0)->findChild<QCheckBox*>());
     bool isChecked = anAttributeList->isInList(aResult);
 
     bool aBlocked = aButton->blockSignals(true);
     aButton->setChecked(isChecked);
-    this->updateItemIcon(aButton);
     aButton->blockSignals(aBlocked);
   }
   return true;
@@ -119,13 +121,15 @@ void ModuleBase_WidgetConcealedObjects::addViewRow(
   int anId = myView->rowCount();
   myView->setRowCount(anId+1);
 
-  QToolButton* aVisibilityBtn = new QToolButton(this);
+  QWidget* aVisibilityWdg = new QWidget(this);
+  QVBoxLayout* aVisibilityLay = new QVBoxLayout(aVisibilityWdg);
+  aVisibilityLay->setContentsMargins(2, 2, 2, 2);
+  QCheckBox* aVisibilityBtn = new QCheckBox(aVisibilityWdg);
+  aVisibilityLay->addWidget(aVisibilityBtn, 0, Qt::AlignHCenter);
   connect(aVisibilityBtn, SIGNAL(toggled(bool)), this, SLOT(onItemToggled(bool)));
-  aVisibilityBtn->setCheckable(true);
   aVisibilityBtn->setChecked(false);
-  updateItemIcon(aVisibilityBtn);
 
-  myView->setCellWidget(anId, 0, aVisibilityBtn);
+  myView->setCellWidget(anId, 0, aVisibilityWdg);
   myView->setItem(anId, 1, new QTableWidgetItem(theResult->data()->name().c_str()));
 
   if (anId == 1) {
@@ -140,10 +144,3 @@ void ModuleBase_WidgetConcealedObjects::onItemToggled(bool theState)
   updateObject(myFeature);
 }
 
-void ModuleBase_WidgetConcealedObjects::updateItemIcon(QToolButton* theButton)
-{
-  bool isChecked = theButton->isChecked();
-  theButton->setIcon(isChecked ? QIcon(":icons/concealed_on.png")
-                               : QIcon(":icons/concealed_off.png"));
-  theButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-}

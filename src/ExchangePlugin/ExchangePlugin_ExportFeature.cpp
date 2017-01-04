@@ -28,16 +28,22 @@
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeStringArray.h>
+#include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_AttributeTables.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultGroup.h>
+#include <ModelAPI_ResultField.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
 #include <XAO_Group.hxx>
+#include <XAO_Field.hxx>
 #include <XAO_Xao.hxx>
+#include <XAO_Geometry.hxx>
 
 #include <ExchangePlugin_Tools.h>
 
@@ -170,6 +176,27 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   }
 }
 
+/// Returns XAO string by the value from the table
+static std::string valToString(const ModelAPI_AttributeTables::Value& theVal,
+  const ModelAPI_AttributeTables::ValueType& theType) {
+  std::ostringstream aStr; // the resulting string value
+  switch(theType) {
+  case ModelAPI_AttributeTables::BOOLEAN:
+    aStr<<(theVal.myBool ? "true" : "false");
+    break;
+  case ModelAPI_AttributeTables::INTEGER:
+    aStr<<theVal.myInt;
+    break;
+  case ModelAPI_AttributeTables::DOUBLE:
+    aStr<<theVal.myDouble;
+    break;
+  case ModelAPI_AttributeTables::STRING:
+    aStr<<theVal.myStr;
+    break;
+  }
+  return aStr.str();
+}
+
 void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 {
   try {
@@ -224,7 +251,8 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 
     // conversion of dimension
     std::string aSelectionType = aSelectionList->selectionType();
-    std::string aDimensionString = ExchangePlugin_Tools::selectionType2xaoDimension(aSelectionType);
+    std::string aDimensionString =
+      ExchangePlugin_Tools::selectionType2xaoDimension(aSelectionType);
     XAO::Dimension aGroupDimension = XAO::XaoUtils::stringToDimension(aDimensionString);
 
     XAO::Group* aXaoGroup = aXao.addGroup(aGroupDimension,
@@ -243,8 +271,85 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
     }
   }
 
-  // exporting
+  // fields
+  int aFieldCount = document()->size(ModelAPI_ResultField::group());
+  for (int aFieldIndex = 0; aFieldIndex < aFieldCount; ++aFieldIndex) {
+    ResultFieldPtr aResultField =
+        std::dynamic_pointer_cast<ModelAPI_ResultField>(
+            document()->object(ModelAPI_ResultField::group(), aFieldIndex));
 
+    FeaturePtr aFieldFeature = document()->feature(aResultField);
+
+    AttributeSelectionListPtr aSelectionList =
+        aFieldFeature->selectionList("selected");
+
+    // conversion of dimension
+    std::string aSelectionType = aSelectionList->selectionType();
+    std::string aDimensionString =
+      ExchangePlugin_Tools::selectionType2xaoDimension(aSelectionType);
+    XAO::Dimension aFieldDimension = XAO::XaoUtils::stringToDimension(aDimensionString);
+    bool isWholePart = aSelectionType == "part";
+    // get tables and their type
+    std::shared_ptr<ModelAPI_AttributeTables> aTables = aFieldFeature->tables("values");
+    std::string aTypeString = ExchangePlugin_Tools::valuesType2xaoType(aTables->type());
+    XAO::Type aFieldType = XAO::XaoUtils::stringToFieldType(aTypeString);
+
+    XAO::Field* aXaoField = aXao.addField(aFieldType, aFieldDimension, aTables->columns(),
+                                          aResultField->data()->name());
+    // set components names
+    AttributeStringArrayPtr aComponents = aFieldFeature->stringArray("components_names");
+    for(int aComp = 0; aComp < aComponents->size(); aComp++) {
+      std::string aName = aComponents->value(aComp);
+      aXaoField->setComponentName(aComp, aName);
+    }
+
+    AttributeIntArrayPtr aStamps = aFieldFeature->intArray("stamps");
+    for (int aStepIndex = 0; aStepIndex < aTables->tables(); aStepIndex++) {
+      XAO::Step* aStep = aXaoField->addNewStep(aStepIndex);
+      aStep->setStep(aStepIndex);
+      int aStampIndex = aStamps->value(aStepIndex);
+      aStep->setStamp(aStampIndex);
+      int aNumElements = isWholePart ? aXaoField->countElements() : aTables->rows();
+      int aNumComps = aTables->columns();
+      std::set<int> aFilledIDs; // to fill the rest by defaults
+      // omit default values first row
+      for(int aRow = isWholePart ? 0 : 1; aRow < aNumElements; aRow++) {
+        for(int aCol = 0; aCol < aNumComps; aCol++) {
+          int anElementID = 0;
+          if (!isWholePart) {
+            // element index actually is the ID of the selection
+            AttributeSelectionPtr aSelection = aSelectionList->value(aRow - 1);
+
+            // complex conversion of reference id to element index
+            int aReferenceID = aSelection->Id();
+            std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
+            anElementID =
+              aXao.getGeometry()->getElementIndexByReference(aFieldDimension, aReferenceString);
+          }
+
+          ModelAPI_AttributeTables::Value aVal = aTables->value(
+            isWholePart ? 0 : aRow, aCol, aStepIndex);
+          std::string aStrVal = valToString(aVal, aTables->type());
+          aStep->setStringValue(isWholePart ? aRow : anElementID, aCol, aStrVal);
+          aFilledIDs.insert(anElementID);
+        }
+      }
+      if (!isWholePart) { // fill the rest values by default ones
+        XAO::GeometricElementList::iterator allElem = aXao.getGeometry()->begin(aFieldDimension);
+        for(; allElem != aXao.getGeometry()->end(aFieldDimension); allElem++) {
+          if (aFilledIDs.find(allElem->first) != aFilledIDs.end())
+            continue;
+          for(int aCol = 0; aCol < aNumComps; aCol++) {
+            ModelAPI_AttributeTables::Value aVal = aTables->value(0, aCol, aStepIndex); // default
+            std::string aStrVal = valToString(aVal, aTables->type());
+            aStep->setStringValue(allElem->first, aCol, aStrVal);
+          }
+        }
+      }
+    }
+  }
+
+  // exporting
   XAOExport(theFileName, &aXao, anError);
 
   if (!anError.empty()) {
@@ -254,7 +359,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 
   } catch (XAO::XAO_Exception& e) {
     std::string anError = e.what();
-    setError("An error occurred while importing " + theFileName + ": " + anError);
+    setError("An error occurred while exporting " + theFileName + ": " + anError);
     return;
   }
 }

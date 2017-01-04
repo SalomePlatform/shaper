@@ -16,6 +16,7 @@
 
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
+#include <GeomAlgoAPI_Copy.h>
 
 //=================================================================================================
 BuildPlugin_Face::BuildPlugin_Face()
@@ -103,21 +104,16 @@ void BuildPlugin_Face::execute()
   for(ListOfShape::const_iterator anIt = aFaces.cbegin(); anIt != aFaces.cend(); ++anIt) {
     ResultBodyPtr aResultBody = document()->createBody(data(), anIndex);
     GeomShapePtr aShape = *anIt;
+    GeomAlgoAPI_Copy aCopy(aShape);
+    aShape = aCopy.shape();
     aResultBody->store(aShape);
 
+    // Store edges.
     int anEdgeIndex = 1;
-
     for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
-      GeomShapePtr anEdgeInResult = anExp.current();
-      for(ListOfShape::const_iterator anIt = anEdges.cbegin(); anIt != anEdges.cend(); ++anIt) {
-        std::shared_ptr<GeomAPI_Edge> anEdgeInList(new GeomAPI_Edge(*anIt));
-        if(anEdgeInList->isEqual(anEdgeInResult)) {
-          aResultBody->modified(anEdgeInList, anEdgeInResult,
-                                "Edge_" + std::to_string((long long)anEdgeIndex), anEdgeIndex);
-          ++anEdgeIndex;
-          break;
-        }
-      }
+      GeomShapePtr anEdge = anExp.current();
+      aResultBody->generated(anEdge, "Edge_" + std::to_string((long long)anEdgeIndex), anEdgeIndex);
+      ++anEdgeIndex;
     }
 
     setResult(aResultBody, anIndex);

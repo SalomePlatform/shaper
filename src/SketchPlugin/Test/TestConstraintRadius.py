@@ -151,5 +151,5 @@ assert (aCircleRadius.value() == 25)
 # End of test
 #=========================================================================
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

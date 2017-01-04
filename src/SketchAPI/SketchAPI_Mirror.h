@@ -10,6 +10,7 @@
 
 //--------------------------------------------------------------------------------------
 #include "SketchAPI.h"
+#include "SketchAPI_SketchEntity.h"
 
 #include <list>
 
@@ -53,7 +54,7 @@ public:
 
   /// List of mirrored objects
   SKETCHAPI_EXPORT
-  std::list<std::shared_ptr<ModelHighAPI_Interface> > mirrored() const;
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > mirrored() const;
 
   /// Dump wrapped feature
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;

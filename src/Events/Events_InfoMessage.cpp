@@ -31,30 +31,3 @@ void Events_InfoMessage::send()
   std::shared_ptr<Events_Message> aMsg(new Events_InfoMessage(*this));
   Events_Loop::loop()->send(aMsg);
 }
-
-
-std::string insertParameters(const std::string& theString, const std::list<std::string>& theParams)
-{
-  std::string aResult = theString;
-  std::list<std::string>::const_iterator aIt;
-  int i;
-  char aBuf[20];
-  std::string aParam;
-  for (i=1, aIt = theParams.cbegin(); aIt != theParams.cend(); aIt++, i++) {
-    aParam = (*aIt);
-    sprintf(aBuf, "%d", i);
-    std::string aCode = std::string("%") + std::string(aBuf);
-    size_t aPos = aResult.find(aCode);
-    if (aPos != std::string::npos) {
-      std::string aFirst = aResult.substr(0, aPos);
-      std::string aLast = aResult.substr(aPos + aCode.length(), std::string::npos);
-      aResult = aFirst + aParam + aLast;
-    }
-  }
-  return aResult;
-}
-
-std::string Events_InfoMessage::messageString() const
-{
-  return insertParameters(myMessage, myParameters);
-}

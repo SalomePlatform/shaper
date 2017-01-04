@@ -164,5 +164,5 @@ aSession.finishOperation()
 # Test results
 assert (len(aPipeFeature.results()) > 0)
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

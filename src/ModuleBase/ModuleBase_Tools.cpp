@@ -73,23 +73,6 @@ const double DEFAULT_DEVIATION_COEFFICIENT = 1.e-4;
 
 //#define DEBUG_ACTIVATE_WINDOW
 //#define DEBUG_SET_FOCUS
-//#define DEBUG_SELECTION_INFO
-
-#ifdef DEBUG_SELECTION_INFO
-#include <ModuleBase_ISelection.h>
-#include <ModuleBase_ViewerPrs.h>
-
-#include <AIS_InteractiveContext.hxx>
-#include <AIS_ListOfInteractive.hxx>
-#include <AIS_ListIteratorOfListOfInteractive.hxx>
-#include <AIS_Shape.hxx>
-#include <TopoDS_Shape.hxx>
-#include <AIS_LocalContext.hxx>
-#include <NCollection_List.hxx>
-#include <StdSelect_BRepOwner.hxx>
-#include <TColStd_ListOfInteger.hxx>
-#include <TColStd_ListIteratorOfListOfInteger.hxx>
-#endif
 
 #ifdef WIN32
 # define FSEP "\\"
@@ -283,6 +266,7 @@ QAction* createAction(const QIcon& theIcon, const QString& theText,
   return anAction;
 }
 
+#ifdef _DEBUG
 QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
 {
   QString aFeatureStr = "feature";
@@ -326,196 +310,7 @@ QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
 
   return aFeatureStr;
 }
-
-#ifdef DEBUG_SELECTION_INFO
-QString getShapeTypeInfo(const int theType)
-{
-  QString anInfo = "Undefined";
-  switch(theType) {
-    case TopAbs_COMPOUND:  anInfo = "compound"; break;
-    case TopAbs_COMPSOLID: anInfo = "compsolid"; break;
-    case TopAbs_SOLID:     anInfo = "solid"; break;
-    case TopAbs_SHELL:     anInfo = "shell"; break;
-    case TopAbs_FACE:      anInfo = "face"; break;
-    case TopAbs_WIRE:      anInfo = "wire"; break;
-    case TopAbs_EDGE:      anInfo = "edge"; break;
-    case TopAbs_VERTEX:    anInfo = "vertex"; break;
-    case TopAbs_SHAPE:     anInfo = "shape"; break;
-    case ModuleBase_ResultPrs::Sel_Result:
-                           anInfo = "result_shape"; break;
-    default: break;
-  }
-  return anInfo;
-}
-
-QString getModeInfo(const int theMode)
-{
-  QString anInfo = "Undefined";
-  switch(theMode) {
-    case 0: anInfo = "SHAPE(0)"; break;
-    case 1: anInfo = "VERTEX(1)"; break;
-    case 2: anInfo = "EDGE(2)"; break;
-    case 3: anInfo = "WIRE(3)"; break;
-    case 4: anInfo = "FACE(4)"; break;
-    case 5: anInfo = "SHELL(5)"; break;
-    case 6: anInfo = "SOLID(6)"; break;
-    case 7: anInfo = "COMPSOLID(7)"; break;
-    case 8: anInfo = "COMPOUND(8)"; break;
-    case 100: anInfo = "Sel_Mode_First(100)"; break; //SketcherPrs_Tools
-    case 101: anInfo = "Sel_Constraint(101)"; break;
-    case 102: anInfo = "Sel_Dimension_All(102)"; break;
-    case 103: anInfo = "Sel_Dimension_Line(103)"; break;
-    case 104: anInfo = "Sel_Dimension_Text(104)"; break;
-    default: break;
-  }
-  return anInfo;
-}
-
-QString displayedInteractiveObjects(Handle(AIS_InteractiveContext)& theContext,
-                                    const bool theShapeInfoOnly = true)
-{
-  if (theContext.IsNull())
-    return "";
-  AIS_ListOfInteractive aListOfIO;
-  theContext->DisplayedObjects(aListOfIO, false);
-  QStringList anObjects;
-  AIS_ListIteratorOfListOfInteractive aIt;
-  for (aIt.Initialize(aListOfIO); aIt.More(); aIt.Next()) {
-    Handle(AIS_InteractiveObject) anAISIO = aIt.Value();
-    Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(anAISIO);
-    if (theShapeInfoOnly && aShapePrs.IsNull())
-      continue;
-
-    QString anInfo = "IO";
-    std::ostringstream aPtrStr;
-    aPtrStr << "[" << anAISIO.Access() << "]";
-    anInfo += aPtrStr.str().c_str();
-
-    if (!aShapePrs.IsNull()) {
-      const TopoDS_Shape& aShape = aShapePrs->Shape();
-      if (aShape.IsNull()) {
-        //Events_Error::throwException("An empty AIS presentation");
-      }
-      else
-        anInfo += QString(", shape type: %1").arg(getShapeTypeInfo(aShape.ShapeType()));
-    }
-    TColStd_ListOfInteger aTColModes;
-    theContext->ActivatedModes(anAISIO, aTColModes);
-    TColStd_ListIteratorOfListOfInteger itr( aTColModes );
-    QIntList aModesActivatedForIO;
-    bool isDeactivated = false;
-    QStringList aModes;
-    for (; itr.More(); itr.Next() ) {
-      Standard_Integer aMode = itr.Value();
-      aModes.append(getModeInfo(aMode));
-      //int aShapeMode = (aMode > 8)? aMode : AIS_Shape::SelectionType(aMode);
-    }
-    if (aModes.size() > 0)
-      anInfo += QString(", activated modes: %1").arg(aModes.join(", "));
-
-    anObjects += anInfo;
-  }
-  QString aValue = QString("displayedIO[%1]").arg(anObjects.size());
-  if (anObjects.size() > 0)
-    aValue += QString(":\n  %1").arg(anObjects.join("\n  "));
-  return aValue;
-}
-
-QString activeOwners(Handle(AIS_InteractiveContext)& theContext, const bool theShapeInfoOnly = true)
-{
-  if (theContext.IsNull())
-    return "";
-  Handle(AIS_LocalContext) aLContext = theContext->LocalContext();
-  TCollection_AsciiString aSelectionName = aLContext->SelectionName();
-  aLContext->UnhilightPicked(Standard_False);
-
-  NCollection_List<Handle(SelectBasics_EntityOwner)> anActiveOwners;
-  aLContext->MainSelector()->ActiveOwners(anActiveOwners);
-  NCollection_List<Handle(SelectBasics_EntityOwner)>::Iterator anOwnersIt (anActiveOwners);
-  Handle(SelectMgr_EntityOwner) anOwner;
-  QStringList anObjects;
-  for (; anOwnersIt.More(); anOwnersIt.Next()) {
-    anOwner = Handle(SelectMgr_EntityOwner)::DownCast (anOwnersIt.Value());
-    Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast(anOwner);
-    if (theShapeInfoOnly && BROwnr.IsNull())
-      continue;
-
-    QString anInfo = "Owner";
-    std::ostringstream aPtrStr;
-    aPtrStr << "[" << anOwner.Access() << "]";
-    anInfo += aPtrStr.str().c_str();
-
-    Handle(AIS_InteractiveObject) aAISObj =
-          Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
-    if (!aAISObj.IsNull()) {
-      std::ostringstream aPtrStr;
-      aPtrStr << "[" << aAISObj.Access() << "]";
-      anInfo += QString(", selectable(IO): %1").arg(aPtrStr.str().c_str());
-    }
-
-    if (!BROwnr.IsNull() && BROwnr->HasShape()) {
-      const TopoDS_Shape& aShape = BROwnr->Shape();
-      if (aShape.IsNull()) {
-        //Events_Error::throwException("An empty AIS presentation");
-      }
-      else
-        anInfo += QString(", shape type: %1").arg(getShapeTypeInfo(aShape.ShapeType()));
-    }
-    anObjects += anInfo;
-  }
-  QString aValue = QString("activeOwners[%1]").arg(anObjects.size());
-  if (anObjects.size() > 0)
-    aValue += QString(":\n  %1").arg(anObjects.join("\n  "));
-  return aValue;
-}
-
-QString selectedOwners(Handle(AIS_InteractiveContext)& theContext,
-                              const bool theShapeInfoOnly = true)
-{
-  QStringList anObjects;
-  if (theContext.IsNull())
-    return "";
-
-  QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
-  for (theContext->InitSelected(); theContext->MoreSelected(); theContext->NextSelected()) {
-    Handle(SelectMgr_EntityOwner) anOwner = theContext->SelectedOwner();
-    Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast(anOwner);
-    if (theShapeInfoOnly && BROwnr.IsNull())
-      continue;
-
-    if (aSelectedIds.contains((long)anOwner.Access()))
-      continue;
-    aSelectedIds.append((long)anOwner.Access());
-
-    QString anInfo = "Owner";
-    std::ostringstream aPtrStr;
-    aPtrStr << "[" << anOwner.Access() << "]";
-    anInfo += aPtrStr.str().c_str();
-
-    if (!BROwnr.IsNull() && BROwnr->HasShape()) {
-      const TopoDS_Shape& aShape = BROwnr->Shape();
-      anInfo += QString(", shape type = %1").arg(getShapeTypeInfo(aShape.ShapeType()));
-    }
-    anObjects += anInfo;
-  }
-  QString aValue = QString("selectedOwners[%1]").arg(anObjects.size());
-  if (anObjects.size() > 0)
-    aValue += QString(":\n  %1").arg(anObjects.join("\n  "));
-  return aValue;
-}
 #endif
-
-void selectionInfo(Handle(AIS_InteractiveContext)& theContext, const std::string& thePrefix)
-{
-#ifdef DEBUG_SELECTION_INFO
-  QString aValue = QString("\n\n\nDEBUG_SELECTION_INFO for '%1'\n%2\n%3\n%4")
-                                              .arg(thePrefix.c_str())
-                                              .arg(displayedInteractiveObjects(theContext))
-                                              .arg(activeOwners(theContext))
-                                              .arg(selectedOwners(theContext));
-  qDebug(aValue.toStdString().c_str());
-#endif
-}
 
 typedef QMap<QString, int> ShapeTypes;
 static ShapeTypes myShapeTypes;
@@ -966,6 +761,18 @@ QString wrapTextByWords(const QString& theValue, QWidget* theWidget,
 }
 
 //**************************************************************
+QLocale doubleLocale()
+{
+  // VSR 01/07/2010: Disable thousands separator for spin box
+  // (to avoid inconsistency of double-2-string and string-2-double conversion)
+  QLocale aLocale;
+  aLocale.setNumberOptions(aLocale.numberOptions() |
+                           QLocale::OmitGroupSeparator |
+                           QLocale::RejectGroupSeparator);
+  return aLocale;
+}
+
+//**************************************************************
 void refsToFeatureInFeatureDocument(const ObjectPtr& theObject,
                                     std::set<FeaturePtr>& theRefFeatures)
 {
@@ -1200,15 +1007,34 @@ void convertToFeatures(const QObjectPtrList& theObjects, std::set<FeaturePtr>& t
   }
 }
 
-void translate(const std::string& theContext, std::string& theMessage)
+QString translate(const Events_InfoMessage& theMessage)
 {
+  QString aMessage;
+
+  if (!theMessage.empty()) {
+    std::string aStr = Config_Translator::translate(theMessage);
+    if (!aStr.empty()) {
+      std::string aCodec = Config_Translator::codec(theMessage);
+      aMessage = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aStr.c_str());
+    }
+  }
+
+  return aMessage;
+}
+
+QString translate(const std::string& theContext, const std::string& theMessage)
+{
+  QString aMessage;
+
   if (!theMessage.empty()) {
     std::string aStr = Config_Translator::translate(theContext, theMessage);
     if (!aStr.empty()) {
       std::string aCodec = Config_Translator::codec(theContext);
-      theMessage = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aStr.c_str()).toStdString();
+      aMessage = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aStr.c_str());
     }
   }
+
+  return aMessage;
 }
 
 void setPointBallHighlighting(AIS_Shape* theAIS)

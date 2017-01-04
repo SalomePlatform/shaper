@@ -12,7 +12,6 @@
 
 #define DEBUG_SENSITIVE_TO_BE_CORRECTED
 
-IMPLEMENT_STANDARD_HANDLE(SketcherPrs_SensitivePoint, Select3D_SensitiveEntity);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_SensitivePoint, Select3D_SensitiveEntity);
 
 SketcherPrs_SensitivePoint::SketcherPrs_SensitivePoint(

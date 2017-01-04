@@ -73,4 +73,5 @@ ADD_UNIT_TESTS(TestVertex.py
                TestWire.py
                TestFace.py
                TestShell.py
-               TestSubShapes.py)
+               TestSubShapes.py
+               Test1920.py)

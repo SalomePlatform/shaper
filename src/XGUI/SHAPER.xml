@@ -26,5 +26,10 @@
     <!-- Plugins preferences -->
     <parameter name="default_path" value="" />
   </section>
+  <section name="ExternalBrowser" >
+    <!-- External HELP browser settings -->
+    <parameter name="winapplication"       value="C:\Program Files\Internet Explorer\iexplore.exe" />
+    <parameter name="application"          value="/usr/bin/mozilla" />
+  </section>
 
 </document>

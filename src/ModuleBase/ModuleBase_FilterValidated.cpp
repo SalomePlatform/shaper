@@ -17,7 +17,6 @@
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_Tools.h>
 
-IMPLEMENT_STANDARD_HANDLE(ModuleBase_FilterValidated, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_FilterValidated, SelectMgr_Filter);
 
 Standard_Boolean ModuleBase_FilterValidated::
@@ -29,23 +28,23 @@ Standard_Boolean ModuleBase_FilterValidated::
     ModuleBase_IViewer* aViewer = myWorkshop->viewer();
     Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
 
-    ModuleBase_Tools::selectionInfo(aContext, "ModuleBase_FilterValidated::IsOk");
-
     ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
-    ModuleBase_ModelWidget* aCurrentWidget = aPanel->preselectionWidget();
-    if (!aCurrentWidget)
-      aCurrentWidget = myWorkshop->module()->activeWidget();
-    if (aCurrentWidget) {
-      ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
-      myWorkshop->selection()->fillPresentation(aPrs, theOwner);
-      ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
-                                                                             (aCurrentWidget);
-      if (aWidgetValidated)
-        aValid = !aWidgetValidated || aWidgetValidated->isValidSelection(aPrs);
-      else{
-        ModuleBase_WidgetValidator* aWidgetValidator = aCurrentWidget->widgetValidator();
-        if (aWidgetValidator)
-          aValid = aWidgetValidator->isValidSelection(aPrs);
+    if (aPanel) {
+      ModuleBase_ModelWidget* aCurrentWidget = aPanel->preselectionWidget();
+      if (!aCurrentWidget)
+        aCurrentWidget = myWorkshop->module()->activeWidget();
+      if (aCurrentWidget) {
+        ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
+        myWorkshop->selection()->fillPresentation(aPrs, theOwner);
+        ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
+                                                                               (aCurrentWidget);
+        if (aWidgetValidated)
+          aValid = !aWidgetValidated || aWidgetValidated->isValidSelection(aPrs);
+        else{
+          ModuleBase_WidgetValidator* aWidgetValidator = aCurrentWidget->widgetValidator();
+          if (aWidgetValidator)
+            aValid = aWidgetValidator->isValidSelection(aPrs);
+        }
       }
     }
   }

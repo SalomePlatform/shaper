@@ -224,7 +224,9 @@ FeaturePtr findPartFeature(const DocumentPtr& theMain, const DocumentPtr& theSub
   // to optimize and avoid of crash on partset document close
   // (don't touch the sub-document structure)
   if (theMain != theSub) {
-    for (int a = theMain->size(ModelAPI_Feature::group()) - 1; a >= 0; a--) {
+    // iteration from top to bottom to avoid finding the movement documents before the original
+    int aSize = theMain->size(ModelAPI_Feature::group());
+    for (int a = 0; a < aSize; a++) {
       FeaturePtr aPartFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(
           theMain->object(ModelAPI_Feature::group(), a));
       if (aPartFeat.get()) {

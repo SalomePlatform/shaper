@@ -164,5 +164,5 @@ assert(aLengthAttr.value() == 250.)
 # End of test
 #=========================================================================
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

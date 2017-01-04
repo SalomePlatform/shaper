@@ -1,5 +1,5 @@
 import unittest
-import model
+from salome.shaper import model
 import math
 import TestSketcher
 from TestSketcher import SketcherTestCase

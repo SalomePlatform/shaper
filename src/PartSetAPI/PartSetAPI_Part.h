@@ -56,13 +56,13 @@ PartPtr addPart(const std::shared_ptr<ModelAPI_Document> & thePartSet);
  * \brief Duplicate Part feature
  */
 PARTSETAPI_EXPORT
-PartPtr duplicatePart(const std::shared_ptr<ModelAPI_Document> & thePart);
+PartPtr duplicatePart(const ModelHighAPI_Interface& thePart);
 
 /**\ingroup CPPHighAPI
  * \brief Remove Part feature
  */
 PARTSETAPI_EXPORT
-void removePart(const std::shared_ptr<ModelAPI_Document> & thePart);
+void removePart(const ModelHighAPI_Interface& thePart);
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------

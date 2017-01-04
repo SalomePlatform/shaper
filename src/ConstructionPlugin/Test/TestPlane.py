@@ -4,7 +4,7 @@ Test case for Construction Plane feature. Written on High API.
 from ModelAPI import *
 from GeomAPI import *
 
-import model
+from salome.shaper import model
 
 # Get session
 aSession = ModelAPI_Session.get()
@@ -83,5 +83,4 @@ aPlane = model.addPlane(aDocument, aCoincidentPlane.result(), aPlane.result())
 aSession.finishOperation()
 assert (len(aPlane.results()) > 0)
 
-import model
 assert(model.checkPythonDump())

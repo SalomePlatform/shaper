@@ -55,7 +55,8 @@ public:
   * \param theParams a list of parameters (can be empty)
   */
   static CONFIG_EXPORT std::string translate(const std::string& theContext,
-    const std::string& theMessage);
+    const std::string& theMessage,
+    const std::list<std::string>& theParams = std::list<std::string>());
 
 
   /**
@@ -63,6 +64,12 @@ public:
   * \param theContext the context
   */ 
   static CONFIG_EXPORT std::string codec(const std::string& theContext);
+
+  /**
+  * Returns codec for the context
+  * \param theInfo the info
+  */ 
+  static CONFIG_EXPORT std::string codec(const Events_InfoMessage& theInfo);
 
 #ifdef _DEBUG
 #ifdef MISSED_TRANSLATION

@@ -8,7 +8,7 @@ SET(HAVE_SALOME NO)
 IF(EXISTS ${GUI_ROOT_DIR})
 	MESSAGE("-- SALOME found at " ${GUI_ROOT_DIR})
 	SET(HAVE_SALOME YES)
-  
+
   	FIND_LIBRARY(caf caf ${GUI_ROOT_DIR}/lib/salome)
 	FIND_LIBRARY(CAM CAM ${GUI_ROOT_DIR}/lib/salome)
 	FIND_LIBRARY(CASCatch CASCatch ${GUI_ROOT_DIR}/lib/salome)

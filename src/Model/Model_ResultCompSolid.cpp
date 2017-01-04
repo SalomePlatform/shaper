@@ -122,6 +122,10 @@ bool Model_ResultCompSolid::isConcealed()
         }
       }
     }
+    // update the display state of the subs: explicitly call Model_ResultBody::isConcealed
+    for(aSubIter = mySubs.cbegin(); aSubIter != mySubs.cend(); aSubIter++) {
+      (*aSubIter)->isConcealed();
+    }
   }
   return aResult;
 }

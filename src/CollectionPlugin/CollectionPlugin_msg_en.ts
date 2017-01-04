@@ -3,22 +3,30 @@
 <TS version="2.0" language="en_US">
 
   <context>
-    <name>Group</name>
+    <name>Group:group_list:GeomValidators_BodyShapes</name>
     <message>
-      <source>group_list - GeomValidators_BodyShapes: Error: Context is empty.</source>
+      <source>Error: Context is empty.</source>
       <translation>Selected object has empty context.</translation>
     </message>
+  </context>
+  <context>
+    <name>Group:group_list:GeomValidators_BodyShapes</name>
     <message>
-      <source>group_list - GeomValidators_BodyShapes: Error: Result construction selected.</source>
+      <source>Error: Result construction selected.</source>
       <translation>Constructions not allowed for selection.</translation>
     </message>
+  </context>
+  <context>
+    <name>Group:group_list:GeomValidators_BodyShapes</name>
     <message>
-      <source>group_list - GeomValidators_BodyShapes: Error: Attribute \"%1\" does not supported by this validator.</source>
+      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
       <translation>Attribute "%1" does not supported by "GeomValidators_BodyShapes" validator.</translation>
     </message>
-    
+  </context>
+  <context>
+    <name>Group:Model_FeatureValidator</name>
     <message>
-      <source>Model_FeatureValidator: Attribute "group_list" is not initialized.</source>
+      <source>Attribute "group_list" is not initialized.</source>
       <translation>Objects not selected.</translation>
     </message>
   </context>

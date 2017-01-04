@@ -62,29 +62,6 @@ private:
 };
 
 
-#if (!defined HAVE_SALOME) && (defined WIN32)
-#include <QWindowsVistaStyle>
-/**
-* \ingroup GUI
-* Implementation of XGUI_DataTree custom style
-*/
-class XGUI_TreeViewStyle : public QWindowsVistaStyle
-{
-  Q_OBJECT
-public:
-  XGUI_TreeViewStyle() : QWindowsVistaStyle() {}
-
-  void drawPrimitive(PrimitiveElement theElement, const QStyleOption* theOption,
-                     QPainter* thePainter, const QWidget* theWidget = 0) const;
-
-  void setIndex(const QModelIndex& theIndex) { myIndex = theIndex; }
-  QModelIndex index() const { return myIndex; }
-
-private:
-  QModelIndex myIndex;
-};
-#endif
-
 /**
 * \ingroup GUI
 * Implementation of Data Tree object for Object Browser
@@ -123,14 +100,6 @@ public slots:
 
    /// Redefinition of virtual method
   virtual void resizeEvent(QResizeEvent* theEvent);
-
-#if (!defined HAVE_SALOME) && (defined WIN32)
-  virtual void drawRow(QPainter* thePainter,
-                        const QStyleOptionViewItem& theOptions,
-                        const QModelIndex& theIndex) const;
-private:
-  XGUI_TreeViewStyle* myStyle;
-#endif
 };
 
 /**\class XGUI_ObjectsBrowser
@@ -184,6 +153,16 @@ Q_OBJECT
   /// Set XML reader object for data model
   /// \param theReader the reader object
   void setXMLReader(Config_DataModelReader* theReader);
+
+  /// Returns list of folders opened state for the given document
+  /// \param theDoc the document
+  /// \return list of booleans with state expanded or not
+  std::list<bool> getStateForDoc(DocumentPtr theDoc) const;
+
+  /// Set folders opened state for the given document
+  /// \param theDoc the document
+  /// \param theStates list of booleans with state expanded or not
+  void setStateForDoc(DocumentPtr theDoc, const std::list<bool>& theStates);
 
 public slots:
   //! Called on Edit command request

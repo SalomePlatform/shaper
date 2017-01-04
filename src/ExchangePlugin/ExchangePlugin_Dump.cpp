@@ -9,6 +9,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_ResultPart.h>
 
 #include <ModelHighAPI_Dumper.h>
 
@@ -43,11 +44,26 @@ void ExchangePlugin_Dump::execute()
 void ExchangePlugin_Dump::dump(const std::string& theFileName)
 {
   // load DumpAssistant from Python side
-  Config_ModuleReader::loadScript("model.dump");
+  Config_ModuleReader::loadScript("salome.shaper.model.dump");
 
   ModelHighAPI_Dumper* aDumper = ModelHighAPI_Dumper::getInstance();
   aDumper->clear();
   DocumentPtr aDoc = ModelAPI_Session::get()->moduleDocument();
+
+  std::list<FeaturePtr> aFeatures = aDoc->allFeatures();
+  for(std::list<FeaturePtr>::const_iterator aFeatIt = aFeatures.begin();
+      aFeatIt != aFeatures.end();
+      ++aFeatIt) {
+    ResultPartPtr aResultPart =
+      std::dynamic_pointer_cast<ModelAPI_ResultPart>((*aFeatIt)->firstResult());
+    if(aResultPart.get()) {
+      if(!aResultPart->isActivated()) {
+        setError("Error: Not all parts are loaded. Can not dump.");
+        return;
+      }
+    }
+  }
+
   if (!aDumper || !aDumper->process(aDoc, theFileName))
     setError("An error occured while dumping to " + theFileName);
 }

@@ -32,11 +32,11 @@
 #include <XGUI_Displayer.h>
 #include <XGUI_DataModel.h>
 #include <XGUI_OperationMgr.h>
+#include <XGUI_ObjectsBrowser.h>
 
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
-#include <ModelAPI_ResultPart.h>
 #include <ModelAPI_ResultParameter.h>
 
 #include <QMainWindow>
@@ -457,9 +457,24 @@ void PartSet_MenuMgr::onActivatePart(bool)
         aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aPartFeature->firstResult());
       }
     }
-    if (aPart.get())
-      aPart->activate();
+    if (aPart.get()) {
+      activatePart(aPart);
       myModule->workshop()->updateCommandStatus();
+    }
+  }
+}
+
+void PartSet_MenuMgr::activatePart(ResultPartPtr thePart) const
+{
+  bool isFirstLoad = !thePart->partDoc().get();
+  thePart->activate();
+  if (isFirstLoad) {
+    XGUI_Workshop* aWorkshop = myModule->getWorkshop();
+    XGUI_ObjectsBrowser* aObjBrowser = aWorkshop->objectBrowser();
+    DocumentPtr aDoc = thePart->partDoc();
+    std::list<bool> aStates;
+    aDoc->restoreNodesState(aStates);
+    aObjBrowser->setStateForDoc(aDoc, aStates);
   }
 }
 
@@ -475,7 +490,8 @@ void PartSet_MenuMgr::activatePartSet() const
   SessionPtr aMgr = ModelAPI_Session::get();
   bool isNewTransaction = !aMgr->isOperation();
   // activation may cause changes in current features in document, so it must be in transaction
-  if (isNewTransaction) aMgr->startOperation("Activation");
+  if (isNewTransaction)
+    aMgr->startOperation("Activation");
   aMgr->setActiveDocument(aMgr->moduleDocument());
   if (isNewTransaction) aMgr->finishOperation();
 

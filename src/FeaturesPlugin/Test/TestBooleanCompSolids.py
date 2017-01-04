@@ -129,5 +129,5 @@ assert (aBooleanResult is not None)
 # End of test
 #=========================================================================
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

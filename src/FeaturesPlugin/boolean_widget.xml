@@ -14,7 +14,7 @@
   <multi_selector id="main_objects"
     label="Main objects"
     icon=""
-    tooltip="Select solid objects"
+    tooltip="Select objects"
     type_choice="solids compsolids edges faces"
     use_choice="false"
     concealment="true">
@@ -24,7 +24,7 @@
   <multi_selector id="tool_objects"
     label="Tool objects"
     icon=""
-    tooltip="Select a tool solid"
+    tooltip="Select tools"
     type_choice="solids compsolids edges faces"
     use_choice="false"
     concealment="true" >

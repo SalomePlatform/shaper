@@ -90,6 +90,9 @@ public:
   GEOMAPI_EXPORT
   virtual ShapeType shapeType() const;
 
+  /// Returns the type enumeration by the string-type
+  GEOMAPI_EXPORT static ShapeType shapeTypeByStr(std::string theType);
+
   /// \return the shape type as string.
   GEOMAPI_EXPORT
   virtual std::string shapeTypeStr() const;

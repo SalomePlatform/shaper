@@ -25,7 +25,7 @@
 #include <SelectMgr_SequenceOfOwner.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <SelectMgr_SelectionManager.hxx>
-#include <StdPrs_WFDeflectionShape.hxx>
+#include <StdPrs_WFShape.hxx>
 #include <StdSelect_BRepSelectionTool.hxx>
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Selection.hxx>
@@ -33,15 +33,11 @@
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <TopExp_Explorer.hxx>
 
-IMPLEMENT_STANDARD_HANDLE(ModuleBase_BRepOwner, StdSelect_BRepOwner);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_BRepOwner, StdSelect_BRepOwner);
 
 //*******************************************************************************************
 
-IMPLEMENT_STANDARD_HANDLE(ModuleBase_ResultPrs, ViewerData_AISShape);
 IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ResultPrs, ViewerData_AISShape);
-
-
 
 
 
@@ -182,25 +178,26 @@ void ModuleBase_ResultPrs::HilightSelected(const Handle(PrsMgr_PresentationManag
   for (int i = 1; i <= theOwners.Length(); i++) {
     anOwner = theOwners.Value(i);
     aCompOwner = Handle(ModuleBase_BRepOwner)::DownCast(anOwner);
-    if (aCompOwner.IsNull())
-      anOwner->Hilight(thePM);
+    if (aCompOwner.IsNull()) {
+      thePM->Color(anOwner->Selectable(), GetContext()->SelectionStyle());
+    }
     else {
       TopoDS_Shape aShape = aCompOwner->Shape();
       Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( thePM );
       aSelectionPrs->Clear();
 
-      StdPrs_WFDeflectionShape::Add(aSelectionPrs, aShape, myDrawer);
+      StdPrs_WFShape::Add(aSelectionPrs, aShape, myDrawer);
 
       aSelectionPrs->SetDisplayPriority(9);
-      aSelectionPrs->Highlight(Aspect_TOHM_COLOR, aSelectionPrs->HighlightColor());
+      aSelectionPrs->Highlight(GetContext()->SelectionStyle());
       aSelectionPrs->Display();
-      thePM->Highlight(this);
+      thePM->Color(this, GetContext()->SelectionStyle());
     }
   }
 }
 
 void ModuleBase_ResultPrs::HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM,
-                                                 const Quantity_NameOfColor theColor,
+                                                 const Handle(Graphic3d_HighlightStyle)& theStyle,
                                                  const Handle(SelectMgr_EntityOwner)& theOwner)
 {
   Handle(StdSelect_BRepOwner) aOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
@@ -209,13 +206,13 @@ void ModuleBase_ResultPrs::HilightOwnerWithColor(const Handle(PrsMgr_Presentatio
 
   TopoDS_Shape aShape = aOwner->Shape();
   if (!aShape.IsNull()) {
-    thePM->Color(this, theColor);
+    thePM->Color(this, theStyle);
 
     Handle( Prs3d_Presentation ) aHilightPrs = GetHilightPresentation( thePM );
     aHilightPrs->Clear();
 
-    StdPrs_WFDeflectionShape::Add(aHilightPrs, aShape, myDrawer);
-    aHilightPrs->Highlight(Aspect_TOHM_COLOR, theColor);
+    StdPrs_WFShape::Add(aHilightPrs, aShape, myDrawer);
+    aHilightPrs->Highlight(theStyle);
 
     if (thePM->IsImmediateModeOn())
       thePM->AddToImmediateList(aHilightPrs);

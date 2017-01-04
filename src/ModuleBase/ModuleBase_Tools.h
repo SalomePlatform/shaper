@@ -22,10 +22,9 @@
 
 #include <QIcon>
 #include <QPixmap>
+#include <QLocale>
 
 #include <map>
-
-class Handle_AIS_InteractiveContext;
 
 class QWidget;
 class QLayout;
@@ -36,6 +35,8 @@ class ModuleBase_ParamSpinBox;
 class ModuleBase_IWorkshop;
 
 class GeomAPI_Shape;
+
+class Events_InfoMessage;
 
 namespace ModuleBase_Tools {
 
@@ -130,18 +131,14 @@ MODULEBASE_EXPORT QAction* createAction(const QIcon& theIcon, const QString& the
                                         const QString& theToolTip = QString(),
                                         const QString& theStatusTip = QString());
 
+#ifdef _DEBUG
 /// Converts the object to the feature or a result and generate information string
 /// \param theObj an object
 /// \param isUseAttributesInfo a flag whether the attribute values information is used
 /// \return a string
 MODULEBASE_EXPORT QString objectInfo(const ObjectPtr& theObj,
                                      const bool isUseAttributesInfo = false);
-
-/// Converts the AIS context information in a string information.
-/// \param theContext a viewer context
-/// \param thePrefix additional information where the method is called
-MODULEBASE_EXPORT void selectionInfo(Handle_AIS_InteractiveContext& theContext,
-                                     const std::string& thePrefix);
+#endif
 
 /// Converts string value (name of shape type) to shape enum value
 /// \param theType - string with shape type name
@@ -254,6 +251,11 @@ MODULEBASE_EXPORT void blockUpdateViewer(const bool theValue);
 MODULEBASE_EXPORT QString wrapTextByWords(const QString& theValue, QWidget* theWidget,
                                              int theMaxLineInPixels = 150);
 
+/// Generates a locale to disable thousands separator for spin box
+/// (to avoid inconsistency of double-2-string and string-2-double conversion)
+/// \return locale
+MODULEBASE_EXPORT QLocale doubleLocale();
+
 /// Returns a container of referenced feature to the current object in the object document.
 /// \param theObject an object, which will be casted to a feature type
 /// \param theRefFeatures an output container
@@ -313,10 +315,15 @@ void MODULEBASE_EXPORT convertToFeatures(const QObjectPtrList& theObjects,
 /// Returns translation from the given data.
 /// If translation is not exists then it returns a string
 /// from the info data without translation
+/// \param theMessage a message which dave to be translated
+QString MODULEBASE_EXPORT translate(const Events_InfoMessage& theMessage);
+
+/// Returns translation from the given data.
+/// If translation is not exists then it returns a string
+/// from the info data without translation
 /// \param theContext context of the message (Feature Id)
 /// \param theMessage a message which dave to be translated
-/// \param theParams a list of parameters (can be empty)
-void MODULEBASE_EXPORT translate(const std::string& theContext, std::string& theMessage);
+QString MODULEBASE_EXPORT translate(const std::string& theContext, const std::string& theMessage);
 
 /// Set Highlighting of points as a Ball shape
 /// \param theAIS - the presentation

@@ -16,6 +16,8 @@
 #include <ModelAPI_Result.h>
 #include <Model_Data.h>
 
+#include <Config_Translator.h>
+
 #include <Events_InfoMessage.h>
 
 void Model_ValidatorsFactory::registerValidator(const std::string& theID,
@@ -184,8 +186,10 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
         if (!aFValidator->isValid(theFeature, anArguments, anError)) {
           if (anError.empty())
             anError = "Unknown error.";
-          anError = aValidatorID + ": " + anError.messageString();
-          theFeature->setError(anError.messageString(), false);
+          if (anError.context().empty()) {
+            anError.setContext(theFeature->getKind() + ":" + aValidatorID);
+          }
+          theFeature->setError(Config_Translator::translate(anError), false, false);
           theFeature->data()->execState(ModelAPI_StateInvalidArgument);
           return false;
         }
@@ -228,8 +232,10 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
     if (!validate(anAttribute, aValidatorID, anError)) {
       if (anError.empty())
         anError = "Unknown error.";
-      anError = anAttributeID + " - " + aValidatorID + ": " + anError.messageString();
-      theFeature->setError(anError.messageString(), false);
+      if (anError.context().empty()) {
+        anError.setContext(theFeature->getKind() + ":" + anAttributeID + ":" + aValidatorID);
+      }
+      theFeature->setError(Config_Translator::translate(anError), false, false);
       theFeature->data()->execState(ModelAPI_StateInvalidArgument);
       return false;
     }

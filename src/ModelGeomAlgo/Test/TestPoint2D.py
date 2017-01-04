@@ -16,5 +16,5 @@ __updated__ = "2016-07-20"
 
 aSession = ModelAPI_Session.get()
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

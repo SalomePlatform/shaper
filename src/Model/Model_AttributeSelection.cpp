@@ -11,6 +11,7 @@
 #include "Model_Document.h"
 #include "Model_SelectionNaming.h"
 #include <Model_Objects.h>
+#include <Model_AttributeSelectionList.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
@@ -295,6 +296,7 @@ Model_AttributeSelection::Model_AttributeSelection(TDF_Label& theLabel)
   : myRef(theLabel)
 {
   myIsInitialized = myRef.isInitialized();
+  myParent = NULL;
 }
 
 void Model_AttributeSelection::setID(const std::string theID)
@@ -429,9 +431,6 @@ bool Model_AttributeSelection::update()
       aBuilder.Generated(aContext->shape()->impl<TopoDS_Shape>());
       std::shared_ptr<Model_Document> aMyDoc =
         std::dynamic_pointer_cast<Model_Document>(owner()->document());
-      //std::string aName = contextName(aContext);
-      //aMyDoc->addNamingName(aSelLab, aName);
-      //TDataStd_Name::Set(aSelLab, aName.c_str());
     }
     return setInvalidIfFalse(aSelLab, aContext->shape() && !aContext->shape()->isNull());
   }
@@ -461,10 +460,39 @@ bool Model_AttributeSelection::update()
       aNewShape = aSelector.NamedShape()->Get();
     }
     if (anOldShape.IsNull() || aNewShape.IsNull() ||
-        !anOldShape.IsEqual(aSelector.NamedShape()->Get())) // send updated if shape is changed
-      owner()->data()->sendAttributeUpdated(this);
+        !anOldShape.IsEqual(aSelector.NamedShape()->Get())) {
+      // shape type shoud not not changed: if shape becomes compound of such shapes, then split
+      if (myParent && !anOldShape.IsNull() && !aNewShape.IsNull() &&
+          anOldShape.ShapeType() != aNewShape.ShapeType() &&
+          aNewShape.ShapeType() == TopAbs_COMPOUND) {
+        TopTools_ListOfShape aSubs;
+        for(TopoDS_Iterator anExplorer(aNewShape); anExplorer.More(); anExplorer.Next()) {
+          if (!anExplorer.Value().IsNull() &&
+              anExplorer.Value().ShapeType() == anOldShape.ShapeType()) {
+            aSubs.Append(anExplorer.Value());
+          } else { // invalid case; bad result shape, so, impossible to split easily
+            aSubs.Clear();
+            break;
+          }
+        }
+        if (aSubs.Extent() > 1) { // ok to split
+          TopTools_ListIteratorOfListOfShape aSub(aSubs);
+          GeomShapePtr aSubSh(new GeomAPI_Shape);
+          aSubSh->setImpl(new TopoDS_Shape(aSub.Value()));
+          setValue(aContext, aSubSh);
+          for(aSub.Next(); aSub.More(); aSub.Next()) {
+            GeomShapePtr aSubSh(new GeomAPI_Shape);
+            aSubSh->setImpl(new TopoDS_Shape(aSub.Value()));
+            myParent->append(aContext, aSubSh);
+          }
+        }
+      }
+      owner()->data()->sendAttributeUpdated(this);  // send updated if shape is changed
+    }
     return aResult;
-  } else if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {
+  }
+
+  if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {
     // construction: identification by the results indexes, recompute faces and
     // take the face that more close by the indexes
     ResultConstructionPtr aConstructionContext =
@@ -633,7 +661,7 @@ void Model_AttributeSelection::selectBody(
   TNaming_Selector aSel(selectionLabel());
   TopoDS_Shape aContext;
 
-  ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myRef.value());
+  ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theContext);//myRef.value()
   if (aBody) {
     aContext = aBody->shape()->impl<TopoDS_Shape>();
   } else {
@@ -694,6 +722,13 @@ void Model_AttributeSelection::selectBody(
       }
     }
     if (!isFound) { // sub-shape is not found in the up-to-date instance of the context shape
+      // if context is sub-result of compound/compsolid, selection of sub-shape better propagate to
+      // the main result (which is may be modified), case is in 1799
+      ResultCompSolidPtr aMain = ModelAPI_Tools::compSolidOwner(theContext);
+      if (aMain.get()) {
+        selectBody(aMain, theSubShape);
+        return;
+      }
       setInvalidIfFalse(aSelLab, false);
       Events_InfoMessage("Model_AttributeSelection",
         "Failed to select sub-shape already modified").send();
@@ -701,13 +736,22 @@ void Model_AttributeSelection::selectBody(
     }
   }
 
-
   /// fix for issue 411: result modified shapes must not participate in this selection mechanism
-  FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-  if (aFeatureOwner.get())
-    aFeatureOwner->eraseResults();
   if (!aContext.IsNull()) {
+    FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+    bool aEraseResults = false;
+    if (aFeatureOwner.get()) {
+      aEraseResults = !aFeatureOwner->results().empty();
+      if (aEraseResults) // erase results without flash deleted and redisplay: do it after Select
+        aFeatureOwner->removeResults(0, false);
+    }
     aSel.Select(aNewSub, aNewContext);
+
+    if (aEraseResults) { // flash after Select : in Groups it makes selection with shift working
+      static Events_Loop* aLoop = Events_Loop::loop();
+      static const Events_ID kDeletedEvent = aLoop->eventByName(EVENT_OBJECT_DELETED);
+      aLoop->flush(kDeletedEvent);
+    }
   }
 }
 
@@ -1142,15 +1186,6 @@ void Model_AttributeSelection::updateInHistory()
         aCurrentModifierFeat = aModifierFeat;
         TNaming_Iterator aPairIter(aNewNS);
         aNewShape = aPairIter.NewShape();
-        /*
-        // searching for sub-shape equivalent on the sub-label of the new context result
-        TDF_ChildIDIterator aNSIter(aNewNS->Label(), TNaming_NamedShape::GetID());
-        for(; aNSIter.More(); aNSIter.Next()) {
-          TNaming_Iterator aPairsIter(aNSIter.Value()->Label());
-          for(; aPairsIter.More(); aPairsIter.Next()) {
-            if (aSubShape->impl<TopoDS_Shape>().IsEqual()
-          }
-        }*/
         anIterate = true;
         break;
       } else if (aNewNS->Evolution() == TNaming_DELETE) { // a shape was deleted => result is null
@@ -1162,36 +1197,6 @@ void Model_AttributeSelection::updateInHistory()
         continue;
       }
     }
-
-    /*
-    TNaming_NewShapeIterator aModifIter(aPairIter.NewShape(), aContLab);
-    if (aModifIter.More()) aModifIter.Next(); // skip this shape result
-    for(; aModifIter.More(); aModifIter.Next()) {
-      ResultPtr aModifierObj = std::dynamic_pointer_cast<ModelAPI_Result>
-        (aDoc->objects()->object(aModifIter.Label().Father()));
-      if (!aModifierObj.get())
-        break;
-      FeaturePtr aModifierFeat = aDoc->feature(aModifierObj);
-      if (!aModifierFeat.get())
-        break;
-      if (aModifierFeat == aThisFeature || aDoc->objects()->isLater(aModifierFeat, aThisFeature))
-        break; // the modifier feature is later than this, so, should not be used
-      Handle(TNaming_NamedShape) aNewNS = aModifIter.NamedShape();
-      if (aNewNS->Evolution() == TNaming_MODIFY || aNewNS->Evolution() == TNaming_GENERATED) {
-        aModifierResFound = aModifierObj;
-      } else if (aNewNS->Evolution() == TNaming_DELETE) { // a shape was deleted => result is null
-        ResultPtr anEmptyContext;
-        std::shared_ptr<GeomAPI_Shape> anEmptyShape;
-        setValue(anEmptyContext, anEmptyShape); // nullify the selection
-        return;
-      } else { // not-precessed modification => don't support it
-        break;
-      }
-    }
-    // already found what is needed, don't iterate the next pair since normally
-    if (aModifierResFound.get()) //  there must be only one pair in the result-shape
-      break;
-    */
   }
   if (aModifierResFound.get()) {
     // update scope to reset to a new one
@@ -1199,38 +1204,9 @@ void Model_AttributeSelection::updateInHistory()
     myRef.setValue(aModifierResFound);
     update(); // it must recompute a new sub-shape automatically
   }
-  /*
-  if (aModifierResFound.get()) {
-    // update scope to reset to a new one
-    myScope.Clear();
-    if (!aSubShape.get() || aSubShape->isNull()) { // no sub-shape, so, just update a context
-      setValue(aModifierResFound, aSubShape);
-      return;
-    }
-    // seaching for the same sub-shape: the old topology stays the same
-    TopoDS_Shape anOldShape = aSubShape->impl<TopoDS_Shape>();
-    TopAbs_ShapeEnum aSubType = anOldShape.ShapeType();
-    TopoDS_Shape aNewContext = aModifierResFound->shape()->impl<TopoDS_Shape>();
-    TopExp_Explorer anExp(aNewContext, aSubType);
-    for(; anExp.More(); anExp.Next()) {
-      if (anExp.Current().IsEqual(anOldShape))
-        break;
-    }
-    if (anExp.More()) { // found
-      setValue(aModifierResFound, aSubShape);
-      return;
-    }
-    // seaching for the same sub-shape: equal geometry
-    for(anExp.Init(aNewContext, aSubType); anExp.More(); anExp.Next()) {
-      if (aSubType == TopAbs_VERTEX) {
+}
 
-      }
-    }
-  }*/
-  // if sub-shape selection exists, search also sub-shape new instance
-  /*
-  GeomShapePtr aSubShape = value();
-  if (aSubShape.get() && aSubShape != aContext->shape()) {
-
-  }*/
+void Model_AttributeSelection::setParent(Model_AttributeSelectionList* theParent)
+{
+  myParent = theParent;
 }

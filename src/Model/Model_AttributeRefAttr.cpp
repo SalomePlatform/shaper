@@ -20,9 +20,10 @@ void Model_AttributeRefAttr::setAttr(std::shared_ptr<ModelAPI_Attribute> theAttr
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(
       theAttr->owner()->data());
   std::string anID = aData->id(theAttr);
-  if (myIsInitialized && object() == theAttr->owner() && myID->Get().IsEqual(anID.c_str()))
+  ObjectPtr anObj = object();
+  if (myIsInitialized && anObj == theAttr->owner() && myID->Get().IsEqual(anID.c_str()))
     return;  // nothing is changed
-  REMOVE_BACK_REF(theAttr->owner());
+  REMOVE_BACK_REF(anObj);
   myRef->Set(aData->label().Father());
   myID->Set(aData->id(theAttr).c_str());
   ADD_BACK_REF(theAttr->owner());

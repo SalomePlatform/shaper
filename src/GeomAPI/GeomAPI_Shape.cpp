@@ -28,6 +28,7 @@
 #include <NCollection_List.hxx>
 
 #include <sstream>
+#include <algorithm> // for std::transform
 
 #define MY_SHAPE implPtr<TopoDS_Shape>()
 
@@ -281,6 +282,28 @@ GeomAPI_Shape::ShapeType GeomAPI_Shape::shapeType() const
   }
 
   return aST;
+}
+
+GeomAPI_Shape::ShapeType GeomAPI_Shape::shapeTypeByStr(std::string theType)
+{
+  std::transform(theType.begin(), theType.end(), theType.begin(), ::toupper);
+  if (theType == "COMPOUND")
+    return COMPOUND;
+  if (theType == "COMPSOLID")
+    return COMPSOLID;
+  if (theType == "SOLID")
+    return SOLID;
+  if (theType == "SHELL")
+    return SHELL;
+  if (theType == "FACE")
+    return FACE;
+  if (theType == "WIRE")
+    return WIRE;
+  if (theType == "EDGE")
+    return EDGE;
+  if (theType == "VERTEX")
+    return VERTEX;
+  return SHAPE; // default
 }
 
 std::string GeomAPI_Shape::shapeTypeStr() const

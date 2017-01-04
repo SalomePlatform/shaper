@@ -21,5 +21,5 @@ aFeature1Name = aFeature1.data().name()
 
 assert (aFeatureName == aFeature1Name)
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

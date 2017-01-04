@@ -31,7 +31,7 @@ class ModuleBase_Operation;
 class ModuleBase_IWorkshop;
 class ModelAPI_Result;
 
-class Handle_AIS_InteractiveObject;
+class AIS_InteractiveObject;
 
 /**
  * \ingroup GUI
@@ -251,7 +251,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Create specific for the module presentation
   /// \param theResult an object for presentation
   /// \return created presentation or NULL(default value)
-  virtual Handle_AIS_InteractiveObject createPresentation(
+  virtual Handle(AIS_InteractiveObject) createPresentation(
                            const std::shared_ptr<ModelAPI_Result>& theResult);
 
   //! Returns data object by AIS

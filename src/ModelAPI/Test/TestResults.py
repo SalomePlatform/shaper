@@ -41,5 +41,5 @@ assert(aColors.value(1) == 200)
 assert(aColors.value(2) == 250)
 aSession.finishOperation()
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

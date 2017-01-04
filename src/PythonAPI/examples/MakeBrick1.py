@@ -2,7 +2,7 @@
 # Author: Daniel Brunier-Coulin
 # -----------------------------
 
-import model
+from salome.shaper import model
 
 
 # Initialisation

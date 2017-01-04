@@ -91,12 +91,13 @@
 #include <Config_PropManager.h>
 #include <Config_Keywords.h>
 
+#include <AIS_Dimension.hxx>
+#include <AIS_InteractiveObject.hxx>
 #include <StdSelect_TypeOfFace.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
 #include <BRep_Tool.hxx>
-#include <AIS_Dimension.hxx>
 
 #include <QObject>
 #include <QMouseEvent>
@@ -230,6 +231,10 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_MiddlePointSelection", new PartSet_MiddlePointSelection);
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
   aFactory->registerValidator("PartSet_CoincidentAttr", new PartSet_CoincidentAttr);
+  aFactory->registerValidator("PartSet_MultyTranslationSelection",
+    new PartSet_MultyTranslationSelection);
+  aFactory->registerValidator("PartSet_SplitSelection", new PartSet_SplitSelection);
+  aFactory->registerValidator("PartSet_ProjectionSelection", new PartSet_ProjectionSelection);
 }
 
 void PartSet_Module::registerFilters()
@@ -335,7 +340,6 @@ void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
         }
       }
     } if (!isOperationCommitted) {
-      workshop()->updateCommandStatus();
       aWorkshop->connectToPropertyPanel(true);
       updateSketcherOnStart(aFOperation);
       updatePresentationsOnStart(aFOperation);
@@ -356,6 +360,10 @@ void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
         XGUI_Displayer* aDisplayer = aWorkshop->displayer();
         aDisplayer->updateViewer();
       }
+      /// state of command actions should be updated after displayed objects modification because
+      /// deactivation(for example) of objects may influence on selection in the viewer
+      /// State of command actions may depend on selection in the viewer(e.g. Sketch)
+      workshop()->updateCommandStatus();
     }
     if (aPostonedWidgetActivation) {
       // if the widget is an empty in the chain of activated widgets, the current operation
@@ -577,6 +585,7 @@ bool PartSet_Module::isSketchNeutralPointActivated() const
 
 void PartSet_Module::closeDocument()
 {
+  myActivePartIndex = QModelIndex();
   clearViewer();
 }
 
@@ -625,6 +634,13 @@ bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
       // click on the digit of dimension constrain comes here
       // with an empty shape, so we need the check
       if (aFeature == anOpFeature && aShape.get() && !aShape->isNull()) {
+        // if feature has only one result and shape of result is equal to selected shape
+        // this attribute is not processed. It is a case of Sketch Point.
+        if (aFeature->results().size() == 1) {
+          ResultPtr aResult = aFeature->results().front();
+          if (aResult.get() && aResult->shape()->isEqual(aShape))
+            return aProcessed;
+        }
         const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
         AttributePtr anAttribute = PartSet_Tools::findAttributeBy2dPoint(anObject, aTDShape,
                                                                mySketchMgr->activeSketch());
@@ -1221,12 +1237,12 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
 
     SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aActiveDoc = aMgr->activeDocument();
-    if (aActivePartIndex.isValid())
-      aTreeView->setExpanded(aActivePartIndex, false);
+    if (myActivePartIndex.isValid())
+      aTreeView->setExpanded(myActivePartIndex, false);
     XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
-    aActivePartIndex = aDataModel->documentRootIndex(aActiveDoc);
-    if (aActivePartIndex.isValid())
-      aTreeView->setExpanded(aActivePartIndex, true);
+    myActivePartIndex = aDataModel->documentRootIndex(aActiveDoc);
+    if (myActivePartIndex.isValid())
+      aTreeView->setExpanded(myActivePartIndex, true);
 
     aLabel->setPalette(aPalet);
     aWorkshop->updateCommandStatus();
@@ -1284,7 +1300,8 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
     return;
   SessionPtr aMgr = ModelAPI_Session::get();
   if (!theIndex.isValid()) {
-    aMgr->setActiveDocument(aMgr->moduleDocument());
+    // It seems that this code is obsolete
+    //aMgr->setActiveDocument(aMgr->moduleDocument());
     return;
   }
   if (theIndex.column() != 0) // Use only first column
@@ -1308,7 +1325,7 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
     if (aPart->partDoc() == aMgr->activeDocument()) {
       myMenuMgr->activatePartSet();
     } else {
-      aPart->activate();
+      myMenuMgr->activatePart(aPart);
     }
   }
 }

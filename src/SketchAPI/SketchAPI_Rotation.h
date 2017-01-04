@@ -10,6 +10,7 @@
 
 //--------------------------------------------------------------------------------------
 #include "SketchAPI.h"
+#include "SketchAPI_SketchEntity.h"
 
 #include <list>
 
@@ -64,7 +65,7 @@ public:
 
   /// List of rotated objects
   SKETCHAPI_EXPORT
-  std::list<std::shared_ptr<ModelHighAPI_Interface> > rotated() const;
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > rotated() const;
 
   /// Dump wrapped feature
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;

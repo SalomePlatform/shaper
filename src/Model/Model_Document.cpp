@@ -37,6 +37,7 @@
 #include <TDF_ListIteratorOfAttributeDeltaList.hxx>
 #include <TDF_ListIteratorOfLabelList.hxx>
 #include <TDF_LabelMap.hxx>
+#include <TDF_DeltaOnAddition.hxx>
 #include <TNaming_SameShapeIterator.hxx>
 #include <TNaming_Iterator.hxx>
 #include <TNaming_NamedShape.hxx>
@@ -76,7 +77,7 @@ Model_Document::Model_Document(const int theID, const std::string theKind)
     : myID(theID), myKind(theKind), myIsActive(false),
       myDoc(new TDocStd_Document("BinOcaf"))  // binary OCAF format
 {
-#ifdef OCAFBROWSER
+#ifdef DFBROWSER
   CDF_Session::CurrentSession()->Directory()->Add(myDoc);
 #endif
   myObjs = new Model_Objects(myDoc->Main());
@@ -402,9 +403,14 @@ static bool isEqualContent(Handle(TDF_Attribute) theAttr1, Handle(TDF_Attribute)
     if (anArr1.IsNull() || anArr2.IsNull())
       return false;
     if (anArr1->Lower() == anArr2->Lower() && anArr1->Upper() == anArr2->Upper()) {
-      for(int a = anArr1->Lower(); a <= anArr1->Upper(); a++)
-        if (a != 1 && anArr1->Value(a) != anArr2->Value(a)) // second is for display
+      for(int a = anArr1->Lower(); a <= anArr1->Upper(); a++) {
+        if (a == 1 && // second is for display
+            anArr2->Label().Tag() == 1 && (anArr2->Label().Depth() == 4 ||
+            anArr2->Label().Depth() == 6))
+          continue;
+        if (anArr1->Value(a) != anArr2->Value(a))
           return false;
+      }
       return true;
     }
   } else if (Standard_GUID::IsEqual(theAttr1->ID(), TDataStd_IntegerArray::GetID())) {
@@ -1232,6 +1238,20 @@ TDF_Label Model_Document::findNamingName(std::string theName)
         Handle(TDataStd_Name) aName = Handle(TDataStd_Name)::DownCast(aNamesIter.Value());
         if (aName->Get() == aSubName)
           return aName->Label();
+      }
+      // If not found child label with the exact sub-name, then try to find compound with
+      // such sub-name without suffix.
+      Standard_Integer aSuffixPos = aSubName.SearchFromEnd('_');
+      if (aSuffixPos != -1) {
+        TCollection_ExtendedString anIndexStr = aSubName.Split(aSuffixPos);
+        aSubName.Remove(aSuffixPos);
+        aNamesIter.Initialize(aFind->second, TDataStd_Name::GetID(), Standard_True);
+        for(; aNamesIter.More(); aNamesIter.Next()) {
+          Handle(TDataStd_Name) aName = Handle(TDataStd_Name)::DownCast(aNamesIter.Value());
+          if (aName->Get() == aSubName) {
+            return aName->Label();
+          }
+        }
       }
     }
   }

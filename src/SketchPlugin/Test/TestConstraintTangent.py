@@ -306,5 +306,5 @@ assert(math.fabs(distancePointLine(aCircleCenter, aLine) - round(aCircleRadius.v
 # End of test
 #=========================================================================
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

@@ -35,7 +35,7 @@ class ModuleBase_Operation;
 class XGUI_OperationMgr;
 class XGUI_Workshop;
 
-class Handle_AIS_InteractiveObject;
+class AIS_InteractiveObject;
 
 class QMouseEvent;
 
@@ -248,7 +248,7 @@ public:
   /// Create specific for the module presentation
   /// \param theResult an object for presentation
   /// \return created presentation or NULL(default value)
-  virtual Handle_AIS_InteractiveObject createPresentation(const ResultPtr& theResult);
+  virtual Handle(AIS_InteractiveObject) createPresentation(const ResultPtr& theResult);
 
   /// Connects or disconnects to the value changed signal of the property panel widgets
   /// \param theWidget a property contol widget
@@ -284,10 +284,10 @@ private slots:
   /// a nested sketch feature, it hides the feature in the viewer
   void onLeaveViewPort();
   /// Listens to the value changed signal and display the current operation feature
-  void onBeforeValuesChangedInPropertyPanel();
+  //void onBeforeValuesChangedInPropertyPanel();
   /// Listens to the signal about the modification of the values
   /// have been done in the property panel
-  void onAfterValuesChangedInPropertyPanel();
+  //void onAfterValuesChangedInPropertyPanel();
 
   void onMousePressed(ModuleBase_IViewWindow*, QMouseEvent*);
   void onMouseReleased(ModuleBase_IViewWindow*, QMouseEvent*);
@@ -369,6 +369,7 @@ private:
   PartSet_Module* myModule;
 
   bool myPreviousDrawModeEnabled; // the previous selection enabled state in the viewer
+  bool myIsEditLaunching;
   bool myIsDragging;
   bool myDragDone;
   bool myIsMouseOverWindow; /// the state that the mouse over the view

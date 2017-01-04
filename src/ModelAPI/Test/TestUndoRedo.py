@@ -33,5 +33,5 @@ assert(aDoc.size("Construction") == 8)
 assert(aSession.canUndo())
 assert(not aSession.canRedo())
 
-import model
+from salome.shaper import model
 assert(model.checkPythonDump())

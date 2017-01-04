@@ -445,6 +445,8 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
       // too many repetition of processing (in VS it may crash on 330 with stack overflow)
       Events_InfoMessage("Model_Update",
         "Feature '%1' is updated in infinitive loop").arg(theFeature->data()->name()).send();
+      // to stop iteration
+      myModified.clear();
       return false;
     }
     myProcessed[theFeature] = aCount + 1;

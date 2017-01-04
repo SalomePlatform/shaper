@@ -19,10 +19,14 @@
 #include <GeomAlgoAPI_XAOImport.h>
 
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeStringArray.h>
+#include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_AttributeTables.h>
 #include <ModelAPI_BodyBuilder.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -35,6 +39,8 @@
 
 #include <XAO_Xao.hxx>
 #include <XAO_Group.hxx>
+#include <XAO_Field.hxx>
+#include <XAO_Step.hxx>
 
 #include <ExchangePlugin_Tools.h>
 
@@ -147,11 +153,11 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
   ResultBodyPtr aResultBody = createResultBody(aGeomShape);
   setResult(aResultBody);
 
-  // Process groups
+  // Process groups/fields
   std::shared_ptr<ModelAPI_AttributeRefList> aRefListOfGroups =
       std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(data()->attribute(FEATURES_ID()));
 
-  // Remove previous groups stored in RefList
+  // Remove previous groups/fields stored in RefList
   std::list<ObjectPtr> anGroupList = aRefListOfGroups->list();
   std::list<ObjectPtr>::iterator anGroupIt = anGroupList.begin();
   for (; anGroupIt != anGroupList.end(); ++anGroupIt) {
@@ -174,9 +180,9 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
     AttributeSelectionListPtr aSelectionList = aGroupFeature->selectionList("group_list");
 
     // conversion of dimension
-    XAO::Dimension aGroupDimension = aXaoGroup->getDimension();
     std::string aDimensionString = XAO::XaoUtils::dimensionToString(aXaoGroup->getDimension());
-    std::string aSelectionType = ExchangePlugin_Tools::xaoDimension2selectionType(aDimensionString);
+    std::string aSelectionType =
+      ExchangePlugin_Tools::xaoDimension2selectionType(aDimensionString);
 
     aSelectionList->setSelectionType(aSelectionType);
     for (int anElementIndex = 0; anElementIndex < aXaoGroup->count(); ++anElementIndex) {
@@ -188,6 +194,124 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
       int aReferenceID = XAO::XaoUtils::stringToInt(aReferenceString);
 
       aSelectionList->value(anElementIndex)->setId(aReferenceID);
+    }
+  }
+  // Create new fields
+  for (int aFieldIndex = 0; aFieldIndex < aXao.countFields(); ++aFieldIndex) {
+    XAO::Field* aXaoField = aXao.getField(aFieldIndex);
+
+    std::shared_ptr<ModelAPI_Feature> aFieldFeature = addFeature("Field");
+
+    // group name
+    if (!aXaoField->getName().empty())
+      aFieldFeature->data()->setName(aXaoField->getName());
+
+    // fill selection
+    AttributeSelectionListPtr aSelectionList = aFieldFeature->selectionList("selected");
+
+    // conversion of dimension
+    std::string aDimensionString = XAO::XaoUtils::dimensionToString(aXaoField->getDimension());
+    std::string aSelectionType =
+      ExchangePlugin_Tools::xaoDimension2selectionType(aDimensionString);
+    aSelectionList->setSelectionType(aSelectionType);
+    // limitation: now in XAO fields are related to everything, so, iterate all sub-shapes to fill
+    int aCountSelected = aXaoField->countElements();
+    std::list<ResultPtr>::const_iterator aResIter = results().begin();
+    for(; aResIter != results().end() && aCountSelected; aResIter++) {
+      ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aResIter);
+      if (!aBody.get())
+        continue;
+      // check that only results that were created before this field are used
+      FeaturePtr aResultFeature = document()->feature(aBody);
+      if (!aResultFeature.get())
+        continue;
+      GeomShapePtr aShape = aBody->shape();
+      if (!aShape.get() || aShape->isNull())
+        continue;
+      GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::shapeTypeByStr(aSelectionType));
+      for(; anExp.more(); anExp.next()) {
+        aSelectionList->append(aBody, anExp.current());
+        aCountSelected--;
+        if (aCountSelected == 0)
+          break;
+      }
+    }
+
+    // conversion of type
+    XAO::Type aFieldType = aXaoField->getType();
+    std::string aTypeString = XAO::XaoUtils::fieldTypeToString(aFieldType);
+    ModelAPI_AttributeTables::ValueType aType =
+      ExchangePlugin_Tools::xaoType2valuesType(aTypeString);
+    // set components names
+    AttributeStringArrayPtr aComponents = aFieldFeature->stringArray("components_names");
+    aComponents->setSize(aXaoField->countComponents());
+    for(int aComp = 0; aComp < aXaoField->countComponents(); aComp++) {
+      aComponents->setValue(aComp, aXaoField->getComponentName(aComp));
+    }
+
+    AttributeIntArrayPtr aStamps = aFieldFeature->intArray("stamps");
+    aStamps->setSize(aXaoField->countSteps());
+    std::shared_ptr<ModelAPI_AttributeTables> aTables = aFieldFeature->tables("values");
+    aTables->setSize(
+      aXaoField->countElements() + 1, aXaoField->countComponents(), aXaoField->countSteps());
+    aTables->setType(aType);
+    // iterate steps
+    XAO::stepIterator aStepIter = aXaoField->begin();
+    for(int aStepIndex = 0; aStepIter != aXaoField->end(); aStepIter++, aStepIndex++) {
+      aStamps->setValue(aStepIndex, (*aStepIter)->getStamp());
+      for(int aRow = 1; aRow <= aXaoField->countElements(); aRow++) {
+        for(int aCol = 0; aCol < aXaoField->countComponents(); aCol++) {
+          ModelAPI_AttributeTables::Value aVal;
+          std::string aValStr = (*aStepIter)->getStringValue(aRow - 1, aCol);
+          switch(aType) {
+          case ModelAPI_AttributeTables::BOOLEAN:
+            aVal.myBool = aValStr == "true";
+            break;
+          case ModelAPI_AttributeTables::INTEGER:
+            aVal.myInt = atoi(aValStr.c_str());
+            break;
+          case ModelAPI_AttributeTables::DOUBLE:
+            aVal.myDouble = atof(aValStr.c_str());
+            break;
+          case ModelAPI_AttributeTables::STRING:
+            aVal.myStr = aValStr;
+            break;
+          }
+          aTables->setValue(aVal, aRow, aCol, aStepIndex);
+        }
+      }
+    }
+    // remove everything with zero-values: zeroes are treated as defaults
+    std::set<int> aRowsToRemove;
+    for(int aRow = 1; aRow < aTables->rows(); aRow++) {
+      bool isZero = true;
+      for(int aCol = 0; aCol < aTables->columns() && isZero; aCol++) {
+        for(int aStepIndex = 0; aStepIndex != aTables->tables() && isZero; aStepIndex++) {
+          if (aTables->valueStr(aRow, aCol, aStepIndex) != aTables->valueStr(0, aCol, aStepIndex))
+            isZero = false;
+        }
+      }
+      if (isZero)
+        aRowsToRemove.insert(aRow - 1); // -1 to make prepared for remove from SelectionList
+    }
+    if (!aRowsToRemove.empty()) { // move usefull rows on bottom to the up of the tables
+      // number of rows passed during going through: the current rows will
+      // be moved up for this value
+      int aRemovedPassed = 0;
+      for(int aRow = 1; aRow < aTables->rows(); aRow++) {
+        if (aRowsToRemove.find(aRow - 1) != aRowsToRemove.end()) {
+          aRemovedPassed++;
+        } else if (aRemovedPassed != 0) { // copy the line up
+          for(int aCol = 0; aCol < aTables->columns(); aCol++) {
+            for(int aTable = 0; aTable != aTables->tables(); aTable++) {
+              aTables->setValue(
+                aTables->value(aRow, aCol, aTable), aRow - aRemovedPassed, aCol, aTable);
+            }
+          }
+        }
+      }
+      aTables->setSize(aTables->rows() - aRemovedPassed, aTables->columns(), aTables->tables());
+      aSelectionList->remove(aRowsToRemove); // remove also selected elements
     }
   }
   // Top avoid problems in Object Browser update: issue #1647.

@@ -7,6 +7,8 @@
 #ifndef ModelAPI_Entity_H_
 #define ModelAPI_Entity_H_
 
+#include <memory>
+
 /**\class ModelAPI_Entity
  * \ingroup DataModel
  * \brief Represents a common parent class for Objects and documents.
@@ -19,5 +21,8 @@ public:
   /// Empty function which is added for virtualiation of the interface
   virtual void emptyFunction() const {}
 };
+
+typedef std::shared_ptr<ModelAPI_Entity> EntityPtr;
+
 
 #endif

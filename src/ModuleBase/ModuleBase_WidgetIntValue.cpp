@@ -42,7 +42,7 @@ ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
   QFormLayout* aControlLay = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aControlLay);
 
-  QString aLabelText = QString::fromStdString(theData->widgetLabel());
+  QString aLabelText = translate(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   myLabel = new QLabel(aLabelText, this);
   if (!aLabelIcon.isEmpty())
@@ -80,7 +80,7 @@ ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
     mySpinBox->setValue(aDefVal);
   }
 
-  QString aTTip = QString::fromStdString(theData->widgetTooltip());
+  QString aTTip = translate(theData->widgetTooltip());
   mySpinBox->setToolTip(aTTip);
   myLabel->setToolTip(aTTip);
 

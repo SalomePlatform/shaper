@@ -117,9 +117,8 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
     myTypeCombo->setVisible(false);
   }
 
-  std::string aLabelText = theData->getProperty("label");
-  QLabel* aListLabel = new QLabel(!aLabelText.empty() ? aLabelText.c_str()
-                                                      : tr("Selected objects:"), this);
+  QString aLabelText = translate(theData->getProperty("label"));
+  QLabel* aListLabel = new QLabel(aLabelText, this);
   aMainLay->addWidget(aListLabel, 1, 0);
   // if the xml definition contains one type, an information label
   // should be shown near to the latest
@@ -394,11 +393,41 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
   activateSelectionAndFilters(true);
-  QList<ModuleBase_ViewerPrsPtr> anEmptyList;
-  // This method will call Selection changed event which will call onSelectionChanged
-  // To clear mySelection, myListControl and storeValue()
-  // So, we don't need to call it
-  myWorkshop->setSelected(anEmptyList);
+
+  if (!myFeature)
+    return;
+  /// store the selected type
+  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  std::string aType = anAttribute->attributeType();
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
+    aSelectionListAttr->setSelectionType(myTypeCombo->currentText().toStdString());
+  }
+
+  // clear attribute values
+  DataPtr aData = myFeature->data();
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
+    aSelectionListAttr->clear();
+  }
+  else if (aType == ModelAPI_AttributeRefList::typeId()) {
+    AttributeRefListPtr aRefListAttr = aData->reflist(attributeID());
+    aRefListAttr->clear();
+  }
+  else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
+    AttributeRefAttrListPtr aRefAttrListAttr = aData->refattrlist(attributeID());
+    aRefAttrListAttr->clear();
+  }
+
+  // update object is necessary to flush update signal. It leads to objects references map update
+  // and the operation presentation will not contain deleted items visualized as parameters of
+  // the feature.
+  updateObject(myFeature);
+  restoreValue();
+  myWorkshop->setSelected(getAttributeSelection());
+  // may be the feature's result is not displayed, but attributes should be
+  myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeArguments,
+                            true); /// hope that something is redisplayed by object updated
 }
 
 //********************************************************************
@@ -546,6 +575,21 @@ std::string ModuleBase_WidgetMultiSelector::validatorType(const QString& theType
     aType = "solid";
 
   return aType;
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::clearSelection()
+{
+  bool isClearInNeutralPoint = myIsNeutralPointClear;
+  myIsNeutralPointClear = true;
+
+  QList<ModuleBase_ViewerPrsPtr> anEmptyList;
+  // This method will call Selection changed event which will call onSelectionChanged
+  // To clear mySelection, myListControl and storeValue()
+  // So, we don't need to call it
+  myWorkshop->setSelected(anEmptyList);
+
+  myIsNeutralPointClear = isClearInNeutralPoint;
 }
 
 //********************************************************************

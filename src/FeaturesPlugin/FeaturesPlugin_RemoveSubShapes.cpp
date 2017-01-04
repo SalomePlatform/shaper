@@ -15,6 +15,7 @@
 
 #include <GeomAPI_ShapeIterator.h>
 
+#include <GeomAlgoAPI_Copy.h>
 #include <GeomAlgoAPI_ShapeBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
@@ -93,22 +94,40 @@ void FeaturesPlugin_RemoveSubShapes::execute()
     return;
   }
 
-  // Copy base shape.
+  // Get base shape.
   GeomShapePtr aBaseShape = aShapeAttrSelection->value();
-  if(!aBaseShape.get()) {
-    return;
-  }
-  GeomShapePtr aResultShape = aBaseShape->emptyCopied();
 
-  // Copy sub-shapes from list to new shape.
-  for(int anIndex = 0; anIndex < aSubShapesAttrList->size(); ++anIndex) {
-    AttributeSelectionPtr anAttrSelectionInList = aSubShapesAttrList->value(anIndex);
-    GeomShapePtr aShapeToAdd = anAttrSelectionInList->value();
-    GeomAlgoAPI_ShapeBuilder::add(aResultShape, aShapeToAdd);
+  GeomShapePtr aResultShape;
+  int aSubsNb = aSubShapesAttrList->size();
+  if(aSubsNb > 1) {
+    if(!aBaseShape.get()) {
+      return;
+    }
+    aResultShape = aBaseShape->emptyCopied();
+
+    // Copy sub-shapes from list to new shape.
+    for(int anIndex = 0; anIndex < aSubsNb; ++anIndex) {
+      AttributeSelectionPtr anAttrSelectionInList = aSubShapesAttrList->value(anIndex);
+      GeomShapePtr aShapeToAdd = anAttrSelectionInList->value();
+      GeomAlgoAPI_ShapeBuilder::add(aResultShape, aShapeToAdd);
+    }
+  } else if(aSubsNb == 1) {
+    AttributeSelectionPtr anAttrSelectionInList = aSubShapesAttrList->value(0);
+    aResultShape = anAttrSelectionInList->value();
   }
+
+  GeomAlgoAPI_Copy aCopy(aResultShape);
+  aResultShape = aCopy.shape();
 
   // Store result.
   ResultBodyPtr aResultBody = document()->createBody(data());
-  aResultBody->storeModified(aBaseShape, aResultShape);
+  aResultBody->storeModified(aBaseShape, aResultShape, 1);
+  aResultBody->loadAndOrientModifiedShapes(&aCopy,
+                                           aBaseShape,
+                                           GeomAPI_Shape::FACE,
+                                           10000,
+                                           "Modified_Face",
+                                           *aCopy.mapOfSubShapes().get(),
+                                           true);
   setResult(aResultBody);
 }

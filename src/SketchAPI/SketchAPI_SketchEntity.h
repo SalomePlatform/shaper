@@ -45,7 +45,7 @@ public:
 
   /// Convert list of features to list of appropriate wrappers
   SKETCHAPI_EXPORT
-  static std::list<std::shared_ptr<ModelHighAPI_Interface> >
+  static std::list<std::shared_ptr<SketchAPI_SketchEntity> >
   wrap(const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures);
 
 protected:

@@ -29,7 +29,7 @@ public:
                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane,
                                          bool isHorisontal);
 
-  DEFINE_STANDARD_RTTI(SketcherPrs_HVDirection)
+  DEFINE_STANDARD_RTTIEXT(SketcherPrs_HVDirection, SketcherPrs_SymbolPrs)
 
   /// Returns true if the constraint feature arguments are correcly filled to build AIS presentation
   /// \param theConstraint a constraint feature

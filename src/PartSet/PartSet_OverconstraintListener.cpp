@@ -170,6 +170,7 @@ XGUI_Workshop* PartSet_OverconstraintListener::workshop() const
   return aConnector->workshop();
 }
 
+#ifdef _DEBUG
 QString PartSet_OverconstraintListener::getObjectsInfo(const std::set<ObjectPtr>& theObjects)
 {
   std::set<ObjectPtr>::const_iterator anIt = theObjects.begin(),
@@ -180,3 +181,4 @@ QString PartSet_OverconstraintListener::getObjectsInfo(const std::set<ObjectPtr>
 
   return anInfo.join(";\n");
 }
+#endif

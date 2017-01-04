@@ -95,7 +95,7 @@ Q_OBJECT
   virtual bool canDragByMouse() const;
 
   // Fit all along Z (perpendicular to display)
-  virtual void Zfitall();
+  //virtual void Zfitall();
 
 signals:
   /// Emits by mouse entering the view port

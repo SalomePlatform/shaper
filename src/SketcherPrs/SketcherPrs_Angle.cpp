@@ -5,8 +5,8 @@
 // Author:      Vitaly SMETANNIKOV
 
 #include "SketcherPrs_Angle.h"
-#include "SketcherPrs_Tools.h"
 #include "SketcherPrs_DimensionStyleListener.h"
+#include "SketcherPrs_Tools.h"
 
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_Constraint.h>
@@ -31,7 +31,6 @@
 //  #define COMPILATION_CORRECTION
 //#endif
 
-IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Angle, AIS_AngleDimension);
 
 SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint,
@@ -176,12 +175,12 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   switch (anAngleType) {
     case SketcherPrs_Tools::ANGLE_DIRECT: {
 #ifndef COMPILATION_CORRECTION
-      SetArrowVisible(Standard_False/*first*/, Standard_True/*second*/);
+      SetArrowsVisibility(AIS_TOAV_Second);
 #endif
       SetMeasuredGeometry(myFirstPoint, myCenterPoint, mySecondPoint);
 #ifndef COMPILATION_CORRECTION
       bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
-      SetAngleReversed(!isReversedPlanes);
+      SetType(!isReversedPlanes ? AIS_TOA_Exterior : AIS_TOA_Interior);
 #endif
     }
     break;
@@ -192,18 +191,18 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
                           gp_Vec(myCenterPoint, myFirstPoint).Normalized() * (-anEdge1Length));
       SetMeasuredGeometry(aFirstPoint, myCenterPoint, mySecondPoint);
 #ifndef COMPILATION_CORRECTION
-      SetAngleReversed(false);
+      SetType(AIS_TOA_Interior);
 #endif
     }
     break;
     case SketcherPrs_Tools::ANGLE_BACKWARD: {
 #ifndef COMPILATION_CORRECTION
-      SetArrowVisible(Standard_False/*first*/, Standard_True/*second*/);
+      SetArrowsVisibility(AIS_TOAV_Second);
 #endif
       SetMeasuredGeometry(myFirstPoint, myCenterPoint, mySecondPoint);
       bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
 #ifndef COMPILATION_CORRECTION
-      SetAngleReversed(isReversedPlanes);
+      SetType(isReversedPlanes ? AIS_TOA_Exterior : AIS_TOA_Interior);
 #endif
     }
     break;

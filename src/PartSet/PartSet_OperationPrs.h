@@ -23,6 +23,9 @@
 
 #include <Quantity_Color.hxx>
 #include <NCollection_List.hxx>
+#include <NCollection_DataMap.hxx>
+#include <TopoDS_Shape.hxx>
+#include <AIS_InteractiveObject.hxx>
 
 #include <QMap>
 #include <QList>
@@ -32,7 +35,7 @@
 DEFINE_STANDARD_HANDLE(PartSet_OperationPrs, ViewerData_AISShape)
 
 class XGUI_Displayer;
-class Handle_AIS_InteractiveObject;
+class SelectMgr_Selection;
 
 /**
 * \ingroup GUI
@@ -58,7 +61,7 @@ public:
   /// Switch on using of the AIS presentation with of the shape object increased on the delta
   void useAISWidth();
 
-  DEFINE_STANDARD_RTTI(PartSet_OperationPrs)
+  DEFINE_STANDARD_RTTIEXT(PartSet_OperationPrs, ViewerData_AISShape)
 
 protected:
   /// Redefinition of virtual function
@@ -73,7 +76,7 @@ protected:
 protected:
   /// list of visualized shapes
   /// \return a map of shapes
-  NCollection_DataMap<TopoDS_Shape, Handle_AIS_InteractiveObject>& shapesMap();
+  NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)>& shapesMap();
 
 private:
   /// Fills the map by the feature object and shapes, which should be visuaziled
