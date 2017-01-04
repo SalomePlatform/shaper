@@ -29,6 +29,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Validators.h
     FeaturesPlugin_RemoveSubShapes.h
     FeaturesPlugin_Tools.h
+    FeaturesPlugin_Symmetry.h
 )
 
 SET(PROJECT_SOURCES
@@ -56,6 +57,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Validators.cpp
     FeaturesPlugin_RemoveSubShapes.cpp
     FeaturesPlugin_Tools.cpp
+    FeaturesPlugin_Symmetry.cpp
 )
 
 SET(XML_RESOURCES
@@ -76,6 +78,7 @@ SET(XML_RESOURCES
   pipe_widget.xml
   remove_subshapes_widget.xml
   union_widget.xml
+  symmetry_widget.xml
 )
 
 SET(TEXT_RESOURCES

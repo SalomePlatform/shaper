@@ -47,6 +47,7 @@
   #include "GeomAlgoAPI_Box.h"
   #include "GeomAlgoAPI_ConeSegment.h"
   #include "GeomAlgoAPI_Copy.h"
+  #include "GeomAlgoAPI_Symmetry.h"
 
   #include <memory>
   #include <string>

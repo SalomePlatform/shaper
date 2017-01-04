@@ -22,6 +22,7 @@
   #include "FeaturesAPI_Revolution.h"
   #include "FeaturesAPI_RevolutionBoolean.h"
   #include "FeaturesAPI_Rotation.h"
+  #include "FeaturesAPI_Symmetry.h"
   #include "FeaturesAPI_Translation.h"
   #include "FeaturesAPI_Union.h"
 

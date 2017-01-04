@@ -13,6 +13,7 @@
 #include <memory>
 
 class GeomAPI_Ax1;
+class GeomAPI_Ax2;
 class GeomAPI_Pnt;
 
 /**\class GeomAPI_Trsf
@@ -57,6 +58,21 @@ class GeomAPI_Trsf : public GeomAPI_Interface
    */
   GEOMAPI_EXPORT void setRotation(const std::shared_ptr<GeomAPI_Ax1> theAxis,
                                   const double theAngle);
+
+  /** \brief Sets a point symmetry transformation.
+   *  \param[in] thePoint symmetry point.
+   */
+  GEOMAPI_EXPORT void setSymmetry(const std::shared_ptr<GeomAPI_Pnt> thePoint);
+
+  /** \brief Sets an axis symmetry transformation.
+   *  \param[in] theAxis symmetry axis.
+   */
+  GEOMAPI_EXPORT void setSymmetry(const std::shared_ptr<GeomAPI_Ax1> theAxis);
+
+  /** \brief Sets a plane symmetry transformation.
+   *  \param[in] thePlane symmetry plane.
+   */
+  GEOMAPI_EXPORT void setSymmetry(const std::shared_ptr<GeomAPI_Ax2> thePlane);
 };
 
 #endif

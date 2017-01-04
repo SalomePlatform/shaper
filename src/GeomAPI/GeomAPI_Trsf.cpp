@@ -9,9 +9,11 @@
 #include<GeomAPI_Trsf.h>
 
 #include <GeomAPI_Ax1.h>
+#include <GeomAPI_Ax2.h>
 
 #include <gp_Ax1.hxx>
-#include<gp_Trsf.hxx>
+#include <gp_Ax2.hxx>
+#include <gp_Trsf.hxx>
 
 #define MY_TRSF implPtr<gp_Trsf>()
 
@@ -52,4 +54,22 @@ void GeomAPI_Trsf::setRotation(const std::shared_ptr<GeomAPI_Ax1> theAxis,
                                const double theAngle)
 {
   MY_TRSF->SetRotation(theAxis->impl<gp_Ax1>(), theAngle / 180.0 * M_PI);
+}
+
+//=================================================================================================
+void GeomAPI_Trsf::setSymmetry(const std::shared_ptr<GeomAPI_Pnt> thePoint)
+{
+  MY_TRSF->SetMirror(thePoint->impl<gp_Pnt>());
+}
+
+//=================================================================================================
+void GeomAPI_Trsf::setSymmetry(const std::shared_ptr<GeomAPI_Ax1> theAxis)
+{
+  MY_TRSF->SetMirror(theAxis->impl<gp_Ax1>());
+}
+
+//=================================================================================================
+void GeomAPI_Trsf::setSymmetry(const std::shared_ptr<GeomAPI_Ax2> thePlane)
+{
+  MY_TRSF->SetMirror(thePlane->impl<gp_Ax2>());
 }

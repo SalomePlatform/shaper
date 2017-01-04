@@ -9,12 +9,8 @@
 #include <GeomAlgoAPI_Box.h>
 #include <GeomAlgoAPI_ConeSegment.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
+#include <GeomAlgoAPI_Symmetry.h>
 #include <GeomAlgoAPI_Translation.h>
-
-#include <GeomAPI_Pnt.h>
-#include <GeomAPI_Edge.h>
-
-//#include <iostream>
 
 namespace GeomAlgoAPI_ShapeAPI
 {
@@ -130,6 +126,72 @@ namespace GeomAlgoAPI_ShapeAPI
       throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
     }
     return aTranslationAlgo.shape();
+  }
+
+  //=========================================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeSymmetry(
+    std::shared_ptr<GeomAPI_Shape> theSourceShape,
+    std::shared_ptr<GeomAPI_Pnt>   thePoint) throw (GeomAlgoAPI_Exception)
+  {
+    GeomAlgoAPI_Symmetry aSymmetryAlgo(theSourceShape, thePoint);
+    
+    if (!aSymmetryAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
+    }
+
+    aSymmetryAlgo.build();
+
+    if(!aSymmetryAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
+    }
+    if (!aSymmetryAlgo.checkValid("Symmetry builder by a point")) {
+      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
+    }
+    return aSymmetryAlgo.shape();
+  }
+
+  //=========================================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeSymmetry(
+    std::shared_ptr<GeomAPI_Shape> theSourceShape,
+    std::shared_ptr<GeomAPI_Ax1>   theAxis) throw (GeomAlgoAPI_Exception)
+  {
+    GeomAlgoAPI_Symmetry aSymmetryAlgo(theSourceShape, theAxis);
+    
+    if (!aSymmetryAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
+    }
+
+    aSymmetryAlgo.build();
+
+    if(!aSymmetryAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
+    }
+    if (!aSymmetryAlgo.checkValid("Symmetry builder by an axis")) {
+      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
+    }
+    return aSymmetryAlgo.shape();
+  }
+
+  //=========================================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeSymmetry(
+    std::shared_ptr<GeomAPI_Shape> theSourceShape,
+    std::shared_ptr<GeomAPI_Ax2>   thePlane) throw (GeomAlgoAPI_Exception)
+  {
+    GeomAlgoAPI_Symmetry aSymmetryAlgo(theSourceShape, thePlane);
+    
+    if (!aSymmetryAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
+    }
+
+    aSymmetryAlgo.build();
+
+    if(!aSymmetryAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
+    }
+    if (!aSymmetryAlgo.checkValid("Symmetry builder by a plane")) {
+      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
+    }
+    return aSymmetryAlgo.shape();
   }
 
   //=========================================================================================================

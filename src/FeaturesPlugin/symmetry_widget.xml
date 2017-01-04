@@ -1,0 +1,60 @@
+<!-- Copyright (C) 2014-2016 CEA/DEN, EDF R&D -->
+
+<source>
+  <toolbox id="CreationMethod"> 
+    <box id="ByPoint" title="Point reflection" icon="icons/Features/symmetry_point_32x32.png">
+      <multi_selector id="main_objects"
+                      label="Main objects"
+                      icon="icons/Features/cut_shape.png"
+                      tooltip="Select solid objects"
+                      type_choice="solid objects"
+                      concealment="true">
+        <validator id="FeaturesPlugin_ValidatorTransform"/>
+      </multi_selector>
+      <shape_selector id="point_object"
+                      icon="icons/Features/point.png"
+                      label="Point"
+                      tooltip="Select a point"
+                      shape_types="vertex"
+                      default="">
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+      </shape_selector>
+    </box>
+    <box id="ByAxis" title="Axis reflection" icon="icons/Features/symmetry_axis_32x32.png">
+      <multi_selector id="main_objects"
+                      label="Main objects"
+                      icon="icons/Features/cut_shape.png"
+                      tooltip="Select solid objects"
+                      type_choice="solid objects"
+                      concealment="true">
+        <validator id="FeaturesPlugin_ValidatorTransform"/>
+      </multi_selector>
+      <shape_selector id="axis_object"
+                      icon="icons/Features/axis.png"
+                      label="Axis"
+                      tooltip="Select an axis"
+                      shape_types="edge"
+                      default="">
+        <validator id="GeomValidators_ShapeType" parameters="line"/>
+      </shape_selector>
+    </box>
+    <box id="ByPlane" title="Plane reflection" icon="icons/Features/symmetry_plane_32x32.png">
+      <multi_selector id="main_objects"
+                      label="Main objects"
+                      icon="icons/Features/cut_shape.png"
+                      tooltip="Select solid objects"
+                      type_choice="solid objects"
+                      concealment="true">
+        <validator id="FeaturesPlugin_ValidatorTransform"/>
+      </multi_selector>
+      <shape_selector id="plane_object"
+                      label="Plane"
+                      icon="icons/Features/plane.png"
+                      tooltip="Select a plane"
+                      shape_types="face"
+                      default="">
+        <validator id="GeomValidators_Face" parameters="plane"/>
+      </shape_selector>
+    </box>
+  </toolbox>
+</source>

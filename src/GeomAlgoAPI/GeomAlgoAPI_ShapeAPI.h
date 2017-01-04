@@ -8,6 +8,7 @@
 #define GEOMALGOAPI_SHAPEAPI_H
 
 #include <GeomAPI_Ax1.h>
+#include <GeomAPI_Ax2.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Shape.h>
@@ -69,6 +70,21 @@ public:
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      std::shared_ptr<GeomAPI_Pnt>   theStartPoint,
                      std::shared_ptr<GeomAPI_Pnt>   theEndPoint) throw (GeomAlgoAPI_Exception);
+                     
+  /// Performs a symmetry by a point
+  static std::shared_ptr<GeomAPI_Shape> makeSymmetry(
+                     std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                     std::shared_ptr<GeomAPI_Pnt>   thePoint) throw (GeomAlgoAPI_Exception);
+
+  /// Performs a symmetry by an axis
+  static std::shared_ptr<GeomAPI_Shape> makeSymmetry(
+                     std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                     std::shared_ptr<GeomAPI_Ax1>   theAxis) throw (GeomAlgoAPI_Exception);
+
+  /// Performs a symmetry by a plane
+  static std::shared_ptr<GeomAPI_Shape> makeSymmetry(
+                     std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                     std::shared_ptr<GeomAPI_Ax2>   thePlane) throw (GeomAlgoAPI_Exception);
 
   /// Creates a cone segment using standard GDML parameters
   /// \param theRMin1 Inner radius at base of cone

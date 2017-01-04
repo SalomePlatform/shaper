@@ -35,6 +35,7 @@
 %shared_ptr(FeaturesAPI_RevolutionCut)
 %shared_ptr(FeaturesAPI_RevolutionFuse)
 %shared_ptr(FeaturesAPI_Rotation)
+%shared_ptr(FeaturesAPI_Symmetry)
 %shared_ptr(FeaturesAPI_Translation)
 %shared_ptr(FeaturesAPI_Union)
 
@@ -51,5 +52,6 @@
 %include "FeaturesAPI_Revolution.h"
 %include "FeaturesAPI_RevolutionBoolean.h"
 %include "FeaturesAPI_Rotation.h"
+%include "FeaturesAPI_Symmetry.h"
 %include "FeaturesAPI_Translation.h"
 %include "FeaturesAPI_Union.h"

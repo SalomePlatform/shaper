@@ -17,6 +17,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_Revolution.h
   FeaturesAPI_RevolutionBoolean.h
   FeaturesAPI_Rotation.h
+  FeaturesAPI_Symmetry.h
   FeaturesAPI_Translation.h
   FeaturesAPI_Union.h
 )
@@ -34,6 +35,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_Revolution.cpp
   FeaturesAPI_RevolutionBoolean.cpp
   FeaturesAPI_Rotation.cpp
+  FeaturesAPI_Symmetry.cpp
   FeaturesAPI_Translation.cpp
   FeaturesAPI_Union.cpp
 )
@@ -92,4 +94,5 @@ INSTALL(TARGETS _FeaturesAPI DESTINATION ${SHAPER_INSTALL_SWIG})
 INSTALL(TARGETS FeaturesAPI DESTINATION ${SHAPER_INSTALL_BIN})
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/FeaturesAPI.py DESTINATION ${SHAPER_INSTALL_SWIG})
 
-ADD_UNIT_TESTS(APIParam_Translation.py)
+ADD_UNIT_TESTS(APIParam_Symmetry.py
+               APIParam_Translation.py)
