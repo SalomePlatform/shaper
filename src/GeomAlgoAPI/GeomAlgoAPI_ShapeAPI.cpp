@@ -134,7 +134,7 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Pnt>   thePoint) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Symmetry aSymmetryAlgo(theSourceShape, thePoint);
-    
+
     if (!aSymmetryAlgo.check()) {
       throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
     }
@@ -156,7 +156,7 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Ax1>   theAxis) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Symmetry aSymmetryAlgo(theSourceShape, theAxis);
-    
+
     if (!aSymmetryAlgo.check()) {
       throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
     }
@@ -178,7 +178,7 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Ax2>   thePlane) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Symmetry aSymmetryAlgo(theSourceShape, thePlane);
-    
+
     if (!aSymmetryAlgo.check()) {
       throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
     }
