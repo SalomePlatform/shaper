@@ -929,10 +929,8 @@ void Model_AttributeSelection::selectConstruction(
     }
   }
   // store the selected as primitive
-  TNaming_Builder aBuilder(selectionLabel());
-  aBuilder.Generated(aSubShape);
-    registerSubShape(
-      selectionLabel(), aSubShape, 0, aContextFeature, aMyDoc, anOrientations, aSubNames, aRefs);
+  registerSubShape(
+    selectionLabel(), aSubShape, 0, aContextFeature, aMyDoc, anOrientations, aSubNames, aRefs);
 }
 
 bool Model_AttributeSelection::selectPart(
@@ -1156,6 +1154,8 @@ void Model_AttributeSelection::updateInHistory()
   // that this one and is really modifies the referenced result to refer to it
   ResultPtr aModifierResFound;
   TNaming_Iterator aPairIter(aContNS);
+  if (!aPairIter.More())
+    return;
   TopoDS_Shape aNewShape = aPairIter.NewShape();
   bool anIterate = true;
   // trying to update also the sub-shape selected
