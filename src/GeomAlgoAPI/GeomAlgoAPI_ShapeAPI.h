@@ -70,7 +70,7 @@ public:
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      std::shared_ptr<GeomAPI_Pnt>   theStartPoint,
                      std::shared_ptr<GeomAPI_Pnt>   theEndPoint) throw (GeomAlgoAPI_Exception);
-                     
+
   /// Performs a symmetry by a point
   static std::shared_ptr<GeomAPI_Shape> makeSymmetry(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,

@@ -105,9 +105,9 @@ void GeomAlgoAPI_Symmetry::build()
       return;
     }
   }
-  
+
   const TopoDS_Shape& aSourceShape = mySourceShape->impl<TopoDS_Shape>();
-  
+
   if(aSourceShape.IsNull()) {
     myError = "Mirror builder :: source shape does not contain any actual shape.";
     return;
