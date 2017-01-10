@@ -473,22 +473,3 @@ int Model_Session::transactionID()
 {
   return ROOT_DOC->transactionID();
 }
-
-void Model_Session::forceLoadPlugin(const std::string& thePluginName)
-{
-  // load all information about plugins, features and attributes
-  LoadPluginsInfo();
-
-  // store name of current plugin for further restoring,
-  // because forceLoadPlugin may be called while loading another plugin
-  std::string aCurrentPluginName = myCurrentPluginName;
-
-  myCurrentPluginName = thePluginName;
-  if (myPluginObjs.find(myCurrentPluginName) == myPluginObjs.end()) {
-    // load plugin library if not yet done
-    Config_ModuleReader::loadPlugin(myCurrentPluginName);
-  }
-
-  // restore current plugin
-  myCurrentPluginName = aCurrentPluginName;
-}
