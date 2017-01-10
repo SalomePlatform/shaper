@@ -43,8 +43,8 @@ export PATH=${CPPLINT_ROOT_DIR}:${PATH}
 
 #------ OCCT ------
 # Defaults
-export CSF_PluginDefaults=${CAS_ROOT_DIR}/src/StdResource
-export CSF_StandardDefaults=${CAS_ROOT_DIR}/src/StdResource
+export CSF_PluginDefaults=${CAS_ROOT_DIR}/share/opencascade/resources
+export CSF_StandardDefaults=${CAS_ROOT_DIR}/share/opencascade/resources
 # For CMake
 export LIB=${LD_LIBRARY_PATH}
 export PATH=${CASROOT}:${PATH}
