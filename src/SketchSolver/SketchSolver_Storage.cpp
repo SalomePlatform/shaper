@@ -18,6 +18,7 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_ConstraintRigid.h>
+#include <SketchPlugin_Projection.h>
 
 
 /// \brief Verify two vectors of constraints are equal.
@@ -160,20 +161,14 @@ static bool isCopyInMulti(std::shared_ptr<SketchPlugin_Feature> theFeature,
     return false;
   bool aResult = theFeature->isCopy();
   if (aResult) {
-    std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
-        anIt = theConstraints.begin();
-    for (; anIt != theConstraints.end() && aResult; ++anIt) {
-      if (anIt->first->getKind() != SketchPlugin_ConstraintMirror::ID())
-        continue;
-      AttributeRefListPtr aRefList = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
-          anIt->first->attribute(SketchPlugin_Constraint::ENTITY_C()));
-      std::list<ObjectPtr> aMirroredList =  aRefList->list();
-      std::list<ObjectPtr>::const_iterator aMIt = aMirroredList.begin();
-      for (; aMIt != aMirroredList.end() && aResult; ++aMIt) {
-        FeaturePtr aFeat = ModelAPI_Feature::feature(*aMIt);
-        if (aFeat == theFeature)
-          aResult = false;
-      }
+    const std::set<AttributePtr>& aRefs = theFeature->data()->refsToMe();
+    for (std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin();
+         aRefIt != aRefs.end() && aResult; ++aRefIt) {
+      FeaturePtr anOwner = ModelAPI_Feature::feature((*aRefIt)->owner());
+      if ((anOwner->getKind() == SketchPlugin_ConstraintMirror::ID() &&
+          (*aRefIt)->id() == SketchPlugin_Constraint::ENTITY_C()) ||
+         (anOwner->getKind() == SketchPlugin_Projection::ID()))
+        aResult = false;
     }
   }
   return aResult;
