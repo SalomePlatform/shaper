@@ -254,7 +254,7 @@ void SketcherPrs_SymbolPrs::Compute(
   aBnd.Clear();
   for (int i = 1; i <= myPntArray->ItemNumber(); i++) {
     aVert = myPntArray->Vertice(i);
-    aBnd.Add (Graphic3d_Vec4((float)aVert.X(), (float)aVert.Y(), (float)aVert.Z(), 1.0f));
+    aBnd.Add(Graphic3d_Vec4((float)aVert.X(), (float)aVert.Y(), (float)aVert.Z(), 1.0f));
   }
 
   // Pint the group with custom procedure (see Render)
@@ -263,7 +263,7 @@ void SketcherPrs_SymbolPrs::Compute(
   aGroup->AddElement(aElem);
 
   // Disable frustum culling for this object by marking it as mutable
-  //aGroup->Structure()->SetMutable(true);
+  aGroup->Structure()->SetMutable(true);
 
   if (!aReadyToDisplay)
     SketcherPrs_Tools::sendEmptyPresentationError(myConstraint,
