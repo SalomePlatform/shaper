@@ -196,7 +196,20 @@ bool PartSet_RigidSelection::isValid(const ModuleBase_ISelection* theSelection,
   } else {
     QList<ModuleBase_ViewerPrsPtr> aList =
       theSelection->getSelected(ModuleBase_ISelection::Viewer);
-    return (aList.count() == 1);
+    int aCount = 0;
+    foreach (ModuleBase_ViewerPrsPtr aPrs, aList) {
+      ObjectPtr aObj = aPrs->object();
+      if (aObj.get()) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+        if (aFeature.get()) {
+          std::shared_ptr<SketchPlugin_Feature> aSketch =
+            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+          if (aSketch.get())
+            aCount++;
+        }
+      }
+    }
+    return (aCount == 1);
   }
 }
 
