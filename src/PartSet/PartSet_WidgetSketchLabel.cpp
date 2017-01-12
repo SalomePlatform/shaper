@@ -259,7 +259,6 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   // 2. if the planes were displayed, change the view projection
   const GeomShapePtr& aShape = thePrs->shape();
   std::shared_ptr<GeomAPI_Shape> aGShape;
-  std::shared_ptr<GeomAPI_Shape> aBaseShape;
 
   DataPtr aData = feature()->data();
   AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
@@ -268,20 +267,33 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   // selection happens in OCC viewer
   if (aShape.get() && !aShape->isNull()) {
     aGShape = aShape;
-
-    if (aSelAttr && aSelAttr->context()) {
-      aBaseShape = aSelAttr->context()->shape();
-    }
   }
   else { // selection happens in OCC viewer(on body) of in the OB browser
     if (aSelAttr) {
       aGShape = aSelAttr->value();
     }
   }
+  // If the selected object is a sketch then use its plane
+  std::shared_ptr<GeomAPI_Pln> aPlane;
+  ObjectPtr aObj = thePrs->object();
+  if (aObj.get()) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+    if (aFeature.get() && (aFeature != feature())) {
+      if (aFeature->getKind() == SketchPlugin_Sketch::ID()) {
+        CompositeFeaturePtr aSketch =
+          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+        aPlane = PartSet_Tools::sketchPlane(aSketch);
+      }
+    }
+  }
   if (aGShape.get() != NULL) {
     // get plane parameters
-    std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aGShape));
-    std::shared_ptr<GeomAPI_Pln> aPlane = aFace->getPlane();
+    if (!aPlane.get()) {
+      std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aGShape));
+      aPlane = aFace->getPlane();
+    }
+    if (!aPlane.get())
+      return;
     std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
     gp_XYZ aXYZ = aDir->impl<gp_Dir>().XYZ();
     double aTwist = 0.0;
@@ -378,7 +390,7 @@ void PartSet_WidgetSketchLabel::restoreAttributeValue(const AttributePtr& theAtt
 
 bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
-  return fillSketchPlaneBySelection(feature(), thePrs);
+  return fillSketchPlaneBySelection(thePrs);
 }
 
 bool PartSet_WidgetSketchLabel::canFillSketch(const ModuleBase_ViewerPrsPtr& thePrs)
@@ -411,16 +423,27 @@ bool PartSet_WidgetSketchLabel::canFillSketch(const ModuleBase_ViewerPrsPtr& the
   return aCanFillSketch;
 }
 
-bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const FeaturePtr& theFeature,
-                                                           const ModuleBase_ViewerPrsPtr& thePrs)
+bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   bool isOwnerSet = false;
 
   const GeomShapePtr& aShape = thePrs->shape();
   std::shared_ptr<GeomAPI_Dir> aDir;
 
-  if (thePrs->object() && (theFeature != thePrs->object())) {
-    DataPtr aData = theFeature->data();
+  if (thePrs->object() && (feature() != thePrs->object())) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(thePrs->object());
+    if (aFeature.get() && (aFeature != feature())) {
+      if (aFeature->getKind() == SketchPlugin_Sketch::ID()) {
+        CompositeFeaturePtr aSketch =
+          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+        std::shared_ptr<GeomAPI_Pln> aPlane = PartSet_Tools::sketchPlane(aSketch);
+        if (aPlane.get()) {
+          aDir = setSketchPlane(aPlane);
+          return aDir.get();
+        }
+      }
+    }
+    DataPtr aData = feature()->data();
     AttributeSelectionPtr aSelAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
       (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
@@ -443,7 +466,7 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const FeaturePtr& the
   }
   else if (aShape.get() && !aShape->isNull()) {
     const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
-    aDir = setSketchPlane(theFeature, aTDShape);
+    aDir = setSketchPlane(aTDShape);
     isOwnerSet = aDir.get();
   }
   return isOwnerSet;
@@ -475,9 +498,6 @@ void PartSet_WidgetSketchLabel::activateCustom()
     mySizeOfViewWidget->setVisible(false);
 
   activateSelection(true);
-
-  //myLabel->setText(myText);
-  //myLabel->setToolTip(myTooltip);
 
   connect(XGUI_Tools::workshop(myWorkshop)->selector(), SIGNAL(selectionChanged()),
           this, SLOT(onSelectionChanged()));
@@ -514,8 +534,8 @@ void PartSet_WidgetSketchLabel::activateSelection(bool toActivate)
 }
 
 
-std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const FeaturePtr& theFeature,
-                                                                       const TopoDS_Shape& theShape)
+std::shared_ptr<GeomAPI_Dir>
+  PartSet_WidgetSketchLabel::setSketchPlane(const TopoDS_Shape& theShape)
 {
   if (theShape.IsNull())
     return std::shared_ptr<GeomAPI_Dir>();
@@ -524,18 +544,21 @@ std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const Fea
   std::shared_ptr<GeomAPI_Shape> aGShape(new GeomAPI_Shape);
   aGShape->setImpl(new TopoDS_Shape(theShape));
 
-
-
   // get plane parameters
   std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aGShape));
   std::shared_ptr<GeomAPI_Pln> aPlane = aFace->getPlane();
   if (!aPlane.get())
     return std::shared_ptr<GeomAPI_Dir>();
+  return setSketchPlane(aPlane);
+}
 
+std::shared_ptr<GeomAPI_Dir>
+  PartSet_WidgetSketchLabel::setSketchPlane(std::shared_ptr<GeomAPI_Pln> thePlane)
+{
   // set plane parameters to feature
-  std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  std::shared_ptr<ModelAPI_Data> aData = feature()->data();
   double anA, aB, aC, aD;
-  aPlane->coefficients(anA, aB, aC, aD);
+  thePlane->coefficients(anA, aB, aC, aD);
 
   // calculate attributes of the sketch
   std::shared_ptr<GeomAPI_Dir> aNormDir(new GeomAPI_Dir(anA, aB, aC));
@@ -560,7 +583,7 @@ std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const Fea
   std::shared_ptr<GeomDataAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
   aDirX->setValue(aXDir);
-  std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+  std::shared_ptr<GeomAPI_Dir> aDir = thePlane->direction();
   return aDir;
 }
 
