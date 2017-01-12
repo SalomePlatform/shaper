@@ -38,6 +38,7 @@
 #include <TDF_ListIteratorOfLabelList.hxx>
 #include <TDF_LabelMap.hxx>
 #include <TDF_DeltaOnAddition.hxx>
+#include <TNaming_Builder.hxx>
 #include <TNaming_SameShapeIterator.hxx>
 #include <TNaming_Iterator.hxx>
 #include <TNaming_NamedShape.hxx>
@@ -196,6 +197,51 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
   if (!isError) {
     myDoc = aLoaded;
     myDoc->SetUndoLimit(UNDO_LIMIT);
+
+    // TODO: remove after fix in OCCT.
+    // All named shapes are stored in reversed order, so to fix this we reverse them back.
+    for(TDF_ChildIDIterator aChildIter(myDoc->Main(), TNaming_NamedShape::GetID(), true);
+        aChildIter.More();
+        aChildIter.Next()) {
+      Handle(TNaming_NamedShape) aNamedShape =
+        Handle(TNaming_NamedShape)::DownCast(aChildIter.Value());
+      if (aNamedShape.IsNull()) {
+        continue;
+      }
+
+      TopoDS_Shape aShape = aNamedShape->Get();
+      if(aShape.IsNull() || aShape.ShapeType() != TopAbs_COMPOUND) {
+        continue;
+      }
+
+      TNaming_Evolution anEvol = aNamedShape->Evolution();
+      std::list<std::pair<TopoDS_Shape, TopoDS_Shape> > aShapePairs; // to store old and new shapes
+      for(TNaming_Iterator anIter(aNamedShape); anIter.More(); anIter.Next()) {
+        aShapePairs.push_back(
+          std::pair<TopoDS_Shape, TopoDS_Shape>(anIter.OldShape(), anIter.NewShape()));
+      }
+
+      // Add in reverse order.
+      TDF_Label aLabel = aNamedShape->Label();
+      TNaming_Builder aBuilder(aLabel);
+      for(std::list<std::pair<TopoDS_Shape, TopoDS_Shape> >::iterator aPairsIter =
+            aShapePairs.begin();
+          aPairsIter != aShapePairs.end();
+          aPairsIter++) {
+        if (anEvol == TNaming_GENERATED) {
+          aBuilder.Generated(aPairsIter->first, aPairsIter->second);
+        } else if (anEvol == TNaming_MODIFY) {
+          aBuilder.Modify(aPairsIter->first, aPairsIter->second);
+        } else if (anEvol == TNaming_DELETE) {
+          aBuilder.Delete(aPairsIter->first);
+        } else if (anEvol == TNaming_PRIMITIVE) {
+          aBuilder.Generated(aPairsIter->second);
+        } else if (anEvol == TNaming_SELECTED) {
+          aBuilder.Select(aPairsIter->second, aPairsIter->first);
+        }
+      }
+    }
+
     // to avoid the problem that feature is created in the current, not this, document
     aSession->setActiveDocument(anApp->document(myID), false);
     aSession->setCheckTransactions(false);

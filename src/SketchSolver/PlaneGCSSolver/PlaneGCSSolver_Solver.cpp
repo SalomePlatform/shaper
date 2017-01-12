@@ -127,6 +127,7 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
 
   // Additionally check redundant constraints
   if (aResult == GCS::Success || aResult == GCS::Converged) {
+    bool isSolveWithoutTangent = !aRedundantID.empty();
     GCS::VEC_I aRedundantLocal;
     myEquationSystem->getRedundant(aRedundantLocal);
     aRedundantID.insert(aRedundantID.end(), aRedundantLocal.begin(), aRedundantLocal.end());
@@ -137,7 +138,15 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
     // if the entities are coupled smoothly.
     // Sometimes tangent constraints are fall to both conflicting and redundant constraints.
     // Need to check if there are redundant constraints without these tangencies.
-    if (!aRedundantID.empty())
+    if (!aRedundantID.empty() && !isSolveWithoutTangent) {
+      GCS::VEC_I::iterator aCIt = aRedundantID.begin();
+      for (; aCIt != aRedundantID.end(); ++ aCIt)
+        if (myTangent.find(*aCIt) != myTangent.end()) {
+          isSolveWithoutTangent = true;
+          break;
+        }
+    }
+    if (isSolveWithoutTangent)
       aResult = myTangent.empty() ? GCS::Failed : solveWithoutTangent();
     else
       aResult = GCS::Success;

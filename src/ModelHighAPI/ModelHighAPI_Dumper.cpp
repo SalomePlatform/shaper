@@ -915,13 +915,24 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
   theDumper.myDumpBuffer << theEndl;
 
   if (!theDumper.myEntitiesStack.empty()) {
-    // Name for composite feature is dumped when all sub-entities are dumped
-    // (see method ModelHighAPI_Dumper::processSubs).
-    const ModelHighAPI_Dumper::LastDumpedEntity& aLastDumped = theDumper.myEntitiesStack.top();
-    CompositeFeaturePtr aComposite =
-        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aLastDumped.myEntity);
-    if (!aComposite)
-      theDumper.dumpEntitySetName();
+    bool isCopy;
+    // all copies have been stored into stack, pop them all
+    do {
+      isCopy = false;
+      // Name for composite feature is dumped when all sub-entities are dumped
+      // (see method ModelHighAPI_Dumper::processSubs).
+      const ModelHighAPI_Dumper::LastDumpedEntity& aLastDumped = theDumper.myEntitiesStack.top();
+      CompositeFeaturePtr aComposite =
+          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aLastDumped.myEntity);
+      if (!aComposite) {
+        theDumper.dumpEntitySetName();
+        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aLastDumped.myEntity);
+        if (aFeature) {
+          AttributeBooleanPtr aCopyAttr = aFeature->boolean("Copy");
+          isCopy = aCopyAttr.get() && aCopyAttr->value();
+        }
+      }
+    } while (isCopy);
   }
 
   // store all not-dumped entities first

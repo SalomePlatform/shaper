@@ -143,4 +143,5 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestSplit.py
                TestHighload.py
                TestSnowflake.py
-               TestArcBehavior.py )
+               TestArcBehavior.py
+               Test1924.py )

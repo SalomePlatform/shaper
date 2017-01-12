@@ -72,24 +72,25 @@ static void evolutionToSelectionRec(TDF_Label theLab, const bool theFlag) {
       aShapePairs.push_front(std::pair<TopoDS_Shape, TopoDS_Shape>
         (anIter.OldShape(), anIter.NewShape()));
     }
-  }
-  // create new
-  TNaming_Builder aBuilder(theLab);
-  TNaming_Evolution anEvol = (TNaming_Evolution)(anEvolution);
-  std::list<std::pair<TopoDS_Shape, TopoDS_Shape> >::iterator aPairsIter = aShapePairs.begin();
-  for(; aPairsIter != aShapePairs.end(); aPairsIter++) {
-    if (theFlag) { // disabled => make selection
-      aBuilder.Select(aPairsIter->second, aPairsIter->first);
-    } else if (anEvol == TNaming_GENERATED) {
-      aBuilder.Generated(aPairsIter->first, aPairsIter->second);
-    } else if (anEvol == TNaming_MODIFY) {
-      aBuilder.Modify(aPairsIter->first, aPairsIter->second);
-    } else if (anEvol == TNaming_DELETE) {
-      aBuilder.Delete(aPairsIter->first);
-    } else if (anEvol == TNaming_PRIMITIVE) {
-      aBuilder.Generated(aPairsIter->second);
-    } else if (anEvol == TNaming_SELECTED) {
-      aBuilder.Select(aPairsIter->second, aPairsIter->first);
+
+    // create new
+    TNaming_Builder aBuilder(theLab);
+    TNaming_Evolution anEvol = (TNaming_Evolution)(anEvolution);
+    std::list<std::pair<TopoDS_Shape, TopoDS_Shape> >::iterator aPairsIter = aShapePairs.begin();
+    for(; aPairsIter != aShapePairs.end(); aPairsIter++) {
+      if (theFlag) { // disabled => make selection
+        aBuilder.Select(aPairsIter->second, aPairsIter->first);
+      } else if (anEvol == TNaming_GENERATED) {
+        aBuilder.Generated(aPairsIter->first, aPairsIter->second);
+      } else if (anEvol == TNaming_MODIFY) {
+        aBuilder.Modify(aPairsIter->first, aPairsIter->second);
+      } else if (anEvol == TNaming_DELETE) {
+        aBuilder.Delete(aPairsIter->first);
+      } else if (anEvol == TNaming_PRIMITIVE) {
+        aBuilder.Generated(aPairsIter->second);
+      } else if (anEvol == TNaming_SELECTED) {
+        aBuilder.Select(aPairsIter->second, aPairsIter->first);
+      }
     }
   }
   // recursive call for all sub-labels

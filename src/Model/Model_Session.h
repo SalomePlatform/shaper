@@ -128,9 +128,6 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   /// Returns the global identifier of the current transaction (needed for the update algo)
   MODEL_EXPORT virtual int transactionID();
 
-  /// Load plugin by its name
-  MODEL_EXPORT virtual void forceLoadPlugin(const std::string& thePluginName);
-
  protected:
   /// Loads (if not done yet) the information about the features and plugins
   void LoadPluginsInfo();
