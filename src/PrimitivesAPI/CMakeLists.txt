@@ -6,10 +6,12 @@ INCLUDE(UnitTest)
 SET(PROJECT_HEADERS
   PrimitivesAPI.h
   PrimitivesAPI_Box.h
+  PrimitivesAPI_Cylinder.h
 )
 
 SET(PROJECT_SOURCES
   PrimitivesAPI_Box.cpp
+  PrimitivesAPI_Cylinder.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -67,4 +69,5 @@ INSTALL(TARGETS PrimitivesAPI DESTINATION ${SHAPER_INSTALL_BIN})
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/PrimitivesAPI.py DESTINATION ${SHAPER_INSTALL_SWIG})
 
 # Tests
-ADD_UNIT_TESTS(TestBox.py)
+ADD_UNIT_TESTS(TestBox.py
+               TestCylinder.py)

@@ -7,6 +7,7 @@
 #include <PrimitivesPlugin_Plugin.h>
 
 #include <PrimitivesPlugin_Box.h>
+#include <PrimitivesPlugin_Cylinder.h>
 #include <ModelAPI_Session.h>
 
 #include <string>
@@ -26,6 +27,8 @@ FeaturePtr PrimitivesPlugin_Plugin::createFeature(std::string theFeatureID)
 {
   if (theFeatureID == PrimitivesPlugin_Box::ID()) {
     return FeaturePtr(new PrimitivesPlugin_Box);
+  } else if (theFeatureID == PrimitivesPlugin_Cylinder::ID()) {
+    return FeaturePtr(new PrimitivesPlugin_Cylinder);
   }
   // feature of such kind is not found
   return FeaturePtr();

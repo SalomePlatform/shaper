@@ -1,0 +1,101 @@
+<!-- Copyright (C) 2014-201x CEA/DEN, EDF R&D -->
+
+<source>
+  <toolbox id="CreationMethod">
+    <box id="Cylinder" title="Cylinder" icon="icons/Primitives/cylinder_32x32.png">
+      <shape_selector
+          id="base_point"
+          label="base_point"
+          default=""
+          shape_types="vertex"
+          icon="icons/Primitives/point.png"
+          tooltip="Select the center of the base of the cylinder">
+        <validator id="GeomValidators_ConstructionComposite"/>
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+      </shape_selector>
+      <shape_selector
+          id="axis"
+          label="axis"
+          default=""
+          shape_types="edge"
+          icon="icons/Primitives/axis.png"
+          tooltip="Select the axis of the cylinder">
+        <validator id="GeomValidators_ConstructionComposite"/>
+        <validator id="GeomValidators_ShapeType" parameters="line"/>
+      </shape_selector>
+      <doublevalue
+          id="radius"
+          label="radius"
+          step="1."
+          default="5."
+          min="0."
+          icon="icons/Primitives/radius.png"
+          tooltip="Enter the radius of the cylinder">
+        <validator id="GeomValidators_Positive"/>
+      </doublevalue>
+      <doublevalue
+          id="height"
+          label="height"
+          step="1."
+          default="10."
+          min="0."
+          icon="icons/Primitives/dimension_v.png"
+          tooltip="Enter the height of the cylinder">
+        <validator id="GeomValidators_Positive"/>
+      </doublevalue>
+    </box>
+    <box id="CylinderPortion" title="Portion of cylinder" icon="icons/Primitives/cylinder_portion_32x32.png">
+      <shape_selector
+          id="base_point"
+          label="base_point"
+          default=""
+          shape_types="vertex"
+          icon="icons/Primitives/point.png"
+          tooltip="Select the center of the base of the cylinder">
+        <validator id="GeomValidators_ConstructionComposite"/>
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+      </shape_selector>
+      <shape_selector
+          id="axis"
+          label="axis"
+          default=""
+          shape_types="edge"
+          icon="icons/Primitives/axis.png"
+          tooltip="Select the axis of the cylinder">
+        <validator id="GeomValidators_ConstructionComposite"/>
+        <validator id="GeomValidators_ShapeType" parameters="line"/>
+      </shape_selector>
+      <doublevalue
+          id="radius"
+          label="radius"
+          step="1."
+          default="5."
+          min="0."
+          icon="icons/Primitives/radius.png"
+          tooltip="Enter the radius of the cylinder">
+        <validator id="GeomValidators_Positive"/>
+      </doublevalue>
+      <doublevalue
+          id="height"
+          label="height"
+          step="1."
+          default="10."
+          min="0."
+          icon="icons/Primitives/dimension_v.png"
+          tooltip="Enter the height of the cylinder">
+        <validator id="GeomValidators_Positive"/>
+      </doublevalue>
+      <doublevalue
+          id="angle"
+          label="angle"
+          step="10."
+          default="45.0"
+          min="0."
+          max="360."
+          icon="icons/Primitives/angle.png"
+          tooltip="Enter the angle of the portion of the cylinder">
+        <validator id="GeomValidators_Positive"/>
+      </doublevalue>
+    </box>
+  </toolbox>
+</source>

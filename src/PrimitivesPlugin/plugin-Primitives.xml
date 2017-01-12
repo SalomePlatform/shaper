@@ -8,5 +8,10 @@
         <source path="box_widget.xml"/>
       </feature>
     </group>
+    <group id="Primitives">
+      <feature id="Cylinder" title="Cylinder" tooltip="Create a cylinder" icon="icons/Primitives/cylinder.png">
+        <source path="cylinder_widget.xml"/>
+      </feature>
+    </group>
   </workbench>
 </plugin>

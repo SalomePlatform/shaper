@@ -4,12 +4,13 @@
 // Created: 28 June 2016
 // Author:  Clarisse Genrault (CEA)
 
-#ifndef PrimitivesAPI_swig_H_
-#define PrimitivesAPI_swig_H_
+#ifndef PRIMITIVESAPI_SWIG_H_
+#define PRIMITIVESAPI_SWIG_H_
 
   #include <ModelHighAPI_swig.h>
 
   #include "PrimitivesAPI.h"
   #include "PrimitivesAPI_Box.h"
+  #include "PrimitivesAPI_Cylinder.h"
 
-#endif // PrimitivesAPI_swig_H_
+#endif // PRIMITIVESAPI_SWIG_H_
