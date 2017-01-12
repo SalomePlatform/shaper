@@ -273,7 +273,9 @@ QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getHighlighted() const
 
 QObjectPtrList XGUI_Selection::selectedObjects() const
 {
-  return myWorkshop->objectBrowser()->selectedObjects();
+  if (myWorkshop->objectBrowser())
+    return myWorkshop->objectBrowser()->selectedObjects();
+  return QObjectPtrList();
 }
 
 void XGUI_Selection::setSelectedObjects( const QObjectPtrList& theObjects ) const

@@ -202,9 +202,8 @@ bool PartSet_RigidSelection::isValid(const ModuleBase_ISelection* theSelection,
       if (aObj.get()) {
         FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
         if (aFeature.get()) {
-          std::shared_ptr<SketchPlugin_Feature> aSketch =
-            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-          if (aSketch.get())
+          CompositeFeaturePtr aComp = ModelAPI_Tools::compositeOwner(aFeature);
+          if (aComp.get() && (aComp->getKind() == SketchPlugin_Sketch::ID()))
             aCount++;
         }
       }
