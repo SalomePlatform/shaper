@@ -206,43 +206,7 @@ void Model_BodyBuilder::storeModified(const std::shared_ptr<GeomAPI_Shape>& theO
     if (aShapeNew.IsNull())
       return;  // null shape inside
     aBuilder.Modify(aShapeOld, aShapeNew);
-    if (theDecomposeSolidsTag && aShapeNew.ShapeType() == TopAbs_COMPOUND) {
-      // make sub elements as subs
-
-      // register name if it is possible
-      TCollection_AsciiString aName;
-      if(!aBuilder.NamedShape()->IsEmpty()) {
-        Handle(TDataStd_Name) anAttr;
-        if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
-          aName = TCollection_AsciiString(anAttr->Get()).ToCString();
-        }
-      }
-
-      TopoDS_Iterator aSubIter(aShapeNew);
-      for(int aTag = theDecomposeSolidsTag; aSubIter.More(); aSubIter.Next()) {
-        const TopoDS_Shape& aShape = aSubIter.Value();
-        Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aShape, aShapeLab);
-        if(!aNS.IsNull() && !aNS->IsEmpty()) {
-          // This shape is already in document, don't add it.
-          continue;
-        }
-        TNaming_Builder aSubBuilder(aShapeLab.FindChild(aTag++));
-        aSubBuilder.Generated(aSubIter.Value());
-        if(!aName.IsEmpty()) {
-          TCollection_AsciiString aShapeType = aShape.ShapeType() == TopAbs_EDGE ? "_Edge_" :
-                                               aShape.ShapeType() == TopAbs_FACE ? "_Face_" :
-                                               aShape.ShapeType() == TopAbs_SOLID ? "_Solid_" :
-                                               "_Shape_";
-          std::string aSolidName =
-            (aName + aShapeType + TCollection_AsciiString(aTag - theDecomposeSolidsTag))
-            .ToCString();
-          std::shared_ptr<Model_Document> aDoc =
-            std::dynamic_pointer_cast<Model_Document>(document());
-          aDoc->addNamingName(aSubBuilder.NamedShape()->Label(), aSolidName);
-          TDataStd_Name::Set(aSubBuilder.NamedShape()->Label(), aSolidName.c_str());
-        }
-      }
-    } else if(!aBuilder.NamedShape()->IsEmpty()) {
+    if(!aBuilder.NamedShape()->IsEmpty()) {
       Handle(TDataStd_Name) anAttr;
       if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
         std::string aName (TCollection_AsciiString(anAttr->Get()).ToCString());
