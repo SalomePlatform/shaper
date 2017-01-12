@@ -23,15 +23,15 @@ class GeomAlgoAPI_Symmetry : public GeomAlgoAPI_MakeShape
 public:
   /// Type of mirror operation
   enum MethodType {
-    BY_POINT, ///< Mirror by point.
-    BY_AXIS,  ///< Mirror by axis.
-    BY_PLANE  ///< Mirror by plane.
+    BY_POINT, ///< Symmetry by point.
+    BY_AXIS,  ///< Symmetry by axis.
+    BY_PLANE  ///< Symmetry by plane.
   };
 
   /// \brief Creates an object which is obtained from current object by performing
   ///        a symmetry operation by a point.
   /// \param[in] theSourceShape  a shape to be moved.
-  /// \param[in] thePoint         symmetry point.
+  /// \param[in] thePoint        symmetry point.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Symmetry(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                           std::shared_ptr<GeomAPI_Pnt>   thePoint);
 

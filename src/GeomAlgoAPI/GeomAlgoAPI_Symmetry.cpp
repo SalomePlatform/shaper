@@ -41,39 +41,39 @@ bool GeomAlgoAPI_Symmetry::check()
   switch (myMethodType) {
     case BY_POINT: {
       if (!myPoint) {
-        myError = "Mirror builder :: point is invalid.";
+        myError = "Symmetry builder :: point is invalid.";
         return false;
       }
       if (!mySourceShape) {
-        myError = "Mirror builder :: source shape is invalid.";
+        myError = "Symmetry builder :: source shape is invalid.";
         return false;
       }
       return true;
     }
     case BY_AXIS: {
       if (!myAxis) {
-        myError = "Mirror builder :: axis is invalid.";
+        myError = "Symmetry builder :: axis is invalid.";
         return false;
       }
       if (!mySourceShape) {
-        myError = "Mirror builder :: source shape is invalid.";
+        myError = "Symmetry builder :: source shape is invalid.";
         return false;
       }
       return true;
     }
     case BY_PLANE: {
       if (!myPlane) {
-        myError = "Mirror builder :: plane is invalid.";
+        myError = "Symmetry builder :: plane is invalid.";
         return false;
       }
       if (!mySourceShape) {
-        myError = "Translation builder :: source shape is invalid.";
+        myError = "Symmetry builder :: source shape is invalid.";
         return false;
       }
       return true;
     }
     default: {
-      myError = "Translation builder :: method not implemented.";
+      myError = "Symmetry builder :: method not implemented.";
       return false;
     }
   }

@@ -4,8 +4,8 @@
 // Created:     28 June 2016
 // Author:      Clarisse Genrault (CEA)
 
-#ifndef PrimitivesAPI_Box_H_
-#define PrimitivesAPI_Box_H_
+#ifndef PRIMITIVESAPI_BOX_H_
+#define PRIMITIVESAPI_BOX_H_
 
 #include "PrimitivesAPI.h"
 
@@ -92,4 +92,4 @@ BoxPtr addBox(const std::shared_ptr<ModelAPI_Document>& thePart,
               const ModelHighAPI_Selection& theFirstPoint,
               const ModelHighAPI_Selection& theSecondPoint);
 
-#endif // PrimitivesAPI_Box_H_
+#endif // PRIMITIVESAPI_BOX_H_
