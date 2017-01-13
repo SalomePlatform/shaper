@@ -196,7 +196,19 @@ bool PartSet_RigidSelection::isValid(const ModuleBase_ISelection* theSelection,
   } else {
     QList<ModuleBase_ViewerPrsPtr> aList =
       theSelection->getSelected(ModuleBase_ISelection::Viewer);
-    return (aList.count() == 1);
+    int aCount = 0;
+    foreach (ModuleBase_ViewerPrsPtr aPrs, aList) {
+      ObjectPtr aObj = aPrs->object();
+      if (aObj.get()) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+        if (aFeature.get()) {
+          CompositeFeaturePtr aComp = ModelAPI_Tools::compositeOwner(aFeature);
+          if (aComp.get() && (aComp->getKind() == SketchPlugin_Sketch::ID()))
+            aCount++;
+        }
+      }
+    }
+    return (aCount == 1);
   }
 }
 

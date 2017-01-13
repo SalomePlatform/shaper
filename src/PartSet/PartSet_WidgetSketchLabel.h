@@ -78,12 +78,6 @@ public:
   /// \param thePrs a presentation
   static bool canFillSketch(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
-  /// Set sketch plane from selected object
-  /// \param theFeature a feature of sketch
-  /// \param thePrs a presentation
-  static bool fillSketchPlaneBySelection(const FeaturePtr& theFeature,
-                                         const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
-
 signals:
   /// Signal on plane selection
   void planeSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
@@ -153,6 +147,11 @@ protected:
   /// \param thePrs a selected presentation
   void updateByPlaneSelected(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
+  /// Set sketch plane from selected object
+  /// \param theFeature a feature of sketch
+  /// \param thePrs a presentation
+  bool fillSketchPlaneBySelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
+
  protected:
   /// Activate or deactivate selection
   void activateSelection(bool toActivate);
@@ -171,9 +170,11 @@ protected:
  private:
   /// Set sketch plane by shape
   /// \param theShape a planar face
-  static std::shared_ptr<GeomAPI_Dir> setSketchPlane(const FeaturePtr& theFeature,
-                                                     const TopoDS_Shape& theShape);
+  std::shared_ptr<GeomAPI_Dir> setSketchPlane(const TopoDS_Shape& theShape);
 
+  /// Set sketch plane
+  /// \param thePlane a plane
+  std::shared_ptr<GeomAPI_Dir> setSketchPlane(std::shared_ptr<GeomAPI_Pln> thePlane);
 
 private:
   /// class to show/hide preview planes

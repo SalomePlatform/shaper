@@ -148,10 +148,12 @@ class Model_Objects
   //! Synchronizes myFeatures list with the updated document
   //! \param theUpdated list of labels that are marked as modified, so featrues must be also
   //! \param theUpdateReferences causes the update of back-references
+  //! \param theExecuteFeatures requires re-execute modified persistent features
+  //!            (not needed on undo/redo/abort/open)
   //! \param theOpen - on open nothing must be reexecuted, except not persistent results
   //! \param theFlush makes flush all events in the end of all modifications of this method
   void synchronizeFeatures(const TDF_LabelList& theUpdated, const bool theUpdateReferences,
-    const bool theOpen, const bool theFlush);
+    const bool theOpen, const bool theExecuteFeatures, const bool theFlush);
   //! Synchronizes the BackReferences list in Data of Features and Results
   void synchronizeBackRefs();
 

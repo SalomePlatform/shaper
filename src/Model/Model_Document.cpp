@@ -726,7 +726,7 @@ void Model_Document::abortOperation()
   for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->abortOperation();
   // references may be changed because they are set in attributes on the fly
-  myObjs->synchronizeFeatures(aDeltaLabels, true, false, isRoot());
+  myObjs->synchronizeFeatures(aDeltaLabels, true, false, false, isRoot());
 }
 
 bool Model_Document::isOperation() const
@@ -793,7 +793,7 @@ void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchron
   }
   // after undo of all sub-documents to avoid updates on not-modified data (issue 370)
   if (theSynchronize) {
-    myObjs->synchronizeFeatures(aDeltaLabels, true, false, isRoot());
+    myObjs->synchronizeFeatures(aDeltaLabels, true, false, false, isRoot());
     // update the current features status
     setCurrentFeature(currentFeature(false), false);
   }
@@ -840,7 +840,7 @@ void Model_Document::redo()
     subDoc(*aSubIter)->redo();
 
   // after redo of all sub-documents to avoid updates on not-modified data (issue 370)
-  myObjs->synchronizeFeatures(aDeltaLabels, true, false, isRoot());
+  myObjs->synchronizeFeatures(aDeltaLabels, true, false, false, isRoot());
   // update the current features status
   setCurrentFeature(currentFeature(false), false);
 }
