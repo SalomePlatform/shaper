@@ -77,20 +77,21 @@ bool GeomAlgoAPI_Cylinder::check()
 void GeomAlgoAPI_Cylinder::build()
 {
   myCreatedFaces.clear();
-  
+
   const gp_Ax2& anAxis = myAxis->impl<gp_Ax2>();
-  
+
   // Construct the cylinder
   BRepPrimAPI_MakeCylinder *aCylinderMaker;
-  
+
   if (withAngle) {
-    aCylinderMaker = new  BRepPrimAPI_MakeCylinder(anAxis, myRadius, myHeight, myAngle * M_PI / 180.);
+    aCylinderMaker =
+      new BRepPrimAPI_MakeCylinder(anAxis, myRadius, myHeight, myAngle * M_PI / 180.);
   } else {
-    aCylinderMaker = new  BRepPrimAPI_MakeCylinder(anAxis, myRadius, myHeight);
+    aCylinderMaker = new BRepPrimAPI_MakeCylinder(anAxis, myRadius, myHeight);
   }
-  
+
   aCylinderMaker->Build();
-  
+
   if (!aCylinderMaker->IsDone()) {
     return;
   }
@@ -105,8 +106,8 @@ void GeomAlgoAPI_Cylinder::build()
     myError = "Cylinder builder :: resulting shape is null.";
     return;
   }
-  
+
   setImpl(aCylinderMaker);
-  
+
   setDone(true);
 }

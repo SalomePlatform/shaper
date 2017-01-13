@@ -31,19 +31,19 @@ void PrimitivesPlugin_Cylinder::initAttributes()
 {
   data()->addAttribute(PrimitivesPlugin_Cylinder::CREATION_METHOD(),
                        ModelAPI_AttributeString::typeId());
-  
+
   data()->addAttribute(PrimitivesPlugin_Cylinder::BASE_POINT_ID(),
                        ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(PrimitivesPlugin_Cylinder::AXIS_ID(),
                        ModelAPI_AttributeSelection::typeId());
-  
+
   data()->addAttribute(PrimitivesPlugin_Cylinder::RADIUS_ID(),
                        ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(PrimitivesPlugin_Cylinder::HEIGHT_ID(),
                        ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(PrimitivesPlugin_Cylinder::ANGLE_ID(),
                        ModelAPI_AttributeDouble::typeId());
-  
+
   // Initialize the base point of the cylinder at the origin if the base point is not filled.
   AttributeSelectionPtr aBasePoint = data()->selection(BASE_POINT_ID());
   if (!aBasePoint->isInitialized()) {
@@ -54,10 +54,10 @@ void PrimitivesPlugin_Cylinder::initAttributes()
       aBasePoint->setValue(aPointRes, std::shared_ptr<GeomAPI_Shape>());
     }
   }
-  
+
   // Initialize the axis at the OZ axis if the axis is not filled.
   AttributeSelectionPtr anAxis = data()->selection(AXIS_ID());
-  if (!anAxis->isInitialized()) { 
+  if (!anAxis->isInitialized()) {
     ObjectPtr anAxisObj = ModelAPI_Session::get()->moduleDocument()
       ->objectByName(ModelAPI_ResultConstruction::group(), "OZ");
     if (anAxisObj.get()) {
@@ -98,7 +98,7 @@ void PrimitivesPlugin_Cylinder::createCylinder(bool withAngle)
       aBasePoint = GeomAlgoAPI_PointBuilder::point(aShape1);
     }
   }
- 
+
   // Getting axis.
   std::shared_ptr<GeomAPI_Ax2> anAxis;
   std::shared_ptr<GeomAPI_Edge> anEdge;
@@ -114,21 +114,21 @@ void PrimitivesPlugin_Cylinder::createCylinder(bool withAngle)
     anAxis = std::shared_ptr<GeomAPI_Ax2>(new GeomAPI_Ax2(aBasePoint,
                                                           anEdge->line()->direction()));
   }
-  
+
   // Getting radius and height
   double aRadius = real(PrimitivesPlugin_Cylinder::RADIUS_ID())->value();
   double aHeight = real(PrimitivesPlugin_Cylinder::HEIGHT_ID())->value();
-  
+
   std::shared_ptr<GeomAlgoAPI_Cylinder> aCylinderAlgo;
   if (withAngle) {
     // Getting angle
     double anAngle = real(PrimitivesPlugin_Cylinder::ANGLE_ID())->value();
-    aCylinderAlgo = 
+    aCylinderAlgo =
       std::shared_ptr<GeomAlgoAPI_Cylinder>(new GeomAlgoAPI_Cylinder(anAxis,
                                                                      aRadius, aHeight,
                                                                      anAngle));
   } else {
-    aCylinderAlgo = 
+    aCylinderAlgo =
       std::shared_ptr<GeomAlgoAPI_Cylinder>(new GeomAlgoAPI_Cylinder(anAxis,
                                                                      aRadius, aHeight));
   }
@@ -165,7 +165,6 @@ void PrimitivesPlugin_Cylinder::createCylinder(bool withAngle)
 void PrimitivesPlugin_Cylinder::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Cylinder> theCylinderAlgo,
                                              std::shared_ptr<ModelAPI_ResultBody> theResultCylinder)
 {
-  
   // Load the result
   theResultCylinder->store(theCylinderAlgo->shape());
 

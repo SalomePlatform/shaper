@@ -37,14 +37,14 @@ class PrimitivesPlugin_Cylinder : public ModelAPI_Feature
     static const std::string MY_CREATION_METHOD_ID("CreationMethod");
     return MY_CREATION_METHOD_ID;
   }
-  
+
   /// Attribute name for creation method
   inline static const std::string& CREATION_METHOD_CYLINDER()
   {
     static const std::string MY_CREATION_METHOD_ID("Cylinder");
     return MY_CREATION_METHOD_ID;
   }
-  
+
   /// Attribute name for creation method
   inline static const std::string& CREATION_METHOD_CYLINDER_PORTION()
   {

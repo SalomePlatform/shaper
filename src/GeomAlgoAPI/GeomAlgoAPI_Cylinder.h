@@ -21,16 +21,15 @@ class GeomAlgoAPI_Cylinder : public GeomAlgoAPI_MakeShape
  public:
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Cylinder();
 
-  /// Creates a cylinder
+  /// Creates a cylinder.
   /// \param theAxis The axis of the cylinder
   /// \param theRadius The radius of the cylinder
   /// \param theHeight The height of the cylinder
-  /// \param theAngle The covering angle of the cylinder
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Cylinder(std::shared_ptr<GeomAPI_Ax2> theAxis,
                                           const double theRadius,
                                           const double theHeight);
 
-  /// Creates a cylinder
+  /// Creates a cylinder.
   /// \param theAxis The axis of the cylinder
   /// \param theRadius The radius of the cylinder
   /// \param theHeight The height of the cylinder
@@ -47,8 +46,8 @@ class GeomAlgoAPI_Cylinder : public GeomAlgoAPI_MakeShape
   GEOMALGOAPI_EXPORT void build();
 
  private:
-  bool withAngle;
-  std::shared_ptr<GeomAPI_Pnt> myBasePoint;
+  bool withAngle; /// Boolean indicating if the type of cylinder (full or portion).
+  std::shared_ptr<GeomAPI_Pnt> myBasePoint; /// Center of the lower base of the cylinder.
   std::shared_ptr<GeomAPI_Ax2> myAxis; /// Axis of the cylinder.
   double myRadius; /// Radius of the cylinder.
   double myHeight; /// Height of the cylinder.

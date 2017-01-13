@@ -65,7 +65,7 @@ bool GeomAlgoAPI_Box::check()
     if (fabs(aDiffX)  < Precision::Confusion() ||
         fabs(aDiffY)  < Precision::Confusion() ||
         fabs(aDiffZ)  < Precision::Confusion()) {
-      myError = 
+      myError =
         "Box builder with points :: the points belong both to one of the OXY, OYZ or OZX planes";
       return false;
     }

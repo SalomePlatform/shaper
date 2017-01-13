@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="32"
+   height="32"
+   id="svg3352"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   viewBox="0 0 32 32"
+   sodipodi:docname="cylinder_32x32_cla.svg"
+   inkscape:export-filename="/export/home/cgenraul/SHAPER-CEA-FD20_64/INSTALL/SHAPER/share/salome/resources/shaper/icons/Primitives/cylinder_32x32.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs3354">
+    <linearGradient
+       id="linearGradient4223"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop4225" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.836083"
+     inkscape:cx="10.55697"
+     inkscape:cy="19.400616"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:grid-bbox="true"
+     inkscape:document-units="px"
+     showguides="true"
+     inkscape:window-width="1920"
+     inkscape:window-height="1110"
+     inkscape:window-x="-2"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1"
+     showborder="true"
+     inkscape:showpageshadow="false">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3398"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata3357">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer">
+    <path
+       style="fill:#b7d9ea;fill-opacity:1;stroke:#b7d9ea;stroke-width:0.18526213;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 13.182776,29.487897 C 9.8774461,29.254602 6.9059739,28.600862 5.5971891,27.819018 l -0.575868,-0.344006 0,-9.934896 0,-9.9348943 1.0349683,0.2733641 C 11.82566,9.4024394 20.456092,9.4332793 25.974601,7.9497624 26.583072,7.7861867 27.14744,7.6345711 27.228758,7.6128329 c 0.117871,-0.0315 0.147774,1.9587736 0.147427,9.8159421 -4.75e-4,9.5286 -0.0079,9.862898 -0.223499,10.079799 -0.898127,0.903301 -4.283156,1.722424 -8.198987,1.984027 -1.33024,0.08889 -4.481566,0.08633 -5.770907,-0.0048 z"
+       id="path4145"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#1b4955;stroke-width:1.20723967;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="path3404-3"
+       sodipodi:type="arc"
+       sodipodi:cx="14.977674"
+       sodipodi:cy="26.080961"
+       sodipodi:rx="7"
+       sodipodi:ry="3.1079483"
+       sodipodi:start="6.1688662"
+       sodipodi:end="9.4821825"
+       d="M 21.931982,25.726437 A 7,3.1079483 0 1 1 7.9892038,25.902649"
+       sodipodi:open="true"
+       transform="matrix(1.658174,0,0,1.6551711,-8.8162043,-18.273731)" />
+    <path
+       style="fill:none;stroke:#1b4955;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 27.59775,6.7001261 0,18.1037449"
+       id="path3402"
+       inkscape:connector-curvature="0" />
+    <ellipse
+       style="fill:#b7d9ea;fill-opacity:1;stroke:#1b4955;stroke-width:1.46138835;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="path3404-3-0-9"
+       transform="matrix(1.6451704,0,0,-1.4676935,-8.6236034,-2.4341761)"
+       cx="14.981355"
+       cy="-6.1497636"
+       rx="7"
+       ry="3.1079483"
+       sodipodi:cx="14.981355"
+       sodipodi:cy="-6.1497636"
+       sodipodi:rx="7"
+       sodipodi:ry="3.1079483" />
+    <path
+       style="fill:none;stroke:#1b4955;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 4.3782992,6.1071278 0,18.6104482"
+       id="path3400"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

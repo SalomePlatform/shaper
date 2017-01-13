@@ -159,6 +159,7 @@ INSTALL(TARGETS GeomAlgoAPI DESTINATION ${SHAPER_INSTALL_BIN})
 INSTALL(FILES ${SWIG_SCRIPTS} DESTINATION ${SHAPER_INSTALL_SWIG})
 
 ADD_UNIT_TESTS(TestAPI_Box.py
+               TestAPI_Cylinder.py
                TestAPI_GDMLConeSegment.py
                TestAPI_Symmetry.py
                TestAPI_Translation.py)
