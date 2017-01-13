@@ -26,6 +26,7 @@ PrimitivesAPI_Cylinder::PrimitivesAPI_Cylinder(const std::shared_ptr<ModelAPI_Fe
 : ModelHighAPI_Interface(theFeature)
 {
   if (initialize()) {
+    fillAttribute(PrimitivesPlugin_Cylinder::CREATION_METHOD_CYLINDER(), creationMethod());
     fillAttribute(theBasePoint, basePoint());
     fillAttribute(theAxis, axis());
     setSizes(theRadius, theHeight);
@@ -42,6 +43,7 @@ PrimitivesAPI_Cylinder::PrimitivesAPI_Cylinder(const std::shared_ptr<ModelAPI_Fe
 : ModelHighAPI_Interface(theFeature)
 {
   if (initialize()) {
+    fillAttribute(PrimitivesPlugin_Cylinder::CREATION_METHOD_CYLINDER_PORTION(), creationMethod());
     fillAttribute(theBasePoint, basePoint());
     fillAttribute(theAxis, axis());
     fillAttribute(theAngle, angle());
