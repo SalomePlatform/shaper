@@ -1376,10 +1376,12 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
       Handle(CDF_Application) anApplication = CDF_Session::CurrentSession()->CurrentApplication();
       DFBrowserAPI_Communicator* aCommunicator =
                      DFBrowserAPI_Communicator::loadPluginLibrary("TKDFBrowser.dll");
-      if (!aCommunicator) // to support previous configuration
-        aCommunicator = DFBrowserAPI_Communicator::loadPluginLibrary("DFBrowser.dll");
-      if (aCommunicator)
+      if (aCommunicator) {
         aCommunicator->setApplication(anApplication);
+        Handle(AIS_InteractiveContext) aContext = viewer()->AISContext();
+        if (aContext)
+          aCommunicator->setContext(aContext);
+      }
       DFBrowser_FirstCall = false;
     }
   }
