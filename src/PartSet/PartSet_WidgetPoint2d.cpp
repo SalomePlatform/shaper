@@ -487,17 +487,6 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
                 anOrphanPoint = isOrphanPoint(aFixedFeature, mySketch, aX, aY);
               }
             }
-            else {
-              // point is taken from mouse event and set in attribute.
-              // It should be done before setting
-              // coinident constraint to the external line. If a point is created, it should be
-              // in the mouse clicked point
-              gp_Pnt aPoint =
-                PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
-              double aX, anY;
-              PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, anY);
-              setPoint(aX, anY);
-            }
           }
           if (aFixedObject.get())
             setConstraintWith(aFixedObject);

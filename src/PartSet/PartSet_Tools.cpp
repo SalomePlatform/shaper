@@ -563,16 +563,6 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
         (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
 
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-      /// check external line created on Trihedron Axis
-      /// selection of a point on external edge referenced to AIS_Trihedron axis
-      /// should be prohibited or point should be replaced to "Origin". The second
-      /// case is implemented because of not correct AIS_Trihedron origin point highlight
-      /// When AIS is corrected(exactly priority of origin and stayed vertex by highlight)
-      /// the next check should be moved to Partset 2d point widget in isValidSelectionCustom
-      bool isAxis = isAxisSelected(theObject);
-      if (isAxis)
-        aRes = ResultPtr(); // to rely on code below that found the Origin result
-
       // if there is no object,
       // it means that this is the origin point: search it in the module document
       if (!aRes.get()) {
@@ -626,29 +616,6 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
     }
   }
   return ResultPtr();
-}
-
-bool PartSet_Tools::isAxisSelected(const ObjectPtr& theObject)
-{
-  bool isAxis = false;
-  ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-  if (aRes.get()) {
-    // check if result belongs to external feature
-    // in this case we should use as a result reference of external feature
-    FeaturePtr aResFeature = ModelAPI_Feature::feature(aRes);
-    std::shared_ptr<SketchPlugin_Feature> aSPFeature =
-                  std::dynamic_pointer_cast<SketchPlugin_Feature>(aResFeature);
-    if (aSPFeature.get() && aSPFeature->isExternal()) {
-      AttributeSelectionPtr aAttr = aResFeature->selection(
-                                    SketchPlugin_SketchEntity::EXTERNAL_ID());
-      if (aAttr) { /// check if the result is Axis
-        ResultPtr anExternalRes = std::dynamic_pointer_cast<ModelAPI_Result>(aAttr->context());
-        FeaturePtr aResFeature = ModelAPI_Feature::feature(anExternalRes);
-        isAxis = aResFeature->getKind() == "Axis"; //ConstructionPlugin_Axis::ID()
-      }
-    }
-  }
-  return isAxis;
 }
 
 bool PartSet_Tools::isContainPresentation(const QList<ModuleBase_ViewerPrsPtr>& theSelected,

@@ -180,13 +180,6 @@ public:
                                                CompositeFeaturePtr theSketch,
                                                const bool theTemporary = false);
 
-
-  /// Checks if the shape is Origin, the conditions are the shape is a vertex and
-  /// selected feature is an external feature created on Axis
-  /// \param theObject a selected object in the viewer
-  /// \return boolean value
-  static bool isAxisSelected(const ObjectPtr& theObject);
-
     /// Checks whether the list of selected presentations contains the given one
   /// \param theSelected a list of presentations
   /// \param thePrs a presentation to be found
