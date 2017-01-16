@@ -1375,8 +1375,11 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     if (DFBrowser_FirstCall) {
       Handle(CDF_Application) anApplication = CDF_Session::CurrentSession()->CurrentApplication();
       DFBrowserAPI_Communicator* aCommunicator =
-                     DFBrowserAPI_Communicator::loadPluginLibrary("DFBrowser.dll");
-      aCommunicator->setApplication(anApplication);
+                     DFBrowserAPI_Communicator::loadPluginLibrary("TKDFBrowser.dll");
+      if (!aCommunicator) // to support previous configuration
+        aCommunicator = DFBrowserAPI_Communicator::loadPluginLibrary("DFBrowser.dll");
+      if (aCommunicator)
+        aCommunicator->setApplication(anApplication);
       DFBrowser_FirstCall = false;
     }
   }
