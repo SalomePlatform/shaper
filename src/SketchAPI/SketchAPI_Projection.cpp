@@ -7,7 +7,14 @@
 
 //--------------------------------------------------------------------------------------
 #include "SketchAPI_Projection.h"
-//--------------------------------------------------------------------------------------
+
+#include <SketchPlugin_Line.h>
+#include <SketchPlugin_Circle.h>
+
+#include <SketchAPI_Line.h>
+#include <SketchAPI_Circle.h>
+#include <SketchAPI_Arc.h>
+
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
@@ -60,12 +67,19 @@ void SketchAPI_Projection::setByExternalName(const std::string& theExternalName)
 }
 
 //--------------------------------------------------------------------------------------
-std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Projection::createdFeature() const
+std::shared_ptr<SketchAPI_SketchEntity> SketchAPI_Projection::createdFeature() const
 {
   AttributeRefAttrPtr aProjectedRefAttr = projectedFeature();
   FeaturePtr aProjectedFeature = ModelAPI_Feature::feature(aProjectedRefAttr->object());
 
-  return std::shared_ptr<ModelHighAPI_Interface>(new ModelHighAPI_Interface(aProjectedFeature));
+  std::shared_ptr<SketchAPI_SketchEntity> anEntity;
+  aProjectedFeature->getKind() == SketchPlugin_Line::ID() ?
+    anEntity.reset(new SketchAPI_Line(aProjectedFeature)) :
+    aProjectedFeature->getKind() == SketchPlugin_Circle::ID() ?
+      anEntity.reset(new SketchAPI_Circle(aProjectedFeature)) :
+      anEntity.reset(new SketchAPI_Arc(aProjectedFeature));
+
+  return anEntity;
 }
 
 //--------------------------------------------------------------------------------------
