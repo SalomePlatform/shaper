@@ -826,8 +826,12 @@ bool CollectionPlugin_WidgetField::
   for (anIt = theValues.begin(); anIt != theValues.end(); anIt++) {
     ModuleBase_ViewerPrsPtr aValue = *anIt;
     ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aValue->object());
-    if (theToValidate && aRes.get() && acceptSubShape(aValue->shape(), aRes))
-      aSelected.append(aValue);
+    if (theToValidate && aRes.get()) {
+      if (myShapeTypeCombo->currentIndex() > 3)
+        aSelected.append(aValue);
+      else if (acceptSubShape(aValue->shape(), aRes))
+        aSelected.append(aValue);
+    }
   }
   AttributeSelectionListPtr aSelList =
     myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());
