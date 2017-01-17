@@ -458,13 +458,20 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
     if (aSelectedFeature.get() != NULL)
       aSPFeature = std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
 
-    if ((!aSPFeature && !aShape.IsNull()) ||
-        (aSPFeature.get() && aSPFeature->isExternal())) {
-      ResultPtr aFixedObject;
-      anExternal = true;
+    ResultPtr aFixedObject;
+    bool aSketchExternalFeature = aSPFeature.get() && aSPFeature->isExternal();
+    if ((!aSPFeature && !aShape.IsNull()) || aSketchExternalFeature) {
       aFixedObject = PartSet_Tools::findFixedObjectByExternal(aShape, aObject, mySketch);
-      if (!aFixedObject.get())
-        aFixedObject = PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
+      if (aSketchExternalFeature && !aFixedObject.get()) {/// local selection on external feature
+        anExternal = false;
+      }
+      else {
+        anExternal = true;
+        if (!aFixedObject.get())
+          aFixedObject = PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
+      }
+    }
+    if (anExternal) {
       double aX, aY;
       if (getPoint2d(aView, aShape, aX, aY) && isFeatureContainsPoint(myFeature, aX, aY)) {
         // do not create a constraint to the point, which already used by the feature
