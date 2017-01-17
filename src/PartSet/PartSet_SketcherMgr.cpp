@@ -903,6 +903,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 
   // Display sketcher objects
   QStringList anInfo;
+  Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
   for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
     FeaturePtr aFeature = myCurrentSketch->subFeature(i);
 #ifdef DEBUG_SKETCHER_ENTITIES
@@ -911,9 +913,16 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
     std::list<ResultPtr> aResults = aFeature->results();
     std::list<ResultPtr>::const_iterator aIt;
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-      (*aIt)->setDisplayed(true);
+      if ((*aIt)->isDisplayed())
+        // Display object if it was created outside of GUI
+        aECreator->sendUpdated((*aIt), EVENT_DISP);
+      else
+        (*aIt)->setDisplayed(true);
     }
-    aFeature->setDisplayed(true);
+    if (aFeature->isDisplayed())
+      aECreator->sendUpdated(aFeature, EVENT_DISP);
+    else
+      aFeature->setDisplayed(true);
   }
 #ifdef DEBUG_SKETCHER_ENTITIES
   QString anInfoStr = anInfo.join(";\t");
