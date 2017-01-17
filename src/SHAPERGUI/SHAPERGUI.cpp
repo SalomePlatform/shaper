@@ -121,7 +121,6 @@ SHAPERGUI::~SHAPERGUI()
 void SHAPERGUI::initialize(CAM_Application* theApp)
 {
   LightApp_Module::initialize(theApp);
-  inspectSalomeModules();
 
   myWorkshop->startApplication();
   LightApp_Application* anApp = dynamic_cast<LightApp_Application*>(theApp);
@@ -661,15 +660,6 @@ void SHAPERGUI::preferencesChanged(const QString& theSection, const QString& the
 void SHAPERGUI::putInfo(const QString& theInfo, const int theMSecs)
 {
   application()->putInfo(theInfo, theMSecs);
-}
-
-void SHAPERGUI::inspectSalomeModules()
-{
-  QStringList aModuleNames;
-  getApp()->modules(aModuleNames, false);
-  foreach(QString eachModule, aModuleNames) {
-    Config_ModuleReader::addDependencyModule(eachModule.toStdString());
-  }
 }
 
 bool SHAPERGUI::abortAllOperations()
