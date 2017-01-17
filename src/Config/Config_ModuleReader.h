@@ -49,7 +49,9 @@ class Config_ModuleReader : public Config_XMLReader
   /// loads the library with specific name, appends "lib*.dll" or "*.so" depending on the platform
   CONFIG_EXPORT static void loadLibrary(const std::string& theLibName);
   /// loads the python module with specified name
-  CONFIG_EXPORT static void loadScript(const std::string& theFileName);
+  /// \param theFileName name of the script
+  /// \param theSendErr send error message in case of faile
+  CONFIG_EXPORT static void loadScript(const std::string& theFileName, bool theSendErr = true);
   /*!
    * Extends set of modules,  used for dependency checking (if there is no
    * required module in the set, a plugin will not be loaded)
