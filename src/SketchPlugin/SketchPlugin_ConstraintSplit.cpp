@@ -16,6 +16,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_AttributeBoolean.h>
 
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
@@ -1146,13 +1147,25 @@ void SketchPlugin_ConstraintSplit::arrangePointsOnArc(
 void SketchPlugin_ConstraintSplit::fillAttribute(const AttributePtr& theModifiedAttribute,
                                                  const AttributePtr& theSourceAttribute)
 {
-  AttributePoint2DPtr aModifiedAttribute = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                            theModifiedAttribute);
-  AttributePoint2DPtr aSourceAttribute = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                            theSourceAttribute);
+  std::string anAttributeType = theModifiedAttribute->attributeType();
+  if (anAttributeType == GeomDataAPI_Point2D::typeId()) {
+    AttributePoint2DPtr aModifiedAttribute = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                              theModifiedAttribute);
+    AttributePoint2DPtr aSourceAttribute = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                              theSourceAttribute);
 
-  if (aModifiedAttribute.get() && aSourceAttribute.get())
-    aModifiedAttribute->setValue(aSourceAttribute->pnt());
+    if (aModifiedAttribute.get() && aSourceAttribute.get())
+      aModifiedAttribute->setValue(aSourceAttribute->pnt());
+  }
+  else if (anAttributeType == ModelAPI_AttributeBoolean::typeId()) {
+    AttributeBooleanPtr aModifiedAttribute = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
+                                              theModifiedAttribute);
+    AttributeBooleanPtr aSourceAttribute = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(
+                                              theSourceAttribute);
+
+    if (aModifiedAttribute.get() && aSourceAttribute.get())
+      aModifiedAttribute->setValue(aSourceAttribute->value());
+  }
 }
 
 FeaturePtr SketchPlugin_ConstraintSplit::createLineFeature(const FeaturePtr& theBaseFeature,
@@ -1168,6 +1181,10 @@ FeaturePtr SketchPlugin_ConstraintSplit::createLineFeature(const FeaturePtr& the
 
   fillAttribute(aFeature->attribute(SketchPlugin_Line::START_ID()), theFirstPointAttr);
   fillAttribute(aFeature->attribute(SketchPlugin_Line::END_ID()), theSecondPointAttr);
+
+  fillAttribute(aFeature->attribute(SketchPlugin_SketchEntity::AUXILIARY_ID()),
+                theBaseFeature->attribute(SketchPlugin_SketchEntity::AUXILIARY_ID()));
+
   aFeature->execute(); // to obtain result
 
   return aFeature;
@@ -1204,6 +1221,9 @@ FeaturePtr SketchPlugin_ConstraintSplit::createArcFeature(const FeaturePtr& theB
                 theBaseFeature->attribute(aCenterAttributeId));
   fillAttribute(aFeature->attribute(SketchPlugin_Arc::START_ID()), theFirstPointAttr);
   fillAttribute(aFeature->attribute(SketchPlugin_Arc::END_ID()), theSecondPointAttr);
+
+  fillAttribute(aFeature->attribute(SketchPlugin_SketchEntity::AUXILIARY_ID()),
+                theBaseFeature->attribute(SketchPlugin_SketchEntity::AUXILIARY_ID()));
 
   /// fill referersed state of created arc as it is on the base arc
   if (theBaseFeature->getKind() == SketchPlugin_Arc::ID()) {
