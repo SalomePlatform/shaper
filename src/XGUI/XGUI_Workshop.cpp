@@ -808,6 +808,7 @@ void XGUI_Workshop::openDirectory(const QString& theDirectory)
   }
 
   QApplication::setOverrideCursor(Qt::WaitCursor);
+  module()->closeDocument();
   SessionPtr aSession = ModelAPI_Session::get();
   aSession->closeAll();
   aSession->load(myCurrentDir.toLatin1().constData());
