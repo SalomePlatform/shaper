@@ -1332,12 +1332,16 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   else if (theId == "SHOW_CMD") {
     showObjects(aObjects, true);
     mySelector->updateSelectionBy(ModuleBase_ISelection::Browser);
+    updateCommandStatus();
   }
-  else if (theId == "HIDE_CMD")
+  else if (theId == "HIDE_CMD") {
     showObjects(aObjects, false);
+    updateCommandStatus();
+  }
   else if (theId == "SHOW_ONLY_CMD") {
     showOnlyObjects(aObjects);
     mySelector->updateSelectionBy(ModuleBase_ISelection::Browser);
+    updateCommandStatus();
   }
   else if (theId == "SHADING_CMD")
     setDisplayMode(aObjects, XGUI_Displayer::Shading);
@@ -1350,6 +1354,7 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
         aObj->setDisplayed(false);
     }
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    updateCommandStatus();
   } else if (theId == "SELECT_VERTEX_CMD") {
     setViewerSelectionMode(TopAbs_VERTEX);
   } else if (theId == "SELECT_EDGE_CMD") {
@@ -1988,17 +1993,7 @@ for (int i = 0; i < aDoc->size(aGroupName); i++) { \
 void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
 {
   foreach (ObjectPtr aObj, theList) {
-    /*
-    ResultPartPtr aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
-    if (aPartRes) {
-      DocumentPtr aDoc = aPartRes->partDoc();
-      SET_DISPLAY_GROUP(ModelAPI_ResultBody::group(), isVisible)
-      SET_DISPLAY_GROUP(ModelAPI_ResultConstruction::group(), isVisible)
-      SET_DISPLAY_GROUP(ModelAPI_ResultGroup::group(), isVisible)
-    } else {
-    */
-      aObj->setDisplayed(isVisible);
-    //}
+    aObj->setDisplayed(isVisible);
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
@@ -2015,20 +2010,9 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
 
   // Show only objects from the list
   foreach (ObjectPtr aObj, theList) {
-    /*
-    ResultPartPtr aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
-    if (aPartRes) {
-      DocumentPtr aDoc = aPartRes->partDoc();
-      SET_DISPLAY_GROUP(ModelAPI_ResultBody::group(), true)
-      SET_DISPLAY_GROUP(ModelAPI_ResultConstruction::group(), true)
-      SET_DISPLAY_GROUP(ModelAPI_ResultGroup::group(), true)
-    } else {
-    */
-      aObj->setDisplayed(true);
-    //}
+    aObj->setDisplayed(true);
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-
 }
 
 
