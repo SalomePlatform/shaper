@@ -399,6 +399,32 @@ static bool setInvalidIfFalse(TDF_Label& theLab, const bool theFlag) {
   return theFlag;
 }
 
+void Model_AttributeSelection::split(
+  ResultPtr theContext, TopoDS_Shape theNewShape, TopAbs_ShapeEnum theType)
+{
+  TopTools_ListOfShape aSubs;
+  for(TopoDS_Iterator anExplorer(theNewShape); anExplorer.More(); anExplorer.Next()) {
+    if (!anExplorer.Value().IsNull() &&
+      anExplorer.Value().ShapeType() == theType) {
+        aSubs.Append(anExplorer.Value());
+    } else { // invalid case; bad result shape, so, impossible to split easily
+      aSubs.Clear();
+      break;
+    }
+  }
+  if (aSubs.Extent() > 1) { // ok to split
+    TopTools_ListIteratorOfListOfShape aSub(aSubs);
+    GeomShapePtr aSubSh(new GeomAPI_Shape);
+    aSubSh->setImpl(new TopoDS_Shape(aSub.Value()));
+    setValue(theContext, aSubSh);
+    for(aSub.Next(); aSub.More(); aSub.Next()) {
+      GeomShapePtr aSubSh(new GeomAPI_Shape);
+      aSubSh->setImpl(new TopoDS_Shape(aSub.Value()));
+      myParent->append(theContext, aSubSh);
+    }
+  }
+}
+
 bool Model_AttributeSelection::update()
 {
   TDF_Label aSelLab = selectionLabel();
@@ -464,28 +490,9 @@ bool Model_AttributeSelection::update()
       // shape type shoud not not changed: if shape becomes compound of such shapes, then split
       if (myParent && !anOldShape.IsNull() && !aNewShape.IsNull() &&
           anOldShape.ShapeType() != aNewShape.ShapeType() &&
-          aNewShape.ShapeType() == TopAbs_COMPOUND) {
-        TopTools_ListOfShape aSubs;
-        for(TopoDS_Iterator anExplorer(aNewShape); anExplorer.More(); anExplorer.Next()) {
-          if (!anExplorer.Value().IsNull() &&
-              anExplorer.Value().ShapeType() == anOldShape.ShapeType()) {
-            aSubs.Append(anExplorer.Value());
-          } else { // invalid case; bad result shape, so, impossible to split easily
-            aSubs.Clear();
-            break;
-          }
-        }
-        if (aSubs.Extent() > 1) { // ok to split
-          TopTools_ListIteratorOfListOfShape aSub(aSubs);
-          GeomShapePtr aSubSh(new GeomAPI_Shape);
-          aSubSh->setImpl(new TopoDS_Shape(aSub.Value()));
-          setValue(aContext, aSubSh);
-          for(aSub.Next(); aSub.More(); aSub.Next()) {
-            GeomShapePtr aSubSh(new GeomAPI_Shape);
-            aSubSh->setImpl(new TopoDS_Shape(aSub.Value()));
-            myParent->append(aContext, aSubSh);
-          }
-        }
+          (aNewShape.ShapeType() == TopAbs_COMPOUND || aNewShape.ShapeType() == TopAbs_COMPSOLID))
+      {
+        split(aContext, aNewShape, anOldShape.ShapeType());
       }
       owner()->data()->sendAttributeUpdated(this);  // send updated if shape is changed
     }
@@ -1202,6 +1209,19 @@ void Model_AttributeSelection::updateInHistory()
     // update scope to reset to a new one
     myScope.Clear();
     myRef.setValue(aModifierResFound);
+    // if context shape type is changed to more complicated and this context is selected, split
+    if (myParent &&!aSubShape.get() && aModifierResFound->shape().get() && aContext->shape().get())
+    {
+      TopoDS_Shape anOldShape = aContext->shape()->impl<TopoDS_Shape>();
+      TopoDS_Shape aNewShape = aModifierResFound->shape()->impl<TopoDS_Shape>();
+      if (!anOldShape.IsNull() && !aNewShape.IsNull() &&
+        anOldShape.ShapeType() != aNewShape.ShapeType() &&
+        (aNewShape.ShapeType() == TopAbs_COMPOUND || aNewShape.ShapeType() == TopAbs_COMPSOLID)) {
+        // prepare for split in "update"
+        TDF_Label aSelLab = selectionLabel();
+        split(aContext, aNewShape, anOldShape.ShapeType());
+      }
+    }
     update(); // it must recompute a new sub-shape automatically
   }
 }

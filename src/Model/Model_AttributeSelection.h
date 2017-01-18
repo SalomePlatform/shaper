@@ -11,6 +11,7 @@
 #include "Model_AttributeReference.h"
 #include <ModelAPI_AttributeSelection.h>
 #include <TDF_LabelMap.hxx>
+#include <TopoDS_Shape.hxx>
 
 class Model_AttributeSelectionList;
 
@@ -120,6 +121,9 @@ protected:
 
   /// Sets the parent attribute
   void setParent(Model_AttributeSelectionList* theParent);
+
+  /// Splits theNewShape into sub-shapes of theType type (for the list parent of this attribute)
+  void split(ResultPtr theContext, TopoDS_Shape theNewShape, TopAbs_ShapeEnum theType);
 
   friend class Model_Data;
   friend class Model_AttributeSelectionList;
