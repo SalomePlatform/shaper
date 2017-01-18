@@ -28,6 +28,7 @@
 // standard definitions
 %include "typemaps.i"
 %include "std_list.i"
+%include "std_pair.i"
 %include "std_string.i"
 %include "std_shared_ptr.i"
 
@@ -215,6 +216,9 @@
 %template(SelectionList) std::list<ModelHighAPI_Selection>;
 %template(RefAttrList) std::list<ModelHighAPI_RefAttr>;
 %template(RefList) std::list<ModelHighAPI_Reference>;
+
+// std::pair -> []
+%template(ResultSubShapePair) std::pair<std::shared_ptr<ModelAPI_Result>, std::shared_ptr<GeomAPI_Shape> >;
 
 
 // fix compilarion error: ‘res*’ was not declared in this scope

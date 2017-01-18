@@ -24,3 +24,4 @@ from parameter import *
 from partset import *
 from primitives import *
 from gdml import *
+from tests import *
