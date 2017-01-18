@@ -99,7 +99,7 @@ SET(PROJECT_LIBRARIES
     GeomAPI
     GeomAlgoImpl
     ModelAPI
-    XAO
+    XAOShaper
     ${CAS_OCAF}
     ${CAS_SHAPE}
     ${CAS_TKBO}

@@ -35,7 +35,7 @@ ADD_DEFINITIONS(
 # libraries to link to
 SET(_link_LIBRARIES
   ${CPPUNIT_LIBRARIES}
-  XAO
+  XAOShaper
   )
 
 # --- sources ---

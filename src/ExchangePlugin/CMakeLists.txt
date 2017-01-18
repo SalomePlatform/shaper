@@ -47,7 +47,7 @@ SET(PROJECT_LIBRARIES
     ModelHighAPI
     GeomAPI
     GeomAlgoAPI
-    XAO
+    XAOShaper
 )
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
 
