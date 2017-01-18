@@ -104,8 +104,13 @@ std::string ModelHighAPI_Selection::shapeType() const
 //==================================================================================================
 void ModelHighAPI_Selection::setName(const std::string& theName)
 {
-  if (myVariantType == VT_ResultSubShapePair)
-    myResultSubShapePair.first->data()->setName(theName);
+  if (myVariantType == VT_ResultSubShapePair) {
+    std::shared_ptr<ModelAPI_Result> aResult = myResultSubShapePair.first;
+    if(!aResult.get()) {
+      return;
+    }
+    aResult->data()->setName(theName);
+  }
 }
 
 void ModelHighAPI_Selection::setColor(int theRed, int theGreen, int theBlue)
