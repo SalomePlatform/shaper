@@ -71,8 +71,12 @@ std::shared_ptr<SketchAPI_SketchEntity> SketchAPI_Projection::createdFeature() c
 {
   AttributeRefAttrPtr aProjectedRefAttr = projectedFeature();
   FeaturePtr aProjectedFeature = ModelAPI_Feature::feature(aProjectedRefAttr->object());
-
   std::shared_ptr<SketchAPI_SketchEntity> anEntity;
+
+  if(!aProjectedFeature.get()) {
+    return anEntity;
+  }
+
   aProjectedFeature->getKind() == SketchPlugin_Line::ID() ?
     anEntity.reset(new SketchAPI_Line(aProjectedFeature)) :
     aProjectedFeature->getKind() == SketchPlugin_Circle::ID() ?
