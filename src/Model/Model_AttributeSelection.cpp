@@ -937,7 +937,8 @@ void Model_AttributeSelection::selectConstruction(
                   TopoDS_Vertex aV = TopoDS::Vertex(anEdgeExp.Current());
 
                   TDF_Label aLab = selectionLabel().FindChild(aTagIndex);
-                  std::string aName = "Vertex-" + Model_SelectionNaming::shortName(aConstr, aDelta / kSTART_VERTEX_DELTA);
+                  std::string aName = "Vertex-"
+                      + Model_SelectionNaming::shortName(aConstr, aDelta / kSTART_VERTEX_DELTA);
                   TNaming_Builder aBuilder(aLab);
                   aBuilder.Generated(aV);
                   aMyDoc->addNamingName(aLab, aName.c_str());
