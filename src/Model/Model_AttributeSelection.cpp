@@ -911,22 +911,37 @@ void Model_AttributeSelection::selectConstruction(
                   if (aFaceCurve == aCurve) {
                     int anOrient = Model_SelectionNaming::edgeOrientation(aSubShape, anEdge);
                     anOrientations[anID] = anOrient;
-                    registerSubShape(
-                      selectionLabel(), anEdge, anID, aContextFeature, aMyDoc, anOrientations,
-                      aSubNames, Handle(TDataStd_IntPackedMap)(), anOrient);
+
+                    TDF_Label aLab = selectionLabel().FindChild(anID);
+                    std::string aName = "Edge-" + Model_SelectionNaming::shortName(aConstr, 0);
+                    TNaming_Builder aBuilder(aLab);
+                    aBuilder.Generated(anEdge);
+                    aMyDoc->addNamingName(aLab, aName.c_str());
+                    TDataStd_Name::Set(aLab, aName.c_str());
+
+                    if (anOrient != 0) {
+                      // store the orientation of edge relatively to face if needed
+                      TDataStd_Integer::Set(aLab, anOrient);
+                    }
                   }
                 }
               } else { // put vertices of the selected edge to sub-labels
                 // add edges to sub-label to support naming for edges selection
-                TopExp_Explorer anEdgeExp(aSubShape, TopAbs_VERTEX);
+                int aDelta = kSTART_VERTEX_DELTA;
                 int aTagIndex = anID + kSTART_VERTEX_DELTA;
-                for(; anEdgeExp.More(); anEdgeExp.Next(), aTagIndex += kSTART_VERTEX_DELTA) {
+                for(TopExp_Explorer anEdgeExp(aSubShape, TopAbs_VERTEX);
+                    anEdgeExp.More();
+                    anEdgeExp.Next(),
+                    aTagIndex += kSTART_VERTEX_DELTA,
+                    aDelta += kSTART_VERTEX_DELTA) {
                   TopoDS_Vertex aV = TopoDS::Vertex(anEdgeExp.Current());
 
-                  std::stringstream anAdditionalName;
-                  registerSubShape(
-                    selectionLabel(), aV, aTagIndex, aContextFeature, aMyDoc, anOrientations,
-                    aSubNames);
+                  TDF_Label aLab = selectionLabel().FindChild(aTagIndex);
+                  std::string aName = "Vertex-" + Model_SelectionNaming::shortName(aConstr, aDelta / kSTART_VERTEX_DELTA);
+                  TNaming_Builder aBuilder(aLab);
+                  aBuilder.Generated(aV);
+                  aMyDoc->addNamingName(aLab, aName.c_str());
+                  TDataStd_Name::Set(aLab, aName.c_str());
                 }
               }
             }
