@@ -58,7 +58,7 @@ def vertical_body():
 
 def bottom_body():
     # Create XOY sketch
-    sketch = model.addSketch(part, "Extrusion_1_1/Generated_Face_3")
+    sketch = model.addSketch(part, "Extrusion_1_1/Generated_Face_5")
 
     # Create base polygon
     points = [(0, 0), (0, L), (P, L), (P, 16 + 16), (P - 20, 16 + 16), (P - 20, 16), (P, 16), (P, 0)]
@@ -91,7 +91,7 @@ def bottom_body():
     sketch.setCoincident(arc.endPoint(), h1.startPoint())
 
     # Binding
-    left_e = sketch.addLine("Extrusion_1_1/Generated_Face_3&Extrusion_1_1/To_Face_1_1")
+    left_e = sketch.addLine("Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1_1")
     sketch.setCoincident(left_e.startPoint(), left.endPoint())
     sketch.setCoincident(left_e.endPoint(), left.startPoint())
 
@@ -112,7 +112,7 @@ def bottom_body():
 
 def body_3():
     # Create XOZ sketch
-    sketch = model.addSketch(part, "Boolean_1_1/Modified_4")
+    sketch = model.addSketch(part, "Boolean_1_1/Modified_2")
 
     # Create base polygon
     H, L, l, r = 28, 40, 8, 12
@@ -150,7 +150,7 @@ def body_3():
     sketch.setRadius(arc, r)
 
     # Binding
-    bottom_e = sketch.addLine("Boolean_1_1/Modified_5&Boolean_1_1/Modified_8")
+    bottom_e = sketch.addLine("Boolean_1_1/Modified_7&Boolean_1_1/Modified_5")
     sketch.setCoincident(bottom_e, bottom.startPoint())
     sketch.setCoincident(bottom_e.startPoint(), bottom.endPoint())
 
