@@ -11,6 +11,7 @@
 #include <BRep_Builder.hxx>
 #include <BRepTopAdaptor_FClass2d.hxx>
 #include <Geom_Plane.hxx>
+#include <Geom_TrimmedCurve.hxx>
 #include <Precision.hxx>
 #include <TopExp.hxx>
 #include <TopExp_Explorer.hxx>
@@ -44,6 +45,45 @@ static TopoDS_Vertex findStartVertex(const TopoDS_Shape& theShape)
     }
   }
   return aStart;
+}
+
+static TopoDS_Vertex findStartVertex(const TopoDS_Shape& theShape,
+    const std::list<std::shared_ptr<GeomAPI_Shape> >& theInitialShapes)
+{
+  // Try to find edge lying on the one of original edges.
+  // First found edge will be taken as a start edge for the result wire
+  std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator aFeatIt = theInitialShapes.begin();
+  for (; aFeatIt != theInitialShapes.end(); aFeatIt++) {
+    std::shared_ptr<GeomAPI_Shape> aShape(*aFeatIt);
+    const TopoDS_Edge& anEdge = aShape->impl<TopoDS_Edge>();
+    if (anEdge.ShapeType() != TopAbs_EDGE)
+      continue;
+
+    double aFirst, aLast;
+    Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+    if (aCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve))
+      aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
+
+    TopExp_Explorer anExp(theShape, TopAbs_EDGE);
+    for (; anExp.More(); anExp.Next()) {
+      const TopoDS_Edge& aShapeEdge = TopoDS::Edge(anExp.Current());
+      double aF, aL;
+      Handle(Geom_Curve) aShapeCurve = BRep_Tool::Curve(aShapeEdge, aF, aL);
+      if (aShapeCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve))
+        aShapeCurve = Handle(Geom_TrimmedCurve)::DownCast(aShapeCurve)->BasisCurve();
+
+      if (aCurve != aShapeCurve)
+        continue;
+
+      // the edge is found, search vertex
+      TopoDS_Vertex aV1, aV2;
+      TopExp::Vertices(aShapeEdge, aV1, aV2);
+      return fabs(aF - aFirst) <= fabs(aL - aFirst) ? aV1 : aV2;
+    }
+  }
+
+  // start vertex is not found, use algorithm to search vertex with the greatest coordinates
+  return findStartVertex(theShape);
 }
 
 void GeomAlgoAPI_SketchBuilder::createFaces(
@@ -99,8 +139,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
       TopoDS_Wire aWire = TopoDS::Wire(aWireExp.Current());
 
       // to make faces equal on different platforms, we will find
-      // a vertex with greater coordinates and start wire from it
-      TopoDS_Vertex aStartVertex = findStartVertex(aWire);
+      // a vertex lying on an edge with the lowest index in the list of initial edges
+      TopoDS_Vertex aStartVertex = findStartVertex(aWire, theFeatures);
 
       TopoDS_Wire aNewWire;
       aBuilder.MakeWire(aNewWire);
