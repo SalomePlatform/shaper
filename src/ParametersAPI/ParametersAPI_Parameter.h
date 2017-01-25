@@ -47,6 +47,11 @@ public:
               ModelAPI_AttributeString, /** Comment */
   )
 
+  /// Just sets the numeric value to the parameter (it resets the previous expression)
+  PARAMETERSAPI_EXPORT void setValue(const double theValue);
+  /// Returns the current value of the parameter: the expression result.
+  PARAMETERSAPI_EXPORT double value();
+
   /// Dump wrapped feature
   PARAMETERSAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;

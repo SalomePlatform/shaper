@@ -10,6 +10,7 @@
 //--------------------------------------------------------------------------------------
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
+#include <ModelAPI_ResultParameter.h>
 //--------------------------------------------------------------------------------------
 ParametersAPI_Parameter::ParametersAPI_Parameter(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
@@ -33,6 +34,22 @@ ParametersAPI_Parameter::ParametersAPI_Parameter(
 
     execute();
   }
+}
+
+void ParametersAPI_Parameter::setValue(const double theValue)
+{
+  // convert value to the expression string
+  std::ostringstream aValueStr;
+  aValueStr<<theValue;
+  fillAttribute(aValueStr.str(), expression());
+  execute();
+}
+
+double ParametersAPI_Parameter::value() {
+  ResultParameterPtr aRes =
+    std::dynamic_pointer_cast<ModelAPI_ResultParameter>(feature()->firstResult());
+  // it may raise an exception if result is invalid
+  return aRes->data()->real(ModelAPI_ResultParameter::VALUE())->value();
 }
 
 ParametersAPI_Parameter::~ParametersAPI_Parameter()
