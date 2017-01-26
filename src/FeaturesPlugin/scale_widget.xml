@@ -1,0 +1,76 @@
+<!-- Copyright (C) 2014-201x CEA/DEN, EDF R&D -->
+
+<source>
+  <toolbox id="CreationMethod">
+    <box id="ByFactor"
+         title="By one common factor for the three directions"
+         icon="icons/Features/scale_factor_32x32.png">
+      <multi_selector id="main_objects"
+                      label="Main objects"
+                      icon=""
+                      tooltip="Select objects"
+                      type_choice="objects"
+                      concealment="true">
+        <validator id="FeaturesPlugin_ValidatorTransform"/>
+      </multi_selector>
+      <shape_selector id="center_point"
+                      icon=""
+                      label="Center point"
+                      tooltip="Select the center point"
+                      shape_types="vertex"
+                      default="">
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        <validator id="GeomValidators_ConstructionComposite"/>
+      </shape_selector>
+      <doublevalue
+          id="scale_factor"
+          label="Scale factor"
+          step="1."
+          default="2."
+          tooltip="Scale factor">
+      </doublevalue>
+    </box>
+    <box id="ByDimensions"
+         title="Different factors for the three directions"
+         icon="icons/Features/scale_dimensions_32x32.png">
+      <multi_selector id="main_objects"
+                      label="Main objects"
+                      icon=""
+                      tooltip="Select objects"
+                      type_choice="objects"
+                      concealment="true">
+        <validator id="FeaturesPlugin_ValidatorTransform"/>
+      </multi_selector>
+      <shape_selector id="center_point"
+                      icon=""
+                      label="Center point"
+                      tooltip="Select the center point"
+                      shape_types="vertex"
+                      default="">
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        <validator id="GeomValidators_ConstructionComposite"/>
+      </shape_selector>
+      <doublevalue
+          id="scale_factor_x"
+          label="Scale factor in X"
+          step="1."
+          default="2."
+          tooltip="Scale factor in X">
+      </doublevalue>
+      <doublevalue
+          id="scale_factor_y"
+          label="Scale factor in Y"
+          step="1."
+          default="2."
+          tooltip="Scale factor in Y">
+      </doublevalue>
+      <doublevalue
+          id="scale_factor_z"
+          label="Scale factor in Z"
+          step="1."
+          default="2."
+          tooltip="Scale factor in Z">
+      </doublevalue>
+    </box>
+  </toolbox>
+</source>

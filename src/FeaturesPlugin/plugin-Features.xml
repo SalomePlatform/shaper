@@ -71,6 +71,9 @@
       <feature id="Symmetry" title="Symmetry" tooltip="Perform symmetry with respect to a point, an axis or a plane" icon="icons/Features/symmetry.png">
         <source path="symmetry_widget.xml"/>
       </feature>
+      <feature id="Scale" title="Scale" tooltip="Perform scale an objects" icon="icons/Features/scale.png">
+        <source path="scale_widget.xml"/>
+      </feature>
     </group>
   </workbench>
 </plugin>

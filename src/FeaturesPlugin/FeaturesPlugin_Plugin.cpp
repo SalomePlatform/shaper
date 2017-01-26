@@ -17,10 +17,11 @@
 #include <FeaturesPlugin_RevolutionCut.h>
 #include <FeaturesPlugin_RevolutionFuse.h>
 #include <FeaturesPlugin_Rotation.h>
+#include <FeaturesPlugin_Scale.h>
+#include <FeaturesPlugin_Symmetry.h>
 #include <FeaturesPlugin_Union.h>
 #include <FeaturesPlugin_ValidatorTransform.h>
 #include <FeaturesPlugin_Validators.h>
-#include <FeaturesPlugin_Symmetry.h>
 
 #include <ModelAPI_Session.h>
 
@@ -102,6 +103,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_Union);
   } else if (theFeatureID == FeaturesPlugin_Symmetry::ID()) {
     return FeaturePtr(new FeaturesPlugin_Symmetry);
+  } else if (theFeatureID == FeaturesPlugin_Scale::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Scale);
   }
 
   // feature of such kind is not found
