@@ -21,7 +21,7 @@
 class GeomAlgoAPI_Symmetry : public GeomAlgoAPI_MakeShape
 {
 public:
-  /// Type of mirror operation
+  /// Type of symmetry operation
   enum MethodType {
     BY_POINT, ///< Symmetry by point.
     BY_AXIS,  ///< Symmetry by axis.
@@ -30,29 +30,29 @@ public:
 
   /// \brief Creates an object which is obtained from current object by performing
   ///        a symmetry operation by a point.
-  /// \param[in] theSourceShape  a shape to be moved.
-  /// \param[in] thePoint        symmetry point.
+  /// \param[in] theSourceShape  the shape to be moved.
+  /// \param[in] thePoint        the symmetry point.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Symmetry(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                           std::shared_ptr<GeomAPI_Pnt>   thePoint);
 
   /// \brief Creates an object which is obtained from current object by performing
   ///        a symmetry operation by a point.
-  /// \param[in] theSourceShape  a shape to be moved.
-  /// \param[in] theAxis         symmetry axis.
+  /// \param[in] theSourceShape  the shape to be moved.
+  /// \param[in] theAxis         the symmetry axis.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Symmetry(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                           std::shared_ptr<GeomAPI_Ax1>   theAxis);
 
   /// \brief Creates an object which is obtained from current object by performing
   ///        a symmetry operation by a point.
-  /// \param[in] theSourceShape  a shape to be moved.
-  /// \param[in] thePlane        symmetry plane.
+  /// \param[in] theSourceShape  the shape to be moved.
+  /// \param[in] thePlane        the symmetry plane.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Symmetry(std::shared_ptr<GeomAPI_Shape> theSourceShape,
                                           std::shared_ptr<GeomAPI_Ax2>   thePlane);
 
-  /// Checks if data for the translation execution is OK.
+  /// Checks if data for the symmetry execution is OK.
   GEOMALGOAPI_EXPORT bool check();
 
-  /// Execute the translation.
+  /// Execute the symmetry.
   GEOMALGOAPI_EXPORT void build();
 
 private:

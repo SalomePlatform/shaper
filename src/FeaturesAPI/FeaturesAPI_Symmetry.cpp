@@ -10,8 +10,7 @@
 #include <ModelHighAPI_Tools.h>
 
 //==================================================================================================
-FeaturesAPI_Symmetry::FeaturesAPI_Symmetry(
-  const std::shared_ptr<ModelAPI_Feature>& theFeature)
+FeaturesAPI_Symmetry::FeaturesAPI_Symmetry(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
 {
   initialize();
@@ -24,7 +23,7 @@ FeaturesAPI_Symmetry::FeaturesAPI_Symmetry(const std::shared_ptr<ModelAPI_Featur
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    fillAttribute(theMainObjects, mymainObjects);
+    fillAttribute(theMainObjects, mainObjects());
     GeomAPI_Shape::ShapeType aType = getShapeType(theObject);
     if(aType == GeomAPI_Shape::VERTEX) {
       setPoint(theObject);
@@ -39,7 +38,6 @@ FeaturesAPI_Symmetry::FeaturesAPI_Symmetry(const std::shared_ptr<ModelAPI_Featur
 //==================================================================================================
 FeaturesAPI_Symmetry::~FeaturesAPI_Symmetry()
 {
-
 }
 
 //==================================================================================================
@@ -81,7 +79,6 @@ void FeaturesAPI_Symmetry::setPlane(const ModelHighAPI_Selection& thePlaneObject
 //==================================================================================================
 void FeaturesAPI_Symmetry::dump(ModelHighAPI_Dumper& theDumper) const
 {
-  std::cout << "DUMP SYMMETRY" << std::endl;
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
@@ -106,7 +103,7 @@ void FeaturesAPI_Symmetry::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << ", " << anAttrPlane;
   }
 
-   theDumper << ")" << std::endl;
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================

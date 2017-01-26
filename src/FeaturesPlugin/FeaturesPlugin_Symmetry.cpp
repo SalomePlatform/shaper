@@ -6,17 +6,16 @@
 
 #include <FeaturesPlugin_Symmetry.h>
 
-#include <ModelAPI_AttributeSelectionList.h>
-#include <ModelAPI_AttributeString.h>
-#include <ModelAPI_ResultBody.h>
+#include <GeomAlgoAPI_PointBuilder.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Pln.h>
 
-#include <GeomAlgoAPI_PointBuilder.h>
-
+#include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeString.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
 
 //=================================================================================================
