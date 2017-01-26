@@ -36,7 +36,6 @@ SET(PROJECT_HEADERS
     GeomAPI_Ax2.h
     GeomAPI_Ax3.h
     GeomAPI_Trsf.h
-    GeomAPI_Angle.h
     GeomAPI_Angle2d.h
     GeomAPI_Wire.h
 )
@@ -71,7 +70,6 @@ SET(PROJECT_SOURCES
     GeomAPI_Ax3.cpp
     GeomAPI_IPresentable.cpp
     GeomAPI_Trsf.cpp
-    GeomAPI_Angle.cpp
     GeomAPI_Angle2d.cpp
     GeomAPI_Wire.cpp
 )

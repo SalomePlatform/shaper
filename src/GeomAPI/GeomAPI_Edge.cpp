@@ -193,6 +193,8 @@ bool GeomAPI_Edge::isInPlane(std::shared_ptr<GeomAPI_Pln> thePlane) const
   double aFirst, aLast;
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
+  if (aCurve.IsNull())
+    return false;
 
   double A, B, C, D;
   thePlane->coefficients(A, B, C, D);

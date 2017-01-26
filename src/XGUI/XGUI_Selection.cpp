@@ -233,13 +233,6 @@ QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getHighlighted() const
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
     Handle(SelectMgr_EntityOwner) anOwner = aContext->DetectedOwner();
-    try {
-      // It is checking of existence of presentation object
-      // BUG of OCCT
-      Handle(AIS_InteractiveObject) aTest = aContext->DetectedInteractive();
-    } catch (...) {
-      continue;
-    }
     if (!anOwner.IsNull()) {
       if (aSelectedIds.contains((long)anOwner.get()))
         continue;

@@ -58,7 +58,7 @@ public:
 
   /// Returns created feature
   SKETCHAPI_EXPORT
-  std::shared_ptr<ModelHighAPI_Interface> createdFeature() const;
+  std::shared_ptr<SketchAPI_SketchEntity> createdFeature() const;
 
   /// Dump wrapped feature
   SKETCHAPI_EXPORT

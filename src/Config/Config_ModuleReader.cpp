@@ -172,7 +172,7 @@ void Config_ModuleReader::loadPlugin(const std::string& thePluginName)
   }
 }
 
-void Config_ModuleReader::loadScript(const std::string& theFileName)
+void Config_ModuleReader::loadScript(const std::string& theFileName, bool theSendErr)
 {
   /* acquire python thread */
   PyGILState_STATE gstate = PyGILState_Ensure();
@@ -195,7 +195,8 @@ void Config_ModuleReader::loadScript(const std::string& theFileName)
       Py_XDECREF(pvalue);
       Py_XDECREF(ptraceback);
     }
-    Events_InfoMessage("Config_ModuleReader", anErrorMsg).send();
+    if (theSendErr)
+      Events_InfoMessage("Config_ModuleReader", anErrorMsg).send();
   }
 
   /* release python thread */

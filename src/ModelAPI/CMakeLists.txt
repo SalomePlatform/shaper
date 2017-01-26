@@ -141,4 +141,5 @@ ADD_UNIT_TESTS(TestConstants.py
                Test1512.py
                TestDoubleArray.py
                Test1757.py
+               Test1998.py
 )

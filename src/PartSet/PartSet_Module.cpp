@@ -1195,10 +1195,6 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
           }
         }
       }
-
-      ResultBodyPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObject);
-      if( aResult.get() )
-        theMenu->addAction(myMenuMgr->action("SELECT_PARENT_CMD"));
     }
   }
   bool aNotDeactivate = (aCurrentOp == 0);

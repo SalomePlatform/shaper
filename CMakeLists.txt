@@ -114,7 +114,13 @@ IF(${HAVE_SALOME})
     ADD_SUBDIRECTORY (src/ConnectorPlugin)
 ENDIF(${HAVE_SALOME})
 
+ADD_SUBDIRECTORY (test.models)
+
 ENABLE_TESTING()
+
+IF(ADD_MODELS_TESTS)
+  ADD_CUSTOM_TARGET(run_unit_tests COMMAND ${CMAKE_CTEST_COMMAND} -C "${CMAKE_BUILD_TYPE}" -LE "models_tests")
+ENDIF(ADD_MODELS_TESTS)
 
 # Add the uninstall target for eclipse IDE
 if (CMAKE_GENERATOR MATCHES "NMake Makefiles")

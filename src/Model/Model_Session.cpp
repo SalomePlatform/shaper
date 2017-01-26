@@ -191,6 +191,7 @@ std::shared_ptr<ModelAPI_Document> Model_Session::moduleDocument()
   if (aFirstCall) {
     // to be sure that plugins are loaded,
     // even before the first "createFeature" call (in unit tests)
+
     LoadPluginsInfo();
     // creation of the root document is always outside of the transaction, so, avoid checking it
     setCheckTransactions(false);
@@ -434,7 +435,7 @@ void Model_Session::LoadPluginsInfo()
 {
   if (myPluginsInfoLoaded)  // nothing to do
     return;
-
+  Config_ModuleReader::loadScript("salome.shaper.initConfig", false);
   // Read plugins information from XML files
   Config_ModuleReader aModuleReader(Config_FeatureMessage::MODEL_EVENT());
   aModuleReader.readAll();

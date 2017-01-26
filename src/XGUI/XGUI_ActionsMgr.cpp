@@ -101,8 +101,7 @@ void XGUI_ActionsMgr::updateCommandsStatus()
 {
   setAllEnabled();
   XGUI_Selection* aSelection = myWorkshop->selector()->selection();
-  //if (aSelection->getSelected(ModuleBase_ISelection::Viewer).size() > 0)
-  if (aSelection->getSelected().size() > 0)
+  if (aSelection->getSelected(ModuleBase_ISelection::AllControls).size() > 0)
     updateOnViewSelection();
 
   FeaturePtr anActiveFeature = FeaturePtr();

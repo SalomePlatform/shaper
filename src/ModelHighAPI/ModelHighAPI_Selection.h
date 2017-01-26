@@ -91,9 +91,13 @@ public:
   MODELHIGHAPI_EXPORT
   void setDeflection(double theValue);
 
-  /// Return sub-result for ResultCompSolid
+  /// Returns the number of sub-elements.
   MODELHIGHAPI_EXPORT
-  ModelHighAPI_Selection subResult(int theIndex);
+  int numberOfSubs() const;
+
+  /// Returns the sub-result by zero-base index.
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Selection subResult(int theIndex) const;
 
 private:
   VariantType myVariantType;

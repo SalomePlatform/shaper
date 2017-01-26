@@ -10,7 +10,7 @@
 
 void Model_AttributeBoolean::setValue(bool theValue)
 {
-  Standard_Boolean aValue = theValue ? Standard_True : Standard_False;
+  Standard_Integer aValue = theValue ? 1 : 0;
   if (!myIsInitialized || myBool->Get() != aValue) {
     if (myBool.IsNull())
       myBool = TDataStd_Integer::Set(myLab, 0);
@@ -21,7 +21,7 @@ void Model_AttributeBoolean::setValue(bool theValue)
 
 bool Model_AttributeBoolean::value()
 {
-  return myIsInitialized && myBool->Get() == Standard_True ;
+  return myIsInitialized && myBool->Get() == 1;
 }
 
 Model_AttributeBoolean::Model_AttributeBoolean(TDF_Label& theLabel)

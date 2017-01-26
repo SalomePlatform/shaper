@@ -13,7 +13,7 @@
   <plugin library="CollectionPlugin" configuration="plugin-Collection.xml"/>
   <plugin library="ExchangePlugin" configuration="plugin-Exchange.xml"/>
   <plugin script="addons_Features" configuration="addons_Features.xml"/>
-  <plugin script="ConnectorPlugin" configuration="plugin-Connector.xml" dependency="Geometry"/>
+  <plugin script="ConnectorPlugin" configuration="plugin-Connector.xml" dependency="GEOM"/>
   <plugin library="ParametersPlugin" configuration="plugin-Parameters.xml"/>
 @DEFAULT_SOLVER@
 <!--

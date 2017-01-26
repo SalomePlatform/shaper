@@ -399,6 +399,32 @@ static bool setInvalidIfFalse(TDF_Label& theLab, const bool theFlag) {
   return theFlag;
 }
 
+void Model_AttributeSelection::split(
+  ResultPtr theContext, TopoDS_Shape theNewShape, TopAbs_ShapeEnum theType)
+{
+  TopTools_ListOfShape aSubs;
+  for(TopoDS_Iterator anExplorer(theNewShape); anExplorer.More(); anExplorer.Next()) {
+    if (!anExplorer.Value().IsNull() &&
+      anExplorer.Value().ShapeType() == theType) {
+        aSubs.Append(anExplorer.Value());
+    } else { // invalid case; bad result shape, so, impossible to split easily
+      aSubs.Clear();
+      break;
+    }
+  }
+  if (aSubs.Extent() > 1) { // ok to split
+    TopTools_ListIteratorOfListOfShape aSub(aSubs);
+    GeomShapePtr aSubSh(new GeomAPI_Shape);
+    aSubSh->setImpl(new TopoDS_Shape(aSub.Value()));
+    setValue(theContext, aSubSh);
+    for(aSub.Next(); aSub.More(); aSub.Next()) {
+      GeomShapePtr aSubSh(new GeomAPI_Shape);
+      aSubSh->setImpl(new TopoDS_Shape(aSub.Value()));
+      myParent->append(theContext, aSubSh);
+    }
+  }
+}
+
 bool Model_AttributeSelection::update()
 {
   TDF_Label aSelLab = selectionLabel();
@@ -464,28 +490,9 @@ bool Model_AttributeSelection::update()
       // shape type shoud not not changed: if shape becomes compound of such shapes, then split
       if (myParent && !anOldShape.IsNull() && !aNewShape.IsNull() &&
           anOldShape.ShapeType() != aNewShape.ShapeType() &&
-          aNewShape.ShapeType() == TopAbs_COMPOUND) {
-        TopTools_ListOfShape aSubs;
-        for(TopoDS_Iterator anExplorer(aNewShape); anExplorer.More(); anExplorer.Next()) {
-          if (!anExplorer.Value().IsNull() &&
-              anExplorer.Value().ShapeType() == anOldShape.ShapeType()) {
-            aSubs.Append(anExplorer.Value());
-          } else { // invalid case; bad result shape, so, impossible to split easily
-            aSubs.Clear();
-            break;
-          }
-        }
-        if (aSubs.Extent() > 1) { // ok to split
-          TopTools_ListIteratorOfListOfShape aSub(aSubs);
-          GeomShapePtr aSubSh(new GeomAPI_Shape);
-          aSubSh->setImpl(new TopoDS_Shape(aSub.Value()));
-          setValue(aContext, aSubSh);
-          for(aSub.Next(); aSub.More(); aSub.Next()) {
-            GeomShapePtr aSubSh(new GeomAPI_Shape);
-            aSubSh->setImpl(new TopoDS_Shape(aSub.Value()));
-            myParent->append(aContext, aSubSh);
-          }
-        }
+          (aNewShape.ShapeType() == TopAbs_COMPOUND || aNewShape.ShapeType() == TopAbs_COMPSOLID))
+      {
+        split(aContext, aNewShape, anOldShape.ShapeType());
       }
       owner()->data()->sendAttributeUpdated(this);  // send updated if shape is changed
     }
@@ -904,22 +911,38 @@ void Model_AttributeSelection::selectConstruction(
                   if (aFaceCurve == aCurve) {
                     int anOrient = Model_SelectionNaming::edgeOrientation(aSubShape, anEdge);
                     anOrientations[anID] = anOrient;
-                    registerSubShape(
-                      selectionLabel(), anEdge, anID, aContextFeature, aMyDoc, anOrientations,
-                      aSubNames, Handle(TDataStd_IntPackedMap)(), anOrient);
+
+                    TDF_Label aLab = selectionLabel().FindChild(anID);
+                    std::string aName = "Edge-" + Model_SelectionNaming::shortName(aConstr, 0);
+                    TNaming_Builder aBuilder(aLab);
+                    aBuilder.Generated(anEdge);
+                    aMyDoc->addNamingName(aLab, aName.c_str());
+                    TDataStd_Name::Set(aLab, aName.c_str());
+
+                    if (anOrient != 0) {
+                      // store the orientation of edge relatively to face if needed
+                      TDataStd_Integer::Set(aLab, anOrient);
+                    }
                   }
                 }
               } else { // put vertices of the selected edge to sub-labels
                 // add edges to sub-label to support naming for edges selection
-                TopExp_Explorer anEdgeExp(aSubShape, TopAbs_VERTEX);
+                int aDelta = kSTART_VERTEX_DELTA;
                 int aTagIndex = anID + kSTART_VERTEX_DELTA;
-                for(; anEdgeExp.More(); anEdgeExp.Next(), aTagIndex += kSTART_VERTEX_DELTA) {
+                for(TopExp_Explorer anEdgeExp(aSubShape, TopAbs_VERTEX);
+                    anEdgeExp.More();
+                    anEdgeExp.Next(),
+                    aTagIndex += kSTART_VERTEX_DELTA,
+                    aDelta += kSTART_VERTEX_DELTA) {
                   TopoDS_Vertex aV = TopoDS::Vertex(anEdgeExp.Current());
 
-                  std::stringstream anAdditionalName;
-                  registerSubShape(
-                    selectionLabel(), aV, aTagIndex, aContextFeature, aMyDoc, anOrientations,
-                    aSubNames);
+                  TDF_Label aLab = selectionLabel().FindChild(aTagIndex);
+                  std::string aName = "Vertex-"
+                      + Model_SelectionNaming::shortName(aConstr, aDelta / kSTART_VERTEX_DELTA);
+                  TNaming_Builder aBuilder(aLab);
+                  aBuilder.Generated(aV);
+                  aMyDoc->addNamingName(aLab, aName.c_str());
+                  TDataStd_Name::Set(aLab, aName.c_str());
                 }
               }
             }
@@ -1202,6 +1225,19 @@ void Model_AttributeSelection::updateInHistory()
     // update scope to reset to a new one
     myScope.Clear();
     myRef.setValue(aModifierResFound);
+    // if context shape type is changed to more complicated and this context is selected, split
+    if (myParent &&!aSubShape.get() && aModifierResFound->shape().get() && aContext->shape().get())
+    {
+      TopoDS_Shape anOldShape = aContext->shape()->impl<TopoDS_Shape>();
+      TopoDS_Shape aNewShape = aModifierResFound->shape()->impl<TopoDS_Shape>();
+      if (!anOldShape.IsNull() && !aNewShape.IsNull() &&
+        anOldShape.ShapeType() != aNewShape.ShapeType() &&
+        (aNewShape.ShapeType() == TopAbs_COMPOUND || aNewShape.ShapeType() == TopAbs_COMPSOLID)) {
+        // prepare for split in "update"
+        TDF_Label aSelLab = selectionLabel();
+        split(aContext, aNewShape, anOldShape.ShapeType());
+      }
+    }
     update(); // it must recompute a new sub-shape automatically
   }
 }

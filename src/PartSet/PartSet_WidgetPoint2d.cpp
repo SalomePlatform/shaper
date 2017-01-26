@@ -457,60 +457,57 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
     std::shared_ptr<SketchPlugin_Feature> aSPFeature;
     if (aSelectedFeature.get() != NULL)
       aSPFeature = std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
-      if ((!aSPFeature && !aShape.IsNull()) ||
-          (aSPFeature.get() && aSPFeature->isExternal())) {
-        ResultPtr aFixedObject;
+
+    ResultPtr aFixedObject;
+    bool aSketchExternalFeature = aSPFeature.get() && aSPFeature->isExternal();
+    if ((!aSPFeature && !aShape.IsNull()) || aSketchExternalFeature) {
+      aFixedObject = PartSet_Tools::findFixedObjectByExternal(aShape, aObject, mySketch);
+      if (aSketchExternalFeature && !aFixedObject.get()) {/// local selection on external feature
+        anExternal = false;
+      }
+      else {
         anExternal = true;
-        aFixedObject = PartSet_Tools::findFixedObjectByExternal(aShape, aObject, mySketch);
         if (!aFixedObject.get())
           aFixedObject = PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
-        double aX, aY;
-        if (getPoint2d(aView, aShape, aX, aY) && isFeatureContainsPoint(myFeature, aX, aY)) {
-          // do not create a constraint to the point, which already used by the feature
-          // if the feature contains the point, focus is not switched
+      }
+    }
+    if (anExternal) {
+      double aX, aY;
+      if (getPoint2d(aView, aShape, aX, aY) && isFeatureContainsPoint(myFeature, aX, aY)) {
+        // do not create a constraint to the point, which already used by the feature
+        // if the feature contains the point, focus is not switched
+        setPoint(aX, aY);
+      }
+      else {
+        if (getPoint2d(aView, aShape, aX, aY))
           setPoint(aX, aY);
-        }
-        else {
-          if (getPoint2d(aView, aShape, aX, aY))
-            setPoint(aX, aY);
-          else
-            setValueState(Stored); // in case of edge selection, Apply state should also be updated
-          bool anOrphanPoint = aShape.ShapeType() == TopAbs_VERTEX ||
-                               isOrphanPoint(aSelectedFeature, mySketch, aX, aY);
-          if (anExternal) {
-            // we should not stop reentrant operation on external objects because
-            anOrphanPoint = true;
-            // they are not participate in the contour creation excepting external vertices
-            if (aShape.ShapeType() == TopAbs_VERTEX) {
-              FeaturePtr aFixedFeature = ModelAPI_Feature::feature(aFixedObject);
-              if (aFixedFeature.get() && aFixedFeature->getKind() == SketchPlugin_Point::ID()) {
-                anOrphanPoint = isOrphanPoint(aFixedFeature, mySketch, aX, aY);
-              }
-            }
-            else {
-              // point is taken from mouse event and set in attribute.
-              // It should be done before setting
-              // coinident constraint to the external line. If a point is created, it should be
-              // in the mouse clicked point
-              gp_Pnt aPoint =
-                PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
-              double aX, anY;
-              PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, anY);
-              setPoint(aX, anY);
+        else
+          setValueState(Stored); // in case of edge selection, Apply state should also be updated
+        bool anOrphanPoint = aShape.ShapeType() == TopAbs_VERTEX ||
+                              isOrphanPoint(aSelectedFeature, mySketch, aX, aY);
+        if (anExternal) {
+          // we should not stop reentrant operation on external objects because
+          anOrphanPoint = true;
+          // they are not participate in the contour creation excepting external vertices
+          if (aShape.ShapeType() == TopAbs_VERTEX) {
+            FeaturePtr aFixedFeature = ModelAPI_Feature::feature(aFixedObject);
+            if (aFixedFeature.get() && aFixedFeature->getKind() == SketchPlugin_Point::ID()) {
+              anOrphanPoint = isOrphanPoint(aFixedFeature, mySketch, aX, aY);
             }
           }
-          if (aFixedObject.get())
-            setConstraintWith(aFixedObject);
-          // fignal updated should be flushed in order to visualize possible created
-          // external objects e.g. selection of trihedron axis when input end arc point
-          updateObject(feature());
-
-          if (!anOrphanPoint)
-            emit vertexSelected(); // it stops the reentrant operation
-
-          emit focusOutWidget(this);
         }
+        if (aFixedObject.get())
+          setConstraintWith(aFixedObject);
+        // fignal updated should be flushed in order to visualize possible created
+        // external objects e.g. selection of trihedron axis when input end arc point
+        updateObject(feature());
+
+        if (!anOrphanPoint)
+          emit vertexSelected(); // it stops the reentrant operation
+
+        emit focusOutWidget(this);
       }
+    }
     if (!anExternal) {
       double aX, aY;
       bool isProcessed = false;

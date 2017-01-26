@@ -104,8 +104,13 @@ std::string ModelHighAPI_Selection::shapeType() const
 //==================================================================================================
 void ModelHighAPI_Selection::setName(const std::string& theName)
 {
-  if (myVariantType == VT_ResultSubShapePair)
-    myResultSubShapePair.first->data()->setName(theName);
+  if (myVariantType == VT_ResultSubShapePair) {
+    std::shared_ptr<ModelAPI_Result> aResult = myResultSubShapePair.first;
+    if(!aResult.get()) {
+      return;
+    }
+    aResult->data()->setName(theName);
+  }
 }
 
 void ModelHighAPI_Selection::setColor(int theRed, int theGreen, int theBlue)
@@ -132,7 +137,20 @@ void ModelHighAPI_Selection::setDeflection(double theValue)
   aDeflectionAttr->setValue(theValue);
 }
 
-ModelHighAPI_Selection ModelHighAPI_Selection::subResult(int theIndex)
+int ModelHighAPI_Selection::numberOfSubs() const
+{
+  if (myVariantType != VT_ResultSubShapePair)
+    return 0;
+
+  ResultCompSolidPtr aCompSolid =
+      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(myResultSubShapePair.first);
+  if (!aCompSolid)
+    return 0;
+
+  return aCompSolid->numberOfSubs();
+}
+
+ModelHighAPI_Selection ModelHighAPI_Selection::subResult(int theIndex) const
 {
   if (myVariantType != VT_ResultSubShapePair)
     return ModelHighAPI_Selection();
