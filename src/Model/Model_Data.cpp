@@ -300,7 +300,7 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
 
 bool Model_Data::blockSendAttributeUpdated(const bool theBlock, const bool theSendMessage)
 {
-  bool aWasBlocked = mySendAttributeUpdated;
+  bool aWasBlocked = !mySendAttributeUpdated;
   if (mySendAttributeUpdated == theBlock) {
     mySendAttributeUpdated = !theBlock;
     if (mySendAttributeUpdated && !myWasChangedButBlocked.empty()) {
