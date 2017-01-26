@@ -140,9 +140,9 @@ void ParametersPlugin_EvalListener::renameInParameter(
                                                 theNewName);
   // Issue #588. No need for reevaluating expression.
   // Moreover, current history may not contain necessary parameters.
-  anExpressionAttribute->owner()->data()->blockSendAttributeUpdated(true);
+  bool aWasBlocked = anExpressionAttribute->owner()->data()->blockSendAttributeUpdated(true);
   anExpressionAttribute->setValue(anExpressionString);
-  anExpressionAttribute->owner()->data()->blockSendAttributeUpdated(false);
+  anExpressionAttribute->owner()->data()->blockSendAttributeUpdated(aWasBlocked);
 }
 
 void ParametersPlugin_EvalListener::renameInAttribute(
@@ -229,18 +229,18 @@ bool isValidAttribute(const AttributePtr& theAttribute)
 
 void setParameterName(ResultParameterPtr theResultParameter, const std::string& theName)
 {
-  theResultParameter->data()->blockSendAttributeUpdated(true);
+  bool aWasBlocked = theResultParameter->data()->blockSendAttributeUpdated(true);
   theResultParameter->data()->setName(theName);
-  theResultParameter->data()->blockSendAttributeUpdated(false, false);
+  theResultParameter->data()->blockSendAttributeUpdated(aWasBlocked, false);
 
   std::shared_ptr<ParametersPlugin_Parameter> aParameter =
       std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
           ModelAPI_Feature::feature(theResultParameter));
 
-  aParameter->data()->blockSendAttributeUpdated(true);
+  aWasBlocked = aParameter->data()->blockSendAttributeUpdated(true);
   aParameter->data()->setName(theName);
   aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->setValue(theName);
-  aParameter->data()->blockSendAttributeUpdated(false);
+  aParameter->data()->blockSendAttributeUpdated(aWasBlocked);
 }
 
 void ParametersPlugin_EvalListener::processObjectRenamedEvent(

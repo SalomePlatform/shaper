@@ -129,8 +129,8 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// Blocks sending "attribute updated" if theBlock is true
   /// \param theID identifier of the attribute that can be referenced by this ID later
   /// \param theAttrType type of the created attribute (received from the type method)
-  /// \returns the just created attribute
-  virtual void blockSendAttributeUpdated(
+  /// \returns the previous state of block
+  virtual bool blockSendAttributeUpdated(
     const bool theBlock, const bool theSendMessage = true) = 0;
 
   /// Erases all the data from the data model

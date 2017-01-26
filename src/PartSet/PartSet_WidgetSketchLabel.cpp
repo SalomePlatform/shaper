@@ -211,10 +211,12 @@ void PartSet_WidgetSketchLabel::onShowConstraint(bool theOn)
 
 void PartSet_WidgetSketchLabel::blockAttribute(const AttributePtr& theAttribute,
                                                const bool& theToBlock, bool& isFlushesActived,
-                                               bool& isAttributeSetInitializedBlocked)
+                                               bool& isAttributeSetInitializedBlocked,
+                                               bool& isAttributeSendUpdatedBlocked)
 {
   ModuleBase_WidgetValidated::blockAttribute(theAttribute, theToBlock, isFlushesActived,
-                                             isAttributeSetInitializedBlocked);
+                                             isAttributeSetInitializedBlocked,
+                                             isAttributeSendUpdatedBlocked);
   // We do not restore the previous state of isAttributeSetInitializedBlocked for each of
   // attributes. It it is necessary, these states should be append to the method attributes
   // or stored in the widget

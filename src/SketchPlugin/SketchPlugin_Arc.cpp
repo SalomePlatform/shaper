@@ -268,7 +268,7 @@ void SketchPlugin_Arc::move(double theDeltaX, double theDeltaY)
   if (!aData->isValid())
     return;
 
-  aData->blockSendAttributeUpdated(true);
+  bool aWasBlocked = aData->blockSendAttributeUpdated(true);
 
   myStartUpdate = true;
   myEndUpdate = true;
@@ -293,7 +293,7 @@ void SketchPlugin_Arc::move(double theDeltaX, double theDeltaY)
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(PASSED_POINT_ID()));
   if (aPassedPoint->isInitialized())
     aPassedPoint->move(theDeltaX, theDeltaY);
-  aData->blockSendAttributeUpdated(false);
+  aData->blockSendAttributeUpdated(aWasBlocked);
 }
 
 bool SketchPlugin_Arc::isFixed() {
@@ -418,10 +418,10 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
       std::shared_ptr<GeomAPI_Lin2d> aMiddleLine(new GeomAPI_Lin2d(aMidPnt, aMidDir));
       std::shared_ptr<GeomAPI_Pnt2d> aCenter = anOrthoLine->intersect(aMiddleLine);
       if (aCenter) {
-        data()->blockSendAttributeUpdated(true);
+        bool aWasBlocked = data()->blockSendAttributeUpdated(true);
         aCenterAttr->setValue(aCenter);
         aStartAttr->setValue(aTangPnt2d);
-        data()->blockSendAttributeUpdated(false);
+        data()->blockSendAttributeUpdated(aWasBlocked);
       }
 
       tangencyArcConstraints();
@@ -441,7 +441,7 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
       return;
     std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(new GeomAPI_Circ2d(aCenter, aStart));
 
-    data()->blockSendAttributeUpdated(true);
+    bool aWasBlocked = data()->blockSendAttributeUpdated(true);
     // The Arc end point is projected
     // on the circle formed by center and start points
     std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEnd);
@@ -526,12 +526,12 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
 
     // do not need to inform that other parameters were changed in this basis mode: these arguments
     // change is enough
-    data()->blockSendAttributeUpdated(false, false);
+    data()->blockSendAttributeUpdated(aWasBlocked, false);
     return;
   }
 
   if (theID == PASSED_POINT_ID()) {
-    data()->blockSendAttributeUpdated(true);
+    bool aWasBlocked = data()->blockSendAttributeUpdated(true);
 
     std::shared_ptr<GeomAPI_Pnt2d> aPoints[3];
     int aNbInitialized = 0;
@@ -551,7 +551,7 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
         aCenterAttr->setValue(aCenter);
       }
     }
-    data()->blockSendAttributeUpdated(false);
+    data()->blockSendAttributeUpdated(aWasBlocked);
     return;
   }
 
@@ -569,7 +569,7 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
         data()->attribute(RADIUS_ID()));
     double aRadius = aRadiusAttr->value();
 
-    data()->blockSendAttributeUpdated(true);
+    bool aWasBlocked = data()->blockSendAttributeUpdated(true);
     std::shared_ptr<GeomAPI_Dir2d>
       aStartDir(new GeomAPI_Dir2d(aStart->xy()->decreased(aCenter->xy())));
     std::shared_ptr<GeomAPI_XY>
@@ -580,7 +580,7 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
     std::shared_ptr<GeomAPI_XY>
       aNewEnd = anEndDir->xy()->multiplied(aRadius)->added(aCenter->xy());
     anEndAttr->setValue(aNewEnd->x(), aNewEnd->y());
-    data()->blockSendAttributeUpdated(false);
+    data()->blockSendAttributeUpdated(aWasBlocked);
     return;
   }
   if (theID == ANGLE_ID()) {
@@ -588,7 +588,7 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
       return;
     AttributeDoublePtr anAngleAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
         data()->attribute(ANGLE_ID()));
-    data()->blockSendAttributeUpdated(true);
+    bool aWasBlocked = data()->blockSendAttributeUpdated(true);
     // move end point and passed point
     std::shared_ptr<GeomAPI_XY> aCenter = aCenterAttr->pnt()->xy();
     double anAngle = anAngleAttr->value() * PI / 180.0;
@@ -599,7 +599,7 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
         aStartDir->x() * cosA - aStartDir->y() * sinA,
         aStartDir->x() * sinA + aStartDir->y() * cosA));
     anEndAttr->setValue(aCenter->x() + aDir->x(), aCenter->y() + aDir->y());
-    data()->blockSendAttributeUpdated(false);
+    data()->blockSendAttributeUpdated(aWasBlocked);
     return;
   }
 }

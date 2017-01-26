@@ -171,7 +171,8 @@ class Model_Data : public ModelAPI_Data
   /// \param theSendMessage if false, it does not send the update message
   ///            even if something is changed
   ///            (normally is it used in attributeChanged because this message will be sent anyway)
-  MODEL_EXPORT virtual void blockSendAttributeUpdated(
+  /// \returns the previous state of block
+  MODEL_EXPORT virtual bool blockSendAttributeUpdated(
     const bool theBlock, const bool theSendMessage = true);
 
   /// Puts feature to the document data sub-structure
