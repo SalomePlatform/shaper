@@ -330,32 +330,6 @@ namespace GeomAlgoAPI_ShapeAPI
   }
 
   //===============================================================================================
-  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeScale(
-   std::shared_ptr<GeomAPI_Shape> theSourceShape,
-   std::shared_ptr<GeomAPI_Pnt>   theCenterPoint,
-   const double                   theScaleFactorX,
-   const double                   theScaleFactorY,
-   const double                   theScaleFactorZ) throw (GeomAlgoAPI_Exception)
-  {
-    GeomAlgoAPI_Scale aScaleAlgo(theSourceShape, theCenterPoint,
-                                 theScaleFactorX, theScaleFactorY, theScaleFactorZ);
-
-    if (!aScaleAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
-    }
-
-    aScaleAlgo.build();
-
-    if(!aScaleAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
-    }
-    if (!aScaleAlgo.checkValid("Scale builder by dimensions")) {
-      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
-    }
-    return aScaleAlgo.shape();
-  }
-
-  //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeConeSegment(
     const double theRMin1, const double theRMax1,
     const double theRMin2, const double theRMax2,

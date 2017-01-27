@@ -133,19 +133,6 @@ public:
                      std::shared_ptr<GeomAPI_Pnt>   theCenterPoint,
                      const double                   theScaleFactor) throw (GeomAlgoAPI_Exception);
 
-  /// Performs a scale by dimensions.
-  /// \param theSourceShape Shape be scaled
-  /// \param theCenterPoint Point of scale
-  /// \param theScaleFactorX Factor of scale in X
-  /// \param theScaleFactorY Factor of scale in Y
-  /// \param theScaleFactorZ Factor of scale in Z
-  static std::shared_ptr<GeomAPI_Shape> makeScale(
-                     std::shared_ptr<GeomAPI_Shape> theSourceShape,
-                     std::shared_ptr<GeomAPI_Pnt>   theCenterPoint,
-                     const double                   theScaleFactorX,
-                     const double                   theScaleFactorY,
-                     const double                   theScaleFactorZ) throw (GeomAlgoAPI_Exception);
-
   /// Creates a cone segment using standard GDML parameters.
   /// \param theRMin1 Inner radius at base of cone
   /// \param theRMax1 Outer radius at base of cone
