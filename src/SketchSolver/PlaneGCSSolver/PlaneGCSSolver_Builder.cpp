@@ -390,7 +390,7 @@ std::list<ConstraintWrapperPtr> PlaneGCSSolver_Builder::createMirror(
     // Do not allow mirrored arc recalculate its position until
     // coordinated of all points recalculated
     FeaturePtr aMirrArc = theEntity2->baseFeature();
-    aMirrArc->data()->blockSendAttributeUpdated(true);
+    bool aWasBlocked = aMirrArc->data()->blockSendAttributeUpdated(true);
 
     // Make mirror for center and start point of original arc
     std::list<ConstraintWrapperPtr> aMrrList;
@@ -450,7 +450,7 @@ std::list<ConstraintWrapperPtr> PlaneGCSSolver_Builder::createMirror(
     aResult.push_back(aSubResult);
 
     // Restore event sending
-    aMirrArc->data()->blockSendAttributeUpdated(false);
+    aMirrArc->data()->blockSendAttributeUpdated(aWasBlocked);
   }
   return aResult;
 }

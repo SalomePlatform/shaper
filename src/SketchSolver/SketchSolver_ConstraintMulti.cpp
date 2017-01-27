@@ -161,8 +161,9 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
         continue;
       anEntity = myStorage->entity(aFeature);
 
+      bool aWasBlocked = false;
       if (!anEntity || !myStorage->isEventsBlocked())
-        aFeature->data()->blockSendAttributeUpdated(true);
+        aWasBlocked = aFeature->data()->blockSendAttributeUpdated(true);
 
       std::list<AttributePtr> aPoints;
       if (aFeature->getKind() == SketchPlugin_Arc::ID()) {
@@ -203,7 +204,7 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
       }
 
       if (!anEntity || !myStorage->isEventsBlocked())
-        aFeature->data()->blockSendAttributeUpdated(false);
+        aFeature->data()->blockSendAttributeUpdated(aWasBlocked);
     }
   }
 

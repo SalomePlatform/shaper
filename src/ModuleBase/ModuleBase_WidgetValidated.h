@@ -126,8 +126,10 @@ protected:
   /// to be used to restore flush state when unblocked
   /// \param isAttributeSetInitializedBlocked out value if model is blocked
   /// in value if model is unblocked to be used to restore previous state when unblocked
+  /// \param isAttributeSendUpdatedBlocked out value if model signal is blocked
   virtual void blockAttribute(const AttributePtr& theAttribute, const bool& theToBlock,
-                              bool& isFlushesActived, bool& isAttributeSetInitializedBlocked);
+                              bool& isFlushesActived, bool& isAttributeSetInitializedBlocked,
+                              bool& isAttributeSendUpdatedBlocked);
 
 private:
   /// Checks the current attibute in all attribute validators

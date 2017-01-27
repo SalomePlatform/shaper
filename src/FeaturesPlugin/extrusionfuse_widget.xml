@@ -88,7 +88,7 @@
     label="Fuse with:"
     icon="icons/Features/cut_shape.png"
     tooltip="Objects to Fuse"
-    type_choice="Solids Compsolids"
+    type_choice="Objects"
     use_choice="false"
     concealment="true">
     <validator id="GeomValidators_ShapeType" parameters="solid"/>

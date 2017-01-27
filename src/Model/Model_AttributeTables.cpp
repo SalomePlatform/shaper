@@ -61,9 +61,6 @@ void Model_AttributeTables::setSize(const int theRows, const int theColumns, con
         (myType == ModelAPI_AttributeTables::DOUBLE) ?
         new TColStd_HArray1OfReal(0, aNewSize - 1) : Handle(TColStd_HArray1OfReal)();
       bool* anOldBool = 0; // an not work with internal arrays because of different indexing
-      Handle(TColStd_HArray1OfByte) aNewBool = (myType == ModelAPI_AttributeTables::BOOLEAN) ?
-        // internal array for boolean has 8 times lower size
-        new TColStd_HArray1OfByte(0, (aNewSize - 1)>>3) : Handle(TColStd_HArray1OfByte)();
       Handle(TDataStd_BooleanArray) aBoolArray; // an existing array
       Handle(TColStd_HArray1OfInteger) anOldInt, aNewInt =
         (myType == ModelAPI_AttributeTables::INTEGER) ?
@@ -84,7 +81,7 @@ void Model_AttributeTables::setSize(const int theRows, const int theColumns, con
           aBoolArray = Handle(TDataStd_BooleanArray)::DownCast(anArray);
           for(int a = 0; a < aSize; a++)
             anOldBool[a] = aBoolArray->Value(a);
-          aBoolArray->SetInternalArray(aNewBool);
+          aBoolArray->Init(0, aNewSize - 1);
           break;
         }
         case ModelAPI_AttributeTables::INTEGER:

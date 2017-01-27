@@ -260,7 +260,7 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createMirror(
     // Do not allow mirrored arc recalculate its position until
     // coordinated of all points recalculated
     FeaturePtr aMirrArc = theEntity2->baseFeature();
-    aMirrArc->data()->blockSendAttributeUpdated(true);
+    bool aWasBlocked = aMirrArc->data()->blockSendAttributeUpdated(true);
 
     std::list<ConstraintWrapperPtr> aMrrList;
     std::list<EntityWrapperPtr>::const_iterator anIt1 = theEntity1->subEntities().begin();
@@ -283,7 +283,7 @@ std::list<ConstraintWrapperPtr> SolveSpaceSolver_Builder::createMirror(
       aResult.insert(aResult.end(), aMrrList.begin(), aMrrList.end());
     }
     // Restore event sending
-    aMirrArc->data()->blockSendAttributeUpdated(false);
+    aMirrArc->data()->blockSendAttributeUpdated(aWasBlocked);
   }
   return aResult;
 }

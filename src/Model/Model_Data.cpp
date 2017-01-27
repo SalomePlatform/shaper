@@ -298,8 +298,9 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
   }
 }
 
-void Model_Data::blockSendAttributeUpdated(const bool theBlock, const bool theSendMessage)
+bool Model_Data::blockSendAttributeUpdated(const bool theBlock, const bool theSendMessage)
 {
+  bool aWasBlocked = !mySendAttributeUpdated;
   if (mySendAttributeUpdated == theBlock) {
     mySendAttributeUpdated = !theBlock;
     if (mySendAttributeUpdated && !myWasChangedButBlocked.empty()) {
@@ -320,6 +321,7 @@ void Model_Data::blockSendAttributeUpdated(const bool theBlock, const bool theSe
       }
     }
   }
+  return aWasBlocked;
 }
 
 void Model_Data::erase()

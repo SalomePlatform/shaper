@@ -1228,7 +1228,7 @@ FeaturePtr SketchPlugin_ConstraintSplit::createArcFeature(const FeaturePtr& theB
   // update fillet arc: make the arc correct for sure, so, it is not needed to process
   // the "attribute updated"
   // by arc; moreover, it may cause cyclicity in hte mechanism of updater
-  aFeature->data()->blockSendAttributeUpdated(true);
+  bool aWasBlocked = aFeature->data()->blockSendAttributeUpdated(true);
 
   aFeature->string(SketchPlugin_Arc::ARC_TYPE())->setValue(
                 SketchPlugin_Arc::ARC_TYPE_CENTER_START_END());
@@ -1246,7 +1246,7 @@ FeaturePtr SketchPlugin_ConstraintSplit::createArcFeature(const FeaturePtr& theB
     bool aReversed = theBaseFeature->boolean(SketchPlugin_Arc::INVERSED_ID())->value();
     aFeature->boolean(SketchPlugin_Arc::INVERSED_ID())->setValue(aReversed);
   }
-  aFeature->data()->blockSendAttributeUpdated(false);
+  aFeature->data()->blockSendAttributeUpdated(aWasBlocked);
   aFeature->execute(); // to obtain result
 
   return aFeature;

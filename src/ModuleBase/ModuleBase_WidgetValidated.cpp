@@ -150,9 +150,10 @@ bool ModuleBase_WidgetValidated::isValidSelectionForAttribute(
   bool aValid = false;
 
   // stores the current values of the widget attribute
-  bool isFlushesActived, isAttributeSetInitializedBlocked;
+  bool isFlushesActived, isAttributeSetInitializedBlocked, isAttributeSendUpdatedBlocked;
 
-  blockAttribute(theAttribute, true, isFlushesActived, isAttributeSetInitializedBlocked);
+  blockAttribute(theAttribute, true, isFlushesActived, isAttributeSetInitializedBlocked,
+                 isAttributeSendUpdatedBlocked);
 
   storeAttributeValue(theAttribute);
 
@@ -165,7 +166,8 @@ bool ModuleBase_WidgetValidated::isValidSelectionForAttribute(
   // restores the current values of the widget attribute
   restoreAttributeValue(theAttribute, aValid);
 
-  blockAttribute(theAttribute, false, isFlushesActived, isAttributeSetInitializedBlocked);
+  blockAttribute(theAttribute, false, isFlushesActived, isAttributeSetInitializedBlocked,
+                 isAttributeSendUpdatedBlocked);
   /// NDS: The following rows are commented for issue #1452 (to be removed after debug)
   /// This is not correct to perform it here because it might cause update selection and
   /// the selection mechanizm will be circled: use the scenario of the bug with preselected point.
@@ -229,7 +231,8 @@ bool ModuleBase_WidgetValidated::activateFilters(const bool toActivate)
 void ModuleBase_WidgetValidated::blockAttribute(const AttributePtr& theAttribute,
                                                 const bool& theToBlock,
                                                 bool& isFlushesActived,
-                                                bool& isAttributeSetInitializedBlocked)
+                                                bool& isAttributeSetInitializedBlocked,
+                                                bool& isAttributeSendUpdatedBlocked)
 {
   Events_Loop* aLoop = Events_Loop::loop();
   DataPtr aData = myFeature->data();
@@ -238,11 +241,11 @@ void ModuleBase_WidgetValidated::blockAttribute(const AttributePtr& theAttribute
     // they should not be shown in order to do not lose highlight by erasing them
     isFlushesActived = aLoop->activateFlushes(false);
 
-    aData->blockSendAttributeUpdated(true);
+    isAttributeSendUpdatedBlocked = aData->blockSendAttributeUpdated(true);
     isAttributeSetInitializedBlocked = theAttribute->blockSetInitialized(true);
   }
   else {
-    aData->blockSendAttributeUpdated(false, false);
+    aData->blockSendAttributeUpdated(isAttributeSendUpdatedBlocked, false);
     theAttribute->blockSetInitialized(isAttributeSetInitializedBlocked);
     aLoop->activateFlushes(isFlushesActived);
   }

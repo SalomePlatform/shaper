@@ -221,7 +221,7 @@ void SketchPlugin_Circle::attributeChanged(const std::string& theID) {
       data()->attribute(CIRCLE_TYPE()))->value();
     if (aType == CIRCLE_TYPE_CENTER_AND_RADIUS())
       return;
-    data()->blockSendAttributeUpdated(true); // to modify two attributes at once
+    bool aWasBlocked = data()->blockSendAttributeUpdated(true); // to modify two attributes at once
     std::shared_ptr<GeomAPI_Pnt2d> aPoints[3];
     int aNbInitialized = 0;
     for (int i = 1; i <= 3; ++i) {
@@ -255,7 +255,7 @@ void SketchPlugin_Circle::attributeChanged(const std::string& theID) {
         aRadiusAttr->setValue(aRadius);
       }
     }
-    data()->blockSendAttributeUpdated(false, false);
+    data()->blockSendAttributeUpdated(aWasBlocked, false);
 
   } else if (theID == CIRCLE_TYPE()) { // if switched to 3 points mode, adjust the needed attributes
     std::string aType = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
@@ -277,7 +277,7 @@ void SketchPlugin_Circle::adjustThreePoints()
   if (!aRadiusAttr->isInitialized())
     return;
 
-  data()->blockSendAttributeUpdated(true);
+  bool aWasBlocked = data()->blockSendAttributeUpdated(true);
   std::shared_ptr<GeomDataAPI_Point2D> aFirstPnt =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(FIRST_POINT_ID()));
   std::shared_ptr<GeomDataAPI_Point2D> aSecondPnt =
@@ -297,5 +297,5 @@ void SketchPlugin_Circle::adjustThreePoints()
     aSecondPnt->setValue(aCenterAttr->x(), aCenterAttr->y() + aRadius);
     aThirdPnt->setValue(aCenterAttr->x() - aRadius, aCenterAttr->y());
   }
-  data()->blockSendAttributeUpdated(false, false);
+  data()->blockSendAttributeUpdated(aWasBlocked, false);
 }
