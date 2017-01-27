@@ -1008,6 +1008,9 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
   std::shared_ptr<GeomAPI_Shape> aSubSh = value();
   ResultPtr aCont = context();
 
+  if (!aCont.get()) // in case of selection of removed result
+    return "";
+
   Model_SelectionNaming aSelNaming(selectionLabel());
   return aSelNaming.namingName(
     aCont, aSubSh, theDefaultName, owner()->document() != aCont->document());
