@@ -1,0 +1,27 @@
+<!-- Copyright (C) 2014-201x CEA/DEN, EDF R&D -->
+
+<source>
+  <multi_selector id="main_objects"
+                  label="Main objects"
+                  icon=""
+                  tooltip="Select objects"
+                  type_choice="objects"
+                  concealment="true">
+    <validator id="FeaturesPlugin_ValidatorTransform"/>
+  </multi_selector>
+  <shape_selector id="center_point"
+                  icon=""
+                  label="Center point"
+                  tooltip="Select the center point"
+                  shape_types="vertex"
+                  default="">
+    <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+    <validator id="GeomValidators_ConstructionComposite"/>
+  </shape_selector>
+  <doublevalue id="scale_factor"
+               label="Scale factor"
+               step="1."
+               default="2."
+               tooltip="Scale factor">
+  </doublevalue>
+</source>

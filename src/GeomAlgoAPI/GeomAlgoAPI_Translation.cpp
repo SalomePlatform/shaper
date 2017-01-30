@@ -128,7 +128,7 @@ void GeomAlgoAPI_Translation::build()
   // Transform the shape while copying it.
   BRepBuilderAPI_Transform* aBuilder = new BRepBuilderAPI_Transform(aSourceShape, *aTrsf, true);
   if(!aBuilder) {
-    myError = "Translation builder :: source shape does not contain any actual shape.";
+    myError = "Translation builder :: transform initialization failed.";
     return;
   }
 
@@ -136,7 +136,7 @@ void GeomAlgoAPI_Translation::build()
   setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
 
   if(!aBuilder->IsDone()) {
-    myError = "Translation builder :: source shape does not contain any actual shape.";
+    myError = "Translation builder :: algorithm failed.";
     return;
   }
 

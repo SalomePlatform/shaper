@@ -49,6 +49,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Copy.h
     GeomAlgoAPI_ConeSegment.h
     GeomAlgoAPI_Symmetry.h
+    GeomAlgoAPI_Scale.h
 )
 
 SET(PROJECT_SOURCES
@@ -93,6 +94,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Copy.cpp
     GeomAlgoAPI_ConeSegment.cpp
     GeomAlgoAPI_Symmetry.cpp
+    GeomAlgoAPI_Scale.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -161,6 +163,7 @@ INSTALL(FILES ${SWIG_SCRIPTS} DESTINATION ${SHAPER_INSTALL_SWIG})
 ADD_UNIT_TESTS(TestAPI_Box.py
                TestAPI_Cylinder.py
                TestAPI_GDMLConeSegment.py
+               TestAPI_Scale.py
                TestAPI_Symmetry.py
                TestAPI_Translation.py)
 

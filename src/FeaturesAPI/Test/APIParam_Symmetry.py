@@ -1,5 +1,5 @@
 """
-Test case for Translation feature. 
+Test case for Symmetry feature. 
 Written on High API.
 """
 from ModelAPI import *
@@ -18,11 +18,11 @@ aDocument = aSession.activeDocument()
 aSession.finishOperation()
 
 # Create a box
-
 aSession.startOperation()
 aBox1 =  model.addBox(aDocument, 10, 10, 10)
 aBox2 =  model.addBox(aDocument, 10, 10, 10)
 aBox3 =  model.addBox(aDocument, 10, 10, 10)
+aSession.finishOperation()
 
 # Perform a symmetry by a point
 aSession.startOperation()

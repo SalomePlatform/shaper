@@ -13,9 +13,12 @@
 
 #include <gp_Ax1.hxx>
 #include <gp_Ax2.hxx>
+#include <gp_GTrsf.hxx>
 #include <gp_Trsf.hxx>
 
 #define MY_TRSF implPtr<gp_Trsf>()
+
+#include <iostream>
 
 //=================================================================================================
 GeomAPI_Trsf::GeomAPI_Trsf()
@@ -72,4 +75,11 @@ void GeomAPI_Trsf::setSymmetry(const std::shared_ptr<GeomAPI_Ax1> theAxis)
 void GeomAPI_Trsf::setSymmetry(const std::shared_ptr<GeomAPI_Ax2> thePlane)
 {
   MY_TRSF->SetMirror(thePlane->impl<gp_Ax2>());
+}
+
+//=================================================================================================
+void GeomAPI_Trsf::setScale(const std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
+                            const double theScaleFactor)
+{
+  MY_TRSF->SetScale(theCenterPoint->impl<gp_Pnt>(), theScaleFactor);
 }

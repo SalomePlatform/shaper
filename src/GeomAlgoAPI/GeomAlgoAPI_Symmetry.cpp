@@ -101,7 +101,7 @@ void GeomAlgoAPI_Symmetry::build()
       break;
     }
     default: {
-      myError = "Mirror builder :: method not supported";
+      myError = "Symmetry builder :: method not supported";
       return;
     }
   }
@@ -109,14 +109,14 @@ void GeomAlgoAPI_Symmetry::build()
   const TopoDS_Shape& aSourceShape = mySourceShape->impl<TopoDS_Shape>();
 
   if(aSourceShape.IsNull()) {
-    myError = "Mirror builder :: source shape does not contain any actual shape.";
+    myError = "Symmetry builder :: source shape does not contain any actual shape.";
     return;
   }
 
   // Transform the shape while copying it.
   BRepBuilderAPI_Transform* aBuilder = new BRepBuilderAPI_Transform(aSourceShape, *aTrsf, true);
   if(!aBuilder) {
-    myError = "Mirror builder :: source shape does not contain any actual shape.";
+    myError = "Symmetry builder :: transform initialization failed.";
     return;
   }
 
@@ -124,7 +124,7 @@ void GeomAlgoAPI_Symmetry::build()
   setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
 
   if(!aBuilder->IsDone()) {
-    myError = "Mirror builder :: source shape does not contain any actual shape.";
+    myError = "Symmetry builder :: algorithm failed.";
     return;
   }
 

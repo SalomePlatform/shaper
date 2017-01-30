@@ -73,6 +73,13 @@ class GeomAPI_Trsf : public GeomAPI_Interface
    *  \param[in] thePlane symmetry plane.
    */
   GEOMAPI_EXPORT void setSymmetry(const std::shared_ptr<GeomAPI_Ax2> thePlane);
+  
+  /** \brief Sets a scale transformation using a factor.
+   *  \param[in] theCenterPoint center point.
+   *  \param[in] theScaleFactor scale factor.
+   */
+  GEOMAPI_EXPORT void setScale(const std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
+                               const double theScaleFactor);
 };
 
 #endif

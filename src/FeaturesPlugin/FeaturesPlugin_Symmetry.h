@@ -23,8 +23,8 @@ class FeaturesPlugin_Symmetry : public ModelAPI_Feature
   /// Symmetry kind.
   inline static const std::string& ID()
   {
-    static const std::string MY_SYMMETRY("Symmetry");
-    return MY_SYMMETRY;
+    static const std::string MY_SYMMETRY_ID("Symmetry");
+    return MY_SYMMETRY_ID;
   }
 
   /// Attribute name for creation method.
@@ -34,21 +34,21 @@ class FeaturesPlugin_Symmetry : public ModelAPI_Feature
     return MY_CREATION_METHOD_ID;
   }
 
-  /// Attribute name for creation method "ByAxisAndDistance".
+  /// Attribute name for creation method "ByPoint".
   inline static const std::string& CREATION_METHOD_BY_POINT()
   {
     static const std::string MY_CREATION_METHOD_ID("ByPoint");
     return MY_CREATION_METHOD_ID;
   }
 
-  /// Attribute name for creation method "ByDimensions".
+  /// Attribute name for creation method "ByAxis".
   inline static const std::string& CREATION_METHOD_BY_AXIS()
   {
     static const std::string MY_CREATION_METHOD_ID("ByAxis");
     return MY_CREATION_METHOD_ID;
   }
 
-  /// Attribute name for creation method "ByTwoPoints".
+  /// Attribute name for creation method "ByPlane".
   inline static const std::string& CREATION_METHOD_BY_PLANE()
   {
     static const std::string MY_CREATION_METHOD_ID("ByPlane");
@@ -100,15 +100,16 @@ class FeaturesPlugin_Symmetry : public ModelAPI_Feature
   FeaturesPlugin_Symmetry();
 
 private:
-  ///Perform symmetry with respect to a point.
+  /// Perform symmetry with respect to a point.
   void performSymmetryByPoint();
 
-  ///Perform symmetry with respect to an axis.
+  /// Perform symmetry with respect to an axis.
   void performSymmetryByAxis();
 
-  ///Perform symmetry with respect to a plane.
+  /// Perform symmetry with respect to a plane.
   void performSymmetryByPlane();
 
+  /// Perform the naming
   void loadNamingDS(GeomAlgoAPI_Symmetry& theSymmetryAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theBaseShape);

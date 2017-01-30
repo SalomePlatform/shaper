@@ -10,6 +10,7 @@
 #include <GeomAlgoAPI_Cylinder.h>
 #include <GeomAlgoAPI_ConeSegment.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
+#include <GeomAlgoAPI_Scale.h>
 #include <GeomAlgoAPI_Symmetry.h>
 #include <GeomAlgoAPI_Translation.h>
 
@@ -303,6 +304,29 @@ namespace GeomAlgoAPI_ShapeAPI
       throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
     }
     return aSymmetryAlgo.shape();
+  }
+
+  //===============================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeScale(
+    std::shared_ptr<GeomAPI_Shape> theSourceShape,
+    std::shared_ptr<GeomAPI_Pnt>   theCenterPoint,
+    const double                   theScaleFactor) throw (GeomAlgoAPI_Exception)
+  {
+    GeomAlgoAPI_Scale aScaleAlgo(theSourceShape, theCenterPoint, theScaleFactor);
+
+    if (!aScaleAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
+    }
+
+    aScaleAlgo.build();
+
+    if(!aScaleAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
+    }
+    if (!aScaleAlgo.checkValid("Scale builder by a scale factor")) {
+      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
+    }
+    return aScaleAlgo.shape();
   }
 
   //===============================================================================================
