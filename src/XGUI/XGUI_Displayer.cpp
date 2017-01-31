@@ -1585,17 +1585,17 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
       if (aShape.IsNull())
         continue;
 
-      NCollection_DataMap<TopoDS_Shape,
-        NCollection_Map<Handle(AIS_InteractiveObject)> >::Iterator aShapeIt(theShapesToBeSelected);
+      NCollection_DataMap<TopoDS_Shape, NCollection_Map<Handle(AIS_InteractiveObject)> >
+                                             ::Iterator aShapeIt(theShapesToBeSelected);
       for (; aShapeIt.More(); aShapeIt.Next()) {
         if (aShapeIt.Key().IsSame(aShape)) {
           const TopoDS_Shape& aParameterShape = aShapeIt.Key();
           // isSame should be used here as it does not check orientation of shapes
-          // despite on isEqual of shapes or IsBound for shape in QMap
-          // orientation is different for Edges shapes in model and owner even if this is one shape
+          // despite on isEqual of shapes or IsBound for shape in QMap. Orientation is
+          // different for Edges shapes in model shape and owner even if this is the same shape
           if (aParameterShape.IsSame(aShape)) {
             Handle(AIS_InteractiveObject) anOwnerPresentation =
-                                        Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
+                              Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
             NCollection_Map<Handle(AIS_InteractiveObject)> aPresentations =
                                         theShapesToBeSelected.Find(aParameterShape);
             if (aPresentations.Contains(anOwnerPresentation)) {
