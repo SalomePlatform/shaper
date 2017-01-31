@@ -242,24 +242,6 @@ QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getHighlighted() const
       fillPresentation(aPrs, anOwner);
       aPresentations.push_back(aPrs);
     }
-    else { // TODO: check why the entity owner is null here, case is selection point on a line
-      Handle(AIS_InteractiveObject) anIO = aContext->DetectedInteractive();
-      ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
-      aPrs->setInteractive(anIO);
-
-      ObjectPtr aResult = aDisplayer->getObject(anIO);
-      // we should not check the appearance of this feature because there can be some selected
-      // shapes for one feature
-      aPrs->setObject(aResult);
-      TopoDS_Shape aShape = aContext->DetectedShape();
-      if (!aShape.IsNull()) {
-        std::shared_ptr<GeomAPI_Shape> aGeomShape =
-          std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-        aGeomShape->setImpl(new TopoDS_Shape(aShape));
-        aPrs->setShape(aGeomShape);
-      }
-      aPresentations.push_back(aPrs);
-    }
   }
   return aPresentations;
 }

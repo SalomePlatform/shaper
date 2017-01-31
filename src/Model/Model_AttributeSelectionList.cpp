@@ -217,14 +217,15 @@ bool Model_AttributeSelectionList::isInList(const ResultPtr& theContext,
     std::map<ResultPtr, std::list<std::shared_ptr<GeomAPI_Shape> > >::iterator aContext =
       myCash.find(theContext);
     if (aContext != myCash.end()) {
-      // iterate shapes because "isEqual" method must be called for each shape
+      // iterate shapes because "isSame" method must be called for each shape
       std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aShapes = aContext->second.begin();
       for(; aShapes != aContext->second.end(); aShapes++) {
         if (!theSubShape.get()) {
           if (!aShapes->get())
             return true;
         } else {
-          if (theSubShape->isEqual(*aShapes))
+          // we need to call here isSame instead of isEqual to do not check shapes orientation
+          if (theSubShape->isSame(*aShapes))
             return true;
         }
       }
@@ -242,7 +243,8 @@ bool Model_AttributeSelectionList::isInList(const ResultPtr& theContext,
             return true;
           }
         } else {
-          if (aValue->isEqual(theSubShape)) // shapes are equal
+          // we need to call here isSame instead of isEqual to do not check shapes orientation
+          if (aValue->isSame(theSubShape)) // shapes are equal
             return true;
         }
       }

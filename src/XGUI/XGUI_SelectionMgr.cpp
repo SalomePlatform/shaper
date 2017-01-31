@@ -27,7 +27,7 @@
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
 #ifdef VINSPECTOR
-#include <VInspectorAPI_CallBack.h>
+#include <VInspectorAPI_CallBack.hxx>
 #endif
 
 XGUI_SelectionMgr::XGUI_SelectionMgr(XGUI_Workshop* theParent)

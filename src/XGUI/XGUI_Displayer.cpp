@@ -16,8 +16,7 @@
 #endif
 
 #ifdef VINSPECTOR
-#include <VInspectorAPI_PluginMgr.h>
-#include <VInspectorAPI_Communicator.h>
+#include <VInspectorAPI_Communicator.hxx>
 #ifndef HAVE_SALOME
 #include <AppElements_MainWindow.h>
 #endif
@@ -67,7 +66,7 @@ static bool VInspector_FirstCall = true;
 #include <TColStd_MapIteratorOfMapOfTransient.hxx>
 
 #ifdef VINSPECTOR
-#include <VInspectorAPI_CallBack.h>
+#include <VInspectorAPI_CallBack.hxx>
 #endif
 
 #include <Events_Loop.h>
@@ -1047,14 +1046,19 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
 #ifdef VINSPECTOR
     if (VInspector_FirstCall) {
       XGUI_Displayer* aDisplayer = (XGUI_Displayer*)this;
-      VInspectorAPI_Communicator* aCommunicator = VInspectorAPI_PluginMgr::activateVInspector(
-                                        "VInspector.dll", aContext);
-      aDisplayer->setCommunicator(aCommunicator);
-      #ifndef HAVE_SALOME
-      AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-      if (aViewer)
-        aViewer->setCallBack(aCommunicator->getCallBack());
-      #endif
+
+      VInspectorAPI_Communicator* aCommunicator =
+                     VInspectorAPI_Communicator::loadPluginLibrary("TKVInspector.dll");
+      if (aCommunicator) {
+        aCommunicator->setContext(aContext);
+
+        aDisplayer->setCommunicator(aCommunicator);
+        #ifndef HAVE_SALOME
+        AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+        if (aViewer)
+          aViewer->setCallBack(aCommunicator->getCallBack());
+        #endif
+      }
       VInspector_FirstCall = false;
     }
 #endif
@@ -1578,14 +1582,27 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
     Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast(anOwner);
     if (!BROwnr.IsNull() && BROwnr->HasShape()) {
       const TopoDS_Shape& aShape = BROwnr->Shape();
-      if (!aShape.IsNull() && theShapesToBeSelected.IsBound(aShape)) {
-        Handle(AIS_InteractiveObject) anOwnerPresentation =
-                                    Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
-        NCollection_Map<Handle(AIS_InteractiveObject)> aPresentations =
-                                    theShapesToBeSelected.Find(aShape);
-        if (aPresentations.Contains(anOwnerPresentation)) {
-          theContext->AddOrRemoveSelected(anOwner);
-          anOwner->SetSelected (Standard_True);
+      if (aShape.IsNull())
+        continue;
+
+      NCollection_DataMap<TopoDS_Shape,
+        NCollection_Map<Handle(AIS_InteractiveObject)> >::Iterator aShapeIt(theShapesToBeSelected);
+      for (; aShapeIt.More(); aShapeIt.Next()) {
+        if (aShapeIt.Key().IsSame(aShape)) {
+          const TopoDS_Shape& aParameterShape = aShapeIt.Key();
+          // isSame should be used here as it does not check orientation of shapes
+          // despite on isEqual of shapes or IsBound for shape in QMap
+          // orientation is different for Edges shapes in model and owner even if this is one shape
+          if (aParameterShape.IsSame(aShape)) {
+            Handle(AIS_InteractiveObject) anOwnerPresentation =
+                                        Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
+            NCollection_Map<Handle(AIS_InteractiveObject)> aPresentations =
+                                        theShapesToBeSelected.Find(aParameterShape);
+            if (aPresentations.Contains(anOwnerPresentation)) {
+              theContext->AddOrRemoveSelected(anOwner);
+              anOwner->SetSelected (Standard_True);
+            }
+          }
         }
       }
     }

@@ -195,6 +195,9 @@ protected:
 
   /// A flag to clear selection by click in empty place in the viewer
   bool myIsNeutralPointClear;
+
+  /// A flag to block set selection perform if the method is in process
+  bool myIsSetSelectionBlocked;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */

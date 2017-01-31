@@ -50,6 +50,10 @@ public:
   GEOMAPI_EXPORT
   virtual bool isEqual(const std::shared_ptr<GeomAPI_Shape> theShape) const;
 
+  /// Returns whether the shapes are same
+  GEOMAPI_EXPORT
+  virtual bool isSame(const std::shared_ptr<GeomAPI_Shape> theShape) const;
+
   /// Returns whether the shape is a vertex
   GEOMAPI_EXPORT
   virtual bool isVertex() const;
