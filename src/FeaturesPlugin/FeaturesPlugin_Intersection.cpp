@@ -132,7 +132,8 @@ void FeaturesPlugin_Intersection::loadNamingDS(std::shared_ptr<ModelAPI_ResultBo
   aShapes.push_back(theBaseShape);
   GeomAPI_DataMapOfShapeShape aShapesMap; // Map to store {result_shape, original_shape}
   const int aShapeTypesNb = 2;
-  const GeomAPI_Shape::ShapeType aShapeTypes[aShapeTypesNb] = {GeomAPI_Shape::VERTEX, GeomAPI_Shape::EDGE};
+  const GeomAPI_Shape::ShapeType aShapeTypes[aShapeTypesNb] =
+    {GeomAPI_Shape::VERTEX, GeomAPI_Shape::EDGE};
   for(ListOfShape::const_iterator anIt = aShapes.cbegin(); anIt != aShapes.cend(); ++anIt) {
     const GeomShapePtr aShape = *anIt;
     for(int anIndex = 0; anIndex < aShapeTypesNb; ++anIndex) {
