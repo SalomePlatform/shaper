@@ -61,7 +61,7 @@ bool isAttributeNode(xmlNodePtr theNode)
     return false;
 
   //it should not be a "source" or a "validator" node
-  bool isLogical = isNode(theNode, NODE_SOURCE, NODE_VALIDATOR, NODE_SELFILTER, NULL);
+  bool isLogical = isNode(theNode, NODE_SOURCE, NODE_VALIDATOR, NULL);
   // here must be only widgets not connected to attributes
   bool isPagedContainer = isNode(theNode, WDG_TOOLBOX_BOX,
                                           WDG_GROUP,
@@ -79,7 +79,7 @@ bool isWidgetNode(xmlNodePtr theNode)
     return false;
 
   //it should not be a "source" or a "validator" node
-  return !isNode(theNode, NODE_SOURCE, NODE_VALIDATOR, NODE_SELFILTER, NULL);
+  return !isNode(theNode, NODE_SOURCE, NODE_VALIDATOR, NULL);
 }
 
 // widget api?

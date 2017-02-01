@@ -65,8 +65,7 @@ class Config_XMLReader
  protected:
   /*!
    * \brief Allows to customize reader's behavior for a node. Virtual.
-   * The default implementation process "source", "validator" and
-   * "selection_filter" nodes.
+   * The default implementation process "source" and "validator" nodes.
    */
   virtual void processNode(xmlNodePtr aNode);
 

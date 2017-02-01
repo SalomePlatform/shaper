@@ -57,7 +57,6 @@ bool Config_WidgetReader::processChildren(xmlNodePtr theNode)
 {
   //Read all nodes recursively, source and validator nodes have no children
   return !isNode(theNode, NODE_VALIDATOR,
-                          NODE_SELFILTER,
                           NODE_SOURCE, NULL);
 }
 

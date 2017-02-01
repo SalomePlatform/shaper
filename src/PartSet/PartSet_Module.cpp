@@ -37,7 +37,6 @@
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_WidgetValidated.h>
-#include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_WidgetFactory.h>
@@ -235,13 +234,6 @@ void PartSet_Module::registerValidators()
     new PartSet_MultyTranslationSelection);
   aFactory->registerValidator("PartSet_SplitSelection", new PartSet_SplitSelection);
   aFactory->registerValidator("PartSet_ProjectionSelection", new PartSet_ProjectionSelection);
-}
-
-void PartSet_Module::registerFilters()
-{
-  //Registering of selection filters
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-  ModuleBase_FilterFactory* aFactory = aConnector->selectionFilters();
 }
 
 void PartSet_Module::registerProperties()

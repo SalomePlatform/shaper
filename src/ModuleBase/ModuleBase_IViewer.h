@@ -83,9 +83,6 @@ Q_OBJECT
   /// \param theFilter a selection filter
   virtual bool hasSelectionFilter(const Handle(SelectMgr_Filter)& theFilter) = 0;
 
-  /// Remove all selection filters from the viewer
-  virtual void clearSelectionFilters() = 0;
-
   /// Update current viewer
   virtual void update() = 0;
 

@@ -5,7 +5,6 @@
 // Author:      Natalia ERMOLAEVA
 
 #include "ModuleBase_IWorkshop.h"
-#include "ModuleBase_FilterFactory.h"
 
 ModuleBase_IWorkshop::ModuleBase_IWorkshop(QObject* theParent)
 : QObject(theParent)
@@ -16,10 +15,4 @@ ModuleBase_IWorkshop::ModuleBase_IWorkshop(QObject* theParent)
 Handle(ModuleBase_FilterValidated) ModuleBase_IWorkshop::validatorFilter()
 {
   return myValidatorFilter;
-}
-
-ModuleBase_FilterFactory* ModuleBase_IWorkshop::selectionFilters() const
-{
-  static ModuleBase_FilterFactory* aFactory = new ModuleBase_FilterFactory;
-  return aFactory;
 }

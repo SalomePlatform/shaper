@@ -153,7 +153,6 @@ ModuleBase_Operation* ModuleBase_IModule::createOperation(const std::string& the
 void ModuleBase_IModule::createFeatures()
 {
   registerValidators();
-  registerFilters();
   registerProperties();
 
   Config_ModuleReader aXMLReader = Config_ModuleReader();

@@ -10,7 +10,6 @@
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_Tools.h>
-#include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_Filter.h>
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_ViewerPrs.h>

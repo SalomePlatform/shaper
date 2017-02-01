@@ -19,6 +19,11 @@ SET(PROJECT_HEADERS
     SamplePanelPlugin_WidgetCreator.h
 )
 
+SET(PROJECT_MOC_HEADERS
+    SamplePanelPlugin_ModelWidget.h
+    SamplePanelPlugin_Panel.h
+)
+
 SET(PROJECT_SOURCES
     SamplePanelPlugin_Feature.cpp
     SamplePanelPlugin_ModelWidget.cpp
@@ -40,7 +45,7 @@ SET(XML_RESOURCES
   plugin-SamplePanel.xml
 )
 # sources / moc wrappings
-QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_HEADERS})
+QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_MOC_HEADERS})
 
 SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC})
 

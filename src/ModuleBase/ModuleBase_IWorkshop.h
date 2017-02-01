@@ -22,7 +22,6 @@ class ModuleBase_ISelection;
 class ModuleBase_IViewer;
 class ModuleBase_IPropertyPanel;
 class ModuleBase_Operation;
-class ModuleBase_FilterFactory;
 class ModuleBase_ViewerPrs;
 class QMainWindow;
 
@@ -66,9 +65,6 @@ Q_OBJECT
   /// A filter to process an attribute validators
   /// \return a filter
   Handle(ModuleBase_FilterValidated) validatorFilter();
-
-  //! Returns the factory of selection filters : the only one instance per application
-  ModuleBase_FilterFactory* selectionFilters() const;
 
   //! Returns currently active operation
   virtual ModuleBase_Operation* currentOperation() const = 0;

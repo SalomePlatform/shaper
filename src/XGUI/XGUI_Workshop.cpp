@@ -58,7 +58,6 @@
 #include <Events_InfoMessage.h>
 #include <Events_LongOp.h>
 
-#include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_Operation.h>
@@ -80,7 +79,6 @@
 #include <Config_ModuleReader.h>
 #include <Config_PointerMessage.h>
 #include <Config_PropManager.h>
-#include <Config_SelectionFilterMessage.h>
 #include <Config_DataModelReader.h>
 #include <Config_Translator.h>
 

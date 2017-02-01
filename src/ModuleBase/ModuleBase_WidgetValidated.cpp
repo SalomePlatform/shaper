@@ -1,8 +1,8 @@
 ﻿// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 #include <ModuleBase_WidgetValidated.h>
-#include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_IViewer.h>
+#include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_WidgetSelectorStore.h>
 #include <ModuleBase_ViewerPrs.h>

@@ -10,63 +10,81 @@ INCLUDE_DIRECTORIES(${QT_INCLUDES})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 SET(PROJECT_HEADERS
-	PartSet.h
-	PartSet_Constants.h
-	PartSet_CustomPrs.h
-	PartSet_ExternalObjectsMgr.h
-	PartSet_Module.h
-	PartSet_MouseProcessor.h
-	PartSet_OperationPrs.h
-        PartSet_OverconstraintListener.h
-        PartSet_PreviewPlanes.h
-	PartSet_Tools.h
-	PartSet_WidgetSketchLabel.h
-	PartSet_Validators.h
-	PartSet_WidgetPoint2d.h
-	PartSet_WidgetEditor.h
-	PartSet_WidgetMultiSelector.h
-	PartSet_WidgetPoint2dDistance.h
-	PartSet_WidgetPoint2DFlyout.h
-	PartSet_WidgetShapeSelector.h
-	PartSet_WidgetFileSelector.h
-	PartSet_Filters.h
-	PartSet_FilterInfinite.h
-	PartSet_ResultSketchPrs.h
-	PartSet_SketcherMgr.h
-	PartSet_SketcherReetntrantMgr.h
-	PartSet_MenuMgr.h
-	PartSet_WidgetSketchCreator.h
-	PartSet_IconFactory.h
-	PartSet_WidgetChoice.h
-	PartSet_WidgetSubShapeSelector.h
+    PartSet.h
+    PartSet_Constants.h
+    PartSet_CustomPrs.h
+    PartSet_ExternalObjectsMgr.h
+    PartSet_Module.h
+    PartSet_MouseProcessor.h
+    PartSet_OperationPrs.h
+    PartSet_OverconstraintListener.h
+    PartSet_PreviewPlanes.h
+    PartSet_Tools.h
+    PartSet_WidgetSketchLabel.h
+    PartSet_Validators.h
+    PartSet_WidgetPoint2d.h
+    PartSet_WidgetEditor.h
+    PartSet_WidgetMultiSelector.h
+    PartSet_WidgetPoint2dDistance.h
+    PartSet_WidgetPoint2DFlyout.h
+    PartSet_WidgetShapeSelector.h
+    PartSet_WidgetFileSelector.h
+    PartSet_Filters.h
+    PartSet_FilterInfinite.h
+    PartSet_ResultSketchPrs.h
+    PartSet_SketcherMgr.h
+    PartSet_SketcherReetntrantMgr.h
+    PartSet_MenuMgr.h
+    PartSet_WidgetSketchCreator.h
+    PartSet_IconFactory.h
+    PartSet_WidgetChoice.h
+    PartSet_WidgetSubShapeSelector.h
+)
+
+SET(PROJECT_MOC_HEADERS
+    PartSet_MenuMgr.h
+    PartSet_Module.h
+    PartSet_SketcherMgr.h
+    PartSet_SketcherReetntrantMgr.h
+    PartSet_WidgetChoice.h
+    PartSet_WidgetEditor.h
+    PartSet_WidgetFileSelector.h
+    PartSet_WidgetMultiSelector.h
+    PartSet_WidgetPoint2d.h
+    PartSet_WidgetPoint2dDistance.h
+    PartSet_WidgetPoint2DFlyout.h
+    PartSet_WidgetShapeSelector.h
+    PartSet_WidgetSketchCreator.h
+    PartSet_WidgetSketchLabel.h
+    PartSet_WidgetSubShapeSelector.h
 )
 
 SET(PROJECT_SOURCES
-	PartSet_CustomPrs.cpp
-	PartSet_ExternalObjectsMgr.cpp
-	PartSet_Module.cpp
-	PartSet_OperationPrs.cpp
-        PartSet_OverconstraintListener.cpp
-        PartSet_PreviewPlanes.cpp
-	PartSet_Tools.cpp
-	PartSet_WidgetSketchLabel.cpp
-	PartSet_Validators.cpp
-	PartSet_WidgetEditor.cpp
-	PartSet_WidgetMultiSelector.cpp
-	PartSet_WidgetPoint2d.cpp
-	PartSet_WidgetPoint2dDistance.cpp
-	PartSet_WidgetPoint2DFlyout.cpp
-	PartSet_WidgetShapeSelector.cpp
-	PartSet_WidgetFileSelector.cpp
-	PartSet_Filters.cpp
-	PartSet_FilterInfinite.cpp
-	PartSet_ResultSketchPrs.cpp
-	PartSet_SketcherMgr.cpp
-	PartSet_SketcherReetntrantMgr.cpp
-	PartSet_MenuMgr.cpp
-	PartSet_WidgetSketchCreator.cpp
-	PartSet_IconFactory.cpp
-	PartSet_WidgetSubShapeSelector.cpp
+    PartSet_CustomPrs.cpp
+    PartSet_ExternalObjectsMgr.cpp
+    PartSet_Module.cpp
+    PartSet_OperationPrs.cpp
+    PartSet_OverconstraintListener.cpp
+    PartSet_PreviewPlanes.cpp
+    PartSet_Tools.cpp
+    PartSet_WidgetSketchLabel.cpp
+    PartSet_Validators.cpp
+    PartSet_WidgetEditor.cpp
+    PartSet_WidgetMultiSelector.cpp
+    PartSet_WidgetPoint2d.cpp
+    PartSet_WidgetPoint2dDistance.cpp
+    PartSet_WidgetPoint2DFlyout.cpp
+    PartSet_WidgetShapeSelector.cpp
+    PartSet_WidgetFileSelector.cpp
+    PartSet_Filters.cpp
+    PartSet_FilterInfinite.cpp
+    PartSet_ResultSketchPrs.cpp
+    PartSet_SketcherMgr.cpp
+    PartSet_SketcherReetntrantMgr.cpp
+    PartSet_MenuMgr.cpp
+    PartSet_WidgetSketchCreator.cpp
+    PartSet_IconFactory.cpp
+    PartSet_WidgetSubShapeSelector.cpp
 )
 
 SET(PROJECT_RESOURCES
@@ -74,7 +92,7 @@ SET(PROJECT_RESOURCES
 )
 
 #SET(TEXT_RESOURCES
-#	PartSet_msg_fr.ts
+#    PartSet_msg_fr.ts
 #)
 
 SET(PROJECT_LIBRARIES
@@ -89,20 +107,17 @@ SET(PROJECT_LIBRARIES
     ${CAS_SHAPE}
 )
 
-#SET(PROJECT_AUTOMOC
-#    ${CMAKE_CURRENT_BINARY_DIR}/PartSet_automoc.cpp
-#)
 # sources / moc wrappings
-QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_HEADERS})
+QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_MOC_HEADERS})
 
 # sources / rcc wrappings
 QT_ADD_RESOURCES(PROJECT_COMPILED_RESOURCES ${PROJECT_RESOURCES})
 #QT4_ADD_TRANSLATION(QM_RESOURCES ${TEXT_RESOURCES})
 #QT4_CREATE_TRANSLATION(QM_RESOURCES
-#					   ${PROJECT_SOURCES}
-#					   ${TEXT_RESOURCES}
-#					   OPTIONS -extensions cpp -no-recursive
-#					   )
+#                       ${PROJECT_SOURCES}
+#                       ${TEXT_RESOURCES}
+#                       OPTIONS -extensions cpp -no-recursive
+#                       )
 
 #SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC} ${PROJECT_COMPILED_RESOURCES} ${QM_RESOURCES})
 SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC} ${PROJECT_COMPILED_RESOURCES})
@@ -136,12 +151,12 @@ ENDIF(${HAVE_SALOME})
 
 ADD_DEFINITIONS(-DPARTSET_EXPORTS ${CAS_DEFINITIONS})
 ADD_LIBRARY(PartSet SHARED
-	${PROJECT_SOURCES}
-	${PROJECT_HEADERS}
-	${PROJECT_COMPILED_RESOURCES}
-	${PROJECT_AUTOMOC}
-#	${TEXT_RESOURCES}
-#	${QM_RESOURCES}
+    ${PROJECT_SOURCES}
+    ${PROJECT_HEADERS}
+    ${PROJECT_COMPILED_RESOURCES}
+    ${PROJECT_AUTOMOC}
+#    ${TEXT_RESOURCES}
+#    ${QM_RESOURCES}
 )
 
 # The Qt5Widgets_LIBRARIES variable also includes QtGui and QtCore

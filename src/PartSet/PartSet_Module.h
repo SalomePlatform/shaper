@@ -379,9 +379,6 @@ protected:
   /// Register validators for this module
   virtual void registerValidators();
 
-  /// Register selection filters for this module
-  virtual void registerFilters();
-
   /// Register properties of this module
   virtual void registerProperties();
 

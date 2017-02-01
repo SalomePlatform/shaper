@@ -39,12 +39,10 @@
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IViewer.h>
-#include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_WidgetSelector.h>
 
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
-#include <Config_SelectionFilterMessage.h>
 #include <Config_Keywords.h>
 #include <Events_InfoMessage.h>
 
@@ -90,7 +88,6 @@ void XGUI_WorkshopListener::initializeEventListening()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->registerListener(this, Events_LongOp::eventID());
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_PLUGIN_LOADED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SELFILTER_LOADED));
 
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED));
@@ -156,17 +153,6 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     } else {
       QApplication::restoreOverrideCursor();
-    }
-  }
-  else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_SELFILTER_LOADED)) {
-    std::shared_ptr<Config_SelectionFilterMessage> aMsg =
-      std::dynamic_pointer_cast<Config_SelectionFilterMessage>(theMessage);
-    if (aMsg) {
-      ModuleBase_FilterFactory* aFactory = myWorkshop->selectionFilters();
-      if (!aMsg->attributeId().empty()) {
-        aFactory->assignFilter(aMsg->selectionFilterId(), aMsg->featureId(), aMsg->attributeId(),
-                               aMsg->parameters());
-      }
     }
   } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_UPDATE_VIEWER_BLOCKED)) {
     // the viewer's update context will not happens until viewer updated is emitted

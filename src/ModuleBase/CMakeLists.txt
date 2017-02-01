@@ -18,7 +18,6 @@ SET(PROJECT_HEADERS
   ModuleBase_DoubleSpinBox.h
   ModuleBase_Events.h
   ModuleBase_Filter.h
-  ModuleBase_FilterFactory.h
   ModuleBase_FilterValidated.h
   ModuleBase_IErrorMgr.h
   ModuleBase_IModule.h
@@ -78,11 +77,54 @@ SET(PROJECT_HEADERS
   ModuleBase_ModelDialogWidget.h
 )
 
+SET(PROJECT_MOC_HEADERS
+  ModuleBase_Dialog.h
+  ModuleBase_DoubleSpinBox.h
+  ModuleBase_IErrorMgr.h
+  ModuleBase_IModule.h
+  ModuleBase_IntSpinBox.h
+  ModuleBase_IPropertyPanel.h
+  ModuleBase_IViewer.h
+  ModuleBase_IWorkshop.h
+  ModuleBase_LabelValue.h
+  ModuleBase_ModelDialogWidget.h
+  ModuleBase_ModelWidget.h
+  ModuleBase_Operation.h
+  ModuleBase_OperationAction.h
+  ModuleBase_OperationFeature.h
+  ModuleBase_PagedContainer.h
+  ModuleBase_PageGroupBox.h
+  ModuleBase_PageWidget.h
+  ModuleBase_ParamIntSpinBox.h
+  ModuleBase_ParamSpinBox.h
+  ModuleBase_Preferences.h
+  ModuleBase_ToolBox.h
+  ModuleBase_WidgetAction.h
+  ModuleBase_WidgetBoolValue.h
+  ModuleBase_WidgetChoice.h
+  ModuleBase_WidgetConcealedObjects.h
+  ModuleBase_WidgetDoubleValue.h
+  ModuleBase_WidgetEditor.h
+  ModuleBase_WidgetExprEditor.h
+  ModuleBase_WidgetFeatureSelector.h
+  ModuleBase_WidgetFileSelector.h
+  ModuleBase_WidgetIntValue.h
+  ModuleBase_WidgetLabel.h
+  ModuleBase_WidgetLabelValue.h
+  ModuleBase_WidgetLineEdit.h
+  ModuleBase_WidgetMultiSelector.h
+  ModuleBase_WidgetOptionalBox.h
+  ModuleBase_WidgetSelector.h
+  ModuleBase_WidgetShapeSelector.h
+  ModuleBase_WidgetSwitch.h
+  ModuleBase_WidgetToolbox.h
+  ModuleBase_WidgetValidated.h
+)
+
 SET(PROJECT_SOURCES
   ModuleBase_ActionInfo.cpp
   ModuleBase_DoubleSpinBox.cpp
   ModuleBase_Filter.cpp
-  ModuleBase_FilterFactory.cpp
   ModuleBase_FilterValidated.cpp
   ModuleBase_IErrorMgr.cpp
   ModuleBase_IModule.cpp
@@ -159,7 +201,7 @@ SET(PROJECT_LIBRARIES
 )
 
 # sources / moc wrappings
-QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_HEADERS})
+QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_MOC_HEADERS})
 
 #QT5_ADD_TRANSLATION(QM_RESOURCES ${TEXT_RESOURCES})
 

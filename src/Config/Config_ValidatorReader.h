@@ -35,8 +35,7 @@ class Config_ValidatorReader : public Config_XMLReader
  protected:
   /*!
    * \brief Allows to customize reader's behavior for a node. Virtual.
-   * The default implementation process "source", "validator" and
-   * "selection_filter" nodes.
+   * The default implementation process "source" and "validator" nodes.
    */
   virtual void processNode(xmlNodePtr aNode);
   /*!
@@ -55,11 +54,6 @@ class Config_ValidatorReader : public Config_XMLReader
    * Sends ValidatorLoaded event
    */
   void processValidator(xmlNodePtr theNode);
-  /*!
-   * \brief Retrieves all the necessary info from the SelectionFilter node.
-   * Sends SelectionFilterLoaded event
-   */
-  void processSelectionFilter(xmlNodePtr theNode);
 
  private:
   std::string myCurrentWidget;

@@ -11,7 +11,6 @@
 #include <Config_Keywords.h>
 #include <Config_Common.h>
 #include <Config_ValidatorMessage.h>
-#include <Config_SelectionFilterMessage.h>
 #include <Config_PropManager.h>
 
 #include <Events_Loop.h>
@@ -37,8 +36,6 @@ void Config_ValidatorReader::processNode(xmlNodePtr theNode)
 {
   if (isNode(theNode, NODE_VALIDATOR, NULL)) {
     processValidator(theNode);
-  } else if (isNode(theNode, NODE_SELFILTER, NULL)) {
-    processSelectionFilter(theNode);
   } else if (isNode(theNode, NODE_FEATURE, NULL)) {
     storeAttribute(theNode, _ID);
   } else if (isWidgetNode(theNode)) {
@@ -77,27 +74,6 @@ void Config_ValidatorReader::processValidator(xmlNodePtr theNode)
   getParametersInfo(theNode, aValidatorId, aParameters);
   aMessage->setValidatorId(aValidatorId);
   aMessage->setValidatorParameters(aParameters);
-  std::string aFeatureId = restoreAttribute(NODE_FEATURE, _ID);
-  aMessage->setFeatureId(aFeatureId);
-  // parent is attribute (widget)
-  if (!myCurrentWidget.empty()) {
-    std::string aParentId = restoreAttribute(myCurrentWidget.c_str(), _ID);
-    aMessage->setAttributeId(aParentId);
-  }
-  aEvLoop->send(aMessage);
-}
-
-void Config_ValidatorReader::processSelectionFilter(xmlNodePtr theNode)
-{
-  Events_ID aFilterEvent = Events_Loop::eventByName(EVENT_SELFILTER_LOADED);
-  Events_Loop* aEvLoop = Events_Loop::loop();
-  std::shared_ptr<Config_SelectionFilterMessage> aMessage(
-      new Config_SelectionFilterMessage(aFilterEvent, this));
-  std::string aSelectionFilterId;
-  std::list<std::string> aParameters;
-  getParametersInfo(theNode, aSelectionFilterId, aParameters);
-  aMessage->setSelectionFilterId(aSelectionFilterId);
-  aMessage->setFilterParameters(aParameters);
   std::string aFeatureId = restoreAttribute(NODE_FEATURE, _ID);
   aMessage->setFeatureId(aFeatureId);
   // parent is attribute (widget)

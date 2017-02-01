@@ -18,7 +18,6 @@ const static char* NODE_GROUP = "group";
 const static char* NODE_FEATURE = "feature";
 const static char* NODE_SOURCE = "source";
 const static char* NODE_VALIDATOR = "validator";
-const static char* NODE_SELFILTER = "selection_filter";
 const static char* NODE_XMLPARENT = "libxml_parent";
 
 // Property panels
@@ -67,7 +66,7 @@ const static char* FEATURE_WHEN_NESTED_ABORT = "abort";
 const static char* FEATURE_DOC = WORKBENCH_DOC;
 const static char* FEATURE_MODAL = "modal";
 const static char* FEATURE_AUTO_PREVIEW = "auto_preview";
-// NODE_VALIDATOR properties, NODE_SELFILTER properties
+// NODE_VALIDATOR properties
 const static char* _PARAMETERS = "parameters";
 
 // Widget (attribute) properties

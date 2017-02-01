@@ -19,6 +19,10 @@ SET(PROJECT_HEADERS
     ParametersPlugin_WidgetParamsMgr.h
 )
 
+SET(PROJECT_MOC_HEADERS
+    ParametersPlugin_WidgetParamsMgr.h
+)
+
 SET(PROJECT_SOURCES
     ParametersPlugin_Plugin.cpp
     ParametersPlugin_Parameter.cpp
@@ -67,7 +71,7 @@ SET(TEXT_RESOURCES
 #    ${CMAKE_CURRENT_BINARY_DIR}/ParametersPlugin_automoc.cpp
 #)
 # sources / moc wrappings
-QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_HEADERS})
+QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_MOC_HEADERS})
 
 
 SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC} ${QM_RESOURCES})

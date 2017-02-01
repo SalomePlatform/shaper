@@ -23,7 +23,6 @@ SET(PROJECT_HEADERS
   Config_Prop.h
   Config_PropManager.h
   Config_AttributeMessage.h
-  Config_SelectionFilterMessage.h
   Config_ValidatorReader.h
   Config_DataModelReader.h
   Config_Translator.h
@@ -42,7 +41,6 @@ SET(PROJECT_SOURCES
   Config_Prop.cpp
   Config_PropManager.cpp
   Config_AttributeMessage.cpp
-  Config_SelectionFilterMessage.cpp
   Config_ValidatorReader.cpp
   Config_DataModelReader.cpp
   Config_Translator.cpp

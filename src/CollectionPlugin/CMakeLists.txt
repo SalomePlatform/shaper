@@ -19,6 +19,10 @@ SET(PROJECT_HEADERS
     CollectionPlugin_WidgetField.h
 )
 
+SET(PROJECT_MOC_HEADERS
+    CollectionPlugin_WidgetField.h
+)
+
 SET(PROJECT_SOURCES
     CollectionPlugin_Plugin.cpp
     CollectionPlugin_Group.cpp
@@ -37,7 +41,7 @@ SET(TEXT_RESOURCES
 )
 
 # sources / moc wrappings
-QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_HEADERS})
+QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_MOC_HEADERS})
 
 #QT5_ADD_TRANSLATION(QM_RESOURCES ${TEXT_RESOURCES})
 
