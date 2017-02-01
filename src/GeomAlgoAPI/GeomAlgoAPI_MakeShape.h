@@ -79,7 +79,7 @@ public:
 
   /// \return the list of shapes modified from the shape \a theShape.
   /// \param[in] theShape base shape.
-  /// \param[out] theHistory modified shapes.
+  /// \param[out] theHistory modified shapes. Does not cleared!
   GEOMALGOAPI_EXPORT virtual void modified(const std::shared_ptr<GeomAPI_Shape> theShape,
                                            ListOfShape& theHistory);
 

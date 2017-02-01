@@ -13,6 +13,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 
 #include <GeomAlgoAPI_Intersection.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <sstream>
 
@@ -107,35 +108,80 @@ void FeaturesPlugin_Intersection::loadNamingDS(std::shared_ptr<ModelAPI_ResultBo
                                                const ListOfShape& theTools,
                                                GeomAlgoAPI_MakeShape& theMakeShape)
 {
-  //load result
   std::shared_ptr<GeomAPI_Shape> aResultShape = theMakeShape.shape();
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfShapes = theMakeShape.mapOfSubShapes();
-  const int aDeletedTag = 1;
-  /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
-  const int aSubsolidsTag = 2;
-  const int aModifyTag = 100000;
-  int aModifyToolsTag = 200000;
-  std::ostringstream aStream;
+  theResultBody->storeModified(theBaseShape, aResultShape);
 
-  theResultBody->storeModified(theBaseShape, aResultShape, aSubsolidsTag);
+  const int aDeletedVertexTag = 1;
+  const int aDeletedEdgeTag   = 2;
+  const int aDeletedFaceTag   = 3;
 
-  std::string aModName = "Modified";
-  theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::VERTEX,
-                                             aModifyTag, aModName, *aMapOfShapes.get(), true);
-  theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::EDGE,
-                                             aModifyTag, aModName, *aMapOfShapes.get(), true);
-  theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE, aDeletedTag);
+  theResultBody->loadDeletedShapes(&theMakeShape,
+                                   theBaseShape,
+                                   GeomAPI_Shape::VERTEX,
+                                   aDeletedVertexTag);
+  theResultBody->loadDeletedShapes(&theMakeShape,
+                                   theBaseShape,
+                                   GeomAPI_Shape::EDGE,
+                                   aDeletedEdgeTag);
+  theResultBody->loadDeletedShapes(&theMakeShape,
+                                   theBaseShape,
+                                   GeomAPI_Shape::FACE,
+                                   aDeletedFaceTag);
 
-  int anIndex = 1;
-  for(ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
-    aStream.str(std::string());
-    aStream.clear();
-    aStream << aModName << "_" << anIndex++;
-    theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::VERTEX,
-                                   aModifyToolsTag, aStream.str(), *aMapOfShapes.get(), true);
-    theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::EDGE,
-                                 aModifyToolsTag, aStream.str(), *aMapOfShapes.get(), true);
-    theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
-    aModifyToolsTag += 10000;
+  ListOfShape aShapes = theTools;
+  aShapes.push_back(theBaseShape);
+  GeomAPI_DataMapOfShapeShape aShapesMap; // Map to store {result_shape, original_shape}
+  const int aShapeTypesNb = 2;
+  const GeomAPI_Shape::ShapeType aShapeTypes[aShapeTypesNb] = {GeomAPI_Shape::VERTEX, GeomAPI_Shape::EDGE};
+  for(ListOfShape::const_iterator anIt = aShapes.cbegin(); anIt != aShapes.cend(); ++anIt) {
+    const GeomShapePtr aShape = *anIt;
+    for(int anIndex = 0; anIndex < aShapeTypesNb; ++anIndex) {
+      for(GeomAPI_ShapeExplorer anOrigShapeExp(aShape, aShapeTypes[anIndex]);
+          anOrigShapeExp.more();
+          anOrigShapeExp.next()) {
+        ListOfShape aHistory;
+        const GeomShapePtr aSubShape = anOrigShapeExp.current();
+        theMakeShape.modified(aSubShape, aHistory);
+        for(ListOfShape::const_iterator aHistoryIt = aHistory.cbegin();
+            aHistoryIt != aHistory.cend();
+            ++aHistoryIt) {
+          aShapesMap.bind(*aHistoryIt, aSubShape);
+        }
+      }
+    }
+  }
+
+  int aModifiedVertexIndex(1),
+      aGeneratedVertexIndex(1),
+      aModifiedEdgeIndex(1),
+      aGeneratedEdgeIndex(1);
+  int aTag = 4;
+  GeomAPI_DataMapOfShapeShape aStoredShapes;
+  for(int anIndex = 0; anIndex < aShapeTypesNb; ++anIndex) {
+    for(GeomAPI_ShapeExplorer aShapeExp(aResultShape, aShapeTypes[anIndex]);
+        aShapeExp.more();
+        aShapeExp.next()) {
+      const GeomShapePtr aSubShape = aShapeExp.current();
+      if(aStoredShapes.isBound(aSubShape)) {
+        continue;
+      }
+      if(aShapesMap.isBound(aSubShape)) {
+        theResultBody->modified(aShapesMap.find(aSubShape),
+          aSubShape,
+          std::string("Modified_")
+            + (anIndex == 0 ? "Vertex_" : "Edge_")
+            + std::to_string((long long)(anIndex == 0 ? aModifiedVertexIndex++
+                                                      : aModifiedEdgeIndex++)),
+          aTag++);
+      } else {
+        theResultBody->generated(aSubShape,
+          std::string("Generated_")
+            + (anIndex == 0 ? "Vertex_" : "Edge_")
+            + std::to_string((long long)(anIndex == 0 ? aGeneratedVertexIndex++
+                                                      : aGeneratedEdgeIndex++)),
+          aTag++);
+      }
+      aStoredShapes.bind(aSubShape, aSubShape);
+    }
   }
 }
