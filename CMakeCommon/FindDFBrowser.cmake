@@ -9,10 +9,6 @@
 ## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 #=============================================================================
 
-IF(NOT DFBROWSER_FIND_QUIETLY)
-  MESSAGE(STATUS "Try to find DFBrowser at $ENV{DFBROWSER_ROOT_DIR}...")
-ENDIF()
-
 SET(DFBROWSER_ROOT_DIR $ENV{DFBROWSER_ROOT_DIR} CACHE PATH "Path to the DFBrowser directory")
 IF(EXISTS ${DFBROWSER_ROOT_DIR})
   SET(DFBROWSER_INCLUDE_DIR "${DFBROWSER_ROOT_DIR}/include")

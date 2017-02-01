@@ -9,10 +9,6 @@
 ## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 #=============================================================================
 
-IF(NOT VINSPECTOR_FIND_QUIETLY)
-  MESSAGE(STATUS "Try to find VInspector at $ENV{VINSPECTOR_ROOT_DIR}...")
-ENDIF()
-
 SET(VINSPECTOR_ROOT_DIR $ENV{VINSPECTOR_ROOT_DIR} CACHE PATH "Path to the VInspector directory")
 IF(EXISTS $ENV{VINSPECTOR_ROOT_DIR})
   SET(VINSPECTOR_INCLUDE_DIR "$ENV{VINSPECTOR_ROOT_DIR}/include")

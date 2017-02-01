@@ -316,7 +316,10 @@ void GeomAPI_AISObject::setColor(const int& theColor)
     aDimAIS->DimensionAspect()->SetCommonColor(aColor);
   }
   Handle(AIS_InteractiveContext) aContext = anAIS->GetContext();
-  aContext->SetColor(anAIS, aColor, false);
+  if (!aContext.IsNull())
+    aContext->SetColor(anAIS, aColor, false);
+  else
+    anAIS->SetColor(aColor);
 }
 
 double GeomAPI_AISObject::width()
@@ -358,7 +361,10 @@ bool GeomAPI_AISObject::setColor(int theR, int theG, int theB)
     aDimAIS->DimensionAspect()->SetCommonColor(aColor);
   }
   Handle(AIS_InteractiveContext) aContext = anAIS->GetContext();
-  aContext->SetColor(anAIS, aColor, false);
+  if (!aContext.IsNull())
+    aContext->SetColor(anAIS, aColor, false);
+  else
+    anAIS->SetColor(aColor);
   return true;
 }
 
@@ -464,13 +470,13 @@ bool GeomAPI_AISObject::setLineStyle(int theStyle)
     if (aDrawer->HasOwnWireAspect()) {
       aLineAspect = aDrawer->WireAspect();
     }
-    Quantity_Color aCurrentColor;
-    Aspect_TypeOfLine aCurrentType;
-    Standard_Real aCurrentWidth;
-    aLineAspect->Aspect()->Values(aCurrentColor, aCurrentType, aCurrentWidth);
-    isChanged = aType != aCurrentType;
-    if (isChanged) {
-      aLineAspect->SetTypeOfLine(aType);
+    if (!aLineAspect.IsNull()) {
+      Handle(Graphic3d_AspectLine3d) aGraphicAspect = aLineAspect->Aspect();
+      Aspect_TypeOfLine aCurrentType = aGraphicAspect->Type();
+      isChanged = aType != aCurrentType;
+      if (isChanged) {
+        aLineAspect->SetTypeOfLine(aType);
+      }
     }
   }
   return isChanged;
