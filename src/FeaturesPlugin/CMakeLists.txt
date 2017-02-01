@@ -142,4 +142,5 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestRecover1798.py
                Test1922.py
                Test1942.py
+               Test1915.py
 )

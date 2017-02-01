@@ -271,26 +271,29 @@ void FeaturesPlugin_Boolean::execute()
         aMakeShapeList.appendAlgo(aBoolAlgo);
         GeomAPI_DataMapOfShapeShape aMapOfShapes;
         aMapOfShapes.merge(aBoolAlgo->mapOfSubShapes());
+        GeomShapePtr aResultShape = aBoolAlgo->shape();
 
         // Add result to not used solids from compsolid.
-        ListOfShape aShapesToAdd = aNotUsedSolids;
-        aShapesToAdd.push_back(aBoolAlgo->shape());
-        std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
-          new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
-        if(!aFillerAlgo->isDone()) {
-          std::string aFeatureError = "Error: PaveFiller algorithm failed.";
-          setError(aFeatureError);
-          return;
+        if(!aNotUsedSolids.empty()) {
+          ListOfShape aShapesToAdd = aNotUsedSolids;
+          aShapesToAdd.push_back(aBoolAlgo->shape());
+          std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
+            new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
+          if(!aFillerAlgo->isDone()) {
+            std::string aFeatureError = "Error: PaveFiller algorithm failed.";
+            setError(aFeatureError);
+            return;
+          }
+
+          aMakeShapeList.appendAlgo(aFillerAlgo);
+          aMapOfShapes.merge(aFillerAlgo->mapOfSubShapes());
+          aResultShape = aFillerAlgo->shape();
         }
 
-        aMakeShapeList.appendAlgo(aFillerAlgo);
-        aMapOfShapes.merge(aFillerAlgo->mapOfSubShapes());
-
-        if(GeomAlgoAPI_ShapeTools::volume(aFillerAlgo->shape()) > 1.e-27) {
+        if(GeomAlgoAPI_ShapeTools::volume(aResultShape) > 1.e-27) {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody =
             document()->createBody(data(), aResultIndex);
-          loadNamingDS(aResultBody, aCompSolid, aTools,
-                       aFillerAlgo->shape(), aMakeShapeList, aMapOfShapes);
+          loadNamingDS(aResultBody, aCompSolid, aTools, aResultShape, aMakeShapeList, aMapOfShapes);
           setResult(aResultBody, aResultIndex);
           aResultIndex++;
         }
