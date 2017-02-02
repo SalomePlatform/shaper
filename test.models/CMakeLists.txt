@@ -1,52 +1,45 @@
 # Copyright (C) 2007-2017  CEA/DEN, EDF R&D, OPEN CASCADE
 
-IF(ADD_MODELS_TESTS)
-  ENABLE_TESTING()
+ENABLE_TESTING()
 
-  file(GLOB pyFiles
-      "*.py"
-  )
+file(GLOB pyFiles "*.py")
 
-  if (WIN32) # different separators and path to libraries variable name
-    SET(_JUSTPATH "${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_BIN};${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_SWIG};${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_PLUGIN_FILES};${SUIT_LIB_DIR};$ENV{PATH}")
-    STRING(REPLACE "\\" "/" _JUSTPATH "${_JUSTPATH}")
-    STRING(REPLACE ";" "\\;" _JUSTPATH "${_JUSTPATH}")
-    SET(_PYTHONPATH "${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_SWIG};${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_PLUGIN_FILES};${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_ADDONS};$ENV{PYTHONPATH}")
-    STRING(REPLACE "\\" "/" _PYTHONPATH "${_PYTHONPATH}")
-    STRING(REPLACE ";" "\\;" _PYTHONPATH "${_PYTHONPATH}")
-  else()
-    SET(_LD_LIBRARY_PATH "${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_BIN}:${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_SWIG}:${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_PLUGIN_FILES}:${SUIT_LIB_DIR}:$ENV{LD_LIBRARY_PATH}")
-    SET(_PYTHONPATH "${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_SWIG}:${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_PLUGIN_FILES}:${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_ADDONS}:$ENV{PYTHONPATH}")
-  endif()
+if (WIN32) # different separators and path to libraries variable name
+  SET(_JUSTPATH "${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_BIN};${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_SWIG};${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_PLUGIN_FILES};${SUIT_LIB_DIR};$ENV{PATH}")
+  STRING(REPLACE "\\" "/" _JUSTPATH "${_JUSTPATH}")
+  STRING(REPLACE ";" "\\;" _JUSTPATH "${_JUSTPATH}")
+  SET(_PYTHONPATH "${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_SWIG};${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_PLUGIN_FILES};${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_ADDONS};$ENV{PYTHONPATH}")
+  STRING(REPLACE "\\" "/" _PYTHONPATH "${_PYTHONPATH}")
+  STRING(REPLACE ";" "\\;" _PYTHONPATH "${_PYTHONPATH}")
+else()
+  SET(_LD_LIBRARY_PATH "${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_BIN}:${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_SWIG}:${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_PLUGIN_FILES}:${SUIT_LIB_DIR}:$ENV{LD_LIBRARY_PATH}")
+  SET(_PYTHONPATH "${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_SWIG}:${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_PLUGIN_FILES}:${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_ADDONS}:$ENV{PYTHONPATH}")
+endif()
 
-  foreach(eachFilePath ${pyFiles})
-    # Strip the ".py" suffix
-    GET_FILENAME_COMPONENT(aTestName ${eachFilePath} NAME_WE)
+foreach(eachFilePath ${pyFiles})
+  # Strip the ".py" suffix
+  GET_FILENAME_COMPONENT(aTestName ${eachFilePath} NAME_WE)
 
-    # Add "SubprojectName_" prefix
-    GET_FILENAME_COMPONENT(aSubprojectName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-    SET(aTestName "${aSubprojectName}_${aTestName}")
+  # Add "SubprojectName_" prefix
+  GET_FILENAME_COMPONENT(aSubprojectName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+  SET(aTestName "${aSubprojectName}_${aTestName}")
 
-    # Full path to the python test file beeing executed
-    SET(aTestFilePath "${eachFilePath}")
-    IF(EXISTS ${aTestFilePath})
-      ADD_TEST(NAME ${aTestName}
-               COMMAND ${PYTHON_EXECUTABLE} ${aTestFilePath})
-      if (WIN32) # different path to libraries variable name
-        SET_TESTS_PROPERTIES(${aTestName} PROPERTIES
-               ENVIRONMENT "PATH=${_JUSTPATH};PYTHONPATH=${_PYTHONPATH}"
-               LABELS "models_tests")
-      else()
-        SET_TESTS_PROPERTIES(${aTestName} PROPERTIES
-               ENVIRONMENT "LD_LIBRARY_PATH=${_LD_LIBRARY_PATH};PYTHONPATH=${_PYTHONPATH}"
-               LABELS "models_tests")
-      endif()
-      # Debug output...
-      # MESSAGE(STATUS "Test added: ${aTestName} file: ${aTestFilePath}")
-    ELSE(EXISTS ${aTestFilePath})
-      MESSAGE(WARNING "Can not find the test file: ${aTestFilePath}")
-    ENDIF(EXISTS ${aTestFilePath})
-  endforeach(eachFilePath ${ARGN})
+  # Full path to the python test file beeing executed
+  SET(aTestFilePath "${eachFilePath}")
+  IF(EXISTS ${aTestFilePath})
+    ADD_TEST(NAME ${aTestName} COMMAND ${PYTHON_EXECUTABLE} ${aTestFilePath})
+    if (WIN32) # different path to libraries variable name
+      SET_TESTS_PROPERTIES(${aTestName} PROPERTIES ENVIRONMENT "PATH=${_JUSTPATH};PYTHONPATH=${_PYTHONPATH}"
+        LABELS "models_tests")
+    else()
+      SET_TESTS_PROPERTIES(${aTestName} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${_LD_LIBRARY_PATH};PYTHONPATH=${_PYTHONPATH}"
+        LABELS "models_tests")
+    endif()
+    # Debug output...
+    # MESSAGE(STATUS "Test added: ${aTestName} file: ${aTestFilePath}")
+  ELSE(EXISTS ${aTestFilePath})
+    MESSAGE(WARNING "Can not find the test file: ${aTestFilePath}")
+  ENDIF(EXISTS ${aTestFilePath})
+endforeach(eachFilePath ${ARGN})
 
-  ADD_CUSTOM_TARGET(run_models_tests COMMAND ${CMAKE_CTEST_COMMAND} -C "${CMAKE_BUILD_TYPE}" -L "models_tests")
-ENDIF(ADD_MODELS_TESTS)
+ADD_CUSTOM_TARGET(run_models_tests COMMAND ${CMAKE_CTEST_COMMAND} -C "${CMAKE_BUILD_TYPE}" -L "models_tests")

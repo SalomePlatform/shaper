@@ -4,7 +4,7 @@ PROJECT (SHAPER)
 # Ensure a proper linker behavior:
 CMAKE_POLICY(SET CMP0003 NEW)
 IF(WIN32)
-  CMAKE_POLICY(SET CMP0020 OLD) # disable automatic linking to qtmain.lib 
+  CMAKE_POLICY(SET CMP0020 OLD) # disable automatic linking to qtmain.lib
 ENDIF(WIN32)
 
 SET (SHAPER_Version 2.6.0)
@@ -114,11 +114,10 @@ IF(${HAVE_SALOME})
     ADD_SUBDIRECTORY (src/ConnectorPlugin)
 ENDIF(${HAVE_SALOME})
 
-ADD_SUBDIRECTORY (test.models)
-
 ENABLE_TESTING()
 
 IF(ADD_MODELS_TESTS)
+  ADD_SUBDIRECTORY (test.models)
   ADD_CUSTOM_TARGET(run_unit_tests COMMAND ${CMAKE_CTEST_COMMAND} -C "${CMAKE_BUILD_TYPE}" -LE "models_tests")
 ENDIF(ADD_MODELS_TESTS)
 
