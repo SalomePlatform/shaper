@@ -22,7 +22,6 @@ void FeaturesPlugin_Tools::storeModifiedShapes(GeomAlgoAPI_MakeShape& theAlgo,
       for(GeomAPI_ShapeIterator anIt(theBaseShape); anIt.more(); anIt.next())
       {
         storeModifiedShapes(theAlgo, theResultBody, theBaseShape, theTag, theName, theSubShapes);
-        theTag++;
       }
       break;
     }
@@ -36,15 +35,20 @@ void FeaturesPlugin_Tools::storeModifiedShapes(GeomAlgoAPI_MakeShape& theAlgo,
           || theBaseShape->shapeType() == GeomAPI_Shape::SOLID) {
         break;
       }
+      ++theTag;
     }
     case GeomAPI_Shape::FACE:
-    case GeomAPI_Shape::WIRE:
+    case GeomAPI_Shape::WIRE: {
       theResultBody->loadAndOrientModifiedShapes(&theAlgo,
                                 theBaseShape, GeomAPI_Shape::EDGE,
-                                ++theTag, theName + "_Edge", theSubShapes);
-    case GeomAPI_Shape::EDGE:
+                                theTag, theName + "_Edge", theSubShapes);
+      ++theTag;
+    }
+    case GeomAPI_Shape::EDGE: {
       theResultBody->loadAndOrientModifiedShapes(&theAlgo,
                               theBaseShape, GeomAPI_Shape::VERTEX,
-                              ++theTag, theName + "_Vertex", theSubShapes);
+                              theTag, theName + "_Vertex", theSubShapes);
+      ++theTag;
+    }
   }
 }
