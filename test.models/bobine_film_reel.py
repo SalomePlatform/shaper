@@ -109,6 +109,12 @@ model.do()
 ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_8/Face-SketchLine_7r-SketchLine_8r-SketchLine_10f-SketchLine_11f"), model.selection("FACE", "Sketch_8/Face-SketchLine_16f-SketchLine_17f-SketchLine_18r-SketchLine_19r"), model.selection("FACE", "Sketch_8/Face-SketchLine_12f-SketchLine_13f-SketchLine_14r-SketchLine_15r")], model.selection(), model.selection("FACE", "ExtrusionCut_2_1/Modfied_23"), 0, model.selection(), 0, [model.selection("SOLID", "ExtrusionCut_2_1")])
 model.end()
 
+from GeomAPI import GeomAPI_Shape
+
 model.testNbResults(ExtrusionCut_3, 1)
 model.testNbSubResults(ExtrusionCut_3, [0])
+model.testNbSubShapes(ExtrusionCut_3, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(ExtrusionCut_3, GeomAPI_Shape.FACE, [50])
+model.testNbSubShapes(ExtrusionCut_3, GeomAPI_Shape.EDGE, [300])
+model.testNbSubShapes(ExtrusionCut_3, GeomAPI_Shape.VERTEX, [600])
 model.testResultsVolumes(ExtrusionCut_3, [34439.077343526856566313654184341])
