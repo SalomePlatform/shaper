@@ -348,7 +348,8 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
   const int  theTag,
   const std::string& theName,
   GeomAPI_DataMapOfShapeShape& theSubShapes,
-  const bool theIsStoreSeparate)
+  const bool theIsStoreSeparate,
+  const bool theIsStoreAsGenerated)
 {
   int anIndex = 1;
   int aTag = theTag;
@@ -377,7 +378,13 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
       GeomShapePtr aGeomNewShape(new GeomAPI_Shape());
       aGeomNewShape->setImpl(new TopoDS_Shape(aNewShape));
       if(!aRoot.IsSame(aNewShape) && aResultShape->isSubShape(aGeomNewShape)) {
-        builder(aTag)->Modify(aRoot,aNewShape);
+        if(theIsStoreAsGenerated) {
+          // Here we store shapes as generated, to avoid problem when one parent shape produce
+          // several child shapes. In this case naming could not determine which shape to select.
+          builder(aTag)->Generated(aRoot,aNewShape);
+        } else {
+          builder(aTag)->Modify(aRoot,aNewShape);
+        }
         if(isBuilt) {
           if(theIsStoreSeparate) {
             aStream.str(std::string());
