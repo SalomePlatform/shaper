@@ -11,7 +11,6 @@
         min = "0.0"
         icon=""
         tooltip="Dimension in X">
-        <validator id="GeomValidators_Positive"/>
       </doublevalue>
       <doublevalue
         id="dy"
@@ -21,7 +20,6 @@
         min = "0.0"
         icon=""
         tooltip="Dimension in Y">
-        <validator id="GeomValidators_Positive"/>
       </doublevalue>
       <doublevalue
         id="dz"
@@ -31,7 +29,6 @@
         min = "0.0"
         icon=""
         tooltip="Dimension in Z">
-        <validator id="GeomValidators_Positive"/>
       </doublevalue>
     </box>
     <box id="BoxByTwoPoints" title="By two points" icon="icons/Primitives/box_2pt_32x32.png">
@@ -40,15 +37,12 @@
         icon="icons/Primitives/point.png"
         tooltip="Select a first point"
         shape_types="vertex">
-        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
       </shape_selector>
       <shape_selector id="SecondPoint"
         label="Second point"
         icon="icons/Primitives/point.png"
         tooltip="Select a second point"
         shape_types="vertex">
-        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
-        <validator id="GeomValidators_DifferentShapes"/>
       </shape_selector>
     </box>
   </toolbox>

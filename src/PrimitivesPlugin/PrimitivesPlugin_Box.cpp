@@ -15,6 +15,7 @@
 #include <GeomAlgoAPI_PointBuilder.h>
 
 #include <memory>
+#include <iostream>
 
 //=================================================================================================
 PrimitivesPlugin_Box::PrimitivesPlugin_Box() // Nothing to do during instantiation
@@ -61,8 +62,7 @@ void PrimitivesPlugin_Box::createBoxByDimensions()
   // These checks should be made to the GUI for the feature but
   // the corresponding validator does not exist yet.
   if (!aBoxAlgo->check()) {
-    // The error is not displayed in a popup window. It must be in the status bar.
-    setError(aBoxAlgo->getError(), false);
+    setError(aBoxAlgo->getError());
     return;
   }
 
@@ -110,8 +110,7 @@ void PrimitivesPlugin_Box::createBoxByTwoPoints()
   // These checks should be made to the GUI for the feature but
   // the corresponding validator does not exist yet.
   if (!aBoxAlgo->check()) {
-    // The error is not displayed in a popup window. It must be in the message console.
-    setError(aBoxAlgo->getError(), false);
+    setError(aBoxAlgo->getError());
     return;
   }
 
@@ -121,12 +120,12 @@ void PrimitivesPlugin_Box::createBoxByTwoPoints()
   // Check if the creation of the box
   if(!aBoxAlgo->isDone()) {
     // The error is not displayed in a popup window. It must be in the message console.
-    setError(aBoxAlgo->getError(), false);
+    setError(aBoxAlgo->getError());
     return;
   }
   if(!aBoxAlgo->checkValid("Box builder with two points")) {
     // The error is not displayed in a popup window. It must be in the message console.
-    setError(aBoxAlgo->getError(), false);
+    setError(aBoxAlgo->getError());
     return;
   }
 

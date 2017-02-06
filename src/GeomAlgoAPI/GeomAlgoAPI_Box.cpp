@@ -37,22 +37,22 @@ bool GeomAlgoAPI_Box::check()
 {
   if (myMethodType == MethodType::BOX_DIM) {
     if (myDx < Precision::Confusion()) {
-      myError = "Box builder with dimensions :: Dx is null.";
+      myError = "Box builder with dimensions :: Dx is null or negative.";
       return false;
     } else if (myDy < Precision::Confusion()) {
-      myError = "Box builder with dimensions :: Dy is null.";
+      myError = "Box builder with dimensions :: Dy is null or negative.";
       return false;
     } else if (myDz < Precision::Confusion()) {
-      myError = "Box builder with dimensions :: Dz is null.";
+      myError = "Box builder with dimensions :: Dz is null or negative.";
       return false;
     }
   } else if (myMethodType == MethodType::BOX_POINTS) {
     if (!myFirstPoint.get()) {
-      myError = "Box builder with points :: the first point is not a correct";
+      myError = "Box builder with points :: the first point is not correct.";
       return false;
     }
     if (!mySecondPoint.get()) {
-      myError = "Box builder with points :: the second point is not a correct";
+      myError = "Box builder with points :: the second point is not correct.";
       return false;
     }
     if (myFirstPoint->distance(mySecondPoint) < Precision::Confusion()) {
@@ -66,7 +66,7 @@ bool GeomAlgoAPI_Box::check()
         fabs(aDiffY)  < Precision::Confusion() ||
         fabs(aDiffZ)  < Precision::Confusion()) {
       myError =
-        "Box builder with points :: the points belong both to one of the OXY, OYZ or OZX planes";
+        "Box builder with points :: the points belong both to one of the OXY, OYZ or OZX planes.";
       return false;
     }
   } else {
