@@ -1,5 +1,13 @@
 from GeomAlgoAPI import *
+from GeomAPI import *
 import math
+
+
+aShapeTypes = {
+  GeomAPI_Shape.SOLID:  "GeomAPI_Shape.SOLID",
+  GeomAPI_Shape.FACE:   "GeomAPI_Shape.FACE",
+  GeomAPI_Shape.EDGE:   "GeomAPI_Shape.EDGE",
+  GeomAPI_Shape.VERTEX: "GeomAPI_Shape.VERTEX"}
 
 
 def generateTests(theFeature, theFeatureName, theTestsList = []):
@@ -18,6 +26,20 @@ def generateTests(theFeature, theFeatureName, theTestsList = []):
     for anIndex in range(0, aNbResults):
       aNbSubResults.append(theFeature.results()[anIndex].numberOfSubs())
     print "model.testNbSubResults({}, {})".format(theFeatureName, aNbSubResults)
+
+  if "testNbSubShapes" in theTestsList or len(theTestsList) == 0:
+    aNbResults = len(theFeature.results())
+    for aShapeType in aShapeTypes:
+      aNbSubShapes = []
+      for anIndex in range(0, aNbResults):
+        aShape = theFeature.results()[anIndex].resultSubShapePair()[0].shape()
+        aNbResultSubShapes = 0
+        aShapeExplorer = GeomAPI_ShapeExplorer(aShape, aShapeType)
+        while aShapeExplorer.more():
+          aNbResultSubShapes += 1
+          aShapeExplorer.next();
+        aNbSubShapes.append(aNbResultSubShapes)
+      print "model.testNbSubShapes({}, {}, {})".format(theFeatureName, aShapeTypes[aShapeType], aNbSubShapes)
 
   if "testResultsVolumes" in theTestsList or len(theTestsList) == 0:
     aNbResults = len(theFeature.results())
@@ -48,6 +70,26 @@ def testNbSubResults(theFeature, theExpectedNbSubResults):
     aNbSubResults = theFeature.results()[anIndex].numberOfSubs()
     anExpectedNbSubResults = theExpectedNbSubResults[anIndex]
     assert (aNbSubResults == anExpectedNbSubResults), "Number of sub-results for result[{}]: {}. Expected: {}.".format(anIndex, aNbSubResults, anExpectedNbSubResults)
+
+
+def testNbSubShapes(theFeature, theShapeType, theExpectedNbSubShapes):
+  """ Tests number of feature sub-shapes of passed type for each result.
+  :param theFeature: feature to test.
+  :param theShapeType: shape type of sub-shapes to test.
+  :param theExpectedNbSubShapes: list of sub-shapes numbers. Size of list should be equal to len(theFeature.results()).
+  """
+  aNbResults = len(theFeature.results())
+  aListSize = len(theExpectedNbSubShapes)
+  assert (aNbResults == aListSize), "Number of results: {} not equal to list size: {}.".format(aNbResults, aListSize)
+  for anIndex in range(0, aNbResults):
+    aNbResultSubShapes = 0
+    anExpectedNbSubShapes = theExpectedNbSubShapes[anIndex]
+    aShape = theFeature.results()[anIndex].resultSubShapePair()[0].shape()
+    aShapeExplorer = GeomAPI_ShapeExplorer(aShape, theShapeType)
+    while aShapeExplorer.more():
+      aNbResultSubShapes += 1
+      aShapeExplorer.next();
+    assert (aNbResultSubShapes == anExpectedNbSubShapes), "Number of sub-shapes of type {} for result[{}]: {}. Expected: {}.".format(aShapeTypes[theShapeType], anIndex, aNbResultSubShapes, anExpectedNbSubShapes)
 
 
 def testResultsVolumes(theFeature, theExpectedResultsVolumes, theNbSignificantDigits = 10):
