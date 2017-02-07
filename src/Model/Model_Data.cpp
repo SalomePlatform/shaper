@@ -94,8 +94,12 @@ void Model_Data::setLabel(TDF_Label theLab)
 std::string Model_Data::name()
 {
   Handle(TDataStd_Name) aName;
-  if (myLab.FindAttribute(TDataStd_Name::GetID(), aName))
+  if (myLab.FindAttribute(TDataStd_Name::GetID(), aName)) {
+#ifdef DEBUG_NAMES
+    myObject->myName = TCollection_AsciiString(aName->Get()).ToCString();
+#endif
     return std::string(TCollection_AsciiString(aName->Get()).ToCString());
+  }
   return "";  // not defined
 }
 
@@ -118,6 +122,9 @@ void Model_Data::setName(const std::string& theName)
     std::dynamic_pointer_cast<Model_Document>(myObject->document())->
       changeNamingName(anOldName, theName);
   }
+#ifdef DEBUG_NAMES
+  myObject->myName = theName;
+#endif
 }
 
 AttributePtr Model_Data::addAttribute(const std::string& theID, const std::string theAttrType)
