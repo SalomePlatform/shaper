@@ -6,38 +6,32 @@
 
 #include <GeomAPI_Pnt2d.h>
 #include <SketchPlugin_Circle.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
 
 #include <cmath>
 
 
-/// \brief Check whether the entities has only one shared point
-static bool hasSingleCoincidence(EntityWrapperPtr theEntity1, EntityWrapperPtr theEntity2)
+/// \brief Check whether the entities has only one shared point or less
+static bool hasSingleCoincidence(FeaturePtr theFeature1, FeaturePtr theFeature2)
 {
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
+  const std::set<AttributePtr>& aRefs1 = theFeature1->data()->refsToMe();
+  const std::set<AttributePtr>& aRefs2 = theFeature2->data()->refsToMe();
 
-  const std::list<EntityWrapperPtr>& aPoints1 = theEntity1->subEntities();
-  const std::list<EntityWrapperPtr>& aPoints2 = theEntity2->subEntities();
-
-  std::list<EntityWrapperPtr>::const_iterator aStartIt1 = aPoints1.begin();
-  if (theEntity1->type() == ENTITY_ARC) ++aStartIt1; // skip center of arc
-  std::list<EntityWrapperPtr>::const_iterator aStartIt2 = aPoints2.begin();
-  if (theEntity2->type() == ENTITY_ARC) ++aStartIt2; // skip center of arc
-
-  int aNbCoinc = 0;
-  std::list<EntityWrapperPtr>::const_iterator anIt1, anIt2;
-  for (anIt1 = aStartIt1; anIt1 != aPoints1.end(); ++anIt1) {
-    if ((*anIt1)->type() != ENTITY_POINT)
-      continue;
-    std::shared_ptr<GeomAPI_Pnt2d> aPt1 = aBuilder->point(*anIt1);
-    for (anIt2 = aStartIt2; anIt2 != aPoints2.end(); ++anIt2) {
-      if ((*anIt2)->type() != ENTITY_POINT)
-        continue;
-      std::shared_ptr<GeomAPI_Pnt2d> aPt2 = aBuilder->point(*anIt2);
-      if (aPt1->distance(aPt2) < tolerance)
-        ++aNbCoinc;
-    }
+  // collect all shared coincidendes
+  std::set<FeaturePtr> aCoincidences;
+  std::set<AttributePtr>::const_iterator anIt;
+  for (anIt = aRefs1.begin(); anIt != aRefs1.end(); ++anIt) {
+    FeaturePtr aRef = ModelAPI_Feature::feature((*anIt)->owner());
+    if (aRef && aRef->getKind() == SketchPlugin_ConstraintCoincidence::ID())
+      aCoincidences.insert(aRef);
   }
-  return aNbCoinc == 1;
+  for (anIt = aRefs2.begin(); anIt != aRefs2.end(); ++anIt) {
+    FeaturePtr aRef = ModelAPI_Feature::feature((*anIt)->owner());
+    if (aRef)
+      aCoincidences.erase(aRef);
+  }
+
+  return aCoincidences.size() <= 1;
 }
 
 /// \brief Check if two connected arcs have centers
@@ -50,7 +44,7 @@ static bool isInternalTangency(EntityWrapperPtr theEntity1, EntityWrapperPtr the
 
 
 void SketchSolver_ConstraintTangent::getAttributes(
-    double& theValue,
+    EntityWrapperPtr& theValue,
     std::vector<EntityWrapperPtr>& theAttributes)
 {
   SketchSolver_Constraint::getAttributes(theValue, theAttributes);
@@ -97,9 +91,15 @@ void SketchSolver_ConstraintTangent::getAttributes(
     return;
   }
 
-  if (myType == CONSTRAINT_TANGENT_ARC_LINE &&
-      !hasSingleCoincidence(theAttributes[2], theAttributes[3]))
-    myErrorMsg = SketchSolver_Error::TANGENCY_FAILED();
+  if (myType == CONSTRAINT_TANGENT_ARC_LINE) {
+    AttributeRefAttrPtr aRefAttr = myBaseConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
+    FeaturePtr aFeature1 = ModelAPI_Feature::feature(aRefAttr->object());
+    aRefAttr = myBaseConstraint->refattr(SketchPlugin_Constraint::ENTITY_B());
+    FeaturePtr aFeature2 = ModelAPI_Feature::feature(aRefAttr->object());
+
+    if (!hasSingleCoincidence(aFeature1, aFeature2))
+      myErrorMsg = SketchSolver_Error::TANGENCY_FAILED();
+  }
 
   if (isSwap) {
     EntityWrapperPtr aTemp = theAttributes[2];
@@ -110,29 +110,13 @@ void SketchSolver_ConstraintTangent::getAttributes(
 
 void SketchSolver_ConstraintTangent::adjustConstraint()
 {
-  if (myType == CONSTRAINT_TANGENT_CIRCLE_LINE) {
-    ConstraintWrapperPtr aConstraint = myStorage->constraint(myBaseConstraint).front();
-    AttributePtr aCircleCenter = aConstraint->entities().front()->baseAttribute();
-    if (!aCircleCenter)
-      return;
-    FeaturePtr aCircle = ModelAPI_Feature::feature(aCircleCenter->owner());
-    AttributeDoublePtr aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-        aCircle->attribute(SketchPlugin_Circle::RADIUS_ID()));
+  if (myType == CONSTRAINT_TANGENT_ARC_ARC) {
+    EntityWrapperPtr anEntity1 =
+        myStorage->entity(myBaseConstraint->refattr(SketchPlugin_Constraint::ENTITY_A()));
+    EntityWrapperPtr anEntity2 =
+        myStorage->entity(myBaseConstraint->refattr(SketchPlugin_Constraint::ENTITY_B()));
 
-    if (fabs(aRadius->value()) == fabs(aConstraint->value()))
-      return;
-
-    aConstraint->setValue(aRadius->value());
-
-    // Adjust the sign of constraint value
-    BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-    aBuilder->adjustConstraint(aConstraint);
-    myStorage->addConstraint(myBaseConstraint, aConstraint);
-  }
-  else if (myType == CONSTRAINT_TANGENT_ARC_ARC) {
-    ConstraintWrapperPtr aConstraint = myStorage->constraint(myBaseConstraint).front();
-    if (isArcArcInternal != isInternalTangency(
-        aConstraint->entities().front(), aConstraint->entities().back())) {
+    if (isArcArcInternal != isInternalTangency(anEntity1, anEntity2)) {
       // fully rebuld constraint, because it is unable to access attributes of PlaneGCS constraint
       remove();
       process();

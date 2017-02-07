@@ -10,545 +10,344 @@
 #include <PlaneGCSSolver_ConstraintWrapper.h>
 #include <PlaneGCSSolver_EntityWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
-#include <PlaneGCSSolver_ScalarWrapper.h>
-#include <PlaneGCSSolver_ParameterWrapper.h>
 
-#include <GeomAPI_Edge.h>
+#include <PlaneGCSSolver_AttributeBuilder.h>
+#include <PlaneGCSSolver_FeatureBuilder.h>
+#include <PlaneGCSSolver_EntityDestroyer.h>
+
 #include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
-#include <SketchPlugin_Arc.h>
-#include <SketchPlugin_ConstraintTangent.h>
+#include <SketchPlugin_Projection.h>
 
 #include <cmath>
 
 
-PlaneGCSSolver_Storage::PlaneGCSSolver_Storage(const GroupID& theGroup)
-  : SketchSolver_Storage(theGroup),
-    myEntityLastID(EID_SKETCH),
+static void constraintsToSolver(const ConstraintWrapperPtr& theConstraint,
+                                const SolverPtr& theSolver)
+{
+  std::shared_ptr<PlaneGCSSolver_Solver> aSolver =
+      std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(theSolver);
+  if (!aSolver)
+    return;
+
+  const std::list<GCSConstraintPtr>& aConstraints =
+      std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(theConstraint)->constraints();
+  std::list<GCSConstraintPtr>::const_iterator anIt = aConstraints.begin();
+  for (; anIt != aConstraints.end(); ++anIt)
+    aSolver->addConstraint(*anIt);
+}
+
+
+PlaneGCSSolver_Storage::PlaneGCSSolver_Storage(const SolverPtr& theSolver)
+  : SketchSolver_Storage(theSolver),
     myConstraintLastID(CID_UNKNOWN)
 {
 }
 
 void PlaneGCSSolver_Storage::addConstraint(
-    ConstraintPtr                   theConstraint,
-    std::list<ConstraintWrapperPtr> theSolverConstraints)
+    ConstraintPtr        theConstraint,
+    ConstraintWrapperPtr theSolverConstraint)
 {
-  SketchSolver_Storage::addConstraint(theConstraint, theSolverConstraints);
+  SketchSolver_Storage::addConstraint(theConstraint, theSolverConstraint);
 
-  // update point-point coincidence
-  if (!theSolverConstraints.empty() &&
-      theSolverConstraints.front()->type() == CONSTRAINT_PT_PT_COINCIDENT) {
-    std::list<ConstraintWrapperPtr>::iterator aCIt = theSolverConstraints.begin();
-    for (; aCIt != theSolverConstraints.end(); ++aCIt)
-      update(*aCIt);
-  }
+  theSolverConstraint->setId(++myConstraintLastID);
+  constraintsToSolver(theSolverConstraint, mySketchSolver);
+}
+
+void PlaneGCSSolver_Storage::addTemporaryConstraint(
+    const ConstraintWrapperPtr& theSolverConstraint)
+{
+  if (myConstraintMap.empty())
+    return; // no need to process temporary constraints if there is no active constraint
+
+  theSolverConstraint->setId(CID_MOVEMENT);
+  constraintsToSolver(theSolverConstraint, mySketchSolver);
 }
 
 
-bool PlaneGCSSolver_Storage::update(ConstraintWrapperPtr theConstraint)
+EntityWrapperPtr PlaneGCSSolver_Storage::createFeature(
+    const FeaturePtr&             theFeature,
+    PlaneGCSSolver_EntityBuilder* theBuilder)
 {
-  bool isUpdated = false;
-  std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aConstraint =
-      std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(theConstraint);
+  std::list<AttributePtr> anAttributes = theFeature->data()->attributes(std::string());
+  std::list<AttributePtr>::const_iterator anIt = anAttributes.begin();
+  for (; anIt != anAttributes.end(); ++anIt)
+    createAttribute(*anIt, theBuilder);
 
-  // point-Line distance should be positive
-  if (aConstraint->type() == CONSTRAINT_PT_LINE_DISTANCE && aConstraint->value() < 0.0)
-    aConstraint->setValue(-aConstraint->value());
+  EntityWrapperPtr aResult = theBuilder->createFeature(theFeature);
+  if (aResult)
+    addEntity(theFeature, aResult);
+  return aResult;
+}
 
-  // make value of constraint unchangeable
-  ParameterWrapperPtr aValue = aConstraint->valueParameter();
-  if (aValue)
-    isUpdated = update(aValue) || isUpdated;
+EntityWrapperPtr PlaneGCSSolver_Storage::createAttribute(
+    const AttributePtr&           theAttribute,
+    PlaneGCSSolver_EntityBuilder* theBuilder)
+{
+  EntityWrapperPtr aResult = theBuilder->createAttribute(theAttribute);
+  if (aResult)
+    addEntity(theAttribute, aResult);
+  return aResult;
+}
 
-  // update constrained entities
-  std::list<EntityWrapperPtr> anEntities = theConstraint->entities();
-  std::list<EntityWrapperPtr>::iterator anIt = anEntities.begin();
-  for (; anIt != anEntities.end(); ++anIt)
-    isUpdated = update(*anIt) || isUpdated;
-
-  if (aConstraint->id() == CID_UNKNOWN) {
-    const std::list<EntityWrapperPtr>& aSubs = aConstraint->entities();
-    // check middle-point constraint conflicts with point-on-line
-    if (aConstraint->type() == CONSTRAINT_MIDDLE_POINT) {
-      std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
-          anIt = myConstraintMap.begin();
-      for (; anIt != myConstraintMap.end(); ++anIt) {
-        EntityWrapperPtr aPoint, aLine;
-        if (anIt->second.empty())
-          continue;
-        ConstraintWrapperPtr aCurrentConstr = anIt->second.front();
-        if (aCurrentConstr->type() != CONSTRAINT_PT_ON_LINE)
-          continue;
-        const std::list<EntityWrapperPtr>& aCurSubs = aCurrentConstr->entities();
-        std::list<EntityWrapperPtr>::const_iterator aSIt1, aSIt2;
-        for (aSIt1 = aSubs.begin(); aSIt1 != aSubs.end(); ++aSIt1) {
-          if ((*aSIt1)->type() == ENTITY_POINT)
-            aPoint = *aSIt1;
-          else if((*aSIt1)->type() == ENTITY_LINE)
-            aLine = *aSIt1;
-          else
-            continue;
-          for (aSIt2 = aCurSubs.begin(); aSIt2 != aCurSubs.end(); ++aSIt2)
-            if ((*aSIt1)->id() == (*aSIt2)->id())
-              break;
-          if (aSIt2 == aCurSubs.end())
-            break;
-        }
-        // point-on-line found, change it to bisector
-        if (aSIt1 == aSubs.end()) {
-          std::list<GCSConstraintPtr> aConstrList = aConstraint->constraints();
-          aConstrList.pop_front();
-          aConstraint->setConstraints(aConstrList);
-          break;
-        }
-      }
-    }
-
-    // Change ID of constraints
-    aConstraint->setId(++myConstraintLastID);
-  }
-
+/// \brief Update value
+static bool updateValue(const double& theSource, double& theDest)
+{
+  static const double aTol = 1000. * tolerance;
+  bool isUpdated = fabs(theSource - theDest) > aTol;
+  if (isUpdated)
+    theDest = theSource;
   return isUpdated;
 }
 
 /// \brief Update coordinates of the point or scalar using its base attribute
-static bool updateValues(EntityWrapperPtr& theEntity)
+static bool updateValues(AttributePtr& theAttribute, EntityWrapperPtr& theEntity)
 {
-  const double aTol = 1000. * tolerance;
   bool isUpdated = false;
-  AttributePtr anAttr = theEntity->baseAttribute();
-  const std::list<ParameterWrapperPtr> aParams = theEntity->parameters();
-
-  double aCoord[2];
 
   std::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr);
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
   if (aPoint2D) {
-    aCoord[0] = aPoint2D->x();
-    aCoord[1] = aPoint2D->y();
+    const GCSPointPtr& aGCSPoint =
+        std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theEntity)->point();
+    isUpdated = updateValue(aPoint2D->x(), *(aGCSPoint->x)) || isUpdated;
+    isUpdated = updateValue(aPoint2D->y(), *(aGCSPoint->y)) || isUpdated;
   } else {
-    AttributeDoublePtr aScalar = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anAttr);
-    if (aScalar)
-      aCoord[0] = aScalar->value();
-  }
-
-  std::list<ParameterWrapperPtr>::const_iterator anIt = aParams.begin();
-  for (int i = 0; anIt != aParams.end(); ++anIt, ++i)
-    if (fabs((*anIt)->value() - aCoord[i]) > aTol) {
-      (*anIt)->setValue(aCoord[i]);
-      isUpdated = true;
-    }
-  return isUpdated;
-}
-
-bool PlaneGCSSolver_Storage::update(EntityWrapperPtr theEntity)
-{
-  if (theEntity->type() == ENTITY_SKETCH)
-    return true; // sketch is not necessary for PlaneGCS, so it is always says true
-
-  bool isUpdated = false;
-
-  if (theEntity->baseAttribute()) {
-    isUpdated = updateValues(theEntity);
-    if (isUpdated) {
-      setNeedToResolve(true);
-      if (theEntity->type() == ENTITY_POINT && theEntity->group() != myGroupID)
-        updateCoincident(theEntity);
-    }
-  }
-
-  // update parameters
-  std::list<ParameterWrapperPtr> aParams = theEntity->parameters();
-  std::list<ParameterWrapperPtr>::iterator aPIt = aParams.begin();
-  for (; aPIt != aParams.end(); ++aPIt)
-    isUpdated = update(*aPIt) || isUpdated;
-
-  // update sub-entities
-  std::list<EntityWrapperPtr> aSubEntities = theEntity->subEntities();
-  std::list<EntityWrapperPtr>::iterator aSIt = aSubEntities.begin();
-  for (; aSIt != aSubEntities.end(); ++aSIt)
-    isUpdated = update(*aSIt) || isUpdated;
-
-  // additional constraints for the arc processing
-  if (theEntity->type() == ENTITY_ARC)
-    processArc(theEntity);
-
-  // Change entity's ID, if necessary
-  if (theEntity->id() == EID_UNKNOWN) {
-    if (theEntity->type() == ENTITY_POINT) {
-      std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint =
-          std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theEntity);
-      if (!aPoint) {
-        aPoint = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(
-            theEntity->subEntities().front());
-      }
-      aPoint->setId(++myEntityLastID);
-    } else if (theEntity->type() == ENTITY_SCALAR) {
-      std::shared_ptr<PlaneGCSSolver_ScalarWrapper> aScalar =
+    AttributeDoublePtr aScalar =
+        std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
+    if (aScalar) {
+      ScalarWrapperPtr aWrapper =
           std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(theEntity);
-      aScalar->setId(++myEntityLastID);
-    } else {
-      std::shared_ptr<PlaneGCSSolver_EntityWrapper> aGCSEnt =
-          std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(theEntity);
-      aGCSEnt->setId(++myEntityLastID);
+      // There is possible angular value, which is converted between degrees and radians.
+      // So, we use its value instead of using direct pointer to value.
+      double aValue = aWrapper->value();
+      isUpdated = updateValue(aScalar->value(), aValue);
+      if (isUpdated)
+        aWrapper->setValue(aValue);
     }
   }
+
   return isUpdated;
 }
 
-bool PlaneGCSSolver_Storage::update(ParameterWrapperPtr theParameter)
+static bool isCopyInMulti(std::shared_ptr<SketchPlugin_Feature> theFeature)
 {
-  std::shared_ptr<PlaneGCSSolver_ParameterWrapper> aParam =
-      std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(theParameter);
-  if (aParam->isProcessed())
+  if (!theFeature)
     return false;
-  if (theParameter->group() != myGroupID || theParameter->isParametric())
-    myConst.push_back(aParam->parameter());
-  else
-    myParameters.push_back(aParam->parameter());
-  aParam->setProcessed(true);
+
+  bool aResult = theFeature->isCopy();
+  if (aResult) {
+    const std::set<AttributePtr>& aRefs = theFeature->data()->refsToMe();
+    for (std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin();
+         aRefIt != aRefs.end() && aResult; ++aRefIt) {
+      FeaturePtr anOwner = ModelAPI_Feature::feature((*aRefIt)->owner());
+      if (anOwner->getKind() == SketchPlugin_Projection::ID())
+        aResult = false;
+    }
+  }
+  return aResult;
+}
+
+bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
+{
+  bool isUpdated = false;
+  EntityWrapperPtr aRelated = entity(theFeature);
+  if (aRelated) // send signal to subscribers
+    notify(theFeature);
+  else { // Feature is not exist, create it
+    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
+    bool isCopy = isCopyInMulti(aSketchFeature);
+    // the feature is a copy in "Multi" constraint and does not used in other constraints
+    if (!theForce && isCopy && myFeatureMap.find(theFeature) == myFeatureMap.end())
+      return false;
+
+    // external feature processing
+    bool isExternal = (aSketchFeature && (aSketchFeature->isExternal() || isCopy));
+
+    PlaneGCSSolver_FeatureBuilder aBuilder(isExternal ? 0 : this);
+
+    // Reserve the feature in the map of features
+    // (do not want to add several copies of it while adding attributes)
+    aRelated = createFeature(theFeature, &aBuilder);
+    myFeatureMap[theFeature] = aRelated;
+
+    const std::list<GCSConstraintPtr>& aConstraints = aBuilder.constraints();
+    if (!aConstraints.empty()) { // the feature is arc
+      /// TODO: avoid this workaround
+      ConstraintWrapperPtr aWrapper(
+          new PlaneGCSSolver_ConstraintWrapper(aConstraints, CONSTRAINT_UNKNOWN));
+      aWrapper->setId(++myConstraintLastID);
+      constraintsToSolver(aWrapper, mySketchSolver);
+
+      myArcConstraintMap[myFeatureMap[theFeature]] = aWrapper;
+    }
+    isUpdated = true;
+  }
+
+  std::list<AttributePtr> anAttributes = theFeature->data()->attributes(std::string());
+  std::list<AttributePtr>::iterator anAttrIt = anAttributes.begin();
+  for (; anAttrIt != anAttributes.end(); ++anAttrIt)
+    if ((*anAttrIt)->attributeType() == GeomDataAPI_Point2D::typeId() ||
+        (*anAttrIt)->attributeType() == ModelAPI_AttributeDouble::typeId())
+      isUpdated = update(*anAttrIt) || isUpdated;
+
+  // update arc
+  if (aRelated && aRelated->type() == ENTITY_ARC) {
+    /// TODO: this code should be shared with FeatureBuilder somehow
+
+    std::shared_ptr<PlaneGCSSolver_EntityWrapper> anEntity =
+        std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(aRelated);
+    std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEntity->entity());
+
+    static std::shared_ptr<GeomAPI_Dir2d> OX(new GeomAPI_Dir2d(1.0, 0.0));
+    std::shared_ptr<GeomAPI_Pnt2d> aCenter(
+        new GeomAPI_Pnt2d(*anArc->center.x, *anArc->center.y));
+    std::shared_ptr<GeomAPI_Pnt2d> aStart(
+        new GeomAPI_Pnt2d(*anArc->start.x, *anArc->start.y));
+
+    *anArc->rad = aStart->distance(aCenter);
+
+    std::shared_ptr<GeomAPI_Dir2d> aDir(new GeomAPI_Dir2d(aStart->xy()->decreased(aCenter->xy())));
+    *anArc->startAngle = OX->angle(aDir);
+
+    aDir = std::shared_ptr<GeomAPI_Dir2d>(
+        new GeomAPI_Dir2d((*anArc->end.x) - aCenter->x(), (*anArc->end.y) - aCenter->y()));
+    *anArc->endAngle = OX->angle(aDir);
+  }
+
+  return isUpdated;
+}
+
+bool PlaneGCSSolver_Storage::update(AttributePtr theAttribute, bool theForce)
+{
+  if (!theAttribute->isInitialized())
+    return false;
+
+  AttributePtr anAttribute = theAttribute;
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
+  if (aRefAttr) {
+    if (aRefAttr->isObject()) {
+      FeaturePtr aFeature;
+      /// TODO: Check resultToFeatureOrAttribute() precisely.
+      resultToFeatureOrAttribute(aRefAttr->object(), aFeature, anAttribute);
+      if (aFeature)
+        return update(aFeature, theForce);
+    } else
+      anAttribute = aRefAttr->attr();
+  }
+
+  EntityWrapperPtr aRelated = entity(anAttribute);
+  if (!aRelated) { // Attribute does not exist, create it.
+    // First of all check if the parent feature exists. If not, add it.
+    FeaturePtr aFeature = ModelAPI_Feature::feature(anAttribute->owner());
+    if (aFeature && myFeatureMap.find(aFeature) == myFeatureMap.end())
+      return update(aFeature, theForce); // theAttribute has been processed while adding feature
+
+    PlaneGCSSolver_AttributeBuilder aBuilder(this);
+    aRelated = createAttribute(anAttribute, &aBuilder);
+    return aRelated.get() != 0;
+  }
+
+  bool isUpdated = updateValues(anAttribute, aRelated);
+  if (isUpdated)
+    setNeedToResolve(true);
+  return isUpdated;
+}
+
+
+
+bool PlaneGCSSolver_Storage::removeConstraint(ConstraintPtr theConstraint)
+{
+  std::map<ConstraintPtr, ConstraintWrapperPtr>::iterator
+      aFound = myConstraintMap.find(theConstraint);
+  if (aFound != myConstraintMap.end()) {
+    ConstraintID anID = aFound->second->id();
+    // Remove solver's constraints
+    std::shared_ptr<PlaneGCSSolver_Solver> aSolver =
+        std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(mySketchSolver);
+    aSolver->removeConstraint(anID);
+    // Remove constraint
+    myConstraintMap.erase(aFound);
+
+    // notify subscibers
+    notify(theConstraint);
+  }
   return true;
 }
 
-
-bool PlaneGCSSolver_Storage::remove(ConstraintWrapperPtr theConstraint)
+void PlaneGCSSolver_Storage::removeInvalidEntities()
 {
-  std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aConstraint =
-    std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(theConstraint);
+  PlaneGCSSolver_EntityDestroyer aDestroyer;
 
-  bool isFullyRemoved = true;
-  // remove point-point coincidence
-  if (aConstraint->type() == CONSTRAINT_PT_PT_COINCIDENT)
-    isFullyRemoved = removeCoincidence(theConstraint) && isFullyRemoved;
-  // remove sub-entities
-  const std::list<EntityWrapperPtr>& aSubs = aConstraint->entities();
-  std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
-  for (; aSIt != aSubs.end(); ++ aSIt)
-    isFullyRemoved = remove(*aSIt) && isFullyRemoved;
+  // Remove invalid constraints
+  std::list<ConstraintPtr> anInvalidConstraints;
+  std::map<ConstraintPtr, ConstraintWrapperPtr>::const_iterator
+      aCIter = myConstraintMap.begin();
+  for (; aCIter != myConstraintMap.end(); ++aCIter)
+    if (!aCIter->first->data() || !aCIter->first->data()->isValid())
+      anInvalidConstraints.push_back(aCIter->first);
+  std::list<ConstraintPtr>::const_iterator anInvCIt = anInvalidConstraints.begin();
+  for (; anInvCIt != anInvalidConstraints.end(); ++anInvCIt)
+    removeConstraint(*anInvCIt);
 
-  if (aConstraint->valueParameter())
-    isFullyRemoved = remove(aConstraint->valueParameter()) && isFullyRemoved;
-  if (!isFullyRemoved && aConstraint->baseConstraint() &&
-     (!aConstraint->baseConstraint()->data() || !aConstraint->baseConstraint()->data()->isValid()))
-    isFullyRemoved = true;
-  setNeedToResolve(true);
-  myRemovedConstraints.insert(myRemovedConstraints.end(),
-      aConstraint->constraints().begin(), aConstraint->constraints().end());
+  // Remove invalid features
+  std::list<FeaturePtr> anInvalidFeatures;
+  std::map<FeaturePtr, EntityWrapperPtr>::const_iterator aFIter = myFeatureMap.begin();
+  for (; aFIter != myFeatureMap.end(); aFIter++)
+    if (!aFIter->first->data() || !aFIter->first->data()->isValid()) {
+      anInvalidFeatures.push_back(aFIter->first);
+      aDestroyer.remove(aFIter->second);
 
-  if (isFullyRemoved && theConstraint->id() == myConstraintLastID)
-    --myConstraintLastID;
-
-  return isFullyRemoved;
-}
-
-bool PlaneGCSSolver_Storage::remove(EntityWrapperPtr theEntity)
-{
-  // do not remove entity, if it is used by constraints or other entities
-  if ((theEntity->baseFeature() && isUsed(theEntity->baseFeature())) ||
-      (theEntity->baseAttribute() && isUsed(theEntity->baseAttribute())))
-    return false;
-
-  bool isFullyRemoved = SketchSolver_Storage::remove(theEntity);
-  if (isFullyRemoved) {
-    if (theEntity->type() == ENTITY_ARC) {
-      // remove arc additional constraints
-      std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >::iterator
-          aFound = myArcConstraintMap.find(theEntity);
+      // remove invalid arc
+      std::map<EntityWrapperPtr, ConstraintWrapperPtr>::iterator
+          aFound = myArcConstraintMap.find(aFIter->second);
       if (aFound != myArcConstraintMap.end()) {
-        myRemovedConstraints.insert(myRemovedConstraints.end(),
-            aFound->second.begin(), aFound->second.end());
+        std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(
+            mySketchSolver)->removeConstraint(aFound->second->id());
         myArcConstraintMap.erase(aFound);
       }
     }
-    if (theEntity->id() == myEntityLastID)
-      --myEntityLastID;
-  }
-  return isFullyRemoved;
-}
+  std::list<FeaturePtr>::const_iterator anInvFIt = anInvalidFeatures.begin();
+  for (; anInvFIt != anInvalidFeatures.end(); ++anInvFIt)
+    removeFeature(*anInvFIt);
 
-bool PlaneGCSSolver_Storage::remove(ParameterWrapperPtr theParameter)
-{
-  std::shared_ptr<PlaneGCSSolver_ParameterWrapper> aParam =
-      std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(theParameter);
-  if (aParam->isProcessed()) {
-    double* aValPtr = aParam->parameter();
-    GCS::VEC_pD::iterator anIt =  myParameters.begin();
-    for (; anIt != myParameters.end(); ++anIt)
-      if (*anIt == aValPtr)
-        break;
-    if (anIt != myParameters.end()) {
-      myParameters.erase(anIt);
-      setNeedToResolve(true);
-      aParam->setProcessed(false);
-    }
-    else {
-      for (anIt = myConst.begin(); anIt != myConst.end(); ++anIt)
-        if (*anIt == aValPtr)
-          break;
-      if (anIt != myConst.end()) {
-        myConst.erase(anIt);
-        setNeedToResolve(true);
-        aParam->setProcessed(false);
-      }
+  // Remove invalid attributes
+  std::list<AttributePtr> anInvalidAttributes;
+  std::map<AttributePtr, EntityWrapperPtr>::const_iterator anAttrIt = myAttributeMap.begin();
+  for (; anAttrIt != myAttributeMap.end(); ++anAttrIt) {
+    FeaturePtr anOwner = ModelAPI_Feature::feature(anAttrIt->first->owner());
+    if (!anOwner || !anOwner->data() || !anOwner->data()->isValid()) {
+      anInvalidAttributes.push_back(anAttrIt->first);
+      aDestroyer.remove(anAttrIt->second);
     }
   }
-  return true;
+  std::list<AttributePtr>::const_iterator anInvAtIt = anInvalidAttributes.begin();
+  for (; anInvAtIt != anInvalidAttributes.end(); ++anInvAtIt)
+    removeAttribute(*anInvAtIt);
+
+  // free memory occupied by parameters
+  removeParameters(aDestroyer.parametersToRemove());
+
+  /// TODO: Think on optimization of checking invalid features and attributes
 }
 
 
-void PlaneGCSSolver_Storage::addCoincidentPoints(
-    EntityWrapperPtr theMaster, EntityWrapperPtr theSlave)
+
+double* PlaneGCSSolver_Storage::createParameter()
 {
-  if (theMaster->type() != ENTITY_POINT || theSlave->type() != ENTITY_POINT)
-    return;
-
-  std::shared_ptr<PlaneGCSSolver_PointWrapper> aMaster =
-      std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theMaster);
-  if (!aMaster)
-    aMaster = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(
-      std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(theMaster)->subEntities().front());
-  std::shared_ptr<PlaneGCSSolver_PointWrapper> aSlave =
-      std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theSlave);
-  if (!aSlave)
-    aSlave = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(
-      std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(theSlave)->subEntities().front());
-
-  // Search available coincidence
-  CoincidentPointsMap::iterator aMasterFound = myCoincidentPoints.find(aMaster);
-  CoincidentPointsMap::iterator aSlaveFound = myCoincidentPoints.find(aSlave);
-  if (aMasterFound == myCoincidentPoints.end() &&  aSlaveFound == myCoincidentPoints.end()) {
-    // try to find master and slave points in the lists of slaves of already existent coincidences
-    CoincidentPointsMap::iterator anIt = myCoincidentPoints.begin();
-    for (; anIt != myCoincidentPoints.end(); ++anIt) {
-      if (anIt->second.find(aMaster) != anIt->second.end())
-        aMasterFound = anIt;
-      else if (anIt->second.find(aSlave) != anIt->second.end())
-        aSlaveFound = anIt;
-
-      if (aMasterFound != myCoincidentPoints.end() &&  aSlaveFound != myCoincidentPoints.end())
-        break;
-    }
-  }
-
-  if (aMasterFound == myCoincidentPoints.end()) {
-    // create new group
-    myCoincidentPoints[aMaster] = std::set<EntityWrapperPtr>();
-    aMasterFound = myCoincidentPoints.find(aMaster);
-  } else if (aMasterFound == aSlaveFound)
-    return; // already coincident
-
-  if (aSlaveFound != myCoincidentPoints.end()) {
-    // A slave has been found, we need to attach all points coincident with it to the new master
-    std::set<EntityWrapperPtr> aNewSlaves = aSlaveFound->second;
-    aNewSlaves.insert(aSlaveFound->first);
-    myCoincidentPoints.erase(aSlaveFound);
-
-    std::set<EntityWrapperPtr>::const_iterator aSlIt = aNewSlaves.begin();
-    for (; aSlIt != aNewSlaves.end(); ++aSlIt)
-      addCoincidentPoints(aMaster, *aSlIt);
-  } else {
-    //std::list<ParameterWrapperPtr> aSlaveParams = aSlave->parameters();
-    //aSlave->setParameters(aMaster->parameters());
-
-    //// Remove slave's parameters
-    //std::list<ParameterWrapperPtr>::iterator aParIt = aSlaveParams.begin();
-    //for (; aParIt != aSlaveParams.end(); ++aParIt)
-    //  remove(*aParIt);
-
-    aMasterFound->second.insert(aSlave);
-  }
+  double* aResult = new double(0);
+  myParameters.push_back(aResult);
+  return aResult;
 }
 
-
-void PlaneGCSSolver_Storage::changeGroup(EntityWrapperPtr theEntity, const GroupID& theGroup)
+void PlaneGCSSolver_Storage::removeParameters(const GCS::SET_pD& theParams)
 {
-  theEntity->setGroup(theGroup);
-  if (theGroup == myGroupID)
-    makeVariable(theEntity);
-  else {
-    if (theEntity->type() == ENTITY_POINT)
-      update(theEntity);
-    makeConstant(theEntity);
-  }
-}
-
-void PlaneGCSSolver_Storage::changeGroup(ParameterWrapperPtr theParam, const GroupID& theGroup)
-{
-  // TODO
-}
-
-void PlaneGCSSolver_Storage::verifyFixed()
-{
-  // TODO
-}
-
-void PlaneGCSSolver_Storage::processArc(const EntityWrapperPtr& theArc)
-{
-  // Calculate additional parameters necessary for PlaneGCS
-  const std::list<EntityWrapperPtr>& aSubs = theArc->subEntities();
-  std::list<EntityWrapperPtr>::const_iterator aSubIt = aSubs.begin();
-  bool isFixed[3] = {false, false, false};
-  for (int i = 0; (*aSubIt)->type() == ENTITY_POINT; ++i) { // search scalar entities
-    isFixed[i] = (*aSubIt)->group() == GID_OUTOFGROUP;
-    ++aSubIt;
-  }
-  double* aStartAngle =
-    std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(*aSubIt++)->scalar();
-  double* aEndAngle =
-    std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(*aSubIt++)->scalar();
-  double* aRadius = std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(*aSubIt)->scalar();
-
-  std::shared_ptr<SketchPlugin_Feature> anArcFeature =
-      std::dynamic_pointer_cast<SketchPlugin_Feature>(theArc->baseFeature());
-  std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      anArcFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      anArcFeature->attribute(SketchPlugin_Arc::START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aEndAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      anArcFeature->attribute(SketchPlugin_Arc::END_ID()));
-  if (!aCenterAttr || !aStartAttr || !aEndAttr)
-    return;
-  std::shared_ptr<GeomAPI_Pnt2d> aCenterPnt = aCenterAttr->pnt();
-  std::shared_ptr<GeomAPI_Pnt2d> aStartPnt  = aStartAttr->pnt();
-  std::shared_ptr<GeomAPI_Pnt2d> aEndPnt    = aEndAttr->pnt();
-
-  if (isFixed[2] && !isFixed[1])
-    *aRadius = aCenterPnt->distance(aEndPnt);
-  else
-    *aRadius = aCenterPnt->distance(aStartPnt);
-  if (!anArcFeature->lastResult())
-    return;
-  static std::shared_ptr<GeomAPI_Dir2d> OX(new GeomAPI_Dir2d(1.0, 0.0));
-  std::shared_ptr<GeomAPI_Dir2d> aDir(new GeomAPI_Dir2d(
-      aStartPnt->xy()->decreased(aCenterPnt->xy())));
-  *aStartAngle = OX->angle(aDir);
-  aDir = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d(
-      aEndPnt->xy()->decreased(aCenterPnt->xy())));
-  *aEndAngle = OX->angle(aDir);
-
-  // no need to constraint a fixed or a copied arc
-  if (theArc->group() == GID_OUTOFGROUP || anArcFeature->isCopy())
-    return;
-  // No need to add constraints if they are already exist
-  std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >::const_iterator
-      aFound = myArcConstraintMap.find(theArc);
-//  if (aFound != myArcConstraintMap.end())
-//    return;
-
-  // Prepare additional constraints to produce the arc
-  std::vector<GCSConstraintPtr> anArcConstraints;
-  std::shared_ptr<PlaneGCSSolver_EntityWrapper> anArcEnt =
-      std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(theArc);
-  std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anArcEnt->entity());
-  // Distances from center till start and end points are equal to radius
-  GCSConstraintPtr aNew = GCSConstraintPtr(new GCS::ConstraintP2PDistance(
-      anArc->center, anArc->start, anArc->rad));
-//  aNew->setTag((int)(++myConstraintLastID));
-  anArcConstraints.push_back(aNew);
-  aNew = GCSConstraintPtr(new GCS::ConstraintP2PDistance(
-      anArc->center, anArc->end, anArc->rad));
-//  aNew->setTag((int)myConstraintLastID);
-  anArcConstraints.push_back(aNew);
-  // Angles of start and end points should be equal to given angles
-  aNew = GCSConstraintPtr(new GCS::ConstraintP2PAngle(
-      anArc->center, anArc->start, anArc->startAngle));
-//  aNew->setTag((int)myConstraintLastID);
-  anArcConstraints.push_back(aNew);
-  aNew = GCSConstraintPtr(new GCS::ConstraintP2PAngle(
-      anArc->center, anArc->end, anArc->endAngle));
-//  aNew->setTag((int)myConstraintLastID);
-  anArcConstraints.push_back(aNew);
-
-  myArcConstraintMap[theArc] = anArcConstraints;
-}
-
-
-void PlaneGCSSolver_Storage::makeConstant(const EntityWrapperPtr& theEntity)
-{
-  toggleEntity(theEntity, myParameters, myConst);
-  if (theEntity->type() == ENTITY_POINT)
-    updateCoincident(theEntity);
-}
-
-void PlaneGCSSolver_Storage::makeVariable(const EntityWrapperPtr& theEntity)
-{
-  toggleEntity(theEntity, myConst, myParameters);
-}
-
-static void getParametersToMove(const EntityWrapperPtr& theEntity, std::set<double*>& theParamList)
-{
-  const std::list<ParameterWrapperPtr> aParams = theEntity->parameters();
-  std::list<ParameterWrapperPtr>::const_iterator aPIt = aParams.begin();
-  for (; aPIt != aParams.end(); ++aPIt)
-    theParamList.insert(
-        std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(*aPIt)->parameter());
-
-  const std::list<EntityWrapperPtr> aSubs = theEntity->subEntities();
-  std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
-
-  if (theEntity->type() == ENTITY_ARC) {
-    // workaround for the arc processing, because the arc is fixed by a set of constraints,
-    // which will conflict with all parameters fixed:
-    // 1. take center
-    getParametersToMove(*aSIt++, theParamList);
-    // 2. skip start and end points
-    ++aSIt;
-    // 3. take radius, start angle and end angle parameters
-    getParametersToMove(*(++aSIt), theParamList);
-    getParametersToMove(*(++aSIt), theParamList);
-    getParametersToMove(*(++aSIt), theParamList);
-  } else {
-    for (; aSIt != aSubs.end(); ++aSIt)
-      getParametersToMove(*aSIt, theParamList);
-  }
-}
-
-void PlaneGCSSolver_Storage::toggleEntity(
-    const EntityWrapperPtr& theEntity, GCS::VEC_pD& theFrom, GCS::VEC_pD& theTo)
-{
-  std::set<double*> aParamsToMove;
-  getParametersToMove(theEntity, aParamsToMove);
-
-  GCS::VEC_pD::iterator anIt = theFrom.begin();
-  while (anIt != theFrom.end()) {
-    if (aParamsToMove.find(*anIt) == aParamsToMove.end()) {
-      ++anIt;
-      continue;
-    }
-
-    theTo.push_back(*anIt);
-    int aShift = int(anIt - theFrom.begin());
-    theFrom.erase(anIt);
-    anIt = theFrom.begin() + aShift;
-  }
-}
-
-void PlaneGCSSolver_Storage::updateCoincident(const EntityWrapperPtr& thePoint)
-{
-  CoincidentPointsMap::iterator anIt = myCoincidentPoints.begin();
-  for (; anIt != myCoincidentPoints.end(); ++anIt) {
-    if (anIt->first == thePoint || anIt->second.find(thePoint) != anIt->second.end()) {
-      std::set<EntityWrapperPtr> aCoincident = anIt->second;
-      aCoincident.insert(anIt->first);
-
-      const std::list<ParameterWrapperPtr>& aBaseParams = thePoint->parameters();
-      std::list<ParameterWrapperPtr> aParams;
-      std::list<ParameterWrapperPtr>::const_iterator aBaseIt, anUpdIt;
-
-      std::set<EntityWrapperPtr>::const_iterator aCoincIt = aCoincident.begin();
-      for (; aCoincIt != aCoincident.end(); ++aCoincIt)
-        if (*aCoincIt != thePoint && (*aCoincIt)->group() != GID_OUTOFGROUP) {
-          aParams = (*aCoincIt)->parameters();
-          aBaseIt = aBaseParams.begin();
-          for (anUpdIt = aParams.begin(); anUpdIt != aParams.end(); ++anUpdIt, ++aBaseIt)
-            (*anUpdIt)->setValue((*aBaseIt)->value());
-        }
-
-      break;
-    }
-  }
+  for (int i = (int)myParameters.size() - 1; i >= 0; --i)
+    if (theParams.find(myParameters[i]) != theParams.end())
+      myParameters.erase(myParameters.begin() + i);
 }
 
 
@@ -605,54 +404,12 @@ bool PlaneGCSSolver_Storage::isRedundant(
   return false;
 }
 
-void PlaneGCSSolver_Storage::initializeSolver(SolverPtr theSolver)
+void PlaneGCSSolver_Storage::initializeSolver()
 {
   std::shared_ptr<PlaneGCSSolver_Solver> aSolver =
-      std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(theSolver);
-  if (!aSolver)
-    return;
-  aSolver->clear();
-
-  if (myExistArc)
-    processArcs();
-
-  // initialize constraints
-  std::map<ConstraintPtr, std::list<ConstraintWrapperPtr> >::const_iterator
-      aCIt = myConstraintMap.begin();
-  GCS::SET_I aTangentIDs;
-  std::list<std::set<double*> > aCoincidentPoints;
-  for (; aCIt != myConstraintMap.end(); ++aCIt) {
-    std::list<ConstraintWrapperPtr>::const_iterator aCWIt = aCIt->second.begin();
-    for (; aCWIt != aCIt->second.end(); ++ aCWIt) {
-      std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aGCS =
-          std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(*aCWIt);
-      std::list<GCSConstraintPtr>::const_iterator anIt = aGCS->constraints().begin();
-      for (; anIt != aGCS->constraints().end(); ++anIt)
-        if (!isRedundant(*anIt, aGCS, aCoincidentPoints))
-          aSolver->addConstraint(*anIt, aGCS->type());
-    }
-    // store IDs of tangent constraints to avoid incorrect report of redundant constraints
-    if (aCIt->first && aCIt->first->getKind() == SketchPlugin_ConstraintTangent::ID())
-      for (aCWIt = aCIt->second.begin(); aCWIt != aCIt->second.end(); ++ aCWIt)
-        aTangentIDs.insert((int)(*aCWIt)->id());
-  }
-  // additional constraints for arcs
-  std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >::const_iterator
-      anArcIt = myArcConstraintMap.begin();
-  for (; anArcIt != myArcConstraintMap.end(); ++anArcIt) {
-    std::vector<GCSConstraintPtr>::const_iterator anIt = anArcIt->second.begin();
-    for (; anIt != anArcIt->second.end(); ++anIt)
-      aSolver->addConstraint(*anIt, CONSTRAINT_UNKNOWN);
-  }
-  // removed waste constraints
-  std::list<GCSConstraintPtr>::const_iterator aRemIt = myRemovedConstraints.begin();
-  for (; aRemIt != myRemovedConstraints.end(); ++aRemIt)
-    aSolver->removeConstraint(*aRemIt);
-  myRemovedConstraints.clear();
-  // set list of tangent constraints
-  aSolver->setTangent(aTangentIDs);
-  // initialize unknowns
-  aSolver->setParameters(myParameters);
+      std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(mySketchSolver);
+  if (aSolver)
+    aSolver->setParameters(myParameters);
 }
 
 // indicates attribute containing in the external feature
@@ -665,157 +422,35 @@ bool isExternalAttribute(const AttributePtr& theAttribute)
   return aSketchFeature.get() && aSketchFeature->isExternal();
 }
 
-void PlaneGCSSolver_Storage::refresh(bool theFixedOnly) const
+void PlaneGCSSolver_Storage::refresh() const
 {
-  //blockEvents(true);
-
   const double aTol = 1000. * tolerance; // tolerance to prevent frequent updates
 
   std::map<AttributePtr, EntityWrapperPtr>::const_iterator anIt = myAttributeMap.begin();
-  std::list<ParameterWrapperPtr> aParams;
-  std::list<ParameterWrapperPtr>::const_iterator aParIt;
   for (; anIt != myAttributeMap.end(); ++anIt) {
     // the external feature always should keep the up to date values, so,
     // refresh from the solver is never needed
-    bool isExternal = isExternalAttribute(anIt->first);
-
-    // update parameter wrappers and obtain values of attributes
-    aParams = anIt->second->parameters();
-    double aCoords[3];
-    bool isUpd[3] = {false};
-    int i = 0;
-    for (aParIt = aParams.begin(); i < 3 && aParIt != aParams.end(); ++aParIt, ++i) {
-      if (!theFixedOnly || isExternal ||
-          (*aParIt)->group() == GID_OUTOFGROUP || (*aParIt)->isParametric()) {
-        aCoords[i] = (*aParIt)->value();
-        isUpd[i] = true;
-      }
-    }
-    if (!isUpd[0] && !isUpd[1] && !isUpd[2])
-      continue; // nothing is updated
+    if (isExternalAttribute(anIt->first))
+      continue;
 
     std::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anIt->first);
     if (aPoint2D) {
-      if ((isUpd[0] && fabs(aPoint2D->x() - aCoords[0]) > aTol) ||
-          (isUpd[1] && fabs(aPoint2D->y() - aCoords[1]) > aTol) || isExternal) {
-        // Find points coincident with this one (probably not in GID_OUTOFGROUP)
-        CoincidentPointsMap::const_iterator aCoincIt = myCoincidentPoints.begin();
-        for (; aCoincIt != myCoincidentPoints.end(); ++aCoincIt)
-          if (aCoincIt->first == anIt->second ||
-              aCoincIt->second.find(anIt->second) != aCoincIt->second.end())
-            break;
-        // get coordinates of "master"-point
-        std::shared_ptr<GeomDataAPI_Point2D> aMaster = aCoincIt != myCoincidentPoints.end() ?
-            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aCoincIt->first->baseAttribute()) :
-            aPoint2D;
-        if (!isUpd[0] || isExternal) aCoords[0] = aMaster->x();
-        if (!isUpd[1] || isExternal) aCoords[1] = aMaster->y();
-        if (!isExternal)
-          aPoint2D->setValue(aCoords[0], aCoords[1]);
-        if (aCoincIt != myCoincidentPoints.end()) {
-          if (aMaster && !isExternalAttribute(aMaster))
-            aMaster->setValue(aCoords[0], aCoords[1]);
-          std::set<EntityWrapperPtr>::const_iterator aSlaveIt = aCoincIt->second.begin();
-          for (; aSlaveIt != aCoincIt->second.end(); ++aSlaveIt) {
-            aPoint2D = std::dynamic_pointer_cast<GeomDataAPI_Point2D>((*aSlaveIt)->baseAttribute());
-            if (aPoint2D && !isExternalAttribute(aPoint2D))
-              aPoint2D->setValue(aCoords[0], aCoords[1]);
-          }
-        }
-      }
+      std::shared_ptr<PlaneGCSSolver_PointWrapper> aPointWrapper =
+          std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(anIt->second);
+      GCSPointPtr aGCSPoint = aPointWrapper->point();
+      if (fabs(aPoint2D->x() - (*aGCSPoint->x)) > aTol ||
+          fabs(aPoint2D->y() - (*aGCSPoint->y)) > aTol)
+        aPoint2D->setValue(*aGCSPoint->x, *aGCSPoint->y);
       continue;
     }
     AttributeDoublePtr aScalar = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anIt->first);
-    if (aScalar && !isExternal) {
-      if (isUpd[0] && fabs(aScalar->value() - aCoords[0]) > aTol)
-        aScalar->setValue(aCoords[0]);
+    if (aScalar) {
+      ScalarWrapperPtr aScalarWrapper =
+          std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(anIt->second);
+      if (fabs(aScalar->value() - aScalarWrapper->value()) > aTol)
+        aScalar->setValue(aScalarWrapper->value());
       continue;
     }
   }
-
-  //blockEvents(false);
-}
-
-EntityWrapperPtr PlaneGCSSolver_Storage::calculateMiddlePoint(
-    EntityWrapperPtr theBase, double theCoeff)
-{
-  std::shared_ptr<PlaneGCSSolver_Builder> aBuilder =
-      std::dynamic_pointer_cast<PlaneGCSSolver_Builder>(PlaneGCSSolver_Builder::getInstance());
-
-  std::shared_ptr<GeomAPI_XY> aMidPoint;
-  if (theBase->type() == ENTITY_LINE) {
-    std::shared_ptr<GeomAPI_Pnt2d> aPoints[2];
-    const std::list<EntityWrapperPtr>& aSubs = theBase->subEntities();
-    std::list<EntityWrapperPtr>::const_iterator anIt = aSubs.begin();
-    for (int i = 0; i < 2; ++i, ++anIt)
-      aPoints[i] = aBuilder->point(*anIt);
-    aMidPoint = aPoints[0]->xy()->multiplied(1.0 - theCoeff)->added(
-        aPoints[1]->xy()->multiplied(theCoeff));
-  }
-  else if (theBase->type() == ENTITY_ARC) {
-    double theX, theY;
-    double anArcPoint[3][2];
-    const std::list<EntityWrapperPtr>& aSubs = theBase->subEntities();
-    std::list<EntityWrapperPtr>::const_iterator anIt = aSubs.begin();
-    for (int i = 0; i < 3; ++i, ++anIt) {
-      std::shared_ptr<GeomAPI_Pnt2d> aPoint = aBuilder->point(*anIt);
-      anArcPoint[i][0] = aPoint->x();
-      anArcPoint[i][1] = aPoint->y();
-    }
-    // project last point of arc on the arc
-    double x = anArcPoint[1][0] - anArcPoint[0][0];
-    double y = anArcPoint[1][1] - anArcPoint[0][1];
-    double aRad = sqrt(x*x + y*y);
-    x = anArcPoint[2][0] - anArcPoint[0][0];
-    y = anArcPoint[2][1] - anArcPoint[0][1];
-    double aNorm = sqrt(x*x + y*y);
-    if (aNorm >= tolerance) {
-      anArcPoint[2][0] = x * aRad / aNorm;
-      anArcPoint[2][1] = y * aRad / aNorm;
-    }
-    anArcPoint[1][0] -= anArcPoint[0][0];
-    anArcPoint[1][1] -= anArcPoint[0][1];
-    if (theCoeff < tolerance) {
-      theX = anArcPoint[0][0] + anArcPoint[1][0];
-      theY = anArcPoint[0][1] + anArcPoint[1][1];
-    } else if (1 - theCoeff < tolerance) {
-      theX = anArcPoint[0][0] + anArcPoint[2][0];
-      theY = anArcPoint[0][1] + anArcPoint[2][1];
-    } else {
-      std::shared_ptr<GeomAPI_Dir2d>
-        aStartDir(new GeomAPI_Dir2d(anArcPoint[1][0], anArcPoint[1][1]));
-      std::shared_ptr<GeomAPI_Dir2d>
-        aEndDir(new GeomAPI_Dir2d(anArcPoint[2][0], anArcPoint[2][1]));
-      double anAngle = aStartDir->angle(aEndDir);
-      if (anAngle < 0)
-        anAngle += 2.0 * PI;
-      anAngle *= theCoeff;
-      double aCos = cos(anAngle);
-      double aSin = sin(anAngle);
-      theX = anArcPoint[0][0] + anArcPoint[1][0] * aCos - anArcPoint[1][1] * aSin;
-      theY = anArcPoint[0][1] + anArcPoint[1][0] * aSin + anArcPoint[1][1] * aCos;
-    }
-    aMidPoint = std::shared_ptr<GeomAPI_XY>(new GeomAPI_XY(theX, theY));
-  }
-
-  if (!aMidPoint)
-    return EntityWrapperPtr();
-
-  std::list<ParameterWrapperPtr> aParameters;
-  aParameters.push_back(aBuilder->createParameter(myGroupID, aMidPoint->x()));
-  aParameters.push_back(aBuilder->createParameter(myGroupID, aMidPoint->y()));
-  // Create entity (parameters are not filled)
-  GCSPointPtr aPnt(new GCS::Point);
-  aPnt->x =
-    std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(aParameters.front())->parameter();
-  aPnt->y =
-    std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(aParameters.back())->parameter();
-
-  EntityWrapperPtr aResult(new PlaneGCSSolver_PointWrapper(AttributePtr(), aPnt));
-  aResult->setGroup(myGroupID);
-  aResult->setParameters(aParameters);
-
-  update(aResult);
-  return aResult;
 }

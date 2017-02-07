@@ -3,9 +3,11 @@
 #include <SketchSolver_ConstraintLength.h>
 #include <SketchSolver_Error.h>
 
+#include <SketchPlugin_Line.h>
+
 
 void SketchSolver_ConstraintLength::getAttributes(
-    double& theValue,
+    EntityWrapperPtr& theValue,
     std::vector<EntityWrapperPtr>& theAttributes)
 {
   SketchSolver_Constraint::getAttributes(theValue, theAttributes);
@@ -15,13 +17,11 @@ void SketchSolver_ConstraintLength::getAttributes(
     return;
   }
 
-  // Get boundary points of line segment and create point-point distance constraint
-  std::list<EntityWrapperPtr> aSubs = theAttributes[2]->subEntities();
-  theAttributes.assign(theAttributes.size(), EntityWrapperPtr());
-  std::vector<EntityWrapperPtr>::iterator anAttrIt = theAttributes.begin();
-  std::list<EntityWrapperPtr>::const_iterator aSubIt = aSubs.begin();
-  for (; aSubIt != aSubs.end(); ++aSubIt, ++anAttrIt)
-    *anAttrIt = *aSubIt;
+  AttributeRefAttrPtr aRefAttr = myBaseConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
+  FeaturePtr aLine = ModelAPI_Feature::feature(aRefAttr->object());
+
+  theAttributes[0] = myStorage->entity(aLine->attribute(SketchPlugin_Line::START_ID()));
+  theAttributes[1] = myStorage->entity(aLine->attribute(SketchPlugin_Line::END_ID()));
 
   myType = CONSTRAINT_PT_PT_DISTANCE;
 }

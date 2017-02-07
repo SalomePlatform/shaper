@@ -17,22 +17,21 @@ class SketchSolver_ConstraintAngle : public SketchSolver_Constraint
 {
 public:
   /// Constructor based on SketchPlugin constraint
-  SketchSolver_ConstraintAngle(ConstraintPtr theConstraint) :
-      SketchSolver_Constraint(theConstraint),
-      myAngle(0.0)
+  SketchSolver_ConstraintAngle(ConstraintPtr theConstraint)
+    : SketchSolver_Constraint(theConstraint)
   {}
 
   /// \brief This method is used in derived objects to check consistence of constraint.
-  virtual void adjustConstraint();
+  virtual void adjustConstraint() override;
 
 protected:
   /// \brief Generate list of attributes of constraint in order useful for constraints
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
   /// \param[out] theAttributes list of attributes to be filled
-  virtual void getAttributes(double& theValue, std::vector<EntityWrapperPtr>& theAttributes);
+  virtual void getAttributes(EntityWrapperPtr&              theValue,
+                             std::vector<EntityWrapperPtr>& theAttributes) override;
 
 private:
-  double myAngle;
   int    myType;
 };
 

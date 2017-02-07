@@ -12,14 +12,12 @@
 #include <SketchSolver_ConstraintDistance.h>
 #include <SketchSolver_ConstraintEqual.h>
 #include <SketchSolver_ConstraintFixed.h>
-#include <SketchSolver_ConstraintFixedArcRadius.h>
 #include <SketchSolver_ConstraintLength.h>
 #include <SketchSolver_ConstraintMiddle.h>
 #include <SketchSolver_ConstraintMirror.h>
 #include <SketchSolver_ConstraintTangent.h>
 #include <SketchSolver_ConstraintMultiRotation.h>
 #include <SketchSolver_ConstraintMultiTranslation.h>
-#include <SketchSolver_ConstraintMovement.h>
 
 #ifdef _DEBUG
 #include <Events_InfoMessage.h>
@@ -41,14 +39,12 @@
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 
-#include <math.h>
+#include <cmath>
 
 SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theConstraint) const
 {
   SolverConstraintPtr aResult;
   DataPtr aData = theConstraint->data();
-  if (!aData || !aData->isValid())
-    return aResult;
 
 #ifdef _DEBUG
   // Verify attributes of constraint and generate errors
@@ -110,61 +106,7 @@ SolverConstraintPtr SketchSolver_Builder::createConstraint(ConstraintPtr theCons
   return SolverConstraintPtr(new SketchSolver_Constraint(theConstraint));
 }
 
-SolverConstraintPtr SketchSolver_Builder::createFixedConstraint(FeaturePtr theFixedFeature) const
+SolverConstraintPtr SketchSolver_Builder::createMovementConstraint(FeaturePtr theMovedFeature) const
 {
-  DataPtr aData = theFixedFeature->data();
-  if (!aData || !aData->isValid())
-    return SolverConstraintPtr();
-  return SolverConstraintPtr(new SketchSolver_ConstraintFixed(theFixedFeature));
+  return SolverConstraintPtr(new SketchSolver_ConstraintFixed(theMovedFeature));
 }
-
-SolverConstraintPtr SketchSolver_Builder::createFixedArcRadiusConstraint(FeaturePtr theArc) const
-{
-  DataPtr aData = theArc->data();
-  if (!aData || !aData->isValid())
-    return SolverConstraintPtr();
-  return SolverConstraintPtr(new SketchSolver_ConstraintFixedArcRadius(theArc));
-}
-
-SolverConstraintPtr SketchSolver_Builder::createMovementConstraint(FeaturePtr theFixedFeature) const
-{
-  DataPtr aData = theFixedFeature->data();
-  if (!aData || !aData->isValid())
-    return SolverConstraintPtr();
-  return SolverConstraintPtr(new SketchSolver_ConstraintMovement(theFixedFeature));
-}
-
-std::shared_ptr<GeomAPI_Pnt2d> SketchSolver_Builder::point(EntityWrapperPtr theEntity) const
-{
-  if (theEntity->type() != ENTITY_POINT)
-    return std::shared_ptr<GeomAPI_Pnt2d>();
-  if (theEntity->subEntities().size() == 1) // SketchPlugin_Point wrapper
-    return point(theEntity->subEntities().front());
-
-  double aXY[2];
-  std::list<ParameterWrapperPtr> aParams = theEntity->parameters();
-  std::list<ParameterWrapperPtr>::const_iterator anIt = aParams.begin();
-  for (int i = 0; i < 2 && anIt != aParams.end(); ++i, ++anIt)
-    aXY[i] = (*anIt)->value();
-  if (anIt != aParams.end())
-    return std::shared_ptr<GeomAPI_Pnt2d>();
-
-  return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aXY[0], aXY[1]));
-}
-
-std::shared_ptr<GeomAPI_Lin2d> SketchSolver_Builder::line(EntityWrapperPtr theEntity) const
-{
-  if (theEntity->type() != ENTITY_LINE)
-    return std::shared_ptr<GeomAPI_Lin2d>();
-
-  std::shared_ptr<GeomAPI_Pnt2d> aPoints[2];
-  std::list<EntityWrapperPtr> aSubs = theEntity->subEntities();
-  std::list<EntityWrapperPtr>::const_iterator anIt = aSubs.begin();
-  for (int i = 0; i < 2 && anIt != aSubs.end(); ++i, ++anIt)
-    aPoints[i] = point(*anIt);
-  if (anIt != aSubs.end())
-    return std::shared_ptr<GeomAPI_Lin2d>();
-
-  return std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aPoints[0], aPoints[1]));
-}
-

@@ -2,32 +2,22 @@
 
 #include <SketchSolver_ConstraintFixed.h>
 #include <SketchSolver_Error.h>
-#include <SketchSolver_Manager.h>
 
-#include <SketchPlugin_Arc.h>
-#include <SketchPlugin_Circle.h>
-#include <SketchPlugin_ConstraintRigid.h>
-#include <SketchPlugin_Line.h>
-#include <SketchPlugin_Point.h>
+#include <PlaneGCSSolver_ConstraintWrapper.h>
+#include <PlaneGCSSolver_EntityWrapper.h>
+#include <PlaneGCSSolver_PointWrapper.h>
 
-#include <GeomAPI_Pnt2d.h>
-#include <GeomAPI_XY.h>
-#include <GeomDataAPI_Point2D.h>
-#include <ModelAPI_AttributeDouble.h>
-
-#include <math.h>
 
 SketchSolver_ConstraintFixed::SketchSolver_ConstraintFixed(ConstraintPtr theConstraint)
-  : SketchSolver_Constraint()
+  : SketchSolver_Constraint(theConstraint)
 {
-  myBaseConstraint = theConstraint;
   myType = CONSTRAINT_FIXED;
-  AttributeRefAttrPtr anAttribute =
-      theConstraint->refattr(SketchPlugin_ConstraintRigid::ENTITY_A());
-  if (anAttribute->isObject())
-    myFixedFeature = ModelAPI_Feature::feature(anAttribute->object());
-  else
-    myFixedAttribute = anAttribute->attr();
+////  AttributeRefAttrPtr anAttribute =
+////      theConstraint->refattr(SketchPlugin_ConstraintRigid::ENTITY_A());
+////  if (anAttribute->isObject())
+////    myFixedFeature = ModelAPI_Feature::feature(anAttribute->object());
+////  else
+////    myFixedAttribute = anAttribute->attr();
 }
 
 SketchSolver_ConstraintFixed::SketchSolver_ConstraintFixed(FeaturePtr theFeature)
@@ -35,91 +25,119 @@ SketchSolver_ConstraintFixed::SketchSolver_ConstraintFixed(FeaturePtr theFeature
     myBaseFeature(theFeature)
 {
   myType = CONSTRAINT_FIXED;
-  process();
+////  process();
+}
+
+void SketchSolver_ConstraintFixed::blockEvents(bool isBlocked)
+{
+  if (myBaseFeature)
+    myBaseFeature->data()->blockSendAttributeUpdated(isBlocked);
+  if (myBaseConstraint)
+    SketchSolver_Constraint::blockEvents(isBlocked);
 }
 
 void SketchSolver_ConstraintFixed::process()
 {
   cleanErrorMsg();
-  if ((!myBaseConstraint && !myBaseFeature) || !myStorage || myGroupID == GID_UNKNOWN) {
+  if ((!myBaseConstraint && !myBaseFeature) || !myStorage) {
     // Not enough parameters are assigned
     return;
   }
 
-  ParameterWrapperPtr aValue;
+  EntityWrapperPtr aValue;
   std::vector<EntityWrapperPtr> anEntities;
   getAttributes(aValue, anEntities);
-  if (!myErrorMsg.empty() || anEntities.empty())
+  if (anEntities.empty())
+    myErrorMsg = SketchSolver_Error::ALREADY_FIXED();
+  if (!myErrorMsg.empty())
     return;
   fixFeature(anEntities.front());
 }
 
 void SketchSolver_ConstraintFixed::fixFeature(EntityWrapperPtr theFeature)
 {
-  // extract feature from the group
-  if (theFeature->baseAttribute())
-    myStorage->update(theFeature->baseAttribute(), GID_OUTOFGROUP);
-  else if (theFeature->baseFeature())
-    myStorage->update(theFeature->baseFeature(), GID_OUTOFGROUP);
+  std::shared_ptr<PlaneGCSSolver_EntityWrapper> anEntity =
+      std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(theFeature);
+
+  GCS::VEC_pD aParameters; // parameters of entity to be fixed
+
+  // Collect parameters for each type of entity
+  switch (theFeature->type()) {
+  case ENTITY_POINT: {
+    std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint =
+        std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theFeature);
+    aParameters.push_back(aPoint->point()->x);
+    aParameters.push_back(aPoint->point()->y);
+    break;
+    }
+  case ENTITY_LINE: {
+    std::shared_ptr<GCS::Line> aLine = std::dynamic_pointer_cast<GCS::Line>(anEntity->entity());
+    aParameters.push_back(aLine->p1.x);
+    aParameters.push_back(aLine->p1.y);
+    aParameters.push_back(aLine->p2.x);
+    aParameters.push_back(aLine->p2.y);
+    break;
+    }
+  case ENTITY_CIRCLE: {
+    std::shared_ptr<GCS::Circle> aCircle =
+        std::dynamic_pointer_cast<GCS::Circle>(anEntity->entity());
+    aParameters.push_back(aCircle->center.x);
+    aParameters.push_back(aCircle->center.y);
+    aParameters.push_back(aCircle->rad);
+    break;
+    }
+  case ENTITY_ARC: {
+    myFixedValues.reserve(4);
+    std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEntity->entity());
+    aParameters.push_back(anArc->center.x);
+    aParameters.push_back(anArc->center.y);
+    aParameters.push_back(anArc->rad);
+    aParameters.push_back(anArc->startAngle);
+    aParameters.push_back(anArc->endAngle);
+    break;
+    }
+  default:
+    break;
+  }
+
+  // Fix given list of parameters
+  std::list<GCSConstraintPtr> aConstraints;
+  myFixedValues.reserve(aParameters.size());
+  GCS::VEC_pD::const_iterator anIt = aParameters.begin();
+  for (int i = 0; anIt != aParameters.end(); ++anIt, ++i) {
+    myFixedValues.push_back(**anIt);
+    aConstraints.push_back(
+        GCSConstraintPtr(new GCS::ConstraintEqual(*anIt, &myFixedValues[i])));
+  }
+
+  myConstraint = ConstraintWrapperPtr(
+      new PlaneGCSSolver_ConstraintWrapper(aConstraints, getType()));
 
   if (myBaseConstraint)
-    myStorage->addConstraint(myBaseConstraint, std::list<ConstraintWrapperPtr>());
+    myStorage->addConstraint(myBaseConstraint, myConstraint);
+  else
+    myStorage->addTemporaryConstraint(myConstraint);
 }
 
 void SketchSolver_ConstraintFixed::getAttributes(
-    ParameterWrapperPtr& theValue,
+    EntityWrapperPtr& theValue,
     std::vector<EntityWrapperPtr>& theAttributes)
 {
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-
-  EntityWrapperPtr aSolverEntity;
   if (myBaseFeature) {
     // The feature is fixed.
-    myStorage->update(myBaseFeature/*, myGroupID*/);
-    aSolverEntity = myStorage->entity(myBaseFeature);
+    myStorage->update(myBaseFeature);
+    EntityWrapperPtr aSolverEntity = myStorage->entity(myBaseFeature);
+    if (aSolverEntity)
+      theAttributes.push_back(aSolverEntity);
   } else if (myBaseConstraint) {
     // Constraint Fixed is added by user.
     // Get the attribute of constraint (it should be alone in the list of constraints).
-    AttributePtr anAttr = myBaseConstraint->attribute(SketchPlugin_ConstraintRigid::ENTITY_A());
-    AttributeRefAttrPtr aRefAttr =
-        std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttr);
-    if (!aRefAttr || !aRefAttr->isInitialized()) {
-      myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
-      return;
-    }
-
-    myStorage->update(anAttr, myGroupID);
-    aSolverEntity = myStorage->entity(anAttr);
+    std::vector<EntityWrapperPtr> anAttributes;
+    SketchSolver_Constraint::getAttributes(theValue, anAttributes);
+    std::vector<EntityWrapperPtr>::const_iterator anIt = anAttributes.begin();
+    for (; anIt != anAttributes.end(); ++anIt)
+      if (*anIt)
+        theAttributes.push_back(*anIt);
   } else
     myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
-
-  if (aSolverEntity)
-    theAttributes.push_back(aSolverEntity);
-}
-
-
-bool SketchSolver_ConstraintFixed::remove()
-{
-  cleanErrorMsg();
-  // Move fixed entities back to the current group
-  FeaturePtr aFeature = myBaseFeature;
-  if (myBaseConstraint) {
-    if (myFixedFeature)
-      aFeature = myFixedFeature;
-    else if (myFixedAttribute)
-      myStorage->update(AttributePtr(myFixedAttribute), myGroupID);
-  }
-  if (aFeature)
-    myStorage->update(aFeature, myGroupID);
-  myStorage->setNeedToResolve(true);
-
-  // Remove constraint or base feature
-  if (myBaseConstraint) {
-    bool isRemoved = false;
-    if (aFeature)
-      isRemoved = myStorage->removeEntity(aFeature);
-    return SketchSolver_Constraint::remove() || isRemoved;
-  } else if (myBaseFeature)
-    myStorage->removeEntity(myBaseFeature);
-  return true;
 }

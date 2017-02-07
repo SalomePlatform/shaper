@@ -17,13 +17,13 @@ class SketchSolver_ConstraintCollinear : public SketchSolver_Constraint
 {
 public:
   /// Constructor based on SketchPlugin constraint
-  SKETCHSOLVER_EXPORT SketchSolver_ConstraintCollinear(ConstraintPtr theConstraint);
+  SketchSolver_ConstraintCollinear(ConstraintPtr theConstraint);
 
   virtual ~SketchSolver_ConstraintCollinear() {}
 
-  /// \brief Notify constraint, that coincidence appears or removed
-  virtual void notifyCoincidenceChanged(EntityWrapperPtr theCoincAttr1,
-                                        EntityWrapperPtr theCoincAttr2);
+////  /// \brief Notify constraint, that coincidence appears or removed
+////  virtual void notifyCoincidenceChanged(EntityWrapperPtr theCoincAttr1,
+////                                        EntityWrapperPtr theCoincAttr2);
 };
 
 #endif

@@ -7,12 +7,13 @@
 #ifndef PlaneGCSSolver_AngleWrapper_H_
 #define PlaneGCSSolver_AngleWrapper_H_
 
-#include <PlaneGCSSolver_ParameterWrapper.h>
+#include <PlaneGCSSolver_ScalarWrapper.h>
 
 /**
  *  Wrapper providing operations with angular parameters in PlaneGCS.
+ *  Provides automatic conversion from degrees to radians and vice versa.
  */
-class PlaneGCSSolver_AngleWrapper : public PlaneGCSSolver_ParameterWrapper
+class PlaneGCSSolver_AngleWrapper : public PlaneGCSSolver_ScalarWrapper
 {
 public:
   PlaneGCSSolver_AngleWrapper(double *const theParam);

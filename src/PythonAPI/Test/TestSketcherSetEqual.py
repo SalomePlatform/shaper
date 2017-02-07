@@ -27,13 +27,13 @@ class SketcherSetEqual(SketcherTestCase):
         # Set the constraint
         circle_1 = self.sketch.addCircle(0, 0, 10.0)
         circle_2 = self.sketch.addCircle(1, 2, 25.0)
-        self.sketch.setEqual(circle_1.result(), circle_2.result())
+        self.sketch.setEqual(circle_1.defaultResult(), circle_2.defaultResult())
         # Commit the transaction
         model.do()
         # Check the result
         self.assertAlmostEqual(
-            circle_1.radiusData().value(),
-            circle_2.radiusData().value(),
+            circle_1.radius().value(),
+            circle_2.radius().value(),
             delta=TestSketcher.DELTA
             )
 

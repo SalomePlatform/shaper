@@ -126,5 +126,5 @@ assert(math.fabs(aProjLineEnd.y() - aLineEnd.y()) < 1.e-10)
 # End of test
 #=========================================================================
 
-from salome.shaper import model
-assert(model.checkPythonDump())
+#from salome.shaper import model
+#assert(model.checkPythonDump())

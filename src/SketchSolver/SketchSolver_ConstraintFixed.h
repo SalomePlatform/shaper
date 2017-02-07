@@ -16,43 +16,37 @@
  *
  *  Fixed constraint may have NULL basic SketchPlugin constraint,
  *  because the Fixed constraint may be temporary for correct moving of objects.
- *
- *  Fixed constraint does not create a constraint, but builds the entities in separate group,
- *  so they will not be moved while resolving the set of constraints.
  */
 class SketchSolver_ConstraintFixed : public SketchSolver_Constraint
 {
 public:
   /// Creates constraint to manage the given constraint from plugin
   SketchSolver_ConstraintFixed(ConstraintPtr theConstraint);
-  /// Creates temporary constraint based on feature
+  /// Creates temporary constraint based on feature (useful while the feature is being moved)
   SketchSolver_ConstraintFixed(FeaturePtr theFeature);
 
-  /// \brief Tries to remove constraint
-  /// \return \c false, if current constraint contains another
-  /// SketchPlugin constraints (like for multiple coincidence)
-  virtual bool remove();
+  /// \brief Block or unblock events from this constraint
+  virtual void blockEvents(bool isBlocked) override;
 
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
-  virtual void process();
+  virtual void process() override;
 
   /// \brief Generate list of attributes of constraint in order useful for constraints
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
   /// \param[out] theAttributes list of attributes to be filled
-  virtual void getAttributes(ParameterWrapperPtr& theValue,
-                             std::vector<EntityWrapperPtr>& theAttributes);
+  virtual void getAttributes(EntityWrapperPtr&              theValue,
+                             std::vector<EntityWrapperPtr>& theAttributes) override;
 
   /// \brief Fixed feature basing on its type
   /// \param theFeature [in]  feature, converted to solver specific format
   virtual void fixFeature(EntityWrapperPtr theFeature);
 
-protected:
+private:
   FeaturePtr myBaseFeature; ///< fixed feature (when it is set, myBaseConstraint should be NULL)
 
-private:
-  AttributePtr myFixedAttribute; ///< possible attribute of a fixed constraint (for correct remove)
-  FeaturePtr   myFixedFeature;   ///< possible attribute of a fixed constraint (for correct remove)
+  ConstraintWrapperPtr myConstraint;
+  std::vector<double> myFixedValues;
 };
 
 #endif

@@ -1,10 +1,33 @@
 ## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
+# Avoid using SolveSpace
+SET(NO_SolveSpace TRUE)
+
+# Convert files in list to full name
+FUNCTION(TO_FULL_PATH theFILES)
+  SET(locFiles "")
+  FOREACH(locFile ${${theFILES}})
+    SET(locFiles ${locFiles} ${CMAKE_CURRENT_SOURCE_DIR}/${locFile})
+  ENDFOREACH()
+  SET(${theFILES} ${locFiles} PARENT_SCOPE)
+ENDFUNCTION(TO_FULL_PATH)
+
+
 INCLUDE(Common)
 
-SET(PROJECT_HEADERS
+SET(SKETCHSOLVER_HEADERS
     SketchSolver.h
     SketchSolver_Error.h
+    SketchSolver_Group.h
+    SketchSolver_Builder.h
+    SketchSolver_IConstraintWrapper.h
+    SketchSolver_IEntityWrapper.h
+    SketchSolver_ISolver.h
+    SketchSolver_Manager.h
+    SketchSolver_Storage.h
+)
+
+SET(SKETCHSOLVER_CONSTRAINT_HEADERS
     SketchSolver_Constraint.h
     SketchSolver_ConstraintAngle.h
     SketchSolver_ConstraintCoincidence.h
@@ -15,23 +38,20 @@ SET(PROJECT_HEADERS
     SketchSolver_ConstraintMiddle.h
     SketchSolver_ConstraintMirror.h
     SketchSolver_ConstraintFixed.h
-    SketchSolver_ConstraintFixedArcRadius.h
     SketchSolver_ConstraintTangent.h
     SketchSolver_ConstraintMulti.h
     SketchSolver_ConstraintMultiRotation.h
     SketchSolver_ConstraintMultiTranslation.h
-    SketchSolver_ConstraintMovement.h
-    SketchSolver_Group.h
-    SketchSolver_Builder.h
-    SketchSolver_IConstraintWrapper.h
-    SketchSolver_IEntityWrapper.h
-    SketchSolver_IParameterWrapper.h
-    SketchSolver_ISolver.h
-    SketchSolver_Manager.h
-    SketchSolver_Storage.h
 )
 
-SET(PROJECT_SOURCES
+SET(SKETCHSOLVER_SOURCES
+    SketchSolver_Group.cpp
+    SketchSolver_Builder.cpp
+    SketchSolver_Manager.cpp
+    SketchSolver_Storage.cpp
+)
+
+SET(SKETCHSOLVER_CONSTRAINT_SOURCES
     SketchSolver_Constraint.cpp
     SketchSolver_ConstraintAngle.cpp
     SketchSolver_ConstraintCoincidence.cpp
@@ -42,19 +62,13 @@ SET(PROJECT_SOURCES
     SketchSolver_ConstraintMiddle.cpp
     SketchSolver_ConstraintMirror.cpp
     SketchSolver_ConstraintFixed.cpp
-    SketchSolver_ConstraintFixedArcRadius.cpp
     SketchSolver_ConstraintTangent.cpp
     SketchSolver_ConstraintMulti.cpp
     SketchSolver_ConstraintMultiRotation.cpp
     SketchSolver_ConstraintMultiTranslation.cpp
-    SketchSolver_ConstraintMovement.cpp
-    SketchSolver_Group.cpp
-    SketchSolver_Builder.cpp
-    SketchSolver_Manager.cpp
-    SketchSolver_Storage.cpp
 )
 
-SET(PROJECT_LIBRARIES
+SET(SKETCHSOLVER_LIBRARIES
     Config
     Events
     ModelAPI
@@ -62,7 +76,7 @@ SET(PROJECT_LIBRARIES
     GeomDataAPI
 )
 
-SET(TEXT_RESOURCES
+SET(SKETCHSOLVER_TEXT_RESOURCES
     SketchSolver_msg_en.ts
 )
 
@@ -75,18 +89,25 @@ INCLUDE_DIRECTORIES(
     ${PROJECT_SOURCE_DIR}/src/Events
 )
 
-SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
+#SOURCE_GROUP ("Resource Files" FILES ${SKETCHSOLVER_TEXT_RESOURCES})
+#
+#ADD_DEFINITIONS(-DSKETCHSOLVER_EXPORTS)
+#
+#ADD_LIBRARY(SketchSolver SHARED ${SKETCHSOLVER_SOURCES} ${SKETCHSOLVER_CONSTRAINT_SOURCES} ${SKETCHSOLVER_HEADERS} ${SKETCHSOLVER_CONSTRAINT_HEADERS} ${SKETCHSOLVER_TEXT_RESOURCES}
+#)
+#
+#TARGET_LINK_LIBRARIES(SketchSolver ${SKETCHSOLVER_LIBRARIES}
+#)
+#
+#INSTALL(TARGETS SketchSolver DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
+#INSTALL(FILES ${SKETCHSOLVER_TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
-ADD_DEFINITIONS(-DSKETCHSOLVER_EXPORTS)
-
-ADD_LIBRARY(SketchSolver SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${TEXT_RESOURCES}
-)
-
-TARGET_LINK_LIBRARIES(SketchSolver ${PROJECT_LIBRARIES}
-)
-
-INSTALL(TARGETS SketchSolver DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
-INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
+# Set full path to source files
+TO_FULL_PATH(SKETCHSOLVER_SOURCES)
+TO_FULL_PATH(SKETCHSOLVER_CONSTRAINT_SOURCES)
+TO_FULL_PATH(SKETCHSOLVER_HEADERS)
+TO_FULL_PATH(SKETCHSOLVER_CONSTRAINT_HEADERS)
+TO_FULL_PATH(SKETCHSOLVER_TEXT_RESOURCES)
 
 
 # Include specific solvers

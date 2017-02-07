@@ -21,7 +21,7 @@ class SketchSolver_Builder
 {
 public:
   /// \brief Creates a storage specific for used solver
-  virtual StoragePtr createStorage(const GroupID& theGroup) const = 0;
+  virtual StoragePtr createStorage(const SolverPtr&) const = 0;
   /// \brief Creates specific solver
   virtual SolverPtr createSolver() const = 0;
 
@@ -29,35 +29,23 @@ public:
   ///        or returns empty pointer if not all attributes are correct
   SolverConstraintPtr createConstraint(ConstraintPtr theConstraint) const;
 
-  /// \brief Creates temporary constraint to fix the placement of the feature
-  SolverConstraintPtr createFixedConstraint(FeaturePtr theFixedFeature) const;
-
-  /// \brief Creates temporary constraint to fix radius of the arc
-  SolverConstraintPtr createFixedArcRadiusConstraint(FeaturePtr theArc) const;
-
   /// \brief Creates temporary constraint to fix the feature after movement
-  SolverConstraintPtr createMovementConstraint(FeaturePtr theFixedFeature) const;
+  SolverConstraintPtr createMovementConstraint(FeaturePtr theMovedFeature) const;
 
-  /// \brief Creates new constraint(s) using given parameters
+  /// \brief Creates new constraint using given parameters
   /// \param theConstraint [in]  original constraint
-  /// \param theGroupID    [in]  group the constraint belongs to
-  /// \param theSketchID   [in]  sketch the constraint belongs to
   /// \param theType       [in]  type of constraint
   /// \param theValue      [in]  numeric characteristic of constraint
-  /// (e.g. distance or radius) if applicable
+  ///                            (e.g. distance or radius) if applicable
   /// \param theEntity1    [in]  first attribute of constraint
   /// \param theEntity2    [in]  second attribute of constraint
   /// \param theEntity3    [in]  third attribute of constraint
   /// \param theEntity4    [in]  fourth attribute of constraint
-  /// \return Created list of wrappers of constraints applicable for specific solver.
-  ///         Most of constraint types lead to single constraint, but there are some kind of
-  ///         constraints (e.g. mirror), which may produce couple of constraints.
-  virtual std::list<ConstraintWrapperPtr>
+  /// \return Created wrapper of constraints applicable for specific solver.
+  virtual ConstraintWrapperPtr
     createConstraint(ConstraintPtr theConstraint,
-                     const GroupID& theGroup,
-                     const EntityID& theSketchID,
                      const SketchSolver_ConstraintType& theType,
-                     const double& theValue,
+                     const EntityWrapperPtr& theValue,
                      const EntityWrapperPtr& theEntity1,
                      const EntityWrapperPtr& theEntity2 = EntityWrapperPtr(),
                      const EntityWrapperPtr& theEntity3 = EntityWrapperPtr(),
@@ -65,62 +53,39 @@ public:
 
   /// \brief Creates new multi-translation or multi-rotation constraint
   /// \param theConstraint [in]  original constraint
-  /// \param theGroupID    [in]  group the constraint belongs to
-  /// \param theSketchID   [in]  sketch the constraint belongs to
   /// \param theType       [in]  type of constraint
   /// \param theValue      [in]  numeric characteristic of constraint (angle for multi-rotation)
   ///                            if applicable
   /// \param theFullValue  [in]  indicates theValue shows full translation delta/rotation angle or
-  ///  delta/angle between neighbor entities
+  ///                            delta/angle between neighbor entities
   /// \param thePoint1     [in]  center for multi-rotation or start point for multi-translation
   /// \param thePoint2     [in]  end point for multi-translation (empty for multi-rotation)
   /// \param theTrsfEnt    [in]  list of transformed entities
-  virtual std::list<ConstraintWrapperPtr>
+  virtual ConstraintWrapperPtr
     createConstraint(ConstraintPtr theConstraint,
-                     const GroupID& theGroup,
-                     const EntityID& theSketchID,
                      const SketchSolver_ConstraintType& theType,
-                     const double& theValue,
+                     const EntityWrapperPtr& theValue,
                      const bool theFullValue,
                      const EntityWrapperPtr& thePoint1,
                      const EntityWrapperPtr& thePoint2,
                      const std::list<EntityWrapperPtr>& theTrsfEnt) const = 0;
 
-  /// \brief Update flags for several kinds of constraints
-  virtual void adjustConstraint(ConstraintWrapperPtr theConstraint) const = 0;
-
-  /// \brief Creates a feature using list of already created attributes
-  /// \param theFeature    [in]  feature to create
-  /// \param theAttributes [in]  attributes of the feature
-  /// \param theGroupID    [in]  group the feature belongs to
-  /// \param theSketchID   [in]  sketch the feature belongs to
-  /// \return Created wrapper of the feature applicable for specific solver
-  virtual EntityWrapperPtr createFeature(FeaturePtr theFeature,
-                                         const std::list<EntityWrapperPtr>& theAttributes,
-                                         const GroupID& theGroupID,
-                                         const EntityID& theSketchID = EID_UNKNOWN) const = 0;
-
-  /// \brief Creates an attribute
-  /// \param theAttribute [in]  attribute to create
-  /// \param theGroup     [in]  group the attribute belongs to
-  /// \param theSketchID  [in]  sketch the attribute belongs to
-  /// \return Created wrapper of the attribute applicable for specific solver
-  virtual EntityWrapperPtr createAttribute(AttributePtr theAttribute,
-                                           const GroupID& theGroup,
-                                           const EntityID& theSketchID = EID_UNKNOWN) const = 0;
-
 
   /// \brief Convert entity to point
   /// \return empty pointer if the entity is not a point
-  SKETCHSOLVER_EXPORT std::shared_ptr<GeomAPI_Pnt2d> point(EntityWrapperPtr theEntity) const;
+  virtual std::shared_ptr<GeomAPI_Pnt2d> point(EntityWrapperPtr theEntity) const = 0;
   /// \brief Convert entity to line
   /// \return empty pointer if the entity is not a line
-  SKETCHSOLVER_EXPORT std::shared_ptr<GeomAPI_Lin2d> line(EntityWrapperPtr theEntity) const;
+  virtual std::shared_ptr<GeomAPI_Lin2d> line(EntityWrapperPtr theEntity) const = 0;
+
+  /// \brief Convert entity to line
+  /// \return empty pointer if the entity is not a line
+  virtual std::shared_ptr<GeomAPI_Lin2d> line(FeaturePtr theFeature) const = 0;
 
   /// \brief Check if two connected arcs have centers
   ///        in same direction relatively to connection point
-  SKETCHSOLVER_EXPORT virtual bool isArcArcTangencyInternal(EntityWrapperPtr theArc1,
-    EntityWrapperPtr theArc2) const { return false; }
+  virtual bool isArcArcTangencyInternal(EntityWrapperPtr theArc1,
+                                        EntityWrapperPtr theArc2) const = 0;
 };
 
 typedef std::shared_ptr<SketchSolver_Builder> BuilderPtr;

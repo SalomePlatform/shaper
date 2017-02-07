@@ -6,7 +6,7 @@
 
 #include <PlaneGCSSolver_AngleWrapper.h>
 
-#include <math.h>
+#include <cmath>
 
 static double deg2rad(double theDegrees)
 {
@@ -19,9 +19,9 @@ static double rad2deg(double theRadians)
 }
 
 PlaneGCSSolver_AngleWrapper::PlaneGCSSolver_AngleWrapper(double *const theParam)
-  : PlaneGCSSolver_ParameterWrapper(theParam)
+  : PlaneGCSSolver_ScalarWrapper(theParam)
 {
-  setValue(*myValue);
+  setValue(*theParam);
 }
 
 void PlaneGCSSolver_AngleWrapper::setValue(double theValue)

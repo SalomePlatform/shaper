@@ -22,7 +22,6 @@
  */
 class PlaneGCSSolver_Builder : public SketchSolver_Builder
 {
-private:
   /// Default constructor
   PlaneGCSSolver_Builder() {}
 
@@ -31,14 +30,12 @@ public:
   static BuilderPtr getInstance();
 
   /// \brief Creates a storage specific for used solver
-  virtual StoragePtr createStorage(const GroupID& theGroup) const;
+  virtual StoragePtr createStorage(const SolverPtr& theSolver) const override;
   /// \brief Creates specific solver
-  virtual SolverPtr createSolver() const;
+  virtual SolverPtr createSolver() const override;
 
-  /// \brief Creates new constraint(s) using given parameters
+  /// \brief Creates new constraint using given parameters
   /// \param theConstraint [in]  original constraint
-  /// \param theGroupID    [in]  group the constraint belongs to
-  /// \param theSketchID   [in]  sketch the constraint belongs to
   /// \param theType       [in]  type of constraint
   /// \param theValue      [in]  numeric characteristic of constraint
   ///                            (e.g. distance or radius) if applicable
@@ -46,24 +43,18 @@ public:
   /// \param theEntity2    [in]  second attribute of constraint
   /// \param theEntity3    [in]  third attribute of constraint
   /// \param theEntity4    [in]  fourth attribute of constraint
-  /// \return Created list of wrappers of constraints applicable for specific solver.
-  ///         Most of constraint types lead to single constraint, but there are some kind of
-  ///         constraints (e.g. mirror), which may produce couple of constraints.
-  virtual std::list<ConstraintWrapperPtr>
+  /// \return Created wrapper of constraints applicable for specific solver.
+  virtual ConstraintWrapperPtr
     createConstraint(ConstraintPtr theConstraint,
-                     const GroupID& theGroupID,
-                     const EntityID& theSketchID,
                      const SketchSolver_ConstraintType& theType,
-                     const double& theValue,
+                     const EntityWrapperPtr& theValue,
                      const EntityWrapperPtr& theEntity1,
                      const EntityWrapperPtr& theEntity2 = EntityWrapperPtr(),
                      const EntityWrapperPtr& theEntity3 = EntityWrapperPtr(),
-                     const EntityWrapperPtr& theEntity4 = EntityWrapperPtr()) const;
+                     const EntityWrapperPtr& theEntity4 = EntityWrapperPtr()) const override;
 
   /// \brief Creates new multi-translation or multi-rotation constraint
   /// \param theConstraint [in]  original constraint
-  /// \param theGroupID    [in]  group the constraint belongs to
-  /// \param theSketchID   [in]  sketch the constraint belongs to
   /// \param theType       [in]  type of constraint
   /// \param theValue      [in]  numeric characteristic of constraint (angle for multi-rotation)
   ///                            if applicable
@@ -72,68 +63,30 @@ public:
   /// \param thePoint1     [in]  center for multi-rotation or start point for multi-translation
   /// \param thePoint2     [in]  end point for multi-translation (empty for multi-rotation)
   /// \param theTrsfEnt    [in]  list of transformed entities
-  virtual std::list<ConstraintWrapperPtr>
+  virtual ConstraintWrapperPtr
     createConstraint(ConstraintPtr theConstraint,
-                     const GroupID& theGroupID,
-                     const EntityID& theSketchID,
                      const SketchSolver_ConstraintType& theType,
-                     const double& theValue,
+                     const EntityWrapperPtr& theValue,
                      const bool theFullValue,
                      const EntityWrapperPtr& thePoint1,
                      const EntityWrapperPtr& thePoint2,
-                     const std::list<EntityWrapperPtr>& theTrsfEnt) const;
+                     const std::list<EntityWrapperPtr>& theTrsfEnt) const override;
 
-  /// \brief Update flags for several kinds of constraints
-  virtual void adjustConstraint(ConstraintWrapperPtr theConstraint) const;
+  /// \brief Convert entity to point
+  /// \return empty pointer if the entity is not a point
+  virtual std::shared_ptr<GeomAPI_Pnt2d> point(EntityWrapperPtr theEntity) const override;
+  /// \brief Convert entity to line
+  /// \return empty pointer if the entity is not a line
+  virtual std::shared_ptr<GeomAPI_Lin2d> line(EntityWrapperPtr theEntity) const override;
 
-  /// \brief Creates a feature using list of already created attributes
-  /// \param theFeature    [in]  feature to create
-  /// \param theAttributes [in]  attributes of the feature
-  /// \param theGroupID    [in]  group the feature belongs to
-  /// \param theSketchID   [in]  sketch the feature belongs to
-  /// \return Created wrapper of the feature applicable for specific solver
-  virtual EntityWrapperPtr createFeature(FeaturePtr theFeature,
-                                         const std::list<EntityWrapperPtr>& theAttributes,
-                                         const GroupID& theGroupID,
-                                         const EntityID& theSketchID = EID_UNKNOWN) const;
-
-  /// \brief Creates an attribute
-  /// \param theAttribute [in]  attribute to create
-  /// \param theGroup     [in]  group the attribute belongs to
-  /// \param theSketchID  [in]  sketch the attribute belongs to
-  /// \return Created wrapper of the attribute applicable for specific solver
-  virtual EntityWrapperPtr createAttribute(AttributePtr theAttribute,
-                                           const GroupID& theGroup,
-                                           const EntityID& theSketchID = EID_UNKNOWN) const;
-
-  /// \brief Create a parameter
-  /// \param theGroupID [in]  group the parameter belongs to
-  /// \param theValue   [in]  value of the parameter
-  /// \return Created wrapper for parameter
-  ParameterWrapperPtr createParameter(const GroupID& theGroupID, double theValue = 0.0) const;
+  /// \brief Convert entity to line
+  /// \return empty pointer if the entity is not a line
+  virtual std::shared_ptr<GeomAPI_Lin2d> line(FeaturePtr theFeature) const override;
 
   /// \brief Check if two connected arcs have centers
   ///        in same direction relatively to connection point
-  virtual bool isArcArcTangencyInternal(EntityWrapperPtr theArc1, EntityWrapperPtr theArc2) const;
-
-private:
-  /// \brief Create necessary constraints to make two object symmetric relatively a given line
-  std::list<ConstraintWrapperPtr> createMirror(ConstraintPtr theConstraint,
-                                               const GroupID& theGroupID,
-                                               const EntityID& theSketchID,
-                                               const EntityWrapperPtr& theEntity1,
-                                               const EntityWrapperPtr& theEntity2,
-                                               const EntityWrapperPtr& theMirrorLine) const;
-
-  /// \brief Converts sketch parameters to the entity applicable for the solver.
-  /// \param theSketch  [in]  the element to be converted
-  /// \param theGroupID [in]  group where the sketch should be created
-  /// \return Entity respective the sketch or empty pointer, it the sketch has incorrect attributes
-  EntityWrapperPtr createSketchEntity(CompositeFeaturePtr theSketch,
-                                      const GroupID& theGroupID) const;
-
-private:
-  static BuilderPtr mySelf;
+  virtual bool isArcArcTangencyInternal(EntityWrapperPtr theArc1,
+                                        EntityWrapperPtr theArc2) const override;
 };
 
 #endif

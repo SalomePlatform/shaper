@@ -5,62 +5,15 @@
 // Author:  Artem ZHIDKOV
 
 #include "SketchSolver_Group.h"
-
-#include <SketchSolver_Constraint.h>
-#include <SketchSolver_ConstraintCoincidence.h>
-#include <SketchSolver_ConstraintMulti.h>
 #include <SketchSolver_Error.h>
 #include <SketchSolver_Manager.h>
 
+#include <PlaneGCSSolver_Solver.h>
+
 #include <Events_InfoMessage.h>
-#include <Events_Loop.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Events.h>
-#include <ModelAPI_Session.h>
-#include <ModelAPI_Validator.h>
-
-#include <SketchPlugin_Arc.h>
-#include <SketchPlugin_ConstraintAngle.h>
-#include <SketchPlugin_ConstraintCoincidence.h>
-#include <SketchPlugin_ConstraintDistance.h>
-#include <SketchPlugin_ConstraintEqual.h>
-#include <SketchPlugin_ConstraintHorizontal.h>
-#include <SketchPlugin_ConstraintLength.h>
-#include <SketchPlugin_ConstraintFillet.h>
-#include <SketchPlugin_ConstraintMirror.h>
-#include <SketchPlugin_ConstraintParallel.h>
-#include <SketchPlugin_ConstraintPerpendicular.h>
-#include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_ConstraintRigid.h>
-#include <SketchPlugin_ConstraintSplit.h>
-#include <SketchPlugin_ConstraintTangent.h>
-#include <SketchPlugin_ConstraintVertical.h>
-#include <SketchPlugin_MultiRotation.h>
-#include <SketchPlugin_MultiTranslation.h>
-
-#include <math.h>
-#include <assert.h>
-
-
-/// \brief This class is used to give unique index to the groups
-class GroupIndexer
-{
-public:
-  /// \brief Return vacant index
-  static GroupID NEW_GROUP() { return ++myGroupIndex; }
-  /// \brief Removes the index
-  static void REMOVE_GROUP(const GroupID& theIndex) {
-    if (myGroupIndex == theIndex)
-      myGroupIndex--;
-  }
-
-private:
-  GroupIndexer() {};
-
-  static GroupID myGroupIndex; ///< index of the group
-};
-
-GroupID GroupIndexer::myGroupIndex = GID_OUTOFGROUP;
 
 
 static void sendMessage(const char* theMessageName)
@@ -85,68 +38,24 @@ static void sendMessage(const char* theMessageName, const std::set<ObjectPtr>& t
 // =========  SketchSolver_Group  ===============
 // ========================================================
 
-SketchSolver_Group::SketchSolver_Group(
-    std::shared_ptr<ModelAPI_CompositeFeature> theWorkplane)
-    : myID(GroupIndexer::NEW_GROUP()),
-      myPrevResult(STATUS_UNKNOWN)
+SketchSolver_Group::SketchSolver_Group(const CompositeFeaturePtr& theWorkplane)
+  : mySketch(theWorkplane),
+    myPrevResult(STATUS_UNKNOWN),
+    myIsEventsBlocked(false)
 {
-  // Initialize workplane
-  myWorkplaneID = EID_UNKNOWN;
-  addWorkplane(theWorkplane);
+  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
+  mySketchSolver = aBuilder->createSolver();
+  myStorage = aBuilder->createStorage(mySketchSolver);
 }
 
 SketchSolver_Group::~SketchSolver_Group()
 {
   myConstraints.clear();
-  GroupIndexer::REMOVE_GROUP(myID);
   // send the message that there is no more conflicting constraints
   if (!myConflictingConstraints.empty()) {
     sendMessage(EVENT_SOLVER_REPAIRED, myConflictingConstraints);
     myConflictingConstraints.clear();
   }
-}
-
-// ============================================================================
-//  Function: isBaseWorkplane
-//  Class:    SketchSolver_Group
-//  Purpose:  verify the group is based on the given workplane
-// ============================================================================
-bool SketchSolver_Group::isBaseWorkplane(CompositeFeaturePtr theWorkplane) const
-{
-  return theWorkplane == mySketch;
-}
-
-// ============================================================================
-//  Function: isInteract
-//  Class:    SketchSolver_Group
-//  Purpose:  verify are there any entities in the group used by given constraint
-// ============================================================================
-bool SketchSolver_Group::isInteract(FeaturePtr theFeature) const
-{
-  // Empty group interacts with everything
-  if (isEmpty())
-    return true;
-  // Check interaction with the storage
-  bool isInteracted = myStorage->isInteract(theFeature);
-  ConstraintConstraintMap::const_iterator anIt = myConstraints.begin();
-  for (; !isInteracted && anIt != myConstraints.end(); ++anIt)
-    if (anIt->first->getKind() == SketchPlugin_MultiRotation::ID() ||
-        anIt->first->getKind() == SketchPlugin_MultiTranslation::ID()) {
-      isInteracted = anIt->second->isUsed(theFeature);
-      if (isInteracted)
-        break;
-      // if theFeature is a constraint, check its attributes
-      ConstraintPtr aConstraint = std::dynamic_pointer_cast<SketchPlugin_Constraint>(theFeature);
-      if (!aConstraint)
-        continue;
-      for (int i = 0; i < 4 && !isInteracted; ++i) {
-        AttributeRefAttrPtr aRefAttr = aConstraint->refattr(aConstraint->ATTRIBUTE(i));
-        if (!aRefAttr)
-          continue;
-        isInteracted = anIt->second->isUsed((AttributePtr)aRefAttr);
-      }
-    }
-  return isInteracted;
 }
 
 // ============================================================================
@@ -157,181 +66,46 @@ bool SketchSolver_Group::isInteract(FeaturePtr theFeature) const
 bool SketchSolver_Group::changeConstraint(
     std::shared_ptr<SketchPlugin_Constraint> theConstraint)
 {
-  // There is no workplane yet, something wrong
-  if (myWorkplaneID == EID_UNKNOWN)
-    return false;
-
-  if (!theConstraint || !theConstraint->data())
-    return false;
-
-  if (!checkFeatureValidity(theConstraint))
-    return false;
-
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-  myStorage->blockEvents(true);
-
   bool isNewConstraint = myConstraints.find(theConstraint) == myConstraints.end();
   if (isNewConstraint) {
+    BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
     // Add constraint to the current group
     SolverConstraintPtr aConstraint = aBuilder->createConstraint(theConstraint);
     if (!aConstraint)
       return false;
-    aConstraint->process(myStorage, getId(), getWorkplaneId());
+    aConstraint->process(myStorage, myIsEventsBlocked);
     if (!aConstraint->error().empty()) {
       if (aConstraint->error() == SketchSolver_Error::NOT_INITIALIZED())
         return false; // some attribute are not initialized yet, don't show message
       Events_InfoMessage("SketchSolver_Group", aConstraint->error(), this).send();
     }
     myConstraints[theConstraint] = aConstraint;
-
-    if (theConstraint->getKind() == SketchPlugin_ConstraintCoincidence::ID())
-      notifyCoincidenceChanged(myConstraints[theConstraint]);
   }
   else
     myConstraints[theConstraint]->update();
-
-  // Fix mirror line
-  if (theConstraint->getKind() == SketchPlugin_ConstraintMirror::ID()) {
-    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-        theConstraint->attribute(SketchPlugin_ConstraintMirror::ENTITY_A()));
-    if (aRefAttr && aRefAttr->isObject()) {
-      std::shared_ptr<SketchPlugin_Feature> aFeature =
-          std::dynamic_pointer_cast<SketchPlugin_Feature>(
-          ModelAPI_Feature::feature(aRefAttr->object()));
-      if (aFeature) {
-        SolverConstraintPtr aConstraint = aBuilder->createFixedConstraint(aFeature);
-        if (aConstraint) {
-          aConstraint->process(myStorage, getId(), getWorkplaneId());
-          setTemporary(aConstraint);
-        }
-      }
-    }
-  }
   return true;
-}
-
-// Update constraints if they contain specific feature
-static void updateMultiConstraints(ConstraintConstraintMap& theConstraints, FeaturePtr theFeature)
-{
-  ConstraintConstraintMap::iterator aCIt = theConstraints.begin();
-  for (; aCIt != theConstraints.end(); ++aCIt) {
-    SketchSolver_ConstraintType aType = aCIt->second->getType();
-    if ((aType == CONSTRAINT_MULTI_ROTATION ||
-         aType == CONSTRAINT_MULTI_TRANSLATION)
-        && aCIt->second->isUsed(theFeature))
-      std::dynamic_pointer_cast<SketchSolver_ConstraintMulti>(aCIt->second)->update(true);
-    else if ((aType == CONSTRAINT_TANGENT_CIRCLE_LINE || aType == CONSTRAINT_TANGENT_ARC_ARC ||
-              aType == CONSTRAINT_SYMMETRIC || aType == CONSTRAINT_ANGLE)
-             && aCIt->second->isUsed(theFeature))
-      aCIt->second->update();
-  }
-}
-
-// Recalculate slave features of the Multi constraints
-static void updateMultiConstraints(ConstraintConstraintMap& theConstraints)
-{
-  ConstraintConstraintMap::iterator aCIt = theConstraints.begin();
-  for (; aCIt != theConstraints.end(); ++aCIt) {
-    SketchSolver_ConstraintType aType = aCIt->second->getType();
-    if ((aType == CONSTRAINT_MULTI_ROTATION ||
-         aType == CONSTRAINT_MULTI_TRANSLATION))
-      std::dynamic_pointer_cast<SketchSolver_ConstraintMulti>(aCIt->second)->update(true);
-  }
 }
 
 bool SketchSolver_Group::updateFeature(FeaturePtr theFeature)
 {
-  if (!checkFeatureValidity(theFeature))
-    return false;
-
-  bool isBlocked = myStorage->isEventsBlocked();
-  if (!isBlocked)
-    myStorage->blockEvents(true);
-
-  myStorage->refresh(true);
-  bool isUpdated = myStorage->update(theFeature);
-
-  updateMultiConstraints(myConstraints, theFeature);
-
-  // events were not blocked before, the feature has not been updated,
-  // so it is necessary to revert blocking
-  if (!isUpdated && !isBlocked)
-    myStorage->blockEvents(false);
-  return isUpdated;
+  return myStorage->update(theFeature);
 }
 
 bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
 {
   BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
 
-  // Firstly, revert changes in the fixed entities
-  myStorage->blockEvents(true);
-  myStorage->refresh(true);
-
-  // Secondly, search attributes of the feature in the list of the Multi constraints and update them
-  updateMultiConstraints(myConstraints, theFeature);
-
-  // Then, create temporary Fixed constraint
+  // Create temporary Fixed constraint
   SolverConstraintPtr aConstraint = aBuilder->createMovementConstraint(theFeature);
   if (!aConstraint)
     return false;
-  aConstraint->process(myStorage, getId(), getWorkplaneId());
+  aConstraint->process(myStorage, myIsEventsBlocked);
   if (aConstraint->error().empty())
     setTemporary(aConstraint);
+  else
+    myStorage->notify(theFeature);
 
-  // Workaround to process arcs.
-  // When move unconstrained arc, add temporary constraint to fix radius.
-  if (theFeature->getKind() == SketchPlugin_Arc::ID()) {
-    bool hasDup = myStorage->hasDuplicatedConstraint();
-    SolverConstraintPtr aFixedRadius = aBuilder->createFixedArcRadiusConstraint(theFeature);
-    if (aFixedRadius) {
-      aFixedRadius->process(myStorage, getId(), getWorkplaneId());
-      hasDup = myStorage->hasDuplicatedConstraint() && !hasDup;
-      if (aFixedRadius->error().empty() && !hasDup)
-        setTemporary(aFixedRadius);
-      else
-        aFixedRadius->remove();
-    }
-  }
   return true;
-}
-
-// ============================================================================
-//  Function: addWorkplane
-//  Class:    SketchSolver_Group
-//  Purpose:  create workplane for the group
-// ============================================================================
-bool SketchSolver_Group::addWorkplane(CompositeFeaturePtr theSketch)
-{
-  if (myWorkplaneID != EID_UNKNOWN || theSketch->getKind() != SketchPlugin_Sketch::ID())
-    return false;  // the workplane already exists or the function parameter is not Sketch
-
-  mySketch = theSketch;
-  if (!updateWorkplane()) {
-    mySketch = CompositeFeaturePtr();
-    return false;
-  }
-  return true;
-}
-
-// ============================================================================
-//  Function: updateWorkplane
-//  Class:    SketchSolver_Group
-//  Purpose:  update parameters of workplane
-// ============================================================================
-bool SketchSolver_Group::updateWorkplane()
-{
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-  if (!myStorage) // Create storage if not exists
-    myStorage = aBuilder->createStorage(getId());
-
-  // sketch should be unchanged, set it out of current group
-  bool isUpdated = myStorage->update(FeaturePtr(mySketch), GID_OUTOFGROUP);
-  if (isUpdated) {
-    EntityWrapperPtr anEntity = myStorage->entity(FeaturePtr(mySketch));
-    myWorkplaneID = anEntity->id();
-  }
-  return isUpdated;
 }
 
 // ============================================================================
@@ -345,19 +119,16 @@ bool SketchSolver_Group::resolveConstraints()
   bool isGroupEmpty = isEmpty() && myStorage->isEmpty();
   if (myStorage->isNeedToResolve() &&
       (!isGroupEmpty || !myConflictingConstraints.empty() || myPrevResult == STATUS_FAILED)) {
-    if (!mySketchSolver)
-      mySketchSolver = SketchSolver_Manager::instance()->builder()->createSolver();
+////    if (!mySketchSolver)
+////      mySketchSolver = SketchSolver_Manager::instance()->builder()->createSolver();
 
-    mySketchSolver->setGroup(myID);
-    mySketchSolver->calculateFailedConstraints(false);
-    myStorage->initializeSolver(mySketchSolver);
-    mySketchSolver->prepare();
+////    mySketchSolver->calculateFailedConstraints(false);
+    myStorage->initializeSolver();
+////    mySketchSolver->prepare();
 
     SketchSolver_SolveStatus aResult = STATUS_OK;
     try {
-      if (myStorage->hasDuplicatedConstraint())
-        aResult = STATUS_INCONSISTENT;
-      else if (!isGroupEmpty) {
+      if (!isGroupEmpty) {
         // To avoid overconstraint situation, we will remove temporary constraints one-by-one
         // and try to find the case without overconstraint
         bool isLastChance = false;
@@ -373,7 +144,7 @@ bool SketchSolver_Group::resolveConstraints()
 
           removeTemporaryConstraints();
           mySketchSolver->calculateFailedConstraints(true); // something failed => need to find it
-          myStorage->initializeSolver(mySketchSolver);
+          myStorage->initializeSolver();
         }
       }
     } catch (...) {
@@ -392,10 +163,10 @@ bool SketchSolver_Group::resolveConstraints()
     if (aResult == STATUS_OK || aResult == STATUS_EMPTYSET) {
       myStorage->setNeedToResolve(false);
       myStorage->refresh();
-      updateMultiConstraints(myConstraints);
-      // multi-constraints updated some parameters, need to store them
-      if (myStorage->isNeedToResolve())
-        resolveConstraints();
+////      updateMultiConstraints(myConstraints);
+////      // multi-constraints updated some parameters, need to store them
+////      if (myStorage->isNeedToResolve())
+////        resolveConstraints();
 
       if (myPrevResult != STATUS_OK || myPrevResult == STATUS_UNKNOWN) {
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
@@ -448,142 +219,18 @@ bool SketchSolver_Group::resolveConstraints()
       myStorage->refresh();
   }
   removeTemporaryConstraints();
-  myStorage->blockEvents(false);
   myStorage->setNeedToResolve(false);
   return aResolved;
 }
 
 // ============================================================================
-//  Function: mergeGroups
-//  Class:    SketchSolver_Group
-//  Purpose:  append specified group to the current group
-// ============================================================================
-void SketchSolver_Group::mergeGroups(const SketchSolver_Group& theGroup)
-{
-  // If specified group is empty, no need to merge
-  if (theGroup.isEmpty())
-    return;
-
-  std::set<ObjectPtr> aConstraints;
-  ConstraintConstraintMap::const_iterator aConstrIter = theGroup.myConstraints.begin();
-  for (; aConstrIter != theGroup.myConstraints.end(); aConstrIter++)
-    aConstraints.insert(aConstrIter->first);
-
-  std::list<FeaturePtr> aSortedConstraints = selectApplicableFeatures(aConstraints);
-  std::list<FeaturePtr>::iterator aSCIter = aSortedConstraints.begin();
-  for (; aSCIter != aSortedConstraints.end(); ++aSCIter) {
-    ConstraintPtr aConstr = std::dynamic_pointer_cast<SketchPlugin_Constraint>(*aSCIter);
-    if (!aConstr)
-      continue;
-    changeConstraint(aConstr);
-  }
-
-  // merge previous states of groups => use the worst state,
-  // so the group after rebuilt may discard error messages if exist
-  if (theGroup.myPrevResult > myPrevResult)
-    myPrevResult = theGroup.myPrevResult;
-}
-
-// ============================================================================
-//  Function: splitGroup
-//  Class:    SketchSolver_Group
-//  Purpose:  divide the group into several subgroups
-// ============================================================================
-void SketchSolver_Group::splitGroup(std::list<SketchSolver_Group*>& theCuts)
-{
-  // New storage will be used in trimmed way to store the list of constraint interacted together.
-  StoragePtr aNewStorage = SketchSolver_Manager::instance()->builder()->createStorage(getId());
-  // empty vector to avoid creation of solver's constraints
-  std::list<ConstraintWrapperPtr> aDummyVec;
-
-  // Obtain constraints, which should be separated
-  std::list<ConstraintPtr> anUnusedConstraints;
-  ConstraintConstraintMap::iterator aCIter = myConstraints.begin();
-  for ( ; aCIter != myConstraints.end(); aCIter++) {
-    if (aNewStorage->isInteract(FeaturePtr(aCIter->first)))
-      aNewStorage->addConstraint(aCIter->first, aDummyVec);
-    else
-      anUnusedConstraints.push_back(aCIter->first);
-  }
-
-  // Check the unused constraints once again,
-  // because they may become interacted with new storage since adding constraints
-  std::list<ConstraintPtr>::iterator aUnuseIt = anUnusedConstraints.begin();
-  while (aUnuseIt != anUnusedConstraints.end()) {
-    if (aNewStorage->isInteract(FeaturePtr(*aUnuseIt))) {
-      aNewStorage->addConstraint(*aUnuseIt, aDummyVec);
-      anUnusedConstraints.erase(aUnuseIt);
-      aUnuseIt = anUnusedConstraints.begin();
-      continue;
-    }
-    aUnuseIt++;
-  }
-
-  std::list<SketchSolver_Group*>::iterator aCutsIter;
-  // Remove unused constraints
-  for (aUnuseIt = anUnusedConstraints.begin(); aUnuseIt != anUnusedConstraints.end(); ++aUnuseIt)
-    removeConstraint(*aUnuseIt);
-
-  SketchSolver_Group* aBaseGroup;
-  for (aUnuseIt = anUnusedConstraints.begin(); aUnuseIt != anUnusedConstraints.end(); ++aUnuseIt) {
-    aBaseGroup = 0;
-    aCutsIter = theCuts.begin();
-    // Try to append constraint to the current group
-    if (isInteract(*aUnuseIt)) {
-      changeConstraint(*aUnuseIt);
-      aBaseGroup = this;
-    } else {
-      // Try to append constraint to already existent group
-      for (; aCutsIter != theCuts.end(); ++aCutsIter)
-        if ((*aCutsIter)->isInteract(*aUnuseIt)) {
-          (*aCutsIter)->changeConstraint(*aUnuseIt);
-          break;
-        }
-    }
-
-    if (aCutsIter == theCuts.end() && !aBaseGroup) {
-      // Add new group
-      SketchSolver_Group* aGroup = new SketchSolver_Group(mySketch);
-      aGroup->changeConstraint(*aUnuseIt);
-      theCuts.push_back(aGroup);
-    } else {
-      if (!aBaseGroup)
-        aBaseGroup = *aCutsIter++;
-      // Find other groups interacting with constraint
-      for (; aCutsIter != theCuts.end(); ++aCutsIter)
-        if ((*aCutsIter)->isInteract(*aUnuseIt)) {
-          aBaseGroup->mergeGroups(**aCutsIter);
-          std::list<SketchSolver_Group*>::iterator aRemoveIt = aCutsIter--;
-          theCuts.erase(aRemoveIt);
-        }
-    }
-  }
-}
-
-// ============================================================================
-//  Function: isConsistent
+//  Function: repairConsistency
 //  Class:    SketchSolver_Group
 //  Purpose:  search removed entities and constraints
 // ============================================================================
-bool SketchSolver_Group::isConsistent()
+void SketchSolver_Group::repairConsistency()
 {
-  if (isEmpty()) // no one constraint is initialized yet
-    return true;
-
-  // Check the features and constraint is the storage are valid
-  bool aResult = myStorage->isConsistent();
-  if (aResult) {
-    // additional check of consistency of the Fixed constraint,
-    // because they are not added to the storage
-    ConstraintConstraintMap::iterator aCIter = myConstraints.begin();
-    for (; aCIter != myConstraints.end(); ++aCIter)
-      if (aCIter->first->getKind() == SketchPlugin_ConstraintRigid::ID() &&
-         (!aCIter->first->data() || !aCIter->first->data()->isValid())) {
-        aResult = false;
-        break;
-      }
-  }
-  if (!aResult) {
+  if (!myStorage->isConsistent()) {
     // remove invalid constraints
     std::set<ConstraintPtr> anInvalidConstraints;
     ConstraintConstraintMap::iterator aCIter = myConstraints.begin();
@@ -594,10 +241,10 @@ bool SketchSolver_Group::isConsistent()
     std::set<ConstraintPtr>::const_iterator aRemoveIt = anInvalidConstraints.begin();
     for (; aRemoveIt != anInvalidConstraints.end(); ++aRemoveIt)
       removeConstraint(*aRemoveIt);
+
     // remove invalid features
     myStorage->removeInvalidEntities();
   }
-  return aResult;
 }
 
 // ============================================================================
@@ -608,14 +255,18 @@ bool SketchSolver_Group::isConsistent()
 // ============================================================================
 void SketchSolver_Group::removeTemporaryConstraints()
 {
-  std::set<SolverConstraintPtr>::iterator aTmpIt = myTempConstraints.begin();
-  for (; aTmpIt != myTempConstraints.end(); ++aTmpIt)
-    (*aTmpIt)->remove();
+  if (!myTempConstraints.empty()) {
+    std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(
+        mySketchSolver)->removeConstraint(CID_MOVEMENT);
 
-  if (!myTempConstraints.empty())
-    myStorage->verifyFixed();
+    std::set<SolverConstraintPtr>::iterator aTmpIt = myTempConstraints.begin();
+    for (; aTmpIt != myTempConstraints.end(); ++aTmpIt)
+      (*aTmpIt)->remove();
+
+    myTempConstraints.clear();
+  }
+
   myStorage->setNeedToResolve(false);
-  myTempConstraints.clear();
 }
 
 // ============================================================================
@@ -629,18 +280,10 @@ void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
   for (; aCIter != myConstraints.end(); aCIter++)
     if (aCIter->first == theConstraint) {
       aCIter->second->remove(); // the constraint is not fully removed
-      if (aCIter->first->getKind() == SketchPlugin_ConstraintCoincidence::ID())
-        notifyCoincidenceChanged(aCIter->second);
       break;
     }
   if (aCIter != myConstraints.end())
     myConstraints.erase(aCIter);
-  // empty group => clear storage
-  if (myConstraints.empty()) {
-    myStorage = StoragePtr();
-    mySketchSolver = SolverPtr();
-    updateWorkplane();
-  }
 }
 
 // ============================================================================
@@ -653,114 +296,23 @@ void SketchSolver_Group::setTemporary(SolverConstraintPtr theConstraint)
   myTempConstraints.insert(theConstraint);
 }
 
-
 // ============================================================================
-//  Function: checkFeatureValidity
+//  Function: blockEvents
 //  Class:    SketchSolver_Group
-//  Purpose:  verifies is the feature valid
+//  Purpose:  block or unblock events from features in this group
 // ============================================================================
-bool SketchSolver_Group::checkFeatureValidity(FeaturePtr theFeature)
+void SketchSolver_Group::blockEvents(bool isBlocked)
 {
-  if (!theFeature || !theFeature->data()->isValid())
-    return true;
+  if (myIsEventsBlocked == isBlocked)
+    return;
 
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  return aFactory->validate(theFeature);
-}
+  // block/unblock events from the features in the storage
+  myStorage->blockEvents(isBlocked);
 
+  // block/unblock events from constraints
+  ConstraintConstraintMap::iterator aCIt = myConstraints.begin();
+  for (; aCIt != myConstraints.end(); ++aCIt)
+    aCIt->second->blockEvents(isBlocked);
 
-
-
-// ===========   Auxiliary functions   ========================================
-static double featureToVal(FeaturePtr theFeature)
-{
-  if (theFeature->getKind() == SketchPlugin_Sketch::ID())
-    return 0.0; // sketch
-  ConstraintPtr aConstraint = std::dynamic_pointer_cast<SketchPlugin_Constraint>(theFeature);
-  if (!aConstraint)
-    return 1.0; // features (arc, circle, line, point)
-
-  const std::string& anID = aConstraint->getKind();
-  if (anID == SketchPlugin_ConstraintCoincidence::ID()) {
-    AttributeRefAttrPtr anAttrA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-        aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-    AttributeRefAttrPtr anAttrB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-        aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
-    if (anAttrA && anAttrB && (anAttrA->isObject() || anAttrB->isObject()))
-      // point-on-line and point-on-circle should go before points coincidence constraint
-      return 2.0;
-    return 2.5;
-  }
-  if (anID == SketchPlugin_ConstraintDistance::ID() ||
-      anID == SketchPlugin_ConstraintLength::ID() ||
-      anID == SketchPlugin_ConstraintRadius::ID())
-    return 3.0;
-  if (anID == SketchPlugin_ConstraintAngle::ID())
-    return 3.5;
-  if (anID == SketchPlugin_ConstraintHorizontal::ID() ||
-      anID == SketchPlugin_ConstraintVertical::ID() ||
-      anID == SketchPlugin_ConstraintParallel::ID() ||
-      anID == SketchPlugin_ConstraintPerpendicular::ID())
-    return 4.0;
-  if (anID == SketchPlugin_ConstraintEqual::ID())
-    return 5.0;
-  if (anID == SketchPlugin_ConstraintTangent::ID() ||
-      anID == SketchPlugin_ConstraintMirror::ID())
-    return 6.0;
-  if (anID == SketchPlugin_ConstraintRigid::ID())
-    return 0.5;
-  if (anID == SketchPlugin_MultiRotation::ID() ||
-      anID == SketchPlugin_MultiTranslation::ID())
-    return 8.0;
-
-  // all other constraints are placed between Equal and Tangent constraints
-  return 5.5;
-}
-
-static bool isLess(FeaturePtr theFeature1, FeaturePtr theFeature2)
-{
-  return featureToVal(theFeature1) < featureToVal(theFeature2);
-}
-
-std::list<FeaturePtr> SketchSolver_Group::
-  selectApplicableFeatures(const std::set<ObjectPtr>& theObjects)
-{
-  std::list<FeaturePtr> aResult;
-  std::list<FeaturePtr>::iterator aResIt;
-
-  std::set<ObjectPtr>::const_iterator anObjIter = theObjects.begin();
-  for (; anObjIter != theObjects.end(); ++anObjIter) {
-    // Operate sketch itself and SketchPlugin features only.
-    // Also, the Fillet and Split need to be skipped,
-    // because there are several separated constraints composing it.
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
-    if (!aFeature)
-      continue;
-    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
-        std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    if ((aFeature->getKind() != SketchPlugin_Sketch::ID() && !aSketchFeature) ||
-        aFeature->getKind() == SketchPlugin_ConstraintFillet::ID() ||
-        aFeature->getKind() == SketchPlugin_ConstraintSplit::ID())
-      continue;
-
-    // Find the place where to insert a feature
-    for (aResIt = aResult.begin(); aResIt != aResult.end(); ++aResIt)
-      if (isLess(aFeature, *aResIt))
-        break;
-    aResult.insert(aResIt, aFeature);
-  }
-
-  return aResult;
-}
-
-void SketchSolver_Group::notifyCoincidenceChanged(SolverConstraintPtr theCoincidence)
-{
-  const std::list<EntityWrapperPtr>& aCoincident = theCoincidence->attributes();
-  EntityWrapperPtr anAttr1 = aCoincident.front();
-  EntityWrapperPtr anAttr2 = aCoincident.back();
-
-  ConstraintConstraintMap::iterator anIt = myConstraints.begin();
-  for (; anIt != myConstraints.end(); ++anIt)
-    anIt->second->notifyCoincidenceChanged(anAttr1, anAttr2);
+  myIsEventsBlocked = isBlocked;
 }

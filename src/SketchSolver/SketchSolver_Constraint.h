@@ -9,6 +9,7 @@
 
 #include "SketchSolver.h"
 #include <SketchSolver_Storage.h>
+#include <PlaneGCSSolver_Update.h>
 
 #include <SketchPlugin_Constraint.h>
 
@@ -27,49 +28,40 @@ class SketchSolver_Constraint
 protected:
   /// Default constructor
   SketchSolver_Constraint()
-    : myGroupID(GID_UNKNOWN),
-      myType(CONSTRAINT_UNKNOWN)
+    : myType(CONSTRAINT_UNKNOWN)
   {}
 
 public:
   /// Constructor based on SketchPlugin constraint
-  SKETCHSOLVER_EXPORT SketchSolver_Constraint(ConstraintPtr theConstraint);
+  SketchSolver_Constraint(ConstraintPtr theConstraint);
 
   virtual ~SketchSolver_Constraint() {}
 
   /// \brief Initializes parameters and start constraint creation
-  /// \param theStorage  [in]  storage where to place new constraint
-  /// \param theGroupID  [in]  group for constraint
-  /// \param theSketchID [in] sketch for constraint
-  void process(StoragePtr theStorage, const GroupID& theGroupID, const EntityID& theSketchID);
+  /// \param theStorage       [in]  storage where to place new constraint
+  /// \param theEventsBlocked [in]  all events from this constraint should be blocked
+  void process(StoragePtr theStorage, bool theEvensBlocked);
+
+  /// \brief Notify this object about the feature is changed somewhere
+  virtual void notify(const FeaturePtr& theFeature, PlaneGCSSolver_Update* theUpdater) {}
 
   /// \brief Update constraint
-  SKETCHSOLVER_EXPORT virtual void update();
+  virtual void update();
 
   /// \brief Tries to remove constraint
   /// \return \c false, if current constraint contains another SketchPlugin constraints
   /// (like for multiple coincidence)
-  SKETCHSOLVER_EXPORT virtual bool remove();
+  virtual bool remove();
+
+  /// \brief Block or unblock events from this constraint
+  virtual void blockEvents(bool isBlocked);
 
   /// \brief Obtain a type of SketchPlugin constraint
-  SKETCHSOLVER_EXPORT static SketchSolver_ConstraintType TYPE(ConstraintPtr theConstraint);
+  static SketchSolver_ConstraintType TYPE(ConstraintPtr theConstraint);
 
   /// \brief Returns the type of constraint
   virtual SketchSolver_ConstraintType getType() const
   { return myType; }
-
-  /// \brief Returns list of attributes of constraint
-  const std::list<EntityWrapperPtr>& attributes() const
-  { return myAttributes; }
-
-  /// \brief Verify the feature or any its attribute is used by constraint
-  virtual bool isUsed(FeaturePtr theFeature) const;
-  /// \brief Verify the attribute is used by constraint
-  virtual bool isUsed(AttributePtr theAttribute) const;
-
-  /// \brief Notify constraint, that coincidence appears or removed
-  virtual void notifyCoincidenceChanged(EntityWrapperPtr theCoincAttr1,
-    EntityWrapperPtr theCoincAttr2) { /* implement in derived class */ }
 
   /// \brief Shows error message
   const std::string& error() const
@@ -82,7 +74,8 @@ protected:
   /// \brief Generate list of attributes of constraint in order useful for constraints
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
   /// \param[out] theAttributes list of attributes to be filled
-  virtual void getAttributes(double& theValue, std::vector<EntityWrapperPtr>& theAttributes);
+  virtual void getAttributes(EntityWrapperPtr&              theValue,
+                             std::vector<EntityWrapperPtr>& theAttributes);
 
   /// \brief This method is used in derived objects to check consistency of constraint.
   ///        E.g. the distance between line and point may be signed.
@@ -94,9 +87,8 @@ protected:
   { myErrorMsg.clear(); }
 
 protected:
-  GroupID       myGroupID;  ///< identifier of the group, the constraint belongs to
-  EntityID      mySketchID; ///< identifier of the sketch, the constraint belongs to
   ConstraintPtr myBaseConstraint; ///< base SketchPlugin constraint
+  ConstraintWrapperPtr mySolverConstraint; ///< wrapper for PlaneGCS constraint
 
   /// storage, which contains all information about entities and constraints
   StoragePtr    myStorage;

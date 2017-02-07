@@ -200,12 +200,6 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
   aProjection->execute();
   aRefAttr->setObject(aProjection);
 
-  if (!hasPrevProj) {
-    FeaturePtr aFixed = sketch()->addFeature(SketchPlugin_ConstraintRigid::ID());
-    aFixed->refattr(SketchPlugin_Constraint::ENTITY_A())->setObject(aProjection->lastResult());
-    aFixed->execute();
-  }
-
   if (theID == EXTERNAL_FEATURE_ID()) {
     selection(EXTERNAL_ID())->setValue(aExtFeature->context(), aExtFeature->value());
 

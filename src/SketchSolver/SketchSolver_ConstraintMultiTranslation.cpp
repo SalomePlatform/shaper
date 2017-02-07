@@ -4,6 +4,8 @@
 #include <SketchSolver_Error.h>
 #include <SketchSolver_Manager.h>
 
+#include <PlaneGCSSolver_PointWrapper.h>
+
 #include <SketchPlugin_MultiTranslation.h>
 
 #include <ModelAPI_AttributeString.h>
@@ -39,8 +41,8 @@ void SketchSolver_ConstraintMultiTranslation::getAttributes(
 void SketchSolver_ConstraintMultiTranslation::process()
 {
   cleanErrorMsg();
-  if (!myBaseConstraint || !myStorage || myGroupID == GID_UNKNOWN) {
-    /// TODO: Put error message here
+  if (!myBaseConstraint || !myStorage) {
+    // Not enough parameters are assigned
     return;
   }
 
@@ -51,25 +53,10 @@ void SketchSolver_ConstraintMultiTranslation::process()
   if (!myErrorMsg.empty())
     return;
 
-  AttributeStringPtr aMethodTypeAttr =
-      myBaseConstraint->data()->string(SketchPlugin_MultiTranslation::VALUE_TYPE());
-
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-  std::list<ConstraintWrapperPtr> aTransConstraints;
-
-  std::list<EntityWrapperPtr>::iterator anEntIt = aBaseEntities.begin();
-  for (; anEntIt != aBaseEntities.end(); ++anEntIt) {
-    std::list<ConstraintWrapperPtr> aNewConstraints =
-        aBuilder->createConstraint(myBaseConstraint, myGroupID, mySketchID, myType,
-        0.0, aFullValue, aStartPoint, aEndPoint, std::list<EntityWrapperPtr>(1, *anEntIt));
-    aTransConstraints.insert(aTransConstraints.end(),
-                             aNewConstraints.begin(), aNewConstraints.end());
-  }
-
-  myStorage->addConstraint(myBaseConstraint, aTransConstraints);
-
   myAdjusted = false;
   adjustConstraint();
+
+  myStorage->subscribeUpdates(this, PlaneGCSSolver_UpdateFeature::GROUP());
 }
 
 const std::string& SketchSolver_ConstraintMultiTranslation::nameNbObjects()
@@ -98,47 +85,8 @@ void SketchSolver_ConstraintMultiTranslation::updateLocal()
   if (isMethodChanged)
     myIsFullValue = aFullValue;
 
-  if (aStartPointChanged || anEndPointChanged || isMethodChanged) {
-    DataPtr aData = myBaseConstraint->data();
-    std::list<ConstraintWrapperPtr> aConstraints = myStorage->constraint(myBaseConstraint);
-    std::list<ConstraintWrapperPtr>::const_iterator anIt = aConstraints.begin(),
-                                                    aLast = aConstraints.end();
-    std::list<EntityWrapperPtr> anEntities;
-    for (; anIt != aLast; anIt++) {
-      ConstraintWrapperPtr aConstraint = *anIt;
-      aConstraint->setIsFullValue(myIsFullValue);
-      anEntities.clear();
-
-      const std::list<EntityWrapperPtr>& aConstraintEntities = aConstraint->entities();
-      std::list<EntityWrapperPtr>::const_iterator aSIt = aConstraintEntities.begin(),
-                                                  aSLast = aConstraintEntities.end();
-      EntityWrapperPtr aStartEntity = *aSIt++;
-      if (aStartPointChanged) {
-        AttributePtr aStartPointAttr =
-          aData->attribute(SketchPlugin_MultiTranslation::START_POINT_ID());
-        myStorage->update(aStartPointAttr);
-        aStartEntity = myStorage->entity(aStartPointAttr);
-      }
-      anEntities.push_back(aStartEntity);
-
-      EntityWrapperPtr anEndEntity = *aSIt++;
-      if (anEndPointChanged) {
-        AttributePtr anEndPointAttr =
-          aData->attribute(SketchPlugin_MultiTranslation::END_POINT_ID());
-        myStorage->update(anEndPointAttr);
-        anEndEntity = myStorage->entity(anEndPointAttr);
-      }
-      anEntities.push_back(anEndEntity);
-
-      for (; aSIt != aSLast; ++aSIt)
-        anEntities.push_back(*aSIt);
-
-      aConstraint->setEntities(anEntities);
-    }
-    myStorage->addConstraint(myBaseConstraint, aConstraints);
-
+  if (aStartPointChanged || anEndPointChanged || isMethodChanged)
     myAdjusted = false;
-  }
 }
 
 void SketchSolver_ConstraintMultiTranslation::adjustConstraint()
@@ -147,15 +95,18 @@ void SketchSolver_ConstraintMultiTranslation::adjustConstraint()
     return;
 
   // Obtain delta between start and end points of translation
-  EntityWrapperPtr aStart = myStorage->entity(
-      myBaseConstraint->attribute(SketchPlugin_MultiTranslation::START_POINT_ID()));
-  std::list<ParameterWrapperPtr> aStartParams = aStart->parameters();
-  EntityWrapperPtr aEnd = myStorage->entity(
-      myBaseConstraint->attribute(SketchPlugin_MultiTranslation::END_POINT_ID()));
-  std::list<ParameterWrapperPtr> aEndParams = aEnd->parameters();
+  std::shared_ptr<PlaneGCSSolver_PointWrapper> aStartWrapper =
+      std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(myStorage->entity(
+      myBaseConstraint->attribute(SketchPlugin_MultiTranslation::START_POINT_ID())));
+  std::shared_ptr<PlaneGCSSolver_PointWrapper> aEndWrapper =
+      std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(myStorage->entity(
+      myBaseConstraint->attribute(SketchPlugin_MultiTranslation::END_POINT_ID())));
 
-  myDelta[0] = aEndParams.front()->value() - aStartParams.front()->value();
-  myDelta[1] = aEndParams.back()->value() - aStartParams.back()->value();
+  GCSPointPtr aStart = aStartWrapper->point();
+  GCSPointPtr aEnd   = aEndWrapper->point();
+
+  myDelta[0] = *(aEnd->x) - *(aStart->x);
+  myDelta[1] = *(aEnd->y) - *(aStart->y);
 
   if (myIsFullValue && myNumberOfCopies > 0) {
     myDelta[0] /= myNumberOfCopies;

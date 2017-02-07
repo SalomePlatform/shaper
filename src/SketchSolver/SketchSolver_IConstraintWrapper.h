@@ -54,17 +54,11 @@ class SketchSolver_IConstraintWrapper
 public:
   virtual ~SketchSolver_IConstraintWrapper() {}
 
-  /// \brief Return base feature
-  const ConstraintPtr& baseConstraint() const
-  { return myBaseConstraint; }
-
-  /// \brief Return ID of current entity
-  virtual ConstraintID id() const = 0;
-
-  /// \brief Change group for the constraint
-  virtual void setGroup(const GroupID& theGroup) = 0;
-  /// \brief Return identifier of the group the constraint belongs to
-  virtual GroupID group() const = 0;
+  /// \brief Return ID of current constraint
+  const ConstraintID& id() const
+  { return myID; }
+  /// \brief Change constraint ID
+  virtual void setId( const ConstraintID& theID) = 0;
 
   /// \brief Return type of current entity
   virtual SketchSolver_ConstraintType type() const = 0;
@@ -77,11 +71,9 @@ public:
   { return myConstrained; }
 
   /// \brief Assign numeric parameter of constraint
-  virtual void setValue(const double& theValue)
-  { myValue = theValue; }
+  virtual void setValue(const double& theValue) = 0;
   /// \brief Return numeric parameter of constraint
-  const double& value() const
-  { return myValue; }
+  virtual double value() const = 0;
 
   /// \brief Store a boolean flag for full value using
   void setIsFullValue(const bool& theFullValue)
@@ -90,22 +82,9 @@ public:
   const bool& isFullValue() const
   { return myIsFullValue; }
 
-  /// \brief Verify the feature is used in the constraint
-  virtual bool isUsed(FeaturePtr theFeature) const = 0;
-  /// \brief Verify the attribute is used in the constraint
-  virtual bool isUsed(AttributePtr theAttribute) const = 0;
-
-  /// \brief Compare current constraint with other
-  virtual bool isEqual(const std::shared_ptr<SketchSolver_IConstraintWrapper>& theOther) = 0;
-
-  /// \brief Update values of parameters of this constraint by the parameters of given one
-  /// \return \c true if some parameters change their values
-  virtual bool update(const std::shared_ptr<SketchSolver_IConstraintWrapper>& theOther) = 0;
-
 protected:
-  ConstraintPtr               myBaseConstraint;
+  ConstraintID                myID;
   std::list<EntityWrapperPtr> myConstrained;
-  double                      myValue;
   bool                        myIsFullValue;
 };
 

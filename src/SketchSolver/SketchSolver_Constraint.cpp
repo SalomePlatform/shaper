@@ -5,6 +5,8 @@
 #include <SketchSolver_Error.h>
 #include <SketchSolver_Manager.h>
 
+#include <PlaneGCSSolver_AttributeBuilder.h>
+
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Line.h>
@@ -37,20 +39,21 @@
 SketchSolver_Constraint::SketchSolver_Constraint(
     ConstraintPtr  theConstraint)
   : myBaseConstraint(theConstraint),
-    myGroupID(GID_UNKNOWN),
     myType(CONSTRAINT_UNKNOWN)
 {
 }
 
-void SketchSolver_Constraint::process(StoragePtr theStorage,
-                                      const GroupID& theGroupID,
-                                      const EntityID& theSketchID)
+void SketchSolver_Constraint::process(StoragePtr theStorage, bool theEvensBlocked)
 {
   myStorage = theStorage;
-  myGroupID = theGroupID;
-  mySketchID = theSketchID;
+  blockEvents(theEvensBlocked);
   // Process constraint according to its type
   process();
+}
+
+void SketchSolver_Constraint::blockEvents(bool isBlocked)
+{
+  myBaseConstraint->data()->blockSendAttributeUpdated(isBlocked);
 }
 
 
@@ -93,13 +96,13 @@ SketchSolver_ConstraintType SketchSolver_Constraint::TYPE(ConstraintPtr theConst
 void SketchSolver_Constraint::process()
 {
   cleanErrorMsg();
-  if (!myBaseConstraint || !myStorage || myGroupID == GID_UNKNOWN) {
+  if (!myBaseConstraint || !myStorage) {
     // Not enough parameters are assigned
     return;
   }
 
   SketchSolver_ConstraintType aConstrType = getType();
-  double aValue;
+  EntityWrapperPtr aValue;
   std::vector<EntityWrapperPtr> anAttributes;
   getAttributes(aValue, anAttributes);
   if (!myErrorMsg.empty())
@@ -112,10 +115,10 @@ void SketchSolver_Constraint::process()
     aConstrType = getType();
 
   BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-  std::list<ConstraintWrapperPtr> aNewConstraints = aBuilder->createConstraint(
-      myBaseConstraint, myGroupID, mySketchID, aConstrType,
+  ConstraintWrapperPtr aNewConstraint = aBuilder->createConstraint(
+      myBaseConstraint, aConstrType,
       aValue, anAttributes[0], anAttributes[1], anAttributes[2], anAttributes[3]);
-  myStorage->addConstraint(myBaseConstraint, aNewConstraints);
+  myStorage->addConstraint(myBaseConstraint, aNewConstraint);
 
   adjustConstraint();
 }
@@ -123,69 +126,42 @@ void SketchSolver_Constraint::process()
 void SketchSolver_Constraint::update()
 {
   cleanErrorMsg();
-  std::list<ConstraintWrapperPtr> aWrapper = myStorage->constraint(myBaseConstraint);
-  std::list<ConstraintWrapperPtr>::iterator aWIt = aWrapper.begin();
 
-  // Check if attributes of constraint are changed, rebuild constraint
-  std::set<AttributePtr> anAttributes;
-  std::set<AttributePtr>::iterator aFoundAttr;
-  std::set<FeaturePtr> aFeatures;
-  std::set<FeaturePtr>::iterator aFoundFeat;
+  // Get list of attributes of the constraint and compare it with previously stored.
+  // If the lists are different, fully rebuild constraint
+  std::set<EntityWrapperPtr> anAttributes;
   for (int anEntIndex = 0; anEntIndex < 4; ++anEntIndex) {
     AttributePtr anAttr =
         myBaseConstraint->attribute(SketchPlugin_Constraint::ATTRIBUTE(anEntIndex));
     if (!anAttr)
       continue;
 
-    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttr);
-    if (aRefAttr) {
-      if (aRefAttr->isObject()) {
-        FeaturePtr aFeat = ModelAPI_Feature::feature(aRefAttr->object());
-        if (myBaseConstraint->getKind() != SketchPlugin_ConstraintLength::ID())
-          aFeatures.insert(aFeat);
-        else {
-          // Workaround for the Length constraint: add points of line, not line itself
-          anAttributes.insert(aFeat->attribute(SketchPlugin_Line::START_ID()));
-          anAttributes.insert(aFeat->attribute(SketchPlugin_Line::END_ID()));
-        }
-      } else
-        anAttributes.insert(aRefAttr->attr());
-    } else
-      anAttributes.insert(anAttr);
-  }
-  bool hasNewAttr = !(anAttributes.empty() && aFeatures.empty());
-  for (; hasNewAttr && aWIt != aWrapper.end(); ++ aWIt) {
-    const std::list<EntityWrapperPtr>& aSubs = (*aWIt)->entities();
-    std::list<EntityWrapperPtr>::const_iterator aSIt = aSubs.begin();
-    for (; hasNewAttr && aSIt != aSubs.end(); ++aSIt) {
-      if ((*aSIt)->baseAttribute()) {
-        aFoundAttr = anAttributes.find((*aSIt)->baseAttribute());
-        if (aFoundAttr != anAttributes.end())
-          anAttributes.erase(aFoundAttr);
-      } else {
-        aFoundFeat = aFeatures.find((*aSIt)->baseFeature());
-        if (aFoundFeat != aFeatures.end())
-          aFeatures.erase(aFoundFeat);
+    if (myBaseConstraint->getKind() == SketchPlugin_ConstraintLength::ID()) {
+      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttr);
+      FeaturePtr aFeat = ModelAPI_Feature::feature(aRefAttr->object());
+      if (aFeat) {
+        // Workaround for the Length constraint: add points of line, not line itself
+        anAttributes.insert(myStorage->entity(aFeat->attribute(SketchPlugin_Line::START_ID())));
+        anAttributes.insert(myStorage->entity(aFeat->attribute(SketchPlugin_Line::END_ID())));
       }
-      hasNewAttr = !(anAttributes.empty() && aFeatures.empty());
-    }
+    } else
+      anAttributes.insert(myStorage->entity(anAttr));
   }
-  if (hasNewAttr) {
+
+  std::set<EntityWrapperPtr>::iterator aFound;
+  std::list<EntityWrapperPtr>::const_iterator anAttrIt = myAttributes.begin();
+  for (; anAttrIt != myAttributes.end() && !anAttributes.empty(); ++anAttrIt)
+    anAttributes.erase(*anAttrIt);
+
+  if (!anAttributes.empty()) {
     remove();
     process();
     return;
   }
 
-  AttributeDoublePtr aValueAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      myBaseConstraint->attribute(SketchPlugin_Constraint::VALUE()));
-  if (aValueAttr) {
-    for (aWIt = aWrapper.begin(); aWIt != aWrapper.end(); ++aWIt)
-      if (fabs((*aWIt)->value() - aValueAttr->value()) > tolerance) {
-        (*aWIt)->setValue(aValueAttr->value());
-        myStorage->setNeedToResolve(true);
-      }
-  }
-  myStorage->addConstraint(myBaseConstraint, aWrapper);
+  AttributeDoublePtr aValueAttr = myBaseConstraint->real(SketchPlugin_Constraint::VALUE());
+  if (aValueAttr)
+    myStorage->update(aValueAttr);
 
   adjustConstraint();
 }
@@ -194,11 +170,12 @@ bool SketchSolver_Constraint::remove()
 {
   cleanErrorMsg();
   myType = CONSTRAINT_UNKNOWN;
+  myStorage->unsubscribeUpdates(this);
   return myStorage->removeConstraint(myBaseConstraint);
 }
 
 void SketchSolver_Constraint::getAttributes(
-    double& theValue,
+    EntityWrapperPtr& theValue,
     std::vector<EntityWrapperPtr>& theAttributes)
 {
   static const int anInitNbOfAttr = 4;
@@ -210,9 +187,12 @@ void SketchSolver_Constraint::getAttributes(
 
   myType = TYPE(myBaseConstraint);
 
-  AttributeDoublePtr aValueAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      aData->attribute(SketchPlugin_Constraint::VALUE()));
-  theValue = aValueAttr ? aValueAttr->value() : 0.0;
+  AttributeDoublePtr aValueAttr = aData->real(SketchPlugin_Constraint::VALUE());
+  if (aValueAttr) {
+    PlaneGCSSolver_AttributeBuilder aValueBuilder;
+    theValue = aValueBuilder.createAttribute(aValueAttr);
+    myStorage->addEntity(aValueAttr, theValue);
+  }
 
   int aPtInd = 0; // index of first point in the list of attributes
   int aEntInd = 2; // index of first entity in the list of attributes
@@ -226,13 +206,8 @@ void SketchSolver_Constraint::getAttributes(
       return;
     }
 
-    myStorage->update(*anIter/*, myGroupID*/);
+    myStorage->update(*anIter, true);
     EntityWrapperPtr anEntity = myStorage->entity(*anIter);
-    if (!anEntity) {
-      // Force creation of an entity
-      myStorage->update(*anIter, GID_UNKNOWN, true);
-      anEntity = myStorage->entity(*anIter);
-    }
     myAttributes.push_back(anEntity);
 
     SketchSolver_EntityType aType = anEntity->type();
@@ -248,42 +223,4 @@ void SketchSolver_Constraint::getAttributes(
       aEntInd++;
     }
   }
-}
-
-bool SketchSolver_Constraint::isUsed(FeaturePtr theFeature) const
-{
-  const std::list<ConstraintWrapperPtr>& aCList = myStorage->constraint(myBaseConstraint);
-  std::list<ConstraintWrapperPtr>::const_iterator aCIt = aCList.begin();
-  for (; aCIt != aCList.end(); ++aCIt)
-    if ((*aCIt)->isUsed(theFeature))
-      return true;
-
-  std::list<AttributePtr> anAttrList =
-    theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
-  std::list<AttributePtr>::const_iterator anAttrIt = anAttrList.begin();
-  for (; anAttrIt != anAttrList.end(); ++ anAttrIt)
-    if (isUsed(*anAttrIt))
-      return true;
-
-  return false;
-}
-
-bool SketchSolver_Constraint::isUsed(AttributePtr theAttribute) const
-{
-  AttributePtr anAttribute = theAttribute;
-  AttributeRefAttrPtr aRefAttr =
-      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
-  if (aRefAttr) {
-    if (aRefAttr->isObject())
-      return isUsed(ModelAPI_Feature::feature(aRefAttr->object()));
-    else
-      anAttribute = aRefAttr->attr();
-  }
-
-  const std::list<ConstraintWrapperPtr>& aCList = myStorage->constraint(myBaseConstraint);
-  std::list<ConstraintWrapperPtr>::const_iterator aCIt = aCList.begin();
-  for (; aCIt != aCList.end(); ++aCIt)
-    if ((*aCIt)->isUsed(theAttribute))
-      return true;
-  return false;
 }

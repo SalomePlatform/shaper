@@ -90,6 +90,24 @@ reflistB.setObject(aLine1.lastResult())
 aConstraint.execute()
 aSession.finishOperation()
 #=========================================================================
+# Check error message (this message is not a error but a limitation of PlaneGCS)
+# If the problem will be resolved, following block may be removed
+#=========================================================================
+assert aSketchFeature.string("SolverError").value() != "", "PlaneGCS limitation: if you see this message, then PlaneGCS has solved conflicting constraints when applying Middle constraint for the point out of the segment"
+aSession.startOperation()
+aDocument.removeFeature(aConstraint)
+aSession.finishOperation()
+aSession.startOperation()
+aEndPoint2.setValue(80., 25.)
+aConstraint = aSketchFeature.addFeature("SketchConstraintMiddle")
+reflistA = aConstraint.refattr("ConstraintEntityA")
+reflistB = aConstraint.refattr("ConstraintEntityB")
+reflistA.setAttr(aEndPoint2)
+reflistB.setObject(aLine1.lastResult())
+aConstraint.execute()
+aSession.finishOperation()
+
+#=========================================================================
 # Check values and move one constrainted object
 #=========================================================================
 checkMiddlePoint(aEndPoint2, aLine1)
@@ -137,6 +155,48 @@ checkMiddlePoint(anOriginCoord, aLine2)
 # Check origin coordinates does not changed
 #=========================================================================
 assert (anOriginCoord.x() == 0. and anOriginCoord.y() == 0.)
+
+#=========================================================================
+# Add other line with one extremity coincident to the first line
+#=========================================================================
+aSession.startOperation()
+aLine3 = aSketchFeature.addFeature("SketchLine")
+aStartPoint3 = geomDataAPI_Point2D(aLine3.attribute("StartPoint"))
+aEndPoint3 = geomDataAPI_Point2D(aLine3.attribute("EndPoint"))
+aStartPoint3.setValue(50., 50.)
+aEndPoint3.setValue(50., 0.)
+aCoincidence = aSketchFeature.addFeature("SketchConstraintCoincidence")
+reflistA = aCoincidence.refattr("ConstraintEntityA")
+reflistB = aCoincidence.refattr("ConstraintEntityB")
+reflistA.setAttr(aEndPoint3)
+reflistB.setObject(aLine1.lastResult())
+aSession.finishOperation()
+#=========================================================================
+# Set Middle point
+#=========================================================================
+aSession.startOperation()
+aMiddle = aSketchFeature.addFeature("SketchConstraintMiddle")
+reflistA = aMiddle.refattr("ConstraintEntityA")
+reflistB = aMiddle.refattr("ConstraintEntityB")
+reflistA.setAttr(aEndPoint3)
+reflistB.setObject(aLine1.lastResult())
+aSession.finishOperation()
+# check the point, and no error message
+assert aSketchFeature.string("SolverError").value() == ""
+checkMiddlePoint(aEndPoint3, aLine1)
+#=========================================================================
+# Remove coincidence and move one line
+#=========================================================================
+aSession.startOperation()
+aDocument.removeFeature(aCoincidence)
+aSession.finishOperation()
+deltaX, deltaY = 10.0, -10.0
+aSession.startOperation()
+aStartPoint1.setValue(aStartPoint1.x() + deltaX, aStartPoint1.y() + deltaY)
+aEndPoint1.setValue(aEndPoint1.x() + deltaX, aEndPoint1.y() + deltaY)
+aSession.finishOperation()
+checkMiddlePoint(aEndPoint3, aLine1)
+
 #=========================================================================
 # End of test
 #=========================================================================

@@ -48,7 +48,7 @@ model.do()
 # Creating a cylinder on a face of the box
 
 thisface = "Extrusion_1_1/Generated_Face_2"
-thisxmin = "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_2"
+thisxmin = "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/Generated_Face_1"
 thiszmax = "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/To_Face_1_1"
 
 mystand = model.addSketch(mypart, thisface)

@@ -43,15 +43,15 @@ def checkMirror(theListInit, theListMirr, theMirrorLine):
         assert(aFeatureC is not None)
         assert(aFeatureB.getKind() == aFeatureC.getKind())
         
-        anAttributes = {}
+        anAttributes = []
         if (aFeatureB.getKind() == "SketchLine"):
-            anAttributes = {'StartPoint':'StartPoint', 'EndPoint':'EndPoint'}
+            anAttributes = ['StartPoint', 'EndPoint']
         elif (aFeatureB.getKind() == "SketchArc"):
-            anAttributes = {'ArcCenter':'ArcCenter', 'ArcStartPoint':'ArcEndPoint', 'ArcEndPoint':'ArcStartPoint'}
+            anAttributes = ['ArcCenter', 'ArcStartPoint', 'ArcEndPoint']
         
         for key in anAttributes:
             aPointB = geomDataAPI_Point2D(aFeatureB.attribute(key))
-            aPointC = geomDataAPI_Point2D(aFeatureC.attribute(anAttributes[key]))
+            aPointC = geomDataAPI_Point2D(aFeatureC.attribute(key))
             aDir = [aPointC.x() - aPointB.x(), aPointC.y() - aPointB.y()]
             aDir = normalize(aDir)
             aDot = aLineDir[0] * aDir[0] + aLineDir[1] * aDir[1]

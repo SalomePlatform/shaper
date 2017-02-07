@@ -5,62 +5,20 @@
 // Author:  Artem ZHIDKOV
 
 #include <PlaneGCSSolver_ScalarWrapper.h>
-#include <PlaneGCSSolver_ParameterWrapper.h>
 
+#include <cmath>
 
-
-PlaneGCSSolver_ScalarWrapper::PlaneGCSSolver_ScalarWrapper(
-    const AttributePtr              theAttribute,
-    const ParameterWrapperPtr       theParam)
+PlaneGCSSolver_ScalarWrapper::PlaneGCSSolver_ScalarWrapper(double *const theParam)
+  : myValue(theParam)
 {
-  myBaseAttribute = theAttribute;
-  myParameters.assign(1, theParam);
 }
 
-void PlaneGCSSolver_ScalarWrapper::setGroup(const GroupID& theGroup)
+void PlaneGCSSolver_ScalarWrapper::setValue(double theValue)
 {
-  myGroup = theGroup;
-  myParameters.front()->setGroup(theGroup);
+  *myValue = theValue;
 }
 
-double* PlaneGCSSolver_ScalarWrapper::scalar() const
+double PlaneGCSSolver_ScalarWrapper::value() const
 {
-  std::shared_ptr<PlaneGCSSolver_ParameterWrapper> aParam =
-      std::dynamic_pointer_cast<PlaneGCSSolver_ParameterWrapper>(myParameters.front());
-  return aParam->parameter();
-}
-
-bool PlaneGCSSolver_ScalarWrapper::isUsed(AttributePtr theAttribute) const
-{
-  return isBase(theAttribute);
-}
-
-bool PlaneGCSSolver_ScalarWrapper::isEqual(const EntityWrapperPtr& theOther)
-{
-  if (type() != theOther->type())
-    return false;
-
-  // Verify equality of parameters
-  const std::list<ParameterWrapperPtr>& anOtherParams = theOther->parameters();
-  if (myParameters.size() != anOtherParams.size())
-    return false;
-  std::list<ParameterWrapperPtr>::const_iterator aMyIt = myParameters.begin();
-  std::list<ParameterWrapperPtr>::const_iterator anOtherIt = anOtherParams.begin();
-  for (; aMyIt != myParameters.end(); ++aMyIt, ++anOtherIt)
-    if (!(*aMyIt)->isEqual(*anOtherIt))
-      return false;
-  return true;
-}
-
-bool PlaneGCSSolver_ScalarWrapper::update(const EntityWrapperPtr& theOther)
-{
-  bool isUpdated = false;
-  std::list<ParameterWrapperPtr> aMyParams = parameters();
-  std::list<ParameterWrapperPtr> anOtherParams = theOther->parameters();
-  std::list<ParameterWrapperPtr>::const_iterator aMyParIt = aMyParams.begin();
-  std::list<ParameterWrapperPtr>::const_iterator anOtherParIt = anOtherParams.begin();
-  for (; aMyParIt != aMyParams.end() && anOtherParIt != anOtherParams.end();
-      ++aMyParIt, ++anOtherParIt)
-    isUpdated = (*aMyParIt)->update(*anOtherParIt);
-  return isUpdated;
+  return *myValue;
 }

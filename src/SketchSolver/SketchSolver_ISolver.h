@@ -29,10 +29,6 @@ class SketchSolver_ISolver
 public:
   virtual ~SketchSolver_ISolver() {}
 
-  /// \brief Changes the ID of the group to solve
-  void setGroup(const GroupID& theGroupID)
-  { myGroup = theGroupID; }
-
   /// \brief Set or unset the flag which allows to find all failed constraints
   void calculateFailedConstraints(bool theSic)
   { myFindFaileds = theSic; }
@@ -54,7 +50,6 @@ public:
   virtual int dof() const = 0;
 
 protected:
-  GroupID myGroup;       ///< ID of the group to be solved
   bool    myFindFaileds; ///< flag to find conflicting or inappropriate constraints
 };
 

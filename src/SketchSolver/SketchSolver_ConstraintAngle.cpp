@@ -1,41 +1,20 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 #include <SketchSolver_ConstraintAngle.h>
-#include <SketchSolver_Manager.h>
-
-#include <GeomAPI_Dir2d.h>
-#include <GeomAPI_Lin2d.h>
-#include <GeomAPI_Pnt2d.h>
-#include <GeomAPI_XY.h>
 
 #include <ModelAPI_AttributeInteger.h>
-
 #include <SketchPlugin_ConstraintAngle.h>
 
-#include <cmath>
-
 void SketchSolver_ConstraintAngle::getAttributes(
-    double& theValue, std::vector<EntityWrapperPtr>& theAttributes)
+    EntityWrapperPtr& theValue, std::vector<EntityWrapperPtr>& theAttributes)
 {
   SketchSolver_Constraint::getAttributes(theValue, theAttributes);
-
-  myAngle = theValue;
   myType = myBaseConstraint->integer(SketchPlugin_ConstraintAngle::TYPE_ID())->value();
 }
 
 
 void SketchSolver_ConstraintAngle::adjustConstraint()
 {
-  static const double aTol = 1000. * tolerance;
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-
-  ConstraintWrapperPtr aConstraint = myStorage->constraint(myBaseConstraint).front();
-  //if (fabs(myAngle - aConstraint->value()) < aTol)
-  //  return;
-  myAngle = aConstraint->value();
-  aBuilder->adjustConstraint(aConstraint);
-  myStorage->addConstraint(myBaseConstraint, aConstraint);
-
   int aType = myBaseConstraint->integer(SketchPlugin_ConstraintAngle::TYPE_ID())->value();
   if (aType != myType) {
     myType = aType;

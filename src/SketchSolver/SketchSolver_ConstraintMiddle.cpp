@@ -1,54 +1,64 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 #include <SketchSolver_ConstraintMiddle.h>
+#include <PlaneGCSSolver_ConstraintWrapper.h>
+#include <PlaneGCSSolver_UpdateCoincidence.h>
 
-#include <SketchSolver_Builder.h>
-#include <SketchSolver_Manager.h>
-
-#include <GeomAPI_XY.h>
-
-SketchSolver_ConstraintMiddle::SketchSolver_ConstraintMiddle(ConstraintPtr theConstraint)
-  : SketchSolver_Constraint(theConstraint)
+void SketchSolver_ConstraintMiddle::getAttributes(
+    EntityWrapperPtr& theValue,
+    std::vector<EntityWrapperPtr>& theAttributes)
 {
+  SketchSolver_Constraint::getAttributes(theValue, theAttributes);
 }
 
-void SketchSolver_ConstraintMiddle::notifyCoincidenceChanged(
-    EntityWrapperPtr theCoincAttr1,
-    EntityWrapperPtr theCoincAttr2)
+void SketchSolver_ConstraintMiddle::notify(const FeaturePtr&      theFeature,
+                                           PlaneGCSSolver_Update* theUpdater)
 {
-  // Check the coincidence between point and line has been changed
-  AttributePtr aPoint;
-  FeaturePtr aLine;
-  EntityWrapperPtr anEntities[2] = {theCoincAttr1, theCoincAttr2};
-  for (int i = 0; i < 2; ++i) {
-    if (anEntities[i]->type() == ENTITY_POINT)
-      aPoint = anEntities[i]->baseAttribute();
-    else if (anEntities[i]->type() == ENTITY_LINE)
-      aLine = anEntities[i]->baseFeature();
-  }
-  if (!aPoint || !aLine)
-    return;
+  PlaneGCSSolver_UpdateCoincidence* anUpdater =
+      static_cast<PlaneGCSSolver_UpdateCoincidence*>(theUpdater);
+  bool isAccepted = anUpdater->checkCoincidence(myAttributes.front(), myAttributes.back());
+  if (isAccepted) {
+    if (!myInSolver) {
+      myInSolver = true;
 
-  // Check the attributes of middle-point constraint are the same point and line
-  bool isSameAttr = true;
-  for (int i = 0; i < 2 && isSameAttr; ++i) {
-    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-        myBaseConstraint->attribute(SketchPlugin_Constraint::ATTRIBUTE(i)));
-    if (!aRefAttr)
-    {
-      // It seems the Middle point constraint has been deleted, so keep it unchanged.
-      // It will be removed later.
-      return;
+      if (myMiddle) {
+        // remove previously adde constraint
+        myStorage->removeConstraint(myBaseConstraint);
+        // merge divided constraints into single object
+        std::list<GCSConstraintPtr> aGCSConstraints;
+        std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aConstraint =
+            std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(myMiddle);
+        aGCSConstraints.push_back(aConstraint->constraints().front());
+        aConstraint =
+            std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(mySolverConstraint);
+        aGCSConstraints.push_back(aConstraint->constraints().front());
+
+        myMiddle = ConstraintWrapperPtr();
+        mySolverConstraint = ConstraintWrapperPtr(
+            new PlaneGCSSolver_ConstraintWrapper(aGCSConstraints, CONSTRAINT_MIDDLE_POINT));
+      }
+
+      myStorage->addConstraint(myBaseConstraint, mySolverConstraint);
     }
-    if (aRefAttr->isObject()) {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
-      isSameAttr = (aFeature == aLine);
-    } else
-      isSameAttr = (aRefAttr->attr() == aPoint);
-  }
+  } else {
+    if (myInSolver) {
+      myInSolver = false;
+      myStorage->removeConstraint(myBaseConstraint);
+    }
 
-  if (isSameAttr) {
-    remove();
-    process();
+    if (!myMiddle) {
+      // divide solver constraints to the middle point and point-line coincidence
+      std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aConstraint =
+          std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(mySolverConstraint);
+      std::list<GCSConstraintPtr> aGCSConstraints = aConstraint->constraints();
+
+      myMiddle = ConstraintWrapperPtr(
+          new PlaneGCSSolver_ConstraintWrapper(aGCSConstraints.front(), CONSTRAINT_MIDDLE_POINT));
+      mySolverConstraint = ConstraintWrapperPtr(
+          new PlaneGCSSolver_ConstraintWrapper(aGCSConstraints.back(), CONSTRAINT_MIDDLE_POINT));
+
+      // send middle constraint only
+      myStorage->addConstraint(myBaseConstraint, myMiddle);
+    }
   }
 }

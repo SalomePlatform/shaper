@@ -24,32 +24,28 @@ public:
   {}
 
   /// \brief Update constraint
-  virtual void update();
+  virtual void update() override;
+
+  /// \brief Notify this object about the feature is changed somewhere
+  virtual void notify(const FeaturePtr& theFeature, PlaneGCSSolver_Update*) override;
+
+  /// \brief Block or unblock events from this constraint
+  virtual void blockEvents(bool isBlocked) override;
 
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
-  virtual void process();
-
-  /// \brief Generate list of attributes of constraint in order useful for constraints
-  /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
-  /// \param[out] theAttributes list of attributes to be filled
-  virtual void getAttributes(double& theValue, std::vector<EntityWrapperPtr>& theAttributes)
-  { /* do nothing here */ }
+  virtual void process() override;
 
   /// \brief Generate list of entities of mirror constraint
-  /// \param[out] theMirrorLine     entity corresponding to mirror line
-  /// \param[out] theBaseEntities   list of entities to mirror
-  /// \param[out] theMirrorEntities list of mirrored entities
-  void getAttributes(EntityWrapperPtr& theMirrorLine,
-                     std::vector<EntityWrapperPtr>& theBaseEntities,
-                     std::vector<EntityWrapperPtr>& theMirrorEntities);
+  virtual void getAttributes(EntityWrapperPtr&, std::vector<EntityWrapperPtr>&) override;
 
   /// \brief This method is used in derived objects to check consistence of constraint.
   ///        E.g. the distance between line and point may be signed.
-  virtual void adjustConstraint();
+  virtual void adjustConstraint() override;
 
 private:
   size_t myNumberOfObjects;  ///< number of previously mirrored objects
+  std::set<FeaturePtr> myFeatures; ///< mirror line, original and mirrored features
 };
 
 #endif

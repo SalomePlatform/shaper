@@ -85,8 +85,7 @@ aSession.finishOperation()
 aSession.startOperation()
 aSketchArc = aSketchFeature.addFeature("SketchArc")
 anArcCentr = geomDataAPI_Point2D(aSketchArc.attribute("ArcCenter"))
-anArcStartPoint = geomDataAPI_Point2D(
-    aSketchArc.attribute("ArcStartPoint"))
+anArcStartPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcStartPoint"))
 anArcEndPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcEndPoint"))
 anArcCentr.setValue(10., 10.)
 anArcStartPoint.setValue(0., 50.)
@@ -112,10 +111,8 @@ aSession.finishOperation()
 #=========================================================================
 # Check values and move one constrainted object
 #=========================================================================
-assert (anArcEndPoint.x() == 50)
-assert (anArcEndPoint.y() == 0)
-assert (aLineStartPoint.x() == 50)
-assert (aLineStartPoint.y() == 0)
+assert (anArcEndPoint.x() == aLineStartPoint.x())
+assert (anArcEndPoint.y() == aLineStartPoint.y())
 deltaX = deltaY = 40.
 #  move line
 aSession.startOperation()
@@ -202,10 +199,97 @@ reflistB.setObject(aSketchArc.lastResult())
 aConstraint.execute()
 aSession.finishOperation()
 checkPointOnArc(aCircleCenter, aSketchArc)
-#=========================================================================
-# Check center of circle is still in origin
-#=========================================================================
+# check center of circle is still in origin
 assert (aCircleCenter.x() == 0. and aCircleCenter.y() == 0.)
+
+#=========================================================================
+# Create two more lines and set multi-coincidence between their extremities
+#=========================================================================
+aSession.startOperation()
+# line 2
+aLine2 = aSketchFeature.addFeature("SketchLine")
+aLine2StartPoint = geomDataAPI_Point2D(aLine2.attribute("StartPoint"))
+aLine2EndPoint = geomDataAPI_Point2D(aLine2.attribute("EndPoint"))
+aLine2StartPoint.setValue(50., 0.)
+aLine2EndPoint.setValue(100., 0.)
+# line 3
+aLine3 = aSketchFeature.addFeature("SketchLine")
+aLine3StartPoint = geomDataAPI_Point2D(aLine3.attribute("StartPoint"))
+aLine3EndPoint = geomDataAPI_Point2D(aLine3.attribute("EndPoint"))
+aLine3StartPoint.setValue(50., 0.)
+aLine3EndPoint.setValue(0., 100.)
+aSession.finishOperation()
+# coincidences between extremities of lines
+aSession.startOperation()
+aConstraint12 = aSketchFeature.addFeature("SketchConstraintCoincidence")
+refAttrA = aConstraint12.refattr("ConstraintEntityA")
+refAttrB = aConstraint12.refattr("ConstraintEntityB")
+refAttrA.setAttr(aLineStartPoint)
+refAttrB.setAttr(aLine2StartPoint)
+aConstraint23 = aSketchFeature.addFeature("SketchConstraintCoincidence")
+refAttrA = aConstraint23.refattr("ConstraintEntityA")
+refAttrB = aConstraint23.refattr("ConstraintEntityB")
+refAttrA.setAttr(aLine2StartPoint)
+refAttrB.setAttr(aLine3StartPoint)
+aConstraint31 = aSketchFeature.addFeature("SketchConstraintCoincidence")
+refAttrA = aConstraint31.refattr("ConstraintEntityA")
+refAttrB = aConstraint31.refattr("ConstraintEntityB")
+refAttrA.setAttr(aLine3StartPoint)
+refAttrB.setAttr(aLineStartPoint)
+aSession.finishOperation()
+# check the points have same coordinates
+assert (aLineStartPoint.x() == aLine2StartPoint.x() and aLineStartPoint.y() == aLine2StartPoint.y())
+assert (aLineStartPoint.x() == aLine3StartPoint.x() and aLineStartPoint.y() == aLine3StartPoint.y())
+#=========================================================================
+# Move one line and check other have been updated too
+#=========================================================================
+aSession.startOperation()
+aLine3StartPoint.setValue(aLine3StartPoint.x() + deltaX,
+                          aLine3StartPoint.y() + deltaY)
+aLine3EndPoint.setValue(aLine3EndPoint.x() + deltaX,
+                        aLine3EndPoint.y() + deltaY)
+aSession.finishOperation()
+assert (aLineStartPoint.x() == aLine2StartPoint.x() and aLineStartPoint.y() == aLine2StartPoint.y())
+assert (aLineStartPoint.x() == aLine3StartPoint.x() and aLineStartPoint.y() == aLine3StartPoint.y())
+#=========================================================================
+# Fix a line and move another connected segment
+#=========================================================================
+coordX = aLineStartPoint.x()
+coordY = aLineStartPoint.y()
+aSession.startOperation()
+aFixed = aSketchFeature.addFeature("SketchConstraintRigid")
+refAttrA = aFixed.refattr("ConstraintEntityA")
+refAttrA.setObject(aLine2.lastResult())
+aSession.finishOperation()
+# move another line
+aSession.startOperation()
+aLine3StartPoint.setValue(aLine3StartPoint.x() + deltaX,
+                          aLine3StartPoint.y() + deltaY)
+aLine3EndPoint.setValue(aLine3EndPoint.x() + deltaX,
+                        aLine3EndPoint.y() + deltaY)
+aSession.finishOperation()
+assert (aLineStartPoint.x() == coordX and aLineStartPoint.y() == coordY)
+assert (aLine2StartPoint.x() == coordX and aLine2StartPoint.y() == coordY)
+assert (aLine3StartPoint.x() == coordX and aLine3StartPoint.y() == coordY)
+#=========================================================================
+# Detach fixed line and move one of remaining
+#=========================================================================
+aSession.startOperation()
+aDocument.removeFeature(aConstraint12)
+aDocument.removeFeature(aConstraint23)
+aSession.finishOperation()
+# move line
+deltaX = 1.
+deltaY = 0.
+aSession.startOperation()
+aLineStartPoint.setValue(aLineStartPoint.x() + deltaX,
+                          aLineStartPoint.y() + deltaY)
+aLineEndPoint.setValue(aLineEndPoint.x() + deltaX,
+                        aLineEndPoint.y() + deltaY)
+aSession.finishOperation()
+assert (aLineStartPoint.x() != aLine2StartPoint.x() or aLineStartPoint.y() != aLine2StartPoint.y())
+assert (aLineStartPoint.x() == aLine3StartPoint.x() and aLineStartPoint.y() == aLine3StartPoint.y())
+
 #=========================================================================
 # End of test
 #=========================================================================

@@ -13,6 +13,8 @@
 #include <SketchSolver_Storage.h>
 #include <SketchSolver_ISolver.h>
 
+class PlaneGCSSolver_EntityBuilder;
+
 /** \class   PlaneGCSSolver_Storage
  *  \ingroup Plugins
  *  \brief   Contains all necessary data in PlaneGCS format to solve a single group of constraints
@@ -20,89 +22,55 @@
 class PlaneGCSSolver_Storage : public SketchSolver_Storage
 {
 public:
-  PlaneGCSSolver_Storage(const GroupID& theGroup);
+  PlaneGCSSolver_Storage(const SolverPtr& theSolver);
 
 // =============   Inherited from SketchSolver_Storage   =============
 
   /// \brief Change mapping between constraint from SketchPlugin and
-  ///        the list of constraints applicable for corresponding solver.
-  ///        Derived here to update point-point coincidence.
-  /// \param theConstraint        [in]   original SketchPlugin constraint
-  /// \param theSolverConstraints [in]   list of solver's constraints
-  virtual void addConstraint(ConstraintPtr                   theConstraint,
-                             std::list<ConstraintWrapperPtr> theSolverConstraints);
+  ///        a constraint applicable for corresponding solver.
+  /// \param theConstraint       [in]   original SketchPlugin constraint
+  /// \param theSolverConstraint [in]   solver's constraint
+  virtual void addConstraint(ConstraintPtr        theConstraint,
+                             ConstraintWrapperPtr theSolverConstraint) override;
 
-  /// \brief Update constraint's data
-  /// \return \c true if any value is updated
-  virtual bool update(ConstraintWrapperPtr theConstraint);
-  /// \brief Update entity's data
-  /// \return \c true if any value is updated
-  virtual bool update(EntityWrapperPtr theEntity);
-  /// \brief Update parameter's data
-  /// \return \c true if the value of parameter is updated
-  virtual bool update(ParameterWrapperPtr theParameter);
+  /// \brief Add list of temporary constraints which will be destroyed
+  ///        after the next solving of the set of constraints.
+  /// \param theSolverConstraint [in]  solver's constraint
+  virtual void addTemporaryConstraint(const ConstraintWrapperPtr& theSolverConstraint) override;
+
+
+  /// \brief Convert feature to the form applicable for specific solver and map it
+  /// \param theFeature [in]  feature to convert
+  /// \param theForce   [in]  forced feature creation
+  /// \return \c true if the feature has been created or updated
+  virtual bool update(FeaturePtr theFeature, bool theForce = false) override;
+
+  /// \brief Convert attribute to the form applicable for specific solver and map it
+  /// \param theAttribute [in]  attribute to convert
+  /// \param theForce     [in]  forced feature creation
+  /// \return \c true if the attribute has been created or updated
+  virtual bool update(AttributePtr theAttribute, bool theForce = false) override;
+
+
+  /// \brief Removes constraint from the storage
+  /// \return \c true if the constraint and all its parameters are removed successfully
+  virtual bool removeConstraint(ConstraintPtr theConstraint) override;
 
   /// \brief Update SketchPlugin features after resolving constraints
-  /// \param theFixedOnly [in]  if \c true the fixed points will be updated only
-  virtual void refresh(bool theFixedOnly = false) const;
-
-  /// \brief Check if some parameters or entities are returned
-  ///        to the current group after removing temporary constraints
-  virtual void verifyFixed();
-
-  /// \brief Mark two points as coincident
-  virtual void addCoincidentPoints(EntityWrapperPtr theMaster, EntityWrapperPtr theSlave);
-
-  /// \brief Shows the storage has the same constraint twice
-  virtual bool hasDuplicatedConstraint() const
-  { return false; }
-
-  /// \brief Calculate point on theBase entity. Value theCoeff is in [0.0 .. 1.0] and
-  ///        shows the distance from the start point.
-  virtual EntityWrapperPtr calculateMiddlePoint(EntityWrapperPtr theBase, double theCoeff);
+  virtual void refresh() const override;
 
   /// \brief Initialize solver by constraints, entities and parameters
-  virtual void initializeSolver(SolverPtr theSolver);
+  virtual void initializeSolver();
 
-protected:
-  /// \brief Remove constraint
-  /// \return \c true if the constraint and all its parameters are removed successfully
-  virtual bool remove(ConstraintWrapperPtr theConstraint);
-  /// \brief Remove entity
-  /// \return \c true if the entity and all its parameters are removed successfully
-  virtual bool remove(EntityWrapperPtr theEntity);
-  /// \brief Remove parameter
-  /// \return \c true if the parameter has been removed
-  virtual bool remove(ParameterWrapperPtr theParameter);
+  /// \brief Initialize memory for new solver's parameter
+  double* createParameter();
+  /// \brief Release memory occupied by parameters
+  void removeParameters(const GCS::SET_pD& theParams);
 
-  /// \brief Update the group for the given entity, its sub-entities and parameters
-  virtual void changeGroup(EntityWrapperPtr theEntity, const GroupID& theGroup);
-  /// \brief Update the group for the given parameter
-  virtual void changeGroup(ParameterWrapperPtr theParam, const GroupID& theGroup);
-
-
-// =============   Own methods   =============
-
-  /// \brief Move parameters of the entity to the constants
-  void makeConstant(const EntityWrapperPtr& theEntity);
-  /// \brief Move parameters of the entity to the variables
-  void makeVariable(const EntityWrapperPtr& theEntity);
+  /// \brief Remove all features became invalid
+  virtual void removeInvalidEntities() override;
 
 private:
-  /// \brief Move parameters of the entity from the list of variables to the list of constants
-  ///        and vice versa
-  /// \param theEntity [in]  entity to be changed
-  /// \param theFrom   [out] source list
-  /// \param theTo     [out] destination list
-  void toggleEntity(const EntityWrapperPtr& theEntity, GCS::VEC_pD& theFrom, GCS::VEC_pD& theTo);
-
-  /// \brief Create additional constraints for correct processing of arcs
-  /// \param theArc [in]  updated arc
-  void processArc(const EntityWrapperPtr& theArc);
-
-  /// \brief Adjust parameters of points coincident with the given
-  void updateCoincident(const EntityWrapperPtr& thePoint);
-
   /// \brief Verifies the constraint should not be added into the solver
   ///
   /// This is a workaround method to avoid some kinds of conflicting constraints:
@@ -111,18 +79,23 @@ private:
                    ConstraintWrapperPtr theParentConstraint,
                    std::list<std::set<double*> >& theCoincidentPoints) const;
 
+  /// \brief Convert feature using specified builder.
+  EntityWrapperPtr createFeature(const FeaturePtr&             theFeature,
+                                 PlaneGCSSolver_EntityBuilder* theBuilder);
+
+  /// \brief Convert attribute using specified builder.
+  EntityWrapperPtr createAttribute(const AttributePtr&           theAttribute,
+                                   PlaneGCSSolver_EntityBuilder* theBuilder);
+
 private:
-  GCS::VEC_pD                      myParameters;         ///< list of parameters
-  GCS::VEC_pD                      myConst;              ///< list of constants
-  EntityID                         myEntityLastID;       ///< identifier of last added entity
-  ConstraintID                     myConstraintLastID;   ///< identifier of last added constraint
+  GCS::VEC_pD  myParameters;         ///< list of parameters
+  ConstraintID myConstraintLastID;   ///< identifier of last added constraint
 
   /// additional constraints for correct processing of the arcs
-  std::map<EntityWrapperPtr, std::vector<GCSConstraintPtr> >
-                                   myArcConstraintMap;
+  std::map<EntityWrapperPtr, ConstraintWrapperPtr> myArcConstraintMap;
 
   /// list of removed constraints to notify solver
-  std::list<GCSConstraintPtr>      myRemovedConstraints;
+  std::list<GCSConstraintPtr> myRemovedConstraints;
 };
 
 #endif

@@ -26,7 +26,7 @@ public:
 
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
-  virtual void process();
+  virtual void process() override;
 
   /// \brief Generate list of translated entities
   /// \param[out] theStartPoint start point of translation
@@ -37,21 +37,23 @@ protected:
                      bool& theFullValue, std::list<EntityWrapperPtr>& theEntities);
 
   /// \brief This method is used in derived objects to check consistence of constraint.
-  virtual void adjustConstraint();
+  virtual void adjustConstraint() override;
 
   /// \brief Update parameters (called from base class)
-  virtual void updateLocal();
+  virtual void updateLocal() override;
 
 private:
   /// \brief Convert absolute coordinates to relative coordinates
-  virtual void getRelative(double theAbsX, double theAbsY, double& theRelX, double& theRelY);
+  virtual void getRelative(double theAbsX, double theAbsY,
+                           double& theRelX, double& theRelY) override;
   /// \brief Convert relative coordinates to absolute coordinates
-  virtual void getAbsolute(double theRelX, double theRelY, double& theAbsX, double& theAbsY);
+  virtual void getAbsolute(double theRelX, double theRelY,
+                           double& theAbsX, double& theAbsY) override;
   /// \brief Apply transformation for relative coordinates
-  virtual void transformRelative(double& theX, double& theY);
+  virtual void transformRelative(double& theX, double& theY) override;
 
   /// \brief Returns name of NUMBER_OF_COPIES parameter for corresponding feature
-  virtual const std::string& nameNbObjects();
+  virtual const std::string& nameNbObjects() override;
 
 private:
   AttributePoint2DPtr myStartPointAttribute;

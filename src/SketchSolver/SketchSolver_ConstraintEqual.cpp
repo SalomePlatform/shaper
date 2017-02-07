@@ -3,8 +3,11 @@
 #include <SketchSolver_ConstraintEqual.h>
 #include <SketchSolver_Error.h>
 
+#include <ModelAPI_AttributeRefAttr.h>
+#include <SketchPlugin_Line.h>
+
 void SketchSolver_ConstraintEqual::getAttributes(
-    double& theValue,
+    EntityWrapperPtr& theValue,
     std::vector<EntityWrapperPtr>& theAttributes)
 {
   SketchSolver_Constraint::getAttributes(theValue, theAttributes);
@@ -51,6 +54,15 @@ void SketchSolver_ConstraintEqual::getAttributes(
     break;
   default:
     myType = CONSTRAINT_EQUAL_LINES;
+
+    AttributeRefAttrPtr aRefLine1 =
+        myBaseConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
+    FeaturePtr aLine1 = ModelAPI_Feature::feature(aRefLine1->object());
+    if (aLine1) {
+      // store length of first line as a value for constraint
+      // (will be used to make equal lengths of lines)
+      theValue = myStorage->entity(aLine1->attribute(SketchPlugin_Line::LENGTH_ID()));
+    }
     break;
   }
 }

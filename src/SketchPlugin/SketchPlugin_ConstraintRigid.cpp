@@ -33,25 +33,5 @@ AISObjectPtr SketchPlugin_ConstraintRigid::getAISObject(AISObjectPtr thePrevious
 {
   if (!sketch())
     return thePrevious;
-
-  AISObjectPtr anAIS = thePrevious;
-
-  bool isValidRigid = false;
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  AttributeRefAttrPtr anAttr = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
-  ObjectPtr aObj = anAttr->object();
-  if (aObj.get() != NULL) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-    std::shared_ptr<SketchPlugin_Feature> aSkFea =
-      std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    if (!aSkFea->isExternal())
-      isValidRigid = true;
-  }
-
-  if (isValidRigid)
-    anAIS = SketcherPrs_Factory::rigidConstraint(this, sketch()->coordinatePlane(), thePrevious);
-  else
-    anAIS = AISObjectPtr();
-
-  return anAIS;
+  return SketcherPrs_Factory::rigidConstraint(this, sketch()->coordinatePlane(), thePrevious);
 }

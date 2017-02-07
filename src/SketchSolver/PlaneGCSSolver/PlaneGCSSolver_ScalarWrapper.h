@@ -16,44 +16,25 @@
 class PlaneGCSSolver_ScalarWrapper : public SketchSolver_IEntityWrapper
 {
 public:
-  PlaneGCSSolver_ScalarWrapper(const AttributePtr theAttribute, const ParameterWrapperPtr theParam);
+  PlaneGCSSolver_ScalarWrapper(double *const theParam);
 
   /// \brief Return PlaneGCS parameter
-  double* scalar() const;
+  double* scalar() const
+  { return myValue; }
 
-  /// \brief Return ID of current entity
-  virtual EntityID id() const
-  { return myID; }
-  /// \brief Change ID of the entity
-  void setId(EntityID theID)
-  { myID = theID; }
-
-  /// \brief Change group for the entity
-  virtual void setGroup(const GroupID& theGroup);
-  /// \brief Return identifier of the group the entity belongs to
-  virtual GroupID group() const
-  { return myGroup; }
+  /// \brief Change value of parameter
+  virtual void setValue(double theValue);
+  /// \brief Return value of parameter
+  virtual double value() const;
 
   /// \brief Return type of current entity
   virtual SketchSolver_EntityType type() const
   { return ENTITY_SCALAR; }
 
-  /// \brief Verify the feature is used in the entity
-  virtual bool isUsed(FeaturePtr theFeature) const
-  { return false; }
-  /// \brief Verify the attribute is used in the entity
-  virtual bool isUsed(AttributePtr theAttribute) const;
-
-  /// \brief Compare current entity with other
-  virtual bool isEqual(const EntityWrapperPtr& theOther);
-
-  /// \brief Update values of parameters of this entity by the parameters of given one
-  /// \return \c true if some parameters change their values
-  virtual bool update(const EntityWrapperPtr& theOther);
-
-private:
-  EntityID                myID;
-  GroupID                 myGroup;
+protected:
+  double* myValue; ///< pointer to value provided by the storage
 };
+
+typedef std::shared_ptr<PlaneGCSSolver_ScalarWrapper> ScalarWrapperPtr;
 
 #endif
