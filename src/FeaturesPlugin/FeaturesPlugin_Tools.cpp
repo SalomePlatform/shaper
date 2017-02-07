@@ -13,7 +13,9 @@
 void FeaturesPlugin_Tools::storeModifiedShapes(GeomAlgoAPI_MakeShape& theAlgo,
                                                std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                                std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                               int& theTag,
+                                               const int theFaceTag,
+                                               const int theEdgeTag,
+                                               const int theVertexTag,
                                                const std::string theName,
                                                GeomAPI_DataMapOfShapeShape& theSubShapes)
 {
@@ -21,7 +23,14 @@ void FeaturesPlugin_Tools::storeModifiedShapes(GeomAlgoAPI_MakeShape& theAlgo,
     case GeomAPI_Shape::COMPOUND: {
       for(GeomAPI_ShapeIterator anIt(theBaseShape); anIt.more(); anIt.next())
       {
-        storeModifiedShapes(theAlgo, theResultBody, theBaseShape, theTag, theName, theSubShapes);
+        storeModifiedShapes(theAlgo,
+                            theResultBody,
+                            anIt.current(),
+                            theFaceTag,
+                            theEdgeTag,
+                            theVertexTag,
+                            theName,
+                            theSubShapes);
       }
       break;
     }
@@ -30,25 +39,22 @@ void FeaturesPlugin_Tools::storeModifiedShapes(GeomAlgoAPI_MakeShape& theAlgo,
     case GeomAPI_Shape::SHELL: {
       theResultBody->loadAndOrientModifiedShapes(&theAlgo,
                                 theBaseShape, GeomAPI_Shape::FACE,
-                                theTag, theName + "_Face", theSubShapes);
+                                theFaceTag, theName + "_Face", theSubShapes);
       if (theBaseShape->shapeType() == GeomAPI_Shape::COMPSOLID
           || theBaseShape->shapeType() == GeomAPI_Shape::SOLID) {
         break;
       }
-      ++theTag;
     }
     case GeomAPI_Shape::FACE:
     case GeomAPI_Shape::WIRE: {
       theResultBody->loadAndOrientModifiedShapes(&theAlgo,
                                 theBaseShape, GeomAPI_Shape::EDGE,
-                                theTag, theName + "_Edge", theSubShapes);
-      ++theTag;
+                                theEdgeTag, theName + "_Edge", theSubShapes);
     }
     case GeomAPI_Shape::EDGE: {
       theResultBody->loadAndOrientModifiedShapes(&theAlgo,
                               theBaseShape, GeomAPI_Shape::VERTEX,
-                              theTag, theName + "_Vertex", theSubShapes);
-      ++theTag;
+                              theVertexTag, theName + "_Vertex", theSubShapes);
     }
   }
 }

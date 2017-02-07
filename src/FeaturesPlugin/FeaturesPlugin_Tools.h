@@ -16,7 +16,9 @@ public:
   static void storeModifiedShapes(GeomAlgoAPI_MakeShape& theAlgo,
                                   std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                   std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                  int& theTag,
+                                  const int theFaceTag,
+                                  const int theEdgeTag,
+                                  const int theVertexTag,
                                   const std::string theName,
                                   GeomAPI_DataMapOfShapeShape& theSubShapes);
 };
