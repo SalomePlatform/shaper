@@ -19,44 +19,46 @@ aSession.finishOperation()
 
 # Create a box with dimensions
 aSession.startOperation()
-aBox1 = model.addBox(aDocument, 10, 10, 10).result()
-assert (aBox1 is not None)
+aBox1 = model.addBox(aDocument, 10, 10, 10)
+model.testNbResults(aBox1, 1)
+model.testNbSubShapes(aBox1, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(aBox1, GeomAPI_Shape.FACE, [6])
 print "box1 : ok"
 aSession.finishOperation()
 
 aSession.startOperation()
 aBox2 = model.addBox(aDocument, 0, 10, 10)
-assert (len(aBox2.results()) == 0)
+model.testNbResults(aBox2, 0)
 print "box2 : ko (" + aBox2.feature().error() + ")"
 aSession.finishOperation()
 
 aSession.startOperation()
 aBox3 = model.addBox(aDocument, 10, 0, 10)
-assert (len(aBox3.results()) == 0)
+model.testNbResults(aBox3, 0)
 print "box3 : ko (" + aBox3.feature().error() + ")"
 aSession.finishOperation()
 
 aSession.startOperation()
 aBox4 = model.addBox(aDocument, 10, 10, 0)
-assert (len(aBox4.results()) == 0)
+model.testNbResults(aBox4, 0)
 print "box4 : ko (" + aBox4.feature().error() + ")"
 aSession.finishOperation()
 
 aSession.startOperation()
 aBox5 = model.addBox(aDocument, -10, 10, 10)
-assert (len(aBox5.results()) == 0)
+model.testNbResults(aBox5, 0)
 print "box5 : ko (" + aBox5.feature().error() + ")"
 aSession.finishOperation()
 
 aSession.startOperation()
 aBox6 = model.addBox(aDocument, 10, -10, 10)
-assert (len(aBox6.results()) == 0)
+model.testNbResults(aBox6, 0)
 print "box6 : ko (" + aBox6.feature().error() + ")"
 aSession.finishOperation()
 
 aSession.startOperation()
 aBox7 = model.addBox(aDocument, 10, 10, -10)
-assert (len(aBox7.results()) == 0)
+model.testNbResults(aBox7, 0)
 print "box7 : ko (" + aBox7.feature().error() + ")"
 aSession.finishOperation()
 
@@ -64,14 +66,17 @@ aSession.finishOperation()
 aSession.startOperation()
 aPoint1 = model.addPoint(aDocument, 0, 0, 0).result()
 aPoint2 = model.addPoint(aDocument, 50, 50, 50).result()
-aBox8 = model.addBox(aDocument, aPoint1, aPoint2).result()
-assert (aBox8 is not None)
+aBox8 = model.addBox(aDocument, aPoint1, aPoint2)
+model.testNbResults(aBox8, 1)
+model.testNbSubShapes(aBox8, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(aBox8, GeomAPI_Shape.FACE, [6])
 print "box8 : ok"
+aSession.finishOperation()
 
 aSession.startOperation()
 aPoint1 = model.addPoint(aDocument, 0, 0, 0).result()
 aBox9 = model.addBox(aDocument, aPoint1, aPoint1)
-assert (len(aBox9.results()) == 0)
+model.testNbResults(aBox9, 0)
 print "box9 : ko (" + aBox9.feature().error() + ")"
 aSession.finishOperation()
 
@@ -79,7 +84,7 @@ aSession.startOperation()
 aPoint1 = model.addPoint(aDocument, 0, 0, 0).result()
 aPoint2 = model.addPoint(aDocument, 0, 50, 50).result()
 aBox10 = model.addBox(aDocument, aPoint1, aPoint2)
-assert (len(aBox10.results()) == 0)
+model.testNbResults(aBox10, 0)
 print "box10 : ko (" + aBox10.feature().error() + ")"
 aSession.finishOperation()
 
@@ -87,7 +92,7 @@ aSession.startOperation()
 aPoint1 = model.addPoint(aDocument, 0, 0, 0).result()
 aPoint2 = model.addPoint(aDocument, 50, 0, 50).result()
 aBox11 = model.addBox(aDocument, aPoint1, aPoint2)
-assert (len(aBox11.results()) == 0)
+model.testNbResults(aBox11, 0)
 print "box11 : ko (" + aBox11.feature().error() + ")"
 aSession.finishOperation()
 
@@ -95,7 +100,7 @@ aSession.startOperation()
 aPoint1 = model.addPoint(aDocument, 0, 0, 0).result()
 aPoint2 = model.addPoint(aDocument, 50, 50, 0).result()
 aBox12 = model.addBox(aDocument, aPoint1, aPoint2)
-assert (len(aBox12.results()) == 0)
+model.testNbResults(aBox12, 0)
 print "box12 : ko (" + aBox12.feature().error() + ")"
 aSession.finishOperation()
 
@@ -103,7 +108,7 @@ aSession.startOperation()
 aPoint1 = model.selection("VERTEX", "point1")
 aPoint2 = model.addPoint(aDocument, 50, 50, 0).result()
 aBox13 = model.addBox(aDocument, aPoint1, aPoint2)
-assert (len(aBox13.results()) == 0)
+model.testNbResults(aBox13, 0)
 print "box13 : ko (" + aBox13.feature().error() + ")"
 aSession.finishOperation()
 
@@ -111,7 +116,7 @@ aSession.startOperation()
 aPoint1 = model.addPoint(aDocument, 0, 0, 0).result()
 aPoint2 = model.selection("VERTEX", "point2")
 aBox14 = model.addBox(aDocument, aPoint1, aPoint2)
-assert (len(aBox14.results()) == 0)
+model.testNbResults(aBox14, 0)
 print "box14 : ko (" + aBox14.feature().error() + ")"
 aSession.finishOperation()
 
@@ -137,7 +142,10 @@ aSession.finishOperation()
 aSession.startOperation()
 aBox15 = model.addBox(aDocument, model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1s-SketchLine_4e"),
                       model.selection("VERTEX", "Sketch_2/Vertex-SketchLine_7s-SketchLine_6e"))
-assert (aBox15 is not None)
+
+model.testNbResults(aBox15, 1)
+model.testNbSubShapes(aBox15, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(aBox15, GeomAPI_Shape.FACE, [6])
 print "box15 : ok"
 aSession.finishOperation()
 
@@ -146,15 +154,18 @@ Extrusion_1 = model.addExtrusion(aDocument, [model.selection("COMPOUND", "Sketch
 Extrusion_2 = model.addExtrusion(aDocument, [model.selection("COMPOUND", "Sketch_2")], model.selection("EDGE", "PartSet/OX"), 100, 0)
 aBox16 = model.addBox(aDocument, model.selection("VERTEX", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_2&Extrusion_1_1/To_Face_1"),
                        model.selection("VERTEX", "Extrusion_2_1/Generated_Face_2&Extrusion_2_1/Generated_Face_1&Extrusion_2_1/To_Face_1"))
-assert (aBox16 is not None)
+model.testNbResults(aBox16, 1)
+model.testNbSubShapes(aBox16, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(aBox16, GeomAPI_Shape.FACE, [6])
 print "box16 : ok"
 aSession.finishOperation()
 
 aSession.startOperation()
-
 Vertex_1 = model.addVertex(aDocument, [model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1s-SketchLine_4e")])
 Vertex_2 = model.addVertex(aDocument, [model.selection("VERTEX", "Sketch_2/Vertex-SketchLine_7s-SketchLine_6e")])
 aBox17 = model.addBox(aDocument, model.selection("VERTEX", "Vertex_1_1"), model.selection("VERTEX", "Vertex_2_1"))
-assert (aBox17 is not None)
+model.testNbResults(aBox17, 1)
+model.testNbSubShapes(aBox17, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(aBox17, GeomAPI_Shape.FACE, [6])
 print "box17 : ok"
 aSession.finishOperation()
