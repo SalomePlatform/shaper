@@ -295,7 +295,9 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
     // dump document in a separate line
     *this << aDocName << " = " << aPartName << ".document()" << std::endl;
     // dump features in the document
-    return process(aSubDoc);
+    bool aRes = process(aSubDoc);
+    *this << "model.do()" << std::endl;
+    return aRes;
   }
 
   // dump sub-features
