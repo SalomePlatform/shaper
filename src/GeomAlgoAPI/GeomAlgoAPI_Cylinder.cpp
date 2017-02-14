@@ -26,7 +26,6 @@ GeomAlgoAPI_Cylinder::GeomAlgoAPI_Cylinder(std::shared_ptr<GeomAPI_Ax2> theAxis,
                                            const double theHeight)
 {
   withAngle = false;
-  //myBasePoint = theBasePoint;
   myAxis = theAxis;
   myRadius = theRadius;
   myHeight = theHeight;
