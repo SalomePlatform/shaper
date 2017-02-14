@@ -7,7 +7,7 @@
 #include <FeaturesPlugin_ExtrusionCut.h>
 #include <FeaturesPlugin_ExtrusionFuse.h>
 #include <FeaturesPlugin_Intersection.h>
-#include <FeaturesPlugin_Translation.h>
+#include <FeaturesPlugin_MultiTranslation.h>
 #include <FeaturesPlugin_Partition.h>
 #include <FeaturesPlugin_Pipe.h>
 #include <FeaturesPlugin_Placement.h>
@@ -19,6 +19,7 @@
 #include <FeaturesPlugin_Rotation.h>
 #include <FeaturesPlugin_Scale.h>
 #include <FeaturesPlugin_Symmetry.h>
+#include <FeaturesPlugin_Translation.h>
 #include <FeaturesPlugin_Union.h>
 #include <FeaturesPlugin_ValidatorTransform.h>
 #include <FeaturesPlugin_Validators.h>
@@ -105,6 +106,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_Symmetry);
   } else if (theFeatureID == FeaturesPlugin_Scale::ID()) {
     return FeaturePtr(new FeaturesPlugin_Scale);
+  } else if (theFeatureID == FeaturesPlugin_MultiTranslation::ID()) {
+    return FeaturePtr(new FeaturesPlugin_MultiTranslation);
   }
 
   // feature of such kind is not found

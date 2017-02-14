@@ -1,0 +1,60 @@
+<!-- Copyright (C) 2014-201x CEA/DEN, EDF R&D -->
+
+<source>
+  <multi_selector id="main_objects"
+                  label="Main objects"
+                  icon=""
+                  tooltip="Select objects"
+                  type_choice="objects"
+                  concealment="true">
+    <validator id="FeaturesPlugin_ValidatorTransform"/>
+  </multi_selector>
+  <groupbox title="First direction">
+    <shape_selector id="axis_first_dir"
+                    icon="icons/Features/axis.png"
+                    label="Axis"
+                    tooltip="Select an edge for the first direction"
+                    shape_types="edge"
+                    default="">
+      <validator id="GeomValidators_ShapeType" parameters="line"/>
+    </shape_selector>
+    <doublevalue id="step_first_dir"
+                 label="Step"
+                 step="1.0"
+                 default="0"
+                 icon="icons/Features/dimension_v.png"
+                 tooltip="Step for the first direction">
+    </doublevalue>
+    <integervalue id="nb_first_dir"
+                  label="Nb copies"
+                  step="1"
+                  default="2"
+                  icon=""
+                  tooltip="Number of copies for the first direction">
+    </integervalue>
+  </groupbox>
+  <optionalbox id="use_second_dir" title="Second direction">
+    <shape_selector id="axis_second_dir"
+                    icon="icons/Features/axis.png"
+                    label="Axis"
+                    tooltip="Select an edge for the second direction"
+                    shape_types="edge"
+                    default="">
+      <validator id="GeomValidators_ShapeType" parameters="line"/>
+    </shape_selector>
+    <doublevalue id="step_second_dir"
+                 label="Step"
+                 step="1.0"
+                 default="0"
+                 icon="icons/Features/dimension_v.png"
+                 tooltip="Step for the second direction">
+    </doublevalue>
+    <integervalue id="nb_second_dir"
+                  label="Nb copies"
+                  step="1"
+                  default="2"
+                  icon=""
+                  tooltip="Number of copies for the second direction">
+    </integervalue>
+  </optionalbox>
+</source>

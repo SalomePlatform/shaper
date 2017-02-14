@@ -2,6 +2,11 @@
 
 <plugin>
   <workbench id="Features" document="Part">
+    <group id="Transformation">
+      <feature id="Scale" title="Scale" tooltip="Perform scale objects" icon="icons/Features/scale.png">
+        <source path="scale_widget.xml"/>
+      </feature>
+    </group>
     <group id="Extrusion">
       <feature id="Extrusion" title="Extrusion" tooltip="Create a solid by extrusion of a face" icon="icons/Features/extrusion.png">
           <source path="extrusion_widget.xml"/>
@@ -71,8 +76,8 @@
       <feature id="Symmetry" title="Symmetry" tooltip="Perform symmetry with respect to a point, an axis or a plane" icon="icons/Features/symmetry.png">
         <source path="symmetry_widget.xml"/>
       </feature>
-      <feature id="Scale" title="Scale" tooltip="Perform scale an objects" icon="icons/Features/scale.png">
-        <source path="scale_widget.xml"/>
+      <feature id="MultiTranslation" title="MultiTranslation" tooltip="Perform multi-translation objects" icon="icons/Features/multitranslation.png">
+        <source path="multitranslation_widget.xml"/>
       </feature>
     </group>
   </workbench>
