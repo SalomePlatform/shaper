@@ -101,6 +101,6 @@ void SketchAPI_Projection::dump(ModelHighAPI_Dumper& theDumper) const
   // Dump created line feature
   AttributeRefAttrPtr aProjectedRefAttr = projectedFeature();
   FeaturePtr aProjectedFeature = ModelAPI_Feature::feature(aProjectedRefAttr->object());
-  std::string aProjectedName = theDumper.name(aProjectedFeature, false);
-  theDumper << aProjectedName << " = " << theDumper.name(aBase) << ".createdFeature()" << std::endl;
+  theDumper << aProjectedFeature << " = "
+    << theDumper.name(aBase) << ".createdFeature()" << std::endl;
 }

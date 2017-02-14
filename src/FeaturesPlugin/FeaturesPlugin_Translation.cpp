@@ -356,11 +356,10 @@ void FeaturesPlugin_Translation::loadNamingDS(GeomAlgoAPI_Translation& theTransl
   // Store result.
   theResultBody->storeModified(theBaseShape, theTranslationAlgo.shape());
 
-  int aTranslatedTag = 1;
   std::string aTranslatedName = "Translated";
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theTranslationAlgo.mapOfSubShapes();
 
   FeaturesPlugin_Tools::storeModifiedShapes(theTranslationAlgo, theResultBody,
-                                            theBaseShape, aTranslatedTag, aTranslatedName,
+                                            theBaseShape, 1, 2, 3, aTranslatedName,
                                             *aSubShapes.get());
 }

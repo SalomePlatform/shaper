@@ -16,6 +16,9 @@
 class ModelAPI_Data;
 class ModelAPI_Document;
 
+// sometimes it is usefull for debug to see name of each object (bad for memory and performance)
+//#define DEBUG_NAMES
+
 /**\class ModelAPI_Object
  * \ingroup DataModel
  * \brief Represents any object in the data model and in the object browser.
@@ -30,6 +33,9 @@ class ModelAPI_Object: public ModelAPI_Entity
   std::shared_ptr<ModelAPI_Data> myData;  ///< manager of the data model of a feature
   std::shared_ptr<ModelAPI_Document> myDoc;  ///< document this object belongs to
  public:
+#ifdef DEBUG_NAMES
+  std::string myName; // name of this object
+#endif
   /// By default object is displayed in the object browser.
   MODELAPI_EXPORT virtual bool isInHistory();
 

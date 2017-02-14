@@ -719,8 +719,10 @@ void SketchAPI_Sketch::dump(ModelHighAPI_Dumper& theDumper) const
 
     // Check the plane is coordinate plane
     std::string aPlaneName = defaultPlane(anOrigin, aNormal, aDirX);
-    if (anExternal->context()) { // checking for selected planes
-      if (!aPlaneName.empty()) {
+    if(anExternal->context()) { // checking for selected planes
+      if (!aPlaneName.empty()
+          && anExternal->context()->data()
+          && anExternal->context()->data()->name() == aPlaneName) {
         // dump sketch based on coordinate plane
         theDumper << aBase << " = model.addSketch(" << aDocName
                   << ", model.standardPlane(\"" << aPlaneName << "\"))" << std::endl;

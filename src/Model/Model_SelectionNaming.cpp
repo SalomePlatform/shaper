@@ -881,6 +881,7 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
                     }
                   } else { // take first or second vertex of the edge
                     TopoDS_Shape aShape = aRes->shape()->impl<TopoDS_Shape>();
+                    if (aShape.ShapeType() == TopAbs_VERTEX) continue;
                     TopExp_Explorer anExp(aShape, aType);
                     for(; anExp.More() && anOrientation != 2; anOrientation--)
                       anExp.Next();
