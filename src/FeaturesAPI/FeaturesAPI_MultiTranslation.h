@@ -84,7 +84,7 @@ public:
   FEATURESAPI_EXPORT
   void setSecondAxisAndDistance(const ModelHighAPI_Selection& theAxisObject,
                                 const ModelHighAPI_Double& theDistance);
-  
+
   /// Modify CreationMethod, nb_first_dir attribute of the feature.
   FEATURESAPI_EXPORT
   void setFirstNumber(const ModelHighAPI_Integer& theFirstNumber);

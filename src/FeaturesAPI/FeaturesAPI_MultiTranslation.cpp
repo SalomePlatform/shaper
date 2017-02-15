@@ -120,7 +120,7 @@ void FeaturesAPI_MultiTranslation::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_MultiTranslation::OBJECTS_LIST_ID());
   theDumper << aBase << " = model.addMultiTranslation(" << aDocName << ", " << anAttrObjects;
-  
+
   AttributeSelectionPtr anAttrFirstAxis =
     aBase->selection(FeaturesPlugin_MultiTranslation::AXIS_FIRST_DIR_ID());
   AttributeDoublePtr anAttrFirstStep =
@@ -129,7 +129,7 @@ void FeaturesAPI_MultiTranslation::dump(ModelHighAPI_Dumper& theDumper) const
     aBase->integer(FeaturesPlugin_MultiTranslation::NB_COPIES_FIRST_DIR_ID());
   theDumper << ", " << anAttrFirstAxis << ", " << anAttrFirstStep;
   theDumper << ", " << anAttrFirstNumber;
-      
+
   if (aBase->string(FeaturesPlugin_MultiTranslation::USE_SECOND_DIR_ID())->isInitialized()
       && !aBase->string(FeaturesPlugin_MultiTranslation::USE_SECOND_DIR_ID())->value().empty()) {
     AttributeSelectionPtr anAttrSecondAxis =
