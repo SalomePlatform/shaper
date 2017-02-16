@@ -78,7 +78,7 @@ public:
   /// \return a shape
   static std::shared_ptr<GeomAPI_Shape> makeTranslation(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
-                     std::shared_ptr<GeomAPI_Ax1>   theAxis,
+                     std::shared_ptr<GeomAPI_Ax1> theAxis,
                      const double theDistance) throw (GeomAlgoAPI_Exception);
 
   /// Performs a translation from dimensions.
@@ -100,29 +100,29 @@ public:
   /// \return a shape
   static std::shared_ptr<GeomAPI_Shape> makeTranslation(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
-                     std::shared_ptr<GeomAPI_Pnt>   theStartPoint,
-                     std::shared_ptr<GeomAPI_Pnt>   theEndPoint) throw (GeomAlgoAPI_Exception);
+                     std::shared_ptr<GeomAPI_Pnt> theStartPoint,
+                     std::shared_ptr<GeomAPI_Pnt> theEndPoint) throw (GeomAlgoAPI_Exception);
 
   /// Performs a symmetry by a point.
   /// \param theSourceShape Shape be symmetrized
   /// \param thePoint Point of symmetry
   static std::shared_ptr<GeomAPI_Shape> makeSymmetry(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
-                     std::shared_ptr<GeomAPI_Pnt>   thePoint) throw (GeomAlgoAPI_Exception);
+                     std::shared_ptr<GeomAPI_Pnt> thePoint) throw (GeomAlgoAPI_Exception);
 
   /// Performs a symmetry by an axis.
   /// \param theSourceShape Shape be symmetrized
   /// \param theAxis Axis of symmetry
   static std::shared_ptr<GeomAPI_Shape> makeSymmetry(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
-                     std::shared_ptr<GeomAPI_Ax1>   theAxis) throw (GeomAlgoAPI_Exception);
+                     std::shared_ptr<GeomAPI_Ax1> theAxis) throw (GeomAlgoAPI_Exception);
 
   /// Performs a symmetry by a plane.
   /// \param theSourceShape Shape be symmetrized
   /// \param thePlane Plane of symmetry
   static std::shared_ptr<GeomAPI_Shape> makeSymmetry(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
-                     std::shared_ptr<GeomAPI_Ax2>   thePlane) throw (GeomAlgoAPI_Exception);
+                     std::shared_ptr<GeomAPI_Ax2> thePlane) throw (GeomAlgoAPI_Exception);
 
   /// Performs a scale by a scale factor.
   /// \param theSourceShape Shape be scaled
@@ -130,8 +130,52 @@ public:
   /// \param theScaleFactor Factor of scale
   static std::shared_ptr<GeomAPI_Shape> makeScale(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
-                     std::shared_ptr<GeomAPI_Pnt>   theCenterPoint,
-                     const double                   theScaleFactor) throw (GeomAlgoAPI_Exception);
+                     std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
+                     const double theScaleFactor) throw (GeomAlgoAPI_Exception);
+
+  /// Performs a scale by dimensions.
+  /// \param theSourceShape Shape be scaled
+  /// \param theCenterPoint Point of scale
+  /// \param theScaleFactorX Factor of scale in X
+  /// \param theScaleFactorY Factor of scale in Y
+  /// \param theScaleFactorZ Factor of scale in Z
+  static std::shared_ptr<GeomAPI_Shape> makeScale(
+                     std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                     std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
+                     const double theScaleFactorX,
+                     const double theScaleFactorY,
+                     const double theScaleFactorZ) throw (GeomAlgoAPI_Exception);
+
+  /// Performs a multi translation along one axis, at a distance and a number of times
+  /// \param theSourceShape Shape to be moved
+  /// \param theAxis Movement axis
+  /// \param theStep Movement step
+  /// \param theNumber Movement number
+  /// \return a shape
+  static std::shared_ptr<GeomAPI_Shape> makeMultiTranslation(
+                     std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                     std::shared_ptr<GeomAPI_Ax1> theAxis,
+                     const double theStep,
+                     const int theNumber) throw (GeomAlgoAPI_Exception);
+
+  /// Performs a multi translation along two axis : a different distance on each axis
+  /// and a different number of times for each axis
+  /// \param theSourceShape Shape to be moved
+  /// \param theFirstAxis First movement axis
+  /// \param theFirstStep First movement step
+  /// \param theFirstNumber First movement number
+  /// \param theSecondAxis First movement axis
+  /// \param theSecondStep First movement step
+  /// \param theSecondNumber First movement number
+  /// \return a shape
+  static std::shared_ptr<GeomAPI_Shape> makeMultiTranslation(
+                     std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                     std::shared_ptr<GeomAPI_Ax1> theFirstAxis,
+                     const double theFirstStep,
+                     const int theFirstNumber,
+                     std::shared_ptr<GeomAPI_Ax1> theSecondAxis,
+                     const double theSecondStep,
+                     const int theSecondNumber) throw (GeomAlgoAPI_Exception);
 
   /// Creates a cone segment using standard GDML parameters.
   /// \param theRMin1 Inner radius at base of cone

@@ -8,6 +8,7 @@
 
 #include <GeomAlgoAPI_Box.h>
 #include <GeomAlgoAPI_Cylinder.h>
+#include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_ConeSegment.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_Scale.h>
@@ -15,6 +16,8 @@
 #include <GeomAlgoAPI_Translation.h>
 
 #include <GeomAPI_Lin.h>
+
+#include <math.h>
 
 namespace GeomAlgoAPI_ShapeAPI
 {
@@ -327,6 +330,81 @@ namespace GeomAlgoAPI_ShapeAPI
       throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
     }
     return aScaleAlgo.shape();
+  }
+
+  //===============================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeScale(
+    std::shared_ptr<GeomAPI_Shape> theSourceShape,
+    std::shared_ptr<GeomAPI_Pnt>   theCenterPoint,
+    const double                   theScaleFactorX,
+    const double                   theScaleFactorY,
+    const double                   theScaleFactorZ) throw (GeomAlgoAPI_Exception)
+  {
+    GeomAlgoAPI_Scale aScaleAlgo(theSourceShape, theCenterPoint,
+                                 theScaleFactorX, theScaleFactorY, theScaleFactorZ);
+
+    if (!aScaleAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
+    }
+
+    aScaleAlgo.build();
+
+    if(!aScaleAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
+    }
+    if (!aScaleAlgo.checkValid("Scale builder by dimensions")) {
+      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
+    }
+    return aScaleAlgo.shape();
+  }
+
+  //===============================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeMultiTranslation(
+    std::shared_ptr<GeomAPI_Shape> theSourceShape,
+    std::shared_ptr<GeomAPI_Ax1> theAxis,
+    const double theStep,
+    const int theNumber) throw (GeomAlgoAPI_Exception)
+  {
+    ListOfShape aListOfShape;
+    for (int i=0; i<theNumber; i++) {
+      aListOfShape.
+        push_back(GeomAlgoAPI_ShapeAPI::makeTranslation(theSourceShape, theAxis, i*theStep));
+    }
+    return GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
+  }
+
+  //===============================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeMultiTranslation(
+    std::shared_ptr<GeomAPI_Shape> theSourceShape,
+    std::shared_ptr<GeomAPI_Ax1> theFirstAxis,
+    const double theFirstStep,
+    const int theFirstNumber,
+    std::shared_ptr<GeomAPI_Ax1> theSecondAxis,
+    const double theSecondStep,
+    const int theSecondNumber) throw (GeomAlgoAPI_Exception)
+  {
+    // Coord theFirstAxis
+    double x1 = theFirstAxis->dir()->x();
+    double y1 = theFirstAxis->dir()->y();
+    double z1 = theFirstAxis->dir()->z();
+    double norm1 = sqrt(x1*x1 + y1*y1 + z1*z1);
+
+    // Coord theSecondAxis
+    double x2 = theSecondAxis->dir()->x();
+    double y2 = theSecondAxis->dir()->y();
+    double z2 = theSecondAxis->dir()->z();
+    double norm2 = sqrt(x2*x2 + y2*y2 + z2*z2);
+
+    ListOfShape aListOfShape;
+    for (int j=0; j<theSecondStep; j++) {
+      for (int i=0; i<theFirstNumber; i++) {
+        double dx = i*theFirstStep*x1/norm1+j*theSecondStep*x2/norm2;
+        double dy = i*theFirstStep*y1/norm1+j*theSecondStep*y2/norm2;
+        double dz = i*theFirstStep*z1/norm1+j*theSecondStep*z2/norm2;
+        aListOfShape.push_back(GeomAlgoAPI_ShapeAPI::makeTranslation(theSourceShape, dx, dy, dz));
+      }
+    }
+    return GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
   }
 
   //===============================================================================================
