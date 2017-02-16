@@ -76,10 +76,3 @@ void GeomAPI_Trsf::setSymmetry(const std::shared_ptr<GeomAPI_Ax2> thePlane)
 {
   MY_TRSF->SetMirror(thePlane->impl<gp_Ax2>());
 }
-
-//=================================================================================================
-void GeomAPI_Trsf::setScale(const std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
-                            const double theScaleFactor)
-{
-  MY_TRSF->SetScale(theCenterPoint->impl<gp_Pnt>(), theScaleFactor);
-}

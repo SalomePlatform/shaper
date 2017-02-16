@@ -27,6 +27,27 @@ class FeaturesPlugin_Scale : public ModelAPI_Feature
     return MY_SCALE_ID;
   }
 
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD()
+  {
+    static const std::string MY_CREATION_METHOD_ID("CreationMethod");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method "ByFactor".
+  inline static const std::string& CREATION_METHOD_BY_FACTOR()
+  {
+    static const std::string MY_CREATION_METHOD_ID("ByFactor");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method "ByFactor".
+  inline static const std::string& CREATION_METHOD_BY_DIMENSIONS()
+  {
+    static const std::string MY_CREATION_METHOD_ID("ByDimensions");
+    return MY_CREATION_METHOD_ID;
+  }
+
   /// Attribute name of referenced objects.
   inline static const std::string& OBJECTS_LIST_ID()
   {
@@ -48,6 +69,27 @@ class FeaturesPlugin_Scale : public ModelAPI_Feature
     return MY_SCALE_FACTOR_ID;
   }
 
+  /// Attribute name of scale factor in X.
+  inline static const std::string& SCALE_FACTOR_X_ID()
+  {
+    static const std::string MY_SCALE_FACTOR_X_ID("scale_factor_x");
+    return MY_SCALE_FACTOR_X_ID;
+  }
+
+  /// Attribute name of scale factor in Y.
+  inline static const std::string& SCALE_FACTOR_Y_ID()
+  {
+    static const std::string MY_SCALE_FACTOR_Y_ID("scale_factor_y");
+    return MY_SCALE_FACTOR_Y_ID;
+  }
+
+  /// Attribute name of scale factor in Z.
+  inline static const std::string& SCALE_FACTOR_Z_ID()
+  {
+    static const std::string MY_SCALE_FACTOR_Z_ID("scale_factor_z");
+    return MY_SCALE_FACTOR_Z_ID;
+  }
+
   /// \return the kind of a feature.
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
   {
@@ -65,6 +107,12 @@ class FeaturesPlugin_Scale : public ModelAPI_Feature
   FeaturesPlugin_Scale();
 
 private:
+  /// Perform scale using a central point and a value of the scale.
+  void performScaleByFactor();
+
+  /// Perform symmetry using a central point and three dimensions
+  void performScaleByDimensions();
+
   /// Perform the naming
   void loadNamingDS(GeomAlgoAPI_Scale& theScaleAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,

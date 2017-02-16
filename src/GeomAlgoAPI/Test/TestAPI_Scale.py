@@ -11,6 +11,7 @@ from GeomAPI import GeomAPI_Pnt as pnt
 # Create a box
 try :
   box1 = shaperpy.makeBox(10.,10.,10.)
+  box2 = shaperpy.makeBox(10.,10.,10.)
   centerPoint = pnt(20.,20.,0.)
  
 except myExcept, ec:
@@ -19,6 +20,13 @@ except myExcept, ec:
 # Perfom a scale by a factor.
 try :
   scale1 = shaperpy.makeScale(box1,centerPoint, -1.6)
+ 
+except myExcept, ec:
+  print ec.what()
+
+# Perfom a scale by dimensions.
+try :
+  scale2 = shaperpy.makeScale(box2,centerPoint, 2, -0.5, 1.3)
  
 except myExcept, ec:
   print ec.what()

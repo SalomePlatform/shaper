@@ -18,6 +18,12 @@
 class GeomAlgoAPI_Scale : public GeomAlgoAPI_MakeShape
 {
 public:
+  /// Type of scale operation
+  enum MethodType {
+    BY_FACTOR,     ///< Scale by factor.
+    BY_DIMENSIONS, ///< Scale by dimensions.
+  };
+
   /// \brief Creates an object which is obtained from current object by performing
   ///        a scale operation by a factor.
   /// \param[in] theSourceShape  the shape to be moved.
@@ -27,6 +33,19 @@ public:
                                        std::shared_ptr<GeomAPI_Pnt>   theCenterPoint,
                                        double                         theScaleFactor);
 
+  /// \brief Creates an object which is obtained from current object by performing
+  ///        a scale operation by dimensions.
+  /// \param[in] theSourceShape  the shape to be moved.
+  /// \param[in] theCenterPoint  the center point.
+  /// \param[in] theFactorX      the scale factor in X.
+  /// \param[in] theFactorY      the scale factor in Y.
+  /// \param[in] theFactorZ      the scale factor in Z.
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Scale(std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                                       std::shared_ptr<GeomAPI_Pnt>   theCenterPoint,
+                                       double                         theScaleFactorX,
+                                       double                         theScaleFactorY,
+                                       double                         theScaleFactorZ);
+
   /// Checks if data for the scale transform is OK.
   GEOMALGOAPI_EXPORT bool check();
 
@@ -34,9 +53,16 @@ public:
   GEOMALGOAPI_EXPORT void build();
 
 private:
+  MethodType myMethodType; /// Type of method used.
   std::shared_ptr<GeomAPI_Shape> mySourceShape; /// Shape to be moved.
   std::shared_ptr<GeomAPI_Pnt> myCenterPoint; /// Center point.
   double myScaleFactor; /// Scale factor.
+  double myScaleFactorX; /// Scale factor in X.
+  double myScaleFactorY; /// Scale factor in Y.
+  double myScaleFactorZ; /// Scale factor in Z.
+
+  void buildByFactor();
+  void buildByDimensions();
 };
 
 #endif // GEOMALGOAPI_SCALE_H_
