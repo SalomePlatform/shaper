@@ -18,6 +18,9 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
 
+#include <iostream>
+#include <GeomAlgoAPI_FaceBuilder.h>
+
 //=================================================================================================
 FeaturesPlugin_Symmetry::FeaturesPlugin_Symmetry()
 {
@@ -274,15 +277,15 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
   std::shared_ptr<GeomAPI_Pln> aPln;
   std::shared_ptr<ModelAPI_AttributeSelection> anObjRef =
     selection(FeaturesPlugin_Symmetry::PLANE_OBJECT_ID());
-  if(anObjRef && anObjRef->value() && anObjRef->value()->isFace()) {
+  if (anObjRef && anObjRef->value() && anObjRef->value()->isFace()) {
     aPln = std::shared_ptr<GeomAPI_Face>(new GeomAPI_Face(anObjRef->value()))->getPlane();
   }
   else if (anObjRef && !anObjRef->value() && anObjRef->context() &&
-             anObjRef->context()->shape() && anObjRef->context()->shape()->isEdge()) {
+             anObjRef->context()->shape() && anObjRef->context()->shape()->isFace()) {
     aPln =
       std::shared_ptr<GeomAPI_Face>(new GeomAPI_Face(anObjRef->context()->shape()))->getPlane();
   }
-  if(aPln) {
+  if (aPln) {
     aPlane = std::shared_ptr<GeomAPI_Ax2>(new GeomAPI_Ax2(aPln->location(),
                                                           aPln->direction()));
   }
