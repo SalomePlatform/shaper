@@ -8,114 +8,86 @@ from GeomAlgoAPI import GeomAlgoAPI_ShapeAPI as shaperpy
 from GeomAlgoAPI import GeomAlgoAPI_Exception as myExcept
 from GeomAPI import GeomAPI_Pnt as pnt
 
-# Create a box with dimensions    
-try :    
-  box1 = shaperpy.makeBox(10.,10.,10.)
-  print "box1 : ok"
-  
-except myExcept,ec:
-  print "box1 : ko (" + ec.what() + ")"
+# Create a box with dimensions   
+Box_1 = shaperpy.makeBox(10.,10.,10.)
   
 try :    
-  box2 = shaperpy.makeBox(0.,10.,10.)
-  print "box2 : ok"
+  Box_2 = shaperpy.makeBox(0.,10.,10.)
   
 except myExcept,ec:
-  print "box2 : ko (" + ec.what() + ")"
+  assert(ec.what() == "Box builder with dimensions :: Dx is null or negative.")
 
 try :    
-  box3 = shaperpy.makeBox(10.,0.,10.)
-  print "box3 : ok"
+  Box_3 = shaperpy.makeBox(10.,0.,10.)
   
 except myExcept,ec:
-  print "box3 : ko (" + ec.what() + ")"
+  assert(ec.what() == "Box builder with dimensions :: Dy is null or negative.")
   
 try :    
-  box4 = shaperpy.makeBox(10.,10.,0.)
-  print "box4 : ok"
+  Box_4 = shaperpy.makeBox(10.,10.,0.)
   
 except myExcept,ec:
-  print "box4 : ko (" + ec.what() + ")"
+  assert(ec.what() == "Box builder with dimensions :: Dz is null or negative.")
   
 try :    
-  box5 = shaperpy.makeBox(-10.,10.,10.)
-  print "box5 : ok"
+  Box_5 = shaperpy.makeBox(-10.,10.,10.)
   
 except myExcept,ec:
-  print "box5 : ko (" + ec.what() + ")"
+  assert(ec.what() == "Box builder with dimensions :: Dx is null or negative.")
   
 try :    
-  box6 = shaperpy.makeBox(10.,-10.,10.)
-  print "box6 : ok"
+  Box_6 = shaperpy.makeBox(10.,-10.,10.)
   
 except myExcept,ec:
-  print "box6 : ko (" + ec.what() + ")"
+  assert(ec.what() == "Box builder with dimensions :: Dy is null or negative.")
   
 try :    
-  box7 = shaperpy.makeBox(10.,10.,-10.)
-  print "box7 : ok"
+  Box_7 = shaperpy.makeBox(10.,10.,-10.)
   
 except myExcept,ec:
-  print "box7 : ko (" + ec.what() + ")"
+  assert(ec.what() == "Box builder with dimensions :: Dz is null or negative.")
 
-# Create a box with two points defining the diagonal   
-try :    
-  pnt1 = pnt(0.,0.,0.)
-  pnt2 = pnt(50.,50.,50.)
-  box8 = shaperpy.makeBox(pnt1,pnt2)
-  print "box8 : ok"
-  
-except myExcept,ec:
-  print "box8 : ko (" + ec.what() + ")"
+# Create a box with two points defining the diagonal
+pnt1 = pnt(0.,0.,0.)
+pnt2 = pnt(50.,50.,50.)
+Box_8 = shaperpy.makeBox(pnt1,pnt2)
 
-try :    
-  pnt1 = pnt(0.,0.,0.)
-  box9 = shaperpy.makeBox(pnt1,pnt1)
-  print "box9 : ok"
+try :  
+  Box_9 = shaperpy.makeBox(pnt1,pnt1)
   
 except myExcept,ec:
-  print "box9 : ko (" + ec.what() + ")"
+  assert(ec.what() == "Box builder with points :: the distance between the two points is null.")
   
 try :    
-  pnt1 = pnt(0.,0.,0.)
-  pnt2 = pnt(0.,50.,50.)
-  box10 = shaperpy.makeBox(pnt1,pnt2)
-  print "box10 : ok"
+  pnt3 = pnt(0.,50.,50.)
+  Box_10 = shaperpy.makeBox(pnt1,pnt3)
   
 except myExcept,ec:
-  print "box10 : ko (" + ec.what() + ")"
+  assert(ec.what() == "Box builder with points :: the points belong both to one of the OXY, OYZ or OZX planes.")
   
 try :    
-  pnt1 = pnt(0.,0.,0.)
-  pnt2 = pnt(50.,0.,50.)
-  box11 = shaperpy.makeBox(pnt1,pnt2)
-  print "box11 : ok"
+  pnt4 = pnt(50.,0.,50.)
+  Box_11 = shaperpy.makeBox(pnt1,pnt4)
   
 except myExcept,ec:
-  print "box11 : ko (" + ec.what() + ")"
+  assert(ec.what() == "Box builder with points :: the points belong both to one of the OXY, OYZ or OZX planes.")
   
 try :    
-  pnt1 = pnt(0.,0.,0.)
-  pnt2 = pnt(50.,50.,0.)
-  box12 = shaperpy.makeBox(pnt1,pnt2)
-  print "box12 : ok"
+  pnt5 = pnt(50.,50.,0.)
+  Box_12 = shaperpy.makeBox(pnt1,pnt5)
   
 except myExcept,ec:
-  print "box12 : ko (" + ec.what() + ")"
+  assert(ec.what() == "Box builder with points :: the points belong both to one of the OXY, OYZ or OZX planes.")
   
 try :    
-  pnt1 = pnt(50.,50.,50.)
-  box13 = shaperpy.makeBox(pnt1,None)
-  print "box13 : ok"
+  Box_13 = shaperpy.makeBox(pnt2,None)
   
 except myExcept,ec:
-  print "box13 : ko (" + ec.what() + ")"
+  assert(ec.what() == "Box builder with points :: the second point is not correct.")
   
 try :    
-  pnt2 = pnt(50.,50.,50.)
-  box14 = shaperpy.makeBox(None,pnt2)
-  print "box14 : ok"
+  Box_14 = shaperpy.makeBox(None,pnt2)
   
 except myExcept,ec:
-  print "box14 : ko (" + ec.what() + ")"
+  assert(ec.what() == "Box builder with points :: the first point is not correct.")
   
