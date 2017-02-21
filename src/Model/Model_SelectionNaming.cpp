@@ -440,87 +440,43 @@ size_t ParseName(const std::string& theSubShapeName,   std::list<std::string>& t
 const TopoDS_Shape findCommonShape(
   const TopAbs_ShapeEnum theType, const TopTools_ListOfShape& theList)
 {
-  if(theList.IsEmpty() || theList.Extent() == 1) {
+  if(theList.Extent() < 2) {
     return TopoDS_Shape();
   }
 
-  TopoDS_Shape aShape;
+  // Store in maps sub-shapes from each face.
   std::vector<TopTools_MapOfShape> aVec;
-  TopTools_MapOfShape aMap1, aMap2, aMap3, aMap4;
-  if(theList.Extent() > 1) {
-    aVec.push_back(aMap1);
-    aVec.push_back(aMap2);
+  for(TopTools_ListIteratorOfListOfShape anIt(theList); anIt.More(); anIt.Next()) {
+    const TopoDS_Shape aFace = anIt.Value();
+    TopTools_MapOfShape aMap;
+    for(TopExp_Explorer anExp(aFace, theType); anExp.More(); anExp.Next()) {
+      const TopoDS_Shape& aSubShape = anExp.Current();
+      aMap.Add(anExp.Current());
+    }
+    aVec.push_back(aMap);
   }
-  if(theList.Extent() > 2)
-    aVec.push_back(aMap3);
-  if(theList.Extent() == 4)
-    aVec.push_back(aMap4);
 
-  //fill maps
-  TopTools_ListIteratorOfListOfShape it(theList);
-  for(int i = 0;it.More();it.Next(),i++) {
-    const TopoDS_Shape& aFace = it.Value();
-    if(i < 2) {
-      TopExp_Explorer anExp (aFace, theType);
-      for(;anExp.More();anExp.Next()) {
-        const TopoDS_Shape& anEdge = anExp.Current();
-        if (!anEdge.IsNull())
-          aVec[i].Add(anExp.Current());
-      }
-    } else {
-      TopExp_Explorer anExp (aFace, TopAbs_VERTEX);
-      for(;anExp.More();anExp.Next()) {
-        const TopoDS_Shape& aVertex = anExp.Current();
-        if (!aVertex.IsNull())
-          aVec[i].Add(anExp.Current());
+  // Find sub-shape shared between all faces.
+  TopoDS_Shape aSharedShape;
+  for(TopTools_MapIteratorOfMapOfShape anIt(aVec[0]); anIt.More(); anIt.Next()) {
+    const TopoDS_Shape& aSubShape = anIt.Value();
+    int aSharedNb = 1;
+    for(int anIndex = 1; anIndex < aVec.size(); ++anIndex) {
+      if(aVec[anIndex].Contains(aSubShape)) {
+        ++aSharedNb;
       }
     }
-  }
-  //trivial case: 2 faces
-  TopTools_ListOfShape aList;
-  TopTools_MapIteratorOfMapOfShape it2(aVec[0]);
-  for(;it2.More();it2.Next()) {
-    if(aVec[1].Contains(it2.Key())) {
-      aShape = it2.Key();
-      if(theList.Extent() == 2)
-        break;
-      else
-        aList.Append(it2.Key());
-    }
-  }
-  if(aList.Extent() && aVec.size() > 3) {// list of common edges ==> search ny neighbors
-    if(aVec[2].Extent() && aVec[3].Extent()) {
-      TopTools_ListIteratorOfListOfShape it(aList);
-      for(;it.More();it.Next()) {
-        const TopoDS_Shape& aCand = it.Value();
-        // not yet completelly implemented, to be rechecked
-        TopoDS_Vertex aV1, aV2;
-        TopExp::Vertices(TopoDS::Edge(aCand), aV1, aV2);
-        int aNum(0);
-        if(aVec[2].Contains(aV1)) aNum++;
-        else if(aVec[2].Contains(aV2)) aNum++;
-        if(aVec[3].Contains(aV1)) aNum++;
-        else if(aVec[3].Contains(aV2)) aNum++;
-        if(aNum == 2) {
-          aShape = aCand;
-          break;
-        }
+    if(aSharedNb == theList.Extent()) {
+      if(aSharedShape.IsNull()) {
+        aSharedShape = aSubShape;
+      } else {
+        // More than one shape shared between all faces, return null shape in this case.
+        return TopoDS_Shape();
       }
     }
   }
 
-  if(aList.Extent() && aVec.size() == 3) {
-
-    TopTools_ListIteratorOfListOfShape it(aList);
-    for(;it.More();it.Next()) {
-      const TopoDS_Shape& aCand = it.Value();
-      if(aVec[2].Contains(aCand)) {
-        aShape = aCand;
-        break;
-      }
-    }
-  }
-  return aShape;
+  return aSharedShape;
 }
 
 std::string getContextName(const std::string& theSubShapeName)
@@ -824,7 +780,7 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   std::list<std::string> aListofNames;
   size_t aN = aSelection.IsNull() ? ParseName(aSubShapeName, aListofNames) : 0;
   if (aSelection.IsNull() && (aType == TopAbs_EDGE || aType == TopAbs_VERTEX)) {
-    if(aN > 1 && (aN < 4 || (aType == TopAbs_EDGE && aN < 5))) { // 2 || 3 or 4 for EDGE
+    if(aN > 1) {
       TopTools_ListOfShape aList;
       std::list<std::string>::iterator it = aListofNames.begin();
       for(; it != aListofNames.end(); it++){
