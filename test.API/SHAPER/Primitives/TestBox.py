@@ -17,7 +17,7 @@ Point_4 = model.addPoint(Part_1_doc, 50, 0, 50).result()
 Point_5 = model.addPoint(Part_1_doc, 50, 50, 0).result()
 Vertex_3 = model.selection("VERTEX", "pnt")
 
-#Sketch
+# Sketch
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
 SketchLine_1 = Sketch_1.addLine(20, 10, 40, 10)
@@ -37,9 +37,14 @@ SketchConstraintCoincidence_4 = Sketch_2.setCoincident(SketchLine_5.startPoint()
 Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1s-SketchLine_4e")])
 Vertex_2 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_2/Vertex-SketchLine_7s-SketchLine_6e")])
 
-#Extrusion
+# Extrusion
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection("EDGE", "PartSet/OZ"), 100, 0)
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_2")], model.selection("EDGE", "PartSet/OX"), 100, 0)
+
+# Parameters
+model.addParameter(Part_1_doc, "dx", "10")
+model.addParameter(Part_1_doc, "dy", "10")
+model.addParameter(Part_1_doc, "dz", "10")
 
 # Tests
 Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
@@ -59,6 +64,9 @@ Box_14 = model.addBox(Part_1_doc, Point_2, Vertex_3)
 Box_15 = model.addBox(Part_1_doc, model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1s-SketchLine_4e"), model.selection("VERTEX", "Sketch_2/Vertex-SketchLine_7s-SketchLine_6e"))
 Box_16 = model.addBox(Part_1_doc, model.selection("VERTEX", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_2&Extrusion_1_1/To_Face_1"), model.selection("VERTEX", "Extrusion_2_1/Generated_Face_2&Extrusion_2_1/Generated_Face_1&Extrusion_2_1/To_Face_1"))
 Box_17 = model.addBox(Part_1_doc, model.selection("VERTEX", "Vertex_1_1"), model.selection("VERTEX", "Vertex_2_1"))
+Box_18 = model.addBox(Part_1_doc, "dx", "dy", "dz")
+model.do()
+model.end()
 
 # Checks
 from GeomAPI import GeomAPI_Shape
@@ -92,6 +100,12 @@ model.testNbSubResults(Box_17, [0])
 model.testNbSubShapes(Box_17, GeomAPI_Shape.SOLID, [1])
 model.testNbSubShapes(Box_17, GeomAPI_Shape.FACE, [6])
 model.testHaveNamingFaces(Box_17, model, Part_1_doc)
+
+model.testNbResults(Box_18, 1)
+model.testNbSubResults(Box_18, [0])
+model.testNbSubShapes(Box_18, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Box_18, GeomAPI_Shape.FACE, [6])
+model.testHaveNamingFaces(Box_18, model, Part_1_doc)
 
 model.testNbResults(Box_2, 0)
 assert(Box_2.feature().error() == "Box builder with dimensions :: Dx is null or negative.")
