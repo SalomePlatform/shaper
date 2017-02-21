@@ -2,127 +2,24 @@
 Test case for Primitive Box feature. 
 Written on High API.
 """
-from ModelAPI import *
-from GeomAPI import *
-
 from salome.shaper import model
 
-# Get session
-aSession = ModelAPI_Session.get()
+model.begin()
+partSet = model.moduleDocument()
+Part_1 = model.addPart(partSet)
+Part_1_doc = Part_1.document()
 
-# Create a part
-aDocument = aSession.activeDocument()
-aSession.startOperation()
-model.addPart(aDocument)
-aDocument = aSession.activeDocument()
-aSession.finishOperation()
+# Init
+Point_1 = model.addPoint(Part_1_doc, 0, 0, 0).result()
+Point_2 = model.addPoint(Part_1_doc, 50, 50, 50).result()
+Point_3 = model.addPoint(Part_1_doc, 0, 50, 50).result()
+Point_4 = model.addPoint(Part_1_doc, 50, 0, 50).result()
+Point_5 = model.addPoint(Part_1_doc, 50, 50, 0).result()
+Vertex_3 = model.selection("VERTEX", "pnt")
 
-# Create a box with dimensions
-aSession.startOperation()
-aBox1 = model.addBox(aDocument, 10, 10, 10)
-model.testNbResults(aBox1, 1)
-model.testNbSubShapes(aBox1, GeomAPI_Shape.SOLID, [1])
-model.testNbSubShapes(aBox1, GeomAPI_Shape.FACE, [6])
-print "box1 : ok"
-aSession.finishOperation()
-
-aSession.startOperation()
-aBox2 = model.addBox(aDocument, 0, 10, 10)
-model.testNbResults(aBox2, 0)
-print "box2 : ko (" + aBox2.feature().error() + ")"
-aSession.finishOperation()
-
-aSession.startOperation()
-aBox3 = model.addBox(aDocument, 10, 0, 10)
-model.testNbResults(aBox3, 0)
-print "box3 : ko (" + aBox3.feature().error() + ")"
-aSession.finishOperation()
-
-aSession.startOperation()
-aBox4 = model.addBox(aDocument, 10, 10, 0)
-model.testNbResults(aBox4, 0)
-print "box4 : ko (" + aBox4.feature().error() + ")"
-aSession.finishOperation()
-
-aSession.startOperation()
-aBox5 = model.addBox(aDocument, -10, 10, 10)
-model.testNbResults(aBox5, 0)
-print "box5 : ko (" + aBox5.feature().error() + ")"
-aSession.finishOperation()
-
-aSession.startOperation()
-aBox6 = model.addBox(aDocument, 10, -10, 10)
-model.testNbResults(aBox6, 0)
-print "box6 : ko (" + aBox6.feature().error() + ")"
-aSession.finishOperation()
-
-aSession.startOperation()
-aBox7 = model.addBox(aDocument, 10, 10, -10)
-model.testNbResults(aBox7, 0)
-print "box7 : ko (" + aBox7.feature().error() + ")"
-aSession.finishOperation()
-
-# Create a box with 2 points
-aSession.startOperation()
-aPoint1 = model.addPoint(aDocument, 0, 0, 0).result()
-aPoint2 = model.addPoint(aDocument, 50, 50, 50).result()
-aBox8 = model.addBox(aDocument, aPoint1, aPoint2)
-model.testNbResults(aBox8, 1)
-model.testNbSubShapes(aBox8, GeomAPI_Shape.SOLID, [1])
-model.testNbSubShapes(aBox8, GeomAPI_Shape.FACE, [6])
-print "box8 : ok"
-aSession.finishOperation()
-
-aSession.startOperation()
-aPoint1 = model.addPoint(aDocument, 0, 0, 0).result()
-aBox9 = model.addBox(aDocument, aPoint1, aPoint1)
-model.testNbResults(aBox9, 0)
-print "box9 : ko (" + aBox9.feature().error() + ")"
-aSession.finishOperation()
-
-aSession.startOperation()
-aPoint1 = model.addPoint(aDocument, 0, 0, 0).result()
-aPoint2 = model.addPoint(aDocument, 0, 50, 50).result()
-aBox10 = model.addBox(aDocument, aPoint1, aPoint2)
-model.testNbResults(aBox10, 0)
-print "box10 : ko (" + aBox10.feature().error() + ")"
-aSession.finishOperation()
-
-aSession.startOperation()
-aPoint1 = model.addPoint(aDocument, 0, 0, 0).result()
-aPoint2 = model.addPoint(aDocument, 50, 0, 50).result()
-aBox11 = model.addBox(aDocument, aPoint1, aPoint2)
-model.testNbResults(aBox11, 0)
-print "box11 : ko (" + aBox11.feature().error() + ")"
-aSession.finishOperation()
-
-aSession.startOperation()
-aPoint1 = model.addPoint(aDocument, 0, 0, 0).result()
-aPoint2 = model.addPoint(aDocument, 50, 50, 0).result()
-aBox12 = model.addBox(aDocument, aPoint1, aPoint2)
-model.testNbResults(aBox12, 0)
-print "box12 : ko (" + aBox12.feature().error() + ")"
-aSession.finishOperation()
-
-aSession.startOperation()
-aPoint1 = model.selection("VERTEX", "point1")
-aPoint2 = model.addPoint(aDocument, 50, 50, 0).result()
-aBox13 = model.addBox(aDocument, aPoint1, aPoint2)
-model.testNbResults(aBox13, 0)
-print "box13 : ko (" + aBox13.feature().error() + ")"
-aSession.finishOperation()
-
-aSession.startOperation()
-aPoint1 = model.addPoint(aDocument, 0, 0, 0).result()
-aPoint2 = model.selection("VERTEX", "point2")
-aBox14 = model.addBox(aDocument, aPoint1, aPoint2)
-model.testNbResults(aBox14, 0)
-print "box14 : ko (" + aBox14.feature().error() + ")"
-aSession.finishOperation()
-
-aSession.startOperation()
-Sketch_1 = model.addSketch(aDocument, model.defaultPlane("XOY"))
-Sketch_2 = model.addSketch(aDocument, model.defaultPlane("YOZ"))
+#Sketch
+Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
+Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
 SketchLine_1 = Sketch_1.addLine(20, 10, 40, 10)
 SketchLine_2 = Sketch_1.addLine(40, 10, 40, 20)
 SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchLine_2.startPoint())
@@ -137,35 +34,97 @@ SketchLine_7 = Sketch_2.addLine(40, 20, 20, 20)
 SketchLine_8 = Sketch_2.addLine(20, 20, 20, 10)
 SketchConstraintCoincidence_3 = Sketch_2.setCoincident(SketchLine_7.endPoint(), SketchLine_8.startPoint())
 SketchConstraintCoincidence_4 = Sketch_2.setCoincident(SketchLine_5.startPoint(), SketchLine_8.endPoint())
-aSession.finishOperation()
+Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1s-SketchLine_4e")])
+Vertex_2 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_2/Vertex-SketchLine_7s-SketchLine_6e")])
 
-aSession.startOperation()
-aBox15 = model.addBox(aDocument, model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1s-SketchLine_4e"),
-                      model.selection("VERTEX", "Sketch_2/Vertex-SketchLine_7s-SketchLine_6e"))
+#Extrusion
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection("EDGE", "PartSet/OZ"), 100, 0)
+Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_2")], model.selection("EDGE", "PartSet/OX"), 100, 0)
 
-model.testNbResults(aBox15, 1)
-model.testNbSubShapes(aBox15, GeomAPI_Shape.SOLID, [1])
-model.testNbSubShapes(aBox15, GeomAPI_Shape.FACE, [6])
-print "box15 : ok"
-aSession.finishOperation()
+# Tests
+Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
+Box_2 = model.addBox(Part_1_doc, 0, 10, 10)
+Box_3 = model.addBox(Part_1_doc, 10, 0, 10)
+Box_4 = model.addBox(Part_1_doc, 10, 10, 0)
+Box_5 = model.addBox(Part_1_doc, -10, 10, 10)
+Box_6 = model.addBox(Part_1_doc, 10, -10, 10)
+Box_7 = model.addBox(Part_1_doc, 10, 10, -10)
+Box_8 = model.addBox(Part_1_doc, Point_1, Point_2)
+Box_9 = model.addBox(Part_1_doc, Point_1, Point_1)
+Box_10 = model.addBox(Part_1_doc, Point_1, Point_3)
+Box_11 = model.addBox(Part_1_doc, Point_1, Point_4)
+Box_12 = model.addBox(Part_1_doc, Point_1, Point_5)
+Box_13 = model.addBox(Part_1_doc, Vertex_3, Point_2)
+Box_14 = model.addBox(Part_1_doc, Point_2, Vertex_3)
+Box_15 = model.addBox(Part_1_doc, model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1s-SketchLine_4e"), model.selection("VERTEX", "Sketch_2/Vertex-SketchLine_7s-SketchLine_6e"))
+Box_16 = model.addBox(Part_1_doc, model.selection("VERTEX", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_2&Extrusion_1_1/To_Face_1"), model.selection("VERTEX", "Extrusion_2_1/Generated_Face_2&Extrusion_2_1/Generated_Face_1&Extrusion_2_1/To_Face_1"))
+Box_17 = model.addBox(Part_1_doc, model.selection("VERTEX", "Vertex_1_1"), model.selection("VERTEX", "Vertex_2_1"))
 
-aSession.startOperation()
-Extrusion_1 = model.addExtrusion(aDocument, [model.selection("COMPOUND", "Sketch_1")], model.selection("EDGE", "PartSet/OZ"), 100, 0)
-Extrusion_2 = model.addExtrusion(aDocument, [model.selection("COMPOUND", "Sketch_2")], model.selection("EDGE", "PartSet/OX"), 100, 0)
-aBox16 = model.addBox(aDocument, model.selection("VERTEX", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_2&Extrusion_1_1/To_Face_1"),
-                       model.selection("VERTEX", "Extrusion_2_1/Generated_Face_2&Extrusion_2_1/Generated_Face_1&Extrusion_2_1/To_Face_1"))
-model.testNbResults(aBox16, 1)
-model.testNbSubShapes(aBox16, GeomAPI_Shape.SOLID, [1])
-model.testNbSubShapes(aBox16, GeomAPI_Shape.FACE, [6])
-print "box16 : ok"
-aSession.finishOperation()
+# Checks
+from GeomAPI import GeomAPI_Shape
 
-aSession.startOperation()
-Vertex_1 = model.addVertex(aDocument, [model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1s-SketchLine_4e")])
-Vertex_2 = model.addVertex(aDocument, [model.selection("VERTEX", "Sketch_2/Vertex-SketchLine_7s-SketchLine_6e")])
-aBox17 = model.addBox(aDocument, model.selection("VERTEX", "Vertex_1_1"), model.selection("VERTEX", "Vertex_2_1"))
-model.testNbResults(aBox17, 1)
-model.testNbSubShapes(aBox17, GeomAPI_Shape.SOLID, [1])
-model.testNbSubShapes(aBox17, GeomAPI_Shape.FACE, [6])
-print "box17 : ok"
-aSession.finishOperation()
+model.testNbResults(Box_1, 1)
+model.testNbSubResults(Box_1, [0])
+model.testNbSubShapes(Box_1, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Box_1, GeomAPI_Shape.FACE, [6])
+model.testHaveNamingFaces(Box_1, model, Part_1_doc)
+
+model.testNbResults(Box_8, 1)
+model.testNbSubResults(Box_8, [0])
+model.testNbSubShapes(Box_8, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Box_8, GeomAPI_Shape.FACE, [6])
+model.testHaveNamingFaces(Box_8, model, Part_1_doc)
+
+model.testNbResults(Box_15, 1)
+model.testNbSubResults(Box_15, [0])
+model.testNbSubShapes(Box_15, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Box_15, GeomAPI_Shape.FACE, [6])
+model.testHaveNamingFaces(Box_15, model, Part_1_doc)
+
+model.testNbResults(Box_16, 1)
+model.testNbSubResults(Box_16, [0])
+model.testNbSubShapes(Box_16, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Box_16, GeomAPI_Shape.FACE, [6])
+model.testHaveNamingFaces(Box_16, model, Part_1_doc)
+
+model.testNbResults(Box_17, 1)
+model.testNbSubResults(Box_17, [0])
+model.testNbSubShapes(Box_17, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Box_17, GeomAPI_Shape.FACE, [6])
+model.testHaveNamingFaces(Box_17, model, Part_1_doc)
+
+model.testNbResults(Box_2, 0)
+assert(Box_2.feature().error() == "Box builder with dimensions :: Dx is null or negative.")
+
+model.testNbResults(Box_3, 0)
+assert(Box_3.feature().error() == "Box builder with dimensions :: Dy is null or negative.")
+
+model.testNbResults(Box_4, 0)
+assert(Box_4.feature().error() == "Box builder with dimensions :: Dz is null or negative.")
+
+model.testNbResults(Box_5, 0)
+assert(Box_5.feature().error() == "Box builder with dimensions :: Dx is null or negative.")
+
+model.testNbResults(Box_6, 0)
+assert(Box_6.feature().error() == "Box builder with dimensions :: Dy is null or negative.")
+
+model.testNbResults(Box_7, 0)
+assert(Box_7.feature().error() == "Box builder with dimensions :: Dz is null or negative.")
+
+model.testNbResults(Box_9, 0)
+assert(Box_9.feature().error() == "Box builder with points :: the distance between the two points is null.")
+
+model.testNbResults(Box_10, 0)
+assert(Box_10.feature().error() == "Box builder with points :: the points belong both to one of the OXY, OYZ or OZX planes.")
+
+model.testNbResults(Box_11, 0)
+assert(Box_11.feature().error() == "Box builder with points :: the points belong both to one of the OXY, OYZ or OZX planes.")
+
+model.testNbResults(Box_12, 0)
+assert(Box_12.feature().error() == "Box builder with points :: the points belong both to one of the OXY, OYZ or OZX planes.")
+
+model.testNbResults(Box_13, 0)
+assert(Box_13.feature().error() == "Attribute \"FirstPoint\" is not initialized.")
+
+model.testNbResults(Box_14, 0)
+assert(Box_14.feature().error() == "Attribute \"SecondPoint\" is not initialized.")
