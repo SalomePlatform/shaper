@@ -80,14 +80,14 @@ except myExcept,ec:
   assert(ec.what() == "Box builder with points :: the points belong both to one of the OXY, OYZ or OZX planes.")
   
 try :    
-  Box_13 = shaperpy.makeBox(pnt2,None)
+  Box_13 = shaperpy.makeBox(None, pnt2)
   
 except myExcept,ec:
-  assert(ec.what() == "Box builder with points :: the second point is not correct.")
+  assert(ec.what() == "Box builder with points :: the first point is not valid.")
   
 try :    
-  Box_14 = shaperpy.makeBox(None,pnt2)
+  Box_14 = shaperpy.makeBox(pnt2, None)
   
 except myExcept,ec:
-  assert(ec.what() == "Box builder with points :: the first point is not correct.")
+  assert(ec.what() == "Box builder with points :: the second point is not valid.")
   

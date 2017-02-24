@@ -48,11 +48,11 @@ bool GeomAlgoAPI_Box::check()
     }
   } else if (myMethodType == MethodType::BOX_POINTS) {
     if (!myFirstPoint.get()) {
-      myError = "Box builder with points :: the first point is not correct.";
+      myError = "Box builder with points :: the first point is not valid.";
       return false;
     }
     if (!mySecondPoint.get()) {
-      myError = "Box builder with points :: the second point is not correct.";
+      myError = "Box builder with points :: the second point is not valid.";
       return false;
     }
     if (myFirstPoint->distance(mySecondPoint) < Precision::Confusion()) {

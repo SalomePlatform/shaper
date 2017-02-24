@@ -53,29 +53,29 @@ bool GeomAlgoAPI_Translation::check()
   switch (myMethodType) {
     case BY_DISTANCE: {
       if (!myAxis) {
-        myError = "Translation builder :: axis is invalid.";
+        myError = "Translation builder :: axis is not valid.";
         return false;
       }
       if (!mySourceShape) {
-        myError = "Translation builder :: source shape is invalid.";
+        myError = "Translation builder :: source shape is not valid.";
         return false;
       }
       return true;
     }
     case BY_DIM: {
       if (!mySourceShape) {
-        myError = "Translation builder :: source shape is invalid.";
+        myError = "Translation builder :: source shape is not valid.";
         return false;
       }
       return true;
     }
     case BY_POINTS: {
       if (!myStartPoint) {
-        myError = "Translation builder :: start point is invalid.";
+        myError = "Translation builder :: start point is not valid.";
         return false;
       }
       if (!myEndPoint) {
-        myError = "Translation builder :: start point is invalid.";
+        myError = "Translation builder :: start point is not valid.";
         return false;
       }
       if (!mySourceShape) {
