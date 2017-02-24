@@ -48,7 +48,7 @@ GeomAlgoAPI_Cylinder::GeomAlgoAPI_Cylinder(std::shared_ptr<GeomAPI_Ax2> theAxis,
 bool GeomAlgoAPI_Cylinder::check()
 {
   if (!myAxis) {
-    myError = "Cylinder builder :: axis is invalid.";
+    myError = "Cylinder builder :: axis is not valid.";
     return false;
   }
   if (myRadius < Precision::Confusion()) {

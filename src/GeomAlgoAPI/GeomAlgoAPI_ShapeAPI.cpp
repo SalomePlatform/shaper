@@ -70,6 +70,15 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Pnt> theBasePoint, std::shared_ptr<GeomAPI_Edge> theEdge,
     double theRadius, double theHeight) throw (GeomAlgoAPI_Exception)
   {
+    // Check if the base point is OK
+    if (!theBasePoint) {
+      throw GeomAlgoAPI_Exception("Cylinder builder :: the base point is not valid.");
+    }
+    // Check if the edge is OK
+    if (!theEdge) {
+      throw GeomAlgoAPI_Exception("Cylinder builder :: the axis is not valid.");
+    }
+    
     std::shared_ptr<GeomAPI_Ax2> anAxis;
     anAxis = std::shared_ptr<GeomAPI_Ax2>(new GeomAPI_Ax2(theBasePoint,
                                                           theEdge->line()->direction()));
