@@ -9,6 +9,8 @@
 """
 from GeomDataAPI import *
 from ModelAPI import *
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -40,6 +42,7 @@ aLineEndPoint = geomDataAPI_Point2D(aSketchLine.attribute("EndPoint"))
 aLineStartPoint.setValue(0., 15.)
 aLineEndPoint.setValue(20., 25.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 4)
 #=========================================================================
 # Assign vertical constraint for a line
 #=========================================================================
@@ -52,6 +55,7 @@ refattrA.setObject(aResult)
 aVerticalConstraint.execute()
 aSession.finishOperation()
 assert(aLineStartPoint.x() == aLineEndPoint.x())
+assert (model.dof(aSketchFeature) == 3)
 #=========================================================================
 # Move one of boundary points of a line
 #=========================================================================
@@ -61,6 +65,7 @@ aLineStartPoint.setValue(aLineStartPoint.x() + deltaX,
                          aLineStartPoint.y() + deltaY)
 aSession.finishOperation()
 assert(aLineStartPoint.x() == aLineEndPoint.x())
+assert (model.dof(aSketchFeature) == 3)
 #=========================================================================
 # Move other boundary point of a line
 #=========================================================================
@@ -71,9 +76,9 @@ aLineEndPoint.setValue(aLineEndPoint.x() + deltaX,
                        aLineEndPoint.y() + deltaY)
 aSession.finishOperation()
 assert(aLineStartPoint.x() == aLineEndPoint.x())
+assert (model.dof(aSketchFeature) == 3)
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

@@ -56,14 +56,14 @@ void SketchAPI_Projection::setExternalFeature(const ModelHighAPI_Selection & the
 {
   fillAttribute(theExternalFeature, externalFeature());
 
-  execute();
+  execute(true);
 }
 
 void SketchAPI_Projection::setByExternalName(const std::string& theExternalName)
 {
   fillAttribute(ModelHighAPI_Selection("EDGE", theExternalName), external());
 
-  execute();
+  execute(true);
 }
 
 //--------------------------------------------------------------------------------------

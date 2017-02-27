@@ -19,6 +19,8 @@
 from GeomDataAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -97,6 +99,7 @@ aLineEndPoint = geomDataAPI_Point2D(aSketchLine.attribute("EndPoint"))
 aLineStartPoint.setValue(50., 0.)
 aLineEndPoint.setValue(100., 25.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 9)
 #=========================================================================
 # Link arc's end and line's start points with concidence constraint
 #=========================================================================
@@ -108,6 +111,7 @@ reflistA.setAttr(anArcEndPoint)
 reflistB.setAttr(aLineStartPoint)
 aConstraint.execute()
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 7)
 #=========================================================================
 # Check values and move one constrainted object
 #=========================================================================
@@ -124,6 +128,7 @@ aSession.finishOperation()
 # check that arc's points are moved also
 assert (anArcEndPoint.x() == aLineStartPoint.x())
 assert (anArcEndPoint.y() == aLineStartPoint.y())
+assert (model.dof(aSketchFeature) == 7)
 #=========================================================================
 # Remove coincidence and move the line
 #=========================================================================
@@ -134,6 +139,7 @@ aSession.startOperation()
 aLineStartPoint.setValue(70., 0.)
 aSession.finishOperation()
 assert (anArcEndPoint.x() != aLineStartPoint.x() or anArcEndPoint.y() != aLineStartPoint.y())
+assert (model.dof(aSketchFeature) == 9)
 
 #=========================================================================
 # Add constraint point-on-line
@@ -147,6 +153,7 @@ reflistB.setObject(aSketchLine.lastResult())
 aConstraint.execute()
 aSession.finishOperation()
 checkPointOnLine(anArcStartPoint, aSketchLine)
+assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # Add constraint point-on-circle
 #=========================================================================
@@ -158,6 +165,7 @@ aCircleRadius = aSketchCircle.real("CircleRadius")
 aCircleCenter.setValue(10., 10.)
 aCircleRadius.setValue(25.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 11)
 # create origin
 aSession.startOperation()
 anOrigRes = modelAPI_Result(aDocument.objectByName("Construction", anOriginName))
@@ -169,6 +177,7 @@ anOriginCoord = geomDataAPI_Point2D(anOrigin.attribute("PointCoordindates"))
 anOriginCoord.setValue(0., 0.)
 anOrigin.selection("External").setValue(anOrigRes, anOrigShape)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 11)
 # coincidence between center of circle and the origin
 aSession.startOperation()
 aConstraint = aSketchFeature.addFeature("SketchConstraintCoincidence")
@@ -177,6 +186,7 @@ reflistB = aConstraint.refattr("ConstraintEntityB")
 reflistA.setAttr(aCircleCenter)
 reflistB.setObject(anOrigin.lastResult())
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 9)
 # point-on-circle
 aSession.startOperation()
 aConstraint = aSketchFeature.addFeature("SketchConstraintCoincidence")
@@ -187,6 +197,7 @@ reflistB.setAttr(aLineEndPoint)
 aConstraint.execute()
 aSession.finishOperation()
 checkPointOnCircle(aLineEndPoint, aSketchCircle)
+assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # Add constraint point-on-arc
 #=========================================================================
@@ -201,6 +212,7 @@ aSession.finishOperation()
 checkPointOnArc(aCircleCenter, aSketchArc)
 # check center of circle is still in origin
 assert (aCircleCenter.x() == 0. and aCircleCenter.y() == 0.)
+assert (model.dof(aSketchFeature) == 7)
 
 #=========================================================================
 # Create two more lines and set multi-coincidence between their extremities
@@ -219,6 +231,7 @@ aLine3EndPoint = geomDataAPI_Point2D(aLine3.attribute("EndPoint"))
 aLine3StartPoint.setValue(50., 0.)
 aLine3EndPoint.setValue(0., 100.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 15)
 # coincidences between extremities of lines
 aSession.startOperation()
 aConstraint12 = aSketchFeature.addFeature("SketchConstraintCoincidence")
@@ -240,6 +253,7 @@ aSession.finishOperation()
 # check the points have same coordinates
 assert (aLineStartPoint.x() == aLine2StartPoint.x() and aLineStartPoint.y() == aLine2StartPoint.y())
 assert (aLineStartPoint.x() == aLine3StartPoint.x() and aLineStartPoint.y() == aLine3StartPoint.y())
+assert (model.dof(aSketchFeature) == 11)
 #=========================================================================
 # Move one line and check other have been updated too
 #=========================================================================
@@ -251,6 +265,7 @@ aLine3EndPoint.setValue(aLine3EndPoint.x() + deltaX,
 aSession.finishOperation()
 assert (aLineStartPoint.x() == aLine2StartPoint.x() and aLineStartPoint.y() == aLine2StartPoint.y())
 assert (aLineStartPoint.x() == aLine3StartPoint.x() and aLineStartPoint.y() == aLine3StartPoint.y())
+assert (model.dof(aSketchFeature) == 11)
 #=========================================================================
 # Fix a line and move another connected segment
 #=========================================================================
@@ -271,6 +286,7 @@ aSession.finishOperation()
 assert (aLineStartPoint.x() == coordX and aLineStartPoint.y() == coordY)
 assert (aLine2StartPoint.x() == coordX and aLine2StartPoint.y() == coordY)
 assert (aLine3StartPoint.x() == coordX and aLine3StartPoint.y() == coordY)
+assert (model.dof(aSketchFeature) == 7)
 #=========================================================================
 # Detach fixed line and move one of remaining
 #=========================================================================
@@ -289,10 +305,10 @@ aLineEndPoint.setValue(aLineEndPoint.x() + deltaX,
 aSession.finishOperation()
 assert (aLineStartPoint.x() != aLine2StartPoint.x() or aLineStartPoint.y() != aLine2StartPoint.y())
 assert (aLineStartPoint.x() == aLine3StartPoint.x() and aLineStartPoint.y() == aLine3StartPoint.y())
+assert (model.dof(aSketchFeature) == 9)
 
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

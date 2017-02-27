@@ -40,3 +40,8 @@ def addPolygon(sketch, *coords):
         )
     pg.append(ln)
     return pg
+
+def dof(sketch):
+    """ Extract degrees of freedom for the given sketch
+    """
+    return int(filter(str.isdigit, sketch.string("SolverDOF").value()))

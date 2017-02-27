@@ -10,7 +10,8 @@
 
 PlaneGCSSolver_Solver::PlaneGCSSolver_Solver()
   : myEquationSystem(new GCS::System),
-    myConfCollected(false)
+    myConfCollected(false),
+    myDOF(0)
 {
 }
 
@@ -23,18 +24,46 @@ void PlaneGCSSolver_Solver::clear()
 {
   myEquationSystem->clear();
   myParameters.clear();
-  myEqualConstraints.clear();
-  myEqualParameters.clear();
+  myConstraints.clear();
+  myConflictingIDs.clear();
+  myDOF = 0;
 }
 
 void PlaneGCSSolver_Solver::addConstraint(GCSConstraintPtr theConstraint)
 {
   myEquationSystem->addConstraint(theConstraint.get());
+  myConstraints[theConstraint->getTag()].insert(theConstraint);
+  myDOF = -1;
 }
 
 void PlaneGCSSolver_Solver::removeConstraint(ConstraintID theID)
 {
-  myEquationSystem->clearByTag(theID);
+  myConstraints.erase(theID);
+  if (myConstraints.empty()) {
+    myEquationSystem->clear();
+    myDOF = (int)myParameters.size();
+  } else {
+    myEquationSystem->clearByTag(theID);
+    myDOF = -1;
+  }
+}
+
+double* PlaneGCSSolver_Solver::createParameter()
+{
+  double* aResult = new double(0);
+  myParameters.push_back(aResult);
+  if (myDOF >= 0)
+    ++myDOF;
+  return aResult;
+}
+
+void PlaneGCSSolver_Solver::removeParameters(const GCS::SET_pD& theParams)
+{
+  for (int i = (int)myParameters.size() - 1; i >= 0; --i)
+    if (theParams.find(myParameters[i]) != theParams.end()) {
+      myParameters.erase(myParameters.begin() + i);
+      --myDOF;
+    }
 }
 
 SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
@@ -56,6 +85,8 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
   SketchSolver_SolveStatus aStatus;
   if (aResult == GCS::Success) {
     myEquationSystem->applySolution();
+    if (myDOF < 0)
+      myDOF = myEquationSystem->dofsNumber();
     aStatus = STATUS_OK;
   } else
     aStatus = STATUS_FAILED;
@@ -87,7 +118,9 @@ void PlaneGCSSolver_Solver::collectConflicting()
   myConfCollected = true;
 }
 
-int PlaneGCSSolver_Solver::dof() const
+int PlaneGCSSolver_Solver::dof()
 {
-  return const_cast<PlaneGCSSolver_Solver*>(this)->myEquationSystem->dofsNumber();
+  if (myDOF < 0 && !myConstraints.empty())
+    solve();
+  return myDOF;
 }

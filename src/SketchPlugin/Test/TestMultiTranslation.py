@@ -15,6 +15,7 @@
 """
 from GeomDataAPI import *
 from ModelAPI import *
+from salome.shaper import model
 
 #=========================================================================
 # Auxiliary functions
@@ -106,6 +107,7 @@ aSession.finishOperation()
 aSession.startOperation()
 aFeaturesList = createSketch(aSketchFeature)
 aSession.finishOperation()
+assert(model.dof(aSketchFeature) == 5)
 #=========================================================================
 # Global variables
 #=========================================================================
@@ -125,6 +127,7 @@ aTransLineEndPoint = geomDataAPI_Point2D(aTransLine.attribute("EndPoint"))
 aTransLineStartPoint.setValue(START_X, START_Y)
 aTransLineEndPoint.setValue(START_X + DELTA_X, START_Y + DELTA_Y)
 aSession.finishOperation()
+assert(model.dof(aSketchFeature) == 9)
 #=========================================================================
 # Create the Translation constraint
 #=========================================================================
@@ -146,6 +149,7 @@ aNbCopies = aMultiTranslation.integer("MultiTranslationObjects")
 aNbCopies.setValue(2)
 aMultiTranslation.execute()
 aSession.finishOperation()
+assert(model.dof(aSketchFeature) == 9)
 #=========================================================================
 # Verify the objects are moved for the specified distance
 #=========================================================================
@@ -159,6 +163,7 @@ aNbCopies.setValue(3)
 aSession.finishOperation()
 aTranslated = aMultiTranslation.reflist("ConstraintEntityB")
 checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
+assert(model.dof(aSketchFeature) == 9)
 
 #=========================================================================
 # Create new feature and add it into the Rotation
@@ -172,6 +177,7 @@ assert(aResult is not None)
 aTransList.append(aResult)
 aSession.finishOperation()
 checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
+assert(model.dof(aSketchFeature) == 13)
 #=========================================================================
 # Move line and check the copies are moved too
 #=========================================================================
@@ -180,6 +186,7 @@ aStartPoint = geomDataAPI_Point2D(aLine.attribute("StartPoint"))
 aStartPoint.setValue(12., 5.)
 aSession.finishOperation()
 checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
+assert(model.dof(aSketchFeature) == 13)
 #=========================================================================
 # Change number of copies and verify Rotation
 #=========================================================================
@@ -187,6 +194,7 @@ aSession.startOperation()
 aNbCopies.setValue(2)
 aSession.finishOperation()
 checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
+assert(model.dof(aSketchFeature) == 13)
 
 #=========================================================================
 # Remove a feature from the Rotation
@@ -196,6 +204,7 @@ aRemoveIt = aTransList.object(0)
 aTransList.remove(aRemoveIt)
 aSession.finishOperation()
 checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
+assert(model.dof(aSketchFeature) == 13)
 
 #=========================================================================
 # Clear the list of rotated features
@@ -207,9 +216,9 @@ checkTranslation(aTranslated, 1, DELTA_X, DELTA_Y)
 aTransList.append(aResult)
 aSession.finishOperation()
 checkTranslation(aTranslated, aNbCopies.value(), DELTA_X, DELTA_Y)
+assert(model.dof(aSketchFeature) == 13)
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

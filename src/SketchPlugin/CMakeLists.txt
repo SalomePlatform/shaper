@@ -127,7 +127,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestConstraintParallel.py
                TestConstraintPerpendicular.py
                TestConstraintRadius.py
-               TestConstraintRigid.py
+               TestConstraintFixed.py
                TestConstraintHorizontal.py
                TestConstraintVertical.py
                TestConstraintEqual.py

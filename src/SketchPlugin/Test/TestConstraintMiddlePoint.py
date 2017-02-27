@@ -19,6 +19,8 @@
 from GeomDataAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -78,6 +80,7 @@ aEndPoint2 = geomDataAPI_Point2D(aLine2.attribute("EndPoint"))
 aStartPoint2.setValue(10., 100.)
 aEndPoint2.setValue(100., 25.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # Make end point of second line middle point on first line
 #=========================================================================
@@ -106,6 +109,7 @@ reflistA.setAttr(aEndPoint2)
 reflistB.setObject(aLine1.lastResult())
 aConstraint.execute()
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 6)
 
 #=========================================================================
 # Check values and move one constrainted object
@@ -116,6 +120,7 @@ aSession.startOperation()
 aStartPoint1.setValue(aStartPoint1.x() + deltaX, aStartPoint1.y() + deltaY)
 aSession.finishOperation()
 checkMiddlePoint(aEndPoint2, aLine1)
+assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 # Remove constraint and move the line
 #=========================================================================
@@ -123,10 +128,12 @@ aCurX, aCurY = aEndPoint2.x(), aEndPoint2.y()
 aSession.startOperation()
 aDocument.removeFeature(aConstraint)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 8)
 aSession.startOperation()
 aEndPoint1.setValue(90., 0.)
 aSession.finishOperation()
 assert (aEndPoint2.x() == aCurX and aEndPoint2.y() == aCurY)
+assert (model.dof(aSketchFeature) == 8)
 
 #=========================================================================
 # Set external point as a middle point
@@ -142,6 +149,7 @@ anOriginCoord = geomDataAPI_Point2D(anOrigin.attribute("PointCoordindates"))
 anOriginCoord.setValue(0., 0.)
 anOrigin.selection("External").setValue(anOrigRes, anOrigShape)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 8)
 # middle point constraint
 aSession.startOperation()
 aConstraint = aSketchFeature.addFeature("SketchConstraintMiddle")
@@ -151,6 +159,7 @@ reflistA.setObject(aLine2.lastResult())
 reflistB.setObject(anOrigin.lastResult())
 aSession.finishOperation()
 checkMiddlePoint(anOriginCoord, aLine2)
+assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 # Check origin coordinates does not changed
 #=========================================================================
@@ -171,6 +180,7 @@ reflistB = aCoincidence.refattr("ConstraintEntityB")
 reflistA.setAttr(aEndPoint3)
 reflistB.setObject(aLine1.lastResult())
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 9)
 #=========================================================================
 # Set Middle point
 #=========================================================================
@@ -183,6 +193,7 @@ reflistB.setObject(aLine1.lastResult())
 aSession.finishOperation()
 # check the point, and no error message
 assert aSketchFeature.string("SolverError").value() == ""
+assert (model.dof(aSketchFeature) == 8)
 checkMiddlePoint(aEndPoint3, aLine1)
 #=========================================================================
 # Remove coincidence and move one line
@@ -196,10 +207,10 @@ aStartPoint1.setValue(aStartPoint1.x() + deltaX, aStartPoint1.y() + deltaY)
 aEndPoint1.setValue(aEndPoint1.x() + deltaX, aEndPoint1.y() + deltaY)
 aSession.finishOperation()
 checkMiddlePoint(aEndPoint3, aLine1)
+assert (model.dof(aSketchFeature) == 8)
 
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

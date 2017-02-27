@@ -16,6 +16,7 @@
 from GeomDataAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
 
 #=========================================================================
 # Auxiliary functions
@@ -114,6 +115,7 @@ aSession.finishOperation()
 aSession.startOperation()
 aFeaturesList = createSketch(aSketchFeature)
 aSession.finishOperation()
+assert(model.dof(aSketchFeature) == 5)
 #=========================================================================
 # Global variables
 #=========================================================================
@@ -128,6 +130,7 @@ aRotationPoint = aSketchFeature.addFeature("SketchPoint")
 aRotationPointPoint = geomDataAPI_Point2D(aRotationPoint.attribute("PointCoordindates"))
 aRotationPointPoint.setValue(CENTER_X, CENTER_Y)
 aSession.finishOperation()
+assert(model.dof(aSketchFeature) == 7)
 #=========================================================================
 # Create the Rotation constraint
 #=========================================================================
@@ -155,6 +158,7 @@ aNbCopies = aMultiRotation.integer("MultiRotationObjects")
 aNbCopies.setValue(2)
 aMultiRotation.execute()
 aSession.finishOperation()
+assert(model.dof(aSketchFeature) == 7)
 #=========================================================================
 # Verify the objects are moved for the specified distance
 #=========================================================================
@@ -168,6 +172,7 @@ aNbCopies.setValue(3)
 aSession.finishOperation()
 aRotated = aMultiRotation.reflist("ConstraintEntityB")
 checkRotation(aRotated, aNbCopies.value(), CENTER_X, CENTER_Y, ANGLE)
+assert(model.dof(aSketchFeature) == 7)
 
 #=========================================================================
 # Create new feature and add it into the Rotation
@@ -181,6 +186,7 @@ assert(aResult is not None)
 aRotList.append(aResult)
 aSession.finishOperation()
 checkRotation(aRotated, aNbCopies.value(), CENTER_X, CENTER_Y, ANGLE)
+assert(model.dof(aSketchFeature) == 11)
 #=========================================================================
 # Move line and check the copies are moved too
 #=========================================================================
@@ -189,6 +195,7 @@ aStartPoint = geomDataAPI_Point2D(aLine.attribute("StartPoint"))
 aStartPoint.setValue(12., 5.)
 aSession.finishOperation()
 checkRotation(aRotated, aNbCopies.value(), CENTER_X, CENTER_Y, ANGLE)
+assert(model.dof(aSketchFeature) == 11)
 #=========================================================================
 # Change number of copies and verify Rotation
 #=========================================================================
@@ -196,6 +203,7 @@ aSession.startOperation()
 aNbCopies.setValue(2)
 aSession.finishOperation()
 checkRotation(aRotated, aNbCopies.value(), CENTER_X, CENTER_Y, ANGLE)
+assert(model.dof(aSketchFeature) == 11)
 
 #=========================================================================
 # Remove a feature from the Rotation
@@ -205,6 +213,7 @@ aRemoveIt = aRotList.object(0)
 aRotList.remove(aRemoveIt)
 aSession.finishOperation()
 checkRotation(aRotated, aNbCopies.value(), CENTER_X, CENTER_Y, ANGLE)
+assert(model.dof(aSketchFeature) == 11)
 
 #=========================================================================
 # Clear the list of rotated features
@@ -216,9 +225,9 @@ checkRotation(aRotated, 1, CENTER_X, CENTER_Y, ANGLE)
 aRotList.append(aResult)
 aSession.finishOperation()
 checkRotation(aRotated, aNbCopies.value(), CENTER_X, CENTER_Y, ANGLE)
+assert(model.dof(aSketchFeature) == 11)
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

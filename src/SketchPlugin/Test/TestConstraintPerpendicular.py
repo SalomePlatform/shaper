@@ -18,6 +18,8 @@
 """
 from GeomDataAPI import *
 from ModelAPI import *
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -56,6 +58,7 @@ aLineBEndPoint = geomDataAPI_Point2D(aSketchLineB.attribute("EndPoint"))
 aLineBStartPoint.setValue(25., 40.)
 aLineBEndPoint.setValue(25., 125.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # Make a constraint to keep the length of the line constant
 # to prevent perpendicular constraint collapsing line to point
@@ -79,6 +82,7 @@ assert (aLineBStartPoint.x() == 25)
 assert (aLineBStartPoint.y() == 40)
 assert (aLineBEndPoint.x() == 25)
 assert (aLineBEndPoint.y() == 125)
+assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 # Link lines with perpendicular constraint
 #=========================================================================
@@ -94,6 +98,7 @@ refattrA.setObject(aResultA)
 refattrB.setObject(aResultB)
 aPerpendicularConstraint.execute()
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # Check values and move one constrainted object
 #=========================================================================
@@ -118,9 +123,9 @@ aLineAEndPoint.setValue(aLineAEndPoint.x() - deltaX, aLineAEndPoint.y() - deltaY
 aSession.finishOperation()
 assert (aLineBStartPointPrev != (aLineBStartPoint.x(), aLineBStartPoint.y()))
 assert (aLineBEndPointPrev   != (aLineBEndPoint.x(),   aLineBEndPoint.y()))
+assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

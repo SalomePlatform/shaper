@@ -102,6 +102,7 @@ aSession.finishOperation()
 #=========================================================================
 # Create 4x4 polygons N = {5, 21}
 #=========================================================================
+aDOF = 0
 deltaX = deltaY = 50.
 n = 5
 aSession.startOperation()
@@ -110,6 +111,7 @@ for i in xrange(4):
         allNangleLines = createNAngle(aSketchFeature, n, 50)
         fixLineLength(aSketchFeature, allNangleLines)
         moveTo(allNangleLines, deltaX, deltaY)
+        aDOF += n
         n += 1
         deltaX += 110.
     deltaY += 110.
@@ -122,4 +124,5 @@ aSession.finishOperation()
 #=========================================================================
 
 from salome.shaper import model
+assert(model.dof(aSketchFeature) == aDOF)
 assert(model.checkPythonDump())

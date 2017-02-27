@@ -11,6 +11,8 @@
 """
 from GeomDataAPI import *
 from ModelAPI import *
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -49,6 +51,7 @@ aLineBEndPoint = geomDataAPI_Point2D(aSketchLineB.attribute("EndPoint"))
 aLineBStartPoint.setValue(0., 50)
 aLineBEndPoint.setValue(80., 75)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # Make a constraint to keep the length of the line constant
 # to parallel perpendicular constraint collapsing line to point
@@ -71,6 +74,7 @@ assert (aLineBStartPoint.x() == 0)
 assert (aLineBStartPoint.y() == 50)
 assert (aLineBEndPoint.x() == 80)
 assert (aLineBEndPoint.y() == 75)
+assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 # Link lines with parallel constraint
 #=========================================================================
@@ -87,6 +91,7 @@ refattrA.setObject(aResultA)
 refattrB.setObject(aResultB)
 aParallelConstraint.execute()
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # Check values and move one constrainted object
 #=========================================================================
@@ -105,9 +110,9 @@ aLineBEndPointNew = (aLineBEndPoint.x(), aLineBEndPoint.y())
 
 assert (aLineBStartPointPrev != aLineBStartPointNew)
 assert (aLineBEndPointPrev != aLineBEndPointNew)
+assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

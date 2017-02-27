@@ -12,6 +12,8 @@
 from GeomDataAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -43,6 +45,7 @@ aLineAEndPoint = geomDataAPI_Point2D(aSketchLineA.attribute("EndPoint"))
 aLineAStartPoint.setValue(0., 25.)
 aLineAEndPoint.setValue(100., 25.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 4)
 #=========================================================================
 # Make a constraint to keep the length
 #=========================================================================
@@ -61,6 +64,7 @@ aLengthConstraint.execute()
 aSession.finishOperation()
 assert (aLength.isInitialized())
 assert (refattrA.isInitialized())
+assert (model.dof(aSketchFeature) == 3)
 #=========================================================================
 # Check values and move one constrainted object
 #=========================================================================
@@ -74,6 +78,7 @@ aSession.startOperation()
 aLineAStartPoint.setValue(aLineAStartPoint.x() + deltaX,
                           aLineAStartPoint.y())
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 3)
 assert (aLineAStartPoint.y() == 25)
 assert (aLineAEndPoint.y() == 25)
 # length of the line is the same
@@ -86,6 +91,7 @@ aLength.setValue(140.)
 aLengthConstraint.execute()
 aSession.finishOperation()
 assert (math.fabs(aLineAEndPoint.x() - aLineAStartPoint.x() - 140) < 1.e-10)
+assert (model.dof(aSketchFeature) == 3)
 #=========================================================================
 # TODO: improve test
 # 1. remove constraint, move line's start point to
@@ -95,5 +101,4 @@ assert (math.fabs(aLineAEndPoint.x() - aLineAStartPoint.x() - 140) < 1.e-10)
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

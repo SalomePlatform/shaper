@@ -108,8 +108,6 @@ public:
   void setNeedToResolve(bool theFlag)
   { myNeedToResolve = theFlag; }
 
-  /// \brief Initialize solver by constraints, entities and parameters
-  virtual void initializeSolver() = 0;
   /// \brief Return list of conflicting constraints
   std::set<ObjectPtr> getConflictingConstraints(SolverPtr theSolver) const;
 

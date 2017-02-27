@@ -13,6 +13,7 @@
 from GeomDataAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
 
 #=========================================================================
 # Auxiliary functions
@@ -21,7 +22,7 @@ aStartPoint1 = []
 
 def createSketch1(theSketch):
     global aEndPoint1, aEndPoint2
-    # Initialize sketch by two lines with coincident boundary
+    # Initialize sketch by three lines with coincident boundaries
     allFeatures = []
     # Line1
     aSketchLine1 = theSketch.addFeature("SketchLine")
@@ -178,7 +179,7 @@ norm = geomDataAPI_Dir(aSketchFeature.attribute("Norm"))
 norm.setValue(0, 0, 1)
 aSession.finishOperation()
 #=========================================================================
-# Initialize sketch by two lines
+# Initialize sketch by three connected lines
 #=========================================================================
 aSession.startOperation()
 aFeaturesList = createSketch1(aSketchFeature)
@@ -186,6 +187,7 @@ aSession.finishOperation()
 aSketchSubFeatures = []
 for aSubIndex in range(0, aSketchFeature.numberOfSubs()):
     aSketchSubFeatures.append(aSketchFeature.subFeature(aSubIndex))
+assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # Global variables
 #=========================================================================
@@ -215,6 +217,7 @@ for aSubIndex in range(0, aSketchFeature.numberOfSubs()):
 #=========================================================================
 assert(aResObjects)
 checkFillet(aResObjects, FILLET_RADIUS1)
+assert model.dof(aSketchFeature) == 8, "PlaneGCS limitation: if you see this message, then PlaneGCS has solved DoF for sketch with fillet correctly (expected DoF = 10, observed = {0}".format(model.dof(aSketchFeature))
 #=========================================================================
 # Change Fillet radius
 #=========================================================================
@@ -222,6 +225,7 @@ aRadius.setValue(FILLET_RADIUS2)
 aFillet.execute()
 aSession.finishOperation()
 checkFillet(aResObjects, FILLET_RADIUS2)
+assert model.dof(aSketchFeature) == 14, "PlaneGCS limitation: if you see this message, then PlaneGCS has solved DoF for sketch with fillet correctly (expected DoF = 10, observed = {0}".format(model.dof(aSketchFeature))
 
 #=========================================================================
 # Create another sketch
@@ -245,6 +249,7 @@ aSession.finishOperation()
 aSketchSubFeatures = []
 for aSubIndex in range(0, aSketchFeature.numberOfSubs()):
     aSketchSubFeatures.append(aSketchFeature.subFeature(aSubIndex))
+assert (model.dof(aSketchFeature) == 7)
 #=========================================================================
 # Create the Fillet
 #=========================================================================
@@ -268,6 +273,7 @@ for aSubIndex in range(0, aSketchFeature.numberOfSubs()):
 #=========================================================================
 assert(aResObjects)
 checkFillet(aResObjects, FILLET_RADIUS1)
+assert model.dof(aSketchFeature) == 7, "PlaneGCS limitation: if you see this message, then PlaneGCS has solved DoF for sketch with fillet correctly (expected DoF = 8, observed = {0}".format(model.dof(aSketchFeature))
 #=========================================================================
 # Change Fillet radius
 #=========================================================================
@@ -275,9 +281,9 @@ aRadius.setValue(FILLET_RADIUS2)
 aFillet.execute()
 aSession.finishOperation()
 checkFillet(aResObjects, FILLET_RADIUS2)
+assert model.dof(aSketchFeature) == 11, "PlaneGCS limitation: if you see this message, then PlaneGCS has solved DoF for sketch with fillet correctly (expected DoF = 8, observed = {0}".format(model.dof(aSketchFeature))
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

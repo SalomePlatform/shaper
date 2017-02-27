@@ -11,6 +11,8 @@
 from GeomDataAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -85,6 +87,7 @@ anArcStartPoint.setValue(0., 50.)
 anArcEndPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcEndPoint"))
 anArcEndPoint.setValue(50., 0.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 5)
 # Circle
 aSession.startOperation()
 aSketchCircle = aSketchFeature.addFeature("SketchCircle")
@@ -93,6 +96,7 @@ aCircleRadius = aSketchCircle.real("CircleRadius")
 anCircleCentr.setValue(-25., -25.)
 aCircleRadius.setValue(25.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # A constraint to make equal radii of arc and circle
 #=========================================================================
@@ -113,6 +117,7 @@ anArcVecX = anArcStartPoint.x() - anArcCentr.x()
 anArcVecY = anArcStartPoint.y() - anArcCentr.y()
 anArcRadius = math.sqrt(anArcVecX**2 + anArcVecY**2)
 assert (math.fabs(aCircRadius - anArcRadius) <= 1.e-10)
+assert (model.dof(aSketchFeature) == 7)
 #=========================================================================
 # A constraint to make equal radii of arc and external circle
 #=========================================================================
@@ -124,6 +129,7 @@ anExtCircleCenter.setValue(-50., 50.)
 anExtCircleRadius.setValue(10.)
 anExtCircle.selection("External").selectSubShape("EDGE", "Sketch_1/Edge-SketchCircle_1_2")
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 7)
 aSession.startOperation()
 aConstraintEqRad2 = aSketchFeature.addFeature("SketchConstraintEqual")
 aRefObjectA = aConstraintEqRad2.refattr("ConstraintEntityA")
@@ -136,6 +142,7 @@ anArcVecX = anArcStartPoint.x() - anArcCentr.x()
 anArcVecY = anArcStartPoint.y() - anArcCentr.y()
 anArcRadius = math.sqrt(anArcVecX**2 + anArcVecY**2)
 assert (math.fabs(anExtCircleRadius.value() - anArcRadius) <= 1.e-10)
+assert (model.dof(aSketchFeature) == 6)
 
 #=========================================================================
 # Creation of two different lines
@@ -156,6 +163,7 @@ aLine2EndPoint = geomDataAPI_Point2D(aSketchLine2.attribute("EndPoint"))
 aLine2StartPoint.setValue(0., 0.)
 aLine2EndPoint.setValue(-1., 10.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 14)
 #=========================================================================
 # A constraint to make equal lengths of lines
 #=========================================================================
@@ -174,6 +182,7 @@ aSession.finishOperation()
 aLine1Len = lineLength(aSketchLine1)
 aLine2Len = lineLength(aSketchLine2)
 assert (math.fabs(aLine1Len - aLine2Len) < 1.e-10)
+assert (model.dof(aSketchFeature) == 13)
 #=========================================================================
 # A constraint to make equal length of line with external line
 #=========================================================================
@@ -186,6 +195,7 @@ anExtLineEnd.setValue(-60., 25.)
 anExtLine.selection("External").selectSubShape("EDGE", "Sketch_1/Edge-SketchLine_1")
 anExtLineLen = lineLength(anExtLine)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 13)
 aSession.startOperation()
 aConstraintEqLen2 = aSketchFeature.addFeature("SketchConstraintEqual")
 aRefObjectA = aConstraintEqLen2.refattr("ConstraintEntityA")
@@ -197,9 +207,9 @@ aLine1Len = lineLength(aSketchLine1)
 aLine2Len = lineLength(aSketchLine2)
 assert (math.fabs(aLine1Len - anExtLineLen) < 1.e-10)
 assert (math.fabs(aLine2Len - anExtLineLen) < 1.e-10)
+assert (model.dof(aSketchFeature) == 12)
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

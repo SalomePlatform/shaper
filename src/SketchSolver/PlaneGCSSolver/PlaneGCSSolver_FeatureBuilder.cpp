@@ -19,6 +19,9 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
 
+static bool isAttributeApplicable(const std::string& theAttrName,
+                                  const std::string& theOwnerName);
+
 static EntityWrapperPtr createLine(const AttributeEntityMap& theAttributes);
 static EntityWrapperPtr createCircle(const AttributeEntityMap& theAttributes);
 static EntityWrapperPtr createArc(const AttributeEntityMap&    theAttributes,
@@ -40,7 +43,10 @@ PlaneGCSSolver_FeatureBuilder::PlaneGCSSolver_FeatureBuilder(const StoragePtr& t
 EntityWrapperPtr PlaneGCSSolver_FeatureBuilder::createAttribute(
     AttributePtr theAttribute)
 {
-  EntityWrapperPtr anAttr = PlaneGCSSolver_AttributeBuilder::createAttribute(theAttribute);
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
+  EntityWrapperPtr anAttr;
+  if (isAttributeApplicable(theAttribute->id(), anOwner->getKind()))
+    anAttr = PlaneGCSSolver_AttributeBuilder::createAttribute(theAttribute);
   if (anAttr)
     myAttributes[theAttribute] = anAttr;
   return anAttr;
@@ -198,4 +204,24 @@ EntityWrapperPtr createArc(const AttributeEntityMap&    theAttributes,
   }
 
   return EntityWrapperPtr(new PlaneGCSSolver_EntityWrapper(aNewArc));
+}
+
+bool isAttributeApplicable(const std::string& theAttrName, const std::string& theOwnerName)
+{
+  if (theOwnerName == SketchPlugin_Arc::ID()) {
+    return theAttrName == SketchPlugin_Arc::CENTER_ID() ||
+           theAttrName == SketchPlugin_Arc::START_ID() ||
+           theAttrName == SketchPlugin_Arc::END_ID();
+  }
+  else if (theOwnerName == SketchPlugin_Circle::ID()) {
+    return theAttrName == SketchPlugin_Circle::CENTER_ID() ||
+           theAttrName == SketchPlugin_Circle::RADIUS_ID();
+  }
+  else if (theOwnerName == SketchPlugin_Line::ID()) {
+    return theAttrName == SketchPlugin_Line::START_ID() ||
+           theAttrName == SketchPlugin_Line::END_ID();
+  }
+
+  // suppose that all remaining features are points
+  return theAttrName == SketchPlugin_Point::COORD_ID();
 }

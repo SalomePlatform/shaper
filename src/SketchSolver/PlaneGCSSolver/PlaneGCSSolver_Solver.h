@@ -29,9 +29,10 @@ public:
   /// \brief Remove constraint from the system of equations
   void removeConstraint(ConstraintID theID);
 
-  /// \brief Initialize list of unknowns
-  void setParameters(const GCS::VEC_pD& theParams)
-  { myParameters = theParams; }
+  /// \brief Initialize memory for new solver's parameter
+  double* createParameter();
+  /// \brief Release memory occupied by parameters
+  void removeParameters(const GCS::SET_pD& theParams);
 
   /// \brief Solve the set of equations
   /// \return identifier whether solution succeeded
@@ -48,13 +49,17 @@ public:
   virtual bool isConflicting(const ConstraintID& theConstraint) const;
 
   /// \brief Degrees of freedom
-  virtual int dof() const;
+  virtual int dof();
 
 private:
   void collectConflicting();
 
 private:
+  typedef std::map<ConstraintID, std::set<GCSConstraintPtr> > ConstraintMap;
+
   GCS::VEC_pD                  myParameters;     ///< list of unknowns
+  ConstraintMap                myConstraints;    ///< list of constraints
+
   std::shared_ptr<GCS::System> myEquationSystem; ///< set of equations for solving in FreeGCS
 
   GCS::SET_I                   myConflictingIDs; ///< list of IDs of conflicting constraints
@@ -62,10 +67,7 @@ private:
   /// specifies the conflicting constraints are already collected
   bool                         myConfCollected;
 
-  /// lists of parameters used in the Equal constraints (to avoid multiple equalities)
-  std::list<GCS::SET_pD>       myEqualParameters;
-  /// lists of the Equal constraints
-  std::map<ConstraintID, std::set<GCSConstraintPtr> > myEqualConstraints;
+  int                          myDOF;            ///< degrees of freedom
 };
 
 #endif

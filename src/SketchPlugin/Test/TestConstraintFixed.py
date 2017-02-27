@@ -1,7 +1,7 @@
 """
     TestConstraintRigid.py
     Unit test of SketchPlugin_ConstraintRigid class
-    
+
     SketchPlugin_Constraint
         static const std::string MY_CONSTRAINT_VALUE("ConstraintValue");
         static const std::string MY_FLYOUT_VALUE_PNT("ConstraintFlyoutValuePnt");
@@ -9,7 +9,7 @@
         static const std::string MY_ENTITY_B("ConstraintEntityB");
         static const std::string MY_ENTITY_C("ConstraintEntityC");
         static const std::string MY_ENTITY_D("ConstraintEntityD");
-        
+
     SketchPlugin_ConstraintRigid
         static const std::string MY_CONSTRAINT_RIGID_ID("SketchConstraintRigid");
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
@@ -18,6 +18,8 @@
 from GeomDataAPI import *
 from ModelAPI import *
 from GeomAPI import *
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -59,6 +61,7 @@ aLineBEndPoint.setValue(60., 75.)
 aLineCStartPoint.setValue(60., 75.)
 aLineCEndPoint.setValue(25., 25.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 12)
 # Store initial values of lines
 kLineAStart = (aLineAStartPoint.x(), aLineAStartPoint.y())
 kLineAEnd = (aLineAEndPoint.x(),   aLineAEndPoint.y())
@@ -80,6 +83,7 @@ for eachLink in concidenceLinks:
     reflistB.setAttr(eachLink[1])
     aConstraint.execute()
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 6)
 
 # Check that constarints doesn't affected lines' values
 assert (kLineAStart == (aLineAStartPoint.x(), aLineAStartPoint.y()))
@@ -108,6 +112,8 @@ aSession.finishOperation()
 assert ((aLineAStartPoint.x(), aLineAStartPoint.y()) == (aLineCEndPoint.x(), aLineCEndPoint.y()))
 assert ((aLineBStartPoint.x(), aLineBStartPoint.y()) == (aLineAEndPoint.x(), aLineAEndPoint.y()))
 assert ((aLineCStartPoint.x(), aLineCStartPoint.y()) == (aLineBEndPoint.x(), aLineBEndPoint.y()))
+assert (model.dof(aSketchFeature) == 2)
+
 #=========================================================================
 # Check that moving line A does not affect lines
 #=========================================================================
@@ -118,6 +124,8 @@ aSession.finishOperation()
 assert ((aLineAStartPoint.x(), aLineAStartPoint.y()) == (aLineCEndPoint.x(), aLineCEndPoint.y()))
 assert ((aLineBStartPoint.x(), aLineBStartPoint.y()) == (aLineAEndPoint.x(), aLineAEndPoint.y()))
 assert ((aLineCStartPoint.x(), aLineCStartPoint.y()) == (aLineBEndPoint.x(), aLineBEndPoint.y()))
+assert (model.dof(aSketchFeature) == 2)
+
 #=========================================================================
 # Check that moving line B does not affect lines
 #=========================================================================
@@ -128,13 +136,21 @@ aSession.finishOperation()
 assert ((aLineAStartPoint.x(), aLineAStartPoint.y()) == (aLineCEndPoint.x(), aLineCEndPoint.y()))
 assert ((aLineBStartPoint.x(), aLineBStartPoint.y()) == (aLineAEndPoint.x(), aLineAEndPoint.y()))
 assert ((aLineCStartPoint.x(), aLineCStartPoint.y()) == (aLineBEndPoint.x(), aLineBEndPoint.y()))
+assert (model.dof(aSketchFeature) == 2)
+
 #=========================================================================
-# TODO: improve test
-# 1. remove constraint, move line to check that constraint are not applied
+# Remove constraint, move line to check that it is not fixed
 #=========================================================================
+aSession.startOperation()
+aDocument.removeFeature(aRigidConstraint)
+aLineBEndPoint.setValue(90., 150.)
+aSession.finishOperation()
+assert ((aLineAStartPoint.x(), aLineAStartPoint.y()) == (aLineCEndPoint.x(), aLineCEndPoint.y()))
+assert ((aLineBStartPoint.x(), aLineBStartPoint.y()) == (aLineAEndPoint.x(), aLineAEndPoint.y()))
+assert ((aLineCStartPoint.x(), aLineCStartPoint.y()) == (aLineBEndPoint.x(), aLineBEndPoint.y()))
+assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

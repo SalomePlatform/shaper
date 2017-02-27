@@ -2,4 +2,4 @@
 """
 
 from SketchAPI import addSketch
-from tools import addPolyline, addPolygon
+from tools import addPolyline, addPolygon, dof

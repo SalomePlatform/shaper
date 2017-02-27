@@ -94,6 +94,9 @@ private:
   /// \brief Append given constraint to the group of temporary constraints
   void setTemporary(SolverConstraintPtr theConstraint);
 
+  /// \brief Compute DoF of the sketch and set corresponding field
+  void computeDoF() const;
+
 private:
   CompositeFeaturePtr mySketch; ///< Sketch for this group
   ConstraintConstraintMap myConstraints; ///< List of constraints

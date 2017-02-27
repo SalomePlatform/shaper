@@ -2,6 +2,7 @@
 
 #include <SketchSolver_ConstraintEqual.h>
 #include <SketchSolver_Error.h>
+#include <PlaneGCSSolver_AttributeBuilder.h>
 
 #include <ModelAPI_AttributeRefAttr.h>
 #include <SketchPlugin_Line.h>
@@ -59,9 +60,10 @@ void SketchSolver_ConstraintEqual::getAttributes(
         myBaseConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
     FeaturePtr aLine1 = ModelAPI_Feature::feature(aRefLine1->object());
     if (aLine1) {
+      PlaneGCSSolver_AttributeBuilder aBuilder(myStorage);
       // store length of first line as a value for constraint
       // (will be used to make equal lengths of lines)
-      theValue = myStorage->entity(aLine1->attribute(SketchPlugin_Line::LENGTH_ID()));
+      theValue = aBuilder.createAttribute(aLine1->attribute(SketchPlugin_Line::LENGTH_ID()));
     }
     break;
   }

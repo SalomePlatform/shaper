@@ -59,9 +59,6 @@ public:
   /// \brief Update SketchPlugin features after resolving constraints
   virtual void refresh() const;
 
-  /// \brief Initialize solver by constraints, entities and parameters
-  virtual void initializeSolver();
-
   /// \brief Initialize memory for new solver's parameter
   double* createParameter();
   /// \brief Release memory occupied by parameters
@@ -88,7 +85,6 @@ private:
                                    PlaneGCSSolver_EntityBuilder* theBuilder);
 
 private:
-  GCS::VEC_pD  myParameters;         ///< list of parameters
   ConstraintID myConstraintLastID;   ///< identifier of last added constraint
 
   /// additional constraints for correct processing of the arcs

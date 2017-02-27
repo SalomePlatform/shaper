@@ -11,6 +11,8 @@
 from GeomDataAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -71,6 +73,7 @@ aLineBEndPoint = geomDataAPI_Point2D(aSketchLineB.attribute("EndPoint"))
 aLineBStartPoint.setValue(0., 50)
 aLineBEndPoint.setValue(80., 75)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # Link lines with collinear constraint
 #=========================================================================
@@ -83,6 +86,7 @@ refattrB.setObject(aSketchLineB.firstResult())
 aParallelConstraint.execute()
 aSession.finishOperation()
 checkCollinear(aSketchLineA, aSketchLineB)
+assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 # Check values and move one constrainted object
 #=========================================================================
@@ -97,9 +101,9 @@ aLineAEndPoint.setValue(aLineAEndPoint.x() - deltaX,
                         aLineAEndPoint.y() - deltaY)
 aSession.finishOperation()
 checkCollinear(aSketchLineA, aSketchLineB)
+assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

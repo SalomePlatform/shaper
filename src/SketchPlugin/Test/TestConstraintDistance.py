@@ -22,6 +22,8 @@
 from GeomDataAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -84,6 +86,7 @@ aLineAEndPoint = geomDataAPI_Point2D(aSketchLine.attribute("EndPoint"))
 aLineAStartPoint.setValue(0., 25.)
 aLineAEndPoint.setValue(100., 25.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 # Make a constraint to keep the distance
 #=========================================================================
@@ -105,6 +108,7 @@ aConstraint.execute()
 refattrA.setAttr(aSketchPointCoords)
 refattrB.setAttr(aLineAStartPoint)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 5)
 # set flyout point then abort operation, after that check the Distance is correct
 aSession.startOperation()
 aFlyoutPoint = geomDataAPI_Point2D(aConstraint.attribute("ConstraintFlyoutValuePnt"))
@@ -114,6 +118,7 @@ assert (refattrA.isInitialized())
 assert (refattrB.isInitialized())
 assert (aDistance.isInitialized())
 assert math.fabs(aDistance.value() - aDist) < 1.e-4, "Distance values are different: {0} != {1}".format(aDistance.value(), aDist)
+assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # Change distance value
 #=========================================================================
@@ -121,6 +126,7 @@ aSession.startOperation()
 aDistance.setValue(PT_PT_DIST)
 aSession.finishOperation()
 assert (math.fabs(distancePointPoint(aSketchPointCoords, aLineAStartPoint) - PT_PT_DIST) < 1.e-10)
+assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # Move line, check that distance is constant
 #=========================================================================
@@ -129,6 +135,7 @@ aLineAStartPoint.setValue(0., 40.)
 aLineAEndPoint.setValue(100., 40.)
 aSession.finishOperation()
 assert (math.fabs(distancePointPoint(aSketchPointCoords, aLineAStartPoint) - PT_PT_DIST) < 1.e-10)
+assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # Remove constraint, check the points are unconstrained now
 #=========================================================================
@@ -139,6 +146,7 @@ aSession.startOperation()
 aSketchPointCoords.setValue(0., 0.)
 aSession.finishOperation()
 assert (math.fabs(distancePointPoint(aSketchPointCoords, aLineAStartPoint) - PT_PT_DIST) > 1.e-10)
+assert (model.dof(aSketchFeature) == 6)
 
 #=========================================================================
 # Add distance between point and line
@@ -158,6 +166,7 @@ assert (aLineResult is not None)
 refattrA.setObject(aLineResult)
 refattrB.setAttr(aSketchPointCoords)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 5)
 # set flyout point then abort operation, after that check the Distance is correct
 aSession.startOperation()
 aFlyoutPoint = geomDataAPI_Point2D(aConstraint.attribute("ConstraintFlyoutValuePnt"))
@@ -167,6 +176,7 @@ assert (refattrA.isInitialized())
 assert (refattrB.isInitialized())
 assert (aDistance.isInitialized())
 assert math.fabs(aDistance.value() - aDist) < 1.e-4, "Distance values are different: {0} != {1}".format(aDistance.value(), aDist)
+assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # Change distance value
 #=========================================================================
@@ -174,6 +184,7 @@ aSession.startOperation()
 aDistance.setValue(PT_LINE_DIST)
 aSession.finishOperation()
 assert (math.fabs(distancePointLine(aSketchPointCoords, aSketchLine) - PT_LINE_DIST) < 1.e-10)
+assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # Set distance between line boundaries
 #=========================================================================
@@ -182,9 +193,9 @@ refattrA.setAttr(aLineAStartPoint)
 refattrB.setAttr(aLineAEndPoint)
 aSession.finishOperation()
 assert (math.fabs(distancePointPoint(aLineAStartPoint, aLineAEndPoint) - PT_LINE_DIST) < 1.e-10)
+assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

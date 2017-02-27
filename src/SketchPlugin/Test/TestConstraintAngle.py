@@ -13,8 +13,8 @@
 """
 from GeomDataAPI import *
 from ModelAPI import *
-import os
 import math
+from salome.shaper import model
 
 #=========================================================================
 # Auxiliary functions
@@ -81,6 +81,7 @@ aEndPoint = geomDataAPI_Point2D(aSketchLineB.attribute("EndPoint"))
 aStartPoint.setValue(-10., 15.)
 aEndPoint.setValue(80., 50.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # Make a constraint to keep the angle
 #=========================================================================
@@ -108,6 +109,7 @@ assert (anAngleVal.isInitialized())
 assert (refattrA.isInitialized())
 assert (refattrB.isInitialized())
 assert (angle(aSketchLineA, aSketchLineB) == ANGLE_DEGREE)
+assert (model.dof(aSketchFeature) == 7)
 #=========================================================================
 # Move line, check that angle is constant
 #=========================================================================
@@ -117,6 +119,7 @@ aStartPoint.setValue(0., -30.)
 aConstraint.execute()
 aSession.finishOperation()
 assert (angle(aSketchLineA, aSketchLineB) == ANGLE_DEGREE)
+assert (model.dof(aSketchFeature) == 7)
 #=========================================================================
 # Change angle value and check the lines are moved
 #=========================================================================
@@ -126,6 +129,7 @@ anAngleVal.setValue(NEW_ANGLE_DEGREE)
 aConstraint.execute()
 aSession.finishOperation()
 assert (angle(aSketchLineA, aSketchLineB) == NEW_ANGLE_DEGREE)
+assert (model.dof(aSketchFeature) == 7)
 #=========================================================================
 # Change angle type
 #=========================================================================
@@ -137,17 +141,21 @@ aSession.startOperation()
 aConstraint.integer("AngleType").setValue(ANGLE_BACKWARD)
 aSession.finishOperation()
 assert (angle(aSketchLineA, aSketchLineB) == NEW_ANGLE_DEGREE)
+assert (model.dof(aSketchFeature) == 7)
 #=========================================================================
-# TODO: improve test
-# 1. remove constraint, move line's start point to
-#    check that constraint are not applied
-# 2. check constrained distance between:
-#    * point and line
-#    * two lines
+# Remove constraint, move line's point to check the constraint is not applied
 #=========================================================================
+aSession.startOperation()
+aDocument.removeFeature(aConstraint)
+aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 8)
+aSession.startOperation()
+aStartPoint.setValue(-30., 0.)
+aSession.finishOperation()
+assert (angle(aSketchLineA, aSketchLineB) != NEW_ANGLE_DEGREE)
+assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

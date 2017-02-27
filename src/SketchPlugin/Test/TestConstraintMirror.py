@@ -12,6 +12,8 @@
 from GeomDataAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -109,6 +111,7 @@ aLine2EndPoint = geomDataAPI_Point2D(aSketchLine2.attribute("EndPoint"))
 aLine2StartPoint.setValue(50., 0.)
 aLine2EndPoint.setValue(100., 0.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 13)
 #=========================================================================
 # Link arc points and lines points by the coincidence constraint
 #=========================================================================
@@ -128,6 +131,7 @@ reflistA.setAttr(anArcEndPoint)
 reflistB.setAttr(aLine2StartPoint)
 aConstraint.execute()
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 9)
 #=========================================================================
 # Add tangency constraint and check correctness
 #=========================================================================
@@ -143,6 +147,7 @@ aRefObjectA.setObject(anObjectA)
 aRefObjectB.setObject(anObjectB)
 aTangency.execute()
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # Create mirror line
 #=========================================================================
@@ -153,6 +158,7 @@ aLineEndPoint = geomDataAPI_Point2D(aMirrorLine.attribute("EndPoint"))
 aLineStartPoint.setValue(100., 0.)
 aLineEndPoint.setValue(100., 100.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 12)
 #=========================================================================
 # Make mirror for objects created above
 #=========================================================================
@@ -166,6 +172,7 @@ aRefListInitial.append(aSketchArc1.lastResult())
 aRefListInitial.append(aSketchLine2.lastResult())
 aMirror.execute()
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 12)
 #=========================================================================
 # Verify the simmetricity of all mirrored objects
 #=========================================================================
@@ -174,6 +181,7 @@ aRefListC = aMirror.reflist("ConstraintEntityC")
 assert (aRefListB.size() == 3)
 assert (aRefListC.size() == 3)
 checkMirror(aRefListB, aRefListC, aMirrorLine)
+assert (model.dof(aSketchFeature) == 12)
 
 #=========================================================================
 # Remove object from mirror
@@ -184,6 +192,7 @@ aSession.finishOperation()
 assert (aRefListB.size() == 2)
 assert (aRefListC.size() == 2)
 checkMirror(aRefListB, aRefListC, aMirrorLine)
+assert (model.dof(aSketchFeature) == 12)
 
 #=========================================================================
 # Clear list of mirrored features
@@ -198,30 +207,9 @@ aSession.finishOperation()
 assert (aRefListB.size() == 1)
 assert (aRefListC.size() == 1)
 checkMirror(aRefListB, aRefListC, aMirrorLine)
+assert (model.dof(aSketchFeature) == 12)
 #=========================================================================
 # End of test
 #=========================================================================
 
-
-# make second line fixed
-aSession.startOperation()
-aFixed = aSketchFeature.addFeature("SketchConstraintRigid")
-aRefObjectA = aFixed.refattr("ConstraintEntityA")
-anObjectA = modelAPI_ResultConstruction(aSketchLine2.lastResult())
-assert (anObjectA is not None)
-aRefObjectA.setObject(anObjectA)
-aFixed.execute()
-aSession.finishOperation()
-# set mirror for first line to check dumping
-aSession.startOperation()
-aRefListInitial.clear()
-assert (aRefListB.size() == 0)
-assert (aRefListC.size() == 0)
-aRefListInitial.append(aSketchLine1.lastResult())
-aSession.finishOperation()
-assert (aRefListB.size() == 1)
-assert (aRefListC.size() == 1)
-checkMirror(aRefListB, aRefListC, aMirrorLine)
-
-from salome.shaper import model
 assert(model.checkPythonDump())

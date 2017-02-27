@@ -47,7 +47,7 @@ public:
   virtual bool isConflicting(const ConstraintID& theConstraint) const = 0;
 
   /// \brief Degrees of freedom
-  virtual int dof() const = 0;
+  virtual int dof() = 0;
 
 protected:
   bool    myFindFaileds; ///< flag to find conflicting or inappropriate constraints

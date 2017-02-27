@@ -12,6 +12,8 @@ from GeomDataAPI import *
 from GeomAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -82,6 +84,7 @@ aLine2EndPoint = geomDataAPI_Point2D(aSketchLine2.attribute("EndPoint"))
 aLine2StartPoint.setValue(50., 0.)
 aLine2EndPoint.setValue(100., 0.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 13)
 #=========================================================================
 # Link arc points and lines points by the coincidence constraint
 #=========================================================================
@@ -101,6 +104,7 @@ reflistA.setAttr(anArcEndPoint)
 reflistB.setAttr(aLine2StartPoint)
 aConstraint.execute()
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 9)
 #=========================================================================
 # Add tangency constraint and check correctness
 #=========================================================================
@@ -124,6 +128,7 @@ aLineVecY = aLine1EndPoint.y() - aLine1StartPoint.y()
 aLen = aLen * math.sqrt(aLineVecX**2 + aLineVecY**2)
 aDot = anArcVecX * aLineVecX + anArcVecY * aLineVecY
 assert math.fabs(aDot) <= 2.e-6 * aLen, "Observed dot product: {0}".format(aDot)
+assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # Add tangency constraint for arc and second line and check correctness
 #=========================================================================
@@ -147,6 +152,7 @@ aLineVecY = aLine2EndPoint.y() - aLine2StartPoint.y()
 aLen = aLen * math.sqrt(aLineVecX**2 + aLineVecY**2)
 aDot = anArcVecX * aLineVecX + anArcVecY * aLineVecY
 assert math.fabs(aDot) <= 2.e-6 * aLen, "Observed dot product: {0}".format(aDot)
+assert (model.dof(aSketchFeature) == 7)
 
 #=========================================================================
 # TEST 2. Arc-arc tangency
@@ -175,6 +181,7 @@ anArc2EndPoint.setValue(-50., 0.)
 anArc2PassedPoint = geomDataAPI_Point2D(aSketchArc2.attribute("ArcPassedPoint"))
 anArc2PassedPoint.setValue(-40., 40.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 17)
 #=========================================================================
 # Link points of arcs by the coincidence constraint
 #=========================================================================
@@ -186,6 +193,7 @@ reflistA.setAttr(anArc1EndPoint)
 reflistB.setAttr(anArc2StartPoint)
 aConstraint.execute()
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 15)
 #=========================================================================
 # Add tangency constraint and check correctness
 #=========================================================================
@@ -209,6 +217,7 @@ anArc2VecY = anArc2StartPoint.y() - anArc2Centr.y()
 aLen = aLen * math.sqrt(anArc2VecX**2 + anArc2VecY**2)
 aCross = anArc1VecX * anArc2VecY - anArc1VecY * anArc2VecX
 assert math.fabs(aCross) <= 2.e-6 * aLen, "Observed cross product: {0}".format(aCross)
+assert (model.dof(aSketchFeature) == 14)
 
 #=========================================================================
 # TEST 3. Tangency between non-connected objects should be wrong
@@ -245,9 +254,11 @@ assert(aLine2EndPointNew == aLine2EndPointPrev)
 assert(anArc2CenterNew == anArc2CenterPrev)
 assert(anArc2StartPointNew == anArc2StartPointPrev)
 assert(anArc2EndPointNew == anArc2EndPointPrev)
+assert (model.dof(aSketchFeature) == 14)
 aSession.startOperation()
 aDocument.removeFeature(aTangency)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 14)
 
 #=========================================================================
 # TEST 4. Creating of tangency arc by the option of the SketchArc feature
@@ -271,6 +282,7 @@ anArc3VecY = anArc3StartPoint.y() - anArc3Center.y()
 aLen = aLen * math.sqrt(anArc3VecX**2 + anArc3VecY**2)
 aCross = anArc1VecX * anArc3VecY - anArc1VecY * anArc3VecX
 assert math.fabs(aCross) <= 2.e-6 * aLen, "Observed cross product: {0}".format(aCross)
+assert (model.dof(aSketchFeature) == 19)
 
 #=========================================================================
 # TEST 5. Creating of tangency between line and circle
@@ -287,6 +299,7 @@ aCircleRadius = aCircle.real("CircleRadius")
 aCircleCenter.setValue(150., 100.)
 aCircleRadius.setValue(20.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 26)
 
 aSession.startOperation()
 aTangency = aSketchFeature.addFeature("SketchConstraintTangent")
@@ -302,9 +315,9 @@ aTangency.execute()
 aSession.finishOperation()
 
 assert(math.fabs(distancePointLine(aCircleCenter, aLine) - round(aCircleRadius.value(), 5)) < 1.e-10)
+assert (model.dof(aSketchFeature) == 25)
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

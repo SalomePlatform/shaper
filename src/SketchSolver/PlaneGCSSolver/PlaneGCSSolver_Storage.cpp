@@ -246,8 +246,8 @@ bool PlaneGCSSolver_Storage::update(AttributePtr theAttribute, bool theForce)
     if (aFeature && myFeatureMap.find(aFeature) == myFeatureMap.end())
       return update(aFeature, theForce); // theAttribute has been processed while adding feature
 
-    PlaneGCSSolver_AttributeBuilder aBuilder(this);
-    aRelated = createAttribute(anAttribute, &aBuilder);
+////    PlaneGCSSolver_AttributeBuilder aBuilder(this);
+////    aRelated = createAttribute(anAttribute, &aBuilder);
     return aRelated.get() != 0;
   }
 
@@ -338,16 +338,12 @@ void PlaneGCSSolver_Storage::removeInvalidEntities()
 
 double* PlaneGCSSolver_Storage::createParameter()
 {
-  double* aResult = new double(0);
-  myParameters.push_back(aResult);
-  return aResult;
+  return std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(mySketchSolver)->createParameter();
 }
 
 void PlaneGCSSolver_Storage::removeParameters(const GCS::SET_pD& theParams)
 {
-  for (int i = (int)myParameters.size() - 1; i >= 0; --i)
-    if (theParams.find(myParameters[i]) != theParams.end())
-      myParameters.erase(myParameters.begin() + i);
+  std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(mySketchSolver)->removeParameters(theParams);
 }
 
 
@@ -402,14 +398,6 @@ bool PlaneGCSSolver_Storage::isRedundant(
   }
 
   return false;
-}
-
-void PlaneGCSSolver_Storage::initializeSolver()
-{
-  std::shared_ptr<PlaneGCSSolver_Solver> aSolver =
-      std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(mySketchSolver);
-  if (aSolver)
-    aSolver->setParameters(myParameters);
 }
 
 // indicates attribute containing in the external feature

@@ -20,6 +20,8 @@
 from GeomDataAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -63,6 +65,7 @@ anArcStartPoint.setValue(0., 50.)
 anArcEndPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcEndPoint"))
 anArcEndPoint.setValue(50., 0.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 5)
 # Test changing the arc start/end point
 aSession.startOperation()
 anArcStartPoint.setValue(anArcStartPoint.x(), 40.)
@@ -74,6 +77,7 @@ anArcEndPoint.setValue(40., anArcEndPoint.y())
 anArcEndPoint.setValue(50., 0.)
 assert (math.hypot(anArcEndPoint.x() - 50., anArcEndPoint.y() - 0.) < 1.e-10)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 5)
 # Circle
 aSession.startOperation()
 aSketchCircle = aSketchFeature.addFeature("SketchCircle")
@@ -82,12 +86,14 @@ aCircleRadius = aSketchCircle.real("CircleRadius")
 anCircleCentr.setValue(-25., -25)
 aCircleRadius.setValue(25.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 8)
 # Change the radius of the arc
 aSession.startOperation()
 RADIUS = 40
 anArcRadius = aSketchArc.real("ArcRadius")
 anArcRadius.setValue(RADIUS)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # Make a constraint to keep the radius of the arc
 #=========================================================================
@@ -102,6 +108,7 @@ aConstraint.execute()
 aSession.finishOperation()
 assert (aRadius.isInitialized())
 assert (aRefObject.isInitialized())
+assert (model.dof(aSketchFeature) == 7)
 #=========================================================================
 # Make a constraint to keep the radius of the circle
 #=========================================================================
@@ -116,6 +123,7 @@ aConstraint.execute()
 aSession.finishOperation()
 assert (aRadius.isInitialized())
 assert (aRefObject.isInitialized())
+assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 # Perform some actions and checks:
 # 1. Check that constraints does not changes values
@@ -134,6 +142,7 @@ assert (anArcEndPoint.x() != anArcPrevEndPointX)
 assert (anArcEndPoint.y() != anArcPrevEndPointY)
 assert (math.fabs(distancePointPoint(anArcCentr, anArcStartPoint) - RADIUS) < 1.e-10)
 assert (math.fabs(distancePointPoint(anArcCentr, anArcEndPoint) - RADIUS) < 1.e-10)
+assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 # 4. Move the centr or the point of the arc
 # 5. Check radius is the same
@@ -147,9 +156,9 @@ aSession.finishOperation()
 assert (anCircleCentr.x() == 100)
 assert (anCircleCentr.y() == 100)
 assert (aCircleRadius.value() == 25)
+assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

@@ -6,6 +6,8 @@
 from GeomDataAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -66,6 +68,7 @@ for i in range (0, aNbSubs):
         assert (isHorizontal(aLastLine) or isVertical(aLastLine))
         aNbLines = aNbLines + 1
 assert (aNbLines == 4)
+assert (model.dof(aSketchFeature) == 4)
 #=========================================================================
 # Move one of lines
 #=========================================================================
@@ -85,9 +88,9 @@ for i in range (0, aNbSubs):
         assert (isHorizontal(aLastLine) or isVertical(aLastLine))
         aNbLines = aNbLines + 1
 assert (aNbLines == 4)
+assert (model.dof(aSketchFeature) == 4)
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())

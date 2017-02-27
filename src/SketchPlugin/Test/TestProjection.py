@@ -6,6 +6,8 @@
 from GeomDataAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
+
 #=========================================================================
 # Initialization of the test
 #=========================================================================
@@ -54,6 +56,7 @@ anArcCenter.setValue(10., 10.)
 anArcStart.setValue(50., 0.)
 anArcEnd.setValue(0., 50.)
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 12)
 #=========================================================================
 # Create another sketch
 #=========================================================================
@@ -82,6 +85,7 @@ anArcProjector = aSketchFeature.addFeature("SketchProjection")
 anArcProjector.selection("ExternalFeature").selectSubShape("EDGE", "Sketch_1/Edge-SketchArc_1_2")
 anArcProjector.execute()
 aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 0)
 #=========================================================================
 # Check projection coordinates
 #=========================================================================
@@ -122,9 +126,9 @@ assert(math.fabs(aProjLineStart.x() - aLineStart.x()) < 1.e-10)
 assert(math.fabs(aProjLineStart.y() - aLineStart.y()) < 1.e-10)
 assert(math.fabs(aProjLineEnd.x() - aLineEnd.x()) < 1.e-10)
 assert(math.fabs(aProjLineEnd.y() - aLineEnd.y()) < 1.e-10)
+assert (model.dof(aSketchFeature) == 0)
 #=========================================================================
 # End of test
 #=========================================================================
 
-#from salome.shaper import model
-#assert(model.checkPythonDump())
+assert(model.checkPythonDump())

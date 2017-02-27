@@ -123,7 +123,7 @@ bool SketchSolver_Group::resolveConstraints()
 ////      mySketchSolver = SketchSolver_Manager::instance()->builder()->createSolver();
 
 ////    mySketchSolver->calculateFailedConstraints(false);
-    myStorage->initializeSolver();
+////    myStorage->initializeSolver();
 ////    mySketchSolver->prepare();
 
     SketchSolver_SolveStatus aResult = STATUS_OK;
@@ -144,7 +144,7 @@ bool SketchSolver_Group::resolveConstraints()
 
           removeTemporaryConstraints();
           mySketchSolver->calculateFailedConstraints(true); // something failed => need to find it
-          myStorage->initializeSolver();
+////          myStorage->initializeSolver();
         }
       }
     } catch (...) {
@@ -176,6 +176,9 @@ bool SketchSolver_Group::resolveConstraints()
         // the error message should be changed before sending the message
         sendMessage(EVENT_SOLVER_REPAIRED, aConflicting);
       }
+
+      // show degrees of freedom
+      computeDoF();
     } else {
       mySketchSolver->undo();
       if (!myConstraints.empty()) {
@@ -217,10 +220,27 @@ bool SketchSolver_Group::resolveConstraints()
       }
     if (aCIt == myConstraints.end())
       myStorage->refresh();
-  }
+  } else if (isGroupEmpty)
+    computeDoF();
   removeTemporaryConstraints();
   myStorage->setNeedToResolve(false);
   return aResolved;
+}
+
+// ============================================================================
+//  Function: computeDoF
+//  Class:    SketchSolver_Group
+//  Purpose:  compute DoF of the sketch and set corresponding field
+// ============================================================================
+void SketchSolver_Group::computeDoF() const
+{
+  std::ostringstream aDoFMsg;
+  int aDoF = /*isEmpty() ? myStorage->numberOfParameters() :*/ mySketchSolver->dof();
+  if (aDoF == 0)
+    aDoFMsg << "Sketch is fully fixed (DoF = 0)";
+  else
+    aDoFMsg << "DoF (degrees of freedom) = " << aDoF;
+  mySketch->string(SketchPlugin_Sketch::SOLVER_DOF())->setValue(aDoFMsg.str());
 }
 
 // ============================================================================
@@ -244,6 +264,9 @@ void SketchSolver_Group::repairConsistency()
 
     // remove invalid features
     myStorage->removeInvalidEntities();
+
+    // show DoF
+    computeDoF();
   }
 }
 
