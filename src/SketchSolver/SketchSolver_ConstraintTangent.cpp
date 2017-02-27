@@ -112,9 +112,9 @@ void SketchSolver_ConstraintTangent::adjustConstraint()
 {
   if (myType == CONSTRAINT_TANGENT_ARC_ARC) {
     EntityWrapperPtr anEntity1 =
-        myStorage->entity(myBaseConstraint->refattr(SketchPlugin_Constraint::ENTITY_A()));
+        myStorage->entity(myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
     EntityWrapperPtr anEntity2 =
-        myStorage->entity(myBaseConstraint->refattr(SketchPlugin_Constraint::ENTITY_B()));
+        myStorage->entity(myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
 
     if (isArcArcInternal != isInternalTangency(anEntity1, anEntity2)) {
       // fully rebuld constraint, because it is unable to access attributes of PlaneGCS constraint
