@@ -35,20 +35,20 @@ public:
 
   /// \brief Solve the set of equations
   /// \return identifier whether solution succeeded
-  virtual SketchSolver_SolveStatus solve() override;
+  virtual SketchSolver_SolveStatus solve();
 
   /// \brief Prepare for solving. Store initial values of parameters for undo
-  virtual void prepare() override
+  virtual void prepare()
   { /* do nothing */ }
 
   /// \brief Revert solution to initial values
-  virtual void undo() override;
+  virtual void undo();
 
   /// \brief Check the constraint is conflicted with others
-  virtual bool isConflicting(const ConstraintID& theConstraint) const override;
+  virtual bool isConflicting(const ConstraintID& theConstraint) const;
 
   /// \brief Degrees of freedom
-  virtual int dof() const override;
+  virtual int dof() const;
 
 private:
   void collectConflicting();

@@ -23,14 +23,14 @@ public:
 
   /// \brief Notify this object about the feature is changed somewhere
   virtual void notify(const FeaturePtr&      theFeature,
-                      PlaneGCSSolver_Update* theUpdater) override;
+                      PlaneGCSSolver_Update* theUpdater);
 
 protected:
   /// \brief Generate list of attributes of constraint in order useful for constraints
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
   /// \param[out] theAttributes list of attributes to be filled
   virtual void getAttributes(EntityWrapperPtr&              theValue,
-                             std::vector<EntityWrapperPtr>& theAttributes) override;
+                             std::vector<EntityWrapperPtr>& theAttributes);
 
 private:
   ConstraintWrapperPtr myMiddle;

@@ -31,33 +31,33 @@ public:
   /// \param theConstraint       [in]   original SketchPlugin constraint
   /// \param theSolverConstraint [in]   solver's constraint
   virtual void addConstraint(ConstraintPtr        theConstraint,
-                             ConstraintWrapperPtr theSolverConstraint) override;
+                             ConstraintWrapperPtr theSolverConstraint);
 
   /// \brief Add list of temporary constraints which will be destroyed
   ///        after the next solving of the set of constraints.
   /// \param theSolverConstraint [in]  solver's constraint
-  virtual void addTemporaryConstraint(const ConstraintWrapperPtr& theSolverConstraint) override;
+  virtual void addTemporaryConstraint(const ConstraintWrapperPtr& theSolverConstraint);
 
 
   /// \brief Convert feature to the form applicable for specific solver and map it
   /// \param theFeature [in]  feature to convert
   /// \param theForce   [in]  forced feature creation
   /// \return \c true if the feature has been created or updated
-  virtual bool update(FeaturePtr theFeature, bool theForce = false) override;
+  virtual bool update(FeaturePtr theFeature, bool theForce = false);
 
   /// \brief Convert attribute to the form applicable for specific solver and map it
   /// \param theAttribute [in]  attribute to convert
   /// \param theForce     [in]  forced feature creation
   /// \return \c true if the attribute has been created or updated
-  virtual bool update(AttributePtr theAttribute, bool theForce = false) override;
+  virtual bool update(AttributePtr theAttribute, bool theForce = false);
 
 
   /// \brief Removes constraint from the storage
   /// \return \c true if the constraint and all its parameters are removed successfully
-  virtual bool removeConstraint(ConstraintPtr theConstraint) override;
+  virtual bool removeConstraint(ConstraintPtr theConstraint);
 
   /// \brief Update SketchPlugin features after resolving constraints
-  virtual void refresh() const override;
+  virtual void refresh() const;
 
   /// \brief Initialize solver by constraints, entities and parameters
   virtual void initializeSolver();
@@ -68,7 +68,7 @@ public:
   void removeParameters(const GCS::SET_pD& theParams);
 
   /// \brief Remove all features became invalid
-  virtual void removeInvalidEntities() override;
+  virtual void removeInvalidEntities();
 
 private:
   /// \brief Verifies the constraint should not be added into the solver

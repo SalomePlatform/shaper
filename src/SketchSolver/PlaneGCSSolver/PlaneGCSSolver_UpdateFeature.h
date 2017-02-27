@@ -31,10 +31,10 @@ public:
   /// \param theObserver [in]  object which want to receive notifications
   /// \param theType     [in]  receive notifications about changing objects
   ///                          of theType and their derivatives
-  virtual void attach(SketchSolver_Constraint* theObserver, const std::string& theType) override;
+  virtual void attach(SketchSolver_Constraint* theObserver, const std::string& theType);
 
   /// \brief Send notification about update of the feature to all interested
-  virtual void update(const FeaturePtr& theFeature) override;
+  virtual void update(const FeaturePtr& theFeature);
 };
 
 #endif

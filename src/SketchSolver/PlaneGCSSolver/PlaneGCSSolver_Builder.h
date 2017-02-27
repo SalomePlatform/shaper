@@ -30,9 +30,9 @@ public:
   static BuilderPtr getInstance();
 
   /// \brief Creates a storage specific for used solver
-  virtual StoragePtr createStorage(const SolverPtr& theSolver) const override;
+  virtual StoragePtr createStorage(const SolverPtr& theSolver) const;
   /// \brief Creates specific solver
-  virtual SolverPtr createSolver() const override;
+  virtual SolverPtr createSolver() const;
 
   /// \brief Creates new constraint using given parameters
   /// \param theConstraint [in]  original constraint
@@ -51,7 +51,7 @@ public:
                      const EntityWrapperPtr& theEntity1,
                      const EntityWrapperPtr& theEntity2 = EntityWrapperPtr(),
                      const EntityWrapperPtr& theEntity3 = EntityWrapperPtr(),
-                     const EntityWrapperPtr& theEntity4 = EntityWrapperPtr()) const override;
+                     const EntityWrapperPtr& theEntity4 = EntityWrapperPtr()) const;
 
   /// \brief Creates new multi-translation or multi-rotation constraint
   /// \param theConstraint [in]  original constraint
@@ -70,23 +70,23 @@ public:
                      const bool theFullValue,
                      const EntityWrapperPtr& thePoint1,
                      const EntityWrapperPtr& thePoint2,
-                     const std::list<EntityWrapperPtr>& theTrsfEnt) const override;
+                     const std::list<EntityWrapperPtr>& theTrsfEnt) const;
 
   /// \brief Convert entity to point
   /// \return empty pointer if the entity is not a point
-  virtual std::shared_ptr<GeomAPI_Pnt2d> point(EntityWrapperPtr theEntity) const override;
+  virtual std::shared_ptr<GeomAPI_Pnt2d> point(EntityWrapperPtr theEntity) const;
   /// \brief Convert entity to line
   /// \return empty pointer if the entity is not a line
-  virtual std::shared_ptr<GeomAPI_Lin2d> line(EntityWrapperPtr theEntity) const override;
+  virtual std::shared_ptr<GeomAPI_Lin2d> line(EntityWrapperPtr theEntity) const;
 
   /// \brief Convert entity to line
   /// \return empty pointer if the entity is not a line
-  virtual std::shared_ptr<GeomAPI_Lin2d> line(FeaturePtr theFeature) const override;
+  virtual std::shared_ptr<GeomAPI_Lin2d> line(FeaturePtr theFeature) const;
 
   /// \brief Check if two connected arcs have centers
   ///        in same direction relatively to connection point
   virtual bool isArcArcTangencyInternal(EntityWrapperPtr theArc1,
-                                        EntityWrapperPtr theArc2) const override;
+                                        EntityWrapperPtr theArc2) const;
 };
 
 #endif

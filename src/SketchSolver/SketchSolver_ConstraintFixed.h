@@ -26,17 +26,17 @@ public:
   SketchSolver_ConstraintFixed(FeaturePtr theFeature);
 
   /// \brief Block or unblock events from this constraint
-  virtual void blockEvents(bool isBlocked) override;
+  virtual void blockEvents(bool isBlocked);
 
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
-  virtual void process() override;
+  virtual void process();
 
   /// \brief Generate list of attributes of constraint in order useful for constraints
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
   /// \param[out] theAttributes list of attributes to be filled
   virtual void getAttributes(EntityWrapperPtr&              theValue,
-                             std::vector<EntityWrapperPtr>& theAttributes) override;
+                             std::vector<EntityWrapperPtr>& theAttributes);
 
   /// \brief Fixed feature basing on its type
   /// \param theFeature [in]  feature, converted to solver specific format

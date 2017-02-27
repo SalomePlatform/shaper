@@ -27,7 +27,7 @@ protected:
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
   /// \param[out] theAttributes list of attributes to be filled
   virtual void getAttributes(EntityWrapperPtr&              theValue,
-                             std::vector<EntityWrapperPtr>& theAttributes) override;
+                             std::vector<EntityWrapperPtr>& theAttributes);
 };
 
 #endif

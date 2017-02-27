@@ -24,24 +24,24 @@ public:
   {}
 
   /// \brief Update constraint
-  virtual void update() override;
+  virtual void update();
 
   /// \brief Notify this object about the feature is changed somewhere
-  virtual void notify(const FeaturePtr& theFeature, PlaneGCSSolver_Update*) override;
+  virtual void notify(const FeaturePtr& theFeature, PlaneGCSSolver_Update*);
 
   /// \brief Block or unblock events from this constraint
-  virtual void blockEvents(bool isBlocked) override;
+  virtual void blockEvents(bool isBlocked);
 
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
-  virtual void process() override;
+  virtual void process();
 
   /// \brief Generate list of entities of mirror constraint
-  virtual void getAttributes(EntityWrapperPtr&, std::vector<EntityWrapperPtr>&) override;
+  virtual void getAttributes(EntityWrapperPtr&, std::vector<EntityWrapperPtr>&);
 
   /// \brief This method is used in derived objects to check consistence of constraint.
   ///        E.g. the distance between line and point may be signed.
-  virtual void adjustConstraint() override;
+  virtual void adjustConstraint();
 
 private:
   size_t myNumberOfObjects;  ///< number of previously mirrored objects

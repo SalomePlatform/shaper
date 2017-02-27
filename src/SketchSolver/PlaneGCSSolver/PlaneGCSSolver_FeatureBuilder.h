@@ -25,15 +25,15 @@ public:
   ///        Double attributes and 2D points are supported only.
   /// \param theAttribute [in]  attribute to create
   /// \return Created wrapper of the attribute applicable for specific solver
-  virtual EntityWrapperPtr createAttribute(AttributePtr theAttribute) override;
+  virtual EntityWrapperPtr createAttribute(AttributePtr theAttribute);
 
   /// \brief Converts SketchPlugin's feature to the solver's entity.
   ///        Result if based on the list of already converted attributes.
   /// \param theFeature [in]  feature to create
-  virtual EntityWrapperPtr createFeature(FeaturePtr theFeature) override;
+  virtual EntityWrapperPtr createFeature(FeaturePtr theFeature);
 
   /// \brief Return list of constraints necessary to fix feature's extra DoF
-  virtual const std::list<GCSConstraintPtr>& constraints() const override
+  virtual const std::list<GCSConstraintPtr>& constraints() const
   { return myFeatureConstraints; }
 
 private:

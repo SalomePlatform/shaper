@@ -22,14 +22,14 @@ public:
   {}
 
   /// \brief This method is used in derived objects to check consistence of constraint.
-  virtual void adjustConstraint() override;
+  virtual void adjustConstraint();
 
 protected:
   /// \brief Generate list of attributes of constraint in order useful for constraints
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
   /// \param[out] theAttributes list of attributes to be filled
   virtual void getAttributes(EntityWrapperPtr&              theValue,
-                             std::vector<EntityWrapperPtr>& theAttributes) override;
+                             std::vector<EntityWrapperPtr>& theAttributes);
 
 private:
   int    myType;

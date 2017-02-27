@@ -26,7 +26,7 @@ public:
 
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
-  virtual void process() override;
+  virtual void process();
 
   /// \brief Generate list of rotated entities
   /// \param[out] theCenter   central point of rotation
@@ -39,23 +39,23 @@ protected:
                      std::list<EntityWrapperPtr>& theEntities);
 
   /// \brief This method is used in derived objects to check consistence of constraint.
-  virtual void adjustConstraint() override;
+  virtual void adjustConstraint();
 
   /// \brief Update parameters (called from base class)
-  virtual void updateLocal() override;
+  virtual void updateLocal();
 
 private:
   /// \brief Convert absolute coordinates to relative coordinates
   virtual void getRelative(double theAbsX, double theAbsY,
-                           double& theRelX, double& theRelY) override;
+                           double& theRelX, double& theRelY);
   /// \brief Convert relative coordinates to absolute coordinates
   virtual void getAbsolute(double theRelX, double theRelY,
-                           double& theAbsX, double& theAbsY) override;
+                           double& theAbsX, double& theAbsY);
   /// \brief Apply transformation for relative coordinates
-  virtual void transformRelative(double& theX, double& theY) override;
+  virtual void transformRelative(double& theX, double& theY);
 
   /// \brief Returns name of NUMBER_OF_COPIES parameter for corresponding feature
-  virtual const std::string& nameNbObjects() override;
+  virtual const std::string& nameNbObjects();
 
 private:
   AttributePoint2DPtr myCenterPointAttribute; ///< a center of rotation
