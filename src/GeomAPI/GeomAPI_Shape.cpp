@@ -7,6 +7,7 @@
 #include "GeomAPI_Shape.h"
 
 #include <BRep_Tool.hxx>
+#include <BRepAlgoAPI_Common.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_FindPlane.hxx>
 #include <BRepTools.hxx>
@@ -428,4 +429,26 @@ std::string GeomAPI_Shape::getShapeStream() const
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
   BRepTools::Write(aShape, aStream);
   return aStream.str();
+}
+
+GeomShapePtr GeomAPI_Shape::intersect(const GeomShapePtr theShape) const
+{
+  const TopoDS_Shape& aShape1 = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aShape2 = theShape->impl<TopoDS_Shape>();
+
+  BRepAlgoAPI_Common aCommon(aShape1, aShape2);
+  if (!aCommon.IsDone())
+    return GeomShapePtr();
+
+  TopoDS_Shape aResult = aCommon.Shape();
+  if (aResult.ShapeType() == TopAbs_COMPOUND) {
+    NCollection_List<TopoDS_Shape> aSubs;
+    addSimpleToList(aResult, aSubs);
+    if (aSubs.Size() == 1)
+      aResult = aSubs.First();
+  }
+
+  GeomShapePtr aResShape(new GeomAPI_Shape);
+  aResShape->setImpl(new TopoDS_Shape(aResult));
+  return aResShape;
 }
