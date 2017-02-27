@@ -159,7 +159,7 @@ void SketchSolver_Constraint::update()
     return;
   }
 
-  AttributeDoublePtr aValueAttr = myBaseConstraint->real(SketchPlugin_Constraint::VALUE());
+  AttributePtr aValueAttr = myBaseConstraint->attribute(SketchPlugin_Constraint::VALUE());
   if (aValueAttr)
     myStorage->update(aValueAttr);
 
@@ -187,7 +187,7 @@ void SketchSolver_Constraint::getAttributes(
 
   myType = TYPE(myBaseConstraint);
 
-  AttributeDoublePtr aValueAttr = aData->real(SketchPlugin_Constraint::VALUE());
+  AttributePtr aValueAttr = aData->attribute(SketchPlugin_Constraint::VALUE());
   if (aValueAttr) {
     PlaneGCSSolver_AttributeBuilder aValueBuilder;
     theValue = aValueBuilder.createAttribute(aValueAttr);
