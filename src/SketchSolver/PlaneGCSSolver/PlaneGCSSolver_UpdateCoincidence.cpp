@@ -10,7 +10,8 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintMiddle.h>
 
-void PlaneGCSSolver_UpdateCoincidence::attach(SketchSolver_Constraint* theObserver, const std::string& theType)
+void PlaneGCSSolver_UpdateCoincidence::attach(SketchSolver_Constraint* theObserver,
+                                              const std::string& theType)
 {
   if (theType == GROUP()) {
     std::list<SketchSolver_Constraint*>::iterator aPlaceToAdd = myObservers.end();

@@ -44,7 +44,8 @@ void SketchSolver_Storage::addConstraint(ConstraintPtr        theConstraint,
 ////        theConstraint->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
 ////    std::list<AttributePtr>::const_iterator anAttrIt = aRefAttrs.begin();
 ////    for (; anAttrIt != aRefAttrs.end(); ++anAttrIt) {
-////      AttributeRefAttrPtr aRef = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIt);
+////      AttributeRefAttrPtr aRef =
+////          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIt);
 ////      if (aRef->isObject()) {
 ////        FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
 ////        if (aFeature) addEntity(aFeature, EntityWrapperPtr());
@@ -54,7 +55,8 @@ void SketchSolver_Storage::addConstraint(ConstraintPtr        theConstraint,
 ////    std::list<AttributePtr> aRefLists =
 ////        theConstraint->data()->attributes(ModelAPI_AttributeRefList::typeId());
 ////    for (anAttrIt = aRefLists.begin(); anAttrIt != aRefLists.end(); ++anAttrIt) {
-////      AttributeRefListPtr aRef = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anAttrIt);
+////      AttributeRefListPtr aRef =
+////          std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anAttrIt);
 ////      std::list<ObjectPtr> anObj = aRef->list();
 ////      std::list<ObjectPtr>::iterator anIt = anObj.begin();
 ////      for (; anIt != anObj.end(); ++anIt) {

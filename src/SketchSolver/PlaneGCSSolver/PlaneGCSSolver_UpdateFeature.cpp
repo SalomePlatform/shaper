@@ -7,7 +7,8 @@
 #include <PlaneGCSSolver_UpdateFeature.h>
 #include <SketchSolver_Constraint.h>
 
-void PlaneGCSSolver_UpdateFeature::attach(SketchSolver_Constraint* theObserver, const std::string& theType)
+void PlaneGCSSolver_UpdateFeature::attach(SketchSolver_Constraint* theObserver,
+                                          const std::string& theType)
 {
   if (theType == GROUP())
     myObservers.push_back(theObserver);
