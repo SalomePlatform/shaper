@@ -27,6 +27,9 @@ public:
   virtual void notify(const FeaturePtr&      theFeature,
                       PlaneGCSSolver_Update* theUpdater);
 
+  /// \brief Remove constraint
+  virtual bool remove();
+
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
   virtual void process();

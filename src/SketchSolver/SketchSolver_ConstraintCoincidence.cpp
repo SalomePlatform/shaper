@@ -32,6 +32,12 @@ void SketchSolver_ConstraintCoincidence::process()
   myStorage->notify(myBaseConstraint);
 }
 
+bool SketchSolver_ConstraintCoincidence::remove()
+{
+  myInSolver = false;
+  return SketchSolver_Constraint::remove();
+}
+
 void SketchSolver_ConstraintCoincidence::getAttributes(
     EntityWrapperPtr& theValue,
     std::vector<EntityWrapperPtr>& theAttributes)
