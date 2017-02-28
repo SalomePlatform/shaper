@@ -120,6 +120,10 @@ public:
   /// Returns the shape as BRep stream
   GEOMAPI_EXPORT
   std::string getShapeStream() const;
+
+  /// Returns intersection of shapes
+  GEOMAPI_EXPORT
+  std::shared_ptr<GeomAPI_Shape> intersect(const std::shared_ptr<GeomAPI_Shape> theShape) const;
 };
 
 //! Pointer on list of shapes
