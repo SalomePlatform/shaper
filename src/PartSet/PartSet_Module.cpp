@@ -11,6 +11,7 @@
 #include "PartSet_WidgetShapeSelector.h"
 #include "PartSet_WidgetMultiSelector.h"
 #include "PartSet_WidgetSubShapeSelector.h"
+#include "PartSet_WidgetFeaturePointSelector.h"
 #include "PartSet_WidgetEditor.h"
 #include "PartSet_WidgetFileSelector.h"
 #include "PartSet_WidgetSketchCreator.h"
@@ -743,6 +744,12 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
                           new PartSet_WidgetSubShapeSelector(theParent, aWorkshop, theWidgetApi);
     aSubShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aSubShapeSelectorWgt;
+  }
+  else if (theType == "sketch_feature_point_selector") {
+    PartSet_WidgetFeaturePointSelector* aPointSelectorWgt =
+                          new PartSet_WidgetFeaturePointSelector(theParent, aWorkshop, theWidgetApi);
+    aPointSelectorWgt->setSketcher(mySketchMgr->activeSketch());
+    aWgt = aPointSelectorWgt;
   }
   else if (theType == WDG_DOUBLEVALUE_EDITOR) {
     aWgt = new PartSet_WidgetEditor(theParent, aWorkshop, theWidgetApi);

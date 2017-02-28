@@ -582,9 +582,13 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
 }
 
 void PartSet_WidgetPoint2D::setPreSelection(
-  const std::shared_ptr<ModuleBase_ViewerPrs>& thePreSelected)
+                               const std::shared_ptr<ModuleBase_ViewerPrs>& thePreSelected,
+                               ModuleBase_IViewWindow* theWnd,
+                               QMouseEvent* theEvent)
 {
   myPreSelected = thePreSelected;
+  mouseReleased(theWnd, theEvent);
+  myPreSelected = ModuleBase_ViewerPrsPtr();
 }
 
 void PartSet_WidgetPoint2D::mouseMoved(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent)

@@ -228,11 +228,11 @@ void PartSet_WidgetSubShapeSelector::fillObjectShapes(const ObjectPtr& theObject
   std::set<std::shared_ptr<GeomDataAPI_Point2D> > aRefAttributes;
   // current feature
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  std::set<GeomShapePtr> anEdgeShapes;
   // edges on feature
-  ModelAPI_Tools::shapesOfType(aFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
-  if (!anEdgeShapes.empty()) {
-    GeomShapePtr aFeatureShape = *anEdgeShapes.begin();
+  std::set<ResultPtr> anEdgeResults;
+  ModelAPI_Tools::shapesOfType(aFeature, GeomAPI_Shape::EDGE, anEdgeResults);
+  if (!anEdgeResults.empty()) {
+    GeomShapePtr aFeatureShape = (*anEdgeResults.begin())->shape();
 
     // coincidences to the feature
     ModelGeomAlgo_Point2D::getPointsOfReference(aFeature, SketchPlugin_ConstraintCoincidence::ID(),
@@ -248,10 +248,10 @@ void PartSet_WidgetSubShapeSelector::fillObjectShapes(const ObjectPtr& theObject
         aData->attribute(SketchPlugin_Sketch::NORM_ID()));
     std::shared_ptr<GeomAPI_Dir> aY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
     std::list<std::shared_ptr<GeomAPI_Pnt> > aPoints;
-    ModelGeomAlgo_Point2D::getPointsInsideShape(aFeatureShape, aRefAttributes, aC->pnt(),
+    ModelGeomAlgo_Point2D::getPointsInsideShape_p(aFeatureShape, aRefAttributes, aC->pnt(),
                                                 aX->dir(), aY, aPoints, aPointToAttributes);
 
-    GeomAlgoAPI_ShapeTools::splitShape(aFeatureShape, aPoints, aShapes);
+    GeomAlgoAPI_ShapeTools::splitShape_p(aFeatureShape, aPoints, aShapes);
   }
   myCashedShapes[theObject] = aShapes;
   myCashedReferences[theObject] = aPointToAttributes;

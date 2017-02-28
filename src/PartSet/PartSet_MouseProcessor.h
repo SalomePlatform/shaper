@@ -9,7 +9,10 @@
 
 #include "PartSet.h"
 
+#include <memory>
+
 class ModuleBase_IViewWindow;
+class ModuleBase_ViewerPrs;
 class QMouseEvent;
 
 /**
@@ -39,6 +42,11 @@ public:
   /// \param theEvent a mouse event
   PARTSET_EXPORT virtual void mouseDoubleClick(ModuleBase_IViewWindow* theWindow,
                                                QMouseEvent* theEvent) {}
+
+  /// Fill preselection used in mouseReleased
+  virtual void setPreSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePreSelected,
+                               ModuleBase_IViewWindow* theWnd,
+                               QMouseEvent* theEvent) {}
 };
 
 #endif

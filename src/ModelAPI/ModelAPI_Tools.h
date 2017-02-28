@@ -29,10 +29,10 @@ MODELAPI_EXPORT std::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult)
 /// Creates a container of shape of the feature results satisfied the given shape type
 /// \param theFeature a source feature
 /// \param theType shape type
-/// \param an output container for shapes
+/// \param an output container for result of shapes
 MODELAPI_EXPORT void shapesOfType(const FeaturePtr& theFeature,
                                   const GeomAPI_Shape::ShapeType& theType,
-                                  std::set<GeomShapePtr>& theShapes);
+                                  std::set<ResultPtr>& theShapeResults);
 
 /*! Returns the feature error generated according to feature error and exec state
  * \param theFeature a feature

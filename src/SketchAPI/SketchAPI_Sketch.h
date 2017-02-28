@@ -263,6 +263,12 @@ public:
       const ModelHighAPI_RefAttr& thePoint1,
       const ModelHighAPI_RefAttr& thePoint2);
 
+  /// Add trim
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelHighAPI_Interface> addTrim(
+      const ModelHighAPI_Reference& theFeature,
+      const std::shared_ptr<GeomAPI_Pnt2d>& thePositionPoint);
+
   /// Set angle
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelHighAPI_Interface> setAngle(

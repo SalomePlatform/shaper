@@ -14,40 +14,43 @@ SET(PROJECT_HEADERS
     PartSet_Constants.h
     PartSet_CustomPrs.h
     PartSet_ExternalObjectsMgr.h
+    PartSet_FilterInfinite.h
+    PartSet_Filters.h
+    PartSet_IconFactory.h
+    PartSet_MenuMgr.h
     PartSet_Module.h
     PartSet_MouseProcessor.h
     PartSet_OperationPrs.h
     PartSet_OverconstraintListener.h
     PartSet_PreviewPlanes.h
-    PartSet_Tools.h
-    PartSet_WidgetSketchLabel.h
-    PartSet_Validators.h
-    PartSet_WidgetPoint2d.h
-    PartSet_WidgetEditor.h
-    PartSet_WidgetMultiSelector.h
-    PartSet_WidgetPoint2dDistance.h
-    PartSet_WidgetPoint2DFlyout.h
-    PartSet_WidgetShapeSelector.h
-    PartSet_WidgetFileSelector.h
-    PartSet_Filters.h
-    PartSet_FilterInfinite.h
     PartSet_ResultSketchPrs.h
     PartSet_SketcherMgr.h
     PartSet_SketcherReetntrantMgr.h
-    PartSet_MenuMgr.h
-    PartSet_WidgetSketchCreator.h
-    PartSet_IconFactory.h
+    PartSet_Tools.h
+    PartSet_Validators.h
     PartSet_WidgetChoice.h
+    PartSet_WidgetEditor.h
+    PartSet_WidgetFeaturePointSelector.h
+    PartSet_WidgetFileSelector.h
+    PartSet_WidgetMultiSelector.h
+    PartSet_WidgetPoint2d.h
+    PartSet_WidgetPoint2dDistance.h
+    PartSet_WidgetPoint2DFlyout.h
+    PartSet_WidgetShapeSelector.h
+    PartSet_WidgetSketchCreator.h
+    PartSet_WidgetSketchLabel.h
     PartSet_WidgetSubShapeSelector.h
 )
 
 SET(PROJECT_MOC_HEADERS
+
     PartSet_MenuMgr.h
     PartSet_Module.h
     PartSet_SketcherMgr.h
     PartSet_SketcherReetntrantMgr.h
     PartSet_WidgetChoice.h
     PartSet_WidgetEditor.h
+    PartSet_WidgetFeaturePointSelector.h
     PartSet_WidgetFileSelector.h
     PartSet_WidgetMultiSelector.h
     PartSet_WidgetPoint2d.h
@@ -62,28 +65,29 @@ SET(PROJECT_MOC_HEADERS
 SET(PROJECT_SOURCES
     PartSet_CustomPrs.cpp
     PartSet_ExternalObjectsMgr.cpp
+    PartSet_FilterInfinite.cpp
+    PartSet_Filters.cpp
+    PartSet_IconFactory.cpp
+    PartSet_MenuMgr.cpp
     PartSet_Module.cpp
     PartSet_OperationPrs.cpp
     PartSet_OverconstraintListener.cpp
     PartSet_PreviewPlanes.cpp
+    PartSet_ResultSketchPrs.cpp
+    PartSet_SketcherMgr.cpp
+    PartSet_SketcherReetntrantMgr.cpp
     PartSet_Tools.cpp
-    PartSet_WidgetSketchLabel.cpp
     PartSet_Validators.cpp
     PartSet_WidgetEditor.cpp
+    PartSet_WidgetFeaturePointSelector.cpp
+    PartSet_WidgetFileSelector.cpp
     PartSet_WidgetMultiSelector.cpp
     PartSet_WidgetPoint2d.cpp
     PartSet_WidgetPoint2dDistance.cpp
     PartSet_WidgetPoint2DFlyout.cpp
     PartSet_WidgetShapeSelector.cpp
-    PartSet_WidgetFileSelector.cpp
-    PartSet_Filters.cpp
-    PartSet_FilterInfinite.cpp
-    PartSet_ResultSketchPrs.cpp
-    PartSet_SketcherMgr.cpp
-    PartSet_SketcherReetntrantMgr.cpp
-    PartSet_MenuMgr.cpp
     PartSet_WidgetSketchCreator.cpp
-    PartSet_IconFactory.cpp
+    PartSet_WidgetSketchLabel.cpp
     PartSet_WidgetSubShapeSelector.cpp
 )
 

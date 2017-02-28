@@ -360,7 +360,7 @@ AISObjectPtr SketchPlugin_ConstraintSplit::getAISObject(AISObjectPtr thePrevious
 
     std::set<std::shared_ptr<GeomAPI_Shape> > aSplitShapes;
 
-    GeomAlgoAPI_ShapeTools::splitShape(aBaseShape, aPoints, aSplitShapes);
+    GeomAlgoAPI_ShapeTools::splitShape_p(aBaseShape, aPoints, aSplitShapes);
     std::shared_ptr<GeomAPI_Shape> aShape =
       GeomAlgoAPI_ShapeTools::findShape(aPoints, aSplitShapes);
 

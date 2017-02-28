@@ -92,15 +92,16 @@ std::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult)
 
 void shapesOfType(const FeaturePtr& theFeature,
                   const GeomAPI_Shape::ShapeType& theType,
-                  std::set<GeomShapePtr>& theShapes)
+                  std::set<ResultPtr>& theShapeResults)
 {
+  theShapeResults.clear();
   std::list<ResultPtr> aResults = theFeature->results();
   std::list<ResultPtr>::const_iterator aRIter = aResults.cbegin();
   for (; aRIter != aResults.cend(); aRIter++) {
     ResultPtr aResult = *aRIter;
     GeomShapePtr aShape = aResult->shape();
     if (aShape.get() && aShape->shapeType() == theType)
-      theShapes.insert(aShape);
+      theShapeResults.insert(aResult);
   }
 }
 

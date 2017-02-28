@@ -702,7 +702,7 @@ void XGUI_Displayer::clearSelected(const bool theUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
-    aContext->UnhilightCurrents(false);
+    aContext->UnhilightSelected(false);//UnhilightCurrents(false);
     aContext->ClearSelected(theUpdateViewer);
     #ifdef VINSPECTOR
     if (getCallBack()) getCallBack()->ClearSelected();

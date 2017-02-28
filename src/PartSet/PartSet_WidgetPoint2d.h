@@ -111,7 +111,10 @@ Q_OBJECT
   virtual void mouseReleased(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent);
 
   /// Fill preselection used in mouseReleased
-  void setPreSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePreSelected);
+  //virtual void setPreSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePreSelected);
+  virtual void setPreSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePreSelected,
+                               ModuleBase_IViewWindow* theWnd,
+                               QMouseEvent* theEvent);
 
 signals:
   /// Signal about selection of an existing vertex from an object
@@ -206,7 +209,7 @@ private:
   ModuleBase_LabelValue* myXSpin; ///< the label for the X coordinate
   ModuleBase_LabelValue* myYSpin; ///< the label for the Y coordinate
 
-   /// value used as selection in mouse release method
+  /// value used as selection in mouse release method
   std::shared_ptr<ModuleBase_ViewerPrs> myPreSelected;
 
   /// it is important during restart operation

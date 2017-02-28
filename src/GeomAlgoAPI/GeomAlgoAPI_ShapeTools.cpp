@@ -695,6 +695,52 @@ bool GeomAlgoAPI_ShapeTools::isParallel(const std::shared_ptr<GeomAPI_Edge> theE
 
 //==================================================================================================
 void GeomAlgoAPI_ShapeTools::splitShape(const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
+                                      const GeomAlgoAPI_ShapeTools::PointToRefsMap& thePointsInfo,
+                                      std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes)
+{
+  // General Fuse to split edge by vertices
+  BOPAlgo_Builder aBOP;
+  TopoDS_Edge aBaseEdge = theBaseShape->impl<TopoDS_Edge>();
+  // Rebuild closed edge to place vertex to one of split points.
+  // This will prevent edge to be split on same vertex.
+  if (BRep_Tool::IsClosed(aBaseEdge))
+  {
+    Standard_Real aFirst, aLast;
+    Handle(Geom_Curve) aCurve = BRep_Tool::Curve(aBaseEdge, aFirst, aLast);
+
+    PointToRefsMap::const_iterator aPIt = thePointsInfo.begin();
+    std::shared_ptr<GeomAPI_Pnt> aPnt = aPIt->first;
+    gp_Pnt aPoint(aPnt->x(), aPnt->y(), aPnt->z());
+
+    TopAbs_Orientation anOrientation = aBaseEdge.Orientation();
+    aBaseEdge = BRepBuilderAPI_MakeEdge(aCurve, aPoint, aPoint).Edge();
+    aBaseEdge.Orientation(anOrientation);
+  }
+  aBOP.AddArgument(aBaseEdge);
+
+  PointToRefsMap::const_iterator aPIt = thePointsInfo.begin();
+  for (; aPIt != thePointsInfo.end(); ++aPIt) {
+    std::shared_ptr<GeomAPI_Pnt> aPnt = aPIt->first;
+    TopoDS_Vertex aV = BRepBuilderAPI_MakeVertex(gp_Pnt(aPnt->x(), aPnt->y(), aPnt->z()));
+    aBOP.AddArgument(aV);
+  }
+
+  aBOP.Perform();
+  if (aBOP.ErrorStatus())
+    return;
+
+  // Collect splits
+  const TopTools_ListOfShape& aSplits = aBOP.Modified(aBaseEdge);
+  TopTools_ListIteratorOfListOfShape anIt(aSplits);
+  for (; anIt.More(); anIt.Next()) {
+    std::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
+    anEdge->setImpl(new TopoDS_Shape(anIt.Value()));
+    theShapes.insert(anEdge);
+  }
+}
+
+//==================================================================================================
+void GeomAlgoAPI_ShapeTools::splitShape_p(const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
                                           const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
                                           std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes)
 {

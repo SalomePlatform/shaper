@@ -233,15 +233,21 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
       // fill the first widget by the mouse event point
       // if the active widget is not the first, it means that the restarted operation is filled by
       // the current preselection.
-      PartSet_WidgetPoint2D* aPoint2DWdg =
-        dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
-      ModuleBase_ModelWidget* aFirstWidget = aPanel->findFirstAcceptingValueWidget();
-      if (aPoint2DWdg && aPoint2DWdg == aFirstWidget) {
+      PartSet_MouseProcessor* aMouseProcessor = dynamic_cast<PartSet_MouseProcessor*>(
+                                                                       module()->activeWidget());
+      //PartSet_WidgetPoint2D* aPoint2DWdg =
+      //  dynamic_cast<PartSet_WidgetPoint2D*>(module()->activeWidget());
+      PartSet_MouseProcessor* aFirstWidget = dynamic_cast<PartSet_MouseProcessor*>(
+                                                        aPanel->findFirstAcceptingValueWidget());
+      //if (aPoint2DWdg && aPoint2DWdg == aFirstWidget) {
+      if (aMouseProcessor && aMouseProcessor == aFirstWidget) {
+        std::shared_ptr<ModuleBase_ViewerPrs> aSelectedPrs;
         if (!aPreSelected.empty())
-          aPoint2DWdg->setPreSelection(aPreSelected.front());
-        aPoint2DWdg->mouseReleased(theWnd, theEvent);
-        if (!aPreSelected.empty())
-          aPoint2DWdg->setPreSelection(ModuleBase_ViewerPrsPtr());
+          aSelectedPrs = aPreSelected.front();
+        aMouseProcessor->setPreSelection(aSelectedPrs, theWnd, theEvent);
+        //aPoint2DWdg->mouseReleased(theWnd, theEvent);
+        //if (!aPreSelected.empty())
+        //  aPoint2DWdg->setPreSelection(ModuleBase_ViewerPrsPtr());
       }
       // unblock viewer update
       ModuleBase_Tools::blockUpdateViewer(false);

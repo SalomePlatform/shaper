@@ -5,7 +5,18 @@
     <group id="Linear geometry">
       <feature
         id="Sketch"
-        nested="SketchPoint SketchIntersectionPoint SketchLine SketchCircle SketchArc SketchRectangle SketchProjection SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual SketchConstraintTangent SketchConstraintFillet SketchConstraintSplit SketchConstraintCoincidence SketchConstraintMirror SketchConstraintAngle SketchMultiRotation SketchMultiTranslation SketchConstraintCollinear SketchConstraintMiddle"
+        nested="SketchPoint SketchIntersectionPoint SketchLine SketchCircle SketchArc
+                SketchRectangle
+                SketchProjection
+                SketchConstraintLength SketchConstraintRadius SketchConstraintDistance
+                SketchConstraintParallel SketchConstraintPerpendicular
+                SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical
+                SketchConstraintEqual SketchConstraintTangent
+                SketchConstraintFillet SketchConstraintSplit SketchTrim
+                SketchConstraintCoincidence
+                SketchConstraintMirror SketchConstraintAngle
+                SketchMultiRotation SketchMultiTranslation
+                SketchConstraintCollinear SketchConstraintMiddle"
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create sketch"
@@ -129,15 +140,33 @@
         <validator id="PartSet_FilletSelection"/>
       </feature>
       <!--  SketchConstraintSplit  -->
-      <feature id="SketchConstraintSplit" title="Split" tooltip="Create constraints defining split of linear segment, arc or circle" icon="icons/Sketch/split.png">
+      <feature id="SketchConstraintSplit" title="Split"
+               tooltip="Cut selected segment arc or circle on existing coincident points"
+               icon="icons/Sketch/split.png">
         <sketch_sub_shape_selector
             id="ConstraintValue"
             label="Split feature"
             tooltip="Select feature for split"
             shape_types="edge"
-            use_external="false">
+            use_external="false"
+            use_graphic_intersection="false">
           <validator id="SketchPlugin_SplitValidator"/>
         </sketch_sub_shape_selector>
+        <validator id="PartSet_SplitSelection"/>
+      </feature>
+      <!--  SketchTrim  -->
+      <feature id="SketchTrim" title="Trim"
+               tooltip="Trim selected segment arc or circle on intersection points nearest to the graphic selection"
+               icon="icons/Sketch/trim.png">
+        <sketch_feature_point_selector
+            id="BaseObject"
+            label="Split feature"
+            tooltip="Select feature for split"
+            shape_types="edge"
+            use_external="false"
+            use_graphic_intersection="true">
+          <!--<validator id="SketchPlugin_SplitValidator" parameters="use_graphic_intersection"/> -->
+        </sketch_feature_point_selector>
         <validator id="PartSet_SplitSelection"/>
       </feature>
     </group>

@@ -12,6 +12,7 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Vertex.h>
 
+#include <map>
 #include <set>
 
 class GeomAPI_Edge;
@@ -20,6 +21,8 @@ class GeomAPI_Face;
 class GeomAPI_PlanarEdges;
 class GeomAPI_Pln;
 class GeomAPI_Pnt;
+class GeomDataAPI_Point2D;
+class ModelAPI_Object;
 
 /// \class GeomAlgoAPI_ShapeTools
 /// \ingroup DataAlgo
@@ -116,14 +119,24 @@ public:
   GEOMALGOAPI_EXPORT static bool isParallel(const std::shared_ptr<GeomAPI_Edge> theEdge,
                                             const std::shared_ptr<GeomAPI_Face> theFace);
 
+  typedef std::map<std::shared_ptr<GeomAPI_Pnt>,
+                   std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,
+                             std::list<std::shared_ptr<ModelAPI_Object> > > > PointToRefsMap;
   /// \brief Performs the split of the shape by points.
   /// \param[in] theBaseShape shape that should be splitted.
   /// \param[in] thePoints container of points to split
   /// \param[out] theShapes container of shapes after split
   GEOMALGOAPI_EXPORT static void splitShape(const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
-                                      const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
+                                      const PointToRefsMap& thePointsInfo,
                                       std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes);
 
+  /// \brief Performs the split of the shape by points.
+  /// \param[in] theBaseShape shape that should be splitted.
+  /// \param[in] thePoints container of points to split
+  /// \param[out] theShapes container of shapes after split
+  GEOMALGOAPI_EXPORT static void splitShape_p(const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
+                                      const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
+                                      std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes);
 
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> findShape(
                                     const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints,

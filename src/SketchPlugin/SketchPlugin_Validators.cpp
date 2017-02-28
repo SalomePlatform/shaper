@@ -854,7 +854,7 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
       aKind == SketchPlugin_Arc::ID() ||
       aKind == SketchPlugin_Circle::ID()) {
 
-    std::set<GeomShapePtr> anEdgeShapes;
+    std::set<ResultPtr> anEdgeShapes;
     ModelAPI_Tools::shapesOfType(anAttrFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
     if (anEdgeShapes.empty() || anEdgeShapes.size() > 1 /*there case has not existed yet*/)
       return aValid;
@@ -865,7 +865,7 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
                         SketchPlugin_ConstraintCoincidence::ID(),
                         aRefAttributes, SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
 
-    GeomShapePtr anAttrShape = *anEdgeShapes.begin();
+    GeomShapePtr anAttrShape = (*anEdgeShapes.begin())->shape();
     std::shared_ptr<SketchPlugin_Feature> aSFeature =
                                  std::dynamic_pointer_cast<SketchPlugin_Feature>(anAttrFeature);
     SketchPlugin_Sketch* aSketch = aSFeature->sketch();
@@ -879,13 +879,20 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
         aData->attribute(SketchPlugin_Sketch::NORM_ID()));
     std::shared_ptr<GeomAPI_Dir> aDirY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
 
-    std::list<std::shared_ptr<GeomAPI_Pnt> > aPoints;
-    std::map<std::shared_ptr<GeomDataAPI_Point2D>, std::shared_ptr<GeomAPI_Pnt> >
-      aPointToAttributes;
-    ModelGeomAlgo_Point2D::getPointsInsideShape(anAttrShape, aRefAttributes, aC->pnt(),
-                                                aX->dir(), aDirY, aPoints, aPointToAttributes);
+    typedef std::map<std::shared_ptr<GeomAPI_Pnt>,
+                     std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,
+                               std::list<std::shared_ptr<ModelAPI_Object> > > > PointToRefsMap;
+    PointToRefsMap aPointsInfo;
 
-    int aCoincidentToFeature = (int)aPoints.size();
+    //std::list<std::shared_ptr<GeomAPI_Pnt> > aPoints;
+    //std::map<std::shared_ptr<GeomDataAPI_Point2D>, std::shared_ptr<GeomAPI_Pnt> >
+    //  aPointToAttributes;
+    //std::map<std::shared_ptr<GeomAPI_Pnt>,
+    //                       std::list< std::shared_ptr<GeomDataAPI_Point2D> > > aPointToAttributes;
+    ModelGeomAlgo_Point2D::getPointsInsideShape(anAttrShape, aRefAttributes, aC->pnt(),
+                                                aX->dir(), aDirY, aPointsInfo);//aPoints, aPointToAttributes);
+
+    int aCoincidentToFeature = (int)aPointsInfo.size();//aPoints.size();
     if (aKind == SketchPlugin_Circle::ID())
       aValid = aCoincidentToFeature >= 2;
     else
