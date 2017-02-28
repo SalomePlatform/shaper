@@ -78,7 +78,7 @@ namespace GeomAlgoAPI_ShapeAPI
     if (!theEdge) {
       throw GeomAlgoAPI_Exception("Cylinder builder :: the axis is not valid.");
     }
-    
+
     std::shared_ptr<GeomAPI_Ax2> anAxis;
     anAxis = std::shared_ptr<GeomAPI_Ax2>(new GeomAPI_Ax2(theBasePoint,
                                                           theEdge->line()->direction()));
