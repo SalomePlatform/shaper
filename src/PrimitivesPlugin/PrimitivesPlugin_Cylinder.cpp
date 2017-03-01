@@ -136,7 +136,7 @@ void PrimitivesPlugin_Cylinder::createCylinder(bool withAngle)
   // These checks should be made to the GUI for the feature but
   // the corresponding validator does not exist yet.
   if (!aCylinderAlgo->check()) {
-    setError(aCylinderAlgo->getError(), false);
+    setError(aCylinderAlgo->getError());
     return;
   }
 
@@ -146,12 +146,12 @@ void PrimitivesPlugin_Cylinder::createCylinder(bool withAngle)
   // Check if the creation of the cylinder
   if(!aCylinderAlgo->isDone()) {
     // The error is not displayed in a popup window. It must be in the message console.
-    setError(aCylinderAlgo->getError(), false);
+    setError(aCylinderAlgo->getError());
     return;
   }
   if(!aCylinderAlgo->checkValid("Cylinder builder")) {
     // The error is not displayed in a popup window. It must be in the message console.
-    setError(aCylinderAlgo->getError(), false);
+    setError(aCylinderAlgo->getError());
     return;
   }
 

@@ -8,7 +8,6 @@
         label="DX"
         step="1.0"
         default="10.0"
-        min = "0.0"
         icon=""
         tooltip="Dimension in X">
       </doublevalue>
@@ -17,7 +16,6 @@
         label="DY"
         step="1.0"
         default="10.0"
-        min = "0.0"
         icon=""
         tooltip="Dimension in Y">
       </doublevalue>
@@ -26,7 +24,6 @@
         label="DZ"
         step="1.0"
         default="10.0"
-        min = "0.0"
         icon=""
         tooltip="Dimension in Z">
       </doublevalue>
