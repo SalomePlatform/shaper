@@ -19,10 +19,8 @@ SET(SKETCHSOLVER_HEADERS
     SketchSolver.h
     SketchSolver_Error.h
     SketchSolver_Group.h
-    SketchSolver_Builder.h
     SketchSolver_IConstraintWrapper.h
     SketchSolver_IEntityWrapper.h
-    SketchSolver_ISolver.h
     SketchSolver_Manager.h
     SketchSolver_Storage.h
 )
@@ -46,7 +44,6 @@ SET(SKETCHSOLVER_CONSTRAINT_HEADERS
 
 SET(SKETCHSOLVER_SOURCES
     SketchSolver_Group.cpp
-    SketchSolver_Builder.cpp
     SketchSolver_Manager.cpp
     SketchSolver_Storage.cpp
 )

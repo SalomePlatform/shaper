@@ -9,6 +9,8 @@
 #include <SketchSolver_Manager.h>
 
 #include <PlaneGCSSolver_Solver.h>
+#include <PlaneGCSSolver_Storage.h>
+#include <PlaneGCSSolver_Tools.h>
 
 #include <Events_InfoMessage.h>
 #include <ModelAPI_AttributeString.h>
@@ -40,12 +42,11 @@ static void sendMessage(const char* theMessageName, const std::set<ObjectPtr>& t
 
 SketchSolver_Group::SketchSolver_Group(const CompositeFeaturePtr& theWorkplane)
   : mySketch(theWorkplane),
-    myPrevResult(STATUS_UNKNOWN),
+    myPrevResult(PlaneGCSSolver_Solver::STATUS_UNKNOWN),
     myIsEventsBlocked(false)
 {
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-  mySketchSolver = aBuilder->createSolver();
-  myStorage = aBuilder->createStorage(mySketchSolver);
+  mySketchSolver = SolverPtr(new PlaneGCSSolver_Solver);
+  myStorage = StoragePtr(new PlaneGCSSolver_Storage(mySketchSolver));
 }
 
 SketchSolver_Group::~SketchSolver_Group()
@@ -68,9 +69,8 @@ bool SketchSolver_Group::changeConstraint(
 {
   bool isNewConstraint = myConstraints.find(theConstraint) == myConstraints.end();
   if (isNewConstraint) {
-    BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
     // Add constraint to the current group
-    SolverConstraintPtr aConstraint = aBuilder->createConstraint(theConstraint);
+    SolverConstraintPtr aConstraint = PlaneGCSSolver_Tools::createConstraint(theConstraint);
     if (!aConstraint)
       return false;
     aConstraint->process(myStorage, myIsEventsBlocked);
@@ -93,10 +93,8 @@ bool SketchSolver_Group::updateFeature(FeaturePtr theFeature)
 
 bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
 {
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-
   // Create temporary Fixed constraint
-  SolverConstraintPtr aConstraint = aBuilder->createMovementConstraint(theFeature);
+  SolverConstraintPtr aConstraint = PlaneGCSSolver_Tools::createMovementConstraint(theFeature);
   if (!aConstraint)
     return false;
   aConstraint->process(myStorage, myIsEventsBlocked);
@@ -118,49 +116,28 @@ bool SketchSolver_Group::resolveConstraints()
   bool aResolved = false;
   bool isGroupEmpty = isEmpty() && myStorage->isEmpty();
   if (myStorage->isNeedToResolve() &&
-      (!isGroupEmpty || !myConflictingConstraints.empty() || myPrevResult == STATUS_FAILED)) {
-////    if (!mySketchSolver)
-////      mySketchSolver = SketchSolver_Manager::instance()->builder()->createSolver();
+      (!isGroupEmpty || !myConflictingConstraints.empty() ||
+        myPrevResult == PlaneGCSSolver_Solver::STATUS_FAILED)) {
 
-////    mySketchSolver->calculateFailedConstraints(false);
-////    myStorage->initializeSolver();
-////    mySketchSolver->prepare();
-
-    SketchSolver_SolveStatus aResult = STATUS_OK;
+    PlaneGCSSolver_Solver::SolveStatus aResult = PlaneGCSSolver_Solver::STATUS_OK;
     try {
-      if (!isGroupEmpty) {
-        // To avoid overconstraint situation, we will remove temporary constraints one-by-one
-        // and try to find the case without overconstraint
-        bool isLastChance = false;
-        while (true) {
-          aResult = mySketchSolver->solve();
-          if (aResult == STATUS_OK || aResult == STATUS_EMPTYSET || isLastChance)
-            break;
-////          // try to update parameters and resolve once again
-////          ConstraintConstraintMap::iterator aConstrIt = myConstraints.begin();
-////          for (; aConstrIt != myConstraints.end(); ++aConstrIt)
-////            aConstrIt->second->update();
-          isLastChance = true;
-
-          removeTemporaryConstraints();
-          mySketchSolver->calculateFailedConstraints(true); // something failed => need to find it
-////          myStorage->initializeSolver();
-        }
-      }
+      if (!isGroupEmpty)
+        aResult = mySketchSolver->solve();
     } catch (...) {
-//      Events_Error::send(SketchSolver_Error::SOLVESPACE_CRASH(), this);
       getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())
         ->setValue(SketchSolver_Error::SOLVESPACE_CRASH());
-      if (myPrevResult == STATUS_OK || myPrevResult == STATUS_UNKNOWN) {
+      if (myPrevResult == PlaneGCSSolver_Solver::STATUS_OK ||
+          myPrevResult == PlaneGCSSolver_Solver::STATUS_UNKNOWN) {
         // the error message should be changed before sending the message
         sendMessage(EVENT_SOLVER_FAILED);
-        myPrevResult = STATUS_FAILED;
+        myPrevResult = PlaneGCSSolver_Solver::STATUS_FAILED;
       }
       mySketchSolver->undo();
       return false;
     }
     // solution succeeded, store results into correspondent attributes
-    if (aResult == STATUS_OK || aResult == STATUS_EMPTYSET) {
+    if (aResult == PlaneGCSSolver_Solver::STATUS_OK ||
+        aResult == PlaneGCSSolver_Solver::STATUS_EMPTYSET) {
       myStorage->setNeedToResolve(false);
       myStorage->refresh();
 ////      updateMultiConstraints(myConstraints);
@@ -168,11 +145,12 @@ bool SketchSolver_Group::resolveConstraints()
 ////      if (myStorage->isNeedToResolve())
 ////        resolveConstraints();
 
-      if (myPrevResult != STATUS_OK || myPrevResult == STATUS_UNKNOWN) {
+      if (myPrevResult != PlaneGCSSolver_Solver::STATUS_OK ||
+          myPrevResult == PlaneGCSSolver_Solver::STATUS_UNKNOWN) {
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
         std::set<ObjectPtr> aConflicting = myConflictingConstraints;
         myConflictingConstraints.clear();
-        myPrevResult = STATUS_OK;
+        myPrevResult = PlaneGCSSolver_Solver::STATUS_OK;
         // the error message should be changed before sending the message
         sendMessage(EVENT_SOLVER_REPAIRED, aConflicting);
       }
@@ -186,8 +164,8 @@ bool SketchSolver_Group::resolveConstraints()
         getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())
           ->setValue(SketchSolver_Error::CONSTRAINTS());
         if (myPrevResult != aResult ||
-            myPrevResult == STATUS_UNKNOWN ||
-            myPrevResult == STATUS_FAILED) {
+            myPrevResult == PlaneGCSSolver_Solver::STATUS_UNKNOWN ||
+            myPrevResult == PlaneGCSSolver_Solver::STATUS_FAILED) {
           // Obtain list of conflicting constraints
           std::set<ObjectPtr> aConflicting = myStorage->getConflictingConstraints(mySketchSolver);
 

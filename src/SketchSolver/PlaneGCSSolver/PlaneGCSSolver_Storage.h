@@ -11,7 +11,6 @@
 
 #include <SketchSolver.h>
 #include <SketchSolver_Storage.h>
-#include <SketchSolver_ISolver.h>
 
 class PlaneGCSSolver_EntityBuilder;
 
@@ -68,14 +67,6 @@ public:
   virtual void removeInvalidEntities();
 
 private:
-  /// \brief Verifies the constraint should not be added into the solver
-  ///
-  /// This is a workaround method to avoid some kinds of conflicting constraints:
-  ///   * symmetric of two points placed on the mirror line (do not add perpendicular constraint)
-  bool isRedundant(GCSConstraintPtr theCheckedConstraint,
-                   ConstraintWrapperPtr theParentConstraint,
-                   std::list<std::set<double*> >& theCoincidentPoints) const;
-
   /// \brief Convert feature using specified builder.
   EntityWrapperPtr createFeature(const FeaturePtr&             theFeature,
                                  PlaneGCSSolver_EntityBuilder* theBuilder);

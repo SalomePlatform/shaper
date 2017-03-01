@@ -9,7 +9,8 @@
 
 #include <SketchSolver_Constraint.h>
 #include <SketchSolver_Storage.h>
-#include <SketchSolver_ISolver.h>
+
+#include <PlaneGCSSolver_Solver.h>
 
 #include <SketchPlugin_Constraint.h>
 
@@ -106,7 +107,7 @@ private:
   SolverPtr mySketchSolver;  ///< Solver for set of equations obtained by constraints
 
   /// Result of previous solution of the set of constraints
-  SketchSolver_SolveStatus myPrevResult;
+  PlaneGCSSolver_Solver::SolveStatus myPrevResult;
   std::set<ObjectPtr>      myConflictingConstraints; ///< List of conflicting constraints
 
   bool myIsEventsBlocked; ///< shows the events are blocked for this group

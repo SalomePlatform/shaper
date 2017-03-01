@@ -2,8 +2,8 @@
 
 #include <SketchSolver_ConstraintMirror.h>
 #include <SketchSolver_Error.h>
-#include <SketchSolver_Manager.h>
 
+#include <PlaneGCSSolver_Tools.h>
 #include <PlaneGCSSolver_UpdateFeature.h>
 
 #include <GeomAPI_XY.h>
@@ -99,12 +99,10 @@ void SketchSolver_ConstraintMirror::update()
 
 void SketchSolver_ConstraintMirror::adjustConstraint()
 {
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-
   AttributeRefAttrPtr aMirrLineRefAttr =
       myBaseConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
   std::shared_ptr<GeomAPI_Lin2d> aMirrorLine =
-      aBuilder->line(ModelAPI_Feature::feature(aMirrLineRefAttr->object()));
+      PlaneGCSSolver_Tools::line(ModelAPI_Feature::feature(aMirrLineRefAttr->object()));
 
   AttributeRefListPtr aBaseRefList =
       myBaseConstraint->reflist(SketchPlugin_Constraint::ENTITY_B());

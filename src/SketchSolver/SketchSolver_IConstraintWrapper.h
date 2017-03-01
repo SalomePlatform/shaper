@@ -63,29 +63,13 @@ public:
   /// \brief Return type of current entity
   virtual SketchSolver_ConstraintType type() const = 0;
 
-  /// \brief Assign list of constrained objects
-  void setEntities(const std::list<EntityWrapperPtr>& theEntities)
-  { myConstrained = theEntities; }
-  /// \brief Return list of constrained objects
-  const std::list<EntityWrapperPtr>& entities() const
-  { return myConstrained; }
-
   /// \brief Assign numeric parameter of constraint
   virtual void setValue(const double& theValue) = 0;
   /// \brief Return numeric parameter of constraint
   virtual double value() const = 0;
 
-  /// \brief Store a boolean flag for full value using
-  void setIsFullValue(const bool& theFullValue)
-  { myIsFullValue = theFullValue; }
-  /// \brief Return a flag of a full value using
-  const bool& isFullValue() const
-  { return myIsFullValue; }
-
 protected:
-  ConstraintID                myID;
-  std::list<EntityWrapperPtr> myConstrained;
-  bool                        myIsFullValue;
+  ConstraintID myID;
 };
 
 typedef std::shared_ptr<SketchSolver_IConstraintWrapper> ConstraintWrapperPtr;

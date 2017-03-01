@@ -10,8 +10,8 @@
 #include <SketchSolver.h>
 #include <SketchSolver_IConstraintWrapper.h>
 #include <SketchSolver_IEntityWrapper.h>
-#include <SketchSolver_ISolver.h>
 
+#include <PlaneGCSSolver_Solver.h>
 #include <PlaneGCSSolver_UpdateFeature.h>
 
 #include <ModelAPI_Attribute.h>

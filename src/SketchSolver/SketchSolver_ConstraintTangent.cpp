@@ -2,7 +2,8 @@
 
 #include <SketchSolver_ConstraintTangent.h>
 #include <SketchSolver_Error.h>
-#include <SketchSolver_Manager.h>
+
+#include <PlaneGCSSolver_Tools.h>
 
 #include <GeomAPI_Pnt2d.h>
 #include <SketchPlugin_Circle.h>
@@ -33,15 +34,6 @@ static bool hasSingleCoincidence(FeaturePtr theFeature1, FeaturePtr theFeature2)
 
   return aCoincidences.size() <= 1;
 }
-
-/// \brief Check if two connected arcs have centers
-///        in same direction relatively to connection point
-static bool isInternalTangency(EntityWrapperPtr theEntity1, EntityWrapperPtr theEntity2)
-{
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-  return aBuilder->isArcArcTangencyInternal(theEntity1, theEntity2);
-}
-
 
 void SketchSolver_ConstraintTangent::getAttributes(
     EntityWrapperPtr& theValue,
@@ -84,7 +76,8 @@ void SketchSolver_ConstraintTangent::getAttributes(
   }
   else if (aNbArcs == 2) {
     myType = CONSTRAINT_TANGENT_ARC_ARC;
-    isArcArcInternal = isInternalTangency(theAttributes[2], theAttributes[3]);
+    isArcArcInternal =
+        PlaneGCSSolver_Tools::isArcArcTangencyInternal(theAttributes[2], theAttributes[3]);
   }
   else {
     myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
@@ -116,7 +109,7 @@ void SketchSolver_ConstraintTangent::adjustConstraint()
     EntityWrapperPtr anEntity2 =
         myStorage->entity(myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
 
-    if (isArcArcInternal != isInternalTangency(anEntity1, anEntity2)) {
+    if (isArcArcInternal != PlaneGCSSolver_Tools::isArcArcTangencyInternal(anEntity1, anEntity2)) {
       // fully rebuld constraint, because it is unable to access attributes of PlaneGCS constraint
       remove();
       process();

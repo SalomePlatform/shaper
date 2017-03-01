@@ -4,7 +4,7 @@
 // Created: 14 Dec 2014
 // Author:  Artem ZHIDKOV
 
-#include "PlaneGCSSolver_Solver.h"
+#include <PlaneGCSSolver_Solver.h>
 #include <Events_LongOp.h>
 
 
@@ -66,7 +66,7 @@ void PlaneGCSSolver_Solver::removeParameters(const GCS::SET_pD& theParams)
     }
 }
 
-SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
+PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
 {
   // clear list of conflicting constraints
   if (myConfCollected) {
@@ -82,7 +82,7 @@ SketchSolver_SolveStatus PlaneGCSSolver_Solver::solve()
   GCS::SolveStatus aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters);
   Events_LongOp::end(this);
 
-  SketchSolver_SolveStatus aStatus;
+  SolveStatus aStatus;
   if (aResult == GCS::Success) {
     myEquationSystem->applySolution();
     if (myDOF < 0)

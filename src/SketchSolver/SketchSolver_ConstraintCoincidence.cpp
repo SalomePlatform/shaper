@@ -2,7 +2,7 @@
 
 #include <SketchSolver_ConstraintCoincidence.h>
 #include <SketchSolver_Error.h>
-#include <SketchSolver_Manager.h>
+#include <PlaneGCSSolver_Tools.h>
 #include <PlaneGCSSolver_UpdateCoincidence.h>
 
 void SketchSolver_ConstraintCoincidence::process()
@@ -23,8 +23,7 @@ void SketchSolver_ConstraintCoincidence::process()
     return;
   }
 
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-  mySolverConstraint = aBuilder->createConstraint(
+  mySolverConstraint = PlaneGCSSolver_Tools::createConstraint(
       myBaseConstraint, getType(),
       aValue, anAttributes[0], anAttributes[1], anAttributes[2], anAttributes[3]);
 

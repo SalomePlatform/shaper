@@ -62,16 +62,6 @@ SketchSolver_Manager::~SketchSolver_Manager()
   myGroups.clear();
 }
 
-void SketchSolver_Manager::setBuilder(BuilderPtr theBuilder)
-{
-  myBuilder = theBuilder;
-}
-
-BuilderPtr SketchSolver_Manager::builder()
-{
-  return myBuilder;
-}
-
 bool SketchSolver_Manager::groupMessages()
 {
   return true;

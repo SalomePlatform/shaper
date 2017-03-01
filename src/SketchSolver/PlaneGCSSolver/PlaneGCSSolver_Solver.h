@@ -7,16 +7,24 @@
 #ifndef PlaneGCSSolver_Solver_H_
 #define PlaneGCSSolver_Solver_H_
 
-#include <SketchSolver_ISolver.h>
 #include <SketchSolver_IConstraintWrapper.h>
 #include <PlaneGCSSolver_Defs.h>
 
 #include <GCS.h>
 
 /// \brief The main class that performs the high-level operations for connection to the PlaneGCS.
-class PlaneGCSSolver_Solver : public SketchSolver_ISolver
+class PlaneGCSSolver_Solver
 {
 public:
+  /// The result of constraints solution
+  enum SolveStatus {
+    STATUS_OK,
+    STATUS_INCONSISTENT,
+    STATUS_EMPTYSET,
+    STATUS_FAILED, // set if no one other status is applicable
+    STATUS_UNKNOWN // set for newly created groups
+  };
+
   PlaneGCSSolver_Solver();
   ~PlaneGCSSolver_Solver();
 
@@ -36,20 +44,16 @@ public:
 
   /// \brief Solve the set of equations
   /// \return identifier whether solution succeeded
-  virtual SketchSolver_SolveStatus solve();
-
-  /// \brief Prepare for solving. Store initial values of parameters for undo
-  virtual void prepare()
-  { /* do nothing */ }
+  SolveStatus solve();
 
   /// \brief Revert solution to initial values
-  virtual void undo();
+  void undo();
 
   /// \brief Check the constraint is conflicted with others
-  virtual bool isConflicting(const ConstraintID& theConstraint) const;
+  bool isConflicting(const ConstraintID& theConstraint) const;
 
   /// \brief Degrees of freedom
-  virtual int dof();
+  int dof();
 
 private:
   void collectConflicting();
@@ -69,5 +73,7 @@ private:
 
   int                          myDOF;            ///< degrees of freedom
 };
+
+typedef std::shared_ptr<PlaneGCSSolver_Solver> SolverPtr;
 
 #endif

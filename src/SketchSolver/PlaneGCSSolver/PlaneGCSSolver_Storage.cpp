@@ -5,7 +5,6 @@
 // Author:  Artem ZHIDKOV
 
 #include <PlaneGCSSolver_Storage.h>
-#include <PlaneGCSSolver_Builder.h>
 #include <PlaneGCSSolver_Solver.h>
 #include <PlaneGCSSolver_ConstraintWrapper.h>
 #include <PlaneGCSSolver_EntityWrapper.h>
@@ -19,6 +18,7 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
+#include <ModelAPI_AttributeRefAttr.h>
 #include <SketchPlugin_Projection.h>
 
 #include <cmath>
@@ -266,9 +266,7 @@ bool PlaneGCSSolver_Storage::removeConstraint(ConstraintPtr theConstraint)
   if (aFound != myConstraintMap.end()) {
     ConstraintID anID = aFound->second->id();
     // Remove solver's constraints
-    std::shared_ptr<PlaneGCSSolver_Solver> aSolver =
-        std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(mySketchSolver);
-    aSolver->removeConstraint(anID);
+    mySketchSolver->removeConstraint(anID);
     // Remove constraint
     myConstraintMap.erase(aFound);
 
@@ -305,8 +303,7 @@ void PlaneGCSSolver_Storage::removeInvalidEntities()
       std::map<EntityWrapperPtr, ConstraintWrapperPtr>::iterator
           aFound = myArcConstraintMap.find(aFIter->second);
       if (aFound != myArcConstraintMap.end()) {
-        std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(
-            mySketchSolver)->removeConstraint(aFound->second->id());
+        mySketchSolver->removeConstraint(aFound->second->id());
         myArcConstraintMap.erase(aFound);
       }
     }
@@ -338,66 +335,12 @@ void PlaneGCSSolver_Storage::removeInvalidEntities()
 
 double* PlaneGCSSolver_Storage::createParameter()
 {
-  return std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(mySketchSolver)->createParameter();
+  return mySketchSolver->createParameter();
 }
 
 void PlaneGCSSolver_Storage::removeParameters(const GCS::SET_pD& theParams)
 {
-  std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(mySketchSolver)->removeParameters(theParams);
-}
-
-
-bool PlaneGCSSolver_Storage::isRedundant(
-    GCSConstraintPtr theCheckedConstraint,
-    ConstraintWrapperPtr theParentConstraint,
-    std::list<std::set<double*> >& theCoincidentPoints) const
-{
-  if (theParentConstraint->type() == CONSTRAINT_SYMMETRIC) {
-    if (theCheckedConstraint->getTypeId() == GCS::Perpendicular) {
-      BuilderPtr aBuilder = PlaneGCSSolver_Builder::getInstance();
-      // check the initial point is placed on the mirror line
-      std::list<EntityWrapperPtr> aSubs = theParentConstraint->entities();
-      std::shared_ptr<GeomAPI_Pnt2d> aPoint = aBuilder->point(aSubs.front());
-      std::shared_ptr<GeomAPI_Lin2d> aLine = aBuilder->line(aSubs.back());
-      return aLine->distance(aPoint) < tolerance;
-    }
-  }
-  else if (theParentConstraint->type() == CONSTRAINT_PT_PT_COINCIDENT) {
-    // Verify that the coincidence between points is already added
-    GCS::VEC_pD aParams = theCheckedConstraint->params();
-
-    std::list<std::set<double*> >::iterator aCoincIt, aFound1, aFound2;
-    aFound1 = aFound2 = theCoincidentPoints.end();
-    for (aCoincIt = theCoincidentPoints.begin();
-         aCoincIt != theCoincidentPoints.end(); ++aCoincIt) {
-      if (aFound1 == theCoincidentPoints.end() && aCoincIt->find(aParams[0]) != aCoincIt->end())
-        aFound1 = aCoincIt;
-      if (aFound2 == theCoincidentPoints.end() && aCoincIt->find(aParams[1]) != aCoincIt->end())
-        aFound2 = aCoincIt;
-      if (aFound1 != theCoincidentPoints.end() && aFound2 != theCoincidentPoints.end())
-        break;
-    }
-    if (aCoincIt != theCoincidentPoints.end()) { // both point are found
-      if (aFound1 == aFound2)
-        return true;
-      // merge two groups of coincidence
-      aFound1->insert(aFound2->begin(), aFound2->end());
-      theCoincidentPoints.erase(aFound2);
-    } else {
-      if (aFound1 != theCoincidentPoints.end())
-        aFound1->insert(aParams[1]);
-      else if (aFound2 != theCoincidentPoints.end())
-        aFound2->insert(aParams[0]);
-      else {
-        std::set<double*> aNewCoincidence;
-        aNewCoincidence.insert(aParams[0]);
-        aNewCoincidence.insert(aParams[1]);
-        theCoincidentPoints.push_back(aNewCoincidence);
-      }
-    }
-  }
-
-  return false;
+  mySketchSolver->removeParameters(theParams);
 }
 
 // indicates attribute containing in the external feature

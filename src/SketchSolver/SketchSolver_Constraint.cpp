@@ -1,11 +1,10 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 #include <SketchSolver_Constraint.h>
-#include <SketchSolver_Group.h>
 #include <SketchSolver_Error.h>
-#include <SketchSolver_Manager.h>
 
 #include <PlaneGCSSolver_AttributeBuilder.h>
+#include <PlaneGCSSolver_Tools.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
@@ -114,8 +113,7 @@ void SketchSolver_Constraint::process()
   if (aConstrType == CONSTRAINT_UNKNOWN)
     aConstrType = getType();
 
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
-  ConstraintWrapperPtr aNewConstraint = aBuilder->createConstraint(
+  ConstraintWrapperPtr aNewConstraint = PlaneGCSSolver_Tools::createConstraint(
       myBaseConstraint, aConstrType,
       aValue, anAttributes[0], anAttributes[1], anAttributes[2], anAttributes[3]);
   myStorage->addConstraint(myBaseConstraint, aNewConstraint);
@@ -183,7 +181,6 @@ void SketchSolver_Constraint::getAttributes(
   myAttributes.clear();
 
   DataPtr aData = myBaseConstraint->data();
-  BuilderPtr aBuilder = SketchSolver_Manager::instance()->builder();
 
   myType = TYPE(myBaseConstraint);
 

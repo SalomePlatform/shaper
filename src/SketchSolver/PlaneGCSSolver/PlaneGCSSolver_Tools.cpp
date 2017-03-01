@@ -1,21 +1,42 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:    PlaneGCSSolver_Builder.cpp
-// Created: 14 Dec 2015
+// File:    SketchSolver_Builder.cpp
+// Created: 25 Mar 2015
 // Author:  Artem ZHIDKOV
 
-#include <PlaneGCSSolver_Builder.h>
-#include <PlaneGCSSolver_Storage.h>
+#include <PlaneGCSSolver_Tools.h>
 #include <PlaneGCSSolver_EntityWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
 #include <PlaneGCSSolver_ScalarWrapper.h>
 #include <PlaneGCSSolver_ConstraintWrapper.h>
 
-#include <SketchSolver_Manager.h>
+#include <SketchSolver_Constraint.h>
+#include <SketchSolver_ConstraintAngle.h>
+#include <SketchSolver_ConstraintCoincidence.h>
+#include <SketchSolver_ConstraintCollinear.h>
+#include <SketchSolver_ConstraintDistance.h>
+#include <SketchSolver_ConstraintEqual.h>
+#include <SketchSolver_ConstraintFixed.h>
+#include <SketchSolver_ConstraintLength.h>
+#include <SketchSolver_ConstraintMiddle.h>
+#include <SketchSolver_ConstraintMirror.h>
+#include <SketchSolver_ConstraintTangent.h>
+#include <SketchSolver_ConstraintMultiRotation.h>
+#include <SketchSolver_ConstraintMultiTranslation.h>
 
-#include <GeomDataAPI_Point2D.h>
-#include <SketchPlugin_Line.h>
 #include <SketchPlugin_ConstraintAngle.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintCollinear.h>
+#include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintEqual.h>
+#include <SketchPlugin_ConstraintLength.h>
+#include <SketchPlugin_ConstraintMiddle.h>
+#include <SketchPlugin_ConstraintMirror.h>
+#include <SketchPlugin_ConstraintRigid.h>
+#include <SketchPlugin_ConstraintTangent.h>
+#include <SketchPlugin_Line.h>
+#include <SketchPlugin_MultiRotation.h>
+#include <SketchPlugin_MultiTranslation.h>
 
 #include <cmath>
 
@@ -77,38 +98,54 @@ static ConstraintWrapperPtr
 
 
 
-// Initialization of pointer to builder
-static BuilderPtr gBuilder = PlaneGCSSolver_Builder::getInstance();
 
-BuilderPtr PlaneGCSSolver_Builder::getInstance()
+
+SolverConstraintPtr PlaneGCSSolver_Tools::createConstraint(ConstraintPtr theConstraint)
 {
-  static BuilderPtr mySelf;
-  if (!mySelf) {
-    mySelf = BuilderPtr(new PlaneGCSSolver_Builder);
-    SketchSolver_Manager::instance()->setBuilder(mySelf);
+  if (theConstraint->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintCoincidence(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintCollinear::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintCollinear(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintDistance::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintDistance(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintEqual::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintEqual(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintLength::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintLength(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintMiddle::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintMiddle(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintMirror::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintMirror(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintTangent::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintTangent(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintRigid::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintFixed(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_MultiTranslation::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintMultiTranslation(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_MultiRotation::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintMultiRotation(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintAngle::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintAngle(theConstraint));
   }
-  return mySelf;
+  // All other types of constraints
+  return SolverConstraintPtr(new SketchSolver_Constraint(theConstraint));
 }
 
-StoragePtr PlaneGCSSolver_Builder::createStorage(const SolverPtr& theSolver) const
+SolverConstraintPtr PlaneGCSSolver_Tools::createMovementConstraint(FeaturePtr theMovedFeature)
 {
-  return StoragePtr(new PlaneGCSSolver_Storage(theSolver));
-}
-
-SolverPtr PlaneGCSSolver_Builder::createSolver() const
-{
-  return SolverPtr(new PlaneGCSSolver_Solver);
+  return SolverConstraintPtr(new SketchSolver_ConstraintFixed(theMovedFeature));
 }
 
 
-ConstraintWrapperPtr PlaneGCSSolver_Builder::createConstraint(
+
+ConstraintWrapperPtr PlaneGCSSolver_Tools::createConstraint(
     ConstraintPtr theConstraint,
     const SketchSolver_ConstraintType& theType,
     const EntityWrapperPtr& theValue,
     const EntityWrapperPtr& thePoint1,
     const EntityWrapperPtr& thePoint2,
     const EntityWrapperPtr& theEntity1,
-    const EntityWrapperPtr& theEntity2) const
+    const EntityWrapperPtr& theEntity2)
 {
   ConstraintWrapperPtr aResult;
   ScalarWrapperPtr anIntermediate;
@@ -188,35 +225,7 @@ ConstraintWrapperPtr PlaneGCSSolver_Builder::createConstraint(
   return aResult;
 }
 
-ConstraintWrapperPtr PlaneGCSSolver_Builder::createConstraint(
-    ConstraintPtr theConstraint,
-    const SketchSolver_ConstraintType& theType,
-    const EntityWrapperPtr& theValue,
-    const bool theFullValue,
-    const EntityWrapperPtr& thePoint1,
-    const EntityWrapperPtr& thePoint2,
-    const std::list<EntityWrapperPtr>& theTrsfEnt) const
-{
-  if (theType != CONSTRAINT_MULTI_ROTATION && theType != CONSTRAINT_MULTI_TRANSLATION)
-    return ConstraintWrapperPtr();
-
-  std::list<EntityWrapperPtr> aConstrAttrList = theTrsfEnt;
-  if (thePoint2)
-    aConstrAttrList.push_front(thePoint2);
-  aConstrAttrList.push_front(thePoint1);
-
-  ScalarWrapperPtr aValue = GCS_SCALAR_WRAPPER(theValue);
-
-  std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aResult(
-      new PlaneGCSSolver_ConstraintWrapper(std::list<GCSConstraintPtr>(), theType));
-  aResult->setEntities(aConstrAttrList);
-  if (aValue)
-    aResult->setValueParameter(aValue);
-  aResult->setIsFullValue(theFullValue);
-  return aResult;
-}
-
-std::shared_ptr<GeomAPI_Pnt2d> PlaneGCSSolver_Builder::point(EntityWrapperPtr theEntity) const
+std::shared_ptr<GeomAPI_Pnt2d> PlaneGCSSolver_Tools::point(EntityWrapperPtr theEntity)
 {
   if (theEntity->type() != ENTITY_POINT)
     return std::shared_ptr<GeomAPI_Pnt2d>();
@@ -227,7 +236,7 @@ std::shared_ptr<GeomAPI_Pnt2d> PlaneGCSSolver_Builder::point(EntityWrapperPtr th
   return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(*aPoint->x, *aPoint->y));
 }
 
-std::shared_ptr<GeomAPI_Lin2d> PlaneGCSSolver_Builder::line(EntityWrapperPtr theEntity) const
+std::shared_ptr<GeomAPI_Lin2d> PlaneGCSSolver_Tools::line(EntityWrapperPtr theEntity)
 {
   if (theEntity->type() != ENTITY_LINE)
     return std::shared_ptr<GeomAPI_Lin2d>();
@@ -239,7 +248,7 @@ std::shared_ptr<GeomAPI_Lin2d> PlaneGCSSolver_Builder::line(EntityWrapperPtr the
       new GeomAPI_Lin2d(*(aLine->p1.x), *(aLine->p1.y), *(aLine->p2.x), *(aLine->p2.y)));
 }
 
-std::shared_ptr<GeomAPI_Lin2d> PlaneGCSSolver_Builder::line(FeaturePtr theFeature) const
+std::shared_ptr<GeomAPI_Lin2d> PlaneGCSSolver_Tools::line(FeaturePtr theFeature)
 {
   if (theFeature->getKind() != SketchPlugin_Line::ID())
     return std::shared_ptr<GeomAPI_Lin2d>();
@@ -513,8 +522,8 @@ ConstraintWrapperPtr createConstraintTangent(
   return ConstraintWrapperPtr(new PlaneGCSSolver_ConstraintWrapper(aNewConstr, theType));
 }
 
-bool PlaneGCSSolver_Builder::isArcArcTangencyInternal(
-    EntityWrapperPtr theArc1, EntityWrapperPtr theArc2) const
+bool PlaneGCSSolver_Tools::isArcArcTangencyInternal(
+    EntityWrapperPtr theArc1, EntityWrapperPtr theArc2)
 {
   std::shared_ptr<GCS::Circle> aCirc1 = std::dynamic_pointer_cast<GCS::Circle>(
       GCS_ENTITY_WRAPPER(theArc1)->entity());
