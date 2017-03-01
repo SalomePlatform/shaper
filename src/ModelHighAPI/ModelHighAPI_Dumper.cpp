@@ -470,7 +470,8 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
 bool ModelHighAPI_Dumper::isDumped(const EntityPtr& theEntity) const
 {
   EntityNameMap::const_iterator aFound = myNames.find(theEntity);
-  return aFound != myNames.end();
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theEntity);
+  return aFound != myNames.end() || myFeaturesToSkip.find(aFeature) != myFeaturesToSkip.end();
 }
 
 bool ModelHighAPI_Dumper::isDefaultColor(const ResultPtr& theResult) const

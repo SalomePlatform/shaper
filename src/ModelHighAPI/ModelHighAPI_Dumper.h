@@ -103,6 +103,11 @@ public:
   /// Dump given feature
   virtual void dumpFeature(const FeaturePtr& theFeature, const bool theForce = false) = 0;
 
+  /// Set a feature that should not be dumped anyway
+  MODELHIGHAPI_EXPORT
+  void doNotDumpFeature(const FeaturePtr& theFeature)
+  { myFeaturesToSkip.insert(theFeature); }
+
   /// Dump sub-feature name and color, without dumping feature creation.
   /// Used for features which creates sub-features in their execute method.
   /// \param theSubFeatureGet [in] method for getting sub-feature (e.g. "Feature_1.subFeature(0)")
@@ -303,6 +308,9 @@ private:
   DumpStack           myEntitiesStack;      ///< stack of dumped entities
 
   NbFeaturesMap       myFeatureCount;       ///< number of features of each kind
+
+  /// features which should not be dumped (like coincidence and tangency created by tangent arc)
+  std::set<FeaturePtr> myFeaturesToSkip;
 
 protected:
    /// list of entities, used by other features but not dumped yet

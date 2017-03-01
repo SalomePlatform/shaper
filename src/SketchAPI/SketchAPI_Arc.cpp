@@ -13,6 +13,12 @@
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 
+#include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintTangent.h>
+
+/// Obtain constraints prepared by tangent arc
+static std::list<FeaturePtr> tangentArcConstraints(const FeaturePtr& theArc);
+
 //================================================================================================
 SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature> & theFeature)
 : SketchAPI_SketchEntity(theFeature)
@@ -259,6 +265,12 @@ void SketchAPI_Arc::dump(ModelHighAPI_Dumper& theDumper) const
       theDumper << aBase << " = " << aSketchName << ".addArc(" << startPoint() << ", "
                 << endPoint() << ", " << passedPoint() << ")" << std::endl;
     } else {
+      // do not dump coincidence and tangency constraint built by tangent arc
+      std::list<FeaturePtr> aConstraintsToSkip = tangentArcConstraints(aBase);
+      std::list<FeaturePtr>::iterator anIt = aConstraintsToSkip.begin();
+      for (; anIt != aConstraintsToSkip.end(); ++anIt)
+        theDumper.doNotDumpFeature(*anIt);
+
       // tangent arc
       AttributeRefAttrPtr aTangentPoint = tangentPoint();
       theDumper << aBase << " = " << aSketchName << ".addArc("
@@ -267,4 +279,61 @@ void SketchAPI_Arc::dump(ModelHighAPI_Dumper& theDumper) const
   }
   // dump "auxiliary" flag if necessary
   SketchAPI_SketchEntity::dump(theDumper);
+}
+
+
+// ====================   Auxiliary functions   ===============================
+std::list<FeaturePtr> tangentArcConstraints(const FeaturePtr& theArc)
+{
+  std::list<FeaturePtr> aConstraints;
+
+  std::set<FeaturePtr> aCoincidences;
+  std::set<FeaturePtr> aTangencies;
+
+  const std::set<AttributePtr>& aBaseRefs = theArc->data()->refsToMe();
+  std::set<AttributePtr>::const_iterator anIt = aBaseRefs.begin();
+  for (; anIt != aBaseRefs.end(); ++anIt) {
+    FeaturePtr anOwner = ModelAPI_Feature::feature((*anIt)->owner());
+    if (anOwner->getKind() == SketchPlugin_ConstraintCoincidence::ID())
+      aCoincidences.insert(anOwner);
+  }
+  const std::set<AttributePtr>& aBaseResultRefs = theArc->lastResult()->data()->refsToMe();
+  for (anIt = aBaseResultRefs.begin(); anIt != aBaseResultRefs.end(); ++anIt) {
+    FeaturePtr anOwner = ModelAPI_Feature::feature((*anIt)->owner());
+    if (anOwner->getKind() == SketchPlugin_ConstraintTangent::ID())
+      aTangencies.insert(anOwner);
+  }
+
+  AttributePtr aTangentPoint = theArc->refattr(SketchPlugin_Arc::TANGENT_POINT_ID())->attr();
+  if (aTangentPoint) {
+    FeaturePtr aTangentFeature = ModelAPI_Feature::feature(aTangentPoint->owner());
+
+    const std::set<AttributePtr>& aTgRefs = aTangentFeature->data()->refsToMe();
+    for (anIt = aTgRefs.begin(); anIt != aTgRefs.end(); ++anIt) {
+      FeaturePtr anOwner = ModelAPI_Feature::feature((*anIt)->owner());
+      if (aCoincidences.find(anOwner) != aCoincidences.end()) {
+        // check the coincidence is correct
+        AttributePtr aConstrained1 = anOwner->refattr(SketchPlugin_Constraint::ENTITY_A())->attr();
+        AttributePtr aConstrained2 = anOwner->refattr(SketchPlugin_Constraint::ENTITY_B())->attr();
+        AttributePtr anArcStartPoint = theArc->attribute(SketchPlugin_Arc::START_ID());
+        if ((aConstrained1 == anArcStartPoint && aConstrained2 == aTangentPoint) ||
+            (aConstrained1 == aTangentPoint && aConstrained2 == anArcStartPoint)) {
+          aConstraints.push_back(anOwner);
+          break; // search first applicable coincidence only
+        }
+      }
+    }
+
+    const std::set<AttributePtr>& aTgResultRefs =
+        aTangentFeature->lastResult()->data()->refsToMe();
+    for (anIt = aTgResultRefs.begin(); anIt != aTgResultRefs.end(); ++anIt) {
+      FeaturePtr anOwner = ModelAPI_Feature::feature((*anIt)->owner());
+      if (aTangencies.find(anOwner) != aTangencies.end()) {
+        aConstraints.push_back(anOwner);
+        break; // search first tangency only
+      }
+    }
+  }
+
+  return aConstraints;
 }
