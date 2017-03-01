@@ -13,6 +13,10 @@ while [[ $# > 0 ]]; do
       USE_TEST_COVERAGE=ON
       shift
       ;;
+    models|test-models)
+      ADD_MODELS_TESTS=TRUE
+      shift
+      ;;
     *)
       shift
       ;;
@@ -24,6 +28,7 @@ source env.sh
 CMAKE_ARGS=""
 CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_BUILD_TYPE=${BUILD_TYPE:-Release}"
 CMAKE_ARGS="${CMAKE_ARGS} -DUSE_TEST_COVERAGE=${USE_TEST_COVERAGE:-OFF}"
+CMAKE_ARGS="${CMAKE_ARGS} -DADD_MODELS_TESTS=${ADD_MODELS_TESTS:-FALSE}"
 CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX:PATH=${SHAPER_ROOT_DIR}"
 CMAKE_ARGS="${CMAKE_ARGS} ${SOURCES_DIR}"
 

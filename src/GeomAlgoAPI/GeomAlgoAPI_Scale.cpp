@@ -39,11 +39,11 @@ GeomAlgoAPI_Scale::GeomAlgoAPI_Scale(std::shared_ptr<GeomAPI_Shape> theSourceSha
 bool GeomAlgoAPI_Scale::check()
 {
   if (!mySourceShape) {
-    myError = "Scale builder :: source shape is invalid.";
+    myError = "Scale builder :: source shape is not valid.";
     return false;
   }
   if (!myCenterPoint) {
-    myError = "Scale builder :: center point is invalid.";
+    myError = "Scale builder :: center point is not valid.";
     return false;
   }
   switch (myMethodType) {

@@ -41,33 +41,33 @@ bool GeomAlgoAPI_Symmetry::check()
   switch (myMethodType) {
     case BY_POINT: {
       if (!myPoint) {
-        myError = "Symmetry builder :: point is invalid.";
+        myError = "Symmetry builder :: point is not valid.";
         return false;
       }
       if (!mySourceShape) {
-        myError = "Symmetry builder :: source shape is invalid.";
+        myError = "Symmetry builder :: source shape is not valid.";
         return false;
       }
       return true;
     }
     case BY_AXIS: {
       if (!myAxis) {
-        myError = "Symmetry builder :: axis is invalid.";
+        myError = "Symmetry builder :: axis is not valid.";
         return false;
       }
       if (!mySourceShape) {
-        myError = "Symmetry builder :: source shape is invalid.";
+        myError = "Symmetry builder :: source shape is not valid.";
         return false;
       }
       return true;
     }
     case BY_PLANE: {
       if (!myPlane) {
-        myError = "Symmetry builder :: plane is invalid.";
+        myError = "Symmetry builder :: plane is not valid.";
         return false;
       }
       if (!mySourceShape) {
-        myError = "Symmetry builder :: source shape is invalid.";
+        myError = "Symmetry builder :: source shape is not valid.";
         return false;
       }
       return true;
