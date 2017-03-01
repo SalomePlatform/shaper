@@ -31,7 +31,6 @@
           min="0."
           icon="icons/Primitives/radius.png"
           tooltip="Enter the radius of the cylinder">
-        <validator id="GeomValidators_Positive"/>
       </doublevalue>
       <doublevalue
           id="height"
@@ -41,7 +40,6 @@
           min="0."
           icon="icons/Primitives/dimension_v.png"
           tooltip="Enter the height of the cylinder">
-        <validator id="GeomValidators_Positive"/>
       </doublevalue>
     </box>
     <box id="CylinderPortion" title="Portion of cylinder" icon="icons/Primitives/cylinder_portion_32x32.png">
@@ -73,7 +71,6 @@
           min="0."
           icon="icons/Primitives/radius.png"
           tooltip="Enter the radius of the cylinder">
-        <validator id="GeomValidators_Positive"/>
       </doublevalue>
       <doublevalue
           id="height"
@@ -83,7 +80,6 @@
           min="0."
           icon="icons/Primitives/dimension_v.png"
           tooltip="Enter the height of the cylinder">
-        <validator id="GeomValidators_Positive"/>
       </doublevalue>
       <doublevalue
           id="angle"
@@ -94,7 +90,6 @@
           max="360."
           icon="icons/Primitives/angle.png"
           tooltip="Enter the angle of the portion of the cylinder">
-        <validator id="GeomValidators_Positive"/>
       </doublevalue>
     </box>
   </toolbox>
