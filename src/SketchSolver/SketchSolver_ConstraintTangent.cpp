@@ -47,35 +47,27 @@ void SketchSolver_ConstraintTangent::getAttributes(
 
   // Check the quantity of entities of each type and their order (arcs first)
   int aNbLines = 0;
-  int aNbArcs = 0;
   int aNbCircles = 0;
   bool isSwap = false; // whether need to swap arguments (arc goes before line)
   std::vector<EntityWrapperPtr>::iterator anEntIt = theAttributes.begin() + 2;
   for (; anEntIt != theAttributes.end(); ++anEntIt) {
     if ((*anEntIt)->type() == ENTITY_LINE)
       ++aNbLines;
-    else if ((*anEntIt)->type() == ENTITY_ARC) {
-      ++aNbArcs;
-      isSwap = aNbLines > 0;
-    }
-    else if ((*anEntIt)->type() == ENTITY_CIRCLE) {
+    else if ((*anEntIt)->type() == ENTITY_ARC || (*anEntIt)->type() == ENTITY_CIRCLE) {
       ++aNbCircles;
       isSwap = aNbLines > 0;
     }
   }
 
-  if (aNbArcs < 1 && aNbCircles < 1) {
+  if (aNbCircles < 1) {
     myErrorMsg = SketchSolver_Error::INCORRECT_TANGENCY_ATTRIBUTE();
     return;
   }
-  if (aNbLines == 1) {
-    if (aNbArcs == 1)
-      myType = CONSTRAINT_TANGENT_ARC_LINE;
-    else if (aNbCircles == 1)
-      myType = CONSTRAINT_TANGENT_CIRCLE_LINE;
+  if (aNbLines == 1 && aNbCircles == 1) {
+    myType = CONSTRAINT_TANGENT_CIRCLE_LINE;
   }
-  else if (aNbArcs == 2) {
-    myType = CONSTRAINT_TANGENT_ARC_ARC;
+  else if (aNbCircles == 2) {
+    myType = CONSTRAINT_TANGENT_CIRCLE_CIRCLE;
     isArcArcInternal =
         PlaneGCSSolver_Tools::isArcArcTangencyInternal(theAttributes[2], theAttributes[3]);
   }
@@ -84,7 +76,7 @@ void SketchSolver_ConstraintTangent::getAttributes(
     return;
   }
 
-  if (myType == CONSTRAINT_TANGENT_ARC_LINE) {
+  if (myType == CONSTRAINT_TANGENT_CIRCLE_LINE) {
     AttributeRefAttrPtr aRefAttr = myBaseConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
     FeaturePtr aFeature1 = ModelAPI_Feature::feature(aRefAttr->object());
     aRefAttr = myBaseConstraint->refattr(SketchPlugin_Constraint::ENTITY_B());
@@ -103,7 +95,7 @@ void SketchSolver_ConstraintTangent::getAttributes(
 
 void SketchSolver_ConstraintTangent::adjustConstraint()
 {
-  if (myType == CONSTRAINT_TANGENT_ARC_ARC) {
+  if (myType == CONSTRAINT_TANGENT_CIRCLE_CIRCLE) {
     EntityWrapperPtr anEntity1 =
         myStorage->entity(myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
     EntityWrapperPtr anEntity2 =

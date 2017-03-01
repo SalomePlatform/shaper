@@ -204,9 +204,8 @@ ConstraintWrapperPtr PlaneGCSSolver_Tools::createConstraint(
                                     GCS_ENTITY_WRAPPER(theEntity2),
                                     anIntermediate);
     break;
-  case CONSTRAINT_TANGENT_ARC_LINE:
   case CONSTRAINT_TANGENT_CIRCLE_LINE:
-  case CONSTRAINT_TANGENT_ARC_ARC:
+  case CONSTRAINT_TANGENT_CIRCLE_CIRCLE:
     aResult = createConstraintTangent(theType,
                                       GCS_ENTITY_WRAPPER(theEntity1),
                                       GCS_ENTITY_WRAPPER(theEntity2));
@@ -498,7 +497,7 @@ ConstraintWrapperPtr createConstraintTangent(
     std::shared_ptr<PlaneGCSSolver_EntityWrapper> theEntity2)
 {
   GCSConstraintPtr aNewConstr;
-  if (theType == CONSTRAINT_TANGENT_ARC_LINE || theType == CONSTRAINT_TANGENT_CIRCLE_LINE) {
+  if (theType == CONSTRAINT_TANGENT_CIRCLE_LINE) {
     std::shared_ptr<GCS::Circle> aCirc =
       std::dynamic_pointer_cast<GCS::Circle>(theEntity1->entity());
     std::shared_ptr<GCS::Line> aLine =

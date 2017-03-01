@@ -198,7 +198,7 @@ bool SketchSolver_Group::resolveConstraints()
       }
     if (aCIt == myConstraints.end())
       myStorage->refresh();
-  } else if (isGroupEmpty)
+  } else if (isGroupEmpty && isWorkplaneValid())
     computeDoF();
   removeTemporaryConstraints();
   myStorage->setNeedToResolve(false);

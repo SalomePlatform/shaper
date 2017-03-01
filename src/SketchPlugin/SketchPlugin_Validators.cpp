@@ -108,57 +108,6 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribut
   return true;
 }
 
-static bool isCoincident(FeaturePtr theFeature1, FeaturePtr theFeature2)
-{
-  AttributePtr aFeature1PointAttr[2];
-  if(theFeature1->getKind() == SketchPlugin_Line::ID()) {
-    aFeature1PointAttr[0] = theFeature1->attribute(SketchPlugin_Line::START_ID());
-    aFeature1PointAttr[1] = theFeature1->attribute(SketchPlugin_Line::END_ID());
-  } else if(theFeature1->getKind() == SketchPlugin_Arc::ID()) {
-    aFeature1PointAttr[0] = theFeature1->attribute(SketchPlugin_Arc::START_ID());
-    aFeature1PointAttr[1] = theFeature1->attribute(SketchPlugin_Arc::END_ID());
-  }
-
-  std::set<AttributePtr> aRefsList = theFeature1->data()->refsToMe();
-  for(std::set<AttributePtr>::const_iterator aRefIt = aRefsList.begin();
-      aRefIt != aRefsList.end();
-      ++aRefIt) {
-    // Find constraint
-    FeaturePtr aRefFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIt)->owner());
-    if(aRefFeature->getKind() != SketchPlugin_ConstraintCoincidence::ID())
-      continue;
-    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*aRefIt);
-    AttributePtr anAttr = aRefAttr->attr();
-    if(anAttr != aFeature1PointAttr[0] && anAttr != aFeature1PointAttr[1])
-      continue;
-
-    // Get coincides from constraint.
-    std::set<FeaturePtr> aCoinsides;
-    SketchPlugin_Tools::findCoincidences(aRefFeature,
-                                         SketchPlugin_ConstraintCoincidence::ENTITY_A(),
-                                         aCoinsides);
-    SketchPlugin_Tools::findCoincidences(aRefFeature,
-                                         SketchPlugin_ConstraintCoincidence::ENTITY_B(),
-                                         aCoinsides);
-
-    if(aCoinsides.find(theFeature2) != aCoinsides.end()) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-static bool hasCoincidentPoint(FeaturePtr theFeature1, FeaturePtr theFeature2)
-{
-  if(theFeature1->getKind() == SketchPlugin_Circle::ID() ||
-      theFeature2->getKind() == SketchPlugin_Circle::ID()) {
-    return false;
-  }
-
-  return (isCoincident(theFeature1, theFeature2) && isCoincident(theFeature2, theFeature1));
-}
-
 bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute,
                                                 const std::list<std::string>& theArguments,
                                                 Events_InfoMessage& theError) const
@@ -190,11 +139,6 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
     if (!aOtherFea)
       return true;
 
-    if ((aRefFea->getKind() == SketchPlugin_Arc::ID() ||
-        aOtherFea->getKind() == SketchPlugin_Arc::ID()) &&
-        !hasCoincidentPoint(aRefFea, aOtherFea))
-      return false;
-
     if (aRefFea->getKind() == SketchPlugin_Line::ID()) {
       if (aOtherFea->getKind() != SketchPlugin_Arc::ID() &&
           aOtherFea->getKind() != SketchPlugin_Circle::ID()) {
@@ -204,20 +148,15 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
         return false;
       }
     }
-    else if (aRefFea->getKind() == SketchPlugin_Arc::ID()) {
+    else if (aRefFea->getKind() == SketchPlugin_Arc::ID() ||
+             aRefFea->getKind() == SketchPlugin_Circle::ID()) {
       if (aOtherFea->getKind() != SketchPlugin_Line::ID() &&
-        aOtherFea->getKind() != SketchPlugin_Arc::ID()) {
-        theError = "It refers to an %1, but %2 is not a %3 or an %4";
+          aOtherFea->getKind() != SketchPlugin_Arc::ID() &&
+          aOtherFea->getKind() != SketchPlugin_Circle::ID()) {
+        theError = "It refers to an %1, but %2 is not a %3 or an %4 or a %5";
         theError.arg(SketchPlugin_Arc::ID()).arg(aParamA)
-            .arg(SketchPlugin_Line::ID()).arg(SketchPlugin_Arc::ID());
-        return false;
-      }
-    }
-    else if (aRefFea->getKind() == SketchPlugin_Circle::ID()) {
-      if (aOtherFea->getKind() != SketchPlugin_Line::ID()) {
-        theError = "It refers to an %1, but %2 is not a %3";
-        theError.arg(SketchPlugin_Circle::ID()).arg(aParamA)
-            .arg(SketchPlugin_Line::ID());
+            .arg(SketchPlugin_Line::ID()).arg(SketchPlugin_Arc::ID())
+            .arg(SketchPlugin_Circle::ID());
         return false;
       }
     }

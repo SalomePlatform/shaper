@@ -164,6 +164,11 @@ void SketchPlugin_Arc::execute()
       aConstr2->setIsInHistory(false);
       setResult(aConstr2, 1);
     }
+
+    if (!hasResult && string(ARC_TYPE())->value() == ARC_TYPE_TANGENT()) {
+      // constraints for tangent arc have not been prepared yet, do them
+      tangencyArcConstraints();
+    }
   }
 }
 

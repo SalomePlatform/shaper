@@ -20,6 +20,14 @@ from salome.shaper import model
 
 __updated__ = "2015-03-17"
 
+def distancePointPoint(thePoint1, thePoint2):
+    """
+    subroutine to calculate distance between two points
+    result of calculated distance is has 10**-5 precision
+    """
+    aDist = math.sqrt((thePoint1.x()-thePoint2.x())**2 + (thePoint1.y()-thePoint2.y())**2)
+    return round(aDist, 5)
+
 def distancePointLine(point, line):
     """
     subroutine to calculate distance between point and line
@@ -36,6 +44,42 @@ def distancePointLine(point, line):
     aVecX = point.x() - aStartPoint.x()
     aVecY = point.y() - aStartPoint.y()
     return round(math.fabs(aVecX * aDirX + aVecY * aDirY), 5)
+
+def checkArcLineTangency(theArc, theLine):
+    """
+    subroutine to check that the line is tangent to arc/circle
+    """
+    if (theArc.getKind() == "SketchCircle"):
+        aCenter = geomDataAPI_Point2D(theArc.attribute("CircleCenter"))
+        aRadius = theArc.real("CircleRadius").value()
+    else:
+        aCenter = geomDataAPI_Point2D(theArc.attribute("ArcCenter"))
+        aStartPnt = geomDataAPI_Point2D(theArc.attribute("ArcStartPoint"))
+        aRadius = distancePointPoint(aStartPnt, aCenter)
+    aDist = distancePointLine(aCenter, theLine)
+    assert math.fabs(aDist - aRadius) < 2.e-5, "aDist = {0}, aRadius = {1}".format(aDist, aRadius)
+
+def checkArcArcTangency(theArc1, theArc2):
+    """
+    subroutine to check that arcs/circles arc tangent
+    """
+    anArcs = [theArc1, theArc2]
+    aCenters = []
+    aRadii = []
+    for anArc in anArcs:
+        if (anArc.getKind() == "SketchCircle"):
+            aCenter = geomDataAPI_Point2D(anArc.attribute("CircleCenter"))
+            aRadius = anArc.real("CircleRadius").value()
+        else:
+            aCenter = geomDataAPI_Point2D(anArc.attribute("ArcCenter"))
+            aStartPnt = geomDataAPI_Point2D(anArc.attribute("ArcStartPoint"))
+            aRadius = distancePointPoint(aStartPnt, aCenter)
+        aCenters.append(aCenter)
+        aRadii.append(aRadius)
+    aDist = distancePointPoint(aCenters[0], aCenters[1])
+    aRSum = aRadii[0] + aRadii[1]
+    aRDiff = math.fabs(aRadii[0] - aRadii[1])
+    assert math.fabs(aDist - aRSum) < 2.e-5 or math.fabs(aDist - aRDiff) < 2.e-5, "aDist = {0}, aRSum = {1}, aRDiff = {2}".format(aDist, aRSum, aRDiff)
 
 
 aSession = ModelAPI_Session.get()
@@ -113,21 +157,14 @@ aTangency = aSketchFeature.addFeature("SketchConstraintTangent")
 aRefObjectA = aTangency.refattr("ConstraintEntityA")
 aRefObjectB = aTangency.refattr("ConstraintEntityB")
 anObjectA = modelAPI_ResultConstruction(aSketchArc1.lastResult())
-anObjectB = modelAPI_ResultConstruction(aSketchLine1.firstResult())
+anObjectB = modelAPI_ResultConstruction(aSketchLine1.lastResult())
 assert (anObjectA is not None)
 assert (anObjectB is not None)
 aRefObjectA.setObject(anObjectA)
 aRefObjectB.setObject(anObjectB)
 aTangency.execute()
 aSession.finishOperation()
-anArcVecX = anArcStartPoint.x() - anArcCentr.x()
-anArcVecY = anArcStartPoint.y() - anArcCentr.y()
-aLen = math.sqrt(anArcVecX**2 + anArcVecY**2)
-aLineVecX = aLine1EndPoint.x() - aLine1StartPoint.x()
-aLineVecY = aLine1EndPoint.y() - aLine1StartPoint.y()
-aLen = aLen * math.sqrt(aLineVecX**2 + aLineVecY**2)
-aDot = anArcVecX * aLineVecX + anArcVecY * aLineVecY
-assert math.fabs(aDot) <= 2.e-6 * aLen, "Observed dot product: {0}".format(aDot)
+checkArcLineTangency(aSketchArc1, aSketchLine1)
 assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # Add tangency constraint for arc and second line and check correctness
@@ -137,21 +174,14 @@ aTangency = aSketchFeature.addFeature("SketchConstraintTangent")
 aRefObjectA = aTangency.refattr("ConstraintEntityA")
 aRefObjectB = aTangency.refattr("ConstraintEntityB")
 anObjectA = modelAPI_ResultConstruction(aSketchArc1.lastResult())
-anObjectB = modelAPI_ResultConstruction(aSketchLine2.firstResult())
+anObjectB = modelAPI_ResultConstruction(aSketchLine2.lastResult())
 assert (anObjectA is not None)
 assert (anObjectB is not None)
 aRefObjectA.setObject(anObjectA)
 aRefObjectB.setObject(anObjectB)
 aTangency.execute()
 aSession.finishOperation()
-anArcVecX = anArcEndPoint.x() - anArcCentr.x()
-anArcVecY = anArcEndPoint.y() - anArcCentr.y()
-aLen = math.sqrt(anArcVecX**2 + anArcVecY**2)
-aLineVecX = aLine2EndPoint.x() - aLine2StartPoint.x()
-aLineVecY = aLine2EndPoint.y() - aLine2StartPoint.y()
-aLen = aLen * math.sqrt(aLineVecX**2 + aLineVecY**2)
-aDot = anArcVecX * aLineVecX + anArcVecY * aLineVecY
-assert math.fabs(aDot) <= 2.e-6 * aLen, "Observed dot product: {0}".format(aDot)
+checkArcLineTangency(aSketchArc1, aSketchLine2)
 assert (model.dof(aSketchFeature) == 7)
 
 #=========================================================================
@@ -209,56 +239,94 @@ aRefObjectA.setObject(anObjectA)
 aRefObjectB.setObject(anObjectB)
 aTangency.execute()
 aSession.finishOperation()
-anArc1VecX = anArc1EndPoint.x() - anArc1Centr.x()
-anArc1VecY = anArc1EndPoint.y() - anArc1Centr.y()
-aLen = math.sqrt(anArc1VecX**2 + anArc1VecY**2)
-anArc2VecX = anArc2StartPoint.x() - anArc2Centr.x()
-anArc2VecY = anArc2StartPoint.y() - anArc2Centr.y()
-aLen = aLen * math.sqrt(anArc2VecX**2 + anArc2VecY**2)
-aCross = anArc1VecX * anArc2VecY - anArc1VecY * anArc2VecX
-assert math.fabs(aCross) <= 2.e-6 * aLen, "Observed cross product: {0}".format(aCross)
+checkArcArcTangency(aSketchArc1, aSketchArc2)
 assert (model.dof(aSketchFeature) == 14)
 
 #=========================================================================
-# TEST 3. Tangency between non-connected objects should be wrong
+# TEST 3. Tangency between non-connected objects should work
 #=========================================================================
-# Store data
-aLine2StartPointPrev = (aLine2StartPoint.x(), aLine2StartPoint.y())
-aLine2EndPointPrev = (aLine2EndPoint.x(), aLine2EndPoint.y())
-anArc2CenterPrev = (anArc2Centr.x(), anArc2Centr.y())
-anArc2StartPointPrev = (anArc2StartPoint.x(), anArc2StartPoint.y())
-anArc2EndPointPrev = (anArc2EndPoint.x(), anArc2EndPoint.y())
-#=========================================================================
-# Add tangency between arc2 and line2
-#=========================================================================
+# 3.1 tangency between arc2 and line2
 aSession.startOperation()
 aTangency = aSketchFeature.addFeature("SketchConstraintTangent")
 aRefObjectA = aTangency.refattr("ConstraintEntityA")
 aRefObjectB = aTangency.refattr("ConstraintEntityB")
 anObjectA = modelAPI_ResultConstruction(aSketchArc2.lastResult())
-anObjectB = modelAPI_ResultConstruction(aSketchLine2.firstResult())
+anObjectB = modelAPI_ResultConstruction(aSketchLine2.lastResult())
 assert (anObjectA is not None)
 assert (anObjectB is not None)
 aRefObjectA.setObject(anObjectA)
 aRefObjectB.setObject(anObjectB)
 aTangency.execute()
 aSession.finishOperation()
-# Check that nothing is changed
-aLine2StartPointNew = (aLine2StartPoint.x(), aLine2StartPoint.y())
-aLine2EndPointNew = (aLine2EndPoint.x(), aLine2EndPoint.y())
-anArc2CenterNew = (anArc2Centr.x(), anArc2Centr.y())
-anArc2StartPointNew = (anArc2StartPoint.x(), anArc2StartPoint.y())
-anArc2EndPointNew = (anArc2EndPoint.x(), anArc2EndPoint.y())
-assert(aLine2StartPointNew == aLine2StartPointPrev)
-assert(aLine2EndPointNew == aLine2EndPointPrev)
-assert(anArc2CenterNew == anArc2CenterPrev)
-assert(anArc2StartPointNew == anArc2StartPointPrev)
-assert(anArc2EndPointNew == anArc2EndPointPrev)
-assert (model.dof(aSketchFeature) == 14)
+checkArcLineTangency(aSketchArc2, aSketchLine2)
+assert (model.dof(aSketchFeature) == 13)
+
 aSession.startOperation()
 aDocument.removeFeature(aTangency)
 aSession.finishOperation()
 assert (model.dof(aSketchFeature) == 14)
+
+# 3.2  tangency between non-connected arcs
+aSession.startOperation()
+aSketchArc3 = aSketchFeature.addFeature("SketchArc")
+anArc3Centr = geomDataAPI_Point2D(aSketchArc3.attribute("ArcCenter"))
+anArc3Centr.setValue(100., -10.)
+anArc3StartPoint = geomDataAPI_Point2D(aSketchArc3.attribute("ArcStartPoint"))
+anArc3StartPoint.setValue(70., -10.)
+anArc3EndPoint = geomDataAPI_Point2D(aSketchArc3.attribute("ArcEndPoint"))
+anArc3EndPoint.setValue(100., 20.)
+aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 19)
+
+aSession.startOperation()
+aTangency = aSketchFeature.addFeature("SketchConstraintTangent")
+aTangency.refattr("ConstraintEntityA").setObject(modelAPI_ResultConstruction(aSketchArc2.lastResult()))
+aTangency.refattr("ConstraintEntityB").setObject(modelAPI_ResultConstruction(aSketchArc3.lastResult()))
+aSession.finishOperation()
+checkArcArcTangency(aSketchArc2, aSketchArc3)
+assert (model.dof(aSketchFeature) == 18)
+
+aSession.startOperation()
+aDocument.removeFeature(aSketchArc3)
+aDocument.removeFeature(aTangency)
+aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 14)
+
+# 3.3  tangency between arc and circle
+aSession.startOperation()
+aCircle1 = aSketchFeature.addFeature("SketchCircle")
+aCircleCenter = geomDataAPI_Point2D(aCircle1.attribute("CircleCenter"))
+aCircleRadius = aCircle1.real("CircleRadius")
+aCircleCenter.setValue(150., 100.)
+aCircleRadius.setValue(50.)
+aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 17)
+
+aSession.startOperation()
+aTangency1 = aSketchFeature.addFeature("SketchConstraintTangent")
+aTangency1.refattr("ConstraintEntityA").setObject(modelAPI_ResultConstruction(aSketchArc2.lastResult()))
+aTangency1.refattr("ConstraintEntityB").setObject(modelAPI_ResultConstruction(aCircle1.lastResult()))
+aSession.finishOperation()
+checkArcArcTangency(aSketchArc2, aCircle1)
+assert (model.dof(aSketchFeature) == 16)
+
+# 3.4  tangency between two circles
+aSession.startOperation()
+aCircle2 = aSketchFeature.addFeature("SketchCircle")
+aCircleCenter = geomDataAPI_Point2D(aCircle2.attribute("CircleCenter"))
+aCircleRadius = aCircle2.real("CircleRadius")
+aCircleCenter.setValue(120., 70.)
+aCircleRadius.setValue(20.)
+aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 19)
+
+aSession.startOperation()
+aTangency2 = aSketchFeature.addFeature("SketchConstraintTangent")
+aTangency2.refattr("ConstraintEntityA").setObject(modelAPI_ResultConstruction(aCircle1.lastResult()))
+aTangency2.refattr("ConstraintEntityB").setObject(modelAPI_ResultConstruction(aCircle2.lastResult()))
+aSession.finishOperation()
+checkArcArcTangency(aCircle1, aCircle2)
+assert (model.dof(aSketchFeature) == 18)
 
 #=========================================================================
 # TEST 4. Creating of tangency arc by the option of the SketchArc feature
@@ -269,20 +337,22 @@ aSketchArc3.string("ArcType").setValue("Tangent")
 anArc3Start = aSketchArc3.refattr("ArcTangentPoint")
 anArc3Start.setAttr(anArc1StartPoint)
 anArc3EndPoint = geomDataAPI_Point2D(aSketchArc3.attribute("ArcEndPoint"))
-anArc3EndPoint.setValue(100., 0.)
+anArc3EndPoint.setValue(anArc1StartPoint.x()-5, anArc1StartPoint.y()-30)
 aSession.finishOperation()
-anArc3Center = geomDataAPI_Point2D(aSketchArc2.attribute("ArcCenter"))
-anArc3StartPoint = geomDataAPI_Point2D(aSketchArc2.attribute("ArcStartPoint"))
-
-anArc1VecX = anArc1EndPoint.x() - anArc1Centr.x()
-anArc1VecY = anArc1EndPoint.y() - anArc1Centr.y()
-aLen = math.sqrt(anArc1VecX**2 + anArc1VecY**2)
-anArc3VecX = anArc3StartPoint.x() - anArc3Center.x()
-anArc3VecY = anArc3StartPoint.y() - anArc3Center.y()
-aLen = aLen * math.sqrt(anArc3VecX**2 + anArc3VecY**2)
-aCross = anArc1VecX * anArc3VecY - anArc1VecY * anArc3VecX
-assert math.fabs(aCross) <= 2.e-6 * aLen, "Observed cross product: {0}".format(aCross)
-assert (model.dof(aSketchFeature) == 19)
+checkArcArcTangency(aSketchArc1, aSketchArc3)
+# freeze radius of tangent arc
+aSession.startOperation()
+aConstraintRadius = aSketchFeature.addFeature("SketchConstraintRadius")
+aConstraintRadius.refattr("ConstraintEntityA").setObject(modelAPI_ResultConstruction(aSketchArc3.lastResult()))
+aConstraintRadius.real("ConstraintValue").setValue(30.)
+aSession.finishOperation()
+checkArcArcTangency(aSketchArc1, aSketchArc3)
+# do not check DoF here because it is unstable for tangent arcs,
+# remove tangent arc to avoid instability while dumping
+aSession.startOperation()
+ModelAPI.removeFeaturesAndReferences(FeatureSet([aSketchArc3]))
+aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 18)
 
 #=========================================================================
 # TEST 5. Creating of tangency between line and circle
@@ -299,7 +369,7 @@ aCircleRadius = aCircle.real("CircleRadius")
 aCircleCenter.setValue(150., 100.)
 aCircleRadius.setValue(20.)
 aSession.finishOperation()
-assert (model.dof(aSketchFeature) == 26)
+assert (model.dof(aSketchFeature) == 25)
 
 aSession.startOperation()
 aTangency = aSketchFeature.addFeature("SketchConstraintTangent")
@@ -314,8 +384,8 @@ aRefObjectB.setObject(anObjectB)
 aTangency.execute()
 aSession.finishOperation()
 
-assert(math.fabs(distancePointLine(aCircleCenter, aLine) - round(aCircleRadius.value(), 5)) < 1.e-10)
-assert (model.dof(aSketchFeature) == 25)
+checkArcLineTangency(aCircle, aLine)
+assert (model.dof(aSketchFeature) == 24)
 #=========================================================================
 # End of test
 #=========================================================================

@@ -139,6 +139,7 @@
 %template(DocumentList) std::list<std::shared_ptr<ModelAPI_Document> >;
 // std::set -> []
 %template(AttributeSet) std::set<std::shared_ptr<ModelAPI_Attribute> >;
+%template(FeatureSet) std::set<std::shared_ptr<ModelAPI_Feature> >;
 
 // std::dynamic_pointer_cast
 template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject);
