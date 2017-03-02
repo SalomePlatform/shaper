@@ -26,13 +26,14 @@ static bool hasSingleCoincidence(FeaturePtr theFeature1, FeaturePtr theFeature2)
     if (aRef && aRef->getKind() == SketchPlugin_ConstraintCoincidence::ID())
       aCoincidences.insert(aRef);
   }
+  int aNbCoinCidentPoints = 0;
   for (anIt = aRefs2.begin(); anIt != aRefs2.end(); ++anIt) {
     FeaturePtr aRef = ModelAPI_Feature::feature((*anIt)->owner());
-    if (aRef)
-      aCoincidences.erase(aRef);
+    if (aCoincidences.find(aRef) != aCoincidences.end())
+      ++aNbCoinCidentPoints;
   }
 
-  return aCoincidences.size() <= 1;
+  return aNbCoinCidentPoints <= 1;
 }
 
 void SketchSolver_ConstraintTangent::getAttributes(
