@@ -66,6 +66,10 @@ public:
                      const ModelHighAPI_Double& theZ,
                      const ModelHighAPI_Double& theStartPhi,
                      const ModelHighAPI_Double& theDeltaPhi);
+
+  /// Dump wrapped feature
+  GDMLAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
 /// Pointer on primitive ConeSegment object

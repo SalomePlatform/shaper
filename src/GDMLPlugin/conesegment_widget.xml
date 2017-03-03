@@ -44,7 +44,6 @@
       step="1.0"
       default="12.0"
       tooltip="Enter the height">
-      <validator id="GeomValidators_Positive"/>
     </doublevalue>
     <doublevalue
       id="startphi"
@@ -59,7 +58,6 @@
       step="15.0"
       default="270."
       tooltip="Enter the revolution angle">
-      <validator id="GeomValidators_Positive"/>
     </doublevalue>
   </groupbox>
   <label title="" icon="icons/GDML/gui_cone_segment.png"/>

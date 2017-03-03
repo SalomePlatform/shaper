@@ -82,6 +82,10 @@ bool GeomAlgoAPI_Translation::check()
         myError = "Translation builder :: source shape is invalid.";
         return false;
       }
+      if(myStartPoint->distance(myEndPoint) < Precision::Confusion()) {
+        myError = "Translation builder :: start point and end point coincide.";
+        return false;
+      }
       return true;
     }
     default: {
