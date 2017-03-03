@@ -10,6 +10,8 @@
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 
+#include <iostream>
+
 //==================================================================================================
 PrimitivesAPI_Cylinder::PrimitivesAPI_Cylinder(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
@@ -124,8 +126,8 @@ CylinderPtr addCylinder(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const ModelHighAPI_Double& theRadius,
                         const ModelHighAPI_Double& theHeight)
 {
-  ModelHighAPI_Selection aBasePoint("VERT", "Origin");
-  ModelHighAPI_Selection anAxis("EDGE", "OZ");
+  ModelHighAPI_Selection aBasePoint("VERTEX", "PartSet/Origin");
+  ModelHighAPI_Selection anAxis("EDGE", "PartSet/OZ");
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(PrimitivesAPI_Cylinder::ID());
   return CylinderPtr(new PrimitivesAPI_Cylinder(aFeature, aBasePoint, anAxis,
                                                 theRadius, theHeight));
@@ -137,9 +139,9 @@ CylinderPtr addCylinder(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const ModelHighAPI_Double& theHeight,
                         const ModelHighAPI_Double& theAngle)
 {
-  ModelHighAPI_Selection aBasePoint("VERT", "Origin");
-  ModelHighAPI_Selection anAxis("EDGE", "OZ");
+  ModelHighAPI_Selection aBasePoint("VERTEX", "PartSet/Origin");
+  ModelHighAPI_Selection anAxis("EDGE", "PartSet/OZ");
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(PrimitivesAPI_Cylinder::ID());
   return CylinderPtr(new PrimitivesAPI_Cylinder(aFeature, aBasePoint, anAxis,
-                                                theRadius, theHeight));
+                                                theRadius, theHeight, theAngle));
 }
