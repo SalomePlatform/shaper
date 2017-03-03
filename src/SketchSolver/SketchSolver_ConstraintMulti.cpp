@@ -99,6 +99,10 @@ void SketchSolver_ConstraintMulti::update()
     remove();
     process();
   }
+
+  // update derived object
+  updateLocal();
+  adjustConstraint();
 }
 
 void SketchSolver_ConstraintMulti::adjustConstraint()
