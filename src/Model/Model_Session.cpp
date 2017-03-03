@@ -435,7 +435,6 @@ void Model_Session::LoadPluginsInfo()
 {
   if (myPluginsInfoLoaded)  // nothing to do
     return;
-  Config_ModuleReader::loadScript("salome.shaper.initConfig", false);
   // Read plugins information from XML files
   Config_ModuleReader aModuleReader(Config_FeatureMessage::MODEL_EVENT());
   aModuleReader.readAll();

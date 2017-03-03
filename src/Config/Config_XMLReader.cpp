@@ -11,6 +11,7 @@
 #include <Config_Keywords.h>
 #include <Config_Common.h>
 #include <Config_PropManager.h>
+#include <Config_ModuleReader.h>
 
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
@@ -79,6 +80,9 @@ std::string Config_XMLReader::pluginConfigFile()
 
 void Config_XMLReader::readAll()
 {
+  // to load external modules dependencies (like GEOm for Connector Feature
+  Config_ModuleReader::loadScript("salome.shaper.initConfig", false);
+
   xmlNodePtr aRoot = findRoot();
   readRecursively(aRoot);
 }
