@@ -39,11 +39,12 @@ void PlaneGCSSolver_UpdateCoincidence::update(const FeaturePtr& theFeature)
     myNext->update(theFeature);
 }
 
-static bool hasExternalPoint(const std::set<EntityWrapperPtr>& theCoincidences)
+static bool hasAnotherExternalPoint(const std::set<EntityWrapperPtr>& theCoincidences,
+                                    const EntityWrapperPtr& thePoint)
 {
   std::set<EntityWrapperPtr>::const_iterator anIt = theCoincidences.begin();
   for (; anIt != theCoincidences.end(); ++anIt)
-    if ((*anIt)->type() == ENTITY_POINT && (*anIt)->isExternal())
+    if ((*anIt)->type() == ENTITY_POINT && (*anIt)->isExternal() && *anIt != thePoint)
       return true;
   return false;
 }
@@ -55,41 +56,49 @@ bool PlaneGCSSolver_UpdateCoincidence::checkCoincidence(
   bool isAccepted = true;
 
   std::list<std::set<EntityWrapperPtr> >::iterator anIt = myCoincident.begin();
-  std::list<std::set<EntityWrapperPtr> >::iterator aFound1 = myCoincident.end();
-  std::list<std::set<EntityWrapperPtr> >::iterator aFound2 = myCoincident.end();
+  std::list<std::set<EntityWrapperPtr> >::iterator
+      aFound[2] = {myCoincident.end(), myCoincident.end()};
+
   for (; anIt != myCoincident.end(); ++anIt) {
-    if (aFound1 == myCoincident.end() && anIt->find(theEntity1) != anIt->end())
-      aFound1 = anIt;
-    if (aFound2 == myCoincident.end() && anIt->find(theEntity2) != anIt->end())
-      aFound2 = anIt;
-    if (aFound1 != myCoincident.end() && aFound2 != myCoincident.end())
+    if (aFound[0] == myCoincident.end() && anIt->find(theEntity1) != anIt->end())
+      aFound[0] = anIt;
+    if (aFound[1] == myCoincident.end() && anIt->find(theEntity2) != anIt->end())
+      aFound[1] = anIt;
+    if (aFound[0] != myCoincident.end() && aFound[1] != myCoincident.end())
       break;
   }
 
-  if (aFound1 == myCoincident.end() && aFound2 == myCoincident.end()) {
+  if (aFound[0] == myCoincident.end() && aFound[1] == myCoincident.end()) {
     // new group of coincidence
     std::set<EntityWrapperPtr> aNewCoinc;
     aNewCoinc.insert(theEntity1);
     aNewCoinc.insert(theEntity2);
     myCoincident.push_back(aNewCoinc);
-  } else if (aFound1 == aFound2) // same group => already coincident
+  } else if (aFound[0] == aFound[1]) // same group => already coincident
     isAccepted = false;
   else {
     if (theEntity1->type() == ENTITY_POINT && theEntity2->type() == ENTITY_POINT &&
        (theEntity1->isExternal() || theEntity2->isExternal())) {
-      bool hasExternal = aFound1 != myCoincident.end() && hasExternalPoint(*aFound1);
-      hasExternal = hasExternal || (aFound2 != myCoincident.end() && hasExternalPoint(*aFound2));
+      bool hasExternal = false;
+      for (int i = 0; i < 2 && !hasExternal; ++i) {
+        if (aFound[i] != myCoincident.end()) {
+          if (theEntity1->isExternal())
+            hasExternal = hasAnotherExternalPoint(*aFound[i], theEntity1);
+          if (!hasExternal && theEntity2->isExternal())
+            hasExternal = hasAnotherExternalPoint(*aFound[i], theEntity2);
+        }
+      }
       if (hasExternal)
         isAccepted = false;
     }
 
-    if (aFound1 == myCoincident.end())
-      aFound2->insert(theEntity1);
-    else if (aFound2 == myCoincident.end())
-      aFound1->insert(theEntity2);
+    if (aFound[0] == myCoincident.end())
+      aFound[1]->insert(theEntity1);
+    else if (aFound[1] == myCoincident.end())
+      aFound[0]->insert(theEntity2);
     else { // merge two groups
-      aFound1->insert(aFound2->begin(), aFound2->end());
-      myCoincident.erase(aFound2);
+      aFound[0]->insert(aFound[1]->begin(), aFound[1]->end());
+      myCoincident.erase(aFound[1]);
     }
   }
 

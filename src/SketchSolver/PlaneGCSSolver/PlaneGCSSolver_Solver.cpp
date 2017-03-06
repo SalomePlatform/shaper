@@ -38,14 +38,17 @@ void PlaneGCSSolver_Solver::addConstraint(GCSConstraintPtr theConstraint,
 
   // Workaround: avoid tangent constraint in the list of redundant
   if (theType == CONSTRAINT_TANGENT_CIRCLE_LINE ||
-      theType == CONSTRAINT_TANGENT_CIRCLE_CIRCLE)
-    myTangentIDs.insert(theConstraint->getTag());
+      theType == CONSTRAINT_TANGENT_CIRCLE_CIRCLE ||
+      theType == CONSTRAINT_PT_PT_COINCIDENT ||
+      theType == CONSTRAINT_PT_ON_CIRCLE ||
+      theType == CONSTRAINT_PT_ON_LINE)
+    myConstraintIDsNotRedundant.insert(theConstraint->getTag());
 }
 
 void PlaneGCSSolver_Solver::removeConstraint(ConstraintID theID)
 {
   myConstraints.erase(theID);
-  myTangentIDs.erase(theID);
+  myConstraintIDsNotRedundant.erase(theID);
   if (myConstraints.empty()) {
     myEquationSystem->clear();
     myDOF = (int)myParameters.size();
@@ -91,8 +94,11 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
 
   GCS::VEC_I aRedundant;
   myEquationSystem->getRedundant(aRedundant);
-  if (!aRedundant.empty())
-    aResult = GCS::Failed;
+  if (!aRedundant.empty()) {
+    collectConflicting();
+    if (!myConflictingIDs.empty())
+      aResult = GCS::Failed;
+  }
 
   SolveStatus aStatus;
   if (aResult == GCS::Success) {
@@ -129,7 +135,7 @@ void PlaneGCSSolver_Solver::collectConflicting()
   GCS::VEC_I aTemp = aConflict;
   aConflict.clear();
   for (GCS::VEC_I::iterator anIt = aTemp.begin(); anIt != aTemp.end(); ++anIt)
-    if (myTangentIDs.find(*anIt) == myTangentIDs.end())
+    if (myConstraintIDsNotRedundant.find(*anIt) == myConstraintIDsNotRedundant.end())
       aConflict.push_back(*anIt);
   myConflictingIDs.insert(aConflict.begin(), aConflict.end());
 

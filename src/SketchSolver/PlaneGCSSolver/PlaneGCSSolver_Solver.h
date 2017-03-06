@@ -63,7 +63,10 @@ private:
 
   GCS::VEC_pD                  myParameters;     ///< list of unknowns
   ConstraintMap                myConstraints;    ///< list of constraints
-  GCS::SET_I                   myTangentIDs;     ///< IDs of tangent constraints
+
+  /// IDs of constraints (coincidence, tangency) which will not be treated as conflicting
+  /// if they are reported as redundant
+  GCS::SET_I                   myConstraintIDsNotRedundant;
 
   std::shared_ptr<GCS::System> myEquationSystem; ///< set of equations for solving in FreeGCS
 

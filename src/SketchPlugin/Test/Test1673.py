@@ -260,13 +260,12 @@ for ang in range(0, 50):
     aEndPoint.setValue(X, Y)
     model.do()
     movementTime = timer() - movementTime
-    print movementTime
     assert movementTime < expectedTime, "Time to move point {0} is greater than expected {1}".format(movementTime, expectedTime)
     assert math.fabs(aEndPoint.x() - X) < TOLERANCE and math.fabs(aEndPoint.y() - Y) < TOLERANCE, "({0}, {1}) != ({2}, {3})".format(aEndPoint.x(), aEndPoint.y(), X, Y)
     averageTime += movementTime
     nbMoves += 1
     aDeltaX = aEndPoint.x() - aCenter.x()
-    aDeltaY - aEndPoint.y() - aCenter.y()
+    aDeltaY = aEndPoint.y() - aCenter.y()
 print "Movement average time: {0}".format(averageTime / nbMoves)
 
 model.end()
