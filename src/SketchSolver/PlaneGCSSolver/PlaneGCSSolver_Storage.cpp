@@ -27,16 +27,11 @@
 static void constraintsToSolver(const ConstraintWrapperPtr& theConstraint,
                                 const SolverPtr& theSolver)
 {
-  std::shared_ptr<PlaneGCSSolver_Solver> aSolver =
-      std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(theSolver);
-  if (!aSolver)
-    return;
-
   const std::list<GCSConstraintPtr>& aConstraints =
       std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(theConstraint)->constraints();
   std::list<GCSConstraintPtr>::const_iterator anIt = aConstraints.begin();
   for (; anIt != aConstraints.end(); ++anIt)
-    aSolver->addConstraint(*anIt);
+    theSolver->addConstraint(*anIt, theConstraint->type());
 }
 
 
@@ -269,6 +264,9 @@ bool PlaneGCSSolver_Storage::removeConstraint(ConstraintPtr theConstraint)
     mySketchSolver->removeConstraint(anID);
     // Remove constraint
     myConstraintMap.erase(aFound);
+
+    if (anID != CID_MOVEMENT)
+      myNeedToResolve = true;
 
     // notify subscibers
     notify(theConstraint);

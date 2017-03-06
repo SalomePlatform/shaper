@@ -32,7 +32,7 @@ public:
   void clear();
 
   /// \brief Add constraint to the system of equations
-  void addConstraint(GCSConstraintPtr theConstraint);
+  void addConstraint(GCSConstraintPtr theConstraint, const SketchSolver_ConstraintType theType);
 
   /// \brief Remove constraint from the system of equations
   void removeConstraint(ConstraintID theID);
@@ -63,6 +63,7 @@ private:
 
   GCS::VEC_pD                  myParameters;     ///< list of unknowns
   ConstraintMap                myConstraints;    ///< list of constraints
+  GCS::SET_I                   myTangentIDs;     ///< IDs of tangent constraints
 
   std::shared_ptr<GCS::System> myEquationSystem; ///< set of equations for solving in FreeGCS
 
