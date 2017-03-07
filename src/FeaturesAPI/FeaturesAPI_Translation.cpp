@@ -142,7 +142,7 @@ void FeaturesAPI_Translation::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << ", " << anAttrStartPoint << ", " << anAttrEndPoint;
   }
 
-   theDumper << ")" << std::endl;
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================

@@ -139,7 +139,7 @@ void FeaturesAPI_MultiTranslation::dump(ModelHighAPI_Dumper& theDumper) const
     AttributeIntegerPtr anAttrSecondNumber =
       aBase->integer(FeaturesPlugin_MultiTranslation::NB_COPIES_SECOND_DIR_ID());
     theDumper << ", " << anAttrSecondAxis << ", " << anAttrSecondStep;
-    theDumper << ", " << anAttrSecondStep;
+    theDumper << ", " << anAttrSecondNumber;
   }
 
   theDumper << ")" << std::endl;
