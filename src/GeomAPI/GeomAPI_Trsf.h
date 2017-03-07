@@ -59,6 +59,15 @@ class GeomAPI_Trsf : public GeomAPI_Interface
   GEOMAPI_EXPORT void setRotation(const std::shared_ptr<GeomAPI_Ax1> theAxis,
                                   const double theAngle);
 
+  /** \brief Sets a rotation transformation using three points.
+   *  \param[in] theCenterPoint  rotation center.
+   *  \param[in] theStartPoint   start rotation point.
+   *  \param[in] theEndPoint     end rotation point.
+   */
+  GEOMAPI_EXPORT void setRotation(const std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
+                                  const std::shared_ptr<GeomAPI_Pnt> theStartPoint,
+                                  const std::shared_ptr<GeomAPI_Pnt> theEndPoint);
+
   /** \brief Sets a point symmetry transformation.
    *  \param[in] thePoint symmetry point.
    */

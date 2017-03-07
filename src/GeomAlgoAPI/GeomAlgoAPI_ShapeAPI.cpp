@@ -11,6 +11,7 @@
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_ConeSegment.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
+#include <GeomAlgoAPI_Rotation.h>
 #include <GeomAlgoAPI_Scale.h>
 #include <GeomAlgoAPI_Symmetry.h>
 #include <GeomAlgoAPI_Translation.h>
@@ -259,6 +260,51 @@ namespace GeomAlgoAPI_ShapeAPI
       throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
     }
     return aTranslationAlgo.shape();
+  }
+
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeRotation(
+    std::shared_ptr<GeomAPI_Shape> theSourceShape,
+    std::shared_ptr<GeomAPI_Ax1> theAxis,
+    const double theAngle) throw (GeomAlgoAPI_Exception)
+  {
+    GeomAlgoAPI_Rotation aRotationAlgo(theSourceShape, theAxis, theAngle);
+
+    if (!aRotationAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aRotationAlgo.getError());
+    }
+
+    aRotationAlgo.build();
+
+    if(!aRotationAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aRotationAlgo.getError());
+    }
+    if (!aRotationAlgo.checkValid("Rotation builder with two points")) {
+      throw GeomAlgoAPI_Exception(aRotationAlgo.getError());
+    }
+    return aRotationAlgo.shape();
+  }
+
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeRotation(
+    std::shared_ptr<GeomAPI_Shape> theSourceShape,
+    std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
+    std::shared_ptr<GeomAPI_Pnt> theStartPoint,
+    std::shared_ptr<GeomAPI_Pnt> theEndPoint) throw (GeomAlgoAPI_Exception)
+  {
+    GeomAlgoAPI_Rotation aRotationAlgo(theSourceShape, theCenterPoint, theStartPoint, theEndPoint);
+
+    if (!aRotationAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aRotationAlgo.getError());
+    }
+
+    aRotationAlgo.build();
+
+    if(!aRotationAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aRotationAlgo.getError());
+    }
+    if (!aRotationAlgo.checkValid("Rotation builder with two points")) {
+      throw GeomAlgoAPI_Exception(aRotationAlgo.getError());
+    }
+    return aRotationAlgo.shape();
   }
 
   //===============================================================================================

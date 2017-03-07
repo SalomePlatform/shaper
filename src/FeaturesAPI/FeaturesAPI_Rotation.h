@@ -35,17 +35,34 @@ public:
                        const ModelHighAPI_Selection& theAxisObject,
                        const ModelHighAPI_Double& theAngle);
 
+  /// Constructor with values.
+  FEATURESAPI_EXPORT
+  FeaturesAPI_Rotation(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                       const std::list<ModelHighAPI_Selection>& theMainObjects,
+                       const ModelHighAPI_Selection& theCenterPoint,
+                       const ModelHighAPI_Selection& theStartPoint,
+                       const ModelHighAPI_Selection& theEndPoint);
+
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_Rotation();
 
-  INTERFACE_3(FeaturesPlugin_Rotation::ID(),
+  INTERFACE_7(FeaturesPlugin_Rotation::ID(),
+              creationMethod, FeaturesPlugin_Rotation::CREATION_METHOD(),
+              ModelAPI_AttributeString, /** Creation method */,
               mainObjects, FeaturesPlugin_Rotation::OBJECTS_LIST_ID(),
               ModelAPI_AttributeSelectionList, /** Main objects */,
               axisObject, FeaturesPlugin_Rotation::AXIS_OBJECT_ID(),
               ModelAPI_AttributeSelection, /** Axis object */,
               angle, FeaturesPlugin_Rotation::ANGLE_ID(),
-              ModelAPI_AttributeDouble, /** Angle */)
+              ModelAPI_AttributeDouble, /** Angle */,
+              centerPoint, FeaturesPlugin_Rotation::CENTER_POINT_ID(),
+              ModelAPI_AttributeSelection, /** Center point */,
+              startPoint, FeaturesPlugin_Rotation::START_POINT_ID(),
+              ModelAPI_AttributeSelection, /** Start point */,
+              endPoint, FeaturesPlugin_Rotation::END_POINT_ID(),
+              ModelAPI_AttributeSelection, /** End point */
+             )
 
   /// Set main objects.
   FEATURESAPI_EXPORT
@@ -58,6 +75,11 @@ public:
   /// Set angle.
   FEATURESAPI_EXPORT
   void setAngle(const ModelHighAPI_Double& theAngle);
+
+  /// Set center point, start point and end point
+  void setPoints(const ModelHighAPI_Selection& theCenterPoint,
+                 const ModelHighAPI_Selection& theStartPoint,
+                 const ModelHighAPI_Selection& theEndPoint);
 
   /// Dump wrapped feature
   FEATURESAPI_EXPORT
@@ -74,5 +96,14 @@ RotationPtr addRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const std::list<ModelHighAPI_Selection>& theMainObjects,
                         const ModelHighAPI_Selection& theAxisObject,
                         const ModelHighAPI_Double& theAngle);
+
+/// \ingroup CPPHighAPI
+/// \brief Create Rotation feature.
+FEATURESAPI_EXPORT
+RotationPtr addRotation(const std::shared_ptr<ModelAPI_Document>& thePart,
+                        const std::list<ModelHighAPI_Selection>& theMainObjects,
+                        const ModelHighAPI_Selection& theCenterPoint,
+                        const ModelHighAPI_Selection& theStartPoint,
+                        const ModelHighAPI_Selection& theEndPoint);
 
 #endif // FeaturesAPI_Rotation_H_

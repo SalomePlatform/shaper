@@ -103,6 +103,28 @@ public:
                      std::shared_ptr<GeomAPI_Pnt> theStartPoint,
                      std::shared_ptr<GeomAPI_Pnt> theEndPoint) throw (GeomAlgoAPI_Exception);
 
+  /// Performs a rotation from an axis and an angle.
+  /// \param theSourceShape Shape to be rotated
+  /// \param theAxis Movement axis
+  /// \param theAngle Movement angle
+  /// \return a shape
+  static std::shared_ptr<GeomAPI_Shape> makeRotation(
+                     std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                     std::shared_ptr<GeomAPI_Ax1> theAxis,
+                     const double theAngle) throw (GeomAlgoAPI_Exception);
+
+  /// Performs a rotation from three points.
+  /// \param theSourceShape Shape to be rotated
+  /// \param theCenterPoint Movement center point
+  /// \param theStartPoint Movement start point
+  /// \param theEndPoint Movement end point
+  /// \return a shape
+  static std::shared_ptr<GeomAPI_Shape> makeRotation(
+                     std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                     std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
+                     std::shared_ptr<GeomAPI_Pnt> theStartPoint,
+                     std::shared_ptr<GeomAPI_Pnt> theEndPoint) throw (GeomAlgoAPI_Exception);
+
   /// Performs a symmetry by a point.
   /// \param theSourceShape Shape be symmetrized
   /// \param thePoint Point of symmetry

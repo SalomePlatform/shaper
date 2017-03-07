@@ -1,30 +1,73 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+<!-- Modified by Clarisse Genrault (CEA) : 02 Mar 2017 -->
 
 <source>
-  <multi_selector id="main_objects"
-    label="Main objects"
-    icon="icons/Features/cut_shape.png"
-    tooltip="Select solid objects"
-    type_choice="objects"
-    concealment="true">
-    <validator id="FeaturesPlugin_ValidatorTransform"/>
-  </multi_selector>
-  <shape_selector id="axis_object"
+  <toolbox id="CreationMethod">
+    <box id="ByAxisAndAngle"
+         title="By an axis and an angle"
+         icon="icons/Features/rotation_axis_32x32.png">
+      <multi_selector id="main_objects"
+                      label="Main objects"
+                      icon=""
+                      tooltip="Select solid objects"
+                      type_choice="objects"
+                      concealment="true">
+        <validator id="FeaturesPlugin_ValidatorTransform"/>
+      </multi_selector>
+      <shape_selector id="axis_object"
                   icon="icons/Features/axis.png"
                   label="Axis"
                   tooltip="Select an edge for axis"
                   shape_types="edge"
                   default="">
-    <validator id="GeomValidators_ShapeType" parameters="line"/>
-  </shape_selector>
-  <doublevalue
-    id="angle"
-    label="Angle"
-    min="-360"
-    max="360"
-    step="1.0"
-    default="0"
-    icon="icons/Features/angle.png"
-    tooltip="Angle">
-  </doublevalue>
+        <validator id="GeomValidators_ShapeType" parameters="line"/>
+      </shape_selector>
+      <doublevalue id="angle"
+                   label="Angle"
+                   min="-360"
+                   max="360"
+                   step="1.0"
+                   default="0"
+                   icon="icons/Features/angle.png"
+                   tooltip="Angle">
+      </doublevalue>
+    </box>
+    <box id="ByThreePoints"
+         title="By a center and two points"
+         icon="icons/Features/rotation_3pt_32x32.png">
+      <multi_selector id="main_objects"
+                      label="Main objects"
+                      icon=""
+                      tooltip="Select solid objects"
+                      type_choice="objects"
+                      concealment="true">
+        <validator id="FeaturesPlugin_ValidatorTransform"/>
+      </multi_selector>
+      <shape_selector id="center_point"
+                      label="Center point"
+                      icon="icons/Features/point.png"
+                      tooltip="Select a center point"
+                      shape_types="vertex">
+        <validator id="GeomValidators_ConstructionComposite"/>
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+      </shape_selector>
+      <shape_selector id="start_point"
+                      label="Start point"
+                      icon="icons/Features/point.png"  
+                      tooltip="Select a starting point"
+                      shape_types="vertex">
+        <validator id="GeomValidators_ConstructionComposite"/>
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+      </shape_selector>
+      <shape_selector id="end_point"
+                      label="End point"
+                      icon="icons/Features/point.png"
+                      tooltip="Select an end point"
+                      shape_types="vertex">
+        <validator id="GeomValidators_ConstructionComposite"/>
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        <validator id="GeomValidators_DifferentShapes"/>
+      </shape_selector>
+    </box>
+  </toolbox>
 </source>

@@ -60,6 +60,25 @@ void GeomAPI_Trsf::setRotation(const std::shared_ptr<GeomAPI_Ax1> theAxis,
 }
 
 //=================================================================================================
+void GeomAPI_Trsf::setRotation(const std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
+                               const std::shared_ptr<GeomAPI_Pnt> theStartPoint,
+                               const std::shared_ptr<GeomAPI_Pnt> theEndPoint)
+{
+  gp_Pnt aCenterPoint = theCenterPoint->impl<gp_Pnt>();
+  gp_Pnt aStartPoint = theStartPoint->impl<gp_Pnt>();
+  gp_Pnt aEndPoint = theEndPoint->impl<gp_Pnt>();
+
+  gp_Vec aVec1(aCenterPoint, aStartPoint);
+  gp_Vec aVec2(aCenterPoint, aEndPoint);
+  gp_Dir aDir(aVec1 ^ aVec2);
+  gp_Ax1 anAxis(aCenterPoint, aDir);
+  double anAngle = aVec1.Angle(aVec2);
+  if (fabs(anAngle) < Precision::Angular()) anAngle += 2.*M_PI; // Taken from old GEOM code
+
+  MY_TRSF->SetRotation(anAxis, anAngle);
+}
+
+//=================================================================================================
 void GeomAPI_Trsf::setSymmetry(const std::shared_ptr<GeomAPI_Pnt> thePoint)
 {
   MY_TRSF->SetMirror(thePoint->impl<gp_Pnt>());

@@ -26,6 +26,27 @@ class FeaturesPlugin_Rotation : public ModelAPI_Feature
     return MY_ROTATION_ID;
   }
 
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD()
+  {
+    static const std::string MY_CREATION_METHOD_ID("CreationMethod");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method "ByAxisAndAngle".
+  inline static const std::string& CREATION_METHOD_BY_ANGLE()
+  {
+    static const std::string MY_CREATION_METHOD_ID("ByAxisAndAngle");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method "ByThreePoints".
+  inline static const std::string& CREATION_METHOD_BY_THREE_POINTS()
+  {
+    static const std::string MY_CREATION_METHOD_ID("ByThreePoints");
+    return MY_CREATION_METHOD_ID;
+  }
+
   /// Attribute name of referenced objects.
   inline static const std::string& OBJECTS_LIST_ID()
   {
@@ -47,6 +68,27 @@ class FeaturesPlugin_Rotation : public ModelAPI_Feature
     return MY_ANGLE_ID;
   }
 
+  /// Attribute name of a center point.
+  inline static const std::string& CENTER_POINT_ID()
+  {
+    static const std::string MY_CENTER_POINT_ID("center_point");
+    return MY_CENTER_POINT_ID;
+  }
+
+  /// Attribute name of a center point.
+  inline static const std::string& START_POINT_ID()
+  {
+    static const std::string MY_START_POINT_ID("start_point");
+    return MY_START_POINT_ID;
+  }
+
+  /// Attribute name of a center point.
+  inline static const std::string& END_POINT_ID()
+  {
+    static const std::string MY_END_POINT_ID("end_point");
+    return MY_END_POINT_ID;
+  }
+
   /// \return the kind of a feature.
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
   {
@@ -64,6 +106,12 @@ class FeaturesPlugin_Rotation : public ModelAPI_Feature
   FeaturesPlugin_Rotation();
 
 private:
+  ///Perform the rotation using an axis and an angle.
+  void performTranslationByAxisAndAngle();
+
+  ///Perform the rotation using a center and two points.
+  void performTranslationByThreePoints();
+
   void loadNamingDS(GeomAlgoAPI_Rotation& theRotaionAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theBaseShape);
