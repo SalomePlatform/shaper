@@ -499,7 +499,9 @@ bool CollectionPlugin_WidgetField::restoreValueCustom()
   std::string aTypeStr = aSelList->selectionType();
   if (aTypeStr == "")
     return false; // The attribute is not initialized
+  isBlocked = myShapeTypeCombo->blockSignals(true);
   myShapeTypeCombo->setCurrentIndex(getSelectionType(aTypeStr));
+  myShapeTypeCombo->blockSignals(isBlocked);
 
   // Get number of components
   AttributeStringArrayPtr aStringsAttr =
