@@ -1,6 +1,7 @@
 # Author: Sergey Pokhodenko
 # Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
+import ModelHighAPI
 
 def addPolyline(sketch, *coords):
     """Add a poly-line to sketch.
@@ -44,4 +45,7 @@ def addPolygon(sketch, *coords):
 def dof(sketch):
     """ Extract degrees of freedom for the given sketch
     """
-    return int(filter(str.isdigit, sketch.string("SolverDOF").value()))
+    aSketch = sketch
+    if issubclass(type(aSketch), ModelHighAPI.ModelHighAPI_Interface):
+        aSketch = sketch.feature()
+    return int(filter(str.isdigit, aSketch.string("SolverDOF").value()))

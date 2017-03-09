@@ -5,9 +5,12 @@
 // Author:  Artem ZHIDKOV
 
 #include <PlaneGCSSolver_UpdateCoincidence.h>
+#include <PlaneGCSSolver_EntityWrapper.h>
+#include <PlaneGCSSolver_PointWrapper.h>
 #include <SketchSolver_Constraint.h>
 
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintMiddle.h>
 
 void PlaneGCSSolver_UpdateCoincidence::attach(SketchSolver_Constraint* theObserver,
@@ -29,7 +32,8 @@ void PlaneGCSSolver_UpdateCoincidence::attach(SketchSolver_Constraint* theObserv
 void PlaneGCSSolver_UpdateCoincidence::update(const FeaturePtr& theFeature)
 {
   if (theFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID() ||
-      theFeature->getKind() == SketchPlugin_ConstraintMiddle::ID()) {
+      theFeature->getKind() == SketchPlugin_ConstraintMiddle::ID() ||
+      theFeature->getKind() == SketchPlugin_ConstraintCollinear::ID()) {
     myCoincident.clear();
     // notify listeners and stop procesing
     std::list<SketchSolver_Constraint*>::iterator anIt = myObservers.begin();
@@ -87,6 +91,30 @@ bool PlaneGCSSolver_UpdateCoincidence::checkCoincidence(
   return isAccepted;
 }
 
+bool PlaneGCSSolver_UpdateCoincidence::isPointOnEntity(
+    const EntityWrapperPtr& thePoint,
+    const EntityWrapperPtr& theEntity)
+{
+  std::list<CoincidentEntities>::iterator anIt = myCoincident.begin();
+  for (; anIt != myCoincident.end(); ++anIt)
+    if (anIt->isExist(thePoint))
+      break;
+
+  if (anIt == myCoincident.end())
+    return false;
+
+  if (anIt->isExist(theEntity))
+    return true;
+
+  if (theEntity->type() == ENTITY_LINE) {
+    std::shared_ptr<GCS::Line> aLine = std::dynamic_pointer_cast<GCS::Line>(
+        std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(theEntity)->entity());
+    return anIt->isExist(aLine->p1) || anIt->isExist(aLine->p2);
+  }
+  return false;
+}
+
+
 
 
 
@@ -124,6 +152,36 @@ bool PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::isExist(
     if (anIt->first == theEntity ||
         anIt->second.find(theEntity) != anIt->second.end())
       return true;
+  return false;
+}
+
+static bool isEqual(const GCS::Point& thePoint1, const GCS::Point& thePoint2)
+{
+  return thePoint1.x == thePoint2.x && thePoint1.y == thePoint2.y;
+}
+
+bool PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::isExist(
+    const GCS::Point& thePoint) const
+{
+  std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> >::const_iterator
+      anIt = myExternalAndConnected.begin();
+  for (; anIt != myExternalAndConnected.end(); ++anIt) {
+    if (anIt->first && anIt->first->type() == ENTITY_POINT) {
+      const GCSPointPtr& aPoint =
+          std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(anIt->first)->point();
+      if (isEqual(*aPoint, thePoint))
+        return true;
+    }
+
+    std::set<EntityWrapperPtr>::const_iterator anEntIt = anIt->second.begin();
+    for (; anEntIt != anIt->second.end(); ++anEntIt)
+      if ((*anEntIt)->type() == ENTITY_POINT) {
+        const GCSPointPtr& aPoint =
+            std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(*anEntIt)->point();
+        if (isEqual(*aPoint, thePoint))
+          return true;
+      }
+  }
   return false;
 }
 

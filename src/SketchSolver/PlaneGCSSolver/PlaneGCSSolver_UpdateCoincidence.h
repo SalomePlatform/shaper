@@ -10,6 +10,8 @@
 #include <PlaneGCSSolver_Update.h>
 #include <SketchSolver_IEntityWrapper.h>
 
+#include <GCS.h>
+
 #include <map>
 
 /** \class   PlaneGCSSolver_UpdateCoincidence
@@ -45,6 +47,10 @@ public:
   /// \return \c true if the entities does not coincident
   bool checkCoincidence(const EntityWrapperPtr& theEntity1, const EntityWrapperPtr& theEntity2);
 
+  /// \brief Verifies the point is coincident to the feature
+  /// \return \c true if the point is on the feature
+  bool isPointOnEntity(const EntityWrapperPtr& thePoint, const EntityWrapperPtr& theEntity);
+
 private:
   /// \brief Container for collecting and operating coincident entities
   class CoincidentEntities
@@ -55,6 +61,8 @@ private:
 
     /// Verify the entity is already in the list
     bool isExist(const EntityWrapperPtr& theEntity) const;
+    /// Verify the point is already in the list
+    bool isExist(const GCS::Point& thePoint) const;
     /// Check the coincidence is not in list yet
     bool isNewCoincidence(const EntityWrapperPtr& theEntityExist,
                           const EntityWrapperPtr& theOtherEntity);

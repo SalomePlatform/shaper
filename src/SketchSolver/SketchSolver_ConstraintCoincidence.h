@@ -31,7 +31,7 @@ public:
   virtual bool remove();
 
 protected:
-  /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
+  /// \brief Converts SketchPlugin constraint to a list of solver constraints
   virtual void process();
 
   /// \brief Generate list of attributes of constraint in order useful for constraints

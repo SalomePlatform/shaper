@@ -540,7 +540,6 @@
       </feature>
       
     <!--  SketchConstraintCollinear  -->
-      <!--
       <feature id="SketchConstraintCollinear" title="Collinear" tooltip="Create constraint defining collinearity of two lines" icon="icons/Sketch/collinear.png">
         <sketch_shape_selector id="ConstraintEntityA" 
             label="First line" tooltip="Select a line" shape_types="edge">
@@ -555,7 +554,6 @@
         </sketch_shape_selector>
         <validator id="PartSet_CollinearSelection"/>
       </feature>
-      -->
          
     </group>
     

@@ -17,13 +17,24 @@ class SketchSolver_ConstraintCollinear : public SketchSolver_Constraint
 {
 public:
   /// Constructor based on SketchPlugin constraint
-  SketchSolver_ConstraintCollinear(ConstraintPtr theConstraint);
+  SketchSolver_ConstraintCollinear(ConstraintPtr theConstraint)
+    : SketchSolver_Constraint(theConstraint)
+  {
+    for (int i = 0; i < 4; ++i)
+      myIsConstraintApplied[i] = false;
+  }
 
-  virtual ~SketchSolver_ConstraintCollinear() {}
+  /// \brief Notify this object about the feature is changed somewhere
+  virtual void notify(const FeaturePtr&      theFeature,
+                      PlaneGCSSolver_Update* theUpdater);
 
-////  /// \brief Notify constraint, that coincidence appears or removed
-////  virtual void notifyCoincidenceChanged(EntityWrapperPtr theCoincAttr1,
-////                                        EntityWrapperPtr theCoincAttr2);
+protected:
+  /// \brief Converts SketchPlugin constraint to a list of solver constraints
+  virtual void process();
+
+private:
+  EntityWrapperPtr myPoints[4];  ///< extremities on collinear lines
+  bool myIsConstraintApplied[4]; ///< set \c true if point on opposite line
 };
 
 #endif

@@ -121,7 +121,7 @@ INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 ADD_UNIT_TESTS(TestSketchPointLine.py
                TestSketchArcCircle.py
                TestConstraintCoincidence.py
-               # TestConstraintCollinear.py
+               TestConstraintCollinear.py
                TestConstraintLength.py
                TestConstraintDistance.py
                TestConstraintParallel.py
