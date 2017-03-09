@@ -17,6 +17,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultPart.h>
 
 #include <math.h>
 
@@ -113,46 +114,60 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
+    bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
 
-    ListOfShape aListOfShape;
-    std::list<std::shared_ptr<GeomAlgoAPI_Translation> > aListOfTranslationAlgo;
-
-    for (int i=0; i<nbCopies; i++) {
-      std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
-        new GeomAlgoAPI_Translation(aBaseShape, anAxis, i*aStep));
-
-      if (!aTranslationAlgo->check()) {
-        setError(aTranslationAlgo->getError());
-        break;
+    // Setting result.
+    if (isPart) {
+      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
+      std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
+      for (int i=0; i<nbCopies; i++) {
+        aTrsf->setTranslation(anAxis, i*aStep);
+        ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
+        aResultPart->setTrsf(*aContext, aTrsf);
+        setResult(aResultPart, aResultIndex);
+        aResultIndex++;
       }
+    } else {
+      ListOfShape aListOfShape;
+      std::list<std::shared_ptr<GeomAlgoAPI_Translation> > aListOfTranslationAlgo;
 
-      aTranslationAlgo->build();
+      for (int i=0; i<nbCopies; i++) {
+        std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
+          new GeomAlgoAPI_Translation(aBaseShape, anAxis, i*aStep));
 
-      // Checking that the algorithm worked properly.
-      if (!aTranslationAlgo->isDone()) {
-        static const std::string aFeatureError = "Error : Multitranslation algorithm failed.";
-        setError(aFeatureError);
-        break;
+        if (!aTranslationAlgo->check()) {
+          setError(aTranslationAlgo->getError());
+          break;
+        }
+
+        aTranslationAlgo->build();
+
+        // Checking that the algorithm worked properly.
+        if (!aTranslationAlgo->isDone()) {
+          static const std::string aFeatureError = "Error : Multitranslation algorithm failed.";
+          setError(aFeatureError);
+          break;
+        }
+        if (aTranslationAlgo->shape()->isNull()) {
+          static const std::string aShapeError = "Error : Resulting shape is null.";
+          setError(aShapeError);
+          break;
+        }
+        if (!aTranslationAlgo->isValid()) {
+          static const std::string aFeatureError = "Error : Resulting shape in not valid.";
+          setError(aFeatureError);
+          break;
+        }
+        aListOfShape.push_back(aTranslationAlgo->shape());
+        aListOfTranslationAlgo.push_back(aTranslationAlgo);
       }
-      if (aTranslationAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Error : Resulting shape is null.";
-        setError(aShapeError);
-        break;
-      }
-      if (!aTranslationAlgo->isValid()) {
-        static const std::string aFeatureError = "Error : Resulting shape in not valid.";
-        setError(aFeatureError);
-        break;
-      }
-      aListOfShape.push_back(aTranslationAlgo->shape());
-      aListOfTranslationAlgo.push_back(aTranslationAlgo);
+      std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
+      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+      aResultBody->storeModified(aBaseShape, aCompound);
+      loadNamingDS(aListOfTranslationAlgo, aResultBody, aBaseShape);
+
+      setResult(aResultBody, aResultIndex);
     }
-    std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
-    ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    aResultBody->storeModified(aBaseShape, aCompound);
-    loadNamingDS(aListOfTranslationAlgo, aResultBody, aBaseShape);
-
-    setResult(aResultBody, aResultIndex);
     aResultIndex++;
   }
 
@@ -239,50 +254,69 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
+    bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
 
-    ListOfShape aListOfShape;
-    std::list<std::shared_ptr<GeomAlgoAPI_Translation> > aListOfTranslationAlgo;
-
-    for (int j=0; j<aSecondNbCopies; j++) {
-      for (int i=0; i<aFirstNbCopies; i++) {
-        double dx = i*aFirstStep*x1/norm1+j*aSecondStep*x2/norm2;
-        double dy = i*aFirstStep*y1/norm1+j*aSecondStep*y2/norm2;
-        double dz = i*aFirstStep*z1/norm1+j*aSecondStep*z2/norm2;
-        std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
-          new GeomAlgoAPI_Translation(aBaseShape, dx, dy, dz));
-
-        if (!aTranslationAlgo->check()) {
-          setError(aTranslationAlgo->getError());
-          break;
+    // Setting result.
+    if (isPart) {
+      ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
+      std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
+      for (int j=0; j<aSecondNbCopies; j++) {
+        for (int i=0; i<aFirstNbCopies; i++) {
+          double dx = i*aFirstStep*x1/norm1+j*aSecondStep*x2/norm2;
+          double dy = i*aFirstStep*y1/norm1+j*aSecondStep*y2/norm2;
+          double dz = i*aFirstStep*z1/norm1+j*aSecondStep*z2/norm2;
+          aTrsf->setTranslation(dx, dy, dz);
+          ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
+          aResultPart->setTrsf(*aContext, aTrsf);
+          setResult(aResultPart, aResultIndex);
+          aResultIndex++;
         }
-
-        aTranslationAlgo->build();
-
-        // Checking that the algorithm worked properly.
-        if (!aTranslationAlgo->isDone()) {
-          static const std::string aFeatureError = "Error : Multitranslation algorithm failed.";
-          setError(aFeatureError);
-          break;
-        }
-        if (aTranslationAlgo->shape()->isNull()) {
-          static const std::string aShapeError = "Error : Resulting shape is null.";
-          setError(aShapeError);
-          break;
-        }
-        if (!aTranslationAlgo->isValid()) {
-          static const std::string aFeatureError = "Error : Resulting shape in not valid.";
-          setError(aFeatureError);
-          break;
-        }
-        aListOfShape.push_back(aTranslationAlgo->shape());
-        aListOfTranslationAlgo.push_back(aTranslationAlgo);
       }
+    } else {
+      ListOfShape aListOfShape;
+      std::list<std::shared_ptr<GeomAlgoAPI_Translation> > aListOfTranslationAlgo;
+
+      for (int j=0; j<aSecondNbCopies; j++) {
+        for (int i=0; i<aFirstNbCopies; i++) {
+          double dx = i*aFirstStep*x1/norm1+j*aSecondStep*x2/norm2;
+          double dy = i*aFirstStep*y1/norm1+j*aSecondStep*y2/norm2;
+          double dz = i*aFirstStep*z1/norm1+j*aSecondStep*z2/norm2;
+          std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
+            new GeomAlgoAPI_Translation(aBaseShape, dx, dy, dz));
+
+          if (!aTranslationAlgo->check()) {
+            setError(aTranslationAlgo->getError());
+            break;
+          }
+
+          aTranslationAlgo->build();
+
+          // Checking that the algorithm worked properly.
+          if (!aTranslationAlgo->isDone()) {
+            static const std::string aFeatureError = "Error : Multitranslation algorithm failed.";
+            setError(aFeatureError);
+            break;
+          }
+          if (aTranslationAlgo->shape()->isNull()) {
+            static const std::string aShapeError = "Error : Resulting shape is null.";
+            setError(aShapeError);
+            break;
+          }
+          if (!aTranslationAlgo->isValid()) {
+            static const std::string aFeatureError = "Error : Resulting shape in not valid.";
+            setError(aFeatureError);
+           break;
+          }
+          aListOfShape.push_back(aTranslationAlgo->shape());
+          aListOfTranslationAlgo.push_back(aTranslationAlgo);
+        }
+      }
+      std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
+      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+      aResultBody->storeModified(aBaseShape, aCompound);
+      loadNamingDS(aListOfTranslationAlgo, aResultBody, aBaseShape);
+      setResult(aResultBody, aResultIndex);
     }
-    std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
-    ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    aResultBody->storeModified(aBaseShape, aCompound);
-    loadNamingDS(aListOfTranslationAlgo, aResultBody, aBaseShape);
-    setResult(aResultBody, aResultIndex);
     aResultIndex++;
   }
 
