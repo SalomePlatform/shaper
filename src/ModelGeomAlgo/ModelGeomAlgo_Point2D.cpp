@@ -137,7 +137,7 @@ namespace ModelGeomAlgo_Point2D {
     }
   }
 
-  void appendShapePoints(GeomShapePtr& theShape,
+  void appendShapePoints(const GeomShapePtr& theShape,
                          const std::shared_ptr<ModelAPI_Result>& theResult,
                          PointToRefsMap& thePointToAttributeOrObject)
   {
