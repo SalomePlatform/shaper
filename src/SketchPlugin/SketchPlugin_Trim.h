@@ -225,7 +225,7 @@ private:
   /// \param theConstraintId a constraint index
   /// \param theFirstAttribute an attribute of further coincidence
   /// \param theSecondObject an object of further coincidence
-  std::shared_ptr<ModelAPI_Feature> createConstraint(const std::string& theConstraintId,
+  std::shared_ptr<ModelAPI_Feature> createConstraintToObject(const std::string& theConstraintId,
                         const std::shared_ptr<ModelAPI_Attribute>& theFirstAttribute,
                         const std::shared_ptr<ModelAPI_Object>& theSecondObject);
 

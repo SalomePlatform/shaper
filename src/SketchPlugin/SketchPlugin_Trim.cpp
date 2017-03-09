@@ -240,7 +240,8 @@ void SketchPlugin_Trim::execute()
     const std::list<ObjectPtr>& anObjects = anInfo.second;
     for (std::list<ObjectPtr>::const_iterator anObjectIt = anObjects.begin();
       anObjectIt != anObjects.end(); anObjectIt++) {
-      createConstraint(SketchPlugin_ConstraintCoincidence::ID(), aPointAttribute, *anObjectIt);
+      createConstraintToObject(SketchPlugin_ConstraintCoincidence::ID(), aPointAttribute,
+                               *anObjectIt);
     }
   }
 
@@ -925,7 +926,7 @@ FeaturePtr SketchPlugin_Trim::createConstraint(const std::string& theConstraintI
   return aConstraint;
 }
 
-FeaturePtr SketchPlugin_Trim::createConstraint(const std::string& theConstraintId,
+FeaturePtr SketchPlugin_Trim::createConstraintToObject(const std::string& theConstraintId,
                                                const AttributePtr& theFirstAttribute,
                                                const ObjectPtr& theSecondObject)
 {
