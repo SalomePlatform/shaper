@@ -747,7 +747,7 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
   }
   else if (theType == "sketch_feature_point_selector") {
     PartSet_WidgetFeaturePointSelector* aPointSelectorWgt =
-                          new PartSet_WidgetFeaturePointSelector(theParent, aWorkshop, theWidgetApi);
+            new PartSet_WidgetFeaturePointSelector(theParent, aWorkshop, theWidgetApi);
     aPointSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aPointSelectorWgt;
   }

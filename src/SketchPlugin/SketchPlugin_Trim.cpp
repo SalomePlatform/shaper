@@ -295,7 +295,8 @@ AISObjectPtr SketchPlugin_Trim::getAISObject(AISObjectPtr thePrevious)
   AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                                            data()->attribute(ENTITY_POINT()));
   std::shared_ptr<GeomAPI_Pnt2d> anAttributePnt2d = aPoint->pnt();
-  std::shared_ptr<GeomAPI_Pnt> anAttributePnt = sketch()->to3D(anAttributePnt2d->x(), anAttributePnt2d->y());
+  std::shared_ptr<GeomAPI_Pnt> anAttributePnt = sketch()->to3D(anAttributePnt2d->x(),
+                                                               anAttributePnt2d->y());
 
   if (myCashedShapes.find(aBaseObject) == myCashedShapes.end())
     fillObjectShapes(aBaseObject);
@@ -404,7 +405,8 @@ void SketchPlugin_Trim::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete
                                                         ModelAPI_Feature::feature(aResult2));
           // get the point not lying on the splitting feature
           for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
-            AttributeRefAttrPtr aRefAttr = aCoincidenceFeature->refattr(SketchPlugin_Trim::BASE_OBJECT());
+            AttributeRefAttrPtr aRefAttr = aCoincidenceFeature->refattr(
+                                                        SketchPlugin_Trim::BASE_OBJECT());
             if (!aRefAttr || aRefAttr->isObject())
               continue;
             AttributePoint2DPtr aPoint =
@@ -418,10 +420,7 @@ void SketchPlugin_Trim::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete
           }
         }
         if (aTangentPoint.get()) {
-          //FeaturePtr aFeature1 = ModelAPI_Feature::feature(aResult1);
-          //std::string anAttributeToBeModified = aFeature1 == aBaseFeature
-          //             ? SketchPlugin_Constraint::ENTITY_A() : SketchPlugin_Constraint::ENTITY_B();
-          //theTangentFeatures[aRefFeature] = std::make_pair(anAttributeToBeModified, aTangentPoint);
+          // collect tangent feaures
         }
         else /// there is not coincident point between tangent constraint
           theFeaturesToDelete.insert(aRefFeature);
@@ -789,7 +788,8 @@ void SketchPlugin_Trim::fillPointAttribute(const AttributePtr& theModifiedAttrib
     aModifiedAttribute->setValue(thePoint);
 
 #ifdef DEBUG_TRIM
-    std::cout << "<fillPointAttribute> => Pnt2d - [" << thePoint->x() << ", " << thePoint->y() << "]" << std::endl;
+    std::cout << "<fillPointAttribute> => Pnt2d - [" << thePoint->x() << ", "
+              << thePoint->y() << "]" << std::endl;
 #endif
   }
 }
@@ -819,7 +819,7 @@ void SketchPlugin_Trim::fillAttribute(const AttributePtr& theModifiedAttribute,
   }
   else if (anAttributeType == ModelAPI_AttributeRefAttr::typeId()) {
     AttributeRefAttrPtr aRefAttributeToFill = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                                                               theModifiedAttribute);
+                                                                             theModifiedAttribute);
     AttributeRefAttrPtr aSourceRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
                                          theSourceAttribute);
     if (!aSourceRefAttr.get())
@@ -1056,7 +1056,8 @@ void SketchPlugin_Trim::attributeChanged(const std::string& theID)
       AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                                                data()->attribute(ENTITY_POINT()));
       std::shared_ptr<GeomAPI_Pnt2d> anAttributePnt2d = aPoint->pnt();
-      std::shared_ptr<GeomAPI_Pnt> anAttributePnt = sketch()->to3D(anAttributePnt2d->x(), anAttributePnt2d->y());
+      std::shared_ptr<GeomAPI_Pnt> anAttributePnt = sketch()->to3D(anAttributePnt2d->x(),
+                                                                   anAttributePnt2d->y());
 
       if (myCashedShapes.find(aBaseObject) == myCashedShapes.end())
         fillObjectShapes(aBaseObject);

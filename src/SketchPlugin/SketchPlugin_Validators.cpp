@@ -63,7 +63,8 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const AttributePtr& theAttribut
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
-  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
+                                                                      (theAttribute);
   bool isObject = aRefAttr->isObject();
   if (!isObject) {
     // an attribute is a point. A point value is valid always for the distance
@@ -884,15 +885,9 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
                                std::list<std::shared_ptr<ModelAPI_Object> > > > PointToRefsMap;
     PointToRefsMap aPointsInfo;
 
-    //std::list<std::shared_ptr<GeomAPI_Pnt> > aPoints;
-    //std::map<std::shared_ptr<GeomDataAPI_Point2D>, std::shared_ptr<GeomAPI_Pnt> >
-    //  aPointToAttributes;
-    //std::map<std::shared_ptr<GeomAPI_Pnt>,
-    //                       std::list< std::shared_ptr<GeomDataAPI_Point2D> > > aPointToAttributes;
     ModelGeomAlgo_Point2D::getPointsInsideShape(anAttrShape, aRefAttributes, aC->pnt(),
-                                                aX->dir(), aDirY, aPointsInfo);//aPoints, aPointToAttributes);
-
-    int aCoincidentToFeature = (int)aPointsInfo.size();//aPoints.size();
+                                                aX->dir(), aDirY, aPointsInfo);
+    int aCoincidentToFeature = (int)aPointsInfo.size();
     if (aKind == SketchPlugin_Circle::ID())
       aValid = aCoincidentToFeature >= 2;
     else
