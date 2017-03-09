@@ -39,40 +39,167 @@ void PlaneGCSSolver_UpdateCoincidence::update(const FeaturePtr& theFeature)
     myNext->update(theFeature);
 }
 
+static bool hasAnotherExternalPoint(const std::set<EntityWrapperPtr>& theCoincidences,
+                                    const EntityWrapperPtr& thePoint)
+{
+  std::set<EntityWrapperPtr>::const_iterator anIt = theCoincidences.begin();
+  for (; anIt != theCoincidences.end(); ++anIt)
+    if ((*anIt)->type() == ENTITY_POINT && (*anIt)->isExternal() && *anIt != thePoint)
+      return true;
+  return false;
+}
+
 bool PlaneGCSSolver_UpdateCoincidence::checkCoincidence(
     const EntityWrapperPtr& theEntity1,
     const EntityWrapperPtr& theEntity2)
 {
   bool isAccepted = true;
 
-  std::list<std::set<EntityWrapperPtr> >::iterator anIt = myCoincident.begin();
-  std::list<std::set<EntityWrapperPtr> >::iterator aFound1 = myCoincident.end();
-  std::list<std::set<EntityWrapperPtr> >::iterator aFound2 = myCoincident.end();
+  std::list<CoincidentEntities>::iterator anIt = myCoincident.begin();
+  std::list<CoincidentEntities>::iterator
+      aFound[2] = {myCoincident.end(), myCoincident.end()};
+
   for (; anIt != myCoincident.end(); ++anIt) {
-    if (aFound1 == myCoincident.end() && anIt->find(theEntity1) != anIt->end())
-      aFound1 = anIt;
-    if (aFound2 == myCoincident.end() && anIt->find(theEntity2) != anIt->end())
-      aFound2 = anIt;
-    if (aFound1 != myCoincident.end() && aFound2 != myCoincident.end())
+    if (anIt->isExist(theEntity1))
+      aFound[0] = anIt;
+    if (anIt->isExist(theEntity2))
+      aFound[1] = anIt;
+    if (aFound[0] != myCoincident.end() && aFound[1] != myCoincident.end())
       break;
   }
 
-  if (aFound1 == myCoincident.end() && aFound2 == myCoincident.end()) {
+  if (aFound[0] == myCoincident.end() && aFound[1] == myCoincident.end()) {
     // new group of coincidence
-    std::set<EntityWrapperPtr> aNewCoinc;
-    aNewCoinc.insert(theEntity1);
-    aNewCoinc.insert(theEntity2);
-    myCoincident.push_back(aNewCoinc);
-  } else if (aFound1 == aFound2) // same group => already coincident
+    myCoincident.push_back(CoincidentEntities(theEntity1, theEntity2));
+  } else if (aFound[0] == aFound[1]) // same group => already coincident
     isAccepted = false;
-  else if (aFound1 == myCoincident.end())
-    aFound2->insert(theEntity1);
-  else if (aFound2 == myCoincident.end())
-    aFound1->insert(theEntity2);
-  else { // merge two groups
-    aFound1->insert(aFound2->begin(), aFound2->end());
-    myCoincident.erase(aFound2);
+  else {
+    if (aFound[0] == myCoincident.end())
+      isAccepted = aFound[1]->isNewCoincidence(theEntity2, theEntity1);
+    else if (aFound[1] == myCoincident.end())
+      isAccepted = aFound[0]->isNewCoincidence(theEntity1, theEntity2);
+    else { // merge two groups
+      isAccepted = aFound[0]->isNewCoincidence(theEntity1, *(aFound[1]), theEntity2);
+      myCoincident.erase(aFound[1]);
+    }
   }
 
   return isAccepted;
+}
+
+
+
+
+PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::CoincidentEntities(
+    const EntityWrapperPtr& theEntity1,
+    const EntityWrapperPtr& theEntity2)
+{
+  if (theEntity1->isExternal() && theEntity2->isExternal()) {
+    myExternalAndConnected[theEntity1] = std::set<EntityWrapperPtr>();
+    myExternalAndConnected[theEntity2] = std::set<EntityWrapperPtr>();
+  } else if (theEntity1->isExternal())
+    myExternalAndConnected[theEntity1].insert(theEntity2);
+  else if (theEntity2->isExternal())
+    myExternalAndConnected[theEntity2].insert(theEntity1);
+  else {
+    std::set<EntityWrapperPtr> aGroup;
+    aGroup.insert(theEntity1);
+    aGroup.insert(theEntity2);
+    myExternalAndConnected[EntityWrapperPtr()] = aGroup;
+  }
+}
+
+bool PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::hasExternal() const
+{
+  return myExternalAndConnected.size() != 1 ||
+         myExternalAndConnected.find(EntityWrapperPtr()) == myExternalAndConnected.end();
+}
+
+bool PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::isExist(
+    const EntityWrapperPtr& theEntity) const
+{
+  std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> >::const_iterator
+      anIt = myExternalAndConnected.begin();
+  for (; anIt != myExternalAndConnected.end(); ++anIt)
+    if (anIt->first == theEntity ||
+        anIt->second.find(theEntity) != anIt->second.end())
+      return true;
+  return false;
+}
+
+bool PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::isNewCoincidence(
+    const EntityWrapperPtr& theEntityExist,
+    const EntityWrapperPtr& theOtherEntity)
+{
+  if (theOtherEntity->isExternal()) {
+    if (hasExternal()) {
+      if (myExternalAndConnected.find(theOtherEntity) == myExternalAndConnected.end())
+        myExternalAndConnected[theOtherEntity] = std::set<EntityWrapperPtr>();
+      return false;
+    } else {
+      myExternalAndConnected[theOtherEntity] = myExternalAndConnected[EntityWrapperPtr()];
+      myExternalAndConnected.erase(EntityWrapperPtr());
+      return true;
+    }
+  }
+
+  if (theEntityExist->isExternal()) {
+    myExternalAndConnected[theEntityExist].insert(theOtherEntity);
+    return true;
+  }
+
+  std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> >::iterator
+      anIt = myExternalAndConnected.begin();
+  for (; anIt != myExternalAndConnected.end(); ++anIt)
+    if (anIt->second.find(theEntityExist) != anIt->second.end()) {
+      anIt->second.insert(theOtherEntity);
+      break;
+    }
+  return true;
+}
+
+bool PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::isNewCoincidence(
+    const EntityWrapperPtr&   theEntityExist,
+    const CoincidentEntities& theOtherGroup,
+    const EntityWrapperPtr&   theEntityInOtherGroup)
+{
+  bool hasExt[2] = {hasExternal(), theOtherGroup.hasExternal()};
+  if (hasExt[0] && hasExt[1]) {
+    myExternalAndConnected.insert(theOtherGroup.myExternalAndConnected.begin(),
+                                  theOtherGroup.myExternalAndConnected.end());
+    return false;
+  } else if (!hasExt[0] && !hasExt[1]) {
+    std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> >::const_iterator
+        aFound = theOtherGroup.myExternalAndConnected.find(EntityWrapperPtr());
+
+    myExternalAndConnected[EntityWrapperPtr()].insert(
+        aFound->second.begin(), aFound->second.end());
+    return true;
+  } else {
+    std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> > aSource, aDest;
+    EntityWrapperPtr aTarget;
+    if (hasExt[0]) {
+      aDest = myExternalAndConnected;
+      aSource = theOtherGroup.myExternalAndConnected;
+      aTarget = theEntityExist;
+    } else {
+      aSource = myExternalAndConnected;
+      aDest = theOtherGroup.myExternalAndConnected;
+      aTarget = theEntityInOtherGroup;
+    }
+
+    std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> >::const_iterator
+        aFound = aSource.find(EntityWrapperPtr());
+
+    std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> >::iterator anIt = aDest.begin();
+    for (; anIt != aDest.end(); ++anIt)
+      if (anIt->first == aTarget ||
+          anIt->second.find(aTarget) != anIt->second.end()) {
+        anIt->second.insert(aFound->second.begin(), aFound->second.end());
+        break;
+      }
+    return true;
+  }
+  // impossible case
+  return false;
 }

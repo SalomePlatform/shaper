@@ -32,7 +32,7 @@ public:
   void clear();
 
   /// \brief Add constraint to the system of equations
-  void addConstraint(GCSConstraintPtr theConstraint);
+  void addConstraint(GCSConstraintPtr theConstraint, const SketchSolver_ConstraintType theType);
 
   /// \brief Remove constraint from the system of equations
   void removeConstraint(ConstraintID theID);
@@ -63,6 +63,10 @@ private:
 
   GCS::VEC_pD                  myParameters;     ///< list of unknowns
   ConstraintMap                myConstraints;    ///< list of constraints
+
+  /// IDs of constraints (coincidence, tangency) which will not be treated as conflicting
+  /// if they are reported as redundant
+  GCS::SET_I                   myConstraintIDsNotRedundant;
 
   std::shared_ptr<GCS::System> myEquationSystem; ///< set of equations for solving in FreeGCS
 

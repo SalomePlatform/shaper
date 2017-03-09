@@ -10,6 +10,8 @@
 #include <PlaneGCSSolver_Update.h>
 #include <SketchSolver_IEntityWrapper.h>
 
+#include <map>
+
 /** \class   PlaneGCSSolver_UpdateCoincidence
  *  \ingroup Plugins
  *  \brief   Send events to listeners about changing a constraint
@@ -44,7 +46,31 @@ public:
   bool checkCoincidence(const EntityWrapperPtr& theEntity1, const EntityWrapperPtr& theEntity2);
 
 private:
-  std::list<std::set<EntityWrapperPtr> > myCoincident; ///< list of coincidences
+  /// \brief Container for collecting and operating coincident entities
+  class CoincidentEntities
+  {
+  public:
+    CoincidentEntities(const EntityWrapperPtr& theEntity1,
+                       const EntityWrapperPtr& theEntity2);
+
+    /// Verify the entity is already in the list
+    bool isExist(const EntityWrapperPtr& theEntity) const;
+    /// Check the coincidence is not in list yet
+    bool isNewCoincidence(const EntityWrapperPtr& theEntityExist,
+                          const EntityWrapperPtr& theOtherEntity);
+    bool isNewCoincidence(const EntityWrapperPtr& theEntityExist,
+                          const CoincidentEntities& theOtherGroup,
+                          const EntityWrapperPtr& theEntityInOtherGroup);
+
+  private:
+    bool hasExternal() const;
+
+  private:
+    /// external entity and set of entities connected to it
+    std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> > myExternalAndConnected;
+  };
+
+  std::list<CoincidentEntities> myCoincident; ///< list of coincidences
 };
 
 #endif

@@ -238,10 +238,8 @@ std::set<ObjectPtr> SketchSolver_Storage::getConflictingConstraints(SolverPtr th
   std::map<ConstraintPtr, ConstraintWrapperPtr>::const_iterator
       aConstrIt = myConstraintMap.begin();
   for (; aConstrIt != myConstraintMap.end(); ++aConstrIt) {
-    if (theSolver->isConflicting(aConstrIt->second->id())) {
+    if (theSolver->isConflicting(aConstrIt->second->id()))
       aConflicting.insert(aConstrIt->first);
-      break;
-    }
   }
   return aConflicting;
 }

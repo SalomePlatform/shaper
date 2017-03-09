@@ -257,8 +257,7 @@ void SketchSolver_Group::repairConsistency()
 void SketchSolver_Group::removeTemporaryConstraints()
 {
   if (!myTempConstraints.empty()) {
-    std::dynamic_pointer_cast<PlaneGCSSolver_Solver>(
-        mySketchSolver)->removeConstraint(CID_MOVEMENT);
+    mySketchSolver->removeConstraint(CID_MOVEMENT);
 
     std::set<SolverConstraintPtr>::iterator aTmpIt = myTempConstraints.begin();
     for (; aTmpIt != myTempConstraints.end(); ++aTmpIt)
