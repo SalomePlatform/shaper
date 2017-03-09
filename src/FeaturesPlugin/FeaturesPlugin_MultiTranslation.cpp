@@ -161,7 +161,8 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
         aListOfShape.push_back(aTranslationAlgo->shape());
         aListOfTranslationAlgo.push_back(aTranslationAlgo);
       }
-      std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
+      std::shared_ptr<GeomAPI_Shape> aCompound =
+        GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
       aResultBody->storeModified(aBaseShape, aCompound);
       loadNamingDS(aListOfTranslationAlgo, aResultBody, aBaseShape);
@@ -311,7 +312,8 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
           aListOfTranslationAlgo.push_back(aTranslationAlgo);
         }
       }
-      std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
+      std::shared_ptr<GeomAPI_Shape> aCompound =
+        GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
       aResultBody->storeModified(aBaseShape, aCompound);
       loadNamingDS(aListOfTranslationAlgo, aResultBody, aBaseShape);
