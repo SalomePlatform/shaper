@@ -119,6 +119,7 @@ aRotateFt = aPart.addFeature("Rotation")
 assert (aRotateFt.getKind() == "Rotation")
 aRotateFt.selectionList("main_objects").append(
     anExtrusionResult, anExtrusionResult.shape())
+aRotateFt.string("CreationMethod").setValue("ByAxisAndAngle")
 aRotateFt.selection("axis_object").setValue(aLineSketchResult, aLineEdge)
 aRotateFt.real("angle").setValue(90)
 aRotateFt.execute()
