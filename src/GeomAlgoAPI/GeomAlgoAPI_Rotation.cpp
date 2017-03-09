@@ -78,7 +78,7 @@ bool GeomAlgoAPI_Rotation::check()
         return false;
       }
       if (!mySourceShape) {
-        myError = "Rotation builder :: source shape is invalid.";
+        myError = "Rotation builder :: source shape is not valid.";
         return false;
       }
       if(myCenterPoint->distance(myStartPoint) < Precision::Confusion()) {
