@@ -77,6 +77,7 @@ public:
   void setAngle(const ModelHighAPI_Double& theAngle);
 
   /// Set center point, start point and end point
+  FEATURESAPI_EXPORT
   void setPoints(const ModelHighAPI_Selection& theCenterPoint,
                  const ModelHighAPI_Selection& theStartPoint,
                  const ModelHighAPI_Selection& theEndPoint);
