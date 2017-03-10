@@ -49,9 +49,11 @@ static bool VInspector_FirstCall = true;
 #include <AIS_Shape.hxx>
 #include <AIS_Dimension.hxx>
 #include <AIS_Trihedron.hxx>
+#ifdef BEFORE_TRIHEDRON_PATCH
 #include <AIS_Axis.hxx>
 #include <AIS_Plane.hxx>
 #include <AIS_Point.hxx>
+#endif
 #include <AIS_Selection.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 #include <SelectMgr_ListOfFilter.hxx>
@@ -767,6 +769,7 @@ void XGUI_Displayer::deactivateTrihedron(const bool theUpdateViewer) const
       );
 
     /// #1136 hidden axis are selected in sketch
+#ifdef BEFORE_TRIHEDRON_PATCH
     deactivateObject(aContext, aTrie->XAxis()
     #ifdef VINSPECTOR
       , getCallBack()
@@ -803,7 +806,7 @@ void XGUI_Displayer::deactivateTrihedron(const bool theUpdateViewer) const
       , getCallBack()
     #endif
     );
-
+#endif
     if (theUpdateViewer)
       updateViewer();
   }

@@ -85,8 +85,10 @@
 #include <SUIT_ResourceMgr.h>
 
 #include <AIS_Trihedron.hxx>
+#ifdef BEFORE_TRIHEDRON_PATCH
 #include <AIS_Point.hxx>
 #include <AIS_Axis.hxx>
+#endif
 
 #include <QApplication>
 #include <QFileDialog>
@@ -341,13 +343,14 @@ void XGUI_Workshop::deactivateModule()
     Standard_Integer aMode = itr.Value();
     aContext->Deactivate(aTrihedron, aMode);
   }
+#ifdef BEFORE_TRIHEDRON_PATCH
   /// Trihedron problem: objects stayed in the viewer, should be removed manually
   /// otherwise in SALOME happens crash by HideAll in the viewer
   aContext->Remove(aTrihedron->Position(), true);
   aContext->Remove(aTrihedron->Axis(), true);
   aContext->Remove(aTrihedron->XAxis(), true);
   aContext->Remove(aTrihedron->YAxis(), true);
-
+#endif
 
   myOperationMgr->deactivate();
 }

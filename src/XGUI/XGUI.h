@@ -3,6 +3,8 @@
 #ifndef XGUI_H
 #define XGUI_H
 
+//#define BEFORE_TRIHEDRON_PATCH
+
 #if defined XGUI_EXPORTS
 #if defined WIN32
 #define XGUI_EXPORT              __declspec( dllexport )

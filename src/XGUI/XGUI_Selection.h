@@ -106,7 +106,9 @@ protected:
   /// Generates a vertex or edge by the give IO if it is an AIS created on trihedron
   /// \param theIO a selected object
   /// \return created shape or empty shape
+#ifdef BEFORE_TRIHEDRON_PATCH
   TopoDS_Shape findAxisShape(Handle(AIS_InteractiveObject) theIO) const;
+#endif
 
 private:
   XGUI_Workshop* myWorkshop;

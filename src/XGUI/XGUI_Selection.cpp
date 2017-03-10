@@ -19,8 +19,12 @@
 #include <ModelAPI_ResultConstruction.h>
 
 #include <AIS_InteractiveContext.hxx>
+#ifdef BEFORE_TRIHEDRON_PATCH
 #include <AIS_Axis.hxx>
 #include <AIS_Point.hxx>
+#else
+#include <AIS_TrihedronOwner.hxx>
+#endif
 #include <Geom_Line.hxx>
 #include <BRep_Builder.hxx>
 #include <TopoDS_Edge.hxx>
@@ -135,9 +139,11 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
     // the located method is called in the context to obtain the shape by the SelectedShape()
     // method, so the shape is located by the same rules
     TopoDS_Shape aShape = aBRO->Shape().Located (aBRO->Location() * aBRO->Shape().Location());
+#ifdef BEFORE_TRIHEDRON_PATCH
 #ifndef DEBUG_DELIVERY
     if (aShape.IsNull())
       aShape = findAxisShape(anIO);
+#endif
 #endif
     if (!aShape.IsNull()) {
       std::shared_ptr<GeomAPI_Shape> aGeomShape =
@@ -148,6 +154,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
   } else {
 #ifdef DEBUG_DELIVERY
     // Fill by trihedron shapes
+#ifdef BEFORE_TRIHEDRON_PATCH
     Handle(AIS_Axis) aAxis = Handle(AIS_Axis)::DownCast(anIO);
     DocumentPtr aDoc = ModelAPI_Session::get()->moduleDocument();
     int aSize = aDoc->size(ModelAPI_ResultConstruction::group());
@@ -197,6 +204,39 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
         }
       }
     }
+#else
+    /// find axis direction
+    Handle(AIS_TrihedronOwner) aTrihedronOwner = Handle(AIS_TrihedronOwner)::DownCast(theOwner);
+    if (!aTrihedronOwner.IsNull()) {
+      const Prs3d_DatumParts& aPart = aTrihedronOwner->DatumPart();
+      std::string aName;
+      switch (aPart) {
+        case Prs3d_DP_Origin: aName = "Origin"; break;
+        case Prs3d_DP_XAxis: aName = "OX"; break;
+        case Prs3d_DP_YAxis: aName = "OY"; break;
+        case Prs3d_DP_ZAxis: aName = "OZ"; break;
+        default: break;
+      }
+      if (aName.length() > 0) {
+        DocumentPtr aDoc = ModelAPI_Session::get()->moduleDocument();
+        int aSize = aDoc->size(ModelAPI_ResultConstruction::group());
+        ObjectPtr aObj;
+        ResultPtr aResult;
+        for (int i = 0; i < aSize; i++) {
+          aObj = aDoc->object(ModelAPI_ResultConstruction::group(), i);
+          if (aObj->data()->name() == aName) {
+            aResult = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aObj);
+            break;
+          }
+        }
+        if (aResult.get()) {
+          thePrs->setObject(aResult);
+          thePrs->setShape(aResult->shape());
+          return;
+        }
+      }
+    }
+#endif
 #endif
   }
 
@@ -348,6 +388,7 @@ void XGUI_Selection::entityOwners(const Handle(AIS_InteractiveObject)& theObject
 }
 
 //**************************************************************
+#ifdef BEFORE_TRIHEDRON_PATCH
 TopoDS_Shape XGUI_Selection::findAxisShape(Handle(AIS_InteractiveObject) theIO) const
 {
   TopoDS_Shape aShape;
@@ -378,3 +419,4 @@ TopoDS_Shape XGUI_Selection::findAxisShape(Handle(AIS_InteractiveObject) theIO) 
   }
   return aShape;
 }
+#endif

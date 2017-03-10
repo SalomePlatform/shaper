@@ -45,6 +45,8 @@
 
 #include <cmath>
 
+//#define CREATE_CONSTRAINTS
+
 //#define DEBUG_SPLIT
 #ifdef DEBUG_SPLIT
 #include <iostream>
@@ -885,6 +887,7 @@ void SketchPlugin_ConstraintSplit::splitLine(FeaturePtr& theSplitFeature,
     thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                        (theSplitFeature->attribute(SketchPlugin_Line::START_ID())));
 
+#ifdef CREATE_CONSTRAINTS
   // additional constraints between split and base features
   aConstraintFeature = createConstraintForObjects(SketchPlugin_ConstraintParallel::ID(),
                                                        getFeatureResult(aBaseFeature),
@@ -896,6 +899,7 @@ void SketchPlugin_ConstraintSplit::splitLine(FeaturePtr& theSplitFeature,
                                                     getFeatureResult(theAfterFeature));
     theCreatedFeatures.insert(aConstraintFeature);
   }
+#endif
 }
 
 void SketchPlugin_ConstraintSplit::splitArc(FeaturePtr& theSplitFeature,
@@ -1021,6 +1025,7 @@ void SketchPlugin_ConstraintSplit::splitArc(FeaturePtr& theSplitFeature,
                                        (theSplitFeature->attribute(SketchPlugin_Arc::START_ID())));
 
   // additional constraints between split and base features
+#ifdef CREATE_CONSTRAINTS
   aConstraintFeature = createConstraintForObjects(SketchPlugin_ConstraintEqual::ID(),
                                                        getFeatureResult(aBaseFeature),
                                                        getFeatureResult(theSplitFeature));
@@ -1039,6 +1044,7 @@ void SketchPlugin_ConstraintSplit::splitArc(FeaturePtr& theSplitFeature,
                                                     getFeatureResult(theAfterFeature));
     theCreatedFeatures.insert(aConstraintFeature);
   }
+#endif
 }
 
 void SketchPlugin_ConstraintSplit::splitCircle(FeaturePtr& theSplitFeature,
@@ -1102,10 +1108,12 @@ void SketchPlugin_ConstraintSplit::splitCircle(FeaturePtr& theSplitFeature,
                      theSplitFeature->attribute(SketchPlugin_Arc::START_ID()));
   theCreatedFeatures.insert(aConstraintFeature);
 
+#ifdef CREATE_CONSTRAINTS
   aConstraintFeature = createConstraintForObjects(SketchPlugin_ConstraintTangent::ID(),
                                                        getFeatureResult(theSplitFeature),
                                                        getFeatureResult(theBaseFeatureModified));
   theCreatedFeatures.insert(aConstraintFeature);
+#endif
 }
 
 void SketchPlugin_ConstraintSplit::arrangePointsOnLine(
