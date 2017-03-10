@@ -119,7 +119,7 @@
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
 
-      <!--  SketchConstraintFillet  -->
+      <!--  SketchFillet  -->
       <feature id="SketchFillet"
                title="Fillet"
                tooltip="Create constraint defining fillet between two objects"

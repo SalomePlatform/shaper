@@ -1,9 +1,9 @@
 """
     TestFillet.py
-    Unit test of SketchPlugin_ConstraintFillet class
+    Unit test of SketchPlugin_Fillet class
 
-    SketchPlugin_ConstraintFillet
-        static const std::string MY_CONSTRAINT_FILLET_ID("SketchConstraintFillet");
+    SketchPlugin_Fillet
+        static const std::string MY_CONSTRAINT_FILLET_ID("SketchFillet");
         data()->addAttribute(SketchPlugin_Constraint::VALUE(), ModelAPI_AttributeDouble::typeId());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttrList::typeId());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
@@ -18,12 +18,14 @@ from salome.shaper import model
 #=========================================================================
 # Auxiliary functions
 #=========================================================================
-aStartPoint1 = []
+TOLERANCE = 1.e-7
 
 def createSketch1(theSketch):
     global aEndPoint1, aEndPoint2
     # Initialize sketch by three lines with coincident boundaries
     allFeatures = []
+
+    aSession.startOperation()
     # Line1
     aSketchLine1 = theSketch.addFeature("SketchLine")
     aStartPoint1 = geomDataAPI_Point2D(aSketchLine1.attribute("StartPoint"))
@@ -54,7 +56,7 @@ def createSketch1(theSketch):
     aCoincidence2.refattr("ConstraintEntityA").setAttr(aEndPoint2)
     aCoincidence2.refattr("ConstraintEntityB").setAttr(aStartPoint3)
 
-    theSketch.execute()
+    aSession.finishOperation()
     return allFeatures
 
 
@@ -62,6 +64,8 @@ def createSketch2(theSketch):
     global aStartPoint1
     # Initialize sketch by line and arc with coincident boundary
     allFeatures = []
+
+    aSession.startOperation()
     # Line
     aSketchLine = theSketch.addFeature("SketchLine")
     aStartPoint1 = geomDataAPI_Point2D(aSketchLine.attribute("StartPoint"))
@@ -83,78 +87,71 @@ def createSketch2(theSketch):
     aCoincidence.refattr("ConstraintEntityA").setAttr(aStartPoint1)
     aCoincidence.refattr("ConstraintEntityB").setAttr(aStartPoint2)
 
-    theSketch.execute()
+    aSession.finishOperation()
     return allFeatures
 
-def checkFillet(theObjects, theRadius):
-    # Verify the arc and lines are connected smoothly
-    print "Check Fillet"
-    aLine = []
-    anArc = []
-    aSize = len(theObjects)
-    for feat in theObjects:
-        assert(feat is not None)
-        if (feat.getKind() == "SketchLine"):
-            aLine.append(feat)
-        elif (feat.getKind() == "SketchArc"):
-            anArc.append(feat)
-    aFilletArc = anArc[-1]
-    assert(aFilletArc is not None)
-    anArc.pop()
+def checkSmoothness(theSketch):
+    aPtPtCoincidences = getCoincidences(theSketch)
+    for coinc in aPtPtCoincidences:
+        aConnectedFeatures = connectedFeatures(coinc)
+        assert(len(aConnectedFeatures) == 2)
+        if aConnectedFeatures[0].getKind() == "SketchArc":
+            if aConnectedFeatures[1].getKind() == "SketchArc":
+                checkArcArcSmoothness(aConnectedFeatures[0], aConnectedFeatures[1])
+            elif aConnectedFeatures[1].getKind() == "SketchLine":
+                checkArcLineSmoothness(aConnectedFeatures[0], aConnectedFeatures[1])
+        elif aConnectedFeatures[0].getKind() == "SketchLine" and aConnectedFeatures[1].getKind() == "SketchArc":
+            checkArcLineSmoothness(aConnectedFeatures[1], aConnectedFeatures[0])
 
-    anArcPoints = []
-    aPoint = geomDataAPI_Point2D(aFilletArc.attribute("ArcStartPoint"))
-    #print "ArcStartPoint " + repr(aPoint.x()) + " " + repr(aPoint.y())
-    anArcPoints.append((aPoint.x(), aPoint.y()))
-    aPoint = geomDataAPI_Point2D(aFilletArc.attribute("ArcEndPoint"))
-    #print "ArcEndPoint " + repr(aPoint.x()) + " " + repr(aPoint.y())
-    anArcPoints.append((aPoint.x(), aPoint.y()))
-    aPoint = geomDataAPI_Point2D(aFilletArc.attribute("ArcCenter"))
-    #print "ArcCenter " + repr(aPoint.x()) + " " + repr(aPoint.y())
-    aCenterX = aPoint.x()
-    aCenterY = aPoint.y()
-    aFilletRadius = math.hypot(anArcPoints[0][0]-aCenterX, anArcPoints[0][1]-aCenterY)
+def checkArcLineSmoothness(theArc, theLine):
+    aCenter = geomDataAPI_Point2D(theArc.attribute("ArcCenter"))
+    aDistance = distancePointLine(aCenter, theLine)
+    aRadius = arcRadius(theArc)
+    assert(math.fabs(aRadius - aDistance) < TOLERANCE)
 
-    for line in aLine:
-        aStartPoint = geomDataAPI_Point2D(line.attribute("StartPoint"))
-        aEndPoint = geomDataAPI_Point2D(line.attribute("EndPoint"))
+def checkArcArcSmoothness(theArc1, theArc2):
+    aCenter1 = geomDataAPI_Point2D(theArc1.attribute("ArcCenter"))
+    aCenter2 = geomDataAPI_Point2D(theArc2.attribute("ArcCenter"))
+    aDistance = distancePointPoint(aCenter1, aCenter2)
+    aRadius1 = arcRadius(theArc1)
+    aRadius2 = arcRadius(theArc2)
+    aRadSum = aRadius1 + aRadius2
+    aRadDiff = math.fabs(aRadius1 - aRadius2)
+    assert(math.fabs(aDistance - aRadSum) < TOLERANCE or math.fabs(aDistance - aRadDiff) < TOLERANCE)
 
-        aLinePoints = []
-        aLinePoints.append((aStartPoint.x(), aStartPoint.y()))
-        #print "aLineStartPoint " + repr(aStartPoint.x()) + " " + repr(aStartPoint.y())
-        aLinePoints.append((aEndPoint.x(), aEndPoint.y()))
-        #print "aLineEndPoint " + repr(aEndPoint.x()) + " " + repr(aEndPoint.y())
+def getCoincidences(theSketch):
+    aCoincidences = []
+    for anIndex in range(0, theSketch.numberOfSubs()):
+        aSubFeature = theSketch.subFeature(anIndex)
+        if aSubFeature.getKind == "SketchConstraintCoincidence":
+            anEntityA = aSubFeature.refattr("ConstraintEntityA")
+            anEntityB = aSubFeature.refattr("ConstraintEntityB")
+            if not anEntityA.isObject() and not anEntityB.isObject():
+                aCoincidences.append(aSubFeature)
+    return aCoincidences
 
-        aLineDirX = aEndPoint.x() - aStartPoint.x()
-        aLineDirY = aEndPoint.y() - aStartPoint.y()
+def connectedFeatures(theCoincidence):
+    anEntityA = aSubFeature.refattr("ConstraintEntityA")
+    anEntityB = aSubFeature.refattr("ConstraintEntityB")
+    return [anEntityA.attr().owner(), anEntityB.attr().owner()]
 
-        for arcPt in anArcPoints:
-            for linePt in aLinePoints:
-                if (math.hypot(linePt[0]-arcPt[0], linePt[1]-arcPt[1]) < 1.e-10):
-                    aDirX = linePt[0] - aCenterX
-                    aDirY = linePt[1] - aCenterY
-                    assert(math.fabs(math.hypot(aDirX, aDirY) - theRadius) < 1.e-7)
-                    aDot = aDirX * aLineDirX + aDirY * aLineDirY
+def arcRadius(theArc):
+    aCenter = geomDataAPI_Point2D(theArc.attribute("ArcCenter"))
+    aStart = geomDataAPI_Point2D(theArc.attribute("ArcStartPoint"))
+    return distancePointPoint(aCenter, aStart)
 
-                    break;
+def distancePointPoint(thePoint1, thePoint2):
+    return math.hypot(thePoint1.x() - thePoint2.x(), thePoint1.y() - thePoint2.y())
 
-    if (aSize == 3):
-        for arc in anArc:
-            aStartPoint = geomDataAPI_Point2D(arc.attribute("ArcStartPoint"))
-            aEndPoint = geomDataAPI_Point2D(arc.attribute("ArcEndPoint"))
-            aCenterPoint = geomDataAPI_Point2D(arc.attribute("ArcCenter"))
+def distancePointLine(thePoint, theLine):
+    aLineStart = geomDataAPI_Point2D(theLine.attribute("StartPoint"))
+    aLineEnd = geomDataAPI_Point2D(theLine.attribute("EndPoint"))
+    aLength = distancePointPoint(aLineStart, aLineEnd)
 
-            aBaseArcPoints = []
-            aBaseArcPoints.append((aStartPoint.x(), aStartPoint.y()))
-            #print "anArcStartPoint " + repr(aStartPoint.x()) + " " + repr(aStartPoint.y())
-            aBaseArcPoints.append((aEndPoint.x(), aEndPoint.y()))
-            #print "anArcEndPoint " + repr(aEndPoint.x()) + " " + repr(aEndPoint.y())
-            #print "anArcCenter " + repr(aCenterPoint.x()) + " " + repr(aCenterPoint.y())
-
-            aRadius = math.hypot(aStartPoint.x()-aCenterPoint.x(), aStartPoint.y()-aCenterPoint.y())
-            aDist = math.hypot(aCenterPoint.x() - aCenterX, aCenterPoint.y() - aCenterY)
-            assert math.fabs(aFilletRadius + aRadius - aDist) < 1.e-7 or math.fabs(math.fabs(aFilletRadius - aRadius) - aDist) < 1.e-7, \
-                "Fillet radius = {0}, Base arc radius = {1}, distance between centers = {2}".format(aFilletRadius, aRadius, aDist)
+    aDir1x, aDir1y = aLineEnd.x() - aLineStart.x(), aLineEnd.y() - aLineStart.y()
+    aDir2x, aDir2y = thePoint.x() - aLineStart.x(), thePoint.y() - aLineStart.y()
+    aCross = aDir1x * aDir2y - aDir1y * aDir2x
+    return math.fabs(aCross) / aLength
 
 
 #=========================================================================
@@ -181,51 +178,24 @@ aSession.finishOperation()
 #=========================================================================
 # Initialize sketch by three connected lines
 #=========================================================================
-aSession.startOperation()
-aFeaturesList = createSketch1(aSketchFeature)
-aSession.finishOperation()
-aSketchSubFeatures = []
-for aSubIndex in range(0, aSketchFeature.numberOfSubs()):
-    aSketchSubFeatures.append(aSketchFeature.subFeature(aSubIndex))
+createSketch1(aSketchFeature)
 assert (model.dof(aSketchFeature) == 8)
-#=========================================================================
-# Global variables
-#=========================================================================
-FILLET_RADIUS1 = 3.
-FILLET_RADIUS2 = 5.
 #=========================================================================
 # Create the Fillet
 #=========================================================================
 aSession.startOperation()
-aFillet = aSketchFeature.addFeature("SketchConstraintFillet")
-aRefAttrA = aFillet.data().refattrlist("ConstraintEntityA");
-aRefAttrA.append(aEndPoint1)
-aRefAttrA.append(aEndPoint2)
-aRadius = aFillet.real("ConstraintValue")
-aRadius.setValue(FILLET_RADIUS1)
-aFillet.execute()
-aResObjects = []
-for aSubIndex in range(0, aSketchFeature.numberOfSubs()):
-    aSubFeature = aSketchFeature.subFeature(aSubIndex)
-    if aSubFeature not in aSketchSubFeatures:
-        if aSubFeature.getKind() == "SketchLine":
-            aResObjects.insert(0, aSubFeature)
-        elif aSubFeature.getKind() == "SketchArc":
-            aResObjects.append(aSubFeature)
+aFillet = aSketchFeature.addFeature("SketchFillet")
+aFillet.refattr("fillet_point").setAttr(aEndPoint1);
+aSession.finishOperation()
+aSession.startOperation()
+aFillet = aSketchFeature.addFeature("SketchFillet")
+aFillet.refattr("fillet_point").setAttr(aEndPoint2);
+aSession.finishOperation()
 #=========================================================================
 # Verify the objects of fillet are created
 #=========================================================================
-assert(aResObjects)
-checkFillet(aResObjects, FILLET_RADIUS1)
-assert model.dof(aSketchFeature) == 8, "PlaneGCS limitation: if you see this message, then PlaneGCS has solved DoF for sketch with fillet correctly (expected DoF = 10, observed = {0}".format(model.dof(aSketchFeature))
-#=========================================================================
-# Change Fillet radius
-#=========================================================================
-aRadius.setValue(FILLET_RADIUS2)
-aFillet.execute()
-aSession.finishOperation()
-checkFillet(aResObjects, FILLET_RADIUS2)
-assert model.dof(aSketchFeature) == 8, "PlaneGCS limitation: if you see this message, then PlaneGCS has solved DoF for sketch with fillet correctly (expected DoF = 10, observed = {0}".format(model.dof(aSketchFeature))
+checkSmoothness(aSketchFeature)
+assert model.dof(aSketchFeature) == 14, "PlaneGCS limitation: if you see this message, then maybe PlaneGCS has solved DoF for sketch with fillet correctly (expected DoF = 10, observed = {0}".format(model.dof(aSketchFeature))
 
 #=========================================================================
 # Create another sketch
@@ -243,45 +213,20 @@ aSession.finishOperation()
 #=========================================================================
 # Initialize sketch by line and arc
 #=========================================================================
-aSession.startOperation()
-aFeaturesList = createSketch2(aSketchFeature)
-aSession.finishOperation()
-aSketchSubFeatures = []
-for aSubIndex in range(0, aSketchFeature.numberOfSubs()):
-    aSketchSubFeatures.append(aSketchFeature.subFeature(aSubIndex))
+createSketch2(aSketchFeature)
 assert (model.dof(aSketchFeature) == 7)
 #=========================================================================
 # Create the Fillet
 #=========================================================================
 aSession.startOperation()
-aFillet = aSketchFeature.addFeature("SketchConstraintFillet")
-aRefAttrA = aFillet.data().refattrlist("ConstraintEntityA");
-aRefAttrA.append(aStartPoint1)
-aRadius = aFillet.real("ConstraintValue")
-aRadius.setValue(FILLET_RADIUS1)
-aFillet.execute()
-aResObjects = []
-for aSubIndex in range(0, aSketchFeature.numberOfSubs()):
-    aSubFeature = aSketchFeature.subFeature(aSubIndex)
-    if aSubFeature not in aSketchSubFeatures:
-        if aSubFeature.getKind() == "SketchLine":
-            aResObjects.insert(0, aSubFeature)
-        elif aSubFeature.getKind() == "SketchArc":
-            aResObjects.append(aSubFeature)
+aFillet = aSketchFeature.addFeature("SketchFillet")
+aFillet.refattr("fillet_point").setAttr(aStartPoint1)
+aSession.finishOperation()
 #=========================================================================
 # Verify the objects of fillet are created
 #=========================================================================
-assert(aResObjects)
-checkFillet(aResObjects, FILLET_RADIUS1)
-assert model.dof(aSketchFeature) == 7, "PlaneGCS limitation: if you see this message, then PlaneGCS has solved DoF for sketch with fillet correctly (expected DoF = 8, observed = {0}".format(model.dof(aSketchFeature))
-#=========================================================================
-# Change Fillet radius
-#=========================================================================
-aRadius.setValue(FILLET_RADIUS2)
-aFillet.execute()
-aSession.finishOperation()
-checkFillet(aResObjects, FILLET_RADIUS2)
-assert model.dof(aSketchFeature) == 11, "PlaneGCS limitation: if you see this message, then PlaneGCS has solved DoF for sketch with fillet correctly (expected DoF = 8, observed = {0}".format(model.dof(aSketchFeature))
+checkSmoothness(aSketchFeature)
+assert model.dof(aSketchFeature) == 10, "PlaneGCS limitation: if you see this message, then maybe PlaneGCS has solved DoF for sketch with fillet correctly (expected DoF = 8, observed = {0}".format(model.dof(aSketchFeature))
 #=========================================================================
 # End of test
 #=========================================================================

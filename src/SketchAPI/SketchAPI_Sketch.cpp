@@ -31,6 +31,7 @@
 //--------------------------------------------------------------------------------------
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelHighAPI_Double.h>
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_RefAttr.h>
 #include <ModelHighAPI_Selection.h>
@@ -603,15 +604,31 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setEqual(
 }
 
 std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setFillet(
-    const std::list<ModelHighAPI_RefAttr> & thePoints,
-    const ModelHighAPI_Double & theRadius)
+    const ModelHighAPI_RefAttr & thePoint)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_Fillet::ID());
-  fillAttribute(thePoints, aFeature->data()->refattrlist(SketchPlugin_Constraint::ENTITY_A()));
-  fillAttribute(theRadius, aFeature->real(SketchPlugin_Constraint::VALUE()));
-  aFeature->execute();
+  fillAttribute(thePoint, aFeature->data()->refattr(SketchPlugin_Fillet::FILLET_POINT_ID()));
+  apply(); // finish operation to remove Fillet feature correcly
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));
+}
+
+std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setFilletWithRadius(
+    const ModelHighAPI_RefAttr & thePoint,
+    const ModelHighAPI_Double & theRadius)
+{
+  CompositeFeaturePtr aSketch = compositeFeature();
+  int aNbSubs = aSketch->numberOfSubs();
+
+  // create fillet
+  InterfacePtr aFilletFeature = setFillet(thePoint);
+
+  // set radius for just created arc
+  FeaturePtr anArc = aSketch->subFeature(aNbSubs - 1);
+  if (anArc->getKind() == SketchPlugin_Arc::ID())
+    setRadius(ModelHighAPI_RefAttr(anArc->lastResult()), ModelHighAPI_Double(theRadius));
+
+  return aFilletFeature;
 }
 
 std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setFixed(

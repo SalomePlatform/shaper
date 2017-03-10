@@ -3,12 +3,19 @@ from salome.shaper import model
 from TestSketcher import SketcherTestCase
 
 class SketcherSetFillet(SketcherTestCase):
-    def runTest(self):
+    def test_fillet(self):
         l1 = self.sketch.addLine(0, 0, 0, 1)
         l2 = self.sketch.addLine(0, 1, 1, 1)
         self.sketch.setCoincident(l1.endPoint(), l2.startPoint())
-        self.sketch.setFillet([l1.endPoint()], 10.0)
+        self.sketch.setFillet(l1.endPoint())
+        model.do()
+
+    def test_fillet_with_radius(self):
+        l1 = self.sketch.addLine(10, 10, 30, 10)
+        l2 = self.sketch.addLine(10, 10, 30, 30)
+        self.sketch.setCoincident(l1.startPoint(), l2.startPoint())
+        self.sketch.setFilletWithRadius(l1.startPoint(), 10.0)
         model.do()
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

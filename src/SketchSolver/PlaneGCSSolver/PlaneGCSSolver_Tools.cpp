@@ -473,10 +473,19 @@ ConstraintWrapperPtr createConstraintTangent(
 {
   GCSConstraintPtr aNewConstr;
   if (theType == CONSTRAINT_TANGENT_CIRCLE_LINE) {
+    GCSCurvePtr anEntCirc, anEntLine;
+    if (theEntity1->type() == ENTITY_LINE) {
+      anEntLine = theEntity1->entity();
+      anEntCirc = theEntity2->entity();
+    } else {
+      anEntLine = theEntity2->entity();
+      anEntCirc = theEntity1->entity();
+    }
+
     std::shared_ptr<GCS::Circle> aCirc =
-      std::dynamic_pointer_cast<GCS::Circle>(theEntity1->entity());
+      std::dynamic_pointer_cast<GCS::Circle>(anEntCirc);
     std::shared_ptr<GCS::Line> aLine =
-      std::dynamic_pointer_cast<GCS::Line>(theEntity2->entity());
+      std::dynamic_pointer_cast<GCS::Line>(anEntLine);
 
     aNewConstr =
       GCSConstraintPtr(new GCS::ConstraintP2LDistance(aCirc->center, *aLine, aCirc->rad));

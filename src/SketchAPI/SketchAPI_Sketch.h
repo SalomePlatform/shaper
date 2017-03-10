@@ -318,7 +318,12 @@ public:
   /// Set fillet
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelHighAPI_Interface> setFillet(
-      const std::list<ModelHighAPI_RefAttr> & thePoints,
+      const ModelHighAPI_RefAttr & thePoint);
+
+  /// Set fillet with additional radius constraint
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelHighAPI_Interface> setFilletWithRadius(
+      const ModelHighAPI_RefAttr & thePoint,
       const ModelHighAPI_Double & theRadius);
 
   /// Set fixed

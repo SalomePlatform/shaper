@@ -47,7 +47,7 @@ def vertical_body():
     sketch.setLength(top, "L")
     sketch.setLength(left, "L")
 
-    sketch.setFillet([left.endPoint()], 32)
+    sketch.setFilletWithRadius(left.endPoint(), 32)
 
     model.do()  #!!!
 

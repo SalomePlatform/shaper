@@ -12,6 +12,7 @@
 #include "SketchPlugin_SketchEntity.h"
 
 #include <GeomAPI_IPresentable.h>
+#include <GeomDataAPI_Point2D.h>
 
 class GeomAPI_XY;
 
@@ -64,6 +65,11 @@ class SketchPlugin_Fillet: public SketchPlugin_SketchEntity, public GeomAPI_IPre
 
   /// \brief Use plugin manager for features creation
   SketchPlugin_Fillet();
+
+private:
+  bool calculateFilletParameters();
+
+  bool findFeaturesContainingFilletPoint(std::shared_ptr<GeomDataAPI_Point2D> theFilletPoint);
 
 private:
     FeaturePtr myBaseFeatures[2];

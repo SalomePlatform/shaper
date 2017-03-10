@@ -101,13 +101,14 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
   }
 
   SolveStatus aStatus;
-  if (aResult == GCS::Success) {
+  if (aResult == GCS::Failed)
+    aStatus = STATUS_FAILED;
+  else {
     myEquationSystem->applySolution();
     if (myDOF < 0)
       myDOF = myEquationSystem->dofsNumber();
     aStatus = STATUS_OK;
-  } else
-    aStatus = STATUS_FAILED;
+  }
 
   return aStatus;
 }

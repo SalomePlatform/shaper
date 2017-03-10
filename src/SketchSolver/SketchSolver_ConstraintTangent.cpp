@@ -49,15 +49,12 @@ void SketchSolver_ConstraintTangent::getAttributes(
   // Check the quantity of entities of each type and their order (arcs first)
   int aNbLines = 0;
   int aNbCircles = 0;
-  bool isSwap = false; // whether need to swap arguments (arc goes before line)
   std::vector<EntityWrapperPtr>::iterator anEntIt = theAttributes.begin() + 2;
   for (; anEntIt != theAttributes.end(); ++anEntIt) {
     if ((*anEntIt)->type() == ENTITY_LINE)
       ++aNbLines;
-    else if ((*anEntIt)->type() == ENTITY_ARC || (*anEntIt)->type() == ENTITY_CIRCLE) {
+    else if ((*anEntIt)->type() == ENTITY_ARC || (*anEntIt)->type() == ENTITY_CIRCLE)
       ++aNbCircles;
-      isSwap = aNbLines > 0;
-    }
   }
 
   if (aNbCircles < 1) {
@@ -85,12 +82,6 @@ void SketchSolver_ConstraintTangent::getAttributes(
 
     if (!hasSingleCoincidence(aFeature1, aFeature2))
       myErrorMsg = SketchSolver_Error::TANGENCY_FAILED();
-  }
-
-  if (isSwap) {
-    EntityWrapperPtr aTemp = theAttributes[2];
-    theAttributes[2] = theAttributes[3];
-    theAttributes[3] = aTemp;
   }
 }
 
