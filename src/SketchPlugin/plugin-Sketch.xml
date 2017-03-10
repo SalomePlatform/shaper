@@ -12,7 +12,7 @@
                 SketchConstraintParallel SketchConstraintPerpendicular
                 SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical
                 SketchConstraintEqual SketchConstraintTangent
-                SketchConstraintFillet SketchConstraintSplit SketchTrim
+                SketchFillet SketchConstraintSplit SketchTrim
                 SketchConstraintCoincidence
                 SketchConstraintMirror SketchConstraintAngle
                 SketchMultiRotation SketchMultiTranslation
@@ -120,24 +120,17 @@
       </feature>
 
       <!--  SketchConstraintFillet  -->
-      <feature id="SketchConstraintFillet" title="Fillet" tooltip="Create constraint defining fillet between two objects" icon="icons/Sketch/fillet.png">
-        <!--<sketch_shape_selector id="ConstraintEntityA"
-            label="Point" tooltip="Select point for fillet (should be shared by two entities only)" shape_types="vertex">
+      <feature id="SketchFillet"
+               title="Fillet"
+               tooltip="Create constraint defining fillet between two objects"
+               icon="icons/Sketch/fillet.png">
+        <sketch_shape_selector id="fillet_point"
+                               label="Point"
+                               tooltip="Select point for fillet (should be shared by two entities only)"
+                               shape_types="vertex">
           <validator id="SketchPlugin_FilletVertexValidator"/>
-        </sketch_shape_selector>-->
-        <sketch_multi_selector id="ConstraintEntityA"
-            label="Points:"
-            tooltip="Select points for fillets"
-            type_choice="Vertices"
-            greed = "true"
-            clear_in_neutral_point="false">
-          <validator id="SketchPlugin_FilletVertexValidator"/>
-        </sketch_multi_selector>
-        <labelvalue label="Radius" tooltip="Fillet arc radius" id="ConstraintValue" accept_expressions="0" min="0" use_reset="false"
-                     enable_value="enable_by_preferences">
-          <validator id="GeomValidators_Positive"/>
-        </labelvalue>
-        <validator id="PartSet_FilletSelection"/>
+        </sketch_shape_selector>
+        <!--<validator id="PartSet_FilletSelection"/>-->
       </feature>
       <!--  SketchConstraintSplit  -->
       <feature id="SketchConstraintSplit" title="Split"

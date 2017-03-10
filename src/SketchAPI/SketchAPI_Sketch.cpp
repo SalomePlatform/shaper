@@ -14,7 +14,7 @@
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintEqual.h>
-#include <SketchPlugin_ConstraintFillet.h>
+#include <SketchPlugin_Fillet.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintMiddle.h>
@@ -607,7 +607,7 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setFillet(
     const ModelHighAPI_Double & theRadius)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
-      compositeFeature()->addFeature(SketchPlugin_ConstraintFillet::ID());
+      compositeFeature()->addFeature(SketchPlugin_Fillet::ID());
   fillAttribute(thePoints, aFeature->data()->refattrlist(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theRadius, aFeature->real(SketchPlugin_Constraint::VALUE()));
   aFeature->execute();

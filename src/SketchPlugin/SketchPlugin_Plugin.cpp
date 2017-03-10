@@ -13,7 +13,7 @@
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintEqual.h>
-#include <SketchPlugin_ConstraintFillet.h>
+#include <SketchPlugin_Fillet.h>
 #include <SketchPlugin_ConstraintSplit.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
@@ -165,8 +165,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintMiddle);
   } else if (theFeatureID == SketchPlugin_ConstraintMirror::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintMirror);
-  } else if (theFeatureID == SketchPlugin_ConstraintFillet::ID()) {
-    return FeaturePtr(new SketchPlugin_ConstraintFillet);
+  } else if (theFeatureID == SketchPlugin_Fillet::ID()) {
+    return FeaturePtr(new SketchPlugin_Fillet);
   } else if (theFeatureID == SketchPlugin_ConstraintSplit::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintSplit);
   } else if (theFeatureID == SketchPlugin_MultiTranslation::ID()) {
@@ -234,7 +234,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_ConstraintTangent::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintMiddle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintMirror::ID(), aHasSketchPlane);
-      aMsg->setState(SketchPlugin_ConstraintFillet::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_Fillet::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintSplit::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintAngle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MultiRotation::ID(), aHasSketchPlane);

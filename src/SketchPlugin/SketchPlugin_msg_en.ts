@@ -1938,77 +1938,77 @@
   </context>
 
   <context>
-    <name>SketchConstraintFillet:ConstraintValue:GeomValidators_Positive</name>
+    <name>SketchFillet:ConstraintValue:GeomValidators_Positive</name>
     <message>
       <source>Double is not initialized.</source>
       <translation>Set the fillet radius</translation>
     </message>
   </context>
   <context>
-    <name>SketchConstraintFillet:ConstraintValue:GeomValidators_Positive</name>
+    <name>SketchFillet:ConstraintValue:GeomValidators_Positive</name>
     <message>
       <source>Double is not positive.</source>
       <translation>The fillet radius must be positive</translation>
     </message>
   </context>
   <context>
-    <name>SketchConstraintFillet:ConstraintValue:GeomValidators_Positive</name>
+    <name>SketchFillet:ConstraintValue:GeomValidators_Positive</name>
     <message>
       <source>Integer is not initialized.</source>
       <translation>Set the integer fillet radius</translation>
     </message>
   </context>
   <context>
-    <name>SketchConstraintFillet:ConstraintValue:GeomValidators_Positive</name>
+    <name>SketchFillet:ConstraintValue:GeomValidators_Positive</name>
     <message>
       <source>Integer is not positive.</source>
       <translation>The integer fillet radius must be positive</translation>
     </message>
   </context>
   <context>
-    <name>SketchConstraintFillet:Model_FeatureValidator</name>
+    <name>SketchFillet:Model_FeatureValidator</name>
     <message>
       <source>Attribute "ConstraintEntityA" is not initialized.</source>
       <translation>Select one or several points for filet</translation>
     </message>
   </context>
   <context>
-    <name>SketchConstraintFillet:Model_FeatureValidator</name>
+    <name>SketchFillet:Model_FeatureValidator</name>
     <message>
       <source>Attribute "ConstraintValue" is not initialized.</source>
       <translation>Set the fillet radius</translation>
     </message>
   </context>
   <context>
-    <name>SketchConstraintFillet:ConstraintEntityA:SketchPlugin_FilletVertexValidator</name>
+    <name>SketchFillet:ConstraintEntityA:SketchPlugin_FilletVertexValidator</name>
     <message>
       <source>Error: List of points is empty.</source>
       <translation>List of points is empty</translation>
     </message>
   </context>
   <context>
-    <name>SketchConstraintFillet:ConstraintEntityA:SketchPlugin_FilletVertexValidator</name>
+    <name>SketchFillet:ConstraintEntityA:SketchPlugin_FilletVertexValidator</name>
     <message>
       <source>Error: one of the selected point does not have coicidence.</source>
       <translation>One of the selected point does not have coicidence</translation>
     </message>
   </context>
   <context>
-    <name>SketchConstraintFillet:ConstraintEntityA:SketchPlugin_FilletVertexValidator</name>
+    <name>SketchFillet:ConstraintEntityA:SketchPlugin_FilletVertexValidator</name>
     <message>
       <source>Error: One of the selected points does not have two suitable edges for fillet.</source>
       <translation>One of the selected points does not have two suitable edges for fillet</translation>
     </message>
   </context>
   <context>
-    <name>SketchConstraintFillet:ConstraintEntityA:SketchPlugin_FilletVertexValidator</name>
+    <name>SketchFillet:ConstraintEntityA:SketchPlugin_FilletVertexValidator</name>
     <message>
       <source>Error: Edges in selected point has tangent constraint.</source>
       <translation>Edges in selected point has tangent constraint</translation>
     </message>
   </context>
   <context>
-    <name>SketchConstraintFillet:ConstraintEntityA:SketchPlugin_FilletVertexValidator</name>
+    <name>SketchFillet:ConstraintEntityA:SketchPlugin_FilletVertexValidator</name>
     <message>
       <source>Error: Edges in selected point has tangent constraint.</source>
       <translation>Edges in selected point has tangent constraint</translation>

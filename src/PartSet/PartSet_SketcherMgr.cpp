@@ -60,7 +60,7 @@
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
-#include <SketchPlugin_ConstraintFillet.h>
+#include <SketchPlugin_Fillet.h>
 #include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCollinear.h>
