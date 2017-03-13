@@ -510,13 +510,21 @@ void PartSet_MenuMgr::grantedOperationIds(ModuleBase_Operation* theOperation,
 void PartSet_MenuMgr::onEdit(bool)
 {
   QObjectPtrList aObjects = myModule->workshop()->selection()->selectedObjects();
-  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObjects.first());
-  if (aFeature == NULL) {
-    ResultParameterPtr aParam =
-      std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aObjects.first());
-    if (aParam.get() != NULL) {
-      aFeature = ModelAPI_Feature::feature(aParam);
+  FeaturePtr aFeature;
+  foreach(ObjectPtr aObj, aObjects) {
+    aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+    if (aFeature.get())
+      break;
+  }
+  if (aFeature.get() == NULL) {
+    ResultParameterPtr aParam;
+    foreach(ObjectPtr aObj, aObjects) {
+      aParam = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aObj);
+      if (aParam.get())
+        break;
     }
+    if (aParam.get() != NULL)
+      aFeature = ModelAPI_Feature::feature(aParam);
   }
   if (aFeature.get() != NULL)
     myModule->editFeature(aFeature);

@@ -1159,14 +1159,15 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
   SessionPtr aMgr = ModelAPI_Session::get();
   QAction* aActivatePartAction = myMenuMgr->action("ACTIVATE_PART_CMD");
 
+  bool hasResult = false;
+  bool hasFeature = false;
+  bool hasParameter = false;
+  bool hasCompositeOwner = false;
+  ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter,
+                                  hasCompositeOwner);
+
   ModuleBase_Operation* aCurrentOp = myWorkshop->currentOperation();
   if (aSelected == 1) {
-    bool hasResult = false;
-    bool hasFeature = false;
-    bool hasParameter = false;
-    bool hasCompositeOwner = false;
-    ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter,
-                                   hasCompositeOwner);
     ObjectPtr aObject = aObjects.first();
     if (aObject) {
       ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
@@ -1194,6 +1195,12 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
           }
         }
       }
+    }
+  } else {
+    if (hasFeature) {
+      myMenuMgr->action("EDIT_CMD")->setEnabled(aCurrentOp == 0);
+      theMenu->addAction(myMenuMgr->action("EDIT_CMD"));
+      theMenu->addSeparator();
     }
   }
   bool aNotDeactivate = (aCurrentOp == 0);
