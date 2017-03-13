@@ -340,8 +340,17 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
   double anAngle = real(ANGLE())->value();
 
   GeomAlgoAPI_Rotation aRotationAlgo(aFace, anAxis, anAngle);
-  std::shared_ptr<GeomAPI_Face> aRes(new GeomAPI_Face(aRotationAlgo.shape()));
+  if (!aRotationAlgo.check()) {
+    setError(aRotationAlgo.getError());
+    return GeomShapePtr();
+  }
+  aRotationAlgo.build();
+  if (!aRotationAlgo.isDone()) {
+    setError("Error: Failed to rotate plane");
+    return GeomShapePtr();
+  }
 
+  std::shared_ptr<GeomAPI_Face> aRes(new GeomAPI_Face(aRotationAlgo.shape()));
   return aRes;
 }
 
