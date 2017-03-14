@@ -626,7 +626,7 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setFilletWithRadius(
   // set radius for just created arc
   FeaturePtr anArc = aSketch->subFeature(aNbSubs - 1);
   if (anArc->getKind() == SketchPlugin_Arc::ID())
-    setRadius(ModelHighAPI_RefAttr(anArc->lastResult()), ModelHighAPI_Double(theRadius));
+    setRadius(ModelHighAPI_RefAttr(ObjectPtr(anArc->lastResult())), ModelHighAPI_Double(theRadius));
 
   return aFilletFeature;
 }
