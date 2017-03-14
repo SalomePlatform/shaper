@@ -140,6 +140,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestMultiRotation.py
                TestMultiTranslation.py
                TestFillet.py
+               TestFilletInteracting.py
                TestRectangle.py
                TestProjection.py
                TestSplit.py

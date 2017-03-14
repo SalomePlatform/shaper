@@ -123,7 +123,7 @@ def getCoincidences(theSketch):
     aCoincidences = []
     for anIndex in range(0, theSketch.numberOfSubs()):
         aSubFeature = theSketch.subFeature(anIndex)
-        if aSubFeature.getKind == "SketchConstraintCoincidence":
+        if aSubFeature.getKind() == "SketchConstraintCoincidence":
             anEntityA = aSubFeature.refattr("ConstraintEntityA")
             anEntityB = aSubFeature.refattr("ConstraintEntityB")
             if not anEntityA.isObject() and not anEntityB.isObject():
@@ -131,9 +131,11 @@ def getCoincidences(theSketch):
     return aCoincidences
 
 def connectedFeatures(theCoincidence):
-    anEntityA = aSubFeature.refattr("ConstraintEntityA")
-    anEntityB = aSubFeature.refattr("ConstraintEntityB")
-    return [anEntityA.attr().owner(), anEntityB.attr().owner()]
+    anEntityA = theCoincidence.refattr("ConstraintEntityA")
+    anEntityB = theCoincidence.refattr("ConstraintEntityB")
+    aFeatureA = ModelAPI.ModelAPI_Feature.feature(anEntityA.attr().owner())
+    aFeatureB = ModelAPI.ModelAPI_Feature.feature(anEntityB.attr().owner())
+    return [aFeatureA, aFeatureB]
 
 def arcRadius(theArc):
     aCenter = geomDataAPI_Point2D(theArc.attribute("ArcCenter"))
@@ -230,6 +232,8 @@ assert model.dof(aSketchFeature) == 10, "PlaneGCS limitation: if you see this me
 #=========================================================================
 # End of test
 #=========================================================================
+
+# TODO: Improve Fillet test case by moving one of filleted objectes and check coincidence and tangency are correct
 
 # TODO: Checking of Python dump has been disabled until the Fillet redesigned.
 #assert(model.checkPythonDump())
