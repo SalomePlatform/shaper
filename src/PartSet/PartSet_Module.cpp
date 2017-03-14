@@ -166,6 +166,9 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Config_PropManager::registerProp("Visualization", "operation_highlight_color",
                           "Multi selector item color in operation", Config_Prop::Color,
                           PartSet_CustomPrs::OPERATION_HIGHLIGHT_COLOR());
+  Config_PropManager::registerProp("Visualization", "operation_remove_feature_color",
+                          "Color of removed feature in operation", Config_Prop::Color,
+                          PartSet_CustomPrs::OPERATION_REMOVE_FEATURE_COLOR());
 }
 
 PartSet_Module::~PartSet_Module()

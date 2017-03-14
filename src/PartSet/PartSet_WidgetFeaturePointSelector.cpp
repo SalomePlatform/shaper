@@ -135,6 +135,8 @@ void PartSet_WidgetFeaturePointSelector::mouseReleased(ModuleBase_IViewWindow* t
     return;
 
   emit focusOutWidget(this);
+  // we need to deselect base feature for better visibility of selected feature
+  XGUI_Tools::workshop(myWorkshop)->displayer()->clearSelected(false);
 }
 
 //********************************************************************

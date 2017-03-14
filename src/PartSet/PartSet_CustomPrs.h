@@ -39,6 +39,8 @@ public:
   /// Returns color between white and color of highlight
   static const std::string OPERATION_HIGHLIGHT_COLOR() { return "128, 0, 0"; }
 
+  /// Returns color lighter than sketch feature entity : pink
+  static const std::string OPERATION_REMOVE_FEATURE_COLOR() { return "255, 174, 201"; }
 public:
   /// Constructor
   /// \param theWorkshop a reference to workshop

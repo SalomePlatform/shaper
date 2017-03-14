@@ -56,6 +56,7 @@
 static const double PI = 3.141592653589793238463;
 
 static const std::string OPERATION_HIGHLIGHT_COLOR() { return "128, 0, 0"; }
+static const std::string OPERATION_REMOVE_FEATURE_COLOR() { return "255, 174, 201"; }
 
 SketchPlugin_Trim::SketchPlugin_Trim()
 {
@@ -365,8 +366,8 @@ AISObjectPtr SketchPlugin_Trim::getAISObject(AISObjectPtr thePrevious)
           bool isConstruction = anAuxiliaryAttr.get() != NULL && anAuxiliaryAttr->value();
 
           std::vector<int> aColor;
-          aColor = Config_PropManager::color("Visualization", "operation_highlight_color",
-                                             OPERATION_HIGHLIGHT_COLOR());
+          aColor = Config_PropManager::color("Visualization", "operation_remove_feature_color",
+                                             OPERATION_REMOVE_FEATURE_COLOR());
           double aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
           int aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
           if (isConstruction) {
@@ -374,8 +375,7 @@ AISObjectPtr SketchPlugin_Trim::getAISObject(AISObjectPtr thePrevious)
             aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY();
           }
           anAIS->setColor(aColor[0], aColor[1], aColor[2]);
-           // modification of width should be replaced to value 1 after highlight problem is fixed
-          anAIS->setWidth(aWidth + 2);//1);
+          anAIS->setWidth(aWidth);
           anAIS->setLineStyle(aLineStyle);
           break;
         }
