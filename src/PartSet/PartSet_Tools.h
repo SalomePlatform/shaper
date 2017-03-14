@@ -135,15 +135,10 @@ public:
   static std::shared_ptr<GeomDataAPI_Point2D> findFirstEqualPoint(const FeaturePtr& theFeature,
                                        const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
-  /// Creates constrains of the current
-  /// \param theSketch a sketch feature
-  /// \param theFeature a source feature
-  /// \param theAttribute a name of the requried attribute attribute
-  /// \param theClickedX the horizontal coordnate of the point
-  /// \param theClickedY the vertical coordnate of the point
-  static void setConstraints(CompositeFeaturePtr theSketch, FeaturePtr theFeature,
-                             const std::string& theAttribute, double theClickedX,
-                             double theClickedY);
+  static std::shared_ptr<GeomDataAPI_Point2D> findFirstEqualPointInSketch(
+                                       const CompositeFeaturePtr& theSketch,
+                                       const std::shared_ptr<GeomDataAPI_Point2D>& theFeaturePoint,
+                                       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
   /// Create a sketch plane instance
   /// \param theSketch a sketch feature

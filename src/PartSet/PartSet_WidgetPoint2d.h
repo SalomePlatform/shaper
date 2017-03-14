@@ -19,6 +19,7 @@
 #include <V3d_View.hxx>
 
 class ModelAPI_Feature;
+class ModelAPI_AttributeRefAttr;
 class ModuleBase_IWorkshop;
 class ModuleBase_ParamSpinBox;
 class ModuleBase_IViewWindow;
@@ -173,6 +174,11 @@ protected:
    bool getPoint2d(const Handle(V3d_View)& theView, const TopoDS_Shape& theShape,
                    double& theX, double& theY) const;
 
+   /// Creates constrains of the clicked point
+   /// \param theClickedX the horizontal coordnate of the point
+   /// \param theClickedY the vertical coordnate of the point
+   bool setConstraintTo(double theClickedX, double theClickedY);
+
    /// Create a coincidence constraint between the attribute and the parameter object
    /// \theObject a result object
    /// \return true if succed
@@ -198,11 +204,12 @@ protected:
                                   const std::shared_ptr<GeomAPI_Pnt2d>& thePoint,
                                   const CompositeFeaturePtr& theSketch);
 
+   std::shared_ptr<ModelAPI_AttributeRefAttr> attributeRefAttr() const;
+
 protected:
   ModuleBase_IWorkshop* myWorkshop; ///< workshop
 
 private:
-
   QGroupBox* myGroupBox;  ///< the parent group box for all intenal widgets
   //ModuleBase_ParamSpinBox* myXSpin;  ///< the spin box for the X coordinate
   //ModuleBase_ParamSpinBox* myYSpin;  ///< the spin box for the Y coordinate
@@ -215,6 +222,7 @@ private:
   /// it is important during restart operation
   CompositeFeaturePtr mySketch;
 
+  std::string myRefAttribute; /// if not empty, coincidences are not set but attribute is filled
   bool myValueIsCashed; /// boolean state if the value is cashed during value state change
   bool myIsFeatureVisibleInCash; /// boolean value if the feature was visible when cash if filled
   double myXValueInCash; /// the cashed X value during value state change

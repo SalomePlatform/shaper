@@ -30,7 +30,7 @@ for index in range(Sketch_1_feature.numberOfSubs()):
 assert(idList.count(SketchLineId) == 2)
 assert(idList.count(SketchPointId) == 1)
 assert(idList.count(SketchConstraintCoincidenceId) == 3)
-assert(idList.count(SketchConstraintParallelId) == 1)
+assert(idList.count(SketchConstraintParallelId) == 0)
 # Test end
 
 # Test split on line with two points
@@ -51,7 +51,7 @@ for index in range(Sketch_2_feature.numberOfSubs()):
 assert(idList.count(SketchLineId) == 3)
 assert(idList.count(SketchPointId) == 2)
 assert(idList.count(SketchConstraintCoincidenceId) == 6)
-assert(idList.count(SketchConstraintParallelId) == 2)
+assert(idList.count(SketchConstraintParallelId) == 0)
 # Test end
 
 # Test split on circle with two points
@@ -72,7 +72,7 @@ for index in range(Sketch_3_feature.numberOfSubs()):
 assert(idList.count(SketchArcId) == 2)
 assert(idList.count(SketchPointId) == 2)
 assert(idList.count(SketchConstraintCoincidenceId) == 6)
-assert(idList.count(SketchConstraintTangentId) == 1)
+assert(idList.count(SketchConstraintTangentId) == 0)
 # Test end
 
 # Test split on arc with one point
@@ -94,8 +94,8 @@ for index in range(Sketch_4_feature.numberOfSubs()):
 assert(idList.count(SketchArcId) == 2)
 assert(idList.count(SketchPointId) == 1)
 assert(idList.count(SketchConstraintCoincidenceId) == 3)
-assert(idList.count(SketchConstraintEqualId) == 1)
-assert(idList.count(SketchConstraintTangentId) == 1)
+assert(idList.count(SketchConstraintEqualId) == 0)
+assert(idList.count(SketchConstraintTangentId) == 0)
 # Test end
 
 # Test split on arc with two points
@@ -120,8 +120,8 @@ for index in range(Sketch_5_feature.numberOfSubs()):
 assert(idList.count(SketchArcId) == 3)
 assert(idList.count(SketchPointId) == 0)
 assert(idList.count(SketchConstraintCoincidenceId) == 6)
-assert(idList.count(SketchConstraintEqualId) == 2)
-assert(idList.count(SketchConstraintTangentId) == 2)
+assert(idList.count(SketchConstraintEqualId) == 0)
+assert(idList.count(SketchConstraintTangentId) == 0)
 # Test end
 
 model.end()

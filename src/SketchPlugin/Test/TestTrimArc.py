@@ -23,11 +23,11 @@ Part_1_doc = Part_1.document()
 
 # Test1:begin split on circle with coincident point and intersection line : smaller part
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
-SketchCircle_1_1 = Sketch_1.addCircle(50, 50, 20)
+SketchArc_1_1 = Sketch_1.addArc(50, 50, 55, 70, 30, 45, True)
 SketchLine_1_1 = Sketch_1.addLine(50, 30, 100, 30)
 SketchLine_1_2 = Sketch_1.addLine(60, 50, 100, 30)
 
-SketchConstraintCoincidence_1_1 = Sketch_1.setCoincident(SketchLine_1_1.startPoint(), SketchCircle_1_1.results()[1])
+SketchConstraintCoincidence_1_1 = Sketch_1.setCoincident(SketchLine_1_1.startPoint(), SketchArc_1_1.results()[1])
 SketchConstraintCoincidence_1_2 = Sketch_1.setCoincident(SketchLine_1_1.endPoint(), SketchLine_1_2.endPoint())
 GeomPoint_1_1 = geom.Pnt2d(60, 35)
 
@@ -36,13 +36,13 @@ Sketch_1_feature = featureToCompositeFeature(Sketch_1.feature())
 idList_before_1 = []
 for index in range(Sketch_1_feature.numberOfSubs()):
   idList_before_1.append(Sketch_1_feature.subFeature(index).getKind())
-assert(idList_before_1.count(SketchCircleId) == 1)
-assert(idList_before_1.count(SketchArcId) == 0)
+assert(idList_before_1.count(SketchArcId) == 1)
 assert(idList_before_1.count(SketchLineId) == 2)
 assert(idList_before_1.count(SketchConstraintCoincidenceId) == 2)
+assert(idList_before_1.count(SketchConstraintEqualId) == 0)
 
 #perform trim
-SketchTrim_1_1 = Sketch_1.addTrim(SketchCircle_1_1, GeomPoint_1_1)
+SketchTrim_1_1 = Sketch_1.addTrim(SketchArc_1_1, GeomPoint_1_1)
 SketchTrim_1_1.execute()
 model.do()
 
@@ -52,25 +52,14 @@ idList_after_1 = []
 for SubIndex in range(SketchFeatures.numberOfSubs()):
     SubFeature = SketchFeatures.subFeature(SubIndex)
     idList_after_1.append(SubFeature.getKind())
-    if SubFeature.getKind() == SketchArcId:
-      ArcFeature_1 = SubFeature
 
-
-assert(idList_after_1.count(SketchCircleId) == 0)
-assert(idList_after_1.count(SketchArcId) == 1)
+assert(idList_after_1.count(SketchArcId) == 2)
 assert(idList_after_1.count(SketchLineId) == 2)
-assert(idList_after_1.count(SketchConstraintCoincidenceId) == 3)
+aCount = idList_after_1.count(SketchConstraintCoincidenceId)
 
-#test created arc: it is not inversed, has coincidence to end line point
-anInversed_1 = ArcFeature_1.boolean("InversedArc").value()
-assert(anInversed_1 == False)
-ArcPoint_1 = geomDataAPI_Point2D(ArcFeature_1.attribute("ArcEndPoint"))
-LinePoint_1 = geomDataAPI_Point2D(SketchLine_1_1.startPoint())
-aDistance_1 = math.hypot(LinePoint_1.x() - ArcPoint_1.x(), LinePoint_1.y() - ArcPoint_1.y())
-#print "Distance " + repr(aDistance)
-assert (math.fabs(aDistance_1) <= TOLERANCE)
+assert(idList_after_1.count(SketchConstraintCoincidenceId) == 4)
+assert(idList_after_1.count(SketchConstraintEqualId) == 1)
 # Test1:end
-
 
 # Test2: split on circle with coincident point and intersection line : largest part
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))

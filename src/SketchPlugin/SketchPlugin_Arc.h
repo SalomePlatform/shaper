@@ -73,6 +73,13 @@ class SketchPlugin_Arc : public SketchPlugin_SketchEntity, public GeomAPI_IPrese
     static const std::string MY_CENTER_ID = "ArcCenter";
     return MY_CENTER_ID;
   }
+
+  inline static const std::string& CENTER_REF_ID()
+  {
+    static const std::string MY_CENTER_REF_ID = "ArcCenterRef";
+    return MY_CENTER_REF_ID;
+  }
+
   /// Start 2D point of the arc
   inline static const std::string& START_ID()
   {

@@ -112,7 +112,7 @@ private:
   /// \param theCoincidenceToPoint [out] coincidence to point be connected to new feature
   void getConstraints(std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete,
               std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToUpdate,
-              std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theTangentFeatures,
+              //std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theTangentFeatures,
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature/*,
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToPoint*/);
 
@@ -142,9 +142,9 @@ private:
   /// Move tangency constraint to the nearest split feature that has a coincidence to the tangent
   /// \param theTangentFeatures tangencies to feature to be connected to nearest feature
   /// \param theFurtherCoincidences a list of points where coincidences is built
-  void updateTangentConstraintsToFeature(
-              const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theTangentFeatures,
-              const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences);
+  //void updateTangentConstraintsToFeature(
+  //            const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theTangentFeatures,
+  //            const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences);
 
 
   /// Move constraints from base feature to given feature

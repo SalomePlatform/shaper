@@ -101,6 +101,9 @@ void SketchPlugin_Arc::initDerivedClassAttributes()
   if (!isInversed->isInitialized())
     isInversed->setValue(false);
   anArcType->setValue(ARC_TYPE_CENTER_START_END());
+
+  //data()->addAttribute(CENTER_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
+  //ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CENTER_REF_ID());
 }
 
 void SketchPlugin_Arc::execute()

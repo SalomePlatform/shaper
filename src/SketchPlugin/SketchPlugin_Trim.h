@@ -91,9 +91,7 @@ private:
   /// Obtains those constraints of the feature that should be modified. output maps contain
   /// point of coincidence and attribute id to be modified after split
   /// \param theFeaturesToDelete [out] constrains that will be deleted after split
-  /// \param theFeaturesToUpdate [out] constrains that will be updated after split
-  void getConstraints(std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete,
-              std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToUpdate);
+  void getConstraints(std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete);
 
   /// Obtains references to feature point attributes and to feature,
   /// e.g. for feature line: 1st container is
@@ -106,11 +104,12 @@ private:
                         std::map<AttributePtr, std::list<AttributePtr> >& theRefs,
                         std::list<AttributePtr>& theRefsToFeature);
 
-  /// Move constraints from base feature to given feature
-  /// \param theFeature a base feature
-  /// \param theRefsToFeature list of attributes referenced to base feature
-  void updateRefFeatureConstraints(const std::shared_ptr<ModelAPI_Result>& theFeatureBaseResult,
-                                   const std::list<AttributePtr>& theRefsToFeature);
+  /// Obtains coincident features to the given object. It is collected in a container
+  /// by the coincident attribute
+  /// \param theObject an investigated object
+  /// \param theCoincidencesToBaseFeature a container of list of referenced attributes
+  void getCoincidencesToObject(const ObjectPtr& theObject,
+                               std::map<AttributePtr, FeaturePtr>& theCoincidencesToBaseFeature);
 
   /// Move constraints from attribute of base feature to attribute after modification
   /// \param theBaseRefAttributes container of references to the attributes of base feature
@@ -121,18 +120,16 @@ private:
                const std::set<std::pair<AttributePtr, AttributePtr> >& theModifiedAttributes,
                std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete);
 
-//  /// Make the base object is splitted by the point attributes
-//  /// \param theSplitFeature a result split feature
-//  /// \param theBeforeFeature a feature between start point and the 1st point of split feature
-//  /// \param theAfterFeature a feature between last point of split feature and the end point
-//  /// \param thePoints a list of points where coincidences will be build
-//  /// \param theCreatedFeatures a container of created features
-//  /// \param theModifiedAttributes a container of attribute on base
-//  /// feature to attribute on new feature
+  /// Make the base object is splitted by the point attributes
+  /// \param theSplitFeature a result split feature
+  /// \param theBeforeFeature a feature between start point and the 1st point of split feature
+  /// \param theAfterFeature a feature between last point of split feature and the end point
+  /// \param thePoints a list of points where coincidences will be build
+  /// \param theModifiedAttributes a container of attribute on base
+  /// feature to attribute on new feature
   void trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
                 const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
                 std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
-                std::set<std::shared_ptr<ModelAPI_Feature>>& theCreatedFeatures,
                 std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
 
   /// Make the base object is splitted by the point attributes
@@ -140,11 +137,9 @@ private:
   /// \param theBeforeFeature a feature between start point and the 1st point of split feature
   /// \param theAfterFeature a feature between last point of split feature and the end point
   /// \param thePoints a list of points where coincidences will be build
-  /// \param theCreatedFeatures a container of created features
   void trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
                const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
                std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
-               std::set<std::shared_ptr<ModelAPI_Feature>>& theCreatedFeatures,
                std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
 
   /// Make the base object is splitted by the point attributes
@@ -152,11 +147,9 @@ private:
   /// \param theBeforeFeature a feature between start point and the 1st point of split feature
   /// \param theAfterFeature a feature between last point of split feature and the end point
   /// \param thePoints a list of points where coincidences will be build
-  /// \param theCreatedFeatures a container of created features
-  void trimCircle(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
+  FeaturePtr trimCircle(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
                   const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
                   std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
-                  std::set<std::shared_ptr<ModelAPI_Feature>>& theCreatedFeatures,
                   std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
 
   /// Correct the first and the second point to provide condition that the first is closer to
