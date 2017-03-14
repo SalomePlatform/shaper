@@ -209,9 +209,7 @@ namespace GeomAlgoAPI_ShapeAPI
     if(!aTranslationAlgo.isDone()) {
       throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
     }
-    if (!aTranslationAlgo.checkValid("Translation builder with axis and distance")) {
-      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
-    }
+
     return aTranslationAlgo.shape();
   }
 
@@ -233,9 +231,7 @@ namespace GeomAlgoAPI_ShapeAPI
     if(!aTranslationAlgo.isDone()) {
       throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
     }
-    if (!aTranslationAlgo.checkValid("Translation builder with dimensions")) {
-      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
-    }
+
     return aTranslationAlgo.shape();
   }
 
@@ -256,12 +252,11 @@ namespace GeomAlgoAPI_ShapeAPI
     if(!aTranslationAlgo.isDone()) {
       throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
     }
-    if (!aTranslationAlgo.checkValid("Translation builder with two points")) {
-      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
-    }
+
     return aTranslationAlgo.shape();
   }
 
+  //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeRotation(
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
     std::shared_ptr<GeomAPI_Ax1> theAxis,
@@ -278,12 +273,11 @@ namespace GeomAlgoAPI_ShapeAPI
     if(!aRotationAlgo.isDone()) {
       throw GeomAlgoAPI_Exception(aRotationAlgo.getError());
     }
-    if (!aRotationAlgo.checkValid("Rotation builder with two points")) {
-      throw GeomAlgoAPI_Exception(aRotationAlgo.getError());
-    }
+
     return aRotationAlgo.shape();
   }
 
+  //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeRotation(
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
     std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
@@ -301,9 +295,7 @@ namespace GeomAlgoAPI_ShapeAPI
     if(!aRotationAlgo.isDone()) {
       throw GeomAlgoAPI_Exception(aRotationAlgo.getError());
     }
-    if (!aRotationAlgo.checkValid("Rotation builder with two points")) {
-      throw GeomAlgoAPI_Exception(aRotationAlgo.getError());
-    }
+
     return aRotationAlgo.shape();
   }
 
@@ -323,9 +315,7 @@ namespace GeomAlgoAPI_ShapeAPI
     if(!aSymmetryAlgo.isDone()) {
       throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
     }
-    if (!aSymmetryAlgo.checkValid("Symmetry builder by a point")) {
-      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
-    }
+
     return aSymmetryAlgo.shape();
   }
 
@@ -345,9 +335,7 @@ namespace GeomAlgoAPI_ShapeAPI
     if(!aSymmetryAlgo.isDone()) {
       throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
     }
-    if (!aSymmetryAlgo.checkValid("Symmetry builder by an axis")) {
-      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
-    }
+
     return aSymmetryAlgo.shape();
   }
 
@@ -367,9 +355,7 @@ namespace GeomAlgoAPI_ShapeAPI
     if(!aSymmetryAlgo.isDone()) {
       throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
     }
-    if (!aSymmetryAlgo.checkValid("Symmetry builder by a plane")) {
-      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
-    }
+
     return aSymmetryAlgo.shape();
   }
 
@@ -390,9 +376,7 @@ namespace GeomAlgoAPI_ShapeAPI
     if(!aScaleAlgo.isDone()) {
       throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
     }
-    if (!aScaleAlgo.checkValid("Scale builder by a scale factor")) {
-      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
-    }
+
     return aScaleAlgo.shape();
   }
 
@@ -416,9 +400,7 @@ namespace GeomAlgoAPI_ShapeAPI
     if(!aScaleAlgo.isDone()) {
       throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
     }
-    if (!aScaleAlgo.checkValid("Scale builder by dimensions")) {
-      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
-    }
+
     return aScaleAlgo.shape();
   }
 
