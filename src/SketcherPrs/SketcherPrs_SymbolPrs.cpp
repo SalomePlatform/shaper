@@ -53,7 +53,8 @@ public:
   SketcherPrs_SymbolArray(const OpenGl_GraphicDriver* theDriver,
     const Handle(SketcherPrs_SymbolPrs)& theObj, const Handle(AIS_InteractiveContext)& theCtx)
     :OpenGl_PrimitiveArray(theDriver, theObj->myPntArray->Type(), theObj->myPntArray->Indices(),
-    theObj->myPntArray->Attributes(), theObj->myPntArray->Bounds()), myObj(theObj), myContext(theCtx) {}
+    theObj->myPntArray->Attributes(), theObj->myPntArray->Bounds()), myObj(theObj),
+    myContext(theCtx) {}
 
   virtual void Render(const Handle(OpenGl_Workspace)& theWorkspace) const
   {
