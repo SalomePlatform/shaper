@@ -48,24 +48,19 @@ class Config_PropManager
 
   //! Returns value of the property by its owner, section, and name
   CONFIG_EXPORT static std::string string(const std::string& theSection,
-                                          const std::string& theName,
-                                          const std::string& theDefault);
+                                          const std::string& theName);
   //! Returns color by given section and name as 3-element vector {r,g,b}.
   CONFIG_EXPORT static std::vector<int> color(const std::string& theSection,
-                                              const std::string& theName,
-                                              const std::string& theDefault);
+                                              const std::string& theName);
   //! Returns integer by given section and name
   CONFIG_EXPORT static int integer(const std::string& theSection,
-                                   const std::string& theName,
-                                   const std::string& theDefault);
+                                   const std::string& theName);
   //! Returns real by given section and name
   CONFIG_EXPORT static double real(const std::string& theSection,
-                                   const std::string& theName,
-                                   const std::string& theDefault);
+                                   const std::string& theName);
   //! Returns boolean by given section and name
   CONFIG_EXPORT static bool boolean(const std::string& theSection,
-                                   const std::string& theName,
-                                   const std::string& theDefault);
+                                   const std::string& theName);
 
  private:
   CONFIG_EXPORT static Config_Properties myProps; ///< List of all stored properties

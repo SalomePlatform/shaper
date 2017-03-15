@@ -371,8 +371,7 @@ AISObjectPtr SketchPlugin_Trim::getAISObject(AISObjectPtr thePrevious)
 
     bool isConstruction = anAuxiliaryAttr.get() != NULL && anAuxiliaryAttr->value();
     std::vector<int> aColor;
-    aColor = Config_PropManager::color("Visualization", "operation_remove_feature_color",
-                                        OPERATION_REMOVE_FEATURE_COLOR());
+          aColor = Config_PropManager::color("Visualization", "operation_remove_feature_color");
     double aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
     int aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
     if (isConstruction) {

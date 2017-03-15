@@ -244,16 +244,13 @@ Quantity_Color PartSet_CustomPrs::getShapeColor(
   Quantity_Color aColor;
   switch(theFlag) {
     case ModuleBase_IModule::CustomizeArguments:
-      aColor = ModuleBase_Tools::color("Visualization", "operation_parameter_color",
-                                       OPERATION_PARAMETER_COLOR());
+      aColor = ModuleBase_Tools::color("Visualization", "operation_parameter_color");
     break;
     case ModuleBase_IModule::CustomizeResults:
-      aColor = ModuleBase_Tools::color("Visualization", "operation_result_color",
-                                       OPERATION_RESULT_COLOR());
+      aColor = ModuleBase_Tools::color("Visualization", "operation_result_color");
     break;
     case ModuleBase_IModule::CustomizeHighlightedObjects:
-      aColor = ModuleBase_Tools::color("Visualization", "operation_highlight_color",
-                                       OPERATION_HIGHLIGHT_COLOR());
+      aColor = ModuleBase_Tools::color("Visualization", "operation_highlight_color");
     break;
     default:
     break;

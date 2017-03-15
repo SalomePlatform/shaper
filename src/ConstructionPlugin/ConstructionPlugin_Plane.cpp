@@ -139,8 +139,7 @@ bool ConstructionPlugin_Plane::customisePresentation(ResultPtr theResult, AISObj
     }
   }
   if (aColor.empty())
-    aColor = Config_PropManager::color("Visualization", "construction_plane_color",
-                                       ConstructionPlugin_Plane::DEFAULT_COLOR());
+    aColor = Config_PropManager::color("Visualization", "construction_plane_color");
 
   bool isCustomized = false;
   if (aColor.size() == 3)
@@ -167,8 +166,7 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByGeneralEquation
            aC = anAttrC->value(), aD = anAttrD->value();
     std::shared_ptr<GeomAPI_Pln> aPlane =
       std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
-    std::string kDefaultPlaneSize = "200";
-    double aSize = Config_PropManager::integer(SKETCH_TAB_NAME, "planes_size", kDefaultPlaneSize);
+    double aSize = Config_PropManager::integer(SKETCH_TAB_NAME, "planes_size");
     aSize *= 4.;
     aPlaneFace = GeomAlgoAPI_FaceBuilder::squareFace(aPlane, aSize);
   }

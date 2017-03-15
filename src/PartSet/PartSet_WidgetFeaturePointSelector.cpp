@@ -76,8 +76,7 @@ bool PartSet_WidgetFeaturePointSelector::activateSelectionAndFilters(bool toActi
   Handle(Graphic3d_HighlightStyle) aSStyle = aContext->SelectionStyle();
   if (toActivate) {
     std::vector<int> aColors;
-    aColors = Config_PropManager::color("Visualization", "sketch_entity_color",
-                                       SKETCH_ENTITY_COLOR);
+  aColors = Config_PropManager::color("Visualization", "sketch_entity_color");
     aColor = Quantity_Color(aColors[0] / 255., aColors[1] / 255., aColors[2] / 255.,
                             Quantity_TOC_RGB);
     myHighlightColor = aHStyle->Color();

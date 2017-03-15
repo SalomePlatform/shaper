@@ -38,8 +38,7 @@ bool PartSet_OverconstraintListener::isConflictingObject(const ObjectPtr& theObj
 
 void PartSet_OverconstraintListener::getConflictingColor(std::vector<int>& theColor)
 {
-  Quantity_Color aColor = ModuleBase_Tools::color("Visualization", "sketch_overconstraint_color",
-                                                  SKETCH_OVERCONSTRAINT_COLOR);
+  Quantity_Color aColor = ModuleBase_Tools::color("Visualization", "sketch_overconstraint_color");
   theColor.push_back(aColor.Red()*255.);
   theColor.push_back(aColor.Green()*255.);
   theColor.push_back(aColor.Blue()*255.);

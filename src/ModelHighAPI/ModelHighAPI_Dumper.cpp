@@ -514,11 +514,9 @@ bool ModelHighAPI_Dumper::isDefaultDeflection(const ResultPtr& theResult) const
     }
   }
   if (isConstruction)
-    aDefault = Config_PropManager::real("Visualization", "construction_deflection",
-                                        ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());
+    aDefault = Config_PropManager::real("Visualization", "construction_deflection");
   else
-    aDefault = Config_PropManager::real("Visualization", "body_deflection",
-                                        ModelAPI_ResultBody::DEFAULT_DEFLECTION());
+    aDefault = Config_PropManager::real("Visualization", "body_deflection");
 
   return fabs(aCurrent - aDefault) < 1.e-12;
 }

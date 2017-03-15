@@ -362,14 +362,12 @@ AISObjectPtr SketchPlugin_ConstraintSplit::getAISObject(AISObjectPtr thePrevious
       double aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
       int aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
       if (isConstruction) {
-        aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color",
-                                           SKETCH_AUXILIARY_COLOR);
+        aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color");
         aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH_AUXILIARY();
         aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY();
       }
       else {
-        aColor = Config_PropManager::color("Visualization", "sketch_entity_color",
-                                            SKETCH_ENTITY_COLOR);
+        aColor = Config_PropManager::color("Visualization", "sketch_entity_color");
       }
       anAIS->setColor(aColor[0], aColor[1], aColor[2]);
       anAIS->setWidth(aWidth + 1);

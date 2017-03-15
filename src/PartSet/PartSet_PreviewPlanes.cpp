@@ -104,13 +104,16 @@ void PartSet_PreviewPlanes::showPreviewPlanes(ModuleBase_IWorkshop* theWorkshop)
     std::shared_ptr<GeomAPI_Dir> aXZDir(new GeomAPI_Dir(0, -1, 0));
     std::shared_ptr<GeomAPI_Dir> aXYDir(new GeomAPI_Dir(0, 0, 1));
 
-    std::vector<int> aYZRGB, aXZRGB, aXYRGB;
-    aYZRGB = Config_PropManager::color("Visualization", "yz_plane_color",
-                                                        YZ_PLANE_COLOR);
-    aXZRGB = Config_PropManager::color("Visualization", "xz_plane_color",
-                                                        XZ_PLANE_COLOR);
-    aXYRGB = Config_PropManager::color("Visualization", "xy_plane_color",
-                                                        XY_PLANE_COLOR);
+    std::vector<int> aYZRGB(3, 0), aXZRGB(3, 0), aXYRGB(3, 0);
+#ifdef SET_PLANES_COLOR_IN_PREFERENCES
+    aYZRGB = Config_PropManager::color("Visualization", "yz_plane_color");
+    aXZRGB = Config_PropManager::color("Visualization", "xz_plane_color");
+    aXYRGB = Config_PropManager::color("Visualization", "xy_plane_color");
+#else
+    aYZRGB[0] = 225;
+    aXZRGB[1] = 225;
+    aXYRGB[2] = 225;
+#endif
     int aR[] = {aYZRGB[0], aYZRGB[1], aYZRGB[2]};
     int aG[] = {aXZRGB[0], aXZRGB[1], aXZRGB[2]};
     int aB[] = {aXYRGB[0], aXYRGB[1], aXYRGB[2]};
@@ -130,12 +133,12 @@ AISObjectPtr PartSet_PreviewPlanes::createPreviewPlane(std::shared_ptr<GeomAPI_P
                                                        std::shared_ptr<GeomAPI_Dir> theNorm,
                                                        const int theRGB[3])
 {
-  double aSize = Config_PropManager::integer(SKETCH_TAB_NAME, "planes_size", PLANE_SIZE);
+  double aSize = Config_PropManager::integer(SKETCH_TAB_NAME, "planes_size");
   std::shared_ptr<GeomAPI_Shape> aFace =
     GeomAlgoAPI_FaceBuilder::squareFace(theOrigin, theNorm, aSize);
   AISObjectPtr aAIS = AISObjectPtr(new GeomAPI_AISObject());
   aAIS->createShape(aFace);
-  aAIS->setWidth(Config_PropManager::integer(SKETCH_TAB_NAME, "planes_thickness", SKETCH_WIDTH));
+  aAIS->setWidth(Config_PropManager::integer(SKETCH_TAB_NAME, "planes_thickness"));
   aAIS->setColor(theRGB[0], theRGB[1], theRGB[2]);
   return aAIS;
 }
