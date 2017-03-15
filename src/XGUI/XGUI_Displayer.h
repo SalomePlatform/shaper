@@ -33,8 +33,7 @@ class ModuleBase_ViewerPrs;
 class ModelAPI_Feature;
 class XGUI_Workshop;
 
-#ifdef VINSPECTOR
-class VInspectorAPI_Communicator;
+#ifdef TINSPECTOR
 class VInspectorAPI_CallBack;
 #endif
 
@@ -259,12 +258,10 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Selection modes will be returned according to TopAbs_ShapeEnum
   QIntList activeSelectionModes() const;
 
-#ifdef VINSPECTOR
-  void setVInspectorVisible(const bool theVisible);
-
-  void setCommunicator(VInspectorAPI_Communicator* theCommunicator);
-
-  VInspectorAPI_CallBack* getCallBack() const;
+#ifdef TINSPECTOR
+  void setCallBack(const Handle(VInspectorAPI_CallBack)& theCallBack)
+    { myVCallBack = theCallBack; }
+  Handle(VInspectorAPI_CallBack) getCallBack() const { return myVCallBack; }
 #endif
   /// Converts shape type (TopAbs_ShapeEnum) to selection mode
   /// \param theShapeType a shape type from TopAbs_ShapeEnum
@@ -360,8 +357,8 @@ private:
  protected:
    /// Reference to workshop
   XGUI_Workshop* myWorkshop;
-#ifdef VINSPECTOR
-  VInspectorAPI_Communicator* myCommunicator; ///< callback to debug display, show/hide it
+#ifdef TINSPECTOR
+  Handle(VInspectorAPI_CallBack) myVCallBack;
 #endif
   /// A container for selection filters
   Handle(SelectMgr_AndFilter) myAndFilter;

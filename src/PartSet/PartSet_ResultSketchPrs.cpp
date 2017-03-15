@@ -166,8 +166,7 @@ void PartSet_ResultSketchPrs::ComputeSelection(const Handle(SelectMgr_Selection)
     debugInfo(aComp, TopAbs_FACE); // 2
 #endif
     Set(aComp);
-    double aBodyDefDeflection = Config_PropManager::real("Visualization", "body_deflection",
-                                                         ModelAPI_ResultBody::DEFAULT_DEFLECTION());
+    double aBodyDefDeflection = Config_PropManager::real("Visualization", "body_deflection");
     Attributes()->SetDeviationCoefficient(aBodyDefDeflection);
     aShapeIsChanged = true;
   }

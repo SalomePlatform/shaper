@@ -354,9 +354,9 @@ std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findFirstEqualPoint(
 }
 
 std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findFirstEqualPointInSketch(
-                                              const CompositeFeaturePtr& theSketch,
-                                              const std::shared_ptr<GeomDataAPI_Point2D>& theFeaturePoint,
-                                              const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+                                    const CompositeFeaturePtr& theSketch,
+                                    const std::shared_ptr<GeomDataAPI_Point2D>& theFeaturePoint,
+                                    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {
   // get all sketch features. If the point with the given coordinates belong to any sketch feature,
   // the constraint is created between the feature point and the found sketch point

@@ -177,11 +177,9 @@ MODULEBASE_EXPORT void setDefaultDeviationCoefficient(const TopoDS_Shape& theSha
 /// Obtains the color from the property manager and converts it to the OCCT color
 /// \param theSection a property section
 /// \param theName a property item name
-/// \param theDefault a default color value
 /// \return quantity color
 MODULEBASE_EXPORT Quantity_Color color(const std::string& theSection,
-                                       const std::string& theName,
-                                       const std::string& theDefault);
+                                       const std::string& theName);
 
 /// Returns the object from the attribute
 /// \param theObj an object

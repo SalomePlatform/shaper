@@ -13,6 +13,7 @@ bool stringToBoolean(const std::string& theInt);
 
 Config_Properties Config_PropManager::myProps;
 
+
 Config_Prop* Config_PropManager::registerProp(const std::string& theSection,
                                               const std::string& theName,
                                               const std::string& theTitle,
@@ -89,8 +90,7 @@ Config_Properties Config_PropManager::getProperties(const std::string& theSectio
   return aRes;
 }
 
-std::string Config_PropManager::string(const std::string& theSection, const std::string& theName,
-                                       const std::string& theDefault)
+std::string Config_PropManager::string(const std::string& theSection, const std::string& theName)
 {
   Config_Properties aProps = getProperties(theSection);
   Config_Properties::const_iterator aIt;
@@ -99,36 +99,33 @@ std::string Config_PropManager::string(const std::string& theSection, const std:
     if (aProp->name() == theName)
       return aProp->value();
   }
-  return theDefault;
+  std::string aMsg = "Property " + theSection + ":" + theName + " is not registered";
+  throw aMsg.c_str();
 }
 
 std::vector<int> Config_PropManager::color(const std::string& theSection,
-                                           const std::string& theName,
-                                           const std::string& theDefault)
+                                           const std::string& theName)
 {
-  std::string aStr = string(theSection, theName, theDefault);
+  std::string aStr = string(theSection, theName);
   return stringToRGB(aStr);
 }
 
-int Config_PropManager::integer(const std::string& theSection, const std::string& theName,
-                                const std::string& theDefault)
+int Config_PropManager::integer(const std::string& theSection, const std::string& theName)
 {
-  std::string aStr = string(theSection, theName, theDefault);
+  std::string aStr = string(theSection, theName);
   return stringToInteger(aStr);
 }
 
-double Config_PropManager::real(const std::string& theSection, const std::string& theName,
-                                const std::string& theDefault)
+double Config_PropManager::real(const std::string& theSection, const std::string& theName)
 {
-  std::string aStr = string(theSection, theName, theDefault);
+  std::string aStr = string(theSection, theName);
   return stringToDouble(aStr);
 }
 
 bool Config_PropManager::boolean(const std::string& theSection,
-                                 const std::string& theName,
-                                 const std::string& theDefault)
+                                 const std::string& theName)
 {
-  std::string aStr = string(theSection, theName, theDefault);
+  std::string aStr = string(theSection, theName);
   return stringToBoolean(aStr);
 }
 

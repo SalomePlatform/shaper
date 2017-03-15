@@ -57,6 +57,10 @@ Q_OBJECT
   /// \return a boolean value
   virtual bool isValidSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
 
+  /// Activate or deactivate selection and selection filters
+  /// \return true if the selection filter of the widget is activated in viewer context
+  virtual bool activateSelectionAndFilters(bool toActivate);
+
   /// Set sketcher
   /// \param theSketch a sketcher object
   void setSketcher(CompositeFeaturePtr theSketch) { mySketch = theSketch; }
@@ -101,6 +105,9 @@ protected:
   /// a shape. If the attribute do not uses the shape, it is empty
   virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getAttributeSelection() const;
 
+  /// Computes and updates name of selected object in the widget
+  virtual void updateSelectionName();
+
 protected:
   /// The methiod called when widget is activated
   virtual void activateCustom();
@@ -114,6 +121,7 @@ protected:
   CompositeFeaturePtr mySketch;
   Quantity_Color myHighlightColor;
   Quantity_Color mySelectionColor;
+  bool myBaseSelected;
 };
 
 #endif

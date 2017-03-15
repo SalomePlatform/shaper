@@ -115,7 +115,7 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
       std::string aSection, aName, aDefault;
       theResult->colorConfigInfo(aSection, aName, aDefault);
       std::vector<int> aColor;
-      aColor = Config_PropManager::color(aSection, aName, aDefault);
+      aColor = Config_PropManager::color(aSection, aName);
       thePrs->setColor(aColor[0], aColor[1], aColor[2]);
     }
 
@@ -133,16 +133,13 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
                                     data()->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID());
     bool isConstruction = anAuxiliaryAttr.get() != NULL && anAuxiliaryAttr->value();
     if (isConstruction) {
-      aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color",
-                                         SKETCH_AUXILIARY_COLOR);
+      aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color");
     }
     else if (isExternal()) {
-      aColor = Config_PropManager::color("Visualization", "sketch_external_color",
-                                        SKETCH_EXTERNAL_COLOR);
+      aColor = Config_PropManager::color("Visualization", "sketch_external_color");
     }
     else {
-      aColor = Config_PropManager::color("Visualization", "sketch_entity_color",
-                                          SKETCH_ENTITY_COLOR);
+      aColor = Config_PropManager::color("Visualization", "sketch_entity_color");
     }
     if (!aColor.empty()) {
       thePrs->setColor(aColor[0], aColor[1], aColor[2]);

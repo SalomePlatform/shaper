@@ -412,20 +412,17 @@ void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
 
   double aDeflection;
   if (isConstruction)
-    aDeflection = Config_PropManager::real("Visualization", "construction_deflection",
-                                           ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());
+    aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
   else
-    aDeflection = Config_PropManager::real("Visualization", "body_deflection",
-                                           ModelAPI_ResultBody::DEFAULT_DEFLECTION());
+    aDeflection = Config_PropManager::real("Visualization", "body_deflection");
 
   theDrawer->SetDeviationCoefficient(aDeflection);
 }
 
 Quantity_Color color(const std::string& theSection,
-                     const std::string& theName,
-                     const std::string& theDefault)
+                     const std::string& theName)
 {
-  std::vector<int> aColor = Config_PropManager::color(theSection, theName, theDefault);
+  std::vector<int> aColor = Config_PropManager::color(theSection, theName);
   return Quantity_Color(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255., Quantity_TOC_RGB);
 }
 

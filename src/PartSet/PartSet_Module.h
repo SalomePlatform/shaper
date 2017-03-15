@@ -379,9 +379,6 @@ protected:
   /// Register validators for this module
   virtual void registerValidators();
 
-  /// Register properties of this module
-  virtual void registerProperties();
-
   /// Connects or disconnects to the value changed signal of the property panel widgets
   /// \param theWidget a property contol widget
   /// \param isToConnect a boolean value whether connect or disconnect

@@ -11,6 +11,10 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 
+#define SKETCH_WIDTH        "4"
+/// face of the square-face displayed for selection of general plane
+#define PLANE_SIZE          "200"
+
 // the only created instance of this plugin
 static ConstructionPlugin_Plugin* MY_CONSTRUCTION_INSTANCE = new ConstructionPlugin_Plugin();
 
@@ -30,6 +34,13 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
                               new ConstructionPlugin_ValidatorPlaneTwoParallelPlanes());
   aFactory->registerValidator("ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes",
                               new ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes());
+
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_size", "Size", Config_Prop::Double,
+                                   PLANE_SIZE);
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_thickness", "Thickness",
+                                   Config_Prop::Integer, SKETCH_WIDTH);
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "rotate_to_plane",
+    "Rotate to plane when selected", Config_Prop::Boolean, "false");
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

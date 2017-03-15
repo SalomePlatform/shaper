@@ -20,9 +20,11 @@
 #include <GeomDataAPI_Dir.h>
 #include <list>
 
-#define YZ_PLANE_COLOR "225,0,0"
-#define XZ_PLANE_COLOR "0,225,0"
-#define XY_PLANE_COLOR "0,0,225"
+#ifdef SET_PLANES_COLOR_IN_PREFERENCES
+  #define YZ_PLANE_COLOR "225,0,0"
+  #define XZ_PLANE_COLOR "0,225,0"
+  #define XY_PLANE_COLOR "0,0,225"
+#endif
 
 /**\class SketchPlugin_Sketch
  * \ingroup Plugins

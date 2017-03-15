@@ -56,6 +56,7 @@
 static const double PI = 3.141592653589793238463;
 
 static const std::string OPERATION_HIGHLIGHT_COLOR() { return "128, 0, 0"; }
+static const std::string OPERATION_REMOVE_FEATURE_COLOR() { return "255, 174, 201"; }
 
 SketchPlugin_Trim::SketchPlugin_Trim()
 {
@@ -334,7 +335,7 @@ AISObjectPtr SketchPlugin_Trim::getAISObject(AISObjectPtr thePrevious)
                                            data()->attribute(SketchPlugin_Trim::BASE_OBJECT()));
   ObjectPtr aBaseObject = aBaseObjectAttr->value();
   if (!aBaseObject.get())
-    return anAIS;
+    return AISObjectPtr();
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
 
   // point on feature
@@ -347,41 +348,43 @@ AISObjectPtr SketchPlugin_Trim::getAISObject(AISObjectPtr thePrevious)
   if (myCashedShapes.find(aBaseObject) == myCashedShapes.end())
     fillObjectShapes(aBaseObject);
 
+  GeomShapePtr aBaseShape;
+
   const std::set<GeomShapePtr>& aShapes = myCashedShapes[aBaseObject];
   if (!aShapes.empty()) {
     std::set<GeomShapePtr>::const_iterator anIt = aShapes.begin(), aLast = aShapes.end();
     for (; anIt != aLast; anIt++) {
-      GeomShapePtr aBaseShape = *anIt;
+      GeomShapePtr aShape = *anIt;
       std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
-      if (ModelGeomAlgo_Point2D::isPointOnEdge(aBaseShape, anAttributePnt, aProjectedPoint)) {
-        if (aBaseShape) {
-          if (!anAIS)
-            anAIS = AISObjectPtr(new GeomAPI_AISObject);
-          anAIS->createShape(aBaseShape);
-
-          std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr =
-                 aBaseFeature->data()->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID());
-
-          bool isConstruction = anAuxiliaryAttr.get() != NULL && anAuxiliaryAttr->value();
-
-          std::vector<int> aColor;
-          aColor = Config_PropManager::color("Visualization", "operation_highlight_color",
-                                             OPERATION_HIGHLIGHT_COLOR());
-          double aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
-          int aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
-          if (isConstruction) {
-            aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH_AUXILIARY();
-            aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY();
-          }
-          anAIS->setColor(aColor[0], aColor[1], aColor[2]);
-           // modification of width should be replaced to value 1 after highlight problem is fixed
-          anAIS->setWidth(aWidth + 2);//1);
-          anAIS->setLineStyle(aLineStyle);
-          break;
-        }
-      }
+      if (ModelGeomAlgo_Point2D::isPointOnEdge(aShape, anAttributePnt, aProjectedPoint))
+        aBaseShape = aShape;
     }
   }
+
+  if (aBaseShape.get()) {
+    if (!anAIS)
+      anAIS = AISObjectPtr(new GeomAPI_AISObject);
+    anAIS->createShape(aBaseShape);
+
+    std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr =
+            aBaseFeature->data()->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID());
+
+    bool isConstruction = anAuxiliaryAttr.get() != NULL && anAuxiliaryAttr->value();
+    std::vector<int> aColor;
+          aColor = Config_PropManager::color("Visualization", "operation_remove_feature_color");
+    double aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
+    int aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
+    if (isConstruction) {
+      aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH_AUXILIARY();
+      aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY();
+    }
+    anAIS->setColor(aColor[0], aColor[1], aColor[2]);
+    // width is extened in several points in order to see this preview over highlight
+    anAIS->setWidth(aWidth + 2);
+    anAIS->setLineStyle(aLineStyle);
+  }
+  else
+    anAIS = AISObjectPtr();
 
   return anAIS;
 }

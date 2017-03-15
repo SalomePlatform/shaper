@@ -65,13 +65,13 @@ void XGUI_CustomPrs::getDefaultColor(ObjectPtr theObject, const bool isEmptyColo
     std::string aSection, aName, aDefault;
     theObject->colorConfigInfo(aSection, aName, aDefault);
     if (!aSection.empty() && !aName.empty()) {
-      theColor = Config_PropManager::color(aSection, aName, aDefault);
+      theColor = Config_PropManager::color(aSection, aName);
     }
   }
   if (!isEmptyColorValid && theColor.empty()) {
     // all AIS objects, where the color is not set, are in black.
     // The color should be defined in XML or set in the attribute
-    theColor = Config_PropManager::color("Visualization", "object_default_color", "#000000");
+    theColor = Config_PropManager::color("Visualization", "object_default_color");
     Events_InfoMessage("XGUI_CustomPrs",
       "A default color is not defined in the preferences for this kind of result").send();
   }
@@ -97,11 +97,9 @@ double XGUI_CustomPrs::getDefaultDeflection(const ObjectPtr& theObject)
       }
     }
     if (isConstruction)
-      aDeflection = Config_PropManager::real("Visualization", "construction_deflection",
-                                             ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());
+      aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
     else
-      aDeflection = Config_PropManager::real("Visualization", "body_deflection",
-                                             ModelAPI_ResultBody::DEFAULT_DEFLECTION());
+      aDeflection = Config_PropManager::real("Visualization", "body_deflection");
   }
   return aDeflection;
 }

@@ -80,11 +80,6 @@ class SketchPlugin_ConstraintSplit : public SketchPlugin_ConstraintBase
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintSplit();
 
-  /// \return map of base points and features;
-  //SKETCHPLUGIN_EXPORT const std::map<AttributePtr, FilletFeatures> pointsFeaturesMap() const {
-  //  return myPointFeaturesMap;
-  //};
-
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
@@ -112,9 +107,7 @@ private:
   /// \param theCoincidenceToPoint [out] coincidence to point be connected to new feature
   void getConstraints(std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete,
               std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToUpdate,
-              //std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theTangentFeatures,
-              std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature/*,
-              std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToPoint*/);
+              std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature);
 
   /// Obtains references to feature point attributes and to feature,
   /// e.g. for feature line: 1st container is
@@ -138,14 +131,6 @@ private:
       const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences,
       const std::set<ResultPtr>& theFeatureResults,
       const FeaturePtr& theSplitFeature);
-
-  /// Move tangency constraint to the nearest split feature that has a coincidence to the tangent
-  /// \param theTangentFeatures tangencies to feature to be connected to nearest feature
-  /// \param theFurtherCoincidences a list of points where coincidences is built
-  //void updateTangentConstraintsToFeature(
-  //            const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theTangentFeatures,
-  //            const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences);
-
 
   /// Move constraints from base feature to given feature
   /// \param theFeature a base feature

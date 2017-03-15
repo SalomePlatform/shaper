@@ -142,23 +142,6 @@ void SketchPlugin_ConstraintSplit::execute()
     }
   }
 
-  /*if (!aTangentFeatures.empty()) {
-    std::cout << std::endl;
-    std::cout << "Tangencies to base feature[" << aTangentFeatures.size() << "]: " << std::endl;
-    std::map<FeaturePtr, IdToPointPair>::const_iterator anIt = aTangentFeatures.begin(),
-                                                        aLast = aTangentFeatures.end();
-    for (int i = 1; anIt != aLast; anIt++, i++) {
-      FeaturePtr aFeature = (*anIt).first;
-      std::string anAttributeId = (*anIt).second.first;
-      std::shared_ptr<GeomDataAPI_Point2D> aPointAttr = (*anIt).second.second;
-
-      std::cout << i << "-" << getFeatureInfo(aFeature) << std::endl;
-      std::cout <<     " -Attribute to correct:" << anAttributeId << std::endl;
-      std::cout <<     " -Point attribute:" <<
-        ModelGeomAlgo_Point2D::getPointAttributeInfo(aPointAttr) << std::endl;
-    }
-  }*/
-
   std::map<AttributePtr, std::list<AttributePtr> >::const_iterator
     aRefIt = aBaseRefAttributes.begin(), aRefLast = aBaseRefAttributes.end();
   std::cout << std::endl << "References to attributes of base feature [" <<
@@ -286,8 +269,6 @@ void SketchPlugin_ConstraintSplit::execute()
   // coincidence to feature
   updateCoincidenceConstraintsToFeature(aCoincidenceToFeature, aFurtherCoincidences,
                                         aFeatureResults, aSplitFeature);
-  // tangency
-  //updateTangentConstraintsToFeature(aTangentFeatures, aFurtherCoincidences);
 
   updateRefAttConstraints(aBaseRefAttributes, aModifiedAttributes);
 
@@ -381,14 +362,12 @@ AISObjectPtr SketchPlugin_ConstraintSplit::getAISObject(AISObjectPtr thePrevious
       double aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
       int aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
       if (isConstruction) {
-        aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color",
-                                           SKETCH_AUXILIARY_COLOR);
+        aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color");
         aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH_AUXILIARY();
         aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY();
       }
       else {
-        aColor = Config_PropManager::color("Visualization", "sketch_entity_color",
-                                            SKETCH_ENTITY_COLOR);
+        aColor = Config_PropManager::color("Visualization", "sketch_entity_color");
       }
       anAIS->setColor(aColor[0], aColor[1], aColor[2]);
       anAIS->setWidth(aWidth + 1);
@@ -440,7 +419,6 @@ void SketchPlugin_ConstraintSplit::getFeaturePoints(const FeaturePtr& theFeature
 
 void SketchPlugin_ConstraintSplit::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete,
                                       std::set<FeaturePtr>& theFeaturesToUpdate,
-                                      //std::map<FeaturePtr, IdToPointPair>& theTangentFeatures,
                                       std::map<FeaturePtr, IdToPointPair>& theCoincidenceToFeature)
 {
   std::shared_ptr<ModelAPI_Data> aData = data();
@@ -467,46 +445,7 @@ void SketchPlugin_ConstraintSplit::getConstraints(std::set<FeaturePtr>& theFeatu
       theFeaturesToDelete.insert(aRefFeature);
     else if (aRefFeatureKind == SketchPlugin_ConstraintLength::ID())
       theFeaturesToUpdate.insert(aRefFeature);
-    /*else if (aRefFeatureKind == SketchPlugin_ConstraintTangent::ID()) {
-      if (aBaseFeature->getKind() == SketchPlugin_Circle::ID()) /// TEMPORARY limitaion
-        /// until tangency between arc and line is implemented
-        theFeaturesToDelete.insert(aRefFeature);
-      else {
-        std::string anAttributeToBeModified;
-        AttributePoint2DPtr aTangentPoint;
-        ObjectPtr aResult1 = aRefFeature->refattr(SketchPlugin_Constraint::ENTITY_A())->object();
-        ObjectPtr aResult2 = aRefFeature->refattr(SketchPlugin_Constraint::ENTITY_B())->object();
-        if (aResult1.get() && aResult2.get()) {
-          FeaturePtr aCoincidenceFeature =
-            SketchPlugin_ConstraintCoincidence::findCoincidenceFeature
-                                                       (ModelAPI_Feature::feature(aResult1),
-                                                        ModelAPI_Feature::feature(aResult2));
-          // get the point not lying on the splitting feature
-          for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
-            AttributeRefAttrPtr aRefAttr = aCoincidenceFeature->refattr(ATTRIBUTE(i));
-            if (!aRefAttr || aRefAttr->isObject())
-              continue;
-            AttributePoint2DPtr aPoint =
-                std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRefAttr->attr());
-            if (!aPoint)
-              continue;
-            if (aPoint->owner() != aBaseFeature) {
-              aTangentPoint = aPoint;
-              break;
-            }
-          }
-        }
-        if (aTangentPoint.get()) {
-          FeaturePtr aFeature1 = ModelAPI_Feature::feature(aResult1);
-          std::string anAttributeToBeModified = aFeature1 == aBaseFeature
-                       ? SketchPlugin_Constraint::ENTITY_A() : SketchPlugin_Constraint::ENTITY_B();
-          theTangentFeatures[aRefFeature] = std::make_pair(anAttributeToBeModified, aTangentPoint);
-        }
-        else /// there is not coincident point between tangent constraint
-          theFeaturesToDelete.insert(aRefFeature);
-      }
-    }
-    */else if (aRefFeatureKind == SketchPlugin_ConstraintCoincidence::ID()) {
+    else if (aRefFeatureKind == SketchPlugin_ConstraintCoincidence::ID()) {
       std::string anAttributeToBeModified;
       AttributePoint2DPtr aCoincidentPoint;
       AttributeRefAttrPtr anAttrA = aRefFeature->refattr(SketchPlugin_Constraint::ENTITY_A());
@@ -681,44 +620,6 @@ void SketchPlugin_ConstraintSplit::updateCoincidenceConstraintsToFeature(
 #endif
   }
 }
-
-//void SketchPlugin_ConstraintSplit::updateTangentConstraintsToFeature(
-//      const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theTangentFeatures,
-//      const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences)
-//{
-//  if (theTangentFeatures.empty())
-//    return;
-//
-//  std::map<FeaturePtr, IdToPointPair>::const_iterator aTIt = theTangentFeatures.begin(),
-//                                                      aTLast = theTangentFeatures.end();
-//#ifdef DEBUG_SPLIT
-//  std::cout << std::endl;
-//  std::cout << "Tangencies to feature(modified):"<< std::endl;
-//#endif
-//  for (; aTIt != aTLast; aTIt++) {
-//    FeaturePtr aTangentFeature = aTIt->first;
-//    std::string anAttributeId = aTIt->second.first;
-//    AttributePoint2DPtr aTangentPoint = aTIt->second.second;
-//    std::set<AttributePoint2DPtr>::const_iterator aFCIt = theFurtherCoincidences.begin(),
-//                                                  aFCLast = theFurtherCoincidences.end();
-//    std::shared_ptr<GeomAPI_Pnt2d> aCoincPnt = aTangentPoint->pnt();
-//    AttributePoint2DPtr aFeaturePointAttribute;
-//    /// here we rely on created coincidence between further coincidence point and tangent result
-//    for (; aFCIt != aFCLast && !aFeaturePointAttribute.get(); aFCIt++) {
-//      AttributePoint2DPtr aFCAttribute = *aFCIt;
-//      if (aCoincPnt->isEqual(aFCAttribute->pnt()))
-//        aFeaturePointAttribute = aFCAttribute;
-//    }
-//    if (aFeaturePointAttribute.get()) {
-//      FeaturePtr aFeature =
-//        std::dynamic_pointer_cast<ModelAPI_Feature>(aFeaturePointAttribute->owner());
-//      aTangentFeature->refattr(anAttributeId)->setObject(getFeatureResult(aFeature));
-//    }
-//#ifdef DEBUG_SPLIT
-//  std::cout << " -" << getFeatureInfo(aTangentFeature) << std::endl;
-//#endif
-//  }
-//}
 
 void SketchPlugin_ConstraintSplit::updateRefFeatureConstraints(
                                                   const ResultPtr& theFeatureBaseResult,

@@ -107,11 +107,14 @@
 
 #include <iterator>
 
-#ifdef DFBROWSER
+#ifdef TINSPECTOR
 #include <CDF_Session.hxx>
 #include <CDF_Application.hxx>
-#include <DFBrowserAPI_Communicator.hxx>
-static bool DFBrowser_FirstCall = true;
+#include <TInspector_Communicator.hxx>
+#include <VInspector_CallBack.hxx>
+static TInspector_Communicator* MyTCommunicator;
+static Handle(VInspector_CallBack) MyVCallBack;
+
 #endif
 
 #ifdef _DEBUG
@@ -1372,24 +1375,35 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   } else if (theId == "SHOW_FEATURE_CMD") {
     highlightFeature(aObjects);
   }
-#ifdef VINSPECTOR
-  else if (theId == "VINSPECTOR_VIEW") {
-    displayer()->setVInspectorVisible(true);
-  }
-#endif
-#ifdef DFBROWSER
-  else if (theId == "DFBROWSER_VIEW") {
-    if (DFBrowser_FirstCall) {
-      Handle(CDF_Application) anApplication = CDF_Session::CurrentSession()->CurrentApplication();
-      DFBrowserAPI_Communicator* aCommunicator =
-                     DFBrowserAPI_Communicator::loadPluginLibrary("TKDFBrowser.dll");
-      if (aCommunicator) {
-        aCommunicator->setApplication(anApplication);
+#ifdef TINSPECTOR
+  else if (theId == "TINSPECTOR_VIEW") {
+    Handle(CDF_Application) anApplication = CDF_Session::CurrentSession()->CurrentApplication();
+    if (!anApplication.IsNull())
+    {
+      if (!MyTCommunicator)
+      {
+        MyTCommunicator = new TInspector_Communicator();
+
+        NCollection_List<Handle(Standard_Transient)> aParameters;
+        aParameters.Append(anApplication);
         Handle(AIS_InteractiveContext) aContext = viewer()->AISContext();
-        if (aContext)
-          aCommunicator->setContext(aContext);
+        if (!aContext.IsNull())
+          aParameters.Append(aContext);
+
+        MyVCallBack = new VInspector_CallBack();
+        myDisplayer->setCallBack(MyVCallBack);
+        #ifndef HAVE_SALOME
+        AppElements_Viewer* aViewer = mainWindow()->viewer();
+        if (aViewer)
+          aViewer->setCallBack(MyVCallBack);
+        #endif
+        aParameters.Append(MyVCallBack);
+
+        MyTCommunicator->init(aParameters);
+        MyTCommunicator->Activate("TKVInspector"); // to have filled callback by model
+        MyTCommunicator->Activate("TKDFBrowser");
       }
-      DFBrowser_FirstCall = false;
+      MyTCommunicator->setVisible(true);
     }
   }
 #endif

@@ -166,6 +166,9 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Config_PropManager::registerProp("Visualization", "operation_highlight_color",
                           "Multi selector item color in operation", Config_Prop::Color,
                           PartSet_CustomPrs::OPERATION_HIGHLIGHT_COLOR());
+  Config_PropManager::registerProp("Visualization", "operation_remove_feature_color",
+                          "Color of removed feature in operation", Config_Prop::Color,
+                          PartSet_CustomPrs::OPERATION_REMOVE_FEATURE_COLOR());
 }
 
 PartSet_Module::~PartSet_Module()
@@ -235,16 +238,6 @@ void PartSet_Module::registerValidators()
     new PartSet_MultyTranslationSelection);
   aFactory->registerValidator("PartSet_SplitSelection", new PartSet_SplitSelection);
   aFactory->registerValidator("PartSet_ProjectionSelection", new PartSet_ProjectionSelection);
-}
-
-void PartSet_Module::registerProperties()
-{
-  Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_size", "Size", Config_Prop::Double,
-                                   PLANE_SIZE);
-  Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_thickness", "Thickness",
-                                   Config_Prop::Integer, SKETCH_WIDTH);
-  Config_PropManager::registerProp(SKETCH_TAB_NAME, "rotate_to_plane",
-    "Rotate to plane when selected", Config_Prop::Boolean, "false");
 }
 
 void PartSet_Module::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget,

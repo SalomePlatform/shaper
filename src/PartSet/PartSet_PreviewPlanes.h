@@ -15,11 +15,6 @@
 
 class ModuleBase_IWorkshop;
 
-/// the plane edge width
-#define SKETCH_WIDTH        "4"
-/// face of the square-face displayed for selection of general plane
-#define PLANE_SIZE          "200"
-
 /**
 * \class PartSet_PreviewPlanes
 * \ingroup Modules
