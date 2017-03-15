@@ -78,8 +78,8 @@ bool PartSet_WidgetFeaturePointSelector::activateSelectionAndFilters(bool toActi
     std::vector<int> aColors;
     aColors = Config_PropManager::color("Visualization", "sketch_entity_color",
                                        SKETCH_ENTITY_COLOR);
-    aColor = Quantity_Color(aColors[0] / 255., aColors[1] / 255., aColors[2] / 255., Quantity_TOC_RGB);
-
+    aColor = Quantity_Color(aColors[0] / 255., aColors[1] / 255., aColors[2] / 255.,
+                            Quantity_TOC_RGB);
     myHighlightColor = aHStyle->Color();
     mySelectionColor = aSStyle->Color();
 
@@ -123,7 +123,8 @@ void PartSet_WidgetFeaturePointSelector::mouseMoved(ModuleBase_IViewWindow* theW
   ModuleBase_ISelection* aSelect = myWorkshop->selection();
   QList<ModuleBase_ViewerPrsPtr> aHighlighted = aSelect->getHighlighted();
 
-  ModuleBase_ViewerPrsPtr aPrs = !aHighlighted.empty() ? aHighlighted.first() : ModuleBase_ViewerPrsPtr();
+  ModuleBase_ViewerPrsPtr aPrs = !aHighlighted.empty() ? aHighlighted.first()
+                                                       : ModuleBase_ViewerPrsPtr();
   fillFeature(aPrs, theWindow, theEvent);
 }
 
