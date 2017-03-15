@@ -240,16 +240,6 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_ProjectionSelection", new PartSet_ProjectionSelection);
 }
 
-void PartSet_Module::registerProperties()
-{
-  Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_size", "Size", Config_Prop::Double,
-                                   PLANE_SIZE);
-  Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_thickness", "Thickness",
-                                   Config_Prop::Integer, SKETCH_WIDTH);
-  Config_PropManager::registerProp(SKETCH_TAB_NAME, "rotate_to_plane",
-    "Rotate to plane when selected", Config_Prop::Boolean, "false");
-}
-
 void PartSet_Module::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget,
                                             const bool isToConnect)
 {
