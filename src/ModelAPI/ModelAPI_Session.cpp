@@ -28,8 +28,11 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <Config_ModuleReader.h>
+#include <Config_PropManager.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -53,6 +56,17 @@ std::shared_ptr<ModelAPI_Session> ModelAPI_Session::get()
 {
   if (!MY_MANAGER) {  // import Model library that implements this interface of ModelAPI
     Config_ModuleReader::loadLibrary("Model");
+
+    Config_PropManager::registerProp("Visualization", "body_deflection",
+                                     "Body deflection coefficient",
+                                     Config_Prop::Double,
+                                     ModelAPI_ResultBody::DEFAULT_DEFLECTION());
+
+    Config_PropManager::registerProp("Visualization", "construction_deflection",
+                                     "Construction deflection coefficient",
+                                     Config_Prop::Double,
+                                     ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());
+
   }
   return MY_MANAGER;
 }
