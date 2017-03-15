@@ -3,6 +3,12 @@ from salome.shaper import model
 from TestSketcher import SketcherTestCase
 
 class SketcherSetFillet(SketcherTestCase):
+    # TODO: Remove tearDown method to check Python dump in super-class
+    def tearDown(self):
+        model.end()
+        #assert(model.checkPythonDump())
+        model.reset()
+
     def test_fillet(self):
         l1 = self.sketch.addLine(0, 0, 0, 1)
         l2 = self.sketch.addLine(0, 1, 1, 1)
