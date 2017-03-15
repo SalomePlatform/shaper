@@ -26,7 +26,7 @@
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
-#ifdef VINSPECTOR
+#ifdef TINSPECTOR
 #include <VInspectorAPI_CallBack.hxx>
 #endif
 
@@ -66,7 +66,7 @@ void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& the
       Handle(SelectMgr_EntityOwner) anOwner = theSelectedOwners(i);
 
       aContext->AddOrRemoveSelected(anOwner, isUpdateViewer);
-      #ifdef VINSPECTOR
+      #ifdef TINSPECTOR
       if (myWorkshop->displayer()->getCallBack())
         myWorkshop->displayer()->getCallBack()->AddOrRemoveSelected(anOwner);
       #endif

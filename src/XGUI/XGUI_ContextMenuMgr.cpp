@@ -151,13 +151,9 @@ void XGUI_ContextMenuMgr::createActions()
                                            tr("Select parent feature"), aDesktop);
   addAction("SHOW_FEATURE_CMD", aAction);
 
-#ifdef VINSPECTOR
-  aAction = ModuleBase_Tools::createAction(QIcon(), tr("Debug Visualization"), aDesktop);
-  addAction("VINSPECTOR_VIEW", aAction);
-#endif
-#ifdef DFBROWSER
-  aAction = ModuleBase_Tools::createAction(QIcon(), tr("DFBrowser"), aDesktop);
-  addAction("DFBROWSER_VIEW", aAction);
+#ifdef TINSPECTOR
+  aAction = ModuleBase_Tools::createAction(QIcon(), tr("TInspector"), aDesktop);
+  addAction("TINSPECTOR_VIEW", aAction);
 #endif
 
   buildObjBrowserMenu();
@@ -338,11 +334,8 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     action("DEFLECTION_CMD")->setEnabled(true);
 
   #ifdef _DEBUG
-    #ifdef VINSPECTOR
-      action("VINSPECTOR_VIEW")->setEnabled(true);
-    #endif
-    #ifdef DFBROWSER
-      action("DFBROWSER_VIEW")->setEnabled(true);
+    #ifdef TINSPECTOR
+      action("TINSPECTOR_VIEW")->setEnabled(true);
     #endif
   #endif
 
@@ -578,11 +571,8 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
   }
 #ifdef _DEBUG
   if (aSelected == 0) {
-    #ifdef VINSPECTOR
-    aActions.append(action("VINSPECTOR_VIEW"));
-    #endif
-    #ifdef DFBROWSER
-    aActions.append(action("DFBROWSER_VIEW"));
+    #ifdef TINSPECTOR
+    aActions.append(action("TINSPECTOR_VIEW"));
     #endif
   }
 #endif
