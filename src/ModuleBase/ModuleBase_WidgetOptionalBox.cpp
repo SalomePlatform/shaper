@@ -222,16 +222,13 @@ void ModuleBase_WidgetOptionalBox::updateControlsVisibility()
 {
   if (myOptionType == GroupBox) {
     bool aChecked = myGroupBox->isChecked();
-    if (aChecked)
-      ModuleBase_Tools::zeroMargins(myGroupBoxLayout);
-    else
-      ModuleBase_Tools::adjustMargins(myGroupBoxLayout);
+    ModuleBase_Tools::adjustMargins(myGroupBoxLayout);
 
     int aNbSubControls = myGroupBoxLayout->count();
     for (int i = 0; i < aNbSubControls; i++) {
       QWidget* aWidget = myGroupBoxLayout->itemAt(i)->widget();
       if (aWidget)
-        aWidget->setVisible(aChecked);
+        aWidget->setEnabled(aChecked);
     }
   }
   else {
