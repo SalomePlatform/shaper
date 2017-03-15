@@ -75,7 +75,7 @@ bool GeomAlgoAPI_Translation::check()
         return false;
       }
       if (!myEndPoint) {
-        myError = "Translation builder :: start point is not valid.";
+        myError = "Translation builder :: end point is not valid.";
         return false;
       }
       if (!mySourceShape) {
