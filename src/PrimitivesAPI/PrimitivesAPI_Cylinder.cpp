@@ -10,8 +10,6 @@
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
 
-#include <iostream>
-
 //==================================================================================================
 PrimitivesAPI_Cylinder::PrimitivesAPI_Cylinder(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : ModelHighAPI_Interface(theFeature)
@@ -21,10 +19,10 @@ PrimitivesAPI_Cylinder::PrimitivesAPI_Cylinder(const std::shared_ptr<ModelAPI_Fe
 
 //==================================================================================================
 PrimitivesAPI_Cylinder::PrimitivesAPI_Cylinder(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                     const ModelHighAPI_Selection& theBasePoint,
-                                  const ModelHighAPI_Selection& theAxis,
-                                  const ModelHighAPI_Double& theRadius,
-                                  const ModelHighAPI_Double& theHeight)
+                                               const ModelHighAPI_Selection& theBasePoint,
+                                               const ModelHighAPI_Selection& theAxis,
+                                               const ModelHighAPI_Double& theRadius,
+                                               const ModelHighAPI_Double& theHeight)
 : ModelHighAPI_Interface(theFeature)
 {
   if (initialize()) {
@@ -37,11 +35,11 @@ PrimitivesAPI_Cylinder::PrimitivesAPI_Cylinder(const std::shared_ptr<ModelAPI_Fe
 
 //==================================================================================================
 PrimitivesAPI_Cylinder::PrimitivesAPI_Cylinder(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                     const ModelHighAPI_Selection& theBasePoint,
-                                  const ModelHighAPI_Selection& theAxis,
-                                  const ModelHighAPI_Double& theRadius,
-                                  const ModelHighAPI_Double& theHeight,
-                                  const ModelHighAPI_Double& theAngle)
+                                               const ModelHighAPI_Selection& theBasePoint,
+                                               const ModelHighAPI_Selection& theAxis,
+                                               const ModelHighAPI_Double& theRadius,
+                                               const ModelHighAPI_Double& theHeight,
+                                               const ModelHighAPI_Double& theAngle)
 : ModelHighAPI_Interface(theFeature)
 {
   if (initialize()) {

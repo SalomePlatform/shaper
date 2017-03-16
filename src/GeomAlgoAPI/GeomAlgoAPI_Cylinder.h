@@ -39,7 +39,7 @@ class GeomAlgoAPI_Cylinder : public GeomAlgoAPI_MakeShape
                                           const double theHeight,
                                           const double theAngle);
 
-  /// Checks if data for the cyminder construction is OK.
+  /// Checks if data for the cylinder construction is OK.
   GEOMALGOAPI_EXPORT bool check();
 
   /// Builds the cylinder.

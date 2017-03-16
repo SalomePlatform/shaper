@@ -17,22 +17,15 @@
 class ModelHighAPI_Double;
 class ModelHighAPI_Selection;
 
-/// \class PrimitivesAPI_Box
+/// \class PrimitivesAPI_Cylinder
 /// \ingroup CPPHighAPI
-/// \brief Interface for primitive Box feature.
+/// \brief Interface for primitive Cylinder feature.
 class PrimitivesAPI_Cylinder: public ModelHighAPI_Interface
 {
 public:
   /// Constructor without values.
   PRIMITIVESAPI_EXPORT
   explicit PrimitivesAPI_Cylinder(const std::shared_ptr<ModelAPI_Feature>& theFeature);
-
-  /// Constructor with values.
-  /*PRIMITIVESAPI_EXPORT
-  explicit PrimitivesAPI_Cylinder(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                             const ModelHighAPI_Double& theDx,
-                             const ModelHighAPI_Double& theDy,
-                             const ModelHighAPI_Double& theDz);*/
 
   /// Constructor with values.
   PRIMITIVESAPI_EXPORT
@@ -59,15 +52,15 @@ public:
              creationMethod, PrimitivesPlugin_Cylinder::CREATION_METHOD(),
              ModelAPI_AttributeString, /** Creation method */,
              basePoint, PrimitivesPlugin_Cylinder::BASE_POINT_ID(),
-             ModelAPI_AttributeSelection, /** Dimension in X */,
+             ModelAPI_AttributeSelection, /** Base point */,
              axis, PrimitivesPlugin_Cylinder::AXIS_ID(),
-             ModelAPI_AttributeSelection, /** Dimension in Y */,
+             ModelAPI_AttributeSelection, /** Axis */,
              radius, PrimitivesPlugin_Cylinder::RADIUS_ID(),
-             ModelAPI_AttributeDouble, /** Dimension in Z */,
+             ModelAPI_AttributeDouble, /** Radius */,
              height, PrimitivesPlugin_Cylinder::HEIGHT_ID(),
-             ModelAPI_AttributeDouble, /** First point */,
+             ModelAPI_AttributeDouble, /** Height */,
              angle, PrimitivesPlugin_Cylinder::ANGLE_ID(),
-             ModelAPI_AttributeDouble, /** Second point */)
+             ModelAPI_AttributeDouble, /** Angle */)
 
   /// Set dimensions
   PRIMITIVESAPI_EXPORT
@@ -79,11 +72,11 @@ public:
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
-/// Pointer on primitive Box object
+/// Pointer on primitive Cylinder object
 typedef std::shared_ptr<PrimitivesAPI_Cylinder> CylinderPtr;
 
 /// \ingroup CPPHighAPI
-/// \brief Create primitive Box feature.
+/// \brief Create primitive Cylinder feature.
 PRIMITIVESAPI_EXPORT
 CylinderPtr addCylinder(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const ModelHighAPI_Selection& theBasePoint,
@@ -92,7 +85,7 @@ CylinderPtr addCylinder(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const ModelHighAPI_Double& theHeight);
 
 /// \ingroup CPPHighAPI
-/// \brief Create primitive Box feature.
+/// \brief Create primitive Cylinder feature.
 PRIMITIVESAPI_EXPORT
 CylinderPtr addCylinder(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const ModelHighAPI_Selection& theBasePoint,
@@ -102,14 +95,14 @@ CylinderPtr addCylinder(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const ModelHighAPI_Double& theAngle);
 
 /// \ingroup CPPHighAPI
-/// \brief Create primitive Box feature.
+/// \brief Create primitive Cylinder feature.
 PRIMITIVESAPI_EXPORT
 CylinderPtr addCylinder(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const ModelHighAPI_Double& theRadius,
                         const ModelHighAPI_Double& theHeight);
 
 /// \ingroup CPPHighAPI
-/// \brief Create primitive Box feature.
+/// \brief Create primitive Cylinder feature.
 PRIMITIVESAPI_EXPORT
 CylinderPtr addCylinder(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const ModelHighAPI_Double& theRadius,

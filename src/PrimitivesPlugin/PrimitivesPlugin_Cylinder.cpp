@@ -19,8 +19,6 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
 
-#include <iostream>
-
 //=================================================================================================
 PrimitivesPlugin_Cylinder::PrimitivesPlugin_Cylinder()
 {
