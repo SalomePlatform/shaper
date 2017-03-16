@@ -43,6 +43,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Exception.h
     GeomAlgoAPI_Box.h
     GeomAlgoAPI_Cylinder.h
+    GeomAlgoAPI_Sphere.h
     GeomAlgoAPI_XAOExport.h
     GeomAlgoAPI_XAOImport.h
     GeomAlgoAPI_Copy.h
@@ -88,6 +89,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Exception.cpp
     GeomAlgoAPI_Box.cpp
     GeomAlgoAPI_Cylinder.cpp
+    GeomAlgoAPI_Sphere.cpp
     GeomAlgoAPI_XAOExport.cpp
     GeomAlgoAPI_XAOImport.cpp
     GeomAlgoAPI_Copy.cpp

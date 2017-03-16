@@ -7,12 +7,13 @@
 #include "GeomAlgoAPI_ShapeAPI.h"
 
 #include <GeomAlgoAPI_Box.h>
-#include <GeomAlgoAPI_Cylinder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_ConeSegment.h>
+#include <GeomAlgoAPI_Cylinder.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_Rotation.h>
 #include <GeomAlgoAPI_Scale.h>
+#include <GeomAlgoAPI_Sphere.h>
 #include <GeomAlgoAPI_Symmetry.h>
 #include <GeomAlgoAPI_Translation.h>
 
@@ -190,6 +191,53 @@ namespace GeomAlgoAPI_ShapeAPI
       throw GeomAlgoAPI_Exception(aCylinderAlgo.getError());
     }
     return aCylinderAlgo.shape();
+  }
+
+  //===============================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeSphere(
+      std::shared_ptr<GeomAPI_Pnt> theCenterPoint, double theRadius) throw (GeomAlgoAPI_Exception)
+  {
+    GeomAlgoAPI_Sphere aSphereAlgo(theCenterPoint, theRadius);
+
+    if (!aSphereAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aSphereAlgo.getError());
+    }
+
+    aSphereAlgo.build();
+
+    if(!aSphereAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aSphereAlgo.getError());
+    }
+
+    if (!aSphereAlgo.checkValid("Sphere builder")) {
+      throw GeomAlgoAPI_Exception(aSphereAlgo.getError());
+    }
+    return aSphereAlgo.shape();
+  }
+
+  //===============================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeSphere(double theRadius)
+      throw (GeomAlgoAPI_Exception)
+  {
+    std::shared_ptr<GeomAPI_Pnt> aCenterPoint =
+      std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(0.,0.,0.));
+
+    GeomAlgoAPI_Sphere aSphereAlgo(aCenterPoint, theRadius);
+
+    if (!aSphereAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aSphereAlgo.getError());
+    }
+
+    aSphereAlgo.build();
+
+    if(!aSphereAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aSphereAlgo.getError());
+    }
+
+    if (!aSphereAlgo.checkValid("Sphere builder")) {
+      throw GeomAlgoAPI_Exception(aSphereAlgo.getError());
+    }
+    return aSphereAlgo.shape();
   }
 
   //===============================================================================================

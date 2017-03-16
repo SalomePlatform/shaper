@@ -1,0 +1,17 @@
+<!-- Copyright (C) 2014-201x CEA/DEN, EDF R&D -->
+
+<source>
+  <shape_selector id="center_point"
+                  label="Center point"
+                  icon="icons/Primitives/point.png"
+                  tooltip="Select a center point"
+                  shape_types="vertex">
+  </shape_selector>
+  <doublevalue id="radius"
+               label="Radius"
+               icon="icons/Primitives/radius.png"
+               tooltip="Enter a radius"
+               step="1."
+               default="10.">
+  </doublevalue>
+</source>

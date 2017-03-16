@@ -21,7 +21,9 @@
 // shared pointers
 %shared_ptr(PrimitivesAPI_Box)
 %shared_ptr(PrimitivesAPI_Cylinder)
+%shared_ptr(PrimitivesAPI_Sphere)
 
 // all supported interfaces
 %include "PrimitivesAPI_Box.h"
 %include "PrimitivesAPI_Cylinder.h"
+%include "PrimitivesAPI_Sphere.h"

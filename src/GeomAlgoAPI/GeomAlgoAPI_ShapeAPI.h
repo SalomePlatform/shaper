@@ -71,6 +71,17 @@ public:
   static std::shared_ptr<GeomAPI_Shape> makeCylinder(double theRadius, double theHeight,
                      double theAngle) throw (GeomAlgoAPI_Exception);
 
+  /// Creates a sphere using a center and a radius.
+  /// \param theCenterPoint The center of the sphere
+  /// \param theRadius The radius of the sphere
+  static std::shared_ptr<GeomAPI_Shape> makeSphere(std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
+                     double theRadius) throw (GeomAlgoAPI_Exception);
+
+  /// Creates a sphere using the origin and a radius.
+  /// \param theRadius The radius of the cylinder
+  static std::shared_ptr<GeomAPI_Shape> makeSphere(double theRadius)
+                     throw (GeomAlgoAPI_Exception);
+
   /// Performs a translation from an axis and a distance.
   /// \param theSourceShape Shape to be moved
   /// \param theAxis Movement axis

@@ -13,5 +13,10 @@
         <source path="cylinder_widget.xml"/>
       </feature>
     </group>
+    <group id="Primitives">
+      <feature id="Sphere" title="Sphere" tooltip="Create a sphere" icon="icons/Primitives/sphere.png">
+        <source path="sphere_widget.xml"/>
+      </feature>
+    </group>
   </workbench>
 </plugin>

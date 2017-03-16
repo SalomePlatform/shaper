@@ -6,11 +6,13 @@ SET(PROJECT_HEADERS
   PrimitivesAPI.h
   PrimitivesAPI_Box.h
   PrimitivesAPI_Cylinder.h
+  PrimitivesAPI_Sphere.h
 )
 
 SET(PROJECT_SOURCES
   PrimitivesAPI_Box.cpp
   PrimitivesAPI_Cylinder.cpp
+  PrimitivesAPI_Sphere.cpp
 )
 
 SET(PROJECT_LIBRARIES

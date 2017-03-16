@@ -8,6 +8,8 @@
 
 #include <PrimitivesPlugin_Box.h>
 #include <PrimitivesPlugin_Cylinder.h>
+#include <PrimitivesPlugin_Sphere.h>
+
 #include <ModelAPI_Session.h>
 
 #include <string>
@@ -29,6 +31,8 @@ FeaturePtr PrimitivesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new PrimitivesPlugin_Box);
   } else if (theFeatureID == PrimitivesPlugin_Cylinder::ID()) {
     return FeaturePtr(new PrimitivesPlugin_Cylinder);
+  } else if (theFeatureID == PrimitivesPlugin_Sphere::ID()) {
+    return FeaturePtr(new PrimitivesPlugin_Sphere);
   }
   // feature of such kind is not found
   return FeaturePtr();
