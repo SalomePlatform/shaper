@@ -51,9 +51,10 @@ class SketcherPrs_SymbolArray: public OpenGl_PrimitiveArray
 {
 public:
   SketcherPrs_SymbolArray(const OpenGl_GraphicDriver* theDriver,
-    const Handle(SketcherPrs_SymbolPrs)& theObj)
+    const Handle(SketcherPrs_SymbolPrs)& theObj, const Handle(AIS_InteractiveContext)& theCtx)
     :OpenGl_PrimitiveArray(theDriver, theObj->myPntArray->Type(), theObj->myPntArray->Indices(),
-    theObj->myPntArray->Attributes(), theObj->myPntArray->Bounds()), myObj(theObj) {}
+    theObj->myPntArray->Attributes(), theObj->myPntArray->Bounds()), myObj(theObj),
+    myContext(theCtx) {}
 
   virtual void Render(const Handle(OpenGl_Workspace)& theWorkspace) const
   {
@@ -78,10 +79,18 @@ public:
       }
     }
     OpenGl_PrimitiveArray::Render(theWorkspace);
+
+    // Update selection position only if there is no selected object
+    // because it can corrupt selection of other objects
+    if ((myContext->NbCurrents() == 0) && (myContext->NbSelected() == 0))  {
+      myContext->MainSelector()->RebuildSensitivesTree(myObj);
+      myContext->MainSelector()->RebuildObjectsTree (false);
+    }
   }
 
 private:
   Handle(SketcherPrs_SymbolPrs) myObj;
+  Handle(AIS_InteractiveContext) myContext;
 };
 
 
@@ -259,7 +268,7 @@ void SketcherPrs_SymbolPrs::Compute(
 
   // Pint the group with custom procedure (see Render)
   SketcherPrs_SymbolArray* aElem =
-    new SketcherPrs_SymbolArray((OpenGl_GraphicDriver*)aDriver->This(), this);
+    new SketcherPrs_SymbolArray((OpenGl_GraphicDriver*)aDriver->This(), this, GetContext());
   aGroup->AddElement(aElem);
 
   // Disable frustum culling for this object by marking it as mutable
