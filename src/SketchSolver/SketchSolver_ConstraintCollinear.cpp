@@ -4,7 +4,7 @@
 #include <SketchSolver_Error.h>
 
 #include <PlaneGCSSolver_ConstraintWrapper.h>
-#include <PlaneGCSSolver_EntityWrapper.h>
+#include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
 #include <PlaneGCSSolver_UpdateCoincidence.h>
 
@@ -13,7 +13,7 @@
 static ConstraintWrapperPtr createPointsOnLine(
     std::shared_ptr<PlaneGCSSolver_PointWrapper>  thePoint1,
     std::shared_ptr<PlaneGCSSolver_PointWrapper>  thePoint2,
-    std::shared_ptr<PlaneGCSSolver_EntityWrapper> theLine)
+    std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theLine)
 {
   std::shared_ptr<GCS::Line> aGCSLine = std::dynamic_pointer_cast<GCS::Line>(theLine->entity());
 
@@ -82,7 +82,7 @@ void SketchSolver_ConstraintCollinear::notify(const FeaturePtr&      theFeature,
   bool aConstraintToApply[4] = {false, false, false, false};
   ConstraintWrapperPtr aNewConstraint;
   std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoints[2];
-  std::shared_ptr<PlaneGCSSolver_EntityWrapper> aLine;
+  std::shared_ptr<PlaneGCSSolver_EdgeWrapper> aLine;
 
   if (isPointOnOppositeLine[0] || isPointOnOppositeLine[1]) {
     // one of points of first line is already on the second line,
@@ -95,7 +95,7 @@ void SketchSolver_ConstraintCollinear::notify(const FeaturePtr&      theFeature,
         aPoints[i] = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(myPoints[i]);
       aConstraintToApply[i] = true;
     }
-    aLine = std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(myAttributes.back());
+    aLine = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(myAttributes.back());
   } else {
     // verify second line and add necessary constraints
     for (int i = 0; i < 2; ++i) {
@@ -106,7 +106,7 @@ void SketchSolver_ConstraintCollinear::notify(const FeaturePtr&      theFeature,
         aPoints[i] = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(myPoints[i + 2]);
       aConstraintToApply[i+2] = true;
     }
-    aLine = std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(myAttributes.front());
+    aLine = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(myAttributes.front());
   }
 
   bool isNew = false;

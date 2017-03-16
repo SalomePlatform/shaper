@@ -8,12 +8,12 @@
 #define PlaneGCSSolver_PointWrapper_H_
 
 #include <PlaneGCSSolver_Defs.h>
-#include <SketchSolver_IEntityWrapper.h>
+#include <PlaneGCSSolver_EntityWrapper.h>
 
 /**
  *  Wrapper providing operations with PlaneGCS points.
  */
-class PlaneGCSSolver_PointWrapper : public SketchSolver_IEntityWrapper
+class PlaneGCSSolver_PointWrapper : public PlaneGCSSolver_EntityWrapper
 {
 public:
   PlaneGCSSolver_PointWrapper(const GCSPointPtr thePoint);

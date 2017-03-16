@@ -7,7 +7,8 @@ SET(PLANEGCSSOLVER_HEADERS
     PlaneGCSSolver_Solver.h
     PlaneGCSSolver_Storage.h
     PlaneGCSSolver_ConstraintWrapper.h
-    PlaneGCSSolver_EntityWrapper.h
+    PlaneGCSSolver_EdgeWrapper.h
+    PlaneGCSSolver_EdgeWrapper.h
     PlaneGCSSolver_PointWrapper.h
     PlaneGCSSolver_ScalarWrapper.h
     PlaneGCSSolver_AngleWrapper.h
@@ -18,7 +19,7 @@ SET(PLANEGCSSOLVER_SOURCES
     PlaneGCSSolver_Solver.cpp
     PlaneGCSSolver_Storage.cpp
     PlaneGCSSolver_ConstraintWrapper.cpp
-    PlaneGCSSolver_EntityWrapper.cpp
+    PlaneGCSSolver_EdgeWrapper.cpp
     PlaneGCSSolver_PointWrapper.cpp
     PlaneGCSSolver_ScalarWrapper.cpp
     PlaneGCSSolver_AngleWrapper.cpp

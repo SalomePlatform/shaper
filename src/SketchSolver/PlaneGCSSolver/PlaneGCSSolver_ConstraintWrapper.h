@@ -8,15 +8,12 @@
 #define PlaneGCSSolver_ConstraintWrapper_H_
 
 #include <PlaneGCSSolver_Defs.h>
-#include <PlaneGCSSolver_Solver.h>
 #include <PlaneGCSSolver_ScalarWrapper.h>
-#include <SketchSolver_IConstraintWrapper.h>
-
 
 /**
  *  Wrapper providing operations with PlaneGCS constraints.
  */
-class PlaneGCSSolver_ConstraintWrapper : public SketchSolver_IConstraintWrapper
+class PlaneGCSSolver_ConstraintWrapper
 {
 public:
   PlaneGCSSolver_ConstraintWrapper(const GCSConstraintPtr&            theConstraint,
@@ -31,6 +28,9 @@ public:
   void setConstraints(const std::list<GCSConstraintPtr>& theConstraints)
   { myGCSConstraints = theConstraints; }
 
+  /// \brief Return ID of current constraint
+  const ConstraintID& id() const
+  { return myID; }
   /// \brief Change constraint ID
   virtual void setId(const ConstraintID& theID);
 
@@ -50,9 +50,12 @@ public:
   { return myValueParam; }
 
 private:
+  ConstraintID                myID;
   SketchSolver_ConstraintType myType;
   ScalarWrapperPtr            myValueParam;
   std::list<GCSConstraintPtr> myGCSConstraints;
 };
+
+typedef std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> ConstraintWrapperPtr;
 
 #endif

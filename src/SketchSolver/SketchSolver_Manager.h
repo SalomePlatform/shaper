@@ -7,7 +7,6 @@
 #ifndef SketchSolver_Manager_H_
 #define SketchSolver_Manager_H_
 
-#include "SketchSolver.h"
 #include <SketchSolver_Group.h>
 
 #include <Events_Listener.h>

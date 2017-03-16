@@ -8,7 +8,7 @@
 #define PlaneGCSSolver_UpdateCoincidence_H_
 
 #include <PlaneGCSSolver_Update.h>
-#include <SketchSolver_IEntityWrapper.h>
+#include <PlaneGCSSolver_EntityWrapper.h>
 
 #include <GCS.h>
 

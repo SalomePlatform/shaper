@@ -1,12 +1,12 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:    PlaneGCSSolver_EntityWrapper.cpp
+// File:    PlaneGCSSolver_EdgeWrapper.cpp
 // Created: 14 Dec 2015
 // Author:  Artem ZHIDKOV
 
-#include <PlaneGCSSolver_EntityWrapper.h>
+#include <PlaneGCSSolver_EdgeWrapper.h>
 
-PlaneGCSSolver_EntityWrapper::PlaneGCSSolver_EntityWrapper(const GCSCurvePtr theEntity)
+PlaneGCSSolver_EdgeWrapper::PlaneGCSSolver_EdgeWrapper(const GCSCurvePtr theEntity)
   : myEntity(theEntity)
 {
   std::shared_ptr<GCS::Line> aLine = std::dynamic_pointer_cast<GCS::Line>(myEntity);

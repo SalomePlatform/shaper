@@ -7,7 +7,6 @@
 #ifndef SketchSolver_ConstraintTangent_H_
 #define SketchSolver_ConstraintTangent_H_
 
-#include "SketchSolver.h"
 #include <SketchSolver_Constraint.h>
 
 /** \class   SketchSolver_ConstraintTangent

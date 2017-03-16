@@ -5,7 +5,7 @@
 // Author:  Artem ZHIDKOV
 
 #include <PlaneGCSSolver_UpdateCoincidence.h>
-#include <PlaneGCSSolver_EntityWrapper.h>
+#include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
 #include <SketchSolver_Constraint.h>
 
@@ -108,7 +108,7 @@ bool PlaneGCSSolver_UpdateCoincidence::isPointOnEntity(
 
   if (theEntity->type() == ENTITY_LINE) {
     std::shared_ptr<GCS::Line> aLine = std::dynamic_pointer_cast<GCS::Line>(
-        std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(theEntity)->entity());
+        std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theEntity)->entity());
     return anIt->isExist(aLine->p1) || anIt->isExist(aLine->p2);
   }
   return false;

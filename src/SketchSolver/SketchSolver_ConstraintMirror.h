@@ -7,7 +7,6 @@
 #ifndef SketchSolver_ConstraintMirror_H_
 #define SketchSolver_ConstraintMirror_H_
 
-#include "SketchSolver.h"
 #include <SketchSolver_Constraint.h>
 
 /** \class   SketchSolver_ConstraintMirror

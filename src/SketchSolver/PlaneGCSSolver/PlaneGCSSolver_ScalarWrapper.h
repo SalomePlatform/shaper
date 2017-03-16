@@ -8,12 +8,12 @@
 #define PlaneGCSSolver_ScalarWrapper_H_
 
 #include <PlaneGCSSolver_Defs.h>
-#include <SketchSolver_IEntityWrapper.h>
+#include <PlaneGCSSolver_EntityWrapper.h>
 
 /**
  *  Wrapper providing operations with PlaneGCS scalars.
  */
-class PlaneGCSSolver_ScalarWrapper : public SketchSolver_IEntityWrapper
+class PlaneGCSSolver_ScalarWrapper : public PlaneGCSSolver_EntityWrapper
 {
 public:
   PlaneGCSSolver_ScalarWrapper(double *const theParam);

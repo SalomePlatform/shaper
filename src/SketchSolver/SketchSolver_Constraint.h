@@ -7,7 +7,6 @@
 #ifndef SketchSolver_Constraint_H_
 #define SketchSolver_Constraint_H_
 
-#include "SketchSolver.h"
 #include <SketchSolver_Storage.h>
 #include <PlaneGCSSolver_Update.h>
 

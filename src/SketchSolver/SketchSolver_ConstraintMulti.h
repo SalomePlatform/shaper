@@ -7,7 +7,6 @@
 #ifndef SketchSolver_ConstraintMulti_H_
 #define SketchSolver_ConstraintMulti_H_
 
-#include "SketchSolver.h"
 #include <SketchSolver_Constraint.h>
 
 #include <vector>

@@ -7,7 +7,7 @@
 #include <PlaneGCSSolver_Storage.h>
 #include <PlaneGCSSolver_Solver.h>
 #include <PlaneGCSSolver_ConstraintWrapper.h>
-#include <PlaneGCSSolver_EntityWrapper.h>
+#include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
 
 #include <PlaneGCSSolver_AttributeBuilder.h>
@@ -193,8 +193,8 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
   if (aRelated && aRelated->type() == ENTITY_ARC) {
     /// TODO: this code should be shared with FeatureBuilder somehow
 
-    std::shared_ptr<PlaneGCSSolver_EntityWrapper> anEntity =
-        std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(aRelated);
+    std::shared_ptr<PlaneGCSSolver_EdgeWrapper> anEntity =
+        std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(aRelated);
     std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEntity->entity());
 
     static std::shared_ptr<GeomAPI_Dir2d> OX(new GeomAPI_Dir2d(1.0, 0.0));

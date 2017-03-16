@@ -7,8 +7,8 @@
 #ifndef PlaneGCSSolver_Solver_H_
 #define PlaneGCSSolver_Solver_H_
 
-#include <SketchSolver_IConstraintWrapper.h>
 #include <PlaneGCSSolver_Defs.h>
+#include <PlaneGCSSolver_ConstraintWrapper.h>
 
 #include <GCS.h>
 

@@ -5,7 +5,7 @@
 // Author:  Artem ZHIDKOV
 
 #include <PlaneGCSSolver_FeatureBuilder.h>
-#include <PlaneGCSSolver_EntityWrapper.h>
+#include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
 #include <PlaneGCSSolver_ScalarWrapper.h>
 
@@ -117,7 +117,7 @@ EntityWrapperPtr createLine(const AttributeEntityMap& theAttributes)
       aNewLine->p2 = *(aPoint->point());
   }
 
-  return EntityWrapperPtr(new PlaneGCSSolver_EntityWrapper(aNewLine));
+  return EntityWrapperPtr(new PlaneGCSSolver_EdgeWrapper(aNewLine));
 }
 
 EntityWrapperPtr createCircle(const AttributeEntityMap& theAttributes)
@@ -138,7 +138,7 @@ EntityWrapperPtr createCircle(const AttributeEntityMap& theAttributes)
     }
   }
 
-  return EntityWrapperPtr(new PlaneGCSSolver_EntityWrapper(aNewCircle));
+  return EntityWrapperPtr(new PlaneGCSSolver_EdgeWrapper(aNewCircle));
 }
 
 static double* createParameter(PlaneGCSSolver_Storage* theStorage)
@@ -203,7 +203,7 @@ EntityWrapperPtr createArc(const AttributeEntityMap&    theAttributes,
         aNewArc->center, aNewArc->end, aNewArc->endAngle)));
   }
 
-  return EntityWrapperPtr(new PlaneGCSSolver_EntityWrapper(aNewArc));
+  return EntityWrapperPtr(new PlaneGCSSolver_EdgeWrapper(aNewArc));
 }
 
 bool isAttributeApplicable(const std::string& theAttrName, const std::string& theOwnerName)

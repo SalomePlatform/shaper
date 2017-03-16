@@ -16,11 +16,8 @@ ENDFUNCTION(TO_FULL_PATH)
 INCLUDE(Common)
 
 SET(SKETCHSOLVER_HEADERS
-    SketchSolver.h
     SketchSolver_Error.h
     SketchSolver_Group.h
-    SketchSolver_IConstraintWrapper.h
-    SketchSolver_IEntityWrapper.h
     SketchSolver_Manager.h
     SketchSolver_Storage.h
 )

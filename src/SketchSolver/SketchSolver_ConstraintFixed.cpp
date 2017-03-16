@@ -4,7 +4,7 @@
 #include <SketchSolver_Error.h>
 
 #include <PlaneGCSSolver_ConstraintWrapper.h>
-#include <PlaneGCSSolver_EntityWrapper.h>
+#include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
 
 
@@ -56,8 +56,8 @@ void SketchSolver_ConstraintFixed::process()
 
 void SketchSolver_ConstraintFixed::fixFeature(EntityWrapperPtr theFeature)
 {
-  std::shared_ptr<PlaneGCSSolver_EntityWrapper> anEntity =
-      std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(theFeature);
+  std::shared_ptr<PlaneGCSSolver_EdgeWrapper> anEntity =
+      std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theFeature);
 
   GCS::VEC_pD aParameters; // parameters of entity to be fixed
 
