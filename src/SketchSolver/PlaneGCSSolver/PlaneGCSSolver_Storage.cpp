@@ -31,7 +31,7 @@ static void constraintsToSolver(const ConstraintWrapperPtr& theConstraint,
       std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(theConstraint)->constraints();
   std::list<GCSConstraintPtr>::const_iterator anIt = aConstraints.begin();
   for (; anIt != aConstraints.end(); ++anIt)
-    theSolver->addConstraint(*anIt, theConstraint->type());
+    theSolver->addConstraint(*anIt);
 }
 
 
@@ -259,9 +259,20 @@ bool PlaneGCSSolver_Storage::removeConstraint(ConstraintPtr theConstraint)
   std::map<ConstraintPtr, ConstraintWrapperPtr>::iterator
       aFound = myConstraintMap.find(theConstraint);
   if (aFound != myConstraintMap.end()) {
-    ConstraintID anID = aFound->second->id();
+    ConstraintWrapperPtr aCW = aFound->second;
+    ConstraintID anID = aCW->id();
+
     // Remove solver's constraints
     mySketchSolver->removeConstraint(anID);
+
+    // Remove value if exists
+    const ScalarWrapperPtr& aValue = aCW->valueParameter();
+    if (aValue) {
+      GCS::SET_pD aParToRemove;
+      aParToRemove.insert(aValue->scalar());
+      removeParameters(aParToRemove);
+    }
+
     // Remove constraint
     myConstraintMap.erase(aFound);
 
@@ -295,7 +306,8 @@ void PlaneGCSSolver_Storage::removeInvalidEntities()
   for (; aFIter != myFeatureMap.end(); aFIter++)
     if (!aFIter->first->data() || !aFIter->first->data()->isValid()) {
       anInvalidFeatures.push_back(aFIter->first);
-      aDestroyer.remove(aFIter->second);
+      if (aFIter->second)
+        aDestroyer.remove(aFIter->second);
 
       // remove invalid arc
       std::map<EntityWrapperPtr, ConstraintWrapperPtr>::iterator

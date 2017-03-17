@@ -34,4 +34,6 @@ private:
   GCSCurvePtr myEntity;
 };
 
+typedef std::shared_ptr<PlaneGCSSolver_EdgeWrapper> EdgeWrapperPtr;
+
 #endif

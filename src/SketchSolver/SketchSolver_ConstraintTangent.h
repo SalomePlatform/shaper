@@ -19,15 +19,20 @@ public:
   /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintTangent(ConstraintPtr theConstraint) :
       SketchSolver_Constraint(theConstraint),
-      isArcArcInternal(false)
+      isArcArcInternal(false),
+      myCurveCurveAngle(0.0)
   {}
 
+  /// \brief Notify this object about the feature is changed somewhere
+  virtual void notify(const FeaturePtr&      theFeature,
+                      PlaneGCSSolver_Update* theUpdater);
+
 protected:
-  /// \brief Generate list of attributes of constraint in order useful for constraints
-  /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
-  /// \param[out] theAttributes list of attributes to be filled
-  virtual void getAttributes(EntityWrapperPtr&              theValue,
-                             std::vector<EntityWrapperPtr>& theAttributes);
+  /// \brief Converts SketchPlugin constraint to a list of solver constraints
+  virtual void process();
+
+  /// \brief Remove current constraint from the storage and build is again
+  void rebuild();
 
   /// \brief This method is used in derived objects to check consistency of constraint.
   ///        E.g. the distance between line and point may be signed.
@@ -35,6 +40,8 @@ protected:
 
 private:
   bool isArcArcInternal;
+  double myCurveCurveAngle;
+  AttributePtr mySharedPoint;
 };
 
 #endif

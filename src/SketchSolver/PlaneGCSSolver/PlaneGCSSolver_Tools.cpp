@@ -85,10 +85,6 @@ static ConstraintWrapperPtr
                         std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity2,
                         std::shared_ptr<PlaneGCSSolver_ScalarWrapper> theIntermed);
 static ConstraintWrapperPtr
-  createConstraintTangent(const SketchSolver_ConstraintType& theType,
-                          std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity1,
-                          std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity2);
-static ConstraintWrapperPtr
   createConstraintMiddlePoint(std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint,
                               std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity);
 
@@ -200,15 +196,6 @@ ConstraintWrapperPtr PlaneGCSSolver_Tools::createConstraint(
                                     GCS_EDGE_WRAPPER(theEntity2),
                                     anIntermediate);
     break;
-  case CONSTRAINT_TANGENT_CIRCLE_LINE:
-  case CONSTRAINT_TANGENT_CIRCLE_CIRCLE:
-    aResult = createConstraintTangent(theType,
-                                      GCS_EDGE_WRAPPER(theEntity1),
-                                      GCS_EDGE_WRAPPER(theEntity2));
-    break;
-  case CONSTRAINT_MULTI_TRANSLATION:
-  case CONSTRAINT_MULTI_ROTATION:
-  case CONSTRAINT_SYMMETRIC:
   default:
     break;
   }
@@ -464,61 +451,4 @@ ConstraintWrapperPtr createConstraintEqual(
   if (theIntermed)
     aResult->setValueParameter(theIntermed);
   return aResult;
-}
-
-ConstraintWrapperPtr createConstraintTangent(
-    const SketchSolver_ConstraintType& theType,
-    std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity1,
-    std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity2)
-{
-  GCSConstraintPtr aNewConstr;
-  if (theType == CONSTRAINT_TANGENT_CIRCLE_LINE) {
-    GCSCurvePtr anEntCirc, anEntLine;
-    if (theEntity1->type() == ENTITY_LINE) {
-      anEntLine = theEntity1->entity();
-      anEntCirc = theEntity2->entity();
-    } else {
-      anEntLine = theEntity2->entity();
-      anEntCirc = theEntity1->entity();
-    }
-
-    std::shared_ptr<GCS::Circle> aCirc =
-      std::dynamic_pointer_cast<GCS::Circle>(anEntCirc);
-    std::shared_ptr<GCS::Line> aLine =
-      std::dynamic_pointer_cast<GCS::Line>(anEntLine);
-
-    aNewConstr =
-      GCSConstraintPtr(new GCS::ConstraintP2LDistance(aCirc->center, *aLine, aCirc->rad));
-  } else {
-    std::shared_ptr<GCS::Circle> aCirc1 =
-      std::dynamic_pointer_cast<GCS::Circle>(theEntity1->entity());
-    std::shared_ptr<GCS::Circle> aCirc2 =
-      std::dynamic_pointer_cast<GCS::Circle>(theEntity2->entity());
-
-    double aDX = *(aCirc1->center.x) - *(aCirc2->center.x);
-    double aDY = *(aCirc1->center.y) - *(aCirc2->center.y);
-    double aDist = sqrt(aDX * aDX + aDY * aDY);
-    aNewConstr = GCSConstraintPtr(new GCS::ConstraintTangentCircumf(aCirc1->center, aCirc2->center,
-        aCirc1->rad, aCirc2->rad, (aDist < *(aCirc1->rad) || aDist < *(aCirc2->rad))));
-  }
-
-  return ConstraintWrapperPtr(new PlaneGCSSolver_ConstraintWrapper(aNewConstr, theType));
-}
-
-bool PlaneGCSSolver_Tools::isArcArcTangencyInternal(
-    EntityWrapperPtr theArc1, EntityWrapperPtr theArc2)
-{
-  std::shared_ptr<GCS::Circle> aCirc1 = std::dynamic_pointer_cast<GCS::Circle>(
-      GCS_EDGE_WRAPPER(theArc1)->entity());
-  std::shared_ptr<GCS::Circle> aCirc2 = std::dynamic_pointer_cast<GCS::Circle>(
-      GCS_EDGE_WRAPPER(theArc2)->entity());
-
-  if (!aCirc1 || !aCirc2)
-    return false;
-
-  double aDX = *(aCirc1->center.x) - *(aCirc2->center.x);
-  double aDY = *(aCirc1->center.y) - *(aCirc2->center.y);
-  double aDist = sqrt(aDX * aDX + aDY * aDY);
-
-  return (aDist < *(aCirc1->rad) || aDist < *(aCirc2->rad));
 }

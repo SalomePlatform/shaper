@@ -58,8 +58,7 @@ class TestFilletInteracting(unittest.TestCase):
 
   def tearDown(self):
     model.end()
-    # TODO: Revert commented line to check Python dump
-    #self.assertTrue(model.checkPythonDump())
+    self.assertTrue(model.checkPythonDump())
     model.reset()
 
 
@@ -115,7 +114,6 @@ class TestFilletInteracting(unittest.TestCase):
     return [aFeatureA, aFeatureB]
 
 
-  @unittest.expectedFailure
   def test_fillet_two_lines(self):
     """ Test 1. Fillet on two connected lines
     """
@@ -173,7 +171,6 @@ class TestFilletInteracting(unittest.TestCase):
     # remove fillet for correct python dump
     self.myDocument.removeFeature(aFillet.feature())
 
-  @unittest.expectedFailure
   def test_fillet_arc_line(self):
     """ Test 3. Fillet on connected arc and line
     """
@@ -202,7 +199,6 @@ class TestFilletInteracting(unittest.TestCase):
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.EDGE, [3])
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [6])
 
-  @unittest.expectedFailure
   def test_fillet_two_arcs(self):
     """ Test 4. Fillet on two connected arcs
     """
@@ -231,7 +227,6 @@ class TestFilletInteracting(unittest.TestCase):
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.EDGE, [3])
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [6])
 
-  @unittest.expectedFailure
   def test_fillet_with_horizontal_vertical(self):
     """ Test 5. Fillet on two connected lines in case of Horizontal or Vertical constraints applied
     """
@@ -267,7 +262,6 @@ class TestFilletInteracting(unittest.TestCase):
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.EDGE, [3])
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [6])
 
-  @unittest.expectedFailure
   def test_fillet_with_orthogonal(self):
     """ Test 6. Fillet on two connected lines in case of Perpendicular constraint applied
     """
@@ -301,7 +295,6 @@ class TestFilletInteracting(unittest.TestCase):
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.EDGE, [3])
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [6])
 
-  @unittest.expectedFailure
   def test_fillet_with_parallel(self):
     """ Test 7. Fillet on two connected lines in case of Parallel constraint applied
     """
@@ -338,7 +331,6 @@ class TestFilletInteracting(unittest.TestCase):
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.EDGE, [4])
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [8])
 
-  @unittest.expectedFailure
   def test_fillet_with_equal_lines(self):
     """ Test 8. Fillet on two connected lines in case of Equal constraint applied
     """
@@ -355,7 +347,7 @@ class TestFilletInteracting(unittest.TestCase):
     model.do()
     self.checkDOF()
     self.mySketch.setFillet(aSketchLineA.startPoint())
-    self.myDOF += 2
+    self.myDOF += 2 # Equal has been removed
     model.do()
     self.checkFillet()
     self.checkDOF()
@@ -372,7 +364,6 @@ class TestFilletInteracting(unittest.TestCase):
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.EDGE, [3])
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [6])
 
-  @unittest.expectedFailure
   def test_fillet_with_equal_arcs(self):
     """ Test 9. Fillet on two connected arcs in case of Equal constraint applied
     """
@@ -389,7 +380,7 @@ class TestFilletInteracting(unittest.TestCase):
     model.do()
     self.checkDOF()
     self.mySketch.setFillet(aSketchArc1.endPoint())
-    self.myDOF += 1
+    self.myDOF += 2 # Equal has been removed
     model.do()
     self.checkFillet()
     self.checkDOF()
@@ -406,7 +397,6 @@ class TestFilletInteracting(unittest.TestCase):
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.EDGE, [3])
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [6])
 
-  @unittest.expectedFailure
   def test_fillet_with_length(self):
     """ Test 10. Fillet on two connected lines in case of Length constraint applied
     """
@@ -440,7 +430,6 @@ class TestFilletInteracting(unittest.TestCase):
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.EDGE, [3])
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [6])
 
-  @unittest.expectedFailure
   def test_fillet_with_radius(self):
     """ Test 11. Fillet on connected arc and line in case of Radius constraint is applied to arc
     """
@@ -474,7 +463,6 @@ class TestFilletInteracting(unittest.TestCase):
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.EDGE, [3])
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [6])
 
-  @unittest.expectedFailure
   def test_fillet_with_distance(self):
     """ Test 12. Fillet on two connected lines in case of Distance constraint applied
     """
@@ -495,7 +483,7 @@ class TestFilletInteracting(unittest.TestCase):
     model.do()
     self.checkDOF()
     self.mySketch.setFillet(aSketchLineA.startPoint())
-    self.myDOF += 1
+    self.myDOF += 2 # Distance has been removed
     model.do()
     self.checkFillet()
     self.checkDOF()
@@ -512,7 +500,6 @@ class TestFilletInteracting(unittest.TestCase):
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.EDGE, [4])
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [8])
 
-  @unittest.expectedFailure
   def test_fillet_with_fixed_point(self):
     """ Test 13. Fillet on two connected lines in case of Fixed constraint applied to the fillet point
     """
@@ -529,7 +516,7 @@ class TestFilletInteracting(unittest.TestCase):
     model.do()
     self.checkDOF()
     self.mySketch.setFillet(aSketchLineA.startPoint())
-    self.myDOF += 1
+    self.myDOF += 3 # Fixed constraint has been removed
     model.do()
     self.checkFillet()
     self.checkDOF()
@@ -546,7 +533,6 @@ class TestFilletInteracting(unittest.TestCase):
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.EDGE, [3])
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [6])
 
-  @unittest.expectedFailure
   def test_fillet_with_fixed_line(self):
     """ Test 14. Fillet on two connected lines in case of Fixed constraint applied to one of lines
     """
@@ -580,7 +566,6 @@ class TestFilletInteracting(unittest.TestCase):
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.EDGE, [3])
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [6])
 
-  @unittest.expectedFailure
   def test_fillet_with_angle(self):
     """ Test 15. Fillet on two connected lines in case of Perpendicular constraint applied
     """
@@ -615,6 +600,5 @@ class TestFilletInteracting(unittest.TestCase):
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [6])
 
 
-# TODO: Remove unittest.expectedFailure if the Tangency in PlaneGCS will be updated
 if __name__ == '__main__':
   unittest.main()
