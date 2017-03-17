@@ -13,7 +13,6 @@
 
 #include <gp_Ax1.hxx>
 #include <gp_Ax2.hxx>
-#include <gp_GTrsf.hxx>
 #include <gp_Trsf.hxx>
 
 #define MY_TRSF implPtr<gp_Trsf>()

@@ -11,6 +11,9 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <vector>
 
+class ModelAPI_Document;
+class TDF_Label;
+
 /**\class Model_ResultConstruction
  * \ingroup DataModel
  * \brief The construction element result of a feature.
@@ -58,9 +61,39 @@ class Model_ResultConstruction : public ModelAPI_ResultConstruction
   /// The construction element is never concealed
   MODEL_EXPORT virtual void setIsConcealed(const bool theValue);
 
+  // methods related to selection of sub-shapes in construction, used by SelectionAttribute
+
+  /// Selects theSubShape in the construction. Returns an index of the selected sub-shape.
+  /// Puts the selected shape with a needed BRepNaming sub-structure to the data tree of result.
+  /// If theSubShape is null, it selects the whole construction and returns zero index.
+  /// If theIndex is not -1, it re-selects over the existing data (used for update selection).
+  /// If theExtDoc is document where this selection is needed, if it differs from this,
+  /// naming structures will be located there.
+  int select(const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const std::shared_ptr<ModelAPI_Document> theExtDoc, const int theIndex = -1);
+
+  /// Returns already selected shape by the given index. Zero index means the whole construction,
+  /// so, the returned shape in this case is null.
+  /// If theExtDoc is document where this selection is needed, if it differs from this,
+  /// naming structures will be located there.
+  std::shared_ptr<GeomAPI_Shape> shape(const int theIndex,
+    const std::shared_ptr<ModelAPI_Document> theExtDoc);
+
+  /// Updates the existing selection by the index.
+  /// Returns false if update is failed. Returns theModified true if the selection was updated.
+  /// If theExtDoc is document where this selection is needed, if it differs from this,
+  /// naming structures will be updated there.
+  bool update(const int theIndex, const std::shared_ptr<ModelAPI_Document> theExtDoc,
+    bool& theModified);
+
  protected:
   /// Makes a body on the given feature
   Model_ResultConstruction();
+
+  /// Searchies for the working label selection/update will start from
+  /// Returns true if this is label of the external document.
+  /// theExtDoc is document where this selection is required
+  TDF_Label startLabel(const std::shared_ptr<ModelAPI_Document> theExtDoc, bool& theExternal);
 
   friend class Model_Objects;
 };

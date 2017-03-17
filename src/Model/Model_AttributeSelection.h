@@ -93,10 +93,6 @@ protected:
   virtual void selectBody(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape);
 
-  /// Performs the selection for the construction result (selection by index)
-  virtual void selectConstruction(
-    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape);
-
   /// Performs the selection for the part result (selection by name of body result inside of part)
   /// \param theContext the result - owner of the selection
   /// \param theSubShape selected shape

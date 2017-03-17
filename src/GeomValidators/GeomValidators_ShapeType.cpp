@@ -90,6 +90,7 @@ bool GeomValidators_ShapeType::isValid(const AttributePtr& theAttribute,
     for (; anIt != aLast; anIt++) {
       if (!aTypes.empty())
         aTypes += ", ";
+      aTypes += *anIt;
     }
     theError = "It does not contain element with acceptable shape type. "
                "The type should be one of the next: %1";

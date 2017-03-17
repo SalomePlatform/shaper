@@ -55,7 +55,6 @@ std::string Model_SelectionNaming::getShapeName(
   // add the result name to the name of the shape
   // (it was in BodyBuilder, but did not work on Result rename)
   bool isNeedContextName = theContext->shape().get() != NULL;
-  // && !theContext->shape()->isEqual(theSubSh);
   // check if the subShape is already in DF
   Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(theShape, myLab);
   Handle(TDataStd_Name) anAttr;
