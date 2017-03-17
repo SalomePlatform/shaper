@@ -20,6 +20,7 @@
 
 class ModelAPI_Feature;
 class ModelAPI_AttributeRefAttr;
+class GeomDataAPI_Point2D;
 class ModuleBase_IWorkshop;
 class ModuleBase_ParamSpinBox;
 class ModuleBase_IViewWindow;
@@ -177,12 +178,12 @@ protected:
    /// Creates constrains of the clicked point
    /// \param theClickedX the horizontal coordnate of the point
    /// \param theClickedY the vertical coordnate of the point
-   bool setConstraintTo(double theClickedX, double theClickedY);
+   bool setConstraintToPoint(double theClickedX, double theClickedY);
 
    /// Create a coincidence constraint between the attribute and the parameter object
    /// \theObject a result object
    /// \return true if succed
-   bool setConstraintWith(const ObjectPtr& theObject);
+   bool setConstraintToObject(const ObjectPtr& theObject);
 
    /// Returns if the feature is an orphan point, circle or an arc. Returns true if it
    /// has no a coincident to other lines. It processes point, circle and arc features
@@ -204,7 +205,33 @@ protected:
                                   const std::shared_ptr<GeomAPI_Pnt2d>& thePoint,
                                   const CompositeFeaturePtr& theSketch);
 
-   std::shared_ptr<ModelAPI_AttributeRefAttr> attributeRefAttr() const;
+  /// Finds in the feature's sub-features first Point2D attribute with the given point coordinates
+  /// \param theFeature a feature with sub-feature attributes
+  /// \param thePoint a point to provided searched coordinates
+  /// \return found point or null
+  static std::shared_ptr<GeomDataAPI_Point2D> findFirstEqualPointInArgumentFeatures(
+                  const FeaturePtr& theFeature, const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+
+  /// Finds in the feature first Point2D attribute with the given point coordinates
+  /// \param theFeature a feature with point attributes
+  /// \param thePoint a point to provided searched coordinates
+  /// \return found point or null
+  static std::shared_ptr<GeomDataAPI_Point2D> findFirstEqualPoint(const FeaturePtr& theFeature,
+                                       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+
+  /// Finds in the sketch attribute point of any feature that is nearest to the given point
+  /// \param theSketch a sketch, that is a container of features
+  /// \param theSkipFeature a feature that do not participate in the search
+  /// \param thePoint a point to provided searched coordinates
+  /// \return found point or null
+  static std::shared_ptr<GeomDataAPI_Point2D> findFirstEqualPointInSketch(
+                                       const CompositeFeaturePtr& theSketch,
+                                       const FeaturePtr& theSkipFeature,
+                                       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+
+  /// Returns attribute reference if the key is defined in XML definition of this control
+  /// \return found attribute or null
+  std::shared_ptr<ModelAPI_AttributeRefAttr> attributeRefAttr() const;
 
 protected:
   ModuleBase_IWorkshop* myWorkshop; ///< workshop
