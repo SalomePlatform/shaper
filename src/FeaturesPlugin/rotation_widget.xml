@@ -56,6 +56,7 @@
                       shape_types="vertex">
         <validator id="GeomValidators_ConstructionComposite"/>
         <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        <validator id="GeomValidators_DifferentShapes"/>
       </shape_selector>
       <shape_selector id="end_point"
                       label="End point"
