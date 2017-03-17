@@ -411,6 +411,12 @@ namespace GeomAlgoAPI_ShapeAPI
     const double theStep,
     const int theNumber) throw (GeomAlgoAPI_Exception)
   {
+    if (theNumber <=0) {
+    std::string aError = "Multitranslation builder ";
+    aError+=":: the number of copies for the first direction is null or negative.";
+      throw GeomAlgoAPI_Exception(aError);
+    }
+
     ListOfShape aListOfShape;
     for (int i=0; i<theNumber; i++) {
       aListOfShape.
@@ -429,6 +435,18 @@ namespace GeomAlgoAPI_ShapeAPI
     const double theSecondStep,
     const int theSecondNumber) throw (GeomAlgoAPI_Exception)
   {
+    if (theFirstNumber <=0) {
+    std::string aError = "Multitranslation builder ";
+    aError+=":: the number of copies for the first direction is null or negative.";
+      throw GeomAlgoAPI_Exception(aError);
+    }
+
+    if (theSecondNumber <=0) {
+    std::string aError = "Multitranslation builder ";
+    aError+=":: the number of copies for the second direction is null or negative.";
+      throw GeomAlgoAPI_Exception(aError);
+    }
+
     // Coord theFirstAxis
     double x1 = theFirstAxis->dir()->x();
     double y1 = theFirstAxis->dir()->y();

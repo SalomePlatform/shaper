@@ -108,6 +108,12 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
   int nbCopies =
     integer(FeaturesPlugin_MultiTranslation::NB_COPIES_FIRST_DIR_ID())->value();
 
+  if (nbCopies <=0) {
+    std::string aFeatureError = "Multitranslation builder ";
+    aFeatureError+=":: the number of copies for the first direction is null or negative.";
+    setError(aFeatureError);
+  }
+
   // Moving each object.
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
@@ -236,6 +242,18 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
     integer(FeaturesPlugin_MultiTranslation::NB_COPIES_FIRST_DIR_ID())->value();
   int aSecondNbCopies =
     integer(FeaturesPlugin_MultiTranslation::NB_COPIES_SECOND_DIR_ID())->value();
+
+  if (aFirstNbCopies <=0) {
+    std::string aFeatureError = "Multitranslation builder ";
+    aFeatureError+=":: the number of copies for the first direction is null or negative.";
+    setError(aFeatureError);
+  }
+
+  if (aSecondNbCopies <=0) {
+    std::string aFeatureError = "Multitranslation builder ";
+    aFeatureError+=":: the number of copies for the second direction is null or negative.";
+    setError(aFeatureError);
+  }
 
   // Coord aFirstAxis
   double x1 = aFirstAxis->dir()->x();
