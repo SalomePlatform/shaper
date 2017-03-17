@@ -289,7 +289,7 @@ class Model_Document : public ModelAPI_Document
   virtual void restoreNodesState(std::list<bool>& theStates) const;
 
   /// Label that constains structures for selection of constructions of another document
-  TDF_Label Model_Document::extConstructionsLabel() const;
+  TDF_Label extConstructionsLabel() const;
 
   friend class Model_Application;
   friend class Model_Session;
