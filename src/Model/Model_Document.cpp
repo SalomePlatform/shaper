@@ -73,6 +73,8 @@ static const int TAG_CURRENT_FEATURE = 1; ///< reference to the current feature
 static const int TAG_CURRENT_TRANSACTION = 2; ///< integer, index of the transaction
 static const int TAG_SELECTION_FEATURE = 3; ///< integer, tag of the selection feature label
 static const int TAG_NODES_STATE = 4; ///< array, tag of the Object Browser nodes states
+///< naming structures constructions selected from other document
+static const int TAG_EXTERNAL_CONSTRUCTIONS = 5;
 
 Model_Document::Model_Document(const int theID, const std::string theKind)
     : myID(theID), myKind(theKind), myIsActive(false),
@@ -1327,6 +1329,11 @@ void Model_Document::decrementTransactionID()
 {
   int aNewVal = transactionID() - 1;
   TDataStd_Integer::Set(generalLabel().FindChild(TAG_CURRENT_TRANSACTION), aNewVal);
+}
+
+TDF_Label Model_Document::extConstructionsLabel() const
+{
+  return myDoc->Main().FindChild(TAG_EXTERNAL_CONSTRUCTIONS);
 }
 
 bool Model_Document::isOpened()

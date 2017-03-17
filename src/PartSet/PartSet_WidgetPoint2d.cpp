@@ -29,6 +29,9 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
@@ -157,7 +160,7 @@ bool PartSet_WidgetPoint2D::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr
 
   /// analysis of AIS
   std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  std::shared_ptr<GeomDataAPI_Point2D> aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(attributeID()));
   std::shared_ptr<GeomAPI_Pnt2d> aPoint = aPointAttr->pnt();
   if (anAISShape.get())
@@ -225,8 +228,7 @@ bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrsPtr>& theValu
     const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
     if (getPoint2d(aView, aTDShape, aX, aY)) {
       isDone = setPoint(aX, aY);
-      setConstraintTo(aX, aY);
-      //PartSet_Tools::setConstraints(mySketch, feature(), attributeID(), aX, aY);
+      setConstraintToPoint(aX, aY);
     }
   }
   return isDone;
@@ -259,7 +261,7 @@ bool PartSet_WidgetPoint2D::storeValueCustom()
   std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   if (!aData) // can be on abort of sketcher element
     return false;
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(attributeID()));
 
   PartSet_WidgetPoint2D* that = (PartSet_WidgetPoint2D*) this;
@@ -285,7 +287,7 @@ bool PartSet_WidgetPoint2D::storeValueCustom()
 bool PartSet_WidgetPoint2D::restoreValueCustom()
 {
   std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(attributeID()));
   double aValueX = aPoint->isInitialized() ? aPoint->x() : 0.;
   double aValueY = aPoint->isInitialized() ? aPoint->y() : 0.;
@@ -393,7 +395,7 @@ bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView,
   return false;
 }
 
-bool PartSet_WidgetPoint2D::setConstraintTo(double theClickedX, double theClickedY)
+bool PartSet_WidgetPoint2D::setConstraintToPoint(double theClickedX, double theClickedY)
 {
   FeaturePtr aFeature = feature();
   std::string anAttribute = attributeID();
@@ -403,61 +405,60 @@ bool PartSet_WidgetPoint2D::setConstraintTo(double theClickedX, double theClicke
 
   std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = std::shared_ptr<GeomAPI_Pnt2d>(
                                    new GeomAPI_Pnt2d(theClickedX, theClickedY));
-
-  // find a feature point by the selection mode
-  std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint;
-  if (aFeature->isMacro()) {
-    // the macro feature will be removed after the operation is stopped, so we need to build
-    // coicidence to possible sub-features
-    aFeaturePoint = PartSet_Tools::findFirstEqualPointInArgumentFeatures(aFeature, aClickedPoint);
-  }
-  else {
-    aFeaturePoint = std::dynamic_pointer_cast<
-                                   GeomDataAPI_Point2D>(aFeature->data()->attribute(anAttribute));
-  }
-  if (!aFeaturePoint.get())
-    return false;
-
-  std::shared_ptr<GeomDataAPI_Point2D> aFPoint = PartSet_Tools::findFirstEqualPointInSketch(
-                                                      mySketch, aFeaturePoint, aClickedPoint);
-  if (!aFPoint.get())
+  AttributePoint2DPtr aClickedFeaturePoint = findFirstEqualPointInSketch(mySketch,
+                                                         aFeature, aClickedPoint);
+  if (!aClickedFeaturePoint.get())
     return false;
 
   AttributeRefAttrPtr aRefAttr = attributeRefAttr();
   if (aRefAttr.get())
-    aRefAttr->setAttr(aFPoint);
-  else
-    PartSet_Tools::createConstraint(mySketch, aFPoint, aFeaturePoint);
+    aRefAttr->setAttr(aClickedFeaturePoint);
+  else {
+    // find a feature point by the selection mode
+    AttributePoint2DPtr aFeaturePoint;
+    if (aFeature->isMacro()) {
+      // the macro feature will be removed after the operation is stopped, so we need to build
+      // coicidence to possible sub-features
+      aFeaturePoint = findFirstEqualPointInArgumentFeatures(aFeature, aClickedPoint);
+    }
+    else {
+      aFeaturePoint = std::dynamic_pointer_cast<
+                                     GeomDataAPI_Point2D>(aFeature->data()->attribute(anAttribute));
+    }
+    if (!aFeaturePoint.get())
+      return false;
 
+    PartSet_Tools::createConstraint(mySketch, aClickedFeaturePoint, aFeaturePoint);
+  }
   return true;
 }
 
-bool PartSet_WidgetPoint2D::setConstraintWith(const ObjectPtr& theObject)
+bool PartSet_WidgetPoint2D::setConstraintToObject(const ObjectPtr& theObject)
 {
-  std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint;
-
-  if (feature()->isMacro()) {
-    AttributePtr aThisAttr = feature()->data()->attribute(attributeID());
-    std::shared_ptr<GeomDataAPI_Point2D> anAttrPoint =
-                               std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aThisAttr);
-    if (anAttrPoint.get()) {
-      // the macro feature will be removed after the operation is stopped, so we need to build
-      // coicidence to possible sub-features
-      aFeaturePoint = PartSet_Tools::findFirstEqualPointInArgumentFeatures(feature(),
-                                                                 anAttrPoint->pnt());
-    }
-  }
-  else {
-    AttributePtr aThisAttr = feature()->data()->attribute(attributeID());
-    aFeaturePoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aThisAttr);
-  }
-  if (!aFeaturePoint.get())
-    return false;
-
   AttributeRefAttrPtr aRefAttr = attributeRefAttr();
-  if (aRefAttr.get())
+  if (aRefAttr.get()) {
     aRefAttr->setObject(theObject);
+  }
   else {
+    AttributePoint2DPtr aFeaturePoint;
+
+    if (feature()->isMacro()) {
+      AttributePtr aThisAttr = feature()->data()->attribute(attributeID());
+      AttributePoint2DPtr anAttrPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aThisAttr);
+      if (anAttrPoint.get()) {
+        // the macro feature will be removed after the operation is stopped, so we need to build
+        // coicidence to possible sub-features
+        aFeaturePoint = findFirstEqualPointInArgumentFeatures(feature(),
+                                                                   anAttrPoint->pnt());
+      }
+    }
+    else {
+      AttributePtr aThisAttr = feature()->data()->attribute(attributeID());
+      aFeaturePoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aThisAttr);
+    }
+    if (!aFeaturePoint.get())
+      return false;
+
     // Create point-edge coincedence
     FeaturePtr aFeature = mySketch->addFeature(SketchPlugin_ConstraintCoincidence::ID());
     std::shared_ptr<ModelAPI_Data> aData = aFeature->data();
@@ -544,7 +545,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
           }
         }
         if (aFixedObject.get())
-          setConstraintWith(aFixedObject);
+          setConstraintToObject(aFixedObject);
         // fignal updated should be flushed in order to visualize possible created
         // external objects e.g. selection of trihedron axis when input end arc point
         updateObject(feature());
@@ -573,8 +574,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
           setPoint(aX, aY);
           feature()->execute();
 
-          setConstraintTo(aX, aY);
-          //PartSet_Tools::setConstraints(mySketch, feature(), attributeID(), aX, aY);
+          setConstraintToPoint(aX, aY);
         }
         else if (aShape.ShapeType() == TopAbs_EDGE) {
           // point is taken from mouse event and set in attribute. It should be done before setting
@@ -583,7 +583,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
           gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
           PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, aY);
           setPoint(aX, aY);
-          setConstraintWith(aObject);
+          setConstraintToObject(aObject);
           setValueState(Stored); // in case of edge selection, Apply state should also be updated
           isAuxiliaryFeature = PartSet_Tools::isAuxiliarySketchEntity(aObject);
         }
@@ -611,21 +611,6 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
     if (!setPoint(aX, anY) || isFeatureContainsPoint(myFeature, aX, anY))
       return;
 
-    /// Start alternative code
-    //std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint = std::dynamic_pointer_cast<
-    //    GeomDataAPI_Point2D>(feature()->data()->attribute(attributeID()));
-    //QList<FeaturePtr> aIgnore;
-    //aIgnore.append(feature());
-
-    //double aTolerance = aView->Convert(7);
-    //std::shared_ptr<GeomDataAPI_Point2D> aAttrPnt =
-    //  PartSet_Tools::findAttributePoint(mySketch, aX, anY, aTolerance, aIgnore);
-    //if (aAttrPnt.get() != NULL) {
-    //  aFeaturePoint->setValue(aAttrPnt->pnt());
-    //  PartSet_Tools::createConstraint(mySketch, aAttrPnt, aFeaturePoint);
-    //  emit vertexSelected();
-    //}
-    /// End alternative code
     emit focusOutWidget(this);
   }
 }
@@ -733,7 +718,7 @@ bool PartSet_WidgetPoint2D::isOrphanPoint(const FeaturePtr& theFeature,
 {
   bool anOrphanPoint = false;
   if (theFeature.get()) {
-    std::shared_ptr<GeomDataAPI_Point2D> aPointAttr;
+    AttributePoint2DPtr aPointAttr;
     std::string aFeatureKind = theFeature->getKind();
     if (aFeatureKind == SketchPlugin_Point::ID())
       aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -809,4 +794,82 @@ AttributeRefAttrPtr PartSet_WidgetPoint2D::attributeRefAttr() const
     return anAttribute;
 
   return std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttributeRef);
+}
+
+std::shared_ptr<GeomDataAPI_Point2D> PartSet_WidgetPoint2D::findFirstEqualPointInArgumentFeatures(
+                  const FeaturePtr& theFeature, const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint;
+
+  // may be feature is not updated yet, execute is not performed and references features
+  // are not created. Case: rectangle macro feature
+  ModuleBase_Tools::flushUpdated(theFeature);
+
+  std::list<AttributePtr> anAttributes = theFeature->data()->attributes(
+                                          ModelAPI_AttributeRefList::typeId());
+  std::list<AttributePtr>::const_iterator anIt = anAttributes.begin(), aLast = anAttributes.end();
+  for (; anIt != aLast && !aFeaturePoint.get(); anIt++) {
+    std::shared_ptr<ModelAPI_AttributeRefList> aCurSelList =
+                                      std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*anIt);
+    for (int i = 0, aNb = aCurSelList->size(); i < aNb && !aFeaturePoint.get(); i++) {
+      ObjectPtr anObject = aCurSelList->object(i);
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+      if (aFeature.get())
+        aFeaturePoint = findFirstEqualPoint(aFeature, thePoint);
+    }
+  }
+  return aFeaturePoint;
+}
+
+std::shared_ptr<GeomDataAPI_Point2D> PartSet_WidgetPoint2D::findFirstEqualPoint(
+                                              const FeaturePtr& theFeature,
+                                              const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  std::shared_ptr<GeomDataAPI_Point2D> aFPoint;
+
+  // find the given point in the feature attributes
+  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttiributes =
+                                    theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+  std::list<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
+      aLast = anAttiributes.end();
+  ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
+
+  for (; anIt != aLast && !aFPoint; anIt++) {
+    std::shared_ptr<GeomDataAPI_Point2D> aCurPoint =
+                                             std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
+    if (aCurPoint && aCurPoint->isInitialized() &&
+        aValidators->isCase(theFeature, aCurPoint->id()) &&
+        (aCurPoint->pnt()->distance(thePoint) < Precision::Confusion())) {
+      aFPoint = aCurPoint;
+      break;
+    }
+  }
+  return aFPoint;
+}
+
+std::shared_ptr<GeomDataAPI_Point2D> PartSet_WidgetPoint2D::findFirstEqualPointInSketch(
+                                    const CompositeFeaturePtr& theSketch,
+                                    const FeaturePtr& theSkipFeature,
+                                    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  // get all sketch features. If the point with the given coordinates belong to any sketch feature,
+  // the constraint is created between the feature point and the found sketch point
+  std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
+  std::shared_ptr<ModelAPI_AttributeRefList> aRefList = std::dynamic_pointer_cast<
+      ModelAPI_AttributeRefList>(aData->attribute(SketchPlugin_Sketch::FEATURES_ID()));
+
+  std::list<ObjectPtr> aFeatures = aRefList->list();
+  std::list<ObjectPtr>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
+  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttiributes;
+
+  std::shared_ptr<GeomDataAPI_Point2D> aFPoint;
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
+    if (!aFeature.get() || (theSkipFeature.get() && theSkipFeature == aFeature))
+      continue;
+    aFPoint = PartSet_WidgetPoint2D::findFirstEqualPoint(aFeature, thePoint);
+    if (aFPoint.get())
+      break;
+  }
+  return aFPoint;
 }

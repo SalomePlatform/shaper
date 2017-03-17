@@ -212,9 +212,10 @@ bool SketchPlugin_Sketch::isSub(ObjectPtr theObject) const
 
 void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
   if (theID == SketchPlugin_SketchEntity::EXTERNAL_ID()) {
-    std::shared_ptr<GeomAPI_Shape> aSelection =
-      data()->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->value();
-    if (aSelection) { // update arguments due to the selection value
+    AttributeSelectionPtr aSelAttr = selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+    if (aSelAttr->context().get()) { // update arguments due to the selection value
+      std::shared_ptr<GeomAPI_Shape> aSelection = aSelAttr->value();
+      if (!aSelection.get()) aSelection = aSelAttr->context()->shape();
       // update the sketch plane
       std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aSelection));
       std::shared_ptr<GeomAPI_Pln> aPlane = aFace->getPlane();

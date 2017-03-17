@@ -288,6 +288,9 @@ class Model_Document : public ModelAPI_Document
   /// Appends the values to theStates list.
   virtual void restoreNodesState(std::list<bool>& theStates) const;
 
+  /// Label that constains structures for selection of constructions of another document
+  TDF_Label extConstructionsLabel() const;
+
   friend class Model_Application;
   friend class Model_Session;
   friend class Model_Update;
@@ -298,6 +301,7 @@ class Model_Document : public ModelAPI_Document
   friend class Model_AttributeSelection;
   friend class Model_ResultPart;
   friend class Model_ResultCompSolid;
+  friend class Model_ResultConstruction;
   friend class Model_SelectionNaming;
   friend class DFBrowser;
 
