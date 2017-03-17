@@ -52,9 +52,9 @@ FeaturesAPI_MultiTranslation::FeaturesAPI_MultiTranslation(
     fillAttribute(theFirstAxisObject, firstAxisObject());
     fillAttribute(theFirstStep, firstStep());
     fillAttribute(theFirstNumber, firstNumber());
+    fillAttribute(FeaturesPlugin_MultiTranslation::USE_SECOND_DIR_ID(),useSecondDir());
     fillAttribute(theSecondAxisObject, secondAxisObject());
     fillAttribute(theSecondStep, secondStep());
-    fillAttribute("true",useSecondDir());
     setSecondNumber(theSecondNumber);
   }
 }
