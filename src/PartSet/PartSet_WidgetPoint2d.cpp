@@ -67,8 +67,6 @@ const double MaxCoordinate = 1e12;
 
 static QStringList MyFeaturesForCoincedence;
 
-#define DEBUG_SELECTION
-
 PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
                                              ModuleBase_IWorkshop* theWorkshop,
                                              const Config_WidgetAPI* theData)
@@ -146,7 +144,6 @@ bool PartSet_WidgetPoint2D::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr
   /// the selection is not possible if the current feature has no presentation for the current
   /// attribute not in AIS not in results. If so, no object in current feature where make
   /// coincidence, so selection is not necessary
-  bool aFoundPoint = false;
   GeomShapePtr anAISShape;
   GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(myFeature);
   if (aPrs.get()) {
@@ -160,24 +157,32 @@ bool PartSet_WidgetPoint2D::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr
   if (!anAISShape.get() && aResults.empty())
     return true;
 
-  /// analysis of AIS
-  std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aData->attribute(attributeID()));
-  std::shared_ptr<GeomAPI_Pnt2d> aPoint = aPointAttr->pnt();
-  if (anAISShape.get())
-    aFoundPoint = shapeContainsPoint(anAISShape, aPoint, mySketch);
+  AttributeRefAttrPtr aRefAttr = attributeRefAttr();
+  if (!aRefAttr.get()) {
+    bool aFoundPoint = false;
+    /// Avoid coincidence build to passed point. Coincidence is build later only if there are no
+    /// reference attribute.
+    /// The condition is that the selected feature has shape that has after explore a point
+    /// equal to clicked one.
+    std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
+    AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(attributeID()));
+    std::shared_ptr<GeomAPI_Pnt2d> aPoint = aPointAttr->pnt();
+    if (anAISShape.get())
+      aFoundPoint = shapeExploreHasVertex(anAISShape, aPoint, mySketch);
 
-  /// analysis of results
-  std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.cbegin();
-  for (; aRIter != aResults.cend() && !aFoundPoint; aRIter++) {
-    ResultPtr aResult = *aRIter;
-    if (aResult.get() && aResult->shape().get()) {
-      GeomShapePtr aShape = aResult->shape();
-      aFoundPoint = shapeContainsPoint(aShape, aPoint, mySketch);
+    /// analysis of results
+    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.cbegin();
+    for (; aRIter != aResults.cend() && !aFoundPoint; aRIter++) {
+      ResultPtr aResult = *aRIter;
+      if (aResult.get() && aResult->shape().get()) {
+        GeomShapePtr aShape = aResult->shape();
+        aFoundPoint = shapeExploreHasVertex(aShape, aPoint, mySketch);
+      }
     }
+    return aFoundPoint;
   }
-  return aFoundPoint;
+  return true;
 }
 
 bool PartSet_WidgetPoint2D::resetCustom()
@@ -574,10 +579,6 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
         bool isAuxiliaryFeature = false;
         if (getPoint2d(aView, aShape, aX, aY)) {
           setPoint(aX, aY);
-#ifndef DEBUG_SELECTION
-          feature()->execute();
-#endif
-
           setConstraintToPoint(aX, aY);
         }
         else if (aShape.ShapeType() == TopAbs_EDGE) {
@@ -770,9 +771,9 @@ bool PartSet_WidgetPoint2D::isOrphanPoint(const FeaturePtr& theFeature,
   return anOrphanPoint;
 }
 
-bool PartSet_WidgetPoint2D::shapeContainsPoint(const GeomShapePtr& theShape,
-                                               const std::shared_ptr<GeomAPI_Pnt2d>& thePoint,
-                                               const CompositeFeaturePtr& theSketch)
+bool PartSet_WidgetPoint2D::shapeExploreHasVertex(const GeomShapePtr& theShape,
+                                                  const std::shared_ptr<GeomAPI_Pnt2d>& thePoint,
+                                                  const CompositeFeaturePtr& theSketch)
 {
   std::shared_ptr<GeomAPI_Pnt> aPoint = PartSet_Tools::point3D(thePoint, theSketch);
 
@@ -784,11 +785,7 @@ bool PartSet_WidgetPoint2D::shapeContainsPoint(const GeomShapePtr& theShape,
     if (aVertex.get())
       aContainPoint = aPoint->isEqual(aVertex->point());
   }
-#ifdef DEBUG_SELECTION
-  return true;
-#else
   return aContainPoint;
-#endif
 }
 
 AttributeRefAttrPtr PartSet_WidgetPoint2D::attributeRefAttr() const

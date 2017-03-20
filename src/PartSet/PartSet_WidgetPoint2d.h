@@ -201,9 +201,9 @@ protected:
    /// \param theShape a shape to be exploded
    /// \param thePoint a point
    /// \return boolean value
-   static bool shapeContainsPoint(const std::shared_ptr<GeomAPI_Shape>& theShape,
-                                  const std::shared_ptr<GeomAPI_Pnt2d>& thePoint,
-                                  const CompositeFeaturePtr& theSketch);
+   static bool shapeExploreHasVertex(const std::shared_ptr<GeomAPI_Shape>& theShape,
+                                     const std::shared_ptr<GeomAPI_Pnt2d>& thePoint,
+                                     const CompositeFeaturePtr& theSketch);
 
   /// Finds in the feature's sub-features first Point2D attribute with the given point coordinates
   /// \param theFeature a feature with sub-feature attributes
