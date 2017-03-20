@@ -6,12 +6,17 @@
 
 #include "SketchPlugin_Tools.h"
 
+#include "SketchPlugin_ConstraintCoincidence.h"
+#include "SketchPlugin_ConstraintTangent.h"
+#include "SketchPlugin_Point.h"
+#include "SketchPlugin_SketchEntity.h"
+
+#include <SketcherPrs_Tools.h>
+
+#include <ModelAPI_AttributeDouble.h>
+
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
-#include <ModelAPI_AttributeDouble.h>
-#include <SketcherPrs_Tools.h>
-#include <SketchPlugin_ConstraintCoincidence.h>
-#include <SketchPlugin_SketchEntity.h>
 
 namespace SketchPlugin_Tools {
 
@@ -101,4 +106,43 @@ void findCoincidences(const FeaturePtr theStartCoin,
   }
 }
 
+void createConstraint(SketchPlugin_Feature* theFeature,
+                      const std::string& theId,
+                      const AttributePtr theAttr,
+                      const ObjectPtr theObject,
+                      const bool theIsCanBeTangent)
+{
+  AttributeRefAttrPtr aRefAttr = theFeature->refattr(theId);
+  if(aRefAttr.get() && aRefAttr->isInitialized()) {
+    FeaturePtr aConstraint;
+    if(!theIsCanBeTangent) {
+      aConstraint = theFeature->sketch()
+                              ->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+    } else {
+      if(aRefAttr->isObject()) {
+        ObjectPtr anObject = aRefAttr->object();
+        FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+        if(aFeature->getKind() == SketchPlugin_Point::ID()) {
+          aConstraint = theFeature->sketch()
+                                  ->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+        } else {
+          aConstraint = theFeature->sketch()
+                                  ->addFeature(SketchPlugin_ConstraintTangent::ID());
+        }
+      } else {
+        aConstraint = theFeature->sketch()
+                                ->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+      }
+    }
+    AttributeRefAttrPtr aRefAttrA = aConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
+    aRefAttr->isObject() ? aRefAttrA->setObject(aRefAttr->object())
+                         : aRefAttrA->setAttr(aRefAttr->attr());
+    AttributeRefAttrPtr aRefAttrB = aConstraint->refattr(SketchPlugin_Constraint::ENTITY_B());
+    if(theObject.get()) {
+      aRefAttrB->setObject(theObject);
+    } else if(theAttr.get()) {
+      aRefAttrB->setAttr(theAttr);
+    }
+  }
+}
 } // namespace SketchPlugin_Tools

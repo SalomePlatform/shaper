@@ -67,6 +67,8 @@ const double MaxCoordinate = 1e12;
 
 static QStringList MyFeaturesForCoincedence;
 
+#define DEBUG_SELECTION
+
 PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
                                              ModuleBase_IWorkshop* theWorkshop,
                                              const Config_WidgetAPI* theData)
@@ -572,7 +574,9 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
         bool isAuxiliaryFeature = false;
         if (getPoint2d(aView, aShape, aX, aY)) {
           setPoint(aX, aY);
+#ifndef DEBUG_SELECTION
           feature()->execute();
+#endif
 
           setConstraintToPoint(aX, aY);
         }
@@ -780,7 +784,11 @@ bool PartSet_WidgetPoint2D::shapeContainsPoint(const GeomShapePtr& theShape,
     if (aVertex.get())
       aContainPoint = aPoint->isEqual(aVertex->point());
   }
+#ifdef DEBUG_SELECTION
+  return true;
+#else
   return aContainPoint;
+#endif
 }
 
 AttributeRefAttrPtr PartSet_WidgetPoint2D::attributeRefAttr() const

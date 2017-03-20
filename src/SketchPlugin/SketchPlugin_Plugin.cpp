@@ -25,6 +25,7 @@
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
+#include <SketchPlugin_MacroCircle.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_Trim.h>
@@ -179,6 +180,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintAngle);
   } else if (theFeatureID == SketchPlugin_Trim::ID()) {
     return FeaturePtr(new SketchPlugin_Trim);
+  } else if (theFeatureID == SketchPlugin_MacroCircle::ID()) {
+    return FeaturePtr(new SketchPlugin_MacroCircle);
   }
   // feature of such kind is not found
   return FeaturePtr();
@@ -242,6 +245,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_MultiRotation::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MultiTranslation::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Trim::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_MacroCircle::ID(), aHasSketchPlane);
       // SketchRectangle is a python feature, so its ID is passed just as a string
       aMsg->setState("SketchRectangle", aHasSketchPlane);
     }

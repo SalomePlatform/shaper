@@ -29,6 +29,14 @@ void GeomData_Point2D::reinit()
   }
 }
 
+void GeomData_Point2D::reset()
+{
+  myIsInitialized = false;
+  for(int aComponent = 0; aComponent < NUM_COMPONENTS; ++aComponent) {
+    myExpression[aComponent]->reset();
+  }
+}
+
 void GeomData_Point2D::setCalculatedValue(const double theX, const double theY)
 {
   if (!myIsInitialized || x() != theX || y() != theY) {

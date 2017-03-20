@@ -26,7 +26,7 @@
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Arc.h>
-#include <SketchPlugin_Circle.h>
+#include <SketchPlugin_MacroCircle.h>
 #include <SketchPlugin_Point.h>
 
 #include <XGUI_Workshop.h>
@@ -599,9 +599,9 @@ bool PartSet_SketcherReetntrantMgr::copyReetntrantAttributes(const FeaturePtr& t
                                                  aSFData->attribute(SketchPlugin_Line::END_ID()));
     aNPoint->setValue(aSPoint->x(), aSPoint->y());
   }
-  else if (aFeatureKind == SketchPlugin_Circle::ID()) {
+  else if (aFeatureKind == SketchPlugin_MacroCircle::ID()) {
     // set circle type
-    std::string aTypeAttributeId = SketchPlugin_Circle::CIRCLE_TYPE();
+    std::string aTypeAttributeId = SketchPlugin_MacroCircle::CIRCLE_TYPE();
     AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
     AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
     aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());

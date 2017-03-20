@@ -24,6 +24,12 @@ void Model_AttributeDouble::reinit()
   myIsInitialized = myExpression->isInitialized();
 }
 
+void Model_AttributeDouble::reset()
+{
+  myExpression->reset();
+  myIsInitialized = false;
+}
+
 void Model_AttributeDouble::setCalculatedValue(const double theValue)
 {
   if (!myIsInitialized || value() != theValue) {

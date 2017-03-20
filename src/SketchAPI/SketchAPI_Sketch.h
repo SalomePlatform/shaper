@@ -28,6 +28,7 @@ class ModelHighAPI_Reference;
 class ModelHighAPI_Selection;
 class SketchAPI_Arc;
 class SketchAPI_Circle;
+class SketchAPI_MacroCircle;
 class SketchAPI_IntersectionPoint;
 class SketchAPI_Line;
 class SketchAPI_Mirror;
@@ -154,13 +155,23 @@ public:
       double theRadius);
   /// Add circle
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Circle> addCircle(
+  std::shared_ptr<SketchAPI_MacroCircle> addCircle(
+      double theCenterX, double theCenterY,
+      double thePassedX, double thePassedY);
+  /// Add circle
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_MacroCircle> addCircle(
+      const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint,
+      const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint);
+  /// Add circle
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_MacroCircle> addCircle(
       double theX1, double theY1,
       double theX2, double theY2,
       double theX3, double theY3);
   /// Add circle
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Circle> addCircle(
+  std::shared_ptr<SketchAPI_MacroCircle> addCircle(
       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3);

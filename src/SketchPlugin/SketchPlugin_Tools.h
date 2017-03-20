@@ -12,6 +12,8 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Attribute.h>
 
+class SketchPlugin_Feature;
+
 namespace SketchPlugin_Tools {
 
 /// Clears text expressions for all attributes of the feature
@@ -28,6 +30,18 @@ std::shared_ptr<GeomAPI_Pnt2d> getCoincidencePoint(const FeaturePtr theStartCoin
 void findCoincidences(const FeaturePtr theStartCoin,
                       const std::string& theAttr,
                       std::set<FeaturePtr>& theList);
+
+/// Creates coincidence or tangent constraint.
+/// \param[in] theFeature to get selected attribute or object
+/// \param[in] theId ID of attribute where selection is.
+/// \param[in] theObject object for constraint
+/// \param[in] theIsCanBeTangent if true constraint can be tangent or coincidence, depending on
+///                              the selection in the attribute with passed ID.
+void createConstraint(SketchPlugin_Feature* theFeature,
+                      const std::string& theId,
+                      const AttributePtr theAttr,
+                      const ObjectPtr theObject,
+                      const bool theIsCanBeTangent);
 }; // namespace SketchPlugin_Tools
 
 #endif // SKETCHPLUGIN_TOOLS_H_

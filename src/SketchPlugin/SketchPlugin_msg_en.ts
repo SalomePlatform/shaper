@@ -73,91 +73,91 @@
   </context>
   
   <context>
-    <name>SketchCircle:CircleRadius:GeomValidators_Positive</name>
+    <name>SketchMacroCircle:CircleRadius:GeomValidators_Positive</name>
     <message>
       <source>Double is not positive.</source>
       <translation>Radius value is not positive</translation>
     </message>
   </context>
   <context>
-    <name>SketchCircle:Model_FeatureValidator</name>
+    <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
       <source>Attribute "CircleCenter" is not initialized.</source>
       <translation>A center point is not selected</translation>
     </message>
   </context>
   <context>
-    <name>SketchCircle:Model_FeatureValidator</name>
+    <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
       <source>Attribute "FirstPoint" is not initialized.</source>
       <translation>A first point is not selected</translation>
     </message>
   </context>
   <context>
-    <name>SketchCircle:Model_FeatureValidator</name>
+    <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
       <source>Attribute "SecondPoint" is not initialized.</source>
       <translation>A second point is not selected</translation>
     </message>
   </context>
   <context>
-    <name>SketchCircle:Model_FeatureValidator</name>
+    <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
       <source>Attribute "ThirdPoint" is not initialized.</source>
       <translation>A third point is not selected</translation>
     </message>
   </context>
   <context>
-    <name>SketchCircle:CircleCenter</name>
+    <name>SketchMacroCircle:CircleCenter</name>
     <message>
       <source>Attribute "CircleCenter" is locked by modification value in the viewer.</source>
       <translation>Select a center point</translation>
     </message>
   </context>
   <context>
-    <name>SketchCircle:FirstPoint</name>
+    <name>SketchMacroCircle:FirstPoint</name>
     <message>
       <source>Attribute "FirstPoint" is locked by modification value in the viewer.</source>
       <translation>Select a center point</translation>
     </message>
   </context>
   <context>
-    <name>SketchCircle:SecondPoint</name>
+    <name>SketchMacroCircle:SecondPoint</name>
     <message>
       <source>Attribute "SecondPoint" is locked by modification value in the viewer.</source>
       <translation>Select a center point</translation>
     </message>
   </context>
   <context>
-    <name>SketchCircle:ThirdPoint</name>
+    <name>SketchMacroCircle:ThirdPoint</name>
     <message>
       <source>Attribute "ThirdPoint" is locked by modification value in the viewer.</source>
       <translation>Select a center point</translation>
     </message>
   </context>
   <context>
-    <name>SketchCircle:CircleRadius</name>
+    <name>SketchMacroCircle:CircleRadius</name>
     <message>
       <source>Attribute "CircleRadius" is locked by modification value in the viewer.</source>
       <translation>Select a radius distance</translation>
     </message>
   </context>
   <context>
-    <name>SketchCircle:CircleRadius:GeomValidators_Positive</name>
+    <name>SketchMacroCircle:CircleRadius:GeomValidators_Positive</name>
     <message>
       <source>Integer is not initialized.</source>
       <translation>Integer radius is not initialized</translation>
     </message>
   </context>
   <context>
-    <name>SketchCircle:CircleRadius:GeomValidators_Positive</name>
+    <name>SketchMacroCircle:CircleRadius:GeomValidators_Positive</name>
     <message>
       <source>Integer is not positive.</source>
       <translation>Integer radius must be set</translation>
     </message>
   </context>
   <context>
-    <name>SketchCircle:Model_FeatureValidator</name>
+    <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
       <source>Attribute "CircleRadius" is not initialized.</source>
       <translation>Set the circle radius</translation>
