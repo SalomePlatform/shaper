@@ -279,7 +279,7 @@ static void adjustAngleBetweenCurves(const GCSCurvePtr& theCurve1,
                                      const GCSPointPtr& thePoint,
                                      double*            theAngle)
 {
-  double anAngle = GCS::System::calculateAngleViaPoint(*theCurve1, *theCurve2, *thePoint);
+  double anAngle = GCS::System().calculateAngleViaPoint(*theCurve1, *theCurve2, *thePoint);
   // bring angle to [-pi..pi]
   if (anAngle >  PI) anAngle -= 2.0 * PI;
   if (anAngle < -PI) anAngle += 2.0 * PI;
