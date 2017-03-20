@@ -81,6 +81,8 @@
 #include <Config_PropManager.h>
 #include <Config_DataModelReader.h>
 #include <Config_Translator.h>
+#include <Config_WidgetAPI.h>
+#include <Config_Keywords.h>
 
 #include <SUIT_ResourceMgr.h>
 
@@ -587,7 +589,15 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
 #else
   AppElements_MainMenu* aMenuBar = mainWindow()->menuObject();
   AppElements_Command* aCommand = aMenuBar->feature(aFeatureKind.c_str());
-  bool anIsAutoPreview = aCommand && aCommand->featureMessage()->isAutoPreview();
+  bool anIsAutoPreview = true;
+  if (aCommand)
+    anIsAutoPreview = aCommand->featureMessage()->isAutoPreview();
+  else {
+    std::string aXmlCfg, aDescription;
+    module()->getXMLRepresentation(aFeatureKind, aXmlCfg, aDescription);
+    ModuleBase_WidgetFactory aFactory(aXmlCfg, moduleConnector());
+    anIsAutoPreview = aFactory.widgetAPI()->getBooleanAttribute(FEATURE_AUTO_PREVIEW, true);
+  }
 #endif
   if (!anIsAutoPreview) {
     myPropertyPanel->findButton(PROP_PANEL_PREVIEW)->setVisible(true);
