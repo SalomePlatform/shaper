@@ -66,6 +66,7 @@ SketchConstraintCoincidence_12 = Sketch_1.setCoincident(SketchLine_2.startPoint(
 SketchConstraintCoincidence_12.setName("SketchConstraintCoincidence_14")
 SketchConstraintRadius_1 = Sketch_1.setRadius(SketchArc_1.results()[1], 30)
 SketchArc_2 = Sketch_1.addArc(-8.152231059872202, 11.25015706261054, -38.72043789437247, 5.632510332222703, -20.37351638704503, 39.82660556161157, True)
+SketchConstraintRadius_2 = Sketch_1.setRadius(SketchArc_2.results()[1], 30)
 SketchConstraintCoincidence_13 = Sketch_1.setCoincident(SketchArc_2.startPoint(), SketchLine_2.endPoint())
 SketchConstraintCoincidence_13.setName("SketchConstraintCoincidence_15")
 SketchConstraintTangent_3 = Sketch_1.setTangent(SketchArc_2.results()[1], SketchLine_2.result())
