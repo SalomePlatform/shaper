@@ -24,7 +24,6 @@
 #include <TDataStd_IntPackedMap.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDataStd_UAttribute.hxx>
-#include <TDataStd_IntegerArray.hxx>
 #include <TColStd_MapOfTransient.hxx>
 #include <TColStd_MapIteratorOfPackedMapOfInteger.hxx>
 #include <BRep_Tool.hxx>
@@ -253,16 +252,10 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
     // empty NS
     TNaming_Builder aBuilder(aLab);
     // store all sub-faces naming since faces may be used for extrusion, where all edges are needed
+    Handle(TDataStd_IntPackedMap) anIndices = TDataStd_IntPackedMap::Set(aLab);
     std::list<int> aFacesIndexes;
     for(int a = 0; a < facesNum(); a++) {
-      aFacesIndexes.push_back(select(face(a), theExtDoc, -1));
-    }
-    if (aFacesIndexes.size()) {
-      Handle(TDataStd_IntegerArray) anArray =
-        TDataStd_IntegerArray::Set(aLab, 0, int(aFacesIndexes.size() - 1));
-      std::list<int>::iterator anIter = aFacesIndexes.begin();
-      for(int anArrayIndex = 0; anIter != aFacesIndexes.end(); anArrayIndex++, anIter++)
-        anArray->SetValue(anArrayIndex, *anIter);
+      anIndices->Add(select(face(a), theExtDoc, -1));
     }
     return anIndex - 1;
   }
@@ -457,10 +450,11 @@ bool Model_ResultConstruction::update(const int theIndex,
     if (!isInfinite()) {
       // update all faces named by the whole result
       bool aRes = true;
-      Handle(TDataStd_IntegerArray) anArray;
-      if (aLab.FindAttribute(TDataStd_IntegerArray::GetID(), anArray)) {
-        for(int anIndex = 0; anIndex <= anArray->Upper(); anIndex++) {
-          if (!update(anArray->Value(anIndex), theExtDoc, theModified))
+      Handle(TDataStd_IntPackedMap) anIndices;
+      if (aLab.FindAttribute(TDataStd_IntPackedMap::GetID(), anIndices)) {
+        TColStd_MapIteratorOfPackedMapOfInteger anIndexIter(anIndices->GetMap());
+        for(; anIndexIter.More(); anIndexIter.Next()) {
+          if (!update(anIndexIter.Key(), theExtDoc, theModified))
             aRes = false;
         }
       }
