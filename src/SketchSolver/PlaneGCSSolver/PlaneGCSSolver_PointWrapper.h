@@ -33,4 +33,6 @@ private:
   GCSPointPtr myPoint;
 };
 
+typedef std::shared_ptr<PlaneGCSSolver_PointWrapper> PointWrapperPtr;
+
 #endif
