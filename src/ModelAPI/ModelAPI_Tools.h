@@ -18,6 +18,7 @@ class ModelAPI_ResultCompSolid;
 
 class GeomAPI_Shape;
 
+#include <memory>
 #include <vector>
 #include <map>
 #include <set>
