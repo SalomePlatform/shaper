@@ -50,7 +50,7 @@
 PartSet_WidgetFeaturePointSelector::PartSet_WidgetFeaturePointSelector(QWidget* theParent,
                                                          ModuleBase_IWorkshop* theWorkshop,
                                                          const Config_WidgetAPI* theData)
-: ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData), myBaseSelected(false)
+: ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData)
 {
 }
 
@@ -62,7 +62,8 @@ PartSet_WidgetFeaturePointSelector::~PartSet_WidgetFeaturePointSelector()
 bool PartSet_WidgetFeaturePointSelector::isValidSelection(
                                         const std::shared_ptr<ModuleBase_ViewerPrs>& theValue)
 {
-  return true;
+  return ModuleBase_WidgetShapeSelector::isValidSelection(theValue);
+  //return true;
 }
 
 //********************************************************************
@@ -76,13 +77,11 @@ bool PartSet_WidgetFeaturePointSelector::activateSelectionAndFilters(bool toActi
   Handle(Graphic3d_HighlightStyle) aSStyle = aContext->SelectionStyle();
   if (toActivate) {
     std::vector<int> aColors;
-  aColors = Config_PropManager::color("Visualization", "sketch_entity_color");
+    aColors = Config_PropManager::color("Visualization", "sketch_entity_color");
     aColor = Quantity_Color(aColors[0] / 255., aColors[1] / 255., aColors[2] / 255.,
                             Quantity_TOC_RGB);
     myHighlightColor = aHStyle->Color();
     mySelectionColor = aSStyle->Color();
-
-    aHStyle->SetTransparency(0.5f);
   }
   else {
     aColor = myHighlightColor;
@@ -102,8 +101,6 @@ bool PartSet_WidgetFeaturePointSelector::activateSelectionAndFilters(bool toActi
 void PartSet_WidgetFeaturePointSelector::activateCustom()
 {
   ModuleBase_WidgetShapeSelector::activateCustom();
-
-  myBaseSelected = false;
 
   myWorkshop->module()->activateCustomPrs(myFeature,
                             ModuleBase_IModule::CustomizeHighlightedObjects, true);
@@ -135,7 +132,25 @@ void PartSet_WidgetFeaturePointSelector::mouseReleased(ModuleBase_IViewWindow* t
   if (theEvent->button() != Qt::LeftButton)
     return;
 
-  myBaseSelected = true;
+  // set parameters of preview into parameters of selection in the feature
+  std::shared_ptr<ModelAPI_AttributeReference> aRefSelectedAttr =
+                          std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                          feature()->data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
+  std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
+                          std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                          feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+  aRefSelectedAttr->setValue(aRefPreviewAttr->value());
+
+  std::shared_ptr<GeomDataAPI_Point2D> aPointSelectedAttr =
+                          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                          feature()->data()->attribute(SketchPlugin_Trim::SELECTED_POINT()));
+  std::shared_ptr<GeomDataAPI_Point2D> aPointPreviewAttr =
+                          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                          feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
+  aPointSelectedAttr->setValue(aPointPreviewAttr->x(), aPointPreviewAttr->y());
+
+  updateObject(feature());
+
   emit focusOutWidget(this);
   // we need to deselect base feature for better visibility of selected feature
   XGUI_Tools::workshop(myWorkshop)->displayer()->clearSelected(false);
@@ -159,12 +174,12 @@ bool PartSet_WidgetFeaturePointSelector::fillFeature(
 
   std::shared_ptr<ModelAPI_AttributeReference> aRef =
                           std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                          feature()->data()->attribute(SketchPlugin_Trim::BASE_OBJECT()));
+                          feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
   aRef->setValue(anObject);
 
   std::shared_ptr<GeomDataAPI_Point2D> anAttributePoint =
                   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                  feature()->data()->attribute(SketchPlugin_Trim::ENTITY_POINT()));
+                  feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
   anAttributePoint->setValue(aX, anY);
   // redisplay AIS presentation in viewer
 #ifndef HIGHLIGHT_STAYS_PROBLEM
@@ -172,6 +187,8 @@ bool PartSet_WidgetFeaturePointSelector::fillFeature(
   XGUI_Tools::workshop(myWorkshop)->displayer()->clearSelected(true);
 #endif
   updateObject(feature());
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+
   aFilled = true;
 
   return aFilled;
@@ -181,13 +198,6 @@ bool PartSet_WidgetFeaturePointSelector::fillFeature(
 QList<ModuleBase_ViewerPrsPtr> PartSet_WidgetFeaturePointSelector::getAttributeSelection() const
 {
   return QList<ModuleBase_ViewerPrsPtr>();
-}
-
-//********************************************************************
-void PartSet_WidgetFeaturePointSelector::updateSelectionName()
-{
-  if (myBaseSelected)
-    ModuleBase_WidgetShapeSelector::updateSelectionName();
 }
 
 //********************************************************************

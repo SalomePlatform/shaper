@@ -15,6 +15,7 @@
 #include <Model_ResultConstruction.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_CompositeFeature.h>

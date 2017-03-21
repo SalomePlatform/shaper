@@ -8,7 +8,7 @@
 #define ModelAPI_ResultPart_H_
 
 #include "ModelAPI_Result.h"
-#include <GeomAPI_Trsf.h>
+class GeomAPI_Trsf;
 
 #include <string>
 

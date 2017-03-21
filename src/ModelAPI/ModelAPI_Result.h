@@ -8,7 +8,7 @@
 #define ModelAPI_Result_H_
 
 #include "ModelAPI_Object.h"
-#include <GeomAPI_Shape.h>
+class GeomAPI_Shape;
 
 class ModelAPI_Feature;
 

@@ -16,6 +16,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
 
 #include <AIS_InteractiveContext.hxx>

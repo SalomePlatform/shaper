@@ -4,6 +4,7 @@
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Tools.h>

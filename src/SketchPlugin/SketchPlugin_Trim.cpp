@@ -12,6 +12,7 @@
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_CompoundBuilder.h>
 
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeString.h>
@@ -22,6 +23,8 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_AttributeDouble.h>
+
+#include <ModelGeomAlgo_Shape.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_ConstraintMiddle.h>
@@ -64,25 +67,38 @@ SketchPlugin_Trim::SketchPlugin_Trim()
 
 void SketchPlugin_Trim::initAttributes()
 {
-  data()->addAttribute(SketchPlugin_Trim::BASE_OBJECT(), ModelAPI_AttributeReference::typeId());
-  data()->addAttribute(ENTITY_POINT(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(SketchPlugin_Trim::SELECTED_OBJECT(),
+                       ModelAPI_AttributeReference::typeId());
+  data()->addAttribute(SELECTED_POINT(), GeomDataAPI_Point2D::typeId());
+
+  data()->addAttribute(PREVIEW_POINT(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(PREVIEW_OBJECT(), ModelAPI_AttributeReference::typeId());
+
+  data()->attribute(PREVIEW_POINT())->setIsArgument(false);
+  data()->attribute(SELECTED_POINT())->setIsArgument(false);
+  data()->attribute(PREVIEW_OBJECT())->setIsArgument(false);
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PREVIEW_POINT());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PREVIEW_OBJECT());
 }
 
-void SketchPlugin_Trim::findShapePoints(std::shared_ptr<GeomAPI_Pnt>& aStartPoint,
+void SketchPlugin_Trim::findShapePoints(const std::string& theObjectAttributeId,
+                                        const std::string& thePointAttributeId,
+                                        std::shared_ptr<GeomAPI_Pnt>& aStartPoint,
                                         std::shared_ptr<GeomAPI_Pnt>& aLastPoint)
 {
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                                            data()->attribute(SketchPlugin_Trim::BASE_OBJECT()));
+                                            data()->attribute(theObjectAttributeId));
   ObjectPtr aBaseObject = aBaseObjectAttr->value();
 
   AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                                            data()->attribute(ENTITY_POINT()));
+                                              data()->attribute(thePointAttributeId));
   std::shared_ptr<GeomAPI_Pnt2d> anAttributePnt2d = aPoint->pnt();
   std::shared_ptr<GeomAPI_Pnt> anAttributePnt = sketch()->to3D(anAttributePnt2d->x(),
                                                                anAttributePnt2d->y());
 
   if (myCashedShapes.find(aBaseObject) == myCashedShapes.end())
-    fillObjectShapes(aBaseObject);
+    fillObjectShapes(aBaseObject, sketch()->data()->owner(), myCashedShapes, myObjectToPoints);
 
   const std::set<GeomShapePtr>& aShapes = myCashedShapes[aBaseObject];
   if (!aShapes.empty()) {
@@ -116,10 +132,10 @@ std::shared_ptr<GeomAPI_Pnt2d> SketchPlugin_Trim::convertPoint(
   std::shared_ptr<GeomAPI_Pnt2d> aPoint;
 
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                                            data()->attribute(SketchPlugin_Trim::BASE_OBJECT()));
+                                        data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
   ObjectPtr aBaseObject = aBaseObjectAttr->value();
   if (myObjectToPoints.find(aBaseObject) == myObjectToPoints.end())
-    return aPoint;
+    fillObjectShapes(aBaseObject, sketch()->data()->owner(), myCashedShapes, myObjectToPoints);
 
   bool aFound = false;
   const PointToRefsMap& aRefsMap = myObjectToPoints.at(aBaseObject);
@@ -141,7 +157,8 @@ std::shared_ptr<GeomAPI_Pnt2d> SketchPlugin_Trim::convertPoint(
     }
   }
   if (!aFound) {
-    // returns an end of the shape to define direction of split if feature's attribute participates
+    // returns an end of the shape to define direction of split if feature's attribute
+    // participates
     std::shared_ptr<GeomAPI_Pln> aPlane = sketch()->plane();
     aPoint = thePoint->to2D(aPlane);
   }
@@ -160,7 +177,7 @@ void SketchPlugin_Trim::execute()
 
   // Check the base objects are initialized.
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                                            data()->attribute(SketchPlugin_Trim::BASE_OBJECT()));
+                                        data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
   if(!aBaseObjectAttr->isInitialized()) {
     setError("Error: Base object is not initialized.");
     return;
@@ -172,7 +189,7 @@ void SketchPlugin_Trim::execute()
 
   /// points of trim
   std::shared_ptr<GeomAPI_Pnt> aStartShapePoint, aLastShapePoint;
-  findShapePoints(aStartShapePoint, aLastShapePoint);
+  findShapePoints(SELECTED_OBJECT(), SELECTED_POINT(), aStartShapePoint, aLastShapePoint);
   std::shared_ptr<GeomAPI_Pnt2d> aStartShapePoint2d = convertPoint(aStartShapePoint);
 
   std::shared_ptr<GeomAPI_Pnt2d> aLastShapePoint2d = convertPoint(aLastShapePoint);
@@ -200,8 +217,16 @@ void SketchPlugin_Trim::execute()
                aFurtherCoincidences, aModifiedAttributes);
 
     aFeaturesToDelete.insert(aBaseFeature);
-    // as circle is removed, temporary fill this attribute
+    // as circle is removed, erase it from dependencies(arguments) of this feature
+    // otherwise Trim feature will be removed with the circle before
+    // this operation is finished
     aBaseObjectAttr->setObject(ResultPtr());
+
+    AttributeReferencePtr aPreviewObjectAttr =
+                     std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                     data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+    aPreviewObjectAttr->setObject(ResultPtr());
+
   }
   else if (aKind == SketchPlugin_Line::ID()) {
     trimLine(aStartShapePoint2d, aLastShapePoint2d,
@@ -213,6 +238,9 @@ void SketchPlugin_Trim::execute()
   }
 
   //
+  if (myObjectToPoints.find(aBaseObject) == myObjectToPoints.end())
+    fillObjectShapes(aBaseObject, sketch()->data()->owner(), myCashedShapes, myObjectToPoints);
+
   const PointToRefsMap& aRefsMap = myObjectToPoints.at(aBaseObject);
   std::set<AttributePoint2DPtr>::const_iterator anIt = aFurtherCoincidences.begin(),
                                                 aLast = aFurtherCoincidences.end();
@@ -330,25 +358,63 @@ bool SketchPlugin_Trim::isMacro() const
 AISObjectPtr SketchPlugin_Trim::getAISObject(AISObjectPtr thePrevious)
 {
   AISObjectPtr anAIS = thePrevious;
-  // feature for trim
-  AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                                           data()->attribute(SketchPlugin_Trim::BASE_OBJECT()));
-  ObjectPtr aBaseObject = aBaseObjectAttr->value();
-  if (!aBaseObject.get())
+
+  std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
+  GeomShapePtr aPreviewShape = getSubShape(PREVIEW_OBJECT(), PREVIEW_POINT());
+  if (aPreviewShape.get())
+    aShapes.push_back(aPreviewShape);
+  GeomShapePtr aSelectedShape = getSubShape(SELECTED_OBJECT(), SELECTED_POINT());
+  if (aSelectedShape.get())
+    aShapes.push_back(aSelectedShape);
+
+  if (aShapes.empty())
     return AISObjectPtr();
-  FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
+
+  GeomShapePtr aBaseShape = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+  if (!aBaseShape.get())
+    return AISObjectPtr();
+
+  if (aBaseShape.get()) {
+    if (!anAIS)
+      anAIS = AISObjectPtr(new GeomAPI_AISObject);
+    anAIS->createShape(aBaseShape);
+
+    std::vector<int> aColor;
+    aColor = Config_PropManager::color("Visualization", "operation_remove_feature_color");
+    double aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
+    int aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
+    anAIS->setColor(aColor[0], aColor[1], aColor[2]);
+    // width when there is not base object should be extened in several points
+    // in order to see this preview over highlight
+    anAIS->setWidth(aWidth+4);
+    anAIS->setLineStyle(aLineStyle);
+  }
+  else
+    anAIS = AISObjectPtr();
+
+  return anAIS;
+}
+
+GeomShapePtr SketchPlugin_Trim::getSubShape(const std::string& theObjectAttributeId,
+                                            const std::string& thePointAttributeId)
+{
+  GeomShapePtr aBaseShape;
+
+  AttributeReferencePtr anObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                                                       data()->attribute(theObjectAttributeId));
+  ObjectPtr aBaseObject = anObjectAttr->value();
+  if (!aBaseObject.get())
+    return aBaseShape;
 
   // point on feature
   AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                           data()->attribute(ENTITY_POINT()));
+                                           data()->attribute(thePointAttributeId));
   std::shared_ptr<GeomAPI_Pnt2d> anAttributePnt2d = aPoint->pnt();
   std::shared_ptr<GeomAPI_Pnt> anAttributePnt = sketch()->to3D(anAttributePnt2d->x(),
                                                                anAttributePnt2d->y());
 
   if (myCashedShapes.find(aBaseObject) == myCashedShapes.end())
-    fillObjectShapes(aBaseObject);
-
-  GeomShapePtr aBaseShape;
+    fillObjectShapes(aBaseObject, sketch()->data()->owner(), myCashedShapes, myObjectToPoints);
 
   const std::set<GeomShapePtr>& aShapes = myCashedShapes[aBaseObject];
   if (!aShapes.empty()) {
@@ -360,33 +426,7 @@ AISObjectPtr SketchPlugin_Trim::getAISObject(AISObjectPtr thePrevious)
         aBaseShape = aShape;
     }
   }
-
-  if (aBaseShape.get()) {
-    if (!anAIS)
-      anAIS = AISObjectPtr(new GeomAPI_AISObject);
-    anAIS->createShape(aBaseShape);
-
-    std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr =
-            aBaseFeature->data()->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID());
-
-    bool isConstruction = anAuxiliaryAttr.get() != NULL && anAuxiliaryAttr->value();
-    std::vector<int> aColor;
-          aColor = Config_PropManager::color("Visualization", "operation_remove_feature_color");
-    double aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
-    int aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
-    if (isConstruction) {
-      aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH_AUXILIARY();
-      aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY();
-    }
-    anAIS->setColor(aColor[0], aColor[1], aColor[2]);
-    // width is extened in several points in order to see this preview over highlight
-    anAIS->setWidth(aWidth + 2);
-    anAIS->setLineStyle(aLineStyle);
-  }
-  else
-    anAIS = AISObjectPtr();
-
-  return anAIS;
+  return aBaseShape;
 }
 
 void SketchPlugin_Trim::getFeaturePoints(const FeaturePtr& theFeature,
@@ -417,7 +457,7 @@ void SketchPlugin_Trim::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete
 
   // Check the base objects are initialized.
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                                            aData->attribute(SketchPlugin_Trim::BASE_OBJECT()));
+                                         aData->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
   ResultPtr aBaseFeatureResult = getFeatureResult(aBaseFeature);
 
@@ -565,7 +605,7 @@ void SketchPlugin_Trim::trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& theStartS
 {
   // Check the base objects are initialized.
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                                            data()->attribute(SketchPlugin_Trim::BASE_OBJECT()));
+                                        data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
   ObjectPtr aBaseObject = aBaseObjectAttr->value();
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
 
@@ -614,7 +654,8 @@ void SketchPlugin_Trim::trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& theStartS
                                (aBaseFeature->attribute(aModifiedAttribute)));
   }
   else {
-    // result is two lines: start line point - start shape point, last shape point - last line point
+    // result is two lines: start line point - start shape point,
+    // last shape point - last line point
     // create second line
     FeaturePtr anNewFeature = createLineFeature(aBaseFeature, aLastShapePoint, aLastFeaturePoint);
     thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>
@@ -646,7 +687,7 @@ void SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theStartSh
 {
   // Check the base objects are initialized.
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                                            data()->attribute(SketchPlugin_Trim::BASE_OBJECT()));
+                                        data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
   ObjectPtr aBaseObject = aBaseObjectAttr->value();
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
 
@@ -730,7 +771,7 @@ FeaturePtr SketchPlugin_Trim::trimCircle(const std::shared_ptr<GeomAPI_Pnt2d>& t
 {
   // Check the base objects are initialized.
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                                            data()->attribute(SketchPlugin_Trim::BASE_OBJECT()));
+                                        data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
   ObjectPtr aBaseObject = aBaseObjectAttr->value();
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
 
@@ -1013,13 +1054,10 @@ std::shared_ptr<ModelAPI_Result> SketchPlugin_Trim::getFeatureResult(
 }
 
 //********************************************************************
-bool SketchPlugin_Trim::useGraphicIntersection() const
-{
-  return true;
-}
-
-//********************************************************************
-void SketchPlugin_Trim::fillObjectShapes(const ObjectPtr& theObject)
+void SketchPlugin_Trim::fillObjectShapes(const ObjectPtr& theObject,
+                ObjectPtr& theSketch,
+                std::map<ObjectPtr, std::set<GeomShapePtr> >& theCashedShapes,
+                std::map<ObjectPtr, PointToRefsMap>& theObjectToPoints)
 {
   PointToRefsMap aPointsInfo;
 
@@ -1034,7 +1072,7 @@ void SketchPlugin_Trim::fillObjectShapes(const ObjectPtr& theObject)
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
   std::set<ResultPtr> anEdgeShapes;
   // edges on feature
-  ModelAPI_Tools::shapesOfType(aFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
+  ModelGeomAlgo_Shape::shapesOfType(aFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
   if (!anEdgeShapes.empty()) {
     GeomShapePtr aFeatureShape = (*anEdgeShapes.begin())->shape();
 
@@ -1042,8 +1080,8 @@ void SketchPlugin_Trim::fillObjectShapes(const ObjectPtr& theObject)
     ModelGeomAlgo_Point2D::getPointsOfReference(aFeature, SketchPlugin_ConstraintCoincidence::ID(),
                          aRefAttributes, SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
     // layed on feature coincidences to divide it on several shapes
-    SketchPlugin_Sketch* aSketch = sketch();
-    std::shared_ptr<ModelAPI_Data> aData = aSketch->data();
+    //SketchPlugin_Sketch* aSketch = sketch();
+    std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
     std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
         aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
     std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
@@ -1055,52 +1093,18 @@ void SketchPlugin_Trim::fillObjectShapes(const ObjectPtr& theObject)
     ModelGeomAlgo_Point2D::getPointsInsideShape(aFeatureShape, aRefAttributes, aC->pnt(),
                                                 aX->dir(), aY, aPointsInfo);
 
-    // intersection points
-    if (useGraphicIntersection()) {
-      std::list<FeaturePtr> aFeatures;
-      for (int i = 0; i < aSketch->numberOfSubs(); i++) {
-        FeaturePtr aFeature = aSketch->subFeature(i);
-        if (aFeature.get())
-          aFeatures.push_back(aFeature);
-      }
-      ModelGeomAlgo_Point2D::getPointsIntersectedShape(aFeature, aFeatures, aPointsInfo);
+    std::list<FeaturePtr> aFeatures;
+    CompositeFeaturePtr aSketchComposite =
+                         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theSketch);
+    for (int i = 0; i < aSketchComposite->numberOfSubs(); i++) {
+      FeaturePtr aFeature = aSketchComposite->subFeature(i);
+      if (aFeature.get())
+        aFeatures.push_back(aFeature);
     }
+    ModelGeomAlgo_Point2D::getPointsIntersectedShape(aFeature, aFeatures, aPointsInfo);
+
     GeomAlgoAPI_ShapeTools::splitShape(aFeatureShape, aPointsInfo, aShapes);
   }
-  myObjectToPoints[theObject] = aPointsInfo;
-  myCashedShapes[theObject] = aShapes;
-}
-
-//********************************************************************
-void SketchPlugin_Trim::attributeChanged(const std::string& theID)
-{
-  //data()->addAttribute(SketchPlugin_Trim::BASE_OBJECT(), ModelAPI_AttributeReference::typeId());
-  if (theID == SketchPlugin_Trim::BASE_OBJECT()) {
-    bool isValidAttribute = false;
-    // feature for trim
-    AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                                             data()->attribute(SketchPlugin_Trim::BASE_OBJECT()));
-    ObjectPtr aBaseObject = aBaseObjectAttr->value();
-    if (aBaseObject.get()) {
-      FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
-      // point on feature
-      AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                               data()->attribute(ENTITY_POINT()));
-      std::shared_ptr<GeomAPI_Pnt2d> anAttributePnt2d = aPoint->pnt();
-      std::shared_ptr<GeomAPI_Pnt> anAttributePnt = sketch()->to3D(anAttributePnt2d->x(),
-                                                                   anAttributePnt2d->y());
-
-      if (myCashedShapes.find(aBaseObject) == myCashedShapes.end())
-        fillObjectShapes(aBaseObject);
-
-      const std::set<GeomShapePtr>& aShapes = myCashedShapes[aBaseObject];
-      isValidAttribute = !aShapes.empty();
-
-      if (!isValidAttribute) {
-        bool aWasBlocked = data()->blockSendAttributeUpdated(true);
-        aBaseObjectAttr->setValue(ObjectPtr());
-        data()->blockSendAttributeUpdated(aWasBlocked);
-      }
-    }
-  }
+  theObjectToPoints[theObject] = aPointsInfo;
+  theCashedShapes[theObject] = aShapes;
 }

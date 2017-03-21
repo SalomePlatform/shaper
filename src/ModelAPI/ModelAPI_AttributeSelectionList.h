@@ -10,6 +10,8 @@
 #include "ModelAPI_AttributeSelection.h"
 #include <ModelAPI_Result.h>
 
+class GeomAPI_Shape;
+
 /**\class ModelAPI_AttributeSelectionList
  * \ingroup DataModel
  * \brief Attribute that contains list of references to the sub-shapes with
@@ -25,7 +27,7 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// \param theTemporarily if it is true, do not store and name the added in the data framework
   ///           (used to remove immediately, without the following updates)
   virtual void append(const ResultPtr& theContext,
-                      const GeomShapePtr& theSubShape,
+                      const std::shared_ptr<GeomAPI_Shape>& theSubShape,
                       const bool theTemporarily = false) = 0;
 
   /// Adds the new reference to the end of the list by the naming name of the selected shape

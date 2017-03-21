@@ -20,6 +20,7 @@
 
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <ModelGeomAlgo_Point2D.h>
+#include <ModelGeomAlgo_Shape.h>
 
 #include <ModelGeomAlgo_Point2D.h>
 
@@ -230,7 +231,7 @@ void PartSet_WidgetSubShapeSelector::fillObjectShapes(const ObjectPtr& theObject
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
   // edges on feature
   std::set<ResultPtr> anEdgeResults;
-  ModelAPI_Tools::shapesOfType(aFeature, GeomAPI_Shape::EDGE, anEdgeResults);
+  ModelGeomAlgo_Shape::shapesOfType(aFeature, GeomAPI_Shape::EDGE, anEdgeResults);
   if (!anEdgeResults.empty()) {
     GeomShapePtr aFeatureShape = (*anEdgeResults.begin())->shape();
 

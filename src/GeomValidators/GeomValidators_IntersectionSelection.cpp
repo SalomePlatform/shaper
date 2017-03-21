@@ -6,6 +6,8 @@
 
 #include "GeomValidators_IntersectionSelection.h"
 
+#include <GeomAPI_Shape.h>
+
 #include <Events_InfoMessage.h>
 
 #include <ModelAPI_AttributeInteger.h>

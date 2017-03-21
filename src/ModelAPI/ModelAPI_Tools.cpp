@@ -6,9 +6,11 @@
 
 #include "ModelAPI_Tools.h"
 #include <ModelAPI_Session.h>
+#include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_AttributeDocRef.h>
@@ -88,21 +90,6 @@ namespace ModelAPI_Tools {
 std::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult)
 {
   return theResult->shape();
-}
-
-void shapesOfType(const FeaturePtr& theFeature,
-                  const GeomAPI_Shape::ShapeType& theType,
-                  std::set<ResultPtr>& theShapeResults)
-{
-  theShapeResults.clear();
-  std::list<ResultPtr> aResults = theFeature->results();
-  std::list<ResultPtr>::const_iterator aRIter = aResults.cbegin();
-  for (; aRIter != aResults.cend(); aRIter++) {
-    ResultPtr aResult = *aRIter;
-    GeomShapePtr aShape = aResult->shape();
-    if (aShape.get() && aShape->shapeType() == theType)
-      theShapeResults.insert(aResult);
-  }
 }
 
 const char* toString(ModelAPI_ExecState theExecState)

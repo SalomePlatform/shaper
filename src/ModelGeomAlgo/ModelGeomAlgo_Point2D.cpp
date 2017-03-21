@@ -12,6 +12,8 @@
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Tools.h>
 
+#include <ModelGeomAlgo_Shape.h>
+
 #include <GeomAPI_ShapeIterator.h>
 
 #include <GeomAlgoAPI_ShapeTools.h>
@@ -176,7 +178,7 @@ namespace ModelGeomAlgo_Point2D {
     GeomShapePtr aFeatureShape;
     {
       std::set<ResultPtr> anEdgeShapes;
-      ModelAPI_Tools::shapesOfType(theBaseFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
+      ModelGeomAlgo_Shape::shapesOfType(theBaseFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
       if (anEdgeShapes.empty())
         return;
       aFeatureShape = (*anEdgeShapes.begin())->shape();
@@ -190,7 +192,7 @@ namespace ModelGeomAlgo_Point2D {
         continue;
       if (aFeature.get()) {
         std::set<ResultPtr> anEdgeShapes;
-        ModelAPI_Tools::shapesOfType(aFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
+        ModelGeomAlgo_Shape::shapesOfType(aFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
         if (anEdgeShapes.empty())
           continue;
         ResultPtr aResult = *anEdgeShapes.begin();
@@ -220,17 +222,11 @@ namespace ModelGeomAlgo_Point2D {
         if (thePointToAttributeOrObject.find(aProjectedPoint) != thePointToAttributeOrObject.end())
           thePointToAttributeOrObject.at(aProjectedPoint).first.push_back(anAttribute);
         else {
-          //std::list< std::shared_ptr<GeomDataAPI_Point2D> > anAttributes;
-          //anAttributes.push_back(anAttribute);
-          //thePointToAttributeOrObject.insert(aProjectedPoint, anAttributes);
-
           std::list<std::shared_ptr<GeomDataAPI_Point2D> > anAttributes;
           std::list<std::shared_ptr<ModelAPI_Object> > anObjects;
           anAttributes.push_back(anAttribute);
           thePointToAttributeOrObject[aProjectedPoint] = std::make_pair(anAttributes, anObjects);
         }
-        //thePoints.push_back(aProjectedPoint);
-        //theAttributeToPoint[anAttribute] = aProjectedPoint;
       }
     }
   }

@@ -490,9 +490,9 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::addTrim(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Trim::ID());
-  fillAttribute(theFeature, aFeature->reference(SketchPlugin_Trim::BASE_OBJECT()));
+  fillAttribute(theFeature, aFeature->reference(SketchPlugin_Trim::SELECTED_OBJECT()));
 
-  AttributePtr anAttribute = aFeature->attribute(SketchPlugin_Trim::ENTITY_POINT());
+  AttributePtr anAttribute = aFeature->attribute(SketchPlugin_Trim::SELECTED_POINT());
   if (anAttribute->attributeType() == GeomDataAPI_Point2D::typeId()) {
     AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttribute);
     fillAttribute(thePositionPoint, aPointAttr);
