@@ -1055,7 +1055,7 @@ std::shared_ptr<ModelAPI_Result> SketchPlugin_Trim::getFeatureResult(
 
 //********************************************************************
 void SketchPlugin_Trim::fillObjectShapes(const ObjectPtr& theObject,
-                ObjectPtr& theSketch,
+                const ObjectPtr& theSketch,
                 std::map<ObjectPtr, std::set<GeomShapePtr> >& theCashedShapes,
                 std::map<ObjectPtr, PointToRefsMap>& theObjectToPoints)
 {

@@ -14,6 +14,7 @@
 class GeomDataAPI_Point2D;
 class ModelAPI_Feature;
 class ModelAPI_Result;
+class ModelAPI_Object;
 
 typedef std::pair<std::string, std::shared_ptr<GeomDataAPI_Point2D> > IdToPointPair;
 
@@ -92,10 +93,10 @@ class SketchPlugin_Trim : public SketchPlugin_Feature, public GeomAPI_IPresentab
                    std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,
                              std::list<std::shared_ptr<ModelAPI_Object> > > > PointToRefsMap;
 
-  static void fillObjectShapes(const ObjectPtr& theObject,
-                   ObjectPtr& theSketch,
-                   std::map<ObjectPtr, std::set<GeomShapePtr> >& theCashedShapes,
-                   std::map<ObjectPtr, PointToRefsMap>& theObjectToPoints);
+  static void fillObjectShapes(const std::shared_ptr<ModelAPI_Object>& theObject,
+    const std::shared_ptr<ModelAPI_Object>& theSketch,
+    std::map<std::shared_ptr<ModelAPI_Object>, std::set<GeomShapePtr> >& theCashedShapes,
+    std::map<std::shared_ptr<ModelAPI_Object>, PointToRefsMap>& theObjectToPoints);
 
 private:
   GeomShapePtr getSubShape(const std::string& theObjectAttributeId,
@@ -130,7 +131,7 @@ private:
   /// by the coincident attribute
   /// \param theObject an investigated object
   /// \param theCoincidencesToBaseFeature a container of list of referenced attributes
-  void getCoincidencesToObject(const ObjectPtr& theObject,
+  void getCoincidencesToObject(const std::shared_ptr<ModelAPI_Object>& theObject,
                                std::map<AttributePtr, FeaturePtr>& theCoincidencesToBaseFeature);
 
   /// Move constraints from attribute of base feature to attribute after modification
@@ -267,9 +268,8 @@ private:
   std::shared_ptr<GeomAPI_Pnt2d> convertPoint(const std::shared_ptr<GeomAPI_Pnt>& thePoint);
 
 private:
-  std::map<ObjectPtr, std::set<GeomShapePtr> > myCashedShapes;
-
-  std::map<ObjectPtr, PointToRefsMap> myObjectToPoints;
+  std::map<std::shared_ptr<ModelAPI_Object>, std::set<GeomShapePtr> > myCashedShapes;
+  std::map<std::shared_ptr<ModelAPI_Object>, PointToRefsMap> myObjectToPoints;
 };
 
 #endif
