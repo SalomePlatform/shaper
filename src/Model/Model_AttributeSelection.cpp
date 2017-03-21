@@ -232,9 +232,8 @@ bool Model_AttributeSelection::isInitialized()
         if (aConstr.get()) {
           Handle(TDataStd_Integer) anIndex;
           if (aSelLab.FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
-            if (anIndex->Get() == 0) // it is just reference to construction, nothing is in value
-              return true;
-            return aConstr->shape(anIndex->Get(), owner()->document()).get() != NULL;
+            // for the whole shape it may return null, so, if index exists, returns true
+            return true;
           }
         }
       }

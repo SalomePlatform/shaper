@@ -9,29 +9,35 @@
 #include <Model_Data.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <Model_SelectionNaming.h>
+#include <ModelAPI_Events.h>
 #include <Config_PropManager.h>
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
 #include <Events_Loop.h>
-#include <ModelAPI_Events.h>
 
+#include <TDF_Reference.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Builder.hxx>
-#include <TopoDS_Shape.hxx>
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_IntPackedMap.hxx>
 #include <TDataStd_Name.hxx>
+#include <TDataStd_UAttribute.hxx>
+#include <TDataStd_IntegerArray.hxx>
 #include <TColStd_MapOfTransient.hxx>
 #include <TColStd_MapIteratorOfPackedMapOfInteger.hxx>
 #include <BRep_Tool.hxx>
 #include <BRep_Builder.hxx>
 #include <TopoDS.hxx>
+#include <TopoDS_Shape.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <TopExp_Explorer.hxx>
 #include <Precision.hxx>
+
+// identifier that it is full result selected, but in external document (for internal index is 0)
+Standard_GUID kFULL_RESULT_ID("ee87e529-da6f-46af-be25-5e0fefde52f7");
 
 
 void Model_ResultConstruction::colorConfigInfo(std::string& theSection, std::string& theName,
@@ -117,6 +123,7 @@ static const int kSTART_VERTEX_DELTA = 1000000;
 
 static void registerSubShape(TDF_Label theMainLabel, TopoDS_Shape theShape,
   const int theID, std::shared_ptr<Model_Document> theDoc,
+  bool theSelectionMode,
   std::map<int, int>& theOrientations,
   // name of sub-elements by ID to be exported instead of indexes
   std::map<int, std::string>& theSubNames,
@@ -128,7 +135,12 @@ static void registerSubShape(TDF_Label theMainLabel, TopoDS_Shape theShape,
     TDataStd_Integer::Set(aLab, theOrientation);
   }
   TNaming_Builder aBuilder(aLab);
-  aBuilder.Generated(theShape);
+  // wire never happens as sub, it must be generated to be found
+  // by SelectionNaming TNaming_Tool::NamedShape
+  if (theSelectionMode && theShape.ShapeType() != TopAbs_WIRE)
+    aBuilder.Select(theShape, theShape);
+  else
+    aBuilder.Generated(theShape);
   std::stringstream aName;
   // #1839 : do not store name of the feature in the tree, since this name could be changed
   //aName<<theContextFeature->name();
@@ -215,10 +227,59 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
 
   // set the naming structure at index
   TDF_Label aLab = aDataLab.FindChild(anIndex, Standard_True);
-  TNaming_Builder aBuilder(aLab);
-  if (aSubShape.IsNull())
-    return anIndex - 1; // just keep empty named shape
-  aBuilder.Generated(aSubShape);
+
+  // if the subshape is part of a result face, select the whole face (#1997)
+  bool isSelectionMode = false; // and other don't set shapes - all the naming is in face label
+  if (!aSubShape.IsNull() && aSubShape.ShapeType() > TopAbs_FACE) {
+    for(int aFaceIndex = 0; aFaceIndex < facesNum(); aFaceIndex++) {
+      TopExp_Explorer anExp(face(aFaceIndex)->impl<TopoDS_Shape>(), aSubShape.ShapeType());
+      for(; anExp.More(); anExp.Next()) {
+        if (aSubShape.IsSame(anExp.Current())) { // this is the case: select the whole face
+          // here just store the face index (to update face if update of edge is needed)
+          TNaming_Builder aBuilder(aLab);
+          aBuilder.Select(aSubShape, aSubShape);
+          int aFaceSelID = select(face(aFaceIndex), theExtDoc, -1);
+          TDF_Reference::Set(aLab, aLab.Father().FindChild(aFaceSelID));
+          isSelectionMode = true;
+          break;
+        }
+      }
+    }
+  }
+
+  // external full result is not identified by index == 0, so, add here the ID
+  if (!theSubShape.get()) {
+    TDataStd_UAttribute::Set(aLab, kFULL_RESULT_ID);
+    // empty NS
+    TNaming_Builder aBuilder(aLab);
+    // store all sub-faces naming since faces may be used for extrusion, where all edges are needed
+    std::list<int> aFacesIndexes;
+    for(int a = 0; a < facesNum(); a++) {
+      aFacesIndexes.push_back(select(face(a), theExtDoc, -1));
+    }
+    if (aFacesIndexes.size()) {
+      Handle(TDataStd_IntegerArray) anArray =
+        TDataStd_IntegerArray::Set(aLab, 0, int(aFacesIndexes.size() - 1));
+      std::list<int>::iterator anIter = aFacesIndexes.begin();
+      for(int anArrayIndex = 0; anIter != aFacesIndexes.end(); anArrayIndex++, anIter++)
+        anArray->SetValue(anArrayIndex, *anIter);
+    }
+    return anIndex - 1;
+  }
+
+  { // this to have erased Builder after the shape was generated (NS on this label may be changed)
+    TNaming_Builder aBuilder(aLab);
+    if (aSubShape.IsNull()) {
+      return anIndex - 1; // just keep empty named shape
+    }
+    // wire never happens as sub, it must be generated to be found
+    // by SelectionNaming TNaming_Tool::NamedShape
+    if (isSelectionMode && aSubShape.ShapeType() != TopAbs_WIRE) {
+      aBuilder.Select(aSubShape, aSubShape);
+    } else {
+      aBuilder.Generated(aSubShape);
+    }
+  }
 
   if (anIndex == 1 && isInfinite()) { // infinitive results has no sub-selection
     return anIndex - 1;
@@ -231,6 +292,7 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
     // saving of context is enough: result construction contains exactly the needed shape
     return anIndex - 1;
   }
+
   // identify the results of sub-object of the composite by edges
   // save type of the selected shape in integer attribute
   TopAbs_ShapeEnum aShapeType = aSubShape.ShapeType();
@@ -313,7 +375,10 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
                     TDF_Label aSubLab = aLab.FindChild(anID);
                     std::string aName = "Edge-" + Model_SelectionNaming::shortName(aConstr, 0);
                     TNaming_Builder aBuilder(aSubLab);
-                    aBuilder.Generated(anEdge);
+                    if (isSelectionMode)
+                      aBuilder.Select(anEdge, anEdge);
+                    else
+                      aBuilder.Generated(anEdge);
                     aMyDoc->addNamingName(aSubLab, aName.c_str());
                     TDataStd_Name::Set(aSubLab, aName.c_str());
 
@@ -338,7 +403,10 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
                   std::string aName = "Vertex-"
                       + Model_SelectionNaming::shortName(aConstr, aDelta / kSTART_VERTEX_DELTA);
                   TNaming_Builder aBuilder(aLab);
-                  aBuilder.Generated(aV);
+                  if (isSelectionMode)
+                    aBuilder.Select(aV, aV);
+                  else
+                    aBuilder.Generated(aV);
                   aMyDoc->addNamingName(aLab, aName.c_str());
                   TDataStd_Name::Set(aLab, aName.c_str());
                 }
@@ -350,8 +418,7 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
     }
   }
   // store the selected as primitive
-  registerSubShape(aLab, aSubShape, 0, aMyDoc, anOrientations, aSubNames, aRefs);
-
+  registerSubShape(aLab, aSubShape, 0, aMyDoc, isSelectionMode, anOrientations, aSubNames, aRefs);
   return anIndex - 1;
 }
 
@@ -368,6 +435,8 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultConstruction::shape(const int theInde
     Handle(TNaming_NamedShape) aSelection;
     if (aLab.FindAttribute(TNaming_NamedShape::GetID(), aSelection)) {
       TopoDS_Shape aSelShape = aSelection->Get();
+      if (aSelShape.IsNull())
+        return aResult; // shape equal to context => null
       aResult = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
       aResult->setImpl(new TopoDS_Shape(aSelShape));
     }
@@ -382,20 +451,20 @@ bool Model_ResultConstruction::update(const int theIndex,
   theModified = false;
   bool anExt;
   TDF_Label aLab = startLabel(theExtDoc, anExt).FindChild(theIndex + 1, Standard_True);
-  if (theIndex == 0) {
+  if (theIndex == 0 || aLab.IsAttribute(kFULL_RESULT_ID)) { // full for external same as index == 0
     // it is just reference to construction, not sub-shape
     // if there is a sketch, the sketch-naming must be updated
     if (!isInfinite()) {
-      BRep_Builder aCompoundBuilder;
-      TopoDS_Compound aComp;
-      aCompoundBuilder.MakeCompound(aComp);
-      for(int a = 0; a < facesNum(); a++) {
-        TopoDS_Shape aFace = face(a)->impl<TopoDS_Shape>();
-        aCompoundBuilder.Add(aComp, aFace);
+      // update all faces named by the whole result
+      bool aRes = true;
+      Handle(TDataStd_IntegerArray) anArray;
+      if (aLab.FindAttribute(TDataStd_IntegerArray::GetID(), anArray)) {
+        for(int anIndex = 0; anIndex <= anArray->Upper(); anIndex++) {
+          if (!update(anArray->Value(anIndex), theExtDoc, theModified))
+            aRes = false;
+        }
       }
-      std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
-      aShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aComp));
-      select(aShape, theExtDoc, theIndex);
+      return aRes;
     } else {
       // For correct naming selection, put the shape into the naming structure.
       // It seems sub-shapes are not needed: only this shape is (and can be ) selected.
@@ -408,9 +477,17 @@ bool Model_ResultConstruction::update(const int theIndex,
   // take the face that more close by the indexes
   ResultPtr aThisPtr = std::dynamic_pointer_cast<ModelAPI_Result>(data()->owner());
   FeaturePtr aContextFeature = document()->feature(aThisPtr);
+
   // sketch sub-element
   if (std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContextFeature).get())
   {
+    // update the referenced object if it is sub
+    Handle(TDF_Reference) aRef;
+    if (aLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
+      int aFaceIndex = aRef->Get().Tag();
+      // don't check selection ,since face may disappear, but the shape stays correct
+      Model_ResultConstruction::update(aFaceIndex, theExtDoc, theModified);
+    }
     // getting a type of selected shape
     Handle(TDataStd_Integer) aTypeAttr;
     if (!aLab.FindAttribute(TDataStd_Integer::GetID(), aTypeAttr)) {
