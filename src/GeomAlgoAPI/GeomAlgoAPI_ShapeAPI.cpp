@@ -411,15 +411,15 @@ namespace GeomAlgoAPI_ShapeAPI
     const double theStep,
     const int theNumber) throw (GeomAlgoAPI_Exception)
   {
-    if (theNumber <=0) {
-      std::string aError = "Multitranslation builder ";
-      aError+=":: the number of copies for the first direction is null or negative.";
-      throw GeomAlgoAPI_Exception(aError);
-    }
-
     if (!theAxis) {
       std::string aError = "Multitranslation builder ";
       aError+=":: the first axis is not valid";
+      throw GeomAlgoAPI_Exception(aError);
+    }
+
+    if (theNumber <=0) {
+      std::string aError = "Multitranslation builder ";
+      aError+=":: the number of copies for the first direction is null or negative.";
       throw GeomAlgoAPI_Exception(aError);
     }
 
@@ -441,18 +441,6 @@ namespace GeomAlgoAPI_ShapeAPI
     const double theSecondStep,
     const int theSecondNumber) throw (GeomAlgoAPI_Exception)
   {
-    if (theFirstNumber <=0) {
-      std::string aError = "Multitranslation builder ";
-      aError+=":: the number of copies for the first direction is null or negative.";
-      throw GeomAlgoAPI_Exception(aError);
-    }
-
-    if (theSecondNumber <=0) {
-      std::string aError = "Multitranslation builder ";
-      aError+=":: the number of copies for the second direction is null or negative.";
-      throw GeomAlgoAPI_Exception(aError);
-    }
-
     if (!theFirstAxis) {
       std::string aError = "Multitranslation builder ";
       aError+=":: the first axis is not valid";
@@ -462,6 +450,18 @@ namespace GeomAlgoAPI_ShapeAPI
     if (!theSecondAxis) {
       std::string aError = "Multitranslation builder ";
       aError+=":: the second axis is not valid";
+      throw GeomAlgoAPI_Exception(aError);
+    }
+
+    if (theFirstNumber <=0) {
+      std::string aError = "Multitranslation builder ";
+      aError+=":: the number of copies for the first direction is null or negative.";
+      throw GeomAlgoAPI_Exception(aError);
+    }
+
+    if (theSecondNumber <=0) {
+      std::string aError = "Multitranslation builder ";
+      aError+=":: the number of copies for the second direction is null or negative.";
       throw GeomAlgoAPI_Exception(aError);
     }
 

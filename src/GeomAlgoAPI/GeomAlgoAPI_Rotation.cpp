@@ -66,7 +66,7 @@ bool GeomAlgoAPI_Rotation::check()
     }
     case BY_POINTS: {
       if (!myCenterPoint) {
-        myError = "Rotation builder :: start point is not valid.";
+        myError = "Rotation builder :: center point is not valid.";
         return false;
       }
       if (!myStartPoint) {
@@ -74,7 +74,7 @@ bool GeomAlgoAPI_Rotation::check()
         return false;
       }
       if (!myEndPoint) {
-        myError = "Rotation builder :: start point is not valid.";
+        myError = "Rotation builder :: end point is not valid.";
         return false;
       }
       if (!mySourceShape) {
