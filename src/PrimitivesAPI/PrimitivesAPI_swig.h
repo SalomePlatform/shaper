@@ -11,7 +11,9 @@
 
   #include "PrimitivesAPI.h"
   #include "PrimitivesAPI_Box.h"
+  #include "PrimitivesAPI_Cone.h"
   #include "PrimitivesAPI_Cylinder.h"
   #include "PrimitivesAPI_Sphere.h"
+  #include "PrimitivesAPI_Torus.h"
 
 #endif // PRIMITIVESAPI_SWIG_H_

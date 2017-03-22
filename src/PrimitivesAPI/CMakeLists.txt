@@ -5,14 +5,18 @@ INCLUDE(Common)
 SET(PROJECT_HEADERS
   PrimitivesAPI.h
   PrimitivesAPI_Box.h
+  PrimitivesAPI_Cone.h
   PrimitivesAPI_Cylinder.h
   PrimitivesAPI_Sphere.h
+  PrimitivesAPI_Torus.h
 )
 
 SET(PROJECT_SOURCES
   PrimitivesAPI_Box.cpp
+  PrimitivesAPI_Cone.cpp
   PrimitivesAPI_Cylinder.cpp
   PrimitivesAPI_Sphere.cpp
+  PrimitivesAPI_Torus.cpp
 )
 
 SET(PROJECT_LIBRARIES

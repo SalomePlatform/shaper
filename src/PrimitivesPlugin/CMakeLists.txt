@@ -8,22 +8,28 @@ SET(PROJECT_HEADERS
     PrimitivesPlugin.h
     PrimitivesPlugin_Plugin.h
     PrimitivesPlugin_Box.h
+    PrimitivesPlugin_Cone.h
     PrimitivesPlugin_Cylinder.h
     PrimitivesPlugin_Sphere.h
+    PrimitivesPlugin_Torus.h
 )
 
 SET(PROJECT_SOURCES
     PrimitivesPlugin_Plugin.cpp
     PrimitivesPlugin_Box.cpp
+    PrimitivesPlugin_Cone.cpp
     PrimitivesPlugin_Cylinder.cpp
     PrimitivesPlugin_Sphere.cpp
+    PrimitivesPlugin_Torus.cpp
 )
 
 SET(XML_RESOURCES
   plugin-Primitives.xml
   box_widget.xml
+  cone_widget.xml
   cylinder_widget.xml
   sphere_widget.xml
+  torus_widget.xml
 )
 
 INCLUDE_DIRECTORIES(

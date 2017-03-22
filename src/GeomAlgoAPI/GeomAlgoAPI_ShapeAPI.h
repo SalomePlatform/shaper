@@ -78,9 +78,41 @@ public:
                      double theRadius) throw (GeomAlgoAPI_Exception);
 
   /// Creates a sphere using the origin and a radius.
-  /// \param theRadius The radius of the cylinder
+  /// \param theRadius The radius of the sphere
   static std::shared_ptr<GeomAPI_Shape> makeSphere(double theRadius)
                      throw (GeomAlgoAPI_Exception);
+
+  /// Creates a torus using a base point, an axis, a radius and a ring radius.
+  /// \param theBasePoint The center of the torus
+  /// \param theEdge The axis of the torus
+  /// \param theRadius The radius of the torus
+  /// \param theRingRadius The ring radius of the torus
+  static std::shared_ptr<GeomAPI_Shape> makeTorus(std::shared_ptr<GeomAPI_Pnt> theBasePoint,
+                     std::shared_ptr<GeomAPI_Edge> theEdge, double theRadius, double theRingRadius)
+                     throw (GeomAlgoAPI_Exception);
+
+  /// Creates a torus using a radius and a ring radius.
+  /// \param theRadius The radius of the torus
+  /// \param theRingRadius The ring radius of the torus
+  static std::shared_ptr<GeomAPI_Shape> makeTorus(double theRadius, double theRingRadius)
+                     throw (GeomAlgoAPI_Exception);
+
+  /// Creates a cone using a base point, an axis, a base radius, a top radius and a height.
+  /// \param theBasePoint The center of the lower base of the cone
+  /// \param theEdge The axis of the cone
+  /// \param theBaseRadius The base radius of the cone
+  /// \param theTopRadius The top radius of the cone
+  /// \param theHeight The height of the cone
+  static std::shared_ptr<GeomAPI_Shape> makeCone(std::shared_ptr<GeomAPI_Pnt> theBasePoint,
+                     std::shared_ptr<GeomAPI_Edge> theEdge, double theBaseRadius,
+                     double theTopRadius, double theHeight) throw (GeomAlgoAPI_Exception);
+
+  /// Creates a cone using a base radius, a top radius and a height.
+  /// \param theBaseRadius The base radius of the cone
+  /// \param theTopRadius The top radius of the cone
+  /// \param theHeight The height of the cone
+  static std::shared_ptr<GeomAPI_Shape> makeCone(double theBaseRadius, double theTopRadius,
+                     double theHeight) throw (GeomAlgoAPI_Exception);
 
   /// Performs a translation from an axis and a distance.
   /// \param theSourceShape Shape to be moved

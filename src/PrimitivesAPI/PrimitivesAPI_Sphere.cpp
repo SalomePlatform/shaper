@@ -19,14 +19,14 @@ PrimitivesAPI_Sphere::PrimitivesAPI_Sphere(const std::shared_ptr<ModelAPI_Featur
 
 //==================================================================================================
 PrimitivesAPI_Sphere::PrimitivesAPI_Sphere(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-		                                       const ModelHighAPI_Selection& theCenterPoint,
-		                                       const ModelHighAPI_Double& theRadius)
+                                           const ModelHighAPI_Selection& theCenterPoint,
+                                           const ModelHighAPI_Double& theRadius)
 : ModelHighAPI_Interface(theFeature)
 {
-	if (initialize()) {
-	  fillAttribute(theCenterPoint, centerPoint());
-	  setRadius(theRadius);
-	}
+  if (initialize()) {
+    fillAttribute(theCenterPoint, centerPoint());
+    setRadius(theRadius);
+  }
 }
 
 //==================================================================================================

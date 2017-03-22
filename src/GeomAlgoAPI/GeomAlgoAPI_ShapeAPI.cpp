@@ -8,6 +8,7 @@
 
 #include <GeomAlgoAPI_Box.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_Cone.h>
 #include <GeomAlgoAPI_ConeSegment.h>
 #include <GeomAlgoAPI_Cylinder.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
@@ -15,6 +16,7 @@
 #include <GeomAlgoAPI_Scale.h>
 #include <GeomAlgoAPI_Sphere.h>
 #include <GeomAlgoAPI_Symmetry.h>
+#include <GeomAlgoAPI_Torus.h>
 #include <GeomAlgoAPI_Translation.h>
 
 #include <GeomAPI_Lin.h>
@@ -238,6 +240,138 @@ namespace GeomAlgoAPI_ShapeAPI
       throw GeomAlgoAPI_Exception(aSphereAlgo.getError());
     }
     return aSphereAlgo.shape();
+  }
+
+  //===============================================================================================
+  std::shared_ptr<GeomAPI_Shape> makeTorus(std::shared_ptr<GeomAPI_Pnt> theBasePoint,
+                                           std::shared_ptr<GeomAPI_Edge> theEdge,
+                                           double theRadius, double theRingRadius)
+      throw (GeomAlgoAPI_Exception)
+  {
+    // Check if the base point is OK
+    if (!theBasePoint) {
+      throw GeomAlgoAPI_Exception("Torus builder :: the base point is not valid.");
+    }
+    // Check if the edge is OK
+    if (!theEdge) {
+      throw GeomAlgoAPI_Exception("Torus builder :: the axis is not valid.");
+    }
+
+    std::shared_ptr<GeomAPI_Ax2> anAxis;
+    anAxis = std::shared_ptr<GeomAPI_Ax2>(new GeomAPI_Ax2(theBasePoint,
+                                                          theEdge->line()->direction()));
+
+    GeomAlgoAPI_Torus aTorusAlgo(anAxis, theRadius, theRingRadius);
+
+    if (!aTorusAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aTorusAlgo.getError());
+    }
+
+    aTorusAlgo.build();
+
+    if(!aTorusAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aTorusAlgo.getError());
+    }
+
+    if (!aTorusAlgo.checkValid("Torus builder")) {
+      throw GeomAlgoAPI_Exception(aTorusAlgo.getError());
+    }
+    return aTorusAlgo.shape();
+  }
+
+  //===============================================================================================
+  std::shared_ptr<GeomAPI_Shape> makeTorus(double theRadius, double theRingRadius)
+      throw (GeomAlgoAPI_Exception)
+  {
+    std::shared_ptr<GeomAPI_Pnt> aBasePoint =
+      std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(0.,0.,0.));
+    std::shared_ptr<GeomAPI_Edge> aEdge = GeomAlgoAPI_EdgeBuilder::line(0., 0., 1.);
+    std::shared_ptr<GeomAPI_Ax2> anAxis;
+    anAxis = std::shared_ptr<GeomAPI_Ax2>(new GeomAPI_Ax2(aBasePoint,
+                                                          aEdge->line()->direction()));
+
+    GeomAlgoAPI_Torus aTorusAlgo(anAxis, theRadius, theRingRadius);
+
+    if (!aTorusAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aTorusAlgo.getError());
+    }
+
+    aTorusAlgo.build();
+
+    if(!aTorusAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aTorusAlgo.getError());
+    }
+
+    if (!aTorusAlgo.checkValid("Torus builder")) {
+      throw GeomAlgoAPI_Exception(aTorusAlgo.getError());
+    }
+    return aTorusAlgo.shape();
+  }
+
+  //===============================================================================================
+  std::shared_ptr<GeomAPI_Shape> makeCone(std::shared_ptr<GeomAPI_Pnt> theBasePoint,
+                                          std::shared_ptr<GeomAPI_Edge> theEdge,
+                                          double theBaseRadius, double theTopRadius,
+                                          double theHeight) throw (GeomAlgoAPI_Exception)
+  {
+    // Check if the base point is OK
+    if (!theBasePoint) {
+      throw GeomAlgoAPI_Exception("Cone builder :: the base point is not valid.");
+    }
+    // Check if the edge is OK
+    if (!theEdge) {
+      throw GeomAlgoAPI_Exception("Cone builder :: the axis is not valid.");
+    }
+
+    std::shared_ptr<GeomAPI_Ax2> anAxis;
+    anAxis = std::shared_ptr<GeomAPI_Ax2>(new GeomAPI_Ax2(theBasePoint,
+                                                          theEdge->line()->direction()));
+
+    GeomAlgoAPI_Cone aConeAlgo(anAxis, theBaseRadius, theTopRadius, theHeight);
+
+    if (!aConeAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aConeAlgo.getError());
+    }
+
+    aConeAlgo.build();
+
+    if(!aConeAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aConeAlgo.getError());
+    }
+
+    if (!aConeAlgo.checkValid("Cone builder")) {
+      throw GeomAlgoAPI_Exception(aConeAlgo.getError());
+    }
+    return aConeAlgo.shape();
+  }
+
+  //===============================================================================================
+  std::shared_ptr<GeomAPI_Shape> makeCone(double theBaseRadius, double theTopRadius,
+                                          double theHeight) throw (GeomAlgoAPI_Exception)
+  {
+    std::shared_ptr<GeomAPI_Pnt> aBasePoint =
+      std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(0.,0.,0.));
+    std::shared_ptr<GeomAPI_Edge> aEdge = GeomAlgoAPI_EdgeBuilder::line(0., 0., 1.);
+    std::shared_ptr<GeomAPI_Ax2> anAxis;
+    anAxis = std::shared_ptr<GeomAPI_Ax2>(new GeomAPI_Ax2(aBasePoint,
+                                                          aEdge->line()->direction()));
+
+    GeomAlgoAPI_Cone aConeAlgo(anAxis, theBaseRadius, theTopRadius, theHeight);
+
+    if (!aConeAlgo.check()) {
+      throw GeomAlgoAPI_Exception(aConeAlgo.getError());
+    }
+
+    aConeAlgo.build();
+
+    if(!aConeAlgo.isDone()) {
+      throw GeomAlgoAPI_Exception(aConeAlgo.getError());
+    }
+
+    if (!aConeAlgo.checkValid("Cone builder")) {
+      throw GeomAlgoAPI_Exception(aConeAlgo.getError());
+    }
+    return aConeAlgo.shape();
   }
 
   //===============================================================================================

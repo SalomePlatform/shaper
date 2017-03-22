@@ -1,0 +1,38 @@
+<!-- Copyright (C) 2014-201x CEA/DEN, EDF R&D -->
+
+<source>
+  <shape_selector
+      id="base_point"
+      label="base_point"
+      default=""
+      shape_types="vertex"
+      icon="icons/Primitives/point.png"
+      tooltip="Select the center of the torus">
+    <validator id="GeomValidators_ConstructionComposite"/>
+    <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+  </shape_selector>
+  <shape_selector
+      id="axis"
+      label="axis"
+      default=""
+      shape_types="edge"
+      icon="icons/Primitives/axis.png"
+      tooltip="Select the axis of the torus">
+    <validator id="GeomValidators_ConstructionComposite"/>
+    <validator id="GeomValidators_ShapeType" parameters="line"/>
+  </shape_selector>
+  <doublevalue
+    id="radius"
+    label="Radius"
+    step="1."
+    default="15."
+    tooltip="Enter the radius of the torus">
+  </doublevalue>
+  <doublevalue
+    id="ring_radius"
+    label="Ring radius"
+    step="1."
+    default="3."
+    tooltip="Enter the ring radius of the torus">
+  </doublevalue>
+</source>

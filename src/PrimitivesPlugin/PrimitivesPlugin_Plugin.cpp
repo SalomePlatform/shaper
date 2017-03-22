@@ -7,8 +7,10 @@
 #include <PrimitivesPlugin_Plugin.h>
 
 #include <PrimitivesPlugin_Box.h>
+#include <PrimitivesPlugin_Cone.h>
 #include <PrimitivesPlugin_Cylinder.h>
 #include <PrimitivesPlugin_Sphere.h>
+#include <PrimitivesPlugin_Torus.h>
 
 #include <ModelAPI_Session.h>
 
@@ -29,10 +31,14 @@ FeaturePtr PrimitivesPlugin_Plugin::createFeature(std::string theFeatureID)
 {
   if (theFeatureID == PrimitivesPlugin_Box::ID()) {
     return FeaturePtr(new PrimitivesPlugin_Box);
+  } else if (theFeatureID == PrimitivesPlugin_Cone::ID()) {
+    return FeaturePtr(new PrimitivesPlugin_Cone);
   } else if (theFeatureID == PrimitivesPlugin_Cylinder::ID()) {
     return FeaturePtr(new PrimitivesPlugin_Cylinder);
   } else if (theFeatureID == PrimitivesPlugin_Sphere::ID()) {
     return FeaturePtr(new PrimitivesPlugin_Sphere);
+  } else if (theFeatureID == PrimitivesPlugin_Torus::ID()) {
+    return FeaturePtr(new PrimitivesPlugin_Torus);
   }
   // feature of such kind is not found
   return FeaturePtr();

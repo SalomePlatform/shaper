@@ -1,0 +1,46 @@
+<!-- Copyright (C) 2014-201x CEA/DEN, EDF R&D -->
+
+<source>
+  <shape_selector
+      id="base_point"
+      label="base_point"
+      default=""
+      shape_types="vertex"
+      icon="icons/Primitives/point.png"
+      tooltip="Select the center of the base of the cone">
+    <validator id="GeomValidators_ConstructionComposite"/>
+    <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+  </shape_selector>
+  <shape_selector
+      id="axis"
+      label="axis"
+      default=""
+      shape_types="edge"
+      icon="icons/Primitives/axis.png"
+      tooltip="Select the axis of the cone">
+    <validator id="GeomValidators_ConstructionComposite"/>
+    <validator id="GeomValidators_ShapeType" parameters="line"/>
+  </shape_selector>
+  <doublevalue
+    id="base_radius"
+    label="Base radius"
+    step="1."
+    default="10."
+    tooltip="Enter the base radius of the cone">
+  </doublevalue>
+  <doublevalue
+    id="top_radius"
+    label="Top radius"
+    step="1."
+    default="5."
+    tooltip="Enter the top radius of the cone">
+  </doublevalue>
+  <doublevalue
+    id="height"
+    label="height"
+    step="1."
+    default="10."
+    icon="icons/Primitives/dimension_v.png"
+    tooltip="Enter the height of the cone">
+  </doublevalue>
+</source>

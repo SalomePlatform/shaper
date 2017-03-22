@@ -13,8 +13,6 @@
 
 #include <BRepPrimAPI_MakeCylinder.hxx>
 
-#include <iostream>
-
 //=================================================================================================
 GeomAlgoAPI_Cylinder::GeomAlgoAPI_Cylinder()
 {

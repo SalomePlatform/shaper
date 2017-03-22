@@ -18,5 +18,15 @@
         <source path="sphere_widget.xml"/>
       </feature>
     </group>
+    <group id="Primitives">
+      <feature id="Torus" title="Torus" tooltip="Create a Torus" icon="icons/Primitives/torus.png">
+        <source path="torus_widget.xml"/>
+      </feature>
+    </group>
+    <group id="Primitives">
+      <feature id="Cone" title="Cone" tooltip="Create a Cone" icon="icons/Primitives/cone.png">
+        <source path="cone_widget.xml"/>
+      </feature>
+    </group>
   </workbench>
 </plugin>
