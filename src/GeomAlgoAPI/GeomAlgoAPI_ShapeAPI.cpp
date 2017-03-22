@@ -243,9 +243,9 @@ namespace GeomAlgoAPI_ShapeAPI
   }
 
   //===============================================================================================
-  std::shared_ptr<GeomAPI_Shape> makeTorus(std::shared_ptr<GeomAPI_Pnt> theBasePoint,
-                                           std::shared_ptr<GeomAPI_Edge> theEdge,
-                                           double theRadius, double theRingRadius)
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeTorus(
+      std::shared_ptr<GeomAPI_Pnt> theBasePoint,
+      std::shared_ptr<GeomAPI_Edge> theEdge,double theRadius, double theRingRadius)
       throw (GeomAlgoAPI_Exception)
   {
     // Check if the base point is OK
@@ -280,8 +280,8 @@ namespace GeomAlgoAPI_ShapeAPI
   }
 
   //===============================================================================================
-  std::shared_ptr<GeomAPI_Shape> makeTorus(double theRadius, double theRingRadius)
-      throw (GeomAlgoAPI_Exception)
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeTorus(double theRadius,
+      double theRingRadius) throw (GeomAlgoAPI_Exception)
   {
     std::shared_ptr<GeomAPI_Pnt> aBasePoint =
       std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(0.,0.,0.));
@@ -309,10 +309,11 @@ namespace GeomAlgoAPI_ShapeAPI
   }
 
   //===============================================================================================
-  std::shared_ptr<GeomAPI_Shape> makeCone(std::shared_ptr<GeomAPI_Pnt> theBasePoint,
-                                          std::shared_ptr<GeomAPI_Edge> theEdge,
-                                          double theBaseRadius, double theTopRadius,
-                                          double theHeight) throw (GeomAlgoAPI_Exception)
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeCone(
+      std::shared_ptr<GeomAPI_Pnt> theBasePoint,
+      std::shared_ptr<GeomAPI_Edge> theEdge,
+      double theBaseRadius, double theTopRadius,
+      double theHeight) throw (GeomAlgoAPI_Exception)
   {
     // Check if the base point is OK
     if (!theBasePoint) {
@@ -346,8 +347,9 @@ namespace GeomAlgoAPI_ShapeAPI
   }
 
   //===============================================================================================
-  std::shared_ptr<GeomAPI_Shape> makeCone(double theBaseRadius, double theTopRadius,
-                                          double theHeight) throw (GeomAlgoAPI_Exception)
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeCone(
+      double theBaseRadius, double theTopRadius,
+      double theHeight) throw (GeomAlgoAPI_Exception)
   {
     std::shared_ptr<GeomAPI_Pnt> aBasePoint =
       std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(0.,0.,0.));
