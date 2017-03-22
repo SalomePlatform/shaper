@@ -490,7 +490,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     updateArguments(theFeature);
     std::shared_ptr<GeomAPI_Shape> aShapeAfter = anExtSel->value();
     if (!aShapeAfter.get() && anExtSel->context()) aShapeAfter = anExtSel->context()->shape();
-    // if selected plane is different, make all subs taouched, reason of this sketch to be recomputed
+    // if selected plane is changed, try to re-take external references of all subs of the sketch
     if (aShapeBefore.get() && !aShapeBefore->isEqual(aShapeAfter)) {
       std::set<FeaturePtr> aWholeR;
       allReasons(theFeature, aWholeR);
