@@ -43,7 +43,7 @@ void Model_ResultPart::initAttributes()
 
   if (aDocRef->isInitialized() && // initialized immideately means already exist and will be loaded
       !Model_Application::getApplication()->hasDocument(aDocRef->docId()))
-    Model_Application::getApplication()->setLoadByDemand(data()->name());
+    Model_Application::getApplication()->setLoadByDemand(data()->name(), aDocRef->docId());
 }
 
 std::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
