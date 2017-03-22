@@ -10,6 +10,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <GeomAPI_PlanarEdges.h>
 
 #include <Events_InfoMessage.h>

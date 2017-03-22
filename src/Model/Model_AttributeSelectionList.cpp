@@ -10,6 +10,8 @@
 #include "Model_Events.h"
 #include "Model_Data.h"
 
+#include <GeomAPI_Shape.h>
+
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDF_RelocationTable.hxx>

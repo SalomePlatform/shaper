@@ -4,20 +4,22 @@
 #include <SketchSolver_Error.h>
 
 #include <PlaneGCSSolver_ConstraintWrapper.h>
-#include <PlaneGCSSolver_EntityWrapper.h>
+#include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
+
+#include <GeomDataAPI_Point2D.h>
+
+#include <cmath>
+
+// Find parameters of the feature that have been updated during the movement
+static EntityWrapperPtr getChangedEntity(const FeaturePtr& theFeature,
+                                         const StoragePtr& theStorage);
 
 
 SketchSolver_ConstraintFixed::SketchSolver_ConstraintFixed(ConstraintPtr theConstraint)
   : SketchSolver_Constraint(theConstraint)
 {
   myType = CONSTRAINT_FIXED;
-////  AttributeRefAttrPtr anAttribute =
-////      theConstraint->refattr(SketchPlugin_ConstraintRigid::ENTITY_A());
-////  if (anAttribute->isObject())
-////    myFixedFeature = ModelAPI_Feature::feature(anAttribute->object());
-////  else
-////    myFixedAttribute = anAttribute->attr();
 }
 
 SketchSolver_ConstraintFixed::SketchSolver_ConstraintFixed(FeaturePtr theFeature)
@@ -25,7 +27,6 @@ SketchSolver_ConstraintFixed::SketchSolver_ConstraintFixed(FeaturePtr theFeature
     myBaseFeature(theFeature)
 {
   myType = CONSTRAINT_FIXED;
-////  process();
 }
 
 void SketchSolver_ConstraintFixed::blockEvents(bool isBlocked)
@@ -56,8 +57,8 @@ void SketchSolver_ConstraintFixed::process()
 
 void SketchSolver_ConstraintFixed::fixFeature(EntityWrapperPtr theFeature)
 {
-  std::shared_ptr<PlaneGCSSolver_EntityWrapper> anEntity =
-      std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(theFeature);
+  std::shared_ptr<PlaneGCSSolver_EdgeWrapper> anEntity =
+      std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theFeature);
 
   GCS::VEC_pD aParameters; // parameters of entity to be fixed
 
@@ -125,8 +126,8 @@ void SketchSolver_ConstraintFixed::getAttributes(
 {
   if (myBaseFeature) {
     // The feature is fixed.
+    EntityWrapperPtr aSolverEntity = getChangedEntity(myBaseFeature, myStorage);
     myStorage->update(myBaseFeature);
-    EntityWrapperPtr aSolverEntity = myStorage->entity(myBaseFeature);
     if (aSolverEntity)
       theAttributes.push_back(aSolverEntity);
   } else if (myBaseConstraint) {
@@ -140,4 +141,41 @@ void SketchSolver_ConstraintFixed::getAttributes(
         theAttributes.push_back(*anIt);
   } else
     myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
+}
+
+
+
+
+// ====================   Auxiliary functions   ===============================
+static bool isSameCoordinates(const AttributePoint2DPtr& thePointAttr,
+                              const PointWrapperPtr& thePointWrapper)
+{
+  GCSPointPtr aGCSPoint = thePointWrapper->point();
+  return fabs(*aGCSPoint->x - thePointAttr->x()) < tolerance &&
+         fabs(*aGCSPoint->y - thePointAttr->y()) < tolerance;
+}
+
+EntityWrapperPtr getChangedEntity(const FeaturePtr& theFeature,
+                                  const StoragePtr& theStorage)
+{
+  std::list<AttributePtr> aPoints = theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+  std::list<EntityWrapperPtr> aChangedPoints;
+
+  std::list<AttributePtr>::const_iterator aPIt = aPoints.begin();
+  for (; aPIt != aPoints.end(); ++aPIt) {
+    AttributePoint2DPtr aPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*aPIt);
+    EntityWrapperPtr anEnt = theStorage->entity(*aPIt);
+    if (!anEnt)
+      continue;
+    PointWrapperPtr aPW = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(anEnt);
+    if (!isSameCoordinates(aPnt, aPW))
+      aChangedPoints.push_back(anEnt);
+  }
+
+  EntityWrapperPtr aChanged;
+  if (aChangedPoints.size() == 1)
+    aChanged = aChangedPoints.front();
+  else if (!aChangedPoints.empty()) // update whole feature
+    aChanged = theStorage->entity(theFeature);
+  return aChanged;
 }

@@ -8,8 +8,6 @@
 #define PlaneGCSSolver_Storage_H_
 
 #include <PlaneGCSSolver_Defs.h>
-
-#include <SketchSolver.h>
 #include <SketchSolver_Storage.h>
 
 class PlaneGCSSolver_EntityBuilder;

@@ -11,6 +11,7 @@
 #include <GeomAPI_Ax1.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
+#include <GeomAPI_Trsf.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>

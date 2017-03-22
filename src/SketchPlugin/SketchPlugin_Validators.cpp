@@ -16,6 +16,7 @@
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Sketch.h"
+#include "SketchPlugin_Trim.h"
 #include "SketchPlugin_Tools.h"
 
 #include "SketcherPrs_Tools.h"
@@ -36,6 +37,7 @@
 #include <ModelAPI_ResultConstruction.h>
 
 #include <ModelGeomAlgo_Point2D.h>
+#include <ModelGeomAlgo_Shape.h>
 
 #include <GeomAPI_Circ.h>
 #include <GeomAPI_Lin.h>
@@ -820,7 +822,7 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
       aKind == SketchPlugin_Circle::ID()) {
 
     std::set<ResultPtr> anEdgeShapes;
-    ModelAPI_Tools::shapesOfType(anAttrFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
+    ModelGeomAlgo_Shape::shapesOfType(anAttrFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
     if (anEdgeShapes.empty() || anEdgeShapes.size() > 1 /*there case has not existed yet*/)
       return aValid;
 
@@ -859,6 +861,63 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
   }
 
   return aValid;
+}
+
+bool SketchPlugin_TrimValidator::isValid(const AttributePtr& theAttribute,
+                                         const std::list<std::string>& theArguments,
+                                         Events_InfoMessage& theError) const
+{
+  bool aValid = false;
+
+  if (theAttribute->attributeType() != ModelAPI_AttributeReference::typeId()) {
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
+    return aValid;
+  }
+  AttributeReferencePtr aBaseObjectAttr =
+            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
+
+  std::shared_ptr<SketchPlugin_Feature> aTrimFeature =
+                 std::dynamic_pointer_cast<SketchPlugin_Feature>(theAttribute->owner());
+
+  ObjectPtr aBaseObject = aBaseObjectAttr->value();
+  if (!aBaseObject) {
+    AttributePtr aPreviewAttr = aTrimFeature->attribute(SketchPlugin_Trim::PREVIEW_OBJECT());
+    aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(aPreviewAttr);
+    aBaseObject = aBaseObjectAttr->value();
+
+    //return aValid;
+  }
+
+  FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObject);
+  if (!aBaseFeature)
+    return aValid;
+
+  std::string aKind = aBaseFeature->getKind();
+  if (aKind != SketchPlugin_Line::ID() &&
+      aKind != SketchPlugin_Arc::ID() &&
+      aKind != SketchPlugin_Circle::ID())
+    return aValid;
+
+  // point on feature
+  AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                       aTrimFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
+
+  SketchPlugin_Sketch* aSketch = aTrimFeature->sketch();
+
+  std::shared_ptr<GeomAPI_Pnt2d> anAttributePnt2d = aPoint->pnt();
+  std::shared_ptr<GeomAPI_Pnt> anAttributePnt = aSketch->to3D(anAttributePnt2d->x(),
+                                                              anAttributePnt2d->y());
+
+  std::map<ObjectPtr, std::set<GeomShapePtr> > aCashedShapes;
+  std::map<ObjectPtr, std::map<std::shared_ptr<GeomAPI_Pnt>,
+           std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,
+                     std::list<std::shared_ptr<ModelAPI_Object> > > > > anObjectToPoints;
+  SketchPlugin_Trim::fillObjectShapes(aBaseObject, aSketch->data()->owner(),
+                                      aCashedShapes, anObjectToPoints);
+  const std::set<GeomShapePtr>& aShapes = aCashedShapes[aBaseObject];
+
+  return aShapes.size() > 1;
 }
 
 bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,

@@ -7,7 +7,6 @@
 #ifndef SketchSolver_ConstraintEqual_H_
 #define SketchSolver_ConstraintEqual_H_
 
-#include "SketchSolver.h"
 #include <SketchSolver_Constraint.h>
 
 /** \class   SketchSolver_ConstraintEqual

@@ -11,6 +11,8 @@
 #include <ModelAPI_AttributeSelection.h>
 #include "ModelAPI_Object.h"
 
+#include <GeomAPI_Shape.h>
+
 bool GeomValidators_DifferentShapes::isValid(const AttributePtr& theAttribute,
                                       const std::list<std::string>& theArguments,
                                       Events_InfoMessage& theError) const

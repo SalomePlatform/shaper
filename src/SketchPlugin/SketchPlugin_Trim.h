@@ -14,6 +14,7 @@
 class GeomDataAPI_Point2D;
 class ModelAPI_Feature;
 class ModelAPI_Result;
+class ModelAPI_Object;
 
 typedef std::pair<std::string, std::shared_ptr<GeomDataAPI_Point2D> > IdToPointPair;
 
@@ -38,17 +39,31 @@ class SketchPlugin_Trim : public SketchPlugin_Feature, public GeomAPI_IPresentab
   }
 
   /// The value parameter for the constraint
-  inline static const std::string& BASE_OBJECT()
+  inline static const std::string& SELECTED_OBJECT()
   {
-    static const std::string MY_CONSTRAINT_BASE_OBJECT("BaseObject");
-    return MY_CONSTRAINT_BASE_OBJECT;
+    static const std::string MY_SELECTED_OBJECT("SelectedObject");
+    return MY_SELECTED_OBJECT;
   }
 
   /// Start 2D point of the split segment
-  inline static const std::string& ENTITY_POINT()
+  inline static const std::string& SELECTED_POINT()
   {
-    static const std::string MY_ENTITY_POINT("ConstraintEntityPoint");
-    return MY_ENTITY_POINT;
+    static const std::string MY_SELECTED_POINT("SelectedPoint");
+    return MY_SELECTED_POINT;
+  }
+
+  /// The value parameter for the preview object
+  inline static const std::string& PREVIEW_OBJECT()
+  {
+    static const std::string MY_PREVIEW_OBJECT("PreviewObject");
+    return MY_PREVIEW_OBJECT;
+  }
+
+  /// Start 2D point of the split segment
+  inline static const std::string& PREVIEW_POINT()
+  {
+    static const std::string MY_PREVIEW_POINT("PreviewPoint");
+    return MY_PREVIEW_POINT;
   }
 
   /// \brief Creates a new part document if needed
@@ -65,10 +80,6 @@ class SketchPlugin_Trim : public SketchPlugin_Feature, public GeomAPI_IPresentab
   /// This is necessary to perform execute only by apply the feature
   SKETCHPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return false; }
 
-  /// Called on change of any argument-attribute of this object
-  /// \param theID identifier of changed attribute
-  SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
-
   /// \brief Use plugin manager for features creation
   SketchPlugin_Trim();
 
@@ -78,7 +89,19 @@ class SketchPlugin_Trim : public SketchPlugin_Feature, public GeomAPI_IPresentab
   /// Moves the feature : Empty
   SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY) {};
 
+  typedef std::map<std::shared_ptr<GeomAPI_Pnt>,
+                   std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,
+                             std::list<std::shared_ptr<ModelAPI_Object> > > > PointToRefsMap;
+
+  static void fillObjectShapes(const std::shared_ptr<ModelAPI_Object>& theObject,
+    const std::shared_ptr<ModelAPI_Object>& theSketch,
+    std::map<std::shared_ptr<ModelAPI_Object>, std::set<GeomShapePtr> >& theCashedShapes,
+    std::map<std::shared_ptr<ModelAPI_Object>, PointToRefsMap>& theObjectToPoints);
+
 private:
+  GeomShapePtr getSubShape(const std::string& theObjectAttributeId,
+                           const std::string& thePointAttributeId);
+
   /// Returns geom point attribute of the feature bounds. It processes line or arc.
   /// For circle feature, the result attributes are null
   /// \param theFeature a source feature
@@ -108,7 +131,7 @@ private:
   /// by the coincident attribute
   /// \param theObject an investigated object
   /// \param theCoincidencesToBaseFeature a container of list of referenced attributes
-  void getCoincidencesToObject(const ObjectPtr& theObject,
+  void getCoincidencesToObject(const std::shared_ptr<ModelAPI_Object>& theObject,
                                std::map<AttributePtr, FeaturePtr>& theCoincidencesToBaseFeature);
 
   /// Move constraints from attribute of base feature to attribute after modification
@@ -237,23 +260,16 @@ private:
                                     const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
 private:
-  bool useGraphicIntersection() const;
-
-  void fillObjectShapes(const ObjectPtr& theObject);
-
-  void findShapePoints(std::shared_ptr<GeomAPI_Pnt>& aStartPoint,
+  void findShapePoints(const std::string& theObjectAttributeId,
+                       const std::string& thePointAttributeId,
+                       std::shared_ptr<GeomAPI_Pnt>& aStartPoint,
                        std::shared_ptr<GeomAPI_Pnt>& aLastPoint);
 
   std::shared_ptr<GeomAPI_Pnt2d> convertPoint(const std::shared_ptr<GeomAPI_Pnt>& thePoint);
 
 private:
-  std::map<ObjectPtr, std::set<GeomShapePtr> > myCashedShapes;
-
-  typedef std::map<std::shared_ptr<GeomAPI_Pnt>,
-                   std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,
-                             std::list<std::shared_ptr<ModelAPI_Object> > > > PointToRefsMap;
-
-  std::map<ObjectPtr, PointToRefsMap> myObjectToPoints;
+  std::map<std::shared_ptr<ModelAPI_Object>, std::set<GeomShapePtr> > myCashedShapes;
+  std::map<std::shared_ptr<ModelAPI_Object>, PointToRefsMap> myObjectToPoints;
 };
 
 #endif

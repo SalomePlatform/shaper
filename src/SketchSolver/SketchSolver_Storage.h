@@ -7,9 +7,8 @@
 #ifndef SketchSolver_Storage_H_
 #define SketchSolver_Storage_H_
 
-#include <SketchSolver.h>
-#include <SketchSolver_IConstraintWrapper.h>
-#include <SketchSolver_IEntityWrapper.h>
+#include <PlaneGCSSolver_ConstraintWrapper.h>
+#include <PlaneGCSSolver_EntityWrapper.h>
 
 #include <PlaneGCSSolver_Solver.h>
 #include <PlaneGCSSolver_UpdateFeature.h>

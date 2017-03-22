@@ -24,6 +24,12 @@ IF(EXISTS ${TINSPECTOR_ROOT_DIR})
     FIND_LIBRARY(TKVInspector TKVInspector "${TINSPECTOR_LIB_DIR}")
     SET(TKVInspector ${TKVInspector})
 
+    FIND_LIBRARY(DFBrowserAPI DFBrowserAPI "${TINSPECTOR_LIB_DIR}")
+    SET(DFBrowserAPI ${DFBrowserAPI})
+
+    FIND_LIBRARY(TKDFTreeModel TKDFTreeModel "${TINSPECTOR_LIB_DIR}")
+    SET(TKDFTreeModel ${TKDFTreeModel})
+
   ENDIF(TKTInspector)
 
 ENDIF(EXISTS ${TINSPECTOR_ROOT_DIR})

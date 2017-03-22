@@ -16,6 +16,7 @@
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
+#include <GeomAPI_Trsf.h>
 
 #include <FeaturesPlugin_Tools.h>
 

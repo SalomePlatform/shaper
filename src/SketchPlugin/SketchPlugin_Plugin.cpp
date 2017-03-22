@@ -78,6 +78,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_FilletVertexValidator);
   aFactory->registerValidator("SketchPlugin_SplitValidator",
                               new SketchPlugin_SplitValidator);
+  aFactory->registerValidator("SketchPlugin_TrimValidator",
+                              new SketchPlugin_TrimValidator);
   aFactory->registerValidator("SketchPlugin_MiddlePointAttr",
                               new SketchPlugin_MiddlePointAttrValidator);
   aFactory->registerValidator("SketchPlugin_ArcTangentPoint",

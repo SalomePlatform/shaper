@@ -209,6 +209,13 @@ assert (math.fabs(aLine1Len - anExtLineLen) < 1.e-10)
 assert (math.fabs(aLine2Len - anExtLineLen) < 1.e-10)
 assert (model.dof(aSketchFeature) == 12)
 #=========================================================================
+# Remove costraint to check the DOF
+#=========================================================================
+aSession.startOperation()
+aDocument.removeFeature(aConstraintEqLen2)
+aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 13)
+#=========================================================================
 # End of test
 #=========================================================================
 

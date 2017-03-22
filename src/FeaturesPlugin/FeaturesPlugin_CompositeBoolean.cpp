@@ -7,6 +7,7 @@
 #include "FeaturesPlugin_CompositeBoolean.h"
 
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_Tools.h>
 
 #include <GeomAlgoAPI_Boolean.h>

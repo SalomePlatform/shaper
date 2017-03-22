@@ -21,6 +21,8 @@
 #include <Config_ValidatorMessage.h>
 #include <Config_ModuleReader.h>
 #include <Config_ValidatorReader.h>
+
+#include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Tools.h>
 

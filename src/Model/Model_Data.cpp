@@ -302,6 +302,12 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
       if (myWasChangedButBlocked.empty() || *(myWasChangedButBlocked.rbegin()) != theAttr)
         myWasChangedButBlocked.push_back(theAttr);
     }
+  } else {
+    // trim: need to redisplay
+    if (myObject) {
+      static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+      ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
+    }
   }
 }
 

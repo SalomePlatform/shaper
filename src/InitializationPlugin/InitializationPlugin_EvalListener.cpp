@@ -21,6 +21,7 @@
 #include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
 

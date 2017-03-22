@@ -7,7 +7,6 @@
 #ifndef SketchSolver_ConstraintMultiTranslation_H_
 #define SketchSolver_ConstraintMultiTranslation_H_
 
-#include "SketchSolver.h"
 #include <SketchSolver_ConstraintMulti.h>
 
 #include "GeomDataAPI_Point2D.h"

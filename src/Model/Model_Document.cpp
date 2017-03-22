@@ -16,6 +16,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
 

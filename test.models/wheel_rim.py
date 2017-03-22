@@ -59,6 +59,16 @@ SketchConstraintCoincidence_18 = Sketch_1.setCoincident(SketchLine_7.startPoint(
 SketchConstraintCoincidence_18.setName("SketchConstraintCoincidence_20")
 SketchConstraintTangent_2 = Sketch_1.setTangent(SketchArc_2.results()[1], SketchArc_3.results()[1])
 SketchConstraintTangent_3 = Sketch_1.setTangent(SketchArc_3.results()[1], SketchArc_2.results()[1])
+model.do()
+
+# check overconstraint message appears
+assert Sketch_1.solverError().value() != "", "FAILED: Sketch should report over-constrained situation"
+# remove duplicated Tangent constraint
+Part_1_doc.removeFeature(SketchConstraintTangent_3.feature())
+model.do()
+assert Sketch_1.solverError().value() == "", "FAILED: Sketch should NOT report over-constrained situation"
+
+# continue creating model
 SketchLine_8 = Sketch_1.addLine(16.63997893808557, 190, 16.63997893808557, 184)
 SketchConstraintCoincidence_19 = Sketch_1.setCoincident(SketchLine_2.startPoint(), SketchLine_8.startPoint())
 SketchConstraintCoincidence_19.setName("SketchConstraintCoincidence_21")
@@ -234,6 +244,6 @@ model.testNbSubShapes(Boolean_1, GeomAPI_Shape.SOLID, [1])
 model.testNbSubShapes(Boolean_1, GeomAPI_Shape.FACE, [35])
 model.testNbSubShapes(Boolean_1, GeomAPI_Shape.EDGE, [162])
 model.testNbSubShapes(Boolean_1, GeomAPI_Shape.VERTEX, [324])
-model.testResultsVolumes(Boolean_1, [2053931.831648423336446285247802734])
+model.testResultsVolumes(Boolean_1, [2053931.555419394280761480331420898])
 
 assert(model.checkPythonDump())

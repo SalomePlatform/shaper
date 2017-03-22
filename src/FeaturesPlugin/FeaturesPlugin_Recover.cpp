@@ -14,6 +14,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
 #include <GeomAlgoAPI_Copy.h>
 

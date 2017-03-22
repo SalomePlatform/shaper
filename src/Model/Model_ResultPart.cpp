@@ -20,6 +20,8 @@
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
 
+#include <GeomAPI_Trsf.h>
+
 #include <TNaming_Tool.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TDataStd_Name.hxx>

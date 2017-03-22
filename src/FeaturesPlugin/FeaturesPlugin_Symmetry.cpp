@@ -12,6 +12,7 @@
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Pln.h>
+#include <GeomAPI_Trsf.h>
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>

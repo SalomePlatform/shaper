@@ -49,10 +49,10 @@ Q_OBJECT
 
   virtual ~PartSet_WidgetFeaturePointSelector();
 
-  /// Checks all widget validator if the owner is valid. Firstly it checks custom widget validating,
-  /// next, the attribute's validating. It trying on the give selection to current attribute by
-  /// setting the value inside and calling validators. After this, the previous attribute value is
-  /// restored.The valid/invalid value is cashed.
+  /// Checks all widget validator if the owner is valid. Firstly it checks custom widget
+  /// validating, next, the attribute's validating. It trying on the give selection to current
+  /// attribute by setting the value inside and calling validators. After this, the previous
+  /// attribute value is restored.The valid/invalid value is cashed.
   /// \param theValue a selected presentation in the view
   /// \return a boolean value
   virtual bool isValidSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
@@ -81,10 +81,6 @@ Q_OBJECT
   /// \param theEvent a mouse event
   virtual void mouseReleased(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent);
 
-  /// Returns values which should be highlighted when the whidget is active
-  /// \param theValues a list of presentations
-  //virtual void getHighlighted(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
-
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// The method is called by the current operation to process the operation preselection.
@@ -95,7 +91,6 @@ Q_OBJECT
                             const bool theToValidate);
 
   /// Fill preselection used in mouseReleased
-  //virtual void setPreSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePreSelected);
   virtual void setPreSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePreSelected,
                                ModuleBase_IViewWindow* theWnd,
                                QMouseEvent* theEvent);
@@ -104,9 +99,6 @@ protected:
   /// \return a list of viewer presentations, which contains an attribute result and
   /// a shape. If the attribute do not uses the shape, it is empty
   virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getAttributeSelection() const;
-
-  /// Computes and updates name of selected object in the widget
-  virtual void updateSelectionName();
 
 protected:
   /// The methiod called when widget is activated
@@ -121,7 +113,6 @@ protected:
   CompositeFeaturePtr mySketch;
   Quantity_Color myHighlightColor;
   Quantity_Color mySelectionColor;
-  bool myBaseSelected;
 };
 
 #endif

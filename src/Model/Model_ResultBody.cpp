@@ -6,6 +6,7 @@
 
 #include <Model_ResultBody.h>
 #include <Model_BodyBuilder.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_Tools.h>
 #include <Config_PropManager.h>
 #include <ModelAPI_Events.h>

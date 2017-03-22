@@ -197,7 +197,17 @@ aSession.finishOperation()
 # Verify the objects of fillet are created
 #=========================================================================
 checkSmoothness(aSketchFeature)
-assert model.dof(aSketchFeature) == 14, "PlaneGCS limitation: if you see this message, then maybe PlaneGCS has solved DoF for sketch with fillet correctly (expected DoF = 10, observed = {0}".format(model.dof(aSketchFeature))
+assert (model.dof(aSketchFeature) == 10)
+#=========================================================================
+# Move a line and check the fillet is correct
+#=========================================================================
+DELTA_X = DELTA_Y = 10.
+aSession.startOperation()
+aEndPoint1.setValue(aEndPoint1.x() + DELTA_X, aEndPoint1.y() + DELTA_Y)
+aSession.finishOperation()
+checkSmoothness(aSketchFeature)
+assert (model.dof(aSketchFeature) == 10)
+
 
 #=========================================================================
 # Create another sketch
@@ -228,12 +238,21 @@ aSession.finishOperation()
 # Verify the objects of fillet are created
 #=========================================================================
 checkSmoothness(aSketchFeature)
-assert model.dof(aSketchFeature) == 10, "PlaneGCS limitation: if you see this message, then maybe PlaneGCS has solved DoF for sketch with fillet correctly (expected DoF = 8, observed = {0}".format(model.dof(aSketchFeature))
+assert (model.dof(aSketchFeature) == 8)
+#=========================================================================
+# Move a line and check the fillet is correct
+#=========================================================================
+DELTA_X = 1.
+DELTA_Y = -2.
+aSession.startOperation()
+aStartPoint1.setValue(aStartPoint1.x() + DELTA_X, aStartPoint1.y() + DELTA_Y)
+aSession.finishOperation()
+checkSmoothness(aSketchFeature)
+assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # End of test
 #=========================================================================
 
 # TODO: Improve Fillet test case by moving one of filleted objectes and check coincidence and tangency are correct
 
-# TODO: Checking of Python dump has been disabled until the Fillet redesigned.
-#assert(model.checkPythonDump())
+assert(model.checkPythonDump())

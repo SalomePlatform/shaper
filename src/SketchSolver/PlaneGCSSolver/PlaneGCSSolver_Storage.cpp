@@ -7,7 +7,7 @@
 #include <PlaneGCSSolver_Storage.h>
 #include <PlaneGCSSolver_Solver.h>
 #include <PlaneGCSSolver_ConstraintWrapper.h>
-#include <PlaneGCSSolver_EntityWrapper.h>
+#include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
 
 #include <PlaneGCSSolver_AttributeBuilder.h>
@@ -31,7 +31,7 @@ static void constraintsToSolver(const ConstraintWrapperPtr& theConstraint,
       std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(theConstraint)->constraints();
   std::list<GCSConstraintPtr>::const_iterator anIt = aConstraints.begin();
   for (; anIt != aConstraints.end(); ++anIt)
-    theSolver->addConstraint(*anIt, theConstraint->type());
+    theSolver->addConstraint(*anIt);
 }
 
 
@@ -193,8 +193,8 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
   if (aRelated && aRelated->type() == ENTITY_ARC) {
     /// TODO: this code should be shared with FeatureBuilder somehow
 
-    std::shared_ptr<PlaneGCSSolver_EntityWrapper> anEntity =
-        std::dynamic_pointer_cast<PlaneGCSSolver_EntityWrapper>(aRelated);
+    std::shared_ptr<PlaneGCSSolver_EdgeWrapper> anEntity =
+        std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(aRelated);
     std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEntity->entity());
 
     static std::shared_ptr<GeomAPI_Dir2d> OX(new GeomAPI_Dir2d(1.0, 0.0));
@@ -259,9 +259,20 @@ bool PlaneGCSSolver_Storage::removeConstraint(ConstraintPtr theConstraint)
   std::map<ConstraintPtr, ConstraintWrapperPtr>::iterator
       aFound = myConstraintMap.find(theConstraint);
   if (aFound != myConstraintMap.end()) {
-    ConstraintID anID = aFound->second->id();
+    ConstraintWrapperPtr aCW = aFound->second;
+    ConstraintID anID = aCW->id();
+
     // Remove solver's constraints
     mySketchSolver->removeConstraint(anID);
+
+    // Remove value if exists
+    const ScalarWrapperPtr& aValue = aCW->valueParameter();
+    if (aValue) {
+      GCS::SET_pD aParToRemove;
+      aParToRemove.insert(aValue->scalar());
+      removeParameters(aParToRemove);
+    }
+
     // Remove constraint
     myConstraintMap.erase(aFound);
 
@@ -295,7 +306,8 @@ void PlaneGCSSolver_Storage::removeInvalidEntities()
   for (; aFIter != myFeatureMap.end(); aFIter++)
     if (!aFIter->first->data() || !aFIter->first->data()->isValid()) {
       anInvalidFeatures.push_back(aFIter->first);
-      aDestroyer.remove(aFIter->second);
+      if (aFIter->second)
+        aDestroyer.remove(aFIter->second);
 
       // remove invalid arc
       std::map<EntityWrapperPtr, ConstraintWrapperPtr>::iterator

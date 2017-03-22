@@ -143,4 +143,5 @@ ADD_UNIT_TESTS(TestConstants.py
                Test1757.py
                Test1998.py
                Test1995.py
+               TestExternalConstruction.py
 )

@@ -27,6 +27,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
 

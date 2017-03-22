@@ -8,10 +8,12 @@ INCLUDE(UnitTest)
 SET(PROJECT_HEADERS
     ModelGeomAlgo.h
     ModelGeomAlgo_Point2D.h
+    ModelGeomAlgo_Shape.h
 )
 
 SET(PROJECT_SOURCES
     ModelGeomAlgo_Point2D.cpp
+    ModelGeomAlgo_Shape.cpp
 )
 
 SET(PROJECT_LIBRARIES

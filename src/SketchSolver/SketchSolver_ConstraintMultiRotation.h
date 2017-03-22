@@ -7,7 +7,6 @@
 #ifndef SketchSolver_ConstraintMultiRotation_H_
 #define SketchSolver_ConstraintMultiRotation_H_
 
-#include "SketchSolver.h"
 #include <SketchSolver_ConstraintMulti.h>
 
 #include "GeomDataAPI_Point2D.h"

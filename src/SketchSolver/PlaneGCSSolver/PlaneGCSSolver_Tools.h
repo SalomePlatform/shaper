@@ -54,11 +54,6 @@ namespace PlaneGCSSolver_Tools
   /// \brief Convert entity to line
   /// \return empty pointer if the entity is not a line
   std::shared_ptr<GeomAPI_Lin2d> line(FeaturePtr theFeature);
-
-  /// \brief Check if two connected arcs have centers
-  ///        in same direction relatively to connection point
-  bool isArcArcTangencyInternal(EntityWrapperPtr theArc1,
-                                EntityWrapperPtr theArc2);
 };
 
 #endif
