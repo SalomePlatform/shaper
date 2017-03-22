@@ -123,7 +123,10 @@ INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Sketc
 INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
 ADD_UNIT_TESTS(TestSketchPointLine.py
-               TestSketchArcCircle.py
+               TestCreateArc.py
+               TestCreateCircleByCenterAndPassed.py
+               TestCreateCircleByThreePoints.py
+               TestCreateCircleChangeType.py
                TestConstraintCoincidence.py
                TestConstraintCollinear.py
                TestConstraintLength.py

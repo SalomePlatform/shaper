@@ -1,6 +1,6 @@
 """
-    TestSketchArcCircle.py
-    
+    TestCreateArc.py
+
     static const std::string MY_SKETCH_ARC_ID("SketchArc");
     static const std::string MY_CENTER_ID = "ArcCenter";
     static const std::string MY_START_ID = "ArcStartPoint";
@@ -8,12 +8,6 @@
     data()->addAttribute(SketchPlugin_Arc::CENTER_ID(), GeomDataAPI_Point2D::typeId());
     data()->addAttribute(SketchPlugin_Arc::START_ID(),  GeomDataAPI_Point2D::typeId());
     data()->addAttribute(SketchPlugin_Arc::END_ID(),    GeomDataAPI_Point2D::typeId());
-    
-    static const std::string MY_CIRCLE_ID("SketchCircle");
-    static const std::string MY_CIRCLE_CENTER_ID("CircleCenter");
-    static const std::string MY_CIRCLE_RADIUS_ID("CircleRadius");
-    data()->addAttribute(SketchPlugin_Circle::CENTER_ID(), GeomDataAPI_Point2D::typeId());
-    data()->addAttribute(SketchPlugin_Circle::RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
 """
 
 #=========================================================================
@@ -158,47 +152,6 @@ aResultConstruction = modelAPI_ResultConstruction(aResult)
 aShape = aResultConstruction.shape()
 assert (aShape is not None)
 assert (not aShape.isNull())
-#=========================================================================
-# Create a circle
-# 1. Test SketchPlugin_Circle.h attributes
-# 2. ModelAPI_AttributeDouble attribute
-#=========================================================================
-aSession.startOperation()
-aSketchReflist = aSketchFeature.reflist("Features")
-# Arc is already added
-assert (aSketchReflist.size() == 1)
-assert (len(aSketchReflist.list()) == 1)
-aSketchCircle = aSketchFeature.addFeature("SketchCircle")
-assert (aSketchCircle.getKind() == "SketchCircle")
-anCircleCentr = geomDataAPI_Point2D(aSketchCircle.attribute("CircleCenter"))
-assert (not anCircleCentr.isInitialized())
-aCircleRadius = aSketchCircle.real("CircleRadius")
-assert (type(aCircleRadius) == ModelAPI_AttributeDouble)
-# ModelAPI_AttributeDouble.typeId() is checked in ModelAPI_TestConstants
-assert (aCircleRadius.attributeType() == ModelAPI_AttributeDouble.typeId())
-anCircleCentr.setValue(-25., -25)
-aCircleRadius.setValue(25.)
-assert (anCircleCentr.x() == -25)
-assert (anCircleCentr.y() == -25)
-assert (aCircleRadius.value() == 25)
-aSession.finishOperation()
-#=========================================================================
-# Edit the Cricle
-# 1. Check that changing the centr of a circle does not affects radius
-# 2. and vise versa; also check that int is acceptable as well as a real
-#=========================================================================
-aSession.startOperation()
-anCircleCentr.setValue(10, 60)
-aSession.finishOperation()
-assert (anCircleCentr.x() == 10)
-assert (anCircleCentr.y() == 60)
-assert (aCircleRadius.value() == 25)
-aSession.startOperation()
-aCircleRadius.setValue(int(20))
-aSession.finishOperation()
-assert (anCircleCentr.x() == 10)
-assert (anCircleCentr.y() == 60)
-assert (aCircleRadius.value() == 20)
 #=========================================================================
 # Create an arc, tangent to the line
 #=========================================================================
