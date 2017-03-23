@@ -18,7 +18,6 @@ model.addParameter(Part_1_doc, "z", "12")
 model.addParameter(Part_1_doc, "startphi", "0")
 model.addParameter(Part_1_doc, "deltaphi", "270")
 
-# Tests
 CS1 = model.addConeSegment(Part_1_doc, 7, 11, 5, 8, 12, 0 , 270)
 CS2 = model.addConeSegment(Part_1_doc, 5, 10, 7, 15, 15, 45 , 180)
 CS3 = model.addConeSegment(Part_1_doc, 5, 10, 7, 15, 15, -45 , 180)

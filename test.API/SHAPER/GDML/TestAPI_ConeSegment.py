@@ -1,7 +1,9 @@
-"""
-Test case for GDML Cone Segment feature. 
-Written on Shape API.
-"""
+# Copyright (C) 2014-2016 CEA/DEN, EDF R&D
+
+# File:        TestAPI_Box.py
+# Created:     29 Nov 2016
+# Author:      Clarisse Genrault (CEA)
+
 from GeomAlgoAPI import GeomAlgoAPI_ShapeAPI as shaperpy
 from GeomAlgoAPI import GeomAlgoAPI_Exception as myExcept
 from GeomAPI import GeomAPI_Pnt as pnt
