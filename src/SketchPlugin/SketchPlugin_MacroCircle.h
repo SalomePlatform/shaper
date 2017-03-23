@@ -163,8 +163,6 @@ class SketchPlugin_MacroCircle: public SketchPlugin_SketchEntity,
   SketchPlugin_MacroCircle();
 
 private:
-  void resetAttribute(const std::string& theId);
-
   void createCircleByCenterAndPassed();
   void createCircleByThreePoints();
 

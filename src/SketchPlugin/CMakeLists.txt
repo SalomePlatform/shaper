@@ -30,6 +30,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_Feature.h
     SketchPlugin_IntersectionPoint.h
     SketchPlugin_Line.h
+    SketchPlugin_MacroArc.h
     SketchPlugin_MacroCircle.h
     SketchPlugin_MultiRotation.h
     SketchPlugin_MultiTranslation.h
@@ -69,6 +70,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_Feature.cpp
     SketchPlugin_IntersectionPoint.cpp
     SketchPlugin_Line.cpp
+    SketchPlugin_MacroArc.cpp
     SketchPlugin_MacroCircle.cpp
     SketchPlugin_MultiRotation.cpp
     SketchPlugin_MultiTranslation.cpp

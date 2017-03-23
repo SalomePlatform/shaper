@@ -7,29 +7,27 @@
 #include "SketchPlugin_MacroCircle.h"
 
 #include "SketchPlugin_Circle.h"
-//#include "SketchPlugin_ConstraintCoincidence.h"
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Tools.h"
 
-#include <ModelAPI_Data.h>
-#include <ModelAPI_Events.h>
-#include <ModelAPI_ResultConstruction.h>
-#include <ModelAPI_AttributeSelection.h>
-#include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
+#include <GeomDataAPI_Dir.h>
+#include <GeomDataAPI_Point2D.h>
+
+#include <GeomAPI_Circ2d.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Circ.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_XY.h>
-#include <GeomDataAPI_Point2D.h>
-#include <GeomDataAPI_Dir.h>
-#include <GeomAlgoAPI_PointBuilder.h>
-#include <GeomAlgoAPI_EdgeBuilder.h>
+
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_EdgeBuilder.h>
+#include <GeomAlgoAPI_PointBuilder.h>
 
 
 const double tolerance = 1e-7;
@@ -38,9 +36,9 @@ namespace {
   static const std::string& POINT_ID(int theIndex)
   {
     switch (theIndex) {
-    case 1: return SketchPlugin_MacroCircle::FIRST_POINT_ID();
-    case 2: return SketchPlugin_MacroCircle::SECOND_POINT_ID();
-    case 3: return SketchPlugin_MacroCircle::THIRD_POINT_ID();
+      case 1: return SketchPlugin_MacroCircle::FIRST_POINT_ID();
+      case 2: return SketchPlugin_MacroCircle::SECOND_POINT_ID();
+      case 3: return SketchPlugin_MacroCircle::THIRD_POINT_ID();
     }
 
     static const std::string DUMMY;
@@ -241,12 +239,17 @@ void SketchPlugin_MacroCircle::attributeChanged(const std::string& theID) {
   if(theID == CIRCLE_TYPE()) {
     std::string aType = string(CIRCLE_TYPE())->value();
     if(aType == CIRCLE_TYPE_BY_CENTER_AND_PASSED_POINTS()) {
-      resetAttribute(CENTER_POINT_ID());
-      resetAttribute(PASSED_POINT_ID());
+      SketchPlugin_Tools::resetAttribute(this, CENTER_POINT_ID());
+      SketchPlugin_Tools::resetAttribute(this, CENTER_POINT_REF_ID());
+      SketchPlugin_Tools::resetAttribute(this, PASSED_POINT_ID());
+      SketchPlugin_Tools::resetAttribute(this, PASSED_POINT_REF_ID());
     } else if(aType == CIRCLE_TYPE_BY_THREE_POINTS()) {
-      resetAttribute(FIRST_POINT_ID());
-      resetAttribute(SECOND_POINT_ID());
-      resetAttribute(THIRD_POINT_ID());
+      SketchPlugin_Tools::resetAttribute(this, FIRST_POINT_ID());
+      SketchPlugin_Tools::resetAttribute(this, FIRST_POINT_REF_ID());
+      SketchPlugin_Tools::resetAttribute(this, SECOND_POINT_ID());
+      SketchPlugin_Tools::resetAttribute(this, SECOND_POINT_REF_ID());
+      SketchPlugin_Tools::resetAttribute(this, THIRD_POINT_ID());
+      SketchPlugin_Tools::resetAttribute(this, THIRD_POINT_REF_ID());
     }
     myCenter.reset();
     myRadius = 0;
@@ -295,12 +298,4 @@ void SketchPlugin_MacroCircle::attributeChanged(const std::string& theID) {
   bool aWasBlocked = data()->blockSendAttributeUpdated(true);
   aRadiusAttr->setValue(myRadius);
   data()->blockSendAttributeUpdated(aWasBlocked, false);
-}
-
-void SketchPlugin_MacroCircle::resetAttribute(const std::string& theId)
-{
-  AttributePtr anAttr = attribute(theId);
-  if(anAttr.get()) {
-    anAttr->reset();
-  }
 }

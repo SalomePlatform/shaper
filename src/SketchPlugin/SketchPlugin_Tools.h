@@ -31,6 +31,8 @@ void findCoincidences(const FeaturePtr theStartCoin,
                       const std::string& theAttr,
                       std::set<FeaturePtr>& theList);
 
+void resetAttribute(SketchPlugin_Feature* theFeature, const std::string& theId);
+
 /// Creates coincidence or tangent constraint.
 /// \param[in] theFeature to get selected attribute or object
 /// \param[in] theId ID of attribute where selection is.

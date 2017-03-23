@@ -106,6 +106,15 @@ void findCoincidences(const FeaturePtr theStartCoin,
   }
 }
 
+void resetAttribute(SketchPlugin_Feature* theFeature,
+                    const std::string& theId)
+{
+  AttributePtr anAttr = theFeature->attribute(theId);
+  if(anAttr.get()) {
+    anAttr->reset();
+  }
+}
+
 void createConstraint(SketchPlugin_Feature* theFeature,
                       const std::string& theId,
                       const AttributePtr theAttr,
