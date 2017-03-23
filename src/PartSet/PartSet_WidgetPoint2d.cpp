@@ -7,7 +7,7 @@
 #include "PartSet_WidgetPoint2d.h"
 #include <PartSet_Tools.h>
 #include <PartSet_Module.h>
-#include <PartSet_SketcherReetntrantMgr.h>
+#include <PartSet_SketcherReentrantMgr.h>
 
 #include <XGUI_Tools.h>
 #include <XGUI_Workshop.h>

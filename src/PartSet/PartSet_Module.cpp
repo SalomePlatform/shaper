@@ -16,7 +16,7 @@
 #include "PartSet_WidgetFileSelector.h"
 #include "PartSet_WidgetSketchCreator.h"
 #include "PartSet_SketcherMgr.h"
-#include "PartSet_SketcherReetntrantMgr.h"
+#include "PartSet_SketcherReentrantMgr.h"
 #include "PartSet_ResultSketchPrs.h"
 #include "PartSet_MenuMgr.h"
 #include "PartSet_CustomPrs.h"
@@ -132,7 +132,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   new PartSet_IconFactory();
 
   mySketchMgr = new PartSet_SketcherMgr(this);
-  mySketchReentrantMgr = new PartSet_SketcherReetntrantMgr(theWshop);
+  mySketchReentrantMgr = new PartSet_SketcherReentrantMgr(theWshop);
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
