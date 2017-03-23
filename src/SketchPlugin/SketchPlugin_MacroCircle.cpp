@@ -7,7 +7,8 @@
 #include "SketchPlugin_MacroCircle.h"
 
 #include "SketchPlugin_Circle.h"
-#include "SketchPlugin_ConstraintCoincidence.h"
+//#include "SketchPlugin_ConstraintCoincidence.h"
+#include "SketchPlugin_Point.h"
 #include "SketchPlugin_Tools.h"
 
 #include <ModelAPI_Data.h>
@@ -22,7 +23,6 @@
 
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Circ.h>
-#include <GeomAPI_Circ2d.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
@@ -67,28 +67,74 @@ void SketchPlugin_MacroCircle::initAttributes()
   data()->addAttribute(FIRST_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(SECOND_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(THIRD_POINT_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(FIRST_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(SECOND_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(THIRD_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
 
   data()->addAttribute(CIRCLE_RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(AUXILIARY_ID(), ModelAPI_AttributeBoolean::typeId());
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CENTER_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PASSED_POINT_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FIRST_POINT_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SECOND_POINT_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), THIRD_POINT_REF_ID());
 }
 
 void SketchPlugin_MacroCircle::execute()
 {
-  // Create circle feature.
-  FeaturePtr aCircleFeature = sketch()->addFeature(SketchPlugin_Circle::ID());
-  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aCircleFeature->attribute(SketchPlugin_Circle::CENTER_ID()))->setValue(myCenter->x(),
-                                                                             myCenter->y());
-  aCircleFeature->real(SketchPlugin_Circle::RADIUS_ID())->setValue(myRadius);
-  aCircleFeature->boolean(SketchPlugin_Circle::AUXILIARY_ID())
-                ->setValue(boolean(AUXILIARY_ID())->value());
-  aCircleFeature->execute();
+  std::string aType = string(CIRCLE_TYPE())->value();
+  if (aType == CIRCLE_TYPE_BY_CENTER_AND_PASSED_POINTS())
+    createCircleByCenterAndPassed();
+  else if (aType == CIRCLE_TYPE_BY_THREE_POINTS())
+    createCircleByThreePoints();
 
   myCenter.reset();
   myRadius = 0;
+}
+
+static void convertToPointOrTangent(const AttributeRefAttrPtr&      theRefAttr,
+                                    const AttributePtr&             theBaseAttr,
+                                    std::shared_ptr<GeomAPI_Pnt2d>& thePassingPoint,
+                                    std::shared_ptr<GeomAPI_Shape>& theTangentCurve)
+{
+  AttributePtr anAttr = theBaseAttr;
+  if (theRefAttr->isObject()) {
+    FeaturePtr aTgFeature = ModelAPI_Feature::feature(theRefAttr->object());
+    if (aTgFeature) {
+      if (aTgFeature->getKind() != SketchPlugin_Point::ID()) {
+        theTangentCurve = aTgFeature->lastResult()->shape();
+        return;
+      }
+      anAttr = aTgFeature->attribute(SketchPlugin_Point::COORD_ID());
+    }
+  } else
+    anAttr = theRefAttr->attr();
+
+  thePassingPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr)->pnt();
+}
+
+void SketchPlugin_MacroCircle::createCircleByCenterAndPassed()
+{
+  AttributePtr aPassedAttr = attribute(PASSED_POINT_ID());
+  AttributeRefAttrPtr aPassedRef = refattr(PASSED_POINT_REF_ID());
+  // Calculate circle parameters
+  std::shared_ptr<GeomAPI_Pnt2d> aCenter =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_POINT_ID()))->pnt();
+  std::shared_ptr<GeomAPI_Pnt2d> aPassedPoint;
+  std::shared_ptr<GeomAPI_Shape> aTangentCurve;
+  convertToPointOrTangent(aPassedRef, aPassedAttr, aPassedPoint, aTangentCurve);
+
+  // Build a circle
+  std::shared_ptr<GeomAPI_Circ2d> aCircle;
+  if (aTangentCurve) {
+    std::shared_ptr<GeomAPI_Ax3> anAxis = SketchPlugin_Sketch::plane(sketch());
+    aCircle = std::shared_ptr<GeomAPI_Circ2d>(new GeomAPI_Circ2d(aCenter, aTangentCurve, anAxis));
+  } else
+    aCircle = std::shared_ptr<GeomAPI_Circ2d>(new GeomAPI_Circ2d(aCenter, aPassedPoint));
+
+  // Create circle feature.
+  FeaturePtr aCircleFeature = createCircleFeature(aCircle);
 
   // Create constraints.
   SketchPlugin_Tools::createConstraint(this,
@@ -101,6 +147,57 @@ void SketchPlugin_MacroCircle::execute()
                                        NULL,
                                        aCircleFeature->lastResult(),
                                        true);
+}
+
+void SketchPlugin_MacroCircle::createCircleByThreePoints()
+{
+  std::string aPointAttr[3] = { FIRST_POINT_ID(),
+                                SECOND_POINT_ID(),
+                                THIRD_POINT_ID() };
+  std::string aPointRef[3] = { FIRST_POINT_REF_ID(),
+                               SECOND_POINT_REF_ID(),
+                               THIRD_POINT_REF_ID() };
+  std::shared_ptr<GeomAPI_Interface> aPassedEntities[3];
+  for (int i = 0; i < 3; ++i) {
+    AttributePtr aPassedAttr = attribute(aPointAttr[i]);
+    AttributeRefAttrPtr aPassedRef = refattr(aPointRef[i]);
+    // calculate circle parameters
+    std::shared_ptr<GeomAPI_Pnt2d> aPassedPoint;
+    std::shared_ptr<GeomAPI_Shape> aTangentCurve;
+    convertToPointOrTangent(aPassedRef, aPassedAttr, aPassedPoint, aTangentCurve);
+
+    if (aPassedPoint)
+      aPassedEntities[i] = aPassedPoint;
+    else
+      aPassedEntities[i] = aTangentCurve;
+  }
+
+  std::shared_ptr<GeomAPI_Ax3> anAxis = SketchPlugin_Sketch::plane(sketch());
+  std::shared_ptr<GeomAPI_Circ2d> aCircle = std::shared_ptr<GeomAPI_Circ2d>(
+      new GeomAPI_Circ2d(aPassedEntities[0], aPassedEntities[1], aPassedEntities[2], anAxis));
+
+  // Create circle feature.
+  FeaturePtr aCircleFeature = createCircleFeature(aCircle);
+  ResultPtr aCircleResult = aCircleFeature->lastResult();
+
+  // Create constraints.
+  for (int i = 0; i < 3; ++i)
+    SketchPlugin_Tools::createConstraint(this, aPointRef[i], NULL, aCircleResult, true);
+}
+
+FeaturePtr SketchPlugin_MacroCircle::createCircleFeature(
+    const std::shared_ptr<GeomAPI_Circ2d>& theCircle)
+{
+  FeaturePtr aCircleFeature = sketch()->addFeature(SketchPlugin_Circle::ID());
+  std::shared_ptr<GeomAPI_Pnt2d> aCenter = theCircle->center();
+  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aCircleFeature->attribute(SketchPlugin_Circle::CENTER_ID()))->setValue(aCenter->x(),
+                                                                             aCenter->y());
+  aCircleFeature->real(SketchPlugin_Circle::RADIUS_ID())->setValue(theCircle->radius());
+  aCircleFeature->boolean(SketchPlugin_Circle::AUXILIARY_ID())
+                ->setValue(boolean(AUXILIARY_ID())->value());
+  aCircleFeature->execute();
+  return aCircleFeature;
 }
 
 AISObjectPtr SketchPlugin_MacroCircle::getAISObject(AISObjectPtr thePrevious)

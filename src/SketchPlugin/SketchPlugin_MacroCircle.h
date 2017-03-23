@@ -14,6 +14,7 @@
 
 #include <GeomAPI_IPresentable.h>
 #include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_Circ2d.h>
 
 /**\class SketchPlugin_MacroCircle
  * \ingroup Plugins
@@ -85,6 +86,13 @@ class SketchPlugin_MacroCircle: public SketchPlugin_SketchEntity,
     return ID;
   }
 
+  /// Reference for first point selection.
+  inline static const std::string& FIRST_POINT_REF_ID()
+  {
+    static const std::string ID("first_point_ref");
+    return ID;
+  }
+
   /// Second point id.
   inline static const std::string& SECOND_POINT_ID()
   {
@@ -92,10 +100,24 @@ class SketchPlugin_MacroCircle: public SketchPlugin_SketchEntity,
     return ID;
   }
 
+  /// Reference for second point selection.
+  inline static const std::string& SECOND_POINT_REF_ID()
+  {
+    static const std::string ID("second_point_ref");
+    return ID;
+  }
+
   /// Third point id.
   inline static const std::string& THIRD_POINT_ID()
   {
     static const std::string ID("third_point");
+    return ID;
+  }
+
+  /// Reference for third point selection.
+  inline static const std::string& THIRD_POINT_REF_ID()
+  {
+    static const std::string ID("third_point_ref");
     return ID;
   }
 
@@ -142,6 +164,11 @@ class SketchPlugin_MacroCircle: public SketchPlugin_SketchEntity,
 
 private:
   void resetAttribute(const std::string& theId);
+
+  void createCircleByCenterAndPassed();
+  void createCircleByThreePoints();
+
+  FeaturePtr createCircleFeature(const std::shared_ptr<GeomAPI_Circ2d>& theCircle);
 
 private:
   std::shared_ptr<GeomAPI_Pnt2d> myCenter;
