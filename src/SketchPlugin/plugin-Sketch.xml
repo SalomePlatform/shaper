@@ -91,7 +91,10 @@
                                      title="Passed point"
                                      tooltip="Passed point coordinates"
                                      accept_expressions="0"
-                                     enable_value="enable_by_preferences"/>
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_CirclePassedPointValidator"/>
+            </sketch-2dpoint_selector>
+            <validator id="GeomValidators_Different" parameters="center_point_ref,passed_point_ref"/>
           </box>
           <box id="circle_type_by_three_points"
                icon="icons/Sketch/circle_3pt_32x32.png"
@@ -107,13 +110,19 @@
                                      title="Second point"
                                      tooltip="Second point"
                                      accept_expressions="0"
-                                     enable_value="enable_by_preferences"/>
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_DifferentReference" parameters="first_point_ref,second_point_ref"/>
+            </sketch-2dpoint_selector>
             <sketch-2dpoint_selector id="third_point"
                                      reference_attribute="third_point_ref"
                                      title="Third point"
                                      tooltip="Third point"
                                      accept_expressions="0"
-                                     enable_value="enable_by_preferences"/>
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_DifferentReference" parameters="first_point_ref,second_point_ref,third_point_ref"/>
+              <validator id="SketchPlugin_ThirdPointValidator"/>
+            </sketch-2dpoint_selector>
+            <validator id="GeomValidators_Different" parameters="first_point_ref,second_point_ref,third_point_ref"/>
           </box>
         </toolbox>
         <labelvalue id="circle_radius"

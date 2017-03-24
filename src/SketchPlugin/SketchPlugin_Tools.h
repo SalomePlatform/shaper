@@ -11,6 +11,7 @@
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Attribute.h>
+#include <GeomDataAPI_Point2D.h>
 
 class SketchPlugin_Feature;
 
@@ -23,6 +24,9 @@ void clearExpressions(FeaturePtr theFeature);
 /// \param[in] theStartCoin coincidence feature
 std::shared_ptr<GeomAPI_Pnt2d> getCoincidencePoint(const FeaturePtr theStartCoin);
 
+/// Find all Coincident constraints referred to the feature or its attribute
+std::set<FeaturePtr> findCoincidentConstraints(const FeaturePtr& theFeature);
+
 /// Finds lines coincident at point
 /// \param[in] theStartCoin coincidence feature
 /// \param[in] theAttr attribute name
@@ -30,6 +34,9 @@ std::shared_ptr<GeomAPI_Pnt2d> getCoincidencePoint(const FeaturePtr theStartCoin
 void findCoincidences(const FeaturePtr theStartCoin,
                       const std::string& theAttr,
                       std::set<FeaturePtr>& theList);
+
+/// Find all features the point is coincident to.
+std::set<FeaturePtr> findFeaturesCoincidentToPoint(const AttributePoint2DPtr& thePoint);
 
 void resetAttribute(SketchPlugin_Feature* theFeature, const std::string& theId);
 

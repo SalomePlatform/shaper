@@ -90,6 +90,12 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_IntersectionValidator);
   aFactory->registerValidator("SketchPlugin_ProjectionValidator",
                               new SketchPlugin_ProjectionValidator);
+  aFactory->registerValidator("SketchPlugin_DifferentReference",
+                              new SketchPlugin_DifferentReferenceValidator);
+  aFactory->registerValidator("SketchPlugin_CirclePassedPointValidator",
+                              new SketchPlugin_CirclePassedPointValidator);
+  aFactory->registerValidator("SketchPlugin_ThirdPointValidator",
+                              new SketchPlugin_ThirdPointValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

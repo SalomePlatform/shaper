@@ -292,4 +292,70 @@ class SketchPlugin_ProjectionValidator : public ModelAPI_AttributeValidator
                        Events_InfoMessage& theError) const;
 };
 
+/**\class SketchPlugin_DifferentReferenceValidator
+ * \ingroup Validators
+ * \brief Validator for attributes of a sketch feature.
+ *
+ * It checks that at least one of specified attributes
+ * refers to another feature in respect to each other.
+ */
+class SketchPlugin_DifferentReferenceValidator : public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
+/**\class SketchPlugin_CirclePassedPointValidator
+ * \ingroup Validators
+ * \brief Validator for passed point of MacroCircle feature.
+ *
+ * Checks that passed point does not refer to the feature, the center is coincident to.
+ */
+class SketchPlugin_CirclePassedPointValidator : public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>&,
+                       Events_InfoMessage& theError) const;
+};
+
+/**\class SketchPlugin_ThirdPointValidator
+ * \ingroup Validators
+ * \brief Validator for the third point of MacroCircle feature.
+ *
+ * Checks that third point does not lie on a line passed through the first two points.
+ * Checks that third point does not refer to feature lying between the first two points.
+ */
+class SketchPlugin_ThirdPointValidator : public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>&,
+                       Events_InfoMessage& theError) const;
+
+private:
+  //! returns true if three points have not been placed on the same line
+  bool arePointsNotOnLine(const FeaturePtr& theMacroCircle,
+                          Events_InfoMessage& theError) const;
+
+  //! returns true if the first two points have not been separated
+  //! by a feature referred by thrid point
+  bool arePointsNotSeparated(const FeaturePtr& theMacroCircle,
+                             Events_InfoMessage& theError) const;
+};
+
 #endif
