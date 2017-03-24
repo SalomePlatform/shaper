@@ -138,11 +138,11 @@ void SketchPlugin_MacroCircle::createCircleByCenterAndPassed()
   SketchPlugin_Tools::createConstraint(this,
                                        CENTER_POINT_REF_ID(),
                                        aCircleFeature->attribute(SketchPlugin_Circle::CENTER_ID()),
-                                       NULL,
+                                       ObjectPtr(),
                                        false);
   SketchPlugin_Tools::createConstraint(this,
                                        PASSED_POINT_REF_ID(),
-                                       NULL,
+                                       AttributePtr(),
                                        aCircleFeature->lastResult(),
                                        true);
 }
@@ -180,7 +180,7 @@ void SketchPlugin_MacroCircle::createCircleByThreePoints()
 
   // Create constraints.
   for (int i = 0; i < 3; ++i)
-    SketchPlugin_Tools::createConstraint(this, aPointRef[i], NULL, aCircleResult, true);
+    SketchPlugin_Tools::createConstraint(this, aPointRef[i], AttributePtr(), aCircleResult, true);
 }
 
 FeaturePtr SketchPlugin_MacroCircle::createCircleFeature(

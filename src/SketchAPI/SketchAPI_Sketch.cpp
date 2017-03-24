@@ -408,7 +408,8 @@ std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
-  return MacroArcPtr(new SketchAPI_MacroArc(aFeature, theTangentPoint, theEndX, theEndY, theInversed));
+  return MacroArcPtr(new SketchAPI_MacroArc(
+    aFeature, theTangentPoint, theEndX, theEndY, theInversed));
 }
 
 std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(
