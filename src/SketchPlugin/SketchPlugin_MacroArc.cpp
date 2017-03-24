@@ -6,6 +6,7 @@
 
 #include "SketchPlugin_MacroArc.h"
 
+#include "SketchPlugin_Arc.h"
 #include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_Tools.h"
 
@@ -333,4 +334,61 @@ AISObjectPtr SketchPlugin_MacroArc::getAISObject(AISObjectPtr thePrevious)
 
 void SketchPlugin_MacroArc::execute()
 {
+  // Create arc feature.
+  FeaturePtr anArcFeature = sketch()->addFeature(SketchPlugin_Arc::ID());
+  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      anArcFeature->attribute(SketchPlugin_Arc::CENTER_ID()))->setValue(myCenter);
+  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      anArcFeature->attribute(SketchPlugin_Arc::START_ID()))->setValue(myStart);
+  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      anArcFeature->attribute(SketchPlugin_Arc::END_ID()))->setValue(myEnd);
+  anArcFeature->boolean(SketchPlugin_Arc::REVERSED_ID())
+    ->setValue(boolean(REVERSED_ID())->value());
+  anArcFeature->execute();
+
+  myCenter.reset();
+  myStart.reset();
+  myEnd.reset();
+
+  // Create constraints.
+  std::string anArcType = string(ARC_TYPE())->value();
+  if(anArcType == ARC_TYPE_BY_CENTER_AND_POINTS()) {
+    SketchPlugin_Tools::createConstraint(this,
+                                         CENTER_POINT_REF_ID(),
+                                         anArcFeature->attribute(SketchPlugin_Arc::CENTER_ID()),
+                                         ObjectPtr(),
+                                         false);
+    SketchPlugin_Tools::createConstraint(this,
+                                         START_POINT_REF_ID(),
+                                         anArcFeature->attribute(SketchPlugin_Arc::START_ID()),
+                                         ObjectPtr(),
+                                         false);
+    SketchPlugin_Tools::createConstraint(this,
+                                         END_POINT_REF_ID(),
+                                         anArcFeature->attribute(SketchPlugin_Arc::END_ID()),
+                                         ObjectPtr(),
+                                         false);
+  } else if(anArcType == ARC_TYPE_BY_THREE_POINTS()) {
+    SketchPlugin_Tools::createConstraint(this,
+                                         START_POINT_REF_ID(),
+                                         anArcFeature->attribute(SketchPlugin_Arc::START_ID()),
+                                         ObjectPtr(),
+                                         false);
+    SketchPlugin_Tools::createConstraint(this,
+                                         END_POINT_REF_ID(),
+                                         anArcFeature->attribute(SketchPlugin_Arc::END_ID()),
+                                         ObjectPtr(),
+                                         false);
+    SketchPlugin_Tools::createConstraint(this,
+                                         PASSED_POINT_REF_ID(),
+                                         AttributePtr(),
+                                         anArcFeature->lastResult(),
+                                         true);
+  } else if(anArcType == ARC_TYPE_BY_TANGENT_EDGE()) {
+    SketchPlugin_Tools::createConstraint(this,
+                                         END_POINT_REF_ID(),
+                                         anArcFeature->attribute(SketchPlugin_Arc::END_ID()),
+                                         ObjectPtr(),
+                                         false);
+  }
 }
