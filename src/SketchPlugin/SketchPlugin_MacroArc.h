@@ -8,9 +8,12 @@
 #define SketchPlugin_MacroArc_H_
 
 #include "SketchPlugin.h"
-#include <SketchPlugin_SketchEntity.h>
-#include <SketchPlugin_Sketch.h>
+
+#include "SketchPlugin_SketchEntity.h"
+
 #include <GeomAPI_IPresentable.h>
+
+class GeomAPI_Pnt2d;
 
 /**\class SketchPlugin_MacroArc
  * \ingroup Plugins
@@ -132,6 +135,13 @@ class SketchPlugin_MacroArc: public SketchPlugin_SketchEntity,
     return ID;
   }
 
+  /// Reversed flag
+  inline static const std::string& REVERSED_ID()
+  {
+    static const std::string ID("reversed");
+    return ID;
+  }
+
   /// Arc radius.
   static const std::string& RADIUS_ID()
   {
@@ -187,7 +197,6 @@ private:
   std::shared_ptr<GeomAPI_Pnt2d> myEnd;
 
   /// To define in which direction draw arc.
-  bool myIsInversed;
   double myParamBefore;
 };
 

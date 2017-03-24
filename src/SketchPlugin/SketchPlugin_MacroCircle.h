@@ -9,12 +9,12 @@
 
 #include "SketchPlugin.h"
 
-#include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_SketchEntity.h"
 
 #include <GeomAPI_IPresentable.h>
-#include <GeomAPI_Pnt2d.h>
-#include <GeomAPI_Circ2d.h>
+
+class GeomAPI_Circ2d;
+class GeomAPI_Pnt2d;
 
 /**\class SketchPlugin_MacroCircle
  * \ingroup Plugins

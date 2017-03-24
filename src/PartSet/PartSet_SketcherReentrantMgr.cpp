@@ -25,7 +25,7 @@
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Line.h>
-#include <SketchPlugin_Arc.h>
+#include <SketchPlugin_MacroArc.h>
 #include <SketchPlugin_MacroCircle.h>
 #include <SketchPlugin_Point.h>
 
@@ -155,7 +155,7 @@ bool PartSet_SketcherReentrantMgr::processMouseMoved(ModuleBase_IViewWindow* the
         isLineFeature = anActiveWidget->attributeID() == anAttributeOnStart;
       }
       else if (isTangentArc(aFOperation, module()->sketchMgr()->activeSketch())) {
-        anAttributeOnStart = SketchPlugin_Arc::TANGENT_POINT_ID();
+        anAttributeOnStart = SketchPlugin_MacroArc::TANGENT_POINT_ID();
         isArcFeature = anActiveWidget->attributeID() == anAttributeOnStart;
       }
       bool aCanBeActivatedByMove = isLineFeature || isArcFeature;
@@ -656,32 +656,32 @@ bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& th
     //ModuleBase_Tools::flushUpdated(theNewFeature);
     aChanged = true;
   }
-  else if (aFeatureKind == SketchPlugin_Arc::ID()) {
+  else if (aFeatureKind == SketchPlugin_MacroArc::ID()) {
     // set arc type
-    std::string aTypeAttributeId = SketchPlugin_Arc::ARC_TYPE();
+    std::string aTypeAttributeId = SketchPlugin_MacroArc::ARC_TYPE();
     AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
     AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
     aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
 
-    // if the arc is tangent, set coincidence to end point of the previous arc
-    std::string anArcType = aSourceFeatureTypeAttr->value();
-    if (anArcType == SketchPlugin_Arc::ARC_TYPE_TANGENT()) {
-      // get the last point of the previuos arc feature(geom point 2d)
-      std::shared_ptr<ModelAPI_Data> aSData = theSourceFeature->data();
-      std::shared_ptr<GeomDataAPI_Point2D> aSPointAttr =
-                                      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                      aSData->attribute(SketchPlugin_Arc::END_ID()));
-      // get point attribute on the current feature
-      AttributeRefAttrPtr aTangentPointAttr = theNewFeature->data()->refattr(
-                                                    SketchPlugin_Arc::TANGENT_POINT_ID());
-      aTangentPointAttr->setAttr(aSPointAttr);
+    //// if the arc is tangent, set coincidence to end point of the previous arc
+    //std::string anArcType = aSourceFeatureTypeAttr->value();
+    //if (anArcType == SketchPlugin_Arc::ARC_TYPE_TANGENT()) {
+    //  // get the last point of the previuos arc feature(geom point 2d)
+    //  std::shared_ptr<ModelAPI_Data> aSData = theSourceFeature->data();
+    //  std::shared_ptr<GeomDataAPI_Point2D> aSPointAttr =
+    //                                  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    //                                  aSData->attribute(SketchPlugin_Arc::END_ID()));
+    //  // get point attribute on the current feature
+    //  AttributeRefAttrPtr aTangentPointAttr = theNewFeature->data()->refattr(
+    //                                                SketchPlugin_Arc::TANGENT_POINT_ID());
+    //  aTangentPointAttr->setAttr(aSPointAttr);
 
-      std::shared_ptr<GeomDataAPI_Point2D> aNPointAttr =
-                                    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                    theNewFeature->data()->attribute(SketchPlugin_Arc::END_ID()));
-      aNPointAttr->setValue(aSPointAttr->x(), aSPointAttr->y());
+    //  std::shared_ptr<GeomDataAPI_Point2D> aNPointAttr =
+    //                                std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    //                                theNewFeature->data()->attribute(SketchPlugin_Arc::END_ID()));
+    //  aNPointAttr->setValue(aSPointAttr->x(), aSPointAttr->y());
 
-    }
+    //}
     //ModuleBase_Tools::flushUpdated(theNewFeature);
     aChanged = true;
   }
@@ -696,10 +696,10 @@ bool PartSet_SketcherReentrantMgr::isTangentArc(ModuleBase_Operation* theOperati
                                                                         (theOperation);
   if (aFOperation && module()->sketchMgr()->isNestedSketchOperation(aFOperation)) {
     FeaturePtr aFeature = aFOperation->feature();
-    if (aFeature.get() && aFeature->getKind() == SketchPlugin_Arc::ID()) {
-      AttributeStringPtr aTypeAttr = aFeature->data()->string(SketchPlugin_Arc::ARC_TYPE());
+    if (aFeature.get() && aFeature->getKind() == SketchPlugin_MacroArc::ID()) {
+      AttributeStringPtr aTypeAttr = aFeature->data()->string(SketchPlugin_MacroArc::ARC_TYPE());
       std::string anArcType = aTypeAttr.get() ? aTypeAttr->value() : "";
-      aTangentArc = anArcType == SketchPlugin_Arc::ARC_TYPE_TANGENT();
+      aTangentArc = anArcType == SketchPlugin_MacroArc::ARC_TYPE_BY_TANGENT_EDGE();
     }
   }
   return aTangentArc;

@@ -39,6 +39,7 @@
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 #include "SketchAPI_Arc.h"
+#include "SketchAPI_MacroArc.h"
 #include "SketchAPI_Circle.h"
 #include "SketchAPI_IntersectionPoint.h"
 #include "SketchAPI_Line.h"
@@ -378,46 +379,46 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(
   return ArcPtr(new SketchAPI_Arc(aFeature, theCenter, theStart, theEnd, theInversed));
 }
 
-std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(double theStartX, double theStartY,
+std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(double theStartX, double theStartY,
                                                         double theEndX, double theEndY,
                                                         double thePassedX, double thePassedY)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
-  return ArcPtr(new SketchAPI_Arc(aFeature,
-                                  theStartX, theStartY,
-                                  theEndX, theEndY,
-                                  thePassedX, thePassedY));
+  return MacroArcPtr(new SketchAPI_MacroArc(aFeature,
+                                       theStartX, theStartY,
+                                       theEndX, theEndY,
+                                       thePassedX, thePassedY));
 }
 
-std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(
+std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(
                                                 const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
                                                 const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
                                                 const std::shared_ptr<GeomAPI_Pnt2d>& thePassed)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
-  return ArcPtr(new SketchAPI_Arc(aFeature, theStart, theEnd, thePassed));
+  return MacroArcPtr(new SketchAPI_MacroArc(aFeature, theStart, theEnd, thePassed));
 }
 
-std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(
+std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(
                                                 const ModelHighAPI_RefAttr& theTangentPoint,
                                                 double theEndX, double theEndY,
                                                 bool theInversed)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
-  return ArcPtr(new SketchAPI_Arc(aFeature, theTangentPoint, theEndX, theEndY, theInversed));
+  return MacroArcPtr(new SketchAPI_MacroArc(aFeature, theTangentPoint, theEndX, theEndY, theInversed));
 }
 
-std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(
+std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(
                                               const ModelHighAPI_RefAttr& theTangentPoint,
                                               const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
                                               bool theInversed)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
-  return ArcPtr(new SketchAPI_Arc(aFeature, theTangentPoint, theEnd, theInversed));
+  return MacroArcPtr(new SketchAPI_MacroArc(aFeature, theTangentPoint, theEnd, theInversed));
 }
 
 std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const ModelHighAPI_Selection & theExternal)

@@ -824,7 +824,7 @@ void SketchPlugin_Trim::arrangePointsOnArc(const FeaturePtr& theArc,
 
   std::shared_ptr<GeomAPI_Pnt2d> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       theArc->attribute(SketchPlugin_Arc::CENTER_ID()))->pnt();
-  bool isReversed = theArc->boolean(SketchPlugin_Arc::INVERSED_ID())->value();
+  bool isReversed = theArc->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
 
   // collect directions to each point
   std::shared_ptr<GeomAPI_Dir2d> aStartDir(
@@ -952,9 +952,6 @@ FeaturePtr SketchPlugin_Trim::createArcFeature(const FeaturePtr& theBaseFeature,
   // by arc; moreover, it may cause cyclicity in hte mechanism of updater
   bool aWasBlocked = aFeature->data()->blockSendAttributeUpdated(true);
 
-  aFeature->string(SketchPlugin_Arc::ARC_TYPE())->setValue(
-                SketchPlugin_Arc::ARC_TYPE_CENTER_START_END());
-
   fillAttribute(aFeature->attribute(SketchPlugin_Arc::CENTER_ID()),
                 theBaseFeature->attribute(aCenterAttributeId));
   fillPointAttribute(aFeature->attribute(SketchPlugin_Arc::START_ID()), theFirstPoint);
@@ -965,8 +962,8 @@ FeaturePtr SketchPlugin_Trim::createArcFeature(const FeaturePtr& theBaseFeature,
 
   /// fill referersed state of created arc as it is on the base arc
   if (theBaseFeature->getKind() == SketchPlugin_Arc::ID()) {
-    bool aReversed = theBaseFeature->boolean(SketchPlugin_Arc::INVERSED_ID())->value();
-    aFeature->boolean(SketchPlugin_Arc::INVERSED_ID())->setValue(aReversed);
+    bool aReversed = theBaseFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
+    aFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(aReversed);
   }
   aFeature->execute(); // to obtain result
   aFeature->data()->blockSendAttributeUpdated(aWasBlocked);

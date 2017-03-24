@@ -41,7 +41,6 @@ const double PI = 3.141592653589793238463;
 
 SketchPlugin_MacroArc::SketchPlugin_MacroArc()
 : SketchPlugin_SketchEntity(),
-  myIsInversed(false),
   myParamBefore(0.0)
 {
 }
@@ -61,6 +60,8 @@ void SketchPlugin_MacroArc::initAttributes()
   data()->addAttribute(TANGENT_POINT_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(END_POINT_3_ID(), GeomDataAPI_Point2D::typeId());
 
+  data()->addAttribute(REVERSED_ID(), ModelAPI_AttributeBoolean::typeId());
+
   data()->addAttribute(RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(ANGLE_ID(), ModelAPI_AttributeDouble::typeId());
 
@@ -70,6 +71,8 @@ void SketchPlugin_MacroArc::initAttributes()
   data()->addAttribute(START_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(END_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(PASSED_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
+
+  boolean(REVERSED_ID())->setValue(false);
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CENTER_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), START_POINT_REF_ID());
@@ -107,7 +110,7 @@ void SketchPlugin_MacroArc::attributeChanged(const std::string& theID)
     myCenter.reset();
     myStart.reset();
     myEnd.reset();
-    myIsInversed = false;
+    boolean(REVERSED_ID())->setValue(false);
     myParamBefore = 0.0;
   } else if(anArcType == ARC_TYPE_BY_CENTER_AND_POINTS()) {
     std::shared_ptr<GeomDataAPI_Point2D> aCenterPointAttr =
@@ -141,9 +144,9 @@ void SketchPlugin_MacroArc::attributeChanged(const std::string& theID)
       double aParameterNew = 0.0;
       if(aCircleForArc.parameter(myEnd, paramTolerance, aParameterNew)) {
         if(myParamBefore <= PI / 2.0 && aParameterNew >= PI * 1.5) {
-          myIsInversed = true;
+          boolean(REVERSED_ID())->setValue(true);
         } else if(myParamBefore >= PI * 1.5 && aParameterNew <= PI / 2.0) {
-          myIsInversed = false;
+          boolean(REVERSED_ID())->setValue(false);
         }
       }
       myParamBefore = aParameterNew;
@@ -174,9 +177,9 @@ void SketchPlugin_MacroArc::attributeChanged(const std::string& theID)
       aCircle.parameter(myEnd, paramTolerance, anEndParam);
       aCircle.parameter(aPassed, paramTolerance, aPassedParam);
       if(aPassedParam > anEndParam) {
-        myIsInversed = true;
+        boolean(REVERSED_ID())->setValue(true);
       } else {
-        myIsInversed = false;
+        boolean(REVERSED_ID())->setValue(false);
       }
     } else {
       std::shared_ptr<GeomAPI_XY> aDir = myEnd->xy()->decreased(myStart->xy())->multiplied(0.5);
@@ -251,12 +254,12 @@ void SketchPlugin_MacroArc::attributeChanged(const std::string& theID)
     double aParameterNew = 0.0;
     if(aCircleForArc.parameter(myEnd, paramTolerance, aParameterNew)) {
       if(myParamBefore <= PI / 2.0 && aParameterNew >= PI * 1.5) {
-        if(!myIsInversed) {
-          myIsInversed = true;
+        if(!boolean(REVERSED_ID())->value()) {
+          boolean(REVERSED_ID())->setValue(true);
         }
       } else if(myParamBefore >= PI * 1.5 && aParameterNew <= PI / 2.0) {
-        if(myIsInversed) {
-          myIsInversed = false;
+        if(boolean(REVERSED_ID())->value()) {
+          boolean(REVERSED_ID())->setValue(false);
         }
       }
     }
@@ -276,7 +279,7 @@ void SketchPlugin_MacroArc::attributeChanged(const std::string& theID)
         aCircleForArc.parameter(myStart, paramTolerance, aStartParam);
         aCircleForArc.parameter(myEnd, paramTolerance, anEndParam);
         anAngle = (anEndParam - aStartParam) / PI * 180.0;
-        if(myIsInversed) anAngle = 360.0 - anAngle;
+        if(boolean(REVERSED_ID())->value()) anAngle = 360.0 - anAngle;
       }
     }
   }
@@ -306,7 +309,7 @@ AISObjectPtr SketchPlugin_MacroArc::getAISObject(AISObjectPtr thePrevious)
       std::dynamic_pointer_cast<GeomDataAPI_Dir>(
           aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
   std::shared_ptr<GeomAPI_Dir> aNormal = aNDir->dir();
-  GeomShapePtr anArcShape = myIsInversed ?
+  GeomShapePtr anArcShape = boolean(REVERSED_ID())->value() ?
       GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, anEnd, aStart, aNormal)
     : GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStart, anEnd, aNormal);
   GeomShapePtr aCenterPointShape = GeomAlgoAPI_PointBuilder::vertex(aCenter);
