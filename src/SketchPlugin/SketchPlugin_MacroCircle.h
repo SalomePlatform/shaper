@@ -163,14 +163,15 @@ class SketchPlugin_MacroCircle: public SketchPlugin_SketchEntity,
   SketchPlugin_MacroCircle();
 
 private:
+  std::shared_ptr<GeomAPI_Circ2d> shapeByCenterAndPassed();
+  std::shared_ptr<GeomAPI_Circ2d> shapeByThreePoints();
+  /// Creates shape if only two of three points is initialized
+  std::shared_ptr<GeomAPI_Circ2d> shapeByTwoPassedPoints();
+
   void createCircleByCenterAndPassed();
   void createCircleByThreePoints();
 
   FeaturePtr createCircleFeature(const std::shared_ptr<GeomAPI_Circ2d>& theCircle);
-
-private:
-  std::shared_ptr<GeomAPI_Pnt2d> myCenter;
-  double myRadius;
 };
 
 #endif

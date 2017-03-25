@@ -231,7 +231,7 @@ private:
                                   GccEnt::Unqualified(aCurve1->Line()),
                                   aPoint, Precision::Confusion()));
       }
-    } else if (aCurve2->GetType() == GeomAbs_Circle) {
+    } else if (aCurve1->GetType() == GeomAbs_Circle) {
       if (aCurve2->GetType() == GeomAbs_Line) {
         aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(
             new GccAna_Circ2d3Tan(GccEnt::Unqualified(aCurve1->Circle()),

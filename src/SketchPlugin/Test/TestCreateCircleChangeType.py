@@ -49,6 +49,29 @@ def assertNotInitializedByThreePoints(theMacroCircle):
     assert (not aSecondPointRef.isInitialized())
     assert (not aThirdPointRef.isInitialized())
 
+def getLastCircle(theSketch):
+    """
+    obtains last feature from the sketch and generates error if the feature is not a circle
+    """
+    expectedKind = "SketchCircle"
+    for anIndex in range(theSketch.numberOfSubs() - 1, -1, -1):
+        aSub = theSketch.subFeature(anIndex)
+        if (aSub.getKind() == expectedKind):
+            return aSub
+
+def verifyLastCircle(theSketch, theX, theY, theR):
+    """
+    subroutine to verify position of last circle in the sketch
+    """
+    aLastCircle = getLastCircle(theSketch)
+    aCenter = geomDataAPI_Point2D(aLastCircle.attribute("circle_center"))
+    verifyPointCoordinates(aCenter, theX, theY)
+    aRadius = aLastCircle.real("circle_radius")
+    assert aRadius.value() == theR, "Wrong radius {0}, expected {1}".format(aRadius.value(), theR)
+
+def verifyPointCoordinates(thePoint, theX, theY):
+    assert thePoint.x() == theX and thePoint.y() == theY, "Wrong '{0}' point ({1}, {2}), expected ({3}, {4})".format(thePoint.attributeType(), thePoint.x(), thePoint.y(), theX, theY)
+
 def distancePointPoint(thePoint1, thePoint2):
     return thePoint1.pnt().distance(thePoint2.pnt())
 
@@ -160,7 +183,8 @@ aPassedPoint.setValue(aLineEnd.pnt())
 aSession.finishOperation()
 
 aRadius = distancePointPoint(aLineStart, aLineEnd)
-assert (aSketchFeature.numberOfSubs() == 2)
+NB_FEATURES_EXPECTED = 4 # line, circle and two coincidences
+assert (aSketchFeature.numberOfSubs() == NB_FEATURES_EXPECTED), "Number of features in sketch {}, expected {}".format(aSketchFeature.numberOfSubs(), NB_FEATURES_EXPECTED)
 verifyLastCircle(aSketchFeature, aLineStart.x(), aLineStart.y(), aRadius)
 
 #=========================================================================

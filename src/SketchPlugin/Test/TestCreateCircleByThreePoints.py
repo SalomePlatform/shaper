@@ -61,8 +61,8 @@ def verifyTangentCircles(theCircle1, theCircle2):
 
 def verifyTangentCircleArc(theCircle, theArc):
     aCircleCenter = geomDataAPI_Point2D(theCircle.attribute("circle_center"))
-    anArcCenter = geomDataAPI_Point2D(theArc.attribute("ArcCenter"))
-    anArcStart = geomDataAPI_Point2D(theArc.attribute("ArcStartPoint"))
+    anArcCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
+    anArcStart = geomDataAPI_Point2D(theArc.attribute("start_point"))
     aDistCC = distancePointPoint(aCircleCenter, anArcCenter)
     aCircleRadius = theCircle.real("circle_radius").value()
     anArcRadius = distancePointPoint(anArcCenter, anArcStart)
@@ -200,11 +200,11 @@ anArcStart = [anArcCenter[0], anArcCenter[1] - anArcRadius]
 anArcEnd = [anArcCenter[0], anArcCenter[1] + anArcRadius]
 aSession.startOperation()
 anArc = aSketchFeature.addFeature("SketchArc")
-anArcCenterPnt = geomDataAPI_Point2D(anArc.attribute("ArcCenter"))
+anArcCenterPnt = geomDataAPI_Point2D(anArc.attribute("center_point"))
 anArcCenterPnt.setValue(anArcCenter[0], anArcCenter[1])
-anArcStartPnt = geomDataAPI_Point2D(anArc.attribute("ArcStartPoint"))
+anArcStartPnt = geomDataAPI_Point2D(anArc.attribute("start_point"))
 anArcStartPnt.setValue(anArcStart[0], anArcStart[1])
-anArcEndPnt = geomDataAPI_Point2D(anArc.attribute("ArcEndPoint"))
+anArcEndPnt = geomDataAPI_Point2D(anArc.attribute("end_point"))
 anArcEndPnt.setValue(anArcEnd[0], anArcEnd[1])
 aSession.finishOperation()
 # create new circle
@@ -267,7 +267,7 @@ aCirclePnt3Ref.setObject(aLine.lastResult())
 aCirclePnt3.setValue(aLineEnd[0], aLineEnd[1])
 aSession.finishOperation()
 aLastFeature = aSketchFeature.subFeature(aSketchFeature.numberOfSubs() - 1)
-assert aLastFeature == aCircle, "ERROR: SketchMacroCircle has NOT expected to be valid"
+assert aLastFeature.getKind() == "SketchMacroCircle", "ERROR: SketchMacroCircle has NOT expected to be valid"
 aDocument.removeFeature(aCircle)
 assert (aSketchFeature.numberOfSubs() == 12)
 
@@ -294,7 +294,7 @@ aCirclePnt3Ref.setObject(aLine.lastResult())
 aCirclePnt3.setValue(aLineEnd[0], aLineEnd[1])
 aSession.finishOperation()
 aLastFeature = aSketchFeature.subFeature(aSketchFeature.numberOfSubs() - 1)
-assert aLastFeature == aCircle, "ERROR: SketchMacroCircle has NOT expected to be valid"
+assert aLastFeature.getKind() == "SketchMacroCircle", "ERROR: SketchMacroCircle has NOT expected to be valid"
 aDocument.removeFeature(aCircle)
 assert (aSketchFeature.numberOfSubs() == 12)
 

@@ -86,4 +86,7 @@ void ModelAPI_Attribute::setID(const std::string theID)
 
 void ModelAPI_Attribute::reinit() {}
 
-void ModelAPI_Attribute::reset() {}
+void ModelAPI_Attribute::reset()
+{
+  myIsInitialized = false;
+}
