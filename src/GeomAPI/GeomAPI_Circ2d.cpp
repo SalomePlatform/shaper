@@ -67,10 +67,10 @@ public:
 
     double aFirst, aLast;
     TopLoc_Location aLoc;
-    CurveAdaptorPtr aCurve(new Geom2dAdaptor_Curve(
-        BRep_Tool::CurveOnSurface(anEdge, myPlane, aLoc, aFirst, aLast)));
+    Handle(Geom2d_Curve) aCurve = BRep_Tool::CurveOnSurface(anEdge, myPlane, aLoc, aFirst, aLast);
+    CurveAdaptorPtr aCurveAdaptor(new Geom2dAdaptor_Curve(aCurve, aFirst, aLast));
 
-    myTangentShapes.push_back(aCurve);
+    myTangentShapes.push_back(aCurveAdaptor);
   }
 
   void addPassingPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)

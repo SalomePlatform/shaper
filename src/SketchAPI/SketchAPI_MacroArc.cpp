@@ -28,10 +28,10 @@ SketchAPI_MacroArc::SketchAPI_MacroArc(const std::shared_ptr<ModelAPI_Feature> &
 
 //================================================================================================
 SketchAPI_MacroArc::SketchAPI_MacroArc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                             double theCenterX, double theCenterY,
-                             double theStartX, double theStartY,
-                             double theEndX, double theEndY,
-                             bool theInversed)
+                                       double theCenterX, double theCenterY,
+                                       double theStartX, double theStartY,
+                                       double theEndX, double theEndY,
+                                       bool theInversed)
 : SketchAPI_SketchEntity(theFeature)
 {
   if(initialize()) {
@@ -42,10 +42,10 @@ SketchAPI_MacroArc::SketchAPI_MacroArc(const std::shared_ptr<ModelAPI_Feature>& 
 
 //================================================================================================
 SketchAPI_MacroArc::SketchAPI_MacroArc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                             const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
-                             const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
-                             const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
-                             bool theInversed)
+                                       const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+                                       const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
+                                       const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+                                       bool theInversed)
 : SketchAPI_SketchEntity(theFeature)
 {
   if(initialize()) {
@@ -55,9 +55,9 @@ SketchAPI_MacroArc::SketchAPI_MacroArc(const std::shared_ptr<ModelAPI_Feature>& 
 
 //================================================================================================
 SketchAPI_MacroArc::SketchAPI_MacroArc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                             double theStartX, double theStartY,
-                             double theEndX, double theEndY,
-                             double thePassedX, double thePassedY)
+                                       double theStartX, double theStartY,
+                                       double theEndX, double theEndY,
+                                       double thePassedX, double thePassedY)
 : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
@@ -67,9 +67,9 @@ SketchAPI_MacroArc::SketchAPI_MacroArc(const std::shared_ptr<ModelAPI_Feature>& 
 
 //===============================================================================================
 SketchAPI_MacroArc::SketchAPI_MacroArc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                             const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
-                             const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
-                             const std::shared_ptr<GeomAPI_Pnt2d>& thePassed)
+                                       const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
+                                       const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+                                       const std::shared_ptr<GeomAPI_Pnt2d>& thePassed)
 : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
@@ -79,9 +79,9 @@ SketchAPI_MacroArc::SketchAPI_MacroArc(const std::shared_ptr<ModelAPI_Feature>& 
 
 //================================================================================================
 SketchAPI_MacroArc::SketchAPI_MacroArc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                             const ModelHighAPI_RefAttr& theTangentPoint,
-                             double theEndX, double theEndY,
-                             bool theInversed)
+                                       const ModelHighAPI_RefAttr& theTangentPoint,
+                                       double theEndX, double theEndY,
+                                       bool theInversed)
 : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
@@ -91,9 +91,9 @@ SketchAPI_MacroArc::SketchAPI_MacroArc(const std::shared_ptr<ModelAPI_Feature>& 
 
 //================================================================================================
 SketchAPI_MacroArc::SketchAPI_MacroArc(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                             const ModelHighAPI_RefAttr& theTangentPoint,
-                             const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
-                             bool theInversed)
+                                       const ModelHighAPI_RefAttr& theTangentPoint,
+                                       const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+                                       bool theInversed)
 : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
@@ -109,14 +109,14 @@ SketchAPI_MacroArc::~SketchAPI_MacroArc()
 
 //================================================================================================
 void SketchAPI_MacroArc::setByCenterStartEnd(double theCenterX, double theCenterY,
-                                        double theStartX, double theStartY,
-                                        double theEndX, double theEndY,
-                                        bool theInversed)
+                                             double theStartX, double theStartY,
+                                             double theEndX, double theEndY,
+                                             bool theInversed)
 {
   fillAttribute(SketchPlugin_MacroArc::ARC_TYPE_BY_CENTER_AND_POINTS(), myarcType);
   fillAttribute(center(), theCenterX, theCenterY);
-  fillAttribute(startPoint1(), theStartX, theStartY);
-  fillAttribute(endPoint1(), theEndX, theEndY);
+  fillAttribute(startPoint(), theStartX, theStartY);
+  fillAttribute(endPoint(), theEndX, theEndY);
   fillAttribute(theInversed, myreversed);
 
   execute();
@@ -124,14 +124,14 @@ void SketchAPI_MacroArc::setByCenterStartEnd(double theCenterX, double theCenter
 
 //================================================================================================
 void SketchAPI_MacroArc::setByCenterStartEnd(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
-                                        const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
-                                        const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
-                                        bool theInversed)
+                                             const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
+                                             const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+                                             bool theInversed)
 {
   fillAttribute(SketchPlugin_MacroArc::ARC_TYPE_BY_CENTER_AND_POINTS(), myarcType);
   fillAttribute(theCenter, mycenter);
-  fillAttribute(theStart, mystartPoint1);
-  fillAttribute(theEnd, myendPoint1);
+  fillAttribute(theStart, mystartPoint);
+  fillAttribute(theEnd, myendPoint);
   fillAttribute(theInversed, myreversed);
 
   execute();
@@ -139,12 +139,12 @@ void SketchAPI_MacroArc::setByCenterStartEnd(const std::shared_ptr<GeomAPI_Pnt2d
 
 //================================================================================================
 void SketchAPI_MacroArc::setByStartEndPassed(double theStartX, double theStartY,
-                                        double theEndX, double theEndY,
-                                        double thePassedX, double thePassedY)
+                                             double theEndX, double theEndY,
+                                             double thePassedX, double thePassedY)
 {
   fillAttribute(SketchPlugin_MacroArc::ARC_TYPE_BY_THREE_POINTS(), myarcType);
-  fillAttribute(startPoint2(), theStartX, theStartY);
-  fillAttribute(endPoint2(), theEndX, theEndY);
+  fillAttribute(startPoint(), theStartX, theStartY);
+  fillAttribute(endPoint(), theEndX, theEndY);
   fillAttribute(passedPoint(), thePassedX, thePassedY);
 
   execute();
@@ -152,12 +152,12 @@ void SketchAPI_MacroArc::setByStartEndPassed(double theStartX, double theStartY,
 
 //================================================================================================
 void SketchAPI_MacroArc::setByStartEndPassed(const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
-                                        const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
-                                        const std::shared_ptr<GeomAPI_Pnt2d>& thePassed)
+                                             const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+                                             const std::shared_ptr<GeomAPI_Pnt2d>& thePassed)
 {
   fillAttribute(SketchPlugin_MacroArc::ARC_TYPE_BY_THREE_POINTS(), myarcType);
-  fillAttribute(theStart, mystartPoint2);
-  fillAttribute(theEnd, myendPoint2);
+  fillAttribute(theStart, mystartPoint);
+  fillAttribute(theEnd, myendPoint);
   fillAttribute(thePassed, mypassedPoint);
 
   execute();
@@ -165,12 +165,12 @@ void SketchAPI_MacroArc::setByStartEndPassed(const std::shared_ptr<GeomAPI_Pnt2d
 
 //================================================================================================
 void SketchAPI_MacroArc::setByTangent(const ModelHighAPI_RefAttr& theTangentPoint,
-                                 double theEndX, double theEndY,
-                                 bool theInversed)
+                                      double theEndX, double theEndY,
+                                      bool theInversed)
 {
   fillAttribute(SketchPlugin_MacroArc::ARC_TYPE_BY_TANGENT_EDGE(), myarcType);
   fillAttribute(theTangentPoint, mytangentPoint);
-  fillAttribute(endPoint3(), theEndX, theEndY);
+  fillAttribute(endPoint(), theEndX, theEndY);
   fillAttribute(theInversed, myreversed);
 
   execute();
@@ -178,12 +178,12 @@ void SketchAPI_MacroArc::setByTangent(const ModelHighAPI_RefAttr& theTangentPoin
 
 //================================================================================================
 void SketchAPI_MacroArc::setByTangent(const ModelHighAPI_RefAttr& theTangentPoint,
-                                 const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
-                                 bool theInversed)
+                                      const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+                                      bool theInversed)
 {
   fillAttribute(SketchPlugin_MacroArc::ARC_TYPE_BY_TANGENT_EDGE(), myarcType);
   fillAttribute(theTangentPoint, mytangentPoint);
-  fillAttribute(theEnd, myendPoint3);
+  fillAttribute(theEnd, myendPoint);
   fillAttribute(theInversed, myreversed);
 
   execute();

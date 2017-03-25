@@ -85,27 +85,6 @@ void SketchPlugin_MacroCircle::execute()
     createCircleByThreePoints();
 }
 
-static void convertToPointOrTangent(const AttributeRefAttrPtr&      theRefAttr,
-                                    const AttributePtr&             theBaseAttr,
-                                    std::shared_ptr<GeomAPI_Pnt2d>& thePassingPoint,
-                                    std::shared_ptr<GeomAPI_Shape>& theTangentCurve)
-{
-  AttributePtr anAttr = theBaseAttr;
-  if (theRefAttr->isObject()) {
-    FeaturePtr aTgFeature = ModelAPI_Feature::feature(theRefAttr->object());
-    if (aTgFeature) {
-      if (aTgFeature->getKind() != SketchPlugin_Point::ID()) {
-        theTangentCurve = aTgFeature->lastResult()->shape();
-        return;
-      }
-      anAttr = aTgFeature->attribute(SketchPlugin_Point::COORD_ID());
-    }
-  } else
-    anAttr = theRefAttr->attr();
-
-  thePassingPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr)->pnt();
-}
-
 void SketchPlugin_MacroCircle::createCircleByCenterAndPassed()
 {
   // Create circle feature.
@@ -169,7 +148,8 @@ std::shared_ptr<GeomAPI_Circ2d> SketchPlugin_MacroCircle::shapeByCenterAndPassed
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aCenterAttr)->pnt();
   std::shared_ptr<GeomAPI_Pnt2d> aPassedPoint;
   std::shared_ptr<GeomAPI_Shape> aTangentCurve;
-  convertToPointOrTangent(aPassedRef, aPassedAttr, aPassedPoint, aTangentCurve);
+  SketchPlugin_Tools::convertRefAttrToPointOrTangentCurve(
+      aPassedRef, aPassedAttr, aTangentCurve, aPassedPoint);
 
   // Build a circle
   std::shared_ptr<GeomAPI_Circ2d> aCircle;
@@ -199,7 +179,8 @@ std::shared_ptr<GeomAPI_Circ2d> SketchPlugin_MacroCircle::shapeByThreePoints()
     // calculate circle parameters
     std::shared_ptr<GeomAPI_Pnt2d> aPassedPoint;
     std::shared_ptr<GeomAPI_Shape> aTangentCurve;
-    convertToPointOrTangent(aPassedRef, aPassedAttr, aPassedPoint, aTangentCurve);
+    SketchPlugin_Tools::convertRefAttrToPointOrTangentCurve(
+        aPassedRef, aPassedAttr, aTangentCurve, aPassedPoint);
 
     if (aPassedPoint)
       aPassedEntities[aPntIndex] = aPassedPoint;
@@ -233,7 +214,8 @@ std::shared_ptr<GeomAPI_Circ2d> SketchPlugin_MacroCircle::shapeByTwoPassedPoints
     // calculate circle parameters
     std::shared_ptr<GeomAPI_Pnt2d> aPassedPoint;
     std::shared_ptr<GeomAPI_Shape> aTangentCurve;
-    convertToPointOrTangent(aPassedRef, aPassedAttr, aPassedPoint, aTangentCurve);
+    SketchPlugin_Tools::convertRefAttrToPointOrTangentCurve(
+        aPassedRef, aPassedAttr, aTangentCurve, aPassedPoint);
 
     if (aPassedPoint) {
       aPassedEntities[aPntIndex] = aPassedPoint;

@@ -120,7 +120,7 @@
                                      accept_expressions="0"
                                      enable_value="enable_by_preferences">
               <validator id="SketchPlugin_DifferentReference" parameters="first_point_ref,second_point_ref,third_point_ref"/>
-              <validator id="SketchPlugin_ThirdPointValidator"/>
+              <validator id="SketchPlugin_ThirdPointValidator" parameters="third_point_ref"/>
             </sketch-2dpoint_selector>
             <validator id="GeomValidators_Different" parameters="first_point_ref,second_point_ref,third_point_ref"/>
           </box>
@@ -205,42 +205,47 @@
                                      tooltip="Center of a circle"
                                      accept_expressions="0"
                                      enable_value="enable_by_preferences" />
-            <sketch-2dpoint_selector id="start_point_1"
+            <sketch-2dpoint_selector id="start_point"
                                      reference_attribute="start_point_ref"
                                      title="Start point"
                                      tooltip="Start point"
                                      accept_expressions="0"
                                      enable_value="enable_by_preferences"/>
-            <sketch-2dpoint_selector id="end_point_1"
+            <sketch-2dpoint_selector id="end_point"
                                      reference_attribute="end_point_ref"
                                      title="End point"
                                      tooltip="End point"
                                      accept_expressions="0"
                                      enable_value="enable_by_preferences"/>
-            <validator id="GeomValidators_Different" parameters="center_point,start_point_1,end_point_1"/>
+            <validator id="GeomValidators_Different" parameters="center_point,start_point,end_point"/>
           </box>
           <box id="by_three_points"
                icon="icons/Sketch/arc_3pt_32x32.png"
                title="Three points on arc">
-            <sketch-2dpoint_selector id="start_point_2"
+            <sketch-2dpoint_selector id="start_point"
                                      reference_attribute="start_point_ref"
                                      title="Start point"
                                      tooltip="Start point"
                                      accept_expressions="0"
                                      enable_value="enable_by_preferences"/>
-            <sketch-2dpoint_selector id="end_point_2"
+            <sketch-2dpoint_selector id="end_point"
                                      reference_attribute="end_point_ref"
                                      title="End point"
                                      tooltip="End point"
                                      accept_expressions="0"
-                                     enable_value="enable_by_preferences"/>
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_DifferentReference" parameters="start_point_ref,end_point_ref"/>
+            </sketch-2dpoint_selector>
             <sketch-2dpoint_selector id="passed_point"
                                      reference_attribute="passed_point_ref"
                                      title="Passed point"
                                      tooltip="Passed point"
                                      accept_expressions="0"
-                                     enable_value="enable_by_preferences"/>
-            <validator id="GeomValidators_Different" parameters="start_point_2,end_point_2,passed_point"/>
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_DifferentReference" parameters="start_point_ref,end_point_ref,passed_point_ref"/>
+              <validator id="SketchPlugin_ThirdPointValidator" parameters="passed_point_ref"/>
+            </sketch-2dpoint_selector>
+            <validator id="GeomValidators_Different" parameters="start_point,end_point,passed_point"/>
           </box>
           <box id="by_tangent_edge"
                icon="icons/Sketch/arc_tang_32x32.png"
@@ -251,7 +256,7 @@
                                    shape_types="vertex">
               <validator id="SketchPlugin_ArcTangentPoint"/>
             </sketch_shape_selector>
-            <sketch-2dpoint_selector id="end_point_3"
+            <sketch-2dpoint_selector id="end_point"
                                      reference_attribute="end_point_ref"
                                      title="End point"
                                      tooltip="End point"

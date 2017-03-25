@@ -13,6 +13,7 @@
 
 #include <GeomAPI_IPresentable.h>
 
+class GeomAPI_Circ2d;
 class GeomAPI_Pnt2d;
 
 /**\class SketchPlugin_MacroArc
@@ -70,16 +71,9 @@ class SketchPlugin_MacroArc: public SketchPlugin_SketchEntity,
   }
 
   /// Start 2D point of the arc
-  inline static const std::string& START_POINT_1_ID()
+  inline static const std::string& START_POINT_ID()
   {
-    static const std::string ID = "start_point_1";
-    return ID;
-  }
-
-  /// Start 2D point of the arc
-  inline static const std::string& START_POINT_2_ID()
-  {
-    static const std::string ID = "start_point_2";
+    static const std::string ID = "start_point";
     return ID;
   }
 
@@ -90,23 +84,9 @@ class SketchPlugin_MacroArc: public SketchPlugin_SketchEntity,
   }
 
   /// End 2D point of the arc
-  inline static const std::string& END_POINT_1_ID()
+  inline static const std::string& END_POINT_ID()
   {
-    static const std::string ID = "end_point_1";
-    return ID;
-  }
-
-  /// End 2D point of the arc
-  inline static const std::string& END_POINT_2_ID()
-  {
-    static const std::string ID = "end_point_2";
-    return ID;
-  }
-
-  /// End 2D point of the arc
-  inline static const std::string& END_POINT_3_ID()
-  {
-    static const std::string ID = "end_point_3";
+    static const std::string ID = "end_point";
     return ID;
   }
 
@@ -190,6 +170,19 @@ class SketchPlugin_MacroArc: public SketchPlugin_SketchEntity,
 
   /// Use plugin manager for features creation.
   SketchPlugin_MacroArc();
+
+private:
+  /// Set fields for center, start and end points
+  void fillByCenterAndTwoPassed();
+  /// Set fields for center, start and end points by selected passed points
+  void fillByThreePassedPoints();
+  /// Set fields for center, start and end points by selected tangent edge
+  void fillByTangentEdge();
+
+  FeaturePtr createArcFeature();
+
+  void recalculateReversedFlagByEnd(const GeomAPI_Circ2d& theCurrentCircular);
+  void recalculateReversedFlagByPassed(const GeomAPI_Circ2d& theCurrentCircular);
 
 private:
   std::shared_ptr<GeomAPI_Pnt2d> myCenter;

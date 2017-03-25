@@ -344,17 +344,18 @@ class SketchPlugin_ThirdPointValidator : public ModelAPI_AttributeValidator
   //! \param theArguments arguments of the attribute
   //! \param theError error message
   virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>&,
+                       const std::list<std::string>& theArguments,
                        Events_InfoMessage& theError) const;
 
 private:
   //! returns true if three points have not been placed on the same line
-  bool arePointsNotOnLine(const FeaturePtr& theMacroCircle,
+  bool arePointsNotOnLine(const FeaturePtr& theMacroFeature,
                           Events_InfoMessage& theError) const;
 
   //! returns true if the first two points have not been separated
   //! by a feature referred by thrid point
-  bool arePointsNotSeparated(const FeaturePtr& theMacroCircle,
+  bool arePointsNotSeparated(const FeaturePtr& theMacroFeature,
+                             const std::list<std::string>& theArguments,
                              Events_InfoMessage& theError) const;
 };
 

@@ -14,6 +14,7 @@
 #include "SketchPlugin_ConstraintTangent.h"
 #include "SketchPlugin_Fillet.h"
 #include "SketchPlugin_Line.h"
+#include "SketchPlugin_MacroArc.h"
 #include "SketchPlugin_MacroCircle.h"
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Sketch.h"
@@ -1110,11 +1111,12 @@ bool SketchPlugin_CirclePassedPointValidator::isValid(
 
 bool SketchPlugin_ThirdPointValidator::isValid(
     const AttributePtr& theAttribute,
-    const std::list<std::string>&,
+    const std::list<std::string>& theArguments,
     Events_InfoMessage& theError) const
 {
   FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
-  return arePointsNotOnLine(anOwner, theError) && arePointsNotSeparated(anOwner, theError);
+  return arePointsNotOnLine(anOwner, theError) &&
+         arePointsNotSeparated(anOwner, theArguments, theError);
 }
 
 static std::shared_ptr<GeomAPI_Pnt2d> toPoint(const FeaturePtr& theMacroCircle,
@@ -1154,6 +1156,32 @@ static std::shared_ptr<GeomAPI_Pnt2d> toPoint(const FeaturePtr& theMacroCircle,
   }
 
   return aPoint;
+}
+
+static void threePointsOfFeature(const FeaturePtr& theMacroFeature,
+                                 std::shared_ptr<GeomAPI_Pnt2d> thePoints[3])
+{
+  if (theMacroFeature->getKind() == SketchPlugin_MacroCircle::ID()) {
+    thePoints[0] = toPoint(theMacroFeature,
+          SketchPlugin_MacroCircle::FIRST_POINT_ID(),
+          SketchPlugin_MacroCircle::FIRST_POINT_REF_ID());
+    thePoints[1] = toPoint(theMacroFeature,
+          SketchPlugin_MacroCircle::SECOND_POINT_ID(),
+          SketchPlugin_MacroCircle::SECOND_POINT_REF_ID());
+    thePoints[2] = toPoint(theMacroFeature,
+          SketchPlugin_MacroCircle::THIRD_POINT_ID(),
+          SketchPlugin_MacroCircle::THIRD_POINT_REF_ID());
+  } else if (theMacroFeature->getKind() == SketchPlugin_MacroArc::ID()) {
+    thePoints[0] = toPoint(theMacroFeature,
+          SketchPlugin_MacroArc::START_POINT_ID(),
+          SketchPlugin_MacroArc::START_POINT_REF_ID());
+    thePoints[1] = toPoint(theMacroFeature,
+          SketchPlugin_MacroArc::END_POINT_ID(),
+          SketchPlugin_MacroArc::END_POINT_REF_ID());
+    thePoints[2] = toPoint(theMacroFeature,
+          SketchPlugin_MacroArc::PASSED_POINT_ID(),
+          SketchPlugin_MacroArc::PASSED_POINT_REF_ID());
+  }
 }
 
 static bool isPointsOnLine(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
@@ -1196,23 +1224,16 @@ static bool isOnSameSide(const std::shared_ptr<GeomAPI_Circ>& theCircle,
 }
 
 bool SketchPlugin_ThirdPointValidator::arePointsNotOnLine(
-    const FeaturePtr& theMacroCircle,
+    const FeaturePtr& theMacroFeature,
     Events_InfoMessage& theError) const
 {
   static const std::string aErrorPointsOnLine(
       "Selected points are on the same line");
 
-  std::shared_ptr<GeomAPI_Pnt2d> aFirstPoint = toPoint(theMacroCircle,
-        SketchPlugin_MacroCircle::FIRST_POINT_ID(),
-        SketchPlugin_MacroCircle::FIRST_POINT_REF_ID());
-  std::shared_ptr<GeomAPI_Pnt2d> aSecondPoint = toPoint(theMacroCircle,
-        SketchPlugin_MacroCircle::SECOND_POINT_ID(),
-        SketchPlugin_MacroCircle::SECOND_POINT_REF_ID());
-  std::shared_ptr<GeomAPI_Pnt2d> aThirdPoint = toPoint(theMacroCircle,
-        SketchPlugin_MacroCircle::THIRD_POINT_ID(),
-        SketchPlugin_MacroCircle::THIRD_POINT_REF_ID());
+  std::shared_ptr<GeomAPI_Pnt2d> aPoints[3];
+  threePointsOfFeature(theMacroFeature, aPoints);
 
-  if (isPointsOnLine(aFirstPoint, aSecondPoint, aThirdPoint)) {
+  if (isPointsOnLine(aPoints[0], aPoints[1], aPoints[2])) {
     theError = aErrorPointsOnLine;
     return false;
   }
@@ -1220,26 +1241,22 @@ bool SketchPlugin_ThirdPointValidator::arePointsNotOnLine(
 }
 
 bool SketchPlugin_ThirdPointValidator::arePointsNotSeparated(
-    const FeaturePtr& theMacroCircle,
+    const FeaturePtr& theMacroFeature,
+    const std::list<std::string>& theArguments,
     Events_InfoMessage& theError) const
 {
   static const std::string aErrorPointsApart(
       "Selected entity is lying between first two points");
 
-  AttributeRefAttrPtr aThirdPointRef =
-      theMacroCircle->refattr(SketchPlugin_MacroCircle::THIRD_POINT_REF_ID());
+  AttributeRefAttrPtr aThirdPointRef = theMacroFeature->refattr(theArguments.front());
   FeaturePtr aRefByThird;
   if (aThirdPointRef->isObject())
     aRefByThird = ModelAPI_Feature::feature(aThirdPointRef->object());
   if (!aRefByThird)
     return true;
 
-  std::shared_ptr<GeomAPI_Pnt2d> aFirstPoint = toPoint(theMacroCircle,
-        SketchPlugin_MacroCircle::FIRST_POINT_ID(),
-        SketchPlugin_MacroCircle::FIRST_POINT_REF_ID());
-  std::shared_ptr<GeomAPI_Pnt2d> aSecondPoint = toPoint(theMacroCircle,
-        SketchPlugin_MacroCircle::SECOND_POINT_ID(),
-        SketchPlugin_MacroCircle::SECOND_POINT_REF_ID());
+  std::shared_ptr<GeomAPI_Pnt2d> aPoints[3];
+  threePointsOfFeature(theMacroFeature, aPoints);
 
   std::shared_ptr<GeomAPI_Edge> aThirdShape =
       std::dynamic_pointer_cast<GeomAPI_Edge>(aRefByThird->lastResult()->shape());
@@ -1247,9 +1264,9 @@ bool SketchPlugin_ThirdPointValidator::arePointsNotSeparated(
     return true;
 
   SketchPlugin_Sketch* aSketch =
-      std::dynamic_pointer_cast<SketchPlugin_Feature>(theMacroCircle)->sketch();
-  std::shared_ptr<GeomAPI_Pnt> aFirstPnt3D = aSketch->to3D(aFirstPoint->x(), aFirstPoint->y());
-  std::shared_ptr<GeomAPI_Pnt> aSecondPnt3D = aSketch->to3D(aSecondPoint->x(), aSecondPoint->y());
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(theMacroFeature)->sketch();
+  std::shared_ptr<GeomAPI_Pnt> aFirstPnt3D = aSketch->to3D(aPoints[0]->x(), aPoints[0]->y());
+  std::shared_ptr<GeomAPI_Pnt> aSecondPnt3D = aSketch->to3D(aPoints[1]->x(), aPoints[1]->y());
 
   bool isOk = true;
   if (aThirdShape->isLine())

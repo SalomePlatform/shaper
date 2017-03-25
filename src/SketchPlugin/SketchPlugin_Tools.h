@@ -11,6 +11,7 @@
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Attribute.h>
+#include <ModelAPI_AttributeRefAttr.h>
 #include <GeomDataAPI_Point2D.h>
 
 class SketchPlugin_Feature;
@@ -51,6 +52,16 @@ void createConstraint(SketchPlugin_Feature* theFeature,
                       const AttributePtr theAttr,
                       const ObjectPtr theObject,
                       const bool theIsCanBeTangent);
+
+/// Creates passing point or tangent curve basing on the given attributes are initialized.
+/// \param[in]  theRefAttr       prefered attribute to be converted
+/// \param[in]  theDefaultAttr   default attribute if theRefAttr is not initialized
+/// \param[out] theTangentCurve  tangent curve if theRefAttr refers to an edge
+/// \param[out] thePassingPoint  passing point if theRefAttr does not refer to an edge
+void convertRefAttrToPointOrTangentCurve(const AttributeRefAttrPtr&      theRefAttr,
+                                         const AttributePtr&             theDefaultAttr,
+                                         std::shared_ptr<GeomAPI_Shape>& theTangentCurve,
+                                         std::shared_ptr<GeomAPI_Pnt2d>& thePassingPoint);
 }; // namespace SketchPlugin_Tools
 
 #endif // SKETCHPLUGIN_TOOLS_H_

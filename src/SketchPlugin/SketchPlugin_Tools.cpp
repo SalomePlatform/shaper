@@ -199,4 +199,26 @@ void createConstraint(SketchPlugin_Feature* theFeature,
     }
   }
 }
+
+void convertRefAttrToPointOrTangentCurve(const AttributeRefAttrPtr&      theRefAttr,
+                                         const AttributePtr&             theDefaultAttr,
+                                         std::shared_ptr<GeomAPI_Shape>& theTangentCurve,
+                                         std::shared_ptr<GeomAPI_Pnt2d>& thePassingPoint)
+{
+  AttributePtr anAttr = theDefaultAttr;
+  if (theRefAttr->isObject()) {
+    FeaturePtr aTgFeature = ModelAPI_Feature::feature(theRefAttr->object());
+    if (aTgFeature) {
+      if (aTgFeature->getKind() != SketchPlugin_Point::ID()) {
+        theTangentCurve = aTgFeature->lastResult()->shape();
+        return;
+      }
+      anAttr = aTgFeature->attribute(SketchPlugin_Point::COORD_ID());
+    }
+  } else
+    anAttr = theRefAttr->attr();
+
+  thePassingPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr)->pnt();
+}
+
 } // namespace SketchPlugin_Tools
