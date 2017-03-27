@@ -71,9 +71,16 @@ class SketchPlugin_MacroArc: public SketchPlugin_SketchEntity,
   }
 
   /// Start 2D point of the arc
-  inline static const std::string& START_POINT_ID()
+  inline static const std::string& START_POINT_1_ID()
   {
-    static const std::string ID = "start_point";
+    static const std::string ID = "start_point_1";
+    return ID;
+  }
+
+  /// Start 2D point of the arc
+  inline static const std::string& START_POINT_2_ID()
+  {
+    static const std::string ID = "start_point_2";
     return ID;
   }
 
@@ -84,9 +91,23 @@ class SketchPlugin_MacroArc: public SketchPlugin_SketchEntity,
   }
 
   /// End 2D point of the arc
-  inline static const std::string& END_POINT_ID()
+  inline static const std::string& END_POINT_1_ID()
   {
-    static const std::string ID = "end_point";
+    static const std::string ID = "end_point_1";
+    return ID;
+  }
+
+  /// End 2D point of the arc
+  inline static const std::string& END_POINT_2_ID()
+  {
+    static const std::string ID = "end_point_2";
+    return ID;
+  }
+
+  /// End 2D point of the arc
+  inline static const std::string& END_POINT_3_ID()
+  {
+    static const std::string ID = "end_point_3";
     return ID;
   }
 

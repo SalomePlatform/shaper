@@ -1173,10 +1173,10 @@ static void threePointsOfFeature(const FeaturePtr& theMacroFeature,
           SketchPlugin_MacroCircle::THIRD_POINT_REF_ID());
   } else if (theMacroFeature->getKind() == SketchPlugin_MacroArc::ID()) {
     thePoints[0] = toPoint(theMacroFeature,
-          SketchPlugin_MacroArc::START_POINT_ID(),
+          SketchPlugin_MacroArc::START_POINT_2_ID(),
           SketchPlugin_MacroArc::START_POINT_REF_ID());
     thePoints[1] = toPoint(theMacroFeature,
-          SketchPlugin_MacroArc::END_POINT_ID(),
+          SketchPlugin_MacroArc::END_POINT_2_ID(),
           SketchPlugin_MacroArc::END_POINT_REF_ID());
     thePoints[2] = toPoint(theMacroFeature,
           SketchPlugin_MacroArc::PASSED_POINT_ID(),

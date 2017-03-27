@@ -60,12 +60,15 @@ void SketchPlugin_MacroArc::initAttributes()
   data()->addAttribute(ARC_TYPE(), ModelAPI_AttributeString::typeId());
 
   data()->addAttribute(CENTER_POINT_ID(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(START_POINT_ID(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(END_POINT_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(START_POINT_1_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(END_POINT_1_ID(), GeomDataAPI_Point2D::typeId());
 
+  data()->addAttribute(START_POINT_2_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(END_POINT_2_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(PASSED_POINT_ID(), GeomDataAPI_Point2D::typeId());
 
   data()->addAttribute(TANGENT_POINT_ID(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(END_POINT_3_ID(), GeomDataAPI_Point2D::typeId());
 
   data()->addAttribute(REVERSED_ID(), ModelAPI_AttributeBoolean::typeId());
 
@@ -95,13 +98,16 @@ void SketchPlugin_MacroArc::attributeChanged(const std::string& theID)
   if(theID == ARC_TYPE()) {
     SketchPlugin_Tools::resetAttribute(this, CENTER_POINT_ID());
     SketchPlugin_Tools::resetAttribute(this, CENTER_POINT_REF_ID());
-    SketchPlugin_Tools::resetAttribute(this, START_POINT_ID());
+    SketchPlugin_Tools::resetAttribute(this, START_POINT_1_ID());
     SketchPlugin_Tools::resetAttribute(this, START_POINT_REF_ID());
-    SketchPlugin_Tools::resetAttribute(this, END_POINT_ID());
+    SketchPlugin_Tools::resetAttribute(this, END_POINT_1_ID());
     SketchPlugin_Tools::resetAttribute(this, END_POINT_REF_ID());
+    SketchPlugin_Tools::resetAttribute(this, START_POINT_2_ID());
+    SketchPlugin_Tools::resetAttribute(this, END_POINT_2_ID());
     SketchPlugin_Tools::resetAttribute(this, PASSED_POINT_ID());
     SketchPlugin_Tools::resetAttribute(this, PASSED_POINT_REF_ID());
     SketchPlugin_Tools::resetAttribute(this, TANGENT_POINT_ID());
+    SketchPlugin_Tools::resetAttribute(this, END_POINT_3_ID());
     SketchPlugin_Tools::resetAttribute(this, REVERSED_ID());
     SketchPlugin_Tools::resetAttribute(this, RADIUS_ID());
     SketchPlugin_Tools::resetAttribute(this, ANGLE_ID());
@@ -274,7 +280,7 @@ void SketchPlugin_MacroArc::fillByCenterAndTwoPassed()
       return;
 
   AttributePoint2DPtr aStartPointAttr =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_POINT_ID()));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_POINT_1_ID()));
   if (!aStartPointAttr->isInitialized())
     return;
 
@@ -283,7 +289,7 @@ void SketchPlugin_MacroArc::fillByCenterAndTwoPassed()
   myEnd = myStart;
 
   AttributePoint2DPtr anEndPointAttr =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(END_POINT_ID()));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(END_POINT_1_ID()));
   if (!anEndPointAttr->isInitialized())
     return;
 
@@ -315,12 +321,12 @@ void SketchPlugin_MacroArc::recalculateReversedFlagByEnd(const GeomAPI_Circ2d& t
 void SketchPlugin_MacroArc::fillByThreePassedPoints()
 {
   AttributePoint2DPtr aStartPointAttr =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_POINT_ID()));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_POINT_2_ID()));
   if (!aStartPointAttr->isInitialized())
     return;
 
   AttributePoint2DPtr anEndPointAttr =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(END_POINT_ID()));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(END_POINT_2_ID()));
   if (!anEndPointAttr->isInitialized())
     return;
 
@@ -381,7 +387,7 @@ void SketchPlugin_MacroArc::fillByTangentEdge()
     return;
 
   AttributePoint2DPtr anEndPointAttr =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(END_POINT_ID()));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(END_POINT_3_ID()));
   if (!anEndPointAttr->isInitialized())
     return;
 
