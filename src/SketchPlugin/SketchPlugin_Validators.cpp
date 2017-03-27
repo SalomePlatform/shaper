@@ -1293,7 +1293,9 @@ bool SketchPlugin_ArcEndPointValidator::isValid(
     return true;
   }
 
-  if(!anEndPointRef->isInitialized()) {
+  ObjectPtr anObject = anEndPointRef->object();
+  AttributePtr anAttr = anEndPointRef->attr();
+  if(!anObject.get() && !anAttr.get()) {
     return true;
   }
 
@@ -1301,7 +1303,6 @@ bool SketchPlugin_ArcEndPointValidator::isValid(
     return false;
   }
 
-  ObjectPtr anObject = anEndPointRef->object();
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
   if(aResult.get()) {
     GeomShapePtr aShape = aResult->shape();
@@ -1333,10 +1334,6 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
     return true;
   }
 
-  if(!anEndPointRef->isInitialized()) {
-    return true;
-  }
-
   GeomShapePtr anArcShape = anArcFeature->getArcShape();
 
   if(!anArcShape.get() || anArcShape->isNull()) {
@@ -1344,6 +1341,11 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
   }
 
   ObjectPtr anObject = anEndPointRef->object();
+  AttributePtr anAttr = anEndPointRef->attr();
+  if(!anObject.get() && !anAttr.get()) {
+    return true;
+  }
+
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
   if(aResult.get()) {
     GeomShapePtr aShape = aResult->shape();
