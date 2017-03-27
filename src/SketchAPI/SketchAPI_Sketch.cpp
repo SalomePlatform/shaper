@@ -760,6 +760,22 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setVertical(
 
 //--------------------------------------------------------------------------------------
 
+std::shared_ptr<GeomAPI_Pnt2d> SketchAPI_Sketch::to2D(const std::shared_ptr<GeomAPI_Pnt>& thePoint)
+{
+  FeaturePtr aBase = feature();
+  std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+      aBase->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aBase->attribute(SketchPlugin_Sketch::NORM_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aBase->attribute(SketchPlugin_Sketch::DIRX_ID()));
+  std::shared_ptr<GeomAPI_Dir> aY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
+
+  return thePoint->to2D(aC->pnt(), aX->dir(), aY);
+}
+
+//--------------------------------------------------------------------------------------
+
 void SketchAPI_Sketch::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();

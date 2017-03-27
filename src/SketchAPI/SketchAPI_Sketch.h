@@ -395,6 +395,9 @@ public:
       const std::shared_ptr<ModelHighAPI_Interface> & theConstraint,
       const ModelHighAPI_Double & theValue);
 
+  SKETCHAPI_EXPORT
+  std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& thePoint);
+
   // TODO(spo): rename to selectFaces() or faces() (or add faces() -> list to SWIG)
   /// Select face
   SKETCHAPI_EXPORT
