@@ -7,6 +7,7 @@
 #include "SketchPlugin_MacroArc.h"
 
 #include "SketchPlugin_Arc.h"
+#include "SketchPlugin_ConstraintTangent.h"
 #include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_Tools.h"
 
@@ -225,6 +226,20 @@ void SketchPlugin_MacroArc::execute()
                                          anArcFeature->lastResult(),
                                          true);
   } else if(anArcType == ARC_TYPE_BY_TANGENT_EDGE()) {
+    // constraints for tangent arc
+    SketchPlugin_Tools::createConstraint(this,
+                                         TANGENT_POINT_ID(),
+                                         anArcFeature->attribute(SketchPlugin_Arc::START_ID()),
+                                         ObjectPtr(),
+                                         false);
+    FeaturePtr aTangent = sketch()->addFeature(SketchPlugin_ConstraintTangent::ID());
+    AttributeRefAttrPtr aRefAttrA = aTangent->refattr(SketchPlugin_Constraint::ENTITY_A());
+    AttributeRefAttrPtr aTgPntRefAttr = refattr(TANGENT_POINT_ID());
+    FeaturePtr aTgFeature = ModelAPI_Feature::feature(aTgPntRefAttr->attr()->owner());
+    aRefAttrA->setObject(aTgFeature->lastResult());
+    AttributeRefAttrPtr aRefAttrB = aTangent->refattr(SketchPlugin_Constraint::ENTITY_B());
+    aRefAttrB->setObject(anArcFeature->lastResult());
+    // constraint for end point
     SketchPlugin_Tools::createConstraint(this,
                                          END_POINT_REF_ID(),
                                          anArcFeature->attribute(SketchPlugin_Arc::END_ID()),
