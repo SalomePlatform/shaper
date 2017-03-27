@@ -173,15 +173,29 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
 
     ## Returns a type of the shape type in the old GEOM representation
     def selectionDim(self, theSelectionType):
-        if theSelectionType == "vertex":
+        selType=theSelectionType.lower() # more or less independed approach
+        if selType== "vertex":
             return 0
-        if theSelectionType == "edge":
+        if selType== "edge":
             return 1
-        if theSelectionType == "face":
+        if selType== "face":
             return 2
-        if theSelectionType == "solid":
+        if selType== "solid":
             return 3
         return -1
+
+    ## Returns a type of the shape type in the GeomAPI_Shape representation
+    def geomAPISelectionDim(self, theSelectionType):
+        selType=theSelectionType.lower() # more or less independed approach
+        if selType== "vertex":
+            return GeomAPI.GeomAPI_Shape.VERTEX
+        if selType== "edge":
+            return GeomAPI.GeomAPI_Shape.EDGE
+        if selType== "face":
+            return GeomAPI.GeomAPI_Shape.FACE
+        if selType== "solid":
+            return GeomAPI.GeomAPI_Shape.SOLID
+        return GeomAPI.GeomAPI_Shape.SHAPE
 
     ## Creates a field by the field feature and the name
     #  @param theField: the field feature
@@ -205,14 +219,36 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
         #self.geompy.UnionIDs(theField,Ids)
         self.geompy.addToStudyInFather(self.brep, aResField, theFieldName)
 
+        # set default values to all not filled sub-shapes (fields in GEOM support only full set of subs)
+        Ids={}
+        anExp = GeomAPI.GeomAPI_ShapeExplorer(self.shape, self.geomAPISelectionDim(aSelection.selectionType()))
+        while anExp.more():
+          anID = GeomAlgoAPI.GeomAlgoAPI_CompoundBuilder.id(self.shape, anExp.current())
+          if anID != 0:
+            Ids[anID]=anExp.current()
+          anExp.next()
+
+        SelectedIds={}
+        for aSelIndex in range(aSelection.size()):
+          selShape = aSelection.value(aSelIndex).value()
+          # searching for this shape in Ids
+          for a in Ids.items():
+            if (a[1].isSame(selShape)):
+              SelectedIds[a[0]] = aSelIndex
+
+        # values here are in the same order as in field
+        listOfValues = Ids.items()
+        listOfValues.sort()
         # set steps
         aStepsNum = aTables.tables()
         for aStepIndex in range(0, aStepsNum):
           aStamp = theField.intArray("stamps").value(aStepIndex)
           aValues = []
-          aRows = aTables.rows()
-          aCols = aTables.columns()
-          for aRow in range(1, aRows): # no defaults
+          for aValId in listOfValues:
+            aRow = 0 # default value if not from selection
+            if SelectedIds.has_key(aValId[0]): # take the value from the table
+              aRow = SelectedIds[aValId[0]] + 1 # plus one to avoid default string
+            aCols = aTables.columns()
             for aCol in range(0, aCols):
               aVal = aTables.valueStr(aRow, aCol, aStepIndex)
               if aTables.type() == 0: # bool
