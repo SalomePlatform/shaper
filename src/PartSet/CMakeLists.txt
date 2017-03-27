@@ -34,7 +34,6 @@ SET(PROJECT_HEADERS
     PartSet_WidgetFileSelector.h
     PartSet_WidgetMultiSelector.h
     PartSet_WidgetPoint2d.h
-    PartSet_WidgetPoint2dDistance.h
     PartSet_WidgetPoint2DFlyout.h
     PartSet_WidgetShapeSelector.h
     PartSet_WidgetSketchCreator.h
@@ -54,7 +53,6 @@ SET(PROJECT_MOC_HEADERS
     PartSet_WidgetFileSelector.h
     PartSet_WidgetMultiSelector.h
     PartSet_WidgetPoint2d.h
-    PartSet_WidgetPoint2dDistance.h
     PartSet_WidgetPoint2DFlyout.h
     PartSet_WidgetShapeSelector.h
     PartSet_WidgetSketchCreator.h
@@ -83,7 +81,6 @@ SET(PROJECT_SOURCES
     PartSet_WidgetFileSelector.cpp
     PartSet_WidgetMultiSelector.cpp
     PartSet_WidgetPoint2d.cpp
-    PartSet_WidgetPoint2dDistance.cpp
     PartSet_WidgetPoint2DFlyout.cpp
     PartSet_WidgetShapeSelector.cpp
     PartSet_WidgetSketchCreator.cpp

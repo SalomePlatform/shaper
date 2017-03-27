@@ -6,7 +6,6 @@
 #include "PartSet_Tools.h"
 #include "PartSet_PreviewPlanes.h"
 #include "PartSet_WidgetPoint2d.h"
-#include "PartSet_WidgetPoint2dDistance.h"
 #include "PartSet_WidgetPoint2DFlyout.h"
 #include "PartSet_WidgetShapeSelector.h"
 #include "PartSet_WidgetMultiSelector.h"
@@ -716,11 +715,6 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     aPointWgt->setSketch(mySketchMgr->activeSketch());
     connect(aPointWgt, SIGNAL(vertexSelected()), sketchReentranceMgr(), SLOT(onVertexSelected()));
     aWgt = aPointWgt;
-  } else if (theType == "point2ddistance") {
-    PartSet_WidgetPoint2dDistance* aDistanceWgt = new PartSet_WidgetPoint2dDistance(theParent,
-                                                                     aWorkshop, theWidgetApi);
-    aDistanceWgt->setSketch(mySketchMgr->activeSketch());
-    aWgt = aDistanceWgt;
   } else if (theType == "sketch_shape_selector") {
     PartSet_WidgetShapeSelector* aShapeSelectorWgt =
                           new PartSet_WidgetShapeSelector(theParent, aWorkshop, theWidgetApi);
