@@ -192,6 +192,9 @@ class SketchPlugin_MacroArc: public SketchPlugin_SketchEntity,
   /// Use plugin manager for features creation.
   SketchPlugin_MacroArc();
 
+  /// Returns shape of arc.
+  GeomShapePtr getArcShape();
+
 private:
   /// Set fields for center, start and end points
   void fillByCenterAndTwoPassed();

@@ -108,6 +108,14 @@ public:
     const std::shared_ptr<GeomAPI_Shape> theSubShape,
     const std::shared_ptr<GeomAPI_Shape> theBaseShape);
 
+  /// \brief Checks that shapes intersects.
+  /// \param[in] theShape1 first shape.
+  /// \param[in] theShape2 second shape.
+  /// \return true if shapes intersects.
+  GEOMALGOAPI_EXPORT static bool GeomAlgoAPI_ShapeTools::isShapesIntersects(
+    const std::shared_ptr<GeomAPI_Shape> theShape1,
+    const std::shared_ptr<GeomAPI_Shape> theShape2);
+
   /// \return true if theShape is valid.
   GEOMALGOAPI_EXPORT static bool isShapeValid(const std::shared_ptr<GeomAPI_Shape> theShape);
 

@@ -148,6 +148,31 @@ void SketchPlugin_MacroArc::attributeChanged(const std::string& theID)
   data()->blockSendAttributeUpdated(aWasBlocked, false);
 }
 
+GeomShapePtr SketchPlugin_MacroArc::getArcShape()
+{
+  if(!myStart.get() || !myEnd.get() || !myCenter.get()) {
+    return GeomShapePtr();
+  }
+
+  SketchPlugin_Sketch* aSketch = sketch();
+  if(!aSketch) {
+    return GeomShapePtr();
+  }
+
+  std::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(myCenter->x(), myCenter->y()));
+  std::shared_ptr<GeomAPI_Pnt> aStart(aSketch->to3D(myStart->x(), myStart->y()));
+  std::shared_ptr<GeomAPI_Pnt> anEnd(aSketch->to3D(myEnd->x(), myEnd->y()));
+  std::shared_ptr<GeomDataAPI_Dir> aNDir =
+    std::dynamic_pointer_cast<GeomDataAPI_Dir>(aSketch->attribute(SketchPlugin_Sketch::NORM_ID()));
+  std::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
+
+  GeomShapePtr anArcShape = boolean(REVERSED_ID())->value() ?
+      GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, anEnd, aStart, aNormal)
+    : GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStart, anEnd, aNormal);
+
+  return anArcShape;
+}
+
 AISObjectPtr SketchPlugin_MacroArc::getAISObject(AISObjectPtr thePrevious)
 {
   if(!myStart.get() || !myEnd.get() || !myCenter.get()) {
@@ -159,17 +184,8 @@ AISObjectPtr SketchPlugin_MacroArc::getAISObject(AISObjectPtr thePrevious)
     return AISObjectPtr();
   }
 
-  std::shared_ptr<GeomAPI_Pnt> aStart = aSketch->to3D(myStart->x(), myStart->y());
-  std::shared_ptr<GeomAPI_Pnt> anEnd = aSketch->to3D(myEnd->x(), myEnd->y());
+  GeomShapePtr anArcShape = getArcShape();
   std::shared_ptr<GeomAPI_Pnt> aCenter = aSketch->to3D(myCenter->x(), myCenter->y());;
-
-  std::shared_ptr<GeomDataAPI_Dir> aNDir =
-      std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-          aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
-  std::shared_ptr<GeomAPI_Dir> aNormal = aNDir->dir();
-  GeomShapePtr anArcShape = boolean(REVERSED_ID())->value() ?
-      GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, anEnd, aStart, aNormal)
-    : GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStart, anEnd, aNormal);
   GeomShapePtr aCenterPointShape = GeomAlgoAPI_PointBuilder::vertex(aCenter);
 
   if(!anArcShape.get() || !aCenterPointShape.get()) {

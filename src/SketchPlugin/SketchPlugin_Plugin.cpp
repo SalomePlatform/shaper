@@ -96,6 +96,10 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_CirclePassedPointValidator);
   aFactory->registerValidator("SketchPlugin_ThirdPointValidator",
                               new SketchPlugin_ThirdPointValidator);
+  aFactory->registerValidator("SketchPlugin_ArcEndPointValidator",
+                              new SketchPlugin_ArcEndPointValidator);
+  aFactory->registerValidator("SketchPlugin_ArcEndPointIntersectionValidator",
+                              new SketchPlugin_ArcEndPointIntersectionValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

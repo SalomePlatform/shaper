@@ -216,7 +216,10 @@
                                      title="End point"
                                      tooltip="End point"
                                      accept_expressions="0"
-                                     enable_value="enable_by_preferences"/>
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_ArcEndPointValidator" parameters="end_point_ref"/>
+              <validator id="SketchPlugin_ArcEndPointIntersectionValidator" parameters="end_point_ref"/>
+            </sketch-2dpoint_selector>
             <validator id="GeomValidators_Different" parameters="center_point,start_point_1,end_point_1"/>
           </box>
           <box id="by_three_points"
@@ -235,6 +238,7 @@
                                      accept_expressions="0"
                                      enable_value="enable_by_preferences">
               <validator id="SketchPlugin_DifferentReference" parameters="start_point_ref,end_point_ref"/>
+              <validator id="SketchPlugin_ArcEndPointValidator" parameters="end_point_ref"/>
             </sketch-2dpoint_selector>
             <sketch-2dpoint_selector id="passed_point"
                                      reference_attribute="passed_point_ref"
@@ -261,7 +265,9 @@
                                      title="End point"
                                      tooltip="End point"
                                      accept_expressions="0"
-                                     enable_value="enable_by_preferences"/>
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_ArcEndPointValidator" parameters="end_point_ref"/>
+            </sketch-2dpoint_selector>
           </box>
         </toolbox>
         <labelvalue id="radius"

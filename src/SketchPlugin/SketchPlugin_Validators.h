@@ -359,4 +359,40 @@ private:
                              Events_InfoMessage& theError) const;
 };
 
+/**\class SketchPlugin_ArcEndPointValidator
+ * \ingroup Validators
+ * \brief Validator for the end point of MacroArc feature.
+ *
+ * Checks that third point does not lie on a point.
+ */
+class SketchPlugin_ArcEndPointValidator: public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
+/**\class SketchPlugin_ArcEndPointIntersectionValidator
+ * \ingroup Validators
+ * \brief Validator for the end point of MacroArc feature.
+ *
+ * Checks that third point does lie on edge which intersects arc.
+ */
+class SketchPlugin_ArcEndPointIntersectionValidator: public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 #endif

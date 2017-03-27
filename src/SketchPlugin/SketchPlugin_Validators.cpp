@@ -41,6 +41,8 @@
 #include <ModelGeomAlgo_Point2D.h>
 #include <ModelGeomAlgo_Shape.h>
 
+#include <GeomAlgoAPI_ShapeTools.h>
+
 #include <GeomAPI_Circ.h>
 #include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Lin.h>
@@ -1277,4 +1279,94 @@ bool SketchPlugin_ThirdPointValidator::arePointsNotSeparated(
   if (!isOk)
     theError = aErrorPointsApart;
   return isOk;
+}
+
+bool SketchPlugin_ArcEndPointValidator::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& theArguments,
+    Events_InfoMessage& theError) const
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+  AttributeRefAttrPtr anEndPointRef = aFeature->refattr(theArguments.front());
+
+  if(!anEndPointRef.get()) {
+    return true;
+  }
+
+  if(!anEndPointRef->isInitialized()) {
+    return true;
+  }
+
+  if(anEndPointRef->attr().get()) {
+    return false;
+  }
+
+  ObjectPtr anObject = anEndPointRef->object();
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+  if(aResult.get()) {
+    GeomShapePtr aShape = aResult->shape();
+    if(aShape.get() && aShape->isVertex()) {
+      return false;
+    }
+  }
+
+  aFeature = ModelAPI_Feature::feature(anObject);
+  if(aFeature.get()) {
+    if(aFeature->getKind() == SketchPlugin_Point::ID()) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& theArguments,
+    Events_InfoMessage& theError) const
+{
+  std::shared_ptr<SketchPlugin_MacroArc> anArcFeature =
+      std::dynamic_pointer_cast<SketchPlugin_MacroArc>(theAttribute->owner());
+  AttributeRefAttrPtr anEndPointRef = anArcFeature->refattr(theArguments.front());
+
+  if(!anEndPointRef.get()) {
+    return true;
+  }
+
+  if(!anEndPointRef->isInitialized()) {
+    return true;
+  }
+
+  GeomShapePtr anArcShape = anArcFeature->getArcShape();
+
+  if(!anArcShape.get() || anArcShape->isNull()) {
+    return true;
+  }
+
+  ObjectPtr anObject = anEndPointRef->object();
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+  if(aResult.get()) {
+    GeomShapePtr aShape = aResult->shape();
+    if(aShape.get() && !aShape->isNull()) {
+      return GeomAlgoAPI_ShapeTools::isShapesIntersects(anArcShape, aShape);
+    }
+  }
+
+  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(anObject);
+  if(aSelectedFeature.get()) {
+    std::list<ResultPtr> aResults = aSelectedFeature->results();
+    for(std::list<ResultPtr>::const_iterator anIt = aResults.cbegin();
+        anIt != aResults.cend();
+        ++anIt)
+    {
+      GeomShapePtr aShape = (*anIt)->shape();
+      if(aShape.get() && !aShape->isNull()) {
+        if(GeomAlgoAPI_ShapeTools::isShapesIntersects(anArcShape, aShape)) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
 }
