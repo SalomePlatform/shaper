@@ -47,6 +47,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_ResultField.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_ResultCompSolid.h>
@@ -235,6 +236,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
                                    ModelAPI_ResultConstruction::DEFAULT_COLOR());
   Config_PropManager::registerProp("Visualization", "result_part_color", "Part color",
                                    Config_Prop::Color, ModelAPI_ResultPart::DEFAULT_COLOR());
+  Config_PropManager::registerProp("Visualization", "result_field_color", "Field color",
+                                   Config_Prop::Color, ModelAPI_ResultField::DEFAULT_COLOR());
 
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "face-selection", true))
     myViewerSelMode.append(TopAbs_FACE);
