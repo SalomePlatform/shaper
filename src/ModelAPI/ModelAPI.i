@@ -10,6 +10,9 @@
 
 %{
   #include "ModelAPI_swig.h"
+
+  // fix for SWIG v2.0.4
+  #define SWIGPY_SLICE_ARG(obj) ((PySliceObject*)(obj))
 %}
 
 // import other modules
@@ -135,6 +138,7 @@
 // std::list -> []
 %template(StringList) std::list<std::string>;
 %template(ObjectList) std::list<std::shared_ptr<ModelAPI_Object> >;
+%template(FeatureList) std::list<std::shared_ptr<ModelAPI_Feature> >;
 %template(ResultList) std::list<std::shared_ptr<ModelAPI_Result> >;
 %template(DocumentList) std::list<std::shared_ptr<ModelAPI_Document> >;
 // std::set -> []

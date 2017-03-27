@@ -30,7 +30,7 @@
 
 // shared pointers
 // For Point2D.method()
-%shared_ptr(ModelAPI_Point2D)
+%shared_ptr(ModelGeomAlgo_Point2D)
 
 // all supported interfaces
 %include "ModelGeomAlgo_Point2D.h"

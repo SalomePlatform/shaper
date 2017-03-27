@@ -1,6 +1,8 @@
 ﻿// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 #include <ModuleBase_WidgetValidator.h>
+#include <ModuleBase_WidgetSelectorStore.h>
+#include <ModuleBase_WidgetValidated.h>
 
 #include <ModuleBase_ModelWidget.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -9,12 +11,14 @@
 
 ModuleBase_WidgetValidator::ModuleBase_WidgetValidator(ModuleBase_ModelWidget* theModelWidget,
                                                        ModuleBase_IWorkshop* theWorkshop)
-: myModelWidget(theModelWidget), myWorkshop(theWorkshop)
+: myModelWidget(theModelWidget), myWorkshop(theWorkshop), myIsInValidate(false)
 {
+  myAttributeStore = new ModuleBase_WidgetSelectorStore();
 }
 
 ModuleBase_WidgetValidator::~ModuleBase_WidgetValidator()
 {
+  delete myAttributeStore;
 }
 
 //********************************************************************
@@ -45,6 +49,24 @@ bool ModuleBase_WidgetValidator::activateFilters(const bool toActivate)
   }
 
   return aHasSelectionFilter;
+}
+
+void ModuleBase_WidgetValidator::storeAttributeValue(const AttributePtr& theAttribute)
+{
+  myIsInValidate = true;
+  myAttributeStore->storeAttributeValue(theAttribute, myWorkshop);
+}
+
+void ModuleBase_WidgetValidator::restoreAttributeValue(const AttributePtr& theAttribute,
+                                                       const bool theValid)
+{
+  myIsInValidate = false;
+  myAttributeStore->restoreAttributeValue(theAttribute, myWorkshop);
+}
+
+bool ModuleBase_WidgetValidator::isValidAttribute(const AttributePtr& theAttribute) const
+{
+  return ModuleBase_WidgetValidated::isValidAttribute(theAttribute);
 }
 
 bool ModuleBase_WidgetValidator::isFilterActivated() const

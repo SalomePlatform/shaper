@@ -20,12 +20,14 @@
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_WidgetValidator.h>
+#include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_LabelValue.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
 
 #include <Events_Loop.h>
+#include <Events_InfoMessage.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeRefAttr.h>
@@ -158,7 +160,9 @@ bool PartSet_WidgetPoint2D::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr
     return true;
 
   AttributeRefAttrPtr aRefAttr = attributeRefAttr();
-  if (!aRefAttr.get()) {
+  if (aRefAttr.get())
+    return isValidSelectionForAttribute_(theValue, myFeature->attribute(attributeID()));
+  else {
     bool aFoundPoint = false;
     /// Avoid coincidence build to passed point. Coincidence is build later only if there are no
     /// reference attribute.
@@ -183,6 +187,55 @@ bool PartSet_WidgetPoint2D::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr
     return aFoundPoint;
   }
   return true;
+}
+
+//********************************************************************
+bool PartSet_WidgetPoint2D::isValidSelectionForAttribute_(
+                                            const ModuleBase_ViewerPrsPtr& theValue,
+                                            const AttributePtr& theAttribute)
+{
+  bool aValid = false;
+
+  // stores the current values of the widget attribute
+  bool isFlushesActived, isAttributeSetInitializedBlocked, isAttributeSendUpdatedBlocked;
+
+  AttributeRefAttrPtr aRefAttr = attributeRefAttr();
+  ModuleBase_WidgetValidated::blockFeatureAttribute(aRefAttr, myFeature, true,
+      isFlushesActived, isAttributeSetInitializedBlocked, isAttributeSendUpdatedBlocked);
+  myWidgetValidator->storeAttributeValue(aRefAttr);
+
+  // saves the owner value to the widget attribute
+  aValid = setSelectionCustom(theValue);
+  if (aValid)
+    // checks the attribute validity
+    aValid = myWidgetValidator->isValidAttribute(theAttribute);
+
+  // restores the current values of the widget attribute
+  myWidgetValidator->restoreAttributeValue(aRefAttr, aValid);
+
+  ModuleBase_WidgetValidated::blockFeatureAttribute(aRefAttr, myFeature, false, isFlushesActived,
+                                isAttributeSetInitializedBlocked, isAttributeSendUpdatedBlocked);
+  return aValid;
+}
+
+bool PartSet_WidgetPoint2D::setSelectionCustom(const ModuleBase_ViewerPrsPtr& theValue)
+{
+  bool isDone = false;
+  GeomShapePtr aShape = theValue->shape();
+  if (aShape.get() && !aShape->isNull()) {
+    Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
+    double aX, aY;
+    const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+    if (getPoint2d(aView, aTDShape, aX, aY)) {
+      fillRefAttribute(aX, aY);
+      isDone = true;
+    }
+    else if (aTDShape.ShapeType() == TopAbs_EDGE) {
+      fillRefAttribute(theValue->object());
+      isDone = true;
+    }
+  }
+  return isDone;
 }
 
 bool PartSet_WidgetPoint2D::resetCustom()
@@ -404,23 +457,25 @@ bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView,
 
 bool PartSet_WidgetPoint2D::setConstraintToPoint(double theClickedX, double theClickedY)
 {
-  FeaturePtr aFeature = feature();
-  std::string anAttribute = attributeID();
-
-  if (!aFeature.get())
-    return false;
-
-  std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = std::shared_ptr<GeomAPI_Pnt2d>(
-                                   new GeomAPI_Pnt2d(theClickedX, theClickedY));
-  AttributePoint2DPtr aClickedFeaturePoint = findFirstEqualPointInSketch(mySketch,
-                                                         aFeature, aClickedPoint);
-  if (!aClickedFeaturePoint.get())
-    return false;
-
   AttributeRefAttrPtr aRefAttr = attributeRefAttr();
   if (aRefAttr.get())
-    aRefAttr->setAttr(aClickedFeaturePoint);
+    fillRefAttribute(theClickedX, theClickedY);
   else {
+    FeaturePtr aFeature = feature();
+    std::string anAttribute = attributeID();
+
+    if (!aFeature.get())
+      return false;
+
+    std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = std::shared_ptr<GeomAPI_Pnt2d>(
+                                     new GeomAPI_Pnt2d(theClickedX, theClickedY));
+    AttributePoint2DPtr aClickedFeaturePoint = findFirstEqualPointInSketch(mySketch,
+                                                           aFeature, aClickedPoint);
+    if (!aClickedFeaturePoint.get())
+      return false;
+
+  //  aRefAttr->setAttr(aClickedFeaturePoint);
+  //else {
     // find a feature point by the selection mode
     AttributePoint2DPtr aFeaturePoint;
     if (aFeature->isMacro()) {
@@ -444,7 +499,7 @@ bool PartSet_WidgetPoint2D::setConstraintToObject(const ObjectPtr& theObject)
 {
   AttributeRefAttrPtr aRefAttr = attributeRefAttr();
   if (aRefAttr.get()) {
-    aRefAttr->setObject(theObject);
+    fillRefAttribute(theObject);
   }
   else {
     AttributePoint2DPtr aFeaturePoint;
@@ -799,6 +854,32 @@ AttributeRefAttrPtr PartSet_WidgetPoint2D::attributeRefAttr() const
     return anAttribute;
 
   return std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttributeRef);
+}
+
+void PartSet_WidgetPoint2D::fillRefAttribute(double theClickedX, double theClickedY)
+{
+  AttributeRefAttrPtr aRefAttr = attributeRefAttr();
+  if (!aRefAttr.get())
+    return;
+
+  FeaturePtr aFeature = feature();
+  std::string anAttribute = attributeID();
+
+  if (aFeature.get()) {
+    std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = std::shared_ptr<GeomAPI_Pnt2d>(
+                                      new GeomAPI_Pnt2d(theClickedX, theClickedY));
+    AttributePoint2DPtr aClickedFeaturePoint = findFirstEqualPointInSketch(mySketch,
+                                                            aFeature, aClickedPoint);
+    if (aClickedFeaturePoint.get())
+      aRefAttr->setAttr(aClickedFeaturePoint);
+  }
+}
+
+void PartSet_WidgetPoint2D::fillRefAttribute(const ObjectPtr& theObject)
+{
+  AttributeRefAttrPtr aRefAttr = attributeRefAttr();
+  if (aRefAttr.get())
+    aRefAttr->setObject(theObject);
 }
 
 std::shared_ptr<GeomDataAPI_Point2D> PartSet_WidgetPoint2D::findFirstEqualPointInArgumentFeatures(
