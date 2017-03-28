@@ -444,8 +444,11 @@ GeomShapePtr GeomAPI_Shape::intersect(const GeomShapePtr theShape) const
   if (aResult.ShapeType() == TopAbs_COMPOUND) {
     NCollection_List<TopoDS_Shape> aSubs;
     addSimpleToList(aResult, aSubs);
-    if (aSubs.Size() == 1)
+    if(aSubs.Size() == 1) {
       aResult = aSubs.First();
+    } else if(aSubs.Size() == 0) {
+      return GeomShapePtr();
+    }
   }
 
   GeomShapePtr aResShape(new GeomAPI_Shape);

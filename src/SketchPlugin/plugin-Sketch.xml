@@ -195,7 +195,7 @@
         title="Arc"
         tooltip="Create arc"
         icon="icons/Sketch/arc.png">
-        <toolbox id="arc_type">
+        <toolbox id="arc_type" modified_in_edit="false">
           <box id="by_center_and_points"
                icon="icons/Sketch/arc_base_32x32.png"
                title="Center and two points">

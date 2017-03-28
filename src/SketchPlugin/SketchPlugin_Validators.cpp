@@ -1350,7 +1350,10 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
   if(aResult.get()) {
     GeomShapePtr aShape = aResult->shape();
     if(aShape.get() && !aShape->isNull()) {
-      return GeomAlgoAPI_ShapeTools::isShapesIntersects(anArcShape, aShape);
+      GeomShapePtr anIntersection = anArcShape->intersect(aShape);
+      if(anIntersection.get() && !anIntersection->isNull()) {
+        return true;
+      }
     }
   }
 
@@ -1363,7 +1366,8 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
     {
       GeomShapePtr aShape = (*anIt)->shape();
       if(aShape.get() && !aShape->isNull()) {
-        if(GeomAlgoAPI_ShapeTools::isShapesIntersects(anArcShape, aShape)) {
+        GeomShapePtr anIntersection = anArcShape->intersect(aShape);
+        if(anIntersection.get() && !anIntersection->isNull()) {
           return true;
         }
       }
