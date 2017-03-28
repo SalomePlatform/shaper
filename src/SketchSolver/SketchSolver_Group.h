@@ -96,7 +96,7 @@ private:
   void setTemporary(SolverConstraintPtr theConstraint);
 
   /// \brief Compute DoF of the sketch and set corresponding field
-  void computeDoF() const;
+  void computeDoF();
 
 private:
   CompositeFeaturePtr mySketch; ///< Sketch for this group
@@ -109,6 +109,8 @@ private:
   /// Result of previous solution of the set of constraints
   PlaneGCSSolver_Solver::SolveStatus myPrevResult;
   std::set<ObjectPtr>      myConflictingConstraints; ///< List of conflicting constraints
+
+  int  myDOF; ///< degrees of freedom of the current sketch
 
   bool myIsEventsBlocked; ///< shows the events are blocked for this group
 };
