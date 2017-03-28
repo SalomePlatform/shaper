@@ -586,22 +586,25 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
   ModuleBase_Tools::flushUpdated(aFeature);
 
   // update visible state of Preview button
+  std::shared_ptr<Config_FeatureMessage> aFeatureInfo;
 #ifdef HAVE_SALOME
-  bool anIsAutoPreview =
-    mySalomeConnector->featureInfo(aFeatureKind.c_str())->isAutoPreview();
+  aFeatureInfo = mySalomeConnector->featureInfo(aFeatureKind.c_str());
 #else
   AppElements_MainMenu* aMenuBar = mainWindow()->menuObject();
   AppElements_Command* aCommand = aMenuBar->feature(aFeatureKind.c_str());
-  bool anIsAutoPreview = true;
   if (aCommand)
-    anIsAutoPreview = aCommand->featureMessage()->isAutoPreview();
+    aFeatureInfo = aCommand->featureMessage();
+#endif
+  bool anIsAutoPreview = true;
+  if (aFeatureInfo.get())
+    aFeatureInfo->isAutoPreview();
   else {
     std::string aXmlCfg, aDescription;
     module()->getXMLRepresentation(aFeatureKind, aXmlCfg, aDescription);
     ModuleBase_WidgetFactory aFactory(aXmlCfg, moduleConnector());
     anIsAutoPreview = aFactory.widgetAPI()->getBooleanAttribute(FEATURE_AUTO_PREVIEW, true);
   }
-#endif
+
   if (!anIsAutoPreview) {
     myPropertyPanel->findButton(PROP_PANEL_PREVIEW)->setVisible(true);
     // send signal about preview should not be computed automatically, click on preview
