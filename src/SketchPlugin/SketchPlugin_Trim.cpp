@@ -334,7 +334,8 @@ void SketchPlugin_Trim::execute()
       continue;
 
     if (aReplacingResult.get()) {
-      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
+      AttributeRefAttrPtr aRefAttr =
+          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
       if (aRefAttr.get())
         aRefAttr->setObject(aReplacingResult);
       else {

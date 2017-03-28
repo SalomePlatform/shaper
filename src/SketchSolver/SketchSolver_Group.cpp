@@ -34,7 +34,9 @@ static void sendMessage(const char* theMessageName, const std::set<ObjectPtr>& t
   Events_Loop::loop()->send(aMessage);
 }
 
-static void sendMessage(const char* theMessageName, const CompositeFeaturePtr& theSketch, const int theDOF)
+static void sendMessage(const char* theMessageName,
+                        const CompositeFeaturePtr& theSketch,
+                        const int theDOF)
 {
   std::shared_ptr<ModelAPI_SolverFailedMessage> aMessage =
       std::shared_ptr<ModelAPI_SolverFailedMessage>(

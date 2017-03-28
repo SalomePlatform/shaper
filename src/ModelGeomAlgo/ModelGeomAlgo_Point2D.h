@@ -51,7 +51,8 @@ public:
   /// \param isSkipFeatureAttributes a boolean value if coincidences to the feature attributes
   /// should be skipped
   /// \returns found point attribute or NULL
-  static MODELGEOMALGO_EXPORT void getPointsOfReference(const std::shared_ptr<ModelAPI_Object>& theObject,
+  static MODELGEOMALGO_EXPORT
+        void getPointsOfReference(const std::shared_ptr<ModelAPI_Object>& theObject,
                                   const std::string& theReferenceFeatureKind,
                                   std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theAttributes,
                                   const std::string& theObjectFeatureKind = "",
