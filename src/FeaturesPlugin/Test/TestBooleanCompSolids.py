@@ -27,8 +27,8 @@ norm = geomDataAPI_Dir(aCircleSketchFeature.attribute("Norm"))
 norm.setValue(0, 0, 1)
 
 aSketchCircle = aCircleSketchFeature.addFeature("SketchCircle")
-aCircleCentr = geomDataAPI_Point2D(aSketchCircle.attribute("CircleCenter"))
-aCircleRadius = aSketchCircle.real("CircleRadius")
+aCircleCentr = geomDataAPI_Point2D(aSketchCircle.attribute("circle_center"))
+aCircleRadius = aSketchCircle.real("circle_radius")
 aCircleCentr.setValue(0, 0)
 aCircleRadius.setValue(50)
 

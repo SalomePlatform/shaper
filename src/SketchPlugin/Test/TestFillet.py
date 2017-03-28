@@ -75,9 +75,9 @@ def createSketch2(theSketch):
     allFeatures.append(aSketchLine)
     # Arc
     aSketchArc = theSketch.addFeature("SketchArc")
-    aStartPoint2 = geomDataAPI_Point2D(aSketchArc.attribute("ArcStartPoint"))
-    aEndPoint2   = geomDataAPI_Point2D(aSketchArc.attribute("ArcEndPoint"))
-    aCenterPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcCenter"))
+    aStartPoint2 = geomDataAPI_Point2D(aSketchArc.attribute("start_point"))
+    aEndPoint2   = geomDataAPI_Point2D(aSketchArc.attribute("end_point"))
+    aCenterPoint = geomDataAPI_Point2D(aSketchArc.attribute("center_point"))
     aCenterPoint.setValue(20., 10.)
     aStartPoint2.setValue(10., 10.)
     aEndPoint2.setValue(20., 0.)
@@ -104,15 +104,15 @@ def checkSmoothness(theSketch):
             checkArcLineSmoothness(aConnectedFeatures[1], aConnectedFeatures[0])
 
 def checkArcLineSmoothness(theArc, theLine):
-    aCenter = geomDataAPI_Point2D(theArc.attribute("ArcCenter"))
+    aCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
     aDistance = distancePointLine(aCenter, theLine)
     aRadius = arcRadius(theArc)
     assert(math.fabs(aRadius - aDistance) < TOLERANCE)
 
 def checkArcArcSmoothness(theArc1, theArc2):
-    aCenter1 = geomDataAPI_Point2D(theArc1.attribute("ArcCenter"))
-    aCenter2 = geomDataAPI_Point2D(theArc2.attribute("ArcCenter"))
-    aDistance = distancePointPoint(aCenter1, aCenter2)
+    aCenter1 = geomDataAPI_Point2D(theArc1.attribute("center_point"))
+    aCenter2 = geomDataAPI_Point2D(theArc2.attribute("center_point"))
+    aDistance = model.distancePointPoint(aCenter1, aCenter2)
     aRadius1 = arcRadius(theArc1)
     aRadius2 = arcRadius(theArc2)
     aRadSum = aRadius1 + aRadius2
@@ -138,17 +138,14 @@ def connectedFeatures(theCoincidence):
     return [aFeatureA, aFeatureB]
 
 def arcRadius(theArc):
-    aCenter = geomDataAPI_Point2D(theArc.attribute("ArcCenter"))
-    aStart = geomDataAPI_Point2D(theArc.attribute("ArcStartPoint"))
-    return distancePointPoint(aCenter, aStart)
-
-def distancePointPoint(thePoint1, thePoint2):
-    return math.hypot(thePoint1.x() - thePoint2.x(), thePoint1.y() - thePoint2.y())
+    aCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
+    aStart = geomDataAPI_Point2D(theArc.attribute("start_point"))
+    return model.distancePointPoint(aCenter, aStart)
 
 def distancePointLine(thePoint, theLine):
     aLineStart = geomDataAPI_Point2D(theLine.attribute("StartPoint"))
     aLineEnd = geomDataAPI_Point2D(theLine.attribute("EndPoint"))
-    aLength = distancePointPoint(aLineStart, aLineEnd)
+    aLength = model.distancePointPoint(aLineStart, aLineEnd)
 
     aDir1x, aDir1y = aLineEnd.x() - aLineStart.x(), aLineEnd.y() - aLineStart.y()
     aDir2x, aDir2y = thePoint.x() - aLineStart.x(), thePoint.y() - aLineStart.y()

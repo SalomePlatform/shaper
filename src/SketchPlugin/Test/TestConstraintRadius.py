@@ -28,15 +28,6 @@ from salome.shaper import model
 
 __updated__ = "2014-10-28"
 
-def distancePointPoint(pointA, pointB):
-    """
-    subroutine to calculate distance between two points
-    result of calculated distance is has 10**-5 precision
-    """
-    xdiff = math.pow((pointA.x() - pointB.x()), 2)
-    ydiff = math.pow((pointA.y() - pointB.y()), 2)
-    return round(math.sqrt(xdiff + ydiff), 5)
-
 
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
@@ -58,11 +49,11 @@ aSession.finishOperation()
 #=========================================================================
 aSession.startOperation()
 aSketchArc = aSketchFeature.addFeature("SketchArc")
-anArcCentr = geomDataAPI_Point2D(aSketchArc.attribute("ArcCenter"))
+anArcCentr = geomDataAPI_Point2D(aSketchArc.attribute("center_point"))
 anArcCentr.setValue(10., 10.)
-anArcStartPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcStartPoint"))
+anArcStartPoint = geomDataAPI_Point2D(aSketchArc.attribute("start_point"))
 anArcStartPoint.setValue(0., 50.)
-anArcEndPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcEndPoint"))
+anArcEndPoint = geomDataAPI_Point2D(aSketchArc.attribute("end_point"))
 anArcEndPoint.setValue(50., 0.)
 aSession.finishOperation()
 assert (model.dof(aSketchFeature) == 5)
@@ -81,22 +72,16 @@ assert (model.dof(aSketchFeature) == 5)
 # Circle
 aSession.startOperation()
 aSketchCircle = aSketchFeature.addFeature("SketchCircle")
-anCircleCentr = geomDataAPI_Point2D(aSketchCircle.attribute("CircleCenter"))
-aCircleRadius = aSketchCircle.real("CircleRadius")
+anCircleCentr = geomDataAPI_Point2D(aSketchCircle.attribute("circle_center"))
+aCircleRadius = aSketchCircle.real("circle_radius")
 anCircleCentr.setValue(-25., -25)
 aCircleRadius.setValue(25.)
-aSession.finishOperation()
-assert (model.dof(aSketchFeature) == 8)
-# Change the radius of the arc
-aSession.startOperation()
-RADIUS = 40
-anArcRadius = aSketchArc.real("ArcRadius")
-anArcRadius.setValue(RADIUS)
 aSession.finishOperation()
 assert (model.dof(aSketchFeature) == 8)
 #=========================================================================
 # Make a constraint to keep the radius of the arc
 #=========================================================================
+RADIUS = 40
 aSession.startOperation()
 aConstraint = aSketchFeature.addFeature("SketchConstraintRadius")
 aRadius = aConstraint.real("ConstraintValue")
@@ -104,7 +89,7 @@ aRefObject = aConstraint.refattr("ConstraintEntityA")
 aResult = aSketchArc.lastResult()
 assert (aResult is not None)
 aRefObject.setObject(modelAPI_ResultConstruction(aResult))
-aConstraint.execute()
+aRadius.setValue(RADIUS)
 aSession.finishOperation()
 assert (aRadius.isInitialized())
 assert (aRefObject.isInitialized())
@@ -119,19 +104,21 @@ aRefObject = aConstraint.refattr("ConstraintEntityA")
 aResult = aSketchCircle.lastResult()
 assert (aResult is not None)
 aRefObject.setObject(modelAPI_ResultConstruction(aResult))
-aConstraint.execute()
+aRadius.setValue(RADIUS)
 aSession.finishOperation()
 assert (aRadius.isInitialized())
 assert (aRefObject.isInitialized())
 assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 # Perform some actions and checks:
-# 1. Check that constraints does not changes values
+# 1. Check that constraints does not change values
 # 2. Move one point of the arc
 # 3. Check that second point is moved also
 #=========================================================================
-assert (math.fabs(distancePointPoint(anArcCentr, anArcStartPoint) - RADIUS) < 1.e-10)
-assert (math.fabs(distancePointPoint(anArcCentr, anArcEndPoint) - RADIUS) < 1.e-10)
+distCS = model.distancePointPoint(anArcCentr, anArcStartPoint)
+distCE = model.distancePointPoint(anArcCentr, anArcEndPoint)
+assert (math.fabs(distCS - RADIUS) < 1.e-10)
+assert (math.fabs(distCE - RADIUS) < 1.e-10)
 anArcPrevEndPointX = anArcEndPoint.x()
 anArcPrevEndPointY = anArcEndPoint.y()
 # Move one point of the arc
@@ -140,8 +127,10 @@ anArcStartPoint.setValue(0, 60)
 aSession.finishOperation()
 assert (anArcEndPoint.x() != anArcPrevEndPointX)
 assert (anArcEndPoint.y() != anArcPrevEndPointY)
-assert (math.fabs(distancePointPoint(anArcCentr, anArcStartPoint) - RADIUS) < 1.e-10)
-assert (math.fabs(distancePointPoint(anArcCentr, anArcEndPoint) - RADIUS) < 1.e-10)
+distCS = model.distancePointPoint(anArcCentr, anArcStartPoint)
+distCE = model.distancePointPoint(anArcCentr, anArcEndPoint)
+assert (math.fabs(distCS - RADIUS) < 1.e-10)
+assert (math.fabs(distCE - RADIUS) < 1.e-10)
 assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 # 4. Move the centr or the point of the arc
@@ -149,13 +138,13 @@ assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 assert (anCircleCentr.x() == -25)
 assert (anCircleCentr.y() == -25)
-assert (aCircleRadius.value() == 25)
+assert (aCircleRadius.value() == RADIUS)
 aSession.startOperation()
 anCircleCentr.setValue(100., 100.)
 aSession.finishOperation()
 assert (anCircleCentr.x() == 100)
 assert (anCircleCentr.y() == 100)
-assert (aCircleRadius.value() == 25)
+assert (aCircleRadius.value() == RADIUS)
 assert (model.dof(aSketchFeature) == 6)
 #=========================================================================
 # End of test

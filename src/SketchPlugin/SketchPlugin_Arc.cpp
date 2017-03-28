@@ -190,8 +190,17 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
         aCirc->parameter(anEdge->firstPoint(), paramTolerance, aStartParam);
         aCirc->parameter(aMinPnt, paramTolerance, aMidParam);
         aCirc->parameter(anEdge->lastPoint(), paramTolerance, anEndParam);
+
+        // adjust period
+        anEndParam -= aStartParam;
+        aMidParam -= aStartParam;
+        if (anEndParam < 0.0)
+          anEndParam += 2.0 * PI;
+        if (aMidParam < 0.0)
+          aMidParam += 2.0 * PI;
+
         aWasBlocked = data()->blockSendAttributeUpdated(true);
-        if(aStartParam < aMidParam && aMidParam < anEndParam) {
+        if(aMidParam < anEndParam) {
           setReversed(false);
         } else {
           setReversed(true);

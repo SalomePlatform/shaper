@@ -82,7 +82,7 @@
   <context>
     <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "CircleCenter" is not initialized.</source>
+      <source>Attribute "circle_center" is not initialized.</source>
       <translation>A center point is not selected</translation>
     </message>
   </context>
@@ -110,7 +110,7 @@
   <context>
     <name>SketchMacroCircle:CircleCenter</name>
     <message>
-      <source>Attribute "CircleCenter" is locked by modification value in the viewer.</source>
+      <source>Attribute "circle_center" is locked by modification value in the viewer.</source>
       <translation>Select a center point</translation>
     </message>
   </context>
@@ -138,7 +138,7 @@
   <context>
     <name>SketchMacroCircle:CircleRadius</name>
     <message>
-      <source>Attribute "CircleRadius" is locked by modification value in the viewer.</source>
+      <source>Attribute "circle_radius" is locked by modification value in the viewer.</source>
       <translation>Select a radius distance</translation>
     </message>
   </context>
@@ -159,7 +159,7 @@
   <context>
     <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "CircleRadius" is not initialized.</source>
+      <source>Attribute "circle_radius" is not initialized.</source>
       <translation>Set the circle radius</translation>
     </message>
   </context>
@@ -636,14 +636,14 @@
   <context>
     <name>SketchArc:ArcCenter</name>
     <message>
-      <source>Attribute "ArcCenter" is locked by modification value in the viewer.</source>
+      <source>Attribute "center_point" is locked by modification value in the viewer.</source>
       <translation>Select a center point</translation>
     </message>
   </context>
   <context>
     <name>SketchArc:ArcCenter</name>
     <message>
-      <source>Attribute "ArcCenter" is not initialized.</source>
+      <source>Attribute "center_point" is not initialized.</source>
       <translation>Center point is not defined</translation>
     </message>
   </context>
@@ -720,21 +720,21 @@
   <context>
     <name>SketchArc:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ArcCenter" is not initialized.</source>
+      <source>Attribute "center_point" is not initialized.</source>
       <translation>Select an arc center</translation>
     </message>
   </context>
   <context>
     <name>SketchArc:Model_FeatureValidator:ArcStartPoint</name>
     <message>
-      <source>Attribute "ArcStartPoint" is not initialized.</source>
+      <source>Attribute "start_point" is not initialized.</source>
       <translation>Select an arc start point</translation>
     </message>
   </context>
   <context>
     <name>SketchArc:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ArcEndPoint" is not initialized.</source>
+      <source>Attribute "end_point" is not initialized.</source>
       <translation>Select an arc end point</translation>
     </message>
   </context>

@@ -1,7 +1,7 @@
 """
     TestConstraintMirror.py
     Unit test of SketchPlugin_ConstraintMirror class
-        
+
     SketchPlugin_ConstraintMirror
         static const std::string MY_CONSTRAINT_MIRROR_ID("SketchConstraintMirror");
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
@@ -32,7 +32,7 @@ def normalize(theDir):
 def checkMirror(theListInit, theListMirr, theMirrorLine):
     TOL = 6.e-5
     aListSize = theListInit.size()
-    
+
     aLineStartPoint = geomDataAPI_Point2D(theMirrorLine.attribute("StartPoint"))
     aLineEndPoint = geomDataAPI_Point2D(theMirrorLine.attribute("EndPoint"))
     aLineDir = [aLineEndPoint.x() - aLineStartPoint.x(), aLineEndPoint.y() - aLineStartPoint.y()]
@@ -44,13 +44,13 @@ def checkMirror(theListInit, theListMirr, theMirrorLine):
         assert(aFeatureB is not None)
         assert(aFeatureC is not None)
         assert(aFeatureB.getKind() == aFeatureC.getKind())
-        
+
         anAttributes = []
         if (aFeatureB.getKind() == "SketchLine"):
             anAttributes = ['StartPoint', 'EndPoint']
         elif (aFeatureB.getKind() == "SketchArc"):
-            anAttributes = ['ArcCenter', 'ArcStartPoint', 'ArcEndPoint']
-        
+            anAttributes = ['center_point', 'start_point', 'end_point']
+
         for key in anAttributes:
             aPointB = geomDataAPI_Point2D(aFeatureB.attribute(key))
             aPointC = geomDataAPI_Point2D(aFeatureC.attribute(key))
@@ -88,11 +88,11 @@ aSession.finishOperation()
 # Arc
 aSession.startOperation()
 aSketchArc1 = aSketchFeature.addFeature("SketchArc")
-anArcCentr = geomDataAPI_Point2D(aSketchArc1.attribute("ArcCenter"))
+anArcCentr = geomDataAPI_Point2D(aSketchArc1.attribute("center_point"))
 anArcCentr.setValue(10., 10.)
-anArcStartPoint = geomDataAPI_Point2D(aSketchArc1.attribute("ArcStartPoint"))
+anArcStartPoint = geomDataAPI_Point2D(aSketchArc1.attribute("start_point"))
 anArcStartPoint.setValue(0., 50.)
-anArcEndPoint = geomDataAPI_Point2D(aSketchArc1.attribute("ArcEndPoint"))
+anArcEndPoint = geomDataAPI_Point2D(aSketchArc1.attribute("end_point"))
 anArcEndPoint.setValue(50., 0.)
 aSession.finishOperation()
 # Line 1

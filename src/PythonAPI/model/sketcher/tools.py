@@ -2,6 +2,7 @@
 # Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 import ModelHighAPI
+import GeomDataAPI
 
 def addPolyline(sketch, *coords):
     """Add a poly-line to sketch.
@@ -49,3 +50,21 @@ def dof(sketch):
     if issubclass(type(aSketch), ModelHighAPI.ModelHighAPI_Interface):
         aSketch = sketch.feature()
     return int(filter(str.isdigit, aSketch.string("SolverDOF").value()))
+
+def distancePointPoint(thePoint1, thePoint2):
+    aGeomPnt1 = thePoint1
+    aGeomPnt2 = thePoint2
+    if issubclass(type(thePoint1), GeomDataAPI.GeomDataAPI_Point2D):
+        aGeomPnt1 = thePoint1.pnt()
+    if issubclass(type(thePoint2), GeomDataAPI.GeomDataAPI_Point2D):
+        aGeomPnt2 = thePoint2.pnt()
+    return aGeomPnt1.distance(aGeomPnt2)
+
+def lastSubFeature(theSketch, theKind):
+    """
+    obtains last feature of given kind from the sketch
+    """
+    for anIndex in range(theSketch.numberOfSubs() - 1, -1, -1):
+        aSub = theSketch.subFeature(anIndex)
+        if (aSub.getKind() == theKind):
+            return aSub
