@@ -167,6 +167,11 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
       double aWidth = thePrs->width();
       isCustomized = thePrs->setWidth(aWidth / 2.5) || isCustomized;
     }
+
+    if (!theResult.get()) {
+      double aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
+      thePrs->setDeflection(aDeflection);
+  }
     return isCustomized;
   }
 
