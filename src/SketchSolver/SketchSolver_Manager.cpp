@@ -74,13 +74,17 @@ bool SketchSolver_Manager::groupMessages()
 void SketchSolver_Manager::processEvent(
   const std::shared_ptr<Events_Message>& theMessage)
 {
+  bool needToResolve = false;
+  bool isUpdateFlushed = false;
+  bool isMovedEvt = false;
+
   static const Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
   static const Events_ID aSketchPreparedEvent = Events_Loop::eventByName(EVENT_SKETCH_PREPARED);
   // sketch is prepared for resolve: all the needed events
   // are collected and must be processed by the solver
   if (theMessage->eventID() == aSketchPreparedEvent) {
     flushGrouped(anUpdateEvent);
-    return;
+    needToResolve = true;
   }
 
   if (myIsComputed)
@@ -94,9 +98,9 @@ void SketchSolver_Manager::processEvent(
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     std::set<ObjectPtr> aFeatures = anUpdateMsg->objects();
 
-    bool isUpdateFlushed = stopSendUpdate();
+    isUpdateFlushed = stopSendUpdate();
 
-    bool isMovedEvt = theMessage->eventID()
+    isMovedEvt = theMessage->eventID()
           == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED);
 
     // Shows that the message has at least one feature applicable for solver
@@ -113,25 +117,8 @@ void SketchSolver_Manager::processEvent(
       hasProperFeature = updateFeature(aFeature, isMovedEvt) || hasProperFeature;
     }
 
-    if (isMovedEvt && !hasProperFeature) {
-      // in this iteration it will compute nothing, so, no problem with recursion
-      // it is important that solver flushes signal updated after processing move signal as there
-      // is optimization that relies on this update, might be found by key "optimization"
-      myIsComputed = false;
-    }
-
-    // Solve the set of constraints
-    bool needToUpdate = resolveConstraints();
-
-    // Features may be updated => now send events, but for all changed at once
-    if (isUpdateFlushed)
-      allowSendUpdate();
-
-    myIsComputed = false;
-
-    // send update for movement in any case
-    if (needToUpdate || isMovedEvt)
-      Events_Loop::loop()->flush(anUpdateEvent);
+    if (isMovedEvt && hasProperFeature)
+      needToResolve = true;
 
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
     std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleteMsg =
@@ -158,11 +145,22 @@ void SketchSolver_Manager::processEvent(
         (*aGroupIter)->repairConsistency();
         ++aGroupIter;
       }
-
-      resolveConstraints();
     }
     myIsComputed = false;
   }
+
+  // resolve constraints if needed
+  bool needToUpdate = needToResolve && resolveConstraints();
+
+  // Features may be updated => now send events, but for all changed at once
+  if (isUpdateFlushed)
+    allowSendUpdate();
+
+  myIsComputed = false;
+
+  // send update for movement in any case
+  if (needToUpdate || isMovedEvt)
+    Events_Loop::loop()->flush(anUpdateEvent);
 }
 
 // ============================================================================
