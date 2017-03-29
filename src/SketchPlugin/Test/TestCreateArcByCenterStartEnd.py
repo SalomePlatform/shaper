@@ -40,11 +40,7 @@ def verifyLastArc(theSketch, theCenter, theStart, theEnd):
         verifyPointCoordinates(aStartPnt, theStart[0], theStart[1])
     if len(theEnd):
         verifyPointCoordinates(aEndPnt, theEnd[0], theEnd[1])
-    aRadius = aLastArc.real("radius")
-    aDistCS = model.distancePointPoint(aCenterPnt, aStartPnt)
-    aDistCE = model.distancePointPoint(aCenterPnt, aEndPnt)
-    assert math.fabs(aDistCS - aDistCE) < TOLERANCE, "Wrong arc: center-start distance {}, center-end distance {}".format(aDistCS, aDistCE)
-    assert math.fabs(aRadius.value() -aDistCS) < TOLERANCE, "Wrong radius {0}, expected {1}".format(aRadius.value(), aDistCS)
+    model.assertSketchArc(aLastArc)
 
 def verifyPointCoordinates(thePoint, theX, theY):
     assert thePoint.x() == theX and thePoint.y() == theY, "Wrong '{0}' point ({1}, {2}), expected ({3}, {4})".format(thePoint.id(), thePoint.x(), thePoint.y(), theX, theY)

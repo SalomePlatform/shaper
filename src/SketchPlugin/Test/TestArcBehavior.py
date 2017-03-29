@@ -12,6 +12,7 @@
 from GeomDataAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
 
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
@@ -85,8 +86,8 @@ assert shapeToEdge(aSketchArc.lastResult().shape()).length() < 32.
 aSession.startOperation()
 anArcEndPoint.setValue(10., 0.)
 aSession.finishOperation()
-assert shapeToEdge(aSketchArc.lastResult().shape()).length() > 47.
-assert shapeToEdge(aSketchArc.lastResult().shape()).length() < 48.
+assert shapeToEdge(aSketchArc.lastResult().shape()).length() > 46.5
+assert shapeToEdge(aSketchArc.lastResult().shape()).length() < 47.5
 aSession.startOperation()
 anArcEndPoint.setValue(1., 10.)
 aSession.finishOperation()
@@ -132,9 +133,8 @@ for aCenterCoords in range(-20, 20):
   aSession.finishOperation()
   assert aSketchArc.boolean("reversed").value() == anInversed
 #=========================================================================
-# Test that movement of start point of arc does not change central point
+# Test that movement of start point of arc does not break the arc
 #=========================================================================
-TOL = 1.e-5
 x = anArcCentr.x()
 y = anArcCentr.y()
 sx = anArcStartPoint.x()
@@ -143,16 +143,14 @@ for aDelta in range(0, 20):
   aSession.startOperation()
   anArcStartPoint.setValue(sx, sy+aDelta) # move start point
   aSession.finishOperation()
-  assert math.fabs(anArcCentr.x() - x) < TOL
-  assert math.fabs(anArcCentr.y() - y) < TOL
+  model.assertSketchArc(aSketchArc)
 for aDelta in range(20, -1, -1):
   aSession.startOperation()
   anArcStartPoint.setValue(sx, sy+aDelta) # move start point
   aSession.finishOperation()
-  assert math.fabs(anArcCentr.x() - x) < TOL
-  assert math.fabs(anArcCentr.y() - y) < TOL
+  model.assertSketchArc(aSketchArc)
 #=========================================================================
-# Test that movement of end point of arc does not change central point
+# Test that movement of end point of arc does not break the arc
 #=========================================================================
 x = anArcCentr.x()
 y = anArcCentr.y()
@@ -162,11 +160,9 @@ for aDelta in range(0, 20):
   aSession.startOperation()
   anArcEndPoint.setValue(sx+aDelta, sy) # move end point
   aSession.finishOperation()
-  assert math.fabs(anArcCentr.x() - x) < TOL
-  assert math.fabs(anArcCentr.y() - y) < TOL
+  model.assertSketchArc(aSketchArc)
 for aDelta in range(20, -1, -1):
   aSession.startOperation()
   anArcEndPoint.setValue(sx+aDelta, sy) # move end point
   aSession.finishOperation()
-  assert math.fabs(anArcCentr.x() - x) < TOL
-  assert math.fabs(anArcCentr.y() - y) < TOL
+  model.assertSketchArc(aSketchArc)
