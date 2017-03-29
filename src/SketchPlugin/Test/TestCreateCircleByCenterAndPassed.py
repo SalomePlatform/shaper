@@ -236,7 +236,9 @@ aPassed.setValue(aLineStart[0], aLineStart[1])
 aSession.finishOperation()
 aLastFeature = aSketchFeature.subFeature(aSketchFeature.numberOfSubs() - 1)
 assert aLastFeature.getKind() == "SketchMacroCircle", "ERROR: SketchMacroCircle has NOT expected to be valid"
+aSession.startOperation()
 aDocument.removeFeature(aCircle)
+aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 10)
 
 #=========================================================================

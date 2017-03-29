@@ -2,9 +2,6 @@
 %module GeomAlgoAPI
 %{
   #include "GeomAlgoAPI_swig.h"
-
-  // fix for SWIG v2.0.4
-  #define SWIGPY_SLICE_ARG(obj) ((PySliceObject*)(obj))
 %}
 
 // import other modules
