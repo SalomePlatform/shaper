@@ -663,9 +663,11 @@ void Model_AttributeSelection::selectSubShape(
       }
     }
     setValue(aCont, aShapeToBeSelected);
+    return;
   }
 
-  setInvalidIfFalse(selectionLabel(), false);
+  TDF_Label aSelLab = selectionLabel();
+  setInvalidIfFalse(aSelLab, false);
   reset();
 }
 
