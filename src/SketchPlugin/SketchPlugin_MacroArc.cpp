@@ -366,6 +366,7 @@ void SketchPlugin_MacroArc::fillByThreePassedPoints()
     std::shared_ptr<GeomAPI_Ax3> anAxis = SketchPlugin_Sketch::plane(sketch());
     GeomAPI_Circ2d aCircle(myStart, myEnd, aPassed, anAxis);
     myCenter = aCircle.center();
+    aCircle = GeomAPI_Circ2d(myCenter, myStart);
 
     recalculateReversedFlagByPassed(aCircle);
   } else
