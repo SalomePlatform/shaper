@@ -307,12 +307,13 @@ ConstraintWrapperPtr createArcLineTangency(EntityWrapperPtr theEntity1,
 
   std::shared_ptr<GCS::Circle> aCirc =
       std::dynamic_pointer_cast<GCS::Circle>(anEntCirc->entity());
+  std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(aCirc);
+
   std::shared_ptr<GCS::Line> aLine =
       std::dynamic_pointer_cast<GCS::Line>(anEntLine->entity());
 
   GCSConstraintPtr aNewConstr;
-  if (theSharedPoint) {
-    std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(aCirc);
+  if (theSharedPoint && anArc) { // do not process shared point between circle and line
     GCSPointPtr aPoint =
         std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theSharedPoint)->point();
 
