@@ -34,13 +34,13 @@ SketchConstraintCoincidence_1_3 = Sketch.setCoincident(SketchLine_3.endPoint(), 
 GeomPoint = geom.Pnt2d(40, 50)
 
 #check number of features before trim
-#Sketch_feature = featureToCompositeFeature(Sketch.feature())
-#idList_before = []
-#for index in range(Sketch_feature.numberOfSubs()):
-#  idList_before.append(Sketch_feature.subFeature(index).getKind())
+Sketch_feature = featureToCompositeFeature(Sketch.feature())
+idList_before = []
+for index in range(Sketch_feature.numberOfSubs()):
+  idList_before.append(Sketch_feature.subFeature(index).getKind())
 
-#assert(idList_before.count(SketchLineId) == 3)
-#assert(idList_before.count(SketchConstraintCoincidenceId) == 2)
+assert(idList_before.count(SketchLineId) == 5)
+assert(idList_before.count(SketchConstraintCoincidenceId) == 3)
 
 #perform trim
 SketchTrim = Sketch.addTrim(SketchLine_intersecting, GeomPoint)
@@ -48,25 +48,40 @@ SketchTrim.execute()
 model.do()
 
 #check number of features after trim
-#SketchFeatures = featureToCompositeFeature(Sketch.feature())
-#idList_after = []
-#for SubIndex in range(SketchFeatures.numberOfSubs()):
-#    SubFeature = SketchFeatures.subFeature(SubIndex)
-#    idList_after.append(SubFeature.getKind())
+SketchFeatures = featureToCompositeFeature(Sketch.feature())
+idList_after = []
 
-#assert(idList_after.count(SketchLineId) == 3)
-#assert(idList_after.count(SketchConstraintCoincidenceId) == 2)
+LinesList = FeatureList()
+for SubIndex in range(SketchFeatures.numberOfSubs()):
+    SubFeature = SketchFeatures.subFeature(SubIndex)
+    idList_after.append(SubFeature.getKind())
+    if SubFeature.getKind() == SketchLineId:
+      LinesList.append(SubFeature)
+
+assert(idList_after.count(SketchLineId) == 6)
+assert(idList_after.count(SketchConstraintCoincidenceId) == 5)
+
+
+#check lines intersection to the source line
+SketchLine_intersecting_1 = Sketch.addLine(15, 55, 15, 40)
+SketchLine_intersecting_2 = Sketch.addLine(40, 55, 40, 40)
+SketchLine_intersecting_3 = Sketch.addLine(70, 55, 70, 40)
+SketchLine_intersecting_4 = Sketch.addLine(100, 55, 100, 40)
+SketchLine_intersecting_5 = Sketch.addLine(125, 55, 125, 40)
+
+Intersection_Points_1 = ModelGeomAlgo_Point2D.getSetOfPntIntersectedShape(SketchLine_intersecting_1.feature(), LinesList)
+Intersection_Points_2 = ModelGeomAlgo_Point2D.getSetOfPntIntersectedShape(SketchLine_intersecting_2.feature(), LinesList)
+Intersection_Points_3 = ModelGeomAlgo_Point2D.getSetOfPntIntersectedShape(SketchLine_intersecting_3.feature(), LinesList)
+Intersection_Points_4 = ModelGeomAlgo_Point2D.getSetOfPntIntersectedShape(SketchLine_intersecting_4.feature(), LinesList)
+Intersection_Points_5 = ModelGeomAlgo_Point2D.getSetOfPntIntersectedShape(SketchLine_intersecting_5.feature(), LinesList)
+
+assert(len(Intersection_Points_1) == 1)
+assert(len(Intersection_Points_2) == 0)
+assert(len(Intersection_Points_3) == 1)
+assert(len(Intersection_Points_4) == 1)
+assert(len(Intersection_Points_5) == 1)
 
 #check if line points are the same
-#assert(SketchLine_1.startPoint().x() == 200)
-#assert(SketchLine_1.startPoint().y() == 20)
-#assert(SketchLine_1.endPoint().x() == 20)
-#assert(SketchLine_1.endPoint().y() == 70)
-
-#assert(SketchLine_3.startPoint().x() == -10)
-#assert(SketchLine_3.startPoint().y() == 190)
-#assert(SketchLine_3.endPoint().x() == 90)
-#assert(SketchLine_3.endPoint().y() == 50)
 
 model.end()
 
