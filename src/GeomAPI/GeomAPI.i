@@ -76,3 +76,9 @@
 %include "GeomAPI_XYZ.h"
 %include "GeomAPI_Trsf.h"
 %include "GeomAPI_Wire.h"
+
+%include "std_list.i"
+%include "std_set.i"
+
+%template(PointList) std::list<std::shared_ptr<GeomAPI_Pnt> >;
+%template(PointSet) std::set<std::shared_ptr<GeomAPI_Pnt> >;

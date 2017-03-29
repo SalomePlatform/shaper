@@ -191,7 +191,7 @@ bool ModuleBase_WidgetValidated::isValidSelectionCustom(const ModuleBase_ViewerP
 }
 
 //********************************************************************
-bool ModuleBase_WidgetValidated::isValidAttribute(const AttributePtr& theAttribute) const
+bool ModuleBase_WidgetValidated::isValidAttribute(const AttributePtr& theAttribute)
 {
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
@@ -234,8 +234,20 @@ void ModuleBase_WidgetValidated::blockAttribute(const AttributePtr& theAttribute
                                                 bool& isAttributeSetInitializedBlocked,
                                                 bool& isAttributeSendUpdatedBlocked)
 {
+  blockFeatureAttribute(theAttribute, myFeature, theToBlock, isFlushesActived,
+                        isAttributeSetInitializedBlocked, isAttributeSendUpdatedBlocked);
+}
+
+//********************************************************************
+void ModuleBase_WidgetValidated::blockFeatureAttribute(const AttributePtr& theAttribute,
+                                                const FeaturePtr& theFeature,
+                                                const bool& theToBlock,
+                                                bool& isFlushesActived,
+                                                bool& isAttributeSetInitializedBlocked,
+                                                bool& isAttributeSendUpdatedBlocked)
+{
   Events_Loop* aLoop = Events_Loop::loop();
-  DataPtr aData = myFeature->data();
+  DataPtr aData = theFeature->data();
   if (theToBlock) {
     // blocks the flush signals to avoid the temporary objects visualization in the viewer
     // they should not be shown in order to do not lose highlight by erasing them

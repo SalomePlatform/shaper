@@ -6,12 +6,17 @@
 
 #include "SketchPlugin_Tools.h"
 
+#include "SketchPlugin_ConstraintCoincidence.h"
+#include "SketchPlugin_ConstraintTangent.h"
+#include "SketchPlugin_Point.h"
+#include "SketchPlugin_SketchEntity.h"
+
+#include <SketcherPrs_Tools.h>
+
+#include <ModelAPI_AttributeDouble.h>
+
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
-#include <ModelAPI_AttributeDouble.h>
-#include <SketcherPrs_Tools.h>
-#include <SketchPlugin_ConstraintCoincidence.h>
-#include <SketchPlugin_SketchEntity.h>
 
 namespace SketchPlugin_Tools {
 
@@ -70,6 +75,19 @@ std::shared_ptr<GeomAPI_Pnt2d> getCoincidencePoint(const FeaturePtr theStartCoin
   return aPnt;
 }
 
+std::set<FeaturePtr> findCoincidentConstraints(const FeaturePtr& theFeature)
+{
+  std::set<FeaturePtr> aCoincident;
+  const std::set<AttributePtr>& aRefsList = theFeature->data()->refsToMe();
+  std::set<AttributePtr>::const_iterator aIt;
+  for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
+    FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aIt)->owner());
+    if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID())
+      aCoincident.insert(aConstrFeature);
+  }
+  return aCoincident;
+}
+
 void findCoincidences(const FeaturePtr theStartCoin,
                       const std::string& theAttr,
                       std::set<FeaturePtr>& theList)
@@ -85,20 +103,122 @@ void findCoincidences(const FeaturePtr theStartCoin,
       return;
     }
     theList.insert(aObj);
-    const std::set<AttributePtr>& aRefsList = aObj->data()->refsToMe();
-    std::set<AttributePtr>::const_iterator aIt;
-    for(aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
-      std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
-      FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
-      if(aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
-        std::shared_ptr<GeomAPI_Pnt2d> aPnt = getCoincidencePoint(aConstrFeature);
-        if(aPnt.get() && aOrig->isEqual(aPnt)) {
-          findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A(), theList);
-          findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_B(), theList);
-        }
+    std::set<FeaturePtr> aCoincidences = findCoincidentConstraints(aObj);
+    std::set<FeaturePtr>::const_iterator aCIt = aCoincidences.begin();
+    for (; aCIt != aCoincidences.end(); ++aCIt) {
+      FeaturePtr aConstrFeature = *aCIt;
+      std::shared_ptr<GeomAPI_Pnt2d> aPnt = getCoincidencePoint(aConstrFeature);
+      if(aPnt.get() && aOrig->isEqual(aPnt)) {
+        findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A(), theList);
+        findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_B(), theList);
       }
     }
   }
+}
+
+std::set<FeaturePtr> findFeaturesCoincidentToPoint(const AttributePoint2DPtr& thePoint)
+{
+  std::set<FeaturePtr> aCoincidentFeatures;
+
+  FeaturePtr anOwner = ModelAPI_Feature::feature(thePoint->owner());
+  aCoincidentFeatures.insert(anOwner);
+
+  std::set<FeaturePtr> aCoincidences = findCoincidentConstraints(anOwner);
+  std::set<FeaturePtr>::const_iterator aCIt = aCoincidences.begin();
+  for (; aCIt != aCoincidences.end(); ++aCIt) {
+    bool isPointUsedInCoincidence = false;
+    AttributeRefAttrPtr anOtherCoincidentAttr;
+    for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
+      AttributeRefAttrPtr aRefAttr = (*aCIt)->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
+      if (!aRefAttr)
+        continue;
+      if (!aRefAttr->isObject() && aRefAttr->attr() == thePoint)
+        isPointUsedInCoincidence = true;
+      else
+        anOtherCoincidentAttr = aRefAttr;
+    }
+
+    if (isPointUsedInCoincidence) {
+      ObjectPtr anObj;
+      if (anOtherCoincidentAttr->isObject())
+        anObj = anOtherCoincidentAttr->object();
+      else
+        anObj = anOtherCoincidentAttr->attr()->owner();
+      aCoincidentFeatures.insert(ModelAPI_Feature::feature(anObj));
+    }
+  }
+
+  return aCoincidentFeatures;
+}
+
+void resetAttribute(SketchPlugin_Feature* theFeature,
+                    const std::string& theId)
+{
+  AttributePtr anAttr = theFeature->attribute(theId);
+  if(anAttr.get()) {
+    anAttr->reset();
+  }
+}
+
+void createConstraint(SketchPlugin_Feature* theFeature,
+                      const std::string& theId,
+                      const AttributePtr theAttr,
+                      const ObjectPtr theObject,
+                      const bool theIsCanBeTangent)
+{
+  AttributeRefAttrPtr aRefAttr = theFeature->refattr(theId);
+  if(aRefAttr.get() && aRefAttr->isInitialized()) {
+    FeaturePtr aConstraint;
+    if(!theIsCanBeTangent) {
+      aConstraint = theFeature->sketch()
+                              ->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+    } else {
+      if(aRefAttr->isObject()) {
+        ObjectPtr anObject = aRefAttr->object();
+        FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+        if(aFeature->getKind() == SketchPlugin_Point::ID()) {
+          aConstraint = theFeature->sketch()
+                                  ->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+        } else {
+          aConstraint = theFeature->sketch()
+                                  ->addFeature(SketchPlugin_ConstraintTangent::ID());
+        }
+      } else {
+        aConstraint = theFeature->sketch()
+                                ->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+      }
+    }
+    AttributeRefAttrPtr aRefAttrA = aConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
+    aRefAttr->isObject() ? aRefAttrA->setObject(aRefAttr->object())
+                         : aRefAttrA->setAttr(aRefAttr->attr());
+    AttributeRefAttrPtr aRefAttrB = aConstraint->refattr(SketchPlugin_Constraint::ENTITY_B());
+    if(theObject.get()) {
+      aRefAttrB->setObject(theObject);
+    } else if(theAttr.get()) {
+      aRefAttrB->setAttr(theAttr);
+    }
+  }
+}
+
+void convertRefAttrToPointOrTangentCurve(const AttributeRefAttrPtr&      theRefAttr,
+                                         const AttributePtr&             theDefaultAttr,
+                                         std::shared_ptr<GeomAPI_Shape>& theTangentCurve,
+                                         std::shared_ptr<GeomAPI_Pnt2d>& thePassingPoint)
+{
+  AttributePtr anAttr = theDefaultAttr;
+  if (theRefAttr->isObject()) {
+    FeaturePtr aTgFeature = ModelAPI_Feature::feature(theRefAttr->object());
+    if (aTgFeature) {
+      if (aTgFeature->getKind() != SketchPlugin_Point::ID()) {
+        theTangentCurve = aTgFeature->lastResult()->shape();
+        return;
+      }
+      anAttr = aTgFeature->attribute(SketchPlugin_Point::COORD_ID());
+    }
+  } else
+    anAttr = theRefAttr->attr();
+
+  thePassingPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr)->pnt();
 }
 
 } // namespace SketchPlugin_Tools

@@ -34,7 +34,7 @@ class XGUI_Workshop;
 class PartSet_MenuMgr;
 class PartSet_CustomPrs;
 class PartSet_SketcherMgr;
-class PartSet_SketcherReetntrantMgr;
+class PartSet_SketcherReentrantMgr;
 class ModelAPI_Result;
 
 class QAction;
@@ -203,7 +203,7 @@ public:
   PartSet_SketcherMgr* sketchMgr() const { return mySketchMgr; }
 
   /// Returns sketch reentrant manager
-  PartSet_SketcherReetntrantMgr* sketchReentranceMgr() const { return mySketchReentrantMgr; }
+  PartSet_SketcherReentrantMgr* sketchReentranceMgr() const { return mySketchReentrantMgr; }
 
   /// Returns listener of overconstraint signal
   /// \return the listener
@@ -408,7 +408,7 @@ private:
   SelectMgr_ListOfFilter mySelectionFilters;
 
   PartSet_SketcherMgr* mySketchMgr;
-  PartSet_SketcherReetntrantMgr* mySketchReentrantMgr;
+  PartSet_SketcherReentrantMgr* mySketchReentrantMgr;
   PartSet_MenuMgr* myMenuMgr;
   /// A default custom presentation, which is used for references objects of started operation
   PartSet_CustomPrs* myCustomPrs;

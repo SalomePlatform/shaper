@@ -10,10 +10,12 @@
 #include "SketchPlugin_Circle.h"
 #include "SketchPlugin_ConstraintCoincidence.h"
 #include "SketchPlugin_ConstraintDistance.h"
-#include "SketchPlugin_Fillet.h"
 #include "SketchPlugin_ConstraintRigid.h"
 #include "SketchPlugin_ConstraintTangent.h"
+#include "SketchPlugin_Fillet.h"
 #include "SketchPlugin_Line.h"
+#include "SketchPlugin_MacroArc.h"
+#include "SketchPlugin_MacroCircle.h"
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_Trim.h"
@@ -39,7 +41,10 @@
 #include <ModelGeomAlgo_Point2D.h>
 #include <ModelGeomAlgo_Shape.h>
 
+#include <GeomAlgoAPI_ShapeTools.h>
+
 #include <GeomAPI_Circ.h>
+#include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Vertex.h>
@@ -732,19 +737,6 @@ bool SketchPlugin_ArcTangentPointValidator::isValid(const AttributePtr& theAttri
     return false;
   }
 
-  // Check the tangent point is equal to arc end
-  FeaturePtr anArc = std::dynamic_pointer_cast<ModelAPI_Feature>(aRefAttr->owner());
-  std::shared_ptr<GeomDataAPI_Point2D> anEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      anArc->attribute(SketchPlugin_Arc::END_ID()));
-  if (anEndPoint->isInitialized()) {
-    std::shared_ptr<GeomDataAPI_Point2D> aTangPt =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr);
-    if (aTangPt->pnt()->distance(anEndPoint->pnt()) < tolerance) {
-      theError = "Unable to build arc on same points";
-      return false;
-    }
-  }
-
   return true;
 }
 
@@ -996,5 +988,387 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
   }
 
   theError = "Error: Selected object is not line, circle or arc.";
+  return false;
+}
+
+
+static std::set<FeaturePtr> common(const std::set<FeaturePtr>& theSet1,
+                                   const std::set<FeaturePtr>& theSet2)
+{
+  std::set<FeaturePtr> aCommon;
+  if (theSet1.empty() || theSet2.empty())
+    return aCommon;
+
+  std::set<FeaturePtr>::const_iterator anIt2 = theSet2.begin();
+  for (; anIt2 != theSet2.end(); ++anIt2)
+    if (theSet1.find(*anIt2) != theSet1.end())
+      aCommon.insert(*anIt2);
+  return aCommon;
+}
+
+bool SketchPlugin_DifferentReferenceValidator::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& theArguments,
+    Events_InfoMessage& theError) const
+{
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
+
+  int aNbFeaturesReferred = 0;
+  int aNbAttributesReferred = 0;
+  std::set<FeaturePtr> aCommonReferredFeatures;
+
+  // find all features referred by attributes listed in theArguments
+  std::list<std::string>::const_iterator anArgIt = theArguments.begin();
+  for (; anArgIt != theArguments.end(); ++anArgIt) {
+    AttributeRefAttrPtr aRefAttr = anOwner->refattr(*anArgIt);
+    if (!aRefAttr)
+      continue;
+
+    std::set<FeaturePtr> aCoincidentFeatures;
+    if (aRefAttr->isObject()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
+      if (aFeature) {
+        aCoincidentFeatures.insert(aFeature);
+        aNbFeaturesReferred += 1;
+      }
+    } else {
+      AttributePoint2DPtr aPoint =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRefAttr->attr());
+      if (aPoint) {
+        aCoincidentFeatures = SketchPlugin_Tools::findFeaturesCoincidentToPoint(aPoint);
+        aNbAttributesReferred += 1;
+      }
+    }
+
+    if (aCommonReferredFeatures.empty())
+      aCommonReferredFeatures = aCoincidentFeatures;
+    else
+      aCommonReferredFeatures = common(aCommonReferredFeatures, aCoincidentFeatures);
+
+    if (aCommonReferredFeatures.empty())
+      return true;
+  }
+
+  bool isOk = aNbFeaturesReferred < 1;
+  if (aNbFeaturesReferred == 1) {
+    if (aCommonReferredFeatures.size() == 1) {
+      FeaturePtr aFeature = *aCommonReferredFeatures.begin();
+      isOk = aNbAttributesReferred <= 1 ||
+             aFeature->getKind() == SketchPlugin_Circle::ID() ||
+             aFeature->getKind() == SketchPlugin_Arc::ID();
+    } else
+      isOk = false;
+  }
+
+  if (!isOk)
+    theError = "Attributes are referred to the same feature";
+  return isOk;
+}
+
+bool SketchPlugin_CirclePassedPointValidator::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>&,
+    Events_InfoMessage& theError) const
+{
+  static const std::string aErrorMessage(
+      "Passed point refers to the same feature as a center point");
+
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
+
+  AttributeRefAttrPtr aCenterRef =
+      anOwner->refattr(SketchPlugin_MacroCircle::CENTER_POINT_REF_ID());
+  AttributeRefAttrPtr aPassedRef =
+      anOwner->refattr(SketchPlugin_MacroCircle::PASSED_POINT_REF_ID());
+
+  if (!aPassedRef->isObject())
+    return true;
+
+  FeaturePtr aPassedFeature = ModelAPI_Feature::feature(aPassedRef->object());
+  if (!aPassedFeature)
+    return true;
+
+  if (aCenterRef->isObject()) {
+    FeaturePtr aCenterFeature = ModelAPI_Feature::feature(aCenterRef->object());
+    if (aCenterFeature == aPassedFeature) {
+      theError = aErrorMessage;
+      return false;
+    }
+  } else {
+    AttributePoint2DPtr aCenterPoint =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aCenterRef->attr());
+    if (aCenterPoint) {
+      std::set<FeaturePtr> aCoincidentFeatures =
+          SketchPlugin_Tools::findFeaturesCoincidentToPoint(aCenterPoint);
+      // check one of coincident features is a feature referred by passed point
+      std::set<FeaturePtr>::const_iterator anIt = aCoincidentFeatures.begin();
+      for(; anIt != aCoincidentFeatures.end(); ++anIt)
+        if (*anIt == aPassedFeature) {
+          theError = aErrorMessage;
+          return false;
+        }
+    }
+  }
+  return true;
+}
+
+bool SketchPlugin_ThirdPointValidator::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& theArguments,
+    Events_InfoMessage& theError) const
+{
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
+  return arePointsNotOnLine(anOwner, theError) &&
+         arePointsNotSeparated(anOwner, theArguments, theError);
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> toPoint(const FeaturePtr& theMacroCircle,
+                                              const std::string& thePointAttrName,
+                                              const std::string& theRefPointAttrName)
+{
+  AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theMacroCircle->attribute(thePointAttrName));
+  AttributeRefAttrPtr aRefAttr = theMacroCircle->refattr(theRefPointAttrName);
+
+  std::shared_ptr<GeomAPI_Pnt2d> aPoint = aPointAttr->pnt();
+  if (aRefAttr) {
+    if (aRefAttr->isObject()) {
+      // project a point onto selected feature
+      std::shared_ptr<SketchPlugin_Feature> aFeature =
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(
+          ModelAPI_Feature::feature(aRefAttr->object()));
+      if (aFeature) {
+        SketchPlugin_Sketch* aSketch = aFeature->sketch();
+        std::shared_ptr<GeomAPI_Edge> anEdge =
+            std::dynamic_pointer_cast<GeomAPI_Edge>(aFeature->lastResult()->shape());
+        if (anEdge) {
+          std::shared_ptr<GeomAPI_Pnt> aPoint3D = aSketch->to3D(aPoint->x(), aPoint->y());
+          if (anEdge->isLine())
+            aPoint3D = anEdge->line()->project(aPoint3D);
+          else if (anEdge->isCircle())
+            aPoint3D = anEdge->circle()->project(aPoint3D);
+          aPoint = aSketch->to2D(aPoint3D);
+        }
+      }
+    } else {
+      AttributePoint2DPtr anOtherPoint =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRefAttr->attr());
+      if (anOtherPoint)
+        aPoint = anOtherPoint->pnt(); // the reference point is much more precise, use it
+    }
+  }
+
+  return aPoint;
+}
+
+static void threePointsOfFeature(const FeaturePtr& theMacroFeature,
+                                 std::shared_ptr<GeomAPI_Pnt2d> thePoints[3])
+{
+  if (theMacroFeature->getKind() == SketchPlugin_MacroCircle::ID()) {
+    thePoints[0] = toPoint(theMacroFeature,
+          SketchPlugin_MacroCircle::FIRST_POINT_ID(),
+          SketchPlugin_MacroCircle::FIRST_POINT_REF_ID());
+    thePoints[1] = toPoint(theMacroFeature,
+          SketchPlugin_MacroCircle::SECOND_POINT_ID(),
+          SketchPlugin_MacroCircle::SECOND_POINT_REF_ID());
+    thePoints[2] = toPoint(theMacroFeature,
+          SketchPlugin_MacroCircle::THIRD_POINT_ID(),
+          SketchPlugin_MacroCircle::THIRD_POINT_REF_ID());
+  } else if (theMacroFeature->getKind() == SketchPlugin_MacroArc::ID()) {
+    thePoints[0] = toPoint(theMacroFeature,
+          SketchPlugin_MacroArc::START_POINT_2_ID(),
+          SketchPlugin_MacroArc::START_POINT_REF_ID());
+    thePoints[1] = toPoint(theMacroFeature,
+          SketchPlugin_MacroArc::END_POINT_2_ID(),
+          SketchPlugin_MacroArc::END_POINT_REF_ID());
+    thePoints[2] = toPoint(theMacroFeature,
+          SketchPlugin_MacroArc::PASSED_POINT_ID(),
+          SketchPlugin_MacroArc::PASSED_POINT_REF_ID());
+  }
+}
+
+static bool isPointsOnLine(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
+                           const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
+                           const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3)
+{
+  static const double aTolerance = 1.e-7;
+  if (thePoint1->distance(thePoint2) < aTolerance ||
+      thePoint1->distance(thePoint3) < aTolerance)
+    return true;
+
+  std::shared_ptr<GeomAPI_Dir2d> aDirP1P2(new GeomAPI_Dir2d(thePoint2->x() - thePoint1->x(),
+                                                            thePoint2->y() - thePoint1->y()));
+  std::shared_ptr<GeomAPI_Dir2d> aDirP1P3(new GeomAPI_Dir2d(thePoint3->x() - thePoint1->x(),
+                                                            thePoint3->y() - thePoint1->y()));
+  return fabs(aDirP1P2->cross(aDirP1P3)) < aTolerance;
+}
+
+static bool isOnSameSide(const std::shared_ptr<GeomAPI_Lin>& theLine,
+                         const std::shared_ptr<GeomAPI_Pnt>& thePoint1,
+                         const std::shared_ptr<GeomAPI_Pnt>& thePoint2)
+{
+  static const double aTolerance = 1.e-7;
+  std::shared_ptr<GeomAPI_Dir> aLineDir = theLine->direction();
+  std::shared_ptr<GeomAPI_XYZ> aLineLoc = theLine->location()->xyz();
+  std::shared_ptr<GeomAPI_Dir> aDirP1L(new GeomAPI_Dir(thePoint1->xyz()->decreased(aLineLoc)));
+  std::shared_ptr<GeomAPI_Dir> aDirP2L(new GeomAPI_Dir(thePoint2->xyz()->decreased(aLineLoc)));
+  return aLineDir->cross(aDirP1L)->dot(aLineDir->cross(aDirP2L)) > -aTolerance;
+}
+
+static bool isOnSameSide(const std::shared_ptr<GeomAPI_Circ>& theCircle,
+                         const std::shared_ptr<GeomAPI_Pnt>&  thePoint1,
+                         const std::shared_ptr<GeomAPI_Pnt>&  thePoint2)
+{
+  static const double aTolerance = 1.e-7;
+  std::shared_ptr<GeomAPI_Pnt> aCenter = theCircle->center();
+  double aDistP1C = thePoint1->distance(aCenter);
+  double aDistP2C = thePoint2->distance(aCenter);
+  return (aDistP1C - theCircle->radius()) * (aDistP2C - theCircle->radius()) > -aTolerance;
+}
+
+bool SketchPlugin_ThirdPointValidator::arePointsNotOnLine(
+    const FeaturePtr& theMacroFeature,
+    Events_InfoMessage& theError) const
+{
+  static const std::string aErrorPointsOnLine(
+      "Selected points are on the same line");
+
+  std::shared_ptr<GeomAPI_Pnt2d> aPoints[3];
+  threePointsOfFeature(theMacroFeature, aPoints);
+
+  if (isPointsOnLine(aPoints[0], aPoints[1], aPoints[2])) {
+    theError = aErrorPointsOnLine;
+    return false;
+  }
+  return true;
+}
+
+bool SketchPlugin_ThirdPointValidator::arePointsNotSeparated(
+    const FeaturePtr& theMacroFeature,
+    const std::list<std::string>& theArguments,
+    Events_InfoMessage& theError) const
+{
+  static const std::string aErrorPointsApart(
+      "Selected entity is lying between first two points");
+
+  AttributeRefAttrPtr aThirdPointRef = theMacroFeature->refattr(theArguments.front());
+  FeaturePtr aRefByThird;
+  if (aThirdPointRef->isObject())
+    aRefByThird = ModelAPI_Feature::feature(aThirdPointRef->object());
+  if (!aRefByThird)
+    return true;
+
+  std::shared_ptr<GeomAPI_Pnt2d> aPoints[3];
+  threePointsOfFeature(theMacroFeature, aPoints);
+
+  std::shared_ptr<GeomAPI_Edge> aThirdShape =
+      std::dynamic_pointer_cast<GeomAPI_Edge>(aRefByThird->lastResult()->shape());
+  if (!aThirdShape)
+    return true;
+
+  SketchPlugin_Sketch* aSketch =
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(theMacroFeature)->sketch();
+  std::shared_ptr<GeomAPI_Pnt> aFirstPnt3D = aSketch->to3D(aPoints[0]->x(), aPoints[0]->y());
+  std::shared_ptr<GeomAPI_Pnt> aSecondPnt3D = aSketch->to3D(aPoints[1]->x(), aPoints[1]->y());
+
+  bool isOk = true;
+  if (aThirdShape->isLine())
+    isOk = isOnSameSide(aThirdShape->line(), aFirstPnt3D, aSecondPnt3D);
+  else if (aThirdShape->isCircle() || aThirdShape->isArc())
+    isOk = isOnSameSide(aThirdShape->circle(), aFirstPnt3D, aSecondPnt3D);
+
+  if (!isOk)
+    theError = aErrorPointsApart;
+  return isOk;
+}
+
+bool SketchPlugin_ArcEndPointValidator::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& theArguments,
+    Events_InfoMessage& theError) const
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+  AttributeRefAttrPtr anEndPointRef = aFeature->refattr(theArguments.front());
+
+  if(!anEndPointRef.get()) {
+    return true;
+  }
+
+  ObjectPtr anObject = anEndPointRef->object();
+  AttributePtr anAttr = anEndPointRef->attr();
+  if(!anObject.get() && !anAttr.get()) {
+    return true;
+  }
+
+  if(anEndPointRef->attr().get()) {
+    return false;
+  }
+
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+  if(aResult.get()) {
+    GeomShapePtr aShape = aResult->shape();
+    if(aShape.get() && aShape->isVertex()) {
+      return false;
+    }
+  }
+
+  aFeature = ModelAPI_Feature::feature(anObject);
+  if(aFeature.get()) {
+    if(aFeature->getKind() == SketchPlugin_Point::ID()) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& theArguments,
+    Events_InfoMessage& theError) const
+{
+  std::shared_ptr<SketchPlugin_MacroArc> anArcFeature =
+      std::dynamic_pointer_cast<SketchPlugin_MacroArc>(theAttribute->owner());
+  AttributeRefAttrPtr anEndPointRef = anArcFeature->refattr(theArguments.front());
+
+  if(!anEndPointRef.get()) {
+    return true;
+  }
+
+  GeomShapePtr anArcShape = anArcFeature->getArcShape();
+
+  if(!anArcShape.get() || anArcShape->isNull()) {
+    return true;
+  }
+
+  ObjectPtr anObject = anEndPointRef->object();
+  AttributePtr anAttr = anEndPointRef->attr();
+  if(!anObject.get() && !anAttr.get()) {
+    return true;
+  }
+
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+  if(aResult.get()) {
+    GeomShapePtr aShape = aResult->shape();
+    if(aShape.get() && !aShape->isNull()) {
+      return GeomAlgoAPI_ShapeTools::isShapesIntersects(anArcShape, aShape);
+    }
+  }
+
+  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(anObject);
+  if(aSelectedFeature.get()) {
+    std::list<ResultPtr> aResults = aSelectedFeature->results();
+    for(std::list<ResultPtr>::const_iterator anIt = aResults.cbegin();
+        anIt != aResults.cend();
+        ++anIt)
+    {
+      GeomShapePtr aShape = (*anIt)->shape();
+      if(aShape.get() && !aShape->isNull()) {
+        if(GeomAlgoAPI_ShapeTools::isShapesIntersects(anArcShape, aShape)) {
+          return true;
+        }
+      }
+    }
+  }
+
   return false;
 }

@@ -25,7 +25,7 @@ SET(PROJECT_HEADERS
     PartSet_PreviewPlanes.h
     PartSet_ResultSketchPrs.h
     PartSet_SketcherMgr.h
-    PartSet_SketcherReetntrantMgr.h
+    PartSet_SketcherReentrantMgr.h
     PartSet_Tools.h
     PartSet_Validators.h
     PartSet_WidgetChoice.h
@@ -34,7 +34,6 @@ SET(PROJECT_HEADERS
     PartSet_WidgetFileSelector.h
     PartSet_WidgetMultiSelector.h
     PartSet_WidgetPoint2d.h
-    PartSet_WidgetPoint2dDistance.h
     PartSet_WidgetPoint2DFlyout.h
     PartSet_WidgetShapeSelector.h
     PartSet_WidgetSketchCreator.h
@@ -47,14 +46,13 @@ SET(PROJECT_MOC_HEADERS
     PartSet_MenuMgr.h
     PartSet_Module.h
     PartSet_SketcherMgr.h
-    PartSet_SketcherReetntrantMgr.h
+    PartSet_SketcherReentrantMgr.h
     PartSet_WidgetChoice.h
     PartSet_WidgetEditor.h
     PartSet_WidgetFeaturePointSelector.h
     PartSet_WidgetFileSelector.h
     PartSet_WidgetMultiSelector.h
     PartSet_WidgetPoint2d.h
-    PartSet_WidgetPoint2dDistance.h
     PartSet_WidgetPoint2DFlyout.h
     PartSet_WidgetShapeSelector.h
     PartSet_WidgetSketchCreator.h
@@ -75,7 +73,7 @@ SET(PROJECT_SOURCES
     PartSet_PreviewPlanes.cpp
     PartSet_ResultSketchPrs.cpp
     PartSet_SketcherMgr.cpp
-    PartSet_SketcherReetntrantMgr.cpp
+    PartSet_SketcherReentrantMgr.cpp
     PartSet_Tools.cpp
     PartSet_Validators.cpp
     PartSet_WidgetEditor.cpp
@@ -83,7 +81,6 @@ SET(PROJECT_SOURCES
     PartSet_WidgetFileSelector.cpp
     PartSet_WidgetMultiSelector.cpp
     PartSet_WidgetPoint2d.cpp
-    PartSet_WidgetPoint2dDistance.cpp
     PartSet_WidgetPoint2DFlyout.cpp
     PartSet_WidgetShapeSelector.cpp
     PartSet_WidgetSketchCreator.cpp

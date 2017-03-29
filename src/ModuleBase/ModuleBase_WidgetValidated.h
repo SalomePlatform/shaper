@@ -67,6 +67,27 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   /// \return boolean value
   bool isFilterActivated() const;
 
+  /// Block the model flush of update and intialization of attribute
+  /// \param theAttribute an attribute of blocking
+  /// \param theFeature a feature
+  /// \param theToBlock flag whether the model is blocked or unblocked
+  /// \param isFlushesActived out value if model is blocked, in value if model is unblocked
+  /// to be used to restore flush state when unblocked
+  /// \param isAttributeSetInitializedBlocked out value if model is blocked
+  /// in value if model is unblocked to be used to restore previous state when unblocked
+  /// \param isAttributeSendUpdatedBlocked out value if model signal is blocked
+  static void blockFeatureAttribute(const AttributePtr& theAttribute,
+                                    const FeaturePtr& theFeature,
+                                    const bool& theToBlock,
+                                    bool& isFlushesActived,
+                                    bool& isAttributeSetInitializedBlocked,
+                                    bool& isAttributeSendUpdatedBlocked);
+
+  /// Checks the current attibute in all attribute validators
+  /// \param theAttribute an attribute to be validated
+  /// \return true if all validators return that the attribute is valid
+  static bool isValidAttribute(const AttributePtr& theAttribute);
+
 protected:
   /// Checks whether all active viewer filters validate the presentation
   /// \param thePrs a selected presentation in the view
@@ -130,12 +151,6 @@ protected:
   virtual void blockAttribute(const AttributePtr& theAttribute, const bool& theToBlock,
                               bool& isFlushesActived, bool& isAttributeSetInitializedBlocked,
                               bool& isAttributeSendUpdatedBlocked);
-
-private:
-  /// Checks the current attibute in all attribute validators
-  /// \param theAttribute an attribute to be validated
-  /// \return true if all validators return that the attribute is valid
-  bool isValidAttribute(const AttributePtr& theAttribute) const;
 
 protected:
   /// Gets the validity state of the presentation in an internal map.

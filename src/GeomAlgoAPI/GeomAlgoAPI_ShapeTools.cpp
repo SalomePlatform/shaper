@@ -649,6 +649,27 @@ bool GeomAlgoAPI_ShapeTools::isSubShapeInsideShape(
 }
 
 //==================================================================================================
+bool GeomAlgoAPI_ShapeTools::isShapesIntersects(
+  const std::shared_ptr<GeomAPI_Shape> theShape1,
+  const std::shared_ptr<GeomAPI_Shape> theShape2)
+{
+  if(!theShape1.get() || !theShape2.get()) {
+    return false;
+  }
+
+  const TopoDS_Shape& aShape1 = theShape1->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aShape2 = theShape2->impl<TopoDS_Shape>();
+
+  BRepExtrema_DistShapeShape aDist(aShape1, aShape2);
+  aDist.Perform();
+  if(aDist.IsDone() && aDist.Value() < Precision::Confusion()) {
+    return true;
+  }
+
+  return false;
+}
+
+//==================================================================================================
 bool GeomAlgoAPI_ShapeTools::isShapeValid(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
   if(!theShape.get()) {

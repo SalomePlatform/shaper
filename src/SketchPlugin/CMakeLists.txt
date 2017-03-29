@@ -30,6 +30,8 @@ SET(PROJECT_HEADERS
     SketchPlugin_Feature.h
     SketchPlugin_IntersectionPoint.h
     SketchPlugin_Line.h
+    SketchPlugin_MacroArc.h
+    SketchPlugin_MacroCircle.h
     SketchPlugin_MultiRotation.h
     SketchPlugin_MultiTranslation.h
     SketchPlugin_Plugin.h
@@ -68,6 +70,8 @@ SET(PROJECT_SOURCES
     SketchPlugin_Feature.cpp
     SketchPlugin_IntersectionPoint.cpp
     SketchPlugin_Line.cpp
+    SketchPlugin_MacroArc.cpp
+    SketchPlugin_MacroCircle.cpp
     SketchPlugin_MultiRotation.cpp
     SketchPlugin_MultiTranslation.cpp
     SketchPlugin_Plugin.cpp
@@ -121,7 +125,10 @@ INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Sketc
 INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
 ADD_UNIT_TESTS(TestSketchPointLine.py
-               TestSketchArcCircle.py
+               TestCreateArc.py
+               TestCreateCircleByCenterAndPassed.py
+               TestCreateCircleByThreePoints.py
+               TestCreateCircleChangeType.py
                TestConstraintCoincidence.py
                TestConstraintCollinear.py
                TestConstraintLength.py
@@ -152,5 +159,4 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                Test1673.py
                Test1924.py
                Test1966.py
-               Test1967.py
-               TestTrimCircle.py)
+               Test1967.py)

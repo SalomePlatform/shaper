@@ -34,6 +34,20 @@ static void sendMessage(const char* theMessageName, const std::set<ObjectPtr>& t
   Events_Loop::loop()->send(aMessage);
 }
 
+static void sendMessage(const char* theMessageName, const CompositeFeaturePtr& theSketch, const int theDOF)
+{
+  std::shared_ptr<ModelAPI_SolverFailedMessage> aMessage =
+      std::shared_ptr<ModelAPI_SolverFailedMessage>(
+      new ModelAPI_SolverFailedMessage(Events_Loop::eventByName(theMessageName)));
+
+  std::set<ObjectPtr> anObjects;
+  anObjects.insert(theSketch);
+  aMessage->setObjects(anObjects);
+  aMessage->dof(theDOF);
+
+  Events_Loop::loop()->send(aMessage);
+}
+
 
 
 // ========================================================
@@ -43,6 +57,7 @@ static void sendMessage(const char* theMessageName, const std::set<ObjectPtr>& t
 SketchSolver_Group::SketchSolver_Group(const CompositeFeaturePtr& theWorkplane)
   : mySketch(theWorkplane),
     myPrevResult(PlaneGCSSolver_Solver::STATUS_UNKNOWN),
+    myDOF(0),
     myIsEventsBlocked(false)
 {
   mySketchSolver = SolverPtr(new PlaneGCSSolver_Solver);
@@ -93,6 +108,12 @@ bool SketchSolver_Group::updateFeature(FeaturePtr theFeature)
 
 bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
 {
+  if (myDOF == 0) {
+    // avoid moving elements of fully constrained sketch
+    myStorage->refresh();
+    return true;
+  }
+
   // Create temporary Fixed constraint
   SolverConstraintPtr aConstraint = PlaneGCSSolver_Tools::createMovementConstraint(theFeature);
   if (!aConstraint)
@@ -210,15 +231,24 @@ bool SketchSolver_Group::resolveConstraints()
 //  Class:    SketchSolver_Group
 //  Purpose:  compute DoF of the sketch and set corresponding field
 // ============================================================================
-void SketchSolver_Group::computeDoF() const
+void SketchSolver_Group::computeDoF()
 {
   std::ostringstream aDoFMsg;
-  int aDoF = /*isEmpty() ? myStorage->numberOfParameters() :*/ mySketchSolver->dof();
+  int aDoF = mySketchSolver->dof();
   if (aDoF == 0)
     aDoFMsg << "Sketch is fully fixed (DoF = 0)";
   else
     aDoFMsg << "DoF (degrees of freedom) = " << aDoF;
   mySketch->string(SketchPlugin_Sketch::SOLVER_DOF())->setValue(aDoFMsg.str());
+
+  if (aDoF > 0 && myDOF == 0)
+    sendMessage(EVENT_SKETCH_UNDER_CONSTRAINED, mySketch, aDoF);
+  else if (aDoF == 0 && myDOF > 0)
+    sendMessage(EVENT_SKETCH_FULLY_CONSTRAINED, mySketch, aDoF);
+  else if (aDoF < 0)
+    sendMessage(EVENT_SKETCH_OVER_CONSTRAINED, mySketch, aDoF);
+
+  myDOF = aDoF;
 }
 
 // ============================================================================

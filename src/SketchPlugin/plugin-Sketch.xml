@@ -5,7 +5,8 @@
     <group id="Linear geometry">
       <feature
         id="Sketch"
-        nested="SketchPoint SketchIntersectionPoint SketchLine SketchCircle SketchArc
+        nested="SketchPoint SketchIntersectionPoint SketchLine
+                SketchCircle SketchMacroCircle SketchArc SketchMacroArc
                 SketchRectangle
                 SketchProjection
                 SketchConstraintLength SketchConstraintRadius SketchConstraintDistance
@@ -35,7 +36,7 @@
                                  enable_value="enable_by_preferences"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
-      
+
       <!-- SketchLine -->
       <feature id="SketchLine" title="Line" tooltip="Create line" icon="icons/Sketch/line.png">
         <sketch-2dpoint_selector id="StartPoint" accept_expressions="0" title="Start point" tooltip="Start point coordinates"
@@ -49,75 +50,249 @@
       </feature>
     </group>
     <group id="Circular geometry">
-      <!-- SketchCircle -->
-      <feature 
-        id="SketchCircle"
-        title="Circle"
-        tooltip="Create circle"
-        icon="icons/Sketch/circle.png">
-        <toolbox id="CircleType">
-          <box id="CenterRadius" title="Center and radius" icon="icons/Sketch/circle_pt_rad_32x32.png">
-            <sketch-2dpoint_selector id="CircleCenter" accept_expressions="0" title="Center" tooltip="Center coordinates"
+      <!-- SketchCircle is a hidden feature. It is created inside SketchMacroCircle. -->
+      <feature id="SketchCircle"
+               title="Circle"
+               tooltip="Create circle"
+               icon="icons/Sketch/circle.png"
+               internal="1">
+        <sketch-2dpoint_selector id="circle_center"
+                                 title="Center"
+                                 tooltip="Center coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <labelvalue id="circle_radius"
+                    icon="icons/Sketch/radius.png"
+                    label="Radius:"
+                    tooltip="Set radius"
+                    default="computed"
+                    accept_expressions="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+      </feature>
+      <!-- SketchMacroCircle -->
+      <feature id="SketchMacroCircle"
+               icon="icons/Sketch/circle.png"
+               title="Circle"
+               tooltip="Create circle">
+        <toolbox id="circle_type" modified_in_edit="false">
+          <box id="circle_type_by_center_and_passed_points"
+               icon="icons/Sketch/circle_pt_rad_32x32.png"
+               title="Center and passed points">
+            <sketch-2dpoint_selector id="center_point"
+                                     reference_attribute="center_point_ref"
+                                     title="Center point"
+                                     tooltip="Center point coordinates"
+                                     accept_expressions="0"
                                      enable_value="enable_by_preferences"/>
+            <sketch-2dpoint_selector id="passed_point"
+                                     reference_attribute="passed_point_ref"
+                                     title="Passed point"
+                                     tooltip="Passed point coordinates"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_CirclePassedPointValidator"/>
+            </sketch-2dpoint_selector>
+            <validator id="GeomValidators_Different" parameters="center_point_ref,passed_point_ref"/>
           </box>
-          <box id="ThreePoints" title="Three points" icon="icons/Sketch/circle_3pt_32x32.png">
-            <sketch-2dpoint_selector id="FirstPoint" accept_expressions="0" title="First point" tooltip="First point"
+          <box id="circle_type_by_three_points"
+               icon="icons/Sketch/circle_3pt_32x32.png"
+               title="Three points">
+            <sketch-2dpoint_selector id="first_point"
+                                     reference_attribute="first_point_ref"
+                                     title="First point"
+                                     tooltip="First point"
+                                     accept_expressions="0"
                                      enable_value="enable_by_preferences"/>
-            <sketch-2dpoint_selector id="SecondPoint" accept_expressions="0" title="Second point" tooltip="Second point"
-                                     enable_value="enable_by_preferences"/>
-            <sketch-2dpoint_selector id="ThirdPoint" accept_expressions="0" title="Third point" tooltip="Third point"
-                                     enable_value="enable_by_preferences"/>
+            <sketch-2dpoint_selector id="second_point"
+                                     reference_attribute="second_point_ref"
+                                     title="Second point"
+                                     tooltip="Second point"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_DifferentReference" parameters="first_point_ref,second_point_ref"/>
+            </sketch-2dpoint_selector>
+            <sketch-2dpoint_selector id="third_point"
+                                     reference_attribute="third_point_ref"
+                                     title="Third point"
+                                     tooltip="Third point"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_DifferentReference" parameters="first_point_ref,second_point_ref,third_point_ref"/>
+              <validator id="SketchPlugin_ThirdPointValidator" parameters="third_point_ref"/>
+            </sketch-2dpoint_selector>
+            <validator id="GeomValidators_Different" parameters="first_point_ref,second_point_ref,third_point_ref"/>
           </box>
         </toolbox>
-        <point2ddistance id="CircleRadius" accept_expressions="0" first_point="CircleCenter" label="Radius:" min="0" step="1.0"
-                         default="0" icon="icons/Sketch/radius.png" tooltip="Set radius"
-                         enable_value="enable_by_preferences">
+        <labelvalue id="circle_radius"
+                    icon="icons/Sketch/radius.png"
+                    label="Radius:"
+                    tooltip="Set radius"
+                    default="computed"
+                    accept_expressions="0"
+                    obligatory="0"
+                    enable_value="enable_by_preferences">
           <validator id="GeomValidators_Positive"/>
-        </point2ddistance>
-        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+        </labelvalue>
+        <boolvalue id="Auxiliary"
+                   tooltip="Construction element"
+                   label="Auxiliary"
+                   default="false"
+                   obligatory="0"/>
       </feature>
 
       <!-- SketchArc -->
+      <feature id="SketchArc"
+               icon="icons/Sketch/arc.png"
+               title="Arc"
+               tooltip="Create arc"
+               internal="1">
+        <sketch-2dpoint_selector id="center_point"
+                                 title="Center"
+                                 tooltip="Center of a circle"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="start_point"
+                                 title="Start point"
+                                 tooltip="Start point"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="end_point"
+                                 title="End point"
+                                 tooltip="End point"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <validator id="GeomValidators_Different" parameters="center_point,start_point,end_point"/>
+        <labelvalue id="radius"
+                    icon="icons/Sketch/radius.png"
+                    label="Radius:"
+                    tooltip="Set radius"
+                    accept_expressions="0"
+                    min="0"
+                    default="0"
+                    obligatory="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <labelvalue id="angle"
+                    icon="icons/Sketch/angle.png"
+                    label="Angle:"
+                    tooltip="Set angle"
+                    default="0"
+                    use_reset="false"
+                    obligatory="0"
+                    enable_value="enable_by_preferences"/>
+        <boolvalue id="Auxiliary"
+                   label="Auxiliary"
+                   tooltip="Construction element"
+                   default="false"
+                   obligatory="0"/>
+      </feature>
+
+      <!-- SketchMacroArc -->
       <feature
-        id="SketchArc"
+        id="SketchMacroArc"
         title="Arc"
         tooltip="Create arc"
         icon="icons/Sketch/arc.png">
-        <toolbox id="ArcType">
-          <box id="CenterStartEnd" title="Center and two points" icon="icons/Sketch/arc_base_32x32.png">
-            <sketch-2dpoint_selector id="ArcCenter" accept_expressions="0" title="Center" tooltip="Center of a circle"
-                                     enable_value="enable_by_preferences" reference_attribute="ArcCenterRef" />
-            <!--reference_attribute="ArcCenterRef" />-->
-            <sketch-2dpoint_selector id="ArcStartPoint" accept_expressions="0" title="Start point" tooltip="Start point"
+        <toolbox id="arc_type">
+          <box id="by_center_and_points"
+               icon="icons/Sketch/arc_base_32x32.png"
+               title="Center and two points">
+            <sketch-2dpoint_selector id="center_point"
+                                     reference_attribute="center_point_ref"
+                                     title="Center point"
+                                     tooltip="Center of a circle"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences" />
+            <sketch-2dpoint_selector id="start_point_1"
+                                     reference_attribute="start_point_ref"
+                                     title="Start point"
+                                     tooltip="Start point"
+                                     accept_expressions="0"
                                      enable_value="enable_by_preferences"/>
-            <sketch-2dpoint_selector id="ArcEndPoint" accept_expressions="0" title="End point" tooltip="End point"
-                                     enable_value="enable_by_preferences"/>
-            <validator id="GeomValidators_Different" parameters="ArcCenter,ArcStartPoint,ArcEndPoint"/>
+            <sketch-2dpoint_selector id="end_point_1"
+                                     reference_attribute="end_point_ref"
+                                     title="End point"
+                                     tooltip="End point"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_ArcEndPointValidator" parameters="end_point_ref"/>
+              <validator id="SketchPlugin_ArcEndPointIntersectionValidator" parameters="end_point_ref"/>
+            </sketch-2dpoint_selector>
+            <validator id="GeomValidators_Different" parameters="center_point,start_point_1,end_point_1"/>
           </box>
-          <box id="ThreePoints" title="Three points on arc" icon="icons/Sketch/arc_3pt_32x32.png">
-            <sketch-2dpoint_selector id="ArcStartPoint" accept_expressions="0" title="Start point" tooltip="Start point"
+          <box id="by_three_points"
+               icon="icons/Sketch/arc_3pt_32x32.png"
+               title="Three points on arc">
+            <sketch-2dpoint_selector id="start_point_2"
+                                     reference_attribute="start_point_ref"
+                                     title="Start point"
+                                     tooltip="Start point"
+                                     accept_expressions="0"
                                      enable_value="enable_by_preferences"/>
-            <sketch-2dpoint_selector id="ArcEndPoint" accept_expressions="0" title="End point" tooltip="End point"
-                                     enable_value="enable_by_preferences"/>
-            <sketch-2dpoint_selector id="ArcPassedPoint" accept_expressions="0" title="Passed point" tooltip="Passed point"
-                                     enable_value="enable_by_preferences"/>
-            <validator id="GeomValidators_Different" parameters="ArcStartPoint,ArcEndPoint,ArcPassedPoint"/>
+            <sketch-2dpoint_selector id="end_point_2"
+                                     reference_attribute="end_point_ref"
+                                     title="End point"
+                                     tooltip="End point"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_DifferentReference" parameters="start_point_ref,end_point_ref"/>
+              <validator id="SketchPlugin_ArcEndPointValidator" parameters="end_point_ref"/>
+            </sketch-2dpoint_selector>
+            <sketch-2dpoint_selector id="passed_point"
+                                     reference_attribute="passed_point_ref"
+                                     title="Passed point"
+                                     tooltip="Passed point"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_DifferentReference" parameters="start_point_ref,end_point_ref,passed_point_ref"/>
+              <validator id="SketchPlugin_ThirdPointValidator" parameters="passed_point_ref"/>
+            </sketch-2dpoint_selector>
+            <validator id="GeomValidators_Different" parameters="start_point_2,end_point_2,passed_point"/>
           </box>
-          <box id="Tangent" title="Tangent with edge" icon="icons/Sketch/arc_tang_32x32.png">
-            <sketch_shape_selector id="ArcTangentPoint" label="Tangent point" tooltip="Select point on line" shape_types="vertex">
-              <validator id="SketchPlugin_ArcTangentPoint" parameters="" />
+          <box id="by_tangent_edge"
+               icon="icons/Sketch/arc_tang_32x32.png"
+               title="Tangent with edge">
+            <sketch_shape_selector id="tangent_point"
+                                   label="Tangent point"
+                                   tooltip="Select point on line"
+                                   shape_types="vertex">
+              <validator id="SketchPlugin_ArcTangentPoint"/>
             </sketch_shape_selector>
-            <sketch-2dpoint_selector id="ArcEndPoint" accept_expressions="0" title="End point" tooltip="End point"
-                                     enable_value="enable_by_preferences"/>
+            <sketch-2dpoint_selector id="end_point_3"
+                                     reference_attribute="end_point_ref"
+                                     title="End point"
+                                     tooltip="End point"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_ArcEndPointValidator" parameters="end_point_ref"/>
+            </sketch-2dpoint_selector>
           </box>
         </toolbox>
-        <labelvalue id="ArcRadius" accept_expressions="0" label="Radius:" default="computed" icon="icons/Sketch/radius.png"
-                     tooltip="Set radius" obligatory="0" enable_value="enable_by_preferences">
-          <validator id="GeomValidators_Positive"/>
+        <labelvalue id="radius"
+                    icon="icons/Sketch/radius.png"
+                    label="Radius:"
+                    tooltip="Set radius"
+                    accept_expressions="0"
+                    min="0"
+                    default="0"
+                    obligatory="0"
+                    enable_value="enable_by_preferences">
         </labelvalue>
-        <labelvalue id="ArcAngle" label="Angle:" icon="icons/Sketch/angle.png" tooltip="Set angle" default="90" use_reset="false" obligatory="0"
-                     enable_value="enable_by_preferences"/>
-        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+        <labelvalue id="angle"
+                    icon="icons/Sketch/angle.png"
+                    label="Angle:"
+                    tooltip="Set angle"
+                    default="0"
+                    use_reset="false"
+                    obligatory="0"
+                    enable_value="enable_by_preferences"/>
+        <boolvalue id="Auxiliary"
+                   label="Auxiliary"
+                   tooltip="Construction element"
+                   default="false"
+                   obligatory="0"/>
       </feature>
 
       <!--  SketchFillet  -->
@@ -352,10 +527,10 @@
           <validator id="PartSet_DifferentObjects"/>
           <validator id="GeomValidators_ShapeType" parameters="vertex,line"/>
         </sketch_shape_selector>
-        <sketch_shape_selector 
-          id="ConstraintEntityB" 
-          label="Second object" 
-          tooltip="Select point, line end point, line, center of circle or arc." 
+        <sketch_shape_selector
+          id="ConstraintEntityB"
+          label="Second object"
+          tooltip="Select point, line end point, line, center of circle or arc."
           shape_types="edge vertex">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_DistanceAttr" parameters="ConstraintEntityA"/>
@@ -363,15 +538,15 @@
           <validator id="GeomValidators_ShapeType" parameters="vertex,line"/>
         </sketch_shape_selector>
         <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
-        
+
         <doublevalue_editor label="Value" tooltip="Distance" id="ConstraintValue" default="computed" min="0">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
-        
+
         <validator id="PartSet_DistanceSelection"/>
       </feature>
-      
-    <!--  SketchConstraintLength  -->      
+
+    <!--  SketchConstraintLength  -->
       <feature id="SketchConstraintLength" title="Length" tooltip="Set fixed length of a line segment" icon="icons/Sketch/length.png">
         <label title="Select a line on which to calculate length" tooltip="Select a line on which to calculate length"/>
         <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select a line" shape_types="edge" >
@@ -460,14 +635,14 @@
       <!--  SketchConstraintParallel  -->
       <feature id="SketchConstraintParallel" title="Parallel" tooltip="Create constraint defining two parallel lines"
                icon="icons/Sketch/parallel.png">
-        <sketch_shape_selector id="ConstraintEntityA" 
+        <sketch_shape_selector id="ConstraintEntityA"
             label="First line" tooltip="Select a line" shape_types="edge">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
         </sketch_shape_selector>
-        
-        <sketch_shape_selector id="ConstraintEntityB" label="Second line" tooltip="Select a line" 
+
+        <sketch_shape_selector id="ConstraintEntityB" label="Second line" tooltip="Select a line"
             shape_types="edge">
             <validator id="GeomValidators_ShapeType" parameters="line"/>
             <validator id="PartSet_DifferentObjects"/>
@@ -475,21 +650,21 @@
         </sketch_shape_selector>
         <validator id="PartSet_ParallelSelection"/>
       </feature>
-      
+
     <!--  SketchConstraintPerpendicular  -->
-      <feature id="SketchConstraintPerpendicular" title="Perpendicular" 
-        tooltip="Create constraint defining two perpendicular lines" 
+      <feature id="SketchConstraintPerpendicular" title="Perpendicular"
+        tooltip="Create constraint defining two perpendicular lines"
         icon="icons/Sketch/perpendicular.png">
-        <sketch_shape_selector id="ConstraintEntityA" 
-            label="First line" tooltip="Select a line" 
+        <sketch_shape_selector id="ConstraintEntityA"
+            label="First line" tooltip="Select a line"
             shape_types="edge">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
             <validator id="GeomValidators_ShapeType" parameters="line"/>
         </sketch_shape_selector>
-        
-        <sketch_shape_selector id="ConstraintEntityB" 
-            label="Second line" tooltip="Select a line" 
+
+        <sketch_shape_selector id="ConstraintEntityB"
+            label="Second line" tooltip="Select a line"
             shape_types="edge">
             <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
@@ -547,12 +722,12 @@
       <feature id="SketchConstraintEqual" title="Equal"
         tooltip="Create constraint defining equal lengths of two lines or line and arc or equal radii of two arcs or two circles or arc and circle"
         icon="icons/Sketch/equal.png">
-        <sketch_shape_selector id="ConstraintEntityA" 
+        <sketch_shape_selector id="ConstraintEntityA"
             label="First object" tooltip="Select line, circle or arc" shape_types="edge">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
         </sketch_shape_selector>
-        
+
         <sketch_shape_selector id="ConstraintEntityB"
             label="Second object" tooltip="Select line, circle or arc" shape_types="edge">
           <validator id="SketchPlugin_EqualAttr" parameters="ConstraintEntityA"/>
@@ -561,15 +736,15 @@
         </sketch_shape_selector>
         <validator id="PartSet_EqualSelection"/>
       </feature>
-      
+
     <!--  SketchConstraintCollinear  -->
       <feature id="SketchConstraintCollinear" title="Collinear" tooltip="Create constraint defining collinearity of two lines" icon="icons/Sketch/collinear.png">
-        <sketch_shape_selector id="ConstraintEntityA" 
+        <sketch_shape_selector id="ConstraintEntityA"
             label="First line" tooltip="Select a line" shape_types="edge">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
           <validator id="PartSet_DifferentObjects"/>
         </sketch_shape_selector>
-        
+
         <sketch_shape_selector id="ConstraintEntityB"
             label="Second line" tooltip="Select a line" shape_types="edge">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
@@ -577,8 +752,8 @@
         </sketch_shape_selector>
         <validator id="PartSet_CollinearSelection"/>
       </feature>
-         
+
     </group>
-    
+
   </workbench>
 </plugin>

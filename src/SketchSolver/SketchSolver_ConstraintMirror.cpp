@@ -164,8 +164,8 @@ void mirrorEntities(const std::shared_ptr<GeomAPI_Lin2d>& theMirrorLine,
   // process specific features
   if (theOriginal->getKind() == SketchPlugin_Arc::ID()) {
     // orientation of arc
-    theMirrored->boolean(SketchPlugin_Arc::INVERSED_ID())->setValue(
-        !theOriginal->boolean(SketchPlugin_Arc::INVERSED_ID())->value());
+    theMirrored->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(
+        !theOriginal->boolean(SketchPlugin_Arc::REVERSED_ID())->value());
   } else if (theOriginal->getKind() == SketchPlugin_Circle::ID()) {
     // radius of the circle
     theMirrored->real(SketchPlugin_Circle::RADIUS_ID())->setValue(

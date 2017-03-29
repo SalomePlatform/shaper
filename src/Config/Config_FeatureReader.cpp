@@ -145,6 +145,8 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   outFeatureMessage->setActionsWhenNested(getNormalizedProperty(theFeatureNode,
                                           FEATURE_WHEN_NESTED));
   outFeatureMessage->setModal(getBooleanAttribute(theFeatureNode, FEATURE_MODAL, false));
+  bool isAutoPreview = getBooleanAttribute(theFeatureNode, FEATURE_AUTO_PREVIEW, true);
+  outFeatureMessage->setAutoPreview(isAutoPreview);
 
   bool isInternal = getBooleanAttribute(theFeatureNode, ATTR_INTERNAL, false);
   outFeatureMessage->setInternal(isInternal);
@@ -168,6 +170,4 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
     aDocKind = restoreAttribute(NODE_WORKBENCH, WORKBENCH_DOC);
   }
   outFeatureMessage->setDocumentKind(aDocKind);
-  bool isAutoPreview = getBooleanAttribute(theFeatureNode, FEATURE_AUTO_PREVIEW, true);
-  outFeatureMessage->setAutoPreview(isAutoPreview);
 }

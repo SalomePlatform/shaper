@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-#include "PartSet_SketcherReetntrantMgr.h"
+#include "PartSet_SketcherReentrantMgr.h"
 #include "PartSet_Module.h"
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_WidgetPoint2d.h"
@@ -25,8 +25,8 @@
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Line.h>
-#include <SketchPlugin_Arc.h>
-#include <SketchPlugin_Circle.h>
+#include <SketchPlugin_MacroArc.h>
+#include <SketchPlugin_MacroCircle.h>
 #include <SketchPlugin_Point.h>
 
 #include <XGUI_Workshop.h>
@@ -38,21 +38,23 @@
 
 #include <QToolButton>
 
-PartSet_SketcherReetntrantMgr::PartSet_SketcherReetntrantMgr(ModuleBase_IWorkshop* theWorkshop)
+PartSet_SketcherReentrantMgr::PartSet_SketcherReentrantMgr(ModuleBase_IWorkshop* theWorkshop)
 : QObject(theWorkshop),
   myWorkshop(theWorkshop),
   myRestartingMode(RM_None),
   myIsFlagsBlocked(false),
   myIsInternalEditOperation(false),
+  myIsValueChangedBlocked(false),
+  myInternalActiveWidget(0),
   myNoMoreWidgetsAttribute("")
 {
 }
 
-PartSet_SketcherReetntrantMgr::~PartSet_SketcherReetntrantMgr()
+PartSet_SketcherReentrantMgr::~PartSet_SketcherReentrantMgr()
 {
 }
 
-ModuleBase_ModelWidget* PartSet_SketcherReetntrantMgr::internalActiveWidget() const
+ModuleBase_ModelWidget* PartSet_SketcherReentrantMgr::internalActiveWidget() const
 {
   ModuleBase_ModelWidget* aWidget = 0;
   if (!isActiveMgr())
@@ -70,12 +72,12 @@ ModuleBase_ModelWidget* PartSet_SketcherReetntrantMgr::internalActiveWidget() co
   return aWidget;
 }
 
-bool PartSet_SketcherReetntrantMgr::isInternalEditActive() const
+bool PartSet_SketcherReentrantMgr::isInternalEditActive() const
 {
   return myIsInternalEditOperation;
 }
 
-void PartSet_SketcherReetntrantMgr::updateInternalEditActiveState()
+void PartSet_SketcherReentrantMgr::updateInternalEditActiveState()
 {
   if  (myIsInternalEditOperation) {
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
@@ -95,7 +97,7 @@ void PartSet_SketcherReetntrantMgr::updateInternalEditActiveState()
   }
 }
 
-bool PartSet_SketcherReetntrantMgr::operationCommitted(ModuleBase_Operation* theOperation)
+bool PartSet_SketcherReentrantMgr::operationCommitted(ModuleBase_Operation* theOperation)
 {
   bool aProcessed = false;
   if (!isActiveMgr())
@@ -107,7 +109,7 @@ bool PartSet_SketcherReetntrantMgr::operationCommitted(ModuleBase_Operation* the
   return aProcessed;
 }
 
-void PartSet_SketcherReetntrantMgr::operationStarted(ModuleBase_Operation* theOperation)
+void PartSet_SketcherReentrantMgr::operationStarted(ModuleBase_Operation* theOperation)
 {
   if (!isActiveMgr())
     return;
@@ -121,7 +123,7 @@ void PartSet_SketcherReetntrantMgr::operationStarted(ModuleBase_Operation* theOp
   resetFlags();
 }
 
-void PartSet_SketcherReetntrantMgr::operationAborted(ModuleBase_Operation* theOperation)
+void PartSet_SketcherReentrantMgr::operationAborted(ModuleBase_Operation* theOperation)
 {
   if (!isActiveMgr())
     return;
@@ -129,7 +131,7 @@ void PartSet_SketcherReetntrantMgr::operationAborted(ModuleBase_Operation* theOp
   resetFlags();
 }
 
-bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* theWnd,
+bool PartSet_SketcherReentrantMgr::processMouseMoved(ModuleBase_IViewWindow* theWnd,
                                                       QMouseEvent* theEvent)
 {
   bool aProcessed = false;
@@ -153,7 +155,7 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* th
         isLineFeature = anActiveWidget->attributeID() == anAttributeOnStart;
       }
       else if (isTangentArc(aFOperation, module()->sketchMgr()->activeSketch())) {
-        anAttributeOnStart = SketchPlugin_Arc::TANGENT_POINT_ID();
+        anAttributeOnStart = SketchPlugin_MacroArc::TANGENT_POINT_ID();
         isArcFeature = anActiveWidget->attributeID() == anAttributeOnStart;
       }
       bool aCanBeActivatedByMove = isLineFeature || isArcFeature;
@@ -186,13 +188,13 @@ bool PartSet_SketcherReetntrantMgr::processMouseMoved(ModuleBase_IViewWindow* th
   return aProcessed;
 }
 
-bool PartSet_SketcherReetntrantMgr::processMousePressed(ModuleBase_IViewWindow* /* theWnd*/,
+bool PartSet_SketcherReentrantMgr::processMousePressed(ModuleBase_IViewWindow* /* theWnd*/,
                                                         QMouseEvent* /* theEvent*/)
 {
   return isActiveMgr() && myIsInternalEditOperation;
 }
 
-bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow* theWnd,
+bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* theWnd,
                                                          QMouseEvent* theEvent)
 {
   bool aProcessed = false;
@@ -257,7 +259,7 @@ bool PartSet_SketcherReetntrantMgr::processMouseReleased(ModuleBase_IViewWindow*
   return aProcessed;
 }
 
-void PartSet_SketcherReetntrantMgr::onWidgetActivated()
+void PartSet_SketcherReentrantMgr::onWidgetActivated()
 {
   if (!isActiveMgr())
     return;
@@ -274,7 +276,7 @@ void PartSet_SketcherReetntrantMgr::onWidgetActivated()
   }
 }
 
-void PartSet_SketcherReetntrantMgr::onNoMoreWidgets(const std::string& thePreviousAttributeID)
+void PartSet_SketcherReentrantMgr::onNoMoreWidgets(const std::string& thePreviousAttributeID)
 {
   if (!isActiveMgr())
     return;
@@ -306,7 +308,7 @@ void PartSet_SketcherReetntrantMgr::onNoMoreWidgets(const std::string& thePrevio
   }
 }
 
-bool PartSet_SketcherReetntrantMgr::processEnter(const std::string& thePreviousAttributeID)
+bool PartSet_SketcherReentrantMgr::processEnter(const std::string& thePreviousAttributeID)
 {
   bool isDone = false;
 
@@ -333,7 +335,7 @@ bool PartSet_SketcherReetntrantMgr::processEnter(const std::string& thePreviousA
   return isDone;
 }
 
-void PartSet_SketcherReetntrantMgr::onVertexSelected()
+void PartSet_SketcherReentrantMgr::onVertexSelected()
 {
   if (!isActiveMgr())
     return;
@@ -360,7 +362,21 @@ void PartSet_SketcherReetntrantMgr::onVertexSelected()
   }
 }
 
-void PartSet_SketcherReetntrantMgr::onBeforeStopped()
+void PartSet_SketcherReentrantMgr::onAfterValuesChangedInPropertyPanel()
+{
+  // blocked flag in order to avoid circling when storeValue will be applied in
+  // this method to cached widget
+  if (myIsValueChangedBlocked)
+    return;
+
+  if (isInternalEditActive()) {
+    ModuleBase_ModelWidget* aWidget = (ModuleBase_ModelWidget*)sender();
+    if (!aWidget->isModifiedInEdit())
+      restartOperation();
+  }
+}
+
+void PartSet_SketcherReentrantMgr::onBeforeStopped()
 {
   if (!isActiveMgr() || !myIsInternalEditOperation)
     return;
@@ -368,17 +384,17 @@ void PartSet_SketcherReetntrantMgr::onBeforeStopped()
   beforeStopInternalEdit();
 }
 
-bool PartSet_SketcherReetntrantMgr::canBeCommittedByPreselection()
+bool PartSet_SketcherReentrantMgr::canBeCommittedByPreselection()
 {
   return !isActiveMgr() || myRestartingMode == RM_None;
 }
 
-bool PartSet_SketcherReetntrantMgr::isInternalEditStarted() const
+bool PartSet_SketcherReentrantMgr::isInternalEditStarted() const
 {
   return myIsInternalEditOperation;
 }
 
-bool PartSet_SketcherReetntrantMgr::isActiveMgr() const
+bool PartSet_SketcherReentrantMgr::isActiveMgr() const
 {
   ModuleBase_Operation* aCurrentOperation = myWorkshop->currentOperation();
 
@@ -395,7 +411,7 @@ bool PartSet_SketcherReetntrantMgr::isActiveMgr() const
   return anActive;
 }
 
-bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePreviousAttributeID)
+bool PartSet_SketcherReentrantMgr::startInternalEdit(const std::string& thePreviousAttributeID)
 {
   bool isDone = false;
   /// this is workaround for ModuleBase_WidgetEditor, used in SALOME mode. Sometimes key enter
@@ -468,7 +484,7 @@ bool PartSet_SketcherReetntrantMgr::startInternalEdit(const std::string& thePrev
   return isDone;
 }
 
-void PartSet_SketcherReetntrantMgr::beforeStopInternalEdit()
+void PartSet_SketcherReentrantMgr::beforeStopInternalEdit()
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                       (myWorkshop->currentOperation());
@@ -480,12 +496,29 @@ void PartSet_SketcherReetntrantMgr::beforeStopInternalEdit()
   deleteInternalFeature();
 }
 
-void PartSet_SketcherReetntrantMgr::restartOperation()
+void PartSet_SketcherReentrantMgr::restartOperation()
 {
   if (myIsInternalEditOperation) {
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(
                                                                   myWorkshop->currentOperation());
     if (aFOperation) {
+      // obtain widgets(attributes) which content should be applied to attributes of new feature
+      ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
+      ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
+      const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
+      QList<ModuleBase_ModelWidget*> aValueWidgets;
+      for (int i = 0, aSize = aWidgets.size(); i < aSize; i++) {
+        ModuleBase_ModelWidget* aWidget = aWidgets[i];
+        if (!aWidget->isModifiedInEdit()) {
+          aValueWidgets.append(aWidget);
+          // the widget is cashed to fill feature of new operation by the current widget value
+          // we set empty parent to the widget in order to remove it ourselves. Reason: restart
+          // operation will clear property panel and delete all widgets. This widget should be
+          // removed only after applying value of the widget to new created feature.
+          aWidget->setParent(0);
+        }
+      }
+
       myNoMoreWidgetsAttribute = "";
       myIsFlagsBlocked = true;
       module()->launchOperation(aFOperation->id());
@@ -499,11 +532,26 @@ void PartSet_SketcherReetntrantMgr::restartOperation()
         onNoMoreWidgets(myNoMoreWidgetsAttribute);
         myNoMoreWidgetsAttribute = "";
       }
+
+      // filling new feature by the previous value of active widget
+      // (e.g. circle_type in macro Circle)
+      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(
+                                                                myWorkshop->currentOperation());
+      myIsValueChangedBlocked = true; // flag to avoid onAfterValuesChangedInPropertyPanel slot
+      for (int i = 0, aSize = aValueWidgets.size(); i < aSize; i++) {
+        ModuleBase_ModelWidget* aWidget = aValueWidgets[i];
+        aWidget->setEditingMode(false);
+        aWidget->setFeature(aFOperation->feature());
+        aWidget->storeValue();
+        // we must delete this widget
+        delete aWidget;
+      }
+      myIsValueChangedBlocked = false;
     }
   }
 }
 
-void PartSet_SketcherReetntrantMgr::createInternalFeature()
+void PartSet_SketcherReentrantMgr::createInternalFeature()
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                      (myWorkshop->currentOperation());
@@ -546,7 +594,7 @@ void PartSet_SketcherReetntrantMgr::createInternalFeature()
   }
 }
 
-void PartSet_SketcherReetntrantMgr::deleteInternalFeature()
+void PartSet_SketcherReentrantMgr::deleteInternalFeature()
 {
   if (myInternalActiveWidget) {
     ModuleBase_WidgetSelector* aWSelector =
@@ -564,7 +612,7 @@ void PartSet_SketcherReetntrantMgr::deleteInternalFeature()
   myInternalFeature = FeaturePtr();
 }
 
-void PartSet_SketcherReetntrantMgr::resetFlags()
+void PartSet_SketcherReentrantMgr::resetFlags()
 {
   if (!myIsFlagsBlocked) {
     myIsInternalEditOperation = false;
@@ -573,7 +621,7 @@ void PartSet_SketcherReetntrantMgr::resetFlags()
   }
 }
 
-bool PartSet_SketcherReetntrantMgr::copyReetntrantAttributes(const FeaturePtr& theSourceFeature,
+bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& theSourceFeature,
                                                              const FeaturePtr& theNewFeature,
                                                              const CompositeFeaturePtr& theSketch,
                                                              const bool isTemporary)
@@ -599,48 +647,48 @@ bool PartSet_SketcherReetntrantMgr::copyReetntrantAttributes(const FeaturePtr& t
                                                  aSFData->attribute(SketchPlugin_Line::END_ID()));
     aNPoint->setValue(aSPoint->x(), aSPoint->y());
   }
-  else if (aFeatureKind == SketchPlugin_Circle::ID()) {
+  else if (aFeatureKind == SketchPlugin_MacroCircle::ID()) {
     // set circle type
-    std::string aTypeAttributeId = SketchPlugin_Circle::CIRCLE_TYPE();
+    std::string aTypeAttributeId = SketchPlugin_MacroCircle::CIRCLE_TYPE();
     AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
     AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
     aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
     //ModuleBase_Tools::flushUpdated(theNewFeature);
     aChanged = true;
   }
-  else if (aFeatureKind == SketchPlugin_Arc::ID()) {
+  else if (aFeatureKind == SketchPlugin_MacroArc::ID()) {
     // set arc type
-    std::string aTypeAttributeId = SketchPlugin_Arc::ARC_TYPE();
+    std::string aTypeAttributeId = SketchPlugin_MacroArc::ARC_TYPE();
     AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
     AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
     aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
 
-    // if the arc is tangent, set coincidence to end point of the previous arc
-    std::string anArcType = aSourceFeatureTypeAttr->value();
-    if (anArcType == SketchPlugin_Arc::ARC_TYPE_TANGENT()) {
-      // get the last point of the previuos arc feature(geom point 2d)
-      std::shared_ptr<ModelAPI_Data> aSData = theSourceFeature->data();
-      std::shared_ptr<GeomDataAPI_Point2D> aSPointAttr =
-                                      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                      aSData->attribute(SketchPlugin_Arc::END_ID()));
-      // get point attribute on the current feature
-      AttributeRefAttrPtr aTangentPointAttr = theNewFeature->data()->refattr(
-                                                    SketchPlugin_Arc::TANGENT_POINT_ID());
-      aTangentPointAttr->setAttr(aSPointAttr);
+    //// if the arc is tangent, set coincidence to end point of the previous arc
+    //std::string anArcType = aSourceFeatureTypeAttr->value();
+    //if (anArcType == SketchPlugin_Arc::ARC_TYPE_TANGENT()) {
+    //  // get the last point of the previuos arc feature(geom point 2d)
+    //  std::shared_ptr<ModelAPI_Data> aSData = theSourceFeature->data();
+    //  std::shared_ptr<GeomDataAPI_Point2D> aSPointAttr =
+    //                                  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    //                                  aSData->attribute(SketchPlugin_Arc::END_ID()));
+    //  // get point attribute on the current feature
+    //  AttributeRefAttrPtr aTangentPointAttr = theNewFeature->data()->refattr(
+    //                                                SketchPlugin_Arc::TANGENT_POINT_ID());
+    //  aTangentPointAttr->setAttr(aSPointAttr);
 
-      std::shared_ptr<GeomDataAPI_Point2D> aNPointAttr =
-                                    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                    theNewFeature->data()->attribute(SketchPlugin_Arc::END_ID()));
-      aNPointAttr->setValue(aSPointAttr->x(), aSPointAttr->y());
+    //  std::shared_ptr<GeomDataAPI_Point2D> aNPointAttr =
+    //                                std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    //                                theNewFeature->data()->attribute(SketchPlugin_Arc::END_ID()));
+    //  aNPointAttr->setValue(aSPointAttr->x(), aSPointAttr->y());
 
-    }
+    //}
     //ModuleBase_Tools::flushUpdated(theNewFeature);
     aChanged = true;
   }
   return aChanged;
 }
 
-bool PartSet_SketcherReetntrantMgr::isTangentArc(ModuleBase_Operation* theOperation,
+bool PartSet_SketcherReentrantMgr::isTangentArc(ModuleBase_Operation* theOperation,
                                                  const CompositeFeaturePtr& /*theSketch*/) const
 {
   bool aTangentArc = false;
@@ -648,30 +696,29 @@ bool PartSet_SketcherReetntrantMgr::isTangentArc(ModuleBase_Operation* theOperat
                                                                         (theOperation);
   if (aFOperation && module()->sketchMgr()->isNestedSketchOperation(aFOperation)) {
     FeaturePtr aFeature = aFOperation->feature();
-    if (aFeature.get() && aFeature->getKind() == SketchPlugin_Arc::ID()) {
-      AttributeStringPtr aTypeAttr = aFeature->data()->string(SketchPlugin_Arc::ARC_TYPE());
+    if (aFeature.get() && aFeature->getKind() == SketchPlugin_MacroArc::ID()) {
+      AttributeStringPtr aTypeAttr = aFeature->data()->string(SketchPlugin_MacroArc::ARC_TYPE());
       std::string anArcType = aTypeAttr.get() ? aTypeAttr->value() : "";
-      aTangentArc = anArcType == SketchPlugin_Arc::ARC_TYPE_TANGENT();
+      aTangentArc = anArcType == SketchPlugin_MacroArc::ARC_TYPE_BY_TANGENT_EDGE();
     }
   }
   return aTangentArc;
 }
 
-void PartSet_SketcherReetntrantMgr::updateAcceptAllAction()
+void PartSet_SketcherReentrantMgr::updateAcceptAllAction()
 {
   CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
   if (aSketch.get())
     workshop()->errorMgr()->updateAcceptAllAction(aSketch);
 }
 
-XGUI_Workshop* PartSet_SketcherReetntrantMgr::workshop() const
+XGUI_Workshop* PartSet_SketcherReentrantMgr::workshop() const
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
   return aConnector->workshop();
 }
 
-PartSet_Module* PartSet_SketcherReetntrantMgr::module() const
+PartSet_Module* PartSet_SketcherReentrantMgr::module() const
 {
   return dynamic_cast<PartSet_Module*>(myWorkshop->module());
 }
-

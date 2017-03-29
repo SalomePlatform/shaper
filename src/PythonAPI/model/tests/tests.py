@@ -1,5 +1,6 @@
 from GeomAlgoAPI import *
 from GeomAPI import *
+from ModelAPI import ModelAPI_Feature
 import math
 
 
@@ -139,3 +140,16 @@ def testHaveNamingFaces(theFeature, theModel, thePartDoc) :
     name = attrSelection.namingName()
     assert(shape.isFace())
     assert(name != ""), "String empty"
+
+def testNbSubFeatures(theComposite, theKindOfSub, theExpectedCount):
+  """ Tests number of sub-features of the given type
+  :param theComposite     composite feature to check its subs
+  :param theKindOfSub     kind of sub-feature to calculate count
+  :param theExpectedCount expected number of sub-features
+  """
+  count = 0
+  for aSub in theComposite.features().list():
+    aFeature = ModelAPI_Feature.feature(aSub)
+    if aFeature is not None and aFeature.getKind() == theKindOfSub:
+       count += 1
+  assert (count == theExpectedCount), "Number of sub-features of type {}: {}, expected {}".format(theKindOfSub, count, theExpectedCount)

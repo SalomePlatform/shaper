@@ -111,8 +111,13 @@ bool ModuleBase_PagedContainer::storeValueCustom()
 
 void ModuleBase_PagedContainer::onPageChanged()
 {
-  storeValue();
-  if (myIsFocusOnCurrentPage) focusTo();
+  if (!storeValue())
+    return;
+  // focus might be changed only if the value is correcly stored
+  // if it is not stored, reentrant manager will handle by this widget
+  // after it will restart operation, the widget might be removed
+  if (myIsFocusOnCurrentPage)
+    focusTo();
 }
 
 

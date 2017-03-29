@@ -61,7 +61,7 @@ public:
   //! Returns the path for the loaded by demand documents
   const std::string& loadPath() const;
   //! Defines that specified document must be loaded by demand
-  void setLoadByDemand(std::string theID);
+  void setLoadByDemand(std::string theID, const int theDocID);
   //! Returns true if specified document must be loaded by demand
   bool isLoadByDemand(std::string theID);
   //! Closes and removes the documents that are not loaded by demand and
@@ -88,8 +88,8 @@ public:
   std::map<int, std::shared_ptr<Model_Document> > myDocs;
   /// Path for the loaded by demand documents
   std::string myPath;
-  /// Path for the loaded by demand documents
-  std::set<std::string> myLoadedByDemand;
+  /// Path for the loaded by demand documents (and the persistent ID as the value)
+  std::map<std::string, int> myLoadedByDemand;
 };
 
 #endif

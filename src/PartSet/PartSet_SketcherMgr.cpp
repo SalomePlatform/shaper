@@ -5,7 +5,7 @@
 // Author:      Vitaly SMETANNIKOV
 
 #include "PartSet_SketcherMgr.h"
-#include "PartSet_SketcherReetntrantMgr.h"
+#include "PartSet_SketcherReentrantMgr.h"
 #include "PartSet_Module.h"
 #include "PartSet_MouseProcessor.h"
 #include "PartSet_Tools.h"
@@ -615,7 +615,7 @@ void PartSet_SketcherMgr::onApplicationStarted()
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(anIWorkshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
-  PartSet_SketcherReetntrantMgr* aReentranceMgr = myModule->sketchReentranceMgr();
+  PartSet_SketcherReentrantMgr* aReentranceMgr = myModule->sketchReentranceMgr();
 
   XGUI_PropertyPanel* aPropertyPanel = aWorkshop->propertyPanel();
   if (aPropertyPanel) {
@@ -1540,19 +1540,23 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
 void PartSet_SketcherMgr::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget,
                                                  const bool isToConnect)
 {
-  /*Temporary commented as we do not modify values in property panel
+  //Temporary commented as we do not modify values in property panel
   if (isToConnect) {
-    connect(theWidget, SIGNAL(beforeValuesChanged()),
-            this, SLOT(onBeforeValuesChangedInPropertyPanel()));
+    //connect(theWidget, SIGNAL(beforeValuesChanged()),
+    //        this, SLOT(onBeforeValuesChangedInPropertyPanel()));
+    //connect(theWidget, SIGNAL(afterValuesChanged()),
+    //        this, SLOT(onAfterValuesChangedInPropertyPanel()));
     connect(theWidget, SIGNAL(afterValuesChanged()),
-            this, SLOT(onAfterValuesChangedInPropertyPanel()));
+            myModule->sketchReentranceMgr(), SLOT(onAfterValuesChangedInPropertyPanel()));
   }
   else {
-    disconnect(theWidget, SIGNAL(beforeValuesChanged()),
-                this, SLOT(onBeforeValuesChangedInPropertyPanel()));
+    //disconnect(theWidget, SIGNAL(beforeValuesChanged()),
+    //            this, SLOT(onBeforeValuesChangedInPropertyPanel()));
+    //disconnect(theWidget, SIGNAL(afterValuesChanged()),
+    //            this, SLOT(onAfterValuesChangedInPropertyPanel()));
     disconnect(theWidget, SIGNAL(afterValuesChanged()),
-                this, SLOT(onAfterValuesChangedInPropertyPanel()));
-  }*/
+               myModule->sketchReentranceMgr(), SLOT(onAfterValuesChangedInPropertyPanel()));
+  }
 }
 
 void PartSet_SketcherMgr::widgetStateChanged(int thePreviousState)

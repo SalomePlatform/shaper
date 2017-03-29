@@ -174,7 +174,8 @@ class Model_Objects
                         const int theResultIndex);
 
   //! Updates the results list of the feature basing on the current data tree
-  void updateResults(FeaturePtr theFeature);
+  //! theProcessed is used to avoid update twice (since the function is recursive)
+  void updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& theProcessed);
 
   /// Internally makes document know that feature was removed or added in history after creation
   void updateHistory(const std::shared_ptr<ModelAPI_Object> theObject);

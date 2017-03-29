@@ -27,7 +27,9 @@ class ModelHighAPI_RefAttr;
 class ModelHighAPI_Reference;
 class ModelHighAPI_Selection;
 class SketchAPI_Arc;
+class SketchAPI_MacroArc;
 class SketchAPI_Circle;
+class SketchAPI_MacroCircle;
 class SketchAPI_IntersectionPoint;
 class SketchAPI_Line;
 class SketchAPI_Mirror;
@@ -154,13 +156,23 @@ public:
       double theRadius);
   /// Add circle
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Circle> addCircle(
+  std::shared_ptr<SketchAPI_MacroCircle> addCircle(
+      double theCenterX, double theCenterY,
+      double thePassedX, double thePassedY);
+  /// Add circle
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_MacroCircle> addCircle(
+      const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint,
+      const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint);
+  /// Add circle
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_MacroCircle> addCircle(
       double theX1, double theY1,
       double theX2, double theY2,
       double theX3, double theY3);
   /// Add circle
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Circle> addCircle(
+  std::shared_ptr<SketchAPI_MacroCircle> addCircle(
       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
       const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3);
@@ -189,28 +201,28 @@ public:
 
   /// Add arc
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Arc> addArc(
+  std::shared_ptr<SketchAPI_MacroArc> addArc(
       double theStartX, double theStartY,
       double theEndX, double theEndY,
       double thePassedX, double thePassedY);
 
   /// Add arc
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Arc> addArc(
+  std::shared_ptr<SketchAPI_MacroArc> addArc(
       const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
       const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
       const std::shared_ptr<GeomAPI_Pnt2d>& thePassed);
 
   /// Add arc
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Arc> addArc(
+  std::shared_ptr<SketchAPI_MacroArc> addArc(
       const ModelHighAPI_RefAttr& theTangentPoint,
       double theEndX, double theEndY,
       bool theInversed);
 
   /// Add arc
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_Arc> addArc(
+  std::shared_ptr<SketchAPI_MacroArc> addArc(
       const ModelHighAPI_RefAttr& theTangentPoint,
       const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
       bool theInversed);
@@ -382,6 +394,9 @@ public:
   void setValue(
       const std::shared_ptr<ModelHighAPI_Interface> & theConstraint,
       const ModelHighAPI_Double & theValue);
+
+  SKETCHAPI_EXPORT
+  std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& thePoint);
 
   // TODO(spo): rename to selectFaces() or faces() (or add faces() -> list to SWIG)
   /// Select face

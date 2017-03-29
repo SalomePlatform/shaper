@@ -667,7 +667,7 @@ void getPointOnEdge(const FeaturePtr theFeature,
       theFeature->attribute(SketchPlugin_Arc::START_ID()))->pnt();
     std::shared_ptr<GeomAPI_Pnt2d> aPntEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       theFeature->attribute(SketchPlugin_Arc::END_ID()))->pnt();
-    if(theFeature->attribute(SketchPlugin_Arc::INVERSED_ID())) {
+    if(theFeature->attribute(SketchPlugin_Arc::REVERSED_ID())) {
       aPntTemp = aPntStart;
       aPntStart = aPntEnd;
       aPntEnd = aPntTemp;

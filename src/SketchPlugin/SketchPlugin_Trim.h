@@ -89,6 +89,9 @@ class SketchPlugin_Trim : public SketchPlugin_Feature, public GeomAPI_IPresentab
   /// Moves the feature : Empty
   SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY) {};
 
+  bool setCoincidenceToAttribute(const AttributePtr& theAttribute,
+            const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences);
+
   typedef std::map<std::shared_ptr<GeomAPI_Pnt>,
                    std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,
                              std::list<std::shared_ptr<ModelAPI_Object> > > > PointToRefsMap;

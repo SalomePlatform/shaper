@@ -1,7 +1,7 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-#ifndef PartSet_SketcherReetntrantMgr_H
-#define PartSet_SketcherReetntrantMgr_H
+#ifndef PartSet_SketcherReentrantMgr_H
+#define PartSet_SketcherReentrantMgr_H
 
 #include "PartSet.h"
 
@@ -23,7 +23,7 @@ class QMouseEvent;
 class XGUI_Workshop;
 class PartSet_Module;
 
-/// \ingroup PartSet_SketcherReetntrantMgr
+/// \ingroup PartSet_SketcherReentrantMgr
 /// It provides reentrant create operations in sketch, that is when all inputs are valid,
 /// automatic validation of the creation and switch the created entity to edit mode
 /// ('internal' edit operation), with the ability to simultaneously create the next entity
@@ -31,7 +31,7 @@ class PartSet_Module;
 /// OK valids the current edition and exits from the operation (no re-entrance).
 /// Cancel removes (undo) the entity currently edited and
 /// exits from the operation (no re-entrance).
-class PARTSET_EXPORT PartSet_SketcherReetntrantMgr : public QObject
+class PARTSET_EXPORT PartSet_SketcherReentrantMgr : public QObject
 {
 Q_OBJECT
 
@@ -47,8 +47,8 @@ enum RestartingMode {
 public:
   /// Constructor
   /// \param theWorkshop a workshop instance
-  PartSet_SketcherReetntrantMgr(ModuleBase_IWorkshop* theWorkshop);
-  virtual ~PartSet_SketcherReetntrantMgr();
+  PartSet_SketcherReentrantMgr(ModuleBase_IWorkshop* theWorkshop);
+  virtual ~PartSet_SketcherReentrantMgr();
 
 public:
   /// Returns a first widget of the current opeation if the internal edit operation is active
@@ -120,6 +120,13 @@ private slots:
   /// the current feature is a line and there are not obligate widgets anymore
   void onVertexSelected();
 
+  /// Listens to the signal about the modification of the values
+  /// have been done in the property panel. If the manager has active edit operation and
+  /// the active widget does not process the modification of value, the manager will
+  /// restart current operation and fill a new feature attribute by the value of current
+  /// widget
+  void onAfterValuesChangedInPropertyPanel();
+
   /// Deactivates selection and filters of the first operation widget if it is an internal
   /// 'edit' operation
   void onBeforeStopped();
@@ -182,6 +189,7 @@ private:
   RestartingMode myRestartingMode;  /// automatical restarting mode flag
   bool myIsFlagsBlocked; /// true when reset of flags should not be perfromed
   bool myIsInternalEditOperation; /// true when the 'internal' edit is started
+  bool myIsValueChangedBlocked; /// blocked flag to avoid circling by value changed
 
   FeaturePtr myPreviousFeature; /// feature of the previous operation, which is restarted
   FeaturePtr myInternalFeature;

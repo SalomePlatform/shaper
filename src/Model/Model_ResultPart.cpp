@@ -43,12 +43,12 @@ void Model_ResultPart::initAttributes()
 
   if (aDocRef->isInitialized() && // initialized immideately means already exist and will be loaded
       !Model_Application::getApplication()->hasDocument(aDocRef->docId()))
-    Model_Application::getApplication()->setLoadByDemand(data()->name());
+    Model_Application::getApplication()->setLoadByDemand(data()->name(), aDocRef->docId());
 }
 
 std::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
 {
-  if (myTrsf.get()) {
+  if (myTrsf.get() && baseRef().get()) { // the second condition is to to #2035
     return baseRef()->partDoc();
   }
   DocumentPtr aRes = data()->document(DOC_REF())->value();
@@ -99,7 +99,7 @@ void Model_ResultPart::activate()
 
 std::shared_ptr<ModelAPI_ResultPart> Model_ResultPart::original()
 {
-  if (myTrsf.get()) {
+  if (myTrsf.get() && baseRef().get()) {  // the second condition is to to #2035
     return baseRef()->original();
   }
   return std::dynamic_pointer_cast<ModelAPI_ResultPart>(data()->owner());

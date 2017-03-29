@@ -70,6 +70,13 @@ static const char * EVENT_SOLVER_FAILED = "SolverFailed";
 /// Event ID that the problem in solver disappeared
 static const char * EVENT_SOLVER_REPAIRED = "SolverRepaired";
 
+/// Event Id that sketch has DoF = 0
+static const char * EVENT_SKETCH_FULLY_CONSTRAINED = "SketchFullyConstrainted";
+/// Event Id that sketch has DoF > 0
+static const char * EVENT_SKETCH_UNDER_CONSTRAINED = "SketchUnderConstrainted";
+/// Event Id that sketch has DoF < 0
+static const char * EVENT_SKETCH_OVER_CONSTRAINED  = "SketchOverConstrainted";
+
 /// Event ID that informs that some object has changed the stability
 static const char * EVENT_STABILITY_CHANGED = "StabilityChanged";
 

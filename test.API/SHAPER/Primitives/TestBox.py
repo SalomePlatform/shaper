@@ -43,8 +43,8 @@ Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketc
 
 # Parameters
 model.addParameter(Part_1_doc, "dx", "10")
-model.addParameter(Part_1_doc, "dy", "10")
-model.addParameter(Part_1_doc, "dz", "10")
+model.addParameter(Part_1_doc, "dy", "25")
+model.addParameter(Part_1_doc, "dz", "15")
 
 # Tests
 Box_1 = model.addBox(Part_1_doc, 10, 10, 10)

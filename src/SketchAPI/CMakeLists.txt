@@ -9,6 +9,8 @@ SET(PROJECT_HEADERS
   SketchAPI_Constraint.h
   SketchAPI_IntersectionPoint.h
   SketchAPI_Line.h
+  SketchAPI_MacroArc.h
+  SketchAPI_MacroCircle.h
   SketchAPI_Mirror.h
   SketchAPI_Sketch.h
   SketchAPI_SketchEntity.h
@@ -25,6 +27,8 @@ SET(PROJECT_SOURCES
   SketchAPI_Constraint.cpp
   SketchAPI_IntersectionPoint.cpp
   SketchAPI_Line.cpp
+  SketchAPI_MacroArc.cpp
+  SketchAPI_MacroCircle.cpp
   SketchAPI_Mirror.cpp
   SketchAPI_Sketch.cpp
   SketchAPI_SketchEntity.cpp

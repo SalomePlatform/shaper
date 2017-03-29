@@ -25,6 +25,8 @@
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
+#include <SketchPlugin_MacroArc.h>
+#include <SketchPlugin_MacroCircle.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_Trim.h>
@@ -88,6 +90,16 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_IntersectionValidator);
   aFactory->registerValidator("SketchPlugin_ProjectionValidator",
                               new SketchPlugin_ProjectionValidator);
+  aFactory->registerValidator("SketchPlugin_DifferentReference",
+                              new SketchPlugin_DifferentReferenceValidator);
+  aFactory->registerValidator("SketchPlugin_CirclePassedPointValidator",
+                              new SketchPlugin_CirclePassedPointValidator);
+  aFactory->registerValidator("SketchPlugin_ThirdPointValidator",
+                              new SketchPlugin_ThirdPointValidator);
+  aFactory->registerValidator("SketchPlugin_ArcEndPointValidator",
+                              new SketchPlugin_ArcEndPointValidator);
+  aFactory->registerValidator("SketchPlugin_ArcEndPointIntersectionValidator",
+                              new SketchPlugin_ArcEndPointIntersectionValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -179,6 +191,10 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintAngle);
   } else if (theFeatureID == SketchPlugin_Trim::ID()) {
     return FeaturePtr(new SketchPlugin_Trim);
+  } else if (theFeatureID == SketchPlugin_MacroArc::ID()) {
+    return FeaturePtr(new SketchPlugin_MacroArc);
+  } else if (theFeatureID == SketchPlugin_MacroCircle::ID()) {
+    return FeaturePtr(new SketchPlugin_MacroCircle);
   }
   // feature of such kind is not found
   return FeaturePtr();
@@ -242,6 +258,8 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_MultiRotation::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MultiTranslation::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Trim::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_MacroArc::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_MacroCircle::ID(), aHasSketchPlane);
       // SketchRectangle is a python feature, so its ID is passed just as a string
       aMsg->setState("SketchRectangle", aHasSketchPlane);
     }

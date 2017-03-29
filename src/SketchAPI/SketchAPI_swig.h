@@ -11,7 +11,9 @@
 
   #include "SketchAPI.h"
   #include "SketchAPI_Arc.h"
+  #include "SketchAPI_MacroArc.h"
   #include "SketchAPI_Circle.h"
+  #include "SketchAPI_MacroCircle.h"
   #include "SketchAPI_Constraint.h"
   #include "SketchAPI_IntersectionPoint.h"
   #include "SketchAPI_Line.h"

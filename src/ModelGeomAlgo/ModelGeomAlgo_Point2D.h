@@ -24,8 +24,9 @@ class GeomDataAPI_Point2D;
 #include <map>
 
 
-namespace ModelGeomAlgo_Point2D {
-
+class ModelGeomAlgo_Point2D
+{
+public:
   /// Searches Point2D attribute of reference of the attribute of given feature
   /// \param theFeature a feature to obtain AttributeRefAttr
   /// \param theAttribute a name of AttributeRefAttr on the given feature
@@ -33,7 +34,7 @@ namespace ModelGeomAlgo_Point2D {
   /// \param theObjectFeatureAttribute a feature attribute in object that satisfies the search
   /// \param isSkipFeatureAttributes a boolean value if coincidences to the feature attributes
   /// \returns found point attribute or NULL
-  MODELGEOMALGO_EXPORT std::shared_ptr<GeomDataAPI_Point2D> getPointOfRefAttr(
+  static MODELGEOMALGO_EXPORT std::shared_ptr<GeomDataAPI_Point2D> getPointOfRefAttr(
                         ModelAPI_Feature* theFeature,
                         const std::string& theAttribute,
                         const std::string& theObjectFeatureKind = "",
@@ -50,7 +51,7 @@ namespace ModelGeomAlgo_Point2D {
   /// \param isSkipFeatureAttributes a boolean value if coincidences to the feature attributes
   /// should be skipped
   /// \returns found point attribute or NULL
-  MODELGEOMALGO_EXPORT void getPointsOfReference(const std::shared_ptr<ModelAPI_Object>& theObject,
+  static MODELGEOMALGO_EXPORT void getPointsOfReference(const std::shared_ptr<ModelAPI_Object>& theObject,
                                   const std::string& theReferenceFeatureKind,
                                   std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theAttributes,
                                   const std::string& theObjectFeatureKind = "",
@@ -66,10 +67,14 @@ namespace ModelGeomAlgo_Point2D {
                    std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,
                              std::list<std::shared_ptr<ModelAPI_Object> > > > PointToRefsMap;
 
-  MODELGEOMALGO_EXPORT void getPointsIntersectedShape(
+  static MODELGEOMALGO_EXPORT void getPointsIntersectedShape(
                   const std::shared_ptr<ModelAPI_Feature>& theBaseFeature,
                   const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
                   PointToRefsMap& thePointToAttributeOrObject);
+
+  static MODELGEOMALGO_EXPORT std::list<std::shared_ptr<GeomAPI_Pnt> > getSetOfPntIntersectedShape(
+                  const std::shared_ptr<ModelAPI_Feature>& theBaseFeature,
+                  const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures);
 
   /// Removes attributes which points are out of the base shape
   /// \param theBaseShape a shape of check
@@ -79,7 +84,7 @@ namespace ModelGeomAlgo_Point2D {
   /// \param theDirY plane X direction to generate 3D point by 2D attribute point
   /// \param thePoints a container of 3D points belong to the shape
   /// \param theAttributeToPoint a container of attribute to point
-  MODELGEOMALGO_EXPORT void getPointsInsideShape(
+  static MODELGEOMALGO_EXPORT void getPointsInsideShape(
                         const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                         const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theAttributes,
                         const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
@@ -95,7 +100,7 @@ namespace ModelGeomAlgo_Point2D {
   /// \param theDirY plane X direction to generate 3D point by 2D attribute point
   /// \param thePoints a container of 3D points belong to the shape
   /// \param theAttributeToPoint a container of attribute to point
-  MODELGEOMALGO_EXPORT void getPointsInsideShape_p(
+  static MODELGEOMALGO_EXPORT void getPointsInsideShape_p(
                               const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                               const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theAttributes,
                               const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
@@ -104,31 +109,31 @@ namespace ModelGeomAlgo_Point2D {
                               std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
                               std::map<std::shared_ptr<GeomDataAPI_Point2D>,
                                        std::shared_ptr<GeomAPI_Pnt> >& theAttributeToPoint);
-
   /// Finds projected point to the given shape line
   /// \param theBaseShape a shape of check
   /// \param thePoint [in] a point to project
   /// \param theProjectedPoint [out] a projected point
-  MODELGEOMALGO_EXPORT bool isPointOnEdge(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
+  static MODELGEOMALGO_EXPORT bool isPointOnEdge(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                                           const std::shared_ptr<GeomAPI_Pnt>& thePoint,
                                           std::shared_ptr<GeomAPI_Pnt>& theProjectedPoint);
+
 
 #ifdef _DEBUG
   /// Return feature name, kind and point values united in a string info
   /// \param theFeature an investigated feature
   /// \param theAttributesOnly a container of necessary attributes, if empty, all
   /// \return string value
-  MODELGEOMALGO_EXPORT std::string getPontAttributesInfo(
-                           const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                           const std::set<std::shared_ptr<ModelAPI_Attribute> >& theAttributesOnly);
+  static MODELGEOMALGO_EXPORT std::string getPontAttributesInfo(
+                      const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                      const std::set<std::shared_ptr<ModelAPI_Attribute> >& theAttributesOnly);
 
   /// Return point attribute string info
   /// \param theAttribute an investigated attribute
   /// \return string value
-  MODELGEOMALGO_EXPORT std::string getPointAttributeInfo(
-                                  const std::shared_ptr<ModelAPI_Attribute>& theAttribute);
+  static MODELGEOMALGO_EXPORT std::string getPointAttributeInfo(
+                      const std::shared_ptr<ModelAPI_Attribute>& theAttribute);
 
 #endif
-}
+};
 
 #endif

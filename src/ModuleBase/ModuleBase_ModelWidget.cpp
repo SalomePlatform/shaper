@@ -51,6 +51,8 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
 
   myIsInternal = theData->getBooleanAttribute(ATTR_INTERNAL, false);
 
+  myIsModifiedInEdit = theData->getBooleanAttribute(ATTR_MODIFIED_IN_EDIT, true);
+
   myDefaultValue = theData->getProperty(ATTR_DEFAULT);
   myUseReset = theData->getBooleanAttribute(ATTR_USE_RESET, true);
   myIsComputedDefault = theData->getProperty(ATTR_DEFAULT) == DOUBLE_WDG_DEFAULT_COMPUTED;
@@ -310,7 +312,12 @@ bool ModuleBase_ModelWidget::storeValue()
   setValueState(Stored);
 
   emit beforeValuesChanged();
-  bool isDone = storeValueCustom();
+  bool isDone = false;
+  // value is stored only in creation mode and in edition if there is not
+  // XML flag prohibited modification in edit mode(macro feature circle/arc)
+  if (!isEditingMode() || isModifiedInEdit())
+    isDone = storeValueCustom();
+
   emit afterValuesChanged();
 
   return isDone;

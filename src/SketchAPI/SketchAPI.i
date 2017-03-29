@@ -26,7 +26,9 @@
 
 // shared pointers
 %shared_ptr(SketchAPI_Arc)
+%shared_ptr(SketchAPI_MacroArc)
 %shared_ptr(SketchAPI_Circle)
+%shared_ptr(SketchAPI_MacroCircle)
 %shared_ptr(SketchAPI_Constraint)
 %shared_ptr(SketchAPI_IntersectionPoint)
 %shared_ptr(SketchAPI_Line)
@@ -207,7 +209,9 @@
 %include "SketchAPI_IntersectionPoint.h"
 %include "SketchAPI_Line.h"
 %include "SketchAPI_Circle.h"
+%include "SketchAPI_MacroCircle.h"
 %include "SketchAPI_Arc.h"
+%include "SketchAPI_MacroArc.h"
 %include "SketchAPI_Projection.h"
 %include "SketchAPI_Mirror.h"
 %include "SketchAPI_Translation.h"

@@ -723,23 +723,15 @@ void Model_Objects::synchronizeFeatures(
   // they may be connected, like sketch and sub elements)
   // After synchronisation of back references because sketch
   // must be set in sub-elements before "execute" by updateResults
-  std::list<FeaturePtr> aComposites; // composites must be updated after their subs (issue 360)
+  std::set<FeaturePtr> aProcessed; // composites must be updated after their subs (issue 360)
   TDF_ChildIDIterator aLabIter2(featuresLabel(), TDataStd_Comment::GetID());
   for (; aLabIter2.More(); aLabIter2.Next()) {
     TDF_Label aFeatureLabel = aLabIter2.Value()->Label();
     if (myFeatures.IsBound(aFeatureLabel)) {  // a new feature is inserted
       FeaturePtr aFeature = myFeatures.Find(aFeatureLabel);
-      if (std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature).get())
-        aComposites.push_back(aFeature);
-      else
-        updateResults(aFeature);
+      updateResults(aFeature, aProcessed);
     }
   }
-  std::list<FeaturePtr>::iterator aComposite = aComposites.begin();
-  for(; aComposite != aComposites.end(); aComposite++) {
-    updateResults(*aComposite);
-  }
-
   // the synchronize should be done after updateResults
   // in order to correct back references of updated results
   if (theUpdateReferences) {
@@ -1075,8 +1067,22 @@ std::string Model_Objects::featureResultGroup(FeaturePtr theFeature)
   return anEmpty; // not found
 }
 
-void Model_Objects::updateResults(FeaturePtr theFeature)
+void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& theProcessed)
 {
+  if (theProcessed.find(theFeature) != theProcessed.end())
+    return;
+  theProcessed.insert(theFeature);
+  // for composites update subs recursively (sketch elements results are needed for the sketch)
+  CompositeFeaturePtr aComp = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
+  if (aComp.get()) {
+    // update subs of composites first
+    int aSubNum = aComp->numberOfSubs();
+    for(int a = 0; a < aSubNum; a++) {
+      FeaturePtr aSub = aComp->subFeature(a);
+      updateResults(aComp->subFeature(a), theProcessed);
+    }
+  }
+
   // for not persistent is will be done by parametric updater automatically
   //if (!theFeature->isPersistentResult()) return;
   // check the existing results and remove them if there is nothing on the label

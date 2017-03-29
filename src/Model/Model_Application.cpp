@@ -116,9 +116,9 @@ const std::string& Model_Application::loadPath() const
 }
 
 //=======================================================================
-void Model_Application::setLoadByDemand(std::string theID)
+void Model_Application::setLoadByDemand(std::string theID, const int theDocID)
 {
-  myLoadedByDemand.insert(theID);
+  myLoadedByDemand[theID] = theDocID;
 }
 
 //=======================================================================
@@ -150,8 +150,21 @@ void Model_Application::removeUselessDocuments(
 
 int Model_Application::generateDocumentId()
 {
-  int aResult = int(myDocs.size());
-  for(; myDocs.find(aResult) != myDocs.end(); aResult++) {} // count until the result id is unique
+  int aResult;
+  // count until the result id is unique
+  for(aResult = int(myDocs.size()); true; aResult++) {
+    if (myDocs.find(aResult) == myDocs.end()) {
+      bool aFound = false;
+      std::map<std::string, int>::iterator aLBDIter = myLoadedByDemand.begin();
+      for(; aLBDIter != myLoadedByDemand.end(); aLBDIter++) {
+        if (aLBDIter->second == aResult) {
+          aFound = true;
+          break;
+        }
+      }
+      if (!aFound) break;
+    }
+  }
   return aResult;
 }
 

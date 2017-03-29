@@ -113,6 +113,7 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
     std::string aFeatureError = "Multitranslation builder ";
     aFeatureError+=":: the number of copies for the first direction is null or negative.";
     setError(aFeatureError);
+    return;
   }
 
   // Moving each object.
@@ -248,12 +249,14 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
     std::string aFeatureError = "Multitranslation builder ";
     aFeatureError+=":: the number of copies for the first direction is null or negative.";
     setError(aFeatureError);
+    return;
   }
 
   if (aSecondNbCopies <=0) {
     std::string aFeatureError = "Multitranslation builder ";
     aFeatureError+=":: the number of copies for the second direction is null or negative.";
     setError(aFeatureError);
+    return;
   }
 
   // Coord aFirstAxis

@@ -837,10 +837,6 @@ void SketchPlugin_ConstraintSplit::splitArc(FeaturePtr& theSplitFeature,
     return;
   }
 
-  // manually change type of arc to avoid incorrect self-constrainting of the tangent arc
-  aBaseFeature->string(SketchPlugin_Arc::ARC_TYPE())->setValue(
-      SketchPlugin_Arc::ARC_TYPE_CENTER_START_END());
-
   arrangePointsOnArc(aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase,
                      aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
 #ifdef DEBUG_SPLIT
@@ -1044,7 +1040,7 @@ void SketchPlugin_ConstraintSplit::arrangePointsOnArc(
 
   std::shared_ptr<GeomAPI_Pnt2d> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       theArc->attribute(SketchPlugin_Arc::CENTER_ID()))->pnt();
-  bool isReversed = theArc->boolean(SketchPlugin_Arc::INVERSED_ID())->value();
+  bool isReversed = theArc->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
 
   // collect directions to each point
   std::shared_ptr<GeomAPI_Dir2d> aStartDir(
@@ -1140,9 +1136,6 @@ FeaturePtr SketchPlugin_ConstraintSplit::createArcFeature(const FeaturePtr& theB
   // by arc; moreover, it may cause cyclicity in hte mechanism of updater
   bool aWasBlocked = aFeature->data()->blockSendAttributeUpdated(true);
 
-  aFeature->string(SketchPlugin_Arc::ARC_TYPE())->setValue(
-                SketchPlugin_Arc::ARC_TYPE_CENTER_START_END());
-
   fillAttribute(aFeature->attribute(SketchPlugin_Arc::CENTER_ID()),
                 theBaseFeature->attribute(aCenterAttributeId));
   fillAttribute(aFeature->attribute(SketchPlugin_Arc::START_ID()), theFirstPointAttr);
@@ -1153,8 +1146,8 @@ FeaturePtr SketchPlugin_ConstraintSplit::createArcFeature(const FeaturePtr& theB
 
   /// fill referersed state of created arc as it is on the base arc
   if (theBaseFeature->getKind() == SketchPlugin_Arc::ID()) {
-    bool aReversed = theBaseFeature->boolean(SketchPlugin_Arc::INVERSED_ID())->value();
-    aFeature->boolean(SketchPlugin_Arc::INVERSED_ID())->setValue(aReversed);
+    bool aReversed = theBaseFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
+    aFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(aReversed);
   }
   aFeature->data()->blockSendAttributeUpdated(aWasBlocked);
   aFeature->execute(); // to obtain result

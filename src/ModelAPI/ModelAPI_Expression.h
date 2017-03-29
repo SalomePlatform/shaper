@@ -62,6 +62,10 @@ class ModelAPI_Expression
   MODELAPI_EXPORT ModelAPI_Expression();
   /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
   MODELAPI_EXPORT virtual void reinit() = 0;
+  /// Resets attribute to deafult state.
+  MODELAPI_EXPORT virtual void reset() {
+    myIsInitialized = false;
+  };
 
   bool myIsInitialized; ///< is some value assigned to this attribute
 

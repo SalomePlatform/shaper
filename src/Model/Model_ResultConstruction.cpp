@@ -452,11 +452,33 @@ bool Model_ResultConstruction::update(const int theIndex,
       bool aRes = true;
       Handle(TDataStd_IntPackedMap) anIndices;
       if (aLab.FindAttribute(TDataStd_IntPackedMap::GetID(), anIndices)) {
+        NCollection_Map<TopoDS_Shape> aFaces; // collect faces, updated in the tree
         TColStd_MapIteratorOfPackedMapOfInteger anIndexIter(anIndices->GetMap());
+        Handle(TColStd_HPackedMapOfInteger) aNewPackedMap =
+          new TColStd_HPackedMapOfInteger; // with only faces that are ok
+        // iterate to find existing faces, updated
         for(; anIndexIter.More(); anIndexIter.Next()) {
-          if (!update(anIndexIter.Key(), theExtDoc, theModified))
-            aRes = false;
+          if (update(anIndexIter.Key(), theExtDoc, theModified)) {
+            GeomShapePtr aFace = shape(anIndexIter.Key(), theExtDoc);
+            if (!aFaces.Contains(aFace->impl<TopoDS_Shape>())) {
+              aNewPackedMap->ChangeMap().Add(anIndexIter.Key());
+              aFaces.Add(aFace->impl<TopoDS_Shape>());
+            }
+          }
         }
+        // then iterate all existing faces to find new faces
+        int aCurrentFacesNum = facesNum();
+        for(int a = 0; a < aCurrentFacesNum; a++) {
+          GeomShapePtr aFace = face(a);
+          if (!aFaces.Contains(aFace->impl<TopoDS_Shape>())) {
+            // add this one
+            int aNewFaceIndex = select(aFace, theExtDoc, -1);
+            if (aNewFaceIndex > 0) {
+              aNewPackedMap->ChangeMap().Add(aNewFaceIndex);
+            }
+          }
+        }
+        anIndices->ChangeMap(aNewPackedMap);
       }
       return aRes;
     } else {

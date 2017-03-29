@@ -47,6 +47,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_ResultField.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_ResultCompSolid.h>
@@ -81,6 +82,8 @@
 #include <Config_PropManager.h>
 #include <Config_DataModelReader.h>
 #include <Config_Translator.h>
+#include <Config_WidgetAPI.h>
+#include <Config_Keywords.h>
 
 #include <SUIT_ResourceMgr.h>
 
@@ -233,6 +236,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
                                    ModelAPI_ResultConstruction::DEFAULT_COLOR());
   Config_PropManager::registerProp("Visualization", "result_part_color", "Part color",
                                    Config_Prop::Color, ModelAPI_ResultPart::DEFAULT_COLOR());
+  Config_PropManager::registerProp("Visualization", "result_field_color", "Field color",
+                                   Config_Prop::Color, ModelAPI_ResultField::DEFAULT_COLOR());
 
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "face-selection", true))
     myViewerSelMode.append(TopAbs_FACE);
@@ -581,14 +586,25 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
   ModuleBase_Tools::flushUpdated(aFeature);
 
   // update visible state of Preview button
+  std::shared_ptr<Config_FeatureMessage> aFeatureInfo;
 #ifdef HAVE_SALOME
-  bool anIsAutoPreview =
-    mySalomeConnector->featureInfo(aFeatureKind.c_str())->isAutoPreview();
+  aFeatureInfo = mySalomeConnector->featureInfo(aFeatureKind.c_str());
 #else
   AppElements_MainMenu* aMenuBar = mainWindow()->menuObject();
   AppElements_Command* aCommand = aMenuBar->feature(aFeatureKind.c_str());
-  bool anIsAutoPreview = aCommand && aCommand->featureMessage()->isAutoPreview();
+  if (aCommand)
+    aFeatureInfo = aCommand->featureMessage();
 #endif
+  bool anIsAutoPreview = true;
+  if (aFeatureInfo.get())
+    aFeatureInfo->isAutoPreview();
+  else {
+    std::string aXmlCfg, aDescription;
+    module()->getXMLRepresentation(aFeatureKind, aXmlCfg, aDescription);
+    ModuleBase_WidgetFactory aFactory(aXmlCfg, moduleConnector());
+    anIsAutoPreview = aFactory.widgetAPI()->getBooleanAttribute(FEATURE_AUTO_PREVIEW, true);
+  }
+
   if (!anIsAutoPreview) {
     myPropertyPanel->findButton(PROP_PANEL_PREVIEW)->setVisible(true);
     // send signal about preview should not be computed automatically, click on preview

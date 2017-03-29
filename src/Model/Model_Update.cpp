@@ -24,6 +24,7 @@
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
+#include <GeomAPI_Shape.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
 #include <Events_Loop.h>
@@ -484,7 +485,21 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
         }
       }
     }
+    std::shared_ptr<GeomAPI_Shape> aShapeBefore = anExtSel->value();
+    if (!aShapeBefore.get() && anExtSel->context()) aShapeBefore = anExtSel->context()->shape();
     updateArguments(theFeature);
+    std::shared_ptr<GeomAPI_Shape> aShapeAfter = anExtSel->value();
+    if (!aShapeAfter.get() && anExtSel->context()) aShapeAfter = anExtSel->context()->shape();
+    // if selected plane is changed, try to re-take external references of all subs of the sketch
+    if (aShapeBefore.get() && !aShapeBefore->isEqual(aShapeAfter)) {
+      std::set<FeaturePtr> aWholeR;
+      allReasons(theFeature, aWholeR);
+      std::set<FeaturePtr>::iterator aRIter = aWholeR.begin();
+      for(; aRIter != aWholeR.end(); aRIter++) {
+        if ((*aRIter)->data()->selection("External"))
+          (*aRIter)->attributeChanged("External");
+      }
+    }
     // send event that sketch is prepared to be recomputed
     static Events_ID anID = Events_Loop::eventByName("SketchPrepared");
     std::shared_ptr<Events_Message> aMsg(new Events_Message(anID, this));
@@ -633,7 +648,6 @@ ModelAPI_ExecState stateByReference(ObjectPtr theTarget, const ModelAPI_ExecStat
 void Model_Update::updateArguments(FeaturePtr theFeature) {
   // perform this method also for disabled features: to make "not done" state for
   // features referenced to the active and modified features
-
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
 
   ModelAPI_ExecState aState = theFeature->data()->execState();

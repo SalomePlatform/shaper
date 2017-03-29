@@ -1,4 +1,4 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+﻿// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 // File:        PartSet_WidgetPoint2d.h
 // Created:     25 Apr 2014
@@ -57,6 +57,19 @@ Q_OBJECT
   /// \param theValue a selected presentation in the view
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
+
+  /// Checks all attribute validators returns valid. It tries on the given selection
+  /// to current attribute by setting the value inside and calling validators. After this,
+  /// the previous attribute value is restored.The valid/invalid value is cashed.
+  /// \param theValue a selected presentation in the view
+  /// \param theAttribute the attribute
+  /// \return a boolean value
+  bool isValidSelectionForAttribute_(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue,
+                                     const std::shared_ptr<ModelAPI_Attribute>& theAttribute);
+
+  /// Fills the attribute with the value of the selected owner
+  /// \param thePrs a selected owner
+  bool setSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
 
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
@@ -201,9 +214,9 @@ protected:
    /// \param theShape a shape to be exploded
    /// \param thePoint a point
    /// \return boolean value
-   static bool shapeContainsPoint(const std::shared_ptr<GeomAPI_Shape>& theShape,
-                                  const std::shared_ptr<GeomAPI_Pnt2d>& thePoint,
-                                  const CompositeFeaturePtr& theSketch);
+   static bool shapeExploreHasVertex(const std::shared_ptr<GeomAPI_Shape>& theShape,
+                                     const std::shared_ptr<GeomAPI_Pnt2d>& thePoint,
+                                     const CompositeFeaturePtr& theSketch);
 
   /// Finds in the feature's sub-features first Point2D attribute with the given point coordinates
   /// \param theFeature a feature with sub-feature attributes
@@ -232,6 +245,12 @@ protected:
   /// Returns attribute reference if the key is defined in XML definition of this control
   /// \return found attribute or null
   std::shared_ptr<ModelAPI_AttributeRefAttr> attributeRefAttr() const;
+
+  /// Finds first equal point attribute in sketch and set it to reference attribute
+  /// \param theClickedX the horizontal coordnate of the point
+  /// \param theClickedY the vertical coordnate of the point
+  void fillRefAttribute(double theClickedX, double theClickedY);
+  void fillRefAttribute(const ObjectPtr& theObject);
 
 protected:
   ModuleBase_IWorkshop* myWorkshop; ///< workshop

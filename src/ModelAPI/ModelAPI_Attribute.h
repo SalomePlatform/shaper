@@ -73,6 +73,9 @@ class ModelAPI_Attribute
   /// ID of the attribute in Data
   MODELAPI_EXPORT const std::string& id() const;
 
+  /// Resets attribute to deafult state.
+  MODELAPI_EXPORT virtual void reset();
+
  protected:
   /// Objects are created for features automatically
   MODELAPI_EXPORT ModelAPI_Attribute();

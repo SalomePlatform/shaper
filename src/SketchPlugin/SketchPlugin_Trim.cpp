@@ -110,19 +110,28 @@ void SketchPlugin_Trim::findShapePoints(const std::string& theObjectAttributeId,
 
         if (aBaseShape->shapeType() == GeomAPI_Shape::EDGE) {
           std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aBaseShape));
-          aStartPoint = anEdge->lastPoint();
-          aLastPoint = anEdge->firstPoint();
+          //GeomAPI_Shape::Orientation anOrientation = anEdge->orientation();
+          //if (anOrientation == GeomAPI_Shape::REVERSED) {
+            aStartPoint = anEdge->lastPoint();
+            aLastPoint = anEdge->firstPoint();
+          //}
+          //else {
+            //aStartPoint = anEdge->firstPoint();
+            //aLastPoint = anEdge->lastPoint();
+          //}
         }
       }
     }
   }
 #ifdef DEBUG_TRIM
   std::cout << "<findShapePoints> => "
-            << "Start Point: ["
-            << aStartPoint->x() << ", " << aStartPoint->y() << ", " << aStartPoint->z() << "]"
-            << "Last Point: ["
-            << aLastPoint->x() << ", " << aLastPoint->y() << ", " << aLastPoint->z() << "]"
-            << std::endl;
+    << std::endl << "Attribute point: "
+    << anAttributePnt->x() << ", " << anAttributePnt->y() << ", " << anAttributePnt->z() << "]"
+    << std::endl << "Start Point: ["
+    << aStartPoint->x() << ", " << aStartPoint->y() << ", " << aStartPoint->z() << "]"
+    << std::endl << "Last Point: ["
+    << aLastPoint->x() << ", " << aLastPoint->y() << ", " << aLastPoint->z() << "]"
+    << std::endl;
 #endif
 }
 
@@ -150,8 +159,7 @@ std::shared_ptr<GeomAPI_Pnt2d> SketchPlugin_Trim::convertPoint(
         aFound = true;
       }
       else {
-        std::shared_ptr<GeomAPI_Pln> aPlane = sketch()->plane();
-        aPoint = thePoint->to2D(aPlane);
+        aPoint = sketch()->to2D(thePoint);
         aFound = true;
       }
     }
@@ -159,8 +167,7 @@ std::shared_ptr<GeomAPI_Pnt2d> SketchPlugin_Trim::convertPoint(
   if (!aFound) {
     // returns an end of the shape to define direction of split if feature's attribute
     // participates
-    std::shared_ptr<GeomAPI_Pln> aPlane = sketch()->plane();
-    aPoint = thePoint->to2D(aPlane);
+    aPoint = sketch()->to2D(thePoint);
   }
   return aPoint;
 }
@@ -189,7 +196,11 @@ void SketchPlugin_Trim::execute()
 
   /// points of trim
   std::shared_ptr<GeomAPI_Pnt> aStartShapePoint, aLastShapePoint;
+#ifdef DEBUG_TRIM
+  std::cout << " Base Feature: " << aBaseFeature->data()->name() << std::endl;
+#endif
   findShapePoints(SELECTED_OBJECT(), SELECTED_POINT(), aStartShapePoint, aLastShapePoint);
+
   std::shared_ptr<GeomAPI_Pnt2d> aStartShapePoint2d = convertPoint(aStartShapePoint);
 
   std::shared_ptr<GeomAPI_Pnt2d> aLastShapePoint2d = convertPoint(aLastShapePoint);
@@ -200,7 +211,6 @@ void SketchPlugin_Trim::execute()
   std::map<AttributePtr, std::list<AttributePtr> > aBaseRefAttributes;
   std::list<AttributePtr> aRefsToFeature;
   getRefAttributes(aBaseFeature, aBaseRefAttributes, aRefsToFeature);
-
 
   // coincidence to result points
   // find coincidences to the base object, it should be used when attribute is found
@@ -237,16 +247,28 @@ void SketchPlugin_Trim::execute()
             aFurtherCoincidences, aModifiedAttributes);
   }
 
-  //
+  // constraints to end points of trim feature
   if (myObjectToPoints.find(aBaseObject) == myObjectToPoints.end())
     fillObjectShapes(aBaseObject, sketch()->data()->owner(), myCashedShapes, myObjectToPoints);
 
+  // create coincidence to objects, intersected the base object
   const PointToRefsMap& aRefsMap = myObjectToPoints.at(aBaseObject);
-  std::set<AttributePoint2DPtr>::const_iterator anIt = aFurtherCoincidences.begin(),
-                                                aLast = aFurtherCoincidences.end();
-  for (; anIt != aLast; anIt++) {
+  for (std::set<AttributePoint2DPtr>::const_iterator anIt = aFurtherCoincidences.begin(),
+                                                     aLast = aFurtherCoincidences.end();
+       anIt != aLast; anIt++) {
     AttributePoint2DPtr aPointAttribute = (*anIt);
     std::shared_ptr<GeomAPI_Pnt2d> aPoint2d = aPointAttribute->pnt();
+
+#ifdef DEBUG_TRIM
+    std::cout << "<compare Points> => "
+            << "aPoint2d: [" << aPoint2d->x() << ", " << aPoint2d->y() << "]" << std::endl;
+    if (aStartShapePoint2d.get())
+      std::cout << "Start Point: [" << aStartShapePoint2d->x() << ", " << aStartShapePoint2d->y()
+                << "]" << std::endl;
+    if (aLastShapePoint2d.get())
+      std::cout << "Last Point: [" << aLastShapePoint2d->x() << ", " << aLastShapePoint2d->y()
+                << "]" << std::endl;
+#endif
 
     std::shared_ptr<GeomAPI_Pnt> aPoint;
     if (aStartShapePoint2d.get() && aPoint2d->isEqual(aStartShapePoint2d))
@@ -266,7 +288,7 @@ void SketchPlugin_Trim::execute()
         break;
       }
     }
-    const std::list<AttributePoint2DPtr >& anAttributes = anInfo.first;
+    /*const std::list<AttributePoint2DPtr >& anAttributes = anInfo.first;
     for (std::list<AttributePoint2DPtr>::const_iterator anAttrIt = anAttributes.begin();
           anAttrIt != anAttributes.end(); anAttrIt++) {
       AttributePtr anAttribute = *anAttrIt;
@@ -288,7 +310,7 @@ void SketchPlugin_Trim::execute()
           aRefAttr->setAttr(aPointAttribute);
       }
     }
-
+    */
     const std::list<ObjectPtr>& anObjects = anInfo.second;
     for (std::list<ObjectPtr>::const_iterator anObjectIt = anObjects.begin();
       anObjectIt != anObjects.end(); anObjectIt++) {
@@ -299,23 +321,28 @@ void SketchPlugin_Trim::execute()
 
   // move constraints from base feature to replacing feature: ignore coincidences to feature
   // if attributes of coincidence participated in split
+  ResultPtr aReplacingResult;
   if (aReplacingFeature.get()) {
-    ResultPtr aReplacingResult = getFeatureResult(aReplacingFeature);
-    std::list<AttributePtr>::const_iterator anIt = aRefsToFeature.begin(),
-                                            aLast = aRefsToFeature.end();
-    for (; anIt != aLast; anIt++) {
-      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anIt);
-      if (!aRefAttr.get())
-        continue;
-      FeaturePtr anAttrFeature = ModelAPI_Feature::feature(aRefAttr->owner());
-      if (anAttrFeature.get() &&
-          anAttrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID())
-      {
-        if (anAttrFeature->attribute(SketchPlugin_Constraint::ENTITY_A()) == aRefAttr ||
-            anAttrFeature->attribute(SketchPlugin_Constraint::ENTITY_B()) == aRefAttr)
-          continue;
+    aReplacingFeature->execute(); // need it to obtain result
+    aReplacingResult = getFeatureResult(aReplacingFeature);
+  }
+  for(std::list<AttributePtr>::const_iterator anIt = aRefsToFeature.begin(),
+                                          aLast = aRefsToFeature.end();
+      anIt != aLast; anIt++) {
+    AttributePtr anAttribute = *anIt;
+    if (setCoincidenceToAttribute(anAttribute, aFurtherCoincidences))
+      continue;
+
+    if (aReplacingResult.get()) {
+      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
+      if (aRefAttr.get())
+        aRefAttr->setObject(aReplacingResult);
+      else {
+        AttributeReferencePtr aReferenceAttr =
+                             std::dynamic_pointer_cast<ModelAPI_AttributeReference>(anAttribute);
+        if (aReferenceAttr.get())
+          aReferenceAttr->setObject(aReplacingResult);
       }
-      aRefAttr->setObject(aReplacingResult);
     }
   }
 
@@ -348,6 +375,54 @@ void SketchPlugin_Trim::execute()
 #ifdef DEBUG_TRIM
   std::cout << "SketchPlugin_Trim::done" << std::endl;
 #endif
+}
+
+bool SketchPlugin_Trim::setCoincidenceToAttribute(const AttributePtr& theAttribute,
+                                const std::set<AttributePoint2DPtr>& theFurtherCoincidences)
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+  if (aFeature->getKind() != SketchPlugin_ConstraintCoincidence::ID())
+    return false;
+
+  AttributePoint2DPtr aRefPointAttr = SketchPlugin_ConstraintCoincidence::getPoint(aFeature);
+  if (!aRefPointAttr.get())
+    return false;
+  std::shared_ptr<GeomAPI_Pnt2d> aRefPnt2d = aRefPointAttr->pnt();
+
+  std::set<AttributePoint2DPtr>::const_iterator anIt = theFurtherCoincidences.begin(),
+                                                aLast = theFurtherCoincidences.end();
+  bool aFoundPoint = false;
+  for (; anIt != aLast && !aFoundPoint; anIt++) {
+    AttributePoint2DPtr aPointAttribute = (*anIt);
+    std::shared_ptr<GeomAPI_Pnt2d> aPoint2d = aPointAttribute->pnt();
+    if (aPoint2d->isEqual(aRefPnt2d)) {
+      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                                                                           theAttribute);
+      /*if (theAttribute->id() == SketchPlugin_ConstraintCoincidence::ENTITY_A())
+        aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                  aFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_B()));
+      else if (theAttribute->id() == SketchPlugin_ConstraintCoincidence::ENTITY_B())
+        aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                  aFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_A()));*/
+      if (aRefAttr.get()) {
+        aRefAttr->setAttr(aPointAttribute);
+        aFoundPoint = true;
+      }
+    }
+  }
+  /*AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  if (!aRefAttr.get())
+    return false;
+
+  if (aRefAttr.get())
+    aRefAttr->setObject(aReplacingResult);//continue;
+  else {
+  //AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anIt);
+    AttributeReferencePtr aReferenceAttr =
+                          std::dynamic_pointer_cast<ModelAPI_AttributeReference>(anAttribute);
+  }*/
+
+  return aFoundPoint;
 }
 
 bool SketchPlugin_Trim::isMacro() const
@@ -542,20 +617,22 @@ void SketchPlugin_Trim::getCoincidencesToObject(const ObjectPtr& theObject,
       anAttribute = aRefFeature->attribute(SketchPlugin_Constraint::ENTITY_B());
     }
     else {
-      aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
+      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
                                     (aRefFeature->attribute(SketchPlugin_Constraint::ENTITY_B()));
       if (aRefAttr->isObject() && aRefAttr->object() == theObject)
-      {
         anAttribute = aRefFeature->attribute(SketchPlugin_Constraint::ENTITY_A());
-      }
-      if (anAttribute.get())
-      {
-        aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
-                                    (anAttribute);
-        anAttribute = aRefAttr->attr();
-        if (anAttribute.get())
-          theCoincidencesToBaseFeature[anAttribute] = aRefFeature;
-      }
+    }
+    if (!anAttribute.get())
+      continue;
+
+    aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
+    if (aRefAttr->isObject())
+      continue; // one of attributes of coincidence contains link to an attribute
+
+    anAttribute = aRefAttr->attr();
+    if (anAttribute.get())
+    {
+      theCoincidencesToBaseFeature[anAttribute] = aRefFeature;
     }
   }
 }
@@ -754,6 +831,7 @@ void SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theStartSh
                                (aBaseFeature->attribute(aModifiedAttribute)));
 
     // equal Radius constraint for arcs
+    anArcFeature->execute(); // we need the created arc result to set equal constraint
     createConstraintForObjects(SketchPlugin_ConstraintEqual::ID(),
                                getFeatureResult(aBaseFeature),
                                getFeatureResult(anArcFeature));
@@ -781,6 +859,8 @@ FeaturePtr SketchPlugin_Trim::trimCircle(const std::shared_ptr<GeomAPI_Pnt2d>& t
 
   /// trim feature
   FeaturePtr anArcFeature = createArcFeature(aBaseFeature, theStartShapePoint, theLastShapePoint);
+  // arc created by trim of circle is always correct, that means that it is not inversed
+  anArcFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(false);
 
   theModifiedAttributes.insert(
     std::make_pair(aBaseFeature->attribute(SketchPlugin_Circle::CENTER_ID()),
@@ -824,7 +904,7 @@ void SketchPlugin_Trim::arrangePointsOnArc(const FeaturePtr& theArc,
 
   std::shared_ptr<GeomAPI_Pnt2d> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       theArc->attribute(SketchPlugin_Arc::CENTER_ID()))->pnt();
-  bool isReversed = theArc->boolean(SketchPlugin_Arc::INVERSED_ID())->value();
+  bool isReversed = theArc->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
 
   // collect directions to each point
   std::shared_ptr<GeomAPI_Dir2d> aStartDir(
@@ -927,7 +1007,6 @@ FeaturePtr SketchPlugin_Trim::createLineFeature(const FeaturePtr& theBaseFeature
   return aFeature;
 }
 
-
 FeaturePtr SketchPlugin_Trim::createArcFeature(const FeaturePtr& theBaseFeature,
                                                const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
                                                const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint)
@@ -952,9 +1031,6 @@ FeaturePtr SketchPlugin_Trim::createArcFeature(const FeaturePtr& theBaseFeature,
   // by arc; moreover, it may cause cyclicity in hte mechanism of updater
   bool aWasBlocked = aFeature->data()->blockSendAttributeUpdated(true);
 
-  aFeature->string(SketchPlugin_Arc::ARC_TYPE())->setValue(
-                SketchPlugin_Arc::ARC_TYPE_CENTER_START_END());
-
   fillAttribute(aFeature->attribute(SketchPlugin_Arc::CENTER_ID()),
                 theBaseFeature->attribute(aCenterAttributeId));
   fillPointAttribute(aFeature->attribute(SketchPlugin_Arc::START_ID()), theFirstPoint);
@@ -965,10 +1041,10 @@ FeaturePtr SketchPlugin_Trim::createArcFeature(const FeaturePtr& theBaseFeature,
 
   /// fill referersed state of created arc as it is on the base arc
   if (theBaseFeature->getKind() == SketchPlugin_Arc::ID()) {
-    bool aReversed = theBaseFeature->boolean(SketchPlugin_Arc::INVERSED_ID())->value();
-    aFeature->boolean(SketchPlugin_Arc::INVERSED_ID())->setValue(aReversed);
+    bool aReversed = theBaseFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
+    aFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(aReversed);
   }
-  aFeature->execute(); // to obtain result
+  //aFeature->execute(); // to obtain result
   aFeature->data()->blockSendAttributeUpdated(aWasBlocked);
 
   return aFeature;
