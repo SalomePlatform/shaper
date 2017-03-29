@@ -392,9 +392,15 @@ bool checkPythonDump()
     aDump->execute();
   }
   bool isProblem = !aDump.get() || !aDump->error().empty(); // after "finish" dump will be removed
+  if (isProblem && aDump.get()) {
+    std::cout<<"Dump feature error "<<aDump->error()<<std::endl;
+    Events_InfoMessage anErrorMsg(std::string("checkPythonDump"), aDump->error());
+    anErrorMsg.send();
+  }
   aSession->finishOperation();
-  if (isProblem)
+  if (isProblem) {
     return false; // something is wrong during dump
+  }
 
    // map from document name to feature name to feature data
   std::map<std::string, std::map<std::string, ModelHighAPI_FeatureStore> > aStore;

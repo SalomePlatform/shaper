@@ -918,22 +918,23 @@ void Model_Document::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
   // add it after all nested (otherwise the nested will be disabled)
   CompositeFeaturePtr aCompositeAfter =
     std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theAfterThis);
+  FeaturePtr anAfterThisSub = theAfterThis;
   if (aCompositeAfter.get()) {
     FeaturePtr aSub = aCompositeAfter;
     do {
       FeaturePtr aNext = myObjs->nextFeature(aSub);
       if (!isSub(aCompositeAfter, aNext)) {
-        theAfterThis = aSub;
+        anAfterThisSub = aSub;
         break;
       }
       aSub = aNext;
     } while (aSub.get());
   }
 
-  myObjs->moveFeature(theMoved, theAfterThis);
+  myObjs->moveFeature(theMoved, anAfterThisSub);
   if (aCurrentUp) { // make the moved feature enabled or disabled due to the real status
     setCurrentFeature(currentFeature(false), false);
-  } else if (theAfterThis == currentFeature(false)) {
+  } else if (theAfterThis == currentFeature(false) || anAfterThisSub == currentFeature(false)) {
     // must be after move to make enabled all features which are before theMoved
     setCurrentFeature(theMoved, true);
   }
