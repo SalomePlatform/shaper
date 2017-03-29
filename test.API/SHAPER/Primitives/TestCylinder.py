@@ -56,7 +56,7 @@ Cylinder_8 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "InvalidNam
 Cylinder_9 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "InvalidName"), 5, 10)
 Cylinder_10 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_3s-SketchLine_2e"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), 50, 120)
 Cylinder_11 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "Vertex_1_1"), model.selection("EDGE", "Edge_1_1"), 60, 100)
-Cylinder_12 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/Generated_Face_1&Extrusion_1_1/To_Face_1"), model.selection("EDGE", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/To_Face_1"), 5, 10)
+Cylinder_12 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_1&Extrusion_1_1/To_Face_1"), model.selection("EDGE", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/To_Face_1"), 5, 10)
 Cylinder_13 = model.addCylinder(Part_1_doc, "r", "h")
 Cylinder_14 = model.addCylinder(Part_1_doc, 5, 10, 45)
 Cylinder_15 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "Point_1"), model.selection("EDGE", "PartSet/OX"), 5, 10, 90)
@@ -73,7 +73,7 @@ Cylinder_25 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "InvalidNa
 Cylinder_26 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "InvalidName"), 5, 10, 90)
 Cylinder_27 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_2s-SketchLine_1e"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), 50, 120, 90)
 Cylinder_28 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "Vertex_1_1"), model.selection("EDGE", "Edge_2_1"), 60, 100, 180)
-Cylinder_29 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "Extrusion_2_1/Generated_Face_5&Extrusion_1_1/Generated_Face_4&Extrusion_1_1/To_Face_1"), model.selection("EDGE", "Extrusion_2_1/Generated_Face_2&Extrusion_2_1/To_Face_1"), 5, 10, 120)
+Cylinder_29 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "Extrusion_2_1/Generated_Face_3&Extrusion_2_1/Generated_Face_2&Extrusion_2_1/To_Face_1"), model.selection("EDGE", "Extrusion_2_1/Generated_Face_2&Extrusion_2_1/To_Face_1"), 5, 10, 120)
 Cylinder_30 = model.addCylinder(Part_1_doc, "r2", "h2", "angle")
 
 model.do()
