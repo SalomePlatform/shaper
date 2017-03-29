@@ -1014,9 +1014,10 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
   if (!anObject)
     return aCustomized;
 
+  std::vector<int> aColor;
+  bool aCustomColor = myOverconstraintListener->hasCustomColor(anObject, aColor);
+
   if (!theResult.get()) {
-    std::vector<int> aColor;
-    bool isConflicting = myOverconstraintListener->hasCustomColor(anObject, aColor);
     // customize sketch symbol presentation
     if (thePrs.get()) {
       Handle(AIS_InteractiveObject) anAISIO = thePrs->impl<Handle(AIS_InteractiveObject)>();
@@ -1038,7 +1039,7 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
     }
     // customize sketch dimension constraint presentation
     if (!aCustomized) {
-      if (!isConflicting)
+      if (!aCustomColor)
         XGUI_CustomPrs::getDefaultColor(anObject, true, aColor);
       if (!aColor.empty()) {
         aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);

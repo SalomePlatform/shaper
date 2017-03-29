@@ -29,7 +29,7 @@
 //#define DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
 
 PartSet_OverconstraintListener::PartSet_OverconstraintListener(ModuleBase_IWorkshop* theWorkshop)
-: myWorkshop(theWorkshop)
+: myWorkshop(theWorkshop), myIsFullyConstrained(false)
 {
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_FAILED));
@@ -110,7 +110,24 @@ void PartSet_OverconstraintListener::processEvent(
   }
   else if (anEventID == Events_Loop::eventByName(EVENT_SKETCH_UNDER_CONSTRAINED) ||
            anEventID == Events_Loop::eventByName(EVENT_SKETCH_FULLY_CONSTRAINED)) {
+    bool aPrevFullyConstrained = myIsFullyConstrained;
     myIsFullyConstrained = anEventID == Events_Loop::eventByName(EVENT_SKETCH_FULLY_CONSTRAINED);
+
+    if (aPrevFullyConstrained != myIsFullyConstrained) {
+      std::set<ObjectPtr> aModifiedObjects;
+      PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+      CompositeFeaturePtr aSketch = aModule->sketchMgr()->activeSketch();
+      for (int i = 0; i < aSketch->numberOfSubs(); i++) {
+        FeaturePtr aFeature = aSketch->subFeature(i);
+        aModifiedObjects.insert(aFeature); // is necessary to redisplay presentations
+        std::list<ResultPtr> aResults = aFeature->results();
+        for (std::list<ResultPtr>::const_iterator aIt = aResults.begin();
+             aIt != aResults.end(); ++aIt) {
+          aModifiedObjects.insert(*aIt);
+        }
+      }
+      redisplayObjects(aModifiedObjects);
+    }
   }
 
 #ifdef DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
@@ -124,8 +141,6 @@ bool PartSet_OverconstraintListener::appendConflictingObjects(
                                                const std::set<ObjectPtr>& theConflictingObjects)
 {
   std::set<ObjectPtr> aModifiedObjects;
-  //std::vector<int> aColor;
-  //getConflictingColor(aColor);
 
   // set error state for new objects and append them in the internal map of objects
   std::set<ObjectPtr>::const_iterator
