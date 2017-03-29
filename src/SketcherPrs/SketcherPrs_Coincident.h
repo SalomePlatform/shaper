@@ -38,14 +38,10 @@ public:
   /// \param aColor a color name
   Standard_EXPORT virtual void SetColor(const Quantity_NameOfColor aColor);
 
-  /// Set state of the presentation, in case of conflicting state, the icon of the presentation is
+  /// Set state of the presentation, in case of custom color, the icon of the presentation is
   /// visualized in error color.
-  /// The state is stored in an internal field, so should be changed when
-  /// constraint become not conflicting
-  /// \param theConflicting a state
-  /// \param theColor a color for conflicting object
-  Standard_EXPORT void SetConflictingConstraint(const bool& theConflicting,
-                                                const std::vector<int>& theColor);
+  /// \param theColor a custom color for object presentation
+  Standard_EXPORT void SetCustomColor(const std::vector<int>& theColor);
 
   /// Returns true if the constraint feature arguments are correcly filled to build AIS presentation
   /// \param theConstraint a constraint feature
@@ -74,8 +70,8 @@ private:
   ModelAPI_Feature* myConstraint;
   std::shared_ptr<GeomAPI_Ax3> mySketcherPlane;
   gp_Pnt myPoint;
-  bool myIsConflicting; /// state if the presentation is visualized in error state
-  Quantity_Color myConflictingColor; /// the color of mid ring if there is a conflict
+  bool myIsCustomColor; /// state if the presentation is visualized in custom color
+  Quantity_Color myCustomColor; /// the color of mid ring if there is a conflict
 };
 
 

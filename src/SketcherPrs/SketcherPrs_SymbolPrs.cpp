@@ -103,7 +103,7 @@ std::map<const char*, Handle(Image_AlienPixMap)> SketcherPrs_SymbolPrs::myIconsM
 
 SketcherPrs_SymbolPrs::SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint,
                                              const std::shared_ptr<GeomAPI_Ax3>& thePlane)
- : AIS_InteractiveObject(), myConstraint(theConstraint), myPlane(thePlane), myIsConflicting(false)
+ : AIS_InteractiveObject(), myConstraint(theConstraint), myPlane(thePlane), myIsCustomColor(false)
 {
   SetAutoHilight(Standard_False);
   myPntArray = new Graphic3d_ArrayOfPoints(1);
@@ -166,7 +166,7 @@ void SketcherPrs_SymbolPrs::prepareAspect()
     else
       myAspect = new Graphic3d_AspectMarker3d(aIcon);
 
-    myAspect->SetColor(myColor);
+    myAspect->SetColor(myCustomColor);
   }
 }
 
@@ -294,25 +294,17 @@ void SketcherPrs_SymbolPrs::ComputeSelection(const Handle(SelectMgr_Selection)& 
 }
 
 //*********************************************************************************
-void SketcherPrs_SymbolPrs::SetConflictingConstraint(const bool& theConflicting,
-                                                     const std::vector<int>& theColor)
+void SketcherPrs_SymbolPrs::SetCustomColor(const std::vector<int>& theColor)
 {
-  if (theConflicting)
-  {
-    myColor = Quantity_Color (theColor[0] / 255., theColor[1] / 255.,
-                              theColor[2] / 255., Quantity_TOC_RGB);
-    //if (!myAspect.IsNull())
-    //  myAspect->SetColor (Quantity_Color (theColor[0] / 255., theColor[1] / 255.,
-    //                      theColor[2] / 255., Quantity_TOC_RGB));
-    //myIsConflicting = true;
-  }
+  myIsCustomColor = !theColor.empty();
+  if (myIsCustomColor)
+    myCustomColor = Quantity_Color(theColor[0] / 255., theColor[1] / 255.,
+                                   theColor[2] / 255., Quantity_TOC_RGB);
   else
-  {
-    myColor = Quantity_Color (1.0, 1.0, 0.0, Quantity_TOC_RGB);
-    //if (!myAspect.IsNull())
-    //  myAspect->SetColor (Quantity_Color (1.0, 1.0, 0.0, Quantity_TOC_RGB));
-    //myIsConflicting = false;
-  }
+    myCustomColor = Quantity_Color (1.0, 1.0, 0.0, Quantity_TOC_RGB);
+
+  if (!myAspect.IsNull())
+    myAspect->SetColor (myCustomColor);
 }
 
 //*********************************************************************************

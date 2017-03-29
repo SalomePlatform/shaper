@@ -40,12 +40,9 @@ public:
 
   /// Returns true if the object belongs to internal container of conflicting objects
   /// \param theObject an object to be checked
-  /// \return boolean result
-  bool isConflictingObject(const ObjectPtr& theObject);
-
-  /// Returns values of conflicting color
   /// \param theColor the output container to be filled in [red, green, blue] values
-  void getConflictingColor(std::vector<int>& theColor);
+  /// \return boolean result
+  bool hasCustomColor(const ObjectPtr& theObject, std::vector<int>& theColor);
 
   /// Redefinition of Events_Listener method
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
@@ -79,6 +76,7 @@ private:
 private:
   std::set<ObjectPtr> myConflictingObjects;
   ModuleBase_IWorkshop* myWorkshop;
+  bool myIsFullyConstrained; /// state if Solver is fully constrained, DOF = 0
 };
 
 #endif

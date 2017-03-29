@@ -1015,7 +1015,8 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
     return aCustomized;
 
   if (!theResult.get()) {
-    bool isConflicting = myOverconstraintListener->isConflictingObject(anObject);
+    std::vector<int> aColor;
+    bool isConflicting = myOverconstraintListener->hasCustomColor(anObject, aColor);
     // customize sketch symbol presentation
     if (thePrs.get()) {
       Handle(AIS_InteractiveObject) anAISIO = thePrs->impl<Handle(AIS_InteractiveObject)>();
@@ -1023,17 +1024,13 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
         if (!Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO).IsNull()) {
           Handle(SketcherPrs_SymbolPrs) aPrs = Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO);
           if (!aPrs.IsNull()) {
-            std::vector<int> aColor;
-            myOverconstraintListener->getConflictingColor(aColor);
-            aPrs->SetConflictingConstraint(isConflicting, aColor);
+            aPrs->SetCustomColor(aColor);
             aCustomized = true;
           }
         } else if (!Handle(SketcherPrs_Coincident)::DownCast(anAISIO).IsNull()) {
           Handle(SketcherPrs_Coincident) aPrs = Handle(SketcherPrs_Coincident)::DownCast(anAISIO);
           if (!aPrs.IsNull()) {
-            std::vector<int> aColor;
-            myOverconstraintListener->getConflictingColor(aColor);
-            aPrs->SetConflictingConstraint(isConflicting, aColor);
+            aPrs->SetCustomColor(aColor);
             aCustomized = true;
           }
         }
@@ -1041,11 +1038,7 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
     }
     // customize sketch dimension constraint presentation
     if (!aCustomized) {
-      std::vector<int> aColor;
-      if (isConflicting) {
-        myOverconstraintListener->getConflictingColor(aColor);
-      }
-      if (aColor.empty())
+      if (!isConflicting)
         XGUI_CustomPrs::getDefaultColor(anObject, true, aColor);
       if (!aColor.empty()) {
         aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);

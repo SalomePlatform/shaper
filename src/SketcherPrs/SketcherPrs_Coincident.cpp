@@ -34,7 +34,7 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Coincident, AIS_InteractiveObject);
 SketcherPrs_Coincident::SketcherPrs_Coincident(ModelAPI_Feature* theConstraint,
                                                const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 : AIS_InteractiveObject(), myConstraint(theConstraint), mySketcherPlane(thePlane),
-  myPoint(gp_Pnt(0.0, 0.0, 0.0)), myIsConflicting(false)
+  myPoint(gp_Pnt(0.0, 0.0, 0.0)), myIsCustomColor(false)
 {
 }
 
@@ -76,12 +76,12 @@ void SketcherPrs_Coincident::Compute(
     myPoint = aPoint;
 
   // Create the presentation as a combination of standard point markers
-  bool aValid = !myIsConflicting;
+  bool aCustomColor = myIsCustomColor;
   // The external yellow contour
   Handle(Graphic3d_AspectMarker3d) aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(Aspect_TOM_RING3);
   aPtA->SetScale(2.);
-  aPtA->SetColor(aValid ? Quantity_NOC_YELLOW : myConflictingColor);
+  aPtA->SetColor(!aCustomColor ? Quantity_NOC_YELLOW : myCustomColor);
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
   aGroup->SetPrimitivesAspect(aPtA);
@@ -93,7 +93,7 @@ void SketcherPrs_Coincident::Compute(
   aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(Aspect_TOM_RING1);
   aPtA->SetScale(1.);
-  aPtA->SetColor(aValid ? Quantity_NOC_BLACK : myConflictingColor);
+  aPtA->SetColor(!aCustomColor ? Quantity_NOC_BLACK : myCustomColor);
   aGroup->SetPrimitivesAspect(aPtA);
   aGroup->AddPrimitiveArray (aPntArray);
 
@@ -101,7 +101,7 @@ void SketcherPrs_Coincident::Compute(
   aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(Aspect_TOM_POINT);
   aPtA->SetScale(5.);
-  aPtA->SetColor(aValid ? Quantity_NOC_BLACK : myConflictingColor);
+  aPtA->SetColor(!aCustomColor ? Quantity_NOC_BLACK : myCustomColor);
   aGroup->SetPrimitivesAspect(aPtA);
   aGroup->AddPrimitiveArray (aPntArray);
 
@@ -128,10 +128,12 @@ void SketcherPrs_Coincident::SetColor(const Quantity_Color &aCol)
   myOwnColor=aCol;
 }
 
-void SketcherPrs_Coincident::SetConflictingConstraint(const bool& theConflicting,
-                                                     const std::vector<int>& theColor)
+void SketcherPrs_Coincident::SetCustomColor(const std::vector<int>& theColor)
 {
-  myIsConflicting = theConflicting;
-  myConflictingColor = Quantity_Color(theColor[0] / 255., theColor[1] / 255., theColor[2] / 255.,
-                                      Quantity_TOC_RGB);
+  myIsCustomColor = !theColor.empty();
+  if (myIsCustomColor)
+    myCustomColor = Quantity_Color(theColor[0] / 255., theColor[1] / 255.,
+                                   theColor[2] / 255., Quantity_TOC_RGB);
+  else
+    myCustomColor = Quantity_Color();
 }
