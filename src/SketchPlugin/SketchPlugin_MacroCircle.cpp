@@ -270,6 +270,8 @@ AISObjectPtr SketchPlugin_MacroCircle::getAISObject(AISObjectPtr thePrevious)
     return AISObjectPtr();
 
   std::shared_ptr<GeomAPI_Pnt2d> aCenter2D = aCircleOnSketch->center();
+  if(!aCenter2D.get())
+    return AISObjectPtr();
   double aRadius = aCircleOnSketch->radius();
 
   // Compute a circle in 3D view.
