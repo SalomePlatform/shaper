@@ -1,5 +1,5 @@
 """
-Test case for Primitive Cylinder feature. 
+Test case for Primitive Cylinder feature.
 Written on High API.
 """
 #from ModelAPI import *
@@ -23,6 +23,7 @@ SketchLine_3 = Sketch_1.addLine(44.70109718071649, 32.40093347950982, 40.1917811
 SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchLine_2.startPoint())
 SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchLine_2.endPoint(), SketchLine_3.startPoint())
 SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_1.startPoint(), SketchLine_3.endPoint())
+model.do()
 
 # Extrusion
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f")], model.selection(), 100, 0)
