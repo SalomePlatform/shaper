@@ -664,6 +664,9 @@ void Model_AttributeSelection::selectSubShape(
     }
     setValue(aCont, aShapeToBeSelected);
   }
+
+  setInvalidIfFalse(selectionLabel(), false);
+  reset();
 }
 
 int Model_AttributeSelection::Id()

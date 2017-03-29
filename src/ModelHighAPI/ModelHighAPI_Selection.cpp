@@ -12,6 +12,7 @@
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultCompSolid.h>
 //--------------------------------------------------------------------------------------
 
@@ -50,6 +51,11 @@ void ModelHighAPI_Selection::fillAttribute(
       return;
     case VT_TypeSubShapeNamePair:
       theAttribute->selectSubShape(myTypeSubShapeNamePair.first, myTypeSubShapeNamePair.second);
+      if(theAttribute->isInvalid()) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+        aFeature->setError(
+          std::string("Error: attribute \"") + theAttribute->id() + std::string("\" is invalid."));
+      }
       return;
   }
 }
