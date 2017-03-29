@@ -194,6 +194,13 @@ void SketchPlugin_Trim::execute()
     return;
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
 
+  /// Remove reference of this feature to feature used in preview, it is not necessary anymore
+  /// as trim will be removed after execute
+  AttributeReferencePtr aPreviewObjectAttr =
+                     std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                     data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+  aPreviewObjectAttr->setValue(ResultPtr());
+
   /// points of trim
   std::shared_ptr<GeomAPI_Pnt> aStartShapePoint, aLastShapePoint;
 #ifdef DEBUG_TRIM
@@ -272,12 +279,6 @@ void SketchPlugin_Trim::execute()
     // otherwise Trim feature will be removed with the circle before
     // this operation is finished
     aBaseObjectAttr->setObject(ResultPtr());
-
-    AttributeReferencePtr aPreviewObjectAttr =
-                     std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                     data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
-    aPreviewObjectAttr->setObject(ResultPtr());
-
   }
   else if (aKind == SketchPlugin_Line::ID()) {
     trimLine(aStartShapePoint2d, aLastShapePoint2d, aBaseRefAttributes,
@@ -378,6 +379,17 @@ void SketchPlugin_Trim::execute()
     Events_Loop::loop()->setFlushed(anUpdateEvent, false);
 
   // delete constraints
+#ifdef DEBUG_TRIM
+  if (aFeaturesToDelete.size() > 0) {
+    std::cout << "after SPlit: removeFeaturesAndReferences: " << std::endl;
+    std::string aValue;
+    for (std::set<FeaturePtr>::const_iterator anIt = aFeaturesToDelete.begin();
+         anIt != aFeaturesToDelete.end(); anIt++) {
+      FeaturePtr aFeature = *anIt;
+      std::cout << aFeature->data()->name() << std::endl;
+    }
+  }
+#endif
   ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToDelete);
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 
@@ -716,7 +728,18 @@ void SketchPlugin_Trim::removeReferencesToAttribute(const AttributePtr& theAttri
     }
   }
 
+#ifdef DEBUG_TRIM
   // delete constraints
+  if (aFeaturesToDelete.size() > 0) {
+    std::cout << "removeReferencesToAttribute: " << std::endl;
+    std::string aValue;
+    for (std::set<FeaturePtr>::const_iterator anIt = aFeaturesToDelete.begin();
+         anIt != aFeaturesToDelete.end(); anIt++) {
+      FeaturePtr aFeature = *anIt;
+      std::cout << aFeature->data()->name() << std::endl;
+    }
+  }
+#endif
   ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToDelete);
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 }

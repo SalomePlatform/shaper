@@ -149,6 +149,7 @@ private:
 
   Select3D_EntitySequence mySPoints;
 
+  Quantity_Color myColor;
   bool myIsConflicting; /// state if the presentation is visualized in error state
   Handle(Image_AlienPixMap) myErrorIcon;
   Handle(Graphic3d_MarkerImage) myErrorImage;

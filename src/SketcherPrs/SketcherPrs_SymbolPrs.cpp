@@ -165,6 +165,8 @@ void SketcherPrs_SymbolPrs::prepareAspect()
       myAspect = new Graphic3d_AspectMarker3d();
     else
       myAspect = new Graphic3d_AspectMarker3d(aIcon);
+
+    myAspect->SetColor(myColor);
   }
 }
 
@@ -297,16 +299,19 @@ void SketcherPrs_SymbolPrs::SetConflictingConstraint(const bool& theConflicting,
 {
   if (theConflicting)
   {
-    if (!myAspect.IsNull())
-      myAspect->SetColor (Quantity_Color (theColor[0] / 255., theColor[1] / 255.,
-                          theColor[2] / 255., Quantity_TOC_RGB));
-    myIsConflicting = true;
+    myColor = Quantity_Color (theColor[0] / 255., theColor[1] / 255.,
+                              theColor[2] / 255., Quantity_TOC_RGB);
+    //if (!myAspect.IsNull())
+    //  myAspect->SetColor (Quantity_Color (theColor[0] / 255., theColor[1] / 255.,
+    //                      theColor[2] / 255., Quantity_TOC_RGB));
+    //myIsConflicting = true;
   }
   else
   {
-    if (!myAspect.IsNull())
-      myAspect->SetColor (Quantity_Color (1.0, 1.0, 0.0, Quantity_TOC_RGB));
-    myIsConflicting = false;
+    myColor = Quantity_Color (1.0, 1.0, 0.0, Quantity_TOC_RGB);
+    //if (!myAspect.IsNull())
+    //  myAspect->SetColor (Quantity_Color (1.0, 1.0, 0.0, Quantity_TOC_RGB));
+    //myIsConflicting = false;
   }
 }
 
