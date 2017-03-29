@@ -687,7 +687,8 @@ void SketchPlugin_Trim::updateRefAttConstraints(
     AttributePtr aNewAttribute = anIt->second;
     if (aNewAttribute.get()) {
       for (; aRefIt != aRLast; aRefIt++) {
-        AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*aRefIt);
+        AttributeRefAttrPtr aRefAttr =
+                        std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*aRefIt);
         if (aRefAttr.get()) {
             aRefAttr->setAttr(aNewAttribute);
         }
