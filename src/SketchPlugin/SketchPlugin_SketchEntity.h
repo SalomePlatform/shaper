@@ -171,7 +171,7 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
     if (!theResult.get()) {
       double aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
       thePrs->setDeflection(aDeflection);
-  }
+    }
     return isCustomized;
   }
 
