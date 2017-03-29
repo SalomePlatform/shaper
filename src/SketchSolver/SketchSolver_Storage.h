@@ -97,7 +97,7 @@ public:
   bool isConsistent() const;
 
   /// \brief Check the storage has constraints
-  bool isEmpty() const
+  virtual bool isEmpty() const
   { return myConstraintMap.empty(); }
 
   /// \brief Shows the sketch should be resolved

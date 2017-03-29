@@ -64,6 +64,10 @@ public:
   /// \brief Remove all features became invalid
   virtual void removeInvalidEntities();
 
+  /// \brief Check the storage has constraints
+  virtual bool isEmpty() const
+  { return SketchSolver_Storage::isEmpty() && myArcConstraintMap.empty(); }
+
 private:
   /// \brief Convert feature using specified builder.
   EntityWrapperPtr createFeature(const FeaturePtr&             theFeature,

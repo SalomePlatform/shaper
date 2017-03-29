@@ -222,31 +222,25 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
       return;
     std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(new GeomAPI_Circ2d(aCenter, aStart));
 
-    bool aWasBlocked = data()->blockSendAttributeUpdated(true);
-    // The Arc end point is projected
-    // on the circle formed by center and start points
+    // Do not recalculate REVERSED flag if the arc is not consistent
     std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEnd);
-    if (aProjection && anEnd->distance(aProjection) > tolerance) {
-      anEndAttr->setValue(aProjection);
-      anEnd = aProjection;
-    }
-    data()->blockSendAttributeUpdated(aWasBlocked, false);
-
-    double aParameterNew = 0.0;
-    if(aCircleForArc->parameter(anEnd, paramTolerance, aParameterNew)) {
-      bool aWasBlocked = data()->blockSendAttributeUpdated(true);
-      if(myParamBefore <= PI / 2.0 && aParameterNew >= PI * 1.5) {
-        if(!boolean(REVERSED_ID())->value()) {
-          boolean(REVERSED_ID())->setValue(true);
+    if (aProjection && anEnd->distance(aProjection) <= tolerance) {
+      double aParameterNew = 0.0;
+      if(aCircleForArc->parameter(anEnd, paramTolerance, aParameterNew)) {
+        bool aWasBlocked = data()->blockSendAttributeUpdated(true);
+        if(myParamBefore <= PI / 2.0 && aParameterNew >= PI * 1.5) {
+          if(!boolean(REVERSED_ID())->value()) {
+            boolean(REVERSED_ID())->setValue(true);
+          }
+        } else if(myParamBefore >= PI * 1.5 && aParameterNew <= PI / 2.0) {
+          if(boolean(REVERSED_ID())->value()) {
+            boolean(REVERSED_ID())->setValue(false);
+          }
         }
-      } else if(myParamBefore >= PI * 1.5 && aParameterNew <= PI / 2.0) {
-        if(boolean(REVERSED_ID())->value()) {
-          boolean(REVERSED_ID())->setValue(false);
-        }
+        data()->blockSendAttributeUpdated(aWasBlocked, false);
       }
-      data()->blockSendAttributeUpdated(aWasBlocked, false);
+      myParamBefore = aParameterNew;
     }
-    myParamBefore = aParameterNew;
   }
 
   double aRadius = 0;

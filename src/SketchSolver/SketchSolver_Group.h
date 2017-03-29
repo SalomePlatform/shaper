@@ -37,7 +37,7 @@ class SketchSolver_Group
   /// \brief Returns true if the group has no constraints yet
   inline bool isEmpty() const
   {
-    return myConstraints.empty();
+    return myConstraints.empty() && myTempConstraints.empty();
   }
 
   /// \brief Check for valid sketch data

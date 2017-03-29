@@ -91,27 +91,27 @@ aCenter = [15., 20.]
 aSession.startOperation()
 anArcCenter.setValue(aCenter[0], aCenter[1])
 aSession.finishOperation()
-verifyLastArc(aSketchFeature, aCenter, [], [])
+verifyLastArc(aSketchFeature, [], [], [])
 # Move start point
 deltaX, deltaY = 5., 2.
 aStart = [anArcStartPoint.x() + deltaX, anArcStartPoint.y() + deltaY]
 aSession.startOperation()
 anArcStartPoint.setValue(aStart[0], aStart[1])
 aSession.finishOperation()
-verifyLastArc(aSketchFeature, [], aStart, [])
+verifyLastArc(aSketchFeature, [], [], [])
 # Move end point
 aEnd = [anArcEndPoint.x() - deltaX, anArcEndPoint.y() - deltaY]
 aSession.startOperation()
 anArcEndPoint.setValue(aEnd[0], aEnd[1])
 aSession.finishOperation()
-verifyLastArc(aSketchFeature, [], [], aEnd)
+verifyLastArc(aSketchFeature, [], [], [])
 # Check that changing the radius does not affect arc
 aSession.startOperation()
 anArcRadius = aSketchArc.real("radius")
 aPrevRadius = anArcRadius.value();
 anArcRadius.setValue(aPrevRadius + 10.)
 aSession.finishOperation()
-assert (math.fabs(anArcRadius.value - aPrevRadius) < TOLERANCE)
+assert (math.fabs(anArcRadius.value() - aPrevRadius) < TOLERANCE)
 verifyLastArc(aSketchFeature, [], [], [])
 # Check that changing the angle does not affect arc
 aSession.startOperation()
@@ -119,7 +119,7 @@ anArcAngle = aSketchArc.real("angle")
 aPrevAngle = anArcAngle.value()
 anArcAngle.setValue(aPrevAngle + 10.)
 aSession.finishOperation()
-assert (math.fabs(anArcAngle.value - aPrevAngle) < TOLERANCE)
+assert (math.fabs(anArcAngle.value() - aPrevAngle) < TOLERANCE)
 verifyLastArc(aSketchFeature, [], [], [])
 
 #=========================================================================
