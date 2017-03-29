@@ -18,5 +18,6 @@ Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_1/
 model.do()
 Extrusion_1.setDirection(model.selection("EDGE", "OX"))
 model.do()
-print Extrusion_1.feature().error()
 model.end()
+
+assert (len(Extrusion_1.feature().error()) != 0)
