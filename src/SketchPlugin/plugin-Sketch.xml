@@ -314,8 +314,8 @@
                icon="icons/Sketch/split.png">
         <sketch_sub_shape_selector
             id="ConstraintValue"
-            label="Split feature"
-            tooltip="Select feature for split"
+            label="Segment"
+            tooltip="Select segment for split"
             shape_types="edge"
             use_external="false"
             use_graphic_intersection="false">
@@ -329,8 +329,8 @@
                icon="icons/Sketch/trim.png">
         <sketch_feature_point_selector
             id="SelectedObject"
-            label="Split feature"
-            tooltip="Select feature for split"
+            label="Segment"
+            tooltip="Select segment for trim"
             shape_types="edge"
             use_external="false"
             use_graphic_intersection="true">
