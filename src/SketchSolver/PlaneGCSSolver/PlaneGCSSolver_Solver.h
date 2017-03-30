@@ -68,9 +68,9 @@ private:
   ConstraintMap                myConstraints;    ///< list of constraints
 
   std::shared_ptr<GCS::System> myEquationSystem; ///< set of equations for solving in FreeGCS
+  bool                         myDiagnoseBeforeSolve; ///< is the diagnostic necessary
 
   GCS::SET_I                   myConflictingIDs; ///< list of IDs of conflicting constraints
-
   /// specifies the conflicting constraints are already collected
   bool                         myConfCollected;
 

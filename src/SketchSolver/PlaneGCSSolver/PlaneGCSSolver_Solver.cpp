@@ -10,6 +10,7 @@
 
 PlaneGCSSolver_Solver::PlaneGCSSolver_Solver()
   : myEquationSystem(new GCS::System),
+    myDiagnoseBeforeSolve(false),
     myConfCollected(false),
     myDOF(0)
 {
@@ -54,6 +55,8 @@ double* PlaneGCSSolver_Solver::createParameter()
   myParameters.push_back(aResult);
   if (myConstraints.empty() && myDOF >= 0)
     ++myDOF; // calculate DoF by hand if and only if there is no constraints yet
+  else
+    myDiagnoseBeforeSolve = true;
   return aResult;
 }
 
@@ -78,6 +81,8 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
     return STATUS_INCONSISTENT;
 
   Events_LongOp::start(this);
+  if (myDiagnoseBeforeSolve)
+    diagnose();
   // solve equations
   GCS::SolveStatus aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters);
   Events_LongOp::end(this);
@@ -130,7 +135,7 @@ void PlaneGCSSolver_Solver::collectConflicting()
 int PlaneGCSSolver_Solver::dof()
 {
   if (myDOF < 0 && !myConstraints.empty())
-    solve();
+    diagnose();
   return myDOF;
 }
 
@@ -138,4 +143,5 @@ void PlaneGCSSolver_Solver::diagnose()
 {
   myEquationSystem->declareUnknowns(myParameters);
   myDOF = myEquationSystem->diagnose();
+  myDiagnoseBeforeSolve = false;
 }
