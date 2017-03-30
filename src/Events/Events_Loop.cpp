@@ -207,7 +207,7 @@ void Events_Loop::flush(const Events_ID& theID)
       }
     }
   }
-  if (hasEventsToFlush && myGroups.empty()) {
+  if (hasEventsToFlush && myGroups.empty() && myFlushed.empty()) {
     // no more messages left in the queue, so, finalize the sketch processing
     static Events_ID anID = Events_Loop::eventByName("SketchPrepared");
     std::shared_ptr<Events_Message> aMsg(new Events_Message(anID, this));

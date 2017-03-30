@@ -500,10 +500,6 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
           (*aRIter)->attributeChanged("External");
       }
     }
-    // send event that sketch is prepared to be recomputed
-    static Events_ID anID = Events_Loop::eventByName("SketchPrepared");
-    std::shared_ptr<Events_Message> aMsg(new Events_Message(anID, this));
-    Events_Loop::loop()->send(aMsg);
   }
 
   if (!aIsModified) { // no modification is needed
