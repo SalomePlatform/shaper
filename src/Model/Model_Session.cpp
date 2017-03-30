@@ -26,10 +26,17 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Tools.h>
 
+#include <TDF_ChildIDIterator.hxx>
 #include <TDF_CopyTool.hxx>
 #include <TDF_DataSet.hxx>
 #include <TDF_RelocationTable.hxx>
 #include <TDF_ClosureTool.hxx>
+
+#include <TNaming_Builder.hxx>
+#include <TNaming_Iterator.hxx>
+#include <TNaming_NamedShape.hxx>
+
+#include <TopoDS_Shape.hxx>
 
 static Model_Session* myImpl = new Model_Session();
 
@@ -330,6 +337,50 @@ std::shared_ptr<ModelAPI_Document> Model_Session::copy(
   Handle(TDF_RelocationTable) aRT = new TDF_RelocationTable(Standard_True);
   aRT->SetRelocation(aSourceRoot, aTargetRoot);
   TDF_CopyTool::Copy(aDS, aRT);
+
+  // TODO: remove after fix in OCCT.
+  // All named shapes are stored in reversed order, so to fix this we reverse them back.
+  for(TDF_ChildIDIterator aChildIter(aTargetRoot, TNaming_NamedShape::GetID(), true);
+      aChildIter.More();
+      aChildIter.Next()) {
+    Handle(TNaming_NamedShape) aNamedShape =
+      Handle(TNaming_NamedShape)::DownCast(aChildIter.Value());
+    if (aNamedShape.IsNull()) {
+      continue;
+    }
+
+    TopoDS_Shape aShape = aNamedShape->Get();
+    if(aShape.IsNull() || aShape.ShapeType() != TopAbs_COMPOUND) {
+      continue;
+    }
+
+    TNaming_Evolution anEvol = aNamedShape->Evolution();
+    std::list<std::pair<TopoDS_Shape, TopoDS_Shape> > aShapePairs; // to store old and new shapes
+    for(TNaming_Iterator anIter(aNamedShape); anIter.More(); anIter.Next()) {
+      aShapePairs.push_back(
+        std::pair<TopoDS_Shape, TopoDS_Shape>(anIter.OldShape(), anIter.NewShape()));
+    }
+
+    // Add in reverse order.
+    TDF_Label aLabel = aNamedShape->Label();
+    TNaming_Builder aBuilder(aLabel);
+    for(std::list<std::pair<TopoDS_Shape, TopoDS_Shape> >::iterator aPairsIter =
+          aShapePairs.begin();
+        aPairsIter != aShapePairs.end();
+        aPairsIter++) {
+      if (anEvol == TNaming_GENERATED) {
+        aBuilder.Generated(aPairsIter->first, aPairsIter->second);
+      } else if (anEvol == TNaming_MODIFY) {
+        aBuilder.Modify(aPairsIter->first, aPairsIter->second);
+      } else if (anEvol == TNaming_DELETE) {
+        aBuilder.Delete(aPairsIter->first);
+      } else if (anEvol == TNaming_PRIMITIVE) {
+        aBuilder.Generated(aPairsIter->second);
+      } else if (anEvol == TNaming_SELECTED) {
+        aBuilder.Select(aPairsIter->second, aPairsIter->first);
+      }
+    }
+  }
 
   TDF_LabelList anEmptyUpdated;
   aNew->objects()->synchronizeFeatures(anEmptyUpdated, true, true, true, true);
