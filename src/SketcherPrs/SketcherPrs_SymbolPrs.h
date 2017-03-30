@@ -111,7 +111,7 @@ protected:
 
   /// Update myPntArray according to presentation positions
   /// \return true in case of success
-  virtual bool updateIfReadyToDisplay(double theStep) const { return true; }
+  virtual bool updateIfReadyToDisplay(double theStep, bool withColor) const { return true; }
 
   /// Draw a shape into the given presentation scene
   /// \param theShape the shape to draw
@@ -150,7 +150,6 @@ private:
   bool myIsCustomColor; /// state if the presentation is visualized in custom color
   Quantity_Color myCustomColor; /// the color of mid ring if there is a conflict
 
-  //Quantity_Color myIsCustomColor;
   //bool myIsConflicting; /// state if the presentation is visualized in error state
   Handle(Image_AlienPixMap) myErrorIcon;
   Handle(Graphic3d_MarkerImage) myErrorImage;

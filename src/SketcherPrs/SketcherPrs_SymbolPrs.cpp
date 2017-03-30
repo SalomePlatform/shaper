@@ -63,7 +63,7 @@ public:
       Handle(OpenGl_View) aView = theWorkspace->View();
       double aScale = aView->Camera()->Scale();
       // Update points coordinate taking the viewer scale into account
-      myObj->updateIfReadyToDisplay(MyDist * aScale);
+      myObj->updateIfReadyToDisplay(MyDist * aScale, myObj->myIsCustomColor);
       if (myIsVboInit) {
         if (myVboAttribs) {
           const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();
@@ -106,8 +106,6 @@ SketcherPrs_SymbolPrs::SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint,
  : AIS_InteractiveObject(), myConstraint(theConstraint), myPlane(thePlane), myIsCustomColor(false)
 {
   SetAutoHilight(Standard_False);
-  myPntArray = new Graphic3d_ArrayOfPoints(1);
-  myPntArray->AddVertex(0., 0., 0.);
 }
 
 //*********************************************************************************
@@ -242,7 +240,7 @@ void SketcherPrs_SymbolPrs::Compute(
   // it updates array of points if the presentation is ready to display, or the array of points
   // contains the previous values
 
-  bool aReadyToDisplay = updateIfReadyToDisplay(20);
+  bool aReadyToDisplay = updateIfReadyToDisplay(20, myIsCustomColor);
 
   int aNbVertex = myPntArray->VertexNumber();
   if (myOwner.IsNull()) {
@@ -254,9 +252,11 @@ void SketcherPrs_SymbolPrs::Compute(
   for (int i = 1; i <= aNbVertex; i++) {
     Handle(SketcherPrs_SensitivePoint) aSP = new SketcherPrs_SensitivePoint(myOwner, i);
     mySPoints.Append(aSP);
+    if (myIsCustomColor)
+      myPntArray->SetVertexColor(i, myCustomColor);
   }
 
-  Handle(OpenGl_Group) aGroup = Handle(OpenGl_Group)::DownCast(thePresentation->NewGroup());
+  Handle(OpenGl_Group) aGroup = Handle(OpenGl_Group)::DownCast(Prs3d_Root::CurrentGroup (thePresentation));
   aGroup->SetPrimitivesAspect(myAspect);
 
   // Recompute boundary box of the group

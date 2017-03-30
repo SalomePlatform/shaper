@@ -23,10 +23,6 @@ SketcherPrs_Parallel::SketcherPrs_Parallel(ModelAPI_Feature* theConstraint,
                                            const std::shared_ptr<GeomAPI_Ax3>& thePlane)
  : SketcherPrs_SymbolPrs(theConstraint, thePlane)
 {
-  // Create default array
-  myPntArray = new Graphic3d_ArrayOfPoints(2);
-  myPntArray->AddVertex(0., 0., 0.);
-  myPntArray->AddVertex(0., 0., 0.);
 }
 
 bool SketcherPrs_Parallel::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
@@ -44,7 +40,7 @@ bool SketcherPrs_Parallel::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_Parallel::updateIfReadyToDisplay(double theStep) const
+bool SketcherPrs_Parallel::updateIfReadyToDisplay(double theStep, bool withColor) const
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
@@ -58,8 +54,9 @@ bool SketcherPrs_Parallel::updateIfReadyToDisplay(double theStep) const
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep);
   gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);
-  myPntArray->SetVertice(1, aP1);
-  myPntArray->SetVertice(2, aP2);
+  myPntArray = new Graphic3d_ArrayOfPoints(2, withColor);
+  myPntArray->AddVertex(aP1);
+  myPntArray->AddVertex(aP2);
   return true;
 }
 

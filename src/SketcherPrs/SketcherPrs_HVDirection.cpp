@@ -36,7 +36,7 @@ bool SketcherPrs_HVDirection::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_HVDirection::updateIfReadyToDisplay(double theStep) const
+bool SketcherPrs_HVDirection::updateIfReadyToDisplay(double theStep, bool withColor) const
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
@@ -45,7 +45,8 @@ bool SketcherPrs_HVDirection::updateIfReadyToDisplay(double theStep) const
   ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   gp_Pnt aP1 = aMgr->getPosition(aObj, this, theStep);
-  myPntArray->SetVertice(1, aP1);
+  myPntArray = new Graphic3d_ArrayOfPoints(1, withColor);
+  myPntArray->AddVertex(aP1);
   return true;
 }
 

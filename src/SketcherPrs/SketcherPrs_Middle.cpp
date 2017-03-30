@@ -42,13 +42,14 @@ bool SketcherPrs_Middle::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_Middle::updateIfReadyToDisplay(double theStep) const
+bool SketcherPrs_Middle::updateIfReadyToDisplay(double theStep, bool withColor) const
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
   ObjectPtr aPointObject;
 
   // find a line result to set middle symbol near it
+  myPntArray = new Graphic3d_ArrayOfPoints(1, withColor);
   AttributePtr anAttribute =
     SketcherPrs_Tools::getAttribute(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   if (!anAttribute.get()) {

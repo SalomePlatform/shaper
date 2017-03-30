@@ -59,7 +59,7 @@ bool SketcherPrs_Mirror::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_Mirror::updateIfReadyToDisplay(double theStep) const
+bool SketcherPrs_Mirror::updateIfReadyToDisplay(double theStep, bool withColor) const
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
@@ -79,7 +79,7 @@ bool SketcherPrs_Mirror::updateIfReadyToDisplay(double theStep) const
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   int aNb = anAttrB->size();
 
-  myPntArray = new Graphic3d_ArrayOfPoints(2 * aNb);
+  myPntArray = new Graphic3d_ArrayOfPoints(2 * aNb, withColor);
   int i;
   ObjectPtr aObj;
   gp_Pnt aP1;
