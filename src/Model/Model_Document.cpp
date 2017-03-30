@@ -554,7 +554,6 @@ bool Model_Document::finishOperation()
     static std::shared_ptr<Events_Message> aFinishMsg
       (new Events_Message(Events_Loop::eventByName("FinishOperation")));
     Events_Loop::loop()->send(aFinishMsg);
-    Events_Loop::loop()->autoFlush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED), false);
   }
   // to avoid "updated" message appearance by updater
   //aLoop->clear(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
@@ -566,6 +565,11 @@ bool Model_Document::finishOperation()
   for (; aSubIter != aSubs.end(); aSubIter++)
     if (subDoc(*aSubIter)->finishOperation())
       aResult = true;
+
+  // sub-Part may send updated by flush of deleted (macro circle)
+  if (isRoot()) { // once for root document
+    Events_Loop::loop()->autoFlush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED), false);
+  }
 
   // transaction may be empty if this document was created during this transaction (create part)
   if (!myTransactions.empty() && myDoc->CommitCommand()) {
