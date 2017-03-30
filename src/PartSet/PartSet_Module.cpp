@@ -1014,36 +1014,11 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
   if (!anObject)
     return aCustomized;
 
-  std::vector<int> aColor;
-  //bool aCustomColor = myOverconstraintListener->hasCustomColor(anObject, aColor);
-
   if (!theResult.get()) {
-    /*// customize sketch symbol presentation
-    if (thePrs.get()) {
-      Handle(AIS_InteractiveObject) anAISIO = thePrs->impl<Handle(AIS_InteractiveObject)>();
-      if (!anAISIO.IsNull()) {
-        if (!Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO).IsNull()) {
-          Handle(SketcherPrs_SymbolPrs) aPrs = Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO);
-          if (!aPrs.IsNull()) {
-            aPrs->SetCustomColor(aColor);
-            aCustomized = true;
-          }
-        } else if (!Handle(SketcherPrs_Coincident)::DownCast(anAISIO).IsNull()) {
-          Handle(SketcherPrs_Coincident) aPrs = Handle(SketcherPrs_Coincident)::DownCast(anAISIO);
-          if (!aPrs.IsNull()) {
-            aPrs->SetCustomColor(aColor);
-            aCustomized = true;
-          }
-        }
-      }
-    }*/
-    // customize sketch dimension constraint presentation
-    //if (!aCustomized) {
-    //  if (!aCustomColor)
+    std::vector<int> aColor;
     XGUI_CustomPrs::getDefaultColor(anObject, true, aColor);
     if (!aColor.empty()) {
       aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
-    //  }
     }
   }
   // customize dimentional constrains
@@ -1065,45 +1040,30 @@ bool PartSet_Module::afterCustomisePresentation(std::shared_ptr<ModelAPI_Result>
     return aCustomized;
 
   std::vector<int> aColor;
-  bool aCustomColorChanged = myOverconstraintListener->isNeedUpdateCustomColor();
-  if (aCustomColorChanged) {
-    bool aUseCustomColor = true;
-    // do not use fully constrained color if create operation is started
-    /*if (aWorkshop->operationMgr()->hasOperation()) {
-      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                           (aWorkshop->operationMgr()->currentOperation());
-      if (aFOperation && !aFOperation->isEditOperation())
-        aUseCustomColor = false;
-    }*/
-    if (aUseCustomColor)
-      myOverconstraintListener->getCustomColor(anObject, aColor);
-    //if (!theResult.get()) {
-    // customize sketch symbol presentation
-    //if (thePrs.get()) {
-      Handle(AIS_InteractiveObject) anAISIO = thePrs->impl<Handle(AIS_InteractiveObject)>();
-      if (!anAISIO.IsNull()) {
-        if (!Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO).IsNull()) {
-          Handle(SketcherPrs_SymbolPrs) aPrs = Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO);
-          if (!aPrs.IsNull()) {
-            aPrs->SetCustomColor(aColor);
-            aCustomized = true;
-          }
-        } else if (!Handle(SketcherPrs_Coincident)::DownCast(anAISIO).IsNull()) {
-          Handle(SketcherPrs_Coincident) aPrs = Handle(SketcherPrs_Coincident)::DownCast(anAISIO);
-          if (!aPrs.IsNull()) {
-            aPrs->SetCustomColor(aColor);
-            aCustomized = true;
-          }
-        }
+  bool aUseCustomColor = true;
+  if (aUseCustomColor)
+    myOverconstraintListener->getCustomColor(anObject, aColor);
+  // customize sketch symbol presentation
+  Handle(AIS_InteractiveObject) anAISIO = thePrs->impl<Handle(AIS_InteractiveObject)>();
+  if (!anAISIO.IsNull()) {
+    if (!Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO).IsNull()) {
+      Handle(SketcherPrs_SymbolPrs) aPrs = Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO);
+      if (!aPrs.IsNull()) {
+        aPrs->SetCustomColor(aColor);
+        aCustomized = true;
       }
-    //}
-    // customize sketch dimension constraint presentation
-    if (!aCustomized) {
-      //if (!aCustomColor)
-      //  XGUI_CustomPrs::getDefaultColor(anObject, true, aColor);
-      if (!aColor.empty()) { // otherwise presentation has the default color
-        aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+    } else if (!Handle(SketcherPrs_Coincident)::DownCast(anAISIO).IsNull()) {
+      Handle(SketcherPrs_Coincident) aPrs = Handle(SketcherPrs_Coincident)::DownCast(anAISIO);
+      if (!aPrs.IsNull()) {
+        aPrs->SetCustomColor(aColor);
+        aCustomized = true;
       }
+    }
+  }
+  // customize sketch dimension constraint presentation
+  if (!aCustomized) {
+    if (!aColor.empty()) { // otherwise presentation has the default color
+      aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
     }
   }
   return aCustomized;

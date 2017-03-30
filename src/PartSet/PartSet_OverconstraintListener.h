@@ -44,10 +44,6 @@ public:
   /// \return boolean result
   void getCustomColor(const ObjectPtr& theObject, std::vector<int>& theColor);
 
-  /// Returns true if custom color of presentations is changed and it should be redisplayed
-  /// \return boolean value
-  bool isNeedUpdateCustomColor() const { return true;/*myIsNeedUpdateCustomColor;*/ }
-
   /// Redefinition of Events_Listener method
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
@@ -81,7 +77,6 @@ private:
   std::set<ObjectPtr> myConflictingObjects;
   ModuleBase_IWorkshop* myWorkshop;
   bool myIsFullyConstrained; /// state if Solver is fully constrained, DOF = 0
-  bool myIsNeedUpdateCustomColor;
 };
 
 #endif

@@ -1351,7 +1351,6 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   return isActivationChanged;
 }
 
-//#define DEBUG_FULLY_CONSTRAINED
 bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
 {
   AISObjectPtr anAISObj = getAISObject(theObject);
@@ -1374,10 +1373,8 @@ bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
   }
   bool isCustomized = aCustomPrs.get() &&
                       aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
-#ifdef DEBUG_FULLY_CONSTRAINED
   isCustomized = myWorkshop->module()->afterCustomisePresentation(aResult, anAISObj, myCustomPrs)
                  || isCustomized;
-#endif
   return isCustomized;
 }
 
