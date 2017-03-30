@@ -10,6 +10,8 @@
 
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_Tools.h>
 
 //=================================================================================================
 bool GeomValidators_BooleanArguments::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
@@ -26,15 +28,47 @@ bool GeomValidators_BooleanArguments::isValid(const std::shared_ptr<ModelAPI_Fea
 
   std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
 
-  std::shared_ptr<ModelAPI_AttributeSelectionList> anAttrSelList = theFeature->selectionList(*anIt);
+  bool isAllInSameCompSolid = true;
+  ResultCompSolidPtr aCompSolid;
+
+  AttributeSelectionListPtr anAttrSelList = theFeature->selectionList(*anIt);
   if(anAttrSelList) {
     anObjectsNb = anAttrSelList->size();
+    for(int anIndex = 0; anIndex < anObjectsNb; ++anIndex) {
+      AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
+      ResultPtr aContext = anAttr->context();
+      ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+      if(aResCompSolidPtr.get()) {
+        if(aCompSolid.get()) {
+          isAllInSameCompSolid = aCompSolid == aResCompSolidPtr;
+        } else {
+          aCompSolid = aResCompSolidPtr;
+        }
+      } else {
+        isAllInSameCompSolid = false;
+      }
+    }
   }
   anIt++;
+
 
   anAttrSelList = theFeature->selectionList(*anIt);
   if(anAttrSelList) {
     aToolsNb = anAttrSelList->size();
+    for(int anIndex = 0; anIndex < aToolsNb; ++anIndex) {
+      AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
+      ResultPtr aContext = anAttr->context();
+      ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+      if(aResCompSolidPtr.get()) {
+        if(aCompSolid.get()) {
+          isAllInSameCompSolid = aCompSolid == aResCompSolidPtr;
+        } else {
+          aCompSolid = aResCompSolidPtr;
+        }
+      } else {
+        isAllInSameCompSolid = false;
+      }
+    }
   }
   anIt++;
 
@@ -43,14 +77,31 @@ bool GeomValidators_BooleanArguments::isValid(const std::shared_ptr<ModelAPI_Fea
     anOperationType = anAttrInt->value();
   }
 
-  if(anOperationType == 1 && (anObjectsNb + aToolsNb > 1)) {
-    return true;
-  } else if (anOperationType != 1 && anObjectsNb > 0 && aToolsNb > 0) {
-    return true;
+  if(anOperationType == 1) {
+    // Fuse operation
+    if(anObjectsNb + aToolsNb < 2) {
+      theError = "Not enough arguments for Fuse operation.";
+      return false;
+    } else if(isAllInSameCompSolid) {
+      theError = "Operations only between sub-shapes of the same shape not allowed.";
+      return false;
+    }
+  } else {
+    if(anObjectsNb < 1) {
+      theError = "Objects not selected.";
+      return false;
+    }
+    if(aToolsNb < 1) {
+      theError = "Tools not selected.";
+      return false;
+    }
+    if(isAllInSameCompSolid) {
+      theError = "Operations only between sub-shapes of the same shape not allowed.";
+      return false;
+    }
   }
 
-  theError = "Not enough arguments";
-  return false;
+  return true;
 }
 
 //=================================================================================================
