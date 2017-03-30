@@ -1375,7 +1375,8 @@ bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
   bool isCustomized = aCustomPrs.get() &&
                       aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
 #ifdef DEBUG_FULLY_CONSTRAINED
-  isCustomized = myWorkshop->module()->afterCustomisePresentation(aResult, anAISObj, myCustomPrs) || isCustomized;
+  isCustomized = myWorkshop->module()->afterCustomisePresentation(aResult, anAISObj, myCustomPrs)
+                 || isCustomized;
 #endif
   return isCustomized;
 }
