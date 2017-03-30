@@ -117,7 +117,8 @@ bool SketchSolver_Group::updateFeature(FeaturePtr theFeature)
 
 bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
 {
-  if (myDOF == 0) {
+  bool isFeatureExists = (myStorage->entity(theFeature).get() != 0);
+  if (myDOF == 0 && isFeatureExists) {
     // avoid moving elements of fully constrained sketch
     myStorage->refresh();
     return true;

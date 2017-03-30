@@ -165,11 +165,14 @@ EntityWrapperPtr getChangedEntity(const FeaturePtr& theFeature,
   for (; aPIt != aPoints.end(); ++aPIt) {
     AttributePoint2DPtr aPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*aPIt);
     EntityWrapperPtr anEnt = theStorage->entity(*aPIt);
-    if (!anEnt)
-      continue;
-    PointWrapperPtr aPW = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(anEnt);
-    if (!isSameCoordinates(aPnt, aPW))
-      aChangedPoints.push_back(anEnt);
+    if (anEnt) {
+      PointWrapperPtr aPW = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(anEnt);
+      if (!isSameCoordinates(aPnt, aPW))
+        aChangedPoints.push_back(anEnt);
+    } else {
+      theStorage->update(*aPIt);
+      aChangedPoints.push_back(theStorage->entity(*aPIt));
+    }
   }
 
   EntityWrapperPtr aChanged;

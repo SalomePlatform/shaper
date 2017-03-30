@@ -52,6 +52,9 @@ public:
   /// \brief Check the constraint is conflicted with others
   bool isConflicting(const ConstraintID& theConstraint) const;
 
+  /// \brief Check conflicting/redundant constraints and DoF
+  void diagnose();
+
   /// \brief Degrees of freedom
   int dof();
 

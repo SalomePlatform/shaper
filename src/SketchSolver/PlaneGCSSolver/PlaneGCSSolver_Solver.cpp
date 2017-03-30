@@ -52,8 +52,8 @@ double* PlaneGCSSolver_Solver::createParameter()
 {
   double* aResult = new double(0);
   myParameters.push_back(aResult);
-  if (myDOF >= 0)
-    ++myDOF;
+  if (myConstraints.empty() && myDOF >= 0)
+    ++myDOF; // calculate DoF by hand if and only if there is no constraints yet
   return aResult;
 }
 
@@ -132,4 +132,10 @@ int PlaneGCSSolver_Solver::dof()
   if (myDOF < 0 && !myConstraints.empty())
     solve();
   return myDOF;
+}
+
+void PlaneGCSSolver_Solver::diagnose()
+{
+  myEquationSystem->declareUnknowns(myParameters);
+  myDOF = myEquationSystem->diagnose();
 }

@@ -57,6 +57,10 @@ void PlaneGCSSolver_Storage::addTemporaryConstraint(
   if (myConstraintMap.empty())
     return; // no need to process temporary constraints if there is no active constraint
 
+  // before adding movement constraint to solver, re-check its DOF
+  if (mySketchSolver->dof() == 0)
+    mySketchSolver->diagnose();
+
   theSolverConstraint->setId(CID_MOVEMENT);
   constraintsToSolver(theSolverConstraint, mySketchSolver);
 }
