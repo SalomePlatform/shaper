@@ -22,6 +22,7 @@ class QMouseEvent;
 
 class XGUI_Workshop;
 class PartSet_Module;
+class ModuleBase_ViewerPrs;
 
 /// \ingroup PartSet_SketcherReentrantMgr
 /// It provides reentrant create operations in sketch, that is when all inputs are valid,
@@ -173,6 +174,10 @@ private:
   /// Checks whethe the feature of the given operation has kind an arc and the arc type is tangent
   bool isTangentArc(ModuleBase_Operation* theOperation,
                     const std::shared_ptr<ModelAPI_CompositeFeature>& /*theSketch*/) const;
+
+  /// Creates selection instance by the current feature and created by restart objects
+  /// \returns viewer selection presentation
+  std::shared_ptr<ModuleBase_ViewerPrs> generatePreSelection();
 
   /// Accept All action is enabled if an internal edit is started.
   /// It updates the state of the button

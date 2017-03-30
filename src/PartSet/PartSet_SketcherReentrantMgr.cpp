@@ -246,6 +246,12 @@ bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* 
         std::shared_ptr<ModuleBase_ViewerPrs> aSelectedPrs;
         if (!aPreSelected.empty())
           aSelectedPrs = aPreSelected.front();
+        if (!aSelectedPrs.get() && aSelectedPrs->object().get()
+            && !aSelectedPrs->object()->data()->isValid()) {
+          // the selected object was removed diring restart, e.g. presentable macro feature
+          // there are created objects to replace the object depending on created feature kind
+          aSelectedPrs = generatePreSelection();
+        }
         aMouseProcessor->setPreSelection(aSelectedPrs, theWnd, theEvent);
         //aPoint2DWdg->mouseReleased(theWnd, theEvent);
         //if (!aPreSelected.empty())
@@ -255,7 +261,6 @@ bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* 
       ModuleBase_Tools::blockUpdateViewer(false);
     }
   }
-
   return aProcessed;
 }
 
@@ -394,10 +399,19 @@ void PartSet_SketcherReentrantMgr::appendCreatedObjects(const std::set<ObjectPtr
   if (!myIsFlagsBlocked) // we need to collect objects only when launch operation is called
     return;
 
+  FeaturePtr aCurrentFeature;
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                       (myWorkshop->currentOperation());
+  if (aFOperation)
+    aCurrentFeature = aFOperation->feature();
+
+
   for (std::set<ObjectPtr>::const_iterator anIt = theObjects.begin();
        anIt != theObjects.end(); ++anIt) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
-    if (myCreatedFeatures.find(aFeature) != myCreatedFeatures.end())
+    if (aFeature == aCurrentFeature)
+      continue;
+    if (myCreatedFeatures.find(aFeature) == myCreatedFeatures.end())
       myCreatedFeatures.insert(aFeature);
   }
 }
@@ -712,6 +726,13 @@ bool PartSet_SketcherReentrantMgr::isTangentArc(ModuleBase_Operation* theOperati
     }
   }
   return aTangentArc;
+}
+
+std::shared_ptr<ModuleBase_ViewerPrs> PartSet_SketcherReentrantMgr::generatePreSelection()
+{
+  std::shared_ptr<ModuleBase_ViewerPrs> aPrs;
+
+  return aPrs;
 }
 
 void PartSet_SketcherReentrantMgr::updateAcceptAllAction()

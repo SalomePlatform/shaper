@@ -167,6 +167,9 @@ bool PartSet_WidgetFeaturePointSelector::fillFeature(
   if (theSelectedPrs.get() && theSelectedPrs->object().get())
     anObject = theSelectedPrs->object();
 
+  if (!anObject.get())
+    return aFilled;
+
   gp_Pnt aPnt = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
   double aX, anY;
   Handle(V3d_View) aView = theWindow->v3dView();

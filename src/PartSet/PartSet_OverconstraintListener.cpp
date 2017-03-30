@@ -46,11 +46,7 @@ void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
                                                     std::vector<int>& theColor)
 {
   if (myConflictingObjects.find(theObject) != myConflictingObjects.end()) {
-    Quantity_Color aColor = ModuleBase_Tools::color("Visualization",
-                                                    "sketch_overconstraint_color");
-    theColor.push_back(aColor.Red()*255.);
-    theColor.push_back(aColor.Green()*255.);
-    theColor.push_back(aColor.Blue()*255.);
+    theColor = Config_PropManager::color("Visualization", "sketch_overconstraint_color");
   }
   if (myIsFullyConstrained) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
@@ -59,13 +55,8 @@ void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
       PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
       CompositeFeaturePtr aCompositeFeature = aModule->sketchMgr()->activeSketch();
       // the given object is sub feature of the current sketch(created or edited)
-      if (ModelAPI_Tools::compositeOwner(aFeature) == aCompositeFeature) {
-        Quantity_Color aColor = ModuleBase_Tools::color("Visualization",
-                                                        "sketch_fully_constrained_color");
-        theColor.push_back(aColor.Red()*0.);
-        theColor.push_back(aColor.Green()*255.);
-        theColor.push_back(aColor.Blue()*0.);
-      }
+      if (ModelAPI_Tools::compositeOwner(aFeature) == aCompositeFeature)
+        theColor = Config_PropManager::color("Visualization", "sketch_fully_constrained_color");
     }
   }
 }
