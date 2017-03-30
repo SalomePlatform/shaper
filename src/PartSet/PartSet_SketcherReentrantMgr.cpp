@@ -246,7 +246,7 @@ bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* 
         std::shared_ptr<ModuleBase_ViewerPrs> aSelectedPrs;
         if (!aPreSelected.empty())
           aSelectedPrs = aPreSelected.front();
-        if (!aSelectedPrs.get() && aSelectedPrs->object().get()
+        if (aSelectedPrs.get() && aSelectedPrs->object().get()
             && !aSelectedPrs->object()->data()->isValid()) {
           // the selected object was removed diring restart, e.g. presentable macro feature
           // there are created objects to replace the object depending on created feature kind
