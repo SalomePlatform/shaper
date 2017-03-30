@@ -29,7 +29,7 @@
 //#define DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
 
 PartSet_OverconstraintListener::PartSet_OverconstraintListener(ModuleBase_IWorkshop* theWorkshop)
-: myWorkshop(theWorkshop), myIsFullyConstrained(false)
+: myWorkshop(theWorkshop), myIsFullyConstrained(false), myIsNeedUpdateCustomColor(false)
 {
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_FAILED));
@@ -39,7 +39,7 @@ PartSet_OverconstraintListener::PartSet_OverconstraintListener(ModuleBase_IWorks
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SKETCH_FULLY_CONSTRAINED));
 }
 
-bool PartSet_OverconstraintListener::hasCustomColor(const ObjectPtr& theObject,
+void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
                                                     std::vector<int>& theColor)
 {
   if (myConflictingObjects.find(theObject) != myConflictingObjects.end()) {
@@ -48,7 +48,6 @@ bool PartSet_OverconstraintListener::hasCustomColor(const ObjectPtr& theObject,
     theColor.push_back(aColor.Red()*255.);
     theColor.push_back(aColor.Green()*255.);
     theColor.push_back(aColor.Blue()*255.);
-    return true;
   }
   if (myIsFullyConstrained) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
@@ -59,14 +58,12 @@ bool PartSet_OverconstraintListener::hasCustomColor(const ObjectPtr& theObject,
       if (ModelAPI_Tools::compositeOwner(aFeature) == aCompositeFeature) {
         Quantity_Color aColor = ModuleBase_Tools::color("Visualization",
                                                         "sketch_fully_constrained_color");
-        theColor.push_back(aColor.Red()*255.);
+        theColor.push_back(aColor.Red()*0.);
         theColor.push_back(aColor.Green()*255.);
-        theColor.push_back(aColor.Blue()*255.);
-        return true;
+        theColor.push_back(aColor.Blue()*0.);
       }
     }
   }
-  return false;
 }
 
 void PartSet_OverconstraintListener::processEvent(
@@ -114,6 +111,7 @@ void PartSet_OverconstraintListener::processEvent(
     myIsFullyConstrained = anEventID == Events_Loop::eventByName(EVENT_SKETCH_FULLY_CONSTRAINED);
 
     if (aPrevFullyConstrained != myIsFullyConstrained) {
+      myIsNeedUpdateCustomColor = true;
       std::set<ObjectPtr> aModifiedObjects;
       PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
       CompositeFeaturePtr aSketch = aModule->sketchMgr()->activeSketch();
@@ -127,6 +125,7 @@ void PartSet_OverconstraintListener::processEvent(
         }
       }
       redisplayObjects(aModifiedObjects);
+      myIsNeedUpdateCustomColor = false;
     }
   }
 

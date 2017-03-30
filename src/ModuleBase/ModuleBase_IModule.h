@@ -229,6 +229,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
                                      AISObjectPtr thePrs,
                                      GeomCustomPrsPtr theCustomPrs) { return false; };
 
+  /// Modifies the given presentation in the custom way after usual customize is performed.
+  virtual bool afterCustomisePresentation(std::shared_ptr<ModelAPI_Result> theResult,
+                                     AISObjectPtr thePrs,
+                                     GeomCustomPrsPtr theCustomPrs) { return false; };
+
   /// Update the object presentable properties such as color, lines width and other
   /// If the object is result with the color attribute value set, it is used,
   /// otherwise the customize is applyed to the object's feature if it is a custom prs
