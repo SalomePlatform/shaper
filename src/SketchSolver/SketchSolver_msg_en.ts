@@ -8,6 +8,10 @@
       <translation>The constraint is conflicting with others. To fix this, you can either undo your operation or remove a conflicting constraint.</translation>
     </message>
     <message>
+      <source>There is a circular reference between copied sketch entities and their originals. To fix this, you can either undo your operation or remove wrong constraint.</source>
+      <translation>There is a circular reference between copied sketch entities and their originals. To fix this, you can either undo your operation or remove wrong constraint.</translation>
+    </message>
+    <message>
       <source>Caution: SolveSpace crash! Constraints are wrong</source>
       <translation>Caution: SolveSpace crash! Constraints are wrong</translation>
     </message>

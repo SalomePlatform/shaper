@@ -95,6 +95,9 @@ private:
   /// \brief Append given constraint to the group of temporary constraints
   void setTemporary(SolverConstraintPtr theConstraint);
 
+  /// \brief Update dependent (copied) features created by Mirror and other "Multi" constraints
+  void updateMultiConstraints();
+
   /// \brief Compute DoF of the sketch and set corresponding field
   void computeDoF();
 
@@ -113,6 +116,8 @@ private:
   int  myDOF; ///< degrees of freedom of the current sketch
 
   bool myIsEventsBlocked; ///< shows the events are blocked for this group
+
+  int myMultiConstraintUpdateStack; ///< depth of the stack updating "Multi" constraints
 };
 
 typedef std::shared_ptr<SketchSolver_Group> SketchGroupPtr;

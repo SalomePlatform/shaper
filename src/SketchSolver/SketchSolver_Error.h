@@ -24,6 +24,14 @@ class SketchSolver_Error
       "To fix this, you can either undo your operation or remove a conflicting constraint.");
     return MY_ERROR_VALUE;
   }
+  /// Cyclic dependency of copied features with their originals
+  inline static const std::string& INFINITE_LOOP()
+  {
+    static const std::string MY_ERROR_VALUE(
+      "There is a circular reference between copied sketch entities and their originals. "
+      "To fix this, you can either undo your operation or remove wrong constraint.");
+    return MY_ERROR_VALUE;
+  }
   /// Constraints should use objects instead of features as attributes
   inline static const std::string& NEED_OBJECT_NOT_FEATURE()
   {

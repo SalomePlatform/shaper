@@ -15,7 +15,10 @@
 #include <Events_InfoMessage.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Events.h>
+#include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_ConstraintRigid.h>
+#include <SketchPlugin_MultiRotation.h>
+#include <SketchPlugin_MultiTranslation.h>
 
 
 static void sendMessage(const char* theMessageName)
@@ -60,7 +63,8 @@ SketchSolver_Group::SketchSolver_Group(const CompositeFeaturePtr& theWorkplane)
   : mySketch(theWorkplane),
     myPrevResult(PlaneGCSSolver_Solver::STATUS_UNKNOWN),
     myDOF(0),
-    myIsEventsBlocked(false)
+    myIsEventsBlocked(false),
+    myMultiConstraintUpdateStack(0)
 {
   mySketchSolver = SolverPtr(new PlaneGCSSolver_Solver);
   myStorage = StoragePtr(new PlaneGCSSolver_Storage(mySketchSolver));
@@ -100,6 +104,9 @@ bool SketchSolver_Group::changeConstraint(
   }
   else
     myConstraints[theConstraint]->update();
+
+  // constraint is created/updated => reset stack of "multi" constraints updates
+  myMultiConstraintUpdateStack = 0;
   return true;
 }
 
@@ -136,6 +143,16 @@ bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
 // ============================================================================
 bool SketchSolver_Group::resolveConstraints()
 {
+  // check the "Multi" constraints do not drop sketch into infinite loop
+  if (myMultiConstraintUpdateStack > 1) {
+    myPrevResult = PlaneGCSSolver_Solver::STATUS_FAILED;
+    // generate error message due to loop update of the sketch
+    getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())
+      ->setValue(SketchSolver_Error::INFINITE_LOOP());
+    sendMessage(EVENT_SOLVER_FAILED, myConflictingConstraints);
+    return false;
+  }
+
   bool aResolved = false;
   bool isGroupEmpty = isEmpty() && myStorage->isEmpty();
   if (myStorage->isNeedToResolve() &&
@@ -144,7 +161,7 @@ bool SketchSolver_Group::resolveConstraints()
 
     PlaneGCSSolver_Solver::SolveStatus aResult = PlaneGCSSolver_Solver::STATUS_OK;
     try {
-      if (!isGroupEmpty)
+      if (!isGroupEmpty && myMultiConstraintUpdateStack <= 1)
         aResult = mySketchSolver->solve();
     } catch (...) {
       getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())
@@ -163,19 +180,27 @@ bool SketchSolver_Group::resolveConstraints()
         aResult == PlaneGCSSolver_Solver::STATUS_EMPTYSET) {
       myStorage->setNeedToResolve(false);
       myStorage->refresh();
-////      updateMultiConstraints(myConstraints);
-////      // multi-constraints updated some parameters, need to store them
-////      if (myStorage->isNeedToResolve())
-////        resolveConstraints();
 
-      if (myPrevResult != PlaneGCSSolver_Solver::STATUS_OK ||
-          myPrevResult == PlaneGCSSolver_Solver::STATUS_UNKNOWN) {
-        getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
-        std::set<ObjectPtr> aConflicting = myConflictingConstraints;
-        myConflictingConstraints.clear();
-        myPrevResult = PlaneGCSSolver_Solver::STATUS_OK;
-        // the error message should be changed before sending the message
-        sendMessage(EVENT_SOLVER_REPAIRED, aConflicting);
+      // additional check that copied entities used in Mirror and other "Multi" constraints
+      // is not connected with their originals by constraints.
+      myMultiConstraintUpdateStack += 1;
+      updateMultiConstraints();
+      aResolved = true;
+      if (myStorage->isNeedToResolve())
+        aResolved = resolveConstraints();
+
+      if (aResolved) {
+        myMultiConstraintUpdateStack -= 1;
+
+        if (myPrevResult != PlaneGCSSolver_Solver::STATUS_OK ||
+            myPrevResult == PlaneGCSSolver_Solver::STATUS_UNKNOWN) {
+          getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
+          std::set<ObjectPtr> aConflicting = myConflictingConstraints;
+          myConflictingConstraints.clear();
+          myPrevResult = PlaneGCSSolver_Solver::STATUS_OK;
+          // the error message should be changed before sending the message
+          sendMessage(EVENT_SOLVER_REPAIRED, aConflicting);
+        }
       }
 
       // show degrees of freedom
@@ -209,7 +234,6 @@ bool SketchSolver_Group::resolveConstraints()
       }
     }
 
-    aResolved = true;
   } else if (isGroupEmpty && isWorkplaneValid())
     computeDoF();
   removeTemporaryConstraints();
@@ -301,6 +325,9 @@ void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
   for (; aCIter != myConstraints.end(); aCIter++)
     if (aCIter->first == theConstraint) {
       aCIter->second->remove(); // the constraint is not fully removed
+
+      // constraint is removed => reset stack of "multi" constraints updates
+      myMultiConstraintUpdateStack = 0;
       break;
     }
   if (aCIter != myConstraints.end())
@@ -336,4 +363,20 @@ void SketchSolver_Group::blockEvents(bool isBlocked)
     aCIt->second->blockEvents(isBlocked);
 
   myIsEventsBlocked = isBlocked;
+}
+
+// ============================================================================
+//  Function: updateMultiConstraints
+//  Class:    SketchSolver_Group
+//  Purpose:  update multi constraints
+// ============================================================================
+void SketchSolver_Group::updateMultiConstraints()
+{
+  ConstraintConstraintMap::iterator anIt = myConstraints.begin();
+  for (; anIt != myConstraints.end(); ++anIt) {
+    if (anIt->first->getKind() == SketchPlugin_ConstraintMirror::ID() ||
+        anIt->first->getKind() == SketchPlugin_MultiRotation::ID() ||
+        anIt->first->getKind() == SketchPlugin_MultiTranslation::ID())
+      anIt->second->update();
+  }
 }

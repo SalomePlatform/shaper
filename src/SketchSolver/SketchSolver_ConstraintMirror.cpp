@@ -62,13 +62,6 @@ void SketchSolver_ConstraintMirror::getAttributes(
       myFeatures.insert(aFeature);
     }
   }
-  // add mirrored features to the list
-  aList = aMirroredRefList->list();
-  for (anIt = aList.begin(); anIt != aList.end(); ++anIt) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
-    if (aFeature)
-      myFeatures.insert(aFeature);
-  }
 }
 
 void SketchSolver_ConstraintMirror::process()
@@ -118,6 +111,10 @@ void SketchSolver_ConstraintMirror::adjustConstraint()
     FeaturePtr aBase = ModelAPI_Feature::feature(*aBIt);
     FeaturePtr aMirrored = ModelAPI_Feature::feature(*aMIt);
     mirrorEntities(aMirrorLine, aBase, aMirrored);
+
+    // update mirrored entity if it exists in the storage
+    if (myStorage->entity(aMirrored))
+      myStorage->update(aMirrored);
   }
 }
 
