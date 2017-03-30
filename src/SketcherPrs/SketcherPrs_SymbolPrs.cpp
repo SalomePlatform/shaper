@@ -256,7 +256,8 @@ void SketcherPrs_SymbolPrs::Compute(
       myPntArray->SetVertexColor(i, myCustomColor);
   }
 
-  Handle(OpenGl_Group) aGroup = Handle(OpenGl_Group)::DownCast(Prs3d_Root::CurrentGroup (thePresentation));
+  Handle(OpenGl_Group) aGroup =
+    Handle(OpenGl_Group)::DownCast(Prs3d_Root::CurrentGroup (thePresentation));
   aGroup->SetPrimitivesAspect(myAspect);
 
   // Recompute boundary box of the group
