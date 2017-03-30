@@ -235,6 +235,17 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
 bool Model_Document::save(
   const char* theDirName, const char* theFileName, std::list<std::string>& theResults)
 {
+  // if the history line is not in the end, move it to the end before save, otherwise
+  // problems with results restore and (the most important) naming problems will appear
+  // due to change evolution to SELECTION (problems in NamedShape and Name)
+  FeaturePtr aWasCurrent;
+  std::shared_ptr<Model_Session> aSession =
+    std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
+  if (currentFeature(false) != lastFeature()) {
+    aSession->setCheckTransactions(false);
+    aWasCurrent = currentFeature(false);
+    setCurrentFeature(lastFeature(), false);
+  }
   // create a directory in the root document if it is not yet exist
   Handle(Model_Application) anApp = Model_Application::getApplication();
   if (isRoot()) {
@@ -253,6 +264,10 @@ bool Model_Document::save(
     Handle(Standard_Failure) aFail = Standard_Failure::Caught();
     Events_InfoMessage("Model_Document",
         "Exception in saving of document: %1").arg(aFail->GetMessageString()).send();
+    if (aWasCurrent.get()) { // return the current feature to the initial position
+      setCurrentFeature(aWasCurrent, false);
+      aSession->setCheckTransactions(true);
+    }
     return false;
   }
   bool isDone = aStatus == PCDM_SS_OK || aStatus == PCDM_SS_No_Obj;
@@ -271,6 +286,12 @@ bool Model_Document::save(
         break;
     }
   }
+
+  if (aWasCurrent.get()) { // return the current feature to the initial position
+    setCurrentFeature(aWasCurrent, false);
+    aSession->setCheckTransactions(true);
+  }
+
   myTransactionSave = int(myTransactions.size());
   if (isDone) {  // save also sub-documents if any
     theResults.push_back(TCollection_AsciiString(aPath).ToCString());
