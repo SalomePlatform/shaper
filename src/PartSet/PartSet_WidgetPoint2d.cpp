@@ -689,7 +689,7 @@ void PartSet_WidgetPoint2D::mouseMoved(ModuleBase_IViewWindow* theWindow, QMouse
 {
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
 
-  if (isEditingMode() || aModule->sketchReentranceMgr()->isInternalEditStarted())
+  if (isEditingMode() || aModule->sketchReentranceMgr()->isInternalEditActive())
     return;
 
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());

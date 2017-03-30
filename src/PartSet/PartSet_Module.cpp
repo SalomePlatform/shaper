@@ -512,7 +512,7 @@ bool PartSet_Module::isActionEnableStateFixed(const int theActionId) const
 {
   bool isEnabledFixed = false;
   if (theActionId == XGUI_ActionsMgr::AcceptAll &&
-      mySketchReentrantMgr->isInternalEditStarted())
+      mySketchReentrantMgr->isInternalEditActive())
     isEnabledFixed = true;
   return isEnabledFixed;
 }
@@ -560,7 +560,7 @@ bool PartSet_Module::isMouseOverWindow()
 bool PartSet_Module::isSketchNeutralPointActivated() const
 {
   bool isNeutralPoint = true;
-  if (sketchReentranceMgr()->isInternalEditStarted())
+  if (sketchReentranceMgr()->isInternalEditActive())
     isNeutralPoint = false;
   if (myIsOperationIsLaunched)
     isNeutralPoint = false;

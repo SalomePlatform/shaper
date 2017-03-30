@@ -389,9 +389,17 @@ bool PartSet_SketcherReentrantMgr::canBeCommittedByPreselection()
   return !isActiveMgr() || myRestartingMode == RM_None;
 }
 
-bool PartSet_SketcherReentrantMgr::isInternalEditStarted() const
+void PartSet_SketcherReentrantMgr::appendCreatedObjects(const std::set<ObjectPtr>& theObjects)
 {
-  return myIsInternalEditOperation;
+  if (!myIsFlagsBlocked) // we need to collect objects only when launch operation is called
+    return;
+
+  for (std::set<ObjectPtr>::const_iterator anIt = theObjects.begin();
+       anIt != theObjects.end(); ++anIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+    if (myCreatedFeatures.find(aFeature) != myCreatedFeatures.end())
+      myCreatedFeatures.insert(aFeature);
+  }
 }
 
 bool PartSet_SketcherReentrantMgr::isActiveMgr() const
@@ -618,6 +626,7 @@ void PartSet_SketcherReentrantMgr::resetFlags()
     myIsInternalEditOperation = false;
     updateAcceptAllAction();
     myRestartingMode = RM_None;
+    myCreatedFeatures.clear();
   }
 }
 

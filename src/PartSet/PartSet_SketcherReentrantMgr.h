@@ -101,9 +101,10 @@ public:
   /// Returns false if the reentrant mode of the operation is not empty.
   bool canBeCommittedByPreselection();
 
-  /// returns true if an internal edit operation is started
-  /// \return boolean value
-  bool isInternalEditStarted() const;
+  /// Put information about created objects into a cash. It will be processed in
+  /// restart operation.
+  /// \param theObjects a list of created objects
+  void appendCreatedObjects(const std::set<ObjectPtr>& theObjects);
 
 private slots:
   /// SLOT, that is called by a widget activating in the property panel
@@ -192,6 +193,7 @@ private:
   bool myIsValueChangedBlocked; /// blocked flag to avoid circling by value changed
 
   FeaturePtr myPreviousFeature; /// feature of the previous operation, which is restarted
+  std::set<FeaturePtr> myCreatedFeatures; /// list of created features by restart operation
   FeaturePtr myInternalFeature;
   QWidget* myInternalWidget;
   ModuleBase_ModelWidget* myInternalActiveWidget;
