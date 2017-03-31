@@ -40,6 +40,7 @@
 
 const double tolerance = 1.e-7;
 const double paramTolerance = 1.e-4;
+const double PI = 3.141592653589793238463;
 
 /// \brief Attract specified point on theNewArc to the attribute of theFeature
 static void recalculateAttributes(FeaturePtr theNewArc, const std::string& theNewArcAttribute,
@@ -555,7 +556,9 @@ void calculateFilletCenter(FeaturePtr theFeatureA, FeaturePtr theFeatureB,
         new GeomAPI_Dir2d(aStart[1-aLineInd]->decreased(aCenter[1-aLineInd])));
     std::shared_ptr<GeomAPI_Dir2d> aEndArcDir = std::shared_ptr<GeomAPI_Dir2d>(
         new GeomAPI_Dir2d(aEnd[1-aLineInd]->decreased(aCenter[1-aLineInd])));
-    double anArcAngle = aEndArcDir->angle(aStartArcDir);
+    double anArcAngle = aStartArcDir->angle(aEndArcDir);
+    if (anArcAngle < 0.0)
+      anArcAngle += 2.0 * PI;
 
     // get possible centers and filter them
     std::list< std::shared_ptr<GeomAPI_XY> > aSuspectCenters;
@@ -578,9 +581,10 @@ void calculateFilletCenter(FeaturePtr theFeatureA, FeaturePtr theFeatureB,
         aWeight -= 1;
       std::shared_ptr<GeomAPI_Dir2d> aCurDir = std::shared_ptr<GeomAPI_Dir2d>(
           new GeomAPI_Dir2d((*anIt)->decreased(aCenter[1-aLineInd])));
-      double aCurAngle = aCurDir->angle(aStartArcDir);
-      if (anArcAngle < 0.0) aCurAngle *= -1.0;
-      if (aCurAngle < 0.0 || aCurAngle > fabs(anArcAngle))
+      double aCurAngle = aStartArcDir->angle(aCurDir);
+      if (aCurAngle < 0.0)
+        aCurAngle += 2.0 * PI;
+      if (aCurAngle < 0.0 || aCurAngle > anArcAngle)
         continue;
       if (aWeight > aBestWeight)
         aBestWeight = aWeight;
@@ -611,7 +615,9 @@ void calculateFilletCenter(FeaturePtr theFeatureA, FeaturePtr theFeatureB,
           new GeomAPI_Dir2d(aStart[i]->decreased(aCenter[i])));
       std::shared_ptr<GeomAPI_Dir2d> aEndArcDir = std::shared_ptr<GeomAPI_Dir2d>(
           new GeomAPI_Dir2d(aEnd[i]->decreased(aCenter[i])));
-      anArcAngle[i] = aEndArcDir->angle(aStartArcDir[i]);
+      anArcAngle[i] = aStartArcDir[i]->angle(aEndArcDir);
+      if (anArcAngle[i] < 0.0)
+        anArcAngle[i] += 2.0 * PI;
     }
 
     // get and filter possible centers
@@ -624,16 +630,18 @@ void calculateFilletCenter(FeaturePtr theFeatureA, FeaturePtr theFeatureB,
     for (; anIt != aSuspectCenters.end(); anIt++) {
       std::shared_ptr<GeomAPI_Dir2d> aCurDir = std::shared_ptr<GeomAPI_Dir2d>(
           new GeomAPI_Dir2d((*anIt)->decreased(aCenter[0])));
-      double aCurAngle = aCurDir->angle(aStartArcDir[0]);
-      if (anArcAngle[0] < 0.0) aCurAngle *= -1.0;
-      if (aCurAngle < 0.0 || aCurAngle > fabs(anArcAngle[0]))
+      double aCurAngle = aStartArcDir[0]->angle(aCurDir);
+      if (aCurAngle < 0.0)
+          aCurAngle += 2.0 * PI;
+      if (aCurAngle < 0.0 || aCurAngle > anArcAngle[0])
         continue; // incorrect position
       theTangentA = aCenter[0]->added(aCurDir->xy()->multiplied(anArcRadius[0]));
 
       aCurDir = std::shared_ptr<GeomAPI_Dir2d>(new GeomAPI_Dir2d((*anIt)->decreased(aCenter[1])));
-      aCurAngle = aCurDir->angle(aStartArcDir[1]);
-      if (anArcAngle[1] < 0.0) aCurAngle *= -1.0;
-      if (aCurAngle < 0.0 || aCurAngle > fabs(anArcAngle[1]))
+      aCurAngle = aStartArcDir[1]->angle(aCurDir);
+      if (aCurAngle < 0.0)
+          aCurAngle += 2.0 * PI;
+      if (aCurAngle < 0.0 || aCurAngle > anArcAngle[1])
         continue; // incorrect position
       theTangentB = aCenter[1]->added(aCurDir->xy()->multiplied(anArcRadius[1]));
 
@@ -667,7 +675,7 @@ void getPointOnEdge(const FeaturePtr theFeature,
       theFeature->attribute(SketchPlugin_Arc::START_ID()))->pnt();
     std::shared_ptr<GeomAPI_Pnt2d> aPntEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       theFeature->attribute(SketchPlugin_Arc::END_ID()))->pnt();
-    if(theFeature->attribute(SketchPlugin_Arc::REVERSED_ID())) {
+    if(theFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->value()) {
       aPntTemp = aPntStart;
       aPntStart = aPntEnd;
       aPntEnd = aPntTemp;
