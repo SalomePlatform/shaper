@@ -8,6 +8,7 @@
 #include <PlaneGCSSolver_PointWrapper.h>
 
 #include <GeomDataAPI_Point2D.h>
+#include <SketchPlugin_SketchEntity.h>
 
 #include <cmath>
 
@@ -125,6 +126,14 @@ void SketchSolver_ConstraintFixed::getAttributes(
     std::vector<EntityWrapperPtr>& theAttributes)
 {
   if (myBaseFeature) {
+    // if the feature is copy, do not move it
+    std::shared_ptr<SketchPlugin_SketchEntity> aSketchFeature =
+        std::dynamic_pointer_cast<SketchPlugin_SketchEntity>(myBaseFeature);
+    if (aSketchFeature && aSketchFeature->isCopy()) {
+      myStorage->setNeedToResolve(true);
+      return;
+    }
+
     // The feature is fixed.
     EntityWrapperPtr aSolverEntity = getChangedEntity(myBaseFeature, myStorage);
     myStorage->update(myBaseFeature);

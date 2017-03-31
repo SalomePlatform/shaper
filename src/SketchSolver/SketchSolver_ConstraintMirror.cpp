@@ -86,8 +86,7 @@ void SketchSolver_ConstraintMirror::process()
 void SketchSolver_ConstraintMirror::update()
 {
   cleanErrorMsg();
-  remove();
-  process();
+  adjustConstraint();
 }
 
 void SketchSolver_ConstraintMirror::adjustConstraint()
@@ -131,6 +130,16 @@ void SketchSolver_ConstraintMirror::blockEvents(bool isBlocked)
   std::set<FeaturePtr>::iterator anIt = myFeatures.begin();
   for (; anIt != myFeatures.end(); ++anIt)
     (*anIt)->data()->blockSendAttributeUpdated(isBlocked);
+
+  AttributeRefListPtr aMirroredRefList =
+      myBaseConstraint->reflist(SketchPlugin_Constraint::ENTITY_C());
+  std::list<ObjectPtr> aMirroredList = aMirroredRefList->list();
+  std::list<ObjectPtr>::iterator aMIt = aMirroredList.begin();
+  for (; aMIt != aMirroredList.end(); ++aMIt) {
+    FeaturePtr aMirrored = ModelAPI_Feature::feature(*aMIt);
+    aMirrored->data()->blockSendAttributeUpdated(isBlocked);
+  }
+
 
   SketchSolver_Constraint::blockEvents(isBlocked);
 }
