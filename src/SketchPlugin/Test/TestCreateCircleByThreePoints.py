@@ -137,7 +137,7 @@ aLineStart = [10., 0.]
 aLineEnd = [10., 50.]
 aSession.startOperation()
 aPoint = aSketchFeature.addFeature("SketchPoint")
-aPointCoord = geomDataAPI_Point2D(aPoint.attribute("PointCoordindates"))
+aPointCoord = geomDataAPI_Point2D(aPoint.attribute("PointCoordinates"))
 aPointCoord.setValue(aPointCoodinates[0], aPointCoodinates[1])
 aLine = aSketchFeature.addFeature("SketchLine")
 aStartPnt = geomDataAPI_Point2D(aLine.attribute("StartPoint"))

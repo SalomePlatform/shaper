@@ -28,7 +28,7 @@ class SketchPlugin_Point : public SketchPlugin_SketchEntity
   /// Coordinates of the point
   inline static const std::string& COORD_ID()
   {
-    static const std::string MY_COORD_ID("PointCoordindates");
+    static const std::string MY_COORD_ID("PointCoordinates");
     return MY_COORD_ID;
   }
   /// Returns the kind of a feature

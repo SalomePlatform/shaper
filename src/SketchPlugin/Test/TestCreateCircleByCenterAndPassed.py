@@ -139,7 +139,7 @@ aPrevCenter = geomDataAPI_Point2D(aPrevCircle.attribute("circle_center"))
 aPointCoodinates = [0., 0.]
 aSession.startOperation()
 aPoint = aSketchFeature.addFeature("SketchPoint")
-aPointCoord = geomDataAPI_Point2D(aPoint.attribute("PointCoordindates"))
+aPointCoord = geomDataAPI_Point2D(aPoint.attribute("PointCoordinates"))
 aPointCoord.setValue(aPointCoodinates[0], aPointCoodinates[1])
 aSession.finishOperation()
 # create new circle

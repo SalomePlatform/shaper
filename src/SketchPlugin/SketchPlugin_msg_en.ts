@@ -571,14 +571,14 @@
   <context>
     <name>SketchPoint:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "PointCoordindates" is not initialized.</source>
+      <source>Attribute "PointCoordinates" is not initialized.</source>
       <translation>Point is not defined</translation>
     </message>
   </context>
   <context>
-    <name>SketchPoint:PointCoordindates</name>
+    <name>SketchPoint:PointCoordinates</name>
     <message>
-      <source>Attribute "PointCoordindates" is locked by modification value in the viewer.</source>
+      <source>Attribute "PointCoordinates" is locked by modification value in the viewer.</source>
       <translation>Select a point</translation>
     </message>
   </context>

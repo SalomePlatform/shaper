@@ -127,7 +127,7 @@ ANGLE = 30.
 #=========================================================================
 aSession.startOperation()
 aRotationPoint = aSketchFeature.addFeature("SketchPoint")
-aRotationPointPoint = geomDataAPI_Point2D(aRotationPoint.attribute("PointCoordindates"))
+aRotationPointPoint = geomDataAPI_Point2D(aRotationPoint.attribute("PointCoordinates"))
 aRotationPointPoint.setValue(CENTER_X, CENTER_Y)
 aSession.finishOperation()
 assert(model.dof(aSketchFeature) == 7)

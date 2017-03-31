@@ -32,7 +32,7 @@
 
       <!-- SketchPoint -->
       <feature id="SketchPoint" title="Point" tooltip="Create point" icon="icons/Sketch/point.png">
-        <sketch-2dpoint_selector id="PointCoordindates" accept_expressions="0" title="Point" tooltip="Point coordinates"
+        <sketch-2dpoint_selector id="PointCoordinates" accept_expressions="0" title="Point" tooltip="Point coordinates"
                                  enable_value="enable_by_preferences"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
