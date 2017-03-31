@@ -84,6 +84,9 @@ class SketchSolver_Group
   void blockEvents(bool isBlocked);
 
 private:
+  /// \biref Verify constraints have not been removed
+  bool areConstraintsValid() const;
+
   /** \brief Removes constraints from the group
    *  \param[in] theConstraint constraint to be removed
    */

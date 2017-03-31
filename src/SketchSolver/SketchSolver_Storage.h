@@ -93,8 +93,8 @@ public:
   /// \brief Remove all features became invalid
   virtual void removeInvalidEntities() = 0;
 
-  /// \brief Check the features is not removed
-  bool isConsistent() const;
+  /// \brief Check the features have not been removed
+  bool areFeaturesValid() const;
 
   /// \brief Check the storage has constraints
   virtual bool isEmpty() const

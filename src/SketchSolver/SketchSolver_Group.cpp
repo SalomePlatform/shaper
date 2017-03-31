@@ -274,7 +274,7 @@ void SketchSolver_Group::computeDoF()
 // ============================================================================
 void SketchSolver_Group::repairConsistency()
 {
-  if (!myStorage->isConsistent()) {
+  if (!areConstraintsValid() || !myStorage->areFeaturesValid()) {
     // remove invalid constraints
     std::set<ConstraintPtr> anInvalidConstraints;
     ConstraintConstraintMap::iterator aCIter = myConstraints.begin();
@@ -380,4 +380,14 @@ void SketchSolver_Group::updateMultiConstraints()
         anIt->first->getKind() == SketchPlugin_MultiTranslation::ID())
       anIt->second->update();
   }
+}
+
+bool SketchSolver_Group::areConstraintsValid() const
+{
+  // Check the constraints are valid
+  ConstraintConstraintMap::const_iterator aCIter = myConstraints.begin();
+  for (; aCIter != myConstraints.end(); ++aCIter)
+    if (!aCIter->first->data() || !aCIter->first->data()->isValid())
+      return false;
+  return true;
 }
