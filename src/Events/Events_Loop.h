@@ -86,13 +86,13 @@ class Events_Loop
   //! Clears all collected messages
   EVENTS_EXPORT void clear(const Events_ID& theID);
 
-  //! Enables flush without grouping for the given message
-  EVENTS_EXPORT void autoFlush(const Events_ID& theID, const bool theAuto = true);
-
   //! Returns true if the evement is flushed right now
   EVENTS_EXPORT bool isFlushed(const Events_ID& theID);
   //! Sets the flag that the event is flished right now
   EVENTS_EXPORT void setFlushed(const Events_ID& theID, const bool theValue);
+
+  //! Returns true if a loop accumulated events to be flashed
+  EVENTS_EXPORT bool hasGrouppedEvent(const Events_ID& theID);
 
 private:
   //! Calls "processEvent" for the given listeners.

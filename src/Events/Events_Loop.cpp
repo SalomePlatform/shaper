@@ -241,14 +241,6 @@ void Events_Loop::clear(const Events_ID& theID)
   }
 }
 
-void Events_Loop::autoFlush(const Events_ID& theID, const bool theAuto)
-{
-  if (theAuto)
-    myFlushed.insert(theID.myID);
-  else
-    myFlushed.erase(myFlushed.find(theID.myID));
-}
-
 bool Events_Loop::isFlushed(const Events_ID& theID)
 {
   return myFlushed.find(theID.myID) != myFlushed.end();
@@ -260,4 +252,9 @@ void Events_Loop::setFlushed(const Events_ID& theID, const bool theValue)
     myFlushed.insert(theID.myID);
   else
     myFlushed.erase(myFlushed.find(theID.myID));
+}
+
+bool Events_Loop::hasGrouppedEvent(const Events_ID& theID)
+{
+  return myGroups.find(theID.myID) != myGroups.end();
 }

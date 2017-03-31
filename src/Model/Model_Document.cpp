@@ -557,10 +557,14 @@ bool Model_Document::finishOperation()
   }
   myObjs->synchronizeBackRefs();
   Events_Loop* aLoop = Events_Loop::loop();
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  static const Events_ID kCreatedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED);
+  static const Events_ID kUpdatedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED);
+  static const Events_ID kRedispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const Events_ID kDeletedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED);
+  aLoop->flush(kCreatedEvent);
+  aLoop->flush(kUpdatedEvent);
+  aLoop->flush(kRedispEvent);
+  aLoop->flush(kDeletedEvent);
 
   if (isNestedClosed) {
     if (myDoc->CommitCommand())
@@ -571,11 +575,19 @@ bool Model_Document::finishOperation()
   // to avoid messages about modifications outside of the transaction
   // and to rebuild everything after all updates and creates
   if (isRoot()) { // once for root document
-    Events_Loop::loop()->autoFlush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
     static std::shared_ptr<Events_Message> aFinishMsg
       (new Events_Message(Events_Loop::eventByName("FinishOperation")));
     Events_Loop::loop()->send(aFinishMsg);
   }
+
+  while(aLoop->hasGrouppedEvent(kCreatedEvent) || aLoop->hasGrouppedEvent(kUpdatedEvent) ||
+        aLoop->hasGrouppedEvent(kRedispEvent) || aLoop->hasGrouppedEvent(kDeletedEvent)) {
+    aLoop->flush(kCreatedEvent);
+    aLoop->flush(kUpdatedEvent);
+    aLoop->flush(kRedispEvent);
+    aLoop->flush(kDeletedEvent);
+  }
+
   // to avoid "updated" message appearance by updater
   //aLoop->clear(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
@@ -586,11 +598,6 @@ bool Model_Document::finishOperation()
   for (; aSubIter != aSubs.end(); aSubIter++)
     if (subDoc(*aSubIter)->finishOperation())
       aResult = true;
-
-  // sub-Part may send updated by flush of deleted (macro circle)
-  if (isRoot()) { // once for root document
-    Events_Loop::loop()->autoFlush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED), false);
-  }
 
   // transaction may be empty if this document was created during this transaction (create part)
   if (!myTransactions.empty() && myDoc->CommitCommand()) {
