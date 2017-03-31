@@ -87,13 +87,12 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
   GCS::SolveStatus aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters);
   Events_LongOp::end(this);
 
-  GCS::VEC_I aRedundant;
-  myEquationSystem->getRedundant(aRedundant);
-  if (!aRedundant.empty()) {
-    collectConflicting();
-    if (!myConflictingIDs.empty())
-      aResult = GCS::Failed;
-  }
+  // collect information about conflicting constraints every time,
+  // sometimes solver reports about succeeded recalculation but has conflicting constraints
+  // (for example, apply horizontal constraint for a copied feature)
+  collectConflicting();
+  if (!myConflictingIDs.empty())
+    aResult = GCS::Failed;
 
   SolveStatus aStatus;
   if (aResult == GCS::Failed)
