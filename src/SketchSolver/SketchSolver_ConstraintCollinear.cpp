@@ -110,9 +110,12 @@ void SketchSolver_ConstraintCollinear::notify(const FeaturePtr&      theFeature,
   }
 
   bool isNew = false;
-  for (int i = 0; i < 4 && !isNew; ++i)
+  for (int i = 0; i < 4; ++i) {
     if (aConstraintToApply[i] != myIsConstraintApplied[i])
       isNew = true;
+    myIsConstraintApplied[i] = aConstraintToApply[i];
+  }
+
   if (isNew) {
     mySolverConstraint = createPointsOnLine(aPoints[0], aPoints[1], aLine);
     if (myInSolver) {
@@ -123,8 +126,5 @@ void SketchSolver_ConstraintCollinear::notify(const FeaturePtr&      theFeature,
       myStorage->addConstraint(myBaseConstraint, mySolverConstraint);
       myInSolver = true;
     }
-
-    for (int i = 0; i < 4; ++i)
-      myIsConstraintApplied[i] = aConstraintToApply[i];
   }
 }
