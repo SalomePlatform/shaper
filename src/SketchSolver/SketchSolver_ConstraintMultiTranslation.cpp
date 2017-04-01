@@ -17,8 +17,10 @@ void SketchSolver_ConstraintMultiTranslation::getAttributes(
     bool& theFullValue, std::list<EntityWrapperPtr>& theEntities)
 {
   DataPtr aData = myBaseConstraint->data();
-  AttributeRefAttrPtr aStartPointAttr = aData->refattr(SketchPlugin_MultiTranslation::START_POINT_ID());
-  AttributeRefAttrPtr aEndPointAttr = aData->refattr(SketchPlugin_MultiTranslation::END_POINT_ID());
+  AttributeRefAttrPtr aStartPointAttr =
+      aData->refattr(SketchPlugin_MultiTranslation::START_POINT_ID());
+  AttributeRefAttrPtr aEndPointAttr =
+      aData->refattr(SketchPlugin_MultiTranslation::END_POINT_ID());
   if (!aStartPointAttr || !aStartPointAttr->isInitialized() ||
       !aEndPointAttr || !aEndPointAttr->isInitialized()) {
     myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();

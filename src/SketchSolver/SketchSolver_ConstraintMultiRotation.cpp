@@ -24,7 +24,8 @@ void SketchSolver_ConstraintMultiRotation::getAttributes(
   theAngle = aValueBuilder.createAttribute(anAngleAttr);
   myStorage->addEntity(anAngleAttr, theAngle);
 
-  AttributeRefAttrPtr aCenterAttr = myBaseConstraint->refattr(SketchPlugin_MultiRotation::CENTER_ID());
+  AttributeRefAttrPtr aCenterAttr =
+      myBaseConstraint->refattr(SketchPlugin_MultiRotation::CENTER_ID());
   if (!aCenterAttr || !aCenterAttr->isInitialized()) {
     myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
     return;
