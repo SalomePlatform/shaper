@@ -55,13 +55,13 @@ class SketchPlugin_Fillet: public SketchPlugin_SketchEntity, public GeomAPI_IPre
 
   /// Reimplemented from ModelAPI_Feature::isMacro().
   /// \returns true
-  SKETCHPLUGIN_EXPORT virtual bool isMacro() const {return true;};
+  SKETCHPLUGIN_EXPORT virtual bool isMacro() const {return true;}
 
-  SKETCHPLUGIN_EXPORT virtual bool isPreviewNeeded() const {return false;};
+  SKETCHPLUGIN_EXPORT virtual bool isPreviewNeeded() const {return false;}
 
   /// Reimplemented from SketchPlugin_Feature::move().
   /// Do nothing.
-  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY) {};
+  SKETCHPLUGIN_EXPORT virtual void move(const double, const double) {}
 
   /// \brief Use plugin manager for features creation
   SketchPlugin_Fillet();

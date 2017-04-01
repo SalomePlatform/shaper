@@ -53,6 +53,14 @@ class GeomAPI_Circ2d : public GeomAPI_Interface
                  const std::shared_ptr<GeomAPI_Interface>& theEntity3,
                  const std::shared_ptr<GeomAPI_Ax3>&       thePlane);
 
+  /// Creation of a circle with given radius passing through or tangent to two entities.
+  /// Supported items are GeomAPI_Pnt2d or GeomAPI_Shape
+  GEOMAPI_EXPORT
+  GeomAPI_Circ2d(const std::shared_ptr<GeomAPI_Interface>& theEntity1,
+                 const std::shared_ptr<GeomAPI_Interface>& theEntity2,
+                 const double                              theRadius,
+                 const std::shared_ptr<GeomAPI_Ax3>&       thePlane);
+
   /// Return center of the circle
   GEOMAPI_EXPORT
   const std::shared_ptr<GeomAPI_Pnt2d> center() const;

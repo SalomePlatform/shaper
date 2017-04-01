@@ -11,11 +11,13 @@
 #include <GeomAPI_Shape.h>
 
 #include <BRep_Tool.hxx>
+#include <ElCLib.hxx>
 #include <gp_Dir2d.hxx>
 #include <gp_Circ2d.hxx>
 #include <gp_Lin2d.hxx>
 #include <gp_Pnt2d.hxx>
 #include <gp_Ax2d.hxx>
+#include <GccAna_Circ2d2TanRad.hxx>
 #include <GccAna_Circ2d3Tan.hxx>
 #include <GccAna_Circ2dTanCen.hxx>
 #include <GccEnt.hxx>
@@ -35,13 +37,24 @@
 #define MY_CIRC2D implPtr<gp_Circ2d>()
 
 typedef std::shared_ptr<Geom2dAdaptor_Curve>  CurveAdaptorPtr;
+typedef std::vector< std::shared_ptr<GccEnt_QualifiedCirc> > VectorOfGccCirc;
+typedef std::vector< std::shared_ptr<GccEnt_QualifiedLin> >  VectorOfGccLine;
 
+// Provide different mechanisms to create circle:
+// * by passing points
+// * by tangent edges
+// * with specified radius
+// * etc.
 class CircleBuilder
 {
 public:
   CircleBuilder(const std::shared_ptr<GeomAPI_Ax3>& theBasePlane)
-    : myPlane(new Geom_Plane(theBasePlane->impl<gp_Ax3>()))
+    : myPlane(new Geom_Plane(theBasePlane->impl<gp_Ax3>())),
+      myRadius(0.0)
   {}
+
+  void setRadius(const double theRadius)
+  { myRadius = theRadius; }
 
   void addCenter(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter)
   { myCenter = theCenter; }
@@ -80,12 +93,20 @@ public:
 
   gp_Circ2d* circle()
   {
+    if (myTangentShapes.size() > 1)
+      sortTangentShapes();
+
     gp_Circ2d* aResult = 0;
     if (myCenter) {
       if (myPassingPoints.size() == 1)
         aResult = circleByCenterAndPassingPoint();
       else if (myTangentShapes.size() == 1)
         aResult = circleByCenterAndTangent();
+      else if (myRadius > 0.0)
+        aResult = circleByCenterAndRadius();
+    } else if (myRadius > 0.0) {
+      if (myTangentShapes.size() == 2)
+        aResult = circleByRadiusAndTwoTangentCurves();
     } else {
       switch (myPassingPoints.size()) {
       case 0:
@@ -108,6 +129,25 @@ public:
   }
 
 private:
+  void sortTangentShapes()
+  {
+    // sort tangent shapes, so circles go before lines
+    int aSize = (int)myTangentShapes.size();
+    for (int i = 1; i < aSize; ++i) {
+      if (myTangentShapes[i]->GetType() != GeomAbs_Circle)
+        continue;
+
+      for (int j = i - 1; j >= 0 && myTangentShapes[j]->GetType() == GeomAbs_Line; --j)
+        std::swap(myTangentShapes[j], myTangentShapes[j+1]);
+    }
+  }
+
+  gp_Circ2d* circleByCenterAndRadius()
+  {
+    const gp_Pnt2d& aCenter = myCenter->impl<gp_Pnt2d>();
+    return new gp_Circ2d(gp_Ax2d(aCenter, gp::DX2d()), myRadius);
+  }
+
   gp_Circ2d* circleByCenterAndPassingPoint()
   {
     const gp_Pnt2d& aCenter = myCenter->impl<gp_Pnt2d>();
@@ -162,31 +202,15 @@ private:
 
   gp_Circ2d* circleByThreeTangentCurves()
   {
-    std::shared_ptr<GccEnt_QualifiedCirc> aTgCirc[3];
-    std::shared_ptr<GccEnt_QualifiedLin>  aTgLine[3];
-    int aNbTgCirc = 0;
-    int aNbTgLine = 0;
+    VectorOfGccCirc aTgCirc;
+    VectorOfGccLine aTgLine;
+    convertTangentCurvesToGccEnt(aTgCirc, aTgLine);
 
-    std::vector<CurveAdaptorPtr>::iterator anIt = myTangentShapes.begin();
-    for (; anIt != myTangentShapes.end(); ++anIt) {
-      switch ((*anIt)->GetType()) {
-      case GeomAbs_Line:
-        aTgLine[aNbTgLine++] = std::shared_ptr<GccEnt_QualifiedLin>(
-            new GccEnt_QualifiedLin((*anIt)->Line(), GccEnt_unqualified));
-        break;
-      case GeomAbs_Circle:
-        aTgCirc[aNbTgCirc++] = std::shared_ptr<GccEnt_QualifiedCirc>(
-            new GccEnt_QualifiedCirc((*anIt)->Circle(), GccEnt_unqualified));
-        break;
-      default:
-        break;
-      }
-    }
-    if (aNbTgCirc + aNbTgLine != 3)
+    if (aTgCirc.size() + aTgLine.size() != 3)
       return 0;
 
     std::shared_ptr<GccAna_Circ2d3Tan> aCircleBuilder;
-    switch (aNbTgLine) {
+    switch (aTgLine.size()) {
     case 0:
       aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
           *aTgCirc[0], *aTgCirc[1], *aTgCirc[2], Precision::Confusion()));
@@ -279,7 +303,6 @@ private:
     return 0;
   }
 
-
   gp_Circ2d* getProperCircle(const std::shared_ptr<GccAna_Circ2d3Tan>& theBuilder) const
   {
     if (!theBuilder)
@@ -318,11 +341,127 @@ private:
     return aResult;
   }
 
+
+  gp_Circ2d* circleByRadiusAndTwoTangentCurves()
+  {
+    VectorOfGccCirc aTgCirc;
+    VectorOfGccLine aTgLine;
+    convertTangentCurvesToGccEnt(aTgCirc, aTgLine);
+
+    if (aTgCirc.size() + aTgLine.size() != 2)
+      return 0;
+
+    std::shared_ptr<GccAna_Circ2d2TanRad> aCircleBuilder;
+    switch (aTgLine.size()) {
+    case 0:
+      aCircleBuilder = std::shared_ptr<GccAna_Circ2d2TanRad>(new GccAna_Circ2d2TanRad(
+          *aTgCirc[0], *aTgCirc[1], myRadius, Precision::Confusion()));
+      break;
+    case 1:
+      aCircleBuilder = std::shared_ptr<GccAna_Circ2d2TanRad>(new GccAna_Circ2d2TanRad(
+          *aTgCirc[0], *aTgLine[0], myRadius, Precision::Confusion()));
+      break;
+    case 2:
+      aCircleBuilder = std::shared_ptr<GccAna_Circ2d2TanRad>(new GccAna_Circ2d2TanRad(
+          *aTgLine[0], *aTgLine[1], myRadius, Precision::Confusion()));
+      break;
+    default:
+      break;
+    }
+
+    return getProperCircle(aCircleBuilder);
+  }
+
+  gp_Circ2d* getProperCircle(const std::shared_ptr<GccAna_Circ2d2TanRad>& theBuilder) const
+  {
+    if (!theBuilder)
+      return 0;
+
+    gp_Circ2d* aResult = 0;
+    int aNbSol = theBuilder->NbSolutions();
+    double aParSol, aPonTgCurve;
+    gp_Pnt2d aTgPnt;
+    for (int i = 1; i <= aNbSol; ++i) {
+      bool isApplicable = false;
+      if (myTangentShapes.size() >= 1) {
+        theBuilder->Tangency1(i, aParSol, aPonTgCurve, aTgPnt);
+        isApplicable = isParamInCurve(aPonTgCurve, myTangentShapes[0]);
+      }
+      if (myTangentShapes.size() >= 2 && isApplicable) {
+        theBuilder->Tangency2(i, aParSol, aPonTgCurve, aTgPnt);
+        isApplicable = isParamInCurve(aPonTgCurve, myTangentShapes[1]);
+      }
+
+      if (isApplicable) {
+        aResult = new gp_Circ2d(theBuilder->ThisSolution(i));
+        break;
+      }
+    }
+    // unable to build circle passing through the tangent curve => get any tangent point
+    if (!aResult && aNbSol > 0)
+      aResult =  new gp_Circ2d(theBuilder->ThisSolution(1));
+    return aResult;
+  }
+
+
+  void convertTangentCurvesToGccEnt(VectorOfGccCirc& theTangentCircles,
+                                    VectorOfGccLine& theTangentLines)
+  {
+    theTangentCircles.reserve(3);
+    theTangentLines.reserve(3);
+
+    std::vector<CurveAdaptorPtr>::iterator anIt = myTangentShapes.begin();
+    for (; anIt != myTangentShapes.end(); ++anIt) {
+      switch ((*anIt)->GetType()) {
+      case GeomAbs_Line:
+        theTangentLines.push_back(
+            std::shared_ptr<GccEnt_QualifiedLin>(
+            new GccEnt_QualifiedLin((*anIt)->Line(), GccEnt_unqualified))
+        );
+        break;
+      case GeomAbs_Circle:
+        theTangentCircles.push_back(
+            std::shared_ptr<GccEnt_QualifiedCirc>(
+            new GccEnt_QualifiedCirc((*anIt)->Circle(), GccEnt_unqualified))
+        );
+        break;
+      default:
+        break;
+      }
+    }
+  }
+
+
+  // boundary parameters of curve are NOT applied
+  static bool isParamInCurve(double& theParameter, const CurveAdaptorPtr& theCurve)
+  {
+    if (theCurve->Curve()->IsPeriodic()) {
+      theParameter = ElCLib::InPeriod(theParameter,
+                                      theCurve->FirstParameter(),
+                                      theCurve->FirstParameter() + theCurve->Period());
+    }
+    return theParameter > theCurve->FirstParameter() &&
+           theParameter < theCurve->LastParameter();
+  }
+
+  // boundary parameters of curve are applied too
+  static bool isParamOnCurve(double& theParameter, const CurveAdaptorPtr& theCurve)
+  {
+    if (theCurve->IsPeriodic()) {
+      theParameter = ElCLib::InPeriod(theParameter,
+                                      theCurve->FirstParameter(),
+                                      theCurve->FirstParameter() + theCurve->Period());
+    }
+    return theParameter >= theCurve->FirstParameter() &&
+           theParameter <= theCurve->LastParameter();
+  }
+
 private:
   Handle(Geom_Plane) myPlane;
   std::shared_ptr<GeomAPI_Pnt2d> myCenter;
   std::vector<gp_Pnt2d> myPassingPoints;
   std::vector<CurveAdaptorPtr> myTangentShapes;
+  double myRadius;
 };
 
 typedef std::shared_ptr<CircleBuilder> CircleBuilderPtr;
@@ -438,6 +577,19 @@ GeomAPI_Circ2d::GeomAPI_Circ2d(const std::shared_ptr<GeomAPI_Interface>& theEnti
   aBuilder->addPassingEntity(theEntity3);
   setImpl(aBuilder->circle());
 }
+
+GeomAPI_Circ2d::GeomAPI_Circ2d(const std::shared_ptr<GeomAPI_Interface>& theEntity1,
+                               const std::shared_ptr<GeomAPI_Interface>& theEntity2,
+                               const double                              theRadius,
+                               const std::shared_ptr<GeomAPI_Ax3>&       thePlane)
+{
+  CircleBuilderPtr aBuilder(new CircleBuilder(thePlane));
+  aBuilder->addPassingEntity(theEntity1);
+  aBuilder->addPassingEntity(theEntity2);
+  aBuilder->setRadius(theRadius);
+  setImpl(aBuilder->circle());
+}
+
 
 
 const std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Circ2d::project(
