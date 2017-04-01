@@ -103,6 +103,12 @@ void SketchPlugin_Arc::execute()
       GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, anEnd, aStart, aNormal)
     : GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStart, anEnd, aNormal);
 
+  if (myParamBefore == 0) { // parameter has not been calculate yet
+    std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
+        new GeomAPI_Circ2d(aCenterAttr->pnt(), aStartAttr->pnt()));
+    aCircleForArc->parameter(anEndAttr->pnt(), paramTolerance, myParamBefore);
+  }
+
   std::shared_ptr<ModelAPI_ResultConstruction> aResult = document()->createConstruction(data(), 1);
   aResult->setShape(anArcShape);
   aResult->setIsInHistory(false);
