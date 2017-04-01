@@ -187,7 +187,7 @@ private:
     gp_Pnt2d aTgPnt;
     for (int i = 1; i <= aNbSol && aCurve; ++i) {
       theBuilder->Tangency1(i, aParSol, aPonTgCurve, aTgPnt);
-      if (aPonTgCurve >= aCurve->FirstParameter() && aPonTgCurve <= aCurve->LastParameter()) {
+      if (isParamOnCurve(aPonTgCurve, aCurve)) {
         aResult = new gp_Circ2d(theBuilder->ThisSolution(i));
         break;
       }
@@ -316,18 +316,15 @@ private:
       bool isApplicable = false;
       if (myTangentShapes.size() >= 1) {
         theBuilder->Tangency1(i, aParSol, aPonTgCurve, aTgPnt);
-        isApplicable = aPonTgCurve >= myTangentShapes[0]->FirstParameter() &&
-                       aPonTgCurve <= myTangentShapes[0]->LastParameter();
+        isApplicable = isParamOnCurve(aPonTgCurve, myTangentShapes[0]);
       }
       if (myTangentShapes.size() >= 2 && isApplicable) {
         theBuilder->Tangency2(i, aParSol, aPonTgCurve, aTgPnt);
-        isApplicable = aPonTgCurve >= myTangentShapes[1]->FirstParameter() &&
-                       aPonTgCurve <= myTangentShapes[1]->LastParameter();
+        isApplicable = isParamOnCurve(aPonTgCurve, myTangentShapes[1]);
       }
       if (myTangentShapes.size() >= 3 && isApplicable) {
         theBuilder->Tangency3(i, aParSol, aPonTgCurve, aTgPnt);
-        isApplicable = aPonTgCurve >= myTangentShapes[2]->FirstParameter() &&
-                       aPonTgCurve <= myTangentShapes[2]->LastParameter();
+        isApplicable = isParamOnCurve(aPonTgCurve, myTangentShapes[2]);
       }
 
       if (isApplicable) {
