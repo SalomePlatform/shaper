@@ -96,11 +96,12 @@ def testNbSubShapes(theFeature, theShapeType, theExpectedNbSubShapes):
     assert (aNbResultSubShapes == anExpectedNbSubShapes), "Number of sub-shapes of type {} for result[{}]: {}. Expected: {}.".format(aShapeTypes[theShapeType], anIndex, aNbResultSubShapes, anExpectedNbSubShapes)
 
 
-def testResultsVolumes(theFeature, theExpectedResultsVolumes, theNbSignificantDigits = 10):
+def testResultsVolumes(theFeature, theExpectedResultsVolumes, theNbSignificantDigits = 7):
   """ Tests results volumes.
   :param theFeature: feature to test.
   :param theExpectedResultsVolumes: list of results volumes. Size of list should be equal to len(theFeature.results()).
   """
+  aTolerance = 10**(-theNbSignificantDigits)
   aNbResults = len(theFeature.results())
   aListSize = len(theExpectedResultsVolumes)
   assert (aNbResults == aListSize), "Number of results: {} not equal to list size: {}.".format(aNbResults, aListSize)
@@ -109,7 +110,7 @@ def testResultsVolumes(theFeature, theExpectedResultsVolumes, theNbSignificantDi
     aResultVolumeStr = "{:0.27f}".format(aResultVolume).lstrip("0").lstrip(".").lstrip("0")
     anExpectedResultVolume = theExpectedResultsVolumes[anIndex]
     anExpectedResultVolumeStr = "{:0.27f}".format(anExpectedResultVolume).lstrip("0").lstrip(".").lstrip("0")
-    assert (aResultVolumeStr[:theNbSignificantDigits] == anExpectedResultVolumeStr[:theNbSignificantDigits]), "Volume of result[{}]: {:0.27f}. Expected: {:0.27f}. The first {} significant digits not equal.".format(anIndex, aResultVolume, anExpectedResultVolume, theNbSignificantDigits)
+    assert math.fabs(aResultVolume - anExpectedResultVolume) < aTolerance * anExpectedResultVolume, "Volume of result[{}]: {:0.27f}. Expected: {:0.27f}. The first {} significant digits not equal.".format(anIndex, aResultVolume, anExpectedResultVolume, theNbSignificantDigits)
 
 def testHaveNamingFaces(theFeature, theModel, thePartDoc) :
   """ Tests if all faces of result have a name
