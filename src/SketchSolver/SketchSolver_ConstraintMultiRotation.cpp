@@ -24,7 +24,7 @@ void SketchSolver_ConstraintMultiRotation::getAttributes(
   theAngle = aValueBuilder.createAttribute(anAngleAttr);
   myStorage->addEntity(anAngleAttr, theAngle);
 
-  AttributePtr aCenterAttr = myBaseConstraint->attribute(SketchPlugin_MultiRotation::CENTER_ID());
+  AttributeRefAttrPtr aCenterAttr = myBaseConstraint->refattr(SketchPlugin_MultiRotation::CENTER_ID());
   if (!aCenterAttr || !aCenterAttr->isInitialized()) {
     myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
     return;
@@ -40,6 +40,11 @@ void SketchSolver_ConstraintMultiRotation::getAttributes(
   theFullValue = aMethodTypeAttr->value() != "SingleAngle";
 
   getEntities(theEntities);
+
+  // add owner of central point of Multi-Rotation to the list of monitored features
+  FeaturePtr anOwner = ModelAPI_Feature::feature(aCenterAttr->attr()->owner());
+  if (anOwner)
+    myFeatures.insert(anOwner);
 }
 
 void SketchSolver_ConstraintMultiRotation::process()

@@ -98,9 +98,6 @@ private:
   /// \brief Append given constraint to the group of temporary constraints
   void setTemporary(SolverConstraintPtr theConstraint);
 
-  /// \brief Update dependent (copied) features created by Mirror and other "Multi" constraints
-  void updateMultiConstraints();
-
   /// \brief Compute DoF of the sketch and set corresponding field
   void computeDoF();
 

@@ -208,6 +208,29 @@ assert (aRefListB.size() == 1)
 assert (aRefListC.size() == 1)
 checkMirror(aRefListB, aRefListC, aMirrorLine)
 assert (model.dof(aSketchFeature) == 12)
+
+#=========================================================================
+# Create distance between original and mirrored entities (check the error appears)
+#=========================================================================
+aSketchErrorAttr = aSketchFeature.string("SolverError")
+assert len(aSketchErrorAttr.value()) == 0, "Sketch failed with error: {}".format(aSketchErrorAttr.value())
+aMirroredArc = model.lastSubFeature(aSketchFeature, "SketchArc")
+aSession.startOperation()
+aConstraint = aSketchFeature.addFeature("SketchConstraintDistance")
+refAttrA = aConstraint.refattr("ConstraintEntityA")
+refAttrB = aConstraint.refattr("ConstraintEntityB")
+anArcStartPoint = geomDataAPI_Point2D(aSketchArc1.attribute("start_point"))
+aMirroredArcStartPoint = geomDataAPI_Point2D(aMirroredArc.attribute("start_point"))
+refAttrA.setAttr(anArcStartPoint)
+refAttrB.setAttr(aMirroredArcStartPoint)
+aConstraint.real("ConstraintValue").setValue(200.)
+aSession.finishOperation()
+print "Sketch error : {}".format(aSketchErrorAttr.value())
+assert len(aSketchErrorAttr.value()) != 0, "ERROR: Sketch has not been failed as expected"
+aSession.startOperation()
+aDocument.removeFeature(aConstraint)
+aSession.finishOperation()
+
 #=========================================================================
 # End of test
 #=========================================================================

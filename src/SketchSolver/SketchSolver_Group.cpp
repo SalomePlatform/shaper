@@ -185,7 +185,6 @@ bool SketchSolver_Group::resolveConstraints()
       // additional check that copied entities used in Mirror and other "Multi" constraints
       // is not connected with their originals by constraints.
       myMultiConstraintUpdateStack += 1;
-      updateMultiConstraints();
       aResolved = true;
       if (myStorage->isNeedToResolve())
         aResolved = resolveConstraints();
@@ -364,22 +363,6 @@ void SketchSolver_Group::blockEvents(bool isBlocked)
     aCIt->second->blockEvents(isBlocked);
 
   myIsEventsBlocked = isBlocked;
-}
-
-// ============================================================================
-//  Function: updateMultiConstraints
-//  Class:    SketchSolver_Group
-//  Purpose:  update multi constraints
-// ============================================================================
-void SketchSolver_Group::updateMultiConstraints()
-{
-  ConstraintConstraintMap::iterator anIt = myConstraints.begin();
-  for (; anIt != myConstraints.end(); ++anIt) {
-    if (anIt->first->getKind() == SketchPlugin_ConstraintMirror::ID() ||
-        anIt->first->getKind() == SketchPlugin_MultiRotation::ID() ||
-        anIt->first->getKind() == SketchPlugin_MultiTranslation::ID())
-      anIt->second->update();
-  }
 }
 
 bool SketchSolver_Group::areConstraintsValid() const
