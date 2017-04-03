@@ -32,9 +32,11 @@
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
-#include <GeomAlgoAPI_PointBuilder.h>
+
+#include <GeomAlgoAPI_Circ2dBuilder.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_PointBuilder.h>
 
 // for sqrt on Linux
 #include <math.h>
@@ -437,18 +439,22 @@ void SketchPlugin_MacroArc::fillByThreePassedPoints()
     SketchPlugin_Tools::convertRefAttrToPointOrTangentCurve(
         refattr(PASSED_POINT_REF_ID()), aPassedPointAttr, aTangentCurve, aPassedPnt);
 
-    std::shared_ptr<GeomAPI_Interface> aPassed;
-    if (aTangentCurve)
-      aPassed = aTangentCurve;
-    else
-      aPassed = aPassedPnt;
+    GeomAlgoAPI_Circ2dBuilder aCircBuilder(SketchPlugin_Sketch::plane(sketch()));
+    aCircBuilder.addPassingPoint(myStart);
+    aCircBuilder.addPassingPoint(myEnd);
+    if (aTangentCurve) {
+      aCircBuilder.addTangentCurve(aTangentCurve);
+      aCircBuilder.setClosestPoint(aPassedPointAttr->pnt());
+    } else
+      aCircBuilder.addPassingPoint(aPassedPnt);
 
-    std::shared_ptr<GeomAPI_Ax3> anAxis = SketchPlugin_Sketch::plane(sketch());
-    GeomAPI_Circ2d aCircle(myStart, myEnd, aPassed, anAxis);
-    myCenter = aCircle.center();
-    aCircle = GeomAPI_Circ2d(myCenter, myStart);
+    std::shared_ptr<GeomAPI_Circ2d> aCircle = aCircBuilder.circle();
+    if (!aCircle)
+      return;
+    myCenter = aCircle->center();
 
-    recalculateReversedFlagByPassed(aCircle);
+    aCircle = std::shared_ptr<GeomAPI_Circ2d>(new GeomAPI_Circ2d(myCenter, myStart));
+    recalculateReversedFlagByPassed(*aCircle);
   } else
     myCenter.reset(new GeomAPI_Pnt2d(myStart->xy()->added(myEnd->xy())->multiplied(0.5)));
 }
@@ -497,11 +503,15 @@ void SketchPlugin_MacroArc::fillByTangentEdge()
   FeaturePtr aTangentFeature = ModelAPI_Feature::feature(aTangentPointAttr->owner());
   std::shared_ptr<GeomAPI_Shape> aTangentShape = aTangentFeature->lastResult()->shape();
 
-  std::shared_ptr<GeomAPI_Ax3> anAxis = SketchPlugin_Sketch::plane(sketch());
-  GeomAPI_Circ2d aCircle(myStart, myEnd, aTangentShape, anAxis);
-  myCenter = aCircle.center();
+  GeomAlgoAPI_Circ2dBuilder aCircBuilder(SketchPlugin_Sketch::plane(sketch()));
+  aCircBuilder.addPassingPoint(myStart);
+  aCircBuilder.addPassingPoint(myEnd);
+  aCircBuilder.addTangentCurve(aTangentShape);
+
+  std::shared_ptr<GeomAPI_Circ2d> aCircle = aCircBuilder.circle();
+  myCenter = aCircle->center();
 
   // rebuild circle to set start point equal to zero parameter
-  aCircle = GeomAPI_Circ2d(myCenter, myStart);
-  recalculateReversedFlagByEnd(aCircle);
+  aCircle = std::shared_ptr<GeomAPI_Circ2d>(new GeomAPI_Circ2d(myCenter, myStart));
+  recalculateReversedFlagByEnd(*aCircle);
 }

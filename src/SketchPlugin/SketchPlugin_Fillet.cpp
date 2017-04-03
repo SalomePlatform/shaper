@@ -24,6 +24,7 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Validator.h>
 
+#include <GeomAlgoAPI_Circ2dBuilder.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 
 #include <GeomAPI_Circ2d.h>
@@ -410,9 +411,13 @@ void calculateFilletCenter(FeaturePtr theFilletFeatures[2],
   GeomShapePtr aShapeA = theFilletFeatures[0]->lastResult()->shape();
   GeomShapePtr aShapeB = theFilletFeatures[1]->lastResult()->shape();
 
-  std::shared_ptr<GeomAPI_Circ2d> aFilletCircle(
-      new GeomAPI_Circ2d(aShapeA, aShapeB, theFilletRadius, theSketchPlane));
-  if (!aFilletCircle->implPtr<char>())
+  GeomAlgoAPI_Circ2dBuilder aCircBuilder(theSketchPlane);
+  aCircBuilder.addTangentCurve(aShapeA);
+  aCircBuilder.addTangentCurve(aShapeB);
+  aCircBuilder.setRadius(theFilletRadius);
+
+  std::shared_ptr<GeomAPI_Circ2d> aFilletCircle = aCircBuilder.circle();
+  if (!aFilletCircle)
     return;
 
   theCenter = aFilletCircle->center()->xy();

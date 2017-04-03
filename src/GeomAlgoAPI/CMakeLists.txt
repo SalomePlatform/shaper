@@ -49,6 +49,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_ConeSegment.h
     GeomAlgoAPI_Symmetry.h
     GeomAlgoAPI_Scale.h
+    GeomAlgoAPI_Circ2dBuilder.h
 )
 
 SET(PROJECT_SOURCES
@@ -94,6 +95,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_ConeSegment.cpp
     GeomAlgoAPI_Symmetry.cpp
     GeomAlgoAPI_Scale.cpp
+    GeomAlgoAPI_Circ2dBuilder.cpp
 )
 
 SET(PROJECT_LIBRARIES

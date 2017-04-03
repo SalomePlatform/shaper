@@ -25,6 +25,7 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Vertex.h>
 
+#include <GeomAlgoAPI_Circ2dBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_PointBuilder.h>
@@ -211,13 +212,20 @@ void SketchPlugin_MacroCircle::fillByCenterAndPassed()
       aPassedRef, aPassedAttr, aTangentCurve, aPassedPoint);
 
   // Build a circle
-  std::shared_ptr<GeomAPI_Circ2d> aCircle;
+  GeomAlgoAPI_Circ2dBuilder aCircBuilder(SketchPlugin_Sketch::plane(sketch()));
+  aCircBuilder.setCenter(aCenter);
   if (aTangentCurve) {
-    std::shared_ptr<GeomAPI_Ax3> anAxis = SketchPlugin_Sketch::plane(sketch());
-    aCircle = std::shared_ptr<GeomAPI_Circ2d>(new GeomAPI_Circ2d(aCenter, aTangentCurve, anAxis));
+    aCircBuilder.addTangentCurve(aTangentCurve);
+
+    AttributePoint2DPtr aPassedPntAttr =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPassedAttr);
+    if (aPassedPntAttr)
+      aCircBuilder.setClosestPoint(aPassedPntAttr->pnt());
   } else
-    aCircle = std::shared_ptr<GeomAPI_Circ2d>(new GeomAPI_Circ2d(aCenter, aPassedPoint));
-  if (aCircle->implPtr<char>()) {
+    aCircBuilder.addPassingPoint(aPassedPoint);
+
+  std::shared_ptr<GeomAPI_Circ2d> aCircle = aCircBuilder.circle();
+  if (aCircle) {
     myCenter = aCircle->center();
     myRadius = aCircle->radius();
   }
@@ -231,7 +239,9 @@ void SketchPlugin_MacroCircle::fillByThreePoints()
   std::string aPointRef[3] = { FIRST_POINT_REF_ID(),
                                SECOND_POINT_REF_ID(),
                                THIRD_POINT_REF_ID() };
-  std::shared_ptr<GeomAPI_Interface> aPassedEntities[3];
+
+  GeomAlgoAPI_Circ2dBuilder aCircBuilder(SketchPlugin_Sketch::plane(sketch()));
+
   for (int aPntIndex = 0; aPntIndex < 3; ++aPntIndex) {
     AttributePtr aPassedAttr = attribute(aPointAttr[aPntIndex]);
     if (!aPassedAttr->isInitialized())
@@ -245,15 +255,18 @@ void SketchPlugin_MacroCircle::fillByThreePoints()
         aPassedRef, aPassedAttr, aTangentCurve, aPassedPoint);
 
     if (aPassedPoint)
-      aPassedEntities[aPntIndex] = aPassedPoint;
+      aCircBuilder.addPassingPoint(aPassedPoint);
     else
-      aPassedEntities[aPntIndex] = aTangentCurve;
+      aCircBuilder.addTangentCurve(aTangentCurve);
   }
 
-  std::shared_ptr<GeomAPI_Ax3> anAxis = SketchPlugin_Sketch::plane(sketch());
-  std::shared_ptr<GeomAPI_Circ2d> aCircle = std::shared_ptr<GeomAPI_Circ2d>(
-      new GeomAPI_Circ2d(aPassedEntities[0], aPassedEntities[1], aPassedEntities[2], anAxis));
-  if (aCircle->implPtr<char>()) {
+  AttributePoint2DPtr aThirdPoint =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(THIRD_POINT_ID()));
+  if (aThirdPoint)
+    aCircBuilder.setClosestPoint(aThirdPoint->pnt());
+
+  std::shared_ptr<GeomAPI_Circ2d> aCircle = aCircBuilder.circle();
+  if (aCircle) {
     myCenter = aCircle->center();
     myRadius = aCircle->radius();
   }
@@ -265,8 +278,10 @@ void SketchPlugin_MacroCircle::fillByTwoPassedPoints()
                                 SECOND_POINT_ID() };
   std::string aPointRef[2] = { FIRST_POINT_REF_ID(),
                                SECOND_POINT_REF_ID() };
+
+  GeomAlgoAPI_Circ2dBuilder aCircBuilder(SketchPlugin_Sketch::plane(sketch()));
+
   std::shared_ptr<GeomAPI_Pnt2d> aPassedPoints[2]; // there is possible only two passed points
-  std::shared_ptr<GeomAPI_Interface> aPassedEntities[3];
   int aPntIndex = 0;
   for (; aPntIndex < 2; ++aPntIndex) {
     AttributePtr aPassedAttr = attribute(aPointAttr[aPntIndex]);
@@ -281,31 +296,30 @@ void SketchPlugin_MacroCircle::fillByTwoPassedPoints()
         aPassedRef, aPassedAttr, aTangentCurve, aPassedPoint);
 
     if (aPassedPoint) {
-      aPassedEntities[aPntIndex] = aPassedPoint;
+      aCircBuilder.addPassingPoint(aPassedPoint);
       aPassedPoints[aPntIndex] = aPassedPoint;
     } else {
-      aPassedEntities[aPntIndex] = aTangentCurve;
+      aCircBuilder.addTangentCurve(aTangentCurve);
       // if the circle is tangent to any curve,
       // the third point will be initialized by the tangent point
-      aPassedEntities[2] = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPassedAttr)->pnt();
+      aCircBuilder.addPassingPoint(
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPassedAttr)->pnt());
     }
   }
-  if (aPntIndex <= 1)
-    return;
 
   std::shared_ptr<GeomAPI_Circ2d> aCircle;
-  if (aPassedEntities[2]) {
-    std::shared_ptr<GeomAPI_Ax3> anAxis = SketchPlugin_Sketch::plane(sketch());
-    aCircle = std::shared_ptr<GeomAPI_Circ2d>(
-        new GeomAPI_Circ2d(aPassedEntities[0], aPassedEntities[1], aPassedEntities[2], anAxis));
-  } else {
+
+  if (aPntIndex == 3)
+    aCircle = aCircBuilder.circle();
+  else if (aPntIndex == 2) {
     // the circle is defined by two points, calculate its parameters manually
     std::shared_ptr<GeomAPI_Pnt2d> aCenter(new GeomAPI_Pnt2d(
         (aPassedPoints[0]->x() + aPassedPoints[1]->x()) * 0.5,
         (aPassedPoints[0]->y() + aPassedPoints[1]->y()) * 0.5));
     aCircle = std::shared_ptr<GeomAPI_Circ2d>(new GeomAPI_Circ2d(aCenter, aPassedPoints[0]));
   }
-  if (aCircle->implPtr<char>()) {
+
+  if (aCircle) {
     myCenter = aCircle->center();
     myRadius = aCircle->radius();
   }
