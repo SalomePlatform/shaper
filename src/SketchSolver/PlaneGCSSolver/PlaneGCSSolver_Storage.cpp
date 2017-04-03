@@ -151,10 +151,11 @@ static bool isCopyInMulti(std::shared_ptr<SketchPlugin_Feature> theFeature)
 
 bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
 {
+  bool sendNotify = false;
   bool isUpdated = false;
   EntityWrapperPtr aRelated = entity(theFeature);
   if (aRelated) // send signal to subscribers
-    notify(theFeature);
+    sendNotify = true;
   else { // Feature is not exist, create it
     std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
         std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
@@ -192,6 +193,10 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
     if ((*anAttrIt)->attributeType() == GeomDataAPI_Point2D::typeId() ||
         (*anAttrIt)->attributeType() == ModelAPI_AttributeDouble::typeId())
       isUpdated = update(*anAttrIt) || isUpdated;
+
+  // send notification to listeners due to at least one attribute is changed
+  if (sendNotify && isUpdated)
+    notify(theFeature);
 
   // update arc
   if (aRelated && aRelated->type() == ENTITY_ARC) {
