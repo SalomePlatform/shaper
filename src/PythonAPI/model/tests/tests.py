@@ -1,8 +1,11 @@
 from GeomAlgoAPI import *
 from GeomAPI import *
+from GeomDataAPI import *
 from ModelAPI import ModelAPI_Feature
 import math
+from salome.shaper.model import sketcher
 
+TOLERANCE = 1.e-7
 
 aShapeTypes = {
   GeomAPI_Shape.SOLID:  "GeomAPI_Shape.SOLID",
@@ -93,11 +96,12 @@ def testNbSubShapes(theFeature, theShapeType, theExpectedNbSubShapes):
     assert (aNbResultSubShapes == anExpectedNbSubShapes), "Number of sub-shapes of type {} for result[{}]: {}. Expected: {}.".format(aShapeTypes[theShapeType], anIndex, aNbResultSubShapes, anExpectedNbSubShapes)
 
 
-def testResultsVolumes(theFeature, theExpectedResultsVolumes, theNbSignificantDigits = 10):
+def testResultsVolumes(theFeature, theExpectedResultsVolumes, theNbSignificantDigits = 7):
   """ Tests results volumes.
   :param theFeature: feature to test.
   :param theExpectedResultsVolumes: list of results volumes. Size of list should be equal to len(theFeature.results()).
   """
+  aTolerance = 10**(-theNbSignificantDigits)
   aNbResults = len(theFeature.results())
   aListSize = len(theExpectedResultsVolumes)
   assert (aNbResults == aListSize), "Number of results: {} not equal to list size: {}.".format(aNbResults, aListSize)
@@ -106,7 +110,7 @@ def testResultsVolumes(theFeature, theExpectedResultsVolumes, theNbSignificantDi
     aResultVolumeStr = "{:0.27f}".format(aResultVolume).lstrip("0").lstrip(".").lstrip("0")
     anExpectedResultVolume = theExpectedResultsVolumes[anIndex]
     anExpectedResultVolumeStr = "{:0.27f}".format(anExpectedResultVolume).lstrip("0").lstrip(".").lstrip("0")
-    assert (aResultVolumeStr[:theNbSignificantDigits] == anExpectedResultVolumeStr[:theNbSignificantDigits]), "Volume of result[{}]: {:0.27f}. Expected: {:0.27f}. The first {} significant digits not equal.".format(anIndex, aResultVolume, anExpectedResultVolume, theNbSignificantDigits)
+    assert math.fabs(aResultVolume - anExpectedResultVolume) < aTolerance * anExpectedResultVolume, "Volume of result[{}]: {:0.27f}. Expected: {:0.27f}. The first {} significant digits not equal.".format(anIndex, aResultVolume, anExpectedResultVolume, theNbSignificantDigits)
 
 def testHaveNamingFaces(theFeature, theModel, thePartDoc) :
   """ Tests if all faces of result have a name
@@ -153,3 +157,15 @@ def testNbSubFeatures(theComposite, theKindOfSub, theExpectedCount):
     if aFeature is not None and aFeature.getKind() == theKindOfSub:
        count += 1
   assert (count == theExpectedCount), "Number of sub-features of type {}: {}, expected {}".format(theKindOfSub, count, theExpectedCount)
+
+def assertSketchArc(theArcFeature):
+  """ Tests whether the arc is correctly defined
+  """
+  aCenterPnt = geomDataAPI_Point2D(theArcFeature.attribute("center_point"))
+  aStartPnt = geomDataAPI_Point2D(theArcFeature.attribute("start_point"))
+  aEndPnt = geomDataAPI_Point2D(theArcFeature.attribute("end_point"))
+  aRadius = theArcFeature.real("radius")
+  aDistCS = sketcher.tools.distancePointPoint(aCenterPnt, aStartPnt)
+  aDistCE = sketcher.tools.distancePointPoint(aCenterPnt, aEndPnt)
+  assert math.fabs(aDistCS - aDistCE) < TOLERANCE, "Wrong arc: center-start distance {}, center-end distance {}".format(aDistCS, aDistCE)
+  assert math.fabs(aRadius.value() -aDistCS) < TOLERANCE, "Wrong arc: radius is {0}, expected {1}".format(aRadius.value(), aDistCS)

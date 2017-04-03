@@ -4,19 +4,29 @@
 // Created:     20 August 2015
 // Author:      Vitaly SMETANNIKOV
 
+#include <ModelAPI_Tools.h>
+#include <ModelAPI_AttributeString.h>
+
 #include "PartSet_OverconstraintListener.h"
+#include <PartSet_Module.h>
+#include <PartSet_SketcherMgr.h>
+#include <PartSet_SketcherReentrantMgr.h>
 
 #include "XGUI_ModuleConnector.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_Displayer.h"
+#include "XGUI_CustomPrs.h"
 
 #include "SketcherPrs_SymbolPrs.h"
 #include "SketchPlugin_SketchEntity.h"
+#include "SketchPlugin_MacroArcReentrantMessage.h"
+#include "SketchPlugin_Sketch.h"
 
 #include "Events_Loop.h"
 
 #include <GeomAPI_IPresentable.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_EventReentrantMessage.h>
 #include <ModuleBase_Tools.h>
 
 #include <QString>
@@ -24,29 +34,65 @@
 //#define DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
 
 PartSet_OverconstraintListener::PartSet_OverconstraintListener(ModuleBase_IWorkshop* theWorkshop)
-: myWorkshop(theWorkshop)
+: myWorkshop(theWorkshop), myIsActive(false), myIsFullyConstrained(false)
 {
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_FAILED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_REPAIRED));
+
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SKETCH_UNDER_CONSTRAINED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SKETCH_FULLY_CONSTRAINED));
+
+  aLoop->registerListener(this, ModelAPI_EventReentrantMessage::eventId());
+  aLoop->registerListener(this, SketchPlugin_MacroArcReentrantMessage::eventId());
 }
 
-bool PartSet_OverconstraintListener::isConflictingObject(const ObjectPtr& theObject)
+void PartSet_OverconstraintListener::setActive(const bool& theActive)
 {
-  return myConflictingObjects.find(theObject) != myConflictingObjects.end();
+  if (myIsActive == theActive)
+    return;
+
+  myIsActive = theActive;
+  myIsFullyConstrained = false; /// returned to default state, no custom color for it
+
+  if (myIsActive) {
+    PartSet_Module* aModule = module();
+    CompositeFeaturePtr aSketch = aModule->sketchMgr()->activeSketch();
+    if (aSketch.get()) {
+      std::string aDOFMessage = aSketch->string(SketchPlugin_Sketch::SOLVER_DOF())->value();
+      myIsFullyConstrained = QString(aDOFMessage.c_str()).contains("DoF = 0");
+    }
+  }
 }
 
-void PartSet_OverconstraintListener::getConflictingColor(std::vector<int>& theColor)
+void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
+                                                    std::vector<int>& theColor)
 {
-  Quantity_Color aColor = ModuleBase_Tools::color("Visualization", "sketch_overconstraint_color");
-  theColor.push_back(aColor.Red()*255.);
-  theColor.push_back(aColor.Green()*255.);
-  theColor.push_back(aColor.Blue()*255.);
+  if (!myIsActive)
+    return;
+
+  if (myConflictingObjects.find(theObject) != myConflictingObjects.end()) {
+    theColor = Config_PropManager::color("Visualization", "sketch_overconstraint_color");
+  }
+  if (myIsFullyConstrained) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+    // only entity features has custom color when sketch is fully constrained
+    if (aFeature.get() && PartSet_SketcherMgr::isEntity(aFeature->getKind())) {
+      PartSet_Module* aModule = module();
+      CompositeFeaturePtr aSketch = aModule->sketchMgr()->activeSketch();
+      // the given object is sub feature of the current sketch(created or edited)
+      if (ModelAPI_Tools::compositeOwner(aFeature) == aSketch)
+        theColor = Config_PropManager::color("Visualization", "sketch_fully_constrained_color");
+    }
+  }
 }
 
 void PartSet_OverconstraintListener::processEvent(
                                                  const std::shared_ptr<Events_Message>& theMessage)
 {
+  if (!myIsActive)
+    return;
+
 #ifdef DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
   bool isRepaired = theMessage->eventID() == Events_Loop::eventByName(EVENT_SOLVER_REPAIRED);
   int aCount = 0;
@@ -69,30 +115,48 @@ void PartSet_OverconstraintListener::processEvent(
              .arg(aCurrentInfoStr).toStdString().c_str());
 #endif
 
-  if (theMessage->eventID() == Events_Loop::eventByName(EVENT_SOLVER_FAILED)) {
+  Events_ID anEventID = theMessage->eventID();
+  if (anEventID == Events_Loop::eventByName(EVENT_SOLVER_FAILED) ||
+      anEventID == Events_Loop::eventByName(EVENT_SOLVER_REPAIRED)) {
     std::shared_ptr<ModelAPI_SolverFailedMessage> anErrorMsg =
                    std::dynamic_pointer_cast<ModelAPI_SolverFailedMessage>(theMessage);
     bool anUpdated = false;
     if (anErrorMsg.get()) {
       const std::set<ObjectPtr>& aConflictingObjects = anErrorMsg->objects();
-      anUpdated = appendConflictingObjects(aConflictingObjects);
-    }
-    else {
-      // there is a crash in the solver. All objects are invalid
-      //anUpdated = appendConflictingObjects(std::set<ObjectPtr>());
+      if (anEventID == Events_Loop::eventByName(EVENT_SOLVER_FAILED))
+        anUpdated = appendConflictingObjects(aConflictingObjects);
+      else
+        anUpdated = repairConflictingObjects(aConflictingObjects);
     }
   }
-   if (theMessage->eventID() == Events_Loop::eventByName(EVENT_SOLVER_REPAIRED)) {
-    std::shared_ptr<ModelAPI_SolverFailedMessage> anErrorMsg =
-                   std::dynamic_pointer_cast<ModelAPI_SolverFailedMessage>(theMessage);
-    bool anUpdated = false;
-    if (anErrorMsg.get()) {
-      const std::set<ObjectPtr>& aConflictingObjects = anErrorMsg->objects();
-      anUpdated = repairConflictingObjects(aConflictingObjects);
+  else if (anEventID == Events_Loop::eventByName(EVENT_SKETCH_UNDER_CONSTRAINED) ||
+           anEventID == Events_Loop::eventByName(EVENT_SKETCH_FULLY_CONSTRAINED)) {
+    bool aPrevFullyConstrained = myIsFullyConstrained;
+    myIsFullyConstrained = anEventID == Events_Loop::eventByName(EVENT_SKETCH_FULLY_CONSTRAINED);
+
+    if (aPrevFullyConstrained != myIsFullyConstrained) {
+      std::set<ObjectPtr> aModifiedObjects;
+      PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+      CompositeFeaturePtr aSketch = aModule->sketchMgr()->activeSketch();
+      if (aSketch.get()) {
+        for (int i = 0; i < aSketch->numberOfSubs(); i++) {
+          FeaturePtr aFeature = aSketch->subFeature(i);
+          aModifiedObjects.insert(aFeature); // is necessary to redisplay presentations
+          std::list<ResultPtr> aResults = aFeature->results();
+          for (std::list<ResultPtr>::const_iterator aIt = aResults.begin();
+               aIt != aResults.end(); ++aIt) {
+            aModifiedObjects.insert(*aIt);
+          }
+        }
+        redisplayObjects(aModifiedObjects);
+      }
     }
-    else {
-      // there is no repaired objects, do nothing
-    }
+  }
+  else if (anEventID == ModelAPI_EventReentrantMessage::eventId() ||
+           anEventID == SketchPlugin_MacroArcReentrantMessage::eventId()) {
+    PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+    PartSet_SketcherReentrantMgr* aReentrantMgr = aModule->sketchReentranceMgr();
+    aReentrantMgr->setReentrantMessage(theMessage);
   }
 
 #ifdef DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
@@ -106,8 +170,6 @@ bool PartSet_OverconstraintListener::appendConflictingObjects(
                                                const std::set<ObjectPtr>& theConflictingObjects)
 {
   std::set<ObjectPtr> aModifiedObjects;
-  std::vector<int> aColor;
-  getConflictingColor(aColor);
 
   // set error state for new objects and append them in the internal map of objects
   std::set<ObjectPtr>::const_iterator
@@ -163,10 +225,9 @@ void PartSet_OverconstraintListener::redisplayObjects(
   aLoop->flush(EVENT_DISP);
 }
 
-XGUI_Workshop* PartSet_OverconstraintListener::workshop() const
+PartSet_Module* PartSet_OverconstraintListener::module() const
 {
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-  return aConnector->workshop();
+  return dynamic_cast<PartSet_Module*>(myWorkshop->module());
 }
 
 #ifdef _DEBUG

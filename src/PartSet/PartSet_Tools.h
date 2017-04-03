@@ -25,6 +25,7 @@
 #include <memory>
 
 class V3d_View;
+class ModuleBase_IViewWindow;
 class ModuleBase_ViewerPrs;
 class ModuleBase_IWorkshop;
 class GeomDataAPI_Point2D;
@@ -35,6 +36,8 @@ class GeomAPI_Pnt;
 class GeomAPI_Edge;
 class GeomAPI_Vertex;
 class ModelAPI_Result;
+
+class QMouseEvent;
 
 /*!
  * \class PartSet_Tools
@@ -213,6 +216,16 @@ public:
   */
   static std::shared_ptr<GeomAPI_Pnt2d> getPoint(std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                  const std::string& theAttribute);
+
+  /**
+  * Convertes parameters into a geom point
+  * \theEvent a Qt event to find mouse position
+  * \param theWindow view window to define eye of view
+  * \param theSketch to convert 3D point coordinates into coorditates of the sketch plane
+  */
+  static std::shared_ptr<GeomAPI_Pnt2d> getPnt2d(QMouseEvent* theEvent,
+                                                 ModuleBase_IViewWindow* theWindow,
+                                                 const FeaturePtr& theSketch);
 
   /**
   * Gets all references to the feature, take coincidence constraint features, get point 2d attributes

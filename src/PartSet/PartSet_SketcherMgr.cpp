@@ -428,6 +428,10 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   if (myModule->sketchReentranceMgr()->processMouseReleased(theWnd, theEvent))
     return;
 
+  // if mouse is pressed when it was over view and at release the mouse is out of view, do nothing
+  if (!myIsMouseOverViewProcessed)
+    return;
+
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
   if (!aViewer->canDragByMouse())
@@ -901,6 +905,9 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
     }
   }
 
+  // update state of overconstraint listener should be done before sketch features/results
+  // display (as the display will ask custom color from the listener)
+  myModule->overconstraintListener()->setActive(true);
   // Display sketcher objects
   QStringList anInfo;
   Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
@@ -1014,6 +1021,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 
     Events_Loop::loop()->flush(aDispEvent);
   }
+  myModule->overconstraintListener()->setActive(false);
   // restore the module selection modes, which were changed on startSketch
   aConnector->activateModuleSelectionModes();
 }

@@ -100,6 +100,16 @@ private:
                               QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes,
                               const bool theListShouldBeCleared = true);
 
+  /// Fills the map by the feature presentation if the feature is presentable
+  /// \param theFeature a current feature
+  /// \param theWorkshop a current workshop
+  /// \param theObjectShapes an output map
+  /// \param theObjectShape an output map of objects
+  static void getPresentationShapes(const FeaturePtr& theFeature,
+                              ModuleBase_IWorkshop* theWorkshop,
+                              QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes,
+                              const bool theListShouldBeCleared = true);
+
   /// Fills the map by the feature object and shapes, which should be visuaziled
   /// Gets the active widget, obtain the highlighted presentations if it has such and
   /// fill map by object and shapes

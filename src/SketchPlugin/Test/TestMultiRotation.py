@@ -26,9 +26,9 @@ def createSketch(theSketch):
     allFeatures = []
     # Create arc
     aSketchArc = theSketch.addFeature("SketchArc")
-    aCenter     = geomDataAPI_Point2D(aSketchArc.attribute("ArcCenter"))
-    aStartPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcStartPoint"))
-    aEndPoint   = geomDataAPI_Point2D(aSketchArc.attribute("ArcEndPoint"))
+    aCenter     = geomDataAPI_Point2D(aSketchArc.attribute("center_point"))
+    aStartPoint = geomDataAPI_Point2D(aSketchArc.attribute("start_point"))
+    aEndPoint   = geomDataAPI_Point2D(aSketchArc.attribute("end_point"))
     aCenter.setValue(5., 5.)
     aStartPoint.setValue(10., 5.)
     aEndPoint.setValue(5., 10.)
@@ -69,9 +69,9 @@ def checkRotation(theObjects, theNbObjects, theCenterX, theCenterY, theAngle):
             anAttributes.append('StartPoint')
             anAttributes.append('EndPoint')
         elif (feat.getKind() == "SketchArc"):
-            anAttributes.append('ArcCenter')
-            anAttributes.append('ArcStartPoint')
-            anAttributes.append('ArcEndPoint')
+            anAttributes.append('center_point')
+            anAttributes.append('start_point')
+            anAttributes.append('end_point')
             
         for attr in anAttributes:
             aPoint1 = geomDataAPI_Point2D(feat.attribute(attr))
@@ -127,7 +127,7 @@ ANGLE = 30.
 #=========================================================================
 aSession.startOperation()
 aRotationPoint = aSketchFeature.addFeature("SketchPoint")
-aRotationPointPoint = geomDataAPI_Point2D(aRotationPoint.attribute("PointCoordindates"))
+aRotationPointPoint = geomDataAPI_Point2D(aRotationPoint.attribute("PointCoordinates"))
 aRotationPointPoint.setValue(CENTER_X, CENTER_Y)
 aSession.finishOperation()
 assert(model.dof(aSketchFeature) == 7)

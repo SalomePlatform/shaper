@@ -6,9 +6,9 @@ class SketcherSetTangent(SketcherTestCase):
     def setUp(self):
         SketcherTestCase.setUp(self)
         self.line = self.sketch.addLine(0, 0, 0, 1)
-        self.arc = self.sketch.addArc(0, 1, 0, 0, 1, 1)
+        self.arc = self.sketch.addArc(0, 1, 0, 0, 1, 1, False)
         self.sketch.setCoincident(
-            self.line.endPoint(), self.arc.startPoint()
+            self.line.startPoint(), self.arc.startPoint()
             )
         
     def test_set_tangent(self):

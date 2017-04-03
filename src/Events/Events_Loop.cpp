@@ -171,6 +171,7 @@ void Events_Loop::flush(const Events_ID& theID)
 {
   if (!myFlushActive)
     return;
+  bool hasEventsToFlush = !myGroups.empty();
   std::map<char*, std::shared_ptr<Events_Message> >::iterator aMyGroup;
   for(aMyGroup = myGroups.find(theID.eventText());
     aMyGroup != myGroups.end(); aMyGroup = myGroups.find(theID.eventText()))
@@ -206,6 +207,12 @@ void Events_Loop::flush(const Events_ID& theID)
       }
     }
   }
+  if (hasEventsToFlush && myGroups.empty() && myFlushed.empty()) {
+    // no more messages left in the queue, so, finalize the sketch processing
+    static Events_ID anID = Events_Loop::eventByName("SketchPrepared");
+    std::shared_ptr<Events_Message> aMsg(new Events_Message(anID, this));
+    Events_Loop::loop()->send(aMsg, false);
+  }
 }
 
 void Events_Loop::eraseMessages(const Events_ID& theID)
@@ -234,14 +241,6 @@ void Events_Loop::clear(const Events_ID& theID)
   }
 }
 
-void Events_Loop::autoFlush(const Events_ID& theID, const bool theAuto)
-{
-  if (theAuto)
-    myFlushed.insert(theID.myID);
-  else
-    myFlushed.erase(myFlushed.find(theID.myID));
-}
-
 bool Events_Loop::isFlushed(const Events_ID& theID)
 {
   return myFlushed.find(theID.myID) != myFlushed.end();
@@ -253,4 +252,9 @@ void Events_Loop::setFlushed(const Events_ID& theID, const bool theValue)
     myFlushed.insert(theID.myID);
   else
     myFlushed.erase(myFlushed.find(theID.myID));
+}
+
+bool Events_Loop::hasGrouppedEvent(const Events_ID& theID)
+{
+  return myGroups.find(theID.myID) != myGroups.end();
 }

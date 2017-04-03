@@ -52,6 +52,9 @@ public:
   /// \brief Check the constraint is conflicted with others
   bool isConflicting(const ConstraintID& theConstraint) const;
 
+  /// \brief Check conflicting/redundant constraints and DoF
+  void diagnose();
+
   /// \brief Degrees of freedom
   int dof();
 
@@ -65,9 +68,9 @@ private:
   ConstraintMap                myConstraints;    ///< list of constraints
 
   std::shared_ptr<GCS::System> myEquationSystem; ///< set of equations for solving in FreeGCS
+  bool                         myDiagnoseBeforeSolve; ///< is the diagnostic necessary
 
   GCS::SET_I                   myConflictingIDs; ///< list of IDs of conflicting constraints
-
   /// specifies the conflicting constraints are already collected
   bool                         myConfCollected;
 

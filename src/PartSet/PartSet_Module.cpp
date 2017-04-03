@@ -512,7 +512,7 @@ bool PartSet_Module::isActionEnableStateFixed(const int theActionId) const
 {
   bool isEnabledFixed = false;
   if (theActionId == XGUI_ActionsMgr::AcceptAll &&
-      mySketchReentrantMgr->isInternalEditStarted())
+      mySketchReentrantMgr->isInternalEditActive())
     isEnabledFixed = true;
   return isEnabledFixed;
 }
@@ -552,6 +552,17 @@ void PartSet_Module::customSubShapesSelectionModes(QIntList& theTypes)
     theTypes.append(SketcherPrs_Tools::Sel_Sketch_Wire);
 }
 
+void PartSet_Module::getGeomSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theSelected,
+                                      ObjectPtr& theObject, AttributePtr& theAttribute)
+{
+  ObjectPtr anObject = theSelected->object();
+  GeomShapePtr aShape = theSelected->shape();
+
+  theAttribute = findAttribute(anObject, aShape);
+  // TODO: try to create result if object is an external object
+  theObject = anObject;
+}
+
 bool PartSet_Module::isMouseOverWindow()
 {
   return mySketchMgr->isMouseOverWindow();
@@ -560,7 +571,7 @@ bool PartSet_Module::isMouseOverWindow()
 bool PartSet_Module::isSketchNeutralPointActivated() const
 {
   bool isNeutralPoint = true;
-  if (sketchReentranceMgr()->isInternalEditStarted())
+  if (sketchReentranceMgr()->isInternalEditActive())
     isNeutralPoint = false;
   if (myIsOperationIsLaunched)
     isNeutralPoint = false;
@@ -1015,46 +1026,57 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
     return aCustomized;
 
   if (!theResult.get()) {
-    bool isConflicting = myOverconstraintListener->isConflictingObject(anObject);
-    // customize sketch symbol presentation
-    if (thePrs.get()) {
-      Handle(AIS_InteractiveObject) anAISIO = thePrs->impl<Handle(AIS_InteractiveObject)>();
-      if (!anAISIO.IsNull()) {
-        if (!Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO).IsNull()) {
-          Handle(SketcherPrs_SymbolPrs) aPrs = Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO);
-          if (!aPrs.IsNull()) {
-            std::vector<int> aColor;
-            myOverconstraintListener->getConflictingColor(aColor);
-            aPrs->SetConflictingConstraint(isConflicting, aColor);
-            aCustomized = true;
-          }
-        } else if (!Handle(SketcherPrs_Coincident)::DownCast(anAISIO).IsNull()) {
-          Handle(SketcherPrs_Coincident) aPrs = Handle(SketcherPrs_Coincident)::DownCast(anAISIO);
-          if (!aPrs.IsNull()) {
-            std::vector<int> aColor;
-            myOverconstraintListener->getConflictingColor(aColor);
-            aPrs->SetConflictingConstraint(isConflicting, aColor);
-            aCustomized = true;
-          }
-        }
-      }
-    }
-    // customize sketch dimension constraint presentation
-    if (!aCustomized) {
-      std::vector<int> aColor;
-      if (isConflicting) {
-        myOverconstraintListener->getConflictingColor(aColor);
-      }
-      if (aColor.empty())
-        XGUI_CustomPrs::getDefaultColor(anObject, true, aColor);
-      if (!aColor.empty()) {
-        aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
-      }
+    std::vector<int> aColor;
+    XGUI_CustomPrs::getDefaultColor(anObject, true, aColor);
+    if (!aColor.empty()) {
+      aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
     }
   }
   // customize dimentional constrains
   sketchMgr()->customizePresentation(anObject);
 
+  return aCustomized;
+}
+
+bool PartSet_Module::afterCustomisePresentation(std::shared_ptr<ModelAPI_Result> theResult,
+                                                AISObjectPtr thePrs,
+                                                GeomCustomPrsPtr theCustomPrs)
+{
+  bool aCustomized = false;
+
+  XGUI_Workshop* aWorkshop = getWorkshop();
+  XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+  ObjectPtr anObject = aDisplayer->getObject(thePrs);
+  if (!anObject)
+    return aCustomized;
+
+  std::vector<int> aColor;
+  bool aUseCustomColor = true;
+  if (aUseCustomColor)
+    myOverconstraintListener->getCustomColor(anObject, aColor);
+  // customize sketch symbol presentation
+  Handle(AIS_InteractiveObject) anAISIO = thePrs->impl<Handle(AIS_InteractiveObject)>();
+  if (!anAISIO.IsNull()) {
+    if (!Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO).IsNull()) {
+      Handle(SketcherPrs_SymbolPrs) aPrs = Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO);
+      if (!aPrs.IsNull()) {
+        aPrs->SetCustomColor(aColor);
+        aCustomized = true;
+      }
+    } else if (!Handle(SketcherPrs_Coincident)::DownCast(anAISIO).IsNull()) {
+      Handle(SketcherPrs_Coincident) aPrs = Handle(SketcherPrs_Coincident)::DownCast(anAISIO);
+      if (!aPrs.IsNull()) {
+        aPrs->SetCustomColor(aColor);
+        aCustomized = true;
+      }
+    }
+  }
+  // customize sketch dimension constraint presentation
+  if (!aCustomized) {
+    if (!aColor.empty()) { // otherwise presentation has the default color
+      aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+    }
+  }
   return aCustomized;
 }
 
@@ -1411,6 +1433,18 @@ AttributePtr PartSet_Module::findAttribute(const ObjectPtr& theObject,
                                                  mySketchMgr->activeSketch());
   }
   return anAttribute;
+}
+
+//******************************************************
+std::shared_ptr<Events_Message> PartSet_Module::reentrantMessage()
+{
+  return sketchReentranceMgr()->reentrantMessage();
+}
+
+//******************************************************
+void PartSet_Module::setReentrantPreSelection(const std::shared_ptr<Events_Message>& theMessage)
+{
+  sketchReentranceMgr()->setReentrantPreSelection(theMessage);
 }
 
 //******************************************************

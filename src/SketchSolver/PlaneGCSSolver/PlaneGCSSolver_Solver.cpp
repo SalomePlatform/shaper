@@ -10,6 +10,7 @@
 
 PlaneGCSSolver_Solver::PlaneGCSSolver_Solver()
   : myEquationSystem(new GCS::System),
+    myDiagnoseBeforeSolve(false),
     myConfCollected(false),
     myDOF(0)
 {
@@ -52,8 +53,10 @@ double* PlaneGCSSolver_Solver::createParameter()
 {
   double* aResult = new double(0);
   myParameters.push_back(aResult);
-  if (myDOF >= 0)
-    ++myDOF;
+  if (myConstraints.empty() && myDOF >= 0)
+    ++myDOF; // calculate DoF by hand if and only if there is no constraints yet
+  else
+    myDiagnoseBeforeSolve = true;
   return aResult;
 }
 
@@ -78,17 +81,18 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
     return STATUS_INCONSISTENT;
 
   Events_LongOp::start(this);
+  if (myDiagnoseBeforeSolve)
+    diagnose();
   // solve equations
   GCS::SolveStatus aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters);
   Events_LongOp::end(this);
 
-  GCS::VEC_I aRedundant;
-  myEquationSystem->getRedundant(aRedundant);
-  if (!aRedundant.empty()) {
-    collectConflicting();
-    if (!myConflictingIDs.empty())
-      aResult = GCS::Failed;
-  }
+  // collect information about conflicting constraints every time,
+  // sometimes solver reports about succeeded recalculation but has conflicting constraints
+  // (for example, apply horizontal constraint for a copied feature)
+  collectConflicting();
+  if (!myConflictingIDs.empty())
+    aResult = GCS::Failed;
 
   SolveStatus aStatus;
   if (aResult == GCS::Failed)
@@ -130,6 +134,13 @@ void PlaneGCSSolver_Solver::collectConflicting()
 int PlaneGCSSolver_Solver::dof()
 {
   if (myDOF < 0 && !myConstraints.empty())
-    solve();
+    diagnose();
   return myDOF;
+}
+
+void PlaneGCSSolver_Solver::diagnose()
+{
+  myEquationSystem->declareUnknowns(myParameters);
+  myDOF = myEquationSystem->diagnose();
+  myDiagnoseBeforeSolve = false;
 }

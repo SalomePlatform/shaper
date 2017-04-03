@@ -51,7 +51,7 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
 
   myIsInternal = theData->getBooleanAttribute(ATTR_INTERNAL, false);
 
-  myIsModifiedInEdit = theData->getBooleanAttribute(ATTR_MODIFIED_IN_EDIT, true);
+  myIsModifiedInEdit = theData->getProperty(ATTR_MODIFIED_IN_EDIT);
 
   myDefaultValue = theData->getProperty(ATTR_DEFAULT);
   myUseReset = theData->getBooleanAttribute(ATTR_USE_RESET, true);
@@ -315,8 +315,18 @@ bool ModuleBase_ModelWidget::storeValue()
   bool isDone = false;
   // value is stored only in creation mode and in edition if there is not
   // XML flag prohibited modification in edit mode(macro feature circle/arc)
-  if (!isEditingMode() || isModifiedInEdit())
+  if (!isEditingMode() || isModifiedInEdit().empty())
     isDone = storeValueCustom();
+  else {
+    /// store value in an alternative attribute if possible(attribute has the same type)
+    std::string aWidgetAttribute = attributeID();
+    myAttributeID = isModifiedInEdit();
+    storeValueCustom();
+    myAttributeID = aWidgetAttribute;
+    // operation will be restarted but if isDone == true, PagedContainer will try to set focus
+    // to the current widget, but will be already deleted
+    isDone = false;
+  }
 
   emit afterValuesChanged();
 

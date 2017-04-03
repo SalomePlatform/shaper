@@ -52,6 +52,14 @@ class SketchPlugin_ConstraintCoincidence : public SketchPlugin_ConstraintBase
   static FeaturePtr findCoincidenceFeature(const FeaturePtr& theFeature1,
                                            const FeaturePtr& theFeature2);
 
+  /// Creates a constraint on two points
+  /// \param theSketch a sketch feature
+  /// \param thePoint1 the first point
+  /// \param thePoint2 the second point
+  static void createCoincidenceFeature(SketchPlugin_Sketch* theSketch,
+                                const std::shared_ptr<GeomDataAPI_Point2D>& thePoint1,
+                                const std::shared_ptr<GeomDataAPI_Point2D>& thePoint2);
+
   /// Returns point of coincidence feature
   /// \param theFeature a coincidence feature
   /// \return point 2d attribute. Coincidence always has at least one point 2d attribute

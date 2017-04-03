@@ -18,7 +18,8 @@ class SketchSolver_ConstraintCollinear : public SketchSolver_Constraint
 public:
   /// Constructor based on SketchPlugin constraint
   SketchSolver_ConstraintCollinear(ConstraintPtr theConstraint)
-    : SketchSolver_Constraint(theConstraint)
+    : SketchSolver_Constraint(theConstraint),
+      myInSolver(false)
   {
     for (int i = 0; i < 4; ++i)
       myIsConstraintApplied[i] = false;
@@ -35,6 +36,7 @@ protected:
 private:
   EntityWrapperPtr myPoints[4];  ///< extremities on collinear lines
   bool myIsConstraintApplied[4]; ///< set \c true if point on opposite line
+  bool myInSolver; ///< the constraint is added to the solver
 };
 
 #endif

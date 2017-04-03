@@ -10,9 +10,6 @@
 
 %{
   #include "ModelAPI_swig.h"
-
-  // fix for SWIG v2.0.4
-  #define SWIGPY_SLICE_ARG(obj) ((PySliceObject*)(obj))
 %}
 
 // import other modules
@@ -177,6 +174,9 @@ template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr
 %template(modelAPI_AttributeRefList)       shared_ptr_cast<ModelAPI_AttributeRefList, ModelAPI_Attribute>;
 %template(modelAPI_AttributeRefAttrList)   shared_ptr_cast<ModelAPI_AttributeRefAttrList, ModelAPI_Attribute>;
 %template(modelAPI_AttributeTables)        shared_ptr_cast<ModelAPI_AttributeTables, ModelAPI_Attribute>;
+
+%template(PointList) std::list<std::shared_ptr<GeomAPI_Pnt> >;
+%template(PointSet) std::set<std::shared_ptr<GeomAPI_Pnt> >;
 
 // Geometry casts
 %template(shapeToEdge) shared_ptr_cast<GeomAPI_Edge, GeomAPI_Shape>;

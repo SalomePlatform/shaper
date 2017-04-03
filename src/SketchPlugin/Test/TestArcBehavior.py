@@ -12,6 +12,7 @@
 from GeomDataAPI import *
 from ModelAPI import *
 import math
+from salome.shaper import model
 
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
@@ -35,11 +36,11 @@ aSession.finishOperation()
 #=========================================================================
 aSession.startOperation()
 aSketchArc = aSketchFeature.addFeature("SketchArc")
-anArcCentr = geomDataAPI_Point2D(aSketchArc.attribute("ArcCenter"))
+anArcCentr = geomDataAPI_Point2D(aSketchArc.attribute("center_point"))
 anArcCentr.setValue(0., 0.)
-anArcStartPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcStartPoint"))
+anArcStartPoint = geomDataAPI_Point2D(aSketchArc.attribute("start_point"))
 anArcStartPoint.setValue(0., 10.)
-anArcEndPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcEndPoint"))
+anArcEndPoint = geomDataAPI_Point2D(aSketchArc.attribute("end_point"))
 anArcEndPoint.setValue(1., 10.)
 aSession.finishOperation()
 # the arc must be small, not near to the whole circle
@@ -85,8 +86,8 @@ assert shapeToEdge(aSketchArc.lastResult().shape()).length() < 32.
 aSession.startOperation()
 anArcEndPoint.setValue(10., 0.)
 aSession.finishOperation()
-assert shapeToEdge(aSketchArc.lastResult().shape()).length() > 47.
-assert shapeToEdge(aSketchArc.lastResult().shape()).length() < 48.
+assert shapeToEdge(aSketchArc.lastResult().shape()).length() > 46.5
+assert shapeToEdge(aSketchArc.lastResult().shape()).length() < 47.5
 aSession.startOperation()
 anArcEndPoint.setValue(1., 10.)
 aSession.finishOperation()
@@ -94,11 +95,11 @@ assert shapeToEdge(aSketchArc.lastResult().shape()).length() > 60.
 # check from the scratch that from initial state to counterclockwise position also works
 aSession.startOperation()
 aSketchArc = aSketchFeature.addFeature("SketchArc")
-anArcCentr = geomDataAPI_Point2D(aSketchArc.attribute("ArcCenter"))
+anArcCentr = geomDataAPI_Point2D(aSketchArc.attribute("center_point"))
 anArcCentr.setValue(0., 0.)
-anArcStartPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcStartPoint"))
+anArcStartPoint = geomDataAPI_Point2D(aSketchArc.attribute("start_point"))
 anArcStartPoint.setValue(0., 10.)
-anArcEndPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcEndPoint"))
+anArcEndPoint = geomDataAPI_Point2D(aSketchArc.attribute("end_point"))
 anArcEndPoint.setValue(-1., 10.)
 aSession.finishOperation()
 # the arc must be small, not near to the whole circle
@@ -108,33 +109,32 @@ assert shapeToEdge(aSketchArc.lastResult().shape()).length() < 2.
 #=========================================================================
 aSession.startOperation()
 aSketchArc = aSketchFeature.addFeature("SketchArc")
-anArcCentr = geomDataAPI_Point2D(aSketchArc.attribute("ArcCenter"))
+anArcCentr = geomDataAPI_Point2D(aSketchArc.attribute("center_point"))
 anArcCentr.setValue(0., 0.)
-anArcStartPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcStartPoint"))
+anArcStartPoint = geomDataAPI_Point2D(aSketchArc.attribute("start_point"))
 anArcStartPoint.setValue(0., 10.)
-anArcEndPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcEndPoint"))
+anArcEndPoint = geomDataAPI_Point2D(aSketchArc.attribute("end_point"))
 anArcEndPoint.setValue(10, 0.)
 aSession.finishOperation()
-anInversed = aSketchArc.boolean("InversedArc").value()
+anInversed = aSketchArc.boolean("reversed").value()
 for aCenterCoords in range(1, 20):
   aSession.startOperation()
   anArcCentr.setValue(aCenterCoords, aCenterCoords/2) # move center
   aSession.finishOperation()
-  assert aSketchArc.boolean("InversedArc").value() == anInversed
+  assert aSketchArc.boolean("reversed").value() == anInversed
 for aCenterCoords in range(20, -20, -1):
   aSession.startOperation()
   anArcCentr.setValue(aCenterCoords, aCenterCoords/2) # move center
   aSession.finishOperation()
-  assert aSketchArc.boolean("InversedArc").value() == anInversed
+  assert aSketchArc.boolean("reversed").value() == anInversed
 for aCenterCoords in range(-20, 20):
   aSession.startOperation()
   anArcCentr.setValue(aCenterCoords, aCenterCoords/2) # move center
   aSession.finishOperation()
-  assert aSketchArc.boolean("InversedArc").value() == anInversed
+  assert aSketchArc.boolean("reversed").value() == anInversed
 #=========================================================================
-# Test that movement of start point of arc does not change central point
+# Test that movement of start point of arc does not break the arc
 #=========================================================================
-TOL = 1.e-5
 x = anArcCentr.x()
 y = anArcCentr.y()
 sx = anArcStartPoint.x()
@@ -143,16 +143,14 @@ for aDelta in range(0, 20):
   aSession.startOperation()
   anArcStartPoint.setValue(sx, sy+aDelta) # move start point
   aSession.finishOperation()
-  assert math.fabs(anArcCentr.x() - x) < TOL
-  assert math.fabs(anArcCentr.y() - y) < TOL
+  model.assertSketchArc(aSketchArc)
 for aDelta in range(20, -1, -1):
   aSession.startOperation()
   anArcStartPoint.setValue(sx, sy+aDelta) # move start point
   aSession.finishOperation()
-  assert math.fabs(anArcCentr.x() - x) < TOL
-  assert math.fabs(anArcCentr.y() - y) < TOL
+  model.assertSketchArc(aSketchArc)
 #=========================================================================
-# Test that movement of end point of arc does not change central point
+# Test that movement of end point of arc does not break the arc
 #=========================================================================
 x = anArcCentr.x()
 y = anArcCentr.y()
@@ -162,11 +160,9 @@ for aDelta in range(0, 20):
   aSession.startOperation()
   anArcEndPoint.setValue(sx+aDelta, sy) # move end point
   aSession.finishOperation()
-  assert math.fabs(anArcCentr.x() - x) < TOL
-  assert math.fabs(anArcCentr.y() - y) < TOL
+  model.assertSketchArc(aSketchArc)
 for aDelta in range(20, -1, -1):
   aSession.startOperation()
   anArcEndPoint.setValue(sx+aDelta, sy) # move end point
   aSession.finishOperation()
-  assert math.fabs(anArcCentr.x() - x) < TOL
-  assert math.fabs(anArcCentr.y() - y) < TOL
+  model.assertSketchArc(aSketchArc)

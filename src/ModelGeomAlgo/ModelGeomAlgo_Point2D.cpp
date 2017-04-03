@@ -191,7 +191,8 @@ void appendShapePoints(const GeomShapePtr& theShape,
   }
 }
 
-void ModelGeomAlgo_Point2D::getPointsIntersectedShape(const std::shared_ptr<ModelAPI_Feature>& theBaseFeature,
+void ModelGeomAlgo_Point2D::getPointsIntersectedShape(
+                        const std::shared_ptr<ModelAPI_Feature>& theBaseFeature,
                         const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
                         PointToRefsMap& thePointToAttributeOrObject)
 {

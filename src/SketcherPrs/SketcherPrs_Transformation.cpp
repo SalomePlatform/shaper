@@ -71,7 +71,7 @@ bool SketcherPrs_Transformation::IsReadyToDisplay(ModelAPI_Feature* theConstrain
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_Transformation::updateIfReadyToDisplay(double theStep) const
+bool SketcherPrs_Transformation::updateIfReadyToDisplay(double theStep, bool withColor) const
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
@@ -91,7 +91,7 @@ bool SketcherPrs_Transformation::updateIfReadyToDisplay(double theStep) const
   }
 
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
-  myPntArray = new Graphic3d_ArrayOfPoints(aNbB);
+  myPntArray = new Graphic3d_ArrayOfPoints(aNbB, withColor);
 
   int i;
   ObjectPtr aObj;

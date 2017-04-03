@@ -6,7 +6,10 @@
 
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_Sketch.h"
+#include "SketchPlugin_ConstraintCoincidence.h"
+
 #include <ModelAPI_Data.h>
+#include <ModelAPI_EventReentrantMessage.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeBoolean.h>
@@ -64,6 +67,13 @@ void SketchPlugin_Line::execute()
       aConstr->setShape(anEdge);
       aConstr->setIsInHistory(false);
       setResult(aConstr);
+
+      static Events_ID anId = ModelAPI_EventReentrantMessage::eventId();
+      std::shared_ptr<ModelAPI_EventReentrantMessage> aMessage = std::shared_ptr
+          <ModelAPI_EventReentrantMessage>(new ModelAPI_EventReentrantMessage(anId, 0));
+      aMessage->setCreatedFeature(ModelAPI_Feature::feature(
+                                  data()->attribute(START_ID())->owner()));
+      Events_Loop::loop()->send(aMessage);
     }
   }
 }
@@ -81,6 +91,28 @@ void SketchPlugin_Line::move(double theDeltaX, double theDeltaY)
   std::shared_ptr<GeomDataAPI_Point2D> aPoint2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>
     (aData->attribute(END_ID()));
   aPoint2->move(theDeltaX, theDeltaY);
+}
+
+std::string SketchPlugin_Line::processEvent(const std::shared_ptr<Events_Message>& theMessage)
+{
+  std::string aFilledAttributeName;
+
+  std::shared_ptr<ModelAPI_EventReentrantMessage> aReentrantMessage =
+        std::dynamic_pointer_cast<ModelAPI_EventReentrantMessage>(theMessage);
+  if (aReentrantMessage.get()) {
+    FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
+
+    // Initialize new line with first point equal to end of previous
+    std::shared_ptr<ModelAPI_Data> aSFData = aCreatedFeature->data();
+    std::shared_ptr<GeomDataAPI_Point2D> aSPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                                 aSFData->attribute(SketchPlugin_Line::END_ID()));
+    std::shared_ptr<ModelAPI_Data> aNFData = data();
+    std::shared_ptr<GeomDataAPI_Point2D> aNPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                                 aNFData->attribute(SketchPlugin_Line::START_ID()));
+    aNPoint->setValue(aSPoint->x(), aSPoint->y());
+    SketchPlugin_ConstraintCoincidence::createCoincidenceFeature(sketch(), aSPoint, aNPoint);
+  }
+  return aFilledAttributeName;
 }
 
 double SketchPlugin_Line::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)

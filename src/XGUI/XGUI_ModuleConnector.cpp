@@ -13,6 +13,7 @@
 #include "XGUI_Displayer.h"
 #include "XGUI_PropertyPanel.h"
 #include "XGUI_ActionsMgr.h"
+#include "XGUI_ErrorMgr.h"
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -56,6 +57,11 @@ ModuleBase_IViewer* XGUI_ModuleConnector::viewer() const
 ModuleBase_IPropertyPanel* XGUI_ModuleConnector::propertyPanel() const
 {
   return myWorkshop->propertyPanel();
+}
+
+ModuleBase_IErrorMgr* XGUI_ModuleConnector::errorMgr() const
+{
+  return myWorkshop->errorMgr();
 }
 
 ModuleBase_Operation* XGUI_ModuleConnector::currentOperation() const

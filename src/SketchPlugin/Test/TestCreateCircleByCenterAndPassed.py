@@ -22,28 +22,18 @@ __updated__ = "2017-03-22"
 #=========================================================================
 TOLERANCE = 1.e-7
 
-def getLastCircle(theSketch):
-    """
-    obtains last feature from the sketch and generates error if the feature is not a circle
-    """
-    expectedKind = "SketchCircle"
-    for anIndex in range(theSketch.numberOfSubs() - 1, -1, -1):
-        aSub = theSketch.subFeature(anIndex)
-        if (aSub.getKind() == expectedKind):
-            return aSub
-
 def verifyLastCircle(theSketch, theX, theY, theR):
     """
     subroutine to verify position of last circle in the sketch
     """
-    aLastCircle = getLastCircle(theSketch)
+    aLastCircle = model.lastSubFeature(theSketch, "SketchCircle")
     aCenter = geomDataAPI_Point2D(aLastCircle.attribute("circle_center"))
     verifyPointCoordinates(aCenter, theX, theY)
     aRadius = aLastCircle.real("circle_radius")
     assert aRadius.value() == theR, "Wrong radius {0}, expected {1}".format(aRadius.value(), theR)
 
 def verifyPointCoordinates(thePoint, theX, theY):
-    assert thePoint.x() == theX and thePoint.y() == theY, "Wrong '{0}' point ({1}, {2}), expected ({3}, {4})".format(thePoint.attributeType(), thePoint.x(), thePoint.y(), theX, theY)
+    assert thePoint.x() == theX and thePoint.y() == theY, "Wrong '{0}' point ({1}, {2}), expected ({3}, {4})".format(thePoint.id(), thePoint.x(), thePoint.y(), theX, theY)
 
 def verifyPointOnLine(thePoint, theLine):
     aDistance = distancePointLine(thePoint, theLine)
@@ -52,15 +42,12 @@ def verifyPointOnLine(thePoint, theLine):
 def verifyTangentCircles(theCircle1, theCircle2):
     aCenter1 = geomDataAPI_Point2D(theCircle1.attribute("circle_center"))
     aCenter2 = geomDataAPI_Point2D(theCircle2.attribute("circle_center"))
-    aDistCC = distancePointPoint(aCenter1, aCenter2)
+    aDistCC = model.distancePointPoint(aCenter1, aCenter2)
     aRadius1 = theCircle1.real("circle_radius").value()
     aRadius2 = theCircle2.real("circle_radius").value()
     aRSum = aRadius1 + aRadius2
     aRDiff = math.fabs(aRadius1 - aRadius2)
     assert math.fabs(aRSum - aDistCC) < TOLERANCE or math.fabs(aRDiff - aDistCC) < TOLERANCE, "Circles do not tangent"
-
-def distancePointPoint(thePoint1, thePoint2):
-    return thePoint1.pnt().distance(thePoint2.pnt())
 
 def distancePointLine(thePoint, theLine):
     aLineStart = geomDataAPI_Point2D(theLine.attribute("StartPoint")).pnt().xy()
@@ -137,7 +124,7 @@ assert (not aCircleType.isInitialized())
 aCircleType.setValue("circle_type_by_center_and_passed_points")
 aCircleCenter.setValue(-25., -25)
 aCirclePassed.setValue(0., -25.)
-aRadius = distancePointPoint(aCircleCenter, aCirclePassed)
+aRadius = model.distancePointPoint(aCircleCenter, aCirclePassed)
 aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 2)
 verifyLastCircle(aSketchFeature, -25., -25., aRadius)
@@ -146,13 +133,13 @@ verifyLastCircle(aSketchFeature, -25., -25., aRadius)
 # Test 3. Create a circle as a macro-feature by center and passed point coincident to other points
 #=========================================================================
 # get previous circle
-aPrevCircle = getLastCircle(aSketchFeature)
+aPrevCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
 aPrevCenter = geomDataAPI_Point2D(aPrevCircle.attribute("circle_center"))
 # create additional point
 aPointCoodinates = [0., 0.]
 aSession.startOperation()
 aPoint = aSketchFeature.addFeature("SketchPoint")
-aPointCoord = geomDataAPI_Point2D(aPoint.attribute("PointCoordindates"))
+aPointCoord = geomDataAPI_Point2D(aPoint.attribute("PointCoordinates"))
 aPointCoord.setValue(aPointCoodinates[0], aPointCoodinates[1])
 aSession.finishOperation()
 # create new circle
@@ -172,7 +159,7 @@ aCenterRef.setObject(aPoint.lastResult())
 aCenter.setValue(aPointCoord.pnt())
 aPassedRef.setAttr(aPrevCenter)
 aPassed.setValue(aPrevCenter.pnt())
-aRadius = distancePointPoint(aPrevCenter, aPointCoord)
+aRadius = model.distancePointPoint(aPrevCenter, aPointCoord)
 aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 6)
 verifyPointCoordinates(aPointCoord, aPointCoodinates[0], aPointCoodinates[1])
@@ -183,7 +170,7 @@ model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 2)
 # Test 4. Create a circle as a macro-feature by center on a line and passed point on another circle
 #=========================================================================
 # get previous circle
-aPrevCircle = getLastCircle(aSketchFeature)
+aPrevCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
 aPrevCenter = geomDataAPI_Point2D(aPrevCircle.attribute("circle_center"))
 aPrevCenterXY = [aPrevCenter.x(), aPrevCenter.y()]
 aPrevRadius = aPrevCircle.real("circle_radius").value()
@@ -212,7 +199,7 @@ anExpectedCenter = [(aLineStart[0] + aLineEnd[0]) * 0.5, (aLineStart[1] + aLineE
 aCenter.setValue(anExpectedCenter[0], anExpectedCenter[1])
 aPassedRef.setObject(aPrevCircle.lastResult())
 aPassed.setValue(aPrevCenter.x() + aPrevRadius, aPrevCenter.y())
-aRadius = distancePointPoint(aCenter, aPassed)
+aRadius = model.distancePointPoint(aCenter, aPassed)
 aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 10)
 # check connected features do not change their positions
@@ -221,7 +208,7 @@ assert(aPrevCircle.real("circle_radius").value() == aPrevRadius)
 verifyPointCoordinates(aStartPnt, aLineStart[0], aLineStart[1])
 verifyPointCoordinates(aEndPnt, aLineEnd[0], aLineEnd[1])
 # verify newly created circle
-aCircle = getLastCircle(aSketchFeature)
+aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
 aCenter = geomDataAPI_Point2D(aCircle.attribute("circle_center"))
 verifyPointCoordinates(aCenter, anExpectedCenter[0], anExpectedCenter[1])
 verifyPointOnLine(aCenter, aLine)
@@ -249,7 +236,9 @@ aPassed.setValue(aLineStart[0], aLineStart[1])
 aSession.finishOperation()
 aLastFeature = aSketchFeature.subFeature(aSketchFeature.numberOfSubs() - 1)
 assert aLastFeature.getKind() == "SketchMacroCircle", "ERROR: SketchMacroCircle has NOT expected to be valid"
+aSession.startOperation()
 aDocument.removeFeature(aCircle)
+aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 10)
 
 #=========================================================================

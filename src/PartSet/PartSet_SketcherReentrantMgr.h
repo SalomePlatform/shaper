@@ -8,6 +8,7 @@
 #include <ModelAPI_Feature.h>
 
 #include <string>
+#include <memory>
 
 #include <QObject>
 
@@ -22,6 +23,10 @@ class QMouseEvent;
 
 class XGUI_Workshop;
 class PartSet_Module;
+class ModuleBase_ViewerPrs;
+class Events_Message;
+class ModelAPI_Attribute;
+class GeomAPI_Pnt2d;
 
 /// \ingroup PartSet_SketcherReentrantMgr
 /// It provides reentrant create operations in sketch, that is when all inputs are valid,
@@ -101,9 +106,17 @@ public:
   /// Returns false if the reentrant mode of the operation is not empty.
   bool canBeCommittedByPreselection();
 
-  /// returns true if an internal edit operation is started
-  /// \return boolean value
-  bool isInternalEditStarted() const;
+  /// Fills reentrant message during restarting operation
+  /// \param theMessage reentrant message
+  void setReentrantMessage(const std::shared_ptr<Events_Message>& theMessage)
+  { myReentrantMessage = theMessage; }
+
+  /// Returnss reentrant message
+  std::shared_ptr<Events_Message> reentrantMessage() const { return myReentrantMessage; }
+
+  /// Put current selection into reentrant message
+  /// \param theMessage a message of reentrant operation
+  void setReentrantPreSelection(const std::shared_ptr<Events_Message>& theMessage);
 
 private slots:
   /// SLOT, that is called by a widget activating in the property panel
@@ -173,6 +186,10 @@ private:
   bool isTangentArc(ModuleBase_Operation* theOperation,
                     const std::shared_ptr<ModelAPI_CompositeFeature>& /*theSketch*/) const;
 
+  /// Creates selection instance by the current feature and created by restart objects
+  /// \returns viewer selection presentation
+  std::shared_ptr<ModuleBase_ViewerPrs> generatePreSelection();
+
   /// Accept All action is enabled if an internal edit is started.
   /// It updates the state of the button
   void updateAcceptAllAction();
@@ -189,13 +206,17 @@ private:
   RestartingMode myRestartingMode;  /// automatical restarting mode flag
   bool myIsFlagsBlocked; /// true when reset of flags should not be perfromed
   bool myIsInternalEditOperation; /// true when the 'internal' edit is started
-  bool myIsValueChangedBlocked; /// blocked flag to avoid circling by value changed
 
   FeaturePtr myPreviousFeature; /// feature of the previous operation, which is restarted
   FeaturePtr myInternalFeature;
   QWidget* myInternalWidget;
   ModuleBase_ModelWidget* myInternalActiveWidget;
   std::string myNoMoreWidgetsAttribute;
+
+  std::shared_ptr<Events_Message> myReentrantMessage; /// message obtained by operation restart
+  ObjectPtr mySelectedObject; /// cashed selected object
+  std::shared_ptr<ModelAPI_Attribute> mySelectedAttribute; /// cashed selected attribute
+  std::shared_ptr<GeomAPI_Pnt2d> myClickedSketchPoint; /// cashed clicked point
 };
 
 #endif

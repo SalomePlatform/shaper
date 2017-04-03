@@ -32,7 +32,7 @@
 
       <!-- SketchPoint -->
       <feature id="SketchPoint" title="Point" tooltip="Create point" icon="icons/Sketch/point.png">
-        <sketch-2dpoint_selector id="PointCoordindates" accept_expressions="0" title="Point" tooltip="Point coordinates"
+        <sketch-2dpoint_selector id="PointCoordinates" accept_expressions="0" title="Point" tooltip="Point coordinates"
                                  enable_value="enable_by_preferences"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
@@ -76,7 +76,7 @@
                icon="icons/Sketch/circle.png"
                title="Circle"
                tooltip="Create circle">
-        <toolbox id="circle_type" modified_in_edit="false">
+        <toolbox id="circle_type" modified_in_edit="edit_circle_type">
           <box id="circle_type_by_center_and_passed_points"
                icon="icons/Sketch/circle_pt_rad_32x32.png"
                title="Center and passed points">
@@ -195,7 +195,7 @@
         title="Arc"
         tooltip="Create arc"
         icon="icons/Sketch/arc.png">
-        <toolbox id="arc_type">
+        <toolbox id="arc_type" modified_in_edit="edit_arc_type">
           <box id="by_center_and_points"
                icon="icons/Sketch/arc_base_32x32.png"
                title="Center and two points">
@@ -238,7 +238,6 @@
                                      accept_expressions="0"
                                      enable_value="enable_by_preferences">
               <validator id="SketchPlugin_DifferentReference" parameters="start_point_ref,end_point_ref"/>
-              <validator id="SketchPlugin_ArcEndPointValidator" parameters="end_point_ref"/>
             </sketch-2dpoint_selector>
             <sketch-2dpoint_selector id="passed_point"
                                      reference_attribute="passed_point_ref"
@@ -314,8 +313,8 @@
                icon="icons/Sketch/split.png">
         <sketch_sub_shape_selector
             id="ConstraintValue"
-            label="Split feature"
-            tooltip="Select feature for split"
+            label="Segment"
+            tooltip="Select segment for split"
             shape_types="edge"
             use_external="false"
             use_graphic_intersection="false">
@@ -329,8 +328,8 @@
                icon="icons/Sketch/trim.png">
         <sketch_feature_point_selector
             id="SelectedObject"
-            label="Split feature"
-            tooltip="Select feature for split"
+            label="Segment"
+            tooltip="Select segment for trim"
             shape_types="edge"
             use_external="false"
             use_graphic_intersection="true">

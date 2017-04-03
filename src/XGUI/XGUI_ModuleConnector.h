@@ -50,6 +50,9 @@ Q_OBJECT
   //! Returns property panel
   virtual ModuleBase_IPropertyPanel* propertyPanel() const;
 
+  //! Returns error manager
+  virtual ModuleBase_IErrorMgr* errorMgr() const;
+
   //! Returns currently active operation
   virtual ModuleBase_Operation* currentOperation() const;
 

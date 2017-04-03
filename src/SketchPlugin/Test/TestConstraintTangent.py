@@ -20,14 +20,6 @@ from salome.shaper import model
 
 __updated__ = "2015-03-17"
 
-def distancePointPoint(thePoint1, thePoint2):
-    """
-    subroutine to calculate distance between two points
-    result of calculated distance is has 10**-5 precision
-    """
-    aDist = math.sqrt((thePoint1.x()-thePoint2.x())**2 + (thePoint1.y()-thePoint2.y())**2)
-    return round(aDist, 5)
-
 def distancePointLine(point, line):
     """
     subroutine to calculate distance between point and line
@@ -50,12 +42,12 @@ def checkArcLineTangency(theArc, theLine):
     subroutine to check that the line is tangent to arc/circle
     """
     if (theArc.getKind() == "SketchCircle"):
-        aCenter = geomDataAPI_Point2D(theArc.attribute("CircleCenter"))
-        aRadius = theArc.real("CircleRadius").value()
+        aCenter = geomDataAPI_Point2D(theArc.attribute("circle_center"))
+        aRadius = theArc.real("circle_radius").value()
     else:
-        aCenter = geomDataAPI_Point2D(theArc.attribute("ArcCenter"))
-        aStartPnt = geomDataAPI_Point2D(theArc.attribute("ArcStartPoint"))
-        aRadius = distancePointPoint(aStartPnt, aCenter)
+        aCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
+        aStartPnt = geomDataAPI_Point2D(theArc.attribute("start_point"))
+        aRadius = model.distancePointPoint(aStartPnt, aCenter)
     aDist = distancePointLine(aCenter, theLine)
     assert math.fabs(aDist - aRadius) < 2.e-5, "aDist = {0}, aRadius = {1}".format(aDist, aRadius)
 
@@ -68,15 +60,15 @@ def checkArcArcTangency(theArc1, theArc2):
     aRadii = []
     for anArc in anArcs:
         if (anArc.getKind() == "SketchCircle"):
-            aCenter = geomDataAPI_Point2D(anArc.attribute("CircleCenter"))
-            aRadius = anArc.real("CircleRadius").value()
+            aCenter = geomDataAPI_Point2D(anArc.attribute("circle_center"))
+            aRadius = anArc.real("circle_radius").value()
         else:
-            aCenter = geomDataAPI_Point2D(anArc.attribute("ArcCenter"))
-            aStartPnt = geomDataAPI_Point2D(anArc.attribute("ArcStartPoint"))
-            aRadius = distancePointPoint(aStartPnt, aCenter)
+            aCenter = geomDataAPI_Point2D(anArc.attribute("center_point"))
+            aStartPnt = geomDataAPI_Point2D(anArc.attribute("start_point"))
+            aRadius = model.distancePointPoint(aStartPnt, aCenter)
         aCenters.append(aCenter)
         aRadii.append(aRadius)
-    aDist = distancePointPoint(aCenters[0], aCenters[1])
+    aDist = model.distancePointPoint(aCenters[0], aCenters[1])
     aRSum = aRadii[0] + aRadii[1]
     aRDiff = math.fabs(aRadii[0] - aRadii[1])
     assert math.fabs(aDist - aRSum) < 2.e-5 or math.fabs(aDist - aRDiff) < 2.e-5, "aDist = {0}, aRSum = {1}, aRDiff = {2}".format(aDist, aRSum, aRDiff)
@@ -105,11 +97,11 @@ aSession.finishOperation()
 # Arc
 aSession.startOperation()
 aSketchArc1 = aSketchFeature.addFeature("SketchArc")
-anArcCentr = geomDataAPI_Point2D(aSketchArc1.attribute("ArcCenter"))
+anArcCentr = geomDataAPI_Point2D(aSketchArc1.attribute("center_point"))
 anArcCentr.setValue(10., 10.)
-anArcStartPoint = geomDataAPI_Point2D(aSketchArc1.attribute("ArcStartPoint"))
+anArcStartPoint = geomDataAPI_Point2D(aSketchArc1.attribute("start_point"))
 anArcStartPoint.setValue(0., 50.)
-anArcEndPoint = geomDataAPI_Point2D(aSketchArc1.attribute("ArcEndPoint"))
+anArcEndPoint = geomDataAPI_Point2D(aSketchArc1.attribute("end_point"))
 anArcEndPoint.setValue(50., 0.)
 aSession.finishOperation()
 # Line 1
@@ -192,26 +184,28 @@ assert (model.dof(aSketchFeature) == 7)
 # Arc 1
 aSession.startOperation()
 aSketchArc1 = aSketchFeature.addFeature("SketchArc")
-anArc1Centr = geomDataAPI_Point2D(aSketchArc1.attribute("ArcCenter"))
+anArc1Centr = geomDataAPI_Point2D(aSketchArc1.attribute("center_point"))
 anArc1Centr.setValue(10., 10.)
-anArc1StartPoint = geomDataAPI_Point2D(aSketchArc1.attribute("ArcStartPoint"))
+anArc1StartPoint = geomDataAPI_Point2D(aSketchArc1.attribute("start_point"))
 anArc1StartPoint.setValue(50., 0.)
-anArc1EndPoint = geomDataAPI_Point2D(aSketchArc1.attribute("ArcEndPoint"))
+anArc1EndPoint = geomDataAPI_Point2D(aSketchArc1.attribute("end_point"))
 anArc1EndPoint.setValue(0., 50.)
 aSession.finishOperation()
 # Arc 2
 aSession.startOperation()
-aSketchArc2 = aSketchFeature.addFeature("SketchArc")
-aSketchArc2.string("ArcType").setValue("ThreePoints")
-anArc2Centr = geomDataAPI_Point2D(aSketchArc2.attribute("ArcCenter"))
-anArc2StartPoint = geomDataAPI_Point2D(aSketchArc2.attribute("ArcStartPoint"))
+aSketchArc2 = aSketchFeature.addFeature("SketchMacroArc")
+aSketchArc2.string("arc_type").setValue("by_three_points")
+anArc2StartPoint = geomDataAPI_Point2D(aSketchArc2.attribute("start_point_2"))
 anArc2StartPoint.setValue(0., 50.)
-anArc2EndPoint = geomDataAPI_Point2D(aSketchArc2.attribute("ArcEndPoint"))
+anArc2EndPoint = geomDataAPI_Point2D(aSketchArc2.attribute("end_point_2"))
 anArc2EndPoint.setValue(-50., 0.)
-anArc2PassedPoint = geomDataAPI_Point2D(aSketchArc2.attribute("ArcPassedPoint"))
+anArc2PassedPoint = geomDataAPI_Point2D(aSketchArc2.attribute("passed_point"))
 anArc2PassedPoint.setValue(-40., 40.)
 aSession.finishOperation()
-assert (model.dof(aSketchFeature) == 17)
+#assert (model.dof(aSketchFeature) == 17)
+aSketchArc2 = model.lastSubFeature(aSketchFeature, "SketchArc")
+anArc2Centr = geomDataAPI_Point2D(aSketchArc2.attribute("center_point"))
+anArc2StartPoint = geomDataAPI_Point2D(aSketchArc2.attribute("start_point"))
 #=========================================================================
 # Link points of arcs by the coincidence constraint
 #=========================================================================
@@ -269,11 +263,11 @@ assert (model.dof(aSketchFeature) == 14)
 # 3.2  tangency between non-connected arcs
 aSession.startOperation()
 aSketchArc3 = aSketchFeature.addFeature("SketchArc")
-anArc3Centr = geomDataAPI_Point2D(aSketchArc3.attribute("ArcCenter"))
+anArc3Centr = geomDataAPI_Point2D(aSketchArc3.attribute("center_point"))
 anArc3Centr.setValue(100., -10.)
-anArc3StartPoint = geomDataAPI_Point2D(aSketchArc3.attribute("ArcStartPoint"))
+anArc3StartPoint = geomDataAPI_Point2D(aSketchArc3.attribute("start_point"))
 anArc3StartPoint.setValue(70., -10.)
-anArc3EndPoint = geomDataAPI_Point2D(aSketchArc3.attribute("ArcEndPoint"))
+anArc3EndPoint = geomDataAPI_Point2D(aSketchArc3.attribute("end_point"))
 anArc3EndPoint.setValue(100., 20.)
 aSession.finishOperation()
 assert (model.dof(aSketchFeature) == 19)
@@ -295,8 +289,8 @@ assert (model.dof(aSketchFeature) == 14)
 # 3.3  tangency between arc and circle
 aSession.startOperation()
 aCircle1 = aSketchFeature.addFeature("SketchCircle")
-aCircleCenter = geomDataAPI_Point2D(aCircle1.attribute("CircleCenter"))
-aCircleRadius = aCircle1.real("CircleRadius")
+aCircleCenter = geomDataAPI_Point2D(aCircle1.attribute("circle_center"))
+aCircleRadius = aCircle1.real("circle_radius")
 aCircleCenter.setValue(150., 100.)
 aCircleRadius.setValue(50.)
 aSession.finishOperation()
@@ -313,8 +307,8 @@ assert (model.dof(aSketchFeature) == 16)
 # 3.4  tangency between two circles
 aSession.startOperation()
 aCircle2 = aSketchFeature.addFeature("SketchCircle")
-aCircleCenter = geomDataAPI_Point2D(aCircle2.attribute("CircleCenter"))
-aCircleRadius = aCircle2.real("CircleRadius")
+aCircleCenter = geomDataAPI_Point2D(aCircle2.attribute("circle_center"))
+aCircleRadius = aCircle2.real("circle_radius")
 aCircleCenter.setValue(120., 70.)
 aCircleRadius.setValue(20.)
 aSession.finishOperation()
@@ -332,13 +326,14 @@ assert (model.dof(aSketchFeature) == 18)
 # TEST 4. Creating of tangency arc by the option of the SketchArc feature
 #=========================================================================
 aSession.startOperation()
-aSketchArc3 = aSketchFeature.addFeature("SketchArc")
-aSketchArc3.string("ArcType").setValue("Tangent")
-anArc3Start = aSketchArc3.refattr("ArcTangentPoint")
+aSketchArc3 = aSketchFeature.addFeature("SketchMacroArc")
+aSketchArc3.string("arc_type").setValue("by_tangent_edge")
+anArc3Start = aSketchArc3.refattr("tangent_point")
 anArc3Start.setAttr(anArc1StartPoint)
-anArc3EndPoint = geomDataAPI_Point2D(aSketchArc3.attribute("ArcEndPoint"))
+anArc3EndPoint = geomDataAPI_Point2D(aSketchArc3.attribute("end_point_3"))
 anArc3EndPoint.setValue(anArc1StartPoint.x()-5, anArc1StartPoint.y()-30)
 aSession.finishOperation()
+aSketchArc3 = model.lastSubFeature(aSketchFeature, "SketchArc")
 checkArcArcTangency(aSketchArc1, aSketchArc3)
 # freeze radius of tangent arc
 aSession.startOperation()
@@ -364,8 +359,8 @@ aLineEnd = geomDataAPI_Point2D(aLine.attribute("EndPoint"))
 aLineStart.setValue(100., 100.)
 aLineEnd.setValue(200., 200.)
 aCircle = aSketchFeature.addFeature("SketchCircle")
-aCircleCenter = geomDataAPI_Point2D(aCircle.attribute("CircleCenter"))
-aCircleRadius = aCircle.real("CircleRadius")
+aCircleCenter = geomDataAPI_Point2D(aCircle.attribute("circle_center"))
+aCircleRadius = aCircle.real("circle_radius")
 aCircleCenter.setValue(150., 100.)
 aCircleRadius.setValue(20.)
 aSession.finishOperation()

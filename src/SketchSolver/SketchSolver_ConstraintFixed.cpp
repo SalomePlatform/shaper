@@ -8,6 +8,7 @@
 #include <PlaneGCSSolver_PointWrapper.h>
 
 #include <GeomDataAPI_Point2D.h>
+#include <SketchPlugin_Feature.h>
 
 #include <cmath>
 
@@ -125,6 +126,14 @@ void SketchSolver_ConstraintFixed::getAttributes(
     std::vector<EntityWrapperPtr>& theAttributes)
 {
   if (myBaseFeature) {
+    // if the feature is copy, do not move it
+    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(myBaseFeature);
+    if (aSketchFeature && aSketchFeature->isCopy()) {
+      myStorage->setNeedToResolve(true);
+      return;
+    }
+
     // The feature is fixed.
     EntityWrapperPtr aSolverEntity = getChangedEntity(myBaseFeature, myStorage);
     myStorage->update(myBaseFeature);
@@ -165,11 +174,14 @@ EntityWrapperPtr getChangedEntity(const FeaturePtr& theFeature,
   for (; aPIt != aPoints.end(); ++aPIt) {
     AttributePoint2DPtr aPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*aPIt);
     EntityWrapperPtr anEnt = theStorage->entity(*aPIt);
-    if (!anEnt)
-      continue;
-    PointWrapperPtr aPW = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(anEnt);
-    if (!isSameCoordinates(aPnt, aPW))
-      aChangedPoints.push_back(anEnt);
+    if (anEnt) {
+      PointWrapperPtr aPW = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(anEnt);
+      if (!isSameCoordinates(aPnt, aPW))
+        aChangedPoints.push_back(anEnt);
+    } else {
+      theStorage->update(*aPIt);
+      aChangedPoints.push_back(theStorage->entity(*aPIt));
+    }
   }
 
   EntityWrapperPtr aChanged;

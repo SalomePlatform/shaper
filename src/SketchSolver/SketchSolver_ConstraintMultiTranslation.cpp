@@ -17,8 +17,10 @@ void SketchSolver_ConstraintMultiTranslation::getAttributes(
     bool& theFullValue, std::list<EntityWrapperPtr>& theEntities)
 {
   DataPtr aData = myBaseConstraint->data();
-  AttributePtr aStartPointAttr = aData->attribute(SketchPlugin_MultiTranslation::START_POINT_ID());
-  AttributePtr aEndPointAttr = aData->attribute(SketchPlugin_MultiTranslation::END_POINT_ID());
+  AttributeRefAttrPtr aStartPointAttr =
+      aData->refattr(SketchPlugin_MultiTranslation::START_POINT_ID());
+  AttributeRefAttrPtr aEndPointAttr =
+      aData->refattr(SketchPlugin_MultiTranslation::END_POINT_ID());
   if (!aStartPointAttr || !aStartPointAttr->isInitialized() ||
       !aEndPointAttr || !aEndPointAttr->isInitialized()) {
     myErrorMsg = SketchSolver_Error::NOT_INITIALIZED();
@@ -27,15 +29,23 @@ void SketchSolver_ConstraintMultiTranslation::getAttributes(
 
   myType = CONSTRAINT_MULTI_TRANSLATION;
 
-  myStorage->update(aStartPointAttr);
-  theStartPoint = myStorage->entity(aStartPointAttr);
-  myStorage->update(aEndPointAttr);
-  theEndPoint = myStorage->entity(aEndPointAttr);
+  myStorage->update(AttributePtr(aStartPointAttr));
+  theStartPoint = myStorage->entity(AttributePtr(aStartPointAttr));
+  myStorage->update(AttributePtr(aEndPointAttr));
+  theEndPoint = myStorage->entity(AttributePtr(aEndPointAttr));
 
   AttributeStringPtr aMethodTypeAttr = aData->string(SketchPlugin_MultiTranslation::VALUE_TYPE());
   theFullValue = aMethodTypeAttr->value() != "SingleValue";
 
   getEntities(theEntities);
+
+  // add owner of start and end points of Multi-Translation to the list of monitored features
+  FeaturePtr anOwner = ModelAPI_Feature::feature(aStartPointAttr->attr()->owner());
+  if (anOwner)
+    myFeatures.insert(anOwner);
+  anOwner = ModelAPI_Feature::feature(aEndPointAttr->attr()->owner());
+  if (anOwner)
+    myFeatures.insert(anOwner);
 }
 
 void SketchSolver_ConstraintMultiTranslation::process()

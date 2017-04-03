@@ -12,7 +12,7 @@
 #include <ModelAPI_Object.h>
 
 class ModuleBase_IWorkshop;
-class XGUI_Workshop;
+class PartSet_Module;
 
 #include <QString>
 
@@ -33,19 +33,15 @@ public:
 
   virtual ~PartSet_OverconstraintListener() {};
 
-  // Set erroneous color for the presentation of object if the object is in the conflicting list
-  // \param theObject an object to be settled
-  // \param theUpdateViewer a boolean state whether the current viewer should be updated
-  //bool customizeObject(ObjectPtr theObject, const bool theUpdateViewer);
+  /// If active state is changed, update fully defined state and sketch sub-entities color
+  /// \param theActive a state
+  void setActive(const bool& theActive);
 
   /// Returns true if the object belongs to internal container of conflicting objects
   /// \param theObject an object to be checked
-  /// \return boolean result
-  bool isConflictingObject(const ObjectPtr& theObject);
-
-  /// Returns values of conflicting color
   /// \param theColor the output container to be filled in [red, green, blue] values
-  void getConflictingColor(std::vector<int>& theColor);
+  /// \return boolean result
+  void getCustomColor(const ObjectPtr& theObject, std::vector<int>& theColor);
 
   /// Redefinition of Events_Listener method
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
@@ -66,8 +62,8 @@ protected:
   void redisplayObjects(const std::set<ObjectPtr>& theObjects);
 
 private:
-  /// Returns workshop
-  XGUI_Workshop* workshop() const;
+  /// Returns module
+  PartSet_Module* module() const;
 
 #ifdef _DEBUG
   /// Unite objects in one string information
@@ -77,8 +73,10 @@ private:
 #endif
 
 private:
-  std::set<ObjectPtr> myConflictingObjects;
   ModuleBase_IWorkshop* myWorkshop;
+  bool myIsActive; /// state if sketch is active
+  std::set<ObjectPtr> myConflictingObjects;
+  bool myIsFullyConstrained; /// state if Solver is fully constrained, DOF = 0
 };
 
 #endif

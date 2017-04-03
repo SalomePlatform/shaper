@@ -68,10 +68,8 @@ public:
   /// Set state of the presentation, in case of conflicting state, the icon of the presentation is
   /// visualized in error color. The state is stored in an internal field, so should be changed
   /// when constraint become not conflicting
-  /// \param theConflicting a state
   /// \param theColor a color for conflicting object
-  Standard_EXPORT void SetConflictingConstraint(const bool& theConflicting,
-                                                const std::vector<int>& theColor);
+  Standard_EXPORT void SetCustomColor(const std::vector<int>& theColor);
 
   /// Add a bounding box of the presentation to common bounding box
   /// \param theBndBox the common bounding box to update
@@ -113,7 +111,7 @@ protected:
 
   /// Update myPntArray according to presentation positions
   /// \return true in case of success
-  virtual bool updateIfReadyToDisplay(double theStep) const { return true; }
+  virtual bool updateIfReadyToDisplay(double theStep, bool withColor) const { return true; }
 
   /// Draw a shape into the given presentation scene
   /// \param theShape the shape to draw
@@ -149,7 +147,10 @@ private:
 
   Select3D_EntitySequence mySPoints;
 
-  bool myIsConflicting; /// state if the presentation is visualized in error state
+  bool myIsCustomColor; /// state if the presentation is visualized in custom color
+  Quantity_Color myCustomColor; /// the color of mid ring if there is a conflict
+
+  //bool myIsConflicting; /// state if the presentation is visualized in error state
   Handle(Image_AlienPixMap) myErrorIcon;
   Handle(Graphic3d_MarkerImage) myErrorImage;
 

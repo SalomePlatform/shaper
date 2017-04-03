@@ -49,6 +49,12 @@
 #include <iostream>
 #endif
 
+#define SKETCH_ENTITY_COLOR "225,0,0"
+#define SKETCH_EXTERNAL_COLOR "170,0,225"
+#define SKETCH_AUXILIARY_COLOR "0,85,0"
+#define SKETCH_OVERCONSTRAINT_COLOR "0,0,0"
+#define SKETCH_FULLY_CONSTRAINED_COLOR "0,150,0"
+
 //#define SET_PLANES_COLOR_IN_PREFERENCES
 
 // the only created instance of this plugin
@@ -123,6 +129,10 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   Config_PropManager::registerProp("Visualization", "sketch_overconstraint_color",
                                    "Sketch overconstraint color",
                                    Config_Prop::Color, SKETCH_OVERCONSTRAINT_COLOR);
+
+  Config_PropManager::registerProp("Visualization", "sketch_fully_constrained_color",
+                                   "Sketch fully constrained color",
+                                   Config_Prop::Color, SKETCH_FULLY_CONSTRAINED_COLOR);
 
   // register sketcher properties
 #ifdef SET_PLANES_COLOR_IN_PREFERENCES

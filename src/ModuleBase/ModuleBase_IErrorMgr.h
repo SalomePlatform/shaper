@@ -8,9 +8,13 @@
 #define ModuleBase_IErrorMgr_H
 
 #include "ModuleBase.h"
+
 #include <QObject>
 
+#include <memory>
+
 class ModuleBase_IPropertyPanel;
+class ModelAPI_Feature;
 
 /**
  * \class ModuleBase_IErrorMgr
@@ -33,6 +37,10 @@ public:
 
   /// \return Currently installed property panel
   ModuleBase_IPropertyPanel* propertyPanel() const { return myPropertyPanel; }
+
+  /// Update actions for the given feature
+  /// \param theFeature a feature
+  virtual void updateActions(const std::shared_ptr<ModelAPI_Feature>& theFeature) = 0;
 
 protected slots:
   /// Process values changed event for processing feature attribute validation errors.

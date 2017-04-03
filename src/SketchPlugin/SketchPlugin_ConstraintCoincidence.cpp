@@ -11,10 +11,13 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
 
+#include <ModelAPI_Events.h>
 #include <ModelGeomAlgo_Point2D.h>
 #include <GeomDataAPI_Point2D.h>
 
 #include <SketcherPrs_Factory.h>
+
+#include <Events_Loop.h>
 
 SketchPlugin_ConstraintCoincidence::SketchPlugin_ConstraintCoincidence()
 {
@@ -95,4 +98,30 @@ AttributePoint2DPtr SketchPlugin_ConstraintCoincidence::getPoint(const FeaturePt
                                                       SketchPlugin_Constraint::ENTITY_B(),
                                  SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
   return aPoint;
+}
+
+void SketchPlugin_ConstraintCoincidence::createCoincidenceFeature(SketchPlugin_Sketch* theSketch,
+                                           const std::shared_ptr<GeomDataAPI_Point2D>& thePoint1,
+                                           const std::shared_ptr<GeomDataAPI_Point2D>& thePoint2)
+{
+  FeaturePtr aFeature;
+  if (theSketch) {
+    aFeature = theSketch->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+  } else {
+    std::shared_ptr<ModelAPI_Document> aDoc = theSketch->document();
+    aFeature = aDoc->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+  }
+
+  std::shared_ptr<ModelAPI_Data> aData = aFeature->data();
+
+  std::shared_ptr<ModelAPI_AttributeRefAttr> aRef1 = std::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  aRef1->setAttr(thePoint1);
+
+  std::shared_ptr<ModelAPI_AttributeRefAttr> aRef2 = std::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
+  aRef2->setAttr(thePoint2);
+
+  // we need to flush created signal in order to coincidence is processed by solver
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
 }

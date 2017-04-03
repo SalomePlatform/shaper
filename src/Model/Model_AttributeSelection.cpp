@@ -663,7 +663,12 @@ void Model_AttributeSelection::selectSubShape(
       }
     }
     setValue(aCont, aShapeToBeSelected);
+    return;
   }
+
+  TDF_Label aSelLab = selectionLabel();
+  setInvalidIfFalse(aSelLab, false);
+  reset();
 }
 
 int Model_AttributeSelection::Id()

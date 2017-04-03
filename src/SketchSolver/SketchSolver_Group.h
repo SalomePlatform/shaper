@@ -37,7 +37,7 @@ class SketchSolver_Group
   /// \brief Returns true if the group has no constraints yet
   inline bool isEmpty() const
   {
-    return myConstraints.empty();
+    return myConstraints.empty() && myTempConstraints.empty();
   }
 
   /// \brief Check for valid sketch data
@@ -84,6 +84,9 @@ class SketchSolver_Group
   void blockEvents(bool isBlocked);
 
 private:
+  /// \biref Verify constraints have not been removed
+  bool areConstraintsValid() const;
+
   /** \brief Removes constraints from the group
    *  \param[in] theConstraint constraint to be removed
    */
@@ -113,6 +116,8 @@ private:
   int  myDOF; ///< degrees of freedom of the current sketch
 
   bool myIsEventsBlocked; ///< shows the events are blocked for this group
+
+  int myMultiConstraintUpdateStack; ///< depth of the stack updating "Multi" constraints
 };
 
 typedef std::shared_ptr<SketchSolver_Group> SketchGroupPtr;

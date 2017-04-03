@@ -66,17 +66,6 @@ for SubIndex in range(SketchFeatures.numberOfSubs()):
 assert(idList_after.count(SketchLineId) == 3)
 assert(idList_after.count(SketchConstraintCoincidenceId) == 2)
 
-#check if line points are the same
-assert(SketchLine_1.startPoint().x() == 200)
-assert(SketchLine_1.startPoint().y() == 20)
-assert(SketchLine_1.endPoint().x() == 20)
-assert(SketchLine_1.endPoint().y() == 70)
-
-assert(SketchLine_3.startPoint().x() == -10)
-assert(SketchLine_3.startPoint().y() == 190)
-assert(SketchLine_3.endPoint().x() == 90)
-assert(SketchLine_3.endPoint().y() == 50)
-
 model.end()
 
 #assert(model.checkPythonDump())

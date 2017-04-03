@@ -118,6 +118,10 @@ void SketchSolver_ConstraintMirror::adjustConstraint()
     FeaturePtr aBase = ModelAPI_Feature::feature(*aBIt);
     FeaturePtr aMirrored = ModelAPI_Feature::feature(*aMIt);
     mirrorEntities(aMirrorLine, aBase, aMirrored);
+
+    // update mirrored entity if it exists in the storage
+    if (myStorage->entity(aMirrored))
+      myStorage->update(aMirrored);
   }
 }
 

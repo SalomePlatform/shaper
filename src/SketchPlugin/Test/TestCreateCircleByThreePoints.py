@@ -22,21 +22,11 @@ __updated__ = "2017-03-22"
 #=========================================================================
 TOLERANCE = 1.e-7
 
-def getLastCircle(theSketch):
-    """
-    obtains last feature from the sketch and generates error if the feature is not a circle
-    """
-    expectedKind = "SketchCircle"
-    for anIndex in range(theSketch.numberOfSubs() - 1, -1, -1):
-        aSub = theSketch.subFeature(anIndex)
-        if (aSub.getKind() == expectedKind):
-            return aSub
-
 def verifyLastCircle(theSketch, theX, theY, theR):
     """
     subroutine to verify position of last circle in the sketch
     """
-    aLastCircle = getLastCircle(theSketch)
+    aLastCircle = model.lastSubFeature(theSketch, "SketchCircle")
     aCenter = geomDataAPI_Point2D(aLastCircle.attribute("circle_center"))
     verifyPointCoordinates(aCenter, theX, theY)
     aRadius = aLastCircle.real("circle_radius")
@@ -47,14 +37,14 @@ def verifyPointCoordinates(thePoint, theX, theY):
 
 def verifyPointOnCircle(thePoint, theCircle):
     aCircleCenter = geomDataAPI_Point2D(theCircle.attribute("circle_center"))
-    aDistCP = distancePointPoint(aCircleCenter, thePoint)
+    aDistCP = model.distancePointPoint(aCircleCenter, thePoint)
     aCircleRadius = theCircle.real("circle_radius").value()
     assert math.fabs(aDistCP - aCircleRadius) < TOLERANCE, "Point is not on circle, distance: {0}, radius of circle: {1}".format(aDistCP, aCircleRadius)
 
 def verifyTangentCircles(theCircle1, theCircle2):
     aCenter1 = geomDataAPI_Point2D(theCircle1.attribute("circle_center"))
     aCenter2 = geomDataAPI_Point2D(theCircle2.attribute("circle_center"))
-    aDistCC = distancePointPoint(aCenter1, aCenter2)
+    aDistCC = model.distancePointPoint(aCenter1, aCenter2)
     aRadius1 = theCircle1.real("circle_radius").value()
     aRadius2 = theCircle2.real("circle_radius").value()
     verifyTangentCircular(aDistCC, aRadius1, aRadius2)
@@ -63,9 +53,9 @@ def verifyTangentCircleArc(theCircle, theArc):
     aCircleCenter = geomDataAPI_Point2D(theCircle.attribute("circle_center"))
     anArcCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
     anArcStart = geomDataAPI_Point2D(theArc.attribute("start_point"))
-    aDistCC = distancePointPoint(aCircleCenter, anArcCenter)
+    aDistCC = model.distancePointPoint(aCircleCenter, anArcCenter)
     aCircleRadius = theCircle.real("circle_radius").value()
-    anArcRadius = distancePointPoint(anArcCenter, anArcStart)
+    anArcRadius = model.distancePointPoint(anArcCenter, anArcStart)
     verifyTangentCircular(aDistCC, aCircleRadius, anArcRadius)
 
 def verifyTangentCircular(theDistBetweenCenters, theRadius1, theRadius2):
@@ -78,9 +68,6 @@ def verifyTangentCircleLine(theCircle, theLine):
     aRadius = theCircle.real("circle_radius").value()
     aDistCL = distancePointLine(aCenter, theLine)
     assert math.fabs(aDistCL - aRadius) < TOLERANCE, "Circle and line are not tangent"
-
-def distancePointPoint(thePoint1, thePoint2):
-    return thePoint1.pnt().distance(thePoint2.pnt())
 
 def distancePointLine(thePoint, theLine):
     aLineStart = geomDataAPI_Point2D(theLine.attribute("StartPoint")).pnt().xy()
@@ -140,7 +127,7 @@ verifyLastCircle(aSketchFeature, expectedCenter[0], expectedCenter[1], expectedR
 # Test 2. Create a circle by three points coincident to other points
 #=========================================================================
 # get previous circle
-aPrevCircle = getLastCircle(aSketchFeature)
+aPrevCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
 aPrevCenter = geomDataAPI_Point2D(aPrevCircle.attribute("circle_center"))
 aPrevCenterXY = [aPrevCenter.x(), aPrevCenter.y()]
 aPrevCircleRadius = aPrevCircle.real("circle_radius").value()
@@ -150,7 +137,7 @@ aLineStart = [10., 0.]
 aLineEnd = [10., 50.]
 aSession.startOperation()
 aPoint = aSketchFeature.addFeature("SketchPoint")
-aPointCoord = geomDataAPI_Point2D(aPoint.attribute("PointCoordindates"))
+aPointCoord = geomDataAPI_Point2D(aPoint.attribute("PointCoordinates"))
 aPointCoord.setValue(aPointCoodinates[0], aPointCoodinates[1])
 aLine = aSketchFeature.addFeature("SketchLine")
 aStartPnt = geomDataAPI_Point2D(aLine.attribute("StartPoint"))
@@ -183,7 +170,7 @@ verifyPointCoordinates(aPrevCenter, aPrevCenterXY[0], aPrevCenterXY[1])
 verifyPointCoordinates(aPointCoord, aPointCoodinates[0], aPointCoodinates[1])
 verifyPointCoordinates(aStartPnt, aLineStart[0], aLineStart[1])
 # check newly created circle passes through the points
-aCircle = getLastCircle(aSketchFeature)
+aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
 verifyPointOnCircle(aPrevCenter, aCircle)
 verifyPointOnCircle(aPointCoord, aCircle)
 verifyPointOnCircle(aStartPnt, aCircle)
@@ -236,7 +223,7 @@ verifyPointCoordinates(anArcCenterPnt, anArcCenter[0], anArcCenter[1])
 verifyPointCoordinates(anArcStartPnt, anArcStart[0], anArcStart[1])
 verifyPointCoordinates(anArcEndPnt, anArcEnd[0], anArcEnd[1])
 # check newly created circle passes through the points
-aCircle = getLastCircle(aSketchFeature)
+aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
 verifyTangentCircles(aCircle, aPrevCircle)
 verifyTangentCircleArc(aCircle, anArc)
 verifyTangentCircleLine(aCircle, aLine)

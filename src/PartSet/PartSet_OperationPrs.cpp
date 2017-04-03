@@ -348,6 +348,41 @@ void PartSet_OperationPrs::getResultShapes(const FeaturePtr& theFeature,
   }
 }
 
+void PartSet_OperationPrs::getPresentationShapes(const FeaturePtr& theFeature,
+                                           ModuleBase_IWorkshop* theWorkshop,
+                                           QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes,
+                                           const bool theListShouldBeCleared)
+{
+  if (theListShouldBeCleared)
+    theObjectShapes.clear();
+
+  if (!theFeature.get() || !theFeature->data()->isValid()) // if feature is already removed
+    return;
+
+  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(theWorkshop)->displayer();
+
+  GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theFeature);
+  if (!aPrs.get())
+    return;
+
+  AISObjectPtr anAIS = aPrs->getAISObject(aDisplayer->getAISObject(theFeature));
+  if (!anAIS.get())
+    return;
+
+  Handle(AIS_InteractiveObject) anAISPrs = anAIS->impl<Handle(AIS_InteractiveObject)>();
+  if (!anAISPrs.IsNull()) {
+    Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(anAISPrs);
+    if (!aShapePrs.IsNull()) {
+      TopoDS_Shape aShape = aShapePrs->Shape();
+      if (!aShape.IsNull()) {
+        std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape());
+        aGeomShape->setImpl(new TopoDS_Shape(aShape));
+        appendShapeIfVisible(theWorkshop, theFeature, aGeomShape, theObjectShapes);
+      }
+    }
+  }
+}
+
 void PartSet_OperationPrs::getHighlightedShapes(ModuleBase_IWorkshop* theWorkshop,
                                                 QMap<ObjectPtr,
                                                 QList<GeomShapePtr> >& theObjectShapes)

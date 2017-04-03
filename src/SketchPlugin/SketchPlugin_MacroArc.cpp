@@ -10,10 +10,12 @@
 #include "SketchPlugin_ConstraintTangent.h"
 #include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_Tools.h"
+#include "SketchPlugin_MacroArcReentrantMessage.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
@@ -27,12 +29,15 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_XY.h>
+#include <GeomAPI_ShapeIterator.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
-#include <GeomAlgoAPI_PointBuilder.h>
+
+#include <GeomAlgoAPI_Circ2dBuilder.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_PointBuilder.h>
 
 // for sqrt on Linux
 #include <math.h>
@@ -46,6 +51,69 @@ static void projectPointOnCircle(AttributePoint2DPtr& thePoint, const GeomAPI_Ci
   std::shared_ptr<GeomAPI_Pnt2d> aProjection = theCircle.project(thePoint->pnt());
   if(aProjection.get())
     thePoint->setValue(aProjection);
+}
+
+static void intersectShapeAndCircle(const GeomShapePtr& theShape,
+                                    const GeomAPI_Circ2d& theCircle,
+                                    const SketchPlugin_Sketch* theSketch,
+                                    AttributePoint2DPtr& theIntersection)
+{
+  if (!theShape->isEdge())
+    return projectPointOnCircle(theIntersection, theCircle);
+
+  // convert shape to unbounded
+  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(theShape));
+  if (anEdge->isLine()) {
+    static const double HALF_SIZE = 1.e6;
+    std::shared_ptr<GeomAPI_XYZ> aLoc = anEdge->line()->location()->xyz();
+    std::shared_ptr<GeomAPI_XYZ> aDir = anEdge->line()->direction()->xyz();
+
+    std::shared_ptr<GeomAPI_Pnt> aStart(
+        new GeomAPI_Pnt(aLoc->added(aDir->multiplied(-HALF_SIZE))));
+    std::shared_ptr<GeomAPI_Pnt> aEnd(
+        new GeomAPI_Pnt(aLoc->added(aDir->multiplied(HALF_SIZE))));
+    anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, aEnd);
+  } else if (anEdge->isArc()) {
+    std::shared_ptr<GeomAPI_Circ> aCircle = anEdge->circle();
+    anEdge = GeomAlgoAPI_EdgeBuilder::lineCircle(
+        aCircle->center(), aCircle->normal(), aCircle->radius());
+  }
+
+  // convert 2D circle to 3D object
+  std::shared_ptr<GeomAPI_Pnt2d> aCenter2d = theCircle.center();
+  std::shared_ptr<GeomAPI_Pnt> aCenter(theSketch->to3D(aCenter2d->x(), aCenter2d->y()));
+  std::shared_ptr<GeomDataAPI_Dir> aNDir = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      const_cast<SketchPlugin_Sketch*>(theSketch)->attribute(SketchPlugin_Sketch::NORM_ID()));
+  std::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
+
+  GeomShapePtr aCircleShape =
+      GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, theCircle.radius());
+
+  GeomShapePtr anInter = anEdge->intersect(aCircleShape);
+  std::shared_ptr<GeomAPI_Pnt2d> anInterPnt;
+  if (!anInter)
+    return projectPointOnCircle(theIntersection, theCircle);
+  if (anInter->isVertex()) {
+    std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(anInter));
+    anInterPnt = theSketch->to2D(aVertex->point());
+  } else if (anInter->isCompound()) {
+    double aMinDist = 1.e300;
+
+    GeomAPI_ShapeIterator anIt(anInter);
+    for (; anIt.more(); anIt.next()) {
+      GeomShapePtr aCurrent = anIt.current();
+      if (!aCurrent->isVertex())
+        continue;
+      std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aCurrent));
+      std::shared_ptr<GeomAPI_Pnt2d> aPnt = theSketch->to2D(aVertex->point());
+      double aDist = aPnt->distance(theIntersection->pnt());
+      if (aDist < aMinDist) {
+        aMinDist = aDist;
+        anInterPnt = aPnt;
+      }
+    }
+  }
+  theIntersection->setValue(anInterPnt);
 }
 
 
@@ -82,12 +150,16 @@ void SketchPlugin_MacroArc::initAttributes()
   data()->addAttribute(END_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(PASSED_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
 
+  data()->addAttribute(EDIT_ARC_TYPE_ID(), ModelAPI_AttributeString::typeId());
+
   boolean(REVERSED_ID())->setValue(false);
+  string(EDIT_ARC_TYPE_ID())->setValue("");
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CENTER_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), START_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), END_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PASSED_POINT_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EDIT_ARC_TYPE_ID());
 }
 
 void SketchPlugin_MacroArc::attributeChanged(const std::string& theID)
@@ -143,12 +215,17 @@ void SketchPlugin_MacroArc::attributeChanged(const std::string& theID)
   }
 
   bool aWasBlocked = data()->blockSendAttributeUpdated(true);
+  if(myCenter.get()) {
+    // center attribute is used in processEvent() to set reference to reentrant arc
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_POINT_ID()))
+        ->setValue(myCenter);
+  }
   real(RADIUS_ID())->setValue(aRadius);
   real(ANGLE_ID())->setValue(anAngle);
   data()->blockSendAttributeUpdated(aWasBlocked, false);
 }
 
-GeomShapePtr SketchPlugin_MacroArc::getArcShape()
+GeomShapePtr SketchPlugin_MacroArc::getArcShape(bool isBound)
 {
   if(!myStart.get() || !myEnd.get() || !myCenter.get()) {
     return GeomShapePtr();
@@ -166,9 +243,15 @@ GeomShapePtr SketchPlugin_MacroArc::getArcShape()
     std::dynamic_pointer_cast<GeomDataAPI_Dir>(aSketch->attribute(SketchPlugin_Sketch::NORM_ID()));
   std::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
 
-  GeomShapePtr anArcShape = boolean(REVERSED_ID())->value() ?
-      GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, anEnd, aStart, aNormal)
-    : GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStart, anEnd, aNormal);
+  GeomShapePtr anArcShape;
+  if (isBound) {
+    anArcShape = boolean(REVERSED_ID())->value() ?
+        GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, anEnd, aStart, aNormal)
+      : GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStart, anEnd, aNormal);
+  } else {
+    double aRadius = aCenter->distance(aStart);
+    anArcShape = GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, aRadius);
+  }
 
   return anArcShape;
 }
@@ -268,6 +351,97 @@ void SketchPlugin_MacroArc::execute()
                                          ObjectPtr(),
                                          false);
   }
+
+  // message to init reentrant operation
+  static Events_ID anId = SketchPlugin_MacroArcReentrantMessage::eventId();
+  std::shared_ptr<SketchPlugin_MacroArcReentrantMessage> aMessage = std::shared_ptr
+    <SketchPlugin_MacroArcReentrantMessage>(new SketchPlugin_MacroArcReentrantMessage(anId, 0));
+
+  std::string anEditArcType = string(EDIT_ARC_TYPE_ID())->value();
+  aMessage->setTypeOfCreation(!anEditArcType.empty() ? anEditArcType : anArcType);
+  aMessage->setCreatedFeature(anArcFeature);
+  Events_Loop::loop()->send(aMessage);
+}
+
+std::string SketchPlugin_MacroArc::processEvent(const std::shared_ptr<Events_Message>& theMessage)
+{
+  std::string aFilledAttributeName;
+  std::shared_ptr<SketchPlugin_MacroArcReentrantMessage> aReentrantMessage =
+        std::dynamic_pointer_cast<SketchPlugin_MacroArcReentrantMessage>(theMessage);
+  if (aReentrantMessage.get()) {
+    FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
+    std::string anArcType = aReentrantMessage->typeOfCreation();
+
+    string(ARC_TYPE())->setValue(anArcType);
+
+    aFilledAttributeName = ARC_TYPE();
+    if(anArcType == ARC_TYPE_BY_TANGENT_EDGE()) {
+      aFilledAttributeName = TANGENT_POINT_ID();
+      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                                                        attribute(aFilledAttributeName));
+      FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
+      aRefAttr->setAttr(aCreatedFeature->attribute(SketchPlugin_Arc::END_ID()));
+    }
+    else {
+      ObjectPtr anObject = aReentrantMessage->selectedObject();
+      AttributePtr anAttribute = aReentrantMessage->selectedAttribute();
+      std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = aReentrantMessage->clickedPoint();
+
+      if (aClickedPoint.get() && (anObject.get() || anAttribute.get())) {
+        if (anArcType == ARC_TYPE_BY_CENTER_AND_POINTS() ||
+            anArcType == ARC_TYPE_BY_THREE_POINTS()) {
+          std::string aReferenceAttributeName;
+          if (anArcType == ARC_TYPE_BY_CENTER_AND_POINTS()) {
+            aFilledAttributeName = CENTER_POINT_ID();
+            aReferenceAttributeName = CENTER_POINT_REF_ID();
+          }
+          else {
+            aFilledAttributeName = START_POINT_2_ID();
+            aReferenceAttributeName = START_POINT_REF_ID();
+          }
+          // fill 2d point attribute
+          AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                                            attribute(aFilledAttributeName));
+          aPointAttr->setValue(aClickedPoint);
+          // fill reference attribute
+          AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                                                          attribute(aReferenceAttributeName));
+          if (aRefAttr.get()) {
+            if (anAttribute.get()) {
+              if (!anAttribute->owner().get() || !anAttribute->owner()->data()->isValid()) {
+                FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
+                if (aCreatedFeature.get()) {
+                  std::string anID = anAttribute->id();
+                  std::string anArcID;
+                  if (anID == END_POINT_1_ID() || anID == END_POINT_2_ID() ||
+                      anID == END_POINT_3_ID())
+                    anArcID = SketchPlugin_Arc::END_ID();
+                  else if (anID == START_POINT_1_ID() || anID ==START_POINT_2_ID())
+                    anArcID = SketchPlugin_Arc::START_ID();
+                  else if (anID == CENTER_POINT_ID())
+                    anArcID = SketchPlugin_Arc::CENTER_ID();
+                  anAttribute = aCreatedFeature->attribute(anArcID);
+                }
+              }
+              aRefAttr->setAttr(anAttribute);
+            }
+            else if (anObject.get()) {
+              // if presentation of previous reentrant macro arc is used, the object is invalid,
+              // we should use result of previous feature of the message(Arc)
+              if (!anObject->data()->isValid()) {
+                FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
+                if (aCreatedFeature.get())
+                  anObject = aCreatedFeature->lastResult();
+              }
+              aRefAttr->setObject(anObject);
+            }
+          }
+        }
+      }
+    }
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  }
+  return aFilledAttributeName;
 }
 
 FeaturePtr SketchPlugin_MacroArc::createArcFeature()
@@ -311,9 +485,24 @@ void SketchPlugin_MacroArc::fillByCenterAndTwoPassed()
 
   GeomAPI_Circ2d aCircleForArc(myCenter, myStart);
 
-  // End point should be a projection on circle.
   bool aWasBlocked = data()->blockSendAttributeUpdated(true);
-  projectPointOnCircle(anEndPointAttr, aCircleForArc);
+  // check the end point is referred to another feature
+  GeomShapePtr aRefShape;
+  AttributeRefAttrPtr aEndPointRefAttr = refattr(END_POINT_REF_ID());
+  if (aEndPointRefAttr && aEndPointRefAttr->isInitialized()) {
+    if (aEndPointRefAttr->isObject()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aEndPointRefAttr->object());
+      if (aFeature)
+        aRefShape = aFeature->lastResult()->shape();
+    }
+  }
+  if (aRefShape) {
+    // Calculate end point as an intersection between circle and another shape
+    intersectShapeAndCircle(aRefShape, aCircleForArc, sketch(), anEndPointAttr);
+  } else {
+    // End point should be a projection on circle.
+    projectPointOnCircle(anEndPointAttr, aCircleForArc);
+  }
   data()->blockSendAttributeUpdated(aWasBlocked, false);
   myEnd = anEndPointAttr->pnt();
 
@@ -357,17 +546,22 @@ void SketchPlugin_MacroArc::fillByThreePassedPoints()
     SketchPlugin_Tools::convertRefAttrToPointOrTangentCurve(
         refattr(PASSED_POINT_REF_ID()), aPassedPointAttr, aTangentCurve, aPassedPnt);
 
-    std::shared_ptr<GeomAPI_Interface> aPassed;
-    if (aTangentCurve)
-      aPassed = aTangentCurve;
-    else
-      aPassed = aPassedPnt;
+    GeomAlgoAPI_Circ2dBuilder aCircBuilder(SketchPlugin_Sketch::plane(sketch()));
+    aCircBuilder.addPassingPoint(myStart);
+    aCircBuilder.addPassingPoint(myEnd);
+    if (aTangentCurve) {
+      aCircBuilder.addTangentCurve(aTangentCurve);
+      aCircBuilder.setClosestPoint(aPassedPointAttr->pnt());
+    } else
+      aCircBuilder.addPassingPoint(aPassedPnt);
 
-    std::shared_ptr<GeomAPI_Ax3> anAxis = SketchPlugin_Sketch::plane(sketch());
-    GeomAPI_Circ2d aCircle(myStart, myEnd, aPassed, anAxis);
-    myCenter = aCircle.center();
+    std::shared_ptr<GeomAPI_Circ2d> aCircle = aCircBuilder.circle();
+    if (!aCircle)
+      return;
+    myCenter = aCircle->center();
 
-    recalculateReversedFlagByPassed(aCircle);
+    aCircle = std::shared_ptr<GeomAPI_Circ2d>(new GeomAPI_Circ2d(myCenter, myStart));
+    recalculateReversedFlagByPassed(*aCircle);
   } else
     myCenter.reset(new GeomAPI_Pnt2d(myStart->xy()->added(myEnd->xy())->multiplied(0.5)));
 }
@@ -416,11 +610,15 @@ void SketchPlugin_MacroArc::fillByTangentEdge()
   FeaturePtr aTangentFeature = ModelAPI_Feature::feature(aTangentPointAttr->owner());
   std::shared_ptr<GeomAPI_Shape> aTangentShape = aTangentFeature->lastResult()->shape();
 
-  std::shared_ptr<GeomAPI_Ax3> anAxis = SketchPlugin_Sketch::plane(sketch());
-  GeomAPI_Circ2d aCircle(myStart, myEnd, aTangentShape, anAxis);
-  myCenter = aCircle.center();
+  GeomAlgoAPI_Circ2dBuilder aCircBuilder(SketchPlugin_Sketch::plane(sketch()));
+  aCircBuilder.addPassingPoint(myStart);
+  aCircBuilder.addPassingPoint(myEnd);
+  aCircBuilder.addTangentCurve(aTangentShape);
+
+  std::shared_ptr<GeomAPI_Circ2d> aCircle = aCircBuilder.circle();
+  myCenter = aCircle->center();
 
   // rebuild circle to set start point equal to zero parameter
-  aCircle = GeomAPI_Circ2d(myCenter, myStart);
-  recalculateReversedFlagByEnd(aCircle);
+  aCircle = std::shared_ptr<GeomAPI_Circ2d>(new GeomAPI_Circ2d(myCenter, myStart));
+  recalculateReversedFlagByEnd(*aCircle);
 }

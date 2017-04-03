@@ -93,11 +93,11 @@ public:
   /// \brief Remove all features became invalid
   virtual void removeInvalidEntities() = 0;
 
-  /// \brief Check the features is not removed
-  bool isConsistent() const;
+  /// \brief Check the features have not been removed
+  bool areFeaturesValid() const;
 
   /// \brief Check the storage has constraints
-  bool isEmpty() const
+  virtual bool isEmpty() const
   { return myConstraintMap.empty(); }
 
   /// \brief Shows the sketch should be resolved

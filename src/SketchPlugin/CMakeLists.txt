@@ -31,6 +31,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_IntersectionPoint.h
     SketchPlugin_Line.h
     SketchPlugin_MacroArc.h
+    SketchPlugin_MacroArcReentrantMessage.h
     SketchPlugin_MacroCircle.h
     SketchPlugin_MultiRotation.h
     SketchPlugin_MultiTranslation.h
@@ -125,7 +126,10 @@ INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Sketc
 INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
 ADD_UNIT_TESTS(TestSketchPointLine.py
-               TestCreateArc.py
+               TestCreateArcByCenterStartEnd.py
+               TestCreateArcByThreePoints.py
+               TestCreateArcByTangentEdge.py
+               TestCreateArcChangeType.py
                TestCreateCircleByCenterAndPassed.py
                TestCreateCircleByThreePoints.py
                TestCreateCircleChangeType.py
@@ -141,9 +145,9 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestConstraintVertical.py
                TestConstraintEqual.py
                TestConstraintTangent.py
-               TestConstraintMirror.py
                TestConstraintAngle.py
                TestConstraintMiddlePoint.py
+               TestMirror.py
                TestMultiRotation.py
                TestMultiTranslation.py
                TestFillet.py

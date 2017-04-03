@@ -14,15 +14,15 @@ from salome.shaper import model
 __updated__ = "2017-03-06"
 
 def isArcLineSmooth(theArc, theLine, theTolerance):
-  aCenter = geomDataAPI_Point2D(theArc.attribute("ArcCenter"))
+  aCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
   aDistance = distancePointLine(aCenter, theLine)
   aRadius = arcRadius(theArc)
   return math.fabs(aRadius - aDistance) < theTolerance
 
 def isArcArcSmooth(theArc1, theArc2, theTolerance):
-  aCenter1 = geomDataAPI_Point2D(theArc1.attribute("ArcCenter"))
-  aCenter2 = geomDataAPI_Point2D(theArc2.attribute("ArcCenter"))
-  aDistance = distancePointPoint(aCenter1, aCenter2)
+  aCenter1 = geomDataAPI_Point2D(theArc1.attribute("center_point"))
+  aCenter2 = geomDataAPI_Point2D(theArc2.attribute("center_point"))
+  aDistance = model.distancePointPoint(aCenter1, aCenter2)
   aRadius1 = arcRadius(theArc1)
   aRadius2 = arcRadius(theArc2)
   aRadSum = aRadius1 + aRadius2
@@ -30,17 +30,14 @@ def isArcArcSmooth(theArc1, theArc2, theTolerance):
   return math.fabs(aDistance - aRadSum) < theTolerance or math.fabs(aDistance - aRadDiff) < theTolerance
 
 def arcRadius(theArc):
-  aCenter = geomDataAPI_Point2D(theArc.attribute("ArcCenter"))
-  aStart = geomDataAPI_Point2D(theArc.attribute("ArcStartPoint"))
-  return distancePointPoint(aCenter, aStart)
-
-def distancePointPoint(thePoint1, thePoint2):
-  return math.hypot(thePoint1.x() - thePoint2.x(), thePoint1.y() - thePoint2.y())
+  aCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
+  aStart = geomDataAPI_Point2D(theArc.attribute("start_point"))
+  return model.distancePointPoint(aCenter, aStart)
 
 def distancePointLine(thePoint, theLine):
   aLineStart = geomDataAPI_Point2D(theLine.attribute("StartPoint"))
   aLineEnd = geomDataAPI_Point2D(theLine.attribute("EndPoint"))
-  aLength = distancePointPoint(aLineStart, aLineEnd)
+  aLength = model.distancePointPoint(aLineStart, aLineEnd)
   aDir1x, aDir1y = aLineEnd.x() - aLineStart.x(), aLineEnd.y() - aLineStart.y()
   aDir2x, aDir2y = thePoint.x() - aLineStart.x(), thePoint.y() - aLineStart.y()
   aCross = aDir1x * aDir2y - aDir1y * aDir2x

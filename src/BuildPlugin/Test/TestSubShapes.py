@@ -8,8 +8,8 @@ import random
 
 def createPoint(theSketchFeature):
     aSketchPointFeature = theSketchFeature.addFeature("SketchPoint")
-    aPointCoordindates = geomDataAPI_Point2D(aSketchPointFeature.attribute("PointCoordindates"))
-    aPointCoordindates.setValue(random.uniform(0, 50), random.uniform(0, 50))
+    aPointCoordinates = geomDataAPI_Point2D(aSketchPointFeature.attribute("PointCoordinates"))
+    aPointCoordinates.setValue(random.uniform(0, 50), random.uniform(0, 50))
     return aSketchPointFeature
 
 def createLine(theSketchFeature):

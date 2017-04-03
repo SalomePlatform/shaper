@@ -39,7 +39,7 @@ void FeaturesPlugin_Tools::storeModifiedShapes(GeomAlgoAPI_MakeShape& theAlgo,
     case GeomAPI_Shape::SHELL: {
       theResultBody->loadAndOrientModifiedShapes(&theAlgo,
                                 theBaseShape, GeomAPI_Shape::FACE,
-                                theFaceTag, theName + "_Face", theSubShapes);
+                                theFaceTag, theName + "_Face", theSubShapes, false, true);
       if (theBaseShape->shapeType() == GeomAPI_Shape::COMPSOLID
           || theBaseShape->shapeType() == GeomAPI_Shape::SOLID) {
         break;
@@ -49,12 +49,12 @@ void FeaturesPlugin_Tools::storeModifiedShapes(GeomAlgoAPI_MakeShape& theAlgo,
     case GeomAPI_Shape::WIRE: {
       theResultBody->loadAndOrientModifiedShapes(&theAlgo,
                                 theBaseShape, GeomAPI_Shape::EDGE,
-                                theEdgeTag, theName + "_Edge", theSubShapes);
+                                theEdgeTag, theName + "_Edge", theSubShapes, false, true);
     }
     case GeomAPI_Shape::EDGE: {
       theResultBody->loadAndOrientModifiedShapes(&theAlgo,
                               theBaseShape, GeomAPI_Shape::VERTEX,
-                              theVertexTag, theName + "_Vertex", theSubShapes);
+                              theVertexTag, theName + "_Vertex", theSubShapes, false, true);
     }
   }
 }

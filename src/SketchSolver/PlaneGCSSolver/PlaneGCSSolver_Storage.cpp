@@ -57,6 +57,10 @@ void PlaneGCSSolver_Storage::addTemporaryConstraint(
   if (myConstraintMap.empty())
     return; // no need to process temporary constraints if there is no active constraint
 
+  // before adding movement constraint to solver, re-check its DOF
+  if (mySketchSolver->dof() == 0)
+    mySketchSolver->diagnose();
+
   theSolverConstraint->setId(CID_MOVEMENT);
   constraintsToSolver(theSolverConstraint, mySketchSolver);
 }
@@ -147,10 +151,11 @@ static bool isCopyInMulti(std::shared_ptr<SketchPlugin_Feature> theFeature)
 
 bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
 {
+  bool sendNotify = false;
   bool isUpdated = false;
   EntityWrapperPtr aRelated = entity(theFeature);
   if (aRelated) // send signal to subscribers
-    notify(theFeature);
+    sendNotify = true;
   else { // Feature is not exist, create it
     std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
         std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
@@ -188,6 +193,10 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
     if ((*anAttrIt)->attributeType() == GeomDataAPI_Point2D::typeId() ||
         (*anAttrIt)->attributeType() == ModelAPI_AttributeDouble::typeId())
       isUpdated = update(*anAttrIt) || isUpdated;
+
+  // send notification to listeners due to at least one attribute is changed
+  if (sendNotify && isUpdated)
+    notify(theFeature);
 
   // update arc
   if (aRelated && aRelated->type() == ENTITY_ARC) {
@@ -354,7 +363,7 @@ void PlaneGCSSolver_Storage::removeParameters(const GCS::SET_pD& theParams)
 }
 
 // indicates attribute containing in the external feature
-bool isExternalAttribute(const AttributePtr& theAttribute)
+static bool isExternalAttribute(const AttributePtr& theAttribute)
 {
   if (!theAttribute)
     return false;
@@ -363,9 +372,18 @@ bool isExternalAttribute(const AttributePtr& theAttribute)
   return aSketchFeature.get() && aSketchFeature->isExternal();
 }
 
+static void addOwnerToSet(const AttributePtr& theAttribute, std::set<FeaturePtr>& theFeatures)
+{
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
+  if (anOwner)
+    theFeatures.insert(anOwner);
+}
+
 void PlaneGCSSolver_Storage::refresh() const
 {
   const double aTol = 1000. * tolerance; // tolerance to prevent frequent updates
+
+  std::set<FeaturePtr> anUpdatedFeatures;
 
   std::map<AttributePtr, EntityWrapperPtr>::const_iterator anIt = myAttributeMap.begin();
   for (; anIt != myAttributeMap.end(); ++anIt) {
@@ -381,17 +399,26 @@ void PlaneGCSSolver_Storage::refresh() const
           std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(anIt->second);
       GCSPointPtr aGCSPoint = aPointWrapper->point();
       if (fabs(aPoint2D->x() - (*aGCSPoint->x)) > aTol ||
-          fabs(aPoint2D->y() - (*aGCSPoint->y)) > aTol)
+          fabs(aPoint2D->y() - (*aGCSPoint->y)) > aTol) {
         aPoint2D->setValue(*aGCSPoint->x, *aGCSPoint->y);
+        addOwnerToSet(anIt->first, anUpdatedFeatures);
+      }
       continue;
     }
     AttributeDoublePtr aScalar = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anIt->first);
     if (aScalar) {
       ScalarWrapperPtr aScalarWrapper =
           std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(anIt->second);
-      if (fabs(aScalar->value() - aScalarWrapper->value()) > aTol)
+      if (fabs(aScalar->value() - aScalarWrapper->value()) > aTol) {
         aScalar->setValue(aScalarWrapper->value());
+        addOwnerToSet(anIt->first, anUpdatedFeatures);
+      }
       continue;
     }
   }
+
+  // notify listeners about features update
+  std::set<FeaturePtr>::const_iterator aFIt = anUpdatedFeatures.begin();
+  for (; aFIt != anUpdatedFeatures.end(); ++aFIt)
+    notify(*aFIt);
 }

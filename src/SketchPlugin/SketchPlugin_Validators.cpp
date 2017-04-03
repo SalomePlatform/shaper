@@ -877,12 +877,15 @@ bool SketchPlugin_TrimValidator::isValid(const AttributePtr& theAttribute,
     AttributePtr aPreviewAttr = aTrimFeature->attribute(SketchPlugin_Trim::PREVIEW_OBJECT());
     aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(aPreviewAttr);
     aBaseObject = aBaseObjectAttr->value();
-
-    //return aValid;
   }
 
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObject);
   if (!aBaseFeature)
+    return aValid;
+
+  std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+                                 std::dynamic_pointer_cast<SketchPlugin_Feature>(aBaseFeature);
+  if (!aSketchFeature.get() || aSketchFeature->isCopy())
     return aValid;
 
   std::string aKind = aBaseFeature->getKind();
@@ -1146,7 +1149,8 @@ static std::shared_ptr<GeomAPI_Pnt2d> toPoint(const FeaturePtr& theMacroCircle,
             aPoint3D = anEdge->line()->project(aPoint3D);
           else if (anEdge->isCircle())
             aPoint3D = anEdge->circle()->project(aPoint3D);
-          aPoint = aSketch->to2D(aPoint3D);
+          if(aPoint3D)
+            aPoint = aSketch->to2D(aPoint3D);
         }
       }
     } else {
@@ -1334,7 +1338,7 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
     return true;
   }
 
-  GeomShapePtr anArcShape = anArcFeature->getArcShape();
+  GeomShapePtr anArcShape = anArcFeature->getArcShape(false);
 
   if(!anArcShape.get() || anArcShape->isNull()) {
     return true;
@@ -1350,7 +1354,10 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
   if(aResult.get()) {
     GeomShapePtr aShape = aResult->shape();
     if(aShape.get() && !aShape->isNull()) {
-      return GeomAlgoAPI_ShapeTools::isShapesIntersects(anArcShape, aShape);
+      GeomShapePtr anIntersection = anArcShape->intersect(aShape);
+      if(anIntersection.get() && !anIntersection->isNull()) {
+        return true;
+      }
     }
   }
 
@@ -1363,7 +1370,8 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
     {
       GeomShapePtr aShape = (*anIt)->shape();
       if(aShape.get() && !aShape->isNull()) {
-        if(GeomAlgoAPI_ShapeTools::isShapesIntersects(anArcShape, aShape)) {
+        GeomShapePtr anIntersection = anArcShape->intersect(aShape);
+        if(anIntersection.get() && !anIntersection->isNull()) {
           return true;
         }
       }

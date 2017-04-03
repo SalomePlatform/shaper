@@ -96,6 +96,7 @@ bool PartSet_CustomPrs::displayPresentation(
       break;
     case ModuleBase_IModule::CustomizeResults:
       PartSet_OperationPrs::getResultShapes(myFeature, myWorkshop, aFeatureShapes);
+      PartSet_OperationPrs::getPresentationShapes(myFeature, myWorkshop, aFeatureShapes);
       break;
     case ModuleBase_IModule::CustomizeHighlightedObjects:
       PartSet_OperationPrs::getHighlightedShapes(myWorkshop, aFeatureShapes);

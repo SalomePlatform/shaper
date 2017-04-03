@@ -200,14 +200,8 @@ void SketchSolver_Storage::removeAttribute(AttributePtr theAttribute)
 }
 
 
-bool SketchSolver_Storage::isConsistent() const
+bool SketchSolver_Storage::areFeaturesValid() const
 {
-  // Check the constraints are valid
-  std::map<ConstraintPtr, ConstraintWrapperPtr>::const_iterator
-      aCIter = myConstraintMap.begin();
-  for (; aCIter != myConstraintMap.end(); ++aCIter)
-    if (!aCIter->first->data() || !aCIter->first->data()->isValid())
-      return false;
   // Check the features are valid
   std::map<FeaturePtr, EntityWrapperPtr>::const_iterator aFIter = myFeatureMap.begin();
   for (; aFIter != myFeatureMap.end(); aFIter++)

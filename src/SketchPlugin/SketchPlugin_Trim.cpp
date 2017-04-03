@@ -41,6 +41,8 @@
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_Point.h>
 
+#include <ModelAPI_EventReentrantMessage.h>
+
 #include <ModelAPI_Events.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Arc.h>
@@ -51,8 +53,14 @@
 
 #include <cmath>
 
-#define DEBUG_TRIM
+//#define DEBUG_TRIM_METHODS
+//#define DEBUG_TRIM
+
 #ifdef DEBUG_TRIM
+#include <iostream>
+#endif
+
+#ifdef DEBUG_TRIM_METHODS
 #include <iostream>
 #endif
 
@@ -139,6 +147,8 @@ std::shared_ptr<GeomAPI_Pnt2d> SketchPlugin_Trim::convertPoint(
                                                    const std::shared_ptr<GeomAPI_Pnt>& thePoint)
 {
   std::shared_ptr<GeomAPI_Pnt2d> aPoint;
+  if (!thePoint.get())
+    return aPoint;
 
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                                         data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
@@ -174,8 +184,8 @@ std::shared_ptr<GeomAPI_Pnt2d> SketchPlugin_Trim::convertPoint(
 
 void SketchPlugin_Trim::execute()
 {
-#ifdef DEBUG_TRIM
-  std::cout << "SketchPlugin_Trim::execute" << std::endl;
+#ifdef DEBUG_TRIM_METHODS
+  std::cout << "SketchPlugin_Trim::execute: " << data()->name() << std::endl;
 #endif
 
   SketchPlugin_Sketch* aSketch = sketch();
@@ -194,6 +204,21 @@ void SketchPlugin_Trim::execute()
     return;
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
 
+  /// Remove reference of this feature to feature used in preview, it is not necessary anymore
+  /// as trim will be removed after execute
+  AttributeReferencePtr aPreviewObjectAttr =
+                     std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                     data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+
+  ObjectPtr aPreviewObject = aPreviewObjectAttr->value();
+  AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                           data()->attribute(PREVIEW_POINT()));
+  std::shared_ptr<GeomAPI_Pnt2d> aPreviewPnt2d = aPoint->pnt();
+  // nullify pointer of preview attribute
+  aPreviewObjectAttr->setValue(ResultPtr());
+
+  bool anIsEqualPreviewAndSelected = aPreviewObject == aBaseObject;
+
   /// points of trim
   std::shared_ptr<GeomAPI_Pnt> aStartShapePoint, aLastShapePoint;
 #ifdef DEBUG_TRIM
@@ -202,7 +227,6 @@ void SketchPlugin_Trim::execute()
   findShapePoints(SELECTED_OBJECT(), SELECTED_POINT(), aStartShapePoint, aLastShapePoint);
 
   std::shared_ptr<GeomAPI_Pnt2d> aStartShapePoint2d = convertPoint(aStartShapePoint);
-
   std::shared_ptr<GeomAPI_Pnt2d> aLastShapePoint2d = convertPoint(aLastShapePoint);
 
   std::set<FeaturePtr> aFeaturesToDelete;
@@ -211,17 +235,58 @@ void SketchPlugin_Trim::execute()
   std::map<AttributePtr, std::list<AttributePtr> > aBaseRefAttributes;
   std::list<AttributePtr> aRefsToFeature;
   getRefAttributes(aBaseFeature, aBaseRefAttributes, aRefsToFeature);
-
+#ifdef DEBUG_TRIM
+  std::cout << "---- getRefAttributes ----" << std::endl;
+  std::map<AttributePtr, std::list<AttributePtr> >::const_iterator
+    aRefIt = aBaseRefAttributes.begin(), aRefLast = aBaseRefAttributes.end();
+  std::cout << std::endl << "References to attributes of base feature [" <<
+    aBaseRefAttributes.size() << "]" << std::endl;
+  for (; aRefIt != aRefLast; aRefIt++) {
+    AttributePtr aBaseAttr = aRefIt->first;
+    std::list<AttributePtr> aRefAttributes = aRefIt->second;
+    std::string aRefsInfo;
+    std::list<AttributePtr>::const_iterator aRefAttrIt = aRefAttributes.begin(),
+                                            aRefAttrLast = aRefAttributes.end();
+    for (; aRefAttrIt != aRefAttrLast; aRefAttrIt++) {
+      if (!aRefsInfo.empty())
+        aRefsInfo.append(",");
+      AttributePtr aRAttr = *aRefAttrIt;
+      aRefsInfo.append(aRAttr->id());
+      FeaturePtr aRFeature = ModelAPI_Feature::feature(aRAttr->owner());
+      aRefsInfo.append("(" + aRFeature->name() + ") ");
+    }
+    std::shared_ptr<GeomDataAPI_Point2D> aPointAttr =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aBaseAttr);
+    std::cout << aPointAttr->id().c_str() <<
+      ": " << "[" << aRefAttributes.size() << "] " << aRefsInfo << std::endl;
+  }
+  std::cout << std::endl;
+  std::cout << std::endl << "References to base feature [" <<
+    aRefsToFeature.size() << "]" << std::endl;
+  std::list<AttributePtr>::const_iterator aRefAttrIt = aRefsToFeature.begin(),
+                                          aRefAttrLast = aRefsToFeature.end();
+  std::string aRefsInfo;
+  for (; aRefAttrIt != aRefAttrLast; aRefAttrIt++) {
+    if (!aRefsInfo.empty())
+      aRefsInfo.append(",");
+    AttributePtr aRAttr = *aRefAttrIt;
+    aRefsInfo.append(aRAttr->id());
+    FeaturePtr aRFeature = ModelAPI_Feature::feature(aRAttr->owner());
+    aRefsInfo.append("(" + aRFeature->name() + ") ");
+  }
+  std::cout << "[" << aRefsToFeature.size() << "] " << aRefsInfo << std::endl;
+  std::cout << "---- getRefAttributes:end ----" << std::endl;
+#endif
   // coincidence to result points
   // find coincidences to the base object, it should be used when attribute is found
   // in myObjectToPoints
-  std::map<AttributePtr, FeaturePtr> aCoincidencesToBaseFeature;
-  getCoincidencesToObject(aBaseObject, aCoincidencesToBaseFeature);
+  //std::map<AttributePtr, FeaturePtr> aCoincidencesToBaseFeature;
+  //getCoincidencesToObject(aBaseObject, aCoincidencesToBaseFeature);
 
   std::set<AttributePoint2DPtr> aFurtherCoincidences;
   std::set<std::pair<AttributePtr, AttributePtr>> aModifiedAttributes;
   const std::string& aKind = aBaseFeature->getKind();
-  FeaturePtr aReplacingFeature;
+  FeaturePtr aReplacingFeature, aNewFeature;
   if (aKind == SketchPlugin_Circle::ID()) {
     aReplacingFeature = trimCircle(aStartShapePoint2d, aLastShapePoint2d,
                aFurtherCoincidences, aModifiedAttributes);
@@ -231,20 +296,14 @@ void SketchPlugin_Trim::execute()
     // otherwise Trim feature will be removed with the circle before
     // this operation is finished
     aBaseObjectAttr->setObject(ResultPtr());
-
-    AttributeReferencePtr aPreviewObjectAttr =
-                     std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                     data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
-    aPreviewObjectAttr->setObject(ResultPtr());
-
   }
   else if (aKind == SketchPlugin_Line::ID()) {
-    trimLine(aStartShapePoint2d, aLastShapePoint2d,
-             aFurtherCoincidences, aModifiedAttributes);
+    aNewFeature = trimLine(aStartShapePoint2d, aLastShapePoint2d, aBaseRefAttributes,
+                           aFurtherCoincidences, aModifiedAttributes);
   }
   else if (aKind == SketchPlugin_Arc::ID()) {
-    trimArc(aStartShapePoint2d, aLastShapePoint2d,
-            aFurtherCoincidences, aModifiedAttributes);
+    aNewFeature = trimArc(aStartShapePoint2d, aLastShapePoint2d, aBaseRefAttributes,
+                          aFurtherCoincidences, aModifiedAttributes);
   }
 
   // constraints to end points of trim feature
@@ -260,7 +319,7 @@ void SketchPlugin_Trim::execute()
     std::shared_ptr<GeomAPI_Pnt2d> aPoint2d = aPointAttribute->pnt();
 
 #ifdef DEBUG_TRIM
-    std::cout << "<compare Points> => "
+    std::cout << "<compare Points> => " << std::endl
             << "aPoint2d: [" << aPoint2d->x() << ", " << aPoint2d->y() << "]" << std::endl;
     if (aStartShapePoint2d.get())
       std::cout << "Start Point: [" << aStartShapePoint2d->x() << ", " << aStartShapePoint2d->y()
@@ -288,29 +347,6 @@ void SketchPlugin_Trim::execute()
         break;
       }
     }
-    /*const std::list<AttributePoint2DPtr >& anAttributes = anInfo.first;
-    for (std::list<AttributePoint2DPtr>::const_iterator anAttrIt = anAttributes.begin();
-          anAttrIt != anAttributes.end(); anAttrIt++) {
-      AttributePtr anAttribute = *anAttrIt;
-      if (aCoincidencesToBaseFeature.find(anAttribute) != aCoincidencesToBaseFeature.end())
-      {
-        FeaturePtr anAttrFeature = aCoincidencesToBaseFeature.at(anAttribute);
-        AttributePtr anOtherAttribute;
-        if (std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
-           (anAttrFeature->attribute(SketchPlugin_Constraint::ENTITY_A()))->attr() == anAttribute)
-          anOtherAttribute = anAttrFeature->attribute(SketchPlugin_Constraint::ENTITY_B());
-        else if (std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
-          (anAttrFeature->attribute(SketchPlugin_Constraint::ENTITY_B()))->attr() == anAttribute)
-          anOtherAttribute = anAttrFeature->attribute(SketchPlugin_Constraint::ENTITY_A());
-        else
-          continue;
-        AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
-                                       (anOtherAttribute);
-        if (aRefAttr.get())
-          aRefAttr->setAttr(aPointAttribute);
-      }
-    }
-    */
     const std::list<ObjectPtr>& anObjects = anInfo.second;
     for (std::list<ObjectPtr>::const_iterator anObjectIt = anObjects.begin();
       anObjectIt != anObjects.end(); anObjectIt++) {
@@ -330,11 +366,16 @@ void SketchPlugin_Trim::execute()
                                           aLast = aRefsToFeature.end();
       anIt != aLast; anIt++) {
     AttributePtr anAttribute = *anIt;
+
+    //if (replaceCoincidenceAttribute(anAttribute, aModifiedAttributes))
+    //  continue;
+
     if (setCoincidenceToAttribute(anAttribute, aFurtherCoincidences))
       continue;
 
     if (aReplacingResult.get()) {
-      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
+      AttributeRefAttrPtr aRefAttr =
+          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
       if (aRefAttr.get())
         aRefAttr->setObject(aReplacingResult);
       else {
@@ -346,22 +387,24 @@ void SketchPlugin_Trim::execute()
     }
   }
 
+  updateRefAttConstraints(aBaseRefAttributes, aModifiedAttributes, aFeaturesToDelete);
+
   // Wait all constraints being created, then send update events
   static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
   bool isUpdateFlushed = Events_Loop::loop()->isFlushed(anUpdateEvent);
   if (isUpdateFlushed)
     Events_Loop::loop()->setFlushed(anUpdateEvent, false);
 
-  updateRefAttConstraints(aBaseRefAttributes, aModifiedAttributes, aFeaturesToDelete);
-
   // delete constraints
 #ifdef DEBUG_TRIM
-  std::cout << "remove features and references:" << std::endl;
-  std::set<FeaturePtr>::const_iterator aDIt = aFeaturesToDelete.begin(),
-                                       aDLast = aFeaturesToDelete.end();
-  for (; aDIt != aDLast; aDIt++) {
-    //std::cout << getFeatureInfo(*aDIt, false) << std::endl;
-    //std::cout << std::endl;
+  if (aFeaturesToDelete.size() > 0) {
+    std::cout << "after SPlit: removeFeaturesAndReferences: " << std::endl;
+    std::string aValue;
+    for (std::set<FeaturePtr>::const_iterator anIt = aFeaturesToDelete.begin();
+         anIt != aFeaturesToDelete.end(); anIt++) {
+      FeaturePtr aFeature = *anIt;
+      std::cout << aFeature->data()->name() << std::endl;
+    }
   }
 #endif
   ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToDelete);
@@ -372,9 +415,113 @@ void SketchPlugin_Trim::execute()
     Events_Loop::loop()->setFlushed(anUpdateEvent, true);
   }
 
+  if (anIsEqualPreviewAndSelected) {
+    // equal preview and selected objects
+    // nothing to do if the preview and selected objects are different
+    if (aReplacingResult.get()) { // base object was removed
+      aPreviewObject = aReplacingResult;
+      //aMessage->setSelectedObject(aReplacingResult);
+
+      GeomShapePtr aSelectedShape = aReplacingResult->shape();
+      std::shared_ptr<GeomAPI_Pnt> aPreviewPnt = sketch()->to3D(aPreviewPnt2d->x(),
+                                                                aPreviewPnt2d->y());
+      std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
+      if (ModelGeomAlgo_Point2D::isPointOnEdge(aSelectedShape, aPreviewPnt, aProjectedPoint)) {
+        bool aValue = true;
+      }
+      //aBaseShape = aShape;
+
+#ifdef DEBUG_TRIM_METHODS
+      if (!aSelectedShape.get())
+        std::cout << "Set empty selected object" << std::endl;
+      else
+        std::cout << "Set shape with ShapeType: " << aSelectedShape->shapeTypeStr() << std::endl;
+#endif
+      bool aValue = true;
+    }
+    else {
+      aPreviewObject = ObjectPtr();
+
+      aBaseFeature->execute(); // should recompute shapes of result to do not check obsolete one
+      aBaseObject = getFeatureResult(aBaseFeature);
+      std::shared_ptr<GeomAPI_Pnt> aPreviewPnt = sketch()->to3D(aPreviewPnt2d->x(),
+                                                                aPreviewPnt2d->y());
+      ResultPtr aBaseResult = std::dynamic_pointer_cast<ModelAPI_Result>(aBaseObject);
+      if (aBaseResult) {
+        GeomShapePtr aShape = aBaseResult->shape();
+        std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
+        if (ModelGeomAlgo_Point2D::isPointOnEdge(aShape, aPreviewPnt, aProjectedPoint))
+          aPreviewObject = aBaseResult;
+      }
+      if (!aPreviewObject.get() && aNewFeature.get()) {
+        ResultPtr aNewFeatureResult = getFeatureResult(aNewFeature);
+        if (aNewFeatureResult.get()) {
+          GeomShapePtr aShape = aNewFeatureResult->shape();
+          std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
+          if (ModelGeomAlgo_Point2D::isPointOnEdge(aShape, aPreviewPnt, aProjectedPoint))
+            aPreviewObject = aNewFeatureResult;
+        }
+      }
+    }
+  }
+  if (aPreviewObject.get()) {
+    std::shared_ptr<ModelAPI_EventReentrantMessage> aMessage = std::shared_ptr
+      <ModelAPI_EventReentrantMessage>(new ModelAPI_EventReentrantMessage(
+                                           ModelAPI_EventReentrantMessage::eventId(), 0));
+    aMessage->setSelectedObject(aPreviewObject);
+    Events_Loop::loop()->send(aMessage);
+  }
 #ifdef DEBUG_TRIM
   std::cout << "SketchPlugin_Trim::done" << std::endl;
 #endif
+}
+
+std::string SketchPlugin_Trim::processEvent(const std::shared_ptr<Events_Message>& theMessage)
+{
+#ifdef DEBUG_TRIM_METHODS
+  std::cout << "SketchPlugin_Trim::processEvent:" << data()->name() << std::endl;
+#endif
+
+  std::string aFilledAttributeName;
+
+  std::shared_ptr<ModelAPI_EventReentrantMessage> aMessage =
+        std::dynamic_pointer_cast<ModelAPI_EventReentrantMessage>(theMessage);
+  if (aMessage.get()) {
+    ObjectPtr anObject = aMessage->selectedObject();
+    std::shared_ptr<GeomAPI_Pnt2d> aPoint = aMessage->clickedPoint();
+
+    if (anObject.get() && aPoint.get()) {
+      std::shared_ptr<ModelAPI_AttributeReference> aRefSelectedAttr =
+                            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                            data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
+      std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
+                            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                            data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+      aRefSelectedAttr->setValue(anObject);
+      aRefPreviewAttr->setValue(anObject);
+
+      std::shared_ptr<GeomDataAPI_Point2D> aPointSelectedAttr =
+                            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                            data()->attribute(SketchPlugin_Trim::SELECTED_POINT()));
+      std::shared_ptr<GeomDataAPI_Point2D> aPointPreviewAttr =
+                            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                            data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
+      aPointSelectedAttr->setValue(aPoint);
+      aPointPreviewAttr->setValue(aPoint);
+
+      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+
+      GeomShapePtr aSelectedShape = getSubShape(SELECTED_OBJECT(), SELECTED_POINT());
+#ifdef DEBUG_TRIM_METHODS
+      if (!aSelectedShape.get())
+        std::cout << "Set empty selected object" << std::endl;
+      else
+        std::cout << "Set shape with ShapeType: " << aSelectedShape->shapeTypeStr() << std::endl;
+#endif
+      aFilledAttributeName = SketchPlugin_Trim::SELECTED_OBJECT();
+    }
+  }
+  return aFilledAttributeName;
 }
 
 bool SketchPlugin_Trim::setCoincidenceToAttribute(const AttributePtr& theAttribute,
@@ -398,31 +545,43 @@ bool SketchPlugin_Trim::setCoincidenceToAttribute(const AttributePtr& theAttribu
     if (aPoint2d->isEqual(aRefPnt2d)) {
       AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
                                                                            theAttribute);
-      /*if (theAttribute->id() == SketchPlugin_ConstraintCoincidence::ENTITY_A())
-        aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                  aFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_B()));
-      else if (theAttribute->id() == SketchPlugin_ConstraintCoincidence::ENTITY_B())
-        aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                  aFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_A()));*/
       if (aRefAttr.get()) {
         aRefAttr->setAttr(aPointAttribute);
         aFoundPoint = true;
       }
     }
   }
-  /*AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  if (!aRefAttr.get())
+  return aFoundPoint;
+}
+
+bool SketchPlugin_Trim::replaceCoincidenceAttribute(const AttributePtr& theCoincidenceAttribute,
+                   const std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes)
+{
+  FeaturePtr aCoincidenceFeature = ModelAPI_Feature::feature(theCoincidenceAttribute->owner());
+  if (aCoincidenceFeature->getKind() != SketchPlugin_ConstraintCoincidence::ID())
     return false;
 
-  if (aRefAttr.get())
-    aRefAttr->setObject(aReplacingResult);//continue;
-  else {
-  //AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anIt);
-    AttributeReferencePtr aReferenceAttr =
-                          std::dynamic_pointer_cast<ModelAPI_AttributeReference>(anAttribute);
-  }*/
+  AttributeRefAttrPtr aCAttrA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                         aCoincidenceFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  AttributeRefAttrPtr aCAttrB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                         aCoincidenceFeature->attribute(SketchPlugin_Constraint::ENTITY_B()));
+  AttributePtr aCAttrRefA = aCAttrA->attr();
+  AttributePtr aCAttrRefB = aCAttrB->attr();
 
-  return aFoundPoint;
+  bool isProcessed = false;
+  for (std::set<std::pair<AttributePtr, AttributePtr>>::const_iterator
+       anIt = theModifiedAttributes.begin(); anIt != theModifiedAttributes.end(); anIt++) {
+    AttributePtr anAttributeBefore = anIt->first;
+    if (anAttributeBefore == aCAttrRefA) {
+      aCAttrA->setAttr(anIt->second);
+      isProcessed = true;
+    }
+    if (anAttributeBefore == aCAttrRefB) {
+      aCAttrB->setAttr(anIt->second);
+      isProcessed = true;
+    }
+  }
+  return isProcessed;
 }
 
 bool SketchPlugin_Trim::isMacro() const
@@ -432,6 +591,10 @@ bool SketchPlugin_Trim::isMacro() const
 
 AISObjectPtr SketchPlugin_Trim::getAISObject(AISObjectPtr thePrevious)
 {
+#ifdef DEBUG_TRIM_METHODS
+  std::cout << "SketchPlugin_Trim::getAISObject: " << data()->name() << std::endl;
+#endif
+
   AISObjectPtr anAIS = thePrevious;
 
   std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
@@ -599,7 +762,7 @@ void SketchPlugin_Trim::getRefAttributes(const FeaturePtr& theFeature,
   }
 }
 
-void SketchPlugin_Trim::getCoincidencesToObject(const ObjectPtr& theObject,
+/*void SketchPlugin_Trim::getCoincidencesToObject(const ObjectPtr& theObject,
                    std::map<AttributePtr, FeaturePtr>& theCoincidencesToBaseFeature)
 {
   const std::set<AttributePtr>& aRefsList = theObject->data()->refsToMe();
@@ -635,7 +798,7 @@ void SketchPlugin_Trim::getCoincidencesToObject(const ObjectPtr& theObject,
       theCoincidencesToBaseFeature[anAttribute] = aRefFeature;
     }
   }
-}
+}*/
 
 void SketchPlugin_Trim::updateRefAttConstraints(
                     const std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
@@ -659,27 +822,61 @@ void SketchPlugin_Trim::updateRefAttConstraints(
                                             aRLast = aRefAttributes.end();
 
     AttributePtr aNewAttribute = anIt->second;
-    for (; aRefIt != aRLast; aRefIt++) {
-      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*aRefIt);
-      if (aRefAttr.get()) {
-        if (aNewAttribute.get())
-          aRefAttr->setAttr(aNewAttribute);
-        else
-          theFeaturesToDelete.insert(ModelAPI_Feature::feature(aRefAttr->owner()));
-#ifdef DEBUG_TRIM
-        //FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->owner());
-        //std::cout << " -" << getFeatureInfo(aFeature) << std::endl;
-#endif
+    if (aNewAttribute.get()) {
+      for (; aRefIt != aRLast; aRefIt++) {
+        AttributeRefAttrPtr aRefAttr =
+                        std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*aRefIt);
+        if (aRefAttr.get()) {
+            aRefAttr->setAttr(aNewAttribute);
+        }
       }
     }
   }
 }
 
-void SketchPlugin_Trim::trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
-                                 const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
-                                 std::set<AttributePoint2DPtr>& thePoints,
+void SketchPlugin_Trim::removeReferencesToAttribute(const AttributePtr& theAttribute,
+                  std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes)
+{
+  /// not found in references
+  if (theBaseRefAttributes.find(theAttribute) == theBaseRefAttributes.end())
+    return;
+
+  std::list<AttributePtr> aRefAttributes = theBaseRefAttributes.at(theAttribute);
+  std::list<AttributePtr>::const_iterator aRefIt = aRefAttributes.begin(),
+                                          aRLast = aRefAttributes.end();
+
+  std::set<FeaturePtr> aFeaturesToDelete;
+  for (; aRefIt != aRLast; aRefIt++) {
+    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*aRefIt);
+    if (aRefAttr.get()) {
+      aFeaturesToDelete.insert(ModelAPI_Feature::feature(aRefAttr->owner()));
+    }
+  }
+
+#ifdef DEBUG_TRIM
+  // delete constraints
+  if (aFeaturesToDelete.size() > 0) {
+    std::cout << "removeReferencesToAttribute: " << std::endl;
+    std::string aValue;
+    for (std::set<FeaturePtr>::const_iterator anIt = aFeaturesToDelete.begin();
+         anIt != aFeaturesToDelete.end(); anIt++) {
+      FeaturePtr aFeature = *anIt;
+      std::cout << aFeature->data()->name() << std::endl;
+    }
+  }
+#endif
+  ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToDelete);
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+}
+
+FeaturePtr SketchPlugin_Trim::trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
+                  const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
+                  std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
+                  std::set<AttributePoint2DPtr>& thePoints,
                   std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes)
 {
+  FeaturePtr anNewFeature;
+
   // Check the base objects are initialized.
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                                         data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
@@ -723,9 +920,14 @@ void SketchPlugin_Trim::trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& theStartS
     else
       aPoint = aStartShapePoint.get() ? aStartShapePoint : aLastShapePoint;
 
+    // it is important to delete references before the feature modification because
+    // if deletion will be after the feature modification, solver returns the feature back
+    removeReferencesToAttribute(aBaseFeature->attribute(aModifiedAttribute),
+                                theBaseRefAttributes);
+
     fillPointAttribute(aBaseFeature->attribute(aModifiedAttribute), aPoint);
-    theModifiedAttributes.insert(
-      std::make_pair(aBaseFeature->attribute(aModifiedAttribute), AttributePtr()));
+    //theModifiedAttributes.insert(
+    //  std::make_pair(aBaseFeature->attribute(aModifiedAttribute), AttributePtr()));
 
     thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                (aBaseFeature->attribute(aModifiedAttribute)));
@@ -734,7 +936,7 @@ void SketchPlugin_Trim::trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& theStartS
     // result is two lines: start line point - start shape point,
     // last shape point - last line point
     // create second line
-    FeaturePtr anNewFeature = createLineFeature(aBaseFeature, aLastShapePoint, aLastFeaturePoint);
+    anNewFeature = createLineFeature(aBaseFeature, aLastShapePoint, aLastFeaturePoint);
     thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                (anNewFeature->attribute(SketchPlugin_Line::START_ID())));
 
@@ -755,13 +957,16 @@ void SketchPlugin_Trim::trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& theStartS
                                getFeatureResult(anNewFeature));
 
   }
+  return anNewFeature;
 }
 
-void SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
-                                const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
-                                std::set<AttributePoint2DPtr>& thePoints,
+FeaturePtr SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
+                 const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
+                 std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
+                 std::set<AttributePoint2DPtr>& thePoints,
                  std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes)
 {
+  FeaturePtr anNewFeature;
   // Check the base objects are initialized.
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                                         data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
@@ -782,14 +987,14 @@ void SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theStartSh
 #ifdef DEBUG_TRIM
   std::cout << "Arranged points (to build split between 1st and 2nd points:" << std::endl;
   if (aStartShapePoint.get())
-    std::cout << "Start point: [" << aStartShapePoint->x() << ", " <<
+    std::cout << "Start shape point: [" << aStartShapePoint->x() << ", " <<
                                        aStartShapePoint->y() << "]" << std::endl;
-  std::cout << "1st point:   [" << aStartArcPoint->x() << ", " <<
+  std::cout << "Start arc attribute point:   [" << aStartArcPoint->x() << ", " <<
                                    aStartArcPoint->y() << "]" << std::endl;
   if (aLastShapePoint.get())
-    std::cout << "2st point:   [" << aLastShapePoint->x() << ", " <<
+    std::cout << "Last shape point:   [" << aLastShapePoint->x() << ", " <<
                                      aLastShapePoint->y() << "]" << std::endl;
-  std::cout << "End point:   [" << aLastArcPoint->x() << ", " <<
+  std::cout << "Last arc attribute point:   [" << aLastArcPoint->x() << ", " <<
                                    aLastArcPoint->y() << "]" << std::endl;
 #endif
 
@@ -805,9 +1010,10 @@ void SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theStartSh
     else
       aPoint = aStartShapePoint.get() ? aStartShapePoint : aLastShapePoint;
 
+    removeReferencesToAttribute(aBaseFeature->attribute(aModifiedAttribute),
+                                theBaseRefAttributes);
+
     fillPointAttribute(aBaseFeature->attribute(aModifiedAttribute), aPoint);
-    theModifiedAttributes.insert(
-      std::make_pair(aBaseFeature->attribute(aModifiedAttribute), AttributePtr()));
 
     thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                (aBaseFeature->attribute(aModifiedAttribute)));
@@ -815,14 +1021,14 @@ void SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theStartSh
   else {
     // result is two arcs: start arc point - start shape point, last shape point - last arc point
     // create second arc
-    FeaturePtr anArcFeature = createArcFeature(aBaseFeature, aLastShapePoint, aLastArcPoint);
+    anNewFeature = createArcFeature(aBaseFeature, aLastShapePoint, aLastArcPoint);
     thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-                               (anArcFeature->attribute(SketchPlugin_Arc::START_ID())));
+                               (anNewFeature->attribute(SketchPlugin_Arc::START_ID())));
 
     std::string aModifiedAttribute = SketchPlugin_Arc::END_ID();
     theModifiedAttributes.insert(
       std::make_pair(aBaseFeature->attribute(aModifiedAttribute),
-                                   anArcFeature->attribute(SketchPlugin_Arc::END_ID())));
+                                   anNewFeature->attribute(SketchPlugin_Arc::END_ID())));
 
     // modify base arc
     fillPointAttribute(aBaseFeature->attribute(aModifiedAttribute), aStartShapePoint);
@@ -831,15 +1037,22 @@ void SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theStartSh
                                (aBaseFeature->attribute(aModifiedAttribute)));
 
     // equal Radius constraint for arcs
-    anArcFeature->execute(); // we need the created arc result to set equal constraint
+    anNewFeature->execute(); // we need the created arc result to set equal constraint
     createConstraintForObjects(SketchPlugin_ConstraintEqual::ID(),
                                getFeatureResult(aBaseFeature),
-                               getFeatureResult(anArcFeature));
+                               getFeatureResult(anNewFeature));
     // coincident centers constraint
     createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
                      aBaseFeature->attribute(SketchPlugin_Arc::CENTER_ID()),
-                     anArcFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
+                     anNewFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
+
+#ifdef DEBUG_TRIM
+    std::cout << "Created arc on points:" << std::endl;
+    std::cout << "Start shape point: [" << aStartShapePoint->x() << ", " <<
+                                           aStartShapePoint->y() << "]" << std::endl;
+#endif
   }
+  return anNewFeature;
 }
 
 FeaturePtr SketchPlugin_Trim::trimCircle(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
@@ -858,20 +1071,20 @@ FeaturePtr SketchPlugin_Trim::trimCircle(const std::shared_ptr<GeomAPI_Pnt2d>& t
   //getFeaturePoints(aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase);
 
   /// trim feature
-  FeaturePtr anArcFeature = createArcFeature(aBaseFeature, theStartShapePoint, theLastShapePoint);
+  FeaturePtr anNewFeature = createArcFeature(aBaseFeature, theStartShapePoint, theLastShapePoint);
   // arc created by trim of circle is always correct, that means that it is not inversed
-  anArcFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(false);
+  anNewFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(false);
 
   theModifiedAttributes.insert(
     std::make_pair(aBaseFeature->attribute(SketchPlugin_Circle::CENTER_ID()),
-                   anArcFeature->attribute(SketchPlugin_Arc::CENTER_ID())));
+                   anNewFeature->attribute(SketchPlugin_Arc::CENTER_ID())));
 
   thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-                             (anArcFeature->attribute(SketchPlugin_Arc::START_ID())));
+                             (anNewFeature->attribute(SketchPlugin_Arc::START_ID())));
   thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-                             (anArcFeature->attribute(SketchPlugin_Arc::END_ID())));
+                             (anNewFeature->attribute(SketchPlugin_Arc::END_ID())));
 
-  return anArcFeature;
+  return anNewFeature;
 }
 
 void SketchPlugin_Trim::arrangePointsOnLine(const AttributePoint2DPtr& theStartPointAttr,
@@ -940,8 +1153,10 @@ void SketchPlugin_Trim::fillPointAttribute(const AttributePtr& theModifiedAttrib
     aModifiedAttribute->setValue(thePoint);
 
 #ifdef DEBUG_TRIM
-    std::cout << "<fillPointAttribute> => Pnt2d - [" << thePoint->x() << ", "
-              << thePoint->y() << "]" << std::endl;
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theModifiedAttribute->owner());
+    std::cout << "<fillPointAttribute[" << aFeature->data()->name() << ": " <<
+      theModifiedAttribute->id() <<
+      "]> => Pnt2d - [" << thePoint->x() << ", " << thePoint->y() << "]" << std::endl;
 #endif
   }
 }
@@ -989,6 +1204,10 @@ FeaturePtr SketchPlugin_Trim::createLineFeature(const FeaturePtr& theBaseFeature
                                         const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
                                         const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint)
 {
+#ifdef DEBUG_TRIM
+  std::cout << "---- createLineFeature ---" << std::endl;
+#endif
+
   FeaturePtr aFeature;
   SketchPlugin_Sketch* aSketch = sketch();
   if (!aSketch || !theBaseFeature.get())
@@ -1003,6 +1222,10 @@ FeaturePtr SketchPlugin_Trim::createLineFeature(const FeaturePtr& theBaseFeature
                 theBaseFeature->attribute(SketchPlugin_SketchEntity::AUXILIARY_ID()));
 
   aFeature->execute(); // to obtain result
+
+#ifdef DEBUG_TRIM
+  std::cout << "---- createLineFeature:end ---" << std::endl;
+#endif
 
   return aFeature;
 }
@@ -1025,6 +1248,10 @@ FeaturePtr SketchPlugin_Trim::createArcFeature(const FeaturePtr& theBaseFeature,
   if (aCenterAttributeId.empty())
     return aFeature;
 
+#ifdef DEBUG_TRIM
+  std::cout << "---- createArcFeature ---" << std::endl;
+#endif
+
   aFeature = aSketch->addFeature(SketchPlugin_Arc::ID());
   // update fillet arc: make the arc correct for sure, so, it is not needed to process
   // the "attribute updated"
@@ -1046,6 +1273,10 @@ FeaturePtr SketchPlugin_Trim::createArcFeature(const FeaturePtr& theBaseFeature,
   }
   //aFeature->execute(); // to obtain result
   aFeature->data()->blockSendAttributeUpdated(aWasBlocked);
+
+  #ifdef DEBUG_TRIM
+  std::cout << "---- createArcFeature:end ---" << std::endl;
+  #endif
 
   return aFeature;
 }

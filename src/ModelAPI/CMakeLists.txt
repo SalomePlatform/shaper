@@ -28,10 +28,12 @@ SET(PROJECT_HEADERS
     ModelAPI_CompositeFeature.h
     ModelAPI_Data.h
     ModelAPI_Document.h
+    ModelAPI_EventReentrantMessage.h
     ModelAPI_Events.h
     ModelAPI_Expression.h
     ModelAPI_Feature.h
     ModelAPI_FeatureValidator.h
+    ModelAPI_IReentrant.h
     ModelAPI_Object.h
     ModelAPI_Plugin.h
     ModelAPI_Result.h
@@ -69,10 +71,12 @@ SET(PROJECT_SOURCES
     ModelAPI_CompositeFeature.cpp
     ModelAPI_Data.cpp
     ModelAPI_Document.cpp
+    ModelAPI_EventReentrantMessage.cpp
     ModelAPI_Events.cpp
     ModelAPI_Expression.cpp
     ModelAPI_Feature.cpp
     ModelAPI_FeatureValidator.cpp
+    ModelAPI_IReentrant.cpp
     ModelAPI_Object.cpp
     ModelAPI_Plugin.cpp
     ModelAPI_Result.cpp

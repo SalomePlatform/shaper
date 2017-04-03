@@ -7,6 +7,8 @@
 #ifndef SketchPlugin_MacroCircle_H_
 #define SketchPlugin_MacroCircle_H_
 
+#include <ModelAPI_IReentrant.h>
+
 #include "SketchPlugin.h"
 
 #include "SketchPlugin_SketchEntity.h"
@@ -21,7 +23,8 @@ class GeomAPI_Pnt2d;
  * \brief Feature for creation of the new circle in Sketch.
  */
 class SketchPlugin_MacroCircle: public SketchPlugin_SketchEntity,
-                                public GeomAPI_IPresentable
+                                public GeomAPI_IPresentable,
+                                public ModelAPI_IReentrant
 {
  public:
   /// Circle feature kind
@@ -34,6 +37,12 @@ class SketchPlugin_MacroCircle: public SketchPlugin_SketchEntity,
   inline static const std::string& CIRCLE_TYPE()
   {
     static const std::string ID("circle_type");
+    return ID;
+  }
+
+  inline static const std::string& EDIT_CIRCLE_TYPE()
+  {
+    static const std::string ID("edit_circle_type");
     return ID;
   }
 
@@ -159,19 +168,27 @@ class SketchPlugin_MacroCircle: public SketchPlugin_SketchEntity,
 
   SKETCHPLUGIN_EXPORT virtual bool isPreviewNeeded() const {return false;};
 
+  /// Apply information of the message to current object. It fills reference object,
+  /// tangent type and tangent point refence in case of tangent arc
+  virtual std::string processEvent(const std::shared_ptr<Events_Message>& theMessage);
+
   /// Use plugin manager for features creation
   SketchPlugin_MacroCircle();
 
 private:
-  std::shared_ptr<GeomAPI_Circ2d> shapeByCenterAndPassed();
-  std::shared_ptr<GeomAPI_Circ2d> shapeByThreePoints();
-  /// Creates shape if only two of three points is initialized
-  std::shared_ptr<GeomAPI_Circ2d> shapeByTwoPassedPoints();
+  void fillByCenterAndPassed();
+  void fillByThreePoints();
+  /// set fields if only two of three points is initialized
+  void fillByTwoPassedPoints();
 
-  void createCircleByCenterAndPassed();
-  void createCircleByThreePoints();
+  void constraintsForCircleByCenterAndPassed(FeaturePtr theCircleFeature);
+  void constraintsForCircleByThreePoints(FeaturePtr theCircleFeature);
 
-  FeaturePtr createCircleFeature(const std::shared_ptr<GeomAPI_Circ2d>& theCircle);
+  FeaturePtr createCircleFeature();
+
+private:
+  std::shared_ptr<GeomAPI_Pnt2d> myCenter;
+  double                         myRadius;
 };
 
 #endif

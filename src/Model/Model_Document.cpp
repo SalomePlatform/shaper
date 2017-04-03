@@ -235,6 +235,17 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
 bool Model_Document::save(
   const char* theDirName, const char* theFileName, std::list<std::string>& theResults)
 {
+  // if the history line is not in the end, move it to the end before save, otherwise
+  // problems with results restore and (the most important) naming problems will appear
+  // due to change evolution to SELECTION (problems in NamedShape and Name)
+  FeaturePtr aWasCurrent;
+  std::shared_ptr<Model_Session> aSession =
+    std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
+  if (currentFeature(false) != lastFeature()) {
+    aSession->setCheckTransactions(false);
+    aWasCurrent = currentFeature(false);
+    setCurrentFeature(lastFeature(), false);
+  }
   // create a directory in the root document if it is not yet exist
   Handle(Model_Application) anApp = Model_Application::getApplication();
   if (isRoot()) {
@@ -253,6 +264,10 @@ bool Model_Document::save(
     Handle(Standard_Failure) aFail = Standard_Failure::Caught();
     Events_InfoMessage("Model_Document",
         "Exception in saving of document: %1").arg(aFail->GetMessageString()).send();
+    if (aWasCurrent.get()) { // return the current feature to the initial position
+      setCurrentFeature(aWasCurrent, false);
+      aSession->setCheckTransactions(true);
+    }
     return false;
   }
   bool isDone = aStatus == PCDM_SS_OK || aStatus == PCDM_SS_No_Obj;
@@ -271,6 +286,12 @@ bool Model_Document::save(
         break;
     }
   }
+
+  if (aWasCurrent.get()) { // return the current feature to the initial position
+    setCurrentFeature(aWasCurrent, false);
+    aSession->setCheckTransactions(true);
+  }
+
   myTransactionSave = int(myTransactions.size());
   if (isDone) {  // save also sub-documents if any
     theResults.push_back(TCollection_AsciiString(aPath).ToCString());
@@ -536,10 +557,14 @@ bool Model_Document::finishOperation()
   }
   myObjs->synchronizeBackRefs();
   Events_Loop* aLoop = Events_Loop::loop();
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  static const Events_ID kCreatedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED);
+  static const Events_ID kUpdatedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED);
+  static const Events_ID kRedispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const Events_ID kDeletedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED);
+  aLoop->flush(kCreatedEvent);
+  aLoop->flush(kUpdatedEvent);
+  aLoop->flush(kRedispEvent);
+  aLoop->flush(kDeletedEvent);
 
   if (isNestedClosed) {
     if (myDoc->CommitCommand())
@@ -550,12 +575,19 @@ bool Model_Document::finishOperation()
   // to avoid messages about modifications outside of the transaction
   // and to rebuild everything after all updates and creates
   if (isRoot()) { // once for root document
-    Events_Loop::loop()->autoFlush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
     static std::shared_ptr<Events_Message> aFinishMsg
       (new Events_Message(Events_Loop::eventByName("FinishOperation")));
     Events_Loop::loop()->send(aFinishMsg);
-    Events_Loop::loop()->autoFlush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED), false);
   }
+
+  while(aLoop->hasGrouppedEvent(kCreatedEvent) || aLoop->hasGrouppedEvent(kUpdatedEvent) ||
+        aLoop->hasGrouppedEvent(kRedispEvent) || aLoop->hasGrouppedEvent(kDeletedEvent)) {
+    aLoop->flush(kCreatedEvent);
+    aLoop->flush(kUpdatedEvent);
+    aLoop->flush(kRedispEvent);
+    aLoop->flush(kDeletedEvent);
+  }
+
   // to avoid "updated" message appearance by updater
   //aLoop->clear(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
@@ -918,22 +950,23 @@ void Model_Document::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
   // add it after all nested (otherwise the nested will be disabled)
   CompositeFeaturePtr aCompositeAfter =
     std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theAfterThis);
+  FeaturePtr anAfterThisSub = theAfterThis;
   if (aCompositeAfter.get()) {
     FeaturePtr aSub = aCompositeAfter;
     do {
       FeaturePtr aNext = myObjs->nextFeature(aSub);
       if (!isSub(aCompositeAfter, aNext)) {
-        theAfterThis = aSub;
+        anAfterThisSub = aSub;
         break;
       }
       aSub = aNext;
     } while (aSub.get());
   }
 
-  myObjs->moveFeature(theMoved, theAfterThis);
+  myObjs->moveFeature(theMoved, anAfterThisSub);
   if (aCurrentUp) { // make the moved feature enabled or disabled due to the real status
     setCurrentFeature(currentFeature(false), false);
-  } else if (theAfterThis == currentFeature(false)) {
+  } else if (theAfterThis == currentFeature(false) || anAfterThisSub == currentFeature(false)) {
     // must be after move to make enabled all features which are before theMoved
     setCurrentFeature(theMoved, true);
   }

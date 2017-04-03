@@ -65,8 +65,8 @@ aSession.startOperation()
 aSketchFeature2 = featureToCompositeFeature(aPart.addFeature("Sketch"))
 aSketchFeature2.selection("External").setValue(aXOYPlane, None);
 aCirc1 = aSketchFeature2.addFeature("SketchCircle")
-geomDataAPI_Point2D(aCirc1.attribute("CircleCenter")).setValue(100, 50)
-aCirc1.real("CircleRadius").setValue(40)
+geomDataAPI_Point2D(aCirc1.attribute("circle_center")).setValue(100, 50)
+aCirc1.real("circle_radius").setValue(40)
 aSession.finishOperation()
 
 #=========================================================================
@@ -97,8 +97,8 @@ aSession.startOperation()
 aSketchFeature3 = featureToCompositeFeature(aPart.addFeature("Sketch"))
 aSketchFeature3.selection("External").setValue(aXOYPlane, None);
 aCirc2 = aSketchFeature3.addFeature("SketchCircle")
-geomDataAPI_Point2D(aCirc2.attribute("CircleCenter")).setValue(20, 20)
-aCirc2.real("CircleRadius").setValue(10)
+geomDataAPI_Point2D(aCirc2.attribute("circle_center")).setValue(20, 20)
+aCirc2.real("circle_radius").setValue(10)
 aSession.finishOperation()
 
 #=========================================================================

@@ -103,6 +103,12 @@ void SketchPlugin_Arc::execute()
       GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, anEnd, aStart, aNormal)
     : GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStart, anEnd, aNormal);
 
+  if (myParamBefore == 0) { // parameter has not been calculate yet
+    std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
+        new GeomAPI_Circ2d(aCenterAttr->pnt(), aStartAttr->pnt()));
+    aCircleForArc->parameter(anEndAttr->pnt(), paramTolerance, myParamBefore);
+  }
+
   std::shared_ptr<ModelAPI_ResultConstruction> aResult = document()->createConstruction(data(), 1);
   aResult->setShape(anArcShape);
   aResult->setIsInHistory(false);
@@ -190,8 +196,17 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
         aCirc->parameter(anEdge->firstPoint(), paramTolerance, aStartParam);
         aCirc->parameter(aMinPnt, paramTolerance, aMidParam);
         aCirc->parameter(anEdge->lastPoint(), paramTolerance, anEndParam);
+
+        // adjust period
+        anEndParam -= aStartParam;
+        aMidParam -= aStartParam;
+        if (anEndParam < 0.0)
+          anEndParam += 2.0 * PI;
+        if (aMidParam < 0.0)
+          aMidParam += 2.0 * PI;
+
         aWasBlocked = data()->blockSendAttributeUpdated(true);
-        if(aStartParam < aMidParam && aMidParam < anEndParam) {
+        if(aMidParam < anEndParam) {
           setReversed(false);
         } else {
           setReversed(true);
@@ -213,31 +228,25 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
       return;
     std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(new GeomAPI_Circ2d(aCenter, aStart));
 
-    bool aWasBlocked = data()->blockSendAttributeUpdated(true);
-    // The Arc end point is projected
-    // on the circle formed by center and start points
+    // Do not recalculate REVERSED flag if the arc is not consistent
     std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEnd);
-    if (aProjection && anEnd->distance(aProjection) > tolerance) {
-      anEndAttr->setValue(aProjection);
-      anEnd = aProjection;
-    }
-    data()->blockSendAttributeUpdated(aWasBlocked, false);
-
-    double aParameterNew = 0.0;
-    if(aCircleForArc->parameter(anEnd, paramTolerance, aParameterNew)) {
-      bool aWasBlocked = data()->blockSendAttributeUpdated(true);
-      if(myParamBefore <= PI / 2.0 && aParameterNew >= PI * 1.5) {
-        if(!boolean(REVERSED_ID())->value()) {
-          boolean(REVERSED_ID())->setValue(true);
+    if (aProjection && anEnd->distance(aProjection) <= tolerance) {
+      double aParameterNew = 0.0;
+      if(aCircleForArc->parameter(anEnd, paramTolerance, aParameterNew)) {
+        bool aWasBlocked = data()->blockSendAttributeUpdated(true);
+        if(myParamBefore <= PI / 2.0 && aParameterNew >= PI * 1.5) {
+          if(!boolean(REVERSED_ID())->value()) {
+            boolean(REVERSED_ID())->setValue(true);
+          }
+        } else if(myParamBefore >= PI * 1.5 && aParameterNew <= PI / 2.0) {
+          if(boolean(REVERSED_ID())->value()) {
+            boolean(REVERSED_ID())->setValue(false);
+          }
         }
-      } else if(myParamBefore >= PI * 1.5 && aParameterNew <= PI / 2.0) {
-        if(boolean(REVERSED_ID())->value()) {
-          boolean(REVERSED_ID())->setValue(false);
-        }
+        data()->blockSendAttributeUpdated(aWasBlocked, false);
       }
-      data()->blockSendAttributeUpdated(aWasBlocked, false);
+      myParamBefore = aParameterNew;
     }
-    myParamBefore = aParameterNew;
   }
 
   double aRadius = 0;

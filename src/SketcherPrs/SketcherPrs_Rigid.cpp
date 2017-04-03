@@ -65,11 +65,12 @@ bool SketcherPrs_Rigid::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   return aReadyToDisplay;
 }
 
-bool SketcherPrs_Rigid::updateIfReadyToDisplay(double theStep) const
+bool SketcherPrs_Rigid::updateIfReadyToDisplay(double theStep, bool withColor) const
 {
   if (!IsReadyToDisplay(myConstraint, myPlane))
     return false;
 
+  myPntArray = new Graphic3d_ArrayOfPoints(1, withColor);
   std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
   std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr =
     aData->refattr(SketchPlugin_Constraint::ENTITY_A());
@@ -80,13 +81,13 @@ bool SketcherPrs_Rigid::updateIfReadyToDisplay(double theStep) const
 
     SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
     gp_Pnt aP1 = aMgr->getPosition(aObj, this, theStep);
-    myPntArray->SetVertice(1, aP1);
+    myPntArray->AddVertex(aP1);
   } else {
     // The constraint attached to a point
     std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(myConstraint,
                                                   SketchPlugin_Constraint::ENTITY_A());
     std::shared_ptr<GeomAPI_Pnt> aPoint = myPlane->to3D(aPnt->x(), aPnt->y() + theStep);
-    myPntArray->SetVertice(1, aPoint->impl<gp_Pnt>());
+    myPntArray->AddVertex(aPoint->impl<gp_Pnt>());
   }
   return true;
 }

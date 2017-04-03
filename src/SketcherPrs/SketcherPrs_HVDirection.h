@@ -48,7 +48,7 @@ protected:
 
   /// Update myPntArray according to presentation positions
   /// \return true in case of success
-  virtual bool updateIfReadyToDisplay(double theStep) const;
+  virtual bool updateIfReadyToDisplay(double theStep, bool withColor) const;
 
 private:
   bool myIsHorisontal;

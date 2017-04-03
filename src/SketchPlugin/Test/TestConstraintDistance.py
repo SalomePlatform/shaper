@@ -31,15 +31,6 @@ from salome.shaper import model
 __updated__ = "2014-10-28"
 
 
-def distancePointPoint(pointA, pointB):
-    """
-    subroutine to calculate distance between two points
-    result of calculated distance is has 10**-5 precision
-    """
-    xdiff = math.pow((pointA.x() - pointB.x()), 2)
-    ydiff = math.pow((pointA.y() - pointB.y()), 2)
-    return round(math.sqrt(xdiff + ydiff), 5)
-
 def distancePointLine(point, line):
     """
     subroutine to calculate distance between point and line
@@ -78,7 +69,7 @@ aSession.finishOperation()
 aSession.startOperation()
 aSketchPoint = aSketchFeature.addFeature("SketchPoint")
 aSketchPointCoords = geomDataAPI_Point2D(
-    aSketchPoint.attribute("PointCoordindates"))
+    aSketchPoint.attribute("PointCoordinates"))
 aSketchPointCoords.setValue(50., 50.)
 aSketchLine = aSketchFeature.addFeature("SketchLine")
 aLineAStartPoint = geomDataAPI_Point2D(aSketchLine.attribute("StartPoint"))
@@ -91,7 +82,7 @@ assert (model.dof(aSketchFeature) == 6)
 # Make a constraint to keep the distance
 #=========================================================================
 PT_PT_DIST = 25.
-aDist = distancePointPoint(aSketchPointCoords, aLineAStartPoint);
+aDist = model.distancePointPoint(aSketchPointCoords, aLineAStartPoint);
 assert (aDist != PT_PT_DIST)
 aSession.startOperation()
 aConstraint = aSketchFeature.addFeature("SketchConstraintDistance")
@@ -125,7 +116,7 @@ assert (model.dof(aSketchFeature) == 5)
 aSession.startOperation()
 aDistance.setValue(PT_PT_DIST)
 aSession.finishOperation()
-assert (math.fabs(distancePointPoint(aSketchPointCoords, aLineAStartPoint) - PT_PT_DIST) < 1.e-10)
+assert (math.fabs(model.distancePointPoint(aSketchPointCoords, aLineAStartPoint) - PT_PT_DIST) < 1.e-10)
 assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # Move line, check that distance is constant
@@ -134,7 +125,7 @@ aSession.startOperation()
 aLineAStartPoint.setValue(0., 40.)
 aLineAEndPoint.setValue(100., 40.)
 aSession.finishOperation()
-assert (math.fabs(distancePointPoint(aSketchPointCoords, aLineAStartPoint) - PT_PT_DIST) < 1.e-10)
+assert (math.fabs(model.distancePointPoint(aSketchPointCoords, aLineAStartPoint) - PT_PT_DIST) < 1.e-10)
 assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # Remove constraint, check the points are unconstrained now
@@ -145,7 +136,7 @@ aSession.finishOperation()
 aSession.startOperation()
 aSketchPointCoords.setValue(0., 0.)
 aSession.finishOperation()
-assert (math.fabs(distancePointPoint(aSketchPointCoords, aLineAStartPoint) - PT_PT_DIST) > 1.e-10)
+assert (math.fabs(model.distancePointPoint(aSketchPointCoords, aLineAStartPoint) - PT_PT_DIST) > 1.e-10)
 assert (model.dof(aSketchFeature) == 6)
 
 #=========================================================================
@@ -192,7 +183,7 @@ aSession.startOperation()
 refattrA.setAttr(aLineAStartPoint)
 refattrB.setAttr(aLineAEndPoint)
 aSession.finishOperation()
-assert (math.fabs(distancePointPoint(aLineAStartPoint, aLineAEndPoint) - PT_LINE_DIST) < 1.e-10)
+assert (math.fabs(model.distancePointPoint(aLineAStartPoint, aLineAEndPoint) - PT_LINE_DIST) < 1.e-10)
 assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # End of test

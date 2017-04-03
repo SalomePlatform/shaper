@@ -1,0 +1,23 @@
+from salome.shaper import model
+
+model.begin()
+partSet = model.moduleDocument()
+Part_1 = model.addPart(partSet)
+Part_1_doc = Part_1.document()
+Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
+SketchLine_1 = Sketch_1.addLine(-184.375, -81.25, -71.87500000000006, 206.2500000000001)
+SketchLine_2 = Sketch_1.addLine(-71.87500000000006, 206.2500000000001, 281.2500000000001, 178.125)
+SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchLine_2.startPoint())
+SketchLine_3 = Sketch_1.addLine(281.2500000000001, 178.125, 184.3750000000001, -109.375)
+SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchLine_2.endPoint(), SketchLine_3.startPoint())
+SketchLine_4 = Sketch_1.addLine(184.3750000000001, -109.375, -184.375, -81.25)
+SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_3.endPoint(), SketchLine_4.startPoint())
+SketchConstraintCoincidence_4 = Sketch_1.setCoincident(SketchLine_1.startPoint(), SketchLine_4.endPoint())
+model.do()
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r")], model.selection("EDGE", "PartSet/OZ"), 50, 0)
+model.do()
+Extrusion_1.setDirection(model.selection("EDGE", "OX"))
+model.do()
+model.end()
+
+assert (len(Extrusion_1.feature().error()) != 0)

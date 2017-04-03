@@ -174,11 +174,6 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
     for(; aValidatorIt != aValidators.cend(); aValidatorIt++) {
       const std::string& aValidatorID = aValidatorIt->first;
       const std::list<std::string>& anArguments = aValidatorIt->second;
-      // validators() checks invalid validator names
-      //if (!aValidator) {
-      //  Events_Error::send(std::string("Validator ") + aValidatorID + " was not registered");
-      //  continue;
-      //}
       const ModelAPI_FeatureValidator* aFValidator =
         dynamic_cast<const ModelAPI_FeatureValidator*>(validator(aValidatorID));
       if (aFValidator) {
@@ -196,30 +191,8 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
       }
     }
   }
-  // The default validator was retrned by validators() and was checked in previous cycle
-  //// check default validator
-  //std::map<std::string, ModelAPI_Validator*>::const_iterator aDefaultVal = myIDs.find(kDefaultId);
-  //if(aDefaultVal != myIDs.end()) {
-  //  static const std::list<std::string> anEmptyArgList;
-  //  const ModelAPI_FeatureValidator* aFValidator =
-  //    dynamic_cast<const ModelAPI_FeatureValidator*>(aDefaultVal->second);
-  //  if (aFValidator) {
-  //    std::string anError;
-  //    if (!aFValidator->isValid(theFeature, anEmptyArgList, anError)) {
-  //      if (anError.empty())
-  //        anError = "Unknown error.";
-  //      anError = "Feature invalidated by \"" + kDefaultId + "\" with error: " + anError;
-  //      theFeature->setError(anError, false);
-  //      theFeature->data()->execState(ModelAPI_StateInvalidArgument);
-  //      return false;
-  //    }
-  //  }
-  //}
 
   // check all attributes for validity
-  // Validity of data is checked by "Model_FeatureValidator" (kDefaultId)
-  // if (!aData || !aData->isValid())
-  //   return false;
   static const std::string kAllTypes = "";
   std::list<std::string> aLtAttributes = aData->attributesIDs(kAllTypes);
   std::list<std::string>::const_iterator anAttrIt = aLtAttributes.cbegin();

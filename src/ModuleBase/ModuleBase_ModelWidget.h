@@ -95,7 +95,7 @@ Q_OBJECT
 
   /// Returns this parameter value in the xml file
   /// \return the boolean result
-  bool isModifiedInEdit() const { return myIsModifiedInEdit; }
+  std::string isModifiedInEdit() const { return myIsModifiedInEdit; }
 
   /// Returns this widget value state
   /// \return the enumeration result
@@ -364,7 +364,7 @@ private:
   bool myIsInternal;
 
   // an XML state, the value is not stored into model if the widget is in edit mode
-  bool myIsModifiedInEdit;
+  std::string myIsModifiedInEdit;
 
   /// the reset state. If it is false, the reset method of the widget is not performed
   bool myUseReset;
