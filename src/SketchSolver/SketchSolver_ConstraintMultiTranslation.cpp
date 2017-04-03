@@ -29,10 +29,10 @@ void SketchSolver_ConstraintMultiTranslation::getAttributes(
 
   myType = CONSTRAINT_MULTI_TRANSLATION;
 
-  myStorage->update(aStartPointAttr);
-  theStartPoint = myStorage->entity(aStartPointAttr);
-  myStorage->update(aEndPointAttr);
-  theEndPoint = myStorage->entity(aEndPointAttr);
+  myStorage->update(AttributePtr(aStartPointAttr));
+  theStartPoint = myStorage->entity(AttributePtr(aStartPointAttr));
+  myStorage->update(AttributePtr(aEndPointAttr));
+  theEndPoint = myStorage->entity(AttributePtr(aEndPointAttr));
 
   AttributeStringPtr aMethodTypeAttr = aData->string(SketchPlugin_MultiTranslation::VALUE_TYPE());
   theFullValue = aMethodTypeAttr->value() != "SingleValue";

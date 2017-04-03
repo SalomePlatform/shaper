@@ -33,8 +33,8 @@ void SketchSolver_ConstraintMultiRotation::getAttributes(
 
   myType = CONSTRAINT_MULTI_ROTATION;
 
-  myStorage->update(aCenterAttr);
-  theCenter = myStorage->entity(aCenterAttr);
+  myStorage->update(AttributePtr(aCenterAttr));
+  theCenter = myStorage->entity(AttributePtr(aCenterAttr));
 
   AttributeStringPtr aMethodTypeAttr =
       myBaseConstraint->string(SketchPlugin_MultiRotation::ANGLE_TYPE());
