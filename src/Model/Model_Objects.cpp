@@ -1124,17 +1124,14 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
           if (!aNewP->partDoc().get())
             // create the part result: it is better to restore the previous result if it is possible
             theFeature->execute();
-          break;
         } else if (aGroup->Get() == ModelAPI_ResultConstruction::group().c_str()) {
           theFeature->execute(); // construction shapes are needed for sketch solver
-          break;
         } else if (aGroup->Get() == ModelAPI_ResultGroup::group().c_str()) {
           aNewBody = createGroup(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultField::group().c_str()) {
           aNewBody = createField(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultParameter::group().c_str()) {
           theFeature->attributeChanged("expression"); // just produce a value
-          break;
         } else {
           Events_InfoMessage("Model_Objects", "Unknown type of result is found in the document:")
             .arg(TCollection_AsciiString(aGroup->Get()).ToCString()).send();

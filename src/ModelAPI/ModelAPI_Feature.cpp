@@ -55,7 +55,8 @@ void ModelAPI_Feature::setResult(const std::shared_ptr<ModelAPI_Result>& theResu
     myResults.push_back(theResult);
   }
   // in any case result becomes enabled
-  theResult->setDisabled(theResult, false);
+  if (!isDisabled()) // disabled feature may be executed when it is added as not enabled (#2078)
+    theResult->setDisabled(theResult, false);
 }
 
 void ModelAPI_Feature::setResult(const std::shared_ptr<ModelAPI_Result>& theResult,
