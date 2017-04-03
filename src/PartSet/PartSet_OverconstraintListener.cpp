@@ -5,6 +5,7 @@
 // Author:      Vitaly SMETANNIKOV
 
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_AttributeString.h>
 
 #include "PartSet_OverconstraintListener.h"
 #include <PartSet_Module.h>
@@ -19,6 +20,7 @@
 #include "SketcherPrs_SymbolPrs.h"
 #include "SketchPlugin_SketchEntity.h"
 #include "SketchPlugin_MacroArcReentrantMessage.h"
+#include "SketchPlugin_Sketch.h"
 
 #include "Events_Loop.h"
 
@@ -32,7 +34,7 @@
 //#define DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
 
 PartSet_OverconstraintListener::PartSet_OverconstraintListener(ModuleBase_IWorkshop* theWorkshop)
-: myWorkshop(theWorkshop), myIsFullyConstrained(false)
+: myWorkshop(theWorkshop), myIsActive(false), myIsFullyConstrained(false)
 {
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_FAILED));
@@ -45,9 +47,30 @@ PartSet_OverconstraintListener::PartSet_OverconstraintListener(ModuleBase_IWorks
   aLoop->registerListener(this, SketchPlugin_MacroArcReentrantMessage::eventId());
 }
 
+void PartSet_OverconstraintListener::setActive(const bool& theActive)
+{
+  if (myIsActive == theActive)
+    return;
+
+  myIsActive = theActive;
+  myIsFullyConstrained = false; /// returned to default state, no custom color for it
+
+  if (myIsActive) {
+    PartSet_Module* aModule = module();
+    CompositeFeaturePtr aSketch = aModule->sketchMgr()->activeSketch();
+    if (aSketch.get()) {
+      std::string aDOFMessage = aSketch->string(SketchPlugin_Sketch::SOLVER_DOF())->value();
+      myIsFullyConstrained = QString(aDOFMessage.c_str()).contains("DoF = 0");
+    }
+  }
+}
+
 void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
                                                     std::vector<int>& theColor)
 {
+  if (!myIsActive)
+    return;
+
   if (myConflictingObjects.find(theObject) != myConflictingObjects.end()) {
     theColor = Config_PropManager::color("Visualization", "sketch_overconstraint_color");
   }
@@ -55,10 +78,10 @@ void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     // only entity features has custom color when sketch is fully constrained
     if (aFeature.get() && PartSet_SketcherMgr::isEntity(aFeature->getKind())) {
-      PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
-      CompositeFeaturePtr aCompositeFeature = aModule->sketchMgr()->activeSketch();
+      PartSet_Module* aModule = module();
+      CompositeFeaturePtr aSketch = aModule->sketchMgr()->activeSketch();
       // the given object is sub feature of the current sketch(created or edited)
-      if (ModelAPI_Tools::compositeOwner(aFeature) == aCompositeFeature)
+      if (ModelAPI_Tools::compositeOwner(aFeature) == aSketch)
         theColor = Config_PropManager::color("Visualization", "sketch_fully_constrained_color");
     }
   }
@@ -67,6 +90,9 @@ void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
 void PartSet_OverconstraintListener::processEvent(
                                                  const std::shared_ptr<Events_Message>& theMessage)
 {
+  if (!myIsActive)
+    return;
+
 #ifdef DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
   bool isRepaired = theMessage->eventID() == Events_Loop::eventByName(EVENT_SOLVER_REPAIRED);
   int aCount = 0;
@@ -199,10 +225,9 @@ void PartSet_OverconstraintListener::redisplayObjects(
   aLoop->flush(EVENT_DISP);
 }
 
-XGUI_Workshop* PartSet_OverconstraintListener::workshop() const
+PartSet_Module* PartSet_OverconstraintListener::module() const
 {
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-  return aConnector->workshop();
+  return dynamic_cast<PartSet_Module*>(myWorkshop->module());
 }
 
 #ifdef _DEBUG

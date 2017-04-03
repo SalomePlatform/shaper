@@ -250,6 +250,8 @@ void SketchSolver_Group::computeDoF()
 {
   std::ostringstream aDoFMsg;
   int aDoF = mySketchSolver->dof();
+  /// "DoF = 0" content of string value is used in PartSet by Sketch edit
+  /// If it is changed, it should be corrected also there
   if (aDoF == 0)
     aDoFMsg << "Sketch is fully fixed (DoF = 0)";
   else
