@@ -286,7 +286,10 @@ void PartSet_SketcherReentrantMgr::setReentrantPreSelection(
   if (!aReentrantMessage.get())
     return;
 
-  aReentrantMessage->setSelectedObject(mySelectedObject);
+  // if feature has already filled the selected object, we should not overwrite it
+  if (!aReentrantMessage->selectedObject().get())
+    aReentrantMessage->setSelectedObject(mySelectedObject);
+
   aReentrantMessage->setSelectedAttribute(mySelectedAttribute);
   aReentrantMessage->setClickedPoint(myClickedSketchPoint);
 }
