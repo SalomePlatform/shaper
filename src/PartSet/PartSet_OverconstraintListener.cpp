@@ -18,11 +18,13 @@
 
 #include "SketcherPrs_SymbolPrs.h"
 #include "SketchPlugin_SketchEntity.h"
+#include "SketchPlugin_MacroArcReentrantMessage.h"
 
 #include "Events_Loop.h"
 
 #include <GeomAPI_IPresentable.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_EventReentrantMessage.h>
 #include <ModuleBase_Tools.h>
 
 #include <QString>
@@ -39,7 +41,8 @@ PartSet_OverconstraintListener::PartSet_OverconstraintListener(ModuleBase_IWorks
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SKETCH_UNDER_CONSTRAINED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SKETCH_FULLY_CONSTRAINED));
 
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  aLoop->registerListener(this, ModelAPI_EventReentrantMessage::eventId());
+  aLoop->registerListener(this, SketchPlugin_MacroArcReentrantMessage::eventId());
 }
 
 void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
@@ -123,16 +126,13 @@ void PartSet_OverconstraintListener::processEvent(
       }
     }
   }
-  else if (anEventID == Events_Loop::eventByName(EVENT_OBJECT_CREATED)) {
+  else if (anEventID == ModelAPI_EventReentrantMessage::eventId() ||
+           anEventID == SketchPlugin_MacroArcReentrantMessage::eventId()) {
     PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
     PartSet_SketcherReentrantMgr* aReentrantMgr = aModule->sketchReentranceMgr();
-    if (aReentrantMgr->isInternalEditActive()) {
-      std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
-            std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
-      std::set<ObjectPtr> anObjects = aUpdMsg->objects();
-      aReentrantMgr->appendCreatedObjects(anObjects);
-    }
+    aReentrantMgr->setReentrantMessage(theMessage);
   }
+
 #ifdef DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
   aCurrentInfoStr = getObjectsInfo(myConflictingObjects);
   qDebug(QString("RESULT: current objects count = %1:%2\n")

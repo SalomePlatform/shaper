@@ -17,7 +17,24 @@
 ModuleBase_IPropertyPanel::ModuleBase_IPropertyPanel(QWidget* theParent)
  : QDockWidget(theParent), myIsEditing(false)
 {
+}
 
+ModuleBase_ModelWidget* ModuleBase_IPropertyPanel::modelWidget(
+                                          const std::string& theAttributeId) const
+{
+  ModuleBase_ModelWidget* aWidget = 0;
+  QList<ModuleBase_ModelWidget*> aWidgets = modelWidgets();
+  ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
+  for (QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin();
+    anIt != aWidgets.end() && !aWidget; anIt++) {
+    ModuleBase_ModelWidget* aCurrentWidget = *anIt;
+    if (aCurrentWidget->attributeID() == theAttributeId &&
+        aCurrentWidget->canAcceptFocus() &&
+        aValidators->isCase(aCurrentWidget->feature(), aCurrentWidget->attributeID()))
+      aWidget = aCurrentWidget;
+  }
+
+  return aWidget;
 }
 
 ModuleBase_ModelWidget* ModuleBase_IPropertyPanel::findFirstAcceptingValueWidget()

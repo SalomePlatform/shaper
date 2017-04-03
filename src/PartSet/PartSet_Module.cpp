@@ -552,6 +552,17 @@ void PartSet_Module::customSubShapesSelectionModes(QIntList& theTypes)
     theTypes.append(SketcherPrs_Tools::Sel_Sketch_Wire);
 }
 
+void PartSet_Module::getGeomSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theSelected,
+                                      ObjectPtr& theObject, AttributePtr& theAttribute)
+{
+  ObjectPtr anObject = theSelected->object();
+  GeomShapePtr aShape = theSelected->shape();
+
+  theAttribute = findAttribute(anObject, aShape);
+  // TODO: try to create result if object is an external object
+  theObject = anObject;
+}
+
 bool PartSet_Module::isMouseOverWindow()
 {
   return mySketchMgr->isMouseOverWindow();
@@ -1422,6 +1433,18 @@ AttributePtr PartSet_Module::findAttribute(const ObjectPtr& theObject,
                                                  mySketchMgr->activeSketch());
   }
   return anAttribute;
+}
+
+//******************************************************
+std::shared_ptr<Events_Message> PartSet_Module::reentrantMessage()
+{
+  return sketchReentranceMgr()->reentrantMessage();
+}
+
+//******************************************************
+void PartSet_Module::setReentrantPreSelection(const std::shared_ptr<Events_Message>& theMessage)
+{
+  sketchReentranceMgr()->setReentrantPreSelection(theMessage);
 }
 
 //******************************************************

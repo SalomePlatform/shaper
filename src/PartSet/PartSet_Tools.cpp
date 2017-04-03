@@ -17,6 +17,8 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Validator.h>
 
+#include <ModuleBase_IViewWindow.h>
+
 #include <ModelGeomAlgo_Point2D.h>
 
 #include <Events_Loop.h>
@@ -72,6 +74,8 @@
 #include <AIS_InteractiveObject.hxx>
 #include <StdSelect_BRepOwner.hxx>
 #include <SelectMgr_IndexedMapOfOwner.hxx>
+
+#include <QMouseEvent>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -641,6 +645,18 @@ std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::getPoint(
   if (aPointAttr.get() != NULL)
     return aPointAttr->pnt();
   return std::shared_ptr<GeomAPI_Pnt2d>();
+}
+
+std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::getPnt2d(QMouseEvent* theEvent,
+                                                ModuleBase_IViewWindow* theWindow,
+                                                const FeaturePtr& theSketch)
+{
+  gp_Pnt aPnt = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
+  double aX, anY;
+  Handle(V3d_View) aView = theWindow->v3dView();
+  PartSet_Tools::convertTo2D(aPnt, theSketch, aView, aX, anY);
+
+  return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY));
 }
 
 FeaturePtr findFirstCoincidenceByData(const DataPtr& theData,

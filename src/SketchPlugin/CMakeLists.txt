@@ -31,6 +31,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_IntersectionPoint.h
     SketchPlugin_Line.h
     SketchPlugin_MacroArc.h
+    SketchPlugin_MacroArcReentrantMessage.h
     SketchPlugin_MacroCircle.h
     SketchPlugin_MultiRotation.h
     SketchPlugin_MultiTranslation.h

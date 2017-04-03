@@ -170,11 +170,6 @@ bool PartSet_WidgetFeaturePointSelector::fillFeature(
   if (!anObject.get())
     return aFilled;
 
-  gp_Pnt aPnt = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
-  double aX, anY;
-  Handle(V3d_View) aView = theWindow->v3dView();
-  PartSet_Tools::convertTo2D(aPnt, mySketch, aView, aX, anY);
-
   std::shared_ptr<ModelAPI_AttributeReference> aRef =
                           std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                           feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
@@ -183,7 +178,8 @@ bool PartSet_WidgetFeaturePointSelector::fillFeature(
   std::shared_ptr<GeomDataAPI_Point2D> anAttributePoint =
                   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                   feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
-  anAttributePoint->setValue(aX, anY);
+  std::shared_ptr<GeomAPI_Pnt2d> aPoint = PartSet_Tools::getPnt2d(theEvent, theWindow, mySketch);
+  anAttributePoint->setValue(aPoint);
   // redisplay AIS presentation in viewer
 #ifndef HIGHLIGHT_STAYS_PROBLEM
   // an attempt to clear highlighted item in the viewer: but of OCCT

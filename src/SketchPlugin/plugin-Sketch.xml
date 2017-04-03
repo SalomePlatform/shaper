@@ -76,7 +76,7 @@
                icon="icons/Sketch/circle.png"
                title="Circle"
                tooltip="Create circle">
-        <toolbox id="circle_type" modified_in_edit="false">
+        <toolbox id="circle_type" modified_in_edit="edit_circle_type">
           <box id="circle_type_by_center_and_passed_points"
                icon="icons/Sketch/circle_pt_rad_32x32.png"
                title="Center and passed points">
@@ -195,7 +195,7 @@
         title="Arc"
         tooltip="Create arc"
         icon="icons/Sketch/arc.png">
-        <toolbox id="arc_type" modified_in_edit="false">
+        <toolbox id="arc_type" modified_in_edit="edit_arc_type">
           <box id="by_center_and_points"
                icon="icons/Sketch/arc_base_32x32.png"
                title="Center and two points">

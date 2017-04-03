@@ -8,6 +8,7 @@
 #include "ModelAPI_Session.h"
 #include "ModelAPI_AttributeString.h"
 #include "ModelAPI_AttributeRefAttr.h"
+#include "ModelAPI_EventReentrantMessage.h"
 
 #include "GeomDataAPI_Point2D.h"
 
@@ -28,6 +29,7 @@
 #include <SketchPlugin_MacroArc.h>
 #include <SketchPlugin_MacroCircle.h>
 #include <SketchPlugin_Point.h>
+#include <SketchPlugin_Trim.h>
 
 #include <XGUI_Workshop.h>
 #include <XGUI_ModuleConnector.h>
@@ -38,13 +40,14 @@
 
 #include <QToolButton>
 
+//#define DEBUG_RESTART
+
 PartSet_SketcherReentrantMgr::PartSet_SketcherReentrantMgr(ModuleBase_IWorkshop* theWorkshop)
 : QObject(theWorkshop),
   myWorkshop(theWorkshop),
   myRestartingMode(RM_None),
   myIsFlagsBlocked(false),
   myIsInternalEditOperation(false),
-  myIsValueChangedBlocked(false),
   myInternalActiveWidget(0),
   myNoMoreWidgetsAttribute("")
 {
@@ -118,7 +121,8 @@ void PartSet_SketcherReentrantMgr::operationStarted(ModuleBase_Operation* theOpe
     ModuleBase_OperationFeature* aCurrentOperation = dynamic_cast<ModuleBase_OperationFeature*>(
                                                                 myWorkshop->currentOperation());
     CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
-    copyReetntrantAttributes(myPreviousFeature, aCurrentOperation->feature(), aSketch);
+    if (myPreviousFeature.get() && myPreviousFeature->data()->isValid()) // it is not removed
+      copyReetntrantAttributes(myPreviousFeature, aCurrentOperation->feature(), aSketch);
   }
   resetFlags();
 }
@@ -194,8 +198,8 @@ bool PartSet_SketcherReentrantMgr::processMousePressed(ModuleBase_IViewWindow* /
   return isActiveMgr() && myIsInternalEditOperation;
 }
 
-bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* theWnd,
-                                                         QMouseEvent* theEvent)
+bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* theWindow,
+                                                        QMouseEvent* theEvent)
 {
   bool aProcessed = false;
   if (!isActiveMgr())
@@ -228,7 +232,16 @@ bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* 
       QList<ModuleBase_ViewerPrsPtr> aPreSelected =
         aSelection->getSelected(ModuleBase_ISelection::AllControls);
 
+      myClickedSketchPoint = PartSet_Tools::getPnt2d(theEvent, theWindow,
+                                                     module()->sketchMgr()->activeSketch());
+      if (!aPreSelected.empty())
+        module()->getGeomSelection(aPreSelected.first(), mySelectedObject, mySelectedAttribute);
+
       restartOperation();
+      myClickedSketchPoint = std::shared_ptr<GeomAPI_Pnt2d>();
+      mySelectedObject = ObjectPtr();
+      mySelectedAttribute = AttributePtr();
+
       myPreviousFeature = FeaturePtr();
       aProcessed = true;
 
@@ -252,8 +265,8 @@ bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* 
           // there are created objects to replace the object depending on created feature kind
           aSelectedPrs = generatePreSelection();
         }
-        aMouseProcessor->setPreSelection(aSelectedPrs, theWnd, theEvent);
-        //aPoint2DWdg->mouseReleased(theWnd, theEvent);
+        aMouseProcessor->setPreSelection(aSelectedPrs, theWindow, theEvent);
+        //aPoint2DWdg->mouseReleased(theWindow, theEvent);
         //if (!aPreSelected.empty())
         //  aPoint2DWdg->setPreSelection(ModuleBase_ViewerPrsPtr());
       }
@@ -262,6 +275,20 @@ bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* 
     }
   }
   return aProcessed;
+}
+
+//******************************************************
+void PartSet_SketcherReentrantMgr::setReentrantPreSelection(
+                                       const std::shared_ptr<Events_Message>& theMessage)
+{
+  ReentrantMessagePtr aReentrantMessage =
+                      std::dynamic_pointer_cast<ModelAPI_EventReentrantMessage>(theMessage);
+  if (!aReentrantMessage.get())
+    return;
+
+  aReentrantMessage->setSelectedObject(mySelectedObject);
+  aReentrantMessage->setSelectedAttribute(mySelectedAttribute);
+  aReentrantMessage->setClickedPoint(myClickedSketchPoint);
 }
 
 void PartSet_SketcherReentrantMgr::onWidgetActivated()
@@ -283,6 +310,10 @@ void PartSet_SketcherReentrantMgr::onWidgetActivated()
 
 void PartSet_SketcherReentrantMgr::onNoMoreWidgets(const std::string& thePreviousAttributeID)
 {
+#ifdef DEBUG_RESTART
+  std::cout << "PartSet_SketcherReentrantMgr::onNoMoreWidgets" << std::endl;
+#endif
+
   if (!isActiveMgr())
     return;
 
@@ -369,14 +400,12 @@ void PartSet_SketcherReentrantMgr::onVertexSelected()
 
 void PartSet_SketcherReentrantMgr::onAfterValuesChangedInPropertyPanel()
 {
-  // blocked flag in order to avoid circling when storeValue will be applied in
-  // this method to cached widget
-  if (myIsValueChangedBlocked)
-    return;
 
   if (isInternalEditActive()) {
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                       (myWorkshop->currentOperation());
     ModuleBase_ModelWidget* aWidget = (ModuleBase_ModelWidget*)sender();
-    if (!aWidget->isModifiedInEdit())
+    if (!aWidget->isModifiedInEdit().empty())
       restartOperation();
   }
 }
@@ -392,28 +421,6 @@ void PartSet_SketcherReentrantMgr::onBeforeStopped()
 bool PartSet_SketcherReentrantMgr::canBeCommittedByPreselection()
 {
   return !isActiveMgr() || myRestartingMode == RM_None;
-}
-
-void PartSet_SketcherReentrantMgr::appendCreatedObjects(const std::set<ObjectPtr>& theObjects)
-{
-  if (!myIsFlagsBlocked) // we need to collect objects only when launch operation is called
-    return;
-
-  FeaturePtr aCurrentFeature;
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                       (myWorkshop->currentOperation());
-  if (aFOperation)
-    aCurrentFeature = aFOperation->feature();
-
-
-  for (std::set<ObjectPtr>::const_iterator anIt = theObjects.begin();
-       anIt != theObjects.end(); ++anIt) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
-    if (aFeature == aCurrentFeature)
-      continue;
-    if (myCreatedFeatures.find(aFeature) == myCreatedFeatures.end())
-      myCreatedFeatures.insert(aFeature);
-  }
 }
 
 bool PartSet_SketcherReentrantMgr::isActiveMgr() const
@@ -435,6 +442,10 @@ bool PartSet_SketcherReentrantMgr::isActiveMgr() const
 
 bool PartSet_SketcherReentrantMgr::startInternalEdit(const std::string& thePreviousAttributeID)
 {
+#ifdef DEBUG_RESTART
+  std::cout << "PartSet_SketcherReentrantMgr::startInternalEdit" << std::endl;
+#endif
+
   bool isDone = false;
   /// this is workaround for ModuleBase_WidgetEditor, used in SALOME mode. Sometimes key enter
   /// event comes two times, so we should not start another internal edit operation
@@ -520,32 +531,30 @@ void PartSet_SketcherReentrantMgr::beforeStopInternalEdit()
 
 void PartSet_SketcherReentrantMgr::restartOperation()
 {
+#ifdef DEBUG_RESTART
+  std::cout << "PartSet_SketcherReentrantMgr::restartOperation" << std::endl;
+#endif
+
   if (myIsInternalEditOperation) {
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(
                                                                   myWorkshop->currentOperation());
     if (aFOperation) {
-      // obtain widgets(attributes) which content should be applied to attributes of new feature
-      ModuleBase_IPropertyPanel* aPanel = aFOperation->propertyPanel();
-      ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
-      const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
-      QList<ModuleBase_ModelWidget*> aValueWidgets;
-      for (int i = 0, aSize = aWidgets.size(); i < aSize; i++) {
-        ModuleBase_ModelWidget* aWidget = aWidgets[i];
-        if (!aWidget->isModifiedInEdit()) {
-          aValueWidgets.append(aWidget);
-          // the widget is cashed to fill feature of new operation by the current widget value
-          // we set empty parent to the widget in order to remove it ourselves. Reason: restart
-          // operation will clear property panel and delete all widgets. This widget should be
-          // removed only after applying value of the widget to new created feature.
-          aWidget->setParent(0);
-        }
-      }
+      ModuleBase_ISelection* aSelection = myWorkshop->selection();
+      QList<ModuleBase_ViewerPrsPtr> aPreSelected =
+        aSelection->getSelected(ModuleBase_ISelection::AllControls);
+
+
+
+      if (myInternalFeature.get())
+        copyReetntrantAttributes(myInternalFeature, aFOperation->feature(),
+                                  module()->sketchMgr()->activeSketch());
 
       myNoMoreWidgetsAttribute = "";
       myIsFlagsBlocked = true;
       module()->launchOperation(aFOperation->id());
       myIsFlagsBlocked = false;
       resetFlags();
+
       // we should avoid processing of the signal about no more widgets attributes and
       // do this after the restart operaion is finished if it was called
       // onNoMoreWidgets depends on myIsFlagsBlocked and fill myNoMoreWidgetsAttribute
@@ -554,21 +563,6 @@ void PartSet_SketcherReentrantMgr::restartOperation()
         onNoMoreWidgets(myNoMoreWidgetsAttribute);
         myNoMoreWidgetsAttribute = "";
       }
-
-      // filling new feature by the previous value of active widget
-      // (e.g. circle_type in macro Circle)
-      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>(
-                                                                myWorkshop->currentOperation());
-      myIsValueChangedBlocked = true; // flag to avoid onAfterValuesChangedInPropertyPanel slot
-      for (int i = 0, aSize = aValueWidgets.size(); i < aSize; i++) {
-        ModuleBase_ModelWidget* aWidget = aValueWidgets[i];
-        aWidget->setEditingMode(false);
-        aWidget->setFeature(aFOperation->feature());
-        aWidget->storeValue();
-        // we must delete this widget
-        delete aWidget;
-      }
-      myIsValueChangedBlocked = false;
     }
   }
 }
@@ -583,6 +577,11 @@ void PartSet_SketcherReentrantMgr::createInternalFeature()
 
     CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
     myInternalFeature = aSketch->addFeature(anOperationFeature->getKind());
+
+#ifdef DEBUG_RESTART
+    std::cout << "PartSet_SketcherReentrantMgr::createInternalFeature: "
+              << myInternalFeature->data()->name() << std::endl;
+#endif
 
     bool isFeatureChanged = copyReetntrantAttributes(anOperationFeature, myInternalFeature,
                                                      aSketch, false);
@@ -618,6 +617,10 @@ void PartSet_SketcherReentrantMgr::createInternalFeature()
 
 void PartSet_SketcherReentrantMgr::deleteInternalFeature()
 {
+#ifdef DEBUG_RESTART
+  std::cout << "PartSet_SketcherReentrantMgr::deleteInternalFeature: "
+            << myInternalFeature->data()->name() << std::endl;
+#endif
   if (myInternalActiveWidget) {
     ModuleBase_WidgetSelector* aWSelector =
       dynamic_cast<ModuleBase_WidgetSelector*>(myInternalActiveWidget);
@@ -640,22 +643,28 @@ void PartSet_SketcherReentrantMgr::resetFlags()
     myIsInternalEditOperation = false;
     updateAcceptAllAction();
     myRestartingMode = RM_None;
-    myCreatedFeatures.clear();
+    myReentrantMessage = std::shared_ptr<Events_Message>();
   }
 }
 
 bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& theSourceFeature,
                                                              const FeaturePtr& theNewFeature,
                                                              const CompositeFeaturePtr& theSketch,
-                                                             const bool isTemporary)
+                                                             const bool /*isTemporary*/)
 {
   bool aChanged = false;
   if (!theSourceFeature.get() || !theSourceFeature->data().get() ||
       !theSourceFeature->data()->isValid())
     return aChanged;
 
+#ifdef DEBUG_RESTART
+  std::cout << "PartSet_SketcherReentrantMgr::copyReetntrantAttributes from '"
+            << theSourceFeature->data()->name() << "' to '" << theNewFeature->data()->name()
+            << "'" << std::endl;
+#endif
+
   std::string aFeatureKind = theSourceFeature->getKind();
-  if (aFeatureKind == SketchPlugin_Line::ID()) {
+  /*if (aFeatureKind == SketchPlugin_Line::ID()) {
     // Initialize new line with first point equal to end of previous
     std::shared_ptr<ModelAPI_Data> aSFData = theSourceFeature->data();
     std::shared_ptr<GeomDataAPI_Point2D> aSPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -670,22 +679,23 @@ bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& th
                                                  aSFData->attribute(SketchPlugin_Line::END_ID()));
     aNPoint->setValue(aSPoint->x(), aSPoint->y());
   }
-  else if (aFeatureKind == SketchPlugin_MacroCircle::ID()) {
+  else*/ if (aFeatureKind == SketchPlugin_MacroCircle::ID()) {
     // set circle type
-    std::string aTypeAttributeId = SketchPlugin_MacroCircle::CIRCLE_TYPE();
+    /*std::string aTypeAttributeId = SketchPlugin_MacroCircle::CIRCLE_TYPE();
     AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
     AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
-    aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
+    if (aNewFeatureTypeAttr->value() != aTypeAttributeId) // do nothing if there is no changes
+      aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
     //ModuleBase_Tools::flushUpdated(theNewFeature);
-    aChanged = true;
+    aChanged = true;*/
   }
   else if (aFeatureKind == SketchPlugin_MacroArc::ID()) {
     // set arc type
     std::string aTypeAttributeId = SketchPlugin_MacroArc::ARC_TYPE();
     AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
     AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
-    aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
-
+    if (aNewFeatureTypeAttr->value() != aTypeAttributeId) // do nothing if there is no changes
+      aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
     //// if the arc is tangent, set coincidence to end point of the previous arc
     //std::string anArcType = aSourceFeatureTypeAttr->value();
     //if (anArcType == SketchPlugin_Arc::ARC_TYPE_TANGENT()) {
@@ -706,6 +716,41 @@ bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& th
 
     //}
     //ModuleBase_Tools::flushUpdated(theNewFeature);
+    aChanged = true;
+  }
+  else if (aFeatureKind == SketchPlugin_Trim::ID()) {
+    /*std::shared_ptr<ModelAPI_AttributeReference> aRefSelectedAttr =
+                            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                            theSourceFeature->data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
+    std::shared_ptr<ModelAPI_AttributeReference> aNRefSelectedAttr =
+                            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                            theNewFeature->data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
+    aNRefSelectedAttr->setValue(aRefSelectedAttr->value());*/
+
+    std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
+                            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                            theSourceFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+    std::shared_ptr<ModelAPI_AttributeReference> aNRefPreviewAttr =
+                            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                            theNewFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+    aNRefPreviewAttr->setValue(aRefPreviewAttr->value());
+
+    /*std::shared_ptr<GeomDataAPI_Point2D> aPointSelectedAttr =
+                            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                            theSourceFeature->data()->attribute(SketchPlugin_Trim::SELECTED_POINT()));
+    std::shared_ptr<GeomDataAPI_Point2D> aNPointSelectedAttr =
+                            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                            theNewFeature->data()->attribute(SketchPlugin_Trim::SELECTED_POINT()));
+    aNPointSelectedAttr->setValue(aPointSelectedAttr->x(), aPointSelectedAttr->y());
+    */
+    std::shared_ptr<GeomDataAPI_Point2D> aPointPreviewAttr =
+                            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                            theSourceFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
+    std::shared_ptr<GeomDataAPI_Point2D> aNPointPreviewAttr =
+                            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                            theNewFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
+    aNPointPreviewAttr->setValue(aPointPreviewAttr->x(), aPointPreviewAttr->y());
+
     aChanged = true;
   }
   return aChanged;

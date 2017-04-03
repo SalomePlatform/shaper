@@ -21,6 +21,7 @@ class ModuleBase_IModule;
 class ModuleBase_ISelection;
 class ModuleBase_IViewer;
 class ModuleBase_IPropertyPanel;
+class ModuleBase_IErrorMgr;
 class ModuleBase_Operation;
 class ModuleBase_ViewerPrs;
 class QMainWindow;
@@ -61,6 +62,9 @@ Q_OBJECT
 
   //! Returns property panel
   virtual ModuleBase_IPropertyPanel* propertyPanel() const = 0;
+
+  //! Returns error manager
+  virtual ModuleBase_IErrorMgr* errorMgr() const = 0;
 
   /// A filter to process an attribute validators
   /// \return a filter

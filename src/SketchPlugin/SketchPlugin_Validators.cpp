@@ -877,12 +877,15 @@ bool SketchPlugin_TrimValidator::isValid(const AttributePtr& theAttribute,
     AttributePtr aPreviewAttr = aTrimFeature->attribute(SketchPlugin_Trim::PREVIEW_OBJECT());
     aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(aPreviewAttr);
     aBaseObject = aBaseObjectAttr->value();
-
-    //return aValid;
   }
 
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObject);
   if (!aBaseFeature)
+    return aValid;
+
+  std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+                                 std::dynamic_pointer_cast<SketchPlugin_Feature>(aBaseFeature);
+  if (!aSketchFeature.get() || aSketchFeature->isCopy())
     return aValid;
 
   std::string aKind = aBaseFeature->getKind();

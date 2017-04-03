@@ -10,10 +10,12 @@
 #include "SketchPlugin_ConstraintTangent.h"
 #include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_Tools.h"
+#include "SketchPlugin_MacroArcReentrantMessage.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
@@ -82,12 +84,16 @@ void SketchPlugin_MacroArc::initAttributes()
   data()->addAttribute(END_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(PASSED_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
 
+  data()->addAttribute(EDIT_ARC_TYPE_ID(), ModelAPI_AttributeString::typeId());
+
   boolean(REVERSED_ID())->setValue(false);
+  string(EDIT_ARC_TYPE_ID())->setValue("");
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CENTER_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), START_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), END_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PASSED_POINT_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EDIT_ARC_TYPE_ID());
 }
 
 void SketchPlugin_MacroArc::attributeChanged(const std::string& theID)
@@ -268,6 +274,81 @@ void SketchPlugin_MacroArc::execute()
                                          ObjectPtr(),
                                          false);
   }
+
+  // message to init reentrant operation
+  static Events_ID anId = SketchPlugin_MacroArcReentrantMessage::eventId();
+  std::shared_ptr<SketchPlugin_MacroArcReentrantMessage> aMessage = std::shared_ptr
+    <SketchPlugin_MacroArcReentrantMessage>(new SketchPlugin_MacroArcReentrantMessage(anId, 0));
+
+  std::string anEditArcType = string(EDIT_ARC_TYPE_ID())->value();
+  aMessage->setTypeOfCreation(!anEditArcType.empty() ? anEditArcType : anArcType);
+  aMessage->setCreatedFeature(anArcFeature);
+  Events_Loop::loop()->send(aMessage);
+  Events_Loop::loop()->flush(anId);
+}
+
+std::string SketchPlugin_MacroArc::processEvent(const std::shared_ptr<Events_Message>& theMessage)
+{
+  std::string aFilledAttributeName;
+  std::shared_ptr<SketchPlugin_MacroArcReentrantMessage> aReentrantMessage =
+        std::dynamic_pointer_cast<SketchPlugin_MacroArcReentrantMessage>(theMessage);
+  if (aReentrantMessage.get()) {
+    FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
+    std::string anArcType = aReentrantMessage->typeOfCreation();
+
+    string(ARC_TYPE())->setValue(anArcType);
+
+    aFilledAttributeName = ARC_TYPE();
+    if(anArcType == ARC_TYPE_BY_TANGENT_EDGE()) {
+      aFilledAttributeName = TANGENT_POINT_ID();
+      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                                                        attribute(aFilledAttributeName));
+      FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
+      aRefAttr->setAttr(aCreatedFeature->attribute(SketchPlugin_Arc::END_ID()));
+    }
+    else {
+      ObjectPtr anObject = aReentrantMessage->selectedObject();
+      AttributePtr anAttribute = aReentrantMessage->selectedAttribute();
+      std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = aReentrantMessage->clickedPoint();
+
+      if (aClickedPoint.get() && (anObject.get() || anAttribute.get())) {
+        if (anArcType == ARC_TYPE_BY_CENTER_AND_POINTS() ||
+            anArcType == ARC_TYPE_BY_THREE_POINTS()) {
+          std::string aReferenceAttributeName;
+          if (anArcType == ARC_TYPE_BY_CENTER_AND_POINTS()) {
+            aFilledAttributeName = CENTER_POINT_ID();
+            aReferenceAttributeName = CENTER_POINT_REF_ID();
+          }
+          else {
+            aFilledAttributeName = START_POINT_2_ID();
+            aReferenceAttributeName = START_POINT_REF_ID();
+          }
+          // fill 2d point attribute
+          AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                                            attribute(aFilledAttributeName));
+          aPointAttr->setValue(aClickedPoint);
+          // fill reference attribute
+          AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                                                            attribute(aReferenceAttributeName));
+          if (aRefAttr.get()) {
+            if (anAttribute.get())
+              aRefAttr->setAttr(anAttribute);
+            else if (anObject.get()) {
+              // if presentation of previous reentrant macro arc is used, the object is invalid,
+              // we should use result of previous feature of the message(Arc)
+              if (!anObject->data()->isValid()) {
+                FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
+                anObject = aCreatedFeature->lastResult();
+              }
+              aRefAttr->setObject(anObject);
+            }
+          }
+        }
+      }
+    }
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  }
+  return aFilledAttributeName;
 }
 
 FeaturePtr SketchPlugin_MacroArc::createArcFeature()

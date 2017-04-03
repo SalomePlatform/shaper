@@ -7,6 +7,8 @@
 #ifndef SketchPlugin_Line_H_
 #define SketchPlugin_Line_H_
 
+#include <ModelAPI_IReentrant.h>
+
 #include "SketchPlugin.h"
 #include <SketchPlugin_SketchEntity.h>
 #include <SketchPlugin_Sketch.h>
@@ -18,7 +20,8 @@ class GeomAPI_Pnt2d;
  * \ingroup Plugins
  * \brief Feature for creation of the new part in PartSet.
  */
-class SketchPlugin_Line : public SketchPlugin_SketchEntity
+class SketchPlugin_Line : public SketchPlugin_SketchEntity,
+                          public ModelAPI_IReentrant
 {
  public:
   /// Arc feature kind
@@ -63,6 +66,11 @@ class SketchPlugin_Line : public SketchPlugin_SketchEntity
   /// \param theDeltaX the delta for X coordinate is moved
   /// \param theDeltaY the delta for Y coordinate is moved
   SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
+
+  /// Apply information of the message to current object. It fills start attribute of
+  /// the currrent feature by last attribute of the message feature, build coincidence
+  /// if message has selected object
+  virtual std::string processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
   /// Return the distance between the feature and the point
   /// \param thePoint the point

@@ -28,8 +28,11 @@ class QMenu;
 class Config_WidgetAPI;
 class ModuleBase_ModelWidget;
 class ModuleBase_Operation;
+class ModuleBase_ViewerPrs;
+
 class ModuleBase_IWorkshop;
 class ModelAPI_Result;
+class Events_Message;
 
 class AIS_InteractiveObject;
 
@@ -316,6 +319,13 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \return theAttribute
   virtual AttributePtr findAttribute(const ObjectPtr& theObject,
                                      const GeomShapePtr& theGeomShape) = 0;
+
+  /// Returns reentrant message if it was accepted
+  virtual std::shared_ptr<Events_Message> reentrantMessage() = 0;
+
+  /// Put current selection into reentrant message
+  /// \param theMessage a message of reentrant operation
+  virtual void setReentrantPreSelection(const std::shared_ptr<Events_Message>& theMessage) = 0;
 
   /// Returns XML information by the feature index
   /// \param theFeatureId a feature id

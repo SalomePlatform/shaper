@@ -9,12 +9,14 @@
 #include "SketchPlugin_Circle.h"
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Tools.h"
+#include "SketchPlugin_MacroArcReentrantMessage.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Events.h>
 
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point2D.h>
@@ -54,6 +56,7 @@ SketchPlugin_MacroCircle::SketchPlugin_MacroCircle()
 void SketchPlugin_MacroCircle::initAttributes()
 {
   data()->addAttribute(CIRCLE_TYPE(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(EDIT_CIRCLE_TYPE(), ModelAPI_AttributeString::typeId());
 
   data()->addAttribute(CENTER_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(CENTER_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
@@ -70,11 +73,14 @@ void SketchPlugin_MacroCircle::initAttributes()
   data()->addAttribute(CIRCLE_RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(AUXILIARY_ID(), ModelAPI_AttributeBoolean::typeId());
 
+  string(EDIT_CIRCLE_TYPE())->setValue("");
+
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CENTER_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PASSED_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FIRST_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SECOND_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), THIRD_POINT_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EDIT_CIRCLE_TYPE());
 }
 
 void SketchPlugin_MacroCircle::execute()
@@ -86,6 +92,69 @@ void SketchPlugin_MacroCircle::execute()
     constraintsForCircleByCenterAndPassed(aCircle);
   else if (aType == CIRCLE_TYPE_BY_THREE_POINTS())
     constraintsForCircleByThreePoints(aCircle);
+
+  // message to init reentrant operation
+  static Events_ID anId = SketchPlugin_MacroArcReentrantMessage::eventId();
+  std::shared_ptr<SketchPlugin_MacroArcReentrantMessage> aMessage = std::shared_ptr
+    <SketchPlugin_MacroArcReentrantMessage>(new SketchPlugin_MacroArcReentrantMessage(anId, 0));
+
+  std::string anEditType = string(EDIT_CIRCLE_TYPE())->value();
+  aMessage->setTypeOfCreation(!anEditType.empty() ? anEditType : aType);
+  aMessage->setCreatedFeature(aCircle);
+  Events_Loop::loop()->send(aMessage);
+  Events_Loop::loop()->flush(anId);
+}
+
+std::string SketchPlugin_MacroCircle::processEvent(const std::shared_ptr<Events_Message>& theMessage)
+{
+  std::string aFilledAttributeName;
+  std::shared_ptr<SketchPlugin_MacroArcReentrantMessage> aReentrantMessage =
+        std::dynamic_pointer_cast<SketchPlugin_MacroArcReentrantMessage>(theMessage);
+  if (aReentrantMessage.get()) {
+    FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
+    std::string aCircleType = aReentrantMessage->typeOfCreation();
+
+    string(CIRCLE_TYPE())->setValue(aCircleType);
+
+    aFilledAttributeName = CIRCLE_TYPE();
+    ObjectPtr anObject = aReentrantMessage->selectedObject();
+    AttributePtr anAttribute = aReentrantMessage->selectedAttribute();
+    std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = aReentrantMessage->clickedPoint();
+
+    if (aClickedPoint.get() && (anObject.get() || anAttribute.get())) {
+      std::string aReferenceAttributeName;
+      if (aCircleType == CIRCLE_TYPE_BY_CENTER_AND_PASSED_POINTS()) {
+        aFilledAttributeName = CENTER_POINT_ID();
+        aReferenceAttributeName = CENTER_POINT_REF_ID();
+      }
+      else {
+        aFilledAttributeName = FIRST_POINT_ID();
+        aReferenceAttributeName = FIRST_POINT_REF_ID();
+      }
+      // fill 2d point attribute
+      AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                                                        attribute(aFilledAttributeName));
+      aPointAttr->setValue(aClickedPoint);
+      // fill reference attribute
+      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                                                        attribute(aReferenceAttributeName));
+      if (aRefAttr.get()) {
+        if (anAttribute.get())
+          aRefAttr->setAttr(anAttribute);
+        else if (anObject.get()) {
+          // if presentation of previous reentrant macro arc is used, the object is invalid,
+          // we should use result of previous feature of the message(Arc)
+          if (!anObject->data()->isValid()) {
+            FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
+            anObject = aCreatedFeature->lastResult();
+          }
+          aRefAttr->setObject(anObject);
+        }
+      }
+    }
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  }
+  return aFilledAttributeName;
 }
 
 void SketchPlugin_MacroCircle::constraintsForCircleByCenterAndPassed(FeaturePtr theCircleFeature)

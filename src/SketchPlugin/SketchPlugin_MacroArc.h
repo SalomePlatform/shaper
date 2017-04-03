@@ -7,8 +7,9 @@
 #ifndef SketchPlugin_MacroArc_H_
 #define SketchPlugin_MacroArc_H_
 
-#include "SketchPlugin.h"
+#include <ModelAPI_IReentrant.h>
 
+#include "SketchPlugin.h"
 #include "SketchPlugin_SketchEntity.h"
 
 #include <GeomAPI_IPresentable.h>
@@ -24,7 +25,8 @@ class GeomAPI_Pnt2d;
  * it is calculated if all attributes are initialized.
  */
 class SketchPlugin_MacroArc: public SketchPlugin_SketchEntity,
-                             public GeomAPI_IPresentable
+                             public GeomAPI_IPresentable,
+                             public ModelAPI_IReentrant
 {
  public:
   /// Arc feature kind
@@ -157,6 +159,13 @@ class SketchPlugin_MacroArc: public SketchPlugin_SketchEntity,
     return ID;
   }
 
+  /// Arc angle.
+  static const std::string& EDIT_ARC_TYPE_ID()
+  {
+    static const std::string ID("edit_arc_type");
+    return ID;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {
@@ -188,6 +197,10 @@ class SketchPlugin_MacroArc: public SketchPlugin_SketchEntity,
   SKETCHPLUGIN_EXPORT virtual bool isMacro() const {return true;};
 
   SKETCHPLUGIN_EXPORT virtual bool isPreviewNeeded() const {return false;};
+
+  /// Apply information of the message to current object. It fills reference object,
+  /// tangent type and tangent point refence in case of tangent arc
+  virtual std::string processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
   /// Use plugin manager for features creation.
   SketchPlugin_MacroArc();

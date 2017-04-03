@@ -38,6 +38,10 @@ public:
   /// Returns all property panel's widget created by WidgetFactory
   virtual const QList<ModuleBase_ModelWidget*>& modelWidgets() const = 0;
 
+  /// Returns widget, that has the given attribute index
+  /// \param theAttributeId an attribute from XML
+  virtual ModuleBase_ModelWidget* modelWidget(const std::string& theAttributeId) const;
+
   /// Removes all widgets in the widget area of the property panel
   virtual void cleanContent() = 0;
 

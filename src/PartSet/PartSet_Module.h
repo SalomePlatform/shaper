@@ -30,6 +30,8 @@
 
 class ModuleBase_Operation;
 class ModuleBase_IViewWindow;
+class ModuleBase_ViewerPrs;
+
 class XGUI_Workshop;
 class PartSet_MenuMgr;
 class PartSet_CustomPrs;
@@ -205,6 +207,13 @@ public:
   /// Returns sketch reentrant manager
   PartSet_SketcherReentrantMgr* sketchReentranceMgr() const { return mySketchReentrantMgr; }
 
+  /// Find object and attribute(if selected) for the given viewer selection
+  /// \param theSelected a viewer selection
+  /// \param theObject a selected model object
+  /// \param theAttribute a selected model attribute
+  virtual void getGeomSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theSelected,
+                                ObjectPtr& theObject, AttributePtr& theAttribute);
+
   /// Returns listener of overconstraint signal
   /// \return the listener
   PartSet_OverconstraintListener* overconstraintListener() { return myOverconstraintListener; }
@@ -328,6 +337,13 @@ public:
   /// \param theGeomShape a geom shape
   /// \return theAttribute
   virtual AttributePtr findAttribute(const ObjectPtr& theObject, const GeomShapePtr& theGeomShape);
+
+  /// Returns reentrant message if it was accepted
+  virtual std::shared_ptr<Events_Message> reentrantMessage();
+
+  /// Put current selection into reentrant message
+  /// \param theMessage a message of reentrant operation
+  virtual void setReentrantPreSelection(const std::shared_ptr<Events_Message>& theMessage);
 
   /// Returns the workshop
   XGUI_Workshop* getWorkshop() const;

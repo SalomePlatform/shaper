@@ -1,10 +1,13 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
+#include "ModelAPI_IReentrant.h"
+#include "ModelAPI_EventReentrantMessage.h"
 
 #include "ModuleBase_IModule.h"
 #include "ModuleBase_IViewer.h"
 #include "ModuleBase_ViewerPrs.h"
 #include "ModuleBase_Operation.h"
+#include "ModuleBase_IPropertyPanel.h"
 #include "ModuleBase_ISelection.h"
 #include "ModuleBase_OperationDescription.h"
 #include "ModuleBase_OperationFeature.h"
@@ -12,8 +15,10 @@
 #include "ModuleBase_WidgetFactory.h"
 #include "ModuleBase_PageWidget.h"
 #include "ModuleBase_Dialog.h"
+#include "ModuleBase_IErrorMgr.h"
 
 #include <Events_Loop.h>
+#include <Events_Message.h>
 
 #include <ModelAPI_Events.h>
 #include <ModelAPI_CompositeFeature.h>
@@ -85,9 +90,30 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId)
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                              (createOperation(theCmdId.toStdString()));
   if (aFOperation) {
-    aFOperation->initSelection(aPreSelected);
+    std::shared_ptr<Events_Message> aMessage = reentrantMessage();
+    if (aMessage.get()) {
+      setReentrantPreSelection(aMessage);
+    }
+    else
+      aFOperation->initSelection(aPreSelected);
 
     workshop()->processLaunchOperation(aFOperation);
+
+    if (aFOperation) {
+      FeaturePtr aFeature = aFOperation->feature();
+      ModelReentrantPtr aReentrantFeature =
+                                      std::dynamic_pointer_cast<ModelAPI_IReentrant>(aFeature);
+      if (aReentrantFeature.get()) {
+        if (aMessage.get()) {
+          ModuleBase_IPropertyPanel* aPanel = workshop()->propertyPanel();
+          std::string aPrevAttribute = aReentrantFeature->processEvent(aMessage);
+          workshop()->errorMgr()->updateActions(aFeature);
+
+          ModuleBase_ModelWidget* aPrevWidget = aPanel->modelWidget(aPrevAttribute);
+          aPanel->activateNextWidget(aPrevWidget);
+        }
+      }
+    }
   }
 }
 

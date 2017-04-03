@@ -38,7 +38,7 @@ public:
 
   /// Update actions for the given feature
   /// \param theFeature a feature
-  void updateActions(const FeaturePtr& theFeature);
+  virtual void updateActions(const FeaturePtr& theFeature);
 
   /// Update enable state of AcceptAll action if the feature uses it
   /// \param theFeature a feature
