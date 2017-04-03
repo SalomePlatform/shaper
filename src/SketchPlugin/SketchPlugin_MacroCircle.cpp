@@ -256,14 +256,14 @@ void SketchPlugin_MacroCircle::fillByThreePoints()
 
     if (aPassedPoint)
       aCircBuilder.addPassingPoint(aPassedPoint);
-    else
+    else {
       aCircBuilder.addTangentCurve(aTangentCurve);
+      AttributePoint2DPtr aPassedPoint =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPassedAttr);
+      if (aPassedPoint)
+        aCircBuilder.setClosestPoint(aPassedPoint->pnt());
+    }
   }
-
-  AttributePoint2DPtr aThirdPoint =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(THIRD_POINT_ID()));
-  if (aThirdPoint)
-    aCircBuilder.setClosestPoint(aThirdPoint->pnt());
 
   std::shared_ptr<GeomAPI_Circ2d> aCircle = aCircBuilder.circle();
   if (aCircle) {
