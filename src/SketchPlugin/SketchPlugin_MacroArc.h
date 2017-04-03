@@ -206,7 +206,8 @@ class SketchPlugin_MacroArc: public SketchPlugin_SketchEntity,
   SketchPlugin_MacroArc();
 
   /// Returns shape of arc.
-  GeomShapePtr getArcShape();
+  /// \param isBound  if true prepare arc, otherwice create circle containing this arc
+  GeomShapePtr getArcShape(bool isBound = true);
 
 private:
   /// Set fields for center, start and end points

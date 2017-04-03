@@ -1338,7 +1338,7 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
     return true;
   }
 
-  GeomShapePtr anArcShape = anArcFeature->getArcShape();
+  GeomShapePtr anArcShape = anArcFeature->getArcShape(false);
 
   if(!anArcShape.get() || anArcShape->isNull()) {
     return true;

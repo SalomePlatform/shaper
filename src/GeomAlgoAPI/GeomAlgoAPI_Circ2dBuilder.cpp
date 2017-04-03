@@ -125,9 +125,11 @@ private:
   Circ2dPtr circleByCenterAndPassingPoint()
   {
     const gp_Pnt2d& aCenter = myCenter->impl<gp_Pnt2d>();
-    GccAna_Circ2dTanCen aBuilder(myPassingPoints[0], aCenter);
-    if (aBuilder.NbSolutions() > 0)
-      return Circ2dPtr(new gp_Circ2d(aBuilder.ThisSolution(1)));
+    if (aCenter.SquareDistance(myPassingPoints[0]) > Precision::SquareConfusion()) {
+      GccAna_Circ2dTanCen aBuilder(myPassingPoints[0], aCenter);
+      if (aBuilder.NbSolutions() > 0)
+        return Circ2dPtr(new gp_Circ2d(aBuilder.ThisSolution(1)));
+    }
     return Circ2dPtr();
   }
 

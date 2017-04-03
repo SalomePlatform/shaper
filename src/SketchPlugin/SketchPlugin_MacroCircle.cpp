@@ -282,6 +282,7 @@ void SketchPlugin_MacroCircle::fillByTwoPassedPoints()
   GeomAlgoAPI_Circ2dBuilder aCircBuilder(SketchPlugin_Sketch::plane(sketch()));
 
   std::shared_ptr<GeomAPI_Pnt2d> aPassedPoints[2]; // there is possible only two passed points
+  bool hasTangentCurve = false;
   int aPntIndex = 0;
   for (; aPntIndex < 2; ++aPntIndex) {
     AttributePtr aPassedAttr = attribute(aPointAttr[aPntIndex]);
@@ -299,6 +300,7 @@ void SketchPlugin_MacroCircle::fillByTwoPassedPoints()
       aCircBuilder.addPassingPoint(aPassedPoint);
       aPassedPoints[aPntIndex] = aPassedPoint;
     } else {
+      hasTangentCurve = true;
       aCircBuilder.addTangentCurve(aTangentCurve);
       // if the circle is tangent to any curve,
       // the third point will be initialized by the tangent point
@@ -306,12 +308,14 @@ void SketchPlugin_MacroCircle::fillByTwoPassedPoints()
           std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPassedAttr)->pnt());
     }
   }
+  if (aPntIndex <= 1)
+    return;
 
   std::shared_ptr<GeomAPI_Circ2d> aCircle;
 
-  if (aPntIndex == 3)
+  if (hasTangentCurve)
     aCircle = aCircBuilder.circle();
-  else if (aPntIndex == 2) {
+  else {
     // the circle is defined by two points, calculate its parameters manually
     std::shared_ptr<GeomAPI_Pnt2d> aCenter(new GeomAPI_Pnt2d(
         (aPassedPoints[0]->x() + aPassedPoints[1]->x()) * 0.5,

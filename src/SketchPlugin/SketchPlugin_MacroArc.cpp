@@ -29,6 +29,7 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_XY.h>
+#include <GeomAPI_ShapeIterator.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
@@ -50,6 +51,69 @@ static void projectPointOnCircle(AttributePoint2DPtr& thePoint, const GeomAPI_Ci
   std::shared_ptr<GeomAPI_Pnt2d> aProjection = theCircle.project(thePoint->pnt());
   if(aProjection.get())
     thePoint->setValue(aProjection);
+}
+
+static void intersectShapeAndCircle(const GeomShapePtr& theShape,
+                                    const GeomAPI_Circ2d& theCircle,
+                                    const SketchPlugin_Sketch* theSketch,
+                                    AttributePoint2DPtr& theIntersection)
+{
+  if (!theShape->isEdge())
+    return projectPointOnCircle(theIntersection, theCircle);
+
+  // convert shape to unbounded
+  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(theShape));
+  if (anEdge->isLine()) {
+    static const double HALF_SIZE = 1.e6;
+    std::shared_ptr<GeomAPI_XYZ> aLoc = anEdge->line()->location()->xyz();
+    std::shared_ptr<GeomAPI_XYZ> aDir = anEdge->line()->direction()->xyz();
+
+    std::shared_ptr<GeomAPI_Pnt> aStart(
+        new GeomAPI_Pnt(aLoc->added(aDir->multiplied(-HALF_SIZE))));
+    std::shared_ptr<GeomAPI_Pnt> aEnd(
+        new GeomAPI_Pnt(aLoc->added(aDir->multiplied(HALF_SIZE))));
+    anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, aEnd);
+  } else if (anEdge->isArc()) {
+    std::shared_ptr<GeomAPI_Circ> aCircle = anEdge->circle();
+    anEdge = GeomAlgoAPI_EdgeBuilder::lineCircle(
+        aCircle->center(), aCircle->normal(), aCircle->radius());
+  }
+
+  // convert 2D circle to 3D object
+  std::shared_ptr<GeomAPI_Pnt2d> aCenter2d = theCircle.center();
+  std::shared_ptr<GeomAPI_Pnt> aCenter(theSketch->to3D(aCenter2d->x(), aCenter2d->y()));
+  std::shared_ptr<GeomDataAPI_Dir> aNDir = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      const_cast<SketchPlugin_Sketch*>(theSketch)->attribute(SketchPlugin_Sketch::NORM_ID()));
+  std::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
+
+  GeomShapePtr aCircleShape =
+      GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, theCircle.radius());
+
+  GeomShapePtr anInter = anEdge->intersect(aCircleShape);
+  std::shared_ptr<GeomAPI_Pnt2d> anInterPnt;
+  if (!anInter)
+    return projectPointOnCircle(theIntersection, theCircle);
+  if (anInter->isVertex()) {
+    std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(anInter));
+    anInterPnt = theSketch->to2D(aVertex->point());
+  } else if (anInter->isCompound()) {
+    double aMinDist = 1.e300;
+
+    GeomAPI_ShapeIterator anIt(anInter);
+    for (; anIt.more(); anIt.next()) {
+      GeomShapePtr aCurrent = anIt.current();
+      if (!aCurrent->isVertex())
+        continue;
+      std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aCurrent));
+      std::shared_ptr<GeomAPI_Pnt2d> aPnt = theSketch->to2D(aVertex->point());
+      double aDist = aPnt->distance(theIntersection->pnt());
+      if (aDist < aMinDist) {
+        aMinDist = aDist;
+        anInterPnt = aPnt;
+      }
+    }
+  }
+  theIntersection->setValue(anInterPnt);
 }
 
 
@@ -156,7 +220,7 @@ void SketchPlugin_MacroArc::attributeChanged(const std::string& theID)
   data()->blockSendAttributeUpdated(aWasBlocked, false);
 }
 
-GeomShapePtr SketchPlugin_MacroArc::getArcShape()
+GeomShapePtr SketchPlugin_MacroArc::getArcShape(bool isBound)
 {
   if(!myStart.get() || !myEnd.get() || !myCenter.get()) {
     return GeomShapePtr();
@@ -174,9 +238,15 @@ GeomShapePtr SketchPlugin_MacroArc::getArcShape()
     std::dynamic_pointer_cast<GeomDataAPI_Dir>(aSketch->attribute(SketchPlugin_Sketch::NORM_ID()));
   std::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
 
-  GeomShapePtr anArcShape = boolean(REVERSED_ID())->value() ?
-      GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, anEnd, aStart, aNormal)
-    : GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStart, anEnd, aNormal);
+  GeomShapePtr anArcShape;
+  if (isBound) {
+    anArcShape = boolean(REVERSED_ID())->value() ?
+        GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, anEnd, aStart, aNormal)
+      : GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStart, anEnd, aNormal);
+  } else {
+    double aRadius = aCenter->distance(aStart);
+    anArcShape = GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, aRadius);
+  }
 
   return anArcShape;
 }
@@ -393,9 +463,24 @@ void SketchPlugin_MacroArc::fillByCenterAndTwoPassed()
 
   GeomAPI_Circ2d aCircleForArc(myCenter, myStart);
 
-  // End point should be a projection on circle.
   bool aWasBlocked = data()->blockSendAttributeUpdated(true);
-  projectPointOnCircle(anEndPointAttr, aCircleForArc);
+  // check the end point is referred to another feature
+  GeomShapePtr aRefShape;
+  AttributeRefAttrPtr aEndPointRefAttr = refattr(END_POINT_REF_ID());
+  if (aEndPointRefAttr && aEndPointRefAttr->isInitialized()) {
+    if (aEndPointRefAttr->isObject()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aEndPointRefAttr->object());
+      if (aFeature)
+        aRefShape = aFeature->lastResult()->shape();
+    }
+  }
+  if (aRefShape) {
+    // Calculate end point as an intersection between circle and another shape
+    intersectShapeAndCircle(aRefShape, aCircleForArc, sketch(), anEndPointAttr);
+  } else {
+    // End point should be a projection on circle.
+    projectPointOnCircle(anEndPointAttr, aCircleForArc);
+  }
   data()->blockSendAttributeUpdated(aWasBlocked, false);
   myEnd = anEndPointAttr->pnt();
 
