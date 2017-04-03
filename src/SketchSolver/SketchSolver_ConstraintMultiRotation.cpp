@@ -58,9 +58,8 @@ void SketchSolver_ConstraintMultiRotation::process()
 
   EntityWrapperPtr anAngle;
   EntityWrapperPtr aRotationCenter;
-  bool isFullValue;
   std::list<EntityWrapperPtr> aBaseEntities;
-  getAttributes(aRotationCenter, anAngle, isFullValue, aBaseEntities);
+  getAttributes(aRotationCenter, anAngle, myIsFullValue, aBaseEntities);
   if (!myErrorMsg.empty())
     return;
 
