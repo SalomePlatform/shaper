@@ -1149,7 +1149,8 @@ static std::shared_ptr<GeomAPI_Pnt2d> toPoint(const FeaturePtr& theMacroCircle,
             aPoint3D = anEdge->line()->project(aPoint3D);
           else if (anEdge->isCircle())
             aPoint3D = anEdge->circle()->project(aPoint3D);
-          aPoint = aSketch->to2D(aPoint3D);
+          if(aPoint3D)
+            aPoint = aSketch->to2D(aPoint3D);
         }
       }
     } else {
