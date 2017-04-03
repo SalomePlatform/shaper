@@ -195,7 +195,7 @@ private:
     convertTangentCurvesToGccEnt(aTgCirc, aTgLine);
 
     if (aTgCirc.size() + aTgLine.size() != 3)
-      return 0;
+      return Circ2dPtr();
 
     std::shared_ptr<GccAna_Circ2d3Tan> aCircleBuilder;
     switch (aTgLine.size()) {
@@ -228,7 +228,7 @@ private:
     CurveAdaptorPtr aCurve1 = myTangentShapes[0];
     CurveAdaptorPtr aCurve2 = myTangentShapes[1];
     if (!aCurve1 || !aCurve2)
-      return 0;
+      return Circ2dPtr();
 
     std::shared_ptr<GccAna_Circ2d3Tan> aCircleBuilder;
     if (aCurve1->GetType() == GeomAbs_Line) {
@@ -266,7 +266,7 @@ private:
     const gp_Pnt2d& aPoint2 = myPassingPoints[1];
     CurveAdaptorPtr aCurve = myTangentShapes[0];
     if (!aCurve)
-      return 0;
+      return Circ2dPtr();
 
     std::shared_ptr<GccAna_Circ2d3Tan> aCircleBuilder;
     if (aCurve->GetType() == GeomAbs_Line) {
@@ -340,7 +340,7 @@ private:
     convertTangentCurvesToGccEnt(aTgCirc, aTgLine);
 
     if (aTgCirc.size() + aTgLine.size() != 2)
-      return 0;
+      return Circ2dPtr();
 
     std::shared_ptr<GccAna_Circ2d2TanRad> aCircleBuilder;
     switch (aTgLine.size()) {
