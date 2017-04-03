@@ -111,11 +111,6 @@ std::string SketchPlugin_Line::processEvent(const std::shared_ptr<Events_Message
                                                  aNFData->attribute(SketchPlugin_Line::START_ID()));
     aNPoint->setValue(aSPoint->x(), aSPoint->y());
     SketchPlugin_ConstraintCoincidence::createCoincidenceFeature(sketch(), aSPoint, aNPoint);
-
-    aNPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                                 aSFData->attribute(SketchPlugin_Line::END_ID()));
-    aNPoint->setValue(aSPoint->x(), aSPoint->y());
-
   }
   return aFilledAttributeName;
 }

@@ -428,6 +428,10 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   if (myModule->sketchReentranceMgr()->processMouseReleased(theWnd, theEvent))
     return;
 
+  // if mouse is pressed when it was over view and at release the mouse is out of view, do nothing
+  if (!myIsMouseOverViewProcessed)
+    return;
+
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
   if (!aViewer->canDragByMouse())
