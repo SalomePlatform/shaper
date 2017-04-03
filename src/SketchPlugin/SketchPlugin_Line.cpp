@@ -74,7 +74,6 @@ void SketchPlugin_Line::execute()
       aMessage->setCreatedFeature(ModelAPI_Feature::feature(
                                   data()->attribute(START_ID())->owner()));
       Events_Loop::loop()->send(aMessage);
-      Events_Loop::loop()->flush(anId);
     }
   }
 }

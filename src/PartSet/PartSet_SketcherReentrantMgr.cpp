@@ -720,35 +720,35 @@ bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& th
   }
   else if (aFeatureKind == SketchPlugin_Trim::ID()) {
     /*std::shared_ptr<ModelAPI_AttributeReference> aRefSelectedAttr =
-                            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                            theSourceFeature->data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
+                      std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                      theSourceFeature->data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
     std::shared_ptr<ModelAPI_AttributeReference> aNRefSelectedAttr =
-                            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                            theNewFeature->data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
+                      std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                      theNewFeature->data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
     aNRefSelectedAttr->setValue(aRefSelectedAttr->value());*/
 
     std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
-                            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                            theSourceFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+                      std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                      theSourceFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
     std::shared_ptr<ModelAPI_AttributeReference> aNRefPreviewAttr =
-                            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                            theNewFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+                        std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                        theNewFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
     aNRefPreviewAttr->setValue(aRefPreviewAttr->value());
 
     /*std::shared_ptr<GeomDataAPI_Point2D> aPointSelectedAttr =
-                            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                            theSourceFeature->data()->attribute(SketchPlugin_Trim::SELECTED_POINT()));
+                      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                      theSourceFeature->data()->attribute(SketchPlugin_Trim::SELECTED_POINT()));
     std::shared_ptr<GeomDataAPI_Point2D> aNPointSelectedAttr =
-                            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                            theNewFeature->data()->attribute(SketchPlugin_Trim::SELECTED_POINT()));
+                      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                      theNewFeature->data()->attribute(SketchPlugin_Trim::SELECTED_POINT()));
     aNPointSelectedAttr->setValue(aPointSelectedAttr->x(), aPointSelectedAttr->y());
     */
     std::shared_ptr<GeomDataAPI_Point2D> aPointPreviewAttr =
-                            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                            theSourceFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
+                      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                      theSourceFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
     std::shared_ptr<GeomDataAPI_Point2D> aNPointPreviewAttr =
-                            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                            theNewFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
+                      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                      theNewFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
     aNPointPreviewAttr->setValue(aPointPreviewAttr->x(), aPointPreviewAttr->y());
 
     aChanged = true;

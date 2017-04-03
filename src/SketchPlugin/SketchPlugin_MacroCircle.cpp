@@ -102,10 +102,10 @@ void SketchPlugin_MacroCircle::execute()
   aMessage->setTypeOfCreation(!anEditType.empty() ? anEditType : aType);
   aMessage->setCreatedFeature(aCircle);
   Events_Loop::loop()->send(aMessage);
-  Events_Loop::loop()->flush(anId);
 }
 
-std::string SketchPlugin_MacroCircle::processEvent(const std::shared_ptr<Events_Message>& theMessage)
+std::string SketchPlugin_MacroCircle::processEvent(
+                                              const std::shared_ptr<Events_Message>& theMessage)
 {
   std::string aFilledAttributeName;
   std::shared_ptr<SketchPlugin_MacroArcReentrantMessage> aReentrantMessage =

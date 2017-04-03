@@ -284,7 +284,6 @@ void SketchPlugin_MacroArc::execute()
   aMessage->setTypeOfCreation(!anEditArcType.empty() ? anEditArcType : anArcType);
   aMessage->setCreatedFeature(anArcFeature);
   Events_Loop::loop()->send(aMessage);
-  Events_Loop::loop()->flush(anId);
 }
 
 std::string SketchPlugin_MacroArc::processEvent(const std::shared_ptr<Events_Message>& theMessage)

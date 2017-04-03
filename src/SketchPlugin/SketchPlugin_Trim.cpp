@@ -147,6 +147,8 @@ std::shared_ptr<GeomAPI_Pnt2d> SketchPlugin_Trim::convertPoint(
                                                    const std::shared_ptr<GeomAPI_Pnt>& thePoint)
 {
   std::shared_ptr<GeomAPI_Pnt2d> aPoint;
+  if (!thePoint.get())
+    return aPoint;
 
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                                         data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
@@ -225,7 +227,6 @@ void SketchPlugin_Trim::execute()
   findShapePoints(SELECTED_OBJECT(), SELECTED_POINT(), aStartShapePoint, aLastShapePoint);
 
   std::shared_ptr<GeomAPI_Pnt2d> aStartShapePoint2d = convertPoint(aStartShapePoint);
-
   std::shared_ptr<GeomAPI_Pnt2d> aLastShapePoint2d = convertPoint(aLastShapePoint);
 
   std::set<FeaturePtr> aFeaturesToDelete;
@@ -464,12 +465,11 @@ void SketchPlugin_Trim::execute()
     }
   }
   if (aPreviewObject.get()) {
-    static Events_ID anId = ModelAPI_EventReentrantMessage::eventId();
     std::shared_ptr<ModelAPI_EventReentrantMessage> aMessage = std::shared_ptr
-      <ModelAPI_EventReentrantMessage>(new ModelAPI_EventReentrantMessage(anId, 0));
+      <ModelAPI_EventReentrantMessage>(new ModelAPI_EventReentrantMessage(
+                                           ModelAPI_EventReentrantMessage::eventId(), 0));
     aMessage->setSelectedObject(aPreviewObject);
     Events_Loop::loop()->send(aMessage);
-    Events_Loop::loop()->flush(anId);
   }
 #ifdef DEBUG_TRIM
   std::cout << "SketchPlugin_Trim::done" << std::endl;

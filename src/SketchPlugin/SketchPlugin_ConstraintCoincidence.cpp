@@ -101,8 +101,8 @@ AttributePoint2DPtr SketchPlugin_ConstraintCoincidence::getPoint(const FeaturePt
 }
 
 void SketchPlugin_ConstraintCoincidence::createCoincidenceFeature(SketchPlugin_Sketch* theSketch,
-                                                  const std::shared_ptr<GeomDataAPI_Point2D>& thePoint1,
-                                                  const std::shared_ptr<GeomDataAPI_Point2D>& thePoint2)
+                                           const std::shared_ptr<GeomDataAPI_Point2D>& thePoint1,
+                                           const std::shared_ptr<GeomDataAPI_Point2D>& thePoint2)
 {
   FeaturePtr aFeature;
   if (theSketch) {
