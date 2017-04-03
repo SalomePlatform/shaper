@@ -215,6 +215,11 @@ void SketchPlugin_MacroArc::attributeChanged(const std::string& theID)
   }
 
   bool aWasBlocked = data()->blockSendAttributeUpdated(true);
+  if(myCenter.get()) {
+    // center attribute is used in processEvent() to set reference to reentrant arc
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_POINT_ID()))
+        ->setValue(myCenter);
+  }
   real(RADIUS_ID())->setValue(aRadius);
   real(ANGLE_ID())->setValue(anAngle);
   data()->blockSendAttributeUpdated(aWasBlocked, false);
@@ -400,16 +405,33 @@ std::string SketchPlugin_MacroArc::processEvent(const std::shared_ptr<Events_Mes
           aPointAttr->setValue(aClickedPoint);
           // fill reference attribute
           AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                                            attribute(aReferenceAttributeName));
+                                                          attribute(aReferenceAttributeName));
           if (aRefAttr.get()) {
-            if (anAttribute.get())
+            if (anAttribute.get()) {
+              if (!anAttribute->owner().get() || !anAttribute->owner()->data()->isValid()) {
+                FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
+                if (aCreatedFeature.get()) {
+                  std::string anID = anAttribute->id();
+                  std::string anArcID;
+                  if (anID == END_POINT_1_ID() || anID == END_POINT_2_ID() ||
+                      anID == END_POINT_3_ID())
+                    anArcID = SketchPlugin_Arc::END_ID();
+                  else if (anID == START_POINT_1_ID() || anID ==START_POINT_2_ID())
+                    anArcID = SketchPlugin_Arc::START_ID();
+                  else if (anID == CENTER_POINT_ID())
+                    anArcID = SketchPlugin_Arc::CENTER_ID();
+                  anAttribute = aCreatedFeature->attribute(anArcID);
+                }
+              }
               aRefAttr->setAttr(anAttribute);
+            }
             else if (anObject.get()) {
               // if presentation of previous reentrant macro arc is used, the object is invalid,
               // we should use result of previous feature of the message(Arc)
               if (!anObject->data()->isValid()) {
                 FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
-                anObject = aCreatedFeature->lastResult();
+                if (aCreatedFeature.get())
+                  anObject = aCreatedFeature->lastResult();
               }
               aRefAttr->setObject(anObject);
             }
