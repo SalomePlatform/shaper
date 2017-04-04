@@ -54,6 +54,21 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
   return aRes;
 }
 
+std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
+    const std::shared_ptr<GeomAPI_Lin> theLin)
+{
+  if(!theLin.get()) {
+    return std::shared_ptr<GeomAPI_Edge>();
+  }
+
+  const gp_Lin& aLin = theLin->impl<gp_Lin>();
+  BRepBuilderAPI_MakeEdge anEdgeBuilder(aLin);
+  std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge());
+  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
+  aRes->setImpl(new TopoDS_Shape(anEdge));
+  return aRes;
+}
+
 std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::cylinderAxis(
     std::shared_ptr<GeomAPI_Shape> theCylindricalFace)
 {
@@ -138,6 +153,21 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircle(
 
   BRepBuilderAPI_MakeEdge anEdgeBuilder(aCircle);
   std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
+  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
+  aRes->setImpl(new TopoDS_Shape(anEdge));
+  return aRes;
+}
+
+std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircle(
+    std::shared_ptr<GeomAPI_Circ> theCircle)
+{
+  if(!theCircle.get()) {
+    return std::shared_ptr<GeomAPI_Edge>();
+  }
+
+  const gp_Circ& aCirc = theCircle->impl<gp_Circ>();
+  BRepBuilderAPI_MakeEdge anEdgeBuilder(aCirc);
+  std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge());
   TopoDS_Edge anEdge = anEdgeBuilder.Edge();
   aRes->setImpl(new TopoDS_Shape(anEdge));
   return aRes;

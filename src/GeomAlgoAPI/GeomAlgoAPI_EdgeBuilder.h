@@ -11,6 +11,8 @@
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Dir.h>
+#include <GeomAPI_Lin.h>
+#include <GeomAPI_Circ.h>
 #include <memory>
 
 /**\class GeomAlgoAPI_EdgeBuilder
@@ -35,6 +37,10 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_EdgeBuilder
                                             double theDY,
                                             double theDZ);
 
+  /// Creates linear edge by GeomAPI_Lin.
+  /// \param theLin line.
+  static std::shared_ptr<GeomAPI_Edge> line(const std::shared_ptr<GeomAPI_Lin> theLin);
+
   /// Creates edge - axis of the given cylindrical face. The result axis edge is infinite
   static std::shared_ptr<GeomAPI_Edge> cylinderAxis(
     std::shared_ptr<GeomAPI_Shape> theCylindricalFace);
@@ -43,6 +49,9 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_EdgeBuilder
   static std::shared_ptr<GeomAPI_Edge> lineCircle(std::shared_ptr<GeomAPI_Pnt> theCenter,
                                                     std::shared_ptr<GeomAPI_Dir> theNormal,
                                                     double theRadius);
+
+  /// Creates linear edge in a form of a circle by GeomAPI_Circle
+  static std::shared_ptr<GeomAPI_Edge> lineCircle(std::shared_ptr<GeomAPI_Circ> theCircle);
 
   /// Creates linear edge in a form of a circle arc by a three points
   static std::shared_ptr<GeomAPI_Edge> lineCircleArc(std::shared_ptr<GeomAPI_Pnt> theCenter,

@@ -41,6 +41,7 @@
 #include <ModelGeomAlgo_Point2D.h>
 #include <ModelGeomAlgo_Shape.h>
 
+#include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
 #include <GeomAPI_Circ.h>
@@ -1325,6 +1326,35 @@ bool SketchPlugin_ArcEndPointValidator::isValid(
   return true;
 }
 
+static GeomShapePtr toInfiniteEdge(const GeomShapePtr theShape)
+{
+  if(!theShape.get()) {
+    return theShape;
+  }
+
+  if(!theShape->isEdge()) {
+    return theShape;
+  }
+
+  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(theShape));
+
+  if(!anEdge.get()) {
+    return theShape;
+  }
+
+  if(anEdge->isLine()) {
+    std::shared_ptr<GeomAPI_Lin> aLine = anEdge->line();
+    GeomShapePtr aShape = GeomAlgoAPI_EdgeBuilder::line(aLine);
+    return aShape;
+  }
+
+  if(anEdge->isCircle() || anEdge->isArc()) {
+    std::shared_ptr<GeomAPI_Circ> aCircle = anEdge->circle();
+    GeomShapePtr aShape = GeomAlgoAPI_EdgeBuilder::lineCircle(aCircle);
+    return aShape;
+  }
+}
+
 bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
     const AttributePtr& theAttribute,
     const std::list<std::string>& theArguments,
@@ -1338,7 +1368,7 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
     return true;
   }
 
-  GeomShapePtr anArcShape = anArcFeature->getArcShape(false);
+  GeomShapePtr anArcShape = toInfiniteEdge(anArcFeature->getArcShape(false));
 
   if(!anArcShape.get() || anArcShape->isNull()) {
     return true;
@@ -1352,7 +1382,7 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
 
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
   if(aResult.get()) {
-    GeomShapePtr aShape = aResult->shape();
+    GeomShapePtr aShape = toInfiniteEdge(aResult->shape());
     if(aShape.get() && !aShape->isNull()) {
       GeomShapePtr anIntersection = anArcShape->intersect(aShape);
       if(anIntersection.get() && !anIntersection->isNull()) {
@@ -1368,7 +1398,7 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
         anIt != aResults.cend();
         ++anIt)
     {
-      GeomShapePtr aShape = (*anIt)->shape();
+      GeomShapePtr aShape = toInfiniteEdge((*anIt)->shape());
       if(aShape.get() && !aShape->isNull()) {
         GeomShapePtr anIntersection = anArcShape->intersect(aShape);
         if(anIntersection.get() && !anIntersection->isNull()) {
