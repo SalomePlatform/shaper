@@ -87,10 +87,12 @@ class ModelAPI_Feature : public ModelAPI_Object
   MODELAPI_EXPORT void removeResult(const std::shared_ptr<ModelAPI_Result>& theResult);
   /// removes all results starting from the given index (zero-based)
   /// \param theSinceIndex - index of the deleted result and all after also will be deleted
+  /// \param theForever - removes results for long period (not just because of feature disabling)
   /// \param theFlush - if it is false, REDISPLAY message is not flushed
-  MODELAPI_EXPORT void removeResults(const int theSinceIndex, const bool theFlush = true);
+  MODELAPI_EXPORT void removeResults(const int theSinceIndex,
+    const bool theForever = true, const bool theFlush = true);
   /// removes all results from the feature
-  MODELAPI_EXPORT void eraseResults();
+  MODELAPI_EXPORT void eraseResults(const bool theForever = true);
   /// removes all fields from this feature: results, data, etc
   MODELAPI_EXPORT virtual void erase();
   /// removes the result from the list of feature (not doing in disabled): normally this
