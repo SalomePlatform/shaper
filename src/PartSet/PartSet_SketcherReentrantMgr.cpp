@@ -152,17 +152,16 @@ bool PartSet_SketcherReentrantMgr::processMouseMoved(ModuleBase_IViewWindow* the
       ModuleBase_IPropertyPanel* aPanel = myWorkshop->currentOperation()->propertyPanel();
 
       FeaturePtr aCurrentFeature = aFOperation->feature();
-      bool isLineFeature = false, isArcFeature = false;
+      bool isLineFeature = false, isReentrantArcFeature = false;
       std::string anAttributeOnStart;
       if (aCurrentFeature->getKind() == SketchPlugin_Line::ID()) {
         anAttributeOnStart = SketchPlugin_Line::START_ID();
         isLineFeature = anActiveWidget->attributeID() == anAttributeOnStart;
       }
       else if (isTangentArc(aFOperation, module()->sketchMgr()->activeSketch())) {
-        anAttributeOnStart = SketchPlugin_MacroArc::TANGENT_POINT_ID();
-        isArcFeature = anActiveWidget->attributeID() == anAttributeOnStart;
+        isReentrantArcFeature = true;
       }
-      bool aCanBeActivatedByMove = isLineFeature || isArcFeature;
+      bool aCanBeActivatedByMove = isLineFeature || isReentrantArcFeature;
       if (aCanBeActivatedByMove) {
         /// before restarting of operation we need to clear selection, as it may take part in
         /// new feature creation, e.g. tangent arc. But it is not necessary as it was processed
@@ -690,16 +689,16 @@ bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& th
     AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
     if (aNewFeatureTypeAttr->value() != aTypeAttributeId) // do nothing if there is no changes
       aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
-    //ModuleBase_Tools::flushUpdated(theNewFeature);
-    aChanged = true;*/
+    //ModuleBase_Tools::flushUpdated(theNewFeature);*/
+    //aChanged = true;
   }
   else if (aFeatureKind == SketchPlugin_MacroArc::ID()) {
     // set arc type
-    std::string aTypeAttributeId = SketchPlugin_MacroArc::ARC_TYPE();
+    /*std::string aTypeAttributeId = SketchPlugin_MacroArc::ARC_TYPE();
     AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
     AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
     if (aNewFeatureTypeAttr->value() != aTypeAttributeId) // do nothing if there is no changes
-      aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
+      aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());*/
     //// if the arc is tangent, set coincidence to end point of the previous arc
     //std::string anArcType = aSourceFeatureTypeAttr->value();
     //if (anArcType == SketchPlugin_Arc::ARC_TYPE_TANGENT()) {
@@ -720,7 +719,7 @@ bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& th
 
     //}
     //ModuleBase_Tools::flushUpdated(theNewFeature);
-    aChanged = true;
+    //aChanged = true;
   }
   else if (aFeatureKind == SketchPlugin_Trim::ID()) {
     /*std::shared_ptr<ModelAPI_AttributeReference> aRefSelectedAttr =
@@ -731,13 +730,13 @@ bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& th
                       theNewFeature->data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
     aNRefSelectedAttr->setValue(aRefSelectedAttr->value());*/
 
-    std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
+    /*std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
                       std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                       theSourceFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
     std::shared_ptr<ModelAPI_AttributeReference> aNRefPreviewAttr =
                         std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                         theNewFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
-    aNRefPreviewAttr->setValue(aRefPreviewAttr->value());
+    aNRefPreviewAttr->setValue(aRefPreviewAttr->value());*/
 
     /*std::shared_ptr<GeomDataAPI_Point2D> aPointSelectedAttr =
                       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -747,15 +746,15 @@ bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& th
                       theNewFeature->data()->attribute(SketchPlugin_Trim::SELECTED_POINT()));
     aNPointSelectedAttr->setValue(aPointSelectedAttr->x(), aPointSelectedAttr->y());
     */
-    std::shared_ptr<GeomDataAPI_Point2D> aPointPreviewAttr =
+    /*std::shared_ptr<GeomDataAPI_Point2D> aPointPreviewAttr =
                       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                       theSourceFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
     std::shared_ptr<GeomDataAPI_Point2D> aNPointPreviewAttr =
                       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                       theNewFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
     aNPointPreviewAttr->setValue(aPointPreviewAttr->x(), aPointPreviewAttr->y());
-
-    aChanged = true;
+    */
+    //aChanged = true;
   }
   return aChanged;
 }

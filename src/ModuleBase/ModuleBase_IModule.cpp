@@ -114,10 +114,11 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId,
         if (aMessage.get()) {
           ModuleBase_IPropertyPanel* aPanel = workshop()->propertyPanel();
           std::string aPrevAttribute = aReentrantFeature->processEvent(aMessage);
-          workshop()->errorMgr()->updateActions(aFeature);
-
-          ModuleBase_ModelWidget* aPrevWidget = aPanel->modelWidget(aPrevAttribute);
-          aPanel->activateNextWidget(aPrevWidget);
+          if (!aPrevAttribute.empty()) {
+            workshop()->errorMgr()->updateActions(aFeature);
+            ModuleBase_ModelWidget* aPrevWidget = aPanel->modelWidget(aPrevAttribute);
+            aPanel->activateNextWidget(aPrevWidget);
+          }
         }
       }
     }
