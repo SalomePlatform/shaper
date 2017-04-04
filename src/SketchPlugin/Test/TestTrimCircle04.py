@@ -95,4 +95,4 @@ assert(len(Intersection_Points_3) == 0)
 
 model.end()
 
-#assert(model.checkPythonDump())
+assert(model.checkPythonDump())

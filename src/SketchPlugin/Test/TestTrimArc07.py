@@ -53,14 +53,6 @@ model.do()
 SketchTrim = Sketch.addTrim(SketchArc_1, Sketch.to2D(GeomPoint))
 SketchTrim.execute()
 
-
-# Another case
-#GeomPoint = geom.Pnt2d(60, 50)
-#model.do()
-#SketchTrim = Sketch.addTrim(SketchArc_1, GeomPoint)
-#SketchTrim.execute()
-
-
 model.end()
 
-#assert(model.checkPythonDump())
+assert(model.checkPythonDump())

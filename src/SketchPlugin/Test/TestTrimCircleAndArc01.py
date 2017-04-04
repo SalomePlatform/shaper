@@ -90,22 +90,10 @@ assert(idList_after.count(SketchLineId) == 6)
 assert(idList_after.count(SketchConstraintCoincidenceId) == 8)
 
 
-#check arc position intersections of created arc to an additional line
-#SketchLine_intersecting_1 = Sketch.addLine(0, 0, 50, 50)
-#SketchLine_intersecting_2 = Sketch.addLine(50, 50, 100, 100)
-
-#Intersection_Points_1 = ModelGeomAlgo_Point2D.getSetOfPntIntersectedShape(SketchArc, FeatureList([SketchLine_intersecting_1.feature()]))
-#Intersection_Points_2 = ModelGeomAlgo_Point2D.getSetOfPntIntersectedShape(SketchArc, FeatureList([SketchLine_intersecting_2.feature()]))
-
-#assert(len(Intersection_Points_1) == 1)
-#assert(len(Intersection_Points_2) == 0)
-
 #add point for check
 SketchPoint = Sketch.addPoint(GeomPoint.x(), GeomPoint.y())
 Intersection_Points_3 = ModelGeomAlgo_Point2D.getSetOfPntIntersectedShape(SketchArc, FeatureList([SketchPoint.feature()]))
 assert(len(Intersection_Points_3) == 0)
-
-
 
 #perform trim: horizontal
 #second intersection point - horizontal
@@ -154,4 +142,4 @@ assert(len(Intersection_Points_5) == 0)
 
 model.end()
 
-#assert(model.checkPythonDump())
+assert(model.checkPythonDump())
