@@ -186,10 +186,6 @@ private:
   bool isTangentArc(ModuleBase_Operation* theOperation,
                     const std::shared_ptr<ModelAPI_CompositeFeature>& /*theSketch*/) const;
 
-  /// Creates selection instance by the current feature and created by restart objects
-  /// \returns viewer selection presentation
-  std::shared_ptr<ModuleBase_ViewerPrs> generatePreSelection();
-
   /// Accept All action is enabled if an internal edit is started.
   /// It updates the state of the button
   void updateAcceptAllAction();

@@ -117,13 +117,13 @@ void PartSet_SketcherReentrantMgr::operationStarted(ModuleBase_Operation* theOpe
   if (!isActiveMgr())
     return;
 
-  if (myPreviousFeature.get() && myRestartingMode == RM_LastFeatureUsed) {
-    ModuleBase_OperationFeature* aCurrentOperation = dynamic_cast<ModuleBase_OperationFeature*>(
-                                                                myWorkshop->currentOperation());
-    CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
-    if (myPreviousFeature.get() && myPreviousFeature->data()->isValid()) // it is not removed
-      copyReetntrantAttributes(myPreviousFeature, aCurrentOperation->feature(), aSketch);
-  }
+  //if (myPreviousFeature.get() && myRestartingMode == RM_LastFeatureUsed) {
+    //ModuleBase_OperationFeature* aCurrentOperation = dynamic_cast<ModuleBase_OperationFeature*>(
+    //                                                            myWorkshop->currentOperation());
+    //CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
+    //if (myPreviousFeature.get() && myPreviousFeature->data()->isValid()) // it is not removed
+      //copyReetntrantAttributes(myPreviousFeature, aCurrentOperation->feature(), aSketch);
+  //}
   resetFlags();
 }
 
@@ -262,7 +262,7 @@ bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* 
             && !aSelectedPrs->object()->data()->isValid()) {
           // the selected object was removed diring restart, e.g. presentable macro feature
           // there are created objects to replace the object depending on created feature kind
-          aSelectedPrs = generatePreSelection();
+          aSelectedPrs = std::shared_ptr<ModuleBase_ViewerPrs>();
         }
         aMouseProcessor->setPreSelection(aSelectedPrs, theWindow, theEvent);
         //aPoint2DWdg->mouseReleased(theWindow, theEvent);
@@ -547,7 +547,7 @@ void PartSet_SketcherReentrantMgr::restartOperation()
 
       if (myInternalFeature.get())
         copyReetntrantAttributes(myInternalFeature, aFOperation->feature(),
-                                  module()->sketchMgr()->activeSketch());
+                                 module()->sketchMgr()->activeSketch());
 
       myNoMoreWidgetsAttribute = "";
       myIsFlagsBlocked = true;
@@ -730,13 +730,13 @@ bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& th
                       theNewFeature->data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
     aNRefSelectedAttr->setValue(aRefSelectedAttr->value());*/
 
-    /*std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
+    std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
                       std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                       theSourceFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
     std::shared_ptr<ModelAPI_AttributeReference> aNRefPreviewAttr =
                         std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                         theNewFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
-    aNRefPreviewAttr->setValue(aRefPreviewAttr->value());*/
+    aNRefPreviewAttr->setValue(aRefPreviewAttr->value());
 
     /*std::shared_ptr<GeomDataAPI_Point2D> aPointSelectedAttr =
                       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -746,14 +746,13 @@ bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& th
                       theNewFeature->data()->attribute(SketchPlugin_Trim::SELECTED_POINT()));
     aNPointSelectedAttr->setValue(aPointSelectedAttr->x(), aPointSelectedAttr->y());
     */
-    /*std::shared_ptr<GeomDataAPI_Point2D> aPointPreviewAttr =
+    std::shared_ptr<GeomDataAPI_Point2D> aPointPreviewAttr =
                       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                       theSourceFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
     std::shared_ptr<GeomDataAPI_Point2D> aNPointPreviewAttr =
                       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                       theNewFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
     aNPointPreviewAttr->setValue(aPointPreviewAttr->x(), aPointPreviewAttr->y());
-    */
     //aChanged = true;
   }
   return aChanged;
@@ -774,13 +773,6 @@ bool PartSet_SketcherReentrantMgr::isTangentArc(ModuleBase_Operation* theOperati
     }
   }
   return aTangentArc;
-}
-
-std::shared_ptr<ModuleBase_ViewerPrs> PartSet_SketcherReentrantMgr::generatePreSelection()
-{
-  std::shared_ptr<ModuleBase_ViewerPrs> aPrs;
-
-  return aPrs;
 }
 
 void PartSet_SketcherReentrantMgr::updateAcceptAllAction()

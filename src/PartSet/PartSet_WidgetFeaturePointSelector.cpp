@@ -213,6 +213,7 @@ void PartSet_WidgetFeaturePointSelector::setPreSelection(
                                   ModuleBase_IViewWindow* theWnd,
                                   QMouseEvent* theEvent)
 {
-  if (fillFeature(thePreSelected, theWnd, theEvent))
-    mouseReleased(theWnd, theEvent);
+  // the method is empty because firstly by starging of the feature there is no selection of
+  // sub-segments in the viewer, secondly preselection of restart operation is processed by
+  // special reentrant message sent by the feature
 }
