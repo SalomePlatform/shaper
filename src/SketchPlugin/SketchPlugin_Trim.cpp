@@ -467,7 +467,7 @@ void SketchPlugin_Trim::execute()
   if (aPreviewObject.get()) {
     std::shared_ptr<ModelAPI_EventReentrantMessage> aMessage = std::shared_ptr
       <ModelAPI_EventReentrantMessage>(new ModelAPI_EventReentrantMessage(
-                                           ModelAPI_EventReentrantMessage::eventId(), 0));
+                                           ModelAPI_EventReentrantMessage::eventId(), this));
     aMessage->setSelectedObject(aPreviewObject);
     Events_Loop::loop()->send(aMessage);
   }

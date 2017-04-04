@@ -26,7 +26,7 @@ class ModelAPI_EventReentrantMessage : public Events_Message
 public:
   /// Creates an empty message
   MODELAPI_EXPORT ModelAPI_EventReentrantMessage(const Events_ID theID,
-                                                 const void* theSender = 0);
+                                                 const void* theSender);
   /// The virtual destructor
   MODELAPI_EXPORT virtual ~ModelAPI_EventReentrantMessage() {}
   /// Static. Returns EventID of the message.

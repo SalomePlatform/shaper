@@ -70,7 +70,7 @@ void SketchPlugin_Line::execute()
 
       static Events_ID anId = ModelAPI_EventReentrantMessage::eventId();
       std::shared_ptr<ModelAPI_EventReentrantMessage> aMessage = std::shared_ptr
-          <ModelAPI_EventReentrantMessage>(new ModelAPI_EventReentrantMessage(anId, 0));
+          <ModelAPI_EventReentrantMessage>(new ModelAPI_EventReentrantMessage(anId, this));
       aMessage->setCreatedFeature(ModelAPI_Feature::feature(
                                   data()->attribute(START_ID())->owner()));
       Events_Loop::loop()->send(aMessage);

@@ -97,7 +97,7 @@ void SketchPlugin_MacroCircle::execute()
   // message to init reentrant operation
   static Events_ID anId = SketchPlugin_MacroArcReentrantMessage::eventId();
   std::shared_ptr<SketchPlugin_MacroArcReentrantMessage> aMessage = std::shared_ptr
-    <SketchPlugin_MacroArcReentrantMessage>(new SketchPlugin_MacroArcReentrantMessage(anId, 0));
+    <SketchPlugin_MacroArcReentrantMessage>(new SketchPlugin_MacroArcReentrantMessage(anId, this));
 
   std::string anEditType = string(EDIT_CIRCLE_TYPE())->value();
   aMessage->setTypeOfCreation(!anEditType.empty() ? anEditType : aType);

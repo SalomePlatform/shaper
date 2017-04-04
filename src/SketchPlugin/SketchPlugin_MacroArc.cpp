@@ -355,7 +355,7 @@ void SketchPlugin_MacroArc::execute()
   // message to init reentrant operation
   static Events_ID anId = SketchPlugin_MacroArcReentrantMessage::eventId();
   std::shared_ptr<SketchPlugin_MacroArcReentrantMessage> aMessage = std::shared_ptr
-    <SketchPlugin_MacroArcReentrantMessage>(new SketchPlugin_MacroArcReentrantMessage(anId, 0));
+    <SketchPlugin_MacroArcReentrantMessage>(new SketchPlugin_MacroArcReentrantMessage(anId, this));
 
   std::string anEditArcType = string(EDIT_ARC_TYPE_ID())->value();
   aMessage->setTypeOfCreation(!anEditArcType.empty() ? anEditArcType : anArcType);

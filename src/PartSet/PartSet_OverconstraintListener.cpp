@@ -12,10 +12,12 @@
 #include <PartSet_SketcherMgr.h>
 #include <PartSet_SketcherReentrantMgr.h>
 
-#include "XGUI_ModuleConnector.h"
-#include "XGUI_Workshop.h"
-#include "XGUI_Displayer.h"
 #include "XGUI_CustomPrs.h"
+#include "XGUI_Displayer.h"
+#include "XGUI_ModuleConnector.h"
+#include "XGUI_OperationMgr.h"
+#include "XGUI_Tools.h"
+#include "XGUI_Workshop.h"
 
 #include "SketcherPrs_SymbolPrs.h"
 #include "SketchPlugin_SketchEntity.h"
@@ -154,9 +156,34 @@ void PartSet_OverconstraintListener::processEvent(
   }
   else if (anEventID == ModelAPI_EventReentrantMessage::eventId() ||
            anEventID == SketchPlugin_MacroArcReentrantMessage::eventId()) {
-    PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
-    PartSet_SketcherReentrantMgr* aReentrantMgr = aModule->sketchReentranceMgr();
-    aReentrantMgr->setReentrantMessage(theMessage);
+    // the message is sent to sketcher reentrant manager only if the kind of feature
+    // sender is equal to kind of the current operation. E.g. Horizontal create operation
+    // is active. Sketch Line feature is changed, so execute is called, it will send message
+    // This Line's message should not be processed, as the reentrant operation is not for Line
+    std::string aCurrentFeatureKind;
+    ModuleBase_Operation* anOperation =
+                XGUI_Tools::workshop(myWorkshop)->operationMgr()->currentOperation();
+    if (anOperation) {
+      ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                           (anOperation);
+      if (aFOperation) {
+        FeaturePtr aFeature = aFOperation->feature();
+        if (aFeature.get())
+          aCurrentFeatureKind = aFeature->getKind();
+      }
+    }
+    if (theMessage->sender()) {
+      ModelAPI_Object* aSender = static_cast<ModelAPI_Object*>(theMessage->sender());
+      if (aSender) {
+        FeaturePtr aFeatureSender =
+          std::dynamic_pointer_cast<ModelAPI_Feature>(aSender->data()->owner());
+        if (aFeatureSender.get() && aFeatureSender->getKind() == aCurrentFeatureKind) {
+          PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+          PartSet_SketcherReentrantMgr* aReentrantMgr = aModule->sketchReentranceMgr();
+          aReentrantMgr->setReentrantMessage(theMessage);
+        }
+      }
+    }
   }
 
 #ifdef DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
