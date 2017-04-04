@@ -21,7 +21,7 @@
 class FeaturesPlugin_MultiTranslation : public ModelAPI_Feature
 {
   public:
-  /// Translation kind.
+  /// Multi-translation kind.
   inline static const std::string& ID()
   {
     static const std::string MY_MULTITRANSLATION_ID("MultiTranslation");

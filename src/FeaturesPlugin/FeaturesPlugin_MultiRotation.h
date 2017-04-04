@@ -16,8 +16,9 @@
 
 /** \class FeaturesPlugin_MultiRotation
  *  \ingroup Plugins
- *  \brief Feature for movement objects along one or two axes an arbitary number of times,
- *         making a copy every time.
+ *  \brief Feature that rotaes object around an axis an number of times.
+ *         The 2D version also makes translated copies of the object and performs the rotation
+ *         on these as well.
  */
 class FeaturesPlugin_MultiRotation : public ModelAPI_Feature
 {
@@ -50,35 +51,35 @@ class FeaturesPlugin_MultiRotation : public ModelAPI_Feature
     return MY_USE_ANGULAR_STEP_ID;
   }
 
-  /// Attribute name of step for the first direction.
+  /// Attribute name of step for the angular.
   inline static const std::string& STEP_ANGULAR_ID()
   {
     static const std::string MY_STEP_ANGULAR_ID("step_angular");
     return MY_STEP_ANGULAR_ID;
   }
 
-  /// Attribute name of number of copies for the first direction.
+  /// Attribute name of number of copies for angular.
   inline static const std::string& NB_COPIES_ANGULAR_ID()
   {
     static const std::string MY_NB_COPIES_ANGULAR_ID("nb_angular");
     return MY_NB_COPIES_ANGULAR_ID;
   }
 
-  /// Attribute name for use second dir.
+  /// Attribute name for use radial dir.
   inline static const std::string& USE_RADIAL_DIR_ID()
   {
     static const std::string MY_USE_RADIAL_DIR_ID("use_radial_dir");
     return MY_USE_RADIAL_DIR_ID;
   }
 
-  /// Attribute name of step for the second direction.
+  /// Attribute name of radial step.
   inline static const std::string& STEP_RADIAL_ID()
   {
     static const std::string MY_STEP_RADIAL_ID("step_radial");
     return MY_STEP_RADIAL_ID;
   }
 
-  /// Attribute name of number of copies for the second direction.
+  /// Attribute name of number of copies for radial.
   inline static const std::string& NB_COPIES_RADIAL_ID()
   {
     static const std::string MY_NB_COPIES_RADIAL_ID("nb_radial");
@@ -102,10 +103,10 @@ class FeaturesPlugin_MultiRotation : public ModelAPI_Feature
   FeaturesPlugin_MultiRotation();
 
 private:
-  /// Perform the multi translation in one direction.
+  /// Perform the multi rotation in one direction.
   void performRotation1D();
 
-  /// Perform the multi translation in two directions.
+  /// Perform the multi totation in two directions.
   void performRotation2D();
 
   void loadNamingDS2(std::list<std::shared_ptr<GeomAlgoAPI_Translation> > theListOfTranslationAlgo,

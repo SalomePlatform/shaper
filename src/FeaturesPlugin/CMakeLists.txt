@@ -32,6 +32,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Symmetry.h
     FeaturesPlugin_Scale.h
     FeaturesPlugin_MultiTranslation.h
+    FeaturesPlugin_MultiRotation.h
 )
 
 SET(PROJECT_SOURCES
@@ -62,6 +63,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Symmetry.cpp
     FeaturesPlugin_Scale.cpp
     FeaturesPlugin_MultiTranslation.cpp
+    FeaturesPlugin_MultiRotation.cpp
 )
 
 SET(XML_RESOURCES
@@ -85,6 +87,7 @@ SET(XML_RESOURCES
   symmetry_widget.xml
   scale_widget.xml
   multitranslation_widget.xml
+  multirotation_widget.xml
 )
 
 SET(TEXT_RESOURCES

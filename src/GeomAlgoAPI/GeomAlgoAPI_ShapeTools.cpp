@@ -8,6 +8,7 @@
 
 #include "GeomAlgoAPI_SketchBuilder.h"
 
+#include <GeomAPI_Ax1.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Face.h>
@@ -33,7 +34,9 @@
 #include <Geom2d_Curve.hxx>
 #include <BRepLib_CheckCurveOnSurface.hxx>
 #include <BRep_Tool.hxx>
+#include <Geom_Line.hxx>
 #include <Geom_Plane.hxx>
+#include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <GeomLib_IsPlanarSurface.hxx>
 #include <GeomLib_Tool.hxx>
 #include <gp_Pln.hxx>
@@ -813,4 +816,21 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::findShape(
   }
 
   return aResultShape;
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Dir> GeomAlgoAPI_ShapeTools::buildDirFromAxisAndShape(
+                                    const std::shared_ptr<GeomAPI_Shape> theBaseShape,
+                                    const std::shared_ptr<GeomAPI_Ax1> theAxis)
+{
+  gp_Pnt aCentreOfMassPoint =
+    GeomAlgoAPI_ShapeTools::centreOfMass(theBaseShape)->impl<gp_Pnt>();
+  Handle(Geom_Line) aLine = new Geom_Line(theAxis->impl<gp_Ax1>());
+  GeomAPI_ProjectPointOnCurve aPrjTool(aCentreOfMassPoint, aLine);
+  gp_Pnt aPoint = aPrjTool.NearestPoint();
+
+  std::shared_ptr<GeomAPI_Dir> aDir(new GeomAPI_Dir(aCentreOfMassPoint.X()-aPoint.X(),
+                                                    aCentreOfMassPoint.Y()-aPoint.Y(),
+                                                    aCentreOfMassPoint.Z()-aPoint.Z()));
+  return aDir;
 }

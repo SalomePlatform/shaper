@@ -15,6 +15,7 @@
 #include <map>
 #include <set>
 
+class GeomAPI_Ax1;
 class GeomAPI_Edge;
 class GeomAPI_Dir;
 class GeomAPI_Face;
@@ -142,6 +143,13 @@ public:
                                     const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
                                     const std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes);
 
+  /// \brief Returns a dir from a shape and an axis.
+  /// \param[in] theBaseShape shape whose center of mass serves as the starting point of the dir.
+  /// \param[in] theAxis axis that serves as a direction for the dir
+  /// \return dir that builds from center of mass of the base shape and the axis
+  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Dir> buildDirFromAxisAndShape(
+                                    const std::shared_ptr<GeomAPI_Shape> theBaseShape,
+                                    const std::shared_ptr<GeomAPI_Ax1> theAxis);
 };
 
 #endif

@@ -111,14 +111,14 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
   // Getting number of copies.
   int nbCopies =
     integer(FeaturesPlugin_MultiRotation::NB_COPIES_ANGULAR_ID())->value();
-    
+
   if (nbCopies <=0) {
     std::string aFeatureError = "Multirotation builder ";
     aFeatureError+=":: the number of copies for the angular direction is null or negative.";
     setError(aFeatureError);
     return;
   }
-  
+
   // Getting angle
   double anAngle;
   std::string useAngularStep =
@@ -128,7 +128,7 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
   } else {
     anAngle = 360./nbCopies;
   }
-  
+
   // Moving each object.
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
@@ -235,29 +235,29 @@ void FeaturesPlugin_MultiRotation::performRotation2D()
     anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(),
                                                           anEdge->line()->direction()));
   }
-  
+
   // Getting number of copies int he angular direction.
   int nbAngular =
     integer(FeaturesPlugin_MultiRotation::NB_COPIES_ANGULAR_ID())->value();
-    
+
   if (nbAngular <=0) {
     std::string aFeatureError = "Multirotation builder ";
     aFeatureError+=":: the number of copies for the angular direction is null or negative.";
     setError(aFeatureError);
     return;
   }
-  
+
   // Getting number of copies int he radial direction.
   int nbRadial =
     integer(FeaturesPlugin_MultiRotation::NB_COPIES_RADIAL_ID())->value();
-    
+
   if (nbRadial <=0) {
     std::string aFeatureError = "Multirotation builder ";
     aFeatureError+=":: the number of copies for the radial direction is null or negative.";
     setError(aFeatureError);
     return;
   }
-  
+
   // Getting angle
   double anAngle;
   std::string useAngularStep =
@@ -267,8 +267,8 @@ void FeaturesPlugin_MultiRotation::performRotation2D()
   } else {
     anAngle = 360./nbAngular;
   }
-  
-  // 
+
+  // Getting step
   double aStep = real(FeaturesPlugin_MultiRotation::STEP_RADIAL_ID())->value();
 
   // Moving each object.
@@ -278,8 +278,9 @@ void FeaturesPlugin_MultiRotation::performRotation2D()
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
     bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
-  
-    std::shared_ptr<GeomAPI_Dir> aDir = GeomAlgoAPI_ShapeTools::makeToto(aBaseShape, anAxis);
+
+    std::shared_ptr<GeomAPI_Dir> aDir =
+      GeomAlgoAPI_ShapeTools::buildDirFromAxisAndShape(aBaseShape, anAxis);
     double x = aDir->x();
     double y = aDir->y();
     double z = aDir->z();
@@ -369,7 +370,7 @@ void FeaturesPlugin_MultiRotation::performRotation2D()
         GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
       aResultBody->storeModified(aBaseShape, aCompound);
-      
+
       loadNamingDS2(aListOfTranslationAlgo, aResultBody, aBaseShape);
       loadNamingDS3(aListOfRotationAlgo, aResultBody, aBaseShape, nbRadial);
       setResult(aResultBody, aResultIndex);
@@ -430,7 +431,7 @@ void FeaturesPlugin_MultiRotation::loadNamingDS3(
 
   for (std::list<std::shared_ptr<GeomAlgoAPI_Rotation> >::const_iterator anIt =
     theListOfRotationAlgo.begin(); anIt != theListOfRotationAlgo.cend(); ++anIt) {
-    
+
     // naming of faces
     int numFace = 1;
     GeomAPI_ShapeExplorer anExp((*anIt)->shape(), GeomAPI_Shape::FACE);
