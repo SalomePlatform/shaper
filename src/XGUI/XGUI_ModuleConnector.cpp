@@ -131,9 +131,9 @@ void XGUI_ModuleConnector::setStatusBarMessage(const QString& theMessage)
   myWorkshop->setStatusBarMessage(theMessage);
 }
 
-bool XGUI_ModuleConnector::canStartOperation(QString theId)
+bool XGUI_ModuleConnector::canStartOperation(QString theId, bool& isCommitted)
 {
-  return myWorkshop->operationMgr()->canStartOperation(theId);
+  return myWorkshop->operationMgr()->canStartOperation(theId, isCommitted);
 }
 
 void XGUI_ModuleConnector::processLaunchOperation(ModuleBase_Operation* theOperation)
@@ -164,9 +164,10 @@ bool XGUI_ModuleConnector::canStopOperation(ModuleBase_Operation* theOperation)
   return myWorkshop->operationMgr()->canStopOperation(theOperation);
 }
 
-void XGUI_ModuleConnector::stopOperation(ModuleBase_Operation* theOperation)
+void XGUI_ModuleConnector::stopOperation(ModuleBase_Operation* theOperation,
+                                         bool& isCommitted)
 {
-  myWorkshop->operationMgr()->stopOperation(theOperation);
+  myWorkshop->operationMgr()->stopOperation(theOperation, isCommitted);
 }
 
 void XGUI_ModuleConnector::updateCommandStatus()

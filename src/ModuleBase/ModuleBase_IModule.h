@@ -85,7 +85,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Creates an operation and send it to loop
   /// \param theCmdId the operation name
-  virtual void launchOperation(const QString& theCmdId);
+  /// \param isStartAfterCommitOnly operation is launched if there is no active operation or
+  ///        it is committed
+  virtual void launchOperation(const QString& theCmdId,
+                               const bool& isStartAfterCommitOnly);
 
   /// Executes feature as a modal dialog box
   /// \param theCmdId the operation name

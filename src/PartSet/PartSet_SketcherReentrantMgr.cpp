@@ -546,15 +546,16 @@ void PartSet_SketcherReentrantMgr::restartOperation()
       QList<ModuleBase_ViewerPrsPtr> aPreSelected =
         aSelection->getSelected(ModuleBase_ISelection::AllControls);
 
-
-
       if (myInternalFeature.get())
         copyReetntrantAttributes(myInternalFeature, aFOperation->feature(),
                                   module()->sketchMgr()->activeSketch());
 
       myNoMoreWidgetsAttribute = "";
       myIsFlagsBlocked = true;
-      module()->launchOperation(aFOperation->id());
+      /// launch has 'false' parameter to do not start new operation if the previous operation
+      /// is not committed. It is important for Line Sketch feature as it uses the previous
+      /// created feature parameter(to build coincidence), but by abort the previous is removed
+      module()->launchOperation(aFOperation->id(), true);
       myIsFlagsBlocked = false;
       resetFlags();
 

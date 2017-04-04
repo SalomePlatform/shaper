@@ -101,11 +101,13 @@ Q_OBJECT
   /// Returns whether the operation can be started. Check if there is already started operation and
   /// the granted parameter of the launched operation
   /// \param theId id of the operation which is going to start
-  bool canStartOperation(const QString& theId);
+  /// \param isCommitted boolean value if the operation was committed otherwise it was aborted
+  bool canStartOperation(const QString& theId, bool& isCommitted);
 
   /// If Apply is enabled and operation has modification, it is applyed, otherwise aborted
   /// \param theOperation the started operation
-  void stopOperation(ModuleBase_Operation* theOperation);
+  /// \param isCommitted boolean value if the operation was committed otherwise it was aborted
+  void stopOperation(ModuleBase_Operation* theOperation, bool& isCommitted);
 
   /// Aborts the parameter operation if it is current, else abort operations from the stack
   /// of operations until the operation is found. All operations upper the parameter one are

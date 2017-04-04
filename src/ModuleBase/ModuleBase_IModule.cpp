@@ -56,7 +56,8 @@ ModuleBase_IModule::ModuleBase_IModule(ModuleBase_IWorkshop* theParent)
 
 void ModuleBase_IModule::launchModal(const QString& theCmdId)
 {
-  if (!myWorkshop->canStartOperation(theCmdId))
+  bool isCommitted;
+  if (!myWorkshop->canStartOperation(theCmdId, isCommitted))
     return;
 
   std::string aXmlCfg, aDescription;
@@ -74,7 +75,8 @@ void ModuleBase_IModule::launchModal(const QString& theCmdId)
 }
 
 
-void ModuleBase_IModule::launchOperation(const QString& theCmdId)
+void ModuleBase_IModule::launchOperation(const QString& theCmdId,
+                                         const bool& isStartAfterCommitOnly)
 {
   /// selection should be obtained from workshop before ask if the operation can be started as
   /// the canStartOperation method performs commit/abort of previous operation.
@@ -84,7 +86,12 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId)
   QList<ModuleBase_ViewerPrsPtr> aPreSelected =
     aSelection->getSelected(ModuleBase_ISelection::AllControls);
 
-  if (!myWorkshop->canStartOperation(theCmdId))
+  bool isCommitted;
+  if (!myWorkshop->canStartOperation(theCmdId, isCommitted))
+    return;
+
+  /// reentrant operation(Sketch Line) should not be started if operation is aborted
+  if (isStartAfterCommitOnly && !isCommitted)
     return;
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
@@ -220,8 +227,10 @@ void ModuleBase_IModule::onFeatureTriggered()
   //Do nothing on uncheck
   if (aCmd->isCheckable() && !aCmd->isChecked()) {
     ModuleBase_Operation* anOperation = myWorkshop->findStartedOperation(aCmd->data().toString());
-    if (myWorkshop->canStopOperation(anOperation))
-      myWorkshop->stopOperation(anOperation);
+    if (myWorkshop->canStopOperation(anOperation)) {
+      bool isCommitted;
+      myWorkshop->stopOperation(anOperation, isCommitted);
+    }
     else {
       aCmd->setChecked(true);
     }
@@ -232,7 +241,7 @@ void ModuleBase_IModule::onFeatureTriggered()
     if (aInfo.get() && aInfo->isModal()) {
       launchModal(aCmdId);
     } else {
-      launchOperation(aCmdId);
+      launchOperation(aCmdId, false);
       emit operationLaunched();
     }
   }
@@ -241,7 +250,8 @@ void ModuleBase_IModule::onFeatureTriggered()
 void ModuleBase_IModule::editFeature(FeaturePtr theFeature)
 {
   std::string aFeatureId = theFeature->getKind();
-  if (!myWorkshop->canStartOperation(aFeatureId.c_str()))
+  bool isCommitted;
+  if (!myWorkshop->canStartOperation(aFeatureId.c_str(), isCommitted))
     return;
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>

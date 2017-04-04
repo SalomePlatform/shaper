@@ -306,16 +306,14 @@ void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
 
 void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  if (myModule->sketchReentranceMgr()->processMousePressed(theWnd, theEvent))
-    return;
-
-  //get2dPoint(theWnd, theEvent, myClickedPoint);
-
-  if (!(theEvent->buttons() & Qt::LeftButton))
-    return;
-
   // Clear dragging mode
   myIsDragging = false;
+
+  if (myModule->sketchReentranceMgr()->processMousePressed(theWnd, theEvent))
+    return;
+  //get2dPoint(theWnd, theEvent, myClickedPoint);
+  if (!(theEvent->buttons() & Qt::LeftButton))
+    return;
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
@@ -425,6 +423,9 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
 void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  bool aWasDragging = myIsDragging;
+  myIsDragging = false;
+
   if (myModule->sketchReentranceMgr()->processMouseReleased(theWnd, theEvent))
     return;
 
@@ -440,7 +441,7 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   if (aOp) {
     if (isNestedSketchOperation(aOp)) {
       // Only for sketcher operations
-      if (myIsDragging) {
+      if (aWasDragging) {
         if (myDragDone) {
           myCurrentSelection.clear();
         }
@@ -449,7 +450,6 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   }
 
   aWorkshop->viewer()->enableDrawMode(myPreviousDrawModeEnabled);
-  myIsDragging = false;
 
   ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
   PartSet_MouseProcessor* aProcessor = dynamic_cast<PartSet_MouseProcessor*>(anActiveWidget);

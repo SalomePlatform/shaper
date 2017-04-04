@@ -106,7 +106,10 @@ public:
 
   /// Creates an operation and send it to loop
   /// \param theCmdId the operation name
-  virtual void launchOperation(const QString& theCmdId);
+  /// \param isStartAfterCommitOnly operation is launched if there is no active operation or
+  ///        it is committed
+  virtual void launchOperation(const QString& theCmdId,
+                               const bool& isStartAfterCommitOnly);
 
   /// Realizes some functionality by an operation start
   /// Displays all sketcher sub-Objects, hides sketcher result, appends selection filters
@@ -349,11 +352,6 @@ public:
   XGUI_Workshop* getWorkshop() const;
 
 public slots:
-  /// Redefines the parent method in order to customize the next case:
-  /// If the sketch nested operation is active and the presentation is not visualized in the viewer,
-  /// the operation should be always aborted.
-  virtual void onFeatureTriggered();
-
   /// Slolt called on object display
   /// \param theObject a data object
   /// \param theAIS a presentation object
