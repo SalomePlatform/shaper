@@ -140,8 +140,19 @@ std::string SketchPlugin_MacroCircle::processEvent(
       AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
                                                         attribute(aReferenceAttributeName));
       if (aRefAttr.get()) {
-        if (anAttribute.get())
+        if (anAttribute.get()) {
+          if (!anAttribute->owner().get() || !anAttribute->owner()->data()->isValid()) {
+            FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
+            if (aCreatedFeature.get()) {
+              std::string anID = anAttribute->id();
+              std::string anArcID;
+              if (anID == CENTER_POINT_ID())
+                anArcID = SketchPlugin_Circle::CENTER_ID();
+              anAttribute = aCreatedFeature->attribute(anArcID);
+            }
+          }
           aRefAttr->setAttr(anAttribute);
+        }
         else if (anObject.get()) {
           // if presentation of previous reentrant macro arc is used, the object is invalid,
           // we should use result of previous feature of the message(Arc)
@@ -400,6 +411,11 @@ void SketchPlugin_MacroCircle::attributeChanged(const std::string& theID) {
 
   AttributeDoublePtr aRadiusAttr = real(CIRCLE_RADIUS_ID());
   bool aWasBlocked = data()->blockSendAttributeUpdated(true);
+  if(myCenter.get()) {
+    // center attribute is used in processEvent() to set reference to reentrant arc
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_POINT_ID()))
+        ->setValue(myCenter);
+  }
   aRadiusAttr->setValue(myRadius);
   data()->blockSendAttributeUpdated(aWasBlocked, false);
 }
