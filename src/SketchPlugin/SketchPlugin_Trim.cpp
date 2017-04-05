@@ -1045,7 +1045,6 @@ FeaturePtr SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theS
                                (aBaseFeature->attribute(aModifiedAttribute)));
 
     // equal Radius constraint for arcs
-    anNewFeature->execute(); // we need the created arc result to set equal constraint
     createConstraintForObjects(SketchPlugin_ConstraintEqual::ID(),
                                getFeatureResult(aBaseFeature),
                                getFeatureResult(anNewFeature));
@@ -1279,7 +1278,7 @@ FeaturePtr SketchPlugin_Trim::createArcFeature(const FeaturePtr& theBaseFeature,
     bool aReversed = theBaseFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
     aFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(aReversed);
   }
-  //aFeature->execute(); // to obtain result
+  aFeature->execute(); // to obtain result (need to calculate arc parameters before sending Update)
   aFeature->data()->blockSendAttributeUpdated(aWasBlocked);
 
   #ifdef DEBUG_TRIM

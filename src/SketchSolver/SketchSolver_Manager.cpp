@@ -151,6 +151,7 @@ void SketchSolver_Manager::processEvent(
 
   // resolve constraints if needed
   bool needToUpdate = needToResolve && resolveConstraints();
+  releaseFeaturesIfEventsBlocked();
 
   // Features may be updated => now send events, but for all changed at once
   if (isUpdateFlushed)
@@ -238,9 +239,15 @@ bool SketchSolver_Manager::resolveConstraints()
   for (; aGroupIter != myGroups.end(); ++aGroupIter) {
     if ((*aGroupIter)->resolveConstraints())
       needToUpdate = true;
-    (*aGroupIter)->blockEvents(false);
   }
   return needToUpdate;
+}
+
+void SketchSolver_Manager::releaseFeaturesIfEventsBlocked() const
+{
+  std::list<SketchGroupPtr>::const_iterator aGroupIter = myGroups.begin();
+  for (; aGroupIter != myGroups.end(); ++aGroupIter)
+    (*aGroupIter)->blockEvents(false);
 }
 
 bool SketchSolver_Manager::stopSendUpdate() const
