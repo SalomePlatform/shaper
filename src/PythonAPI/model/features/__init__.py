@@ -2,7 +2,7 @@
 """
 
 from FeaturesAPI import addPlacement, addRotation, addScale, addSymmetry, addTranslation
-from FeaturesAPI import addMultiTranslation
+from FeaturesAPI import addMultiTranslation, addMultiRotation
 from FeaturesAPI import addExtrusion, addExtrusionCut, addExtrusionFuse
 from FeaturesAPI import addRevolution, addRevolutionCut, addRevolutionFuse
 from FeaturesAPI import addPipe

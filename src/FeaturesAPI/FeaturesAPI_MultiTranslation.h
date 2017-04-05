@@ -98,7 +98,7 @@ public:
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
-/// Pointer on Translation object.
+/// Pointer on MultiTranslation object.
 typedef std::shared_ptr<FeaturesAPI_MultiTranslation> MultiTranslationPtr;
 
 /// \ingroup CPPHighAPI

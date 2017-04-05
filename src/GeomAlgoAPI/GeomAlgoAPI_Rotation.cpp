@@ -54,14 +54,6 @@ bool GeomAlgoAPI_Rotation::check()
         myError = "Rotation builder :: source shape is not valid.";
         return false;
       }
-      if (myAngle < -360.) {
-        myError = "Rotation builder :: angle smaller than -360 degrees.";
-        return false;
-      }
-      if (myAngle > 360.) {
-        myError = "Rotation builder :: angle greater than 360 degrees.";
-        return false;
-      }
       return true;
     }
     case BY_POINTS: {
