@@ -244,20 +244,19 @@ bool PlaneGCSSolver_Storage::update(AttributePtr theAttribute, bool theForce)
   }
 
   EntityWrapperPtr aRelated = entity(anAttribute);
+  FeaturePtr aFeature = ModelAPI_Feature::feature(anAttribute->owner());
   if (!aRelated) { // Attribute does not exist, create it.
     // First of all check if the parent feature exists. If not, add it.
-    FeaturePtr aFeature = ModelAPI_Feature::feature(anAttribute->owner());
     if (aFeature && myFeatureMap.find(aFeature) == myFeatureMap.end())
       return update(aFeature, theForce); // theAttribute has been processed while adding feature
-
-////    PlaneGCSSolver_AttributeBuilder aBuilder(this);
-////    aRelated = createAttribute(anAttribute, &aBuilder);
     return aRelated.get() != 0;
   }
 
   bool isUpdated = updateValues(anAttribute, aRelated);
-  if (isUpdated)
+  if (isUpdated) {
     setNeedToResolve(true);
+    notify(aFeature);
+  }
   return isUpdated;
 }
 
