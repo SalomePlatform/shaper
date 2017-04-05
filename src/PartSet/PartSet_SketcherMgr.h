@@ -23,6 +23,8 @@
 
 #include <GeomAPI_Pln.h>
 #include <SelectMgr_IndexedMapOfOwner.hxx>
+#include <TopoDS_Shape.hxx>
+#include <TopTools_MapOfShape.hxx>
 
 #include <QObject>
 #include <QList>
@@ -315,8 +317,15 @@ private:
                                              ModuleBase_IWorkshop* theWorkshop,
                                              bool& theCanCommitOperation);
 
-  typedef QMap<FeaturePtr, std::pair<std::set<AttributePtr>, std::set<ResultPtr> > >
-                                                                       FeatureToSelectionMap;
+  struct SelectionInfo
+  {
+    std::set<AttributePtr> myAttributes;
+    std::set<ResultPtr> myResults;
+    TopoDS_Shape myFirstResultShape;
+    TopTools_MapOfShape myLocalSelectedShapes;
+  };
+
+  typedef QMap<FeaturePtr, SelectionInfo> FeatureToSelectionMap;
 
   /// Applyes the current selection to the object in the workshop viewer
   /// It includes the selection in all modes of activation, even local context - vertexes, edges
@@ -334,7 +343,7 @@ private:
                                   const FeaturePtr& theSketch,
                                   ModuleBase_IWorkshop* theWorkshop,
                                   const FeatureToSelectionMap& theSelection,
-                                  SelectMgr_IndexedMapOfOwner& anOwnersToSelect);
+                                  SelectMgr_IndexedMapOfOwner& theOwnersToSelect);
 
   /// Returns true if the created feature is visible
   /// \param

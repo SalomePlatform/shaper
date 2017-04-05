@@ -108,8 +108,9 @@
 void getAttributesOrResults(const Handle(SelectMgr_EntityOwner)& theOwner,
                             const FeaturePtr& theFeature, const FeaturePtr& theSketch,
                             const ResultPtr& theResult,
-                            std::set<AttributePtr>& aSelectedAttributes,
-                            std::set<ResultPtr>& aSelectedResults)
+                            std::set<AttributePtr>& theSelectedAttributes,
+                            std::set<ResultPtr>& theSelectedResults,
+                            TopTools_MapOfShape& theShapes)
 {
   Handle(StdSelect_BRepOwner) aBRepOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
   if (aBRepOwner.IsNull())
@@ -118,16 +119,17 @@ void getAttributesOrResults(const Handle(SelectMgr_EntityOwner)& theOwner,
                                                                     aBRepOwner->Selectable());
   if (aBRepOwner->HasShape()) {
     const TopoDS_Shape& aShape = aBRepOwner->Shape();
+    theShapes.Add(aShape);
     TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
     if (aShapeType == TopAbs_VERTEX) {
       AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(theFeature,
                                                                     aShape, theSketch);
       if (aPntAttr.get() != NULL)
-        aSelectedAttributes.insert(aPntAttr);
+        theSelectedAttributes.insert(aPntAttr);
     }
     else if (aShapeType == TopAbs_EDGE &&
-             aSelectedResults.find(theResult) == aSelectedResults.end()) {
-      aSelectedResults.insert(theResult);
+             theSelectedResults.find(theResult) == theSelectedResults.end()) {
+      theSelectedResults.insert(theResult);
     }
   }
 }
@@ -540,7 +542,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = anIt.key();
 
-      std::set<AttributePtr> anAttributes = anIt.value().first;
+      std::set<AttributePtr> anAttributes = anIt.value().myAttributes;
       // Process selection by attribute: the priority to the attribute
       if (!anAttributes.empty()) {
         std::set<AttributePtr>::const_iterator anAttIt = anAttributes.begin(),
@@ -1489,8 +1491,9 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
     return;
 
   FeatureToSelectionMap::const_iterator anIt = theSelection.find(theFeature);
-  std::set<AttributePtr> aSelectedAttributes = anIt.value().first;
-  std::set<ResultPtr> aSelectedResults = anIt.value().second;
+  SelectionInfo anInfo = anIt.value();
+  std::set<AttributePtr> aSelectedAttributes = anInfo.myAttributes;
+  std::set<ResultPtr> aSelectedResults = anInfo.myResults;
 
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
 
@@ -1514,8 +1517,10 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
   // 2. found the feature results's owners
   std::list<ResultPtr> aResults = theFeature->results();
   std::list<ResultPtr>::const_iterator aIt;
-  for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
-  {
+
+  const TopoDS_Shape aFirstShape = theFeature->firstResult()->shape()->impl<TopoDS_Shape>();
+  bool isSameShape = aFirstShape.IsEqual(anInfo.myFirstResultShape);
+  for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
     ResultPtr aResult = *aIt;
     AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
     if (aAISObj.get() == NULL)
@@ -1524,10 +1529,11 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
 
     SelectMgr_IndexedMapOfOwner aSelectedOwners;
     aConnector->workshop()->selector()->selection()->entityOwners(anAISIO, aSelectedOwners);
+    bool aFoundLocalShape = false;
     for  ( Standard_Integer i = 1, n = aSelectedOwners.Extent(); i <= n; i++ ) {
       Handle(StdSelect_BRepOwner) anOwner =
         Handle(StdSelect_BRepOwner)::DownCast(aSelectedOwners(i));
-      if ( anOwner.IsNull() || !anOwner->HasShape() )
+      if ( anOwner.IsNull() || !anOwner->HasShape() || theOwnersToSelect.FindIndex(anOwner))
         continue;
       const TopoDS_Shape& aShape = anOwner->Shape();
       TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
@@ -1535,15 +1541,34 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
         AttributePtr aPntAttr =
           PartSet_Tools::findAttributeBy2dPoint(theFeature, aShape, theSketch);
         if (aPntAttr.get() != NULL &&
-            aSelectedAttributes.find(aPntAttr) != aSelectedAttributes.end()) {
+            aSelectedAttributes.find(aPntAttr) != aSelectedAttributes.end())
+          theOwnersToSelect.Add(anOwner);
+        else if (isSameShape && anInfo.myLocalSelectedShapes.Contains(aShape)) {
           theOwnersToSelect.Add(anOwner);
         }
       }
       else if (aShapeType == TopAbs_EDGE) {
-        bool aFound = aSelectedResults.find(aResult) != aSelectedResults.end();
-        if (aSelectedResults.find(aResult) != aSelectedResults.end() &&
-            theOwnersToSelect.FindIndex(anOwner) <= 0)
+        if (isSameShape && anInfo.myLocalSelectedShapes.Contains(aShape)) {
+          // try to restore local selection on Shape result
+          // we can do this only if the shape was not changed
           theOwnersToSelect.Add(anOwner);
+          aFoundLocalShape = true;
+          break;
+        }
+      }
+    }
+    if (!aFoundLocalShape) {
+      // result owners are put in the list of selection only if local selected shapes were not
+      // found
+      if (aSelectedResults.find(aResult) != aSelectedResults.end()) {
+        for  ( Standard_Integer i = 1, n = aSelectedOwners.Extent(); i <= n; i++ ) {
+          Handle(StdSelect_BRepOwner) anOwner =
+            Handle(StdSelect_BRepOwner)::DownCast(aSelectedOwners(i));
+          if ( anOwner.IsNull() || !anOwner->HasShape() || theOwnersToSelect.FindIndex(anOwner))
+            continue;
+            // select whole result
+            theOwnersToSelect.Add(anOwner);
+        }
       }
     }
   }
@@ -1701,17 +1726,16 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
 
     std::set<AttributePtr> aSelectedAttributes;
     std::set<ResultPtr> aSelectedResults;
-    if (myCurrentSelection.find(aFeature) != myCurrentSelection.end()) {
-      std::pair<std::set<AttributePtr>, std::set<ResultPtr> > aPair =
-        myCurrentSelection.find(aFeature).value();
-      aSelectedAttributes = aPair.first;
-      aSelectedResults = aPair.second;
-    }
+    SelectionInfo anInfo;
+    if (myCurrentSelection.find(aFeature) != myCurrentSelection.end())
+      anInfo = myCurrentSelection.find(aFeature).value();
 
+    const TopoDS_Shape aFirstShape = aFeature->firstResult()->shape()->impl<TopoDS_Shape>();
+    anInfo.myFirstResultShape = aFirstShape;
     Handle(SelectMgr_EntityOwner) anOwner = aPrs->owner();
     if (aResult.get()) {
       getAttributesOrResults(anOwner, aFeature, aSketch, aResult,
-                             aSelectedAttributes, aSelectedResults);
+          anInfo.myAttributes, anInfo.myResults, anInfo.myLocalSelectedShapes);
     }
     else {
       std::list<ResultPtr> aResults = aFeature->results();
@@ -1719,10 +1743,10 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
       for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
         ResultPtr aResult = *aIt;
         getAttributesOrResults(anOwner, aFeature, aSketch, aResult,
-                               aSelectedAttributes, aSelectedResults);
+          anInfo.myAttributes, anInfo.myResults, anInfo.myLocalSelectedShapes);
       }
     }
-    myCurrentSelection[aFeature] = std::make_pair(aSelectedAttributes, aSelectedResults);
+    myCurrentSelection[aFeature] = anInfo;
   }
   //qDebug(QString("  storeSelection: %1").arg(myCurrentSelection.size()).toStdString().c_str());
 }
@@ -1741,7 +1765,7 @@ void PartSet_SketcherMgr::restoreSelection()
   anOwnersToSelect.Clear();
   for (; aSIt != aSLast; aSIt++) {
     getSelectionOwners(aSIt.key(), myCurrentSketch, aWorkshop, myCurrentSelection,
-                        anOwnersToSelect);
+                       anOwnersToSelect);
   }
   aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
 }
