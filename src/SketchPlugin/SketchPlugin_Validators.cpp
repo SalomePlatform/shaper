@@ -1353,6 +1353,8 @@ static GeomShapePtr toInfiniteEdge(const GeomShapePtr theShape)
     GeomShapePtr aShape = GeomAlgoAPI_EdgeBuilder::lineCircle(aCircle);
     return aShape;
   }
+
+  return theShape;
 }
 
 bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
