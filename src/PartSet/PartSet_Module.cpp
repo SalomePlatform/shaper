@@ -828,7 +828,8 @@ bool PartSet_Module::deleteObjects()
     // the active nested sketch operation should be aborted unconditionally
     // the Delete action should be additionally granted for the Sketch operation
     // in order to do not abort/commit it
-    if (!anOpMgr->canStartOperation(anOpAction->id()))
+    bool isCommitted;
+    if (!anOpMgr->canStartOperation(anOpAction->id(), isCommitted))
       return true; // the objects are processed but can not be deleted
 
     anOpMgr->startOperation(anOpAction);
@@ -850,29 +851,6 @@ bool PartSet_Module::deleteObjects()
   return isProcessed;
 }
 
-void PartSet_Module::onFeatureTriggered()
-{
-  // is commented for imp: Unpressing the button of the current action must behave like
-  // a validation if the entity can be created (instead of Cancel, as currently)
-  /*QAction* aCmd = dynamic_cast<QAction*>(sender());
-  if (aCmd->isCheckable() && aCmd->isChecked()) {
-    // 1. check whether the delete should be processed in the module
-    ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-    bool isNestedOp = myModule->sketchMgr()->isNestedCreateOperation(anOperation);
-    if (isNestedOp) {
-      // in case if in the viewer nothing is displayed, the create operation should not be
-      // comitted even if all values of the feature are initialized
-      if (!mySketchMgr->canDisplayCurrentCreatedFeature()) {
-        // the action information should be saved before the operation is aborted
-        // because this abort leads to update command status, which unchecks this action
-        anOperation->abort();
-        launchOperation(aCmd->data().toString());
-      }
-    }
-  }*/
-  ModuleBase_IModule::onFeatureTriggered();
-}
-
 void PartSet_Module::editFeature(FeaturePtr theFeature)
 {
   storeConstraintsState(theFeature->getKind());
@@ -884,13 +862,13 @@ bool PartSet_Module::canCommitOperation() const
   return true;
 }
 
-void PartSet_Module::launchOperation(const QString& theCmdId)
+void PartSet_Module::launchOperation(const QString& theCmdId, const bool& isStartAfterCommitOnly)
 {
   myIsOperationIsLaunched = true;
   storeConstraintsState(theCmdId.toStdString());
   updateConstraintsState(theCmdId.toStdString());
 
-  ModuleBase_IModule::launchOperation(theCmdId);
+  ModuleBase_IModule::launchOperation(theCmdId, isStartAfterCommitOnly);
 
   myIsOperationIsLaunched = false;
 }

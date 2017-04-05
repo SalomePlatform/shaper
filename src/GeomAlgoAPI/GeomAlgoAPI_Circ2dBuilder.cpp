@@ -527,7 +527,7 @@ std::shared_ptr<GeomAPI_Circ2d> GeomAlgoAPI_Circ2dBuilder::circle()
   std::shared_ptr<GeomAPI_Circ2d> aCircle;
   if (aCirc2d) {
     const gp_Pnt2d& aCenter = aCirc2d->Location();
-    const gp_Dir2d& aXAxis = aCirc2d->XAxis().Direction();
+    const gp_Dir2d& aXAxis = aCirc2d->Position().XDirection();
 
     std::shared_ptr<GeomAPI_Pnt2d> aCircleCenter(new GeomAPI_Pnt2d(aCenter.X(), aCenter.Y()));
     std::shared_ptr<GeomAPI_Dir2d> aCircleDir(new GeomAPI_Dir2d(aXAxis.X(), aXAxis.Y()));

@@ -74,7 +74,7 @@ Q_OBJECT
   virtual ModuleBase_Operation* currentOperation() const = 0;
 
   //! Returns true if the operation with id theId can be started
-  virtual bool canStartOperation(QString theId) = 0;
+  virtual bool canStartOperation(QString theId, bool& isCommitted) = 0;
 
   //! Performs the operation launch
   //! \param theOperation an operation to be launched
@@ -92,7 +92,9 @@ Q_OBJECT
 
   //! Commits if possible or aborts the given operation.
   //! \param theOperation an aborted operation
-  virtual void stopOperation(ModuleBase_Operation* theOperation) = 0;
+  /// \param isCommitted boolean value if the operation was committed otherwise it was aborted
+  virtual void stopOperation(ModuleBase_Operation* theOperation,
+                             bool& isCommitted) = 0;
 
   //! Returns AIS object by data object
   //! \param theObject a data object

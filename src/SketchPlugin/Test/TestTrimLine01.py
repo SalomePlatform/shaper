@@ -68,4 +68,4 @@ assert(idList_after.count(SketchConstraintCoincidenceId) == 2)
 
 model.end()
 
-#assert(model.checkPythonDump())
+assert(model.checkPythonDump())

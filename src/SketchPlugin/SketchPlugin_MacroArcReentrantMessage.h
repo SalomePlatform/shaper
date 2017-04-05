@@ -21,7 +21,7 @@ class SketchPlugin_MacroArcReentrantMessage : public ModelAPI_EventReentrantMess
 public:
   /// Creates an empty message
   SKETCHPLUGIN_EXPORT SketchPlugin_MacroArcReentrantMessage(const Events_ID theID,
-                                                            const void* theSender = 0)
+                                                            const void* theSender)
   : ModelAPI_EventReentrantMessage(theID, theSender) {}
   /// The virtual destructor
   SKETCHPLUGIN_EXPORT virtual ~SketchPlugin_MacroArcReentrantMessage() {}

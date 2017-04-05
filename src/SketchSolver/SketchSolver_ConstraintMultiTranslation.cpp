@@ -57,9 +57,8 @@ void SketchSolver_ConstraintMultiTranslation::process()
   }
 
   EntityWrapperPtr aStartPoint, aEndPoint;
-  bool aFullValue;
   std::list<EntityWrapperPtr> aBaseEntities;
-  getAttributes(aStartPoint, aEndPoint, aFullValue, aBaseEntities);
+  getAttributes(aStartPoint, aEndPoint, myIsFullValue, aBaseEntities);
   if (!myErrorMsg.empty())
     return;
 

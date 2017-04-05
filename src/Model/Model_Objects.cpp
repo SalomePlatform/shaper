@@ -75,7 +75,6 @@ Model_Objects::~Model_Objects()
     ModelAPI_EventCreator::get()->sendDeleted(myDoc, ModelAPI_Feature::group());
     ModelAPI_EventCreator::get()->sendUpdated(aFeature, EVENT_DISP);
     aFeature->removeResults(0, false);
-    //aFeature->eraseResults();
     aFeature->erase();
     myFeatures.UnBind(aFeaturesIter.Key());
   }

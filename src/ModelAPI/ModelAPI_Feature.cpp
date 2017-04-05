@@ -104,7 +104,8 @@ void ModelAPI_Feature::eraseResultFromList(const std::shared_ptr<ModelAPI_Result
   }
 }
 
-void ModelAPI_Feature::removeResults(const int theSinceIndex, const bool theFlush)
+void ModelAPI_Feature::removeResults(
+  const int theSinceIndex, const bool theForever, const bool theFlush)
 {
   std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
   for(int anIndex = 0; anIndex < theSinceIndex && aResIter != myResults.end(); anIndex++)
@@ -115,12 +116,12 @@ void ModelAPI_Feature::removeResults(const int theSinceIndex, const bool theFlus
   while( aNextIter != myResults.end()) {
     aGroup = (*aNextIter)->groupName();
     // remove previously erased results: to enable later if needed only actual (of history change)
-    //if (theSinceIndex == 0 && (*aNextIter)->isDisabled()) {
-    //  aNextIter = myResults.erase(aNextIter);
-    //} else {
-      (*aNextIter)->setDisabled(*aNextIter, true); // just disable results
+    (*aNextIter)->setDisabled(*aNextIter, true); // just disable results
+    if (theForever) {
+      aNextIter = myResults.erase(aNextIter);
+    } else {
       aNextIter++;
-    //}
+    }
   }
   if (!aGroup.empty() && theFlush) {
     // flush visualisation changes
@@ -132,9 +133,9 @@ void ModelAPI_Feature::removeResults(const int theSinceIndex, const bool theFlus
   }
 }
 
-void ModelAPI_Feature::eraseResults()
+void ModelAPI_Feature::eraseResults(const bool theForever)
 {
-  removeResults(0);
+  removeResults(0, theForever, true);
 }
 
 const std::string& ModelAPI_Feature::documentToAdd()
@@ -192,7 +193,7 @@ bool ModelAPI_Feature::setDisabled(const bool theFlag)
   if (myIsDisabled != theFlag) {
     myIsDisabled = theFlag;
     if (myIsDisabled) {
-      removeResults(0, false); // flush will be in setCurrentFeature
+      removeResults(0, false, false); // flush will be in setCurrentFeature
     } else {
       // enable all disabled previously results
       std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();

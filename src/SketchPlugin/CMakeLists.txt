@@ -163,4 +163,19 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                Test1673.py
                Test1924.py
                Test1966.py
-               Test1967.py)
+               Test1967.py
+               TestTrimArc01.py
+               TestTrimArc02.py
+               TestTrimArc03.py
+               TestTrimArc04.py
+               TestTrimArc05.py
+               TestTrimArc06.py
+               TestTrimArc07.py
+               TestTrimCircle01.py
+               TestTrimCircle02.py
+               TestTrimCircle03.py
+               TestTrimCircle04.py
+               TestTrimCircle05.py
+               TestTrimCircleAndArc01.py
+               TestTrimLine01.py
+               TestTrimLine02.py)

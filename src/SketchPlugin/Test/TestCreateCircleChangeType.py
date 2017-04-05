@@ -23,9 +23,7 @@ __updated__ = "2017-03-22"
 
 def assertNotInitializedByCenterAndPassed(theMacroCircle):
     # check points
-    aCenterPoint = geomDataAPI_Point2D(theMacroCircle.attribute("center_point"))
     aPassedPoint = geomDataAPI_Point2D(theMacroCircle.attribute("passed_point"))
-    assert (not aCenterPoint.isInitialized())
     assert (not aPassedPoint.isInitialized())
     # check references
     aCenterPointRef = theMacroCircle.refattr("center_point_ref")

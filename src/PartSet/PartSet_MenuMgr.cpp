@@ -299,7 +299,8 @@ void PartSet_MenuMgr::onLineDetach(QAction* theAction)
     // the active nested sketch operation should be aborted unconditionally
     // the Delete action should be additionally granted for the Sketch operation
     // in order to do not abort/commit it
-    if (!anOpMgr->canStartOperation(tr("Detach")))
+    bool isCommitted;
+    if (!anOpMgr->canStartOperation(tr("Detach"), isCommitted))
       return; // the objects are processed but can not be deleted
 
     anOpMgr->startOperation(anOpAction);
@@ -358,7 +359,8 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
     anOpAction = new ModuleBase_OperationAction(anAction->text(), myModule);
     bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
 
-    if (!anOpMgr->canStartOperation(anOpAction->id()))
+    bool isCommitted;
+    if (!anOpMgr->canStartOperation(anOpAction->id(), isCommitted))
       return; // the objects are processed but can not be deleted
 
     anOpMgr->startOperation(anOpAction);

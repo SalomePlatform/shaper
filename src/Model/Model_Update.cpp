@@ -580,7 +580,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
   #ifdef DEB_UPDATE
     std::cout<<"Invalid args "<<theFeature->name()<<std::endl;
   #endif
-    theFeature->eraseResults();
+    theFeature->eraseResults(false);
     redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
     return true; // so, feature is modified (results are erased)
   }
@@ -595,7 +595,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     #ifdef DEB_UPDATE
       std::cout<<"Feature is not valid, erase results "<<theFeature->name()<<std::endl;
     #endif
-    theFeature->eraseResults();
+    theFeature->eraseResults(false);
     redisplayWithResults(theFeature, ModelAPI_StateInvalidArgument); // result also must be updated
   }
   return true;
@@ -847,7 +847,7 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
   // The macro feature has to be deleted in any case even its execution is failed
   myWaitForFinish.insert(theFeature);
   if (aState != ModelAPI_StateDone) {
-    theFeature->eraseResults();
+    theFeature->eraseResults(false);
   }
   theFeature->data()->setUpdateID(ModelAPI_Session::get()->transactionID());
   redisplayWithResults(theFeature, aState);

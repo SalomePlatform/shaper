@@ -504,8 +504,7 @@ void Model_Session::registerPlugin(ModelAPI_Plugin* thePlugin)
 {
   myPluginObjs[myCurrentPluginName] = thePlugin;
   static Events_ID EVENT_LOAD = Events_Loop::loop()->eventByName(EVENT_PLUGIN_LOADED);
-  ModelAPI_EventCreator::get()->sendUpdated(ObjectPtr(), EVENT_LOAD);
-  Events_Loop::loop()->flush(EVENT_LOAD);
+  ModelAPI_EventCreator::get()->sendUpdated(ObjectPtr(), EVENT_LOAD, false);
   // If the plugin has an ability to process GUI events, register it
   Events_Listener* aListener = dynamic_cast<Events_Listener*>(thePlugin);
   if (aListener) {

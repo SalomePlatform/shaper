@@ -538,7 +538,7 @@ void Model_AttributeSelection::selectBody(
     if (aFeatureOwner.get()) {
       aEraseResults = !aFeatureOwner->results().empty();
       if (aEraseResults) // erase results without flash deleted and redisplay: do it after Select
-        aFeatureOwner->removeResults(0, false);
+        aFeatureOwner->removeResults(0, false, false);
     }
     aSel.Select(aNewSub, aNewContext);
 

@@ -355,9 +355,10 @@ void XGUI_OperationMgr::setCurrentFeature(const FeaturePtr& theFeature)
     aMgr->finishOperation();
 }
 
-bool XGUI_OperationMgr::canStartOperation(const QString& theId)
+bool XGUI_OperationMgr::canStartOperation(const QString& theId, bool& isCommitted)
 {
   bool aCanStart = true;
+  isCommitted = false;
   ModuleBase_Operation* aCurrentOp = currentOperation();
   if (aCurrentOp) {
     bool aGranted = aCurrentOp->isGranted(theId);
@@ -375,7 +376,7 @@ bool XGUI_OperationMgr::canStartOperation(const QString& theId)
       else if (canStopOperation(aCurrentOp)) {
         // the started operation is granted in the parrent operation,
         // e.g. current - Line in Sketch, started Circle
-        stopOperation(aCurrentOp);
+        stopOperation(aCurrentOp, isCommitted);
       } else {
         aCanStart = false;
       }
@@ -384,12 +385,14 @@ bool XGUI_OperationMgr::canStartOperation(const QString& theId)
   return aCanStart;
 }
 
-void XGUI_OperationMgr::stopOperation(ModuleBase_Operation* theOperation)
+void XGUI_OperationMgr::stopOperation(ModuleBase_Operation* theOperation, bool& isCommitted)
 {
   if (XGUI_Tools::workshop(myWorkshop)->errorMgr()->isApplyEnabled() && theOperation->isModified())
-    theOperation->commit();
-  else
+    isCommitted = theOperation->commit();
+  else {
+    isCommitted = false;
     abortOperation(theOperation);
+  }
 }
 
 void XGUI_OperationMgr::abortOperation(ModuleBase_Operation* theOperation)
