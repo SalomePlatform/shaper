@@ -1518,8 +1518,14 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
   std::list<ResultPtr> aResults = theFeature->results();
   std::list<ResultPtr>::const_iterator aIt;
 
-  const TopoDS_Shape aFirstShape = theFeature->firstResult()->shape()->impl<TopoDS_Shape>();
-  bool isSameShape = aFirstShape.IsEqual(anInfo.myFirstResultShape);
+  bool isSameShape = false;
+  if (aResults.size() > 0) {
+    ResultPtr aFirstResult = theFeature->firstResult();
+    if (aFirstResult.get() && aFirstResult->shape().get()) {
+      const TopoDS_Shape& aFirstShape = aFirstResult->shape()->impl<TopoDS_Shape>();
+      isSameShape = aFirstShape.IsEqual(anInfo.myFirstResultShape);
+    }
+  }
   for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
     ResultPtr aResult = *aIt;
     AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
@@ -1730,7 +1736,10 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
     if (myCurrentSelection.find(aFeature) != myCurrentSelection.end())
       anInfo = myCurrentSelection.find(aFeature).value();
 
-    const TopoDS_Shape aFirstShape = aFeature->firstResult()->shape()->impl<TopoDS_Shape>();
+    TopoDS_Shape aFirstShape;
+    ResultPtr aFirstResult = aFeature->firstResult();
+    if (aFirstResult.get() && aFirstResult->shape().get())
+      aFirstShape = aFirstResult->shape()->impl<TopoDS_Shape>();
     anInfo.myFirstResultShape = aFirstShape;
     Handle(SelectMgr_EntityOwner) anOwner = aPrs->owner();
     if (aResult.get()) {
