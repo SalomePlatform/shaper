@@ -593,10 +593,11 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
           setPoint(aX, aY);
         else {
           if (aShape.ShapeType() == TopAbs_EDGE) {
-            // point is taken from mouse event and set in attribute. It should be done before setting
+            // point is taken from mouse event and set in attribute. It should be done before set
             // coinident constraint to the external line. If a point is created, it should be in
             // the mouse clicked point
-            gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
+            gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(),
+                                                               theWindow->v3dView());
             PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, aY);
             setPoint(aX, aY);
           }
