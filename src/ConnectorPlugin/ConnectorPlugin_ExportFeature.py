@@ -132,7 +132,8 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
             aSelection = theSelectionList.value(aSelIndex)
             # issue 1326: bodies that are already concealed did not exported, so groups should not be invalid
             aContext =  ModelAPI.modelAPI_Result(aSelection.context())
-            if aContext is None or aContext.isConcealed() or aContext.isDisabled():
+            # chcking of concealment removed because of #1799, remark #13 "aContext.isConcealed()"
+            if aContext is None or aContext.isDisabled():
                 continue
 
             anID = GeomAlgoAPI.GeomAlgoAPI_CompoundBuilder.id(self.shape, aSelection.value())
