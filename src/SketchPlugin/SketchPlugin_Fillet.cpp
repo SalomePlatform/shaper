@@ -85,6 +85,9 @@ void SketchPlugin_Fillet::execute()
   if (isUpdateFlushed)
     Events_Loop::loop()->setFlushed(anUpdateEvent, false);
 
+  // set flag here to avoid building Fillet presentation if "Redisplay" event appears
+  myFilletCreated = true;
+
   // Calculate Fillet parameters if does not yet
   if (!myBaseFeatures[0] || !myBaseFeatures[1])
     calculateFilletParameters();
@@ -179,8 +182,6 @@ void SketchPlugin_Fillet::execute()
   if(isUpdateFlushed) {
     Events_Loop::loop()->setFlushed(anUpdateEvent, true);
   }
-
-  myFilletCreated = true;
 }
 
 AISObjectPtr SketchPlugin_Fillet::getAISObject(AISObjectPtr thePrevious)
