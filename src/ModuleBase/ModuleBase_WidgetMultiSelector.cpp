@@ -407,7 +407,6 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
-  clearValidatedCash();
   activateSelectionAndFilters(true);
 
   if (!myFeature)
