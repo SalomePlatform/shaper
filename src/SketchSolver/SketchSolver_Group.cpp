@@ -144,8 +144,9 @@ bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
 // ============================================================================
 bool SketchSolver_Group::resolveConstraints()
 {
+  static const int MAX_STACK_SIZE = 3;
   // check the "Multi" constraints do not drop sketch into infinite loop
-  if (myMultiConstraintUpdateStack > 1) {
+  if (myMultiConstraintUpdateStack > MAX_STACK_SIZE) {
     myPrevResult = PlaneGCSSolver_Solver::STATUS_FAILED;
     // generate error message due to loop update of the sketch
     getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())
