@@ -124,6 +124,10 @@ public:
   /// Returns intersection of shapes
   GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Shape> intersect(const std::shared_ptr<GeomAPI_Shape> theShape) const;
+
+  /// Returns true if min distance between shapes < tolerance.
+  GEOMAPI_EXPORT
+  bool isIntersect(const std::shared_ptr<GeomAPI_Shape> theShape) const;
 };
 
 //! Pointer on list of shapes

@@ -1384,8 +1384,7 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
   if(aResult.get()) {
     GeomShapePtr aShape = toInfiniteEdge(aResult->shape());
     if(aShape.get() && !aShape->isNull()) {
-      GeomShapePtr anIntersection = anArcShape->intersect(aShape);
-      if(anIntersection.get() && !anIntersection->isNull()) {
+      if(anArcShape->isIntersect(aShape)) {
         return true;
       }
     }
@@ -1400,8 +1399,7 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
     {
       GeomShapePtr aShape = toInfiniteEdge((*anIt)->shape());
       if(aShape.get() && !aShape->isNull()) {
-        GeomShapePtr anIntersection = anArcShape->intersect(aShape);
-        if(anIntersection.get() && !anIntersection->isNull()) {
+        if(anArcShape->isIntersect(aShape)) {
           return true;
         }
       }
