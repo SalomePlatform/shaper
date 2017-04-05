@@ -443,6 +443,10 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
       // Only for sketcher operations
       if (aWasDragging) {
         if (myDragDone) {
+          /// the previous selection is lost by mouse release in the viewer(Select method), but
+          /// it is still stored in myCurrentSelection. So, it is possible to restore selection
+          /// It is important for drag(edit with mouse) of sketch entities.
+          restoreSelection();
           myCurrentSelection.clear();
         }
       }
