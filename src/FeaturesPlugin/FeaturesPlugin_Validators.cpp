@@ -184,13 +184,16 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
       GeomShapePtr aShape = aSelectionAttr->value();
       GeomShapePtr aContextShape = aResultConstruction->shape();
       if(!aShape.get()) {
+        // For possibility to select whole sketch from ObjectBrowser when
+        // Extrusion already has sub-element of this sketch, the next check
+        // is commented
         // Whole sketch selected.
-        if(aSelectedSketchesFromObjects.find(aResultConstruction) !=
+        /*if(aSelectedSketchesFromObjects.find(aResultConstruction) !=
             aSelectedSketchesFromObjects.cend()) {
           theError = "Error: Object from this sketch is already selected. "
                      "Sketch is not allowed for selection.";
           return false;
-        }
+        }*/
 
         aSelectedSketches.insert(aResultConstruction);
       } else {
