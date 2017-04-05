@@ -674,6 +674,61 @@ namespace GeomAlgoAPI_ShapeAPI
   }
 
   //===============================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeMultiRotation(
+    std::shared_ptr<GeomAPI_Shape> theSourceShape,
+    std::shared_ptr<GeomAPI_Ax1> theAxis,
+    const int theNumber)
+  {
+    if (!theAxis) {
+      std::string aError = "Multirotation builder ";
+      aError+=":: the axis is not valid";
+      throw GeomAlgoAPI_Exception(aError);
+    }
+
+    if (theNumber <=0) {
+      std::string aError = "Multirotation builder ";
+      aError+=":: the number of copies is null or negative.";
+      throw GeomAlgoAPI_Exception(aError);
+    }
+
+    double anAngle = 360./theNumber;
+
+    ListOfShape aListOfShape;
+    for (int i=0; i<theNumber; i++) {
+      aListOfShape.
+        push_back(GeomAlgoAPI_ShapeAPI::makeRotation(theSourceShape, theAxis, i*anAngle));
+    }
+    return GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
+  }
+
+  //===============================================================================================
+  std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeMultiRotation(
+    std::shared_ptr<GeomAPI_Shape> theSourceShape,
+    std::shared_ptr<GeomAPI_Ax1> theAxis,
+    const double theStep,
+    const int theNumber)
+  {
+    if (!theAxis) {
+      std::string aError = "Multirotation builder ";
+      aError+=":: the axis is not valid";
+      throw GeomAlgoAPI_Exception(aError);
+    }
+
+    if (theNumber <=0) {
+      std::string aError = "Multirotation builder ";
+      aError+=":: the number of copies is null or negative.";
+      throw GeomAlgoAPI_Exception(aError);
+    }
+
+    ListOfShape aListOfShape;
+    for (int i=0; i<theNumber; i++) {
+      aListOfShape.
+        push_back(GeomAlgoAPI_ShapeAPI::makeRotation(theSourceShape, theAxis, i*theStep));
+    }
+    return GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
+  }
+
+  //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeConeSegment(
     const double theRMin1, const double theRMax1,
     const double theRMin2, const double theRMax2,

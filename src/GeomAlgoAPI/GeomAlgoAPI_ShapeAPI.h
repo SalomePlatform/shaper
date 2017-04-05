@@ -242,6 +242,26 @@ public:
                      const double theSecondStep,
                      const int theSecondNumber) throw (GeomAlgoAPI_Exception);
 
+  /// Performs a multi rotation along one axis and a number of times
+  /// \param[in] theSourceShape Shape to be rotated
+  /// \param[in] theAxis Axis for the rotation
+  /// \param[in] theNumber Number of copies
+  static std::shared_ptr<GeomAPI_Shape> makeMultiRotation(
+                     std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                     std::shared_ptr<GeomAPI_Ax1> theAxis,
+                     const int theNumber);
+
+  /// Performs a multi rotation along one axis, at a step and a number of times
+  /// \param theSourceShape Shape to be moved
+  /// \param[in] theAxis Axis for the rotation
+  /// \param[in] theStep Angle for each rotation
+  /// \param[in] theNumber Number of copies
+  static std::shared_ptr<GeomAPI_Shape> makeMultiRotation(
+                     std::shared_ptr<GeomAPI_Shape> theSourceShape,
+                     std::shared_ptr<GeomAPI_Ax1> theAxis,
+                     const double theStep,
+                     const int theNumber);
+
   /// Creates a cone segment using standard GDML parameters.
   /// \param theRMin1 Inner radius at base of cone
   /// \param theRMax1 Outer radius at base of cone
