@@ -1729,6 +1729,8 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
     else
       aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
 
+    if (!aFeature.get())
+      continue;
 
     std::set<AttributePtr> aSelectedAttributes;
     std::set<ResultPtr> aSelectedResults;
