@@ -15,6 +15,7 @@
 #=========================================================================
 from GeomDataAPI import *
 from ModelAPI import *
+from SketchAPI import SketchAPI_Sketch
 import math
 from salome.shaper import model
 
@@ -61,6 +62,7 @@ dirx.setValue(1, 0, 0)
 norm = geomDataAPI_Dir(aSketchFeature.attribute("Norm"))
 norm.setValue(0, 0, 1)
 aSession.finishOperation()
+aSketch = SketchAPI_Sketch(aSketchFeature)
 
 #=========================================================================
 # Test 1. Create an arc by center, start and end points
@@ -117,6 +119,137 @@ anArcAngle.setValue(aPrevAngle + 10.)
 aSession.finishOperation()
 assert (math.fabs(anArcAngle.value() - aPrevAngle) < TOLERANCE)
 verifyLastArc(aSketchFeature, [], [], [])
+
+#=========================================================================
+# Test 2. Create an arc as a macro-feature by center, start and end points
+#=========================================================================
+aSession.startOperation()
+anArc = aSketchFeature.addFeature("SketchMacroArc")
+assert (anArc.getKind() == "SketchMacroArc")
+anArcCenter = geomDataAPI_Point2D(anArc.attribute("center_point"))
+assert (not anArcCenter.isInitialized())
+anArcStart = geomDataAPI_Point2D(anArc.attribute("start_point_1"))
+assert (not anArcStart.isInitialized())
+anArcEnd = geomDataAPI_Point2D(anArc.attribute("end_point_1"))
+assert (not anArcEnd.isInitialized())
+anArcType = anArc.string("arc_type")
+assert (not anArcType.isInitialized())
+anArcType.setValue("by_center_and_points")
+anArcCenter.setValue(aCenter[0], aCenter[1])
+anArcStart.setValue(aStart[0], aStart[1])
+anArcEnd.setValue(aEnd[0], aEnd[1])
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 2)
+verifyLastArc(aSketchFeature, [], [], [])
+
+#=========================================================================
+# Test 3. Create an arc by center and two points coincident to other points
+#=========================================================================
+# get previous arc
+aPrevArc = model.lastSubFeature(aSketchFeature, "SketchArc")
+aPrevArcStart = geomDataAPI_Point2D(aPrevArc.attribute("start_point"))
+aPrevArcEnd = geomDataAPI_Point2D(aPrevArc.attribute("end_point"))
+# create additional point
+aPointCoordinates = [0., 0.]
+aSession.startOperation()
+aPoint = aSketchFeature.addFeature("SketchPoint")
+aPointCoord = geomDataAPI_Point2D(aPoint.attribute("PointCoordinates"))
+aPointCoord.setValue(aPointCoordinates[0], aPointCoordinates[1])
+aPoint.selection("External").selectSubShape("VERTEX", "Origin")
+aSession.finishOperation()
+# create additional line
+aLineStart = [20., -5.]
+aLineEnd = [20., 20]
+aSession.startOperation()
+aLine = aSketchFeature.addFeature("SketchLine")
+aLineStartPoint = geomDataAPI_Point2D(aLine.attribute("StartPoint"))
+aLineEndPoint = geomDataAPI_Point2D(aLine.attribute("EndPoint"))
+aLineStartPoint.setValue(aLineStart[0], aLineStart[1])
+aLineEndPoint.setValue(aLineEnd[0], aLineEnd[1])
+aSession.finishOperation()
+# create new arc
+aSession.startOperation()
+anArc = aSketchFeature.addFeature("SketchMacroArc")
+aCenter = geomDataAPI_Point2D(anArc.attribute("center_point"))
+aCenterRef = anArc.refattr("center_point_ref")
+assert (not aCenterRef.isInitialized())
+aStart = geomDataAPI_Point2D(anArc.attribute("start_point_1"))
+aStartRef = anArc.refattr("start_point_ref")
+assert (not aStartRef.isInitialized())
+aEnd = geomDataAPI_Point2D(anArc.attribute("end_point_1"))
+aEndRef = anArc.refattr("end_point_ref")
+assert (not aEndRef.isInitialized())
+anArcType = anArc.string("arc_type")
+assert (not anArcType.isInitialized())
+# initialize attributes
+anArcType.setValue("by_center_and_points")
+aCenterRef.setAttr(aPrevArcStart)
+aCenter.setValue(aPrevArcStart.pnt())
+aStartRef.setObject(aPoint.lastResult())
+aStart.setValue(aPointCoord.pnt())
+aEndRef.setAttr(aPrevArcEnd)
+aEnd.setValue(aPrevArcEnd.pnt())
+aSession.finishOperation()
+# check the MacroArc is not valid (selection of end point is not possible)
+aLastFeature = aSketchFeature.subFeature(aSketchFeature.numberOfSubs() - 1)
+assert aLastFeature.getKind() == "SketchMacroArc", "ERROR: SketchMacroArc has NOT expected to be valid"
+# change end point reference to a line
+aSession.startOperation()
+aEndRef.setObject(aLine.lastResult())
+aEnd.setValue(aLineStart[0], aLineStart[1])
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 8), "Number of subs {}".format(aSketchFeature.numberOfSubs())
+verifyPointCoordinates(aPointCoord, aPointCoordinates[0], aPointCoordinates[1])
+verifyLastArc(aSketchFeature, [aPrevArcStart.x(), aPrevArcStart.y()], aPointCoordinates, [])
+model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 3)
+
+#=========================================================================
+# Test 4. Create an arc by center and points coincident to other features
+#=========================================================================
+# get previous arc
+aPrevArc = model.lastSubFeature(aSketchFeature, "SketchArc")
+aPrevArcCenter = geomDataAPI_Point2D(aPrevArc.attribute("center_point"))
+aPrevArcStart = geomDataAPI_Point2D(aPrevArc.attribute("start_point"))
+aPrevArcEnd = geomDataAPI_Point2D(aPrevArc.attribute("end_point"))
+aPrevArcCenterXY = [aPrevArcCenter.x(), aPrevArcCenter.y()]
+aPrevArcStartXY = [aPrevArcStart.x(), aPrevArcStart.y()]
+aPrevArcEndXY = [aPrevArcEnd.x(), aPrevArcEnd.y()]
+# create new arc
+aSession.startOperation()
+anArc = aSketchFeature.addFeature("SketchMacroArc")
+aCenter = geomDataAPI_Point2D(anArc.attribute("center_point"))
+aCenterRef = anArc.refattr("center_point_ref")
+aStart = geomDataAPI_Point2D(anArc.attribute("start_point_1"))
+aStartRef = anArc.refattr("start_point_ref")
+aEnd = geomDataAPI_Point2D(anArc.attribute("end_point_1"))
+aEndRef = anArc.refattr("end_point_ref")
+anArcType = anArc.string("arc_type")
+# initialize attributes
+anArcType.setValue("by_center_and_points")
+aCenterRef.setObject(aLine.lastResult())
+aCenter.setValue(aLineStartPoint.pnt())
+aStartRef.setObject(aPrevArc.lastResult())
+aStart.setValue(aPrevArcStart.pnt())
+aEndRef.setObject(aLine.lastResult())
+aEnd.setValue(aLineEndPoint.pnt())
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 12), "Number of subs {}".format(aSketchFeature.numberOfSubs())
+# check connected features do not change their positions
+verifyPointCoordinates(aPrevArcCenter, aPrevArcCenterXY[0], aPrevArcCenterXY[1])
+verifyPointCoordinates(aPrevArcStart, aPrevArcStartXY[0], aPrevArcStartXY[1])
+verifyPointCoordinates(aPrevArcEnd, aPrevArcEndXY[0], aPrevArcEndXY[1])
+verifyPointCoordinates(aLineStartPoint, aLineStart[0], aLineStart[1])
+verifyPointCoordinates(aLineEndPoint, aLineEnd[0], aLineEnd[1])
+# verify newly created arc
+anArc = model.lastSubFeature(aSketchFeature, "SketchArc")
+aCenter = geomDataAPI_Point2D(anArc.attribute("center_point"))
+aStart = geomDataAPI_Point2D(anArc.attribute("start_point"))
+aEnd = geomDataAPI_Point2D(anArc.attribute("end_point"))
+verifyPointOnLine(aCenter, aLine)
+verifyPointOnLine(aEnd, aLine)
+verifyPointOnCircle(aStart, aPrevArc)
+model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 6)
+model.testNbSubFeatures(aSketch, "SketchConstraintTangent", 0)
 
 #=========================================================================
 # End of test

@@ -136,11 +136,11 @@ verifyLastCircle(aSketchFeature, -25., -25., aRadius)
 aPrevCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
 aPrevCenter = geomDataAPI_Point2D(aPrevCircle.attribute("circle_center"))
 # create additional point
-aPointCoodinates = [0., 0.]
+aPointCoordinates = [0., 0.]
 aSession.startOperation()
 aPoint = aSketchFeature.addFeature("SketchPoint")
 aPointCoord = geomDataAPI_Point2D(aPoint.attribute("PointCoordinates"))
-aPointCoord.setValue(aPointCoodinates[0], aPointCoodinates[1])
+aPointCoord.setValue(aPointCoordinates[0], aPointCoordinates[1])
 aSession.finishOperation()
 # create new circle
 aSession.startOperation()
@@ -162,7 +162,7 @@ aPassed.setValue(aPrevCenter.pnt())
 aRadius = model.distancePointPoint(aPrevCenter, aPointCoord)
 aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 6)
-verifyPointCoordinates(aPointCoord, aPointCoodinates[0], aPointCoodinates[1])
+verifyPointCoordinates(aPointCoord, aPointCoordinates[0], aPointCoordinates[1])
 verifyLastCircle(aSketchFeature, aPointCoord.x(), aPointCoord.y(), aRadius)
 model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 2)
 

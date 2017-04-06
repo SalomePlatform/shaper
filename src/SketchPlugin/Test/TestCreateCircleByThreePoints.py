@@ -132,13 +132,13 @@ aPrevCenter = geomDataAPI_Point2D(aPrevCircle.attribute("circle_center"))
 aPrevCenterXY = [aPrevCenter.x(), aPrevCenter.y()]
 aPrevCircleRadius = aPrevCircle.real("circle_radius").value()
 # create additional point and line
-aPointCoodinates = [5., 20.]
+aPointCoordinates = [5., 20.]
 aLineStart = [10., 0.]
 aLineEnd = [10., 50.]
 aSession.startOperation()
 aPoint = aSketchFeature.addFeature("SketchPoint")
 aPointCoord = geomDataAPI_Point2D(aPoint.attribute("PointCoordinates"))
-aPointCoord.setValue(aPointCoodinates[0], aPointCoodinates[1])
+aPointCoord.setValue(aPointCoordinates[0], aPointCoordinates[1])
 aLine = aSketchFeature.addFeature("SketchLine")
 aStartPnt = geomDataAPI_Point2D(aLine.attribute("StartPoint"))
 aStartPnt.setValue(aLineStart[0], aLineStart[1])
@@ -167,7 +167,7 @@ aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 7)
 # check the points do not change their positions
 verifyPointCoordinates(aPrevCenter, aPrevCenterXY[0], aPrevCenterXY[1])
-verifyPointCoordinates(aPointCoord, aPointCoodinates[0], aPointCoodinates[1])
+verifyPointCoordinates(aPointCoord, aPointCoordinates[0], aPointCoordinates[1])
 verifyPointCoordinates(aStartPnt, aLineStart[0], aLineStart[1])
 # check newly created circle passes through the points
 aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
