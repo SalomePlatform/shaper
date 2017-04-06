@@ -46,6 +46,31 @@ def verifyLastArc(theSketch, theCenter, theStart, theEnd):
 def verifyPointCoordinates(thePoint, theX, theY):
     assert thePoint.x() == theX and thePoint.y() == theY, "Wrong '{0}' point ({1}, {2}), expected ({3}, {4})".format(thePoint.id(), thePoint.x(), thePoint.y(), theX, theY)
 
+def verifyPointOnLine(thePoint, theLine):
+    aDistance = distancePointLine(thePoint, theLine)
+    assert aDistance < TOLERANCE, "Point is not on Line, distance: {0}".format(aDistance)
+
+def verifyPointOnCircle(thePoint, theCircular):
+    if theCircular.getKind() == "SketchArc":
+        aCenterPoint = geomDataAPI_Point2D(theCircular.attribute("center_point"))
+        aStartPoint = geomDataAPI_Point2D(theCircular.attribute("start_point"))
+        aRadius = model.distancePointPoint(aCenterPoint, aStartPoint)
+    elif theCircular.getKind() == "SketchCircle":
+        aCenterPoint = geomDataAPI_Point2D(theCircular.attribute("circle_center"))
+        aRadius = theCircular.real("circle_radius").value()
+    else:
+        return
+    assert math.fabs(model.distancePointPoint(aCenterPoint, thePoint) - aRadius) < TOLERANCE
+
+
+def distancePointLine(thePoint, theLine):
+    aLineStart = geomDataAPI_Point2D(theLine.attribute("StartPoint")).pnt().xy()
+    aLineEnd = geomDataAPI_Point2D(theLine.attribute("EndPoint")).pnt().xy()
+    aLineDir = aLineEnd.decreased(aLineStart)
+    aLineLen = aLineEnd.distance(aLineStart)
+    aPntDir = thePoint.pnt().xy().decreased(aLineStart)
+    return math.fabs(aPntDir.cross(aLineDir) / aLineLen)
+
 
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
