@@ -132,13 +132,18 @@ void PartSet_WidgetFeaturePointSelector::mouseReleased(ModuleBase_IViewWindow* t
   if (theEvent->button() != Qt::LeftButton)
     return;
 
+  std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
+                          std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                          feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+  ObjectPtr aPreviewObject = aRefPreviewAttr->value();
+  // do not move focus from the current widget if the object is not highlighted/selected
+  if (!aPreviewObject.get())
+    return;
+
   // set parameters of preview into parameters of selection in the feature
   std::shared_ptr<ModelAPI_AttributeReference> aRefSelectedAttr =
                           std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                           feature()->data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
-  std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
-                          std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                          feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
   aRefSelectedAttr->setValue(aRefPreviewAttr->value());
 
   std::shared_ptr<GeomDataAPI_Point2D> aPointSelectedAttr =
@@ -166,9 +171,6 @@ bool PartSet_WidgetFeaturePointSelector::fillFeature(
   ObjectPtr anObject;
   if (theSelectedPrs.get() && theSelectedPrs->object().get())
     anObject = theSelectedPrs->object();
-
-  if (!anObject.get())
-    return aFilled;
 
   std::shared_ptr<ModelAPI_AttributeReference> aRef =
                           std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
