@@ -345,12 +345,13 @@ int shapeType(const QString& theType)
 }
 
 void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature,
-                  bool& hasParameter, bool& hasCompositeOwner)
+                  bool& hasParameter, bool& hasCompositeOwner, bool& hasResultInHistory)
 {
   hasResult = false;
   hasFeature = false;
   hasParameter = false;
   hasCompositeOwner = false;
+  hasResultInHistory = false;
   foreach(ObjectPtr aObj, theObjects) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
@@ -361,6 +362,12 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
     hasParameter |= (aConstruction.get() != NULL);
     if (hasFeature)
       hasCompositeOwner |= (ModelAPI_Tools::compositeOwner(aFeature) != NULL);
+
+    if (!hasResultInHistory && aResult.get()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aResult);
+      hasResultInHistory = aFeature.get() && aFeature->isInHistory();
+    }
+
     if (hasFeature && hasResult  && hasParameter && hasCompositeOwner)
       break;
   }

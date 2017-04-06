@@ -1150,8 +1150,9 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
   bool hasFeature = false;
   bool hasParameter = false;
   bool hasCompositeOwner = false;
+  bool hasResultInHistory = false;
   ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter,
-                                  hasCompositeOwner);
+                                  hasCompositeOwner, hasResultInHistory);
 
   ModuleBase_Operation* aCurrentOp = myWorkshop->currentOperation();
   if (aSelected == 1) {

@@ -238,8 +238,9 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     bool hasFeature = false;
     bool hasParameter = false;
     bool hasCompositeOwner = false;
+    bool hasResultInHistory = false;
     ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter,
-                                   hasCompositeOwner);
+                                   hasCompositeOwner, hasResultInHistory);
     //Process Feature
     if (aSelected == 1) {
       ObjectPtr aObject = aObjects.first();
@@ -306,7 +307,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
       action("CLEAN_HISTORY_CMD")->setEnabled(true);
 
     action("SHOW_RESULTS_CMD")->setEnabled(hasFeature);
-    action("SHOW_FEATURE_CMD")->setEnabled(hasResult);
+    action("SHOW_FEATURE_CMD")->setEnabled(hasResult && hasResultInHistory);
   }
 
   // Show/Hide command has to be disabled for objects from non active document

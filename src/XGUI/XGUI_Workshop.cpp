@@ -1460,7 +1460,9 @@ void XGUI_Workshop::deleteObjects()
   bool hasFeature = false;
   bool hasParameter = false;
   bool hasCompositeOwner = false;
-  ModuleBase_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter, hasCompositeOwner);
+  bool hasResultInHistory = false;
+  ModuleBase_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter, hasCompositeOwner,
+                                 hasResultInHistory);
   if (!(hasFeature || hasParameter))
     return;
 

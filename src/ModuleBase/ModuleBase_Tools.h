@@ -156,8 +156,10 @@ MODULEBASE_EXPORT bool isSubResult(ObjectPtr theObject);
 /// \param hasFeature will be set to true if list contains Feature objects
 /// \param hasParameter will be set to true if list contains Parameter objects
 /// \param hasCompositeOwner will be set to true if list contains Sub-Feature objects
+/// \param hasResultInHistory will be set to true if one of result is in history
 MODULEBASE_EXPORT void checkObjects(const QObjectPtrList& theObjects, bool& hasResult,
-                           bool& hasFeature, bool& hasParameter, bool& hasCompositeOwner);
+                           bool& hasFeature, bool& hasParameter, bool& hasCompositeOwner,
+                           bool& hasResultInHistory);
 
 /// Sets the default coeffient into the driver calculated accordingly the shape type.
 /// It provides 1.e-4 for results of construction type
