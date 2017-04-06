@@ -27,6 +27,11 @@
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Circ.h>
 
+//#define DEBUG_POINT_INSIDE_SHAPE
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+#include <iostream>
+#endif
+
 #ifdef WIN32
 #pragma warning(disable : 4996) // for sprintf
 #endif
@@ -156,6 +161,9 @@ void appendPoint(const std::shared_ptr<GeomAPI_Pnt>& thePoint,
       anObjects.push_back(theResult);
       thePointToAttributeOrObject[thePoint] = std::make_pair(anAttributes, anObjects);
     }
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+    std::cout << "["<< thePoint->x() << ", " << thePoint->y() << "," << thePoint->z() << "]";
+#endif
   }
 }
 
@@ -196,6 +204,9 @@ void ModelGeomAlgo_Point2D::getPointsIntersectedShape(
                         const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
                         PointToRefsMap& thePointToAttributeOrObject)
 {
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+  std::cout << "ModelGeomAlgo_Point2D::getPointsIntersectedShape" << std::endl;
+#endif
   GeomShapePtr aFeatureShape;
   {
     std::set<ResultPtr> anEdgeShapes;
@@ -223,7 +234,15 @@ void ModelGeomAlgo_Point2D::getPointsIntersectedShape(
       GeomShapePtr aShape = aResult->shape();
 
       GeomShapePtr aShapeOfIntersection = aFeatureShape->intersect(aShape);
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+      int aPrevSize = thePointToAttributeOrObject.size();
+#endif
       appendShapePoints(aShapeOfIntersection, aResult, thePointToAttributeOrObject);
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+      if (aPrevSize != thePointToAttributeOrObject.size())
+        std::cout << " <- appendShapePoints"
+                  << thePointToAttributeOrObject.size() - aPrevSize << std::endl;
+#endif
     }
   }
 }
@@ -252,6 +271,9 @@ void ModelGeomAlgo_Point2D::getPointsInsideShape(
                         const std::shared_ptr<GeomAPI_Dir>& theDirY,
                         PointToRefsMap& thePointToAttributeOrObject)
 {
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+  std::cout << "ModelGeomAlgo_Point2D::getPointsInsideShape:" << std::endl;
+#endif
   std::set<std::shared_ptr<GeomDataAPI_Point2D> >::const_iterator anIt = theAttributes.begin(),
                                                           aLast = theAttributes.end();
   for (; anIt != aLast; anIt++) {
@@ -268,6 +290,17 @@ void ModelGeomAlgo_Point2D::getPointsInsideShape(
         anAttributes.push_back(anAttribute);
         thePointToAttributeOrObject[aProjectedPoint] = std::make_pair(anAttributes, anObjects);
       }
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+      std::cout << "  " << anAttribute->owner()->data()->name() << ": " << anAttribute->id()
+                << "[" << aPoint->x() << ", " << aPoint->y() << ", " << aPoint->z() << "]"
+                << std::endl;
+#endif
+    }
+    else {
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+      std::cout << "  " << anAttribute->owner()->data()->name() << ": " << anAttribute->id()
+                << "OUT of shape" << std::endl;
+#endif
     }
   }
 }
