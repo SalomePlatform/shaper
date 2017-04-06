@@ -27,8 +27,9 @@ void PartSetPlugin_Remove::execute()
   if (aPart.get()) {
     FeaturePtr aFeature = aRoot->feature(aPart);
     if (aFeature) {
-      // do remove
-      aPart->data()->document(ModelAPI_ResultPart::DOC_REF())->value()->close();
+      // do remove, but don't do real close (features are erased without persistence changes
+      // document remove may be undoed)
+      // aPart->data()->document(ModelAPI_ResultPart::DOC_REF())->value()->close();
       std::set<std::shared_ptr<ModelAPI_Feature> > aRefFeatures;
       aRoot->refsToFeature(aFeature, aRefFeatures);
       if (aRefFeatures.empty()) {

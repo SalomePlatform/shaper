@@ -167,7 +167,8 @@ void ModelAPI_Feature::erase()
 
 ModelAPI_Feature::~ModelAPI_Feature()
 {
-  erase();
+  if (data() && data()->isValid())
+    erase();
 }
 
 FeaturePtr ModelAPI_Feature::feature(ObjectPtr theObject)

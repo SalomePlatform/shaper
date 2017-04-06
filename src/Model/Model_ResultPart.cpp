@@ -177,7 +177,7 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
         for(int a = aDoc->size(aBodyGroup) - 1; a >= 0; a--) {
           ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(aDoc->object(aBodyGroup, a));
           // "object" method filters out disabled and concealed anyway, so don't check
-          if (aBody.get() && aBody->shape().get()) {
+          if (aBody.get() && aBody->data()->isValid() && aBody->shape().get()) {
             TopoDS_Shape aShape = *(aBody->shape()->implPtr<TopoDS_Shape>());
             if (!aShape.IsNull()) {
               aBuilder.Add(aResultComp, aShape);

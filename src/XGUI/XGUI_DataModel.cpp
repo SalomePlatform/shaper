@@ -644,11 +644,7 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
           } else {
             // this is an object under sub document root
             std::string aType = myXMLReader->subType();
-            int aCount = theRow - aNbSubFolders;
-            // To check number of objects before using
-            if (aSubDoc->size(aType) <= aCount)
-              return QModelIndex();
-            ObjectPtr aObj = aSubDoc->object(aType, aCount);
+            ObjectPtr aObj = aSubDoc->object(aType, theRow - aNbSubFolders);
             aIndex = objectIndex(aObj);
           }
         } else {

@@ -112,7 +112,8 @@ void PartSetPlugin_Part::erase() {
   ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
   if (aResult.get()) {
     DocumentPtr aDoc = aResult->partDoc();
-    aDoc->eraseAllFeatures();
+    if (aDoc.get())
+      aDoc->eraseAllFeatures();
   }
   ModelAPI_Feature::erase();
 }

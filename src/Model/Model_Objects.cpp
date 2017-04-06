@@ -271,7 +271,28 @@ void Model_Objects::removeFeature(FeaturePtr theFeature)
 
 void Model_Objects::eraseAllFeatures()
 {
-  ModelAPI_EventCreator::get()->sendDeleted(myDoc, ModelAPI_Feature::group());
+  static Events_ID kDispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const ModelAPI_EventCreator* kCreator = ModelAPI_EventCreator::get();
+  // make all features invalid (like deleted)
+  NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFIter(myFeatures);
+  for(; aFIter.More(); aFIter.Next()) {
+    FeaturePtr aFeature = aFIter.Value();
+    std::list<ResultPtr> aResList;
+    ModelAPI_Tools::allResults(aFeature, aResList);
+    std::list<ResultPtr>::iterator aRIter = aResList.begin();
+    for(; aRIter != aResList.end(); aRIter++) {
+      ResultPtr aRes = *aRIter;
+      if (aRes && aRes->data()->isValid()) {
+        kCreator->sendDeleted(myDoc, aRes->groupName());
+        kCreator->sendUpdated(aRes, kDispEvent);
+        aRes->setData(aRes->data()->invalidPtr());
+
+      }
+    }
+    kCreator->sendUpdated(aFeature, kDispEvent);
+    aFeature->setData(aFeature->data()->invalidPtr());
+  }
+  kCreator->sendDeleted(myDoc, ModelAPI_Feature::group());
   myFeatures.Clear(); // just remove features without modification of DS
   updateHistory(ModelAPI_Feature::group());
 }
