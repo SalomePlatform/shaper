@@ -81,6 +81,18 @@ class PARTSET_EXPORT PartSet_SketcherMgr : public QObject
     bool myIsInitialized;  /// the state whether the point is set
     double myCurX, myCurY; /// the point coordinates
   };
+
+public:
+  /// Struct to define selection model information to store/restore selection
+  struct SelectionInfo
+  {
+    std::set<AttributePtr> myAttributes; /// the selected attributes
+    std::set<ResultPtr> myResults; /// the selected results
+    TopoDS_Shape myFirstResultShape; /// the first shape of feature result
+    TopTools_MapOfShape myLocalSelectedShapes; /// shapes of local selection
+  };
+  typedef QMap<FeaturePtr, SelectionInfo> FeatureToSelectionMap;
+
 public:
   /// Constructor
   /// \param theModule a pointer to PartSet module
@@ -218,10 +230,12 @@ public:
   /// It obtains the selected attributes.
   /// The highlighted objects can be processes as the selected ones
   /// \param theHighlightedOnly a boolean flag
-  void storeSelection(const bool theHighlightedOnly = false);
+  /// \param theCurrentSelection a container filled by the current selection
+  void storeSelection(const bool theHighlightedOnly, FeatureToSelectionMap& theCurrentSelection);
 
   /// Restores previously saved selection state
-  void restoreSelection();
+  /// \param theCurrentSelection a container filled by the current selection
+  void restoreSelection(FeatureToSelectionMap& theCurrentSelection);
 
   /// Return error state of the sketch feature, true if the error has happened
   /// \return boolean value
@@ -316,16 +330,6 @@ private:
   static bool setDistanceValueByPreselection(ModuleBase_Operation* theOperation,
                                              ModuleBase_IWorkshop* theWorkshop,
                                              bool& theCanCommitOperation);
-
-  struct SelectionInfo
-  {
-    std::set<AttributePtr> myAttributes;
-    std::set<ResultPtr> myResults;
-    TopoDS_Shape myFirstResultShape;
-    TopTools_MapOfShape myLocalSelectedShapes;
-  };
-
-  typedef QMap<FeaturePtr, SelectionInfo> FeatureToSelectionMap;
 
   /// Applyes the current selection to the object in the workshop viewer
   /// It includes the selection in all modes of activation, even local context - vertexes, edges

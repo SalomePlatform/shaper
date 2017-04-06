@@ -276,7 +276,7 @@ void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
       myModule->sketchReentranceMgr()->isInternalEditActive())
     return;
   // it is necessary to save current selection in order to restore it after the values are modifed
-  storeSelection();
+  storeSelection(false);
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
@@ -358,7 +358,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
     ModuleBase_ISelection* aSelect = aWorkshop->selection();
 
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
-    storeSelection(!aHasShift);
+    storeSelection(!aHasShift, myCurrentSelection);
 
     if (myCurrentSelection.empty()) {
       if (isSketchOpe && (!isSketcher))
@@ -448,7 +448,7 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
           /// the previous selection is lost by mouse release in the viewer(Select method), but
           /// it is still stored in myCurrentSelection. So, it is possible to restore selection
           /// It is important for drag(edit with mouse) of sketch entities.
-          restoreSelection();
+          restoreSelection(myCurrentSelection);
           myCurrentSelection.clear();
         }
       }
@@ -585,7 +585,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     //Events_Loop::loop()->flush(aUpdateEvent); // up update events - to redisplay presentations
 
     // 5. it is necessary to save current selection in order to restore it after the features moving
-    restoreSelection();
+    restoreSelection(myCurrentSelection);
     // 6. restore the update viewer flag and call this update
     aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
     aDisplayer->updateViewer();
@@ -1693,7 +1693,8 @@ void PartSet_SketcherMgr::visualizeFeature(const FeaturePtr& theFeature,
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
 
-void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
+void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly,
+                        PartSet_SketcherMgr::FeatureToSelectionMap& theCurrentSelection)
 {
   if (!myCurrentSketch.get())
     return;
@@ -1710,7 +1711,7 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
   }
 
   // 1. it is necessary to save current selection in order to restore it after the features moving
-  myCurrentSelection.clear();
+  theCurrentSelection.clear();
 
   QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = aStoredPrs.begin(),
                                                 aLast = aStoredPrs.end();
@@ -1735,8 +1736,8 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
     std::set<AttributePtr> aSelectedAttributes;
     std::set<ResultPtr> aSelectedResults;
     SelectionInfo anInfo;
-    if (myCurrentSelection.find(aFeature) != myCurrentSelection.end())
-      anInfo = myCurrentSelection.find(aFeature).value();
+    if (theCurrentSelection.find(aFeature) != theCurrentSelection.end())
+      anInfo = theCurrentSelection.find(aFeature).value();
 
     TopoDS_Shape aFirstShape;
     ResultPtr aFirstResult = aFeature->firstResult();
@@ -1757,25 +1758,26 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
           anInfo.myAttributes, anInfo.myResults, anInfo.myLocalSelectedShapes);
       }
     }
-    myCurrentSelection[aFeature] = anInfo;
+    theCurrentSelection[aFeature] = anInfo;
   }
-  //qDebug(QString("  storeSelection: %1").arg(myCurrentSelection.size()).toStdString().c_str());
+  //qDebug(QString("  storeSelection: %1").arg(theCurrentSelection.size()).toStdString().c_str());
 }
 
-void PartSet_SketcherMgr::restoreSelection()
+void PartSet_SketcherMgr::restoreSelection(
+                                PartSet_SketcherMgr::FeatureToSelectionMap& theCurrentSelection)
 {
   if (!myCurrentSketch.get())
     return;
 
-  //qDebug(QString("restoreSelection: %1").arg(myCurrentSelection.size()).toStdString().c_str());
+  //qDebug(QString("restoreSelection: %1").arg(theCurrentSelection.size()).toStdString().c_str());
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-  FeatureToSelectionMap::const_iterator aSIt = myCurrentSelection.begin(),
-                                        aSLast = myCurrentSelection.end();
+  FeatureToSelectionMap::const_iterator aSIt = theCurrentSelection.begin(),
+                                        aSLast = theCurrentSelection.end();
   SelectMgr_IndexedMapOfOwner anOwnersToSelect;
   anOwnersToSelect.Clear();
   for (; aSIt != aSLast; aSIt++) {
-    getSelectionOwners(aSIt.key(), myCurrentSketch, aWorkshop, myCurrentSelection,
+    getSelectionOwners(aSIt.key(), myCurrentSketch, aWorkshop, theCurrentSelection,
                        anOwnersToSelect);
   }
   aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);

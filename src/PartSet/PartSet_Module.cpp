@@ -204,12 +204,18 @@ void PartSet_Module::deactivateSelectionFilters()
 
 void PartSet_Module::storeSelection()
 {
-  sketchMgr()->storeSelection();
+  // cash is used only to restore selection, so it should be filled in storeSelection and
+  // after applying immediatelly cleared in restoreSelection
+  myCurrentSelection.clear();
+  sketchMgr()->storeSelection(false, myCurrentSelection);
 }
 
 void PartSet_Module::restoreSelection()
 {
-  sketchMgr()->restoreSelection();
+  // cash is used only to restore selection, so it should be filled in storeSelection and
+  // after applying immediatelly cleared in restoreSelection
+  sketchMgr()->restoreSelection(myCurrentSelection);
+  myCurrentSelection.clear();
 }
 
 void PartSet_Module::registerValidators()

@@ -6,6 +6,7 @@
 #include "PartSet.h"
 #include "PartSet_Tools.h"
 #include "PartSet_OverconstraintListener.h"
+#include "PartSet_SketcherMgr.h"
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Definitions.h>
@@ -437,6 +438,9 @@ private:
   /// backup of the visible state to restore them by operation stop
   QMap<PartSet_Tools::ConstraintVisibleState, bool> myHasConstraintShown;
 
+  /// backup of selection in the viewer, it is used only to store selection before
+  /// redisplay and restore it after
+  PartSet_SketcherMgr::FeatureToSelectionMap myCurrentSelection;
   QModelIndex myActivePartIndex;
 };
 
