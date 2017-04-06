@@ -128,7 +128,7 @@ INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 ADD_UNIT_TESTS(TestSketchPointLine.py
                TestCreateArcByCenterStartEnd.py
                # TestCreateArcByThreePoints.py
-               # TestCreateArcByTangentEdge.py
+               TestCreateArcByTangentEdge.py
                # TestCreateArcChangeType.py
                TestCreateCircleByCenterAndPassed.py
                TestCreateCircleByThreePoints.py

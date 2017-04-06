@@ -62,7 +62,6 @@ def verifyPointOnCircle(thePoint, theCircular):
         return
     assert math.fabs(model.distancePointPoint(aCenterPoint, thePoint) - aRadius) < TOLERANCE
 
-
 def distancePointLine(thePoint, theLine):
     aLineStart = geomDataAPI_Point2D(theLine.attribute("StartPoint")).pnt().xy()
     aLineEnd = geomDataAPI_Point2D(theLine.attribute("EndPoint")).pnt().xy()
