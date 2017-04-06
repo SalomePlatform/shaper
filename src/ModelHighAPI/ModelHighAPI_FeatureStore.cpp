@@ -187,6 +187,10 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
     aResult<<anAttr->value();
   } else if (aType == ModelAPI_AttributeString::typeId()) {
     AttributeStringPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttr);
+    // do not dump solver DOF for sketch as it may be changed unexpectedly
+    if(anAttr->id() == "SolverDOF") {
+      return "";
+    }
     aResult<<anAttr->value();
   } else if (aType == ModelAPI_AttributeReference::typeId()) {
     AttributeReferencePtr anAttr =
