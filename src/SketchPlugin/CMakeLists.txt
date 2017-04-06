@@ -129,7 +129,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestCreateArcByCenterStartEnd.py
                TestCreateArcByThreePoints.py
                TestCreateArcByTangentEdge.py
-               # TestCreateArcChangeType.py
+               TestCreateArcChangeType.py
                TestCreateCircleByCenterAndPassed.py
                TestCreateCircleByThreePoints.py
                TestCreateCircleChangeType.py
