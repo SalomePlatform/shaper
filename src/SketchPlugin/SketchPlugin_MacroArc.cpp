@@ -113,7 +113,9 @@ static void intersectShapeAndCircle(const GeomShapePtr& theShape,
       }
     }
   }
-  theIntersection->setValue(anInterPnt);
+  if(anInterPnt.get()) {
+    theIntersection->setValue(anInterPnt);
+  }
 }
 
 
