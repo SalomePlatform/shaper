@@ -6,7 +6,7 @@ model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-model.addParameter(Part_1_doc, "R", "40")
+Parameter_R = model.addParameter(Part_1_doc, "R", "40")
 model.addParameter(Part_1_doc, "h", "3")
 model.addParameter(Part_1_doc, "R2", "33.5")
 model.addParameter(Part_1_doc, "h2", "4")
@@ -107,6 +107,12 @@ SketchLine_13.setName("SketchLine_16")
 SketchLine_13.result().setName("SketchLine_16")
 model.do()
 ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_8/Face-SketchLine_7r-SketchLine_8r-SketchLine_10f-SketchLine_11f"), model.selection("FACE", "Sketch_8/Face-SketchLine_16f-SketchLine_17f-SketchLine_18r-SketchLine_19r"), model.selection("FACE", "Sketch_8/Face-SketchLine_12f-SketchLine_13f-SketchLine_14r-SketchLine_15r")], model.selection(), model.selection("FACE", "ExtrusionCut_2_1/Modfied_23"), 0, model.selection(), 0, [model.selection("SOLID", "ExtrusionCut_2_1")])
+
+# Test reexecution after parameter change
+Parameter_R.setValue(50)
+model.do()
+model.testResultsVolumes(ExtrusionCut_3, [35832.402050074902945198118686676])
+Parameter_R.setValue(40)
 model.end()
 
 from GeomAPI import GeomAPI_Shape

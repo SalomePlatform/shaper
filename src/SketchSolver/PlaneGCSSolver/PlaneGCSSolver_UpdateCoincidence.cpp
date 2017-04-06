@@ -193,7 +193,13 @@ bool PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::isNewCoincidence(
     if (hasExternal()) {
       if (myExternalAndConnected.find(theOtherEntity) == myExternalAndConnected.end())
         myExternalAndConnected[theOtherEntity] = std::set<EntityWrapperPtr>();
-      return false;
+      // check whether all external entities are edges
+      bool isNewCoinc = true;
+      std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> >::iterator
+          anIt = myExternalAndConnected.begin();
+      for (; anIt != myExternalAndConnected.end() && isNewCoinc; ++anIt)
+        isNewCoinc = (anIt->first->type() != ENTITY_POINT);
+      return isNewCoinc;
     } else {
       myExternalAndConnected[theOtherEntity] = myExternalAndConnected[EntityWrapperPtr()];
       myExternalAndConnected.erase(EntityWrapperPtr());

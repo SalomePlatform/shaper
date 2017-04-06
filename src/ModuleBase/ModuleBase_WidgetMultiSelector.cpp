@@ -407,6 +407,7 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
+  clearValidatedCash();
   activateSelectionAndFilters(true);
 
   if (!myFeature)
@@ -815,7 +816,7 @@ bool ModuleBase_WidgetMultiSelector::findInSelection(const ObjectPtr& theObject,
     for (; anIt != aLast && !aFound; anIt++) {
       GeomShapePtr aCShape = *anIt;
       if (aCShape.get())
-        aFound = aCShape->isEqual(aShape);
+        aFound = aCShape->isSame(aShape);
     }
   }
   return aFound;

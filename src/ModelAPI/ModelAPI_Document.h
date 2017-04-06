@@ -184,6 +184,9 @@ public:
   /// Appends the values to theStates list.
   MODELAPI_EXPORT virtual void restoreNodesState(std::list<bool>& theStates) const = 0;
 
+  /// Just removes all features without touching the document data (to be able undo)
+  MODELAPI_EXPORT virtual void eraseAllFeatures() = 0;
+
 protected:
   //! Only for SWIG wrapping it is here
   MODELAPI_EXPORT ModelAPI_Document();

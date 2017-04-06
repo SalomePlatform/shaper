@@ -68,7 +68,9 @@ bool GeomAPI_Face::isEqual(std::shared_ptr<GeomAPI_Shape> theFace) const
     return false;
 
   Handle(IntTools_Context) aContext = new IntTools_Context();
-  Standard_Boolean aRes = BOPTools_AlgoTools::CheckSameGeom(aMyFace, aInFace, aContext);
+  // Double check needed bacause BOPTools_AlgoTools::CheckSameGeom not very smart.
+  Standard_Boolean aRes = BOPTools_AlgoTools::CheckSameGeom(aMyFace, aInFace, aContext)
+    && BOPTools_AlgoTools::CheckSameGeom(aInFace, aMyFace, aContext);
 
   return aRes == Standard_True;
 }

@@ -10,6 +10,7 @@
 #include <BRepAlgoAPI_Section.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_FindPlane.hxx>
+#include <BRepExtrema_DistShapeShape.hxx>
 #include <BRepTools.hxx>
 #include <Bnd_Box.hxx>
 #include <Geom_Circle.hxx>
@@ -30,6 +31,8 @@
 
 #include <sstream>
 #include <algorithm> // for std::transform
+
+#include <BRepTools.hxx>
 
 #define MY_SHAPE implPtr<TopoDS_Shape>()
 
@@ -454,4 +457,22 @@ GeomShapePtr GeomAPI_Shape::intersect(const GeomShapePtr theShape) const
   GeomShapePtr aResShape(new GeomAPI_Shape);
   aResShape->setImpl(new TopoDS_Shape(aResult));
   return aResShape;
+}
+
+bool GeomAPI_Shape::isIntersect(const GeomShapePtr theShape) const
+{
+  if(!theShape.get()) {
+    return false;
+  }
+
+  const TopoDS_Shape& aShape1 = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aShape2 = theShape->impl<TopoDS_Shape>();
+
+  BRepExtrema_DistShapeShape aDist(aShape1, aShape2);
+  aDist.Perform();
+  if(aDist.IsDone() && aDist.Value() < Precision::Confusion()) {
+    return true;
+  }
+
+  return false;
 }

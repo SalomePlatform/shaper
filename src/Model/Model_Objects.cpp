@@ -269,6 +269,13 @@ void Model_Objects::removeFeature(FeaturePtr theFeature)
   }
 }
 
+void Model_Objects::eraseAllFeatures()
+{
+  ModelAPI_EventCreator::get()->sendDeleted(myDoc, ModelAPI_Feature::group());
+  myFeatures.Clear(); // just remove features without modification of DS
+  updateHistory(ModelAPI_Feature::group());
+}
+
 void Model_Objects::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
 {
   TDF_Label aFeaturesLab = featuresLabel();
@@ -667,7 +674,7 @@ void Model_Objects::synchronizeFeatures(
       aFeature = myFeatures.Find(aFeatureLabel);
       aKeptFeatures.insert(aFeature);
       if (anUpdatedMap.Contains(aFeatureLabel)) {
-        if (!theOpen) { // on abort/undo/redo reinitialize attributes is something is changed
+        if (!theOpen) { // on abort/undo/redo reinitialize attributes if something is changed
           std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs =
             aFeature->data()->attributes("");
           std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
@@ -1073,7 +1080,7 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
   theProcessed.insert(theFeature);
   // for composites update subs recursively (sketch elements results are needed for the sketch)
   CompositeFeaturePtr aComp = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
-  if (aComp.get()) {
+  if (aComp.get() && aComp->getKind() != "Part") { // don't go inside of parts sub-features
     // update subs of composites first
     int aSubNum = aComp->numberOfSubs();
     for(int a = 0; a < aSubNum; a++) {

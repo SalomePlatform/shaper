@@ -46,6 +46,7 @@ bool GeomValidators_BooleanArguments::isValid(const std::shared_ptr<ModelAPI_Fea
         }
       } else {
         isAllInSameCompSolid = false;
+        break;
       }
     }
   }
@@ -55,18 +56,21 @@ bool GeomValidators_BooleanArguments::isValid(const std::shared_ptr<ModelAPI_Fea
   anAttrSelList = theFeature->selectionList(*anIt);
   if(anAttrSelList) {
     aToolsNb = anAttrSelList->size();
-    for(int anIndex = 0; anIndex < aToolsNb; ++anIndex) {
-      AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
-      ResultPtr aContext = anAttr->context();
-      ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
-      if(aResCompSolidPtr.get()) {
-        if(aCompSolid.get()) {
-          isAllInSameCompSolid = aCompSolid == aResCompSolidPtr;
+    if(isAllInSameCompSolid) {
+      for(int anIndex = 0; anIndex < aToolsNb; ++anIndex) {
+        AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
+        ResultPtr aContext = anAttr->context();
+        ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+        if(aResCompSolidPtr.get()) {
+          if(aCompSolid.get()) {
+            isAllInSameCompSolid = aCompSolid == aResCompSolidPtr;
+          } else {
+            aCompSolid = aResCompSolidPtr;
+          }
         } else {
-          aCompSolid = aResCompSolidPtr;
+          isAllInSameCompSolid = false;
+          break;
         }
-      } else {
-        isAllInSameCompSolid = false;
       }
     }
   }

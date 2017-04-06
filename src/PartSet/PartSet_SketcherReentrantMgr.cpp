@@ -117,13 +117,13 @@ void PartSet_SketcherReentrantMgr::operationStarted(ModuleBase_Operation* theOpe
   if (!isActiveMgr())
     return;
 
-  if (myPreviousFeature.get() && myRestartingMode == RM_LastFeatureUsed) {
-    ModuleBase_OperationFeature* aCurrentOperation = dynamic_cast<ModuleBase_OperationFeature*>(
-                                                                myWorkshop->currentOperation());
-    CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
-    if (myPreviousFeature.get() && myPreviousFeature->data()->isValid()) // it is not removed
-      copyReetntrantAttributes(myPreviousFeature, aCurrentOperation->feature(), aSketch);
-  }
+  //if (myPreviousFeature.get() && myRestartingMode == RM_LastFeatureUsed) {
+    //ModuleBase_OperationFeature* aCurrentOperation = dynamic_cast<ModuleBase_OperationFeature*>(
+    //                                                            myWorkshop->currentOperation());
+    //CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
+    //if (myPreviousFeature.get() && myPreviousFeature->data()->isValid()) // it is not removed
+      //copyReetntrantAttributes(myPreviousFeature, aCurrentOperation->feature(), aSketch);
+  //}
   resetFlags();
 }
 
@@ -152,17 +152,16 @@ bool PartSet_SketcherReentrantMgr::processMouseMoved(ModuleBase_IViewWindow* the
       ModuleBase_IPropertyPanel* aPanel = myWorkshop->currentOperation()->propertyPanel();
 
       FeaturePtr aCurrentFeature = aFOperation->feature();
-      bool isLineFeature = false, isArcFeature = false;
+      bool isLineFeature = false, isReentrantArcFeature = false;
       std::string anAttributeOnStart;
       if (aCurrentFeature->getKind() == SketchPlugin_Line::ID()) {
         anAttributeOnStart = SketchPlugin_Line::START_ID();
         isLineFeature = anActiveWidget->attributeID() == anAttributeOnStart;
       }
       else if (isTangentArc(aFOperation, module()->sketchMgr()->activeSketch())) {
-        anAttributeOnStart = SketchPlugin_MacroArc::TANGENT_POINT_ID();
-        isArcFeature = anActiveWidget->attributeID() == anAttributeOnStart;
+        isReentrantArcFeature = true;
       }
-      bool aCanBeActivatedByMove = isLineFeature || isArcFeature;
+      bool aCanBeActivatedByMove = isLineFeature || isReentrantArcFeature;
       if (aCanBeActivatedByMove) {
         /// before restarting of operation we need to clear selection, as it may take part in
         /// new feature creation, e.g. tangent arc. But it is not necessary as it was processed
@@ -263,7 +262,7 @@ bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* 
             && !aSelectedPrs->object()->data()->isValid()) {
           // the selected object was removed diring restart, e.g. presentable macro feature
           // there are created objects to replace the object depending on created feature kind
-          aSelectedPrs = generatePreSelection();
+          aSelectedPrs = std::shared_ptr<ModuleBase_ViewerPrs>();
         }
         aMouseProcessor->setPreSelection(aSelectedPrs, theWindow, theEvent);
         //aPoint2DWdg->mouseReleased(theWindow, theEvent);
@@ -548,7 +547,7 @@ void PartSet_SketcherReentrantMgr::restartOperation()
 
       if (myInternalFeature.get())
         copyReetntrantAttributes(myInternalFeature, aFOperation->feature(),
-                                  module()->sketchMgr()->activeSketch());
+                                 module()->sketchMgr()->activeSketch());
 
       myNoMoreWidgetsAttribute = "";
       myIsFlagsBlocked = true;
@@ -690,16 +689,16 @@ bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& th
     AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
     if (aNewFeatureTypeAttr->value() != aTypeAttributeId) // do nothing if there is no changes
       aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
-    //ModuleBase_Tools::flushUpdated(theNewFeature);
-    aChanged = true;*/
+    //ModuleBase_Tools::flushUpdated(theNewFeature);*/
+    //aChanged = true;
   }
   else if (aFeatureKind == SketchPlugin_MacroArc::ID()) {
     // set arc type
-    std::string aTypeAttributeId = SketchPlugin_MacroArc::ARC_TYPE();
+    /*std::string aTypeAttributeId = SketchPlugin_MacroArc::ARC_TYPE();
     AttributeStringPtr aSourceFeatureTypeAttr = theSourceFeature->data()->string(aTypeAttributeId);
     AttributeStringPtr aNewFeatureTypeAttr = theNewFeature->data()->string(aTypeAttributeId);
     if (aNewFeatureTypeAttr->value() != aTypeAttributeId) // do nothing if there is no changes
-      aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());
+      aNewFeatureTypeAttr->setValue(aSourceFeatureTypeAttr->value());*/
     //// if the arc is tangent, set coincidence to end point of the previous arc
     //std::string anArcType = aSourceFeatureTypeAttr->value();
     //if (anArcType == SketchPlugin_Arc::ARC_TYPE_TANGENT()) {
@@ -720,7 +719,7 @@ bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& th
 
     //}
     //ModuleBase_Tools::flushUpdated(theNewFeature);
-    aChanged = true;
+    //aChanged = true;
   }
   else if (aFeatureKind == SketchPlugin_Trim::ID()) {
     /*std::shared_ptr<ModelAPI_AttributeReference> aRefSelectedAttr =
@@ -754,8 +753,7 @@ bool PartSet_SketcherReentrantMgr::copyReetntrantAttributes(const FeaturePtr& th
                       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                       theNewFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
     aNPointPreviewAttr->setValue(aPointPreviewAttr->x(), aPointPreviewAttr->y());
-
-    aChanged = true;
+    //aChanged = true;
   }
   return aChanged;
 }
@@ -775,13 +773,6 @@ bool PartSet_SketcherReentrantMgr::isTangentArc(ModuleBase_Operation* theOperati
     }
   }
   return aTangentArc;
-}
-
-std::shared_ptr<ModuleBase_ViewerPrs> PartSet_SketcherReentrantMgr::generatePreSelection()
-{
-  std::shared_ptr<ModuleBase_ViewerPrs> aPrs;
-
-  return aPrs;
 }
 
 void PartSet_SketcherReentrantMgr::updateAcceptAllAction()

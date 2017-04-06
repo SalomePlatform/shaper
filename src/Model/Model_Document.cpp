@@ -1629,3 +1629,9 @@ void Model_Document::restoreNodesState(std::list<bool>& theStates) const
     }
   }
 }
+
+void Model_Document::eraseAllFeatures()
+{
+  if (myObjs)
+    myObjs->eraseAllFeatures();
+}

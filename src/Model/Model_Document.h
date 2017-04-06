@@ -225,6 +225,10 @@ class Model_Document : public ModelAPI_Document
   /// Returns true if theLater is in history of features creation later than theCurrent
   MODEL_EXPORT virtual bool isLater(FeaturePtr theLater, FeaturePtr theCurrent) const;
 
+  /// Just removes all features without touching the document data (to be able undo)
+  MODEL_EXPORT virtual void eraseAllFeatures();
+
+
  protected:
   //! Returns (creates if needed) the general label
   TDF_Label generalLabel() const;

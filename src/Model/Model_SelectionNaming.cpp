@@ -143,8 +143,11 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
   const bool theAnotherDoc)
 {
   std::string aName("Undefined name");
-  if(!theContext.get() || theContext->shape()->isNull())
+  if(!theContext.get()
+      || !theContext->shape().get()
+      || theContext->shape()->isNull()) {
     return !theDefaultName.empty() ? theDefaultName : aName;
+  }
 
   // if it is in result of another part
   std::shared_ptr<Model_Document> aDoc =

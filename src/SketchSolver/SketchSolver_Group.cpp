@@ -141,11 +141,14 @@ bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
 //  Function: resolveConstraints
 //  Class:    SketchSolver_Group
 //  Purpose:  solve the set of constraints for the current group
+#include <iostream>
 // ============================================================================
 bool SketchSolver_Group::resolveConstraints()
 {
+  static const int MAX_STACK_SIZE = 5;
   // check the "Multi" constraints do not drop sketch into infinite loop
-  if (myMultiConstraintUpdateStack > 1) {
+  if (myMultiConstraintUpdateStack > MAX_STACK_SIZE) {
+    myMultiConstraintUpdateStack = 0;
     myPrevResult = PlaneGCSSolver_Solver::STATUS_FAILED;
     // generate error message due to loop update of the sketch
     getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())
@@ -162,7 +165,7 @@ bool SketchSolver_Group::resolveConstraints()
 
     PlaneGCSSolver_Solver::SolveStatus aResult = PlaneGCSSolver_Solver::STATUS_OK;
     try {
-      if (!isGroupEmpty && myMultiConstraintUpdateStack <= 1)
+      if (!isGroupEmpty)
         aResult = mySketchSolver->solve();
     } catch (...) {
       getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())

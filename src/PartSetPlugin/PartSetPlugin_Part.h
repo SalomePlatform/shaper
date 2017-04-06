@@ -70,6 +70,9 @@ class PartSetPlugin_Part : public ModelAPI_CompositeFeature
 
   /// Use plugin manager for features creation
   PartSetPlugin_Part();
+
+  /// Just removes all features of the part without touching the document data (to be able undo)
+  PARTSETPLUGIN_EXPORT virtual void erase();
 };
 
 #endif

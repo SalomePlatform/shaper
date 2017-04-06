@@ -310,9 +310,6 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
     bool aRotate = Config_PropManager::boolean(SKETCH_TAB_NAME, "rotate_to_plane");
     if (aRotate) {
       myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z(), aTwist);
-      PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
-      if (aModule)
-        aModule->onViewTransformed();
     }
     QString aSizeOfViewStr = mySizeOfView->text();
     if (!aSizeOfViewStr.isEmpty()) {
@@ -328,6 +325,9 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
         }
       }
     }
+    PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+    if (aModule)
+      aModule->onViewTransformed();
   }
   // 3. Clear text in the label
   myStackWidget->setCurrentIndex(1);

@@ -13,6 +13,7 @@
 #include "SketchPlugin_ConstraintEqual.h"
 #include "SketchPlugin_ConstraintCoincidence.h"
 #include "SketchPlugin_ConstraintLength.h"
+#include "SketchPlugin_ConstraintMiddle.h"
 #include "SketchPlugin_ConstraintTangent.h"
 #include "SketchPlugin_ConstraintRadius.h"
 #include "SketchPlugin_Tools.h"
@@ -83,6 +84,9 @@ void SketchPlugin_Fillet::execute()
   bool isUpdateFlushed = Events_Loop::loop()->isFlushed(anUpdateEvent);
   if (isUpdateFlushed)
     Events_Loop::loop()->setFlushed(anUpdateEvent, false);
+
+  // set flag here to avoid building Fillet presentation if "Redisplay" event appears
+  myFilletCreated = true;
 
   // Calculate Fillet parameters if does not yet
   if (!myBaseFeatures[0] || !myBaseFeatures[1])
@@ -178,8 +182,6 @@ void SketchPlugin_Fillet::execute()
   if(isUpdateFlushed) {
     Events_Loop::loop()->setFlushed(anUpdateEvent, true);
   }
-
-  myFilletCreated = true;
 }
 
 AISObjectPtr SketchPlugin_Fillet::getAISObject(AISObjectPtr thePrevious)
@@ -521,7 +523,8 @@ std::set<FeaturePtr> findFeaturesToRemove(const FeaturePtr theFeature,
       continue;
     }
     if(aFeature->getKind() == SketchPlugin_ConstraintLength::ID()
-        || aFeature->getKind() == SketchPlugin_ConstraintEqual::ID()) {
+        || aFeature->getKind() == SketchPlugin_ConstraintEqual::ID()
+        || aFeature->getKind() == SketchPlugin_ConstraintMiddle::ID()) {
       aFeaturesToBeRemoved.insert(aFeature);
     } else {
       std::list<AttributePtr> anAttrs =

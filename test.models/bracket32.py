@@ -8,7 +8,7 @@ model.addParameter(Part_1_doc, "BHD", "8", "Base Hole Diameter")
 model.addParameter(Part_1_doc, "BHPD", "14", "Base Hole Plate Diameter")
 model.addParameter(Part_1_doc, "BHPS", "2", "Base Hole Plate Thickness")
 model.addParameter(Part_1_doc, "BHPFR", "BHPS/4*3", "Base Hole Plate Fillet Radius")
-model.addParameter(Part_1_doc, "BPS", "6", "Base Plate Thickness")
+Parameter_BPS = model.addParameter(Part_1_doc, "BPS", "6", "Base Plate Thickness")
 model.addParameter(Part_1_doc, "Draft", "100", "Bracket Draft")
 model.addParameter(Part_1_doc, "TDI", "14", "Tube Internal Diameter")
 model.addParameter(Part_1_doc, "TDE", "TDI+8", "Tube External Diameter")
@@ -809,6 +809,12 @@ model.do()
 RevolutionFuse_3 = model.addRevolutionFuse(Part_1_doc, [model.selection("COMPOUND", "Sketch_9")], model.selection("EDGE", "Sketch_9/Edge-SketchLine_58"), 360, 0, [model.selection("SOLID", "RevolutionFuse_2_1")])
 RevolutionFuse_4 = model.addRevolutionFuse(Part_1_doc, [model.selection("COMPOUND", "Sketch_10")], model.selection("EDGE", "Sketch_10/Edge-SketchLine_66"), 360, 0, [model.selection("SOLID", "RevolutionFuse_3_1")])
 ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_6/Face-SketchCircle_11_2f"), model.selection("FACE", "Sketch_6/Face-SketchCircle_9_2f"), model.selection("WIRE", "Sketch_6/Wire-SketchCircle_10_2f"), model.selection("FACE", "Sketch_6/Face-SketchCircle_12_2f")], model.selection("EDGE", "PartSet/OZ"), "BPS+5", 5, [model.selection("SOLID", "RevolutionFuse_4_1")])
+
+# Test reexecution after parameter change
+Parameter_BPS.setValue(3)
+model.do()
+model.testResultsVolumes(ExtrusionCut_3, [154096.039414040715200826525688171])
+Parameter_BPS.setValue(6)
 model.end()
 
 from GeomAPI import GeomAPI_Shape

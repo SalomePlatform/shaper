@@ -189,8 +189,10 @@ void SketchPlugin_Trim::execute()
 #endif
 
   SketchPlugin_Sketch* aSketch = sketch();
-  if (!aSketch)
+  if (!aSketch) {
+    setError("Error: Sketch object is empty.");
     return;
+  }
 
   // Check the base objects are initialized.
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
@@ -200,8 +202,10 @@ void SketchPlugin_Trim::execute()
     return;
   }
   ObjectPtr aBaseObject = aBaseObjectAttr->value();
-  if (!aBaseObject.get())
+  if (!aBaseObject.get()) {
+    setError("Error: Base object is not initialized.");
     return;
+  }
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
 
   /// Remove reference of this feature to feature used in preview, it is not necessary anymore
@@ -481,7 +485,6 @@ std::string SketchPlugin_Trim::processEvent(const std::shared_ptr<Events_Message
 #ifdef DEBUG_TRIM_METHODS
   std::cout << "SketchPlugin_Trim::processEvent:" << data()->name() << std::endl;
 #endif
-
   std::string aFilledAttributeName;
 
   std::shared_ptr<ModelAPI_EventReentrantMessage> aMessage =
@@ -491,34 +494,39 @@ std::string SketchPlugin_Trim::processEvent(const std::shared_ptr<Events_Message
     std::shared_ptr<GeomAPI_Pnt2d> aPoint = aMessage->clickedPoint();
 
     if (anObject.get() && aPoint.get()) {
-      std::shared_ptr<ModelAPI_AttributeReference> aRefSelectedAttr =
-                            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                            data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
-      std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
-                            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                            data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
-      aRefSelectedAttr->setValue(anObject);
-      aRefPreviewAttr->setValue(anObject);
+      if (myCashedShapes.find(anObject) == myCashedShapes.end())
+        fillObjectShapes(anObject, sketch()->data()->owner(), myCashedShapes, myObjectToPoints);
+      const std::set<GeomShapePtr>& aShapes = myCashedShapes[anObject];
+      if (aShapes.size() > 1) {
+        std::shared_ptr<ModelAPI_AttributeReference> aRefSelectedAttr =
+                              std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                              data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
+        std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
+                              std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                              data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+        aRefSelectedAttr->setValue(anObject);
+        aRefPreviewAttr->setValue(anObject);
 
-      std::shared_ptr<GeomDataAPI_Point2D> aPointSelectedAttr =
-                            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                            data()->attribute(SketchPlugin_Trim::SELECTED_POINT()));
-      std::shared_ptr<GeomDataAPI_Point2D> aPointPreviewAttr =
-                            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                            data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
-      aPointSelectedAttr->setValue(aPoint);
-      aPointPreviewAttr->setValue(aPoint);
+        std::shared_ptr<GeomDataAPI_Point2D> aPointSelectedAttr =
+                              std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                              data()->attribute(SketchPlugin_Trim::SELECTED_POINT()));
+        std::shared_ptr<GeomDataAPI_Point2D> aPointPreviewAttr =
+                              std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                              data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
+        aPointSelectedAttr->setValue(aPoint);
+        aPointPreviewAttr->setValue(aPoint);
 
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
-      GeomShapePtr aSelectedShape = getSubShape(SELECTED_OBJECT(), SELECTED_POINT());
-#ifdef DEBUG_TRIM_METHODS
-      if (!aSelectedShape.get())
-        std::cout << "Set empty selected object" << std::endl;
-      else
-        std::cout << "Set shape with ShapeType: " << aSelectedShape->shapeTypeStr() << std::endl;
-#endif
-      aFilledAttributeName = SketchPlugin_Trim::SELECTED_OBJECT();
+        GeomShapePtr aSelectedShape = getSubShape(SELECTED_OBJECT(), SELECTED_POINT());
+  #ifdef DEBUG_TRIM_METHODS
+        if (!aSelectedShape.get())
+          std::cout << "Set empty selected object" << std::endl;
+        else
+          std::cout << "Set shape with ShapeType: " << aSelectedShape->shapeTypeStr() << std::endl;
+  #endif
+        aFilledAttributeName = SketchPlugin_Trim::SELECTED_OBJECT();
+      }
     }
   }
   return aFilledAttributeName;
@@ -1037,7 +1045,6 @@ FeaturePtr SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theS
                                (aBaseFeature->attribute(aModifiedAttribute)));
 
     // equal Radius constraint for arcs
-    anNewFeature->execute(); // we need the created arc result to set equal constraint
     createConstraintForObjects(SketchPlugin_ConstraintEqual::ID(),
                                getFeatureResult(aBaseFeature),
                                getFeatureResult(anNewFeature));
@@ -1271,7 +1278,7 @@ FeaturePtr SketchPlugin_Trim::createArcFeature(const FeaturePtr& theBaseFeature,
     bool aReversed = theBaseFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
     aFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(aReversed);
   }
-  //aFeature->execute(); // to obtain result
+  aFeature->execute(); // to obtain result (need to calculate arc parameters before sending Update)
   aFeature->data()->blockSendAttributeUpdated(aWasBlocked);
 
   #ifdef DEBUG_TRIM

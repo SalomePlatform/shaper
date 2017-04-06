@@ -212,6 +212,9 @@ class Model_Objects
   void synchronizeBackRefsForObject(
     const std::set<std::shared_ptr<ModelAPI_Attribute>>& theNewRefs, ObjectPtr theObject);
 
+  /// Just removes all features without touching the document data (to be able undo)
+  virtual void eraseAllFeatures();
+
  private:
   TDF_Label myMain; ///< main label of the data storage
 
