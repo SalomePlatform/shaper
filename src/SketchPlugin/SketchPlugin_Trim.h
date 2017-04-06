@@ -126,7 +126,9 @@ private:
   /// Obtains those constraints of the feature that should be modified. output maps contain
   /// point of coincidence and attribute id to be modified after split
   /// \param theFeaturesToDelete [out] constrains that will be deleted after split
-  void getConstraints(std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete);
+  /// \param theFeaturesToUpdate [out] constrains that will be updated after split
+  void getConstraints(std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete,
+                      std::set<FeaturePtr>& theFeaturesToUpdate);
 
   /// Obtains references to feature point attributes and to feature,
   /// e.g. for feature line: 1st container is
@@ -160,6 +162,10 @@ private:
   /// \param theModifiedAttributes modifiable container of attributes
   void removeReferencesToAttribute(const AttributePtr& theAttribute,
                   std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes);
+
+   /// Updates line length if it exist in the list
+  /// \param theFeaturesToUpdate a constraints container
+  void updateFeaturesAfterTrim(const std::set<FeaturePtr>& theFeaturesToUpdate);
 
   /// Make the base object is splitted by the point attributes
   /// \param theBaseRefAttributes container of references to the attributes of base feature

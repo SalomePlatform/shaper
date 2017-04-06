@@ -233,8 +233,8 @@ void SketchPlugin_Trim::execute()
   std::shared_ptr<GeomAPI_Pnt2d> aStartShapePoint2d = convertPoint(aStartShapePoint);
   std::shared_ptr<GeomAPI_Pnt2d> aLastShapePoint2d = convertPoint(aLastShapePoint);
 
-  std::set<FeaturePtr> aFeaturesToDelete;
-  getConstraints(aFeaturesToDelete);
+  std::set<FeaturePtr> aFeaturesToDelete, aFeaturesToUpdate;
+  getConstraints(aFeaturesToDelete, aFeaturesToUpdate);
 
   std::map<AttributePtr, std::list<AttributePtr> > aBaseRefAttributes;
   std::list<AttributePtr> aRefsToFeature;
@@ -413,6 +413,8 @@ void SketchPlugin_Trim::execute()
 #endif
   ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToDelete);
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+
+  updateFeaturesAfterTrim(aFeaturesToUpdate);
 
   // Send events to update the sub-features by the solver.
   if(isUpdateFlushed) {
@@ -697,7 +699,8 @@ void SketchPlugin_Trim::getFeaturePoints(const FeaturePtr& theFeature,
   }
 }
 
-void SketchPlugin_Trim::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete)
+void SketchPlugin_Trim::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete,
+                                       std::set<FeaturePtr>& theFeaturesToUpdate)
 {
   std::shared_ptr<ModelAPI_Data> aData = data();
 
@@ -721,6 +724,8 @@ void SketchPlugin_Trim::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete
         aRefFeatureKind == SketchPlugin_MultiTranslation::ID() ||
         aRefFeatureKind == SketchPlugin_ConstraintMiddle::ID())
       theFeaturesToDelete.insert(aRefFeature);
+    else if (aRefFeatureKind == SketchPlugin_ConstraintLength::ID())
+      theFeaturesToUpdate.insert(aRefFeature);
   }
 }
 
@@ -875,6 +880,27 @@ void SketchPlugin_Trim::removeReferencesToAttribute(const AttributePtr& theAttri
 #endif
   ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToDelete);
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+}
+
+void SketchPlugin_Trim::updateFeaturesAfterTrim(const std::set<FeaturePtr>& theFeaturesToUpdate)
+{
+  std::set<FeaturePtr>::const_iterator anIt = theFeaturesToUpdate.begin(),
+                                       aLast = theFeaturesToUpdate.end();
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aRefFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
+    std::string aRefFeatureKind = aRefFeature->getKind();
+    if (aRefFeatureKind == SketchPlugin_ConstraintLength::ID()) {
+      std::shared_ptr<SketchPlugin_ConstraintLength> aLenghtFeature =
+                              std::dynamic_pointer_cast<SketchPlugin_ConstraintLength>(*anIt);
+      if (aLenghtFeature.get()) {
+        std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
+            ModelAPI_AttributeDouble>(aLenghtFeature->attribute(SketchPlugin_Constraint::VALUE()));
+        double aValue;
+        if (aLenghtFeature->computeLenghtValue(aValue) && aValueAttr.get())
+          aValueAttr->setValue(aValue);
+      }
+    }
+  }
 }
 
 FeaturePtr SketchPlugin_Trim::trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
