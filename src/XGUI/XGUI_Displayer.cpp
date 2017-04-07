@@ -1431,6 +1431,14 @@ void XGUI_Displayer::getPresentations(const ObjectPtr& theObject,
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
   if (aResult.get()) {
     AISObjectPtr aAISObj = getAISObject(aResult);
+    if (aAISObj.get() == NULL) {
+      // if result is a result of a composite feature, it is visualized by visualization of
+      // composite children, so we should get one of this presentations
+      ResultCompSolidPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+      if (aCompSolid.get() && aCompSolid->numberOfSubs() > 0) {
+        aAISObj = getAISObject(aCompSolid->subResult(0));
+      }
+    }
     if (aAISObj.get() != NULL) {
       Handle(AIS_InteractiveObject) anAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
       if (!anAIS.IsNull() && !thePresentations.Contains(anAIS))
