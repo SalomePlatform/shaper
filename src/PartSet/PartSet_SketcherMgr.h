@@ -129,6 +129,11 @@ public:
   /// \return a boolean value
   static bool isEntity(const std::string& theId);
 
+  /// Returns whether the feature has external attribute filled with 'true' value
+  /// \param theFeature a feature object
+  /// \return a boolean value
+  static bool isExternalFeature(const FeaturePtr& theFeature);
+
   /// Returns whether the current operation is a sketch distance - lenght, distance or radius
   /// \param theOperation the operation
   /// \return a boolean value

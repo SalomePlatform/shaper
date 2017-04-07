@@ -79,7 +79,8 @@ void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
   if (myIsFullyConstrained) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     // only entity features has custom color when sketch is fully constrained
-    if (aFeature.get() && PartSet_SketcherMgr::isEntity(aFeature->getKind())) {
+    if (aFeature.get() && PartSet_SketcherMgr::isEntity(aFeature->getKind()) &&
+        !PartSet_SketcherMgr::isExternalFeature(aFeature)) {
       PartSet_Module* aModule = module();
       CompositeFeaturePtr aSketch = aModule->sketchMgr()->activeSketch();
       // the given object is sub feature of the current sketch(created or edited)

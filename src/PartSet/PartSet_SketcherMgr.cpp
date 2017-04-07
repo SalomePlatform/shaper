@@ -838,6 +838,13 @@ bool PartSet_SketcherMgr::isEntity(const std::string& theId)
          (theId == SketchPlugin_Circle::ID());
 }
 
+bool PartSet_SketcherMgr::isExternalFeature(const FeaturePtr& theFeature)
+{
+  std::shared_ptr<SketchPlugin_Feature> aSPFeature =
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
+  return aSPFeature.get() && aSPFeature->isExternal();
+}
+
 bool PartSet_SketcherMgr::isDistanceOperation(ModuleBase_Operation* theOperation)
 {
   std::string anId = theOperation ? theOperation->id().toStdString() : "";
