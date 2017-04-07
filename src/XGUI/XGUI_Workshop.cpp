@@ -597,7 +597,7 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
 #endif
   bool anIsAutoPreview = true;
   if (aFeatureInfo.get())
-    aFeatureInfo->isAutoPreview();
+    anIsAutoPreview = aFeatureInfo->isAutoPreview();
   else {
     std::string aXmlCfg, aDescription;
     module()->getXMLRepresentation(aFeatureKind, aXmlCfg, aDescription);
