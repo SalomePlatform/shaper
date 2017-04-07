@@ -87,7 +87,10 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(
 
   if (myPlane.get()) {
     aValid = Standard_False;
-    if (theOwner->HasSelectable()) {
+    // selectable may be empty if the object is selected in Object Browser and is not visualized
+    // in the viewer(virtual owner is created for this case)
+    //if (theOwner->HasSelectable())
+    {
       gp_Pln aPlane = myPlane->impl<gp_Pln>();
       Handle(StdSelect_BRepOwner) aShapeOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
       if (!aShapeOwner.IsNull() && aShapeOwner->HasShape()) {
@@ -112,6 +115,7 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(
         break;
         }
       } else {
+        if (theOwner->HasSelectable()) {
         // Check Trihedron sub-objects
         Handle(SelectMgr_SelectableObject) aSelObj = theOwner->Selectable();
         Handle(Standard_Type) aType = aSelObj->DynamicType();
@@ -156,6 +160,7 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(
 #endif
         // This is not object controlled by the filter
         aValid = Standard_True;
+        }
       }
     }
   }
