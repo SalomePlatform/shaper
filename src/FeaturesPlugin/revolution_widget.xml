@@ -84,4 +84,5 @@
     </box>
   </toolbox>
   <validator id="GeomValidators_ZeroOffset" parameters="CreationMethod,ByAngles,base,to_angle,from_angle,to_object,to_offset,from_object,from_offset"/>
+  <validator id="FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects" parameters="base"/>
 </source>

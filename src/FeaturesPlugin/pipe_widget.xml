@@ -34,4 +34,5 @@
     </box>
   </toolbox>
   <validator id="FeaturesPlugin_ValidatorPipeLocations"/>
+  <validator id="FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects" parameters="base_objects"/>
 </source>

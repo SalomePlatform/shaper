@@ -64,6 +64,26 @@ private:
                         Events_InfoMessage& theError) const;
 };
 
+/// \class FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects
+/// \ingroup Validators
+/// \brief Validator for the base objects for generation. Checks that sketch and it objects
+///        are not selected at the same time.
+class FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects:
+  public ModelAPI_FeatureValidator
+{
+ public:
+  //! \return true if sketch and it objects not selected at the same time.
+  //! \param theFeature the checked feature
+  //! \param theArguments arguments of the feature (not used)
+  //! \param theError error message
+  virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+
+  /// Returns true if the attribute in feature is not obligatory for the feature execution
+  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
+};
+
 /// \class FeaturesPlugin_ValidatorCompositeLauncher
 /// \ingroup Validators
 /// \brief A validator for selection at composite feature start

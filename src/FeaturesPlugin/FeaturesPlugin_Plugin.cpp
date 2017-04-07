@@ -43,6 +43,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorCompositeLauncher);
   aFactory->registerValidator("FeaturesPlugin_ValidatorBaseForGeneration",
                               new FeaturesPlugin_ValidatorBaseForGeneration);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects",
+                              new FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects);
   aFactory->registerValidator("FeaturesPlugin_ValidatorPipeLocations",
                               new FeaturesPlugin_ValidatorPipeLocations);
   aFactory->registerValidator("FeaturesPlugin_ValidatorExtrusionDir",
