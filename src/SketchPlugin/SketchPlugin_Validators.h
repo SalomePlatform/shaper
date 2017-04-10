@@ -311,6 +311,24 @@ class SketchPlugin_DifferentReferenceValidator : public ModelAPI_AttributeValida
                        Events_InfoMessage& theError) const;
 };
 
+/**\class SketchPlugin_DifferentPointReferenceValidator
+ * \ingroup Validators
+ * \brief Validator for attributes of a sketch feature.
+ *
+ * It checks that at least two of specified attributes refer to different points.
+ */
+class SketchPlugin_DifferentPointReferenceValidator : public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 /**\class SketchPlugin_CirclePassedPointValidator
  * \ingroup Validators
  * \brief Validator for passed point of MacroCircle feature.

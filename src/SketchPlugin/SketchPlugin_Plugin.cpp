@@ -98,6 +98,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_ProjectionValidator);
   aFactory->registerValidator("SketchPlugin_DifferentReference",
                               new SketchPlugin_DifferentReferenceValidator);
+  aFactory->registerValidator("SketchPlugin_DifferentPointReference",
+                              new SketchPlugin_DifferentPointReferenceValidator);
   aFactory->registerValidator("SketchPlugin_CirclePassedPointValidator",
                               new SketchPlugin_CirclePassedPointValidator);
   aFactory->registerValidator("SketchPlugin_ThirdPointValidator",

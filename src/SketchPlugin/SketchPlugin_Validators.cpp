@@ -1069,6 +1069,39 @@ bool SketchPlugin_DifferentReferenceValidator::isValid(
   return isOk;
 }
 
+bool SketchPlugin_DifferentPointReferenceValidator::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& theArguments,
+    Events_InfoMessage& theError) const
+{
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
+  std::set<AttributePoint2DPtr> aReferredCoincidentPoints;
+
+  // find all points referred by attributes listed in theArguments
+  bool hasRefsToPoints = false;
+  std::list<std::string>::const_iterator anArgIt = theArguments.begin();
+  for (; anArgIt != theArguments.end(); ++anArgIt) {
+    AttributeRefAttrPtr aRefAttr = anOwner->refattr(*anArgIt);
+    if (!aRefAttr)
+      continue;
+
+    if (!aRefAttr->isObject()) {
+      AttributePoint2DPtr aPoint =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aRefAttr->attr());
+      if (aReferredCoincidentPoints.empty())
+        aReferredCoincidentPoints = SketchPlugin_Tools::findPointsCoincidentToPoint(aPoint);
+      else if (aReferredCoincidentPoints.find(aPoint) == aReferredCoincidentPoints.end())
+        return true; // non-coincident point has been found
+      else
+        hasRefsToPoints = true;
+    }
+  }
+
+  if (hasRefsToPoints)
+    theError = "Attributes are referred to the same point";
+  return !hasRefsToPoints;
+}
+
 bool SketchPlugin_CirclePassedPointValidator::isValid(
     const AttributePtr& theAttribute,
     const std::list<std::string>&,

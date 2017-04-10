@@ -251,6 +251,46 @@ assert aLastFeature.getKind() == "SketchMacroArc", "ERROR: SketchMacroArc has NO
 aDocument.removeFeature(anArc)
 assert (aSketchFeature.numberOfSubs() == 9)
 
+#=========================================================================
+# Test 6. Create an arc by three points:
+#         a. check that one point IS NOT selectable as first and second points simultaneously
+#         b. check that one segment IS selectable by first and second points
+#=========================================================================
+aSession.startOperation()
+anArc = aSketchFeature.addFeature("SketchMacroArc")
+anArcPnt1 = geomDataAPI_Point2D(anArc.attribute("start_point_2"))
+anArcPnt2 = geomDataAPI_Point2D(anArc.attribute("end_point_2"))
+anArcPnt3 = geomDataAPI_Point2D(anArc.attribute("passed_point"))
+anArcPnt1Ref = anArc.refattr("start_point_ref")
+anArcPnt2Ref = anArc.refattr("end_point_ref")
+anArcPnt3Ref = anArc.refattr("passed_point_ref")
+anArcType = anArc.string("arc_type")
+# initialize attributes
+anArcType.setValue("by_three_points")
+anArcPnt1Ref.setAttr(aStartPnt)
+anArcPnt1.setValue(aStartPnt.pnt())
+anArcPnt2Ref.setAttr(aStartPnt)
+anArcPnt2.setValue(aStartPnt.pnt())
+anArcPnt3.setValue(0., 0.)
+aSession.finishOperation()
+# check the macro arc is not valid
+aLastFeature = aSketchFeature.subFeature(aSketchFeature.numberOfSubs() - 1)
+assert aLastFeature.getKind() == "SketchMacroArc", "ERROR: SketchMacroArc has NOT expected to be valid"
+# reselect first points
+aSession.startOperation()
+anArcPnt1Ref.setObject(aLine.lastResult())
+anArcPnt1.setValue(aStartPnt.pnt())
+anArcPnt2Ref.setObject(aLine.lastResult())
+anArcPnt2.setValue(aEndPnt.pnt())
+aSession.finishOperation()
+# check the macro arc is valid
+aLastFeature = aSketchFeature.subFeature(aSketchFeature.numberOfSubs() - 1)
+assert aLastFeature.getKind() != "SketchMacroArc", "ERROR: SketchMacroArc is expected to be valid"
+assert (aSketchFeature.numberOfSubs() == 12)
+# check sub-features
+model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 5)
+model.testNbSubFeatures(aSketch, "SketchConstraintTangent", 1)
+
 model.do()
 model.end()
 

@@ -39,6 +39,9 @@ void findCoincidences(const FeaturePtr theStartCoin,
 /// Find all features the point is coincident to.
 std::set<FeaturePtr> findFeaturesCoincidentToPoint(const AttributePoint2DPtr& thePoint);
 
+/// Find all points the given point is coincident to.
+std::set<AttributePoint2DPtr> findPointsCoincidentToPoint(const AttributePoint2DPtr& thePoint);
+
 void resetAttribute(SketchPlugin_Feature* theFeature, const std::string& theId);
 
 /// Creates coincidence or tangent constraint.
