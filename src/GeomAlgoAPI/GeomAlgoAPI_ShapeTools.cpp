@@ -698,7 +698,11 @@ void GeomAlgoAPI_ShapeTools::splitShape(const std::shared_ptr<GeomAPI_Shape>& th
                                       const GeomAlgoAPI_ShapeTools::PointToRefsMap& thePointsInfo,
                                       std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes)
 {
-  // General Fuse to split edge by vertices
+  // to split shape at least one point should be presented in the points container
+  if (thePointsInfo.empty())
+    return;
+
+    // General Fuse to split edge by vertices
   BOPAlgo_Builder aBOP;
   TopoDS_Edge aBaseEdge = theBaseShape->impl<TopoDS_Edge>();
   // Rebuild closed edge to place vertex to one of split points.
