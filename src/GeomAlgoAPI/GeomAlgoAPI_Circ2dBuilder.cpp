@@ -307,7 +307,7 @@ private:
 
     double aParSol, aPonTgCurve;
     gp_Pnt2d aTgPnt;
-    for (int i = 1; i <= aNbSol; ++i) {
+    for (int i = 1; i <= aNbSol && aNbSol > 1; ++i) {
       bool isApplicable = false;
       if (myTangentShapes.size() >= 1) {
         theBuilder->Tangency1(i, aParSol, aPonTgCurve, aTgPnt);
@@ -379,7 +379,7 @@ private:
 
     double aParSol, aPonTgCurve;
     gp_Pnt2d aTgPnt;
-    for (int i = 1; i <= aNbSol; ++i) {
+    for (int i = 1; i <= aNbSol && aNbSol > 1; ++i) {
       bool isApplicable = false;
       if (myTangentShapes.size() >= 1) {
         theBuilder->Tangency1(i, aParSol, aPonTgCurve, aTgPnt);
