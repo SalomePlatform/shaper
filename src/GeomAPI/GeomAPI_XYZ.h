@@ -62,6 +62,9 @@ class GeomAPI_XYZ : public GeomAPI_Interface
   /// Distance between two triplets
   GEOMAPI_EXPORT
   double distance(const std::shared_ptr<GeomAPI_XYZ>& theOther) const;
+
+  /// Square length of triplet from the origin
+  GEOMAPI_EXPORT double squareModulus() const;
 };
 
 #endif

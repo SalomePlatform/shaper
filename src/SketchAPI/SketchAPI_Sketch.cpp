@@ -302,7 +302,7 @@ std::shared_ptr<SketchAPI_MacroCircle> SketchAPI_Sketch::addCircle(double theCen
                                                                    double thePassedY)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_Circle::ID());
+    compositeFeature()->addFeature(SketchPlugin_MacroCircle::ID());
   return MacroCirclePtr(new SketchAPI_MacroCircle(aFeature, theCenterX, theCenterY,
                                                             thePassedX, thePassedY));
 }
@@ -312,7 +312,7 @@ std::shared_ptr<SketchAPI_MacroCircle> SketchAPI_Sketch::addCircle(
     const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_Circle::ID());
+    compositeFeature()->addFeature(SketchPlugin_MacroCircle::ID());
   return MacroCirclePtr(new SketchAPI_MacroCircle(aFeature, theCenterPoint, thePassedPoint));
 }
 
@@ -321,7 +321,7 @@ std::shared_ptr<SketchAPI_MacroCircle> SketchAPI_Sketch::addCircle(double theX1,
                                                                    double theX3, double theY3)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_Circle::ID());
+    compositeFeature()->addFeature(SketchPlugin_MacroCircle::ID());
   return MacroCirclePtr(new SketchAPI_MacroCircle(aFeature, theX1, theY1,
                                                             theX2, theY2,
                                                             theX3, theY3));
@@ -333,7 +333,7 @@ std::shared_ptr<SketchAPI_MacroCircle> SketchAPI_Sketch::addCircle(
     const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_Circle::ID());
+    compositeFeature()->addFeature(SketchPlugin_MacroCircle::ID());
   return MacroCirclePtr(new SketchAPI_MacroCircle(aFeature, thePoint1, thePoint2, thePoint3));
 }
 
@@ -384,7 +384,7 @@ std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(double theStartX, d
                                                         double thePassedX, double thePassedY)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_Arc::ID());
+    compositeFeature()->addFeature(SketchPlugin_MacroArc::ID());
   return MacroArcPtr(new SketchAPI_MacroArc(aFeature,
                                        theStartX, theStartY,
                                        theEndX, theEndY,
@@ -397,7 +397,7 @@ std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(
                                                 const std::shared_ptr<GeomAPI_Pnt2d>& thePassed)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_Arc::ID());
+    compositeFeature()->addFeature(SketchPlugin_MacroArc::ID());
   return MacroArcPtr(new SketchAPI_MacroArc(aFeature, theStart, theEnd, thePassed));
 }
 
@@ -407,7 +407,7 @@ std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(
                                                 bool theInversed)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_Arc::ID());
+    compositeFeature()->addFeature(SketchPlugin_MacroArc::ID());
   return MacroArcPtr(new SketchAPI_MacroArc(
     aFeature, theTangentPoint, theEndX, theEndY, theInversed));
 }
@@ -418,7 +418,7 @@ std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(
                                               bool theInversed)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_Arc::ID());
+    compositeFeature()->addFeature(SketchPlugin_MacroArc::ID());
   return MacroArcPtr(new SketchAPI_MacroArc(aFeature, theTangentPoint, theEnd, theInversed));
 }
 

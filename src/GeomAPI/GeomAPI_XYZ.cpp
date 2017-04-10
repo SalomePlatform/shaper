@@ -86,3 +86,7 @@ double GeomAPI_XYZ::distance(const std::shared_ptr<GeomAPI_XYZ>& theOther) const
   return aResult.Modulus();
 }
 
+double GeomAPI_XYZ::squareModulus() const
+{
+  return MY_XYZ->SquareModulus();
+}
