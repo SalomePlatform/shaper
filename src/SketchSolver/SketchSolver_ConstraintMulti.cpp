@@ -168,6 +168,10 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
             std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*aPtIt);
         aPoint2D->setValue(aXCoord, aYCoord);
       }
+
+      // update transformed entity if it exists in the storage
+      if (myStorage->entity(aFeature))
+        myStorage->update(aFeature);
     }
   }
 
