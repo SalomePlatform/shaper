@@ -111,6 +111,11 @@ bool ModuleBase_WidgetEditor::showPopupEditor(const bool theSendSignals)
   isValueAccepted = editedValue(aValue, aText);
   if (isValueAccepted) {
     if (aText.isEmpty()) {
+      if (mySpinBox->hasVariable()) {
+        // variable text should be cleared before setting value as the value
+        // will not be set if there is a varable in control
+        ModuleBase_Tools::setSpinText(mySpinBox, "");
+      }
       ModuleBase_Tools::setSpinValue(mySpinBox, aValue);
     } else {
       ModuleBase_Tools::setSpinText(mySpinBox, aText);
