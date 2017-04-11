@@ -9,6 +9,7 @@
 #include <PlaneGCSSolver_UpdateCoincidence.h>
 
 #include <GeomAPI_Pnt2d.h>
+#include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 
@@ -26,7 +27,8 @@ static std::set<FeaturePtr> collectCoincidences(FeaturePtr theFeature1, FeatureP
 
 /// \brief Check whether the entities has only one shared point or less.
 ///        Return list of coincident points.
-static std::list<AttributePtr> coincidentPoints(FeaturePtr theFeature1, FeaturePtr theFeature2);
+static std::list<AttributePtr> coincidentBoundaryPoints(FeaturePtr theFeature1,
+                                                        FeaturePtr theFeature2);
 
 /// \brief Check if two connected arcs have centers
 ///        in same direction relatively to connection point
@@ -109,7 +111,7 @@ void SketchSolver_ConstraintTangent::rebuild()
   getTangentFeatures(myBaseConstraint, aFeature1, aFeature2);
 
   // check number of coincident points
-  std::list<AttributePtr> aCoincidentPoints = coincidentPoints(aFeature1, aFeature2);
+  std::list<AttributePtr> aCoincidentPoints = coincidentBoundaryPoints(aFeature1, aFeature2);
   if (myType == CONSTRAINT_TANGENT_CIRCLE_LINE && aCoincidentPoints.size() > 1) {
     myErrorMsg = SketchSolver_Error::TANGENCY_FAILED();
     return;
@@ -186,7 +188,7 @@ void SketchSolver_ConstraintTangent::notify(const FeaturePtr&      theFeature,
   } else if (mySharedPoint) {
     // The features are tangent in the shared point, but the coincidence has been removed.
     // Check if the coincidence is the same.
-    std::list<AttributePtr> aCoincidentPoints = coincidentPoints(aTgFeat1, aTgFeat2);
+    std::list<AttributePtr> aCoincidentPoints = coincidentBoundaryPoints(aTgFeat1, aTgFeat2);
     isRebuild = true;
     std::list<AttributePtr>::iterator anIt = aCoincidentPoints.begin();
     for (; anIt != aCoincidentPoints.end() && isRebuild; ++anIt)
@@ -238,7 +240,7 @@ std::set<FeaturePtr> collectCoincidences(FeaturePtr theFeature1, FeaturePtr theF
   return aCoincidencesBetweenFeatures;
 }
 
-std::list<AttributePtr> coincidentPoints(FeaturePtr theFeature1, FeaturePtr theFeature2)
+std::list<AttributePtr> coincidentBoundaryPoints(FeaturePtr theFeature1, FeaturePtr theFeature2)
 {
   std::set<FeaturePtr> aCoincidences = collectCoincidences(theFeature1, theFeature2);
   // collect points only
@@ -247,7 +249,12 @@ std::list<AttributePtr> coincidentPoints(FeaturePtr theFeature1, FeaturePtr theF
   for (; aCIt != aCoincidences.end(); ++ aCIt) {
     for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
       AttributeRefAttrPtr aRefAttr = (*aCIt)->refattr(SketchPlugin_Constraint::ENTITY_A());
-      if (aRefAttr && !aRefAttr->isObject()) {
+      if (!aRefAttr || aRefAttr->isObject())
+        continue;
+
+      AttributePtr anAttr = aRefAttr->attr();
+      if (anAttr->id() != SketchPlugin_Arc::CENTER_ID() &&
+          anAttr->id() != SketchPlugin_Circle::CENTER_ID()) {
         aCoincidentPoints.push_back(aRefAttr->attr());
         break;
       }
