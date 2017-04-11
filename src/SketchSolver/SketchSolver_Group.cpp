@@ -167,6 +167,11 @@ bool SketchSolver_Group::resolveConstraints()
     try {
       if (!isGroupEmpty)
         aResult = mySketchSolver->solve();
+      if (aResult == PlaneGCSSolver_Solver::STATUS_FAILED &&
+          !myTempConstraints.empty()) {
+        removeTemporaryConstraints();
+        aResult = mySketchSolver->solve();
+      }
     } catch (...) {
       getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())
         ->setValue(SketchSolver_Error::SOLVESPACE_CRASH());
