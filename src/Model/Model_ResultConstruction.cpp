@@ -49,9 +49,11 @@ void Model_ResultConstruction::colorConfigInfo(std::string& theSection, std::str
 
 void Model_ResultConstruction::setShape(std::shared_ptr<GeomAPI_Shape> theShape)
 {
-  if (myShape != theShape && (!theShape.get() || !theShape->isEqual(myShape))) {
-    static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-    ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), anEvent);
+  if (myShape != theShape) {
+    if (!theShape.get() || !theShape->isEqual(myShape)) {
+        static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+        ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), anEvent);
+    }
     myShape = theShape;
     if (theShape.get()) {
       myFacesUpToDate = false;
