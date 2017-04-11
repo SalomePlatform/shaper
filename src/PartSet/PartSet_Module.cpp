@@ -207,7 +207,7 @@ void PartSet_Module::storeSelection()
   // cash is used only to restore selection, so it should be filled in storeSelection and
   // after applying immediatelly cleared in restoreSelection
   myCurrentSelection.clear();
-  sketchMgr()->storeSelection(false, myCurrentSelection);
+  sketchMgr()->storeSelection(PartSet_SketcherMgr::ST_SelectType, myCurrentSelection);
 }
 
 void PartSet_Module::restoreSelection()

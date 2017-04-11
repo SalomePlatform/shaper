@@ -231,12 +231,19 @@ public:
   /// \return boolean value
   bool isObjectOfSketch(const ObjectPtr& theObject) const;
 
+  /// Enumeration for selection mode used
+  enum SelectionType {
+    ST_HighlightType, /// Only highlighted objects
+    ST_SelectType, /// Only selected objects
+    ST_SelectAndHighlightType /// Both, highlighted and selected objects
+  };
+
   /// Saves the current selection in the viewer into an internal container
   /// It obtains the selected attributes.
   /// The highlighted objects can be processes as the selected ones
   /// \param theHighlightedOnly a boolean flag
   /// \param theCurrentSelection a container filled by the current selection
-  void storeSelection(const bool theHighlightedOnly, FeatureToSelectionMap& theCurrentSelection);
+  void storeSelection(const SelectionType theType, FeatureToSelectionMap& theCurrentSelection);
 
   /// Restores previously saved selection state
   /// \param theCurrentSelection a container filled by the current selection

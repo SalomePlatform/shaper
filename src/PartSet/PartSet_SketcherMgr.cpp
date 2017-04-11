@@ -276,7 +276,7 @@ void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
       myModule->sketchReentranceMgr()->isInternalEditActive())
     return;
   // it is necessary to save current selection in order to restore it after the values are modifed
-  storeSelection(false);
+  storeSelection(ST_SelectAndHighlightType);
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
@@ -358,7 +358,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
     ModuleBase_ISelection* aSelect = aWorkshop->selection();
 
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
-    storeSelection(!aHasShift, myCurrentSelection);
+    storeSelection(aHasShift ? ST_SelectAndHighlightType : ST_HighlightType, myCurrentSelection);
 
     if (myCurrentSelection.empty()) {
       if (isSketchOpe && (!isSketcher))
@@ -1529,7 +1529,7 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
   if (aResults.size() > 0) {
     ResultPtr aFirstResult = theFeature->firstResult();
     if (aFirstResult.get() && aFirstResult->shape().get()) {
-      const TopoDS_Shape& aFirstShape = aFirstResult->shape()->impl<TopoDS_Shape>();
+      TopoDS_Shape aFirstShape = aFirstResult->shape()->impl<TopoDS_Shape>();
       isSameShape = aFirstShape.IsEqual(anInfo.myFirstResultShape);
     }
   }
@@ -1700,7 +1700,7 @@ void PartSet_SketcherMgr::visualizeFeature(const FeaturePtr& theFeature,
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
 
-void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly,
+void PartSet_SketcherMgr::storeSelection(const SelectionType theType,
                         PartSet_SketcherMgr::FeatureToSelectionMap& theCurrentSelection)
 {
   if (!myCurrentSketch.get())
@@ -1708,10 +1708,13 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly,
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_ISelection* aSelect = aWorkshop->selection();
-  QList<ModuleBase_ViewerPrsPtr> aStoredPrs = aSelect->getHighlighted();
+  QList<ModuleBase_ViewerPrsPtr> aStoredPrs;
+
+  if (theType == ST_HighlightType || theType == ST_SelectAndHighlightType)
+    aStoredPrs = aSelect->getHighlighted();
 
   QList<FeaturePtr> aFeatureList;
-  if (!theHighlightedOnly) {
+  if (theType == ST_SelectAndHighlightType || theType == ST_SelectType) {
     QList<ModuleBase_ViewerPrsPtr> aSelected = aSelect->getSelected(
                                                               ModuleBase_ISelection::AllControls);
     aStoredPrs.append(aSelected);

@@ -86,6 +86,11 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId,
   QList<ModuleBase_ViewerPrsPtr> aPreSelected =
     aSelection->getSelected(ModuleBase_ISelection::AllControls);
 
+  ModuleBase_OperationFeature* aCurOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                         (myWorkshop->currentOperation());
+  QString anOperationKind = aCurOperation ? aCurOperation->getDescription()->operationId() : "";
+
+
   bool isCommitted;
   if (!myWorkshop->canStartOperation(theCmdId, isCommitted))
     return;
@@ -101,7 +106,7 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId,
     if (aMessage.get()) {
       setReentrantPreSelection(aMessage);
     }
-    else
+    else if (anOperationKind == theCmdId) // restore of selection only if the kind is the same
       aFOperation->initSelection(aPreSelected);
 
     workshop()->processLaunchOperation(aFOperation);

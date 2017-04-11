@@ -140,10 +140,6 @@ std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::addFeature(std::string th
    // set as current also after it becomes sub to set correctly enabled for other sketch subs
   document()->setCurrentFeature(aNew, false);
 
-  static Events_Loop* aLoop = Events_Loop::loop();
-  static Events_ID aDeleteEvent = aLoop->eventByName(EVENT_OBJECT_DELETED);
-  aLoop->flush(aDeleteEvent);
-
   return aNew;
 }
 
