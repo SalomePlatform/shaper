@@ -90,7 +90,6 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId,
                                                          (myWorkshop->currentOperation());
   QString anOperationKind = aCurOperation ? aCurOperation->getDescription()->operationId() : "";
 
-
   bool isCommitted;
   if (!myWorkshop->canStartOperation(theCmdId, isCommitted))
     return;
@@ -106,9 +105,10 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId,
     if (aMessage.get()) {
       setReentrantPreSelection(aMessage);
     }
-    else if (anOperationKind == theCmdId) // restore of selection only if the kind is the same
+    else if (anOperationKind.isEmpty() || anOperationKind == theCmdId) {
+      // restore of previous opeation is absent or new launched operation has the same kind
       aFOperation->initSelection(aPreSelected);
-
+    }
     workshop()->processLaunchOperation(aFOperation);
 
     if (aFOperation) {
