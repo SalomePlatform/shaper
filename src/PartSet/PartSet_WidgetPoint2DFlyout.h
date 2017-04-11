@@ -30,6 +30,13 @@ public:
   /// Destructor
   virtual ~PartSet_WidgetPoint2DFlyout() {};
 
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// \param theValues the wrapped widget values
+  /// \param theToValidate a validation flag
+  virtual bool setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
+                            const bool theToValidate);
+
   /// Checks if the selection presentation is valid in widget
   /// \param theValue a selected presentation in the view
   /// \return a boolean value

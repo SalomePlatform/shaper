@@ -7,6 +7,7 @@
 #include "PartSet_WidgetPoint2DFlyout.h"
 
 #include "ModuleBase_WidgetValidator.h"
+#include "ModuleBase_ViewerPrs.h"
 
 #include <XGUI_Workshop.h>
 #include <XGUI_ModuleConnector.h>
@@ -24,6 +25,15 @@ PartSet_WidgetPoint2DFlyout::PartSet_WidgetPoint2DFlyout(QWidget* theParent,
  : PartSet_WidgetPoint2D(theParent, theWorkshop, theData)
 {
   myWidgetValidator = new ModuleBase_WidgetValidator(this, myWorkshop);
+}
+
+bool PartSet_WidgetPoint2DFlyout::setSelection(QList<ModuleBase_ViewerPrsPtr>& theValues,
+                                               const bool theToValidate)
+{
+  PartSet_WidgetPoint2D::setSelection(theValues, theToValidate);
+  // true value should be returned to set this control as processed the selection
+  // to move focus to the next control if it is filled by preselection
+  return true;
 }
 
 bool PartSet_WidgetPoint2DFlyout::isValidSelectionCustom(

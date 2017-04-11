@@ -281,14 +281,17 @@ bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrsPtr>& theValu
     return isDone;
 
   ModuleBase_ViewerPrsPtr aValue = theValues.takeFirst();
-  GeomShapePtr aShape = aValue->shape();
-  if (aShape.get() && !aShape->isNull()) {
-    Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
-    double aX, aY;
-    const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
-    if (getPoint2d(aView, aTDShape, aX, aY)) {
-      isDone = setPoint(aX, aY);
-      setConstraintToPoint(aX, aY);
+
+  if (!theToValidate || myWidgetValidator->isValidSelection(aValue)) {
+    GeomShapePtr aShape = aValue->shape();
+    if (aShape.get() && !aShape->isNull()) {
+      Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
+      double aX, aY;
+      const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+      if (getPoint2d(aView, aTDShape, aX, aY)) {
+        isDone = setPoint(aX, aY);
+        setConstraintToPoint(aX, aY);
+      }
     }
   }
   return isDone;
