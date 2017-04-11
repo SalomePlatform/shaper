@@ -613,36 +613,51 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
     }
   }
 
-  // Check that lines not collinear
-  if(aFirstFeature->getKind() == SketchPlugin_Line::ID() &&
-      aSecondFeature->getKind() == SketchPlugin_Line::ID()) {
-    std::string aStartAttr = SketchPlugin_Line::START_ID();
-    std::string anEndAttr = SketchPlugin_Line::END_ID();
-    std::shared_ptr<GeomAPI_Pnt2d> aFirstStartPnt, aFirstEndPnt, aSecondStartPnt, aSecondEndPnt;
-    aFirstStartPnt =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aFirstFeature->attribute(aStartAttr))->pnt();
-    aFirstEndPnt =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFirstFeature->attribute(anEndAttr))->pnt();
-    aSecondStartPnt =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aSecondFeature->attribute(aStartAttr))->pnt();
-    aSecondEndPnt =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aSecondFeature->attribute(anEndAttr))->pnt();
-    double aCheck1 =
-      fabs((aFirstEndPnt->x() - aFirstStartPnt->x()) *
-      (aSecondStartPnt->y() - aFirstStartPnt->y()) -
-      (aSecondStartPnt->x() - aFirstStartPnt->x()) * (aFirstEndPnt->y() - aFirstStartPnt->y()));
-    double aCheck2 =
-      fabs((aFirstEndPnt->x() - aFirstStartPnt->x()) *
-      (aSecondEndPnt->y() - aFirstStartPnt->y()) -
-      (aSecondEndPnt->x() - aFirstStartPnt->x()) * (aFirstEndPnt->y() - aFirstStartPnt->y()));
-    if(aCheck1 < 1.e-7 && aCheck2 < 1.e-7) {
-      return false;
-    }
+  // Check the features are not tangent
+  std::shared_ptr<GeomAPI_Shape> aFirstShape = aFirstFeature->lastResult()->shape();
+  std::shared_ptr<GeomAPI_Shape> aSecondShape = aSecondFeature->lastResult()->shape();
+  if (!aFirstShape || !aFirstShape->isEdge() ||
+      !aSecondShape || !aSecondShape->isEdge()) {
+    theError = "Error: At least on of the features is not an edge";
+    return false;
   }
 
+  std::shared_ptr<GeomAPI_Edge> anEdge1 = std::dynamic_pointer_cast<GeomAPI_Edge>(aFirstShape);
+  std::shared_ptr<GeomAPI_Edge> anEdge2 = std::dynamic_pointer_cast<GeomAPI_Edge>(aSecondShape);
+
+  static const double TOL = 1.e-7;
+  if (anEdge1->isLine() && anEdge2->isLine()) {
+    // Check that lines not collinear
+    std::shared_ptr<GeomAPI_Dir> aDir1 = anEdge1->line()->direction();
+    std::shared_ptr<GeomAPI_Dir> aDir2 = anEdge2->line()->direction();
+    double aCross = aDir1->cross(aDir2)->squareModulus();
+    if (aCross < TOL * TOL)
+      return false;
+  } else if (anEdge1->isArc() && anEdge2->isArc()) {
+    // check the circles are not tangent
+    std::shared_ptr<GeomAPI_Circ> aCirc1 = anEdge1->circle();
+    std::shared_ptr<GeomAPI_Circ> aCirc2 = anEdge2->circle();
+    double aDistCC = aCirc1->center()->distance(aCirc2->center());
+    double aRadSum = aCirc1->radius() + aCirc2->radius();
+    double aRadDiff = fabs(aCirc1->radius() - aCirc2->radius());
+    if (fabs(aDistCC - aRadSum) < TOL || fabs(aDistCC - aRadDiff) < TOL)
+      return false;
+  } else {
+    // check whether line and arc are tangent
+    std::shared_ptr<GeomAPI_Circ> aCirc;
+    std::shared_ptr<GeomAPI_Lin> aLine;
+    if (anEdge1->isLine()) {
+      aLine = anEdge1->line();
+      aCirc = anEdge2->circle();
+    } else {
+      aCirc = anEdge1->circle();
+      aLine = anEdge2->line();
+    }
+
+    double aDistCL = aLine->distance(aCirc->center());
+    if (fabs(aDistCL - aCirc->radius()) < TOL)
+      return false;
+  }
 
   return true;
 }
