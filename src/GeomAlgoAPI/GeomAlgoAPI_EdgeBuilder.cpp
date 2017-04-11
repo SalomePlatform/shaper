@@ -191,7 +191,11 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
   gp_Circ aCircle(gp_Ax2(aCenter, aDir), aRadius);
 
   const gp_Pnt& aStart = theStartPoint->impl<gp_Pnt>();
-  const gp_Pnt& anEnd = theEndPoint->impl<gp_Pnt>();
+  const gp_Pnt& anEndInter = theEndPoint->impl<gp_Pnt>();
+
+  // project end point to a circle
+  gp_XYZ aEndDir = anEndInter.XYZ() - aCenter.XYZ();
+  gp_Pnt anEnd(aCenter.XYZ() + aEndDir.Normalized() * aRadius);
 
   BRepBuilderAPI_MakeEdge anEdgeBuilder;
   anEdgeBuilder = BRepBuilderAPI_MakeEdge(aCircle, aStart, anEnd);
