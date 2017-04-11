@@ -480,6 +480,15 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
   return mySketchMgr->canDisplayObject(theObject);
 }
 
+bool PartSet_Module::canUsePreselection(const QString& thePreviousOperationKind,
+                                        const QString& theStartedOperationKind)
+{
+  if (ModuleBase_IModule::canUsePreselection(thePreviousOperationKind, theStartedOperationKind))
+    return true;
+
+  return mySketchMgr->isNestedSketchFeature(theStartedOperationKind);
+}
+
 /*void PartSet_Module::processHiddenObject(const std::list<ObjectPtr>& theObjects)
 {
   mySketchMgr->processHiddenObject(theObjects);

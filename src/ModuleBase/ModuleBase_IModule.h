@@ -183,6 +183,14 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theObject a model object
   virtual bool canDisplayObject(const ObjectPtr& theObject) const;
 
+  /// Returns whether the started operation may use preselection of the previous one
+  /// Cases are: previous operation is null, edit operation, previuos and started operations
+  /// kinds are the same
+  /// \param thePreviousOperationKind a kind of previous operation
+  /// \param theStartedOperationKind a kind of a started operation
+  virtual bool canUsePreselection(const QString& thePreviousOperationKind,
+                                  const QString& theStartedOperationKind);
+
   /// Make some functionality after the objects are hidden in viewer
   /// \param theObjects a list of hidden objects
   //virtual void processHiddenObject(const std::list<ObjectPtr>& theObjects) {};

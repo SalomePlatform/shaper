@@ -111,6 +111,12 @@ public:
   /// \return the boolean result
   bool isNestedSketchOperation(ModuleBase_Operation* theOperation) const;
 
+  /// Returns true if the feature kind belongs to list of granted features of Sketch
+  /// operation. An operation of a sketch should be started before.
+  /// \param theOperation an operation
+  /// \return the boolean result
+  bool isNestedSketchFeature(const QString& theFeatureKind) const;
+
   /// Returns true if the operation is a create and nested sketch operationn
   /// \param theOperation a checked operation
   /// \param theSketch a sketch feature

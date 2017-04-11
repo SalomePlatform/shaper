@@ -812,6 +812,22 @@ bool PartSet_SketcherMgr::isNestedSketchOperation(ModuleBase_Operation* theOpera
   return aNestedSketch;
 }
 
+bool PartSet_SketcherMgr::isNestedSketchFeature(const QString& theFeatureKind) const
+{
+  bool aNestedSketch = false;
+
+  FeaturePtr anActiveSketch = activeSketch();
+  if (anActiveSketch.get()) {
+    ModuleBase_Operation* aSketchOperation = operationMgr()->findOperation(
+                                                              anActiveSketch->getKind().c_str());
+    if (aSketchOperation) {
+      QStringList aGrantedOpIds = aSketchOperation->grantedOperationIds();
+      aNestedSketch = aGrantedOpIds.contains(theFeatureKind);
+    }
+  }
+  return aNestedSketch;
+}
+
 bool PartSet_SketcherMgr::isNestedCreateOperation(ModuleBase_Operation* theOperation,
                                                   const CompositeFeaturePtr& theSketch) const
 {

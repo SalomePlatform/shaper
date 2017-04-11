@@ -170,6 +170,13 @@ public:
   /// \param theObject a model object
   virtual bool canDisplayObject(const ObjectPtr& theObject) const;
 
+  /// Returns parent result if accepted, true if the started operation is a nested operation
+  /// of the previous operation
+  /// \param thePreviousOperationKind a kind of previous operation
+  /// \param theStartedOperationKind a kind of a new operation
+  virtual bool canUsePreselection(const QString& thePreviousOperationKind,
+                                  const QString& theStartedOperationKind);
+
   /// Make some functionality after the objects are hidden in viewer
   /// \param theObjects a list of hidden objects
   //virtual void processHiddenObject(const std::list<ObjectPtr>& theObjects);

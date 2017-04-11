@@ -88,7 +88,7 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId,
 
   ModuleBase_OperationFeature* aCurOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                          (myWorkshop->currentOperation());
-  QString anOperationKind = aCurOperation ? aCurOperation->getDescription()->operationId() : "";
+  QString aCurOperationKind = aCurOperation ? aCurOperation->getDescription()->operationId() : "";
 
   bool isCommitted;
   if (!myWorkshop->canStartOperation(theCmdId, isCommitted))
@@ -105,7 +105,7 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId,
     if (aMessage.get()) {
       setReentrantPreSelection(aMessage);
     }
-    else if (anOperationKind.isEmpty() || anOperationKind == theCmdId) {
+    else if (canUsePreselection(aCurOperationKind, theCmdId)) {
       // restore of previous opeation is absent or new launched operation has the same kind
       aFOperation->initSelection(aPreSelected);
     }
@@ -213,6 +213,23 @@ bool ModuleBase_IModule::canEraseObject(const ObjectPtr& theObject) const
 bool ModuleBase_IModule::canDisplayObject(const ObjectPtr& theObject) const
 {
   return true;
+}
+
+bool ModuleBase_IModule::canUsePreselection(const QString& thePreviousOperationKind,
+                                            const QString& theStartedOperationKind)
+{
+  // no previous operation
+  if (thePreviousOperationKind.isEmpty())
+    return true;
+  // edit operation
+  if (thePreviousOperationKind.endsWith(ModuleBase_OperationFeature::EditSuffix()))
+    return true;
+
+  // reentrant operation
+  if (thePreviousOperationKind == theStartedOperationKind)
+    return true;
+
+  return false;
 }
 
 bool ModuleBase_IModule::canUndo() const
