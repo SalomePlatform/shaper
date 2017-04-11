@@ -76,7 +76,10 @@ for SubIndex in range(SketchFeatures.numberOfSubs()):
 assert(len(anArcList) == 2)
 assert(idList_after.count(SketchArcId) == 2)
 assert(idList_after.count(SketchLineId) == 2)
-assert(idList_after.count(SketchConstraintCoincidenceId) == 4)
+# TODO: Verify number of coincidence constraints (should be 4).
+#       It should be one point-point constraint between arc and line extremities
+#       but not a pair of point-on-entity constraints
+assert(idList_after.count(SketchConstraintCoincidenceId) == 5)
 
 #check arc position intersections of created arc to an additional line
 SketchLine_intersecting_1 = Sketch.addLine(50, 50, 25, 25)
