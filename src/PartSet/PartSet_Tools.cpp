@@ -16,6 +16,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Tools.h>
 
 #include <ModuleBase_IViewWindow.h>
 
@@ -421,6 +422,22 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
         anAttr->setValue(aRes, anEdge);
         //if (!theTemporary) {
           aMyFeature->execute();
+
+        // issue #2125: Naming problem: two edges in Naming for one circle on solid
+        // this is result of boolean and seamedge
+        if (aAdaptor.GetType() == GeomAbs_Circle) {
+          ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+          if (!aFactory->validate(aMyFeature)) {
+            anAttr->setValue(ResultPtr(), GeomShapePtr());
+            std::set<FeaturePtr> aFeatures;
+            aFeatures.insert(aMyFeature);
+            ModelAPI_Tools::removeFeaturesAndReferences(aFeatures);
+            Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+            Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+
+            return ResultPtr();
+          }
+        }
 
         //  // fix this edge
         //  FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
