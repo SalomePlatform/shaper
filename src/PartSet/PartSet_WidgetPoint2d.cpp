@@ -704,6 +704,13 @@ void PartSet_WidgetPoint2D::setPreSelection(
   myPreSelected = ModuleBase_ViewerPrsPtr();
 }
 
+void PartSet_WidgetPoint2D::getGeomSelection_(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue,
+                                              ObjectPtr& theObject,
+                                              GeomShapePtr& theShape)
+{
+  myExternalObjectMgr->getGeomSelection(theValue, theObject, theShape, myWorkshop, sketch(), true);
+}
+
 void PartSet_WidgetPoint2D::mouseMoved(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent)
 {
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());

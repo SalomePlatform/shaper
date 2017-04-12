@@ -233,8 +233,16 @@ bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* 
 
       myClickedSketchPoint = PartSet_Tools::getPnt2d(theEvent, theWindow,
                                                      module()->sketchMgr()->activeSketch());
-      if (!aPreSelected.empty())
-        module()->getGeomSelection(aPreSelected.first(), mySelectedObject, mySelectedAttribute);
+      if (!aPreSelected.empty()) {
+        ModuleBase_ViewerPrsPtr aValue = aPreSelected.first();
+        module()->getGeomSelection(aValue, mySelectedObject, mySelectedAttribute);
+
+        PartSet_WidgetPoint2D* aPointWidget = dynamic_cast<PartSet_WidgetPoint2D*>(anActiveWidget);
+        if (aPointWidget) {
+          GeomShapePtr aShape;
+          aPointWidget->getGeomSelection_(aValue, mySelectedObject, aShape);
+        }
+      }
 
       restartOperation();
       myClickedSketchPoint = std::shared_ptr<GeomAPI_Pnt2d>();

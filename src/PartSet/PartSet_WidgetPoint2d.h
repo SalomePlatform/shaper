@@ -132,6 +132,14 @@ Q_OBJECT
                                ModuleBase_IViewWindow* theWnd,
                                QMouseEvent* theEvent);
 
+  /// Return an object and geom shape by the viewer presentation
+  /// \param thePrs a selection
+  /// \param theObject an output object
+  /// \param theShape a shape of the selection
+  void getGeomSelection_(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue,
+                         std::shared_ptr<ModelAPI_Object>& theObject,
+                         std::shared_ptr<GeomAPI_Shape>& theShape);
+
 signals:
   /// Signal about selection of an existing vertex from an object
   void vertexSelected();
