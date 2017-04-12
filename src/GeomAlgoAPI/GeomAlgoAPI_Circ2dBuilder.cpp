@@ -139,7 +139,8 @@ private:
     CurveAdaptorPtr aCurve = myTangentShapes[0];
 
     std::shared_ptr<GccAna_Circ2dTanCen> aCircleBuilder;
-    if (aCurve->GetType() == GeomAbs_Line) {
+    if (aCurve->GetType() == GeomAbs_Line &&
+        aCurve->Line().Distance(aCenter) > Precision::Confusion()) {
       aCircleBuilder = std::shared_ptr<GccAna_Circ2dTanCen>(
           new GccAna_Circ2dTanCen(aCurve->Line(), aCenter));
     } else if (aCurve->GetType() == GeomAbs_Circle) {
