@@ -487,6 +487,24 @@ static bool hasSameTangentFeature(const std::set<AttributePtr>& theRefsList,
   return false;
 }
 
+static bool isPointPointCoincidence(const FeaturePtr& theCoincidence)
+{
+  AttributeRefAttrPtr aRefAttr[2] = {
+      theCoincidence->refattr(SketchPlugin_Constraint::ENTITY_A()),
+      theCoincidence->refattr(SketchPlugin_Constraint::ENTITY_B())
+  };
+
+  bool arePoints = true;
+  for (int i = 0; i < 2 && arePoints; ++i) {
+    if (aRefAttr[i]->isObject()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr[i]->object());
+      arePoints = aFeature.get() && aFeature->getKind() == SketchPlugin_Point::ID();
+    } else
+      arePoints = aRefAttr[i]->attr().get();
+  }
+  return arePoints;
+}
+
 bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribute,
                                                  const std::list<std::string>& theArguments,
                                                  Events_InfoMessage& theError) const
@@ -514,23 +532,24 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
     std::shared_ptr<ModelAPI_Attribute> aAttr = (*anIt);
     FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
     if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+      if (!isPointPointCoincidence(aConstrFeature))
+        continue;
+
       AttributeRefAttrPtr anAttrRefA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
         aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_A()));
       AttributeRefAttrPtr anAttrRefB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
         aConstrFeature->attribute(SketchPlugin_ConstraintCoincidence::ENTITY_B()));
-      if(anAttrRefA.get() && !anAttrRefA->isObject()) {
-        AttributePtr anAttrA = anAttrRefA->attr();
-        if(aPointAttribute == anAttrA) {
-          aConstraintCoincidence = aConstrFeature;
-          break;
-        }
+
+      AttributePtr anAttrA = anAttrRefA->attr();
+      if(aPointAttribute == anAttrA) {
+        aConstraintCoincidence = aConstrFeature;
+        break;
       }
-      if(anAttrRefB.get() && !anAttrRefB->isObject()) {
-        AttributePtr anAttrB = anAttrRefB->attr();
-        if(aPointAttribute == anAttrB) {
-          aConstraintCoincidence = aConstrFeature;
-          break;
-        }
+
+      AttributePtr anAttrB = anAttrRefB->attr();
+      if(aPointAttribute == anAttrB) {
+        aConstraintCoincidence = aConstrFeature;
+        break;
       }
     }
   }
