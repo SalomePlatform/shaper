@@ -1267,12 +1267,12 @@ static bool isOnSameSide(const std::shared_ptr<GeomAPI_Lin>& theLine,
   // the first point is on the line
   if (aVec1->squareModulus() < aTolerance * aTolerance)
     return false;
-  std::shared_ptr<GeomAPI_Dir> aDirP1L(new GeomAPI_Dir(thePoint1->xyz()->decreased(aLineLoc)));
-  std::shared_ptr<GeomAPI_XYZ> aVec2 = thePoint1->xyz()->decreased(aLineLoc);
+  std::shared_ptr<GeomAPI_Dir> aDirP1L(new GeomAPI_Dir(aVec1));
+  std::shared_ptr<GeomAPI_XYZ> aVec2 = thePoint2->xyz()->decreased(aLineLoc);
   // the second point is on the line
   if (aVec2->squareModulus() < aTolerance * aTolerance)
     return false;
-  std::shared_ptr<GeomAPI_Dir> aDirP2L(new GeomAPI_Dir(thePoint2->xyz()->decreased(aLineLoc)));
+  std::shared_ptr<GeomAPI_Dir> aDirP2L(new GeomAPI_Dir(aVec2));
 
   return aLineDir->cross(aDirP1L)->dot(aLineDir->cross(aDirP2L)) > -aTolerance;
 }
