@@ -432,14 +432,19 @@ private:
   }
 
 
-  // boundary parameters of curve are NOT applied
-  static bool isParamInCurve(double& theParameter, const CurveAdaptorPtr& theCurve)
+  static void adjustPeriod(double& theParameter, const CurveAdaptorPtr& theCurve)
   {
     if (theCurve->Curve()->IsPeriodic()) {
       theParameter = ElCLib::InPeriod(theParameter,
                                       theCurve->FirstParameter(),
                                       theCurve->FirstParameter() + theCurve->Period());
     }
+  }
+
+  // boundary parameters of curve are NOT applied
+  static bool isParamInCurve(double& theParameter, const CurveAdaptorPtr& theCurve)
+  {
+    adjustPeriod(theParameter, theCurve);
     return theParameter > theCurve->FirstParameter() &&
            theParameter < theCurve->LastParameter();
   }
@@ -447,11 +452,7 @@ private:
   // boundary parameters of curve are applied too
   static bool isParamOnCurve(double& theParameter, const CurveAdaptorPtr& theCurve)
   {
-    if (theCurve->IsPeriodic()) {
-      theParameter = ElCLib::InPeriod(theParameter,
-                                      theCurve->FirstParameter(),
-                                      theCurve->FirstParameter() + theCurve->Period());
-    }
+    adjustPeriod(theParameter, theCurve);
     return theParameter >= theCurve->FirstParameter() &&
            theParameter <= theCurve->LastParameter();
   }
