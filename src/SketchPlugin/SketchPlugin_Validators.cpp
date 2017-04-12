@@ -1442,7 +1442,10 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
 
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
   if(aResult.get()) {
-    GeomShapePtr aShape = toInfiniteEdge(aResult->shape());
+    GeomShapePtr aShape = aResult->shape();
+    if (!aShape->isEdge())
+      return true;
+    aShape = toInfiniteEdge(aShape);
     if(aShape.get() && !aShape->isNull()) {
       if(anArcShape->isIntersect(aShape)) {
         return true;
@@ -1457,7 +1460,10 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
         anIt != aResults.cend();
         ++anIt)
     {
-      GeomShapePtr aShape = toInfiniteEdge((*anIt)->shape());
+      GeomShapePtr aShape = (*anIt)->shape();
+      if (!aShape->isEdge())
+        return true;
+      aShape = toInfiniteEdge(aShape);
       if(aShape.get() && !aShape->isNull()) {
         if(anArcShape->isIntersect(aShape)) {
           return true;
