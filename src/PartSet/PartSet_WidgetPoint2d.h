@@ -25,6 +25,7 @@ class ModuleBase_IWorkshop;
 class ModuleBase_ParamSpinBox;
 class ModuleBase_IViewWindow;
 class ModuleBase_LabelValue;
+class PartSet_ExternalObjectsMgr;
 class GeomAPI_Pnt2d;
 class ModuleBase_IWorkshop;
 
@@ -191,7 +192,8 @@ protected:
    /// Creates constrains of the clicked point
    /// \param theClickedX the horizontal coordnate of the point
    /// \param theClickedY the vertical coordnate of the point
-   bool setConstraintToPoint(double theClickedX, double theClickedY);
+   bool setConstraintToPoint(double theClickedX, double theClickedY,
+                             const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
 
    /// Create a coincidence constraint between the attribute and the parameter object
    /// \theObject a result object
@@ -249,8 +251,12 @@ protected:
   /// Finds first equal point attribute in sketch and set it to reference attribute
   /// \param theClickedX the horizontal coordnate of the point
   /// \param theClickedY the vertical coordnate of the point
-  void fillRefAttribute(double theClickedX, double theClickedY);
+  void fillRefAttribute(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
+  void fillRefAttribute(double theClickedX, double theClickedY,
+                        const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
   void fillRefAttribute(const ObjectPtr& theObject);
+
+  ObjectPtr getGeomSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
 
 protected:
   ModuleBase_IWorkshop* myWorkshop; ///< workshop
@@ -261,6 +267,7 @@ private:
   //ModuleBase_ParamSpinBox* myYSpin;  ///< the spin box for the Y coordinate
   ModuleBase_LabelValue* myXSpin; ///< the label for the X coordinate
   ModuleBase_LabelValue* myYSpin; ///< the label for the Y coordinate
+  PartSet_ExternalObjectsMgr* myExternalObjectMgr; ///< reference to external objects manager
 
   /// value used as selection in mouse release method
   std::shared_ptr<ModuleBase_ViewerPrs> myPreSelected;

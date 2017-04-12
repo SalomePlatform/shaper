@@ -74,6 +74,9 @@ void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr
 {
   ModuleBase_WidgetShapeSelector::getGeomSelection(thePrs, theObject, theShape);
 
+  myExternalObjectMgr->getGeomSelection(thePrs, theObject, theShape,
+                                        myWorkshop, sketch(), myIsInValidate);
+  /*
   FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(theObject);
   std::shared_ptr<SketchPlugin_Feature> aSPFeature =
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
@@ -104,7 +107,7 @@ void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr
     /// current sketch) and it is not created by object manager
     theObject = anExternalObject;
     theShape = anExternalShape;
-  }
+  }*/
 }
 
 //********************************************************************

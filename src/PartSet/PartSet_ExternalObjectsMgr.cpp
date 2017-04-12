@@ -10,6 +10,9 @@
 #include <XGUI_Workshop.h>
 #include <XGUI_ModuleConnector.h>
 
+#include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_ISelection.h>
+
 #include <SketchPlugin_Feature.h>
 
 #include <QString>
@@ -73,6 +76,46 @@ ObjectPtr PartSet_ExternalObjectsMgr::externalObject(const ObjectPtr& theSelecte
         myExternalObjectValidated = aSelectedObject;
   }
   return aSelectedObject;
+}
+
+void PartSet_ExternalObjectsMgr::getGeomSelection(const ModuleBase_ViewerPrsPtr& thePrs,
+                                                   ObjectPtr& theObject,
+                                                   GeomShapePtr& theShape,
+                                                   ModuleBase_IWorkshop* theWorkshop,
+                                                   const CompositeFeaturePtr& theSketch,
+                                                   const bool isInValidate)
+{
+  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(theObject);
+  std::shared_ptr<SketchPlugin_Feature> aSPFeature =
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
+  // there is no a sketch feature is selected, but the shape exists,
+  // try to create an exernal object
+  // TODO: unite with the same functionality in PartSet_WidgetShapeSelector
+  if (aSPFeature.get() == NULL) {
+    ObjectPtr anExternalObject = ObjectPtr();
+    GeomShapePtr anExternalShape = GeomShapePtr();
+    if (useExternal()) {
+      if (canCreateExternal()) {
+        GeomShapePtr aShape = theShape;
+        if (!aShape.get()) {
+          ResultPtr aResult = theWorkshop->selection()->getResult(thePrs);
+          if (aResult.get())
+            aShape = aResult->shape();
+        }
+        if (aShape.get() != NULL && !aShape->isNull())
+          anExternalObject =
+            externalObject(theObject, aShape, theSketch, isInValidate);
+      }
+      else { /// use objects of found selection
+        anExternalObject = theObject;
+        anExternalShape = theShape;
+      }
+    }
+    /// the object is null if the selected feature is "external"(not sketch entity feature of the
+    /// current sketch) and it is not created by object manager
+    theObject = anExternalObject;
+    theShape = anExternalShape;
+  }
 }
 
 //********************************************************************

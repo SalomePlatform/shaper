@@ -19,6 +19,7 @@
 #include <string>
 
 class ModuleBase_IWorkshop;
+class ModuleBase_ViewerPrs;
 class XGUI_Workshop;
 
 /**
@@ -69,6 +70,17 @@ class PARTSET_EXPORT PartSet_ExternalObjectsMgr
                       const FeaturePtr& theFeature,
                       ModuleBase_IWorkshop* theWorkshop,
                       const bool theTemporary);
+
+  /// Return an object and geom shape by the viewer presentation
+  /// \param thePrs a selection
+  /// \param theObject an output object
+  /// \param theShape a shape of the selection
+  virtual void getGeomSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
+                                ObjectPtr& theObject,
+                                GeomShapePtr& theShape,
+                                ModuleBase_IWorkshop* theWorkshop,
+                                const CompositeFeaturePtr& theSketch,
+                                const bool isInValidate);
 
 protected:
   /// Delete from the document the feature of the object. It deletes all objects, which refers to
