@@ -244,7 +244,17 @@ bool Model_Document::save(
   if (currentFeature(false) != lastFeature()) {
     aSession->setCheckTransactions(false);
     aWasCurrent = currentFeature(false);
-    setCurrentFeature(lastFeature(), false);
+    // if last is nested into something else, make this something else as last:
+    // otherwise it will look like edition of sub-element, so, the main will be disabled
+    FeaturePtr aLast = lastFeature();
+    if (aLast.get()) {
+      CompositeFeaturePtr aMain = ModelAPI_Tools::compositeOwner(aLast);
+      while(aMain.get()) {
+        aLast = aMain;
+        aMain = ModelAPI_Tools::compositeOwner(aLast);
+      }
+    }
+    setCurrentFeature(aLast, true);
   }
   // create a directory in the root document if it is not yet exist
   Handle(Model_Application) anApp = Model_Application::getApplication();
@@ -1115,7 +1125,7 @@ void Model_Document::setCurrentFeature(
       if (isSub(aMain, anIter)) // sub-elements of not-disabled feature are not disabled
         aDisabledFlag = false;
       else if (anOwners.find(anIter) != anOwners.end())
-        // disable the higher-level feature is the nested is the current
+        // disable the higher-level feature if the nested is the current
         aDisabledFlag = true;
     }
 
