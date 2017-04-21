@@ -1244,10 +1244,15 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     DocumentPtr aActiveDoc = aMgr->activeDocument();
     if (myActivePartIndex.isValid())
       aTreeView->setExpanded(myActivePartIndex, false);
+
     XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
     myActivePartIndex = aDataModel->documentRootIndex(aActiveDoc);
-    if (myActivePartIndex.isValid())
-      aTreeView->setExpanded(myActivePartIndex, true);
+    bool needUpdate = false;
+    if (myActivePartIndex.isValid()) {
+      needUpdate = aTreeView->isExpanded(myActivePartIndex);
+      if (!needUpdate)
+        aTreeView->setExpanded(myActivePartIndex, true);
+    }
 
     aLabel->setPalette(aPalet);
     aWorkshop->updateCommandStatus();
@@ -1263,6 +1268,10 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
         aDisplayer->redisplay(aObj, false);
     }
     aDisplayer->updateViewer();
+    // Update tree items if they are expanded
+    if (needUpdate) {
+      aTreeView->viewport()->repaint(aTreeView->viewport()->rect());
+    }
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
