@@ -169,6 +169,7 @@ bool SketchSolver_Group::resolveConstraints()
         aResult = mySketchSolver->solve();
       if (aResult == PlaneGCSSolver_Solver::STATUS_FAILED &&
           !myTempConstraints.empty()) {
+        mySketchSolver->undo();
         removeTemporaryConstraints();
         aResult = mySketchSolver->solve();
       }

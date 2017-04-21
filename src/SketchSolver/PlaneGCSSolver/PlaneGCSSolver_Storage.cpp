@@ -131,22 +131,22 @@ static bool updateValues(AttributePtr& theAttribute, EntityWrapperPtr& theEntity
   return isUpdated;
 }
 
-static bool isCopyInMulti(std::shared_ptr<SketchPlugin_Feature> theFeature)
+static bool hasReference(std::shared_ptr<SketchPlugin_Feature> theFeature,
+                         const std::string& theFeatureKind)
 {
-  if (!theFeature)
-    return false;
-
-  bool aResult = theFeature->isCopy();
-  if (aResult) {
-    const std::set<AttributePtr>& aRefs = theFeature->data()->refsToMe();
-    for (std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin();
-         aRefIt != aRefs.end() && aResult; ++aRefIt) {
-      FeaturePtr anOwner = ModelAPI_Feature::feature((*aRefIt)->owner());
-      if (anOwner->getKind() == SketchPlugin_Projection::ID())
-        aResult = false;
-    }
+  const std::set<AttributePtr>& aRefs = theFeature->data()->refsToMe();
+  for (std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin();
+       aRefIt != aRefs.end(); ++aRefIt) {
+     FeaturePtr anOwner = ModelAPI_Feature::feature((*aRefIt)->owner());
+     if (anOwner->getKind() == theFeatureKind)
+       return true;
   }
-  return aResult;
+  return false;
+}
+
+static bool isCopyFeature(std::shared_ptr<SketchPlugin_Feature> theFeature)
+{
+  return theFeature && theFeature->isCopy();
 }
 
 bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
@@ -159,13 +159,16 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
   else { // Feature is not exist, create it
     std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
         std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
-    bool isCopy = isCopyInMulti(aSketchFeature);
+    bool isCopy = isCopyFeature(aSketchFeature);
+    bool isProjReferred = hasReference(aSketchFeature, SketchPlugin_Projection::ID());
     // the feature is a copy in "Multi" constraint and does not used in other constraints
-    if (!theForce && isCopy && myFeatureMap.find(theFeature) == myFeatureMap.end())
+    if (!theForce && (isCopy && !isProjReferred) &&
+        myFeatureMap.find(theFeature) == myFeatureMap.end())
       return false;
 
     // external feature processing
-    bool isExternal = (aSketchFeature && (aSketchFeature->isExternal() || isCopy));
+    bool isExternal =
+        (aSketchFeature && (aSketchFeature->isExternal() || isCopy || isProjReferred));
 
     PlaneGCSSolver_FeatureBuilder aBuilder(isExternal ? 0 : this);
 
