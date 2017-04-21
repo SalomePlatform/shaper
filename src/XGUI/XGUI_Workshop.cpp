@@ -2162,12 +2162,16 @@ void XGUI_Workshop::setStatusBarMessage(const QString& theMessage)
 void XGUI_Workshop::synchronizeViewer()
 {
   SessionPtr aMgr = ModelAPI_Session::get();
-  DocumentPtr aDoc = aMgr->activeDocument();
+  QList<DocumentPtr> aDocs;
+  aDocs.append(aMgr->activeDocument());
+  aDocs.append(aMgr->moduleDocument());
 
-  synchronizeGroupInViewer(aDoc, ModelAPI_ResultConstruction::group(), false);
-  synchronizeGroupInViewer(aDoc, ModelAPI_ResultBody::group(), false);
-  synchronizeGroupInViewer(aDoc, ModelAPI_ResultPart::group(), false);
-  synchronizeGroupInViewer(aDoc, ModelAPI_ResultGroup::group(), false);
+  foreach(DocumentPtr aDoc, aDocs) {
+    synchronizeGroupInViewer(aDoc, ModelAPI_ResultConstruction::group(), false);
+    synchronizeGroupInViewer(aDoc, ModelAPI_ResultBody::group(), false);
+    synchronizeGroupInViewer(aDoc, ModelAPI_ResultPart::group(), false);
+    synchronizeGroupInViewer(aDoc, ModelAPI_ResultGroup::group(), false);
+  }
 }
 
 void XGUI_Workshop::synchronizeGroupInViewer(const DocumentPtr& theDoc,
