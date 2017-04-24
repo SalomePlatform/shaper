@@ -61,6 +61,8 @@ void SketchSolver_ConstraintCoincidence::process()
 bool SketchSolver_ConstraintCoincidence::remove()
 {
   myInSolver = false;
+  myFeatureExtremities[0] = EntityWrapperPtr();
+  myFeatureExtremities[1] = EntityWrapperPtr();
   return SketchSolver_Constraint::remove();
 }
 
