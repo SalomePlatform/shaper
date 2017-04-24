@@ -500,7 +500,7 @@ static bool isPointPointCoincidence(const FeaturePtr& theCoincidence)
       FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr[i]->object());
       arePoints = aFeature.get() && aFeature->getKind() == SketchPlugin_Point::ID();
     } else
-      arePoints = aRefAttr[i]->attr().get();
+      arePoints = aRefAttr[i]->attr().get() != NULL;
   }
   return arePoints;
 }
