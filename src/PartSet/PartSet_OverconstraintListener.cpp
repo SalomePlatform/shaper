@@ -157,11 +157,13 @@ void PartSet_OverconstraintListener::processEvent(
   }
   else if (anEventID == ModelAPI_EventReentrantMessage::eventId() ||
            anEventID == SketchPlugin_MacroArcReentrantMessage::eventId()) {
-    // the message is sent to sketcher reentrant manager only if the kind of feature
-    // sender is equal to kind of the current operation. E.g. Horizontal create operation
+    // the message is sent to sketcher reentrant manager only if the name of feature
+    // sender is equal to feature name of the current operation. E.g. Horizontal create operation
     // is active. Sketch Line feature is changed, so execute is called, it will send message
     // This Line's message should not be processed, as the reentrant operation is not for Line
-    std::string aCurrentFeatureKind;
+    // It is not enoght of kind, the name should be used, e.g. restarted Lines on auxiliary
+    // cirlce sometimes causes previous line change, kind the same, but feature line is different
+    std::string aCurrentFeatureName;
     ModuleBase_Operation* anOperation =
                 XGUI_Tools::workshop(myWorkshop)->operationMgr()->currentOperation();
     if (anOperation) {
@@ -170,7 +172,7 @@ void PartSet_OverconstraintListener::processEvent(
       if (aFOperation) {
         FeaturePtr aFeature = aFOperation->feature();
         if (aFeature.get())
-          aCurrentFeatureKind = aFeature->getKind();
+          aCurrentFeatureName = aFeature->data()->name();
       }
     }
     if (theMessage->sender()) {
@@ -178,7 +180,7 @@ void PartSet_OverconstraintListener::processEvent(
       if (aSender) {
         FeaturePtr aFeatureSender =
           std::dynamic_pointer_cast<ModelAPI_Feature>(aSender->data()->owner());
-        if (aFeatureSender.get() && aFeatureSender->getKind() == aCurrentFeatureKind) {
+        if (aFeatureSender.get() && aFeatureSender->data()->name() == aCurrentFeatureName) {
           PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
           PartSet_SketcherReentrantMgr* aReentrantMgr = aModule->sketchReentranceMgr();
           aReentrantMgr->setReentrantMessage(theMessage);
