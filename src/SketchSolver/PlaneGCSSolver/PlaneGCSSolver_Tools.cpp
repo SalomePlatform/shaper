@@ -123,9 +123,11 @@ SolverConstraintPtr PlaneGCSSolver_Tools::createConstraint(ConstraintPtr theCons
   return SolverConstraintPtr(new SketchSolver_Constraint(theConstraint));
 }
 
-SolverConstraintPtr PlaneGCSSolver_Tools::createMovementConstraint(FeaturePtr theMovedFeature)
+std::shared_ptr<SketchSolver_ConstraintFixed> PlaneGCSSolver_Tools::createMovementConstraint(
+    FeaturePtr theMovedFeature)
 {
-  return SolverConstraintPtr(new SketchSolver_ConstraintFixed(theMovedFeature));
+  return std::shared_ptr<SketchSolver_ConstraintFixed>(
+      new SketchSolver_ConstraintFixed(theMovedFeature));
 }
 
 

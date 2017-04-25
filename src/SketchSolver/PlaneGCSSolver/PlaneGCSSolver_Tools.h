@@ -8,6 +8,7 @@
 #define PlaneGCSSolver_Tools_H_
 
 #include <SketchSolver_Constraint.h>
+#include <SketchSolver_ConstraintFixed.h>
 #include <SketchPlugin_Constraint.h>
 
 #include <GeomAPI_Lin2d.h>
@@ -24,7 +25,8 @@ namespace PlaneGCSSolver_Tools
   SolverConstraintPtr createConstraint(ConstraintPtr theConstraint);
 
   /// \brief Creates temporary constraint to fix the feature after movement
-  SolverConstraintPtr createMovementConstraint(FeaturePtr theMovedFeature);
+  std::shared_ptr<SketchSolver_ConstraintFixed>
+      createMovementConstraint(FeaturePtr theMovedFeature);
 
   /// \brief Creates new constraint using given parameters
   /// \param theConstraint [in]  original constraint

@@ -125,13 +125,19 @@ bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
   }
 
   // Create temporary Fixed constraint
-  SolverConstraintPtr aConstraint = PlaneGCSSolver_Tools::createMovementConstraint(theFeature);
+  std::shared_ptr<SketchSolver_ConstraintFixed> aConstraint =
+      PlaneGCSSolver_Tools::createMovementConstraint(theFeature);
   if (!aConstraint)
     return false;
-  aConstraint->process(myStorage, myIsEventsBlocked);
-  if (aConstraint->error().empty())
+  SolverConstraintPtr(aConstraint)->process(myStorage, myIsEventsBlocked);
+  if (aConstraint->error().empty()) {
     setTemporary(aConstraint);
-  else
+    if (!myStorage->isEmpty())
+      myStorage->setNeedToResolve(true);
+
+    mySketchSolver->initialize();
+    aConstraint->moveFeature();
+  } else
     myStorage->notify(theFeature);
 
   return true;
@@ -141,7 +147,6 @@ bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
 //  Function: resolveConstraints
 //  Class:    SketchSolver_Group
 //  Purpose:  solve the set of constraints for the current group
-#include <iostream>
 // ============================================================================
 bool SketchSolver_Group::resolveConstraints()
 {

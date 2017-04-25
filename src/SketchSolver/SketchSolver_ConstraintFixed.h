@@ -27,15 +27,19 @@ public:
   /// \brief Block or unblock events from this constraint
   virtual void blockEvents(bool isBlocked);
 
+  /// \brief Set coordinates of fixed feature to the values where it has been dragged.
+  ///        Useful when the feature is being moved.
+  void moveFeature();
+
 protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
   virtual void process();
 
   /// \brief Generate list of attributes of constraint in order useful for constraints
-  /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
-  /// \param[out] theAttributes list of attributes to be filled
-  virtual void getAttributes(EntityWrapperPtr&              theValue,
-                             std::vector<EntityWrapperPtr>& theAttributes);
+  /// \param[out] theBaseEntity  the entity which coordinates should be fixed
+  /// \param[out] theFixedEntity the entity containing fixed values
+  virtual void getAttributes(EntityWrapperPtr& theBaseEntity,
+                             EntityWrapperPtr& theFixedEntity);
 
   /// \brief Fixed feature basing on its type
   /// \param theFeature [in]  feature, converted to solver specific format
@@ -46,6 +50,7 @@ private:
 
   ConstraintWrapperPtr myConstraint;
   std::vector<double> myFixedValues;
+  EntityWrapperPtr    myFixedEntity;
 };
 
 #endif

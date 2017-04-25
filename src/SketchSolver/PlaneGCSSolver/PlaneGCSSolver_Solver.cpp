@@ -11,6 +11,7 @@
 PlaneGCSSolver_Solver::PlaneGCSSolver_Solver()
   : myEquationSystem(new GCS::System),
     myDiagnoseBeforeSolve(false),
+    myInitilized(false),
     myConfCollected(false),
     myDOF(0)
 {
@@ -69,6 +70,18 @@ void PlaneGCSSolver_Solver::removeParameters(const GCS::SET_pD& theParams)
     }
 }
 
+void PlaneGCSSolver_Solver::initialize()
+{
+  Events_LongOp::start(this);
+  if (myDiagnoseBeforeSolve)
+    diagnose();
+  myEquationSystem->declareUnknowns(myParameters);
+  myEquationSystem->initSolution();
+  Events_LongOp::end(this);
+
+  myInitilized = true;
+}
+
 PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
 {
   // clear list of conflicting constraints
@@ -80,11 +93,15 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
   if (myParameters.empty())
     return STATUS_INCONSISTENT;
 
+  GCS::SolveStatus aResult = GCS::Success;
   Events_LongOp::start(this);
-  if (myDiagnoseBeforeSolve)
-    diagnose();
-  // solve equations
-  GCS::SolveStatus aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters);
+  if (myInitilized) {
+    aResult = (GCS::SolveStatus)myEquationSystem->solve();
+  } else {
+    if (myDiagnoseBeforeSolve)
+      diagnose();
+    aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters);
+  }
   Events_LongOp::end(this);
 
   // collect information about conflicting constraints every time,
@@ -104,6 +121,7 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
     aStatus = STATUS_OK;
   }
 
+  myInitilized = false;
   return aStatus;
 }
 

@@ -51,7 +51,8 @@ static EntityWrapperPtr createScalar(const AttributePtr&     theAttribute,
   else
     aWrapper = ScalarWrapperPtr(new PlaneGCSSolver_ScalarWrapper(createParameter(theStorage)));
 
-  aWrapper->setValue(aScalar->value());
+  if (aScalar->isInitialized())
+    aWrapper->setValue(aScalar->value());
   return aWrapper;
 }
 
@@ -66,9 +67,11 @@ static EntityWrapperPtr createPoint(const AttributePtr&     theAttribute,
   GCSPointPtr aNewPoint(new GCS::Point);
 
   aNewPoint->x = createParameter(theStorage);
-  *(aNewPoint->x) = aPoint2D->x();
   aNewPoint->y = createParameter(theStorage);
-  *(aNewPoint->y) = aPoint2D->y();
+  if (aPoint2D->isInitialized()) {
+    *(aNewPoint->x) = aPoint2D->x();
+    *(aNewPoint->y) = aPoint2D->y();
+  }
 
   return EntityWrapperPtr(new PlaneGCSSolver_PointWrapper(aNewPoint));
 }

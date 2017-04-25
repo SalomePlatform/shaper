@@ -42,6 +42,10 @@ public:
   /// \brief Release memory occupied by parameters
   void removeParameters(const GCS::SET_pD& theParams);
 
+  /// \brief Preliminary initialization of solver (useful for moving a feature).
+  ///        When called, the solve() method does not reinitialize a set of constraints.
+  void initialize();
+
   /// \brief Solve the set of equations
   /// \return identifier whether solution succeeded
   SolveStatus solve();
@@ -69,6 +73,7 @@ private:
 
   std::shared_ptr<GCS::System> myEquationSystem; ///< set of equations for solving in FreeGCS
   bool                         myDiagnoseBeforeSolve; ///< is the diagnostic necessary
+  bool                         myInitilized;     ///< is the system already initialized
 
   GCS::SET_I                   myConflictingIDs; ///< list of IDs of conflicting constraints
   /// specifies the conflicting constraints are already collected
