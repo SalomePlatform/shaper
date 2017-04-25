@@ -34,6 +34,8 @@
 #include <GeomDataAPI_Dir.h>
 #include <GeomAPI_XYZ.h>
 #include <GeomAPI_Face.h>
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <SketchPlugin_Sketch.h>
 #include <SketcherPrs_Tools.h>
@@ -526,6 +528,9 @@ void PartSet_WidgetSketchLabel::activateSelection(bool toActivate)
     QIntList aModes;
     std::shared_ptr<GeomAPI_Pln> aPlane = plane();
     if (aPlane.get()) {
+      //QList<std::shared_ptr<ModuleBase_ViewerPrs>> aEdges = findCircularEdgesInPlane();
+      //foreach(std::shared_ptr<ModuleBase_ViewerPrs> aPrs, aEdges) {
+      //}
       myWorkshop->module()->activeSelectionModes(aModes);
     }
     else {
@@ -604,4 +609,48 @@ void PartSet_WidgetSketchLabel::onSetPlaneView()
     if (aModule)
       aModule->onViewTransformed();
   }
+}
+
+
+//******************************************************
+QList<std::shared_ptr<ModuleBase_ViewerPrs>> PartSet_WidgetSketchLabel::findCircularEdgesInPlane()
+{
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> aResult;
+  XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
+  XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+  QObjectPtrList aDispObjects = aDisplayer->displayedObjects();
+
+  std::shared_ptr<GeomAPI_Pln> aPlane = plane();
+  foreach(ObjectPtr aObj, aDispObjects) {
+    ResultPtr aResObj = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    if (aResObj.get()) {
+      GeomShapePtr aShape = aResObj->shape();
+      if (aShape.get()) {
+        GeomAPI_ShapeExplorer aExplorer(aShape, GeomAPI_Shape::EDGE);
+        for(; aExplorer.more(); aExplorer.next()) {
+          GeomShapePtr aEdgeShape = aExplorer.current();
+          GeomAPI_Edge anEdge(aEdgeShape);
+          if ((anEdge.isCircle() || anEdge.isArc() || anEdge.isEllipse()) &&
+               anEdge.isInPlane(aPlane)) {
+            bool isContains = false;
+            // Check that edge is not used.
+            // It is possible that the same edge will be taken from different faces
+            foreach(std::shared_ptr<ModuleBase_ViewerPrs> aPrs, aResult) {
+              GeomAPI_Edge aUsedEdge(aPrs->shape());
+              if (aUsedEdge.isEqual(aEdgeShape)) {
+                isContains = true;
+                break;
+              }
+            }
+            if (!isContains) {
+              std::shared_ptr<ModuleBase_ViewerPrs>
+                aPrs(new ModuleBase_ViewerPrs(aResObj, aEdgeShape));
+              aResult.append(aPrs);
+            }
+          }
+        }
+      }
+    }
+  }
+  return aResult;
 }

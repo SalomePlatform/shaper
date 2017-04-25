@@ -13,6 +13,7 @@ class GeomAPI_Pln;
 class GeomAPI_Pnt;
 class GeomAPI_Circ;
 class GeomAPI_Lin;
+class GeomAPI_Ellipse;
 
 /**\class GeomAPI_Edge
 * \ingroup DataModel
@@ -42,6 +43,10 @@ public:
   GEOMAPI_EXPORT
   bool isArc() const;
 
+  /// Verifies that the edge is an arc of circle
+  GEOMAPI_EXPORT
+  bool isEllipse() const;
+
   /// Returns the first vertex coordinates of the edge
   GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt> firstPoint();
@@ -52,11 +57,15 @@ public:
 
   /// Returns a circle if edge is based on the circle curve
   GEOMAPI_EXPORT
-  std::shared_ptr<GeomAPI_Circ> circle();
+  std::shared_ptr<GeomAPI_Circ> circle() const;
+
+  /// Returns an ellipse if edge is based on the ellipse curve
+  GEOMAPI_EXPORT
+  std::shared_ptr<GeomAPI_Ellipse> ellipse() const;
 
   /// Returns a line if edge is based on the linear curve
   GEOMAPI_EXPORT
-  std::shared_ptr<GeomAPI_Lin> line();
+  std::shared_ptr<GeomAPI_Lin> line() const;
 
   /// Returns true if the current edge is geometrically equal to the given edge
   GEOMAPI_EXPORT
@@ -74,6 +83,9 @@ public:
   GEOMAPI_EXPORT
   double length() const;
 };
+
+//! Pointer on attribute object
+typedef std::shared_ptr<GeomAPI_Edge> GeomEdgePtr;
 
 #endif
 

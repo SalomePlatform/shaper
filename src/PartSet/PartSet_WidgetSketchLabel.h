@@ -178,6 +178,13 @@ protected:
   /// \param thePlane a plane
   std::shared_ptr<GeomAPI_Dir> setSketchPlane(std::shared_ptr<GeomAPI_Pln> thePlane);
 
+  /**
+  * Returns list of presentations which have displayed shapes with circular edges
+  * (circles, arcs) which are in pane of of the given sketch
+  * \param theSketch - the sketch
+  */
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> findCircularEdgesInPlane();
+
 private:
   /// class to show/hide preview planes
   PartSet_PreviewPlanes* myPreviewPlanes;

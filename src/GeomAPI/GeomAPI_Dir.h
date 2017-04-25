@@ -64,5 +64,8 @@ class GeomAPI_Dir : public GeomAPI_Interface
 
 };
 
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_Dir> GeomDirPtr;
+
 #endif
 

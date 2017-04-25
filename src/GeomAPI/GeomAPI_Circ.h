@@ -23,7 +23,8 @@ class GeomAPI_Circ : public GeomAPI_Interface
 {
  public:
 
-  /** \brief Constructs a circle of radius Radius, where theAx2 locates the circle and defines its orientation in 3D space such that:\n
+  /** \brief Constructs a circle of radius Radius, where theAx2 locates
+   *  the circle and defines its orientation in 3D space such that:\n
    *  - the center of the circle is the origin of theAx2;\n
    *  - the origin, "X Direction" and "Y Direction" of theAx2 define the plane of the circle;\n
    *  - theAx2 is the local coordinate system of the circle.\n
