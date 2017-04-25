@@ -386,15 +386,7 @@ void ModuleBase_ModelWidget::updateObject(ObjectPtr theObject)
 #ifdef DEBUG_WIDGET_INSTANCE
     qDebug("ModuleBase_ModelWidget::updateObject");
 #endif
-    ModuleBase_Tools::blockUpdateViewer(true);
-    // Fix the problem of not previewed results of constraints applied. Flush Create/Delete
-    // (for the sketch result) to start processing of the sketch in the solver.
-    // TODO: these flushes should be moved in a separate method provided by Model
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
-
-    ModuleBase_Tools::blockUpdateViewer(false);
+    ModuleBase_Tools::flushUpdated(theObject);
     emit objectUpdated();
   }
 }
