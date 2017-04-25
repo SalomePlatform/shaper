@@ -10,6 +10,8 @@
 #include "ModelAPI_Attribute.h"
 #include <ModelAPI_Result.h>
 
+class GeomAPI_Edge;
+
 /**\class ModelAPI_AttributeSelection
  * \ingroup DataModel
  * \brief Attribute that contains reference to the sub-shape of some result, the selected shape.
@@ -18,6 +20,14 @@
 class ModelAPI_AttributeSelection : public ModelAPI_Attribute
 {
  public:
+   /// Type of the center of the circular of elliptical edge
+   enum CenterType {
+     NOT_CENTER, ///< this is not a center
+     CIRCLE_CENTER, ///< center of the circle
+     ELLIPSE_FIRST_FOCUS, ///< first focus point of the ellipse
+     ELLIPSE_SECOND_FOCUS, ///< second focus point of the ellipse
+   };
+
   /// Defines the result and its selected sub-shape
   /// \param theContext object where the sub-shape was selected
   /// \param theSubShape selected sub-shape (if null, the whole context is selected)
@@ -25,6 +35,13 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   ///           (used to remove immideately, without the following updates)
   virtual void setValue(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const bool theTemporarily = false) = 0;
+
+  /// Same as SetValue, but it takes an edge (on circular or elliptical curve)
+  /// and stores the vertex of the central point (for ellipse the first or the second focus point)
+  virtual void setValueCenter(
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
+    const CenterType theCenterType,
     const bool theTemporarily = false) = 0;
 
   /// Reset temporary stored values
