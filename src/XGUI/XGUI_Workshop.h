@@ -247,19 +247,10 @@ Q_OBJECT
   */
   void saveDocument(const QString& theName, std::list<std::string>& theFileNames);
 
-  /**
-   * If there is an active (uncommitted) operation shows a prompt to abort it
-   * and performs abortion if user agreed. Returns true if
-   * - operation aborted successfully
-   * - there is no active operation
-   */
-  bool abortAllOperations();
-
   /// Updates workshop state according to the started operation, e.g. visualizes the property panel
   /// and connect to it.
   /// \param theOpertion a started operation
   void operationStarted(ModuleBase_Operation* theOperation);
-
 
   //! Delete features. Delete the referenced features. There can be a question with a list of
   //! referenced objects.

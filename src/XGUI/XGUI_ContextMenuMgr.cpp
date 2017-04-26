@@ -679,7 +679,7 @@ QStringList XGUI_ContextMenuMgr::actionObjectGroups(const QString& theName)
 void XGUI_ContextMenuMgr::onRename()
 {
   QObjectPtrList anObjects = myWorkshop->selector()->selection()->selectedObjects();
-  if (!myWorkshop->abortAllOperations())
+  if (!myWorkshop->operationMgr()->abortAllOperations())
     return;
   // restore selection in case if dialog box was shown
   myWorkshop->objectBrowser()->setObjectsSelected(anObjects);

@@ -491,7 +491,7 @@ void XGUI_Workshop::onAcceptActionClicked()
                                                     (anOperationMgr->currentOperation());
     if (aFOperation) {
       //if (errorMgr()->canProcessClick(anAction, aFOperation->feature()))
-      myOperationMgr->onCommitOperation();
+      myOperationMgr->commitOperation();
     }
   }
 }
@@ -760,12 +760,6 @@ void XGUI_Workshop::saveDocument(const QString& theName, std::list<std::string>&
 }
 
 //******************************************************
-bool XGUI_Workshop::abortAllOperations()
-{
-  return myOperationMgr->abortAllOperations();
-}
-
-//******************************************************
 void XGUI_Workshop::operationStarted(ModuleBase_Operation* theOperation)
 {
   setGrantedFeatures(theOperation);
@@ -780,7 +774,7 @@ void XGUI_Workshop::operationStarted(ModuleBase_Operation* theOperation)
 //******************************************************
 void XGUI_Workshop::onOpen()
 {
-  if(!abortAllOperations())
+  if(!myOperationMgr->abortAllOperations())
     return;
   //save current file before close if modified
   SessionPtr aSession = ModelAPI_Session::get();
@@ -910,7 +904,7 @@ void XGUI_Workshop::onTrihedronVisibilityChanged(bool theState)
 //******************************************************
 bool XGUI_Workshop::onSave()
 {
-  if(!abortAllOperations())
+  if(!myOperationMgr->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
     return false;
   if (myCurrentDir.isEmpty()) {
     return onSaveAs();
@@ -927,7 +921,7 @@ bool XGUI_Workshop::onSave()
 //******************************************************
 bool XGUI_Workshop::onSaveAs()
 {
-  if(!abortAllOperations())
+  if(!myOperationMgr->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
     return false;
   QFileDialog dialog(desktop());
   dialog.setWindowTitle(tr("Select directory to save files..."));
@@ -1453,7 +1447,7 @@ void XGUI_Workshop::deleteObjects()
   }
 
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
-  if (!abortAllOperations())
+  if (!myOperationMgr->abortAllOperations())
     return;
 
   bool hasResult = false;
@@ -1520,7 +1514,7 @@ void addRefsToFeature(const FeaturePtr& theFeature,
 //**************************************************************
 void XGUI_Workshop::cleanHistory()
 {
-  if (!abortAllOperations())
+  if (!myOperationMgr->abortAllOperations())
     return;
 
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
@@ -1646,7 +1640,7 @@ void XGUI_Workshop::cleanHistory()
 //**************************************************************
 void XGUI_Workshop::moveObjects()
 {
-  if (!abortAllOperations())
+  if (!myOperationMgr->abortAllOperations())
     return;
 
   SessionPtr aMgr = ModelAPI_Session::get();
@@ -1887,7 +1881,7 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   if (aColor.size() != 3)
     return;
 
-  if (!abortAllOperations())
+  if (!myOperationMgr->abortAllOperations())
   return;
   // 2. show the dialog to change the value
   XGUI_ColorDialog* aDlg = new XGUI_ColorDialog(desktop());
@@ -1977,7 +1971,7 @@ void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
   if (aDeflection < 0)
     return;
 
-  if (!abortAllOperations())
+  if (!myOperationMgr->abortAllOperations())
   return;
   // 2. show the dialog to change the value
   XGUI_DeflectionDialog* aDlg = new XGUI_DeflectionDialog(desktop());
