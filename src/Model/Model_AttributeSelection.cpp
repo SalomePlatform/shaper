@@ -184,7 +184,7 @@ GeomShapePtr centerByEdge(GeomShapePtr theEdge, ModelAPI_AttributeSelection::Cen
 {
   if (theType != ModelAPI_AttributeSelection::NOT_CENTER && theEdge.get() != NULL) {
     TopoDS_Shape aShape = theEdge->impl<TopoDS_Shape>();
-    if (!aShape.IsNull()) {
+    if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_EDGE) {
       TopoDS_Edge anEdge = TopoDS::Edge(aShape);
       double aFirst, aLast;
       Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
