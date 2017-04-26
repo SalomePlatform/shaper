@@ -64,5 +64,8 @@ class GeomAPI_Circ : public GeomAPI_Interface
                                       double& theParameter) const;
 };
 
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_Circ> GeomCirclePtr;
+
 #endif
 

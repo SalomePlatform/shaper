@@ -12,6 +12,7 @@
 #include "PartSet_WidgetSketchLabel.h"
 #include "PartSet_WidgetEditor.h"
 #include "PartSet_ResultSketchPrs.h"
+#include "PartSet_ExternalPointsMgr.h"
 
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Displayer.h>
@@ -138,7 +139,7 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsEditLaunching(false), myIsDragging(false),
     myDragDone(false), myIsMouseOverWindow(false),
     myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
-    myIsPopupMenuActive(false)
+    myIsPopupMenuActive(false), myExternalPointsMgr(0)
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
@@ -985,6 +986,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   // plane filter
   if (aPln.get())
     aConnector->activateModuleSelectionModes();
+
+  myExternalPointsMgr = new PartSet_ExternalPointsMgr(myModule->workshop(), myCurrentSketch);
 }
 
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
@@ -993,6 +996,11 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   myIsConstraintsShown[PartSet_Tools::Geometrical] = true;
   myIsConstraintsShown[PartSet_Tools::Dimensional] = true;
   myIsConstraintsShown[PartSet_Tools::Expressions] = false;
+
+  if (myExternalPointsMgr) {
+    delete myExternalPointsMgr;
+    myExternalPointsMgr = 0;
+  }
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
 

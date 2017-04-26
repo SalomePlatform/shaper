@@ -39,6 +39,8 @@ SET(PROJECT_HEADERS
     PartSet_WidgetSketchCreator.h
     PartSet_WidgetSketchLabel.h
     PartSet_WidgetSubShapeSelector.h
+	PartSet_CenterPrs.h
+	PartSet_ExternalPointsMgr.h
 )
 
 SET(PROJECT_MOC_HEADERS
@@ -58,6 +60,7 @@ SET(PROJECT_MOC_HEADERS
     PartSet_WidgetSketchCreator.h
     PartSet_WidgetSketchLabel.h
     PartSet_WidgetSubShapeSelector.h
+	PartSet_ExternalPointsMgr.h
 )
 
 SET(PROJECT_SOURCES
@@ -86,6 +89,8 @@ SET(PROJECT_SOURCES
     PartSet_WidgetSketchCreator.cpp
     PartSet_WidgetSketchLabel.cpp
     PartSet_WidgetSubShapeSelector.cpp
+	PartSet_CenterPrs.cpp
+	PartSet_ExternalPointsMgr.cpp
 )
 
 SET(PROJECT_RESOURCES
