@@ -33,7 +33,7 @@ public:
 
   virtual ~PartSet_ExternalPointsMgr();
 
-private slots:
+public slots:
   /**
   * A slot which processes display of object
   * \param theObj the displayed object
@@ -47,6 +47,9 @@ private slots:
   * \param theAIS its presentation
   */
   void onEraseObject(ObjectPtr theObj, AISObjectPtr theAIS);
+
+  // Called on selection changed
+  void onSelectionChanged();
 
 private:
   /**
@@ -62,14 +65,24 @@ private:
   /// Returns plane of the current sketch
   GeomPlanePtr plane() const;
 
+  /**
+  * Checks that the given object is an object of the current sketch
+  * \param theRes an object to check
+  * \return True if the given object is a sub-object of the current sketch
+  */
   bool isSketchObject(const ObjectPtr& theRes) const;
 
 private:
+  /// Workshop
   ModuleBase_IWorkshop* myWorkshop;
+
+  /// Current sketch
   CompositeFeaturePtr mySketch;
 
+  /// Type for list of created AIS objects
   typedef QList<AISObjectPtr> ListOfAIS;
 
+  /// Map of created AIS objects
   QMap<ObjectPtr, ListOfAIS> myPresentations;
 };
 

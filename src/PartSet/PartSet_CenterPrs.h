@@ -8,7 +8,8 @@
 #define PartSet_CenterPrs_H
 
 #include <ModelAPI_Object.h>
-#include <GeomAPI_Shape.h>
+#include <ModelAPI_AttributeSelection.h>
+#include <GeomAPI_Edge.h>
 
 #include <AIS_Point.hxx>
 #include <Standard_DefineHandle.hxx>
@@ -16,22 +17,38 @@
 
 DEFINE_STANDARD_HANDLE(PartSet_CenterPrs, AIS_Point)
 
+/**
+* \ingroup GUI
+* A presentation class for displaying of centers of external curcular objects in a sketch
+*/
 class PartSet_CenterPrs: public AIS_Point
 {
 public:
   /// Constructor
-  /// \param theResult a result object
+  /// \param theObject an object with circular edge
+  /// \param theEdge a circular edge
+  /// \param theCenter a center point of the circular edge
+  /// \param theType a type of the center
   Standard_EXPORT PartSet_CenterPrs(const ObjectPtr& theObject,
-                                    const GeomShapePtr& theEdge,
-                                    const gp_Pnt& theCenter);
+                                    const GeomEdgePtr& theEdge,
+                                    const gp_Pnt& theCenter,
+                                    ModelAPI_AttributeSelection::CenterType theType);
 
+  /// Returns an Object which contains the circular edge
   ObjectPtr object() const { return myObject; }
-  GeomShapePtr edge() const { return myEdge; }
+
+  /// Returns a circular edge shape
+  GeomEdgePtr edge() const { return myEdge; }
+
+  /// Returns type of the center
+  ModelAPI_AttributeSelection::CenterType centerType() const { return myCenterType; }
 
   DEFINE_STANDARD_RTTIEXT(PartSet_CenterPrs, AIS_Point)
+
 private:
   ObjectPtr myObject;
-  GeomShapePtr myEdge;
+  GeomEdgePtr myEdge;
+  ModelAPI_AttributeSelection::CenterType myCenterType;
 };
 
 #endif

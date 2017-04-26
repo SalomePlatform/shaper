@@ -12,10 +12,12 @@
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_CenterPrs, AIS_Point)
 
 PartSet_CenterPrs::PartSet_CenterPrs(const ObjectPtr& theObject,
-                                     const GeomShapePtr& theEdge,
-                                     const gp_Pnt& theCenter)
+                                     const GeomEdgePtr& theEdge,
+                                     const gp_Pnt& theCenter,
+                                     ModelAPI_AttributeSelection::CenterType theType)
   : AIS_Point(new Geom_CartesianPoint(theCenter)),
   myObject(theObject),
-  myEdge(theEdge)
+  myEdge(theEdge),
+  myCenterType(theType)
 {
 }

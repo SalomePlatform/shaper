@@ -22,6 +22,7 @@
 #include <XGUI_Tools.h>
 #include <XGUI_Displayer.h>
 #include <XGUI_Workshop.h>
+#include <XGUI_SelectionMgr.h>
 
 PartSet_ExternalPointsMgr::PartSet_ExternalPointsMgr(ModuleBase_IWorkshop* theWorkshop,
                                                      const CompositeFeaturePtr& theSketch)
@@ -29,8 +30,9 @@ PartSet_ExternalPointsMgr::PartSet_ExternalPointsMgr(ModuleBase_IWorkshop* theWo
 {
   XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
-  connect(aDisplayer, SIGNAL(objectDisplayed(ObjectPtr, AISObjctPtr)),
+  connect(aDisplayer, SIGNAL(objectDisplayed(ObjectPtr, AISObjectPtr)),
                       SLOT(onDisplayObject(ObjectPtr, AISObjectPtr)));
+
   connect(aDisplayer, SIGNAL(beforeObjectErase(ObjectPtr, AISObjectPtr)),
                       SLOT(onEraseObject(ObjectPtr, AISObjectPtr)));
 
@@ -43,6 +45,9 @@ PartSet_ExternalPointsMgr::~PartSet_ExternalPointsMgr()
   if (myPresentations.isEmpty())
     return;
   XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
+  if (!aWorkshop)
+    return;
+
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
   QMapIterator<ObjectPtr, ListOfAIS> aIt(myPresentations);
   while (aIt.hasNext()) {
@@ -108,48 +113,55 @@ QList<std::shared_ptr<ModuleBase_ViewerPrs>> PartSet_ExternalPointsMgr::findCirc
 
 void PartSet_ExternalPointsMgr::updateCenterPresentations()
 {
-  // Return if there is no plane defined
-  if (!plane().get())
-    return;
-
   XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
+  // Return if there is no plane defined
+  if (!plane().get()) {
+    connect(aWorkshop->selector(), SIGNAL(selectionChanged()),
+                                   SLOT(onSelectionChanged()));
+    return;
+  }
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
 
   QList<std::shared_ptr<ModuleBase_ViewerPrs>> aEdgesPrs = findCircularEdgesInPlane();
   foreach(std::shared_ptr<ModuleBase_ViewerPrs> aPrs, aEdgesPrs) {
-    GeomAPI_Edge aEdge(aPrs->shape());
-    if (aEdge.isArc() || aEdge.isCircle()) {
-      GeomCirclePtr aCircle = aEdge.circle();
+    GeomEdgePtr aEdge(new GeomAPI_Edge(aPrs->shape()));
+    ListOfAIS aList;
+    if (aEdge->isArc() || aEdge->isCircle()) {
+      GeomCirclePtr aCircle = aEdge->circle();
       GeomPointPtr aCenter = aCircle->center();
       Handle(PartSet_CenterPrs) aCentPrs =
-        new PartSet_CenterPrs(aPrs->object(), aPrs->shape(), aCenter->impl<gp_Pnt>());
+        new PartSet_CenterPrs(aPrs->object(), aEdge, aCenter->impl<gp_Pnt>(),
+                              ModelAPI_AttributeSelection::CIRCLE_CENTER);
 
       AISObjectPtr anAIS(new GeomAPI_AISObject());
       anAIS->setImpl(new Handle(AIS_InteractiveObject)(aCentPrs));
-      aDisplayer->displayAIS(anAIS, false);
-      ListOfAIS aList;
       aList.append(anAIS);
-      myPresentations[aPrs->object()] = aList;
-    } else if (aEdge.isEllipse()) {
-      GeomEllipsePtr aEllipse = aEdge.ellipse();
+    } else if (aEdge->isEllipse()) {
+      GeomEllipsePtr aEllipse = aEdge->ellipse();
       GeomPointPtr aF1 = aEllipse->firstFocus();
       GeomPointPtr aF2 = aEllipse->secondFocus();
       Handle(PartSet_CenterPrs) aF1Prs =
-        new PartSet_CenterPrs(aPrs->object(), aPrs->shape(), aF1->impl<gp_Pnt>());
+        new PartSet_CenterPrs(aPrs->object(), aEdge, aF1->impl<gp_Pnt>(),
+                              ModelAPI_AttributeSelection::ELLIPSE_FIRST_FOCUS);
       Handle(PartSet_CenterPrs) aF2Prs =
-        new PartSet_CenterPrs(aPrs->object(), aPrs->shape(), aF2->impl<gp_Pnt>());
+        new PartSet_CenterPrs(aPrs->object(), aEdge, aF2->impl<gp_Pnt>(),
+                              ModelAPI_AttributeSelection::ELLIPSE_SECOND_FOCUS);
 
-      ListOfAIS aList;
       AISObjectPtr anAIS1(new GeomAPI_AISObject());
       anAIS1->setImpl(new Handle(AIS_InteractiveObject)(aF1Prs));
-      aDisplayer->displayAIS(anAIS1, false);
       aList.append(anAIS1);
 
       AISObjectPtr anAIS2(new GeomAPI_AISObject());
       anAIS2->setImpl(new Handle(AIS_InteractiveObject)(aF2Prs));
-      aDisplayer->displayAIS(anAIS2, false);
       aList.append(anAIS2);
+    }
+    if (myPresentations.contains(aPrs->object()))
+      myPresentations[aPrs->object()].append(aList);
+    else
       myPresentations[aPrs->object()] = aList;
+    foreach(AISObjectPtr anAIS, aList) {
+      aDisplayer->displayAIS(anAIS, false);
+      aDisplayer->activateAIS(anAIS->impl<Handle(AIS_InteractiveObject)>(), TopAbs_VERTEX, false);
     }
   }
 }
@@ -166,7 +178,16 @@ void PartSet_ExternalPointsMgr::onDisplayObject(ObjectPtr theObj, AISObjectPtr t
 
 void PartSet_ExternalPointsMgr::onEraseObject(ObjectPtr theObj, AISObjectPtr theAIS)
 {
-  updateCenterPresentations();
+  if (myPresentations.contains(theObj)) {
+    XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
+    XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+    ListOfAIS aList = myPresentations[theObj];
+    foreach(AISObjectPtr aAIS, aList) {
+      aDisplayer->eraseAIS(aAIS, false);
+    }
+    myPresentations.remove(theObj);
+    aDisplayer->updateViewer();
+  }
 }
 
 
@@ -177,4 +198,14 @@ bool PartSet_ExternalPointsMgr::isSketchObject(const ObjectPtr& theRes) const
     return false;
   CompositeFeaturePtr aComp = ModelAPI_Tools::compositeOwner(aFeature);
   return aComp == mySketch;
+}
+
+void PartSet_ExternalPointsMgr::onSelectionChanged()
+{
+  if (plane().get()) {
+    XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
+    disconnect(aWorkshop->selector(), SIGNAL(selectionChanged()),
+               this, SLOT(onSelectionChanged()));
+    updateCenterPresentations();
+  }
 }

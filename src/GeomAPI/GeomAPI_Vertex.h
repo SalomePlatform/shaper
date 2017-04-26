@@ -38,5 +38,8 @@ public:
   bool isEqual(const std::shared_ptr<GeomAPI_Shape> theVert) const;
 };
 
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_Vertex> GeomVertexPtr;
+
 #endif
 

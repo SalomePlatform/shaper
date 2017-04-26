@@ -17,6 +17,7 @@
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Attribute.h>
+#include <ModelAPI_AttributeSelection.h>
 
 #include <Events_Message.h>
 
@@ -265,6 +266,13 @@ public:
    * \return boolean result
    */
   static bool isAuxiliarySketchEntity(const ObjectPtr& theObject);
+
+  static ResultPtr createFixedByExternalCenter(const ObjectPtr& theObject,
+                                               const std::shared_ptr<GeomAPI_Edge>& theEdge,
+                                               ModelAPI_AttributeSelection::CenterType theType,
+                                               const CompositeFeaturePtr& theSketch,
+                                               bool theTemporary = false);
+
 };
 
 #endif
