@@ -108,6 +108,7 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_ArcEndPointValidator);
   aFactory->registerValidator("SketchPlugin_ArcEndPointIntersectionValidator",
                               new SketchPlugin_ArcEndPointIntersectionValidator);
+  aFactory->registerValidator("SketchPlugin_HasNoConstraint", new SketchPlugin_HasNoConstraint);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

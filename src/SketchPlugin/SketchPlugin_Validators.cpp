@@ -1493,3 +1493,46 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
 
   return false;
 }
+
+bool SketchPlugin_HasNoConstraint::isValid(const AttributePtr& theAttribute,
+                                           const std::list<std::string>& theArguments,
+                                           Events_InfoMessage& theError) const
+{
+  std::set<std::string> aFeatureKinds;
+  for (std::list<std::string>::const_iterator anArgIt = theArguments.begin();
+       anArgIt != theArguments.end(); anArgIt++) {
+    aFeatureKinds.insert(*anArgIt);
+  }
+
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
+    return false;
+  }
+
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
+                                                                      (theAttribute);
+  bool isObject = aRefAttr->isObject();
+  if (!isObject) {
+    theError = "It uses an empty object";
+    return false;
+  }
+  ObjectPtr anObject = aRefAttr->object();
+  FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+  if (!aFeature.get()) {
+    theError = "The feature of the checked attribute is empty";
+    return false;
+  }
+
+  FeaturePtr aCurrentFeature = ModelAPI_Feature::feature(aRefAttr->owner());
+
+  std::set<AttributePtr> aRefsList = anObject->data()->refsToMe();
+  std::set<AttributePtr>::const_iterator anIt = aRefsList.begin();
+  for (; anIt != aRefsList.end(); anIt++) {
+    FeaturePtr aRefFeature = ModelAPI_Feature::feature((*anIt)->owner());
+    if (aRefFeature.get() && aCurrentFeature != aRefFeature &&
+        aFeatureKinds.find(aRefFeature->getKind()) != aFeatureKinds.end())
+      return false; // constraint is found, that means that the check is not valid
+  }
+  return true;
+}
