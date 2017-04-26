@@ -225,7 +225,8 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
       // it is just reference to construction.
       return centerByEdge(myTmpSubShape, myTmpCenterType);
     }
-    return centerByEdge(myTmpSubShape.get() ? myTmpSubShape : myTmpContext->shape(), myTmpCenterType);
+    return centerByEdge(myTmpSubShape.get() ? myTmpSubShape : myTmpContext->shape(),
+                        myTmpCenterType);
   }
 
   TDF_Label aSelLab = selectionLabel();
