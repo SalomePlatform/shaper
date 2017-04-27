@@ -238,9 +238,9 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
   if (aSelLab.IsAttribute(kCIRCLE_CENTER))
     aType = CIRCLE_CENTER;
   else if (aSelLab.IsAttribute(kELLIPSE_CENTER1))
-    aType = CIRCLE_CENTER;
+    aType = ELLIPSE_FIRST_FOCUS;
   else if (aSelLab.IsAttribute(kELLIPSE_CENTER2))
-    aType = CIRCLE_CENTER;
+    aType = ELLIPSE_SECOND_FOCUS;
 
 
   if (myRef.isInitialized()) {
