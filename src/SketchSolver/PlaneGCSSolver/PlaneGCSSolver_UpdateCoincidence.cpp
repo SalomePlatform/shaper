@@ -18,12 +18,11 @@ void PlaneGCSSolver_UpdateCoincidence::attach(SketchSolver_Constraint* theObserv
 {
   if (theType == GROUP()) {
     std::list<SketchSolver_Constraint*>::iterator aPlaceToAdd = myObservers.end();
-    // point-point coincidence is placed first
-    if (theObserver->getType() == CONSTRAINT_PT_PT_COINCIDENT) {
-      for (aPlaceToAdd = myObservers.begin(); aPlaceToAdd != myObservers.end(); ++aPlaceToAdd)
-        if ((*aPlaceToAdd)->getType() != CONSTRAINT_PT_PT_COINCIDENT)
-          break;
-    }
+    // point-point coincidence is placed first,
+    // other constraints are sorted by their type
+    for (aPlaceToAdd = myObservers.begin(); aPlaceToAdd != myObservers.end(); ++aPlaceToAdd)
+      if ((*aPlaceToAdd)->getType() > theObserver->getType())
+        break;
     myObservers.insert(aPlaceToAdd, theObserver);
   } else
     myNext->attach(theObserver, theType);

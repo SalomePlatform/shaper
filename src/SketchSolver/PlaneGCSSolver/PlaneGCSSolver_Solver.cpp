@@ -35,7 +35,8 @@ void PlaneGCSSolver_Solver::addConstraint(GCSConstraintPtr theConstraint)
 {
   myEquationSystem->addConstraint(theConstraint.get());
   myConstraints[theConstraint->getTag()].insert(theConstraint);
-  myDOF = -1;
+  if (theConstraint->getTag() >= 0)
+    myDOF = -1;
 }
 
 void PlaneGCSSolver_Solver::removeConstraint(ConstraintID theID)
@@ -46,7 +47,8 @@ void PlaneGCSSolver_Solver::removeConstraint(ConstraintID theID)
     myDOF = (int)myParameters.size();
   } else {
     myEquationSystem->clearByTag(theID);
-    myDOF = -1;
+    if (theID >= 0)
+      myDOF = -1;
   }
 }
 
