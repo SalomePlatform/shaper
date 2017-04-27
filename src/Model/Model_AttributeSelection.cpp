@@ -167,6 +167,7 @@ void Model_AttributeSelection::setValueCenter(
       TDataStd_UAttribute::Set(aSelLab, kELLIPSE_CENTER2);
       break;
     }
+    owner()->data()->sendAttributeUpdated(this);
   }
 }
 
@@ -278,6 +279,7 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
       TopoDS_Shape aSelShape = aSelection->Get();
       aResult = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
       aResult->setImpl(new TopoDS_Shape(aSelShape));
+      return centerByEdge(aResult, aType);
     } else { // for simple construction element: just shape of this construction element
       std::shared_ptr<Model_ResultConstruction> aConstr =
         std::dynamic_pointer_cast<Model_ResultConstruction>(context());
@@ -291,7 +293,7 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
       }
     }
   }
-  return aResult;
+  return aResult; // empty case
 }
 
 bool Model_AttributeSelection::isInvalid()

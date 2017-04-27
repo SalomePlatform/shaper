@@ -577,7 +577,7 @@ std::shared_ptr<GeomAPI_Dir>
   std::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
   // X axis is preferable to be dirX on the sketch
   const double tol = Precision::Confusion();
-  bool isX = fabs(anA - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
+  bool isX = fabs(fabs(anA) - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
   std::shared_ptr<GeomAPI_Dir> aTempDir(
       isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
   std::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
