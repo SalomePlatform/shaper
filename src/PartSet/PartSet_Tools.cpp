@@ -891,11 +891,12 @@ bool PartSet_Tools::isAuxiliarySketchEntity(const ObjectPtr& theObject)
 }
 
 
-ResultPtr PartSet_Tools::createFixedByExternalCenter(const ObjectPtr& theObject,
-                                                     const std::shared_ptr<GeomAPI_Edge>& theEdge,
-                                                     ModelAPI_AttributeSelection::CenterType theType,
-                                                     const CompositeFeaturePtr& theSketch,
-                                                     bool theTemporary)
+ResultPtr PartSet_Tools::createFixedByExternalCenter(
+    const ObjectPtr& theObject,
+    const std::shared_ptr<GeomAPI_Edge>& theEdge,
+    ModelAPI_AttributeSelection::CenterType theType,
+    const CompositeFeaturePtr& theSketch,
+    bool theTemporary)
 {
   FeaturePtr aMyFeature = theSketch->addFeature(SketchPlugin_Point::ID());
 

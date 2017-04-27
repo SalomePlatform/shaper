@@ -50,7 +50,8 @@ void SketchPlugin_MacroEllipse::initAttributes()
   data()->addAttribute(AUXILIARY_ID(), ModelAPI_AttributeBoolean::typeId());
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CENTER_POINT_REF_ID());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), MAJOR_AXIS_POINT_REF_ID());
+  ModelAPI_Session::get()->validators()->
+      registerNotObligatory(getKind(), MAJOR_AXIS_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PASSED_POINT_REF_ID());
 }
 

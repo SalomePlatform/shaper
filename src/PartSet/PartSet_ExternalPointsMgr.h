@@ -29,7 +29,8 @@ class PartSet_ExternalPointsMgr: public QObject
 {
   Q_OBJECT
 public:
-  PartSet_ExternalPointsMgr(ModuleBase_IWorkshop* theWorkshop, const CompositeFeaturePtr& theSketch);
+  PartSet_ExternalPointsMgr(ModuleBase_IWorkshop* theWorkshop,
+                            const CompositeFeaturePtr& theSketch);
 
   virtual ~PartSet_ExternalPointsMgr();
 

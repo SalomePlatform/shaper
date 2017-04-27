@@ -684,13 +684,15 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
   }
   // The selection could be a center of an external circular object
   else if (aFirstValue.get() && (!aFirstValue->interactive().IsNull())) {
-    Handle(PartSet_CenterPrs) aAIS = Handle(PartSet_CenterPrs)::DownCast(aFirstValue->interactive());
+    Handle(PartSet_CenterPrs) aAIS =
+        Handle(PartSet_CenterPrs)::DownCast(aFirstValue->interactive());
     if (!aAIS.IsNull()) {
       gp_Pnt aPntComp = aAIS->Component()->Pnt();
       GeomVertexPtr aVertPtr(new GeomAPI_Vertex(aPntComp.X(), aPntComp.Y(), aPntComp.Z()));
       TopoDS_Shape aShape = aVertPtr->impl<TopoDS_Shape>();
 
-      ResultPtr aFixedObject = PartSet_Tools::findFixedObjectByExternal(aShape, aAIS->object(), mySketch);
+      ResultPtr aFixedObject =
+          PartSet_Tools::findFixedObjectByExternal(aShape, aAIS->object(), mySketch);
       if (!aFixedObject.get())
         aFixedObject = PartSet_Tools::createFixedByExternalCenter(aAIS->object(), aAIS->edge(),
                                                                   aAIS->centerType(), mySketch);
