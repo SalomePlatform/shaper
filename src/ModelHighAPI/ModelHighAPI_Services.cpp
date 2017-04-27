@@ -102,6 +102,13 @@ void apply()
   aSession->startOperation();
 }
 
+void updateFeatures()
+{
+  Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+}
+
 //--------------------------------------------------------------------------------------
 void undo()
 {

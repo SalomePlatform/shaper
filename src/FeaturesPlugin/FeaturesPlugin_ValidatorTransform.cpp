@@ -33,7 +33,10 @@ bool FeaturesPlugin_ValidatorTransform::isValid(const AttributePtr& theAttribute
   for(int i = 0; i < aCurSelList->size() && aValid; i++) {
     std::shared_ptr<ModelAPI_AttributeSelection> aSelAttribute = aCurSelList->value(i);
     ResultPtr aResult = aSelAttribute->context();
-    if (isPartSetDocument) // PartSet document: Result Part is valid
+    if (!aResult) {
+      theError = "Invalid selection.";
+      return false;
+    } if (isPartSetDocument) // PartSet document: Result Part is valid
       aValid = aResult->groupName() == ModelAPI_ResultPart::group();
     else { // Part document: Result CompSolid is valid
       aValid = aResult->groupName() == ModelAPI_ResultBody::group();

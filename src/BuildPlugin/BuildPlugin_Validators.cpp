@@ -184,6 +184,10 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
     GeomShapePtr aShape = aSelection->value();
     if(!aShape.get()) {
+      if (!aSelection->context()) {
+        theError = "Objects are not selected.";
+        return false;
+      }
       aShape = aSelection->context()->shape();
     }
     for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
@@ -193,7 +197,7 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
   }
 
   if(anEdges.empty()) {
-    theError = "Objects not selected.";
+    theError = "Objects are not selected.";
     return false;
   }
 

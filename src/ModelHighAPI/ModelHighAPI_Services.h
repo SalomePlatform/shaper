@@ -75,6 +75,14 @@ void end();
 MODELHIGHAPI_EXPORT
 void apply();
 
+/** Executes features, created or updated before.
+ *
+ *  This method flushes creation and update events in order to make all
+ *  features up to date.
+ */
+MODELHIGHAPI_EXPORT
+void updateFeatures();
+
 /// Roll-back the data structure to the previous control point.
 MODELHIGHAPI_EXPORT
 void undo();

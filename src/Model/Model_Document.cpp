@@ -590,6 +590,8 @@ bool Model_Document::finishOperation()
     Events_Loop::loop()->send(aFinishMsg);
   }
 
+  // for open of document with primitive box inside (finish transaction in initAttributes)
+  bool aWasActivatedFlushes = aLoop->activateFlushes(true);
   while(aLoop->hasGrouppedEvent(kCreatedEvent) || aLoop->hasGrouppedEvent(kUpdatedEvent) ||
         aLoop->hasGrouppedEvent(kRedispEvent) || aLoop->hasGrouppedEvent(kDeletedEvent)) {
     aLoop->flush(kCreatedEvent);
@@ -597,6 +599,7 @@ bool Model_Document::finishOperation()
     aLoop->flush(kRedispEvent);
     aLoop->flush(kDeletedEvent);
   }
+  aLoop->activateFlushes(aWasActivatedFlushes);
 
   // to avoid "updated" message appearance by updater
   //aLoop->clear(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));

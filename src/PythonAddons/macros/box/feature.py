@@ -82,7 +82,8 @@ class BoxFeature(model.Feature):
         self.base.setPerpendicular(line[0], line[3])
 
         # execute sketch
-        model.do()
+        mypart.setCurrentFeature(self.base.feature(), False)
+        model.updateFeatures()
 
         # Creating the extrusion (the box) at default size
         # A box result
