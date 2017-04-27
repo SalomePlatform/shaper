@@ -14,7 +14,6 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintCollinear.h
     SketchPlugin_ConstraintDistance.h
     SketchPlugin_ConstraintEqual.h
-    SketchPlugin_Fillet.h
     SketchPlugin_ConstraintHorizontal.h
     SketchPlugin_ConstraintLength.h
     SketchPlugin_ConstraintMiddle.h
@@ -26,13 +25,16 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintSplit.h
     SketchPlugin_ConstraintTangent.h
     SketchPlugin_ConstraintVertical.h
+    SketchPlugin_Ellipse.h
     SketchPlugin_ExternalValidator.h
     SketchPlugin_Feature.h
+    SketchPlugin_Fillet.h
     SketchPlugin_IntersectionPoint.h
     SketchPlugin_Line.h
     SketchPlugin_MacroArc.h
     SketchPlugin_MacroArcReentrantMessage.h
     SketchPlugin_MacroCircle.h
+    SketchPlugin_MacroEllipse.h
     SketchPlugin_MultiRotation.h
     SketchPlugin_MultiTranslation.h
     SketchPlugin_Plugin.h
@@ -55,7 +57,6 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintCollinear.cpp
     SketchPlugin_ConstraintDistance.cpp
     SketchPlugin_ConstraintEqual.cpp
-    SketchPlugin_Fillet.cpp
     SketchPlugin_ConstraintHorizontal.cpp
     SketchPlugin_ConstraintLength.cpp
     SketchPlugin_ConstraintMiddle.cpp
@@ -67,12 +68,15 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintSplit.cpp
     SketchPlugin_ConstraintTangent.cpp
     SketchPlugin_ConstraintVertical.cpp
+    SketchPlugin_Ellipse.cpp
     SketchPlugin_ExternalValidator.cpp
     SketchPlugin_Feature.cpp
+    SketchPlugin_Fillet.cpp
     SketchPlugin_IntersectionPoint.cpp
     SketchPlugin_Line.cpp
     SketchPlugin_MacroArc.cpp
     SketchPlugin_MacroCircle.cpp
+    SketchPlugin_MacroEllipse.cpp
     SketchPlugin_MultiRotation.cpp
     SketchPlugin_MultiTranslation.cpp
     SketchPlugin_Plugin.cpp

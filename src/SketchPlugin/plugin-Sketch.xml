@@ -7,6 +7,7 @@
         id="Sketch"
         nested="SketchPoint SketchIntersectionPoint SketchLine
                 SketchCircle SketchMacroCircle SketchArc SketchMacroArc
+                SketchEllipse SketchMacroEllipse
                 SketchRectangle
                 SketchProjection
                 SketchConstraintLength SketchConstraintRadius SketchConstraintDistance
@@ -337,6 +338,95 @@
           <validator id="SketchPlugin_TrimValidator"/>
         </sketch_feature_point_selector>
         <validator id="PartSet_SplitSelection"/>
+      </feature>
+    </group>
+
+    <group id="Elliptic geometry">
+      <!-- SketchEllipse is a hidden feature. It is created inside SketchMacroEllipse. -->
+      <feature id="SketchEllipse"
+               title="Ellipse"
+               tooltip="Create ellipse"
+               icon="icons/Sketch/ellipse.png"
+               internal="1">
+        <sketch-2dpoint_selector id="ellipse_center"
+                                 title="Center"
+                                 tooltip="Center coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_focus"
+                                 title="Focus"
+                                 tooltip="Focus coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <labelvalue id="ellipse_major_radius"
+                    icon="icons/Sketch/radius.png"
+                    label="Major radius:"
+                    tooltip="Set major radius"
+                    default="computed"
+                    accept_expressions="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <labelvalue id="ellipse_minor_radius"
+                    icon="icons/Sketch/radius.png"
+                    label="Minor radius:"
+                    tooltip="Set minor radius"
+                    default="computed"
+                    accept_expressions="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+      </feature>
+      <!-- SketchMacroEllipse -->
+      <feature id="SketchMacroEllipse"
+               icon="icons/Sketch/ellipse.png"
+               title="Ellipse"
+               tooltip="Create ellipse">
+        <sketch-2dpoint_selector id="center_point"
+                                 reference_attribute="center_point_ref"
+                                 title="Center point"
+                                 tooltip="Center point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="major_axis_point"
+                                 reference_attribute="major_axis_point_ref"
+                                 title="Major axis point"
+                                 tooltip="Major axis point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="passed_point"
+                                 reference_attribute="passed_point_ref"
+                                 title="Passed point"
+                                 tooltip="Passed point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences">
+<!--          <validator id="SketchPlugin_CirclePassedPointValidator"/> -->
+        </sketch-2dpoint_selector>
+<!--        <validator id="GeomValidators_Different" parameters="center_point_ref,passed_point_ref"/> -->
+        <labelvalue id="ellipse_major_radius"
+                    icon="icons/Sketch/radius.png"
+                    label="Major radius:"
+                    tooltip="Set major radius"
+                    default="computed"
+                    accept_expressions="0"
+                    obligatory="0"
+                    enable_value="enable_by_preferences">
+          <validator id="GeomValidators_Positive"/>
+        </labelvalue>
+        <labelvalue id="ellipse_minor_radius"
+                    icon="icons/Sketch/radius.png"
+                    label="Minor radius:"
+                    tooltip="Set minor radius"
+                    default="computed"
+                    accept_expressions="0"
+                    obligatory="0"
+                    enable_value="enable_by_preferences">
+          <validator id="GeomValidators_Positive"/>
+        </labelvalue>
+        <boolvalue id="Auxiliary"
+                   tooltip="Construction element"
+                   label="Auxiliary"
+                   default="false"
+                   obligatory="0"/>
       </feature>
     </group>
 

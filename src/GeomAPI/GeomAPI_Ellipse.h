@@ -35,10 +35,13 @@ public:
   GEOMAPI_EXPORT GeomAPI_Ellipse(const std::shared_ptr<GeomAPI_Ax2>& theAx2,
                                  double theMajorRadius, double theMinorRadius);
 
-  /// Returns first center of the ellipse
+  /// Returns center of the ellipse
+  GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Pnt> center() const;
+
+  /// Returns first focus of the ellipse
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Pnt> firstFocus() const;
 
-  /// Returns second center of the ellipse
+  /// Returns second focus of the ellipse
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Pnt> secondFocus() const;
 
   /// Returns minor radius of the ellipse

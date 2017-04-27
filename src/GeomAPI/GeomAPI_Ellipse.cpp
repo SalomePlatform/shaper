@@ -18,6 +18,12 @@ GeomAPI_Ellipse::GeomAPI_Ellipse(const std::shared_ptr<GeomAPI_Ax2>& theAx2,
 {
 }
 
+std::shared_ptr<GeomAPI_Pnt> GeomAPI_Ellipse::center() const
+{
+  const gp_Pnt& aCenter = MY_ELIPS->Location();
+  return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aCenter.X(), aCenter.Y(), aCenter.Z()));
+}
+
 GeomPointPtr GeomAPI_Ellipse::firstFocus() const
 {
   const gp_Pnt& aFirst = MY_ELIPS->Focus1();

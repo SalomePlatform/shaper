@@ -32,6 +32,8 @@
 #include <SketchPlugin_Trim.h>
 #include <SketchPlugin_Validators.h>
 #include <SketchPlugin_ExternalValidator.h>
+#include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_MacroEllipse.h>
 
 #include <Events_Loop.h>
 #include <GeomDataAPI_Dir.h>
@@ -208,6 +210,10 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_MacroArc);
   } else if (theFeatureID == SketchPlugin_MacroCircle::ID()) {
     return FeaturePtr(new SketchPlugin_MacroCircle);
+  } else if (theFeatureID == SketchPlugin_Ellipse::ID()) {
+    return FeaturePtr(new SketchPlugin_Ellipse);
+  } else if (theFeatureID == SketchPlugin_MacroEllipse::ID()) {
+    return FeaturePtr(new SketchPlugin_MacroEllipse);
   }
   // feature of such kind is not found
   return FeaturePtr();

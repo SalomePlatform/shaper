@@ -373,7 +373,6 @@ AISObjectPtr SketchPlugin_MacroCircle::getAISObject(AISObjectPtr thePrevious)
 }
 
 void SketchPlugin_MacroCircle::attributeChanged(const std::string& theID) {
-  double aRadius = 0.0;
   // If circle type switched reset all attributes.
   if(theID == CIRCLE_TYPE()) {
     SketchPlugin_Tools::resetAttribute(this, CENTER_POINT_ID());

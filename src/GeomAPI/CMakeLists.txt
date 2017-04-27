@@ -38,7 +38,8 @@ SET(PROJECT_HEADERS
     GeomAPI_Trsf.h
     GeomAPI_Angle2d.h
     GeomAPI_Wire.h
-	GeomAPI_Ellipse.h
+    GeomAPI_Ellipse.h
+    GeomAPI_Ellipse2d.h
 )
 
 SET(PROJECT_SOURCES
@@ -73,7 +74,8 @@ SET(PROJECT_SOURCES
     GeomAPI_Trsf.cpp
     GeomAPI_Angle2d.cpp
     GeomAPI_Wire.cpp
-	GeomAPI_Ellipse.cpp
+    GeomAPI_Ellipse.cpp
+    GeomAPI_Ellipse2d.cpp
 )
 
 SET(PROJECT_LIBRARIES

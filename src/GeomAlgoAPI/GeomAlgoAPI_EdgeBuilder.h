@@ -58,6 +58,13 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_EdgeBuilder
                                                        std::shared_ptr<GeomAPI_Pnt> theStartPoint,
                                                        std::shared_ptr<GeomAPI_Pnt> theEndPoint,
                                                        std::shared_ptr<GeomAPI_Dir> theNormal);
+
+  /// Creates elliptic edge
+  static std::shared_ptr<GeomAPI_Edge> ellipse(const std::shared_ptr<GeomAPI_Pnt>& theCenter,
+                                               const std::shared_ptr<GeomAPI_Dir>& theNormal,
+                                               const std::shared_ptr<GeomAPI_Dir>& theMajorAxis,
+                                               const double                        theMajorRadius,
+                                               const double                        theMinorRadius);
 };
 
 #endif
