@@ -120,7 +120,7 @@ void SketcherPrs_Mirror::drawLines(const Handle(Prs3d_Presentation)& thePrs,
   if (aNb != anAttrC->size())
     return;
 
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
+  Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePrs);
 
   // drawListOfShapes uses myDrawer for attributes definition
   Handle(Prs3d_LineAspect) aLnAspect = new Prs3d_LineAspect(theColor, Aspect_TOL_SOLID, 1);
@@ -130,9 +130,9 @@ void SketcherPrs_Mirror::drawLines(const Handle(Prs3d_Presentation)& thePrs,
   addLine(aGroup, SketchPlugin_Constraint::ENTITY_A());
 
   // Draw source objects
-  drawListOfShapes(anAttrB, thePrs);
+  drawListOfShapes(anAttrB, thePrs, theColor);
 
   // draw mirrored objects
-  drawListOfShapes(anAttrC, thePrs);
+  drawListOfShapes(anAttrC, thePrs, theColor);
 }
 

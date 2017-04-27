@@ -117,13 +117,11 @@ void SketcherPrs_Transformation::drawLines(const Handle(Prs3d_Presentation)& the
   if (anAttrB.get() == NULL)
     return;
 
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
-
   // drawListOfShapes uses myDrawer for attributes definition
-  Handle(Prs3d_LineAspect) aLnAspect = new Prs3d_LineAspect(theColor, Aspect_TOL_SOLID, 1);
-  myDrawer->SetLineAspect(aLnAspect);
+  //Handle(Prs3d_LineAspect) aLnAspect = new Prs3d_LineAspect(theColor, Aspect_TOL_SOLID, 1);
+  //myDrawer->SetLineAspect(aLnAspect);
 
-  drawListOfShapes(anAttrB, thePrs);
+  drawListOfShapes(anAttrB, thePrs, theColor);
   if (myConstraint->getKind() == SketchPlugin_MultiTranslation::ID()) {
     // If it is translation
     AttributePoint2DPtr aStart = GeomDataAPI_Point2D::getPoint2D(aData,

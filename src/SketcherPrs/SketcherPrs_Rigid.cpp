@@ -116,13 +116,8 @@ void SketcherPrs_Rigid::drawLines(const Handle(Prs3d_Presentation)& thePrs,
   if (aShape.get() == NULL)
     return;
 
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
-  Handle(Graphic3d_AspectLine3d) aLineAspect =
-    new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
-  aGroup->SetPrimitivesAspect(aLineAspect);
-
   Handle(Prs3d_PointAspect) aPntAspect = new Prs3d_PointAspect(Aspect_TOM_PLUS, theColor, 1);
   myDrawer->SetPointAspect(aPntAspect);
-  drawShape(aShape, thePrs);
+  drawShape(aShape, thePrs, theColor);
 }
 

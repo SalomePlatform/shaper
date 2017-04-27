@@ -67,12 +67,6 @@ bool SketcherPrs_Tangent::updateIfReadyToDisplay(double theStep, bool withColor)
 void SketcherPrs_Tangent::drawLines(const Handle(Prs3d_Presentation)& thePrs,
                                     Quantity_Color theColor) const
 {
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
-
-  Handle(Graphic3d_AspectLine3d) aLineAspect =
-    new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
-  aGroup->SetPrimitivesAspect(aLineAspect);
-
   ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   ObjectPtr aObj2 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
 
@@ -81,7 +75,7 @@ void SketcherPrs_Tangent::drawLines(const Handle(Prs3d_Presentation)& thePrs,
 
   if ((aShape1.get() == NULL) || (aShape2.get() == NULL))
     return;
-  drawShape(aShape1, thePrs);
-  drawShape(aShape2, thePrs);
+  drawShape(aShape1, thePrs, theColor);
+  drawShape(aShape2, thePrs, theColor);
 }
 

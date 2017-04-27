@@ -117,13 +117,13 @@ protected:
   /// \param theShape the shape to draw
   /// \param thePrs the presentation scene
   void drawShape(const std::shared_ptr<GeomAPI_Shape>& theShape,
-    const Handle(Prs3d_Presentation)& thePrs) const;
+    const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const;
 
   /// Draw a list of shapes stored in a RefListAttribute
   /// \param theListAttr the attribute of reference3s list
   /// \param thePrs the presentation scene
   void drawListOfShapes(const std::shared_ptr<ModelAPI_AttributeRefList>& theListAttr,
-                        const Handle(Prs3d_Presentation)& thePrs) const;
+                        const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const;
 
 protected:
   /// Constraint feature

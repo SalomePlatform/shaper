@@ -80,7 +80,7 @@ bool SketcherPrs_Middle::updateIfReadyToDisplay(double theStep, bool withColor) 
 void SketcherPrs_Middle::drawLines(const Handle(Prs3d_Presentation)& thePrs,
                                    Quantity_Color theColor) const
 {
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
+  Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePrs);
 
   Handle(Graphic3d_AspectLine3d) aLineAspect =
     new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
@@ -105,13 +105,13 @@ void SketcherPrs_Middle::drawLine(const Handle(Prs3d_Presentation)& thePrs,
       ResultPtr aResult = aResults.front();
       std::shared_ptr<GeomAPI_Shape> aLine = SketcherPrs_Tools::getShape(aResult);
       if (aLine.get() != NULL)
-        drawShape(aLine, thePrs);
+        drawShape(aLine, thePrs, theColor);
     }
   }
   else {
     std::shared_ptr<GeomAPI_Shape> aLine = SketcherPrs_Tools::getShape(theObject);
     if (aLine.get() != NULL)
-      drawShape(aLine, thePrs);
+      drawShape(aLine, thePrs, theColor);
   }
 }
 

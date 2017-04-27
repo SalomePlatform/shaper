@@ -28,6 +28,7 @@
 #include <StdPrs_DeflectionCurve.hxx>
 #include <StdPrs_Point.hxx>
 #include <StdPrs_Curve.hxx>
+#include <Prs3d_LineAspect.hxx>
 
 #include <OpenGl_Element.hxx>
 #include <OpenGl_GraphicDriver.hxx>
@@ -194,7 +195,6 @@ void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup,
 void SketcherPrs_SymbolPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM,
                                             const SelectMgr_SequenceOfOwner& theOwners)
 {
-
   Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( thePM );
   aSelectionPrs->Clear();
   drawLines(aSelectionPrs, GetContext()->SelectionStyle()->Color());
@@ -310,8 +310,17 @@ void SketcherPrs_SymbolPrs::SetCustomColor(const std::vector<int>& theColor)
 
 //*********************************************************************************
 void SketcherPrs_SymbolPrs::drawShape(const std::shared_ptr<GeomAPI_Shape>& theShape,
-                                      const Handle(Prs3d_Presentation)& thePrs) const
+                                      const Handle(Prs3d_Presentation)& thePrs,
+                                      Quantity_Color theColor) const
 {
+  Handle(Graphic3d_AspectLine3d) aLineAspect =
+    new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
+
+  Handle(Prs3d_LineAspect) aLinesStyle = myDrawer->LineAspect();
+  Handle(Graphic3d_AspectLine3d) aOldStyle = aLinesStyle->Aspect();
+  aLinesStyle->SetAspect(aLineAspect);
+  myDrawer->SetLineAspect(aLinesStyle);
+
   if (theShape->isEdge()) {
     // The shape is edge
     std::shared_ptr<GeomAPI_Curve> aCurve =
@@ -335,12 +344,15 @@ void SketcherPrs_SymbolPrs::drawShape(const std::shared_ptr<GeomAPI_Shape>& theS
     Handle(Geom_CartesianPoint) aPoint = new Geom_CartesianPoint(aPnt->impl<gp_Pnt>());
     StdPrs_Point::Add(thePrs, aPoint, myDrawer);
   }
+
+  aLinesStyle->SetAspect(aOldStyle);
+  myDrawer->SetLineAspect(aLinesStyle);
 }
 
 //*********************************************************************************
 void SketcherPrs_SymbolPrs::drawListOfShapes(
                       const std::shared_ptr<ModelAPI_AttributeRefList>& theListAttr,
-                      const Handle(Prs3d_Presentation)& thePrs) const
+                      const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const
 {
   int aNb = theListAttr->size();
   if (aNb == 0)
@@ -351,7 +363,7 @@ void SketcherPrs_SymbolPrs::drawListOfShapes(
     aObj = theListAttr->object(i);
     std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getShape(aObj);
     if (aShape.get() != NULL)
-      drawShape(aShape, thePrs);
+      drawShape(aShape, thePrs, theColor);
   }
 }
 
