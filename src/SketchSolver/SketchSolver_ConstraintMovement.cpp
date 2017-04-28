@@ -67,7 +67,8 @@ EntityWrapperPtr SketchSolver_ConstraintMovement::entityToFix()
   return myStorage->entity(myMovedFeature);
 }
 
-void SketchSolver_ConstraintMovement::moveTo(const std::shared_ptr<GeomAPI_Pnt2d>& theDestinationPoint)
+void SketchSolver_ConstraintMovement::moveTo(
+    const std::shared_ptr<GeomAPI_Pnt2d>& theDestinationPoint)
 {
 #ifdef SUPPORT_NEW_MOVE
   EntityWrapperPtr aMovedEntity = myStorage->entity(myMovedFeature);

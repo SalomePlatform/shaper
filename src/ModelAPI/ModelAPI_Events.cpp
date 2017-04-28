@@ -354,7 +354,8 @@ void ModelAPI_ObjectMovedMessage::setOriginalPosition(double theX, double theY)
   myOriginalPosition = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
 }
 
-void ModelAPI_ObjectMovedMessage::setOriginalPosition(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+void ModelAPI_ObjectMovedMessage::setOriginalPosition(
+    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {
   myOriginalPosition = thePoint;
 }
@@ -364,7 +365,8 @@ void ModelAPI_ObjectMovedMessage::setCurrentPosition(double theX, double theY)
   myCurrentPosition = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
 }
 
-void ModelAPI_ObjectMovedMessage::setCurrentPosition(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+void ModelAPI_ObjectMovedMessage::setCurrentPosition(
+    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {
   myCurrentPosition = thePoint;
 }

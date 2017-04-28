@@ -47,7 +47,7 @@ protected:
   virtual EntityWrapperPtr entityToFix();
 
 private:
-  FeaturePtr       myMovedFeature; ///< fixed feature (when it is set, myBaseConstraint should be NULL)
+  FeaturePtr       myMovedFeature; ///< fixed feature (if set, myBaseConstraint should be NULL)
   AttributePtr     myDraggedPoint; ///< one of the feature points which has been moved
   std::shared_ptr<GeomAPI_Pnt2d> myStartPoint; ///< start point of the movement
 };
