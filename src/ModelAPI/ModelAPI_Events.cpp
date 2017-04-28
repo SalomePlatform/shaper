@@ -10,6 +10,8 @@
 #include <ModelAPI.h>
 #include <ModelAPI_Events.h>
 
+#include <GeomAPI_Pnt2d.h>
+
 ModelAPI_ObjectUpdatedMessage::ModelAPI_ObjectUpdatedMessage(const Events_ID theID,
                                                              const void* theSender)
     : Events_MessageGroup(theID, theSender)
@@ -328,3 +330,41 @@ const std::set<ObjectPtr>& ModelAPI_SolverFailedMessage::objects() const
   return myObjects;
 }
 
+
+// =====   ModelAPI_ObjectMovedMessage   =====
+ModelAPI_ObjectMovedMessage::ModelAPI_ObjectMovedMessage(const void* theSender)
+  : Events_Message(Events_Loop::eventByName(EVENT_OBJECT_MOVED), theSender)
+{
+}
+
+void ModelAPI_ObjectMovedMessage::setMovedObject(const ObjectPtr& theMovedObject)
+{
+  myMovedObject = theMovedObject;
+  myMovedAttribute = AttributePtr();
+}
+
+void ModelAPI_ObjectMovedMessage::setMovedAttribute(const AttributePtr& theMovedAttribute)
+{
+  myMovedAttribute = theMovedAttribute;
+  myMovedObject = ObjectPtr();
+}
+
+void ModelAPI_ObjectMovedMessage::setOriginalPosition(double theX, double theY)
+{
+  myOriginalPosition = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
+}
+
+void ModelAPI_ObjectMovedMessage::setOriginalPosition(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  myOriginalPosition = thePoint;
+}
+
+void ModelAPI_ObjectMovedMessage::setCurrentPosition(double theX, double theY)
+{
+  myCurrentPosition = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
+}
+
+void ModelAPI_ObjectMovedMessage::setCurrentPosition(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  myCurrentPosition = thePoint;
+}

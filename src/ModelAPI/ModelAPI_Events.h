@@ -22,6 +22,7 @@
 
 class ModelAPI_Document;
 class ModelAPI_ResultParameter;
+class GeomAPI_Pnt2d;
 
 /// Event ID that feature is created (comes with ModelAPI_ObjectUpdatedMessage)
 static const char * EVENT_OBJECT_CREATED = "ObjectCreated";
@@ -451,6 +452,48 @@ public:
 private:
   std::set<ObjectPtr> myObjects;
   int myDOF;
+};
+
+/// Message sent when feature or attrubute has been moved.
+/// Stores the moving object/attribute, original and new positions of mouse.
+class ModelAPI_ObjectMovedMessage : public Events_Message
+{
+  ObjectPtr myMovedObject;
+  AttributePtr myMovedAttribute;
+
+  std::shared_ptr<GeomAPI_Pnt2d> myOriginalPosition;
+  std::shared_ptr<GeomAPI_Pnt2d> myCurrentPosition;
+
+public:
+  MODELAPI_EXPORT ModelAPI_ObjectMovedMessage(const void* theSender = 0);
+
+  /// Set object which is being moved (if the message already contains attribute it will be cleared)
+  MODELAPI_EXPORT void setMovedObject(const ObjectPtr& theMovedObject);
+  /// Set attribute which is being moved (if the message already contains object it will be cleared)
+  MODELAPI_EXPORT void setMovedAttribute(const AttributePtr& theMovedAttribute);
+
+  /// Return moved object
+  ObjectPtr movedObject() const
+  { return myMovedObject; }
+  /// Return moved attribute
+  AttributePtr movedAttribute() const
+  { return myMovedAttribute; }
+
+  /// Set original mouse position
+  MODELAPI_EXPORT void setOriginalPosition(double theX, double theY);
+  /// Set original mouse position
+  MODELAPI_EXPORT void setOriginalPosition(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+  /// Return original mouse position
+  const std::shared_ptr<GeomAPI_Pnt2d>& originalPosition() const
+  { return myOriginalPosition; }
+
+  /// Set current mouse position
+  MODELAPI_EXPORT void setCurrentPosition(double theX, double theY);
+  /// Set current mouse position
+  MODELAPI_EXPORT void setCurrentPosition(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+  /// Return current mouse position
+  const std::shared_ptr<GeomAPI_Pnt2d>& currentPosition() const
+  { return myCurrentPosition; }
 };
 
 #endif

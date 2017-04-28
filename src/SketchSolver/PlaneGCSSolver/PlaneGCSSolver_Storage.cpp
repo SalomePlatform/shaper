@@ -51,7 +51,7 @@ void PlaneGCSSolver_Storage::addConstraint(
   constraintsToSolver(theSolverConstraint, mySketchSolver);
 }
 
-void PlaneGCSSolver_Storage::addTemporaryConstraint(
+void PlaneGCSSolver_Storage::addMovementConstraint(
     const ConstraintWrapperPtr& theSolverConstraint)
 {
   if (myConstraintMap.empty())

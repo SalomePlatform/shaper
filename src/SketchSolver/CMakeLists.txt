@@ -37,6 +37,7 @@ SET(SKETCHSOLVER_CONSTRAINT_HEADERS
     SketchSolver_ConstraintMulti.h
     SketchSolver_ConstraintMultiRotation.h
     SketchSolver_ConstraintMultiTranslation.h
+    SketchSolver_ConstraintMovement.h
 )
 
 SET(SKETCHSOLVER_SOURCES
@@ -60,6 +61,7 @@ SET(SKETCHSOLVER_CONSTRAINT_SOURCES
     SketchSolver_ConstraintMulti.cpp
     SketchSolver_ConstraintMultiRotation.cpp
     SketchSolver_ConstraintMultiTranslation.cpp
+    SketchSolver_ConstraintMovement.cpp
 )
 
 SET(SKETCHSOLVER_LIBRARIES

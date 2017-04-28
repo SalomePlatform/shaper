@@ -16,8 +16,6 @@
 
 // Verify the entities are equal
 static bool isEqual(const EntityWrapperPtr& theEntity1, const EntityWrapperPtr& theEntity2);
-// Convert entity to the list of parameters
-static GCS::VEC_pD toParameters(const EntityWrapperPtr& theEntity);
 
 
 SketchSolver_ConstraintFixed::SketchSolver_ConstraintFixed(ConstraintPtr theConstraint)
@@ -26,42 +24,65 @@ SketchSolver_ConstraintFixed::SketchSolver_ConstraintFixed(ConstraintPtr theCons
   myType = CONSTRAINT_FIXED;
 }
 
+#ifndef SUPPORT_NEW_MOVE
 SketchSolver_ConstraintFixed::SketchSolver_ConstraintFixed(FeaturePtr theFeature)
   : SketchSolver_Constraint(),
     myBaseFeature(theFeature)
 {
   myType = CONSTRAINT_FIXED;
 }
+#endif
 
 void SketchSolver_ConstraintFixed::blockEvents(bool isBlocked)
 {
+#ifndef SUPPORT_NEW_MOVE
   if (myBaseFeature)
     myBaseFeature->data()->blockSendAttributeUpdated(isBlocked);
   if (myBaseConstraint)
-    SketchSolver_Constraint::blockEvents(isBlocked);
+#endif
+  SketchSolver_Constraint::blockEvents(isBlocked);
 }
 
 void SketchSolver_ConstraintFixed::process()
 {
   cleanErrorMsg();
+#ifdef SUPPORT_NEW_MOVE
+  if (!myBaseConstraint || !myStorage) {
+#else
   if ((!myBaseConstraint && !myBaseFeature) || !myStorage) {
+#endif
     // Not enough parameters are assigned
     return;
   }
 
+#ifdef SUPPORT_NEW_MOVE
+  EntityWrapperPtr aBaseEntity = entityToFix();
+  if (!aBaseEntity)
+    myErrorMsg = SketchSolver_Error::ALREADY_FIXED();
+#else
   EntityWrapperPtr aBaseEntity;
   getAttributes(aBaseEntity, myFixedEntity);
   if (!aBaseEntity) {
     moveFeature(); // remove myFixed entity
     myErrorMsg = SketchSolver_Error::ALREADY_FIXED();
   }
+#endif
   if (!myErrorMsg.empty())
     return;
 
-  fixFeature(aBaseEntity);
+#ifdef SUPPORT_NEW_MOVE
+  ConstraintWrapperPtr aConstraint = fixFeature(aBaseEntity);
+  myStorage->addConstraint(myBaseConstraint, aConstraint);
+#else
+  myConstraint = fixFeature(aBaseEntity);
+  if (myBaseConstraint)
+    myStorage->addConstraint(myBaseConstraint, myConstraint);
+  else
+    myStorage->addMovementConstraint(myConstraint);
+#endif
 }
 
-void SketchSolver_ConstraintFixed::fixFeature(EntityWrapperPtr theFeature)
+ConstraintWrapperPtr SketchSolver_ConstraintFixed::fixFeature(EntityWrapperPtr theFeature)
 {
   GCS::VEC_pD aParameters = toParameters(theFeature);
 
@@ -75,15 +96,25 @@ void SketchSolver_ConstraintFixed::fixFeature(EntityWrapperPtr theFeature)
         GCSConstraintPtr(new GCS::ConstraintEqual(&myFixedValues[i], *anIt)));
   }
 
-  myConstraint = ConstraintWrapperPtr(
+  return ConstraintWrapperPtr(
       new PlaneGCSSolver_ConstraintWrapper(aConstraints, getType()));
-
-  if (myBaseConstraint)
-    myStorage->addConstraint(myBaseConstraint, myConstraint);
-  else
-    myStorage->addTemporaryConstraint(myConstraint);
 }
 
+#ifdef SUPPORT_NEW_MOVE
+EntityWrapperPtr SketchSolver_ConstraintFixed::entityToFix()
+{
+  // Constraint Fixed is added by user.
+  // Get the attribute of constraint (it should be alone in the list of constraints).
+  EntityWrapperPtr aValue;
+  std::vector<EntityWrapperPtr> anAttributes;
+  SketchSolver_Constraint::getAttributes(aValue, anAttributes);
+  std::vector<EntityWrapperPtr>::const_iterator anIt = anAttributes.begin();
+  for (; anIt != anAttributes.end(); ++anIt)
+    if (*anIt)
+      return *anIt;
+  return EntityWrapperPtr();
+}
+#else
 void SketchSolver_ConstraintFixed::getAttributes(EntityWrapperPtr& theBaseEntity,
                                                  EntityWrapperPtr& theFixedEntity)
 {
@@ -139,12 +170,9 @@ void SketchSolver_ConstraintFixed::moveFeature()
 
   myFixedEntity = EntityWrapperPtr();
 }
+#endif
 
-
-
-
-// ====================   Auxiliary functions   ===============================
-GCS::VEC_pD toParameters(const EntityWrapperPtr& theEntity)
+GCS::VEC_pD SketchSolver_ConstraintFixed::toParameters(const EntityWrapperPtr& theEntity)
 {
   GCS::VEC_pD aParameters;
   if (!theEntity)
@@ -175,16 +203,20 @@ GCS::VEC_pD toParameters(const EntityWrapperPtr& theEntity)
         std::dynamic_pointer_cast<GCS::Circle>(anEntity->entity());
     aParameters.push_back(aCircle->center.x);
     aParameters.push_back(aCircle->center.y);
+#ifndef SUPPORT_NEW_MOVE
     aParameters.push_back(aCircle->rad);
+#endif
     break;
     }
   case ENTITY_ARC: {
     std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEntity->entity());
     aParameters.push_back(anArc->center.x);
     aParameters.push_back(anArc->center.y);
+#ifndef SUPPORT_NEW_MOVE
     aParameters.push_back(anArc->rad);
     aParameters.push_back(anArc->startAngle);
     aParameters.push_back(anArc->endAngle);
+#endif
     break;
     }
   default:
@@ -194,10 +226,12 @@ GCS::VEC_pD toParameters(const EntityWrapperPtr& theEntity)
   return aParameters;
 }
 
+#ifndef SUPPORT_NEW_MOVE
+// ====================   Auxiliary functions   ===============================
 bool isEqual(const EntityWrapperPtr& theEntity1, const EntityWrapperPtr& theEntity2)
 {
-  GCS::VEC_pD aParamList1 = toParameters(theEntity1);
-  GCS::VEC_pD aParamList2 = toParameters(theEntity2);
+  GCS::VEC_pD aParamList1 = SketchSolver_ConstraintFixed::toParameters(theEntity1);
+  GCS::VEC_pD aParamList2 = SketchSolver_ConstraintFixed::toParameters(theEntity2);
 
   GCS::VEC_pD::const_iterator anIt1 = aParamList1.begin();
   GCS::VEC_pD::const_iterator anIt2 = aParamList2.begin();
@@ -207,3 +241,4 @@ bool isEqual(const EntityWrapperPtr& theEntity1, const EntityWrapperPtr& theEnti
 
   return anIt1 == aParamList1.end() && anIt2 == aParamList2.end();
 }
+#endif
