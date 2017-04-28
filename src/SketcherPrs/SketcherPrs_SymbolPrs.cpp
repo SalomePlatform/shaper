@@ -115,6 +115,23 @@ SketcherPrs_SymbolPrs::~SketcherPrs_SymbolPrs()
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   // Empty memory in position manager
   aMgr->deleteConstraint(this);
+
+  Handle(Prs3d_Presentation) aSelPrs =
+    GetSelectPresentation(Handle(PrsMgr_PresentationManager3d)());
+  if (!aSelPrs.IsNull()) {
+      if (!aSelPrs->Groups().IsEmpty()) {
+        aSelPrs->Clear();
+      }
+      aSelPrs->Erase();
+  }
+  Handle(Prs3d_Presentation) aHilightPrs =
+    GetHilightPresentation(Handle(PrsMgr_PresentationManager3d)());
+  if (!aHilightPrs.IsNull()) {
+    if (!aHilightPrs->Groups().IsEmpty()) {
+      aHilightPrs->Clear();
+    }
+    aHilightPrs->Erase();
+  }
 }
 
 #ifdef _WINDOWS
@@ -313,6 +330,8 @@ void SketcherPrs_SymbolPrs::drawShape(const std::shared_ptr<GeomAPI_Shape>& theS
                                       const Handle(Prs3d_Presentation)& thePrs,
                                       Quantity_Color theColor) const
 {
+  int aColNam = theColor.Name();
+  cout<<"### SketcherPrs_SymbolPrs::drawShape "<<theColor.Name()<<endl;
   Handle(Graphic3d_AspectLine3d) aLineAspect =
     new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
 
