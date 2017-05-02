@@ -399,6 +399,7 @@ void ModuleBase_ModelWidget::updateObject(ObjectPtr theObject)
   }
 }
 
+#ifndef SUPPORT_NEW_MOVE
 void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
 {
   //blockUpdateViewer(true);
@@ -412,6 +413,7 @@ void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
 
   //blockUpdateViewer(false);
 }
+#endif
 
 bool ModuleBase_ModelWidget::processEnter()
 {

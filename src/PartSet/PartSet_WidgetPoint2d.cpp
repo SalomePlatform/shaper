@@ -347,7 +347,11 @@ bool PartSet_WidgetPoint2D::storeValueCustom()
   aPoint->setValue(myXSpin->value(), myYSpin->value());
 
   // after movement the solver will call the update event: optimization
+#ifndef SUPPORT_NEW_MOVE
   moveObject(myFeature);
+#else
+  updateObject(myFeature);
+#endif
   aPoint->setImmutable(isImmutable);
   that->blockSignals(isBlocked);
 

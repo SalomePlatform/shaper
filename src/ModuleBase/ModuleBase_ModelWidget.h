@@ -235,10 +235,12 @@ Q_OBJECT
   /// \param theObj is updating object
   void updateObject(ObjectPtr theObj);
 
+#ifndef SUPPORT_NEW_MOVE
   /// Sends Move event for the given object
   /// \param theObj is object for moving
   static void moveObject(ObjectPtr theObj);
 
+#endif
   /// Translate passed string with widget context()
   virtual QString translate(const std::string& theStr) const;
 
