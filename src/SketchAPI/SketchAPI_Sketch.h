@@ -321,6 +321,20 @@ public:
       const ModelHighAPI_RefAttr & thePointOrLine,
       const ModelHighAPI_Double & theValue);
 
+  /// Set horizontal distance
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelHighAPI_Interface> setHorizontalDistance(
+      const ModelHighAPI_RefAttr & thePoint1,
+      const ModelHighAPI_RefAttr & thePoint2,
+      const ModelHighAPI_Double & theValue);
+
+  /// Set vertical distance
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelHighAPI_Interface> setVerticalDistance(
+      const ModelHighAPI_RefAttr & thePoint1,
+      const ModelHighAPI_RefAttr & thePoint2,
+      const ModelHighAPI_Double & theValue);
+
   /// Set equal
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelHighAPI_Interface> setEqual(

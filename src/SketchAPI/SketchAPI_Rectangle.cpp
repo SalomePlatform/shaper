@@ -67,3 +67,12 @@ void SketchAPI_Rectangle::setByPoints(
 
 //--------------------------------------------------------------------------------------
 
+std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Rectangle::lines() const
+{
+  std::list<FeaturePtr> aFeatures;
+  std::list<ObjectPtr> aList = linesList()->list();
+  std::list<ObjectPtr>::const_iterator anIt = aList.begin();
+  for (; anIt != aList.end(); ++anIt)
+    aFeatures.push_back(ModelAPI_Feature::feature(*anIt));
+  return SketchAPI_SketchEntity::wrap(aFeatures);
+}

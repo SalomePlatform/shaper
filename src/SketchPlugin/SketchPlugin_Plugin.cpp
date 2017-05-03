@@ -12,6 +12,8 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintDistanceHorizontal.h>
+#include <SketchPlugin_ConstraintDistanceVertical.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_Fillet.h>
 #include <SketchPlugin_ConstraintSplit.h>
@@ -172,6 +174,10 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintCollinear);
   } else if (theFeatureID == SketchPlugin_ConstraintDistance::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintDistance);
+  } else if (theFeatureID == SketchPlugin_ConstraintDistanceHorizontal::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintDistanceHorizontal);
+  } else if (theFeatureID == SketchPlugin_ConstraintDistanceVertical::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintDistanceVertical);
   } else if (theFeatureID == SketchPlugin_ConstraintLength::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintLength);
   } else if (theFeatureID == SketchPlugin_ConstraintParallel::ID()) {
@@ -256,6 +262,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Line::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Circle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Arc::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_Ellipse::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Projection::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintCoincidence::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintCollinear::ID(), aHasSketchPlane);
@@ -279,6 +286,8 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Trim::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroArc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroCircle::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintDistanceHorizontal::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintDistanceVertical::ID(), aHasSketchPlane);
       // SketchRectangle is a python feature, so its ID is passed just as a string
       aMsg->setState("SketchRectangle", aHasSketchPlane);
     }

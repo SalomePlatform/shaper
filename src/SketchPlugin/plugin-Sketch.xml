@@ -10,7 +10,7 @@
                 SketchEllipse SketchMacroEllipse
                 SketchRectangle
                 SketchProjection
-                SketchConstraintLength SketchConstraintRadius SketchConstraintDistance
+                SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintDistanceHorizontal SketchConstraintDistanceVertical
                 SketchConstraintParallel SketchConstraintPerpendicular
                 SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical
                 SketchConstraintEqual SketchConstraintTangent
@@ -636,7 +636,71 @@
         <validator id="PartSet_DistanceSelection"/>
       </feature>
 
-    <!--  SketchConstraintLength  -->
+      <!--  SketchConstraintDistanceHorizontal  -->
+      <feature
+        id="SketchConstraintDistanceHorizontal"
+        title="Horizontal Distance"
+        tooltip="Set horizontal distance between two points"
+        icon="icons/Sketch/distance_h.png">
+        <label title="Select points for distance definition."/>
+        <sketch_shape_selector
+              id="ConstraintEntityA"
+              label="First point"
+              tooltip="Select point."
+              shape_types="vertex">
+          <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
+          <validator id="PartSet_DifferentObjects"/>
+          <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        </sketch_shape_selector>
+        <sketch_shape_selector
+          id="ConstraintEntityB"
+          label="Second point"
+          tooltip="Select point."
+          shape_types="vertex">
+          <validator id="PartSet_DifferentObjects"/>
+          <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
+          <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        </sketch_shape_selector>
+        <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
+
+        <doublevalue_editor label="Value" tooltip="Distance" id="ConstraintValue" default="computed"/>
+
+        <validator id="PartSet_DistanceSelection"/>
+      </feature>
+
+      <!--  SketchConstraintDistanceVertical  -->
+      <feature
+        id="SketchConstraintDistanceVertical"
+        title="Vertical Distance"
+        tooltip="Set vertical distance between two points"
+        icon="icons/Sketch/distance_v.png">
+        <label title="Select points for distance definition."/>
+        <sketch_shape_selector
+              id="ConstraintEntityA"
+              label="First point"
+              tooltip="Select point."
+              shape_types="vertex">
+          <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
+          <validator id="PartSet_DifferentObjects"/>
+          <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        </sketch_shape_selector>
+        <sketch_shape_selector
+          id="ConstraintEntityB"
+          label="Second point"
+          tooltip="Select point."
+          shape_types="vertex">
+          <validator id="PartSet_DifferentObjects"/>
+          <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
+          <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        </sketch_shape_selector>
+        <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
+
+        <doublevalue_editor label="Value" tooltip="Distance" id="ConstraintValue" default="computed"/>
+
+        <validator id="PartSet_DistanceSelection"/>
+      </feature>
+
+      <!--  SketchConstraintLength  -->
       <feature id="SketchConstraintLength" title="Length" tooltip="Set fixed length of a line segment" icon="icons/Sketch/length.png">
         <label title="Select a line on which to calculate length" tooltip="Select a line on which to calculate length"/>
         <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select a line" shape_types="edge" >

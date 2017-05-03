@@ -1,46 +1,36 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
-// File:    SketchPlugin_ConstraintDistance.h
-// Created: 23 May 2014
+// File:    SketchPlugin_ConstraintDistanceVertical.h
+// Created: 10 May 2017
 // Author:  Artem ZHIDKOV
 
-#ifndef SketchPlugin_ConstraintDistance_H_
-#define SketchPlugin_ConstraintDistance_H_
+#ifndef SketchPlugin_ConstraintDistanceVertical_H_
+#define SketchPlugin_ConstraintDistanceVertical_H_
 
-#include "SketchPlugin.h"
-#include "SketchPlugin_ConstraintBase.h"
-#include "SketchPlugin_Sketch.h"
-#include "ModelAPI_Data.h"
+#include <SketchPlugin.h>
+#include <SketchPlugin_ConstraintDistance.h>
 
-#include <GeomAPI_ICustomPrs.h>
-
-#include <list>
-
-class SketchPlugin_Line;
-class GeomDataAPI_Point2D;
-
-/** \class SketchPlugin_ConstraintDistance
+/** \class SketchPlugin_ConstraintDistanceVertical
  *  \ingroup Plugins
- *  \brief Feature for creation of a new constraint which defines a distance
- *         between a point and another feature (point, line, plane or face)
+ *  \brief Feature for creation of a new constraint which defines a vertical distance between two points.
  *
  *  This constraint has three attributes:
  *  SketchPlugin_Constraint::VALUE(), SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
-class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
+class SketchPlugin_ConstraintDistanceVertical : public SketchPlugin_ConstraintDistance
 {
- public:
+public:
   /// Distance constraint kind
   inline static const std::string& ID()
   {
-    static const std::string MY_CONSTRAINT_DISTANCE_ID("SketchConstraintDistance");
+    static const std::string MY_CONSTRAINT_DISTANCE_ID("SketchConstraintDistanceVertical");
     return MY_CONSTRAINT_DISTANCE_ID;
   }
 
   /// \brief Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {
-    static std::string MY_KIND = SketchPlugin_ConstraintDistance::ID();
+    static std::string MY_KIND = SketchPlugin_ConstraintDistanceVertical::ID();
     return MY_KIND;
   }
 
@@ -49,10 +39,6 @@ class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
 
   /// \brief Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
-
-  /// Retuns the parameters of color definition in the resources config manager
-  SKETCHPLUGIN_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,
-                                                   std::string& theDefault);
 
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
@@ -67,14 +53,11 @@ class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
   /// \brief Use plugin manager for features creation
-  SketchPlugin_ConstraintDistance();
+  SketchPlugin_ConstraintDistanceVertical();
 
 protected:
   /// Returns the current distance between the feature attributes
   virtual double calculateCurrentDistance();
-
-  /// Check the attributes related to distanced points/features are initialized
-  bool areAttributesInitialized();
 
 private:
   bool myFlyoutUpdate; ///< to avoid cyclic dependencies on automatic updates of flyout point

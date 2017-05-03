@@ -13,6 +13,8 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintDistanceHorizontal.h>
+#include <SketchPlugin_ConstraintDistanceVertical.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_Fillet.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
@@ -611,6 +613,34 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setDistance(
       compositeFeature()->addFeature(SketchPlugin_ConstraintDistance::ID());
   fillAttribute(thePoint, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(thePointOrLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+  fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  aFeature->execute();
+  return InterfacePtr(new ModelHighAPI_Interface(aFeature));
+}
+
+std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setHorizontalDistance(
+    const ModelHighAPI_RefAttr & thePoint1,
+    const ModelHighAPI_RefAttr & thePoint2,
+    const ModelHighAPI_Double & theValue)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintDistanceHorizontal::ID());
+  fillAttribute(thePoint1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(thePoint2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+  fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  aFeature->execute();
+  return InterfacePtr(new ModelHighAPI_Interface(aFeature));
+}
+
+std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setVerticalDistance(
+    const ModelHighAPI_RefAttr & thePoint1,
+    const ModelHighAPI_RefAttr & thePoint2,
+    const ModelHighAPI_Double & theValue)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintDistanceVertical::ID());
+  fillAttribute(thePoint1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(thePoint2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
   aFeature->execute();
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));

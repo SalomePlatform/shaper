@@ -13,6 +13,8 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintCoincidence.h
     SketchPlugin_ConstraintCollinear.h
     SketchPlugin_ConstraintDistance.h
+    SketchPlugin_ConstraintDistanceHorizontal.h
+    SketchPlugin_ConstraintDistanceVertical.h
     SketchPlugin_ConstraintEqual.h
     SketchPlugin_ConstraintHorizontal.h
     SketchPlugin_ConstraintLength.h
@@ -56,6 +58,8 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintCoincidence.cpp
     SketchPlugin_ConstraintCollinear.cpp
     SketchPlugin_ConstraintDistance.cpp
+    SketchPlugin_ConstraintDistanceHorizontal.cpp
+    SketchPlugin_ConstraintDistanceVertical.cpp
     SketchPlugin_ConstraintEqual.cpp
     SketchPlugin_ConstraintHorizontal.cpp
     SketchPlugin_ConstraintLength.cpp
@@ -141,6 +145,9 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestConstraintCollinear.py
                TestConstraintLength.py
                TestConstraintDistance.py
+               TestConstraintDistanceHorizontal.py
+               TestConstraintDistanceVertical.py
+               TestConstraintDistanceBehavior.py
                TestConstraintParallel.py
                TestConstraintPerpendicular.py
                TestConstraintRadius.py
