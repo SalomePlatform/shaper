@@ -99,7 +99,7 @@ void SketchSolver_ConstraintCoincidence::notify(const FeaturePtr&      theFeatur
 {
   PlaneGCSSolver_UpdateCoincidence* anUpdater =
       static_cast<PlaneGCSSolver_UpdateCoincidence*>(theUpdater);
-  bool isAccepted = anUpdater->checkCoincidence(myAttributes.front(), myAttributes.back());
+  bool isAccepted = anUpdater->addCoincidence(myAttributes.front(), myAttributes.back());
 
   // additionally check the point is coincident to extremity of coincident feature
   if (myFeatureExtremities[0] && myFeatureExtremities[1]) {

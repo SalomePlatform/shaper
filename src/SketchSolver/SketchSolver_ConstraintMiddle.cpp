@@ -16,7 +16,7 @@ void SketchSolver_ConstraintMiddle::notify(const FeaturePtr&      theFeature,
 {
   PlaneGCSSolver_UpdateCoincidence* anUpdater =
       static_cast<PlaneGCSSolver_UpdateCoincidence*>(theUpdater);
-  bool isAccepted = anUpdater->checkCoincidence(myAttributes.front(), myAttributes.back());
+  bool isAccepted = anUpdater->addCoincidence(myAttributes.front(), myAttributes.back());
   if (isAccepted) {
     if (!myInSolver) {
       myInSolver = true;

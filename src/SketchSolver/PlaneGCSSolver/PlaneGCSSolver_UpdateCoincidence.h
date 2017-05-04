@@ -43,9 +43,9 @@ public:
   /// \brief Send notification about update of the feature to all interested
   virtual void update(const FeaturePtr& theFeature);
 
-  /// \brief Verifies the entities are not coincident yet
-  /// \return \c true if the entities does not coincident
-  bool checkCoincidence(const EntityWrapperPtr& theEntity1, const EntityWrapperPtr& theEntity2);
+  /// \brief Set coincidence between two given entities
+  /// \return \c true if the entities does not coincident yet
+  bool addCoincidence(const EntityWrapperPtr& theEntity1, const EntityWrapperPtr& theEntity2);
 
   /// \brief Verifies the point is coincident to the feature
   /// \return \c true if the point is on the feature
@@ -63,21 +63,31 @@ private:
     bool isExist(const EntityWrapperPtr& theEntity) const;
     /// Verify the point is already in the list
     bool isExist(const GCS::Point& thePoint) const;
-    /// Check the coincidence is not in list yet
-    bool isNewCoincidence(const EntityWrapperPtr& theEntityExist,
-                          const EntityWrapperPtr& theOtherEntity);
-    bool isNewCoincidence(const EntityWrapperPtr& theEntityExist,
-                          const CoincidentEntities& theOtherGroup,
-                          const EntityWrapperPtr& theEntityInOtherGroup);
+
+    /// Add entity to group
+    bool add(const EntityWrapperPtr& theEntity);
+
+    /// Remove entity from group
+    void remove(const EntityWrapperPtr& theEntity);
+
+    /// Merge two groups
+    void merge(const CoincidentEntities& theOther);
 
   private:
-    bool hasExternal() const;
-
-  private:
-    /// external entity and set of entities connected to it
-    std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> > myExternalAndConnected;
+    std::set<EntityWrapperPtr> myPoints; ///< coincident points
+    std::set<EntityWrapperPtr> myExternalPoints; //< external points coincident to other points
+    std::set<EntityWrapperPtr> myFeatures; ///< other entities containing points
   };
 
+  /// \brief Search the group of coincidences containing given entity.
+  ///        Searches points only.
+  std::list<CoincidentEntities>::iterator findGroupOfCoincidence(const EntityWrapperPtr& theEntity);
+
+  /// \brief Add entity to group of coincidences
+  /// \reutrn \c true if the entity is added, thus the coincidence is new
+  bool addToGroupOfCoincidence(CoincidentEntities& theGroup, const EntityWrapperPtr& theEntity);
+
+private:
   std::list<CoincidentEntities> myCoincident; ///< list of coincidences
 };
 
