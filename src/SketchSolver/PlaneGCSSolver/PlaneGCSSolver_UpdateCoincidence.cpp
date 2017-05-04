@@ -157,7 +157,8 @@ static bool hasSamePoint(const std::set<EntityWrapperPtr>& theList, const GCS::P
   return false;
 }
 
-static bool hasSamePoint(const std::set<EntityWrapperPtr>& theList, const EntityWrapperPtr& thePoint)
+static bool hasSamePoint(const std::set<EntityWrapperPtr>& theList,
+                         const EntityWrapperPtr& thePoint)
 {
   return hasSamePoint(theList, toPoint(thePoint));
 }
