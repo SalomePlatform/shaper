@@ -106,9 +106,10 @@ void SketchPlugin_Arc::execute()
   }
 
   GeomShapePtr anArcShape;
-  if (fabs(myParamBefore - 2.0 * PI) < paramTolerance)
+  if (fabs(myParamBefore - 2.0 * PI) < paramTolerance) {
     anArcShape = GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, aStart->distance(aCenter));
-  else {
+    myParamBefore = 0;
+  } else {
     anArcShape = boolean(REVERSED_ID())->value() ?
       GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, anEnd, aStart, aNormal)
     : GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStart, anEnd, aNormal);
