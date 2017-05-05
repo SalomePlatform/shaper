@@ -344,14 +344,23 @@ bool PartSet_WidgetPoint2D::storeValueCustom()
   //                myYSpin->hasVariable() ? myYSpin->text().toStdString() : "");
   //aPoint->setValue(!myXSpin->hasVariable() ? myXSpin->value() : aPoint->x(),
   //                 !myYSpin->hasVariable() ? myYSpin->value() : aPoint->y());
-  aPoint->setValue(myXSpin->value(), myYSpin->value());
 
-  // after movement the solver will call the update event: optimization
-#ifndef SUPPORT_NEW_MOVE
-  moveObject(myFeature);
-#else
-  updateObject(myFeature);
-#endif
+  if (myFeature->isMacro()) {
+    // Moving points of macro-features has been processed directly (without solver)
+    aPoint->setValue(myXSpin->value(), myYSpin->value());
+    moveObject(myFeature);
+  } else {
+    if (!aPoint->isInitialized())
+      aPoint->setValue(0., 0.);
+
+    std::shared_ptr<ModelAPI_ObjectMovedMessage> aMessage(
+        new ModelAPI_ObjectMovedMessage(this));
+    aMessage->setMovedAttribute(aPoint);
+    aMessage->setOriginalPosition(aPoint->pnt());
+    aMessage->setCurrentPosition(myXSpin->value(), myYSpin->value());
+    Events_Loop::loop()->send(aMessage);
+  }
+
   aPoint->setImmutable(isImmutable);
   that->blockSignals(isBlocked);
 

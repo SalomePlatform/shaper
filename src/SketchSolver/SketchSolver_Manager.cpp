@@ -91,27 +91,13 @@ void SketchSolver_Manager::processEvent(
     return;
   myIsComputed = true;
 
-#ifdef SUPPORT_NEW_MOVE
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)
       || theMessage->eventID() == anUpdateEvent) {
-#else
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)
-      || theMessage->eventID() == anUpdateEvent
-      || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
-#endif
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     std::set<ObjectPtr> aFeatures = anUpdateMsg->objects();
 
     isUpdateFlushed = stopSendUpdate();
-
-#ifndef SUPPORT_NEW_MOVE
-    isMovedEvt = theMessage->eventID()
-          == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED);
-
-    // Shows that the message has at least one feature applicable for solver
-    bool hasProperFeature = false;
-#endif
 
     // update sketch features only
     std::set<ObjectPtr>::iterator aFeatIter;
@@ -121,18 +107,9 @@ void SketchSolver_Manager::processEvent(
       if (!aFeature || aFeature->isMacro())
         continue;
 
-#ifdef SUPPORT_NEW_MOVE
       updateFeature(aFeature);
-#else
-      hasProperFeature = updateFeature(aFeature, isMovedEvt) || hasProperFeature;
-#endif
     }
 
-#ifndef SUPPORT_NEW_MOVE
-    if (isMovedEvt && hasProperFeature)
-      needToResolve = true;
-
-#else
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
     std::shared_ptr<ModelAPI_ObjectMovedMessage> aMoveMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectMovedMessage>(theMessage);
@@ -153,7 +130,6 @@ void SketchSolver_Manager::processEvent(
     } else if (aMovedPoint)
       needToResolve = moveAttribute(aMovedPoint, aFrom, aTo);
 
-#endif
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
     std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleteMsg =
       std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
@@ -202,12 +178,7 @@ void SketchSolver_Manager::processEvent(
 //  Function: updateFeature
 //  Purpose:  create/update constraint or feature in appropriate group
 // ============================================================================
-#ifdef SUPPORT_NEW_MOVE
 bool SketchSolver_Manager::updateFeature(const std::shared_ptr<SketchPlugin_Feature>& theFeature)
-#else
-bool SketchSolver_Manager::updateFeature(std::shared_ptr<SketchPlugin_Feature> theFeature,
-                                         bool theMoved)
-#endif
 {
   // Check feature validity and find a group to place it.
   // If the feature is not valid, the returned group will be empty.
@@ -223,16 +194,11 @@ bool SketchSolver_Manager::updateFeature(std::shared_ptr<SketchPlugin_Feature> t
   bool isOk = false;
   if (aConstraint)
     isOk = aGroup->changeConstraint(aConstraint);
-#ifndef SUPPORT_NEW_MOVE
-  else if (theMoved)
-    isOk = aGroup->moveFeature(theFeature);
-#endif
   else
     isOk = aGroup->updateFeature(theFeature);
   return isOk;
 }
 
-#ifdef SUPPORT_NEW_MOVE
 // ============================================================================
 //  Function: moveFeature
 //  Purpose:  move given feature in appropriate group
@@ -265,13 +231,14 @@ bool SketchSolver_Manager::moveAttribute(
   SketchGroupPtr aGroup;
   if (aSketchFeature)
     aGroup = findGroup(aSketchFeature);
-  if (!aGroup)
+  if (!aGroup) {
+    theMovedAttribute->setValue(theTo);
     return false;
+  }
 
   aGroup->blockEvents(true);
   return aGroup->movePoint(theMovedAttribute, theFrom, theTo);
 }
-#endif
 
 // ============================================================================
 //  Function: findGroup

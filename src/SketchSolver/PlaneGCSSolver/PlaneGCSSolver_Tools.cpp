@@ -123,7 +123,6 @@ SolverConstraintPtr PlaneGCSSolver_Tools::createConstraint(ConstraintPtr theCons
   return SolverConstraintPtr(new SketchSolver_Constraint(theConstraint));
 }
 
-#ifdef SUPPORT_NEW_MOVE
 std::shared_ptr<SketchSolver_ConstraintMovement> PlaneGCSSolver_Tools::createMovementConstraint(
     FeaturePtr theMovedFeature)
 {
@@ -137,14 +136,6 @@ std::shared_ptr<SketchSolver_ConstraintMovement> PlaneGCSSolver_Tools::createMov
   return std::shared_ptr<SketchSolver_ConstraintMovement>(
       new SketchSolver_ConstraintMovement(theMovedAttribute));
 }
-#else
-std::shared_ptr<SketchSolver_ConstraintFixed> PlaneGCSSolver_Tools::createMovementConstraint(
-    FeaturePtr theMovedFeature)
-{
-  return std::shared_ptr<SketchSolver_ConstraintFixed>(
-      new SketchSolver_ConstraintFixed(theMovedFeature));
-}
-#endif
 
 
 

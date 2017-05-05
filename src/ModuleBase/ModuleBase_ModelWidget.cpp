@@ -399,7 +399,6 @@ void ModuleBase_ModelWidget::updateObject(ObjectPtr theObject)
   }
 }
 
-#ifndef SUPPORT_NEW_MOVE
 void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
 {
   //blockUpdateViewer(true);
@@ -407,13 +406,12 @@ void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
   qDebug("ModuleBase_ModelWidget::moveObject");
 #endif
 
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
   ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);
   Events_Loop::loop()->flush(anEvent);
 
   //blockUpdateViewer(false);
 }
-#endif
 
 bool ModuleBase_ModelWidget::processEnter()
 {

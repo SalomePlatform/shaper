@@ -115,7 +115,6 @@ bool SketchSolver_Group::updateFeature(FeaturePtr theFeature)
   return myStorage->update(theFeature);
 }
 
-#ifdef SUPPORT_NEW_MOVE
 template <class Type>
 static SolverConstraintPtr move(StoragePtr theStorage,
                                 SolverPtr theSketchSolver,
@@ -170,35 +169,6 @@ bool SketchSolver_Group::movePoint(AttributePtr theAttribute,
   setTemporary(aConstraint);
   return true;
 }
-#else
-bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
-{
-  bool isFeatureExists = (myStorage->entity(theFeature).get() != 0);
-  if (myDOF == 0 && isFeatureExists) {
-    // avoid moving elements of fully constrained sketch
-    myStorage->refresh();
-    return true;
-  }
-
-  // Create temporary Fixed constraint
-  std::shared_ptr<SketchSolver_ConstraintFixed> aConstraint =
-      PlaneGCSSolver_Tools::createMovementConstraint(theFeature);
-  if (!aConstraint)
-    return false;
-  SolverConstraintPtr(aConstraint)->process(myStorage, myIsEventsBlocked);
-  if (aConstraint->error().empty()) {
-    setTemporary(aConstraint);
-    if (!myStorage->isEmpty())
-      myStorage->setNeedToResolve(true);
-
-    mySketchSolver->initialize();
-    aConstraint->moveFeature();
-  } else
-    myStorage->notify(theFeature);
-
-  return true;
-}
-#endif
 
 // ============================================================================
 //  Function: resolveConstraints

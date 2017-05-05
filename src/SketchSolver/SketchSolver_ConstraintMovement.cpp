@@ -49,8 +49,8 @@ void SketchSolver_ConstraintMovement::process()
     return;
   }
 
-  ConstraintWrapperPtr aConstraint = fixFeature(aMovedEntity);
-  myStorage->addMovementConstraint(aConstraint);
+  mySolverConstraint = fixFeature(aMovedEntity);
+  myStorage->addMovementConstraint(mySolverConstraint);
 }
 
 
@@ -64,14 +64,20 @@ EntityWrapperPtr SketchSolver_ConstraintMovement::entityToFix()
     return EntityWrapperPtr();
   }
 
-  return myStorage->entity(myMovedFeature);
+  EntityWrapperPtr anEntity =
+      myDraggedPoint ? myStorage->entity(myDraggedPoint) : myStorage->entity(myMovedFeature);
+  if (!anEntity) {
+    myStorage->update(myMovedFeature, true);
+    anEntity = myStorage->entity(myMovedFeature);
+  }
+  return anEntity;
 }
 
 void SketchSolver_ConstraintMovement::moveTo(
     const std::shared_ptr<GeomAPI_Pnt2d>& theDestinationPoint)
 {
-#ifdef SUPPORT_NEW_MOVE
-  EntityWrapperPtr aMovedEntity = myStorage->entity(myMovedFeature);
+  EntityWrapperPtr aMovedEntity =
+      myDraggedPoint ? myStorage->entity(myDraggedPoint) : myStorage->entity(myMovedFeature);
   if (!aMovedEntity)
     return;
 
@@ -82,5 +88,10 @@ void SketchSolver_ConstraintMovement::moveTo(
   for (int i = 0; i < aFixedParams.size() && i < myFixedValues.size(); ++i)
     myFixedValues[i] = *(aFixedParams[i]) + aDelta[i % 2];
 
-#endif
+  // no persistent constraints in the storage, thus store values directly to the feature
+  if (myStorage->isEmpty()) {
+    for (int i = 0; i < aFixedParams.size() && i < myFixedValues.size(); ++i)
+      *(aFixedParams[i]) = myFixedValues[i];
+    myStorage->setNeedToResolve(true);
+  }
 }

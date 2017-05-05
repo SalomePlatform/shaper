@@ -523,15 +523,12 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
     Point aMousePnt;
     get2dPoint(theWnd, theEvent, aMousePnt);
-#ifndef SUPPORT_NEW_MOVE
-    double dX =  aMousePnt.myCurX - myCurrentPoint.myCurX;
-    double dY =  aMousePnt.myCurY - myCurrentPoint.myCurY;
-#else
+
     std::shared_ptr<GeomAPI_Pnt2d> anOriginalPosition = std::shared_ptr<GeomAPI_Pnt2d>(
                             new GeomAPI_Pnt2d(myCurrentPoint.myCurX, myCurrentPoint.myCurY));
     std::shared_ptr<GeomAPI_Pnt2d> aCurrentPosition = std::shared_ptr<GeomAPI_Pnt2d>(
                             new GeomAPI_Pnt2d(aMousePnt.myCurX, aMousePnt.myCurY));
-#endif
+
     ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
     XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
@@ -565,17 +562,14 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
               std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(aAttrId));
             if (aPoint.get() != NULL) {
               bool isImmutable = aPoint->setImmutable(true);
-#ifndef SUPPORT_NEW_MOVE
-              aPoint->move(dX, dY);
-              ModelAPI_EventCreator::get()->sendUpdated(aFeature, aMoveEvent);
-#else
+
               std::shared_ptr<ModelAPI_ObjectMovedMessage> aMessage = std::shared_ptr
                        <ModelAPI_ObjectMovedMessage>(new ModelAPI_ObjectMovedMessage(this));
               aMessage->setMovedAttribute(aPoint);
               aMessage->setOriginalPosition(anOriginalPosition);
               aMessage->setCurrentPosition(aCurrentPosition);
               Events_Loop::loop()->send(aMessage);
-#endif
+
               isModified = true;
               aPoint->setImmutable(isImmutable);
             }
@@ -586,17 +580,12 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
         std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature) {
-#ifndef SUPPORT_NEW_MOVE
-          aSketchFeature->move(dX, dY);
-          ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, aMoveEvent);
-#else
           std::shared_ptr<ModelAPI_ObjectMovedMessage> aMessage = std::shared_ptr
                     <ModelAPI_ObjectMovedMessage>(new ModelAPI_ObjectMovedMessage(this));
           aMessage->setMovedObject(aFeature);
           aMessage->setOriginalPosition(anOriginalPosition);
           aMessage->setCurrentPosition(aCurrentPosition);
           Events_Loop::loop()->send(aMessage);
-#endif
           isModified = true;
         }
       }

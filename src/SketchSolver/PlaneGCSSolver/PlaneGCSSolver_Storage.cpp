@@ -389,6 +389,9 @@ void PlaneGCSSolver_Storage::refresh() const
 
   std::map<AttributePtr, EntityWrapperPtr>::const_iterator anIt = myAttributeMap.begin();
   for (; anIt != myAttributeMap.end(); ++anIt) {
+    if (!anIt->first->isInitialized())
+      continue;
+
     // the external feature always should keep the up to date values, so,
     // refresh from the solver is never needed
     if (isExternalAttribute(anIt->first))

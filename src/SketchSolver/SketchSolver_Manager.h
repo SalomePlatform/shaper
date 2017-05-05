@@ -48,7 +48,6 @@ protected:
   SketchSolver_Manager();
   ~SketchSolver_Manager();
 
-#ifdef SUPPORT_NEW_MOVE
   /** \brief Adds or updates a constraint or an entity in the suitable group
    *  \param[in] theFeature sketch feature to be changed
    *  \return \c true if the feature changed successfully
@@ -74,14 +73,6 @@ protected:
   bool moveAttribute(const std::shared_ptr<GeomDataAPI_Point2D>& theMovedAttribute,
                      const std::shared_ptr<GeomAPI_Pnt2d>& theFromPoint,
                      const std::shared_ptr<GeomAPI_Pnt2d>& theToPoint);
-#else
-  /** \brief Adds or updates a constraint or an entity in the suitable group
-   *  \param[in] theFeature sketch feature to be changed
-   *  \param[in] theMoved   \c true if the feature has been moved in the viewer
-   *  \return \c true if the feature changed successfully
-   */
-  bool updateFeature(std::shared_ptr<SketchPlugin_Feature> theFeature, bool theMoved = false);
-#endif
 
   /** \brief Removes a constraint from the manager
    *  \param[in] theConstraint constraint to be removed

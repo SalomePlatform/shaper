@@ -59,7 +59,6 @@ class SketchSolver_Group
    */
   bool updateFeature(FeaturePtr theFeature);
 
-#ifdef SUPPORT_NEW_MOVE
   /** \brief Updates the data corresponding the specified feature moved in GUI.
    *         Special kind of Fixed constraints is created.
    *  \param[in] theFeature the feature to be updated
@@ -80,14 +79,6 @@ class SketchSolver_Group
   bool movePoint(AttributePtr thePoint,
                  const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
                  const std::shared_ptr<GeomAPI_Pnt2d>& theTo);
-#else
-  /** \brief Updates the data corresponding the specified feature moved in GUI.
-   *         Additional Fixed constraints are created.
-   *  \param[in] theFeature the feature to be updated
-   *  \return \c true, if the feature is moved
-   */
-  bool moveFeature(FeaturePtr theFeature);
-#endif
 
   /// Returns the current workplane
   inline const CompositeFeaturePtr& getWorkplane() const
