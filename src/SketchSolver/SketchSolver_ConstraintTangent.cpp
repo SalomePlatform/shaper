@@ -185,8 +185,10 @@ void SketchSolver_ConstraintTangent::notify(const FeaturePtr&      theFeature,
       if (aNbCoincidentFeatures == 2)
         isRebuild = true;
     }
-  } else if (mySharedPoint) {
-    // The features are tangent in the shared point, but the coincidence has been removed.
+  }
+
+  if (mySharedPoint && !isRebuild) {
+    // The features are tangent in the shared point, but the coincidence has been removed/updated.
     // Check if the coincidence is the same.
     std::list<AttributePtr> aCoincidentPoints = coincidentBoundaryPoints(aTgFeat1, aTgFeat2);
     isRebuild = true;
