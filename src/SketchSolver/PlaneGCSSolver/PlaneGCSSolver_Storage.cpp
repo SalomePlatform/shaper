@@ -54,9 +54,6 @@ void PlaneGCSSolver_Storage::addConstraint(
 void PlaneGCSSolver_Storage::addMovementConstraint(
     const ConstraintWrapperPtr& theSolverConstraint)
 {
-  if (myConstraintMap.empty())
-    return; // no need to process temporary constraints if there is no active constraint
-
   // before adding movement constraint to solver, re-check its DOF
   if (mySketchSolver->dof() == 0)
     mySketchSolver->diagnose();

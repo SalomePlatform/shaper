@@ -137,12 +137,10 @@ static SolverConstraintPtr move(StoragePtr theStorage,
   if (aConstraint) {
     SolverConstraintPtr(aConstraint)->process(theStorage, theEventsBlocked);
     if (aConstraint->error().empty()) {
-      if (!theStorage->isEmpty())
-        theStorage->setNeedToResolve(true);
-
-      theSketchSolver->initialize();
       aConstraint->startPoint(theFrom);
+      theSketchSolver->initialize();
       aConstraint->moveTo(theTo);
+      theStorage->setNeedToResolve(true);
     } else
       theStorage->notify(aConstraint->movedFeature());
   }

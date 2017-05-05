@@ -65,6 +65,11 @@ public:
 private:
   void collectConflicting();
 
+  /// \brief Add fictive constraint if the sketch contains temporary constraints only
+  void addFictiveConstraintIfNecessary();
+  /// \brief Remove previously added fictive constraint
+  void removeFictiveConstraint();
+
 private:
   typedef std::map<ConstraintID, std::set<GCSConstraintPtr> > ConstraintMap;
 
@@ -80,6 +85,8 @@ private:
   bool                         myConfCollected;
 
   int                          myDOF;            ///< degrees of freedom
+
+  GCS::Constraint*             myFictiveConstraint;
 };
 
 typedef std::shared_ptr<PlaneGCSSolver_Solver> SolverPtr;

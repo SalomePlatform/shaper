@@ -12,10 +12,8 @@
 #include <GeomDataAPI_Point2D.h>
 #include <SketchPlugin_Feature.h>
 
-#include <cmath>
-
-// Verify the entities are equal
-static bool isEqual(const EntityWrapperPtr& theEntity1, const EntityWrapperPtr& theEntity2);
+/// \brief Get list of parameters of current entity
+static GCS::VEC_pD toParameters(const EntityWrapperPtr& theEntity);
 
 
 SketchSolver_ConstraintFixed::SketchSolver_ConstraintFixed(ConstraintPtr theConstraint)
@@ -79,7 +77,11 @@ EntityWrapperPtr SketchSolver_ConstraintFixed::entityToFix()
   return EntityWrapperPtr();
 }
 
-GCS::VEC_pD SketchSolver_ConstraintFixed::toParameters(const EntityWrapperPtr& theEntity)
+
+
+
+// ==================     Auxiliary functions     ==================
+GCS::VEC_pD toParameters(const EntityWrapperPtr& theEntity)
 {
   GCS::VEC_pD aParameters;
   if (!theEntity)
@@ -110,12 +112,16 @@ GCS::VEC_pD SketchSolver_ConstraintFixed::toParameters(const EntityWrapperPtr& t
         std::dynamic_pointer_cast<GCS::Circle>(anEntity->entity());
     aParameters.push_back(aCircle->center.x);
     aParameters.push_back(aCircle->center.y);
+    aParameters.push_back(aCircle->rad);
     break;
     }
   case ENTITY_ARC: {
     std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEntity->entity());
     aParameters.push_back(anArc->center.x);
     aParameters.push_back(anArc->center.y);
+    aParameters.push_back(anArc->rad);
+    aParameters.push_back(anArc->startAngle);
+    aParameters.push_back(anArc->endAngle);
     break;
     }
   default:

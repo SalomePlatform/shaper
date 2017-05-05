@@ -33,15 +33,12 @@ protected:
   {}
 
   /// \brief Obtain entity to be fixed
-  virtual EntityWrapperPtr entityToFix();
+  EntityWrapperPtr entityToFix();
 
   /// \brief Create Fixed constraint for the feature basing on its type
   /// \param theFeature [in]  feature, converted to solver specific format
   /// \return Fixed constraint
-  virtual ConstraintWrapperPtr fixFeature(EntityWrapperPtr theFeature);
-
-  /// \brief Get list of parameters of current entity
-  static GCS::VEC_pD toParameters(const EntityWrapperPtr& theEntity);
+  ConstraintWrapperPtr fixFeature(EntityWrapperPtr theFeature);
 
 protected:
   std::vector<double> myFixedValues;

@@ -25,8 +25,7 @@ public:
   SketchSolver_ConstraintMovement(AttributePtr thePoint);
 
   /// \brief Set coordinates of the start point of the movement
-  void startPoint(const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint)
-  { myStartPoint = theStartPoint; }
+  void startPoint(const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint);
 
   /// \brief Set coordinates of fixed feature to the values where it has been dragged.
   ///        Useful when the feature is being moved.
@@ -43,13 +42,22 @@ protected:
   /// \brief Converts SketchPlugin constraint to a list of SolveSpace constraints
   virtual void process();
 
-  /// \brief Obtain entity to be fixed
-  virtual EntityWrapperPtr entityToFix();
+  /// \brief Create Fixed constraint for the feature basing on its type and moved point
+  /// \return Fixed constraint
+  ConstraintWrapperPtr initMovement();
+
+  /// \brief Create constraint to fix moved arc extremity
+  ConstraintWrapperPtr fixArcExtremity(const EntityWrapperPtr& theArcExtremity);
+
+  /// \brief Creat constraint to fix moved point on circle/arc
+  ConstraintWrapperPtr fixPointOnCircle(const EntityWrapperPtr& theCircular);
 
 private:
   FeaturePtr       myMovedFeature; ///< fixed feature (if set, myBaseConstraint should be NULL)
   AttributePtr     myDraggedPoint; ///< one of the feature points which has been moved
   std::shared_ptr<GeomAPI_Pnt2d> myStartPoint; ///< start point of the movement
+
+  bool mySimpleMove; ///< simple move, thus all parameters should be increased by movement delta
 };
 
 #endif
