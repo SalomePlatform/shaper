@@ -351,14 +351,12 @@ ConstraintWrapperPtr createArcArcTangency(EntityWrapperPtr theEntity1,
 
   GCSConstraintPtr aNewConstr;
   if (theSharedPoint) {
-    std::shared_ptr<GCS::Arc> anArc1 = std::dynamic_pointer_cast<GCS::Arc>(aCirc1);
-    std::shared_ptr<GCS::Arc> anArc2 = std::dynamic_pointer_cast<GCS::Arc>(aCirc2);
     GCSPointPtr aPoint =
         std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theSharedPoint)->point();
 
-    adjustAngleBetweenCurves(anArc1, anArc2, aPoint, theAngle);
+    adjustAngleBetweenCurves(aCirc1, aCirc2, aPoint, theAngle);
     aNewConstr =
-        GCSConstraintPtr(new GCS::ConstraintAngleViaPoint(*anArc1, *anArc2, *aPoint, theAngle));
+        GCSConstraintPtr(new GCS::ConstraintAngleViaPoint(*aCirc1, *aCirc2, *aPoint, theAngle));
   } else {
     aNewConstr = GCSConstraintPtr(new GCS::ConstraintTangentCircumf(aCirc1->center, aCirc2->center,
                                   aCirc1->rad, aCirc2->rad, theInternalTangency));
