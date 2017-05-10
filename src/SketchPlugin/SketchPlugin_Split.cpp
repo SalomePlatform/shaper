@@ -729,8 +729,8 @@ void SketchPlugin_Split::getFeaturePoints(const FeaturePtr& theFeature,
 }
 
 void SketchPlugin_Split::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete,
-                                        std::set<FeaturePtr>& theFeaturesToUpdate,
-                                        std::map<FeaturePtr, IdToPointPair>& theCoincidenceToFeature)
+                                    std::set<FeaturePtr>& theFeaturesToUpdate,
+                                    std::map<FeaturePtr, IdToPointPair>& theCoincidenceToFeature)
 {
   std::shared_ptr<ModelAPI_Data> aData = data();
 
@@ -1577,7 +1577,8 @@ std::set<std::shared_ptr<ModelAPI_Attribute> > SketchPlugin_Split::getEdgeAttrib
   return anAttributes;
 }
 
-std::shared_ptr<GeomDataAPI_Point2D> SketchPlugin_Split::getPointAttribute(const bool isFirstAttribute)
+std::shared_ptr<GeomDataAPI_Point2D> SketchPlugin_Split::getPointAttribute
+                                                              (const bool isFirstAttribute)
 {
   std::shared_ptr<GeomDataAPI_Point2D> anAttribute;
 
