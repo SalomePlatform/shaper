@@ -14,7 +14,6 @@
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_Fillet.h>
-#include <SketchPlugin_ConstraintSplit.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintMiddle.h>
@@ -30,6 +29,7 @@
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_Trim.h>
+#include <SketchPlugin_Split.h>
 #include <SketchPlugin_Validators.h>
 #include <SketchPlugin_ExternalValidator.h>
 
@@ -193,14 +193,14 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintMirror);
   } else if (theFeatureID == SketchPlugin_Fillet::ID()) {
     return FeaturePtr(new SketchPlugin_Fillet);
-  } else if (theFeatureID == SketchPlugin_ConstraintSplit::ID()) {
-    return FeaturePtr(new SketchPlugin_ConstraintSplit);
   } else if (theFeatureID == SketchPlugin_MultiTranslation::ID()) {
     return FeaturePtr(new SketchPlugin_MultiTranslation);
   } else if (theFeatureID == SketchPlugin_MultiRotation::ID()) {
     return FeaturePtr(new SketchPlugin_MultiRotation);
   } else if (theFeatureID == SketchPlugin_ConstraintAngle::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintAngle);
+  } else if (theFeatureID == SketchPlugin_Split::ID()) {
+    return FeaturePtr(new SketchPlugin_Split);
   } else if (theFeatureID == SketchPlugin_Trim::ID()) {
     return FeaturePtr(new SketchPlugin_Trim);
   } else if (theFeatureID == SketchPlugin_MacroArc::ID()) {
@@ -265,10 +265,10 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_ConstraintMiddle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintMirror::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Fillet::ID(), aHasSketchPlane);
-      aMsg->setState(SketchPlugin_ConstraintSplit::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintAngle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MultiRotation::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MultiTranslation::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_Split::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Trim::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroArc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroCircle::ID(), aHasSketchPlane);

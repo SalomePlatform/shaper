@@ -9,7 +9,6 @@
 #include "PartSet_WidgetPoint2DFlyout.h"
 #include "PartSet_WidgetShapeSelector.h"
 #include "PartSet_WidgetMultiSelector.h"
-#include "PartSet_WidgetSubShapeSelector.h"
 #include "PartSet_WidgetFeaturePointSelector.h"
 #include "PartSet_WidgetEditor.h"
 #include "PartSet_WidgetFileSelector.h"
@@ -751,12 +750,6 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
                           new PartSet_WidgetMultiSelector(theParent, aWorkshop, theWidgetApi);
     aShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aShapeSelectorWgt;
-  }
-  else if (theType == "sketch_sub_shape_selector") {
-    PartSet_WidgetSubShapeSelector* aSubShapeSelectorWgt =
-                          new PartSet_WidgetSubShapeSelector(theParent, aWorkshop, theWidgetApi);
-    aSubShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
-    aWgt = aSubShapeSelectorWgt;
   }
   else if (theType == "sketch_feature_point_selector") {
     PartSet_WidgetFeaturePointSelector* aPointSelectorWgt =

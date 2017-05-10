@@ -272,8 +272,7 @@ public:
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelHighAPI_Interface> addSplit(
       const ModelHighAPI_Reference& theFeature,
-      const ModelHighAPI_RefAttr& thePoint1,
-      const ModelHighAPI_RefAttr& thePoint2);
+      const std::shared_ptr<GeomAPI_Pnt2d>& thePositionPoint);
 
   /// Add trim
   SKETCHAPI_EXPORT

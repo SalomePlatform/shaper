@@ -23,7 +23,6 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintPerpendicular.h
     SketchPlugin_ConstraintRadius.h
     SketchPlugin_ConstraintRigid.h
-    SketchPlugin_ConstraintSplit.h
     SketchPlugin_ConstraintTangent.h
     SketchPlugin_ConstraintVertical.h
     SketchPlugin_ExternalValidator.h
@@ -40,6 +39,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_Projection.h
     SketchPlugin_Sketch.h
     SketchPlugin_SketchEntity.h
+    SketchPlugin_Split.h
     SketchPlugin_Tools.h
     SketchPlugin_Trim.h
     SketchPlugin_Validators.h
@@ -64,7 +64,6 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintPerpendicular.cpp
     SketchPlugin_ConstraintRadius.cpp
     SketchPlugin_ConstraintRigid.cpp
-    SketchPlugin_ConstraintSplit.cpp
     SketchPlugin_ConstraintTangent.cpp
     SketchPlugin_ConstraintVertical.cpp
     SketchPlugin_ExternalValidator.cpp
@@ -80,6 +79,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_Projection.cpp
     SketchPlugin_Sketch.cpp
     SketchPlugin_SketchEntity.cpp
+    SketchPlugin_Split.cpp
     SketchPlugin_Tools.cpp
     SketchPlugin_Trim.cpp
     SketchPlugin_Validators.cpp

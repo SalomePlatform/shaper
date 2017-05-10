@@ -7,10 +7,10 @@
 #ifndef SketchPlugin_Trim_H_
 #define SketchPlugin_Trim_H_
 
-#include <ModelAPI_IReentrant.h>
-
 #include "SketchPlugin.h"
-#include "SketchPlugin_ConstraintBase.h"
+
+#include "GeomAPI_IPresentable.h"
+#include <ModelAPI_IReentrant.h>
 #include <SketchPlugin_Sketch.h>
 
 class GeomDataAPI_Point2D;
@@ -77,7 +77,7 @@ class SketchPlugin_Trim : public SketchPlugin_Feature, public GeomAPI_IPresentab
 
   /// Reimplemented from ModelAPI_Feature::isMacro()
   /// \returns true
-  SKETCHPLUGIN_EXPORT virtual bool isMacro() const;
+  SKETCHPLUGIN_EXPORT virtual bool isMacro() const { return true; }
 
   /// Reimplemented from ModelAPI_Feature::isPreviewNeeded(). Returns false.
   /// This is necessary to perform execute only by apply the feature

@@ -23,8 +23,8 @@
 #include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_ConstraintRigid.h>
-#include <SketchPlugin_ConstraintSplit.h>
 #include <SketchPlugin_Trim.h>
+#include <SketchPlugin_Split.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
 #include <SketcherPrs_Tools.h>
@@ -495,16 +495,19 @@ std::shared_ptr<SketchAPI_Rotation> SketchAPI_Sketch::addRotation(
 
 //--------------------------------------------------------------------------------------
 std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::addSplit(
-                                                    const ModelHighAPI_Reference& theFeature,
-                                                    const ModelHighAPI_RefAttr& thePoint1,
-                                                    const ModelHighAPI_RefAttr& thePoint2)
+                                          const ModelHighAPI_Reference& theFeature,
+                                          const std::shared_ptr<GeomAPI_Pnt2d>& thePositionPoint)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
-    compositeFeature()->addFeature(SketchPlugin_ConstraintSplit::ID());
-  fillAttribute(theFeature, aFeature->reference(SketchPlugin_Constraint::VALUE()));
-  fillAttribute(thePoint1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
-  fillAttribute(thePoint2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
-  //aFeature->execute();
+    compositeFeature()->addFeature(SketchPlugin_Split::ID());
+  fillAttribute(theFeature, aFeature->reference(SketchPlugin_Split::SELECTED_OBJECT()));
+
+  AttributePtr anAttribute = aFeature->attribute(SketchPlugin_Split::SELECTED_POINT());
+  if (anAttribute->attributeType() == GeomDataAPI_Point2D::typeId()) {
+    AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttribute);
+    fillAttribute(thePositionPoint, aPointAttr);
+  }
+
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));
 }
 

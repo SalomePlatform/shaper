@@ -17,6 +17,7 @@
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_ViewerPrs.h>
 
+#include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Tools.h>
@@ -28,10 +29,7 @@
 #include "PartSet_WidgetFeaturePointSelector.h"
 #include "PartSet_Tools.h"
 
-//#include <SketchPlugin_ConstraintCoincidence.h>
-//#include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_Point.h>
-#include <SketchPlugin_Trim.h>
 
 #include <XGUI_Tools.h>
 #include <XGUI_Workshop.h>
@@ -52,6 +50,13 @@ PartSet_WidgetFeaturePointSelector::PartSet_WidgetFeaturePointSelector(QWidget* 
                                                          const Config_WidgetAPI* theData)
 : ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData)
 {
+  std::string anAttributes = theData->getProperty("selection_attributes");
+  QStringList anAttributesList = QString(anAttributes.c_str()).split(' ', QString::SkipEmptyParts);
+
+  mySelectedObjectAttribute = anAttributesList[0].toStdString();
+  mySelectedPointAttribute = anAttributesList[1].toStdString();
+  myPreviewObjectAttribute = anAttributesList[2].toStdString();
+  myPreviewPointAttribute = anAttributesList[3].toStdString();
 }
 
 PartSet_WidgetFeaturePointSelector::~PartSet_WidgetFeaturePointSelector()
@@ -134,7 +139,7 @@ void PartSet_WidgetFeaturePointSelector::mouseReleased(ModuleBase_IViewWindow* t
 
   std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
                           std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                          feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+                          feature()->data()->attribute(myPreviewObjectAttribute));
   ObjectPtr aPreviewObject = aRefPreviewAttr->value();
   // do not move focus from the current widget if the object is not highlighted/selected
   if (!aPreviewObject.get())
@@ -143,15 +148,15 @@ void PartSet_WidgetFeaturePointSelector::mouseReleased(ModuleBase_IViewWindow* t
   // set parameters of preview into parameters of selection in the feature
   std::shared_ptr<ModelAPI_AttributeReference> aRefSelectedAttr =
                           std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                          feature()->data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
+                          feature()->data()->attribute(mySelectedObjectAttribute));
   aRefSelectedAttr->setValue(aRefPreviewAttr->value());
 
   std::shared_ptr<GeomDataAPI_Point2D> aPointSelectedAttr =
                           std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                          feature()->data()->attribute(SketchPlugin_Trim::SELECTED_POINT()));
+                          feature()->data()->attribute(mySelectedPointAttribute));
   std::shared_ptr<GeomDataAPI_Point2D> aPointPreviewAttr =
                           std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                          feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
+                          feature()->data()->attribute(myPreviewPointAttribute));
   aPointSelectedAttr->setValue(aPointPreviewAttr->x(), aPointPreviewAttr->y());
 
   updateObject(feature());
@@ -174,12 +179,12 @@ bool PartSet_WidgetFeaturePointSelector::fillFeature(
 
   std::shared_ptr<ModelAPI_AttributeReference> aRef =
                           std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                          feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+                          feature()->data()->attribute(myPreviewObjectAttribute));
   aRef->setValue(anObject);
 
   std::shared_ptr<GeomDataAPI_Point2D> anAttributePoint =
                   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                  feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
+                  feature()->data()->attribute(myPreviewPointAttribute));
   std::shared_ptr<GeomAPI_Pnt2d> aPoint = PartSet_Tools::getPnt2d(theEvent, theWindow, mySketch);
   anAttributePoint->setValue(aPoint);
   // redisplay AIS presentation in viewer

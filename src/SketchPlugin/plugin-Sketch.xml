@@ -13,7 +13,7 @@
                 SketchConstraintParallel SketchConstraintPerpendicular
                 SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical
                 SketchConstraintEqual SketchConstraintTangent
-                SketchFillet SketchConstraintSplit SketchTrim
+                SketchFillet SketchSplit SketchTrim
                 SketchConstraintCoincidence
                 SketchConstraintMirror SketchConstraintAngle
                 SketchMultiRotation SketchMultiTranslation
@@ -308,19 +308,19 @@
         </sketch_shape_selector>
         <!--<validator id="PartSet_FilletSelection"/>-->
       </feature>
-      <!--  SketchConstraintSplit  -->
-      <feature id="SketchConstraintSplit" title="Split"
+      <!--  SketchSplit  -->
+      <feature id="SketchSplit" title="Split"
                tooltip="Cut selected segment arc or circle on existing coincident points"
                icon="icons/Sketch/split.png">
-        <sketch_sub_shape_selector
-            id="ConstraintValue"
+        <sketch_feature_point_selector
+            id="SelectedObject"
+            selection_attributes="SelectedObject SelectedPoint PreviewObject PreviewPoint"
             label="Segment"
             tooltip="Select segment for split"
             shape_types="edge"
-            use_external="false"
-            use_graphic_intersection="false">
+            use_external="false">
           <validator id="SketchPlugin_SplitValidator"/>
-        </sketch_sub_shape_selector>
+        </sketch_feature_point_selector>
         <validator id="PartSet_SplitSelection"/>
       </feature>
       <!--  SketchTrim  -->
@@ -329,11 +329,11 @@
                icon="icons/Sketch/trim.png">
         <sketch_feature_point_selector
             id="SelectedObject"
+            selection_attributes="SelectedObject SelectedPoint PreviewObject PreviewPoint"
             label="Segment"
             tooltip="Select segment for trim"
             shape_types="edge"
-            use_external="false"
-            use_graphic_intersection="true">
+            use_external="false">
           <validator id="SketchPlugin_TrimValidator"/>
         </sketch_feature_point_selector>
         <validator id="PartSet_SplitSelection"/>

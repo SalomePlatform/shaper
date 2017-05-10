@@ -18,6 +18,8 @@
 
 #include <QObject>
 
+#include <string>
+
 class ModuleBase_IWorkshop;
 class Config_WidgetAPI;
 class ModuleBase_IViewWindow;
@@ -113,6 +115,11 @@ protected:
   CompositeFeaturePtr mySketch;
   Quantity_Color myHighlightColor;
   Quantity_Color mySelectionColor;
+
+  std::string mySelectedObjectAttribute;
+  std::string mySelectedPointAttribute;
+  std::string myPreviewObjectAttribute;
+  std::string myPreviewPointAttribute;
 };
 
 #endif

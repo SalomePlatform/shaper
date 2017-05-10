@@ -75,8 +75,7 @@ SketchPlugin_Trim::SketchPlugin_Trim()
 
 void SketchPlugin_Trim::initAttributes()
 {
-  data()->addAttribute(SketchPlugin_Trim::SELECTED_OBJECT(),
-                       ModelAPI_AttributeReference::typeId());
+  data()->addAttribute(SELECTED_OBJECT(), ModelAPI_AttributeReference::typeId());
   data()->addAttribute(SELECTED_POINT(), GeomDataAPI_Point2D::typeId());
 
   data()->addAttribute(PREVIEW_POINT(), GeomDataAPI_Point2D::typeId());
@@ -427,23 +426,12 @@ void SketchPlugin_Trim::execute()
     if (aReplacingResult.get()) { // base object was removed
       aPreviewObject = aReplacingResult;
       //aMessage->setSelectedObject(aReplacingResult);
-
-      GeomShapePtr aSelectedShape = aReplacingResult->shape();
-      std::shared_ptr<GeomAPI_Pnt> aPreviewPnt = sketch()->to3D(aPreviewPnt2d->x(),
-                                                                aPreviewPnt2d->y());
-      std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
-      if (ModelGeomAlgo_Point2D::isPointOnEdge(aSelectedShape, aPreviewPnt, aProjectedPoint)) {
-        bool aValue = true;
-      }
-      //aBaseShape = aShape;
-
 #ifdef DEBUG_TRIM_METHODS
       if (!aSelectedShape.get())
         std::cout << "Set empty selected object" << std::endl;
       else
         std::cout << "Set shape with ShapeType: " << aSelectedShape->shapeTypeStr() << std::endl;
 #endif
-      bool aValue = true;
     }
     else {
       aPreviewObject = ObjectPtr();
@@ -594,11 +582,6 @@ bool SketchPlugin_Trim::replaceCoincidenceAttribute(const AttributePtr& theCoinc
   return isProcessed;
 }
 
-bool SketchPlugin_Trim::isMacro() const
-{
-  return true;
-}
-
 AISObjectPtr SketchPlugin_Trim::getAISObject(AISObjectPtr thePrevious)
 {
 #ifdef DEBUG_TRIM_METHODS
@@ -655,9 +638,9 @@ GeomShapePtr SketchPlugin_Trim::getSubShape(const std::string& theObjectAttribut
     return aBaseShape;
 
   // point on feature
-  AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                                            data()->attribute(thePointAttributeId));
-  std::shared_ptr<GeomAPI_Pnt2d> anAttributePnt2d = aPoint->pnt();
+  std::shared_ptr<GeomAPI_Pnt2d> anAttributePnt2d = aPointAttr->pnt();
   std::shared_ptr<GeomAPI_Pnt> anAttributePnt = sketch()->to3D(anAttributePnt2d->x(),
                                                                anAttributePnt2d->y());
 
