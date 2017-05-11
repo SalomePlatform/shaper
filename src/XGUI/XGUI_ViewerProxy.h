@@ -71,6 +71,9 @@ Q_OBJECT
   //! Sets the view fitted all
   virtual void fitAll();
 
+  //! Erases all presentations from the viewer
+  virtual void eraseAll();
+
   /// Connects to a viewer according to current environment
   void connectToViewer();
 

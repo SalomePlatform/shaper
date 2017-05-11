@@ -5,7 +5,7 @@
 
 #include <OCCViewer_ViewPort3d.h>
 #include <OCCViewer_ViewFrame.h>
-
+#include <SOCC_ViewModel.h>
 #include <SUIT_ViewManager.h>
 
 #include <QtxActionToolMgr.h>
@@ -349,6 +349,13 @@ void SHAPERGUI_SalomeViewer::fitAll()
       aVFrame->onFitAll();
     }
   }
+}
+
+//**********************************************
+void SHAPERGUI_SalomeViewer::eraseAll()
+{
+  SOCC_Viewer* aViewer = dynamic_cast<SOCC_Viewer*>(myView->viewer());
+  aViewer->EraseAll(0);
 }
 
 //**********************************************

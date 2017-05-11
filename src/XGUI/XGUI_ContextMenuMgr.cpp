@@ -387,8 +387,13 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
     } else
       action("SHOW_CMD")->setEnabled(true);
   }
+  //issue #2159 Hide all incomplete behavior
+#ifdef HAVE_SALOME
+    action("HIDEALL_CMD")->setEnabled(true);
+#else
   if (myWorkshop->displayer()->objectsCount() > 0)
     action("HIDEALL_CMD")->setEnabled(true);
+#endif
 
   // Update selection menu
   QIntList aModes = aDisplayer->activeSelectionModes();

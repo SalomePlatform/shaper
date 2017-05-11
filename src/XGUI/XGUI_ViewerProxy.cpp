@@ -109,6 +109,14 @@ void XGUI_ViewerProxy::fitAll()
 #endif
 }
 
+void XGUI_ViewerProxy::eraseAll()
+{
+#ifdef HAVE_SALOME
+  myWorkshop->salomeConnector()->viewer()->eraseAll();
+#else
+#endif
+}
+
 void XGUI_ViewerProxy::connectToViewer()
 {
 #ifdef HAVE_SALOME

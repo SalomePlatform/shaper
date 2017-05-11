@@ -63,6 +63,9 @@ Q_OBJECT
   //! Perfroms the fit all for the active view
   virtual void fitAll() = 0;
 
+  //! Erases all presentations from the viewer
+  virtual void eraseAll() = 0;
+
   //! Sets the view projection
   /// \param theX the X projection value
   /// \param theY the Y projection value
