@@ -267,6 +267,14 @@ QAction* createAction(const QIcon& theIcon, const QString& theText,
 }
 
 #ifdef _DEBUG
+QString objectName(const ObjectPtr& theObj)
+{
+  if (!theObj.get())
+    return "";
+
+  return theObj->data()->name().c_str();
+}
+
 QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
 {
   QString aFeatureStr = "feature";

@@ -351,6 +351,12 @@ void XGUI_OperationMgr::setCurrentFeature(const FeaturePtr& theFeature)
     aMgr->startOperation(QString("Set current feature: %1")
     .arg(theFeature->getKind().c_str()).toStdString());
   aDoc->setCurrentFeature(theFeature, false);
+#ifdef DEBUG_CURRENT_FEATURE
+  qDebug(QString("   document->setCurrentFeature(false) = %1    SET").arg(
+         ModuleBase_Tools::objectName(
+         ModelAPI_Session::get()->activeDocument()->currentFeature(false))).toStdString().c_str());
+#endif
+
   if (!aIsOp)
     aMgr->finishOperation();
 }
@@ -456,12 +462,12 @@ void XGUI_OperationMgr::onBeforeOperationStarted()
 #ifdef DEBUG_CURRENT_FEATURE
     FeaturePtr aFeature = aFOperation->feature();
     QString aKind = aFeature ? aFeature->getKind().c_str() : "";
-    qDebug(QString("onBeforeOperationStarted(), edit operation = %1, feature = %2")
+    qDebug("");
+    qDebug(QString("onBeforeOperationStarted() isEditOperation = %1, feature = %2")
             .arg(aFOperation->isEditOperation())
-            .arg(ModuleBase_Tools::objectInfo(aFeature)).toStdString().c_str());
-
-    qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
-            ModuleBase_Tools::objectInfo(
+            .arg(ModuleBase_Tools::objectName(aFeature)).toStdString().c_str());
+    qDebug(QString("   document->currentFeature(false) = %1 : DO: setPreviousCurrentFeature").arg(
+            ModuleBase_Tools::objectName(
             ModelAPI_Session::get()->activeDocument()->currentFeature(false)))
             .toStdString().c_str());
 #endif
@@ -469,6 +475,11 @@ void XGUI_OperationMgr::onBeforeOperationStarted()
     if (aFOperation->isEditOperation()) {// it should be performed by the feature edit only
       // in create operation, the current feature is changed by addFeature()
       aDoc->setCurrentFeature(aFOperation->feature(), false);
+#ifdef DEBUG_CURRENT_FEATURE
+      qDebug(QString("   document->setCurrentFeature(false) = %1").arg(
+             ModuleBase_Tools::objectName(
+             ModelAPI_Session::get()->activeDocument()->currentFeature(false))).toStdString().c_str());
+#endif
       // this is the only place where flushes must be called after setCurrentFeature for the
       // current moment: after this the opertion is not finished, so, the ObjectBrowser
       // state may be corrupted (issue #1457)
@@ -478,14 +489,6 @@ void XGUI_OperationMgr::onBeforeOperationStarted()
       static Events_ID aDeleteEvent = aLoop->eventByName(EVENT_OBJECT_DELETED);
       aLoop->flush(aDeleteEvent);
     }
-
-#ifdef DEBUG_CURRENT_FEATURE
-    qDebug("\tdocument->setCurrentFeature");
-    qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
-            ModuleBase_Tools::objectInfo(
-            ModelAPI_Session::get()->activeDocument()->currentFeature(false)))
-            .toStdString().c_str());
-#endif
   }
 }
 
@@ -520,12 +523,11 @@ void XGUI_OperationMgr::onBeforeOperationCommitted()
   if (aFOperation) {
 #ifdef DEBUG_CURRENT_FEATURE
     QString aKind = aFOperation->feature()->getKind().c_str();
-    qDebug(QString("onBeforeOperationCommitted(), edit operation = %1, feature = %2")
+    qDebug(QString("onBeforeOperationCommitted() isEditOperation = %1, feature = %2")
             .arg(aFOperation->isEditOperation())
-            .arg(ModuleBase_Tools::objectInfo(aFOperation->feature())).toStdString().c_str());
-
-    qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
-            ModuleBase_Tools::objectInfo(
+            .arg(ModuleBase_Tools::objectName(aFOperation->feature())).toStdString().c_str());
+    qDebug(QString("   document->currentFeature(false) = %1").arg(
+            ModuleBase_Tools::objectName(
             ModelAPI_Session::get()->activeDocument()->currentFeature(false)))
             .toStdString().c_str());
 #endif
@@ -543,13 +545,6 @@ void XGUI_OperationMgr::onBeforeOperationCommitted()
       if (myOperations.front() != aFOperation)
         setCurrentFeature(aFOperation->previousCurrentFeature());
     }
-#ifdef DEBUG_CURRENT_FEATURE
-    qDebug("\tdocument->setCurrentFeature");
-    qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
-           ModuleBase_Tools::objectInfo(
-           ModelAPI_Session::get()->activeDocument()->currentFeature(false)))
-           .toStdString().c_str());
-#endif
     ModuleBase_IModule* aModule = myWorkshop->module();
     if (aModule)
       aModule->beforeOperationStopped(aFOperation);

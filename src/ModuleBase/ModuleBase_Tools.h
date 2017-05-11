@@ -132,6 +132,11 @@ MODULEBASE_EXPORT QAction* createAction(const QIcon& theIcon, const QString& the
                                         const QString& theStatusTip = QString());
 
 #ifdef _DEBUG
+/// Returns name of data of the object if it is not NULL
+/// \param theObj an object
+/// \return a string
+MODULEBASE_EXPORT QString objectName(const ObjectPtr& theObj);
+
 /// Converts the object to the feature or a result and generate information string
 /// \param theObj an object
 /// \param isUseAttributesInfo a flag whether the attribute values information is used
