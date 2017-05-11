@@ -467,9 +467,7 @@ void XGUI_OperationMgr::onBeforeOperationStarted()
             .arg(aFOperation->isEditOperation())
             .arg(ModuleBase_Tools::objectName(aFeature)).toStdString().c_str());
     qDebug(QString("   document->currentFeature(false) = %1 : DO: setPreviousCurrentFeature").arg(
-            ModuleBase_Tools::objectName(
-            ModelAPI_Session::get()->activeDocument()->currentFeature(false)))
-            .toStdString().c_str());
+            ModuleBase_Tools::objectName(aDoc->currentFeature(false))).toStdString().c_str());
 #endif
 
     if (aFOperation->isEditOperation()) {// it should be performed by the feature edit only
@@ -477,8 +475,7 @@ void XGUI_OperationMgr::onBeforeOperationStarted()
       aDoc->setCurrentFeature(aFOperation->feature(), false);
 #ifdef DEBUG_CURRENT_FEATURE
       qDebug(QString("   document->setCurrentFeature(false) = %1").arg(
-             ModuleBase_Tools::objectName(
-             ModelAPI_Session::get()->activeDocument()->currentFeature(false))).toStdString().c_str());
+             ModuleBase_Tools::objectName(aDoc->currentFeature(false))).toStdString().c_str());
 #endif
       // this is the only place where flushes must be called after setCurrentFeature for the
       // current moment: after this the opertion is not finished, so, the ObjectBrowser
