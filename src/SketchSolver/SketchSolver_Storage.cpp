@@ -192,11 +192,13 @@ const EntityWrapperPtr& SketchSolver_Storage::entity(const AttributePtr& theAttr
 void SketchSolver_Storage::removeFeature(FeaturePtr theFeature)
 {
   myFeatureMap.erase(theFeature);
+  myNeedToResolve = true;
 }
 
 void SketchSolver_Storage::removeAttribute(AttributePtr theAttribute)
 {
   myAttributeMap.erase(theAttribute);
+  myNeedToResolve = true;
 }
 
 

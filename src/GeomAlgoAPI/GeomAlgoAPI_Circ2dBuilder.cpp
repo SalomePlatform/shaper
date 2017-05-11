@@ -167,7 +167,7 @@ private:
 
     double aParSol, aPonTgCurve;
     gp_Pnt2d aTgPnt;
-    for (int i = 1; i <= aNbSol && aCurve; ++i) {
+    for (int i = 1; i <= aNbSol && aNbSol > 1 && aCurve; ++i) {
       theBuilder->Tangency1(i, aParSol, aPonTgCurve, aTgPnt);
       if (isParamOnCurve(aPonTgCurve, aCurve)) {
         double aDist = distanceToClosestPoint(theBuilder->ThisSolution(i));
