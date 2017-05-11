@@ -15,7 +15,7 @@ __updated__ = "2017-03-06"
 
 def isArcLineSmooth(theArc, theLine, theTolerance):
   aCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
-  aDistance = distancePointLine(aCenter, theLine)
+  aDistance = model.distancePointLine(aCenter, theLine)
   aRadius = arcRadius(theArc)
   return math.fabs(aRadius - aDistance) < theTolerance
 
@@ -33,15 +33,6 @@ def arcRadius(theArc):
   aCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
   aStart = geomDataAPI_Point2D(theArc.attribute("start_point"))
   return model.distancePointPoint(aCenter, aStart)
-
-def distancePointLine(thePoint, theLine):
-  aLineStart = geomDataAPI_Point2D(theLine.attribute("StartPoint"))
-  aLineEnd = geomDataAPI_Point2D(theLine.attribute("EndPoint"))
-  aLength = model.distancePointPoint(aLineStart, aLineEnd)
-  aDir1x, aDir1y = aLineEnd.x() - aLineStart.x(), aLineEnd.y() - aLineStart.y()
-  aDir2x, aDir2y = thePoint.x() - aLineStart.x(), thePoint.y() - aLineStart.y()
-  aCross = aDir1x * aDir2y - aDir1y * aDir2x
-  return math.fabs(aCross) / aLength
 
 
 

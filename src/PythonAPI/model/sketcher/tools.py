@@ -2,7 +2,8 @@
 # Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 import ModelHighAPI
-import GeomDataAPI
+from GeomDataAPI import *
+import math
 
 def addPolyline(sketch, *coords):
     """Add a poly-line to sketch.
@@ -52,13 +53,20 @@ def dof(sketch):
     return int(filter(str.isdigit, aSketch.string("SolverDOF").value()))
 
 def distancePointPoint(thePoint1, thePoint2):
-    aGeomPnt1 = thePoint1
-    aGeomPnt2 = thePoint2
-    if issubclass(type(thePoint1), GeomDataAPI.GeomDataAPI_Point2D):
-        aGeomPnt1 = thePoint1.pnt()
-    if issubclass(type(thePoint2), GeomDataAPI.GeomDataAPI_Point2D):
-        aGeomPnt2 = thePoint2.pnt()
+    aGeomPnt1 = toPoint(thePoint1)
+    aGeomPnt2 = toPoint(thePoint2)
     return aGeomPnt1.distance(aGeomPnt2)
+
+def distancePointLine(thePoint, theLine):
+    aPoint = toPoint(thePoint)
+    aLine = toSketchFeature(theLine)
+
+    aLineStart = geomDataAPI_Point2D(aLine.attribute("StartPoint")).pnt().xy()
+    aLineEnd = geomDataAPI_Point2D(aLine.attribute("EndPoint")).pnt().xy()
+    aLineDir = aLineEnd.decreased(aLineStart)
+    aLineLen = aLineEnd.distance(aLineStart)
+    aPntDir = aPoint.xy().decreased(aLineStart)
+    return math.fabs(aPntDir.cross(aLineDir) / aLineLen)
 
 def lastSubFeature(theSketch, theKind):
     """
@@ -68,3 +76,18 @@ def lastSubFeature(theSketch, theKind):
         aSub = theSketch.subFeature(anIndex)
         if (aSub.getKind() == theKind):
             return aSub
+
+def toSketchFeature(theEntity):
+    """ Converts entity to sketch feature if possible
+    """
+    if issubclass(type(theEntity), ModelHighAPI.ModelHighAPI_Interface):
+        return theEntity.feature()
+    else:
+        return theEntity
+
+def toPoint(thePoint):
+    if issubclass(type(thePoint), GeomDataAPI_Point2D):
+        return thePoint.pnt()
+    else:
+        aPoint = toSketchFeature(thePoint)
+        return geomDataAPI_Point2D(aPoint.attribute("PointCoordinates")).pnt()

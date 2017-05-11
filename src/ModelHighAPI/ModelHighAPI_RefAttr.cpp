@@ -10,6 +10,7 @@
 
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefAttrList.h>
+#include <ModelAPI_Events.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
 #include "ModelHighAPI_Interface.h"
@@ -68,4 +69,14 @@ void ModelHighAPI_RefAttr::appendToList(
 bool ModelHighAPI_RefAttr::isEmpty() const
 {
   return !(myAttribute && myObject);
+}
+
+//--------------------------------------------------------------------------------------
+void ModelHighAPI_RefAttr::fillMessage(
+    const std::shared_ptr<ModelAPI_ObjectMovedMessage>& theMessage) const
+{
+  switch (myVariantType) {
+  case VT_ATTRIBUTE: theMessage->setMovedAttribute(myAttribute); return;
+  case VT_OBJECT: theMessage->setMovedObject(myObject); return;
+  }
 }

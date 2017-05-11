@@ -143,12 +143,12 @@ for aDelta in range(0, 20):
   aSession.startOperation()
   anArcStartPoint.setValue(sx, sy+aDelta) # move start point
   aSession.finishOperation()
-  model.assertSketchArc(aSketchArc)
+  model.assertArcValidity(aSketchArc)
 for aDelta in range(20, -1, -1):
   aSession.startOperation()
   anArcStartPoint.setValue(sx, sy+aDelta) # move start point
   aSession.finishOperation()
-  model.assertSketchArc(aSketchArc)
+  model.assertArcValidity(aSketchArc)
 #=========================================================================
 # Test that movement of end point of arc does not break the arc
 #=========================================================================
@@ -160,9 +160,9 @@ for aDelta in range(0, 20):
   aSession.startOperation()
   anArcEndPoint.setValue(sx+aDelta, sy) # move end point
   aSession.finishOperation()
-  model.assertSketchArc(aSketchArc)
+  model.assertArcValidity(aSketchArc)
 for aDelta in range(20, -1, -1):
   aSession.startOperation()
   anArcEndPoint.setValue(sx+aDelta, sy) # move end point
   aSession.finishOperation()
-  model.assertSketchArc(aSketchArc)
+  model.assertArcValidity(aSketchArc)
