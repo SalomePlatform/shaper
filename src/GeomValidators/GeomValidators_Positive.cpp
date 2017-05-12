@@ -6,6 +6,7 @@
 
 #include "GeomValidators_Positive.h"
 
+#include <Config_PropManager.h>
 #include <Events_InfoMessage.h>
 
 #include <ModelAPI_AttributeDouble.h>
@@ -34,8 +35,8 @@ bool GeomValidators_Positive::isValid(const AttributePtr& theAttribute,
   if(theArguments.size() == 1) {
     std::list<std::string>::const_iterator anIt = theArguments.begin();
     char *aErr;
-    double aValue = strtod((*anIt).c_str(), &aErr);
-    if(*aErr == 0) {
+    double aValue = Config_PropManager::stringToDouble((*anIt).c_str());
+    if(aValue != 0) {
       // very probably ok
       aMinValue = aValue;
     }

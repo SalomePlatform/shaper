@@ -61,6 +61,11 @@ class Config_PropManager
   //! Returns boolean by given section and name
   CONFIG_EXPORT static bool boolean(const std::string& theSection,
                                    const std::string& theName);
+  //! Returns convertion of the string to double value. Temporary changes locale to process
+  //! values contained "," or "." separator.
+  //! \param theDouble a value to be converted
+  //! \return double result or zero
+  CONFIG_EXPORT static double stringToDouble(const std::string& theDouble);
 
  private:
   CONFIG_EXPORT static Config_Properties myProps; ///< List of all stored properties

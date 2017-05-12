@@ -8,7 +8,6 @@
 
 std::vector<int> stringToRGB(const std::string& theColor);
 int stringToInteger(const std::string& theInt);
-double stringToDouble(const std::string& theDouble);
 bool stringToBoolean(const std::string& theInt);
 
 Config_Properties Config_PropManager::myProps;
@@ -176,10 +175,23 @@ int stringToInteger(const std::string& theInt)
   return atoi(theInt.c_str());
 }
 
-double stringToDouble(const std::string& theDouble)
+double Config_PropManager::stringToDouble(const std::string& theDouble)
 {
+  std::string aStr = theDouble;
+
+  // change locale and convert "," to "." if exists
+  std::string aCurLocale = setlocale(LC_NUMERIC, 0);
+  setlocale(LC_NUMERIC, "C");
+  int dotpos = (int)aStr.find(',');
+  if (dotpos != std::string::npos)
+    aStr.replace(dotpos, 1, ".");
+
   char* p;
-  return strtod(theDouble.c_str(), &p);
+  double aValue = strtod(aStr.c_str(), &p);
+
+  // restore locale
+  setlocale(LC_NUMERIC, aCurLocale.c_str());
+  return aValue;
 }
 
 bool stringToBoolean(const std::string& theBoolean)
