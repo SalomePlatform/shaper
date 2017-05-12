@@ -192,4 +192,10 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestTrimCircle05.py
                TestTrimCircleAndArc01.py
                TestTrimLine01.py
-               TestTrimLine02.py)
+               TestTrimLine02.py
+               TestMovePoint.py
+               TestMoveLine.py
+               TestMoveCircle.py
+               TestMoveArc.py
+               TestMovementComplex.py
+)

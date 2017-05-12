@@ -409,6 +409,16 @@ public:
       const std::shared_ptr<ModelHighAPI_Interface> & theConstraint,
       const ModelHighAPI_Double & theValue);
 
+  /// Move point or sketch feature
+  SKETCHAPI_EXPORT
+  void move(const ModelHighAPI_RefAttr& theMovedEntity,
+            const std::shared_ptr<GeomAPI_Pnt2d>& theTargetPoint);
+
+  /// Move point or sketch feature
+  SKETCHAPI_EXPORT
+  void move(const ModelHighAPI_RefAttr& theMovedEntity,
+            double theTargetX, double theTargetY);
+
   SKETCHAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& thePoint);
 

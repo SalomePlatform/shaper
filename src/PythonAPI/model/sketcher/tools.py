@@ -3,6 +3,7 @@
 
 import ModelHighAPI
 from GeomDataAPI import *
+from ModelAPI import *
 import math
 
 def addPolyline(sketch, *coords):
@@ -53,27 +54,28 @@ def dof(sketch):
     return int(filter(str.isdigit, aSketch.string("SolverDOF").value()))
 
 def distancePointPoint(thePoint1, thePoint2):
-    aGeomPnt1 = toPoint(thePoint1)
-    aGeomPnt2 = toPoint(thePoint2)
-    return aGeomPnt1.distance(aGeomPnt2)
+    aPnt1 = toList(thePoint1)
+    aPnt2 = toList(thePoint2)
+    return math.hypot(aPnt1[0] - aPnt2[0], aPnt1[1] - aPnt2[1])
 
 def distancePointLine(thePoint, theLine):
-    aPoint = toPoint(thePoint)
+    aPoint = toList(thePoint)
     aLine = toSketchFeature(theLine)
 
     aLineStart = geomDataAPI_Point2D(aLine.attribute("StartPoint")).pnt().xy()
     aLineEnd = geomDataAPI_Point2D(aLine.attribute("EndPoint")).pnt().xy()
     aLineDir = aLineEnd.decreased(aLineStart)
     aLineLen = aLineEnd.distance(aLineStart)
-    aPntDir = aPoint.xy().decreased(aLineStart)
-    return math.fabs(aPntDir.cross(aLineDir) / aLineLen)
+    aCross = (aPoint[0] - aLineStart.x()) * aLineDir.y() - (aPoint[1] - aLineStart.y()) * aLineDir.x()
+    return math.fabs(aCross / aLineLen)
 
 def lastSubFeature(theSketch, theKind):
     """
     obtains last feature of given kind from the sketch
     """
-    for anIndex in range(theSketch.numberOfSubs() - 1, -1, -1):
-        aSub = theSketch.subFeature(anIndex)
+    aSketch = featureToCompositeFeature(toSketchFeature(theSketch))
+    for anIndex in range(aSketch.numberOfSubs() - 1, -1, -1):
+        aSub = aSketch.subFeature(anIndex)
         if (aSub.getKind() == theKind):
             return aSub
 
@@ -85,9 +87,12 @@ def toSketchFeature(theEntity):
     else:
         return theEntity
 
-def toPoint(thePoint):
-    if issubclass(type(thePoint), GeomDataAPI_Point2D):
-        return thePoint.pnt()
+def toList(thePoint):
+    if issubclass(type(thePoint), list):
+        return thePoint
+    elif issubclass(type(thePoint), GeomDataAPI_Point2D):
+        return [thePoint.x(), thePoint.y()]
     else:
-        aPoint = toSketchFeature(thePoint)
-        return geomDataAPI_Point2D(aPoint.attribute("PointCoordinates")).pnt()
+        aFeature = toSketchFeature(thePoint)
+        aPoint = geomDataAPI_Point2D(aFeature.attribute("PointCoordinates"))
+        return [aPoint.x(), aPoint.y()]

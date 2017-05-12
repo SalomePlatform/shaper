@@ -31,6 +31,7 @@
 #include <SketchPlugin_ConstraintVertical.h>
 #include <SketcherPrs_Tools.h>
 //--------------------------------------------------------------------------------------
+#include <ModelAPI_Events.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelHighAPI_Double.h>
@@ -52,6 +53,10 @@
 #include "SketchAPI_Rectangle.h"
 #include "SketchAPI_Rotation.h"
 #include "SketchAPI_Translation.h"
+//--------------------------------------------------------------------------------------
+#include <GeomAPI_Dir2d.h>
+#include <GeomAPI_XY.h>
+#include <cmath>
 //--------------------------------------------------------------------------------------
 SketchAPI_Sketch::SketchAPI_Sketch(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
@@ -786,6 +791,127 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setVertical(
   fillAttribute(theLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   aFeature->execute();
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));
+}
+
+//--------------------------------------------------------------------------------------
+
+static std::shared_ptr<GeomAPI_Pnt2d> pointCoordinates(const AttributePtr& thePoint)
+{
+  AttributePoint2DPtr aPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(thePoint);
+  if (aPnt)
+    return aPnt->pnt();
+  return std::shared_ptr<GeomAPI_Pnt2d>();
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnLine(const FeaturePtr& theFeature)
+{
+  AttributePoint2DPtr aStartAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Line::START_ID()));
+  AttributePoint2DPtr aEndAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Line::END_ID()));
+
+  if (!aStartAttr || !aEndAttr)
+    return std::shared_ptr<GeomAPI_Pnt2d>();
+
+  std::shared_ptr<GeomAPI_XY> aStartPoint = aStartAttr->pnt()->xy();
+  std::shared_ptr<GeomAPI_XY> aEndPoint = aEndAttr->pnt()->xy();
+  return std::shared_ptr<GeomAPI_Pnt2d>(
+      new GeomAPI_Pnt2d(aStartPoint->added(aEndPoint)->multiplied(0.5)));
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> pointOnCircle(const FeaturePtr& theFeature)
+{
+  AttributePoint2DPtr aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Circle::CENTER_ID()));
+  AttributeDoublePtr aRadius = theFeature->real(SketchPlugin_Circle::RADIUS_ID());
+
+  if (!aCenter || !aRadius)
+    return std::shared_ptr<GeomAPI_Pnt2d>();
+
+  return std::shared_ptr<GeomAPI_Pnt2d>(
+      new GeomAPI_Pnt2d(aCenter->x() + aRadius->value(), aCenter->y()));
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnArc(const FeaturePtr& theFeature)
+{
+  static const double PI = 3.141592653589793238463;
+
+  AttributePoint2DPtr aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
+  AttributePoint2DPtr aStartAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Arc::START_ID()));
+  AttributePoint2DPtr aEndAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Arc::END_ID()));
+
+  if (!aCenterAttr || !aStartAttr || !aEndAttr)
+    return std::shared_ptr<GeomAPI_Pnt2d>();
+
+  std::shared_ptr<GeomAPI_Dir2d> aStartDir(new GeomAPI_Dir2d(
+      aStartAttr->x() - aCenterAttr->x(), aStartAttr->y() - aCenterAttr->y()));
+  std::shared_ptr<GeomAPI_Dir2d> aEndDir(new GeomAPI_Dir2d(
+      aEndAttr->x() - aCenterAttr->x(), aEndAttr->y() - aCenterAttr->y()));
+
+  double anAngle = aStartDir->angle(aEndDir);
+  bool isReversed = theFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
+  if (isReversed && anAngle > 0.)
+    anAngle -= 2.0 * PI;
+  else if (!isReversed && anAngle <= 0.)
+    anAngle += 2.0 * PI;
+
+  double cosA = cos(anAngle);
+  double sinA = sin(anAngle);
+
+  // rotate start dir to find middle point on arc
+  double aRadius = aStartAttr->pnt()->distance(aCenterAttr->pnt());
+  double x = aCenterAttr->x() + aRadius * (aStartDir->x() * cosA - aStartDir->y() * sinA);
+  double y = aCenterAttr->y() + aRadius * (aStartDir->x() * sinA + aStartDir->y() * cosA);
+
+  return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(x, y));
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject)
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (aFeature) {
+    const std::string& aFeatureKind = aFeature->getKind();
+    if (aFeatureKind == SketchPlugin_Point::ID())
+      return pointCoordinates(aFeature->attribute(SketchPlugin_Point::COORD_ID()));
+    else if (aFeatureKind == SketchPlugin_Line::ID())
+      return middlePointOnLine(aFeature);
+    else if (aFeatureKind == SketchPlugin_Circle::ID())
+      return pointOnCircle(aFeature);
+    else if (aFeatureKind == SketchPlugin_Arc::ID())
+      return middlePointOnArc(aFeature);
+  }
+  // do not move other types of features
+  return std::shared_ptr<GeomAPI_Pnt2d>();
+}
+
+void SketchAPI_Sketch::move(const ModelHighAPI_RefAttr& theMovedEntity,
+                            const std::shared_ptr<GeomAPI_Pnt2d>& theTargetPoint)
+{
+  std::shared_ptr<ModelAPI_ObjectMovedMessage> aMessage(new ModelAPI_ObjectMovedMessage);
+  theMovedEntity.fillMessage(aMessage);
+
+  std::shared_ptr<GeomAPI_Pnt2d> anOriginalPosition;
+  if (aMessage->movedAttribute())
+    anOriginalPosition = pointCoordinates(aMessage->movedAttribute());
+  else
+    anOriginalPosition = middlePoint(aMessage->movedObject());
+
+  if (!anOriginalPosition)
+    return; // something has gone wrong, do not process movement
+
+  aMessage->setOriginalPosition(anOriginalPosition);
+  aMessage->setCurrentPosition(theTargetPoint);
+  Events_Loop::loop()->send(aMessage);
+}
+
+void SketchAPI_Sketch::move(const ModelHighAPI_RefAttr& theMovedEntity,
+                            double theTargetX, double theTargetY)
+{
+  std::shared_ptr<GeomAPI_Pnt2d> aTargetPoint(new GeomAPI_Pnt2d(theTargetX, theTargetY));
+  move(theMovedEntity, aTargetPoint);
 }
 
 //--------------------------------------------------------------------------------------

@@ -12,8 +12,8 @@ TOLERANCE = 1.e-7
 def assertPoint(thePoint, theCoords):
     """ Verifies coordinates of the point
     """
-    aPoint = tools.toPoint(thePoint)
-    assert aPoint.x() == theCoords[0] and aPoint.y() == theCoords[1], "Wrong '{}' point ({}, {}), expected ({}, {})".format(thePoint.id(), aPoint.x(), aPoint.y(), theCoords[0], theCoords[1])
+    aPoint = tools.toList(thePoint)
+    assert aPoint[0] == theCoords[0] and aPoint[1] == theCoords[1], "Wrong '{}' point {}, expected {}".format(thePoint.id(), aPoint, theCoords)
 
 
 def assertLine(theLine, theStart, theEnd):
@@ -73,4 +73,4 @@ def assertArcValidity(theArc):
     aDistCS = tools.distancePointPoint(aCenterPnt, aStartPnt)
     aDistCE = tools.distancePointPoint(aCenterPnt, aEndPnt)
     assert math.fabs(aDistCS - aDistCE) < TOLERANCE, "Wrong arc: center-start distance {}, center-end distance {}".format(aDistCS, aDistCE)
-    assert math.fabs(aRadius.value() - aDistCS) < TOLERANCE, "Wrong arc: radius is {0}, expected {1}".format(aRadius.value(), aDistCS)
+    assert math.fabs(aRadius.value() - aDistCS) < TOLERANCE, "Wrong arc: radius is {}, expected {}".format(aRadius.value(), aDistCS)
