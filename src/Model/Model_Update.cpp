@@ -314,9 +314,22 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     // processed features must be only on finish, so clear anyway (to avoid reimport on load)
     myProcessOnFinish.clear();
 
+    // #2156: current must be sketch, left after the macro execution
+    DocumentPtr anActiveDoc = ModelAPI_Session::get()->activeDocument();
+    FeaturePtr aCurrent;
+    if (anActiveDoc.get())
+      aCurrent = anActiveDoc->currentFeature(false);
+
     if (!(theMessage->eventID() == kOpStartEvent)) {
       processFeatures(false);
     }
+
+    if (anActiveDoc.get() && aCurrent.get() && aCurrent->data()->isValid()) {
+      if (anActiveDoc->currentFeature(false) != aCurrent)
+        anActiveDoc->setCurrentFeature(aCurrent, false); // #2156 make the current feature back
+    }
+
+
     // remove all macros before clearing all created
     std::set<FeaturePtr>::iterator anUpdatedIter = myWaitForFinish.begin();
     while(anUpdatedIter != myWaitForFinish.end()) {
