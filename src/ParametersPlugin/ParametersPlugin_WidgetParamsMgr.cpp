@@ -329,7 +329,7 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
     for(aIt = aRefs.cbegin(); aIt != aRefs.cend(); aIt++) {
       std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
       FeaturePtr aReferenced = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
-      if (aReferenced.get()) {
+      if (aReferenced.get() && (aReferenced != aParameter)) {
         if (aReferenced->getKind() == ParametersPlugin_Parameter::ID()) {
           // Find referenced feature Recursive
           QList<FeaturePtr> aList;
@@ -758,16 +758,14 @@ void ParametersPlugin_WidgetParamsMgr::enableButtons(bool theEnable)
 bool ParametersPlugin_WidgetParamsMgr::isValid()
 {
   QTreeWidgetItem* aItem;
-  bool aIsValid = true;
   for(int i = 0; i < myParameters->childCount(); i++) {
     aItem = myParameters->child(i);
     if ((aItem->text(Col_Name) == NoName) ||
         (aItem->text(Col_Equation) == NoValue) ||
         (!ModelAPI_Expression::isVariable(aItem->text(Col_Name).toStdString())) ) {
-      aIsValid = false;
-      break;
+      return false;
     }
   }
-  return aIsValid;
+  return true;
 }
 
