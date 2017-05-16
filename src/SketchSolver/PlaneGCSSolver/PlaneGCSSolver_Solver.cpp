@@ -74,7 +74,7 @@ void PlaneGCSSolver_Solver::addParameters(const GCS::SET_pD& theParams)
 
   myParameters.insert(myParameters.end(), aParams.begin(), aParams.end());
   if (myConstraints.empty() && myDOF >=0)
-    myDOF += (int)aParams.size(); // calculate DoF by hand if and only if there is no constraints yet
+    myDOF += (int)aParams.size(); // calculate DoF by hand only if there is no constraints yet
   else
     myDiagnoseBeforeSolve = true;
 }
