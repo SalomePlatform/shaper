@@ -262,7 +262,9 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
               elif aTables.type() == 2: # double
                 aVal = float(aVal)
               aValues.append(aVal)
-          aResField.addStep(aStepIndex + 1, aStamp, aValues)
+          aStep = aResField.addStep(aStepIndex + 1, aStamp, aValues)
+          if aStep:
+            self.geompy.addToStudyInFather( aResField, aStep, aStep.GetName() )
 
     ## Exports all shapes and groups into the GEOM module.
     def execute(self):
