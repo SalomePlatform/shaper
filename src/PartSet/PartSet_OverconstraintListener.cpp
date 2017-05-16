@@ -171,7 +171,9 @@ void PartSet_OverconstraintListener::processEvent(
                                                            (anOperation);
       if (aFOperation) {
         FeaturePtr aFeature = aFOperation->feature();
-        if (aFeature.get())
+        // data valid is necessary if the feature has been already deleted
+        // (e.g. Esc of Lenght if lenght value is modified)
+        if (aFeature.get() && aFeature->data()->isValid())
           aCurrentFeatureName = aFeature->data()->name();
       }
     }
