@@ -88,6 +88,12 @@ static ConstraintWrapperPtr
   createConstraintMiddlePoint(std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint,
                               std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity);
 
+static GCS::SET_pD scalarParameters(const ScalarWrapperPtr& theScalar);
+static GCS::SET_pD pointParameters(const PointWrapperPtr& thePoint);
+static GCS::SET_pD lineParameters(const EdgeWrapperPtr& theLine);
+static GCS::SET_pD circleParameters(const EdgeWrapperPtr& theCircle);
+static GCS::SET_pD arcParameters(const EdgeWrapperPtr& theArc);
+
 
 
 
@@ -240,6 +246,27 @@ std::shared_ptr<GeomAPI_Lin2d> PlaneGCSSolver_Tools::line(FeaturePtr theFeature)
 
   return std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aStart->pnt(), aEnd->pnt()));
 }
+
+
+GCS::SET_pD PlaneGCSSolver_Tools::parameters(const EntityWrapperPtr& theEntity)
+{
+  switch (theEntity->type()) {
+  case ENTITY_SCALAR:
+  case ENTITY_ANGLE:
+    return scalarParameters(GCS_SCALAR_WRAPPER(theEntity));
+  case ENTITY_POINT:
+    return pointParameters(GCS_POINT_WRAPPER(theEntity));
+  case ENTITY_LINE:
+    return lineParameters(GCS_EDGE_WRAPPER(theEntity));
+  case ENTITY_CIRCLE:
+    return circleParameters(GCS_EDGE_WRAPPER(theEntity));
+  case ENTITY_ARC:
+    return arcParameters(GCS_EDGE_WRAPPER(theEntity));
+  default: break;
+  }
+  return GCS::SET_pD();
+}
+
 
 
 
@@ -453,4 +480,56 @@ ConstraintWrapperPtr createConstraintEqual(
   if (theIntermed)
     aResult->setValueParameter(theIntermed);
   return aResult;
+}
+
+GCS::SET_pD scalarParameters(const ScalarWrapperPtr& theScalar)
+{
+  GCS::SET_pD aParams;
+  aParams.insert(theScalar->scalar());
+  return aParams;
+}
+
+GCS::SET_pD pointParameters(const PointWrapperPtr& thePoint)
+{
+  GCS::SET_pD aParams;
+  aParams.insert(thePoint->point()->x);
+  aParams.insert(thePoint->point()->y);
+  return aParams;
+}
+
+GCS::SET_pD lineParameters(const EdgeWrapperPtr& theLine)
+{
+  GCS::SET_pD aParams;
+  std::shared_ptr<GCS::Line> aLine = std::dynamic_pointer_cast<GCS::Line>(theLine->entity());
+  aParams.insert(aLine->p1.x);
+  aParams.insert(aLine->p1.y);
+  aParams.insert(aLine->p2.x);
+  aParams.insert(aLine->p2.y);
+  return aParams;
+}
+
+GCS::SET_pD circleParameters(const EdgeWrapperPtr& theCircle)
+{
+  GCS::SET_pD aParams;
+  std::shared_ptr<GCS::Circle> aCirc = std::dynamic_pointer_cast<GCS::Circle>(theCircle->entity());
+  aParams.insert(aCirc->center.x);
+  aParams.insert(aCirc->center.y);
+  aParams.insert(aCirc->rad);
+  return aParams;
+}
+
+GCS::SET_pD arcParameters(const EdgeWrapperPtr& theArc)
+{
+  GCS::SET_pD aParams;
+  std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(theArc->entity());
+  aParams.insert(anArc->center.x);
+  aParams.insert(anArc->center.y);
+  aParams.insert(anArc->start.x);
+  aParams.insert(anArc->start.y);
+  aParams.insert(anArc->end.x);
+  aParams.insert(anArc->end.y);
+  aParams.insert(anArc->startAngle);
+  aParams.insert(anArc->endAngle);
+  aParams.insert(anArc->rad);
+  return aParams;
 }

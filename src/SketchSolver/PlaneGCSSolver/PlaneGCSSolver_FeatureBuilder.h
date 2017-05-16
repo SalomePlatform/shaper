@@ -32,17 +32,9 @@ public:
   /// \param theFeature [in]  feature to create
   virtual EntityWrapperPtr createFeature(FeaturePtr theFeature);
 
-  /// \brief Return list of constraints necessary to fix feature's extra DoF
-  virtual const std::list<GCSConstraintPtr>& constraints() const
-  { return myFeatureConstraints; }
-
 private:
   /// list of converted attributes (will be cleared when the feature is created)
   AttributeEntityMap myAttributes;
-
-  /// constraints for the feature
-  /// (primarily used for constrain arcs, which have 9 parameters but 5 DoF)
-  std::list<GCSConstraintPtr> myFeatureConstraints;
 };
 
 #endif

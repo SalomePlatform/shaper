@@ -90,9 +90,3 @@ EntityWrapperPtr PlaneGCSSolver_AttributeBuilder::createAttribute(
     aResult->setExternal(true);
   return aResult;
 }
-
-const std::list<GCSConstraintPtr>& PlaneGCSSolver_AttributeBuilder::constraints() const
-{
-  static std::list<GCSConstraintPtr> aList;
-  return aList;
-}

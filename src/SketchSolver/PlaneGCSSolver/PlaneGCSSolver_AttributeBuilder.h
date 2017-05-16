@@ -28,9 +28,6 @@ public:
   /// \brief Blank. To be defined in derived class.
   virtual EntityWrapperPtr createFeature(FeaturePtr)
   { return EntityWrapperPtr(); }
-
-  /// \brief Blank. To be defined in derived class.
-  virtual const std::list<GCSConstraintPtr>& constraints() const;
 };
 
 #endif

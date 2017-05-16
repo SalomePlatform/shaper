@@ -14,6 +14,17 @@
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_IntersectionPoint.h>
 
+static void createCopiedEntity(const FeaturePtr& theFeature, const StoragePtr& theStorage)
+{
+  EntityWrapperPtr anEntity = theStorage->entity(theFeature);
+  if (anEntity) {
+    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
+    if (!anEntity->isExternal() && aSketchFeature->isCopy())
+      theStorage->makeExternal(anEntity);
+  }
+}
+
 void SketchSolver_ConstraintMulti::getEntities(std::list<EntityWrapperPtr>& theEntities)
 {
   myAdjusted = false;
@@ -53,8 +64,10 @@ void SketchSolver_ConstraintMulti::getEntities(std::list<EntityWrapperPtr>& theE
     for (int i = 0; i < myNumberOfCopies && anObjIt != anObjectList.end(); ++i, ++anObjIt) {
       // just add copied features into the list of objects
       aFeature = ModelAPI_Feature::feature(*anObjIt);
-      if (aFeature)
+      if (aFeature) {
+        createCopiedEntity(aFeature, myStorage);
         myFeatures.insert(aFeature);
+      }
     }
   }
 }
@@ -62,6 +75,20 @@ void SketchSolver_ConstraintMulti::getEntities(std::list<EntityWrapperPtr>& theE
 bool SketchSolver_ConstraintMulti::remove()
 {
   myStorage->unsubscribeUpdates(this);
+
+  // "Multi" constraint has been removed, thus all copy features become non-copied,
+  // add them once again to be a common feature
+  std::set<FeaturePtr>::iterator anIt = myFeatures.begin();
+  for (; anIt != myFeatures.end(); ++anIt) {
+    EntityWrapperPtr anEntity = myStorage->entity(*anIt);
+    if (anEntity) {
+      std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
+      if (anEntity->isExternal() && !aSketchFeature->isExternal())
+        myStorage->makeNonExternal(anEntity);
+    } else
+      myStorage->update(*anIt, true);
+  }
 
   myFeatures.clear();
   return SketchSolver_Constraint::remove();

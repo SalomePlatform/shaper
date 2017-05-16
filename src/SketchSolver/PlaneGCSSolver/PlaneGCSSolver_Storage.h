@@ -48,6 +48,10 @@ public:
   /// \return \c true if the attribute has been created or updated
   virtual bool update(AttributePtr theAttribute, bool theForce = false);
 
+  /// \brief Make entity external
+  virtual void makeExternal(const EntityWrapperPtr& theEntity);
+  /// \brief Make entity non-external
+  virtual void makeNonExternal(const EntityWrapperPtr& theEntity);
 
   /// \brief Removes constraint from the storage
   /// \return \c true if the constraint and all its parameters are removed successfully
@@ -76,6 +80,9 @@ private:
   /// \brief Convert attribute using specified builder.
   EntityWrapperPtr createAttribute(const AttributePtr&           theAttribute,
                                    PlaneGCSSolver_EntityBuilder* theBuilder);
+
+  void createArcConstraints(const EntityWrapperPtr& theArc);
+  void removeArcConstraints(const EntityWrapperPtr& theArc);
 
 private:
   ConstraintID myConstraintLastID;   ///< identifier of last added constraint

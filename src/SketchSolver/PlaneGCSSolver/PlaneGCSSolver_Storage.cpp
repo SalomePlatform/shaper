@@ -9,6 +9,7 @@
 #include <PlaneGCSSolver_ConstraintWrapper.h>
 #include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
+#include <PlaneGCSSolver_Tools.h>
 
 #include <PlaneGCSSolver_AttributeBuilder.h>
 #include <PlaneGCSSolver_FeatureBuilder.h>
@@ -176,17 +177,7 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
     // (do not want to add several copies of it while adding attributes)
     aRelated = createFeature(theFeature, &aBuilder);
     myFeatureMap[theFeature] = aRelated;
-
-    const std::list<GCSConstraintPtr>& aConstraints = aBuilder.constraints();
-    if (!aConstraints.empty()) { // the feature is arc
-      /// TODO: avoid this workaround
-      ConstraintWrapperPtr aWrapper(
-          new PlaneGCSSolver_ConstraintWrapper(aConstraints, CONSTRAINT_UNKNOWN));
-      aWrapper->setId(++myConstraintLastID);
-      constraintsToSolver(aWrapper, mySketchSolver);
-
-      myArcConstraintMap[myFeatureMap[theFeature]] = aWrapper;
-    }
+    createArcConstraints(aRelated);
     isUpdated = true;
   }
 
@@ -263,6 +254,72 @@ bool PlaneGCSSolver_Storage::update(AttributePtr theAttribute, bool theForce)
   return isUpdated;
 }
 
+void PlaneGCSSolver_Storage::makeExternal(const EntityWrapperPtr& theEntity)
+{
+  if (theEntity->isExternal())
+    return;
+
+  removeArcConstraints(theEntity);
+
+  GCS::SET_pD aParameters = PlaneGCSSolver_Tools::parameters(theEntity);
+  mySketchSolver->removeParameters(aParameters);
+  theEntity->setExternal(true);
+  myNeedToResolve = true;
+}
+
+void PlaneGCSSolver_Storage::makeNonExternal(const EntityWrapperPtr& theEntity)
+{
+  if (!theEntity->isExternal())
+    return;
+
+  GCS::SET_pD aParameters = PlaneGCSSolver_Tools::parameters(theEntity);
+  mySketchSolver->addParameters(aParameters);
+  theEntity->setExternal(false);
+
+  createArcConstraints(theEntity);
+
+  myNeedToResolve = true;
+}
+
+
+void PlaneGCSSolver_Storage::createArcConstraints(const EntityWrapperPtr& theArc)
+{
+  if (theArc->type() != ENTITY_ARC || theArc->isExternal())
+    return;
+
+  EdgeWrapperPtr anEdge = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theArc);
+  std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEdge->entity());
+
+  // Additional constaints to fix arc's extra DoF (if the arc is not external):
+  std::list<GCSConstraintPtr> anArcConstraints;
+  // 1. distances from center till start and end points are equal to radius
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
+      anArc->center, anArc->start, anArc->rad)));
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
+      anArc->center, anArc->end, anArc->rad)));
+  // 2. angles of start and end points should be equal to the arc angles
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PAngle(
+      anArc->center, anArc->start, anArc->startAngle)));
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PAngle(
+      anArc->center, anArc->end, anArc->endAngle)));
+
+  ConstraintWrapperPtr aWrapper(
+      new PlaneGCSSolver_ConstraintWrapper(anArcConstraints, CONSTRAINT_UNKNOWN));
+  aWrapper->setId(++myConstraintLastID);
+  constraintsToSolver(aWrapper, mySketchSolver);
+
+  myArcConstraintMap[theArc] = aWrapper;
+}
+
+void PlaneGCSSolver_Storage::removeArcConstraints(const EntityWrapperPtr& theArc)
+{
+  std::map<EntityWrapperPtr, ConstraintWrapperPtr>::iterator
+      aFound = myArcConstraintMap.find(theArc);
+  if (aFound != myArcConstraintMap.end()) {
+    mySketchSolver->removeConstraint(aFound->second->id());
+    myArcConstraintMap.erase(aFound);
+  }
+}
 
 
 bool PlaneGCSSolver_Storage::removeConstraint(ConstraintPtr theConstraint)
@@ -321,12 +378,7 @@ void PlaneGCSSolver_Storage::removeInvalidEntities()
         aDestroyer.remove(aFIter->second);
 
       // remove invalid arc
-      std::map<EntityWrapperPtr, ConstraintWrapperPtr>::iterator
-          aFound = myArcConstraintMap.find(aFIter->second);
-      if (aFound != myArcConstraintMap.end()) {
-        mySketchSolver->removeConstraint(aFound->second->id());
-        myArcConstraintMap.erase(aFound);
-      }
+      removeArcConstraints(aFIter->second);
     }
   std::list<FeaturePtr>::const_iterator anInvFIt = anInvalidFeatures.begin();
   for (; anInvFIt != anInvalidFeatures.end(); ++anInvFIt)

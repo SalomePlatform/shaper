@@ -63,6 +63,22 @@ double* PlaneGCSSolver_Solver::createParameter()
   return aResult;
 }
 
+void PlaneGCSSolver_Solver::addParameters(const GCS::SET_pD& theParams)
+{
+  GCS::SET_pD aParams(theParams);
+  // leave new parameters only
+  GCS::VEC_pD::iterator anIt = myParameters.begin();
+  for (; anIt != myParameters.end(); ++anIt)
+    if (aParams.find(*anIt) != aParams.end())
+      aParams.erase(*anIt);
+
+  myParameters.insert(myParameters.end(), aParams.begin(), aParams.end());
+  if (myConstraints.empty() && myDOF >=0)
+    myDOF += (int)aParams.size(); // calculate DoF by hand if and only if there is no constraints yet
+  else
+    myDiagnoseBeforeSolve = true;
+}
+
 void PlaneGCSSolver_Solver::removeParameters(const GCS::SET_pD& theParams)
 {
   for (int i = (int)myParameters.size() - 1; i >= 0; --i)
@@ -70,6 +86,8 @@ void PlaneGCSSolver_Solver::removeParameters(const GCS::SET_pD& theParams)
       myParameters.erase(myParameters.begin() + i);
       --myDOF;
     }
+  if (!myConstraints.empty())
+    myDiagnoseBeforeSolve = true;
 }
 
 void PlaneGCSSolver_Solver::initialize()

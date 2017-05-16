@@ -82,6 +82,11 @@ public:
   /// \brief Returns entity related to corresponding attribute
   const EntityWrapperPtr& entity(const AttributePtr& theAttribute) const;
 
+  /// \brief Make entity external
+  virtual void makeExternal(const EntityWrapperPtr& theEntity) = 0;
+  /// \brief Make entity non-external
+  virtual void makeNonExternal(const EntityWrapperPtr& theEntity) = 0;
+
   /// \brief Removes constraint from the storage
   /// \return \c true if the constraint and all its parameters are removed successfully
   virtual bool removeConstraint(ConstraintPtr theConstraint) = 0;

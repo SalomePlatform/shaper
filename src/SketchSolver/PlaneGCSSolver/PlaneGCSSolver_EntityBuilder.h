@@ -37,9 +37,6 @@ public:
   /// \param theFeature [in]  feature to create
   virtual EntityWrapperPtr createFeature(FeaturePtr) = 0;
 
-  /// \brief Return list of constraints necessary to fix feature's extra DoF
-  virtual const std::list<GCSConstraintPtr>& constraints() const = 0;
-
 protected:
   PlaneGCSSolver_Storage* myStorage;
 };

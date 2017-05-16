@@ -39,6 +39,8 @@ public:
 
   /// \brief Initialize memory for new solver's parameter
   double* createParameter();
+  /// \brief Add parameters created elsewhere
+  void addParameters(const GCS::SET_pD& theParams);
   /// \brief Release memory occupied by parameters
   void removeParameters(const GCS::SET_pD& theParams);
 
