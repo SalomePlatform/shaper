@@ -284,7 +284,7 @@ void PlaneGCSSolver_Storage::makeNonExternal(const EntityWrapperPtr& theEntity)
 
 void PlaneGCSSolver_Storage::createArcConstraints(const EntityWrapperPtr& theArc)
 {
-  if (theArc->type() != ENTITY_ARC || theArc->isExternal())
+  if (!theArc || theArc->type() != ENTITY_ARC || theArc->isExternal())
     return;
 
   EdgeWrapperPtr anEdge = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theArc);
