@@ -345,10 +345,29 @@ void SketchPlugin_Trim::execute()
       }
     }
     const std::list<ObjectPtr>& anObjects = anInfo.second;
+    std::shared_ptr<GeomAPI_Pnt2d> aPoint2D = sketch()->to2D(aPoint);
     for (std::list<ObjectPtr>::const_iterator anObjectIt = anObjects.begin();
       anObjectIt != anObjects.end(); anObjectIt++) {
-      createConstraintToObject(SketchPlugin_ConstraintCoincidence::ID(), aPointAttribute,
-                               *anObjectIt);
+      ObjectPtr anObject = *anObjectIt;
+      // find an attribute on the point feature and if it is, append it into attribute list
+      // the case when the feature just touch the source feature, not intersect
+      FeaturePtr aRefFeature = ModelAPI_Feature::feature(anObject);
+      std::list<std::shared_ptr<ModelAPI_Attribute> > anAttributes =
+                              aRefFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+      bool aFoundAttribute = false;
+      for (std::list<std::shared_ptr<ModelAPI_Attribute> >::const_iterator
+           aPntAttrIt = anAttributes.begin(); aPntAttrIt != anAttributes.end(); aPntAttrIt++) {
+        std::shared_ptr<GeomDataAPI_Point2D> anAttrPoint =
+                                 std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*aPntAttrIt);
+        if (anAttrPoint->pnt()->isEqual(aPoint2D)) {
+          createConstraint(SketchPlugin_ConstraintCoincidence::ID(), aPointAttribute, anAttrPoint);
+          aFoundAttribute = true;
+          break;
+        }
+      }
+      if (!aFoundAttribute)
+        createConstraintToObject(SketchPlugin_ConstraintCoincidence::ID(), aPointAttribute,
+                                 anObject);
     }
   }
 
