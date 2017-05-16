@@ -837,10 +837,13 @@ bool PartSet_WidgetPoint2D::isOrphanPoint(const FeaturePtr& theFeature,
       if (aCoincidence.get()) {
         QList<FeaturePtr> aCoinsideLines;
         QList<FeaturePtr> aCoins;
+        QList<bool> anIsAttributes;
         PartSet_Tools::findCoincidences(aCoincidence, aCoinsideLines, aCoins,
-                                        SketchPlugin_ConstraintCoincidence::ENTITY_A());
+                                        SketchPlugin_ConstraintCoincidence::ENTITY_A(),
+                                        anIsAttributes);
         PartSet_Tools::findCoincidences(aCoincidence, aCoinsideLines, aCoins,
-                                        SketchPlugin_ConstraintCoincidence::ENTITY_B());
+                                        SketchPlugin_ConstraintCoincidence::ENTITY_B(),
+                                        anIsAttributes);
         QList<FeaturePtr>::const_iterator anIt = aCoinsideLines.begin(),
                                           aLast = aCoinsideLines.end();
         for (; anIt != aLast && anOrphanPoint; anIt++) {

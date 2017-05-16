@@ -749,7 +749,7 @@ FeaturePtr PartSet_Tools::findFirstCoincidence(const FeaturePtr& theFeature,
 
 void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList,
                                      QList<FeaturePtr>& theCoincidencies,
-                                     std::string theAttr)
+                                     std::string theAttr, QList<bool>& theIsAttributes)
 {
   std::shared_ptr<GeomAPI_Pnt2d> aOrig = getCoincedencePoint(theStartCoin);
   if (aOrig.get() == NULL)
@@ -764,6 +764,7 @@ void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>&
     if (!theList.contains(aFeature)) {
       theList.append(aFeature);
       theCoincidencies.append(theStartCoin);
+      theIsAttributes.append(true); // point attribute on a feature
       const std::set<AttributePtr>& aRefsList = aFeature->data()->refsToMe();
       std::set<AttributePtr>::const_iterator aIt;
       for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
@@ -774,9 +775,9 @@ void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>&
             std::shared_ptr<GeomAPI_Pnt2d> aPnt = getCoincedencePoint(aConstrFeature);
             if (aPnt.get() && aOrig->isEqual(aPnt)) {
               findCoincidences(aConstrFeature, theList, theCoincidencies,
-                SketchPlugin_ConstraintCoincidence::ENTITY_A());
+                SketchPlugin_ConstraintCoincidence::ENTITY_A(), theIsAttributes);
               findCoincidences(aConstrFeature, theList, theCoincidencies,
-                SketchPlugin_ConstraintCoincidence::ENTITY_B());
+                SketchPlugin_ConstraintCoincidence::ENTITY_B(), theIsAttributes);
             }
           }
         }
@@ -790,6 +791,7 @@ void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>&
       if (!theList.contains(aFeature))
         theList.append(aFeature);
       theCoincidencies.append(theStartCoin);
+      theIsAttributes.append(false); // point attribute on a feature
 
       const std::set<AttributePtr>& aRefsList = aResult->data()->refsToMe();
       std::set<AttributePtr>::const_iterator aIt;
@@ -801,9 +803,9 @@ void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>&
             std::shared_ptr<GeomAPI_Pnt2d> aPnt = getCoincedencePoint(aConstrFeature);
             if (aPnt.get() && aOrig->isEqual(aPnt)) {
               findCoincidences(aConstrFeature, theList, theCoincidencies,
-                SketchPlugin_ConstraintCoincidence::ENTITY_A());
+                SketchPlugin_ConstraintCoincidence::ENTITY_A(), theIsAttributes);
               findCoincidences(aConstrFeature, theList, theCoincidencies,
-                SketchPlugin_ConstraintCoincidence::ENTITY_B());
+                SketchPlugin_ConstraintCoincidence::ENTITY_B(), theIsAttributes);
             }
           }
         }

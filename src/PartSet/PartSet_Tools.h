@@ -247,7 +247,7 @@ public:
   */
   static void findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList,
                                QList<FeaturePtr>& theCoincidencies,
-                               std::string theAttr);
+                               std::string theAttr, QList<bool>& theIsAttributes);
 
   /**
   * Returns point of a coincedence

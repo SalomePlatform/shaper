@@ -331,7 +331,7 @@ void SketcherPrs_SymbolPrs::drawShape(const std::shared_ptr<GeomAPI_Shape>& theS
                                       Quantity_Color theColor) const
 {
   int aColNam = theColor.Name();
-  cout<<"### SketcherPrs_SymbolPrs::drawShape "<<theColor.Name()<<endl;
+  //cout<<"### SketcherPrs_SymbolPrs::drawShape "<<theColor.Name()<<endl;
   Handle(Graphic3d_AspectLine3d) aLineAspect =
     new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
 

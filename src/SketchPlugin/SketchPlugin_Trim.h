@@ -107,9 +107,10 @@ class SketchPlugin_Trim : public SketchPlugin_Feature, public GeomAPI_IPresentab
 private:
   bool setCoincidenceToAttribute(const AttributePtr& theAttribute,
             const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences);
-
-  bool replaceCoincidenceAttribute(const AttributePtr& theCoincidenceAttribute,
-            const std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
+  /// Move tangency constraint to the feature if it is geometrically closely to it
+  /// \param theAttribute an attribute of a tangent constraint feature
+  /// \param theFeature a feature that can be set into the attribute
+  bool moveTangency(const AttributePtr& theAttribute, const FeaturePtr& theFeature);
 
   GeomShapePtr getSubShape(const std::string& theObjectAttributeId,
                            const std::string& thePointAttributeId);
@@ -140,13 +141,6 @@ private:
   void getRefAttributes(const FeaturePtr& theFeature,
                         std::map<AttributePtr, std::list<AttributePtr> >& theRefs,
                         std::list<AttributePtr>& theRefsToFeature);
-
-  /// Obtains coincident features to the given object. It is collected in a container
-  /// by the coincident attribute
-  /// \param theObject an investigated object
-  /// \param theCoincidencesToBaseFeature a container of list of referenced attributes
-  //void getCoincidencesToObject(const std::shared_ptr<ModelAPI_Object>& theObject,
-  //                             std::map<AttributePtr, FeaturePtr>& theCoincidencesToBaseFeature);
 
   /// Move constraints from attribute of base feature to attribute after modification
   /// \param theBaseRefAttributes container of references to the attributes of base feature

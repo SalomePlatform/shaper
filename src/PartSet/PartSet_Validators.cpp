@@ -639,10 +639,13 @@ bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute,
         AttributePtr aAR = aRAttr->attr();
         if (aAR->id() != SketchPlugin_Arc::CENTER_ID()) // ignore constraint to center of arc
           aCoinList.insert(aConstrFeature);
+          QList<bool> anIsAttributes;
           PartSet_Tools::findCoincidences(aConstrFeature, aCoinsideLines, aCoins,
-                                          SketchPlugin_ConstraintCoincidence::ENTITY_A());
+                                          SketchPlugin_ConstraintCoincidence::ENTITY_A(),
+                                          anIsAttributes);
           PartSet_Tools::findCoincidences(aConstrFeature, aCoinsideLines, aCoins,
-                                          SketchPlugin_ConstraintCoincidence::ENTITY_B());
+                                          SketchPlugin_ConstraintCoincidence::ENTITY_B(),
+                                          anIsAttributes);
       }
     }
     // if there is no coincidence then it is not valid

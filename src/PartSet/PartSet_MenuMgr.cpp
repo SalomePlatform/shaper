@@ -160,10 +160,13 @@ bool PartSet_MenuMgr::addViewerMenu(const QMap<QString, QAction*>& theStdActions
         if (aCoincident.get() != NULL) {
           QList<FeaturePtr> aCoins;
           mySelectedFeature = aCoincident;
+          QList<bool> anIsAttributes;
           PartSet_Tools::findCoincidences(mySelectedFeature, myCoinsideLines, aCoins,
-                                          SketchPlugin_ConstraintCoincidence::ENTITY_A());
+                                          SketchPlugin_ConstraintCoincidence::ENTITY_A(),
+                                          anIsAttributes);
           PartSet_Tools::findCoincidences(mySelectedFeature, myCoinsideLines, aCoins,
-                                          SketchPlugin_ConstraintCoincidence::ENTITY_B());
+                                          SketchPlugin_ConstraintCoincidence::ENTITY_B(),
+                                          anIsAttributes);
           if (myCoinsideLines.size() > 0) {
             aIsDetach = true;
             QMenu* aSubMenu = new QMenu(tr("Detach"), theParent);
@@ -171,7 +174,12 @@ bool PartSet_MenuMgr::addViewerMenu(const QMap<QString, QAction*>& theStdActions
             QAction* aAction;
             int i = 0;
             foreach (FeaturePtr aCoins, myCoinsideLines) {
-              aAction = aSubMenu->addAction(aCoins->data()->name().c_str());
+              QString anItemText = aCoins->data()->name().c_str();
+#ifdef _DEBUG
+              if (anIsAttributes[i])
+                anItemText += " [attribute]";
+#endif
+              aAction = aSubMenu->addAction(anItemText);
               aAction->setData(QVariant(i));
               i++;
             }
