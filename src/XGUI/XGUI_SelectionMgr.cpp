@@ -8,6 +8,7 @@
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_Selection.h"
+#include "XGUI_OperationMgr.h"
 
 #ifndef HAVE_SALOME
 #include <AppElements_MainWindow.h>
@@ -121,6 +122,7 @@ void XGUI_SelectionMgr::onViewerSelection()
   QObjectPtrList aFeatures;
   ResultPtr aResult;
   FeaturePtr aFeature;
+  bool aHasOperation = (myWorkshop->operationMgr()->currentOperation() != 0);
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull()) {
     QList<ModuleBase_ViewerPrsPtr> aPresentations =
@@ -129,7 +131,7 @@ void XGUI_SelectionMgr::onViewerSelection()
       if (aPrs->object().get()) {
         if (!aFeatures.contains(aPrs->object()))
           aFeatures.append(aPrs->object());
-        if (aPrs->shape().get()) {
+        if (aPrs->shape().get() && (!aHasOperation)) {
           aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
           if (aResult.get()) {
             aFeature = anActiveDocument->producedByFeature(aResult, aPrs->shape());
