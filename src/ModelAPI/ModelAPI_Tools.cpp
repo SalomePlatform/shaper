@@ -167,8 +167,12 @@ bool findVariable(const DocumentPtr& theDocument, FeaturePtr theSearcher,
   if (!theParam.get())
     return false;
   // avoid usage of parameters created later than the initial parameter
-  if (theSearcher.get() && theDocument->isLater(theDocument->feature(theParam), theSearcher))
-    return false;
+
+  if (theSearcher.get()) {
+    FeaturePtr aParamFeat = theDocument->feature(theParam);
+    if (aParamFeat == theSearcher || theDocument->isLater(aParamFeat, theSearcher))
+      return false;
+  }
   AttributeDoublePtr aValueAttribute = theParam->data()->real(ModelAPI_ResultParameter::VALUE());
   outValue = aValueAttribute->value();
   return true;
