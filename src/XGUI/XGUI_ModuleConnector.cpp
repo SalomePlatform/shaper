@@ -123,6 +123,8 @@ void XGUI_ModuleConnector::setSelected(const QList<ModuleBase_ViewerPrsPtr>& the
     myWorkshop->selector()->clearSelection();
   } else {
     aDisp->setSelected(theValues);
+    // according to #2154 we need to update OB selection when selection in the viewer happens
+    myWorkshop->selector()->onViewerSelection();
   }
 }
 

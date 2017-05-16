@@ -58,7 +58,7 @@ signals:
   //! Emited when selection in a one of viewers was changed
   void selectionChanged();
 
- private slots:
+ public slots:
    /// Reaction on selectio0n in Object browser
   void onObjectBrowserSelection();
 

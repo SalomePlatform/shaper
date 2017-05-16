@@ -119,6 +119,10 @@ protected:
   /// Computes and updates name of selected object in the widget
   virtual void updateSelectionName();
 
+  /// Emits model changed info, updates the current control by selection change
+  /// \param theDone a state whether the selection is set
+  virtual void updateOnSelectionChanged(const bool theDone);
+
   /// Retunrs a list of possible shape types
   /// \return a list of shapes
   virtual QIntList shapeTypes() const;

@@ -275,17 +275,6 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>
     //emit valuesChanged();
   //}
 
-  // Restore selection in the viewer by the attribute selection list
-  // it is possible that diring selection attribute filling, selection in Object Browser
-  // is changed(some items were removed/added) and as result, selection in the viewer
-  // differs from the selection come to this method. By next rows, we restore selection
-  // in the viewer according to content of selection attribute. Case is Edge selection in Group
-  myIsSetSelectionBlocked = true;
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
-  ModelAPI_EventCreator::get()->sendUpdated(myFeature, anEvent);
-  Events_Loop::loop()->flush(anEvent);
-  myIsSetSelectionBlocked = false;
-
   if (aSelectionListAttr.get())
     aSelectionListAttr->cashValues(false);
 
@@ -477,6 +466,29 @@ void ModuleBase_WidgetMultiSelector::updateFocus()
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::updateSelectionName()
 {
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::updateOnSelectionChanged(const bool theDone)
+{
+  if (myIsSetSelectionBlocked)
+    return;
+  ModuleBase_WidgetSelector::updateOnSelectionChanged(theDone);
+
+  // according to #2154 we need to update OB selection when selection in the viewer happens
+  // it is important to flush sinchronize selection signal after flush of Update/Create/Delete.
+  // because we need that Object Browser has been already updated when synchronize happens.
+
+  // Restore selection in the viewer by the attribute selection list
+  // it is possible that diring selection attribute filling, selection in Object Browser
+  // is changed(some items were removed/added) and as result, selection in the viewer
+  // differs from the selection come to this method. By next rows, we restore selection
+  // in the viewer according to content of selection attribute. Case is Edge selection in Group
+  myIsSetSelectionBlocked = true;
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
+  ModelAPI_EventCreator::get()->sendUpdated(myFeature, anEvent);
+  Events_Loop::loop()->flush(anEvent);
+  myIsSetSelectionBlocked = false;
 }
 
 //********************************************************************
