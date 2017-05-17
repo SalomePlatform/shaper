@@ -1159,8 +1159,7 @@ bool SketchPlugin_CirclePassedPointValidator::isValid(
     return true;
 
   if (aCenterRef->isObject()) {
-    FeaturePtr aCenterFeature = ModelAPI_Feature::feature(aCenterRef->object());
-    if (aCenterFeature == aPassedFeature) {
+    if (aCenterRef->object() == aPassedRef->object()) {
       theError = aErrorMessage;
       return false;
     }
