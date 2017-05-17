@@ -33,7 +33,7 @@ protected:
   /// \param[out] theFullValue  applying translation using the disstance as a full or single value
   /// \param[out] theEntities list of base entities
   void getAttributes(EntityWrapperPtr&            theCenter,
-                     EntityWrapperPtr&            theAngle,
+                     ScalarWrapperPtr&            theAngle,
                      bool&                        theFullValue,
                      std::list<EntityWrapperPtr>& theEntities);
 
@@ -58,7 +58,7 @@ private:
 
 private:
   AttributePoint2DPtr myCenterPointAttribute; ///< a center of rotation
-  double              myAngle;           ///< angle of rotation
+  ScalarWrapperPtr    myAngle;                ///< angle of rotation
 
   double myCenterCoord[2]; ///< coordinates of rotation center
   double myRotationVal[2]; ///< sinus and cosine of rotation angle

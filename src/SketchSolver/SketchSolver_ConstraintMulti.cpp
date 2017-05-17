@@ -86,7 +86,7 @@ bool SketchSolver_ConstraintMulti::remove()
           std::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
       if (anEntity->isExternal() && !aSketchFeature->isExternal())
         myStorage->makeNonExternal(anEntity);
-    } else
+    } else if ((*anIt)->data() && (*anIt)->data()->isValid())
       myStorage->update(*anIt, true);
   }
 

@@ -16,12 +16,13 @@
 #include <cmath>
 
 void SketchSolver_ConstraintMultiRotation::getAttributes(
-    EntityWrapperPtr& theCenter, EntityWrapperPtr& theAngle,
+    EntityWrapperPtr& theCenter, ScalarWrapperPtr& theAngle,
     bool& theFullValue, std::list<EntityWrapperPtr>& theEntities)
 {
   AttributePtr anAngleAttr = myBaseConstraint->attribute(SketchPlugin_MultiRotation::ANGLE_ID());
   PlaneGCSSolver_AttributeBuilder aValueBuilder;
-  theAngle = aValueBuilder.createAttribute(anAngleAttr);
+  theAngle = std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(
+      aValueBuilder.createAttribute(anAngleAttr));
   myStorage->addEntity(anAngleAttr, theAngle);
 
   AttributeRefAttrPtr aCenterAttr =
@@ -56,15 +57,12 @@ void SketchSolver_ConstraintMultiRotation::process()
     return;
   }
 
-  EntityWrapperPtr anAngle;
   EntityWrapperPtr aRotationCenter;
   std::list<EntityWrapperPtr> aBaseEntities;
-  getAttributes(aRotationCenter, anAngle, myIsFullValue, aBaseEntities);
+  getAttributes(aRotationCenter, myAngle, myIsFullValue, aBaseEntities);
   if (!myErrorMsg.empty())
     return;
 
-  ScalarWrapperPtr anAngleVal = std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(anAngle);
-  myAngle = anAngleVal->value();
   myAdjusted = false;
   adjustConstraint();
 
@@ -74,10 +72,10 @@ void SketchSolver_ConstraintMultiRotation::process()
 void SketchSolver_ConstraintMultiRotation::updateLocal()
 {
   double aValue = myBaseConstraint->real(SketchPlugin_MultiRotation::ANGLE_ID())->value();
-  if (fabs(myAngle - aValue) > tolerance)
+  if (fabs(myAngle->value() - aValue) > tolerance)
     myAdjusted = false;
   // update angle value
-  myAngle = aValue;
+  myAngle->setValue(aValue);
 
   // update center
   DataPtr aData = myBaseConstraint->data();
@@ -102,7 +100,8 @@ void SketchSolver_ConstraintMultiRotation::adjustConstraint()
   if (myAdjusted)
     return;
 
-  if (fabs(myAngle) < tolerance) {
+  double anAngleValue = myAngle->value();
+  if (fabs(anAngleValue) < tolerance) {
     myStorage->setNeedToResolve(false);
     return;
   }
@@ -115,7 +114,6 @@ void SketchSolver_ConstraintMultiRotation::adjustConstraint()
   myCenterCoord[0] = *(aCenterPoint->x);
   myCenterCoord[1] = *(aCenterPoint->y);
 
-  double anAngleValue = myAngle;
   if (myIsFullValue && myNumberOfCopies > 0)
     anAngleValue /= myNumberOfCopies;
 
