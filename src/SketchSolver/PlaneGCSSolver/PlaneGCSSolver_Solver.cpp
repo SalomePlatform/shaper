@@ -37,6 +37,7 @@ void PlaneGCSSolver_Solver::addConstraint(GCSConstraintPtr theConstraint)
   myConstraints[theConstraint->getTag()].insert(theConstraint);
   if (theConstraint->getTag() >= 0)
     myDOF = -1;
+  myInitilized = false;
 }
 
 void PlaneGCSSolver_Solver::removeConstraint(ConstraintID theID)
@@ -50,6 +51,7 @@ void PlaneGCSSolver_Solver::removeConstraint(ConstraintID theID)
     if (theID >= 0)
       myDOF = -1;
   }
+  myInitilized = false;
 }
 
 double* PlaneGCSSolver_Solver::createParameter()
