@@ -13,6 +13,10 @@
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintMiddle.h>
 
+static bool hasSamePoint(const std::set<EntityWrapperPtr>& theList,
+                         const EntityWrapperPtr& thePoint);
+
+
 void PlaneGCSSolver_UpdateCoincidence::attach(SketchSolver_Constraint* theObserver,
                                               const std::string& theType)
 {
@@ -72,17 +76,21 @@ bool PlaneGCSSolver_UpdateCoincidence::addCoincidence(
   } else if (aFound[0] == aFound[1]) { // same group => already coincident
     isAccepted = false;
   } else { // merge two groups
-    EntityWrapperPtr anEntityToAdd = theEntity1;
-    if (theEntity1->isExternal()) { // swap found groups;
-      anEntityToAdd = theEntity2;
-      std::list<CoincidentEntities>::iterator aTempIt = aFound[0];
-      aFound[0] = aFound[1];
-      aFound[1] = aTempIt;
+    // first check the external points are equal
+    EntityWrapperPtr anExternal0 = aFound[0]->externalPoint();
+    EntityWrapperPtr anExternal1 = aFound[1]->externalPoint();
+    if (anExternal0 && anExternal1) {
+      std::set<EntityWrapperPtr> anExtList;
+      anExtList.insert(anExternal0);
+      if (hasSamePoint(anExtList, anExternal1)) {
+        // no need to add coincidence, because all points are
+        // already coincident to correct external points
+        isAccepted = false;
+      }
     }
 
-    aFound[1]->remove(anEntityToAdd);
+    // merge
     aFound[0]->merge(*aFound[1]);
-    isAccepted = aFound[0]->add(anEntityToAdd);
     myCoincident.erase(aFound[1]);
   }
 
@@ -126,9 +134,7 @@ bool PlaneGCSSolver_UpdateCoincidence::addToGroupOfCoincidence(
 {
   if (theGroup.isExist(theEntity))
     return false;
-
-  theGroup.add(theEntity);
-  return true;
+  return theGroup.add(theEntity);
 }
 
 
@@ -157,8 +163,8 @@ static bool hasSamePoint(const std::set<EntityWrapperPtr>& theList, const GCS::P
   return false;
 }
 
-static bool hasSamePoint(const std::set<EntityWrapperPtr>& theList,
-                         const EntityWrapperPtr& thePoint)
+bool hasSamePoint(const std::set<EntityWrapperPtr>& theList,
+                  const EntityWrapperPtr& thePoint)
 {
   return hasSamePoint(theList, toPoint(thePoint));
 }
@@ -224,4 +230,9 @@ bool PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::isExist(
     const GCS::Point& thePoint) const
 {
   return hasSamePoint(myExternalPoints, thePoint) || hasSamePoint(myPoints, thePoint);
+}
+
+EntityWrapperPtr PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::externalPoint() const
+{
+  return myExternalPoints.empty() ? EntityWrapperPtr() : *myExternalPoints.begin();
 }

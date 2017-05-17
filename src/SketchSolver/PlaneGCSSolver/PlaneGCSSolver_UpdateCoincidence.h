@@ -73,6 +73,9 @@ private:
     /// Merge two groups
     void merge(const CoincidentEntities& theOther);
 
+    /// Returns any of external points
+    EntityWrapperPtr externalPoint() const;
+
   private:
     std::set<EntityWrapperPtr> myPoints; ///< coincident points
     std::set<EntityWrapperPtr> myExternalPoints; //< external points coincident to other points
