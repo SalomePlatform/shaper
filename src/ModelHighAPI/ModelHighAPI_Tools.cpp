@@ -338,6 +338,7 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
       }
       std::string anError = aFeatFind->second.compare(aFeat);
       if (!anError.empty()) {
+        anError = "Document " + theDocName + " " + anError;
         return anError;
       }
       aFeaturesCount++;
