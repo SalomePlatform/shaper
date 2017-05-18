@@ -1358,16 +1358,15 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   else if (theId == "WIREFRAME_CMD")
     setDisplayMode(aObjects, XGUI_Displayer::Wireframe);
   else if (theId == "HIDEALL_CMD") {
-#ifdef HAVE_SALOME
-    //issue #2159 Hide all incomplete behavior
-    viewer()->eraseAll();
-#else
     QObjectPtrList aList = myDisplayer->displayedObjects();
     foreach (ObjectPtr aObj, aList) {
       if (module()->canEraseObject(aObj))
         aObj->setDisplayed(false);
     }
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+#ifdef HAVE_SALOME
+    //issue #2159 Hide all incomplete behavior
+    viewer()->eraseAll();
 #endif
     updateCommandStatus();
   } else if (theId == "SELECT_VERTEX_CMD") {
@@ -2038,6 +2037,11 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
     if (module()->canEraseObject(aObj))
       aObj->setDisplayed(false);
   }
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+#ifdef HAVE_SALOME
+    //issue #2159 Hide all incomplete behavior
+    viewer()->eraseAll();
+#endif
 
   // Show only objects from the list
   foreach (ObjectPtr aObj, theList) {
