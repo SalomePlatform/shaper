@@ -345,7 +345,7 @@ std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>&
   std::shared_ptr<GeomAPI_Pnt> aCenter = GeomAlgoAPI_ShapeTools::centreOfMass(theShape);
   aResult<<"Center of mass: ";
   double aCenterVals[3] = {aCenter->x(), aCenter->y(), aCenter->z()};
-  dumpArray(aResult, aCenterVals, 3);
+  dumpArray(aResult, aCenterVals, 3, 5);
   aResult<<std::endl;
   return aResult.str();
 }

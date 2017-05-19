@@ -756,9 +756,9 @@ model.testNbSubShapes(Part_1, GeomAPI_Shape.VERTEX, [888])
 model.testResultsVolumes(Part_1, [118190.673218984])
 
 # checking for parametric update
-Parameter_Epaisseur.setValue(33)
+Parameter_Epaisseur.setValue(33.9)
 model.do()
-model.testResultsVolumes(Part_1, [117340.407981679])
+model.testResultsVolumes(Part_1, [118105.9369682])
 Parameter_Epaisseur.setValue(34)
 model.end()
 
