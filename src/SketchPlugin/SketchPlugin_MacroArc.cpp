@@ -618,6 +618,8 @@ void SketchPlugin_MacroArc::fillByTangentEdge()
   aCircBuilder.addTangentCurve(aTangentShape);
 
   std::shared_ptr<GeomAPI_Circ2d> aCircle = aCircBuilder.circle();
+  if (!aCircle)
+    return;
   myCenter = aCircle->center();
 
   // rebuild circle to set start point equal to zero parameter
