@@ -42,10 +42,10 @@ void SketchSolver_ConstraintMultiTranslation::getAttributes(
   // add owner of start and end points of Multi-Translation to the list of monitored features
   FeaturePtr anOwner = ModelAPI_Feature::feature(aStartPointAttr->attr()->owner());
   if (anOwner)
-    myFeatures.insert(anOwner);
+    myOriginalFeatures.insert(anOwner);
   anOwner = ModelAPI_Feature::feature(aEndPointAttr->attr()->owner());
   if (anOwner)
-    myFeatures.insert(anOwner);
+    myOriginalFeatures.insert(anOwner);
 }
 
 void SketchSolver_ConstraintMultiTranslation::process()

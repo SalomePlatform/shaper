@@ -46,7 +46,7 @@ void SketchSolver_ConstraintMultiRotation::getAttributes(
   // add owner of central point of Multi-Rotation to the list of monitored features
   FeaturePtr anOwner = ModelAPI_Feature::feature(aCenterAttr->attr()->owner());
   if (anOwner)
-    myFeatures.insert(anOwner);
+    myOriginalFeatures.insert(anOwner);
 }
 
 void SketchSolver_ConstraintMultiRotation::process()

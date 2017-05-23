@@ -78,8 +78,9 @@ protected:
 
   bool myAdjusted; ///< the constraint is already adjusted (to not do it several times)
 
-  /// list of features and their copies to find whether some of them are disappeared
-  std::set<FeaturePtr> myFeatures;
+  /// lists of original features and their copies to find whether some of them are disappeared
+  std::set<FeaturePtr> myOriginalFeatures;
+  std::set<FeaturePtr> myCopiedFeatures;
 
   bool myIsEventsBlocked;
 };

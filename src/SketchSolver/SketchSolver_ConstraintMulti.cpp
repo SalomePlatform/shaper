@@ -60,13 +60,13 @@ void SketchSolver_ConstraintMulti::getEntities(std::list<EntityWrapperPtr>& theE
     if (!myStorage->update(aFeature))
       myStorage->update(aFeature, true);
     theEntities.push_back(myStorage->entity(aFeature));
-    myFeatures.insert(aFeature);
+    myOriginalFeatures.insert(aFeature);
     for (int i = 0; i < myNumberOfCopies && anObjIt != anObjectList.end(); ++i, ++anObjIt) {
       // just add copied features into the list of objects
       aFeature = ModelAPI_Feature::feature(*anObjIt);
       if (aFeature) {
         createCopiedEntity(aFeature, myStorage);
-        myFeatures.insert(aFeature);
+        myCopiedFeatures.insert(aFeature);
       }
     }
   }
@@ -78,8 +78,8 @@ bool SketchSolver_ConstraintMulti::remove()
 
   // "Multi" constraint has been removed, thus all copy features become non-copied,
   // add them once again to be a common feature
-  std::set<FeaturePtr>::iterator anIt = myFeatures.begin();
-  for (; anIt != myFeatures.end(); ++anIt) {
+  std::set<FeaturePtr>::iterator anIt = myCopiedFeatures.begin();
+  for (; anIt != myCopiedFeatures.end(); ++anIt) {
     EntityWrapperPtr anEntity = myStorage->entity(*anIt);
     if (anEntity) {
       std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
@@ -90,7 +90,8 @@ bool SketchSolver_ConstraintMulti::remove()
       myStorage->update(*anIt, true);
   }
 
-  myFeatures.clear();
+  myOriginalFeatures.clear();
+  myCopiedFeatures.clear();
   return SketchSolver_Constraint::remove();
 }
 
@@ -114,7 +115,8 @@ void SketchSolver_ConstraintMulti::update()
       std::list<ObjectPtr>::iterator anObjIt = anObjectList.begin();
       for (; anObjIt != anObjectList.end(); ++anObjIt) {
         aFeature = ModelAPI_Feature::feature(*anObjIt);
-        if (aFeature && myFeatures.find(aFeature) == myFeatures.end()) {
+        if (aFeature && myOriginalFeatures.find(aFeature) == myOriginalFeatures.end() &&
+            myCopiedFeatures.find(aFeature) == myCopiedFeatures.end()) {
           isUpdated = true;
           break;
         }
@@ -208,7 +210,8 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
 void SketchSolver_ConstraintMulti::notify(const FeaturePtr& theFeature,
                                           PlaneGCSSolver_Update*)
 {
-  if (myFeatures.find(theFeature) == myFeatures.end())
+  if (myOriginalFeatures.find(theFeature) == myOriginalFeatures.end() &&
+      myCopiedFeatures.find(theFeature) == myCopiedFeatures.end())
     return; // the feature is not used by constraint => nothing to update
 
   // update derivative object
@@ -221,8 +224,10 @@ void SketchSolver_ConstraintMulti::blockEvents(bool isBlocked)
 {
   myIsEventsBlocked = isBlocked;
 
-  std::set<FeaturePtr>::iterator anIt = myFeatures.begin();
-  for (; anIt != myFeatures.end(); ++anIt)
+  std::set<FeaturePtr>::iterator anIt = myOriginalFeatures.begin();
+  for (; anIt != myOriginalFeatures.end(); ++anIt)
+    (*anIt)->data()->blockSendAttributeUpdated(isBlocked);
+  for (anIt = myCopiedFeatures.begin(); anIt != myCopiedFeatures.end(); ++anIt)
     (*anIt)->data()->blockSendAttributeUpdated(isBlocked);
 
   SketchSolver_Constraint::blockEvents(isBlocked);
