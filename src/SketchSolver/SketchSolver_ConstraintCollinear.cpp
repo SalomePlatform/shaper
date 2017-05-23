@@ -62,6 +62,9 @@ void SketchSolver_ConstraintCollinear::process()
 void SketchSolver_ConstraintCollinear::notify(const FeaturePtr&      theFeature,
                                               PlaneGCSSolver_Update* theUpdater)
 {
+  if (theFeature == myBaseConstraint)
+    return; // the constraint is already being updated
+
   PlaneGCSSolver_UpdateCoincidence* anUpdater =
       static_cast<PlaneGCSSolver_UpdateCoincidence*>(theUpdater);
 
