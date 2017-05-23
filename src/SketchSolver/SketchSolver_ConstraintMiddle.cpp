@@ -14,7 +14,7 @@ void SketchSolver_ConstraintMiddle::getAttributes(
 void SketchSolver_ConstraintMiddle::notify(const FeaturePtr&      theFeature,
                                            PlaneGCSSolver_Update* theUpdater)
 {
-  if (theFeature == myBaseConstraint)
+  if (theFeature == myBaseConstraint && myInSolver)
     return; // the constraint is already being updated
 
   PlaneGCSSolver_UpdateCoincidence* anUpdater =
@@ -45,8 +45,8 @@ void SketchSolver_ConstraintMiddle::notify(const FeaturePtr&      theFeature,
     }
   } else {
     if (myInSolver) {
-      myInSolver = false;
       myStorage->removeConstraint(myBaseConstraint);
+      myInSolver = false;
     }
 
     if (!myMiddle) {
