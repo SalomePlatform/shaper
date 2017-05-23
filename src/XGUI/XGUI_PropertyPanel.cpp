@@ -42,6 +42,8 @@
 
 //#define DEBUG_TAB_WIDGETS
 
+//#define DEBUG_ACTIVE_WIDGET
+
 XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* theMgr)
     : ModuleBase_IPropertyPanel(theParent),
     myActiveWidget(NULL),
@@ -128,6 +130,9 @@ void XGUI_PropertyPanel::cleanContent()
   myWidgets.clear();
   myPanelPage->clearPage();
   myActiveWidget = NULL;
+#ifdef DEBUG_ACTIVE_WIDGET
+  std::cout << "myActiveWidget = NULL" << std::endl;
+#endif
 
   findButton(PROP_PANEL_PREVIEW)->setVisible(false); /// by default it is hidden
   setWindowTitle(tr("Property Panel"));
@@ -204,6 +209,9 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
 
 void XGUI_PropertyPanel::onFocusInWidget(ModuleBase_ModelWidget* theWidget)
 {
+#ifdef DEBUG_ACTIVE_WIDGET
+  std::cout << "onFocusInWidget" << std::endl;
+#endif
   if (theWidget->canAcceptFocus())
     activateWidget(theWidget);
 }
@@ -444,6 +452,9 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
     theWidget->activate();
   }
   myActiveWidget = theWidget;
+#ifdef DEBUG_ACTIVE_WIDGET
+  std::cout << "myActiveWidget = " << (theWidget ? theWidget->context().c_str() : "") << std::endl;
+#endif
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
   Events_Loop::loop()->flush(anEvent);
 
