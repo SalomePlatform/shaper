@@ -397,13 +397,13 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
                   TDF_Label aSubLab = aLab.FindChild(aTagIndex);
                   std::string aName = "Vertex-"
                       + Model_SelectionNaming::shortName(aConstr, aDelta / kSTART_VERTEX_DELTA);
-                  TNaming_Builder aBuilder(aLab);
+                  TNaming_Builder aBuilder(aSubLab);
                   if (isSelectionMode)
                     aBuilder.Select(aV, aV);
                   else
                     aBuilder.Generated(aV);
-                  aMyDoc->addNamingName(aLab, aName.c_str());
-                  TDataStd_Name::Set(aLab, aName.c_str());
+                  aMyDoc->addNamingName(aSubLab, aName.c_str());
+                  TDataStd_Name::Set(aSubLab, aName.c_str());
                 }
               }
             }
