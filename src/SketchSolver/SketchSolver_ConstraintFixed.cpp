@@ -14,6 +14,8 @@
 
 #include <cmath>
 
+// Verify the points are equal
+static bool isEqual(const GCS::Point& thePoint1, const GCS::Point& thePoint2);
 // Verify the entities are equal
 static bool isEqual(const EntityWrapperPtr& theEntity1, const EntityWrapperPtr& theEntity2);
 // Convert entity to the list of parameters
@@ -96,17 +98,35 @@ void SketchSolver_ConstraintFixed::getAttributes(EntityWrapperPtr& theBaseEntity
       return;
     }
 
+    bool fixFullFeature = false;
+    theBaseEntity = EntityWrapperPtr();
+    theFixedEntity = EntityWrapperPtr();
+
     // The feature is fixed.
     PlaneGCSSolver_FeatureBuilder aBuilder;
     std::list<AttributePtr> aBaseAttr = myBaseFeature->data()->attributes(std::string());
     std::list<AttributePtr>::const_iterator anIt = aBaseAttr.begin();
-    for (; anIt != aBaseAttr.end(); ++anIt)
-      aBuilder.createAttribute(*anIt);
-    theFixedEntity = aBuilder.createFeature(myBaseFeature);
+    for (; anIt != aBaseAttr.end(); ++anIt) {
+      EntityWrapperPtr anEntity = aBuilder.createAttribute(*anIt);
+      EntityWrapperPtr aBaseEntity = myStorage->entity(*anIt);
+      if (!anEntity || !aBaseEntity)
+        continue;
 
-    theBaseEntity = myStorage->entity(myBaseFeature);
-    if (isEqual(theBaseEntity, theFixedEntity))
-      theBaseEntity = EntityWrapperPtr(); // do not want to fix already fixed entity
+      if (!fixFullFeature && anEntity->type() == ENTITY_POINT &&
+          !isEqual(anEntity, aBaseEntity)) {
+        if (theFixedEntity)
+          fixFullFeature = true;
+        theFixedEntity = anEntity;
+        theBaseEntity = aBaseEntity;
+      }
+    }
+
+    if (fixFullFeature) {
+      theFixedEntity = aBuilder.createFeature(myBaseFeature);
+      theBaseEntity = myStorage->entity(myBaseFeature);
+      if (isEqual(theBaseEntity, theFixedEntity))
+        theBaseEntity = EntityWrapperPtr(); // do not want to fix already fixed entity
+    }
 
   } else if (myBaseConstraint) {
     // Constraint Fixed is added by user.
@@ -192,6 +212,12 @@ GCS::VEC_pD toParameters(const EntityWrapperPtr& theEntity)
   }
 
   return aParameters;
+}
+
+bool isEqual(const GCS::Point& thePoint1, const GCS::Point& thePoint2)
+{
+  return fabs((*thePoint1.x) - (*thePoint2.x)) <= tolerance &&
+         fabs((*thePoint1.y) - (*thePoint2.y)) <= tolerance;
 }
 
 bool isEqual(const EntityWrapperPtr& theEntity1, const EntityWrapperPtr& theEntity2)
