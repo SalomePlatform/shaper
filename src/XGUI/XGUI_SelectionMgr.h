@@ -50,6 +50,11 @@ Q_OBJECT
   //! Clears selection in Viewer and object Browser
   void clearSelection();
 
+  //! Sets values selected in both, ObjectBrowser and V3d viewer
+  //! Selection is not synchronized between these controls.
+  //! \param theValues a container of values to be selected.
+  void setSelected(const QList<std::shared_ptr<ModuleBase_ViewerPrs> >& theValues);
+
   /// Updates selection, which are depend on the selection in the given place
   /// \param thePlace a widget where selection has happened.
   void updateSelectionBy(const ModuleBase_ISelection::SelectionPlace& thePlace);
@@ -65,7 +70,14 @@ signals:
    /// Reaction on selectio0n in Viewer
   void onViewerSelection();
 
- private:
+private:
+  /// Interates through the values to prepare container of objects that may be selected in OB
+  /// \param theValues selection information
+  /// \param theObjecs an output container
+  void convertToObjectBrowserSelection(
+       const QList<std::shared_ptr<ModuleBase_ViewerPrs> >& theValues, QObjectPtrList& theObjects);
+
+private:
    /// Reference to workshop
   XGUI_Workshop* myWorkshop;
 

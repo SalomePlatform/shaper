@@ -117,33 +117,16 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
 //**************************************************************
 void XGUI_SelectionMgr::onViewerSelection()
 {
-  SessionPtr aMgr = ModelAPI_Session::get();
-  DocumentPtr anActiveDocument = aMgr->activeDocument();
-  QObjectPtrList aFeatures;
-  ResultPtr aResult;
-  FeaturePtr aFeature;
-  bool aHasOperation = (myWorkshop->operationMgr()->currentOperation() != 0);
+  QList<ModuleBase_ViewerPrsPtr> aValues;
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (!aContext.IsNull()) {
-    QList<ModuleBase_ViewerPrsPtr> aPresentations =
-      selection()->getSelected(ModuleBase_ISelection::Viewer);
-    foreach(ModuleBase_ViewerPrsPtr aPrs, aPresentations) {
-      if (aPrs->object().get()) {
-        if (!aFeatures.contains(aPrs->object()))
-          aFeatures.append(aPrs->object());
-        if (aPrs->shape().get() && (!aHasOperation)) {
-          aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
-          if (aResult.get()) {
-            aFeature = anActiveDocument->producedByFeature(aResult, aPrs->shape());
-            if (aFeature.get() && (!aFeatures.contains(aFeature)))
-              aFeatures.append(aFeature);
-          }
-        }
-      }
-    }
-  }
+  if (!aContext.IsNull())
+    aValues = selection()->getSelected(ModuleBase_ISelection::Viewer);
+
+  QObjectPtrList anObjects;
+  convertToObjectBrowserSelection(aValues, anObjects);
+
   bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
-  myWorkshop->objectBrowser()->setObjectsSelected(aFeatures);
+  myWorkshop->objectBrowser()->setObjectsSelected(anObjects);
   myWorkshop->objectBrowser()->blockSignals(aBlocked);
 
   emit selectionChanged();
@@ -175,4 +158,47 @@ void XGUI_SelectionMgr::clearSelection()
   aDisplayer->setSelected(aSelectedPrs);
 
   emit selectionChanged();
+}
+//**************************************************************
+void XGUI_SelectionMgr::setSelected(const QList<ModuleBase_ViewerPrsPtr>& theValues)
+{
+  // update selection in Viewer
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  aDisplayer->setSelected(theValues);
+
+  // update selection in Object Browser
+  bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
+  QObjectPtrList anObjects;
+  convertToObjectBrowserSelection(theValues, anObjects);
+
+  myWorkshop->objectBrowser()->setObjectsSelected(anObjects);
+  myWorkshop->objectBrowser()->blockSignals(aBlocked);
+}
+//**************************************************************
+void XGUI_SelectionMgr::convertToObjectBrowserSelection(
+                                   const QList<ModuleBase_ViewerPrsPtr>& theValues,
+                                   QObjectPtrList& theObjects)
+{
+  theObjects.clear();
+
+  ResultPtr aResult;
+  FeaturePtr aFeature;
+  bool aHasOperation = (myWorkshop->operationMgr()->currentOperation() != 0);
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr anActiveDocument = aMgr->activeDocument();
+
+  foreach(ModuleBase_ViewerPrsPtr aPrs, theValues) {
+    if (aPrs->object().get()) {
+      if (!theObjects.contains(aPrs->object()))
+        theObjects.append(aPrs->object());
+      if (aPrs->shape().get() && (!aHasOperation)) {
+        aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
+        if (aResult.get()) {
+          aFeature = anActiveDocument->producedByFeature(aResult, aPrs->shape());
+          if (aFeature.get() && (!theObjects.contains(aFeature)))
+            theObjects.append(aFeature);
+        }
+      }
+    }
+  }
 }

@@ -10,6 +10,7 @@
 #include "XGUI_PropertyPanel.h"
 #include "XGUI_ModuleConnector.h"
 #include "XGUI_QtEvents.h"
+#include "XGUI_SelectionMgr.h"
 
 #ifndef HAVE_SALOME
 #include <AppElements_MainWindow.h>
@@ -138,7 +139,7 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
       ModuleBase_WidgetSelector* aWidgetSelector =
         dynamic_cast<ModuleBase_WidgetSelector*>(aWidget);
       if (aWidgetSelector)
-        myWorkshop->setSelected(aWidgetSelector->getAttributeSelection());
+        workshop()->selector()->setSelected(aWidgetSelector->getAttributeSelection());
     }
   }
 

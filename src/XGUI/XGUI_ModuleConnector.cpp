@@ -121,11 +121,8 @@ void XGUI_ModuleConnector::setSelected(const QList<ModuleBase_ViewerPrsPtr>& the
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   if (theValues.isEmpty()) {
     myWorkshop->selector()->clearSelection();
-  } else {
+  } else
     aDisp->setSelected(theValues);
-    // according to #2154 we need to update OB selection when selection in the viewer happens
-    myWorkshop->selector()->onViewerSelection();
-  }
 }
 
 void XGUI_ModuleConnector::setStatusBarMessage(const QString& theMessage)
