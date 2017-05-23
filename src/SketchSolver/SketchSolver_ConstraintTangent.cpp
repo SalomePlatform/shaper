@@ -27,8 +27,8 @@ static std::set<FeaturePtr> collectCoincidences(FeaturePtr theFeature1, FeatureP
 
 /// \brief Check whether the entities has only one shared point or less.
 ///        Return list of coincident points.
-static std::list<AttributePtr> coincidentBoundaryPoints(FeaturePtr theFeature1,
-                                                        FeaturePtr theFeature2);
+static std::set<AttributePtr> coincidentBoundaryPoints(FeaturePtr theFeature1,
+                                                       FeaturePtr theFeature2);
 
 /// \brief Check if two connected arcs have centers
 ///        in same direction relatively to connection point
@@ -111,15 +111,15 @@ void SketchSolver_ConstraintTangent::rebuild()
   getTangentFeatures(myBaseConstraint, aFeature1, aFeature2);
 
   // check number of coincident points
-  std::list<AttributePtr> aCoincidentPoints = coincidentBoundaryPoints(aFeature1, aFeature2);
-  if (myType == CONSTRAINT_TANGENT_CIRCLE_LINE && aCoincidentPoints.size() > 1) {
+  std::set<AttributePtr> aCoincidentPoints = coincidentBoundaryPoints(aFeature1, aFeature2);
+  if (myType == CONSTRAINT_TANGENT_CIRCLE_LINE && aCoincidentPoints.size() > 2) {
     myErrorMsg = SketchSolver_Error::TANGENCY_FAILED();
     return;
   }
 
   EntityWrapperPtr aSharedPointEntity;
   if (!aCoincidentPoints.empty()) {
-    mySharedPoint = aCoincidentPoints.front();
+    mySharedPoint = *aCoincidentPoints.begin();
     aSharedPointEntity = myStorage->entity(mySharedPoint);
   }
 
@@ -190,9 +190,9 @@ void SketchSolver_ConstraintTangent::notify(const FeaturePtr&      theFeature,
   if (mySharedPoint && !isRebuild) {
     // The features are tangent in the shared point, but the coincidence has been removed/updated.
     // Check if the coincidence is the same.
-    std::list<AttributePtr> aCoincidentPoints = coincidentBoundaryPoints(aTgFeat1, aTgFeat2);
+    std::set<AttributePtr> aCoincidentPoints = coincidentBoundaryPoints(aTgFeat1, aTgFeat2);
     isRebuild = true;
-    std::list<AttributePtr>::iterator anIt = aCoincidentPoints.begin();
+    std::set<AttributePtr>::iterator anIt = aCoincidentPoints.begin();
     for (; anIt != aCoincidentPoints.end() && isRebuild; ++anIt)
       if (*anIt == mySharedPoint)
         isRebuild = false; // the coincidence is still exists => nothing to change
@@ -242,24 +242,27 @@ std::set<FeaturePtr> collectCoincidences(FeaturePtr theFeature1, FeaturePtr theF
   return aCoincidencesBetweenFeatures;
 }
 
-std::list<AttributePtr> coincidentBoundaryPoints(FeaturePtr theFeature1, FeaturePtr theFeature2)
+std::set<AttributePtr> coincidentBoundaryPoints(FeaturePtr theFeature1, FeaturePtr theFeature2)
 {
   std::set<FeaturePtr> aCoincidences = collectCoincidences(theFeature1, theFeature2);
   // collect points only
-  std::list<AttributePtr> aCoincidentPoints;
+  std::set<AttributePtr> aCoincidentPoints;
   std::set<FeaturePtr>::const_iterator aCIt = aCoincidences.begin();
   for (; aCIt != aCoincidences.end(); ++ aCIt) {
-    for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
-      AttributeRefAttrPtr aRefAttr = (*aCIt)->refattr(SketchPlugin_Constraint::ENTITY_A());
-      if (!aRefAttr || aRefAttr->isObject())
-        continue;
+    AttributeRefAttrPtr aRefAttrA = (*aCIt)->refattr(SketchPlugin_Constraint::ENTITY_A());
+    AttributeRefAttrPtr aRefAttrB = (*aCIt)->refattr(SketchPlugin_Constraint::ENTITY_B());
+    if (!aRefAttrA || aRefAttrA->isObject() ||
+        !aRefAttrB || aRefAttrB->isObject())
+      continue;
 
-      AttributePtr anAttr = aRefAttr->attr();
-      if (anAttr->id() != SketchPlugin_Arc::CENTER_ID() &&
-          anAttr->id() != SketchPlugin_Circle::CENTER_ID()) {
-        aCoincidentPoints.push_back(aRefAttr->attr());
-        break;
-      }
+    AttributePtr anAttrA = aRefAttrA->attr();
+    AttributePtr anAttrB = aRefAttrB->attr();
+    if (anAttrA->id() != SketchPlugin_Arc::CENTER_ID() &&
+        anAttrA->id() != SketchPlugin_Circle::CENTER_ID() &&
+        anAttrB->id() != SketchPlugin_Arc::CENTER_ID() &&
+        anAttrB->id() != SketchPlugin_Circle::CENTER_ID()) {
+      aCoincidentPoints.insert(anAttrA);
+      aCoincidentPoints.insert(anAttrB);
     }
   }
   return aCoincidentPoints;
