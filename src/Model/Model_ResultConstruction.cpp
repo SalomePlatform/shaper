@@ -227,9 +227,7 @@ std::string fullName(CompositeFeaturePtr theComposite, const TopoDS_Shape& theSu
   }
   std::stringstream aName;
   // #1839 : do not store name of the feature in the tree, since this name could be changed
-  //aName<<theContextFeature->name();
-  if (theSubShape.ShapeType() != TopAbs_COMPOUND) { // compound means the whole result for construction
-    //aName<<"/";
+  if (theSubShape.ShapeType() != TopAbs_COMPOUND) { // compound means the whole construction result
     if (theSubShape.ShapeType() == TopAbs_FACE) aName<<"Face";
     else if (theSubShape.ShapeType() == TopAbs_WIRE) aName<<"Wire";
     else if (theSubShape.ShapeType() == TopAbs_EDGE) aName<<"Edge";
