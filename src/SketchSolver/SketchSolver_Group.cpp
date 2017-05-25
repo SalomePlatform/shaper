@@ -137,9 +137,10 @@ bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
 
     mySketchSolver->initialize();
     aConstraint->moveFeature();
-  } else
-    myStorage->notify(theFeature);
+  }
 
+  // notify all observers that theFeature has been changed
+  myStorage->notify(theFeature);
   return true;
 }
 
