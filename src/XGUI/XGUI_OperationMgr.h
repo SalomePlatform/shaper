@@ -88,11 +88,6 @@ Q_OBJECT
   /// else, or if there is no parent - returns NULL
   ModuleBase_Operation* previousOperation(ModuleBase_Operation* theOperation) const;
 
-  /// Redefinition of virtual function
-  /// \param theObject a sender of the event
-  /// \param theEvent the event
-  virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
-
   /// Start the operation and append it to the stack of operations
   /// \param theOperation the started operation
   /// \return the state whether the current operation is started

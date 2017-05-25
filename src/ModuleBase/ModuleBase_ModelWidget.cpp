@@ -5,6 +5,7 @@
 // Author:      Natalia ERMOLAEVA
 
 #include "ModuleBase_ModelWidget.h"
+#include "ModuleBase_IPropertyPanel.h"
 #include "ModuleBase_ViewerPrs.h"
 #include "ModuleBase_Tools.h"
 #include "ModuleBase_WidgetValidator.h"
@@ -426,8 +427,14 @@ bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
     QFocusEvent* aFocusEvent = dynamic_cast<QFocusEvent*>(theEvent);
     bool isWinFocus = aFocusEvent->reason() == Qt::ActiveWindowFocusReason;
     #endif
-    if (getControls().contains(aWidget)) {
-      emit focusInWidget(this);
+    Qt::FocusReason aReason = aFocusEvent->reason();
+    bool aMouseOrKey = aReason == Qt::MouseFocusReason ||
+                        /*aReason == Qt::TabFocusReason ||
+                        //aReason == Qt::BacktabFocusReason ||*/
+                        aReason == Qt::OtherFocusReason; // to process widget->setFocus()
+    if (aMouseOrKey && getControls().contains(aWidget)) {
+    //if (getControls().contains(aWidget)) {
+      emitFocusInWidget();
     }
   }
   else if (theEvent->type() == QEvent::FocusOut) {
@@ -461,7 +468,23 @@ void ModuleBase_ModelWidget::onWidgetValuesModified()
   setValueState(ModifiedInPP);
 }
 
+//**************************************************************
 QString ModuleBase_ModelWidget::translate(const std::string& theStr) const
 {
   return ModuleBase_Tools::translate(context(), theStr);
+}
+
+//**************************************************************
+ModuleBase_ModelWidget* ModuleBase_ModelWidget::findModelWidget(ModuleBase_IPropertyPanel* theProp,
+                                                                QWidget* theWidget)
+{
+  ModuleBase_ModelWidget* aModelWidget;
+  QObject* aParent = theWidget->parent();
+  while (aParent) {
+    aModelWidget = qobject_cast<ModuleBase_ModelWidget*>(aParent);
+    if (aModelWidget)
+      break;
+    aParent = aParent->parent();
+  }
+  return aModelWidget;
 }

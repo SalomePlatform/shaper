@@ -241,9 +241,6 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId)
       case AbortAll: {
         aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_cancel.png"), "Cancel",
                                                  aParent);
-        if (theId == Abort) {
-          aResult->setShortcut(QKeySequence(Qt::Key_Escape));
-        }
       }
       break;
       case Help: {

@@ -60,11 +60,15 @@ public:
     bool isAccepted = false;
     if (myIsActive && theEvent->type() == QEvent::KeyRelease) {
       QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-      if(aKeyEvent) {
+      if (aKeyEvent) {
         switch (aKeyEvent->key()) {
-          case Qt::Key_Delete: {
+          case Qt::Key_Delete:
             isAccepted = myOperationMgr->onProcessDelete(theObject);
-          }
+          break;
+          default:
+            myOperationMgr->onKeyReleased(theObject, aKeyEvent);
+            isAccepted = true;
+            break;
         }
       }
     }
@@ -169,20 +173,6 @@ ModuleBase_Operation* XGUI_OperationMgr::previousOperation(ModuleBase_Operation*
     return NULL;
   }
   return myOperations.at(idx - 1);
-}
-
-bool XGUI_OperationMgr::eventFilter(QObject *theObject, QEvent *theEvent)
-{
-  bool isAccepted = false;
-  if (theEvent->type() == QEvent::KeyRelease) {
-    QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-    if(aKeyEvent)
-      isAccepted = onKeyReleased(theObject, aKeyEvent);
-  }
-  if (!isAccepted)
-    isAccepted = QObject::eventFilter(theObject, theEvent);
-
-  return isAccepted;
 }
 
 bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
@@ -600,6 +590,28 @@ bool XGUI_OperationMgr::onKeyReleased(QObject *theObject, QKeyEvent* theEvent)
   ModuleBase_Operation* anOperation = currentOperation();
   bool isAccepted = false;
   switch (theEvent->key()) {
+    case Qt::Key_Escape: {
+      ModuleBase_Operation* aOperation = currentOperation();
+      if (aOperation) {
+        onAbortOperation();
+        isAccepted = true;
+      }
+    }
+    break;
+    case Qt::Key_Tab:
+    case Qt::Key_Backtab:
+    {
+      ModuleBase_Operation* aOperation = currentOperation();
+      if (aOperation) {
+        ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
+        if (aPanel) { // check for case when the operation is started but property panel is not filled
+          XGUI_PropertyPanel* aPP = dynamic_cast<XGUI_PropertyPanel*>(aPanel);
+          aPP->focusNextPrevChild_(theEvent->key() == Qt::Key_Tab);
+          isAccepted = true;
+        }
+      }
+    }
+    break;
     case Qt::Key_Return:
     case Qt::Key_Enter: {
       isAccepted = onProcessEnter(theObject);
@@ -640,10 +652,11 @@ bool XGUI_OperationMgr::onProcessEnter(QObject* theObject)
   if (!aOperation)
     return isAccepted;
   ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+  // the next code is obsolete as we want to process Enter in property panel always
   // only property panel enter is processed in order to do not process enter in application dialogs
-  bool isPPChild = isChildObject(theObject, aPanel);
-  if (!isPPChild)
-    return isAccepted;
+  //bool isPPChild = isChildObject(theObject, aPanel);
+  //if (!isPPChild)
+  //  return isAccepted;
 
   ModuleBase_ModelWidget* anActiveWgt = aPanel->activeWidget();
   bool isAborted = false;

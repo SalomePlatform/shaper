@@ -175,9 +175,8 @@ bool PartSet_SketcherReentrantMgr::processMouseMoved(ModuleBase_IViewWindow* the
         myPreviousFeature = FeaturePtr();
 
         anActiveWidget = module()->activeWidget();
-        aCurrentFeature = anActiveWidget->feature();
         aProcessed = true;
-        if (anActiveWidget->attributeID() == anAttributeOnStart) {
+        if (anActiveWidget && anActiveWidget->attributeID() == anAttributeOnStart) {
           // it was not deactivated by preselection processing
           aPanel->activateNextWidget(anActiveWidget);
         }
@@ -501,6 +500,7 @@ bool PartSet_SketcherReentrantMgr::startInternalEdit(const std::string& thePrevi
         if (aPreviousAttributeWidget) {
           if (!aPreviousAttributeWidget->isViewerSelector()) {
             aPreviousAttributeWidget->focusTo();
+            aPreviousAttributeWidget->emitFocusInWidget();
             aPreviousAttributeWidget->selectContent();
           }
           else {

@@ -244,7 +244,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
 
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(), aLast = myWidgets.end();
   bool isFoundWidget = false;
-  ModuleBase_Tools::activateWindow(this, "XGUI_PropertyPanel::activateNextWidget()");
+  //ModuleBase_Tools::activateWindow(this, "XGUI_PropertyPanel::activateNextWidget()");
   for (; anIt != aLast; anIt++) {
     ModuleBase_ModelWidget* aCurrentWidget = *anIt;
     if (isFoundWidget || !theWidget) {
@@ -262,6 +262,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
         continue; // do not set focus if it can not be accepted, case: optional choice
 
       if (aCurrentWidget->focusTo()) {
+        aCurrentWidget->emitFocusInWidget();
         return;
       }
     }
@@ -341,7 +342,7 @@ void findDirectChildren(QWidget* theParent, QList<QWidget*>& theWidgets, const b
 #endif
 }
 
-bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
+bool XGUI_PropertyPanel::focusNextPrevChild_(bool theIsNext)
 {
   // it wraps the Tabs clicking to follow in the chain:
   // controls, last control, Apply, Cancel, first control, controls
@@ -354,6 +355,10 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
     qDebug(anInfo.toStdString().c_str());
   }
 #endif
+  ModuleBase_ModelWidget* aFocusMWidget = ModuleBase_ModelWidget::findModelWidget(this,
+                                                                         aFocusWidget);
+  if (aFocusMWidget)
+    aFocusMWidget->setHighlighted(false);
 
   QWidget* aNewFocusWidget = 0;
   if (aFocusWidget) {
@@ -398,7 +403,6 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
   }
   if (aNewFocusWidget) {
     if (myActiveWidget) {
-      myActiveWidget->getControls();
       bool isFirstControl = !theIsNext;
       QWidget* aLastFocusControl = myActiveWidget->getControlAcceptingFocus(isFirstControl);
       if (aFocusWidget == aLastFocusControl) {
@@ -408,6 +412,11 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
 
     //ModuleBase_Tools::setFocus(aNewFocusWidget, "XGUI_PropertyPanel::focusNextPrevChild()");
     aNewFocusWidget->setFocus(theIsNext ? Qt::TabFocusReason : Qt::BacktabFocusReason);
+
+    ModuleBase_ModelWidget* aNewFocusMWidget = ModuleBase_ModelWidget::findModelWidget(this,
+                                                                              aNewFocusWidget);
+    if (aNewFocusMWidget)
+      aNewFocusMWidget->emitFocusInWidget();
     isChangedFocus = true;
   }
   return isChangedFocus;

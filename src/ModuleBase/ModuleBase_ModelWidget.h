@@ -17,6 +17,7 @@
 
 class Config_WidgetAPI;
 class Events_InfoMessage;
+class ModuleBase_IPropertyPanel;
 class ModuleBase_IWorkshop;
 class ModuleBase_ViewerPrs;
 class ModuleBase_WidgetValidator;
@@ -242,6 +243,15 @@ Q_OBJECT
   /// Translate passed string with widget context()
   virtual QString translate(const std::string& theStr) const;
 
+  /// Emit focus in widget to set this control as active in propety panel
+  void emitFocusInWidget() { emit focusInWidget(this); }
+
+  /// Finds model widget parent of the given sub widget
+  /// \param theWidget a candidate to be a child of the model widget
+  /// \param theProp a property panel instance
+  /// \return a model widget or NULL
+  static ModuleBase_ModelWidget* findModelWidget(ModuleBase_IPropertyPanel* theProp,
+                                                 QWidget* theWidget);
 signals:
   /// The signal about widget values are to be changed
   void beforeValuesChanged();

@@ -35,7 +35,7 @@
 ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
                                                  const Config_WidgetAPI* theData)
 : ModuleBase_WidgetDoubleValue(theParent, theData),
-  myXPosition(-1), myYPosition(-1)
+  myXPosition(-1), myYPosition(-1), myEditorDialog(0)
 {
 }
 
@@ -47,13 +47,12 @@ bool ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
 {
   bool isValueAccepted = false;
 
-  QDialog aDlg(QApplication::desktop(), Qt::FramelessWindowHint);
-  QHBoxLayout* aLay = new QHBoxLayout(&aDlg);
+  myEditorDialog = new QDialog(QApplication::desktop(), Qt::FramelessWindowHint);
+
+  QHBoxLayout* aLay = new QHBoxLayout(myEditorDialog);
   aLay->setContentsMargins(2, 2, 2, 2);
 
-  ModuleBase_ParamSpinBox* anEditor = new ModuleBase_ParamSpinBox(&aDlg);
-  anEditor->enableKeyPressEvent(true);
-
+  ModuleBase_ParamSpinBox* anEditor = new ModuleBase_ParamSpinBox(myEditorDialog);
   anEditor->setMinimum(0);
   anEditor->setMaximum(DBL_MAX);
   if (outText.isEmpty())
@@ -65,14 +64,13 @@ bool ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
 
   ModuleBase_Tools::setFocus(anEditor, "ModuleBase_WidgetEditor::editedValue");
   anEditor->selectAll();
-  QObject::connect(anEditor, SIGNAL(enterReleased()), &aDlg, SLOT(accept()));
 
   QPoint aPoint = QCursor::pos();
   if (myXPosition >= 0 && myYPosition >= 0)
     aPoint = QPoint(myXPosition, myYPosition);
 
-  aDlg.move(aPoint);
-  isValueAccepted = aDlg.exec() == QDialog::Accepted;
+  myEditorDialog->move(aPoint);
+  isValueAccepted = myEditorDialog->exec() == QDialog::Accepted;
   if (isValueAccepted) {
     outText = anEditor->text();
     bool isDouble;
@@ -82,6 +80,8 @@ bool ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
       outText = ""; // return empty string, if it's can be converted to a double
     }
   }
+  delete myEditorDialog;
+  myEditorDialog = 0;
   return isValueAccepted;
 }
 
@@ -98,7 +98,7 @@ bool ModuleBase_WidgetEditor::showPopupEditor(const bool theSendSignals)
   // in the property panel before the mouse leave event happens in the viewer. The module
   // ask an active widget and change the feature visualization if the widget is not the current one.
   if (theSendSignals)
-    emit focusInWidget(this);
+    emitFocusInWidget();
 
   // nds: it seems, that the envents processing is not necessary anymore
   // White while all events will be processed
@@ -140,4 +140,14 @@ void ModuleBase_WidgetEditor::setCursorPosition(const int theX, const int theY)
 {
   myXPosition = theX;
   myYPosition = theY;
+}
+
+bool ModuleBase_WidgetEditor::processEnter()
+{
+  if (myEditorDialog) {
+    myEditorDialog->accept();
+    return true;
+  }
+
+  return ModuleBase_WidgetDoubleValue::processEnter();
 }

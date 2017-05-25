@@ -14,6 +14,7 @@
 #include <QStringList>
 
 class ModelAPI_Feature;
+class QDialog;
 class QLineEdit;
 
 /**\class ModuleBase_WidgetEditor
@@ -53,6 +54,9 @@ Q_OBJECT
   /// \param theY the Y coordinate
   void setCursorPosition(const int theX, const int theY);
 
+  /// Returns true if the event is processed.
+  virtual bool processEnter();
+
 private:
   /// Show editor
   /// \param theOutValue a result value
@@ -68,6 +72,8 @@ private:
    QStringList myFeatureKinds;
 
    int myXPosition, myYPosition;
+
+   QDialog* myEditorDialog;
 };
 
 #endif

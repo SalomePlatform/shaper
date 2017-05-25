@@ -59,8 +59,7 @@ const double PSEUDO_ZERO = 1.e-20;
  */
 ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePrecision)
     : QDoubleSpinBox(theParent),
-      myCleared(false),
-      myIsEmitKeyPressEvent(false)
+      myCleared(false)
 {
   setLocale(ModuleBase_Tools::doubleLocale());
 
@@ -198,42 +197,6 @@ QString ModuleBase_DoubleSpinBox::removeTrailingZeroes(const QString& src) const
   return res;
 }
 
-void ModuleBase_DoubleSpinBox::keyPressEvent(QKeyEvent* theEvent)
-{
-  switch (theEvent->key()) {
-    case Qt::Key_Enter:
-    case Qt::Key_Return: {
-      // do not react to the Enter key, the property panel processes it
-      if (!myIsEmitKeyPressEvent)
-        return;
-    }
-    break;
-    default:
-      break;
-  }
-  QDoubleSpinBox::keyPressEvent(theEvent);
-}
-
-void ModuleBase_DoubleSpinBox::keyReleaseEvent(QKeyEvent* theEvent)
-{
-  switch (theEvent->key()) {
-    case Qt::Key_Enter:
-    case Qt::Key_Return: {
-      // the enter has already been processed when key is pressed,
-      // key release should not be processed in operation manager
-      if (myIsEmitKeyPressEvent) {
-        theEvent->accept();
-        emit enterReleased();
-        return;
-      }
-    }
-    break;
-    default:
-      break;
-  }
-  QDoubleSpinBox::keyReleaseEvent(theEvent);
-}
-
 /*!
  \brief Perform \a steps increment/decrement steps.
 
@@ -346,14 +309,6 @@ QValidator::State ModuleBase_DoubleSpinBox::validate(QString& str, int& pos) con
 void ModuleBase_DoubleSpinBox::onTextChanged(const QString& )
 {
   myCleared = false;
-}
-
-bool ModuleBase_DoubleSpinBox::enableKeyPressEvent(const bool& theEnable)
-{
-  bool aPreviousValue = myIsEmitKeyPressEvent;
-  myIsEmitKeyPressEvent = theEnable;
-
-  return aPreviousValue;
 }
 
 void ModuleBase_DoubleSpinBox::setValueEnabled(const bool& theEnable)

@@ -151,12 +151,13 @@ protected:
   /// Makes the widget active, deactivate the previous, activate and hightlight the given one
   /// \param theWidget a widget
   bool setActiveWidget(ModuleBase_ModelWidget* theWidget);
-
+public:
   /// The parent method that processes the "Tab"/"SHIF + Tab" keyboard events
   /// Emits a signal about focus change
   /// If theIsNext is true, this function searches forward, if next is false, it searches backward.
-  virtual bool focusNextPrevChild(bool theIsNext);
-
+  virtual bool focusNextPrevChild_(bool theIsNext);
+protected:
+  virtual bool focusNextPrevChild(bool theIsNext) { return true; }
   /// Activate the next widget in the property panel
   /// \param theWidget a widget. The next widget should be activated
   /// \param isCheckVisibility flag whether the next widget visibility is checked

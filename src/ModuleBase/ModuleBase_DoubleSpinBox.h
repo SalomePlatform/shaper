@@ -51,18 +51,9 @@ Q_OBJECT
   /// Validate current value
   virtual QValidator::State validate(QString&, int&) const;
 
-  /// Change enable/disable internal state to emit key press event
-  /// \param theEnable if true, the signal is emitted
-  /// \return the previous value
-  bool enableKeyPressEvent(const bool& theEnable);
-
   /// Imitation of disable control value. If theEnable is false, the control becomes
   /// read only and base color is disabled.
   void setValueEnabled(const bool& theEnable);
-
-signals:
-  /// The signal about key release on the control, that corresponds to the attribute
-  void enterReleased();
 
  protected slots:
    /// Called on text changed
@@ -71,11 +62,6 @@ signals:
  protected:
    /// Removes extra trailing zero symbols
   QString removeTrailingZeroes(const QString&) const;
-  /// Called on key press event
-  virtual void keyReleaseEvent(QKeyEvent* theEvent);
-
-  /// Called on key press event
-  virtual void keyPressEvent(QKeyEvent* theEvent);
 
  private:
   // boolen flag whether the key event is emitted. The default value is false
