@@ -422,11 +422,7 @@ bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
 {
   QWidget* aWidget = qobject_cast<QWidget*>(theObject);
   if (theEvent->type() == QEvent::FocusIn) {
-    #ifdef _DEBUG
-    // The following two lines are for debugging purpose only
     QFocusEvent* aFocusEvent = dynamic_cast<QFocusEvent*>(theEvent);
-    bool isWinFocus = aFocusEvent->reason() == Qt::ActiveWindowFocusReason;
-    #endif
     Qt::FocusReason aReason = aFocusEvent->reason();
     bool aMouseOrKey = aReason == Qt::MouseFocusReason ||
                         /*aReason == Qt::TabFocusReason ||
@@ -479,6 +475,9 @@ ModuleBase_ModelWidget* ModuleBase_ModelWidget::findModelWidget(ModuleBase_IProp
                                                                 QWidget* theWidget)
 {
   ModuleBase_ModelWidget* aModelWidget;
+  if (!theWidget)
+    return aModelWidget;
+
   QObject* aParent = theWidget->parent();
   while (aParent) {
     aModelWidget = qobject_cast<ModuleBase_ModelWidget*>(aParent);

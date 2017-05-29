@@ -244,7 +244,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
 
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(), aLast = myWidgets.end();
   bool isFoundWidget = false;
-  //ModuleBase_Tools::activateWindow(this, "XGUI_PropertyPanel::activateNextWidget()");
+  ModuleBase_Tools::activateWindow(this, "XGUI_PropertyPanel::activateNextWidget()");
   for (; anIt != aLast; anIt++) {
     ModuleBase_ModelWidget* aCurrentWidget = *anIt;
     if (isFoundWidget || !theWidget) {
@@ -410,8 +410,8 @@ bool XGUI_PropertyPanel::focusNextPrevChild_(bool theIsNext)
       }
     }
 
-    //ModuleBase_Tools::setFocus(aNewFocusWidget, "XGUI_PropertyPanel::focusNextPrevChild()");
-    aNewFocusWidget->setFocus(theIsNext ? Qt::TabFocusReason : Qt::BacktabFocusReason);
+    ModuleBase_Tools::setFocus(aNewFocusWidget, "XGUI_PropertyPanel::focusNextPrevChild()");
+    //aNewFocusWidget->setFocus(theIsNext ? Qt::TabFocusReason : Qt::BacktabFocusReason);
 
     ModuleBase_ModelWidget* aNewFocusMWidget = ModuleBase_ModelWidget::findModelWidget(this,
                                                                               aNewFocusWidget);
