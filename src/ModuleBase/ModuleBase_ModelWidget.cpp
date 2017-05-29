@@ -474,7 +474,7 @@ QString ModuleBase_ModelWidget::translate(const std::string& theStr) const
 ModuleBase_ModelWidget* ModuleBase_ModelWidget::findModelWidget(ModuleBase_IPropertyPanel* theProp,
                                                                 QWidget* theWidget)
 {
-  ModuleBase_ModelWidget* aModelWidget;
+  ModuleBase_ModelWidget* aModelWidget = 0;
   if (!theWidget)
     return aModelWidget;
 
