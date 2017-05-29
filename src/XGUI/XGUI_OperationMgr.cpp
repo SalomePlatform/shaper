@@ -604,7 +604,8 @@ bool XGUI_OperationMgr::onKeyReleased(QObject *theObject, QKeyEvent* theEvent)
       ModuleBase_Operation* aOperation = currentOperation();
       if (aOperation) {
         ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
-        if (aPanel) { // check for case when the operation is started but property panel is not filled
+        if (aPanel) {
+          // check for case when the operation is started but property panel is not filled
           XGUI_PropertyPanel* aPP = dynamic_cast<XGUI_PropertyPanel*>(aPanel);
           aPP->focusNextPrevChild_(theEvent->key() == Qt::Key_Tab);
           isAccepted = true;
