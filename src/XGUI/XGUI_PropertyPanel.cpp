@@ -410,8 +410,9 @@ bool XGUI_PropertyPanel::focusNextPrevChild_(bool theIsNext)
       }
     }
 
+    // we want to have property panel as an active window to enter values in double control
+    ModuleBase_Tools::activateWindow(this, "XGUI_PropertyPanel::activateNextWidget()");
     ModuleBase_Tools::setFocus(aNewFocusWidget, "XGUI_PropertyPanel::focusNextPrevChild()");
-    //aNewFocusWidget->setFocus(theIsNext ? Qt::TabFocusReason : Qt::BacktabFocusReason);
 
     ModuleBase_ModelWidget* aNewFocusMWidget = ModuleBase_ModelWidget::findModelWidget(this,
                                                                               aNewFocusWidget);
