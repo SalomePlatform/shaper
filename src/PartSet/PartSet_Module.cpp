@@ -255,6 +255,9 @@ void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation)
   if (sketchMgr()->isNestedSketchOperation(theOperation)) {
     mySketchMgr->commitNestedSketch(theOperation);
   }
+  /// deactivate of overconstraint listener should be performed after Sketch commit (#2176)
+  if (PartSet_SketcherMgr::isSketchOperation(theOperation))
+    overconstraintListener()->setActive(false);
 
   /// Restart sketcher operations automatically
   if (!mySketchReentrantMgr->operationCommitted(theOperation)) {
@@ -274,6 +277,9 @@ void PartSet_Module::operationAborted(ModuleBase_Operation* theOperation)
 {
   /// Restart sketcher operations automatically
   mySketchReentrantMgr->operationAborted(theOperation);
+  /// deactivate of overconstraint listener should be performed after Sketch abort (#2176)
+  if (PartSet_SketcherMgr::isSketchOperation(theOperation))
+    overconstraintListener()->setActive(false);
 }
 
 void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)

@@ -1050,7 +1050,6 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 
     Events_Loop::loop()->flush(aDispEvent);
   }
-  myModule->overconstraintListener()->setActive(false);
   // restore the module selection modes, which were changed on startSketch
   aConnector->activateModuleSelectionModes();
 }
