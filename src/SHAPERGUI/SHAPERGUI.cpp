@@ -47,6 +47,7 @@
 #include <QTimer>
 #include <QMenu>
 
+//#define SALOME_PATCH_FOR_CTRL_WHEEL
 
 extern "C" {
 SHAPERGUI_EXPORT CAM_Module* createModule()
@@ -383,6 +384,9 @@ SHAPERGUI_OCCSelector* SHAPERGUI::createSelector(SUIT_ViewManager* theMgr)
     OCCViewer_Viewer* aViewer = static_cast<OCCViewer_Viewer*>(theMgr->getViewModel());
     SHAPERGUI_OCCSelector* aSelector = new SHAPERGUI_OCCSelector(aViewer,
                                                                  getApp()->selectionMgr());
+#ifdef SALOME_PATCH_FOR_CTRL_WHEEL
+    aViewer->setUseLocalSelection(true);
+#endif
     LightApp_SelectionMgr* aMgr = getApp()->selectionMgr();
     QList<SUIT_Selector*> aList;
     aMgr->selectors(aList);

@@ -66,8 +66,7 @@ public:
             isAccepted = myOperationMgr->onProcessDelete(theObject);
           break;
           default:
-            myOperationMgr->onKeyReleased(theObject, aKeyEvent);
-            isAccepted = true;
+            isAccepted = myOperationMgr->onKeyReleased(theObject, aKeyEvent);
             break;
         }
       }
@@ -605,10 +604,14 @@ bool XGUI_OperationMgr::onKeyReleased(QObject *theObject, QKeyEvent* theEvent)
       if (aOperation) {
         ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
         if (aPanel) {
-          // check for case when the operation is started but property panel is not filled
-          XGUI_PropertyPanel* aPP = dynamic_cast<XGUI_PropertyPanel*>(aPanel);
-          aPP->focusNextPrevChild_(theEvent->key() == Qt::Key_Tab);
-          isAccepted = true;
+          QWidget* aFocusedWidget = qApp->focusWidget();
+          bool isPPChildObject = aFocusedWidget && isChildObject(aFocusedWidget, aPanel);
+          if (!isPPChildObject) {
+            // check for case when the operation is started but property panel is not filled
+            XGUI_PropertyPanel* aPP = dynamic_cast<XGUI_PropertyPanel*>(aPanel);
+            aPP->setFocusNextPrevChild(theEvent->key() == Qt::Key_Tab);
+            isAccepted = true;
+          }
         }
       }
     }

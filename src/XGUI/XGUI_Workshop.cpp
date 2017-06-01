@@ -1275,7 +1275,6 @@ void XGUI_Workshop::showPropertyPanel()
   // in order to operation manager could process key events of the panel.
   // otherwise they are ignored. It happens only if the same(activateWindow) is
   // not happened by property panel activation(e.g. resume operation of Sketch)
-  ModuleBase_Tools::activateWindow(myPropertyPanel, "XGUI_Workshop::showPropertyPanel()");
   ModuleBase_Tools::setFocus(myPropertyPanel, "XGUI_Workshop::showPropertyPanel()");
 }
 
@@ -1295,7 +1294,6 @@ void XGUI_Workshop::hidePropertyPanel()
   // are processed by this console. For example Undo actions.
   // It is possible that this code is to be moved to SHAPER package
   QMainWindow* aDesktop = desktop();
-  ModuleBase_Tools::activateWindow(aDesktop, "XGUI_Workshop::hidePropertyPanel()");
   ModuleBase_Tools::setFocus(aDesktop, "XGUI_Workshop::showPropertyPanel()");
 }
 

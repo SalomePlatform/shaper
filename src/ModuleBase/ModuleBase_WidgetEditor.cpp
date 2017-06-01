@@ -129,6 +129,8 @@ bool ModuleBase_WidgetEditor::showPopupEditor(const bool theSendSignals)
     else
       storeValue();
   }
+  ModuleBase_Tools::setFocus(mySpinBox, "ModuleBase_WidgetEditor::editedValue");
+  mySpinBox->selectAll();
 
   if (theSendSignals && !myIsEditing)
     emit enterClicked(this);

@@ -517,7 +517,7 @@ bool PartSet_SketcherReentrantMgr::startInternalEdit(const std::string& thePrevi
             QToolButton* anOkBtn =
               dynamic_cast<XGUI_PropertyPanel*>(aPanel)->findButton(PROP_PANEL_OK);
             if (anOkBtn)
-              anOkBtn->setFocus(Qt::TabFocusReason);
+              ModuleBase_Tools::setFocus(anOkBtn, "XGUI_PropertyPanel::activateNextWidget");
           }
         }
       }

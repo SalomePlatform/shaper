@@ -118,7 +118,10 @@ void zeroMargins(QLayout* theLayout)
 
 void activateWindow(QWidget* theWidget, const QString& theInfo)
 {
-  theWidget->activateWindow();
+  if (theWidget) {
+    theWidget->activateWindow();
+    theWidget->raise();
+  }
 
 #ifdef DEBUG_ACTIVATE_WINDOW
   qDebug(QString("activateWindow: %1").arg(theInfo).toStdString().c_str());
@@ -127,8 +130,10 @@ void activateWindow(QWidget* theWidget, const QString& theInfo)
 
 void setFocus(QWidget* theWidget, const QString& theInfo)
 {
+  activateWindow(theWidget);
   theWidget->setFocus();
-
+  // rectangle of focus is not visible on tool button widgets
+  theWidget->repaint();
 #ifdef DEBUG_SET_FOCUS
   qDebug(QString("setFocus: %1").arg(theInfo).toStdString().c_str());
 #endif

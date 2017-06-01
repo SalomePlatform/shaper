@@ -67,7 +67,6 @@ void XGUI_ErrorDialog::addError(std::shared_ptr<Events_InfoMessage> theMsg)
   refresh();
   if (!isVisible()) {
     show();
-    raise();
     ModuleBase_Tools::activateWindow(this, "XGUI_ErrorDialog::addError");
   }
 }

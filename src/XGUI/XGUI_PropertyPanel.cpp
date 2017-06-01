@@ -281,7 +281,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
       aNewFocusWidget = aCancelBtn;
   }
   if (aNewFocusWidget)
-    aNewFocusWidget->setFocus(Qt::TabFocusReason);
+    ModuleBase_Tools::setFocus(aNewFocusWidget, "XGUI_PropertyPanel::activateNextWidget");
 
   activateWidget(NULL);
 }
@@ -342,7 +342,12 @@ void findDirectChildren(QWidget* theParent, QList<QWidget*>& theWidgets, const b
 #endif
 }
 
-bool XGUI_PropertyPanel::focusNextPrevChild_(bool theIsNext)
+bool XGUI_PropertyPanel::setFocusNextPrevChild(bool theIsNext)
+{
+  return focusNextPrevChild(theIsNext);
+}
+
+bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
 {
   // it wraps the Tabs clicking to follow in the chain:
   // controls, last control, Apply, Cancel, first control, controls
@@ -411,7 +416,6 @@ bool XGUI_PropertyPanel::focusNextPrevChild_(bool theIsNext)
     }
 
     // we want to have property panel as an active window to enter values in double control
-    ModuleBase_Tools::activateWindow(this, "XGUI_PropertyPanel::activateNextWidget()");
     ModuleBase_Tools::setFocus(aNewFocusWidget, "XGUI_PropertyPanel::focusNextPrevChild()");
 
     ModuleBase_ModelWidget* aNewFocusMWidget = ModuleBase_ModelWidget::findModelWidget(this,

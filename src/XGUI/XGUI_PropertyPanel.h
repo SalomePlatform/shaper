@@ -114,6 +114,11 @@ Q_OBJECT
   /// \return button instance or NULL
   QToolButton* findButton(const char* theInternalName) const;
 
+  /// Possibility to process focus by method, for example when Tab or SHIF+Tab is pressed
+  /// but property panel is not active widget
+  /// \param theIsNext true, if Tab(to the next widget) or false(moving to the previous)
+  bool setFocusNextPrevChild(bool theIsNext);
+
 public slots:
   /// \brief Update all widgets in property panel with values from the given feature
   /// \param theFeature a Feature to update values in widgets
@@ -151,13 +156,10 @@ protected:
   /// Makes the widget active, deactivate the previous, activate and hightlight the given one
   /// \param theWidget a widget
   bool setActiveWidget(ModuleBase_ModelWidget* theWidget);
-public:
   /// The parent method that processes the "Tab"/"SHIF + Tab" keyboard events
   /// Emits a signal about focus change
   /// If theIsNext is true, this function searches forward, if next is false, it searches backward.
-  virtual bool focusNextPrevChild_(bool theIsNext);
-protected:
-  virtual bool focusNextPrevChild(bool theIsNext) { return true; }
+  virtual bool focusNextPrevChild(bool theIsNext);
   /// Activate the next widget in the property panel
   /// \param theWidget a widget. The next widget should be activated
   /// \param isCheckVisibility flag whether the next widget visibility is checked

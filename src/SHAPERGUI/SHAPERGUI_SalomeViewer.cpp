@@ -15,6 +15,8 @@
 #include <QMouseEvent>
 #include <QContextMenuEvent>
 
+//#define SALOME_PATCH_FOR_CTRL_WHEEL
+
 SHAPERGUI_SalomeView::SHAPERGUI_SalomeView(OCCViewer_Viewer* theViewer)
 : ModuleBase_IViewWindow(), myCurrentView(0)
 {
@@ -449,6 +451,11 @@ void SHAPERGUI_SalomeViewer::activateViewer(bool toActivate)
   if (!mySelector || !mySelector->viewer())
     return;
   SUIT_ViewManager* aMgr = mySelector->viewer()->getViewManager();
+#ifdef SALOME_PATCH_FOR_CTRL_WHEEL
+  OCCViewer_Viewer* aViewer = dynamic_cast<OCCViewer_Viewer*>(aMgr->getViewModel());
+  if (aViewer)
+    aViewer->setUseLocalSelection(toActivate);
+#endif
   QVector<SUIT_ViewWindow*> aViews = aMgr->getViews();
   if (toActivate) {
     foreach (SUIT_ViewWindow* aView, aViews) {
