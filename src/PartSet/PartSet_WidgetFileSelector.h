@@ -14,15 +14,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
-
-/*
- * PartSet_WidgetFileSelector.h
- *
- *  Created on: May 18, 2015
- *      Author: spo
- */
 
 #ifndef PARTSET_WIDGETFILESELECTOR_H_
 #define PARTSET_WIDGETFILESELECTOR_H_

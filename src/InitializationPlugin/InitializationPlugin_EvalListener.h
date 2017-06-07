@@ -14,15 +14,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
-
-/*
- * InitializationPlugin_EvalListener.h
- *
- *  Created on: Apr 28, 2015
- *      Author: sbh
- */
 
 #ifndef SRC_INITIALIZATIONPLUGIN_EVALLISTENER_H_
 #define SRC_INITIALIZATIONPLUGIN_EVALLISTENER_H_

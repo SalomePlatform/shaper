@@ -14,15 +14,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
-
-/*
- * Config_XMLReader.h
- *
- *  Created on: Mar 14, 2014
- *      Author: sbh
- */
 
 #ifndef CONFIG_XMLREADER_H_
 #define CONFIG_XMLREADER_H_

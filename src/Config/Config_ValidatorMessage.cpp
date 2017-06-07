@@ -14,15 +14,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
-
-/*
- * Config_ValidatorMessage.cpp
- *
- *  Created on: 08 Jul 2014 �.
- *      Author: sbh
- */
 
 #include <Config_ValidatorMessage.h>
 

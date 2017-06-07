@@ -14,13 +14,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-/*
- *  Created on: Jul 10, 2015
- *      Author: vsv
- */
 // This file is added in order to avoid a problem with
 // dynamic_cast of GeomAPI_IPresentable objects under
 // SALOME in release mode

@@ -19,9 +19,6 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  File:   GEOMAlgo_Splitter.hxx
-//
-//  Author: Peter KURNEV
 
 #ifndef GEOMAlgo_Splitter_HeaderFile
 #define GEOMAlgo_Splitter_HeaderFile

@@ -14,15 +14,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
-// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
-
-/*
- * Config_DataModelReader.h
- *
- *  Created on: Jul 21, 2015
- *      Author: vsv
- */
 
 #ifndef CONFIG_DATAMODELREADER_H_
 #define CONFIG_DATAMODELREADER_H_
