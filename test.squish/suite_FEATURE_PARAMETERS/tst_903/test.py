@@ -1,3 +1,23 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 #[tested functionality] Add parameter
 #[tested functionality] Use wrong parameter name
 #[tested functionality] Error notification in header
@@ -5,12 +25,12 @@
 
 def main():
     source(findFile("scripts", "common.py"))
-    
+
     startApplication("salome_run.sh")
-   
+
     activate_SHAPER()
 
-    #[step] Click menu Part->Parameter    
+    #[step] Click menu Part->Parameter
     activateItem(waitForObjectItem(":SALOME*_QMenuBar", "Part"))
     activateItem(waitForObjectItem(":Part_QMenu", "Parameter"))
     mouseClick(waitForObject(":Parameter_QLineEdit"), 79, 8, 0, Qt.LeftButton)
@@ -24,14 +44,14 @@ def main():
     waitFor("object.exists(':Parameter_ExpressionEditor')", 20000)
     test.compare(str(findObject(":Parameter_ExpressionEditor").toolTip), 'Errors:\nexpression - Parameters_ExpressionValidator: Attribute "expression" is not initialized.')
 
-    #[step] Enter variable name 'a'    
+    #[step] Enter variable name 'a'
     type(waitForObject(":Parameter_QLineEdit"), "a")
     mouseClick(waitForObject(":Parameter_ExpressionEditor"), 97, 31, 0, Qt.LeftButton)
-    
+
     #[step] Enter variable expression '100+b'
     type(waitForObject(":Parameter_ExpressionEditor"), "100+b")
     type(waitForObject(":Parameter_ExpressionEditor"), "<Return>")
-    
+
     #[step] Check that expression tooltip is: Errors:\nexpression - Parameters_ExpressionValidator: name 'b' is not defined
     waitFor("object.exists(':Parameter_ExpressionEditor')", 20000)
     test.compare(str(findObject(":Parameter_ExpressionEditor").toolTip), "Errors:\nexpression - Parameters_ExpressionValidator: Result is empty.")

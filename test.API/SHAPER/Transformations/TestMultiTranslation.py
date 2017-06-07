@@ -1,5 +1,25 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 """
-Test case for MultiTranslation feature. 
+Test case for MultiTranslation feature.
 Written on High API.
 """
 from salome.shaper import model
@@ -96,7 +116,7 @@ model.testNbResults(MultiTranslation_10, 2)
 model.testNbSubResults(MultiTranslation_10, [3, 3])
 
 def testSubResult(theFeature, theModel, thePartDoc, resultIndex, nbSolidsExpected, nbFacesExpected):
-    result = theFeature.results()[resultIndex].resultSubShapePair()[0] 
+    result = theFeature.results()[resultIndex].resultSubShapePair()[0]
     shape = result.shape()
     shapeExplorer = GeomAPI_ShapeExplorer(shape, GeomAPI_Shape.SOLID)
     nbSolids = 0
@@ -104,7 +124,7 @@ def testSubResult(theFeature, theModel, thePartDoc, resultIndex, nbSolidsExpecte
         nbSolids += 1
         shapeExplorer.next()
     assert(nbSolids == nbSolidsExpected)
-    
+
     shapeExplorer = GeomAPI_ShapeExplorer(shape, GeomAPI_Shape.FACE)
     nbFaces = 0
     selectionList = []
@@ -118,7 +138,7 @@ def testSubResult(theFeature, theModel, thePartDoc, resultIndex, nbSolidsExpecte
     Group_1 = theModel.addGroup(thePartDoc, selectionList)
     theModel.do()
     theModel.end()
-    
+
     # Now you can check that all selected shapes in group have right shape type and name.
     groupFeature = Group_1.feature()
     groupSelectionList = groupFeature.selectionList("group_list")
