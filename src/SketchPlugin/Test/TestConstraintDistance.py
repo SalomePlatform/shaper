@@ -1,7 +1,27 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 """
     TestConstraintDistance.py
     Unit test of SketchPlugin_ConstraintDistance class
-    
+
     SketchPlugin_Constraint
         static const std::string MY_CONSTRAINT_VALUE("ConstraintValue");
         static const std::string MY_FLYOUT_VALUE_PNT("ConstraintFlyoutValuePnt");
@@ -9,15 +29,15 @@
         static const std::string MY_ENTITY_B("ConstraintEntityB");
         static const std::string MY_ENTITY_C("ConstraintEntityC");
         static const std::string MY_ENTITY_D("ConstraintEntityD");
-        
+
     SketchPlugin_ConstraintDistance
         static const std::string MY_CONSTRAINT_DISTANCE_ID("SketchConstraintDistance");
         data()->addAttribute(SketchPlugin_Constraint::VALUE(),    ModelAPI_AttributeDouble::typeId());
         data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::typeId());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
-        
-    
+
+
 """
 from GeomDataAPI import *
 from ModelAPI import *

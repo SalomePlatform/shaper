@@ -1,15 +1,35 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 """
     TestConstraintAngle.py
     Unit test of SketchPlugin_ConstraintAngle class
-        
+
     SketchPlugin_ConstraintAngle
         static const std::string MY_CONSTRAINT_ANGLE_ID("SketchConstraintAngle");
         data()->addAttribute(SketchPlugin_Constraint::VALUE(),    ModelAPI_AttributeDouble::typeId());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
         data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::typeId());
-        
-    
+
+
 """
 from GeomDataAPI import *
 from ModelAPI import *
@@ -26,16 +46,16 @@ def angle(theLine1, theLine2):
     aEndPoint1   = geomDataAPI_Point2D(theLine1.attribute("EndPoint"))
     aStartPoint2 = geomDataAPI_Point2D(theLine2.attribute("StartPoint"))
     aEndPoint2   = geomDataAPI_Point2D(theLine2.attribute("EndPoint"))
-    
+
     aDirX1 = aEndPoint1.x() - aStartPoint1.x()
     aDirY1 = aEndPoint1.y() - aStartPoint1.y()
     aLen1 = math.hypot(aDirX1, aDirY1)
     aDirX2 = aEndPoint2.x() - aStartPoint2.x()
     aDirY2 = aEndPoint2.y() - aStartPoint2.y()
     aLen2 = math.hypot(aDirX2, aDirY2)
-    
+
     aDot = aDirX1 * aDirX2 + aDirY1 * aDirY2
-    
+
     anAngle = math.acos(aDot / aLen1 / aLen2)
     return round(anAngle * 180. / math.pi, 6)
 

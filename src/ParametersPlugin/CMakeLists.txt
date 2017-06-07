@@ -1,3 +1,23 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 INCLUDE(Common)
 INCLUDE(UnitTest)
 INCLUDE(UseQtExt)
@@ -12,7 +32,7 @@ SET(PROJECT_HEADERS
     ParametersPlugin.h
     ParametersPlugin_Plugin.h
     ParametersPlugin_Parameter.h
-    ParametersPlugin_EvalListener.h 
+    ParametersPlugin_EvalListener.h
     ParametersPlugin_Validators.h
     ParametersPlugin_WidgetCreator.h
     ParametersPlugin_ParametersMgr.h
@@ -96,5 +116,5 @@ INSTALL(FILES ${QM_RESOURCES} DESTINATION ${SHAPER_INSTALL_QM_RESOURCES})
 ADD_UNIT_TESTS(TestParameterCreation.py
                TestParameterRename.py
                TestParameterChangeValue.py
-               Test1806.py 
+               Test1806.py
               )

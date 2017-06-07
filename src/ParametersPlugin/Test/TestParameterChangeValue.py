@@ -1,16 +1,36 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 """
     TestParameterCreation.py
-    
+
     class ParametersPlugin_Parameter
     static const std::string MY_PARAMETER_ID("Parameter");
     static const std::string MY_VARIABLE_ID("variable");
     static const std::string MY_EXPRESSION_ID("expression");
-    
+
     data()->addAttribute(ParametersPlugin_Parameter::VARIABLE_ID(),
                          ModelAPI_AttributeString::typeId());
     data()->addAttribute(ParametersPlugin_Parameter::EXPRESSION_ID(),
                          ModelAPI_AttributeString::typeId());
-                         
+
     class ModelAPI_ResultParameter
     static const std::string MY_VALUE_ID("Value");
     static const std::string MY_VALUE_ID("State");
@@ -144,7 +164,7 @@ class TestParameterRename(unittest.TestCase):
         aParam.string("expression").setValue("200.0")
         self.aSession.finishOperation()
 
-        # Check value of the parameter 
+        # Check value of the parameter
         self.assertEqual(aResultAttr.data().real("Value").value(), 200.)
         # Check value of references
         aParam = self.dtParams["x2"]
