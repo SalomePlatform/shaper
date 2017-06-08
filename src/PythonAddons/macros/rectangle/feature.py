@@ -180,6 +180,7 @@ class SketchPlugin_Rectangle(model.Feature):
         aEndPoint = GeomDataAPI.geomDataAPI_Point2D(self.attribute(self.END_ID()))
         aX = [aStartPoint.x(), aStartPoint.x(), aEndPoint.x(), aEndPoint.x()]
         aY = [aStartPoint.y(), aEndPoint.y(), aEndPoint.y(), aStartPoint.y()]
+        anAuxiliary = self.data().boolean(self.AUXILIARY_ID()).value()
 
         # Update coordinates of rectangle lines
         for i in range (0, aNbLines):
@@ -188,6 +189,7 @@ class SketchPlugin_Rectangle(model.Feature):
             aLineEnd = GeomDataAPI.geomDataAPI_Point2D(aLine.attribute("EndPoint"))
             aLineStart.setValue(aX[i-1], aY[i-1])
             aLineEnd.setValue(aX[i], aY[i])
+            aLine.data().boolean("Auxiliary").setValue(anAuxiliary)
 
     def updateStartPoint(self):
         # Retrieving list of already created lines
