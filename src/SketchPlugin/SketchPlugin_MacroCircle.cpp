@@ -227,10 +227,15 @@ void SketchPlugin_MacroCircle::fillByCenterAndPassed()
   if (!aCenterAttr->isInitialized() || !aPassedAttr->isInitialized())
     return;
 
-  AttributeRefAttrPtr aPassedRef = refattr(PASSED_POINT_REF_ID());
   // Calculate circle parameters
-  std::shared_ptr<GeomAPI_Pnt2d> aCenter =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aCenterAttr)->pnt();
+  AttributeRefAttrPtr aCenterRef = refattr(CENTER_POINT_REF_ID());
+  std::shared_ptr<GeomAPI_Pnt2d> aCenter;
+  std::shared_ptr<GeomAPI_Shape> aCurve;
+  SketchPlugin_Tools::convertRefAttrToPointOrTangentCurve(
+      aCenterRef, aCenterAttr, aCurve, aCenter);
+  if (!aCenter)
+    aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aCenterAttr)->pnt();
+  AttributeRefAttrPtr aPassedRef = refattr(PASSED_POINT_REF_ID());
   std::shared_ptr<GeomAPI_Pnt2d> aPassedPoint;
   std::shared_ptr<GeomAPI_Shape> aTangentCurve;
   SketchPlugin_Tools::convertRefAttrToPointOrTangentCurve(
