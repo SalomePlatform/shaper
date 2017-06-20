@@ -18,7 +18,7 @@
 <context>
   <name>Box:height:GeomValidators_Positive</name>
   <message>
-    <source>Double is not positive.</source>
+    <source>Value is too small.</source>
     <translation>Height of the box is too small.</translation>
   </message>
 </context>
@@ -67,8 +67,8 @@
 <context>
   <name>Box:width:GeomValidators_Positive</name>
   <message>
-    <source>Double is not positive.</source>
-    <translation>The box width must be positive</translation>
+    <source>Value is too small.</source>
+    <translation>The box width is too small</translation>
   </message>
 </context>
 <context>
@@ -95,8 +95,8 @@
 <context>
   <name>Box:length:GeomValidators_Positive</name>
   <message>
-    <source>Double is not positive.</source>
-    <translation>The box width must be positive</translation>
+    <source>Value is too small.</source>
+    <translation>The box width is too small</translation>
   </message>
 </context>
 <context>

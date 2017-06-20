@@ -64,7 +64,7 @@ bool GeomValidators_Positive::isValid(const AttributePtr& theAttribute,
       return false;
     }
     if (aDouble->value() <= aMinValue) {
-      theError = "Double is not positive.";
+      theError = "Value is too small.";
       return false;
     }
   }
