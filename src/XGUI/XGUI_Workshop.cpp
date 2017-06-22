@@ -1418,14 +1418,14 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
         #endif
         aParameters.Append(MyVCallBack);
 
-        MyTCommunicator->registerPlugin("SMBrowser"); // custom plugin to view ModelAPI
+        MyTCommunicator->RegisterPlugin("SMBrowser"); // custom plugin to view ModelAPI
 
-        MyTCommunicator->init(aParameters);
+        MyTCommunicator->Init(aParameters);
         MyTCommunicator->Activate("SMBrowser"); // to have button in TInspector
         MyTCommunicator->Activate("TKVInspector"); // to have filled callback by model
         MyTCommunicator->Activate("TKDFBrowser");
       }
-      MyTCommunicator->setVisible(true);
+      MyTCommunicator->SetVisible(true);
     }
   }
 #endif
