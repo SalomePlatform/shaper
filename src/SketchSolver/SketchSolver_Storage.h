@@ -57,10 +57,10 @@ public:
   virtual void addConstraint(ConstraintPtr        theConstraint,
                              ConstraintWrapperPtr theSolverConstraint);
 
-  /// \brief Add list of temporary constraints which will be destroyed
+  /// \brief Add a movement constraint which will be destroyed
   ///        after the next solving of the set of constraints.
   /// \param theSolverConstraint [in]  solver's constraint
-  virtual void addTemporaryConstraint(const ConstraintWrapperPtr& theSolverConstraint) = 0;
+  virtual void addMovementConstraint(const ConstraintWrapperPtr& theSolverConstraint) = 0;
 
   /// \brief Change mapping feature from SketchPlugin and
   ///        the entity applicable for corresponding solver.

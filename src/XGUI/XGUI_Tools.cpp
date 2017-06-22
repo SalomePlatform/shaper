@@ -169,7 +169,9 @@ bool canRename(const ObjectPtr& theObject, const QString& theName)
 XGUI_Workshop* workshop(ModuleBase_IWorkshop* theWorkshop)
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
-  return aConnector->workshop();
+  if (aConnector)
+    return aConnector->workshop();
+  return 0;
 }
 
 }

@@ -22,10 +22,12 @@
 #include "SketchSolver_Error.h"
 
 #include <Events_Loop.h>
+#include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_Sketch.h>
 
 /// Global constraint manager object
@@ -66,8 +68,6 @@ SketchSolver_Manager::SketchSolver_Manager()
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_MOVED));
 
-  ////Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_FAILED));
-  ////Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_REPAIRED));
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_SKETCH_PREPARED));
 }
 
@@ -106,19 +106,12 @@ void SketchSolver_Manager::processEvent(
   myIsComputed = true;
 
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)
-      || theMessage->eventID() == anUpdateEvent
-      || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
+      || theMessage->eventID() == anUpdateEvent) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     std::set<ObjectPtr> aFeatures = anUpdateMsg->objects();
 
     isUpdateFlushed = stopSendUpdate();
-
-    isMovedEvt = theMessage->eventID()
-          == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED);
-
-    // Shows that the message has at least one feature applicable for solver
-    bool hasProperFeature = false;
 
     // update sketch features only
     std::set<ObjectPtr>::iterator aFeatIter;
@@ -128,11 +121,28 @@ void SketchSolver_Manager::processEvent(
       if (!aFeature || aFeature->isMacro())
         continue;
 
-      hasProperFeature = updateFeature(aFeature, isMovedEvt) || hasProperFeature;
+      updateFeature(aFeature);
     }
 
-    if (isMovedEvt && hasProperFeature)
-      needToResolve = true;
+  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
+    std::shared_ptr<ModelAPI_ObjectMovedMessage> aMoveMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectMovedMessage>(theMessage);
+
+    ObjectPtr aMovedObject = aMoveMsg->movedObject();
+    std::shared_ptr<GeomDataAPI_Point2D> aMovedPoint =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aMoveMsg->movedAttribute());
+
+    const std::shared_ptr<GeomAPI_Pnt2d>& aFrom = aMoveMsg->originalPosition();
+    const std::shared_ptr<GeomAPI_Pnt2d>& aTo = aMoveMsg->currentPosition();
+
+    if (aMovedObject) {
+      FeaturePtr aMovedFeature = ModelAPI_Feature::feature(aMovedObject);
+      std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(aMovedFeature);
+      if (aSketchFeature && !aSketchFeature->isMacro())
+        needToResolve = moveFeature(aSketchFeature, aFrom, aTo);
+    } else if (aMovedPoint)
+      needToResolve = moveAttribute(aMovedPoint, aFrom, aTo);
 
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
     std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleteMsg =
@@ -179,11 +189,10 @@ void SketchSolver_Manager::processEvent(
 }
 
 // ============================================================================
-//  Function: changeConstraintOrEntity
-//  Purpose:  create/update the constraint or the feature and place it into appropriate group
+//  Function: updateFeature
+//  Purpose:  create/update constraint or feature in appropriate group
 // ============================================================================
-bool SketchSolver_Manager::updateFeature(std::shared_ptr<SketchPlugin_Feature> theFeature,
-                                         bool theMoved)
+bool SketchSolver_Manager::updateFeature(const std::shared_ptr<SketchPlugin_Feature>& theFeature)
 {
   // Check feature validity and find a group to place it.
   // If the feature is not valid, the returned group will be empty.
@@ -199,11 +208,50 @@ bool SketchSolver_Manager::updateFeature(std::shared_ptr<SketchPlugin_Feature> t
   bool isOk = false;
   if (aConstraint)
     isOk = aGroup->changeConstraint(aConstraint);
-  else if (theMoved)
-    isOk = aGroup->moveFeature(theFeature);
   else
     isOk = aGroup->updateFeature(theFeature);
   return isOk;
+}
+
+// ============================================================================
+//  Function: moveFeature
+//  Purpose:  move given feature in appropriate group
+// ============================================================================
+bool SketchSolver_Manager::moveFeature(
+    const std::shared_ptr<SketchPlugin_Feature>& theMovedFeature,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theTo)
+{
+  SketchGroupPtr aGroup = findGroup(theMovedFeature);
+  if (!aGroup)
+    return false;
+
+  aGroup->blockEvents(true);
+  return aGroup->moveFeature(theMovedFeature, theFrom, theTo);
+}
+
+// ============================================================================
+//  Function: moveAttribute
+//  Purpose:  move given attribute in appropriate group
+// ============================================================================
+bool SketchSolver_Manager::moveAttribute(
+    const std::shared_ptr<GeomDataAPI_Point2D>& theMovedAttribute,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theTo)
+{
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theMovedAttribute->owner());
+  std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(anOwner);
+  SketchGroupPtr aGroup;
+  if (aSketchFeature)
+    aGroup = findGroup(aSketchFeature);
+  if (!aGroup) {
+    theMovedAttribute->setValue(theTo);
+    return false;
+  }
+
+  aGroup->blockEvents(true);
+  return aGroup->movePoint(theMovedAttribute, theFrom, theTo);
 }
 
 // ============================================================================

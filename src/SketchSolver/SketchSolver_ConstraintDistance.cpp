@@ -22,6 +22,9 @@
 #include <SketchSolver_Error.h>
 #include <SketchSolver_Manager.h>
 
+#include <SketchPlugin_ConstraintDistanceHorizontal.h>
+#include <SketchPlugin_ConstraintDistanceVertical.h>
+
 #include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Lin2d.h>
 #include <GeomAPI_Pnt2d.h>
@@ -40,9 +43,14 @@ void SketchSolver_ConstraintDistance::getAttributes(
     return;
   }
 
-  if (theAttributes[1])
-    myType = CONSTRAINT_PT_PT_DISTANCE;
-  else if (theAttributes[2] && theAttributes[2]->type() == ENTITY_LINE)
+  if (theAttributes[1]) {
+    if (myBaseConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID())
+      myType = CONSTRAINT_HORIZONTAL_DISTANCE;
+    else if (myBaseConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
+      myType = CONSTRAINT_VERTICAL_DISTANCE;
+    else
+      myType = CONSTRAINT_PT_PT_DISTANCE;
+  } else if (theAttributes[2] && theAttributes[2]->type() == ENTITY_LINE)
     myType = CONSTRAINT_PT_LINE_DISTANCE;
   else
     theAttributes.clear();

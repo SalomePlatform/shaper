@@ -53,9 +53,9 @@ public:
   /// Highlight the presentation with the given color
   /// \param aPM a presentations manager
   /// \param theStyle a style of presentation
-  /// \param aMode a drawing mode
+  /// \param theMode a drawing mode
   virtual void HilightWithColor (const Handle(PrsMgr_PresentationManager3d)& aPM,
-    const Handle(Graphic3d_HighlightStyle)& theStyle, const Standard_Integer aMode = 0)
+    const Handle(Graphic3d_HighlightStyle)& theStyle, const Standard_Integer theMode = 0)
   {
     Selectable()->HilightOwnerWithColor(aPM, theStyle, this);
   }
@@ -119,14 +119,22 @@ protected:
 
   /// Redefinition of virtual function
   Standard_EXPORT virtual void ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
-    const Standard_Integer aMode) ;
+                                                const Standard_Integer theMode) ;
 
 private:
+  /// If the shape of this presentation is Vertex, it appends custom sensitive and owners for it.
+  /// Owner is a usual Brep owner with "isDecomposite" in true. It is necessary to have "Ring"
+  /// highlight/selected marker.
+  /// \param theSelection a current filled selection
+  /// \param theMode a selection mode
+  /// \return true if the owner is created
+  bool appendVertexSelection(const Handle(SelectMgr_Selection)& aSelection,
+                             const Standard_Integer theMode);
   /// Appens sensitive and owners for wires of the given shape into selection
   /// \param theSelection a current filled selection
   /// \param theShape a shape
-  void appendWiresSelection(const Handle(SelectMgr_Selection)& theSelection,
-                            const TopoDS_Shape& theShape);
+  //void appendWiresSelection(const Handle(SelectMgr_Selection)& theSelection,
+  //                          const TopoDS_Shape& theShape);
 
   /// Reference to result object
   ResultPtr myResult;

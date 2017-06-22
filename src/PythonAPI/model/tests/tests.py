@@ -23,9 +23,6 @@ from GeomAPI import *
 from GeomDataAPI import *
 from ModelAPI import ModelAPI_Feature
 import math
-from salome.shaper.model import sketcher
-
-TOLERANCE = 1.e-7
 
 aShapeTypes = {
   GeomAPI_Shape.SOLID:  "GeomAPI_Shape.SOLID",
@@ -177,15 +174,3 @@ def testNbSubFeatures(theComposite, theKindOfSub, theExpectedCount):
     if aFeature is not None and aFeature.getKind() == theKindOfSub:
        count += 1
   assert (count == theExpectedCount), "Number of sub-features of type {}: {}, expected {}".format(theKindOfSub, count, theExpectedCount)
-
-def assertSketchArc(theArcFeature):
-  """ Tests whether the arc is correctly defined
-  """
-  aCenterPnt = geomDataAPI_Point2D(theArcFeature.attribute("center_point"))
-  aStartPnt = geomDataAPI_Point2D(theArcFeature.attribute("start_point"))
-  aEndPnt = geomDataAPI_Point2D(theArcFeature.attribute("end_point"))
-  aRadius = theArcFeature.real("radius")
-  aDistCS = sketcher.tools.distancePointPoint(aCenterPnt, aStartPnt)
-  aDistCE = sketcher.tools.distancePointPoint(aCenterPnt, aEndPnt)
-  assert math.fabs(aDistCS - aDistCE) < TOLERANCE, "Wrong arc: center-start distance {}, center-end distance {}".format(aDistCS, aDistCE)
-  assert math.fabs(aRadius.value() -aDistCS) < TOLERANCE, "Wrong arc: radius is {0}, expected {1}".format(aRadius.value(), aDistCS)

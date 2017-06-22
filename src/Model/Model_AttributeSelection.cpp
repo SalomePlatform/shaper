@@ -36,6 +36,8 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Session.h>
 #include <Events_InfoMessage.h>
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_Vertex.h>
 
 #include <TNaming_Selector.hxx>
 #include <TNaming_NamedShape.hxx>
@@ -54,6 +56,9 @@
 #include <TDF_ChildIterator.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <TopoDS_Iterator.hxx>
+#include <Geom_Circle.hxx>
+#include <Geom_Ellipse.hxx>
+#include <BRep_Builder.hxx>
 
 //#define DEB_NAMING 1
 #ifdef DEB_NAMING
@@ -68,6 +73,13 @@ Standard_GUID kSIMPLE_REF_ID("635eacb2-a1d6-4dec-8348-471fae17cb29");
 Standard_GUID kPART_REF_ID("635eacb2-a1d6-4dec-8348-471fae17cb27");
 // selection is invalid after recomputation
 Standard_GUID kINVALID_SELECTION("bce47fd7-80fa-4462-9d63-2f58acddd49d");
+
+// identifier of the selection of the center of circle on edge
+Standard_GUID kCIRCLE_CENTER("d0d0e0f1-217a-4b95-8fbb-0c4132f23718");
+// identifier of the selection of the first focus point of ellipse on edge
+Standard_GUID kELLIPSE_CENTER1("f70df04c-3168-4dc9-87a4-f1f840c1275d");
+// identifier of the selection of the second focus point of ellipse on edge
+Standard_GUID kELLIPSE_CENTER2("1395ae73-8e02-4cf8-b204-06ff35873a32");
 
 // on this label is stored:
 // TNaming_NamedShape - selected shape
@@ -86,6 +98,7 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   } else {
     myTmpContext.reset();
     myTmpSubShape.reset();
+    myTmpCenterType = NOT_CENTER;
   }
 
   const std::shared_ptr<GeomAPI_Shape>& anOldShape = value();
@@ -102,6 +115,9 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   TDF_Label aSelLab = selectionLabel();
   aSelLab.ForgetAttribute(kSIMPLE_REF_ID);
   aSelLab.ForgetAttribute(kINVALID_SELECTION);
+  aSelLab.ForgetAttribute(kCIRCLE_CENTER);
+  aSelLab.ForgetAttribute(kELLIPSE_CENTER1);
+  aSelLab.ForgetAttribute(kELLIPSE_CENTER2);
 
   bool isDegeneratedEdge = false;
   // do not use the degenerated edge as a shape, a null context and shape is used in the case
@@ -145,12 +161,73 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   owner()->data()->sendAttributeUpdated(this);
 }
 
+void Model_AttributeSelection::setValueCenter(
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
+    const CenterType theCenterType, const bool theTemporarily)
+{
+  setValue(theContext, theEdge, theTemporarily);
+  if (theTemporarily) {
+    myTmpCenterType = theCenterType;
+  } else { // store in the data structure
+    TDF_Label aSelLab = selectionLabel();
+    switch(theCenterType) {
+    case CIRCLE_CENTER:
+      TDataStd_UAttribute::Set(aSelLab, kCIRCLE_CENTER);
+      break;
+    case ELLIPSE_FIRST_FOCUS:
+      TDataStd_UAttribute::Set(aSelLab, kELLIPSE_CENTER1);
+      break;
+    case ELLIPSE_SECOND_FOCUS:
+      TDataStd_UAttribute::Set(aSelLab, kELLIPSE_CENTER2);
+      break;
+    }
+    owner()->data()->sendAttributeUpdated(this);
+  }
+}
+
+
 void Model_AttributeSelection::removeTemporaryValues()
 {
   if (myTmpContext.get() || myTmpSubShape.get()) {
     myTmpContext.reset();
     myTmpSubShape.reset();
   }
+}
+
+// returns the center of the edge: circular or elliptical
+GeomShapePtr centerByEdge(GeomShapePtr theEdge, ModelAPI_AttributeSelection::CenterType theType)
+{
+  if (theType != ModelAPI_AttributeSelection::NOT_CENTER && theEdge.get() != NULL) {
+    TopoDS_Shape aShape = theEdge->impl<TopoDS_Shape>();
+    if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_EDGE) {
+      TopoDS_Edge anEdge = TopoDS::Edge(aShape);
+      double aFirst, aLast;
+      Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+      if (!aCurve.IsNull()) {
+        TopoDS_Vertex aVertex;
+        BRep_Builder aBuilder;
+        if (theType == ModelAPI_AttributeSelection::CIRCLE_CENTER) {
+          Handle(Geom_Circle) aCirc = Handle(Geom_Circle)::DownCast(aCurve);
+          if (!aCirc.IsNull()) {
+            aBuilder.MakeVertex(aVertex, aCirc->Location(), Precision::Confusion());
+          }
+        } else { // ellipse
+          Handle(Geom_Ellipse) anEll = Handle(Geom_Ellipse)::DownCast(aCurve);
+          if (!anEll.IsNull()) {
+            aBuilder.MakeVertex(aVertex,
+              theType == ModelAPI_AttributeSelection::ELLIPSE_FIRST_FOCUS ?
+              anEll->Focus1() : anEll->Focus2(), Precision::Confusion());
+          }
+        }
+        if (!aVertex.IsNull()) {
+          std::shared_ptr<GeomAPI_Vertex> aResult(new GeomAPI_Vertex);
+          aResult->setImpl(new TopoDS_Vertex(aVertex));
+          return aResult;
+        }
+      }
+    }
+  }
+  return theEdge; // no vertex, so, return the initial edge
 }
 
 std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
@@ -161,30 +238,40 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myTmpContext);
     if(aResulConstruction.get()) {
       // it is just reference to construction.
-      return myTmpSubShape;
+      return centerByEdge(myTmpSubShape, myTmpCenterType);
     }
-    return myTmpSubShape.get() ? myTmpSubShape : myTmpContext->shape();
+    return centerByEdge(myTmpSubShape.get() ? myTmpSubShape : myTmpContext->shape(),
+                        myTmpCenterType);
   }
 
   TDF_Label aSelLab = selectionLabel();
   if (aSelLab.IsAttribute(kINVALID_SELECTION))
     return aResult;
 
+  CenterType aType = NOT_CENTER;
+  if (aSelLab.IsAttribute(kCIRCLE_CENTER))
+    aType = CIRCLE_CENTER;
+  else if (aSelLab.IsAttribute(kELLIPSE_CENTER1))
+    aType = ELLIPSE_FIRST_FOCUS;
+  else if (aSelLab.IsAttribute(kELLIPSE_CENTER2))
+    aType = ELLIPSE_SECOND_FOCUS;
+
+
   if (myRef.isInitialized()) {
     if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
       ResultPtr aContext = context();
       if (!aContext.get())
         return aResult; // empty result
-      return aContext->shape();
+      return centerByEdge(aContext->shape(), aType);
     }
     if (aSelLab.IsAttribute(kPART_REF_ID)) {
       ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(context());
       if (!aPart.get() || !aPart->isActivated())
-        return std::shared_ptr<GeomAPI_Shape>(); // postponed naming needed
+        return aResult; // postponed naming needed
       Handle(TDataStd_Integer) anIndex;
       if (aSelLab.FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
         if (anIndex->Get()) { // special selection attribute was created, use it
-          return aPart->selectionValue(anIndex->Get());
+          return centerByEdge(aPart->selectionValue(anIndex->Get()), aType);
         } else { // face with name is already in the data model, so try to take it by name
           Handle(TDataStd_Name) aName;
           if (aSelLab.FindAttribute(TDataStd_Name::GetID(), aName)) {
@@ -193,8 +280,8 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
             if (aPartEnd != std::string::npos && aPartEnd != aSubShapeName.rfind('/')) {
               std::string aNameInPart = aSubShapeName.substr(aPartEnd + 1);
               int anIndex;
-              std::string aType; // to reuse already existing selection the type is not needed
-              return aPart->shapeInPart(aNameInPart, aType, anIndex);
+              std::string aTypeStr; // to reuse already existing selection the type is not needed
+              return centerByEdge(aPart->shapeInPart(aNameInPart, aTypeStr, anIndex), aType);
             }
           }
         }
@@ -206,6 +293,7 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
       TopoDS_Shape aSelShape = aSelection->Get();
       aResult = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
       aResult->setImpl(new TopoDS_Shape(aSelShape));
+      return centerByEdge(aResult, aType);
     } else { // for simple construction element: just shape of this construction element
       std::shared_ptr<Model_ResultConstruction> aConstr =
         std::dynamic_pointer_cast<Model_ResultConstruction>(context());
@@ -213,13 +301,13 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
         Handle(TDataStd_Integer) anIndex;
         if (aSelLab.FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
           if (anIndex->Get() == 0) // it is just reference to construction, nothing is in value
-            return aResult;
-          return aConstr->shape(anIndex->Get(), owner()->document());
+            return centerByEdge(aResult, aType);
+          return centerByEdge(aConstr->shape(anIndex->Get(), owner()->document()), aType);
         }
       }
     }
   }
-  return aResult;
+  return aResult; // empty case
 }
 
 bool Model_AttributeSelection::isInvalid()

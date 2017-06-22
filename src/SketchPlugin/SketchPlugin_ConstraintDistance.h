@@ -85,7 +85,10 @@ class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
 
 protected:
   /// Returns the current distance between the feature attributes
-  double calculateCurrentDistance();
+  virtual double calculateCurrentDistance();
+
+  /// Check the attributes related to distanced points/features are initialized
+  bool areAttributesInitialized();
 
 private:
   bool myFlyoutUpdate; ///< to avoid cyclic dependencies on automatic updates of flyout point

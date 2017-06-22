@@ -31,6 +31,8 @@
 #include <memory>
 #include <map>
 
+class GeomAPI_Pnt2d;
+
 typedef std::map<ConstraintPtr, SolverConstraintPtr> ConstraintConstraintMap;
 
 /** \class   SketchSolver_Group
@@ -72,11 +74,25 @@ class SketchSolver_Group
   bool updateFeature(FeaturePtr theFeature);
 
   /** \brief Updates the data corresponding the specified feature moved in GUI.
-   *         Additional Fixed constraints are created.
+   *         Special kind of Fixed constraints is created.
    *  \param[in] theFeature the feature to be updated
-   *  \return \c true, if the feature is moved
+   *  \param[in] theFrom    start point of the movement
+   *  \param[in] theTo      final point of the movement
+   *  \return \c true, if the feature is really moved
    */
-  bool moveFeature(FeaturePtr theFeature);
+  bool moveFeature(FeaturePtr theFeature,
+                   const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
+                   const std::shared_ptr<GeomAPI_Pnt2d>& theTo);
+  /** \brief Updates the data corresponding the specified point moved in GUI.
+   *         Special kind of Fixed constraints is created.
+   *  \param[in] thePoint the attribute to be updated
+   *  \param[in] theFrom  start point of the movement
+   *  \param[in] theTo    final point of the movement
+   *  \return \c true, if the attribute is really moved
+   */
+  bool movePoint(AttributePtr thePoint,
+                 const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
+                 const std::shared_ptr<GeomAPI_Pnt2d>& theTo);
 
   /// Returns the current workplane
   inline const CompositeFeaturePtr& getWorkplane() const

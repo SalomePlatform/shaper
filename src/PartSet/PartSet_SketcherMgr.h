@@ -50,6 +50,7 @@ class ModuleBase_ModelWidget;
 class ModuleBase_Operation;
 class XGUI_OperationMgr;
 class XGUI_Workshop;
+class PartSet_ExternalPointsMgr;
 
 class AIS_InteractiveObject;
 
@@ -432,6 +433,8 @@ private:
   bool myPreviousUpdateViewerEnabled;
 
   QMap<PartSet_Tools::ConstraintVisibleState, bool> myIsConstraintsShown;
+
+  PartSet_ExternalPointsMgr* myExternalPointsMgr;
 };
 
 

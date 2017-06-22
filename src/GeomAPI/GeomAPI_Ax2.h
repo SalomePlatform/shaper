@@ -70,4 +70,7 @@ public:
   std::shared_ptr<GeomAPI_Dir> dir() const;
 };
 
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_Ax2> GeomAx2Ptr;
+
 #endif

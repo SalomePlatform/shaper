@@ -333,6 +333,20 @@ public:
       const ModelHighAPI_RefAttr & thePointOrLine,
       const ModelHighAPI_Double & theValue);
 
+  /// Set horizontal distance
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelHighAPI_Interface> setHorizontalDistance(
+      const ModelHighAPI_RefAttr & thePoint1,
+      const ModelHighAPI_RefAttr & thePoint2,
+      const ModelHighAPI_Double & theValue);
+
+  /// Set vertical distance
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelHighAPI_Interface> setVerticalDistance(
+      const ModelHighAPI_RefAttr & thePoint1,
+      const ModelHighAPI_RefAttr & thePoint2,
+      const ModelHighAPI_Double & theValue);
+
   /// Set equal
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelHighAPI_Interface> setEqual(
@@ -406,6 +420,16 @@ public:
   void setValue(
       const std::shared_ptr<ModelHighAPI_Interface> & theConstraint,
       const ModelHighAPI_Double & theValue);
+
+  /// Move point or sketch feature
+  SKETCHAPI_EXPORT
+  void move(const ModelHighAPI_RefAttr& theMovedEntity,
+            const std::shared_ptr<GeomAPI_Pnt2d>& theTargetPoint);
+
+  /// Move point or sketch feature
+  SKETCHAPI_EXPORT
+  void move(const ModelHighAPI_RefAttr& theMovedEntity,
+            double theTargetX, double theTargetY);
 
   SKETCHAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& thePoint);
