@@ -26,7 +26,6 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         id="Sketch"
         nested="SketchPoint SketchIntersectionPoint SketchLine
                 SketchCircle SketchMacroCircle SketchArc SketchMacroArc
-<!--                SketchEllipse SketchMacroEllipse-->
                 SketchRectangle
                 SketchProjection
                 SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintDistanceHorizontal SketchConstraintDistanceVertical
@@ -360,7 +359,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </feature>
     </group>
 
-<!--
+<excluded>
     <group id="Elliptic geometry">
       <!-- SketchEllipse is a hidden feature. It is created inside SketchMacroEllipse. -->
       <feature id="SketchEllipse"
@@ -449,7 +448,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                    obligatory="0"/>
       </feature>
     </group>
--->
+</excluded>
 
     <group id="Projection">
       <!-- Intersection Point -->
