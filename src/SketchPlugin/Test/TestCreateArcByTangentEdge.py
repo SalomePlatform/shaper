@@ -52,7 +52,19 @@ def verifyLastArc(theSketch, theCenter, theStart, theEnd):
     subroutine to verify position of last arc in the sketch
     """
     aLastArc = model.lastSubFeature(theSketch, "SketchArc")
-    model.assertArc(aLastArc, theCenter, theStart, theEnd)
+    aCenterPnt = geomDataAPI_Point2D(aLastArc.attribute("center_point"))
+    aStartPnt = geomDataAPI_Point2D(aLastArc.attribute("start_point"))
+    aEndPnt = geomDataAPI_Point2D(aLastArc.attribute("end_point"))
+    if len(theCenter):
+        verifyPointCoordinates(aCenterPnt, theCenter[0], theCenter[1])
+    if len(theStart):
+        verifyPointCoordinates(aStartPnt, theStart[0], theStart[1])
+    if len(theEnd):
+        verifyPointCoordinates(aEndPnt, theEnd[0], theEnd[1])
+    model.assertSketchArc(aLastArc)
+
+def verifyPointCoordinates(thePoint, theX, theY):
+    assert thePoint.x() == theX and thePoint.y() == theY, "Wrong '{0}' point ({1}, {2}), expected ({3}, {4})".format(thePoint.id(), thePoint.x(), thePoint.y(), theX, theY)
 
 def verifyTangent(theFeature1, theFeature2):
     anArcs = []
@@ -87,11 +99,19 @@ def verifyArcLineTangent(theArc, theLine):
     aStart  = geomDataAPI_Point2D(theArc.attribute("start_point"))
     aRadius = model.distancePointPoint(aStart, aCenter)
 
-    aDistCL = model.distancePointLine(aCenter, theLine)
+    aDistCL = distancePointLine(aCenter, theLine)
     assert math.fabs(aDistCL - aRadius) < TOLERANCE, "Arc and line do not tangent"
 
+def distancePointLine(thePoint, theLine):
+    aLineStart = geomDataAPI_Point2D(theLine.attribute("StartPoint")).pnt().xy()
+    aLineEnd = geomDataAPI_Point2D(theLine.attribute("EndPoint")).pnt().xy()
+    aLineDir = aLineEnd.decreased(aLineStart)
+    aLineLen = aLineEnd.distance(aLineStart)
+    aPntDir = thePoint.pnt().xy().decreased(aLineStart)
+    return math.fabs(aPntDir.cross(aLineDir) / aLineLen)
+
 def verifyPointOnLine(thePoint, theLine):
-    aDistance = model.distancePointLine(thePoint, theLine)
+    aDistance = distancePointLine(thePoint, theLine)
     assert aDistance < TOLERANCE, "Point is not on Line, distance: {0}".format(aDistance)
 
 

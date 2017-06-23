@@ -413,7 +413,7 @@ void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
   qDebug("ModuleBase_ModelWidget::moveObject");
 #endif
 
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
   ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);
   Events_Loop::loop()->flush(anEvent);
 

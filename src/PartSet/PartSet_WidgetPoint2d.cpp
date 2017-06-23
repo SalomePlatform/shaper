@@ -23,7 +23,6 @@
 #include <PartSet_Module.h>
 #include <PartSet_SketcherReentrantMgr.h>
 #include <PartSet_ExternalObjectsMgr.h>
-#include <PartSet_CenterPrs.h>
 
 #include <XGUI_Tools.h>
 #include <XGUI_Workshop.h>
@@ -77,7 +76,6 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <BRep_Tool.hxx>
-#include <Geom_Point.hxx>
 
 #include <cfloat>
 #include <climits>
@@ -358,23 +356,10 @@ bool PartSet_WidgetPoint2D::storeValueCustom()
   //                myYSpin->hasVariable() ? myYSpin->text().toStdString() : "");
   //aPoint->setValue(!myXSpin->hasVariable() ? myXSpin->value() : aPoint->x(),
   //                 !myYSpin->hasVariable() ? myYSpin->value() : aPoint->y());
+  aPoint->setValue(myXSpin->value(), myYSpin->value());
 
-  if (myFeature->isMacro()) {
-    // Moving points of macro-features has been processed directly (without solver)
-    aPoint->setValue(myXSpin->value(), myYSpin->value());
-    moveObject(myFeature);
-  } else {
-    if (!aPoint->isInitialized())
-      aPoint->setValue(0., 0.);
-
-    std::shared_ptr<ModelAPI_ObjectMovedMessage> aMessage(
-        new ModelAPI_ObjectMovedMessage(this));
-    aMessage->setMovedAttribute(aPoint);
-    aMessage->setOriginalPosition(aPoint->pnt());
-    aMessage->setCurrentPosition(myXSpin->value(), myYSpin->value());
-    Events_Loop::loop()->send(aMessage);
-  }
-
+  // after movement the solver will call the update event: optimization
+  moveObject(myFeature);
   aPoint->setImmutable(isImmutable);
   that->blockSignals(isBlocked);
 
@@ -593,7 +578,6 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
   if (!aFirstValue.get() && myPreSelected.get()) {
     aFirstValue = myPreSelected;
   }
-
   // if we have selection and use it
   if (aFirstValue.get() && isValidSelectionCustom(aFirstValue) &&
       aFirstValue->shape().get()) { /// Trihedron Axis may be selected, but shape is empty
@@ -709,36 +693,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
       }
     }
   }
-  // The selection could be a center of an external circular object
-  else if (aFirstValue.get() && (!aFirstValue->interactive().IsNull())) {
-    Handle(PartSet_CenterPrs) aAIS =
-        Handle(PartSet_CenterPrs)::DownCast(aFirstValue->interactive());
-    if (!aAIS.IsNull()) {
-      gp_Pnt aPntComp = aAIS->Component()->Pnt();
-      GeomVertexPtr aVertPtr(new GeomAPI_Vertex(aPntComp.X(), aPntComp.Y(), aPntComp.Z()));
-      TopoDS_Shape aShape = aVertPtr->impl<TopoDS_Shape>();
-
-      ResultPtr aFixedObject =
-          PartSet_Tools::findFixedObjectByExternal(aShape, aAIS->object(), mySketch);
-      if (!aFixedObject.get())
-        aFixedObject = PartSet_Tools::createFixedByExternalCenter(aAIS->object(), aAIS->edge(),
-                                                                  aAIS->centerType(), mySketch);
-      if (aFixedObject.get())
-        setConstraintToObject(aFixedObject);
-      // fignal updated should be flushed in order to visualize possible created
-      // external objects e.g. selection of trihedron axis when input end arc point
-      updateObject(feature());
-
-      double aX, aY;
-      if (getPoint2d(aView, aShape, aX, aY)) {
-        // do not create a constraint to the point, which already used by the feature
-        // if the feature contains the point, focus is not switched
-        setPoint(aX, aY);
-      }
-      emit vertexSelected(); // it stops the reentrant operation
-      emit focusOutWidget(this);
-    }
-  }
+  // End of Bug dependent fragment
   else {
     // A case when point is taken from mouse event
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());

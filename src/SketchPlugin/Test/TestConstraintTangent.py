@@ -40,6 +40,23 @@ from salome.shaper import model
 
 __updated__ = "2015-03-17"
 
+def distancePointLine(point, line):
+    """
+    subroutine to calculate distance between point and line
+    result of calculated distance is has 10**-5 precision
+    """
+    aStartPoint = geomDataAPI_Point2D(line.attribute("StartPoint"))
+    aEndPoint = geomDataAPI_Point2D(line.attribute("EndPoint"))
+    # orthogonal direction
+    aDirX = -(aEndPoint.y() - aStartPoint.y())
+    aDirY = (aEndPoint.x() - aStartPoint.x())
+    aLen = math.sqrt(aDirX**2 + aDirY**2)
+    aDirX = aDirX / aLen
+    aDirY = aDirY / aLen
+    aVecX = point.x() - aStartPoint.x()
+    aVecY = point.y() - aStartPoint.y()
+    return round(math.fabs(aVecX * aDirX + aVecY * aDirY), 5)
+
 def checkArcLineTangency(theArc, theLine):
     """
     subroutine to check that the line is tangent to arc/circle
@@ -51,7 +68,7 @@ def checkArcLineTangency(theArc, theLine):
         aCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
         aStartPnt = geomDataAPI_Point2D(theArc.attribute("start_point"))
         aRadius = model.distancePointPoint(aStartPnt, aCenter)
-    aDist = model.distancePointLine(aCenter, theLine)
+    aDist = distancePointLine(aCenter, theLine)
     assert math.fabs(aDist - aRadius) < 2.e-5, "aDist = {0}, aRadius = {1}".format(aDist, aRadius)
 
 def checkArcArcTangency(theArc1, theArc2):

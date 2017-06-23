@@ -28,8 +28,6 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
-#include <SketchPlugin_ConstraintDistanceHorizontal.h>
-#include <SketchPlugin_ConstraintDistanceVertical.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
@@ -82,14 +80,6 @@ static const std::string& constraintTypeToSetter(const std::string& theType)
   }
   if (theType == SketchPlugin_ConstraintDistance::ID()) {
     static const std::string DISTANCE_SETTER("setDistance");
-    return DISTANCE_SETTER;
-  }
-  if (theType == SketchPlugin_ConstraintDistanceHorizontal::ID()) {
-    static const std::string DISTANCE_SETTER("setHorizontalDistance");
-    return DISTANCE_SETTER;
-  }
-  if (theType == SketchPlugin_ConstraintDistanceVertical::ID()) {
-    static const std::string DISTANCE_SETTER("setVerticalDistance");
     return DISTANCE_SETTER;
   }
   if (theType == SketchPlugin_ConstraintEqual::ID()) {

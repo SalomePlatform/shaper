@@ -70,7 +70,7 @@ static void sendMessage(const char* theMessageName,
 
 
 // ========================================================
-// =========       SketchSolver_Group       ===============
+// =========  SketchSolver_Group  ===============
 // ========================================================
 
 SketchSolver_Group::SketchSolver_Group(const CompositeFeaturePtr& theWorkplane)
@@ -129,56 +129,32 @@ bool SketchSolver_Group::updateFeature(FeaturePtr theFeature)
   return myStorage->update(theFeature);
 }
 
-template <class Type>
-static SolverConstraintPtr move(StoragePtr theStorage,
-                                SolverPtr theSketchSolver,
-                                int theSketchDOF,
-                                bool theEventsBlocked,
-                                Type theFeatureOrPoint,
-                                const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
-                                const std::shared_ptr<GeomAPI_Pnt2d>& theTo)
+bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
 {
-  bool isEntityExists = (theStorage->entity(theFeatureOrPoint).get() != 0);
-  if (theSketchDOF == 0 && isEntityExists) {
+  bool isFeatureExists = (myStorage->entity(theFeature).get() != 0);
+  if (myDOF == 0 && isFeatureExists) {
     // avoid moving elements of fully constrained sketch
-    theStorage->refresh();
-    return SolverConstraintPtr();
+    myStorage->refresh();
+    return true;
   }
 
   // Create temporary Fixed constraint
-  std::shared_ptr<SketchSolver_ConstraintMovement> aConstraint =
-      PlaneGCSSolver_Tools::createMovementConstraint(theFeatureOrPoint);
-  if (aConstraint) {
-    SolverConstraintPtr(aConstraint)->process(theStorage, theEventsBlocked);
-    if (aConstraint->error().empty()) {
-      aConstraint->startPoint(theFrom);
-      theSketchSolver->initialize();
-      aConstraint->moveTo(theTo);
-      theStorage->setNeedToResolve(true);
-    } else
-      theStorage->notify(aConstraint->movedFeature());
+  std::shared_ptr<SketchSolver_ConstraintFixed> aConstraint =
+      PlaneGCSSolver_Tools::createMovementConstraint(theFeature);
+  if (!aConstraint)
+    return false;
+  SolverConstraintPtr(aConstraint)->process(myStorage, myIsEventsBlocked);
+  if (aConstraint->error().empty()) {
+    setTemporary(aConstraint);
+    if (!myStorage->isEmpty())
+      myStorage->setNeedToResolve(true);
+
+    mySketchSolver->initialize();
+    aConstraint->moveFeature();
   }
 
-  return aConstraint;
-}
-
-bool SketchSolver_Group::moveFeature(FeaturePtr theFeature,
-                                     const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
-                                     const std::shared_ptr<GeomAPI_Pnt2d>& theTo)
-{
-  SolverConstraintPtr aConstraint =
-      move(myStorage, mySketchSolver, myDOF, myIsEventsBlocked, theFeature, theFrom, theTo);
-  setTemporary(aConstraint);
-  return true;
-}
-
-bool SketchSolver_Group::movePoint(AttributePtr theAttribute,
-                                   const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
-                                   const std::shared_ptr<GeomAPI_Pnt2d>& theTo)
-{
-  SolverConstraintPtr aConstraint =
-      move(myStorage, mySketchSolver, myDOF, myIsEventsBlocked, theAttribute, theFrom, theTo);
-  setTemporary(aConstraint);
+  // notify all observers that theFeature has been changed
+  myStorage->notify(theFeature);
   return true;
 }
 
@@ -396,8 +372,7 @@ void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
 // ============================================================================
 void SketchSolver_Group::setTemporary(SolverConstraintPtr theConstraint)
 {
-  if (theConstraint)
-    myTempConstraints.insert(theConstraint);
+  myTempConstraints.insert(theConstraint);
 }
 
 // ============================================================================

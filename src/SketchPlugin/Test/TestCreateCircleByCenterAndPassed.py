@@ -47,10 +47,16 @@ def verifyLastCircle(theSketch, theX, theY, theR):
     subroutine to verify position of last circle in the sketch
     """
     aLastCircle = model.lastSubFeature(theSketch, "SketchCircle")
-    model.assertCircle(aLastCircle, [theX, theY], theR)
+    aCenter = geomDataAPI_Point2D(aLastCircle.attribute("circle_center"))
+    verifyPointCoordinates(aCenter, theX, theY)
+    aRadius = aLastCircle.real("circle_radius")
+    assert aRadius.value() == theR, "Wrong radius {0}, expected {1}".format(aRadius.value(), theR)
+
+def verifyPointCoordinates(thePoint, theX, theY):
+    assert thePoint.x() == theX and thePoint.y() == theY, "Wrong '{0}' point ({1}, {2}), expected ({3}, {4})".format(thePoint.id(), thePoint.x(), thePoint.y(), theX, theY)
 
 def verifyPointOnLine(thePoint, theLine):
-    aDistance = model.distancePointLine(thePoint, theLine)
+    aDistance = distancePointLine(thePoint, theLine)
     assert aDistance < TOLERANCE, "Point is not on Line, distance: {0}".format(aDistance)
 
 def verifyTangentCircles(theCircle1, theCircle2):
@@ -62,6 +68,14 @@ def verifyTangentCircles(theCircle1, theCircle2):
     aRSum = aRadius1 + aRadius2
     aRDiff = math.fabs(aRadius1 - aRadius2)
     assert math.fabs(aRSum - aDistCC) < TOLERANCE or math.fabs(aRDiff - aDistCC) < TOLERANCE, "Circles do not tangent"
+
+def distancePointLine(thePoint, theLine):
+    aLineStart = geomDataAPI_Point2D(theLine.attribute("StartPoint")).pnt().xy()
+    aLineEnd = geomDataAPI_Point2D(theLine.attribute("EndPoint")).pnt().xy()
+    aLineDir = aLineEnd.decreased(aLineStart)
+    aLineLen = aLineEnd.distance(aLineStart)
+    aPntDir = thePoint.pnt().xy().decreased(aLineStart)
+    return math.fabs(aPntDir.cross(aLineDir) / aLineLen)
 
 
 #=========================================================================
@@ -168,7 +182,7 @@ aPassed.setValue(aPrevCenter.pnt())
 aRadius = model.distancePointPoint(aPrevCenter, aPointCoord)
 aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 6)
-model.assertPoint(aPointCoord, aPointCoordinates)
+verifyPointCoordinates(aPointCoord, aPointCoordinates[0], aPointCoordinates[1])
 verifyLastCircle(aSketchFeature, aPointCoord.x(), aPointCoord.y(), aRadius)
 model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 2)
 
@@ -209,13 +223,14 @@ aRadius = model.distancePointPoint(aCenter, aPassed)
 aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 10)
 # check connected features do not change their positions
-model.assertPoint(aPrevCenter, aPrevCenterXY)
+verifyPointCoordinates(aPrevCenter, aPrevCenterXY[0], aPrevCenterXY[1])
 assert(aPrevCircle.real("circle_radius").value() == aPrevRadius)
-model.assertLine(aLine, aLineStart, aLineEnd)
+verifyPointCoordinates(aStartPnt, aLineStart[0], aLineStart[1])
+verifyPointCoordinates(aEndPnt, aLineEnd[0], aLineEnd[1])
 # verify newly created circle
 aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
 aCenter = geomDataAPI_Point2D(aCircle.attribute("circle_center"))
-model.assertPoint(aCenter, anExpectedCenter)
+verifyPointCoordinates(aCenter, anExpectedCenter[0], anExpectedCenter[1])
 verifyPointOnLine(aCenter, aLine)
 verifyTangentCircles(aCircle, aPrevCircle)
 model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 3)

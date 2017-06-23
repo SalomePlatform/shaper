@@ -51,6 +51,23 @@ from salome.shaper import model
 __updated__ = "2014-10-28"
 
 
+def distancePointLine(point, line):
+    """
+    subroutine to calculate distance between point and line
+    result of calculated distance is has 10**-5 precision
+    """
+    aStartPoint = geomDataAPI_Point2D(line.attribute("StartPoint"))
+    aEndPoint = geomDataAPI_Point2D(line.attribute("EndPoint"))
+    # orthogonal direction
+    aDirX = -(aEndPoint.y() - aStartPoint.y())
+    aDirY = (aEndPoint.x() - aStartPoint.x())
+    aLen = math.sqrt(aDirX**2 + aDirY**2)
+    aDirX = aDirX / aLen
+    aDirY = aDirY / aLen
+    aVecX = point.x() - aStartPoint.x()
+    aVecY = point.y() - aStartPoint.y()
+    return round(math.fabs(aVecX * aDirX + aVecY * aDirY), 5)
+
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
 #=========================================================================
@@ -146,7 +163,7 @@ assert (model.dof(aSketchFeature) == 6)
 # Add distance between point and line
 #=========================================================================
 PT_LINE_DIST = 50.
-aDist = model.distancePointLine(aSketchPointCoords, aSketchLine)
+aDist = distancePointLine(aSketchPointCoords, aSketchLine)
 aSession.startOperation()
 aConstraint = aSketchFeature.addFeature("SketchConstraintDistance")
 aDistance = aConstraint.real("ConstraintValue")
@@ -177,7 +194,7 @@ assert (model.dof(aSketchFeature) == 5)
 aSession.startOperation()
 aDistance.setValue(PT_LINE_DIST)
 aSession.finishOperation()
-assert (math.fabs(model.distancePointLine(aSketchPointCoords, aSketchLine) - PT_LINE_DIST) < 1.e-10)
+assert (math.fabs(distancePointLine(aSketchPointCoords, aSketchLine) - PT_LINE_DIST) < 1.e-10)
 assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # Set distance between line boundaries

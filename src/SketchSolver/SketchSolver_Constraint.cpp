@@ -134,10 +134,6 @@ void SketchSolver_Constraint::process()
   ConstraintWrapperPtr aNewConstraint = PlaneGCSSolver_Tools::createConstraint(
       myBaseConstraint, aConstrType,
       aValue, anAttributes[0], anAttributes[1], anAttributes[2], anAttributes[3]);
-  if (!aNewConstraint) {
-    myErrorMsg = SketchSolver_Error::WRONG_CONSTRAINT_TYPE();
-    return;
-  }
   myStorage->addConstraint(myBaseConstraint, aNewConstraint);
 
   adjustConstraint();

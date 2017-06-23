@@ -427,24 +427,4 @@ class SketchPlugin_ArcEndPointIntersectionValidator: public ModelAPI_AttributeVa
                        Events_InfoMessage& theError) const;
 };
 
-/**\class SketchPlugin_HasNoConstraint
- * \ingroup Validators
- * \brief Validator for checking whether the feature has constraint.
- *
- * Checks that feature of the attribute does not have constraint with some kinds.
- * The kinds of constraints should be described in parameters of the validator
- * Validator processes the ModelAPI_AttributeRefAttr attribute kind
- */
-class SketchPlugin_HasNoConstraint: public ModelAPI_AttributeValidator
-{
- public:
-  //! returns true if attribute is valid
-  //! \param theAttribute the checked attribute
-  //! \param theArguments arguments of the attribute
-  //! \param theError error message
-  virtual bool isValid(const AttributePtr& theAttribute,
-                       const std::list<std::string>& theArguments,
-                       Events_InfoMessage& theError) const;
-};
-
 #endif

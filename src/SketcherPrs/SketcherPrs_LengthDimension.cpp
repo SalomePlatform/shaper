@@ -25,8 +25,6 @@
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintDistance.h>
-#include <SketchPlugin_ConstraintDistanceHorizontal.h>
-#include <SketchPlugin_ConstraintDistanceVertical.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Circle.h>
@@ -185,9 +183,7 @@ bool SketcherPrs_LengthDimension::readyToDisplay(ModelAPI_Feature* theConstraint
     thePnt2 = thePlane->to3D(aEndPoint->x(), aEndPoint->y())->impl<gp_Pnt>();
     return true;
 
-  } else if (theConstraint->getKind() == SketchPlugin_ConstraintDistance::ID() ||
-             theConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID() ||
-             theConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID()) {
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintDistance::ID()) {
     // The constraint is distance
     std::shared_ptr<GeomDataAPI_Point2D> aPoint_A = SketcherPrs_Tools::getFeaturePoint(
         aData, SketchPlugin_Constraint::ENTITY_A(), thePlane);

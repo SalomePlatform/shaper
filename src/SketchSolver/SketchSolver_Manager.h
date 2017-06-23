@@ -24,13 +24,10 @@
 #include <SketchSolver_Group.h>
 
 #include <Events_Listener.h>
+#include <SketchPlugin_Constraint.h>
 
 #include <list>
 #include <set>
-
-class GeomAPI_Pnt2d;
-class GeomDataAPI_Point2D;
-class SketchPlugin_Constraint;
 
 /** \class   SketchSolver_Manager
  *  \ingroup Plugins
@@ -64,29 +61,10 @@ protected:
 
   /** \brief Adds or updates a constraint or an entity in the suitable group
    *  \param[in] theFeature sketch feature to be changed
+   *  \param[in] theMoved   \c true if the feature has been moved in the viewer
    *  \return \c true if the feature changed successfully
    */
-  bool updateFeature(const std::shared_ptr<SketchPlugin_Feature>& theFeature);
-
-  /** \brief Move feature
-   *  \param[in] theMovedFeature dragged sketch feature
-   *  \param[in] theFromPoint    original position of the feature
-   *  \param[in] theToPoint      prefereble position of the feature (current position of the mouse)
-   *  \return \c true if the feature has been changed successfully
-   */
-  bool moveFeature(const std::shared_ptr<SketchPlugin_Feature>& theMovedFeature,
-                   const std::shared_ptr<GeomAPI_Pnt2d>& theFromPoint,
-                   const std::shared_ptr<GeomAPI_Pnt2d>& theToPoint);
-
-  /** \brief Move feature using its moved attribute
-   *  \param[in] theMovedAttribute dragged point attribute of sketch feature
-   *  \param[in] theFromPoint      original position of the moved point
-   *  \param[in] theToPoint        prefereble position (current position of the mouse)
-   *  \return \c true if the attribute owner has been changed successfully
-   */
-  bool moveAttribute(const std::shared_ptr<GeomDataAPI_Point2D>& theMovedAttribute,
-                     const std::shared_ptr<GeomAPI_Pnt2d>& theFromPoint,
-                     const std::shared_ptr<GeomAPI_Pnt2d>& theToPoint);
+  bool updateFeature(std::shared_ptr<SketchPlugin_Feature> theFeature, bool theMoved = false);
 
   /** \brief Removes a constraint from the manager
    *  \param[in] theConstraint constraint to be removed

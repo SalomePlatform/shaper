@@ -24,8 +24,6 @@
 #include<GeomAPI_Circ.h>
 #include<GeomAPI_Dir.h>
 #include<GeomAPI_Lin.h>
-#include<GeomAPI_Ax2.h>
-#include<GeomAPI_Ellipse.h>
 
 #include <BRepAdaptor_Curve.hxx>
 
@@ -37,11 +35,9 @@
 #include <Geom_Curve.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_Circle.hxx>
-#include <Geom_Ellipse.hxx>
 #include <GeomAdaptor_Curve.hxx>
 #include <gp_Ax1.hxx>
 #include <gp_Pln.hxx>
-#include <gp_Elips.hxx>
 
 #include <GCPnts_AbscissaPoint.hxx>
 
@@ -100,16 +96,6 @@ bool GeomAPI_Edge::isArc() const
   return false;
 }
 
-bool GeomAPI_Edge::isEllipse() const
-{
-  const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
-  double aFirst, aLast;
-  Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
-  if (aCurve->IsKind(STANDARD_TYPE(Geom_Ellipse)))
-    return true;
-  return false;
-}
-
 std::shared_ptr<GeomAPI_Pnt> GeomAPI_Edge::firstPoint()
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
@@ -130,14 +116,14 @@ std::shared_ptr<GeomAPI_Pnt> GeomAPI_Edge::lastPoint()
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aPoint.X(), aPoint.Y(), aPoint.Z()));
 }
 
-std::shared_ptr<GeomAPI_Circ> GeomAPI_Edge::circle() const
+std::shared_ptr<GeomAPI_Circ> GeomAPI_Edge::circle()
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   double aFirst, aLast;
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
-  if (!aCurve.IsNull()) {
+  if (aCurve) {
     Handle(Geom_Circle) aCirc = Handle(Geom_Circle)::DownCast(aCurve);
-    if (!aCirc.IsNull()) {
+    if (aCirc) {
       gp_Pnt aLoc = aCirc->Location();
       std::shared_ptr<GeomAPI_Pnt> aCenter(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
       gp_Dir anAxis = aCirc->Axis().Direction();
@@ -148,24 +134,7 @@ std::shared_ptr<GeomAPI_Circ> GeomAPI_Edge::circle() const
   return std::shared_ptr<GeomAPI_Circ>(); // not circle
 }
 
-std::shared_ptr<GeomAPI_Ellipse> GeomAPI_Edge::ellipse() const
-{
-  const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
-  double aFirst, aLast;
-  Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
-  if (!aCurve.IsNull()) {
-    Handle(Geom_Ellipse) aElips = Handle(Geom_Ellipse)::DownCast(aCurve);
-    if (!aElips.IsNull()) {
-      gp_Elips aGpElips = aElips->Elips();
-      std::shared_ptr<GeomAPI_Ellipse> aEllipse(new GeomAPI_Ellipse());
-      aEllipse->setImpl(new gp_Elips(aGpElips));
-      return aEllipse;
-    }
-  }
-  return std::shared_ptr<GeomAPI_Ellipse>(); // not elipse
-}
-
-std::shared_ptr<GeomAPI_Lin> GeomAPI_Edge::line() const
+std::shared_ptr<GeomAPI_Lin> GeomAPI_Edge::line()
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   double aFirst, aLast;
