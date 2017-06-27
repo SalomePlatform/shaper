@@ -30,6 +30,7 @@
 #include <QAbstractItemModel>
 
 class Config_DataModelReader;
+class XGUI_Workshop;
 
 /**\class XGUI_DataModel
  * \ingroup GUI
@@ -63,7 +64,7 @@ public:
 
   //! Returns index of the object
   //! \param theObject object to find
-  virtual QModelIndex objectIndex(const ObjectPtr theObject) const;
+  virtual QModelIndex objectIndex(const ObjectPtr theObject, int theColumn = 1) const;
 
   //! Clear internal data
   virtual void clear();
@@ -130,7 +131,7 @@ public:
 
   /// Returns an index which is root of the given document
   /// \param theDoc a document
-  QModelIndex documentRootIndex(DocumentPtr theDoc) const;
+  QModelIndex documentRootIndex(DocumentPtr theDoc, int theColumn = 1) const;
 
   /// Returns last history object index
   virtual QModelIndex lastHistoryIndex() const;
@@ -146,9 +147,15 @@ signals:
   void treeRebuilt();
 
 private:
+  enum VisibilityState {
+    NoneState,
+    Visible,
+    SemiVisible,
+    Hidden };
+
   /// Find a root index which contains objects of the given document
   /// \param theDoc the document object
-  QModelIndex findDocumentRootIndex(const ModelAPI_Document* theDoc) const;
+  QModelIndex findDocumentRootIndex(const ModelAPI_Document* theDoc, int aColumn = 1) const;
 
   /// Returns number of folders in document.
   /// Considered folders which has to be shown only if they are not empty.
@@ -171,13 +178,15 @@ private:
   /// \param theParent - index of parent folder
   void rebuildBranch(int theRow, int theCount, const QModelIndex& theParent = QModelIndex());
 
-
   /// Returns list of folders types which can not be shown empty
   /// \param fromRoot - root document flag
   QStringList listOfShowNotEmptyFolders(bool fromRoot = true) const;
 
+  VisibilityState getVisibilityState(const QModelIndex& theIndex) const;
+
   Config_DataModelReader* myXMLReader;
 
+  XGUI_Workshop* myWorkshop;
   //bool myIsEventsProcessingBlocked;
 };
 

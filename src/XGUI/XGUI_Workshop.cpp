@@ -1228,7 +1228,7 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   aObjDock->setWindowTitle(tr("Object browser"));
   aObjDock->setStyleSheet(
       "::title { position: relative; padding-left: 5px; text-align: left center }");
-  myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
+  myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock, this);
   myObjectBrowser->setXMLReader(myDataModelXMLReader);
   myModule->customizeObjectBrowser(myObjectBrowser);
   aObjDock->setWidget(myObjectBrowser);

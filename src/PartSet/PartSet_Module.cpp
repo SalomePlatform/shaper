@@ -1263,7 +1263,7 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
       aTreeView->setExpanded(myActivePartIndex, false);
 
     XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
-    myActivePartIndex = aDataModel->documentRootIndex(aActiveDoc);
+    myActivePartIndex = aDataModel->documentRootIndex(aActiveDoc, 0);
     bool needUpdate = false;
     if (myActivePartIndex.isValid()) {
       needUpdate = aTreeView->isExpanded(myActivePartIndex);
@@ -1335,7 +1335,7 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
     //aMgr->setActiveDocument(aMgr->moduleDocument());
     return;
   }
-  if (theIndex.column() != 0) // Use only first column
+  if (theIndex.column() != 1) // Use only first column
     return;
 
   XGUI_Workshop* aWorkshop = getWorkshop();
