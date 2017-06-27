@@ -159,10 +159,12 @@ void XGUI_DataTree::mousePressEvent(QMouseEvent* theEvent)
   if (theEvent->button() != Qt::MidButton)
     return;
   QModelIndex aInd = indexAt(theEvent->pos());
-  QString aTxt = QString("r=%1 c=%2 p=%3").arg(aInd.row()).arg(aInd.column()).arg((long)aInd.internalPointer());
+  QString aTxt =
+    QString("r=%1 c=%2 p=%3").arg(aInd.row()).arg(aInd.column()).arg((long)aInd.internalPointer());
 
   QModelIndex aPar = aInd.parent();
-  QString aTxt1 = QString("r=%1 c=%2 p=%3").arg(aPar.row()).arg(aPar.column()).arg((long)aPar.internalPointer());
+  QString aTxt1 =
+    QString("r=%1 c=%2 p=%3").arg(aPar.row()).arg(aPar.column()).arg((long)aPar.internalPointer());
   QToolTip::showText(theEvent->globalPos(), aTxt + '\n' + aTxt1);
 }
 #endif
@@ -236,7 +238,8 @@ void XGUI_DataTree::processEyeClick(const QModelIndex& theIndex)
       Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
       update(theIndex);
     }
-    // Update list of selected objects because this event happens after selection event in object browser
+    // Update list of selected objects because this event happens after
+    // selection event in object browser
     XGUI_ObjectsBrowser* aObjBrowser = qobject_cast<XGUI_ObjectsBrowser*>(parent());
     if (aObjBrowser) {
       aObjBrowser->onSelectionChanged();

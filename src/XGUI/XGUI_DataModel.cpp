@@ -886,7 +886,8 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
 }
 
 //******************************************************
-QModelIndex XGUI_DataModel::findDocumentRootIndex(const ModelAPI_Document* theDoc, int aColumn) const
+QModelIndex
+  XGUI_DataModel::findDocumentRootIndex(const ModelAPI_Document* theDoc, int aColumn) const
 {
   SessionPtr aSession = ModelAPI_Session::get();
   DocumentPtr aRootDoc = aSession->moduleDocument();
