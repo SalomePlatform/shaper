@@ -142,13 +142,13 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           } else {
             int aFolderId = myXMLReader->rootFolderId(aObjType);
             if (aFolderId != -1) {
-              insertRow(aRow, createIndex(aFolderId, 1, (void*)Q_NULLPTR));
+              insertRow(aRow, createIndex(aFolderId, 0, (void*)Q_NULLPTR));
             }
           }
         }
       } else {
         // Object created in sub-document
-        QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get());
+        QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get(), 0);
         if (aDocRoot.isValid()) {
           // Check that new folders could appear
           QStringList aNotEmptyFolders = listOfShowNotEmptyFolders(false);
@@ -168,7 +168,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
               if (aRow != -1) {
                 int aFolderId = folderId(aObjType, aDoc.get());
                 if (aFolderId != -1) {
-                  QModelIndex aParentFolder = createIndex(aFolderId, 1, aDoc.get());
+                  QModelIndex aParentFolder = createIndex(aFolderId, 0, aDoc.get());
                   insertRow(aRow, aParentFolder);
                   emit dataChanged(aParentFolder, aParentFolder);
                 }
@@ -216,7 +216,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           // Process root sub-folder
           int aFolderId = myXMLReader->rootFolderId(aGroup);
           if (aFolderId != -1) {
-            QModelIndex aFolderIndex = createIndex(aFolderId, 1, (void*)Q_NULLPTR);
+            QModelIndex aFolderIndex = createIndex(aFolderId, 0, (void*)Q_NULLPTR);
             removeRow(aRow, aFolderIndex);
             //rebuildBranch(0, aRow);
           }
@@ -233,7 +233,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         }
       } else {
         // Remove row for sub-document
-        QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get());
+        QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get(), 0);
         if (aDocRoot.isValid()) {
           int aRow = aDoc->size(aGroup);
           int aNbSubFolders = foldersCount(aDoc.get());
@@ -245,7 +245,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
             // List of objects under a folder
             int aFolderId = folderId(aGroup, aDoc.get());
             if (aFolderId != -1) {
-              QModelIndex aFolderRoot = createIndex(aFolderId, 1, aDoc.get());
+              QModelIndex aFolderRoot = createIndex(aFolderId, 0, aDoc.get());
               removeRow(aRow, aFolderRoot);
               //rebuildBranch(0, aRow, aFolderRoot);
             }
@@ -282,10 +282,10 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           && (aFeature->firstResult()->groupName() == ModelAPI_ResultField::group())) {
             ResultFieldPtr aResult =
               std::dynamic_pointer_cast<ModelAPI_ResultField>(aFeature->firstResult());
-            QModelIndex aIndex = objectIndex(aResult);
+            QModelIndex aIndex = objectIndex(aResult, 0);
             removeRows(0, aResult->stepsSize(), aIndex);
         } else {
-          QModelIndex aIndex = objectIndex(aObject);
+          QModelIndex aIndex = objectIndex(aObject, 0);
           if (aIndex.isValid()) {
             emit dataChanged(aIndex, aIndex);
           }
@@ -309,16 +309,16 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         if (aGroup == myXMLReader->rootType()) // Update objects under root
           aStartId = foldersCount();
         else // Update objects in folder under root
-          aParent = createIndex(folderId(aGroup), 1, (void*)Q_NULLPTR);
+          aParent = createIndex(folderId(aGroup), 0, (void*)Q_NULLPTR);
       } else {
         // Update a sub-document
         if (aGroup == myXMLReader->subType()) {
           // Update sub-document root
-          aParent = findDocumentRootIndex(aDoc.get());
+          aParent = findDocumentRootIndex(aDoc.get(), 0);
           aStartId = foldersCount(aDoc.get());
         } else
           // update folder in sub-document
-          aParent = createIndex(folderId(aGroup, aDoc.get()), 1, aDoc.get());
+          aParent = createIndex(folderId(aGroup, aDoc.get()), 0, aDoc.get());
       }
       int aChildNb = rowCount(aParent);
       rebuildBranch(aStartId, aChildNb - aStartId, aParent);
@@ -328,7 +328,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
     DocumentPtr aDoc = ModelAPI_Session::get()->activeDocument();
     if (aDoc != aRootDoc) {
-      QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get());
+      QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get(), 0);
       if (aDocRoot.isValid())
         emit dataChanged(aDocRoot, aDocRoot);
       else
@@ -1078,6 +1078,10 @@ void XGUI_DataModel::rebuildBranch(int theRow, int theCount, const QModelIndex& 
 XGUI_DataModel::VisibilityState
   XGUI_DataModel::getVisibilityState(const QModelIndex& theIndex) const
 {
+  Qt::ItemFlags aFlags = theIndex.flags();
+  if (aFlags == Qt::ItemFlags())
+    return NoneState;
+
   ObjectPtr aObj = object(theIndex);
   if (aObj.get()) {
     ResultPtr aResObj = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
@@ -1085,7 +1089,8 @@ XGUI_DataModel::VisibilityState
       XGUI_Displayer* aDisplayer = myWorkshop->displayer();
       ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResObj);
       if (aCompRes.get()) {
-        VisibilityState aState = NoneState;
+        VisibilityState aState = aCompRes->numberOfSubs(true) == 0 ?
+          (aDisplayer->isVisible(aCompRes)? Visible : Hidden) : NoneState;
         for (int i = 0; i < aCompRes->numberOfSubs(true); i++) {
           ResultPtr aSubRes = aCompRes->subResult(i, true);
           VisibilityState aS = aDisplayer->isVisible(aSubRes)? Visible : Hidden;
