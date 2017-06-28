@@ -43,7 +43,7 @@
 #endif
 
 /// Width of second column (minimum acceptable = 27)
-#define FIRST_COL_WIDTH 30
+#define FIRST_COL_WIDTH 20
 #define SECOND_COL_WIDTH 30
 
 
@@ -147,7 +147,7 @@ void XGUI_DataTree::resizeEvent(QResizeEvent* theEvent)
   QSize aSize = theEvent->size();
   if (aSize.isValid()) {
     setColumnWidth(0, FIRST_COL_WIDTH);
-    setColumnWidth(1, aSize.width() - SECOND_COL_WIDTH - FIRST_COL_WIDTH - 12);
+    setColumnWidth(1, aSize.width() - SECOND_COL_WIDTH - FIRST_COL_WIDTH - 10);
     setColumnWidth(2, SECOND_COL_WIDTH);
   }
 }
