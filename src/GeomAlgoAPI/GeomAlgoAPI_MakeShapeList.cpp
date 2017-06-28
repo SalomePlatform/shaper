@@ -123,9 +123,9 @@ void GeomAlgoAPI_MakeShapeList::result(const std::shared_ptr<GeomAPI_Shape> theS
       aBuilderIt != myListOfMakeShape.end(); aBuilderIt++) {
     std::shared_ptr<GeomAlgoAPI_MakeShape> aMakeShape = *aBuilderIt;
     NCollection_Map<TopoDS_Shape> aTempShapes;
-    bool hasResults = false;
     for(NCollection_Map<TopoDS_Shape>::Iterator
         aShapeIt(anAlgoShapes); aShapeIt.More(); aShapeIt.Next()) {
+      bool hasResults = false;
       std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
       aShape->setImpl(new TopoDS_Shape(aShapeIt.Value()));
       ListOfShape aGeneratedShapes;
