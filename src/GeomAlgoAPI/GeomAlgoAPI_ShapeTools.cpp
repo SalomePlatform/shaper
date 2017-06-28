@@ -318,49 +318,85 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
   NCollection_List<TopoDS_Shape> anUngroupedShapes, aStillUngroupedShapes;
   addSimpleShapeToList(anInShape, anUngroupedShapes);
 
-  NCollection_Vector<NCollection_List<TopoDS_Shape>> aGroups;
-  while(!anUngroupedShapes.IsEmpty()) {
-    NCollection_List<TopoDS_Shape> aGroupedShapes;
-    aGroupedShapes.Append(anUngroupedShapes.First());
-    anUngroupedShapes.RemoveFirst();
-    for(NCollection_List<TopoDS_Shape>::Iterator aGroupIt(aGroupedShapes);
-        aGroupIt.More(); aGroupIt.Next()) {
-      const TopoDS_Shape& aGroupedShape = aGroupIt.Value();
-      for(TopExp_Explorer aGroupShapeExp(aGroupedShape, TopAbs_VERTEX);
-          aGroupShapeExp.More();
-          aGroupShapeExp.Next()) {
-        // Find all shapes which have same vertex.
-        aStillUngroupedShapes.Clear();
-        const TopoDS_Shape& aVertex1 = aGroupShapeExp.Current();
-        for(NCollection_List<TopoDS_Shape>::Iterator anUngroupedIt(anUngroupedShapes);
-            anUngroupedIt.More();
-            anUngroupedIt.Next()) {
-          const TopoDS_Shape& anUngroupedShape = anUngroupedIt.Value();
-          bool isAdded = false;
-          for(TopExp_Explorer anUgroupedShapeExp(anUngroupedShape, TopAbs_VERTEX);
-              anUgroupedShapeExp.More();
-              anUgroupedShapeExp.Next()) {
-            const TopoDS_Shape& aVertex2 = anUgroupedShapeExp.Current();
-            if(aVertex1.IsSame(aVertex2)) {
-              aGroupedShapes.Append(anUngroupedShape);
-              isAdded = true;
-              break;
-            }
-          }
-          if(!isAdded) {
-            aStillUngroupedShapes.Append(anUngroupedShape);
-          }
+  // Iterate over all shapes and find shapes with shared vertices.
+  TopTools_ListOfShape aMapOrder;
+  BOPCol_DataMapOfShapeListOfShape aVertexShapesMap;
+  for(NCollection_List<TopoDS_Shape>::Iterator aShapesIt(anUngroupedShapes);
+      aShapesIt.More();
+      aShapesIt.Next()) {
+    const TopoDS_Shape& aShape = aShapesIt.Value();
+    for(TopExp_Explorer aShapeExp(aShape, TopAbs_VERTEX);
+        aShapeExp.More();
+        aShapeExp.Next()) {
+      const TopoDS_Shape& aVertex = aShapeExp.Current();
+      if (!aVertexShapesMap.IsBound(aVertex)) {
+        NCollection_List<TopoDS_Shape> aList;
+        aList.Append(aShape);
+        aMapOrder.Append(aVertex);
+        aVertexShapesMap.Bind(aVertex, aList);
+      } else {
+        if(!aVertexShapesMap.ChangeFind(aVertex).Contains(aShape)) {
+          aVertexShapesMap.ChangeFind(aVertex).Append(aShape);
         }
-        anUngroupedShapes = aStillUngroupedShapes;
-        if(anUngroupedShapes.IsEmpty()) {
-          break;
-        }
-      }
-      if(anUngroupedShapes.IsEmpty()) {
-        break;
       }
     }
-    aGroups.Append(aGroupedShapes);
+  }
+
+  // Iterate over the map and group shapes.
+  NCollection_Vector<TopTools_ListOfShape> aGroups;
+  while (!aMapOrder.IsEmpty()) {
+    // Get first group of shapes in map, and then unbind it.
+    const TopoDS_Shape& aKey = aMapOrder.First();
+    TopTools_ListOfShape aGroupedShapes = aVertexShapesMap.Find(aKey);
+    aVertexShapesMap.UnBind(aKey);
+    aMapOrder.Remove(aKey);
+    // Iterate over shapes in this group and add to it shapes from groups in map.
+    for(TopTools_ListOfShape::Iterator aGroupIt(aGroupedShapes);
+        aGroupIt.More(); aGroupIt.Next()) {
+      const TopoDS_Shape& aGroupedShape = aGroupIt.Value();
+      TopTools_ListOfShape aKeysToUnbind;
+      for(TopTools_ListOfShape::Iterator aKeysIt(aMapOrder);
+          aKeysIt.More();
+          aKeysIt.Next()) {
+        const TopTools_ListOfShape& aGroupInMap = aVertexShapesMap(aKeysIt.Value());
+        if(!aGroupInMap.Contains(aGroupedShape)) {
+          // Group in map does not containt shape from our group, so go to the next group in map.
+          continue;
+        }
+        // Iterate over shape in group in map, and add new shapes into our group.
+        for(TopTools_ListOfShape::Iterator aGroupInMapIt(aGroupInMap);
+            aGroupInMapIt.More();
+            aGroupInMapIt.Next()) {
+          const TopoDS_Shape& aShape = aGroupInMapIt.Value();
+          if (!aGroupedShapes.Contains(aShape)) {
+            aGroupedShapes.Append(aShape);
+          }
+        }
+        // Save key to unbind from this map.
+        aKeysToUnbind.Append(aKeysIt.Value());
+      }
+      // Unbind groups from map that we added to our group.
+      for(TopTools_ListOfShape::Iterator aKeysIt(aKeysToUnbind);
+          aKeysIt.More();
+          aKeysIt.Next()) {
+        aVertexShapesMap.UnBind(aKeysIt.Value());
+        aMapOrder.Remove(aKeysIt.Value());
+      }
+    }
+    // Sort shapes.
+    TopTools_ListOfShape aSortedGroup;
+    for(int aST = TopAbs_COMPOUND; aST <= TopAbs_SHAPE; ++aST) {
+      TopTools_ListOfShape::Iterator anIt(aGroupedShapes);
+      while (anIt.More()) {
+        if(anIt.Value().ShapeType() == aST) {
+          aSortedGroup.Append(anIt.Value());
+          aGroupedShapes.Remove(anIt);
+        } else {
+          anIt.Next();
+        }
+      }
+    }
+    aGroups.Append(aSortedGroup);
   }
 
   TopoDS_Compound aCompound;
