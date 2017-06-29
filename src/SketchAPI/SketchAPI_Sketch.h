@@ -331,6 +331,21 @@ public:
   std::shared_ptr<ModelHighAPI_Interface> setDistance(
       const ModelHighAPI_RefAttr & thePoint,
       const ModelHighAPI_RefAttr & thePointOrLine,
+      const ModelHighAPI_Double & theValue,
+      bool isSigned = false);
+
+  /// Set signed distance
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelHighAPI_Interface> setSignedDistance(
+      const ModelHighAPI_RefAttr & thePoint,
+      const ModelHighAPI_RefAttr & thePointOrLine,
+      const ModelHighAPI_Double & theValue);
+
+  /// Set unsigned distance
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelHighAPI_Interface> setUnsignedDistance(
+      const ModelHighAPI_RefAttr & thePoint,
+      const ModelHighAPI_RefAttr & thePointOrLine,
       const ModelHighAPI_Double & theValue);
 
   /// Set horizontal distance

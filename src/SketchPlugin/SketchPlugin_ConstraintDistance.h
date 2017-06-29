@@ -58,6 +58,13 @@ class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
     return MY_KIND;
   }
 
+  /// \brief Shows whether the point-line distance should keep its sign
+  inline static const std::string& SIGNED()
+  {
+    static const std::string MY_SIGNED("SignedDistance");
+    return MY_SIGNED;
+  }
+
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 

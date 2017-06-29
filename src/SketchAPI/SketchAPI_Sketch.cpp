@@ -627,15 +627,33 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setCollinear(
 std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setDistance(
     const ModelHighAPI_RefAttr & thePoint,
     const ModelHighAPI_RefAttr & thePointOrLine,
-    const ModelHighAPI_Double & theValue)
+    const ModelHighAPI_Double & theValue,
+    bool isSigned)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintDistance::ID());
   fillAttribute(thePoint, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(thePointOrLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  fillAttribute(isSigned, aFeature->boolean(SketchPlugin_ConstraintDistance::SIGNED()));
   aFeature->execute();
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));
+}
+
+std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setSignedDistance(
+    const ModelHighAPI_RefAttr & thePoint,
+    const ModelHighAPI_RefAttr & thePointOrLine,
+    const ModelHighAPI_Double & theValue)
+{
+  return setDistance(thePoint, thePointOrLine, theValue, true);
+}
+
+std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setUnsignedDistance(
+    const ModelHighAPI_RefAttr & thePoint,
+    const ModelHighAPI_RefAttr & thePointOrLine,
+    const ModelHighAPI_Double & theValue)
+{
+  return setDistance(thePoint, thePointOrLine, theValue, false);
 }
 
 std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setHorizontalDistance(

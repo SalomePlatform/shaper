@@ -216,4 +216,11 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestMoveCircle.py
                TestMoveArc.py
                TestMovementComplex.py
+               TestDistanceSignedVsUnsigned01.py
+               TestDistanceSignedVsUnsigned02.py
+               TestDistanceSignedVsUnsigned03.py
+               TestDistanceSignedVsUnsigned04.py
+               TestDistanceSignedVsUnsigned05.py
+               TestSignedDistancePointPoint.py
+               TestSignedDistancePointLine.py
 )

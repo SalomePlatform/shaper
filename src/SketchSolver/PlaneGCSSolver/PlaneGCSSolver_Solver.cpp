@@ -152,6 +152,30 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
   collectConflicting();
   if (!myConflictingIDs.empty())
     aResult = GCS::Failed;
+  else if (aResult == GCS::Failed) {
+    // DogLeg solver failed without conflicting constraints, try to use Levenberg-Marquardt solver
+    // if there are point-line distance constraints
+    ConstraintMap::iterator aCIt = myConstraints.begin();
+    for (; aCIt != myConstraints.end(); ++aCIt) {
+      if (aCIt->second.size() <= 1)
+        continue;
+      std::set<GCSConstraintPtr>::const_iterator anIt = aCIt->second.begin();
+      for (; anIt != aCIt->second.end(); ++anIt)
+        if ((*anIt)->getTypeId() == GCS::P2LDistance)
+          break;
+      if (anIt != aCIt->second.end())
+        break;
+    }
+
+    if (aCIt != myConstraints.end()) {
+      aResult = (GCS::SolveStatus)myEquationSystem->solve(
+          myParameters, true, GCS::LevenbergMarquardt);
+      myConfCollected = false;
+      collectConflicting();
+      if (!myConflictingIDs.empty())
+        aResult = GCS::Failed;
+    }
+  }
 
   SolveStatus aStatus;
   if (aResult == GCS::Failed)

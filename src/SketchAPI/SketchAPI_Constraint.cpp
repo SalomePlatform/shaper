@@ -192,5 +192,10 @@ void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
   if (aValueAttr && aValueAttr->isInitialized())
     theDumper << ", " << aValueAttr;
 
+  if (aBase->getKind() == SketchPlugin_ConstraintDistance::ID()) {
+    AttributeBooleanPtr isSigned = aBase->boolean(SketchPlugin_ConstraintDistance::SIGNED());
+    theDumper << ", " << isSigned->value();
+  }
+
   theDumper << ")" << std::endl;
 }

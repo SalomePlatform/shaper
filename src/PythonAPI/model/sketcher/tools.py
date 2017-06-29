@@ -75,7 +75,7 @@ def distancePointPoint(thePoint1, thePoint2):
     aPnt2 = toList(thePoint2)
     return math.hypot(aPnt1[0] - aPnt2[0], aPnt1[1] - aPnt2[1])
 
-def distancePointLine(thePoint, theLine):
+def signedDistancePointLine(thePoint, theLine):
     aPoint = toList(thePoint)
     aLine = toSketchFeature(theLine)
 
@@ -84,7 +84,10 @@ def distancePointLine(thePoint, theLine):
     aLineDir = aLineEnd.decreased(aLineStart)
     aLineLen = aLineEnd.distance(aLineStart)
     aCross = (aPoint[0] - aLineStart.x()) * aLineDir.y() - (aPoint[1] - aLineStart.y()) * aLineDir.x()
-    return math.fabs(aCross / aLineLen)
+    return aCross / aLineLen
+
+def distancePointLine(thePoint, theLine):
+    return math.fabs(signedDistancePointLine(thePoint, theLine))
 
 def lastSubFeature(theSketch, theKind):
     """

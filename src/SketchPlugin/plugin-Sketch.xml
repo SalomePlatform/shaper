@@ -653,6 +653,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
 
+        <boolvalue id="SignedDistance" label="Keep orientation" default="true" tooltip="Keep distance orientation" obligatory="0"/>
         <validator id="PartSet_DistanceSelection"/>
       </feature>
 

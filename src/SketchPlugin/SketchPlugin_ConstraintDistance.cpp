@@ -54,6 +54,7 @@ void SketchPlugin_ConstraintDistance::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(SIGNED(), ModelAPI_AttributeBoolean::typeId());
 }
 
 void SketchPlugin_ConstraintDistance::colorConfigInfo(std::string& theSection, std::string& theName,
