@@ -1,4 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <SketchSolver_ConstraintTangent.h>
 #include <SketchSolver_Error.h>
@@ -9,6 +27,7 @@
 #include <PlaneGCSSolver_UpdateCoincidence.h>
 
 #include <GeomAPI_Pnt2d.h>
+#include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 
@@ -26,7 +45,8 @@ static std::set<FeaturePtr> collectCoincidences(FeaturePtr theFeature1, FeatureP
 
 /// \brief Check whether the entities has only one shared point or less.
 ///        Return list of coincident points.
-static std::list<AttributePtr> coincidentPoints(FeaturePtr theFeature1, FeaturePtr theFeature2);
+static std::set<AttributePtr> coincidentBoundaryPoints(FeaturePtr theFeature1,
+                                                       FeaturePtr theFeature2);
 
 /// \brief Check if two connected arcs have centers
 ///        in same direction relatively to connection point
@@ -109,15 +129,15 @@ void SketchSolver_ConstraintTangent::rebuild()
   getTangentFeatures(myBaseConstraint, aFeature1, aFeature2);
 
   // check number of coincident points
-  std::list<AttributePtr> aCoincidentPoints = coincidentPoints(aFeature1, aFeature2);
-  if (myType == CONSTRAINT_TANGENT_CIRCLE_LINE && aCoincidentPoints.size() > 1) {
+  std::set<AttributePtr> aCoincidentPoints = coincidentBoundaryPoints(aFeature1, aFeature2);
+  if (myType == CONSTRAINT_TANGENT_CIRCLE_LINE && aCoincidentPoints.size() > 2) {
     myErrorMsg = SketchSolver_Error::TANGENCY_FAILED();
     return;
   }
 
   EntityWrapperPtr aSharedPointEntity;
   if (!aCoincidentPoints.empty()) {
-    mySharedPoint = aCoincidentPoints.front();
+    mySharedPoint = *aCoincidentPoints.begin();
     aSharedPointEntity = myStorage->entity(mySharedPoint);
   }
 
@@ -183,12 +203,14 @@ void SketchSolver_ConstraintTangent::notify(const FeaturePtr&      theFeature,
       if (aNbCoincidentFeatures == 2)
         isRebuild = true;
     }
-  } else if (mySharedPoint) {
-    // The features are tangent in the shared point, but the coincidence has been removed.
+  }
+
+  if (mySharedPoint && !isRebuild) {
+    // The features are tangent in the shared point, but the coincidence has been removed/updated.
     // Check if the coincidence is the same.
-    std::list<AttributePtr> aCoincidentPoints = coincidentPoints(aTgFeat1, aTgFeat2);
+    std::set<AttributePtr> aCoincidentPoints = coincidentBoundaryPoints(aTgFeat1, aTgFeat2);
     isRebuild = true;
-    std::list<AttributePtr>::iterator anIt = aCoincidentPoints.begin();
+    std::set<AttributePtr>::iterator anIt = aCoincidentPoints.begin();
     for (; anIt != aCoincidentPoints.end() && isRebuild; ++anIt)
       if (*anIt == mySharedPoint)
         isRebuild = false; // the coincidence is still exists => nothing to change
@@ -238,19 +260,27 @@ std::set<FeaturePtr> collectCoincidences(FeaturePtr theFeature1, FeaturePtr theF
   return aCoincidencesBetweenFeatures;
 }
 
-std::list<AttributePtr> coincidentPoints(FeaturePtr theFeature1, FeaturePtr theFeature2)
+std::set<AttributePtr> coincidentBoundaryPoints(FeaturePtr theFeature1, FeaturePtr theFeature2)
 {
   std::set<FeaturePtr> aCoincidences = collectCoincidences(theFeature1, theFeature2);
   // collect points only
-  std::list<AttributePtr> aCoincidentPoints;
+  std::set<AttributePtr> aCoincidentPoints;
   std::set<FeaturePtr>::const_iterator aCIt = aCoincidences.begin();
   for (; aCIt != aCoincidences.end(); ++ aCIt) {
-    for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
-      AttributeRefAttrPtr aRefAttr = (*aCIt)->refattr(SketchPlugin_Constraint::ENTITY_A());
-      if (aRefAttr && !aRefAttr->isObject()) {
-        aCoincidentPoints.push_back(aRefAttr->attr());
-        break;
-      }
+    AttributeRefAttrPtr aRefAttrA = (*aCIt)->refattr(SketchPlugin_Constraint::ENTITY_A());
+    AttributeRefAttrPtr aRefAttrB = (*aCIt)->refattr(SketchPlugin_Constraint::ENTITY_B());
+    if (!aRefAttrA || aRefAttrA->isObject() ||
+        !aRefAttrB || aRefAttrB->isObject())
+      continue;
+
+    AttributePtr anAttrA = aRefAttrA->attr();
+    AttributePtr anAttrB = aRefAttrB->attr();
+    if (anAttrA->id() != SketchPlugin_Arc::CENTER_ID() &&
+        anAttrA->id() != SketchPlugin_Circle::CENTER_ID() &&
+        anAttrB->id() != SketchPlugin_Arc::CENTER_ID() &&
+        anAttrB->id() != SketchPlugin_Circle::CENTER_ID()) {
+      aCoincidentPoints.insert(anAttrA);
+      aCoincidentPoints.insert(anAttrB);
     }
   }
   return aCoincidentPoints;
@@ -342,14 +372,12 @@ ConstraintWrapperPtr createArcArcTangency(EntityWrapperPtr theEntity1,
 
   GCSConstraintPtr aNewConstr;
   if (theSharedPoint) {
-    std::shared_ptr<GCS::Arc> anArc1 = std::dynamic_pointer_cast<GCS::Arc>(aCirc1);
-    std::shared_ptr<GCS::Arc> anArc2 = std::dynamic_pointer_cast<GCS::Arc>(aCirc2);
     GCSPointPtr aPoint =
         std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theSharedPoint)->point();
 
-    adjustAngleBetweenCurves(anArc1, anArc2, aPoint, theAngle);
+    adjustAngleBetweenCurves(aCirc1, aCirc2, aPoint, theAngle);
     aNewConstr =
-        GCSConstraintPtr(new GCS::ConstraintAngleViaPoint(*anArc1, *anArc2, *aPoint, theAngle));
+        GCSConstraintPtr(new GCS::ConstraintAngleViaPoint(*aCirc1, *aCirc2, *aPoint, theAngle));
   } else {
     aNewConstr = GCSConstraintPtr(new GCS::ConstraintTangentCircumf(aCirc1->center, aCirc2->center,
                                   aCirc1->rad, aCirc2->rad, theInternalTangency));

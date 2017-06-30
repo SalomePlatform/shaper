@@ -1,4 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef XGUI_WORKSHOP_H
 #define XGUI_WORKSHOP_H
@@ -247,19 +265,10 @@ Q_OBJECT
   */
   void saveDocument(const QString& theName, std::list<std::string>& theFileNames);
 
-  /**
-   * If there is an active (uncommitted) operation shows a prompt to abort it
-   * and performs abortion if user agreed. Returns true if
-   * - operation aborted successfully
-   * - there is no active operation
-   */
-  bool abortAllOperations();
-
   /// Updates workshop state according to the started operation, e.g. visualizes the property panel
   /// and connect to it.
   /// \param theOpertion a started operation
   void operationStarted(ModuleBase_Operation* theOperation);
-
 
   //! Delete features. Delete the referenced features. There can be a question with a list of
   //! referenced objects.

@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        GeomAlgoAPI_ShapeTools.h
-// Created:     3 August 2015
-// Author:      Dmitry Bobylev
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "GeomAlgoAPI_ShapeTools.h"
 
@@ -701,7 +715,11 @@ void GeomAlgoAPI_ShapeTools::splitShape(const std::shared_ptr<GeomAPI_Shape>& th
                                       const GeomAlgoAPI_ShapeTools::PointToRefsMap& thePointsInfo,
                                       std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes)
 {
-  // General Fuse to split edge by vertices
+  // to split shape at least one point should be presented in the points container
+  if (thePointsInfo.empty())
+    return;
+
+    // General Fuse to split edge by vertices
   BOPAlgo_Builder aBOP;
   TopoDS_Edge aBaseEdge = theBaseShape->impl<TopoDS_Edge>();
   // Rebuild closed edge to place vertex to one of split points.

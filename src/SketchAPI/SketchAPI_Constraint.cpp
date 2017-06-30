@@ -1,9 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-// Name   : SketchAPI_Constraint.cpp
-// Purpose:
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 //
-// History:
-// 08/08/16 - Artem ZHIDKOV - Creation of the file
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "SketchAPI_Constraint.h"
 
@@ -15,6 +28,8 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintDistanceHorizontal.h>
+#include <SketchPlugin_ConstraintDistanceVertical.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
@@ -67,6 +82,14 @@ static const std::string& constraintTypeToSetter(const std::string& theType)
   }
   if (theType == SketchPlugin_ConstraintDistance::ID()) {
     static const std::string DISTANCE_SETTER("setDistance");
+    return DISTANCE_SETTER;
+  }
+  if (theType == SketchPlugin_ConstraintDistanceHorizontal::ID()) {
+    static const std::string DISTANCE_SETTER("setHorizontalDistance");
+    return DISTANCE_SETTER;
+  }
+  if (theType == SketchPlugin_ConstraintDistanceVertical::ID()) {
+    static const std::string DISTANCE_SETTER("setVerticalDistance");
     return DISTANCE_SETTER;
   }
   if (theType == SketchPlugin_ConstraintEqual::ID()) {

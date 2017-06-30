@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        ModelAPI_Tools.cpp
-// Created:     20 Jul 2016
-// Author:      Natalia ERMOLAEVA
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "ModelGeomAlgo_Point2D.h"
 
@@ -26,6 +40,11 @@
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Circ.h>
+
+//#define DEBUG_POINT_INSIDE_SHAPE
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+#include <iostream>
+#endif
 
 #ifdef WIN32
 #pragma warning(disable : 4996) // for sprintf
@@ -156,6 +175,9 @@ void appendPoint(const std::shared_ptr<GeomAPI_Pnt>& thePoint,
       anObjects.push_back(theResult);
       thePointToAttributeOrObject[thePoint] = std::make_pair(anAttributes, anObjects);
     }
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+    std::cout << "["<< thePoint->x() << ", " << thePoint->y() << "," << thePoint->z() << "]";
+#endif
   }
 }
 
@@ -196,6 +218,9 @@ void ModelGeomAlgo_Point2D::getPointsIntersectedShape(
                         const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
                         PointToRefsMap& thePointToAttributeOrObject)
 {
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+  std::cout << "ModelGeomAlgo_Point2D::getPointsIntersectedShape" << std::endl;
+#endif
   GeomShapePtr aFeatureShape;
   {
     std::set<ResultPtr> anEdgeShapes;
@@ -223,7 +248,15 @@ void ModelGeomAlgo_Point2D::getPointsIntersectedShape(
       GeomShapePtr aShape = aResult->shape();
 
       GeomShapePtr aShapeOfIntersection = aFeatureShape->intersect(aShape);
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+      int aPrevSize = thePointToAttributeOrObject.size();
+#endif
       appendShapePoints(aShapeOfIntersection, aResult, thePointToAttributeOrObject);
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+      if (aPrevSize != thePointToAttributeOrObject.size())
+        std::cout << " <- appendShapePoints"
+                  << thePointToAttributeOrObject.size() - aPrevSize << std::endl;
+#endif
     }
   }
 }
@@ -252,6 +285,9 @@ void ModelGeomAlgo_Point2D::getPointsInsideShape(
                         const std::shared_ptr<GeomAPI_Dir>& theDirY,
                         PointToRefsMap& thePointToAttributeOrObject)
 {
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+  std::cout << "ModelGeomAlgo_Point2D::getPointsInsideShape:" << std::endl;
+#endif
   std::set<std::shared_ptr<GeomDataAPI_Point2D> >::const_iterator anIt = theAttributes.begin(),
                                                           aLast = theAttributes.end();
   for (; anIt != aLast; anIt++) {
@@ -268,6 +304,17 @@ void ModelGeomAlgo_Point2D::getPointsInsideShape(
         anAttributes.push_back(anAttribute);
         thePointToAttributeOrObject[aProjectedPoint] = std::make_pair(anAttributes, anObjects);
       }
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+      std::cout << "  " << anAttribute->owner()->data()->name() << ": " << anAttribute->id()
+                << "[" << aPoint->x() << ", " << aPoint->y() << ", " << aPoint->z() << "]"
+                << std::endl;
+#endif
+    }
+    else {
+#ifdef DEBUG_POINT_INSIDE_SHAPE
+      std::cout << "  " << anAttribute->owner()->data()->name() << ": " << anAttribute->id()
+                << "OUT of shape" << std::endl;
+#endif
     }
   }
 }

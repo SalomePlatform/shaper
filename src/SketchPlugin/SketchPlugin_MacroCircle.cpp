@@ -1,8 +1,22 @@
-﻿// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
-// File:        SketchPlugin_MacroCircle.cpp
-// Created:     26 May 2014
-// Author:      Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "SketchPlugin_MacroCircle.h"
 
@@ -213,10 +227,15 @@ void SketchPlugin_MacroCircle::fillByCenterAndPassed()
   if (!aCenterAttr->isInitialized() || !aPassedAttr->isInitialized())
     return;
 
-  AttributeRefAttrPtr aPassedRef = refattr(PASSED_POINT_REF_ID());
   // Calculate circle parameters
-  std::shared_ptr<GeomAPI_Pnt2d> aCenter =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aCenterAttr)->pnt();
+  AttributeRefAttrPtr aCenterRef = refattr(CENTER_POINT_REF_ID());
+  std::shared_ptr<GeomAPI_Pnt2d> aCenter;
+  std::shared_ptr<GeomAPI_Shape> aCurve;
+  SketchPlugin_Tools::convertRefAttrToPointOrTangentCurve(
+      aCenterRef, aCenterAttr, aCurve, aCenter);
+  if (!aCenter)
+    aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aCenterAttr)->pnt();
+  AttributeRefAttrPtr aPassedRef = refattr(PASSED_POINT_REF_ID());
   std::shared_ptr<GeomAPI_Pnt2d> aPassedPoint;
   std::shared_ptr<GeomAPI_Shape> aTangentCurve;
   SketchPlugin_Tools::convertRefAttrToPointOrTangentCurve(
@@ -373,7 +392,6 @@ AISObjectPtr SketchPlugin_MacroCircle::getAISObject(AISObjectPtr thePrevious)
 }
 
 void SketchPlugin_MacroCircle::attributeChanged(const std::string& theID) {
-  double aRadius = 0.0;
   // If circle type switched reset all attributes.
   if(theID == CIRCLE_TYPE()) {
     SketchPlugin_Tools::resetAttribute(this, CENTER_POINT_ID());

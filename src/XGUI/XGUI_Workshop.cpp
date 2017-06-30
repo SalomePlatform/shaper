@@ -1,6 +1,23 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
-//#include "XGUI_Constants.h"
 #include "XGUI_Workshop.h"
 
 #include "XGUI_ActionsMgr.h"
@@ -491,7 +508,7 @@ void XGUI_Workshop::onAcceptActionClicked()
                                                     (anOperationMgr->currentOperation());
     if (aFOperation) {
       //if (errorMgr()->canProcessClick(anAction, aFOperation->feature()))
-      myOperationMgr->onCommitOperation();
+      myOperationMgr->commitOperation();
     }
   }
 }
@@ -597,7 +614,7 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
 #endif
   bool anIsAutoPreview = true;
   if (aFeatureInfo.get())
-    aFeatureInfo->isAutoPreview();
+    anIsAutoPreview = aFeatureInfo->isAutoPreview();
   else {
     std::string aXmlCfg, aDescription;
     module()->getXMLRepresentation(aFeatureKind, aXmlCfg, aDescription);
@@ -760,12 +777,6 @@ void XGUI_Workshop::saveDocument(const QString& theName, std::list<std::string>&
 }
 
 //******************************************************
-bool XGUI_Workshop::abortAllOperations()
-{
-  return myOperationMgr->abortAllOperations();
-}
-
-//******************************************************
 void XGUI_Workshop::operationStarted(ModuleBase_Operation* theOperation)
 {
   setGrantedFeatures(theOperation);
@@ -780,7 +791,7 @@ void XGUI_Workshop::operationStarted(ModuleBase_Operation* theOperation)
 //******************************************************
 void XGUI_Workshop::onOpen()
 {
-  if(!abortAllOperations())
+  if(!myOperationMgr->abortAllOperations())
     return;
   //save current file before close if modified
   SessionPtr aSession = ModelAPI_Session::get();
@@ -910,7 +921,7 @@ void XGUI_Workshop::onTrihedronVisibilityChanged(bool theState)
 //******************************************************
 bool XGUI_Workshop::onSave()
 {
-  if(!abortAllOperations())
+  if(!myOperationMgr->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
     return false;
   if (myCurrentDir.isEmpty()) {
     return onSaveAs();
@@ -927,7 +938,7 @@ bool XGUI_Workshop::onSave()
 //******************************************************
 bool XGUI_Workshop::onSaveAs()
 {
-  if(!abortAllOperations())
+  if(!myOperationMgr->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
     return false;
   QFileDialog dialog(desktop());
   dialog.setWindowTitle(tr("Select directory to save files..."));
@@ -1275,7 +1286,6 @@ void XGUI_Workshop::showPropertyPanel()
   // in order to operation manager could process key events of the panel.
   // otherwise they are ignored. It happens only if the same(activateWindow) is
   // not happened by property panel activation(e.g. resume operation of Sketch)
-  ModuleBase_Tools::activateWindow(myPropertyPanel, "XGUI_Workshop::showPropertyPanel()");
   ModuleBase_Tools::setFocus(myPropertyPanel, "XGUI_Workshop::showPropertyPanel()");
 }
 
@@ -1295,7 +1305,6 @@ void XGUI_Workshop::hidePropertyPanel()
   // are processed by this console. For example Undo actions.
   // It is possible that this code is to be moved to SHAPER package
   QMainWindow* aDesktop = desktop();
-  ModuleBase_Tools::activateWindow(aDesktop, "XGUI_Workshop::hidePropertyPanel()");
   ModuleBase_Tools::setFocus(aDesktop, "XGUI_Workshop::showPropertyPanel()");
 }
 
@@ -1364,6 +1373,10 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
         aObj->setDisplayed(false);
     }
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+#ifdef HAVE_SALOME
+    //issue #2159 Hide all incomplete behavior
+    viewer()->eraseAll();
+#endif
     updateCommandStatus();
   } else if (theId == "SELECT_VERTEX_CMD") {
     setViewerSelectionMode(TopAbs_VERTEX);
@@ -1405,14 +1418,14 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
         #endif
         aParameters.Append(MyVCallBack);
 
-        MyTCommunicator->registerPlugin("SMBrowser"); // custom plugin to view ModelAPI
+        MyTCommunicator->RegisterPlugin("SMBrowser"); // custom plugin to view ModelAPI
 
-        MyTCommunicator->init(aParameters);
+        MyTCommunicator->Init(aParameters);
         MyTCommunicator->Activate("SMBrowser"); // to have button in TInspector
         MyTCommunicator->Activate("TKVInspector"); // to have filled callback by model
         MyTCommunicator->Activate("TKDFBrowser");
       }
-      MyTCommunicator->setVisible(true);
+      MyTCommunicator->SetVisible(true);
     }
   }
 #endif
@@ -1453,14 +1466,16 @@ void XGUI_Workshop::deleteObjects()
   }
 
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
-  if (!abortAllOperations())
+  if (!myOperationMgr->abortAllOperations())
     return;
 
   bool hasResult = false;
   bool hasFeature = false;
   bool hasParameter = false;
   bool hasCompositeOwner = false;
-  ModuleBase_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter, hasCompositeOwner);
+  bool hasResultInHistory = false;
+  ModuleBase_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter, hasCompositeOwner,
+                                 hasResultInHistory);
   if (!(hasFeature || hasParameter))
     return;
 
@@ -1518,7 +1533,7 @@ void addRefsToFeature(const FeaturePtr& theFeature,
 //**************************************************************
 void XGUI_Workshop::cleanHistory()
 {
-  if (!abortAllOperations())
+  if (!myOperationMgr->abortAllOperations())
     return;
 
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
@@ -1644,7 +1659,7 @@ void XGUI_Workshop::cleanHistory()
 //**************************************************************
 void XGUI_Workshop::moveObjects()
 {
-  if (!abortAllOperations())
+  if (!myOperationMgr->abortAllOperations())
     return;
 
   SessionPtr aMgr = ModelAPI_Session::get();
@@ -1885,7 +1900,7 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   if (aColor.size() != 3)
     return;
 
-  if (!abortAllOperations())
+  if (!myOperationMgr->abortAllOperations())
   return;
   // 2. show the dialog to change the value
   XGUI_ColorDialog* aDlg = new XGUI_ColorDialog(desktop());
@@ -1975,7 +1990,7 @@ void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
   if (aDeflection < 0)
     return;
 
-  if (!abortAllOperations())
+  if (!myOperationMgr->abortAllOperations())
   return;
   // 2. show the dialog to change the value
   XGUI_DeflectionDialog* aDlg = new XGUI_DeflectionDialog(desktop());
@@ -2031,6 +2046,11 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
     if (module()->canEraseObject(aObj))
       aObj->setDisplayed(false);
   }
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+#ifdef HAVE_SALOME
+    //issue #2159 Hide all incomplete behavior
+    viewer()->eraseAll();
+#endif
 
   // Show only objects from the list
   foreach (ObjectPtr aObj, theList) {
@@ -2160,12 +2180,16 @@ void XGUI_Workshop::setStatusBarMessage(const QString& theMessage)
 void XGUI_Workshop::synchronizeViewer()
 {
   SessionPtr aMgr = ModelAPI_Session::get();
-  DocumentPtr aDoc = aMgr->activeDocument();
+  QList<DocumentPtr> aDocs;
+  aDocs.append(aMgr->activeDocument());
+  aDocs.append(aMgr->moduleDocument());
 
-  synchronizeGroupInViewer(aDoc, ModelAPI_ResultConstruction::group(), false);
-  synchronizeGroupInViewer(aDoc, ModelAPI_ResultBody::group(), false);
-  synchronizeGroupInViewer(aDoc, ModelAPI_ResultPart::group(), false);
-  synchronizeGroupInViewer(aDoc, ModelAPI_ResultGroup::group(), false);
+  foreach(DocumentPtr aDoc, aDocs) {
+    synchronizeGroupInViewer(aDoc, ModelAPI_ResultConstruction::group(), false);
+    synchronizeGroupInViewer(aDoc, ModelAPI_ResultBody::group(), false);
+    synchronizeGroupInViewer(aDoc, ModelAPI_ResultPart::group(), false);
+    synchronizeGroupInViewer(aDoc, ModelAPI_ResultGroup::group(), false);
+  }
 }
 
 void XGUI_Workshop::synchronizeGroupInViewer(const DocumentPtr& theDoc,

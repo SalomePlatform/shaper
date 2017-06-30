@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:    PlaneGCSSolver_UpdateCoincidence.cpp
-// Created: 17 Feb 2017
-// Author:  Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <PlaneGCSSolver_UpdateCoincidence.h>
 #include <PlaneGCSSolver_EdgeWrapper.h>
@@ -13,17 +27,20 @@
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintMiddle.h>
 
+static bool hasSamePoint(const std::set<EntityWrapperPtr>& theList,
+                         const EntityWrapperPtr& thePoint);
+
+
 void PlaneGCSSolver_UpdateCoincidence::attach(SketchSolver_Constraint* theObserver,
                                               const std::string& theType)
 {
   if (theType == GROUP()) {
     std::list<SketchSolver_Constraint*>::iterator aPlaceToAdd = myObservers.end();
-    // point-point coincidence is placed first
-    if (theObserver->getType() == CONSTRAINT_PT_PT_COINCIDENT) {
-      for (aPlaceToAdd = myObservers.begin(); aPlaceToAdd != myObservers.end(); ++aPlaceToAdd)
-        if ((*aPlaceToAdd)->getType() != CONSTRAINT_PT_PT_COINCIDENT)
-          break;
-    }
+    // point-point coincidence is placed first,
+    // other constraints are sorted by their type
+    for (aPlaceToAdd = myObservers.begin(); aPlaceToAdd != myObservers.end(); ++aPlaceToAdd)
+      if ((*aPlaceToAdd)->getType() > theObserver->getType())
+        break;
     myObservers.insert(aPlaceToAdd, theObserver);
   } else
     myNext->attach(theObserver, theType);
@@ -53,39 +70,42 @@ static bool hasAnotherExternalPoint(const std::set<EntityWrapperPtr>& theCoincid
   return false;
 }
 
-bool PlaneGCSSolver_UpdateCoincidence::checkCoincidence(
+bool PlaneGCSSolver_UpdateCoincidence::addCoincidence(
     const EntityWrapperPtr& theEntity1,
     const EntityWrapperPtr& theEntity2)
 {
   bool isAccepted = true;
-
-  std::list<CoincidentEntities>::iterator anIt = myCoincident.begin();
-  std::list<CoincidentEntities>::iterator
-      aFound[2] = {myCoincident.end(), myCoincident.end()};
-
-  for (; anIt != myCoincident.end(); ++anIt) {
-    if (anIt->isExist(theEntity1))
-      aFound[0] = anIt;
-    if (anIt->isExist(theEntity2))
-      aFound[1] = anIt;
-    if (aFound[0] != myCoincident.end() && aFound[1] != myCoincident.end())
-      break;
-  }
+  std::list<CoincidentEntities>::iterator aFound[2] = {
+    findGroupOfCoincidence(theEntity1),
+    findGroupOfCoincidence(theEntity2)
+  };
 
   if (aFound[0] == myCoincident.end() && aFound[1] == myCoincident.end()) {
     // new group of coincidence
     myCoincident.push_back(CoincidentEntities(theEntity1, theEntity2));
-  } else if (aFound[0] == aFound[1]) // same group => already coincident
+  } else if (aFound[0] == myCoincident.end()) {
+    isAccepted = addToGroupOfCoincidence(*aFound[1], theEntity1);
+  } else if (aFound[1] == myCoincident.end()) {
+    isAccepted = addToGroupOfCoincidence(*aFound[0], theEntity2);
+  } else if (aFound[0] == aFound[1]) { // same group => already coincident
     isAccepted = false;
-  else {
-    if (aFound[0] == myCoincident.end())
-      isAccepted = aFound[1]->isNewCoincidence(theEntity2, theEntity1);
-    else if (aFound[1] == myCoincident.end())
-      isAccepted = aFound[0]->isNewCoincidence(theEntity1, theEntity2);
-    else { // merge two groups
-      isAccepted = aFound[0]->isNewCoincidence(theEntity1, *(aFound[1]), theEntity2);
-      myCoincident.erase(aFound[1]);
+  } else { // merge two groups
+    // first check the external points are equal
+    EntityWrapperPtr anExternal0 = aFound[0]->externalPoint();
+    EntityWrapperPtr anExternal1 = aFound[1]->externalPoint();
+    if (anExternal0 && anExternal1) {
+      std::set<EntityWrapperPtr> anExtList;
+      anExtList.insert(anExternal0);
+      if (hasSamePoint(anExtList, anExternal1)) {
+        // no need to add coincidence, because all points are
+        // already coincident to correct external points
+        isAccepted = false;
+      }
     }
+
+    // merge
+    aFound[0]->merge(*aFound[1]);
+    myCoincident.erase(aFound[1]);
   }
 
   return isAccepted;
@@ -95,11 +115,7 @@ bool PlaneGCSSolver_UpdateCoincidence::isPointOnEntity(
     const EntityWrapperPtr& thePoint,
     const EntityWrapperPtr& theEntity)
 {
-  std::list<CoincidentEntities>::iterator anIt = myCoincident.begin();
-  for (; anIt != myCoincident.end(); ++anIt)
-    if (anIt->isExist(thePoint))
-      break;
-
+  std::list<CoincidentEntities>::iterator anIt = findGroupOfCoincidence(thePoint);
   if (anIt == myCoincident.end())
     return false;
 
@@ -114,156 +130,123 @@ bool PlaneGCSSolver_UpdateCoincidence::isPointOnEntity(
   return false;
 }
 
+std::list<PlaneGCSSolver_UpdateCoincidence::CoincidentEntities>::iterator
+  PlaneGCSSolver_UpdateCoincidence::findGroupOfCoincidence(const EntityWrapperPtr& theEntity)
+{
+  if (theEntity->type() != ENTITY_POINT)
+    return myCoincident.end();
+
+  std::list<CoincidentEntities>::iterator aFound = myCoincident.begin();
+  for (; aFound != myCoincident.end(); ++aFound)
+    if (aFound->isExist(theEntity))
+      break;
+  return aFound;
+}
+
+bool PlaneGCSSolver_UpdateCoincidence::addToGroupOfCoincidence(
+    CoincidentEntities& theGroup, const EntityWrapperPtr& theEntity)
+{
+  if (theGroup.isExist(theEntity))
+    return false;
+  return theGroup.add(theEntity);
+}
 
 
+
+
+
+static const GCS::Point& toPoint(const EntityWrapperPtr& theEntity)
+{
+  PointWrapperPtr aPoint = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theEntity);
+  return *(aPoint->point());
+}
+
+static double squareDistance(const GCS::Point& thePoint1, const GCS::Point& thePoint2)
+{
+  double dx = *thePoint1.x - *thePoint2.x;
+  double dy = *thePoint1.y - *thePoint2.y;
+  return dx * dx + dy * dy;
+}
+
+static bool hasSamePoint(const std::set<EntityWrapperPtr>& theList, const GCS::Point& thePoint)
+{
+  std::set<EntityWrapperPtr>::const_iterator anIt = theList.begin();
+  for (; anIt != theList.end(); ++anIt)
+    if (squareDistance(thePoint, toPoint(*anIt)) < 1.e-14)
+      return true;
+  return false;
+}
+
+bool hasSamePoint(const std::set<EntityWrapperPtr>& theList,
+                  const EntityWrapperPtr& thePoint)
+{
+  return hasSamePoint(theList, toPoint(thePoint));
+}
 
 
 PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::CoincidentEntities(
     const EntityWrapperPtr& theEntity1,
     const EntityWrapperPtr& theEntity2)
 {
-  if (theEntity1->isExternal() && theEntity2->isExternal()) {
-    myExternalAndConnected[theEntity1] = std::set<EntityWrapperPtr>();
-    myExternalAndConnected[theEntity2] = std::set<EntityWrapperPtr>();
-  } else if (theEntity1->isExternal())
-    myExternalAndConnected[theEntity1].insert(theEntity2);
-  else if (theEntity2->isExternal())
-    myExternalAndConnected[theEntity2].insert(theEntity1);
-  else {
-    std::set<EntityWrapperPtr> aGroup;
-    aGroup.insert(theEntity1);
-    aGroup.insert(theEntity2);
-    myExternalAndConnected[EntityWrapperPtr()] = aGroup;
-  }
+  add(theEntity1);
+  add(theEntity2);
 }
 
-bool PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::hasExternal() const
+bool PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::add(
+    const EntityWrapperPtr& theEntity)
 {
-  return myExternalAndConnected.size() != 1 ||
-         myExternalAndConnected.find(EntityWrapperPtr()) == myExternalAndConnected.end();
+  bool isAdded = true;
+  if (theEntity->type() == ENTITY_POINT) {
+    if (theEntity->isExternal()) {
+      isAdded = !hasSamePoint(myExternalPoints, theEntity);
+      myExternalPoints.insert(theEntity);
+    } else
+      myPoints.insert(theEntity);
+  } else
+    myFeatures.insert(theEntity);
+  return isAdded;
+}
+
+void PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::remove(
+    const EntityWrapperPtr& theEntity)
+{
+  if (theEntity->type() == ENTITY_POINT) {
+    if (theEntity->isExternal())
+      myExternalPoints.erase(theEntity);
+    else
+      myPoints.erase(theEntity);
+  } else
+    myFeatures.erase(theEntity);
+}
+
+void PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::merge(
+    const CoincidentEntities& theOther)
+{
+  myExternalPoints.insert(theOther.myExternalPoints.begin(), theOther.myExternalPoints.end());
+  myPoints.insert(theOther.myPoints.begin(), theOther.myPoints.end());
+  myFeatures.insert(theOther.myFeatures.begin(), theOther.myFeatures.end());
 }
 
 bool PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::isExist(
     const EntityWrapperPtr& theEntity) const
 {
-  std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> >::const_iterator
-      anIt = myExternalAndConnected.begin();
-  for (; anIt != myExternalAndConnected.end(); ++anIt)
-    if (anIt->first == theEntity ||
-        anIt->second.find(theEntity) != anIt->second.end())
-      return true;
-  return false;
-}
+  if (theEntity->type() == ENTITY_POINT) {
+    if (theEntity->isExternal())
+      return myExternalPoints.find(theEntity) != myExternalPoints.end();
+    else
+      return myPoints.find(theEntity) != myPoints.end();
+  }
 
-static bool isEqual(const GCS::Point& thePoint1, const GCS::Point& thePoint2)
-{
-  return thePoint1.x == thePoint2.x && thePoint1.y == thePoint2.y;
+  return myFeatures.find(theEntity) != myFeatures.end();
 }
 
 bool PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::isExist(
     const GCS::Point& thePoint) const
 {
-  std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> >::const_iterator
-      anIt = myExternalAndConnected.begin();
-  for (; anIt != myExternalAndConnected.end(); ++anIt) {
-    if (anIt->first && anIt->first->type() == ENTITY_POINT) {
-      const GCSPointPtr& aPoint =
-          std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(anIt->first)->point();
-      if (isEqual(*aPoint, thePoint))
-        return true;
-    }
-
-    std::set<EntityWrapperPtr>::const_iterator anEntIt = anIt->second.begin();
-    for (; anEntIt != anIt->second.end(); ++anEntIt)
-      if ((*anEntIt)->type() == ENTITY_POINT) {
-        const GCSPointPtr& aPoint =
-            std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(*anEntIt)->point();
-        if (isEqual(*aPoint, thePoint))
-          return true;
-      }
-  }
-  return false;
+  return hasSamePoint(myExternalPoints, thePoint) || hasSamePoint(myPoints, thePoint);
 }
 
-bool PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::isNewCoincidence(
-    const EntityWrapperPtr& theEntityExist,
-    const EntityWrapperPtr& theOtherEntity)
+EntityWrapperPtr PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::externalPoint() const
 {
-  if (theOtherEntity->isExternal()) {
-    if (hasExternal()) {
-      if (myExternalAndConnected.find(theOtherEntity) == myExternalAndConnected.end())
-        myExternalAndConnected[theOtherEntity] = std::set<EntityWrapperPtr>();
-      // check whether all external entities are edges
-      bool isNewCoinc = true;
-      std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> >::iterator
-          anIt = myExternalAndConnected.begin();
-      for (; anIt != myExternalAndConnected.end() && isNewCoinc; ++anIt)
-        isNewCoinc = (anIt->first->type() != ENTITY_POINT);
-      return isNewCoinc;
-    } else {
-      myExternalAndConnected[theOtherEntity] = myExternalAndConnected[EntityWrapperPtr()];
-      myExternalAndConnected.erase(EntityWrapperPtr());
-      return true;
-    }
-  }
-
-  if (theEntityExist->isExternal()) {
-    myExternalAndConnected[theEntityExist].insert(theOtherEntity);
-    return true;
-  }
-
-  std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> >::iterator
-      anIt = myExternalAndConnected.begin();
-  for (; anIt != myExternalAndConnected.end(); ++anIt)
-    if (anIt->second.find(theEntityExist) != anIt->second.end()) {
-      anIt->second.insert(theOtherEntity);
-      break;
-    }
-  return true;
-}
-
-bool PlaneGCSSolver_UpdateCoincidence::CoincidentEntities::isNewCoincidence(
-    const EntityWrapperPtr&   theEntityExist,
-    const CoincidentEntities& theOtherGroup,
-    const EntityWrapperPtr&   theEntityInOtherGroup)
-{
-  bool hasExt[2] = {hasExternal(), theOtherGroup.hasExternal()};
-  if (hasExt[0] && hasExt[1]) {
-    myExternalAndConnected.insert(theOtherGroup.myExternalAndConnected.begin(),
-                                  theOtherGroup.myExternalAndConnected.end());
-    return false;
-  } else if (!hasExt[0] && !hasExt[1]) {
-    std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> >::const_iterator
-        aFound = theOtherGroup.myExternalAndConnected.find(EntityWrapperPtr());
-
-    myExternalAndConnected[EntityWrapperPtr()].insert(
-        aFound->second.begin(), aFound->second.end());
-    return true;
-  } else {
-    std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> > aSource, aDest;
-    EntityWrapperPtr aTarget;
-    if (hasExt[0]) {
-      aDest = myExternalAndConnected;
-      aSource = theOtherGroup.myExternalAndConnected;
-      aTarget = theEntityExist;
-    } else {
-      aSource = myExternalAndConnected;
-      aDest = theOtherGroup.myExternalAndConnected;
-      aTarget = theEntityInOtherGroup;
-    }
-
-    std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> >::const_iterator
-        aFound = aSource.find(EntityWrapperPtr());
-
-    std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> >::iterator anIt = aDest.begin();
-    for (; anIt != aDest.end(); ++anIt)
-      if (anIt->first == aTarget ||
-          anIt->second.find(aTarget) != anIt->second.end()) {
-        anIt->second.insert(aFound->second.begin(), aFound->second.end());
-        break;
-      }
-    return true;
-  }
-  // impossible case
-  return false;
+  return myExternalPoints.empty() ? EntityWrapperPtr() : *myExternalPoints.begin();
 }

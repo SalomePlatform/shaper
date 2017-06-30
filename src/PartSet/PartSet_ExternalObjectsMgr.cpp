@@ -1,14 +1,31 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        PartSet_ExternalObjectsMgr.cpp
-// Created:     15 Apr 2015
-// Author:      Natalia Ermolaeva
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "PartSet_ExternalObjectsMgr.h"
 #include "PartSet_Tools.h"
 
 #include <XGUI_Workshop.h>
 #include <XGUI_ModuleConnector.h>
+
+#include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_ISelection.h>
 
 #include <SketchPlugin_Feature.h>
 
@@ -73,6 +90,46 @@ ObjectPtr PartSet_ExternalObjectsMgr::externalObject(const ObjectPtr& theSelecte
         myExternalObjectValidated = aSelectedObject;
   }
   return aSelectedObject;
+}
+
+void PartSet_ExternalObjectsMgr::getGeomSelection(const ModuleBase_ViewerPrsPtr& thePrs,
+                                                   ObjectPtr& theObject,
+                                                   GeomShapePtr& theShape,
+                                                   ModuleBase_IWorkshop* theWorkshop,
+                                                   const CompositeFeaturePtr& theSketch,
+                                                   const bool isInValidate)
+{
+  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(theObject);
+  std::shared_ptr<SketchPlugin_Feature> aSPFeature =
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
+  // there is no a sketch feature is selected, but the shape exists,
+  // try to create an exernal object
+  // TODO: unite with the same functionality in PartSet_WidgetShapeSelector
+  if (aSPFeature.get() == NULL) {
+    ObjectPtr anExternalObject = ObjectPtr();
+    GeomShapePtr anExternalShape = GeomShapePtr();
+    if (useExternal()) {
+      if (canCreateExternal()) {
+        GeomShapePtr aShape = theShape;
+        if (!aShape.get()) {
+          ResultPtr aResult = theWorkshop->selection()->getResult(thePrs);
+          if (aResult.get())
+            aShape = aResult->shape();
+        }
+        if (aShape.get() != NULL && !aShape->isNull())
+          anExternalObject =
+            externalObject(theObject, aShape, theSketch, isInValidate);
+      }
+      else { /// use objects of found selection
+        anExternalObject = theObject;
+        anExternalShape = theShape;
+      }
+    }
+    /// the object is null if the selected feature is "external"(not sketch entity feature of the
+    /// current sketch) and it is not created by object manager
+    theObject = anExternalObject;
+    theShape = anExternalShape;
+  }
 }
 
 //********************************************************************

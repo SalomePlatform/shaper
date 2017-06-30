@@ -1,13 +1,29 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        PartSet_WidgetPoint2D.cpp
-// Created:     25 Apr 2014
-// Author:      Natalia ERMOLAEVA
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "PartSet_WidgetPoint2d.h"
 #include <PartSet_Tools.h>
 #include <PartSet_Module.h>
 #include <PartSet_SketcherReentrantMgr.h>
+#include <PartSet_ExternalObjectsMgr.h>
+#include <PartSet_CenterPrs.h>
 
 #include <XGUI_Tools.h>
 #include <XGUI_Workshop.h>
@@ -61,6 +77,7 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <BRep_Tool.hxx>
+#include <Geom_Point.hxx>
 
 #include <cfloat>
 #include <climits>
@@ -133,6 +150,8 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
   setLayout(aLayout);
 
   myWidgetValidator = new ModuleBase_WidgetValidator(this, myWorkshop);
+  myExternalObjectMgr = new PartSet_ExternalObjectsMgr(theData->getProperty("use_external"),
+                                         theData->getProperty("can_create_external"), true);
 }
 
 bool PartSet_WidgetPoint2D::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& theValue)
@@ -212,6 +231,7 @@ bool PartSet_WidgetPoint2D::isValidSelectionForAttribute_(
 
   // restores the current values of the widget attribute
   myWidgetValidator->restoreAttributeValue(aRefAttr, aValid);
+  myExternalObjectMgr->removeExternal(sketch(), myFeature, myWorkshop, true);
 
   ModuleBase_WidgetValidated::blockFeatureAttribute(aRefAttr, myFeature, false, isFlushesActived,
                                 isAttributeSetInitializedBlocked, isAttributeSendUpdatedBlocked);
@@ -227,11 +247,11 @@ bool PartSet_WidgetPoint2D::setSelectionCustom(const ModuleBase_ViewerPrsPtr& th
     double aX, aY;
     const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
     if (getPoint2d(aView, aTDShape, aX, aY)) {
-      fillRefAttribute(aX, aY);
+      fillRefAttribute(aX, aY, theValue);
       isDone = true;
     }
     else if (aTDShape.ShapeType() == TopAbs_EDGE) {
-      fillRefAttribute(theValue->object());
+      fillRefAttribute(theValue);
       isDone = true;
     }
   }
@@ -271,6 +291,7 @@ bool PartSet_WidgetPoint2D::resetCustom()
 
 PartSet_WidgetPoint2D::~PartSet_WidgetPoint2D()
 {
+  delete myExternalObjectMgr;
 }
 
 bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrsPtr>& theValues,
@@ -281,14 +302,17 @@ bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrsPtr>& theValu
     return isDone;
 
   ModuleBase_ViewerPrsPtr aValue = theValues.takeFirst();
-  GeomShapePtr aShape = aValue->shape();
-  if (aShape.get() && !aShape->isNull()) {
-    Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
-    double aX, aY;
-    const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
-    if (getPoint2d(aView, aTDShape, aX, aY)) {
-      isDone = setPoint(aX, aY);
-      setConstraintToPoint(aX, aY);
+
+  if (!theToValidate || myWidgetValidator->isValidSelection(aValue)) {
+    GeomShapePtr aShape = aValue->shape();
+    if (aShape.get() && !aShape->isNull()) {
+      Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
+      double aX, aY;
+      const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+      if (getPoint2d(aView, aTDShape, aX, aY)) {
+        isDone = setPoint(aX, aY);
+        setConstraintToPoint(aX, aY, aValue);
+      }
     }
   }
   return isDone;
@@ -334,10 +358,23 @@ bool PartSet_WidgetPoint2D::storeValueCustom()
   //                myYSpin->hasVariable() ? myYSpin->text().toStdString() : "");
   //aPoint->setValue(!myXSpin->hasVariable() ? myXSpin->value() : aPoint->x(),
   //                 !myYSpin->hasVariable() ? myYSpin->value() : aPoint->y());
-  aPoint->setValue(myXSpin->value(), myYSpin->value());
 
-  // after movement the solver will call the update event: optimization
-  moveObject(myFeature);
+  if (myFeature->isMacro()) {
+    // Moving points of macro-features has been processed directly (without solver)
+    aPoint->setValue(myXSpin->value(), myYSpin->value());
+    moveObject(myFeature);
+  } else {
+    if (!aPoint->isInitialized())
+      aPoint->setValue(0., 0.);
+
+    std::shared_ptr<ModelAPI_ObjectMovedMessage> aMessage(
+        new ModelAPI_ObjectMovedMessage(this));
+    aMessage->setMovedAttribute(aPoint);
+    aMessage->setOriginalPosition(aPoint->pnt());
+    aMessage->setCurrentPosition(myXSpin->value(), myYSpin->value());
+    Events_Loop::loop()->send(aMessage);
+  }
+
   aPoint->setImmutable(isImmutable);
   that->blockSignals(isBlocked);
 
@@ -455,11 +492,12 @@ bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView,
   return false;
 }
 
-bool PartSet_WidgetPoint2D::setConstraintToPoint(double theClickedX, double theClickedY)
+bool PartSet_WidgetPoint2D::setConstraintToPoint(double theClickedX, double theClickedY,
+                                  const std::shared_ptr<ModuleBase_ViewerPrs>& theValue)
 {
   AttributeRefAttrPtr aRefAttr = attributeRefAttr();
   if (aRefAttr.get())
-    fillRefAttribute(theClickedX, theClickedY);
+    fillRefAttribute(theClickedX, theClickedY, theValue);
   else {
     FeaturePtr aFeature = feature();
     std::string anAttribute = attributeID();
@@ -555,6 +593,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
   if (!aFirstValue.get() && myPreSelected.get()) {
     aFirstValue = myPreSelected;
   }
+
   // if we have selection and use it
   if (aFirstValue.get() && isValidSelectionCustom(aFirstValue) &&
       aFirstValue->shape().get()) { /// Trihedron Axis may be selected, but shape is empty
@@ -644,7 +683,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
         bool isAuxiliaryFeature = false;
         if (getPoint2d(aView, aShape, aX, aY)) {
           setPoint(aX, aY);
-          setConstraintToPoint(aX, aY);
+          setConstraintToPoint(aX, aY, aFirstValue);
         }
         else if (aShape.ShapeType() == TopAbs_EDGE) {
           // point is taken from mouse event and set in attribute. It should be done before setting
@@ -670,7 +709,36 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
       }
     }
   }
-  // End of Bug dependent fragment
+  // The selection could be a center of an external circular object
+  else if (aFirstValue.get() && (!aFirstValue->interactive().IsNull())) {
+    Handle(PartSet_CenterPrs) aAIS =
+        Handle(PartSet_CenterPrs)::DownCast(aFirstValue->interactive());
+    if (!aAIS.IsNull()) {
+      gp_Pnt aPntComp = aAIS->Component()->Pnt();
+      GeomVertexPtr aVertPtr(new GeomAPI_Vertex(aPntComp.X(), aPntComp.Y(), aPntComp.Z()));
+      TopoDS_Shape aShape = aVertPtr->impl<TopoDS_Shape>();
+
+      ResultPtr aFixedObject =
+          PartSet_Tools::findFixedObjectByExternal(aShape, aAIS->object(), mySketch);
+      if (!aFixedObject.get())
+        aFixedObject = PartSet_Tools::createFixedByExternalCenter(aAIS->object(), aAIS->edge(),
+                                                                  aAIS->centerType(), mySketch);
+      if (aFixedObject.get())
+        setConstraintToObject(aFixedObject);
+      // fignal updated should be flushed in order to visualize possible created
+      // external objects e.g. selection of trihedron axis when input end arc point
+      updateObject(feature());
+
+      double aX, aY;
+      if (getPoint2d(aView, aShape, aX, aY)) {
+        // do not create a constraint to the point, which already used by the feature
+        // if the feature contains the point, focus is not switched
+        setPoint(aX, aY);
+      }
+      emit vertexSelected(); // it stops the reentrant operation
+      emit focusOutWidget(this);
+    }
+  }
   else {
     // A case when point is taken from mouse event
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
@@ -693,6 +761,13 @@ void PartSet_WidgetPoint2D::setPreSelection(
   myPreSelected = thePreSelected;
   mouseReleased(theWnd, theEvent);
   myPreSelected = ModuleBase_ViewerPrsPtr();
+}
+
+void PartSet_WidgetPoint2D::getGeomSelection_(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue,
+                                              ObjectPtr& theObject,
+                                              GeomShapePtr& theShape)
+{
+  myExternalObjectMgr->getGeomSelection(theValue, theObject, theShape, myWorkshop, sketch(), true);
 }
 
 void PartSet_WidgetPoint2D::mouseMoved(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent)
@@ -821,10 +896,13 @@ bool PartSet_WidgetPoint2D::isOrphanPoint(const FeaturePtr& theFeature,
       if (aCoincidence.get()) {
         QList<FeaturePtr> aCoinsideLines;
         QList<FeaturePtr> aCoins;
+        QList<bool> anIsAttributes;
         PartSet_Tools::findCoincidences(aCoincidence, aCoinsideLines, aCoins,
-                                        SketchPlugin_ConstraintCoincidence::ENTITY_A());
+                                        SketchPlugin_ConstraintCoincidence::ENTITY_A(),
+                                        anIsAttributes);
         PartSet_Tools::findCoincidences(aCoincidence, aCoinsideLines, aCoins,
-                                        SketchPlugin_ConstraintCoincidence::ENTITY_B());
+                                        SketchPlugin_ConstraintCoincidence::ENTITY_B(),
+                                        anIsAttributes);
         QList<FeaturePtr>::const_iterator anIt = aCoinsideLines.begin(),
                                           aLast = aCoinsideLines.end();
         for (; anIt != aLast && anOrphanPoint; anIt++) {
@@ -866,7 +944,8 @@ AttributeRefAttrPtr PartSet_WidgetPoint2D::attributeRefAttr() const
   return std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttributeRef);
 }
 
-void PartSet_WidgetPoint2D::fillRefAttribute(double theClickedX, double theClickedY)
+void PartSet_WidgetPoint2D::fillRefAttribute(double theClickedX, double theClickedY,
+                              const std::shared_ptr<ModuleBase_ViewerPrs>& theValue)
 {
   AttributeRefAttrPtr aRefAttr = attributeRefAttr();
   if (!aRefAttr.get())
@@ -882,7 +961,17 @@ void PartSet_WidgetPoint2D::fillRefAttribute(double theClickedX, double theClick
                                                             aFeature, aClickedPoint);
     if (aClickedFeaturePoint.get())
       aRefAttr->setAttr(aClickedFeaturePoint);
+    else {
+      ObjectPtr anObject = getGeomSelection(theValue);
+      if (anObject.get())
+        aRefAttr->setObject(anObject);
+    }
   }
+}
+
+void PartSet_WidgetPoint2D::fillRefAttribute(const ModuleBase_ViewerPrsPtr& theValue)
+{
+  fillRefAttribute(getGeomSelection(theValue));
 }
 
 void PartSet_WidgetPoint2D::fillRefAttribute(const ObjectPtr& theObject)
@@ -968,4 +1057,16 @@ std::shared_ptr<GeomDataAPI_Point2D> PartSet_WidgetPoint2D::findFirstEqualPointI
       break;
   }
   return aFPoint;
+}
+
+ObjectPtr PartSet_WidgetPoint2D::getGeomSelection(const ModuleBase_ViewerPrsPtr& theValue)
+{
+  ObjectPtr anObject;
+  GeomShapePtr aShape;
+  ModuleBase_ISelection* aSelection = myWorkshop->selection();
+  anObject = aSelection->getResult(theValue);
+  aShape = aSelection->getShape(theValue);
+  myExternalObjectMgr->getGeomSelection(theValue, anObject, aShape, myWorkshop, sketch(), true);
+
+  return anObject;
 }

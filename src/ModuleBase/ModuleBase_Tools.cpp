@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        ModuleBase_Tools.cpp
-// Created:     11 July 2014
-// Author:      Vitaly Smetannikov
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "ModuleBase_Tools.h"
 
@@ -118,7 +132,10 @@ void zeroMargins(QLayout* theLayout)
 
 void activateWindow(QWidget* theWidget, const QString& theInfo)
 {
-  theWidget->activateWindow();
+  if (theWidget) {
+    theWidget->activateWindow();
+    theWidget->raise();
+  }
 
 #ifdef DEBUG_ACTIVATE_WINDOW
   qDebug(QString("activateWindow: %1").arg(theInfo).toStdString().c_str());
@@ -127,8 +144,10 @@ void activateWindow(QWidget* theWidget, const QString& theInfo)
 
 void setFocus(QWidget* theWidget, const QString& theInfo)
 {
+  activateWindow(theWidget);
   theWidget->setFocus();
-
+  // rectangle of focus is not visible on tool button widgets
+  theWidget->repaint();
 #ifdef DEBUG_SET_FOCUS
   qDebug(QString("setFocus: %1").arg(theInfo).toStdString().c_str());
 #endif
@@ -267,6 +286,14 @@ QAction* createAction(const QIcon& theIcon, const QString& theText,
 }
 
 #ifdef _DEBUG
+QString objectName(const ObjectPtr& theObj)
+{
+  if (!theObj.get())
+    return "";
+
+  return theObj->data()->name().c_str();
+}
+
 QString objectInfo(const ObjectPtr& theObj, const bool isUseAttributesInfo)
 {
   QString aFeatureStr = "feature";
@@ -345,12 +372,13 @@ int shapeType(const QString& theType)
 }
 
 void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature,
-                  bool& hasParameter, bool& hasCompositeOwner)
+                  bool& hasParameter, bool& hasCompositeOwner, bool& hasResultInHistory)
 {
   hasResult = false;
   hasFeature = false;
   hasParameter = false;
   hasCompositeOwner = false;
+  hasResultInHistory = false;
   foreach(ObjectPtr aObj, theObjects) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
@@ -361,6 +389,12 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
     hasParameter |= (aConstruction.get() != NULL);
     if (hasFeature)
       hasCompositeOwner |= (ModelAPI_Tools::compositeOwner(aFeature) != NULL);
+
+    if (!hasResultInHistory && aResult.get()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aResult);
+      hasResultInHistory = aFeature.get() && aFeature->isInHistory();
+    }
+
     if (hasFeature && hasResult  && hasParameter && hasCompositeOwner)
       break;
   }
@@ -694,7 +728,12 @@ void flushUpdated(ObjectPtr theObject)
 {
   blockUpdateViewer(true);
 
+  // Fix the problem of not previewed results of constraints applied. Flush Create/Delete
+  // (for the sketch result) to start processing of the sketch in the solver.
+  // TODO: these flushes should be moved in a separate method provided by Model
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 
   blockUpdateViewer(false);
 }

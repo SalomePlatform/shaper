@@ -1,9 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        ModuleBase_ViewerFilters.cpp
-// Created:     07 Okt 2014
-// Author:      Vitaly SMETANNIKOV
-
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "ModuleBase_ViewerFilters.h"
 #include "ModuleBase_IWorkshop.h"
@@ -87,7 +100,10 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(
 
   if (myPlane.get()) {
     aValid = Standard_False;
-    if (theOwner->HasSelectable()) {
+    // selectable may be empty if the object is selected in Object Browser and is not visualized
+    // in the viewer(virtual owner is created for this case)
+    //if (theOwner->HasSelectable())
+    {
       gp_Pln aPlane = myPlane->impl<gp_Pln>();
       Handle(StdSelect_BRepOwner) aShapeOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
       if (!aShapeOwner.IsNull() && aShapeOwner->HasShape()) {
@@ -112,6 +128,7 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(
         break;
         }
       } else {
+        if (theOwner->HasSelectable()) {
         // Check Trihedron sub-objects
         Handle(SelectMgr_SelectableObject) aSelObj = theOwner->Selectable();
         Handle(Standard_Type) aType = aSelObj->DynamicType();
@@ -156,6 +173,7 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(
 #endif
         // This is not object controlled by the filter
         aValid = Standard_True;
+        }
       }
     }
   }

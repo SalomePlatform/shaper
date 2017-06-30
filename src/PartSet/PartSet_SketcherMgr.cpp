@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        PartSet_SketcherMgr.cpp
-// Created:     19 Dec 2014
-// Author:      Vitaly SMETANNIKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_SketcherReentrantMgr.h"
@@ -12,6 +26,7 @@
 #include "PartSet_WidgetSketchLabel.h"
 #include "PartSet_WidgetEditor.h"
 #include "PartSet_ResultSketchPrs.h"
+#include "PartSet_ExternalPointsMgr.h"
 
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Displayer.h>
@@ -138,7 +153,7 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsEditLaunching(false), myIsDragging(false),
     myDragDone(false), myIsMouseOverWindow(false),
     myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
-    myIsPopupMenuActive(false)
+    myIsPopupMenuActive(false), myExternalPointsMgr(0)
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
@@ -276,7 +291,7 @@ void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
       myModule->sketchReentranceMgr()->isInternalEditActive())
     return;
   // it is necessary to save current selection in order to restore it after the values are modifed
-  storeSelection();
+  storeSelection(ST_SelectAndHighlightType);
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
@@ -358,7 +373,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
     ModuleBase_ISelection* aSelect = aWorkshop->selection();
 
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
-    storeSelection(!aHasShift);
+    storeSelection(aHasShift ? ST_SelectAndHighlightType : ST_HighlightType, myCurrentSelection);
 
     if (myCurrentSelection.empty()) {
       if (isSketchOpe && (!isSketcher))
@@ -448,7 +463,7 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
           /// the previous selection is lost by mouse release in the viewer(Select method), but
           /// it is still stored in myCurrentSelection. So, it is possible to restore selection
           /// It is important for drag(edit with mouse) of sketch entities.
-          restoreSelection();
+          restoreSelection(myCurrentSelection);
           myCurrentSelection.clear();
         }
       }
@@ -522,8 +537,11 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
     Point aMousePnt;
     get2dPoint(theWnd, theEvent, aMousePnt);
-    double dX =  aMousePnt.myCurX - myCurrentPoint.myCurX;
-    double dY =  aMousePnt.myCurY - myCurrentPoint.myCurY;
+
+    std::shared_ptr<GeomAPI_Pnt2d> anOriginalPosition = std::shared_ptr<GeomAPI_Pnt2d>(
+                            new GeomAPI_Pnt2d(myCurrentPoint.myCurX, myCurrentPoint.myCurY));
+    std::shared_ptr<GeomAPI_Pnt2d> aCurrentPosition = std::shared_ptr<GeomAPI_Pnt2d>(
+                            new GeomAPI_Pnt2d(aMousePnt.myCurX, aMousePnt.myCurY));
 
     ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
@@ -558,9 +576,15 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
               std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(aAttrId));
             if (aPoint.get() != NULL) {
               bool isImmutable = aPoint->setImmutable(true);
-              aPoint->move(dX, dY);
+
+              std::shared_ptr<ModelAPI_ObjectMovedMessage> aMessage = std::shared_ptr
+                       <ModelAPI_ObjectMovedMessage>(new ModelAPI_ObjectMovedMessage(this));
+              aMessage->setMovedAttribute(aPoint);
+              aMessage->setOriginalPosition(anOriginalPosition);
+              aMessage->setCurrentPosition(aCurrentPosition);
+              Events_Loop::loop()->send(aMessage);
+
               isModified = true;
-              ModelAPI_EventCreator::get()->sendUpdated(aFeature, aMoveEvent);
               aPoint->setImmutable(isImmutable);
             }
           }
@@ -570,9 +594,13 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
         std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature) {
-          aSketchFeature->move(dX, dY);
+          std::shared_ptr<ModelAPI_ObjectMovedMessage> aMessage = std::shared_ptr
+                    <ModelAPI_ObjectMovedMessage>(new ModelAPI_ObjectMovedMessage(this));
+          aMessage->setMovedObject(aFeature);
+          aMessage->setOriginalPosition(anOriginalPosition);
+          aMessage->setCurrentPosition(aCurrentPosition);
+          Events_Loop::loop()->send(aMessage);
           isModified = true;
-          ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, aMoveEvent);
         }
       }
     }
@@ -580,12 +608,12 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     // were changed here
     if (isModified) {
       aCurrentOperation->onValuesChanged();
+      Events_Loop::loop()->flush(aMoveEvent); // up all move events - to be processed in the solver
     }
-    Events_Loop::loop()->flush(aMoveEvent); // up all move events - to be processed in the solver
     //Events_Loop::loop()->flush(aUpdateEvent); // up update events - to redisplay presentations
 
     // 5. it is necessary to save current selection in order to restore it after the features moving
-    restoreSelection();
+    restoreSelection(myCurrentSelection);
     // 6. restore the update viewer flag and call this update
     aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
     aDisplayer->updateViewer();
@@ -812,6 +840,22 @@ bool PartSet_SketcherMgr::isNestedSketchOperation(ModuleBase_Operation* theOpera
   return aNestedSketch;
 }
 
+bool PartSet_SketcherMgr::isNestedSketchFeature(const QString& theFeatureKind) const
+{
+  bool aNestedSketch = false;
+
+  FeaturePtr anActiveSketch = activeSketch();
+  if (anActiveSketch.get()) {
+    ModuleBase_Operation* aSketchOperation = operationMgr()->findOperation(
+                                                              anActiveSketch->getKind().c_str());
+    if (aSketchOperation) {
+      QStringList aGrantedOpIds = aSketchOperation->grantedOperationIds();
+      aNestedSketch = aGrantedOpIds.contains(theFeatureKind);
+    }
+  }
+  return aNestedSketch;
+}
+
 bool PartSet_SketcherMgr::isNestedCreateOperation(ModuleBase_Operation* theOperation,
                                                   const CompositeFeaturePtr& theSketch) const
 {
@@ -836,6 +880,13 @@ bool PartSet_SketcherMgr::isEntity(const std::string& theId)
          (theId == SketchPlugin_Point::ID()) ||
          (theId == SketchPlugin_Arc::ID()) ||
          (theId == SketchPlugin_Circle::ID());
+}
+
+bool PartSet_SketcherMgr::isExternalFeature(const FeaturePtr& theFeature)
+{
+  std::shared_ptr<SketchPlugin_Feature> aSPFeature =
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
+  return aSPFeature.get() && aSPFeature->isExternal();
 }
 
 bool PartSet_SketcherMgr::isDistanceOperation(ModuleBase_Operation* theOperation)
@@ -962,6 +1013,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   // plane filter
   if (aPln.get())
     aConnector->activateModuleSelectionModes();
+
+  myExternalPointsMgr = new PartSet_ExternalPointsMgr(myModule->workshop(), myCurrentSketch);
 }
 
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
@@ -970,6 +1023,11 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   myIsConstraintsShown[PartSet_Tools::Geometrical] = true;
   myIsConstraintsShown[PartSet_Tools::Dimensional] = true;
   myIsConstraintsShown[PartSet_Tools::Expressions] = false;
+
+  if (myExternalPointsMgr) {
+    delete myExternalPointsMgr;
+    myExternalPointsMgr = 0;
+  }
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
 
@@ -1027,7 +1085,6 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 
     Events_Loop::loop()->flush(aDispEvent);
   }
-  myModule->overconstraintListener()->setActive(false);
   // restore the module selection modes, which were changed on startSketch
   aConnector->activateModuleSelectionModes();
 }
@@ -1522,7 +1579,7 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
   if (aResults.size() > 0) {
     ResultPtr aFirstResult = theFeature->firstResult();
     if (aFirstResult.get() && aFirstResult->shape().get()) {
-      const TopoDS_Shape& aFirstShape = aFirstResult->shape()->impl<TopoDS_Shape>();
+      TopoDS_Shape aFirstShape = aFirstResult->shape()->impl<TopoDS_Shape>();
       isSameShape = aFirstShape.IsEqual(anInfo.myFirstResultShape);
     }
   }
@@ -1693,24 +1750,28 @@ void PartSet_SketcherMgr::visualizeFeature(const FeaturePtr& theFeature,
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
 
-void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
+void PartSet_SketcherMgr::storeSelection(const SelectionType theType,
+                        PartSet_SketcherMgr::FeatureToSelectionMap& theCurrentSelection)
 {
   if (!myCurrentSketch.get())
     return;
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_ISelection* aSelect = aWorkshop->selection();
-  QList<ModuleBase_ViewerPrsPtr> aStoredPrs = aSelect->getHighlighted();
+  QList<ModuleBase_ViewerPrsPtr> aStoredPrs;
+
+  if (theType == ST_HighlightType || theType == ST_SelectAndHighlightType)
+    aStoredPrs = aSelect->getHighlighted();
 
   QList<FeaturePtr> aFeatureList;
-  if (!theHighlightedOnly) {
+  if (theType == ST_SelectAndHighlightType || theType == ST_SelectType) {
     QList<ModuleBase_ViewerPrsPtr> aSelected = aSelect->getSelected(
                                                               ModuleBase_ISelection::AllControls);
     aStoredPrs.append(aSelected);
   }
 
   // 1. it is necessary to save current selection in order to restore it after the features moving
-  myCurrentSelection.clear();
+  theCurrentSelection.clear();
 
   QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = aStoredPrs.begin(),
                                                 aLast = aStoredPrs.end();
@@ -1729,12 +1790,14 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
     else
       aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
 
+    if (!aFeature.get())
+      continue;
 
     std::set<AttributePtr> aSelectedAttributes;
     std::set<ResultPtr> aSelectedResults;
     SelectionInfo anInfo;
-    if (myCurrentSelection.find(aFeature) != myCurrentSelection.end())
-      anInfo = myCurrentSelection.find(aFeature).value();
+    if (theCurrentSelection.find(aFeature) != theCurrentSelection.end())
+      anInfo = theCurrentSelection.find(aFeature).value();
 
     TopoDS_Shape aFirstShape;
     ResultPtr aFirstResult = aFeature->firstResult();
@@ -1755,25 +1818,26 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
           anInfo.myAttributes, anInfo.myResults, anInfo.myLocalSelectedShapes);
       }
     }
-    myCurrentSelection[aFeature] = anInfo;
+    theCurrentSelection[aFeature] = anInfo;
   }
-  //qDebug(QString("  storeSelection: %1").arg(myCurrentSelection.size()).toStdString().c_str());
+  //qDebug(QString("  storeSelection: %1").arg(theCurrentSelection.size()).toStdString().c_str());
 }
 
-void PartSet_SketcherMgr::restoreSelection()
+void PartSet_SketcherMgr::restoreSelection(
+                                PartSet_SketcherMgr::FeatureToSelectionMap& theCurrentSelection)
 {
   if (!myCurrentSketch.get())
     return;
 
-  //qDebug(QString("restoreSelection: %1").arg(myCurrentSelection.size()).toStdString().c_str());
+  //qDebug(QString("restoreSelection: %1").arg(theCurrentSelection.size()).toStdString().c_str());
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-  FeatureToSelectionMap::const_iterator aSIt = myCurrentSelection.begin(),
-                                        aSLast = myCurrentSelection.end();
+  FeatureToSelectionMap::const_iterator aSIt = theCurrentSelection.begin(),
+                                        aSLast = theCurrentSelection.end();
   SelectMgr_IndexedMapOfOwner anOwnersToSelect;
   anOwnersToSelect.Clear();
   for (; aSIt != aSLast; aSIt++) {
-    getSelectionOwners(aSIt.key(), myCurrentSketch, aWorkshop, myCurrentSelection,
+    getSelectionOwners(aSIt.key(), myCurrentSketch, aWorkshop, theCurrentSelection,
                        anOwnersToSelect);
   }
   aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);

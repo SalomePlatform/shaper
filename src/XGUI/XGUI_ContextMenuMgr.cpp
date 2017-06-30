@@ -1,4 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "XGUI_ContextMenuMgr.h"
 #include "XGUI_Workshop.h"
@@ -238,8 +256,9 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     bool hasFeature = false;
     bool hasParameter = false;
     bool hasCompositeOwner = false;
+    bool hasResultInHistory = false;
     ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter,
-                                   hasCompositeOwner);
+                                   hasCompositeOwner, hasResultInHistory);
     //Process Feature
     if (aSelected == 1) {
       ObjectPtr aObject = aObjects.first();
@@ -306,7 +325,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
       action("CLEAN_HISTORY_CMD")->setEnabled(true);
 
     action("SHOW_RESULTS_CMD")->setEnabled(hasFeature);
-    action("SHOW_FEATURE_CMD")->setEnabled(hasResult);
+    action("SHOW_FEATURE_CMD")->setEnabled(hasResult && hasResultInHistory);
   }
 
   // Show/Hide command has to be disabled for objects from non active document
@@ -386,8 +405,13 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
     } else
       action("SHOW_CMD")->setEnabled(true);
   }
+  //issue #2159 Hide all incomplete behavior
+#ifdef HAVE_SALOME
+    action("HIDEALL_CMD")->setEnabled(true);
+#else
   if (myWorkshop->displayer()->objectsCount() > 0)
     action("HIDEALL_CMD")->setEnabled(true);
+#endif
 
   // Update selection menu
   QIntList aModes = aDisplayer->activeSelectionModes();
@@ -678,7 +702,7 @@ QStringList XGUI_ContextMenuMgr::actionObjectGroups(const QString& theName)
 void XGUI_ContextMenuMgr::onRename()
 {
   QObjectPtrList anObjects = myWorkshop->selector()->selection()->selectedObjects();
-  if (!myWorkshop->abortAllOperations())
+  if (!myWorkshop->operationMgr()->abortAllOperations())
     return;
   // restore selection in case if dialog box was shown
   myWorkshop->objectBrowser()->setObjectsSelected(anObjects);

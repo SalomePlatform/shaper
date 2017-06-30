@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        ModuleBase_ModelWidget.h
-// Created:     25 Apr 2014
-// Author:      Natalia ERMOLAEVA
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef MODULEBASE_MODELWIDGET_H
 #define MODULEBASE_MODELWIDGET_H
@@ -17,6 +31,7 @@
 
 class Config_WidgetAPI;
 class Events_InfoMessage;
+class ModuleBase_IPropertyPanel;
 class ModuleBase_IWorkshop;
 class ModuleBase_ViewerPrs;
 class ModuleBase_WidgetValidator;
@@ -242,6 +257,15 @@ Q_OBJECT
   /// Translate passed string with widget context()
   virtual QString translate(const std::string& theStr) const;
 
+  /// Emit focus in widget to set this control as active in propety panel
+  void emitFocusInWidget() { emit focusInWidget(this); }
+
+  /// Finds model widget parent of the given sub widget
+  /// \param theWidget a candidate to be a child of the model widget
+  /// \param theProp a property panel instance
+  /// \return a model widget or NULL
+  static ModuleBase_ModelWidget* findModelWidget(ModuleBase_IPropertyPanel* theProp,
+                                                 QWidget* theWidget);
 signals:
   /// The signal about widget values are to be changed
   void beforeValuesChanged();

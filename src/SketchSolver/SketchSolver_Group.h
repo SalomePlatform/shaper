@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:    SketchSolver_Group.h
-// Created: 27 May 2014
-// Author:  Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef SketchSolver_Group_H_
 #define SketchSolver_Group_H_
@@ -16,6 +30,8 @@
 
 #include <memory>
 #include <map>
+
+class GeomAPI_Pnt2d;
 
 typedef std::map<ConstraintPtr, SolverConstraintPtr> ConstraintConstraintMap;
 
@@ -58,11 +74,25 @@ class SketchSolver_Group
   bool updateFeature(FeaturePtr theFeature);
 
   /** \brief Updates the data corresponding the specified feature moved in GUI.
-   *         Additional Fixed constraints are created.
+   *         Special kind of Fixed constraints is created.
    *  \param[in] theFeature the feature to be updated
-   *  \return \c true, if the feature is moved
+   *  \param[in] theFrom    start point of the movement
+   *  \param[in] theTo      final point of the movement
+   *  \return \c true, if the feature is really moved
    */
-  bool moveFeature(FeaturePtr theFeature);
+  bool moveFeature(FeaturePtr theFeature,
+                   const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
+                   const std::shared_ptr<GeomAPI_Pnt2d>& theTo);
+  /** \brief Updates the data corresponding the specified point moved in GUI.
+   *         Special kind of Fixed constraints is created.
+   *  \param[in] thePoint the attribute to be updated
+   *  \param[in] theFrom  start point of the movement
+   *  \param[in] theTo    final point of the movement
+   *  \return \c true, if the attribute is really moved
+   */
+  bool movePoint(AttributePtr thePoint,
+                 const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
+                 const std::shared_ptr<GeomAPI_Pnt2d>& theTo);
 
   /// Returns the current workplane
   inline const CompositeFeaturePtr& getWorkplane() const

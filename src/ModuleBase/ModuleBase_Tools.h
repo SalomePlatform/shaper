@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        ModuleBase_Tools.h
-// Created:     11 July 2014
-// Author:      Vitaly Smetannikov
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef ModuleBase_Tools_H
 #define ModuleBase_Tools_H
@@ -132,6 +146,11 @@ MODULEBASE_EXPORT QAction* createAction(const QIcon& theIcon, const QString& the
                                         const QString& theStatusTip = QString());
 
 #ifdef _DEBUG
+/// Returns name of data of the object if it is not NULL
+/// \param theObj an object
+/// \return a string
+MODULEBASE_EXPORT QString objectName(const ObjectPtr& theObj);
+
 /// Converts the object to the feature or a result and generate information string
 /// \param theObj an object
 /// \param isUseAttributesInfo a flag whether the attribute values information is used
@@ -156,8 +175,10 @@ MODULEBASE_EXPORT bool isSubResult(ObjectPtr theObject);
 /// \param hasFeature will be set to true if list contains Feature objects
 /// \param hasParameter will be set to true if list contains Parameter objects
 /// \param hasCompositeOwner will be set to true if list contains Sub-Feature objects
+/// \param hasResultInHistory will be set to true if one of result is in history
 MODULEBASE_EXPORT void checkObjects(const QObjectPtrList& theObjects, bool& hasResult,
-                           bool& hasFeature, bool& hasParameter, bool& hasCompositeOwner);
+                           bool& hasFeature, bool& hasParameter, bool& hasCompositeOwner,
+                           bool& hasResultInHistory);
 
 /// Sets the default coeffient into the driver calculated accordingly the shape type.
 /// It provides 1.e-4 for results of construction type

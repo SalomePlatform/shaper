@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:    PlaneGCSSolver_Defs.h
-// Created: 14 Dec 2015
-// Author:  Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef PlaneGCSSolver_Defs_H_
 #define PlaneGCSSolver_Defs_H_
@@ -26,6 +40,7 @@ typedef int ConstraintID;
 // Predefined values for identifiers
 const ConstraintID CID_UNKNOWN  =  0;
 const ConstraintID CID_MOVEMENT = -1;
+const ConstraintID CID_FICTIVE = 1024;
 
 /// Types of entities
 enum SketchSolver_EntityType {
@@ -49,6 +64,8 @@ enum SketchSolver_ConstraintType {
   CONSTRAINT_DISTANCE,         // base distance if we don't know the measured objects yet
   CONSTRAINT_PT_PT_DISTANCE,
   CONSTRAINT_PT_LINE_DISTANCE,
+  CONSTRAINT_HORIZONTAL_DISTANCE,
+  CONSTRAINT_VERTICAL_DISTANCE,
   CONSTRAINT_RADIUS,
   CONSTRAINT_ANGLE,
   CONSTRAINT_FIXED,

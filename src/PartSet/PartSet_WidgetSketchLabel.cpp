@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        PartSet_WidgetSketchLabel.cpp
-// Created:     07 July 2014
-// Author:      Vitaly SMETANNIKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "PartSet_WidgetSketchLabel.h"
 #include "PartSet_Tools.h"
@@ -34,6 +48,8 @@
 #include <GeomDataAPI_Dir.h>
 #include <GeomAPI_XYZ.h>
 #include <GeomAPI_Face.h>
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <SketchPlugin_Sketch.h>
 #include <SketcherPrs_Tools.h>
@@ -348,7 +364,9 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
 
   // 6. Update sketcher actions
   XGUI_ActionsMgr* anActMgr = aWorkshop->actionsMgr();
+
   myWorkshop->updateCommandStatus();
+  aWorkshop->selector()->clearSelection();
   myWorkshop->viewer()->update();
 }
 
@@ -524,6 +542,9 @@ void PartSet_WidgetSketchLabel::activateSelection(bool toActivate)
     QIntList aModes;
     std::shared_ptr<GeomAPI_Pln> aPlane = plane();
     if (aPlane.get()) {
+      //QList<std::shared_ptr<ModuleBase_ViewerPrs>> aEdges = findCircularEdgesInPlane();
+      //foreach(std::shared_ptr<ModuleBase_ViewerPrs> aPrs, aEdges) {
+      //}
       myWorkshop->module()->activeSelectionModes(aModes);
     }
     else {
@@ -570,7 +591,7 @@ std::shared_ptr<GeomAPI_Dir>
   std::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
   // X axis is preferable to be dirX on the sketch
   const double tol = Precision::Confusion();
-  bool isX = fabs(anA - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
+  bool isX = fabs(fabs(anA) - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
   std::shared_ptr<GeomAPI_Dir> aTempDir(
       isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
   std::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
@@ -602,4 +623,48 @@ void PartSet_WidgetSketchLabel::onSetPlaneView()
     if (aModule)
       aModule->onViewTransformed();
   }
+}
+
+
+//******************************************************
+QList<std::shared_ptr<ModuleBase_ViewerPrs>> PartSet_WidgetSketchLabel::findCircularEdgesInPlane()
+{
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> aResult;
+  XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
+  XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+  QObjectPtrList aDispObjects = aDisplayer->displayedObjects();
+
+  std::shared_ptr<GeomAPI_Pln> aPlane = plane();
+  foreach(ObjectPtr aObj, aDispObjects) {
+    ResultPtr aResObj = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    if (aResObj.get()) {
+      GeomShapePtr aShape = aResObj->shape();
+      if (aShape.get()) {
+        GeomAPI_ShapeExplorer aExplorer(aShape, GeomAPI_Shape::EDGE);
+        for(; aExplorer.more(); aExplorer.next()) {
+          GeomShapePtr aEdgeShape = aExplorer.current();
+          GeomAPI_Edge anEdge(aEdgeShape);
+          if ((anEdge.isCircle() || anEdge.isArc() || anEdge.isEllipse()) &&
+               anEdge.isInPlane(aPlane)) {
+            bool isContains = false;
+            // Check that edge is not used.
+            // It is possible that the same edge will be taken from different faces
+            foreach(std::shared_ptr<ModuleBase_ViewerPrs> aPrs, aResult) {
+              GeomAPI_Edge aUsedEdge(aPrs->shape());
+              if (aUsedEdge.isEqual(aEdgeShape)) {
+                isContains = true;
+                break;
+              }
+            }
+            if (!isContains) {
+              std::shared_ptr<ModuleBase_ViewerPrs>
+                aPrs(new ModuleBase_ViewerPrs(aResObj, aEdgeShape));
+              aResult.append(aPrs);
+            }
+          }
+        }
+      }
+    }
+  }
+  return aResult;
 }

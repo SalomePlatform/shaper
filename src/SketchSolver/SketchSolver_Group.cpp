@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:    SketchSolver_Group.cpp
-// Created: 27 May 2014
-// Author:  Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "SketchSolver_Group.h"
 #include <SketchSolver_Error.h>
@@ -56,7 +70,7 @@ static void sendMessage(const char* theMessageName,
 
 
 // ========================================================
-// =========  SketchSolver_Group  ===============
+// =========       SketchSolver_Group       ===============
 // ========================================================
 
 SketchSolver_Group::SketchSolver_Group(const CompositeFeaturePtr& theWorkplane)
@@ -115,25 +129,56 @@ bool SketchSolver_Group::updateFeature(FeaturePtr theFeature)
   return myStorage->update(theFeature);
 }
 
-bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
+template <class Type>
+static SolverConstraintPtr move(StoragePtr theStorage,
+                                SolverPtr theSketchSolver,
+                                int theSketchDOF,
+                                bool theEventsBlocked,
+                                Type theFeatureOrPoint,
+                                const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
+                                const std::shared_ptr<GeomAPI_Pnt2d>& theTo)
 {
-  bool isFeatureExists = (myStorage->entity(theFeature).get() != 0);
-  if (myDOF == 0 && isFeatureExists) {
+  bool isEntityExists = (theStorage->entity(theFeatureOrPoint).get() != 0);
+  if (theSketchDOF == 0 && isEntityExists) {
     // avoid moving elements of fully constrained sketch
-    myStorage->refresh();
-    return true;
+    theStorage->refresh();
+    return SolverConstraintPtr();
   }
 
   // Create temporary Fixed constraint
-  SolverConstraintPtr aConstraint = PlaneGCSSolver_Tools::createMovementConstraint(theFeature);
-  if (!aConstraint)
-    return false;
-  aConstraint->process(myStorage, myIsEventsBlocked);
-  if (aConstraint->error().empty())
-    setTemporary(aConstraint);
-  else
-    myStorage->notify(theFeature);
+  std::shared_ptr<SketchSolver_ConstraintMovement> aConstraint =
+      PlaneGCSSolver_Tools::createMovementConstraint(theFeatureOrPoint);
+  if (aConstraint) {
+    SolverConstraintPtr(aConstraint)->process(theStorage, theEventsBlocked);
+    if (aConstraint->error().empty()) {
+      aConstraint->startPoint(theFrom);
+      theSketchSolver->initialize();
+      aConstraint->moveTo(theTo);
+      theStorage->setNeedToResolve(true);
+    } else
+      theStorage->notify(aConstraint->movedFeature());
+  }
 
+  return aConstraint;
+}
+
+bool SketchSolver_Group::moveFeature(FeaturePtr theFeature,
+                                     const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
+                                     const std::shared_ptr<GeomAPI_Pnt2d>& theTo)
+{
+  SolverConstraintPtr aConstraint =
+      move(myStorage, mySketchSolver, myDOF, myIsEventsBlocked, theFeature, theFrom, theTo);
+  setTemporary(aConstraint);
+  return true;
+}
+
+bool SketchSolver_Group::movePoint(AttributePtr theAttribute,
+                                   const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
+                                   const std::shared_ptr<GeomAPI_Pnt2d>& theTo)
+{
+  SolverConstraintPtr aConstraint =
+      move(myStorage, mySketchSolver, myDOF, myIsEventsBlocked, theAttribute, theFrom, theTo);
+  setTemporary(aConstraint);
   return true;
 }
 
@@ -141,7 +186,6 @@ bool SketchSolver_Group::moveFeature(FeaturePtr theFeature)
 //  Function: resolveConstraints
 //  Class:    SketchSolver_Group
 //  Purpose:  solve the set of constraints for the current group
-#include <iostream>
 // ============================================================================
 bool SketchSolver_Group::resolveConstraints()
 {
@@ -167,6 +211,12 @@ bool SketchSolver_Group::resolveConstraints()
     try {
       if (!isGroupEmpty)
         aResult = mySketchSolver->solve();
+      if (aResult == PlaneGCSSolver_Solver::STATUS_FAILED &&
+          !myTempConstraints.empty()) {
+        mySketchSolver->undo();
+        removeTemporaryConstraints();
+        aResult = mySketchSolver->solve();
+      }
     } catch (...) {
       getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())
         ->setValue(SketchSolver_Error::SOLVESPACE_CRASH());
@@ -346,7 +396,8 @@ void SketchSolver_Group::removeConstraint(ConstraintPtr theConstraint)
 // ============================================================================
 void SketchSolver_Group::setTemporary(SolverConstraintPtr theConstraint)
 {
-  myTempConstraints.insert(theConstraint);
+  if (theConstraint)
+    myTempConstraints.insert(theConstraint);
 }
 
 // ============================================================================

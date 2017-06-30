@@ -1,8 +1,22 @@
-// Copyright (C) 2017-20xx CEA/DEN, EDF R&D
-
-// File:    PlaneGCSSolver_UpdateCoincidence.h
-// Created: 17 Feb 2017
-// Author:  Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef PlaneGCSSolver_UpdateCoincidence_H_
 #define PlaneGCSSolver_UpdateCoincidence_H_
@@ -43,9 +57,9 @@ public:
   /// \brief Send notification about update of the feature to all interested
   virtual void update(const FeaturePtr& theFeature);
 
-  /// \brief Verifies the entities are not coincident yet
-  /// \return \c true if the entities does not coincident
-  bool checkCoincidence(const EntityWrapperPtr& theEntity1, const EntityWrapperPtr& theEntity2);
+  /// \brief Set coincidence between two given entities
+  /// \return \c true if the entities does not coincident yet
+  bool addCoincidence(const EntityWrapperPtr& theEntity1, const EntityWrapperPtr& theEntity2);
 
   /// \brief Verifies the point is coincident to the feature
   /// \return \c true if the point is on the feature
@@ -63,21 +77,34 @@ private:
     bool isExist(const EntityWrapperPtr& theEntity) const;
     /// Verify the point is already in the list
     bool isExist(const GCS::Point& thePoint) const;
-    /// Check the coincidence is not in list yet
-    bool isNewCoincidence(const EntityWrapperPtr& theEntityExist,
-                          const EntityWrapperPtr& theOtherEntity);
-    bool isNewCoincidence(const EntityWrapperPtr& theEntityExist,
-                          const CoincidentEntities& theOtherGroup,
-                          const EntityWrapperPtr& theEntityInOtherGroup);
+
+    /// Add entity to group
+    bool add(const EntityWrapperPtr& theEntity);
+
+    /// Remove entity from group
+    void remove(const EntityWrapperPtr& theEntity);
+
+    /// Merge two groups
+    void merge(const CoincidentEntities& theOther);
+
+    /// Returns any of external points
+    EntityWrapperPtr externalPoint() const;
 
   private:
-    bool hasExternal() const;
-
-  private:
-    /// external entity and set of entities connected to it
-    std::map<EntityWrapperPtr, std::set<EntityWrapperPtr> > myExternalAndConnected;
+    std::set<EntityWrapperPtr> myPoints; ///< coincident points
+    std::set<EntityWrapperPtr> myExternalPoints; //< external points coincident to other points
+    std::set<EntityWrapperPtr> myFeatures; ///< other entities containing points
   };
 
+  /// \brief Search the group of coincidences containing given entity.
+  ///        Searches points only.
+  std::list<CoincidentEntities>::iterator findGroupOfCoincidence(const EntityWrapperPtr& theEntity);
+
+  /// \brief Add entity to group of coincidences
+  /// \reutrn \c true if the entity is added, thus the coincidence is new
+  bool addToGroupOfCoincidence(CoincidentEntities& theGroup, const EntityWrapperPtr& theEntity);
+
+private:
   std::list<CoincidentEntities> myCoincident; ///< list of coincidences
 };
 

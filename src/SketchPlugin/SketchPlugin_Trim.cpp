@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
-// File:    SketchPlugin_Trim.cpp
-// Created: 22 Feb 2017
-// Author:  Natalia ERMOLAEVA
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "SketchPlugin_Trim.h"
 
@@ -75,8 +89,7 @@ SketchPlugin_Trim::SketchPlugin_Trim()
 
 void SketchPlugin_Trim::initAttributes()
 {
-  data()->addAttribute(SketchPlugin_Trim::SELECTED_OBJECT(),
-                       ModelAPI_AttributeReference::typeId());
+  data()->addAttribute(SELECTED_OBJECT(), ModelAPI_AttributeReference::typeId());
   data()->addAttribute(SELECTED_POINT(), GeomDataAPI_Point2D::typeId());
 
   data()->addAttribute(PREVIEW_POINT(), GeomDataAPI_Point2D::typeId());
@@ -232,10 +245,10 @@ void SketchPlugin_Trim::execute()
 
   std::shared_ptr<GeomAPI_Pnt2d> aStartShapePoint2d = convertPoint(aStartShapePoint);
   std::shared_ptr<GeomAPI_Pnt2d> aLastShapePoint2d = convertPoint(aLastShapePoint);
-
-  std::set<FeaturePtr> aFeaturesToDelete;
-  getConstraints(aFeaturesToDelete);
-
+  /// find features that should be deleted (e.g. Middle Point) or updated (e.g. Length)
+  std::set<FeaturePtr> aFeaturesToDelete, aFeaturesToUpdate;
+  getConstraints(aFeaturesToDelete, aFeaturesToUpdate);
+  // find references(attributes and features) to the base feature
   std::map<AttributePtr, std::list<AttributePtr> > aBaseRefAttributes;
   std::list<AttributePtr> aRefsToFeature;
   getRefAttributes(aBaseFeature, aBaseRefAttributes, aRefsToFeature);
@@ -281,12 +294,6 @@ void SketchPlugin_Trim::execute()
   std::cout << "[" << aRefsToFeature.size() << "] " << aRefsInfo << std::endl;
   std::cout << "---- getRefAttributes:end ----" << std::endl;
 #endif
-  // coincidence to result points
-  // find coincidences to the base object, it should be used when attribute is found
-  // in myObjectToPoints
-  //std::map<AttributePtr, FeaturePtr> aCoincidencesToBaseFeature;
-  //getCoincidencesToObject(aBaseObject, aCoincidencesToBaseFeature);
-
   std::set<AttributePoint2DPtr> aFurtherCoincidences;
   std::set<std::pair<AttributePtr, AttributePtr>> aModifiedAttributes;
   const std::string& aKind = aBaseFeature->getKind();
@@ -371,10 +378,11 @@ void SketchPlugin_Trim::execute()
       anIt != aLast; anIt++) {
     AttributePtr anAttribute = *anIt;
 
-    //if (replaceCoincidenceAttribute(anAttribute, aModifiedAttributes))
-    //  continue;
-
     if (setCoincidenceToAttribute(anAttribute, aFurtherCoincidences))
+      continue;
+
+    // move tangency constraint to the nearest feature if possible
+    if (aNewFeature.get() && moveTangency(anAttribute, aNewFeature))
       continue;
 
     if (aReplacingResult.get()) {
@@ -414,6 +422,8 @@ void SketchPlugin_Trim::execute()
   ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToDelete);
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 
+  updateFeaturesAfterTrim(aFeaturesToUpdate);
+
   // Send events to update the sub-features by the solver.
   if(isUpdateFlushed) {
     Events_Loop::loop()->setFlushed(anUpdateEvent, true);
@@ -425,23 +435,12 @@ void SketchPlugin_Trim::execute()
     if (aReplacingResult.get()) { // base object was removed
       aPreviewObject = aReplacingResult;
       //aMessage->setSelectedObject(aReplacingResult);
-
-      GeomShapePtr aSelectedShape = aReplacingResult->shape();
-      std::shared_ptr<GeomAPI_Pnt> aPreviewPnt = sketch()->to3D(aPreviewPnt2d->x(),
-                                                                aPreviewPnt2d->y());
-      std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
-      if (ModelGeomAlgo_Point2D::isPointOnEdge(aSelectedShape, aPreviewPnt, aProjectedPoint)) {
-        bool aValue = true;
-      }
-      //aBaseShape = aShape;
-
 #ifdef DEBUG_TRIM_METHODS
       if (!aSelectedShape.get())
         std::cout << "Set empty selected object" << std::endl;
       else
         std::cout << "Set shape with ShapeType: " << aSelectedShape->shapeTypeStr() << std::endl;
 #endif
-      bool aValue = true;
     }
     else {
       aPreviewObject = ObjectPtr();
@@ -562,39 +561,55 @@ bool SketchPlugin_Trim::setCoincidenceToAttribute(const AttributePtr& theAttribu
   return aFoundPoint;
 }
 
-bool SketchPlugin_Trim::replaceCoincidenceAttribute(const AttributePtr& theCoincidenceAttribute,
-                   const std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes)
+bool SketchPlugin_Trim::moveTangency(const AttributePtr& theAttribute,
+                                     const FeaturePtr& theFeature)
 {
-  FeaturePtr aCoincidenceFeature = ModelAPI_Feature::feature(theCoincidenceAttribute->owner());
-  if (aCoincidenceFeature->getKind() != SketchPlugin_ConstraintCoincidence::ID())
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+  if (aFeature->getKind() != SketchPlugin_ConstraintTangent::ID())
     return false;
 
-  AttributeRefAttrPtr aCAttrA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                         aCoincidenceFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  AttributeRefAttrPtr aCAttrB = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                         aCoincidenceFeature->attribute(SketchPlugin_Constraint::ENTITY_B()));
-  AttributePtr aCAttrRefA = aCAttrA->attr();
-  AttributePtr aCAttrRefB = aCAttrB->attr();
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                                                                           theAttribute);
+  if (!aRefAttr.get())
+    return false;
 
-  bool isProcessed = false;
-  for (std::set<std::pair<AttributePtr, AttributePtr>>::const_iterator
-       anIt = theModifiedAttributes.begin(); anIt != theModifiedAttributes.end(); anIt++) {
-    AttributePtr anAttributeBefore = anIt->first;
-    if (anAttributeBefore == aCAttrRefA) {
-      aCAttrA->setAttr(anIt->second);
-      isProcessed = true;
-    }
-    if (anAttributeBefore == aCAttrRefB) {
-      aCAttrB->setAttr(anIt->second);
-      isProcessed = true;
+  // get shape of tangent object to the current
+  std::string aTangentAttr = SketchPlugin_Constraint::ENTITY_A();
+  if (aRefAttr->id() == SketchPlugin_Constraint::ENTITY_A())
+    aTangentAttr = SketchPlugin_Constraint::ENTITY_B();
+  AttributeRefAttrPtr aTangentRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                                                     aFeature->attribute(aTangentAttr));
+  FeaturePtr aTangentFeature = ModelAPI_Feature::feature(aTangentRefAttr->object());
+
+  // get shape of the feature of the attribute
+  FeaturePtr anAttributeFeature = ModelAPI_Feature::feature(aRefAttr->object());
+  anAttributeFeature->execute(); // the modified value should be applyed to recompute shape
+  PointToRefsMap aPointToAttributeOrObject;
+  std::list<FeaturePtr> aFeatures;
+  aFeatures.push_back(anAttributeFeature);
+  ModelGeomAlgo_Point2D::getPointsIntersectedShape(aTangentFeature, aFeatures,
+                                                   aPointToAttributeOrObject);
+  if (!aPointToAttributeOrObject.empty())
+    return true; // the attribute feature has a point of intersection, so we do not replace it
+
+  // get shape of the feature
+  aPointToAttributeOrObject.clear();
+  aFeatures.clear();
+  aFeatures.push_back(theFeature);
+  ModelGeomAlgo_Point2D::getPointsIntersectedShape(aTangentFeature, aFeatures,
+                                                   aPointToAttributeOrObject);
+  if (!aPointToAttributeOrObject.empty()) {
+    std::set<ResultPtr> anEdgeShapes;
+    ModelGeomAlgo_Shape::shapesOfType(theFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
+    if (!anEdgeShapes.empty()) {
+      ResultPtr aResult = *anEdgeShapes.begin();
+      if (aResult.get()) {
+        aRefAttr->setObject(aResult);
+        return true; // the attribute feature has a point of intersection, so we do not replace it
+      }
     }
   }
-  return isProcessed;
-}
-
-bool SketchPlugin_Trim::isMacro() const
-{
-  return true;
+  return false;
 }
 
 AISObjectPtr SketchPlugin_Trim::getAISObject(AISObjectPtr thePrevious)
@@ -653,9 +668,9 @@ GeomShapePtr SketchPlugin_Trim::getSubShape(const std::string& theObjectAttribut
     return aBaseShape;
 
   // point on feature
-  AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                                            data()->attribute(thePointAttributeId));
-  std::shared_ptr<GeomAPI_Pnt2d> anAttributePnt2d = aPoint->pnt();
+  std::shared_ptr<GeomAPI_Pnt2d> anAttributePnt2d = aPointAttr->pnt();
   std::shared_ptr<GeomAPI_Pnt> anAttributePnt = sketch()->to3D(anAttributePnt2d->x(),
                                                                anAttributePnt2d->y());
 
@@ -697,7 +712,8 @@ void SketchPlugin_Trim::getFeaturePoints(const FeaturePtr& theFeature,
   }
 }
 
-void SketchPlugin_Trim::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete)
+void SketchPlugin_Trim::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete,
+                                       std::set<FeaturePtr>& theFeaturesToUpdate)
 {
   std::shared_ptr<ModelAPI_Data> aData = data();
 
@@ -713,14 +729,20 @@ void SketchPlugin_Trim::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete
 
   std::set<AttributePtr>::const_iterator aIt;
   for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
-    std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
-    FeaturePtr aRefFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+    std::shared_ptr<ModelAPI_Attribute> anAttr = (*aIt);
+    FeaturePtr aRefFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->owner());
     std::string aRefFeatureKind = aRefFeature->getKind();
-    if (aRefFeatureKind == SketchPlugin_ConstraintMirror::ID() ||
-        aRefFeatureKind == SketchPlugin_MultiRotation::ID() ||
-        aRefFeatureKind == SketchPlugin_MultiTranslation::ID() ||
+    std::string anAttributeId = anAttr->id();
+    if ((aRefFeatureKind == SketchPlugin_ConstraintMirror::ID() &&
+         anAttributeId == SketchPlugin_ConstraintMirror::MIRROR_LIST_ID()) ||
+        (aRefFeatureKind == SketchPlugin_MultiRotation::ID() &&
+         anAttributeId == SketchPlugin_MultiRotation::ROTATION_LIST_ID()) ||
+        (aRefFeatureKind == SketchPlugin_MultiTranslation::ID() &&
+         anAttributeId == SketchPlugin_MultiTranslation::TRANSLATION_LIST_ID()) ||
         aRefFeatureKind == SketchPlugin_ConstraintMiddle::ID())
       theFeaturesToDelete.insert(aRefFeature);
+    else if (aRefFeatureKind == SketchPlugin_ConstraintLength::ID())
+      theFeaturesToUpdate.insert(aRefFeature);
   }
 }
 
@@ -769,44 +791,6 @@ void SketchPlugin_Trim::getRefAttributes(const FeaturePtr& theFeature,
     }
   }
 }
-
-/*void SketchPlugin_Trim::getCoincidencesToObject(const ObjectPtr& theObject,
-                   std::map<AttributePtr, FeaturePtr>& theCoincidencesToBaseFeature)
-{
-  const std::set<AttributePtr>& aRefsList = theObject->data()->refsToMe();
-  std::set<AttributePtr>::const_iterator aIt;
-  for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
-    std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
-    FeaturePtr aRefFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
-    if (aRefFeature->getKind() != SketchPlugin_ConstraintCoincidence::ID())
-      continue;
-    AttributePtr anAttribute;
-    AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
-                                  (aRefFeature->attribute(SketchPlugin_Constraint::ENTITY_A()));
-    if (aRefAttr->isObject() && aRefAttr->object() == theObject)
-    {
-      anAttribute = aRefFeature->attribute(SketchPlugin_Constraint::ENTITY_B());
-    }
-    else {
-      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
-                                    (aRefFeature->attribute(SketchPlugin_Constraint::ENTITY_B()));
-      if (aRefAttr->isObject() && aRefAttr->object() == theObject)
-        anAttribute = aRefFeature->attribute(SketchPlugin_Constraint::ENTITY_A());
-    }
-    if (!anAttribute.get())
-      continue;
-
-    aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttribute);
-    if (aRefAttr->isObject())
-      continue; // one of attributes of coincidence contains link to an attribute
-
-    anAttribute = aRefAttr->attr();
-    if (anAttribute.get())
-    {
-      theCoincidencesToBaseFeature[anAttribute] = aRefFeature;
-    }
-  }
-}*/
 
 void SketchPlugin_Trim::updateRefAttConstraints(
                     const std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
@@ -875,6 +859,27 @@ void SketchPlugin_Trim::removeReferencesToAttribute(const AttributePtr& theAttri
 #endif
   ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToDelete);
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+}
+
+void SketchPlugin_Trim::updateFeaturesAfterTrim(const std::set<FeaturePtr>& theFeaturesToUpdate)
+{
+  std::set<FeaturePtr>::const_iterator anIt = theFeaturesToUpdate.begin(),
+                                       aLast = theFeaturesToUpdate.end();
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aRefFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
+    std::string aRefFeatureKind = aRefFeature->getKind();
+    if (aRefFeatureKind == SketchPlugin_ConstraintLength::ID()) {
+      std::shared_ptr<SketchPlugin_ConstraintLength> aLenghtFeature =
+                              std::dynamic_pointer_cast<SketchPlugin_ConstraintLength>(*anIt);
+      if (aLenghtFeature.get()) {
+        std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
+            ModelAPI_AttributeDouble>(aLenghtFeature->attribute(SketchPlugin_Constraint::VALUE()));
+        double aValue;
+        if (aLenghtFeature->computeLenghtValue(aValue) && aValueAttr.get())
+          aValueAttr->setValue(aValue);
+      }
+    }
+  }
 }
 
 FeaturePtr SketchPlugin_Trim::trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
@@ -1394,7 +1399,6 @@ void SketchPlugin_Trim::fillObjectShapes(const ObjectPtr& theObject,
     ModelGeomAlgo_Point2D::getPointsOfReference(aFeature, SketchPlugin_ConstraintCoincidence::ID(),
                          aRefAttributes, SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
     // layed on feature coincidences to divide it on several shapes
-    //SketchPlugin_Sketch* aSketch = sketch();
     std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
     std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
         aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));

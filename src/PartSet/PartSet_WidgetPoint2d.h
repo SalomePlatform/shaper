@@ -1,8 +1,22 @@
-﻿// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        PartSet_WidgetPoint2d.h
-// Created:     25 Apr 2014
-// Author:      Natalia ERMOLAEVA
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef PartSet_WidgetPoint2D_H
 #define PartSet_WidgetPoint2D_H
@@ -25,6 +39,7 @@ class ModuleBase_IWorkshop;
 class ModuleBase_ParamSpinBox;
 class ModuleBase_IViewWindow;
 class ModuleBase_LabelValue;
+class PartSet_ExternalObjectsMgr;
 class GeomAPI_Pnt2d;
 class ModuleBase_IWorkshop;
 
@@ -131,6 +146,14 @@ Q_OBJECT
                                ModuleBase_IViewWindow* theWnd,
                                QMouseEvent* theEvent);
 
+  /// Return an object and geom shape by the viewer presentation
+  /// \param thePrs a selection
+  /// \param theObject an output object
+  /// \param theShape a shape of the selection
+  void getGeomSelection_(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue,
+                         std::shared_ptr<ModelAPI_Object>& theObject,
+                         std::shared_ptr<GeomAPI_Shape>& theShape);
+
 signals:
   /// Signal about selection of an existing vertex from an object
   void vertexSelected();
@@ -191,7 +214,8 @@ protected:
    /// Creates constrains of the clicked point
    /// \param theClickedX the horizontal coordnate of the point
    /// \param theClickedY the vertical coordnate of the point
-   bool setConstraintToPoint(double theClickedX, double theClickedY);
+   bool setConstraintToPoint(double theClickedX, double theClickedY,
+                             const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
 
    /// Create a coincidence constraint between the attribute and the parameter object
    /// \theObject a result object
@@ -249,8 +273,12 @@ protected:
   /// Finds first equal point attribute in sketch and set it to reference attribute
   /// \param theClickedX the horizontal coordnate of the point
   /// \param theClickedY the vertical coordnate of the point
-  void fillRefAttribute(double theClickedX, double theClickedY);
+  void fillRefAttribute(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
+  void fillRefAttribute(double theClickedX, double theClickedY,
+                        const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
   void fillRefAttribute(const ObjectPtr& theObject);
+
+  ObjectPtr getGeomSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
 
 protected:
   ModuleBase_IWorkshop* myWorkshop; ///< workshop
@@ -261,6 +289,7 @@ private:
   //ModuleBase_ParamSpinBox* myYSpin;  ///< the spin box for the Y coordinate
   ModuleBase_LabelValue* myXSpin; ///< the label for the X coordinate
   ModuleBase_LabelValue* myYSpin; ///< the label for the Y coordinate
+  PartSet_ExternalObjectsMgr* myExternalObjectMgr; ///< reference to external objects manager
 
   /// value used as selection in mouse release method
   std::shared_ptr<ModuleBase_ViewerPrs> myPreSelected;

@@ -1,12 +1,32 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 def sketch():
     #[step] Click 'Create sketch' toolbar button
     #[step] Select XY plane for sketching
     #[step] Sketch - Point
-    #[step] Create point via clicking inside viewer 
+    #[step] Create point via clicking inside viewer
     point_create_in_view((329, 255))
     #[step] Check 'Auxiliary' check-box
     #[step] Create point via clicking inside viewer
-    point_create_in_view((429, 300), 1) 
+    point_create_in_view((429, 300), 1)
     #[step] Finish creation of points via viewer
     #[step] Create point via direct input of coordinates. Use coordinates (50, 60)
     point_create((50, 60))
@@ -37,7 +57,7 @@ def sketch():
     #[step] Check 'Auxiliary' check-box
     #[step] Create circle via clicking inside viewer
     circle_create_in_view((400, 200), (300, 100), 1)
-    #[step] Finish creation of circles    
+    #[step] Finish creation of circles
     #[step] Sketch - Arc
     #[step] Create arc via direct input of coordinates. Use coordinates (0, 0) for center, (100, 50) - for start point and (80, 90) - for end point
     arc_create((0, 0), (100, 50), (80, 90))
@@ -54,35 +74,35 @@ def sketch():
     #[check] All objects have been created. Check that objects of both types are shown (main and auxiliary)
     test.vp("VP1")
     #[step] Finish sketching
-    
-    
+
+
 def main():
     source(findFile("scripts", "common.py"))
-    
+
     # [project] SHAPER
     # [Scenario] Sketch_001
     #[Topic] Creation of objects in sketch
-    #[Tested functionality] Creation of objects during sketching by 2 ways: direct input of coordinates and clicking in viewer. Creation of auxiliary objects 
+    #[Tested functionality] Creation of objects during sketching by 2 ways: direct input of coordinates and clicking in viewer. Creation of auxiliary objects
     #[Summary description]
-    #[Expected results] 
-    
+    #[Expected results]
+
     #[section] Application start
     #[step] Launch SALOME
     startApplication("salome_run.sh")
 
     set_defaults()
-    
+
     #[step] Activate SHAPER
     #[step]Click 'New' button
     activate_SHAPER()
-    
+
     #[section] Creation of sketch and objects inside it
     #[step] Part - New part
     part_create()
     # clickButton(waitForObject(":Arc.Auxiliary_QCheckBox"))
 
     sketch_create(help_points("XY_plane"), lambda: sketch())
-    #[check] Check that only main objects are shown 
+    #[check] Check that only main objects are shown
     test.vp("VP2")
     #[step] Close application without saving
     close_application_wo_saving()

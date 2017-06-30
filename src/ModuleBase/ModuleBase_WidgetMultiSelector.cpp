@@ -1,11 +1,22 @@
-﻿// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-/*
- * ModuleBase_WidgetMultiSelector.cpp
- *
- *  Created on: Aug 28, 2014
- *      Author: sbh
- */
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <ModuleBase_WidgetMultiSelector.h>
 #include <ModuleBase_WidgetShapeSelector.h>
@@ -275,17 +286,6 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>
     //emit valuesChanged();
   //}
 
-  // Restore selection in the viewer by the attribute selection list
-  // it is possible that diring selection attribute filling, selection in Object Browser
-  // is changed(some items were removed/added) and as result, selection in the viewer
-  // differs from the selection come to this method. By next rows, we restore selection
-  // in the viewer according to content of selection attribute. Case is Edge selection in Group
-  myIsSetSelectionBlocked = true;
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
-  ModelAPI_EventCreator::get()->sendUpdated(myFeature, anEvent);
-  Events_Loop::loop()->flush(anEvent);
-  myIsSetSelectionBlocked = false;
-
   if (aSelectionListAttr.get())
     aSelectionListAttr->cashValues(false);
 
@@ -407,7 +407,6 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
-  clearValidatedCash();
   activateSelectionAndFilters(true);
 
   if (!myFeature)
@@ -478,6 +477,29 @@ void ModuleBase_WidgetMultiSelector::updateFocus()
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::updateSelectionName()
 {
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::updateOnSelectionChanged(const bool theDone)
+{
+  if (myIsSetSelectionBlocked)
+    return;
+  ModuleBase_WidgetSelector::updateOnSelectionChanged(theDone);
+
+  // according to #2154 we need to update OB selection when selection in the viewer happens
+  // it is important to flush sinchronize selection signal after flush of Update/Create/Delete.
+  // because we need that Object Browser has been already updated when synchronize happens.
+
+  // Restore selection in the viewer by the attribute selection list
+  // it is possible that diring selection attribute filling, selection in Object Browser
+  // is changed(some items were removed/added) and as result, selection in the viewer
+  // differs from the selection come to this method. By next rows, we restore selection
+  // in the viewer according to content of selection attribute. Case is Edge selection in Group
+  myIsSetSelectionBlocked = true;
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
+  ModelAPI_EventCreator::get()->sendUpdated(myFeature, anEvent);
+  Events_Loop::loop()->flush(anEvent);
+  myIsSetSelectionBlocked = false;
 }
 
 //********************************************************************

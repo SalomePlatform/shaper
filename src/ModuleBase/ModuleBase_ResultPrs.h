@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        ModuleBase_ResultPrs.h
-// Created:     21 October 2014
-// Author:      Vitaly SMETANNIKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef ModuleBase_ResultPrs_H
 #define ModuleBase_ResultPrs_H
@@ -39,9 +53,9 @@ public:
   /// Highlight the presentation with the given color
   /// \param aPM a presentations manager
   /// \param theStyle a style of presentation
-  /// \param aMode a drawing mode
+  /// \param theMode a drawing mode
   virtual void HilightWithColor (const Handle(PrsMgr_PresentationManager3d)& aPM,
-    const Handle(Graphic3d_HighlightStyle)& theStyle, const Standard_Integer aMode = 0)
+    const Handle(Graphic3d_HighlightStyle)& theStyle, const Standard_Integer theMode = 0)
   {
     Selectable()->HilightOwnerWithColor(aPM, theStyle, this);
   }
@@ -105,14 +119,22 @@ protected:
 
   /// Redefinition of virtual function
   Standard_EXPORT virtual void ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
-    const Standard_Integer aMode) ;
+                                                const Standard_Integer theMode) ;
 
 private:
+  /// If the shape of this presentation is Vertex, it appends custom sensitive and owners for it.
+  /// Owner is a usual Brep owner with "isDecomposite" in true. It is necessary to have "Ring"
+  /// highlight/selected marker.
+  /// \param theSelection a current filled selection
+  /// \param theMode a selection mode
+  /// \return true if the owner is created
+  bool appendVertexSelection(const Handle(SelectMgr_Selection)& aSelection,
+                             const Standard_Integer theMode);
   /// Appens sensitive and owners for wires of the given shape into selection
   /// \param theSelection a current filled selection
   /// \param theShape a shape
-  void appendWiresSelection(const Handle(SelectMgr_Selection)& theSelection,
-                            const TopoDS_Shape& theShape);
+  //void appendWiresSelection(const Handle(SelectMgr_Selection)& theSelection,
+  //                          const TopoDS_Shape& theShape);
 
   /// Reference to result object
   ResultPtr myResult;

@@ -1,3 +1,23 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 """
     TestFillet.py
     Unit test of SketchPlugin_Fillet class
@@ -105,7 +125,7 @@ def checkSmoothness(theSketch):
 
 def checkArcLineSmoothness(theArc, theLine):
     aCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
-    aDistance = distancePointLine(aCenter, theLine)
+    aDistance = model.distancePointLine(aCenter, theLine)
     aRadius = arcRadius(theArc)
     assert(math.fabs(aRadius - aDistance) < TOLERANCE)
 
@@ -141,16 +161,6 @@ def arcRadius(theArc):
     aCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
     aStart = geomDataAPI_Point2D(theArc.attribute("start_point"))
     return model.distancePointPoint(aCenter, aStart)
-
-def distancePointLine(thePoint, theLine):
-    aLineStart = geomDataAPI_Point2D(theLine.attribute("StartPoint"))
-    aLineEnd = geomDataAPI_Point2D(theLine.attribute("EndPoint"))
-    aLength = model.distancePointPoint(aLineStart, aLineEnd)
-
-    aDir1x, aDir1y = aLineEnd.x() - aLineStart.x(), aLineEnd.y() - aLineStart.y()
-    aDir2x, aDir2y = thePoint.x() - aLineStart.x(), thePoint.y() - aLineStart.y()
-    aCross = aDir1x * aDir2y - aDir1y * aDir2x
-    return math.fabs(aCross) / aLength
 
 
 #=========================================================================

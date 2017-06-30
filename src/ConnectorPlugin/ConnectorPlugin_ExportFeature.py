@@ -1,6 +1,25 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 ## @package Plugins
 #  ExportFeature class definition
-#  Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 import EventsAPI
 import ModelAPI
@@ -262,7 +281,9 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
               elif aTables.type() == 2: # double
                 aVal = float(aVal)
               aValues.append(aVal)
-          aResField.addStep(aStepIndex + 1, aStamp, aValues)
+          aStep = aResField.addStep(aStepIndex + 1, aStamp, aValues)
+          if aStep:
+            self.geompy.addToStudyInFather( aResField, aStep, aStep.GetName() )
 
     ## Exports all shapes and groups into the GEOM module.
     def execute(self):

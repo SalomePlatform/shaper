@@ -1,4 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <SketchPlugin_Plugin.h>
 #include <SketchPlugin_Sketch.h>
@@ -12,9 +30,10 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintDistanceHorizontal.h>
+#include <SketchPlugin_ConstraintDistanceVertical.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_Fillet.h>
-#include <SketchPlugin_ConstraintSplit.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintMiddle.h>
@@ -30,8 +49,11 @@
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_Trim.h>
+#include <SketchPlugin_Split.h>
 #include <SketchPlugin_Validators.h>
 #include <SketchPlugin_ExternalValidator.h>
+#include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_MacroEllipse.h>
 
 #include <Events_Loop.h>
 #include <GeomDataAPI_Dir.h>
@@ -98,6 +120,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_ProjectionValidator);
   aFactory->registerValidator("SketchPlugin_DifferentReference",
                               new SketchPlugin_DifferentReferenceValidator);
+  aFactory->registerValidator("SketchPlugin_DifferentPointReference",
+                              new SketchPlugin_DifferentPointReferenceValidator);
   aFactory->registerValidator("SketchPlugin_CirclePassedPointValidator",
                               new SketchPlugin_CirclePassedPointValidator);
   aFactory->registerValidator("SketchPlugin_ThirdPointValidator",
@@ -106,6 +130,7 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_ArcEndPointValidator);
   aFactory->registerValidator("SketchPlugin_ArcEndPointIntersectionValidator",
                               new SketchPlugin_ArcEndPointIntersectionValidator);
+  aFactory->registerValidator("SketchPlugin_HasNoConstraint", new SketchPlugin_HasNoConstraint);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -167,6 +192,10 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintCollinear);
   } else if (theFeatureID == SketchPlugin_ConstraintDistance::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintDistance);
+  } else if (theFeatureID == SketchPlugin_ConstraintDistanceHorizontal::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintDistanceHorizontal);
+  } else if (theFeatureID == SketchPlugin_ConstraintDistanceVertical::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintDistanceVertical);
   } else if (theFeatureID == SketchPlugin_ConstraintLength::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintLength);
   } else if (theFeatureID == SketchPlugin_ConstraintParallel::ID()) {
@@ -191,20 +220,24 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintMirror);
   } else if (theFeatureID == SketchPlugin_Fillet::ID()) {
     return FeaturePtr(new SketchPlugin_Fillet);
-  } else if (theFeatureID == SketchPlugin_ConstraintSplit::ID()) {
-    return FeaturePtr(new SketchPlugin_ConstraintSplit);
   } else if (theFeatureID == SketchPlugin_MultiTranslation::ID()) {
     return FeaturePtr(new SketchPlugin_MultiTranslation);
   } else if (theFeatureID == SketchPlugin_MultiRotation::ID()) {
     return FeaturePtr(new SketchPlugin_MultiRotation);
   } else if (theFeatureID == SketchPlugin_ConstraintAngle::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintAngle);
+  } else if (theFeatureID == SketchPlugin_Split::ID()) {
+    return FeaturePtr(new SketchPlugin_Split);
   } else if (theFeatureID == SketchPlugin_Trim::ID()) {
     return FeaturePtr(new SketchPlugin_Trim);
   } else if (theFeatureID == SketchPlugin_MacroArc::ID()) {
     return FeaturePtr(new SketchPlugin_MacroArc);
   } else if (theFeatureID == SketchPlugin_MacroCircle::ID()) {
     return FeaturePtr(new SketchPlugin_MacroCircle);
+  } else if (theFeatureID == SketchPlugin_Ellipse::ID()) {
+    return FeaturePtr(new SketchPlugin_Ellipse);
+  } else if (theFeatureID == SketchPlugin_MacroEllipse::ID()) {
+    return FeaturePtr(new SketchPlugin_MacroEllipse);
   }
   // feature of such kind is not found
   return FeaturePtr();
@@ -247,6 +280,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Line::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Circle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Arc::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_Ellipse::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Projection::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintCoincidence::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintCollinear::ID(), aHasSketchPlane);
@@ -263,13 +297,15 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_ConstraintMiddle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintMirror::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Fillet::ID(), aHasSketchPlane);
-      aMsg->setState(SketchPlugin_ConstraintSplit::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintAngle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MultiRotation::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MultiTranslation::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_Split::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Trim::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroArc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroCircle::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintDistanceHorizontal::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintDistanceVertical::ID(), aHasSketchPlane);
       // SketchRectangle is a python feature, so its ID is passed just as a string
       aMsg->setState("SketchRectangle", aHasSketchPlane);
     }

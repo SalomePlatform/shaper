@@ -1,8 +1,22 @@
-// Copyright (C) 2017-20xx CEA/DEN, EDF R&D
-
-// File:        GeomAlgoAPI_Circ2dBuilder.cpp
-// Created:     3 April 2017
-// Author:      Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <GeomAlgoAPI_Circ2dBuilder.h>
 #include <GeomAPI_Ax3.h>
@@ -139,7 +153,8 @@ private:
     CurveAdaptorPtr aCurve = myTangentShapes[0];
 
     std::shared_ptr<GccAna_Circ2dTanCen> aCircleBuilder;
-    if (aCurve->GetType() == GeomAbs_Line) {
+    if (aCurve->GetType() == GeomAbs_Line &&
+        aCurve->Line().Distance(aCenter) > Precision::Confusion()) {
       aCircleBuilder = std::shared_ptr<GccAna_Circ2dTanCen>(
           new GccAna_Circ2dTanCen(aCurve->Line(), aCenter));
     } else if (aCurve->GetType() == GeomAbs_Circle) {
@@ -166,7 +181,7 @@ private:
 
     double aParSol, aPonTgCurve;
     gp_Pnt2d aTgPnt;
-    for (int i = 1; i <= aNbSol && aCurve; ++i) {
+    for (int i = 1; i <= aNbSol && aNbSol > 1 && aCurve; ++i) {
       theBuilder->Tangency1(i, aParSol, aPonTgCurve, aTgPnt);
       if (isParamOnCurve(aPonTgCurve, aCurve)) {
         double aDist = distanceToClosestPoint(theBuilder->ThisSolution(i));
@@ -307,7 +322,7 @@ private:
 
     double aParSol, aPonTgCurve;
     gp_Pnt2d aTgPnt;
-    for (int i = 1; i <= aNbSol; ++i) {
+    for (int i = 1; i <= aNbSol && aNbSol > 1; ++i) {
       bool isApplicable = false;
       if (myTangentShapes.size() >= 1) {
         theBuilder->Tangency1(i, aParSol, aPonTgCurve, aTgPnt);
@@ -379,7 +394,7 @@ private:
 
     double aParSol, aPonTgCurve;
     gp_Pnt2d aTgPnt;
-    for (int i = 1; i <= aNbSol; ++i) {
+    for (int i = 1; i <= aNbSol && aNbSol > 1; ++i) {
       bool isApplicable = false;
       if (myTangentShapes.size() >= 1) {
         theBuilder->Tangency1(i, aParSol, aPonTgCurve, aTgPnt);
@@ -431,14 +446,19 @@ private:
   }
 
 
-  // boundary parameters of curve are NOT applied
-  static bool isParamInCurve(double& theParameter, const CurveAdaptorPtr& theCurve)
+  static void adjustPeriod(double& theParameter, const CurveAdaptorPtr& theCurve)
   {
     if (theCurve->Curve()->IsPeriodic()) {
       theParameter = ElCLib::InPeriod(theParameter,
                                       theCurve->FirstParameter(),
                                       theCurve->FirstParameter() + theCurve->Period());
     }
+  }
+
+  // boundary parameters of curve are NOT applied
+  static bool isParamInCurve(double& theParameter, const CurveAdaptorPtr& theCurve)
+  {
+    adjustPeriod(theParameter, theCurve);
     return theParameter > theCurve->FirstParameter() &&
            theParameter < theCurve->LastParameter();
   }
@@ -446,11 +466,7 @@ private:
   // boundary parameters of curve are applied too
   static bool isParamOnCurve(double& theParameter, const CurveAdaptorPtr& theCurve)
   {
-    if (theCurve->IsPeriodic()) {
-      theParameter = ElCLib::InPeriod(theParameter,
-                                      theCurve->FirstParameter(),
-                                      theCurve->FirstParameter() + theCurve->Period());
-    }
+    adjustPeriod(theParameter, theCurve);
     return theParameter >= theCurve->FirstParameter() &&
            theParameter <= theCurve->LastParameter();
   }

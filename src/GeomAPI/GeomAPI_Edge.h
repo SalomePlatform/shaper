@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        GeomAPI_Edge.hxx
-// Created:     24 Jul 2014
-// Author:      Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef GeomAPI_Edge_H_
 #define GeomAPI_Edge_H_
@@ -13,6 +27,7 @@ class GeomAPI_Pln;
 class GeomAPI_Pnt;
 class GeomAPI_Circ;
 class GeomAPI_Lin;
+class GeomAPI_Ellipse;
 
 /**\class GeomAPI_Edge
 * \ingroup DataModel
@@ -42,6 +57,10 @@ public:
   GEOMAPI_EXPORT
   bool isArc() const;
 
+  /// Verifies that the edge is an arc of circle
+  GEOMAPI_EXPORT
+  bool isEllipse() const;
+
   /// Returns the first vertex coordinates of the edge
   GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt> firstPoint();
@@ -52,11 +71,15 @@ public:
 
   /// Returns a circle if edge is based on the circle curve
   GEOMAPI_EXPORT
-  std::shared_ptr<GeomAPI_Circ> circle();
+  std::shared_ptr<GeomAPI_Circ> circle() const;
+
+  /// Returns an ellipse if edge is based on the ellipse curve
+  GEOMAPI_EXPORT
+  std::shared_ptr<GeomAPI_Ellipse> ellipse() const;
 
   /// Returns a line if edge is based on the linear curve
   GEOMAPI_EXPORT
-  std::shared_ptr<GeomAPI_Lin> line();
+  std::shared_ptr<GeomAPI_Lin> line() const;
 
   /// Returns true if the current edge is geometrically equal to the given edge
   GEOMAPI_EXPORT
@@ -74,6 +97,9 @@ public:
   GEOMAPI_EXPORT
   double length() const;
 };
+
+//! Pointer on attribute object
+typedef std::shared_ptr<GeomAPI_Edge> GeomEdgePtr;
 
 #endif
 

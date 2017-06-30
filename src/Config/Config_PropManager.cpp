@@ -1,14 +1,27 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        Config_PropManager.cpp
-// Created:     13 Aug 2014
-// Author:      Vitaly SMETANNIKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "Config_PropManager.h"
 
 std::vector<int> stringToRGB(const std::string& theColor);
 int stringToInteger(const std::string& theInt);
-double stringToDouble(const std::string& theDouble);
 bool stringToBoolean(const std::string& theInt);
 
 Config_Properties Config_PropManager::myProps;
@@ -176,10 +189,23 @@ int stringToInteger(const std::string& theInt)
   return atoi(theInt.c_str());
 }
 
-double stringToDouble(const std::string& theDouble)
+double Config_PropManager::stringToDouble(const std::string& theDouble)
 {
+  std::string aStr = theDouble;
+
+  // change locale and convert "," to "." if exists
+  std::string aCurLocale = setlocale(LC_NUMERIC, 0);
+  setlocale(LC_NUMERIC, "C");
+  int dotpos = (int)aStr.find(',');
+  if (dotpos != std::string::npos)
+    aStr.replace(dotpos, 1, ".");
+
   char* p;
-  return strtod(theDouble.c_str(), &p);
+  double aValue = strtod(aStr.c_str(), &p);
+
+  // restore locale
+  setlocale(LC_NUMERIC, aCurLocale.c_str());
+  return aValue;
 }
 
 bool stringToBoolean(const std::string& theBoolean)

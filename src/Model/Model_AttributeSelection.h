@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        Model_AttributeSelection.h
-// Created:     8 May 2014
-// Author:      Mikhail PONIKAROV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef Model_AttributeSelection_H_
 #define Model_AttributeSelection_H_
@@ -27,6 +41,8 @@ class Model_AttributeSelection : public ModelAPI_AttributeSelection
   ResultPtr myTmpContext;
   /// temporarily storages to avoid keeping in the data structure if not needed
   std::shared_ptr<GeomAPI_Shape> myTmpSubShape;
+  /// temporarily storages to avoid keeping in the data structure if not needed
+  CenterType myTmpCenterType;
   /// Reference to the partent attribute, if any (to split selection compounds in issue 1799)
   Model_AttributeSelectionList* myParent;
 public:
@@ -37,6 +53,13 @@ public:
   ///           (used to remove immideately, without the following updates)
   MODEL_EXPORT virtual void setValue(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const bool theTemporarily = false);
+
+  /// Same as SetValue, but it takes an edge (on circular or elliptical curve)
+  /// and stores the vertex of the central point (for ellipse the first or the second focus point)
+  MODEL_EXPORT virtual void setValueCenter(
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
+    const CenterType theCenterType,
     const bool theTemporarily = false);
 
   /// Reset temporary stored values

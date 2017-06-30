@@ -1,3 +1,23 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 def sketch_circle():
     circle_create((0, 0), 300)
 
@@ -9,16 +29,16 @@ def sketch_lines():
 
 def main():
     source(findFile("scripts", "common.py"))
-    
+
     startApplication("salome_run.sh")
     set_defaults()
-    
+
     activate_SHAPER()
 
     sketch_create(help_points("XY_plane"), lambda: sketch_circle())
     sketch_create(help_points("XY_plane"), lambda: sketch_lines())
     test.vp("VP_SKETCHES")
-    
+
     part_create()
 
     #[step] Create circle sketch
@@ -36,7 +56,7 @@ def main():
     mouseClick(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 651, 229, 0, Qt.LeftButton)
     clickButton(waitForObject(":Plane.property_panel_ok_QToolButton"))
     test.vp("VP_INNER_RIGHT_PLANE")
-    
+
     #[step] Create plane: outer right for V-shape
     activateItem(waitForObjectItem(":SALOME*_QMenuBar", "Construction"))
     activateItem(waitForObjectItem(":_QMenu", "Plane"))
@@ -47,7 +67,7 @@ def main():
     mouseDrag(waitForObject(":SALOME*.3D View Operations_OCCViewer_ViewPort3d"), 515, 402, -7, -305, 67108866, Qt.RightButton)
     clickButton(waitForObject(":Plane.property_panel_ok_QToolButton"))
     test.vp("VP_OUTER_RIGHT_PLANE")
-    
+
     #[step] Activate Partition feature
     activateItem(waitForObjectItem(":SALOME*_QMenuBar", "Features"))
     activateItem(waitForObjectItem(":_QMenu", "Partition"))
@@ -68,7 +88,7 @@ def main():
 
     #[step] Apply Partition
     clickButton(waitForObject(":Partition.property_panel_ok_QToolButton"))
-    
+
     test.vp("VP_PARTITION")
 
     close_application()

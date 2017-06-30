@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        SketcherPrs_SymbolPrs.cpp
-// Created:     12 March 2015
-// Author:      Vitaly SMETANNIKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "SketcherPrs_SymbolPrs.h"
 #include "SketcherPrs_Tools.h"
@@ -28,6 +42,7 @@
 #include <StdPrs_DeflectionCurve.hxx>
 #include <StdPrs_Point.hxx>
 #include <StdPrs_Curve.hxx>
+#include <Prs3d_LineAspect.hxx>
 
 #include <OpenGl_Element.hxx>
 #include <OpenGl_GraphicDriver.hxx>
@@ -114,6 +129,23 @@ SketcherPrs_SymbolPrs::~SketcherPrs_SymbolPrs()
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   // Empty memory in position manager
   aMgr->deleteConstraint(this);
+
+  Handle(Prs3d_Presentation) aSelPrs =
+    GetSelectPresentation(Handle(PrsMgr_PresentationManager3d)());
+  if (!aSelPrs.IsNull()) {
+      if (!aSelPrs->Groups().IsEmpty()) {
+        aSelPrs->Clear();
+      }
+      aSelPrs->Erase();
+  }
+  Handle(Prs3d_Presentation) aHilightPrs =
+    GetHilightPresentation(Handle(PrsMgr_PresentationManager3d)());
+  if (!aHilightPrs.IsNull()) {
+    if (!aHilightPrs->Groups().IsEmpty()) {
+      aHilightPrs->Clear();
+    }
+    aHilightPrs->Erase();
+  }
 }
 
 #ifdef _WINDOWS
@@ -194,7 +226,6 @@ void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup,
 void SketcherPrs_SymbolPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM,
                                             const SelectMgr_SequenceOfOwner& theOwners)
 {
-
   Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( thePM );
   aSelectionPrs->Clear();
   drawLines(aSelectionPrs, GetContext()->SelectionStyle()->Color());
@@ -310,8 +341,19 @@ void SketcherPrs_SymbolPrs::SetCustomColor(const std::vector<int>& theColor)
 
 //*********************************************************************************
 void SketcherPrs_SymbolPrs::drawShape(const std::shared_ptr<GeomAPI_Shape>& theShape,
-                                      const Handle(Prs3d_Presentation)& thePrs) const
+                                      const Handle(Prs3d_Presentation)& thePrs,
+                                      Quantity_Color theColor) const
 {
+  int aColNam = theColor.Name();
+  //cout<<"### SketcherPrs_SymbolPrs::drawShape "<<theColor.Name()<<endl;
+  Handle(Graphic3d_AspectLine3d) aLineAspect =
+    new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
+
+  Handle(Prs3d_LineAspect) aLinesStyle = myDrawer->LineAspect();
+  Handle(Graphic3d_AspectLine3d) aOldStyle = aLinesStyle->Aspect();
+  aLinesStyle->SetAspect(aLineAspect);
+  myDrawer->SetLineAspect(aLinesStyle);
+
   if (theShape->isEdge()) {
     // The shape is edge
     std::shared_ptr<GeomAPI_Curve> aCurve =
@@ -335,12 +377,15 @@ void SketcherPrs_SymbolPrs::drawShape(const std::shared_ptr<GeomAPI_Shape>& theS
     Handle(Geom_CartesianPoint) aPoint = new Geom_CartesianPoint(aPnt->impl<gp_Pnt>());
     StdPrs_Point::Add(thePrs, aPoint, myDrawer);
   }
+
+  aLinesStyle->SetAspect(aOldStyle);
+  myDrawer->SetLineAspect(aLinesStyle);
 }
 
 //*********************************************************************************
 void SketcherPrs_SymbolPrs::drawListOfShapes(
                       const std::shared_ptr<ModelAPI_AttributeRefList>& theListAttr,
-                      const Handle(Prs3d_Presentation)& thePrs) const
+                      const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const
 {
   int aNb = theListAttr->size();
   if (aNb == 0)
@@ -351,7 +396,7 @@ void SketcherPrs_SymbolPrs::drawListOfShapes(
     aObj = theListAttr->object(i);
     std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getShape(aObj);
     if (aShape.get() != NULL)
-      drawShape(aShape, thePrs);
+      drawShape(aShape, thePrs, theColor);
   }
 }
 

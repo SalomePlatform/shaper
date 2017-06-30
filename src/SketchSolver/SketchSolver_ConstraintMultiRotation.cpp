@@ -1,4 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <SketchSolver_ConstraintMultiRotation.h>
 #include <SketchSolver_Error.h>
@@ -16,12 +34,13 @@
 #include <cmath>
 
 void SketchSolver_ConstraintMultiRotation::getAttributes(
-    EntityWrapperPtr& theCenter, EntityWrapperPtr& theAngle,
+    EntityWrapperPtr& theCenter, ScalarWrapperPtr& theAngle,
     bool& theFullValue, std::list<EntityWrapperPtr>& theEntities)
 {
   AttributePtr anAngleAttr = myBaseConstraint->attribute(SketchPlugin_MultiRotation::ANGLE_ID());
   PlaneGCSSolver_AttributeBuilder aValueBuilder;
-  theAngle = aValueBuilder.createAttribute(anAngleAttr);
+  theAngle = std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(
+      aValueBuilder.createAttribute(anAngleAttr));
   myStorage->addEntity(anAngleAttr, theAngle);
 
   AttributeRefAttrPtr aCenterAttr =
@@ -45,7 +64,7 @@ void SketchSolver_ConstraintMultiRotation::getAttributes(
   // add owner of central point of Multi-Rotation to the list of monitored features
   FeaturePtr anOwner = ModelAPI_Feature::feature(aCenterAttr->attr()->owner());
   if (anOwner)
-    myFeatures.insert(anOwner);
+    myOriginalFeatures.insert(anOwner);
 }
 
 void SketchSolver_ConstraintMultiRotation::process()
@@ -56,15 +75,12 @@ void SketchSolver_ConstraintMultiRotation::process()
     return;
   }
 
-  EntityWrapperPtr anAngle;
   EntityWrapperPtr aRotationCenter;
   std::list<EntityWrapperPtr> aBaseEntities;
-  getAttributes(aRotationCenter, anAngle, myIsFullValue, aBaseEntities);
+  getAttributes(aRotationCenter, myAngle, myIsFullValue, aBaseEntities);
   if (!myErrorMsg.empty())
     return;
 
-  ScalarWrapperPtr anAngleVal = std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(anAngle);
-  myAngle = anAngleVal->value();
   myAdjusted = false;
   adjustConstraint();
 
@@ -74,10 +90,10 @@ void SketchSolver_ConstraintMultiRotation::process()
 void SketchSolver_ConstraintMultiRotation::updateLocal()
 {
   double aValue = myBaseConstraint->real(SketchPlugin_MultiRotation::ANGLE_ID())->value();
-  if (fabs(myAngle - aValue) > tolerance)
+  if (fabs(myAngle->value() - aValue) > tolerance)
     myAdjusted = false;
   // update angle value
-  myAngle = aValue;
+  myAngle->setValue(aValue);
 
   // update center
   DataPtr aData = myBaseConstraint->data();
@@ -102,7 +118,8 @@ void SketchSolver_ConstraintMultiRotation::adjustConstraint()
   if (myAdjusted)
     return;
 
-  if (fabs(myAngle) < tolerance) {
+  double anAngleValue = myAngle->value();
+  if (fabs(anAngleValue) < tolerance) {
     myStorage->setNeedToResolve(false);
     return;
   }
@@ -115,7 +132,6 @@ void SketchSolver_ConstraintMultiRotation::adjustConstraint()
   myCenterCoord[0] = *(aCenterPoint->x);
   myCenterCoord[1] = *(aCenterPoint->y);
 
-  double anAngleValue = myAngle;
   if (myIsFullValue && myNumberOfCopies > 0)
     anAngleValue /= myNumberOfCopies;
 

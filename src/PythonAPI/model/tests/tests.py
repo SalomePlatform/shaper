@@ -1,11 +1,28 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 from GeomAlgoAPI import *
 from GeomAPI import *
 from GeomDataAPI import *
 from ModelAPI import ModelAPI_Feature
 import math
-from salome.shaper.model import sketcher
-
-TOLERANCE = 1.e-7
 
 aShapeTypes = {
   GeomAPI_Shape.SOLID:  "GeomAPI_Shape.SOLID",
@@ -157,15 +174,3 @@ def testNbSubFeatures(theComposite, theKindOfSub, theExpectedCount):
     if aFeature is not None and aFeature.getKind() == theKindOfSub:
        count += 1
   assert (count == theExpectedCount), "Number of sub-features of type {}: {}, expected {}".format(theKindOfSub, count, theExpectedCount)
-
-def assertSketchArc(theArcFeature):
-  """ Tests whether the arc is correctly defined
-  """
-  aCenterPnt = geomDataAPI_Point2D(theArcFeature.attribute("center_point"))
-  aStartPnt = geomDataAPI_Point2D(theArcFeature.attribute("start_point"))
-  aEndPnt = geomDataAPI_Point2D(theArcFeature.attribute("end_point"))
-  aRadius = theArcFeature.real("radius")
-  aDistCS = sketcher.tools.distancePointPoint(aCenterPnt, aStartPnt)
-  aDistCE = sketcher.tools.distancePointPoint(aCenterPnt, aEndPnt)
-  assert math.fabs(aDistCS - aDistCE) < TOLERANCE, "Wrong arc: center-start distance {}, center-end distance {}".format(aDistCS, aDistCE)
-  assert math.fabs(aRadius.value() -aDistCS) < TOLERANCE, "Wrong arc: radius is {0}, expected {1}".format(aRadius.value(), aDistCS)

@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
-// File:        FeaturesPlugin_Validators.cpp
-// Created:     22 March 2016
-// Author:      Dmitry Bobylev
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "FeaturesPlugin_Validators.h"
 
@@ -142,8 +156,6 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
     return false;
   }
 
-  std::set<ResultConstructionPtr> aSelectedSketches;
-  std::set<ResultConstructionPtr> aSelectedSketchesFromObjects;
   GeomAPI_DataMapOfShapeShape aSelectedWiresFromObjects;
   std::string anAttributeType = theAttribute->attributeType();
   if(anAttributeType == ModelAPI_AttributeSelectionList::typeId()) {
@@ -185,22 +197,9 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
       GeomShapePtr aContextShape = aResultConstruction->shape();
       if(!aShape.get()) {
         // Whole sketch selected.
-        if(aSelectedSketchesFromObjects.find(aResultConstruction) !=
-            aSelectedSketchesFromObjects.cend()) {
-          theError = "Error: Object from this sketch is already selected. "
-                     "Sketch is not allowed for selection.";
-          return false;
-        }
-
-        aSelectedSketches.insert(aResultConstruction);
+        continue;
       } else {
         // Object from sketch selected.
-        if(aSelectedSketches.find(aResultConstruction) != aSelectedSketches.cend()) {
-          theError = "Error: Whole sketch with this object is already selected. "
-                     "Don't allow to select this object.";
-          return false;
-        }
-
         for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::WIRE); anExp.more(); anExp.next()) {
           GeomShapePtr aWire = anExp.current();
           if(aWire->orientation() != GeomAPI_Shape::FORWARD) {
@@ -215,13 +214,79 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
           }
 
           aSelectedWiresFromObjects.bind(aWire, aWire);
-          aSelectedSketchesFromObjects.insert(aResultConstruction);
         }
       }
     }
   }
 
   return true;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects::isValid(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<std::string>& theArguments,
+  Events_InfoMessage& theError) const
+{
+  const std::string aBaseObjectsID = theArguments.front();
+
+  AttributeSelectionListPtr aListAttr = theFeature->selectionList(aBaseObjectsID);
+  if(!aListAttr.get()) {
+    theError = "Error: Could not get \"%1\" attribute.";
+    theError.arg(aBaseObjectsID);
+    return false;
+  }
+
+  std::set<ResultConstructionPtr> aSelectedSketches;
+  std::set<ResultConstructionPtr> aSelectedSketchesFromObjects;
+
+  for(int anIndex = 0; anIndex < aListAttr->size(); ++anIndex) {
+    AttributeSelectionPtr aSelectionAttr = aListAttr->value(anIndex);
+    ResultPtr aContext = aSelectionAttr->context();
+    if(!aContext.get()) {
+      theError = "Error: Empty context.";
+      return false;
+    }
+
+    ResultConstructionPtr aResultConstruction =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    if(!aResultConstruction.get()) {
+      // It is not a result construction.
+      continue;
+    }
+
+    GeomShapePtr aShape = aSelectionAttr->value();
+    GeomShapePtr aContextShape = aResultConstruction->shape();
+    if(!aShape.get()) {
+      // Whole sketch selected.
+      aSelectedSketches.insert(aResultConstruction);
+    } else {
+      // Object from sketch selected.
+      aSelectedSketchesFromObjects.insert(aResultConstruction);
+    }
+  }
+
+
+  for(std::set<ResultConstructionPtr>::const_iterator anIt = aSelectedSketches.cbegin();
+      anIt != aSelectedSketches.cend();
+      ++anIt) {
+    ResultConstructionPtr aResultConstruction = *anIt;
+    if(aSelectedSketchesFromObjects.find(aResultConstruction) !=
+        aSelectedSketchesFromObjects.cend()) {
+      theError = "Sketch and objects from it can not be selected at the same time.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects::isNotObligatory(
+    std::string theFeature,
+    std::string theAttribute)
+{
+  return false;
 }
 
 //==================================================================================================

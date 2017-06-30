@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        PartSet_WidgetShapeSelector.cpp
-// Created:     27 Nov 2014
-// Author:      Vitaly Smetannikov
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "PartSet_WidgetShapeSelector.h"
 #include "PartSet_Module.h"
@@ -74,6 +88,9 @@ void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr
 {
   ModuleBase_WidgetShapeSelector::getGeomSelection(thePrs, theObject, theShape);
 
+  myExternalObjectMgr->getGeomSelection(thePrs, theObject, theShape,
+                                        myWorkshop, sketch(), myIsInValidate);
+  /*
   FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(theObject);
   std::shared_ptr<SketchPlugin_Feature> aSPFeature =
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
@@ -104,7 +121,7 @@ void PartSet_WidgetShapeSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr
     /// current sketch) and it is not created by object manager
     theObject = anExternalObject;
     theShape = anExternalShape;
-  }
+  }*/
 }
 
 //********************************************************************

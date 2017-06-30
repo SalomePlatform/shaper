@@ -5,6 +5,7 @@ from ModelHighAPI import moduleDocument, activeDocument
 from ModelHighAPI import defaultPlane, standardPlane
 from ModelHighAPI import begin, end
 from ModelHighAPI import apply as do
+from ModelHighAPI import updateFeatures
 from ModelHighAPI import undo, redo
 from ModelHighAPI import reset
 from ModelHighAPI import ModelHighAPI_Selection as selection

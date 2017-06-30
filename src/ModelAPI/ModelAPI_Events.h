@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        ModelAPI_Events.h
-// Created:     10 Apr 2014
-// Author:      Mikhail PONIKAROV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef MODELAPI_EVENTS_H_
 #define MODELAPI_EVENTS_H_
@@ -22,6 +36,7 @@
 
 class ModelAPI_Document;
 class ModelAPI_ResultParameter;
+class GeomAPI_Pnt2d;
 
 /// Event ID that feature is created (comes with ModelAPI_ObjectUpdatedMessage)
 static const char * EVENT_OBJECT_CREATED = "ObjectCreated";
@@ -451,6 +466,48 @@ public:
 private:
   std::set<ObjectPtr> myObjects;
   int myDOF;
+};
+
+/// Message sent when feature or attrubute has been moved.
+/// Stores the moving object/attribute, original and new positions of mouse.
+class ModelAPI_ObjectMovedMessage : public Events_Message
+{
+  ObjectPtr myMovedObject;
+  AttributePtr myMovedAttribute;
+
+  std::shared_ptr<GeomAPI_Pnt2d> myOriginalPosition;
+  std::shared_ptr<GeomAPI_Pnt2d> myCurrentPosition;
+
+public:
+  MODELAPI_EXPORT ModelAPI_ObjectMovedMessage(const void* theSender = 0);
+
+  /// Set object which is being moved (if the message already contains attribute it will be cleared)
+  MODELAPI_EXPORT void setMovedObject(const ObjectPtr& theMovedObject);
+  /// Set attribute which is being moved (if the message already contains object it will be cleared)
+  MODELAPI_EXPORT void setMovedAttribute(const AttributePtr& theMovedAttribute);
+
+  /// Return moved object
+  ObjectPtr movedObject() const
+  { return myMovedObject; }
+  /// Return moved attribute
+  AttributePtr movedAttribute() const
+  { return myMovedAttribute; }
+
+  /// Set original mouse position
+  MODELAPI_EXPORT void setOriginalPosition(double theX, double theY);
+  /// Set original mouse position
+  MODELAPI_EXPORT void setOriginalPosition(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+  /// Return original mouse position
+  const std::shared_ptr<GeomAPI_Pnt2d>& originalPosition() const
+  { return myOriginalPosition; }
+
+  /// Set current mouse position
+  MODELAPI_EXPORT void setCurrentPosition(double theX, double theY);
+  /// Set current mouse position
+  MODELAPI_EXPORT void setCurrentPosition(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+  /// Return current mouse position
+  const std::shared_ptr<GeomAPI_Pnt2d>& currentPosition() const
+  { return myCurrentPosition; }
 };
 
 #endif

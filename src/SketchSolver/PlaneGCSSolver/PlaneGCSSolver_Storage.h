@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:    PlaneGCSSolver_Storage.h
-// Created: 14 Dec 2015
-// Author:  Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef PlaneGCSSolver_Storage_H_
 #define PlaneGCSSolver_Storage_H_
@@ -30,10 +44,10 @@ public:
   virtual void addConstraint(ConstraintPtr        theConstraint,
                              ConstraintWrapperPtr theSolverConstraint);
 
-  /// \brief Add list of temporary constraints which will be destroyed
+  /// \brief Add a movement constraint which will be destroyed
   ///        after the next solving of the set of constraints.
   /// \param theSolverConstraint [in]  solver's constraint
-  virtual void addTemporaryConstraint(const ConstraintWrapperPtr& theSolverConstraint);
+  virtual void addMovementConstraint(const ConstraintWrapperPtr& theSolverConstraint);
 
 
   /// \brief Convert feature to the form applicable for specific solver and map it
@@ -48,6 +62,10 @@ public:
   /// \return \c true if the attribute has been created or updated
   virtual bool update(AttributePtr theAttribute, bool theForce = false);
 
+  /// \brief Make entity external
+  virtual void makeExternal(const EntityWrapperPtr& theEntity);
+  /// \brief Make entity non-external
+  virtual void makeNonExternal(const EntityWrapperPtr& theEntity);
 
   /// \brief Removes constraint from the storage
   /// \return \c true if the constraint and all its parameters are removed successfully
@@ -76,6 +94,9 @@ private:
   /// \brief Convert attribute using specified builder.
   EntityWrapperPtr createAttribute(const AttributePtr&           theAttribute,
                                    PlaneGCSSolver_EntityBuilder* theBuilder);
+
+  void createArcConstraints(const EntityWrapperPtr& theArc);
+  void removeArcConstraints(const EntityWrapperPtr& theArc);
 
 private:
   ConstraintID myConstraintLastID;   ///< identifier of last added constraint

@@ -1,9 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-// Name   : ModelHighAPI_Services.h
-// Purpose:
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 //
-// History:
-// 17/06/16 - Sergey POKHODENKO - Creation of the file
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef SRC_MODELHIGHAPI_MODELHIGHAPI_SERVICES_H_
 #define SRC_MODELHIGHAPI_MODELHIGHAPI_SERVICES_H_
@@ -74,6 +87,14 @@ void end();
  */
 MODELHIGHAPI_EXPORT
 void apply();
+
+/** Executes features, created or updated before.
+ *
+ *  This method flushes creation and update events in order to make all
+ *  features up to date.
+ */
+MODELHIGHAPI_EXPORT
+void updateFeatures();
 
 /// Roll-back the data structure to the previous control point.
 MODELHIGHAPI_EXPORT

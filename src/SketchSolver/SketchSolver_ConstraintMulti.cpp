@@ -1,4 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <SketchSolver_ConstraintMulti.h>
 #include <SketchSolver_Error.h>
@@ -13,6 +31,17 @@
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_IntersectionPoint.h>
+
+static void createCopiedEntity(const FeaturePtr& theFeature, const StoragePtr& theStorage)
+{
+  EntityWrapperPtr anEntity = theStorage->entity(theFeature);
+  if (anEntity) {
+    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
+    if (!anEntity->isExternal() && aSketchFeature->isCopy())
+      theStorage->makeExternal(anEntity);
+  }
+}
 
 void SketchSolver_ConstraintMulti::getEntities(std::list<EntityWrapperPtr>& theEntities)
 {
@@ -49,12 +78,14 @@ void SketchSolver_ConstraintMulti::getEntities(std::list<EntityWrapperPtr>& theE
     if (!myStorage->update(aFeature))
       myStorage->update(aFeature, true);
     theEntities.push_back(myStorage->entity(aFeature));
-    myFeatures.insert(aFeature);
+    myOriginalFeatures.insert(aFeature);
     for (int i = 0; i < myNumberOfCopies && anObjIt != anObjectList.end(); ++i, ++anObjIt) {
       // just add copied features into the list of objects
       aFeature = ModelAPI_Feature::feature(*anObjIt);
-      if (aFeature)
-        myFeatures.insert(aFeature);
+      if (aFeature) {
+        createCopiedEntity(aFeature, myStorage);
+        myCopiedFeatures.insert(aFeature);
+      }
     }
   }
 }
@@ -63,7 +94,22 @@ bool SketchSolver_ConstraintMulti::remove()
 {
   myStorage->unsubscribeUpdates(this);
 
-  myFeatures.clear();
+  // "Multi" constraint has been removed, thus all copy features become non-copied,
+  // add them once again to be a common feature
+  std::set<FeaturePtr>::iterator anIt = myCopiedFeatures.begin();
+  for (; anIt != myCopiedFeatures.end(); ++anIt) {
+    EntityWrapperPtr anEntity = myStorage->entity(*anIt);
+    if (anEntity) {
+      std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
+      if (anEntity->isExternal() && !aSketchFeature->isExternal())
+        myStorage->makeNonExternal(anEntity);
+    } else if ((*anIt)->data() && (*anIt)->data()->isValid())
+      myStorage->update(*anIt, true);
+  }
+
+  myOriginalFeatures.clear();
+  myCopiedFeatures.clear();
   return SketchSolver_Constraint::remove();
 }
 
@@ -87,7 +133,8 @@ void SketchSolver_ConstraintMulti::update()
       std::list<ObjectPtr>::iterator anObjIt = anObjectList.begin();
       for (; anObjIt != anObjectList.end(); ++anObjIt) {
         aFeature = ModelAPI_Feature::feature(*anObjIt);
-        if (aFeature && myFeatures.find(aFeature) == myFeatures.end()) {
+        if (aFeature && myOriginalFeatures.find(aFeature) == myOriginalFeatures.end() &&
+            myCopiedFeatures.find(aFeature) == myCopiedFeatures.end()) {
           isUpdated = true;
           break;
         }
@@ -168,6 +215,10 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
             std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*aPtIt);
         aPoint2D->setValue(aXCoord, aYCoord);
       }
+
+      // update transformed entity if it exists in the storage
+      if (myStorage->entity(aFeature))
+        myStorage->update(aFeature);
     }
   }
 
@@ -177,7 +228,8 @@ void SketchSolver_ConstraintMulti::adjustConstraint()
 void SketchSolver_ConstraintMulti::notify(const FeaturePtr& theFeature,
                                           PlaneGCSSolver_Update*)
 {
-  if (myFeatures.find(theFeature) == myFeatures.end())
+  if (myOriginalFeatures.find(theFeature) == myOriginalFeatures.end() &&
+      myCopiedFeatures.find(theFeature) == myCopiedFeatures.end())
     return; // the feature is not used by constraint => nothing to update
 
   // update derivative object
@@ -190,8 +242,10 @@ void SketchSolver_ConstraintMulti::blockEvents(bool isBlocked)
 {
   myIsEventsBlocked = isBlocked;
 
-  std::set<FeaturePtr>::iterator anIt = myFeatures.begin();
-  for (; anIt != myFeatures.end(); ++anIt)
+  std::set<FeaturePtr>::iterator anIt = myOriginalFeatures.begin();
+  for (; anIt != myOriginalFeatures.end(); ++anIt)
+    (*anIt)->data()->blockSendAttributeUpdated(isBlocked);
+  for (anIt = myCopiedFeatures.begin(); anIt != myCopiedFeatures.end(); ++anIt)
     (*anIt)->data()->blockSendAttributeUpdated(isBlocked);
 
   SketchSolver_Constraint::blockEvents(isBlocked);

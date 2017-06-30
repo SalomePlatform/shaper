@@ -1,11 +1,29 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "SHAPERGUI_SalomeViewer.h"
 #include "SHAPERGUI_OCCSelector.h"
 
 #include <OCCViewer_ViewPort3d.h>
 #include <OCCViewer_ViewFrame.h>
-
+#include <SOCC_ViewModel.h>
 #include <SUIT_ViewManager.h>
 
 #include <QtxActionToolMgr.h>
@@ -14,6 +32,8 @@
 
 #include <QMouseEvent>
 #include <QContextMenuEvent>
+
+//#define SALOME_PATCH_FOR_CTRL_WHEEL
 
 SHAPERGUI_SalomeView::SHAPERGUI_SalomeView(OCCViewer_Viewer* theViewer)
 : ModuleBase_IViewWindow(), myCurrentView(0)
@@ -352,6 +372,13 @@ void SHAPERGUI_SalomeViewer::fitAll()
 }
 
 //**********************************************
+void SHAPERGUI_SalomeViewer::eraseAll()
+{
+  SOCC_Viewer* aViewer = dynamic_cast<SOCC_Viewer*>(myView->viewer());
+  aViewer->EraseAll(0);
+}
+
+//**********************************************
 void SHAPERGUI_SalomeViewer::setViewProjection(double theX, double theY,
                                                double theZ, double theTwist)
 {
@@ -442,6 +469,11 @@ void SHAPERGUI_SalomeViewer::activateViewer(bool toActivate)
   if (!mySelector || !mySelector->viewer())
     return;
   SUIT_ViewManager* aMgr = mySelector->viewer()->getViewManager();
+#ifdef SALOME_PATCH_FOR_CTRL_WHEEL
+  OCCViewer_Viewer* aViewer = dynamic_cast<OCCViewer_Viewer*>(aMgr->getViewModel());
+  if (aViewer)
+    aViewer->setUseLocalSelection(toActivate);
+#endif
   QVector<SUIT_ViewWindow*> aViews = aMgr->getViews();
   if (toActivate) {
     foreach (SUIT_ViewWindow* aView, aViews) {

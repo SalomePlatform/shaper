@@ -1,14 +1,27 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-/*
- * ModelAPI_Events.cpp
- *
- *  Created on: Dec 8, 2014
- *      Author: sbh
- */
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <ModelAPI.h>
 #include <ModelAPI_Events.h>
+
+#include <GeomAPI_Pnt2d.h>
 
 ModelAPI_ObjectUpdatedMessage::ModelAPI_ObjectUpdatedMessage(const Events_ID theID,
                                                              const void* theSender)
@@ -328,3 +341,43 @@ const std::set<ObjectPtr>& ModelAPI_SolverFailedMessage::objects() const
   return myObjects;
 }
 
+
+// =====   ModelAPI_ObjectMovedMessage   =====
+ModelAPI_ObjectMovedMessage::ModelAPI_ObjectMovedMessage(const void* theSender)
+  : Events_Message(Events_Loop::eventByName(EVENT_OBJECT_MOVED), theSender)
+{
+}
+
+void ModelAPI_ObjectMovedMessage::setMovedObject(const ObjectPtr& theMovedObject)
+{
+  myMovedObject = theMovedObject;
+  myMovedAttribute = AttributePtr();
+}
+
+void ModelAPI_ObjectMovedMessage::setMovedAttribute(const AttributePtr& theMovedAttribute)
+{
+  myMovedAttribute = theMovedAttribute;
+  myMovedObject = ObjectPtr();
+}
+
+void ModelAPI_ObjectMovedMessage::setOriginalPosition(double theX, double theY)
+{
+  myOriginalPosition = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
+}
+
+void ModelAPI_ObjectMovedMessage::setOriginalPosition(
+    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  myOriginalPosition = thePoint;
+}
+
+void ModelAPI_ObjectMovedMessage::setCurrentPosition(double theX, double theY)
+{
+  myCurrentPosition = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
+}
+
+void ModelAPI_ObjectMovedMessage::setCurrentPosition(
+    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  myCurrentPosition = thePoint;
+}

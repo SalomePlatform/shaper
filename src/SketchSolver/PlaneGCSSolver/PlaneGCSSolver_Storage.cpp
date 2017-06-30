@@ -1,14 +1,29 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:    PlaneGCSSolver_Storage.cpp
-// Created: 14 Dec 2015
-// Author:  Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <PlaneGCSSolver_Storage.h>
 #include <PlaneGCSSolver_Solver.h>
 #include <PlaneGCSSolver_ConstraintWrapper.h>
 #include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
+#include <PlaneGCSSolver_Tools.h>
 
 #include <PlaneGCSSolver_AttributeBuilder.h>
 #include <PlaneGCSSolver_FeatureBuilder.h>
@@ -51,12 +66,9 @@ void PlaneGCSSolver_Storage::addConstraint(
   constraintsToSolver(theSolverConstraint, mySketchSolver);
 }
 
-void PlaneGCSSolver_Storage::addTemporaryConstraint(
+void PlaneGCSSolver_Storage::addMovementConstraint(
     const ConstraintWrapperPtr& theSolverConstraint)
 {
-  if (myConstraintMap.empty())
-    return; // no need to process temporary constraints if there is no active constraint
-
   // before adding movement constraint to solver, re-check its DOF
   if (mySketchSolver->dof() == 0)
     mySketchSolver->diagnose();
@@ -131,22 +143,22 @@ static bool updateValues(AttributePtr& theAttribute, EntityWrapperPtr& theEntity
   return isUpdated;
 }
 
-static bool isCopyInMulti(std::shared_ptr<SketchPlugin_Feature> theFeature)
+static bool hasReference(std::shared_ptr<SketchPlugin_Feature> theFeature,
+                         const std::string& theFeatureKind)
 {
-  if (!theFeature)
-    return false;
-
-  bool aResult = theFeature->isCopy();
-  if (aResult) {
-    const std::set<AttributePtr>& aRefs = theFeature->data()->refsToMe();
-    for (std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin();
-         aRefIt != aRefs.end() && aResult; ++aRefIt) {
-      FeaturePtr anOwner = ModelAPI_Feature::feature((*aRefIt)->owner());
-      if (anOwner->getKind() == SketchPlugin_Projection::ID())
-        aResult = false;
-    }
+  const std::set<AttributePtr>& aRefs = theFeature->data()->refsToMe();
+  for (std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin();
+       aRefIt != aRefs.end(); ++aRefIt) {
+     FeaturePtr anOwner = ModelAPI_Feature::feature((*aRefIt)->owner());
+     if (anOwner->getKind() == theFeatureKind)
+       return true;
   }
-  return aResult;
+  return false;
+}
+
+static bool isCopyFeature(std::shared_ptr<SketchPlugin_Feature> theFeature)
+{
+  return theFeature && theFeature->isCopy();
 }
 
 bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
@@ -159,13 +171,16 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
   else { // Feature is not exist, create it
     std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
         std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
-    bool isCopy = isCopyInMulti(aSketchFeature);
+    bool isCopy = isCopyFeature(aSketchFeature);
+    bool isProjReferred = hasReference(aSketchFeature, SketchPlugin_Projection::ID());
     // the feature is a copy in "Multi" constraint and does not used in other constraints
-    if (!theForce && isCopy && myFeatureMap.find(theFeature) == myFeatureMap.end())
+    if (!theForce && (isCopy && !isProjReferred) &&
+        myFeatureMap.find(theFeature) == myFeatureMap.end())
       return false;
 
     // external feature processing
-    bool isExternal = (aSketchFeature && (aSketchFeature->isExternal() || isCopy));
+    bool isExternal =
+        (aSketchFeature && (aSketchFeature->isExternal() || isCopy || isProjReferred));
 
     PlaneGCSSolver_FeatureBuilder aBuilder(isExternal ? 0 : this);
 
@@ -173,17 +188,7 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
     // (do not want to add several copies of it while adding attributes)
     aRelated = createFeature(theFeature, &aBuilder);
     myFeatureMap[theFeature] = aRelated;
-
-    const std::list<GCSConstraintPtr>& aConstraints = aBuilder.constraints();
-    if (!aConstraints.empty()) { // the feature is arc
-      /// TODO: avoid this workaround
-      ConstraintWrapperPtr aWrapper(
-          new PlaneGCSSolver_ConstraintWrapper(aConstraints, CONSTRAINT_UNKNOWN));
-      aWrapper->setId(++myConstraintLastID);
-      constraintsToSolver(aWrapper, mySketchSolver);
-
-      myArcConstraintMap[myFeatureMap[theFeature]] = aWrapper;
-    }
+    createArcConstraints(aRelated);
     isUpdated = true;
   }
 
@@ -260,6 +265,72 @@ bool PlaneGCSSolver_Storage::update(AttributePtr theAttribute, bool theForce)
   return isUpdated;
 }
 
+void PlaneGCSSolver_Storage::makeExternal(const EntityWrapperPtr& theEntity)
+{
+  if (theEntity->isExternal())
+    return;
+
+  removeArcConstraints(theEntity);
+
+  GCS::SET_pD aParameters = PlaneGCSSolver_Tools::parameters(theEntity);
+  mySketchSolver->removeParameters(aParameters);
+  theEntity->setExternal(true);
+  myNeedToResolve = true;
+}
+
+void PlaneGCSSolver_Storage::makeNonExternal(const EntityWrapperPtr& theEntity)
+{
+  if (!theEntity->isExternal())
+    return;
+
+  GCS::SET_pD aParameters = PlaneGCSSolver_Tools::parameters(theEntity);
+  mySketchSolver->addParameters(aParameters);
+  theEntity->setExternal(false);
+
+  createArcConstraints(theEntity);
+
+  myNeedToResolve = true;
+}
+
+
+void PlaneGCSSolver_Storage::createArcConstraints(const EntityWrapperPtr& theArc)
+{
+  if (!theArc || theArc->type() != ENTITY_ARC || theArc->isExternal())
+    return;
+
+  EdgeWrapperPtr anEdge = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theArc);
+  std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEdge->entity());
+
+  // Additional constaints to fix arc's extra DoF (if the arc is not external):
+  std::list<GCSConstraintPtr> anArcConstraints;
+  // 1. distances from center till start and end points are equal to radius
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
+      anArc->center, anArc->start, anArc->rad)));
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
+      anArc->center, anArc->end, anArc->rad)));
+  // 2. angles of start and end points should be equal to the arc angles
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PAngle(
+      anArc->center, anArc->start, anArc->startAngle)));
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PAngle(
+      anArc->center, anArc->end, anArc->endAngle)));
+
+  ConstraintWrapperPtr aWrapper(
+      new PlaneGCSSolver_ConstraintWrapper(anArcConstraints, CONSTRAINT_UNKNOWN));
+  aWrapper->setId(++myConstraintLastID);
+  constraintsToSolver(aWrapper, mySketchSolver);
+
+  myArcConstraintMap[theArc] = aWrapper;
+}
+
+void PlaneGCSSolver_Storage::removeArcConstraints(const EntityWrapperPtr& theArc)
+{
+  std::map<EntityWrapperPtr, ConstraintWrapperPtr>::iterator
+      aFound = myArcConstraintMap.find(theArc);
+  if (aFound != myArcConstraintMap.end()) {
+    mySketchSolver->removeConstraint(aFound->second->id());
+    myArcConstraintMap.erase(aFound);
+  }
+}
 
 
 bool PlaneGCSSolver_Storage::removeConstraint(ConstraintPtr theConstraint)
@@ -318,12 +389,7 @@ void PlaneGCSSolver_Storage::removeInvalidEntities()
         aDestroyer.remove(aFIter->second);
 
       // remove invalid arc
-      std::map<EntityWrapperPtr, ConstraintWrapperPtr>::iterator
-          aFound = myArcConstraintMap.find(aFIter->second);
-      if (aFound != myArcConstraintMap.end()) {
-        mySketchSolver->removeConstraint(aFound->second->id());
-        myArcConstraintMap.erase(aFound);
-      }
+      removeArcConstraints(aFIter->second);
     }
   std::list<FeaturePtr>::const_iterator anInvFIt = anInvalidFeatures.begin();
   for (; anInvFIt != anInvalidFeatures.end(); ++anInvFIt)
@@ -386,6 +452,9 @@ void PlaneGCSSolver_Storage::refresh() const
 
   std::map<AttributePtr, EntityWrapperPtr>::const_iterator anIt = myAttributeMap.begin();
   for (; anIt != myAttributeMap.end(); ++anIt) {
+    if (!anIt->first->isInitialized())
+      continue;
+
     // the external feature always should keep the up to date values, so,
     // refresh from the solver is never needed
     if (isExternalAttribute(anIt->first))

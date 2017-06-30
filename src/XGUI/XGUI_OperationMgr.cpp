@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
-// File:        XGUI_OperationMgr.cpp
-// Created:     20 Apr 2014
-// Author:      Natalia ERMOLAEVA
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "XGUI_OperationMgr.h"
 #include "XGUI_ModuleConnector.h"
@@ -60,11 +74,14 @@ public:
     bool isAccepted = false;
     if (myIsActive && theEvent->type() == QEvent::KeyRelease) {
       QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-      if(aKeyEvent) {
+      if (aKeyEvent) {
         switch (aKeyEvent->key()) {
-          case Qt::Key_Delete: {
+          case Qt::Key_Delete:
             isAccepted = myOperationMgr->onProcessDelete(theObject);
-          }
+          break;
+          default:
+            isAccepted = myOperationMgr->onKeyReleased(theObject, aKeyEvent);
+            break;
         }
       }
     }
@@ -171,20 +188,6 @@ ModuleBase_Operation* XGUI_OperationMgr::previousOperation(ModuleBase_Operation*
   return myOperations.at(idx - 1);
 }
 
-bool XGUI_OperationMgr::eventFilter(QObject *theObject, QEvent *theEvent)
-{
-  bool isAccepted = false;
-  if (theEvent->type() == QEvent::KeyRelease) {
-    QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-    if(aKeyEvent)
-      isAccepted = onKeyReleased(theObject, aKeyEvent);
-  }
-  if (!isAccepted)
-    isAccepted = QObject::eventFilter(theObject, theEvent);
-
-  return isAccepted;
-}
-
 bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
 {
   if (hasOperation())
@@ -208,7 +211,12 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
   return isStarted;
 }
 
-bool XGUI_OperationMgr::abortAllOperations()
+void XGUI_OperationMgr::onAbortAllOperations()
+{
+  abortAllOperations();
+}
+
+bool XGUI_OperationMgr::abortAllOperations(const XGUI_MessageKind& theMessageKind)
 {
   bool aResult = true;
   if(!hasOperation())
@@ -216,18 +224,29 @@ bool XGUI_OperationMgr::abortAllOperations()
 
   if (operationsCount() == 1) {
     ModuleBase_Operation* aCurrentOperation = currentOperation();
-    if (canStopOperation(aCurrentOperation)) {
+    if (canStopOperation(aCurrentOperation, theMessageKind)) {
       abortOperation(aCurrentOperation);
     }
     else
       aResult = false;
   }
   else {
-    aResult = QMessageBox::question(qApp->activeWindow(),
-                                    tr("Abort operation"),
-                                    tr("All active operations will be aborted."),
-                                    QMessageBox::Ok | QMessageBox::Cancel,
-                                    QMessageBox::Cancel) == QMessageBox::Ok;
+    if (theMessageKind == XGUI_AbortOperationMessage) {
+      aResult = QMessageBox::question(qApp->activeWindow(),
+                                      tr("Abort operation"),
+                                      tr("All active operations will be aborted."),
+                                      QMessageBox::Ok | QMessageBox::Cancel,
+                                      QMessageBox::Cancel) == QMessageBox::Ok;
+    }
+    else if (theMessageKind == XGUI_InformationMessage) {
+      QString aMessage = tr("Please validate all your active operations before saving.");
+      QMessageBox::question(qApp->activeWindow(),
+                            tr("Validate operation"),
+                            aMessage,
+                            QMessageBox::Ok,
+                            QMessageBox::Ok);
+      aResult = false; // do not perform abort
+    }
     while(aResult && hasOperation()) {
       abortOperation(currentOperation());
     }
@@ -241,7 +260,7 @@ bool XGUI_OperationMgr::commitAllOperations()
   while (hasOperation()) {
     ModuleBase_Operation* anOperation = currentOperation();
     if (XGUI_Tools::workshop(myWorkshop)->errorMgr()->isApplyEnabled()) {
-      anOperationProcessed = onCommitOperation();
+      anOperationProcessed = commitOperation();
     } else {
       abortOperation(anOperation);
       anOperationProcessed = true;
@@ -295,31 +314,33 @@ void XGUI_OperationMgr::updateApplyOfOperations(ModuleBase_Operation* theOperati
   onValidateOperation();
 }
 
-bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation)
+bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation,
+                                         const XGUI_OperationMgr::XGUI_MessageKind& theMessageKind)
 {
   //in case of nested (sketch) operation no confirmation needed
   if (isGrantedOperation(theOperation->id()))
     return true;
   if (theOperation && theOperation->isModified()) {
-    QString aMessage = tr("%1 operation will be aborted.").arg(theOperation->id());
-    int anAnswer = QMessageBox::question(qApp->activeWindow(),
-                                         tr("Abort operation"),
-                                         aMessage,
-                                         QMessageBox::Ok | QMessageBox::Cancel,
-                                         QMessageBox::Cancel);
-    return anAnswer == QMessageBox::Ok;
+    if (theMessageKind == XGUI_AbortOperationMessage) {
+      QString aMessage = tr("%1 operation will be aborted.").arg(theOperation->id());
+      int anAnswer = QMessageBox::question(qApp->activeWindow(),
+                                           tr("Abort operation"),
+                                           aMessage,
+                                           QMessageBox::Ok | QMessageBox::Cancel,
+                                           QMessageBox::Cancel);
+      return anAnswer == QMessageBox::Ok;
+    }
+    else if (theMessageKind == XGUI_InformationMessage) {
+      QString aMessage = tr("Please validate your %1 before saving.").arg(theOperation->id());
+      QMessageBox::question(qApp->activeWindow(),
+                            tr("Validate operation"),
+                            aMessage,
+                            QMessageBox::Ok,
+                            QMessageBox::Ok);
+      return false;
+    }
   }
   return true;
-}
-
-bool XGUI_OperationMgr::commitOperation()
-{
-  //if (hasOperation() && currentOperation()->isValid()) {
-  //  onCommitOperation();
-  //  return true;
-  //}
-  //return false;
-  return onCommitOperation();
 }
 
 void XGUI_OperationMgr::resumeOperation(ModuleBase_Operation* theOperation)
@@ -351,6 +372,12 @@ void XGUI_OperationMgr::setCurrentFeature(const FeaturePtr& theFeature)
     aMgr->startOperation(QString("Set current feature: %1")
     .arg(theFeature->getKind().c_str()).toStdString());
   aDoc->setCurrentFeature(theFeature, false);
+#ifdef DEBUG_CURRENT_FEATURE
+  qDebug(QString("   document->setCurrentFeature(false) = %1    SET").arg(
+         ModuleBase_Tools::objectName(
+         ModelAPI_Session::get()->activeDocument()->currentFeature(false))).toStdString().c_str());
+#endif
+
   if (!aIsOp)
     aMgr->finishOperation();
 }
@@ -413,7 +440,7 @@ void XGUI_OperationMgr::abortOperation(ModuleBase_Operation* theOperation)
   }
 }
 
-bool XGUI_OperationMgr::onCommitOperation()
+bool XGUI_OperationMgr::commitOperation()
 {
   bool isCommitted = false;
   ModuleBase_Operation* anOperation = currentOperation();
@@ -456,19 +483,21 @@ void XGUI_OperationMgr::onBeforeOperationStarted()
 #ifdef DEBUG_CURRENT_FEATURE
     FeaturePtr aFeature = aFOperation->feature();
     QString aKind = aFeature ? aFeature->getKind().c_str() : "";
-    qDebug(QString("onBeforeOperationStarted(), edit operation = %1, feature = %2")
+    qDebug("");
+    qDebug(QString("onBeforeOperationStarted() isEditOperation = %1, feature = %2")
             .arg(aFOperation->isEditOperation())
-            .arg(ModuleBase_Tools::objectInfo(aFeature)).toStdString().c_str());
-
-    qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
-            ModuleBase_Tools::objectInfo(
-            ModelAPI_Session::get()->activeDocument()->currentFeature(false)))
-            .toStdString().c_str());
+            .arg(ModuleBase_Tools::objectName(aFeature)).toStdString().c_str());
+    qDebug(QString("   document->currentFeature(false) = %1 : DO: setPreviousCurrentFeature").arg(
+            ModuleBase_Tools::objectName(aDoc->currentFeature(false))).toStdString().c_str());
 #endif
 
     if (aFOperation->isEditOperation()) {// it should be performed by the feature edit only
       // in create operation, the current feature is changed by addFeature()
       aDoc->setCurrentFeature(aFOperation->feature(), false);
+#ifdef DEBUG_CURRENT_FEATURE
+      qDebug(QString("   document->setCurrentFeature(false) = %1").arg(
+             ModuleBase_Tools::objectName(aDoc->currentFeature(false))).toStdString().c_str());
+#endif
       // this is the only place where flushes must be called after setCurrentFeature for the
       // current moment: after this the opertion is not finished, so, the ObjectBrowser
       // state may be corrupted (issue #1457)
@@ -478,14 +507,6 @@ void XGUI_OperationMgr::onBeforeOperationStarted()
       static Events_ID aDeleteEvent = aLoop->eventByName(EVENT_OBJECT_DELETED);
       aLoop->flush(aDeleteEvent);
     }
-
-#ifdef DEBUG_CURRENT_FEATURE
-    qDebug("\tdocument->setCurrentFeature");
-    qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
-            ModuleBase_Tools::objectInfo(
-            ModelAPI_Session::get()->activeDocument()->currentFeature(false)))
-            .toStdString().c_str());
-#endif
   }
 }
 
@@ -520,12 +541,11 @@ void XGUI_OperationMgr::onBeforeOperationCommitted()
   if (aFOperation) {
 #ifdef DEBUG_CURRENT_FEATURE
     QString aKind = aFOperation->feature()->getKind().c_str();
-    qDebug(QString("onBeforeOperationCommitted(), edit operation = %1, feature = %2")
+    qDebug(QString("onBeforeOperationCommitted() isEditOperation = %1, feature = %2")
             .arg(aFOperation->isEditOperation())
-            .arg(ModuleBase_Tools::objectInfo(aFOperation->feature())).toStdString().c_str());
-
-    qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
-            ModuleBase_Tools::objectInfo(
+            .arg(ModuleBase_Tools::objectName(aFOperation->feature())).toStdString().c_str());
+    qDebug(QString("   document->currentFeature(false) = %1").arg(
+            ModuleBase_Tools::objectName(
             ModelAPI_Session::get()->activeDocument()->currentFeature(false)))
             .toStdString().c_str());
 #endif
@@ -543,13 +563,6 @@ void XGUI_OperationMgr::onBeforeOperationCommitted()
       if (myOperations.front() != aFOperation)
         setCurrentFeature(aFOperation->previousCurrentFeature());
     }
-#ifdef DEBUG_CURRENT_FEATURE
-    qDebug("\tdocument->setCurrentFeature");
-    qDebug(QString("\tdocument->currentFeature(false) = %1").arg(
-           ModuleBase_Tools::objectInfo(
-           ModelAPI_Session::get()->activeDocument()->currentFeature(false)))
-           .toStdString().c_str());
-#endif
     ModuleBase_IModule* aModule = myWorkshop->module();
     if (aModule)
       aModule->beforeOperationStopped(aFOperation);
@@ -608,6 +621,33 @@ bool XGUI_OperationMgr::onKeyReleased(QObject *theObject, QKeyEvent* theEvent)
   ModuleBase_Operation* anOperation = currentOperation();
   bool isAccepted = false;
   switch (theEvent->key()) {
+    case Qt::Key_Escape: {
+      ModuleBase_Operation* aOperation = currentOperation();
+      if (aOperation) {
+        onAbortOperation();
+        isAccepted = true;
+      }
+    }
+    break;
+    case Qt::Key_Tab:
+    case Qt::Key_Backtab:
+    {
+      ModuleBase_Operation* aOperation = currentOperation();
+      if (aOperation) {
+        ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
+        if (aPanel) {
+          QWidget* aFocusedWidget = qApp->focusWidget();
+          bool isPPChildObject = aFocusedWidget && isChildObject(aFocusedWidget, aPanel);
+          if (!isPPChildObject) {
+            // check for case when the operation is started but property panel is not filled
+            XGUI_PropertyPanel* aPP = dynamic_cast<XGUI_PropertyPanel*>(aPanel);
+            aPP->setFocusNextPrevChild(theEvent->key() == Qt::Key_Tab);
+            isAccepted = true;
+          }
+        }
+      }
+    }
+    break;
     case Qt::Key_Return:
     case Qt::Key_Enter: {
       isAccepted = onProcessEnter(theObject);
@@ -648,10 +688,11 @@ bool XGUI_OperationMgr::onProcessEnter(QObject* theObject)
   if (!aOperation)
     return isAccepted;
   ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+  // the next code is obsolete as we want to process Enter in property panel always
   // only property panel enter is processed in order to do not process enter in application dialogs
-  bool isPPChild = isChildObject(theObject, aPanel);
-  if (!isPPChild)
-    return isAccepted;
+  //bool isPPChild = isChildObject(theObject, aPanel);
+  //if (!isPPChild)
+  //  return isAccepted;
 
   ModuleBase_ModelWidget* anActiveWgt = aPanel->activeWidget();
   bool isAborted = false;

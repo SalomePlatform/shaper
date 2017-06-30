@@ -1,7 +1,27 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 """
     TestConstraintTangent.py
     Unit test of SketchPlugin_ConstraintTangent class
-        
+
     SketchPlugin_ConstraintTangent
         static const std::string MY_CONSTRAINT_TANGENT_ID("SketchConstraintTangent");
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
@@ -20,23 +40,6 @@ from salome.shaper import model
 
 __updated__ = "2015-03-17"
 
-def distancePointLine(point, line):
-    """
-    subroutine to calculate distance between point and line
-    result of calculated distance is has 10**-5 precision
-    """
-    aStartPoint = geomDataAPI_Point2D(line.attribute("StartPoint"))
-    aEndPoint = geomDataAPI_Point2D(line.attribute("EndPoint"))
-    # orthogonal direction
-    aDirX = -(aEndPoint.y() - aStartPoint.y())
-    aDirY = (aEndPoint.x() - aStartPoint.x())
-    aLen = math.sqrt(aDirX**2 + aDirY**2)
-    aDirX = aDirX / aLen
-    aDirY = aDirY / aLen
-    aVecX = point.x() - aStartPoint.x()
-    aVecY = point.y() - aStartPoint.y()
-    return round(math.fabs(aVecX * aDirX + aVecY * aDirY), 5)
-
 def checkArcLineTangency(theArc, theLine):
     """
     subroutine to check that the line is tangent to arc/circle
@@ -48,7 +51,7 @@ def checkArcLineTangency(theArc, theLine):
         aCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
         aStartPnt = geomDataAPI_Point2D(theArc.attribute("start_point"))
         aRadius = model.distancePointPoint(aStartPnt, aCenter)
-    aDist = distancePointLine(aCenter, theLine)
+    aDist = model.distancePointLine(aCenter, theLine)
     assert math.fabs(aDist - aRadius) < 2.e-5, "aDist = {0}, aRadius = {1}".format(aDist, aRadius)
 
 def checkArcArcTangency(theArc1, theArc2):

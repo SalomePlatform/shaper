@@ -1,8 +1,23 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:      ModuleBase_DoubleSpinBox.cxx
-// Author:    Sergey TELKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 //
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
+
 #include "ModuleBase_DoubleSpinBox.h"
 #include "ModuleBase_Tools.h"
 
@@ -59,8 +74,7 @@ const double PSEUDO_ZERO = 1.e-20;
  */
 ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePrecision)
     : QDoubleSpinBox(theParent),
-      myCleared(false),
-      myIsEmitKeyPressEvent(false)
+      myCleared(false)
 {
   setLocale(ModuleBase_Tools::doubleLocale());
 
@@ -198,42 +212,6 @@ QString ModuleBase_DoubleSpinBox::removeTrailingZeroes(const QString& src) const
   return res;
 }
 
-void ModuleBase_DoubleSpinBox::keyPressEvent(QKeyEvent* theEvent)
-{
-  switch (theEvent->key()) {
-    case Qt::Key_Enter:
-    case Qt::Key_Return: {
-      // do not react to the Enter key, the property panel processes it
-      if (!myIsEmitKeyPressEvent)
-        return;
-    }
-    break;
-    default:
-      break;
-  }
-  QDoubleSpinBox::keyPressEvent(theEvent);
-}
-
-void ModuleBase_DoubleSpinBox::keyReleaseEvent(QKeyEvent* theEvent)
-{
-  switch (theEvent->key()) {
-    case Qt::Key_Enter:
-    case Qt::Key_Return: {
-      // the enter has already been processed when key is pressed,
-      // key release should not be processed in operation manager
-      if (myIsEmitKeyPressEvent) {
-        theEvent->accept();
-        emit enterReleased();
-        return;
-      }
-    }
-    break;
-    default:
-      break;
-  }
-  QDoubleSpinBox::keyReleaseEvent(theEvent);
-}
-
 /*!
  \brief Perform \a steps increment/decrement steps.
 
@@ -346,14 +324,6 @@ QValidator::State ModuleBase_DoubleSpinBox::validate(QString& str, int& pos) con
 void ModuleBase_DoubleSpinBox::onTextChanged(const QString& )
 {
   myCleared = false;
-}
-
-bool ModuleBase_DoubleSpinBox::enableKeyPressEvent(const bool& theEnable)
-{
-  bool aPreviousValue = myIsEmitKeyPressEvent;
-  myIsEmitKeyPressEvent = theEnable;
-
-  return aPreviousValue;
 }
 
 void ModuleBase_DoubleSpinBox::setValueEnabled(const bool& theEnable)

@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        Model_Objects.cxx
-// Created:     15 May 2015
-// Author:      Mikhail PONIKAROV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <Model_Objects.h>
 #include <Model_Data.h>
@@ -271,7 +285,28 @@ void Model_Objects::removeFeature(FeaturePtr theFeature)
 
 void Model_Objects::eraseAllFeatures()
 {
-  ModelAPI_EventCreator::get()->sendDeleted(myDoc, ModelAPI_Feature::group());
+  static Events_ID kDispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const ModelAPI_EventCreator* kCreator = ModelAPI_EventCreator::get();
+  // make all features invalid (like deleted)
+  NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFIter(myFeatures);
+  for(; aFIter.More(); aFIter.Next()) {
+    FeaturePtr aFeature = aFIter.Value();
+    std::list<ResultPtr> aResList;
+    ModelAPI_Tools::allResults(aFeature, aResList);
+    std::list<ResultPtr>::iterator aRIter = aResList.begin();
+    for(; aRIter != aResList.end(); aRIter++) {
+      ResultPtr aRes = *aRIter;
+      if (aRes && aRes->data()->isValid()) {
+        kCreator->sendDeleted(myDoc, aRes->groupName());
+        kCreator->sendUpdated(aRes, kDispEvent);
+        aRes->setData(aRes->data()->invalidPtr());
+
+      }
+    }
+    kCreator->sendUpdated(aFeature, kDispEvent);
+    aFeature->setData(aFeature->data()->invalidPtr());
+  }
+  kCreator->sendDeleted(myDoc, ModelAPI_Feature::group());
   myFeatures.Clear(); // just remove features without modification of DS
   updateHistory(ModelAPI_Feature::group());
 }

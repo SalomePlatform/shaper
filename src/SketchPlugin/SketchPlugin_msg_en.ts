@@ -75,8 +75,8 @@
   <context>
     <name>SketchMacroCircle:CircleRadius:GeomValidators_Positive</name>
     <message>
-      <source>Double is not positive.</source>
-      <translation>Radius value is not positive</translation>
+      <source>Value is too small.</source>
+      <translation>Radius value is too small</translation>
     </message>
   </context>
   <context>
@@ -386,8 +386,8 @@
   <context>
     <name>SketchConstraintRadius:ConstraintValue:GeomValidators_Positive</name>
     <message>
-      <source>Double is not positive.</source>
-      <translation>Radius must be positive</translation>
+      <source>Value is too small.</source>
+      <translation>Radius is too small</translation>
     </message>
   </context>
   <context>
@@ -699,8 +699,8 @@
   <context>
     <name>SketchArc:ArcRadius:GeomValidators_Positive</name>
     <message>
-      <source>Double is not positive.</source>
-      <translation>Acr radius must e positive</translation>
+      <source>Value is too small.</source>
+      <translation>Arc radius is too small</translation>
     </message>
   </context>
   <context>
@@ -847,7 +847,7 @@
   <context>
     <name>SketchMultiRotation:MultiRotationObjects:GeomValidators_Positive</name>
     <message>
-      <source>Double is not positive.</source>
+      <source>Value is too small.</source>
       <translation>The total number of rotated objects must be positive</translation>
     </message>
   </context>
@@ -982,7 +982,7 @@
   <context>
     <name>SketchMultiTranslation:MultiTranslationObjects:GeomValidators_Positive</name>
     <message>
-      <source>Double is not positive.</source>
+      <source>Value is too small.</source>
       <translation>The total number of translated objects must be positive</translation>
     </message>
   </context>
@@ -1364,8 +1364,8 @@
   <context>
     <name>SketchConstraintDistance:ConstraintValue:GeomValidators_Positive</name>
     <message>
-      <source>Double is not positive.</source>
-      <translation>Distance value must be positive</translation>
+      <source>Value is too small.</source>
+      <translation>Distance value is too small</translation>
     </message>
   </context>
   <context>
@@ -1583,8 +1583,8 @@
   <context>
     <name>SketchConstraintLength:ConstraintValue:GeomValidators_Positive</name>
     <message>
-      <source>Double is not positive.</source>
-      <translation>Length value is not positive</translation>
+      <source>Value is too small.</source>
+      <translation>Length value is too small</translation>
     </message>
   </context>
   <context>
@@ -1947,7 +1947,7 @@
   <context>
     <name>SketchFillet:ConstraintValue:GeomValidators_Positive</name>
     <message>
-      <source>Double is not positive.</source>
+      <source>Value is too small.</source>
       <translation>The fillet radius must be positive</translation>
     </message>
   </context>

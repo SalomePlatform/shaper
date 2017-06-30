@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        PartSet_WidgetFeaturePointSelector.cpp
-// Created:     28 Feb 2017
-// Author:      Natalia ERMOLAEVA
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <Config_WidgetAPI.h>
 
@@ -17,6 +31,7 @@
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_ViewerPrs.h>
 
+#include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Tools.h>
@@ -28,10 +43,7 @@
 #include "PartSet_WidgetFeaturePointSelector.h"
 #include "PartSet_Tools.h"
 
-//#include <SketchPlugin_ConstraintCoincidence.h>
-//#include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_Point.h>
-#include <SketchPlugin_Trim.h>
 
 #include <XGUI_Tools.h>
 #include <XGUI_Workshop.h>
@@ -52,6 +64,13 @@ PartSet_WidgetFeaturePointSelector::PartSet_WidgetFeaturePointSelector(QWidget* 
                                                          const Config_WidgetAPI* theData)
 : ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData)
 {
+  std::string anAttributes = theData->getProperty("selection_attributes");
+  QStringList anAttributesList = QString(anAttributes.c_str()).split(' ', QString::SkipEmptyParts);
+
+  mySelectedObjectAttribute = anAttributesList[0].toStdString();
+  mySelectedPointAttribute = anAttributesList[1].toStdString();
+  myPreviewObjectAttribute = anAttributesList[2].toStdString();
+  myPreviewPointAttribute = anAttributesList[3].toStdString();
 }
 
 PartSet_WidgetFeaturePointSelector::~PartSet_WidgetFeaturePointSelector()
@@ -132,21 +151,26 @@ void PartSet_WidgetFeaturePointSelector::mouseReleased(ModuleBase_IViewWindow* t
   if (theEvent->button() != Qt::LeftButton)
     return;
 
+  std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
+                          std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                          feature()->data()->attribute(myPreviewObjectAttribute));
+  ObjectPtr aPreviewObject = aRefPreviewAttr->value();
+  // do not move focus from the current widget if the object is not highlighted/selected
+  if (!aPreviewObject.get())
+    return;
+
   // set parameters of preview into parameters of selection in the feature
   std::shared_ptr<ModelAPI_AttributeReference> aRefSelectedAttr =
                           std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                          feature()->data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
-  std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
-                          std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                          feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+                          feature()->data()->attribute(mySelectedObjectAttribute));
   aRefSelectedAttr->setValue(aRefPreviewAttr->value());
 
   std::shared_ptr<GeomDataAPI_Point2D> aPointSelectedAttr =
                           std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                          feature()->data()->attribute(SketchPlugin_Trim::SELECTED_POINT()));
+                          feature()->data()->attribute(mySelectedPointAttribute));
   std::shared_ptr<GeomDataAPI_Point2D> aPointPreviewAttr =
                           std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                          feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
+                          feature()->data()->attribute(myPreviewPointAttribute));
   aPointSelectedAttr->setValue(aPointPreviewAttr->x(), aPointPreviewAttr->y());
 
   updateObject(feature());
@@ -167,17 +191,14 @@ bool PartSet_WidgetFeaturePointSelector::fillFeature(
   if (theSelectedPrs.get() && theSelectedPrs->object().get())
     anObject = theSelectedPrs->object();
 
-  if (!anObject.get())
-    return aFilled;
-
   std::shared_ptr<ModelAPI_AttributeReference> aRef =
                           std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                          feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_OBJECT()));
+                          feature()->data()->attribute(myPreviewObjectAttribute));
   aRef->setValue(anObject);
 
   std::shared_ptr<GeomDataAPI_Point2D> anAttributePoint =
                   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                  feature()->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
+                  feature()->data()->attribute(myPreviewPointAttribute));
   std::shared_ptr<GeomAPI_Pnt2d> aPoint = PartSet_Tools::getPnt2d(theEvent, theWindow, mySketch);
   anAttributePoint->setValue(aPoint);
   // redisplay AIS presentation in viewer

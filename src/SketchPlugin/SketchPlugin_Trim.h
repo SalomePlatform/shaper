@@ -1,16 +1,30 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
-// File:    SketchPlugin_Trim.h
-// Created: 22 Feb 2017
-// Author:  Natalia ERMOLAEVA
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef SketchPlugin_Trim_H_
 #define SketchPlugin_Trim_H_
 
-#include <ModelAPI_IReentrant.h>
-
 #include "SketchPlugin.h"
-#include "SketchPlugin_ConstraintBase.h"
+
+#include "GeomAPI_IPresentable.h"
+#include <ModelAPI_IReentrant.h>
 #include <SketchPlugin_Sketch.h>
 
 class GeomDataAPI_Point2D;
@@ -77,7 +91,7 @@ class SketchPlugin_Trim : public SketchPlugin_Feature, public GeomAPI_IPresentab
 
   /// Reimplemented from ModelAPI_Feature::isMacro()
   /// \returns true
-  SKETCHPLUGIN_EXPORT virtual bool isMacro() const;
+  SKETCHPLUGIN_EXPORT virtual bool isMacro() const { return true; }
 
   /// Reimplemented from ModelAPI_Feature::isPreviewNeeded(). Returns false.
   /// This is necessary to perform execute only by apply the feature
@@ -107,9 +121,10 @@ class SketchPlugin_Trim : public SketchPlugin_Feature, public GeomAPI_IPresentab
 private:
   bool setCoincidenceToAttribute(const AttributePtr& theAttribute,
             const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences);
-
-  bool replaceCoincidenceAttribute(const AttributePtr& theCoincidenceAttribute,
-            const std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
+  /// Move tangency constraint to the feature if it is geometrically closely to it
+  /// \param theAttribute an attribute of a tangent constraint feature
+  /// \param theFeature a feature that can be set into the attribute
+  bool moveTangency(const AttributePtr& theAttribute, const FeaturePtr& theFeature);
 
   GeomShapePtr getSubShape(const std::string& theObjectAttributeId,
                            const std::string& thePointAttributeId);
@@ -126,7 +141,9 @@ private:
   /// Obtains those constraints of the feature that should be modified. output maps contain
   /// point of coincidence and attribute id to be modified after split
   /// \param theFeaturesToDelete [out] constrains that will be deleted after split
-  void getConstraints(std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete);
+  /// \param theFeaturesToUpdate [out] constrains that will be updated after split
+  void getConstraints(std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete,
+                      std::set<FeaturePtr>& theFeaturesToUpdate);
 
   /// Obtains references to feature point attributes and to feature,
   /// e.g. for feature line: 1st container is
@@ -138,13 +155,6 @@ private:
   void getRefAttributes(const FeaturePtr& theFeature,
                         std::map<AttributePtr, std::list<AttributePtr> >& theRefs,
                         std::list<AttributePtr>& theRefsToFeature);
-
-  /// Obtains coincident features to the given object. It is collected in a container
-  /// by the coincident attribute
-  /// \param theObject an investigated object
-  /// \param theCoincidencesToBaseFeature a container of list of referenced attributes
-  //void getCoincidencesToObject(const std::shared_ptr<ModelAPI_Object>& theObject,
-  //                             std::map<AttributePtr, FeaturePtr>& theCoincidencesToBaseFeature);
 
   /// Move constraints from attribute of base feature to attribute after modification
   /// \param theBaseRefAttributes container of references to the attributes of base feature
@@ -160,6 +170,10 @@ private:
   /// \param theModifiedAttributes modifiable container of attributes
   void removeReferencesToAttribute(const AttributePtr& theAttribute,
                   std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes);
+
+   /// Updates line length if it exist in the list
+  /// \param theFeaturesToUpdate a constraints container
+  void updateFeaturesAfterTrim(const std::set<FeaturePtr>& theFeaturesToUpdate);
 
   /// Make the base object is splitted by the point attributes
   /// \param theBaseRefAttributes container of references to the attributes of base feature

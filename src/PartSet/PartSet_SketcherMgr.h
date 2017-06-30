@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        PartSet_SketcherMgr.h
-// Created:     19 Dec 2014
-// Author:      Vitaly SMETANNIKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef PartSet_SketcherMgr_H
 #define PartSet_SketcherMgr_H
@@ -36,6 +50,7 @@ class ModuleBase_ModelWidget;
 class ModuleBase_Operation;
 class XGUI_OperationMgr;
 class XGUI_Workshop;
+class PartSet_ExternalPointsMgr;
 
 class AIS_InteractiveObject;
 
@@ -81,6 +96,18 @@ class PARTSET_EXPORT PartSet_SketcherMgr : public QObject
     bool myIsInitialized;  /// the state whether the point is set
     double myCurX, myCurY; /// the point coordinates
   };
+
+public:
+  /// Struct to define selection model information to store/restore selection
+  struct SelectionInfo
+  {
+    std::set<AttributePtr> myAttributes; /// the selected attributes
+    std::set<ResultPtr> myResults; /// the selected results
+    TopoDS_Shape myFirstResultShape; /// the first shape of feature result
+    TopTools_MapOfShape myLocalSelectedShapes; /// shapes of local selection
+  };
+  typedef QMap<FeaturePtr, SelectionInfo> FeatureToSelectionMap;
+
 public:
   /// Constructor
   /// \param theModule a pointer to PartSet module
@@ -99,6 +126,12 @@ public:
   /// \return the boolean result
   bool isNestedSketchOperation(ModuleBase_Operation* theOperation) const;
 
+  /// Returns true if the feature kind belongs to list of granted features of Sketch
+  /// operation. An operation of a sketch should be started before.
+  /// \param theOperation an operation
+  /// \return the boolean result
+  bool isNestedSketchFeature(const QString& theFeatureKind) const;
+
   /// Returns true if the operation is a create and nested sketch operationn
   /// \param theOperation a checked operation
   /// \param theSketch a sketch feature
@@ -116,6 +149,11 @@ public:
   /// \param theId is an id of object
   /// \return a boolean value
   static bool isEntity(const std::string& theId);
+
+  /// Returns whether the feature has external attribute filled with 'true' value
+  /// \param theFeature a feature object
+  /// \return a boolean value
+  static bool isExternalFeature(const FeaturePtr& theFeature);
 
   /// Returns whether the current operation is a sketch distance - lenght, distance or radius
   /// \param theOperation the operation
@@ -214,14 +252,23 @@ public:
   /// \return boolean value
   bool isObjectOfSketch(const ObjectPtr& theObject) const;
 
+  /// Enumeration for selection mode used
+  enum SelectionType {
+    ST_HighlightType, /// Only highlighted objects
+    ST_SelectType, /// Only selected objects
+    ST_SelectAndHighlightType /// Both, highlighted and selected objects
+  };
+
   /// Saves the current selection in the viewer into an internal container
   /// It obtains the selected attributes.
   /// The highlighted objects can be processes as the selected ones
   /// \param theHighlightedOnly a boolean flag
-  void storeSelection(const bool theHighlightedOnly = false);
+  /// \param theCurrentSelection a container filled by the current selection
+  void storeSelection(const SelectionType theType, FeatureToSelectionMap& theCurrentSelection);
 
   /// Restores previously saved selection state
-  void restoreSelection();
+  /// \param theCurrentSelection a container filled by the current selection
+  void restoreSelection(FeatureToSelectionMap& theCurrentSelection);
 
   /// Return error state of the sketch feature, true if the error has happened
   /// \return boolean value
@@ -317,16 +364,6 @@ private:
                                              ModuleBase_IWorkshop* theWorkshop,
                                              bool& theCanCommitOperation);
 
-  struct SelectionInfo
-  {
-    std::set<AttributePtr> myAttributes;
-    std::set<ResultPtr> myResults;
-    TopoDS_Shape myFirstResultShape;
-    TopTools_MapOfShape myLocalSelectedShapes;
-  };
-
-  typedef QMap<FeaturePtr, SelectionInfo> FeatureToSelectionMap;
-
   /// Applyes the current selection to the object in the workshop viewer
   /// It includes the selection in all modes of activation, even local context - vertexes, edges
   /// It gets all results of the feature, find an AIS object in the viewer and takes all BRep
@@ -396,6 +433,8 @@ private:
   bool myPreviousUpdateViewerEnabled;
 
   QMap<PartSet_Tools::ConstraintVisibleState, bool> myIsConstraintsShown;
+
+  PartSet_ExternalPointsMgr* myExternalPointsMgr;
 };
 
 

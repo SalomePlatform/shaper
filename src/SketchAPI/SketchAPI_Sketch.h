@@ -1,9 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-// Name   : SketchAPI_Sketch.h
-// Purpose:
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 //
-// History:
-// 07/06/16 - Sergey POKHODENKO - Creation of the file
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef SRC_SKETCHAPI_SKETCHAPI_SKETCH_H_
 #define SRC_SKETCHAPI_SKETCHAPI_SKETCH_H_
@@ -272,8 +285,7 @@ public:
   SKETCHAPI_EXPORT
   std::shared_ptr<ModelHighAPI_Interface> addSplit(
       const ModelHighAPI_Reference& theFeature,
-      const ModelHighAPI_RefAttr& thePoint1,
-      const ModelHighAPI_RefAttr& thePoint2);
+      const std::shared_ptr<GeomAPI_Pnt2d>& thePositionPoint);
 
   /// Add trim
   SKETCHAPI_EXPORT
@@ -319,6 +331,20 @@ public:
   std::shared_ptr<ModelHighAPI_Interface> setDistance(
       const ModelHighAPI_RefAttr & thePoint,
       const ModelHighAPI_RefAttr & thePointOrLine,
+      const ModelHighAPI_Double & theValue);
+
+  /// Set horizontal distance
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelHighAPI_Interface> setHorizontalDistance(
+      const ModelHighAPI_RefAttr & thePoint1,
+      const ModelHighAPI_RefAttr & thePoint2,
+      const ModelHighAPI_Double & theValue);
+
+  /// Set vertical distance
+  SKETCHAPI_EXPORT
+  std::shared_ptr<ModelHighAPI_Interface> setVerticalDistance(
+      const ModelHighAPI_RefAttr & thePoint1,
+      const ModelHighAPI_RefAttr & thePoint2,
       const ModelHighAPI_Double & theValue);
 
   /// Set equal
@@ -394,6 +420,16 @@ public:
   void setValue(
       const std::shared_ptr<ModelHighAPI_Interface> & theConstraint,
       const ModelHighAPI_Double & theValue);
+
+  /// Move point or sketch feature
+  SKETCHAPI_EXPORT
+  void move(const ModelHighAPI_RefAttr& theMovedEntity,
+            const std::shared_ptr<GeomAPI_Pnt2d>& theTargetPoint);
+
+  /// Move point or sketch feature
+  SKETCHAPI_EXPORT
+  void move(const ModelHighAPI_RefAttr& theMovedEntity,
+            double theTargetX, double theTargetY);
 
   SKETCHAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& thePoint);

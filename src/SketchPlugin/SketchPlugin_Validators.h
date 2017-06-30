@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
-// File:        SketchPlugin_Validators.h
-// Created:     01 Aug 2014
-// Author:      Vitaly SMETANNIKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef SketchPlugin_Validators_H
 #define SketchPlugin_Validators_H
@@ -311,6 +325,24 @@ class SketchPlugin_DifferentReferenceValidator : public ModelAPI_AttributeValida
                        Events_InfoMessage& theError) const;
 };
 
+/**\class SketchPlugin_DifferentPointReferenceValidator
+ * \ingroup Validators
+ * \brief Validator for attributes of a sketch feature.
+ *
+ * It checks that at least two of specified attributes refer to different points.
+ */
+class SketchPlugin_DifferentPointReferenceValidator : public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 /**\class SketchPlugin_CirclePassedPointValidator
  * \ingroup Validators
  * \brief Validator for passed point of MacroCircle feature.
@@ -384,6 +416,26 @@ class SketchPlugin_ArcEndPointValidator: public ModelAPI_AttributeValidator
  * Checks that third point does lie on edge which intersects arc.
  */
 class SketchPlugin_ArcEndPointIntersectionValidator: public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
+/**\class SketchPlugin_HasNoConstraint
+ * \ingroup Validators
+ * \brief Validator for checking whether the feature has constraint.
+ *
+ * Checks that feature of the attribute does not have constraint with some kinds.
+ * The kinds of constraints should be described in parameters of the validator
+ * Validator processes the ModelAPI_AttributeRefAttr attribute kind
+ */
+class SketchPlugin_HasNoConstraint: public ModelAPI_AttributeValidator
 {
  public:
   //! returns true if attribute is valid

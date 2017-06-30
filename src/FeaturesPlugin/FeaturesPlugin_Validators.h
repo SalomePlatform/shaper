@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
-// File:        FeaturesPlugin_Validators.h
-// Created:     22 March 2016
-// Author:      Dmitry Bobylev
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef FeaturesPlugin_Validators_H_
 #define FeaturesPlugin_Validators_H_
@@ -62,6 +76,26 @@ private:
   bool isValidAttribute(const AttributePtr& theAttribute,
                         const std::list<std::string>& theArguments,
                         Events_InfoMessage& theError) const;
+};
+
+/// \class FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects
+/// \ingroup Validators
+/// \brief Validator for the base objects for generation. Checks that sketch and it objects
+///        are not selected at the same time.
+class FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects:
+  public ModelAPI_FeatureValidator
+{
+ public:
+  //! \return true if sketch and it objects not selected at the same time.
+  //! \param theFeature the checked feature
+  //! \param theArguments arguments of the feature (not used)
+  //! \param theError error message
+  virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+
+  /// Returns true if the attribute in feature is not obligatory for the feature execution
+  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
 /// \class FeaturesPlugin_ValidatorCompositeLauncher

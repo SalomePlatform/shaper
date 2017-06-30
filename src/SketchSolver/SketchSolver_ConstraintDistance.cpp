@@ -1,8 +1,29 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <SketchSolver_ConstraintDistance.h>
 #include <SketchSolver_Error.h>
 #include <SketchSolver_Manager.h>
+
+#include <SketchPlugin_ConstraintDistanceHorizontal.h>
+#include <SketchPlugin_ConstraintDistanceVertical.h>
 
 #include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Lin2d.h>
@@ -22,9 +43,14 @@ void SketchSolver_ConstraintDistance::getAttributes(
     return;
   }
 
-  if (theAttributes[1])
-    myType = CONSTRAINT_PT_PT_DISTANCE;
-  else if (theAttributes[2] && theAttributes[2]->type() == ENTITY_LINE)
+  if (theAttributes[1]) {
+    if (myBaseConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID())
+      myType = CONSTRAINT_HORIZONTAL_DISTANCE;
+    else if (myBaseConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
+      myType = CONSTRAINT_VERTICAL_DISTANCE;
+    else
+      myType = CONSTRAINT_PT_PT_DISTANCE;
+  } else if (theAttributes[2] && theAttributes[2]->type() == ENTITY_LINE)
     myType = CONSTRAINT_PT_LINE_DISTANCE;
   else
     theAttributes.clear();

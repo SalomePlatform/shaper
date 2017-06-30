@@ -1,11 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
-/*
- * XGUI_PropertyPanel.h
- *
- *  Created on: Apr 29, 2014
- *      Author: sbh
- */
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef XGUI_PROPERTYPANEL_H_
 #define XGUI_PROPERTYPANEL_H_
@@ -114,6 +125,11 @@ Q_OBJECT
   /// \return button instance or NULL
   QToolButton* findButton(const char* theInternalName) const;
 
+  /// Possibility to process focus by method, for example when Tab or SHIF+Tab is pressed
+  /// but property panel is not active widget
+  /// \param theIsNext true, if Tab(to the next widget) or false(moving to the previous)
+  bool setFocusNextPrevChild(bool theIsNext);
+
 public slots:
   /// \brief Update all widgets in property panel with values from the given feature
   /// \param theFeature a Feature to update values in widgets
@@ -151,12 +167,10 @@ protected:
   /// Makes the widget active, deactivate the previous, activate and hightlight the given one
   /// \param theWidget a widget
   bool setActiveWidget(ModuleBase_ModelWidget* theWidget);
-
   /// The parent method that processes the "Tab"/"SHIF + Tab" keyboard events
   /// Emits a signal about focus change
   /// If theIsNext is true, this function searches forward, if next is false, it searches backward.
   virtual bool focusNextPrevChild(bool theIsNext);
-
   /// Activate the next widget in the property panel
   /// \param theWidget a widget. The next widget should be activated
   /// \param isCheckVisibility flag whether the next widget visibility is checked

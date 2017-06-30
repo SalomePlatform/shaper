@@ -1,8 +1,23 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:      ModuleBase_DoubleSpinBox.h
-// Author:    Sergey BELASH
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 //
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
+
 #ifndef MODULEBASE_DOUBLESPINBOX_H_
 #define MODULEBASE_DOUBLESPINBOX_H_
 
@@ -51,18 +66,9 @@ Q_OBJECT
   /// Validate current value
   virtual QValidator::State validate(QString&, int&) const;
 
-  /// Change enable/disable internal state to emit key press event
-  /// \param theEnable if true, the signal is emitted
-  /// \return the previous value
-  bool enableKeyPressEvent(const bool& theEnable);
-
   /// Imitation of disable control value. If theEnable is false, the control becomes
   /// read only and base color is disabled.
   void setValueEnabled(const bool& theEnable);
-
-signals:
-  /// The signal about key release on the control, that corresponds to the attribute
-  void enterReleased();
 
  protected slots:
    /// Called on text changed
@@ -71,11 +77,6 @@ signals:
  protected:
    /// Removes extra trailing zero symbols
   QString removeTrailingZeroes(const QString&) const;
-  /// Called on key press event
-  virtual void keyReleaseEvent(QKeyEvent* theEvent);
-
-  /// Called on key press event
-  virtual void keyPressEvent(QKeyEvent* theEvent);
 
  private:
   // boolen flag whether the key event is emitted. The default value is false

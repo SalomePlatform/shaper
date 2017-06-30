@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        ModuleBase_ResultPrs.cpp
-// Created:     21 October 2014
-// Author:      Vitaly SMETANNIKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "ModuleBase_ResultPrs.h"
 #include "ModuleBase_Tools.h"
@@ -91,11 +105,14 @@ void ModuleBase_ResultPrs::Compute(
 }
 
 void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
-                                            const Standard_Integer aMode)
+                                            const Standard_Integer theMode)
 {
-  if (aMode > TopAbs_SHAPE) {
+  if (appendVertexSelection(aSelection, theMode))
+    return;
+
+  if (theMode > TopAbs_SHAPE) {
     // In order to avoid using custom selection modes
-    if (aMode == ModuleBase_ResultPrs::Sel_Result) {
+    if (theMode == ModuleBase_ResultPrs::Sel_Result) {
       AIS_Shape::ComputeSelection(aSelection, TopAbs_COMPOUND);
     }
     return;
@@ -103,7 +120,7 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
 
   // TODO: OCCT issue should be created for the COMPOUND processing
   // before it is fixed, the next workaround in necessary
-  if (aMode == AIS_Shape::SelectionMode(TopAbs_COMPOUND)) {
+  if (theMode == AIS_Shape::SelectionMode(TopAbs_COMPOUND)) {
     const TopoDS_Shape& aShape = Shape();
     TopExp_Explorer aCompExp(aShape, TopAbs_COMPOUND);
     // do not activate in compound mode shapes which do not contain compounds
@@ -111,7 +128,7 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
       return;
   }
 
-  if (aMode == AIS_Shape::SelectionMode(TopAbs_COMPSOLID)) {
+  if (theMode == AIS_Shape::SelectionMode(TopAbs_COMPSOLID)) {
     // Limit selection area only by actual object (Shape)
     ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(myResult);
     if (aCompSolid.get()) {
@@ -140,7 +157,7 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
     }
     //AIS_Shape::ComputeSelection(aSelection, 0);
   }
-  AIS_Shape::ComputeSelection(aSelection, aMode);
+  AIS_Shape::ComputeSelection(aSelection, theMode);
 
   if (myAdditionalSelectionPriority > 0) {
     for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
@@ -152,6 +169,34 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
   }
 }
 
+bool ModuleBase_ResultPrs::appendVertexSelection(const Handle(SelectMgr_Selection)& aSelection,
+                                                 const Standard_Integer theMode)
+{
+  if (Shape().ShapeType() == TopAbs_VERTEX) {
+    const TopoDS_Shape& aShape = Shape();
+
+    int aPriority = StdSelect_BRepSelectionTool::GetStandardPriority(aShape, TopAbs_VERTEX);
+    double aDeflection = Prs3d::GetDeflection(aShape, myDrawer);
+
+    /// The cause of this method is the last parameter of BRep owner setting into True.
+    /// That means that owner should behave like it comes from decomposition. (In this case, OCCT
+    /// visualizes it in Ring style) OCCT version is 7.0.0 with path for SHAPER module.
+    Handle(StdSelect_BRepOwner) aOwner = new StdSelect_BRepOwner(aShape, aPriority, Standard_True);
+    StdSelect_BRepSelectionTool::ComputeSensitive(aShape, aOwner, aSelection,
+                                                  aDeflection, myDrawer->HLRAngle(), 9, 500);
+
+    for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
+      Handle(SelectMgr_EntityOwner) anOwner =
+        Handle(SelectMgr_EntityOwner)
+        ::DownCast(aSelection->Sensitive()->BaseSensitive()->OwnerId());
+      anOwner->Set(this);
+    }
+    return true;
+  }
+  return false;
+}
+
+/* OBSOLETE
 void ModuleBase_ResultPrs::appendWiresSelection(const Handle(SelectMgr_Selection)& theSelection,
                                                 const TopoDS_Shape& theShape)
 {
@@ -169,7 +214,7 @@ void ModuleBase_ResultPrs::appendWiresSelection(const Handle(SelectMgr_Selection
                                       myDrawer->IsAutoTriangulation());
   } catch ( Standard_Failure ) {
   }
-}
+}*/
 
 void ModuleBase_ResultPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM,
                                            const SelectMgr_SequenceOfOwner& theOwners)

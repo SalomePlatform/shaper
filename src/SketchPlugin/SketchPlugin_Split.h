@@ -1,15 +1,32 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
-// File:    SketchPlugin_ConstraintSplit.h
-// Created: 25 Aug 2016
-// Author:  Natalia ERMOLAEVA
-
-#ifndef SketchPlugin_ConstraintSplit_H_
-#define SketchPlugin_ConstraintSplit_H_
+#ifndef SketchPlugin_Split_H_
+#define SketchPlugin_Split_H_
 
 #include "SketchPlugin.h"
+
+#include "GeomAPI_IPresentable.h"
+#include <ModelAPI_IReentrant.h>
+
 #include <SketchPlugin_Sketch.h>
-#include "SketchPlugin_ConstraintBase.h"
 
 class GeomDataAPI_Point2D;
 class ModelAPI_Feature;
@@ -17,7 +34,7 @@ class ModelAPI_Result;
 
 typedef std::pair<std::string, std::shared_ptr<GeomDataAPI_Point2D> > IdToPointPair;
 
-/** \class SketchPlugin_ConstraintSplit
+/** \class SketchPlugin_Split
  *  \ingroup Plugins
  *  \brief Feature for creation of a new constraint splitting object. Entities for split:
  * - Linear segment by point(s) on this line
@@ -47,20 +64,48 @@ typedef std::pair<std::string, std::shared_ptr<GeomDataAPI_Point2D> > IdToPointP
  *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B() for the points of split;
  *
  */
-class SketchPlugin_ConstraintSplit : public SketchPlugin_ConstraintBase
+class SketchPlugin_Split : public SketchPlugin_Feature, public GeomAPI_IPresentable,
+                           public ModelAPI_IReentrant
 {
  public:
   /// Split constraint kind
   inline static const std::string& ID()
   {
-    static const std::string MY_CONSTRAINT_SPLIT_ID("SketchConstraintSplit");
-    return MY_CONSTRAINT_SPLIT_ID;
+    static const std::string MY_SPLIT_ID("SketchSplit");
+    return MY_SPLIT_ID;
   }
   /// \brief Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {
-    static std::string MY_KIND = SketchPlugin_ConstraintSplit::ID();
+    static std::string MY_KIND = SketchPlugin_Split::ID();
     return MY_KIND;
+  }
+  /// The value parameter for the constraint
+  inline static const std::string& SELECTED_OBJECT()
+  {
+    static const std::string MY_SELECTED_OBJECT("SelectedObject");
+    return MY_SELECTED_OBJECT;
+  }
+
+  /// Start 2D point of the split segment
+  inline static const std::string& SELECTED_POINT()
+  {
+    static const std::string MY_SELECTED_POINT("SelectedPoint");
+    return MY_SELECTED_POINT;
+  }
+
+  /// The value parameter for the preview object
+  inline static const std::string& PREVIEW_OBJECT()
+  {
+    static const std::string MY_PREVIEW_OBJECT("PreviewObject");
+    return MY_PREVIEW_OBJECT;
+  }
+
+  /// Start 2D point of the split segment
+  inline static const std::string& PREVIEW_POINT()
+  {
+    static const std::string MY_PREVIEW_POINT("PreviewPoint");
+    return MY_PREVIEW_POINT;
   }
 
   /// \brief Creates a new part document if needed
@@ -71,19 +116,33 @@ class SketchPlugin_ConstraintSplit : public SketchPlugin_ConstraintBase
 
   /// Reimplemented from ModelAPI_Feature::isMacro().
   /// \returns true
-  SKETCHPLUGIN_EXPORT virtual bool isMacro() const;
+  SKETCHPLUGIN_EXPORT virtual bool isMacro() const { return true; }
 
   /// Reimplemented from ModelAPI_Feature::isPreviewNeeded(). Returns false.
   /// This is necessary to perform execute only by apply the feature
   SKETCHPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return false; }
 
   /// \brief Use plugin manager for features creation
-  SketchPlugin_ConstraintSplit();
+  SketchPlugin_Split();
 
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
+  /// Moves the feature : Empty
+  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY) {};
+
+  /// Apply information of the message to current object. It fills selected point and object
+  virtual std::string processEvent(const std::shared_ptr<Events_Message>& theMessage);
+
 private:
+  /// Fulfill an internal container by shapes obtained from the parameter object
+  /// Shapes are result of split operation by points coincident to shape of the object
+  /// \param theObject a source object (will be splitted)
+  /// \param theSketch a sketch object
+  void fillObjectShapes(const ObjectPtr& theObject, const ObjectPtr& theSketch);
+
+  GeomShapePtr getSubShape(const std::string& theObjectAttributeId,
+                           const std::string& thePointAttributeId);
   /// Returns geom point attribute of the feature bounds. It processes line or arc.
   /// For circle feature, the result attributes are null
   /// \param theFeature a source feature
@@ -154,7 +213,8 @@ private:
   /// \param theCreatedFeatures a container of created features
   /// \param theModifiedAttributes a container of attribute on base
   /// feature to attribute on new feature
-  void splitLine(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
+  /// \return new line if it was created
+  FeaturePtr splitLine(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
                  std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,
                  std::shared_ptr<ModelAPI_Feature>& theAfterFeature,
                  std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
@@ -167,7 +227,8 @@ private:
   /// \param theAfterFeature a feature between last point of split feature and the end point
   /// \param thePoints a list of points where coincidences will be build
   /// \param theCreatedFeatures a container of created features
-  void splitArc(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
+  /// \return new arc if it was created
+  FeaturePtr splitArc(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
                 std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,
                 std::shared_ptr<ModelAPI_Feature>& theAfterFeature,
                 std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
@@ -180,7 +241,8 @@ private:
   /// \param theAfterFeature a feature between last point of split feature and the end point
   /// \param thePoints a list of points where coincidences will be build
   /// \param theCreatedFeatures a container of created features
-  void splitCircle(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
+  /// \return new arc if it was created
+  FeaturePtr splitCircle(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
                    std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,
                    std::shared_ptr<ModelAPI_Feature>& theAfterFeature,
                    std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
@@ -267,6 +329,11 @@ private:
   std::set<std::shared_ptr<ModelAPI_Attribute> > getEdgeAttributes(
                                     const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
+  /// Returns first attribute coincident to the first/second point of selected shape
+  /// \param isFirstAttribute true for getting the first atribute, false otherwise
+  /// \return an attribute or NULL
+  std::shared_ptr<GeomDataAPI_Point2D> getPointAttribute(const bool isFirstAttribute);
+
 #ifdef _DEBUG
   /// Return feature name, kind, point attribute values united in a string
   /// \param theFeature an investigated feature
@@ -274,6 +341,12 @@ private:
   std::string getFeatureInfo(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                              const bool isUseAttributesInfo = true);
 #endif
+private:
+  typedef std::map<std::shared_ptr<GeomDataAPI_Point2D>,
+                   std::shared_ptr<GeomAPI_Pnt> > PntToAttributesMap;
+
+  std::map<std::shared_ptr<ModelAPI_Object>, std::set<GeomShapePtr> > myCashedShapes;
+  std::map<std::shared_ptr<ModelAPI_Object>, PntToAttributesMap> myCashedReferences;
 };
 
 #endif

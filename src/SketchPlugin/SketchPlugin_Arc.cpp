@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
-// File:        SketchPlugin_Arc.cpp
-// Created:     26 Apr 2014
-// Author:      Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "SketchPlugin_Arc.h"
 #include "SketchPlugin_Sketch.h"
@@ -37,7 +51,7 @@
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 // for sqrt on Linux
-#include <math.h>
+#include <cmath>
 
 const double tolerance = 1e-7;
 const double paramTolerance = 1.e-4;
@@ -99,14 +113,20 @@ void SketchPlugin_Arc::execute()
       aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
   std::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
 
-  GeomShapePtr anArcShape = boolean(REVERSED_ID())->value() ?
-      GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, anEnd, aStart, aNormal)
-    : GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStart, anEnd, aNormal);
-
   if (myParamBefore == 0) { // parameter has not been calculate yet
     std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
         new GeomAPI_Circ2d(aCenterAttr->pnt(), aStartAttr->pnt()));
     aCircleForArc->parameter(anEndAttr->pnt(), paramTolerance, myParamBefore);
+  }
+
+  GeomShapePtr anArcShape;
+  if (fabs(myParamBefore - 2.0 * PI) < paramTolerance) {
+    anArcShape = GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, aStart->distance(aCenter));
+    myParamBefore = 0;
+  } else {
+    anArcShape = boolean(REVERSED_ID())->value() ?
+      GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, anEnd, aStart, aNormal)
+    : GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStart, anEnd, aNormal);
   }
 
   std::shared_ptr<ModelAPI_ResultConstruction> aResult = document()->createConstruction(data(), 1);
@@ -245,6 +265,9 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
         }
         data()->blockSendAttributeUpdated(aWasBlocked, false);
       }
+      if (fabs(aParameterNew) < paramTolerance ||
+          fabs(aParameterNew - 2.0 * PI) < paramTolerance)
+        aParameterNew = 2.0 * PI;
       myParamBefore = aParameterNew;
     }
   }

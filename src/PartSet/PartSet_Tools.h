@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        PartSet_Tools.h
-// Created:     28 Apr 2014
-// Author:      Natalia ERMOLAEVA
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef PartSet_Tools_H
 #define PartSet_Tools_H
@@ -17,6 +31,7 @@
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Attribute.h>
+#include <ModelAPI_AttributeSelection.h>
 
 #include <Events_Message.h>
 
@@ -247,7 +262,7 @@ public:
   */
   static void findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList,
                                QList<FeaturePtr>& theCoincidencies,
-                               std::string theAttr);
+                               std::string theAttr, QList<bool>& theIsAttributes);
 
   /**
   * Returns point of a coincedence
@@ -265,6 +280,13 @@ public:
    * \return boolean result
    */
   static bool isAuxiliarySketchEntity(const ObjectPtr& theObject);
+
+  static ResultPtr createFixedByExternalCenter(const ObjectPtr& theObject,
+                                               const std::shared_ptr<GeomAPI_Edge>& theEdge,
+                                               ModelAPI_AttributeSelection::CenterType theType,
+                                               const CompositeFeaturePtr& theSketch,
+                                               bool theTemporary = false);
+
 };
 
 #endif

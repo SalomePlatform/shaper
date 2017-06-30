@@ -1,11 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
-/*
- * XGUI_PropertyPanel.cpp
- *
- *  Created on: Apr 29, 2014
- *      Author: sbh
- */
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_ActionsMgr.h>
@@ -41,6 +52,8 @@
 #endif
 
 //#define DEBUG_TAB_WIDGETS
+
+//#define DEBUG_ACTIVE_WIDGET
 
 XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* theMgr)
     : ModuleBase_IPropertyPanel(theParent),
@@ -128,6 +141,9 @@ void XGUI_PropertyPanel::cleanContent()
   myWidgets.clear();
   myPanelPage->clearPage();
   myActiveWidget = NULL;
+#ifdef DEBUG_ACTIVE_WIDGET
+  std::cout << "myActiveWidget = NULL" << std::endl;
+#endif
 
   findButton(PROP_PANEL_PREVIEW)->setVisible(false); /// by default it is hidden
   setWindowTitle(tr("Property Panel"));
@@ -204,6 +220,9 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
 
 void XGUI_PropertyPanel::onFocusInWidget(ModuleBase_ModelWidget* theWidget)
 {
+#ifdef DEBUG_ACTIVE_WIDGET
+  std::cout << "onFocusInWidget" << std::endl;
+#endif
   if (theWidget->canAcceptFocus())
     activateWidget(theWidget);
 }
@@ -254,6 +273,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
         continue; // do not set focus if it can not be accepted, case: optional choice
 
       if (aCurrentWidget->focusTo()) {
+        aCurrentWidget->emitFocusInWidget();
         return;
       }
     }
@@ -272,7 +292,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
       aNewFocusWidget = aCancelBtn;
   }
   if (aNewFocusWidget)
-    aNewFocusWidget->setFocus(Qt::TabFocusReason);
+    ModuleBase_Tools::setFocus(aNewFocusWidget, "XGUI_PropertyPanel::activateNextWidget");
 
   activateWidget(NULL);
 }
@@ -333,6 +353,11 @@ void findDirectChildren(QWidget* theParent, QList<QWidget*>& theWidgets, const b
 #endif
 }
 
+bool XGUI_PropertyPanel::setFocusNextPrevChild(bool theIsNext)
+{
+  return focusNextPrevChild(theIsNext);
+}
+
 bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
 {
   // it wraps the Tabs clicking to follow in the chain:
@@ -346,6 +371,10 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
     qDebug(anInfo.toStdString().c_str());
   }
 #endif
+  ModuleBase_ModelWidget* aFocusMWidget = ModuleBase_ModelWidget::findModelWidget(this,
+                                                                         aFocusWidget);
+  if (aFocusMWidget)
+    aFocusMWidget->setHighlighted(false);
 
   QWidget* aNewFocusWidget = 0;
   if (aFocusWidget) {
@@ -390,7 +419,6 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
   }
   if (aNewFocusWidget) {
     if (myActiveWidget) {
-      myActiveWidget->getControls();
       bool isFirstControl = !theIsNext;
       QWidget* aLastFocusControl = myActiveWidget->getControlAcceptingFocus(isFirstControl);
       if (aFocusWidget == aLastFocusControl) {
@@ -398,8 +426,13 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
       }
     }
 
-    //ModuleBase_Tools::setFocus(aNewFocusWidget, "XGUI_PropertyPanel::focusNextPrevChild()");
-    aNewFocusWidget->setFocus(theIsNext ? Qt::TabFocusReason : Qt::BacktabFocusReason);
+    // we want to have property panel as an active window to enter values in double control
+    ModuleBase_Tools::setFocus(aNewFocusWidget, "XGUI_PropertyPanel::focusNextPrevChild()");
+
+    ModuleBase_ModelWidget* aNewFocusMWidget = ModuleBase_ModelWidget::findModelWidget(this,
+                                                                              aNewFocusWidget);
+    if (aNewFocusMWidget)
+      aNewFocusMWidget->emitFocusInWidget();
     isChangedFocus = true;
   }
   return isChangedFocus;
@@ -444,6 +477,9 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
     theWidget->activate();
   }
   myActiveWidget = theWidget;
+#ifdef DEBUG_ACTIVE_WIDGET
+  std::cout << "myActiveWidget = " << (theWidget ? theWidget->context().c_str() : "") << std::endl;
+#endif
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
   Events_Loop::loop()->flush(anEvent);
 

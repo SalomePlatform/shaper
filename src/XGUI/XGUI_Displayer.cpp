@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
-// File:        XGUI_Displayer.cpp
-// Created:     20 Apr 2014
-// Author:      Natalia ERMOLAEVA
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "XGUI_Displayer.h"
 #include "XGUI_Workshop.h"
@@ -1431,6 +1445,14 @@ void XGUI_Displayer::getPresentations(const ObjectPtr& theObject,
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
   if (aResult.get()) {
     AISObjectPtr aAISObj = getAISObject(aResult);
+    if (aAISObj.get() == NULL) {
+      // if result is a result of a composite feature, it is visualized by visualization of
+      // composite children, so we should get one of this presentations
+      ResultCompSolidPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+      if (aCompSolid.get() && aCompSolid->numberOfSubs() > 0) {
+        aAISObj = getAISObject(aCompSolid->subResult(0));
+      }
+    }
     if (aAISObj.get() != NULL) {
       Handle(AIS_InteractiveObject) anAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
       if (!anAIS.IsNull() && !thePresentations.Contains(anAIS))

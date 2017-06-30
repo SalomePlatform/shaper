@@ -1,8 +1,22 @@
-// Copyright (C) 2016-20xx CEA/DEN, EDF R&D -->
-
-// File:        ModelHighAPI_FeatureStore.cpp
-// Created:     12 August 2016
-// Author:      Mikhail PONIKAROV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <ModelHighAPI_FeatureStore.h>
 
@@ -187,6 +201,10 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
     aResult<<anAttr->value();
   } else if (aType == ModelAPI_AttributeString::typeId()) {
     AttributeStringPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttr);
+    // do not dump solver DOF for sketch as it may be changed unexpectedly
+    if(anAttr->id() == "SolverDOF") {
+      return "";
+    }
     aResult<<anAttr->value();
   } else if (aType == ModelAPI_AttributeReference::typeId()) {
     AttributeReferencePtr anAttr =
@@ -341,7 +359,7 @@ std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>&
   std::shared_ptr<GeomAPI_Pnt> aCenter = GeomAlgoAPI_ShapeTools::centreOfMass(theShape);
   aResult<<"Center of mass: ";
   double aCenterVals[3] = {aCenter->x(), aCenter->y(), aCenter->z()};
-  dumpArray(aResult, aCenterVals, 3);
+  dumpArray(aResult, aCenterVals, 3, 5);
   aResult<<std::endl;
   return aResult.str();
 }

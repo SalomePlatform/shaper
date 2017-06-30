@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
-// File:    SketchPlugin_ConstraintDistance.cpp
-// Created: 23 May 2014
-// Author:  Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "SketchPlugin_ConstraintDistance.h"
 #include <SketchPlugin_Point.h>
@@ -162,6 +176,32 @@ double SketchPlugin_ConstraintDistance::calculateCurrentDistance()
     }
   }
   return aDistance;
+}
+
+bool SketchPlugin_ConstraintDistance::areAttributesInitialized()
+{
+  std::shared_ptr<ModelAPI_Data> aData = data();
+  std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
+  std::shared_ptr<GeomDataAPI_Point2D> aPointA =
+      SketcherPrs_Tools::getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_A(), aPlane);
+  std::shared_ptr<GeomDataAPI_Point2D> aPointB =
+      SketcherPrs_Tools::getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_B(), aPlane);
+
+  if (!aPointA && !aPointB)
+    return false;
+  else if (aPointA || aPointB) {
+    FeaturePtr aLine;
+    if (!aPointA)
+      aLine = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
+    else if (!aPointB)
+      aLine = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+    else // both points are initialized
+      return true;
+
+    if (!aLine || aLine->getKind() != SketchPlugin_Line::ID())
+      return false;
+  }
+  return true;
 }
 
 void SketchPlugin_ConstraintDistance::attributeChanged(const std::string& theID)

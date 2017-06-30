@@ -1,7 +1,27 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 """
     TestMultiTranslation.py
     Unit test of SketchPlugin_MultiTranslation class
-        
+
     SketchPlugin_MultiTranslation
         static const std::string MY_CONSTRAINT_TRANSLATION_ID("SketchMultiTranslation");
         data()->addAttribute(VALUE_TYPE(), ModelAPI_AttributeString::typeId());
@@ -34,7 +54,7 @@ def createSketch(theSketch):
     allFeatures.append(aSketchArc)
     theSketch.execute()
     return allFeatures
-    
+
 def createLine(theSketch):
     aSketchLine = theSketch.addFeature("SketchLine")
     aStartPoint = geomDataAPI_Point2D(aSketchLine.attribute("StartPoint"))
@@ -43,7 +63,7 @@ def createLine(theSketch):
     aEndPoint.setValue(1., 3.)
     theSketch.execute()
     return aSketchLine
-    
+
 def checkTranslation(theObjects, theNbObjects, theDeltaX, theDeltaY):
     # Verify distances of the objects and the number of copies
     aFeatures = []
@@ -52,15 +72,15 @@ def checkTranslation(theObjects, theNbObjects, theDeltaX, theDeltaY):
         feat = ModelAPI_Feature.feature(theObjects.object(i))
         assert(feat is not None)
         aFeatures.append(feat)
-        
-    anInd = 0 
+
+    anInd = 0
     for feat, next in zip(aFeatures[:-1], aFeatures[1:]):
         anInd = anInd + 1
         if (anInd > theNbObjects-1):
             anInd = 0
             continue
         assert(feat.getKind() == next.getKind())
-        
+
         anAttributes = []
         if (feat.getKind() == "SketchLine"):
             anAttributes.append('StartPoint')
@@ -69,7 +89,7 @@ def checkTranslation(theObjects, theNbObjects, theDeltaX, theDeltaY):
             anAttributes.append('center_point')
             anAttributes.append('start_point')
             anAttributes.append('end_point')
-            
+
         for attr in anAttributes:
              aPoint1 = geomDataAPI_Point2D(feat.attribute(attr))
              aPoint2 = geomDataAPI_Point2D(next.attribute(attr))

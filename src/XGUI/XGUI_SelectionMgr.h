@@ -1,4 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef XGUI_SelectionMgr_H
 #define XGUI_SelectionMgr_H
@@ -50,6 +68,11 @@ Q_OBJECT
   //! Clears selection in Viewer and object Browser
   void clearSelection();
 
+  //! Sets values selected in both, ObjectBrowser and V3d viewer
+  //! Selection is not synchronized between these controls.
+  //! \param theValues a container of values to be selected.
+  void setSelected(const QList<std::shared_ptr<ModuleBase_ViewerPrs> >& theValues);
+
   /// Updates selection, which are depend on the selection in the given place
   /// \param thePlace a widget where selection has happened.
   void updateSelectionBy(const ModuleBase_ISelection::SelectionPlace& thePlace);
@@ -58,14 +81,21 @@ signals:
   //! Emited when selection in a one of viewers was changed
   void selectionChanged();
 
- private slots:
+ public slots:
    /// Reaction on selectio0n in Object browser
   void onObjectBrowserSelection();
 
    /// Reaction on selectio0n in Viewer
   void onViewerSelection();
 
- private:
+private:
+  /// Interates through the values to prepare container of objects that may be selected in OB
+  /// \param theValues selection information
+  /// \param theObjecs an output container
+  void convertToObjectBrowserSelection(
+       const QList<std::shared_ptr<ModuleBase_ViewerPrs> >& theValues, QObjectPtrList& theObjects);
+
+private:
    /// Reference to workshop
   XGUI_Workshop* myWorkshop;
 

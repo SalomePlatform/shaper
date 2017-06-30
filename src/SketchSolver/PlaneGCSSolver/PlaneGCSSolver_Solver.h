@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:    PlaneGCSSolver_Solver.h
-// Created: 14 Dec 2014
-// Author:  Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef PlaneGCSSolver_Solver_H_
 #define PlaneGCSSolver_Solver_H_
@@ -39,8 +53,14 @@ public:
 
   /// \brief Initialize memory for new solver's parameter
   double* createParameter();
+  /// \brief Add parameters created elsewhere
+  void addParameters(const GCS::SET_pD& theParams);
   /// \brief Release memory occupied by parameters
   void removeParameters(const GCS::SET_pD& theParams);
+
+  /// \brief Preliminary initialization of solver (useful for moving a feature).
+  ///        When called, the solve() method does not reinitialize a set of constraints.
+  void initialize();
 
   /// \brief Solve the set of equations
   /// \return identifier whether solution succeeded
@@ -61,6 +81,11 @@ public:
 private:
   void collectConflicting();
 
+  /// \brief Add fictive constraint if the sketch contains temporary constraints only
+  void addFictiveConstraintIfNecessary();
+  /// \brief Remove previously added fictive constraint
+  void removeFictiveConstraint();
+
 private:
   typedef std::map<ConstraintID, std::set<GCSConstraintPtr> > ConstraintMap;
 
@@ -69,12 +94,15 @@ private:
 
   std::shared_ptr<GCS::System> myEquationSystem; ///< set of equations for solving in FreeGCS
   bool                         myDiagnoseBeforeSolve; ///< is the diagnostic necessary
+  bool                         myInitilized;     ///< is the system already initialized
 
   GCS::SET_I                   myConflictingIDs; ///< list of IDs of conflicting constraints
   /// specifies the conflicting constraints are already collected
   bool                         myConfCollected;
 
   int                          myDOF;            ///< degrees of freedom
+
+  GCS::Constraint*             myFictiveConstraint;
 };
 
 typedef std::shared_ptr<PlaneGCSSolver_Solver> SolverPtr;

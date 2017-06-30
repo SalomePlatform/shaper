@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        Model_Update.cxx
-// Created:     25 Jun 2014
-// Author:      Mikhail PONIKAROV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <Model_Update.h>
 #include <Model_Document.h>
@@ -314,9 +328,22 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     // processed features must be only on finish, so clear anyway (to avoid reimport on load)
     myProcessOnFinish.clear();
 
+    // #2156: current must be sketch, left after the macro execution
+    DocumentPtr anActiveDoc = ModelAPI_Session::get()->activeDocument();
+    FeaturePtr aCurrent;
+    if (anActiveDoc.get())
+      aCurrent = anActiveDoc->currentFeature(false);
+
     if (!(theMessage->eventID() == kOpStartEvent)) {
       processFeatures(false);
     }
+
+    if (anActiveDoc.get() && aCurrent.get() && aCurrent->data()->isValid()) {
+      if (anActiveDoc->currentFeature(false) != aCurrent)
+        anActiveDoc->setCurrentFeature(aCurrent, false); // #2156 make the current feature back
+    }
+
+
     // remove all macros before clearing all created
     std::set<FeaturePtr>::iterator anUpdatedIter = myWaitForFinish.begin();
     while(anUpdatedIter != myWaitForFinish.end()) {

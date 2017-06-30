@@ -1,4 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "ModelAPI_IReentrant.h"
 #include "ModelAPI_EventReentrantMessage.h"
@@ -86,6 +104,10 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId,
   QList<ModuleBase_ViewerPrsPtr> aPreSelected =
     aSelection->getSelected(ModuleBase_ISelection::AllControls);
 
+  ModuleBase_OperationFeature* aCurOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                         (myWorkshop->currentOperation());
+  QString aCurOperationKind = aCurOperation ? aCurOperation->getDescription()->operationId() : "";
+
   bool isCommitted;
   if (!myWorkshop->canStartOperation(theCmdId, isCommitted))
     return;
@@ -101,9 +123,10 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId,
     if (aMessage.get()) {
       setReentrantPreSelection(aMessage);
     }
-    else
+    else if (canUsePreselection(aCurOperationKind, theCmdId)) {
+      // restore of previous opeation is absent or new launched operation has the same kind
       aFOperation->initSelection(aPreSelected);
-
+    }
     workshop()->processLaunchOperation(aFOperation);
 
     if (aFOperation) {
@@ -208,6 +231,23 @@ bool ModuleBase_IModule::canEraseObject(const ObjectPtr& theObject) const
 bool ModuleBase_IModule::canDisplayObject(const ObjectPtr& theObject) const
 {
   return true;
+}
+
+bool ModuleBase_IModule::canUsePreselection(const QString& thePreviousOperationKind,
+                                            const QString& theStartedOperationKind)
+{
+  // no previous operation
+  if (thePreviousOperationKind.isEmpty())
+    return true;
+  // edit operation
+  if (thePreviousOperationKind.endsWith(ModuleBase_OperationFeature::EditSuffix()))
+    return true;
+
+  // reentrant operation
+  if (thePreviousOperationKind == theStartedOperationKind)
+    return true;
+
+  return false;
 }
 
 bool ModuleBase_IModule::canUndo() const

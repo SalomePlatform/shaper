@@ -1,3 +1,23 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 """
 Macro-feature to produce rectangle in the sketcher
 Author: Artem ZHIDKOV
@@ -160,6 +180,7 @@ class SketchPlugin_Rectangle(model.Feature):
         aEndPoint = GeomDataAPI.geomDataAPI_Point2D(self.attribute(self.END_ID()))
         aX = [aStartPoint.x(), aStartPoint.x(), aEndPoint.x(), aEndPoint.x()]
         aY = [aStartPoint.y(), aEndPoint.y(), aEndPoint.y(), aStartPoint.y()]
+        anAuxiliary = self.data().boolean(self.AUXILIARY_ID()).value()
 
         # Update coordinates of rectangle lines
         for i in range (0, aNbLines):
@@ -168,6 +189,7 @@ class SketchPlugin_Rectangle(model.Feature):
             aLineEnd = GeomDataAPI.geomDataAPI_Point2D(aLine.attribute("EndPoint"))
             aLineStart.setValue(aX[i-1], aY[i-1])
             aLineEnd.setValue(aX[i], aY[i])
+            aLine.data().boolean("Auxiliary").setValue(anAuxiliary)
 
     def updateStartPoint(self):
         # Retrieving list of already created lines

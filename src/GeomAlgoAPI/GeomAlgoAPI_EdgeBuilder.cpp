@@ -1,24 +1,39 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        GeomAlgoAPI_EdgeBuilder.cpp
-// Created:     23 Apr 2014
-// Author:      Mikhail PONIKAROV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <GeomAlgoAPI_EdgeBuilder.h>
-#include <gp_Pln.hxx>
-#include <BRepBuilderAPI_MakeEdge.hxx>
-#include <TopoDS_Edge.hxx>
-#include <TopoDS_Face.hxx>
-#include <TopoDS.hxx>
-#include <BRep_Tool.hxx>
-#include <Geom_Plane.hxx>
-#include <Geom_CylindricalSurface.hxx>
-#include <Geom_RectangularTrimmedSurface.hxx>
 
+#include <Bnd_Box.hxx>
+#include <BRep_Tool.hxx>
+#include <BRepBndLib.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
 #include <gp_Ax2.hxx>
 #include <gp_Circ.hxx>
-#include <Bnd_Box.hxx>
-#include <BRepBndLib.hxx>
+#include <gp_Elips.hxx>
+#include <gp_Pln.hxx>
+#include <Geom_CylindricalSurface.hxx>
+#include <Geom_Plane.hxx>
+#include <Geom_RectangularTrimmedSurface.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Edge.hxx>
+#include <TopoDS_Face.hxx>
 
 std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
     std::shared_ptr<GeomAPI_Pnt> theStart, std::shared_ptr<GeomAPI_Pnt> theEnd)
@@ -191,7 +206,11 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
   gp_Circ aCircle(gp_Ax2(aCenter, aDir), aRadius);
 
   const gp_Pnt& aStart = theStartPoint->impl<gp_Pnt>();
-  const gp_Pnt& anEnd = theEndPoint->impl<gp_Pnt>();
+  const gp_Pnt& anEndInter = theEndPoint->impl<gp_Pnt>();
+
+  // project end point to a circle
+  gp_XYZ aEndDir = anEndInter.XYZ() - aCenter.XYZ();
+  gp_Pnt anEnd(aCenter.XYZ() + aEndDir.Normalized() * aRadius);
 
   BRepBuilderAPI_MakeEdge anEdgeBuilder;
   anEdgeBuilder = BRepBuilderAPI_MakeEdge(aCircle, aStart, anEnd);
@@ -202,5 +221,25 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
     aRes = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge);
     aRes->setImpl(new TopoDS_Shape(anEdgeBuilder.Edge()));
   }
+  return aRes;
+}
+
+std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::ellipse(
+    const std::shared_ptr<GeomAPI_Pnt>& theCenter,
+    const std::shared_ptr<GeomAPI_Dir>& theNormal,
+    const std::shared_ptr<GeomAPI_Dir>& theMajorAxis,
+    const double                        theMajorRadius,
+    const double                        theMinorRadius)
+{
+  const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
+  const gp_Dir& aNormal = theNormal->impl<gp_Dir>();
+  const gp_Dir& aMajorAxis = theMajorAxis->impl<gp_Dir>();
+
+  gp_Elips anEllipse(gp_Ax2(aCenter, aNormal, aMajorAxis), theMajorRadius, theMinorRadius);
+
+  BRepBuilderAPI_MakeEdge anEdgeBuilder(anEllipse);
+  std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
+  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
+  aRes->setImpl(new TopoDS_Shape(anEdge));
   return aRes;
 }

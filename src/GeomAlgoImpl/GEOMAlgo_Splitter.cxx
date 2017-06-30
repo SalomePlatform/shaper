@@ -20,12 +20,6 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-// File:        GEOMAlgo_Splitter.cxx
-// Created:     Thu Sep 06 10:54:04 2012
-// Author:      Peter KURNEV
-//              <pkv@irinox>
-//
-
 #include <GEOMAlgo_Splitter.hxx>
 
 #include <TopAbs_ShapeEnum.hxx>

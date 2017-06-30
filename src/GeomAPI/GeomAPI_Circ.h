@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        GeomAPI_Circ.h
-// Created:     24 Jun 2014
-// Author:      Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef GeomAPI_Circ_H_
 #define GeomAPI_Circ_H_
@@ -23,7 +37,8 @@ class GeomAPI_Circ : public GeomAPI_Interface
 {
  public:
 
-  /** \brief Constructs a circle of radius Radius, where theAx2 locates the circle and defines its orientation in 3D space such that:\n
+  /** \brief Constructs a circle of radius Radius, where theAx2 locates
+   *  the circle and defines its orientation in 3D space such that:\n
    *  - the center of the circle is the origin of theAx2;\n
    *  - the origin, "X Direction" and "Y Direction" of theAx2 define the plane of the circle;\n
    *  - theAx2 is the local coordinate system of the circle.\n
@@ -62,6 +77,9 @@ class GeomAPI_Circ : public GeomAPI_Interface
                                       const double theTolerance,
                                       double& theParameter) const;
 };
+
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_Circ> GeomCirclePtr;
 
 #endif
 

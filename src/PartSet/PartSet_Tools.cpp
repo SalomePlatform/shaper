@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        PartSet_Tools.cpp
-// Created:     28 Apr 2014
-// Author:      Natalia ERMOLAEVA
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <PartSet_Tools.h>
 #include <PartSet_Module.h>
@@ -16,6 +30,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Tools.h>
 
 #include <ModuleBase_IViewWindow.h>
 
@@ -422,6 +437,22 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
         //if (!theTemporary) {
           aMyFeature->execute();
 
+        // issue #2125: Naming problem: two edges in Naming for one circle on solid
+        // this is result of boolean and seamedge
+        if (aAdaptor.GetType() == GeomAbs_Circle) {
+          ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+          if (!aFactory->validate(aMyFeature)) {
+            anAttr->setValue(ResultPtr(), GeomShapePtr());
+            std::set<FeaturePtr> aFeatures;
+            aFeatures.insert(aMyFeature);
+            ModelAPI_Tools::removeFeaturesAndReferences(aFeatures);
+            Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+            Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+
+            return ResultPtr();
+          }
+        }
+
         //  // fix this edge
         //  FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
         //  aFix->data()->refattr(SketchPlugin_Constraint::ENTITY_A())->
@@ -732,7 +763,7 @@ FeaturePtr PartSet_Tools::findFirstCoincidence(const FeaturePtr& theFeature,
 
 void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList,
                                      QList<FeaturePtr>& theCoincidencies,
-                                     std::string theAttr)
+                                     std::string theAttr, QList<bool>& theIsAttributes)
 {
   std::shared_ptr<GeomAPI_Pnt2d> aOrig = getCoincedencePoint(theStartCoin);
   if (aOrig.get() == NULL)
@@ -747,6 +778,7 @@ void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>&
     if (!theList.contains(aFeature)) {
       theList.append(aFeature);
       theCoincidencies.append(theStartCoin);
+      theIsAttributes.append(true); // point attribute on a feature
       const std::set<AttributePtr>& aRefsList = aFeature->data()->refsToMe();
       std::set<AttributePtr>::const_iterator aIt;
       for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
@@ -757,9 +789,9 @@ void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>&
             std::shared_ptr<GeomAPI_Pnt2d> aPnt = getCoincedencePoint(aConstrFeature);
             if (aPnt.get() && aOrig->isEqual(aPnt)) {
               findCoincidences(aConstrFeature, theList, theCoincidencies,
-                SketchPlugin_ConstraintCoincidence::ENTITY_A());
+                SketchPlugin_ConstraintCoincidence::ENTITY_A(), theIsAttributes);
               findCoincidences(aConstrFeature, theList, theCoincidencies,
-                SketchPlugin_ConstraintCoincidence::ENTITY_B());
+                SketchPlugin_ConstraintCoincidence::ENTITY_B(), theIsAttributes);
             }
           }
         }
@@ -773,6 +805,7 @@ void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>&
       if (!theList.contains(aFeature))
         theList.append(aFeature);
       theCoincidencies.append(theStartCoin);
+      theIsAttributes.append(false); // point attribute on a feature
 
       const std::set<AttributePtr>& aRefsList = aResult->data()->refsToMe();
       std::set<AttributePtr>::const_iterator aIt;
@@ -784,9 +817,9 @@ void PartSet_Tools::findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>&
             std::shared_ptr<GeomAPI_Pnt2d> aPnt = getCoincedencePoint(aConstrFeature);
             if (aPnt.get() && aOrig->isEqual(aPnt)) {
               findCoincidences(aConstrFeature, theList, theCoincidencies,
-                SketchPlugin_ConstraintCoincidence::ENTITY_A());
+                SketchPlugin_ConstraintCoincidence::ENTITY_A(), theIsAttributes);
               findCoincidences(aConstrFeature, theList, theCoincidencies,
-                SketchPlugin_ConstraintCoincidence::ENTITY_B());
+                SketchPlugin_ConstraintCoincidence::ENTITY_B(), theIsAttributes);
             }
           }
         }
@@ -871,4 +904,30 @@ bool PartSet_Tools::isAuxiliarySketchEntity(const ObjectPtr& theObject)
 
 
   return isAuxiliaryFeature;
+}
+
+
+ResultPtr PartSet_Tools::createFixedByExternalCenter(
+    const ObjectPtr& theObject,
+    const std::shared_ptr<GeomAPI_Edge>& theEdge,
+    ModelAPI_AttributeSelection::CenterType theType,
+    const CompositeFeaturePtr& theSketch,
+    bool theTemporary)
+{
+  FeaturePtr aMyFeature = theSketch->addFeature(SketchPlugin_Point::ID());
+
+  if (aMyFeature) {
+    DataPtr aData = aMyFeature->data();
+    AttributeSelectionPtr anAttr =
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+        (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+
+    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (anAttr.get() && aRes.get()) {
+      anAttr->setValueCenter(aRes, theEdge, theType, theTemporary);
+      aMyFeature->execute();
+      return aMyFeature->lastResult();
+    }
+  }
+  return ResultPtr();
 }

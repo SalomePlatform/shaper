@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        Model_Document.cxx
-// Created:     28 Feb 2014
-// Author:      Mikhail PONIKAROV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <Model_Document.h>
 #include <Model_Data.h>
@@ -244,7 +258,17 @@ bool Model_Document::save(
   if (currentFeature(false) != lastFeature()) {
     aSession->setCheckTransactions(false);
     aWasCurrent = currentFeature(false);
-    setCurrentFeature(lastFeature(), false);
+    // if last is nested into something else, make this something else as last:
+    // otherwise it will look like edition of sub-element, so, the main will be disabled
+    FeaturePtr aLast = lastFeature();
+    if (aLast.get()) {
+      CompositeFeaturePtr aMain = ModelAPI_Tools::compositeOwner(aLast);
+      while(aMain.get()) {
+        aLast = aMain;
+        aMain = ModelAPI_Tools::compositeOwner(aLast);
+      }
+    }
+    setCurrentFeature(aLast, true);
   }
   // create a directory in the root document if it is not yet exist
   Handle(Model_Application) anApp = Model_Application::getApplication();
@@ -580,6 +604,8 @@ bool Model_Document::finishOperation()
     Events_Loop::loop()->send(aFinishMsg);
   }
 
+  // for open of document with primitive box inside (finish transaction in initAttributes)
+  bool aWasActivatedFlushes = aLoop->activateFlushes(true);
   while(aLoop->hasGrouppedEvent(kCreatedEvent) || aLoop->hasGrouppedEvent(kUpdatedEvent) ||
         aLoop->hasGrouppedEvent(kRedispEvent) || aLoop->hasGrouppedEvent(kDeletedEvent)) {
     aLoop->flush(kCreatedEvent);
@@ -587,6 +613,7 @@ bool Model_Document::finishOperation()
     aLoop->flush(kRedispEvent);
     aLoop->flush(kDeletedEvent);
   }
+  aLoop->activateFlushes(aWasActivatedFlushes);
 
   // to avoid "updated" message appearance by updater
   //aLoop->clear(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
@@ -1115,7 +1142,7 @@ void Model_Document::setCurrentFeature(
       if (isSub(aMain, anIter)) // sub-elements of not-disabled feature are not disabled
         aDisabledFlag = false;
       else if (anOwners.find(anIter) != anOwners.end())
-        // disable the higher-level feature is the nested is the current
+        // disable the higher-level feature if the nested is the current
         aDisabledFlag = true;
     }
 

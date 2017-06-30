@@ -1,4 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "PartSet_Module.h"
 #include "PartSet_WidgetSketchLabel.h"
@@ -9,7 +27,6 @@
 #include "PartSet_WidgetPoint2DFlyout.h"
 #include "PartSet_WidgetShapeSelector.h"
 #include "PartSet_WidgetMultiSelector.h"
-#include "PartSet_WidgetSubShapeSelector.h"
 #include "PartSet_WidgetFeaturePointSelector.h"
 #include "PartSet_WidgetEditor.h"
 #include "PartSet_WidgetFileSelector.h"
@@ -204,12 +221,18 @@ void PartSet_Module::deactivateSelectionFilters()
 
 void PartSet_Module::storeSelection()
 {
-  sketchMgr()->storeSelection();
+  // cash is used only to restore selection, so it should be filled in storeSelection and
+  // after applying immediatelly cleared in restoreSelection
+  myCurrentSelection.clear();
+  sketchMgr()->storeSelection(PartSet_SketcherMgr::ST_SelectType, myCurrentSelection);
 }
 
 void PartSet_Module::restoreSelection()
 {
-  sketchMgr()->restoreSelection();
+  // cash is used only to restore selection, so it should be filled in storeSelection and
+  // after applying immediatelly cleared in restoreSelection
+  sketchMgr()->restoreSelection(myCurrentSelection);
+  myCurrentSelection.clear();
 }
 
 void PartSet_Module::registerValidators()
@@ -250,6 +273,9 @@ void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation)
   if (sketchMgr()->isNestedSketchOperation(theOperation)) {
     mySketchMgr->commitNestedSketch(theOperation);
   }
+  /// deactivate of overconstraint listener should be performed after Sketch commit (#2176)
+  if (PartSet_SketcherMgr::isSketchOperation(theOperation))
+    overconstraintListener()->setActive(false);
 
   /// Restart sketcher operations automatically
   if (!mySketchReentrantMgr->operationCommitted(theOperation)) {
@@ -269,6 +295,9 @@ void PartSet_Module::operationAborted(ModuleBase_Operation* theOperation)
 {
   /// Restart sketcher operations automatically
   mySketchReentrantMgr->operationAborted(theOperation);
+  /// deactivate of overconstraint listener should be performed after Sketch abort (#2176)
+  if (PartSet_SketcherMgr::isSketchOperation(theOperation))
+    overconstraintListener()->setActive(false);
 }
 
 void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
@@ -472,6 +501,15 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
   // the sketch manager put the restriction to the objects display
   return mySketchMgr->canDisplayObject(theObject);
+}
+
+bool PartSet_Module::canUsePreselection(const QString& thePreviousOperationKind,
+                                        const QString& theStartedOperationKind)
+{
+  if (ModuleBase_IModule::canUsePreselection(thePreviousOperationKind, theStartedOperationKind))
+    return true;
+
+  return mySketchMgr->isNestedSketchFeature(theStartedOperationKind);
 }
 
 /*void PartSet_Module::processHiddenObject(const std::list<ObjectPtr>& theObjects)
@@ -736,12 +774,6 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
                           new PartSet_WidgetMultiSelector(theParent, aWorkshop, theWidgetApi);
     aShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aShapeSelectorWgt;
-  }
-  else if (theType == "sketch_sub_shape_selector") {
-    PartSet_WidgetSubShapeSelector* aSubShapeSelectorWgt =
-                          new PartSet_WidgetSubShapeSelector(theParent, aWorkshop, theWidgetApi);
-    aSubShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
-    aWgt = aSubShapeSelectorWgt;
   }
   else if (theType == "sketch_feature_point_selector") {
     PartSet_WidgetFeaturePointSelector* aPointSelectorWgt =
@@ -1150,8 +1182,9 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
   bool hasFeature = false;
   bool hasParameter = false;
   bool hasCompositeOwner = false;
+  bool hasResultInHistory = false;
   ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter,
-                                  hasCompositeOwner);
+                                  hasCompositeOwner, hasResultInHistory);
 
   ModuleBase_Operation* aCurrentOp = myWorkshop->currentOperation();
   if (aSelected == 1) {
@@ -1228,10 +1261,15 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     DocumentPtr aActiveDoc = aMgr->activeDocument();
     if (myActivePartIndex.isValid())
       aTreeView->setExpanded(myActivePartIndex, false);
+
     XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
     myActivePartIndex = aDataModel->documentRootIndex(aActiveDoc);
-    if (myActivePartIndex.isValid())
-      aTreeView->setExpanded(myActivePartIndex, true);
+    bool needUpdate = false;
+    if (myActivePartIndex.isValid()) {
+      needUpdate = aTreeView->isExpanded(myActivePartIndex);
+      if (!needUpdate)
+        aTreeView->setExpanded(myActivePartIndex, true);
+    }
 
     aLabel->setPalette(aPalet);
     aWorkshop->updateCommandStatus();
@@ -1247,6 +1285,10 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
         aDisplayer->redisplay(aObj, false);
     }
     aDisplayer->updateViewer();
+    // Update tree items if they are expanded
+    if (needUpdate) {
+      aTreeView->viewport()->repaint(aTreeView->viewport()->rect());
+    }
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);

@@ -1,9 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        PartSet_ExternalObjectsMgr.h
-// Created:     15 Apr 2015
-// Author:      Natalia Ermolaeva
-
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef PartSet_ExternalObjectsMgr_H
 #define PartSet_ExternalObjectsMgr_H
@@ -19,6 +32,7 @@
 #include <string>
 
 class ModuleBase_IWorkshop;
+class ModuleBase_ViewerPrs;
 class XGUI_Workshop;
 
 /**
@@ -69,6 +83,17 @@ class PARTSET_EXPORT PartSet_ExternalObjectsMgr
                       const FeaturePtr& theFeature,
                       ModuleBase_IWorkshop* theWorkshop,
                       const bool theTemporary);
+
+  /// Return an object and geom shape by the viewer presentation
+  /// \param thePrs a selection
+  /// \param theObject an output object
+  /// \param theShape a shape of the selection
+  virtual void getGeomSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
+                                ObjectPtr& theObject,
+                                GeomShapePtr& theShape,
+                                ModuleBase_IWorkshop* theWorkshop,
+                                const CompositeFeaturePtr& theSketch,
+                                const bool isInValidate);
 
 protected:
   /// Delete from the document the feature of the object. It deletes all objects, which refers to

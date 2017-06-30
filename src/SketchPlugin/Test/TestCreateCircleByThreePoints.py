@@ -1,3 +1,23 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
 """
     TestCreateCircleByThreePoints.py
 
@@ -27,13 +47,7 @@ def verifyLastCircle(theSketch, theX, theY, theR):
     subroutine to verify position of last circle in the sketch
     """
     aLastCircle = model.lastSubFeature(theSketch, "SketchCircle")
-    aCenter = geomDataAPI_Point2D(aLastCircle.attribute("circle_center"))
-    verifyPointCoordinates(aCenter, theX, theY)
-    aRadius = aLastCircle.real("circle_radius")
-    assert aRadius.value() == theR, "Wrong radius {0}, expected {1}".format(aRadius.value(), theR)
-
-def verifyPointCoordinates(thePoint, theX, theY):
-    assert thePoint.x() == theX and thePoint.y() == theY, "Wrong '{0}' point ({1}, {2}), expected ({3}, {4})".format(thePoint.attributeType(), thePoint.x(), thePoint.y(), theX, theY)
+    model.assertCircle(aLastCircle, [theX, theY], theR)
 
 def verifyPointOnCircle(thePoint, theCircle):
     aCircleCenter = geomDataAPI_Point2D(theCircle.attribute("circle_center"))
@@ -66,16 +80,8 @@ def verifyTangentCircular(theDistBetweenCenters, theRadius1, theRadius2):
 def verifyTangentCircleLine(theCircle, theLine):
     aCenter = geomDataAPI_Point2D(theCircle.attribute("circle_center"))
     aRadius = theCircle.real("circle_radius").value()
-    aDistCL = distancePointLine(aCenter, theLine)
+    aDistCL = model.distancePointLine(aCenter, theLine)
     assert math.fabs(aDistCL - aRadius) < TOLERANCE, "Circle and line are not tangent"
-
-def distancePointLine(thePoint, theLine):
-    aLineStart = geomDataAPI_Point2D(theLine.attribute("StartPoint")).pnt().xy()
-    aLineEnd = geomDataAPI_Point2D(theLine.attribute("EndPoint")).pnt().xy()
-    aLineDir = aLineEnd.decreased(aLineStart)
-    aLineLen = aLineEnd.distance(aLineStart)
-    aPntDir = thePoint.pnt().xy().decreased(aLineStart)
-    return math.fabs(aPntDir.cross(aLineDir) / aLineLen)
 
 
 #=========================================================================
@@ -132,13 +138,13 @@ aPrevCenter = geomDataAPI_Point2D(aPrevCircle.attribute("circle_center"))
 aPrevCenterXY = [aPrevCenter.x(), aPrevCenter.y()]
 aPrevCircleRadius = aPrevCircle.real("circle_radius").value()
 # create additional point and line
-aPointCoodinates = [5., 20.]
+aPointCoordinates = [5., 20.]
 aLineStart = [10., 0.]
 aLineEnd = [10., 50.]
 aSession.startOperation()
 aPoint = aSketchFeature.addFeature("SketchPoint")
 aPointCoord = geomDataAPI_Point2D(aPoint.attribute("PointCoordinates"))
-aPointCoord.setValue(aPointCoodinates[0], aPointCoodinates[1])
+aPointCoord.setValue(aPointCoordinates[0], aPointCoordinates[1])
 aLine = aSketchFeature.addFeature("SketchLine")
 aStartPnt = geomDataAPI_Point2D(aLine.attribute("StartPoint"))
 aStartPnt.setValue(aLineStart[0], aLineStart[1])
@@ -166,9 +172,9 @@ aCirclePnt3.setValue(aLineStart[0], aLineStart[1])
 aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 7)
 # check the points do not change their positions
-verifyPointCoordinates(aPrevCenter, aPrevCenterXY[0], aPrevCenterXY[1])
-verifyPointCoordinates(aPointCoord, aPointCoodinates[0], aPointCoodinates[1])
-verifyPointCoordinates(aStartPnt, aLineStart[0], aLineStart[1])
+model.assertPoint(aPrevCenter, aPrevCenterXY)
+model.assertPoint(aPointCoord, aPointCoordinates)
+model.assertPoint(aStartPnt, aLineStart)
 # check newly created circle passes through the points
 aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
 verifyPointOnCircle(aPrevCenter, aCircle)
@@ -215,13 +221,10 @@ aCirclePnt3.setValue(anArcCenter[0] + anArcRadius, anArcCenter[1])
 aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 12)
 # check the tangent entities do not change their positions
-verifyPointCoordinates(aPrevCenter, aPrevCenterXY[0], aPrevCenterXY[1])
+model.assertPoint(aPrevCenter, aPrevCenterXY)
 assert (aPrevCircle.real("circle_radius").value() == aPrevCircleRadius)
-verifyPointCoordinates(aStartPnt, aLineStart[0], aLineStart[1])
-verifyPointCoordinates(aEndPnt, aLineEnd[0], aLineEnd[1])
-verifyPointCoordinates(anArcCenterPnt, anArcCenter[0], anArcCenter[1])
-verifyPointCoordinates(anArcStartPnt, anArcStart[0], anArcStart[1])
-verifyPointCoordinates(anArcEndPnt, anArcEnd[0], anArcEnd[1])
+model.assertLine(aLine, aLineStart, aLineEnd)
+model.assertArc(anArc, anArcCenter, anArcStart, anArcEnd)
 # check newly created circle passes through the points
 aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
 verifyTangentCircles(aCircle, aPrevCircle)

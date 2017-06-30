@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        SketcherPrs_Angle.cpp
-// Created:     20 August 2015
-// Author:      Vitaly SMETANNIKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeString.h>
@@ -79,7 +93,8 @@ void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
   if (myIsFullyConstrained) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     // only entity features has custom color when sketch is fully constrained
-    if (aFeature.get() && PartSet_SketcherMgr::isEntity(aFeature->getKind())) {
+    if (aFeature.get() && PartSet_SketcherMgr::isEntity(aFeature->getKind()) &&
+        !PartSet_SketcherMgr::isExternalFeature(aFeature)) {
       PartSet_Module* aModule = module();
       CompositeFeaturePtr aSketch = aModule->sketchMgr()->activeSketch();
       // the given object is sub feature of the current sketch(created or edited)
@@ -156,11 +171,13 @@ void PartSet_OverconstraintListener::processEvent(
   }
   else if (anEventID == ModelAPI_EventReentrantMessage::eventId() ||
            anEventID == SketchPlugin_MacroArcReentrantMessage::eventId()) {
-    // the message is sent to sketcher reentrant manager only if the kind of feature
-    // sender is equal to kind of the current operation. E.g. Horizontal create operation
+    // the message is sent to sketcher reentrant manager only if the name of feature
+    // sender is equal to feature name of the current operation. E.g. Horizontal create operation
     // is active. Sketch Line feature is changed, so execute is called, it will send message
     // This Line's message should not be processed, as the reentrant operation is not for Line
-    std::string aCurrentFeatureKind;
+    // It is not enoght of kind, the name should be used, e.g. restarted Lines on auxiliary
+    // cirlce sometimes causes previous line change, kind the same, but feature line is different
+    std::string aCurrentFeatureName;
     ModuleBase_Operation* anOperation =
                 XGUI_Tools::workshop(myWorkshop)->operationMgr()->currentOperation();
     if (anOperation) {
@@ -168,8 +185,10 @@ void PartSet_OverconstraintListener::processEvent(
                                                            (anOperation);
       if (aFOperation) {
         FeaturePtr aFeature = aFOperation->feature();
-        if (aFeature.get())
-          aCurrentFeatureKind = aFeature->getKind();
+        // data valid is necessary if the feature has been already deleted
+        // (e.g. Esc of Lenght if lenght value is modified)
+        if (aFeature.get() && aFeature->data()->isValid())
+          aCurrentFeatureName = aFeature->data()->name();
       }
     }
     if (theMessage->sender()) {
@@ -177,7 +196,7 @@ void PartSet_OverconstraintListener::processEvent(
       if (aSender) {
         FeaturePtr aFeatureSender =
           std::dynamic_pointer_cast<ModelAPI_Feature>(aSender->data()->owner());
-        if (aFeatureSender.get() && aFeatureSender->getKind() == aCurrentFeatureKind) {
+        if (aFeatureSender.get() && aFeatureSender->data()->name() == aCurrentFeatureName) {
           PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
           PartSet_SketcherReentrantMgr* aReentrantMgr = aModule->sketchReentranceMgr();
           aReentrantMgr->setReentrantMessage(theMessage);

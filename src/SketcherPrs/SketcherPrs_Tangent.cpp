@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        SketcherPrs_Tangent.cpp
-// Created:     16 February 2015
-// Author:      Vitaly SMETANNIKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "SketcherPrs_Tangent.h"
 #include "SketcherPrs_Tools.h"
@@ -67,12 +81,6 @@ bool SketcherPrs_Tangent::updateIfReadyToDisplay(double theStep, bool withColor)
 void SketcherPrs_Tangent::drawLines(const Handle(Prs3d_Presentation)& thePrs,
                                     Quantity_Color theColor) const
 {
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
-
-  Handle(Graphic3d_AspectLine3d) aLineAspect =
-    new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
-  aGroup->SetPrimitivesAspect(aLineAspect);
-
   ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   ObjectPtr aObj2 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
 
@@ -81,7 +89,7 @@ void SketcherPrs_Tangent::drawLines(const Handle(Prs3d_Presentation)& thePrs,
 
   if ((aShape1.get() == NULL) || (aShape2.get() == NULL))
     return;
-  drawShape(aShape1, thePrs);
-  drawShape(aShape2, thePrs);
+  drawShape(aShape1, thePrs, theColor);
+  drawShape(aShape2, thePrs, theColor);
 }
 

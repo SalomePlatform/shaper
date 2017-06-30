@@ -1,4 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "XGUI_SelectionMgr.h"
 
@@ -8,6 +26,7 @@
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_Selection.h"
+#include "XGUI_OperationMgr.h"
 
 #ifndef HAVE_SALOME
 #include <AppElements_MainWindow.h>
@@ -116,32 +135,16 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
 //**************************************************************
 void XGUI_SelectionMgr::onViewerSelection()
 {
-  SessionPtr aMgr = ModelAPI_Session::get();
-  DocumentPtr anActiveDocument = aMgr->activeDocument();
-  QObjectPtrList aFeatures;
-  ResultPtr aResult;
-  FeaturePtr aFeature;
+  QList<ModuleBase_ViewerPrsPtr> aValues;
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (!aContext.IsNull()) {
-    QList<ModuleBase_ViewerPrsPtr> aPresentations =
-      selection()->getSelected(ModuleBase_ISelection::Viewer);
-    foreach(ModuleBase_ViewerPrsPtr aPrs, aPresentations) {
-      if (aPrs->object().get()) {
-        if (!aFeatures.contains(aPrs->object()))
-          aFeatures.append(aPrs->object());
-        if (aPrs->shape().get()) {
-          aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
-          if (aResult.get()) {
-            aFeature = anActiveDocument->producedByFeature(aResult, aPrs->shape());
-            if (aFeature.get() && (!aFeatures.contains(aFeature)))
-              aFeatures.append(aFeature);
-          }
-        }
-      }
-    }
-  }
+  if (!aContext.IsNull())
+    aValues = selection()->getSelected(ModuleBase_ISelection::Viewer);
+
+  QObjectPtrList anObjects;
+  convertToObjectBrowserSelection(aValues, anObjects);
+
   bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
-  myWorkshop->objectBrowser()->setObjectsSelected(aFeatures);
+  myWorkshop->objectBrowser()->setObjectsSelected(anObjects);
   myWorkshop->objectBrowser()->blockSignals(aBlocked);
 
   emit selectionChanged();
@@ -173,4 +176,47 @@ void XGUI_SelectionMgr::clearSelection()
   aDisplayer->setSelected(aSelectedPrs);
 
   emit selectionChanged();
+}
+//**************************************************************
+void XGUI_SelectionMgr::setSelected(const QList<ModuleBase_ViewerPrsPtr>& theValues)
+{
+  // update selection in Viewer
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  aDisplayer->setSelected(theValues);
+
+  // update selection in Object Browser
+  bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
+  QObjectPtrList anObjects;
+  convertToObjectBrowserSelection(theValues, anObjects);
+
+  myWorkshop->objectBrowser()->setObjectsSelected(anObjects);
+  myWorkshop->objectBrowser()->blockSignals(aBlocked);
+}
+//**************************************************************
+void XGUI_SelectionMgr::convertToObjectBrowserSelection(
+                                   const QList<ModuleBase_ViewerPrsPtr>& theValues,
+                                   QObjectPtrList& theObjects)
+{
+  theObjects.clear();
+
+  ResultPtr aResult;
+  FeaturePtr aFeature;
+  bool aHasOperation = (myWorkshop->operationMgr()->currentOperation() != 0);
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr anActiveDocument = aMgr->activeDocument();
+
+  foreach(ModuleBase_ViewerPrsPtr aPrs, theValues) {
+    if (aPrs->object().get()) {
+      if (!theObjects.contains(aPrs->object()))
+        theObjects.append(aPrs->object());
+      if (aPrs->shape().get() && (!aHasOperation)) {
+        aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
+        if (aResult.get()) {
+          aFeature = anActiveDocument->producedByFeature(aResult, aPrs->shape());
+          if (aFeature.get() && (!theObjects.contains(aFeature)))
+            theObjects.append(aFeature);
+        }
+      }
+    }
+  }
 }

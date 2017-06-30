@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:    SketchSolver_Builder.cpp
-// Created: 25 Mar 2015
-// Author:  Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <PlaneGCSSolver_Tools.h>
 #include <PlaneGCSSolver_EdgeWrapper.h>
@@ -28,6 +42,8 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintDistanceHorizontal.h>
+#include <SketchPlugin_ConstraintDistanceVertical.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintMiddle.h>
@@ -63,6 +79,11 @@ static ConstraintWrapperPtr
                                     std::shared_ptr<PlaneGCSSolver_PointWrapper>  thePoint,
                                     std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity);
 static ConstraintWrapperPtr
+  createConstraintHVDistance(const SketchSolver_ConstraintType& theType,
+                             std::shared_ptr<PlaneGCSSolver_ScalarWrapper> theValue,
+                             std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint1,
+                             std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint2);
+static ConstraintWrapperPtr
   createConstraintRadius(std::shared_ptr<PlaneGCSSolver_ScalarWrapper> theValue,
                          std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity);
 static ConstraintWrapperPtr
@@ -88,6 +109,12 @@ static ConstraintWrapperPtr
   createConstraintMiddlePoint(std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint,
                               std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity);
 
+static GCS::SET_pD scalarParameters(const ScalarWrapperPtr& theScalar);
+static GCS::SET_pD pointParameters(const PointWrapperPtr& thePoint);
+static GCS::SET_pD lineParameters(const EdgeWrapperPtr& theLine);
+static GCS::SET_pD circleParameters(const EdgeWrapperPtr& theCircle);
+static GCS::SET_pD arcParameters(const EdgeWrapperPtr& theArc);
+
 
 
 
@@ -98,7 +125,9 @@ SolverConstraintPtr PlaneGCSSolver_Tools::createConstraint(ConstraintPtr theCons
     return SolverConstraintPtr(new SketchSolver_ConstraintCoincidence(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintCollinear::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintCollinear(theConstraint));
-  } else if (theConstraint->getKind() == SketchPlugin_ConstraintDistance::ID()) {
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintDistance::ID() ||
+             theConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID() ||
+             theConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintDistance(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintEqual::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintEqual(theConstraint));
@@ -123,9 +152,18 @@ SolverConstraintPtr PlaneGCSSolver_Tools::createConstraint(ConstraintPtr theCons
   return SolverConstraintPtr(new SketchSolver_Constraint(theConstraint));
 }
 
-SolverConstraintPtr PlaneGCSSolver_Tools::createMovementConstraint(FeaturePtr theMovedFeature)
+std::shared_ptr<SketchSolver_ConstraintMovement> PlaneGCSSolver_Tools::createMovementConstraint(
+    FeaturePtr theMovedFeature)
 {
-  return SolverConstraintPtr(new SketchSolver_ConstraintFixed(theMovedFeature));
+  return std::shared_ptr<SketchSolver_ConstraintMovement>(
+      new SketchSolver_ConstraintMovement(theMovedFeature));
+}
+
+std::shared_ptr<SketchSolver_ConstraintMovement> PlaneGCSSolver_Tools::createMovementConstraint(
+    AttributePtr theMovedAttribute)
+{
+  return std::shared_ptr<SketchSolver_ConstraintMovement>(
+      new SketchSolver_ConstraintMovement(theMovedAttribute));
 }
 
 
@@ -163,6 +201,10 @@ ConstraintWrapperPtr PlaneGCSSolver_Tools::createConstraint(
     aResult = createConstraintDistancePointLine(GCS_SCALAR_WRAPPER(theValue),
                                                 aPoint1,
                                                 GCS_EDGE_WRAPPER(theEntity1));
+    break;
+  case CONSTRAINT_HORIZONTAL_DISTANCE:
+  case CONSTRAINT_VERTICAL_DISTANCE:
+    aResult = createConstraintHVDistance(theType, GCS_SCALAR_WRAPPER(theValue), aPoint1, aPoint2);
     break;
   case CONSTRAINT_RADIUS:
     aResult = createConstraintRadius(GCS_SCALAR_WRAPPER(theValue),
@@ -238,6 +280,27 @@ std::shared_ptr<GeomAPI_Lin2d> PlaneGCSSolver_Tools::line(FeaturePtr theFeature)
 
   return std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aStart->pnt(), aEnd->pnt()));
 }
+
+
+GCS::SET_pD PlaneGCSSolver_Tools::parameters(const EntityWrapperPtr& theEntity)
+{
+  switch (theEntity->type()) {
+  case ENTITY_SCALAR:
+  case ENTITY_ANGLE:
+    return scalarParameters(GCS_SCALAR_WRAPPER(theEntity));
+  case ENTITY_POINT:
+    return pointParameters(GCS_POINT_WRAPPER(theEntity));
+  case ENTITY_LINE:
+    return lineParameters(GCS_EDGE_WRAPPER(theEntity));
+  case ENTITY_CIRCLE:
+    return circleParameters(GCS_EDGE_WRAPPER(theEntity));
+  case ENTITY_ARC:
+    return arcParameters(GCS_EDGE_WRAPPER(theEntity));
+  default: break;
+  }
+  return GCS::SET_pD();
+}
+
 
 
 
@@ -332,6 +395,32 @@ ConstraintWrapperPtr createConstraintDistancePointLine(
       *(thePoint->point()), *(aLine), theValue->scalar()));
   std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aResult(
       new PlaneGCSSolver_ConstraintWrapper(aNewConstr, CONSTRAINT_PT_LINE_DISTANCE));
+  aResult->setValueParameter(theValue);
+  return aResult;
+}
+
+ConstraintWrapperPtr createConstraintHVDistance(
+    const SketchSolver_ConstraintType& theType,
+    std::shared_ptr<PlaneGCSSolver_ScalarWrapper> theValue,
+    std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint1,
+    std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint2)
+{
+  GCSPointPtr aPoint1 = thePoint1->point();
+  GCSPointPtr aPoint2 = thePoint2->point();
+
+  double *aParam1, *aParam2;
+  if (theType == CONSTRAINT_HORIZONTAL_DISTANCE) {
+    aParam1 = aPoint1->x;
+    aParam2 = aPoint2->x;
+  } else if (theType == CONSTRAINT_VERTICAL_DISTANCE) {
+    aParam1 = aPoint1->y;
+    aParam2 = aPoint2->y;
+  }
+
+  GCSConstraintPtr aNewConstr(new GCS::ConstraintDifference(aParam1, aParam2, theValue->scalar()));
+
+  std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aResult(
+      new PlaneGCSSolver_ConstraintWrapper(aNewConstr, theType));
   aResult->setValueParameter(theValue);
   return aResult;
 }
@@ -451,4 +540,56 @@ ConstraintWrapperPtr createConstraintEqual(
   if (theIntermed)
     aResult->setValueParameter(theIntermed);
   return aResult;
+}
+
+GCS::SET_pD scalarParameters(const ScalarWrapperPtr& theScalar)
+{
+  GCS::SET_pD aParams;
+  aParams.insert(theScalar->scalar());
+  return aParams;
+}
+
+GCS::SET_pD pointParameters(const PointWrapperPtr& thePoint)
+{
+  GCS::SET_pD aParams;
+  aParams.insert(thePoint->point()->x);
+  aParams.insert(thePoint->point()->y);
+  return aParams;
+}
+
+GCS::SET_pD lineParameters(const EdgeWrapperPtr& theLine)
+{
+  GCS::SET_pD aParams;
+  std::shared_ptr<GCS::Line> aLine = std::dynamic_pointer_cast<GCS::Line>(theLine->entity());
+  aParams.insert(aLine->p1.x);
+  aParams.insert(aLine->p1.y);
+  aParams.insert(aLine->p2.x);
+  aParams.insert(aLine->p2.y);
+  return aParams;
+}
+
+GCS::SET_pD circleParameters(const EdgeWrapperPtr& theCircle)
+{
+  GCS::SET_pD aParams;
+  std::shared_ptr<GCS::Circle> aCirc = std::dynamic_pointer_cast<GCS::Circle>(theCircle->entity());
+  aParams.insert(aCirc->center.x);
+  aParams.insert(aCirc->center.y);
+  aParams.insert(aCirc->rad);
+  return aParams;
+}
+
+GCS::SET_pD arcParameters(const EdgeWrapperPtr& theArc)
+{
+  GCS::SET_pD aParams;
+  std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(theArc->entity());
+  aParams.insert(anArc->center.x);
+  aParams.insert(anArc->center.y);
+  aParams.insert(anArc->start.x);
+  aParams.insert(anArc->start.y);
+  aParams.insert(anArc->end.x);
+  aParams.insert(anArc->end.y);
+  aParams.insert(anArc->startAngle);
+  aParams.insert(anArc->endAngle);
+  aParams.insert(anArc->rad);
+  return aParams;
 }

@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:    PlaneGCSSolver_AttributeBuilder.cpp
-// Created: 10 Feb 2017
-// Author:  Artem ZHIDKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include <PlaneGCSSolver_FeatureBuilder.h>
 #include <PlaneGCSSolver_EdgeWrapper.h>
@@ -25,8 +39,7 @@ static bool isAttributeApplicable(const std::string& theAttrName,
 static EntityWrapperPtr createLine(const AttributeEntityMap& theAttributes);
 static EntityWrapperPtr createCircle(const AttributeEntityMap& theAttributes);
 static EntityWrapperPtr createArc(const AttributeEntityMap&    theAttributes,
-                                  PlaneGCSSolver_Storage*      theStorage,
-                                  std::list<GCSConstraintPtr>& theArcConstraints);
+                                  PlaneGCSSolver_Storage*      theStorage);
 
 
 PlaneGCSSolver_FeatureBuilder::PlaneGCSSolver_FeatureBuilder(
@@ -76,7 +89,7 @@ EntityWrapperPtr PlaneGCSSolver_FeatureBuilder::createFeature(FeaturePtr theFeat
     aResult = createCircle(myAttributes);
   // Arc
   else if (aFeatureKind == SketchPlugin_Arc::ID())
-    aResult = createArc(myAttributes, myStorage, myFeatureConstraints);
+    aResult = createArc(myAttributes, myStorage);
   // Point (it has low probability to be an attribute of constraint, so it is checked at the end)
   else if (aFeatureKind == SketchPlugin_Point::ID() ||
            aFeatureKind == SketchPlugin_IntersectionPoint::ID()) {
@@ -147,8 +160,7 @@ static double* createParameter(PlaneGCSSolver_Storage* theStorage)
 }
 
 EntityWrapperPtr createArc(const AttributeEntityMap&    theAttributes,
-                           PlaneGCSSolver_Storage*      theStorage,
-                           std::list<GCSConstraintPtr>& theArcConstraints)
+                           PlaneGCSSolver_Storage*      theStorage)
 {
   std::shared_ptr<GCS::Arc> aNewArc(new GCS::Arc);
 
@@ -188,20 +200,6 @@ EntityWrapperPtr createArc(const AttributeEntityMap&    theAttributes,
   aDir = std::shared_ptr<GeomAPI_Dir2d>(
       new GeomAPI_Dir2d((*aNewArc->end.x) - aCenter->x(), (*aNewArc->end.y) - aCenter->y()));
   *aNewArc->endAngle = OX->angle(aDir);
-
-  if (theStorage) {
-    // Additional constaints to fix arc's extra DoF (if the arc is not external):
-    // 1. distances from center till start and end points are equal to radius
-    theArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
-        aNewArc->center, aNewArc->start, aNewArc->rad)));
-    theArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
-        aNewArc->center, aNewArc->end, aNewArc->rad)));
-    // 2. angles of start and end points should be equal to the arc angles
-    theArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PAngle(
-        aNewArc->center, aNewArc->start, aNewArc->startAngle)));
-    theArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PAngle(
-        aNewArc->center, aNewArc->end, aNewArc->endAngle)));
-  }
 
   return EntityWrapperPtr(new PlaneGCSSolver_EdgeWrapper(aNewArc));
 }

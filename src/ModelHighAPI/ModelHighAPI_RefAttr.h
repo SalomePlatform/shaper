@@ -1,9 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-// Name   : ModelHighAPI_RefAttr.h
-// Purpose:
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 //
-// History:
-// 08/06/16 - Sergey POKHODENKO - Creation of the file
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef SRC_MODELHIGHAPI_MODELHIGHAPI_REFATTR_H_
 #define SRC_MODELHIGHAPI_MODELHIGHAPI_REFATTR_H_
@@ -18,6 +31,7 @@ class ModelAPI_Attribute;
 class ModelAPI_AttributeRefAttr;
 class ModelAPI_AttributeRefAttrList;
 class ModelAPI_Object;
+class ModelAPI_ObjectMovedMessage;
 class ModelHighAPI_Interface;
 //--------------------------------------------------------------------------------------
 /**\class ModelHighAPI_RefAttr
@@ -54,6 +68,10 @@ public:
   /// Check the object is empty
   MODELHIGHAPI_EXPORT
   bool isEmpty() const;
+
+  /// Fill moved message by the attribute or object
+  MODELHIGHAPI_EXPORT
+  void fillMessage(const std::shared_ptr<ModelAPI_ObjectMovedMessage>& theMessage) const;
 
 private:
   enum VariantType { VT_ATTRIBUTE, VT_OBJECT } myVariantType;

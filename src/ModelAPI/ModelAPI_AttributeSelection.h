@@ -1,14 +1,30 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        ModelAPI_AttributeSelection.h
-// Created:     2 Oct 2014
-// Author:      Mikhail PONIKAROV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #ifndef ModelAPI_AttributeSelection_H_
 #define ModelAPI_AttributeSelection_H_
 
 #include "ModelAPI_Attribute.h"
 #include <ModelAPI_Result.h>
+
+class GeomAPI_Edge;
 
 /**\class ModelAPI_AttributeSelection
  * \ingroup DataModel
@@ -18,6 +34,14 @@
 class ModelAPI_AttributeSelection : public ModelAPI_Attribute
 {
  public:
+   /// Type of the center of the circular of elliptical edge
+   enum CenterType {
+     NOT_CENTER, ///< this is not a center
+     CIRCLE_CENTER, ///< center of the circle
+     ELLIPSE_FIRST_FOCUS, ///< first focus point of the ellipse
+     ELLIPSE_SECOND_FOCUS, ///< second focus point of the ellipse
+   };
+
   /// Defines the result and its selected sub-shape
   /// \param theContext object where the sub-shape was selected
   /// \param theSubShape selected sub-shape (if null, the whole context is selected)
@@ -25,6 +49,13 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   ///           (used to remove immideately, without the following updates)
   virtual void setValue(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const bool theTemporarily = false) = 0;
+
+  /// Same as SetValue, but it takes an edge (on circular or elliptical curve)
+  /// and stores the vertex of the central point (for ellipse the first or the second focus point)
+  virtual void setValueCenter(
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
+    const CenterType theCenterType,
     const bool theTemporarily = false) = 0;
 
   /// Reset temporary stored values

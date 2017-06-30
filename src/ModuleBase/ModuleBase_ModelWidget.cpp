@@ -1,10 +1,25 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        ModuleBase_ModelWidget.cpp
-// Created:     25 Apr 2014
-// Author:      Natalia ERMOLAEVA
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "ModuleBase_ModelWidget.h"
+#include "ModuleBase_IPropertyPanel.h"
 #include "ModuleBase_ViewerPrs.h"
 #include "ModuleBase_Tools.h"
 #include "ModuleBase_WidgetValidator.h"
@@ -398,7 +413,7 @@ void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
   qDebug("ModuleBase_ModelWidget::moveObject");
 #endif
 
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
   ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);
   Events_Loop::loop()->flush(anEvent);
 
@@ -421,13 +436,15 @@ bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
 {
   QWidget* aWidget = qobject_cast<QWidget*>(theObject);
   if (theEvent->type() == QEvent::FocusIn) {
-    #ifdef _DEBUG
-    // The following two lines are for debugging purpose only
     QFocusEvent* aFocusEvent = dynamic_cast<QFocusEvent*>(theEvent);
-    bool isWinFocus = aFocusEvent->reason() == Qt::ActiveWindowFocusReason;
-    #endif
-    if (getControls().contains(aWidget)) {
-      emit focusInWidget(this);
+    Qt::FocusReason aReason = aFocusEvent->reason();
+    bool aMouseOrKey = aReason == Qt::MouseFocusReason ||
+                        /*aReason == Qt::TabFocusReason ||
+                        //aReason == Qt::BacktabFocusReason ||*/
+                        aReason == Qt::OtherFocusReason; // to process widget->setFocus()
+    if (aMouseOrKey && getControls().contains(aWidget)) {
+    //if (getControls().contains(aWidget)) {
+      emitFocusInWidget();
     }
   }
   else if (theEvent->type() == QEvent::FocusOut) {
@@ -461,7 +478,26 @@ void ModuleBase_ModelWidget::onWidgetValuesModified()
   setValueState(ModifiedInPP);
 }
 
+//**************************************************************
 QString ModuleBase_ModelWidget::translate(const std::string& theStr) const
 {
   return ModuleBase_Tools::translate(context(), theStr);
+}
+
+//**************************************************************
+ModuleBase_ModelWidget* ModuleBase_ModelWidget::findModelWidget(ModuleBase_IPropertyPanel* theProp,
+                                                                QWidget* theWidget)
+{
+  ModuleBase_ModelWidget* aModelWidget = 0;
+  if (!theWidget)
+    return aModelWidget;
+
+  QObject* aParent = theWidget->parent();
+  while (aParent) {
+    aModelWidget = qobject_cast<ModuleBase_ModelWidget*>(aParent);
+    if (aModelWidget)
+      break;
+    aParent = aParent->parent();
+  }
+  return aModelWidget;
 }

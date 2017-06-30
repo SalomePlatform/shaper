@@ -1,8 +1,22 @@
-// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-
-// File:        PartSet_Validators.cpp
-// Created:     09 July 2014
-// Author:      Vitaly SMETANNIKOV
+// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+//
+// See http://www.salome-platform.org/ or
+// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+//
 
 #include "PartSet_Validators.h"
 
@@ -639,10 +653,13 @@ bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute,
         AttributePtr aAR = aRAttr->attr();
         if (aAR->id() != SketchPlugin_Arc::CENTER_ID()) // ignore constraint to center of arc
           aCoinList.insert(aConstrFeature);
+          QList<bool> anIsAttributes;
           PartSet_Tools::findCoincidences(aConstrFeature, aCoinsideLines, aCoins,
-                                          SketchPlugin_ConstraintCoincidence::ENTITY_A());
+                                          SketchPlugin_ConstraintCoincidence::ENTITY_A(),
+                                          anIsAttributes);
           PartSet_Tools::findCoincidences(aConstrFeature, aCoinsideLines, aCoins,
-                                          SketchPlugin_ConstraintCoincidence::ENTITY_B());
+                                          SketchPlugin_ConstraintCoincidence::ENTITY_B(),
+                                          anIsAttributes);
       }
     }
     // if there is no coincidence then it is not valid
