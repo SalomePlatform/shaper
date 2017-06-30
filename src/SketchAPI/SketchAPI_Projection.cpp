@@ -78,6 +78,12 @@ void SketchAPI_Projection::setByExternalName(const std::string& theExternalName)
   execute(true);
 }
 
+void SketchAPI_Projection::setIncludeToResult(bool theKeepResult)
+{
+  fillAttribute(theKeepResult, includeToResult());
+  execute(true);
+}
+
 //--------------------------------------------------------------------------------------
 std::shared_ptr<SketchAPI_SketchEntity> SketchAPI_Projection::createdFeature() const
 {
@@ -106,7 +112,9 @@ void SketchAPI_Projection::dump(ModelHighAPI_Dumper& theDumper) const
   const std::string& aSketchName = theDumper.parentName(aBase);
 
   AttributeSelectionPtr anExternal = externalFeature();
-  theDumper << aBase << " = " << aSketchName << ".addProjection(" << anExternal << ")" << std::endl;
+  AttributeBooleanPtr isIncludeToRes = includeToResult();
+  theDumper << aBase << " = " << aSketchName << ".addProjection("
+            << anExternal << ", " << isIncludeToRes << ")" << std::endl;
   // dump "auxiliary" flag if necessary
   SketchAPI_SketchEntity::dump(theDumper);
 

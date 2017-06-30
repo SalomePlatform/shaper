@@ -458,19 +458,25 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const std::string & theE
 
 //--------------------------------------------------------------------------------------
 std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
-    const ModelHighAPI_Selection & theExternalFeature)
+    const ModelHighAPI_Selection & theExternalFeature,
+    bool theKeepResult)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Projection::ID());
-  return ProjectionPtr(new SketchAPI_Projection(aFeature, theExternalFeature));
+  ProjectionPtr aProjection(new SketchAPI_Projection(aFeature, theExternalFeature));
+  aProjection->setIncludeToResult(theKeepResult);
+  return aProjection;
 }
 
 std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
-    const std::string & theExternalName)
+    const std::string & theExternalName,
+    bool theKeepResult)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Projection::ID());
-  return ProjectionPtr(new SketchAPI_Projection(aFeature, theExternalName));
+  ProjectionPtr aProjection(new SketchAPI_Projection(aFeature, theExternalName));
+  aProjection->setIncludeToResult(theKeepResult);
+  return aProjection;
 }
 
 //--------------------------------------------------------------------------------------

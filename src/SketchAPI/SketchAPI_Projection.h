@@ -52,13 +52,15 @@ public:
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_Projection();
 
-  INTERFACE_3(SketchPlugin_Projection::ID(),
+  INTERFACE_4(SketchPlugin_Projection::ID(),
               externalFeature, SketchPlugin_Projection::EXTERNAL_FEATURE_ID(),
               ModelAPI_AttributeSelection, /** External feature */,
               projectedFeature, SketchPlugin_Projection::PROJECTED_FEATURE_ID(),
               ModelAPI_AttributeRefAttr, /** Projected feature */,
               external, SketchPlugin_Projection::EXTERNAL_ID(),
-              ModelAPI_AttributeSelection, /** External */
+              ModelAPI_AttributeSelection, /** External */,
+              includeToResult, SketchPlugin_Projection::INCLUDE_INTO_RESULT(),
+              ModelAPI_AttributeBoolean, /** Include into result */
   )
 
   /// Set external feature
@@ -68,6 +70,10 @@ public:
   /// Set by external name
   SKETCHAPI_EXPORT
   void setByExternalName(const std::string & theExternalName);
+
+  /// Set flag to include projection to result or not
+  SKETCHAPI_EXPORT
+  void setIncludeToResult(bool theKeepResult);
 
   /// Returns created feature
   SKETCHAPI_EXPORT

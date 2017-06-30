@@ -43,6 +43,7 @@
 
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Feature.h>
+#include <SketchPlugin_Projection.h>
 #include <SketchPlugin_SketchEntity.h>
 #include <SketchPlugin_Tools.h>
 
@@ -102,10 +103,14 @@ void SketchPlugin_Sketch::execute()
     if (aFeature) {
       if (!aFeature->sketch()) // on load document the back references are missed
         aFeature->setSketch(this);
-      // do not include the external edges into the result
+      // do not include into the result the external edges with disabled flag "Include into result"
       if (aFeature->data()->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID())) {
-        if (aFeature->data()->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->context())
-          continue;
+        if (aFeature->data()->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->context()) {
+          AttributeBooleanPtr aKeepResult =
+              aFeature->boolean(SketchPlugin_Projection::INCLUDE_INTO_RESULT());
+          if (!aKeepResult || !aKeepResult->value())
+            continue;
+        }
       }
       // do not include the construction entities in the result
       if (aFeature->data()->attribute(SketchPlugin_SketchEntity::AUXILIARY_ID())) {

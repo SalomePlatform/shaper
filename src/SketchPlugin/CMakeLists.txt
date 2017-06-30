@@ -184,6 +184,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestFilletInteracting.py
                TestRectangle.py
                TestProjection.py
+               TestProjectionIntoResult.py
                TestSplit.py
                TestHighload.py
                TestSnowflake.py

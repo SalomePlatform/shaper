@@ -55,6 +55,12 @@ public:
     return MY_PROJ_FEATURE_ID;
   }
 
+  static const std::string& INCLUDE_INTO_RESULT()
+  {
+    static std::string MY_INCLUDE("IncludeToResult");
+    return MY_INCLUDE;
+  }
+
   /// Returns true because projected feature is always external
   virtual bool isFixed()
   { return true; }

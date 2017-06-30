@@ -479,12 +479,13 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
               id="ExternalFeature"
               label="Edge"
               tooltip="Select external edge."
-              shape_types="edge"
+              shape_types="edge vertex"
               use_external="true"
               can_create_external="false"
               use_sketch_plane="false">
           <validator id="SketchPlugin_ProjectionValidator"/>
         </sketch_shape_selector>
+        <boolvalue id="IncludeToResult" label="Include into the sketch result" default="true" tooltip="Include projected feature into the sketch result"/>
         <validator id="PartSet_ProjectionSelection"/>
       </feature>
     </group>
