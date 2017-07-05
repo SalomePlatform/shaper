@@ -101,7 +101,8 @@ void FeaturesPlugin_Boolean::execute()
     }
     ResultPtr aContext = anObjectAttr->context();
     ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
-    if(aResCompSolidPtr.get()) {
+    if(aResCompSolidPtr.get()
+        && aResCompSolidPtr->shape()->shapeType() == GeomAPI_Shape::COMPSOLID) {
       std::shared_ptr<GeomAPI_Shape> aContextShape = aResCompSolidPtr->shape();
       std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator
         anIt = aCompSolidsObjects.begin();
