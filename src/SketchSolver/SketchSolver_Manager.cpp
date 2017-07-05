@@ -226,6 +226,17 @@ bool SketchSolver_Manager::moveFeature(
   if (!aGroup)
     return false;
 
+  std::shared_ptr<SketchPlugin_Constraint> aConstraint =
+      std::dynamic_pointer_cast<SketchPlugin_Constraint>(theMovedFeature);
+  if (aConstraint)
+  {
+    std::shared_ptr<GeomDataAPI_Point2D> aPntAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+      (aConstraint->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+    aPntAttr->setValue(theTo);
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+    return true;
+  }
+
   aGroup->blockEvents(true);
   return aGroup->moveFeature(theMovedFeature, theFrom, theTo);
 }
@@ -240,6 +251,15 @@ bool SketchSolver_Manager::moveAttribute(
     const std::shared_ptr<GeomAPI_Pnt2d>& theTo)
 {
   FeaturePtr anOwner = ModelAPI_Feature::feature(theMovedAttribute->owner());
+  std::shared_ptr<SketchPlugin_Constraint> aConstraint =
+      std::dynamic_pointer_cast<SketchPlugin_Constraint>(anOwner);
+  if (aConstraint)
+  {
+    theMovedAttribute->setValue(theTo);
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+    return true;
+  }
+
   std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
       std::dynamic_pointer_cast<SketchPlugin_Feature>(anOwner);
   SketchGroupPtr aGroup;

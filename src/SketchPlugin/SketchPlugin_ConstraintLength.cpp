@@ -166,37 +166,6 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
   return anAIS;
 }
 
-void SketchPlugin_ConstraintLength::move(double theDeltaX, double theDeltaY)
-{
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  if (!aData->isValid())
-    return;
-
-  AttributeRefAttrPtr aLineAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-      attribute(SketchPlugin_Constraint::ENTITY_A()));
-  if (!aLineAttr || !aLineAttr->isObject())
-    return;
-  FeaturePtr aLine = ModelAPI_Feature::feature(aLineAttr->object());
-  if (!aLine || aLine->getKind() != SketchPlugin_Line::ID())
-    return;
-
-  // Recalculate a shift of flyout point in terms of local coordinates
-  std::shared_ptr<GeomAPI_XY> aDir(new GeomAPI_XY(theDeltaX, theDeltaY));
-  std::shared_ptr<GeomAPI_XY> aStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aLine->attribute(SketchPlugin_Line::START_ID()))->pnt()->xy();
-  std::shared_ptr<GeomAPI_XY> aEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aLine->attribute(SketchPlugin_Line::END_ID()))->pnt()->xy();
-  std::shared_ptr<GeomAPI_Dir2d> aLineDir(new GeomAPI_Dir2d(aEndPnt->decreased(aStartPnt)));
-  double dX = aDir->dot(aLineDir->xy());
-  double dY = -aDir->cross(aLineDir->xy());
-
-  myFlyoutUpdate = true;
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  aPoint->setValue(aPoint->x() + dX, aPoint->y() + dY);
-  myFlyoutUpdate = false;
-}
-
 void SketchPlugin_ConstraintLength::attributeChanged(const std::string& theID) {
   if (theID == SketchPlugin_Constraint::ENTITY_A())
   {
@@ -209,7 +178,6 @@ void SketchPlugin_ConstraintLength::attributeChanged(const std::string& theID) {
         aValueAttr->setValue(aLength);
     }
   } else if (theID == SketchPlugin_Constraint::FLYOUT_VALUE_PNT() && !myFlyoutUpdate) {
-    myFlyoutUpdate = true;
     // Recalculate flyout point in local coordinates of the line:
     // the X coordinate is a length of projection of the flyout point on the line
     // the Y coordinate is a distance from the point to the line
@@ -230,6 +198,7 @@ void SketchPlugin_ConstraintLength::attributeChanged(const std::string& theID) {
     std::shared_ptr<GeomAPI_XY> aEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aLine->attribute(SketchPlugin_Line::END_ID()))->pnt()->xy();
 
+    myFlyoutUpdate = true;
     std::shared_ptr<GeomAPI_Dir2d> aLineDir(new GeomAPI_Dir2d(aEndPnt->decreased(aStartPnt)));
     std::shared_ptr<GeomAPI_XY> aFlyoutDir = aFlyoutPnt->xy()->decreased(aStartPnt);
     double X = aFlyoutDir->dot(aLineDir->xy());

@@ -173,19 +173,6 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
   return anAIS;
 }
 
-void SketchPlugin_ConstraintRadius::move(double theDeltaX, double theDeltaY)
-{
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  if (!aData->isValid())
-    return;
-
-  myFlyoutUpdate = true;
-  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  aFlyoutAttr->setValue(aFlyoutAttr->x() + theDeltaX, aFlyoutAttr->y() + theDeltaY);
-  myFlyoutUpdate = false;
-}
-
 void SketchPlugin_ConstraintRadius::attributeChanged(const std::string& theID) {
   if (theID == SketchPlugin_Constraint::ENTITY_A()) {
     std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<

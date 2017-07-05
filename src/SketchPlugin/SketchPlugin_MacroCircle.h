@@ -170,12 +170,6 @@ class SketchPlugin_MacroCircle: public SketchPlugin_SketchEntity,
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
-  /// Moves the feature
-  /// \param theDeltaX the delta for X coordinate is moved
-  /// \param theDeltaY the delta for Y coordinate is moved
-  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY)
-  {};
-
   /// Reimplemented from ModelAPI_Feature::isMacro().
   /// \returns true
   SKETCHPLUGIN_EXPORT virtual bool isMacro() const {return true;};

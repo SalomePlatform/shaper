@@ -90,11 +90,6 @@ void SketchPlugin_Projection::execute()
   computeProjection(EXTERNAL_FEATURE_ID());
 }
 
-void SketchPlugin_Projection::move(double theDeltaX, double theDeltaY)
-{
-  // feature cannot be moved
-}
-
 void SketchPlugin_Projection::attributeChanged(const std::string& theID)
 {
   if ((theID == EXTERNAL_FEATURE_ID() || theID == EXTERNAL_ID()) && !myIsComputing) {

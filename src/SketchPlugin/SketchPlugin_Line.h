@@ -76,11 +76,6 @@ class SketchPlugin_Line : public SketchPlugin_SketchEntity,
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
-  /// Moves the feature
-  /// \param theDeltaX the delta for X coordinate is moved
-  /// \param theDeltaY the delta for Y coordinate is moved
-  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
-
   /// Apply information of the message to current object. It fills start attribute of
   /// the currrent feature by last attribute of the message feature, build coincidence
   /// if message has selected object

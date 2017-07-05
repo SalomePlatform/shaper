@@ -73,10 +73,13 @@ Q_OBJECT
 
 private:
   /// Show editor
+  /// \param theSpinMinValue a minimal value of popup menu spin box
+  /// \param theSpinMaxValue a maximum value of popup menu spin box
   /// \param theOutValue a result value
   /// \param theOutText a result text
   /// \return true if the editor value is accepted
-  bool editedValue(double& theOutValue, QString& theOutText);
+  bool editedValue(double theSpinMinValue, double theSpinMaxValue,
+                   double& theOutValue, QString& theOutText);
 
  private:
    ///< the current widget feature

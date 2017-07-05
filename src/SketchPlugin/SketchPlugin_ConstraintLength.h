@@ -29,6 +29,7 @@
 
 #include <list>
 
+class GeomAPI_Pnt2d;
 class GeomDataAPI_Point2D;
 
 /** \class SketchPlugin_ConstraintLength
@@ -72,11 +73,6 @@ class SketchPlugin_ConstraintLength : public SketchPlugin_ConstraintBase
 
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
-
-  /// Moves the feature
-  /// \param theDeltaX the delta for X coordinate is moved
-  /// \param theDeltaY the delta for Y coordinate is moved
-  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
 
   /// Called on change of any argument-attribute of this object
   /// \param theID identifier of changed attribute

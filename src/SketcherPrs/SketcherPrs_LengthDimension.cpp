@@ -42,6 +42,7 @@
 
 #include <AIS_DisplaySpecialSymbol.hxx>
 
+//#ifdef OCCT_28850_FIXED
 
 /// Creates an aspect to be shown in length/radius dimension presentations
 /// \return an instance of aspect
@@ -103,6 +104,13 @@ SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theCo
 {
   SetDimensionAspect(createDimensionAspect());
   myStyleListener = new SketcherPrs_DimensionStyleListener();
+
+#ifdef OCCT_28850_FIXED
+  if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID())
+    SetDirection(true, mySketcherPlane->dirX()->impl<gp_Dir>());
+  else if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
+    SetDirection(true, mySketcherPlane->dirY()->impl<gp_Dir>());
+#endif
 }
 
 SketcherPrs_LengthDimension::~SketcherPrs_LengthDimension()

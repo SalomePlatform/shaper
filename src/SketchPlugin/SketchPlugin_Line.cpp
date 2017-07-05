@@ -92,21 +92,6 @@ void SketchPlugin_Line::execute()
   }
 }
 
-void SketchPlugin_Line::move(double theDeltaX, double theDeltaY)
-{
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  if (!aData->isValid())
-    return;
-
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-    (aData->attribute(START_ID()));
-  aPoint1->move(theDeltaX, theDeltaY);
-
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-    (aData->attribute(END_ID()));
-  aPoint2->move(theDeltaX, theDeltaY);
-}
-
 std::string SketchPlugin_Line::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   std::string aFilledAttributeName;

@@ -58,11 +58,6 @@ class SketchPlugin_Point : public SketchPlugin_SketchEntity
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
-  /// Moves the feature
-  /// \param theDeltaX the delta for X coordinate is moved
-  /// \param theDeltaY the delta for Y coordinate is moved
-  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
-
   /// Called on change of any argument-attribute of this object: for external point
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 

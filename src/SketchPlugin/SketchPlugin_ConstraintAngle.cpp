@@ -269,20 +269,6 @@ void SketchPlugin_ConstraintAngle::updateConstraintValueByAngleValue()
   aValueAttr->setValue(anAngle);
 }
 
-void SketchPlugin_ConstraintAngle::move(double theDeltaX, double theDeltaY)
-{
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  if (!aData->isValid())
-    return;
-
-  myFlyoutUpdate = true;
-  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  aFlyoutAttr->setValue(aFlyoutAttr->x() + theDeltaX, aFlyoutAttr->y() + theDeltaY);
-  myFlyoutUpdate = false;
-}
-
-
 bool SketchPlugin_ConstraintAngle::compute(const std::string& theAttributeId)
 {
   if (theAttributeId != SketchPlugin_Constraint::FLYOUT_VALUE_PNT())

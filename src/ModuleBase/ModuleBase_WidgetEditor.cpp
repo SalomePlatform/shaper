@@ -57,7 +57,8 @@ ModuleBase_WidgetEditor::~ModuleBase_WidgetEditor()
 {
 }
 
-bool ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
+bool ModuleBase_WidgetEditor::editedValue(double theSpinMinValue, double theSpinMaxValue,
+                                          double& outValue, QString& outText)
 {
   bool isValueAccepted = false;
 
@@ -67,8 +68,8 @@ bool ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
   aLay->setContentsMargins(2, 2, 2, 2);
 
   ModuleBase_ParamSpinBox* anEditor = new ModuleBase_ParamSpinBox(myEditorDialog);
-  anEditor->setMinimum(0);
-  anEditor->setMaximum(DBL_MAX);
+  anEditor->setMinimum(theSpinMinValue);
+  anEditor->setMaximum(theSpinMaxValue);
   if (outText.isEmpty())
     anEditor->setValue(outValue);
   else
@@ -122,7 +123,7 @@ bool ModuleBase_WidgetEditor::showPopupEditor(const bool theSendSignals)
   if (mySpinBox->hasVariable())
     aText = mySpinBox->text();
 
-  isValueAccepted = editedValue(aValue, aText);
+  isValueAccepted = editedValue(mySpinBox->minimum(), mySpinBox->maximum(), aValue, aText);
   if (isValueAccepted) {
     if (aText.isEmpty()) {
       if (mySpinBox->hasVariable()) {

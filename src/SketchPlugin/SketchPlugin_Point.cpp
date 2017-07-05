@@ -62,17 +62,6 @@ void SketchPlugin_Point::execute()
   }
 }
 
-void SketchPlugin_Point::move(double theDeltaX, double theDeltaY)
-{
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  if (!aData->isValid())
-    return;
-
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aData->attribute(SketchPlugin_Point::COORD_ID()));
-  aPoint1->move(theDeltaX, theDeltaY);
-}
-
 bool SketchPlugin_Point::isFixed() {
   return data()->selection(EXTERNAL_ID())->context().get() != NULL;
 }

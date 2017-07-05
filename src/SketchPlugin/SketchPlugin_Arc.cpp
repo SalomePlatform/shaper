@@ -135,36 +135,6 @@ void SketchPlugin_Arc::execute()
   setResult(aResult, 1);
 }
 
-void SketchPlugin_Arc::move(double theDeltaX, double theDeltaY)
-{
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  if(!aData->isValid()) {
-    return;
-  }
-
-  bool aWasBlocked = aData->blockSendAttributeUpdated(true);
-
-  std::shared_ptr<GeomDataAPI_Point2D> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      attribute(CENTER_ID()));
-  if(aCenter->isInitialized()) {
-    aCenter->move(theDeltaX, theDeltaY);
-  }
-
-  std::shared_ptr<GeomDataAPI_Point2D> aStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      attribute(START_ID()));
-  if(aStart->isInitialized()) {
-    aStart->move(theDeltaX, theDeltaY);
-  }
-
-  std::shared_ptr<GeomDataAPI_Point2D> anEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      attribute(END_ID()));
-  if(anEnd->isInitialized()) {
-    anEnd->move(theDeltaX, theDeltaY);
-  }
-
-  aData->blockSendAttributeUpdated(aWasBlocked);
-}
-
 bool SketchPlugin_Arc::isFixed()
 {
   return data()->selection(EXTERNAL_ID())->context().get() != NULL;

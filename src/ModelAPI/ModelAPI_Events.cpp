@@ -23,6 +23,11 @@
 
 #include <GeomAPI_Pnt2d.h>
 
+//#define DEBUG_OBJECT_MOVED_MESSAGE
+#ifdef DEBUG_OBJECT_MOVED_MESSAGE
+#include <iostream>
+#endif
+
 ModelAPI_ObjectUpdatedMessage::ModelAPI_ObjectUpdatedMessage(const Events_ID theID,
                                                              const void* theSender)
     : Events_MessageGroup(theID, theSender)
@@ -363,21 +368,41 @@ void ModelAPI_ObjectMovedMessage::setMovedAttribute(const AttributePtr& theMoved
 void ModelAPI_ObjectMovedMessage::setOriginalPosition(double theX, double theY)
 {
   myOriginalPosition = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
+#ifdef DEBUG_OBJECT_MOVED_MESSAGE
+  std::cout << "setOriginalPosition: " << myOriginalPosition->x() << ", "
+                                       << myOriginalPosition->y() << std::endl;
+#endif
 }
 
 void ModelAPI_ObjectMovedMessage::setOriginalPosition(
     const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {
   myOriginalPosition = thePoint;
+#ifdef DEBUG_OBJECT_MOVED_MESSAGE
+  std::cout << "setOriginalPosition: " << myOriginalPosition->x() << ", "
+                                       << myOriginalPosition->y() << std::endl;
+#endif
 }
 
 void ModelAPI_ObjectMovedMessage::setCurrentPosition(double theX, double theY)
 {
   myCurrentPosition = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
+#ifdef DEBUG_OBJECT_MOVED_MESSAGE
+  std::cout << "setCurrentPosition: " << myCurrentPosition->x() << ", " << myCurrentPosition->y()
+            << ", myCurrentPosition - myOriginalPosition: "
+            << myCurrentPosition->x() - myOriginalPosition->x() << ", "
+            << myCurrentPosition->y() - myOriginalPosition->y() << std::endl;
+#endif
 }
 
 void ModelAPI_ObjectMovedMessage::setCurrentPosition(
     const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {
   myCurrentPosition = thePoint;
+#ifdef DEBUG_OBJECT_MOVED_MESSAGE
+  std::cout << "setCurrentPosition: " << myCurrentPosition->x() << ", " << myCurrentPosition->y()
+            << ", myCurrentPosition - myOriginalPosition: "
+            << myCurrentPosition->x() - myOriginalPosition->x() << ", "
+            << myCurrentPosition->y() - myOriginalPosition->y() << std::endl;
+#endif
 }

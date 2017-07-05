@@ -102,20 +102,6 @@ void SketchPlugin_Ellipse::execute()
   setResult(aResult, 1);
 }
 
-void SketchPlugin_Ellipse::move(double theDeltaX, double theDeltaY)
-{
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  if(!aData->isValid()) {
-    return;
-  }
-
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aData->attribute(CENTER_ID()));
-  if(aPoint->isInitialized()) {
-    aPoint->move(theDeltaX, theDeltaY);
-  }
-}
-
 bool SketchPlugin_Ellipse::isFixed() {
   return data()->selection(EXTERNAL_ID())->context().get() != NULL;
 }
