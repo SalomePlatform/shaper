@@ -65,6 +65,27 @@ void Model_ResultCompSolid::storeModified(const std::shared_ptr<GeomAPI_Shape>& 
   updateSubs(theNewShape);
 }
 
+void Model_ResultCompSolid::loadAndOrientModifiedShapes (GeomAlgoAPI_MakeShape* theMS,
+    std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
+    const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes,
+    const bool theIsStoreSeparate,
+    const bool theIsStoreAsGenerated)
+{
+  if (mySubs.size()) { // consists of subs
+    std::vector<std::shared_ptr<ModelAPI_ResultBody> >::const_iterator aSubIter = mySubs.cbegin();
+    for(; aSubIter != mySubs.cend(); aSubIter++) {
+      (*aSubIter)->loadAndOrientModifiedShapes(
+        theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes, theIsStoreSeparate,
+        theIsStoreAsGenerated);
+    }
+  } else { // do for this directly
+    ModelAPI_ResultCompSolid::loadAndOrientModifiedShapes(
+    theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes, theIsStoreSeparate,
+    theIsStoreAsGenerated);
+  }
+}
+
+
 int Model_ResultCompSolid::numberOfSubs(bool forTree) const
 {
   return int(mySubs.size());

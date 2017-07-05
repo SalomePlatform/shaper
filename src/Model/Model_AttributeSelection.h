@@ -26,6 +26,7 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <TDF_LabelMap.hxx>
 #include <TopoDS_Shape.hxx>
+#include <TopTools_ListOfShape.hxx>
 
 class Model_AttributeSelectionList;
 
@@ -134,6 +135,16 @@ protected:
 
   /// Splits theNewShape into sub-shapes of theType type (for the list parent of this attribute)
   void split(ResultPtr theContext, TopoDS_Shape theNewShape, TopAbs_ShapeEnum theType);
+
+  /// When group position is updated, searches the new context and new values
+  bool searchNewContext(std::shared_ptr<Model_Document> theDoc, const TopoDS_Shape theContShape,
+                        ResultPtr theContext, TopoDS_Shape theValShape, TDF_Label theAccessLabel,
+                        std::list<ResultPtr>& theResults, TopTools_ListOfShape& theValShapes);
+
+  /// computes theShapes list - shapes that were generated/modified/deleted the theValShape
+  /// during creation from new to old context
+  void computeValues(ResultPtr theOldContext, ResultPtr theNewContext, TopoDS_Shape theValShape,
+    TopTools_ListOfShape& theShapes);
 
   friend class Model_Data;
   friend class Model_AttributeSelectionList;

@@ -34,7 +34,7 @@ SketchCircle_3 = Sketch_2.addCircle(-41.97827733564338, 89.35676702647821, 6.102
 model.do()
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_2_2f"), model.selection("FACE", "Sketch_2/Face-SketchCircle_3_2f")], model.selection(), 10, 0)
 Boolean_1 = model.addSmash(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], [model.selection("SOLID", "Extrusion_2_1"), model.selection("SOLID", "Extrusion_2_2")])
-Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Extrusion_2_2/To_Face_1"), model.selection("FACE", "Extrusion_2_2/From_Face_1"), model.selection("FACE", "Extrusion_2_2/Generated_Face_1"), model.selection("FACE", "Extrusion_2_1/From_Face_1"), model.selection("FACE", "Boolean_1_1/Modified_3"), model.selection("FACE", "Extrusion_1_1/From_Face_1"), model.selection("FACE", "Extrusion_1_1/Generated_Face_1"), model.selection("FACE", "Extrusion_2_2/From_Face_1"), model.selection("FACE", "Extrusion_2_1/Generated_Face_1"), model.selection("FACE", "Extrusion_2_1/From_Face_1"), model.selection("FACE", "Extrusion_2_1/To_Face_1")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Extrusion_2_2/To_Face_1"), model.selection("FACE", "Extrusion_2_2/From_Face_1"), model.selection("FACE", "Extrusion_2_2/Generated_Face_1"), model.selection("FACE", "Extrusion_2_1/From_Face_1"), model.selection("FACE", "Boolean_1_1_1/Modified_1"), model.selection("FACE", "Extrusion_1_1/From_Face_1"), model.selection("FACE", "Extrusion_1_1/Generated_Face_1"), model.selection("FACE", "Extrusion_2_2/From_Face_1"), model.selection("FACE", "Extrusion_2_1/Generated_Face_1"), model.selection("FACE", "Extrusion_2_1/From_Face_1"), model.selection("FACE", "Extrusion_2_1/To_Face_1")])
 model.do()
 model.end()
 

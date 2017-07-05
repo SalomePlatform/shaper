@@ -47,6 +47,8 @@
 #include <TDataStd_UAttribute.hxx>
 #include <TDataStd_Name.hxx>
 #include <TopTools_ListOfShape.hxx>
+#include <TopTools_DataMapOfShapeShape.hxx>
+#include <TopTools_MapOfShape.hxx>
 #include <TopExp_Explorer.hxx>
 #include <BRep_Tool.hxx>
 #include <TopoDS.hxx>
@@ -54,6 +56,7 @@
 #include <TDF_ChildIterator.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <TopoDS_Iterator.hxx>
+#include <TDF_ChildIDIterator.hxx>
 
 //#define DEB_NAMING 1
 #ifdef DEB_NAMING
@@ -772,6 +775,178 @@ std::string Model_AttributeSelection::contextName(const ResultPtr& theContext) c
   return aResult;
 }
 
+void Model_AttributeSelection::computeValues(
+  ResultPtr theOldContext, ResultPtr theNewContext, TopoDS_Shape theValShape,
+  TopTools_ListOfShape& theShapes)
+{
+  TopoDS_Shape anOldContShape = theOldContext->shape()->impl<TopoDS_Shape>();
+  TopoDS_Shape aNewContShape = theNewContext->shape()->impl<TopoDS_Shape>();
+  if (anOldContShape.IsSame(theValShape)) { // full context shape substituted by new full context
+    theShapes.Append(aNewContShape);
+    return;
+  }
+  if (theValShape.IsNull()) {
+    theShapes.Append(theValShape);
+    return;
+  }
+  // if a new value is unchanged in the new context, do nothing: value is correct
+  TopExp_Explorer aSubExp(aNewContShape, theValShape.ShapeType());
+  for(; aSubExp.More(); aSubExp.Next()) {
+    if (aSubExp.Current().IsSame(theValShape)) {
+      theShapes.Append(theValShape);
+      return;
+    }
+  }
+  // if new context becomes compsolid, the resulting sub may be in sub-solids
+  std::list<ResultPtr> aNewToIterate;
+  aNewToIterate.push_back(theNewContext);
+  ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theNewContext);
+  if (aComp.get()) {
+    for(int a = 0; a < aComp->numberOfSubs(); a++)
+      aNewToIterate.push_back(aComp->subResult(a, false));
+  }
+
+  // first iteration: searching for the whole shape appearance (like face of the box)
+  // second iteration: searching for sub-shapes that contain the sub (like vertex on faces)
+  int aToFindPart = 0;
+  TopTools_DataMapOfShapeShape aNewToOld; // map from new containers to old containers (with val)
+  TopTools_MapOfShape anOlds; // to know how many olds produced new containers
+  for(; aToFindPart != 2 && theShapes.IsEmpty(); aToFindPart++) {
+    std::list<ResultPtr>::iterator aNewContIter = aNewToIterate.begin();
+    for(; aNewContIter != aNewToIterate.end(); aNewContIter++) {
+      std::shared_ptr<Model_Data> aNewData =
+        std::dynamic_pointer_cast<Model_Data>((*aNewContIter)->data());
+      TDF_Label aNewLab = aNewData->label();
+      // searching for produced sub-shape fully on some label
+      TDF_ChildIDIterator aNSIter(aNewLab, TNaming_NamedShape::GetID(), Standard_True);
+      for(; aNSIter.More(); aNSIter.Next()) {
+        Handle(TNaming_NamedShape) aNS = Handle(TNaming_NamedShape)::DownCast(aNSIter.Value());
+        for(TNaming_Iterator aPairIter(aNS); aPairIter.More(); aPairIter.Next()) {
+          if (aToFindPart == 0) { // search shape is fully inside
+            if (aPairIter.OldShape().IsSame(theValShape)) {
+              if (aPairIter.NewShape().IsNull()) {// value was removed
+                theShapes.Clear();
+                return;
+              }
+              theShapes.Append(aPairIter.NewShape());
+            }
+          } else if (!aPairIter.OldShape().IsNull()) { // search shape that contains this sub
+            TopExp_Explorer anExp(aPairIter.OldShape(), theValShape.ShapeType());
+            for(; anExp.More(); anExp.Next()) {
+              if (anExp.Current().IsSame(theValShape)) { // found a new container
+                if (aPairIter.NewShape().IsNull()) {// value was removed
+                  theShapes.Clear();
+                  return;
+                }
+                aNewToOld.Bind(aPairIter.NewShape(), aPairIter.OldShape());
+                anOlds.Add(aPairIter.OldShape());
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (aToFindPart == 2 && !aNewToOld.IsEmpty()) {
+    // map of sub-shapes -> number of occurences of these shapes in containers
+    NCollection_DataMap<TopoDS_Shape, TopTools_MapOfShape, TopTools_ShapeMapHasher> aSubs;
+    TopTools_DataMapOfShapeShape::Iterator aContIter(aNewToOld);
+    for(; aContIter.More(); aContIter.Next()) {
+      TopExp_Explorer aSubExp(aContIter.Key(), theValShape.ShapeType());
+      for(; aSubExp.More(); aSubExp.Next()) {
+        if (!aSubs.IsBound(aSubExp.Current())) {
+          aSubs.Bind(aSubExp.Current(), TopTools_MapOfShape());
+        }
+        // store old to know how many olds produced this shape
+        aSubs.ChangeFind(aSubExp.Current()).Add(aContIter.Value());
+      }
+    }
+    // if sub is appeared same times in containers as the number of old shapes that contain it
+    int aCountInOld = anOlds.Size();
+    NCollection_DataMap<TopoDS_Shape, TopTools_MapOfShape, TopTools_ShapeMapHasher>::Iterator
+      aSubsIter(aSubs);
+    for(; aSubsIter.More(); aSubsIter.Next()) {
+      if (aSubsIter.Value().Size() == aCountInOld) {
+        theShapes.Append(aSubsIter.Key());
+      }
+    }
+  }
+  if (theShapes.IsEmpty()) // nothing was changed
+    theShapes.Append(theValShape);
+}
+
+bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> theDoc,
+  const TopoDS_Shape theContShape, ResultPtr theContext, TopoDS_Shape theValShape,
+  TDF_Label theAccessLabel,
+  std::list<ResultPtr>& theResults, TopTools_ListOfShape& theValShapes)
+{
+  std::set<ResultPtr> aResults; // to avoid duplicates
+  TopTools_ListOfShape aResContShapes;
+  TNaming_SameShapeIterator aModifIter(theContShape, theAccessLabel);
+  for(; aModifIter.More(); aModifIter.Next()) {
+    ResultPtr aModifierObj = std::dynamic_pointer_cast<ModelAPI_Result>
+      (theDoc->objects()->object(aModifIter.Label().Father()));
+    if (!aModifierObj.get())
+      break;
+    FeaturePtr aModifierFeat = theDoc->feature(aModifierObj);
+    if (!aModifierFeat.get())
+      break;
+    FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+    if (aModifierFeat == aThisFeature || theDoc->objects()->isLater(aModifierFeat, aThisFeature))
+      continue; // the modifier feature is later than this, so, should not be used
+    FeaturePtr aCurrentModifierFeat = theDoc->feature(theContext);
+    if (aCurrentModifierFeat == aModifierFeat ||
+      theDoc->objects()->isLater(aCurrentModifierFeat, aModifierFeat))
+      continue; // the current modifier is later than the found, so, useless
+    Handle(TNaming_NamedShape) aNewNS;
+    aModifIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNewNS);
+    if (aNewNS->Evolution() == TNaming_MODIFY || aNewNS->Evolution() == TNaming_GENERATED) {
+      aResults.insert(aModifierObj);
+      TNaming_Iterator aPairIter(aNewNS);
+      aResContShapes.Append(aPairIter.NewShape());
+    } else if (aNewNS->Evolution() == TNaming_DELETE) { // a shape was deleted => result is empty
+      aResults.insert(ResultPtr());
+      aResContShapes.Append(TopoDS_Shape());
+    } else { // not-precessed modification => don't support it
+      continue;
+    }
+  }
+  if (aResults.empty())
+    return false; // no modifications found, must stay the same
+  // iterate all results to find futher modifications
+  std::set<ResultPtr>::iterator aResIter = aResults.begin();
+  TopTools_ListOfShape::Iterator aResShapes(aResContShapes);
+  for(; aResIter != aResults.end(); aResIter++, aResShapes.Next()) {
+    if (aResIter->get() != NULL) {
+      // compute new values by two contextes: the old and the new
+      TopTools_ListOfShape aValShapes;
+      computeValues(theContext, *aResIter, theValShape, aValShapes);
+
+      TopTools_ListIteratorOfListOfShape aNewVal(aValShapes);
+      for(; aNewVal.More(); aNewVal.Next()) {
+        std::list<ResultPtr> aNewRes;
+        TopTools_ListOfShape aNewUpdatedVal;
+        if (searchNewContext(theDoc, aResShapes.Value(), *aResIter, aNewVal.Value(),
+                             theAccessLabel, aNewRes, aNewUpdatedVal))
+        {
+          // appeand new results instead of the current ones
+          std::list<ResultPtr>::iterator aNewIter = aNewRes.begin();
+          TopTools_ListIteratorOfListOfShape aNewUpdVal(aNewUpdatedVal);
+          for(; aNewIter != aNewRes.end(); aNewIter++, aNewUpdVal.Next()) {
+            theResults.push_back(*aNewIter);
+            theValShapes.Append(aNewUpdVal.Value());
+          }
+        } else { // the current result is good
+          theResults.push_back(*aResIter);
+          theValShapes.Append(aNewVal.Value());
+        }
+      }
+    }
+  }
+  return true; // theResults must be empty: everything is deleted
+}
+
 void Model_AttributeSelection::updateInHistory()
 {
   ResultPtr aContext = std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
@@ -795,66 +970,50 @@ void Model_AttributeSelection::updateInHistory()
   TNaming_Iterator aPairIter(aContNS);
   if (!aPairIter.More())
     return;
-  TopoDS_Shape aNewShape = aPairIter.NewShape();
+  TopoDS_Shape aNewCShape = aPairIter.NewShape();
   bool anIterate = true;
   // trying to update also the sub-shape selected
   GeomShapePtr aSubShape = value();
   if (aSubShape.get() && aSubShape->isEqual(aContext->shape()))
     aSubShape.reset();
-
-  while(anIterate) {
-    anIterate = false;
-    TNaming_SameShapeIterator aModifIter(aNewShape, aContLab);
-    for(; aModifIter.More(); aModifIter.Next()) {
-      ResultPtr aModifierObj = std::dynamic_pointer_cast<ModelAPI_Result>
-        (aDoc->objects()->object(aModifIter.Label().Father()));
-      if (!aModifierObj.get())
-        break;
-      FeaturePtr aModifierFeat = aDoc->feature(aModifierObj);
-      if (!aModifierFeat.get())
-        break;
-      if (aModifierFeat == aThisFeature || aDoc->objects()->isLater(aModifierFeat, aThisFeature))
-        continue; // the modifier feature is later than this, so, should not be used
-      if (aCurrentModifierFeat == aModifierFeat ||
-        aDoc->objects()->isLater(aCurrentModifierFeat, aModifierFeat))
-        continue; // the current modifier is later than the found, so, useless
-      Handle(TNaming_NamedShape) aNewNS;
-      aModifIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNewNS);
-      if (aNewNS->Evolution() == TNaming_MODIFY || aNewNS->Evolution() == TNaming_GENERATED) {
-        aModifierResFound = aModifierObj;
-        aCurrentModifierFeat = aModifierFeat;
-        TNaming_Iterator aPairIter(aNewNS);
-        aNewShape = aPairIter.NewShape();
-        anIterate = true;
-        break;
-      } else if (aNewNS->Evolution() == TNaming_DELETE) { // a shape was deleted => result is null
-        ResultPtr anEmptyContext;
-        std::shared_ptr<GeomAPI_Shape> anEmptyShape;
-        setValue(anEmptyContext, anEmptyShape); // nullify the selection
-        return;
-      } else { // not-precessed modification => don't support it
-        continue;
-      }
-    }
+  TopoDS_Shape aValShape;
+  if (aSubShape.get()) {
+    aValShape = aSubShape->impl<TopoDS_Shape>();
   }
-  if (aModifierResFound.get()) {
+
+  std::list<ResultPtr> aNewContexts;
+  TopTools_ListOfShape aValShapes;
+  if (searchNewContext(aDoc, aNewCShape, aContext, aValShape, aContLab, aNewContexts, aValShapes))
+  {
     // update scope to reset to a new one
     myScope.Clear();
-    myRef.setValue(aModifierResFound);
-    // if context shape type is changed to more complicated and this context is selected, split
-    if (myParent &&!aSubShape.get() && aModifierResFound->shape().get() && aContext->shape().get())
-    {
-      TopoDS_Shape anOldShape = aContext->shape()->impl<TopoDS_Shape>();
-      TopoDS_Shape aNewShape = aModifierResFound->shape()->impl<TopoDS_Shape>();
-      if (!anOldShape.IsNull() && !aNewShape.IsNull() &&
-        anOldShape.ShapeType() != aNewShape.ShapeType() &&
-        (aNewShape.ShapeType() == TopAbs_COMPOUND || aNewShape.ShapeType() == TopAbs_COMPSOLID)) {
-        // prepare for split in "update"
-        TDF_Label aSelLab = selectionLabel();
-        split(aContext, aNewShape, anOldShape.ShapeType());
+
+    std::list<ResultPtr>::iterator aNewCont = aNewContexts.begin();
+    TopTools_ListIteratorOfListOfShape aNewValues(aValShapes);
+    if (aNewCont == aNewContexts.end()) { // all results were deleted
+      ResultPtr anEmptyContext;
+      std::shared_ptr<GeomAPI_Shape> anEmptyShape;
+      setValue(anEmptyContext, anEmptyShape); // nullify the selection
+      return;
+    }
+
+    GeomShapePtr aValueShape;
+    if (!aNewValues.Value().IsNull()) {
+      aValueShape = std::make_shared<GeomAPI_Shape>();
+      aValueShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aNewValues.Value()));
+    }
+    setValue(*aNewCont, aValueShape);
+    // if there are more than one result, put them by "append" into "parent" list
+    if (myParent) {
+      for(aNewCont++, aNewValues.Next(); aNewCont != aNewContexts.end(); aNewCont++, aNewValues.Next()) {
+        GeomShapePtr aValueShape;
+        if (!aNewValues.Value().IsNull()) {
+          aValueShape = std::make_shared<GeomAPI_Shape>();
+          aValueShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aNewValues.Value()));
+        }
+        myParent->append(*aNewCont, aValueShape);
       }
     }
-    update(); // it must recompute a new sub-shape automatically
   }
 }
 

@@ -119,8 +119,8 @@ Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Extrusion_1_1/To_
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_12"), 150, True)
 Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_7"), 150, True)
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Plane_1"), model.selection("COMPSOLID", "Extrusion_1_1"), model.selection("FACE", "Plane_2")])
-Plane_6 = model.addPlane(Part_1_doc, model.selection("FACE", "Partition_1_1/Modified_Face_1_2_1"), 110, True)
-Plane_7 = model.addPlane(Part_1_doc, model.selection("FACE", "Partition_1_1/Modified_Face_1_9_1"), 380, True)
+Plane_6 = model.addPlane(Part_1_doc, model.selection("FACE", "Partition_1_1_7/Modified_Face_1_3"), 110, True)
+Plane_7 = model.addPlane(Part_1_doc, model.selection("FACE", "Partition_1_1_5/Modified_Face_1_3"), 380, True)
 Partition_2 = model.addPartition(Part_1_doc, [model.selection("FACE", "Plane_3"), model.selection("COMPSOLID", "Partition_1_1"), model.selection("FACE", "Plane_4")])
 model.do()
 
