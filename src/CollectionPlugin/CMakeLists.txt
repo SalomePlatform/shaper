@@ -105,4 +105,6 @@ ADD_UNIT_TESTS(
                TestGroup.py
                TestField.py
                TestGroup1799.py
+               TestGroupMove.py
+               TestGroupMove2.py
 )

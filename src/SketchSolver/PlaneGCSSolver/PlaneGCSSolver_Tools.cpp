@@ -42,8 +42,6 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
-#include <SketchPlugin_ConstraintDistanceHorizontal.h>
-#include <SketchPlugin_ConstraintDistanceVertical.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintMiddle.h>
@@ -78,11 +76,6 @@ static ConstraintWrapperPtr
   createConstraintDistancePointLine(std::shared_ptr<PlaneGCSSolver_ScalarWrapper> theValue,
                                     std::shared_ptr<PlaneGCSSolver_PointWrapper>  thePoint,
                                     std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity);
-static ConstraintWrapperPtr
-  createConstraintHVDistance(const SketchSolver_ConstraintType& theType,
-                             std::shared_ptr<PlaneGCSSolver_ScalarWrapper> theValue,
-                             std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint1,
-                             std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint2);
 static ConstraintWrapperPtr
   createConstraintRadius(std::shared_ptr<PlaneGCSSolver_ScalarWrapper> theValue,
                          std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity);
@@ -125,9 +118,7 @@ SolverConstraintPtr PlaneGCSSolver_Tools::createConstraint(ConstraintPtr theCons
     return SolverConstraintPtr(new SketchSolver_ConstraintCoincidence(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintCollinear::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintCollinear(theConstraint));
-  } else if (theConstraint->getKind() == SketchPlugin_ConstraintDistance::ID() ||
-             theConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID() ||
-             theConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID()) {
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintDistance::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintDistance(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintEqual::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintEqual(theConstraint));
@@ -152,18 +143,11 @@ SolverConstraintPtr PlaneGCSSolver_Tools::createConstraint(ConstraintPtr theCons
   return SolverConstraintPtr(new SketchSolver_Constraint(theConstraint));
 }
 
-std::shared_ptr<SketchSolver_ConstraintMovement> PlaneGCSSolver_Tools::createMovementConstraint(
+std::shared_ptr<SketchSolver_ConstraintFixed> PlaneGCSSolver_Tools::createMovementConstraint(
     FeaturePtr theMovedFeature)
 {
-  return std::shared_ptr<SketchSolver_ConstraintMovement>(
-      new SketchSolver_ConstraintMovement(theMovedFeature));
-}
-
-std::shared_ptr<SketchSolver_ConstraintMovement> PlaneGCSSolver_Tools::createMovementConstraint(
-    AttributePtr theMovedAttribute)
-{
-  return std::shared_ptr<SketchSolver_ConstraintMovement>(
-      new SketchSolver_ConstraintMovement(theMovedAttribute));
+  return std::shared_ptr<SketchSolver_ConstraintFixed>(
+      new SketchSolver_ConstraintFixed(theMovedFeature));
 }
 
 
@@ -201,10 +185,6 @@ ConstraintWrapperPtr PlaneGCSSolver_Tools::createConstraint(
     aResult = createConstraintDistancePointLine(GCS_SCALAR_WRAPPER(theValue),
                                                 aPoint1,
                                                 GCS_EDGE_WRAPPER(theEntity1));
-    break;
-  case CONSTRAINT_HORIZONTAL_DISTANCE:
-  case CONSTRAINT_VERTICAL_DISTANCE:
-    aResult = createConstraintHVDistance(theType, GCS_SCALAR_WRAPPER(theValue), aPoint1, aPoint2);
     break;
   case CONSTRAINT_RADIUS:
     aResult = createConstraintRadius(GCS_SCALAR_WRAPPER(theValue),
@@ -395,32 +375,6 @@ ConstraintWrapperPtr createConstraintDistancePointLine(
       *(thePoint->point()), *(aLine), theValue->scalar()));
   std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aResult(
       new PlaneGCSSolver_ConstraintWrapper(aNewConstr, CONSTRAINT_PT_LINE_DISTANCE));
-  aResult->setValueParameter(theValue);
-  return aResult;
-}
-
-ConstraintWrapperPtr createConstraintHVDistance(
-    const SketchSolver_ConstraintType& theType,
-    std::shared_ptr<PlaneGCSSolver_ScalarWrapper> theValue,
-    std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint1,
-    std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint2)
-{
-  GCSPointPtr aPoint1 = thePoint1->point();
-  GCSPointPtr aPoint2 = thePoint2->point();
-
-  double *aParam1, *aParam2;
-  if (theType == CONSTRAINT_HORIZONTAL_DISTANCE) {
-    aParam1 = aPoint1->x;
-    aParam2 = aPoint2->x;
-  } else if (theType == CONSTRAINT_VERTICAL_DISTANCE) {
-    aParam1 = aPoint1->y;
-    aParam2 = aPoint2->y;
-  }
-
-  GCSConstraintPtr aNewConstr(new GCS::ConstraintDifference(aParam1, aParam2, theValue->scalar()));
-
-  std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aResult(
-      new PlaneGCSSolver_ConstraintWrapper(aNewConstr, theType));
   aResult->setValueParameter(theValue);
   return aResult;
 }

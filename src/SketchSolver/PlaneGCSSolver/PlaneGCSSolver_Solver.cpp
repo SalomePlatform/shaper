@@ -27,8 +27,7 @@ PlaneGCSSolver_Solver::PlaneGCSSolver_Solver()
     myDiagnoseBeforeSolve(false),
     myInitilized(false),
     myConfCollected(false),
-    myDOF(0),
-    myFictiveConstraint(0)
+    myDOF(0)
 {
 }
 
@@ -44,8 +43,6 @@ void PlaneGCSSolver_Solver::clear()
   myConstraints.clear();
   myConflictingIDs.clear();
   myDOF = 0;
-
-  removeFictiveConstraint();
 }
 
 void PlaneGCSSolver_Solver::addConstraint(GCSConstraintPtr theConstraint)
@@ -112,7 +109,6 @@ void PlaneGCSSolver_Solver::removeParameters(const GCS::SET_pD& theParams)
 void PlaneGCSSolver_Solver::initialize()
 {
   Events_LongOp::start(this);
-  addFictiveConstraintIfNecessary();
   if (myDiagnoseBeforeSolve)
     diagnose();
   myEquationSystem->declareUnknowns(myParameters);
@@ -138,8 +134,6 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
   if (myInitilized) {
     aResult = (GCS::SolveStatus)myEquationSystem->solve();
   } else {
-    addFictiveConstraintIfNecessary();
-
     if (myDiagnoseBeforeSolve)
       diagnose();
     aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters);
@@ -163,7 +157,6 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
     aStatus = STATUS_OK;
   }
 
-  removeFictiveConstraint();
   myInitilized = false;
   return aStatus;
 }
@@ -204,35 +197,4 @@ void PlaneGCSSolver_Solver::diagnose()
   myEquationSystem->declareUnknowns(myParameters);
   myDOF = myEquationSystem->diagnose();
   myDiagnoseBeforeSolve = false;
-}
-
-void PlaneGCSSolver_Solver::addFictiveConstraintIfNecessary()
-{
-  if (!myConstraints.empty() &&
-      myConstraints.find(CID_MOVEMENT) == myConstraints.end())
-    return;
-
-  if (myFictiveConstraint)
-    return; // no need several fictive constraints
-
-  double* aParam = createParameter();
-  double* aFictiveParameter = new double(0.0);
-
-  myFictiveConstraint = new GCS::ConstraintEqual(aFictiveParameter, aParam);
-  myFictiveConstraint->setTag(CID_FICTIVE);
-  myEquationSystem->addConstraint(myFictiveConstraint);
-}
-
-void PlaneGCSSolver_Solver::removeFictiveConstraint()
-{
-  if (myFictiveConstraint) {
-    myEquationSystem->removeConstraint(myFictiveConstraint);
-    myParameters.pop_back();
-
-    GCS::VEC_pD aParams = myFictiveConstraint->params();
-    for (GCS::VEC_pD::iterator anIt = aParams.begin(); anIt != aParams.end(); ++ anIt)
-      delete *anIt;
-    delete myFictiveConstraint;
-    myFictiveConstraint = 0;
-  }
 }

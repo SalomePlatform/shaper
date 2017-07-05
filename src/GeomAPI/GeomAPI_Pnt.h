@@ -91,7 +91,4 @@ class GeomAPI_Pnt : public GeomAPI_Interface
   void translate(const std::shared_ptr<GeomAPI_Dir>& theDir, double theDist);
 };
 
-//! Pointer on the object
-typedef std::shared_ptr<GeomAPI_Pnt> GeomPointPtr;
-
 #endif

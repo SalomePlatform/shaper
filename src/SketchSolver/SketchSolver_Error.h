@@ -103,12 +103,6 @@ class SketchSolver_Error
     static const std::string MY_ERROR_VALUE("Caution: SolveSpace crash! Constraints are wrong");
     return MY_ERROR_VALUE;
   }
-  /// Constraint has wrong type
-  inline static const std::string& WRONG_CONSTRAINT_TYPE()
-  {
-    static const std::string MY_ERROR_VALUE("Unsupported type of constraint");
-    return MY_ERROR_VALUE;
-  }
 };
 
 #endif

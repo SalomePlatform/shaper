@@ -95,8 +95,5 @@ class GeomAPI_Pln : public GeomAPI_Interface
   std::shared_ptr<GeomAPI_Lin> intersect(const std::shared_ptr<GeomAPI_Pln> thePlane) const;
 };
 
-//! Pointer on the object
-typedef std::shared_ptr<GeomAPI_Pln> GeomPlanePtr;
-
 #endif
 

@@ -30,6 +30,9 @@ IF(EXISTS ${TINSPECTOR_ROOT_DIR})
     FIND_LIBRARY(TKTreeModel TKTreeModel "${TINSPECTOR_LIB_DIR}")
     SET(TKTreeModel ${TKTreeModel})
 
+    FIND_LIBRARY(TKVInspector TKVInspector "${TINSPECTOR_LIB_DIR}")
+    SET(TKVInspector ${TKVInspector})
+
   ENDIF(TKTInspector)
 
 ENDIF(EXISTS ${TINSPECTOR_ROOT_DIR})

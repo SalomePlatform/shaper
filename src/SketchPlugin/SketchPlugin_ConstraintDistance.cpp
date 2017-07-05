@@ -178,32 +178,6 @@ double SketchPlugin_ConstraintDistance::calculateCurrentDistance()
   return aDistance;
 }
 
-bool SketchPlugin_ConstraintDistance::areAttributesInitialized()
-{
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
-  std::shared_ptr<GeomDataAPI_Point2D> aPointA =
-      SketcherPrs_Tools::getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_A(), aPlane);
-  std::shared_ptr<GeomDataAPI_Point2D> aPointB =
-      SketcherPrs_Tools::getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_B(), aPlane);
-
-  if (!aPointA && !aPointB)
-    return false;
-  else if (aPointA || aPointB) {
-    FeaturePtr aLine;
-    if (!aPointA)
-      aLine = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
-    else if (!aPointB)
-      aLine = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
-    else // both points are initialized
-      return true;
-
-    if (!aLine || aLine->getKind() != SketchPlugin_Line::ID())
-      return false;
-  }
-  return true;
-}
-
 void SketchPlugin_ConstraintDistance::attributeChanged(const std::string& theID)
 {
   if (theID == SketchPlugin_Constraint::ENTITY_A() ||

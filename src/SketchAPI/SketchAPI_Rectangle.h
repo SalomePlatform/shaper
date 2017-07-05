@@ -65,9 +65,6 @@ public:
   SKETCHAPI_EXPORT
   void setByPoints(const std::shared_ptr<GeomAPI_Pnt2d> & theStartPoint,
                    const std::shared_ptr<GeomAPI_Pnt2d> & theEndPoint);
-
-  /// List of lines composing rectangle
-  SKETCHAPI_EXPORT std::list<std::shared_ptr<SketchAPI_SketchEntity> > lines() const;
 };
 
 //! Pointer on Rectangle object
