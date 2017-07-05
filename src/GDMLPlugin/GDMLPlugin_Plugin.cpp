@@ -23,6 +23,7 @@
 #include <GDMLPlugin_Plugin.h>
 
 #include <GDMLPlugin_ConeSegment.h>
+#include <GDMLPlugin_Ellipsoid.h>
 
 // the only created instance of this plugin
 static GDMLPlugin_Plugin* MY_GDML_INSTANCE = new GDMLPlugin_Plugin();
@@ -37,7 +38,10 @@ FeaturePtr GDMLPlugin_Plugin::createFeature(std::string theFeatureID)
 {
   if (theFeatureID == GDMLPlugin_ConeSegment::ID()) {
     return FeaturePtr(new GDMLPlugin_ConeSegment);
+  } else if (theFeatureID == GDMLPlugin_Ellipsoid::ID()) {
+    return FeaturePtr(new GDMLPlugin_Ellipsoid);
   }
+  
   // feature of such kind is not found
   return FeaturePtr();
 }

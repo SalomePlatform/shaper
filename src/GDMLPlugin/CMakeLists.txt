@@ -27,16 +27,19 @@ SET(PROJECT_HEADERS
     GDMLPlugin.h
     GDMLPlugin_Plugin.h
     GDMLPlugin_ConeSegment.h
+    GDMLPlugin_Ellipsoid.h
 )
 
 SET(PROJECT_SOURCES
     GDMLPlugin_Plugin.cpp
     GDMLPlugin_ConeSegment.cpp
+    GDMLPlugin_Ellipsoid.cpp
 )
 
 SET(XML_RESOURCES
   plugin-GDML.xml
   conesegment_widget.xml
+  ellipsoid_widget.xml
 )
 
 INCLUDE_DIRECTORIES(

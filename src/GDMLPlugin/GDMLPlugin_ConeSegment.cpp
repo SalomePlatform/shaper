@@ -23,7 +23,6 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeDouble.h>
-#include <ModelAPI_AttributeString.h>
 
 //=================================================================================================
 GDMLPlugin_ConeSegment::GDMLPlugin_ConeSegment() // Nothing to do during instantiation

@@ -68,6 +68,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_XAOImport.h
     GeomAlgoAPI_Copy.h
     GeomAlgoAPI_ConeSegment.h
+    GeomAlgoAPI_Ellipsoid.h
     GeomAlgoAPI_Symmetry.h
     GeomAlgoAPI_Scale.h
     GeomAlgoAPI_Circ2dBuilder.h
@@ -117,6 +118,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_XAOImport.cpp
     GeomAlgoAPI_Copy.cpp
     GeomAlgoAPI_ConeSegment.cpp
+    GeomAlgoAPI_Ellipsoid.cpp
     GeomAlgoAPI_Symmetry.cpp
     GeomAlgoAPI_Scale.cpp
     GeomAlgoAPI_Circ2dBuilder.cpp

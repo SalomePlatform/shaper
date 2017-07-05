@@ -1,0 +1,60 @@
+<!--
+Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+See http:##www.salome-platform.org/ or
+email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+-->
+
+<source>
+  <groupbox title="Dimensions">
+    <doublevalue id="ax"
+                 label="ax"
+                 step="1.0"
+                 default="10.0"
+                 tooltip="Enter the x semi axis length">
+    </doublevalue>
+    <doublevalue id="by"
+                 label="by"
+                 step="1.0"
+                 default="20.0"
+                 tooltip="Enter the y semi axis length">
+    </doublevalue>
+    <doublevalue id="cz"
+                 label="cz"
+                 step="1.0"
+                 default="40.0"
+                 tooltip="Enter the z semi axis length">
+    </doublevalue>   
+  </groupbox>
+  <groupbox title="Cuts">
+    <optionalbox id="use_zcut1" title="">
+      <doublevalue id="zcut1" 
+                   label="zcut1" 
+                   tooltip="Enter the lower zcut" 
+                   default="5."
+                   step="1.0"/>
+    </optionalbox>
+    <optionalbox id="use_zcut2" title="">
+      <doublevalue id="zcut2" 
+                   label="zcut2" 
+                   tooltip="Enter the upper zcut" 
+                   default="5."
+                   step="1.0"/>
+    </optionalbox>
+  </groupbox>
+  <label title="" icon="icons/GDML/gui_ellipsoid.png"/>
+</source>
