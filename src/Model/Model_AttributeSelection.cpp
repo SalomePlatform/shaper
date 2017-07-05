@@ -1005,7 +1005,8 @@ void Model_AttributeSelection::updateInHistory()
     setValue(*aNewCont, aValueShape);
     // if there are more than one result, put them by "append" into "parent" list
     if (myParent) {
-      for(aNewCont++, aNewValues.Next(); aNewCont != aNewContexts.end(); aNewCont++, aNewValues.Next()) {
+      for(aNewCont++, aNewValues.Next(); aNewCont != aNewContexts.end();
+          aNewCont++, aNewValues.Next()) {
         GeomShapePtr aValueShape;
         if (!aNewValues.Value().IsNull()) {
           aValueShape = std::make_shared<GeomAPI_Shape>();
