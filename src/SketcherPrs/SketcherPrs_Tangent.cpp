@@ -68,13 +68,29 @@ bool SketcherPrs_Tangent::updateIfReadyToDisplay(double theStep, bool withColor)
   ObjectPtr aObj2 =
     SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
 
+  GeomShapePtr aShp1 = SketcherPrs_Tools::getShape(aObj1);
+  GeomShapePtr aShp2 = SketcherPrs_Tools::getShape(aObj2);
+
+  GeomCurvePtr aCurv1 = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShp1));
+  GeomCurvePtr aCurv2 = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShp2));
+
+  GeomPointPtr aPnt1_1 = aCurv1->getPoint(aCurv1->startParam());
+  GeomPointPtr aPnt1_2 = aCurv1->getPoint(aCurv1->endParam());
+
+  GeomPointPtr aPnt2_1 = aCurv2->getPoint(aCurv2->startParam());
+  GeomPointPtr aPnt2_2 = aCurv2->getPoint(aCurv2->endParam());
+
+  GeomPointPtr aPnt;
+  if (aPnt1_1->isEqual(aPnt2_1) || aPnt1_1->isEqual(aPnt2_2))
+    aPnt = aPnt1_1;
+  else if (aPnt1_2->isEqual(aPnt2_1) || aPnt1_2->isEqual(aPnt2_2))
+    aPnt = aPnt1_2;
+
   // Compute points coordinates
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
-  gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep);
-  gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);
-  myPntArray = new Graphic3d_ArrayOfPoints(2, withColor);
+  gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep, aPnt);
+  myPntArray = new Graphic3d_ArrayOfPoints(1, withColor);
   myPntArray->AddVertex(aP1);
-  myPntArray->AddVertex(aP2);
   return true;
 }
 

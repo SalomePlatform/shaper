@@ -24,6 +24,7 @@
 #include "SketcherPrs_SymbolPrs.h"
 
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_Pnt.h>
 #include <gp_Pnt.hxx>
 #include <ModelAPI_Object.h>
 
@@ -44,7 +45,8 @@ public:
   /// \param theLine constrained object
   /// \param thePrs a presentation of constraint
   /// \param theStep step between symbols
-  gp_Pnt getPosition(ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs, double theStep = 20);
+  gp_Pnt getPosition(ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs,
+                     double theStep = 20, GeomPointPtr thePnt = GeomPointPtr());
 
   /// Deletes constraint object from internal structures. Has to be called on constraint delete.
   /// \param thePrs a constraint presentation
