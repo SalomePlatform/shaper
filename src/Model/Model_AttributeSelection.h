@@ -29,6 +29,7 @@
 #include <TopTools_ListOfShape.hxx>
 
 class Model_AttributeSelectionList;
+class Model_Document;
 
 /**\class Model_AttributeSelection
  * \ingroup DataModel
