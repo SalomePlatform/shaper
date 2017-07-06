@@ -41,7 +41,7 @@ FeaturePtr GDMLPlugin_Plugin::createFeature(std::string theFeatureID)
   } else if (theFeatureID == GDMLPlugin_Ellipsoid::ID()) {
     return FeaturePtr(new GDMLPlugin_Ellipsoid);
   }
-  
+
   // feature of such kind is not found
   return FeaturePtr();
 }

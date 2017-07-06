@@ -46,14 +46,14 @@ void GDMLPlugin_Ellipsoid::initAttributes()
 void GDMLPlugin_Ellipsoid::execute()
 {
   std::shared_ptr<GeomAlgoAPI_Ellipsoid> anEllipsoidAlgo;
-  
+
   double aAx = real(AX_ID())->value();
   double aBy = real(BY_ID())->value();
   double aCz = real(CZ_ID())->value();
-  
+
   std::string useZCut1 = string(USE_ZCUT1_ID())->value();
   std::string useZCut2 = string(USE_ZCUT2_ID())->value();
-  
+
   double aZCut1 = 0.;
   if (useZCut1.empty()) {
     aZCut1 = aCz /2.;
@@ -66,13 +66,13 @@ void GDMLPlugin_Ellipsoid::execute()
   } else {
     aZCut2 = real(ZCUT2_ID())->value();
   }
-  
+
   anEllipsoidAlgo = std::shared_ptr<GeomAlgoAPI_Ellipsoid>(
     new GeomAlgoAPI_Ellipsoid(aAx, aBy, aCz, aZCut1, aZCut2));
-  
+
   // Check with that the arguments for anEllipsoidAlgo are correct
-  if (!anEllipsoidAlgo->check()){
-    setError(anEllipsoidAlgo->getError(), false);   
+  if (!anEllipsoidAlgo->check()) {
+    setError(anEllipsoidAlgo->getError(), false);
     return;
   }
 
@@ -83,15 +83,15 @@ void GDMLPlugin_Ellipsoid::execute()
     setError(anEllipsoidAlgo->getError(), false);
     return;
   }
-  
+
   // Check if the created ellipsoid is valid
   if (!anEllipsoidAlgo->checkValid("Ellipsoid builder")) {
     setError(anEllipsoidAlgo->getError(), false);
     return;
   }
 
-  int aResultIndex = 0; 
-  ResultBodyPtr aResultEllipsoid = document()->createBody(data(), aResultIndex); 
+  int aResultIndex = 0;
+  ResultBodyPtr aResultEllipsoid = document()->createBody(data(), aResultIndex);
   loadNamingDS(anEllipsoidAlgo, aResultEllipsoid);
   setResult(aResultEllipsoid, aResultIndex);
 
@@ -103,10 +103,10 @@ void GDMLPlugin_Ellipsoid::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Ellipsoid> t
 {
   // Load the result
   theResultEllipsoid->store(theEllipsoidAlgo->shape());
-  
+
   // Prepare the naming
   theEllipsoidAlgo->prepareNamingFaces();
-  
+
   // Insert to faces
   int num = 1;
   std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces =

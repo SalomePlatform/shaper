@@ -76,7 +76,7 @@ bool GeomAlgoAPI_Ellipsoid::check()
     myError = "Ellipsoid builder :: zcut1 and zcut2 are null.";
     return false;
   }
-  
+
   return true;
 }
 
@@ -84,17 +84,17 @@ bool GeomAlgoAPI_Ellipsoid::check()
 void GeomAlgoAPI_Ellipsoid::build()
 {
   myCreatedFaces.clear();
-  
+
   BRepOffsetAPI_Sewing aSewer;
   gp_Ax2 aRefAx2;
   gp_Elips anElips;
-  
+
   gp_Pnt anOrigin(0., 0., 0.);
   gp_Dir aDirX(1., 0., 0.);
   gp_Dir aDirY(0., 1., 0.);
   gp_Dir aDirZ(0., 0., 1.);
   gp_Ax1 aZAxis(anOrigin, aDirZ);
-  
+
   // Calculate the parameters needed to make the edges and the faces
   // gp_Elips needs the second parameter to be greater than the third (major axis)
   if (myCz < myAx) {
@@ -104,20 +104,20 @@ void GeomAlgoAPI_Ellipsoid::build()
     aRefAx2 = gp_Ax2(anOrigin, aDirY, aDirZ);
     anElips = gp_Elips(aRefAx2, myCz / 2., myAx / 2.);
   }
-  
+
   double aLowPositionFactor = sqrt(1. - (myZCut1 * myZCut1 * 4. / (myCz * myCz))) / 2.;
   double aHighPositionFactor = sqrt(1. - (myZCut2 * myZCut2 * 4. / (myCz * myCz))) / 2.;
-  
+
   double aXEndTop = myAx * aHighPositionFactor;
   double aXEndBottom = myAx *  aLowPositionFactor;
-  
+
   // Build the XZ ellipse
   gp_Pnt anEndPoint1(aXEndTop, 0., myZCut2);
   gp_Pnt anEndPoint2(aXEndBottom, 0., -myZCut1);
   BRepBuilderAPI_MakeEdge anElipsBuilder(anElips, anEndPoint1, anEndPoint2);
   anElipsBuilder.Build();
   TopoDS_Edge anOuterEdge = anElipsBuilder.Edge();
-  
+
   // Perform a revolution based on the section to build a simple version of the outer face
   // (isotropic in XY)
   BRepPrimAPI_MakeRevol aRevolBuilder(anOuterEdge, aZAxis, 2. * M_PI, Standard_True);
@@ -125,7 +125,7 @@ void GeomAlgoAPI_Ellipsoid::build()
     myError = "Ellipsoid builder :: section revolution did not succeed";
     return;
   }
-  
+
   gp_GTrsf aGTrsf;
   gp_Mat rot (1.,          0., 0.,
               0., myBy / myAx, 0.,
@@ -141,11 +141,11 @@ void GeomAlgoAPI_Ellipsoid::build()
 
   TopoDS_Face anOuterFace = TopoDS::Face(aScaleBuilder.Shape());
   aSewer.Add(TopoDS::Face(anOuterFace.Reversed()));
-  
+
   // Build the high and low ellipse if needed
   gp_Ax2 aLowAx2;
   gp_Ax2 aHighAx2;
-  gp_Elips aLowElips; 
+  gp_Elips aLowElips;
   gp_Elips aHighElips;
   if (myBy < myAx) {
     if ((myCz / 2. - myZCut1) > Precision::Confusion()) {
@@ -179,7 +179,7 @@ void GeomAlgoAPI_Ellipsoid::build()
     aSewer.Add(TopoDS::Face(aBottomFace.Reversed()));
   }
   if ((myCz / 2. - myZCut2) > Precision::Confusion()) {
-    TopoDS_Face aTopFace; 
+    TopoDS_Face aTopFace;
     BRepBuilderAPI_MakeEdge aTopEdgeMk(aHighElips);
     aTopEdgeMk.Build();
     BRepBuilderAPI_MakeWire aTopWireMk;
@@ -188,33 +188,35 @@ void GeomAlgoAPI_Ellipsoid::build()
     aTopFace = aTopFaceMk.Face();
     aSewer.Add(TopoDS::Face(aTopFace.Reversed()));
   }
-  
+
   TopoDS_Shell aShell;
   aSewer.Perform();
-  if ((myCz / 2. - myZCut2) > Precision::Confusion() || (myCz / 2. - myZCut1) > Precision::Confusion()) {
+  if ((myCz / 2. - myZCut2) > Precision::Confusion() ||
+      (myCz / 2. - myZCut1) > Precision::Confusion()) {
     aShell = TopoDS::Shell(aSewer.SewedShape());
   } else {
     TopoDS_Builder aBuilder;
     aBuilder.MakeShell(aShell);
     aBuilder.Add(aShell, aSewer.SewedShape());
   }
-  
+
   BRepBuilderAPI_MakeSolid *anEllipsoidMk = new BRepBuilderAPI_MakeSolid(aShell);
   anEllipsoidMk->Build();
-  
+
   // Store and publish the results
-  std::shared_ptr<GeomAPI_Shape> aResultShape =  std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape()) ;
+  std::shared_ptr<GeomAPI_Shape> aResultShape =
+    std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
   aResultShape->setImpl(new TopoDS_Shape(anEllipsoidMk->Solid()));
   setShape(aResultShape);
-  
+
   // Test on the shapes
   if (!(aResultShape).get() || aResultShape->isNull()) {
     myError = "Ellipsoid builder  :: resulting shape is null.";
     return;
   }
-  
+
   setImpl(anEllipsoidMk);
   setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
-  
+
   setDone(true);
 }
