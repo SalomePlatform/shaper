@@ -76,7 +76,7 @@ public:
   //! Defines that specified document must be loaded by demand
   void setLoadByDemand(std::string theID, const int theDocID);
   //! Returns true if specified document must be loaded by demand
-  bool isLoadByDemand(std::string theID);
+  bool isLoadByDemand(std::string theID, const int theDocIndex);
   //! Closes and removes the documents that are not loaded by demand and
   //! not in the given list
   void removeUselessDocuments(std::list<std::shared_ptr<ModelAPI_Document> > theUsedDocs);
