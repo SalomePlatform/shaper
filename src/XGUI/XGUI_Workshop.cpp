@@ -2052,7 +2052,6 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
     if (module()->canEraseObject(aObj))
       aObj->setDisplayed(false);
   }
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 #ifdef HAVE_SALOME
     //issue #2159 Hide all incomplete behavior
     viewer()->eraseAll();
