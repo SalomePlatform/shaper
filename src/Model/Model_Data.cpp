@@ -307,7 +307,14 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
   if (theAttr->isArgument()) {
     if (mySendAttributeUpdated) {
       if (myObject) {
-        myObject->attributeChanged(theAttr->id());
+        try {
+            myObject->attributeChanged(theAttr->id());
+        } catch(...) {
+          if (owner().get() && owner()->data().get() && owner()->data()->isValid()) {
+            Events_InfoMessage("Model_Data",
+              "%1 has failed during the update").arg(owner()->data()->name()).send();
+          }
+        }
         static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
         ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
       }
@@ -339,7 +346,14 @@ bool Model_Data::blockSendAttributeUpdated(const bool theBlock, const bool theSe
         myWasChangedButBlocked.clear();
         std::list<ModelAPI_Attribute*>::iterator aChangedIter = aWasChangedButBlocked.begin();
         for(; aChangedIter != aWasChangedButBlocked.end(); aChangedIter++) {
-          myObject->attributeChanged((*aChangedIter)->id());
+          try {
+            myObject->attributeChanged((*aChangedIter)->id());
+          } catch(...) {
+            if (owner().get() && owner()->data().get() && owner()->data()->isValid()) {
+              Events_InfoMessage("Model_Data",
+                "%1 has failed during the update").arg(owner()->data()->name()).send();
+            }
+          }
         }
         static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
         ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
