@@ -27,6 +27,8 @@
 #include <ModuleBase_ISelection.h>
 #include <ModelAPI_AttributeValidator.h>
 
+class GeomDataAPI_Point2D;
+
 /*
  * Selector validators
  */
@@ -219,6 +221,34 @@ private:
                            const std::string& theSecondAttribute) const;
 
 };
+
+/**
+* \ingroup Validators
+* A validator which checks that Point2D selected for feature attributes are different (not the same)
+* It iterates by the feature ModelAPI_AttributeRefAttr attributes, finds GeomDataAPI_Point2D attribute in
+* value or attribute of the attributes and if the point of the given attribute is geometrical equal to
+* a point of another attribute, returns false
+*/
+class PartSet_DifferentPointsValidator : public ModelAPI_AttributeValidator
+{
+ public:
+  //! Returns true if the attribute is good for the feature attribute
+  //! \param theAttribute an attribute
+  //! \param theArguments a list of arguments (names of attributes to check)
+  //! \param theError an output error string
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+private:
+  //! Finds Point2D attribute by reference attribute. It might be:
+  //! - COORD_ID attribute of SketchPlugin_Point if object
+  //! - Attribute casted to point if attribute
+  //! \param theAttribute an attribute
+  //! \return point 2d attribute or NULL
+  std::shared_ptr<GeomDataAPI_Point2D> getRefPointAttribute
+                      (const AttributePtr& theAttribute) const;
+};
+
 
 /**\class PartSet_CoincidentAttr
  * \ingroup Validators

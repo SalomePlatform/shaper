@@ -545,6 +545,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
           <validator id="PartSet_DifferentObjects"/>
           <validator id="GeomValidators_ShapeType" parameters="vertex,line"/>
+          <validator id="PartSet_DifferentPoints" parameters="ConstraintEntityB"/>
         </sketch_shape_selector>
         <sketch_shape_selector
           id="ConstraintEntityB"
@@ -555,6 +556,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
           <validator id="SketchPlugin_DistanceAttr" parameters="ConstraintEntityA"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
           <validator id="GeomValidators_ShapeType" parameters="vertex,line"/>
+          <validator id="PartSet_DifferentPoints" parameters="ConstraintEntityA"/>
         </sketch_shape_selector>
         <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
 

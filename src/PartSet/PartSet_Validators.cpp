@@ -33,6 +33,9 @@
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_ViewerPrs.h>
 
+#include <GeomDataAPI_Point2D.h>
+#include <GeomAPI_Pnt2d.h>
+
 #include <Events_InfoMessage.h>
 
 #include <ModelAPI_AttributeRefAttr.h>
@@ -48,6 +51,7 @@
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_Arc.h>
+#include <SketchPlugin_Point.h>
 #include <GeomAPI_Edge.h>
 
 #include <list>
@@ -607,6 +611,56 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
     }
   }
   return true;
+}
+
+bool PartSet_DifferentPointsValidator::isValid(const AttributePtr& theAttribute,
+                                               const std::list<std::string>& theArguments,
+                                               Events_InfoMessage& theError) const
+{
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+
+  // the type of validated attributes should be equal, attributes with
+  // different types are not validated
+  // Check RefAttr attributes
+  std::string anAttrType = theAttribute->attributeType();
+  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs;
+  if (anAttrType != ModelAPI_AttributeRefAttr::typeId())
+    return true;
+
+  // obtain point of the given attribute
+  AttributePoint2DPtr anAttributePoint = getRefPointAttribute(theAttribute);
+  if (!anAttributePoint.get() || !anAttributePoint->isInitialized())
+    return true;
+
+  // obtain point of the parameter attribute
+  AttributePoint2DPtr anArgumentPoint = getRefPointAttribute
+                                              (aFeature->attribute(theArguments.front()));
+
+  if (!anArgumentPoint.get() || !anArgumentPoint->isInitialized())
+    return true;
+
+  return !anAttributePoint->pnt()->isEqual(anArgumentPoint->pnt());
+}
+
+AttributePoint2DPtr PartSet_DifferentPointsValidator::getRefPointAttribute
+                                                     (const AttributePtr& theAttribute) const
+{
+  AttributeRefAttrPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+
+  AttributePoint2DPtr aPointAttribute;
+  if (anAttr->isObject()) {
+    ObjectPtr anObject  = anAttr->object();
+    if (anObject.get()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+      if (aFeature->getKind() == SketchPlugin_Point::ID())
+        aPointAttribute = std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+                                          (aFeature->attribute(SketchPlugin_Point::COORD_ID()));
+    }
+  }
+  else {
+    aPointAttribute = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
+  }
+  return aPointAttribute;
 }
 
 bool PartSet_CoincidentAttr::isValid(const AttributePtr& theAttribute,

@@ -102,7 +102,7 @@ bool ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
 bool ModuleBase_WidgetEditor::focusTo()
 {
   showPopupEditor();
-  return true;
+  return false;
 }
 
 bool ModuleBase_WidgetEditor::showPopupEditor(const bool theSendSignals)
