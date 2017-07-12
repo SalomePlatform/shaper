@@ -138,7 +138,6 @@ bool SketchPlugin_ConstraintLength::getPoints(
 {
   if (!sketch())
     return false;
-  std::shared_ptr<GeomAPI_Pln> aPlane = sketch()->plane();
   std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
   if (!anAttr)

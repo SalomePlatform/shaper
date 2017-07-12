@@ -247,3 +247,17 @@ double GeomAPI_Edge::length() const
   Adaptor3d_Curve* anAdaptor3d = &aBRepAdaptor;
   return GCPnts_AbscissaPoint::Length(*anAdaptor3d);
 }
+
+bool GeomAPI_Edge::isClosed() const
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
+  if (aShape.IsNull())
+    return false;
+  double aFirst, aLast;
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
+  if (aCurve.IsNull() || !aCurve->IsPeriodic())
+    return false;
+  aLast += aLast > aFirst ? -aCurve->Period() : aCurve->Period();;
+
+  return fabs(aFirst - aLast) < 1.e-9;
+}

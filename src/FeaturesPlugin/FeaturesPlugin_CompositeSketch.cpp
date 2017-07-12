@@ -335,6 +335,56 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
                                                 theTag++, aGenName + "Face",
                                                 *aMapOfSubShapes.get());
   }
+  // issue #2197: make naming of edges generated from vertices
+  if (aShapeTypeToExplode == GeomAPI_Shape::EDGE) {
+    GeomAPI_DataMapOfShapeShape aFacesFromFromEdges;
+    GeomAPI_ShapeExplorer anEdgeExp(theBaseShape, GeomAPI_Shape::EDGE);
+    for(; anEdgeExp.more(); anEdgeExp.next()) {
+      ListOfShape aGenerated;
+      theMakeShape->generated(anEdgeExp.current(), aGenerated);
+      ListOfShape::iterator aGenIter = aGenerated.begin();
+      for(; aGenIter != aGenerated.end(); aGenIter++) {
+        aFacesFromFromEdges.bind(*aGenIter, anEdgeExp.current());
+      }
+    }
+
+    // closed revolution of 1-3 faces can not distinguish lateral and base edges
+    if (aFacesFromFromEdges.size() <= 3) {
+      bool isClosed = false; // lateral edges are closed (in full revolution)
+      GeomAPI_DataMapOfShapeShape anEdgesFromVertices;
+      GeomAPI_ShapeExplorer aVertExp(theBaseShape, GeomAPI_Shape::VERTEX);
+      for(int anIndex = 1; aVertExp.more(); aVertExp.next()) {
+        ListOfShape aGenerated;
+        theMakeShape->generated(aVertExp.current(), aGenerated);
+        ListOfShape::iterator aGenIter = aGenerated.begin();
+        for(; aGenIter != aGenerated.end(); aGenIter++) {
+          std::shared_ptr<GeomAPI_Shape> aGenerated = *aGenIter;
+          if (anEdgesFromVertices.isBound(aGenerated)) // already here
+            continue;
+          std::ostringstream aStream;
+          aStream<<"Lateral_Edge_"<<anIndex++;
+          theResultBody->generated(aGenerated, aStream.str(), theTag++);
+
+          anEdgesFromVertices.bind(aGenerated, aVertExp.current());
+          std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aGenerated));
+          isClosed = isClosed || anEdge->isClosed();
+        }
+      }
+      if (isClosed) {
+        GeomAPI_ShapeExplorer anEdgesExp(theMakeShape->shape(), GeomAPI_Shape::EDGE);
+        for(int anIndex = 1; anEdgesExp.more(); anEdgesExp.next()) {
+          if (!anEdgesFromVertices.isBound(anEdgesExp.current())) {
+            // found a base edge
+            std::ostringstream aStream;
+            aStream<<"Base_Edge_"<<anIndex++;
+            theResultBody->generated(anEdgesExp.current(), aStream.str(), theTag++);
+            // only one orientation is needed
+            anEdgesFromVertices.bind(anEdgesExp.current(), anEdgesExp.current());
+          }
+        }
+      }
+    }
+  }
 
   std::shared_ptr<GeomAlgoAPI_MakeSweep> aMakeSweep =
     std::dynamic_pointer_cast<GeomAlgoAPI_MakeSweep>(theMakeShape);
