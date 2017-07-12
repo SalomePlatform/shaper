@@ -87,6 +87,10 @@ public:
   /// Returns edge length.
   GEOMAPI_EXPORT
   double length() const;
+
+  /// Returns true if the edge is closed (like full circle)
+  GEOMAPI_EXPORT
+  bool isClosed() const;
 };
 
 #endif

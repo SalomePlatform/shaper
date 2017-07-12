@@ -92,7 +92,7 @@ void Model_ResultPart::activate()
   }
   if (!aDocRef->value().get()) {  // create (or open) a document if it is not yet created
     Handle(Model_Application) anApp = Model_Application::getApplication();
-    if (anApp->isLoadByDemand(data()->name())) {
+    if (anApp->isLoadByDemand(data()->name(), aDocRef->docId())) {
       anApp->loadDocument(data()->name(), aDocRef->docId()); // if it is just ne part, load may fail
     } else {
       anApp->createDocument(aDocRef->docId());

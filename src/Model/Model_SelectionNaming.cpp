@@ -137,6 +137,8 @@ bool isTrivial (const TopTools_ListOfShape& theAncestors, TopTools_IndexedMapOfS
   BB.MakeCompound(aCmp);
   TopTools_ListIteratorOfListOfShape it(theAncestors);
   for(;it.More();it.Next()) {
+    if (theSMap.Contains(it.Value()))
+      continue;
     BB.Add(aCmp, it.Value());
     theSMap.Add(it.Value());
   }
@@ -440,7 +442,7 @@ const TopoDS_Shape findFaceByName(
 size_t ParseName(const std::string& theSubShapeName,   std::list<std::string>& theList)
 {
   std::string aName = theSubShapeName;
-  std::string aLastName;
+  std::string aLastName = aName;
   size_t n1(0), n2(0); // n1 - start position, n2 - position of the delimiter
   while ((n2 = aName.find('&', n1)) != std::string::npos) {
     const std::string aName1 = aName.substr(n1, n2 - n1); //name of face
@@ -456,8 +458,17 @@ size_t ParseName(const std::string& theSubShapeName,   std::list<std::string>& t
 const TopoDS_Shape findCommonShape(
   const TopAbs_ShapeEnum theType, const TopTools_ListOfShape& theList)
 {
-  if(theList.Extent() < 2) {
+  if(theList.Extent() < 1) {
     return TopoDS_Shape();
+  } else if (theList.Extent() == 1) { // check that sub-shape is bounded by this alone shape
+    TopTools_MapOfShape aSubsInShape;
+    TopExp_Explorer anExp(theList.First(), theType);
+    for(; anExp.More(); anExp.Next()) {
+      if (aSubsInShape.Contains(anExp.Current())) { // found duplicate
+        return anExp.Current();
+      }
+      aSubsInShape.Add(anExp.Current());
+    }
   }
 
   // Store in maps sub-shapes from each face.
@@ -792,11 +803,15 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
     return false;
     }
   }
+  if (!aSelection.IsNull() &&
+      aSelection.ShapeType() != aType && aSelection.ShapeType() != TopAbs_COMPOUND)
+      aSelection.Nullify(); // to avoid selection of face instead of edge that is described by face
   // another try to find edge or vertex by faces
   std::list<std::string> aListofNames;
   size_t aN = aSelection.IsNull() ? ParseName(aSubShapeName, aListofNames) : 0;
-  if (aSelection.IsNull() && (aType == TopAbs_EDGE || aType == TopAbs_VERTEX)) {
-    if(aN > 1) {
+  if ((aSelection.IsNull() && (aType == TopAbs_EDGE || aType == TopAbs_VERTEX)) ||
+      (!aSelection.IsNull() && aSelection.ShapeType() != aType)) { // edge by one face as example
+    if(aN >= 1) {
       TopTools_ListOfShape aList;
       std::list<std::string>::iterator it = aListofNames.begin();
       for(; it != aListofNames.end(); it++){
@@ -809,7 +824,7 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   }
   // in case of construction, there is no registered names for all sub-elements,
   // even for the main element; so, trying to find them by name (without "&" intersections)
-  if (aN == 0) {
+  if (aN < 2) {
     size_t aConstrNamePos = aSubShapeName.find("/");
     bool isFullName = aConstrNamePos == std::string::npos;
     std::string aContrName = aContName;

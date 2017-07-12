@@ -251,9 +251,9 @@ void  Model_BodyBuilder::storeWithoutNaming(const std::shared_ptr<GeomAPI_Shape>
 
 void Model_BodyBuilder::clean()
 {
-  std::vector<TNaming_Builder*>::iterator aBuilder = myBuilders.begin();
+  std::map<int, TNaming_Builder*>::iterator aBuilder = myBuilders.begin();
   for(; aBuilder != myBuilders.end(); aBuilder++)
-    delete *aBuilder;
+    delete aBuilder->second;
   myBuilders.clear();
 }
 
@@ -264,17 +264,13 @@ Model_BodyBuilder::~Model_BodyBuilder()
 
 TNaming_Builder* Model_BodyBuilder::builder(const int theTag)
 {
-  if (myBuilders.size() <= (unsigned int)theTag) {
-    myBuilders.insert(myBuilders.end(), theTag - myBuilders.size() + 1, NULL);
-  }
-  if (!myBuilders[theTag]) {
+  std::map<int, TNaming_Builder*>::iterator aFind = myBuilders.find(theTag);
+  if (aFind == myBuilders.end()) {
     std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
     myBuilders[theTag] = new TNaming_Builder(aData->shapeLab().FindChild(theTag));
-    //TCollection_AsciiString entry;//
-    //TDF_Tool::Entry(aData->shapeLab().FindChild(theTag), entry);
-    //cout << "Label = " <<entry.ToCString() <<endl;
+    aFind = myBuilders.find(theTag);
   }
-  return myBuilders[theTag];
+  return aFind->second;
 }
 
 void Model_BodyBuilder::buildName(const int theTag, const std::string& theName)
