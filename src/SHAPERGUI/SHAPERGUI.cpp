@@ -64,7 +64,7 @@
 #include <QTimer>
 #include <QMenu>
 
-//#define SALOME_PATCH_FOR_CTRL_WHEEL
+#define SALOME_PATCH_FOR_CTRL_WHEEL
 
 extern "C" {
 SHAPERGUI_EXPORT CAM_Module* createModule()
