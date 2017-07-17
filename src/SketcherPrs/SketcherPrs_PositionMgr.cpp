@@ -100,7 +100,11 @@ gp_Vec getVector(ObjectPtr theShape, GeomDirPtr theDir, gp_Pnt theP)
       GeomPointPtr aPnt1 = aCurve->getPoint((aMidParam + aCurve->endParam()) / 2.);
       GeomPointPtr aPnt2 = aCurve->getPoint((aMidParam + aCurve->startParam()) / 2.);
 
-      aVec = gp_Vec(aPnt1->impl<gp_Pnt>(), aPnt2->impl<gp_Pnt>());
+      gp_Pnt aPn2 = aPnt2->impl<gp_Pnt>();
+      if (aPn2.IsEqual(theP, Precision::Confusion()))
+        aVec = gp_Vec(aPn2, aPnt1->impl<gp_Pnt>());
+      else
+        aVec = gp_Vec(aPnt1->impl<gp_Pnt>(), aPn2);
     }
   } else {
     aVec = gp_Vec(theDir->impl<gp_Dir>());
