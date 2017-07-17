@@ -2052,6 +2052,13 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
     if (module()->canEraseObject(aObj))
       aObj->setDisplayed(false);
   }
+  // Block fitAll command according to bug #2214
+  myEventsListener->setFitAllBlocked(true);
+
+  //Do not use eraseAll if you didn't send Redisplay event:
+  //all objects are erased from viewer, but considered as displayed in displayer
+  // Problem in bug 2218
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 #ifdef HAVE_SALOME
     //issue #2159 Hide all incomplete behavior
     viewer()->eraseAll();
@@ -2062,6 +2069,9 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
     aObj->setDisplayed(true);
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+
+  // UnBlock fitAll command (bug #2214)
+  myEventsListener->setFitAllBlocked(false);
 }
 
 

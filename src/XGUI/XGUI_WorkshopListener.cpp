@@ -86,7 +86,8 @@ const std::string DebugFeatureKind = "";//"Extrusion";
 
 XGUI_WorkshopListener::XGUI_WorkshopListener(ModuleBase_IWorkshop* theWorkshop)
   : myWorkshop(theWorkshop),
-    myUpdatePrefs(false)
+    myUpdatePrefs(false),
+    myBlockFitAll(false)
 {
   XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
 }
@@ -352,7 +353,7 @@ void XGUI_WorkshopListener::
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION));
 
     //VSV FitAll updated viewer by itself
-    if (aDoFitAll)
+    if (aDoFitAll && (!myBlockFitAll))
       myWorkshop->viewer()->fitAll();
     else
       aDisplayer->updateViewer();

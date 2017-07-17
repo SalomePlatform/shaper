@@ -59,6 +59,13 @@ public:
   //! Redefinition of Events_Listener method
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
+  //! Returns state of blocking fitAll command
+  bool isFitAllBlocked() const { return myBlockFitAll; }
+
+  //! Sets state of blocking fitAll command
+  //! \param toBlock a new blocking state
+  void setFitAllBlocked(bool toBlock) { myBlockFitAll = toBlock; }
+
 signals:
   /// Emitted when error in applivation happens
   void errorOccurred(std::shared_ptr<Events_InfoMessage> theMsg);
@@ -114,6 +121,7 @@ private:
   ModuleBase_IWorkshop* myWorkshop; // the current workshop
 
   bool myUpdatePrefs;
+  bool myBlockFitAll;
 };
 
 #endif
