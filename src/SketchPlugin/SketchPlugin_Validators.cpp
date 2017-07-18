@@ -577,18 +577,20 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
   std::set<FeaturePtr> aCoinsides;
   SketchPlugin_Tools::findCoincidences(aConstraintCoincidence,
                                         SketchPlugin_ConstraintCoincidence::ENTITY_A(),
-                                        aCoinsides);
+                                        aCoinsides,
+                                        true);
   SketchPlugin_Tools::findCoincidences(aConstraintCoincidence,
                                         SketchPlugin_ConstraintCoincidence::ENTITY_B(),
-                                        aCoinsides);
+                                        aCoinsides,
+                                        true);
 
-  // Remove points from set of coincides.
+  // Remove points and external lines from set of coincides.
   std::set<FeaturePtr> aNewSetOfCoincides;
   for(std::set<FeaturePtr>::iterator anIt = aCoinsides.begin();
       anIt != aCoinsides.end(); ++anIt) {
     std::shared_ptr<SketchPlugin_SketchEntity> aSketchEntity =
       std::dynamic_pointer_cast<SketchPlugin_SketchEntity>(*anIt);
-    if(aSketchEntity.get() && aSketchEntity->isCopy()) {
+    if(aSketchEntity.get() && (aSketchEntity->isCopy() || aSketchEntity->isExternal())) {
       continue;
     }
     if((*anIt)->getKind() != SketchPlugin_Line::ID() &&
