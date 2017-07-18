@@ -344,7 +344,12 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
       theMakeShape->generated(anEdgeExp.current(), aGenerated);
       ListOfShape::iterator aGenIter = aGenerated.begin();
       for(; aGenIter != aGenerated.end(); aGenIter++) {
-        aFacesFromFromEdges.bind(*aGenIter, anEdgeExp.current());
+        GeomShapePtr aGen = *aGenIter;
+        if (aGen.get() && !aGen->isNull()) {
+          if ((*aGenIter)->shapeType() == GeomAPI_Shape::FACE) { // normal case
+            aFacesFromFromEdges.bind(aGen, anEdgeExp.current());
+          }
+        }
       }
     }
 
@@ -380,6 +385,41 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
             theResultBody->generated(anEdgesExp.current(), aStream.str(), theTag++);
             // only one orientation is needed
             anEdgesFromVertices.bind(anEdgesExp.current(), anEdgesExp.current());
+          }
+        }
+      }
+    } else { // issue #2197, test case 4 : edges that produce fully-revolved face,
+      // but contain only 2 edges (on apex of revolution)
+      GeomAPI_ShapeExplorer anEdgeExp(theBaseShape, GeomAPI_Shape::EDGE);
+      for(int anIndex = 1; anEdgeExp.more(); anEdgeExp.next()) {
+        ListOfShape aGenerated;
+        theMakeShape->generated(anEdgeExp.current(), aGenerated);
+        ListOfShape::iterator aGenIter = aGenerated.begin();
+        for(; aGenIter != aGenerated.end(); aGenIter++) {
+          GeomShapePtr aGen = (*aGenIter);
+          if (aGen.get() && !aGen->isNull()) {
+            GeomAPI_ShapeExplorer aFaceEdgeExp(aGen, GeomAPI_Shape::EDGE);
+            int aNumEdges = 0;
+            int aNumClosed = 0;
+            GeomShapePtr aNotClosedEdge;
+            GeomAPI_DataMapOfShapeShape alreadyIterated;
+            for(; aFaceEdgeExp.more(); aFaceEdgeExp.next()) {
+              std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aFaceEdgeExp.current()));
+              if (anEdge->isDegenerated() || alreadyIterated.isBound(anEdge))
+                continue;
+              alreadyIterated.bind(anEdge, anEdge);
+              aNumEdges++;
+              if (anEdge->isClosed()) {
+                aNumClosed++;
+              } else {
+                aNotClosedEdge = anEdge;
+              }
+            }
+            if (aNumEdges == 2 && aNumClosed == 1) {
+              std::ostringstream aStream;
+              aStream<<"Base_Edge_"<<anIndex++;
+              theResultBody->generated(aNotClosedEdge, aStream.str(), theTag++);
+            }
           }
         }
       }

@@ -91,6 +91,10 @@ public:
   /// Returns true if the edge is closed (like full circle)
   GEOMAPI_EXPORT
   bool isClosed() const;
+
+  /// Returns true if the edge is degenerated (has no 3D curve)
+  GEOMAPI_EXPORT
+  bool isDegenerated() const;
 };
 
 #endif
