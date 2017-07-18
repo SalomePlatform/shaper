@@ -126,8 +126,10 @@ void findCoincidences(const FeaturePtr theStartCoin,
       FeaturePtr aConstrFeature = *aCIt;
       std::shared_ptr<GeomAPI_Pnt2d> aPnt = getCoincidencePoint(aConstrFeature);
       if(aPnt.get() && aOrig->isEqual(aPnt)) {
-        findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A(), theList, theIsAttrOnly);
-        findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_B(), theList, theIsAttrOnly);
+        findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A(),
+                         theList, theIsAttrOnly);
+        findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_B(),
+                         theList, theIsAttrOnly);
       }
     }
   }
