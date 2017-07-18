@@ -61,6 +61,9 @@ private:
   /// \param thePrs a presentation of constraint
   int getPositionIndex(ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs);
 
+  gp_Pnt getPointPosition(ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs,
+                          double theStep, GeomPointPtr thePnt);
+
 private:
   typedef std::map<const SketcherPrs_SymbolPrs*, int> PositionsMap;
 

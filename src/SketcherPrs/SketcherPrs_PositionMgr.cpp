@@ -120,7 +120,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
   gp_Pnt aP; // Central point
 
   if (thePnt.get()) {
-    aP = thePnt->impl<gp_Pnt>();
+    return getPointPosition(theShape, thePrs, theStep, thePnt);
   } else {
     if (aShape->isEdge()) {
       std::shared_ptr<GeomAPI_Curve> aCurve =
@@ -143,8 +143,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
   // Compute shifting vector for a one symbol
   gp_Vec aShift = aVec1.Crossed(thePrs->plane()->normal()->impl<gp_Dir>());
   aShift.Normalize();
-  // For point based symbols step = 1.2, for line based = 0.8
-  aShift.Multiply(theStep * (thePnt.get()? 1.2 : 0.8));
+  aShift.Multiply(theStep * 0.8);
 
   // Shift the position coordinate according to position index
   int aPos = getPositionIndex(theShape, thePrs);
@@ -176,6 +175,22 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
   }
   return aP;
 }
+
+gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
+  ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs,
+  double theStep, GeomPointPtr thePnt)
+{
+  gp_Pnt aP = thePnt->impl<gp_Pnt>();
+  gp_Vec aVec1 = getVector(theLine, thePrs->plane()->dirX(), aP);
+
+  // Compute shifting vector for a one symbol
+  gp_Vec aShift = aVec1.Crossed(thePrs->plane()->normal()->impl<gp_Dir>());
+  aShift.Normalize();
+  aShift.Multiply(theStep * 1.5);
+  aP.Translate(aShift);
+  return aP;
+}
+
 
 void SketcherPrs_PositionMgr::deleteConstraint(const SketcherPrs_SymbolPrs* thePrs)
 {

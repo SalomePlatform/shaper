@@ -27,6 +27,9 @@
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Prs3d_Root.hxx>
 
+#include <GeomAPI_Curve.h>
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_Lin.h>
 
 
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Perpendicular, SketcherPrs_SymbolPrs);
@@ -64,13 +67,24 @@ bool SketcherPrs_Perpendicular::updateIfReadyToDisplay(double theStep, bool with
   ObjectPtr aObj2 =
     SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
 
+  GeomShapePtr aShp1 = SketcherPrs_Tools::getShape(aObj1);
+  GeomShapePtr aShp2 = SketcherPrs_Tools::getShape(aObj2);
+
+  GeomEdgePtr aEdge1(new GeomAPI_Edge(aShp1));
+  GeomEdgePtr aEdge2(new GeomAPI_Edge(aShp2));
+
+  std::shared_ptr<GeomAPI_Lin> aLin1 = aEdge1->line();
+  std::shared_ptr<GeomAPI_Lin> aLin2 = aEdge2->line();
+
+  std::shared_ptr<GeomAPI_Pnt> aPnt = aLin1->intersect(aLin2);
+
   // Compute position of symbols
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
-  gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep);
-  gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);
-  myPntArray = new Graphic3d_ArrayOfPoints(2, withColor);
+  gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep, aPnt);
+  //gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);
+  myPntArray = new Graphic3d_ArrayOfPoints(1, withColor);
   myPntArray->AddVertex(aP1);
-  myPntArray->AddVertex(aP2);
+  //myPntArray->AddVertex(aP2);
   return true;
 }
 

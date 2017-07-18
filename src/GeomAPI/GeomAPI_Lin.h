@@ -84,5 +84,8 @@ class GeomAPI_Lin : public GeomAPI_Interface
   bool isCoplanar(const std::shared_ptr<GeomAPI_Lin> theLin) const;
 };
 
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_Lin> GeomLinePtr;
+
 #endif
 

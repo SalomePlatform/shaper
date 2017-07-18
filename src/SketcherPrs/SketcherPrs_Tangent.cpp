@@ -23,6 +23,8 @@
 #include "SketcherPrs_PositionMgr.h"
 
 #include <GeomAPI_Curve.h>
+#include <GeomAPI_Circ.h>
+#include <GeomAPI_Lin.h>
 
 #include <SketchPlugin_Constraint.h>
 
@@ -74,17 +76,24 @@ bool SketcherPrs_Tangent::updateIfReadyToDisplay(double theStep, bool withColor)
   GeomCurvePtr aCurv1 = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShp1));
   GeomCurvePtr aCurv2 = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShp2));
 
-  GeomPointPtr aPnt1_1 = aCurv1->getPoint(aCurv1->startParam());
-  GeomPointPtr aPnt1_2 = aCurv1->getPoint(aCurv1->endParam());
+  GeomCurvePtr aLine;
+  GeomCirclePtr aCircle;
+  if (aCurv1->isLine()) {
+    aLine = aCurv1;
+    aCircle = GeomCirclePtr(new GeomAPI_Circ(aCurv2));
+  } else {
+    aLine = aCurv2;
+    aCircle = GeomCirclePtr(new GeomAPI_Circ(aCurv1));
+  }
 
-  GeomPointPtr aPnt2_1 = aCurv2->getPoint(aCurv2->startParam());
-  GeomPointPtr aPnt2_2 = aCurv2->getPoint(aCurv2->endParam());
-
+  GeomPointPtr aPnt1 = aLine->getPoint(aLine->startParam());
+  GeomPointPtr aPnt2 = aLine->getPoint(aLine->endParam());
+  double aParam;
   GeomPointPtr aPnt;
-  if (aPnt1_1->isEqual(aPnt2_1) || aPnt1_1->isEqual(aPnt2_2))
-    aPnt = aPnt1_1;
-  else if (aPnt1_2->isEqual(aPnt2_1) || aPnt1_2->isEqual(aPnt2_2))
-    aPnt = aPnt1_2;
+  if (aCircle->parameter(aPnt1, 1.e-4, aParam))
+    aPnt = aPnt1;
+  else
+    aPnt = aPnt2;
 
   // Compute points coordinates
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();

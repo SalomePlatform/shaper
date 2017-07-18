@@ -22,6 +22,7 @@
 #define GeomAPI_Circ_H_
 
 #include <GeomAPI_Interface.h>
+#include <GeomAPI_Curve.h>
 #include <memory>
 
 class GeomAPI_Ax2;
@@ -50,6 +51,9 @@ class GeomAPI_Circ : public GeomAPI_Interface
   /// Creation of circle defined by center point, direction and circle radius
   GEOMAPI_EXPORT GeomAPI_Circ(const std::shared_ptr<GeomAPI_Pnt>& theCenter,
                const std::shared_ptr<GeomAPI_Dir>& theDir, double theRadius);
+
+  /// Creation of circle defined by a curve
+  GEOMAPI_EXPORT GeomAPI_Circ(const GeomCurvePtr& theCurve);
 
   /// Return center of the circle
   GEOMAPI_EXPORT const std::shared_ptr<GeomAPI_Pnt> center() const;
