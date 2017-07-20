@@ -27,6 +27,7 @@
 #include <SUIT_ViewManager.h>
 
 #include <QtxActionToolMgr.h>
+#include <SALOME_AISShape.hxx>
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
@@ -374,8 +375,18 @@ void SHAPERGUI_SalomeViewer::fitAll()
 //**********************************************
 void SHAPERGUI_SalomeViewer::eraseAll()
 {
-  SOCC_Viewer* aViewer = dynamic_cast<SOCC_Viewer*>(myView->viewer());
-  aViewer->EraseAll(0);
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  AIS_ListOfInteractive aList;
+  aContext->DisplayedObjects(aList);
+  AIS_ListIteratorOfListOfInteractive aLIt;
+  Handle(AIS_InteractiveObject) anAISIO;
+  for (aLIt.Initialize(aList); aLIt.More(); aLIt.Next()) {
+    anAISIO = aLIt.Value();
+    Handle(Standard_Type) aType = anAISIO->DynamicType();
+    if (anAISIO->IsKind(STANDARD_TYPE(SALOME_AISShape))) {
+      aContext->Erase(anAISIO, false);
+    }
+  }
 }
 
 //**********************************************
