@@ -825,11 +825,16 @@ std::map<ObjectPtr, std::set<GeomShapePtr> > ModuleBase_WidgetMultiSelector::con
 }
 
 bool ModuleBase_WidgetMultiSelector::findInSelection(const ObjectPtr& theObject,
-                              const GeomShapePtr& theShape,
+                              GeomShapePtr theShape,
                               const std::map<ObjectPtr, std::set<GeomShapePtr> >& theGeomSelection)
 {
   bool aFound = false;
   GeomShapePtr anEmptyShape(new GeomAPI_Shape());
+  if (theShape.get()) { // treat shape equal to context as null: 2219, keep order of shapes in list
+    const ResultPtr aContext = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aContext.get() && aContext->shape()->isEqual(theShape))
+      theShape.reset();
+  }
   GeomShapePtr aShape = theShape.get() ? theShape : anEmptyShape;
   if (theGeomSelection.find(theObject) != theGeomSelection.end()) {// found
     const std::set<GeomShapePtr>& aShapes = theGeomSelection.at(theObject);

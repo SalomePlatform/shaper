@@ -186,7 +186,7 @@ protected:
   /// \param theGeomSelection a map built on selection
   /// \return boolean result
   static bool findInSelection(const ObjectPtr& theObject,
-                            const GeomShapePtr& theShape,
+                            GeomShapePtr theShape,
                             const std::map<ObjectPtr, std::set<GeomShapePtr> >& theGeomSelection);
 
 protected:
