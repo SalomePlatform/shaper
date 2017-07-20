@@ -26,6 +26,8 @@
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_Curve.h>
 
+#include <ModelAPI_Tools.h>
+
 #include <Events_InfoMessage.h>
 
 #include <Graphic3d_ArrayOfSegments.hxx>
@@ -413,3 +415,8 @@ void SketcherPrs_SymbolPrs::BoundingBox(Bnd_Box& theBndBox)
                     aTmpBox.CornerMax().x(), aTmpBox.CornerMax().y(), aTmpBox.CornerMax().z());
 }
 
+//*********************************************************************************
+CompositeFeaturePtr SketcherPrs_SymbolPrs::sketcher() const
+{
+  return ModelAPI_Tools::compositeOwner(FeaturePtr(myConstraint));
+}

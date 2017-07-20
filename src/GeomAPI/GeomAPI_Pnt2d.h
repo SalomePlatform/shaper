@@ -76,5 +76,8 @@ class GeomAPI_Pnt2d : public GeomAPI_Interface
   bool isEqual(const std::shared_ptr<GeomAPI_Pnt2d>& theOther) const;
 };
 
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_Pnt2d> GeomPnt2dPtr;
+
 #endif
 

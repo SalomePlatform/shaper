@@ -24,6 +24,7 @@
 #include "SketcherPrs_SensitivePoint.h"
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_CompositeFeature.h>
 
 #include <AIS_InteractiveObject.hxx>
 #include <GeomAPI_Ax3.h>
@@ -75,6 +76,9 @@ public:
 
   /// Returns feature object
   Standard_EXPORT ModelAPI_Feature* feature() const { return myConstraint; }
+
+  /// Returns Sketcher object (owner of the constraint)
+  Standard_EXPORT CompositeFeaturePtr sketcher() const;
 
   /// Return array of points where symbols will be placed
   const Handle(Graphic3d_ArrayOfPoints)& pointsArray() const { return myPntArray; }

@@ -78,19 +78,24 @@ bool SketcherPrs_Tangent::updateIfReadyToDisplay(double theStep, bool withColor)
 
   GeomCurvePtr aLine;
   GeomCirclePtr aCircle;
+  double aFirst, aLast;
   if (aCurv1->isLine()) {
     aLine = aCurv1;
     aCircle = GeomCirclePtr(new GeomAPI_Circ(aCurv2));
+    aFirst = aCurv2->startParam();
+    aLast = aCurv2->endParam();
   } else {
     aLine = aCurv2;
     aCircle = GeomCirclePtr(new GeomAPI_Circ(aCurv1));
+    aFirst = aCurv1->startParam();
+    aLast = aCurv1->endParam();
   }
 
   GeomPointPtr aPnt1 = aLine->getPoint(aLine->startParam());
   GeomPointPtr aPnt2 = aLine->getPoint(aLine->endParam());
   double aParam;
   GeomPointPtr aPnt;
-  if (aCircle->parameter(aPnt1, 1.e-4, aParam))
+  if (aCircle->parameter(aPnt1, 1.e-4, aParam) && (aParam >= aFirst) && (aParam <= aLast))
     aPnt = aPnt1;
   else
     aPnt = aPnt2;

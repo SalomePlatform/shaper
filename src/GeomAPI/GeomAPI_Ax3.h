@@ -94,4 +94,7 @@ public:
 };
 
 
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_Ax3> GeomAx3Ptr;
+
 #endif

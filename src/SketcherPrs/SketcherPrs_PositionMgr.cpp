@@ -25,10 +25,16 @@
 #include <GeomAPI_Curve.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_Dir.h>
+#include <GeomAPI_Ax3.h>
+
+#include <SketchPlugin_Line.h>
+#include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Arc.h>
 
 #include <BRepExtrema_ExtPC.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <Geom_Curve.hxx>
+#include <TColGeom_SequenceOfCurve.hxx>
 
 static SketcherPrs_PositionMgr* MyPosMgr = NULL;
 
@@ -176,10 +182,45 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
   return aP;
 }
 
+
+//*****************************************************************
+//! Returns curves connected to the given point
+TColGeom_SequenceOfCurve getCurves(const GeomPointPtr& thePnt, const SketcherPrs_SymbolPrs* thePrs)
+{
+  TColGeom_SequenceOfCurve aList;
+  //GeomAx3Ptr aAx3 = thePrs->plane();
+  //CompositeFeaturePtr aOwner = thePrs->sketcher();
+  //GeomPnt2dPtr aPnt2d = thePnt->to2D(aAx3->origin(), aAx3->dirX(), aAx3->dirY());
+
+  //int aNbSubs = aOwner->numberOfSubs();
+  //for (int i = 0; i < aNbSubs; i++) {
+  //  FeaturePtr aFeature = aOwner->subFeature(i);
+  //  if (aFeature->getKind() == SketchPlugin_Line::ID()) {
+  //    GeomPnt2dPtr aPnt1 =
+  //      SketcherPrs_Tools::getPoint(aFeature.get(), SketchPlugin_Line::START_ID());
+  //    GeomPnt2dPtr aPnt2 =
+  //      SketcherPrs_Tools::getPoint(aFeature.get(), SketchPlugin_Line::END_ID());
+  //    if (aPnt1->isEqual(aPnt2d) || aPnt2->isEqual(aPnt2d)) {
+  //      GeomShapePtr aShp = SketcherPrs_Tools::getShape(aFeature->firstResult());
+  //      GeomCurvePtr aCurv = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShp));
+  //      aList.Append(aCurv->impl<Handle(Geom_Curve)>());
+  //    }
+  //  } else if ((aFeature->getKind() == SketchPlugin_Circle::ID()) ||
+  //            (aFeature->getKind() == SketchPlugin_Arc::ID())) {
+  //    GeomShapePtr aShp = SketcherPrs_Tools::getShape(aFeature->firstResult());
+  //    GeomCurvePtr aCurv = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShp));
+  //  }
+  //}
+  return aList;
+}
+
+//*****************************************************************
 gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
   ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs,
   double theStep, GeomPointPtr thePnt)
 {
+  TColGeom_SequenceOfCurve aCurves = getCurves(thePnt, thePrs);
+
   gp_Pnt aP = thePnt->impl<gp_Pnt>();
   gp_Vec aVec1 = getVector(theLine, thePrs->plane()->dirX(), aP);
 
@@ -191,7 +232,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
   return aP;
 }
 
-
+//*****************************************************************
 void SketcherPrs_PositionMgr::deleteConstraint(const SketcherPrs_SymbolPrs* thePrs)
 {
   std::map<ObjectPtr, PositionsMap>::iterator aIt;
