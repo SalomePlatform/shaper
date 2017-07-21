@@ -37,8 +37,9 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Perpendicular, SketcherPrs_SymbolPrs);
 static Handle(Image_AlienPixMap) MyPixMap;
 
 SketcherPrs_Perpendicular::SketcherPrs_Perpendicular(ModelAPI_Feature* theConstraint,
+                                                     ModelAPI_CompositeFeature* theSketcher,
                                                      const std::shared_ptr<GeomAPI_Ax3>& thePlane)
- : SketcherPrs_SymbolPrs(theConstraint, thePlane)
+ : SketcherPrs_SymbolPrs(theConstraint, theSketcher, thePlane)
 {
 }
 

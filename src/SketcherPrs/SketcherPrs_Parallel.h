@@ -36,8 +36,10 @@ class SketcherPrs_Parallel: public SketcherPrs_SymbolPrs
 public:
   /// Constructor
   /// \param theConstraint a constraint feature
+  /// \param theSketcher a sketcher object
   /// \param thePlane a coordinate plane of current sketch
   Standard_EXPORT SketcherPrs_Parallel(ModelAPI_Feature* theConstraint,
+                                       ModelAPI_CompositeFeature* theSketcher,
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane);
   DEFINE_STANDARD_RTTIEXT(SketcherPrs_Parallel, SketcherPrs_SymbolPrs)
 

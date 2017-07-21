@@ -49,7 +49,8 @@ AISObjectPtr SketchPlugin_ConstraintVertical::getAISObject(AISObjectPtr thePrevi
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS = SketcherPrs_Factory::verticalConstraint(this, sketch()->coordinatePlane(),
+  AISObjectPtr anAIS = SketcherPrs_Factory::verticalConstraint(this, sketch(),
+                                                               sketch()->coordinatePlane(),
                                                                thePrevious);
   return anAIS;
 }

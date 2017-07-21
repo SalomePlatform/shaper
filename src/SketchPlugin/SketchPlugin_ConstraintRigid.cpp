@@ -47,5 +47,6 @@ AISObjectPtr SketchPlugin_ConstraintRigid::getAISObject(AISObjectPtr thePrevious
 {
   if (!sketch())
     return thePrevious;
-  return SketcherPrs_Factory::rigidConstraint(this, sketch()->coordinatePlane(), thePrevious);
+  return SketcherPrs_Factory::rigidConstraint(this, sketch(),
+                                              sketch()->coordinatePlane(), thePrevious);
 }

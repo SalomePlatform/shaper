@@ -209,7 +209,8 @@ AISObjectPtr SketchPlugin_ConstraintMirror::getAISObject(AISObjectPtr thePreviou
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS = SketcherPrs_Factory::mirrorConstraint(this, sketch()->coordinatePlane(),
+  AISObjectPtr anAIS = SketcherPrs_Factory::mirrorConstraint(this, sketch(),
+                                                             sketch()->coordinatePlane(),
                                                              thePrevious);
   return anAIS;
 }

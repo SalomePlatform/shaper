@@ -56,6 +56,7 @@ public:
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
   Standard_EXPORT SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint,
+                        ModelAPI_CompositeFeature* theSketcher,
                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
   virtual ~SketcherPrs_SymbolPrs();
@@ -78,7 +79,7 @@ public:
   Standard_EXPORT ModelAPI_Feature* feature() const { return myConstraint; }
 
   /// Returns Sketcher object (owner of the constraint)
-  Standard_EXPORT CompositeFeaturePtr sketcher() const;
+  Standard_EXPORT ModelAPI_CompositeFeature* sketcher() const { return mySketcher; }
 
   /// Return array of points where symbols will be placed
   const Handle(Graphic3d_ArrayOfPoints)& pointsArray() const { return myPntArray; }
@@ -146,6 +147,9 @@ protected:
 protected:
   /// Constraint feature
   ModelAPI_Feature* myConstraint;
+
+  /// Sketcher feature
+  ModelAPI_CompositeFeature* mySketcher;
 
   /// Plane of the current sketcher
   std::shared_ptr<GeomAPI_Ax3> myPlane;

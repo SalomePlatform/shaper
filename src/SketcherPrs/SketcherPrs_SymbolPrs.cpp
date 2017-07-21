@@ -119,8 +119,11 @@ std::map<const char*, Handle(Image_AlienPixMap)> SketcherPrs_SymbolPrs::myIconsM
 
 
 SketcherPrs_SymbolPrs::SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint,
+                                             ModelAPI_CompositeFeature* theSketcher,
                                              const std::shared_ptr<GeomAPI_Ax3>& thePlane)
- : AIS_InteractiveObject(), myConstraint(theConstraint), myPlane(thePlane), myIsCustomColor(false)
+ : AIS_InteractiveObject(), myConstraint(theConstraint),
+   myPlane(thePlane), myIsCustomColor(false),
+   mySketcher(theSketcher)
 {
   SetAutoHilight(Standard_False);
 }
@@ -413,10 +416,4 @@ void SketcherPrs_SymbolPrs::BoundingBox(Bnd_Box& theBndBox)
 
   theBndBox.Update (aTmpBox.CornerMin().x(), aTmpBox.CornerMin().y(), aTmpBox.CornerMin().z(),
                     aTmpBox.CornerMax().x(), aTmpBox.CornerMax().y(), aTmpBox.CornerMax().z());
-}
-
-//*********************************************************************************
-CompositeFeaturePtr SketcherPrs_SymbolPrs::sketcher() const
-{
-  return ModelAPI_Tools::compositeOwner(FeaturePtr(myConstraint));
 }

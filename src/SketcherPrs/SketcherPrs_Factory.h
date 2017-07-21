@@ -24,12 +24,14 @@
 #include "SketcherPrs.h"
 
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_CompositeFeature.h>
 
 #include <GeomAPI_Ax3.h>
 #include <GeomAPI_AISObject.h>
 
 #define GET_CONSTRAINT_PRS(NAME) \
   static AISObjectPtr NAME(ModelAPI_Feature* theConstraint, \
+                           ModelAPI_CompositeFeature* theSketcher, \
                            const std::shared_ptr<GeomAPI_Ax3>& thePlane, \
                            AISObjectPtr thePrevious);
 
@@ -39,12 +41,6 @@
 class SKETCHERPRS_EXPORT SketcherPrs_Factory
 {
 public:
-  /// Creates coincedent constraint presentation
-  /// \param theConstraint the constraint
-  /// \param thePlane the current sketch plane
-  /// \param thePrevious the previous presentation
-  GET_CONSTRAINT_PRS(coincidentConstraint)
-
   /// Creates collinear constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
@@ -93,18 +89,6 @@ public:
   /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(tangentConstraint)
 
-  /// Creates radius dimension presentation
-  /// \param theConstraint the constraint
-  /// \param thePlane the current sketch plane
-  /// \param thePrevious the previous presentation
-  GET_CONSTRAINT_PRS(radiusConstraint)
-
-  /// Creates length dimension presentation
-  /// \param theConstraint the constraint
-  /// \param thePlane the current sketch plane
-  /// \param thePrevious the previous presentation
-  GET_CONSTRAINT_PRS(lengthDimensionConstraint)
-
   /// Creates middle constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
@@ -129,11 +113,34 @@ public:
   /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(rotateConstraint)
 
+#define GET_CONSTRAINT2_PRS(NAME) \
+  static AISObjectPtr NAME(ModelAPI_Feature* theConstraint, \
+                           const std::shared_ptr<GeomAPI_Ax3>& thePlane, \
+                           AISObjectPtr thePrevious);
+
+  /// Creates coincedent constraint presentation
+  /// \param theConstraint the constraint
+  /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
+  GET_CONSTRAINT2_PRS(coincidentConstraint)
+
   /// Creates angle constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   /// \param thePrevious the previous presentation
-  GET_CONSTRAINT_PRS(angleConstraint)
+  GET_CONSTRAINT2_PRS(angleConstraint)
+
+  /// Creates length dimension presentation
+  /// \param theConstraint the constraint
+  /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
+  GET_CONSTRAINT2_PRS(lengthDimensionConstraint)
+
+  /// Creates radius dimension presentation
+  /// \param theConstraint the constraint
+  /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
+  GET_CONSTRAINT2_PRS(radiusConstraint)
 };
 
 #endif
