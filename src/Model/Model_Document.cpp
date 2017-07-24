@@ -1308,7 +1308,7 @@ TDF_Label Model_Document::findNamingName(std::string theName)
       // If not found child label with the exact sub-name, then try to find compound with
       // such sub-name without suffix.
       Standard_Integer aSuffixPos = aSubName.SearchFromEnd('_');
-      if (aSuffixPos != -1) {
+      if (aSuffixPos != -1 && aSuffixPos != aSubName.Length()) {
         TCollection_ExtendedString anIndexStr = aSubName.Split(aSuffixPos);
         aSubName.Remove(aSuffixPos);
         aNamesIter.Initialize(aFind->second, TDataStd_Name::GetID(), Standard_True);
