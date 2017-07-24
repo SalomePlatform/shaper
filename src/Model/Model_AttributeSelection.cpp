@@ -665,7 +665,7 @@ void Model_AttributeSelection::selectSubShape(
         Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aConShape, selectionLabel());
         if (!aNS.IsNull()) {
           aNS = TNaming_Tool::CurrentNamedShape(aNS);
-          if (!aNS.IsNull()) {
+          if (!aNS.IsNull() && scope().Contains(aNS->Label())) { // scope check is for 2228
             TDF_Label aLab = aNS->Label();
             while(aLab.Depth() != 7 && aLab.Depth() > 5)
               aLab = aLab.Father();
