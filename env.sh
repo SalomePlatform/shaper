@@ -11,11 +11,8 @@ export AUT_DIR=$(pwd)
 export TOOLS_DIR=$(pwd)
 
 export HOME_OLD=$HOME
-# to use patched OCCT 7.1.0 for SHAPER
-#export CUSTOM_CAS_ROOT=1
-#export ENV_FOR_LAUNCH=1
 
-source /dn64/series8x/work/init.sh 2017-03-22
+source /dn46/SALOME/series8x/current-2017-07-11/start.sh
 export HOME=$HOME_OLD
 
 # Path to solvespace-2
