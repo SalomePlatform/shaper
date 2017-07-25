@@ -190,10 +190,10 @@ void FeaturesPlugin_Partition::storeResult(
     GeomShapePtr aShape = *anIt;
     std::string aModEdgeName = aModName + "_Edge_" + std::to_string((long long)anIndex);
     aResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), aShape, GeomAPI_Shape::EDGE,
-      aModTag, aModEdgeName, *aMapOfSubShapes.get(), false, true);
+      aModTag, aModEdgeName, *aMapOfSubShapes.get(), false, true, true);
     std::string aModFaceName = aModName + "_Face_" + std::to_string((long long)anIndex++);
     aResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), aShape, GeomAPI_Shape::FACE,
-      aModTag + 1, aModFaceName, *aMapOfSubShapes.get(), false, true);
+      aModTag + 1, aModFaceName, *aMapOfSubShapes.get(), false, true, true);
     aResultBody->loadDeletedShapes(theMakeShape.get(), aShape, GeomAPI_Shape::FACE, aDelTag);
   }
 

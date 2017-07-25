@@ -132,7 +132,8 @@ void ModelAPI_ResultBody::loadAndOrientModifiedShapes (GeomAlgoAPI_MakeShape* th
     std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
     const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes,
     const bool theIsStoreSeparate,
-    const bool theIsStoreAsGenerated)
+    const bool theIsStoreAsGenerated,
+    const bool /*theSplitInSubs*/)
 {
   myBuilder->loadAndOrientModifiedShapes(
     theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes, theIsStoreSeparate,
