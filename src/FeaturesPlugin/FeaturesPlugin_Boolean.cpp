@@ -630,7 +630,7 @@ void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
 {
   //load result
   if(theBaseShape->isEqual(theResultShape)) {
-    theResultBody->store(theResultShape);
+    theResultBody->store(theResultShape, false);
   } else {
     const int aModifyTag = 1;
     const int aDeletedTag = 2;

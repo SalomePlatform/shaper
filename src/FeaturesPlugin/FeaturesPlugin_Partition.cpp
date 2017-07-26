@@ -170,7 +170,7 @@ void FeaturesPlugin_Partition::storeResult(
 
   // Store modified shape.
   if(!aBaseShape.get() || aBaseShape->isEqual(theResultShape)) {
-    aResultBody->store(theResultShape);
+    aResultBody->store(theResultShape, false);
     setResult(aResultBody, theIndex);
     return;
   }
