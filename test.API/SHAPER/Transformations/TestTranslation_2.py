@@ -182,98 +182,61 @@ model.do()
 model.end()
 
 
-# Checks
-from GeomAPI import GeomAPI_Shape
-from GeomAPI import GeomAPI_ShapeExplorer
-
-def testHaveNamingEdges(theFeature, theModel, thePartDoc) :
-  """ Tests if all faces of result have a name
-  :param theFeature: feature to test.
-  """
-  # Get feature result/sub-result
-  aResult = theFeature.results()[0].resultSubShapePair()[0]
-  # Get result/sub-result shape
-  shape = aResult.shape()
-  # Create shape explorer with desired shape type
-  shapeExplorer = GeomAPI_ShapeExplorer(shape, GeomAPI_Shape.EDGE)
-  # Create list, and store selections in it
-  selectionList = []
-  while shapeExplorer.more():
-    selection = theModel.selection(aResult, shapeExplorer.current()) # First argument should be result/sub-result, second is sub-shape on this result/sub-result
-    selectionList.append(selection)
-    shapeExplorer.next()
-  # Create group with this selection list
-  Group_1 = theModel.addGroup(thePartDoc, selectionList)
-  theModel.do()
-  theModel.end()
-
-  # Now you can check that all selected shapes in group have right shape type and name.
-  groupFeature = Group_1.feature()
-  groupSelectionList = groupFeature.selectionList("group_list")
-  theModel.end()
-  assert(groupSelectionList.size() == len(selectionList))
-  for index in range(0, groupSelectionList.size()):
-    attrSelection = groupSelectionList.value(index)
-    shape = attrSelection.value()
-    name = attrSelection.namingName()
-    assert(shape.isEdge())
-    assert(name != ""), "String empty"
-
 # Translation 27
 model.testNbResults(Translation_27, 1)
 model.testNbSubResults(Translation_27, [12])
 model.testNbSubShapes(Translation_27, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Translation_27, GeomAPI_Shape.EDGE, [12])
-testHaveNamingEdges(Translation_27, model, Part_1_doc)
+model.testHaveNamingEdges(Translation_27, model, Part_1_doc)
 
 # Translation 28
 model.testNbResults(Translation_28, 1)
 model.testNbSubResults(Translation_28, [12])
 model.testNbSubShapes(Translation_28, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Translation_28, GeomAPI_Shape.EDGE, [12])
-testHaveNamingEdges(Translation_28, model, Part_1_doc)
+model.testHaveNamingEdges(Translation_28, model, Part_1_doc)
 
 # Translation 29
 model.testNbResults(Translation_29, 1)
 model.testNbSubResults(Translation_29, [12])
 model.testNbSubShapes(Translation_29, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Translation_29, GeomAPI_Shape.EDGE, [12])
-testHaveNamingEdges(Translation_29, model, Part_1_doc)
+model.testHaveNamingEdges(Translation_29, model, Part_1_doc)
 
 # Translation 31
 model.testNbResults(Translation_31, 1)
 model.testNbSubResults(Translation_31, [12])
 model.testNbSubShapes(Translation_31, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Translation_31, GeomAPI_Shape.EDGE, [12])
-testHaveNamingEdges(Translation_31, model, Part_1_doc)
+model.testHaveNamingEdges(Translation_31, model, Part_1_doc)
 
 # Translation 32
 model.testNbResults(Translation_32, 1)
 model.testNbSubResults(Translation_32, [12])
 model.testNbSubShapes(Translation_32, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Translation_32, GeomAPI_Shape.EDGE, [12])
-testHaveNamingEdges(Translation_32, model, Part_1_doc)
+model.testHaveNamingEdges(Translation_32, model, Part_1_doc)
 
 # Translation 33
 model.testNbResults(Translation_33, 1)
 model.testNbSubResults(Translation_33, [12])
 model.testNbSubShapes(Translation_33, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Translation_33, GeomAPI_Shape.EDGE, [12])
-testHaveNamingEdges(Translation_33, model, Part_1_doc)
+model.testHaveNamingEdges(Translation_33, model, Part_1_doc)
 
 # Translation 34
 model.testNbResults(Translation_34, 1)
 model.testNbSubResults(Translation_34, [12])
 model.testNbSubShapes(Translation_34, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Translation_34, GeomAPI_Shape.EDGE, [12])
-testHaveNamingEdges(Translation_34, model, Part_1_doc)
+model.testHaveNamingEdges(Translation_34, model, Part_1_doc)
 
 # Translation 35
 model.testNbResults(Translation_35, 1)
 model.testNbSubResults(Translation_35, [12])
 model.testNbSubShapes(Translation_35, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Translation_35, GeomAPI_Shape.EDGE, [12])
-testHaveNamingEdges(Translation_35, model, Part_1_doc)
+model.testHaveNamingEdges(Translation_35, model, Part_1_doc)
 
 # Translation 36
 model.testNbResults(Translation_36, 1)

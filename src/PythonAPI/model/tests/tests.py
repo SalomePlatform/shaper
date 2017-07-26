@@ -136,6 +136,8 @@ def testHaveNamingFaces(theFeature, theModel, thePartDoc) :
   """ Tests if all faces of result have a name
   :param theFeature: feature to test.
   """
+  # open transaction since all the checking are performed in tests after model.end() call
+  theModel.begin()
   # Get feature result/sub-result
   aResult = theFeature.results()[0].resultSubShapePair()[0]
   # Get result/sub-result shape
@@ -150,13 +152,11 @@ def testHaveNamingFaces(theFeature, theModel, thePartDoc) :
     shapeExplorer.next()
   # Create group with this selection list
   Group_1 = theModel.addGroup(thePartDoc, selectionList)
-  theModel.do()
   theModel.end()
 
   # Now you can check that all selected shapes in group have right shape type and name.
   groupFeature = Group_1.feature()
   groupSelectionList = groupFeature.selectionList("group_list")
-  theModel.end()
   assert(groupSelectionList.size() == len(selectionList))
   for index in range(0, groupSelectionList.size()):
     attrSelection = groupSelectionList.value(index)
