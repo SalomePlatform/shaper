@@ -387,6 +387,20 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
             anEdgesFromVertices.bind(anEdgesExp.current(), anEdgesExp.current());
           }
         }
+      } else if (aFacesFromFromEdges.size() == 1) { // 2233: sphere created by the revolution:
+        // vertices at degenerated edges will have the same name
+        GeomAPI_DataMapOfShapeShape aVertices;
+        GeomAPI_ShapeExplorer aVertExp(theMakeShape->shape(), GeomAPI_Shape::VERTEX);
+        for(int anIndex = 1; aVertExp.more(); aVertExp.next()) {
+          if (!aVertices.isBound(aVertExp.current())) {
+            // found a base edge
+            std::ostringstream aStream;
+            aStream<<"Vertex_"<<anIndex++;
+            theResultBody->generated(aVertExp.current(), aStream.str(), theTag++);
+            // only one orientation is needed
+            aVertices.bind(aVertExp.current(), aVertExp.current());
+          }
+        }
       }
     } else { // issue #2197, test case 4 : edges that produce fully-revolved face,
       // but contain only 2 edges (on apex of revolution)
