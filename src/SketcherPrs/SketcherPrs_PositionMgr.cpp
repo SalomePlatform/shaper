@@ -140,7 +140,8 @@ bool containsPoint(const FeaturePtr& theFeature, GeomPnt2dPtr thePnt2d, GeomPoin
   return false;
 }
 
-int SketcherPrs_PositionMgr::getPositionIndex(GeomPointPtr thePos, const SketcherPrs_SymbolPrs* thePrs)
+int SketcherPrs_PositionMgr::getPositionIndex(GeomPointPtr thePos,
+                                              const SketcherPrs_SymbolPrs* thePrs)
 {
   if (myPntShapes.count(thePrs->feature()) == 0) {
     // Renumerate positions around the specified constraint point for all constraints
