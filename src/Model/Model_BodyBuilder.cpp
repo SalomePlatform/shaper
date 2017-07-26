@@ -373,6 +373,8 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
   for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
+    if (TNaming_Tool::NamedShape(aRoot, builder(theTag)->NamedShape()->Label()).IsNull())
+      continue; // there is no sence to write history is old shape does not persented in document
     ListOfShape aList;
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
@@ -427,6 +429,8 @@ void Model_BodyBuilder::loadAndOrientGeneratedShapes (
   for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
+    if (TNaming_Tool::NamedShape(aRoot, builder(theTag)->NamedShape()->Label()).IsNull())
+      continue; // there is no sence to write history is old shape does not persented in document
     ListOfShape aList;
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
