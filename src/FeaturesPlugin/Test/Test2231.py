@@ -76,3 +76,5 @@ Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1"), model.selection("COMPSOLID", "Extrusion_1_2")])
 model.do()
 model.end()
+
+assert(model.checkPythonDump())
