@@ -389,7 +389,7 @@ void FeaturesPlugin_CompositeBoolean::storeModificationHistory(ResultBodyPtr the
     }
     theResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), *anIt,
       (*anIt)->shapeType() == GeomAPI_Shape::EDGE ?
-      GeomAPI_Shape::EDGE : GeomAPI_Shape::FACE, aTag, aName, *aMap.get());
+      GeomAPI_Shape::EDGE : GeomAPI_Shape::FACE, aTag, aName, *aMap.get(), false, false, true);
     theResultBody->loadDeletedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::FACE, aDelTag);
   }
 }
