@@ -140,7 +140,7 @@ bool containsPoint(const FeaturePtr& theFeature, GeomPnt2dPtr thePnt2d, GeomPoin
   return false;
 }
 
-int SketcherPrs_PositionMgr::getPositionIndex(GeomPointPtr thePos,
+const std::array<int, 2>& SketcherPrs_PositionMgr::getPositionIndex(GeomPointPtr thePos,
                                               const SketcherPrs_SymbolPrs* thePrs)
 {
   if (myPntShapes.count(thePrs->feature()) == 0) {
@@ -151,12 +151,14 @@ int SketcherPrs_PositionMgr::getPositionIndex(GeomPointPtr thePos,
 
     int aNbSubs = aOwner->numberOfSubs();
     int aId = 0;
+    std::list<const ModelAPI_Feature*> aFeaList;
     for (int i = 0; i < aNbSubs; i++) {
       FeaturePtr aFeature = aOwner->subFeature(i);
 
       if (myPntShapes.count(aFeature.get()) == 1) {
-        myPntShapes[aFeature.get()] = aId;
+        myPntShapes[aFeature.get()][0] = aId;
         aId++;
+        aFeaList.push_back(aFeature.get());
       } else {
         if (isPntConstraint(aFeature->getKind())) {
           DataPtr aData = aFeature->data();
@@ -173,17 +175,23 @@ int SketcherPrs_PositionMgr::getPositionIndex(GeomPointPtr thePos,
             }
           }
           if (aContains) {
-            myPntShapes[aFeature.get()] = aId;
+            myPntShapes[aFeature.get()][0] = aId;
             aId++;
+            aFeaList.push_back(aFeature.get());
           }
         }
       }
+    }
+    int aSize = (int) aFeaList.size();
+    std::list<const ModelAPI_Feature*>::const_iterator aIt;
+    for (aIt = aFeaList.cbegin(); aIt != aFeaList.cend(); aIt++) {
+      myPntShapes[*aIt][1] = aSize;
     }
   }
   return myPntShapes[thePrs->feature()];
 }
 
-
+//*****************************************************************
 gp_Vec getVector(ObjectPtr theShape, GeomDirPtr theDir, gp_Pnt theP)
 {
   gp_Vec aVec;
@@ -225,6 +233,7 @@ gp_Vec getVector(ObjectPtr theShape, GeomDirPtr theDir, gp_Pnt theP)
   return aVec;
 }
 
+//*****************************************************************
 gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theShape,
                                             const SketcherPrs_SymbolPrs* thePrs,
                                             double theStep, GeomPointPtr thePnt)
@@ -363,8 +372,15 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
     aVectorsList.push_back(getVector((*aItCurv), thePrs->plane()->dirX(), aP));
   }
 
+  // Position of the symbol
+  const std::array<int, 2>& aPos = getPositionIndex(thePnt, thePrs);
+
+  // Angle size of a symbol
+  double aAngleStep = PI * 50./180.;
+
   std::list<gp_Vec>::const_iterator aItVec;
-  std::map<double, gp_Vec> aAngVectors;
+  std::list<double> aAngles;
+  std::list<gp_Vec> aVectors;
   // Select closest vectors and calculate angles between base vector and closest vector
   for (aItVec = aVectorsList.cbegin(); aItVec != aVectorsList.cend(); aItVec++) {
     std::list<gp_Vec>::const_iterator aIt;
@@ -383,41 +399,48 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
         }
       }
     }
-    aAngVectors[aMinAng] = aVec;
+    aVectors.push_back(aVec);
+    aAngles.push_back(aMinAng);
   }
 
-  // Angle size of a symbol for a first level
-  static const double aAngleStep = PI * 50./180.;
-
-  // Position of the symbol
-  int aPos = getPositionIndex(thePnt, thePrs);
-
-  //std::list<double>::const_iterator aItAng;
-  gp_Ax1 aRotAx(aP, aNormDir);
-  int aPosId = 0; // Last used position
+  int aPosCount = 0;
   double aAng;
-  gp_Vec aPrevVec;
-  std::map<double, gp_Vec>::const_iterator aItAng;
-  for (aItAng = aAngVectors.cbegin(); aItAng != aAngVectors.cend(); ++aItAng) {
-    aAng = aItAng->first;
-    aPrevVec = aItAng->second;
-    if (aAng >= aAngleStep) {
-      gp_Vec aShift;
+  std::list<double>::const_iterator aItAng;
+
+  double aAngPos;
+  gp_Vec aVecPos;
+  bool aHasPlace = false;
+  int aIntId = 0; // a position inside a one sector
+  while (aPosCount < aPos[1]) {
+    for (aItAng = aAngles.cbegin(), aItVec = aVectors.cbegin();
+         aItAng != aAngles.cend(); ++aItAng, ++aItVec) {
+      aAng = (*aItAng);
       int Nb = int(aAng / aAngleStep);
-      if ((aPos >= aPosId) && (aPos < (aPosId + Nb))) {
-        // rotate base vector on a necessary angle
-        aShift = aPrevVec.Rotated(aRotAx, aAngleStep + aAngleStep * (aPos - aPosId));
-        aShift.Normalize();
-        aShift.Multiply(theStep * 1.5);
-        return aP.Translated(aShift);
+      aPosCount += Nb;
+
+      if ((!aHasPlace) && (aPosCount >= (aPos[0] + 1))) {
+        aHasPlace = true;
+        aAngPos = (*aItAng);
+        aVecPos = (*aItVec);
+        aIntId = aPos[0] - (aPosCount - Nb);
       }
-      aPosId += Nb;
+    }
+    if (aPosCount < aPos[1]) {
+      aAngleStep -= 0.1;
+      aHasPlace = false;
+      aPosCount = 0;
     }
   }
-  gp_Vec aShift = aPrevVec.Rotated(aRotAx, aAngleStep);
-  aShift.Normalize();
-  aShift.Multiply(theStep * 1.5);
-  return aP.Translated(aShift);
+
+  gp_Ax1 aRotAx(aP, aNormDir);
+  if (aHasPlace) {
+    // rotate base vector on a necessary angle
+    gp_Vec aShift = aVecPos.Rotated(aRotAx, aAngleStep + aAngleStep * aIntId);
+    aShift.Normalize();
+    aShift.Multiply(theStep * 1.5);
+    return aP.Translated(aShift);
+  }
+  return aP;
 }
 
 //*****************************************************************

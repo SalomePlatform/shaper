@@ -98,14 +98,23 @@ bool SketcherPrs_Tangent::updateIfReadyToDisplay(double theStep, bool withColor)
   GeomPointPtr aPnt;
   if (aCircle->parameter(aPnt1, 1.e-4, aParam) && (aParam >= aFirst) && (aParam <= aLast))
     aPnt = aPnt1;
-  else
+  else if (aCircle->parameter(aPnt2, 1.e-4, aParam) && (aParam >= aFirst) && (aParam <= aLast))
     aPnt = aPnt2;
 
   // Compute points coordinates
-  SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
-  gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep, aPnt);
-  myPntArray = new Graphic3d_ArrayOfPoints(1, withColor);
-  myPntArray->AddVertex(aP1);
+  if (aPnt.get()) {
+    SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
+    gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep, aPnt);
+    myPntArray = new Graphic3d_ArrayOfPoints(1, withColor);
+    myPntArray->AddVertex(aP1);
+  } else {
+    SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
+    gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep);
+    gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);
+    myPntArray = new Graphic3d_ArrayOfPoints(2, withColor);
+    myPntArray->AddVertex(aP1);
+    myPntArray->AddVertex(aP2);
+  }
   return true;
 }
 

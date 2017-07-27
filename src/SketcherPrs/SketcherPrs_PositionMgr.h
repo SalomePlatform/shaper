@@ -29,6 +29,7 @@
 #include <ModelAPI_Object.h>
 
 #include <map>
+#include <array>
 
 /**
 * \ingroup GUI
@@ -64,7 +65,8 @@ private:
   /// Returns position index of the given constraint around a point
   /// \param theLine constrained object
   /// \param thePrs a presentation of constraint
-  int getPositionIndex(GeomPointPtr thePos, const SketcherPrs_SymbolPrs* thePrs);
+  const std::array<int, 2>& getPositionIndex(GeomPointPtr thePos,
+                                      const SketcherPrs_SymbolPrs* thePrs);
 
   /// Returns position of a constraint around a point
   /// \param theLine a base object of the constraint
@@ -78,7 +80,7 @@ private:
 
 private:
   typedef std::map<const SketcherPrs_SymbolPrs*, int> PositionsMap;
-  typedef std::map<const ModelAPI_Feature*, int> FeaturesMap;
+  typedef std::map<const ModelAPI_Feature*, std::array<int, 2>> FeaturesMap;
 
   /// The map which contains position of presentation
   PositionsMap myIndexes;
