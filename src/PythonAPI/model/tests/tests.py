@@ -165,6 +165,40 @@ def testHaveNamingFaces(theFeature, theModel, thePartDoc) :
     assert(shape.isFace())
     assert(name != ""), "String empty"
 
+def testHaveNamingEdges(theFeature, theModel, thePartDoc) :
+  """ Tests if all faces of result have a name
+  :param theFeature: feature to test.
+  """
+  # Get feature result/sub-result
+  aResult = theFeature.results()[0].resultSubShapePair()[0]
+  # Get result/sub-result shape
+  shape = aResult.shape()
+  # Create shape explorer with desired shape type
+  shapeExplorer = GeomAPI_ShapeExplorer(shape, GeomAPI_Shape.EDGE)
+  # Create list, and store selections in it
+  selectionList = []
+  while shapeExplorer.more():
+    selection = theModel.selection(aResult, shapeExplorer.current()) # First argument should be result/sub-result, second is sub-shape on this result/sub-result
+    selectionList.append(selection)
+    shapeExplorer.next()
+  # Create group with this selection list
+  Group_1 = theModel.addGroup(thePartDoc, selectionList)
+  theModel.do()
+  theModel.end()
+
+  # Now you can check that all selected shapes in group have right shape type and name.
+  groupFeature = Group_1.feature()
+  groupSelectionList = groupFeature.selectionList("group_list")
+  theModel.end()
+  assert(groupSelectionList.size() == len(selectionList))
+  for index in range(0, groupSelectionList.size()):
+    attrSelection = groupSelectionList.value(index)
+    shape = attrSelection.value()
+    name = attrSelection.namingName()
+    assert(shape.isEdge())
+    assert(name != ""), "String empty"
+
+
 def testNbSubFeatures(theComposite, theKindOfSub, theExpectedCount):
   """ Tests number of sub-features of the given type
   :param theComposite     composite feature to check its subs
