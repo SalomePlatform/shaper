@@ -164,7 +164,7 @@ Translation_41_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "B
 Partition_6 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_30_1"), model.selection("SOLID", "Translation_29_1")])
 Translation_41 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_6_1")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), 15)
 
-# Translateion 42
+# Translation 42
 Translation_42_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_31_1")], model.selection("EDGE", "PartSet/OX"), 5)
 Partition_7 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_32_1"), model.selection("SOLID", "Translation_31_1")])
 Translation_42 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_7_1")], model.selection("EDGE", "Edge_1_1"), 15)
@@ -172,7 +172,7 @@ Translation_42 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", 
 # Translation 43
 Translation_43_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_33_1")], model.selection("EDGE", "PartSet/OX"), 5)
 Partition_8 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_34_1"), model.selection("SOLID", "Translation_33_1")])
-Translation_43 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_8_1")], model.selection("EDGE", "Partition_8_1/Modified_Face_1_1_1&Partition_8_1/Modified_Face_1_9_1"), 15)
+Translation_43 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_8_1")], model.selection("EDGE", "Partition_8_1_1/Modified_Face_1_4&Partition_8_1_1/Modified_Face_1_1"), 15)
 
 # Translation 44
 Translation_44_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_35_1")], model.selection("EDGE", "PartSet/OX"), 5)
@@ -181,6 +181,8 @@ Translation_44 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", 
 model.do()
 model.end()
 
+# Checks
+from GeomAPI import GeomAPI_Shape
 
 # Translation 27
 model.testNbResults(Translation_27, 1)
