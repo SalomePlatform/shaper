@@ -193,6 +193,10 @@ QMainWindow* XGUI_ModuleConnector::desktop() const
   return myWorkshop->desktop();
 }
 
+bool XGUI_ModuleConnector::hasSHIFTPressed() const
+{
+  return myWorkshop->operationMgr()->hasSHIFTPressed();
+}
 
 std::shared_ptr<Config_FeatureMessage> XGUI_ModuleConnector::featureInfo(const QString& theId) const
 {

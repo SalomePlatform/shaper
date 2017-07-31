@@ -127,6 +127,14 @@ Q_OBJECT
   /// Slot that commits the current operation.
   bool onCommitOperation();
 
+  /// Returns true if SHIFT is pressed
+  /// \param thePressed new boolean state
+  void setSHIFTPressed(const bool thePressed) { mySHIFTPressed = thePressed; }
+
+  /// Returns true if SHIFT is pressed
+  /// \return boolean value
+  bool hasSHIFTPressed() const { return mySHIFTPressed; }
+
 public slots:
   /// Slot that aborts the current operation.
   void onAbortOperation();
@@ -239,6 +247,7 @@ private:
   ModuleBase_IWorkshop* myWorkshop;
 
   XGUI_ShortCutListener* myShortCutListener;
+  bool mySHIFTPressed;
 };
 
 #endif

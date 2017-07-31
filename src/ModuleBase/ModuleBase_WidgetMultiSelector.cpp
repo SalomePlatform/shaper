@@ -744,7 +744,8 @@ bool ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
     AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
     for (int i = 0; i < aSelectionListAttr->size(); i++) {
       AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
-      bool aFound = findInSelection(anAttr->context(), anAttr->value(), aGeomSelection);
+      bool aFound = findInSelection(anAttr->context(), anAttr->value(), aGeomSelection,
+                                    myWorkshop);
       if (!aFound)
         anIndicesToBeRemoved.insert(i);
     }
@@ -756,7 +757,8 @@ bool ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
     for (int i = 0; i < aRefListAttr->size(); i++) {
       ObjectPtr anObject = aRefListAttr->object(i);
       if (anObject.get()) {
-        bool aFound = findInSelection(anObject, GeomShapePtr(), aGeomSelection);
+        bool aFound = findInSelection(anObject, GeomShapePtr(), aGeomSelection,
+                                      myWorkshop);
         if (!aFound)
           anIndicesToBeRemoved.insert(i);
       }
@@ -786,7 +788,8 @@ bool ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
         aFound = anAttributes.find(anAttribute) != anAttributes.end();
       }
       else {
-        aFound = findInSelection(aRefAttrListAttr->object(i), GeomShapePtr(), aGeomSelection);
+        aFound = findInSelection(aRefAttrListAttr->object(i), GeomShapePtr(), aGeomSelection,
+                                 myWorkshop);
       }
       if (!aFound)
         anIndicesToBeRemoved.insert(i);
@@ -826,8 +829,14 @@ std::map<ObjectPtr, std::set<GeomShapePtr> > ModuleBase_WidgetMultiSelector::con
 
 bool ModuleBase_WidgetMultiSelector::findInSelection(const ObjectPtr& theObject,
                               GeomShapePtr theShape,
-                              const std::map<ObjectPtr, std::set<GeomShapePtr> >& theGeomSelection)
+                              const std::map<ObjectPtr, std::set<GeomShapePtr> >& theGeomSelection,
+                              ModuleBase_IWorkshop* theWorkshop)
 {
+  // issue #2154: we should not remove from list objects hidden in the viewer if selection
+  // was done with SHIFT button
+  if (theWorkshop->hasSHIFTPressed() && !theObject->isDisplayed())
+    return true;
+
   bool aFound = false;
   GeomShapePtr anEmptyShape(new GeomAPI_Shape());
   if (theShape.get()) { // treat shape equal to context as null: 2219, keep order of shapes in list
