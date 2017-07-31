@@ -1582,7 +1582,7 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
           NCollection_Map<Handle(AIS_InteractiveObject)> aPresentations =
                                       theShapesToBeSelected.Find(aParameterShape);
           if (aPresentations.Contains(anOwnerPresentation)) {
-            theContext->AddOrRemoveSelected(anOwner);
+            theContext->AddOrRemoveSelected(anOwner, Standard_False);
             anOwner->SetSelected (Standard_True);
             // collect selected presentations to do not select them if compsolid is selected
             if (!aSelectedPresentations.Contains(anOwnerPresentation))
@@ -1607,6 +1607,6 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
   for (; anIt.More(); anIt.Next()) {
     if (aSelectedPresentations.Contains(anIt.Value()))
       continue;
-    theContext->AddOrRemoveSelected(anIt.Value());
+    theContext->AddOrRemoveSelected(anIt.Value(), Standard_False);
   }
 }
