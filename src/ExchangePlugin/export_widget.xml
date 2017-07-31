@@ -41,7 +41,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                             title="Export file"
                             path="">
         <validator id="ExchangePlugin_ExportFormat"
-                   parameters="XAO:XAO" />
+                   parameters="xao:XAO" />
       </export_file_selector>
       <stringvalue id="xao_author"
                    label="Author"
