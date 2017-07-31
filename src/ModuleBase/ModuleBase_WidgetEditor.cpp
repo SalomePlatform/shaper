@@ -110,9 +110,10 @@ bool ModuleBase_WidgetEditor::showPopupEditor(const bool theSendSignals)
   bool isValueAccepted = false;
   // we need to emit the focus in event manually in order to save the widget as an active
   // in the property panel before the mouse leave event happens in the viewer. The module
-  // ask an active widget and change the feature visualization if the widget is not the current one.
-  if (theSendSignals)
-    emitFocusInWidget();
+  // ask an active widget and change the feature visualization if the widget is not the current
+  // one.  Also we need this widget as active to provide call of processEnter() applyed
+  // by operation manager to the current widget. If not, the myEditorDialog will stay opened
+  emitFocusInWidget();
 
   // nds: it seems, that the envents processing is not necessary anymore
   // White while all events will be processed
