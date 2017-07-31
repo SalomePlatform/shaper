@@ -168,4 +168,5 @@ ADD_UNIT_TESTS(TestConstants.py
                Test2170.py
                TestExternalConstruction.py
                Test2228.py
+               Test2241.py
 )

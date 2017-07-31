@@ -135,6 +135,8 @@ void FeaturesPlugin_RemoveSubShapes::execute()
 
   // find all removed shapes
   GeomAlgoAPI_MakeShapeCustom aDeletedSubs;
+  std::set<GeomAPI_Shape::ShapeType> aTypes; // types that where removed
+  aTypes.insert(GeomAPI_Shape::FACE);
   for(GeomAPI_ShapeIterator anIt(aBaseShape); anIt.more(); anIt.next()) {
     if (!anIt.current().get() || anIt.current()->isNull())
       continue;
@@ -147,9 +149,13 @@ void FeaturesPlugin_RemoveSubShapes::execute()
       }
     }
     if (anIndex == aSubsNb) { // not found in left
-      GeomAPI_ShapeExplorer aFaces(anIt.current(), GeomAPI_Shape::FACE);
-      for(; aFaces.more(); aFaces.next())
-        aDeletedSubs.addDeleted(aFaces.current());
+      aDeletedSubs.addDeleted(anIt.current());
+      aTypes.insert(anIt.current()->shapeType());
+      if (anIt.current()->shapeType() != GeomAPI_Shape::FACE) {
+        GeomAPI_ShapeExplorer aFaces(anIt.current(), GeomAPI_Shape::FACE);
+        for(; aFaces.more(); aFaces.next())
+          aDeletedSubs.addDeleted(aFaces.current());
+      }
     }
   }
 
@@ -160,13 +166,15 @@ void FeaturesPlugin_RemoveSubShapes::execute()
   // Store result.
   ResultBodyPtr aResultBody = document()->createBody(data());
   aResultBody->storeModified(aBaseShape, aResultShape, 1);
-  aResultBody->loadDeletedShapes(&aDeletedSubs, aBaseShape, GeomAPI_Shape::FACE, 1);
+  std::set<GeomAPI_Shape::ShapeType>::iterator aTypeIter = aTypes.begin();
+  for(; aTypeIter != aTypes.end(); aTypeIter++)
+    aResultBody->loadDeletedShapes(&aDeletedSubs, aBaseShape, *aTypeIter, 1);
   aResultBody->loadAndOrientModifiedShapes(&aCopy,
                                            aBaseShape,
                                            GeomAPI_Shape::FACE,
                                            2,
                                            "Modified_Face",
                                            *aCopy.mapOfSubShapes().get(),
-                                           true);
+                                           true, false, true);
   setResult(aResultBody);
 }

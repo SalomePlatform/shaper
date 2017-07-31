@@ -31,6 +31,7 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Face.hxx>
 #include <TDF_ChildIterator.hxx>
+#include <TDF_ChildIDIterator.hxx>
 #include <TDF_Reference.hxx>
 #include <TopTools_MapOfShape.hxx>
 #include <TopExp_Explorer.hxx>
@@ -251,9 +252,16 @@ void  Model_BodyBuilder::storeWithoutNaming(const std::shared_ptr<GeomAPI_Shape>
 
 void Model_BodyBuilder::clean()
 {
+  TDF_Label aLab = std::dynamic_pointer_cast<Model_Data>(data())->shapeLab();
   std::map<int, TNaming_Builder*>::iterator aBuilder = myBuilders.begin();
-  for(; aBuilder != myBuilders.end(); aBuilder++)
+  for(; aBuilder != myBuilders.end(); aBuilder++) {
     delete aBuilder->second;
+    // clear also shapes on cleaned sub-labels (#2241)
+    Handle(TNaming_NamedShape) aNS;
+    if (aLab.FindChild(aBuilder->first).FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+      aNS->Clear();
+    }
+  }
   myBuilders.clear();
 }
 
