@@ -56,6 +56,8 @@ SketchMultiTranslation_1_objects = [SketchLine_1.result(), SketchLine_2.result()
 SketchMultiTranslation_1 = Sketch_1.addTranslation(SketchMultiTranslation_1_objects, SketchLine_1.endPoint(), SketchLine_5.endPoint(), "N")
 model.do()
 
+from GeomAPI import GeomAPI_Shape
+
 model.testNbResults(Sketch_1, 1)
 model.testNbSubShapes(Sketch_1, GeomAPI_Shape.EDGE, [20])
 model.testNbSubShapes(Sketch_1, GeomAPI_Shape.VERTEX, [40])
@@ -85,3 +87,6 @@ model.testNbSubShapes(Sketch_1, GeomAPI_Shape.EDGE, [20])
 model.testNbSubShapes(Sketch_1, GeomAPI_Shape.VERTEX, [40])
 
 model.end()
+
+
+assert(model.checkPythonDump())
