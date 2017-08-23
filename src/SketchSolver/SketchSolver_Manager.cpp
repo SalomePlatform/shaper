@@ -92,6 +92,7 @@ void SketchSolver_Manager::processEvent(
   bool isUpdateFlushed = false;
   bool isMovedEvt = false;
 
+  static const Events_ID aCreatedEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
   static const Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
   static const Events_ID aSketchPreparedEvent = Events_Loop::eventByName(EVENT_SKETCH_PREPARED);
   // sketch is prepared for resolve: all the needed events
@@ -105,12 +106,11 @@ void SketchSolver_Manager::processEvent(
     return;
   myIsComputed = true;
 
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)
+  if (theMessage->eventID() == aCreatedEvent
       || theMessage->eventID() == anUpdateEvent
       || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
-    std::set<ObjectPtr> aFeatures = anUpdateMsg->objects();
 
     isUpdateFlushed = stopSendUpdate();
 
@@ -121,14 +121,31 @@ void SketchSolver_Manager::processEvent(
     bool hasProperFeature = false;
 
     // update sketch features only
-    std::set<ObjectPtr>::iterator aFeatIter;
-    for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
-      std::shared_ptr<SketchPlugin_Feature> aFeature =
-          std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-      if (!aFeature || aFeature->isMacro())
-        continue;
-
-      hasProperFeature = updateFeature(aFeature, isMovedEvt) || hasProperFeature;
+    const std::set<ObjectPtr>& aFeatures = anUpdateMsg->objects();
+    // try to keep order as features were created if there are several created features: #2229
+    if (theMessage->eventID() == aCreatedEvent && aFeatures.size() > 1) {
+      std::map<int, std::shared_ptr<SketchPlugin_Feature>> anOrderedFeatures;
+      std::set<ObjectPtr>::iterator aFeatIter;
+      for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
+        std::shared_ptr<SketchPlugin_Feature> aFeature =
+            std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
+        if (aFeature && !aFeature->isMacro() && aFeature->data()) {
+          anOrderedFeatures[aFeature->data()->featureId()] = aFeature;
+        }
+      }
+      std::map<int, std::shared_ptr<SketchPlugin_Feature>>::iterator aFeat;
+      for(aFeat = anOrderedFeatures.begin(); aFeat != anOrderedFeatures.end(); aFeat++) {
+        hasProperFeature = updateFeature(aFeat->second, isMovedEvt) || hasProperFeature;
+      }
+    } else { // order is not important
+      std::set<ObjectPtr>::iterator aFeatIter;
+      for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
+        std::shared_ptr<SketchPlugin_Feature> aFeature =
+            std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
+        if (!aFeature || aFeature->isMacro())
+          continue;
+        hasProperFeature = updateFeature(aFeature, isMovedEvt) || hasProperFeature;
+      }
     }
 
     if (isMovedEvt && hasProperFeature)
