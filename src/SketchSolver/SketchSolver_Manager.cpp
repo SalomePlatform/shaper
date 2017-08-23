@@ -129,7 +129,7 @@ void SketchSolver_Manager::processEvent(
       for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
         std::shared_ptr<SketchPlugin_Feature> aFeature =
             std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-        if (aFeature && !aFeature->isMacro() && aFeature->data()) {
+        if (aFeature && !aFeature->isMacro() && aFeature->data() && aFeature->data()->isValid()) {
           anOrderedFeatures[aFeature->data()->featureId()] = aFeature;
         }
       }
