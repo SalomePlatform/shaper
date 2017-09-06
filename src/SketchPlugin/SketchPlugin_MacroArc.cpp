@@ -274,22 +274,16 @@ GeomShapePtr SketchPlugin_MacroArc::getArcShape(bool isBound)
 
 AISObjectPtr SketchPlugin_MacroArc::getAISObject(AISObjectPtr thePrevious)
 {
-  if(!myStart.get() || !myEnd.get() || !myCenter.get()) {
+  GeomShapePtr anArcShape = getArcShape();
+  if(!anArcShape.get())
     return AISObjectPtr();
-  }
 
   SketchPlugin_Sketch* aSketch = sketch();
-  if(!aSketch) {
-    return AISObjectPtr();
-  }
-
-  GeomShapePtr anArcShape = getArcShape();
   std::shared_ptr<GeomAPI_Pnt> aCenter = aSketch->to3D(myCenter->x(), myCenter->y());;
   GeomShapePtr aCenterPointShape = GeomAlgoAPI_PointBuilder::vertex(aCenter);
 
-  if(!anArcShape.get() || !aCenterPointShape.get()) {
+  if(!aCenterPointShape.get())
     return AISObjectPtr();
-  }
 
   std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
   aShapes.push_back(anArcShape);

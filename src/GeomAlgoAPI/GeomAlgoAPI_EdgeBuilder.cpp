@@ -198,7 +198,7 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
 
   /// OCCT creates an edge on a circle with empty radius, but visualization
   /// is not able to process it
-  if (theCenter->isEqual(theStartPoint))
+  if (theCenter->isEqual(theStartPoint) || theCenter->isEqual(theEndPoint))
     return aRes;
 
   double aRadius = theCenter->distance(theStartPoint);
