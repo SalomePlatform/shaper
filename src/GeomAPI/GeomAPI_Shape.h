@@ -21,6 +21,8 @@
 #ifndef GeomAPI_Shape_H_
 #define GeomAPI_Shape_H_
 
+#include "GeomAPI_Dir.h"
+
 #include <GeomAPI_Interface.h>
 #include <memory>
 #include <list>
@@ -142,6 +144,10 @@ public:
   /// Returns true if min distance between shapes < tolerance.
   GEOMAPI_EXPORT
   bool isIntersect(const std::shared_ptr<GeomAPI_Shape> theShape) const;
+
+  // Translates the shape along the direction for the given offset
+  GEOMAPI_EXPORT
+  void translate(const std::shared_ptr<GeomAPI_Dir> theDir, const double theOffset);
 };
 
 //! Pointer on list of shapes

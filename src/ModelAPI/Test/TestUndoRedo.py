@@ -32,6 +32,7 @@ aFeature = aDoc.addFeature("Point")
 aFeature.real("x").setValue(1.)
 aFeature.real("y").setValue(-1.)
 aFeature.real("z").setValue(0.)
+aFeature.string("creation_method").setValue("by_xyz")
 aFeatureName = aFeature.name()
 # "2" is because Origin is the first point
 assert(aFeatureName == "Point_2")

@@ -20,11 +20,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
 -->
 
 <source>
-  <doublevalue id="x" label="X " tooltip="X coordinate" default="0"/>
-  <doublevalue id="y" label="Y " tooltip="Y coordinate" default="0"/>
-  <doublevalue id="z" label="Z " tooltip="Z coordinate" default="0"/>
-
-  <!--<toolbox id="creation_method">
+  <toolbox id="creation_method">
     <box id="by_xyz"
          title="By X, Y, Z"
          tooltip="Point at a given distance from the origin."
@@ -45,6 +41,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                    icon="icons/Construction/z_size.png"
                    default="0"/>
     </box>
+<!--
     <box id="by_distance_on_edge"
          title="By distance on edge"
          tooltip="Point on an edge, at a given distance of one of its end."
@@ -111,6 +108,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <validator id="ConstructionPlugin_ValidatorPointLines" parameters="first_line"/>
       </shape_selector>
     </box>
+-->
     <box id="by_line_and_plane_intersection"
          title="By line and plane intersection"
          tooltip="Point by intersection of line and plane."
@@ -120,8 +118,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       tooltip="Line for intersection."
                       icon="icons/Construction/edge.png"
                       shape_types="edge">
-        <validator id="GeomValidators_ShapeType" parameters="line"/>
-        <validator id="ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel" parameters="intersection_plane"/>
+        <validator id="ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel" parameters="intersection_plane"/>
       </shape_selector>
       <shape_selector id="intersection_plane"
                       label="Plane"
@@ -129,9 +126,13 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       icon="icons/Construction/face.png"
                       shape_types="face">
         <validator id="GeomValidators_Face" parameters="plane"/>
-        <validator id="ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel" parameters="intersection_line"/>
+        <validator id="ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel" parameters="intersection_line"/>
       </shape_selector>
+      <optionalbox id="use_offset" title="Offset from the plane">
+        <doublevalue id="offset" label="Distance " tooltip="Distance from the plane" min="0" default="0"/>
+        <boolvalue id="reverse_offset" label="Reverse" tooltip="Reverse offset value" default="false"/>
+      </optionalbox>
     </box>
 
-  </toolbox>-->
+  </toolbox>
 </source>

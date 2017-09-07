@@ -26,12 +26,14 @@
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Vertex.h>
+#include <GeomAlgoAPI_ShapeTools.h>
 
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeBoolean.h>
 
 #include <Events_InfoMessage.h>
 
+static std::shared_ptr<GeomAPI_Edge> getEdge(const GeomShapePtr theShape);
 static std::shared_ptr<GeomAPI_Lin> getLin(const GeomShapePtr theShape);
 static std::shared_ptr<GeomAPI_Pln> getPln(const GeomShapePtr theShape);
 static std::shared_ptr<GeomAPI_Pnt> getPnt(const GeomShapePtr theShape);
@@ -94,7 +96,7 @@ bool ConstructionPlugin_ValidatorPointLines::isValid(const AttributePtr& theAttr
 }
 
 //==================================================================================================
-bool ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel::isValid(
+bool ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel::isValid(
     const AttributePtr& theAttribute,
     const std::list<std::string>& theArguments,
     Events_InfoMessage& theError) const
@@ -105,7 +107,7 @@ bool ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel::isValid(
     std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   AttributeSelectionPtr anAttribute2 = aFeature->selection(theArguments.front());
 
-  std::shared_ptr<GeomAPI_Lin> aLin;
+  std::shared_ptr<GeomAPI_Edge> anEdge;
   std::shared_ptr<GeomAPI_Pln> aPln;
 
   GeomShapePtr aShape1 = anAttribute1->value();
@@ -127,20 +129,23 @@ bool ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel::isValid(
     aShape2 = aContext2->shape();
   }
 
-  aLin = getLin(aShape1);
+  bool isPlaneFirst = false;
+  anEdge = getEdge(aShape1);
   aPln = getPln(aShape2);
-  if(!aLin.get() || !aPln.get()) {
-    aLin = getLin(aShape2);
+  if(!anEdge.get() || !aPln.get()) {
+    anEdge = getEdge(aShape2);
     aPln = getPln(aShape1);
+    isPlaneFirst = true;
   }
 
-  if(!aLin.get() || !aPln.get()) {
+  if(!anEdge.get() || !aPln.get()) {
     theError = "Wrong shape types selected.";
     return false;
   }
 
-  if(aPln->isParallel(aLin)) {
-    theError = "Plane and line are parallel.";
+  std::shared_ptr<GeomAPI_Face> aPlaneFace(new GeomAPI_Face(isPlaneFirst ? aShape1 : aShape2));
+  if(GeomAlgoAPI_ShapeTools::isParallel(anEdge, aPlaneFace)) {
+    theError = "Plane and edge are parallel.";
     return false;
   }
 
@@ -379,6 +384,17 @@ bool ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes::isValid(
   }
 
   return true;
+}
+
+std::shared_ptr<GeomAPI_Edge> getEdge(const GeomShapePtr theShape)
+{
+  if(!theShape->isEdge()) {
+    return std::shared_ptr<GeomAPI_Edge>();
+  }
+
+  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(theShape));
+
+  return anEdge;
 }
 
 std::shared_ptr<GeomAPI_Lin> getLin(const GeomShapePtr theShape)

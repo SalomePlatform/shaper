@@ -43,6 +43,7 @@
 #include <BRepGProp.hxx>
 #include <BRepTools.hxx>
 #include <BRepTopAdaptor_FClass2d.hxx>
+#include <BRepClass_FaceClassifier.hxx>
 #include <Geom2d_Curve.hxx>
 #include <Geom2d_Curve.hxx>
 #include <BRepLib_CheckCurveOnSurface.hxx>
@@ -50,6 +51,7 @@
 #include <Geom_Plane.hxx>
 #include <GeomLib_IsPlanarSurface.hxx>
 #include <GeomLib_Tool.hxx>
+#include <GeomAPI_ExtremaCurveSurface.hxx>
 #include <gp_Pln.hxx>
 #include <GProp_GProps.hxx>
 #include <IntAna_IntConicQuad.hxx>
@@ -66,6 +68,7 @@
 #include <TopoDS.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
+
 
 #include <BOPAlgo_Builder.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
@@ -705,6 +708,50 @@ bool GeomAlgoAPI_ShapeTools::isParallel(const std::shared_ptr<GeomAPI_Edge> theE
 
   BRepExtrema_ExtCF anExt(anEdge, aFace);
   return anExt.IsParallel() == Standard_True;
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_ShapeTools::intersect(
+  const std::shared_ptr<GeomAPI_Edge> theEdge, const std::shared_ptr<GeomAPI_Face> theFace)
+{
+  if(!theEdge.get() || !theFace.get()) {
+    return false;
+  }
+
+  TopoDS_Edge anEdge = TopoDS::Edge(theEdge->impl<TopoDS_Shape>());
+  double aFirstOnCurve, aLastOnCurve;
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirstOnCurve, aLastOnCurve);
+
+  TopoDS_Face aFace  = TopoDS::Face(theFace->impl<TopoDS_Shape>());
+  Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace);
+
+  GeomAPI_ExtremaCurveSurface anExt(aCurve, aSurf);
+  // searching for the best point-intersection
+  int aMaxLevel = 0;
+  gp_Pnt aResult;
+  for(int anIntNum = 1; anIntNum <= anExt.NbExtrema(); anIntNum++) {
+    if (anExt.Distance(anIntNum) > Precision::Confusion())
+      continue;
+    Standard_Real aW, aU, aV;
+    anExt.Parameters(anIntNum, aW, aU, aV);
+    gp_Pnt2d aPointOfSurf(aU, aV);
+    // level of the intersection: if it is inside of edge and/or face the level is higher
+    int aIntLevel = aW > aFirstOnCurve && aW < aLastOnCurve ? 2 : 1;
+    BRepClass_FaceClassifier aFClass(aFace, aPointOfSurf, Precision::Confusion());
+    if (aFClass.State() == TopAbs_IN) // "in" is better than "on"
+      aIntLevel += 2;
+    else if (aFClass.State() == TopAbs_ON)
+      aIntLevel += 1;
+    if (aMaxLevel < aIntLevel) {
+      aMaxLevel = anIntNum;
+      anExt.Points(anIntNum, aResult, aResult);
+    }
+  }
+  if (aMaxLevel > 0) { // intersection found
+    return std::shared_ptr<GeomAPI_Vertex>(
+      new GeomAPI_Vertex(aResult.X(), aResult.Y(), aResult.Z()));
+  }
+  return std::shared_ptr<GeomAPI_Vertex>(); // no intersection found
 }
 
 //==================================================================================================

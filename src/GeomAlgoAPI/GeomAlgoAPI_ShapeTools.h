@@ -133,6 +133,12 @@ public:
   GEOMALGOAPI_EXPORT static bool isParallel(const std::shared_ptr<GeomAPI_Edge> theEdge,
                                             const std::shared_ptr<GeomAPI_Face> theFace);
 
+  // Computes intersection point between the edge curve and a face surface (only one point, with
+  // preferences to point that belongs to edge and face boundaries.
+  /// \returns null if there is no intersection
+  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Vertex> intersect(
+    const std::shared_ptr<GeomAPI_Edge> theEdge, const std::shared_ptr<GeomAPI_Face> theFace);
+
   typedef std::map<std::shared_ptr<GeomAPI_Pnt>,
                    std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,
                              std::list<std::shared_ptr<ModelAPI_Object> > > > PointToRefsMap;

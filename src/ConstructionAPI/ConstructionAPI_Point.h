@@ -56,21 +56,33 @@ public:
                         const ModelHighAPI_Double& theDistanceValue,
                         const bool theDistancePercent = false,
                         const bool theReverse = false);
-
-  /// Constructor with values.
+  */
+  /// Constructor with values: intersected objects.
   CONSTRUCTIONAPI_EXPORT
   ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                         const ModelHighAPI_Selection& theObject1,
-                        const ModelHighAPI_Selection& theObject2);*/
+                        const ModelHighAPI_Selection& theObject2);
 
   /// Destructor.
   CONSTRUCTIONAPI_EXPORT
   virtual ~ConstructionAPI_Point();
 
-  INTERFACE_3(ConstructionPlugin_Point::ID(),
+  INTERFACE_9(ConstructionPlugin_Point::ID(),
               x, ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble, /** X attribute */,
               y, ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble, /** Y attribute */,
-              z, ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble, /** Z attribute */)
+              z, ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble, /** Z attribute */,
+              creationMethod, ConstructionPlugin_Point::CREATION_METHOD(),
+              ModelAPI_AttributeString, /** Creation method */,
+              intersectionLine, ConstructionPlugin_Point::INTERSECTION_LINE(),
+              ModelAPI_AttributeSelection, /** Line for intersection */,
+              intersectionPlane, ConstructionPlugin_Point::INTERSECTION_PLANE(),
+              ModelAPI_AttributeSelection, /** Plane for intersection */,
+              useOffset, ConstructionPlugin_Point::USE_OFFSET(),
+              ModelAPI_AttributeString, /** Use offset */,
+              offset, ConstructionPlugin_Point::OFFSET(),
+              ModelAPI_AttributeDouble, /** Offset */,
+              reverseOffset, ConstructionPlugin_Point::REVERSE_OFFSET(),
+              ModelAPI_AttributeBoolean, /** Reverse offset */)
 
 
   /// Set point values.
@@ -95,11 +107,11 @@ public:
   CONSTRUCTIONAPI_EXPORT
   void setByLinesIntersection(const ModelHighAPI_Selection& theEdge1,
                               const ModelHighAPI_Selection& theEdge2);
-
+  */
   /// Set line and plane for intersections.
   CONSTRUCTIONAPI_EXPORT
   void setByLineAndPlaneIntersection(const ModelHighAPI_Selection& theEdge,
-                                     const ModelHighAPI_Selection& theFace);*/
+                                     const ModelHighAPI_Selection& theFace);
 
   /// Dump wrapped feature
   CONSTRUCTIONAPI_EXPORT
@@ -125,12 +137,22 @@ PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Double& theDistanceValue,
                   const bool theDistancePercent = false,
                   const bool theReverse = false);
-
+*/
 /// \ingroup CPPHighAPI
-/// \brief Create Point feature
+/// \brief Create Point feature as an intersection of selected plane (or planar face) and edge
 CONSTRUCTIONAPI_EXPORT
 PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Selection& theObject1,
-                  const ModelHighAPI_Selection& theObject2);*/
+                  const ModelHighAPI_Selection& theObject2);
+
+/// \ingroup CPPHighAPI
+/// \brief Create Point feature as an intersection of selected plane (or planar face) and edge
+/// with positive distance from the plane and flag to reverse the offset direction.
+CONSTRUCTIONAPI_EXPORT
+PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
+                  const ModelHighAPI_Selection& theObject1,
+                  const ModelHighAPI_Selection& theObject2,
+                  const ModelHighAPI_Double& theDistanceValue,
+                  const bool theReverse = false);
 
 #endif /* SRC_CONSTRUCTIONAPI_CONSTRUCTIONAPI_POINT_H_ */
