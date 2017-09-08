@@ -27,6 +27,8 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
 
+#include <math.h>
+
 class GeomAPI_Vertex;
 
 /// \class ConstructionPlugin_Point
