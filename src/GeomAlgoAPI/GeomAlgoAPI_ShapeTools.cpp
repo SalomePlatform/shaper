@@ -715,7 +715,7 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_ShapeTools::intersect(
   const std::shared_ptr<GeomAPI_Edge> theEdge, const std::shared_ptr<GeomAPI_Face> theFace)
 {
   if(!theEdge.get() || !theFace.get()) {
-    return false;
+    return std::shared_ptr<GeomAPI_Vertex>();
   }
 
   TopoDS_Edge anEdge = TopoDS::Edge(theEdge->impl<TopoDS_Shape>());

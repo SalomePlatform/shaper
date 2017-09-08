@@ -1418,6 +1418,9 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
         #endif
         aParameters.Append(MyVCallBack);
 
+        MyTCommunicator->RegisterPlugin("TKDFBrowser");
+        MyTCommunicator->RegisterPlugin("TKShapeView");
+        MyTCommunicator->RegisterPlugin("TKVInspector");
         MyTCommunicator->RegisterPlugin("SMBrowser"); // custom plugin to view ModelAPI
 
         MyTCommunicator->Init(aParameters);
