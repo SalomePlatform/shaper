@@ -110,6 +110,13 @@ protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelection(TDF_Label& theLabel);
 
+  /// Returns the selected subshape, internal method that works without knowledge
+  /// about special selection of circle and ellipse focuses (for that the public value
+  /// method calls this and makes additional processing).
+  /// Returns theType type of the center, or NOT_CENTER if it is not.
+  std::shared_ptr<GeomAPI_Shape> internalValue(CenterType& theType);
+
+
   /// Performs the selection for the body result (TNaming Selection)
 
   /// Performs the selection for the body result (TNaming selection)

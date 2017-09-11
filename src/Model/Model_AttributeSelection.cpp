@@ -232,29 +232,36 @@ GeomShapePtr centerByEdge(GeomShapePtr theEdge, ModelAPI_AttributeSelection::Cen
 
 std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
 {
+  CenterType aType = NOT_CENTER;
+  std::shared_ptr<GeomAPI_Shape> aResult = internalValue(aType);
+  return centerByEdge(aResult, aType);
+}
+
+std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterType& theType)
+{
+  theType = NOT_CENTER;
   GeomShapePtr aResult;
   if (myTmpContext.get() || myTmpSubShape.get()) {
+    theType = myTmpCenterType;
     ResultConstructionPtr aResulConstruction =
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myTmpContext);
     if(aResulConstruction.get()) {
       // it is just reference to construction.
-      return centerByEdge(myTmpSubShape, myTmpCenterType);
+      return myTmpSubShape;
     }
-    return centerByEdge(myTmpSubShape.get() ? myTmpSubShape : myTmpContext->shape(),
-                        myTmpCenterType);
+    return myTmpSubShape.get() ? myTmpSubShape : myTmpContext->shape();
   }
 
   TDF_Label aSelLab = selectionLabel();
   if (aSelLab.IsAttribute(kINVALID_SELECTION))
     return aResult;
 
-  CenterType aType = NOT_CENTER;
   if (aSelLab.IsAttribute(kCIRCLE_CENTER))
-    aType = CIRCLE_CENTER;
+    theType = CIRCLE_CENTER;
   else if (aSelLab.IsAttribute(kELLIPSE_CENTER1))
-    aType = ELLIPSE_FIRST_FOCUS;
+    theType = ELLIPSE_FIRST_FOCUS;
   else if (aSelLab.IsAttribute(kELLIPSE_CENTER2))
-    aType = ELLIPSE_SECOND_FOCUS;
+    theType = ELLIPSE_SECOND_FOCUS;
 
 
   if (myRef.isInitialized()) {
@@ -262,7 +269,7 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
       ResultPtr aContext = context();
       if (!aContext.get())
         return aResult; // empty result
-      return centerByEdge(aContext->shape(), aType);
+      return aContext->shape();
     }
     if (aSelLab.IsAttribute(kPART_REF_ID)) {
       ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(context());
@@ -271,7 +278,7 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
       Handle(TDataStd_Integer) anIndex;
       if (aSelLab.FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
         if (anIndex->Get()) { // special selection attribute was created, use it
-          return centerByEdge(aPart->selectionValue(anIndex->Get()), aType);
+          return aPart->selectionValue(anIndex->Get());
         } else { // face with name is already in the data model, so try to take it by name
           Handle(TDataStd_Name) aName;
           if (aSelLab.FindAttribute(TDataStd_Name::GetID(), aName)) {
@@ -281,7 +288,7 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
               std::string aNameInPart = aSubShapeName.substr(aPartEnd + 1);
               int anIndex;
               std::string aTypeStr; // to reuse already existing selection the type is not needed
-              return centerByEdge(aPart->shapeInPart(aNameInPart, aTypeStr, anIndex), aType);
+              return aPart->shapeInPart(aNameInPart, aTypeStr, anIndex);
             }
           }
         }
@@ -293,7 +300,7 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
       TopoDS_Shape aSelShape = aSelection->Get();
       aResult = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
       aResult->setImpl(new TopoDS_Shape(aSelShape));
-      return centerByEdge(aResult, aType);
+      return aResult;
     } else { // for simple construction element: just shape of this construction element
       std::shared_ptr<Model_ResultConstruction> aConstr =
         std::dynamic_pointer_cast<Model_ResultConstruction>(context());
@@ -301,8 +308,8 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
         Handle(TDataStd_Integer) anIndex;
         if (aSelLab.FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
           if (anIndex->Get() == 0) // it is just reference to construction, nothing is in value
-            return centerByEdge(aResult, aType);
-          return centerByEdge(aConstr->shape(anIndex->Get(), owner()->document()), aType);
+            return aResult;
+          return aConstr->shape(anIndex->Get(), owner()->document());
         }
       }
     }
@@ -695,21 +702,56 @@ TDF_Label Model_AttributeSelection::selectionLabel()
   return myRef.myRef->Label().FindChild(1);
 }
 
+/// prefixes of the shape names with centers defined
+static std::map<ModelAPI_AttributeSelection::CenterType, std::string> kCENTERS_PREFIX;
+
+/// returns the map that contains all possible prefixes of the center-names
+static std::map<ModelAPI_AttributeSelection::CenterType, std::string>& centersMap()
+{
+  if (kCENTERS_PREFIX.empty()) { // fill map by initial values
+    kCENTERS_PREFIX[ModelAPI_AttributeSelection::CIRCLE_CENTER] = "__cc";
+    kCENTERS_PREFIX[ModelAPI_AttributeSelection::ELLIPSE_FIRST_FOCUS] = "__eff";
+    kCENTERS_PREFIX[ModelAPI_AttributeSelection::ELLIPSE_SECOND_FOCUS] = "__esf";
+  }
+  return kCENTERS_PREFIX;
+}
+
 std::string Model_AttributeSelection::namingName(const std::string& theDefaultName)
 {
   std::string aName("");
   if(!this->isInitialized())
     return !theDefaultName.empty() ? theDefaultName : aName;
 
-  std::shared_ptr<GeomAPI_Shape> aSubSh = value();
+  CenterType aCenterType = NOT_CENTER;
+  std::shared_ptr<GeomAPI_Shape> aSubSh = internalValue(aCenterType);
   ResultPtr aCont = context();
 
   if (!aCont.get()) // in case of selection of removed result
     return "";
 
   Model_SelectionNaming aSelNaming(selectionLabel());
-  return aSelNaming.namingName(
+  std::string aResult = aSelNaming.namingName(
     aCont, aSubSh, theDefaultName, owner()->document() != aCont->document());
+  if (aCenterType != NOT_CENTER) {
+    aResult += centersMap()[aCenterType];
+  }
+  return aResult;
+}
+
+// returns the center type and modifies the shape name if this name is center-name
+static ModelAPI_AttributeSelection::CenterType centerTypeByName(std::string& theShapeName)
+{
+  std::map<ModelAPI_AttributeSelection::CenterType, std::string>::iterator aPrefixIter =
+    centersMap().begin();
+  for(; aPrefixIter != centersMap().end(); aPrefixIter++) {
+    std::size_t aFound = theShapeName.find(aPrefixIter->second);
+    if (aFound != std::string::npos &&
+        aFound == theShapeName.size() - aPrefixIter->second.size()) {
+      theShapeName = theShapeName.substr(0, aFound);
+      return aPrefixIter->first;
+    }
+  }
+  return ModelAPI_AttributeSelection::NOT_CENTER;
 }
 
 // type ::= COMP | COMS | SOLD | SHEL | FACE | WIRE | EDGE | VERT
@@ -718,54 +760,81 @@ void Model_AttributeSelection::selectSubShape(
 {
   if(theSubShapeName.empty() || theType.empty()) return;
 
-  // check this is Part-name: 2 delimiters in the name
-  std::size_t aPartEnd = theSubShapeName.find('/');
-  if (aPartEnd != std::string::npos && aPartEnd != theSubShapeName.rfind('/')) {
-    std::string aPartName = theSubShapeName.substr(0, aPartEnd);
-    ObjectPtr aFound = owner()->document()->objectByName(ModelAPI_ResultPart::group(), aPartName);
-    if (aFound.get()) { // found such part, so asking it for the name
-      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFound);
-      std::string aNameInPart = theSubShapeName.substr(aPartEnd + 1);
-      int anIndex;
-      std::shared_ptr<GeomAPI_Shape> aSelected = aPart->shapeInPart(aNameInPart, theType, anIndex);
-      if (aSelected.get()) {
-        setValue(aPart, aSelected);
-        TDataStd_Integer::Set(selectionLabel(), anIndex);
-        return;
+  std::string aSubShapeName = theSubShapeName;
+  CenterType aCenterType = theType[0] == 'v' || theType[0] == 'V' ? // only for vertex-type
+    centerTypeByName(aSubShapeName) : NOT_CENTER;
+  std::string aType = aCenterType == NOT_CENTER ? theType : "EDGE"; // search for edge now
+
+  // first iteration is selection by name without center prefix, second - in case of problem,
+  // try with initial name
+  for(int aUseCenter = 1; aUseCenter >= 0; aUseCenter--) {
+    if (aUseCenter == 0 && aCenterType != NOT_CENTER) {
+      aSubShapeName = theSubShapeName;
+      aCenterType = NOT_CENTER;
+      aType = theType;
+    } else if (aUseCenter != 1) continue;
+
+    // check this is Part-name: 2 delimiters in the name
+    std::size_t aPartEnd = aSubShapeName.find('/');
+    if (aPartEnd != std::string::npos && aPartEnd != aSubShapeName.rfind('/')) {
+      std::string aPartName = aSubShapeName.substr(0, aPartEnd);
+      ObjectPtr aFound = owner()->document()->objectByName(ModelAPI_ResultPart::group(), aPartName);
+      if (aFound.get()) { // found such part, so asking it for the name
+        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFound);
+        std::string aNameInPart = aSubShapeName.substr(aPartEnd + 1);
+        int anIndex;
+        std::shared_ptr<GeomAPI_Shape> aSelected = aPart->shapeInPart(aNameInPart, aType, anIndex);
+        if (aSelected.get()) {
+          if (aCenterType != NOT_CENTER) {
+            if (!aSelected->isEdge())
+              continue;
+            std::shared_ptr<GeomAPI_Edge> aSelectedEdge(new GeomAPI_Edge(aSelected));
+            setValueCenter(aPart, aSelectedEdge, aCenterType);
+          } else
+            setValue(aPart, aSelected);
+          TDataStd_Integer::Set(selectionLabel(), anIndex);
+          return;
+        }
       }
     }
-  }
 
-  Model_SelectionNaming aSelNaming(selectionLabel());
-  std::shared_ptr<Model_Document> aDoc =
-    std::dynamic_pointer_cast<Model_Document>(owner()->document());
-  std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected;
-  ResultPtr aCont;
-  if (aSelNaming.selectSubShape(theType, theSubShapeName, aDoc, aShapeToBeSelected, aCont)) {
-    // try to find the last context to find the up to date shape
-    if (aCont->shape().get() && !aCont->shape()->isNull() &&
-      aCont->groupName() == ModelAPI_ResultBody::group() && aDoc == owner()->document()) {
-      const TopoDS_Shape aConShape = aCont->shape()->impl<TopoDS_Shape>();
-      if (!aConShape.IsNull()) {
-        Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aConShape, selectionLabel());
-        if (!aNS.IsNull()) {
-          aNS = TNaming_Tool::CurrentNamedShape(aNS);
+    Model_SelectionNaming aSelNaming(selectionLabel());
+    std::shared_ptr<Model_Document> aDoc =
+      std::dynamic_pointer_cast<Model_Document>(owner()->document());
+    std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected;
+    ResultPtr aCont;
+    if (aSelNaming.selectSubShape(aType, aSubShapeName, aDoc, aShapeToBeSelected, aCont)) {
+      // try to find the last context to find the up to date shape
+      if (aCont->shape().get() && !aCont->shape()->isNull() &&
+        aCont->groupName() == ModelAPI_ResultBody::group() && aDoc == owner()->document()) {
+        const TopoDS_Shape aConShape = aCont->shape()->impl<TopoDS_Shape>();
+        if (!aConShape.IsNull()) {
+          Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aConShape, selectionLabel());
           if (!aNS.IsNull()) {
-            TDF_Label aLab = aNS->Label();
-            while(aLab.Depth() != 7 && aLab.Depth() > 5)
-              aLab = aLab.Father();
-            ObjectPtr anObj = aDoc->objects()->object(aLab);
-            if (anObj.get()) {
-              ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
-              if (aRes)
-                aCont = aRes;
+            aNS = TNaming_Tool::CurrentNamedShape(aNS);
+            if (!aNS.IsNull()) {
+              TDF_Label aLab = aNS->Label();
+              while(aLab.Depth() != 7 && aLab.Depth() > 5)
+                aLab = aLab.Father();
+              ObjectPtr anObj = aDoc->objects()->object(aLab);
+              if (anObj.get()) {
+                ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+                if (aRes)
+                  aCont = aRes;
+              }
             }
           }
         }
       }
+      if (aCenterType != NOT_CENTER) {
+        if (!aShapeToBeSelected->isEdge())
+          continue;
+        std::shared_ptr<GeomAPI_Edge> aSelectedEdge(new GeomAPI_Edge(aShapeToBeSelected));
+        setValueCenter(aCont, aSelectedEdge, aCenterType);
+      } else
+        setValue(aCont, aShapeToBeSelected);
+      return;
     }
-    setValue(aCont, aShapeToBeSelected);
-    return;
   }
 
   TDF_Label aSelLab = selectionLabel();
