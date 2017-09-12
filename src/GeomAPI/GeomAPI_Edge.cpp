@@ -67,6 +67,8 @@ bool GeomAPI_Edge::isLine() const
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   double aFirst, aLast;
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
+  if (aCurve.IsNull()) // degenerative edge
+    return false;
   if (aCurve->IsKind(STANDARD_TYPE(Geom_Line)))
     return true;
   return false;
@@ -77,6 +79,8 @@ bool GeomAPI_Edge::isCircle() const
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   double aFirst, aLast;
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
+  if (aCurve.IsNull()) // degenerative edge
+    return false;
   if (aCurve->IsKind(STANDARD_TYPE(Geom_Circle)))
   {
     // Check the difference of first and last parameters to be equal to the curve period
@@ -91,6 +95,8 @@ bool GeomAPI_Edge::isArc() const
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   double aFirst, aLast;
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
+  if (aCurve.IsNull()) // degenerative edge
+    return false;
   if (aCurve->IsKind(STANDARD_TYPE(Geom_Circle)))
   {
     // Check the difference of first and last parameters is not equal the curve period
@@ -105,6 +111,8 @@ bool GeomAPI_Edge::isEllipse() const
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   double aFirst, aLast;
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
+  if (aCurve.IsNull()) // degenerative edge
+    return false;
   if (aCurve->IsKind(STANDARD_TYPE(Geom_Ellipse)))
     return true;
   return false;
