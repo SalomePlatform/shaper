@@ -54,10 +54,6 @@ void FeaturesPlugin_Tools::storeModifiedShapes(GeomAlgoAPI_MakeShape& theAlgo,
       theResultBody->loadAndOrientModifiedShapes(&theAlgo,
                                 theBaseShape, GeomAPI_Shape::FACE,
                                 theFaceTag, theName + "_Face", theSubShapes, false, true);
-      if (theBaseShape->shapeType() == GeomAPI_Shape::COMPSOLID
-          || theBaseShape->shapeType() == GeomAPI_Shape::SOLID) {
-        break;
-      }
     }
     case GeomAPI_Shape::FACE:
     case GeomAPI_Shape::WIRE: {
