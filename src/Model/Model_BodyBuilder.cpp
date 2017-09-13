@@ -253,6 +253,8 @@ void  Model_BodyBuilder::storeWithoutNaming(const std::shared_ptr<GeomAPI_Shape>
 void Model_BodyBuilder::clean()
 {
   TDF_Label aLab = std::dynamic_pointer_cast<Model_Data>(data())->shapeLab();
+  if (aLab.IsNull())
+    return;
   std::map<int, TNaming_Builder*>::iterator aBuilder = myBuilders.begin();
   for(; aBuilder != myBuilders.end(); aBuilder++) {
     delete aBuilder->second;

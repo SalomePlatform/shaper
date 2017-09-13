@@ -82,7 +82,7 @@ from ModelAPI import *
 aFactory = ModelAPI_Session.get().validators()
 assert(aFactory.validate(Group_1.feature()))
 assert(Group_1.groupList().size() == 10)
-for a in range(3):
+for a in range(10):
   assert(Group_1.groupList().value(a).value().shapeTypeStr() == "EDGE")
   assert(len(Group_1.groupList().value(a).namingName()) > 0)
 
