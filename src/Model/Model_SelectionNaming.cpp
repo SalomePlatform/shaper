@@ -269,7 +269,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
           const TopTools_ListOfShape& anAncestors = aMap.FindFromKey(aSubShape);
           // check that it is not a trivial case (F1 & F2: aNumber = 1)
           isTrivialCase = isTrivial(anAncestors, aSMap);
-          if (!isTrivialCase) { // another try: check that getting of common shape can be done simply
+          if (!isTrivialCase) { // another try: check that common shape can be processed anyway
             isTrivialCase = !findCommonShape(TopAbs_EDGE, anAncestors).IsNull();
           }
         } else
