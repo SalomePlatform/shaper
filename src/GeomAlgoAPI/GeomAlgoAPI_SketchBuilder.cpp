@@ -32,10 +32,12 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
+#include <GProp_GProps.hxx>
+#include <BRepGProp.hxx>
 
 #include <list>
 #include <cmath>
-
+#include <algorithm>
 
 static TopoDS_Vertex findStartVertex(const TopoDS_Shape& theShape)
 {
@@ -100,6 +102,92 @@ static TopoDS_Vertex findStartVertex(const TopoDS_Shape& theShape,
   return findStartVertex(theShape);
 }
 
+// returns true if the first shape must be located earlier than the second
+bool isFirst(const TopoDS_Shape& theFirst, const TopoDS_Shape& theSecond,
+  NCollection_DataMap<TopoDS_Shape, NCollection_Array1<int> >& theAreaToIndex,
+  const NCollection_DataMap<Handle(Geom_Curve), int>& theCurveToIndex)
+{
+  // fill theAreaToIndex for both shapes if needed
+  for(int aShapeNum = 1; aShapeNum <= 2; aShapeNum++) {
+    TopoDS_Shape aShape = aShapeNum == 1 ? theFirst : theSecond;
+    if (!theAreaToIndex.IsBound(aShape)) { // fill the list of curve indices
+      NCollection_List<int> aNewList;
+      TopExp_Explorer anEdgesExp(aShape, TopAbs_EDGE);
+      for(; anEdgesExp.More(); anEdgesExp.Next()) {
+        double aFirst, aLast;
+        Handle(Geom_Curve) aCurve = BRep_Tool::Curve(
+          TopoDS::Edge(anEdgesExp.Current()), aFirst, aLast);
+        if (aCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve))
+          aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
+        if (theCurveToIndex.IsBound(aCurve)) {
+          aNewList.Append(theCurveToIndex.Find(aCurve));
+        }
+      }
+      NCollection_Array1<int> aNewArray(1, aNewList.Extent());
+      NCollection_List<int>::Iterator aListIter(aNewList);
+      for(int anIndex = 1; aListIter.More(); aListIter.Next(), anIndex++) {
+        aNewArray.SetValue(anIndex, aListIter.Value());
+      }
+      std::sort(aNewArray.begin(), aNewArray.end());
+      theAreaToIndex.Bind(aShape, aNewArray);
+    }
+  }
+  // compare lists of indices one by one to find chich list indices are lower
+  NCollection_Array1<int>::Iterator aFirstList(theAreaToIndex.ChangeFind(theFirst));
+  NCollection_Array1<int>::Iterator aSecondList(theAreaToIndex.ChangeFind(theSecond));
+  for(; aFirstList.More() && aSecondList.More(); aFirstList.Next(), aSecondList.Next()) {
+    if (aFirstList.Value() < aSecondList.Value()) return true;
+    if (aFirstList.Value() > aSecondList.Value()) return false;
+  }
+  // if faces are identical by curves names (circle splitted by line in seam-point), use parameters
+  if (!aFirstList.More() && !aSecondList.More()) {
+    GProp_GProps aGProps;
+    BRepGProp::SurfaceProperties(theFirst, aGProps);
+    gp_Pnt aCentre1 = aGProps.CentreOfMass();
+    BRepGProp::SurfaceProperties(theSecond, aGProps);
+    gp_Pnt aCentre2 = aGProps.CentreOfMass();
+    return aCentre1.X() + aCentre1.Y() + aCentre1.Z() < aCentre2.X() + aCentre2.Y() + aCentre2.Z();
+  }
+  // if in first list there is no elements left, it is the first
+  return !aFirstList.More();
+}
+
+// sorts faces (in theAreas list) to make persistent order: by initial shapes edges
+static void sortFaces(TopTools_ListOfShape& theAreas,
+  const std::list<std::shared_ptr<GeomAPI_Shape> >& theInitialShapes)
+{
+  // collect indices of all edges to operate them quickly
+  NCollection_DataMap<Handle(Geom_Curve), int> aCurveToIndex; // curve -> index in initial shapes
+  std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator aFeatIt = theInitialShapes.begin();
+  for (int anIndex = 0; aFeatIt != theInitialShapes.end(); aFeatIt++) {
+    std::shared_ptr<GeomAPI_Shape> aShape(*aFeatIt);
+    const TopoDS_Edge& anEdge = aShape->impl<TopoDS_Edge>();
+    if (anEdge.ShapeType() != TopAbs_EDGE)
+      continue;
+
+    double aFirst, aLast;
+    Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+    if (aCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve))
+      aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
+    if (!aCurveToIndex.IsBound(aCurve))
+      aCurveToIndex.Bind(aCurve, anIndex++);
+  }
+  // map from area to the most first indices of curves (to compare) in it
+  NCollection_DataMap<TopoDS_Shape, NCollection_Array1<int> > anAreaToIndex;
+  // sort areas
+  TopTools_ListOfShape::Iterator anArea1(theAreas);
+  for(; anArea1.More(); anArea1.Next()) {
+    TopTools_ListOfShape::Iterator anArea2 = anArea1;
+    for(anArea2.Next(); anArea2.More(); anArea2.Next()) {
+      if (!isFirst(anArea1.Value(), anArea2.Value(), anAreaToIndex, aCurveToIndex)) { // exchange
+        TopoDS_Shape aTmp = anArea1.Value();
+        anArea1.ChangeValue() = anArea2.Value();
+        anArea2.ChangeValue() = aTmp;
+      }
+    }
+  }
+}
+
 void GeomAlgoAPI_SketchBuilder::createFaces(
     const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
     const std::shared_ptr<GeomAPI_Dir>& theDirX,
@@ -134,7 +222,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
     return;
 
   // Collect faces
-  const TopTools_ListOfShape& anAreas = aBB.Modified(aPlnFace);
+  TopTools_ListOfShape anAreas = aBB.Modified(aPlnFace);
+  sortFaces(anAreas, theFeatures); // sort faces by the edges in them
   TopTools_ListIteratorOfListOfShape anIt(anAreas);
   for (; anIt.More(); anIt.Next()) {
     TopoDS_Face aFace = TopoDS::Face(anIt.Value());
