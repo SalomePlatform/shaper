@@ -963,18 +963,52 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
 void Model_AttributeSelection::updateInHistory()
 {
   ResultPtr aContext = std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
-  // only bodies may be modified later in the history, don't do anything otherwise
-  if (!aContext.get() || aContext->groupName() != ModelAPI_ResultBody::group())
+  // only bodies and parts may be modified later in the history, don't do anything otherwise
+  if (!aContext.get() || (aContext->groupName() != ModelAPI_ResultBody::group() &&
+      aContext->groupName() != ModelAPI_ResultPart::group()))
     return;
+  std::shared_ptr<Model_Document> aDoc =
+    std::dynamic_pointer_cast<Model_Document>(aContext->document());
   std::shared_ptr<Model_Data> aContData = std::dynamic_pointer_cast<Model_Data>(aContext->data());
   if (!aContData.get() || !aContData->isValid())
     return;
   TDF_Label aContLab = aContData->label(); // named shape where the selected context is located
   Handle(TNaming_NamedShape) aContNS;
-  if (!aContLab.FindAttribute(TNaming_NamedShape::GetID(), aContNS))
+  if (!aContLab.FindAttribute(TNaming_NamedShape::GetID(), aContNS)) {
+    bool aFoundNewContext = true;
+    ResultPtr aNewContext = aContext;
+    while(aFoundNewContext) {
+      aFoundNewContext = false;
+      // parts have no shape in result, so, trace references using the Part info
+      if (aNewContext->groupName() == ModelAPI_ResultPart::group()) {
+        ResultPartPtr aPartContext = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aNewContext);
+        if (aPartContext.get()) { // searching for the up to date references to the referenced cont
+          const std::set<AttributePtr>& aRefs = aPartContext->data()->refsToMe();
+          std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
+          for(; aRef != aRefs.end(); aRef++) {
+            // to avoid detection of part changes by local selection only
+            AttributeSelectionPtr aSel =
+              std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRef);
+            if (aSel.get() && !aSel->value()->isSame(aSel->context()->shape()))
+              continue;
+
+            FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
+            if (aRefFeat.get() && aRefFeat != owner()) {
+              FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+              if (aDoc->objects()->isLater(aThisFeature, aRefFeat)) { // found better feature
+                aFoundNewContext = true;
+                aNewContext = aRefFeat->firstResult();
+              }
+            }
+          }
+        }
+      }
+    }
+    if (aNewContext != aContext) {
+      setValue(aNewContext, value());
+    }
     return;
-  std::shared_ptr<Model_Document> aDoc =
-    std::dynamic_pointer_cast<Model_Document>(aContext->document());
+  }
   FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
   FeaturePtr aCurrentModifierFeat = aDoc->feature(aContext);
   // iterate the context shape modifications in order to find a feature that is upper in history
