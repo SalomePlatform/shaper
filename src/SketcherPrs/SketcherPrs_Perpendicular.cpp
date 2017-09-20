@@ -78,14 +78,28 @@ bool SketcherPrs_Perpendicular::updateIfReadyToDisplay(double theStep, bool with
   std::shared_ptr<GeomAPI_Lin> aLin2 = aEdge2->line();
 
   std::shared_ptr<GeomAPI_Pnt> aPnt = aLin1->intersect(aLin2);
+  double aParam1 = aLin1->projParam(aPnt);
+  double aParam2 = aLin2->projParam(aPnt);
+
+  GeomAPI_Curve aCurve1(aShp1);
+  GeomAPI_Curve aCurve2(aShp2);
+  bool isInside1 = ((aParam1 - aCurve1.startParam()) >= -Precision::Confusion()) &&
+    ((aCurve1.endParam() - aParam1) >= Precision::Confusion());
+  bool isInside2 = ((aParam2 - aCurve2.startParam()) >= -Precision::Confusion()) &&
+    ((aCurve2.endParam() - aParam2) >= Precision::Confusion());
+
+  if (!(isInside1 && isInside2))
+    aPnt = std::shared_ptr<GeomAPI_Pnt>();
 
   // Compute position of symbols
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep, aPnt);
-  //gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);
-  myPntArray = new Graphic3d_ArrayOfPoints(1, withColor);
+  myPntArray = new Graphic3d_ArrayOfPoints(aPnt.get()? 1 : 2, withColor);
   myPntArray->AddVertex(aP1);
-  //myPntArray->AddVertex(aP2);
+  if (!aPnt.get()) {
+    gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);
+    myPntArray->AddVertex(aP2);
+  }
   return true;
 }
 

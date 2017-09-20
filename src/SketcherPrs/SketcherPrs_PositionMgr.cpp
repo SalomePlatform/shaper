@@ -27,6 +27,7 @@
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Ax3.h>
 #include <GeomAPI_Circ.h>
+#include <GeomAPI_Lin2d.h>
 
 #include <GeomDataAPI_Point2D.h>
 
@@ -324,9 +325,16 @@ std::list<ObjectPtr> getCurves(const GeomPointPtr& thePnt, const SketcherPrs_Sym
       GeomPnt2dPtr aPnt2 = aSPnt2->pnt();
 
       if (aPnt1->isEqual(aPnt2d) || aPnt2->isEqual(aPnt2d)) {
+        // a point corresponds to one of the line end
         GeomShapePtr aShp = SketcherPrs_Tools::getShape(aFeature->firstResult());
         GeomCurvePtr aCurv = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShp));
         aList.push_back(aFeature->firstResult());
+      } else {
+        // Check that a point belongs to the curve
+        GeomAPI_Lin2d aLin2d(aPnt1, aPnt2);
+        double aDist = aLin2d.distance(aPnt2d);
+        if (aDist <= Precision::Confusion())
+          aList.push_back(aFeature->firstResult());
       }
     } else if ((aFeature->getKind() == SketchPlugin_Circle::ID()) ||
               (aFeature->getKind() == SketchPlugin_Arc::ID())) {

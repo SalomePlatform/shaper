@@ -107,14 +107,21 @@ const std::shared_ptr<GeomAPI_Pnt> GeomAPI_Lin::intersect(
   new GeomAPI_Pnt(aResult.X(), aResult.Y(), aResult.Z()));
 }
 
+double GeomAPI_Lin::projParam(
+      const std::shared_ptr<GeomAPI_Pnt>& thePoint) const
+{
+  const gp_XYZ& aDir = MY_LIN->Direction().XYZ();
+  const gp_XYZ& aLoc = MY_LIN->Location().XYZ();
+  const gp_XYZ& aPnt = thePoint->impl<gp_Pnt>().XYZ();
+  return aDir.Dot(aPnt - aLoc);
+}
+
 const std::shared_ptr<GeomAPI_Pnt> GeomAPI_Lin::project(
     const std::shared_ptr<GeomAPI_Pnt>& thePoint) const
 {
   const gp_XYZ& aDir = MY_LIN->Direction().XYZ();
   const gp_XYZ& aLoc = MY_LIN->Location().XYZ();
-  const gp_XYZ& aPnt = thePoint->impl<gp_Pnt>().XYZ();
-  double aParam = aDir.Dot(aPnt - aLoc);
-
+  double aParam = projParam(thePoint);
   gp_XYZ aResult = aLoc + aDir * aParam;
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aResult.X(), aResult.Y(), aResult.Z()));
 }
