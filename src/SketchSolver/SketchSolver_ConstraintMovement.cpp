@@ -78,12 +78,14 @@ void SketchSolver_ConstraintMovement::process()
 static bool isSimpleMove(FeaturePtr theMovedFeature, AttributePtr theDraggedPoint)
 {
   bool isSimple = true;
+#ifdef CHANGE_RADIUS_WHILE_MOVE
   if (theMovedFeature->getKind() == SketchPlugin_Circle::ID())
     isSimple = (theDraggedPoint.get() != 0);
   else if (theMovedFeature->getKind() == SketchPlugin_Arc::ID()) {
     isSimple = (theDraggedPoint.get() != 0 &&
                 theDraggedPoint->id() == SketchPlugin_Arc::CENTER_ID());
   }
+#endif
   return isSimple;
 }
 
@@ -213,7 +215,11 @@ void SketchSolver_ConstraintMovement::moveTo(
   double aDelta[2] = { theDestinationPoint->x() - myStartPoint->x(),
                        theDestinationPoint->y() - myStartPoint->y() };
 
+#ifdef CHANGE_RADIUS_WHILE_MOVE
   int aMaxSize = mySimpleMove ? (int)myFixedValues.size() : 2;
+#else
+  int aMaxSize = myMovedFeature->getKind() == SketchPlugin_Line::ID() && !myDraggedPoint ? 4 : 2;
+#endif
   for (int i = 0; i < aMaxSize; ++i)
     myFixedValues[i] += aDelta[i % 2];
 }

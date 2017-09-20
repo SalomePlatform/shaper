@@ -212,11 +212,6 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestTrimCircleAndArc01.py
                TestTrimLine01.py
                TestTrimLine02.py
-               TestMovePoint.py
-               TestMoveLine.py
-               TestMoveCircle.py
-               TestMoveArc.py
-               TestMovementComplex.py
                TestDistanceSignedVsUnsigned01.py
                TestDistanceSignedVsUnsigned02.py
                TestDistanceSignedVsUnsigned03.py
@@ -225,3 +220,13 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestSignedDistancePointPoint.py
                TestSignedDistancePointLine.py
 )
+
+if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})
+  ADD_UNIT_TESTS(
+               TestMovePoint.py
+               TestMoveLine.py
+               TestMoveCircle.py
+               TestMoveArc.py
+               TestMovementComplex.py
+  )
+endif()
