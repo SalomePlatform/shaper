@@ -31,6 +31,7 @@
 
 #include <gp_Ax2.hxx>
 #include <gp_Circ.hxx>
+#include <gp_Elips.hxx>
 #include <Bnd_Box.hxx>
 #include <BRepBndLib.hxx>
 

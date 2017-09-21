@@ -36,6 +36,8 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Session.h>
 #include <Events_InfoMessage.h>
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_Vertex.h>
 
 #include <TNaming_Selector.hxx>
 #include <TNaming_NamedShape.hxx>
@@ -57,6 +59,9 @@
 #include <TDF_ChildIDIterator.hxx>
 #include <TopoDS_Iterator.hxx>
 #include <TDF_ChildIDIterator.hxx>
+#include <Geom_Circle.hxx>
+#include <Geom_Ellipse.hxx>
+#include <BRep_Builder.hxx>
 
 //#define DEB_NAMING 1
 #ifdef DEB_NAMING
@@ -298,7 +303,6 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
       TopoDS_Shape aSelShape = aSelection->Get();
       aResult = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
       aResult->setImpl(new TopoDS_Shape(aSelShape));
-      return aResult;
     } else { // for simple construction element: just shape of this construction element
       std::shared_ptr<Model_ResultConstruction> aConstr =
         std::dynamic_pointer_cast<Model_ResultConstruction>(context());
@@ -808,9 +812,9 @@ void Model_AttributeSelection::selectSubShape(
         const TopoDS_Shape aConShape = aCont->shape()->impl<TopoDS_Shape>();
         if (!aConShape.IsNull()) {
           Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aConShape, selectionLabel());
-          if (!aNS.IsNull() && scope().Contains(aNS->Label())) { // scope check is for 2228
+          if (!aNS.IsNull()) {
             aNS = TNaming_Tool::CurrentNamedShape(aNS);
-            if (!aNS.IsNull()) {
+            if (!aNS.IsNull() && scope().Contains(aNS->Label())) { // scope check is for 2228
               TDF_Label aLab = aNS->Label();
               while(aLab.Depth() != 7 && aLab.Depth() > 5)
                 aLab = aLab.Father();
