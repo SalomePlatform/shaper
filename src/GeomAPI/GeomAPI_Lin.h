@@ -68,6 +68,10 @@ class GeomAPI_Lin : public GeomAPI_Interface
   const std::shared_ptr<GeomAPI_Pnt> project(
       const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
 
+  /// Returns parameter of the point projection
+  GEOMAPI_EXPORT
+  double projParam(const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
+
   /// \return true if this line contains thePoint, that is,
   /// if the distance between thePoint and this line
   ///         is less than or equal to theLinearTolerance.
