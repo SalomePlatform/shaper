@@ -1541,6 +1541,9 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
                            const NCollection_DataMap<TopoDS_Shape,
                            NCollection_Map<Handle(AIS_InteractiveObject)>>& theShapesToBeSelected)
 {
+  NCollection_Map<Handle(AIS_InteractiveObject)> aCompsolidPresentations;
+  NCollection_Map<Handle(AIS_InteractiveObject)> aSelectedPresentations;
+
   NCollection_List<Handle(SelectBasics_EntityOwner)> anActiveOwners;
   theContext->MainSelector()->ActiveOwners(anActiveOwners);
   NCollection_List<Handle(SelectBasics_EntityOwner)>::Iterator anOwnersIt (anActiveOwners);
@@ -1564,26 +1567,46 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
       if (aShape.IsNull())
         continue;
 
+      Handle(ModuleBase_BRepOwner) aCustomOwner = Handle(ModuleBase_BRepOwner)::DownCast(anOwner);
+
       NCollection_DataMap<TopoDS_Shape, NCollection_Map<Handle(AIS_InteractiveObject)> >
                                              ::Iterator aShapeIt(theShapesToBeSelected);
       for (; aShapeIt.More(); aShapeIt.Next()) {
-        if (aShapeIt.Key().IsSame(aShape)) {
-          const TopoDS_Shape& aParameterShape = aShapeIt.Key();
-          // isSame should be used here as it does not check orientation of shapes
-          // despite on isEqual of shapes or IsBound for shape in QMap. Orientation is
-          // different for Edges shapes in model shape and owner even if this is the same shape
-          if (aParameterShape.IsSame(aShape)) {
-            Handle(AIS_InteractiveObject) anOwnerPresentation =
-                              Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
-            NCollection_Map<Handle(AIS_InteractiveObject)> aPresentations =
-                                        theShapesToBeSelected.Find(aParameterShape);
-            if (aPresentations.Contains(anOwnerPresentation)) {
-              theContext->AddOrRemoveSelected(anOwner);
-              anOwner->SetSelected (Standard_True);
-            }
+        const TopoDS_Shape& aParameterShape = aShapeIt.Key();
+        // isSame should be used here as it does not check orientation of shapes
+        // despite on isEqual of shapes or IsBound for shape in QMap. Orientation is
+        // different for Edges shapes in model shape and owner even if this is the same shape
+        if (aParameterShape.IsSame(aShape)) {
+          Handle(AIS_InteractiveObject) anOwnerPresentation =
+                            Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
+          NCollection_Map<Handle(AIS_InteractiveObject)> aPresentations =
+                                      theShapesToBeSelected.Find(aParameterShape);
+          if (aPresentations.Contains(anOwnerPresentation)) {
+            theContext->AddOrRemoveSelected(anOwner, Standard_False);
+            anOwner->SetSelected (Standard_True);
+            // collect selected presentations to do not select them if compsolid is selected
+            if (!aSelectedPresentations.Contains(anOwnerPresentation))
+              aSelectedPresentations.Add(anOwnerPresentation);
           }
+        }
+        else if (!aCustomOwner.IsNull()) { // CompSolid processing #2219
+          // shape of owner is compound, but shape to be selected is compsolid, so
+          // we need to compare shape to AIS presentation of owner(rule of the owner creation)
+          Handle(AIS_Shape) anOwnerPresentation =
+                            Handle(AIS_Shape)::DownCast(anOwner->Selectable());
+          const TopoDS_Shape& aPresentationShape = anOwnerPresentation->Shape();
+          if (aParameterShape.IsSame(anOwnerPresentation->Shape()) &&
+              !aCompsolidPresentations.Contains(anOwnerPresentation))
+            aCompsolidPresentations.Add(anOwnerPresentation);
         }
       }
     }
+  }
+  // select CompSolid presentations if their owners was not selected yet
+  NCollection_Map<Handle(AIS_InteractiveObject)>::Iterator anIt (aCompsolidPresentations);
+  for (; anIt.More(); anIt.Next()) {
+    if (aSelectedPresentations.Contains(anIt.Value()))
+      continue;
+    theContext->AddOrRemoveSelected(anIt.Value(), Standard_False);
   }
 }

@@ -113,7 +113,7 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   MODEL_EXPORT virtual std::list<std::shared_ptr<ModelAPI_Document> > allOpenedDocuments();
 
   /// Returns true if document is not loaded yet
-  MODEL_EXPORT virtual bool isLoadByDemand(const std::string theDocID);
+  MODEL_EXPORT virtual bool isLoadByDemand(const std::string theDocID, const int theDocIndex);
 
   /// Registers the plugin that creates features.
   /// It is obligatory for each plugin to call this function on loading to be found by

@@ -72,17 +72,24 @@ public:
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent)
   {
     bool isAccepted = false;
-    if (myIsActive && theEvent->type() == QEvent::KeyRelease) {
-      QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-      if (aKeyEvent) {
-        switch (aKeyEvent->key()) {
-          case Qt::Key_Delete:
-            isAccepted = myOperationMgr->onProcessDelete(theObject);
-          break;
-          default:
-            isAccepted = myOperationMgr->onKeyReleased(theObject, aKeyEvent);
+    if (myIsActive) {
+      if (theEvent->type() == QEvent::KeyRelease) {
+        QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
+        if (aKeyEvent) {
+          myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
+          switch (aKeyEvent->key()) {
+            case Qt::Key_Delete:
+              isAccepted = myOperationMgr->onProcessDelete(theObject);
             break;
+            default:
+              isAccepted = myOperationMgr->onKeyReleased(theObject, aKeyEvent);
+              break;
+          }
         }
+      }
+      else if (theEvent->type() == QEvent::KeyPress) {
+        QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
+        myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
       }
     }
     if (!isAccepted)
@@ -97,7 +104,7 @@ private:
 
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
                                      ModuleBase_IWorkshop* theWorkshop)
-: QObject(theParent), myWorkshop(theWorkshop)
+: QObject(theParent), myWorkshop(theWorkshop), mySHIFTPressed(false)
 {
   /// we need to install filter to the application in order to react to 'Delete' key button
   /// this key can not be a short cut for a corresponded action because we need to set
@@ -211,12 +218,7 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
   return isStarted;
 }
 
-void XGUI_OperationMgr::onAbortAllOperations()
-{
-  abortAllOperations();
-}
-
-bool XGUI_OperationMgr::abortAllOperations(const XGUI_MessageKind& theMessageKind)
+bool XGUI_OperationMgr::abortAllOperations()
 {
   bool aResult = true;
   if(!hasOperation())
@@ -224,29 +226,18 @@ bool XGUI_OperationMgr::abortAllOperations(const XGUI_MessageKind& theMessageKin
 
   if (operationsCount() == 1) {
     ModuleBase_Operation* aCurrentOperation = currentOperation();
-    if (canStopOperation(aCurrentOperation, theMessageKind)) {
+    if (canStopOperation(aCurrentOperation)) {
       abortOperation(aCurrentOperation);
     }
     else
       aResult = false;
   }
   else {
-    if (theMessageKind == XGUI_AbortOperationMessage) {
-      aResult = QMessageBox::question(qApp->activeWindow(),
-                                      tr("Abort operation"),
-                                      tr("All active operations will be aborted."),
-                                      QMessageBox::Ok | QMessageBox::Cancel,
-                                      QMessageBox::Cancel) == QMessageBox::Ok;
-    }
-    else if (theMessageKind == XGUI_InformationMessage) {
-      QString aMessage = tr("Please validate all your active operations before saving.");
-      QMessageBox::question(qApp->activeWindow(),
-                            tr("Validate operation"),
-                            aMessage,
-                            QMessageBox::Ok,
-                            QMessageBox::Ok);
-      aResult = false; // do not perform abort
-    }
+    aResult = QMessageBox::question(qApp->activeWindow(),
+                                    tr("Abort operation"),
+                                    tr("All active operations will be aborted."),
+                                    QMessageBox::Ok | QMessageBox::Cancel,
+                                    QMessageBox::Cancel) == QMessageBox::Ok;
     while(aResult && hasOperation()) {
       abortOperation(currentOperation());
     }
@@ -260,7 +251,7 @@ bool XGUI_OperationMgr::commitAllOperations()
   while (hasOperation()) {
     ModuleBase_Operation* anOperation = currentOperation();
     if (XGUI_Tools::workshop(myWorkshop)->errorMgr()->isApplyEnabled()) {
-      anOperationProcessed = commitOperation();
+      anOperationProcessed = onCommitOperation();
     } else {
       abortOperation(anOperation);
       anOperationProcessed = true;
@@ -314,33 +305,31 @@ void XGUI_OperationMgr::updateApplyOfOperations(ModuleBase_Operation* theOperati
   onValidateOperation();
 }
 
-bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation,
-                                         const XGUI_OperationMgr::XGUI_MessageKind& theMessageKind)
+bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation)
 {
   //in case of nested (sketch) operation no confirmation needed
   if (isGrantedOperation(theOperation->id()))
     return true;
   if (theOperation && theOperation->isModified()) {
-    if (theMessageKind == XGUI_AbortOperationMessage) {
-      QString aMessage = tr("%1 operation will be aborted.").arg(theOperation->id());
-      int anAnswer = QMessageBox::question(qApp->activeWindow(),
-                                           tr("Abort operation"),
-                                           aMessage,
-                                           QMessageBox::Ok | QMessageBox::Cancel,
-                                           QMessageBox::Cancel);
-      return anAnswer == QMessageBox::Ok;
-    }
-    else if (theMessageKind == XGUI_InformationMessage) {
-      QString aMessage = tr("Please validate your %1 before saving.").arg(theOperation->id());
-      QMessageBox::question(qApp->activeWindow(),
-                            tr("Validate operation"),
-                            aMessage,
-                            QMessageBox::Ok,
-                            QMessageBox::Ok);
-      return false;
-    }
+    QString aMessage = tr("%1 operation will be aborted.").arg(theOperation->id());
+    int anAnswer = QMessageBox::question(qApp->activeWindow(),
+                                         tr("Abort operation"),
+                                         aMessage,
+                                         QMessageBox::Ok | QMessageBox::Cancel,
+                                         QMessageBox::Cancel);
+    return anAnswer == QMessageBox::Ok;
   }
   return true;
+}
+
+bool XGUI_OperationMgr::commitOperation()
+{
+  //if (hasOperation() && currentOperation()->isValid()) {
+  //  onCommitOperation();
+  //  return true;
+  //}
+  //return false;
+  return onCommitOperation();
 }
 
 void XGUI_OperationMgr::resumeOperation(ModuleBase_Operation* theOperation)
@@ -440,7 +429,7 @@ void XGUI_OperationMgr::abortOperation(ModuleBase_Operation* theOperation)
   }
 }
 
-bool XGUI_OperationMgr::commitOperation()
+bool XGUI_OperationMgr::onCommitOperation()
 {
   bool isCommitted = false;
   ModuleBase_Operation* anOperation = currentOperation();

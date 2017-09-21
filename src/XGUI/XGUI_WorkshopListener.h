@@ -91,13 +91,6 @@ protected:
   /// \return true if the object is displayed
   bool displayObject(ObjectPtr theObj);
 
-  /// Answer if the viewer needed to be fit all after the object visualization
-  /// The condition is there is not shown objects and the object is a group or body result
-  /// \param theObject a shown object
-  /// \param theNbOfShownObjects a count of already shown objects in the viewer
-  /// \return true if fit all should be done
-  bool neededFitAll(ObjectPtr theObject, const int theNbOfShownObjects);
-
   /// Calls the module method of cusomize object for the feature of the current operation
   /// Perform cusomize if the force redisplay flag is true or the list of objects contains the
   /// current operation feature

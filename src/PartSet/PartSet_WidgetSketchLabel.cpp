@@ -542,9 +542,6 @@ void PartSet_WidgetSketchLabel::activateSelection(bool toActivate)
     QIntList aModes;
     std::shared_ptr<GeomAPI_Pln> aPlane = plane();
     if (aPlane.get()) {
-      //QList<std::shared_ptr<ModuleBase_ViewerPrs>> aEdges = findCircularEdgesInPlane();
-      //foreach(std::shared_ptr<ModuleBase_ViewerPrs> aPrs, aEdges) {
-      //}
       myWorkshop->module()->activeSelectionModes(aModes);
     }
     else {

@@ -101,7 +101,8 @@ void FeaturesPlugin_Boolean::execute()
     }
     ResultPtr aContext = anObjectAttr->context();
     ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
-    if(aResCompSolidPtr.get()) {
+    if(aResCompSolidPtr.get()
+        && aResCompSolidPtr->shape()->shapeType() == GeomAPI_Shape::COMPSOLID) {
       std::shared_ptr<GeomAPI_Shape> aContextShape = aResCompSolidPtr->shape();
       std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator
         anIt = aCompSolidsObjects.begin();
@@ -629,7 +630,7 @@ void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
 {
   //load result
   if(theBaseShape->isEqual(theResultShape)) {
-    theResultBody->store(theResultShape);
+    theResultBody->store(theResultShape, false);
   } else {
     const int aModifyTag = 1;
     const int aDeletedTag = 2;
@@ -644,7 +645,7 @@ void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
     const std::string aModFName = "Modified_Face";
 
     theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE,
-                                               aModifyTag, aModName, theMapOfShapes);
+      aModifyTag, aModName, theMapOfShapes, false, false, true);
     theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape,
                                      GeomAPI_Shape::FACE, aDeletedTag);
 
@@ -665,7 +666,7 @@ void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
       }
       theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter,
         aName == aModEName ? GeomAPI_Shape::EDGE : GeomAPI_Shape::FACE,
-        aTag, aName, theMapOfShapes);
+        aTag, aName, theMapOfShapes, false, false, true);
       theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
     }
   }

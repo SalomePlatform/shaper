@@ -31,6 +31,7 @@
 #include <TopoDS.hxx>
 #include <TopoDS_Face.hxx>
 #include <TDF_ChildIterator.hxx>
+#include <TDF_ChildIDIterator.hxx>
 #include <TDF_Reference.hxx>
 #include <TopTools_MapOfShape.hxx>
 #include <TopExp_Explorer.hxx>
@@ -251,9 +252,18 @@ void  Model_BodyBuilder::storeWithoutNaming(const std::shared_ptr<GeomAPI_Shape>
 
 void Model_BodyBuilder::clean()
 {
-  std::vector<TNaming_Builder*>::iterator aBuilder = myBuilders.begin();
-  for(; aBuilder != myBuilders.end(); aBuilder++)
-    delete *aBuilder;
+  TDF_Label aLab = std::dynamic_pointer_cast<Model_Data>(data())->shapeLab();
+  if (aLab.IsNull())
+    return;
+  std::map<int, TNaming_Builder*>::iterator aBuilder = myBuilders.begin();
+  for(; aBuilder != myBuilders.end(); aBuilder++) {
+    delete aBuilder->second;
+    // clear also shapes on cleaned sub-labels (#2241)
+    Handle(TNaming_NamedShape) aNS;
+    if (aLab.FindChild(aBuilder->first).FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+      aNS->Clear();
+    }
+  }
   myBuilders.clear();
 }
 
@@ -264,17 +274,13 @@ Model_BodyBuilder::~Model_BodyBuilder()
 
 TNaming_Builder* Model_BodyBuilder::builder(const int theTag)
 {
-  if (myBuilders.size() <= (unsigned int)theTag) {
-    myBuilders.insert(myBuilders.end(), theTag - myBuilders.size() + 1, NULL);
-  }
-  if (!myBuilders[theTag]) {
+  std::map<int, TNaming_Builder*>::iterator aFind = myBuilders.find(theTag);
+  if (aFind == myBuilders.end()) {
     std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
     myBuilders[theTag] = new TNaming_Builder(aData->shapeLab().FindChild(theTag));
-    //TCollection_AsciiString entry;//
-    //TDF_Tool::Entry(aData->shapeLab().FindChild(theTag), entry);
-    //cout << "Label = " <<entry.ToCString() <<endl;
+    aFind = myBuilders.find(theTag);
   }
-  return myBuilders[theTag];
+  return aFind->second;
 }
 
 void Model_BodyBuilder::buildName(const int theTag, const std::string& theName)
@@ -377,6 +383,8 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
   for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
+    if (TNaming_Tool::NamedShape(aRoot, builder(theTag)->NamedShape()->Label()).IsNull())
+      continue; // there is no sence to write history is old shape does not persented in document
     ListOfShape aList;
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
@@ -431,6 +439,8 @@ void Model_BodyBuilder::loadAndOrientGeneratedShapes (
   for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
+    if (TNaming_Tool::NamedShape(aRoot, builder(theTag)->NamedShape()->Label()).IsNull())
+      continue; // there is no sence to write history is old shape does not persented in document
     ListOfShape aList;
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));

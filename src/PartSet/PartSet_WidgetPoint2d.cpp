@@ -593,7 +593,6 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
   if (!aFirstValue.get() && myPreSelected.get()) {
     aFirstValue = myPreSelected;
   }
-
   // if we have selection and use it
   if (aFirstValue.get() && isValidSelectionCustom(aFirstValue) &&
       aFirstValue->shape().get()) { /// Trihedron Axis may be selected, but shape is empty

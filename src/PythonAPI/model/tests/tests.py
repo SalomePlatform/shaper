@@ -23,6 +23,9 @@ from GeomAPI import *
 from GeomDataAPI import *
 from ModelAPI import ModelAPI_Feature
 import math
+from salome.shaper.model import sketcher
+
+TOLERANCE = 1.e-7
 
 aShapeTypes = {
   GeomAPI_Shape.SOLID:  "GeomAPI_Shape.SOLID",
@@ -133,12 +136,45 @@ def testHaveNamingFaces(theFeature, theModel, thePartDoc) :
   """ Tests if all faces of result have a name
   :param theFeature: feature to test.
   """
+  # open transaction since all the checking are performed in tests after model.end() call
+  theModel.begin()
   # Get feature result/sub-result
   aResult = theFeature.results()[0].resultSubShapePair()[0]
   # Get result/sub-result shape
   shape = aResult.shape()
   # Create shape explorer with desired shape type
   shapeExplorer = GeomAPI_ShapeExplorer(shape, GeomAPI_Shape.FACE)
+  # Create list, and store selections in it
+  selectionList = []
+  while shapeExplorer.more():
+    selection = theModel.selection(aResult, shapeExplorer.current()) # First argument should be result/sub-result, second is sub-shape on this result/sub-result
+    selectionList.append(selection)
+    shapeExplorer.next()
+  # Create group with this selection list
+  Group_1 = theModel.addGroup(thePartDoc, selectionList)
+  theModel.end()
+
+  # Now you can check that all selected shapes in group have right shape type and name.
+  groupFeature = Group_1.feature()
+  groupSelectionList = groupFeature.selectionList("group_list")
+  assert(groupSelectionList.size() == len(selectionList))
+  for index in range(0, groupSelectionList.size()):
+    attrSelection = groupSelectionList.value(index)
+    shape = attrSelection.value()
+    name = attrSelection.namingName()
+    assert(shape.isFace())
+    assert(name != ""), "String empty"
+
+def testHaveNamingEdges(theFeature, theModel, thePartDoc) :
+  """ Tests if all faces of result have a name
+  :param theFeature: feature to test.
+  """
+  # Get feature result/sub-result
+  aResult = theFeature.results()[0].resultSubShapePair()[0]
+  # Get result/sub-result shape
+  shape = aResult.shape()
+  # Create shape explorer with desired shape type
+  shapeExplorer = GeomAPI_ShapeExplorer(shape, GeomAPI_Shape.EDGE)
   # Create list, and store selections in it
   selectionList = []
   while shapeExplorer.more():
@@ -159,8 +195,9 @@ def testHaveNamingFaces(theFeature, theModel, thePartDoc) :
     attrSelection = groupSelectionList.value(index)
     shape = attrSelection.value()
     name = attrSelection.namingName()
-    assert(shape.isFace())
+    assert(shape.isEdge())
     assert(name != ""), "String empty"
+
 
 def testNbSubFeatures(theComposite, theKindOfSub, theExpectedCount):
   """ Tests number of sub-features of the given type
@@ -174,3 +211,15 @@ def testNbSubFeatures(theComposite, theKindOfSub, theExpectedCount):
     if aFeature is not None and aFeature.getKind() == theKindOfSub:
        count += 1
   assert (count == theExpectedCount), "Number of sub-features of type {}: {}, expected {}".format(theKindOfSub, count, theExpectedCount)
+
+def assertSketchArc(theArcFeature):
+  """ Tests whether the arc is correctly defined
+  """
+  aCenterPnt = geomDataAPI_Point2D(theArcFeature.attribute("center_point"))
+  aStartPnt = geomDataAPI_Point2D(theArcFeature.attribute("start_point"))
+  aEndPnt = geomDataAPI_Point2D(theArcFeature.attribute("end_point"))
+  aRadius = theArcFeature.real("radius")
+  aDistCS = sketcher.tools.distancePointPoint(aCenterPnt, aStartPnt)
+  aDistCE = sketcher.tools.distancePointPoint(aCenterPnt, aEndPnt)
+  assert math.fabs(aDistCS - aDistCE) < TOLERANCE, "Wrong arc: center-start distance {}, center-end distance {}".format(aDistCS, aDistCE)
+  assert math.fabs(aRadius.value() -aDistCS) < TOLERANCE, "Wrong arc: radius is {0}, expected {1}".format(aRadius.value(), aDistCS)

@@ -170,7 +170,7 @@ void FeaturesPlugin_Partition::storeResult(
 
   // Store modified shape.
   if(!aBaseShape.get() || aBaseShape->isEqual(theResultShape)) {
-    aResultBody->store(theResultShape);
+    aResultBody->store(theResultShape, false);
     setResult(aResultBody, theIndex);
     return;
   }
@@ -189,14 +189,11 @@ void FeaturesPlugin_Partition::storeResult(
   for(ListOfShape::const_iterator anIt = theObjects.cbegin(); anIt != theObjects.cend(); ++anIt) {
     GeomShapePtr aShape = *anIt;
     std::string aModEdgeName = aModName + "_Edge_" + std::to_string((long long)anIndex);
-    std::string aModFaceName = aModName + "_Face_" + std::to_string((long long)anIndex++);
     aResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), aShape, GeomAPI_Shape::EDGE,
-                                             aModTag, aModEdgeName, *aMapOfSubShapes.get(), true);
-    aModTag += 10000;
+      aModTag, aModEdgeName, *aMapOfSubShapes.get(), false, true, true);
+    std::string aModFaceName = aModName + "_Face_" + std::to_string((long long)anIndex++);
     aResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), aShape, GeomAPI_Shape::FACE,
-                                             aModTag, aModFaceName, *aMapOfSubShapes.get(), true);
-    aModTag += 10000;
-    aResultBody->loadDeletedShapes(theMakeShape.get(), aShape, GeomAPI_Shape::EDGE, aDelTag);
+      aModTag + 1, aModFaceName, *aMapOfSubShapes.get(), false, true, true);
     aResultBody->loadDeletedShapes(theMakeShape.get(), aShape, GeomAPI_Shape::FACE, aDelTag);
   }
 

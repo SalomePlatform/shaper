@@ -255,6 +255,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_CollinearSelection", new PartSet_CollinearSelection);
   aFactory->registerValidator("PartSet_MiddlePointSelection", new PartSet_MiddlePointSelection);
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
+  aFactory->registerValidator("PartSet_DifferentPoints", new PartSet_DifferentPointsValidator);
   aFactory->registerValidator("PartSet_CoincidentAttr", new PartSet_CoincidentAttr);
   aFactory->registerValidator("PartSet_MultyTranslationSelection",
     new PartSet_MultyTranslationSelection);

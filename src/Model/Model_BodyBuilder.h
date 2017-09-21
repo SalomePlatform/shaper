@@ -36,9 +36,9 @@ class TNaming_Builder;
  */
 class Model_BodyBuilder : public ModelAPI_BodyBuilder
 {
-  /// builders that tores the naming history: one per label to allow store several shapes to one
+  /// builders that store the naming history: one per label to allow store several shapes to one
   /// label; index in vector corresponds to the label tag
-  std::vector<TNaming_Builder*> myBuilders;
+  std::map<int, TNaming_Builder*> myBuilders;
 public:
   /// Stores the shape (called by the execution method).
   MODEL_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape,

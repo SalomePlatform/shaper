@@ -72,6 +72,7 @@ SET(PROJECT_LIBRARIES
     ${OCCViewer}
     ${qtx}
     ${CAS_SHAPE}
+    ${SalomeObject}
 )
 
 ADD_DEFINITIONS( -DSHAPERGUI_EXPORTS ${CAS_DEFINITIONS} )

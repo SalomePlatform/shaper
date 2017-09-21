@@ -57,6 +57,15 @@ public:
   MODEL_EXPORT virtual void storeModified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
     const std::shared_ptr<GeomAPI_Shape>& theNewShape, const int theDecomposeSolidsTag = 0);
 
+  /// load and orient modified shapes for sub-objects
+  MODEL_EXPORT virtual void loadAndOrientModifiedShapes (GeomAlgoAPI_MakeShape* theMS,
+    std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
+    const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes,
+    const bool theIsStoreSeparate = false,
+    const bool theIsStoreAsGenerated = false,
+    const bool theSplitInSubs = false);
+
+
   /// Returns the number of sub-elements
   MODEL_EXPORT virtual int numberOfSubs(bool forTree = false) const;
 

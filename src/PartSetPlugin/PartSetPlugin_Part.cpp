@@ -42,7 +42,9 @@ void PartSetPlugin_Part::execute()
     setResult(aResult);
     // do not activate part by simple execution if it is not loaded yet: it must be explicitly
     // activated for this
-    if (!ModelAPI_Session::get()->isLoadByDemand(aResult->data()->name())) {
+    std::shared_ptr<ModelAPI_AttributeDocRef> aDocRef =
+      aResult->data()->document(ModelAPI_ResultPart::DOC_REF());
+    if (!ModelAPI_Session::get()->isLoadByDemand(aResult->data()->name(), aDocRef->docId())) {
       // On undo/redo creation of the part result the Object Browser must get creation event
       // earlier that activation of this part event (otherwise the crash is produced)
       // So, send a creation event earlier, without any grouping

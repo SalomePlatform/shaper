@@ -136,9 +136,10 @@ void Model_Application::setLoadByDemand(std::string theID, const int theDocID)
 }
 
 //=======================================================================
-bool Model_Application::isLoadByDemand(std::string theID)
+bool Model_Application::isLoadByDemand(std::string theID, const int theDocIndex)
 {
-  return myLoadedByDemand.find(theID) != myLoadedByDemand.end();
+  return myLoadedByDemand.find(theID) != myLoadedByDemand.end() &&
+    myLoadedByDemand[theID] == theDocIndex;
 }
 
 //=======================================================================

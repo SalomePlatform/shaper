@@ -34,6 +34,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintDistanceHorizontal.h
     SketchPlugin_ConstraintDistanceVertical.h
     SketchPlugin_ConstraintEqual.h
+    SketchPlugin_Fillet.h
     SketchPlugin_ConstraintHorizontal.h
     SketchPlugin_ConstraintLength.h
     SketchPlugin_ConstraintMiddle.h
@@ -47,7 +48,6 @@ SET(PROJECT_HEADERS
     SketchPlugin_Ellipse.h
     SketchPlugin_ExternalValidator.h
     SketchPlugin_Feature.h
-    SketchPlugin_Fillet.h
     SketchPlugin_IntersectionPoint.h
     SketchPlugin_Line.h
     SketchPlugin_MacroArc.h
@@ -79,6 +79,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintDistanceHorizontal.cpp
     SketchPlugin_ConstraintDistanceVertical.cpp
     SketchPlugin_ConstraintEqual.cpp
+    SketchPlugin_Fillet.cpp
     SketchPlugin_ConstraintHorizontal.cpp
     SketchPlugin_ConstraintLength.cpp
     SketchPlugin_ConstraintMiddle.cpp
@@ -92,7 +93,6 @@ SET(PROJECT_SOURCES
     SketchPlugin_Ellipse.cpp
     SketchPlugin_ExternalValidator.cpp
     SketchPlugin_Feature.cpp
-    SketchPlugin_Fillet.cpp
     SketchPlugin_IntersectionPoint.cpp
     SketchPlugin_Line.cpp
     SketchPlugin_MacroArc.cpp
@@ -212,6 +212,8 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestTrimCircleAndArc01.py
                TestTrimLine01.py
                TestTrimLine02.py
+               Test2229.py
+               Test2239.py
                TestDistanceSignedVsUnsigned01.py
                TestDistanceSignedVsUnsigned02.py
                TestDistanceSignedVsUnsigned03.py

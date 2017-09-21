@@ -62,7 +62,7 @@ void Model_ResultPart::initAttributes()
 
 std::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
 {
-  if (myTrsf.get() && baseRef().get()) { // the second condition is to to #2035
+  if (myTrsf.get() && baseRef().get()) { // the second condition is due to #2035
     return baseRef()->partDoc();
   }
   DocumentPtr aRes = data()->document(DOC_REF())->value();
@@ -92,8 +92,8 @@ void Model_ResultPart::activate()
   }
   if (!aDocRef->value().get()) {  // create (or open) a document if it is not yet created
     Handle(Model_Application) anApp = Model_Application::getApplication();
-    if (anApp->isLoadByDemand(data()->name())) {
-      anApp->loadDocument(data()->name(), aDocRef->docId()); // if it is just ne part, load may fail
+    if (anApp->isLoadByDemand(data()->name(), aDocRef->docId())) {
+      anApp->loadDocument(data()->name(), aDocRef->docId()); // if it is just new part, load fails
     } else {
       anApp->createDocument(aDocRef->docId());
     }
@@ -113,7 +113,7 @@ void Model_ResultPart::activate()
 
 std::shared_ptr<ModelAPI_ResultPart> Model_ResultPart::original()
 {
-  if (myTrsf.get() && baseRef().get()) {  // the second condition is to to #2035
+  if (myTrsf.get() && baseRef().get()) {  // the second condition is due to #2035
     return baseRef()->original();
   }
   return std::dynamic_pointer_cast<ModelAPI_ResultPart>(data()->owner());

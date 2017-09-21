@@ -64,9 +64,10 @@ protected:
 
   /** \brief Adds or updates a constraint or an entity in the suitable group
    *  \param[in] theFeature sketch feature to be changed
+   *  \param[in] theMoved   \c true if the feature has been moved in the viewer
    *  \return \c true if the feature changed successfully
    */
-  bool updateFeature(const std::shared_ptr<SketchPlugin_Feature>& theFeature);
+  bool updateFeature(std::shared_ptr<SketchPlugin_Feature> theFeature, bool theMoved = false);
 
   /** \brief Move feature
    *  \param[in] theMovedFeature dragged sketch feature

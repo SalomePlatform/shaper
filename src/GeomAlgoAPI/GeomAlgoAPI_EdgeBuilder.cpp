@@ -19,21 +19,20 @@
 //
 
 #include <GeomAlgoAPI_EdgeBuilder.h>
-
-#include <Bnd_Box.hxx>
-#include <BRep_Tool.hxx>
-#include <BRepBndLib.hxx>
-#include <BRepBuilderAPI_MakeEdge.hxx>
-#include <gp_Ax2.hxx>
-#include <gp_Circ.hxx>
-#include <gp_Elips.hxx>
 #include <gp_Pln.hxx>
-#include <Geom_CylindricalSurface.hxx>
-#include <Geom_Plane.hxx>
-#include <Geom_RectangularTrimmedSurface.hxx>
-#include <TopoDS.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
+#include <TopoDS.hxx>
+#include <BRep_Tool.hxx>
+#include <Geom_Plane.hxx>
+#include <Geom_CylindricalSurface.hxx>
+#include <Geom_RectangularTrimmedSurface.hxx>
+
+#include <gp_Ax2.hxx>
+#include <gp_Circ.hxx>
+#include <Bnd_Box.hxx>
+#include <BRepBndLib.hxx>
 
 std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
     std::shared_ptr<GeomAPI_Pnt> theStart, std::shared_ptr<GeomAPI_Pnt> theEnd)
@@ -199,7 +198,7 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
 
   /// OCCT creates an edge on a circle with empty radius, but visualization
   /// is not able to process it
-  if (theCenter->isEqual(theStartPoint))
+  if (theCenter->isEqual(theStartPoint) || theCenter->isEqual(theEndPoint))
     return aRes;
 
   double aRadius = theCenter->distance(theStartPoint);

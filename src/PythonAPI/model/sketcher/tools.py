@@ -19,9 +19,7 @@
 ##
 
 import ModelHighAPI
-from GeomDataAPI import *
-from ModelAPI import *
-import math
+import GeomDataAPI
 
 def addPolyline(sketch, *coords):
     """Add a poly-line to sketch.
@@ -71,9 +69,13 @@ def dof(sketch):
     return int(filter(str.isdigit, aSketch.string("SolverDOF").value()))
 
 def distancePointPoint(thePoint1, thePoint2):
-    aPnt1 = toList(thePoint1)
-    aPnt2 = toList(thePoint2)
-    return math.hypot(aPnt1[0] - aPnt2[0], aPnt1[1] - aPnt2[1])
+    aGeomPnt1 = thePoint1
+    aGeomPnt2 = thePoint2
+    if issubclass(type(thePoint1), GeomDataAPI.GeomDataAPI_Point2D):
+        aGeomPnt1 = thePoint1.pnt()
+    if issubclass(type(thePoint2), GeomDataAPI.GeomDataAPI_Point2D):
+        aGeomPnt2 = thePoint2.pnt()
+    return aGeomPnt1.distance(aGeomPnt2)
 
 def signedDistancePointLine(thePoint, theLine):
     aPoint = toList(thePoint)
@@ -93,26 +95,7 @@ def lastSubFeature(theSketch, theKind):
     """
     obtains last feature of given kind from the sketch
     """
-    aSketch = featureToCompositeFeature(toSketchFeature(theSketch))
-    for anIndex in range(aSketch.numberOfSubs() - 1, -1, -1):
-        aSub = aSketch.subFeature(anIndex)
+    for anIndex in range(theSketch.numberOfSubs() - 1, -1, -1):
+        aSub = theSketch.subFeature(anIndex)
         if (aSub.getKind() == theKind):
             return aSub
-
-def toSketchFeature(theEntity):
-    """ Converts entity to sketch feature if possible
-    """
-    if issubclass(type(theEntity), ModelHighAPI.ModelHighAPI_Interface):
-        return theEntity.feature()
-    else:
-        return theEntity
-
-def toList(thePoint):
-    if issubclass(type(thePoint), list):
-        return thePoint
-    elif issubclass(type(thePoint), GeomDataAPI_Point2D):
-        return [thePoint.x(), thePoint.y()]
-    else:
-        aFeature = toSketchFeature(thePoint)
-        aPoint = geomDataAPI_Point2D(aFeature.attribute("PointCoordinates"))
-        return [aPoint.x(), aPoint.y()]
