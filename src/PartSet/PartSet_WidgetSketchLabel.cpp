@@ -272,8 +272,28 @@ bool PartSet_WidgetSketchLabel::setSelectionInternal(
 
 void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrsPtr& thePrs)
 {
-  // 1. hide main planes if they have been displayed
+  // 1. hide main planes if they have been displayed and display sketch preview plane
   myPreviewPlanes->erasePreviewPlanes(myWorkshop);
+
+  PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+  if (aModule) {
+    // if selected object is a shape of another sketch, the origin of selected shape does not stored
+    // in argument, so we need to find parameters of selected shape on the sketch
+    if (thePrs->object() && (feature() != thePrs->object())) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(thePrs->object());
+      if (aFeature.get() && (aFeature != feature())) {
+        if (aFeature->getKind() == SketchPlugin_Sketch::ID()) {
+          CompositeFeaturePtr aSketch =
+            std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+          std::shared_ptr<GeomAPI_Pln> aPlane = PartSet_Tools::sketchPlane(aSketch);
+          if (aPlane.get())
+            aModule->sketchMgr()->previewSketchPlane()->setOtherSketchParameters(thePrs->shape());
+        }
+      }
+    }
+    CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+    aModule->sketchMgr()->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
+  }
   // 2. if the planes were displayed, change the view projection
   const GeomShapePtr& aShape = thePrs->shape();
   std::shared_ptr<GeomAPI_Shape> aGShape;

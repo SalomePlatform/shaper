@@ -406,20 +406,6 @@ void ModuleBase_ModelWidget::updateObject(ObjectPtr theObject)
   }
 }
 
-void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj)
-{
-  //blockUpdateViewer(true);
-#ifdef DEBUG_WIDGET_INSTANCE
-  qDebug("ModuleBase_ModelWidget::moveObject");
-#endif
-
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
-  ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);
-  Events_Loop::loop()->flush(anEvent);
-
-  //blockUpdateViewer(false);
-}
-
 bool ModuleBase_ModelWidget::processEnter()
 {
   return false;

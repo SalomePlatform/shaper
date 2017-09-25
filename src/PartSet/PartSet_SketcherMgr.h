@@ -25,6 +25,7 @@
 
 #include "PartSet_Filters.h"
 #include "PartSet_Tools.h"
+#include "PartSet_PreviewSketchPlane.h"
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Attribute.h>
@@ -170,6 +171,10 @@ public:
 
   /// Returns current Sketch feature/ Returns NULL if there is no launched sketch operation
   CompositeFeaturePtr activeSketch() const { return myCurrentSketch; }
+
+  /// Returns help class to visualize sketcher plane
+  /// \return a preview plane
+  PartSet_PreviewSketchPlane* previewSketchPlane() const { return mySketchPlane; }
 
   /// Starts sketch operation
   void startSketch(ModuleBase_Operation* );
@@ -413,6 +418,7 @@ private:
 
 private:
   PartSet_Module* myModule;
+  PartSet_PreviewSketchPlane* mySketchPlane; // display/erase sketch plane on start/stop sketch operation
 
   bool myPreviousDrawModeEnabled; // the previous selection enabled state in the viewer
   bool myIsEditLaunching;

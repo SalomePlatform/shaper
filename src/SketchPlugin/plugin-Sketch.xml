@@ -734,6 +734,15 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <doublevalue_editor label="Value" tooltip="Length" id="ConstraintValue" default="computed">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
+        <module_choice id="LocationType"
+          widget_type="radiobuttons"
+          buttons_dir="horizontal"
+          label="Location type"
+          tooltip="Type of location"
+          string_list="Left Automatic Right"
+          icons_list="icons/Sketch/location_left.png icons/Sketch/location_automatic.png icons/Sketch/location_right.png"
+          default="1"
+          />
         <validator id="PartSet_LengthSelection"/>
       </feature>
 

@@ -1071,13 +1071,13 @@ Handle(SelectMgr_AndFilter) XGUI_Displayer::GetFilter()
 }
 
 bool XGUI_Displayer::displayAIS(AISObjectPtr theAIS, const bool toActivateInSelectionModes,
-                                bool theUpdateViewer)
+                                const Standard_Integer theDisplayMode, bool theUpdateViewer)
 {
   bool aDisplayed = false;
   Handle(AIS_InteractiveContext) aContext = AISContext();
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!aContext.IsNull() && !anAISIO.IsNull()) {
-    aContext->Display(anAISIO, 0/*wireframe*/, 0, false/*update viewer*/, true, AIS_DS_Displayed);
+    aContext->Display(anAISIO, theDisplayMode, 0, false/*update viewer*/, true, AIS_DS_Displayed);
     #ifdef TINSPECTOR
     if (getCallBack()) getCallBack()->Display(anAISIO);
     #endif

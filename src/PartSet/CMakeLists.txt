@@ -41,12 +41,12 @@ SET(PROJECT_HEADERS
     PartSet_OperationPrs.h
     PartSet_OverconstraintListener.h
     PartSet_PreviewPlanes.h
+    PartSet_PreviewSketchPlane.h
     PartSet_ResultSketchPrs.h
     PartSet_SketcherMgr.h
     PartSet_SketcherReentrantMgr.h
     PartSet_Tools.h
     PartSet_Validators.h
-    PartSet_WidgetChoice.h
     PartSet_WidgetEditor.h
     PartSet_WidgetFeaturePointSelector.h
     PartSet_WidgetFileSelector.h
@@ -66,7 +66,6 @@ SET(PROJECT_MOC_HEADERS
     PartSet_Module.h
     PartSet_SketcherMgr.h
     PartSet_SketcherReentrantMgr.h
-    PartSet_WidgetChoice.h
     PartSet_WidgetEditor.h
     PartSet_WidgetFeaturePointSelector.h
     PartSet_WidgetFileSelector.h
@@ -90,6 +89,7 @@ SET(PROJECT_SOURCES
     PartSet_OperationPrs.cpp
     PartSet_OverconstraintListener.cpp
     PartSet_PreviewPlanes.cpp
+    PartSet_PreviewSketchPlane.cpp
     PartSet_ResultSketchPrs.cpp
     PartSet_SketcherMgr.cpp
     PartSet_SketcherReentrantMgr.cpp

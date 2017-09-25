@@ -39,6 +39,7 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 
 #include <AIS_DisplaySpecialSymbol.hxx>
 
@@ -64,21 +65,30 @@ Handle(Prs3d_DimensionAspect) createDimensionAspect()
 /// \param theDimValue an arrow value
 /// \param theTextSize an arrow value
 void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
-                  double theDimValue, double theTextSize)
+  double theDimValue, double theTextSize, SketcherPrs_Tools::LocationType theLocationType)
 {
-  double anArrowLength = theDimAspect->ArrowAspect()->Length();
-   // This is not realy correct way to get viewer scale.
-  double aViewerScale = (double) SketcherPrs_Tools::getDefaultArrowSize() / anArrowLength;
+  if (theLocationType == SketcherPrs_Tools::LOCATION_AUTOMATIC) {
+    double anArrowLength = theDimAspect->ArrowAspect()->Length();
+     // This is not realy correct way to get viewer scale.
+    double aViewerScale = (double) SketcherPrs_Tools::getDefaultArrowSize() / anArrowLength;
 
-  if(theTextSize > ((theDimValue - 3 * SketcherPrs_Tools::getArrowSize()) * aViewerScale)) {
-    theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Left);
-    theDimAspect->SetArrowOrientation(Prs3d_DAO_External);
-    theDimAspect->SetExtensionSize(
-      (theTextSize / aViewerScale + SketcherPrs_Tools::getArrowSize()) / 2.0);
-  } else {
-    theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Center);
-    theDimAspect->SetArrowOrientation(Prs3d_DAO_Internal);
+    if(theTextSize > ((theDimValue - 3 * SketcherPrs_Tools::getArrowSize()) * aViewerScale)) {
+      theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Left);
+      theDimAspect->SetArrowOrientation(Prs3d_DAO_External);
+      theDimAspect->SetExtensionSize(
+        (theTextSize / aViewerScale + SketcherPrs_Tools::getArrowSize()) / 2.0);
+    } else {
+      theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Center);
+      theDimAspect->SetArrowOrientation(Prs3d_DAO_Internal);
+    }
   }
+  else if (theLocationType == SketcherPrs_Tools::LOCATION_RIGHT ||
+           theLocationType == SketcherPrs_Tools::LOCATION_LEFT) {
+    theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Left);
+    //theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Right);
+    theDimAspect->SetArrowOrientation(Prs3d_DAO_External);
+  }
+
   theDimAspect->SetArrowTailSize(theDimAspect->ArrowAspect()->Length());
   // The value of vertical aligment is sometimes changed
   theDimAspect->TextAspect()->SetVerticalJustification(Graphic3d_VTA_CENTER);
@@ -152,7 +162,17 @@ void SketcherPrs_LengthDimension::Compute(
   double aTextSize = 0.0;
   GetValueString(aTextSize);
 
-  updateArrows(DimensionAspect(), GetValue(), aTextSize);
+  SketcherPrs_Tools::LocationType aLocationType = SketcherPrs_Tools::LOCATION_AUTOMATIC;
+  std::string aLocationAttribute;
+  if (myConstraint->getKind() == SketchPlugin_ConstraintLength::ID())
+    aLocationAttribute = SketchPlugin_ConstraintLength::LOCATION_TYPE_ID();
+  if (!aLocationAttribute.empty())
+  {
+    std::shared_ptr<ModelAPI_AttributeInteger> aTypeAttr = std::dynamic_pointer_cast<
+      ModelAPI_AttributeInteger>(myConstraint->data()->attribute(aLocationAttribute));
+    aLocationType = (SketcherPrs_Tools::LocationType)(aTypeAttr->value());
+  }
+  updateArrows(DimensionAspect(), GetValue(), aTextSize, aLocationType);
 
   // Update text visualization: parameter value or parameter text
   myStyleListener->updateDimensions(this, myValue);

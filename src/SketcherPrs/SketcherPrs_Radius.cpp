@@ -44,7 +44,7 @@ extern Handle(Prs3d_DimensionAspect) createDimensionAspect();
 /// \param theDimValue an arrow value
 /// \param theTextSize an arrow value
 extern void updateArrows(Handle_Prs3d_DimensionAspect theDimAspect,
-                         double theDimValue, double theTextSize);
+  double theDimValue, double theTextSize, SketcherPrs_Tools::LocationType theLocationType);
 
 
 static const gp_Circ MyDefCirc(gp_Ax2(gp_Pnt(0,0,0), gp_Dir(0,0,1)), 1);
@@ -163,7 +163,7 @@ void SketcherPrs_Radius::Compute(
   // Update variable aspect parameters (depending on viewer scale)
   double aTextSize = 0.0;
   GetValueString(aTextSize);
-  updateArrows(DimensionAspect(), GetValue(), aTextSize);
+  updateArrows(DimensionAspect(), GetValue(), aTextSize, SketcherPrs_Tools::LOCATION_AUTOMATIC);
 
 
   AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);

@@ -70,6 +70,7 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
+#include <SketchPlugin_Projection.h>
 
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -331,26 +332,54 @@ ResultPtr PartSet_Tools::findFixedObjectByExternal(const TopoDS_Shape& theShape,
                                                    const ObjectPtr& theObject,
                                                    CompositeFeaturePtr theSketch)
 {
-  ResultPtr aResult;
-  if (theShape.ShapeType() == TopAbs_EDGE) {
-    // Check that we already have such external edge
-    std::shared_ptr<GeomAPI_Edge> aInEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge());
-    aInEdge->setImpl(new TopoDS_Shape(theShape));
-    aResult = findExternalEdge(theSketch, aInEdge);
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+  if (!aResult.get())
+    return ResultPtr();
+
+  for (int i = 0, aNbSubs = theSketch->numberOfSubs(); i < aNbSubs; i++) {
+    FeaturePtr aFeature = theSketch->subFeature(i);
+    if (aFeature->getKind() != SketchPlugin_Projection::PROJECTED_FEATURE_ID())
+      continue;
+    if (aFeature->lastResult() == aResult)
+      return aResult;
   }
-  if (theShape.ShapeType() == TopAbs_VERTEX) {
-    std::shared_ptr<GeomAPI_Vertex> aInVert = std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex());
-    aInVert->setImpl(new TopoDS_Shape(theShape));
-    aResult = findExternalVertex(theSketch, aInVert);
-  }
-  return aResult;
+  return ResultPtr();
 }
 
-ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShape,
-                                                     const ObjectPtr& theObject,
-                                                     CompositeFeaturePtr theSketch,
-                                                     const bool theTemporary)
+ResultPtr PartSet_Tools::createFixedObjectByExternal(
+                                   const std::shared_ptr<GeomAPI_Shape>& theShape,
+                                   const ObjectPtr& theObject,
+                                   CompositeFeaturePtr theSketch,
+                                   const bool theTemporary,
+                                   FeaturePtr& theCreatedFeature)
 {
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+
+  if (!aResult.get())
+    return ResultPtr();
+
+  FeaturePtr aProjectionFeature = theSketch->addFeature(SketchPlugin_Projection::ID());
+  theCreatedFeature = aProjectionFeature;
+  AttributeSelectionPtr anExternalAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(
+                 aProjectionFeature->attribute(SketchPlugin_Projection::EXTERNAL_FEATURE_ID()));
+  anExternalAttr->setValue(aResult, theShape);
+  AttributeBooleanPtr anIntoResult = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>
+    (aProjectionFeature->data()->attribute(SketchPlugin_Projection::INCLUDE_INTO_RESULT()));
+  anIntoResult->setValue(false);
+
+  aProjectionFeature->execute();
+
+  AttributeRefAttrPtr aRefAttr = aProjectionFeature->data()->refattr(
+    SketchPlugin_Projection::PROJECTED_FEATURE_ID());
+  if (!aRefAttr || !aRefAttr->isInitialized())
+    return ResultPtr();
+
+  FeaturePtr aProjection = ModelAPI_Feature::feature(aRefAttr->object());
+  if (aProjection.get() && aProjection->lastResult().get())
+    return aProjection->lastResult();
+
+  //return aProjectionFeature->lastResult();//ResultPtr();//aFeature->attribute(;
+  /*
   if (theShape.ShapeType() == TopAbs_EDGE) {
     Standard_Real aStart, aEnd;
     Handle(V3d_View) aNullView;
@@ -525,7 +554,7 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
         return aMyFeature->lastResult();
       }
     }
-  }
+  }*/
   return ResultPtr();
 }
 
@@ -537,86 +566,6 @@ bool PartSet_Tools::isContainPresentation(const QList<ModuleBase_ViewerPrsPtr>& 
       return true;
   }
   return false;
-}
-
-ResultPtr PartSet_Tools::findExternalEdge(CompositeFeaturePtr theSketch,
-                                          std::shared_ptr<GeomAPI_Edge> theEdge)
-{
-  for (int i = 0; i < theSketch->numberOfSubs(); i++) {
-    FeaturePtr aFeature = theSketch->subFeature(i);
-    std::shared_ptr<SketchPlugin_Feature> aSketchFea =
-      std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    // not displayed result of feature projection should not be returned as external edge
-    if (aSketchFea && aSketchFea->canBeDisplayed()) {
-      if (aSketchFea->isExternal()) {
-        std::list<ResultPtr> aResults = aSketchFea->results();
-        std::list<ResultPtr>::const_iterator aIt;
-        for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-          ResultConstructionPtr aRes =
-            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aIt);
-          if (aRes) {
-            std::shared_ptr<GeomAPI_Shape> aShape = aRes->shape();
-            if (aShape) {
-              if (theEdge->isEqual(aShape))
-                return aRes;
-            }
-          }
-        }
-      }
-    }
-  }
-  return ResultPtr();
-}
-
-
-ResultPtr PartSet_Tools::findExternalVertex(CompositeFeaturePtr theSketch,
-                                            std::shared_ptr<GeomAPI_Vertex> theVert)
-{
-  for (int i = 0; i < theSketch->numberOfSubs(); i++) {
-    FeaturePtr aFeature = theSketch->subFeature(i);
-    std::shared_ptr<SketchPlugin_Feature> aSketchFea =
-      std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    if (aSketchFea) {
-      if (aSketchFea->isExternal()) {
-        std::list<ResultPtr> aResults = aSketchFea->results();
-        std::list<ResultPtr>::const_iterator aIt;
-        for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-          ResultConstructionPtr aRes =
-            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aIt);
-          if (aRes) {
-            std::shared_ptr<GeomAPI_Shape> aShape = aRes->shape();
-            if (aShape) {
-              if (theVert->isEqual(aShape))
-                return aRes;
-            }
-          }
-        }
-      }
-    }
-  }
-  return ResultPtr();
-}
-
-
-bool PartSet_Tools::hasVertexShape(const ModuleBase_ViewerPrsPtr& thePrs, FeaturePtr theSketch,
-                                   Handle(V3d_View) theView, double& theX, double& theY)
-{
-  bool aHasVertex = false;
-
-  const GeomShapePtr& aShape = thePrs->shape();
-  if (aShape.get() && !aShape->isNull() && aShape->shapeType() == GeomAPI_Shape::VERTEX)
-  {
-    const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
-    const TopoDS_Vertex& aVertex = TopoDS::Vertex(aTDShape);
-    if (!aVertex.IsNull())
-    {
-      gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
-      PartSet_Tools::convertTo2D(aPoint, theSketch, theView, theX, theY);
-      aHasVertex = true;
-    }
-  }
-
-  return aHasVertex;
 }
 
 GeomShapePtr PartSet_Tools::findShapeBy2DPoint(const AttributePtr& theAttribute,

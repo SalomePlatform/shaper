@@ -99,7 +99,7 @@ void XGUI_MenuMgr::addFeature(const std::shared_ptr<Config_FeatureMessage>& theM
     }
     if (aNestedActions.contains(FEATURE_WHEN_NESTED_ABORT)) {
       QAction* anAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AbortAll);
-      QObject::connect(anAction, SIGNAL(triggered()), anOperationMgr, SLOT(abortAllOperations()));
+      QObject::connect(anAction, SIGNAL(triggered()), anOperationMgr, SLOT(onAbortAllOperation()));
       aNestedActList << anAction;
     }
   }
@@ -209,7 +209,7 @@ QAction* XGUI_MenuMgr::buildAction(const std::shared_ptr<Config_FeatureMessage>&
     }
     if (aNestedActions.contains(FEATURE_WHEN_NESTED_ABORT)) {
       QAction* anAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AbortAll);
-      QObject::connect(anAction, SIGNAL(triggered()), anOperationMgr, SLOT(abortAllOperations()));
+      QObject::connect(anAction, SIGNAL(triggered()), anOperationMgr, SLOT(onAbortAllOperation()));
       aNestedActList << anAction;
     }
     anAction = aSalomeConnector->addFeatureOfNested(theWchName.c_str(), aFeatureInfo,

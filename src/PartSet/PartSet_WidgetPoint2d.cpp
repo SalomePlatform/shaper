@@ -362,7 +362,8 @@ bool PartSet_WidgetPoint2D::storeValueCustom()
   if (myFeature->isMacro()) {
     // Moving points of macro-features has been processed directly (without solver)
     aPoint->setValue(myXSpin->value(), myYSpin->value());
-    moveObject(myFeature);
+    updateObject(myFeature);
+
   } else {
     if (!aPoint->isInitialized())
       aPoint->setValue(0., 0.);
@@ -593,6 +594,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
   if (!aFirstValue.get() && myPreSelected.get()) {
     aFirstValue = myPreSelected;
   }
+
   // if we have selection and use it
   if (aFirstValue.get() && isValidSelectionCustom(aFirstValue) &&
       aFirstValue->shape().get()) { /// Trihedron Axis may be selected, but shape is empty
@@ -616,7 +618,11 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
       else {
         anExternal = true;
         if (!aFixedObject.get())
-          aFixedObject = PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
+        {
+          FeaturePtr aCreatedFeature;
+          aFixedObject = PartSet_Tools::createFixedObjectByExternal(aGeomShape, aObject, mySketch,
+            false, aCreatedFeature);
+        }
       }
     }
     if (anExternal) {

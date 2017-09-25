@@ -49,11 +49,19 @@ class SketchPlugin_ConstraintLength : public SketchPlugin_ConstraintBase
     static const std::string MY_CONSTRAINT_LENGTH_ID("SketchConstraintLength");
     return MY_CONSTRAINT_LENGTH_ID;
   }
+
   /// \brief Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {
     static std::string MY_KIND = SketchPlugin_ConstraintLength::ID();
     return MY_KIND;
+  }
+
+  /// attribute name of dimension location type
+  inline static const std::string& LOCATION_TYPE_ID()
+  {
+    static const std::string MY_LOCATION_TYPE_ID("LocationType");
+    return MY_LOCATION_TYPE_ID;
   }
 
   /// \brief Creates a new part document if needed

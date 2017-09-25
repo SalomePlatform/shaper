@@ -27,6 +27,7 @@
 #include "PartSet_WidgetEditor.h"
 #include "PartSet_ResultSketchPrs.h"
 #include "PartSet_ExternalPointsMgr.h"
+#include "PartSet_PreviewSketchPlane.h"
 
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Displayer.h>
@@ -83,6 +84,7 @@
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_IntersectionPoint.h>
+#include <SketchPlugin_Projection.h>
 
 #include <SketcherPrs_Tools.h>
 
@@ -179,6 +181,8 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   myIsConstraintsShown[PartSet_Tools::Geometrical] = true;
   myIsConstraintsShown[PartSet_Tools::Dimensional] = true;
   myIsConstraintsShown[PartSet_Tools::Expressions] = false;
+
+  mySketchPlane = new PartSet_PreviewSketchPlane();
 }
 
 PartSet_SketcherMgr::~PartSet_SketcherMgr()
@@ -719,8 +723,15 @@ void PartSet_SketcherMgr::launchEditing()
     FeaturePtr aFeature = myCurrentSelection.begin().key();
     std::shared_ptr<SketchPlugin_Feature> aSPFeature =
               std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    if (aSPFeature && (!aSPFeature->isExternal())) {
-      myModule->editFeature(aSPFeature);
+    if (aSPFeature) {
+      if (!aSPFeature->isExternal())
+        myModule->editFeature(aSPFeature);
+      else {
+        FeaturePtr aProjectionFeature = PartSet_Tools::findRefsToMeFeature(aFeature,
+                                                        SketchPlugin_Projection::ID());
+        if (aProjectionFeature.get())
+          myModule->editFeature(aProjectionFeature);
+      }
     }
   }
 }
@@ -915,6 +926,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 
   // Display all sketcher sub-Objects
   myCurrentSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFOperation->feature());
+  mySketchPlane->createSketchPlane(myCurrentSketch, myModule->workshop());
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
 
   // Hide sketcher result
@@ -1036,6 +1048,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
     // The sketch was aborted
     myCurrentSketch = CompositeFeaturePtr();
+    mySketchPlane->eraseSketchPlane(myModule->workshop());
     // TODO: move this outside of if-else
     myModule->workshop()->viewer()->removeSelectionFilter(myCirclePointFilter);
     myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
@@ -1079,6 +1092,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
       myCurrentSketch->setDisplayed(true);
 
     myCurrentSketch = CompositeFeaturePtr();
+    mySketchPlane->eraseSketchPlane(myModule->workshop());
 
     myModule->workshop()->viewer()->removeSelectionFilter(myCirclePointFilter);
     myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
@@ -1104,6 +1118,7 @@ void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
 
 void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
 {
+  previewSketchPlane()->updatePlaneSize(activeSketch(), myModule->workshop());
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
   // when sketch nested operation is stopped the cursor should be restored unconditionally

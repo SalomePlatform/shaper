@@ -508,7 +508,7 @@ void XGUI_Workshop::onAcceptActionClicked()
                                                     (anOperationMgr->currentOperation());
     if (aFOperation) {
       //if (errorMgr()->canProcessClick(anAction, aFOperation->feature()))
-      myOperationMgr->onCommitOperation();
+      myOperationMgr->commitOperation();
     }
   }
 }
@@ -927,7 +927,7 @@ void XGUI_Workshop::onTrihedronVisibilityChanged(bool theState)
 //******************************************************
 bool XGUI_Workshop::onSave()
 {
-  if(!abortAllOperations())
+  if(!myOperationMgr->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
     return false;
   if (myCurrentDir.isEmpty()) {
     return onSaveAs();
@@ -944,7 +944,7 @@ bool XGUI_Workshop::onSave()
 //******************************************************
 bool XGUI_Workshop::onSaveAs()
 {
-  if(!abortAllOperations())
+  if(!myOperationMgr->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
     return false;
   QFileDialog dialog(desktop());
   dialog.setWindowTitle(tr("Select directory to save files..."));
@@ -999,6 +999,7 @@ void XGUI_Workshop::onUndo(int theTimes)
   }
 
   operationMgr()->updateApplyOfOperations();
+  operationMgr()->updateOperationByUndoRedo();
   updateCommandStatus();
 }
 
@@ -1027,6 +1028,7 @@ void XGUI_Workshop::onRedo(int theTimes)
       myObjectBrowser->rebuildDataTree();
   }
   operationMgr()->updateApplyOfOperations();
+  operationMgr()->updateOperationByUndoRedo();
   updateCommandStatus();
 
   // unblock the viewer update functionality and make update on purpose
@@ -1430,10 +1432,10 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
         MyTCommunicator->RegisterPlugin("TKDFBrowser");
         MyTCommunicator->RegisterPlugin("TKShapeView");
         MyTCommunicator->RegisterPlugin("TKVInspector");
-        MyTCommunicator->RegisterPlugin("SMBrowser"); // custom plugin to view ModelAPI
+        MyTCommunicator->RegisterPlugin("TKSMBrowser"); // custom plugin to view ModelAPI
 
         MyTCommunicator->Init(aParameters);
-        MyTCommunicator->Activate("SMBrowser"); // to have button in TInspector
+        MyTCommunicator->Activate("TKSMBrowser"); // to have button in TInspector
         MyTCommunicator->Activate("TKVInspector"); // to have filled callback by model
         MyTCommunicator->Activate("TKDFBrowser");
       }

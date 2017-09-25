@@ -167,12 +167,14 @@ public:
   /// \param theObject a selected result object
   /// \param theSketch a sketch feature
   /// \param theTemporary the created external object is temporary, execute is not performed for it
+  /// \param theCreatedFeature a new projection feature
   /// \return result of created feature
   static std::shared_ptr<ModelAPI_Result> createFixedObjectByExternal(
-                                               const TopoDS_Shape& theShape,
+                                               const std::shared_ptr<GeomAPI_Shape>& theShape,
                                                const ObjectPtr& theObject,
                                                CompositeFeaturePtr theSketch,
-                                               const bool theTemporary = false);
+                                               const bool theTemporary,
+                                               FeaturePtr& theCreatedFeature);
 
     /// Checks whether the list of selected presentations contains the given one
   /// \param theSelected a list of presentations
@@ -180,31 +182,6 @@ public:
   /// \return - result of check, true if the list contains the prs
   static bool isContainPresentation(const QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theSelected,
                                     const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
-
-  /// Returns Result object if the given skietch contains external edge equal to the given
-  /// \param theSketch - the sketch feature
-  /// \param theEdge - the edge
-  /// \return result object with external edge if it is found
-  static std::shared_ptr<ModelAPI_Result> findExternalEdge(CompositeFeaturePtr theSketch,
-                                                           std::shared_ptr<GeomAPI_Edge> theEdge);
-
-  /// Returns Result object if the given sketch contains external vertex equal to the given
-  /// \param theSketch - the sketch feature
-  /// \param theVert - the vertex
-  /// \return result object with external vertex if it is found
-  static std::shared_ptr<ModelAPI_Result> findExternalVertex(CompositeFeaturePtr theSketch,
-                                                        std::shared_ptr<GeomAPI_Vertex> theVert);
-
-  /// Returns whether the selected presentation has a shape with the vertex type
-  /// \param thePrs a selected presentation
-  /// \param theSketch the sketch feature
-  /// \param theView a 3D view
-  /// \param theX the output horizontal coordinate of the point
-  /// \param theY the output vertical coordinate of the point
-  static bool hasVertexShape(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
-                             FeaturePtr theSketch,
-                             Handle(V3d_View) theView, double& theX, double& theY);
-
 
   /**
   * Find attribute of object which corresponds to the given shape
@@ -263,6 +240,27 @@ public:
   static void findCoincidences(FeaturePtr theStartCoin, QList<FeaturePtr>& theList,
                                QList<FeaturePtr>& theCoincidencies,
                                std::string theAttr, QList<bool>& theIsAttributes);
+
+  /*
+  * Finds and returns feature reerenced to the paramenter feature with the given name if found
+  * \param theFeature a source feature where refsToMe is obtained
+  * \param theFeatureId an indentifier of the searched feature
+  */
+  static FeaturePtr findRefsToMeFeature(FeaturePtr theFeature, const std::string& theFeatureId)
+  {
+    if (!theFeature.get())
+      return FeaturePtr();
+
+    // find first projected feature and edit it
+    const std::set<AttributePtr>& aRefsList = theFeature->data()->refsToMe();
+    std::set<AttributePtr>::const_iterator anIt;
+    for (anIt = aRefsList.cbegin(); anIt != aRefsList.cend(); ++anIt) {
+      FeaturePtr aRefFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*anIt)->owner());
+      if (aRefFeature->getKind() == theFeatureId)
+        return aRefFeature;
+    }
+    return FeaturePtr();
+  }
 
   /**
   * Returns point of a coincedence

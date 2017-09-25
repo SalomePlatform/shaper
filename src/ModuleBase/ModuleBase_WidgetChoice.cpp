@@ -55,6 +55,8 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
   if (theData->getBooleanAttribute("use_in_title", false))
     myButtonTitles = aList;
 
+  bool aHasDefaultValue;
+  int aDefaultVal = QString::fromStdString(getDefaultValue()).toInt(&aHasDefaultValue);
   // Widget type can be combobox or radiobuttons
   std::string aWgtType = theData->getProperty("widget_type");
   if ((aWgtType.length() > 0) && (aWgtType == "radiobuttons")) {
@@ -97,7 +99,8 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
         myButtons->addButton(aBtn, aId++);
       }
     }
-    myButtons->button(0)->setChecked(true);
+    int aCheckedId = aHasDefaultValue ? aDefaultVal : 0;
+    myButtons->button(aDefaultVal)->setChecked(true);
     connect(myButtons, SIGNAL(buttonClicked(int)), this, SLOT(onCurrentIndexChanged(int)));
   } else {
     myLabel = new QLabel(aLabelText, this);
@@ -114,6 +117,9 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
     aLayout->addWidget(myCombo, 1);
 
     myCombo->addItems(aList);
+
+    if (aHasDefaultValue && aDefaultVal < aList.size())
+      myCombo->setCurrentIndex(aDefaultVal);
 
     connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentIndexChanged(int)));
   }

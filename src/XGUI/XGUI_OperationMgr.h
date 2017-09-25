@@ -48,7 +48,15 @@ class XGUI_ShortCutListener;
 class XGUI_EXPORT XGUI_OperationMgr : public QObject
 {
 Q_OBJECT
- public:
+public:
+  /// Enumeration of kind of message that is used when trying to stop the active operation
+  enum XGUI_MessageKind
+  {
+    XGUI_AbortOperationMessage, //< warns and give possibility to abort current operation
+    XGUI_InformationMessage //< ask to apply the current operation before performing something
+  };
+
+public:
   /// Constructor
   /// \param theParent the parent
   /// \param theWorkshop a reference to workshop
@@ -87,7 +95,9 @@ Q_OBJECT
   /// Returns true if the operation can be aborted. If the operation is modified,
   /// the warning message box is shown.
   /// \param theOperation an operation which is checked on stop
-  bool canStopOperation(ModuleBase_Operation* theOperation);
+  /// \param theMessageKind a kind of message in warning message box
+  bool canStopOperation(ModuleBase_Operation* theOperation,
+                        const XGUI_MessageKind& theMessageKind = XGUI_AbortOperationMessage);
 
   /// Find and return operation by its Id.
   ModuleBase_Operation* findOperation(const QString& theId) const;
@@ -124,8 +134,12 @@ Q_OBJECT
   /// \param theOperation an aborted operation
   void abortOperation(ModuleBase_Operation* theOperation);
 
-  /// Slot that commits the current operation.
-  bool onCommitOperation();
+  /// Abort all operations
+  /// \param theMessageKind kind of shown warning message
+  bool abortAllOperations(const XGUI_MessageKind& theMessageKind = XGUI_AbortOperationMessage);
+
+  /// Commits the current operation.
+  bool commitOperation();
 
   /// Returns true if SHIFT is pressed
   /// \param thePressed new boolean state
@@ -138,12 +152,12 @@ Q_OBJECT
 public slots:
   /// Slot that aborts the current operation.
   void onAbortOperation();
+  /// Slot that aborts all operations. It shows aborting message
+  void onAbortAllOperation();
   /// Slot that validates the current operation using the validateOperation method.
   void onValidateOperation();
   /// Commit all operations
   bool commitAllOperations();
-  /// Abort all operations
-  bool abortAllOperations();
 
 signals:
   /// Signal about an operation is stopped. It is emitted after the stop() of operation is done.
@@ -167,8 +181,8 @@ public: // TEMPORARY, it should be protected and be performed automatically
   /// \param theOperation the sent operation. If it is NULL, all operations in the stack are sent.
   void updateApplyOfOperations(ModuleBase_Operation* theOperation = 0);
 
-  /// Commits the current operatin if it is valid
-  bool commitOperation();
+  /// Updates the current operation state after undo/redo actions calling
+  void updateOperationByUndoRedo();
 
 protected: // TEMPORARY
   /// Sets the current operation or NULL
