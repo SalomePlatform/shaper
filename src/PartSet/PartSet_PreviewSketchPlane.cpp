@@ -106,7 +106,7 @@ void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& th
     // Create Preview
     // default planes parameters
     std::shared_ptr<GeomAPI_Pnt> anOriginPnt = anOrigin->pnt();
-    double aSize = 10;//Config_PropManager::integer(SKETCH_TAB_NAME, "planes_size");
+    double aSize = Config_PropManager::integer(SKETCH_TAB_NAME, "planes_size");
     // another sketch parameters
     if (myOtherSketchOrigin) {
       anOriginPnt = myOtherSketchOrigin;
@@ -116,7 +116,7 @@ void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& th
     else {
       // selected linear face parameters
       AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-                                (theSketch->data()->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+        (theSketch->data()->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
       if (aSelAttr) {
         std::shared_ptr<GeomAPI_Shape> aSketchExternalFace = aSelAttr->value();
         if (aSketchExternalFace)

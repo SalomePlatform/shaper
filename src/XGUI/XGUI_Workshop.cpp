@@ -1418,9 +1418,6 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
           aParameters.Append(aContext);
 
         MyVCallBack = new VInspector_CallBack();
-        MyTCommunicator->RegisterPlugin("TKDFBrowser");
-        MyTCommunicator->RegisterPlugin("TKVInspector");
-        MyTCommunicator->RegisterPlugin("TKShapeView");
         myDisplayer->setCallBack(MyVCallBack);
         #ifndef HAVE_SALOME
         AppElements_Viewer* aViewer = mainWindow()->viewer();
@@ -1432,7 +1429,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
         MyTCommunicator->RegisterPlugin("TKDFBrowser");
         MyTCommunicator->RegisterPlugin("TKShapeView");
         MyTCommunicator->RegisterPlugin("TKVInspector");
-        MyTCommunicator->RegisterPlugin("TKSMBrowser"); // custom plugin to view ModelAPI
+        MyTCommunicator->RegisterPlugin("SMBrowser"); // custom plugin to view ModelAPI
+        //MyTCommunicator->RegisterPlugin("TKSMBrowser"); // custom plugin to view ModelAPI
 
         MyTCommunicator->Init(aParameters);
         MyTCommunicator->Activate("TKSMBrowser"); // to have button in TInspector

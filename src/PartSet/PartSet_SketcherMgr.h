@@ -418,7 +418,7 @@ private:
 
 private:
   PartSet_Module* myModule;
-  PartSet_PreviewSketchPlane* mySketchPlane; // display/erase sketch plane on start/stop sketch operation
+  PartSet_PreviewSketchPlane* mySketchPlane; // display/erase sketch plane on start/stop sketch
 
   bool myPreviousDrawModeEnabled; // the previous selection enabled state in the viewer
   bool myIsEditLaunching;
