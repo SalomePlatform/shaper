@@ -84,8 +84,8 @@ void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
   }
   else if (theLocationType == SketcherPrs_Tools::LOCATION_RIGHT ||
            theLocationType == SketcherPrs_Tools::LOCATION_LEFT) {
-    theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Left);
-    //theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Right);
+    theDimAspect->SetTextHorizontalPosition(
+      theLocationType == SketcherPrs_Tools::LOCATION_LEFT ? Prs3d_DTHP_Left : Prs3d_DTHP_Right);
     theDimAspect->SetArrowOrientation(Prs3d_DAO_External);
   }
 
