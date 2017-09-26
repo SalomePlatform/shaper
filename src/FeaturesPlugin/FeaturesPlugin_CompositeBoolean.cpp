@@ -78,20 +78,27 @@ void FeaturesPlugin_CompositeBoolean::executeCompositeBoolean()
     int aTag = 1;
 
     ResultBodyPtr aResultBody = myFeature->document()->createBody(myFeature->data(), aResultIndex);
-    aResultBody->storeModified(*aBoolObjIt, (*aBoolMSIt)->shape(), aTag);
 
-    aTag += 5000;
-
-    // Store generation history.
-    ListOfShape::const_iterator aGenBaseIt = aGenBaseShapes.cbegin();
-    ListOfMakeShape::const_iterator aGenMSIt = aGenMakeShapes.cbegin();
-    for(; aGenBaseIt != aGenBaseShapes.cend() && aGenMSIt != aGenMakeShapes.cend();
-        ++aGenBaseIt, ++aGenMSIt) {
-      storeGenerationHistory(aResultBody, *aGenBaseIt, *aGenMSIt, aTag);
+    if((*aBoolObjIt)->isEqual((*aBoolMSIt)->shape())) {
+      aResultBody->store((*aBoolMSIt)->shape(), false);
     }
+    else
+    {
+      aResultBody->storeModified(*aBoolObjIt, (*aBoolMSIt)->shape(), aTag);
 
-    int aModTag = aTag;
-    storeModificationHistory(aResultBody, *aBoolObjIt, aTools, *aBoolMSIt, aModTag);
+      aTag += 5000;
+
+      // Store generation history.
+      ListOfShape::const_iterator aGenBaseIt = aGenBaseShapes.cbegin();
+      ListOfMakeShape::const_iterator aGenMSIt = aGenMakeShapes.cbegin();
+      for(; aGenBaseIt != aGenBaseShapes.cend() && aGenMSIt != aGenMakeShapes.cend();
+          ++aGenBaseIt, ++aGenMSIt) {
+        storeGenerationHistory(aResultBody, *aGenBaseIt, *aGenMSIt, aTag);
+      }
+
+      int aModTag = aTag;
+      storeModificationHistory(aResultBody, *aBoolObjIt, aTools, *aBoolMSIt, aModTag);
+    }
 
     myFeature->setResult(aResultBody, aResultIndex++);
   }
