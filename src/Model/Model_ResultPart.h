@@ -53,7 +53,7 @@ class Model_ResultPart : public ModelAPI_ResultPart
   /// Returns the part-document of this result
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> partDoc();
 
-  /// Returns the original part result: for transfomration features results this is
+  /// Returns the original part result: for transformation features results this is
   /// the original Part feature result
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultPart> original();
 

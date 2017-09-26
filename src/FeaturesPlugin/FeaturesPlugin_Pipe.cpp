@@ -342,9 +342,6 @@ void FeaturesPlugin_Pipe::storeResult(const std::shared_ptr<GeomAPI_Shape> theBa
                                            aGenTag++, aGenName + "Face", *aMapOfSubShapes.get());
   }
 
-  aResultBody->loadAndOrientGeneratedShapes(&thePipeAlgo, theBaseShape, aShapeTypeToExplode,
-                                            aGenTag++, aGenName, *aMapOfSubShapes.get());
-
   // Store from shapes.
   int aFromTag = aGenTag;
   storeShapes(aResultBody, aBaseShapeType, aMapOfSubShapes,

@@ -150,7 +150,7 @@ class Model_Document : public ModelAPI_Document
 
   //! Sets the current feature: all features below will be disabled, new features
   //! will be appended after this one.
-  //! \param theCurrent the selected feature as current: blow it everythin become disabled
+  //! \param theCurrent the selected feature as current: below it everything becomes disabled
   //! \param theVisible use visible features only: flag is true for Object Browser functionality
   MODEL_EXPORT virtual void setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent,
     const bool theVisible);

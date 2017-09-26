@@ -27,6 +27,7 @@
 
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Builder.hxx>
+#include <TopTools_MapOfShape.hxx>
 
 //=================================================================================================
 std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Partition::make(const ListOfShape& theObjects,
@@ -46,6 +47,21 @@ GeomAlgoAPI_Partition::GeomAlgoAPI_Partition(const ListOfShape& theObjects,
   build(theObjects, theTools);
 }
 
+static void prepareShapes(const TopoDS_Shape&   theShape,
+                           TopTools_ListOfShape& theSimpleList)
+{
+  if (theShape.ShapeType() != TopAbs_COMPOUND) {
+      theSimpleList.Append(theShape);
+    return;
+  }
+
+  // explode compound on simple shapes to allow their intersections
+  TopoDS_Iterator It (theShape, Standard_True, Standard_True);
+  for (; It.More(); It.Next()) {
+    TopoDS_Shape curSh = It.Value();
+    prepareShapes(curSh, theSimpleList);
+  }
+}
 
 //=================================================================================================
 void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
@@ -60,11 +76,21 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
   this->setImpl(anOperation);
   this->setBuilderType(OCCT_BOPAlgo_Builder);
 
+  TopTools_MapOfShape ShapesMap;
   // Getting objects.
-  for (ListOfShape::const_iterator
+  for(ListOfShape::const_iterator
        anObjectsIt = theObjects.begin(); anObjectsIt != theObjects.end(); anObjectsIt++) {
     const TopoDS_Shape& aShape = (*anObjectsIt)->impl<TopoDS_Shape>();
-    anOperation->AddArgument(aShape);
+    // #2240: decompose compounds to get the valid result
+    TopTools_ListOfShape aSimpleShapes;
+    prepareShapes(aShape, aSimpleShapes);
+    TopTools_ListIteratorOfListOfShape aSimpleIter(aSimpleShapes);
+    for (; aSimpleIter.More(); aSimpleIter.Next()) {
+      const TopoDS_Shape& aSimpleSh = aSimpleIter.Value();
+      if (ShapesMap.Add(aSimpleSh)) {
+        anOperation->AddArgument(aSimpleSh);
+      }
+    }
   }
 
   // Getting tools.

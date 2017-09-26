@@ -46,9 +46,11 @@ std::set<FeaturePtr> findCoincidentConstraints(const FeaturePtr& theFeature);
 /// \param[in] theStartCoin coincidence feature
 /// \param[in] theAttr attribute name
 /// \param[out] theList list of lines
+/// \param[in] theIsAttrOnly if true includes only coincidences with attributes.
 void findCoincidences(const FeaturePtr theStartCoin,
                       const std::string& theAttr,
-                      std::set<FeaturePtr>& theList);
+                      std::set<FeaturePtr>& theList,
+                      const bool theIsAttrOnly = false);
 
 /// Find all features the point is coincident to.
 std::set<FeaturePtr> findFeaturesCoincidentToPoint(const AttributePoint2DPtr& thePoint);

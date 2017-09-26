@@ -28,5 +28,5 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
     clear_in_neutral_point="false">
     <validator id="FeaturesPlugin_ValidatorPartitionSelection" parameters="Plane"/>
   </multi_selector>
-  <validator id="GeomValidators_MinObjectsSelected" parameters="base_objects,2"/>
+  <validator id="GeomValidators_MinObjectsSelected" parameters="base_objects,1"/>
 </source>

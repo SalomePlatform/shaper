@@ -119,6 +119,9 @@ Q_OBJECT
   /// Return application main window
   virtual QMainWindow* desktop() const;
 
+  /// Returns true if SHIFT is pressed
+  /// \return boolean value
+  virtual bool hasSHIFTPressed() const;
 
   //! Returns workshop
   XGUI_Workshop* workshop() const { return myWorkshop; }

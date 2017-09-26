@@ -474,17 +474,19 @@ std::set<FeaturePtr> getCoincides(const FeaturePtr& theConstraintCoincidence)
 
   SketchPlugin_Tools::findCoincidences(theConstraintCoincidence,
                                        SketchPlugin_ConstraintCoincidence::ENTITY_A(),
-                                       aCoincides);
+                                       aCoincides,
+                                       true);
   SketchPlugin_Tools::findCoincidences(theConstraintCoincidence,
                                        SketchPlugin_ConstraintCoincidence::ENTITY_B(),
-                                       aCoincides);
+                                       aCoincides,
+                                       true);
 
   // Remove points from set of coincides.
   std::set<FeaturePtr> aNewSetOfCoincides;
   for(std::set<FeaturePtr>::iterator anIt = aCoincides.begin(); anIt != aCoincides.end(); ++anIt) {
     std::shared_ptr<SketchPlugin_SketchEntity> aSketchEntity =
       std::dynamic_pointer_cast<SketchPlugin_SketchEntity>(*anIt);
-    if(aSketchEntity.get() && aSketchEntity->isCopy()) {
+    if(aSketchEntity.get() && (aSketchEntity->isCopy() || aSketchEntity->isExternal())) {
       continue;
     }
     if((*anIt)->getKind() == SketchPlugin_Line::ID()) {

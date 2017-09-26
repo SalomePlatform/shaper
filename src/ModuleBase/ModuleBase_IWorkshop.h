@@ -137,6 +137,9 @@ Q_OBJECT
   /// Returns main window of the application
   virtual QMainWindow* desktop() const = 0;
 
+  /// Returns true if SHIFT is pressed
+  /// \return boolean value
+  virtual bool hasSHIFTPressed() const = 0;
 
 signals:
   /// Signal selection changed.

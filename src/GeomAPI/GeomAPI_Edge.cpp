@@ -261,3 +261,11 @@ bool GeomAPI_Edge::isClosed() const
 
   return fabs(aFirst - aLast) < 1.e-9;
 }
+
+bool GeomAPI_Edge::isDegenerated() const
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
+  if (aShape.IsNull() || aShape.ShapeType() != TopAbs_EDGE)
+    return false;
+  return BRep_Tool::Degenerated(TopoDS::Edge(aShape));
+}

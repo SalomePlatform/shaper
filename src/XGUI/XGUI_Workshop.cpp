@@ -1416,6 +1416,9 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
           aParameters.Append(aContext);
 
         MyVCallBack = new VInspector_CallBack();
+        MyTCommunicator->RegisterPlugin("TKDFBrowser");
+        MyTCommunicator->RegisterPlugin("TKVInspector");
+        MyTCommunicator->RegisterPlugin("TKShapeView");
         myDisplayer->setCallBack(MyVCallBack);
         #ifndef HAVE_SALOME
         AppElements_Viewer* aViewer = mainWindow()->viewer();
@@ -2052,6 +2055,10 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
     if (module()->canEraseObject(aObj))
       aObj->setDisplayed(false);
   }
+  //Do not use eraseAll if you didn't send Redisplay event:
+  //all objects are erased from viewer, but considered as displayed in displayer
+  // Problem in bug 2218
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 #ifdef HAVE_SALOME
     //issue #2159 Hide all incomplete behavior
     viewer()->eraseAll();

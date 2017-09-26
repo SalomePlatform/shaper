@@ -72,17 +72,24 @@ public:
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent)
   {
     bool isAccepted = false;
-    if (myIsActive && theEvent->type() == QEvent::KeyRelease) {
-      QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-      if (aKeyEvent) {
-        switch (aKeyEvent->key()) {
-          case Qt::Key_Delete:
-            isAccepted = myOperationMgr->onProcessDelete(theObject);
-          break;
-          default:
-            isAccepted = myOperationMgr->onKeyReleased(theObject, aKeyEvent);
+    if (myIsActive) {
+      if (theEvent->type() == QEvent::KeyRelease) {
+        QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
+        if (aKeyEvent) {
+          myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
+          switch (aKeyEvent->key()) {
+            case Qt::Key_Delete:
+              isAccepted = myOperationMgr->onProcessDelete(theObject);
             break;
+            default:
+              isAccepted = myOperationMgr->onKeyReleased(theObject, aKeyEvent);
+              break;
+          }
         }
+      }
+      else if (theEvent->type() == QEvent::KeyPress) {
+        QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
+        myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
       }
     }
     if (!isAccepted)
@@ -97,7 +104,7 @@ private:
 
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
                                      ModuleBase_IWorkshop* theWorkshop)
-: QObject(theParent), myWorkshop(theWorkshop)
+: QObject(theParent), myWorkshop(theWorkshop), mySHIFTPressed(false)
 {
   /// we need to install filter to the application in order to react to 'Delete' key button
   /// this key can not be a short cut for a corresponded action because we need to set

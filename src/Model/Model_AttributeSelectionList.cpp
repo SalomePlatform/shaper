@@ -237,7 +237,7 @@ bool Model_AttributeSelectionList::isInList(const ResultPtr& theContext,
       std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aShapes = aContext->second.begin();
       for(; aShapes != aContext->second.end(); aShapes++) {
         if (!theSubShape.get()) {
-          if (!aShapes->get())
+          if (!aShapes->get() || (*aShapes)->isSame(aContext->first->shape()))
             return true;
         } else {
           // we need to call here isSame instead of isEqual to do not check shapes orientation
@@ -254,13 +254,13 @@ bool Model_AttributeSelectionList::isInList(const ResultPtr& theContext,
     if (anAttr.get()) {
       if (anAttr->context() == theContext) { // contexts are equal, so, check that values are also
         std::shared_ptr<GeomAPI_Shape> aValue = anAttr->value();
-        if (!aValue.get()) {
-          if (!theSubShape.get()) { // both are null
+        if (!theSubShape.get()) {
+          if (!aValue.get() || aValue->isSame(theContext->shape())) { // both are null
             return true;
           }
         } else {
           // we need to call here isSame instead of isEqual to do not check shapes orientation
-          if (aValue->isSame(theSubShape)) // shapes are equal
+          if (theSubShape->isSame(aValue)) // shapes are equal
             return true;
         }
       }

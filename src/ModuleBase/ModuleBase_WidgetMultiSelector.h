@@ -184,10 +184,12 @@ protected:
   /// \param theObject a model object, a set of shapes is searched by it
   /// \param theShape a shape to be in the set of the object shapes
   /// \param theGeomSelection a map built on selection
+  /// \param theWorkshop a current workshop
   /// \return boolean result
   static bool findInSelection(const ObjectPtr& theObject,
-                            const GeomShapePtr& theShape,
-                            const std::map<ObjectPtr, std::set<GeomShapePtr> >& theGeomSelection);
+                            GeomShapePtr theShape,
+                            const std::map<ObjectPtr, std::set<GeomShapePtr> >& theGeomSelection,
+                            ModuleBase_IWorkshop* theWorkshop);
 
 protected:
   /// List control

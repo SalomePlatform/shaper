@@ -154,6 +154,57 @@ bool isTrivial (const TopTools_ListOfShape& theAncestors, TopTools_IndexedMapOfS
   return true;
 }
 
+const TopoDS_Shape findCommonShape(
+  const TopAbs_ShapeEnum theType, const TopTools_ListOfShape& theList)
+{
+  if(theList.Extent() < 1) {
+    return TopoDS_Shape();
+  } else if (theList.Extent() == 1) { // check that sub-shape is bounded by this alone shape
+    TopTools_MapOfShape aSubsInShape;
+    TopExp_Explorer anExp(theList.First(), theType);
+    for(; anExp.More(); anExp.Next()) {
+      if (aSubsInShape.Contains(anExp.Current())) { // found duplicate
+        return anExp.Current();
+      }
+      aSubsInShape.Add(anExp.Current());
+    }
+  }
+
+  // Store in maps sub-shapes from each face.
+  std::vector<TopTools_MapOfShape> aVec;
+  for(TopTools_ListIteratorOfListOfShape anIt(theList); anIt.More(); anIt.Next()) {
+    const TopoDS_Shape aFace = anIt.Value();
+    TopTools_MapOfShape aMap;
+    for(TopExp_Explorer anExp(aFace, theType); anExp.More(); anExp.Next()) {
+      const TopoDS_Shape& aSubShape = anExp.Current();
+      aMap.Add(anExp.Current());
+    }
+    aVec.push_back(aMap);
+  }
+
+  // Find sub-shape shared between all faces.
+  TopoDS_Shape aSharedShape;
+  for(TopTools_MapIteratorOfMapOfShape anIt(aVec[0]); anIt.More(); anIt.Next()) {
+    const TopoDS_Shape& aSubShape = anIt.Value();
+    int aSharedNb = 1;
+    for(int anIndex = 1; anIndex < aVec.size(); ++anIndex) {
+      if(aVec[anIndex].Contains(aSubShape)) {
+        ++aSharedNb;
+      }
+    }
+    if(aSharedNb == theList.Extent()) {
+      if(aSharedShape.IsNull()) {
+        aSharedShape = aSubShape;
+      } else {
+        // More than one shape shared between all faces, return null shape in this case.
+        return TopoDS_Shape();
+      }
+    }
+  }
+
+  return aSharedShape;
+}
+
 std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
   std::shared_ptr<GeomAPI_Shape> theSubSh, const std::string& theDefaultName,
   const bool theAnotherDoc)
@@ -218,6 +269,9 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
           const TopTools_ListOfShape& anAncestors = aMap.FindFromKey(aSubShape);
           // check that it is not a trivial case (F1 & F2: aNumber = 1)
           isTrivialCase = isTrivial(anAncestors, aSMap);
+          if (!isTrivialCase) { // another try: check that common shape can be processed anyway
+            isTrivialCase = !findCommonShape(TopAbs_EDGE, anAncestors).IsNull();
+          }
         } else
           break;
         TopTools_ListOfShape aListOfNbs;
@@ -453,57 +507,6 @@ size_t ParseName(const std::string& theSubShapeName,   std::list<std::string>& t
   if(!aLastName.empty())
     theList.push_back(aLastName);
   return theList.size();
-}
-
-const TopoDS_Shape findCommonShape(
-  const TopAbs_ShapeEnum theType, const TopTools_ListOfShape& theList)
-{
-  if(theList.Extent() < 1) {
-    return TopoDS_Shape();
-  } else if (theList.Extent() == 1) { // check that sub-shape is bounded by this alone shape
-    TopTools_MapOfShape aSubsInShape;
-    TopExp_Explorer anExp(theList.First(), theType);
-    for(; anExp.More(); anExp.Next()) {
-      if (aSubsInShape.Contains(anExp.Current())) { // found duplicate
-        return anExp.Current();
-      }
-      aSubsInShape.Add(anExp.Current());
-    }
-  }
-
-  // Store in maps sub-shapes from each face.
-  std::vector<TopTools_MapOfShape> aVec;
-  for(TopTools_ListIteratorOfListOfShape anIt(theList); anIt.More(); anIt.Next()) {
-    const TopoDS_Shape aFace = anIt.Value();
-    TopTools_MapOfShape aMap;
-    for(TopExp_Explorer anExp(aFace, theType); anExp.More(); anExp.Next()) {
-      const TopoDS_Shape& aSubShape = anExp.Current();
-      aMap.Add(anExp.Current());
-    }
-    aVec.push_back(aMap);
-  }
-
-  // Find sub-shape shared between all faces.
-  TopoDS_Shape aSharedShape;
-  for(TopTools_MapIteratorOfMapOfShape anIt(aVec[0]); anIt.More(); anIt.Next()) {
-    const TopoDS_Shape& aSubShape = anIt.Value();
-    int aSharedNb = 1;
-    for(int anIndex = 1; anIndex < aVec.size(); ++anIndex) {
-      if(aVec[anIndex].Contains(aSubShape)) {
-        ++aSharedNb;
-      }
-    }
-    if(aSharedNb == theList.Extent()) {
-      if(aSharedShape.IsNull()) {
-        aSharedShape = aSubShape;
-      } else {
-        // More than one shape shared between all faces, return null shape in this case.
-        return TopoDS_Shape();
-      }
-    }
-  }
-
-  return aSharedShape;
 }
 
 std::string getContextName(const std::string& theSubShapeName)

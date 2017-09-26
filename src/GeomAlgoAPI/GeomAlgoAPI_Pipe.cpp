@@ -214,49 +214,66 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
   }
 
   // Making pipe.
-  BRepOffsetAPI_MakePipeShell* aPipeBuilder = new BRepOffsetAPI_MakePipeShell(aPathWire);
-  if(!aPipeBuilder) {
-    return;
-  }
+  Standard_Boolean isDone = Standard_False;
   bool anIsSolidNeeded = false;
-  ListOfShape::const_iterator aBaseIt = theBaseShapes.cbegin();
-  ListOfShape::const_iterator aLocIt = theLocations.cbegin();
-  while(aBaseIt != theBaseShapes.cend()) {
-    GeomShapePtr aBase = *aBaseIt;
-    TopoDS_Shape aBaseShape;
-    TopAbs_ShapeEnum aBaseShapeType;
-    if(!getBase(aBaseShape, aBaseShapeType, aBase)) {
-      delete aPipeBuilder;
+  BRepOffsetAPI_MakePipeShell* aPipeBuilder;
+  for(int i = 0; i < 2; ++i) {
+    aPipeBuilder = new BRepOffsetAPI_MakePipeShell(aPathWire);
+    if(!aPipeBuilder) {
       return;
     }
-    ++aBaseIt;
-    if(aBaseShapeType == TopAbs_FACE) {
-      anIsSolidNeeded = true;
-    }
-
-    if(aHasLocations) {
-      GeomShapePtr aLocation = *aLocIt;
-      if(!aLocation.get() || aLocation->shapeType() != GeomAPI_Shape::VERTEX) {
+    ListOfShape::const_iterator aBaseIt = theBaseShapes.cbegin();
+    ListOfShape::const_iterator aLocIt = theLocations.cbegin();
+    while(aBaseIt != theBaseShapes.cend()) {
+      GeomShapePtr aBase = *aBaseIt;
+      TopoDS_Shape aBaseShape;
+      TopAbs_ShapeEnum aBaseShapeType;
+      if(!getBase(aBaseShape, aBaseShapeType, aBase)) {
         delete aPipeBuilder;
         return;
       }
-      TopoDS_Vertex aLocationVertex = aLocation->impl<TopoDS_Vertex>();
-      ++aLocIt;
-      aPipeBuilder->Add(aBaseShape, aLocationVertex);
-    } else {
-      aPipeBuilder->Add(aBaseShape);
+      ++aBaseIt;
+      if(aBaseShapeType == TopAbs_FACE) {
+        anIsSolidNeeded = true;
+      }
+
+      if(aHasLocations) {
+        GeomShapePtr aLocation = *aLocIt;
+        if(!aLocation.get() || aLocation->shapeType() != GeomAPI_Shape::VERTEX) {
+          delete aPipeBuilder;
+          return;
+        }
+        TopoDS_Vertex aLocationVertex = aLocation->impl<TopoDS_Vertex>();
+        ++aLocIt;
+        aPipeBuilder->Add(aBaseShape, aLocationVertex);
+      } else {
+        aPipeBuilder->Add(aBaseShape);
+      }
     }
+
+    if(aPipeBuilder->IsReady() == Standard_False) {
+      delete aPipeBuilder;
+      return;
+    }
+
+    if (i == 1) {
+       // Try to use Descrete Trihedron mode.
+      aPipeBuilder->SetDiscreteMode();
+    }
+    aPipeBuilder->Build();
+    isDone = aPipeBuilder->IsDone();
+
+    if (isDone) {
+      break;
+    }
+
+    delete aPipeBuilder;
   }
 
-  if(aPipeBuilder->IsReady() == Standard_False) {
-    delete aPipeBuilder;
+  if (!isDone) {
     return;
   }
 
-  if(!buildPipe(aPipeBuilder)) {
-    delete aPipeBuilder;
-    return;
-  }
   this->initialize(aPipeBuilder);
 
   // Checking result.

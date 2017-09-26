@@ -65,13 +65,14 @@ void Model_ResultCompSolid::storeModified(const std::shared_ptr<GeomAPI_Shape>& 
   updateSubs(theNewShape);
 }
 
-void Model_ResultCompSolid::loadAndOrientModifiedShapes (GeomAlgoAPI_MakeShape* theMS,
+void Model_ResultCompSolid::loadAndOrientModifiedShapes(GeomAlgoAPI_MakeShape* theMS,
     std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
     const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes,
     const bool theIsStoreSeparate,
-    const bool theIsStoreAsGenerated)
+    const bool theIsStoreAsGenerated,
+    const bool theSplitInSubs)
 {
-  if (mySubs.size()) { // consists of subs
+  if (theSplitInSubs && mySubs.size()) { // consists of subs
     std::vector<std::shared_ptr<ModelAPI_ResultBody> >::const_iterator aSubIter = mySubs.cbegin();
     for(; aSubIter != mySubs.cend(); aSubIter++) {
       (*aSubIter)->loadAndOrientModifiedShapes(
@@ -236,7 +237,8 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
   } else if (!mySubs.empty()) { // erase all subs
     while(!mySubs.empty()) {
       ResultBodyPtr anErased = *(mySubs.rbegin());
-      anErased->setDisabled(anErased, true);
+      if (anErased->data()->isValid())
+        anErased->setDisabled(anErased, true);
       mySubs.pop_back();
     }
     // redisplay this because result with and without subs are displayed differently

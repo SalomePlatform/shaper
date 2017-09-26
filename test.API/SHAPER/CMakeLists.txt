@@ -27,10 +27,19 @@ ADD_UNIT_TESTS_API(
   Primitives/TestAPI_Cylinder.py
   GDML/TestConeSegment.py
   GDML/TestAPI_ConeSegment.py
-  Transformations/TestScale.py
-  Transformations/TestSymmetry.py
-  Transformations/TestTranslation.py
+  Transformations/TestAPI_MultiTranslation.py
+  Transformations/TestAPI_Rotation.py
   Transformations/TestAPI_Scale.py
   Transformations/TestAPI_Symmetry.py
   Transformations/TestAPI_Translation.py
+  Transformations/TestMultiTranslation.py
+  Transformations/TestRotation.py
+  Transformations/TestScale.py
+  Transformations/TestSymmetry.py
+  Transformations/TestTranslation_1.py
+  Transformations/TestTranslation_2.py
+  Transformations/TestTranslation_3.py
+  Transformations/TestTranslation_4.py
+  Transformations/TestTranslation_5.py
+  Transformations/TestTranslation.py
 )

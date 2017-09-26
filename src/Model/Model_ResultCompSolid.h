@@ -62,7 +62,8 @@ public:
     std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
     const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes,
     const bool theIsStoreSeparate = false,
-    const bool theIsStoreAsGenerated = false);
+    const bool theIsStoreAsGenerated = false,
+    const bool theSplitInSubs = false);
 
 
   /// Returns the number of sub-elements

@@ -104,7 +104,8 @@ std::set<FeaturePtr> findCoincidentConstraints(const FeaturePtr& theFeature)
 
 void findCoincidences(const FeaturePtr theStartCoin,
                       const std::string& theAttr,
-                      std::set<FeaturePtr>& theList)
+                      std::set<FeaturePtr>& theList,
+                      const bool theIsAttrOnly)
 {
   AttributeRefAttrPtr aPnt = theStartCoin->refattr(theAttr);
   if(!aPnt) {
@@ -116,15 +117,19 @@ void findCoincidences(const FeaturePtr theStartCoin,
     if(aOrig.get() == NULL) {
       return;
     }
-    theList.insert(aObj);
+    if(!theIsAttrOnly || !aPnt->isObject()) {
+      theList.insert(aObj);
+    }
     std::set<FeaturePtr> aCoincidences = findCoincidentConstraints(aObj);
     std::set<FeaturePtr>::const_iterator aCIt = aCoincidences.begin();
     for (; aCIt != aCoincidences.end(); ++aCIt) {
       FeaturePtr aConstrFeature = *aCIt;
       std::shared_ptr<GeomAPI_Pnt2d> aPnt = getCoincidencePoint(aConstrFeature);
       if(aPnt.get() && aOrig->isEqual(aPnt)) {
-        findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A(), theList);
-        findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_B(), theList);
+        findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A(),
+                         theList, theIsAttrOnly);
+        findCoincidences(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_B(),
+                         theList, theIsAttrOnly);
       }
     }
   }

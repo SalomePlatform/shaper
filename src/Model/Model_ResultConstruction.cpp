@@ -413,6 +413,9 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
   // iterate and store the result ids of sub-elements and sub-elements to sub-labels
   Handle(TDataStd_IntPackedMap) aRefs = TDataStd_IntPackedMap::Set(aLab);
   const int aSubNum = aComposite->numberOfSubs();
+  // subs are placed one by one  because of #2248): sketch curve may produce several edges
+  int aSubLabId = 1;
+
   for(int a = 0; a < aSubNum; a++) {
     FeaturePtr aSub = aComposite->subFeature(a);
     const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
@@ -442,8 +445,9 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
                   Handle(Geom_Curve) aFaceCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
                   if (aFaceCurve == aCurve) {
                     TDF_Label aSubLab = aLab.FindChild(anID);
+                    TDF_Label aShapeSubLab = aLab.FindChild(aSubLabId++);
                     std::string aFullNameSub = fullName(aComposite, anEdge);
-                    saveSubName(aSubLab, isSelectionMode, anEdge, aMyDoc, aFullNameSub);
+                    saveSubName(aShapeSubLab, isSelectionMode, anEdge, aMyDoc, aFullNameSub);
 
                     int anOrient = Model_SelectionNaming::edgeOrientation(aSubShape, anEdge);
                     if (anOrient != 0) {
@@ -454,14 +458,12 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
                 }
               } else { // put vertices of the selected edge to sub-labels
                 // add edges to sub-label to support naming for edges selection
-                int aTagIndex = anID + kSTART_VERTEX_DELTA;
                 for(TopExp_Explorer anEdgeExp(aSubShape, TopAbs_VERTEX);
-                  anEdgeExp.More();
-                  anEdgeExp.Next(), aTagIndex += kSTART_VERTEX_DELTA) {
+                      anEdgeExp.More(); anEdgeExp.Next()) {
                     TopoDS_Vertex aV = TopoDS::Vertex(anEdgeExp.Current());
-                    TDF_Label aSubLab = aLab.FindChild(aTagIndex);
+                    TDF_Label aShapeSubLab = aLab.FindChild(aSubLabId++);
                     std::string aFullNameSub = fullName(aComposite, aV);
-                    saveSubName(aSubLab, isSelectionMode, aV, aMyDoc, aFullNameSub);
+                    saveSubName(aShapeSubLab, isSelectionMode, aV, aMyDoc, aFullNameSub);
                 }
               }
             }

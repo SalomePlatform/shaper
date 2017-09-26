@@ -665,7 +665,7 @@ void Model_AttributeSelection::selectSubShape(
         Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aConShape, selectionLabel());
         if (!aNS.IsNull()) {
           aNS = TNaming_Tool::CurrentNamedShape(aNS);
-          if (!aNS.IsNull()) {
+          if (!aNS.IsNull() && scope().Contains(aNS->Label())) { // scope check is for 2228
             TDF_Label aLab = aNS->Label();
             while(aLab.Depth() != 7 && aLab.Depth() > 5)
               aLab = aLab.Father();
@@ -779,16 +779,18 @@ void Model_AttributeSelection::computeValues(
   ResultPtr theOldContext, ResultPtr theNewContext, TopoDS_Shape theValShape,
   TopTools_ListOfShape& theShapes)
 {
-  TopoDS_Shape anOldContShape = theOldContext->shape()->impl<TopoDS_Shape>();
+  bool aWasWholeContext = theValShape.IsNull();
+  if (aWasWholeContext) {
+    //theShapes.Append(theValShape);
+    //return;
+    theValShape = theOldContext->shape()->impl<TopoDS_Shape>();
+  }
+  //TopoDS_Shape anOldContShape = theOldContext->shape()->impl<TopoDS_Shape>();
   TopoDS_Shape aNewContShape = theNewContext->shape()->impl<TopoDS_Shape>();
-  if (anOldContShape.IsSame(theValShape)) { // full context shape substituted by new full context
-    theShapes.Append(aNewContShape);
-    return;
-  }
-  if (theValShape.IsNull()) {
-    theShapes.Append(theValShape);
-    return;
-  }
+  //if (anOldContShape.IsSame(theValShape)) { // full context shape substituted by new full context
+    //theShapes.Append(aNewContShape);
+    //return;
+  //}
   // if a new value is unchanged in the new context, do nothing: value is correct
   TopExp_Explorer aSubExp(aNewContShape, theValShape.ShapeType());
   for(; aSubExp.More(); aSubExp.Next()) {
@@ -872,8 +874,9 @@ void Model_AttributeSelection::computeValues(
       }
     }
   }
-  if (theShapes.IsEmpty()) // nothing was changed
-    theShapes.Append(theValShape);
+  if (theShapes.IsEmpty()) { // nothing was changed
+    theShapes.Append(aWasWholeContext ? TopoDS_Shape() : theValShape);
+  }
 }
 
 bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> theDoc,
@@ -881,17 +884,24 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
   TDF_Label theAccessLabel,
   std::list<ResultPtr>& theResults, TopTools_ListOfShape& theValShapes)
 {
-  std::set<ResultPtr> aResults; // to avoid duplicates
+  std::set<ResultPtr> aResults; // to avoid duplicates, new context, null if deleted
   TopTools_ListOfShape aResContShapes;
   TNaming_SameShapeIterator aModifIter(theContShape, theAccessLabel);
   for(; aModifIter.More(); aModifIter.Next()) {
+    TDF_Label anObjLab = aModifIter.Label().Father();
     ResultPtr aModifierObj = std::dynamic_pointer_cast<ModelAPI_Result>
-      (theDoc->objects()->object(aModifIter.Label().Father()));
-    if (!aModifierObj.get())
-      break;
+      (theDoc->objects()->object(anObjLab));
+    if (!aModifierObj.get()) {
+      // #2241: shape may be sub-element of new object, not main (shell created from faces)
+      if (!anObjLab.IsRoot())
+        aModifierObj = std::dynamic_pointer_cast<ModelAPI_Result>
+        (theDoc->objects()->object(anObjLab.Father()));
+      if (!aModifierObj.get())
+        continue;
+    }
     FeaturePtr aModifierFeat = theDoc->feature(aModifierObj);
     if (!aModifierFeat.get())
-      break;
+      continue;
     FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
     if (aModifierFeat == aThisFeature || theDoc->objects()->isLater(aModifierFeat, aThisFeature))
       continue; // the modifier feature is later than this, so, should not be used
@@ -903,11 +913,11 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
     aModifIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNewNS);
     if (aNewNS->Evolution() == TNaming_MODIFY || aNewNS->Evolution() == TNaming_GENERATED) {
       aResults.insert(aModifierObj);
-      TNaming_Iterator aPairIter(aNewNS);
-      aResContShapes.Append(aPairIter.NewShape());
+      //TNaming_Iterator aPairIter(aNewNS);
+      //aResContShapes.Append(aPairIter.NewShape());
+      aResContShapes.Append(aModifierObj->shape()->impl<TopoDS_Shape>());
     } else if (aNewNS->Evolution() == TNaming_DELETE) { // a shape was deleted => result is empty
       aResults.insert(ResultPtr());
-      aResContShapes.Append(TopoDS_Shape());
     } else { // not-precessed modification => don't support it
       continue;
     }
@@ -916,8 +926,7 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
     return false; // no modifications found, must stay the same
   // iterate all results to find futher modifications
   std::set<ResultPtr>::iterator aResIter = aResults.begin();
-  TopTools_ListOfShape::Iterator aResShapes(aResContShapes);
-  for(; aResIter != aResults.end(); aResIter++, aResShapes.Next()) {
+  for(; aResIter != aResults.end(); aResIter++) {
     if (aResIter->get() != NULL) {
       // compute new values by two contextes: the old and the new
       TopTools_ListOfShape aValShapes;
@@ -927,7 +936,11 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
       for(; aNewVal.More(); aNewVal.Next()) {
         std::list<ResultPtr> aNewRes;
         TopTools_ListOfShape aNewUpdatedVal;
-        if (searchNewContext(theDoc, aResShapes.Value(), *aResIter, aNewVal.Value(),
+        TopoDS_Shape aNewValSh = aNewVal.Value();
+        TopoDS_Shape aNewContShape = (*aResIter)->shape()->impl<TopoDS_Shape>();
+        if (theValShape.IsNull() && aNewContShape.IsSame(aNewValSh))
+          aNewValSh.Nullify();
+        if (searchNewContext(theDoc, aNewContShape, *aResIter, aNewValSh,
                              theAccessLabel, aNewRes, aNewUpdatedVal))
         {
           // appeand new results instead of the current ones
@@ -939,7 +952,7 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
           }
         } else { // the current result is good
           theResults.push_back(*aResIter);
-          theValShapes.Append(aNewVal.Value());
+          theValShapes.Append(aNewValSh);
         }
       }
     }
@@ -950,18 +963,52 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
 void Model_AttributeSelection::updateInHistory()
 {
   ResultPtr aContext = std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
-  // only bodies may be modified later in the history, don't do anything otherwise
-  if (!aContext.get() || aContext->groupName() != ModelAPI_ResultBody::group())
+  // only bodies and parts may be modified later in the history, don't do anything otherwise
+  if (!aContext.get() || (aContext->groupName() != ModelAPI_ResultBody::group() &&
+      aContext->groupName() != ModelAPI_ResultPart::group()))
     return;
+  std::shared_ptr<Model_Document> aDoc =
+    std::dynamic_pointer_cast<Model_Document>(aContext->document());
   std::shared_ptr<Model_Data> aContData = std::dynamic_pointer_cast<Model_Data>(aContext->data());
   if (!aContData.get() || !aContData->isValid())
     return;
   TDF_Label aContLab = aContData->label(); // named shape where the selected context is located
   Handle(TNaming_NamedShape) aContNS;
-  if (!aContLab.FindAttribute(TNaming_NamedShape::GetID(), aContNS))
+  if (!aContLab.FindAttribute(TNaming_NamedShape::GetID(), aContNS)) {
+    bool aFoundNewContext = true;
+    ResultPtr aNewContext = aContext;
+    while(aFoundNewContext) {
+      aFoundNewContext = false;
+      // parts have no shape in result, so, trace references using the Part info
+      if (aNewContext->groupName() == ModelAPI_ResultPart::group()) {
+        ResultPartPtr aPartContext = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aNewContext);
+        if (aPartContext.get()) { // searching for the up to date references to the referenced cont
+          const std::set<AttributePtr>& aRefs = aPartContext->data()->refsToMe();
+          std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
+          for(; aRef != aRefs.end(); aRef++) {
+            // to avoid detection of part changes by local selection only
+            AttributeSelectionPtr aSel =
+              std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRef);
+            if (aSel.get() && !aSel->value()->isSame(aSel->context()->shape()))
+              continue;
+
+            FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
+            if (aRefFeat.get() && aRefFeat != owner()) {
+              FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+              if (aDoc->objects()->isLater(aThisFeature, aRefFeat)) { // found better feature
+                aFoundNewContext = true;
+                aNewContext = aRefFeat->firstResult();
+              }
+            }
+          }
+        }
+      }
+    }
+    if (aNewContext != aContext) {
+      setValue(aNewContext, value());
+    }
     return;
-  std::shared_ptr<Model_Document> aDoc =
-    std::dynamic_pointer_cast<Model_Document>(aContext->document());
+  }
   FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
   FeaturePtr aCurrentModifierFeat = aDoc->feature(aContext);
   // iterate the context shape modifications in order to find a feature that is upper in history
