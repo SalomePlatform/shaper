@@ -133,7 +133,7 @@ void ModelHighAPI_Selection::setName(const std::string& theName)
 
 void ModelHighAPI_Selection::setColor(int theRed, int theGreen, int theBlue)
 {
-  if (myVariantType != VT_ResultSubShapePair)
+  if (myVariantType != VT_ResultSubShapePair || !myResultSubShapePair.first.get())
     return;
 
   AttributeIntArrayPtr aColor =
