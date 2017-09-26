@@ -425,6 +425,11 @@ bool ModuleBase_ModelWidget::processEnter()
   return false;
 }
 
+bool ModuleBase_ModelWidget::processEscape()
+{
+  return false;
+}
+
 bool ModuleBase_ModelWidget::processDelete()
 {
   // we consider that model objects eats delete key in order to

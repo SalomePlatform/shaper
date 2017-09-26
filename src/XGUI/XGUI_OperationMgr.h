@@ -31,6 +31,7 @@
 #include <QStringList>
 
 class QKeyEvent;
+class QMessageBox;
 
 class ModuleBase_IWorkshop;
 class XGUI_Workshop;
@@ -192,6 +193,11 @@ protected: // TEMPORARY
   /// \param theEvent the mouse event
   bool onKeyReleased(QObject *theObject, QKeyEvent* theEvent);
 
+  /// SLOT, that is called by the key in the property panel is clicked.
+  /// \param theObject a sender of the event
+  /// \param theEvent the mouse event
+  bool onKeyPressed(QObject *theObject, QKeyEvent* theEvent);
+
   /// The functionaly, that should be done by delete click
   /// Fistly the active widget processes it, then workshop. If no one does not
   /// process it, do nothing
@@ -238,6 +244,12 @@ private:
   /// \param theParent a candidate to be a parent
   static bool isChildObject(const QObject* theObject, const QObject* theParent);
 
+  /// Creates question message box with OK/Cancel buttons, where Cancel is default button,
+  /// Escape is Null button
+  /// \param theMessage text of the message
+  /// \return message box
+  static QMessageBox* createMessageBox(const QString& theMessage);
+
  private:
   typedef QList<ModuleBase_Operation*> Operations;  ///< definition for a list of operations
   Operations myOperations;  ///< a stack of started operations. The active operation is on top,
@@ -245,7 +257,7 @@ private:
 
   /// Current workshop
   ModuleBase_IWorkshop* myWorkshop;
-
+  QMessageBox* myActiveMessageBox;
   XGUI_ShortCutListener* myShortCutListener;
   bool mySHIFTPressed;
 };

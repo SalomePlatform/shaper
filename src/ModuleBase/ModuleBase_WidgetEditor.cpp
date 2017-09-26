@@ -36,6 +36,7 @@
 #include <GeomDataAPI_Point2D.h>
 
 #include <QApplication>
+#include <QKeyEvent>
 #include <QLineEdit>
 #include <QMenu>
 #include <QWidget>
@@ -45,6 +46,23 @@
 #include <QDesktopWidget>
 #include <QDialog>
 #include <QLayout>
+
+// Dialog is redefined to avoid Escape key processing
+class ModuleBase_EditorDialog : public QDialog
+{
+public:
+  ModuleBase_EditorDialog(QWidget* theParent, Qt::WindowFlags theFlags)
+    : QDialog(theParent, theFlags) {}
+  ~ModuleBase_EditorDialog() {}
+
+protected:
+  // Do nothing if key pressed because it is processing on operation manager level
+  virtual void keyPressEvent(QKeyEvent* theEvent) {
+    if (theEvent->key() == Qt::Key_Escape)
+        return;
+    QDialog::keyPressEvent(theEvent);
+  }
+};
 
 ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
                                                  const Config_WidgetAPI* theData)
@@ -61,7 +79,7 @@ bool ModuleBase_WidgetEditor::editedValue(double& outValue, QString& outText)
 {
   bool isValueAccepted = false;
 
-  myEditorDialog = new QDialog(QApplication::desktop(), Qt::FramelessWindowHint);
+  myEditorDialog = new ModuleBase_EditorDialog(QApplication::desktop(), Qt::FramelessWindowHint);
 
   QHBoxLayout* aLay = new QHBoxLayout(myEditorDialog);
   aLay->setContentsMargins(2, 2, 2, 2);
@@ -146,9 +164,9 @@ bool ModuleBase_WidgetEditor::showPopupEditor(const bool theSendSignals)
   }
   ModuleBase_Tools::setFocus(mySpinBox, "ModuleBase_WidgetEditor::editedValue");
   mySpinBox->selectAll();
-
-  if (theSendSignals && !myIsEditing)
-    emit enterClicked(this);
+  // enter is processed, so we need not anymore emit clicked signal
+  //if (theSendSignals && !myIsEditing && isValueAccepted)
+  //  emit enterClicked(this);
 
   return isValueAccepted;
 }
@@ -167,4 +185,14 @@ bool ModuleBase_WidgetEditor::processEnter()
   }
 
   return ModuleBase_WidgetDoubleValue::processEnter();
+}
+
+bool ModuleBase_WidgetEditor::processEscape()
+{
+  if (myEditorDialog) {
+    myEditorDialog->reject();
+    return true;
+  }
+
+  return ModuleBase_WidgetDoubleValue::processEscape();
 }
