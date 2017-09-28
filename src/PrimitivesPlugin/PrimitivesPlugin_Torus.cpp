@@ -8,6 +8,7 @@
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <GeomAlgoAPI_PointBuilder.h>
 
@@ -16,6 +17,8 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
+
+#include <sstream>
 
 //=================================================================================================
 PrimitivesPlugin_Torus::PrimitivesPlugin_Torus()
@@ -138,6 +141,7 @@ void PrimitivesPlugin_Torus::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Torus> the
   theTorusAlgo->prepareNamingFaces();
 
   // Insert to faces
+  // Naming for faces
   int num = 1;
   std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces =
       theTorusAlgo->getCreatedFaces();
@@ -145,5 +149,17 @@ void PrimitivesPlugin_Torus::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Torus> the
        it=listOfFaces.begin(); it!=listOfFaces.end(); ++it) {
     std::shared_ptr<GeomAPI_Shape> aFace = (*it).second;
     theResultTorus->generated(aFace, (*it).first, num++);
+  }
+  
+  // Naming of edges
+  GeomAPI_DataMapOfShapeShape anEdges;
+  GeomAPI_ShapeExplorer anEdgeExp(theTorusAlgo->shape(), GeomAPI_Shape::EDGE);
+  for(int anIndex = 1; anEdgeExp.more(); anEdgeExp.next()) {
+    if (!anEdges.isBound(anEdgeExp.current())) {
+      std::ostringstream aStream;
+      aStream<<"Edge_"<<anIndex++;
+      theResultTorus->generated(anEdgeExp.current(), aStream.str(), num++);
+      anEdges.bind(anEdgeExp.current(), anEdgeExp.current());
+    }
   }
 }

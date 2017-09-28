@@ -6,6 +6,8 @@
 
 #include <PrimitivesPlugin_Sphere.h>
 
+#include <GeomAPI_ShapeExplorer.h>
+
 #include <GeomAlgoAPI_PointBuilder.h>
 
 #include <ModelAPI_AttributeDouble.h>
@@ -13,6 +15,8 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
+
+#include <sstream>
 
 //=================================================================================================
 PrimitivesPlugin_Sphere::PrimitivesPlugin_Sphere()
@@ -101,6 +105,7 @@ void PrimitivesPlugin_Sphere::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Sphere> t
   theSphereAlgo->prepareNamingFaces();
 
   // Insert to faces
+  // Naming for faces and edges
   int num = 1;
   std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces =
       theSphereAlgo->getCreatedFaces();
@@ -108,5 +113,17 @@ void PrimitivesPlugin_Sphere::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Sphere> t
        it=listOfFaces.begin(); it!=listOfFaces.end(); ++it) {
     std::shared_ptr<GeomAPI_Shape> aFace = (*it).second;
     theResultSphere->generated(aFace, (*it).first, num++);
+  }
+  
+  // Naming vertices
+  GeomAPI_DataMapOfShapeShape aVertices;
+  GeomAPI_ShapeExplorer aVertExp(theSphereAlgo->shape(), GeomAPI_Shape::VERTEX);
+  for(int anIndex = 1; aVertExp.more(); aVertExp.next()) {
+    if (!aVertices.isBound(aVertExp.current())) {
+      std::ostringstream aStream;
+      aStream<<"Vertex_"<<anIndex++;
+      theResultSphere->generated(aVertExp.current(), aStream.str(), num++);
+      aVertices.bind(aVertExp.current(), aVertExp.current());
+    }
   }
 }

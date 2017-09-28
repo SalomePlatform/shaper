@@ -8,6 +8,7 @@
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <GeomAlgoAPI_PointBuilder.h>
 
@@ -16,6 +17,8 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
+
+#include <sstream>
 
 //=================================================================================================
 PrimitivesPlugin_Cone::PrimitivesPlugin_Cone()
@@ -145,9 +148,25 @@ void PrimitivesPlugin_Cone::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Cone> theCo
   int num = 1;
   std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces =
       theConeAlgo->getCreatedFaces();
+  int nbFaces = 0;
   for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator
        it=listOfFaces.begin(); it!=listOfFaces.end(); ++it) {
     std::shared_ptr<GeomAPI_Shape> aFace = (*it).second;
     theResultCone->generated(aFace, (*it).first, num++);
+    nbFaces++;
+  }
+  
+  if (nbFaces == 2) {
+    // Naming vertices
+    GeomAPI_DataMapOfShapeShape aVertices;
+    GeomAPI_ShapeExplorer aVertExp(theConeAlgo->shape(), GeomAPI_Shape::VERTEX);
+    for(int anIndex = 1; aVertExp.more(); aVertExp.next()) {
+      if (!aVertices.isBound(aVertExp.current())) {
+        std::ostringstream aStream;
+        aStream<<"Vertex_"<<anIndex++;
+        theResultCone->generated(aVertExp.current(), aStream.str(), num++);
+        aVertices.bind(aVertExp.current(), aVertExp.current());
+      }
+    }
   }
 }
