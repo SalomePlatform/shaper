@@ -137,6 +137,12 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
     std::shared_ptr<GeomAPI_Shape> aSubShape;
     if (theSubShape.get() && !theContext->shape()->isEqual(theSubShape))
       aSubShape = theSubShape; // the whole context
+    if (aConstruction->isInfinite()) {
+      // For correct naming selection, put the shape into the naming structure.
+      // It seems sub-shapes are not needed: only this shape is (and can be ) selected.
+      TNaming_Builder aBuilder(aSelLab);
+      aBuilder.Generated(theContext->shape()->impl<TopoDS_Shape>());
+    }
     int anIndex = aConstruction->select(theSubShape, owner()->document());
     TDataStd_Integer::Set(aSelLab, anIndex);
   } else if (theContext->groupName() == ModelAPI_ResultPart::group()) {
@@ -204,21 +210,23 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
       }
     }
 
+    std::shared_ptr<Model_ResultConstruction> aConstr =
+      std::dynamic_pointer_cast<Model_ResultConstruction>(context());
+    if (aConstr) {
+      if (aConstr->isInfinite())
+        return aResult; // empty result
+    }
     Handle(TNaming_NamedShape) aSelection;
     if (aSelLab.FindAttribute(TNaming_NamedShape::GetID(), aSelection)) {
       TopoDS_Shape aSelShape = aSelection->Get();
       aResult = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
       aResult->setImpl(new TopoDS_Shape(aSelShape));
-    } else { // for simple construction element: just shape of this construction element
-      std::shared_ptr<Model_ResultConstruction> aConstr =
-        std::dynamic_pointer_cast<Model_ResultConstruction>(context());
-      if (aConstr) {
-        Handle(TDataStd_Integer) anIndex;
-        if (aSelLab.FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
-          if (anIndex->Get() == 0) // it is just reference to construction, nothing is in value
-            return aResult;
-          return aConstr->shape(anIndex->Get(), owner()->document());
-        }
+    } else if (aConstr) { // for simple construction element: just shape of this construction element
+      Handle(TDataStd_Integer) anIndex;
+      if (aSelLab.FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
+        if (anIndex->Get() == 0) // it is just reference to construction, nothing is in value
+          return aResult;
+        return aConstr->shape(anIndex->Get(), owner()->document());
       }
     }
   }
