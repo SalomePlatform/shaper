@@ -221,7 +221,7 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
       TopoDS_Shape aSelShape = aSelection->Get();
       aResult = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
       aResult->setImpl(new TopoDS_Shape(aSelShape));
-    } else if (aConstr) { // for simple construction element: just shape of this construction element
+    } else if (aConstr) { // simple construction element: just shape of this construction element
       Handle(TDataStd_Integer) anIndex;
       if (aSelLab.FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
         if (anIndex->Get() == 0) // it is just reference to construction, nothing is in value
