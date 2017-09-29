@@ -386,12 +386,7 @@ QModelIndex XGUI_DataModel::objectIndex(const ObjectPtr theObject) const
       if (aResult.get()) {
         ResultCompSolidPtr aCompRes = ModelAPI_Tools::compSolidOwner(aResult);
         if (aCompRes.get()) {
-          for (int i = 0; i < aCompRes->numberOfSubs(true); i++) {
-            if (aCompRes->subResult(i, true) == theObject) {
-              aRow = i;
-              break;
-            }
-          }
+          aRow = ModelAPI_Tools::compSolidIndex(aResult);
         }
       }
     }

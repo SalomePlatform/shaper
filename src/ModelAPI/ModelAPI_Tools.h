@@ -107,6 +107,11 @@ MODELAPI_EXPORT std::shared_ptr<ModelAPI_CompositeFeature> compositeOwner(
  */
 MODELAPI_EXPORT std::shared_ptr<ModelAPI_ResultCompSolid> compSolidOwner(
                                             const std::shared_ptr<ModelAPI_Result>& theSub);
+/*!
+ * Returns index of this result in parent (if parent exists, returned by compSolidOwner)
+ * \returns zero-base index, or -1 if not found
+ */
+MODELAPI_EXPORT int compSolidIndex(const std::shared_ptr<ModelAPI_Result>& theSub);
 
 /*!
 * Returns true if the result contains a not empty list of sub results.
