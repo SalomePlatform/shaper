@@ -117,6 +117,18 @@ model.testNbSubShapes(Rotation_4, GeomAPI_Shape.SOLID, [1])
 model.testNbSubShapes(Rotation_4, GeomAPI_Shape.FACE, [6])
 model.testHaveNamingFaces(Rotation_4, model, Part_1_doc)
 
+model.testNbResults(Rotation_5, 1)
+model.testNbSubResults(Rotation_5, [0])
+model.testNbSubShapes(Rotation_5, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Rotation_5, GeomAPI_Shape.FACE, [6])
+model.testHaveNamingFaces(Rotation_5, model, Part_1_doc)
+
+model.testNbResults(Rotation_6, 1)
+model.testNbSubResults(Rotation_6, [0])
+model.testNbSubShapes(Rotation_6, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Rotation_6, GeomAPI_Shape.FACE, [6])
+model.testHaveNamingFaces(Rotation_6, model, Part_1_doc)
+
 model.testNbResults(Rotation_9, 1)
 model.testNbSubResults(Rotation_9, [0])
 model.testNbSubShapes(Rotation_9, GeomAPI_Shape.SOLID, [1])
@@ -136,11 +148,13 @@ model.testNbResults(Rotation_19, 1)
 model.testNbSubResults(Rotation_19, [0])
 
 
-model.testNbResults(Rotation_5, 0)
-assert(Rotation_5.feature().error() == 'Rotation builder :: angle greater than 360 degrees.')
+# This test is OK because we accept angles greater than 360
+#model.testNbResults(Rotation_5, 0)
+#assert(Rotation_5.feature().error() == 'Rotation builder :: angle greater than 360 degrees.')
 
-model.testNbResults(Rotation_6, 0)
-assert(Rotation_6.feature().error() == 'Rotation builder :: angle smaller than -360 degrees.')
+# This test is OK because we accept angles smaller than 360
+#model.testNbResults(Rotation_6, 0)
+#assert(Rotation_6.feature().error() == 'Rotation builder :: angle smaller than -360 degrees.')
 
 model.testNbResults(Rotation_7, 0)
 assert(Rotation_7.feature().error() == 'Attribute "axis_object" is not initialized.')
