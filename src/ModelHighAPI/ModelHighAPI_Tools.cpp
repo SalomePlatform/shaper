@@ -174,8 +174,10 @@ void fillAttribute(const std::list<ModelHighAPI_Selection> & theValue,
                    const std::shared_ptr<ModelAPI_AttributeRefList> & theAttribute)
 {
   theAttribute->clear();
-  for (auto it = theValue.begin(); it != theValue.end(); ++it)
-    theAttribute->append(it->resultSubShapePair().first); // use only context
+  for (auto it = theValue.begin(); it != theValue.end(); ++it) {
+    if (it->resultSubShapePair().first)
+      theAttribute->append(it->resultSubShapePair().first); // use only context
+  }
 }
 
 //--------------------------------------------------------------------------------------

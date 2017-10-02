@@ -98,12 +98,13 @@ std::shared_ptr<ModelAPI_ResultBody> Model_ResultCompSolid::subResult(const int 
   return mySubs.at(theIndex);
 }
 
-bool Model_ResultCompSolid::isSub(ObjectPtr theObject) const
+bool Model_ResultCompSolid::isSub(ObjectPtr theObject, int& theIndex) const
 {
-  std::vector<std::shared_ptr<ModelAPI_ResultBody> >::const_iterator aSubIter = mySubs.cbegin();
-  for(; aSubIter != mySubs.cend(); aSubIter++)
-    if (*aSubIter == theObject)
-      return true;
+  std::map<ObjectPtr, int>::const_iterator aFound = mySubsMap.find(theObject);
+  if (aFound != mySubsMap.end()) {
+    theIndex = aFound->second;
+    return true;
+  }
   return false;
 }
 
@@ -213,6 +214,7 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
       if (mySubs.size() <= aSubIndex) { // it is needed to create a new sub-result
         aSub = anObjects->createBody(this->data(), aSubIndex);
         mySubs.push_back(aSub);
+        mySubsMap[aSub] = int(mySubs.size() - 1);
       } else { // just update shape of this result
         aSub = mySubs[aSubIndex];
       }
@@ -228,6 +230,7 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
     while(mySubs.size() > aSubIndex) {
       ResultBodyPtr anErased = *(mySubs.rbegin());
       anErased->setDisabled(anErased, true);
+      mySubsMap.erase(anErased);
       mySubs.pop_back();
     }
     if (aWasEmpty) { // erase all subs
@@ -241,6 +244,7 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
         anErased->setDisabled(anErased, true);
       mySubs.pop_back();
     }
+    mySubsMap.clear();
     // redisplay this because result with and without subs are displayed differently
     aECreator->sendUpdated(data()->owner(), EVENT_DISP);
   }

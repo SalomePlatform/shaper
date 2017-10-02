@@ -845,10 +845,17 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
       if (aComposite.get()) {
         if (aType == TopAbs_VERTEX || aType == TopAbs_EDGE) {
           // collect all IDs in the name
+          bool isVertexByEdge = false;
           std::map<int, int> anIDs;
           if (!parseSubIndices(aComposite, aSubShapeName,
-              aType == TopAbs_EDGE ? "Edge" : "Vertex", anIDs))
-            return false;
+              aType == TopAbs_EDGE ? "Edge" : "Vertex", anIDs)) {
+            // there is a case when vertex is identified by one circle-edge (2253)
+            if (aType == TopAbs_VERTEX &&
+                parseSubIndices(aComposite, aSubShapeName, "Edge", anIDs))
+              isVertexByEdge = true;
+            else
+              return false;
+          }
 
           const int aSubNum = aComposite->numberOfSubs();
           for(int a = 0; a < aSubNum; a++) {
@@ -865,9 +872,22 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
                   int anOrientation = abs(anIDs[aCompID]);
                   TopoDS_Shape aShape = aRes->shape()->impl<TopoDS_Shape>();
                   if (anOrientation == 1) {
-                    if (aType == aShape.ShapeType()) {
+                    if (!isVertexByEdge && aType == aShape.ShapeType()) {
                       theShapeToBeSelected = aRes->shape();
                       return true;
+                    } else if (isVertexByEdge && aType != aShape.ShapeType()) {
+                      // check that there is only one vertex produces by and circular edge
+                      TopoDS_Shape aShape = aRes->shape()->impl<TopoDS_Shape>();
+                      TopExp_Explorer anExp(aShape, TopAbs_VERTEX);
+                      if (anExp.More())
+                        aShape = anExp.Current();
+                      anExp.Next();
+                      if (!anExp.More() || anExp.Current().IsSame(aShape)) {
+                        std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected(new GeomAPI_Shape());
+                        aShapeToBeSelected->setImpl(new TopoDS_Shape(aShape));
+                        theShapeToBeSelected = aShapeToBeSelected;
+                        return true;
+                      }
                     }
                   } else { // take first or second vertex of the edge
                     TopoDS_Shape aShape = aRes->shape()->impl<TopoDS_Shape>();

@@ -90,6 +90,13 @@ public:
       else if (theEvent->type() == QEvent::KeyPress) {
         QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
         myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
+        switch (aKeyEvent->key()) {
+          case Qt::Key_Escape:
+            isAccepted = myOperationMgr->onKeyPressed(theObject, aKeyEvent);
+          break;
+          default:
+            break;
+        }
       }
     }
     if (!isAccepted)
@@ -104,7 +111,7 @@ private:
 
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent,
                                      ModuleBase_IWorkshop* theWorkshop)
-: QObject(theParent), myWorkshop(theWorkshop), mySHIFTPressed(false)
+: QObject(theParent), myWorkshop(theWorkshop), mySHIFTPressed(false), myActiveMessageBox(0)
 {
   /// we need to install filter to the application in order to react to 'Delete' key button
   /// this key can not be a short cut for a corresponded action because we need to set
@@ -233,11 +240,9 @@ bool XGUI_OperationMgr::abortAllOperations()
       aResult = false;
   }
   else {
-    aResult = QMessageBox::question(qApp->activeWindow(),
-                                    tr("Abort operation"),
-                                    tr("All active operations will be aborted."),
-                                    QMessageBox::Ok | QMessageBox::Cancel,
-                                    QMessageBox::Cancel) == QMessageBox::Ok;
+    myActiveMessageBox = createMessageBox(tr("All active operations will be aborted."));
+    aResult = myActiveMessageBox->exec() == QMessageBox::Ok;
+    myActiveMessageBox = 0;
     while(aResult && hasOperation()) {
       abortOperation(currentOperation());
     }
@@ -312,12 +317,11 @@ bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation)
     return true;
   if (theOperation && theOperation->isModified()) {
     QString aMessage = tr("%1 operation will be aborted.").arg(theOperation->id());
-    int anAnswer = QMessageBox::question(qApp->activeWindow(),
-                                         tr("Abort operation"),
-                                         aMessage,
-                                         QMessageBox::Ok | QMessageBox::Cancel,
-                                         QMessageBox::Cancel);
-    return anAnswer == QMessageBox::Ok;
+
+    myActiveMessageBox = createMessageBox(aMessage);
+    int anAnswer = myActiveMessageBox->exec() == QMessageBox::Ok;
+    myActiveMessageBox = 0;
+    return anAnswer;
   }
   return true;
 }
@@ -610,14 +614,6 @@ bool XGUI_OperationMgr::onKeyReleased(QObject *theObject, QKeyEvent* theEvent)
   ModuleBase_Operation* anOperation = currentOperation();
   bool isAccepted = false;
   switch (theEvent->key()) {
-    case Qt::Key_Escape: {
-      ModuleBase_Operation* aOperation = currentOperation();
-      if (aOperation) {
-        onAbortOperation();
-        isAccepted = true;
-      }
-    }
-    break;
     case Qt::Key_Tab:
     case Qt::Key_Backtab:
     {
@@ -666,6 +662,38 @@ bool XGUI_OperationMgr::onKeyReleased(QObject *theObject, QKeyEvent* theEvent)
   //if(anOperation) {
   //  anOperation->keyReleased(theEvent->key());
   //}
+  return isAccepted;
+}
+
+bool XGUI_OperationMgr::onKeyPressed(QObject *theObject, QKeyEvent* theEvent)
+{
+  // Let the manager decide what to do with the given key combination.
+  ModuleBase_Operation* anOperation = currentOperation();
+  bool isAccepted = false;
+  switch (theEvent->key()) {
+    case Qt::Key_Escape: {
+      // processing in message box
+      if (myActiveMessageBox)
+      {
+        myActiveMessageBox->reject();
+        isAccepted = true;
+      }
+      // processing in the active widget
+      ModuleBase_Operation* aOperation = currentOperation();
+      if (!isAccepted && aOperation) {
+        ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+        ModuleBase_ModelWidget* anActiveWgt = aPanel->activeWidget();
+        if (anActiveWgt)
+          isAccepted = anActiveWgt && anActiveWgt->processEscape();
+      }
+      // default Escape button functionality
+      if (!isAccepted && aOperation) {
+        onAbortOperation();
+        isAccepted = true;
+      }
+    }
+    break;
+  }
   return isAccepted;
 }
 
@@ -796,4 +824,15 @@ bool XGUI_OperationMgr::isChildObject(const QObject* theObject, const QObject* t
     }
   }
   return isPPChild;
+}
+
+QMessageBox* XGUI_OperationMgr::createMessageBox(const QString& theMessage)
+{
+  QMessageBox * aMessageBox = new QMessageBox(QMessageBox::Question,
+    QObject::tr("Abort operation"), theMessage, QMessageBox::Ok | QMessageBox::Cancel,
+    qApp->activeWindow());
+  aMessageBox->setDefaultButton(QMessageBox::Cancel);
+  aMessageBox->setEscapeButton(QMessageBox::No); // operation manager should process Esc key
+
+  return aMessageBox;
 }

@@ -574,7 +574,7 @@ void Model_BodyBuilder::loadNextLevels(std::shared_ptr<GeomAPI_Shape> theShape,
     TopTools_IndexedMapOfShape Edges;
     BRepTools::Map3DEdges(aShape, Edges);
     if (Edges.Extent() == 1) {
-      builder(++theTag)->Generated(Edges.FindKey(1));
+      builder(theTag++)->Generated(Edges.FindKey(1));
       TopExp_Explorer expl(aShape, TopAbs_VERTEX);
       for (; expl.More(); expl.Next()) {
         builder(theTag)->Generated(expl.Current());
@@ -616,42 +616,57 @@ void Model_BodyBuilder::loadNextLevels(std::shared_ptr<GeomAPI_Shape> theShape,
 int findAmbiguities(const TopoDS_Shape&           theShapeIn,
   TopTools_ListOfShape&   theList)
 {
-  int aNumEdges(0);
   theList.Clear();
-  TopTools_IndexedDataMapOfShapeListOfShape subShapeAndAncestors;
-  TopAbs_ShapeEnum aTS(TopAbs_EDGE);
-  TopAbs_ShapeEnum aTA(TopAbs_FACE);
-  TopTools_MapOfShape aMap1, aMap2; // map1 - for edge ancestors; map2 - for keys => edges
-  TopTools_ListOfShape aKeyList;
-  TopExp::MapShapesAndAncestors(theShapeIn, aTS, aTA, subShapeAndAncestors);
-  for (Standard_Integer i = 1; i <= subShapeAndAncestors.Extent(); i++) {
-    const TopoDS_Shape& aKeyEdge1 = subShapeAndAncestors.FindKey(i);
-    const TopTools_ListOfShape& ancestors1 = subShapeAndAncestors.FindFromIndex(i);
-    aMap1.Clear();
-    TopTools_ListIteratorOfListOfShape it(ancestors1);
-    for(;it.More();it.Next()) aMap1.Add(it.Value()); // fill map with key ancestors => aKey1
-    for (Standard_Integer j = 1; j <= subShapeAndAncestors.Extent(); j++) {
-      if (i == j) continue;
-      const TopoDS_Shape& aKeyEdge2 = subShapeAndAncestors.FindKey(j);
-      const TopTools_ListOfShape& ancestors2 = subShapeAndAncestors.FindFromIndex(j);
-      if(ancestors1.Extent() == ancestors2.Extent() && ancestors1.Extent() > 1) {
-        int aNum (ancestors2.Extent());
-        TopTools_ListIteratorOfListOfShape it(ancestors2);
-        for(;it.More();it.Next())
-          if(aMap1.Contains(it.Value())) aNum--;
-        if(aNum == 0) {
-          if(aMap2.Add(aKeyEdge1))
-            aKeyList.Append(aKeyEdge1);
-          if(aMap2.Add(aKeyEdge2))
-            aKeyList.Append(aKeyEdge2);
+  // edges -> ancestor faces list
+  TopTools_IndexedDataMapOfShapeListOfShape aSubShapeAndAncestors;
+  TopExp::MapShapesAndAncestors(theShapeIn, TopAbs_EDGE, TopAbs_FACE, aSubShapeAndAncestors);
+  // keeps the shapes which are already in the resulting list
+  TopTools_MapOfShape alreadyThere;
+  // map from faces identifier (combination of hash-codes) to list of edges produced such ID
+  NCollection_DataMap<int, NCollection_List<TopoDS_Shape> > aFacesIDs;
+
+  TopTools_IndexedDataMapOfShapeListOfShape::Iterator anAncestorsIter(aSubShapeAndAncestors);
+  for (; anAncestorsIter.More(); anAncestorsIter.Next()) {
+    const TopTools_ListOfShape& ancestors = anAncestorsIter.Value();
+    if (ancestors.Extent() < 2)
+      continue;
+    Standard_Integer anID = 0;
+    for(TopTools_ListIteratorOfListOfShape aFaceIt(ancestors); aFaceIt.More(); aFaceIt.Next()) {
+      anID ^= HashCode(aFaceIt.ChangeValue(), 1990657); // Pierpont prime
+    }
+    if (aFacesIDs.IsBound(anID)) { // there found same edge, check they really have same faces
+      const NCollection_List<TopoDS_Shape>& aSameFaces1 =
+        aSubShapeAndAncestors.FindFromKey(anAncestorsIter.Key());
+      NCollection_List<TopoDS_Shape>::Iterator aSameEdge(aFacesIDs.ChangeFind(anID));
+      for(; aSameEdge.More(); aSameEdge.Next()) {
+        const NCollection_List<TopoDS_Shape>& aSameFaces2 =
+          aSubShapeAndAncestors.FindFromKey(aSameEdge.Value());
+        if (aSameFaces2.Extent() != aSameFaces1.Extent()) // the number of faces is different
+          break;
+
+        NCollection_List<TopoDS_Shape>::Iterator aFaceIter1(aSameFaces1);
+        for(; aFaceIter1.More(); aFaceIter1.Next()) {
+          NCollection_List<TopoDS_Shape>::Iterator aFaceIter2(aSameFaces2);
+          for(; aFaceIter2.More(); aFaceIter2.Next()) {
+            if (aFaceIter1.Value().IsSame(aFaceIter2.Value()))
+              break;
+          }
+          if (!aFaceIter2.More()) // aFaceIter1 contains a face, which is not in aFaceIter2
+            break;
+        }
+        if (!aFaceIter1.More()) { // all the faces are same => put to the result
+          if (alreadyThere.Add(aSameEdge.Value()))
+            theList.Append(aSameEdge.Value());
+          if (alreadyThere.Add(anAncestorsIter.Key()))
+            theList.Append(anAncestorsIter.Key());
         }
       }
-    } // at the end ==> List of edges to be named in addition
+    } else { // ID is unique, just add this edge
+      aFacesIDs.Bind(anID, NCollection_List<TopoDS_Shape>());
+    }
+    aFacesIDs.ChangeFind(anID).Append(anAncestorsIter.Key()); // add to the list anyway
   }
-  aNumEdges = aKeyList.Extent();
-  if(aNumEdges)
-    theList.Assign(aKeyList);
-  return aNumEdges;
+  return theList.Extent();
 }
 
 //=======================================================================
@@ -663,12 +678,13 @@ void Model_BodyBuilder::loadFirstLevel(
   std::string aName;
   if (aShape.ShapeType() == TopAbs_COMPOUND || aShape.ShapeType() == TopAbs_COMPSOLID) {
     TopoDS_Iterator itr(aShape);
-    for (; itr.More(); itr.Next(),theTag++) {
+    for (; itr.More(); itr.Next()) {
       builder(theTag)->Generated(itr.Value());
       TCollection_AsciiString aStr(theTag);
       aName = theName + aStr.ToCString();
       buildName(theTag, aName);
       if(!theName.empty()) buildName(theTag, aName);
+      theTag++;
       if (itr.Value().ShapeType() == TopAbs_COMPOUND ||
         itr.Value().ShapeType() == TopAbs_COMPSOLID)
       {

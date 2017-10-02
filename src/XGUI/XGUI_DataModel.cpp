@@ -124,9 +124,13 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         // Check that new folders could appear
         QStringList aNotEmptyFolders = listOfShowNotEmptyFolders();
         foreach (QString aNotEmptyFolder, aNotEmptyFolders) {
-          if ((aNotEmptyFolder.toStdString() == aObjType) && (aRootDoc->size(aObjType) == 1))
+          if ((aNotEmptyFolder.toStdString() == aObjType) && (aRootDoc->size(aObjType) > 0)) {
             // Appears first object in folder which can not be shown empty
-            insertRow(myXMLReader->rootFolderId(aObjType));
+            if (!hasShownFolder(aRootDoc, aNotEmptyFolder)) {
+              insertRow(myXMLReader->rootFolderId(aObjType));
+              addShownFolder(aRootDoc, aNotEmptyFolder);
+            }
+          }
         }
         // Insert new object
         int aRow = aRootDoc->size(aObjType) - 1;
@@ -147,10 +151,14 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           // Check that new folders could appear
           QStringList aNotEmptyFolders = listOfShowNotEmptyFolders(false);
           foreach (QString aNotEmptyFolder, aNotEmptyFolders) {
-            if ((aNotEmptyFolder.toStdString() == aObjType) && (aDoc->size(aObjType) == 1))
+            if ((aNotEmptyFolder.toStdString() == aObjType) && (aDoc->size(aObjType) > 0)) {
               // Appears first object in folder which can not be shown empty
-              insertRow(myXMLReader->subFolderId(aObjType), aDocRoot);
-          }
+              if (!hasShownFolder(aDoc, aNotEmptyFolder)) {
+                insertRow(myXMLReader->subFolderId(aObjType), aDocRoot);
+                addShownFolder(aDoc, aNotEmptyFolder);
+              }
+            }
+         }
           int aRow = aDoc->index(aObject);
           if (aRow != -1) {
             int aNbSubFolders = foldersCount(aDoc.get());
@@ -221,6 +229,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           if ((aNotEmptyFolder.toStdString() == aGroup) && (aRootDoc->size(aGroup) == 0)) {
             // Appears first object in folder which can not be shown empty
             removeRow(myXMLReader->rootFolderId(aGroup));
+            removeShownFolder(aRootDoc, aNotEmptyFolder);
             //rebuildBranch(0, aNbFolders + aDoc->size(myXMLReader->rootType()));
             break;
           }
@@ -251,6 +260,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
             if ((aNotEmptyFolder.toStdString() == aGroup) && (aSize == 0)) {
               // Appears first object in folder which can not be shown empty
               removeRow(myXMLReader->subFolderId(aGroup), aDocRoot);
+              removeShownFolder(aDoc, aNotEmptyFolder);
               //rebuildBranch(0, aNbSubFolders + aDoc->size(myXMLReader->subType()), aDocRoot);
               break;
             }
@@ -386,12 +396,7 @@ QModelIndex XGUI_DataModel::objectIndex(const ObjectPtr theObject) const
       if (aResult.get()) {
         ResultCompSolidPtr aCompRes = ModelAPI_Tools::compSolidOwner(aResult);
         if (aCompRes.get()) {
-          for (int i = 0; i < aCompRes->numberOfSubs(true); i++) {
-            if (aCompRes->subResult(i, true) == theObject) {
-              aRow = i;
-              break;
-            }
-          }
+          aRow = ModelAPI_Tools::compSolidIndex(aResult);
         }
       }
     }

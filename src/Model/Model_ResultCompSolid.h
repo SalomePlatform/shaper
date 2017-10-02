@@ -24,6 +24,7 @@
 #include "Model.h"
 #include <ModelAPI_ResultCompSolid.h>
 #include <vector>
+#include <map>
 
 /**\class Model_ResultCompSolid
 * \ingroup DataModel
@@ -35,6 +36,8 @@ class Model_ResultCompSolid : public ModelAPI_ResultCompSolid
 {
   /// Sub-bodies if this is compsolid: zero base index to subs
   std::vector<std::shared_ptr<ModelAPI_ResultBody> > mySubs;
+  /// Also keep map of result to index in mySubs to facilitate speed of access from OB
+  std::map<ObjectPtr, int> mySubsMap;
   /// Flag that stores the previous state of "concealed": if it is changed,
   /// The event must be generated to redisplay this and all subs.
   bool myLastConcealed;
@@ -74,7 +77,8 @@ public:
     bool forTree = false) const;
 
   /// Returns true if feature or reuslt belong to this composite feature as subs
-  MODEL_EXPORT virtual bool isSub(ObjectPtr theObject) const;
+  /// Returns theIndex - zero based index of sub if found
+  MODEL_EXPORT virtual bool isSub(ObjectPtr theObject, int& theIndex) const;
 
   /// Returns the parameters of color definition in the resources config manager
   MODEL_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,

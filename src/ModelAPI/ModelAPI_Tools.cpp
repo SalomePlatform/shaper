@@ -268,6 +268,7 @@ CompositeFeaturePtr compositeOwner(const FeaturePtr& theFeature)
 
 ResultCompSolidPtr compSolidOwner(const ResultPtr& theSub)
 {
+  int anIndex;
   ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theSub);
   if (aBody.get()) {
     FeaturePtr aFeatureOwner = aBody->document()->feature(aBody);
@@ -276,12 +277,31 @@ ResultCompSolidPtr compSolidOwner(const ResultPtr& theSub)
         aFeatureOwner->results().cbegin();
       for(; aResIter != aFeatureOwner->results().cend(); aResIter++) {
         ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aResIter);
-        if (aComp && aComp->isSub(aBody))
+        if (aComp && aComp->isSub(aBody, anIndex))
           return aComp;
       }
     }
   }
   return ResultCompSolidPtr(); // not found
+}
+
+int compSolidIndex(const ResultPtr& theSub)
+{
+  int anIndex = -1;
+  ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theSub);
+  if (aBody.get()) {
+    FeaturePtr aFeatureOwner = aBody->document()->feature(aBody);
+    if (aFeatureOwner.get()) {
+      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter =
+        aFeatureOwner->results().cbegin();
+      for(; aResIter != aFeatureOwner->results().cend(); aResIter++) {
+        ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aResIter);
+        if (aComp && aComp->isSub(aBody, anIndex))
+          return anIndex;
+      }
+    }
+  }
+  return anIndex; // not found
 }
 
 bool hasSubResults(const ResultPtr& theResult)

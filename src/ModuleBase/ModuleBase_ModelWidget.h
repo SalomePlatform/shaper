@@ -244,6 +244,9 @@ Q_OBJECT
   virtual bool processEnter();
 
   /// Returns true if the event is processed. The default implementation is empty, returns false.
+  virtual bool processEscape();
+
+  /// Returns true if the event is processed. The default implementation is empty, returns false.
   virtual bool processDelete();
 
   /// Sends Update and Redisplay for the given object

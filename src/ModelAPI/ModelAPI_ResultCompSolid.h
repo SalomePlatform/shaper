@@ -45,7 +45,8 @@ public:
                                                          bool forTree = false) const = 0;
 
   /// Returns true if feature or reuslt belong to this composite feature as subs
-  virtual bool isSub(ObjectPtr theObject) const = 0;
+  /// Returns theIndex - zero based index of sub if found
+  virtual bool isSub(ObjectPtr theObject, int& theIndex) const = 0;
 
   /// Set displayed flag to the result and all sub results
   /// \param theDisplay a boolean value

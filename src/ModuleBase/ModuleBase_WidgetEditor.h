@@ -71,6 +71,9 @@ Q_OBJECT
   /// Returns true if the event is processed.
   virtual bool processEnter();
 
+  /// Reject the current editor dialog if it is shown and returns true.
+  virtual bool processEscape();
+
 private:
   /// Show editor
   /// \param theOutValue a result value

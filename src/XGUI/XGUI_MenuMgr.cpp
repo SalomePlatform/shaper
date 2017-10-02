@@ -170,7 +170,7 @@ void XGUI_MenuMgr::createFeatureActions()
         aGroup->featuresInfo();
       std::list<std::shared_ptr<Config_FeatureMessage> >::const_iterator aFIt =
         aFeaturesInfo.begin(), aFLast = aFeaturesInfo.end();
-      int aFSize = aFeaturesInfo.size();
+      size_t aFSize = aFeaturesInfo.size();
       for(int i = 0; aFIt != aFLast; aFIt++, i++) {
         std::shared_ptr<Config_FeatureMessage> aMessage = *aFIt;
         bool aUseSeparator = i == aFSize-1;
