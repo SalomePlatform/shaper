@@ -176,8 +176,33 @@ private:
   /// \param fromRoot - root document flag
   QStringList listOfShowNotEmptyFolders(bool fromRoot = true) const;
 
+  void addShownFolder(DocumentPtr theDoc, QString theFolder)
+  {
+    if (!myShownFolders.contains(theDoc)) {
+      myShownFolders[theDoc] = QStringList();
+    }
+    myShownFolders[theDoc].append(theFolder);
+  }
+
+  void removeShownFolder(DocumentPtr theDoc, QString theFolder)
+  {
+    if (myShownFolders.contains(theDoc)) {
+      myShownFolders[theDoc].removeAll(theFolder);
+      if (myShownFolders[theDoc].isEmpty())
+        myShownFolders.remove(theDoc);
+    }
+  }
+
+  bool hasShownFolder(DocumentPtr theDoc, QString theFolder) const
+  {
+    if (myShownFolders.contains(theDoc))
+      return myShownFolders[theDoc].contains(theFolder);
+    return false;
+  }
+
   Config_DataModelReader* myXMLReader;
 
+  QMap<DocumentPtr, QStringList> myShownFolders;
   //bool myIsEventsProcessingBlocked;
 };
 
