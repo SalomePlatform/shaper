@@ -22,7 +22,9 @@ INCLUDE(UnitTest)
 
 ADD_UNIT_TESTS_API(
   Primitives/TestBox.py
+  Primitives/TestCone.py
   Primitives/TestCylinder.py
+  Primitives/TestSphere.py
   Primitives/TestAPI_Box.py
   Primitives/TestAPI_Cylinder.py
   GDML/TestConeSegment.py
