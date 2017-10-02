@@ -574,7 +574,7 @@ void Model_BodyBuilder::loadNextLevels(std::shared_ptr<GeomAPI_Shape> theShape,
     TopTools_IndexedMapOfShape Edges;
     BRepTools::Map3DEdges(aShape, Edges);
     if (Edges.Extent() == 1) {
-      builder(++theTag)->Generated(Edges.FindKey(1));
+      builder(theTag++)->Generated(Edges.FindKey(1));
       TopExp_Explorer expl(aShape, TopAbs_VERTEX);
       for (; expl.More(); expl.Next()) {
         builder(theTag)->Generated(expl.Current());
@@ -678,12 +678,13 @@ void Model_BodyBuilder::loadFirstLevel(
   std::string aName;
   if (aShape.ShapeType() == TopAbs_COMPOUND || aShape.ShapeType() == TopAbs_COMPSOLID) {
     TopoDS_Iterator itr(aShape);
-    for (; itr.More(); itr.Next(),theTag++) {
+    for (; itr.More(); itr.Next()) {
       builder(theTag)->Generated(itr.Value());
       TCollection_AsciiString aStr(theTag);
       aName = theName + aStr.ToCString();
       buildName(theTag, aName);
       if(!theName.empty()) buildName(theTag, aName);
+      theTag++;
       if (itr.Value().ShapeType() == TopAbs_COMPOUND ||
         itr.Value().ShapeType() == TopAbs_COMPSOLID)
       {
