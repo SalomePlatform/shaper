@@ -25,6 +25,7 @@ ADD_UNIT_TESTS_API(
   Primitives/TestCone.py
   Primitives/TestCylinder.py
   Primitives/TestSphere.py
+  Primitives/TestTorus.py
   Primitives/TestAPI_Box.py
   Primitives/TestAPI_Cylinder.py
   GDML/TestConeSegment.py
