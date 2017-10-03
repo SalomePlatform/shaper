@@ -155,7 +155,7 @@ void PrimitivesPlugin_Cone::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Cone> theCo
     theResultCone->generated(aFace, (*it).first, num++);
     nbFaces++;
   }
-  
+
   if (nbFaces == 2) {
     // Naming vertices
     GeomAPI_DataMapOfShapeShape aVertices;

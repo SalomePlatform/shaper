@@ -114,7 +114,7 @@ void PrimitivesPlugin_Sphere::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Sphere> t
     std::shared_ptr<GeomAPI_Shape> aFace = (*it).second;
     theResultSphere->generated(aFace, (*it).first, num++);
   }
-  
+
   // Naming vertices
   GeomAPI_DataMapOfShapeShape aVertices;
   GeomAPI_ShapeExplorer aVertExp(theSphereAlgo->shape(), GeomAPI_Shape::VERTEX);

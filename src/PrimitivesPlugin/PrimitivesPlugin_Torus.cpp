@@ -150,7 +150,7 @@ void PrimitivesPlugin_Torus::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Torus> the
     std::shared_ptr<GeomAPI_Shape> aFace = (*it).second;
     theResultTorus->generated(aFace, (*it).first, num++);
   }
-  
+
   // Naming of edges
   GeomAPI_DataMapOfShapeShape anEdges;
   GeomAPI_ShapeExplorer anEdgeExp(theTorusAlgo->shape(), GeomAPI_Shape::EDGE);
