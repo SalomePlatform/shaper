@@ -35,6 +35,7 @@ ADD_UNIT_TESTS_API(
   Transformations/TestAPI_Scale.py
   Transformations/TestAPI_Symmetry.py
   Transformations/TestAPI_Translation.py
+  Transformations/TestMultiRotation.py
   Transformations/TestMultiTranslation.py
   Transformations/TestRotation.py
   Transformations/TestScale.py
