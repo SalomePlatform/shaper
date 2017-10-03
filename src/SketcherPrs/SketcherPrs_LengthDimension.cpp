@@ -43,7 +43,7 @@
 
 #include <AIS_DisplaySpecialSymbol.hxx>
 
-//#ifdef OCCT_28850_FIXED
+#define OCCT_28850_FIXED
 
 /// Creates an aspect to be shown in length/radius dimension presentations
 /// \return an instance of aspect
@@ -87,6 +87,12 @@ void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
     theDimAspect->SetTextHorizontalPosition(
       theLocationType == SketcherPrs_Tools::LOCATION_LEFT ? Prs3d_DTHP_Left : Prs3d_DTHP_Right);
     theDimAspect->SetArrowOrientation(Prs3d_DAO_External);
+
+    double anArrowLength = theDimAspect->ArrowAspect()->Length();
+    // This is not realy correct way to get viewer scale.
+    double aViewerScale = (double) SketcherPrs_Tools::getDefaultArrowSize() / anArrowLength;
+    theDimAspect->SetExtensionSize(
+        (theTextSize / aViewerScale + SketcherPrs_Tools::getArrowSize()) / 2.0);
   }
 
   theDimAspect->SetArrowTailSize(theDimAspect->ArrowAspect()->Length());
@@ -117,9 +123,9 @@ SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theCo
 
 #ifdef OCCT_28850_FIXED
   if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID())
-    SetDirection(true, mySketcherPlane->dirX()->impl<gp_Dir>());
+    SetDirection(mySketcherPlane->dirX()->impl<gp_Dir>(), true);
   else if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
-    SetDirection(true, mySketcherPlane->dirY()->impl<gp_Dir>());
+    SetDirection(mySketcherPlane->dirY()->impl<gp_Dir>(), true);
 #endif
 }
 
@@ -162,17 +168,21 @@ void SketcherPrs_LengthDimension::Compute(
   double aTextSize = 0.0;
   GetValueString(aTextSize);
 
-  SketcherPrs_Tools::LocationType aLocationType = SketcherPrs_Tools::LOCATION_AUTOMATIC;
   std::string aLocationAttribute;
-  if (myConstraint->getKind() == SketchPlugin_ConstraintLength::ID())
+  std::string aConstraintKind = myConstraint->getKind();
+  if (aConstraintKind == SketchPlugin_ConstraintLength::ID())
     aLocationAttribute = SketchPlugin_ConstraintLength::LOCATION_TYPE_ID();
-  if (!aLocationAttribute.empty())
-  {
-    std::shared_ptr<ModelAPI_AttributeInteger> aTypeAttr = std::dynamic_pointer_cast<
-      ModelAPI_AttributeInteger>(myConstraint->data()->attribute(aLocationAttribute));
-    aLocationType = (SketcherPrs_Tools::LocationType)(aTypeAttr->value());
-  }
-  updateArrows(DimensionAspect(), GetValue(), aTextSize, aLocationType);
+  else if (aConstraintKind == SketchPlugin_ConstraintDistance::ID())
+    aLocationAttribute = SketchPlugin_ConstraintDistance::LOCATION_TYPE_ID();
+  else if (aConstraintKind == SketchPlugin_ConstraintDistanceHorizontal::ID())
+    aLocationAttribute = SketchPlugin_ConstraintDistanceHorizontal::LOCATION_TYPE_ID();
+  else if (aConstraintKind == SketchPlugin_ConstraintDistanceVertical::ID())
+    aLocationAttribute = SketchPlugin_ConstraintDistanceVertical::LOCATION_TYPE_ID();
+
+  std::shared_ptr<ModelAPI_AttributeInteger> aLocationTypeAttr = std::dynamic_pointer_cast<
+    ModelAPI_AttributeInteger>(myConstraint->data()->attribute(aLocationAttribute));
+  updateArrows(DimensionAspect(), GetValue(), aTextSize,
+    (SketcherPrs_Tools::LocationType)(aLocationTypeAttr->value()));
 
   // Update text visualization: parameter value or parameter text
   myStyleListener->updateDimensions(this, myValue);

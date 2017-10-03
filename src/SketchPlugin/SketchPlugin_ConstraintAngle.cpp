@@ -65,6 +65,9 @@ void SketchPlugin_ConstraintAngle::initAttributes()
                        ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID(),
                        ModelAPI_AttributeBoolean::typeId());
+
+  data()->addAttribute(SketchPlugin_ConstraintAngle::LOCATION_TYPE_ID(),
+                       ModelAPI_AttributeInteger::typeId());
 }
 
 void SketchPlugin_ConstraintAngle::colorConfigInfo(std::string& theSection, std::string& theName,

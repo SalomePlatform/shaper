@@ -33,6 +33,7 @@
 #include <GeomDataAPI_Point2D.h>
 
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Data.h>
 
 #include <Config_PropManager.h>
@@ -55,6 +56,9 @@ void SketchPlugin_ConstraintDistance::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SIGNED(), ModelAPI_AttributeBoolean::typeId());
+
+  data()->addAttribute(SketchPlugin_ConstraintDistance::LOCATION_TYPE_ID(),
+                       ModelAPI_AttributeInteger::typeId());
 }
 
 void SketchPlugin_ConstraintDistance::colorConfigInfo(std::string& theSection, std::string& theName,

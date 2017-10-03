@@ -55,6 +55,8 @@
 #include <SketchPlugin_Ellipse.h>
 #include <SketchPlugin_MacroEllipse.h>
 
+#include <SketcherPrs_Tools.h>
+
 #include <Events_Loop.h>
 #include <GeomDataAPI_Dir.h>
 
@@ -66,6 +68,7 @@
 #include <Config_PropManager.h>
 
 #include <memory>
+#include <sstream>
 
 #ifdef _DEBUG
 #include <iostream>
@@ -168,6 +171,18 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   Config_PropManager::registerProp("Visualization", "xy_plane_color", "XY plane color",
                                    Config_Prop::Color, XY_PLANE_COLOR);
 #endif
+
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "dimension_font", "Dimension font", Config_Prop::String,
+                                   "Arial");
+  std::ostringstream aStream;
+  aStream << SketcherPrs_Tools::getDefaultTextHeight();
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "dimension_value_size", "Dimension value size", Config_Prop::Integer,
+                                   aStream.str());
+  aStream.str("");
+  aStream.clear();
+  aStream << SketcherPrs_Tools::getDefaultArrowSize();
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "dimension_arrow_size", "Dimension arrow size", Config_Prop::Integer,
+                                   aStream.str());
 }
 
 FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)

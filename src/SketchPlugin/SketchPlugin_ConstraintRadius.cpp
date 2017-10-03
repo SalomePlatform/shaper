@@ -27,6 +27,7 @@
 #include <SketcherPrs_Factory.h>
 
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Data.h>
 
 #include <GeomAPI_Pnt2d.h>
@@ -52,6 +53,9 @@ void SketchPlugin_ConstraintRadius::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::VALUE(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::typeId());
+
+  data()->addAttribute(SketchPlugin_ConstraintRadius::LOCATION_TYPE_ID(),
+                       ModelAPI_AttributeInteger::typeId());
 }
 
 void SketchPlugin_ConstraintRadius::colorConfigInfo(std::string& theSection, std::string& theName,

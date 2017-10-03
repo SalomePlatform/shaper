@@ -656,6 +656,16 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
 
+        <module_choice id="LocationType"
+          widget_type="radiobuttons"
+          buttons_dir="horizontal"
+          label="Location type"
+          tooltip="Type of location"
+          string_list="Left Automatic Right"
+          icons_list="icons/Sketch/location_left.png icons/Sketch/location_automatic.png icons/Sketch/location_right.png"
+          default="1"
+          />
+
         <boolvalue id="SignedDistance" label="Keep orientation" default="true" tooltip="Keep distance orientation" obligatory="0"/>
         <validator id="PartSet_DistanceSelection"/>
       </feature>
@@ -689,6 +699,16 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
 
         <doublevalue_editor label="Value" tooltip="Distance" id="ConstraintValue" default="computed"/>
 
+        <module_choice id="LocationType"
+          widget_type="radiobuttons"
+          buttons_dir="horizontal"
+          label="Location type"
+          tooltip="Type of location"
+          string_list="Left Automatic Right"
+          icons_list="icons/Sketch/location_left.png icons/Sketch/location_automatic.png icons/Sketch/location_right.png"
+          default="1"
+          />
+
         <validator id="PartSet_DistanceSelection"/>
       </feature>
 
@@ -720,6 +740,16 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
 
         <doublevalue_editor label="Value" tooltip="Distance" id="ConstraintValue" default="computed"/>
+
+        <module_choice id="LocationType"
+          widget_type="radiobuttons"
+          buttons_dir="horizontal"
+          label="Location type"
+          tooltip="Type of location"
+          string_list="Left Automatic Right"
+          icons_list="icons/Sketch/location_left.png icons/Sketch/location_automatic.png icons/Sketch/location_right.png"
+          default="1"
+          />
 
         <validator id="PartSet_DistanceSelection"/>
       </feature>
@@ -770,6 +800,17 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
           icons_list="icons/Sketch/angle_direct.png icons/Sketch/angle_complementary.png icons/Sketch/angle_backward.png"
           default="0"
           />
+
+        <module_choice id="LocationType"
+          widget_type="radiobuttons"
+          buttons_dir="horizontal"
+          label="Location type"
+          tooltip="Type of location"
+          string_list="Left Automatic Right"
+          icons_list="icons/Sketch/location_left.png icons/Sketch/location_automatic.png icons/Sketch/location_right.png"
+          default="1"
+          />
+
       </feature>
 
       <!--  SketchConstraintRadius  -->
@@ -783,6 +824,17 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <doublevalue_editor label="Value" tooltip="Radius" id="ConstraintValue" default="computed">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
+
+        <module_choice id="LocationType"
+          widget_type="radiobuttons"
+          buttons_dir="horizontal"
+          label="Location type"
+          tooltip="Type of location"
+          string_list="Left Automatic Right"
+          icons_list="icons/Sketch/location_left.png icons/Sketch/location_automatic.png icons/Sketch/location_right.png"
+          default="1"
+          />
+
         <validator id="PartSet_RadiusSelection"/>
       </feature>
 

@@ -564,6 +564,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setAngle(
       compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
   fillAttribute(SketcherPrs_Tools::ANGLE_DIRECT,
       aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintAngle::LOCATION_TYPE_ID()));
   // fill the value before llines to avoid calculation of angle value by the Angle feature
   fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
   fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
@@ -581,6 +583,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setAngleComplementary(
       compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
   fillAttribute(SketcherPrs_Tools::ANGLE_COMPLEMENTARY,
       aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintAngle::LOCATION_TYPE_ID()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
   fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
@@ -598,6 +602,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setAngleBackward(
       compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
   fillAttribute(SketcherPrs_Tools::ANGLE_BACKWARD,
       aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintAngle::LOCATION_TYPE_ID()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
   fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
@@ -638,6 +644,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setDistance(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintDistance::ID());
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintDistance::LOCATION_TYPE_ID()));
   fillAttribute(thePoint, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(thePointOrLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
@@ -669,6 +677,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setHorizontalDistance(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintDistanceHorizontal::ID());
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintDistanceHorizontal::LOCATION_TYPE_ID()));
   fillAttribute(thePoint1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(thePoint2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
@@ -683,6 +693,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setVerticalDistance(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintDistanceVertical::ID());
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintDistanceVertical::LOCATION_TYPE_ID()));
   fillAttribute(thePoint1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(thePoint2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
@@ -756,6 +768,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setLength(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintLength::ID());
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintLength::LOCATION_TYPE_ID()));
   fillAttribute(theLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
   aFeature->execute();
@@ -804,6 +818,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setRadius(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintRadius::ID());
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintRadius::LOCATION_TYPE_ID()));
   fillAttribute(theCircleOrArc, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
   aFeature->execute();

@@ -52,6 +52,14 @@ public:
     return MY_KIND;
   }
 
+  /// attribute name of dimension location type
+  inline static const std::string& LOCATION_TYPE_ID()
+  {
+    static const std::string MY_LOCATION_TYPE_ID("LocationType");
+    return MY_LOCATION_TYPE_ID;
+  }
+
+
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 

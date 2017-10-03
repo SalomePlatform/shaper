@@ -32,6 +32,7 @@
 #include <GeomDataAPI_Point2D.h>
 
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 
 const double tolerance = 1e-7;
 
@@ -48,6 +49,9 @@ void SketchPlugin_ConstraintDistanceHorizontal::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
+
+  data()->addAttribute(SketchPlugin_ConstraintDistanceHorizontal::LOCATION_TYPE_ID(),
+                       ModelAPI_AttributeInteger::typeId());
 }
 
 //*************************************************************************************

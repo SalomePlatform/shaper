@@ -39,6 +39,13 @@
 #include <TopExp.hxx>
 #include <BRep_Tool.hxx>
 
+/// Update variable aspect parameters (depending on viewer scale)
+/// \param theDimAspect an aspect to be changed
+/// \param theDimValue an arrow value
+/// \param theTextSize an arrow value
+extern void updateArrows(Handle_Prs3d_DimensionAspect theDimAspect,
+  double theDimValue, double theTextSize, SketcherPrs_Tools::LocationType theLocationType);
+
 #define PI 3.1415926535897932
 
 //#ifndef WNT
@@ -230,8 +237,12 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   // Update text visualization: parameter value or parameter text
   myStyleListener->updateDimensions(this, myValue);
 
-  myAspect->SetExtensionSize(myAspect->ArrowAspect()->Length());
-  myAspect->SetArrowTailSize(myAspect->ArrowAspect()->Length());
+  double aTextSize = 0.0;
+  GetValueString(aTextSize);
+  AttributeIntegerPtr aLocationTypeAttr = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>
+    (myConstraint->data()->attribute(SketchPlugin_ConstraintAngle::LOCATION_TYPE_ID()));
+  updateArrows(myAspect, GetValue(), aTextSize,
+    (SketcherPrs_Tools::LocationType)(aLocationTypeAttr->value()));
 
   AIS_AngleDimension::Compute(thePresentationManager, thePresentation, theMode);
 
