@@ -550,12 +550,6 @@ void PartSet_Module::updateViewerMenu(const QMap<QString, QAction*>& theStdActio
   myMenuMgr->updateViewerMenu(theStdActions);
 }
 
-void PartSet_Module::updateOperationByUndoRedo()
-{
-  PartSet_SketcherMgr* aSketchMgr = sketchMgr();
-  aSketchMgr->previewSketchPlane()->updatePlaneSize(aSketchMgr->activeSketch(), workshop());
-}
-
 bool PartSet_Module::isActionEnableStateFixed(const int theActionId) const
 {
   bool isEnabledFixed = false;

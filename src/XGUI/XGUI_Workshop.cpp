@@ -999,7 +999,6 @@ void XGUI_Workshop::onUndo(int theTimes)
   }
 
   operationMgr()->updateApplyOfOperations();
-  operationMgr()->updateOperationByUndoRedo();
   updateCommandStatus();
 }
 
@@ -1028,7 +1027,6 @@ void XGUI_Workshop::onRedo(int theTimes)
       myObjectBrowser->rebuildDataTree();
   }
   operationMgr()->updateApplyOfOperations();
-  operationMgr()->updateOperationByUndoRedo();
   updateCommandStatus();
 
   // unblock the viewer update functionality and make update on purpose

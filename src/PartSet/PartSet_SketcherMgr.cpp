@@ -1118,7 +1118,6 @@ void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
 
 void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
 {
-  previewSketchPlane()->updatePlaneSize(activeSketch(), myModule->workshop());
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
   // when sketch nested operation is stopped the cursor should be restored unconditionally

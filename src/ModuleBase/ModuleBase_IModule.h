@@ -309,9 +309,6 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theStdActions - a map of standard actions
   virtual void updateViewerMenu(const QMap<QString, QAction*>& theStdActions) {}
 
-  /// Updates the current operation state after undo/redo actions calling
-  virtual void updateOperationByUndoRedo() {}
-
   /// Returns true if the action should be always enabled
   /// \param theActionId an action index: Accept or Accept All
   /// \return boolean value

@@ -316,13 +316,6 @@ void XGUI_OperationMgr::updateApplyOfOperations(ModuleBase_Operation* theOperati
   onValidateOperation();
 }
 
-void XGUI_OperationMgr::updateOperationByUndoRedo()
-{
-  ModuleBase_IModule* aModule = myWorkshop->module();
-  if (aModule)
-    aModule->updateOperationByUndoRedo();
-}
-
 bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation,
                                          const XGUI_OperationMgr::XGUI_MessageKind& theMessageKind)
 {

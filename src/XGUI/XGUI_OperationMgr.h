@@ -181,9 +181,6 @@ public: // TEMPORARY, it should be protected and be performed automatically
   /// \param theOperation the sent operation. If it is NULL, all operations in the stack are sent.
   void updateApplyOfOperations(ModuleBase_Operation* theOperation = 0);
 
-  /// Updates the current operation state after undo/redo actions calling
-  void updateOperationByUndoRedo();
-
 protected: // TEMPORARY
   /// Sets the current operation or NULL
   /// \param theOperation the started operation

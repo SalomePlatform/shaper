@@ -277,20 +277,6 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
 
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
   if (aModule) {
-    // if selected object is a shape of another sketch, the origin of selected shape does not stored
-    // in argument, so we need to find parameters of selected shape on the sketch
-    if (thePrs->object() && (feature() != thePrs->object())) {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(thePrs->object());
-      if (aFeature.get() && (aFeature != feature())) {
-        if (aFeature->getKind() == SketchPlugin_Sketch::ID()) {
-          CompositeFeaturePtr aSketch =
-            std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
-          std::shared_ptr<GeomAPI_Pln> aPlane = PartSet_Tools::sketchPlane(aSketch);
-          if (aPlane.get())
-            aModule->sketchMgr()->previewSketchPlane()->setOtherSketchParameters(thePrs->shape());
-        }
-      }
-    }
     CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
     aModule->sketchMgr()->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
   }
@@ -314,7 +300,8 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   // If the selected object is a sketch then use its plane
   std::shared_ptr<GeomAPI_Pln> aPlane;
   ObjectPtr aObj = thePrs->object();
-  if (aObj.get()) {
+  // obsolete as selected sketch is stored in external attribute
+  /*if (aObj.get()) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
     if (aFeature.get() && (aFeature != feature())) {
       if (aFeature->getKind() == SketchPlugin_Sketch::ID()) {
@@ -323,7 +310,7 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
         aPlane = PartSet_Tools::sketchPlane(aSketch);
       }
     }
-  }
+  }*/
   if (aGShape.get() != NULL) {
     // get plane parameters
     if (!aPlane.get()) {
@@ -472,17 +459,6 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_View
 
   if (thePrs->object() && (feature() != thePrs->object())) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(thePrs->object());
-    if (aFeature.get() && (aFeature != feature())) {
-      if (aFeature->getKind() == SketchPlugin_Sketch::ID()) {
-        CompositeFeaturePtr aSketch =
-          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
-        std::shared_ptr<GeomAPI_Pln> aPlane = PartSet_Tools::sketchPlane(aSketch);
-        if (aPlane.get()) {
-          aDir = setSketchPlane(aPlane);
-          return aDir.get();
-        }
-      }
-    }
     DataPtr aData = feature()->data();
     AttributeSelectionPtr aSelAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
