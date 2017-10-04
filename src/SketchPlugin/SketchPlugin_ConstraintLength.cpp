@@ -29,6 +29,8 @@
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 #include <GeomDataAPI_Point2D.h>
 
@@ -56,6 +58,7 @@ void SketchPlugin_ConstraintLength::initAttributes()
 
   data()->addAttribute(SketchPlugin_ConstraintLength::LOCATION_TYPE_ID(),
                        ModelAPI_AttributeInteger::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), LOCATION_TYPE_ID());
 }
 
 void SketchPlugin_ConstraintLength::colorConfigInfo(std::string& theSection, std::string& theName,

@@ -33,6 +33,8 @@
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 const double tolerance = 1e-7;
 
@@ -52,6 +54,7 @@ void SketchPlugin_ConstraintDistanceHorizontal::initAttributes()
 
   data()->addAttribute(SketchPlugin_ConstraintDistanceHorizontal::LOCATION_TYPE_ID(),
                        ModelAPI_AttributeInteger::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), LOCATION_TYPE_ID());
 }
 
 //*************************************************************************************
