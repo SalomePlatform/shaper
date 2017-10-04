@@ -508,7 +508,7 @@ void XGUI_Workshop::onAcceptActionClicked()
                                                     (anOperationMgr->currentOperation());
     if (aFOperation) {
       //if (errorMgr()->canProcessClick(anAction, aFOperation->feature()))
-      myOperationMgr->onCommitOperation();
+      myOperationMgr->commitOperation();
     }
   }
 }
@@ -927,7 +927,7 @@ void XGUI_Workshop::onTrihedronVisibilityChanged(bool theState)
 //******************************************************
 bool XGUI_Workshop::onSave()
 {
-  if(!abortAllOperations())
+  if(!myOperationMgr->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
     return false;
   if (myCurrentDir.isEmpty()) {
     return onSaveAs();
@@ -944,7 +944,7 @@ bool XGUI_Workshop::onSave()
 //******************************************************
 bool XGUI_Workshop::onSaveAs()
 {
-  if(!abortAllOperations())
+  if(!myOperationMgr->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
     return false;
   QFileDialog dialog(desktop());
   dialog.setWindowTitle(tr("Select directory to save files..."));
@@ -1234,7 +1234,7 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   aObjDock->setWindowTitle(tr("Object browser"));
   aObjDock->setStyleSheet(
       "::title { position: relative; padding-left: 5px; text-align: left center }");
-  myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
+  myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock, this);
   myObjectBrowser->setXMLReader(myDataModelXMLReader);
   myModule->customizeObjectBrowser(myObjectBrowser);
   aObjDock->setWidget(myObjectBrowser);
@@ -1416,9 +1416,6 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
           aParameters.Append(aContext);
 
         MyVCallBack = new VInspector_CallBack();
-        MyTCommunicator->RegisterPlugin("TKDFBrowser");
-        MyTCommunicator->RegisterPlugin("TKVInspector");
-        MyTCommunicator->RegisterPlugin("TKShapeView");
         myDisplayer->setCallBack(MyVCallBack);
         #ifndef HAVE_SALOME
         AppElements_Viewer* aViewer = mainWindow()->viewer();
@@ -1427,10 +1424,14 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
         #endif
         aParameters.Append(MyVCallBack);
 
+        MyTCommunicator->RegisterPlugin("TKDFBrowser");
+        MyTCommunicator->RegisterPlugin("TKShapeView");
+        MyTCommunicator->RegisterPlugin("TKVInspector");
         MyTCommunicator->RegisterPlugin("SMBrowser"); // custom plugin to view ModelAPI
+        //MyTCommunicator->RegisterPlugin("TKSMBrowser"); // custom plugin to view ModelAPI
 
         MyTCommunicator->Init(aParameters);
-        MyTCommunicator->Activate("SMBrowser"); // to have button in TInspector
+        MyTCommunicator->Activate("TKSMBrowser"); // to have button in TInspector
         MyTCommunicator->Activate("TKVInspector"); // to have filled callback by model
         MyTCommunicator->Activate("TKDFBrowser");
       }

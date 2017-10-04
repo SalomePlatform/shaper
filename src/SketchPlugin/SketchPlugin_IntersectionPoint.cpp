@@ -52,10 +52,6 @@ void SketchPlugin_IntersectionPoint::execute()
   }
 }
 
-void SketchPlugin_IntersectionPoint::move(double theDeltaX, double theDeltaY)
-{
-}
-
 void SketchPlugin_IntersectionPoint::attributeChanged(const std::string& theID)
 {
   if (theID == EXTERNAL_LINE_ID()) {

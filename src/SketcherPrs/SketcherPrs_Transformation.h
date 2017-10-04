@@ -37,9 +37,11 @@ class SketcherPrs_Transformation: public SketcherPrs_SymbolPrs
 public:
   /// Constructor
   /// \param theConstraint a constraint feature
+  /// \param theSketcher a sketcher object
   /// \param thePlane a coordinate plane of current sketch
   /// \param isTranslation a flag is it translation or rotation
   Standard_EXPORT SketcherPrs_Transformation(ModelAPI_Feature* theConstraint,
+                                            ModelAPI_CompositeFeature* theSketcher,
                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane,
                                          bool isTranslation);
 

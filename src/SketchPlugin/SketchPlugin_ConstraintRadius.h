@@ -49,6 +49,13 @@ class SketchPlugin_ConstraintRadius : public SketchPlugin_ConstraintBase
     return MY_KIND;
   }
 
+  /// attribute name of dimension location type
+  inline static const std::string& LOCATION_TYPE_ID()
+  {
+    static const std::string MY_LOCATION_TYPE_ID("LocationType");
+    return MY_LOCATION_TYPE_ID;
+  }
+
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
@@ -66,11 +73,6 @@ class SketchPlugin_ConstraintRadius : public SketchPlugin_ConstraintBase
 
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
-
-  /// Moves the feature
-  /// \param theDeltaX the delta for X coordinate is moved
-  /// \param theDeltaY the delta for Y coordinate is moved
-  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
 
   /// Called on change of any argument-attribute of this object
   /// \param theID identifier of changed attribute

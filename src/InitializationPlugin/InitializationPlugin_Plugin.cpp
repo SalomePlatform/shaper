@@ -141,6 +141,7 @@ FeaturePtr InitializationPlugin_Plugin::createPoint(DocumentPtr theDoc, const st
   aPoint->real("x")->setValue(theX);
   aPoint->real("y")->setValue(theY);
   aPoint->real("z")->setValue(theZ);
+  aPoint->string("creation_method")->setValue("by_xyz");
   aPoint->data()->setName(theName);
   // don't show automatically created feature in the features history
   aPoint->setInHistory(aPoint, false);

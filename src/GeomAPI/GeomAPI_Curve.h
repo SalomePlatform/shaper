@@ -72,4 +72,7 @@ private:
   double myEnd;
 };
 
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_Curve> GeomCurvePtr;
+
 #endif

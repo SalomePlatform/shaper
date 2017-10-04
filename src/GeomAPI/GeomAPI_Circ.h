@@ -22,6 +22,7 @@
 #define GeomAPI_Circ_H_
 
 #include <GeomAPI_Interface.h>
+#include <GeomAPI_Curve.h>
 #include <memory>
 
 class GeomAPI_Ax2;
@@ -37,7 +38,8 @@ class GeomAPI_Circ : public GeomAPI_Interface
 {
  public:
 
-  /** \brief Constructs a circle of radius Radius, where theAx2 locates the circle and defines its orientation in 3D space such that:\n
+  /** \brief Constructs a circle of radius Radius, where theAx2 locates
+   *  the circle and defines its orientation in 3D space such that:\n
    *  - the center of the circle is the origin of theAx2;\n
    *  - the origin, "X Direction" and "Y Direction" of theAx2 define the plane of the circle;\n
    *  - theAx2 is the local coordinate system of the circle.\n
@@ -49,6 +51,9 @@ class GeomAPI_Circ : public GeomAPI_Interface
   /// Creation of circle defined by center point, direction and circle radius
   GEOMAPI_EXPORT GeomAPI_Circ(const std::shared_ptr<GeomAPI_Pnt>& theCenter,
                const std::shared_ptr<GeomAPI_Dir>& theDir, double theRadius);
+
+  /// Creation of circle defined by a curve
+  GEOMAPI_EXPORT GeomAPI_Circ(const GeomCurvePtr& theCurve);
 
   /// Return center of the circle
   GEOMAPI_EXPORT const std::shared_ptr<GeomAPI_Pnt> center() const;
@@ -76,6 +81,9 @@ class GeomAPI_Circ : public GeomAPI_Interface
                                       const double theTolerance,
                                       double& theParameter) const;
 };
+
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_Circ> GeomCirclePtr;
 
 #endif
 

@@ -88,19 +88,7 @@ def verifyLastArc(theSketch, theCenter, theStart, theEnd):
     subroutine to verify position of last arc in the sketch
     """
     aLastArc = model.lastSubFeature(theSketch, "SketchArc")
-    aCenterPnt = geomDataAPI_Point2D(aLastArc.attribute("center_point"))
-    aStartPnt = geomDataAPI_Point2D(aLastArc.attribute("start_point"))
-    aEndPnt = geomDataAPI_Point2D(aLastArc.attribute("end_point"))
-    if len(theCenter):
-        verifyPointCoordinates(aCenterPnt, theCenter[0], theCenter[1])
-    if len(theStart):
-        verifyPointCoordinates(aStartPnt, theStart[0], theStart[1])
-    if len(theEnd):
-        verifyPointCoordinates(aEndPnt, theEnd[0], theEnd[1])
-    model.assertSketchArc(aLastArc)
-
-def verifyPointCoordinates(thePoint, theX, theY):
-    assert thePoint.x() == theX and thePoint.y() == theY, "Wrong '{0}' point ({1}, {2}), expected ({3}, {4})".format(thePoint.id(), thePoint.x(), thePoint.y(), theX, theY)
+    model.assertArc(aLastArc, theCenter, theStart, theEnd)
 
 
 #=========================================================================

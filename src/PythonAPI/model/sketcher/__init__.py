@@ -3,3 +3,4 @@
 
 from SketchAPI import addSketch
 from tools import *
+from tests import *

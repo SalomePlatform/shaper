@@ -25,6 +25,8 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintDistanceHorizontal.h>
+#include <SketchPlugin_ConstraintDistanceVertical.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_Fillet.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
@@ -41,6 +43,7 @@
 #include <SketchPlugin_ConstraintVertical.h>
 #include <SketcherPrs_Tools.h>
 //--------------------------------------------------------------------------------------
+#include <ModelAPI_Events.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelHighAPI_Double.h>
@@ -62,6 +65,10 @@
 #include "SketchAPI_Rectangle.h"
 #include "SketchAPI_Rotation.h"
 #include "SketchAPI_Translation.h"
+//--------------------------------------------------------------------------------------
+#include <GeomAPI_Dir2d.h>
+#include <GeomAPI_XY.h>
+#include <cmath>
 //--------------------------------------------------------------------------------------
 SketchAPI_Sketch::SketchAPI_Sketch(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
@@ -451,19 +458,25 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const std::string & theE
 
 //--------------------------------------------------------------------------------------
 std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
-    const ModelHighAPI_Selection & theExternalFeature)
+    const ModelHighAPI_Selection & theExternalFeature,
+    bool theKeepResult)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Projection::ID());
-  return ProjectionPtr(new SketchAPI_Projection(aFeature, theExternalFeature));
+  ProjectionPtr aProjection(new SketchAPI_Projection(aFeature, theExternalFeature));
+  aProjection->setIncludeToResult(theKeepResult);
+  return aProjection;
 }
 
 std::shared_ptr<SketchAPI_Projection> SketchAPI_Sketch::addProjection(
-    const std::string & theExternalName)
+    const std::string & theExternalName,
+    bool theKeepResult)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Projection::ID());
-  return ProjectionPtr(new SketchAPI_Projection(aFeature, theExternalName));
+  ProjectionPtr aProjection(new SketchAPI_Projection(aFeature, theExternalName));
+  aProjection->setIncludeToResult(theKeepResult);
+  return aProjection;
 }
 
 //--------------------------------------------------------------------------------------
@@ -551,6 +564,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setAngle(
       compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
   fillAttribute(SketcherPrs_Tools::ANGLE_DIRECT,
       aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintAngle::LOCATION_TYPE_ID()));
   // fill the value before llines to avoid calculation of angle value by the Angle feature
   fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
   fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
@@ -568,6 +583,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setAngleComplementary(
       compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
   fillAttribute(SketcherPrs_Tools::ANGLE_COMPLEMENTARY,
       aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintAngle::LOCATION_TYPE_ID()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
   fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
@@ -585,6 +602,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setAngleBackward(
       compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
   fillAttribute(SketcherPrs_Tools::ANGLE_BACKWARD,
       aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintAngle::LOCATION_TYPE_ID()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
   fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
@@ -620,12 +639,64 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setCollinear(
 std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setDistance(
     const ModelHighAPI_RefAttr & thePoint,
     const ModelHighAPI_RefAttr & thePointOrLine,
-    const ModelHighAPI_Double & theValue)
+    const ModelHighAPI_Double & theValue,
+    bool isSigned)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintDistance::ID());
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintDistance::LOCATION_TYPE_ID()));
   fillAttribute(thePoint, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(thePointOrLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+  fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  fillAttribute(isSigned, aFeature->boolean(SketchPlugin_ConstraintDistance::SIGNED()));
+  aFeature->execute();
+  return InterfacePtr(new ModelHighAPI_Interface(aFeature));
+}
+
+std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setSignedDistance(
+    const ModelHighAPI_RefAttr & thePoint,
+    const ModelHighAPI_RefAttr & thePointOrLine,
+    const ModelHighAPI_Double & theValue)
+{
+  return setDistance(thePoint, thePointOrLine, theValue, true);
+}
+
+std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setUnsignedDistance(
+    const ModelHighAPI_RefAttr & thePoint,
+    const ModelHighAPI_RefAttr & thePointOrLine,
+    const ModelHighAPI_Double & theValue)
+{
+  return setDistance(thePoint, thePointOrLine, theValue, false);
+}
+
+std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setHorizontalDistance(
+    const ModelHighAPI_RefAttr & thePoint1,
+    const ModelHighAPI_RefAttr & thePoint2,
+    const ModelHighAPI_Double & theValue)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintDistanceHorizontal::ID());
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintDistanceHorizontal::LOCATION_TYPE_ID()));
+  fillAttribute(thePoint1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(thePoint2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+  fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  aFeature->execute();
+  return InterfacePtr(new ModelHighAPI_Interface(aFeature));
+}
+
+std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setVerticalDistance(
+    const ModelHighAPI_RefAttr & thePoint1,
+    const ModelHighAPI_RefAttr & thePoint2,
+    const ModelHighAPI_Double & theValue)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_ConstraintDistanceVertical::ID());
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintDistanceVertical::LOCATION_TYPE_ID()));
+  fillAttribute(thePoint1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
+  fillAttribute(thePoint2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
   aFeature->execute();
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));
@@ -697,6 +768,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setLength(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintLength::ID());
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintLength::LOCATION_TYPE_ID()));
   fillAttribute(theLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
   aFeature->execute();
@@ -745,6 +818,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setRadius(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintRadius::ID());
+  fillAttribute(SketcherPrs_Tools::LOCATION_AUTOMATIC,
+    aFeature->integer(SketchPlugin_ConstraintRadius::LOCATION_TYPE_ID()));
   fillAttribute(theCircleOrArc, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
   aFeature->execute();
@@ -771,6 +846,127 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setVertical(
   fillAttribute(theLine, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   aFeature->execute();
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));
+}
+
+//--------------------------------------------------------------------------------------
+
+static std::shared_ptr<GeomAPI_Pnt2d> pointCoordinates(const AttributePtr& thePoint)
+{
+  AttributePoint2DPtr aPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(thePoint);
+  if (aPnt)
+    return aPnt->pnt();
+  return std::shared_ptr<GeomAPI_Pnt2d>();
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnLine(const FeaturePtr& theFeature)
+{
+  AttributePoint2DPtr aStartAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Line::START_ID()));
+  AttributePoint2DPtr aEndAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Line::END_ID()));
+
+  if (!aStartAttr || !aEndAttr)
+    return std::shared_ptr<GeomAPI_Pnt2d>();
+
+  std::shared_ptr<GeomAPI_XY> aStartPoint = aStartAttr->pnt()->xy();
+  std::shared_ptr<GeomAPI_XY> aEndPoint = aEndAttr->pnt()->xy();
+  return std::shared_ptr<GeomAPI_Pnt2d>(
+      new GeomAPI_Pnt2d(aStartPoint->added(aEndPoint)->multiplied(0.5)));
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> pointOnCircle(const FeaturePtr& theFeature)
+{
+  AttributePoint2DPtr aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Circle::CENTER_ID()));
+  AttributeDoublePtr aRadius = theFeature->real(SketchPlugin_Circle::RADIUS_ID());
+
+  if (!aCenter || !aRadius)
+    return std::shared_ptr<GeomAPI_Pnt2d>();
+
+  return std::shared_ptr<GeomAPI_Pnt2d>(
+      new GeomAPI_Pnt2d(aCenter->x() + aRadius->value(), aCenter->y()));
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnArc(const FeaturePtr& theFeature)
+{
+  static const double PI = 3.141592653589793238463;
+
+  AttributePoint2DPtr aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
+  AttributePoint2DPtr aStartAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Arc::START_ID()));
+  AttributePoint2DPtr aEndAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Arc::END_ID()));
+
+  if (!aCenterAttr || !aStartAttr || !aEndAttr)
+    return std::shared_ptr<GeomAPI_Pnt2d>();
+
+  std::shared_ptr<GeomAPI_Dir2d> aStartDir(new GeomAPI_Dir2d(
+      aStartAttr->x() - aCenterAttr->x(), aStartAttr->y() - aCenterAttr->y()));
+  std::shared_ptr<GeomAPI_Dir2d> aEndDir(new GeomAPI_Dir2d(
+      aEndAttr->x() - aCenterAttr->x(), aEndAttr->y() - aCenterAttr->y()));
+
+  double anAngle = aStartDir->angle(aEndDir);
+  bool isReversed = theFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
+  if (isReversed && anAngle > 0.)
+    anAngle -= 2.0 * PI;
+  else if (!isReversed && anAngle <= 0.)
+    anAngle += 2.0 * PI;
+
+  double cosA = cos(anAngle);
+  double sinA = sin(anAngle);
+
+  // rotate start dir to find middle point on arc
+  double aRadius = aStartAttr->pnt()->distance(aCenterAttr->pnt());
+  double x = aCenterAttr->x() + aRadius * (aStartDir->x() * cosA - aStartDir->y() * sinA);
+  double y = aCenterAttr->y() + aRadius * (aStartDir->x() * sinA + aStartDir->y() * cosA);
+
+  return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(x, y));
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject)
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (aFeature) {
+    const std::string& aFeatureKind = aFeature->getKind();
+    if (aFeatureKind == SketchPlugin_Point::ID())
+      return pointCoordinates(aFeature->attribute(SketchPlugin_Point::COORD_ID()));
+    else if (aFeatureKind == SketchPlugin_Line::ID())
+      return middlePointOnLine(aFeature);
+    else if (aFeatureKind == SketchPlugin_Circle::ID())
+      return pointOnCircle(aFeature);
+    else if (aFeatureKind == SketchPlugin_Arc::ID())
+      return middlePointOnArc(aFeature);
+  }
+  // do not move other types of features
+  return std::shared_ptr<GeomAPI_Pnt2d>();
+}
+
+void SketchAPI_Sketch::move(const ModelHighAPI_RefAttr& theMovedEntity,
+                            const std::shared_ptr<GeomAPI_Pnt2d>& theTargetPoint)
+{
+  std::shared_ptr<ModelAPI_ObjectMovedMessage> aMessage(new ModelAPI_ObjectMovedMessage);
+  theMovedEntity.fillMessage(aMessage);
+
+  std::shared_ptr<GeomAPI_Pnt2d> anOriginalPosition;
+  if (aMessage->movedAttribute())
+    anOriginalPosition = pointCoordinates(aMessage->movedAttribute());
+  else
+    anOriginalPosition = middlePoint(aMessage->movedObject());
+
+  if (!anOriginalPosition)
+    return; // something has gone wrong, do not process movement
+
+  aMessage->setOriginalPosition(anOriginalPosition);
+  aMessage->setCurrentPosition(theTargetPoint);
+  Events_Loop::loop()->send(aMessage);
+}
+
+void SketchAPI_Sketch::move(const ModelHighAPI_RefAttr& theMovedEntity,
+                            double theTargetX, double theTargetY)
+{
+  std::shared_ptr<GeomAPI_Pnt2d> aTargetPoint(new GeomAPI_Pnt2d(theTargetX, theTargetY));
+  move(theMovedEntity, aTargetPoint);
 }
 
 //--------------------------------------------------------------------------------------

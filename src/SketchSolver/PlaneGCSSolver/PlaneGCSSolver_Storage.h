@@ -44,10 +44,10 @@ public:
   virtual void addConstraint(ConstraintPtr        theConstraint,
                              ConstraintWrapperPtr theSolverConstraint);
 
-  /// \brief Add list of temporary constraints which will be destroyed
+  /// \brief Add a movement constraint which will be destroyed
   ///        after the next solving of the set of constraints.
   /// \param theSolverConstraint [in]  solver's constraint
-  virtual void addTemporaryConstraint(const ConstraintWrapperPtr& theSolverConstraint);
+  virtual void addMovementConstraint(const ConstraintWrapperPtr& theSolverConstraint);
 
 
   /// \brief Convert feature to the form applicable for specific solver and map it

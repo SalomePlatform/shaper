@@ -20,6 +20,7 @@
 
 #include "SketchPlugin_ConstraintAngle.h"
 #include <SketchPlugin_Line.h>
+#include <SketcherPrs_Tools.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
@@ -65,6 +66,10 @@ void SketchPlugin_ConstraintAngle::initAttributes()
                        ModelAPI_AttributeBoolean::typeId());
   data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID(),
                        ModelAPI_AttributeBoolean::typeId());
+
+  data()->addAttribute(SketchPlugin_ConstraintAngle::LOCATION_TYPE_ID(),
+                       ModelAPI_AttributeInteger::typeId());
+  data()->integer(LOCATION_TYPE_ID())->setValue(SketcherPrs_Tools::LOCATION_AUTOMATIC);
 }
 
 void SketchPlugin_ConstraintAngle::colorConfigInfo(std::string& theSection, std::string& theName,
@@ -268,20 +273,6 @@ void SketchPlugin_ConstraintAngle::updateConstraintValueByAngleValue()
   anAngle = getAngleForType(anAngle, aValueAttr->value() > 180.0);
   aValueAttr->setValue(anAngle);
 }
-
-void SketchPlugin_ConstraintAngle::move(double theDeltaX, double theDeltaY)
-{
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  if (!aData->isValid())
-    return;
-
-  myFlyoutUpdate = true;
-  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  aFlyoutAttr->setValue(aFlyoutAttr->x() + theDeltaX, aFlyoutAttr->y() + theDeltaY);
-  myFlyoutUpdate = false;
-}
-
 
 bool SketchPlugin_ConstraintAngle::compute(const std::string& theAttributeId)
 {

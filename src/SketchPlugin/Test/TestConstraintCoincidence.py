@@ -87,6 +87,7 @@ aFeature = aDocument.addFeature("Point")
 aFeature.real("x").setValue(0.)
 aFeature.real("y").setValue(0.)
 aFeature.real("z").setValue(0.)
+aFeature.string("creation_method").setValue("by_xyz")
 anOriginName = aFeature.name()
 aSession.finishOperation()
 #=========================================================================

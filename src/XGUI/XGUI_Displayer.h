@@ -93,10 +93,11 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param theAIS AIOS object to display
   /// \param toActivateInSelectionModes boolean value whether the presentation should be
   /// activated in the current selection modes
+  /// \param theDisplayMode mode how the presentation should be displayed
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \return true if the object visibility state is changed
   bool displayAIS(AISObjectPtr theAIS, const bool toActivateInSelectionModes,
-                  bool theUpdateViewer = true);
+                  const Standard_Integer theDisplayMode = 0, bool theUpdateViewer = true);
 
   /// Redisplay the shape if it was displayed
   /// \param theObject an object instance

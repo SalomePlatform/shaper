@@ -103,6 +103,13 @@ namespace SketcherPrs_Tools {
     ANGLE_BACKWARD ///< Angle from the second line to the first line
   };
 
+  /// Type of dimension location
+  enum LocationType{
+    LOCATION_RIGHT,   ///< Position is marked by right arrow placed on the left
+    LOCATION_AUTOMATIC,  ///< Position is marked by two arrow placed on the both sides
+    LOCATION_LEFT ///< Position is marked by left arrow placed on the left
+  };
+
   /// Event ID about expression visual state has been changed, the symbol with a digit
   /// or parameter text is shown
 

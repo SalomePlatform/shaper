@@ -103,11 +103,6 @@ class SketchPlugin_Arc: public SketchPlugin_SketchEntity
   /// Creates an arc-shape
   SKETCHPLUGIN_EXPORT virtual void execute();
 
-  /// Moves the feature
-  /// \param theDeltaX the delta for X coordinate is moved
-  /// \param theDeltaY the delta for Y coordinate is moved
-  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
-
   /// Updates the "reversed" flag
   /// \param isReversed  whether the arc will be reversed
   void setReversed(bool isReversed);

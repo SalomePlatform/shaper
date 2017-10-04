@@ -979,18 +979,33 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
   AttributeSelectionPtr aFeatureAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   std::shared_ptr<GeomAPI_Edge> anEdge;
+  std::shared_ptr<SketchPlugin_Feature> aSketchFeature;
   if (aFeatureAttr.get()) {
     GeomShapePtr aVal = aFeatureAttr->value();
     ResultPtr aRes = aFeatureAttr->context();
-    if(aFeatureAttr->value() && aFeatureAttr->value()->isEdge()) {
+    if(aVal && aVal->isEdge()) {
       anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aFeatureAttr->value()));
-    } else if(aFeatureAttr->context() && aFeatureAttr->context()->shape() &&
-              aFeatureAttr->context()->shape()->isEdge()) {
+    } else if(aRes && aRes->shape() && aRes->shape()->isEdge()) {
       anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aFeatureAttr->context()->shape()));
+    }
+
+    // try to convert result to sketch feature
+    if (aRes) {
+      aSketchFeature =
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(ModelAPI_Feature::feature(aRes));
     }
   }
   if (!anEdge) {
-    theError = "The attribute %1 should be an edge";
+    // check a vertex has been selected
+    if (aFeatureAttr->value() && aFeatureAttr->value()->isVertex())
+      return true;
+    else {
+      ResultPtr aRes = aFeatureAttr->context();
+      if (aRes && aRes->shape() && aRes->shape()->isVertex())
+        return true;
+    }
+
+    theError = "The attribute %1 should be an edge or vertex";
     theError.arg(theAttribute->id());
     return false;
   }
@@ -1011,6 +1026,10 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
     theError = "There is no sketch referring to the current feature";
     return false;
   }
+  if (aSketchFeature && aSketch.get() == aSketchFeature->sketch()) {
+    theError = "Unable to project feature from the same sketch";
+    return false;
+  }
 
   std::shared_ptr<GeomAPI_Pln> aPlane = aSketch->plane();
   std::shared_ptr<GeomAPI_Dir> aNormal = aPlane->direction();
@@ -1019,11 +1038,8 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
   if (anEdge->isLine()) {
     std::shared_ptr<GeomAPI_Lin> aLine = anEdge->line();
     std::shared_ptr<GeomAPI_Dir> aLineDir = aLine->direction();
-    std::shared_ptr<GeomAPI_Pnt> aLineLoc = aLine->location();
-    double aDot = aNormal->dot(aLineDir);
-    double aDist = aLineLoc->xyz()->decreased(anOrigin->xyz())->dot(aNormal->xyz());
-    bool aValid = (fabs(aDot) >= tolerance && fabs(aDot) < 1.0 - tolerance) ||
-           (fabs(aDot) < tolerance && fabs(aDist) > tolerance);
+    double aDot = fabs(aNormal->dot(aLineDir));
+    bool aValid = fabs(aDot - 1.0) >= tolerance * tolerance;
     if (!aValid)
       theError = "Error: Edge is already in the sketch plane.";
     return aValid;
@@ -1031,10 +1047,8 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
   else if (anEdge->isCircle() || anEdge->isArc()) {
     std::shared_ptr<GeomAPI_Circ> aCircle = anEdge->circle();
     std::shared_ptr<GeomAPI_Dir> aCircNormal = aCircle->normal();
-    std::shared_ptr<GeomAPI_Pnt> aCircCenter = aCircle->center();
     double aDot = fabs(aNormal->dot(aCircNormal));
-    double aDist = aCircCenter->xyz()->decreased(anOrigin->xyz())->dot(aNormal->xyz());
-    bool aValid = fabs(aDot - 1.0) < tolerance * tolerance && fabs(aDist) > tolerance;
+    bool aValid = fabs(aDot - 1.0) < tolerance * tolerance;
     if (!aValid)
       theError.arg(anEdge->isCircle() ? "Error: Cirlce is already in the sketch plane."
                                       : "Error: Arc is already in the sketch plane.");
@@ -1507,4 +1521,47 @@ bool SketchPlugin_ArcEndPointIntersectionValidator::isValid(
   }
 
   return false;
+}
+
+bool SketchPlugin_HasNoConstraint::isValid(const AttributePtr& theAttribute,
+                                           const std::list<std::string>& theArguments,
+                                           Events_InfoMessage& theError) const
+{
+  std::set<std::string> aFeatureKinds;
+  for (std::list<std::string>::const_iterator anArgIt = theArguments.begin();
+       anArgIt != theArguments.end(); anArgIt++) {
+    aFeatureKinds.insert(*anArgIt);
+  }
+
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
+    return false;
+  }
+
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>
+                                                                      (theAttribute);
+  bool isObject = aRefAttr->isObject();
+  if (!isObject) {
+    theError = "It uses an empty object";
+    return false;
+  }
+  ObjectPtr anObject = aRefAttr->object();
+  FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+  if (!aFeature.get()) {
+    theError = "The feature of the checked attribute is empty";
+    return false;
+  }
+
+  FeaturePtr aCurrentFeature = ModelAPI_Feature::feature(aRefAttr->owner());
+
+  std::set<AttributePtr> aRefsList = anObject->data()->refsToMe();
+  std::set<AttributePtr>::const_iterator anIt = aRefsList.begin();
+  for (; anIt != aRefsList.end(); anIt++) {
+    FeaturePtr aRefFeature = ModelAPI_Feature::feature((*anIt)->owner());
+    if (aRefFeature.get() && aCurrentFeature != aRefFeature &&
+        aFeatureKinds.find(aRefFeature->getKind()) != aFeatureKinds.end())
+      return false; // constraint is found, that means that the check is not valid
+  }
+  return true;
 }

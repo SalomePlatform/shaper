@@ -21,6 +21,13 @@
 #include <ModelAPI.h>
 #include <ModelAPI_Events.h>
 
+#include <GeomAPI_Pnt2d.h>
+
+//#define DEBUG_OBJECT_MOVED_MESSAGE
+#ifdef DEBUG_OBJECT_MOVED_MESSAGE
+#include <iostream>
+#endif
+
 ModelAPI_ObjectUpdatedMessage::ModelAPI_ObjectUpdatedMessage(const Events_ID theID,
                                                              const void* theSender)
     : Events_MessageGroup(theID, theSender)
@@ -337,4 +344,65 @@ void ModelAPI_SolverFailedMessage::setObjects(const std::set<ObjectPtr>& theObje
 const std::set<ObjectPtr>& ModelAPI_SolverFailedMessage::objects() const
 {
   return myObjects;
+}
+
+
+// =====   ModelAPI_ObjectMovedMessage   =====
+ModelAPI_ObjectMovedMessage::ModelAPI_ObjectMovedMessage(const void* theSender)
+  : Events_Message(Events_Loop::eventByName(EVENT_OBJECT_MOVED), theSender)
+{
+}
+
+void ModelAPI_ObjectMovedMessage::setMovedObject(const ObjectPtr& theMovedObject)
+{
+  myMovedObject = theMovedObject;
+  myMovedAttribute = AttributePtr();
+}
+
+void ModelAPI_ObjectMovedMessage::setMovedAttribute(const AttributePtr& theMovedAttribute)
+{
+  myMovedAttribute = theMovedAttribute;
+  myMovedObject = ObjectPtr();
+}
+
+void ModelAPI_ObjectMovedMessage::setOriginalPosition(double theX, double theY)
+{
+  myOriginalPosition = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
+#ifdef DEBUG_OBJECT_MOVED_MESSAGE
+  std::cout << "setOriginalPosition: " << myOriginalPosition->x() << ", "
+                                       << myOriginalPosition->y() << std::endl;
+#endif
+}
+
+void ModelAPI_ObjectMovedMessage::setOriginalPosition(
+    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  myOriginalPosition = thePoint;
+#ifdef DEBUG_OBJECT_MOVED_MESSAGE
+  std::cout << "setOriginalPosition: " << myOriginalPosition->x() << ", "
+                                       << myOriginalPosition->y() << std::endl;
+#endif
+}
+
+void ModelAPI_ObjectMovedMessage::setCurrentPosition(double theX, double theY)
+{
+  myCurrentPosition = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
+#ifdef DEBUG_OBJECT_MOVED_MESSAGE
+  std::cout << "setCurrentPosition: " << myCurrentPosition->x() << ", " << myCurrentPosition->y()
+            << ", myCurrentPosition - myOriginalPosition: "
+            << myCurrentPosition->x() - myOriginalPosition->x() << ", "
+            << myCurrentPosition->y() - myOriginalPosition->y() << std::endl;
+#endif
+}
+
+void ModelAPI_ObjectMovedMessage::setCurrentPosition(
+    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  myCurrentPosition = thePoint;
+#ifdef DEBUG_OBJECT_MOVED_MESSAGE
+  std::cout << "setCurrentPosition: " << myCurrentPosition->x() << ", " << myCurrentPosition->y()
+            << ", myCurrentPosition - myOriginalPosition: "
+            << myCurrentPosition->x() - myOriginalPosition->x() << ", "
+            << myCurrentPosition->y() - myOriginalPosition->y() << std::endl;
+#endif
 }

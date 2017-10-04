@@ -724,7 +724,7 @@ void XGUI_ContextMenuMgr::addFeatures(QMenu* theMenu) const
   bool aIsRoot = false;
   foreach(QModelIndex aIdx, aSelectedIndexes) {
     // Process only first column
-    if (aIdx.column() == 0) {
+    if (aIdx.column() == 1) {
       aIsRoot = !aIdx.parent().isValid();
       // Exit if the selected index belongs to non active document
       if (aIsRoot && (aActiveDoc != aMgr->moduleDocument()))

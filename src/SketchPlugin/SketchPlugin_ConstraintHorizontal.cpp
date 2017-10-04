@@ -50,7 +50,8 @@ AISObjectPtr SketchPlugin_ConstraintHorizontal::getAISObject(AISObjectPtr thePre
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS = SketcherPrs_Factory::horisontalConstraint(this, sketch()->coordinatePlane(),
+  AISObjectPtr anAIS = SketcherPrs_Factory::horisontalConstraint(this, sketch(),
+                                                                 sketch()->coordinatePlane(),
                                                                  thePrevious);
   return anAIS;
 }

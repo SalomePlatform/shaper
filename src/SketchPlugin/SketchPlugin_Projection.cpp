@@ -23,6 +23,7 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_Point.h>
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_ConstraintRigid.h>
 
@@ -39,6 +40,7 @@
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_Vertex.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomDataAPI_Point2D.h>
 
@@ -60,6 +62,8 @@ void SketchPlugin_Projection::initDerivedClassAttributes()
 
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
+
+  data()->addAttribute(INCLUDE_INTO_RESULT(), ModelAPI_AttributeBoolean::typeId());
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), AUXILIARY_ID());
 }
@@ -86,11 +90,6 @@ void SketchPlugin_Projection::execute()
   computeProjection(EXTERNAL_FEATURE_ID());
 }
 
-void SketchPlugin_Projection::move(double theDeltaX, double theDeltaY)
-{
-  // feature cannot be moved
-}
-
 void SketchPlugin_Projection::attributeChanged(const std::string& theID)
 {
   if ((theID == EXTERNAL_FEATURE_ID() || theID == EXTERNAL_ID()) && !myIsComputing) {
@@ -100,19 +99,42 @@ void SketchPlugin_Projection::attributeChanged(const std::string& theID)
   }
 }
 
+static bool isValidProjectionType(FeaturePtr theProjection,
+                                  GeomEdgePtr theEdge,
+                                  GeomVertexPtr theVertex)
+{
+  if (theVertex && theProjection->getKind() == SketchPlugin_Point::ID())
+    return true;
+  if (theEdge) {
+    if (theEdge->isLine() && theProjection->getKind() == SketchPlugin_Line::ID())
+      return true;
+    else if (theEdge->isCircle() && theProjection->getKind() == SketchPlugin_Circle::ID())
+      return true;
+    else if (theEdge->isArc() && theProjection->getKind() == SketchPlugin_Arc::ID())
+      return true;
+  }
+  return false;
+}
+
 void SketchPlugin_Projection::computeProjection(const std::string& theID)
 {
   AttributeSelectionPtr aExtFeature =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(attribute(EXTERNAL_FEATURE_ID()));
 
-  std::shared_ptr<GeomAPI_Edge> anEdge;
-  if (aExtFeature && aExtFeature->value() && aExtFeature->value()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aExtFeature->value()));
-  } else if (aExtFeature->context() && aExtFeature->context()->shape() &&
-             aExtFeature->context()->shape()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aExtFeature->context()->shape()));
+  GeomShapePtr aShape;
+  GeomEdgePtr anEdge;
+  GeomVertexPtr aVertex;
+  if (aExtFeature)
+    aShape = aExtFeature->value();
+  if (!aShape && aExtFeature->context())
+    aShape = aExtFeature->context()->shape();
+  if (aShape) {
+    if (aShape->isEdge())
+      anEdge = GeomEdgePtr(new GeomAPI_Edge(aShape));
+    else if (aShape->isVertex())
+      aVertex = GeomVertexPtr(new GeomAPI_Vertex(aShape));
   }
-  if (!anEdge.get())
+  if (!anEdge && !aVertex)
     return;
 
   AttributeRefAttrPtr aRefAttr = data()->refattr(PROJECTED_FEATURE_ID());
@@ -122,18 +144,15 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
 
   // if the type of feature differs with already selected, remove it and create once again
   bool hasPrevProj = aProjection.get() != 0;
-  if (hasPrevProj) {
-    if ((anEdge->isLine() && aProjection->getKind() != SketchPlugin_Line::ID()) ||
-        (anEdge->isCircle() && aProjection->getKind() != SketchPlugin_Circle::ID()) ||
-        (anEdge->isArc() && aProjection->getKind() != SketchPlugin_Arc::ID())) {
-      DocumentPtr aDoc = sketch()->document();
+  if (hasPrevProj && !isValidProjectionType(aProjection, anEdge, aVertex)) {
+    DocumentPtr aDoc = sketch()->document();
 
-      std::set<FeaturePtr> aFeaturesToBeRemoved;
-      aFeaturesToBeRemoved.insert(aProjection);
-      ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved);
-      aProjection = FeaturePtr();
-      aRefAttr->setObject(aProjection);
-    }
+    std::set<FeaturePtr> aFeaturesToBeRemoved;
+    aFeaturesToBeRemoved.insert(aProjection);
+    ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved);
+    aProjection = FeaturePtr();
+    aRefAttr->setObject(aProjection);
+    hasPrevProj = false;
   }
 
   std::shared_ptr<GeomAPI_Pln> aSketchPlane = sketch()->plane();
@@ -145,7 +164,18 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
   }
 
-  if (anEdge->isLine()) {
+  if (aVertex) {
+    std::shared_ptr<GeomAPI_Pnt> aPrjPnt = aSketchPlane->project(aVertex->point());
+    std::shared_ptr<GeomAPI_Pnt2d> aPntInSketch = sketch()->to2D(aPrjPnt);
+
+    if (!hasPrevProj)
+      aProjection = sketch()->addFeature(SketchPlugin_Point::ID());
+
+    // update coordinates of projection
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aProjection->attribute(SketchPlugin_Point::COORD_ID()))->setValue(aPntInSketch);
+  }
+  else if (anEdge->isLine()) {
     std::shared_ptr<GeomAPI_Pnt> aFirst = aSketchPlane->project(anEdge->firstPoint());
     std::shared_ptr<GeomAPI_Pnt> aLast = aSketchPlane->project(anEdge->lastPoint());
 
@@ -192,8 +222,12 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     std::shared_ptr<GeomAPI_Pnt> aCenter = aSketchPlane->project(aCircle->center());
     std::shared_ptr<GeomAPI_Pnt2d> aCenterInSketch = sketch()->to2D(aCenter);
 
+    bool isInversed = aCircle->normal()->dot(aSketchPlane->direction()) < 0.;
+
     if (!hasPrevProj)
       aProjection = sketch()->addFeature(SketchPlugin_Arc::ID());
+
+    bool aWasBlocked = aProjection->data()->blockSendAttributeUpdated(true);
 
     // update attributes of projection
     std::shared_ptr<GeomDataAPI_Point2D> aCenterPnt =
@@ -208,6 +242,9 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     aStartPnt->setValue(aFirstInSketch);
     aEndPnt->setValue(aLastInSketch);
     aCenterPnt->setValue(aCenterInSketch);
+    aProjection->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(isInversed);
+
+    aProjection->data()->blockSendAttributeUpdated(aWasBlocked, false);
   }
 
   aProjection->boolean(COPY_ID())->setValue(true);

@@ -25,8 +25,10 @@
 #include <SketchPlugin_Point.h>
 
 #include <SketcherPrs_Factory.h>
+#include <SketcherPrs_Tools.h>
 
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Data.h>
 
 #include <GeomAPI_Pnt2d.h>
@@ -52,6 +54,10 @@ void SketchPlugin_ConstraintRadius::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::VALUE(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::typeId());
+
+  data()->addAttribute(SketchPlugin_ConstraintRadius::LOCATION_TYPE_ID(),
+                       ModelAPI_AttributeInteger::typeId());
+  data()->integer(LOCATION_TYPE_ID())->setValue(SketcherPrs_Tools::LOCATION_AUTOMATIC);
 }
 
 void SketchPlugin_ConstraintRadius::colorConfigInfo(std::string& theSection, std::string& theName,
@@ -171,19 +177,6 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
   AISObjectPtr anAIS = SketcherPrs_Factory::radiusConstraint(this, sketch()->coordinatePlane(),
                                                              thePrevious);
   return anAIS;
-}
-
-void SketchPlugin_ConstraintRadius::move(double theDeltaX, double theDeltaY)
-{
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  if (!aData->isValid())
-    return;
-
-  myFlyoutUpdate = true;
-  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  aFlyoutAttr->setValue(aFlyoutAttr->x() + theDeltaX, aFlyoutAttr->y() + theDeltaY);
-  myFlyoutUpdate = false;
 }
 
 void SketchPlugin_ConstraintRadius::attributeChanged(const std::string& theID) {

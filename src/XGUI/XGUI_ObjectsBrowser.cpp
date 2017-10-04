@@ -38,8 +38,12 @@
 #include <QStyledItemDelegate>
 #include <QMessageBox>
 
+#ifdef DEBUG_INDXES
+#include <QToolTip>
+#endif
 
 /// Width of second column (minimum acceptable = 27)
+#define FIRST_COL_WIDTH 20
 #define SECOND_COL_WIDTH 30
 
 
@@ -81,11 +85,12 @@ XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
     : QTreeView(theParent)
 {
   setHeaderHidden(true);
+  setTreePosition(1);
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setSelectionBehavior(QAbstractItemView::SelectRows);
   setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-  setItemDelegateForColumn(0, new XGUI_TreeViewItemDelegate(this));
+  setItemDelegateForColumn(1, new XGUI_TreeViewItemDelegate(this));
 
   connect(this, SIGNAL(doubleClicked(const QModelIndex&)),
     SLOT(onDoubleClick(const QModelIndex&)));
@@ -141,15 +146,46 @@ void XGUI_DataTree::resizeEvent(QResizeEvent* theEvent)
   QTreeView::resizeEvent(theEvent);
   QSize aSize = theEvent->size();
   if (aSize.isValid()) {
-    setColumnWidth(0, aSize.width() - SECOND_COL_WIDTH - 7);
-    setColumnWidth(1, SECOND_COL_WIDTH);
+    setColumnWidth(0, FIRST_COL_WIDTH);
+    setColumnWidth(1, aSize.width() - SECOND_COL_WIDTH - FIRST_COL_WIDTH - 10);
+    setColumnWidth(2, SECOND_COL_WIDTH);
   }
 }
 
-void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
+#ifdef DEBUG_INDXES
+void XGUI_DataTree::mousePressEvent(QMouseEvent* theEvent)
 {
-  if (theIndex.column() != 1)
+  QTreeView::mousePressEvent(theEvent);
+  if (theEvent->button() != Qt::MidButton)
     return;
+  QModelIndex aInd = indexAt(theEvent->pos());
+  QString aTxt =
+    QString("r=%1 c=%2 p=%3").arg(aInd.row()).arg(aInd.column()).arg((long)aInd.internalPointer());
+
+  QModelIndex aPar = aInd.parent();
+  QString aTxt1 =
+    QString("r=%1 c=%2 p=%3").arg(aPar.row()).arg(aPar.column()).arg((long)aPar.internalPointer());
+  QToolTip::showText(theEvent->globalPos(), aTxt + '\n' + aTxt1);
+}
+#endif
+
+void XGUI_DataTree::mouseReleaseEvent(QMouseEvent* theEvent)
+{
+  QTreeView::mouseReleaseEvent(theEvent);
+#ifdef DEBUG_INDXES
+  if (theEvent->button() != Qt::MidButton)
+    return;
+  QToolTip::hideText();
+#endif
+  if (theEvent->button() == Qt::LeftButton) {
+    QModelIndex aInd = indexAt(theEvent->pos());
+    if (aInd.column() == 0)
+      processEyeClick(aInd);
+  }
+}
+
+void XGUI_DataTree::processHistoryChange(const QModelIndex& theIndex)
+{
   SessionPtr aMgr = ModelAPI_Session::get();
   // When operation is opened then we can not change history
   if (aMgr->isOperation())
@@ -187,6 +223,36 @@ void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
   for (int i = 0; i < aSize; i++) {
     update(aModel->index(i, 0, aParent));
     update(aModel->index(i, 1, aParent));
+    update(aModel->index(i, 2, aParent));
+  }
+}
+
+void XGUI_DataTree::processEyeClick(const QModelIndex& theIndex)
+{
+  XGUI_DataModel* aModel = dataModel();
+  ObjectPtr aObj = aModel->object(theIndex);
+  if (aObj.get()) {
+    ResultPtr aResObj = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    if (aResObj.get()) {
+      aResObj->setDisplayed(!aResObj->isDisplayed());
+      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+      update(theIndex);
+    }
+    // Update list of selected objects because this event happens after
+    // selection event in object browser
+    XGUI_ObjectsBrowser* aObjBrowser = qobject_cast<XGUI_ObjectsBrowser*>(parent());
+    if (aObjBrowser) {
+      aObjBrowser->onSelectionChanged();
+    }
+  }
+}
+
+void XGUI_DataTree::onDoubleClick(const QModelIndex& theIndex)
+{
+  switch (theIndex.column()) {
+  case 2:
+    processHistoryChange(theIndex);
+    break;
   }
 }
 
@@ -289,8 +355,8 @@ void XGUI_ActiveDocLbl::unselect()
 //********************************************************************
 //********************************************************************
 //********************************************************************
-XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
-    : QWidget(theParent), myDocModel(0)
+XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent, XGUI_Workshop* theWorkshop)
+    : QWidget(theParent), myDocModel(0), myWorkshop(theWorkshop)
 {
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
@@ -473,12 +539,20 @@ void XGUI_ObjectsBrowser::clearContent()
   myTreeView->clear();
 }
 
+//***************************************************
 void XGUI_ObjectsBrowser::onSelectionChanged(const QItemSelection& theSelected,
                                        const QItemSelection& theDeselected)
+{
+  onSelectionChanged();
+}
+
+//***************************************************
+void XGUI_ObjectsBrowser::onSelectionChanged()
 {
   emit selectionChanged();
 }
 
+//***************************************************
 QObjectPtrList XGUI_ObjectsBrowser::selectedObjects(QModelIndexList* theIndexes) const
 {
   QObjectPtrList aList;
@@ -486,7 +560,7 @@ QObjectPtrList XGUI_ObjectsBrowser::selectedObjects(QModelIndexList* theIndexes)
   XGUI_DataModel* aModel = dataModel();
   QModelIndexList::const_iterator aIt;
   for (aIt = aIndexes.constBegin(); aIt != aIndexes.constEnd(); ++aIt) {
-    if ((*aIt).column() == 0) {
+    if ((*aIt).column() == 1) {
       ObjectPtr aObject = aModel->object(*aIt);
       if (aObject) {
         aList.append(aObject);
@@ -517,7 +591,7 @@ std::list<bool> XGUI_ObjectsBrowser::getStateForDoc(DocumentPtr theDoc) const
   QModelIndex aRootIdx = aModel->documentRootIndex(theDoc);
   int aNbChild = aModel->rowCount(aRootIdx);
   for (int i = 0; i < aNbChild; i++) {
-    QModelIndex aIdx = aModel->index(i, 0, aRootIdx);
+    QModelIndex aIdx = aModel->index(i, 1, aRootIdx);
     aStates.push_back(myTreeView->isExpanded(aIdx));
   }
   return aStates;

@@ -37,9 +37,11 @@ class SketcherPrs_HVDirection: public SketcherPrs_SymbolPrs
 public:
   /// Constructor
   /// \param theConstraint a constraint feature
+  /// \param theSketcher a sketcher object
   /// \param thePlane a coordinate plane of current sketch
   /// \param isHorisontal a flag horizontal or vertical presentation
   Standard_EXPORT SketcherPrs_HVDirection(ModelAPI_Feature* theConstraint,
+                                          ModelAPI_CompositeFeature* theSketcher,
                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane,
                                          bool isHorisontal);
 

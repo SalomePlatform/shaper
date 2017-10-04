@@ -490,3 +490,13 @@ bool GeomAPI_Shape::isIntersect(const GeomShapePtr theShape) const
 
   return false;
 }
+
+void GeomAPI_Shape::translate(const std::shared_ptr<GeomAPI_Dir> theDir, const double theOffset)
+{
+  gp_Dir aDir = theDir->impl<gp_Dir>();
+  gp_Vec aTrsfVec(aDir.XYZ() * theOffset);
+  gp_Trsf aTranslation;
+  aTranslation.SetTranslation(aTrsfVec);
+  TopoDS_Shape aResult = MY_SHAPE->Moved(aTranslation);
+  setImpl(new TopoDS_Shape(aResult));
+}

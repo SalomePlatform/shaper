@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+// Copyright (C) 2017  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -18,26 +18,24 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#ifndef PartSet_WidgetChoice_H
-#define PartSet_WidgetChoice_H
+// File:        PartSet_CenterPrs.cpp
+// Created:     25 April 2017
+// Author:      Vitaly SMETANNIKOV
 
-#include "PartSet.h"
-#include <ModuleBase_WidgetChoice.h>
+#include "PartSet_CenterPrs.h"
 
-/**
-* \ingroup GUI
-* Implementation of a proxy of choice widget in order to geat access to it on moment 
-* of creation in module
-*/
-class PARTSET_EXPORT PartSet_WidgetChoice : public ModuleBase_WidgetChoice
+#include <Geom_CartesianPoint.hxx>
+
+
+IMPLEMENT_STANDARD_RTTIEXT(PartSet_CenterPrs, AIS_Point)
+
+PartSet_CenterPrs::PartSet_CenterPrs(const ObjectPtr& theObject,
+                                     const GeomEdgePtr& theEdge,
+                                     const gp_Pnt& theCenter,
+                                     ModelAPI_AttributeSelection::CenterType theType)
+  : AIS_Point(new Geom_CartesianPoint(theCenter)),
+  myObject(theObject),
+  myEdge(theEdge),
+  myCenterType(theType)
 {
-Q_OBJECT
- public:
-  /// Constructor
-  /// \param theParent the parent object
-  /// \param theData the widget configuation. The attribute of the model widget is obtained from
-  PartSet_WidgetChoice(QWidget* theParent, const Config_WidgetAPI* theData)
-    : ModuleBase_WidgetChoice(theParent, theData) {}
-};
-
-#endif
+}

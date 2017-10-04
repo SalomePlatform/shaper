@@ -23,6 +23,8 @@
 #include "SketcherPrs_PositionMgr.h"
 
 #include <GeomAPI_Curve.h>
+#include <GeomAPI_Circ.h>
+#include <GeomAPI_Lin.h>
 
 #include <SketchPlugin_Constraint.h>
 
@@ -37,8 +39,9 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Tangent, SketcherPrs_SymbolPrs);
 static Handle(Image_AlienPixMap) MyPixMap;
 
 SketcherPrs_Tangent::SketcherPrs_Tangent(ModelAPI_Feature* theConstraint,
+                                         ModelAPI_CompositeFeature* theSketcher,
                                            const std::shared_ptr<GeomAPI_Ax3>& thePlane)
- : SketcherPrs_SymbolPrs(theConstraint, thePlane)
+ : SketcherPrs_SymbolPrs(theConstraint, theSketcher, thePlane)
 {
 }
 
@@ -68,13 +71,50 @@ bool SketcherPrs_Tangent::updateIfReadyToDisplay(double theStep, bool withColor)
   ObjectPtr aObj2 =
     SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
 
+  GeomShapePtr aShp1 = SketcherPrs_Tools::getShape(aObj1);
+  GeomShapePtr aShp2 = SketcherPrs_Tools::getShape(aObj2);
+
+  GeomCurvePtr aCurv1 = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShp1));
+  GeomCurvePtr aCurv2 = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShp2));
+
+  GeomCurvePtr aLine;
+  GeomCirclePtr aCircle;
+  double aFirst, aLast;
+  if (aCurv1->isLine()) {
+    aLine = aCurv1;
+    aCircle = GeomCirclePtr(new GeomAPI_Circ(aCurv2));
+    aFirst = aCurv2->startParam();
+    aLast = aCurv2->endParam();
+  } else {
+    aLine = aCurv2;
+    aCircle = GeomCirclePtr(new GeomAPI_Circ(aCurv1));
+    aFirst = aCurv1->startParam();
+    aLast = aCurv1->endParam();
+  }
+
+  GeomPointPtr aPnt1 = aLine->getPoint(aLine->startParam());
+  GeomPointPtr aPnt2 = aLine->getPoint(aLine->endParam());
+  double aParam;
+  GeomPointPtr aPnt;
+  if (aCircle->parameter(aPnt1, 1.e-4, aParam) && (aParam >= aFirst) && (aParam <= aLast))
+    aPnt = aPnt1;
+  else if (aCircle->parameter(aPnt2, 1.e-4, aParam) && (aParam >= aFirst) && (aParam <= aLast))
+    aPnt = aPnt2;
+
   // Compute points coordinates
-  SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
-  gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep);
-  gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);
-  myPntArray = new Graphic3d_ArrayOfPoints(2, withColor);
-  myPntArray->AddVertex(aP1);
-  myPntArray->AddVertex(aP2);
+  if (aPnt.get()) {
+    SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
+    gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep, aPnt);
+    myPntArray = new Graphic3d_ArrayOfPoints(1, withColor);
+    myPntArray->AddVertex(aP1);
+  } else {
+    SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
+    gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep);
+    gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);
+    myPntArray = new Graphic3d_ArrayOfPoints(2, withColor);
+    myPntArray->AddVertex(aP1);
+    myPntArray->AddVertex(aP2);
+  }
   return true;
 }
 

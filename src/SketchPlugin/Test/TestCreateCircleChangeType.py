@@ -72,13 +72,7 @@ def verifyLastCircle(theSketch, theX, theY, theR):
     subroutine to verify position of last circle in the sketch
     """
     aLastCircle = model.lastSubFeature(theSketch, "SketchCircle")
-    aCenter = geomDataAPI_Point2D(aLastCircle.attribute("circle_center"))
-    verifyPointCoordinates(aCenter, theX, theY)
-    aRadius = aLastCircle.real("circle_radius")
-    assert aRadius.value() == theR, "Wrong radius {0}, expected {1}".format(aRadius.value(), theR)
-
-def verifyPointCoordinates(thePoint, theX, theY):
-    assert thePoint.x() == theX and thePoint.y() == theY, "Wrong '{0}' point ({1}, {2}), expected ({3}, {4})".format(thePoint.attributeType(), thePoint.x(), thePoint.y(), theX, theY)
+    model.assertCircle(aLastCircle, [theX, theY], theR)
 
 
 #=========================================================================

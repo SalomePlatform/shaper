@@ -70,10 +70,6 @@ class GeomAPI_Pln : public GeomAPI_Interface
   GEOMAPI_EXPORT
   bool isCoincident(const std::shared_ptr<GeomAPI_Pln> thePlane, const double theTolerance = 1.e-7);
 
-  /// Returns true if plane is parallel to theLine.
-  GEOMAPI_EXPORT
-  bool isParallel(const std::shared_ptr<GeomAPI_Lin> theLine);
-
   /// Returns intersection point or empty if no intersections
   GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt> intersect(const std::shared_ptr<GeomAPI_Lin>& theLine) const;
@@ -94,6 +90,9 @@ class GeomAPI_Pln : public GeomAPI_Interface
   GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Lin> intersect(const std::shared_ptr<GeomAPI_Pln> thePlane) const;
 };
+
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_Pln> GeomPlanePtr;
 
 #endif
 

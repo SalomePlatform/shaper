@@ -19,6 +19,9 @@
 //
 
 #include "XGUI_DataModel.h"
+#include "XGUI_Workshop.h"
+#include "XGUI_ObjectsBrowser.h"
+#include "XGUI_Displayer.h"
 
 #include <ModuleBase_IconFactory.h>
 
@@ -81,6 +84,9 @@ ModelAPI_Document* getSubDocument(void* theObj)
 XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParent)//,
   //myIsEventsProcessingBlocked(false)
 {
+  XGUI_ObjectsBrowser* aOB = qobject_cast<XGUI_ObjectsBrowser*>(theParent);
+  myWorkshop = aOB->workshop();
+
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
@@ -146,7 +152,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         }
       } else {
         // Object created in sub-document
-        QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get());
+        QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get(), 0);
         if (aDocRoot.isValid()) {
           // Check that new folders could appear
           QStringList aNotEmptyFolders = listOfShowNotEmptyFolders(false);
@@ -236,7 +242,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         }
       } else {
         // Remove row for sub-document
-        QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get());
+        QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get(), 0);
         if (aDocRoot.isValid()) {
           int aRow = aDoc->size(aGroup);
           int aNbSubFolders = foldersCount(aDoc.get());
@@ -286,10 +292,10 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           && (aFeature->firstResult()->groupName() == ModelAPI_ResultField::group())) {
             ResultFieldPtr aResult =
               std::dynamic_pointer_cast<ModelAPI_ResultField>(aFeature->firstResult());
-            QModelIndex aIndex = objectIndex(aResult);
+            QModelIndex aIndex = objectIndex(aResult, 0);
             removeRows(0, aResult->stepsSize(), aIndex);
         } else {
-          QModelIndex aIndex = objectIndex(aObject);
+          QModelIndex aIndex = objectIndex(aObject, 0);
           if (aIndex.isValid()) {
             emit dataChanged(aIndex, aIndex);
           }
@@ -318,7 +324,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         // Update a sub-document
         if (aGroup == myXMLReader->subType()) {
           // Update sub-document root
-          aParent = findDocumentRootIndex(aDoc.get());
+          aParent = findDocumentRootIndex(aDoc.get(), 0);
           aStartId = foldersCount(aDoc.get());
         } else
           // update folder in sub-document
@@ -332,7 +338,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
     DocumentPtr aDoc = ModelAPI_Session::get()->activeDocument();
     if (aDoc != aRootDoc) {
-      QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get());
+      QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get(), 0);
       if (aDocRoot.isValid())
         emit dataChanged(aDocRoot, aDocRoot);
       else
@@ -373,7 +379,7 @@ ObjectPtr XGUI_DataModel::object(const QModelIndex& theIndex) const
 }
 
 //******************************************************
-QModelIndex XGUI_DataModel::objectIndex(const ObjectPtr theObject) const
+QModelIndex XGUI_DataModel::objectIndex(const ObjectPtr theObject, int theColumn) const
 {
   std::string aType = theObject->groupName();
   DocumentPtr aDoc = theObject->document();
@@ -403,7 +409,7 @@ QModelIndex XGUI_DataModel::objectIndex(const ObjectPtr theObject) const
     if (aRow == -1)
       return QModelIndex();
     else
-      return createIndex(aRow, 0, theObject.get());
+      return createIndex(aRow, theColumn, theObject.get());
   }
   SessionPtr aSession = ModelAPI_Session::get();
   DocumentPtr aRootDoc = aSession->moduleDocument();
@@ -414,7 +420,7 @@ QModelIndex XGUI_DataModel::objectIndex(const ObjectPtr theObject) const
     // The object from sub document
     aRow += foldersCount(aDoc.get());
   }
-  return createIndex(aRow, 0, theObject.get());
+  return createIndex(aRow, theColumn, theObject.get());
 }
 
 //******************************************************
@@ -425,10 +431,26 @@ QVariant XGUI_DataModel::data(const QModelIndex& theIndex, int theRole) const
   int aNbFolders = foldersCount();
   int theIndexRow = theIndex.row();
 
-  if ((theRole == Qt::DecorationRole) && (theIndex == lastHistoryIndex()))
-    return QIcon(":pictures/arrow.png");
+  if (theRole == Qt::DecorationRole) {
+    if (theIndex == lastHistoryIndex())
+      return QIcon(":pictures/arrow.png");
+    else if (theIndex.column() == 0) {
+      VisibilityState aState = getVisibilityState(theIndex);
+      switch (aState) {
+      case NoneState:
+        return QIcon();
+      case Visible:
+        return QIcon(":pictures/eyeopen.png");
+      case SemiVisible:
+        return QIcon(":pictures/eyemiclosed.png");
+      case Hidden:
+        return QIcon(":pictures/eyeclosed.png");
+      }
+    }
+  }
 
-  if (theIndex.column() == 1)
+  //if (theIndex.column() == 1)
+  if (theIndex.column() != 1)
     return QVariant();
 
   quintptr aParentId = theIndex.internalId();
@@ -601,7 +623,7 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
 //******************************************************
 int XGUI_DataModel::columnCount(const QModelIndex& theParent) const
 {
-  return 2;
+  return 3;
 }
 
 //******************************************************
@@ -621,7 +643,7 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
       int aObjId = theRow - aNbFolders;
       if (aObjId < aRootDoc->size(aType)) {
         ObjectPtr aObj = aRootDoc->object(aType, aObjId);
-        aIndex = objectIndex(aObj);
+        aIndex = objectIndex(aObj, theColumn);
       }
     }
   } else {
@@ -631,7 +653,7 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
       std::string aType = myXMLReader->rootFolderType(aParentPos);
       if (theRow < aRootDoc->size(aType)) {
         ObjectPtr aObj = aRootDoc->object(aType, theRow);
-        aIndex = objectIndex(aObj);
+        aIndex = objectIndex(aObj, theColumn);
       }
     } else {
       // It is an object which could have children
@@ -646,7 +668,7 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
           std::string aType = myXMLReader->subFolderType(aParentRow);
           if (theRow < aDoc->size(aType)) {
             ObjectPtr aObj = aDoc->object(aType, theRow);
-            aIndex = objectIndex(aObj);
+            aIndex = objectIndex(aObj, theColumn);
           }
         }
       } else {
@@ -664,24 +686,24 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
             // this is an object under sub document root
             std::string aType = myXMLReader->subType();
             ObjectPtr aObj = aSubDoc->object(aType, theRow - aNbSubFolders);
-            aIndex = objectIndex(aObj);
+            aIndex = objectIndex(aObj, theColumn);
           }
         } else {
           // Check for composite object
           ModelAPI_CompositeFeature* aCompFeature =
             dynamic_cast<ModelAPI_CompositeFeature*>(aParentObj);
           if (aCompFeature) {
-            aIndex = objectIndex(aCompFeature->subFeature(theRow));
+            aIndex = objectIndex(aCompFeature->subFeature(theRow), theColumn);
           } else {
             ModelAPI_ResultCompSolid* aCompRes =
               dynamic_cast<ModelAPI_ResultCompSolid*>(aParentObj);
             if (aCompRes)
-              aIndex = objectIndex(aCompRes->subResult(theRow));
+              aIndex = objectIndex(aCompRes->subResult(theRow), theColumn);
             else {
               ModelAPI_ResultField* aFieldRes =
                 dynamic_cast<ModelAPI_ResultField*>(aParentObj);
               if (aFieldRes) {
-                aIndex = createIndex(theRow, 0, aFieldRes->step(theRow));
+                aIndex = createIndex(theRow, theColumn, aFieldRes->step(theRow));
               }
             }
           }
@@ -689,8 +711,6 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
       }
     }
   }
-  if (theColumn != 0)
-    return createIndex(aIndex.row(), theColumn, aIndex.internalPointer());
   return aIndex;
 }
 
@@ -759,7 +779,7 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
         // return first level of folder index
         int aFolderId = myXMLReader->rootFolderId(aType);
         // Items in a one row must have the same parent
-        return createIndex(aFolderId, 0, (void*)Q_NULLPTR);
+        return createIndex(aFolderId, 1, (void*)Q_NULLPTR);
       }
     } else {
       if (aType == myXMLReader->subType())
@@ -768,7 +788,7 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
         // return first level of folder index
         int aFolderId = folderId(aType, aSubDoc.get());
         // Items in a one row must have the same parent
-        return createIndex(aFolderId, 0, aSubDoc.get());
+        return createIndex(aFolderId, 1, aSubDoc.get());
       }
     }
   }
@@ -826,15 +846,15 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
   if (aObj) {
     // An object
     if (aObj->isDisabled())
-      return theIndex.column() == 1? Qt::ItemIsSelectable : aNullFlag;
+      return theIndex.column() == 2? Qt::ItemIsSelectable : aNullFlag;
 
     if (aSession->moduleDocument() != aObj->document())
       if (aActiveDoc != aObj->document())
-        return theIndex.column() == 1? Qt::ItemIsSelectable : aNullFlag;
+        return theIndex.column() == 2? Qt::ItemIsSelectable : aNullFlag;
 
     bool isCompositeSub = false;
-    // An object which is sub-object of a composite object can not be accessible in column 1
-    if (theIndex.column() == 1) {
+    // An object which is sub-object of a composite object can not be accessible in column 2
+    if (theIndex.column() == 2) {
       ObjectPtr aObjPtr = aObj->data()->owner();
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObjPtr);
       if (aFeature.get()) {
@@ -871,7 +891,8 @@ Qt::ItemFlags XGUI_DataModel::flags(const QModelIndex& theIndex) const
 }
 
 //******************************************************
-QModelIndex XGUI_DataModel::findDocumentRootIndex(const ModelAPI_Document* theDoc) const
+QModelIndex
+  XGUI_DataModel::findDocumentRootIndex(const ModelAPI_Document* theDoc, int aColumn) const
 {
   SessionPtr aSession = ModelAPI_Session::get();
   DocumentPtr aRootDoc = aSession->moduleDocument();
@@ -887,7 +908,7 @@ QModelIndex XGUI_DataModel::findDocumentRootIndex(const ModelAPI_Document* theDo
         if (myXMLReader->rootType() == ModelAPI_Feature::group()) {
           aRow += foldersCount();
         }
-        return createIndex(aRow, 0, aObj.get());
+        return createIndex(aRow, aColumn, aObj.get());
       }
     }
   } else { // If document is attached to feature
@@ -901,7 +922,7 @@ QModelIndex XGUI_DataModel::findDocumentRootIndex(const ModelAPI_Document* theDo
         int aRow = i;
         if (myXMLReader->rootType() == ModelAPI_Feature::group())
           aRow += foldersCount();
-        return createIndex(aRow, 0, aObj.get());
+        return createIndex(aRow, aColumn, aObj.get());
       }
     }
   }
@@ -909,14 +930,14 @@ QModelIndex XGUI_DataModel::findDocumentRootIndex(const ModelAPI_Document* theDo
 }
 
 //******************************************************
-QModelIndex XGUI_DataModel::documentRootIndex(DocumentPtr theDoc) const
+QModelIndex XGUI_DataModel::documentRootIndex(DocumentPtr theDoc, int theColumn) const
 {
   SessionPtr aSession = ModelAPI_Session::get();
   DocumentPtr aRootDoc = aSession->moduleDocument();
   if (theDoc == aRootDoc)
     return QModelIndex();
   else
-    return findDocumentRootIndex(theDoc.get());
+    return findDocumentRootIndex(theDoc.get(), theColumn);
 }
 
 //******************************************************
@@ -999,12 +1020,12 @@ QModelIndex XGUI_DataModel::lastHistoryIndex() const
   FeaturePtr aFeature = aCurDoc->currentFeature(true);
   if (aFeature.get()) {
     QModelIndex aInd = objectIndex(aFeature);
-    return createIndex(aInd.row(), 1, aInd.internalPointer());
+    return createIndex(aInd.row(), 2, aInd.internalPointer());
   } else {
     if (aCurDoc == aSession->moduleDocument())
-      return createIndex(foldersCount() - 1, 1, -1);
+      return createIndex(foldersCount() - 1, 2, -1);
     else
-      return createIndex(foldersCount(aCurDoc.get()) - 1, 1, aCurDoc.get());
+      return createIndex(foldersCount(aCurDoc.get()) - 1, 2, aCurDoc.get());
   }
 }
 
@@ -1057,3 +1078,42 @@ void XGUI_DataModel::rebuildBranch(int theRow, int theCount, const QModelIndex& 
 //  myIsEventsProcessingBlocked = theState;
 //  return aPreviousState;
 //}
+
+//******************************************************
+XGUI_DataModel::VisibilityState
+  XGUI_DataModel::getVisibilityState(const QModelIndex& theIndex) const
+{
+  Qt::ItemFlags aFlags = theIndex.flags();
+  if (aFlags == Qt::ItemFlags())
+    return NoneState;
+
+  ObjectPtr aObj = object(theIndex);
+  if (aObj.get()) {
+    ResultPtr aResObj = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    if (aResObj.get()) {
+      XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+      ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResObj);
+      if (aCompRes.get()) {
+        VisibilityState aState = aCompRes->numberOfSubs(true) == 0 ?
+          (aDisplayer->isVisible(aCompRes)? Visible : Hidden) : NoneState;
+        for (int i = 0; i < aCompRes->numberOfSubs(true); i++) {
+          ResultPtr aSubRes = aCompRes->subResult(i, true);
+          VisibilityState aS = aDisplayer->isVisible(aSubRes)? Visible : Hidden;
+          if (aState == NoneState)
+            aState = aS;
+          else if (aState != aS) {
+            aState = SemiVisible;
+            break;
+          }
+        }
+        return aState;
+      } else {
+        if (aDisplayer->isVisible(aResObj))
+          return Visible;
+        else
+          return Hidden;
+      }
+    }
+  }
+  return NoneState;
+}

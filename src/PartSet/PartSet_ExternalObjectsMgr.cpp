@@ -72,22 +72,13 @@ ObjectPtr PartSet_ExternalObjectsMgr::externalObject(const ObjectPtr& theSelecte
 {
   ObjectPtr aSelectedObject = PartSet_Tools::findFixedObjectByExternal(
                                   theShape->impl<TopoDS_Shape>(), theSelectedObject, theSketch);
-  FeaturePtr aFeature = ModelAPI_Feature::feature(aSelectedObject);
-  if (aFeature.get()) {
-    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
-                            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    /// some sketch entities should be never shown, e.g. projection feature
-    /// such external features should not be used in selection
-    if (aSketchFeature.get() && !aSketchFeature->canBeDisplayed())
-      return ObjectPtr();
-  }
-
   if (!aSelectedObject.get()) {
     // Processing of external (non-sketch) object
-    aSelectedObject = PartSet_Tools::createFixedObjectByExternal(theShape->impl<TopoDS_Shape>(),
-                                                    theSelectedObject, theSketch, theTemporary);
+    FeaturePtr aCreatedFeature;
+    aSelectedObject = PartSet_Tools::createFixedObjectByExternal(theShape,
+      theSelectedObject, theSketch, theTemporary, aCreatedFeature);
     if (aSelectedObject.get() && theTemporary)
-        myExternalObjectValidated = aSelectedObject;
+        myExternalObjectValidated = aCreatedFeature;
   }
   return aSelectedObject;
 }

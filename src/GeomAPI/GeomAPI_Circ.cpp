@@ -57,6 +57,16 @@ GeomAPI_Circ::GeomAPI_Circ(const std::shared_ptr<GeomAPI_Pnt>& theCenter,
 }
 
 //=================================================================================================
+GeomAPI_Circ::GeomAPI_Circ(const GeomCurvePtr& theCurve)
+{
+  Handle(Geom_Curve) aCurve = theCurve->impl<Handle(Geom_Curve)>();
+  Handle(Geom_Circle) aCirc = Handle(Geom_Circle)::DownCast(aCurve);
+  if (aCirc.IsNull())
+    throw Standard_ConstructionError("GeomAPI_Circ: Curve is not a circle");
+  setImpl(new gp_Circ(aCirc->Circ()));
+}
+
+//=================================================================================================
 const std::shared_ptr<GeomAPI_Pnt> GeomAPI_Circ::center() const
 {
   const gp_Pnt& aCenter = MY_CIRC->Location();

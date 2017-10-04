@@ -32,6 +32,7 @@
 #include <GeomAPI_Circ.h>
 #include <GeomAPI_XYZ.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 
 #include <gp_Circ.hxx>
 
@@ -44,7 +45,7 @@ extern Handle(Prs3d_DimensionAspect) createDimensionAspect();
 /// \param theDimValue an arrow value
 /// \param theTextSize an arrow value
 extern void updateArrows(Handle_Prs3d_DimensionAspect theDimAspect,
-                         double theDimValue, double theTextSize);
+  double theDimValue, double theTextSize, SketcherPrs_Tools::LocationType theLocationType);
 
 
 static const gp_Circ MyDefCirc(gp_Ax2(gp_Pnt(0,0,0), gp_Dir(0,0,1)), 1);
@@ -163,8 +164,10 @@ void SketcherPrs_Radius::Compute(
   // Update variable aspect parameters (depending on viewer scale)
   double aTextSize = 0.0;
   GetValueString(aTextSize);
-  updateArrows(DimensionAspect(), GetValue(), aTextSize);
-
+  AttributeIntegerPtr aLocationTypeAttr = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>
+    (myConstraint->data()->attribute(SketchPlugin_ConstraintRadius::LOCATION_TYPE_ID()));
+  updateArrows(DimensionAspect(), GetValue(), aTextSize,
+    (SketcherPrs_Tools::LocationType)(aLocationTypeAttr->value()));
 
   AIS_RadiusDimension::Compute(thePresentationManager, thePresentation, theMode);
 

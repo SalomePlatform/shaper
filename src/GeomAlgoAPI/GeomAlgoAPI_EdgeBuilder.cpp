@@ -31,6 +31,7 @@
 
 #include <gp_Ax2.hxx>
 #include <gp_Circ.hxx>
+#include <gp_Elips.hxx>
 #include <Bnd_Box.hxx>
 #include <BRepBndLib.hxx>
 
@@ -220,5 +221,25 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
     aRes = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge);
     aRes->setImpl(new TopoDS_Shape(anEdgeBuilder.Edge()));
   }
+  return aRes;
+}
+
+std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::ellipse(
+    const std::shared_ptr<GeomAPI_Pnt>& theCenter,
+    const std::shared_ptr<GeomAPI_Dir>& theNormal,
+    const std::shared_ptr<GeomAPI_Dir>& theMajorAxis,
+    const double                        theMajorRadius,
+    const double                        theMinorRadius)
+{
+  const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
+  const gp_Dir& aNormal = theNormal->impl<gp_Dir>();
+  const gp_Dir& aMajorAxis = theMajorAxis->impl<gp_Dir>();
+
+  gp_Elips anEllipse(gp_Ax2(aCenter, aNormal, aMajorAxis), theMajorRadius, theMinorRadius);
+
+  BRepBuilderAPI_MakeEdge anEdgeBuilder(anEllipse);
+  std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
+  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
+  aRes->setImpl(new TopoDS_Shape(anEdge));
   return aRes;
 }

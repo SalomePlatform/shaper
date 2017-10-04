@@ -40,6 +40,7 @@ typedef int ConstraintID;
 // Predefined values for identifiers
 const ConstraintID CID_UNKNOWN  =  0;
 const ConstraintID CID_MOVEMENT = -1;
+const ConstraintID CID_FICTIVE = 1024;
 
 /// Types of entities
 enum SketchSolver_EntityType {
@@ -63,6 +64,8 @@ enum SketchSolver_ConstraintType {
   CONSTRAINT_DISTANCE,         // base distance if we don't know the measured objects yet
   CONSTRAINT_PT_PT_DISTANCE,
   CONSTRAINT_PT_LINE_DISTANCE,
+  CONSTRAINT_HORIZONTAL_DISTANCE,
+  CONSTRAINT_VERTICAL_DISTANCE,
   CONSTRAINT_RADIUS,
   CONSTRAINT_ANGLE,
   CONSTRAINT_FIXED,

@@ -31,6 +31,7 @@ class ModelAPI_Attribute;
 class ModelAPI_AttributeRefAttr;
 class ModelAPI_AttributeRefAttrList;
 class ModelAPI_Object;
+class ModelAPI_ObjectMovedMessage;
 class ModelHighAPI_Interface;
 //--------------------------------------------------------------------------------------
 /**\class ModelHighAPI_RefAttr
@@ -67,6 +68,10 @@ public:
   /// Check the object is empty
   MODELHIGHAPI_EXPORT
   bool isEmpty() const;
+
+  /// Fill moved message by the attribute or object
+  MODELHIGHAPI_EXPORT
+  void fillMessage(const std::shared_ptr<ModelAPI_ObjectMovedMessage>& theMessage) const;
 
 private:
   enum VariantType { VT_ATTRIBUTE, VT_OBJECT } myVariantType;

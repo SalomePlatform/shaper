@@ -27,10 +27,12 @@
 #include <ModelAPI_ResultConstruction.h>
 
 #include <GeomAlgoAPI_PointBuilder.h>
+#include <GeomAlgoAPI_ShapeTools.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Vertex.h>
+#include <GeomAPI_Pln.h>
 
 //==================================================================================================
 ConstructionPlugin_Point::ConstructionPlugin_Point()
@@ -47,11 +49,11 @@ const std::string& ConstructionPlugin_Point::getKind()
 //==================================================================================================
 void ConstructionPlugin_Point::initAttributes()
 {
-  //data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
-
   data()->addAttribute(X(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(Y(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(Z(), ModelAPI_AttributeDouble::typeId());
+
+  data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
 
   /*data()->addAttribute(EDGE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(DISTANCE_VALUE(), ModelAPI_AttributeDouble::typeId());
@@ -63,32 +65,38 @@ void ConstructionPlugin_Point::initAttributes()
 
   data()->addAttribute(FIRST_LINE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(SECOND_LINE(), ModelAPI_AttributeSelection::typeId());
-
+*/
   data()->addAttribute(INTERSECTION_LINE(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(INTERSECTION_PLANE(), ModelAPI_AttributeSelection::typeId());*/
+  data()->addAttribute(INTERSECTION_PLANE(), ModelAPI_AttributeSelection::typeId());
+
+  data()->addAttribute(USE_OFFSET(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(OFFSET(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(REVERSE_OFFSET(), ModelAPI_AttributeBoolean::typeId());
 }
 
 //==================================================================================================
 void ConstructionPlugin_Point::execute()
 {
-  GeomShapePtr aShape = createByXYZ();
+  GeomShapePtr aShape;
 
-  /*GeomShapePtr aShape;
-
-  std::string aCreationMethod = string(CREATION_METHOD())->value();
+   // to support compatibility with old documents where aCreationMethod did not exist
+  std::string aCreationMethod =
+    string(CREATION_METHOD()).get() && !string(CREATION_METHOD())->value().empty() ?
+    string(CREATION_METHOD())->value() : CREATION_METHOD_BY_XYZ();
   if(aCreationMethod == CREATION_METHOD_BY_XYZ()) {
     aShape = createByXYZ();
-  } else if(aCreationMethod == CREATION_METHOD_BY_DISTANCE_ON_EDGE()) {
+  }/* else if(aCreationMethod == CREATION_METHOD_BY_DISTANCE_ON_EDGE()) {
     aShape = createByDistanceOnEdge();
   } else if(aCreationMethod == CREATION_METHOD_BY_PROJECTION()) {
     aShape = createByProjection();
   } else if(aCreationMethod == CREATION_METHOD_BY_LINES_INTERSECTION()) {
     aShape = createByLinesIntersection();
-  } else if(aCreationMethod == CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION()) {
+  }*/ else if(aCreationMethod == CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION()) {
     aShape = createByLineAndPlaneIntersection();
-  }*/
+  }
 
   if(!aShape.get()) {
+    setError("Error: intersection not found.");
     return;
   }
 
@@ -180,12 +188,13 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByLinesIntersect
 
   return GeomAlgoAPI_PointBuilder::vertexByIntersection(aFirstEdge, aSecondEdge);
 }
+*/
 
 //==================================================================================================
 std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByLineAndPlaneIntersection()
 {
   // Get line.
-  AttributeSelectionPtr aLineSelection= selection(INTERSECTION_LINE());
+  AttributeSelectionPtr aLineSelection = selection(INTERSECTION_LINE());
   GeomShapePtr aLineShape = aLineSelection->value();
   if(!aLineShape.get()) {
     aLineShape = aLineSelection->context()->shape();
@@ -200,5 +209,14 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByLineAndPlaneIn
   }
   std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aPlaneShape));
 
-  return GeomAlgoAPI_PointBuilder::vertexByIntersection(anEdge, aFace);
-}*/
+  if (!string(USE_OFFSET())->value().empty()) {
+    double anOffset = real(OFFSET())->value();
+    if (boolean(REVERSE_OFFSET())->value())
+      anOffset = -anOffset;
+    if (fabs(anOffset) > 1.e-9) { // move face
+      aFace->translate(aFace->getPlane()->direction(), anOffset);
+    }
+  }
+
+  return GeomAlgoAPI_ShapeTools::intersect(anEdge, aFace);
+}

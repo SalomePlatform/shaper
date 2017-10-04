@@ -58,6 +58,20 @@ class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
     return MY_KIND;
   }
 
+  /// \brief Shows whether the point-line distance should keep its sign
+  inline static const std::string& SIGNED()
+  {
+    static const std::string MY_SIGNED("SignedDistance");
+    return MY_SIGNED;
+  }
+
+  /// attribute name of dimension location type
+  inline static const std::string& LOCATION_TYPE_ID()
+  {
+    static const std::string MY_LOCATION_TYPE_ID("LocationType");
+    return MY_LOCATION_TYPE_ID;
+  }
+
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
@@ -71,11 +85,6 @@ class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
-  /// Moves the feature
-  /// \param theDeltaX the delta for X coordinate is moved
-  /// \param theDeltaY the delta for Y coordinate is moved
-  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
-
   /// Called on change of any argument-attribute of this object
   /// \param theID identifier of changed attribute
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
@@ -85,9 +94,12 @@ class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
 
 protected:
   /// Returns the current distance between the feature attributes
-  double calculateCurrentDistance();
+  virtual double calculateCurrentDistance();
 
-private:
+  /// Check the attributes related to distanced points/features are initialized
+  bool areAttributesInitialized();
+
+protected:
   bool myFlyoutUpdate; ///< to avoid cyclic dependencies on automatic updates of flyout point
 };
 

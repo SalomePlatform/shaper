@@ -52,22 +52,10 @@ def verifyLastArc(theSketch, theCenter, theStart, theEnd):
     subroutine to verify position of last arc in the sketch
     """
     aLastArc = model.lastSubFeature(theSketch, "SketchArc")
-    aCenterPnt = geomDataAPI_Point2D(aLastArc.attribute("center_point"))
-    aStartPnt = geomDataAPI_Point2D(aLastArc.attribute("start_point"))
-    aEndPnt = geomDataAPI_Point2D(aLastArc.attribute("end_point"))
-    if len(theCenter):
-        verifyPointCoordinates(aCenterPnt, theCenter[0], theCenter[1])
-    if len(theStart):
-        verifyPointCoordinates(aStartPnt, theStart[0], theStart[1])
-    if len(theEnd):
-        verifyPointCoordinates(aEndPnt, theEnd[0], theEnd[1])
-    model.assertSketchArc(aLastArc)
-
-def verifyPointCoordinates(thePoint, theX, theY):
-    assert thePoint.x() == theX and thePoint.y() == theY, "Wrong '{0}' point ({1}, {2}), expected ({3}, {4})".format(thePoint.id(), thePoint.x(), thePoint.y(), theX, theY)
+    model.assertArc(aLastArc, theCenter, theStart, theEnd)
 
 def verifyPointOnLine(thePoint, theLine):
-    aDistance = distancePointLine(thePoint, theLine)
+    aDistance = model.distancePointLine(thePoint, theLine)
     assert aDistance < TOLERANCE, "Point is not on Line, distance: {0}".format(aDistance)
 
 def verifyPointOnCircle(thePoint, theCircular):
@@ -81,14 +69,6 @@ def verifyPointOnCircle(thePoint, theCircular):
     else:
         return
     assert math.fabs(model.distancePointPoint(aCenterPoint, thePoint) - aRadius) < TOLERANCE
-
-def distancePointLine(thePoint, theLine):
-    aLineStart = geomDataAPI_Point2D(theLine.attribute("StartPoint")).pnt().xy()
-    aLineEnd = geomDataAPI_Point2D(theLine.attribute("EndPoint")).pnt().xy()
-    aLineDir = aLineEnd.decreased(aLineStart)
-    aLineLen = aLineEnd.distance(aLineStart)
-    aPntDir = thePoint.pnt().xy().decreased(aLineStart)
-    return math.fabs(aPntDir.cross(aLineDir) / aLineLen)
 
 
 aSession = ModelAPI_Session.get()
@@ -243,7 +223,7 @@ aEndRef.setObject(aLine.lastResult())
 aEnd.setValue(aLineStart[0], aLineStart[1])
 aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 8), "Number of subs {}".format(aSketchFeature.numberOfSubs())
-verifyPointCoordinates(aPointCoord, aPointCoordinates[0], aPointCoordinates[1])
+model.assertPoint(aPointCoord, aPointCoordinates)
 verifyLastArc(aSketchFeature, [aPrevArcStart.x(), aPrevArcStart.y()], aPointCoordinates, [])
 model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 3)
 
@@ -279,11 +259,8 @@ aEnd.setValue(aLineEndPoint.pnt())
 aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 12), "Number of subs {}".format(aSketchFeature.numberOfSubs())
 # check connected features do not change their positions
-verifyPointCoordinates(aPrevArcCenter, aPrevArcCenterXY[0], aPrevArcCenterXY[1])
-verifyPointCoordinates(aPrevArcStart, aPrevArcStartXY[0], aPrevArcStartXY[1])
-verifyPointCoordinates(aPrevArcEnd, aPrevArcEndXY[0], aPrevArcEndXY[1])
-verifyPointCoordinates(aLineStartPoint, aLineStart[0], aLineStart[1])
-verifyPointCoordinates(aLineEndPoint, aLineEnd[0], aLineEnd[1])
+model.assertArc(aPrevArc, aPrevArcCenterXY, aPrevArcStartXY, aPrevArcEndXY)
+model.assertLine(aLine, aLineStart, aLineEnd)
 # verify newly created arc
 anArc = model.lastSubFeature(aSketchFeature, "SketchArc")
 aCenter = geomDataAPI_Point2D(anArc.attribute("center_point"))

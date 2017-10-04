@@ -48,6 +48,8 @@
 #include <GeomDataAPI_Dir.h>
 #include <GeomAPI_XYZ.h>
 #include <GeomAPI_Face.h>
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <SketchPlugin_Sketch.h>
 #include <SketcherPrs_Tools.h>
@@ -270,8 +272,14 @@ bool PartSet_WidgetSketchLabel::setSelectionInternal(
 
 void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrsPtr& thePrs)
 {
-  // 1. hide main planes if they have been displayed
+  // 1. hide main planes if they have been displayed and display sketch preview plane
   myPreviewPlanes->erasePreviewPlanes(myWorkshop);
+
+  PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+  if (aModule) {
+    CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+    aModule->sketchMgr()->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
+  }
   // 2. if the planes were displayed, change the view projection
   const GeomShapePtr& aShape = thePrs->shape();
   std::shared_ptr<GeomAPI_Shape> aGShape;
@@ -292,7 +300,8 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   // If the selected object is a sketch then use its plane
   std::shared_ptr<GeomAPI_Pln> aPlane;
   ObjectPtr aObj = thePrs->object();
-  if (aObj.get()) {
+  // obsolete as selected sketch is stored in external attribute
+  /*if (aObj.get()) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
     if (aFeature.get() && (aFeature != feature())) {
       if (aFeature->getKind() == SketchPlugin_Sketch::ID()) {
@@ -301,7 +310,7 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
         aPlane = PartSet_Tools::sketchPlane(aSketch);
       }
     }
-  }
+  }*/
   if (aGShape.get() != NULL) {
     // get plane parameters
     if (!aPlane.get()) {
@@ -450,17 +459,6 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_View
 
   if (thePrs->object() && (feature() != thePrs->object())) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(thePrs->object());
-    if (aFeature.get() && (aFeature != feature())) {
-      if (aFeature->getKind() == SketchPlugin_Sketch::ID()) {
-        CompositeFeaturePtr aSketch =
-          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
-        std::shared_ptr<GeomAPI_Pln> aPlane = PartSet_Tools::sketchPlane(aSketch);
-        if (aPlane.get()) {
-          aDir = setSketchPlane(aPlane);
-          return aDir.get();
-        }
-      }
-    }
     DataPtr aData = feature()->data();
     AttributeSelectionPtr aSelAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
@@ -586,7 +584,7 @@ std::shared_ptr<GeomAPI_Dir>
   std::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
   // X axis is preferable to be dirX on the sketch
   const double tol = Precision::Confusion();
-  bool isX = fabs(anA - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
+  bool isX = fabs(fabs(anA) - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
   std::shared_ptr<GeomAPI_Dir> aTempDir(
       isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
   std::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
@@ -618,4 +616,48 @@ void PartSet_WidgetSketchLabel::onSetPlaneView()
     if (aModule)
       aModule->onViewTransformed();
   }
+}
+
+
+//******************************************************
+QList<std::shared_ptr<ModuleBase_ViewerPrs>> PartSet_WidgetSketchLabel::findCircularEdgesInPlane()
+{
+  QList<std::shared_ptr<ModuleBase_ViewerPrs>> aResult;
+  XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
+  XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+  QObjectPtrList aDispObjects = aDisplayer->displayedObjects();
+
+  std::shared_ptr<GeomAPI_Pln> aPlane = plane();
+  foreach(ObjectPtr aObj, aDispObjects) {
+    ResultPtr aResObj = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    if (aResObj.get()) {
+      GeomShapePtr aShape = aResObj->shape();
+      if (aShape.get()) {
+        GeomAPI_ShapeExplorer aExplorer(aShape, GeomAPI_Shape::EDGE);
+        for(; aExplorer.more(); aExplorer.next()) {
+          GeomShapePtr aEdgeShape = aExplorer.current();
+          GeomAPI_Edge anEdge(aEdgeShape);
+          if ((anEdge.isCircle() || anEdge.isArc() || anEdge.isEllipse()) &&
+               anEdge.isInPlane(aPlane)) {
+            bool isContains = false;
+            // Check that edge is not used.
+            // It is possible that the same edge will be taken from different faces
+            foreach(std::shared_ptr<ModuleBase_ViewerPrs> aPrs, aResult) {
+              GeomAPI_Edge aUsedEdge(aPrs->shape());
+              if (aUsedEdge.isEqual(aEdgeShape)) {
+                isContains = true;
+                break;
+              }
+            }
+            if (!isContains) {
+              std::shared_ptr<ModuleBase_ViewerPrs>
+                aPrs(new ModuleBase_ViewerPrs(aResObj, aEdgeShape));
+              aResult.append(aPrs);
+            }
+          }
+        }
+      }
+    }
+  }
+  return aResult;
 }

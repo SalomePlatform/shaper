@@ -43,6 +43,8 @@ class Model_AttributeSelection : public ModelAPI_AttributeSelection
   ResultPtr myTmpContext;
   /// temporarily storages to avoid keeping in the data structure if not needed
   std::shared_ptr<GeomAPI_Shape> myTmpSubShape;
+  /// temporarily storages to avoid keeping in the data structure if not needed
+  CenterType myTmpCenterType;
   /// Reference to the partent attribute, if any (to split selection compounds in issue 1799)
   Model_AttributeSelectionList* myParent;
 public:
@@ -53,6 +55,13 @@ public:
   ///           (used to remove immideately, without the following updates)
   MODEL_EXPORT virtual void setValue(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const bool theTemporarily = false);
+
+  /// Same as SetValue, but it takes an edge (on circular or elliptical curve)
+  /// and stores the vertex of the central point (for ellipse the first or the second focus point)
+  MODEL_EXPORT virtual void setValueCenter(
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
+    const CenterType theCenterType,
     const bool theTemporarily = false);
 
   /// Reset temporary stored values
@@ -102,6 +111,13 @@ public:
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelection(TDF_Label& theLabel);
+
+  /// Returns the selected subshape, internal method that works without knowledge
+  /// about special selection of circle and ellipse focuses (for that the public value
+  /// method calls this and makes additional processing).
+  /// Returns theType type of the center, or NOT_CENTER if it is not.
+  std::shared_ptr<GeomAPI_Shape> internalValue(CenterType& theType);
+
 
   /// Performs the selection for the body result (TNaming Selection)
 

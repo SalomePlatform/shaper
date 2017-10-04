@@ -38,10 +38,10 @@ public:
                         Events_InfoMessage& theError) const;
 };
 
-/// \class ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel
+/// \class ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel
 /// \ingroup Validators
-/// \brief A validator for selection line and plane for point by intersection.
-class ConstructionPlugin_ValidatorPointLineAndPlaneNotParallel: public ModelAPI_AttributeValidator
+/// \brief A validator for selection edge and plane for point by intersection.
+class ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel: public ModelAPI_AttributeValidator
 {
 public:
   //! \return True if the attribute is valid.

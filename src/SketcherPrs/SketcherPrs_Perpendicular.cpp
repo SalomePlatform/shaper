@@ -27,6 +27,9 @@
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Prs3d_Root.hxx>
 
+#include <GeomAPI_Curve.h>
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_Lin.h>
 
 
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Perpendicular, SketcherPrs_SymbolPrs);
@@ -34,8 +37,9 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Perpendicular, SketcherPrs_SymbolPrs);
 static Handle(Image_AlienPixMap) MyPixMap;
 
 SketcherPrs_Perpendicular::SketcherPrs_Perpendicular(ModelAPI_Feature* theConstraint,
+                                                     ModelAPI_CompositeFeature* theSketcher,
                                                      const std::shared_ptr<GeomAPI_Ax3>& thePlane)
- : SketcherPrs_SymbolPrs(theConstraint, thePlane)
+ : SketcherPrs_SymbolPrs(theConstraint, theSketcher, thePlane)
 {
 }
 
@@ -64,13 +68,38 @@ bool SketcherPrs_Perpendicular::updateIfReadyToDisplay(double theStep, bool with
   ObjectPtr aObj2 =
     SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
 
+  GeomShapePtr aShp1 = SketcherPrs_Tools::getShape(aObj1);
+  GeomShapePtr aShp2 = SketcherPrs_Tools::getShape(aObj2);
+
+  GeomEdgePtr aEdge1(new GeomAPI_Edge(aShp1));
+  GeomEdgePtr aEdge2(new GeomAPI_Edge(aShp2));
+
+  std::shared_ptr<GeomAPI_Lin> aLin1 = aEdge1->line();
+  std::shared_ptr<GeomAPI_Lin> aLin2 = aEdge2->line();
+
+  std::shared_ptr<GeomAPI_Pnt> aPnt = aLin1->intersect(aLin2);
+  double aParam1 = aLin1->projParam(aPnt);
+  double aParam2 = aLin2->projParam(aPnt);
+
+  GeomAPI_Curve aCurve1(aShp1);
+  GeomAPI_Curve aCurve2(aShp2);
+  bool isInside1 = ((aParam1 - aCurve1.startParam()) >= -Precision::Confusion()) &&
+    ((aCurve1.endParam() - aParam1) >= Precision::Confusion());
+  bool isInside2 = ((aParam2 - aCurve2.startParam()) >= -Precision::Confusion()) &&
+    ((aCurve2.endParam() - aParam2) >= Precision::Confusion());
+
+  if (!(isInside1 && isInside2))
+    aPnt = std::shared_ptr<GeomAPI_Pnt>();
+
   // Compute position of symbols
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
-  gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep);
-  gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);
-  myPntArray = new Graphic3d_ArrayOfPoints(2, withColor);
+  gp_Pnt aP1 = aMgr->getPosition(aObj1, this, theStep, aPnt);
+  myPntArray = new Graphic3d_ArrayOfPoints(aPnt.get()? 1 : 2, withColor);
   myPntArray->AddVertex(aP1);
-  myPntArray->AddVertex(aP2);
+  if (!aPnt.get()) {
+    gp_Pnt aP2 = aMgr->getPosition(aObj2, this, theStep);
+    myPntArray->AddVertex(aP2);
+  }
   return true;
 }
 

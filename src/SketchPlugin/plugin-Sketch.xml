@@ -28,7 +28,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                 SketchCircle SketchMacroCircle SketchArc SketchMacroArc
                 SketchRectangle
                 SketchProjection
-                SketchConstraintLength SketchConstraintRadius SketchConstraintDistance
+                SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintDistanceHorizontal SketchConstraintDistanceVertical
                 SketchConstraintParallel SketchConstraintPerpendicular
                 SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical
                 SketchConstraintEqual SketchConstraintTangent
@@ -359,6 +359,97 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </feature>
     </group>
 
+<excluded>
+    <group id="Elliptic geometry">
+      <!-- SketchEllipse is a hidden feature. It is created inside SketchMacroEllipse. -->
+      <feature id="SketchEllipse"
+               title="Ellipse"
+               tooltip="Create ellipse"
+               icon="icons/Sketch/ellipse.png"
+               internal="1">
+        <sketch-2dpoint_selector id="ellipse_center"
+                                 title="Center"
+                                 tooltip="Center coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_focus"
+                                 title="Focus"
+                                 tooltip="Focus coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <labelvalue id="ellipse_major_radius"
+                    icon="icons/Sketch/radius.png"
+                    label="Major radius:"
+                    tooltip="Set major radius"
+                    default="computed"
+                    accept_expressions="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <labelvalue id="ellipse_minor_radius"
+                    icon="icons/Sketch/radius.png"
+                    label="Minor radius:"
+                    tooltip="Set minor radius"
+                    default="computed"
+                    accept_expressions="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+      </feature>
+      <!-- SketchMacroEllipse -->
+      <feature id="SketchMacroEllipse"
+               icon="icons/Sketch/ellipse.png"
+               title="Ellipse"
+               tooltip="Create ellipse">
+        <sketch-2dpoint_selector id="center_point"
+                                 reference_attribute="center_point_ref"
+                                 title="Center point"
+                                 tooltip="Center point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="major_axis_point"
+                                 reference_attribute="major_axis_point_ref"
+                                 title="Major axis point"
+                                 tooltip="Major axis point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="passed_point"
+                                 reference_attribute="passed_point_ref"
+                                 title="Passed point"
+                                 tooltip="Passed point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences">
+<!--          <validator id="SketchPlugin_CirclePassedPointValidator"/> -->
+        </sketch-2dpoint_selector>
+<!--        <validator id="GeomValidators_Different" parameters="center_point_ref,passed_point_ref"/> -->
+        <labelvalue id="ellipse_major_radius"
+                    icon="icons/Sketch/radius.png"
+                    label="Major radius:"
+                    tooltip="Set major radius"
+                    default="computed"
+                    accept_expressions="0"
+                    obligatory="0"
+                    enable_value="enable_by_preferences">
+          <validator id="GeomValidators_Positive"/>
+        </labelvalue>
+        <labelvalue id="ellipse_minor_radius"
+                    icon="icons/Sketch/radius.png"
+                    label="Minor radius:"
+                    tooltip="Set minor radius"
+                    default="computed"
+                    accept_expressions="0"
+                    obligatory="0"
+                    enable_value="enable_by_preferences">
+          <validator id="GeomValidators_Positive"/>
+        </labelvalue>
+        <boolvalue id="Auxiliary"
+                   tooltip="Construction element"
+                   label="Auxiliary"
+                   default="false"
+                   obligatory="0"/>
+      </feature>
+    </group>
+</excluded>
+
     <group id="Projection">
       <!-- Intersection Point -->
       <!-- feature
@@ -388,12 +479,13 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
               id="ExternalFeature"
               label="Edge"
               tooltip="Select external edge."
-              shape_types="edge"
+              shape_types="edge vertex"
               use_external="true"
               can_create_external="false"
               use_sketch_plane="false">
           <validator id="SketchPlugin_ProjectionValidator"/>
         </sketch_shape_selector>
+        <boolvalue id="IncludeToResult" label="Include into the sketch result" default="true" tooltip="Include projected feature into the sketch result"/>
         <validator id="PartSet_ProjectionSelection"/>
       </feature>
     </group>
@@ -564,10 +656,105 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
 
+        <module_choice id="LocationType"
+          widget_type="radiobuttons"
+          buttons_dir="horizontal"
+          label="Location type"
+          tooltip="Type of location"
+          string_list="Left Automatic Right"
+          icons_list="icons/Sketch/location_left.png icons/Sketch/location_automatic.png icons/Sketch/location_right.png"
+          default="1"
+          />
+
+        <boolvalue id="SignedDistance" label="Keep orientation" default="true" tooltip="Keep distance orientation" obligatory="0"/>
         <validator id="PartSet_DistanceSelection"/>
       </feature>
 
-    <!--  SketchConstraintLength  -->
+      <!--  SketchConstraintDistanceHorizontal  -->
+      <feature
+        id="SketchConstraintDistanceHorizontal"
+        title="Horizontal Distance"
+        tooltip="Set horizontal distance between two points"
+        icon="icons/Sketch/distance_h.png">
+        <label title="Select points for distance definition."/>
+        <sketch_shape_selector
+              id="ConstraintEntityA"
+              label="First point"
+              tooltip="Select point."
+              shape_types="vertex">
+          <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
+          <validator id="PartSet_DifferentObjects"/>
+          <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        </sketch_shape_selector>
+        <sketch_shape_selector
+          id="ConstraintEntityB"
+          label="Second point"
+          tooltip="Select point."
+          shape_types="vertex">
+          <validator id="PartSet_DifferentObjects"/>
+          <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
+          <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        </sketch_shape_selector>
+        <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
+
+        <doublevalue_editor label="Value" tooltip="Distance" id="ConstraintValue" default="computed"/>
+
+        <module_choice id="LocationType"
+          widget_type="radiobuttons"
+          buttons_dir="horizontal"
+          label="Location type"
+          tooltip="Type of location"
+          string_list="Left Automatic Right"
+          icons_list="icons/Sketch/location_left.png icons/Sketch/location_automatic.png icons/Sketch/location_right.png"
+          default="1"
+          />
+
+        <validator id="PartSet_DistanceSelection"/>
+      </feature>
+
+      <!--  SketchConstraintDistanceVertical  -->
+      <feature
+        id="SketchConstraintDistanceVertical"
+        title="Vertical Distance"
+        tooltip="Set vertical distance between two points"
+        icon="icons/Sketch/distance_v.png">
+        <label title="Select points for distance definition."/>
+        <sketch_shape_selector
+              id="ConstraintEntityA"
+              label="First point"
+              tooltip="Select point."
+              shape_types="vertex">
+          <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
+          <validator id="PartSet_DifferentObjects"/>
+          <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        </sketch_shape_selector>
+        <sketch_shape_selector
+          id="ConstraintEntityB"
+          label="Second point"
+          tooltip="Select point."
+          shape_types="vertex">
+          <validator id="PartSet_DifferentObjects"/>
+          <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
+          <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        </sketch_shape_selector>
+        <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
+
+        <doublevalue_editor label="Value" tooltip="Distance" id="ConstraintValue" default="computed"/>
+
+        <module_choice id="LocationType"
+          widget_type="radiobuttons"
+          buttons_dir="horizontal"
+          label="Location type"
+          tooltip="Type of location"
+          string_list="Left Automatic Right"
+          icons_list="icons/Sketch/location_left.png icons/Sketch/location_automatic.png icons/Sketch/location_right.png"
+          default="1"
+          />
+
+        <validator id="PartSet_DistanceSelection"/>
+      </feature>
+
+      <!--  SketchConstraintLength  -->
       <feature id="SketchConstraintLength" title="Length" tooltip="Set fixed length of a line segment" icon="icons/Sketch/length.png">
         <label title="Select a line on which to calculate length" tooltip="Select a line on which to calculate length"/>
         <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select a line" shape_types="edge" >
@@ -577,6 +764,15 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <doublevalue_editor label="Value" tooltip="Length" id="ConstraintValue" default="computed">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
+        <module_choice id="LocationType"
+          widget_type="radiobuttons"
+          buttons_dir="horizontal"
+          label="Location type"
+          tooltip="Type of location"
+          string_list="Left Automatic Right"
+          icons_list="icons/Sketch/location_left.png icons/Sketch/location_automatic.png icons/Sketch/location_right.png"
+          default="1"
+          />
         <validator id="PartSet_LengthSelection"/>
       </feature>
 
@@ -604,6 +800,17 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
           icons_list="icons/Sketch/angle_direct.png icons/Sketch/angle_complementary.png icons/Sketch/angle_backward.png"
           default="0"
           />
+
+        <module_choice id="LocationType"
+          widget_type="radiobuttons"
+          buttons_dir="horizontal"
+          label="Location type"
+          tooltip="Type of location"
+          string_list="Left Automatic Right"
+          icons_list="icons/Sketch/location_left.png icons/Sketch/location_automatic.png icons/Sketch/location_right.png"
+          default="1"
+          />
+
       </feature>
 
       <!--  SketchConstraintRadius  -->
@@ -617,6 +824,17 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <doublevalue_editor label="Value" tooltip="Radius" id="ConstraintValue" default="computed">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
+
+        <module_choice id="LocationType"
+          widget_type="radiobuttons"
+          buttons_dir="horizontal"
+          label="Location type"
+          tooltip="Type of location"
+          string_list="Left Automatic Right"
+          icons_list="icons/Sketch/location_left.png icons/Sketch/location_automatic.png icons/Sketch/location_right.png"
+          default="1"
+          />
+
         <validator id="PartSet_RadiusSelection"/>
       </feature>
 
@@ -629,6 +847,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <sketch_shape_selector id="ConstraintEntityA"
             label="Line" tooltip="Select a line" shape_types="edge" use_external="false">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
+          <validator id="SketchPlugin_HasNoConstraint" parameters="SketchConstraintHorizontal, SketchConstraintVertical"/>
         </sketch_shape_selector>
         <validator id="PartSet_HVDirSelection"/>
       </feature>
@@ -638,6 +857,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <sketch_shape_selector id="ConstraintEntityA"
             label="Line" tooltip="Select a line" shape_types="edge" use_external="false">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
+          <validator id="SketchPlugin_HasNoConstraint" parameters="SketchConstraintHorizontal, SketchConstraintVertical"/>
         </sketch_shape_selector>
         <validator id="PartSet_HVDirSelection"/>
       </feature>

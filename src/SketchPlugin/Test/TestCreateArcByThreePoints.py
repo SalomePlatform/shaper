@@ -48,12 +48,9 @@ def verifyLastArc(theSketch, theX, theY, theR):
     """
     aLastArc = model.lastSubFeature(theSketch, "SketchArc")
     aCenter = geomDataAPI_Point2D(aLastArc.attribute("center_point"))
-    verifyPointCoordinates(aCenter, theX, theY)
+    model.assertPoint(aCenter, [theX, theY])
     aRadius = aLastArc.real("radius")
     assert aRadius.value() == theR, "Wrong radius {0}, expected {1}".format(aRadius.value(), theR)
-
-def verifyPointCoordinates(thePoint, theX, theY):
-    assert thePoint.x() == theX and thePoint.y() == theY, "Wrong '{0}' point ({1}, {2}), expected ({3}, {4})".format(thePoint.attributeType(), thePoint.x(), thePoint.y(), theX, theY)
 
 def verifyPointOnArc(thePoint, theArc):
     aCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
@@ -78,16 +75,8 @@ def verifyTangentCircular(theDistBetweenCenters, theRadius1, theRadius2):
 def verifyTangentArcLine(theArc, theLine):
     aCenter = geomDataAPI_Point2D(theArc.attribute("center_point"))
     aRadius = theArc.real("radius").value()
-    aDistCL = distancePointLine(aCenter, theLine)
+    aDistCL = model.distancePointLine(aCenter, theLine)
     assert math.fabs(aDistCL - aRadius) < TOLERANCE, "Circle and line are not tangent"
-
-def distancePointLine(thePoint, theLine):
-    aLineStart = geomDataAPI_Point2D(theLine.attribute("StartPoint")).pnt().xy()
-    aLineEnd = geomDataAPI_Point2D(theLine.attribute("EndPoint")).pnt().xy()
-    aLineDir = aLineEnd.decreased(aLineStart)
-    aLineLen = aLineEnd.distance(aLineStart)
-    aPntDir = thePoint.pnt().xy().decreased(aLineStart)
-    return math.fabs(aPntDir.cross(aLineDir) / aLineLen)
 
 
 #=========================================================================
@@ -178,9 +167,9 @@ anArcPnt3.setValue(aLineStart[0], aLineStart[1])
 aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 7)
 # check the points do not change their positions
-verifyPointCoordinates(aPrevCenter, aPrevCenterXY[0], aPrevCenterXY[1])
-verifyPointCoordinates(aPointCoord, aPointCoodinates[0], aPointCoodinates[1])
-verifyPointCoordinates(aStartPnt, aLineStart[0], aLineStart[1])
+model.assertPoint(aPrevCenter, aPrevCenterXY)
+model.assertPoint(aPointCoord, aPointCoodinates)
+model.assertPoint(aStartPnt, aLineStart)
 # check newly created arc passes through the points
 anArc = model.lastSubFeature(aSketchFeature, "SketchArc")
 verifyPointOnArc(aPrevCenter, anArc)
@@ -209,9 +198,9 @@ anArcPnt3.setValue(20, 25)
 aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 9)
 # check the points do not change their positions
-verifyPointCoordinates(aPrevCenter, aPrevCenterXY[0], aPrevCenterXY[1])
-verifyPointCoordinates(aPointCoord, aPointCoodinates[0], aPointCoodinates[1])
-verifyPointCoordinates(aStartPnt, aLineStart[0], aLineStart[1])
+model.assertPoint(aPrevCenter, aPrevCenterXY)
+model.assertPoint(aPointCoord, aPointCoodinates)
+model.assertPoint(aStartPnt, aLineStart)
 # check sub-features
 model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 3)
 model.testNbSubFeatures(aSketch, "SketchConstraintTangent", 1)

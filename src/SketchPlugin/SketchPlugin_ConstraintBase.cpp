@@ -29,9 +29,3 @@ const void SketchPlugin_ConstraintBase::addSub(const FeaturePtr& theFeature)
 {
 
 }
-
-void SketchPlugin_ConstraintBase::move(const double theDeltaX, const double theDeltaY)
-{
-
-}
-

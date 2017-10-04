@@ -30,6 +30,8 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintDistanceHorizontal.h>
+#include <SketchPlugin_ConstraintDistanceVertical.h>
 #include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_Fillet.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
@@ -50,6 +52,10 @@
 #include <SketchPlugin_Split.h>
 #include <SketchPlugin_Validators.h>
 #include <SketchPlugin_ExternalValidator.h>
+#include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_MacroEllipse.h>
+
+#include <SketcherPrs_Tools.h>
 
 #include <Events_Loop.h>
 #include <GeomDataAPI_Dir.h>
@@ -62,6 +68,7 @@
 #include <Config_PropManager.h>
 
 #include <memory>
+#include <sstream>
 
 #ifdef _DEBUG
 #include <iostream>
@@ -126,6 +133,7 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_ArcEndPointValidator);
   aFactory->registerValidator("SketchPlugin_ArcEndPointIntersectionValidator",
                               new SketchPlugin_ArcEndPointIntersectionValidator);
+  aFactory->registerValidator("SketchPlugin_HasNoConstraint", new SketchPlugin_HasNoConstraint);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -163,6 +171,18 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   Config_PropManager::registerProp("Visualization", "xy_plane_color", "XY plane color",
                                    Config_Prop::Color, XY_PLANE_COLOR);
 #endif
+
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "dimension_font", "Dimension font",
+    Config_Prop::String, "Arial");
+  std::ostringstream aStream;
+  aStream << SketcherPrs_Tools::getDefaultTextHeight();
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "dimension_value_size",
+    "Dimension value size", Config_Prop::Integer, aStream.str());
+  aStream.str("");
+  aStream.clear();
+  aStream << SketcherPrs_Tools::getDefaultArrowSize();
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "dimension_arrow_size",
+    "Dimension arrow size", Config_Prop::Integer, aStream.str());
 }
 
 FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
@@ -187,6 +207,10 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintCollinear);
   } else if (theFeatureID == SketchPlugin_ConstraintDistance::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintDistance);
+  } else if (theFeatureID == SketchPlugin_ConstraintDistanceHorizontal::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintDistanceHorizontal);
+  } else if (theFeatureID == SketchPlugin_ConstraintDistanceVertical::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintDistanceVertical);
   } else if (theFeatureID == SketchPlugin_ConstraintLength::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintLength);
   } else if (theFeatureID == SketchPlugin_ConstraintParallel::ID()) {
@@ -225,6 +249,10 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_MacroArc);
   } else if (theFeatureID == SketchPlugin_MacroCircle::ID()) {
     return FeaturePtr(new SketchPlugin_MacroCircle);
+  } else if (theFeatureID == SketchPlugin_Ellipse::ID()) {
+    return FeaturePtr(new SketchPlugin_Ellipse);
+  } else if (theFeatureID == SketchPlugin_MacroEllipse::ID()) {
+    return FeaturePtr(new SketchPlugin_MacroEllipse);
   }
   // feature of such kind is not found
   return FeaturePtr();
@@ -267,6 +295,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Line::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Circle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Arc::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_Ellipse::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Projection::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintCoincidence::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintCollinear::ID(), aHasSketchPlane);
@@ -290,6 +319,8 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Trim::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroArc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroCircle::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintDistanceHorizontal::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintDistanceVertical::ID(), aHasSketchPlane);
       // SketchRectangle is a python feature, so its ID is passed just as a string
       aMsg->setState("SketchRectangle", aHasSketchPlane);
     }

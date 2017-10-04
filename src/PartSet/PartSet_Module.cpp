@@ -37,7 +37,6 @@
 #include "PartSet_MenuMgr.h"
 #include "PartSet_CustomPrs.h"
 #include "PartSet_IconFactory.h"
-#include "PartSet_WidgetChoice.h"
 #include "PartSet_OverconstraintListener.h"
 
 #include "PartSet_Filters.h"
@@ -52,6 +51,7 @@
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IViewWindow.h>
 #include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_WidgetChoice.h>
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_Tools.h>
@@ -185,6 +185,9 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Config_PropManager::registerProp("Visualization", "operation_remove_feature_color",
                           "Color of removed feature in operation", Config_Prop::Color,
                           PartSet_CustomPrs::OPERATION_REMOVE_FEATURE_COLOR());
+  Config_PropManager::registerProp("Visualization", "sketch_preview_plane",
+                          "Color of sketch plane", Config_Prop::Color,
+                          PartSet_CustomPrs::OPERATION_SKETCH_PLANE());
 }
 
 PartSet_Module::~PartSet_Module()
@@ -789,7 +792,7 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
   } else if (theType == "sketch_launcher") {
     aWgt = new PartSet_WidgetSketchCreator(theParent, this, theWidgetApi);
   } else if (theType == "module_choice") {
-    aWgt = new PartSet_WidgetChoice(theParent, theWidgetApi);
+    aWgt = new ModuleBase_WidgetChoice(theParent, theWidgetApi);
     connect(aWgt, SIGNAL(itemSelected(ModuleBase_ModelWidget*, int)),
             this, SLOT(onChoiceChanged(ModuleBase_ModelWidget*, int)));
   }
@@ -1264,7 +1267,7 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
       aTreeView->setExpanded(myActivePartIndex, false);
 
     XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
-    myActivePartIndex = aDataModel->documentRootIndex(aActiveDoc);
+    myActivePartIndex = aDataModel->documentRootIndex(aActiveDoc, 0);
     bool needUpdate = false;
     if (myActivePartIndex.isValid()) {
       needUpdate = aTreeView->isExpanded(myActivePartIndex);
@@ -1336,7 +1339,7 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
     //aMgr->setActiveDocument(aMgr->moduleDocument());
     return;
   }
-  if (theIndex.column() != 0) // Use only first column
+  if (theIndex.column() != 1) // Use only first column
     return;
 
   XGUI_Workshop* aWorkshop = getWorkshop();
@@ -1472,7 +1475,7 @@ void PartSet_Module::setReentrantPreSelection(const std::shared_ptr<Events_Messa
 void PartSet_Module::onChoiceChanged(ModuleBase_ModelWidget* theWidget,
                                      int theIndex)
 {
-  PartSet_WidgetChoice* aChoiceWidget = dynamic_cast<PartSet_WidgetChoice*>(theWidget);
+  ModuleBase_WidgetChoice* aChoiceWidget = dynamic_cast<ModuleBase_WidgetChoice*>(theWidget);
   if (!aChoiceWidget)
     return;
 

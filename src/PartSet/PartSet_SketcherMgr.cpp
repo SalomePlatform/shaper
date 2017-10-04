@@ -26,6 +26,8 @@
 #include "PartSet_WidgetSketchLabel.h"
 #include "PartSet_WidgetEditor.h"
 #include "PartSet_ResultSketchPrs.h"
+#include "PartSet_ExternalPointsMgr.h"
+#include "PartSet_PreviewSketchPlane.h"
 
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Displayer.h>
@@ -82,6 +84,7 @@
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_IntersectionPoint.h>
+#include <SketchPlugin_Projection.h>
 
 #include <SketcherPrs_Tools.h>
 
@@ -152,7 +155,7 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsEditLaunching(false), myIsDragging(false),
     myDragDone(false), myIsMouseOverWindow(false),
     myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
-    myIsPopupMenuActive(false)
+    myIsPopupMenuActive(false), myExternalPointsMgr(0)
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
@@ -178,6 +181,8 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   myIsConstraintsShown[PartSet_Tools::Geometrical] = true;
   myIsConstraintsShown[PartSet_Tools::Dimensional] = true;
   myIsConstraintsShown[PartSet_Tools::Expressions] = false;
+
+  mySketchPlane = new PartSet_PreviewSketchPlane();
 }
 
 PartSet_SketcherMgr::~PartSet_SketcherMgr()
@@ -536,8 +541,11 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
     Point aMousePnt;
     get2dPoint(theWnd, theEvent, aMousePnt);
-    double dX =  aMousePnt.myCurX - myCurrentPoint.myCurX;
-    double dY =  aMousePnt.myCurY - myCurrentPoint.myCurY;
+
+    std::shared_ptr<GeomAPI_Pnt2d> anOriginalPosition = std::shared_ptr<GeomAPI_Pnt2d>(
+                            new GeomAPI_Pnt2d(myCurrentPoint.myCurX, myCurrentPoint.myCurY));
+    std::shared_ptr<GeomAPI_Pnt2d> aCurrentPosition = std::shared_ptr<GeomAPI_Pnt2d>(
+                            new GeomAPI_Pnt2d(aMousePnt.myCurX, aMousePnt.myCurY));
 
     ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
@@ -572,9 +580,15 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
               std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(aAttrId));
             if (aPoint.get() != NULL) {
               bool isImmutable = aPoint->setImmutable(true);
-              aPoint->move(dX, dY);
+
+              std::shared_ptr<ModelAPI_ObjectMovedMessage> aMessage = std::shared_ptr
+                       <ModelAPI_ObjectMovedMessage>(new ModelAPI_ObjectMovedMessage(this));
+              aMessage->setMovedAttribute(aPoint);
+              aMessage->setOriginalPosition(anOriginalPosition);
+              aMessage->setCurrentPosition(aCurrentPosition);
+              Events_Loop::loop()->send(aMessage);
+
               isModified = true;
-              ModelAPI_EventCreator::get()->sendUpdated(aFeature, aMoveEvent);
               aPoint->setImmutable(isImmutable);
             }
           }
@@ -584,9 +598,13 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
         std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature) {
-          aSketchFeature->move(dX, dY);
+          std::shared_ptr<ModelAPI_ObjectMovedMessage> aMessage = std::shared_ptr
+                    <ModelAPI_ObjectMovedMessage>(new ModelAPI_ObjectMovedMessage(this));
+          aMessage->setMovedObject(aFeature);
+          aMessage->setOriginalPosition(anOriginalPosition);
+          aMessage->setCurrentPosition(aCurrentPosition);
+          Events_Loop::loop()->send(aMessage);
           isModified = true;
-          ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, aMoveEvent);
         }
       }
     }
@@ -594,8 +612,8 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     // were changed here
     if (isModified) {
       aCurrentOperation->onValuesChanged();
+      Events_Loop::loop()->flush(aMoveEvent); // up all move events - to be processed in the solver
     }
-    Events_Loop::loop()->flush(aMoveEvent); // up all move events - to be processed in the solver
     //Events_Loop::loop()->flush(aUpdateEvent); // up update events - to redisplay presentations
 
     // 5. it is necessary to save current selection in order to restore it after the features moving
@@ -705,8 +723,15 @@ void PartSet_SketcherMgr::launchEditing()
     FeaturePtr aFeature = myCurrentSelection.begin().key();
     std::shared_ptr<SketchPlugin_Feature> aSPFeature =
               std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    if (aSPFeature && (!aSPFeature->isExternal())) {
-      myModule->editFeature(aSPFeature);
+    if (aSPFeature) {
+      if (!aSPFeature->isExternal())
+        myModule->editFeature(aSPFeature);
+      else {
+        FeaturePtr aProjectionFeature = PartSet_Tools::findRefsToMeFeature(aFeature,
+                                                        SketchPlugin_Projection::ID());
+        if (aProjectionFeature.get())
+          myModule->editFeature(aProjectionFeature);
+      }
     }
   }
 }
@@ -901,6 +926,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 
   // Display all sketcher sub-Objects
   myCurrentSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFOperation->feature());
+  mySketchPlane->createSketchPlane(myCurrentSketch, myModule->workshop());
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
 
   // Hide sketcher result
@@ -999,6 +1025,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   // plane filter
   if (aPln.get())
     aConnector->activateModuleSelectionModes();
+
+  myExternalPointsMgr = new PartSet_ExternalPointsMgr(myModule->workshop(), myCurrentSketch);
 }
 
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
@@ -1008,6 +1036,11 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   myIsConstraintsShown[PartSet_Tools::Dimensional] = true;
   myIsConstraintsShown[PartSet_Tools::Expressions] = false;
 
+  if (myExternalPointsMgr) {
+    delete myExternalPointsMgr;
+    myExternalPointsMgr = 0;
+  }
+
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
 
   DataPtr aData = myCurrentSketch->data();
@@ -1015,6 +1048,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
     // The sketch was aborted
     myCurrentSketch = CompositeFeaturePtr();
+    mySketchPlane->eraseSketchPlane(myModule->workshop());
     // TODO: move this outside of if-else
     myModule->workshop()->viewer()->removeSelectionFilter(myCirclePointFilter);
     myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
@@ -1058,6 +1092,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
       myCurrentSketch->setDisplayed(true);
 
     myCurrentSketch = CompositeFeaturePtr();
+    mySketchPlane->eraseSketchPlane(myModule->workshop());
 
     myModule->workshop()->viewer()->removeSelectionFilter(myCirclePointFilter);
     myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);

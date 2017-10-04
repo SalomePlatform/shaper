@@ -56,5 +56,9 @@
      <file>pictures/wire.png</file>
      <file>pictures/result.png</file>
      <file>pictures/find_result.png</file>
+
+     <file>pictures/eyeclosed.png</file>
+     <file>pictures/eyemiclosed.png</file>
+     <file>pictures/eyeopen.png</file>
  </qresource>
  </RCC>

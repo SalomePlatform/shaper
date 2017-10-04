@@ -34,6 +34,9 @@
 class ModuleBase_IDocumentDataModel;
 class XGUI_DataModel;
 class Config_DataModelReader;
+class XGUI_Workshop;
+
+//#define DEBUG_INDXES
 
 /**
 * \ingroup GUI
@@ -118,6 +121,22 @@ public slots:
 
    /// Redefinition of virtual method
   virtual void resizeEvent(QResizeEvent* theEvent);
+
+   /// Redefinition of virtual method
+  virtual void mouseReleaseEvent(QMouseEvent* theEvent);
+
+#ifdef DEBUG_INDXES
+  virtual void mousePressEvent(QMouseEvent* theEvent);
+#endif
+
+private:
+  /// Process a history change request
+  /// \param theIndex a clicked data index
+  void processHistoryChange(const QModelIndex& theIndex);
+
+  /// Process a visibility change request
+  /// \param theIndex a clicked data index
+  void processEyeClick(const QModelIndex& theIndex);
 };
 
 /**\class XGUI_ObjectsBrowser
@@ -130,7 +149,7 @@ Q_OBJECT
  public:
    /// Constructor
    /// \param theParent a parent widget
-  XGUI_ObjectsBrowser(QWidget* theParent);
+  XGUI_ObjectsBrowser(QWidget* theParent, XGUI_Workshop* theWorkshop);
   virtual ~XGUI_ObjectsBrowser();
 
   //! Returns Model which provides access to data objects
@@ -182,6 +201,12 @@ Q_OBJECT
   /// \param theStates list of booleans with state expanded or not
   void setStateForDoc(DocumentPtr theDoc, const std::list<bool>& theStates);
 
+  /// Returns current workshop
+  XGUI_Workshop* workshop() const { return myWorkshop; }
+
+  void onSelectionChanged();
+
+
 public slots:
   //! Called on Edit command request
   void onEditItem();
@@ -219,6 +244,7 @@ signals:
   XGUI_DataModel* myDocModel;
   XGUI_ActiveDocLbl* myActiveDocLbl;
   XGUI_DataTree* myTreeView;
+  XGUI_Workshop* myWorkshop;
 
   /// A field to store expanded items before model reset
   QModelIndexList myExpandedItems;

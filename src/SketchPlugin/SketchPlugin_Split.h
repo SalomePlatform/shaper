@@ -128,9 +128,6 @@ class SketchPlugin_Split : public SketchPlugin_Feature, public GeomAPI_IPresenta
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
-  /// Moves the feature : Empty
-  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY) {};
-
   /// Apply information of the message to current object. It fills selected point and object
   virtual std::string processEvent(const std::shared_ptr<Events_Message>& theMessage);
 

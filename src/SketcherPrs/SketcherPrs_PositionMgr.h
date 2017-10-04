@@ -24,10 +24,12 @@
 #include "SketcherPrs_SymbolPrs.h"
 
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_Pnt.h>
 #include <gp_Pnt.hxx>
 #include <ModelAPI_Object.h>
 
 #include <map>
+#include <array>
 
 /**
 * \ingroup GUI
@@ -44,7 +46,8 @@ public:
   /// \param theLine constrained object
   /// \param thePrs a presentation of constraint
   /// \param theStep step between symbols
-  gp_Pnt getPosition(ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs, double theStep = 20);
+  gp_Pnt getPosition(ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs,
+                     double theStep = 20, GeomPointPtr thePnt = GeomPointPtr());
 
   /// Deletes constraint object from internal structures. Has to be called on constraint delete.
   /// \param thePrs a constraint presentation
@@ -59,14 +62,34 @@ private:
   /// \param thePrs a presentation of constraint
   int getPositionIndex(ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs);
 
+  /// Returns position index of the given constraint around a point
+  /// \param theLine constrained object
+  /// \param thePrs a presentation of constraint
+  const std::array<int, 2>& getPositionIndex(GeomPointPtr thePos,
+                                      const SketcherPrs_SymbolPrs* thePrs);
+
+  /// Returns position of a constraint around a point
+  /// \param theLine a base object of the constraint
+  /// \param thePrs a presentation of the constraint symbol
+  /// \param theStep step from base point
+  /// \param thePnt a base point
+  gp_Pnt getPointPosition(ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs,
+                          double theStep, GeomPointPtr thePnt);
+
+  static bool isPntConstraint(const std::string& theName);
+
 private:
   typedef std::map<const SketcherPrs_SymbolPrs*, int> PositionsMap;
+  typedef std::map<const ModelAPI_Feature*, std::array<int, 2>> FeaturesMap;
 
   /// The map which contains position of presentation
   PositionsMap myIndexes;
 
   /// The map contains position index
   std::map<ObjectPtr, PositionsMap> myShapes;
+
+  /// The map contains position of index for constraints around a point
+  FeaturesMap myPntShapes;
 };
 
 #endif

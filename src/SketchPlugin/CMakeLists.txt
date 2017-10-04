@@ -31,6 +31,8 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintCoincidence.h
     SketchPlugin_ConstraintCollinear.h
     SketchPlugin_ConstraintDistance.h
+    SketchPlugin_ConstraintDistanceHorizontal.h
+    SketchPlugin_ConstraintDistanceVertical.h
     SketchPlugin_ConstraintEqual.h
     SketchPlugin_Fillet.h
     SketchPlugin_ConstraintHorizontal.h
@@ -43,6 +45,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintRigid.h
     SketchPlugin_ConstraintTangent.h
     SketchPlugin_ConstraintVertical.h
+    SketchPlugin_Ellipse.h
     SketchPlugin_ExternalValidator.h
     SketchPlugin_Feature.h
     SketchPlugin_IntersectionPoint.h
@@ -50,6 +53,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_MacroArc.h
     SketchPlugin_MacroArcReentrantMessage.h
     SketchPlugin_MacroCircle.h
+    SketchPlugin_MacroEllipse.h
     SketchPlugin_MultiRotation.h
     SketchPlugin_MultiTranslation.h
     SketchPlugin_Plugin.h
@@ -72,6 +76,8 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintCoincidence.cpp
     SketchPlugin_ConstraintCollinear.cpp
     SketchPlugin_ConstraintDistance.cpp
+    SketchPlugin_ConstraintDistanceHorizontal.cpp
+    SketchPlugin_ConstraintDistanceVertical.cpp
     SketchPlugin_ConstraintEqual.cpp
     SketchPlugin_Fillet.cpp
     SketchPlugin_ConstraintHorizontal.cpp
@@ -84,12 +90,14 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintRigid.cpp
     SketchPlugin_ConstraintTangent.cpp
     SketchPlugin_ConstraintVertical.cpp
+    SketchPlugin_Ellipse.cpp
     SketchPlugin_ExternalValidator.cpp
     SketchPlugin_Feature.cpp
     SketchPlugin_IntersectionPoint.cpp
     SketchPlugin_Line.cpp
     SketchPlugin_MacroArc.cpp
     SketchPlugin_MacroCircle.cpp
+    SketchPlugin_MacroEllipse.cpp
     SketchPlugin_MultiRotation.cpp
     SketchPlugin_MultiTranslation.cpp
     SketchPlugin_Plugin.cpp
@@ -155,11 +163,15 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestConstraintCollinear.py
                TestConstraintLength.py
                TestConstraintDistance.py
+               TestConstraintDistanceHorizontal.py
+               TestConstraintDistanceVertical.py
+               TestConstraintDistanceBehavior.py
                TestConstraintParallel.py
                TestConstraintPerpendicular.py
                TestConstraintRadius.py
                TestConstraintFixed.py
                TestConstraintHorizontal.py
+               TestConstraintHorizontalValidator.py
                TestConstraintVertical.py
                TestConstraintEqual.py
                TestConstraintTangent.py
@@ -172,6 +184,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestFilletInteracting.py
                TestRectangle.py
                TestProjection.py
+               TestProjectionIntoResult.py
                TestSplit.py
                TestHighload.py
                TestSnowflake.py
@@ -201,4 +214,21 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestTrimLine02.py
                Test2229.py
                Test2239.py
+               TestDistanceSignedVsUnsigned01.py
+               TestDistanceSignedVsUnsigned02.py
+               TestDistanceSignedVsUnsigned03.py
+               TestDistanceSignedVsUnsigned04.py
+               TestDistanceSignedVsUnsigned05.py
+               TestSignedDistancePointPoint.py
+               TestSignedDistancePointLine.py
 )
+
+if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})
+  ADD_UNIT_TESTS(
+               TestMovePoint.py
+               TestMoveLine.py
+               TestMoveCircle.py
+               TestMoveArc.py
+               TestMovementComplex.py
+  )
+endif()
