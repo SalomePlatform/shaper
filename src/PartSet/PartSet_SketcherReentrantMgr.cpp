@@ -486,6 +486,10 @@ bool PartSet_SketcherReentrantMgr::startInternalEdit(const std::string& thePrevi
                                                      (myWorkshop->currentOperation());
 
   if (aFOperation && module()->sketchMgr()->isNestedSketchOperation(aFOperation)) {
+    /// improvement to deselect automatically all eventual selected objects, when
+    // returning to the neutral point of the Sketcher or start internal edit
+    workshop()->selector()->clearSelection();
+
     aFOperation->setEditOperation(true/*, false*/);
     createInternalFeature();
 
