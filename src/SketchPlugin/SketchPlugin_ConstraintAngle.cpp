@@ -24,6 +24,8 @@
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 #include <GeomDataAPI_Point2D.h>
 
@@ -69,7 +71,7 @@ void SketchPlugin_ConstraintAngle::initAttributes()
 
   data()->addAttribute(SketchPlugin_ConstraintAngle::LOCATION_TYPE_ID(),
                        ModelAPI_AttributeInteger::typeId());
-  data()->integer(LOCATION_TYPE_ID())->setValue(SketcherPrs_Tools::LOCATION_AUTOMATIC);
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), LOCATION_TYPE_ID());
 }
 
 void SketchPlugin_ConstraintAngle::colorConfigInfo(std::string& theSection, std::string& theName,
