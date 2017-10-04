@@ -94,6 +94,8 @@ void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
     theDimAspect->SetExtensionSize(
         (theTextSize / aViewerScale + SketcherPrs_Tools::getArrowSize()) / 2.0);
   }
+  theDimAspect->TextAspect()->SetFont(Config_PropManager::string(SKETCH_TAB_NAME,
+                                      "dimension_font").c_str());
 
   theDimAspect->SetArrowTailSize(theDimAspect->ArrowAspect()->Length());
   // The value of vertical aligment is sometimes changed

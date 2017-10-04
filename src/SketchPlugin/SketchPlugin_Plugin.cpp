@@ -173,9 +173,10 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
 #endif
 
   Config_PropManager::registerProp(SKETCH_TAB_NAME, "dimension_font", "Dimension font",
-    Config_Prop::String, "Arial");
+    Config_Prop::String, "Times-bold");
   std::ostringstream aStream;
   aStream << SketcherPrs_Tools::getDefaultTextHeight();
+
   Config_PropManager::registerProp(SKETCH_TAB_NAME, "dimension_value_size",
     "Dimension value size", Config_Prop::Integer, aStream.str());
   aStream.str("");
