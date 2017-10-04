@@ -165,6 +165,9 @@ namespace SketcherPrs_Tools {
   /// Returns default value of dimension arrows size
   SKETCHERPRS_EXPORT int getDefaultArrowSize();
 
+  /// Returns value of dimension arrows size set in preferences
+  SKETCHERPRS_EXPORT int getConfigArrowSize();
+
   /// Set value of dimension text height
   /// \param theHeight a height value
   SKETCHERPRS_EXPORT void setTextHeight(double theHeight);
@@ -174,6 +177,9 @@ namespace SketcherPrs_Tools {
 
   /// Returns default value of dimension text height
   SKETCHERPRS_EXPORT double getDefaultTextHeight();
+
+  /// Returns value of dimension text height set in preferences
+  SKETCHERPRS_EXPORT double getConfigTextHeight();
 
   /// Get flayout distance of the dimension constraint
   /// \param theConstraint a dimension constraint object

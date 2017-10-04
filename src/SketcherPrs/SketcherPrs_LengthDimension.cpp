@@ -54,7 +54,7 @@ Handle(Prs3d_DimensionAspect) createDimensionAspect()
   anAspect->MakeText3d(false);
   anAspect->MakeTextShaded(false);
   anAspect->MakeUnitsDisplayed(false);
-  anAspect->TextAspect()->SetHeight(SketcherPrs_Tools::getDefaultTextHeight());
+  anAspect->TextAspect()->SetHeight(SketcherPrs_Tools::getConfigTextHeight());
   anAspect->ArrowAspect()->SetLength(SketcherPrs_Tools::getArrowSize());
 
   return anAspect;
@@ -70,7 +70,7 @@ void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
   if (theLocationType == SketcherPrs_Tools::LOCATION_AUTOMATIC) {
     double anArrowLength = theDimAspect->ArrowAspect()->Length();
      // This is not realy correct way to get viewer scale.
-    double aViewerScale = (double) SketcherPrs_Tools::getDefaultArrowSize() / anArrowLength;
+    double aViewerScale = (double) SketcherPrs_Tools::getConfigArrowSize() / anArrowLength;
 
     if(theTextSize > ((theDimValue - 3 * SketcherPrs_Tools::getArrowSize()) * aViewerScale)) {
       theDimAspect->SetTextHorizontalPosition(Prs3d_DTHP_Left);
@@ -90,7 +90,7 @@ void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
 
     double anArrowLength = theDimAspect->ArrowAspect()->Length();
     // This is not realy correct way to get viewer scale.
-    double aViewerScale = (double) SketcherPrs_Tools::getDefaultArrowSize() / anArrowLength;
+    double aViewerScale = (double) SketcherPrs_Tools::getConfigArrowSize() / anArrowLength;
     theDimAspect->SetExtensionSize(
         (theTextSize / aViewerScale + SketcherPrs_Tools::getArrowSize()) / 2.0);
   }

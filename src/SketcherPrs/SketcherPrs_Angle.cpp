@@ -66,7 +66,7 @@ SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint,
   myAspect->MakeText3d(false);
   myAspect->MakeTextShaded(false);
   myAspect->MakeUnitsDisplayed(false);
-  myAspect->TextAspect()->SetHeight(SketcherPrs_Tools::getDefaultTextHeight());
+  myAspect->TextAspect()->SetHeight(SketcherPrs_Tools::getConfigTextHeight());
   myAspect->ArrowAspect()->SetLength(SketcherPrs_Tools::getArrowSize());
 
   SetDimensionAspect(myAspect);

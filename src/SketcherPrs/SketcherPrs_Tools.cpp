@@ -240,6 +240,11 @@ int getDefaultArrowSize()
   return 20;
 }
 
+int getConfigArrowSize()
+{
+  return Config_PropManager::integer(SKETCH_TAB_NAME, "dimension_arrow_size");
+}
+
 static double MyTextHeight = 16;
 double getTextHeight()
 {
@@ -254,6 +259,11 @@ void setTextHeight(double theHeight)
 double getDefaultTextHeight()
 {
   return 16;
+}
+
+double getConfigTextHeight()
+{
+  return Config_PropManager::integer(SKETCH_TAB_NAME, "dimension_value_size");
 }
 
 double getFlyoutDistance(const ModelAPI_Feature* theConstraint)
