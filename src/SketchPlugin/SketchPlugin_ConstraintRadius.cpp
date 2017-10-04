@@ -25,12 +25,11 @@
 #include <SketchPlugin_Point.h>
 
 #include <SketcherPrs_Factory.h>
+#include <SketcherPrs_Tools.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Data.h>
-#include <ModelAPI_Session.h>
-#include <ModelAPI_Validator.h>
 
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Circ.h>
@@ -58,7 +57,7 @@ void SketchPlugin_ConstraintRadius::initAttributes()
 
   data()->addAttribute(SketchPlugin_ConstraintRadius::LOCATION_TYPE_ID(),
                        ModelAPI_AttributeInteger::typeId());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), LOCATION_TYPE_ID());
+  data()->integer(LOCATION_TYPE_ID())->setValue(SketcherPrs_Tools::LOCATION_AUTOMATIC);
 }
 
 void SketchPlugin_ConstraintRadius::colorConfigInfo(std::string& theSection, std::string& theName,
