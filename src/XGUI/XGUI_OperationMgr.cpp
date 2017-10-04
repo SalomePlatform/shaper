@@ -241,11 +241,9 @@ bool XGUI_OperationMgr::abortAllOperations(const XGUI_MessageKind& theMessageKin
   }
   else {
     if (theMessageKind == XGUI_AbortOperationMessage) {
-      aResult = QMessageBox::question(qApp->activeWindow(),
-                                      tr("Abort operation"),
-                                      tr("All active operations will be aborted."),
-                                      QMessageBox::Ok | QMessageBox::Cancel,
-                                      QMessageBox::Cancel) == QMessageBox::Ok;
+      myActiveMessageBox = createMessageBox(tr("All active operations will be aborted."));
+      aResult = myActiveMessageBox->exec() == QMessageBox::Ok;
+      myActiveMessageBox = 0;
     }
     else if (theMessageKind == XGUI_InformationMessage) {
       QString aMessage = tr("Please validate all your active operations before saving.");
@@ -332,11 +330,9 @@ bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation,
   if (theOperation && theOperation->isModified()) {
     if (theMessageKind == XGUI_AbortOperationMessage) {
       QString aMessage = tr("%1 operation will be aborted.").arg(theOperation->id());
-      int anAnswer = QMessageBox::question(qApp->activeWindow(),
-                                           tr("Abort operation"),
-                                           aMessage,
-                                           QMessageBox::Ok | QMessageBox::Cancel,
-                                           QMessageBox::Cancel);
+      myActiveMessageBox = createMessageBox(aMessage);
+      int anAnswer = myActiveMessageBox->exec() == QMessageBox::Ok;
+      myActiveMessageBox = 0;
       return anAnswer == QMessageBox::Ok;
     }
     else if (theMessageKind == XGUI_InformationMessage) {
