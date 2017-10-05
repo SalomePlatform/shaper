@@ -847,7 +847,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <sketch_shape_selector id="ConstraintEntityA"
             label="Line" tooltip="Select a line" shape_types="edge" use_external="false">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
-          <validator id="SketchPlugin_HasNoConstraint" parameters="SketchConstraintHorizontal, SketchConstraintVertical"/>
+          <validator id="SketchPlugin_HasNoConstraint" parameters="SketchConstraintHorizontal,SketchConstraintVertical"/>
         </sketch_shape_selector>
         <validator id="PartSet_HVDirSelection"/>
       </feature>
@@ -857,7 +857,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <sketch_shape_selector id="ConstraintEntityA"
             label="Line" tooltip="Select a line" shape_types="edge" use_external="false">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
-          <validator id="SketchPlugin_HasNoConstraint" parameters="SketchConstraintHorizontal, SketchConstraintVertical"/>
+          <validator id="SketchPlugin_HasNoConstraint" parameters="SketchConstraintHorizontal,SketchConstraintVertical"/>
         </sketch_shape_selector>
         <validator id="PartSet_HVDirSelection"/>
       </feature>
