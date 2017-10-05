@@ -154,7 +154,13 @@ bool ModuleBase_WidgetChoice::restoreValueCustom()
       myCombo->blockSignals(isBlocked);
     } else {
       bool isBlocked = myButtons->blockSignals(true);
-      myButtons->button(aIntAttr->value())->setChecked(true);
+      if (aIntAttr->isInitialized())
+        myButtons->button(aIntAttr->value())->setChecked(true);
+      else {
+        bool aHasDefaultValue;
+        int aDefaultVal = QString::fromStdString(getDefaultValue()).toInt(&aHasDefaultValue);
+        myButtons->button(aHasDefaultValue ? aDefaultVal : 0)->setChecked(true);
+      }
       myButtons->blockSignals(isBlocked);
       emit itemSelected(this, aIntAttr->value());
     }

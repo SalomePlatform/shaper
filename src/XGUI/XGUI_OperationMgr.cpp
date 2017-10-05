@@ -247,11 +247,9 @@ bool XGUI_OperationMgr::abortAllOperations(const XGUI_MessageKind& theMessageKin
     }
     else if (theMessageKind == XGUI_InformationMessage) {
       QString aMessage = tr("Please validate all your active operations before saving.");
-      QMessageBox::question(qApp->activeWindow(),
-                            tr("Validate operation"),
-                            aMessage,
-                            QMessageBox::Ok,
-                            QMessageBox::Ok);
+      myActiveMessageBox = createInformationBox(aMessage);
+      myActiveMessageBox->exec();
+      myActiveMessageBox = 0;
       aResult = false; // do not perform abort
     }
     while(aResult && hasOperation()) {
@@ -331,17 +329,15 @@ bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation,
     if (theMessageKind == XGUI_AbortOperationMessage) {
       QString aMessage = tr("%1 operation will be aborted.").arg(theOperation->id());
       myActiveMessageBox = createMessageBox(aMessage);
-      int anAnswer = myActiveMessageBox->exec() == QMessageBox::Ok;
+      bool aResult = myActiveMessageBox->exec() == QMessageBox::Ok;
       myActiveMessageBox = 0;
-      return anAnswer == QMessageBox::Ok;
+      return aResult;
     }
     else if (theMessageKind == XGUI_InformationMessage) {
       QString aMessage = tr("Please validate your %1 before saving.").arg(theOperation->id());
-      QMessageBox::question(qApp->activeWindow(),
-                            tr("Validate operation"),
-                            aMessage,
-                            QMessageBox::Ok,
-                            QMessageBox::Ok);
+      myActiveMessageBox = createInformationBox(aMessage);
+      myActiveMessageBox->exec();
+      myActiveMessageBox = 0;
       return false;
     }
   }
@@ -849,6 +845,17 @@ QMessageBox* XGUI_OperationMgr::createMessageBox(const QString& theMessage)
     QObject::tr("Abort operation"), theMessage, QMessageBox::Ok | QMessageBox::Cancel,
     qApp->activeWindow());
   aMessageBox->setDefaultButton(QMessageBox::Cancel);
+  aMessageBox->setEscapeButton(QMessageBox::No); // operation manager should process Esc key
+
+  return aMessageBox;
+}
+
+QMessageBox* XGUI_OperationMgr::createInformationBox(const QString& theMessage)
+{
+  QMessageBox * aMessageBox = new QMessageBox(QMessageBox::Question,
+    QObject::tr("Validate operation"), theMessage, QMessageBox::Ok,
+    qApp->activeWindow());
+  aMessageBox->setDefaultButton(QMessageBox::Ok);
   aMessageBox->setEscapeButton(QMessageBox::No); // operation manager should process Esc key
 
   return aMessageBox;

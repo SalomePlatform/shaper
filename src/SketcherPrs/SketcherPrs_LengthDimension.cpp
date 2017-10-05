@@ -181,10 +181,11 @@ void SketcherPrs_LengthDimension::Compute(
   else if (aConstraintKind == SketchPlugin_ConstraintDistanceVertical::ID())
     aLocationAttribute = SketchPlugin_ConstraintDistanceVertical::LOCATION_TYPE_ID();
 
-  std::shared_ptr<ModelAPI_AttributeInteger> aLocationTypeAttr = std::dynamic_pointer_cast<
-    ModelAPI_AttributeInteger>(myConstraint->data()->attribute(aLocationAttribute));
-  updateArrows(DimensionAspect(), GetValue(), aTextSize,
-    (SketcherPrs_Tools::LocationType)(aLocationTypeAttr->value()));
+  AttributeIntegerPtr aLocAttr = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>
+    (myConstraint->data()->attribute(aLocationAttribute));
+  SketcherPrs_Tools::LocationType aLocationType = aLocAttr->isInitialized() ?
+    (SketcherPrs_Tools::LocationType)(aLocAttr->value()) : SketcherPrs_Tools::LOCATION_AUTOMATIC;
+  updateArrows(DimensionAspect(), GetValue(), aTextSize, aLocationType);
 
   // Update text visualization: parameter value or parameter text
   myStyleListener->updateDimensions(this, myValue);

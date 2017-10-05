@@ -239,10 +239,11 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
 
   double aTextSize = 0.0;
   GetValueString(aTextSize);
-  AttributeIntegerPtr aLocationTypeAttr = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>
+  AttributeIntegerPtr aLocAttr = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>
     (myConstraint->data()->attribute(SketchPlugin_ConstraintAngle::LOCATION_TYPE_ID()));
-  updateArrows(myAspect, GetValue(), aTextSize,
-    (SketcherPrs_Tools::LocationType)(aLocationTypeAttr->value()));
+  SketcherPrs_Tools::LocationType aLocationType = aLocAttr->isInitialized() ?
+    (SketcherPrs_Tools::LocationType)(aLocAttr->value()) : SketcherPrs_Tools::LOCATION_AUTOMATIC;
+  updateArrows(myAspect, GetValue(), aTextSize, aLocationType);
 
   AIS_AngleDimension::Compute(thePresentationManager, thePresentation, theMode);
 

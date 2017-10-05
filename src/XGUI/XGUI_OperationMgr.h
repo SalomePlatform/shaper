@@ -261,6 +261,12 @@ private:
   /// \return message box
   static QMessageBox* createMessageBox(const QString& theMessage);
 
+  /// Creates information message box with OK button,
+  /// Escape is Null button
+  /// \param theMessage text of the message
+  /// \return message box
+  static QMessageBox* createInformationBox(const QString& theMessage);
+
  private:
   typedef QList<ModuleBase_Operation*> Operations;  ///< definition for a list of operations
   Operations myOperations;  ///< a stack of started operations. The active operation is on top,
