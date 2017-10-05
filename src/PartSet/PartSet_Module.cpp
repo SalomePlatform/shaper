@@ -986,29 +986,36 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
   }
   if (aView.IsNull())
     return;
-  double aLen = aView->Convert(SketcherPrs_Tools::getConfigArrowSize());
 
-  double aPrevLen = SketcherPrs_Tools::getArrowSize();
-  SketcherPrs_Tools::setArrowSize(aLen);
-  const double aCurScale = aViewer->activeView()->Camera()->Scale();
-  aViewer->SetScale(aViewer->activeView(), aCurScale);
-  double aTextHeight = SketcherPrs_Tools::getConfigTextHeight();
-  SketcherPrs_Tools::setTextHeight (aTextHeight);
-  bool isModified = false;
-  QList<AISObjectPtr> aPrsList = aDisplayer->displayedPresentations();
-  foreach (AISObjectPtr aAIS, aPrsList) {
-    Handle(AIS_InteractiveObject) aAisObj = aAIS->impl<Handle(AIS_InteractiveObject)>();
+  ModuleBase_Operation* aCurrentOperation = myWorkshop->currentOperation();
+  if (aCurrentOperation &&
+    (PartSet_SketcherMgr::isSketchOperation(aCurrentOperation) ||
+     sketchMgr()->isNestedSketchOperation(aCurrentOperation)))
+  {
+    double aLen = aView->Convert(SketcherPrs_Tools::getConfigArrowSize());
 
-    Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(aAisObj);
-    if (!aDim.IsNull()) {
-      aDim->DimensionAspect()->ArrowAspect()->SetLength(aLen);
-      aDim->DimensionAspect()->TextAspect()->SetHeight(aTextHeight);
-      aContext->Redisplay(aDim, false);
-      isModified = true;
+    double aPrevLen = SketcherPrs_Tools::getArrowSize();
+    SketcherPrs_Tools::setArrowSize(aLen);
+    const double aCurScale = aViewer->activeView()->Camera()->Scale();
+    aViewer->SetScale(aViewer->activeView(), aCurScale);
+    double aTextHeight = SketcherPrs_Tools::getConfigTextHeight();
+    SketcherPrs_Tools::setTextHeight (aTextHeight);
+    bool isModified = false;
+    QList<AISObjectPtr> aPrsList = aDisplayer->displayedPresentations();
+    foreach (AISObjectPtr aAIS, aPrsList) {
+      Handle(AIS_InteractiveObject) aAisObj = aAIS->impl<Handle(AIS_InteractiveObject)>();
+
+      Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(aAisObj);
+      if (!aDim.IsNull()) {
+        aDim->DimensionAspect()->ArrowAspect()->SetLength(aLen);
+        aDim->DimensionAspect()->TextAspect()->SetHeight(aTextHeight);
+        aContext->Redisplay(aDim, false);
+        isModified = true;
+      }
     }
+    if (isModified)
+      aDisplayer->updateViewer();
   }
-  if (isModified)
-    aDisplayer->updateViewer();
 }
 
 bool PartSet_Module::isCustomPrsActivated(const ModuleBase_CustomizeFlag& theFlag) const
