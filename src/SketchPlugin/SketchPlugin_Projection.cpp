@@ -147,6 +147,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
   if (hasPrevProj && !isValidProjectionType(aProjection, anEdge, aVertex)) {
     DocumentPtr aDoc = sketch()->document();
 
+    aRefAttr->setObject(data()->owner()); // to not remove of this remove reference to aProjection
     std::set<FeaturePtr> aFeaturesToBeRemoved;
     aFeaturesToBeRemoved.insert(aProjection);
     ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved);
