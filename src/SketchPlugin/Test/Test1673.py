@@ -253,8 +253,11 @@ expectedTime = MOVE_BUILD_RATIO * sketchTime
 averageTime = 0
 nbMoves = 0
 
-# Sketch is overconstrained, check the message
-assert Sketch_1.solverError().value() != "", "FAILED: Sketch should report over-constrained situation"
+# Two vertical constraints: due to #1889 the sketch is invalid now, not overconstrained
+from ModelAPI import *
+aFactory = ModelAPI_Session.get().validators()
+assert(not aFactory.validate(SketchConstraintVertical_10.feature()))
+#assert Sketch_1.solverError().value() != "", "FAILED: Sketch should report over-constrained situation"
 
 # Remove duplicated Vertical constraints
 Part_1_doc.removeFeature(SketchConstraintVertical_10.feature())
