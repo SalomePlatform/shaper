@@ -25,6 +25,7 @@
 #include <GeomAPI_Curve.h>
 #include <GeomAPI_Circ.h>
 #include <GeomAPI_Lin.h>
+#include <GeomAPI_Vertex.h>
 
 #include <SketchPlugin_Constraint.h>
 
@@ -77,29 +78,12 @@ bool SketcherPrs_Tangent::updateIfReadyToDisplay(double theStep, bool withColor)
   GeomCurvePtr aCurv1 = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShp1));
   GeomCurvePtr aCurv2 = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShp2));
 
-  GeomCurvePtr aLine;
-  GeomCirclePtr aCircle;
-  double aFirst, aLast;
-  if (aCurv1->isLine()) {
-    aLine = aCurv1;
-    aCircle = GeomCirclePtr(new GeomAPI_Circ(aCurv2));
-    aFirst = aCurv2->startParam();
-    aLast = aCurv2->endParam();
-  } else {
-    aLine = aCurv2;
-    aCircle = GeomCirclePtr(new GeomAPI_Circ(aCurv1));
-    aFirst = aCurv1->startParam();
-    aLast = aCurv1->endParam();
-  }
-
-  GeomPointPtr aPnt1 = aLine->getPoint(aLine->startParam());
-  GeomPointPtr aPnt2 = aLine->getPoint(aLine->endParam());
-  double aParam;
   GeomPointPtr aPnt;
-  if (aCircle->parameter(aPnt1, 1.e-4, aParam) && (aParam >= aFirst) && (aParam <= aLast))
-    aPnt = aPnt1;
-  else if (aCircle->parameter(aPnt2, 1.e-4, aParam) && (aParam >= aFirst) && (aParam <= aLast))
-    aPnt = aPnt2;
+  GeomShapePtr aIntPnt = aShp1->intersect(aShp2);
+  if (aIntPnt->isVertex()) {
+    GeomVertexPtr aVetrex(new GeomAPI_Vertex(aIntPnt));
+    aPnt = aVetrex->point();
+  }
 
   // Compute points coordinates
   if (aPnt.get()) {

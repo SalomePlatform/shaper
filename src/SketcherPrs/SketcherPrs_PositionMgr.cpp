@@ -354,8 +354,8 @@ std::list<ObjectPtr> getCurves(const GeomPointPtr& thePnt, const SketcherPrs_Sym
         double aStart = aCurve->startParam();
         double aEnd = aCurve->endParam();
         GeomCirclePtr  aCircle = GeomCirclePtr(new GeomAPI_Circ(aCurve));
-        double aParam;
-        if (aCircle->parameter(thePnt, 1.e-4, aParam) && (aParam >= aStart) && (aParam <= aEnd))
+        GeomPointPtr aProjPnt = aCircle->project(thePnt);
+        if (thePnt->distance(aProjPnt) <= Precision::Confusion())
           aList.push_back(aResObj);
       }
     }
@@ -438,6 +438,8 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
       aHasPlace = false;
       aPosCount = 0;
     }
+    if (aAngleStep <= 0)
+      break;
   }
 
   gp_Ax1 aRotAx(aP, aNormDir);
