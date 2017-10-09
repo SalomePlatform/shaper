@@ -56,8 +56,8 @@ public:
   /// Returns color lighter than sketch feature entity : pink
   static const std::string OPERATION_REMOVE_FEATURE_COLOR() { return "255, 174, 201"; }
 
-  /// Returns color equal to default color of construction plugin : gray
-  static const std::string OPERATION_SKETCH_PLANE() { return "150,150,180"; }
+  /// Returns color equal to default color of construction plugin : green
+  static const std::string OPERATION_SKETCH_PLANE() { return "170,255,0"; }
 public:
   /// Constructor
   /// \param theWorkshop a reference to workshop

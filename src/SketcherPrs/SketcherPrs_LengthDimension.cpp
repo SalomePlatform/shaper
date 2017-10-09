@@ -261,6 +261,15 @@ bool SketcherPrs_LengthDimension::readyToDisplay(ModelAPI_Feature* theConstraint
     if (!aPnt_A || !aPnt_B) // Objects not found
       return false;
 
+    if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID()) {
+      if (fabs(aPnt_A->x() - aPnt_B->x()) < Precision::Confusion())
+        return false;
+    }
+    else if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID()) {
+      if (fabs(aPnt_A->y() - aPnt_B->y()) < Precision::Confusion())
+        return false;
+    }
+
     // Get points from these object
     std::shared_ptr<GeomAPI_Pnt> aPoint1 = thePlane->to3D(aPnt_A->x(), aPnt_A->y());
     std::shared_ptr<GeomAPI_Pnt> aPoint2 = thePlane->to3D(aPnt_B->x(), aPnt_B->y());
