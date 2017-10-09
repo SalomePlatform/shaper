@@ -139,9 +139,7 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
     aResult = (GCS::SolveStatus)myEquationSystem->solve();
   } else {
     addFictiveConstraintIfNecessary();
-
-    if (myDiagnoseBeforeSolve)
-      diagnose();
+    diagnose();
     aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters);
   }
   Events_LongOp::end(this);
