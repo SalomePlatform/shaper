@@ -110,9 +110,9 @@ void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
 void PartSet_OverconstraintListener::processEvent(
                                                  const std::shared_ptr<Events_Message>& theMessage)
 {
-  // #2271 open document: if sketch has confilcting elements, solver sends message with the elements
-  // by opening the document. Sketch is not active, but an internal container should be updated.
-  // So, we should not check whether the listener is active here
+  // #2271 open document: if sketch has confilcting elements, solver sends message with the
+  // elements by opening the document. Sketch is not active, but an internal container should
+  // be updated. So, we should not check whether the listener is active here
   //if (!myIsActive)
   //  return;
 
