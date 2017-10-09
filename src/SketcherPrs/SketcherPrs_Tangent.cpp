@@ -80,7 +80,7 @@ bool SketcherPrs_Tangent::updateIfReadyToDisplay(double theStep, bool withColor)
 
   GeomPointPtr aPnt;
   GeomShapePtr aIntPnt = aShp1->intersect(aShp2);
-  if (aIntPnt->isVertex()) {
+  if (aIntPnt.get() && aIntPnt->isVertex()) {
     GeomVertexPtr aVetrex(new GeomAPI_Vertex(aIntPnt));
     aPnt = aVetrex->point();
   }
