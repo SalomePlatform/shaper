@@ -248,8 +248,11 @@ bool SketchSolver_Manager::moveFeature(
   {
     std::shared_ptr<GeomDataAPI_Point2D> aPntAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>
       (aConstraint->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-    aPntAttr->setValue(theTo);
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+    if (aPntAttr)
+    {
+      aPntAttr->setValue(theTo);
+      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+    }
     return true;
   }
 
