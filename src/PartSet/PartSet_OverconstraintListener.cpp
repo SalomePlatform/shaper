@@ -87,6 +87,9 @@ void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
   if (!myIsActive)
     return;
 
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  std::string aFeatureName = aFeature->data()->name();
+
   if (myConflictingObjects.find(theObject) != myConflictingObjects.end()) {
     theColor = Config_PropManager::color("Visualization", "sketch_overconstraint_color");
   }
@@ -107,8 +110,11 @@ void PartSet_OverconstraintListener::getCustomColor(const ObjectPtr& theObject,
 void PartSet_OverconstraintListener::processEvent(
                                                  const std::shared_ptr<Events_Message>& theMessage)
 {
-  if (!myIsActive)
-    return;
+  // #2271 open document: if sketch has confilcting elements, solver sends message with the elements
+  // by opening the document. Sketch is not active, but an internal container should be updated.
+  // So, we should not check whether the listener is active here
+  //if (!myIsActive)
+  //  return;
 
 #ifdef DEBUG_FEATURE_OVERCONSTRAINT_LISTENER
   bool isRepaired = theMessage->eventID() == Events_Loop::eventByName(EVENT_SOLVER_REPAIRED);
