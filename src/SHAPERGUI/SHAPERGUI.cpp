@@ -273,6 +273,17 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
   // Postrrocessing for LoadScriptId to remove created(if it was created) SALOME Object Browser
   connect(getApp()->action(LightApp_Application::UserID+1), SIGNAL(triggered(bool)),
           this, SLOT(onScriptLoaded()));
+
+  disconnect(getApp()->action(LightApp_Application::FileSaveId), SIGNAL(triggered(bool)),
+             getApp(), SLOT(onSaveDoc()));
+  disconnect(getApp()->action(LightApp_Application::FileSaveAsId), SIGNAL(triggered(bool)),
+             getApp(), SLOT(onSaveAsDoc()));
+
+  connect(getApp()->action(LightApp_Application::FileSaveId), SIGNAL(triggered(bool)),
+          this, SLOT(onSaveDocByShaper()));
+  connect(getApp()->action(LightApp_Application::FileSaveAsId), SIGNAL(triggered(bool)),
+          this, SLOT(onSaveAsDocByShaper()));
+
   return isDone;
 }
 
@@ -320,6 +331,17 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
   // Postrrocessing for LoadScriptId to remove created(if it was created) SALOME Object Browser
   disconnect(getApp()->action(LightApp_Application::UserID+1), SIGNAL(triggered(bool)),
              this, SLOT(onScriptLoaded()));
+
+  disconnect(getApp()->action(LightApp_Application::FileSaveId), SIGNAL(triggered(bool)),
+             this, SLOT(onSaveDocByShaper()));
+  disconnect(getApp()->action(LightApp_Application::FileSaveAsId), SIGNAL(triggered(bool)),
+             this, SLOT(onSaveAsDocByShaper()));
+
+  connect(getApp()->action(LightApp_Application::FileSaveId), SIGNAL(triggered(bool)),
+          getApp(), SLOT(onSaveDoc()));
+  connect(getApp()->action(LightApp_Application::FileSaveAsId), SIGNAL(triggered(bool)),
+          getApp(), SLOT(onSaveAsDoc()));
+
 
   return LightApp_Module::deactivateModule(theStudy);
 }
@@ -386,6 +408,24 @@ void SHAPERGUI::onScriptLoaded()
   SUIT_DataBrowser* aBrowser = getApp()->objectBrowser();
   if (aBrowser)
     delete aBrowser;
+}
+
+//******************************************************
+void SHAPERGUI::onSaveDocByShaper()
+{
+  if(!workshop()->operationMgr()->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
+    return;
+
+  getApp()->onSaveDoc();
+}
+
+//******************************************************
+void SHAPERGUI::onSaveAsDocByShaper()
+{
+  if(!workshop()->operationMgr()->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
+    return;
+
+  getApp()->onSaveAsDoc();
 }
 
 //******************************************************

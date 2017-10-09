@@ -182,6 +182,12 @@ Q_OBJECT
   /// Hide object browser if it was created during loading script
   void onScriptLoaded();
 
+  /// Save application functionality with additional processing of aborting the current operation
+  void onSaveDocByShaper();
+
+  /// Save application functionality with additional processing of aborting the current operation
+  void onSaveAsDocByShaper();
+
   /// Obtains the current application and updates its actions
   void onUpdateCommandStatus();
 
