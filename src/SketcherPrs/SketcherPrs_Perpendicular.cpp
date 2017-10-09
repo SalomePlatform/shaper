@@ -83,10 +83,14 @@ bool SketcherPrs_Perpendicular::updateIfReadyToDisplay(double theStep, bool with
 
   GeomAPI_Curve aCurve1(aShp1);
   GeomAPI_Curve aCurve2(aShp2);
-  bool isInside1 = ((aParam1 - aCurve1.startParam()) >= -Precision::Confusion()) &&
-    ((aCurve1.endParam() - aParam1) >= Precision::Confusion());
-  bool isInside2 = ((aParam2 - aCurve2.startParam()) >= -Precision::Confusion()) &&
-    ((aCurve2.endParam() - aParam2) >= Precision::Confusion());
+  bool isInside1 = (aParam1 >= (aCurve1.startParam() - Precision::Confusion())) &&
+    (aParam1 <= (aCurve1.endParam() + Precision::Confusion()));
+  //((aParam1 - aCurve1.startParam()) >= -Precision::Confusion()) &&
+  //  ((aCurve1.endParam() - aParam1) >= Precision::Confusion());
+  bool isInside2 = (aParam2 >= (aCurve2.startParam() - Precision::Confusion())) &&
+    (aParam2 <= (aCurve2.endParam() + Precision::Confusion()));
+  //(fabs(aParam2 - aCurve2.startParam()) >= -Precision::Confusion()) &&
+  //  ((aCurve2.endParam() - aParam2) >= Precision::Confusion());
 
   if (!(isInside1 && isInside2))
     aPnt = std::shared_ptr<GeomAPI_Pnt>();
