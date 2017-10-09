@@ -418,7 +418,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
   double aAngPos;
   gp_Vec aVecPos;
   bool aHasPlace = false;
-  int aIntId = 0; // a position inside a one sector
+  //int aIntId = 0; // a position inside a one sector
   while (aPosCount < aPos[1]) {
     for (aItAng = aAngles.cbegin(), aItVec = aVectors.cbegin();
          aItAng != aAngles.cend(); ++aItAng, ++aItVec) {
@@ -430,7 +430,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
         aHasPlace = true;
         aAngPos = (*aItAng);
         aVecPos = (*aItVec);
-        aIntId = aPos[0] - (aPosCount - Nb);
+        //aIntId = aPos[0] - (aPosCount - Nb);
       }
     }
     if (aPosCount < aPos[1]) {
@@ -443,7 +443,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
   gp_Ax1 aRotAx(aP, aNormDir);
   if (aHasPlace) {
     // rotate base vector on a necessary angle
-    gp_Vec aShift = aVecPos.Rotated(aRotAx, aAngleStep + aAngleStep * aIntId);
+    gp_Vec aShift = aVecPos.Rotated(aRotAx, aAngleStep + aAngleStep * aPos[0]);
     aShift.Normalize();
     aShift.Multiply(theStep * 1.5);
     return aP.Translated(aShift);
