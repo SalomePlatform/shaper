@@ -963,6 +963,19 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
     else {
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
       theDumper.dumpFeature(aFeature, true);
+      // dump all referred features for the "Copy"
+      AttributeBooleanPtr aCopyAttr = aFeature->boolean("Copy");
+      if (aCopyAttr.get() && aCopyAttr->value())
+      {
+        const std::set<AttributePtr>& aRefs = aFeature->data()->refsToMe();
+        std::set<AttributePtr>::iterator aRefIt = aRefs.begin();
+        for (; aRefIt != aRefs.end(); ++aRefIt)
+        {
+          FeaturePtr anOwner = ModelAPI_Feature::feature((*aRefIt)->owner());
+          if (anOwner && !theDumper.isDumped(anOwner))
+            theDumper.dumpFeature(anOwner, true);
+        }
+      }
     }
   }
 
