@@ -130,7 +130,8 @@ void SketchSolver_ConstraintMultiTranslation::adjustConstraint()
   for (int i = 0; i < 2; ++i)
   {
     std::shared_ptr<PlaneGCSSolver_PointWrapper> aPointWrapper =
-        std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(myStorage->entity(aStartEnd[i]));
+        std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(
+        myStorage->entity(AttributePtr(aStartEnd[i])));
     if (aPointWrapper)
     {
       GCSPointPtr aPnt = aPointWrapper->point();

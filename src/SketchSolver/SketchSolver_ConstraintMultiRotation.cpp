@@ -128,7 +128,8 @@ void SketchSolver_ConstraintMultiRotation::adjustConstraint()
   AttributeRefAttrPtr aCenterAttr =
       myBaseConstraint->refattr(SketchPlugin_MultiRotation::CENTER_ID());
   std::shared_ptr<PlaneGCSSolver_PointWrapper> aRotCenter =
-      std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(myStorage->entity(aCenterAttr));
+      std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(
+      myStorage->entity(AttributePtr(aCenterAttr)));
   if (aRotCenter)
   {
     GCSPointPtr aCenterPoint = aRotCenter->point();
