@@ -221,6 +221,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestDistanceSignedVsUnsigned05.py
                TestSignedDistancePointPoint.py
                TestSignedDistancePointLine.py
+               Test2273.py
 )
 
 if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})

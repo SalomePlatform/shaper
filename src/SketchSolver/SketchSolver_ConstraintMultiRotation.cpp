@@ -125,12 +125,23 @@ void SketchSolver_ConstraintMultiRotation::adjustConstraint()
   }
 
   // Obtain coordinates of rotation center
+  AttributeRefAttrPtr aCenterAttr =
+      myBaseConstraint->refattr(SketchPlugin_MultiRotation::CENTER_ID());
   std::shared_ptr<PlaneGCSSolver_PointWrapper> aRotCenter =
-      std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(myStorage->entity(
-      myBaseConstraint->attribute(SketchPlugin_MultiRotation::CENTER_ID())));
-  GCSPointPtr aCenterPoint = aRotCenter->point();
-  myCenterCoord[0] = *(aCenterPoint->x);
-  myCenterCoord[1] = *(aCenterPoint->y);
+      std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(myStorage->entity(aCenterAttr));
+  if (aRotCenter)
+  {
+    GCSPointPtr aCenterPoint = aRotCenter->point();
+    myCenterCoord[0] = *(aCenterPoint->x);
+    myCenterCoord[1] = *(aCenterPoint->y);
+  }
+  else
+  {
+    AttributePoint2DPtr aCenterPnt =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aCenterAttr->attr());
+    myCenterCoord[0] = aCenterPnt->x();
+    myCenterCoord[1] = aCenterPnt->y();
+  }
 
   if (myIsFullValue && myNumberOfCopies > 0)
     anAngleValue /= myNumberOfCopies;

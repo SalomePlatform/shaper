@@ -122,18 +122,32 @@ void SketchSolver_ConstraintMultiTranslation::adjustConstraint()
     return;
 
   // Obtain delta between start and end points of translation
-  std::shared_ptr<PlaneGCSSolver_PointWrapper> aStartWrapper =
-      std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(myStorage->entity(
-      myBaseConstraint->attribute(SketchPlugin_MultiTranslation::START_POINT_ID())));
-  std::shared_ptr<PlaneGCSSolver_PointWrapper> aEndWrapper =
-      std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(myStorage->entity(
-      myBaseConstraint->attribute(SketchPlugin_MultiTranslation::END_POINT_ID())));
+  AttributeRefAttrPtr aStartEnd[2] = {
+      myBaseConstraint->refattr(SketchPlugin_MultiTranslation::START_POINT_ID()),
+      myBaseConstraint->refattr(SketchPlugin_MultiTranslation::END_POINT_ID())
+  };
+  double aCoords[2][2];
+  for (int i = 0; i < 2; ++i)
+  {
+    std::shared_ptr<PlaneGCSSolver_PointWrapper> aPointWrapper =
+        std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(myStorage->entity(aStartEnd[i]));
+    if (aPointWrapper)
+    {
+      GCSPointPtr aPnt = aPointWrapper->point();
+      aCoords[i][0] = *(aPnt->x);
+      aCoords[i][1] = *(aPnt->y);
+    }
+    else
+    {
+      AttributePoint2DPtr aPnt =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aStartEnd[i]->attr());
+      aCoords[i][0] = aPnt->x();
+      aCoords[i][1] = aPnt->y();
+    }
+  }
 
-  GCSPointPtr aStart = aStartWrapper->point();
-  GCSPointPtr aEnd   = aEndWrapper->point();
-
-  myDelta[0] = *(aEnd->x) - *(aStart->x);
-  myDelta[1] = *(aEnd->y) - *(aStart->y);
+  myDelta[0] = aCoords[1][0] - aCoords[0][0];
+  myDelta[1] = aCoords[1][1] - aCoords[0][1];
 
   if (myIsFullValue && myNumberOfCopies > 0) {
     myDelta[0] /= myNumberOfCopies;

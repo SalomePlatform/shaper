@@ -499,6 +499,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <sketch_shape_selector id="ConstraintEntityA"
             label="Mirror line" tooltip="Select mirror line" shape_types="edge">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
+          <validator id="SketchPlugin_ReplicationReference" parameters="ConstraintEntityC"/>
         </sketch_shape_selector>
         <sketch_multi_selector id="ConstraintMirrorList"
             label="Segments:"
@@ -534,6 +535,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                     shape_types="vertex">
                 <validator id="PartSet_DifferentObjects"/>
                 <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+                <validator id="SketchPlugin_ReplicationReference" parameters="ConstraintEntityB"/>
               </sketch_shape_selector>
               <sketch_shape_selector
                     id="MultiTranslationEndPoint"
@@ -542,6 +544,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                     shape_types="vertex">
                 <validator id="PartSet_DifferentObjects"/>
                 <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+                <validator id="SketchPlugin_ReplicationReference" parameters="ConstraintEntityB"/>
               </sketch_shape_selector>
             </groupbox>
           </box>
@@ -554,6 +557,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                     shape_types="vertex">
                 <validator id="PartSet_DifferentObjects"/>
                 <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+                <validator id="SketchPlugin_ReplicationReference" parameters="ConstraintEntityB"/>
               </sketch_shape_selector>
               <sketch_shape_selector
                     id="MultiTranslationEndPoint"
@@ -562,6 +566,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                     shape_types="vertex">
                 <validator id="PartSet_DifferentObjects"/>
                 <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+                <validator id="SketchPlugin_ReplicationReference" parameters="ConstraintEntityB"/>
               </sketch_shape_selector>
             </groupbox>
           </box>
@@ -594,6 +599,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
               tooltip="Center of rotation"
               shape_types="vertex">
           <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+          <validator id="SketchPlugin_ReplicationReference" parameters="ConstraintEntityB"/>
         </sketch_shape_selector>
         <toolbox id="AngleType">
           <box id="SingleAngle" title="Single angle" icon="icons/Sketch/angle_up_32x32.png">

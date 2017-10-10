@@ -447,4 +447,21 @@ class SketchPlugin_HasNoConstraint: public ModelAPI_AttributeValidator
                        Events_InfoMessage& theError) const;
 };
 
+/**\class SketchPlugin_ReplicationReferenceValidator
+ * \ingroup Validators
+ * \brief Validator checking that the replications features (Mirror,
+ *        Multi-Rotation, Mutli-Translation) do not refer to the shapes they produce.
+ */
+class SketchPlugin_ReplicationReferenceValidator: public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 #endif
