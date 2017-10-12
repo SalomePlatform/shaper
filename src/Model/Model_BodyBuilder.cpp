@@ -94,7 +94,12 @@ static void evolutionToSelectionRec(TDF_Label theLab, const bool theFlag) {
     std::list<std::pair<TopoDS_Shape, TopoDS_Shape> >::iterator aPairsIter = aShapePairs.begin();
     for(; aPairsIter != aShapePairs.end(); aPairsIter++) {
       if (theFlag) { // disabled => make selection
-        aBuilder.Select(aPairsIter->second, aPairsIter->first);
+        if (anEvolution == TNaming_DELETE) // issue 2274 : don't put too many same null shapes
+          aBuilder.Select(aPairsIter->first, aPairsIter->first);
+        else if (anEvolution == TNaming_PRIMITIVE)
+          aBuilder.Select(aPairsIter->second, aPairsIter->second);
+        else
+          aBuilder.Select(aPairsIter->second, aPairsIter->first);
       } else if (anEvol == TNaming_GENERATED) {
         aBuilder.Generated(aPairsIter->first, aPairsIter->second);
       } else if (anEvol == TNaming_MODIFY) {
