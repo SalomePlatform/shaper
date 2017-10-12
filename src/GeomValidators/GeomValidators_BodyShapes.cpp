@@ -25,6 +25,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_Tools.h>
 
 bool GeomValidators_BodyShapes::isValid(const AttributePtr& theAttribute,
                                         const std::list<std::string>& theArguments,
@@ -45,6 +46,13 @@ bool GeomValidators_BodyShapes::isValid(const AttributePtr& theAttribute,
     if(aResultConstruction.get()) {
       theError = "Error: Result construction selected.";
       return false;
+    }
+    // additional check that the selected object is top-level result
+    if (theArguments.size() > 0 && *(theArguments.rbegin()) == "toplevel") {
+      if (ModelAPI_Tools::compSolidOwner(aContext).get()) {
+        theError = "Error: Only higher level shape allowed.";
+        return false;
+      }
     }
   } else if(anAttributeType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr anAttrSelectionList =

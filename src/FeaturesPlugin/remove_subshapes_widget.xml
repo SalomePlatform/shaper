@@ -27,7 +27,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                   concealment="true"
                   greed="true">
     <validator id="GeomValidators_ShapeType" parameters="wire,shell,compsolid,compound"/>
-    <validator id="GeomValidators_BodyShapes"/>
+    <validator id="GeomValidators_BodyShapes" parameters="toplevel"/>
   </shape_selector>
   <multi_selector id="subshapes"
                   label="Sub-Shapes to keep:"
