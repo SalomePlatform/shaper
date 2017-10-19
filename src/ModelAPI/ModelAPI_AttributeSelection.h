@@ -47,7 +47,8 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   /// \param theSubShape selected sub-shape (if null, the whole context is selected)
   /// \param theTemporarily if it is true, do not store and name the added in the data framework
   ///           (used to remove immideately, without the following updates)
-  virtual void setValue(
+  /// \returns true if attribute was updated
+  virtual bool setValue(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily = false) = 0;
 
@@ -57,6 +58,10 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
     const CenterType theCenterType,
     const bool theTemporarily = false) = 0;
+
+  /// Makes this selection attribute selects the same as in theSource selection
+  virtual void selectValue(
+    const std::shared_ptr<ModelAPI_AttributeSelection>& theSource) = 0;
 
   /// Reset temporary stored values
   virtual void removeTemporaryValues() = 0;

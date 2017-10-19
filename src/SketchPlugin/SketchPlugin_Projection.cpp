@@ -253,7 +253,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
   aRefAttr->setObject(aProjection);
 
   if (theID == EXTERNAL_FEATURE_ID()) {
-    selection(EXTERNAL_ID())->setValue(aExtFeature->context(), aExtFeature->value());
+    selection(EXTERNAL_ID())->selectValue(aExtFeature);
 
     if (aResult) {
       aResult->setShape(aProjection->lastResult()->shape());

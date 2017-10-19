@@ -90,25 +90,26 @@ Standard_GUID kELLIPSE_CENTER2("1395ae73-8e02-4cf8-b204-06ff35873a32");
 // TDataStd_IntPackedMap - indexes of edges in composite element (for construction)
 // TDataStd_Integer - type of the selected shape (for construction)
 // TDF_Reference - from ReferenceAttribute, the context
-void Model_AttributeSelection::setValue(const ResultPtr& theContext,
+bool Model_AttributeSelection::setValue(const ResultPtr& theContext,
   const std::shared_ptr<GeomAPI_Shape>& theSubShape, const bool theTemporarily)
 {
   if (theTemporarily) { // just keep the stored without DF update
     myTmpContext = theContext;
     myTmpSubShape = theSubShape;
     owner()->data()->sendAttributeUpdated(this);
-    return;
+    return true;
   } else {
     myTmpContext.reset();
     myTmpSubShape.reset();
     myTmpCenterType = NOT_CENTER;
   }
 
-  const std::shared_ptr<GeomAPI_Shape>& anOldShape = value();
+  CenterType aType;
+  const std::shared_ptr<GeomAPI_Shape>& anOldShape = internalValue(aType);
   bool isOldContext = theContext == myRef.value();
   bool isOldShape = isOldContext &&
     (theSubShape == anOldShape || (theSubShape && anOldShape && theSubShape->isEqual(anOldShape)));
-  if (isOldShape) return; // shape is the same, so context is also unchanged
+  if (isOldShape) return false; // shape is the same, so context is also unchanged
   // update the referenced object if needed
   if (!isOldContext) {
       myRef.setValue(theContext);
@@ -134,7 +135,7 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
     TDF_Label aRefLab = myRef.myRef->Label();
     aSelLab.ForgetAllAttributes(true);
     myRef.myRef = TDF_Reference::Set(aSelLab.Father(), aSelLab.Father());
-    return;
+    return false;
   }
   if (theContext->groupName() == ModelAPI_ResultBody::group()) {
     // do not select the whole shape for body:it is already must be in the data framework
@@ -168,32 +169,54 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   }
 
   owner()->data()->sendAttributeUpdated(this);
+  return true;
 }
 
 void Model_AttributeSelection::setValueCenter(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
     const CenterType theCenterType, const bool theTemporarily)
 {
-  setValue(theContext, theEdge, theTemporarily);
+  bool anUpdated = setValue(theContext, theEdge, theTemporarily);
   if (theTemporarily) {
     myTmpCenterType = theCenterType;
   } else { // store in the data structure
     TDF_Label aSelLab = selectionLabel();
     switch(theCenterType) {
     case CIRCLE_CENTER:
+      if (!anUpdated)
+        anUpdated = !aSelLab.IsAttribute(kCIRCLE_CENTER);
       TDataStd_UAttribute::Set(aSelLab, kCIRCLE_CENTER);
       break;
     case ELLIPSE_FIRST_FOCUS:
+      if (!anUpdated)
+        anUpdated = !aSelLab.IsAttribute(kELLIPSE_CENTER1);
       TDataStd_UAttribute::Set(aSelLab, kELLIPSE_CENTER1);
       break;
     case ELLIPSE_SECOND_FOCUS:
+      if (!anUpdated)
+        anUpdated = !aSelLab.IsAttribute(kELLIPSE_CENTER2);
       TDataStd_UAttribute::Set(aSelLab, kELLIPSE_CENTER2);
       break;
     }
-    owner()->data()->sendAttributeUpdated(this);
+    if (anUpdated)
+      owner()->data()->sendAttributeUpdated(this);
   }
 }
 
+void Model_AttributeSelection::selectValue(
+    const std::shared_ptr<ModelAPI_AttributeSelection>& theSource)
+{
+  CenterType aType;
+  std::shared_ptr<GeomAPI_Shape> aValue =
+    std::dynamic_pointer_cast<Model_AttributeSelection>(theSource)->internalValue(aType);
+  if (!aValue.get() || aType == NOT_CENTER) {
+    setValue(theSource->context(), aValue);
+  } else {
+    std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge);
+    anEdge->setImpl(new TopoDS_Shape(aValue->impl<TopoDS_Shape>()));
+    setValueCenter(theSource->context(), anEdge, aType);
+  }
+}
 
 void Model_AttributeSelection::removeTemporaryValues()
 {

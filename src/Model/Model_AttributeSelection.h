@@ -53,7 +53,8 @@ public:
   /// \param theSubShape selected sub-shape (if null, the whole context is selected)
   /// \param theTemporarily if it is true, do not store and name the added in the data framework
   ///           (used to remove immideately, without the following updates)
-  MODEL_EXPORT virtual void setValue(
+  /// \returns true if attribute was updated
+  MODEL_EXPORT virtual bool setValue(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily = false);
 
@@ -63,6 +64,10 @@ public:
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
     const CenterType theCenterType,
     const bool theTemporarily = false);
+
+  /// Makes this selection attribute selects the same as in theSource selection
+  MODEL_EXPORT virtual void selectValue(
+    const std::shared_ptr<ModelAPI_AttributeSelection>& theSource);
 
   /// Reset temporary stored values
   virtual void removeTemporaryValues();
