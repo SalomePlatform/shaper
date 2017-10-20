@@ -18,8 +18,8 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#ifndef CONFIG_MESSAGE_H
-#define CONFIG_MESSAGE_H
+#ifndef CONFIG_FEATUREMESSAGE_H
+#define CONFIG_FEATUREMESSAGE_H
 
 #include <Config_def.h>
 #include <Events_Message.h>

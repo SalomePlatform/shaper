@@ -29,6 +29,7 @@ INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/src/Events
 SET(PROJECT_HEADERS
   Config_def.h
   Config_FeatureMessage.h
+  Config_PluginMessage.h
   Config_XMLReader.h
   Config_ModuleReader.h
   Config_FeatureReader.h
@@ -48,6 +49,7 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_SOURCES
   Config_FeatureMessage.cpp
+  Config_PluginMessage.cpp
   Config_XMLReader.cpp
   Config_ModuleReader.cpp
   Config_FeatureReader.cpp

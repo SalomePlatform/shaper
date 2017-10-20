@@ -62,10 +62,9 @@ QPixmap ModuleBase_IconFactory::loadPixmap(const QString& theValue)
   QPixmap aPixmap(theValue);
 
   if (aPixmap.isNull()) {
-    std::string aPluginPath = Config_XMLReader::pluginConfigFile();
-    QString aPath = QString::fromStdString(aPluginPath) + QDir::separator() + theValue;
-    if (QFile::exists(aPath))
-      aPixmap = QPixmap(aPath);
+    std::string aPath = Config_XMLReader::findConfigFile(theValue.toStdString());
+    if (!aPath.empty())
+      aPixmap = QPixmap(QString::fromStdString(aPath));
   }
   return aPixmap;
 }
@@ -75,10 +74,9 @@ QImage ModuleBase_IconFactory::loadImage(const QString& theValue)
   QImage anImage(theValue);
 
   if (anImage.isNull()) {
-    std::string aPluginPath = Config_XMLReader::pluginConfigFile();
-    QString aPath = QString::fromStdString(aPluginPath) + QDir::separator() + theValue;
-    if (QFile::exists(aPath))
-      anImage = QImage(aPath);
+    std::string aPath = Config_XMLReader::findConfigFile(theValue.toStdString());
+    if (!aPath.empty())
+      anImage = QImage(QString::fromStdString(aPath));
   }
   return anImage;
 }

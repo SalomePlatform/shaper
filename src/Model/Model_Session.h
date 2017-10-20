@@ -44,6 +44,8 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   std::map<std::string, ModelAPI_Plugin*> myPluginObjs;  ///< instances of the already plugins
   std::string myCurrentPluginName;  ///< name of the plugin that must be loaded currently
   std::shared_ptr<ModelAPI_Document> myCurrentDoc;  ///< current working document
+   ///< map from plugin id to plugins which are used by it (must be loaded before this one)
+  std::map<std::string, std::string> myUsePlugins;
 
   /// if true, generates error if document is updated outside of transaction
   bool myCheckTransactions;
@@ -148,6 +150,9 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
 
   /// Creates the feature object using plugins functionality
   FeaturePtr createFeature(std::string theFeatureID, Model_Document* theDocOwner);
+
+  /// Get the plugin by name. If it is not loaded, load plugin.
+  ModelAPI_Plugin* getPlugin(const std::string& thePluginName);
 
   friend class Model_Document;
   friend class Model_Objects;

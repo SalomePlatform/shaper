@@ -66,12 +66,17 @@ class Config_XMLReader
    */
   CONFIG_EXPORT void readAll();
   /*!
-   * Returns xmlNodePtr to the root of reader's document
-   * or NULL if not found
+   * Returns xmlNodePtr to the root of reader's document or NULL if not found.
+   * If the path to the document to read is empty, uses myDocumentPath.
    */
-  CONFIG_EXPORT xmlNodePtr findRoot();
+  CONFIG_EXPORT xmlNodePtr findRoot(const std::string theDocumentPath = "");
 
   CONFIG_EXPORT const char* encoding() const;
+
+  /// Checks all possible paths to configuration file given
+  /// Uses theFindIndex if several solutions can be found (this is the number of solution to find)
+  CONFIG_EXPORT static std::string
+    findConfigFile(const std::string theFileName, const int theFindIndex = 0);
 
  protected:
   /*!
@@ -117,6 +122,7 @@ class Config_XMLReader
  protected:
   std::string myDocumentPath; ///< Path to the xml document
   xmlDocPtr myXmlDoc; ///< Root of the xml document
+  std::string myRootFileName; ///< name of the root file
   /// A map to store all parent's attributes.
   /// The key has from "Node_Name:Node_Attribute"
   std::map<std::string, std::string> myCachedAttributes;
