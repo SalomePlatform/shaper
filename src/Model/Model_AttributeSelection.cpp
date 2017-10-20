@@ -583,6 +583,11 @@ bool Model_AttributeSelection::update()
       bool aModified = true;
       bool aValid = aConstructionContext->update(anIndex->Get(), owner()->document(), aModified);
       setInvalidIfFalse(aSelLab, aValid);
+      if (aConstructionContext->isInfinite()) {
+        // Update the selected shape.
+        TNaming_Builder aBuilder(aSelLab);
+        aBuilder.Generated(aConstructionContext->shape()->impl<TopoDS_Shape>());
+      }
       if (aModified)
         owner()->data()->sendAttributeUpdated(this);
       return aValid;
