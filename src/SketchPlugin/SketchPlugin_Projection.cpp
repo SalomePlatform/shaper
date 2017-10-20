@@ -246,7 +246,8 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     aProjection->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(isInversed);
 
     aProjection->data()->blockSendAttributeUpdated(aWasBlocked, false);
-  }
+  } else
+    return;
 
   aProjection->boolean(COPY_ID())->setValue(true);
   aProjection->execute();
