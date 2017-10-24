@@ -25,59 +25,14 @@
 #include <SketchPlugin_ConstraintDistanceHorizontal.h>
 
 #include <SketcherPrs_Tools.h>
-#include <SketcherPrs_Factory.h>
 
-#include <GeomAPI_Dir2d.h>
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
 
-#include <ModelAPI_AttributeDouble.h>
-#include <ModelAPI_AttributeInteger.h>
-#include <ModelAPI_Session.h>
-#include <ModelAPI_Validator.h>
-
-const double tolerance = 1e-7;
-
 
 SketchPlugin_ConstraintDistanceHorizontal::SketchPlugin_ConstraintDistanceHorizontal()
-  : SketchPlugin_ConstraintDistance()
+  : SketchPlugin_ConstraintDistanceAlongDir()
 {
-}
-
-//*************************************************************************************
-void SketchPlugin_ConstraintDistanceHorizontal::initAttributes()
-{
-  data()->addAttribute(SketchPlugin_Constraint::VALUE(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
-
-  data()->addAttribute(SketchPlugin_ConstraintDistanceHorizontal::LOCATION_TYPE_ID(),
-                       ModelAPI_AttributeInteger::typeId());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), LOCATION_TYPE_ID());
-}
-
-//*************************************************************************************
-void SketchPlugin_ConstraintDistanceHorizontal::execute()
-{
-  AttributeDoublePtr anAttrValue = real(SketchPlugin_Constraint::VALUE());
-  if (anAttrValue->isInitialized() || !areAttributesInitialized())
-    return;
-
-  double aDistance = calculateCurrentDistance();
-  anAttrValue->setValue(aDistance);
-}
-
-//*************************************************************************************
-AISObjectPtr SketchPlugin_ConstraintDistanceHorizontal::getAISObject(AISObjectPtr thePrevious)
-{
-  if (!sketch())
-    return thePrevious;
-
-  AISObjectPtr anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this,
-                                                                      sketch()->coordinatePlane(),
-                                                                      thePrevious);
-  return anAIS;
 }
 
 double SketchPlugin_ConstraintDistanceHorizontal::calculateCurrentDistance()
@@ -92,44 +47,19 @@ double SketchPlugin_ConstraintDistanceHorizontal::calculateCurrentDistance()
   return aPointB->x() - aPointA->x();
 }
 
-void SketchPlugin_ConstraintDistanceHorizontal::attributeChanged(const std::string& theID)
+void SketchPlugin_ConstraintDistanceHorizontal::updateFlyoutPoint()
 {
-  if (theID == SketchPlugin_Constraint::ENTITY_A() ||
-      theID == SketchPlugin_Constraint::ENTITY_B())
-  {
-    AttributeDoublePtr aValueAttr = real(SketchPlugin_Constraint::VALUE());
-    if (!aValueAttr->isInitialized() && areAttributesInitialized()) {
-      // only if it is not initialized, try to compute the current value
-      double aDistance = calculateCurrentDistance();
-      aValueAttr->setValue(aDistance);
-    }
-  } else if (theID == SketchPlugin_Constraint::FLYOUT_VALUE_PNT() && !myFlyoutUpdate) {
-    // Recalculate flyout point in local coordinates of the distance constraint:
-    // the X coordinate is a length of projection of the flyout point on the
-    //                  line binding two distanced points
-    //                  or a line of projection of the distanced point onto the distanced segment
-    // the Y coordinate is a distance from the flyout point to the line
-    std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-    std::shared_ptr<GeomAPI_Pnt2d> aFlyoutPnt = aFlyoutAttr->pnt();
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+  std::shared_ptr<GeomAPI_Pnt2d> aFlyoutPnt = aFlyoutAttr->pnt();
 
-    std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
-    std::shared_ptr<GeomDataAPI_Point2D> aPointA = SketcherPrs_Tools::getFeaturePoint(
-        data(), SketchPlugin_Constraint::ENTITY_A(), aPlane);
-    std::shared_ptr<GeomDataAPI_Point2D> aPointB = SketcherPrs_Tools::getFeaturePoint(
-        data(), SketchPlugin_Constraint::ENTITY_B(), aPlane);
+  std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
+  std::shared_ptr<GeomDataAPI_Point2D> aEndPoint = SketcherPrs_Tools::getFeaturePoint(
+      data(), SketchPlugin_Constraint::ENTITY_B(), aPlane);
 
-    std::shared_ptr<GeomAPI_XY> aStartPnt = aPointA->pnt()->xy();
-    std::shared_ptr<GeomAPI_XY> aEndPnt = aPointB->pnt()->xy();
-    if (aEndPnt->distance(aStartPnt) < tolerance)
-      return;
-
-    myFlyoutUpdate = true;
-    std::shared_ptr<GeomAPI_XY> aFlyoutDir = aFlyoutPnt->xy()->decreased(aEndPnt);
-    double X = aFlyoutDir->x(); // Dot on OX axis
-    double Y = aFlyoutDir->y(); // Cross to OX axis
-    aFlyoutAttr->setValue(X, Y);
-    myFlyoutUpdate = false;
-  }
+  std::shared_ptr<GeomAPI_XY> aFlyoutDir = aFlyoutPnt->xy()->decreased(aEndPoint->pnt()->xy());
+  double X = aFlyoutDir->x(); // Dot on OX axis
+  double Y = aFlyoutDir->y(); // Cross to OX axis
+  aFlyoutAttr->setValue(X, Y);
 }

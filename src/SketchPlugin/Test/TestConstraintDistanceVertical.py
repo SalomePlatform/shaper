@@ -125,7 +125,10 @@ while d >= -30.:
     DISTANCE1 = d
     aDistance.setValue(DISTANCE1)
     aSession.finishOperation()
-    assert math.fabs(verticalDistance(aPoint1Coords, aPoint2Coords) - DISTANCE1) < 1.e-5, "Distance values are different: {0} != {1}".format(verticalDistance(aPoint1Coords, aPoint2Coords), DISTANCE1)
+    if DISTANCE1 == 0:
+        assert(aVDist1.error() != "")
+    else:
+        assert math.fabs(verticalDistance(aPoint1Coords, aPoint2Coords) - DISTANCE1) < 1.e-5, "Distance values are different: {0} != {1}".format(verticalDistance(aPoint1Coords, aPoint2Coords), DISTANCE1)
     d += dStep
 assert (model.dof(aSketchFeature) == 3)
 
@@ -158,9 +161,12 @@ while d >= -50.:
     DISTANCE2 = d
     aDistance.setValue(DISTANCE2)
     aSession.finishOperation()
-    assert math.fabs(verticalDistance(anExtCoords, aPoint1Coords) - DISTANCE2) < 1.e-5, "Distance values are different: {0} != {1}".format(verticalDistance(anExtCoords, aPoint1Coords), DISTANCE2)
-    assert math.fabs(aPoint1Coords.y() - DISTANCE2) < 1.e-5, "Wrong point coordinates ({}, {}), expected y = {}".format(aPoint1Coords.x(), aPoint1Coords.y(), DISTANCE2)
-    assert math.fabs(verticalDistance(aPoint1Coords, aPoint2Coords) - DISTANCE1) < 1.e-5, "Distance values are different: {0} != {1}".format(verticalDistance(aPoint1Coords, aPoint2Coords), DISTANCE1)
+    if DISTANCE2 == 0:
+        assert(aVDist2.error() != "")
+    else:
+        assert math.fabs(verticalDistance(anExtCoords, aPoint1Coords) - DISTANCE2) < 1.e-5, "Distance values are different: {0} != {1}".format(verticalDistance(anExtCoords, aPoint1Coords), DISTANCE2)
+        assert math.fabs(aPoint1Coords.y() - DISTANCE2) < 1.e-5, "Wrong point coordinates ({}, {}), expected y = {}".format(aPoint1Coords.x(), aPoint1Coords.y(), DISTANCE2)
+        assert math.fabs(verticalDistance(aPoint1Coords, aPoint2Coords) - DISTANCE1) < 1.e-5, "Distance values are different: {0} != {1}".format(verticalDistance(aPoint1Coords, aPoint2Coords), DISTANCE1)
     d += dStep
 assert (model.dof(aSketchFeature) == 2)
 
@@ -217,7 +223,10 @@ while d >= -50.:
     DISTANCE3 = d
     aDistance.setValue(DISTANCE3)
     aSession.finishOperation()
-    assert math.fabs(verticalDistance(aStartPoint, aEndPoint) - DISTANCE3) < 1.e-5, "Distance values are different: {0} != {1}".format(verticalDistance(aStartPoint, aEndPoint), DISTANCE3)
+    if DISTANCE3 == 0:
+        assert(aVDist3.error() != "")
+    else:
+        assert math.fabs(verticalDistance(aStartPoint, aEndPoint) - DISTANCE3) < 1.e-5, "Distance values are different: {0} != {1}".format(verticalDistance(aStartPoint, aEndPoint), DISTANCE3)
     d += dStep
 assert (model.dof(aSketchFeature) == 6)
 

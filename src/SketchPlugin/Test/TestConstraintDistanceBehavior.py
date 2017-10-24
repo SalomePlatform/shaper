@@ -45,6 +45,8 @@ model.do()
 
 # changing the parameter
 for param in range(-30, 31, 2):
+    if param == 0:
+        continue
     DistanceParam.setValue(param)
     model.do()
     dist = secondPoint.x() - firstPoint.x()
@@ -66,6 +68,8 @@ model.do()
 
 # changing the parameter
 for param in range(-30, 31, 2):
+    if param == 0:
+        continue
     DistanceParam.setValue(param)
     model.do()
     dist = secondPoint.y() - firstPoint.y()

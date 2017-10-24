@@ -26,7 +26,7 @@
 #define SketchPlugin_ConstraintDistanceHorizontal_H_
 
 #include <SketchPlugin.h>
-#include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintDistanceAlongDir.h>
 
 /** \class SketchPlugin_ConstraintDistanceHorizontal
  *  \ingroup Plugins
@@ -35,7 +35,7 @@
  *  This constraint has three attributes:
  *  SketchPlugin_Constraint::VALUE(), SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
-class SketchPlugin_ConstraintDistanceHorizontal : public SketchPlugin_ConstraintDistance
+class SketchPlugin_ConstraintDistanceHorizontal : public SketchPlugin_ConstraintDistanceAlongDir
 {
 public:
   /// Distance constraint kind
@@ -52,33 +52,15 @@ public:
     return MY_KIND;
   }
 
-  /// attribute name of dimension location type
-  inline static const std::string& LOCATION_TYPE_ID()
-  {
-    static const std::string MY_LOCATION_TYPE_ID("LocationType");
-    return MY_LOCATION_TYPE_ID;
-  }
-
-
-  /// \brief Creates a new part document if needed
-  SKETCHPLUGIN_EXPORT virtual void execute();
-
-  /// \brief Request for initialization of data model of the feature: adding all attributes
-  SKETCHPLUGIN_EXPORT virtual void initAttributes();
-
-  /// Returns the AIS preview
-  SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
-
-  /// Called on change of any argument-attribute of this object
-  /// \param theID identifier of changed attribute
-  SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
-
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintDistanceHorizontal();
 
 protected:
   /// Returns the current distance between the feature attributes
   virtual double calculateCurrentDistance();
+
+  /// Update flyout point
+  virtual void updateFlyoutPoint();
 };
 
 #endif

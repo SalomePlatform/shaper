@@ -31,6 +31,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintCoincidence.h
     SketchPlugin_ConstraintCollinear.h
     SketchPlugin_ConstraintDistance.h
+    SketchPlugin_ConstraintDistanceAlongDir.h
     SketchPlugin_ConstraintDistanceHorizontal.h
     SketchPlugin_ConstraintDistanceVertical.h
     SketchPlugin_ConstraintEqual.h
@@ -76,6 +77,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintCoincidence.cpp
     SketchPlugin_ConstraintCollinear.cpp
     SketchPlugin_ConstraintDistance.cpp
+    SketchPlugin_ConstraintDistanceAlongDir.cpp
     SketchPlugin_ConstraintDistanceHorizontal.cpp
     SketchPlugin_ConstraintDistanceVertical.cpp
     SketchPlugin_ConstraintEqual.cpp

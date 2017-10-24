@@ -703,7 +703,9 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         </sketch_shape_selector>
         <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
 
-        <doublevalue_editor label="Value" tooltip="Distance" id="ConstraintValue" default="computed"/>
+        <doublevalue_editor label="Value" tooltip="Distance" id="DistanceValue" default="computed" min="0">
+          <validator id="GeomValidators_Positive"/>
+        </doublevalue_editor>
 
         <module_choice id="LocationType"
           widget_type="radiobuttons"
@@ -745,7 +747,9 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         </sketch_shape_selector>
         <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
 
-        <doublevalue_editor label="Value" tooltip="Distance" id="ConstraintValue" default="computed"/>
+        <doublevalue_editor label="Value" tooltip="Distance" id="DistanceValue" default="computed" min="0">
+          <validator id="GeomValidators_Positive"/>
+        </doublevalue_editor>
 
         <module_choice id="LocationType"
           widget_type="radiobuttons"

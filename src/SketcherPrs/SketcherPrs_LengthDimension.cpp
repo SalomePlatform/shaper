@@ -158,7 +158,12 @@ void SketcherPrs_LengthDimension::Compute(
     myPlane = gp_Pln(mySketcherPlane->impl<gp_Ax3>());
 
     DataPtr aData = myConstraint->data();
-    AttributeDoublePtr anAttributeValue = aData->real(SketchPlugin_Constraint::VALUE());
+    AttributeDoublePtr anAttributeValue;
+    if (myConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID() ||
+        myConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
+      anAttributeValue = aData->real(SketchPlugin_ConstraintDistanceAlongDir::DISTANCE_VALUE_ID());
+    else
+      anAttributeValue = aData->real(SketchPlugin_Constraint::VALUE());
     myValue.init(anAttributeValue);
   }
 
