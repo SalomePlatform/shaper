@@ -54,6 +54,7 @@
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_Point.h>
+#include <SketchPlugin_Projection.h>
 
 #include <ModelAPI_EventReentrantMessage.h>
 
@@ -1416,7 +1417,7 @@ void SketchPlugin_Trim::fillObjectShapes(const ObjectPtr& theObject,
                          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theSketch);
     for (int i = 0; i < aSketchComposite->numberOfSubs(); i++) {
       FeaturePtr aFeature = aSketchComposite->subFeature(i);
-      if (aFeature.get())
+      if (aFeature.get() && aFeature->getKind() != SketchPlugin_Projection::ID())
         aFeatures.push_back(aFeature);
     }
     ModelGeomAlgo_Point2D::getPointsIntersectedShape(aFeature, aFeatures, aPointsInfo);
