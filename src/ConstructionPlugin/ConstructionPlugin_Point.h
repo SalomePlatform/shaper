@@ -223,7 +223,7 @@ private:
   /*std::shared_ptr<GeomAPI_Vertex> createByDistanceOnEdge();
   std::shared_ptr<GeomAPI_Vertex> createByProjection();
   std::shared_ptr<GeomAPI_Vertex> createByLinesIntersection();*/
-  std::shared_ptr<GeomAPI_Vertex> createByLineAndPlaneIntersection();
+  std::list<std::shared_ptr<GeomAPI_Vertex> > createByLineAndPlaneIntersection();
 
 };
 

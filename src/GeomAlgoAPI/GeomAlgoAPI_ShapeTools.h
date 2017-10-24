@@ -137,8 +137,9 @@ public:
   // Computes intersection point between the edge curve and a face surface (only one point, with
   // preferences to point that belongs to edge and face boundaries.
   /// \returns null if there is no intersection
-  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Vertex> intersect(
-    const std::shared_ptr<GeomAPI_Edge> theEdge, const std::shared_ptr<GeomAPI_Face> theFace);
+  GEOMALGOAPI_EXPORT static std::list<std::shared_ptr<GeomAPI_Vertex> > intersect(
+    const std::shared_ptr<GeomAPI_Edge> theEdge, const std::shared_ptr<GeomAPI_Face> theFace,
+    const bool thePointsOutsideFace);
 
   typedef std::map<std::shared_ptr<GeomAPI_Pnt>,
                    std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,

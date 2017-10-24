@@ -54,7 +54,7 @@
 #include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <GeomLib_IsPlanarSurface.hxx>
 #include <GeomLib_Tool.hxx>
-#include <GeomAPI_ExtremaCurveSurface.hxx>
+#include <GeomAPI_IntCS.hxx>
 #include <gp_Pln.hxx>
 #include <GProp_GProps.hxx>
 #include <IntAna_IntConicQuad.hxx>
@@ -750,11 +750,13 @@ bool GeomAlgoAPI_ShapeTools::isParallel(const std::shared_ptr<GeomAPI_Edge> theE
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_ShapeTools::intersect(
-  const std::shared_ptr<GeomAPI_Edge> theEdge, const std::shared_ptr<GeomAPI_Face> theFace)
+std::list<std::shared_ptr<GeomAPI_Vertex> > GeomAlgoAPI_ShapeTools::intersect(
+  const std::shared_ptr<GeomAPI_Edge> theEdge, const std::shared_ptr<GeomAPI_Face> theFace,
+  const bool thePointsOutsideFace)
 {
+  std::list<std::shared_ptr<GeomAPI_Vertex> > aResult;
   if(!theEdge.get() || !theFace.get()) {
-    return std::shared_ptr<GeomAPI_Vertex>();
+    return aResult;
   }
 
   TopoDS_Edge anEdge = TopoDS::Edge(theEdge->impl<TopoDS_Shape>());
@@ -764,33 +766,33 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_ShapeTools::intersect(
   TopoDS_Face aFace  = TopoDS::Face(theFace->impl<TopoDS_Shape>());
   Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace);
 
-  GeomAPI_ExtremaCurveSurface anExt(aCurve, aSurf);
-  // searching for the best point-intersection
-  int aMaxLevel = 0;
-  gp_Pnt aResult;
-  for(int anIntNum = 1; anIntNum <= anExt.NbExtrema(); anIntNum++) {
-    if (anExt.Distance(anIntNum) > Precision::Confusion())
-      continue;
-    Standard_Real aW, aU, aV;
-    anExt.Parameters(anIntNum, aW, aU, aV);
-    gp_Pnt2d aPointOfSurf(aU, aV);
-    // level of the intersection: if it is inside of edge and/or face the level is higher
-    int aIntLevel = aW > aFirstOnCurve && aW < aLastOnCurve ? 2 : 1;
-    BRepClass_FaceClassifier aFClass(aFace, aPointOfSurf, Precision::Confusion());
-    if (aFClass.State() == TopAbs_IN) // "in" is better than "on"
-      aIntLevel += 2;
-    else if (aFClass.State() == TopAbs_ON)
-      aIntLevel += 1;
-    if (aMaxLevel < aIntLevel) {
-      aMaxLevel = anIntNum;
-      anExt.Points(anIntNum, aResult, aResult);
+  GeomAPI_IntCS anIntAlgo(aCurve, aSurf);
+  if (!anIntAlgo.IsDone())
+    return aResult;
+  // searching for points-intersection
+  for(int anIntNum = 1; anIntNum <= anIntAlgo.NbPoints() + anIntAlgo.NbSegments(); anIntNum++) {
+    gp_Pnt anInt;
+    if (anIntNum <= anIntAlgo.NbPoints()) {
+      anInt = anIntAlgo.Point(anIntNum);
+    } else { // take the middle point on the segment of the intersection
+      Handle(Geom_Curve) anIntCurve = anIntAlgo.Segment(anIntNum - anIntAlgo.NbPoints());
+      anIntCurve->D0((anIntCurve->FirstParameter() + anIntCurve->LastParameter()) / 2., anInt);
     }
+    if (!thePointsOutsideFace) {
+      Standard_Real aW, aU, aV;
+      anExt.Parameters(anIntNum, aW, aU, aV);
+      gp_Pnt2d aPointOfSurf(aU, aV);
+      BRepClass_FaceClassifier aFClass(aFace, aPointOfSurf, Precision::Confusion());
+      if (aFClass.State() == TopAbs_OUT)
+        continue; // outside points are filtered out if not needed
+    }
+    gp_Pnt anIntPnt;
+    anExt.Points(anIntNum, anIntPnt, anIntPnt);
+
+    aResult.push_back(std::shared_ptr<GeomAPI_Vertex>(
+      new GeomAPI_Vertex(anInt.X(), anInt.Y(), anInt.Z())));
   }
-  if (aMaxLevel > 0) { // intersection found
-    return std::shared_ptr<GeomAPI_Vertex>(
-      new GeomAPI_Vertex(aResult.X(), aResult.Y(), aResult.Z()));
-  }
-  return std::shared_ptr<GeomAPI_Vertex>(); // no intersection found
+  return aResult;
 }
 
 //==================================================================================================

@@ -79,7 +79,7 @@ void ConstructionPlugin_Point::execute()
 {
   GeomShapePtr aShape;
 
-   // to support compatibility with old documents where aCreationMethod did not exist
+  // to support compatibility with old documents where aCreationMethod did not exist
   std::string aCreationMethod =
     string(CREATION_METHOD()).get() && !string(CREATION_METHOD())->value().empty() ?
     string(CREATION_METHOD())->value() : CREATION_METHOD_BY_XYZ();
@@ -92,7 +92,20 @@ void ConstructionPlugin_Point::execute()
   } else if(aCreationMethod == CREATION_METHOD_BY_LINES_INTERSECTION()) {
     aShape = createByLinesIntersection();
   }*/ else if(aCreationMethod == CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION()) {
-    aShape = createByLineAndPlaneIntersection();
+    // this may produce several points
+    std::list<std::shared_ptr<GeomAPI_Vertex> > aPoints = createByLineAndPlaneIntersection();
+    if (!aPoints.empty()) { // if no points found produce the standard error later
+      int anIndex = 0;
+      std::list<std::shared_ptr<GeomAPI_Vertex> >::iterator aPIter = aPoints.begin();
+      for(; aPIter != aPoints.end(); aPIter++, anIndex++) {
+        std::shared_ptr<ModelAPI_ResultConstruction> aConstr =
+          document()->createConstruction(data(), anIndex);
+        aConstr->setShape(*aPIter);
+        setResult(aConstr, anIndex);
+      }
+      removeResults(anIndex);
+      return;
+    }
   }
 
   if(!aShape.get()) {
@@ -100,6 +113,7 @@ void ConstructionPlugin_Point::execute()
     return;
   }
 
+  removeResults(1); // for case the point type was switched from multi-results type
   std::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
   aConstr->setShape(aShape);
   setResult(aConstr);
@@ -191,7 +205,8 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByLinesIntersect
 */
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByLineAndPlaneIntersection()
+std::list<std::shared_ptr<GeomAPI_Vertex> >
+  ConstructionPlugin_Point::createByLineAndPlaneIntersection()
 {
   // Get line.
   AttributeSelectionPtr aLineSelection = selection(INTERSECTION_LINE());
@@ -218,5 +233,6 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByLineAndPlaneIn
     }
   }
 
-  return GeomAlgoAPI_ShapeTools::intersect(anEdge, aFace);
+  return GeomAlgoAPI_ShapeTools::intersect(anEdge, aFace,
+    aPlaneSelection->context()->groupName() == ModelAPI_ResultConstruction::group());
 }
