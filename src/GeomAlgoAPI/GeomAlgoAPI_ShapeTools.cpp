@@ -778,17 +778,6 @@ std::list<std::shared_ptr<GeomAPI_Vertex> > GeomAlgoAPI_ShapeTools::intersect(
       Handle(Geom_Curve) anIntCurve = anIntAlgo.Segment(anIntNum - anIntAlgo.NbPoints());
       anIntCurve->D0((anIntCurve->FirstParameter() + anIntCurve->LastParameter()) / 2., anInt);
     }
-    if (!thePointsOutsideFace) {
-      Standard_Real aW, aU, aV;
-      anExt.Parameters(anIntNum, aW, aU, aV);
-      gp_Pnt2d aPointOfSurf(aU, aV);
-      BRepClass_FaceClassifier aFClass(aFace, aPointOfSurf, Precision::Confusion());
-      if (aFClass.State() == TopAbs_OUT)
-        continue; // outside points are filtered out if not needed
-    }
-    gp_Pnt anIntPnt;
-    anExt.Points(anIntNum, anIntPnt, anIntPnt);
-
     aResult.push_back(std::shared_ptr<GeomAPI_Vertex>(
       new GeomAPI_Vertex(anInt.X(), anInt.Y(), anInt.Z())));
   }
