@@ -28,7 +28,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
 
-#include <iostream>
+#include <FeaturesPlugin_Tools.h>
 
 //=================================================================================================
 FeaturesPlugin_Scale::FeaturesPlugin_Scale()
@@ -251,9 +251,8 @@ void FeaturesPlugin_Scale::loadNamingDS(GeomAlgoAPI_Scale& theScaleAlgo,
 
   // Name the faces
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theScaleAlgo.mapOfSubShapes();
-  int aReflectedTag = 1;
-  std::string aReflectedName = "Scaled";
-  theResultBody->loadAndOrientModifiedShapes(&theScaleAlgo,
-                                              theBaseShape, GeomAPI_Shape::FACE,
-                                              aReflectedTag, aReflectedName, *aSubShapes.get());
+  std::string aScaledName = "Scaled";
+  FeaturesPlugin_Tools::storeModifiedShapes(theScaleAlgo, theResultBody,
+                                            theBaseShape, 1, 2, 3, aScaledName,
+                                            *aSubShapes.get());
 }

@@ -21,6 +21,7 @@
 #include <FeaturesPlugin_Symmetry.h>
 
 #include <GeomAlgoAPI_PointBuilder.h>
+#include <GeomAlgoAPI_FaceBuilder.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Face.h>
@@ -33,8 +34,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
 
-#include <iostream>
-#include <GeomAlgoAPI_FaceBuilder.h>
+#include <FeaturesPlugin_Tools.h>
 
 //=================================================================================================
 FeaturesPlugin_Symmetry::FeaturesPlugin_Symmetry()
@@ -369,9 +369,8 @@ void FeaturesPlugin_Symmetry::loadNamingDS(GeomAlgoAPI_Symmetry& theSymmetryAlgo
 
   // Name the faces
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theSymmetryAlgo.mapOfSubShapes();
-  int aReflectedTag = 1;
   std::string aReflectedName = "Symmetried";
-  theResultBody->loadAndOrientModifiedShapes(&theSymmetryAlgo,
-                                              theBaseShape, GeomAPI_Shape::FACE,
-                                              aReflectedTag, aReflectedName, *aSubShapes.get());
+  FeaturesPlugin_Tools::storeModifiedShapes(theSymmetryAlgo, theResultBody,
+                                            theBaseShape, 1, 2, 3, aReflectedName,
+                                            *aSubShapes.get());
 }
