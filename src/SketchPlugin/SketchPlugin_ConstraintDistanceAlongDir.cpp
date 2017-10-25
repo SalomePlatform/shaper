@@ -36,6 +36,8 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <cmath>
+
 const double tolerance = 1e-7;
 
 
