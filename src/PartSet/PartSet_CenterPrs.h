@@ -32,6 +32,7 @@
 #include <AIS_Point.hxx>
 #include <Standard_DefineHandle.hxx>
 #include <gp_Pnt.hxx>
+#include <Geom_Point.hxx>
 
 DEFINE_STANDARD_HANDLE(PartSet_CenterPrs, AIS_Point)
 
@@ -61,9 +62,16 @@ public:
   /// Returns type of the center
   ModelAPI_AttributeSelection::CenterType centerType() const { return myCenterType; }
 
+  virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& PM, const SelectMgr_SequenceOfOwner& Seq);
+  virtual void HilightOwnerWithColor (const Handle(PrsMgr_PresentationManager3d)&,
+                                      const Handle(Graphic3d_HighlightStyle)&,
+                                      const Handle(SelectMgr_EntityOwner)&);
+
   DEFINE_STANDARD_RTTIEXT(PartSet_CenterPrs, AIS_Point)
 
 private:
+  void drawPoint(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor);
+
   ObjectPtr myObject;
   GeomEdgePtr myEdge;
   ModelAPI_AttributeSelection::CenterType myCenterType;
