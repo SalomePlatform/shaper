@@ -62,7 +62,8 @@ public:
   /// Returns type of the center
   ModelAPI_AttributeSelection::CenterType centerType() const { return myCenterType; }
 
-  virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& PM, const SelectMgr_SequenceOfOwner& Seq);
+  virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& PM,
+                               const SelectMgr_SequenceOfOwner& Seq);
   virtual void HilightOwnerWithColor (const Handle(PrsMgr_PresentationManager3d)&,
                                       const Handle(Graphic3d_HighlightStyle)&,
                                       const Handle(SelectMgr_EntityOwner)&);
